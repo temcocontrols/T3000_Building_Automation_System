@@ -92,6 +92,9 @@ BOOL BacnetRange::OnInitDialog()
 	Timer2_handle();
 	SetTimer(1,1000,NULL);
 
+
+
+
 	if((bacnet_device_type == PM_T3PT12) || (m_device_type == PM_T3PT12))
 	{
 
@@ -99,7 +102,6 @@ BOOL BacnetRange::OnInitDialog()
 		GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("32.  PT100 -40 to 1800 Deg.F"));
 		GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("35.  PT1000 -40 to 450 Deg.C"));
 		GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("36.  PT1000 -40 to 800 Deg.F"));
-
 		//ÏÈ½ûÓÃËùÓÐµÄÑ¡Ïî;
 		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
 		{
@@ -142,6 +144,13 @@ BOOL BacnetRange::OnInitDialog()
 		((CButton *)GetDlgItem(IDC_RADIO61))->EnableWindow(1);
 		((CButton *)GetDlgItem(IDC_RADIO62))->EnableWindow(1);
 	}
+    else
+    {
+        GetDlgItem(IDC_RADIO55)->SetWindowTextW(_T("31.  Y3K -40 to 150 Deg.C"));//除了PT12 其他的默认 用3K的传感器
+        GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("32.  Y3K -40 to 300 Deg.F"));
+        GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("35.  G3K -40 to 120 Deg.C"));
+        GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("36.  G3K -40 to 250 Deg.F"));
+    }
 	return FALSE;
 	//return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -202,13 +211,19 @@ void BacnetRange::Initial_static()
 		
 		if(bac_ranges_type == VARIABLE_RANGE_ANALOG_TYPE)
 		{
-			if(bac_range_number_choose> 33)
+			if((bac_range_number_choose> 33) &&
+                (bac_range_number_choose != 101) && (bac_range_number_choose != 102) && (bac_range_number_choose != 103))
 				bac_range_number_choose = 1;
 			if(bac_range_number_choose == 0)
 			{
 				temp_cs.Format(_T("%d"),bac_range_number_choose);
 				GetDlgItem(IDC_RADIO35)->SetFocus();
 			}
+            else if ((bac_range_number_choose >= 101) && (bac_range_number_choose <= 103))
+            {
+                temp_cs.Format(_T("%d"), bac_range_number_choose);
+                GetDlgItem(IDC_RADIO_MSV_1)->SetFocus();
+            }
 			else
 			{
 				temp_cs.Format(_T("%d"),bac_range_number_choose + 30);
@@ -682,6 +697,28 @@ void BacnetRange::Initial_static()
 			GetDlgItem(IDC_RADIO69)->EnableWindow(TRUE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(FALSE);
 		}
+        
+        if ((Device_Basic_Setting.reg.special_flag & 0x01) == 0x01)
+        {
+            GetDlgItem(IDC_RADIO63)->EnableWindow(true);   //使能PT1K Sensor 的 按钮
+            GetDlgItem(IDC_RADIO64)->EnableWindow(true);
+        }
+        else
+        {
+            GetDlgItem(IDC_RADIO63)->EnableWindow(FALSE);  //禁用PT1K Sensor 的 按钮
+            GetDlgItem(IDC_RADIO64)->EnableWindow(FALSE);
+        }
+
+        if ((Device_Basic_Setting.reg.special_flag & 0x02) == 0x02) //目前T3 系列 不支持PT100，待支持时 在启用此位;
+        {
+            //GetDlgItem(IDC_RADIO55)->EnableWindow(true);  //使能PT100 Sensor 的 按钮
+            //GetDlgItem(IDC_RADIO56)->EnableWindow(true);
+        }
+        else
+        {
+            //GetDlgItem(IDC_RADIO55)->EnableWindow(FALSE);  //禁用PT100 Sensor 的 按钮
+            //GetDlgItem(IDC_RADIO56)->EnableWindow(FALSE);
+        }
 
 		GetDlgItem(IDC_RADIO54)->ShowWindow(false);
 
@@ -2177,12 +2214,12 @@ void BacnetRange::ShowAnalogCusRange()
         (m_input_Analog_select == 23) ||
         (m_input_Analog_select == 24))
     {
+        int temp_value = 0;
+        temp_value = m_input_Analog_select - 20;
+        analog_range_tbl_line = temp_value;
         if ((g_protocol == MODBUS_BACNET_MSTP) ||
             (g_protocol == PROTOCOL_BACNET_IP))// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
         {
-            int temp_value = 0;
-            temp_value = m_input_Analog_select - 20;
-            analog_range_tbl_line = temp_value;
             GetPrivateData_Blocking(g_bac_instance, READANALOG_CUS_TABLE_T3000, temp_value, temp_value, sizeof(Str_table_point));
         }
         CBacnetAnalogCusRang AnalogCusRangdlg;

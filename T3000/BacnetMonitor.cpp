@@ -1198,7 +1198,7 @@ void CBacnetMonitor::OnNMKillfocusDatetimepickerMonitor(NMHDR *pNMHDR, LRESULT *
 	}
 
 }
-
+#include "MainFrm.h"
 void CBacnetMonitor::Check_New_DB()
 {
 	CTime tm;
@@ -1209,9 +1209,11 @@ void CBacnetMonitor::Check_New_DB()
 	//temp_cs_week.Format(_T("%u"),(month_of_day  /7) + 1);
 	CString cs_serial_number;
 	cs_serial_number.Format(_T("\\%u"),g_selected_serialnumber);
-
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	CString temp_folder;
-	temp_folder= g_achive_folder_temp_db + cs_serial_number;
+    temp_folder = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\MonitorDatabaseFolder");
+
+	//temp_folder= g_achive_folder_temp_db + cs_serial_number;
 	int ret = FALSE;
 	WIN32_FIND_DATA fd;
 	HANDLE hFind_folder;

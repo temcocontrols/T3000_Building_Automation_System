@@ -120,9 +120,11 @@ int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_
 
 int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint32_t ntotal_seg, uint32_t nseg_index,MonitorUpdateData* up_data);
 int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance);
+int WritePrivateData_Blocking(uint32_t deviceid, unsigned char n_command, unsigned char start_instance, unsigned char end_instance, uint8_t retrytime = 5);
+int Write_Private_Data_Blocking(uint8_t ncommand, uint8_t nstart_index, uint8_t nstop_index, unsigned int write_object_list = 0);
 int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
 int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
-int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t nstop_index,unsigned int write_object_list = 0);
+
 int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag);
 bool Check_Label_Exsit(LPCTSTR m_new_label);
 bool Check_FullLabel_Exsit(LPCTSTR m_new_fulllabel);
@@ -131,6 +133,15 @@ void local_handler_conf_private_trans_ack(
 	uint16_t service_len,
 	BACNET_ADDRESS * src,
 	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
+
+void local_handler_read_property_multiple_ack(
+    uint8_t * service_request,
+    uint16_t service_len,
+    BACNET_ADDRESS * src,
+    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
+
+int Bacnet_Read_Property_Multiple();
+
 int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
 int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime = 3);
 int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE * object_value, uint8_t priority = 16);
@@ -158,7 +169,9 @@ CString GetProductName(int ModelID);
 void Inial_Product_map();
 void Inial_Product_Reglist_map();
 void Inial_Product_Menu_map();
+void Inial_Product_Input_map();
 int Get_Product_Menu_Map(unsigned char product_tpye, int menu_item);
+int Get_Product_Input_Map(unsigned char product_tpye, int input_item);
 CString Get_Table_Name(int SerialNo,CString Type ,int Row);
 void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName); 
 int Get_Unit_Process(CString Unit);
@@ -173,17 +186,15 @@ BOOL Ping(const CString& strIP, CWnd* pWndEcho);
 void Send_WhoIs_remote_ip(CString ipaddress);
 void ClearBacnetData(); //用来初始化bacnet 内存;
 void SaveBacnetBinaryFile(CString &SaveConfigFilePath);
-void SaveBacnetConfigFile(CString &SaveConfigFilePath);
-void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath);
+
 int SaveModbusConfigFile(CString &SaveConfigFilePath);
 void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigned int bufferlength);
 int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path);
-int LoadBacnetBinaryFile_Cache(LPCTSTR tem_read_path);
 int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path);
 
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path);
 //For MINIPanel ARM
-int LoadMiniModbusConfigFile_MINIARM(LPCTSTR tem_read_path);
+
 void Copy_Data_From_485_to_Bacnet(unsigned short *start_point);
 int handle_read_monitordata_ex(char *npoint,int nlength);
 int handle_read_pic_data_ex(char *npoint,int nlength);
@@ -195,7 +206,7 @@ BOOL DeleteDirectory(CString path);
 int GetHostAdaptersInfo(CString &IP_address_local);
 DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirectory, 	DWORD dwMilliseconds);
 CString GetContentFromURL(CString URL);
-CString GetProductFirmwareTimeFromTemcoWebsite(CString URL,CString HexOrBinName,CString &FileSize);
+
 BOOL KillProcessFromName(CString strProcessName) ;
 BOOL CheckTheSameSubnet(CString strIP ,CString strIP2);
 
@@ -238,30 +249,9 @@ BOOL BinFileValidation(const CString& strFileName);
 BOOL AllCharactorIsDigital(LPCTSTR lpszSrc);
 
 
-bool Input_data_to_string(unsigned char  temp_input_index,
-    CString &temp_in_main_panel,
-    CString &temp_in_des,
-    CString &temp_in_auto_manual,
-    CString &temp_in_value,
-    CString &temp_in_units,
-    CString &temp_in_range,
-    CString &temp_in_cal,
-    CString &temp_cacl_sign,
-    CString &temp_in_filter,
-    CString &temp_in_decon,
-    CString &temp_in_jumper,
-    CString &temp_in_label);
+
 bool Save_InputData_to_db(unsigned char  temp_input_index);
-bool Output_data_to_string(unsigned char  temp_output_index,
-    CString &temp_out_panel,
-    CString &temp_out_des,
-    CString &temp_out_auto_manual,
-    CString &temp_out_value,
-    CString &temp_out_units,
-    CString &temp_out_range,
-    CString &temp_out_pwm_period,
-    CString &temp_out_decom,
-    CString &temp_out_label);
+
 bool Save_InputData_to_db(unsigned char  temp_input_index, unsigned int nserialnumber);
 bool Save_OutputData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber);
 bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nserialnumber);

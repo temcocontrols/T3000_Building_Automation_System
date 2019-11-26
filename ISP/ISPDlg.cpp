@@ -63,6 +63,7 @@ int g_Commu_type=0;
 UINT _PingThread(LPVOID pParam);
 unsigned int n_check_temco_firmware = 1;
 unsigned int Remote_timeout = 1000;
+unsigned int nflash_receive_to_send_delay_time = 10;
 CString Auto_flash_SN_connect_IP;
 DWORD WINAPI GetFWFileProc(LPVOID lPvoid);
 #define		WM_CLOSE_THREAD_MESSAGE				WM_USER + 2018
@@ -351,7 +352,7 @@ BOOL CISPDlg::OnInitDialog()
 
 
     g_strExePath=GetExePath(true);
-    m_strLogoFileName=g_strExePath + c_strLogoFileName;
+    m_strLogoFileName=g_strExePath + _T("ResourceFile\\") + c_strLogoFileName;
     SettingPath = g_strExePath + _T("\\Setting.ini");
 
     //从文件中读取配置参数
@@ -384,6 +385,8 @@ BOOL CISPDlg::OnInitDialog()
     if(Remote_timeout < 50)
         Remote_timeout = 1000;
 
+    nflash_receive_to_send_delay_time = GetPrivateProfileInt(_T("Setting"), _T("ResponseTime"), 10, SettingPath);
+
     m_enable_sn_mac = GetPrivateProfileInt(_T("Setting"), _T("LocalTemcoSN"), 0, SettingPath);
     if (!m_enable_sn_mac)
     {
@@ -412,9 +415,6 @@ BOOL CISPDlg::OnInitDialog()
             //MessageBox(_T("ISP Tool will exit soon."));
             auto_flash_mode = false;
             DeleteFile(AutoFlashConfigPath);
-            // PostMessage(WM_CLOSE,NULL,NULL);
-            // return TRUE;
-            //删除文件并退出;
         }
         else
         {
@@ -435,7 +435,7 @@ BOOL CISPDlg::OnInitDialog()
 
             GetPrivateProfileStringW(_T("Data"),_T("IPAddress"),_T("192.168.0.3"),ip.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
             ip.ReleaseBuffer();
-            GetPrivateProfileStringW(_T("Data"),_T("IPPort"),_T("6001"),ipport.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+            GetPrivateProfileStringW(_T("Data"),_T("IPPort"),_T("502"),ipport.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
             ipport.ReleaseBuffer();
             GetPrivateProfileStringW(_T("Data"),_T("Subnote"),_T("0"),subnote.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
             subnote.ReleaseBuffer();
@@ -443,18 +443,8 @@ BOOL CISPDlg::OnInitDialog()
             subID.ReleaseBuffer();
             GetPrivateProfileStringW(_T("Data"),_T("FirmwarePath"),_T(""),filename.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
             filename.ReleaseBuffer();
-            //CFileFind nfind;
-            //if(!nfind.FindFile(filename))
-            //{
-            // DeleteFile(AutoFlashConfigPath);
-            // PostMessage(WM_CLOSE,NULL,NULL);
-            // return TRUE;
-            //}
         }
 
-        //  DeleteFile(AutoFlashConfigPath);
-        //get_file_thread_handle=CreateThread(NULL,NULL,GetFWFileProc,this,NULL,NULL);
-        //CloseHandle(get_file_thread_handle);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3462,6 +3452,10 @@ BOOL CAboutDlg::OnInitDialog()
     // TODO:  在此添加额外的初始化
     CString release_note;
     CString temp;
+    temp.Format(_T("Rev6.0.8  (2019-09-19)\r\n  1.Support CM5 arm version firmware update  .\r\n"));
+    release_note = release_note + temp;
+    temp.Format(_T("Rev6.0.7  (2019-07-29)\r\n  1.Support TSTAT9 Wifi firmware update  .\r\n"));
+    release_note = release_note + temp;
     temp.Format(_T("Rev6.0.5  (2019-04-22)\r\n  1.Support PM5E ARM .\r\n"));
     release_note = release_note + temp;
     temp.Format(_T("Rev6.0.4  (2019-03-18)\r\n  1.Support PM5E ARM .\r\n"));

@@ -36,6 +36,7 @@ public:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	bool window_max; // 标记是否已经最大化;
 	void Reset_Alarm_Rect();
+    afx_msg void OnBnClickedButtonEmailAlarm();
 };
 
 const int ALARMLOG_NUM = 0;

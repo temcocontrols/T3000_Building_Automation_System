@@ -67,7 +67,7 @@
 #define WM_USER_FRESHSTATUSBAR						10000
 #define WM_MYMSG_REFRESHBUILDING					80001
 
-
+#define WM_MAIN_MSG_SCAN_BAC                        10010
 //scan
 
 

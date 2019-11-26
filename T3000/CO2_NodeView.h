@@ -92,6 +92,10 @@ public:
     afx_msg void OnBnClickedRadioScroll20();
     afx_msg void OnBnClickedRadioScroll21();
     afx_msg void OnBnClickedRadioScroll22();
+    afx_msg void OnEnKillfocusEditNatureCo2();
+    afx_msg void OnEnKillfocusEditMaxMinAdjPerday();
+    afx_msg void OnEnKillfocusEditLookDays();
+    afx_msg void OnCbnSelchangeComboCo2AutoCal();
 };
 static DWORD WINAPI UpdateCO2_Note_Thread(LPVOID lPvoid);
 const int CO2_NODE_TYPE_NAME        = 0;
@@ -109,3 +113,7 @@ const int ROW_CO2 = 0;
 const int ROW_TEMPERATURE = 1;
 const int ROW_HUMIDITY = 2;
 
+const int CO2_MODBUS_CO2_BKCAL_ONOFF = 500;
+const int CO2_MODBUS_CO2_NATURE_LEVEL = 501;
+const int CO2_MODBUS_CO2_MIN_ADJ = 502;
+const int CO2_MODBUS_CO2_CAL_DAYS = 503;

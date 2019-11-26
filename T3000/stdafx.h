@@ -141,6 +141,7 @@ INPUT int CheckTstatOnline_nocretical(unsigned char  devLo, unsigned char devHi,
 
 INPUT int Read_One2(unsigned char  device_var,unsigned short  address, bool bComm_Type);
 INPUT int Write_One2(unsigned char  device_var,unsigned short  address,unsigned short  value, bool bComm_Type);
+INPUT int Write_One2_nocretical(unsigned char device_var, unsigned short  address, unsigned short  val, bool bComm_Type, int ncomport);
 INPUT int read_multi2(unsigned char device_var,unsigned short  *put_data_into_here,unsigned short  start_address,int length, bool bComm_Type);
 INPUT int read_multi2_nocretical(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length, bool bComm_Type,int ncomport);
 INPUT void close_T3000_log_file();//scan
@@ -307,3 +308,6 @@ typedef struct _MessageInvokeIDInfo
 //#include "Bacnet_Include.h"
 //#define _DEBUG
 //*********************************link to dll***************************
+
+
+#define USE_THIRD_PARTY_FUNC 0

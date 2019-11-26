@@ -1,0 +1,11 @@
+https://sourceforge.net/projects/mstreeview
+
+Common Public License 1.0
+
+Copyright 2004, Coder's Lab
+All rights reserved. The software and associated documentation 
+supplied hereunder are the proprietary information of Coder's Lab
+and are supplied subject to licence terms.
+  
+Email: ludwig.stuyck@coders-lab.be
+Home page: http://www.coders-lab.be

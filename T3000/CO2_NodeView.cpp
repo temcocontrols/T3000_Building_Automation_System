@@ -80,6 +80,10 @@ BEGIN_MESSAGE_MAP(CCO2_NodeView, CFormView)
     ON_BN_CLICKED(IDC_RADIO_SCROLL20, &CCO2_NodeView::OnBnClickedRadioScroll20)
     ON_BN_CLICKED(IDC_RADIO_SCROLL21, &CCO2_NodeView::OnBnClickedRadioScroll21)
     ON_BN_CLICKED(IDC_RADIO_SCROLL22, &CCO2_NodeView::OnBnClickedRadioScroll22)
+    ON_EN_KILLFOCUS(IDC_EDIT_DLG_NATURE_CO2, &CCO2_NodeView::OnEnKillfocusEditNatureCo2)
+    ON_EN_KILLFOCUS(IDC_EDIT_DLG_MAX_MIN_ADJ_PERDAY, &CCO2_NodeView::OnEnKillfocusEditMaxMinAdjPerday)
+    ON_EN_KILLFOCUS(IDC_EDIT_DLG_LOOK_DAYS, &CCO2_NodeView::OnEnKillfocusEditLookDays)
+    ON_CBN_SELCHANGE(IDC_COMBO_DLG_CO2_AUTO_CAL, &CCO2_NodeView::OnCbnSelchangeComboCo2AutoCal)
 END_MESSAGE_MAP()
 
 
@@ -103,18 +107,19 @@ HANDLE h_co2_node_thread = NULL;
 // CCO2_NodeView 消息处理程序
 void CCO2_NodeView::Fresh()
 {
-    if(h_co2_node_thread == NULL)
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    pFrame->SetWindowTextW(_T("T3000 Building Automation System") + CurrentT3000Version);
+
+    if (h_co2_node_thread == NULL)
+    {
         h_co2_node_thread = CreateThread(NULL, NULL, UpdateCO2_Note_Thread, this, NULL, NULL);
+        CloseHandle(h_co2_node_thread);
+    }
     UpdateUI(NULL,NULL);
 }
 
 LRESULT CCO2_NodeView::UpdateUI(WPARAM wParam, LPARAM lParam)
 {
-    if (this->IsWindowVisible() == false)
-    {
-        TerminateThread(h_co2_node_thread, 0);
-        h_co2_node_thread = NULL;
-    }
     Fresh_CO2_Node_List(NULL, NULL);
     Update_Static_UI();
     return 1;
@@ -124,8 +129,8 @@ LRESULT CCO2_NodeView::UpdateUI(WPARAM wParam, LPARAM lParam)
 DWORD WINAPI UpdateCO2_Note_Thread(LPVOID lPvoid)
 {
     CCO2_NodeView * mparent = (CCO2_NodeView *)lPvoid;
-    while (1)
-    {
+    //while (mparent->IsWindowVisible())
+    //{
         for (int i = 0; i < 5; i++)
         {
             int itemp = 0;
@@ -133,13 +138,19 @@ DWORD WINAPI UpdateCO2_Note_Thread(LPVOID lPvoid)
         }
         PostMessage(mparent->m_hWnd, WM_CO2_NODE_THREAD_READ, NULL, NULL);
         Sleep(15000);
-    }
+    //}
 
 
     h_co2_node_thread = NULL;
     return 1;
 }
 
+
+const CString CO2_Node_Auto_Cal[] =
+{
+    _T("Enable"),
+    _T("Disable")
+};
 
 
 const CString CO2_Node_Baudrate_Array[] =
@@ -148,7 +159,8 @@ const CString CO2_Node_Baudrate_Array[] =
     _T("19200"), //6
     _T("38400"),
     _T("57600"),
-    _T("115200")	//9
+    _T("115200"),	//9
+    _T("76800")
 };
 
 const CString CO2_Node_Protocol[] =
@@ -196,6 +208,13 @@ void CCO2_NodeView::Initial_List()
         ((CComboBox *)GetDlgItem(IDC_COMBO_CO2_NODE_BAUDRATE))->AddString(CO2_Node_Baudrate_Array[i]);
     }
    
+    ((CComboBox *)GetDlgItem(IDC_COMBO_DLG_CO2_AUTO_CAL))->ResetContent();
+    for (int i = 0; i < (sizeof(CO2_Node_Auto_Cal) / sizeof(CO2_Node_Auto_Cal[0])); i++)
+    {
+        ((CComboBox *)GetDlgItem(IDC_COMBO_DLG_CO2_AUTO_CAL))->AddString(CO2_Node_Auto_Cal[i]);
+    }
+    
+
     ((CComboBox *)GetDlgItem(IDC_COMBO_CO2_NODE_PROTOCOL))->ResetContent();
     for (int i = 0; i < (sizeof(CO2_Node_Protocol) / sizeof(CO2_Node_Protocol[0])); i++)
     {
@@ -390,6 +409,36 @@ void CCO2_NodeView::Update_Static_UI()
     CString cs_modbusid;
     cs_modbusid.Format(_T("%d"), product_register_value[6]);
     GetDlgItem(IDC_EDIT_CO2_NODE_MODBUS_ID)->SetWindowText(cs_modbusid);
+
+    CString cs_temp;
+    cs_temp.Format(_T("%d"), product_register_value[CO2_MODBUS_CO2_NATURE_LEVEL]);
+    GetDlgItem(IDC_EDIT_DLG_NATURE_CO2)->SetWindowText(cs_temp);
+
+    cs_temp.Format(_T("%d"), product_register_value[CO2_MODBUS_CO2_MIN_ADJ]);
+    GetDlgItem(IDC_EDIT_DLG_MAX_MIN_ADJ_PERDAY)->SetWindowText(cs_temp);
+
+    cs_temp.Format(_T("%d"), product_register_value[CO2_MODBUS_CO2_CAL_DAYS]);
+    GetDlgItem(IDC_EDIT_DLG_LOOK_DAYS)->SetWindowText(cs_temp);
+
+
+    if (product_register_value[CO2_MODBUS_CO2_BKCAL_ONOFF] <= (sizeof(CO2_Node_Auto_Cal) / sizeof(CO2_Node_Auto_Cal[0])))
+        cs_temp = CO2_Node_Auto_Cal[product_register_value[CO2_MODBUS_CO2_BKCAL_ONOFF]];
+    else
+        cs_temp.Empty();
+    ((CComboBox *)GetDlgItem(IDC_COMBO_DLG_CO2_AUTO_CAL))->SetWindowTextW(cs_temp);
+
+    if (product_register_value[CO2_MODBUS_CO2_BKCAL_ONOFF] == 1)
+    {
+        GetDlgItem(IDC_EDIT_DLG_NATURE_CO2)->EnableWindow(false);
+        GetDlgItem(IDC_EDIT_DLG_MAX_MIN_ADJ_PERDAY)->EnableWindow(false);
+        GetDlgItem(IDC_EDIT_DLG_LOOK_DAYS)->EnableWindow(false);
+    }
+    else
+    {
+        GetDlgItem(IDC_EDIT_DLG_NATURE_CO2)->EnableWindow(true);
+        GetDlgItem(IDC_EDIT_DLG_MAX_MIN_ADJ_PERDAY)->EnableWindow(true);
+        GetDlgItem(IDC_EDIT_DLG_LOOK_DAYS)->EnableWindow(true);
+    }
 
     CString temp_baudrate;
     if(product_register_value[15] <= (sizeof(CO2_Node_Baudrate_Array) / sizeof(CO2_Node_Baudrate_Array[0])))
@@ -836,14 +885,37 @@ void CCO2_NodeView::OnCbnSelchangeComboCo2NodeBaudrate()
     }
 
     int nret = write_one(g_tstat_id, 15, temp_baudrate);
+    Sleep(1000);
+    unsigned short temp_array[200];
+    Read_Multi(g_tstat_id, temp_array, 0, 100);  //Bug , CO2Node 一定要在用以前的读一下，新的baudrate 才能用
     if (nret <= 0)
     {
+        MessageBox(_T("Change baudrate failed!"));
         SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change baudrate failed!"));
         PostMessage(WM_CO2_NODE_THREAD_READ, NULL, NULL);
     }
     else
     {
         SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Operation Done!"));
+
+        int temp_brandrate = 19200;
+        temp_brandrate = _wtoi(CO2_Node_Baudrate_Array[temp_baudrate]);
+        CString SqlText;
+
+        SqlText.Format(_T("update ALL_NODE set Bautrate = '%d' where Serial_ID='%d'"), temp_brandrate, get_serialnumber());
+        Change_BaudRate(temp_brandrate);
+
+
+        CppSQLite3DB SqliteDBBuilding;
+        CppSQLite3Table table;
+        CppSQLite3Query q;
+        SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+        SqliteDBBuilding.execDML((UTF8MBSTR)SqlText);
+        SqliteDBBuilding.closedb();
+        CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+        pFrame->ScanTstatInDB();
+
     }
     ((CButton *)GetDlgItem(IDC_BUTTON_OK))->SetFocus();
 }
@@ -1507,4 +1579,121 @@ void CCO2_NodeView::OnBnClickedRadioScroll22()
 {
     // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
+}
+
+
+void CCO2_NodeView::OnEnKillfocusEditNatureCo2()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_cstring;
+    GetDlgItem(IDC_EDIT_DLG_NATURE_CO2)->GetWindowTextW(temp_cstring);
+    int temp_int;
+    temp_int = _wtoi(temp_cstring);
+    if ((temp_int < 390) || (temp_int > 500))
+    {
+        MessageBox(_T("Nature's CO2 ppm should be in this range (390 - 500)"));
+        return;
+    }
+
+    int nret = write_one(g_tstat_id, CO2_MODBUS_CO2_NATURE_LEVEL, temp_int);
+    if (nret <= 0)
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change Nature Co2 Value (ppm) failed!"));
+        PostMessage(WM_CO2_NODE_THREAD_READ, NULL, NULL);
+    }
+    else
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Operation Done!"));
+    }
+    ((CButton *)GetDlgItem(IDC_BUTTON_OK))->SetFocus();
+}
+
+
+void CCO2_NodeView::OnEnKillfocusEditMaxMinAdjPerday()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_cstring;
+    GetDlgItem(IDC_EDIT_DLG_MAX_MIN_ADJ_PERDAY)->GetWindowTextW(temp_cstring);
+    int temp_int;
+    temp_int = _wtoi(temp_cstring);
+    if ((temp_int < 1) || (temp_int > 10))
+    {
+        MessageBox(_T("Maximum adjustment per day should be in this range (1 - 10)"));
+        return;
+    }
+
+    int nret = write_one(g_tstat_id, CO2_MODBUS_CO2_MIN_ADJ, temp_int);
+    if (nret <= 0)
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change Nature Co2 Value (ppm) failed!"));
+        PostMessage(WM_CO2_NODE_THREAD_READ, NULL, NULL);
+    }
+    else
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Operation Done!"));
+    }
+    ((CButton *)GetDlgItem(IDC_BUTTON_OK))->SetFocus();
+}
+
+
+void CCO2_NodeView::OnEnKillfocusEditLookDays()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_cstring;
+    GetDlgItem(IDC_EDIT_DLG_LOOK_DAYS)->GetWindowTextW(temp_cstring);
+    int temp_int;
+    temp_int = _wtoi(temp_cstring);
+    if ((temp_int < 7) || (temp_int > 30))
+    {
+        MessageBox(_T("Maximum adjustment per day should be in this range (7 - 30)"));
+        return;
+    }
+
+    int nret = write_one(g_tstat_id, CO2_MODBUS_CO2_CAL_DAYS, temp_int);
+    if (nret <= 0)
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change Nature Co2 Value (ppm) failed!"));
+        PostMessage(WM_CO2_NODE_THREAD_READ, NULL, NULL);
+    }
+    else
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Operation Done!"));
+    }
+    ((CButton *)GetDlgItem(IDC_BUTTON_OK))->SetFocus();
+}
+
+
+void CCO2_NodeView::OnCbnSelchangeComboCo2AutoCal()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+
+
+
+    CString temp_cs;
+    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_DLG_CO2_AUTO_CAL))->GetCurSel();
+    ((CComboBox *)GetDlgItem(IDC_COMBO_DLG_CO2_AUTO_CAL))->GetLBText(nSel, temp_cs);
+
+    int temp_value = product_register_value[CO2_MODBUS_CO2_CAL_DAYS];
+    for (int i = 0;i<sizeof(CO2_Node_Auto_Cal) / sizeof(CO2_Node_Auto_Cal[0]);i++)
+    {
+        if (temp_cs.CompareNoCase(CO2_Node_Auto_Cal[i]) == 0)
+        {
+            temp_value = i;
+            break;
+        }
+    }
+
+    int nret = write_one(g_tstat_id, CO2_MODBUS_CO2_CAL_DAYS, temp_value);
+    if (nret <= 0)
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change status failed!"));
+        PostMessage(WM_CO2_NODE_THREAD_READ, NULL, NULL);
+    }
+    else
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Operation Done!"));
+    }
+
+    ((CButton *)GetDlgItem(IDC_BUTTON_OK))->SetFocus();
 }

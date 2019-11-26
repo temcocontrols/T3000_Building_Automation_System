@@ -42,6 +42,7 @@ ON_WM_HELPINFO()
 
 ON_WM_SIZE()
 ON_WM_SYSCOMMAND()
+ON_BN_CLICKED(IDC_BUTTON_EMAIL_ALARM, &CBacnetAlarmLog::OnBnClickedButtonEmailAlarm)
 END_MESSAGE_MAP()
 
 
@@ -498,7 +499,7 @@ void CBacnetAlarmLog::OnSize(UINT nType, int cx, int cy)
 		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
 		//m_program_list.MoveWindow(&rc);
 		m_alarmlog_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
-
+        GetDlgItem(IDC_BUTTON_EMAIL_ALARM)->MoveWindow(rc.left + 80, rc.bottom - 60, 120, 50);
 		//GetDlgItem(IDC_BUTTON_PROGRAM_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
 	}
 	
@@ -527,4 +528,17 @@ void CBacnetAlarmLog::OnSysCommand(UINT nID, LPARAM lParam)
 		return;
 	}
 	CDialogEx::OnSysCommand(nID, lParam);
+}
+
+#include "BacnetEmailAlarm.h"
+void CBacnetAlarmLog::OnBnClickedButtonEmailAlarm()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (GetPrivateData_Blocking(g_bac_instance, READ_EMAIL_ALARM, 0, 0, sizeof(Str_Email_point)) < 0)
+    {
+        MessageBox(_T("Read data timeout"));
+        return;
+    }
+    CBacnetEmailAlarm Dlg;
+    Dlg.DoModal();
 }

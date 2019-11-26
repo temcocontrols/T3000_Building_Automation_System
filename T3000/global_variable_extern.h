@@ -40,7 +40,7 @@ extern int old_product_type;
 extern HWND      m_building_config_hwnd;
 extern bool g_fresh_T3000_background;
 extern unsigned short multi_register_value_tcp[10000];
-extern	unsigned short multi_register_value[1024];
+extern	unsigned short multi_register_value[4096];
 extern unsigned short cm5_register_value[512]; //CM5
 extern unsigned short m_buffer[512];//CM5
 extern unsigned short reg_tstat6[1024];//tstat6_new
@@ -57,7 +57,7 @@ extern int  MDAY,MNIGHT;
 
 extern int nCom;
 extern	CString program_path;
-extern	int g_tstat_id;
+extern	volatile int g_tstat_id;
 extern  int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。
 extern unsigned int g_serialNum;
 extern	BOOL g_tstat_id_changed;
@@ -1040,6 +1040,7 @@ extern vector <Client_Info> m_tcp_connect_info;
 extern vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
 extern vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
 extern Str_Setting_Info Device_Basic_Setting;
+extern Str_Email_point  Device_Email_Point;
 extern Str_MISC Device_Misc_Data;
 extern Str_Special Device_Special_Data;
 extern char m_at_write_buf[100];
@@ -1260,6 +1261,7 @@ extern bool offline_mode ; //全局离线模式判断;
 extern CString offline_prg_path;   //离线模式得prg 保存路径;
 extern bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
 extern bool custom_bacnet_register_listview;
+extern bool n_wifi_connection;  //后台列表 刷新开关
 extern bool initial_bip ;
 extern Str_modbus_reg bacnet_to_modbus_struct; //用于bacnet 协议转换为modbus 协议的结构
 extern vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;

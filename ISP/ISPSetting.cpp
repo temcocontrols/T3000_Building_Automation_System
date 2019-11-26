@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 extern bool auto_flash_mode;
 extern unsigned int Remote_timeout;
+extern unsigned int nflash_receive_to_send_delay_time;
 extern CString SettingPath;
 // CISPSetting dialog
 
@@ -52,12 +53,19 @@ void CISPSetting::OnBnClickedButtonSettingOk()
 	}
 	else
 	{
-
 		WritePrivateProfileStringW(_T("Setting"),_T("REMOTE_TIMEOUT"),temptimeout,SettingPath);
 		Remote_timeout = temp_value;
 		PostMessage(WM_CLOSE,NULL,NULL);
-
 	}
+
+    CString tempresponse;
+    GetDlgItemText(IDC_EDIT_SETTING_RESPONSE_TIME, tempresponse);
+    temp_value = _wtoi(tempresponse);
+
+    WritePrivateProfileStringW(_T("Setting"), _T("ResponseTime"), tempresponse, SettingPath);
+    nflash_receive_to_send_delay_time = temp_value;
+    PostMessage(WM_CLOSE, NULL, NULL);
+
 }
 
 
@@ -90,6 +98,10 @@ BOOL CISPSetting::OnInitDialog()
 	temp_timeout.Format(_T("%d"),Remote_timeout);
 	SetDlgItemText(IDC_EDIT_SETTING_TIMEOUT,temp_timeout);
 	// TODO:  Add extra initialization here
+
+    CString temp_response;
+    temp_response.Format(_T("%u"), nflash_receive_to_send_delay_time);
+    SetDlgItemText(IDC_EDIT_SETTING_RESPONSE_TIME, temp_response);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE

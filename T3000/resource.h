@@ -318,6 +318,12 @@
 #define IDR_MENU_CONTROL_BASIC          733
 #define IDD_DIALOG_BACNET_RANGE_MSV     734
 #define IDD_DIALOG_TSTAT_AQ             736
+#define IDD_DIALOG_BACNET_EMAIL_ALARM   739
+#define IDD_DIALOG_BACNET_SETTING_BASIC 741
+#define IDD_DIALOG_BACNET_SETTING_TCPIP 743
+#define IDD_DIALOG_BACNET_SETTING_TIME  745
+#define IDD_DIALOG_BACNET_SETTING_DYNDNS 747
+#define IDD_DIALOG_BACNET_THIRD_PARTY_MAIN 753
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -445,17 +451,20 @@
 #define IDC_COMBO_AM                    1042
 #define IDC_COMBO_DATAFORMAT            1042
 #define IDC_COMBO_REV                   1042
+#define IDC_COMBO_STOP_BIT              1042
 #define IDC_EDIT9                       1043
 #define IDC_TIMELEFT_EDIT               1043
 #define IDC_DEF_SETPOINT_EDT            1043
 #define IDC_LED3_COMBO                  1043
 #define IDC_IPMODEL_COMBO2              1043
 #define IDC_HUM2                        1043
+#define IDC_COMBO_STOP_BIT2             1043
 #define IDC_EDIT10                      1044
 #define IDC_PID1_EDIT                   1044
 #define IDC_SETPOINTCTLEDIT             1044
 #define IDC_LED4_COMBO                  1044
 #define IDC_TIME2                       1044
+#define IDC_COMBO_STOP_BIT3             1044
 #define IDC_EDIT11                      1045
 #define IDC_PID2_EDIT                   1045
 #define IDC_TIMERONEDIT                 1045
@@ -560,6 +569,7 @@
 #define IDC_HUM9                        1071
 #define IDC_EDIT54                      1071
 #define IDC_EDIT_FREID                  1071
+#define IDC_EDIT_SECURE_CONNECTION      1071
 #define ID_VIEW_IOPANE_DLGBAR           1072
 #define IDC_NIGHTHEAT_EDIT2             1072
 #define IDC_EDIT_DAYHEAT                1072
@@ -2363,6 +2373,7 @@
 #define IDC_STATIC_CUS_MAX_V_LABLE2     2432
 #define IDC_EDIT_CO2_NODE_MODBUS_ID     2432
 #define IDC_COMBO_CO2_NODE_BAUDRATE     2433
+#define IDC_COMBO_DLG_CO2_AUTO_CAL      2434
 #define IDC_COMBO_CO2_NODE_TEMPERATURE_UNIT 2437
 #define IDC_EDIT_CO2_NODE_ROLL_TIME_INTERVAL 2438
 #define IDC_EDIT_CO2_NODE_BACKLIGHT_TIME 2439
@@ -2414,10 +2425,13 @@
 #define IDC_RADIO_SCROLL22              2465
 #define IDC_EDIT_REMOTEDLG_REMOTE_UDP_PORT 2465
 #define IDC_EDIT_REMOTEDLG_REMOTE_TCP_PORT 2466
+#define IDC_EDIT_DLG_NATURE_CO2         2466
 #define IDC_BUTTON_REMOTEDLG_SCAN       2467
 #define IDC_STATIC_ADD_REMOTE1          2468
+#define IDC_EDIT_DLG_MAX_MIN_ADJ_PERDAY 2468
 #define IDC_STATIC_ADD_REMOTE2          2469
 #define IDC_COMBO_REPEATER_BAUDRATE     2469
+#define IDC_EDIT_DLG_LOOK_DAYS          2469
 #define IDC_STATIC_ADD_REMOTE3          2470
 #define IDC_COMBO_REPEATER_MODE         2470
 #define IDC_STATIC_ADD_REMOTE4          2471
@@ -2444,6 +2458,7 @@
 #define IDC_STATIC_HUM_VALUE            2489
 #define IDC_STATIC_CO2_VALUE            2490
 #define IDC_STATIC_AQ_VALUE             2491
+#define IDC_STATIC_VOC_VALUE            2491
 #define IDC_STATIC_WEIGHT_PM1_0         2492
 #define IDC_STATIC_INDEX_PM1_0          2493
 #define IDC_STATIC_WEIGHT_PM2_5         2494
@@ -2454,8 +2469,36 @@
 #define IDC_STATIC_INDEX_PM10           2499
 #define IDC_STATIC_AQ_TEMPERATURE       2500
 #define IDC_STATIC_WEIGHT_TOTAL         2501
-#define IDC_STATIC_INDEX_PM11           2502
 #define IDC_STATIC_INDEX_TOTAL          2502
+#define IDC_STATIC_LIGHT_VALUE          2503
+#define IDC_STATIC_SOUND_VALUE          2504
+#define IDC_STATIC_SOUND                2505
+#define IDC_BUTTON_EMAIL_ALARM          2506
+#define IDC_EDIT_SMTP_SERVER            2507
+#define IDC_EDIT_PORT_NUMBER            2508
+#define IDC_EDIT_EMAIL                  2509
+#define IDC_EDIT_USERNAME               2510
+#define IDC_COMBO_SECURE_TYPE           2511
+#define IDC_TAB_SETTING                 2512
+#define IDC_BUTTON_WIFI_CONFIGURATION   2513
+#define IDC_STATIC_NET_WORK_TYPE        2514
+#define IDC_EDIT_CO2_ON_TIME            2515
+#define IDC_EDIT_CO2_OFF_TIME           2516
+#define IDC_RADIO_IP_STATIC             2516
+#define IDC_EDIT_PM_ON_TIME             2517
+#define IDC_RADIO_IP_STATIC2            2517
+#define IDC_RADIO_IP_AUTO               2517
+#define IDC_EDIT_DEVICE_RUNTIME         2517
+#define IDC_EDIT_PM_OFF_TIME            2518
+#define IDC_EDIT_WIFI_STATUS            2518
+#define IDC_STATIC_VOLTAGE_SELECT       2519
+#define IDC_EDIT_WIFI_MODBUS_PORT       2520
+#define IDC_EDIT_WIFI_MODBUS_PORT2      2521
+#define IDC_EDIT_WIFI_BACNET_PORT       2521
+#define IDC_COMBO_PARITY_BIT            2521
+#define IDC_COMBO_PARITY_BIT2           2522
+#define IDC_BUTTON_THIRD_OK             2522
+#define IDC_COMBO_PARITY_BIT3           2523
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2931,6 +2974,7 @@
 #define ID_SAVEFILE34073                34073
 #define ID_REFRESH34074                 34074
 #define ID_SETTINGS34075                34075
+#define ID_DATABASE_LOGDETAIL           34076
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -3004,9 +3048,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        738
-#define _APS_NEXT_COMMAND_VALUE         34076
-#define _APS_NEXT_CONTROL_VALUE         2501
+#define _APS_NEXT_RESOURCE_VALUE        755
+#define _APS_NEXT_COMMAND_VALUE         34077
+#define _APS_NEXT_CONTROL_VALUE         2523
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

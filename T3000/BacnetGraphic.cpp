@@ -280,7 +280,7 @@ void CBacnetGraphic::Initial_Scale_Time()
 BOOL CBacnetGraphic::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	srand(NULL);
+    srand(time(NULL));
 	Loading_Icon1 = (HICON)LoadImage(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON_LOADING_1),IMAGE_ICON,0,0,LR_LOADTRANSPARENT);  
 	Loading_Icon2 = (HICON)LoadImage(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON_LOADING_2),IMAGE_ICON,0,0,LR_LOADTRANSPARENT);  
 	Loading_Icon3 = (HICON)LoadImage(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON_LOADING_3),IMAGE_ICON,0,0,LR_LOADTRANSPARENT);  

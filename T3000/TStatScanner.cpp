@@ -343,6 +343,7 @@ BOOL CTStatScanner::ScanComDevice()//02
 
     SetCommunicationType(0);   //设置为串口通信方式
     close_com();
+
     if (m_szComs.size() >= 1)
     {
         hScanComData = new HANDLE[(int)m_szComs.size()];	//创建 对应个数的Handle;
@@ -351,10 +352,15 @@ BOOL CTStatScanner::ScanComDevice()//02
         memset(nScanThreadID, 0, m_szComs.size() * sizeof(DWORD));
         for (int i = 0;i<(int)m_szComs.size();i++)
         {
+//#ifdef _DEBUG
+//            if (i == 0)
+//                continue;
+//            if (i == 2)
+//                continue;
+//#endif
             this->scan_com_value = i;
             hScanComData[i] = CreateThread(NULL, NULL, ScanComThreadNoCritical, this /*&i*/, NULL, nScanThreadID+i);
-            Sleep(100); //这个是必须的,否则线程会乱;
-            //::CloseHandle(hScanComData[i]);
+            Sleep(500); //这个是必须的,否则线程会乱;
         }
     }
 
@@ -438,7 +444,7 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
 
                 if (sub_com == 1)
                 {
-                    if (m_T3BB_device_data.at(ncount).zigbee_exsit != 1)
+                    if (m_T3BB_device_data.at(ncount).hardware_info != 0x74)
                     {
                         break;
                     }
@@ -453,8 +459,8 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
                 }
 
 
-                reset_sub_port = write_one_multy_thread(255, 96, sub_com,3, nindex_value);
-                reset_sub_baudrate = write_one_multy_thread(255, 97, sub_baudrate,3, nindex_value);
+                reset_sub_port = write_one_multy_thread(255, 96, sub_com,10, nindex_value);
+                reset_sub_baudrate = write_one_multy_thread(255, 97, sub_baudrate,10, nindex_value);
                 if ((reset_sub_port > 0) && (reset_sub_baudrate > 0))
                     pScan->modbusip_to_modbus485(sub_com, m_device_baudrate, strIP, net_port, m_temp_parent_serialnum, list_count, 1, 254, nindex_value);
                 else
@@ -508,8 +514,6 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
     } while (hdetect_mstp_thread != NULL);
     //if (ncount == 0)
     //    Sleep(100000);
-
-
     UINT i = 0;
 
 
@@ -539,6 +543,10 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
             }
         }
 
+        BOOL  bret = open_com_nocretical(com_port);
+        Sleep(200);
+        close_com_nocritical(com_port);
+        Sleep(200);
 
         Test_Comport(com_port, temp_baudrate_ret);
         for (int j = 0; j < 20; j++)
@@ -651,23 +659,16 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
                     continue;
                 }
 
-
-
-
                 if (pScan->OpenCom(n))
                 {
-
-
                     pScan->SetComPort(n);
                     bool bRet = Change_BaudRate_NoCretical(m_scan_info.at(j).scan_baudrate, n);
                     CString strBaudrate;
                     strBaudrate.Format(_T("%d"), m_scan_info.at(j).scan_baudrate);
-                    pScan->SetBaudRate(strBaudrate);
+                    //pScan->SetBaudRate(strBaudrate);
                     scan_baudrate = m_scan_info.at(j).scan_baudrate;
 
-                    ASSERT(bRet);
-
-
+                    //ASSERT(bRet); // 需要注意 COM1 76800 无法正常打开
                     m_scan_info.at(scan_item).scan_status = SCAN_STATUS_RUNNING;
                     pScan->background_binarysearch(n, scan_item, m_scan_info.at(j).scan_baudrate);	//lsc comscan new cold
                     close_com_nocritical(n);
@@ -694,11 +695,13 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
         }
     }
 
-    g_ScnnedNum = 254;
+    //g_ScnnedNum = 254;
 
+    CloseHandle(hScanComData[ncount]);
     //清空 句柄和线程ID；
     hScanComData[ncount] = NULL;
     nScanThreadID[ncount] = NULL;
+
     return 0;
 }
 
@@ -1400,6 +1403,37 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
             m_szTstatScandRet.push_back(pInfo);
 
             unsigned int nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;//20120424
+            if ((nSerialNumber == 0) || (nSerialNumber == 255 * 255 * 255 * 255))
+            {
+                //如下代码是 修复TSTAT8的序列号为0 的问题，赋值序列号 200000-300000 之间;
+                Write_One2_nocretical(a, 16, 142, 0, nComPort);
+                Sleep(1000);
+                unsigned int temp_serialnumber = 0;
+                unsigned int temp_low_value = 0;
+                unsigned int temp_high_value = 0;
+                srand(time(NULL));
+                temp_serialnumber = rand() % (100000) +200000; //随机分配序列号;
+                temp_low_value = temp_serialnumber % 65536;
+                temp_high_value = temp_serialnumber / 65536;
+                int ret_1 = Write_One2_nocretical(a, 0, temp_low_value, 0, nComPort);
+                int ret_2 = Write_One2_nocretical(a, 2, temp_high_value, 0, nComPort);
+                Sleep(10);
+                if ((ret_1 >= 0) && (ret_2 >= 0))
+                    nSerialNumber = temp_serialnumber;
+
+                //如下代码是 修复TSTAT8的硬件版本为0 的问题，默认硬件版本 6
+                if ((SerialNum[8] == 0) || (SerialNum[8] == 255))
+                {
+                    if (SerialNum[7] == PM_TSTAT8)
+                    {
+                        int ret_3 = Write_One2_nocretical(a, 8, 6, 0, nComPort);
+                        if (ret_3 >= 0)
+                        {
+                            SerialNum[8] = 6;
+                        }
+                    }
+                }
+            }
 
             pTemp->SetSerialID(nSerialNumber);
 
@@ -1787,7 +1821,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
     {
         for (int index=0; index<g_Scan_Vector_Subnet.size(); index++)
         {
-            if (g_Scan_Vector_Subnet[index].StrIP.Find(_T("0.0."))!=-1)
+            if (g_Scan_Vector_Subnet[index].StrIP.Find(_T("0.0.0.0"))!=-1)
             {
                 continue;
             }
@@ -1873,15 +1907,6 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
             //pSendBuf[1] = END_FLAG;
             memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
             int nSendLen = 5;
-
-			  BYTE ptempSendBuf[100];
-			  memset(ptempSendBuf,0,100);
-			  ptempSendBuf[0] = 0xff;
-			  ptempSendBuf[1] = 0x55;
-			  ptempSendBuf[2] = 0xff;
-			  ptempSendBuf[3] = 0x55;
-			  int ntempSendLen = 4;
-			 nRet = ::sendto(h_scan_Broad,(char*)ptempSendBuf,ntempSendLen,0,(sockaddr*)&h_scan_bcast,sizeof(h_scan_bcast));
 
             /////////////////////////////////////////////////////////////////////////*/
             int time_out=0;
@@ -2133,7 +2158,7 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
     temp_data.reg.bacnetip_port = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
     my_temp_point = my_temp_point + 2;
-    temp_data.reg.zigbee_exsit = *(my_temp_point++);
+    temp_data.reg.hardware_info = *(my_temp_point++);
     temp_data.reg.subnet_protocol = *(my_temp_point++);
 
     if (temp_data.reg.subnet_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
@@ -3506,7 +3531,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
         strBaudRate=pInfo->m_tstatip;
         strCom=pInfo->m_tstatport;
     }
-    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_TSTAT8
+    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_TSTAT8 || nClassID == PM_TSTAT9
 		|| (nClassID == PM_TSTAT8_WIFI) || (nClassID == PM_TSTAT8_OCC) || (nClassID == PM_TSTAT7_ARM) || (nClassID == PM_TSTAT8_220V)
 		||nClassID == PM_TSTAT5i
             ||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R||nClassID == PM_CO2_RS485||nClassID == PM_CO2_NODE)
@@ -4842,7 +4867,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
     vector <_Bac_Scan_results_Info> m_temp_result_data;
 
     int n_count = 0;
-    while ((pScan->m_com_scan_end == false) && (n_count < 30))
+    while ((pScan->m_com_scan_end == false) && (n_count < 60))
     {
         n_count++;
         Sleep(1000);
@@ -4859,6 +4884,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
     m_scan_info.at(scan_bacnet_ip_item).scan_status = SCAN_STATUS_RUNNING;
 
     //CString temp_debug;
+    //
 
     int n_find_mstp = false;
     for (int j = 0; j < m_com_mstp_detect.size(); j++)
@@ -4930,10 +4956,10 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
     Initial_bac(temp_port,_T(""), n_mstp_baudrate);
     TRACE(_T("Now scan with COM%d\r\n"),temp_port);
     Sleep(5000);//等待几秒让MSTP 的token 运行起来.
-    for (int i=0; i<25; i++)
+    for (int i=0; i<30; i++)
     {
         CString strInfo;
-        strInfo.Format(_T("Send MSTP command time left(%d)"),25-i);
+        strInfo.Format(_T("Send MSTP command time left(%d)"),30-i);
         memset(m_scan_info.at(scan_bacnet_ip_item).scan_notes,0,250);
         char temp_char[250];
         WideCharToMultiByte( CP_ACP, 0, strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );

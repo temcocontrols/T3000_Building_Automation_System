@@ -1414,7 +1414,8 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 					if(read_each_485_fun_thread == NULL)
 					{
 						hide_485_progress = true;
-						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_OUT);//第二个参数 OUT
+                        //经常性的在load file 的时候锁死 ，待解决 2019 06 19
+						//::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_OUT);//第二个参数 OUT
 					}
 				}
 			}
@@ -1612,7 +1613,7 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 		else
 		{
 			ret_unit.Empty();
-			return -1;
+            return RANGE_ERROR;
 		}
 
 		CString temp_value;
@@ -1626,7 +1627,7 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 		if(m_Output_data.at(i).range>30)
 		{
 			ret_cstring.Empty();
-			return -1;
+            return RANGE_ERROR;
 		}
 		else
 		{
@@ -1641,7 +1642,7 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 			{
 				temp1.Empty();
 				ret_cstring.Empty();
-				return -1;
+                return RANGE_ERROR;
 			}
 
 			SplitCStringA(temparray,temp1,_T("/"));

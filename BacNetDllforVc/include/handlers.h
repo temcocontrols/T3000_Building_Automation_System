@@ -215,7 +215,7 @@ __declspec(dllexport)    void handler_read_property_multiple_ack(
         BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
 
     /* Decode the received RPM data and make a linked list of the results. */
-    int rpm_ack_decode_service_request(
+__declspec(dllexport)    int rpm_ack_decode_service_request(
         uint8_t * apdu,
         int apdu_len,
         BACNET_READ_ACCESS_DATA * read_access_data);
@@ -223,7 +223,7 @@ __declspec(dllexport)    void handler_read_property_multiple_ack(
     void rp_ack_print_data(
         BACNET_READ_PROPERTY_DATA * data);
     /* print the RPM Ack data to stdout */
-    void rpm_ack_print_data(
+__declspec(dllexport)    void rpm_ack_print_data(
         BACNET_READ_ACCESS_DATA * rpm_data);
 
 __declspec(dllexport)    void handler_cov_subscribe(

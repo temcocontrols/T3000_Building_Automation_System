@@ -418,6 +418,8 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 		}
 	}
 
+    if (bac_select_device_online == false)
+        m_health_persent = 0;
 
 	temp_value.Format(_T("%u"), g_llerrCount);
 	mygraphics->DrawString(temp_value, -1, &character_font, staticpointF, &Font_brush);

@@ -88,7 +88,7 @@ extern "C" {
         void);
     uint8_t tsm_transaction_idle_count(
         void);
-    void tsm_timer_milliseconds(
+    __declspec(dllexport)    void tsm_timer_milliseconds(
         uint16_t milliseconds);
 
   __declspec(dllexport)   void	tsm_free_all_invoke_id();
@@ -118,7 +118,7 @@ extern "C" {
  __declspec(dllexport) 	bool set_offline_mode(bool offline);
  __declspec(dllexport)   bool tsm_invoke_id_free(
         uint8_t invokeID);
-    bool tsm_invoke_id_failed(
+ __declspec(dllexport)   bool tsm_invoke_id_failed(
         uint8_t invokeID);
 
 #ifdef __cplusplus

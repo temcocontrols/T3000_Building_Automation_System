@@ -702,8 +702,12 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						m_program_debug_list.SetItemText(0,INPUT_VALUE,cstemp_value);
 
 						unsigned short temp_cal_value = ((unsigned char)(m_Input_data.at(point_number).calibration_h)) *256 + (unsigned char)m_Input_data.at(point_number).calibration_l;
-
-						temp_cal.Format(_T("%.1f"),((float)temp_cal_value)/10);
+                        if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 495)
+                        {
+                            temp_cal.Format(_T("%.2f"), ((float)temp_cal_value) / 100);
+                        }
+                        else
+						    temp_cal.Format(_T("%.1f"),((float)temp_cal_value)/10);
 						m_program_debug_list.SetItemText(0,INPUT_CAL,temp_cal);
 						if(m_Input_data.at(point_number).calibration_sign == 0)
 						{
@@ -2377,8 +2381,17 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 					float temp_float_value;
 					unsigned short temp_cal_value;
 					temp_cal_value = (m_Input_data.at(point_number).calibration_h << 8 ) + m_Input_data.at(point_number).calibration_l;
-					temp_float_value = ((float)temp_cal_value) / 10;
-					n_value.Format(_T("%.1f"),temp_float_value);
+                    if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 495)
+                    {
+                        temp_float_value = ((float)temp_cal_value) / 100;
+                        n_value.Format(_T("%.2f"), temp_float_value);
+                    }
+                    else
+                    {
+                        temp_float_value = ((float)temp_cal_value) / 10;
+                        n_value.Format(_T("%.1f"), temp_float_value);
+                    }
+
 				}
 
 				if(m_Input_data.at(point_number).calibration_sign == 0)
@@ -2532,7 +2545,12 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 
 					CString cstemp_value;
-					cstemp_value.Format(_T("%.1f"),((float)temp_cal_value)/10);
+                    if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 495)
+                    {
+                        cstemp_value.Format(_T("%.2f"), ((float)temp_cal_value) / 100);
+                    }
+                    else
+					    cstemp_value.Format(_T("%.1f"),((float)temp_cal_value)/10);
 					m_program_debug_list.SetItemText(0,INPUT_CAL,cstemp_value);
 
 

@@ -25,7 +25,7 @@ HWND hMbpollWritePopWnd;
 int regDetailsOpenedFrom = 0;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
 bool list_mouse_click = false;
 //#include "stdafx.h"
-unsigned short multi_register_value[1024]={-1};
+unsigned short multi_register_value[4096]={-1};
 unsigned short multi_register_value_tcp[10000]={-1};
 unsigned short product_register_value[20000]={-1};
 
@@ -42,7 +42,7 @@ bool g_fresh_T3000_background = false;
 CString CurrentT3000Version ;
 int nCom;
 //CString program_path=_T("");
-int g_tstat_id=255;
+volatile int g_tstat_id=255;
 int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。 
 unsigned int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
@@ -1959,6 +1959,7 @@ vector <Str_MSV> m_msv_data;
 
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
+Str_Email_point  Device_Email_Point;
 Str_MISC Device_Misc_Data;
 Str_Special Device_Special_Data;
 char m_at_write_buf[100];
@@ -2184,6 +2185,7 @@ const CString c_strBaudate[NUMBER_BAUDRATE] =
     L"19200",
     L"38400",
     L"57600",
+    L"76800",
     L"115200"
 };
 #pragma endregion For_bacnet
@@ -2239,7 +2241,7 @@ bool offline_mode = false; //全局离线模式判断;
 CString offline_prg_path;   //离线模式得prg 保存路径;
 
 bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
-
+bool n_wifi_connection;  //后台列表 刷新开关
 bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构

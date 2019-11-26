@@ -13,6 +13,8 @@
 #include "BacnetEditLabel.h"
 #include "global_define.h"
 extern int pointtotext(char *buf,Point_Net *point);
+extern vector <MSG> My_Receive_msg;
+extern CCriticalSection MyCriticalSection;
 Str_label_point m_temp_graphic_label_data[BAC_GRPHIC_LABEL_COUNT];
 int loading_labels;   //用来判断是否正在加载label;
 static int m_bac_select_label_old = -1;
@@ -862,9 +864,11 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	
 	//ReloadLabelsFromDB();
 	m_screenedit_dlg_hwnd = this->m_hWnd;
-	SetTimer(1,5000,NULL);
+    int temp_read_count = m_graphic_refresh_data.size();
+    int read_interval = temp_read_count * 1500 + 5000;
+    TRACE(_T("read_interval = %d\r\n"), read_interval);
+	SetTimer(1, read_interval,NULL);
 	SetTimer(2,10000,NULL);
-
 	if(!m_bImgExist)
 	{
 		SetTimer(3,5000,NULL);
@@ -883,7 +887,18 @@ BOOL CBacnetScreenEdit::OnInitDialog()
     if(h_read_standard_thread == NULL)
         h_read_standard_thread = CreateThread(NULL, NULL, ReadStandardThreadfun, this, NULL, NULL);
 
-
+    if (My_Receive_msg.size() < 100) //如果队列太长就不要在往队列里面加了 ，防止出现客户各种点进点出;
+    {
+        for (int i = 0;i < (int)m_graphic_refresh_data.size();i++)
+        {
+            Post_Refresh_One_Message(m_graphic_refresh_data.at(i).deviceid,
+                m_graphic_refresh_data.at(i).command,
+                m_graphic_refresh_data.at(i).value_item,
+                m_graphic_refresh_data.at(i).value_item,
+                m_graphic_refresh_data.at(i).entitysize);
+            //m_graphic_refresh_data.at(i).control_pt->Invalidate();
+        }
+    }
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -1677,7 +1692,7 @@ void CBacnetScreenEdit::OnPaint()
 	for (int i=0;i<m_bac_label_vector.size();i++)
 	{
 		int read_bac_index = 0;
-		bool label_invalid = false;
+		int label_invalid = 0;
 		cs_value.Empty();
 		cs_unit.Empty();
 		cs_auto_m.Empty();
@@ -1809,8 +1824,14 @@ void CBacnetScreenEdit::OnPaint()
                 get_label = GetInputLabel(0, cs_label, &m_read_group_data.at(read_group_index).point);
                 get_full_label = GetInputFullLabel(0, cs_full_label, &m_read_group_data.at(read_group_index).point);
                 memcpy(&m_Input_data.at(0), &temp_data_in, sizeof(Str_in_point));
-                if ((get_ret < 0) || (get_label < 0) || (get_full_label < 0))
-                    label_invalid = true;
+
+                if (get_ret < 0)
+                    label_invalid = get_ret;
+                else if (get_label < 0)
+                    label_invalid = get_label;
+                else if (get_full_label < 0)
+                    label_invalid = get_full_label;
+
                  }
             break;
             case BAC_OUT:
@@ -1825,8 +1846,14 @@ void CBacnetScreenEdit::OnPaint()
                 get_label = GetOutputLabel(0, cs_label, &m_read_group_data.at(read_group_index).point);
                 get_full_label = GetOutputFullLabel(0, cs_full_label, &m_read_group_data.at(read_group_index).point);
                 memcpy(&m_Output_data.at(0), &temp_data_out, sizeof(Str_out_point));
-                if ((get_ret < 0) || (get_label < 0) || (get_full_label < 0))
-                    label_invalid = true;
+
+                if (get_ret < 0)
+                    label_invalid = get_ret;
+                else if (get_label < 0)
+                    label_invalid = get_label;
+                else if (get_full_label < 0)
+                    label_invalid = get_full_label;
+
                 break;
             case BAC_VAR:
                 //dufan 先将原variable0 的值存起来，然后 将其他panel 的variable 放入 ，方便调用 GetvariableValue等函数取 解析值.
@@ -1840,8 +1867,14 @@ void CBacnetScreenEdit::OnPaint()
                 get_label = GetVariableLabel(0, cs_label, &m_read_group_data.at(read_group_index).point);
                 get_full_label = GetVariableFullLabel(0, cs_full_label, &m_read_group_data.at(read_group_index).point);
                 memcpy(&m_Variable_data.at(0), &temp_data_var, sizeof(Str_variable_point));
-                //if ((get_ret < 0) || (get_label < 0) || (get_full_label < 0))
-                //    label_invalid = true;
+
+                if (get_ret < 0)
+                    label_invalid = get_ret;
+                else if (get_label < 0)
+                    label_invalid = get_label;
+                else if (get_full_label < 0)
+                    label_invalid = get_full_label;
+
                 break;
             default:
                 break;
@@ -1889,7 +1922,7 @@ void CBacnetScreenEdit::OnPaint()
 					dev_reg = high_3bit * 256 + m_remote_point_data.at(i).point.number;
 
 					unsigned char nFlag = m_remote_point_data.at(i).product_id;
-					if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8) )
+					if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8) || (nFlag == PM_TSTAT9))
 					{
 						MultiByteToWideChar( CP_ACP, 0, (char *)TSTAT_6_ADDRESS[dev_reg].AddressName,(int)strlen((char *)TSTAT_6_ADDRESS[dev_reg].AddressName)+1, temp_description.GetBuffer(MAX_PATH), MAX_PATH );
 						temp_description.ReleaseBuffer();	
@@ -1948,8 +1981,14 @@ void CBacnetScreenEdit::OnPaint()
 						int get_ret = GetInputValue(read_bac_index ,cs_value,cs_unit,cs_auto_m,dig_unit_ret);
 						int get_label = GetInputLabel(read_bac_index,cs_label);
 						int get_full_label = GetInputFullLabel(read_bac_index,cs_full_label);
-						if((get_ret <0) || (get_label < 0) || (get_full_label < 0))
-							label_invalid = true;
+
+                        if (get_ret < 0)
+                            label_invalid = get_ret;
+                        else if (get_label < 0)
+                            label_invalid = get_label;
+                        else if (get_full_label < 0)
+                            label_invalid = get_full_label;
+
 					}
 					else
 					{
@@ -1964,8 +2003,14 @@ void CBacnetScreenEdit::OnPaint()
 						int get_ret_out = GetOutputValue(read_bac_index ,cs_value,cs_unit,cs_auto_m,dig_unit_ret);
 						int get_label_out = GetOutputLabel(read_bac_index,cs_label);
 						int get_full_label_out = GetOutputFullLabel(read_bac_index,cs_full_label);
-						if((get_ret_out <0) || (get_label_out < 0) || (get_full_label_out < 0))
-							label_invalid = true;
+
+                        if (get_ret_out < 0)
+                            label_invalid = get_ret_out;
+                        else if (get_label_out < 0)
+                            label_invalid = get_label_out;
+                        else if (get_full_label_out < 0)
+                            label_invalid = get_full_label_out;
+
 					}
 					else
 						label_invalid = true;
@@ -1978,8 +2023,12 @@ void CBacnetScreenEdit::OnPaint()
 						int get_ret_var = GetVariableValue(read_bac_index ,cs_value,cs_unit,cs_auto_m,dig_unit_ret);
 						int get_label_var = GetVariableLabel(read_bac_index,cs_label);
 						int get_full_label_var = GetVariableFullLabel(read_bac_index,cs_full_label);
-						if((get_ret_var <0) || (get_label_var < 0) || (get_full_label_var < 0))
-							label_invalid = true;
+                        if (get_ret_var < 0)
+                            label_invalid = get_ret_var;
+                        else if (get_label_var < 0)
+                            label_invalid = get_label_var;
+                        else if (get_full_label_var < 0)
+                            label_invalid = get_full_label_var;
 					}
 					else
 						label_invalid = true;
@@ -2080,11 +2129,15 @@ void CBacnetScreenEdit::OnPaint()
 		}
 
 		//**********************************************************************
-		if(label_invalid)
+		if(label_invalid == RANGE_ERROR)
 		{
-			cs_show_info = _T("Label Invalid");
+			cs_show_info = _T("Range is invalid");
 		}
-		else
+        else if (label_invalid == 1)
+        {
+            cs_show_info = _T("Type or index invalid");
+        }
+		else if(label_invalid == 0)
 		{
 			switch(m_bac_label_vector.at(i).nDisplay_Type)
 			{
@@ -2418,7 +2471,7 @@ void CBacnetScreenEdit::OnPaint()
 
 void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	 
+    int temp_write_ret = -1;
 	bool click_ret = false;
 	for (int i=0;i<m_bac_label_vector.size();i++)
 	{
@@ -2590,7 +2643,17 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 
 								CString temp_task_info;
 								temp_task_info.Format(_T("Write Input List Item%d .Changed "),temp_index);
-								Post_Write_Message(g_bac_instance,WRITEINPUT_T3000,temp_index,temp_index,sizeof(Str_in_point),m_screenedit_dlg_hwnd ,temp_task_info);
+                                temp_write_ret = Write_Private_Data_Blocking(WRITEINPUT_T3000, temp_index, temp_index, g_bac_instance);
+                                if (temp_write_ret<0)
+                                {
+                                    temp_task_info = temp_task_info + _T("Timeout");
+                                }
+                                else
+                                {
+                                    temp_task_info = temp_task_info + _T("success!");
+                                }
+
+								//Post_Write_Message(g_bac_instance,WRITEINPUT_T3000,temp_index,temp_index,sizeof(Str_in_point),m_screenedit_dlg_hwnd ,temp_task_info);
 								m_bac_lbuttondown = false;
 								Invalidate(1);
 								return;
@@ -2612,7 +2675,17 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 									m_Output_data.at(temp_index).control = 0;
 								CString temp_task_info;
 								temp_task_info.Format(_T("Write Output List Item%d .Changed"),temp_index);
-								Post_Write_Message(g_bac_instance,WRITEOUTPUT_T3000,temp_index,temp_index,sizeof(Str_out_point),m_screenedit_dlg_hwnd ,temp_task_info);
+                                temp_write_ret = Write_Private_Data_Blocking(WRITEOUTPUT_T3000, temp_index, temp_index, g_bac_instance);
+                                if (temp_write_ret<0)
+                                {
+                                    temp_task_info = temp_task_info + _T("Timeout");
+                                }
+                                else
+                                {
+                                    temp_task_info = temp_task_info + _T("success!");
+                                }
+
+								//Post_Write_Message(g_bac_instance,WRITEOUTPUT_T3000,temp_index,temp_index,sizeof(Str_out_point),m_screenedit_dlg_hwnd ,temp_task_info);
 								m_bac_lbuttondown = false;
 								Invalidate(1);
 								return;
@@ -2634,7 +2707,17 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 									m_Variable_data.at(temp_index).control = 0;
 								CString temp_task_info;
 								temp_task_info.Format(_T("Write Variable List Item%d .Changed "),temp_index);
-								Post_Write_Message(g_bac_instance,WRITEVARIABLE_T3000,temp_index,temp_index,sizeof(Str_variable_point),m_screenedit_dlg_hwnd ,temp_task_info);
+
+                                temp_write_ret = Write_Private_Data_Blocking(WRITEVARIABLE_T3000, temp_index, temp_index, g_bac_instance);
+                                if(temp_write_ret<0)
+                                {
+                                    temp_task_info = temp_task_info + _T("Timeout");
+                                }
+                                else
+                                {
+                                    temp_task_info = temp_task_info + _T("success!");
+                                }
+								//Post_Write_Message(g_bac_instance,WRITEVARIABLE_T3000,temp_index,temp_index,sizeof(Str_variable_point),m_screenedit_dlg_hwnd ,temp_task_info);
 								m_bac_lbuttondown = false;
 								Invalidate(1);
 								return;
@@ -2808,6 +2891,11 @@ void CBacnetScreenEdit::OnCancel()
 	int nsize = screnn_sequence.size();
 	if(nsize > 1)
 	{
+        //当用户关闭这个窗口时，清空所以的队列，即便有正常的消息，也清空，否则100多条消息 全堵在这里
+        MyCriticalSection.Lock();
+        My_Receive_msg.clear();
+        MyCriticalSection.Unlock();
+
 		int temp_screnn_index = screnn_sequence.at(nsize - 2);
 
 		vector <int>::iterator Iter;
@@ -2843,6 +2931,11 @@ void CBacnetScreenEdit::OnCancel()
     h_read_standard_thread = NULL;
 
 	KillTimer(1);
+
+    //当用户关闭这个窗口时，清空所以的队列，即便有正常的消息，也清空，否则100多条消息 全堵在这里
+    MyCriticalSection.Lock();
+    My_Receive_msg.clear();
+    MyCriticalSection.Unlock();
 	CDialogEx::OnCancel();
 }
 
@@ -2858,6 +2951,10 @@ void CBacnetScreenEdit::OnTimer(UINT_PTR nIDEvent)
 		{
 			if(this->IsWindowVisible())
 			{
+                if (My_Receive_msg.size() > 100)
+                {
+                    break;
+                }
 				for (int i=0;i<(int)m_graphic_refresh_data.size();i++)
 				{
 					Post_Refresh_One_Message(m_graphic_refresh_data.at(i).deviceid,
@@ -2898,6 +2995,7 @@ void CBacnetScreenEdit::OnTimer(UINT_PTR nIDEvent)
 
 		}
 		break;
+
 	}
 	
 	CDialogEx::OnTimer(nIDEvent);
@@ -3012,5 +3110,7 @@ void CBacnetScreenEdit::OnLButtonDblClk(UINT nFlags, CPoint point)
 void CBacnetScreenEdit::OnClose()
 {
     // TODO: 在此添加消息处理程序代码和/或调用默认值
+
+
     CDialogEx::OnClose();
 }

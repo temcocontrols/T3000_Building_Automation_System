@@ -6,9 +6,9 @@
 //  9800	-	9999    200个寄存器   setting
 //  10000	-   11471   1472		  OUT
 //  11472   -   12943   1472		  IN
-//	12944   -   15502	2560		  VAR					sizeof(Str_variable_point)= 39
-//	15503   -  	15806	16*19=304	  PRG	                sizeof(Str_program_point) = 37
-//  15807   -   15974	21*8=336	  SCH			sizeof(Str_weekly_routine_point) = 42
+//	12944   -   15503	2560		  VAR					sizeof(Str_variable_point)= 39
+//	15504   -  	15807	16*19=304	  PRG	                sizeof(Str_program_point) = 37
+//  15808   -   15974	21*8=336	  SCH			sizeof(Str_weekly_routine_point) = 42
 //	15975   -	16043		17*4=68		  HOL				sizeof(Str_annual_routine_point) = 33
 //  32712   - 32753		 14*16 =224								sizeof(Str_controller_point)	= 28
 
@@ -216,6 +216,7 @@ const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
 const int PROTOCOL_MSTP_TO_MODBUS = 11;
 const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;
+const int PROTOCOL_THIRD_PARTY_BAC_BIP = 253;
 const int PROTOCOL_VIRTUAL = 254;
 const int PROTOCOL_UNKNOW = 255;
 
@@ -234,7 +235,7 @@ const COLORREF LIST_ITEM_CHANGED_BKCOLOR = RGB(255, 0, 0);
 const COLORREF LIST_ITEM_DEFAULT_BKCOLOR = GetSysColor(COLOR_WINDOW);
 const COLORREF LIST_ITEM_DEFAULT_BKCOLOR_GRAY = RGB(225, 225, 225);
 const COLORREF LIST_ITEM_SELECTED = RGB(150, 150, 200);
-
+const COLORREF LIST_ITEM_DISABLE = RGB(180, 180, 200);
 const bool REFRESH_ON_ITEM = TRUE;
 
 //const int SEND_COMMAND_DELAY_TIME = 100;
@@ -368,7 +369,7 @@ const int BAC_READ_PID_REMAINDER = BAC_READ_PID_GROUP_NUMBER - 1;
 const int BAC_READ_SCHEDULE_REMAINDER = BAC_READ_SCHEDULE_GROUP_NUMBER - 1;
 const int BAC_READ_HOLIDAY_REMAINDER = BAC_READ_HOLIDAY_GROUP_NUMBER - 1;
 const int BAC_READ_USER_LOGIN_INFO_REMAINDER = BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER - 1;
-
+const int BAC_READ_MSV_REMAINDER = BAC_MSV_GROUP_NUMBER - 1;
 const int BAC_READ_CUSTOMER_UNITS_REMAINDER = BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER - 1;;
 
 const int BAC_READ_SCREEN_REMAINDER = BAC_READ_SCREEN_GROUP_NUMBER - 1;
@@ -543,7 +544,7 @@ struct refresh_net_device
 	CString NetCard_Address;
 	CString show_label_name;
 	unsigned short bacnetip_port;
-    int zigbee_exsit;
+    int hardware_info;     //bit  0x74 zigbee   bit1 wifi
     int nprotocol;
 };
 
@@ -825,12 +826,12 @@ const CString Input_List_Analog_Units[] =
 const CString Input_Analog_Units_Array[] =
 {
 	_T("Unused"),
-	_T("PT100 -40 to 1000"),
-	_T("PT100 -40 to 1800"),
+    _T("Y3K -40 to 150"),
+    _T("Y3K -40 to 300"),
 	_T("10K Type2"),
 	_T("10K Type2"),
-	_T("PT1000 -40 to 450"),
-	_T("PT1000 -40 to 800"),
+    _T("G3K -40 to 120"),
+    _T("G3K -40 to 250"),
 	_T("10K Type3"),
 	_T("10K Type3"),
 	_T("PT 1K -200 to 300"),
@@ -912,6 +913,21 @@ const signed short Time_Zone_Value[] =
 	1300
 };
 
+const CString Com_Parity_bit[] =
+{
+    _T("None"),
+    _T("Odd"),
+    _T("Even")
+};
+
+const CString Com_Stop_bit[] =
+{
+    _T("1"),
+    _T("0.5"),
+    _T("2"),
+    _T("1.5")
+};
+
 const CString Time_Zone_Name[] =
 {
 	_T("(UTC - 12:00) , Yankee Time Zone"),
@@ -967,7 +983,7 @@ const CString Sys_Tstat_Mode_Name[] =
 const CString Device_Serial_Port_Status[] =
 {
 	_T("Unused"),
-	_T("MSTP Slave"),
+	_T("Bacnet MSTP"),       //1
 	_T("Modbus Slave"),
 	_T("Bacnet PTP"),
 	_T("GSM"),
@@ -975,7 +991,7 @@ const CString Device_Serial_Port_Status[] =
 	_T("Sub Zigbee"),
 	_T("Modbus Master"),
 	_T("RS232 Meter"),
-	_T("MSTP Master")
+	_T("Bacnet MSTP")       // 9
 };
 
 
@@ -1068,6 +1084,7 @@ typedef enum
 	MINIPANELARM_LB = 6,
 	MINIPANELARM_TB = 7,
     BACNET_ROUTER = 8,
+    T3_TSTAT10    = 9,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1509,6 +1526,7 @@ const int INPUT_COL_NUMBER = 16;
 
 
 
+
 const int TSTAT_INPUT_FITLER = 7;
 const int TSTAT_INPUT_FUNCTION = 8;
 const int TSTAT_INPUT_CUST_FIELD = 9;
@@ -1713,7 +1731,7 @@ const int DEBUG_SHOW_PROGRAM_DATA_ONLY = 4;
 const int DEBUG_SHOW_WRITE_PIC_DATA_ONLY = 5;
 const int DEBUG_SHOW_BACNET_ALL_DATA = 6;
 const int DEBUG_SHOW_SQLITE_INFO = 7;
-#define NUMBER_BAUDRATE 5
+#define NUMBER_BAUDRATE 6
 typedef struct
 {
 	char crc_cal[4];
@@ -2001,7 +2019,7 @@ typedef union
 		UCHAR object_instance_3;
 		UCHAR isp_mode;  //非0 在isp mode   , 0 在应用代码;    第60个字节
 		USHORT bacnetip_port;	//bacnet 的端口号;
-		UCHAR  zigbee_exsit;	// 1 代表有zigbee模块;
+		UCHAR  hardware_info;	//  //bit0 zigbee   bit1 wifi
         UCHAR  subnet_protocol;   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
 	}reg;
 }Str_UPD_SCAN;
@@ -2069,6 +2087,28 @@ const int REGISTER_CHARACTER_STRING_HI_LO = 15;
 const int REGISTER_CHARACTER_STRING_LO_HI = 16;
 
 
+const CString Wifi_Module_Status[] =
+{
+    _T("Wifi Abnormal"),
+    _T("No Wifi Module"),       //1
+    _T("Wifi Normal"),
+    _T("Wifi Connected"),
+    _T("Wifi Disconnected"),
+    _T("Wifi No Connect"),
+    _T("Wifi SSID Password Error")
+};
+
+typedef enum
+{
+    WIFI_NONE,
+    WIFI_NO_WIFI,
+    WIFI_NORMAL,
+    WIFI_CONNECTED,
+    WIFI_DISCONNECTED,
+    WIFI_NO_CONNECT
+};
+
+
 const int DIGITAL_DIRECT = 0; //自定义 数字量Range
 const int DIGITAL_INVERS = 1;
 
@@ -2121,3 +2161,6 @@ typedef struct
     int nbaudrate;
 }connect_Info;
 #pragma endregion
+
+
+#define CHELSEA_TEST  0

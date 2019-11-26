@@ -1044,7 +1044,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
         //nFlag = read_one(now_tstat_id,7,6);
         Read_Multi(now_tstat_id,product_register_value,0,10);
         nFlag = product_register_value[7];
-        if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT8) || (nFlag == PM_TSTAT5i)
+        if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT8) || (nFlag == PM_TSTAT9) || (nFlag == PM_TSTAT5i)
 			|| (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
         {
             product_type =T3000_6_ADDRESS;

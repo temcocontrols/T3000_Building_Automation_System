@@ -77,6 +77,7 @@ typedef enum {
 		 READ_REMOTE_POINT         = 40,
          READ_SCHEDUAL_TIME_FLAG   = 41,
          READ_MSV_COMMAND          = 42,
+         READ_EMAIL_ALARM          = 43,
 
 		 WRITEOUTPUT_T3000         = 100+ENUM_OUT+1,  /* write outputs          */
 		 WRITEINPUT_T3000          = 100+ENUM_IN+1,   /* write inputs           */
@@ -132,6 +133,7 @@ typedef enum {
 		 WRITE_REMOTE_POINT         = 140,
          WRITE_SCHEDUAL_TIME_FLAG   = 141,
          WRITE_MSV_COMMAND          = 142,
+         WRITE_EMAIL_ALARM           = 143,
          WRITE_NEW_TIME_COMMAND     = 188,  //2018 04 17 新的写时间命令
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
@@ -188,6 +190,24 @@ typedef enum {
 
 #pragma pack(push) //保存对齐状态 
 #pragma pack(1)
+
+
+typedef union
+{
+    uint8_t all[400];
+    struct
+    {
+        unsigned char smtp_type;  //  0   ipaddress   // 1   domain
+        unsigned char smtp_ip[4];
+        char smtp_domain[40];
+        unsigned short smtp_port;
+        char email_address[60];
+        char user_name[60];
+        char password[20];
+        char secure_connection_type;  //0 -NULL   1-SSL   2-TLS
+    }reg;
+}Str_Email_point;
+
 
 typedef union
 {
@@ -356,7 +376,7 @@ typedef struct
 	uint8_t range ; /*  (1 uint8_t ; variable_range_equate)*/
 
 
-}	Str_variable_point; /* 21+9+4+1+1 = 36*/
+}	Str_variable_point; /* 39 char   fandu*/
 
 
 
@@ -479,7 +499,7 @@ typedef struct
 	uint8_t errcode;	//      : 5; /* (6 bits; 0=normal end, 1=too int32_t in program)*/
 	uint8_t unused;   //      : 8;
 
-} Str_program_point;	  /* 21+9+2+2 = 34 bytes*/
+} Str_program_point;	  /*37 bytes  fandu*/
 
 
 typedef struct
@@ -835,6 +855,10 @@ typedef union
          unsigned char mstp_id;         //MSTP_ID
          unsigned short zigbee_panid;
          unsigned char max_master; //可设置的最大matser值  245 个
+         unsigned char special_flag; // bit 0  代表是否支持 PT1K snesor 0 不支持 1支持;
+                                     // bit 1 PT100
+         unsigned char uart_parity[3];
+         unsigned char uart_stopbit[3];
 	}reg;
 }Str_Setting_Info;
 
@@ -1102,6 +1126,30 @@ typedef struct
 	char unused[14];
 	uint16_t seg_index;
 }Str_picture_header;
+
+
+typedef union
+{
+    uint8_t all[160];
+    struct
+    {
+        uint8_t Wifi_Enable;   // 写1 应该 这些IP 变更   Modbus 起始位置 2000
+        uint8_t IP_Auto_Manual; //  0 Auto DHCP   1 static IP
+        uint8_t IP_Wifi_Status;  // 0 Wifi模块未知  
+        uint8_t LoadDefault; //1
+        uint8_t modbus_port;
+        uint8_t bacnet_port;
+        uint8_t software_version;
+        uint8_t	reserved[7];
+        char username[64];  //多写
+        char password[32];  //多写
+        uint8_t ip_addr[4];   //IP地址 12个寄存器 多写
+        uint8_t net_mask[4];
+        uint8_t getway[4];
+        uint8_t wifi_mac[6];  //只读
+    }reg;
+}str_wifi_point;
+
 
 
 #pragma pack(pop)//恢复对齐状态 

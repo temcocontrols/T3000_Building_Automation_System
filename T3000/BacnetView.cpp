@@ -3,6 +3,36 @@
 /*
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
 81 0B 00 0C 01 20 FF FF 00 FF 10 08
+
+MSFLXGRD.MSM
+COMCAT.MSM
+拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
+2019 11 25
+1. 加入Yabe
+2. 修改ScreenEdit 当lable 很多时 ，根据数量动态 调整读取时间，并在退出时清空队列;
+3. 支持显示自定义的range
+
+2019 08 19
+1. Setting 界面分类显示
+2. ISP tool 支持wifi 设备烧写
+3. T3000 支持 TSTAT10 WIFI 连接 以及  通过RS485 使用 Modbus 和MSTP连接 ， 并处理好 协议之间的切换
+4. 通过Modbus 485能够访问 Bacnet 的大多数界面，部分没有对应寄存器的界面需切换协议才能访问
+5. 修复 Schedule 无法使用 Copy Monday to Friday 的功能， 对应操作 由双击 变更为单击.
+6. TSTATAQ  multiple sensor 支持 修改 CO2 sensor 以及PM sensor 的 开关时间 。
+7. 修改T3000 底层 接口函数，使得 T3000 能更顺畅的 和 两种协议 Bacnet 和Modbus 的设备通讯。
+
+
+2019 07 11
+1.Fixed program failure caused by lack of .net frame dynamic library files
+2.Fixing remote connection ，unnecessary prompts about IP addresses are not in the same network segment。
+3.Remote connections can now be scanned to subdevices properly。
+4.Devices connected via RS485 can also configure addresses normally.
+5.Unselectable when the device does not support certain ranges。
+6.Add email alarm user interface .(partly completed)
+7.All T3 modules can change bacnet device id.
+8.Fix the value display anomalies caused by coding and decoding errors in programming
+9.Use InstallShield 2018 packaged T3000 applications.
+
 2019 04 29
 1. User can insert more remote point in the "Graphic" user interface.
    Using the standard bacnet keywords "AV,AI,AO,BV,BI,BO" ,format is "Deviceid + Keywords + number"  
@@ -1164,7 +1194,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Inputs list read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Inputs list read time out!"));
 					//MessageBox(_T("Inputs list read time out!"));	
 				}
 				return 0;
@@ -1200,7 +1230,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Outputs list read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Outputs list read time out!"));
 					//MessageBox(_T("Outputs list read time out!"));
 				}
 				return 0;
@@ -1235,7 +1265,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Variable list read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Variable list read time out!"));
 					//MessageBox(_T("Variable list read time out!"));
 				}
 				return 0;
@@ -1272,7 +1302,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Program list read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Program list read time out!"));
 					//MessageBox(_T("Program list read time out!"));
 				}
 				return 0;
@@ -1308,7 +1338,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Weekly list read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Weekly list read time out!"));
 					//MessageBox(_T("Weekly list read time out!"));
 				}
 				return 0;
@@ -1367,7 +1397,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Annual Routine list read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Annual Routine list read time out!"));
 					//MessageBox(_T("Annual Routine list read time out!"));
 				}
 				return 0;
@@ -1394,7 +1424,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Controller list read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Controller list read time out!"));
 					//MessageBox(_T("Controller list read time out!"));
 				}
 				return 0;
@@ -1420,7 +1450,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Screens list read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Screens list read time out!"));
 					//MessageBox(_T("Screens list read time out!"));
 				}
 				return 0;
@@ -1448,7 +1478,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Tstat list read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Tstat list read time out!"));
 				}
 				return 0;
 			}
@@ -1474,7 +1504,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Monitor list read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Monitor list read time out!"));
 				}
 				return 0;
 			}
@@ -1502,7 +1532,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						TerminateThread(hwait_thread,0);
 						hwait_thread = NULL;
 					}
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("AlarmLog read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("AlarmLog read time out!"));
 					//MessageBox(_T("AlarmLog read time out!"));
 				}
 				return 0;
@@ -1529,7 +1559,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				}
 				else
 				{
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data time out!"));
 				}
 
 				return 0;
@@ -1559,7 +1589,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				}
 				else
 				{
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Weekly schedule time read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Weekly schedule time read time out!"));
 					//MessageBox(_T("Weekly schedule time read time out!"));
 				}
 
@@ -1586,7 +1616,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				}
 				else
 				{
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Holiday data read time out!"));
+					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Holiday data read time out!"));
 					//MessageBox(_T("Annual day time read time out!"));
 				}
 
@@ -2248,7 +2278,6 @@ void CDialogCM5_BacNet::InitialBacnetWindow()
 	}
 }
 
-//__declspec(dllexport) HANDLE	Get_RS485_Handle();
 static bool already_retry = false;
 bool has_change_connect_ip = true;
 //INPUT int test_function_return_value();
@@ -2269,6 +2298,7 @@ void CDialogCM5_BacNet::Fresh()
 	{
 		return;
 	}
+    
 //	g_NEED_MULTI_READ = FALSE;
 	already_retry = false;
 	read_write_bacnet_config = false;
@@ -2315,14 +2345,36 @@ void CDialogCM5_BacNet::Fresh()
 	}
 	else if(selected_product_Node.protocol == MODBUS_BACNET_MSTP)
 	{
+#if 1
+        set_datalink_protocol(2);
+        Initial_bac(g_gloab_bac_comport, _T(""), g_gloab_bac_baudrate);
+        CShowMessageDlg TempDlg;
+        TempDlg.SetStaticText(_T("Establishing Bacnet MSTP connection , please wait!"));
+        //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+        TempDlg.SetStaticTextColor(RGB(0, 0, 255));
+        TempDlg.SetStaticTextSize(25, 20);
+        TempDlg.SetProgressAutoClose(250, 100, EVENT_MSTP_CONNECTION_ESTABLISH);
+
+        _Bac_Scan_Com_Info tempinfo;
+        tempinfo.device_id = g_mstp_deviceid;
+        tempinfo.macaddress = selected_product_Node.panel_number;
+        TempDlg.SetMstpDeviceInfo(tempinfo);
+
+        TempDlg.DoModal();
+        //switch_product_last_view();
+#endif
 		BacNet_hwd = this->m_hWnd;
-		if(connect_mstp_thread == NULL)
-			connect_mstp_thread =CreateThread(NULL,NULL,Mstp_Connect_Thread,this,NULL, NULL);
+        if (connect_mstp_thread == NULL)
+        {
+            connect_mstp_thread = CreateThread(NULL, NULL, Mstp_Connect_Thread, this, NULL, NULL);
+            ::CloseHandle(connect_mstp_thread);
+        }
 		return;
 		set_datalink_protocol(2);
 		Initial_bac(g_gloab_bac_comport,_T(""), g_gloab_bac_baudrate);
 		if(g_bac_instance>0)
 			Send_WhoIs_Global(-1, -1);
+
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
 		SetTimer(BAC_TIMER_2_WHOIS,20000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 		return;
@@ -2330,6 +2382,11 @@ void CDialogCM5_BacNet::Fresh()
 	else if((selected_product_Node.protocol == MODBUS_RS485) && (selected_product_Node.NetworkCard_Address.IsEmpty()))
 	{
 		BacNet_hwd = this->m_hWnd;
+        if (read_rs485_thread != NULL)
+        {
+            TerminateThread(read_rs485_thread, 0);
+            read_rs485_thread = NULL;
+        }
 		if(read_rs485_thread == NULL)
 			read_rs485_thread = CreateThread(NULL,NULL,RS485_Connect_Thread,this,NULL, NULL);
 		return;
@@ -2489,13 +2546,7 @@ void CDialogCM5_BacNet::Fresh()
 				g_llTxCount ++;
 				g_llRxCount ++;
 
-				//if(selected_product_Node.status == false)
-				//{
-					//int ret_write = Write_One(g_tstat_id,33,151);	33write 151 is to reset the minipanel ethenet.
-					//TRACE(_T("Write_One(g_tstat_id,33,151) == %d\r\n"),ret_write);
-				//}
 				bac_select_device_online = true;
-				//TRACE(_T("Reconnected ~~~~~~~~\r\n"));
 				break;
 			}
 			else 
@@ -2517,13 +2568,13 @@ void CDialogCM5_BacNet::Fresh()
 		unsigned int temp_instance;
 		int temp_mac;
 		int multy_ret = 0;
-		unsigned short temp_buffer[5];
+		unsigned short temp_buffer[72];
 
 			::PostMessage(MainFram_hwd,MY_RX_TX_COUNT,1,0);
 
 			memset(temp_buffer,0,5);
 
-			multy_ret = Read_Multi(g_tstat_id,temp_buffer,32,5,5);
+			multy_ret = Read_Multi(g_tstat_id,temp_buffer,32,72,5);
 			if(multy_ret<=0)
 			{
 				pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
@@ -2533,7 +2584,8 @@ void CDialogCM5_BacNet::Fresh()
 				bac_select_device_online = false;
 				return;
 			}
-
+            memcpy_s(&product_register_value[32], 72*sizeof(unsigned short), temp_buffer, 72 * sizeof(unsigned short));
+            
 			temp_instance =temp_buffer[0]*65536 + temp_buffer[3];
 			temp_mac = temp_buffer[4];
 			has_change_connect_ip = true;
@@ -2550,6 +2602,8 @@ void CDialogCM5_BacNet::Fresh()
 				bacnet_device_type = STM32_HUM_NET;	
 			else if (selected_product_Node.product_class_id == PM_T3_LC)
 				bacnet_device_type = PM_T3_LC;
+            else if (selected_product_Node.product_class_id == PM_TSTAT10)
+                bacnet_device_type = PM_TSTAT10;
 			else
 			{
 				int ret = 0;
@@ -2972,6 +3026,7 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 {
 	bac_read_which_list = read_list_type;
+#if 0
 	if(WaitDlg==NULL)
 	{
 			if(bac_read_which_list == BAC_READ_SVAE_CONFIG)
@@ -2991,13 +3046,13 @@ void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 			//ClientToScreen(&RECT_SET1);
 			//WaitDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20);		
 	}
-
+#endif
 	//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
-	if(hwait_thread==NULL)
-	{
-		hwait_thread =CreateThread(NULL,NULL,Send_read_Command_Thread,this,NULL, NULL);
+    if (hwait_thread != NULL)
+        TerminateThread(hwait_thread, 0);
+	hwait_thread =CreateThread(NULL,NULL,Send_read_Command_Thread,this,NULL, NULL);
 
-	}
+	
 }
 
 
@@ -3072,26 +3127,7 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 	return 0;
 }
 
-DWORD WINAPI Write_Data_Into_Db(LPVOID lpVoid)
-{
-	for (int i = 0;i<BAC_INPUT_ITEM_COUNT;i++)
-	{
-		Save_InputData_to_db(i, g_selected_serialnumber);
-	}
 
-	for (int i = 0;i<BAC_OUTPUT_ITEM_COUNT;i++)
-	{
-		Save_OutputData_to_db(i, g_selected_serialnumber);
-	}
-
-	for (int i = 0;i<BAC_VARIABLE_ITEM_COUNT;i++)
-	{
-		Save_VariableData_to_db(i, g_selected_serialnumber);
-	}
-
-	write_indb_thread = NULL;
-	return 0;
-}
 
 
 
@@ -3193,7 +3229,7 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 #if 1
 	if((g_bac_read_type == TYPE_ALL) || (g_bac_read_type == TYPE_SETTING) || g_bac_need_read_setting)
 	{
-		for (int i=0;i<1;i++)	//read from start 0 to 4 ;
+		for (int i=0;i<1;i++)	
 		{
 			int ret_n;
 			ret_n = GetPrivateData_Blocking(g_bac_instance,READ_SETTING_COMMAND,i,i,sizeof(Str_Setting_Info));
@@ -3220,6 +3256,7 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 				g_bac_need_read_setting = false;	//读过一次后 就不用在读了，下次点击Input 就直接读Input;
 			}
 		}
+
 		::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
 	}
 #endif
@@ -3748,347 +3785,23 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		if(bac_read_which_list == BAC_READ_GRAPHIC_LABEL_INFO)
 		{
-			Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].end_instance = 0;
-			Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].resend_count =0;
-			Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].invoke_id = -1;
-			bac_graphic_label_read_results = 0;
-			Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].timeout_count = 0;
-		}
-	}
-	if(bac_read_which_list == BAC_READ_REMOTE_POINT_INFO)
-	{
-		for (int i=0;i<BAC_REMOTE_POINT_GROUP;i++)
-		{
-			Bacnet_Refresh_Info.Read_Remote_Point_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Remote_Point_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Remote_Point_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Remote_Point_Info[i].end_instance = 0;
-			Bacnet_Refresh_Info.Read_Remote_Point_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Remote_Point_Info[i].resend_count =0;
-			Bacnet_Refresh_Info.Read_Remote_Point_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Remote_Point_Info[i].invoke_id = -1;
-			bac_remote_point_read_results = 0;
-			Bacnet_Refresh_Info.Read_Remote_Point_Info[i].timeout_count = 0;
-		}
-	}
-
-	for (int i=0;i<BAC_USER_LOGIN_GROUP;i++)
-	{
-		if(bac_read_which_list == BAC_READ_USER_LOGIN_INFO)
-		{
-			Bacnet_Refresh_Info.Read_UserLogin[i].command = 0;
-			Bacnet_Refresh_Info.Read_UserLogin[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_UserLogin[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_UserLogin[i].end_instance = 0;
-			Bacnet_Refresh_Info.Read_UserLogin[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_UserLogin[i].resend_count =0;
-			Bacnet_Refresh_Info.Read_UserLogin[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_UserLogin[i].invoke_id = -1;
-			bac_user_login_read_results = 0;
-			Bacnet_Refresh_Info.Read_UserLogin[i].timeout_count = 0;
-		}
-	}
-
-	
-	for (int i=0;i<BAC_CUSTOMER_UNIT_GROUP;i++)
-	{
-		if(bac_read_which_list == BAC_READ_CUSTOMER_UNITS)
-		{
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].end_instance = 0;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].resend_count =0;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id = -1;
-			bac_customer_unit_read_results = 0;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].timeout_count = 0;
-		}
-	}
-
-
-
-	for (int i=0; i<BAC_MONITOR_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_MONITOR_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG)|| (bac_read_which_list ==BAC_READ_ALL_LIST))
-		//if(bac_read_which_list == BAC_READ_MONITOR_LIST)
-		{
-			Bacnet_Refresh_Info.Read_Monitor_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Monitor_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Monitor_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Monitor_Info[i].end_instance = 0;
-			Bacnet_Refresh_Info.Read_Monitor_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Monitor_Info[i].resend_count =0;
-			Bacnet_Refresh_Info.Read_Monitor_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Monitor_Info[i].invoke_id = -1;
-			bac_monitor_read_results = 0;
-			Bacnet_Refresh_Info.Read_Monitor_Info[i].timeout_count = 0;
-		}
-	}
-
-	for (int i=0;i<BAC_SCREEN_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_SCREEN_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG)|| (bac_read_which_list ==BAC_READ_ALL_LIST))
-		{
-			Bacnet_Refresh_Info.Read_Screen_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Screen_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Screen_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Screen_Info[i].end_instance = 0;
-			Bacnet_Refresh_Info.Read_Screen_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Screen_Info[i].resend_count =0;
-			Bacnet_Refresh_Info.Read_Screen_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Screen_Info[i].invoke_id = -1;
-			bac_screen_read_results = 0;
-			Bacnet_Refresh_Info.Read_Screen_Info[i].timeout_count = 0;
-		}
-	}
-
-	for (int i=0;i<BAC_TIME_COMMAND_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_TIME_COMMAND) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG))
-		{
-			Bacnet_Refresh_Info.Read_Time_Command[i].command = 0;
-			Bacnet_Refresh_Info.Read_Time_Command[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Time_Command[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Time_Command[i].end_instance = 0;
-			Bacnet_Refresh_Info.Read_Time_Command[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Time_Command[i].resend_count =0;
-			Bacnet_Refresh_Info.Read_Time_Command[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Time_Command[i].invoke_id = -1;
-			bac_time_command_read_results = 0;
-			Bacnet_Refresh_Info.Read_Time_Command[i].timeout_count = 0;
-		}
-	}
-
-	for (int i=0;i<BAC_BASIC_SETTING_GROUP;i++)//prg文件暂时不保存这些基本设置的东西，像IP地址和mac地址;
-	{
-		if((bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG))
-		{
-			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].end_instance = 0;
-			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].resend_count =0;
-			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].invoke_id = -1;
-			bac_basic_setting_read_results = 0;
-			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].timeout_count = 0;
-		}
-	}
-
-	
-
-	for(int i=0;i<BAC_SCHEDULE_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_WEEKLY_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG))
-		{
-			Bacnet_Refresh_Info.Read_Weekly_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Weekly_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Weekly_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Weekly_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_Weekly_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Weekly_Info[i].resend_count = 0;
-			Bacnet_Refresh_Info.Read_Weekly_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Weekly_Info[i].invoke_id = -1;
-			bac_weekly_read_results = 0;
-			Bacnet_Refresh_Info.Read_Weekly_Info[i].timeout_count = 0;
-		}
-	}
-
-	for(int i=0;i<BAC_HOLIDAY_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_ANNUAL_LIST) ||(bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG))
-		{
-			Bacnet_Refresh_Info.Read_Annual_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Annual_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Annual_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Annual_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_Annual_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Annual_Info[i].resend_count = 0;
-
-			Bacnet_Refresh_Info.Read_Annual_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Annual_Info[i].invoke_id = -1;
-
-			bac_annual_read_results = 0;
-			Bacnet_Refresh_Info.Read_Annual_Info[i].timeout_count = 0;
-		}
-	}
-	
-	for (int i=0;i<BAC_PROGRAMCODE_GROUP;i++)
-	{
-
-		if((bac_read_which_list == BAC_READ_PROGRAMCODE_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG))
-		{
-			Bacnet_Refresh_Info.Read_Programcode_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Programcode_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Programcode_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Programcode_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_Programcode_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Programcode_Info[i].resend_count = 0;
-
-			Bacnet_Refresh_Info.Read_Programcode_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Programcode_Info[i].invoke_id = -1;
-			bac_programcode_read_results = 0;
-			//bac_program_read_results = 0;
-			Bacnet_Refresh_Info.Read_Programcode_Info[i].timeout_count = 0;
-		}
-	}
-
-	for (int i=0;i<BAC_SCHEDULECODE_GOUP;i++)
-	{
-
-		if((bac_read_which_list == BAC_READ_WEEKLTCODE_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG))
-		{
-			Bacnet_Refresh_Info.Read_Weeklycode_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Weeklycode_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Weeklycode_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Weeklycode_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_Weeklycode_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Weeklycode_Info[i].resend_count = 0;
-
-			Bacnet_Refresh_Info.Read_Weeklycode_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Weeklycode_Info[i].invoke_id = -1;
-			bac_weeklycode_read_results = 0;
-			Bacnet_Refresh_Info.Read_Weeklycode_Info[i].timeout_count = 0;
-		}
-	}
-
-	for (int i=0;i<BAC_PROGRAM_GROUP;i++)
-	{
-
-		if((bac_read_which_list == BAC_READ_PROGRAM_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) ||(bac_read_which_list ==TYPE_SVAE_CONFIG))
-		{
-			Bacnet_Refresh_Info.Read_Program_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Program_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Program_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Program_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_Program_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Program_Info[i].resend_count = 0;
-
-			Bacnet_Refresh_Info.Read_Program_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Program_Info[i].invoke_id = -1;
-
-			bac_program_read_results = 0;
-			Bacnet_Refresh_Info.Read_Program_Info[i].timeout_count = 0;
-		}
-	}
-
-	for (int i=0;i<BAC_INPUT_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_INPUT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) ||(bac_read_which_list ==TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_IN_OUT_VAR_LIST))
-		{
-			Bacnet_Refresh_Info.Read_Input_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Input_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Input_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Input_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_Input_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Input_Info[i].resend_count = 0;
-			Bacnet_Refresh_Info.Read_Input_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Input_Info[i].invoke_id = -1;
-			bac_input_read_results = 0;
-			Bacnet_Refresh_Info.Read_Input_Info[i].timeout_count = 0;
-
-		}
-	}
-	for (int i=0;i<BAC_HOLIDAYCODE_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_ANNUALCODE_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) ||(bac_read_which_list ==TYPE_SVAE_CONFIG))
-		{
-			Bacnet_Refresh_Info.Read_Annualcode_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Annualcode_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Annualcode_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Annualcode_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_Annualcode_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Annualcode_Info[i].resend_count = 0;
-			Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Annualcode_Info[i].invoke_id = -1;
-			bac_annualcode_read_results = 0;
-			Bacnet_Refresh_Info.Read_Annualcode_Info[i].timeout_count = 0;
-
-		}
-	}
-
-	for (int i=0;i<BAC_OUTPUT_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_OUTPUT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) ||(bac_read_which_list ==TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_IN_OUT_VAR_LIST))
-		{
-			Bacnet_Refresh_Info.Read_Output_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Output_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Output_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Output_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_Output_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Output_Info[i].resend_count = 0;
-			Bacnet_Refresh_Info.Read_Output_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Output_Info[i].invoke_id = -1;
-			bac_output_read_results = 0;
-			Bacnet_Refresh_Info.Read_Output_Info[i].timeout_count = 0;
-
-		}
-	}
-
-	for (int i=0;i<BAC_VARIABLE_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_VARIABLE_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) ||(bac_read_which_list ==TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_IN_OUT_VAR_LIST))
-		{
-			Bacnet_Refresh_Info.Read_Variable_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Variable_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Variable_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Variable_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_Variable_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Variable_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Variable_Info[i].invoke_id = -1;
-			Bacnet_Refresh_Info.Read_Variable_Info[i].resend_count = 0;
-			bac_variable_read_results = 0;
-			Bacnet_Refresh_Info.Read_Variable_Info[i].timeout_count = 0;
-		}
-	}
-
-	for (int i=0;i<BAC_PID_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_CONTROLLER_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG)|| (bac_read_which_list ==BAC_READ_ALL_LIST))
-		{
-			Bacnet_Refresh_Info.Read_Controller_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_Controller_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_Controller_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_Controller_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_Controller_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_Controller_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_Controller_Info[i].invoke_id = -1;
-			Bacnet_Refresh_Info.Read_Controller_Info[i].resend_count = 0;
-			bac_controller_read_results = 0;
-				Bacnet_Refresh_Info.Read_Controller_Info[i].timeout_count = 0;
-		}
-	}
-
-
-	for (int i=0;i<BAC_ALARMLOG_GROUP;i++)
-	{
-		if((bac_read_which_list == BAC_READ_ALARMLOG_LIST)/* || (bac_read_which_list ==BAC_READ_ALL_LIST)*/)
-		{
-			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].command = 0;
-			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].device_id = 0;
-			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance =0;
-			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].end_instance =0;
-			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].has_resend_yes_or_no = 0;
-			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result = BAC_RESULTS_UNKONW;
-			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].invoke_id = -1;
-			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].resend_count = 0;
-			bac_alarmlog_read_results = 0;
-			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].timeout_count = 0;
-		}
-	}
-
-	for (int i=0;i<BAC_GRPHIC_LABEL_GROUP;i++)
-	{
-		if(bac_read_which_list == BAC_READ_GRAPHIC_LABEL_INFO)
-		{
+            end_temp_instance = BAC_READ_GRPHIC_LABEL_REMAINDER + (BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_GRPHIC_LABEL_COUNT)
+                end_temp_instance = BAC_GRPHIC_LABEL_COUNT - 1;
+            CString temp_cs;
+            temp_cs.Format(_T("Read Graphic Label From %d to %d "), (BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,
+                end_temp_instance);
+            if (GetPrivateData(g_bac_instance, READ_GRPHIC_LABEL_COMMAND, (BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,
+                end_temp_instance, sizeof(Str_label_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4114,6 +3827,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4121,6 +3835,24 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		for (int i=0;i<BAC_REMOTE_POINT_GROUP;i++)
 		{
+            end_temp_instance = BAC_REMOTE_POINT_GROUP_REMAINDER + (BAC_REMOTE_POINT_GROUP_NUMBER*i);
+            if (end_temp_instance >= BAC_REMOTE_POINT_COUNT)
+                end_temp_instance = BAC_REMOTE_POINT_COUNT - 1;
+
+            CString temp_cs;
+            temp_cs.Format(_T("Read Remote point From %d to %d "), (BAC_REMOTE_POINT_GROUP_NUMBER)*i,
+                end_temp_instance);
+            if(GetPrivateData(g_bac_instance, READ_REMOTE_POINT, (BAC_REMOTE_POINT_GROUP_NUMBER)*i,
+                end_temp_instance, sizeof(Str_remote_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4145,6 +3877,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Remote_Point_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Remote_Point_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4154,6 +3887,23 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		if(bac_read_which_list == BAC_READ_USER_LOGIN_INFO)
 		{
+            end_temp_instance = BAC_READ_USER_LOGIN_INFO_REMAINDER + (BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_USER_LOGIN_COUNT)
+                end_temp_instance = BAC_USER_LOGIN_COUNT - 1;
+            CString temp_cs;
+            temp_cs.Format(_T("Read user login data from %d to %d "), (BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,
+                end_temp_instance);
+            if(GetPrivateData_Blocking(g_bac_instance, READUSER_T3000, (BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,
+                end_temp_instance, sizeof(Str_userlogin_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4179,6 +3929,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_UserLogin[i].start_instance,
 				Bacnet_Refresh_Info.Read_UserLogin[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4187,6 +3938,21 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		if(bac_read_which_list == BAC_READ_CUSTOMER_UNITS) 
 		{
+            CString temp_cs;
+            temp_cs.Format(_T("Read Custom units From %d to %d "), (BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,
+                3 + (BAC_READ_GROUP_NUMBER)*i);
+
+            if(GetPrivateData_Blocking(g_bac_instance, READUNIT_T3000, (BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,
+                3 + (BAC_READ_GROUP_NUMBER)*i, sizeof(Str_Units_element)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4208,6 +3974,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Customer_unit_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Customer_unit_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4217,6 +3984,22 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		if((bac_read_which_list == BAC_READ_MONITOR_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG) || (bac_read_which_list ==BAC_READ_ALL_LIST))
 		//if(bac_read_which_list == BAC_READ_MONITOR_LIST)
 		{
+            end_temp_instance = BAC_READ_MONOTOR_REMAINDER + (BAC_READ_MONITOR_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_MONITOR_COUNT)
+                end_temp_instance = BAC_MONITOR_COUNT - 1;
+            CString temp_cs;
+            temp_cs.Format(_T("Read Monitor Item From %d to %d "), (BAC_READ_MONITOR_GROUP_NUMBER)*i, end_temp_instance);
+            if(GetPrivateData_Blocking(g_bac_instance, READMONITOR_T3000, (BAC_READ_MONITOR_GROUP_NUMBER)*i,
+                end_temp_instance, sizeof(Str_monitor_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4244,6 +4027,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Monitor_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Monitor_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4252,6 +4036,23 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		if((bac_read_which_list == BAC_READ_SCREEN_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG)|| (bac_read_which_list ==BAC_READ_ALL_LIST))
 		//if(bac_read_which_list == BAC_READ_SCREEN_LIST)
 		{
+            CString temp_cs;
+            end_temp_instance = BAC_READ_SCREEN_REMAINDER + (BAC_READ_SCREEN_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_SCREEN_COUNT)
+                end_temp_instance = BAC_SCREEN_COUNT - 1;
+
+            temp_cs.Format(_T("Read Screens Item From %d to %d "), (BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance );
+
+            if(GetPrivateData_Blocking(g_bac_instance, READSCREEN_T3000, (BAC_READ_SCREEN_GROUP_NUMBER)*i, end_temp_instance, sizeof(Control_group_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4277,6 +4078,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Screen_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Screen_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4285,6 +4087,18 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		//如果是在读Setting 界面的时候也要同时读 Time，因为time在setting界面值;
 		if((bac_read_which_list == BAC_READ_TIME_COMMAND) ||(bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND)|| (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG))
 		{
+            CString temp_cs_show;
+            temp_cs_show.Format(_T("Read device time "));
+            if (GetPrivateData_Blocking(g_bac_instance, TIME_COMMAND, 0, 0, sizeof(Time_block_mini)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read system time success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read system time timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4306,7 +4120,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 			CString temp_cs_show;
 			temp_cs_show.Format(_T("Read device time "));
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
-
+#endif
 			//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,_T("1111111111111"));
 			//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 		}
@@ -4318,7 +4132,17 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		if((bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG))
 		{
-			resend_count = 0;
+            if (GetPrivateData_Blocking(g_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read setting success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read setting timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME*3);
+#if 0
+            resend_count = 0;
 			do 
 			{
 				resend_count ++;
@@ -4339,7 +4163,13 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 			CString temp_cs_show;
 			temp_cs_show.Format(_T("Read Basic Setting "));
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
-
+#endif
+            if (GetPrivateData_Blocking(g_bac_instance, READ_EMAIL_ALARM, 0, 0, sizeof(Str_Email_point)) < 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read email setting timeout !"));
+                Sleep(10);
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
 		}
 	}
 
@@ -4350,6 +4180,25 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		if((bac_read_which_list == BAC_READ_WEEKLY_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG))
 		//if(bac_read_which_list == BAC_READ_WEEKLY_LIST)
 		{
+            end_temp_instance = BAC_READ_SCHEDULE_REMAINDER + (BAC_READ_SCHEDULE_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_SCHEDULE_COUNT)
+                end_temp_instance = BAC_SCHEDULE_COUNT - 1;
+            CString temp_cs;
+            temp_cs.Format(_T("Read Weekly Routine Item From %d to %d "), (BAC_READ_SCHEDULE_GROUP_NUMBER)*i,
+                end_temp_instance);
+           if(GetPrivateData_Blocking(g_bac_instance,
+                READWEEKLYROUTINE_T3000, (BAC_READ_SCHEDULE_GROUP_NUMBER)*i,
+                end_temp_instance,
+                sizeof(Str_weekly_routine_point)) > 0) 
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+           Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4377,6 +4226,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Weekly_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Weekly_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4385,6 +4235,24 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		if((bac_read_which_list == BAC_READ_ANNUAL_LIST) ||(bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG))
 		//if(bac_read_which_list == BAC_READ_ANNUAL_LIST)
 		{
+            end_temp_instance = BAC_READ_HOLIDAY_REMAINDER + (BAC_READ_HOLIDAY_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_HOLIDAY_COUNT)
+                end_temp_instance = BAC_HOLIDAY_COUNT - 1;
+            CString temp_cs;
+            temp_cs.Format(_T("Read Annual Routine Item From %d to %d "), (BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
+            if (GetPrivateData_Blocking(g_bac_instance,
+                READANNUALROUTINE_T3000, (BAC_READ_HOLIDAY_GROUP_NUMBER)*i,
+                end_temp_instance,
+                sizeof(Str_annual_routine_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4413,6 +4281,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Annual_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Annual_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4423,6 +4292,24 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		if((bac_read_which_list == BAC_READ_ALARMLOG_LIST) /*|| (bac_read_which_list ==BAC_READ_ALL_LIST)*/)
 		{
+            end_temp_instance = BAC_READ_ALARMLOG_REMAINDER + (BAC_READ_ALARMLOG_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_ALARMLOG_COUNT)
+                end_temp_instance = BAC_ALARMLOG_COUNT - 1;
+            CString temp_cs;
+            temp_cs.Format(_T("Read Alarm Log List from %d to %d "), (BAC_READ_ALARMLOG_GROUP_NUMBER)*i,end_temp_instance);
+
+            if (GetPrivateData_Blocking(g_bac_instance, READALARM_T3000, (BAC_READ_ALARMLOG_GROUP_NUMBER)*i,
+                end_temp_instance, sizeof(Alarm_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+             }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4449,6 +4336,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 			temp_cs.Format(_T("Read Alarm Log List %d"),
 				Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4458,6 +4346,25 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		if((bac_read_which_list == BAC_READ_INPUT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_IN_OUT_VAR_LIST))
 		{
+
+            end_temp_instance = BAC_READ_INPUT_REMAINDER + (BAC_READ_INPUT_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_INPUT_ITEM_COUNT)
+                end_temp_instance = BAC_INPUT_ITEM_COUNT - 1;
+            CString temp_cs;
+            temp_cs.Format(_T("Read Input List Item From %d to %d "),
+                BAC_READ_INPUT_GROUP_NUMBER*i,
+                end_temp_instance);
+            if (GetPrivateData_Blocking(g_bac_instance, READINPUT_T3000, BAC_READ_INPUT_GROUP_NUMBER*i, end_temp_instance, sizeof(Str_in_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4485,6 +4392,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Input_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Input_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4493,6 +4401,21 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 
 		if((bac_read_which_list == BAC_READ_OUTPUT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_IN_OUT_VAR_LIST))
 		{
+            end_temp_instance = BAC_READ_OUTPUT_REMAINDER + (BAC_READ_OUTPUT_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_OUTPUT_ITEM_COUNT)
+                end_temp_instance = BAC_OUTPUT_ITEM_COUNT - 1;
+            CString temp_cs;
+            temp_cs.Format(_T("Read Output List Item From %d to %d "), BAC_READ_OUTPUT_GROUP_NUMBER*i,   end_temp_instance);
+            if (GetPrivateData_Blocking(g_bac_instance, READOUTPUT_T3000, BAC_READ_OUTPUT_GROUP_NUMBER*i,end_temp_instance,sizeof(Str_out_point))> 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			resend_count = 0;
 			do 
 			{
@@ -4519,6 +4442,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Output_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Output_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4526,6 +4450,22 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		if((bac_read_which_list == BAC_READ_VARIABLE_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_IN_OUT_VAR_LIST))
 		{
+
+            end_temp_instance = BAC_READ_VARIABLE_REMAINDER + (BAC_READ_VARIABLE_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_VARIABLE_ITEM_COUNT)
+                end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
+            CString temp_cs;
+            temp_cs.Format(_T("Read Variable List Item From %d to %d "), BAC_READ_VARIABLE_GROUP_NUMBER*i, end_temp_instance);
+            if (GetPrivateData_Blocking(g_bac_instance, READVARIABLE_T3000, BAC_READ_VARIABLE_GROUP_NUMBER*i, end_temp_instance, sizeof(Str_variable_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			int resend_count = 0;
 			do 
 			{
@@ -4550,6 +4490,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Variable_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Variable_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4557,6 +4498,22 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		if((bac_read_which_list == BAC_READ_PROGRAM_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG))
 		{
+            end_temp_instance = BAC_READ_PROGRAM_REMAINDER + (BAC_READ_PROGRAM_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_PROGRAM_ITEM_COUNT)
+                end_temp_instance = BAC_PROGRAM_ITEM_COUNT - 1;
+            
+            CString temp_cs;
+            temp_cs.Format(_T("Read Program List Item From %d to %d "), (BAC_READ_PROGRAM_GROUP_NUMBER)*i, end_temp_instance);
+            if(GetPrivateData_Blocking(g_bac_instance, READPROGRAM_T3000, (BAC_READ_PROGRAM_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_program_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			int resend_count = 0;
 			do 
 			{
@@ -4580,6 +4537,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Program_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Program_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4588,6 +4546,21 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		if((bac_read_which_list == BAC_READ_CONTROLLER_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG)|| (bac_read_which_list ==BAC_READ_ALL_LIST))
 		{
+            end_temp_instance = BAC_READ_PID_REMAINDER + (BAC_READ_PID_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_PID_COUNT)
+                end_temp_instance = BAC_PID_COUNT - 1;
+            CString temp_cs;
+            temp_cs.Format(_T("Read Controller List Item From %d to %d "), (BAC_READ_PID_GROUP_NUMBER)*i, end_temp_instance);
+            if(GetPrivateData_Blocking(g_bac_instance, READCONTROLLER_T3000, (BAC_READ_PID_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_controller_point)) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			int resend_count = 0;
 			do 
 			{
@@ -4611,12 +4584,27 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Controller_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Controller_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
 
 	if(bac_read_which_list == BAC_READ_WEEKLTCODE_LIST)
 	{
+        CString temp_cs;
+        temp_cs.Format(_T("Read annuale schedule time list from %d to %d "), weekly_list_line, weekly_list_line);
+        if(GetPrivateData_Blocking(g_bac_instance, READTIMESCHEDULE_T3000, weekly_list_line, weekly_list_line, WEEKLY_SCHEDULE_SIZE) > 0)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            bac_weeklycode_read_results = true;
+        }
+        else
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            bac_weeklycode_read_results = false;
+        }
+        Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 		int resend_count = 0;
 		do 
 		{
@@ -4637,11 +4625,24 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 			Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].start_instance,
 			Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].end_instance);
 		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 	}
 	else if(bac_read_which_list ==TYPE_SVAE_CONFIG)
 	{
 		for (int i=0;i<BAC_SCHEDULECODE_GOUP;i++)
 		{
+            CString temp_cs;
+            temp_cs.Format(_T("Read schedule time List Item From %d to %d "),i,i);
+            if(GetPrivateData_Blocking(g_bac_instance, READTIMESCHEDULE_T3000, i, i, WEEKLY_SCHEDULE_SIZE) > 0 )
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			int resend_count = 0;
 			do 
 			{
@@ -4662,12 +4663,27 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Weeklycode_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Weeklycode_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
 
 	if(bac_read_which_list == BAC_READ_ANNUALCODE_LIST)
 	{
+        CString temp_cs;
+        temp_cs.Format(_T("Read Annual day List Item From %d to %d "), annual_list_line, annual_list_line);
+        if (GetPrivateData_Blocking(g_bac_instance, READANNUALSCHEDULE_T3000, annual_list_line, annual_list_line, ANNUAL_CODE_SIZE) > 0)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            bac_annualcode_read_results = true;
+        }
+        else
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            bac_annualcode_read_results = false;
+        }
+        Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 		int resend_count = 0;
 		do 
 		{
@@ -4688,11 +4704,24 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 			Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].start_instance,
 			Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].end_instance);
 		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 	}
 	else if(bac_read_which_list ==TYPE_SVAE_CONFIG)
 	{
 		for (int i=0;i<BAC_HOLIDAYCODE_GROUP;i++)
 		{
+            CString temp_cs;
+            temp_cs.Format(_T("Read Holiday List Item From %d to %d "),i,i);
+            if(GetPrivateData_Blocking(g_bac_instance, READANNUALSCHEDULE_T3000, i, i, ANNUAL_CODE_SIZE) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			int resend_count = 0;
 			do 
 			{
@@ -4713,6 +4742,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				Bacnet_Refresh_Info.Read_Annualcode_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Annualcode_Info[i].end_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+#endif
 		}
 	}
 
@@ -4727,6 +4757,20 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 
 		for (int x=0;x<5;x++)
 		{
+            CString temp_cs;
+            temp_cs.Format(_T("Read program data %d ,part %d"), program_list_line, x);
+
+            if (GetProgramData_Blocking(g_bac_instance, program_list_line, program_list_line, x) > 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+
+            }
+            else
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+            }
+            Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 			int send_status = true;
 			int resend_count = 0;
 			int temp_invoke_id = -1;
@@ -4755,7 +4799,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 part_success:
 				continue;
 			}
-
+#endif
 
 
 		}
@@ -4769,10 +4813,6 @@ part_success:
 		{
 			::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, SHOW_PROGRAM_NEWIDE, 0);
 		}
-		
-
-
-		//::PostMessage(m_program_edit_hwnd,WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
 
 	}
 	else if(bac_read_which_list ==TYPE_SVAE_CONFIG)
@@ -4780,6 +4820,23 @@ part_success:
 		for (int z=0;z<BAC_PROGRAM_ITEM_COUNT;z++)
 		{
 			memset(program_code[z],0,2000);		 //清零;
+
+            for (int x = 0;x < 5;x++)
+            {
+                CString temp_cs;
+                temp_cs.Format(_T("Read program data %d ,part %d"), z, x);
+
+                if (GetProgramData_Blocking(g_bac_instance, z, z, x) > 0)
+                {
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+                }
+                else
+                {
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+                }
+                Sleep(SEND_COMMAND_DELAY_TIME);
+            }
+#if 0
 			for (int x=0;x<5;x++)
 			{
 				int send_status = true;
@@ -4819,6 +4876,7 @@ program_part_success:
 
 			}
 			Bacnet_Refresh_Info.Read_Programcode_Info[z].task_result = BAC_RESULTS_OK;
+#endif
 		}
 		//bac_programcode_read_results = true;
 	}
@@ -4831,13 +4889,13 @@ program_part_success:
 	//}
 	
 	hwait_thread = NULL;
-
+    ::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, 0, 0);
 	return 0;
 		//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
 
 myend:	hwait_thread = NULL;
 		//AfxMessageBox(_T("Send Command Timeout!!!!!!!!!!"));
-		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,0,0);
+		
 	return 0;
 }
 
@@ -4993,6 +5051,48 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				int	resend_count = 0;
 				for (int z=0;z<3;z++)
 				{
+                    if (GetPrivateData_Blocking(g_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
+                    {
+                        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data success!"));
+                        if (send_status)
+                        {
+                            bool need_break = false;
+                            for (int z = 0;z<200;z++)
+                            {
+                                Sleep(10);
+                                if (tsm_invoke_id_free(temp_invoke_id))
+                                {
+                                    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data : OK  "));
+                                    g_llRxCount++;
+                                    g_llTxCount++;
+                                    is_connected = true;
+                                    //Device_Basic_Setting.reg.user_name = 2;
+                                    if (Device_Basic_Setting.reg.user_name == 2) //Enable user name
+                                    {
+                                        m_bac_main_tab.ShowWindow(false);
+                                        PostMessage(WM_FRESH_CM_LIST, MENU_CLICK, BAC_READ_USER_LOGIN_INFO);
+                                        User_Login_Window->ShowWindow(SW_NORMAL);
+
+                                        ::PostMessage(m_user_login_hwnd, MY_REDRAW_WINDOW, NULL, NULL);
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        m_user_level = LOGIN_SUCCESS_FULL_ACCESS;
+                                    }
+                                    need_break = true;
+                                    break;
+                                }
+                                else
+                                    continue;
+                            }
+                            if (need_break)
+                                break;
+
+                        }
+                    }
+                    Sleep(SEND_COMMAND_DELAY_TIME);
+#if 0
 					do 
 					{
 						resend_count ++;
@@ -5010,6 +5110,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 
 						Sleep(SEND_COMMAND_DELAY_TIME);
 					} while (temp_invoke_id<0);
+
 					if(send_status)
 					{
 						bool need_break = false;
@@ -5046,7 +5147,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 							break;
 						
 					}
-
+#endif
 				}
 				if(is_connected)	
 				{
@@ -5217,7 +5318,6 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 			}
             else if(LoadBacnetBinaryFile(false, achive_file_path) < 0)
-			//else if(LoadBacnetBinaryFile_Cache(achive_file_path) < 0 )
 			{
                 if (g_protocol == PROTOCOL_BACNET_IP)
                 {
@@ -5395,6 +5495,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		{
 			read_customer_unit = true;
 		}
+        Sleep(50);
 	}
 
 	//if ((!read_analog_customer_unit) && selected_product_Node.protocol != MODBUS_RS485 && ((selected_product_Node.product_class_id == PM_CM5) ||
@@ -5415,7 +5516,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs);
 			read_analog_customer_unit = true;		
 		}
-
+        Sleep(50);
 		if(GetPrivateData_Blocking(g_bac_instance,READVARUNIT_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
 		{
 			temp_cs.Format(_T("Read Data OK."));
@@ -5424,8 +5525,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 
 
 	}
-	  /*if (write_indb_thread == NULL)
-		  write_indb_thread = CreateThread(NULL, NULL, Write_Data_Into_Db, this, NULL, NULL);*/
+
 	WritePrivateProfileStringW(_T("LastView"),_T("ViewSerialNumber"),temp_serial_number,g_cstring_ini_path);
 	WritePrivateProfileStringW(_T("LastView"),_T("ViewPid"),_T("35"),g_cstring_ini_path);
 	SetTimer(BAC_SET_LAST_UI,1000,NULL);
@@ -5717,59 +5817,59 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 
 DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 {
-	unsigned char  read_device_id = 0;
-	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    unsigned char  read_device_id = 0;
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
     //if ((pFrame->m_product.size() == 0) || (selected_product_index >= pFrame->m_product.size()))
     //{
     //    hide_485_progress = false;
     //    read_each_485_fun_thread = NULL;
     //    return 0;
     //}
-	read_device_id = selected_product_Node.product_id;
-	bool read_result = true;
-	unsigned short read_data_buffer[3200];
-	memset(read_data_buffer,0,sizeof(unsigned short)*3200);
+    read_device_id = selected_product_Node.product_id;
+    bool read_result = true;
+    unsigned short read_data_buffer[3200];
+    memset(read_data_buffer, 0, sizeof(unsigned short) * 3200);
 
-	int output_reg = 0;
-	int input_reg = 0;
-	int pid_con_reg = 0;
+    int output_reg = 0;
+    int input_reg = 0;
+    int pid_con_reg = 0;
     int variable_reg = 0;
-	if(n_read_product_type == T38AI8AO6DO)
-	{
-		output_reg = 4; // (6+8)*23 = 322/100 = 4
-		input_reg =  2; //  23 * 8 = 184
-	}
-	else if(n_read_product_type == PID_T322AI)
-	{
-		output_reg = 0; // (6+8)*23 = 322
-		input_reg =  6; //  23 * 22 = 506
-	}
-	else if (n_read_product_type == PWM_TRANSDUCER)
-	{
-		output_reg = 2; // (0 + 6)*23 = 138
-		input_reg = 2; //  (0+6) * 22 = 132
-	}
-	else if(n_read_product_type == PID_T3PT12)
-	{
-		output_reg = 0; // (6+8)*23 = 322
-		input_reg =  3; //  23 * 12 = 506
-	}
-	else if (n_read_product_type == PM_T3_LC)
-	{
-		output_reg =2 ; // (6+8)*23 = 322
-		input_reg = 2; //  23 * 12 = 506
-	}
-	else if (n_read_product_type == PID_T36CTA)
-	{
-		output_reg = 1;       //(1)*23 = 322
-		input_reg = 6;       //23 * 12 = 506
-	}
-	else if(n_read_product_type == STM32_HUM_NET)
-	{
+    if (n_read_product_type == T38AI8AO6DO)
+    {
+        output_reg = 4; // (6+8)*23 = 322/100 = 4
+        input_reg = 2; //  23 * 8 = 184
+    }
+    else if (n_read_product_type == PID_T322AI)
+    {
+        output_reg = 0; // (6+8)*23 = 322
+        input_reg = 6; //  23 * 22 = 506
+    }
+    else if (n_read_product_type == PWM_TRANSDUCER)
+    {
+        output_reg = 2; // (0 + 6)*23 = 138
+        input_reg = 2; //  (0+6) * 22 = 132
+    }
+    else if (n_read_product_type == PID_T3PT12)
+    {
+        output_reg = 0; // (6+8)*23 = 322
+        input_reg = 3; //  23 * 12 = 506
+    }
+    else if (n_read_product_type == PM_T3_LC)
+    {
+        output_reg = 2; // (6+8)*23 = 322
+        input_reg = 2; //  23 * 12 = 506
+    }
+    else if (n_read_product_type == PID_T36CTA)
+    {
+        output_reg = 1;       //(1)*23 = 322
+        input_reg = 6;       //23 * 12 = 506
+    }
+    else if (n_read_product_type == STM32_HUM_NET)
+    {
         output_reg = 1; // (3)*23 = 69/100 = 1
         input_reg = 1; //  23 * 3 = 69/100 = 1
-		pid_con_reg = 1;		//28*3
-	}
+        pid_con_reg = 1;		//28*3
+    }
     else if (n_read_product_type == STM32_CO2_NET)
     {
         output_reg = 1; // (3)*23 = 69/100 = 1
@@ -5780,144 +5880,145 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         output_reg = 1; // (3)*23 = 69/100 = 1
         input_reg = 1; //  23 * 3 = 69/100 = 1
     }
-	else
-	{
-		output_reg = 15; //默认是读minipanel 的所有的寄存器 ;
-		input_reg = 15;
+    else
+    {
+        output_reg = 15; //默认是读minipanel 的所有的寄存器 ;
+        input_reg = 15;
         variable_reg = 26;
-	}
-	
-	
-	int read_type = -1;
-
-	switch(n_read_list_flag)
-	{
-	case BAC_OUT:   //OUT
-		{
-			//output 45 按46算  *64  + input 46  *64  需要读2944;
-			for(int i=0; i<output_reg; i++)
-			{
-				int itemp = 0;
-				itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],BAC_OUT_START_REG+i*100,100,4);
-				if(itemp < 0 )
-				{
-					read_result = false;
-					break; 
-				}
-				else
-				{
-					if(!hide_485_progress)
-						g_progress_persent = (i+1)*100 / output_reg;	
-					else
-					{
-						SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reading Outputs..."));
-					}
-				}
-				Sleep(100);
-			}
-			if(read_result)
-			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read Outputs OK!"));
-				for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
-				{
-					memcpy( &m_Output_data.at(i),&read_data_buffer[i*23],sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
-				}
-
-				CString str_serialid;
-				str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
-				CString achive_file_path;
-				CString temp_serial;
-				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
-
-				SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
-
-				if(Output_Window->IsWindowVisible())
-					::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-			}
-            g_progress_persent = 100;
-		}
-		break;
-	case BAC_IN:   //IN
-		{
-			//output 45 按46算  *64  + input 46  *64  需要读2944;
-			for(int i=0; i<input_reg; i++)
-			{
-
-				int itemp = 0;
-				itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],BAC_IN_START_REG+i*100,100,4);
-				if(itemp < 0 )
-				{
-					read_result = false;
-					break; 
-				}
-				else
-				{
-					if(!hide_485_progress)
-						g_progress_persent = (i+1)*100 / input_reg;	
-					else
-					{
-						SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reading Inputs..."));
-					}
-				}
-				Sleep(100);
-			}
-			if(read_result)
-			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read Iutputs OK!"));
-
-				for (int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
-				{
-					memcpy( &m_Input_data.at(i),&read_data_buffer[i*23],sizeof(Str_in_point));//因为Input 只有45个字节，两个byte放到1个 modbus的寄存器里面;
-				}
-
-				CString str_serialid;
-				str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
-				CString achive_file_path;
-				CString temp_serial;
-				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
-
-				SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
-
-			
-				if(Input_Window->IsWindowVisible())
-					::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-			}
-            g_progress_persent = 100;
-			
-		}
-		for (int i = 0;i < 3;i++)  //读Custom table
-		{
-			int itemp = 0;
-			itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_CUSTOMER_TABLE_START + i * 100, 100, 4);
-			if (itemp < 0)
-			{
-				read_result = false;
-				break;
-			}
-			else
-			{
-				if (!hide_485_progress)
-					g_progress_persent = (i + 1) * 100 / 2;
-			}
-			Sleep(100);
-
-		}
-		if (read_result)
-		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Analog table OK!"));
+        pid_con_reg = 3;
+    }
 
 
-			for (int i = 0;i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT;i++)
-			{
-				memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//因为Input 只有45个字节，两个byte放到1个 modbus的寄存器里面;
-			}
+    int read_type = -1;
 
-		}
+    switch (n_read_list_flag)
+    {
+    case BAC_OUT:   //OUT
+    {
+        //output 45 按46算  *64  + input 46  *64  需要读2944;
+        for (int i = 0; i < output_reg; i++)
+        {
+            int itemp = 0;
+            itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_OUT_START_REG + i * 100, 100, 4);
+            if (itemp < 0)
+            {
+                read_result = false;
+                break;
+            }
+            else
+            {
+                if (!hide_485_progress)
+                    g_progress_persent = (i + 1) * 100 / output_reg;
+                else
+                {
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Reading Outputs..."));
+                }
+            }
+            Sleep(100);
+        }
+        if (read_result)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Outputs OK!"));
+            for (int i = 0;i < BAC_OUTPUT_ITEM_COUNT;i++)
+            {
+                memcpy(&m_Output_data.at(i), &read_data_buffer[i * 23], sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+            }
 
-	break;
+            CString str_serialid;
+            str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
+            CString achive_file_path;
+            CString temp_serial;
+            achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+
+            SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+
+            if (Output_Window->IsWindowVisible())
+                ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+        }
+        g_progress_persent = 100;
+    }
+    break;
+    case BAC_IN:   //IN
+    {
+        //output 45 按46算  *64  + input 46  *64  需要读2944;
+        for (int i = 0; i < input_reg; i++)
+        {
+
+            int itemp = 0;
+            itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_IN_START_REG + i * 100, 100, 4);
+            if (itemp < 0)
+            {
+                read_result = false;
+                break;
+            }
+            else
+            {
+                if (!hide_485_progress)
+                    g_progress_persent = (i + 1) * 100 / input_reg;
+                else
+                {
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Reading Inputs..."));
+                }
+            }
+            Sleep(100);
+        }
+        if (read_result)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Iutputs OK!"));
+
+            for (int i = 0;i < BAC_INPUT_ITEM_COUNT;i++)
+            {
+                memcpy(&m_Input_data.at(i), &read_data_buffer[i * 23], sizeof(Str_in_point));//因为Input 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+            }
+
+            CString str_serialid;
+            str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
+            CString achive_file_path;
+            CString temp_serial;
+            achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+
+            SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+
+
+            if (Input_Window->IsWindowVisible())
+                ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+        }
+        g_progress_persent = 100;
+
+
+        for (int i = 0;i < 3;i++)  //读Custom table
+        {
+            int itemp = 0;
+            itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_CUSTOMER_TABLE_START + i * 100, 100, 4);
+            if (itemp < 0)
+            {
+                read_result = false;
+                break;
+            }
+            else
+            {
+                if (!hide_485_progress)
+                    g_progress_persent = (i + 1) * 100 / 2;
+            }
+            Sleep(100);
+
+        }
+        if (read_result)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Analog table OK!"));
+
+
+            for (int i = 0;i < BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT;i++)
+            {
+                memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//因为Input 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+            }
+
+        }
+    }
+    break;
     case BAC_VAR:
     {
-        for (int i = 0; i<variable_reg; i++)
+        for (int i = 0; i < variable_reg; i++)
         {
             int itemp = 0;
             itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_VAR_START_REG + i * 100, 100, 6);
@@ -5941,7 +6042,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         if (read_result)
         {
             SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Variables OK!"));
-            for (int i = 0;i<BAC_VARIABLE_ITEM_COUNT;i++)
+            for (int i = 0;i < BAC_VARIABLE_ITEM_COUNT;i++)
             {
                 memcpy(&m_Variable_data.at(i), &read_data_buffer[i * 20], sizeof(Str_variable_point));
             }
@@ -5959,95 +6060,140 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         }
         g_progress_persent = 100;
     }
+    break;
+    case BAC_PID:
+    {
+        //output 45 按46算  *64  + input 46  *64  需要读2944;
+        for (int i = 0; i < pid_con_reg; i++)
+        {
+
+            int itemp = 0;
+            itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_PID_CONTROL_START_REG + i * 100, 100, 4);
+            if (itemp < 0)
+            {
+                read_result = false;
+                break;
+            }
+            else
+            {
+                if (!hide_485_progress)
+                    g_progress_persent = (i + 1) * 100 / pid_con_reg;
+                else
+                {
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Reading pid controlls..."));
+                }
+            }
+            Sleep(100);
+        }
+        if (read_result)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read PID OK!"));
+
+            for (int i = 0;i < BAC_PID_COUNT;i++)
+            {
+                memcpy(&m_controller_data.at(i), &read_data_buffer[i * 14], sizeof(Str_controller_point));
+            }
+
+            if (Controller_Window->IsWindowVisible())
+                ::PostMessage(m_controller_dlg_hwnd, WM_REFRESH_BAC_CONTROLLER_LIST, NULL, NULL);
+        }
+    }
+    break;
+    case BAC_PRG:
+    {
+         
+        for (int i = 0; i < 4; i++)  //15503   - 15806
+        {
+            int itemp = 0;
+            itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_PRG_START_REG + i * 100, 100, 6);
+            if (itemp < 0)
+            {
+                read_result = false;
+                break;
+            }
+            else
+            {
+                if (!hide_485_progress)
+                    g_progress_persent = (i + 1) * 100 / variable_reg;
+                else
+                {
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Reading Programs..."));
+                }
+            }
+            Sleep(100);
+        }
+
+        if (read_result)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Programs OK!"));
+            for (int i = 0;i < BAC_PROGRAM_ITEM_COUNT;i++)
+            {
+                memcpy(&m_Program_data.at(i), &read_data_buffer[i * 19], sizeof(Str_program_point));
+            }
+
+            //CString str_serialid;
+            //str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
+            //CString achive_file_path;
+            //CString temp_serial;
+            //achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+
+            //SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+
+            if (Program_Window->IsWindowVisible())
+                ::PostMessage(m_pragram_dlg_hwnd, WM_REFRESH_BAC_PROGRAM_LIST, NULL, NULL);
+        }
+        g_progress_persent = 100;
+    }
         break;
-	case BAC_PID:
-		{
-			//output 45 按46算  *64  + input 46  *64  需要读2944;
-			for(int i=0; i<pid_con_reg; i++)
-			{
+    case   READ_SETTING_COMMAND:
+    {
+        //Setting 400 个字节
+        for (int i = 0; i < 2; i++)
+        {
+            int itemp = 0;
+            itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_SETTING_START_REG + i * 100, 100, 4);
+            if (itemp < 0)
+            {
+                read_result = false;
+                break;
+            }
+            else
+            {
+                if (!hide_485_progress)
+                    g_progress_persent = (i + 1) * 100 / 2;
+            }
+            Sleep(100);
+        }
 
-				int itemp = 0;
-				itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],BAC_PID_CONTROL_START_REG+i*100,100,4);
-				if(itemp < 0 )
-				{
-					read_result = false;
-					break; 
-				}
-				else
-				{
-					if(!hide_485_progress)
-						g_progress_persent = (i+1)*100 / pid_con_reg;	
-					else
-					{
-						SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reading pid controlls..."));
-					}
-				}
-				Sleep(100);
-			}
-			if(read_result)
-			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read PID OK!"));
+        if (read_result)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Setting infomation OK!"));
 
-				for (int i=0;i<BAC_PID_COUNT;i++)
-				{
-					memcpy( &m_controller_data.at(i),&read_data_buffer[i*14],sizeof(Str_controller_point));
-				}
-
-				if(Controller_Window->IsWindowVisible())
-					::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-			}
-		}
-		break;
-
-	case   READ_SETTING_COMMAND:
-		{
-			//Setting 400 个字节
-			for(int i=0; i<2; i++)
-			{
-				int itemp = 0;
-				itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],BAC_SETTING_START_REG+i*100,100,4);
-				if(itemp < 0 )
-				{
-					read_result = false;
-					break; 
-				}
-				else
-				{
-					if(!hide_485_progress)
-						g_progress_persent = (i+1)*100 / 2;	
-				}
-				Sleep(100);
-			}
-
-			if(read_result)
-			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read Setting infomation OK!"));
-
-				memcpy(&Device_Basic_Setting.reg,read_data_buffer,400); //Setting 的400个字节;
+            memcpy(&Device_Basic_Setting.reg, read_data_buffer, 400); //Setting 的400个字节;
 
 
-				CString str_serialid;
-				str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
-				CString achive_file_path;
-				CString temp_serial;
-				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+            CString str_serialid;
+            str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
+            CString achive_file_path;
+            CString temp_serial;
+            achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
 
-				SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
+            SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
 
 
-				if(Setting_Window->IsWindowVisible())
-					 ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
+            if (Setting_Window->IsWindowVisible())
+                ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
 
-			}
+        }
 
-		}
-		break;
-	default:
-		break;
-	}
-	hide_485_progress = false;
-	read_each_485_fun_thread = NULL;
-	return 0;
+    }
+    break;
+    default:
+        break;
+    }
+    hide_485_progress = false;
+    read_each_485_fun_thread = NULL;
+    return 0;
 }
 
 
@@ -6103,36 +6249,41 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 	 bool temp_update =false;
 
 	 temp_panel_number = read_data[36];
-	 temp_object_instance = read_data[35];
+
+     unsigned short temp_low = 0;
+     unsigned short temp_high = 0;
+     Get_Instance_Reg_Map(read_data[7], temp_high, temp_low);
+	 temp_object_instance = temp_high * 65536 + temp_low;;
 
 	 CString str_object_instance;
 	 CString str_panel_number;
 	 CString str_serialid;
 	 CString strSql;
-	 str_object_instance.Format(_T("%u"),temp_object_instance);
-	 str_panel_number.Format(_T("%u"),temp_panel_number);
-	 str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
-	 if(read_data[MODBUS_PRODUCT_MODEL] == PM_MINIPANEL|| read_data[MODBUS_PRODUCT_MODEL] == PM_MINIPANEL_ARM)
-	 {
-		 // 同步 本地数据库 的资料 ， panel number 和 实例号需与设备匹配;
-		 if((temp_panel_number != selected_product_Node.panel_number) || (temp_object_instance != selected_product_Node.object_instance))
-		 {
-			 CppSQLite3DB SqliteDBBuilding;
-			 CppSQLite3Table table;
-			 CppSQLite3Query q;
-			 SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+     unsigned int temp_instance = GetDeviceInstance(product_register_value[7]);
+	 str_object_instance.Format(_T("%u"), temp_instance);
+     str_panel_number.Format(_T("%u"), temp_panel_number);
+     str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
 
-			 CString temp_pro;
-			 temp_pro.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
-			 strSql.Format(_T("update ALL_NODE set  Object_Instance = '%s' , Panal_Number = '%s' ,Online_Status = 1  where Serial_ID = '%s'"),str_object_instance,str_panel_number,str_serialid);
-			 temp_update = true;
-			 SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
-		 }
-	 }
+     // 同步 本地数据库 的资料 ， panel number 和 实例号需与设备匹配;
+     if ((temp_panel_number != selected_product_Node.panel_number) || (temp_object_instance != selected_product_Node.object_instance))
+     {
+         CppSQLite3DB SqliteDBBuilding;
+         CppSQLite3Table table;
+         CppSQLite3Query q;
+         SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
-	 /*
-	 从缓存中得到上次的数据，如果版本不对就重新读一遍.
-	 */
+         CString temp_pro;
+         temp_pro.Format(_T("%u"), PROTOCOL_BIP_TO_MSTP);
+         strSql.Format(_T("update ALL_NODE set  Object_Instance = '%s' , Panal_Number = '%s' ,Online_Status = 1  where Serial_ID = '%s'"), str_object_instance, str_panel_number, str_serialid);
+         temp_update = true;
+         SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+         SqliteDBBuilding.closedb();
+     }
+
+
+     /*
+     从缓存中得到上次的数据，如果版本不对就重新读一遍.
+     */
 
 	 CString achive_file_path;
 	 CString temp_serial;
@@ -6188,7 +6339,11 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 		 else if(Setting_Window->IsWindowVisible())
 			  ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
 
+        
+
 	 }
+
+     switch_product_last_view();
 	 //PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
 
 
@@ -6202,10 +6357,10 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 {
 	set_datalink_protocol(2);
-	Initial_bac(g_gloab_bac_comport,_T(""), g_gloab_bac_baudrate);
+	//Initial_bac(g_gloab_bac_comport,_T(""), g_gloab_bac_baudrate);
 
 	bool find_exsit = false;
-	for (int i=0;i<10;i++)
+	for (int i=0;i<15;i++)
 	{
 		if(g_bac_instance<=0)
 		{
@@ -6229,7 +6384,7 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 		else
 		{
 			CString temp_cs_2;
-			temp_cs_2.Format(_T("Wait for response.(%ds)"),10-i);
+			temp_cs_2.Format(_T("Wait for response.(%ds)"),15-i);
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs_2);
 		}
 	}
@@ -6243,6 +6398,8 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 	}
 	else
 	{
+        g_llRxCount++;
+        g_llTxCount++;
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Receive bacnet 'who is ' command!"));
 	}
 
@@ -6250,9 +6407,17 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 	if(GetPrivateData_Blocking(g_bac_instance,READ_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info)) > 0)
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data success!"));
+        g_llRxCount++;
+        g_llTxCount++;
 	}
+    else
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read setting data timeout!"));
+        g_llRxCount++;
+        g_llTxCount++;
+    }
 
-	
+    switch_product_last_view();
 	connect_mstp_thread = NULL;
 	return 1;
 }

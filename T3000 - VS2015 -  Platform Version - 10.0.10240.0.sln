@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "T3000Controls", "T3000Contr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Update", "Update\Update - Platform Version - 10.0.10240.0.vcxproj", "{76CA38FC-61AC-4D71-B926-8F55406C9542}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemcoStandardBacnetTool", "BacnetExplore\Yabe\TemcoStandardBacnetTool.csproj", "{EE493B17-8185-406C-881F-1144092F01CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -174,6 +176,20 @@ Global
 		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Template|x64.Build.0 = Release|Win32
 		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Template|x86.ActiveCfg = Release|Win32
 		{76CA38FC-61AC-4D71-B926-8F55406C9542}.Template|x86.Build.0 = Release|Win32
+		{EE493B17-8185-406C-881F-1144092F01CB}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Debug|x64.ActiveCfg = Debug|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Debug|x86.ActiveCfg = Debug|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Debug|x86.Build.0 = Debug|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Release|Any CPU.ActiveCfg = Release|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Release|x64.ActiveCfg = Release|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Release|x86.ActiveCfg = Release|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Release|x86.Build.0 = Release|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Template|Any CPU.ActiveCfg = Release|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Template|Any CPU.Build.0 = Release|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Template|x64.ActiveCfg = Release|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Template|x64.Build.0 = Release|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Template|x86.ActiveCfg = Release|x86
+		{EE493B17-8185-406C-881F-1144092F01CB}.Template|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

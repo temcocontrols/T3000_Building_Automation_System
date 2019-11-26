@@ -23,6 +23,7 @@ public:
 	bool HandleAddVirtualDevice(HTREEITEM);
 	bool HandleAddCustomDevice(HTREEITEM hItem);
     bool HandleAddRemoteDevice(HTREEITEM);
+    //bool HandleAddThirdPartBacnetDevice(HTREEITEM);
      virtual bool    DoDeleteItem(HTREEITEM);
 
 	

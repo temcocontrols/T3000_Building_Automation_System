@@ -1592,8 +1592,16 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
 	{
 		return TRUE;
 	}
-
+    else if ((prodcutname.CompareNoCase(_T("CO2")) == 0 ) &&
+        hexproductname.CompareNoCase(_T("CO2 NET")) == 0)
+    {
+        return TRUE;
+    }
     else if ((hexproductname.CompareNoCase(_T("tstat6"))==0)&&(prodcutname.CompareNoCase(_T("tstat5i"))==0))
+    {
+        return TRUE;
+    }
+    else if ((hexproductname.CompareNoCase(_T("CM5_ARM")) == 0) && (prodcutname.CompareNoCase(_T("CM5")) == 0))
     {
         return TRUE;
     }
@@ -1731,6 +1739,10 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
     {
         Ret_Result= TRUE;
     }
+    else if ((hexproductname.CompareNoCase(_T("CM5_ARM")) == 0) && (prodcutname.CompareNoCase(_T("CM5")) == 0))
+    {
+        Ret_Result = TRUE;
+    }
     else
     {
         strtips.Format(_T("Your device is %s   but the hex file is for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
@@ -1849,14 +1861,44 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 				//Wait for the device to enter the ISP mode, some devices jump slower than others, can’t read after reboot, retry;
                 if (nRet <= 0)
                 {
+                    bool read_bootloader_ret = false;
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Sleep(2000);
+                        nRet = Read_One(pWriter->m_szMdbIDs[i], 11);
+                        if (nRet <= 0)
+                        {
+                            CString srtInfo;
+                            srtInfo.Format(_T("|Reading bootloader version (%d)!"), i + 1);
+                            pWriter->OutPutsStatusInfo(srtInfo);
+                            continue;
+                        }
+                        else
+                        {
+                            CString srtInfo;
+                            read_bootloader_ret = true;
+                            srtInfo.Format(_T("|Reading bootloader version OK!"));
+                            pWriter->OutPutsStatusInfo(srtInfo);
+                            break;
+                        }
+                    }
+#if 0
 					 Sleep(3000);
 					 nRet = Read_One(pWriter->m_szMdbIDs[i],11);
 					 if(nRet<= 0)
 					 {
-						 if(!auto_flash_mode)
-							 AfxMessageBox(_T("Failed to enter ISP Mode!"));
+                         Sleep(3000);
+                         nRet = Read_One(pWriter->m_szMdbIDs[i], 11);
+                         if (nRet <= 0)
+                         {
+                             CString srtInfo = _T("|Failed read bootloader version...continue update!");
+                             pWriter->OutPutsStatusInfo(srtInfo);
+                         }
+						 //if(!auto_flash_mode)
+							// AfxMessageBox(_T("Failed to enter ISP Mode!"));
 						 goto end_isp_flash;
 					 }
+#endif
                 }
 
        //         if (nRet >=41)//支持多个波特率切换的

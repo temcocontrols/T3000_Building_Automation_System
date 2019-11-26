@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const unsigned int g_versionNO= 20190613;
+const unsigned int g_versionNO= 20191126;
 
 
 #ifdef _DEBUG
@@ -56,14 +56,14 @@ CT3000App::CT3000App()
 
     //******************************************************
     // Release 版本发布时屏蔽此段，此段 主要用于调试时 显示 具体是 几点钟的版本.
-#ifdef _DEBUG
+//#ifdef _DEBUG
     char strTime[128] = { 0 }; // 取小时当 小版本号;
     CString Test_Version;  //   TIME 和DATE    
     memcpy(strTime, __TIME__, 2);
     MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
     Test_Version.ReleaseBuffer();
-	CurrentT3000Version= CurrentT3000Version + _T(" Version ") + Test_Version; //杜帆 : Release 版发布的时候 这句屏蔽掉就好了 ，会自动获取编译的日期.
-#endif 
+	CurrentT3000Version= CurrentT3000Version + _T(" . ") + Test_Version; //杜帆 : Release 版发布的时候 这句屏蔽掉就好了 ，会自动获取编译的日期.
+//#endif 
     //*******************************************************
     
 	T3000_Version = g_versionNO; //
@@ -145,24 +145,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 	
 }
  
-BOOL CT3000App::JudgeT3000Version(){
-CString ftp_T3000Version;
-ftp_T3000Version=GetContentFromURL(_T("http://www.temcocontrols.com/ftp/software/T3000_Version.txt"));
-if (ftp_T3000Version.GetLength()>20)
-{
-return FALSE;
-}
 
-// COleDateTime ftpVersionTime,CurrentVersionTime;
-// ftpVersionTime.ParseDateTime(ftp_T3000Version);
-// CurrentVersionTime.ParseDateTime(CurrentT3000Version);
-if (ftp_T3000Version>CurrentT3000Version)
-{
-return TRUE;
-}
-return FALSE;
-
-}
 
 void CT3000App::UpdateDB()
 {

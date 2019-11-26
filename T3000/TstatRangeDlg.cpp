@@ -166,6 +166,18 @@ void CTstatRangeDlg::Initial_window(){
 
 	  ((CButton *)GetDlgItem(IDC_RADIO_T_0+m_input_Analog_select))->SetCheck(1);
 	 
+      if ((m_input_Analog_select == 2) || // 0-100%
+          (m_input_Analog_select == 4) ||  //Custom 1
+          (m_input_Analog_select == 6) ||  //Custom 2
+          (m_input_Analog_select == 14))   //Voltage
+      {
+          Show5_10VUI(true);
+      }
+      else
+      {
+          Show5_10VUI(false);
+      }
+
       if (m_input_Analog_select == 12)
       {
           Show4_20maUI(true);
@@ -388,6 +400,7 @@ void CTstatRangeDlg::Click_Radio(){
 		if (((CButton *)GetDlgItem(i))->GetCheck()==1)
 		{
             m_input_Analog_select = i - IDC_RADIO_T_0;
+
 			break;
 		}
 
@@ -1972,6 +1985,25 @@ void CTstatRangeDlg::OnBnClickedRadioT13()
 	  Click_Radio();
 }
 
+void CTstatRangeDlg::Show5_10VUI(bool nshow)
+{
+    //if ((m_input_Analog_select == 2) || // 0-100%
+    //    (m_input_Analog_select == 4) ||  //Custom 1
+    //    (m_input_Analog_select == 6) ||  //Custom 2
+    //    (m_input_Analog_select == 14))   //Voltage
+     if(nshow)
+    {
+        GetDlgItem(IDC_RADIO_5V)->ShowWindow(true);
+        GetDlgItem(IDC_RADIO_10V)->ShowWindow(true);
+        GetDlgItem(IDC_STATIC_VOLTAGE_SELECT)->ShowWindow(true);
+    }
+    else
+    {
+        GetDlgItem(IDC_RADIO_5V)->ShowWindow(false);
+        GetDlgItem(IDC_RADIO_10V)->ShowWindow(false);
+        GetDlgItem(IDC_STATIC_VOLTAGE_SELECT)->ShowWindow(false);
+    }
+}
 
 void CTstatRangeDlg::Show4_20maUI(bool nshow)
 {

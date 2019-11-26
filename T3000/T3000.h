@@ -236,7 +236,6 @@ public:
 	virtual int ExitInstance();
 	void CopyDirectory(CString strSrcPath,CString strDstPath);
 //	bool cm5_timer;	  //CM5
-    BOOL JudgeT3000Version();
 	BOOL haveRegister();
 	void GetModulePath();
 	int GetSoftInstallDays();

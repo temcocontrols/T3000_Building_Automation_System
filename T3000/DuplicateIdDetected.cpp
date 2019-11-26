@@ -103,8 +103,11 @@ BOOL CDuplicateIdDetected::OnInitDialog()
 
     if (duplicate_mode == CONFILIC_IPADDRESS)
     {
-        if(hCheckIPHandle == NULL)
+        if (hCheckIPHandle == NULL)
+        {
             hCheckIPHandle = CreateThread(NULL, NULL, CheckIPvalidThread, this, NULL, NULL);
+            ::CloseHandle(hCheckIPHandle);
+        }
     }
 
 	return FALSE;  // return TRUE unless you set the focus to a control
@@ -727,17 +730,26 @@ void CDuplicateIdDetected::OnBnClickedButtonDuplicateDone()
     if (duplicate_mode == CONFILIC_SUBID)
     {
         if (DuplicatedThread == NULL)
+        {
             DuplicatedThread = CreateThread(NULL, NULL, DuplicatedProcess, this, NULL, NULL);
+            ::CloseHandle(DuplicatedThread);
+        }
     }
     else if (duplicate_mode == CONFILIC_PANEL_ID)
     {
         if (PanelNumberThread == NULL)
+        {
             PanelNumberThread = CreateThread(NULL, NULL, HanlePanelNumber, this, NULL, NULL);
+            ::CloseHandle(PanelNumberThread);
+        }
     }
     else if (duplicate_mode == CONFILIC_IPADDRESS)
     {
         if (hChangeDuplicateIP == NULL)
+        {
             hChangeDuplicateIP = CreateThread(NULL, NULL, ChangeDuplicateIPthread, this, NULL, NULL);
+            ::CloseHandle(hChangeDuplicateIP);
+        }
     }
 
 }

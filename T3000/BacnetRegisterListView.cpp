@@ -377,21 +377,6 @@ void CBacnetRegisterListView::Read_Data_From_DB()
             continue;
         }
 
-        temp_variant = monitor_bado.m_pRecordset->GetCollect("Operation");//
-        if (temp_variant.vt != VT_NULL)
-        {
-            temp_cs = temp_variant;
-            WideCharToMultiByte(CP_ACP, 0, temp_cs.GetBuffer(), -1, data_format[temp_count].cs_Operation, 255, NULL, NULL);
-        }
-        else
-        {
-            memset(data_format[temp_count].cs_Operation, 0, MAX_PATH);
-            temp_count++;
-            monitor_bado.m_pRecordset->MoveNext();
-            continue;
-        }
-
-
 
         temp_variant = monitor_bado.m_pRecordset->GetCollect("Sheet_Name");//
         if (temp_variant.vt != VT_NULL)
@@ -413,6 +398,21 @@ void CBacnetRegisterListView::Read_Data_From_DB()
         else
         {
             data_format[temp_count].n_product_id = 0;
+            temp_count++;
+            monitor_bado.m_pRecordset->MoveNext();
+            continue;
+        }
+
+
+        temp_variant = monitor_bado.m_pRecordset->GetCollect("Operation");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            temp_cs = temp_variant;
+            WideCharToMultiByte(CP_ACP, 0, temp_cs.GetBuffer(), -1, data_format[temp_count].cs_Operation, 255, NULL, NULL);
+        }
+        else
+        {
+            memset(data_format[temp_count].cs_Operation, 0, MAX_PATH);
             temp_count++;
             monitor_bado.m_pRecordset->MoveNext();
             continue;
@@ -447,6 +447,8 @@ void CBacnetRegisterListView::Read_Data_From_DB()
     if (m_record_count <= 0)
     {
         monitor_bado.CloseRecordset();//Ffff add
+        MessageBox(_T("The register list for the corresponding product was not found !"));
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The register list for the corresponding product was not found !"));
         return;
     }
 

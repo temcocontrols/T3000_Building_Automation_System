@@ -29,7 +29,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-    void dlenv_init(
+    __declspec(dllexport) void dlenv_init(
         void);
     int dlenv_register_as_foreign_device(
         void);
