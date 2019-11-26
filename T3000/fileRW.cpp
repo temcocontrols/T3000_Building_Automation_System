@@ -4249,25 +4249,28 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 // 		276	332	1	Low byte	W/R	Number of Heating Stages in Original Table - (Maximum # of total heating and cooling states is 6)
 // 		277	333	1	Low byte	W/R	Number of Cooling Stages in Original Table - (Maximum # of total heating and cooling states is 6)
 	int multy_ret = 0;
-	for(int i=0;i<17;i++) //Modify by Fance , tstat 6 has more register than 512;
+
+	for(int i=0;i<12;i++) //Modify by Fance , tstat 6 has more register than 512;
 
 	{
 	 
 		//register_critical_section.Lock();
 		//
-		
-		multy_ret = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100);
+
+		multy_ret = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100,10);
 		//register_critical_section.Unlock();
 		Sleep(100);
 		if(multy_ret<0)		//Fance : 如果出现读失败 就跳出循环体,因为如果是由断开连接 造成的 读失败 会使其他需要用到读的地方一直无法获得资源;
 			break;
+        g_progress_persent = (i * 100) / 11;
 	}
-
+    g_progress_persent = 0;
      if (multy_ret<0)
      {
 	    AfxMessageBox(_T("Saving Error ,Please try again."));
 		return ;
      }
+    
 
 	//Fance_1
 	memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
@@ -4292,7 +4295,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 #if 1
 	//////////////////////////////////////////////////////////////////////////
 	strTips = _T("Config file saved 10%...");
-	SetPaneString(1, strTips);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, strTips);
 	//////////////////////////////////////////////////////////////////////////
 
 	CString str;
@@ -4353,7 +4356,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 	}
 	//////////////////////////////////////////////////////////////////////////
 	strTips = _T("Config file saved 20%...");
-	SetPaneString(1, strTips);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, strTips);
 	//////////////////////////////////////////////////////////////////////////
 
 	wofstream out;
@@ -4382,7 +4385,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 	write_to_file_a_line(out," ");//space
 	//////////////////////////////////////////////////////////////////////////
 	strTips = _T("Config file saved 50%...");
-	SetPaneString(1, strTips);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, strTips);
 	//////////////////////////////////////////////////////////////////////////
 
 	//if(version>=25)
@@ -4408,37 +4411,38 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 		_Twrite_to_file_a_line(out,_T(" "));//space
 		//////////////////////////////////////////////////////////////////////////
 		strTips = _T("Config file saved 70%...");
-		SetPaneString(1, strTips);
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, strTips);
 		//////////////////////////////////////////////////////////////////////////
 		universal_value_setting_write_Tstat67Auto(out,m_26_heat_stages,m_26_cool_stages);
 	//}
 	//////////////////////////////////////////////////////////////////////////
 	strTips = _T("Config file saved 80%...");
-	SetPaneString(1, strTips);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, strTips);
 	//////////////////////////////////////////////////////////////////////////
 	_Twrite_to_file_a_line(out,_T(" "));//space
 	WriteSerialNumber(out);
 	//////////////////////////////////////////////////////////////////////////
 	strTips = _T("Config file saved 90%...");
-	SetPaneString(1, strTips);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, strTips);
 	//////////////////////////////////////////////////////////////////////////
 	WriteAddress(out);
 	_Twrite_to_file_a_line(out,_T(" "));//space
 	//////////////////////////////////////////////////////////////////////////
 	strTips = _T("Finished");
-	SetPaneString(3, strTips);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, strTips);
 	//////////////////////////////////////////////////////////////////////////
 	var_write_Tstat67(out);
 	save_write_input_output(out);	
 	//_Twrite_to_file_a_line(out,_T("OK!"));//space
 	save_write_TStatAllLabel(out);
     save_write_TStatSchedual(out);
+    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Saved configuration file successfully."));
 	return;
 
 	_Twrite_to_file_a_line(out,_T("//END CONFIG 1 ********************************// "));//space
 	int nvalue=0;
 
-	
+    AfxMessageBox(_T("Saved configuration file successfully."));
 	return;
 
 #endif
@@ -4913,7 +4917,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 		AfxMessageBox(_T("It's not a good config file!"));
 		return;
 	}
-	
+    g_progress_persent = 0;;
 	int fan_value[35]={0};//fan_value 
 	for(int i=0;i<35;i++)
 		fan_value[i]=0;	
@@ -4925,6 +4929,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 	{
 		for(int t_i=0;t_i<7;t_i++)
 			{
+                 g_progress_persent++;
 				int real_fan_address=get_real_fan_address(fan_number-2,i,t_i);
 				if(fan_value[i]>=0)
 				{
@@ -4960,6 +4965,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			{
 				if(value_setting[i]>=0)
 				{
+                    g_progress_persent++;
 					int i_i=write_one(now_tstat_id,MODBUS_VALVE_OPERATION_TABLE_BEGIN+i,value_setting[i]);
 					Reg_Infor_Temp.regAddress=MODBUS_VALVE_OPERATION_TABLE_BEGIN+i;
 					Reg_Infor_Temp.RegValue=value_setting[i];
@@ -5006,6 +5012,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			{
 				if(delay_setting[i]>=0)
 				{
+                    g_progress_persent++;
 					int i_i=write_one(now_tstat_id,MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i,delay_setting[i]);
 					Reg_Infor_Temp.regAddress=MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i;
 
@@ -5030,6 +5037,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			{
 				if(delay_setting[rows+i]>=0)
 				{
+                    g_progress_persent++;
 					int i_i=write_one(now_tstat_id,MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i,delay_setting[rows+i]);
 					Reg_Infor_Temp.regAddress=MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i;
 
@@ -5245,6 +5253,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 					{
 						if(universal_value[i]>=0)          
 						{
+                            g_progress_persent++;
 							int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN+i,universal_value[i]);
 							Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN+i;
 
@@ -5280,6 +5289,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 					{
 						if(value_setting[i]>=0)
 						{
+                            g_progress_persent++;
 							int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+i,value_setting[i]);
 							Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+i;
 
@@ -5313,6 +5323,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 				{
 					if(universal_value[i]>=0)          
 					{
+                        g_progress_persent++;
 						int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_OUTPUT_BEGIN+i,universal_value[i]);
 						Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_OUTPUT_BEGIN+i;
 
@@ -5347,6 +5358,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 				{
 					if(value_setting[i]>=0)
 					{
+                        g_progress_persent++;
 						int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+i,value_setting[i]);
 						Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_VALVE_BEGIN+i;
 
@@ -5372,6 +5384,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 		}
 		else if(wcsstr(buf,_T("serialnumber"))!=NULL || wcsstr(buf,_T("address:"))!=NULL )
 		{
+            g_progress_persent++;
 			/////////////////////////////////////var setting
 			Show_load_file_error_message(load_file_one_time,7,p_log_file);
 			write_one(now_tstat_id,MODBUS_INFO_BYTE,5);//184 register,to no restart,when you write the 185,118,121,128 register
@@ -5393,6 +5406,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 		 	for (vector <Reg_Infor>::iterator iter_index = g_Vector_Write_Error.begin(); 
 		 		iter_index != g_Vector_Write_Error.end();) 
 		 	{
+                g_progress_persent++;
 				int i_i=write_one(now_tstat_id,iter_index->regAddress,iter_index->RegValue);
 				if(p_log_file!=NULL)
 				{
@@ -5432,10 +5446,13 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			p_log_file->WriteString(for_showing_text.GetString());
 	}
 
-
+    g_progress_persent = 100;
 	p_log_file->Flush();
 	inf.close();
-	Sleep(5000);
+
+    AfxMessageBox(_T("Write config file success!"));
+
+	Sleep(2000);
 ////LoadFile2Tstat_twofile(load_file_one_time,fn,p_log_file);
 
 }

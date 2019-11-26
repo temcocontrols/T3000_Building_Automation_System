@@ -89,7 +89,7 @@ BEGIN
     LTEXT           "Baudrate:",IDC_STATIC,13,58,41,9
 END
 
-IDD_DIALOG_SETTING DIALOGEX 0, 0, 198, 60
+IDD_DIALOG_SETTING DIALOGEX 0, 0, 199, 84
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -97,8 +97,11 @@ BEGIN
     LTEXT           "TCP Flash Timeout :",IDC_STATIC,15,11,71,12
     EDITTEXT        IDC_EDIT_SETTING_TIMEOUT,90,8,54,14,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "(ms)",IDC_STATIC,153,11,15,8
-    PUSHBUTTON      "OK",IDC_BUTTON_SETTING_OK,31,32,50,14
-    PUSHBUTTON      "Cancel",IDC_BUTTON_SETTING_CANCEL,103,32,50,14
+    PUSHBUTTON      "OK",IDC_BUTTON_SETTING_OK,31,51,50,14
+    PUSHBUTTON      "Cancel",IDC_BUTTON_SETTING_CANCEL,103,51,50,14
+    LTEXT           "Response Time :",IDC_STATIC,15,33,71,12
+    EDITTEXT        IDC_EDIT_SETTING_RESPONSE_TIME,89,33,54,14,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "(ms)",IDC_STATIC,153,36,15,8
 END
 
 
@@ -118,8 +121,8 @@ BEGIN
     IDD_DIALOG_SETTING, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 191
-        BOTTOMMARGIN, 53
+        RIGHTMARGIN, 192
+        BOTTOMMARGIN, 77
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -149,6 +152,17 @@ BEGIN
         MENUITEM "About_ISP_Tool",              ID_MENU_ABOUT
         MENUITEM "EXIT_ISP_Tool",               ID_MENU_APP
     END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIALOG_SETTING AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 
@@ -285,8 +299,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 6,0,6,0
- PRODUCTVERSION 6,0,6,0
+ FILEVERSION 6,0,8,0
+ PRODUCTVERSION 6,0,8,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -301,12 +315,12 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileVersion", "6.0.6.0"
+            VALUE "FileVersion", "6.0.8.0"
             VALUE "InternalName", "ISP.exe"
             VALUE "OriginalFilename", "ISP.exe"
             VALUE "ProductName", "ISP Tool"
-            VALUE "ProductVersion", "6.0.6.0"
-            VALUE "SpecialBuild", "6.0.6"
+            VALUE "ProductVersion", "6.0.8.0"
+            VALUE "SpecialBuild", "6.0.8"
             VALUE "TemcoCopyright", "Copyright 1999-2020 (c).  All rights reserved."
         END
     END
@@ -396,7 +410,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About NEWISP..."
-    IDS_STR_VIRSIONNUM      "Version 6.0.6"
+    IDS_STR_VIRSIONNUM      "Version 6.0.8"
     IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
 END
 

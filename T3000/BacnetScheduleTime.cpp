@@ -33,7 +33,7 @@ BEGIN_MESSAGE_MAP(CBacnetScheduleTime, CDialogEx)
 	//ON_MESSAGE(MY_RESUME_DATA, SchedualTimeResumeMessageCallBack)
 		ON_MESSAGE(WM_REFRESH_BAC_SCHEDULE_LIST,Fresh_Schedual_List)
 		ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Schedual_Item)
-		ON_NOTIFY(NM_DBLCLK, IDC_LIST_SCHEDULE_TIME, &CBacnetScheduleTime::OnNMDBClickListScheduleTime)
+		ON_NOTIFY(NM_CLICK, IDC_LIST_SCHEDULE_TIME, &CBacnetScheduleTime::OnNMClickListScheduleTime)
 		ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER1_SCHEDUAL, &CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual)
 		ON_WM_TIMER()
 		ON_WM_CLOSE()
@@ -257,7 +257,7 @@ LRESULT CBacnetScheduleTime::Fresh_Schedual_Item(WPARAM wParam,LPARAM lParam)
 }
 
 
-void CBacnetScheduleTime::OnNMDBClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pResult)
+void CBacnetScheduleTime::OnNMClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	
@@ -311,15 +311,15 @@ void CBacnetScheduleTime::OnNMDBClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pR
 	GetWindowRect(win_rect);
 	CRect myrect;
 	m_schedule_time_list.GetSubItemRect(lRow,lCol,LVIR_BOUNDS,myrect);
-	myrect.left = myrect.left + list_rect.left - win_rect.left;
-	myrect.right = myrect.right + list_rect.left - win_rect.left;
-	myrect.top = myrect.top + 11;
-	myrect.bottom = myrect.bottom + 13;
+	myrect.left = myrect.left + list_rect.left - win_rect.left - 5;
+	myrect.right = myrect.right + list_rect.left - win_rect.left ;
+	myrect.top = myrect.top + 9;
+	myrect.bottom = myrect.bottom + 17;
 	
 	m_schedual_time_picker.BringWindowToTop();
 	m_schedual_time_picker.MoveWindow(myrect);
 
-	CTime TimeTemp(2017,1,1,temp_hour,temp_minute,0);
+	CTime TimeTemp(2019,1,1,temp_hour,temp_minute,0);
 
 	m_schedual_time_picker.SetFormat(_T("HH:mm"));
 	m_schedual_time_picker.SetTime(&TimeTemp);
@@ -367,7 +367,8 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
 
 
 	}
-
+    if ((m_row != 0) && (chour == 0) && (cmin == 0))
+        return;
 	m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[m_row][m_col - 1].time_hours = chour;
 	m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[m_row][m_col - 1].time_minutes = cmin;
 
@@ -454,6 +455,10 @@ void CBacnetScheduleTime::OnBnClickedCopyMon_Fri()
 		{
 			m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[j][i].time_hours = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[j][0].time_hours;
 			m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[j][i].time_minutes = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[j][0].time_minutes;
+
+
+             m_Schedual_time_flag.at(weekly_list_line).Time_flag[j][i] = m_Schedual_time_flag.at(weekly_list_line).Time_flag[j][0];
+
 		}
 	}
 	PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
@@ -462,6 +467,14 @@ void CBacnetScheduleTime::OnBnClickedCopyMon_Fri()
 	temp_task_info.Format(_T("Write Schedule Time "));
 	Post_Write_Message(g_bac_instance,WRITETIMESCHEDULE_T3000,weekly_list_line,weekly_list_line,WEEKLY_SCHEDULE_SIZE,BacNet_hwd,temp_task_info);
 
+
+
+
+
+    if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line) > 0)
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change schedule success!"));
+    }
 
 }
 

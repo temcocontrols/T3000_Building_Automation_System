@@ -59,7 +59,8 @@ const int DLG_DIALOG_POWERMETER = 29;
 const int DLG_DIALOG_CO2_NODE = 30;
 const int DLG_DIALOG_ZIGBEE_REPEATER = 31;
 const int DLG_DIALOG_TSTAT_AQ = 32;
-const int NUMVIEWS = 33;
+const int DLG_DIALOG_THIRD_PARTY_BAC = 33;
+const int NUMVIEWS = 34;
 
 
 
@@ -275,6 +276,7 @@ public:
 
 // Generated message map functions
 protected:
+    void ShowSplashWnd(int nMillisecond);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnViewCustomize();
 	afx_msg LRESULT OnToolbarCreateNew(WPARAM wp, LPARAM lp);
@@ -284,7 +286,7 @@ protected:
 	afx_msg void OnUpdateCheckBuildingBar(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateCheckIOPane(CCmdUI* pCmdUI);
 	afx_msg void OnScanDevice();
-	afx_msg void SaveConfigFile();
+
 	afx_msg void OnHelp();
 	
 	afx_msg LRESULT OnCreateStatusBarWindow(WPARAM wParam, LPARAM lParam);
@@ -297,6 +299,7 @@ protected:
     afx_msg LRESULT ReConnect_Message(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam);
+    afx_msg void SaveConfigFile();
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -314,6 +317,7 @@ public:
     static DWORD WINAPI  Write_Modbus_tstat_cfg(LPVOID lpVoid);
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
+    
 	void OnLoadConfigFile();
 	void OnBatchFlashHex();
 	void OnConnect();
@@ -413,7 +417,7 @@ public:
 	unsigned short temptstat6[512];
 	unsigned short nFlag;
 	
-	 
+    CString m_strLogoFileName;
 	
 	BOOL FistWdb;
 	//afx_msg void OnFileIsptool();
@@ -557,4 +561,5 @@ public:
 		afx_msg void OnToolsModbustobacnetrouter();
 		afx_msg void OnControlModbus();
 		afx_msg void OnControlIoNetConfig();
+        afx_msg void OnDatabaseLogdetail();
 };

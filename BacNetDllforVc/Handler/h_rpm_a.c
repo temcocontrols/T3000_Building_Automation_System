@@ -201,6 +201,8 @@ int rpm_ack_decode_service_request(
 }
 
 /* for debugging... */
+//void rpm_ack_print_data(
+//    BACNET_READ_ACCESS_DATA * rpm_data)
 void rpm_ack_print_data(
     BACNET_READ_ACCESS_DATA * rpm_data)
 {
@@ -209,66 +211,86 @@ void rpm_ack_print_data(
     BACNET_APPLICATION_DATA_VALUE *value;
     bool array_value = false;
 
-    if (rpm_data) {
-#if PRINT_ENABLED
-        fprintf(stdout, "%s #%lu\r\n",
+    remove("C:\\log.txt");
+    FILE *st_dout;
+    st_dout = fopen("C:\\log.txt", "a");
+    if (rpm_data) 
+    {
+//#if PRINT_ENABLED
+#if 0
+        fprintf(st_dout, "%s #%lu\r\n",
             bactext_object_type_name(rpm_data->object_type),
             (unsigned long) rpm_data->object_instance);
-        fprintf(stdout, "{\r\n");
+        fprintf(st_dout, "{\r\n");
 #endif
         listOfProperties = rpm_data->listOfProperties;
-        while (listOfProperties) {
+        while (listOfProperties) 
+        {
 #if PRINT_ENABLED
-            if (listOfProperties->propertyIdentifier < 512) {
-                fprintf(stdout, "    %s: ",
+            if (listOfProperties->propertyIdentifier < 512) 
+            {
+                fprintf(st_dout, "    %s: ",
                     bactext_property_name(listOfProperties->
                         propertyIdentifier));
-            } else {
-                fprintf(stdout, "    proprietary %u: ",
+            } else 
+            {
+                fprintf(st_dout, "    proprietary %u: ",
                     (unsigned) listOfProperties->propertyIdentifier);
             }
 #endif
-            if (listOfProperties->propertyArrayIndex != BACNET_ARRAY_ALL) {
+            if (listOfProperties->propertyArrayIndex != BACNET_ARRAY_ALL) 
+            {
 #if PRINT_ENABLED
-                fprintf(stdout, "[%d]", listOfProperties->propertyArrayIndex);
+                fprintf(st_dout, "[%d]", listOfProperties->propertyArrayIndex);
 #endif
             }
             value = listOfProperties->value;
-            if (value) {
+            if (value) 
+            {
 #if PRINT_ENABLED
-                if (value->next) {
-                    fprintf(stdout, "{");
+                if (value->next) 
+                {
+                    fprintf(st_dout, "{");
                     array_value = true;
-                } else {
+                } 
+                else 
+                {
                     array_value = false;
                 }
 #endif
                 object_value.object_type = rpm_data->object_type;
                 object_value.object_instance = rpm_data->object_instance;
-                while (value) {
+                while (value) 
+                {
                     object_value.object_property =
                         listOfProperties->propertyIdentifier;
                     object_value.array_index =
                         listOfProperties->propertyArrayIndex;
                     object_value.value = value;
-                    bacapp_print_value(stdout, &object_value);
+                    bacapp_print_value(st_dout, &object_value);
 #if PRINT_ENABLED
-                    if (value->next) {
-                        fprintf(stdout, ",\r\n        ");
-                    } else {
-                        if (array_value) {
-                            fprintf(stdout, "}\r\n");
+                    if (value->next) 
+                    {
+                        fprintf(st_dout, ",\r\n        ");
+                    } 
+                    else 
+                    {
+                        if (array_value) 
+                        {
+                            fprintf(st_dout, "}\r\n");
                         } else {
-                            fprintf(stdout, "\r\n");
+                            fprintf(st_dout, "\r\n");
                         }
                     }
 #endif
                     value = value->next;
                 }
-            } else {
+            } 
+            else 
+            {
 #if PRINT_ENABLED
                 /* AccessError */
-                fprintf(stdout, "BACnet Error: %s: %s\r\n",
+                fprintf(st_dout, "BACnet Error: %s: %s\r\n",
                     bactext_error_class_name((int) listOfProperties->
                         error.error_class),
                     bactext_error_code_name((int) listOfProperties->
@@ -277,10 +299,12 @@ void rpm_ack_print_data(
             }
             listOfProperties = listOfProperties->next;
         }
-#if PRINT_ENABLED
-        fprintf(stdout, "}\r\n");
+//#if PRINT_ENABLED
+#if 0
+        fprintf(st_dout, "}\r\n");
 #endif
     }
+    fclose(st_dout);
 }
 
 /** Handler for a ReadPropertyMultiple ACK.
@@ -322,7 +346,7 @@ void handler_read_property_multiple_ack(
 #endif
     if (len > 0) {
         while (rpm_data) {
-            rpm_ack_print_data(rpm_data);
+            //rpm_ack_print_data(rpm_data);¶Å·«ÆÁ±Î²âÊÔ
             rpm_property = rpm_data->listOfProperties;
             while (rpm_property) {
                 value = rpm_property->value;

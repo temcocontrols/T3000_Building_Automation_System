@@ -18,6 +18,7 @@ extern bool auto_flash_mode;	//Used for automatic burning;
 char sendbuf[45];
 extern CString g_strFlashInfo;
 extern unsigned int Remote_timeout;
+extern unsigned int nflash_receive_to_send_delay_time;
 /*extern*/ CRITICAL_SECTION g_cs;
 /*extern*/ CString showing_text;
 /*extern*/ int writing_row;
@@ -1090,6 +1091,7 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 CString ShowTFTPMessage;
 BOOL TFTPServer::StartServer()
 {
+
 	   RefreshNetWorkDeviceListByUDPFunc();
 	   TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
 	   Sleep(2000);
@@ -1154,11 +1156,8 @@ BOOL TFTPServer::StartServer()
 				nRet = 0;
                 if((mode_send_flash_try_time++)<15)
                 {
-
-                    //SendFlashCommand();
-
-
 					int send_ret=TCP_Flash_CMD_Socket.Send(byCommand,sizeof(byCommand),0);
+                    Sleep(50);   //WIFI 的 bootloader 需要此延时 ， 设备的响应时间太慢了.不延时他们的设备  会忽略其他的网络包;
                    // int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
                     TRACE(_T("send_ret = %d\r\n"),send_ret);
                     if(send_ret<0)	//Try TCP connection again if send fails
@@ -1168,7 +1167,6 @@ BOOL TFTPServer::StartServer()
                     }
 
                     SetDHCP_Data();
-
 
                     //if(IP_is_Local())//If it's local, send it as broadcast DHCP
                     //{
@@ -1184,6 +1182,7 @@ BOOL TFTPServer::StartServer()
                     }
                     //}
                     //else
+                    Sleep(50);
                     SendUDP_Flash_Socket.SendTo(sendbuf,sizeof(sendbuf),FLASH_UDP_PORT,ISP_Device_IP,0);
 
 
@@ -1480,6 +1479,8 @@ bool TFTPServer::Send_Tftp_File()
                 Sleep(1);
                 if(next_package_number == package_number +1)
                 {
+                    if (nflash_receive_to_send_delay_time)
+                        Sleep(nflash_receive_to_send_delay_time);
                     goto flash_new_package;
                 }
             }

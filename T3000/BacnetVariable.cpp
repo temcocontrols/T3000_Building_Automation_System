@@ -337,6 +337,10 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				cstemp_value.Format(_T("%.3f"),temp_float_value);
 				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value);
 			}
+            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
+            {
+                m_variable_list.SetItemText(i, VARIABLE_UNITE, _T("MSV"));
+            }
 			else
 			{
 				m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
@@ -720,7 +724,8 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 
 		CString temp_info;
-		if(GetPrivateData_Blocking(g_bac_instance,READVARIABLE_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
+
+		if(GetPrivateData_Blocking(g_bac_instance, READVARUNIT_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
 		{
 			temp_info.Format(_T("Read variable custmer units success."));
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_info);
@@ -734,7 +739,9 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		if(m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
 		{
 			bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
-			if(m_Variable_data.at(lRow).range > (sizeof(Variable_Analog_Units_Array) / sizeof(Variable_Analog_Units_Array[0])))
+			if(  ( m_Variable_data.at(lRow).range > (sizeof(Variable_Analog_Units_Array) / sizeof(Variable_Analog_Units_Array[0]))) &&
+                 (m_Variable_data.at(lRow).range != 101) && (m_Variable_data.at(lRow).range != 102) && (m_Variable_data.at(lRow).range != 103)
+                ) 
 			{
 				m_Variable_data.at(lRow).range = 0;
 				bac_range_number_choose = 0;
@@ -1143,7 +1150,7 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 			digital_value = 2;
 
 		}
-		else if((m_Variable_data.at(i).range<=sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))/* && (m_Variable_data.at(i).range != 0)*/)
+		else if((m_Variable_data.at(i).range<sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))/* && (m_Variable_data.at(i).range != 0)*/)
 		{
 			ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
 			if(m_Variable_data.at(i).range == 0)
@@ -1154,6 +1161,17 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 			ret_cstring.Format(_T("%.1f"),temp_float_value);
 			digital_value = 2;
 		}
+        else if ((m_Variable_data.at(i).range >= 34) && (m_Variable_data.at(i).range <= 38))
+        {
+            ret_unit= Analog_Variable_Units[m_Variable_data.at(i).range - 34];
+
+            CString cstemp_value;
+            float temp_float_value;
+            temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+            ret_cstring.Format(_T("%.1f"), temp_float_value);
+
+        }
+
 		else
 		{
 			ret_cstring = _T(" ");

@@ -251,6 +251,25 @@ void CBacnetInput::Reload_Unit_Type()
 
 }
 
+//void CBacnetInput::InitialInputGrid()
+//{
+//    for (int z = 0;z < (int)m_Input_data.size();i++)
+//    {
+//        for (int i = 0; i < INPUT_COL_NUMBER; i++)
+//        {
+//            if (Get_Product_Input_Map(g_selected_product_id, i) == 0)
+//            {
+//                m_input_list.SetCellEnabled(z, i, false);
+//                m_input_list.SetItemText(z, i, _T(""));
+//            }
+//            else
+//            {
+//                m_input_list.SetCellEnabled(z, i, true);
+//            }
+//        }
+//    }
+//}
+
 void CBacnetInput::Initial_List()
 {
     m_input_list.ShowWindow(SW_HIDE);
@@ -304,6 +323,9 @@ void CBacnetInput::Initial_List()
 
 		if(i>=input_item_limit_count)	//vector的大小始终不变 ,用次变量来 约束 要显示的 item 数量;
 			break;
+
+
+
 
 		temp_item.Format(_T("IN%d"),i+1);
 		m_input_list.InsertItem(i,temp_item);
@@ -365,6 +387,12 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		m_input_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
 		return 0;
 	}
+
+    //确认使能关系,如果当前设备的这一列不允许修改就跳过;
+    if (Get_Product_Input_Map(g_selected_product_id, Changed_SubItem) == false)
+    {
+        return 0;
+    }
 
 	memcpy_s(&m_temp_Input_data[Changed_Item],sizeof(Str_in_point),&m_Input_data.at(Changed_Item),sizeof(Str_in_point));
 
@@ -480,7 +508,14 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
             m_input_list.SetItemText(Changed_Item, INPUT_CAL_OPERATION, _T("-"));
         }
 
-		int cal_value = (int)(temp_value * 10);
+        //Fandu 49.6 以后的版本 精度 达到0.01;  2019 09 05
+        int cal_value;
+        //if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 495)
+        //{
+        //    cal_value = (int)(temp_value * 100);
+        //}
+        //else
+		    cal_value = (int)(temp_value * 10);
         cal_value = abs(cal_value);
 		if((cal_value<0) || (cal_value >65535))
 		{
@@ -587,6 +622,16 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
         INPUT_LIMITE_ITEM_COUNT = 3;
         Minipanel_device = 0;
     }
+    else if (bacnet_device_type == PM_MULTI_SENSOR)
+    {
+        INPUT_LIMITE_ITEM_COUNT = 15;
+        Minipanel_device = 0;
+    }
+    else if (bacnet_device_type == PM_TSTAT_AQ)
+    {
+        INPUT_LIMITE_ITEM_COUNT = 11;
+        Minipanel_device = 0;
+    }
     //else if (bacnet_device_type == BACNET_ROUTER)
     //{
     //    INPUT_LIMITE_ITEM_COUNT = BACNET_ROUTER_IN_A + BACNET_ROUTER_IN_D;
@@ -603,6 +648,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	{
 		if(z>= INPUT_LIMITE_ITEM_COUNT)
 			break;
+
+        
 		if((m_Input_data.at(z).sub_id !=0) &&
 			(m_Input_data.at(z).sub_product !=0))
 		{
@@ -734,13 +781,18 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 		if(m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG)
 		{
-
+            m_input_list.SetCellEnabled(i, INPUT_JUMPER, 0);  //如果input range 是analog 默认不可改 signal type 除非custom
+            m_input_list.SetItemTextColor(i, INPUT_JUMPER, LIST_ITEM_DISABLE,0);
 			m_input_list.SetCellEnabled(i,INPUT_CAL,1);
 			m_input_list.SetCellEnabled(i,INPUT_CAL_OPERATION,1);
 			m_input_list.SetCellEnabled(i,INPUT_FITLER,1);
 
-			if((m_Input_data.at(i).range >=20) && (m_Input_data.at(i).range <=24))
-				m_input_list.SetItemText(i,INPUT_UNITE,Analog_Customer_Units[m_Input_data.at(i).range-20]);
+            if ((m_Input_data.at(i).range >= 20) && (m_Input_data.at(i).range <= 24))
+            {
+                m_input_list.SetItemText(i, INPUT_UNITE, Analog_Customer_Units[m_Input_data.at(i).range - 20]);
+                m_input_list.SetCellEnabled(i, INPUT_JUMPER, 1);  //如果input range 是analog 默认不可改 signal type 除非custom
+                m_input_list.SetItemTextColor(i, INPUT_JUMPER, RGB(0,0,0),0);
+            }
 			else if(m_Input_data.at(i).range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
 				m_input_list.SetItemText(i,INPUT_UNITE,Input_List_Analog_Units[m_Input_data.at(i).range]);
 			else if(m_Input_data.at(i).range < (sizeof(Input_Analog_Units_Array)/sizeof(Input_Analog_Units_Array[0])))
@@ -786,8 +838,12 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			m_input_list.SetItemText(i,INPUT_VALUE,cstemp_value);
 
 			unsigned short temp_cal_value = ((unsigned char)(m_Input_data.at(i).calibration_h)) *256 + (unsigned char)m_Input_data.at(i).calibration_l;
-
-			temp_cal.Format(_T("%.1f"),((float)temp_cal_value)/10);
+            //if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 495)
+            //{
+            //    temp_cal.Format(_T("%.2f"), ((float)temp_cal_value) / 100);
+            //}
+            //else
+			    temp_cal.Format(_T("%.1f"),((float)temp_cal_value)/10);
 			m_input_list.SetItemText(i,INPUT_CAL,temp_cal);
 			if(m_Input_data.at(i).calibration_sign == 0)
 			{
@@ -800,7 +856,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		}
 		else if(m_Input_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
-
+            m_input_list.SetCellEnabled(i, INPUT_JUMPER, 0);  //如果input range 是digital 则不可改 signal type
+            m_input_list.SetItemTextColor(i, INPUT_JUMPER, LIST_ITEM_DISABLE,0);
 			m_input_list.SetItemText(i,INPUT_CAL,_T(""));
 			m_input_list.SetCellEnabled(i,INPUT_CAL,0);
 			m_input_list.SetCellEnabled(i,INPUT_CAL_OPERATION,0);
@@ -996,6 +1053,22 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		temp_des2.ReleaseBuffer();
 
 		m_input_list.SetItemText(i,INPUT_LABLE,temp_des2);
+
+        for (int j = 0; j < INPUT_COL_NUMBER; j++)
+        {
+            //如果从初始化表里面得到 某一列能够使能，则显示，否则禁用并清空; 2019 10 29
+            if (Get_Product_Input_Map(g_selected_product_id, j) == 1)
+            {
+                m_input_list.SetCellEnabled(i, j, true);
+            }
+            else
+            {
+                m_input_list.SetCellEnabled(i, j, false);
+                m_input_list.SetItemText(i, j, _T(""));
+            }
+        }
+
+
 		if(isFreshOne)
 		{
 			break;
@@ -1080,6 +1153,12 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 	if(lRow<0)
 		return;
+
+    if (Get_Product_Input_Map(g_selected_product_id, lCol) == false)
+    {
+        return ;
+    }
+
 	CString New_CString;
 	CString temp_task_info;
 
@@ -1147,8 +1226,17 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			float temp_float_value;
 			unsigned short temp_cal_value;
 			temp_cal_value = (m_Input_data.at(lRow).calibration_h << 8 ) + m_Input_data.at(lRow).calibration_l;
-			temp_float_value = ((float)temp_cal_value) / 10;
-			n_value.Format(_T("%.1f"),temp_float_value);
+            if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 495)
+            {
+                temp_float_value = ((float)temp_cal_value) / 100;
+                n_value.Format(_T("%.2f"), temp_float_value);
+            }
+            else
+            {
+                temp_float_value = ((float)temp_cal_value) / 10;
+                n_value.Format(_T("%.1f"), temp_float_value);
+            }
+
 		}
 
 		if(m_Input_data.at(lRow).calibration_sign == 0)
@@ -1339,7 +1427,14 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 				CString cstemp_value;
-				cstemp_value.Format(_T("%.1f"),((float)temp_cal_value)/10);
+                if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 495)
+                {
+                    cstemp_value.Format(_T("%.2f"), ((float)temp_cal_value) / 100);
+                }
+                else
+                {
+                    cstemp_value.Format(_T("%.1f"), ((float)temp_cal_value) / 10);
+                }
 				m_input_list.SetItemText(lRow,INPUT_CAL,cstemp_value);
 
 
@@ -1436,7 +1531,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		m_input_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
 		temp_task_info.Format(_T("Write Input List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
 		Post_Write_Message(g_bac_instance,WRITEINPUT_T3000,(int8_t)lRow,(int8_t)lRow,sizeof(Str_in_point),m_input_dlg_hwnd,temp_task_info,lRow,lCol);
-		SetTimer(UPDATE_INPUT_ONE_ITEM_TIMER,2000,NULL);
+		//SetTimer(UPDATE_INPUT_ONE_ITEM_TIMER,2000,NULL);  wifi 模块 测试用，暂时屏蔽
 	}
 
 

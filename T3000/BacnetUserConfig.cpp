@@ -523,7 +523,6 @@ void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 
 void CBacnetUserConfig::OnBnClickedButtonUserOk()
 {
-	
 	char temp_buffer[255];
 	int compare_ret = 0;
 	CString temp_enter_original;

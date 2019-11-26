@@ -54,8 +54,8 @@ CString INPUT_SETTING[NUM_INPUT_SETTING]=
     _T("AI6"),
     _T("AI7"),
     _T("AI8"),
-    _T("HUM Sensor"),
     _T("CO2 Sensor"),
+    _T("HUM Sensor"),
     _T("Airflow Sensor"),
     _T("Avg AI1ToAI2"),
     _T("Avg AI1ToAI3"),
@@ -397,6 +397,7 @@ BOOL CParameterDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
     if (product_register_value[7] == PM_TSTAT7 ||
+        product_register_value[7] == PM_TSTAT7_ARM ||
         product_register_value[7] == PM_TSTAT8 ||
         product_register_value[7] == PM_TSTAT9)
     {
@@ -593,6 +594,13 @@ BOOL CParameterDlg::OnInitDialog()
         m_InputSelect1.AddString(INPUT_SETTING[0]);
         m_InputSelect1.AddString(INPUT_SETTING[1]);
         m_InputSelect1.AddString(INPUT_SETTING[3]);
+
+        m_inputSelect2.ResetContent();
+        for (int i = 0; i < 8; i++)
+        {
+            m_inputSelect2.AddString(INPUT_SETTING[i + 3]);
+        }
+        
     }
 	if (product_register_value[7] == PM_TSTAT7)
 	{
@@ -1575,14 +1583,25 @@ void CParameterDlg::OnCbnSelchangeInputselect2()
         return;
     }
 
-    TempValue=sel+2;
 
 
+    if (product_register_value[MODBUS_PRODUCT_MODEL] == PM_PM5E)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            if (temp_string.CompareNoCase(INPUT_SETTING[i + 3]) == 0)
+            {
+                TempValue = i + 1;
+                break;
+            }
+        }
+    }
+    else
+    {
+        TempValue = sel + 2;
+    }
 
-
-    CString strText;
-    m_inputSelect2.GetWindowTextW(strText);
-    if (strText.IsEmpty())
+    if (temp_string.IsEmpty())
     {
         Reflesh_ParameterDlg();
         return;
@@ -1895,10 +1914,10 @@ void CParameterDlg::OnEnKillfocusSetvalue2()
     if (ret>0)
     {
         product_register_value[MODBUS_UNIVERSAL_SET]=IValue;
-        strText.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_SET]/10);
-        CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);
+        //strText.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_SET]/10);
+        //CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);
         //strText+=strUnit;
-        m_pid_setptEdt2.SetWindowText(strText);
+        //m_pid_setptEdt2.SetWindowText(strText);
     }
     else
     {
@@ -2145,18 +2164,6 @@ void CParameterDlg::OnEnKillfocusEsetpointhi()
                         (short)product_register_value[MODBUS_MAX_SETPOINT],this->m_hWnd,IDC_ESETPOINTHI,_T("MAX SETPOINT"));
 
 
-
-// 	CString strText;
-// 	m_setptHiEdit.GetWindowText(strText);
-// 	int nValue= _wtoi(strText);
-// 	if(nValue<=0||nValue>=255)
-// 	{
-// 		AfxMessageBox(_T("Setpoint Max must between 10 and 99"));
-// 		return;
-// 	}
-// 	g_bPauseMultiRead = TRUE;
-// 	write_one(g_tstat_id,131 , nValue);g_bPauseMultiRead = FALSE;
-//	Refresh();
 }
 
 void CParameterDlg::OnEnKillfocusEsetpointlo()
@@ -2343,9 +2350,6 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
         if(product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]==(int)(nValue))	//Add this to judge weather this value need to change.
             return;
 
-        /*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,nValue,
-        	product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],this->m_hWnd,IDC_ENIGNTHEATING,
-        	_T("NIGHT HEATING SETPOINT"));*/
         int ret=write_one(g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,nValue);
         if (ret>0)
         {
@@ -2367,9 +2371,6 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
             //Add this to judge weather this value need to change.
             return;
 
-        /*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,nValue,
-        	product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],this->m_hWnd,IDC_ENIGNTHEATING,
-        	_T("NIGHT HEATING DEADBAND"));*/
 
         int ret=write_one(g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,nValue);
         if (ret>0)
@@ -2413,9 +2414,6 @@ void CParameterDlg::OnEnKillfocusEnigntcooling1()
         if((int)(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND])==nValue)	//Add this to judge weather this value need to change.
             return;
 
-        /*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,nValue,
-        product_register_value[MODBUS_NIGHT_COOLING_DEADBAND],
-        this->m_hWnd,IDC_ENIGNTCOOLING1,_T("NIGHT COOLING DEADBAND"));*/
         int ret=write_one(g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,nValue);
         if (ret>0)
         {
@@ -2453,7 +2451,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
     strText.Trim();
     if(strText.IsEmpty())
         return;
-    float fValue=(float)_wtoi(strText);
+    float fValue=(float)_wtof(strText);
 
 
     g_bPauseMultiRead = TRUE;
@@ -2539,31 +2537,7 @@ void CParameterDlg::OnCbnSelchangeOccupiedmodecombo()
                         product_register_value[MODBUS_SETPOINT_CONTROL],this->m_hWnd,IDC_OCCUPIEDMODECOMBO,_T("SETPOINT CONTROL"));
 }
 
-//Annul by Fance ,this code not support T5T6
-//void CParameterDlg::OnCbnSelchangeOccupiedmodecombo()
-//{
-//	if(g_ParamLevel==1)
-//		return;
-//	int nItem=m_occupiedSetPointModeCmbox.GetCurSel();
-//
-//			g_bPauseMultiRead = TRUE;
-//	write_one(g_tstat_id, 339,nItem);
-//
-//	if(product_register_value[339]==0||product_register_value[339]==2)
-//	{
-//		m_defSetPointEdit.EnableWindow(FALSE);
-//	}
-//	if(product_register_value[339]==1)
-//	{
-//		m_defSetPointEdit.EnableWindow(TRUE);
-//	}
-//	g_bPauseMultiRead = FALSE;
-//	//if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
-//	//	Refresh6();
-//	//else
-//	//	Refresh();
-//	Reflesh_ParameterDlg();
-//}
+
 //Modify by Fance 这里原来的代码400只支持 5E 不支持T6 所以 改为如下
 void CParameterDlg::OnCbnSelchangeComboLcdscrn1()
 {
@@ -2624,71 +2598,18 @@ void CParameterDlg::OnCbnSelchangeComboRounddis()
 }
 
 
-//Annul by Fance, this function don't support T6 T7. Need recode.
-//void CParameterDlg::OnCbnSelchangeComboRounddis()
-//{
-//	CComboBox* pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_ROUNDDIS);
-//	int nCursel = pCbx->GetCurSel();
-//
-//			g_bPauseMultiRead = TRUE;
-//	if(nCursel == 0)
-//	{
-//		write_one(g_tstat_id, 318, 0);
-//	}
-//	else if(nCursel == 1)
-//	{
-//		write_one(g_tstat_id, 318, 1);
-//	}
-//	else if(nCursel == 2)
-//	{
-//		write_one(g_tstat_id, 318, 5);
-//	}
-//
-//	g_bPauseMultiRead = FALSE;
-//}
-
 
 void CParameterDlg::OnCbnKillfocusCombo1()
 {
-    
-    //CString str;
 
-    //GetDlgItem(IDC_COMBO1)->GetWindowText(str);
-
-    //if (str.CompareNoCase(_T("Single")) == 0)
-    //	MDAY = 0;
-    //else
-    //	MDAY = 1;
-
-//	FlexSP = 1;
 }
 
 void CParameterDlg::OnCbnKillfocusCombo4()
 {
-    
-//CString str;
-
-    //GetDlgItem(IDC_COMBO4)->GetWindowText(str);
-
-//	if (str.CompareNoCase(_T("Single")) == 0)
-    //	MNIGHT = 0;
-    //else
-//		MNIGHT = 1;
-//FlexSPN = 1;
 
 }
 
 
-//-------------------------------------------------------
-//Annul by Fance ,it not support t6
-//void CParameterDlg::OnEnKillfocusEditCdbnn()
-//{
-//	BeginWaitCursor();
-//	UpdateData();
-//	write_one(g_tstat_id,353,m_cooldbN*10);
-//	newtstat6[353] = m_cooldbN*10;
-//	EndWaitCursor();
-//}
 
 CString CParameterDlg::GetInputValue(int InputNo) //这个是行号，如果是Input的话，要在这个基础上加1
 {
@@ -3025,12 +2946,24 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		sel +=1;
 	}
 
-    sel =product_register_value[MODBUS_INPUT1_SELECT]-2;
-    if (sel<0)
+
+    if (product_register_value[7] == PM_PM5E)
     {
-        sel =0;
+        sel = product_register_value[MODBUS_INPUT1_SELECT] - 1;
+        if (sel<0)
+            sel = 0;
+        m_inputSelect2.SetCurSel(sel);
     }
-    m_inputSelect2.SetCurSel(sel);
+    else
+    {
+        sel = product_register_value[MODBUS_INPUT1_SELECT] - 2;
+        if (sel<0)
+        {
+            sel = 0;
+        }
+        m_inputSelect2.SetCurSel(sel);
+    }
+    
 
 
 
@@ -3053,92 +2986,23 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
         if(product_register_value[382]>=5&&product_register_value[382]<=14) // input1
         {
+            if (product_register_value[382] == 13) //说明是选择的CO2 ，而CO2对应的是 index 是10
+            {
+                strTemp = m_tstat_input_data.at(10).Value.StrValue + m_tstat_input_data.at(10).Unit.StrValue;
+            }
+            else if (product_register_value[382] == 14) //说明是选择的HUM ，而HUM对应的是 index 是9
+            {
+                strTemp = m_tstat_input_data.at(9).Value.StrValue + m_tstat_input_data.at(9).Unit.StrValue;
+            }
+            else if ((product_register_value[382] >= 5) && (product_register_value[382] <= 12))
+            {
+                strTemp = m_tstat_input_data.at(product_register_value[382] - 5).Value.StrValue + m_tstat_input_data.at(product_register_value[382] - 5).Unit.StrValue;
+            }
+            else
+                strTemp = m_tstat_input_data.at(product_register_value[382] - 4).Value.StrValue + m_tstat_input_data.at(product_register_value[382] - 4).Unit.StrValue;
 
-            strTemp=m_tstat_input_data.at(product_register_value[382]-5 ).Value.StrValue + m_tstat_input_data.at(product_register_value[382]-5 ).Unit.StrValue;
             m_inputvalue1.SetWindowText(strTemp);
         }
-        //else if(product_register_value[382]==6) // input2 //m_inputvalue1
-        //{
-
-        //	strTemp=GetInputValue(2);
-        //	m_inputvalue1.SetWindowText(strTemp);
-        //}
-        //else if(product_register_value[382]==7) // input2 //m_inputvalue1
-        //{
-
-        //	strTemp=GetInputValue(3);
-        //	m_inputvalue1.SetWindowText(strTemp);
-        //}
-        //else if(product_register_value[382]==8) // input2 //m_inputvalue1
-        //{
-
-        //	strTemp=GetInputValue(4);
-        //	m_inputvalue1.SetWindowText(strTemp);
-        //}
-        //else if(product_register_value[382]==9) // input2 //m_inputvalue1
-        //{
-
-        //	strTemp=GetInputValue(5);
-        //	m_inputvalue1.SetWindowText(strTemp);
-        //}
-        //else if(product_register_value[382]==10) // input2 //m_inputvalue1
-        //{
-
-        //	strTemp=GetInputValue(6);
-        //	m_inputvalue1.SetWindowText(strTemp);
-        //}
-        //else if(product_register_value[382]==11) // input2 //m_inputvalue1
-        //{
-
-        //	strTemp=GetInputValue(7);
-        //	m_inputvalue1.SetWindowText(strTemp);
-        //}
-        //else if(product_register_value[382]==12) // input2 //m_inputvalue1
-        //{
-
-        //	strTemp=GetInputValue(8);
-        //	m_inputvalue1.SetWindowText(strTemp);
-        //}
-        //else if (product_register_value[382]==13)//Humidity
-        //{		CString temp;
-        //strUnit=_T("%");
-        //if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
-        //{
-
-        //	temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
-
-        //}
-        //else
-        //{
-        //	temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
-        //}
-
-
-        //m_inputvalue1.SetWindowText(temp+strUnit);
-
-
-        //}
-        //else if (product_register_value[382]==14)//Co2
-        //{ CString temp;
-        //strUnit=_T("ppm");
-        //if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
-        //{
-
-        //	temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
-        //	temp=temp+strUnit;
-
-        //}
-        //else
-        //{
-
-        //	temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
-        //	temp=temp+strUnit;
-        //}
-
-        //m_inputvalue1.SetWindowText(temp);
-
-
-        //}
         else
         {
             //m_inputvalue1.SetWindowText(_T("UNUSED"));
@@ -3175,8 +3039,18 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}
         if(product_register_value[383]>=5&&product_register_value[383]<=14) // input1
         {
-
-            strTemp=m_tstat_input_data.at(product_register_value[383]-5).Value.StrValue + m_tstat_input_data.at(product_register_value[383]-5 ).Unit.StrValue;
+            if (product_register_value[383] == 13) //说明是选择的CO2 ，而CO2对应的是 index 是10
+            {
+                strTemp = m_tstat_input_data.at(10).Value.StrValue + m_tstat_input_data.at(10).Unit.StrValue;
+            }
+            else if (product_register_value[383] == 14) //说明是选择的HUM ，而HUM对应的是 index 是9
+            {
+                strTemp = m_tstat_input_data.at(9).Value.StrValue + m_tstat_input_data.at(9).Unit.StrValue;
+            }
+            else if((product_register_value[383] >=5) && (product_register_value[383]<=12))
+                strTemp = m_tstat_input_data.at(product_register_value[383] - 5).Value.StrValue + m_tstat_input_data.at(product_register_value[383] - 5).Unit.StrValue;
+            else
+                strTemp=m_tstat_input_data.at(product_register_value[383]-4).Value.StrValue + m_tstat_input_data.at(product_register_value[383]-4 ).Unit.StrValue;
             m_inputValue2.SetWindowText(strTemp);
         }
         else if (product_register_value[383] == 21)
@@ -3198,6 +3072,16 @@ void CParameterDlg::Reflesh_ParameterDlg()
         GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->SetWindowText(strTemp+strUnit);
 #endif
 
+    }
+    else if ((product_register_value[7] == PM_PM5E) || (product_register_value[7] == PM_PM5E_ARM))
+    {
+        sel = product_register_value[MODBUS_INPUT1_SELECT] - 1;
+        if ((sel >= 0) && (sel <= 7))
+        {
+            CString temp_value;
+            temp_value.Format(_T("%.1f"), (float)product_register_value[367 + sel] / 10.0);
+            m_inputValue2.SetWindowTextW(temp_value);
+        }
     }
     else
     {
@@ -3459,6 +3343,10 @@ void CParameterDlg::Reflesh_ParameterDlg()
     strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
     strTemp.Empty();
     strTemp.Format(_T("%0.1f"),((short)product_register_value[MODBUS_UNIVERSAL_SET])/10.0);	 //246  359
+    if (product_register_value[382] == 13)
+    {
+        strUnit = m_tstat_input_data.at(product_register_value[382] - 4).Unit.StrValue;
+    }
     strTemp=strTemp+strUnit;
     m_pid_setptEdt2.SetWindowText(strTemp);
 
@@ -3707,18 +3595,18 @@ void CParameterDlg::Reflesh_ParameterDlg()
     {
 
 
-        /*GetDlgItem(IDC_SPSET1)->EnableWindow(FALSE);*/GetDlgItem(IDC_SPSET1)->EnableWindow(TRUE);
-        /*GetDlgItem(IDC_SPSET2)->EnableWindow(FALSE);*/GetDlgItem(IDC_SPSET2)->EnableWindow(TRUE);
-        /*GetDlgItem(IDC_ESETPOINTHI)->EnableWindow(FALSE);*/GetDlgItem(IDC_ESETPOINTHI)->EnableWindow(TRUE);
-        /*GetDlgItem(IDC_ESETPOINTLO)->EnableWindow(FALSE);*/GetDlgItem(IDC_ESETPOINTLO)->EnableWindow(TRUE);
-        /*GetDlgItem(IDC_ECOOLDEADBAND1)->EnableWindow(FALSE);*/GetDlgItem(IDC_ECOOLDEADBAND1)->EnableWindow(TRUE);
-        /*GetDlgItem(IDC_ECOOLINGITERM1)->EnableWindow(FALSE);*/GetDlgItem(IDC_ECOOLINGITERM1)->EnableWindow(TRUE);
+        GetDlgItem(IDC_SPSET1)->EnableWindow(TRUE);
+        GetDlgItem(IDC_SPSET2)->EnableWindow(TRUE);
+        GetDlgItem(IDC_ESETPOINTHI)->EnableWindow(TRUE);
+        GetDlgItem(IDC_ESETPOINTLO)->EnableWindow(TRUE);
+        GetDlgItem(IDC_ECOOLDEADBAND1)->EnableWindow(TRUE);
+        GetDlgItem(IDC_ECOOLINGITERM1)->EnableWindow(TRUE);
 
-        /*GetDlgItem(IDC_ECOOLDEADBAND2)->EnableWindow(FALSE);*/GetDlgItem(IDC_ECOOLDEADBAND2)->EnableWindow(TRUE);
-        /*GetDlgItem(IDC_ECOOLINGITERM2)->EnableWindow(FALSE);*/GetDlgItem(IDC_ECOOLINGITERM2)->EnableWindow(TRUE);
+        GetDlgItem(IDC_ECOOLDEADBAND2)->EnableWindow(TRUE);
+        GetDlgItem(IDC_ECOOLINGITERM2)->EnableWindow(TRUE);
         GetDlgItem(IDC_EAPPLICATION)->EnableWindow(FALSE);
-        GetDlgItem(IDC_ENIGNTCOOLING1)->EnableWindow(FALSE);//GetDlgItem(IDC_ENIGNTCOOLING1)->EnableWindow(TRUE);
-        GetDlgItem(IDC_ENIGNTHEATING)->EnableWindow(FALSE);//GetDlgItem(IDC_ENIGNTHEATING)->EnableWindow(TRUE);
+        GetDlgItem(IDC_ENIGNTCOOLING1)->EnableWindow(FALSE);
+        GetDlgItem(IDC_ENIGNTHEATING)->EnableWindow(FALSE);
 
 
 
@@ -3741,29 +3629,12 @@ void CParameterDlg::Reflesh_ParameterDlg()
  
         GetDlgItem(IDC_EDIT_ValueTravelTime)->EnableWindow(TRUE);
 
-        //GetDlgItem(IDC_STATIC_1SP2SPN)->ShowWindow(FALSE);
-        //GetDlgItem(IDC_COMBO1)->ShowWindow(FALSE);
-        //GetDlgItem(IDC_COMBO4)->ShowWindow(FALSE);
-
 
         m_edit_backlighttime.ShowWindow(TRUE);
         CString backlight;
         backlight.Format(_T("%d"),product_register_value[434]);
         m_edit_backlighttime.SetWindowText(backlight);
 
-// 		m_check_occupiedenable.ShowWindow(TRUE);
-// 		if ((product_register_value[629]==1)&&(product_register_value[565]==0))
-// 		{
-// 			m_check_occupiedenable.SetCheck(1);
-// 		}
-// 		else
-// 		{
-// 			m_check_occupiedenable.SetCheck(0);
-// 		}
-// 		m_occupied_timer.ShowWindow(TRUE);
-        //CString occupiedtimer;
-        //occupiedtimer.Format(_T("%d"),product_register_value[641]);
-        //m_occupied_timer.SetWindowText(occupiedtimer);
 
 
         GetDlgItem(IDC_STATIC_LCDSCREEN1)->ShowWindow(SW_HIDE);
@@ -3877,6 +3748,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
         {
             TempSel=2;
         }
+
         m_inputSelect2.SetCurSel(TempSel-2);
 
         if (TempSel == 21)
@@ -3959,11 +3831,6 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 		)
     {
-        //WINDOWPLACEMENT wp;
-        //GetWindowPlacement(&wp);
-        //wp.rcNormalPosition.bottom += 120;
-        //SetWindowPlacement(&wp);
-        //GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_NORMAL);
         GetDlgItem(IDC_STATIC_1SP2SPN)->ShowWindow(SW_NORMAL);
         GetDlgItem(IDC_STATIC_COOLDBN)->ShowWindow(SW_NORMAL);
         GetDlgItem(IDC_STATIC_SPN)->ShowWindow(SW_NORMAL);
@@ -3992,17 +3859,6 @@ void CParameterDlg::Reflesh_ParameterDlg()
     }
     else
     {
-
-        //WINDOWPLACEMENT wp;
-        //GetWindowPlacement(&wp);
-        //CRect rc;
-        //CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
-        //pWnd->GetWindowRect(&rc);
-        ////ScreenToClient(&rc);
-        //wp.rcNormalPosition.bottom = rc.bottom - 10;
-        //SetWindowPlacement(&wp);
-        //GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE);
-
         GetDlgItem(IDC_STATIC_1SP2SPN)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_COOLDBN)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_SPN)->ShowWindow(SW_HIDE);
@@ -4054,14 +3910,6 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 void CParameterDlg::OnBnClickedCancel()
 {
-    
-// 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-// 	CView* pT3000View = pFrame->m_pViews[DLG_T3000_VIEW];
-// 	if(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd!=NULL)
-// 	{
-// 		::PostMessage(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
-// 	}
-
     OnCancel();
 }
 
@@ -4447,10 +4295,10 @@ void CParameterDlg::ShowPID3()
         temp.Format(_T("%d"),product_register_value[MODBUS_MIN_SUPPLY_SETPOINT]);
         temp+=strUnit;
         GetDlgItem(IDC_ESETPOINTLO2_PID3)->SetWindowText(temp);
-        temp.Format(_T("%d"),product_register_value[MODBUS_PID3_COOLING_DB]);
+        temp.Format(_T("%.1f"),((float)product_register_value[MODBUS_PID3_COOLING_DB])/10);
         temp+=strUnit;
         GetDlgItem(IDC_ECOOLDEADBAND3_PID3)->SetWindowText(temp);
-        temp.Format(_T("%d"),product_register_value[MODBUS_PID3_HEATING_DB]);
+        temp.Format(_T("%.1f"),((float)product_register_value[MODBUS_PID3_HEATING_DB])/10);
         temp+=strUnit;
         GetDlgItem(IDC_ECOOLINGITERM3_PID3)->SetWindowText(temp);
         int RegAddress=-1;
@@ -4990,7 +4838,12 @@ void CParameterDlg::OnEnKillfocusEcooldeadband3Pid3()
     CString temp;
     //temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
     GetDlgItem(IDC_ECOOLDEADBAND3_PID3)->GetWindowText(temp);
-    int Val=_wtoi(temp);
+    int Val=_wtof(temp) * 10;
+    if (Val > 255)
+    {
+        AfxMessageBox(_T("Input value can't larger than 25.6"));
+        return;
+    }
     if (Val==product_register_value[MODBUS_PID3_COOLING_DB])
     {
         return;
@@ -5013,7 +4866,12 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm3Pid3()
     CString temp;
     //temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
     GetDlgItem(IDC_ECOOLINGITERM3_PID3)->GetWindowText(temp);
-    int Val=_wtoi(temp);
+    int Val=   _wtof(temp)* 10 ;
+    if (Val > 255)
+    {
+        AfxMessageBox(_T("Input value can't larger than 25.6"));
+        return;
+    }
     if (Val==product_register_value[MODBUS_PID3_HEATING_DB])
     {
         return;
@@ -5400,7 +5258,7 @@ void CParameterDlg::OnEnKillfocusEditTranducerMax()
     }
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,727,deadmastervalue,
-                        product_register_value[727],this->m_hWnd,IDC_EDIT_TRANDUCER_MAX,_T("Tranducer Max"));
+                        product_register_value[727],this->m_hWnd,IDC_EDIT_TRANDUCER_MAX,_T("Transducer Max"));
 }
 
 
@@ -5415,7 +5273,7 @@ void CParameterDlg::OnEnKillfocusEditTranducerMin()
     }
 
     Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,726,deadmastervalue,
-                        product_register_value[726],this->m_hWnd,IDC_EDIT_TRANDUCER_MIN,_T("Tranducer Min"));
+                        product_register_value[726],this->m_hWnd,IDC_EDIT_TRANDUCER_MIN,_T("Transducer Min"));
 }
 
 

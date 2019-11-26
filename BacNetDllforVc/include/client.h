@@ -60,7 +60,7 @@ extern "C" {
         BACNET_ADDRESS * dest,
         BACNET_NPDU_DATA * npdu_data);
 
-    void Send_WhoIs(
+__declspec(dllexport)    void Send_WhoIs(
         int32_t low_limit,
         int32_t high_limit);
 
@@ -133,7 +133,7 @@ __declspec(dllexport) void ShutDownMstpGlobal(uint8_t n_time);
         uint32_t object_instance,
         BACNET_PROPERTY_ID object_property,
         uint32_t array_index);
-    uint8_t Send_Read_Property_Multiple_Request(
+ __declspec(dllexport)    uint8_t Send_Read_Property_Multiple_Request(
         uint8_t * pdu,
         size_t max_pdu,
         uint32_t device_id,     /* destination device */

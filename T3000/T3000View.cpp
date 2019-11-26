@@ -110,7 +110,7 @@ UINT BackMainUIFresh(LPVOID pParam)
         //if(pdlg->IsWindowVisible())
         //{
             Sleep(20000);
-
+            continue;
             if (!no_mouse_keyboard_event_enable_refresh)
             {
                 continue;

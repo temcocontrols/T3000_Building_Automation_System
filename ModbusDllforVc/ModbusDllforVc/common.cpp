@@ -19,6 +19,7 @@ extern  TS_US LATENCY_TIME_NET ;
  
 extern HANDLE m_hSerial;//串口句柄
 extern HANDLE m_com_h_serial[100];
+extern OVERLAPPED m_com_osRead[100], m_com_osWrite[100], m_com_osMulWrite[100]; // 用于多线程同时重叠读/写
 extern OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // 用于重叠读/写
 extern TS_UC  gval[13];//the data that get from com
 extern TS_UC  serinumber_in_dll[4];//only read_one function ,when read 10,
@@ -602,12 +603,18 @@ OUTPUT bool Change_BaudRate_NoCretical(int new_baudrate,int ncomport)
     // 默认串口参数
     int i = 0;
     bool successful = false;//true==do it success;false==do it failure
-    for (i = 0;i<10;i++)
+    for (i = 0;i < 10;i++)
+    {
         if (GetCommState(m_com_h_serial[ncomport], &PortDCB))
         {
             successful = true;
             break;
         }
+        else
+        {
+            Sleep(10);
+        }
+    }
     if (successful == false)
         return false;
     //not to change the baudate
@@ -2542,8 +2549,12 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         int nRet = ::send(m_hSocket, (char*)data, nSendNum, 0);
         if (nRet < 0)	//Add by Fance ,if device is dosconnected , we need to connect the device again;
         {
-            //if (last_connected_port != 0)
-            //    Open_Socket2(last_connected_ip, last_connected_port);
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                    Open_Socket2_multy_thread(last_connected_ip, last_connected_port, nindex);
+            }
         }
         //Sleep(SLEEP_TIME+10);
         Sleep(LATENCY_TIME_NET);
@@ -6467,6 +6478,393 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
     return -1;
 }
 
+
+OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, bool bComm_Type, int ncomport)
+{
+    if (bComm_Type == 0)
+    {
+        HANDLE m_hSerial = NULL;
+        m_hSerial = m_com_h_serial[ncomport];
+        //address        the register
+        //val         the value that you want to write to the register
+        //the return value == -1 ,no connecting
+        //the return value == -3 , no response
+        //清空串口缓冲区
+
+        //		gval[8]={'\0'};//the data that get
+        //      TS_UC  pval[9];
+        for (int i = 0; i <= 11; i++)
+            gval[i] = 0;/////////////////////////////////////////clear buffer
+        TS_US crc;
+        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        pval[0] = device_var;
+        pval[1] = 6;
+        pval[2] = address >> 8 & 0xFF;
+        pval[3] = address & 0xFF;
+        if (address == 10 && (serinumber_in_dll[0] != 0 || serinumber_in_dll[1] != 0 || serinumber_in_dll[2] != 0 || serinumber_in_dll[3] != 0))
+            pval[4] = 0x55;/////////////////////////////new protocal or write_one 10
+        else
+            pval[4] = (val >> 8) & 0xff;//number hi
+        pval[5] = val & 0xff;//number lo
+        if (address != 10)
+        {
+            crc = CRC16(pval, 6);
+            pval[6] = (crc >> 8) & 0xff;
+            pval[7] = crc & 0xff;
+        }
+        else
+        {
+            if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
+            {
+                crc = CRC16(pval, 6);
+                pval[6] = (crc >> 8) & 0xff;
+                pval[7] = crc & 0xff;
+            }
+            else
+            {
+                pval[6] = serinumber_in_dll[0];
+                pval[7] = serinumber_in_dll[1];
+                pval[8] = serinumber_in_dll[2];
+                pval[9] = serinumber_in_dll[3];
+                crc = CRC16(pval, 10);
+                pval[10] = (crc >> 8) & 0xff;
+                pval[11] = crc & 0xff;
+            }
+        }
+
+        if (m_hSerial == NULL)
+        {
+            return -1;
+        }
+        CString nSection;
+        nSection.Format(_T("ComMulWrite_%d"), ncomport);
+        ////////////////////////////////////////////////////////////overlapped declare
+        memset(&m_com_osWrite[ncomport], 0, sizeof(OVERLAPPED));
+        if ((m_com_osWrite[ncomport].hEvent = CreateEvent(NULL, true, false, nSection)) == NULL)
+            return -2;
+        m_com_osWrite[ncomport].Offset = 0;
+        m_com_osWrite[ncomport].OffsetHigh = 0;
+        ////////////////////////////////////////////////clear com error
+        COMSTAT ComStat;
+        DWORD dwErrorFlags;
+
+        ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+        PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
+        int fState;
+        Sleep(50);
+        if (address != 10)
+        {
+            fState = WriteFile(m_hSerial,// 句柄
+                pval,// 数据缓冲区地址
+                8,// 数据大小
+                &m_had_send_data_number,// 返回发送出去的字节数
+                &m_com_osWrite[ncomport]);
+        }
+        else
+        {
+            //==10 register
+            if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
+            {
+                //old protocal
+                fState = WriteFile(m_hSerial,// 句柄
+                    pval,// 数据缓冲区地址
+                    8,// 数据大小
+                    &m_had_send_data_number,// 返回发送出去的字节数
+                    &m_com_osWrite[ncomport]);
+            }
+            else
+            {
+                //new protocal
+                fState = WriteFile(m_hSerial,// 句柄
+                    pval,// 数据缓冲区地址
+                    12,// 数据大小
+                    &m_had_send_data_number,// 返回发送出去的字节数
+                    &m_com_osWrite[ncomport]);
+            }
+        }
+        if (!fState)// 不支持重叠
+        {
+            if (GetLastError() == ERROR_IO_PENDING)
+            {
+                //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
+                GetOverlappedResult(m_hSerial, &m_com_osWrite[ncomport], &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                                                                                                   //			if(GetLastError()==ERROR_IO_INCOMPLETE)
+                                                                                                   //				AfxMessageBox("wrong1");
+            }
+            else
+                m_had_send_data_number = 0;
+        }
+        ///////////////////////////up is write
+        /////////////**************down is read
+        ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+        memset(&m_com_osWrite[ncomport], 0, sizeof(OVERLAPPED));
+        if ((m_com_osWrite[ncomport].hEvent = CreateEvent(NULL, true, false, nSection)) == NULL)
+            return -2;
+        m_com_osWrite[ncomport].Offset = 0;
+        m_com_osWrite[ncomport].OffsetHigh = 0;
+        ////////////////////////////////////////////////clear com error
+        Sleep(LATENCY_TIME_COM);
+        if (address != 10)
+        {
+            fState = ReadFile(m_hSerial,// 句柄
+                gval,// 数据缓冲区地址
+                8,// 数据大小
+                &m_had_send_data_number,// 返回发送出去的字节数
+                &m_com_osWrite[ncomport]);
+        }
+        else
+        {
+            if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
+            {
+                //old protocal
+                fState = ReadFile(m_hSerial,// 句柄
+                    gval,// 数据缓冲区地址
+                    8,// 数据大小
+                    &m_had_send_data_number,// 返回发送出去的字节数
+                    &m_com_osWrite[ncomport]);
+            }
+            else
+            {
+                //new protocal
+                fState = ReadFile(m_hSerial,// 句柄
+                    gval,// 数据缓冲区地址
+                    12,// 数据大小
+                    &m_had_send_data_number,// 返回发送出去的字节数
+                    &m_com_osWrite[ncomport]);
+            }
+        }
+        if (!fState)// 不支持重叠
+        {
+            if (GetLastError() == ERROR_IO_PENDING)
+            {
+                //WaitForSingleObject(m_osRead.hEvent,INFINITE);
+                GetOverlappedResult(m_hSerial, &m_com_osWrite[ncomport], &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+            }
+            else
+                m_had_send_data_number = 0;
+        }
+        if (address != 10)
+        {
+            if (gval[0] == 0 && gval[1] == 0 && gval[2] == 0 && gval[3] == 0 && gval[4] == 0 && gval[5] == 0 && gval[6] == 0 && gval[7] == 0)
+                return -3;
+            for (int i = 0; i<8; i++)
+                if (gval[i] != pval[i])
+                    return -2;
+        }
+        else
+        {
+            if (gval[0] == 0 && gval[1] == 0 && gval[2] == 0 && gval[3] == 0 && gval[4] == 0 && gval[5] == 0 && gval[6] == 0 && gval[7] == 0)
+                return -3;
+            if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
+            {
+                //old protocal
+                for (int i = 0; i<8; i++)
+                    if (gval[i] != pval[i])
+                        return -2;
+            }
+            else
+            {
+                //new protocal
+                //			crc=CRC16(gval,10);
+                //			if(gval[6]!=((crc>>8)&0xff))
+                //				return -2;
+                //			if(gval[7]!=(crc & 0xff))
+                //				return -2;
+                //			TRACE("W:%x %x %x %x\n",serinumber_in_dll[0],serinumber_in_dll[1],serinumber_in_dll[2],serinumber_in_dll[3]);
+                if (gval[0] == 0 && gval[1] == 0 && gval[2] == 0 && gval[3] == 0 && gval[4] == 0 && gval[5] == 0 && gval[6] == 0 && gval[7] == 0 && gval[8] == 0 && gval[9] == 0 && gval[10] == 0 && gval[11] == 0)
+                    return -3;
+                for (int i = 0; i<12; i++)
+                    if (gval[i] != pval[i])
+                        return -2;
+            }
+        }
+        return 1;
+    }
+
+    if (bComm_Type == 1)//tcp.
+    {
+        //address        the register
+        //val         the value that you want to write to the register
+        //the return value == -1 ,no connecting
+        //the return value == -3 , no response
+        //清空串口缓冲区
+
+        //TS_UC data[12];
+        TS_UC data[16];
+        // 		TS_UC* data=NULL;
+        int nSendNum = 12;
+        if (address == 10)
+        {
+            //data = new TS_UC[16];
+            nSendNum = 16;
+        }
+        else
+        {
+            //data = new TS_UC[12];
+            nSendNum = 12;
+        }
+        ZeroMemory(data, nSendNum);
+
+        data[0] = 1;
+        data[1] = 2;
+        data[2] = 3;
+        data[3] = 4;
+        data[4] = 5;
+        data[5] = 6;
+        //		DWORD m_had_send_data_number;//已经发送的数据的字节数
+        data[6] = device_var;
+        data[7] = 6;
+        data[8] = address >> 8 & 0xFF;
+        data[9] = address & 0xFF;
+        if (address == 10 && (serinumber_in_dll[0] != 0 || serinumber_in_dll[1] != 0 || serinumber_in_dll[2] != 0 || serinumber_in_dll[3] != 0))
+            data[10] = 0x55;/////////////////////////////new protocal or write_one 10
+        else
+            data[10] = (val >> 8) & 0xff;//number hi
+        data[11] = val & 0xff;//number lo
+
+        if (address == 10)
+        {
+
+            if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
+            {
+            }
+            else
+            {
+                //* uncommend by zgq; we use net work scan tstat through NC
+                data[12] = serinumber_in_dll[0];
+                data[13] = serinumber_in_dll[1];
+                data[14] = serinumber_in_dll[2];
+                data[15] = serinumber_in_dll[3];
+                //*/
+            }
+        }
+
+
+        for (int i = 0; i <= 11; i++)
+            gval[i] = 0;/////////////////////////////////////////clear buffer
+                        //		TS_US crc;
+                        //	DWORD m_had_send_data_number;//已经发送的数据的字节数
+        pval[0] = device_var;
+        pval[1] = 6;
+        pval[2] = address >> 8 & 0xFF;
+        pval[3] = address & 0xFF;
+        if (address == 10 && (serinumber_in_dll[0] != 0 || serinumber_in_dll[1] != 0 || serinumber_in_dll[2] != 0 || serinumber_in_dll[3] != 0))
+            pval[4] = 0x55;/////////////////////////////new protocal or write_one 10
+        else
+            pval[4] = (val >> 8) & 0xff;//number hi
+        pval[5] = val & 0xff;//number lo
+
+                             /*
+                             for(int i=0;i<=11;i++)
+                             gval[i]=0;/////////////////////////////////////////clear buffer
+                             TS_US crc;
+                             DWORD m_had_send_data_number;//已经发送的数据的字节数
+                             pval[0] = device_var;
+                             pval[1] = 6;
+                             pval[2] = address>>8 & 0xFF ;
+                             pval[3] = address & 0xFF;
+                             if(address==10 && (serinumber_in_dll[0]!=0 || serinumber_in_dll[1]!=0 || serinumber_in_dll[2]!=0 || serinumber_in_dll[3]!=0))
+                             pval[4]=0x55;/////////////////////////////new protocal or write_one 10
+                             else
+                             pval[4] = (val>>8) & 0xff;//number hi
+                             pval[5] = val & 0xff;//number lo
+                             if(address!=10)
+                             {
+                             crc = CRC16(pval,6);
+                             pval[6] = (crc >>8) & 0xff;
+                             pval[7] = crc & 0xff;
+                             }
+                             else
+                             {
+                             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
+                             {
+                             crc = CRC16(pval,6);
+                             pval[6] = (crc >>8) & 0xff;
+                             pval[7] = crc & 0xff;
+                             }
+                             else
+                             {
+                             pval[6]=serinumber_in_dll[0];
+                             pval[7]=serinumber_in_dll[1];
+                             pval[8]=serinumber_in_dll[2];
+                             pval[9]=serinumber_in_dll[3];
+                             crc = CRC16(pval,10);
+                             pval[10] = (crc >>8) & 0xff;
+                             pval[11] = crc & 0xff;
+                             }
+                             }
+                             */
+        if (m_hSocket == INVALID_SOCKET)
+        {
+            return -1;
+        }
+
+        //::send(m_hSocket,(char*)pval,sizeof(pval),MSG_OOB);
+        //::send(m_hSocket,(char*)data,sizeof(data),0);
+        int nRet = ::send(m_hSocket, (char*)data, nSendNum, 0);
+
+        //Sleep(SLEEP_TIME+10);
+        Sleep(LATENCY_TIME_NET + 100);
+        //Sleep(300);
+        TS_UC rvdata[17];
+        int nRecv = ::recv(m_hSocket, (char*)rvdata, sizeof(rvdata), 0);
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                    Open_Socket2(last_connected_ip, last_connected_port);
+            }
+        }
+        int nErr = WSAGetLastError();
+
+        memcpy((void*)&gval[0], (void*)&rvdata[6], 13/*sizeof(gval)*/);
+        if (address != 10)
+        {
+            if (gval[0] == 0 && gval[1] == 0 && gval[2] == 0 && gval[3] == 0 && gval[4] == 0 && gval[5] == 0 /*&& gval[6]==0 && gval[7]==0*/)
+                return -3;
+            for (int i = 0; i<5; i++)
+                if (gval[i] != pval[i])
+                    return -2;
+        }
+        else
+        {
+            if (gval[0] == 0 && gval[1] == 0 && gval[2] == 0 && gval[3] == 0 && gval[4] == 0 && gval[5] == 0/* && gval[6]==0 && gval[7]==0*/)
+                return -3;
+            if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
+            {
+                //old protocal
+                for (int i = 0; i<5; i++)
+                    if (gval[i] != pval[i])
+                        return -2;
+            }
+            else
+            {
+                //new protocal
+                //			crc=CRC16(gval,10);
+                //			if(gval[6]!=((crc>>8)&0xff))
+                //				return -2;
+                //			if(gval[7]!=(crc & 0xff))
+                //				return -2;
+                //			TRACE("W:%x %x %x %x\n",serinumber_in_dll[0],serinumber_in_dll[1],serinumber_in_dll[2],serinumber_in_dll[3]);
+                if (gval[0] == 0 && gval[1] == 0 && gval[2] == 0 && gval[3] == 0 && gval[4] == 0 && gval[5] == 0 /*&& gval[6]==0 && gval[7]==0 && gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0*/)
+                    return -3;
+                for (int i = 0; i<5; i++)
+                    if (gval[i] != pval[i])
+                        return -2;
+            }
+        }
+
+        //delete []data;
+        return 1;
+    }
+    return -1;
+    ///////////////////////////////////////////////////////////
+}
+
+
+
 OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length,bool bComm_Type, int ncomport)
 {
     if(bComm_Type==0)
@@ -8815,13 +9213,19 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 
         if (nRecv < 0)
         {
-            int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length * 2 + 12, 0);
+            if (nRecv < 0)
             {
-                if (last_connected_port != 0)
-                    Open_Socket2(last_connected_ip, last_connected_port);
+                int nErr = WSAGetLastError();
+                if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+                {
+                    if (last_connected_port != 0)
+                        Open_Socket2(last_connected_ip, last_connected_port);
+                }
+                Sleep(1);
+                return -2;
             }
-            Sleep(1);
+
         }
         
 
@@ -9610,6 +10014,8 @@ int check_bacnet_data(unsigned char * buffer, int nlength)
 */
 OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
 {
+    if (comport >= 100)
+        return -1;
     if (open_com_nocretical(comport) == false)
     {
         Sleep(11000);
@@ -9629,13 +10035,20 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
             continue;
         }
         //Speed up scan , if no data online ,check 2 times ,then stop.
-        if (n_no_data_online_count >= 3)
+        //if (n_no_data_online_count >= 10)
+        //{
+        //    ntest_ret[i].test_ret = 0;
+        //    continue;
+        //}
+        bool change_baudrate_ret = false;
+        change_baudrate_ret = Change_BaudRate_NoCretical(ArrayBaudate[i], comport);
+        if (change_baudrate_ret == false)
         {
-            ntest_ret[i].test_ret = 0;
+            DWORD nerrors;COMSTAT com_stats;
+            ::ClearCommError(m_com_h_serial[comport],&nerrors, &com_stats);
+            Sleep(1);
             continue;
         }
-        Change_BaudRate_NoCretical(ArrayBaudate[i], comport);
-
         unsigned char test_data[400];
         memset(test_data, 0, 400);
         //read_multi2_nocretical(255, test_data, 2000, 100, 0, comport);
@@ -9654,11 +10067,11 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         //start_address is the start register
         TS_UC data_to_send[8] = { '\0' }; //the array to used in writefile()
         data_to_send[0] = 255;//slave address
-        data_to_send[1] = 3;//function multiple
-        data_to_send[2] = 2000 >> 8 & 0xff;//starting address hi
-        data_to_send[3] = 2000 & 0xff;//starting address lo
-        data_to_send[4] = 100 >> 8 & 0xff;//quantity of registers hi
-        data_to_send[5] = 100 & 0xff;//quantity of registers lo
+        data_to_send[1] = 255;//function multiple
+        data_to_send[2] = 0xffff >> 8 & 0xff;//starting address hi
+        data_to_send[3] = 0xffff & 0xff;//starting address lo
+        data_to_send[4] = 0xffff >> 8 & 0xff;//quantity of registers hi
+        data_to_send[5] = 0xffff & 0xff;//quantity of registers lo
         TS_US crc = CRC16(data_to_send, 6);
         data_to_send[6] = (crc >> 8) & 0xff +20;
         data_to_send[7] = crc & 0xff + 20;
@@ -9669,36 +10082,39 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
             continue;
             return -1;
         }
+
         ////////////////////////////////////////////////clear com error
         COMSTAT ComStat;
         DWORD dwErrorFlags;
-
+        int fState;
+#if 0
+        Sleep(LATENCY_TIME_COM * 3);
         ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
                                                                                             ////////////////////////////////////////////////////////////overlapped declare
         CString nSection;
         nSection.Format(_T("MulTestBacnetWrite_%d"), comport);
 
-        memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, nSection)) == NULL)
+        memset(&m_com_osMulWrite[comport], 0, sizeof(OVERLAPPED));
+        if ((m_com_osMulWrite[comport].hEvent = CreateEvent(NULL, true, false, nSection)) == NULL)
         {
             continue;
             //return -2;
         }
-        m_osMulWrite.Offset = 0;
-        m_osMulWrite.OffsetHigh = 0;
+        m_com_osMulWrite[comport].Offset = 0;
+        m_com_osMulWrite[comport].OffsetHigh = 0;
         ///////////////////////////////////////////////////////send the to read message
-        int fState = WriteFile(m_hSerial,// 句柄
+        fState = WriteFile(m_hSerial,// 句柄
             data_to_send,// 数据缓冲区地址
             8,// 数据大小
             &m_had_send_data_number,// 返回发送出去的字节数
-            &m_osMulWrite);
+            &m_com_osMulWrite[comport]);
         if (!fState)// 不支持重叠
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_com_osMulWrite[comport], &m_had_send_data_number, TRUE_OR_FALSE);// 等待
             }
             else
                 m_had_send_data_number = 0;
@@ -9706,30 +10122,33 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         ///////////////////////////up is write
         /////////////**************down is read
 
-        Sleep(LATENCY_TIME_COM*10);
+        Sleep(LATENCY_TIME_COM*3);
+#endif
         CString nReadSection;
         nReadSection.Format(_T("MulTestBacnetRead_%d_%d"), comport, ntest_ret[i].baudrate);
         ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
-        memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, nReadSection)) == NULL)
+        memset(&m_com_osRead[comport], 0, sizeof(OVERLAPPED));
+        if ((m_com_osRead[comport].hEvent = CreateEvent(NULL, true, false, nReadSection)) == NULL)
         {
             continue;
             //return -2;
         }
-        m_osRead.Offset = 0;
-        m_osRead.OffsetHigh = 0;
+        m_com_osRead[comport].Offset = 0;
+        m_com_osRead[comport].OffsetHigh = 0;
+
+        Sleep(LATENCY_TIME_COM * 3);
         ////////////////////////////////////////////////clear com error
         fState = ReadFile(m_hSerial,// 句柄
             to_send_data,// 数据缓冲区地址
             100 * 2 + 5,// 数据大小
             &m_had_send_data_number,// 返回发送出去的字节数
-            &m_osRead);
+            &m_com_osRead[comport]);
         if (!fState)// 不支持重叠
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_com_osRead[comport], &m_had_send_data_number, TRUE_OR_FALSE);// 等待
             }
             else
                 m_had_send_data_number = 0;

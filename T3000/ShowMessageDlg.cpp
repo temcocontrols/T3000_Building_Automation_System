@@ -8,10 +8,11 @@
 #include "ping.h"
 #include "global_function.h"
 #include "MainFrm.h"
+extern tree_product selected_product_Node; // 选中的设备信息;
 HANDLE hShowMessageHandle = NULL;
 extern HANDLE hwait_read_thread;
 // CShowMessageDlg 对话框
-
+extern bool mstp_read_result ; //0  没读到    1  读成功    MSTP 设备 记录 建立连接时，是否为客户手动中断操作;
 IMPLEMENT_DYNAMIC(CShowMessageDlg, CDialogEx)
 
 CShowMessageDlg::CShowMessageDlg(CWnd* pParent /*=NULL*/)
@@ -228,7 +229,7 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
         }
         else if (mparent->mevent == EVENT_MSTP_CONNECTION_ESTABLISH)
         {
-            for (int i = 0; i<100; i++)
+            for (int i = 0; i<50; i++)
             {
                 if(i%10 == 0)
                     Send_WhoIs_Global(-1, -1);
@@ -237,9 +238,10 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
 
                 for (int j = 0; j < m_bac_handle_Iam_data.size(); j++)
                 {
-                    if ((mparent->m_mstp_device_info.device_id == m_bac_handle_Iam_data.at(j).device_id) &&
-                        (mparent->m_mstp_device_info.macaddress == m_bac_handle_Iam_data.at(j).macaddress))
+                    if ((mparent->m_mstp_device_info.device_id == m_bac_handle_Iam_data.at(j).device_id) /*&&
+                        (mparent->m_mstp_device_info.macaddress == m_bac_handle_Iam_data.at(j).macaddress)*/)   //暂时拿掉 pannal number的 核对，茶洗说不是一一对应了
                     {
+                        mstp_read_result = true;  // 读值成功;收到返回I am 设备;
                         ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
                         hShowMessageHandle = NULL;
                         return true;
@@ -266,6 +268,7 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
         }
         else if (mparent->mevent == EVENT_CHANGE_PROTOCOL)
         {
+            g_mstp_deviceid = selected_product_Node.object_instance;
             CppSQLite3DB SqliteDBBuilding;
             CppSQLite3Table table;
             CppSQLite3Query q;
@@ -307,7 +310,7 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
                 }
                 else //单纯的 mstp 协议 
                 {
-                    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_RS485, get_serialnumber());
+                    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_RS485, g_selected_serialnumber);
                 }
 
             }
@@ -320,7 +323,14 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
                 }
                 else //单纯的 modbus 485 qie mstp 协议 
                 {
-                    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), PROTOCOL_MSTP_TO_MODBUS, temp_instance, get_serialnumber());
+                    if ((selected_product_Node.product_class_id == PM_TSTAT10) ||
+                        (selected_product_Node.product_class_id == PM_MINIPANEL) ||
+                        (selected_product_Node.product_class_id == PM_MINIPANEL_ARM))
+                    {
+                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
+                    }
+                    else
+                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), PROTOCOL_MSTP_TO_MODBUS, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
                 }
             }
 
@@ -393,6 +403,11 @@ void CShowMessageDlg::OnClose()
 void CShowMessageDlg::OnCancel()
 {
     // TODO: 在此添加专用代码和/或调用基类
+    if (hShowMessageHandle != NULL)  //若是手动点击关闭窗口，则 需要关闭 bacnet 的 口;否则一直在哪里 循环去读一个没有 的matp设备;
+    {
+        mstp_read_result = false;
+        close_bac_com();
+    }
     TerminateThread(hShowMessageHandle, 0);
     hShowMessageHandle = NULL;
     CDialogEx::OnCancel();

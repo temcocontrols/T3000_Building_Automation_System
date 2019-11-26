@@ -8660,9 +8660,7 @@ void COutPutDlg::OnEnKillfocusEditFanOffName()
      CString strText;
  
      m_edit_off.GetWindowText(strText);
-   //  strText.TrimRight();
-    // strText.TrimLeft();
-     
+     strText.Trim();  //去掉前后空格;
      if (!Write_Model_Name(strText,737))
      {
          strText = GetTextFromReg(737);
@@ -8678,8 +8676,7 @@ void COutPutDlg::OnEnKillfocusEditFanOnName()
     CString strText;
 
     m_edit_model1.GetWindowText(strText);
-   // strText.TrimRight();
-   // strText.TrimLeft();
+    strText.Trim();
 
     if (!Write_Model_Name(strText,741))
     {
@@ -8695,8 +8692,7 @@ void COutPutDlg::OnEnKillfocusEditFanLowName()
     CString strText;
 
     m_edit_model2.GetWindowText(strText);
-   // strText.TrimRight();
-   // strText.TrimLeft();
+    strText.Trim();
 
     if (!Write_Model_Name(strText,745))
     {
@@ -8712,8 +8708,7 @@ void COutPutDlg::OnEnKillfocusEditFanMidName()
     CString strText;
 
     m_edit_model3.GetWindowText(strText);
- //   strText.TrimRight();
-  //  strText.TrimLeft();
+    strText.Trim();
 
     if (!Write_Model_Name(strText,749))
     {
@@ -8729,8 +8724,7 @@ void COutPutDlg::OnEnKillfocusEditFanAutoName()
     CString strText;
 
     m_edit_auto.GetWindowText(strText);
-  //  strText.TrimRight();
-  //  strText.TrimLeft();
+    strText.Trim();
 
     if (!Write_Model_Name(strText,753))
     {
@@ -8746,8 +8740,7 @@ void COutPutDlg::OnEnKillfocusEditFanHeatName()
     CString strText;
 
     m_edit_heat.GetWindowText(strText);
-  //  strText.TrimRight();
-   // strText.TrimLeft();
+    strText.Trim();
 
     if (!Write_Model_Name(strText,757))
     {
@@ -8763,8 +8756,7 @@ void COutPutDlg::OnEnKillfocusEditFanCoolName()
     CString strText;
 
     m_edit_cool.GetWindowText(strText);
-    //strText.TrimRight();
-  //  strText.TrimLeft();
+    strText.Trim();
 
     if (!Write_Model_Name(strText,761))
     {

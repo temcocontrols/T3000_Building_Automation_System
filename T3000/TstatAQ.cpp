@@ -28,6 +28,10 @@ void CTstatAQ::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CTstatAQ, CFormView)
     ON_MESSAGE(WM_TSTAT_AQ_THREAD_READ, UpdateUI)
+    ON_EN_KILLFOCUS(IDC_EDIT_CO2_ON_TIME, &CTstatAQ::OnEnKillfocusEditCo2OnTime)
+    ON_EN_KILLFOCUS(IDC_EDIT_CO2_OFF_TIME, &CTstatAQ::OnEnKillfocusEditCo2OffTime)
+    ON_EN_KILLFOCUS(IDC_EDIT_PM_ON_TIME, &CTstatAQ::OnEnKillfocusEditPmOnTime)
+    ON_EN_KILLFOCUS(IDC_EDIT_PM_OFF_TIME, &CTstatAQ::OnEnKillfocusEditPmOffTime)
 END_MESSAGE_MAP()
 
 
@@ -109,8 +113,8 @@ void CTstatAQ::UpdateUI()
     CString cs_ppm;
     cs_ppm.Format(_T("%d"), product_register_value[TSTAT_AQ_CO2]);
 
-    CString cs_AQ;
-    cs_AQ.Format(_T("%d"), product_register_value[TSTAT_AQ_AQ]);
+    CString cs_VOC;
+    cs_VOC.Format(_T("%d"), product_register_value[TSTAT_AQ_VOC]);
 
     CString cs_light;
     cs_light.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT]);
@@ -118,13 +122,27 @@ void CTstatAQ::UpdateUI()
     CString cs_sound;
     cs_sound.Format(_T("%u"), product_register_value[TSTAT_AQ_SOUND]);
 
+    CString cs_co2_on;
+    CString cs_co2_off;
+    CString cs_pm_on;
+    CString cs_pm_off;
+    cs_co2_on.Format(_T("%u"), product_register_value[TATAT_AQ_CO2_ON]);
+    cs_co2_off.Format(_T("%u"), product_register_value[TATAT_AQ_CO2_OFF]);
+    cs_pm_on.Format(_T("%u"), product_register_value[TATAT_AQ_PM_ON]);
+    cs_pm_off.Format(_T("%u"), product_register_value[TATAT_AQ_PM_OFF]);
 
     GetDlgItem(IDC_STATIC_TEMPERATURE_VALUE)->SetWindowTextW(cs_temp);
     GetDlgItem(IDC_STATIC_HUM_VALUE)->SetWindowTextW(cs_hum);
     GetDlgItem(IDC_STATIC_CO2_VALUE)->SetWindowTextW(cs_ppm);
-    GetDlgItem(IDC_STATIC_AQ_VALUE)->SetWindowTextW(cs_AQ);
+    GetDlgItem(IDC_STATIC_VOC_VALUE)->SetWindowTextW(cs_VOC);
     GetDlgItem(IDC_STATIC_LIGHT_VALUE)->SetWindowTextW(cs_light);
     GetDlgItem(IDC_STATIC_SOUND_VALUE)->SetWindowTextW(cs_sound);
+
+    GetDlgItem(IDC_EDIT_CO2_ON_TIME)->SetWindowTextW(cs_co2_on);
+    GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->SetWindowTextW(cs_co2_off);
+    GetDlgItem(IDC_EDIT_PM_ON_TIME)->SetWindowTextW(cs_pm_on);
+    GetDlgItem(IDC_EDIT_PM_OFF_TIME)->SetWindowTextW(cs_pm_off);
+
     CString cs_weight_pm1;
     if (product_register_value[TSTAT_AQ_WEIGHT_1] != 0)
         cs_weight_pm1.Format(_T("%u"), product_register_value[TSTAT_AQ_WEIGHT_1]);
@@ -207,7 +225,7 @@ DWORD WINAPI Update_TstatAQ_Thread(LPVOID lPvoid)
     {
          Read_Multi(g_tstat_id, &product_register_value[100],100, 100, 5);
          Read_Multi(g_tstat_id, &product_register_value[700], 700, 100, 5);
-
+         Read_Multi(g_tstat_id, &product_register_value[950], 950, 100, 5);
         //for (int i = 0; i < 5; i++)
         //{
         //    int itemp = 0;
@@ -226,4 +244,73 @@ LRESULT CTstatAQ::UpdateUI(WPARAM wParam, LPARAM lParam)
 {
     Fresh();
     return 0;
+}
+
+
+void CTstatAQ::OnEnKillfocusEditCo2OnTime()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    CString strText;
+    GetDlgItem(IDC_EDIT_CO2_ON_TIME)->GetWindowText(strText);
+    int nValue = (int)(_wtoi(strText));
+
+
+    if (product_register_value[TATAT_AQ_CO2_ON] == nValue)	//Add this to judge weather this value need to change.
+        return;
+
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_CO2_ON, nValue,
+        product_register_value[TATAT_AQ_CO2_ON], this->m_hWnd, IDC_EDIT_DTERM, _T("CO2 On Time"));
+}
+
+
+void CTstatAQ::OnEnKillfocusEditCo2OffTime()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString strText;
+    GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->GetWindowText(strText);
+    int nValue = (int)(_wtoi(strText));
+
+
+    if (product_register_value[TATAT_AQ_CO2_OFF] == nValue)	//Add this to judge weather this value need to change.
+        return;
+
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_CO2_OFF, nValue,
+        product_register_value[TATAT_AQ_CO2_OFF], this->m_hWnd, IDC_EDIT_DTERM, _T("CO2 Off Time"));
+}
+
+
+void CTstatAQ::OnEnKillfocusEditPmOnTime()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString strText;
+    GetDlgItem(IDC_EDIT_PM_ON_TIME)->GetWindowText(strText);
+    int nValue = (int)(_wtoi(strText));
+
+
+    if (product_register_value[TATAT_AQ_PM_ON] == nValue)	//Add this to judge weather this value need to change.
+        return;
+
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_PM_ON, nValue,
+        product_register_value[TATAT_AQ_PM_ON], this->m_hWnd, IDC_EDIT_DTERM, _T("PM On Time"));
+}
+
+
+void CTstatAQ::OnEnKillfocusEditPmOffTime()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString strText;
+    GetDlgItem(IDC_EDIT_PM_OFF_TIME)->GetWindowText(strText);
+    int nValue = (int)(_wtoi(strText));
+
+
+    if (product_register_value[TATAT_AQ_PM_OFF] == nValue)	//Add this to judge weather this value need to change.
+        return;
+
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_PM_OFF, nValue,
+        product_register_value[TATAT_AQ_PM_OFF], this->m_hWnd, IDC_EDIT_DTERM, _T("PM Off Time"));
 }

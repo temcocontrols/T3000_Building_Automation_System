@@ -2219,7 +2219,7 @@ int get_token(void)
 		}
 
 		/* look for comments */
-		if ( *prog=='/')
+		if (( *prog=='/') || (*prog == '\\'))
 			if( *(prog+1) == '*') 
 			{ /* we're in a comment */
 				prog += 2 ;
@@ -2296,7 +2296,7 @@ int get_token(void)
 			}        /* end of relaional statement check */
 
 
-			if ( strchr("+-*^/%&|=;()[]'," , *prog))
+			if ( strchr("+-*^/%&|=;()[]',\\" , *prog))
 			{    /* delimiter*/
                 ////if ((strstr(prog, "(")) &&
                 ////    (strstr(prog, "(")) &&
@@ -2915,7 +2915,7 @@ void parse_exp3( float *value )
 	register char op ;
 
 	parse_exp4(value) ;
-	while((op = *token ) == '*' || op == '/' || op == '%' || op == '&' || op == '|') 
+	while((op = *token ) == '*' || op == '/' || op == '\\' || op == '%' || op == '&' || op == '|')
 	{
 		get_token() ;
 		parse_exp4(value) ;
@@ -5997,6 +5997,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				 case '-':	 cod_line[Byte++]=MINUS;break;
 				 case '*':	 cod_line[Byte++]=MUL;break;
 				 case '/':	 cod_line[Byte++]=DIV;break;
+                 case '\\':	 cod_line[Byte++] = INT_DIV;break;
 				 case '%':	 cod_line[Byte++]=MOD;break;
 				 case '^':	 cod_line[Byte++]=POW;break;
 				 case '&':   cod_line[Byte++]=BIT_AND;break;
@@ -7235,6 +7236,10 @@ int	desexpr(void)
 							 strcpy(oper," / ");
 							 par=0;
 							 break;
+        case INT_DIV:
+                            strcpy(oper, " \\ ");
+                            par = 0;
+                            break;
 		case MOD:
 							strcpy(oper," % ");
 							par=0;
@@ -7507,6 +7512,7 @@ int	desexpr(void)
 		case MINUS:
 		case MUL:
 		case DIV:
+        case INT_DIV:
 		case MOD:
 		case OR:
 		case AND:
@@ -7925,7 +7931,7 @@ void check_function_table(char *richeditchar ,int ntype)
 {
 	Str_char_pos_color temp_pos_color;
 	char * char_source = NULL;
-	char temp_label[20];
+	char temp_label[200];
 
 	int loop_size = 0;
 	if(ntype == FUNCTION_TABEL)
@@ -7981,7 +7987,8 @@ void check_function_table(char *richeditchar ,int ntype)
 		}
         else if (ntype == LOCAL_VAR_TABEL)
         {
-            strcat_s(temp_label, 20, local_var_new_name[i]);
+            //strcat_s(temp_label, 20, local_var_new_name[i]); ¶Å·«ÆÁ±Î
+            strcat_s(temp_label, 40, local_var_new_name[i]);
             char_color = prg_local_var_color;//RGB(111, 111, 111);
         }
 		else

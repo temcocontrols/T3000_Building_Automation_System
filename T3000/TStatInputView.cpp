@@ -306,6 +306,10 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
     {
         if (i > 8)
         {
+            b_hum_sensor = true;
+            b_co2_sensor = true;
+            b_lux_sensor = true;//先全部显示 ，知道20寄存器有值
+#if 0
             bitset<16> module_type(product_register_value[20]);
             if (module_type.test(1) == true)
             {
@@ -348,17 +352,34 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
             {
                 continue;
             }
+#endif
         }
-        m_input_list.SetItemText(i,1,m_tstat_input_data.at(i).InputName.StrValue);
-        m_input_list.SetItemText(i,2,m_tstat_input_data.at(i).AM.StrValue);
-        m_input_list.SetItemText(i,3,m_tstat_input_data.at(i).Value.StrValue);
-        m_input_list.SetItemText(i,4,m_tstat_input_data.at(i).Unit.StrValue);
-        m_input_list.SetItemText(i,5,m_tstat_input_data.at(i).Range.StrValue);
-        m_input_list.SetItemText(i, 6, m_tstat_input_data.at(i).Calibration.StrValue);
-        //m_input_list.SetItemText(i,6,_T("Adjust..."));
-        m_input_list.SetItemText(i,7,m_tstat_input_data.at(i).Filter.StrValue);
-        m_input_list.SetItemText(i,8,m_tstat_input_data.at(i).Function.StrValue);
-        m_input_list.SetItemText(i,9,m_tstat_input_data.at(i).CustomTable.StrValue);
+        if (i >= 8)
+        {
+            m_input_list.SetItemText(i, 1, m_tstat_input_data.at(i).InputName.StrValue);
+            m_input_list.SetItemText(i, 2, _T(""));
+            m_input_list.SetItemText(i, 3, m_tstat_input_data.at(i).Value.StrValue);
+            m_input_list.SetItemText(i, 4, m_tstat_input_data.at(i).Unit.StrValue);
+            m_input_list.SetItemText(i, 5, m_tstat_input_data.at(i).Range.StrValue);
+            m_input_list.SetItemText(i, 6, _T(""));
+            m_input_list.SetItemText(i, 7, _T(""));
+            m_input_list.SetItemText(i, 8, _T(""));
+            m_input_list.SetItemText(i, 9, _T(""));
+        }
+        else
+        {
+            m_input_list.SetItemText(i, 1, m_tstat_input_data.at(i).InputName.StrValue);
+            m_input_list.SetItemText(i, 2, m_tstat_input_data.at(i).AM.StrValue);
+            m_input_list.SetItemText(i, 3, m_tstat_input_data.at(i).Value.StrValue);
+            m_input_list.SetItemText(i, 4, m_tstat_input_data.at(i).Unit.StrValue);
+            m_input_list.SetItemText(i, 5, m_tstat_input_data.at(i).Range.StrValue);
+            m_input_list.SetItemText(i, 6, m_tstat_input_data.at(i).Calibration.StrValue);
+            m_input_list.SetItemText(i, 7, m_tstat_input_data.at(i).Filter.StrValue);
+            m_input_list.SetItemText(i, 8, m_tstat_input_data.at(i).Function.StrValue);
+            m_input_list.SetItemText(i, 9, m_tstat_input_data.at(i).CustomTable.StrValue);
+        }
+
+
     }
     m_input_list.GetFocus();
     return 0;  
@@ -370,20 +391,22 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	int Changed_SubItem = (int)lParam;
 	CString New_CString =  m_input_list.GetItemText(Changed_Item,Changed_SubItem);
 	
-    if ((Changed_Item == 9) && (b_hum_sensor == false))
-    {
+      if (Changed_Item >= 8)
         return 0;
-    }
+    //if ((Changed_Item == 9) && (b_hum_sensor == false))
+    //{
+    //    return 0;
+    //}
 
-    if ((Changed_Item == 10) && (b_co2_sensor == false))
-    {
-        return 0;
-    }
+    //if ((Changed_Item == 10) && (b_co2_sensor == false))
+    //{
+    //    return 0;
+    //}
 
-    if ((Changed_Item == 11) && (b_lux_sensor == false))
-    {
-        return 0;
-    }
+    //if ((Changed_Item == 11) && (b_lux_sensor == false))
+    //{
+    //    return 0;
+    //}
 
 	BOOL IS_SEND=FALSE;
 	_MessageWriteOneInfo_List  *pwrite_info = new _MessageWriteOneInfo_List;
@@ -465,20 +488,22 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	   } 
 	   else
 	   {
-		   if (m_tstat_input_data.at(Changed_Item).Range.StrValue.CompareNoCase(_T("0-100%"))==0)
-		   {
-			   SendValue=(int)new_fvalue;
-		   }
-		   else{
-                if (Changed_Item == 10)
-                {
-                  SendValue=(int)new_fvalue;
-                }
-                else{
-                SendValue=(int)new_fvalue*10;
-                }
+
+           //下面代码由杜帆2019 08 23 屏蔽  所有的 input 的 value  tstat 都要乘以10 ， 一起 0-100%和hum 是单独额外处理的;
+		   //if (m_tstat_input_data.at(Changed_Item).Range.StrValue.CompareNoCase(_T("0-100%"))==0)
+		   //{
+			  // SendValue=(int)new_fvalue;
+		   //}
+		   //else{
+     //           if (Changed_Item == 10)
+     //           {
+     //             SendValue=(int)new_fvalue;
+     //           }
+     //           else{
+                SendValue=(int)(new_fvalue*10);
+               // }
 			   
-		   }
+		   //}
 	   }
 	   pwrite_info->Changed_Name.Format(_T("%s's Value,From %s to %s"),m_tstat_input_data.at(Changed_Item).InputName.StrValue,m_tstat_input_data.at(Changed_Item).Value.StrValue,New_CString);
 	   pwrite_info->address=m_tstat_input_data.at(Changed_Item).Value.regAddress;
@@ -789,7 +814,17 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
             {
                 CTstatRangeDlg   dlg;
                 int rangevalue=m_tstat_input_data.at(lRow).Range.RegValue;
-                dlg.m_current_range = rangevalue&0x7F;
+                if (rangevalue == 139)  ////如果选择 10V电压  原本是128+ 14  板子却对应 139 的值;
+                {
+                    dlg.m_current_range = 14;
+                    dlg.m_10v = 1;
+                }
+                else
+                {
+                    dlg.m_10v = rangevalue >> 7;
+                    dlg.m_current_range = rangevalue & 0x7F;
+                }
+
                 for (int i=0;i<15;i++)
                 {
                     if (m_tstat_input_data.at(lRow).Range.StrValue.CompareNoCase(analog_range_TSTAT6[i])==0)
@@ -801,7 +836,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 
-                dlg.m_10v = rangevalue>>7;
+                
 
 
                 if (IDOK==dlg.DoModal())
@@ -811,13 +846,15 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                     //m_input_list.SetItemText(lRow,lCol,analog_range[range]);
                     realRange=range;
                     rangevalue = dlg.m_10v<<7;
-
                     dbRange=range;
+                    unsigned short write_value = realRange + rangevalue;
+                    if (write_value == 142)
+                        write_value = 139;  //如果选择 10V电压  原本是128+ 14  板子却对应 139 的值;
                     pwrite_info->Changed_Name.Format(_T("%s's Range,From %s to %s"),m_tstat_input_data.at(lRow).InputName.StrValue,
                         m_tstat_input_data.at(lRow).Range.StrValue,
                         analog_range_TSTAT6[range]);
                     pwrite_info->address=m_tstat_input_data.at(lRow).Range.regAddress;
-                    pwrite_info->new_value=realRange+rangevalue;
+                    pwrite_info->new_value= write_value;
                     pwrite_info->db_value=dbRange;
                     IS_SEND=TRUE;
                 }

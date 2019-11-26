@@ -14,7 +14,8 @@
 #include "BacnetScreenEdit.h"
 #include "Class/md5.h"
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
-
+extern vector <MSG> My_Receive_msg;
+extern CCriticalSection MyCriticalSection;
 HANDLE h_read_screenlabel_thread = NULL;
 HANDLE h_write_pic_thread = NULL;
 HANDLE h_get_pic_thread = NULL;
@@ -238,6 +239,11 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 //在删除这个对话框之前 先尝试保存 操作中的 label;
 LRESULT BacnetScreen::Screeenedit_close_handle(WPARAM wParam,LPARAM lParam)
 {
+    //当用户关闭这个窗口时，清空所以的队列，即便有正常的消息，也清空，否则100多条消息 全堵在这里
+    MyCriticalSection.Lock();
+    My_Receive_msg.clear();
+    MyCriticalSection.Unlock();
+
 	Reg_Hotkey();
 	if(ScreenEdit_Window)
 	{
@@ -260,6 +266,10 @@ LRESULT BacnetScreen::Screeenedit_close_handle(WPARAM wParam,LPARAM lParam)
 		
 		
 	}
+
+
+
+
 	return 0;
 }
 

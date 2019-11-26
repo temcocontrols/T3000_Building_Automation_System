@@ -70,7 +70,7 @@ __declspec(dllexport)    unsigned address_count(
         BACNET_ADDRESS * dest,
         BACNET_ADDRESS * src);
 
-    bool address_bind_request(
+__declspec(dllexport)    bool address_bind_request(
         uint32_t device_id,
         unsigned *max_apdu,
         BACNET_ADDRESS * src);

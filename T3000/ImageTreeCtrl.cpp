@@ -22,6 +22,7 @@ enum ECmdHandler {
 	ID_ADD_VIRTUAL_DEVICE,
 	ID_ADD_CUSTOM_DEVICE,
     ID_ADD_REMOTE_DEVICE,
+    //ID_ADD_BACNET_DEVICE,
 	ID_MAX_CMD
 };
 
@@ -123,27 +124,16 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_nDeviceItemData = 3000;
 	m_Keymap[VK_F2][false][false] = &CImageTreeCtrl::DoEditLabel;
     m_Keymap[VK_DELETE][false][false] = &CImageTreeCtrl::DoDeleteItem;
-	//m_Keymap[VK_INSERT][true ][false] = &CImageTreeCtrl::DoInsertChild;
-	//m_Keymap[VK_INSERT][false][true ] = &CImageTreeCtrl::DoInsertRoot;
-	//m_Keymap[VK_INSERT][false][false] = &CImageTreeCtrl::DoInsertSibling;
-	//m_Keymap[VK_DELETE][false][false] = &CImageTreeCtrl::DoDeleteItem;
-	//m_Keymap['S'      ][true ][false] = &CImageTreeCtrl::DoSortCurrentLevel;
-	//m_Keymap['S'      ][true ][true ] = &CImageTreeCtrl::DoSortCurrentLevelAndBelow;
-
 	m_Commandmap[ID_RENAME]		        = &CImageTreeCtrl::DoEditLabel;
-	//m_Commandmap[ID_ADD_CHILD]          = &CImageTreeCtrl::DoInsertChild;
-	//m_Commandmap[ID_ADD_ROOT]           = &CImageTreeCtrl::DoInsertRoot;
-	//m_Commandmap[ID_ADD_SIBLING]        = &CImageTreeCtrl::DoInsertSibling;
 	m_Commandmap[ID_DELETE]             = &CImageTreeCtrl::DoDeleteItem;
-	//m_Commandmap[ID_SORT_LEVEL]         = &CImageTreeCtrl::DoSortCurrentLevel;
-	//m_Commandmap[ID_SORT_LEVELANDBELOW] = &CImageTreeCtrl::DoSortCurrentLevelAndBelow;
-
 	m_Commandmap[ID_SORT_BY_CONNECTION]		     = &CImageTreeCtrl::SortByConnection;
 	m_Commandmap[ID_SORT_BY_FLOOR]		        = &CImageTreeCtrl::SortByFloor;
 	m_Commandmap[ID_PING_CMD]		        = &CImageTreeCtrl::PingDevice;
 	m_Commandmap[ID_ADD_VIRTUAL_DEVICE]     = &CImageTreeCtrl::HandleAddVirtualDevice;
 	m_Commandmap[ID_ADD_CUSTOM_DEVICE]      = &CImageTreeCtrl::HandleAddCustomDevice;
     m_Commandmap[ID_ADD_REMOTE_DEVICE] =      &CImageTreeCtrl::HandleAddRemoteDevice;
+    //m_Commandmap[ID_ADD_BACNET_DEVICE] =      &CImageTreeCtrl::HandleAddThirdPartBacnetDevice;
+    
 	old_hItem = NULL;
 	m_serial_number = 0;
 	is_focus = false;
@@ -267,6 +257,15 @@ bool CImageTreeCtrl::HandleAddRemoteDevice(HTREEITEM)
     ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING, 0, 0);
     return true;
 }
+
+//bool CImageTreeCtrl::HandleAddThirdPartBacnetDevice(HTREEITEM)
+//{
+//    //CBacnetAddRemoteDevice RemoteDlg;
+//    //RemoteDlg.DoModal();
+//    //CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+//    //::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING, 0, 0);
+//    return true;
+//}
 
 bool CImageTreeCtrl::SortByConnection(HTREEITEM hItem) 
 {
@@ -970,6 +969,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
     case 26:
     case 28:
     case 30:
+    case 32:
 		if(state == false)
 		{
 			brother_nImage++;
@@ -989,6 +989,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
     case 27:
     case 29:
     case 31:
+    case 33:
 		if(state == true)
 		{
 			brother_nImage--;
@@ -1399,7 +1400,8 @@ void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
         VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
         VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device")));
         VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_REMOTE_DEVICE, _T("Add Remote Device")));
-
+        //VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_BACNET_DEVICE, _T("Add Third-Part Bac Device")));
+        
         if ((m_virtual_tree_item != NULL) && (hItem == m_virtual_tree_item))
         {
             VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_VIRTUAL_DEVICE, _T("Add Virtual Device")));

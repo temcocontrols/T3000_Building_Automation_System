@@ -175,11 +175,11 @@ __declspec(dllexport)    void apdu_set_unconfirmed_handler(
         uint8_t ** service_request,
         uint16_t * service_request_len);
 
-    uint16_t apdu_timeout(
+__declspec(dllexport)    uint16_t apdu_timeout(
         void);
     void apdu_timeout_set(
         uint16_t value);
-    uint8_t apdu_retries(
+__declspec(dllexport)    uint8_t apdu_retries(
         void);
     void apdu_retries_set(
         uint8_t value);

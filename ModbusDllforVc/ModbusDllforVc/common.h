@@ -57,6 +57,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
 
 OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type);
 OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US value, bool bComm_Type);
+OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, bool bComm_Type, int ncomport);
 //OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length);
 //OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length);
 OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length, bool bComm_Type);

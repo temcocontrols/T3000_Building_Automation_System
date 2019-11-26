@@ -87,7 +87,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;MultipleMonthCal32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;MultipleMonthCal32.lib;HttpAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -124,7 +124,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;$(SolutionDir)T3000 Output\release\MultipleMonthCal32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;$(SolutionDir)T3000 Output\release\MultipleMonthCal32.lib;$(SolutionDir)T3000 Output\release\HttpAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -183,7 +183,12 @@
     <ClCompile Include="BacnetScreen.cpp" />
     <ClCompile Include="BacnetScreenEdit.cpp" />
     <ClCompile Include="BacnetSetting.cpp" />
+    <ClCompile Include="BacnetSettingBasicInfo.cpp" />
+    <ClCompile Include="BacnetSettingDyndns.cpp" />
     <ClCompile Include="BacnetSettingHealth.cpp" />
+    <ClCompile Include="BacnetSettingTcpip.cpp" />
+    <ClCompile Include="BacnetSettingTime.cpp" />
+    <ClCompile Include="BacnetThirdPartyMain.cpp" />
     <ClCompile Include="BacnetTool.cpp" />
     <ClCompile Include="BacnetToolReadProperty.cpp" />
     <ClCompile Include="BacnetTstat.cpp" />
@@ -242,6 +247,8 @@
     <ClCompile Include="ConfigFileHandler.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
     <ClCompile Include="ConnectRemoteServer.cpp" />
+    <ClCompile Include="CustomSource\JPGLoader.cpp" />
+    <ClCompile Include="CustomSource\Splash.cpp" />
     <ClCompile Include="CustomSTable.cpp" />
     <ClCompile Include="BacnetView.cpp" />
     <ClCompile Include="DebugWindow.cpp" />
@@ -526,7 +533,12 @@
     <ClInclude Include="BacnetRemotePoint.h" />
     <ClInclude Include="BacnetScreenEdit.h" />
     <ClInclude Include="BacnetSetting.h" />
+    <ClInclude Include="BacnetSettingBasicInfo.h" />
+    <ClInclude Include="BacnetSettingDyndns.h" />
     <ClInclude Include="BacnetSettingHealth.h" />
+    <ClInclude Include="BacnetSettingTcpip.h" />
+    <ClInclude Include="BacnetSettingTime.h" />
+    <ClInclude Include="BacnetThirdPartyMain.h" />
     <ClInclude Include="BacnetTool.h" />
     <ClInclude Include="BacnetToolReadProperty.h" />
     <ClInclude Include="BacnetTstat.h" />
@@ -753,6 +765,7 @@
     <ClInclude Include="WeeklyRout_InsertDia.h" />
     <ClInclude Include="WhichOneToChooseDlg.h" />
     <ClInclude Include="WifiConfigDlg.h" />
+    <ClInclude Include="WifiConfiguration.h" />
     <ClInclude Include="WorkspaceBar.h" />
     <ClInclude Include="T3\DialogT3.h" />
     <ClInclude Include="CM5\DialogCM5.h" />

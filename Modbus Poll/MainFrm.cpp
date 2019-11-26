@@ -742,7 +742,13 @@ void Update_ViewData(CView* MBPollView){
 			return;
 		}
 		//DataBuffer=pMBPollView->m_DataBuffer;
-        pMBPollView->m_Slave_ID = GetPrivateProfileInt(_T("MBPOLL_Setting"), _T("Modbus ID"), 255, g_configfile_path);
+        static bool run_loadid_once = false;  //解决Modbus ID 一直固定从ini读取的问题.只有开始第一次从ini读取
+        if (!run_loadid_once)
+        {
+            pMBPollView->m_Slave_ID = GetPrivateProfileInt(_T("MBPOLL_Setting"), _T("Modbus ID"), 255, g_configfile_path);
+            run_loadid_once = true;
+        }
+        
 		ID=pMBPollView->m_Slave_ID;
 		startAdd=pMBPollView->m_address;
 		quantity=pMBPollView->m_Quantity;

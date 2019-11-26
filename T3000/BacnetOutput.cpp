@@ -1613,7 +1613,7 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 		else
 		{
 			ret_unit.Empty();
-			return -1;
+            return RANGE_ERROR;
 		}
 
 		CString temp_value;
@@ -1627,7 +1627,7 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 		if(m_Output_data.at(i).range>30)
 		{
 			ret_cstring.Empty();
-			return -1;
+            return RANGE_ERROR;
 		}
 		else
 		{
@@ -1642,7 +1642,7 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 			{
 				temp1.Empty();
 				ret_cstring.Empty();
-				return -1;
+                return RANGE_ERROR;
 			}
 
 			SplitCStringA(temparray,temp1,_T("/"));

@@ -376,7 +376,7 @@ typedef struct
 	uint8_t range ; /*  (1 uint8_t ; variable_range_equate)*/
 
 
-}	Str_variable_point; /* 21+9+4+1+1 = 36*/
+}	Str_variable_point; /* 39 char   fandu*/
 
 
 
@@ -499,7 +499,7 @@ typedef struct
 	uint8_t errcode;	//      : 5; /* (6 bits; 0=normal end, 1=too int32_t in program)*/
 	uint8_t unused;   //      : 8;
 
-} Str_program_point;	  /* 21+9+2+2 = 34 bytes*/
+} Str_program_point;	  /*37 bytes  fandu*/
 
 
 typedef struct
@@ -857,6 +857,8 @@ typedef union
          unsigned char max_master; //可设置的最大matser值  245 个
          unsigned char special_flag; // bit 0  代表是否支持 PT1K snesor 0 不支持 1支持;
                                      // bit 1 PT100
+         unsigned char uart_parity[3];
+         unsigned char uart_stopbit[3];
 	}reg;
 }Str_Setting_Info;
 
@@ -1124,6 +1126,30 @@ typedef struct
 	char unused[14];
 	uint16_t seg_index;
 }Str_picture_header;
+
+
+typedef union
+{
+    uint8_t all[160];
+    struct
+    {
+        uint8_t Wifi_Enable;   // 写1 应该 这些IP 变更   Modbus 起始位置 2000
+        uint8_t IP_Auto_Manual; //  0 Auto DHCP   1 static IP
+        uint8_t IP_Wifi_Status;  // 0 Wifi模块未知  
+        uint8_t LoadDefault; //1
+        uint8_t modbus_port;
+        uint8_t bacnet_port;
+        uint8_t software_version;
+        uint8_t	reserved[7];
+        char username[64];  //多写
+        char password[32];  //多写
+        uint8_t ip_addr[4];   //IP地址 12个寄存器 多写
+        uint8_t net_mask[4];
+        uint8_t getway[4];
+        uint8_t wifi_mac[6];  //只读
+    }reg;
+}str_wifi_point;
+
 
 
 #pragma pack(pop)//恢复对齐状态 

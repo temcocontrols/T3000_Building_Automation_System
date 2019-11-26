@@ -43,6 +43,15 @@
     <Filter Include="Source Files\TSTAT">
       <UniqueIdentifier>{ac478693-4668-4cf6-99ba-2ec0374f5348}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Bacnet\Setting">
+      <UniqueIdentifier>{a5a6bf42-05e6-4695-8ac5-545e7325981d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonFunction">
+      <UniqueIdentifier>{24291b73-f9d5-484a-a987-4118c16d8286}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CustomSource">
+      <UniqueIdentifier>{babebbb7-6f0b-4fbf-9c8f-6cab0e6f5f69}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AddBuilding.cpp">
@@ -378,9 +387,6 @@
     <ClCompile Include="TstatZigbeeLogic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BacnetSetting.cpp">
-      <Filter>Bacnet</Filter>
-    </ClCompile>
     <ClCompile Include="Class\md5.cpp">
       <Filter>ClassInfo</Filter>
     </ClCompile>
@@ -654,9 +660,6 @@
     <ClCompile Include="BacnetMessageInput.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
-    <ClCompile Include="BacnetSettingHealth.cpp">
-      <Filter>Bacnet</Filter>
-    </ClCompile>
     <ClCompile Include="BacnetVarCusRang.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
@@ -720,13 +723,40 @@
     <ClCompile Include="BacnetAddRemoteDevice.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
-    <ClCompile Include="Bacnet_Range_Msv.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TstatAQ.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BacnetEmailAlarm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Bacnet_Range_Msv.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetSetting.cpp">
+      <Filter>Bacnet\Setting</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetSettingHealth.cpp">
+      <Filter>Bacnet\Setting</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetSettingBasicInfo.cpp">
+      <Filter>Bacnet\Setting</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetSettingTcpip.cpp">
+      <Filter>Bacnet\Setting</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetSettingTime.cpp">
+      <Filter>Bacnet\Setting</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetSettingDyndns.cpp">
+      <Filter>Bacnet\Setting</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSource\JPGLoader.cpp">
+      <Filter>CustomSource</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSource\Splash.cpp">
+      <Filter>CustomSource</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetThirdPartyMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1877,6 +1907,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetEmailAlarm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetSettingTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetSettingTcpip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetSettingBasicInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetSettingDyndns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WifiConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetThirdPartyMain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
