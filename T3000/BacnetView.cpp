@@ -953,7 +953,7 @@ extern bool show_user_list_window ;
 HANDLE connect_mstp_thread = NULL; // 当点击MSTP的设备时开启 连接的线程;
 HANDLE read_rs485_thread = NULL; // RS485的设备 通用;
 HANDLE write_indb_thread = NULL; //将资料写入数据库的线程;
-
+int connect_way = 0;  // 1 为MODBUS RS485    2 为 MODBUS TCP
 HANDLE hbip_whois_thread = NULL; //处理回复 I am 线程
 
 int n_read_product_type = 0;
@@ -1641,7 +1641,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 	case START_BACNET_TIMER:
 		{
 			DFTrace(_T("Connect to the device use the modbus ip and port success!"));
-			m_bac_handle_Iam_data.clear();
+			//m_bac_handle_Iam_data.clear();
 			if(m_is_remote_device)
 			{
 				Send_WhoIs_remote_ip(remote_ip_address);
@@ -2279,7 +2279,7 @@ void CDialogCM5_BacNet::InitialBacnetWindow()
 }
 
 static bool already_retry = false;
-bool has_change_connect_ip = true;
+
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
@@ -2294,6 +2294,7 @@ void CDialogCM5_BacNet::Fresh()
         (g_protocol != MODBUS_RS485) && 
         (g_protocol != MODBUS_TCPIP) &&
         (g_protocol != PROTOCOL_BIP_T0_MSTP_TO_MODBUS) &&
+        (g_protocol != PROTOCOL_MB_TCPIP_TO_MB_RS485) &&
         (g_protocol != PROTOCOL_MSTP_TO_MODBUS))
 	{
 		return;
@@ -2347,20 +2348,37 @@ void CDialogCM5_BacNet::Fresh()
 	{
 #if 1
         set_datalink_protocol(2);
-        Initial_bac(g_gloab_bac_comport, _T(""), g_gloab_bac_baudrate);
-        CShowMessageDlg TempDlg;
-        TempDlg.SetStaticText(_T("Establishing Bacnet MSTP connection , please wait!"));
-        //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
-        TempDlg.SetStaticTextColor(RGB(0, 0, 255));
-        TempDlg.SetStaticTextSize(25, 20);
-        TempDlg.SetProgressAutoClose(250, 100, EVENT_MSTP_CONNECTION_ESTABLISH);
 
-        _Bac_Scan_Com_Info tempinfo;
-        tempinfo.device_id = g_mstp_deviceid;
-        tempinfo.macaddress = selected_product_Node.panel_number;
-        TempDlg.SetMstpDeviceInfo(tempinfo);
+        if ((system_connect_info.mstp_status == 1) &&
+            (system_connect_info.ncomport == selected_product_Node.ncomport) &&
+            (system_connect_info.nbaudrate == selected_product_Node.baudrate) &&
+            (bac_gloab_panel == g_thread_max_mac_id))
+        {
+            Sleep(100);
+        }
+        else
+        {
+            //m_bac_handle_Iam_data.clear();
+            Initial_bac(g_gloab_bac_comport, _T(""), g_gloab_bac_baudrate);
+            CShowMessageDlg TempDlg;
+            TempDlg.SetStaticText(_T("Establishing Bacnet MSTP connection , please wait!"));
+            //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+            TempDlg.SetStaticTextColor(RGB(0, 0, 255));
+            TempDlg.SetStaticTextSize(25, 20);
+            TempDlg.SetProgressAutoClose(250, 100, EVENT_MSTP_CONNECTION_ESTABLISH);
 
-        TempDlg.DoModal();
+            _Bac_Scan_Com_Info tempinfo;
+            tempinfo.device_id = g_mstp_deviceid;
+            tempinfo.macaddress = selected_product_Node.panel_number;
+            TempDlg.SetMstpDeviceInfo(tempinfo);
+
+            TempDlg.DoModal();
+        }
+        Variable_Window->SetTimer(1, 60000, NULL);  //如果是MSTP协议不要刷新的那么频繁;
+        Input_Window->SetTimer(1, 60000, NULL);
+        Output_Window->SetTimer(1, 60000, NULL);
+
+
         //switch_product_last_view();
 #endif
 		BacNet_hwd = this->m_hWnd;
@@ -2387,10 +2405,24 @@ void CDialogCM5_BacNet::Fresh()
             TerminateThread(read_rs485_thread, 0);
             read_rs485_thread = NULL;
         }
+        connect_way = 1;
 		if(read_rs485_thread == NULL)
 			read_rs485_thread = CreateThread(NULL,NULL,RS485_Connect_Thread,this,NULL, NULL);
 		return;
 	}
+    else if (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485)
+    {
+        BacNet_hwd = this->m_hWnd;
+        if (read_rs485_thread != NULL)
+        {
+            TerminateThread(read_rs485_thread, 0);
+            read_rs485_thread = NULL;
+        }
+        connect_way = 2;
+        if (read_rs485_thread == NULL)
+            read_rs485_thread = CreateThread(NULL, NULL, RS485_Connect_Thread, this, NULL, NULL);
+        return;
+    }
 	else if((selected_product_Node.protocol == MODBUS_TCPIP) && 
 		((selected_product_Node.product_class_id == T38AI8AO6DO) ||
 		 (selected_product_Node.product_class_id == PID_T322AI) ||
@@ -2450,8 +2482,9 @@ void CDialogCM5_BacNet::Fresh()
 
             if (selected_product_Node.NetworkCard_Address.CompareNoCase(Re_Initial_Bac_Socket_IP) != 0)
             {
+                int temp_add_port = rand() % 10000;
                 closesocket(my_sokect);
-                int ret_1 = Open_bacnetSocket2(selected_product_Node.NetworkCard_Address, BACNETIP_PORT, my_sokect);
+                int ret_1 = Open_bacnetSocket2(selected_product_Node.NetworkCard_Address, BACNETIP_PORT + temp_add_port, my_sokect);
                 if (ret_1 >= 0)
                 {
                     Re_Initial_Bac_Socket_IP = selected_product_Node.NetworkCard_Address;
@@ -2569,26 +2602,27 @@ void CDialogCM5_BacNet::Fresh()
 		int temp_mac;
 		int multy_ret = 0;
 		unsigned short temp_buffer[72];
+        if (selected_product_Node.protocol != PROTOCOL_BIP_TO_MSTP)  //这玩意的话 不用 校准 obj instance
+        {
+            ::PostMessage(MainFram_hwd, MY_RX_TX_COUNT, 1, 0);
+            memset(temp_buffer, 0, 5);
+            multy_ret = Read_Multi(g_tstat_id, temp_buffer, 32, 72, 5);
+            if (multy_ret <= 0)
+            {
+                pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item, false);
+                ::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, CONNECT_TO_MODBUS_FAILED, 0);
+                g_llTxCount++;
+                g_llerrCount++;
+                bac_select_device_online = false;
+                return;
+            }
+            memcpy_s(&product_register_value[32], 72 * sizeof(unsigned short), temp_buffer, 72 * sizeof(unsigned short));
 
-			::PostMessage(MainFram_hwd,MY_RX_TX_COUNT,1,0);
+            temp_instance = temp_buffer[0] * 65536 + temp_buffer[3];
+            temp_mac = temp_buffer[4];
+        }
 
-			memset(temp_buffer,0,5);
 
-			multy_ret = Read_Multi(g_tstat_id,temp_buffer,32,72,5);
-			if(multy_ret<=0)
-			{
-				pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
-				::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,CONNECT_TO_MODBUS_FAILED,0);
-				g_llTxCount ++;
-				g_llerrCount ++;
-				bac_select_device_online = false;
-				return;
-			}
-            memcpy_s(&product_register_value[32], 72*sizeof(unsigned short), temp_buffer, 72 * sizeof(unsigned short));
-            
-			temp_instance =temp_buffer[0]*65536 + temp_buffer[3];
-			temp_mac = temp_buffer[4];
-			has_change_connect_ip = true;
 
 			if(selected_product_Node.product_class_id == PM_CM5)
 				bacnet_device_type = PRODUCT_CM5;
@@ -3142,7 +3176,6 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
     int end_temp_instance = 0;
     CString Mession_ret;
     int read_success_count = 0;
-	//m_bac_handle_Iam_data.clear();
 	bool find_exsit = false;
 	for (int z=0;z<3;z++)
 	{
@@ -4965,8 +4998,8 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 			if(this->IsWindowVisible())
 			{
 				g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
-				if(!Gsm_communication)
-					m_bac_handle_Iam_data.clear();
+				//if(!Gsm_communication)
+					//m_bac_handle_Iam_data.clear();
 
 
 
@@ -5051,7 +5084,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				int	resend_count = 0;
 				for (int z=0;z<3;z++)
 				{
-                    if (GetPrivateData_Blocking(g_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
+                    if (GetPrivateData_Blocking(g_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info),3) >= 0)
                     {
                         SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data success!"));
                         if (send_status)
@@ -5091,63 +5124,13 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 
                         }
                     }
+                    else
+                    {
+                        CString temp_cs;
+                        temp_cs.Format(_T("Read data Timeout ,retry (%d)  "),z+1);
+                        SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
+                    }
                     Sleep(SEND_COMMAND_DELAY_TIME);
-#if 0
-					do 
-					{
-						resend_count ++;
-						if(resend_count>5)
-						{
-							send_status = false;
-							break;
-						}
-						temp_invoke_id = GetPrivateData(
-							g_bac_instance,
-							READ_SETTING_COMMAND,
-							0,
-							0,
-							sizeof(Str_Setting_Info));		
-
-						Sleep(SEND_COMMAND_DELAY_TIME);
-					} while (temp_invoke_id<0);
-
-					if(send_status)
-					{
-						bool need_break = false;
-						for (int z=0;z<200;z++)
-						{
-							Sleep(10);
-							if(tsm_invoke_id_free(temp_invoke_id))
-							{
-								SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data : OK  "));
-								g_llRxCount ++;
-								g_llTxCount ++;
-								is_connected = true;
-								//Device_Basic_Setting.reg.user_name = 2;
-								if(Device_Basic_Setting.reg.user_name == 2) //Enable user name
-								{
-									m_bac_main_tab.ShowWindow(false);
-									PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_USER_LOGIN_INFO);
-									User_Login_Window->ShowWindow(SW_NORMAL);
-
-									::PostMessage(m_user_login_hwnd,MY_REDRAW_WINDOW,NULL,NULL);
-									return;
-								}
-								else
-								{
-									m_user_level = LOGIN_SUCCESS_FULL_ACCESS;
-								}
-								need_break = true;
-								break;
-							}
-							else
-								continue;
-						}
-						if(need_break)
-							break;
-						
-					}
-#endif
 				}
 				if(is_connected)	
 				{
@@ -5231,6 +5214,20 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
             switch_product_last_view();
 		}
 		break;
+    //case 10: //测试用
+    //    mstp_port_struct_t temp1234;
+    //    Get_MSTP_STRUCT(&temp1234);
+    //    //TRACE(_T("temp1234.DataAvailable = %d\r\n"), temp1234.DataAvailable);
+    //    //TRACE(_T("temp1234.receive_state = %d\r\n"), temp1234.receive_state);
+    //    //TRACE(_T("temp1234.DataLength = %d\r\n"), temp1234.DataLength);
+    //    //TRACE(_T("temp1234.DataRegister = %d\r\n"), temp1234.DataRegister);
+    //    //TRACE(_T("temp1234.master_state = %d\r\n"), temp1234.master_state);
+    //    //TRACE(_T("temp1234.Poll_Station = %d\r\n"), temp1234.Poll_Station);
+    //    //TRACE(_T("temp1234.ReceivedInvalidFrame = %d\r\n"), temp1234.ReceivedInvalidFrame);
+    //    TRACE(_T("temp1234.SoleMaster = %d\r\n"), temp1234.SoleMaster);
+    //    //TRACE(_T("temp1234.SourceAddress = %d\r\n"), temp1234.SourceAddress);
+    //    //TRACE(_T("temp1234.This_Station = %d\r\n"), temp1234.This_Station);
+    //    break;
 	default:
 		break;
 	}
@@ -5496,6 +5493,28 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			read_customer_unit = true;
 		}
         Sleep(50);
+
+        int read_ret[3] = {0};
+        for (int x = 0; x < 3; x++)
+        {
+            CString temp_cs;
+            if (GetPrivateData_Blocking(g_bac_instance, READ_MSV_COMMAND, x, x, sizeof(Str_MSV)) > 0)
+            {
+                int index = 0;
+
+                temp_cs.Format(_T("Read MSV table %d OK."),x + 1);
+
+
+                Get_Msv_Table_Name(x);
+                read_ret[x] = 1;
+            }
+            else
+                temp_cs.Format(_T("Read MSV table %d timeout."), x + 1);
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
+            Sleep(SEND_COMMAND_DELAY_TIME);
+        }
+        read_msv_table = read_ret[0] && read_ret[1] && read_ret[2];
+
 	}
 
 	//if ((!read_analog_customer_unit) && selected_product_Node.protocol != MODBUS_RS485 && ((selected_product_Node.product_class_id == PM_CM5) ||
@@ -5512,7 +5531,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		if(GetPrivateData_Blocking(g_bac_instance,READANALOG_CUS_TABLE_T3000,0,3,sizeof(Str_table_point)) > 0)
 		{
 			GetPrivateData_Blocking(g_bac_instance,READANALOG_CUS_TABLE_T3000,4,4,sizeof(Str_table_point));
-			temp_cs.Format(_T("Read Analog custmer table OK."));
+			temp_cs.Format(_T("Read Analog custom table OK."));
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs);
 			read_analog_customer_unit = true;		
 		}
@@ -5551,6 +5570,7 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
             read_customer_unit = false;
             receive_customer_unit = false;
             read_analog_customer_unit = false;
+            read_msv_table = false;
         }
 		static_value_read = g_selected_serialnumber ;
 	}
@@ -5561,6 +5581,7 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
             read_customer_unit = false;
             read_analog_customer_unit = false;
             receive_customer_unit = false;
+            read_msv_table = false;
         }
 		static_value_read = g_selected_serialnumber;
 	}
@@ -6199,37 +6220,42 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 
 DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 {
-	close_com();
-	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    int m_nbaudrat;
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    if ((selected_product_index > pFrame->m_product.size()) || (pFrame->m_product.size() == 0))
+    {
+        read_rs485_thread = NULL;
+        return 2;
+    }
+    int n_comport = selected_product_Node.ncomport;
+    unsigned char  read_device_id = 0;
+    read_device_id = selected_product_Node.product_id;
+    if (connect_way == 1)
+    {
+        close_com();
+        m_nbaudrat = selected_product_Node.baudrate;
+        if ((n_comport == 0) || (n_comport >50))
+        {
+            AfxMessageBox(_T("Serial Port error!"));
+            read_rs485_thread = NULL;
+            return 1;
+        }
+        bool bret;
+        bret = open_com(n_comport);
+        if (bret == false)
+        {
+            read_rs485_thread = NULL;
+            AfxMessageBox(_T("Open serial port failed!"));
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Open serial port failed!"));
+            return 2;
+        }
+        SetCommunicationType(0);
+        Change_BaudRate(m_nbaudrat);
 
-	if((selected_product_index > pFrame->m_product.size()) || (pFrame->m_product.size() == 0))
-	{
-		read_rs485_thread = NULL;
-		return 2;
-	}
+    }
 
-	int n_comport = selected_product_Node.ncomport;
-	unsigned char  read_device_id = 0;
-	read_device_id =  selected_product_Node.product_id;
-	int m_nbaudrat;
-	m_nbaudrat = selected_product_Node.baudrate;
-	if((n_comport==0)|| (n_comport >50))
-	{
-		AfxMessageBox(_T("Serial Port error!"));
-		read_rs485_thread = NULL;
-		return 1;
-	}
-	bool bret;
-	bret =	open_com(n_comport);
-	if(bret == false)
-	{
-		 read_rs485_thread = NULL;
-		AfxMessageBox(_T("Open serial port failed!"));
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Open serial port failed!"));
-		return 2;
-	}
-    SetCommunicationType(0);
-	 Change_BaudRate(m_nbaudrat);
+
+
 	 unsigned short read_data[100];
 	 int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,100,3);
 	 if(nmultyRet < 0)

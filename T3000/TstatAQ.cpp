@@ -77,7 +77,7 @@ void CTstatAQ::Fresh()
 
 
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    pFrame->SetWindowTextW(_T("T3000 Building Automation System") + CurrentT3000Version);
+    pFrame->SetWindowTextW(cs_special_name + CurrentT3000Version);
     if (h_tstat_aq_thread == NULL)
         h_tstat_aq_thread = CreateThread(NULL, NULL, Update_TstatAQ_Thread, this, NULL, NULL);
     UpdateUI();

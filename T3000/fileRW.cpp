@@ -28,7 +28,7 @@
 #define GROUP_NUM 40
 #define OUTPUTCARD_NUM_PER_INPUTCARD 20
 using namespace std;
-
+bool support_mul_write = false;
 int tstat24_register_var[TSTAT24_VAR_NUM]={	118,121,128,109,110,	111,112,113,114,115,
 											116,117,119,120,122,	123,124,125,126,127,
 											186,187,131,132,133,	135,136,137,182,183};
@@ -3614,20 +3614,33 @@ void write_TStatAllLabel(wifstream & inf,float tstat_version,CStdioFile *p_log_f
 			else
 				p[i]=0;
 		}
+        if (!support_mul_write)
+        {
+            if (Write_Multi(g_tstat_id, p, 737 + 4 * LabelNumber, 8)>0)
+            {
 
-		if (Write_Multi(g_tstat_id,p,737+4*LabelNumber,8)>0)
-		{
-		 
-		} 
-		else
-		{    int times = 5;
-			 while(--times>=0)
-			 {
-				if (Write_Multi(g_tstat_id,p,737+4*LabelNumber,8)>0)
-				break;
-			 }
-		}
-		  LabelNumber ++;
+            }
+            else
+            {
+                int times = 5;
+                while (--times >= 0)
+                {
+                    if (Write_Multi(g_tstat_id, p, 737 + 4 * LabelNumber, 8)>0)
+                        break;
+                }
+            }
+            LabelNumber++;
+        }
+        else
+        {
+           // temp_short_data[i] = htons(temp_short_data[i]);
+            memcpy(&product_register_value[737 + 4 * LabelNumber], p, 8);
+            for (int x = 0; x < 4; x++)
+            {
+                product_register_value[737 + 4 * LabelNumber + x] = htons(product_register_value[737 + 4 * LabelNumber + x]);
+            }
+        }
+
 		 
 		 
 	}
@@ -3650,7 +3663,7 @@ Reg_Infor Reg_Infor_Temp;
         return;  //2018 08 22  TSTAT 现在的版本 COOL HEAT MODE ,这个寄存器 不让写.
     }
 	int register_value=_wtoi(temp);
-	int j;
+	int j = 1;
 	int register_122=0;
 	if(register_id==MODBUS_DEGC_OR_F && register_value>1)
 		j=-4;
@@ -3671,8 +3684,13 @@ Reg_Infor Reg_Infor_Temp;
 	//	}
 	//	j=write_one(now_tstat_id,register_id,register_value);	
 	//}
-	else
-		j=write_one(now_tstat_id,register_id,register_value);	
+    else
+    {
+        if (!support_mul_write)
+            j = write_one(now_tstat_id, register_id, register_value);
+        else
+            product_register_value[register_id] = register_value;
+    }
 #if 0   //20180911 杜帆屏蔽 T5需要，但现在不维护;
 	if(register_id==185)
 	{
@@ -3684,7 +3702,10 @@ Reg_Infor Reg_Infor_Temp;
 	if(j==-2 && tstat_version<25 && tstat_version >0)  ////////////////////////if the version is 24.4 ,write_one some register will restart,for example 118,121
 	{
 		//Sleep(14000);	//20180911 杜帆屏蔽 T5需要，但现在不维护;
-		j=write_one(now_tstat_id,register_id,register_value);	
+        if (!support_mul_write)
+		   j=write_one(now_tstat_id,register_id,register_value);	
+        else
+            product_register_value[register_id] = register_value;
 	}
 	Reg_Infor_Temp.regAddress=register_id;
 
@@ -3760,8 +3781,11 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 	}
 	if(strText.CompareNoCase(strInName)==0)
 		return;
-	    
-		int Model_ID=read_one(now_tstat_id,7,5);
+    int Model_ID;
+    if (!support_mul_write)
+        Model_ID = read_one(now_tstat_id, 7, 5);
+    else
+        Model_ID = product_register_value[7];
 		int nFlag = Model_ID;
 	if ((Model_ID==PM_TSTAT5G)||(Model_ID==PM_TSTAT5E)||(Model_ID==PM_PM5E) || (Model_ID == PM_PM5E_ARM)  ||
         (Model_ID==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(Model_ID==PM_TSTAT7)||(Model_ID==PM_TSTAT8) || (Model_ID == PM_TSTAT9)
@@ -3777,27 +3801,39 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 			else
 				p[i]=0;
 		}
-		 
-			if (Write_Multi(g_tstat_id,p,MODBUS_AI1_CHAR1+4*(lRow-2),8)>0)
-			{
+        if (!support_mul_write)
+            Write_Multi(g_tstat_id, p, MODBUS_AI1_CHAR1 + 4 * (lRow - 2), 8);
+        else
+        {
+            memcpy(&product_register_value[MODBUS_AI1_CHAR1 + 4 * (lRow - 2)], p, 8);
+            for (int x = 0; x < 4; x++)
+            {
+                product_register_value[MODBUS_AI1_CHAR1 + 4 * (lRow - 2) +x] = htons(product_register_value[MODBUS_AI1_CHAR1 + 4 * (lRow - 2) +x]);
+            }
+        }
 
-			} 
-			else
-			{
-				//AfxMessageBox(_T("Error"));
-				//return;
-			}
+
 
 		 
 	}
 	try
 	{
-
-		 int ID=read_one(now_tstat_id,6);
+        int ID;
+        if (!support_mul_write)
+            ID = read_one(now_tstat_id, 6);
+        else
+            ID = product_register_value[6];
 		if(ID>0)
 		{  unsigned short num[4];  
-		   Read_Multi(now_tstat_id,&num[0],0,4);
-		   g_serialNum=num[0]+num[1]*256+num[2]*256*256+num[3]*256*256;
+        if (!support_mul_write)
+        {
+            Read_Multi(now_tstat_id, &num[0], 0, 4);
+            g_serialNum = num[0] + num[1] * 256 + num[2] * 256 * 256 + num[3] * 256 * 256;
+        }
+        else
+            g_serialNum = g_selected_serialnumber;
+
+		   
 		  
 		   CppSQLite3DB SqliteDBBuilding;
 		   CppSQLite3Table table;
@@ -3960,57 +3996,6 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 
 	}
 	
-    //wrong value
-	/*
-	else if(register_id==128 && register_value>5)
-		j=-4;//wrong value
-		//comment on 09-02-03
-		*/
-
-	//else if(register_id==MODBUS_FAN_MODE )
-	//{
-	//	int real_fan_number=get_real_number_fan_speeds(fan_number);
-	//	if(register_value!=real_fan_number && real_fan_number!=-1)
-	//	{
-	//		register_122=-100;
-	//		register_value=real_fan_number;/////////////^-^ 
-	//	}
-	//	j=write_one(now_tstat_id,register_id,register_value);	
-	//}
-	//else
-	//	j=write_one(now_tstat_id,register_id,register_value);	
-	//if(register_id==185)
-	//{
-	//	Sleep(14000);	
-	//	//if(register_value==1)Change_BaudRate(19200);
-	//	//if(register_value==0)Change_BaudRate(9600);
-	//}
-
-	//if(j==-2 && tstat_version<25 && tstat_version >0)  ////////////////////////if the version is 24.4 ,write_one some register will restart,for example 118,121
-	//{
-	//	Sleep(14000);	
-	//	j=write_one(now_tstat_id,register_id,register_value);	
-	//}
-	//if(p_log_file!=NULL)
-	//{
-	//	for_showing_text.Format(_T("register ID:%d,VALUE:%d write "),register_id,register_value);
-	//	if(register_122==-100)
-	//	{
-	//		CString t_str=for_showing_text;
-	//		for_showing_text.Format(_T("NUMBER_OF_FAN_SPEEDS IS INCORRECT,try correct value :%d "),register_value);
-	//		for_showing_text=t_str+for_showing_text;
-	//	}
-	//	if(j>0)
-	//		for_showing_text=for_showing_text+_T("OK\r\n");
-	//	else
-	//	{
-	//		p_log_file_one_time->seven_step=false;
-	//		for_showing_text=for_showing_text+_T("Error******************\r\n");
-	//	}
-	//	change_showing_text_variable(for_showing_text);
-	////	p_log_file->Write(for_showing_text.GetString(),for_showing_text.GetLength());
-	//	p_log_file->WriteString(for_showing_text);
-	//}
 
 }
 void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdioFile *p_log_file,load_file_every_step *p_log_file_one_time)
@@ -4055,9 +4040,14 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 		return;
 	try
 	{
+        int Model_ID;
+        if (!support_mul_write)
+        {
+            Model_ID = read_one(now_tstat_id, 7, 5);
+        }
+        else
+            Model_ID = product_register_value[7];
 		
-
-		 int Model_ID =read_one(now_tstat_id,7,5);
 		if(Model_ID>0)
 		{  
 			if ((Model_ID == PM_TSTAT5G) || (Model_ID == PM_TSTAT5E) || (Model_ID == PM_PM5E) || (Model_ID == PM_PM5E_ARM) || 
@@ -4075,23 +4065,32 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 					else
 						p[i] = 0;
 				}
+                if (!support_mul_write)
+                    Write_Multi(g_tstat_id, p, MODBUS_OUTPUT1_CHAR1 + 4 * (lRow - 1), 8);
+                else
+                {
+                    memcpy(&product_register_value[MODBUS_OUTPUT1_CHAR1 + 4 * (lRow - 1)], p, 8);
+                    for (int x = 0; x < 4; x++)
+                    {
+                        product_register_value[MODBUS_OUTPUT1_CHAR1 + 4 * (lRow - 1) + x] = htons(product_register_value[MODBUS_OUTPUT1_CHAR1 + 4 * (lRow - 1) + x]);
+                    }
+                }
 
-				if (Write_Multi(g_tstat_id, p, MODBUS_OUTPUT1_CHAR1 + 4 * (lRow - 1), 8) > 0)
-				{
-
-				}
-				else
-				{
-					//AfxMessageBox(_T("Error"));
-					//return;
-				}
 
 
 			}
 
 			unsigned short num[4];  
-		   Read_Multi(now_tstat_id,&num[0],0,4);
-		   g_serialNum=num[0]+num[1]*256+num[2]*256*256+num[3]*256*256;
+            if (!support_mul_write)
+            {
+                Read_Multi(now_tstat_id, &num[0], 0, 4);
+                g_serialNum = num[0] + num[1] * 256 + num[2] * 256 * 256 + num[3] * 256 * 256;
+            }
+            else
+            {
+                g_serialNum = g_selected_serialnumber;
+            }
+
 
 		   CppSQLite3DB SqliteDBBuilding;
 		   CppSQLite3Table table;
@@ -4902,6 +4901,11 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 
 void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file)
 {
+    support_mul_write = false;
+    if ((product_register_value[4] > 90) && product_register_value[7] == PM_TSTAT8) //94 版本以后支持随意多写命令;
+    {
+        support_mul_write = true;
+    }
    //int nSpecialValue=read_one(now_tstat_id,326);
 	//write_one(g_tstat_id,324,0);
 	//every step is false
@@ -4929,11 +4933,18 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 	{
 		for(int t_i=0;t_i<7;t_i++)
 			{
-                 g_progress_persent++;
+                 
 				int real_fan_address=get_real_fan_address(fan_number-2,i,t_i);
 				if(fan_value[i]>=0)
 				{
-					int i_i=write_one(now_tstat_id,real_fan_address,fan_value[i*7+t_i]);
+                    int i_i;
+                    if (!support_mul_write)
+                    {
+                        g_progress_persent++;
+                        i_i = write_one(now_tstat_id, real_fan_address, fan_value[i * 7 + t_i]);
+                    }
+                    else
+                        product_register_value[real_fan_address] = fan_value[i * 7 + t_i];
 					Reg_Infor_Temp.regAddress=real_fan_address;
 					Reg_Infor_Temp.RegValue=fan_value[i*7+t_i];
 					if(p_log_file!=NULL)
@@ -4965,8 +4976,15 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			{
 				if(value_setting[i]>=0)
 				{
-                    g_progress_persent++;
-					int i_i=write_one(now_tstat_id,MODBUS_VALVE_OPERATION_TABLE_BEGIN+i,value_setting[i]);
+                    
+                    int i_i;
+                    if (!support_mul_write)
+                    {
+                        g_progress_persent++;
+                        i_i = write_one(now_tstat_id, MODBUS_VALVE_OPERATION_TABLE_BEGIN + i, value_setting[i]);
+                    }
+                    else
+                        product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN + i] = value_setting[i];
 					Reg_Infor_Temp.regAddress=MODBUS_VALVE_OPERATION_TABLE_BEGIN+i;
 					Reg_Infor_Temp.RegValue=value_setting[i];
 					if(p_log_file!=NULL)
@@ -5012,8 +5030,15 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			{
 				if(delay_setting[i]>=0)
 				{
-                    g_progress_persent++;
-					int i_i=write_one(now_tstat_id,MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i,delay_setting[i]);
+                    int i_i;
+                    
+                    if (!support_mul_write)
+                    {
+                        g_progress_persent++;
+                        i_i = write_one(now_tstat_id, MODBUS_OUTPUT1_DELAY_OFF_TO_ON + i, delay_setting[i]);
+                    }
+                    else
+                        product_register_value[MODBUS_OUTPUT1_DELAY_OFF_TO_ON + i] = delay_setting[i];
 					Reg_Infor_Temp.regAddress=MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i;
 
 					Reg_Infor_Temp.RegValue=delay_setting[i];
@@ -5037,8 +5062,16 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			{
 				if(delay_setting[rows+i]>=0)
 				{
-                    g_progress_persent++;
-					int i_i=write_one(now_tstat_id,MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i,delay_setting[rows+i]);
+                    int i_i;
+                    
+                    if (!support_mul_write)
+                    {
+                        g_progress_persent++;
+                        i_i = write_one(now_tstat_id, MODBUS_OUTPUT1_DELAY_ON_TO_OFF + i, delay_setting[rows + i]);
+                    }
+                    else
+                        product_register_value[MODBUS_OUTPUT1_DELAY_ON_TO_OFF + i] = delay_setting[rows + i];
+
 					Reg_Infor_Temp.regAddress=MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i;
 
 					Reg_Infor_Temp.RegValue=delay_setting[rows+i];
@@ -5062,187 +5095,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			if(p_log_file!=NULL)
 			p_log_file->WriteString(_T("\r\n"));
 		}
-		//else if(wcscmp(buf,_T("//   LOOKUP TABLE"))==0)//没有Lookup
-		//{
-		//	/*if(tstat_version<CUSTOM_TABLE_FLOAT_VERSION)
-		//	{*/
-		//		/*int lookup_table_setting[23]={0};
-		//		get_lookup_table_setting(inf,lookup_table_setting);
-		//		Show_load_file_error_message(load_file_one_time,4,p_log_file);
-		//		load_file_one_time.thurth_step=true;
-		//		for(int i=0;i<22;i++)
-		//		{
-		//			if(lookup_table_setting[i]>=0)
-		//			{
-		//				int i_i=write_one(now_tstat_id,MODBUS_TABLE1_ZERO+i,lookup_table_setting[i]);
-		//				if(p_log_file!=NULL)
-		//				{
-		//					if(i_i>0)
-		//						for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),MODBUS_TABLE1_ZERO+i,lookup_table_setting[i]);
-		//					else
-		//					{							
-		//						for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_TABLE1_ZERO+i,lookup_table_setting[i]);
-		//						load_file_one_time.thurth_step=false;
-		//					}
-		//					change_showing_text_variable(for_showing_text);
-		//					p_log_file->WriteString(for_showing_text);
-		//				}
-		//			}					
-		//		}
-		//		if(p_log_file!=NULL)
-		//		p_log_file->WriteString(_T("\r\n"));*/
-		////	}
-		//	//else if(tstat_version>=CUSTOM_TABLE_FLOAT_VERSION)
-		//	//{
-		//	//	int lookup_table_setting[23]={0};
-		//	//	get_lookup_table_setting(inf,lookup_table_setting);
-		//	//	Show_load_file_error_message(load_file_one_time,4,p_log_file);
-		//	//	load_file_one_time.thurth_step=true;
 
-		//	//	int ntemp=(int)lookup_table_setting[0];
-
-		//	//	//table1
-		//	//	{
-		//	//	short high=ntemp/65536;
-		//	//	short low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_ZERO,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_ZERO_HI,high);
-		//	//	//2
-		//	//	ntemp=lookup_table_setting[1];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_HALFONE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_HALFONE_HI,high);
-		//	//	//3
-		//	//	ntemp=lookup_table_setting[2];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_ONE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_ONE_HI,high);
-		//	//	//4
-		//	//	ntemp=(int)lookup_table_setting[3];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_HALFTWO,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_HALFTWO_HI,high);
-		//	//	//5
-		//	//	ntemp=lookup_table_setting[4];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_TWO,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_TWO_HI,high);
-		//	//	//6
-		//	//	ntemp=lookup_table_setting[5];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_HALFTHREE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_HALFTHREE_HI,high);
-		//	//	//7
-		//	//	ntemp=lookup_table_setting[6];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_THREE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_THREE_HI,high);
-		//	//	//8
-
-		//	//	ntemp=lookup_table_setting[7];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_HALFFOUR,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_HALFFOUR_HI,high);
-		//	//	//9
-		//	//	ntemp=lookup_table_setting[8];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_FOUR,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_FOUR_HI,high);
-		//	//	//10
-		//	//	ntemp=lookup_table_setting[9];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_HALFFIVE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_HALFFIVE_HI,high);
-		//	//	//11
-		//	//	ntemp=lookup_table_setting[10];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_FIVE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE1_FIVE_HI,high);
-		//	//	}
-
-		//	//	//table 2
-		//	//	{
-		//	//	int ntemp=(int)lookup_table_setting[11];
-		//	//	short high=ntemp/65536;
-		//	//	short low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_ZERO,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_ZERO_HI,high);
-		//	//	//2
-		//	//	ntemp=lookup_table_setting[12];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;		
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_HALFONE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_HALFONE_HI,high);
-		//	//	//3
-		//	//	ntemp=lookup_table_setting[13];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_ONE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_ONE_HI,high);
-		//	//	//4
-		//	//	ntemp=(int)lookup_table_setting[14];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_HALFTWO,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_HALFTWO_HI,high);
-		//	//	//5
-		//	//	ntemp=lookup_table_setting[15];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_TWO,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_TWO_HI,high);
-		//	//	//6
-		//	//	ntemp=lookup_table_setting[16];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_HALFTHREE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_HALFTHREE_HI,high);
-		//	//	//7
-		//	//	ntemp=lookup_table_setting[17];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_THREE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_THREE_HI,high);
-		//	//	//8
-
-		//	//	ntemp=lookup_table_setting[18];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_HALFFOUR,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_HALFFOUR_HI,high);
-		//	//	//9
-		//	//	ntemp=lookup_table_setting[19];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_FOUR,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_FOUR_HI,high);
-		//	//	//10
-		//	//	ntemp=lookup_table_setting[20];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_HALFFIVE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_HALFFIVE_HI,high);
-		//	//	//11
-		//	//	ntemp=lookup_table_setting[21];
-		//	//	high=ntemp/65536;
-		//	//	low=ntemp%65536;
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_FIVE,low);
-		//	//	write_one(now_tstat_id, MODBUS_TABLE2_FIVE_HI,high);
-		//	//	
-		//	//	}
-		//	//}
-
-		//}
 				else if(wcscmp(buf,_T("//   PID2 OFF TABLE"))==0)
 				{
 					int universal_value[7]={0};
@@ -5253,8 +5106,14 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 					{
 						if(universal_value[i]>=0)          
 						{
-                            g_progress_persent++;
-							int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN+i,universal_value[i]);
+                            int i_i;
+                            if (!support_mul_write)
+                            {
+                                g_progress_persent++;
+                                i_i = write_one(now_tstat_id, MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN + i, universal_value[i]);
+                            }
+                            else
+                                product_register_value[MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN + i] = universal_value[i];
 							Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN+i;
 
 							Reg_Infor_Temp.RegValue=universal_value[i];
@@ -5289,8 +5148,14 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 					{
 						if(value_setting[i]>=0)
 						{
-                            g_progress_persent++;
-							int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+i,value_setting[i]);
+                            int i_i;
+                            if (!support_mul_write)
+                            {
+                                g_progress_persent++;
+                                i_i = write_one(now_tstat_id, MODBUS_UNIVERSAL_OFF_VALVE_BEGIN + i, value_setting[i]);
+                            }
+                            else
+                                product_register_value[MODBUS_UNIVERSAL_OFF_VALVE_BEGIN + i] = value_setting[i];
 							Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+i;
 
 							Reg_Infor_Temp.RegValue=value_setting[i];
@@ -5323,8 +5188,14 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 				{
 					if(universal_value[i]>=0)          
 					{
-                        g_progress_persent++;
-						int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_OUTPUT_BEGIN+i,universal_value[i]);
+                        int i_i;
+                        if (!support_mul_write)
+                        {
+                            g_progress_persent++;
+                            i_i = write_one(now_tstat_id, MODBUS_UNIVERSAL_OUTPUT_BEGIN + i, universal_value[i]);
+                        }
+                        else
+                            product_register_value[MODBUS_UNIVERSAL_OUTPUT_BEGIN + i] = universal_value[i];
 						Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_OUTPUT_BEGIN+i;
 
 						Reg_Infor_Temp.RegValue=universal_value[i];
@@ -5358,8 +5229,14 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 				{
 					if(value_setting[i]>=0)
 					{
-                        g_progress_persent++;
-						int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+i,value_setting[i]);
+                        int i_i;
+                        if (!support_mul_write)
+                        {
+                            g_progress_persent++;
+                            i_i = write_one(now_tstat_id, MODBUS_UNIVERSAL_VALVE_BEGIN + i, value_setting[i]);
+                        }
+                        else
+                            product_register_value[MODBUS_UNIVERSAL_VALVE_BEGIN + i] = value_setting[i];
 						Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_VALVE_BEGIN+i;
 
 						Reg_Infor_Temp.RegValue=value_setting[i];
@@ -5384,10 +5261,16 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 		}
 		else if(wcsstr(buf,_T("serialnumber"))!=NULL || wcsstr(buf,_T("address:"))!=NULL )
 		{
-            g_progress_persent++;
+            
 			/////////////////////////////////////var setting
 			Show_load_file_error_message(load_file_one_time,7,p_log_file);
-			write_one(now_tstat_id,MODBUS_INFO_BYTE,5);//184 register,to no restart,when you write the 185,118,121,128 register
+            if (!support_mul_write)
+            {
+                g_progress_persent++;
+                write_one(now_tstat_id, MODBUS_INFO_BYTE, 5);//184 register,to no restart,when you write the 185,118,121,128 register
+            }
+            else
+                product_register_value[MODBUS_INFO_BYTE] = 5;
 			load_file_one_time.seven_step=true;
 			get_var_write_var(inf,tstat_version,p_log_file,&load_file_one_time);//////a line //////////// a line
 			write_input_output_var(inf,tstat_version,p_log_file,&load_file_one_time);
@@ -5401,38 +5284,63 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 		}
 	}	
 	int Try_Times=5;
-	while(g_Vector_Write_Error.size()>0&&Try_Times>0){
-	    int vecInt_index = 0;
-		 	for (vector <Reg_Infor>::iterator iter_index = g_Vector_Write_Error.begin(); 
-		 		iter_index != g_Vector_Write_Error.end();) 
-		 	{
+    if (!support_mul_write)
+    {
+        while (g_Vector_Write_Error.size() > 0 && Try_Times > 0) {
+            int vecInt_index = 0;
+            for (vector <Reg_Infor>::iterator iter_index = g_Vector_Write_Error.begin();
+                iter_index != g_Vector_Write_Error.end();)
+            {
                 g_progress_persent++;
-				int i_i=write_one(now_tstat_id,iter_index->regAddress,iter_index->RegValue);
-				if(p_log_file!=NULL)
-				{
-					if(i_i>0)
-						{
-						for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),iter_index->regAddress,iter_index->RegValue);
-						vecInt_index = iter_index - g_Vector_Write_Error.begin(); 
-						g_Vector_Write_Error.erase(iter_index);
-						iter_index = g_Vector_Write_Error.begin() + vecInt_index; 
-						}
+                int i_i = write_one(now_tstat_id, iter_index->regAddress, iter_index->RegValue);
+                if (p_log_file != NULL)
+                {
+                    if (i_i > 0)
+                    {
+                        for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"), iter_index->regAddress, iter_index->RegValue);
+                        vecInt_index = iter_index - g_Vector_Write_Error.begin();
+                        g_Vector_Write_Error.erase(iter_index);
+                        iter_index = g_Vector_Write_Error.begin() + vecInt_index;
+                    }
 
-					else
-					{
-						//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
-						//g_Vector_Write_Error.push_back(Reg_Infor_Temp);
-						//load_file_one_time.sixth_step=false;
-						++iter_index;
-					}
-					change_showing_text_variable(for_showing_text);
-					p_log_file->WriteString(for_showing_text.GetString());
-				}
-			
-			}
-		--Try_Times;
-	}
+                    else
+                    {
+                        //for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
+                        //g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+                        //load_file_one_time.sixth_step=false;
+                        ++iter_index;
+                    }
+                    change_showing_text_variable(for_showing_text);
+                    p_log_file->WriteString(for_showing_text.GetString());
+                }
 
+            }
+            --Try_Times;
+        }
+    }
+    else
+    {
+        for (int i = 1; i < 11; i++)
+        {
+             
+            int nwrite_ret = 0;
+            nwrite_ret = Write_Multi_org_short(g_tstat_id, &product_register_value[i*100], i*100, 100, 5);
+            if (nwrite_ret < 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write register timeout ,continue?"));
+                AfxMessageBox(_T("Write register timeout ,continue?"));
+            }
+            g_progress_persent = (i * 100) / 10;
+            Sleep(2000);
+        }
+        //单独在处理一下499-502这个跨界的 output6的名字问题;
+        Write_Multi_org_short(g_tstat_id, &product_register_value[499], 499, 4, 5);
+        Sleep(1000);
+        //单独在处理一下499-502这个跨界的 output6的名字问题;
+        Write_Multi_org_short(g_tstat_id, &product_register_value[897], 897, 12, 5);
+        Sleep(1000);
+        g_progress_persent = 100;
+    }
 
 	for (vector <Reg_Infor>::iterator iter_index = g_Vector_Write_Error.begin(); 
 		iter_index != g_Vector_Write_Error.end(); ++iter_index) 
@@ -7922,21 +7830,24 @@ SqliteDBBuilding.closedb();
          //    897 - 908
          //    CHARLY 15:13 : 06
          //    909 - 971单写
-
-         int n_ret[9] = {0};
-         n_ret[0]=  Write_Multi_org_short(g_tstat_id, &product_register_value[813], 813, 824 - 813 + 1, 5);
-         n_ret[1] = Write_Multi_org_short(g_tstat_id, &product_register_value[825], 825, 836 - 825 + 1, 5);
-         n_ret[2] = Write_Multi_org_short(g_tstat_id, &product_register_value[837], 837, 848 - 837 + 1, 5);
-         n_ret[3] = Write_Multi_org_short(g_tstat_id, &product_register_value[849], 849, 859 - 849 + 1, 5);
-         n_ret[4] = Write_Multi_org_short(g_tstat_id, &product_register_value[860], 860, 872 - 860 + 1, 5);
-         n_ret[5] = Write_Multi_org_short(g_tstat_id, &product_register_value[873], 873, 884 - 873 + 1, 5);
-         n_ret[6] = Write_Multi_org_short(g_tstat_id, &product_register_value[885], 885, 896 - 885 + 1, 5);
-         n_ret[7] = Write_Multi_org_short(g_tstat_id, &product_register_value[897], 897, 908 - 897 + 1, 5);
-
-         for (int i = 909; i <= 971; i++)
+         if (!support_mul_write)
          {
-             write_one(g_tstat_id, i, product_register_value[i]);
+             int n_ret[9] = { 0 };
+             n_ret[0] = Write_Multi_org_short(g_tstat_id, &product_register_value[813], 813, 824 - 813 + 1, 5);
+             n_ret[1] = Write_Multi_org_short(g_tstat_id, &product_register_value[825], 825, 836 - 825 + 1, 5);
+             n_ret[2] = Write_Multi_org_short(g_tstat_id, &product_register_value[837], 837, 848 - 837 + 1, 5);
+             n_ret[3] = Write_Multi_org_short(g_tstat_id, &product_register_value[849], 849, 859 - 849 + 1, 5);
+             n_ret[4] = Write_Multi_org_short(g_tstat_id, &product_register_value[860], 860, 872 - 860 + 1, 5);
+             n_ret[5] = Write_Multi_org_short(g_tstat_id, &product_register_value[873], 873, 884 - 873 + 1, 5);
+             n_ret[6] = Write_Multi_org_short(g_tstat_id, &product_register_value[885], 885, 896 - 885 + 1, 5);
+             n_ret[7] = Write_Multi_org_short(g_tstat_id, &product_register_value[897], 897, 908 - 897 + 1, 5);
+
+             for (int i = 909; i <= 971; i++)
+             {
+                 write_one(g_tstat_id, i, product_register_value[i]);
+             }
          }
+
 
          confirm_flag = 2;
      }

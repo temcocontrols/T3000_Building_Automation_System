@@ -49,4 +49,5 @@ public:
     afx_msg void OnCbnSelchangeComboStopBit3();
     BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
     virtual BOOL OnInitDialog();
+    void ClearSubNetInfo();
 };

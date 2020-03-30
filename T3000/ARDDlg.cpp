@@ -37,9 +37,10 @@ BOOL CARDDlg::OnInitDialog()
 	m_add_device_baudrate.InsertString(1,_T("19200"));
 	m_add_device_baudrate.InsertString(2,_T("38400"));
 	m_add_device_baudrate.InsertString(3,_T("57600"));
-	m_add_device_baudrate.InsertString(4,_T("115200"));
+    m_add_device_baudrate.InsertString(4,_T("76800"));
+	m_add_device_baudrate.InsertString(5,_T("115200"));
 	m_add_device_baudrate.SetCurSel(1);
-	m_add_device_modbus_id.SetWindowText(_T("1"));
+	m_add_device_modbus_id.SetWindowText(_T("255"));
 
 	CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
 	CString strIP;
@@ -163,15 +164,19 @@ void CARDDlg::OnBnClickedOk()
    CString StrProtocol;
    int nComport = 0;
    UpdateData(TRUE);
-   int product_type_id = _wtoi(m_type_id);
-   if (product_type_id < 220 && product_type_id != 210)
-   {
-       AfxMessageBox(_T(" In order to identify your product,Please Enter a number not less than 220!")) ;
-       return;
-   }
+   unsigned char modbus_mstp_rtu_id = 0;
+   int nbaudrate = 115200;
+   unsigned short port = 502;
+
+   //int product_type_id = _wtoi(m_type_id);
+   //if (product_type_id < 220 && product_type_id != 210)
+   //{
+   //    AfxMessageBox(_T(" In order to identify your product,Please Enter a number not less than 220!")) ;
+   //    return;
+   //}
    m_add_device_modbus_id.GetWindowTextW(temp_id);
    read_modbus_id = _wtoi(temp_id); 
-   if (read_modbus_id <0||read_modbus_id>254)
+   if (read_modbus_id <0||read_modbus_id>255)
    {
        AfxMessageBox(_T("Modbus ID should be more than 1 and less than 255")) ;
        return;
@@ -195,9 +200,9 @@ void CARDDlg::OnBnClickedOk()
 			   AfxMessageBox(_T("ip or port can not be empty!"));
 			   return;
 		   }
-		   short port = _wtoi(strport);
+		   port = _wtoi(strport);
 		   SetCommunicationType(1);
-		   is_open = Open_Socket2(ip, port);
+		   is_open = Open_Socket_Retry(ip, port);
 		   StrProtocol = _T("1");
 	   }
 	   else
@@ -209,15 +214,7 @@ void CARDDlg::OnBnClickedOk()
 		   m_add_device_baudrate.GetWindowTextW(temp_baud);
 
 		   nComport = _wtoi(temp_cs_port.Mid(3));
-		   int nbaudrate = _wtoi(temp_baud);
-
-
-		   // 		if((nbaudrate != 19200) && (nbaudrate != 9600))
-		   // 		{
-		   // 			is_open = false;
-		   // 		}
-		   // 		else
-		   // 		{
+		   nbaudrate = _wtoi(temp_baud);
 		   if (nComport > 0)
 		   {
 			   BOOL  bret = open_com(nComport);
@@ -246,6 +243,101 @@ void CARDDlg::OnBnClickedOk()
 	   StrProtocol = _T("0");
    }
 
+   if (is_open && (offline_mode == false))
+   {
+       unsigned short test_array[1000];
+       int ntest_ret = 0;
+
+       memset(test_array, 0, 2000);
+
+       ntest_ret = Read_Multi(read_modbus_id, &test_array[0], 0, 100, 6);
+       if (ntest_ret >= 0)
+       {
+           _Bac_Scan_results_Info  temp_info = { 0 };
+           temp_info.serialnumber = test_array[0] + test_array[1] * 256 + test_array[2] * 256 * 256 + test_array[3] * 256 * 256 * 256;
+           temp_info.product_type = test_array[7];
+           temp_info.modbus_addr = test_array[6];
+           temp_info.panel_number = 0; //ÕâÀïÔÝ¶¨0  
+           temp_info.software_version = 0;
+           temp_info.hardware_version = 0;
+           temp_info.device_id = 0;
+           if (m_is_net_device)
+           {
+               temp_info.ipaddress[0] = test_array[47];
+               temp_info.ipaddress[1] = test_array[48];
+               temp_info.ipaddress[2] = test_array[49];
+               temp_info.ipaddress[3] = test_array[50];
+               temp_info.m_protocol = MODBUS_TCPIP;
+           }
+           else
+           {
+               temp_info.m_protocol = MODBUS_RS485;
+           }
+
+           CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+           CppSQLite3DB SqliteDBBuilding;
+           CppSQLite3Table table;
+           CppSQLite3Query q;
+           SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+           CString temp_serial_number;
+           CString temp_baud;
+           CString str_temp;
+           CString temp_pname;
+           CString temp_modbusid;
+           CString temp_view_name;
+           CString temp_protocol;
+           CString temp_product_id_string;
+           CString temp_port_string;
+           CString temp_object_instance;
+           CString temp_panel_number;
+           int count;
+           temp_serial_number.Format(_T("%u"), temp_info.serialnumber);
+           str_temp.Format(_T("select * from ALL_NODE where Serial_ID = '%s'"), temp_info.serialnumber);
+           temp_baud.Format(_T("%u"), nbaudrate);
+           q = SqliteDBBuilding.execQuery((UTF8MBSTR)str_temp);
+           table = SqliteDBBuilding.getTable((UTF8MBSTR)str_temp);
+           count = table.numRows();
+
+
+
+           temp_pname = GetProductName(temp_info.product_type);
+           temp_modbusid.Format(_T("%u"), temp_info.modbus_addr);
+           temp_view_name = temp_pname + _T(":") + temp_serial_number + _T("-") + temp_modbusid;
+           temp_protocol.Format(_T("%d"), temp_info.m_protocol);
+           temp_product_id_string.Format(_T("%d"), temp_info.product_type);
+           if (m_is_net_device)
+           {
+               temp_port_string.Format(_T("%d"), port);
+           }
+           else
+               temp_port_string.Format(_T("%d"), nComport);
+
+           temp_object_instance.Format(_T("%u"), temp_info.device_id);
+           temp_panel_number.Format(_T("%u"), temp_info.panel_number);
+
+           if (count >= 1)
+           {
+               str_temp.Format(_T("update ALL_NODE set Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Object_Instance = '%s',Panal_Number = ' %s' where Serial_ID = '%s'"), temp_baud, temp_port_string, temp_product_id_string, temp_protocol,
+                   temp_view_name, temp_object_instance, temp_panel_number, temp_serial_number);
+           }
+           else
+           {
+               str_temp.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom,Parent_SerialNum,Panal_Number,Object_Instance)   values('"
+                   + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','""','" + temp_serial_number + "','floor1','room1','" + temp_view_name + "','" + temp_product_id_string + "','" + temp_modbusid + "','""','" + temp_baud + "','Default_Building_PIC.bmp','" + temp_object_instance + "','" + temp_panel_number + "','" + temp_port_string + "','0','" + temp_protocol + "','1','0','0', '" + temp_panel_number + "','" + temp_object_instance + "')"));
+           }
+           SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
+           SqliteDBBuilding.closedb();
+           MessageBox(_T("This operation succeeds.The addition is completed successfully."));
+           return;
+       }
+
+   }
+   else
+   {
+       AfxMessageBox(_T("Can not Connect"));
+   }
+#if 0
    if (is_open||offline_mode)
    {
 	  
@@ -499,6 +591,7 @@ void CARDDlg::OnBnClickedOk()
    {
 	   AfxMessageBox(_T("Can not Connect"));
    }
+#endif
 
 }
 

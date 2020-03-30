@@ -69,6 +69,9 @@ BEGIN_MESSAGE_MAP(BacnetRange, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO86, &BacnetRange::OnBnClickedRadio86)
     ON_BN_CLICKED(IDC_BTN_EDIT_MSV_RANGE, &BacnetRange::OnBnClickedBtnEditMsvRange)
     ON_WM_VSCROLL()
+    ON_BN_CLICKED(IDC_RADIO_MSV_1, &BacnetRange::OnBnClickedRadioMsv1)
+    ON_BN_CLICKED(IDC_RADIO_MSV_2, &BacnetRange::OnBnClickedRadioMsv2)
+    ON_BN_CLICKED(IDC_RADIO_MSV_3, &BacnetRange::OnBnClickedRadioMsv3)
 END_MESSAGE_MAP()
 
 
@@ -161,6 +164,14 @@ void BacnetRange::Initial_static()
 	CString temp_cs;
 	CRect Temp_Rect;
 	GetWindowRect(Temp_Rect);
+
+    if (read_msv_table)
+    {
+        GetDlgItem(IDC_RADIO_MSV_1)->SetWindowTextW(Custom_Msv_Range[0]);
+        GetDlgItem(IDC_RADIO_MSV_2)->SetWindowTextW(Custom_Msv_Range[1]);
+        GetDlgItem(IDC_RADIO_MSV_3)->SetWindowTextW(Custom_Msv_Range[2]);
+        
+    }
 
 	if((receive_customer_unit) || (offline_mode))
 	{
@@ -680,12 +691,18 @@ void BacnetRange::Initial_static()
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
 		}
-		else if ((bacnet_device_type == TINY_EX_MINIPANEL || bacnet_device_type == MINIPANELARM_TB) && (input_list_line >= 0) && (input_list_line <= 7))
+		else if ((bacnet_device_type == TINY_EX_MINIPANEL ) && (input_list_line >= 0) && (input_list_line <= 7))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
 		}
+        else if ((bacnet_device_type == MINIPANELARM_TB) && (input_list_line >= 0) && (input_list_line <= 7))
+        {
+            GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
+            GetDlgItem(IDC_RADIO69)->EnableWindow(TRUE);
+            GetDlgItem(IDC_RADIO87)->EnableWindow(FALSE);
+        }
 		else if((bacnet_device_type == PID_T322AI) && (input_list_line >= 0) && (input_list_line <=10))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
@@ -955,6 +972,10 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 					bac_ranges_type = OUTPUT_RANGE_DIGITAL_TYPE;
 				click_radio = true;
 			}
+            else if ((nfocusid >= IDC_RADIO_MSV_1) && (nfocusid <= IDC_RADIO_MSV_3))
+            {
+                Sleep(1);
+            }
 			else if(nfocusid == IDC_EDIT_RANGE_SELECT)
 			{
 				Sleep(1);
@@ -992,6 +1013,15 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 					break;
 				}
 			}
+
+            for (int i = IDC_RADIO_MSV_1;i <= IDC_RADIO_MSV_3;i++)
+            {
+                if (((CButton *)GetDlgItem(i))->GetCheck())
+                {
+                    m_digital_select = 101+i - IDC_RADIO_MSV_1;
+                    break;
+                }
+            }
 
 			if (m_digital_select != 0)
 			{
@@ -1156,6 +1186,11 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						{
 							((CButton *)GetDlgItem(i))->SetCheck(false);
 						}
+
+                        for (int i = IDC_RADIO_MSV_1;i <= IDC_RADIO_MSV_3;i++)
+                        {
+                            ((CButton *)GetDlgItem(i))->SetCheck(false);
+                        }
 					}
 				}
 				else if((bac_ranges_type == INPUT_RANGE_ANALOG_TYPE) || (initial_dialog == 2))
@@ -1302,7 +1337,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						break;
 
 						
-						if(m_digital_select >22)
+						if((m_digital_select >22) && ((m_digital_select <=30)))
 						{
 							
 							bac_range_number_choose = m_digital_select ;
@@ -1323,6 +1358,15 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							m_rang_pic.SetWindowPos(NULL,c6.left - 40,c6.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
 						}
+                        else if ((m_digital_select >= 101) && (m_digital_select <= 103)) //MSV
+                        {
+                            bac_range_number_choose = m_digital_select;
+                            CRect c6;
+                            GetDlgItem(IDC_RADIO_MSV_1 + m_digital_select - 101)->GetWindowRect(c6);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+                            ScreenToClient(c6);
+                            m_rang_pic.SetWindowPos(NULL, c6.left - 40, c6.top - 4, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+                            m_rang_pic.Invalidate(TRUE);
+                        }
 						else
 						{
 							bac_range_number_choose = m_digital_select;
@@ -1339,6 +1383,10 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						{
 							m_show_unit.SetWindowTextW(Custom_Digital_Range[bac_range_number_choose - 23]);
 						}
+                        else if ((bac_range_number_choose >= 101) && (bac_range_number_choose <= 103)) //MSV
+                        {
+                            m_show_unit.SetWindowTextW(_T("MSV"));
+                        }
 						else
 							m_show_unit.SetWindowTextW(Digital_Units_Array[bac_range_number_choose]);
 
@@ -2312,4 +2360,48 @@ void BacnetRange::OnBnClickedBtnEditMsvRange()
         MsvRangdlg.DoModal();
     }
 
+}
+
+void BacnetRange::DisableAnalogVarRadio()
+{
+    m_digital_select = 0;
+    
+    for (int i = IDC_RADIO54;i <= IDC_RADIO72;i++)
+    {
+        ((CButton *)GetDlgItem(i))->SetCheck(false);
+    }
+
+    for (int i = IDC_RADIO81;i <= IDC_RADIO88;i++)
+    {
+        ((CButton *)GetDlgItem(i))->SetCheck(false);
+    }
+
+    ((CButton *)GetDlgItem(IDC_RADIO101))->SetCheck(false);
+    ((CButton *)GetDlgItem(IDC_RADIO102))->SetCheck(false);
+}
+
+void BacnetRange::OnBnClickedRadioMsv1()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
+    DisableAnalogVarRadio();
+    GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("101"));
+}
+
+
+void BacnetRange::OnBnClickedRadioMsv2()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
+    DisableAnalogVarRadio();
+    GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("102"));
+}
+
+
+void BacnetRange::OnBnClickedRadioMsv3()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
+    DisableAnalogVarRadio();
+    GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("103"));
 }

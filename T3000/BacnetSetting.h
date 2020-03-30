@@ -77,9 +77,6 @@ public:
     int m_reboot_time_left; //用来记录reboot 的时间;
     char m_tcp_type; //用于记录 IP地址是否是动态的，来判别是否有改变;
 
-
-    //afx_msg void OnEnKillfocusEditSettingMstpId();
-
     void InitialTab();
     CTabCtrl m_setting_tab;
     int m_CurSelTab;

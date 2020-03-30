@@ -124,7 +124,6 @@ void CBacnetSettingTime::Get_Time_Edit_By_Control()
         memset(Device_time.new_time.reserved, 0, 3);
     }
 
-    Post_Write_Message(g_bac_instance, WRITE_TIMECOMMAND, 0, 0, sizeof(Time_block_mini), this->m_hWnd, temp_task_info);
 }
 
 void CBacnetSettingTime::OnNMKillfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
@@ -207,7 +206,12 @@ void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
     m_cm5_date_picker.SetTime(&TimeTemp);
 
     Get_Time_Edit_By_Control();
-    Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0);
+
+    //TSTAT10 有时候 写同步时间的时候 会通讯挂掉;
+    //暂时屏蔽TSTAT10 同步时间 后就不通讯;
+   // if (g_selected_product_id == PM_TSTAT10)
+    //    return;
+    Write_Private_Data_Blocking(WRITE_TIMECOMMAND, 0, 0);
 }
 
 void CBacnetSettingTime::OnBnClickedBtnBacWriteTime()

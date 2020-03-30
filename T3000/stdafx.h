@@ -148,6 +148,7 @@ INPUT void close_T3000_log_file();//scan
 INPUT void write_T3000_log_file( CString StrTips);//scan
 INPUT void Create_T3000_log_file();//scan
 INPUT int Test_Comport(int comport, baudrate_def * ntest_ret);
+INPUT int Set_Test_Comport_Status(int command);
 INPUT CString Get_NowTime();
 INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
 INPUT int Write_One_Multy_Thread(unsigned char device_var, unsigned short address, unsigned short val, int nindex);
@@ -310,4 +311,4 @@ typedef struct _MessageInvokeIDInfo
 //*********************************link to dll***************************
 
 
-#define USE_THIRD_PARTY_FUNC 0
+//#define USE_THIRD_PARTY_FUNC 1

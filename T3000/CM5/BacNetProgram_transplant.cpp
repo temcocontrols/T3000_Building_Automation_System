@@ -3618,9 +3618,26 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 				//												fprintf(pmes,"error line %d\n",line);
 				error=1;return 0;
 			}
-			else  if (((strlen(p)==1) && (*p=='0')) && 
-				((k!= COIL_REG) && (k!= DIS_INPUT_REG) && (k!= INPUT_REG) && (k!= MB_REG) &&
-				(k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_BO) && (k != BAC_BV) && (k != BAC_BI)))
+			else  if 
+                (
+                    ((strlen(p)==1) && (*p=='0')) && 
+				    (
+                        (k != BAC_FLOAT_ABCD) &&  // 2020 03 25
+                        (k != BAC_FLOAT_CDAB) &&
+                        (k != BAC_FLOAT_BADC) &&
+                        (k != BAC_FLOAT_CDBA) &&
+                      (k!= COIL_REG) && 
+                      (k!= DIS_INPUT_REG) && 
+                      (k!= INPUT_REG) && 
+                      (k!= MB_REG) &&
+				      (k!= BAC_AV) && 
+                      (k!= BAC_AI) && 
+                      (k != BAC_AO) && 
+                      (k != BAC_BO) && 
+                      (k != BAC_BV) && 
+                      (k != BAC_BI)
+                      )
+                )
 			{
 				memcpy(pmes,"error line : ",13);
 				pmes += 13;
@@ -3681,7 +3698,13 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 						else
 							high_3bit = ((*num_point) & 0xff00) >> 3;
 
-                        if ((k == MB_REG)  && (*num_point >=2000))
+                        if (
+                            ((k == BAC_FLOAT_ABCD) ||
+                             (k == BAC_FLOAT_CDAB) ||
+                             (k == BAC_FLOAT_BADC) ||
+                             (k == BAC_FLOAT_CDBA) ||
+                            (k == MB_REG)  )&& 
+                            (*num_point >=2000))
                         {
                             int temp_num_point = *num_point;
                             temp_num_point = temp_num_point >> 11;
@@ -3695,7 +3718,17 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
                             temp_num_point = temp_num_point | 0x0080;
                             *netpresent = temp_num_point; // 去Number 的 最高5位;
                         }
-						*point_type = k;
+                        if (k > 31)
+                        {
+                            unsigned char high_two_bits = k & 0x60;
+                            *netpresent = *netpresent & 0x9F;
+                            *netpresent = *netpresent | high_two_bits;
+                        }
+                        else
+                        {
+                            *netpresent = *netpresent & 0x9F; //  与上10011111  如果不是大雨32 则这两个bit清0
+                        }
+						*point_type = k & 0x1f;
 						*point_type = *point_type | high_3bit;
 						//if(*num_panel<10 || *num_point<100)
 						//	strcat(buf,"-");
@@ -5811,7 +5844,15 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                             unsigned char high_3bit;
                             cod_line[Byte++] = REMOTE_POINT_PRG;
                             unsigned char temp_point_type = (unsigned char)(vars_table[cur_index].point_type & 0x1F);
-                            if ((temp_point_type == COIL_REG) ||
+                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+                            temp_point_type = temp_point_type | type_highest_2bytes;
+
+                            if (
+                                (temp_point_type == BAC_FLOAT_ABCD) ||
+                                (temp_point_type == BAC_FLOAT_CDAB) ||
+                                (temp_point_type == BAC_FLOAT_BADC) ||
+                                (temp_point_type == BAC_FLOAT_CDBA) ||
+                                (temp_point_type == COIL_REG) ||
                                 (temp_point_type == DIS_INPUT_REG) ||
                                 (temp_point_type == INPUT_REG) ||
                                 (temp_point_type == MB_REG) ||
@@ -5833,7 +5874,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 
                             }
 
-                            point.point_type = (vars_table[cur_index].point_type + 1) | high_3bit;
+                            point.point_type = (vars_table[cur_index].point_type + 1) | high_3bit; //这里刚好涉及到 111 11111  -》31 type 加一后变0 了 尴尬
                             //*point_type = *point_type | high_3bit;
 
 
@@ -5847,7 +5888,11 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 						else if( ( ( (unsigned char)vars_table[cur_index].panel == Station_NUM ) && (  (unsigned char)vars_table[cur_index].sub_panel == Station_NUM  )  )  ||
                             (   (unsigned char)vars_table[cur_index].panel == Station_NUM ) && (  (unsigned char)vars_table[cur_index].sub_panel == 0 ) )
 						{
-							if((vars_table[cur_index].point_type & 0x1F) == 2/*ENUM_VAR*/ )
+                            unsigned char temp_point_type = vars_table[cur_index].point_type & 0x1F;
+                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+                            temp_point_type = temp_point_type | type_highest_2bytes;
+
+							if(temp_point_type == BAC_VAR )
 							{
 								if(vars_table[cur_index].num_point > BAC_VARIABLE_ITEM_COUNT)
 								{
@@ -5856,7 +5901,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 									return -2;
 								}
 							}
-							else if((vars_table[cur_index].point_type & 0x1F) == 0/*ENUM_OUT*/ )
+							else if(temp_point_type == BAC_OUT  )
 							{
 								if(vars_table[cur_index].num_point > BAC_OUTPUT_ITEM_COUNT)
 								{
@@ -5865,7 +5910,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 									return -2;
 								}
 							}
-							else if((vars_table[cur_index].point_type & 0x1F) == 1/*ENUM_IN*/ )
+							else if(temp_point_type == BAC_IN )
 							{
 								if(vars_table[cur_index].num_point > BAC_INPUT_ITEM_COUNT)
 								{
@@ -5887,7 +5932,16 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							unsigned char high_3bit = 0;
 							cod_line[Byte++]=REMOTE_POINT_PRG;
                             unsigned char temp_point_type = (unsigned char) (vars_table[cur_index].point_type & 0x1F);
-							if((temp_point_type == COIL_REG) ||
+
+                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+                            temp_point_type = temp_point_type | type_highest_2bytes;
+
+							if(
+                                (temp_point_type == BAC_FLOAT_ABCD) ||
+                                (temp_point_type == BAC_FLOAT_CDAB) ||
+                                (temp_point_type == BAC_FLOAT_BADC) ||
+                                (temp_point_type == BAC_FLOAT_CDBA) ||
+                                (temp_point_type == COIL_REG) ||
 								(temp_point_type == DIS_INPUT_REG) ||
 								(temp_point_type == INPUT_REG) ||
 								(temp_point_type == MB_REG) ||
@@ -5925,8 +5979,15 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							unsigned char high_3bit;
 							cod_line[Byte++]=REMOTE_POINT_PRG;
                             unsigned char temp_point_type = (unsigned char)(vars_table[cur_index].point_type & 0x1F);
+                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+                            temp_point_type = temp_point_type | type_highest_2bytes;
+
 							if(((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
-								(temp_point_type == DIS_INPUT_REG) ||
+                                (temp_point_type == BAC_FLOAT_ABCD) ||
+                                (temp_point_type == BAC_FLOAT_CDAB) ||
+                                (temp_point_type == BAC_FLOAT_BADC) ||
+                                (temp_point_type == BAC_FLOAT_CDBA) ||
+                                (temp_point_type == DIS_INPUT_REG) ||
 								(temp_point_type == INPUT_REG) ||
 								(temp_point_type == MB_REG) ||
                                 (temp_point_type == BAC_BV) ||
@@ -6983,33 +7044,25 @@ int pointtotext(char *buf,Point_Net *point)
 
 	num= (point->number) + high_3_bit*256  ;
 
-    //if ((point->point_type == COIL_REG) ||
-    //    (point->point_type == DIS_INPUT_REG) ||
-    //    (point->point_type == INPUT_REG) ||
-    //    (point->point_type == MB_REG) ||
-    //    (point->point_type == BAC_AV) ||
-    //    (point->point_type == BAC_AI) ||
-    //    (point->point_type == BAC_AO) ||
-    //    (point->point_type == BAC_BO))
-    //{
-    //    num_point = num_point;
-    //}
-    //else
-    //{
-    //    if (num_point > 0)
-    //        num_point = num_point - 1;
-    //}
-
 
 	panel=point->panel;
 	point_type= (point->point_type ) & 0x1F;
-    if ((point_type == MB_REG)  && (point->network >=128))
+
+    unsigned char type_highest_2bytes = point->network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+    point_type = point_type | type_highest_2bytes;
+
+    if (((point_type == MB_REG) || 
+         (point_type == BAC_FLOAT_ABCD) ||
+         (point_type == BAC_FLOAT_CDAB) ||
+         (point_type == BAC_FLOAT_BADC) ||
+         (point_type == BAC_FLOAT_CDBA) 
+        )&& (point->network >=128))
     {
-        num = (point->number)  + ((point->network -128)*8 + high_3_bit)*256;
+        num = (point->number)  + ((point->network & 0x1f )   *8 + high_3_bit)*256;
     }
     if ((point_type == BAC_VAR) && (point->network >= 128))
     {
-        num = (point->number) + ((point->network - 128) * 8 + high_3_bit) * 256 - 1;
+        num = (point->number) + ((point->network & 0x1f) * 8 + high_3_bit) * 256 - 1;
     }
 	sub_panel = point->sub_panel;
 	if(point_type > BAC_MAX)
@@ -7052,7 +7105,11 @@ int pointtotext(char *buf,Point_Net *point)
         //不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
         strcat(buf, itoa(point->panel, x, 10));
         strcat(buf, ptr_panel.info[point_type].name);//Fance
-        if ((point_type == BAC_AV) ||
+        if ((point_type == BAC_FLOAT_ABCD) ||
+            (point_type == BAC_FLOAT_CDAB) ||
+            (point_type == BAC_FLOAT_BADC) ||
+            (point_type == BAC_FLOAT_CDBA) ||
+            (point_type == BAC_AV) ||
             (point_type == BAC_AI) ||
             (point_type == BAC_AO) ||
             (point_type == BAC_BO) ||
@@ -7070,7 +7127,13 @@ int pointtotext(char *buf,Point_Net *point)
         return 0;
     }
 
-    if ((point->network >= 128) && (point_type != MB_REG) && (point_type != BAC_VAR)) // 说明是新的格式，最高位用来标识.
+    if ((point->network >= 128) && 
+        (point_type != MB_REG) && 
+        (point_type != BAC_FLOAT_ABCD) &&
+        (point_type != BAC_FLOAT_CDAB) &&
+        (point_type != BAC_FLOAT_BADC) &&
+        (point_type != BAC_FLOAT_CDBA) &&
+        (point_type != BAC_VAR)) // 说明是新的格式，最高位用来标识.
     {
         if ((point_type == BAC_BI) || (point_type == BAC_BV) ||
             (point_type == BAC_AV) || (point_type == BAC_AI) ||
@@ -7103,7 +7166,14 @@ int pointtotext(char *buf,Point_Net *point)
             strcat(buf, ptr_panel.info[point_type].name);//Fance
 
         point->point_type = (point->point_type) & 0x1F;
-        if ((point->point_type == COIL_REG) ||
+        unsigned char type_highest_2bytes = point->network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+        point->point_type = point->point_type | type_highest_2bytes;
+
+        if ((point->point_type == BAC_FLOAT_ABCD) ||
+            (point->point_type == BAC_FLOAT_CDAB) ||
+            (point->point_type == BAC_FLOAT_BADC) ||
+            (point->point_type == BAC_FLOAT_CDBA) ||
+            (point->point_type == COIL_REG) ||
             (point->point_type == DIS_INPUT_REG) ||
             (point->point_type == INPUT_REG) ||
             (point->point_type == MB_REG) ||
@@ -7137,7 +7207,16 @@ int pointtotext(char *buf,Point_Net *point)
 		strcat(buf,ptr_panel.info[point_type].name);//Fance
 	//这4个比较特别  是0基址;
     point->point_type = (point->point_type) & 0x1F;
-	if((point->point_type == COIL_REG) ||
+
+    type_highest_2bytes = point->network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+    point->point_type = point->point_type | type_highest_2bytes;
+
+	if(
+        (point->point_type == BAC_FLOAT_ABCD) ||
+        (point->point_type == BAC_FLOAT_CDAB) ||
+        (point->point_type == BAC_FLOAT_BADC) ||
+        (point->point_type == BAC_FLOAT_CDBA) ||
+        (point->point_type == COIL_REG) ||
 		(point->point_type == DIS_INPUT_REG) ||
 		(point->point_type == INPUT_REG) ||
 		(point->point_type == MB_REG) ||
@@ -7776,6 +7855,18 @@ void init_info_table( void )
 				break;
             case BAC_BV:
                 ptr_panel.info[i].name = "BV";
+                break;
+            case BAC_FLOAT_ABCD:
+                ptr_panel.info[i].name = "MB_REG_FLOAT_ABCD";
+                break;
+            case BAC_FLOAT_CDAB:
+                ptr_panel.info[i].name = "MB_REG_FLOAT_CDAB";
+                break;
+            case BAC_FLOAT_BADC:
+                ptr_panel.info[i].name = "MB_REG_FLOAT_BADC";
+                break;
+            case BAC_FLOAT_CDBA:
+                ptr_panel.info[i].name = "MB_REG_FLOAT_CDBA";
                 break;
 			default:
 				{

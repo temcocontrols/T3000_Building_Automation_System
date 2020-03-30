@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const unsigned int g_versionNO= 20191126;
+const unsigned int g_versionNO= 20200327;
 
 
 #ifdef _DEBUG
@@ -745,7 +745,7 @@ BOOL CT3000App::InitInstance()
 
 		 ((CMainFrame*)m_pMainWnd)->InitViews();//
 		CString strTile;
-		strTile.Format(_T("T3000 Building Automation System"));
+        strTile = cs_special_name;
 		strTile+=CurrentT3000Version;
 		m_pMainWnd->SetWindowText(strTile);//
 		m_pMainWnd->ShowWindow(SW_SHOWMAXIMIZED);
@@ -754,7 +754,10 @@ BOOL CT3000App::InitInstance()
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
        m_szAppPath  = g_strExePth;
-       m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
+       if(m_special_customer == 1) //如果是第一个客户 就定义为CPR-1000-Help.chm
+           m_szHelpFile = theApp.m_szAppPath + L"CPR-1000-Help.chm";
+       else
+            m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
 	   m_szTstatHelpFile = theApp.m_szAppPath + L"HelpDoc//" + L"TStat8_Help.chm";
 
 	}
@@ -1134,7 +1137,7 @@ BOOL CAboutDlg::OnInitDialog()
 
 	
 	CString temp_version;
-	temp_version = _T("T3000 Building Automation System") + CurrentT3000Version;
+	temp_version = cs_special_name + CurrentT3000Version;
 	
 	GetDlgItem(IDC_STATIC_ABOUT_INFO)->SetWindowText(temp_version);
 	return TRUE;  // return TRUE unless you set the focus to a control

@@ -29,9 +29,13 @@ DWORD WINAPI CAirQuality_BackMainUIFresh(LPVOID pParam)
 {
 	CAirQuality* pdlg = (CAirQuality*)pParam;
 	int heatbeat = 0;
+
+    pdlg->hFirstThread = NULL;
+    return 0;
+
 	//return 0;
-	while (pdlg->IsWindowVisible())
-	{
+	//while (pdlg->IsWindowVisible())
+	//{
 		Sleep(2000);
 		if (pdlg->IsWindowVisible())
 		{
@@ -48,7 +52,7 @@ DWORD WINAPI CAirQuality_BackMainUIFresh(LPVOID pParam)
 							pdlg->m_fresh_data = FALSE;
 							heatbeat = 0;
 						}
-						continue;
+                        goto end_aq_backthread;
 					}
 					int AddressValue = -1;
 					if (pdlg->m_product_model == PM_HUMTEMPSENSOR)
@@ -72,7 +76,7 @@ DWORD WINAPI CAirQuality_BackMainUIFresh(LPVOID pParam)
 							pdlg->m_fresh_data = FALSE;
 							heatbeat = 0;
 						}
-						continue;
+                        goto end_aq_backthread;
 					}
 
 
@@ -90,7 +94,7 @@ DWORD WINAPI CAirQuality_BackMainUIFresh(LPVOID pParam)
 
 					if (!pdlg->m_fresh_data)
 					{
-						continue;
+                        goto end_aq_backthread;
 					}
 
 					if (pdlg->m_product_model == PM_HUMTEMPSENSOR)
@@ -110,7 +114,9 @@ DWORD WINAPI CAirQuality_BackMainUIFresh(LPVOID pParam)
 				}
 			}
 		}
-	}
+	//}
+end_aq_backthread:
+    pdlg->hFirstThread = NULL;
 	return 0;
 }
 
@@ -293,12 +299,12 @@ void CAirQuality::Fresh()
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST, 0, 0);
 
 
-	if (hFirstThread != NULL)
-		TerminateThread(hFirstThread, 0);
 	hFirstThread = NULL;
 	if (!hFirstThread)
 	{
 		hFirstThread = CreateThread(NULL,NULL, CAirQuality_BackMainUIFresh, this,NULL, 0);
+        CloseHandle(hFirstThread);
+        hFirstThread = NULL;
 	}
 }
 

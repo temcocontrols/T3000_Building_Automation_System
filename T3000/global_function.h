@@ -177,6 +177,7 @@ void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString Table
 int Get_Unit_Process(CString Unit);
 BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position);
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind);
+int AddSubNetInfoIntoRefreshList(BYTE* buffer);
 UINT RefreshNetWorkDeviceListByUDPFunc();
 //void DFTrace(CString &nCString);
 void DFTrace(LPCTSTR lpCString);
@@ -272,6 +273,12 @@ int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bac
     unsigned short nreg_value,
     unsigned char sub_device,         // 如果是子设备  ，数据库中的协议 比较特殊;
     LPCTSTR Dbpath);
-
+int ChangeModbusDB(unsigned int nserialnumber, int nmodbusid, LPCTSTR Dbpath);
 void switch_product_last_view();
+int Initial_Function();
+int Check_Function(int product_id, unsigned char nprotocol, FunctionNumber function_number);//根据产品协议觉得使能功能
+int Get_Msv_Table_Name(int x);// 获取MSV的表缩略名称
+int Get_Msv_Item_Name(int ntable, int nitemvalue, CString &csItemString); // 匹配MSV 对应的值显示哪一个 名称
+int Get_Msv_next_Name_and_Value_BySearchName(int ntable, CString nitemname, CString  &csNextItemString, int &nNextValue);
+int Get_Msv_next_Name_and_Value_BySearchValue(int ntable, int nitemvalue, CString  &csNextItemString, int &nNextValue);
 #endif

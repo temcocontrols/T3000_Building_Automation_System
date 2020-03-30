@@ -62,6 +62,9 @@ public:
     int m_version;
 private:
 	BYTE m_address[4];
+public:
+    afx_msg void OnBnClickedRadioIpAuto();
+    afx_msg void OnBnClickedRadioIpStatic();
 };
 
 

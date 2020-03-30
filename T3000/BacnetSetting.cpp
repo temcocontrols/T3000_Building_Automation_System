@@ -193,9 +193,13 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
             ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
             ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->EnableWindow(FALSE);
+            m_page_tcpip.m_edit_port.EnableWindow(false);
+            ((CButton *)m_page_tcpip.GetDlgItem(IDC_BUTTON_HEALTH))->EnableWindow(FALSE);
         }
         else
         {
+            ((CButton *)m_page_tcpip.GetDlgItem(IDC_BUTTON_HEALTH))->EnableWindow(true);
+             m_page_tcpip.m_edit_port.EnableWindow(true);
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->EnableWindow(TRUE);
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->EnableWindow(TRUE);
             ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->EnableWindow(TRUE);
@@ -207,6 +211,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
                 ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
                 ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
+                
             }
             else if (Device_Basic_Setting.reg.tcp_type == 0)
             {
@@ -235,12 +240,11 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         {
             CString temp_port;
             temp_port.Format(_T("%u"), Device_Basic_Setting.reg.modbus_port);
-            m_page_tcpip.m_edit_port.EnableWindow(true);
             m_page_tcpip.m_edit_port.SetWindowTextW(temp_port);
         }
         else
         {
-            m_page_tcpip.EnableWindow(false);
+            m_page_tcpip.m_edit_port.EnableWindow(false);
         }
 
 
@@ -1607,6 +1611,10 @@ void CBacnetSetting::OnTcnSelchangeTabSetting(NMHDR *pNMHDR, LRESULT *pResult)
     m_CurSelTab = m_setting_tab.GetCurSel();
     if (SETTING_USER_LOGIN == m_CurSelTab)
     {
+        if (!Check_Function(g_selected_product_id, g_protocol, F_SETTING_USER_LOGIN))
+        {
+            return;
+        }
         bool b_ret = true;
         for (int i = 0; i<BAC_USER_LOGIN_GROUP; i++)
         {
@@ -1636,6 +1644,10 @@ void CBacnetSetting::OnTcnSelchangeTabSetting(NMHDR *pNMHDR, LRESULT *pResult)
     }
     else if (SETTING_EXPANSION_IO == m_CurSelTab)
     {
+        if (!Check_Function(g_selected_product_id, g_protocol, F_EXPANSION_IO))
+        {
+            return;
+        }
         if (GetPrivateData_Blocking(g_bac_instance, READEXT_IO_T3000, 0, BAC_EXTIO_COUNT - 1, sizeof(Str_Extio_point)) < 0)
         {
             SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Expansion IO read timeout!"));

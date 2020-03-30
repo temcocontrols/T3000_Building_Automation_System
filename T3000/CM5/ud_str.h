@@ -502,6 +502,7 @@ typedef struct
 } Str_program_point;	  /*37 bytes  fandu*/
 
 
+
 typedef struct
 {
 	Point_T3000 input;	        /* (3 bytes; point)*/
@@ -803,7 +804,7 @@ typedef union
 
 		uint8_t refresh_flash_timer;
 		uint8_t en_plug_n_play;
-		uint8_t reset_default;   // write 88
+		uint8_t reset_default;   // write 88  //µÚ 37 ¸ö
 		uint8_t com_baudrate0; 
 		uint8_t com_baudrate1; 
 		uint8_t com_baudrate2; 
@@ -1150,7 +1151,24 @@ typedef union
     }reg;
 }str_wifi_point;
 
+typedef struct
+{
+    unsigned short modbus_reg;         /* (2 bytes; ) */
+    short m_value;         /* (4 bytes; ) */
+    CString showvalue;
+} register_point;     /* (size = 6 bytes); */
 
+typedef struct
+{
+    int mode;
+    register_point name;
+    register_point type;
+    register_point setpoint;
+    register_point heat_setpoint;
+    register_point cool_setpoint;
+    register_point cool_db;
+    register_point heat_db;
+}Str_tstat_setpoint;
 
 #pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
 

@@ -14,7 +14,7 @@
 
 #include "..\\Update\\MFC16API.h"
 #pragma comment(lib,"..\\Update\\MFC16API.lib")
-
+CString cs_new_name; //自定义软件的名字;
 bool run_t3000 = true;
 
 HANDLE getftpthread = NULL;
@@ -36,7 +36,7 @@ unsigned int T3000_FTP_Version = 0;
 int is_local_temco_net = false;
 int local_persent = 0;
 //#pragma comment(lib,"..\\Debug\\MSVC10APIW.lib")
-
+BOOL KillProcessFromName(CString strProcessName);
 // CAboutDlg dialog used for App About
 
 class CAboutDlg : public CDialogEx
@@ -177,6 +177,9 @@ BOOL CUpdateDlg::OnInitDialog()
 
     T3000_ini_file_path = APP_RUN_FOLDER + _T("\\Database") + _T("\\") + _T("temp\\MonitorIndex.ini");
     PC_T3000_Version = GetPrivateProfileInt(_T("Version"), _T("T3000"), 0, T3000_ini_file_path);
+
+
+
 
 
     is_local_temco_net = GetPrivateProfileInt(_T("Setting"), _T("LocalTemcoNet"), 0, T3000_ini_file_path);
@@ -336,6 +339,23 @@ DWORD WINAPI InstallFileThread(LPVOID lPvoid)
     bool copy_ret = false;
     SetCurrentDirectoryW(APP_RUN_FOLDER);
     copy_ret = CopyDirW(UnzipFileFolder, APP_RUN_FOLDER, FALSE);
+
+    GetPrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("T3000.exe"), cs_new_name.GetBuffer(MAX_PATH), MAX_PATH, T3000_ini_file_path);
+    cs_new_name.ReleaseBuffer();
+    if (cs_new_name.CompareNoCase(_T("T3000.exe")) != 0)
+    {
+        CString CS_Old_File;
+        CString CS_New_File;
+        CS_Old_File = APP_RUN_FOLDER + _T("\\T3000.exe");
+        CS_New_File = APP_RUN_FOLDER + _T("\\") + cs_new_name;
+        char oldfile[1000] = { 0 };
+        char newfile[1000] = { 0 };
+        WideCharToMultiByte(CP_ACP, 0, CS_Old_File.GetBuffer(), -1, oldfile, 1000, NULL, NULL);
+        WideCharToMultiByte(CP_ACP, 0, CS_New_File.GetBuffer(), -1, newfile, 1000, NULL, NULL);
+        KillProcessFromName(cs_new_name);
+        DeleteFile(CS_New_File);
+        rename(oldfile, newfile);
+    }
     if (copy_ret)
     {
         CS_Info.Format(_T("Install success!"));
@@ -611,9 +631,11 @@ download_pass:
 
     if (unzipthread == NULL)
     {
-        KillProcessFromName(_T("T3000.exe"));
+        GetPrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("T3000.exe"), cs_new_name.GetBuffer(MAX_PATH), MAX_PATH, T3000_ini_file_path);
+        cs_new_name.ReleaseBuffer();
+        KillProcessFromName(cs_new_name);
         KillProcessFromName(_T("ISP.exe"));
-
+        Sleep(1000);
         m_static_step = UPDATE_STEP_UNCOMPRESS;
         unzipthread = CreateThread(NULL, NULL, UnzipFileThread, mparent, NULL, NULL);
         CloseHandle(unzipthread);

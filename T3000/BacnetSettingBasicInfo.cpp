@@ -112,13 +112,14 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingModbusId()
             Device_Basic_Setting.reg.modbus_id = (unsigned char)temp_modbusid;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
-                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change object instance failed!"));
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change Modbus RTU ID and Bacnet MSTP MAC ID failed!"));
                 Device_Basic_Setting.reg.modbus_id = old_modbusid;
                 PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
             }
             else
             {
-                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change object instance success!"));
+                ChangeModbusDB(Device_Basic_Setting.reg.n_serial_number, Device_Basic_Setting.reg.modbus_id, g_strCurBuildingDatabasefilePath);
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change Modbus RTU ID and Bacnet MSTP MAC ID success!"));
             }
         }
         else

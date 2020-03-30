@@ -108,7 +108,7 @@ HANDLE h_co2_node_thread = NULL;
 void CCO2_NodeView::Fresh()
 {
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    pFrame->SetWindowTextW(_T("T3000 Building Automation System") + CurrentT3000Version);
+    pFrame->SetWindowTextW(cs_special_name + CurrentT3000Version);
 
     if (h_co2_node_thread == NULL)
     {

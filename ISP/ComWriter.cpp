@@ -264,7 +264,8 @@ UINT Flash_Modebus_Device(LPVOID pParam)
         if(Open_Socket2(pWriter->m_strIPAddr, pWriter->m_nIPPort)==false)
         {
             CString srtInfo = _T("|Error : Network init failed.");
-            MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+            if (!auto_flash_mode)
+                MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
             //AddStringToOutPuts(_T("Error :The com port is occupied!"));
             pWriter->OutPutsStatusInfo(srtInfo, FALSE);
             pWriter->WriteFinish(0);
@@ -711,7 +712,7 @@ end_tcp_flash_mode :
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam)
 {
     CComWriter* pWriter = (CComWriter*)pParam;
-    const int  RETRY_TIMES = 5;
+    const int  RETRY_TIMES = 10;
     TS_UC *register_data=register_data_orginal;
     unsigned int ii=0;
 
@@ -971,7 +972,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam)
 {
     CComWriter* pWriter = (CComWriter*)pParam;
-    const int  RETRY_TIMES = 5;
+    const int  RETRY_TIMES = 10;
     TS_UC *register_data=register_data_orginal;
     unsigned int ii=0;
 
@@ -998,6 +999,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
         if(Write_One(m_ID,12,section)<0)
         {
             ii++;
+            Sleep(200);
         }
         else
         {
@@ -1012,7 +1014,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
         str.Format(_T("Write 12 = %d Failed"),section);
 		if(!auto_flash_mode)
 			AfxMessageBox(str);
-        return -8;
+        return -1;
 
     }
     //	while(ii<=the_max_register_number_parameter)
@@ -1043,6 +1045,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
             if(write_multi(m_ID,&register_data[ii],ii,128)<0)//to write multiple 128 bytes
             {
                 itemp++;
+                Sleep(300); //Ð´Ê§°Ü ÐÝÃß300msºó ÖØÊÔ;
             }
             else
             {
@@ -1055,10 +1058,10 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
 
 
         }
-        while(itemp<RETRY_TIMES);
+        while(itemp<RETRY_TIMES*2);
 
 
-        if (itemp >= RETRY_TIMES)
+        if (itemp >= RETRY_TIMES*2)
         {
             CString str;
             str.Format(_T("Write Flash ID = %d To = 128*%d "),m_ID,ii);
@@ -1787,7 +1790,8 @@ int CComWriter::BeginWirteByTCP()
             if(Open_Socket2(m_strIPAddr, m_nIPPort)==false)
             {
                 CString srtInfo = _T("|Error : Network init failed.");
-                MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+                if (!auto_flash_mode)
+                    MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
                 //AddStringToOutPuts(_T("Error :The com port is occupied!"));
                 OutPutsStatusInfo(srtInfo, FALSE);
                 WriteFinish(0);
@@ -1837,7 +1841,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
     UINT times=0;
 
 #if 1
-    const int  RETRY_TIMES = 5;
+    const int  RETRY_TIMES = 10;
     CString StrCurrentTime;
     StrCurrentTime.Format(_T("|>>>StartTime:%s"),GetSysTime());
     pWriter->OutPutsStatusInfo(StrCurrentTime);
@@ -2241,6 +2245,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         break;
                     }
                     pWriter->OutPutsStatusInfo(strTemp);
+                    Sleep(1000);
                     goto end_isp_flash;
 
                 }
@@ -2305,6 +2310,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
 //*******************************************************************************
 end_isp_flash:
+    Sleep(500);
     pWriter->WriteFinish(nFlashRet);
     Sleep(500);
 

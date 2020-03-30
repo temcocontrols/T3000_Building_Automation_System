@@ -65,20 +65,22 @@ void CScanDbWaitDlg::OnBnClickedCancel()
 extern HANDLE * hScanComData ; //用于串口多线程同时扫描
 void CScanDbWaitDlg::OnBnClickedExitbutton()
 {
-    
+    m_pScaner->m_bStopScan = TRUE;
+    Set_Test_Comport_Status(1);
     g_bCancelScan=TRUE;
 
 
 	//pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
 	TerminateThread(hwait_scan_thread, 0);
     TerminateThread(m_pScaner->m_pScanTCP_to_485Thread, 0);
-    for (int j = 0; j < m_pScaner->m_szComs.size(); j++)
+    for (int j = 0; j < m_pScaner->m_szComs.size(); j++)  //20200327 这里不能随便结束扫描现场，否则会引起串口挂掉，dabuk
     {
-        if (hScanComData[j] != NULL)
-        {
-            TerminateThread(hScanComData[j], 0);
-            hScanComData[j] = NULL;
-        }
+        Sleep(3000);
+        //if (hScanComData[j] != NULL)
+        //{
+        //    TerminateThread(hScanComData[j], 0);
+        //    hScanComData[j] = NULL;
+        //}
     }
     if (m_pScaner->m_pScanBacnetIPThread != NULL)
     {
@@ -109,8 +111,8 @@ BOOL CScanDbWaitDlg::OnInitDialog()
     m_waiting_title.textColor(RGB(20, 20, 20));
     //m_edit_display.bkColor(RGB(255, 255, 255));
     m_waiting_title.setFont(20, 14, NULL, _T("Arial"));
-
     g_bCancelScan=FALSE;
+    m_pScaner->m_bStopScan = FALSE;
     SetTimer(1,100,NULL);
     SetTimer(2,200,NULL);
     Initial_List();

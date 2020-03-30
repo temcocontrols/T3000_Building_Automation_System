@@ -262,7 +262,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
 			
-			if((m_Variable_data.at(i).range == 0) || (m_Variable_data.at(i).range>30))
+			if((m_Variable_data.at(i).range == 0) || ((m_Variable_data.at(i).range>30) && (m_Variable_data.at(i).range<100)) )
 			{
 				CString cstemp_value2;
 				float temp_float_value1;
@@ -271,6 +271,19 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value2);
 				m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
 			}
+            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
+            {
+                if(read_msv_table)
+                    m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
+                int get_name_ret = 0;
+                CString cstemp_value2;
+                float temp_float_value1;
+                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
+                if(get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+                   cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+                m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
+            }
 			else
 			{
 				CString temp1;
@@ -673,7 +686,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 	else if(lCol == VARIABLE_UNITE)
 	{
 
-
+        CString temp_info;
 		BacnetRange dlg;
 
 		//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
@@ -683,6 +696,22 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			int temp_invoke_id = -1;
 			int send_status = true;
 			int	resend_count = 0;
+            if ((g_protocol == P_BACNET_MSTP) || (g_protocol == P_BACNET_IP) || (g_protocol == P_MODBUS_TCP))
+            {
+                if (GetPrivateData_Blocking(g_bac_instance, READUNIT_T3000, 0, BAC_CUSTOMER_UNITS_COUNT - 1, sizeof(Str_Units_element), 5) > 0)
+                {
+                    temp_info.Format(_T("Read digital custom units success."));
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_info);
+                    read_customer_unit = true;
+                }
+                else
+                {
+                    temp_info.Format(_T("Read digital custom units success."));
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_info);
+                }
+
+            }
+#if 0
 			for (int z=0;z<3;z++)
 			{
 				do 
@@ -720,21 +749,24 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 				if(read_customer_unit)
 					break;
 			}
+#endif
 
 		}
 
-		CString temp_info;
 
-		if(GetPrivateData_Blocking(g_bac_instance, READVARUNIT_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
-		{
-			temp_info.Format(_T("Read variable custmer units success."));
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_info);
-		}
-		else
-		{
-			temp_info.Format(_T("Read variable custmer units success."));
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_info);
-		}
+        if ((g_protocol == P_BACNET_MSTP) || (g_protocol == P_BACNET_IP) || (g_protocol == P_MODBUS_TCP))
+        {
+            if (GetPrivateData_Blocking(g_bac_instance, READVARUNIT_T3000, 0, 4, sizeof(Str_variable_uint_point)) > 0)
+            {
+                temp_info.Format(_T("Read variable custmer units success."));
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_info);
+            }
+            else
+            {
+                temp_info.Format(_T("Read variable custmer units success."));
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_info);
+            }
+        }
 
 		if(m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
 		{
@@ -824,8 +856,14 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
                 }
                 else if (bac_range_number_choose < 23)
                     temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
-                else
-                    temp1 = _T("MSV");
+                else if((bac_range_number_choose >= 101) && (bac_range_number_choose <= 103))
+                {
+                        if (read_msv_table)
+                            temp1 = Custom_Msv_Range[bac_range_number_choose - 101];
+                        else
+                            temp1 = _T("MSV");
+                }
+                    
 				SplitCStringA(temparray,temp1,_T("/"));
 
 
@@ -1096,7 +1134,23 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 
 	if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 	{
-		if(m_Variable_data.at(i).range>30)
+        if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))  //判断是MSV range
+        {
+            for (int z = 0; z < 3; z++)
+            {
+                int get_name_ret = 0;
+                float temp_float_value1;
+                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, temp_float_value1, ret_cstring);
+                if (get_name_ret > 0)
+                {
+                    ret_unit.Empty();
+                    break;
+                }
+            }
+
+        }
+		else if(m_Variable_data.at(i).range>30)
 		{
 			ret_cstring = _T(" ");
 			return RANGE_ERROR;

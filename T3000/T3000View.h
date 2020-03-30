@@ -103,7 +103,7 @@ public:
 	void OnConnect();
 	void OnDisconnect();
 	void OnAddBuildingConfig();
-	
+
 	void Fresh();
 	void Fresh_T3000View();
 	void FreshCtrl();
@@ -301,6 +301,7 @@ public:
 	 void NightHandleMovedSlidercontrol1(const VARIANT& sender, float newValue);
 	 /*void ClickSlidercontrol1(const VARIANT& sender, LPDISPATCH e);*/
      afx_msg void OnCbnSelchangeComboSysMode();
+     afx_msg void OnBnClickedButtonSetpointDetail();
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

@@ -59,6 +59,10 @@ public:
     int m_device_type;
     afx_msg void OnBnClickedBtnEditMsvRange();
     afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+    afx_msg void OnBnClickedRadioMsv1();
+    afx_msg void OnBnClickedRadioMsv2();
+    afx_msg void OnBnClickedRadioMsv3();
+    void DisableAnalogVarRadio();
 };
 
 const CString Range_Type[] =

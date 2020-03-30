@@ -1037,7 +1037,7 @@ void CGraphicMode::Initial_UserList(){
 			strTemp.Format(_T("%d"),(int)g_calibration_module_data.User_Table.at(row).Time_offset);
 
 			m_user_list.SetItemText(row,1,strTemp);
-			strTemp.Format(_T("%0.1f"),g_calibration_module_data.User_Table.at(row).Value_offset/10);
+			strTemp.Format(_T("%0.1f"),g_calibration_module_data.User_Table.at(row).Value_offset/10.0);
 			m_user_list.SetItemText(row,2,strTemp);
             if (is_grad)
             {
@@ -1092,7 +1092,7 @@ void CGraphicMode::Initial_FactoryList(){
 			m_factory_list.SetItemText(row,1,strTemp); 
 
 
-			strTemp.Format(_T("%0.1f"), g_calibration_module_data.Factory_Table.at(row).Value_offset/10);
+			strTemp.Format(_T("%0.1f"), g_calibration_module_data.Factory_Table.at(row).Value_offset/10.0);
 			m_factory_list.SetItemText(row,2,strTemp);
 
 			m_factory_list.SetCellEnabled(row,0,FALSE);
@@ -1267,7 +1267,7 @@ LRESULT CGraphicMode::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
         strTemp.Format(_T("%d"),(int)g_calibration_module_data.User_Table.at(row).Time_offset);
 
         m_user_list.SetItemText(row,1,strTemp);
-        strTemp.Format(_T("%0.1f"),g_calibration_module_data.User_Table.at(row).Value_offset/10);
+        strTemp.Format(_T("%0.1f"),g_calibration_module_data.User_Table.at(row).Value_offset/10.0);
         m_user_list.SetItemText(row,2,strTemp);
         if (is_grad)
         {

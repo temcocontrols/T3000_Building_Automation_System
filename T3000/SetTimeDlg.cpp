@@ -49,7 +49,7 @@ void CSetTimeDlg::OnBnClickedOk()
 BOOL CSetTimeDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+    m_TimePicker.SetFormat(_T("HH:mm"));
 	
 	m_TimePicker.GetFocus();
 	return FALSE;  // return TRUE unless you set the focus to a control

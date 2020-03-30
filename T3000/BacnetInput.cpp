@@ -19,7 +19,7 @@ static bool show_external =  false;
 CRect Input_rect;
 int INPUT_LIMITE_ITEM_COUNT = 0;
 // CBacnetInput dialog
-#define UPDATE_INPUT_ONE_ITEM_TIMER 3
+
 int changed_input_item = -1; // 用于改变某一列后 ，立即刷新 当前列的其他变化;
 
 IMPLEMENT_DYNAMIC(CBacnetInput, CDialogEx)
@@ -73,9 +73,12 @@ LRESULT  CBacnetInput::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		if((pInvoke->mRow < BAC_INPUT_ITEM_COUNT) && (pInvoke->mRow >= 0))
 		{
-			Post_Refresh_One_Message(g_bac_instance,READINPUT_T3000,
-				pInvoke->mRow,pInvoke->mRow,sizeof(Str_in_point));
-			SetTimer(2,2000,NULL);
+            if (!SPECIAL_BAC_TO_MODBUS) //不是转Modbus的协议的 就调用下面的刷新单条.
+            {
+                Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000,
+                    pInvoke->mRow, pInvoke->mRow, sizeof(Str_in_point));
+                SetTimer(2, 2000, NULL);
+            }
 		}
 		//Save_InputData_to_db(pInvoke->mRow);
 	}
@@ -115,7 +118,7 @@ BOOL CBacnetInput::OnInitDialog()
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
    
 
-	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
+	SetTimer(INPUT_REFRESH_DATA_TIMER,BAC_LIST_REFRESH_TIME,NULL);
 
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_INPUT_DEFAULT);
 	SetIcon(m_hIcon,TRUE);
@@ -1575,7 +1578,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 
 	switch(nIDEvent)
 	{
-	case 1:
+	case INPUT_REFRESH_DATA_TIMER:
 		{
 			if(offline_mode)
 				break;
@@ -1589,13 +1592,17 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 				if((bac_select_device_online)&& (g_protocol == PROTOCOL_BACNET_IP))
 					Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
-				else if((bac_select_device_online) && ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)))
+				else if((bac_select_device_online) && 
+                    ((g_protocol == MODBUS_RS485) || 
+                     (g_protocol == MODBUS_TCPIP) || 
+                     (g_protocol == PROTOCOL_MSTP_TO_MODBUS) ||   //MSTP协议 接 T322 或者 T3-8 这些设备不支持BB的结构，需要用MSTP转Modbus的协议;
+                     (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)))
 				{
 					if(read_each_485_fun_thread == NULL)
 					{
 						hide_485_progress = true;
                         //经常性的在load file 的时候锁死 ，待解决 2019 06 19
-						//::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_IN);//第二个参数 OUT
+						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_IN);//第二个参数 OUT
 					}
 				}
 			}

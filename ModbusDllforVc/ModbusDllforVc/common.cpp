@@ -612,6 +612,8 @@ OUTPUT bool Change_BaudRate_NoCretical(int new_baudrate,int ncomport)
         }
         else
         {
+            int aaaab = 0;
+            aaaab = ::GetLastError();
             Sleep(10);
         }
     }
@@ -792,6 +794,8 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
     //接收时限
     setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
+    BOOL bDontLinger = FALSE;
+    setsockopt(m_hSocket, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));  //20200214 新增直接关闭套接字
     //****************************************************************************
     // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 
     //改为非阻塞的 2.5秒后还没连接上就 算连接失败;
@@ -805,8 +809,8 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
     bool ret = false;
     if( connect(m_hSocket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
     {
-        tm.tv_sec = 3;//4.5s 如果连接不上就 算失败 ，不要重新retry了;
-        tm.tv_usec = 500;
+        tm.tv_sec = 4;//4s 如果连接不上就 算失败 ，不要重新retry了;
+        tm.tv_usec = 0;
         FD_ZERO(&set);
         FD_SET(sockfd, &set);
         if( select(sockfd+1, NULL, &set, NULL, &tm) > 0)
@@ -917,8 +921,8 @@ OUTPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort,int ninde
     bool ret = false;
     if (connect(m_hSocket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
     {
-        tm.tv_sec = 3;//4.5s 如果连接不上就 算失败 ，不要重新retry了;
-        tm.tv_usec = 500;
+        tm.tv_sec = 4;//4.5s 如果连接不上就 算失败 ，不要重新retry了;
+        tm.tv_usec = 0;
         FD_ZERO(&set);
         FD_SET(sockfd, &set);
         if (select(sockfd + 1, NULL, &set, NULL, &tm) > 0)
@@ -1029,7 +1033,7 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
             temp.Format(_T("%02X "),data_to_write[i]);
             traceStr+=temp;
         }
-        TRACE(_T("%s"),traceStr.GetBuffer());
+        //TRACE(_T("%s"),traceStr.GetBuffer());
 
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
@@ -1098,7 +1102,7 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
             temp.Format(_T("%02X "),gval[i]);
             traceStr+=temp;
         }
-        TRACE(_T("%s"),traceStr);
+        //TRACE(_T("%s"),traceStr);
         ///////////////////////////////////////////////////////////
         for(int i=0; i<6; i++)
             if(gval[i]!=*(data_to_write+i))
@@ -1365,7 +1369,10 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
             if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
             {
                 if (last_connected_port != 0)
+                {
                     Open_Socket2(last_connected_ip, last_connected_port);
+                    return -1;
+                }
             }
         }
         *recvDataLength=13;
@@ -1860,7 +1867,10 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
             if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
             {
                 if (last_connected_port != 0)
+                {
                     Open_Socket2(last_connected_ip, last_connected_port);
+                    return -1;
+                }
             }
         }
         //gval=rvData.pval;
@@ -3850,7 +3860,10 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
             if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
             {
                 if (last_connected_port != 0)
+                {
                     Open_Socket2(last_connected_ip, last_connected_port);
+                    return -1;
+                }
             }
         }
 
@@ -4109,7 +4122,10 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
             if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
             {
                 if (last_connected_port != 0)
+                {
                     Open_Socket2(last_connected_ip, last_connected_port);
+                    return -1;
+                }
             }
         }
 
@@ -4286,6 +4302,15 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         int nRecv = ::recv(m_hSocket, (char *)data_back_write,13, 0);
         if(nRecv<0)
         {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                {
+                    Open_Socket2(last_connected_ip, last_connected_port);
+                    return -1;
+                }
+            }
             return -2;
         }
         //	memcpy((void*)&to_send_data[0],(void*)&to_Reive_data[6],sizeof(to_Reive_data));
@@ -4972,6 +4997,7 @@ OUTPUT bool open_com(int m_com)
     //if(!SetupComm(m_hSerial, 1024*32, 1024*9))
     if (!SetupComm(m_hSerial, 1024 * 64, 1024 * 32))
     {
+        int errornum = GetLastError();
         CloseHandle(m_hSerial);
         m_hSerial = NULL;
     }
@@ -5068,13 +5094,17 @@ OUTPUT bool open_com_nocretical(int m_com)
     {
         CloseHandle(m_hSerial);
         m_hSerial = NULL;
+        m_com_h_serial[m_com] = NULL;
         return false;
     }
     //if(!SetupComm(m_hSerial, 1024*32, 1024*9))
     if(!SetupComm(m_hSerial, 1024*64, 1024*32))
     {
+        int abcd = GetLastError();
         CloseHandle(m_hSerial);
         m_hSerial = NULL;
+        m_com_h_serial[m_com] = NULL;
+        return false;
     }
     DCB  PortDCB;
     PortDCB.DCBlength = sizeof(DCB);
@@ -5083,6 +5113,7 @@ OUTPUT bool open_com_nocretical(int m_com)
     {
         CloseHandle(m_hSerial);
         m_hSerial = NULL;
+        m_com_h_serial[m_com] = NULL;
         return false;
     }
     //not to change the baudate
@@ -5351,7 +5382,10 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
             if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
             {
                 if (last_connected_port != 0)
+                {
                     Open_Socket2(last_connected_ip, last_connected_port);
+                    return -1;
+                }
             }
         }
         //gval=rvData.pval;
@@ -5754,7 +5788,10 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
             if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
             {
                 if (last_connected_port != 0)
+                {
                     Open_Socket2(last_connected_ip, last_connected_port);
+                    return -1;
+                }
             }
         }
         int nErr = WSAGetLastError();
@@ -6814,7 +6851,10 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
             if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
             {
                 if (last_connected_port != 0)
+                {
                     Open_Socket2(last_connected_ip, last_connected_port);
+                    return -1;
+                }
             }
         }
         int nErr = WSAGetLastError();
@@ -9204,7 +9244,10 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         if (xx < 0)
         {
             if (last_connected_port != 0)
+            {
                 Open_Socket2(last_connected_ip, last_connected_port);
+                return -1;
+            }
         }
 
         Sleep(LATENCY_TIME_NET);
@@ -9213,9 +9256,12 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 
         if (nRecv < 0)
         {
+            unsigned int t1 = GetTickCount();//程序段开始前取得系统运行时间(ms);
             nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length * 2 + 12, 0);
+            unsigned int t2 = GetTickCount();//程序段开始前取得系统运行时间(ms);
             if (nRecv < 0)
             {
+                TRACE(_T("\r\n%u-%u , time  %u - %u = %u\r\n"), start_address, start_address+ length - 1,t2,t1,t2 - t1); //Timeout 的时间;
                 int nErr = WSAGetLastError();
                 if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
                 {
@@ -10003,7 +10049,20 @@ int check_bacnet_data(unsigned char * buffer, int nlength)
 }
 
 
+int shutdown_test_comport = 0;
+OUTPUT int Set_Test_Comport_Status(int command)
+{
+    if (command == 0)
+    {
+        shutdown_test_comport = 0;
+    }
+    else if (command == 1)
+    {
+        shutdown_test_comport = 1;
+    }
 
+    return 0;
+}
 
 /* Test_Comport return
     1  发现两个周期的 55 FF 存在
@@ -10011,21 +10070,29 @@ int check_bacnet_data(unsigned char * buffer, int nlength)
     -1 有数据 但长度不足 8个字节
     -2 监视很50个token 以上 但没有发现 55 FF
     -3 检查完长度超过最后得 都没有发现 55 FF
+    -100  代表串口号大于 100
+    -101  同步打开串口失败
+    -102  串口句柄为零，无效的串口
 */
 OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
 {
     if (comport >= 100)
-        return -1;
+        return -100;
     if (open_com_nocretical(comport) == false)
     {
-        Sleep(11000);
+        Sleep(1000);
 
-        return -1;
+        return -101;
     }
     bool found_bacnet_data = false;
     int n_no_data_online_count = 0;
     for (int i = 0; i < sizeof(ArrayBaudate) / sizeof(ArrayBaudate[0]); i++)
     {
+        if (shutdown_test_comport)
+        {
+            close_com_nocritical(comport);
+            return 1;
+        }
         ntest_ret[i].ncomport = comport;
         ntest_ret[i].baudrate = ArrayBaudate[i];
         ntest_ret[i].test_ret = 0;
@@ -10080,7 +10147,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         if (m_hSerial == NULL)
         {
             continue;
-            return -1;
+            return -102;
         }
 
         ////////////////////////////////////////////////clear com error

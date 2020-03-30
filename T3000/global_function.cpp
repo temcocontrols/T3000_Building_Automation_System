@@ -51,7 +51,7 @@ extern char mycode[2000];
 extern int my_lengthcode;// the length of the edit of code
 #pragma endregion
 
-
+int test_count_special = 0;
 extern uint8_t global_network_number ;
 extern BacnetScreen *Screen_Window;
 extern CBacnetProgram *Program_Window;
@@ -94,7 +94,8 @@ CString* pstrInfo = new CString(strInfo);
 
 int read_one(unsigned char device_var,unsigned short address,int retry_times)
 {
-    if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    if (SPECIAL_BAC_TO_MODBUS)
     {
         unsigned short ret_value = 0;
         int n_ret = 0;
@@ -262,7 +263,8 @@ void SetPaneString(int nIndext,CString str)
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
     //2018 0606 在底层公共读写函数增加对不同协议的处理
-    if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    if (SPECIAL_BAC_TO_MODBUS)
     {
         unsigned short temp_short_data[200];
         memset(temp_short_data, 0, 400);
@@ -318,7 +320,8 @@ int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned
 {
 
     //2018 0606 在底层公共读写函数增加对不同协议的处理
-    if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    if (SPECIAL_BAC_TO_MODBUS)
     {
         int n_ret = 0;
         for (int i = 0; i < retry_times; i++)
@@ -399,7 +402,8 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
 {
     //2018 0525 在底层公共读写函数增加对不同协议的处理
-    if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    if (SPECIAL_BAC_TO_MODBUS)
     {
         int n_ret = 0;
         for (int i = 0; i < retry_times; i++)
@@ -482,7 +486,8 @@ int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsig
 {
     CString data;
     CString g_strT3000LogString;
-    if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    if (SPECIAL_BAC_TO_MODBUS)
     {
         int n_ret = 0;
         for (int i = 0; i < retry_times; i++)
@@ -1817,11 +1822,14 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize,uint8_t retrytime)
 {
-    if (g_protocol == MODBUS_RS485)
+    if ((g_protocol == MODBUS_RS485) ||
+        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))
     {
-        if (READVARUNIT_T3000 == command)
+        //if (READVARUNIT_T3000 == command)
             return -1;
     }
+
+
     int send_status = true;
     
     for (int z=0; z<retrytime; z++)
@@ -1875,6 +1883,26 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
 ****************************************************/
 int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t nstop_index,unsigned int write_object_list)
 {
+    if (g_protocol == MODBUS_RS485)
+    {
+        int test_value1 = 0;
+        int test_value2 = 0;
+        unsigned short write_buffer[200];
+        memset(write_buffer, 0, 400);
+        memcpy(write_buffer, &Device_Basic_Setting, sizeof(Str_Setting_Info));
+        for (int j = 0;j < 200;j++)
+        {
+            write_buffer[j] = htons(write_buffer[j]);
+        }
+        test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_SETTING_START_REG, 100, 4);
+
+        test_value2 = Write_Multi_org_short(g_tstat_id, &write_buffer[100], BAC_SETTING_START_REG + 100, 100, 4);
+        if ((test_value1 >= 0) && (test_value2 >= 0))
+        {
+            return 1;
+        }
+        return -1;
+    }
 	int temp_invoke_id = -1;
 	int send_status = true;
 	int	resend_count = 0;
@@ -5331,6 +5359,12 @@ void Inial_Product_Menu_map()
             memcpy(product_menu[i], temp, 20);
         }
             break;
+        case PWM_TRANSDUCER:
+        {
+            unsigned char  temp[20] = { 1,1,1,0,  0,0,0,0,  0,0,0,0,   0,1,1,1  ,0,0,0,0 };
+            memcpy(product_menu[i], temp, 20);
+        }
+            break;
         case PM_CS_SM_AC:
         case PM_CS_SM_DC:
         case PM_CS_RSM_AC:
@@ -5471,7 +5505,7 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_CS_RSM_AC,_T("CS-RSM-AC")));
 	product_map.insert(map<int,CString>::value_type(PM_CS_RSM_DC,_T("CS-RSM-DC")));
 
-    product_map.insert(map<int, CString>::value_type(PM_TSTAT_AQ, _T("TSTAT-AQ")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT_AQ, _T("Airlab")));
     product_map.insert(map<int, CString>::value_type(PM_MULTI_SENSOR, _T("Multi Sensor")));
     
     product_map.insert(map<int, CString>::value_type(PM_PWMETER, _T("Power_Meter")));
@@ -5818,14 +5852,18 @@ void close_bac_com()
     temphandle = Get_RS485_Handle();
     if (temphandle != NULL)
     {
-        TerminateThread((HANDLE)Get_Thread1(), 0);
-        TerminateThread((HANDLE)Get_Thread2(), 0);
+        Set_Thread1_Status(0);
+        Set_Thread2_Status(0);
+        Sleep(500);
+        //TerminateThread((HANDLE)Get_Thread1(), 0);
+        //TerminateThread((HANDLE)Get_Thread2(), 0);
 
         CloseHandle(temphandle);
         Set_RS485_Handle(NULL);
         //g_mstp_com.status = 0;
     }
     system_connect_info.mstp_status = 0;
+    //TRACE(_T("mstp_status = 1 \r\n"));
 }
 
 SOCKET my_sokect;
@@ -5865,6 +5903,7 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         //2017-12-20  杜帆修改  尝试绑定本地的通讯 UDP 47809 端口 ，若绑定失败就尝试其他端口;
         //T3000 不在绑定47808端口了，改为绑定 47809以后得端口，为了 同时能使用其他bacnet软件.
         system_connect_info.mstp_status = 0;
+        TRACE(_T("mstp_status = 0 \r\n"));
         close_bac_com();
 
 
@@ -5940,29 +5979,46 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         //		print_address("Address", &my_address);
         //int * comport_parameter = new int;
         //*comport_parameter = PROTOCOL_BACNET_IP;
-        if(CM5_hThread!=NULL)
+        //if(CM5_hThread==NULL)
+        //{
+        //    system_connect_info.mstp_status = 0;
+        //    TerminateThread(CM5_hThread,0);
+        //    Sleep(200);
+        //    CM5_hThread = NULL;
+        //}
+        if (CM5_hThread == NULL)
         {
-            system_connect_info.mstp_status = 0;
-            TerminateThread(CM5_hThread,0);
-            CM5_hThread = NULL;
+            CM5_hThread = CreateThread(NULL, NULL, MSTP_Receive, NULL, NULL, &nThreadID_x);
+            CloseHandle(CM5_hThread);
         }
-        CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,NULL,NULL, &nThreadID_x);
     }
     else
     {
+        int * comport_parameter = new int;
+        *comport_parameter = MODBUS_BACNET_MSTP;
+        //if (CM5_hThread != NULL)
+        //{
+        //    system_connect_info.mstp_status = 0;
+        //    TRACE(_T("mstp_status = 0 \r\n"));
+        //    TerminateThread(CM5_hThread, 0);
+        //    Sleep(500);
+        //    CM5_hThread = NULL;
+
+        //}
+
         initial_bip = false;
         set_datalink_protocol(MODBUS_BACNET_MSTP);
-        m_bac_handle_Iam_data.clear();
         SetCommunicationType(0);
         close_bac_com();
         close_com();
-
+        Sleep(2000);
         dlmstp_set_baud_rate(n_baudrate);
         //		dlmstp_set_baud_rate(19200);
         dlmstp_set_mac_address(0);
         dlmstp_set_max_info_frames(DEFAULT_MAX_INFO_FRAMES);
         //dlmstp_set_max_master(DEFAULT_MAX_MASTER);
-        dlmstp_set_max_master(254);
+        dlmstp_set_max_master(bac_gloab_panel);
+        g_thread_max_mac_id = bac_gloab_panel;
         memset(my_port,0,50);
 
         CString temp_cs;
@@ -5985,15 +6041,11 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         set_datalink_protocol(MODBUS_BACNET_MSTP);
         datalink_get_broadcast_address(&broadcast_address);
         datalink_get_my_address(&my_address);
-        int * comport_parameter = new int;
-        *comport_parameter = MODBUS_BACNET_MSTP;
-        if(CM5_hThread!=NULL)
+        if (CM5_hThread == NULL)
         {
-            system_connect_info.mstp_status = 0;
-            TerminateThread(CM5_hThread,0);
-            CM5_hThread = NULL;
+            CM5_hThread = CreateThread(NULL, NULL, MSTP_Receive, comport_parameter, NULL, &nThreadID_x);
+            CloseHandle(CM5_hThread);
         }
-        CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,comport_parameter,NULL, &nThreadID_x);
 
         system_connect_info.mstp_status = 1;
         system_connect_info.ncomport = comport;
@@ -6011,16 +6063,17 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
     return true;
 }
 //#include "datalink.h"
+uint8_t Rx_Buf[MAX_MPDU] = { 0 };
 DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
 {
     BACNET_ADDRESS src = {0};
     uint16_t pdu_len;
 
-    uint8_t Rx_Buf[MAX_MPDU] = { 0 };
+
     g_mstp_flag=true;
     while(g_mstp_flag)
     {
-        pdu_len = datalink_receive(&src,&Rx_Buf[0],MAX_MPDU,INFINITE);
+        pdu_len = datalink_receive(&src,&Rx_Buf[0],MAX_MPDU,6000);
         if(pdu_len==0)
         {
             Sleep(1);
@@ -6028,6 +6081,7 @@ DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
         }
         npdu_handler(&src, &Rx_Buf[0], pdu_len);
     }
+    CM5_hThread = NULL;
     return 0;
 }
 
@@ -6457,6 +6511,8 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
 
     setsockopt(mysocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
+    BOOL bDontLinger = FALSE;
+    setsockopt(mysocket, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));  //20200214 新增直接关闭套接字
 
     BOOL bBroadcast=TRUE;
     setsockopt(mysocket,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -6654,13 +6710,49 @@ BOOL CheckForUpdate(
 }
 
 
+int AddSubNetInfoIntoRefreshList(BYTE* buffer)
+{
+    refresh_subnet_device temp = {0};
+    char * npoint = (char *)buffer;
+    npoint = npoint + 1; //命令位
+    temp.device_count = buffer[1];
+    temp.parent_sn = buffer[2] + buffer[3] * 256 + buffer[4] * 256 * 256 + buffer[5] * 256 * 256 * 256;
+    npoint = npoint + 5;
+    npoint = npoint + 15; //预留
+    for (int i = 0; i < temp.device_count; i++)
+    {
+        temp.device_status[i].nstatus = *(npoint++);
+        temp.device_status[i].modbusid = *(npoint++);
+    }
 
+    bool find_exsit = false;
+
+    for (int i = 0; i<(int)m_refresh_subnet_status.size(); i++)
+    {
+        if (m_refresh_subnet_status.at(i).parent_sn == temp.parent_sn)
+        {
+            m_refresh_subnet_status.at(i) = temp;
+            find_exsit = true;
+            break;
+        }
+    }
+
+    if (!find_exsit)
+    {
+        m_refresh_subnet_status.push_back(temp);
+    }
+
+
+
+    return m_refresh_net_device_data.size();
+
+}
 
 
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 {
-	refresh_net_device temp;
-	Str_UPD_SCAN temp_data;
+    refresh_net_device temp = {0};
+    Str_UPD_SCAN temp_data = {0};
 	memset(&temp_data,0,400);
 	unsigned char * my_temp_point = buffer;
 	temp_data.reg.command = *(my_temp_point++);
@@ -6720,13 +6812,33 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	my_temp_point= my_temp_point + 2;
 	temp_data.reg.hardware_info =  *(my_temp_point++); // 1 代表存在，其他任何代表不存在;
     temp_data.reg.subnet_protocol = *(my_temp_point++);   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
+
+    if (nBufLen >= 67) //新增3个
+    {
+        temp_data.reg.command_version = *(my_temp_point++);
+        if (temp_data.reg.parent_serial_number != 0)
+        {
+            temp_data.reg.subnet_port = *(my_temp_point++);
+            temp_data.reg.subnet_baudrate = *(my_temp_point++);
+        }
+        else
+        {
+            my_temp_point = my_temp_point + 2;
+        }
+    }
+
 	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
 	CString nip_address;
 	nip_address.Format(_T("%u.%u.%u.%u"),temp_data.reg.ip_address_1,temp_data.reg.ip_address_2,temp_data.reg.ip_address_3,temp_data.reg.ip_address_4);
 	CString nproduct_name = GetProductName(temp_data.reg.product_id);
 	if(nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
 	{
-		if (temp_data.reg.product_id<220)
+        if (temp_data.reg.product_id == 0)
+        {
+            //是0的情况下特殊处理 有可能是T3 没有读到对应的产品号信息;
+
+        }
+		else if (temp_data.reg.product_id<220)
 		{
             if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
             {
@@ -6754,6 +6866,9 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp.bacnetip_port = temp_data.reg.bacnetip_port;
     temp.hardware_info = temp_data.reg.hardware_info;
     temp.nprotocol = temp_data.reg.subnet_protocol;
+    temp.command_version = temp_data.reg.command_version;
+    temp.subnet_baudrate = temp_data.reg.subnet_baudrate;
+    temp.subnet_port = temp_data.reg.subnet_port;
 
     if (temp.nprotocol == MODBUS_RS485)   //通过64 命令回的 都属于网络的modbus tcp ，除非直接回 12 
         temp.nprotocol = MODBUS_TCPIP;
@@ -6784,6 +6899,24 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  , Product name : %s ,Name:%s, obj = %u ,panel = %u,isp_mode = %d"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name, cs_temp_label,temp.object_instance,temp.panal_number,temp_data.reg.isp_mode);
 		DFTrace(g_Print);
 	}
+
+#ifdef DEBUG
+    if (nip_address.CompareNoCase(_T("192.168.0.33"))== 0)
+    {
+        //t2 = GetTickCount();
+        //CString temp_time_print;
+        //temp_time_print.Format(_T("receive_count = %d , t2 = %u,t1 = %u, delt =%u\r\n"), ++test_count, t2, t1, t2 - t1);
+        //TRACE(temp_time_print);
+        //t1 = t2;
+
+        g_Print.Format(_T("receive_count = %d,Serial = %12u     ID = %d , PID = %d, ip = %s  , Product name : %s ,Name:%s, obj = %u ,panel = %u,isp_mode = %d , p = %d"), ++test_count_special, nSerial, temp_data.reg.modbus_id, temp_data.reg.product_id, nip_address, nproduct_name, cs_temp_label, temp.object_instance, temp.panal_number, temp_data.reg.isp_mode, temp_data.reg.subnet_protocol);
+        //DFTrace(g_Print);
+
+        g_Print = g_Print + _T("\r\n");
+        //TRACE(g_Print);
+    }
+#endif // DEBUG
+
 
 	if((temp_data.reg.isp_mode == 1) || (temp_data.reg.isp_mode == 2))
 	{
@@ -7136,7 +7269,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
     //////////////////////////////////////////////////////////////////////////
     const DWORD END_FLAG = 0x00000000;
     TIMEVAL time;
-    time.tv_sec =3;
+    time.tv_sec =8;
     time.tv_usec = 1000;
 
     fd_set fdSocket;
@@ -7177,7 +7310,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
             }
         }
 
-
+        test_count_special = 0;
         int time_out=0;
         BOOL bTimeOut = FALSE;
         while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
@@ -7207,7 +7340,9 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                 goto END_REFRESH_SCAN;
                 return 0;
             }
-
+            unsigned int t1 = GetTickCount();//程序段开始前取得系统运行时间(ms);
+            unsigned int t2;//程序段开始前取得系统运行时间(ms);
+            
             if(nSelRet > 0)
             {
                 ZeroMemory(buffer, 512);
@@ -7216,13 +7351,23 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                 do
                 {
                     nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
-
+                   
+                   
                     BYTE szIPAddr[4] = {0};
                     if(nRet > 0)
                     {
                         FD_ZERO(&fdSocket);
                         if(buffer[0]==RESPONSE_MSG)
                         {
+#ifdef DEBUG
+                            //t2 = GetTickCount();
+                            //CString temp_time_print;
+                            //temp_time_print.Format(_T("receive_count = %d , t2 = %u,t1 = %u, delt =%u\r\n"), ++test_count, t2, t1, t2 - t1);
+                            //TRACE(temp_time_print);
+                            //t1 = t2;
+#endif // DEBUG
+
+
 							if(scaning_mode)
 							{
 								g_llTxCount++;
@@ -7275,6 +7420,10 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                             {
                                 AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
                             }
+                        }
+                        else if (buffer[0] == RESPONSE_TOTAL_SUB_INFO)
+                        {
+                            AddSubNetInfoIntoRefreshList(buffer);
                         }
 #if 0
                         else if(buffer[0]  == RESPONSE_LABEL)
@@ -8835,7 +8984,6 @@ void Copy_Data_From_485_to_Bacnet(unsigned short *start_point)
 
 
 
-
 //第一个字节 版本
 //然后是 4个字节的 时间 如果时间太久了 也需要重新获取;
 int SaveModbusConfigFile(CString &SaveConfigFilePath)
@@ -9868,10 +10016,16 @@ void LoadTstat_InputData()
     m_tstat_input_data.push_back(temp_tstat_input);
 
 #if 1//  g_strSensorName
-    if(product_register_value[695] == 0)
-        strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);//130   Auto 的时候用 130时
+    if (product_register_value[695] == 0)
+    {
+        strTemp.Format(_T("%.1f"), product_register_value[MODBUS_INTERNAL_THERMISTOR] / 10.0);//130   Auto 的时候用 130时 154校准
+        temp_tstat_input.Calibration.regAddress = MODBUS_CALIBRATION_INTERNAL_THERMISTOR ;
+    }
     else
-        strTemp.Format(_T("%.1f"), product_register_value[MODBUS_TEMPRATURE_CHIP] / 10.0);//121    Manual 用 121
+    {
+        strTemp.Format(_T("%.1f"), product_register_value[MODBUS_TEMPRATURE_CHIP] / 10.0);//121    Manual 用 121   153校准
+        temp_tstat_input.Calibration.regAddress = MODBUS_CALIBRATION_TERM;
+    }
     if (g_strSensorName.Trim().IsEmpty())
     {
         temp_tstat_input.InputName.StrValue = _T("Temperature");
@@ -10077,7 +10231,7 @@ void LoadTstat_InputData()
         }
         else if ((m_crange == 14) || (m_crange == (14 + 128)))
         {
-            strTemp.Format(_T("%.2f"), ((float)product_register_value[MODBUS_ANALOG_INPUT1 + i - 1]) / 10);
+            strTemp.Format(_T("%.2f"), ((float)product_register_value[MODBUS_ANALOG_INPUT1 + i - 1]) / 100);
             m_tstat_input_data.at(i - 1).Unit.StrValue = _T("Volts");
         }
         else
@@ -10250,7 +10404,13 @@ void LoadTstat_InputData()
     m_tstat_input_data.at(11).InputName.StrValue = _T("Light Intensity");
     m_tstat_input_data.at(11).AM.StrValue=NO_APPLICATION;
     m_tstat_input_data.at(11).CustomTable.StrValue=NO_APPLICATION;
-    m_tstat_input_data.at(11).Filter.StrValue=NO_APPLICATION;
+
+
+    m_tstat_input_data.at(11).Filter.StrValue.Format(_T("%d"), (unsigned char)product_register_value[MODBUS_TSTAT_LUX_FILTER]);
+    m_tstat_input_data.at(11).Filter.regAddress = MODBUS_TSTAT_LUX_FILTER;
+    m_tstat_input_data.at(11).Filter.RegValue = product_register_value[MODBUS_TSTAT_LUX_FILTER];
+
+
     m_tstat_input_data.at(11).Function.StrValue=NO_APPLICATION;
     m_tstat_input_data.at(11).Range.StrValue=L"LUX";
     m_tstat_input_data.at(11).Unit.StrValue=L"LUX";
@@ -12141,9 +12301,10 @@ unsigned int GetDeviceInstance(unsigned char pid_type)
     unsigned short temp_high = 0;
     Get_Instance_Reg_Map(pid_type, temp_high, temp_low);
 
-
-    int ret_low = read_one(g_tstat_id, temp_low, 6);
-    int ret_high = read_one(g_tstat_id, temp_high, 6);
+    int ret_low = 0;
+    int ret_high = 0;
+    ret_low = read_one(g_tstat_id, temp_low, 6);
+    ret_high = read_one(g_tstat_id, temp_high, 6);
 
     if ((ret_low >= 0) && (ret_high >= 0))
     {
@@ -12156,7 +12317,21 @@ unsigned int GetDeviceInstance(unsigned char pid_type)
 
 }
 
+//修改数据库中的modbus ID
+int ChangeModbusDB(unsigned int nserialnumber, int nmodbusid, LPCTSTR Dbpath)
+{
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    CppSQLite3DB SqliteDBBuilding;
+    CString SqlText;
 
+    SqlText.Format(_T("update ALL_NODE set Product_ID = '%d' where Serial_ID='%d'"), nmodbusid, nserialnumber);
+    SqliteDBBuilding.open((UTF8MBSTR)Dbpath);
+
+    SqliteDBBuilding.execDML((UTF8MBSTR)SqlText);
+    SqliteDBBuilding.closedb();
+    ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING, 0, 0);
+    return 1;
+}
 
 int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bacnet 
                          unsigned char modbus_id,
@@ -12212,6 +12387,7 @@ void Initial_Instance_Reg_Map()
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT7, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT8, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT9, _T("991,992")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT_AQ, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT7_ARM, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_PM5E_ARM, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT10, _T("35,32")));
@@ -12248,6 +12424,41 @@ bool bac_Invalid_range(unsigned char nrange)
 }
 
 
+bool function_array[255][10][20];
+
+
+int Initial_Function()
+{
+    for (int i = 0; i < 255; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            for (int k = 0; k < 20; k++)
+            {
+                function_array[i][j][k] = true;
+            }
+        }
+    }
+
+    function_array[PM_TSTAT10][MODBUS_RS485][F_EXPANSION_IO] = 0;
+    function_array[PM_TSTAT10][MODBUS_TCPIP][F_EXPANSION_IO] = 0;
+    function_array[PM_TSTAT10][MODBUS_BACNET_MSTP][F_EXPANSION_IO] = 0;
+    function_array[PM_TSTAT10][PROTOCOL_BACNET_IP][F_EXPANSION_IO] = 0;
+
+    function_array[PM_TSTAT10][MODBUS_RS485][F_SETTING_USER_LOGIN] = 0;
+    function_array[PM_TSTAT10][MODBUS_TCPIP][F_SETTING_USER_LOGIN] = 0;
+    function_array[PM_TSTAT10][MODBUS_BACNET_MSTP][F_SETTING_USER_LOGIN] = 0;
+    function_array[PM_TSTAT10][PROTOCOL_BACNET_IP][F_SETTING_USER_LOGIN] = 0;
+    return 1;
+}
+
+//检查某个产品 ，在某种协议下，是否支持某种功能
+int Check_Function(int product_id, unsigned char nprotocol, FunctionNumber function_number)
+{
+    if ((product_id >= 255) || (nprotocol >= 10) || (function_number > 20))
+        return 0;
+    return function_array[product_id][nprotocol][function_number];
+}
 
 int PanelName_Map(int product_type)
 {
@@ -12261,4 +12472,144 @@ int PanelName_Map(int product_type)
     }
 
     return 715; // 如果没有默认按照从715 开始 8个寄存器.
+}
+
+
+int Get_Msv_next_Name_and_Value_BySearchName(int ntable, CString nitemname, CString  &csNextItemString, int &nNextValue)
+{
+    if (ntable > 2)
+        return  -1;
+    nitemname.Trim();
+    int index = -1;
+    for (int i = 0; i < STR_MSV_MULTIPLE_COUNT; i++)
+    {
+        if (m_msv_data.at(ntable).msv_data[i].status) //首先要确保 这一行是使能的;
+        {
+            CString temp_name;
+            MultiByteToWideChar(CP_ACP, 0, (char *)m_msv_data.at(ntable).msv_data[i].msv_name,
+                (int)strlen((char *)m_msv_data.at(ntable).msv_data[i].msv_name) + 1,
+                temp_name.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_name.ReleaseBuffer();
+            temp_name.Trim();
+
+
+            if(nitemname.CompareNoCase(temp_name) == 0)
+            //if (nitemvalue == m_msv_data.at(ntable).msv_data[i].msv_value)
+            {
+                //顺着找一遍 ,找到对应的下一个;
+                for (int j = i + 1; j < STR_MSV_MULTIPLE_COUNT; j++)
+                {
+                    if (m_msv_data.at(ntable).msv_data[j].status)
+                    {
+                        csNextItemString = m_msv_data.at(ntable).msv_data[j].msv_name;
+                        nNextValue = m_msv_data.at(ntable).msv_data[j].msv_value;
+                        return j;
+                    }
+                }
+
+                //如果顺着找没有找到，就回到顺着的第一个;
+                for (int j = 0; j < i; j++)
+                {
+                    if (m_msv_data.at(ntable).msv_data[j].status)
+                    {
+                        csNextItemString = m_msv_data.at(ntable).msv_data[j].msv_name;
+                        nNextValue = m_msv_data.at(ntable).msv_data[j].msv_value;
+                        return j;
+                    }
+                }
+
+            }
+        }
+    }
+    return -2;
+}
+
+
+
+int Get_Msv_next_Name_and_Value_BySearchValue(int ntable, int nitemvalue, CString  &csNextItemString ,int &nNextValue)
+{
+    if (ntable > 2)
+        return  -1;
+    int index = -1;
+    for (int i = 0; i < STR_MSV_MULTIPLE_COUNT; i++)
+    {
+        if (m_msv_data.at(ntable).msv_data[i].status) //首先要确保 这一行是使能的;
+        {
+            if (nitemvalue == m_msv_data.at(ntable).msv_data[i].msv_value)
+            {
+                //顺着找一遍 ,找到对应的下一个;
+                for (int j = i+1; j < STR_MSV_MULTIPLE_COUNT; j++)
+                {
+                    if (m_msv_data.at(ntable).msv_data[j].status)
+                    {
+                        csNextItemString = m_msv_data.at(ntable).msv_data[j].msv_name;
+                        nNextValue = m_msv_data.at(ntable).msv_data[j].msv_value;
+                        return j;
+                    }
+                }
+
+                //如果顺着找没有找到，就回到顺着的第一个;
+                for (int j = 0; j < i; j++)
+                {
+                    if (m_msv_data.at(ntable).msv_data[j].status)
+                    {
+                        csNextItemString = m_msv_data.at(ntable).msv_data[j].msv_name;
+                        nNextValue = m_msv_data.at(ntable).msv_data[j].msv_value;
+                        return j;
+                    }
+                }
+
+            }
+        }
+    }
+    return -2;
+}
+
+int Get_Msv_Item_Name(int ntable, int nitemvalue,CString &csItemString)
+{
+    if (ntable > 2)
+        return  -1;
+    for (int i = 0; i < STR_MSV_MULTIPLE_COUNT; i++)
+    {
+        if (m_msv_data.at(ntable).msv_data[i].status) //首先要确保 这一行是使能的;
+        {
+            if (nitemvalue == m_msv_data.at(ntable).msv_data[i].msv_value)
+            {
+                csItemString = m_msv_data.at(ntable).msv_data[i].msv_name;
+                return 1;
+            }
+        }
+    }
+    return -1;
+}
+
+int Get_Msv_Table_Name(int x)
+{
+    if (x >= BAC_MSV_COUNT)
+        return -1;
+    int index = 0; //最多显示三个  例如AAA/BB/CC
+    Custom_Msv_Range[x].Empty();
+    for (int k = 0; k < STR_MSV_MULTIPLE_COUNT; k++)
+    {
+        CString temp_cs;
+        if (index >= 3)
+            break;
+        if (m_msv_data.at(x).msv_data[k].status == 1)
+        {
+            MultiByteToWideChar(CP_ACP, 0, (char *)m_msv_data.at(x).msv_data[k].msv_name, (int)strlen((char *)m_msv_data.at(x).msv_data[k].msv_name) + 1,
+                temp_cs.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_cs.ReleaseBuffer();
+            temp_cs.Trim();
+            if (temp_cs.IsEmpty())
+                continue;
+            if (index != 0)
+                temp_cs = _T(" / ") + temp_cs;
+
+            index++;
+
+            Custom_Msv_Range[x] = Custom_Msv_Range[x] + temp_cs;
+        }
+
+    }
+    return 1;
 }

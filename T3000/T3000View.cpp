@@ -20,7 +20,7 @@
 #include "DisplayConfig.h"
 #include "LedsDialog.h"
  #include "../SQLiteDriver/CppSQLite3.h"
-
+#include "TstatSetpointDetail.h"
 
 #ifdef _DEBUG
     #define new DEBUG_NEW
@@ -80,6 +80,7 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
     ON_EN_KILLFOCUS(IDC_DAY_EDIT, &CT3000View::OnEnKillfocusDayEdit)
     //ON_BN_CLICKED(IDC_TEST_SLIDER, &CT3000View::OnBnClickedTestSlider)
     ON_CBN_SELCHANGE(IDC_COMBO_SYS_MODE, &CT3000View::OnCbnSelchangeComboSysMode)
+    ON_BN_CLICKED(IDC_BUTTON_SETPOINT_DETAIL, &CT3000View::OnBnClickedButtonSetpointDetail)
 END_MESSAGE_MAP()
 
 #include "TStatInputView.h"
@@ -410,6 +411,8 @@ void CT3000View::OnFileOpen()
 /// </summary>
 void CT3000View::Fresh()
 {
+    Tstat_Setpoint_data.clear();
+
     CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 
     g_ifanStatus = product_register_value[MODBUS_FAN_SPEED];
@@ -552,6 +555,7 @@ void CT3000View::Fresh()
 		InitFlexSliderBars_tstat6();
 	}
 
+
     switch_product_last_view();
 }
 
@@ -599,7 +603,6 @@ void CT3000View::Fresh_T3000View()
     FreshCtrl();
     FreshIOGridTable();
     InitFanSpeed();
-
 
 
 
@@ -3522,7 +3525,7 @@ void CT3000View::OnBnClickedUnoccupiedMark()
         int ret=write_one(g_tstat_id,MODBUS_INFO_BYTE,0);	//184  109
         if (ret>0)
         {
-            product_register_value[MODBUS_CALIBRATION]=0;
+            //product_register_value[MODBUS_CALIBRATION]=0;  2020 03 09 杜帆屏蔽 TSTAT8 勾选 UNOCC 的时候  MODBUS_CALIBRATION 为-1 导致崩溃
         }
         product_register_value[MODBUS_INFO_BYTE] = 0;//184
         //if ((m_strModelName.CompareNoCase(_T("Tstat6")) == 0)||(m_strModelName.CompareNoCase(_T("Tstat7")) == 0))
@@ -4043,7 +4046,7 @@ void CT3000View::OnBnClickedBtnSynctime()
         AfxMessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[1] = (BYTE)(time.GetMonth());
     nRet[1] = write_one(g_tstat_id, MODBUS_MONTH, szTime[1],6);
     if (nRet[1] < 0)
@@ -4051,7 +4054,7 @@ void CT3000View::OnBnClickedBtnSynctime()
         AfxMessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[2] = (BYTE)(time.GetDayOfWeek()-1);
     nRet[2] = write_one(g_tstat_id, MODBUS_WEEK, szTime[2], 6);
     if (nRet[2] < 0)
@@ -4059,7 +4062,7 @@ void CT3000View::OnBnClickedBtnSynctime()
         AfxMessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[3] = (BYTE)(time.GetDay());
     nRet[3] = write_one(g_tstat_id, MODBUS_DAY, szTime[3], 6);
     if (nRet[3] < 0)
@@ -4067,7 +4070,7 @@ void CT3000View::OnBnClickedBtnSynctime()
         AfxMessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[4] = (BYTE)(time.GetHour());
     nRet[4] = write_one(g_tstat_id, MODBUS_HOUR, szTime[4], 6);
     if (nRet[4] < 0)
@@ -4075,7 +4078,7 @@ void CT3000View::OnBnClickedBtnSynctime()
         AfxMessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[5] = (BYTE)(time.GetMinute());
     nRet[5] = write_one(g_tstat_id, MODBUS_MINUTE, szTime[5], 6);
     if (nRet[5] < 0)
@@ -4083,7 +4086,7 @@ void CT3000View::OnBnClickedBtnSynctime()
         AfxMessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[6] = (BYTE)(time.GetSecond());
     nRet[6] = write_one(g_tstat_id, MODBUS_SECOND, szTime[6], 6);
     if (nRet[6] < 0)
@@ -7286,4 +7289,12 @@ void CT3000View::OnCbnSelchangeComboSysMode()
     {
         temp_cs = _T("Change system mode to ") + temp_string + _T(" failed!");
     }
+}
+
+
+void CT3000View::OnBnClickedButtonSetpointDetail()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CTstatSetpointDetail dlg;
+    dlg.DoModal();
 }

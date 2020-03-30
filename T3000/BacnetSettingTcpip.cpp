@@ -303,6 +303,33 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
         {
             if (i == MAIN_MSTP)   //原由： 1 为 MSTP Slave     9为 MSTP Master   现在统统改为MSTP
                 i = MSTP_MASTER;
+            if (g_selected_product_id != PM_TSTAT10)
+            {
+                if (i == MSTP_MASTER)
+                {
+                    if ((Device_Basic_Setting.reg.com2_config == MAIN_MSTP) ||
+                        (Device_Basic_Setting.reg.com2_config == MSTP_MASTER))
+                    {
+                        //想配置为mstp 必须其他的口设置为 空;
+                        MessageBox(_T("With the current version of firmware , only one Bacnet MSTP subnet is supported, please select MSTP on only ONE of the RS485 ports"), _T("Message"));
+                        ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
+                        return;
+                    }
+                }
+                //else if ((i == MAIN_MODBUS) || (i == SUB_MODBUS))
+                //{
+                //    if ((Device_Basic_Setting.reg.com2_config == MSTP_MASTER) ||
+                //        (Device_Basic_Setting.reg.com2_config == MAIN_MSTP))
+                //    {
+                //        MessageBox(_T("With the current version of firmware , only one Bacnet MSTP subnet is supported, please select MSTP on only ONE of the RS485 ports"), _T("Message"));
+                //        ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
+                //        return;
+                //    }
+                //}
+            }
+
+
+
             Device_Basic_Setting.reg.com0_config = i;
             break;
         }
@@ -330,14 +357,24 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
         {
             return;
         }
+        if (g_selected_product_id == PM_TSTAT10)
+        {
+            //并且 TSTAT10 需要  重启 协议更改 才能生效;
+            if (modbus_0_bacnet_1 == 1) //如果是要改到mstp协议
+                Device_Basic_Setting.reg.com0_config = 1;  //1 是TSTAT10 的mstp协议;
+            else
+                Device_Basic_Setting.reg.com0_config = 2;  //2 是TSTAT10的modbus协议
 
+        }
         ChangeDeviceProtocol(modbus_0_bacnet_1, Device_Basic_Setting.reg.modbus_id, 59, Device_Basic_Setting.reg.com0_config, 0, g_strCurBuildingDatabasefilePath);
+        
         return;
     }
 
     CString temp_task_info;
     temp_task_info.Format(_T("Change serial port 0 "));
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+    ClearSubNetInfo();
 }
 
 
@@ -359,13 +396,14 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingCom1()
     CString temp_task_info;
     temp_task_info.Format(_T("Change serial port 1 "));
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+    ClearSubNetInfo();
 }
 
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
 {
     unsigned char temp_main_value = Device_Basic_Setting.reg.com2_config;
-
+    UpdateData();
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->GetLBText(nSel, temp_string);
@@ -375,10 +413,69 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
         {
             if (i == MAIN_MSTP)   //原由： 1 为 MSTP Slave     9为 MSTP Master   现在统统改为MSTP
                 i = MSTP_MASTER;
+            if (i == MSTP_MASTER)
+            {
+                if ((Device_Basic_Setting.reg.com0_config == MSTP_MASTER) || (Device_Basic_Setting.reg.com0_config == MAIN_MSTP))
+                {
+                    //想配置为mstp 必须其他的口设置为 空;
+                    MessageBox(_T("With the current version of firmware , only one Bacnet MSTP subnet is supported, please select MSTP on only ONE of the RS485 ports"), _T("Message"));
+                    ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
+                    return;
+                }
+            }
+            //else if ((i == MAIN_MODBUS) || (i == SUB_MODBUS))
+            //{
+            //    if ((Device_Basic_Setting.reg.com0_config == MSTP_MASTER) ||
+            //        (Device_Basic_Setting.reg.com0_config == MAIN_MSTP))
+            //    {
+            //        MessageBox(_T("With the current version of firmware , only one Bacnet MSTP subnet is supported, please select MSTP on only ONE of the RS485 ports"), _T("Message"));
+            //        ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
+            //        return;
+            //    }
+            //}
+
             Device_Basic_Setting.reg.com2_config = i;
             break;
         }
     }
+
+    if (temp_main_value == Device_Basic_Setting.reg.com2_config)  // 若无变化，则退出;
+        return;
+
+    if ((g_protocol == MODBUS_RS485) ||
+        (MODBUS_BACNET_MSTP == g_protocol))
+    {
+
+        bool modbus_0_bacnet_1 = 0;
+        if ((Device_Basic_Setting.reg.com2_config == MAIN_MSTP) ||
+            (Device_Basic_Setting.reg.com2_config == MSTP_MASTER))
+        {
+            modbus_0_bacnet_1 = 1;
+        }
+        else if ((Device_Basic_Setting.reg.com2_config == NOUSE) ||
+            (Device_Basic_Setting.reg.com2_config == SUB_MODBUS) ||
+            (Device_Basic_Setting.reg.com2_config == MAIN_MODBUS))
+        {
+            modbus_0_bacnet_1 = 0;
+        }
+        else
+        {
+            return;
+        }
+        //if (g_selected_product_id == PM_TSTAT10)
+        //{
+        //    //并且 TSTAT10 需要  重启 协议更改 才能生效;
+        //    if (modbus_0_bacnet_1 == 1) //如果是要改到mstp协议
+        //        Device_Basic_Setting.reg.com0_config = 1;  //1 是TSTAT10 的mstp协议;
+        //    else
+        //        Device_Basic_Setting.reg.com0_config = 2;  //2 是TSTAT10的modbus协议
+
+        //}
+        ChangeDeviceProtocol(modbus_0_bacnet_1, Device_Basic_Setting.reg.modbus_id, 61, Device_Basic_Setting.reg.com2_config, 0, g_strCurBuildingDatabasefilePath);
+
+        return;
+    }
+
 
 #if 0    //暂时屏蔽     以后在客户升级许多次 后 在  禁止许 Asix 改;
     if (Device_Basic_Setting.reg.panel_type == PM_MINIPANEL)
@@ -397,6 +494,30 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
     CString temp_task_info;
     temp_task_info.Format(_T("Change serial port 2 "));
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+    ClearSubNetInfo();
+}
+
+void CBacnetSettingTcpip::ClearSubNetInfo()
+{
+    CShowMessageDlg dlg;
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    dlg.SetStaticText(_T("After changing the protocol or baud rate\r\nmake sure that the devices for RS485 Main and RS485 Sub keep the same with this"));
+    //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+    dlg.SetStaticTextColor(RGB(0, 0, 255));
+    dlg.SetStaticTextSize(25, 20);
+    dlg.SetProgressAutoClose(5000, 1, EVENT_WARNING_CHANGE_PROTOCOL_BAUDRATE);
+
+    int ret_cusunits = 0;
+    ret_cusunits = WritePrivateData_Blocking(g_bac_instance, WRITE_SETTING_COMMAND, 0, 0);
+    if (ret_cusunits < 0)
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Scanning RS485 Main  and RS485 Sub Failed !"));
+    }
+    else
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Ready to scan RS485 Main  and RS485 Sub port!"));
+    }
+    dlg.DoModal();
 }
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingBaudrate0()
@@ -416,7 +537,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingBaudrate0()
     CString temp_task_info;
     temp_task_info.Format(_T("Change serial port 0 baudrate "));
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
-
+    ClearSubNetInfo();
 }
 
 
@@ -438,6 +559,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingBaudrate1()
     CString temp_task_info;
     temp_task_info.Format(_T("Change serial port 1 baudrate "));
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+    ClearSubNetInfo();
 }
 
 
@@ -458,6 +580,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingBaudrate2()
     CString temp_task_info;
     temp_task_info.Format(_T("Change serial port 2 baudrate "));
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+    ClearSubNetInfo();
 }
 
 

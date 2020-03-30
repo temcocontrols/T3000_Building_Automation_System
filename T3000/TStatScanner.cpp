@@ -44,7 +44,7 @@ DWORD * nScanTCPThreadID = NULL;
 
 const int TCP_COMM_PORT = 6001;
 extern int g_ScnnedNum;
-extern bool b_pause_refresh_tree ;
+
 
 
 
@@ -539,16 +539,28 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
             {
                 m_scan_info.at(scan_item).scan_status = SCAN_STATUS_DETECTING;
                 memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
-                memcpy(m_scan_info.at(scan_item).scan_notes, "Automatic detecting ,please wait!", strlen("Automatic detecting ,please wait!"));
+                char temp_show_info[MAX_PATH] = {0};
+                sprintf(temp_show_info, "Automatic detecting ,please wait!");
+                memcpy(m_scan_info.at(scan_item).scan_notes, temp_show_info, strlen(temp_show_info));
             }
         }
 
         BOOL  bret = open_com_nocretical(com_port);
+        if (bret == 0) //打开串口遇到问题;
+        {
+            goto endcritical_thread;
+        }
         Sleep(200);
         close_com_nocritical(com_port);
         Sleep(200);
+        int test_com_ret = 0;
+        test_com_ret = Test_Comport(com_port, temp_baudrate_ret);
+        //if()
+        if (g_bCancelScan)
+        {
+            goto endcritical_thread;
+        }
 
-        Test_Comport(com_port, temp_baudrate_ret);
         for (int j = 0; j < 20; j++)
         {
             if (temp_baudrate_ret[j].ncomport == 0)
@@ -658,7 +670,10 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
 
                     continue;
                 }
-
+                if (g_bCancelScan)
+                {
+                    goto endcritical_thread;
+                }
                 if (pScan->OpenCom(n))
                 {
                     pScan->SetComPort(n);
@@ -696,7 +711,7 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
     }
 
     //g_ScnnedNum = 254;
-
+endcritical_thread:
     CloseHandle(hScanComData[ncount]);
     //清空 句柄和线程ID；
     hScanComData[ncount] = NULL;
@@ -709,7 +724,10 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
 
 void CTStatScanner::background_binarysearch(int nComPort,int nItem,int nbaudrate)
 {
-
+    if (g_bCancelScan)
+    {
+        return;
+    }
 
     binarySearchforComDevice(nComPort, false,1,254, nItem, nbaudrate);
 
@@ -1817,6 +1835,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
     GetIPMaskGetWayForScan();
     CTStatScanner* pScanner = (CTStatScanner*)pParam;
 	                   reply_count = 0;
+
     if(m_scan_info.at(scan_udp_item).scan_skip == false)
     {
         for (int index=0; index<g_Scan_Vector_Subnet.size(); index++)
@@ -2478,6 +2497,11 @@ UINT _ScanTstatThread2(LPVOID pParam)
     {
         Sleep(1000);
         bool b_not_finished = false;
+        if (g_bCancelScan)
+        {
+            pScan->is_delete_tstat_scanner = false;
+            return 1;
+        }
         for (int i = 0;i < pScan->m_szComs.size();i++)
         {
             if (hScanComData[i] != NULL)
@@ -4038,11 +4062,11 @@ void CTStatScanner::ScanAll()
 {
     m_szNCScanRet.clear();	//Clear all the old information ,when we start a new scan;
     GetBuildingName();
-
+    Set_Test_Comport_Status(0); //初始化关闭自动检测的值，主要这个事情是在线程中完成的.
 
     Initial_Scan_Info();
 
-    b_pause_refresh_tree = true ;
+    b_pause_refresh_tree = SCANALL;
 
     ScanDetectComData();//检测串口数据;
 
@@ -4912,8 +4936,11 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
         temphandle1 = Get_RS485_Handle();
         if (temphandle1 != NULL)
         {
-            TerminateThread((HANDLE)Get_Thread1(), 0);
-            TerminateThread((HANDLE)Get_Thread2(), 0);
+            Set_Thread1_Status(0);
+            Set_Thread2_Status(0);
+            Sleep(500);
+            //TerminateThread((HANDLE)Get_Thread1(), 0);
+            //TerminateThread((HANDLE)Get_Thread2(), 0);
 
             CloseHandle(temphandle1);
             Set_RS485_Handle(NULL);
@@ -4952,14 +4979,41 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
 
     int ret_results;
 
-
+    bac_gloab_panel = 254; //扫描的时候 全局扫描，连接的时候就不用轮询那么多;
     Initial_bac(temp_port,_T(""), n_mstp_baudrate);
     TRACE(_T("Now scan with COM%d\r\n"),temp_port);
     Sleep(5000);//等待几秒让MSTP 的token 运行起来.
+    int last_poll_node = 0;
+    unsigned char mstp_add[255] = { 0 };
+    unsigned char mstp_count = 0;
     for (int i=0; i<30; i++)
     {
+        mstp_port_struct_t Temp_MSTP_Port;
+        Get_MSTP_STRUCT(&Temp_MSTP_Port);
+        //TRACE("", Temp_MSTP_Port.);
+        Get_MSTP_Nodes(mstp_add, &mstp_count);
+        if ((Temp_MSTP_Port.SoleMaster == 1))
+        {
+            CString strInfo;
+            strInfo.Format(_T("No other master node exsit,please wait."));
+            memset(m_scan_info.at(scan_bacnet_ip_item).scan_notes, 0, 250);
+            char temp_char[250];
+            WideCharToMultiByte(CP_ACP, 0, strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL);
+            memcpy(m_scan_info.at(scan_bacnet_ip_item).scan_notes, temp_char, 250);
+            Sleep(5000);
+        }
+
+        last_poll_node = Temp_MSTP_Port.Poll_Station;
+
+        Sleep(200);
         CString strInfo;
-        strInfo.Format(_T("Send MSTP command time left(%d)"),30-i);
+        strInfo.Format(_T("Send MSTP command time left(%d),Poll station %d.MSTP MAC ID : "), 30 - i, Temp_MSTP_Port.Poll_Station);
+        for (int z = 0; z < mstp_count; z++)
+        {
+            CString temp_nodes;
+            temp_nodes.Format(_T("%d ,"), mstp_add[z]);
+            strInfo = strInfo + temp_nodes;
+        }
         memset(m_scan_info.at(scan_bacnet_ip_item).scan_notes,0,250);
         char temp_char[250];
         WideCharToMultiByte( CP_ACP, 0, strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL );
@@ -4967,8 +5021,14 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
         Send_WhoIs_Global(-1,-1);
         Sleep(2000);
         m_scan_info.at(scan_bacnet_ip_item).scan_found = m_bac_handle_Iam_data.size();
-        if((m_bac_handle_Iam_data.size() > 0) && (i > 15))
+        if ((m_bac_handle_Iam_data.size() > 0) &&
+            (m_bac_handle_Iam_data.size() >= mstp_count) &&
+            (i>=10) &&
+            mstp_count > 0)
+        {
+            Sleep(1);
             break;
+        }
     }
 
 

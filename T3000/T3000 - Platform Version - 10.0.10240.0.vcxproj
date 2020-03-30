@@ -357,6 +357,7 @@
     <ClCompile Include="TStatInputView.cpp" />
     <ClCompile Include="TStatOutputView.cpp" />
     <ClCompile Include="TstatRangeDlg.cpp" />
+    <ClCompile Include="TstatSetpointDetail.cpp" />
     <ClCompile Include="TstatZigbeeLogic.cpp" />
     <ClCompile Include="TStat_Dev.cpp" />
     <ClCompile Include="TStat_Net.cpp" />
@@ -688,6 +689,7 @@
     <ClInclude Include="TStatInputView.h" />
     <ClInclude Include="TStatOutputView.h" />
     <ClInclude Include="TstatRangeDlg.h" />
+    <ClInclude Include="TstatSetpointDetail.h" />
     <ClInclude Include="TstatZigbeeLogic.h" />
     <ClInclude Include="Tstat_HelpDoc.h" />
     <ClInclude Include="AddBuilding.h" />

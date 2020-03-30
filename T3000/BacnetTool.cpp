@@ -193,8 +193,11 @@ void CBacnetTool::InitialBacnetConnection()
 	bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
 
 
-	if(CM5_hThread==NULL)
-		CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,this,NULL, &nThreadID_mstp);
+    if (CM5_hThread == NULL)
+    {
+        CM5_hThread = CreateThread(NULL, NULL, MSTP_Receive, this, NULL, &nThreadID_mstp);
+        CloseHandle(CM5_hThread);
+    }
 	Send_WhoIs_Global(-1, -1);
 }
 

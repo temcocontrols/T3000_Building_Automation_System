@@ -726,9 +726,6 @@
     <ClCompile Include="TstatAQ.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BacnetEmailAlarm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Bacnet_Range_Msv.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
@@ -756,7 +753,13 @@
     <ClCompile Include="CustomSource\Splash.cpp">
       <Filter>CustomSource</Filter>
     </ClCompile>
+    <ClCompile Include="BacnetEmailAlarm.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
     <ClCompile Include="BacnetThirdPartyMain.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="TstatSetpointDetail.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1925,6 +1928,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetThirdPartyMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TstatSetpointDetail.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

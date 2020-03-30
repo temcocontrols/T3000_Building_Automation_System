@@ -1114,7 +1114,7 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 
 
 	}
-	unsigned short TimeBuffer[100];
+    unsigned short TimeBuffer[100] = {0};
 	int EventNumber[2] = { 0,0 };
 	int i = 0;
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
@@ -1166,13 +1166,36 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 	}
 
 
+    g_progress_persent = 0;
+    int n_total_count = 24;
+    int n_temp_count = 0;
+    int n_ret = -1;
+    int sch_write_delay_time = 100;
 
-
-
-	Write_Multi_short(g_tstat_id, TimeBuffer, 813, 12);
-	write_one(g_tstat_id, 909, EventNumber[0]);
-	write_one(g_tstat_id, 910, EventNumber[1]);
-
+    n_ret = Write_Multi_short(g_tstat_id, TimeBuffer, 813, 12,6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 909, EventNumber[0],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 910, EventNumber[1],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
 	EventNumber[0] = 0;
 	EventNumber[1] = 0;
@@ -1223,9 +1246,30 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 	}
 
 
-	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 1, 12);
-	write_one(g_tstat_id, 911, EventNumber[0]);
-	write_one(g_tstat_id, 912, EventNumber[1]);
+    n_ret = Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 1, 12);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 911, EventNumber[0],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 912, EventNumber[1],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
 	EventNumber[0] = 0;
 	EventNumber[1] = 0;
@@ -1277,9 +1321,30 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 	}
 
 
-	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 2, 12);
-	write_one(g_tstat_id, 913, EventNumber[0]);
-	write_one(g_tstat_id, 914, EventNumber[1]);
+    n_ret = Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 2, 12);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 913, EventNumber[0],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 914, EventNumber[1],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
 	EventNumber[0] = 0;
 	EventNumber[1] = 0;
@@ -1332,9 +1397,33 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 
 
 
-	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 3, 12);
-	write_one(g_tstat_id, 915, EventNumber[0]);
-	write_one(g_tstat_id, 916, EventNumber[1]);
+    n_ret = Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 3, 12);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    int debug_915_value  = EventNumber[0];
+    int debug_916_value = EventNumber[1];
+    n_ret = write_one(g_tstat_id, 915, EventNumber[0],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+
+    n_ret = write_one(g_tstat_id, 916, EventNumber[1],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
 	EventNumber[0] = 0;
 	EventNumber[1] = 0;
@@ -1385,9 +1474,36 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 	}
 
 
-	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 4, 12);
-	write_one(g_tstat_id, 917, EventNumber[0]);
-	write_one(g_tstat_id, 918, EventNumber[1]);
+    n_ret = Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 4, 12);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+
+
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 917, EventNumber[0],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+
+
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 918, EventNumber[1],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+
+
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
 
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
 	EventNumber[0] = 0;
@@ -1439,9 +1555,30 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 	}
 
 
-	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 5, 12);
-	write_one(g_tstat_id, 919, EventNumber[0]);
-	write_one(g_tstat_id, 920, EventNumber[1]);
+    n_ret = Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 5, 12);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 919, EventNumber[0],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 920, EventNumber[1],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
 
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
 	EventNumber[0] = 0;
@@ -1492,9 +1629,30 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 		}
 	}
 
-	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 6, 12);
-	write_one(g_tstat_id, 921, EventNumber[0]);
-	write_one(g_tstat_id, 922, EventNumber[1]);
+    n_ret = Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 6, 12);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 921, EventNumber[0],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 922, EventNumber[1],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
 	EventNumber[0] = 0;
 	EventNumber[1] = 0;
@@ -1544,11 +1702,35 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 		}
 	}
 
-	Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 7, 12);
-	write_one(g_tstat_id, 923, EventNumber[0]);
-	write_one(g_tstat_id, 924, EventNumber[1]);
-
-
+    n_ret = Write_Multi_short(g_tstat_id, TimeBuffer, 813 + 12 * 7, 12);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 923, EventNumber[0],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    n_ret = write_one(g_tstat_id, 924, EventNumber[1],6);
+    g_progress_persent = (++n_temp_count) * 100 / 24;
+    Sleep(sch_write_delay_time);
+    if (n_ret < 0)
+    {
+        AfxMessageBox(_T("Write Data Timeout!"));
+        return;
+    }
+    Sleep(5000);
+    n_ret = write_one(g_tstat_id, 915, debug_915_value, 6);
+    n_ret = write_one(g_tstat_id, 916, debug_916_value, 6);
+    g_progress_persent = 100;
+    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write Tstat Schedule OK!"));
 	AfxMessageBox(_T("Write Successfully"));
 }
 

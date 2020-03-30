@@ -21,13 +21,13 @@ UINT BackMainUIFresh_TstatInput(LPVOID pParam)
     CTStatInputView* pdlg = (CTStatInputView*)pParam;
     int multy_ret = 0;
     Sleep( 3000);
-    while(1)
-    {
+    //while(1)
+    //{
         if(pdlg->IsWindowVisible())
         {
-            Sleep(5000);
-            PostMessage(g_hwnd_now, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
-            continue;
+            Sleep(1000);
+            //PostMessage(g_hwnd_now, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+            //continue;
 #if 0
             if ((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
             {
@@ -56,7 +56,7 @@ UINT BackMainUIFresh_TstatInput(LPVOID pParam)
 #if 0
             int it = 0;
             float progress;
-            for (int i = 0; i<12; i++)
+            for (int i = 1; i<8; i++)
             {
                 //register_critical_section.Lock();
                 //int nStart = GetTickCount();
@@ -153,9 +153,9 @@ UINT BackMainUIFresh_TstatInput(LPVOID pParam)
                 TerminateThread(pdlg->m_Fresh_BackgroundThreadHandle->m_hThread,0);
                 pdlg->m_Fresh_BackgroundThreadHandle=NULL;
             }
-            break;
+            //break;
         }
-    }
+    //}
     pdlg->m_Fresh_BackgroundThreadHandle = NULL;
     return 0;
 }
@@ -362,7 +362,8 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
             m_input_list.SetItemText(i, 4, m_tstat_input_data.at(i).Unit.StrValue);
             m_input_list.SetItemText(i, 5, m_tstat_input_data.at(i).Range.StrValue);
             m_input_list.SetItemText(i, 6, _T(""));
-            m_input_list.SetItemText(i, 7, _T(""));
+
+            m_input_list.SetItemText(i, 7, m_tstat_input_data.at(i).Filter.StrValue);
             m_input_list.SetItemText(i, 8, _T(""));
             m_input_list.SetItemText(i, 9, _T(""));
         }
@@ -391,7 +392,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	int Changed_SubItem = (int)lParam;
 	CString New_CString =  m_input_list.GetItemText(Changed_Item,Changed_SubItem);
 	
-      if (Changed_Item >= 8)
+      if ((Changed_Item >= 9) && (Changed_SubItem != 7))
         return 0;
     //if ((Changed_Item == 9) && (b_hum_sensor == false))
     //{
@@ -557,9 +558,26 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		   return 0;
 		}
         int SendValue=0;
-        SendValue=_wtoi(New_CString)*10;
+
+        int temp_rang_value = 0;
+        temp_rang_value = m_tstat_input_data.at(Changed_Item).Range.regAddress;
+
+        if (temp_rang_value == 14 || temp_rang_value == (14 + 128))
+        {
+            SendValue = _wtof(New_CString) * 100;
+        }
+        else
+        {
+            SendValue = _wtof(New_CString) * 10;
+        }
+        
         pwrite_info->Changed_Name.Format(_T(" %s 's Value,From %s to %s"),m_tstat_input_data.at(Changed_Item).InputName.StrValue,m_tstat_input_data.at(Changed_Item).Value.StrValue,New_CString);
-        pwrite_info->address=m_tstat_input_data.at(Changed_Item).Value.regAddress;
+        if (SendValue == 0)
+        {
+            pwrite_info->address = m_tstat_input_data.at(Changed_Item).Calibration.regAddress;
+        }
+        else
+            pwrite_info->address=m_tstat_input_data.at(Changed_Item).Value.regAddress;
         pwrite_info->new_value=SendValue;
 		IS_SEND=TRUE;
 	}
@@ -760,12 +778,12 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                         m_tstat_input_data.at(lRow).Value.StrValue.CompareNoCase(_T("Open"))==0
 
                         ){
-                            pwrite_info->Changed_Name.Format(_T("%s's Value,From 1 to 0"),lRow,m_tstat_input_data.at(lRow).InputName.StrValue);
+                            pwrite_info->Changed_Name.Format(_T("%s's Value,From 1 to 0"),m_tstat_input_data.at(lRow).InputName.StrValue);
                             pwrite_info->address=m_tstat_input_data.at(lRow).Value.regAddress;
                             pwrite_info->new_value=0;
                     }
                     else{
-                        pwrite_info->Changed_Name.Format(_T("%s's Value,From 0 to 1"),lRow,m_tstat_input_data.at(lRow).InputName.StrValue);
+                        pwrite_info->Changed_Name.Format(_T("%s's Value,From 0 to 1"),m_tstat_input_data.at(lRow).InputName.StrValue);
                         pwrite_info->address=m_tstat_input_data.at(lRow).Value.regAddress;
                         pwrite_info->new_value=1;
                     }  
@@ -839,15 +857,26 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                 
 
 
-                if (IDOK==dlg.DoModal())
-                {   
-                    int realRange,dbRange;
-                    int range=dlg.m_current_range;
+                if (IDOK == dlg.DoModal())
+                {
+                    int realRange, dbRange;
+                    int range = dlg.m_current_range;
                     //m_input_list.SetItemText(lRow,lCol,analog_range[range]);
-                    realRange=range;
-                    rangevalue = dlg.m_10v<<7;
-                    dbRange=range;
-                    unsigned short write_value = realRange + rangevalue;
+                    realRange = range;
+                    rangevalue = dlg.m_10v << 7;
+                    dbRange = range;
+                    unsigned short write_value = 0;
+                    if ((realRange == 0) ||
+                        (realRange == 2) || // 0-100%
+                        (realRange == 4) ||  //Custom 1
+                        (realRange == 6) ||  //Custom 2
+                        (realRange == 14))   //Voltage
+                    {
+                        write_value = realRange + rangevalue;
+                    }
+                    else
+                        write_value = realRange;
+                    
                     if (write_value == 142)
                         write_value = 139;  //如果选择 10V电压  原本是128+ 14  板子却对应 139 的值;
                     pwrite_info->Changed_Name.Format(_T("%s's Range,From %s to %s"),m_tstat_input_data.at(lRow).InputName.StrValue,

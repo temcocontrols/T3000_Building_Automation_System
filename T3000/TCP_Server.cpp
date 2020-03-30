@@ -105,7 +105,7 @@ void CTCP_Server::OnBnClickedButtonStartServer()
 			CM5_hThread = NULL;
 		}
 		CM5_hThread = CreateThread(NULL,NULL, MSTP_Receive,NULL,NULL, &nThreadID_x);
-
+        CloseHandle(CM5_hThread);
 		if (!bac_net_initial_once)
 		{
 			bac_net_initial_once = true;
@@ -187,6 +187,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
     {
         system_connect_info.mstp_status = 0;
         CM5_hThread = CreateThread(NULL, NULL, MSTP_Receive, NULL, NULL, &nThreadID_x);
+        CloseHandle(CM5_hThread);
     }
 	char pSendBuf[1024] = {0x81, 0x0B, 0x00, 0x0C, 0x01, 0x20, 0xFF, 0xFF, 0x00, 0xFF, 0x10, 0x08};
 	int nSendLen = 12;
@@ -220,15 +221,16 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 	if (m_bac_handle_Iam_data.size() == 0)
 	{
 		AfxMessageBox(_T("No device response!"));
-		if (CM5_hThread != NULL)
-		{
-            system_connect_info.mstp_status = 0;
-			TerminateThread(CM5_hThread, 0);
-			CM5_hThread = NULL;
-			Sleep(1000);
-		}
+		//if (CM5_hThread != NULL)
+		//{
+  //          system_connect_info.mstp_status = 0;
+		//	TerminateThread(CM5_hThread, 0);
+		//	CM5_hThread = NULL;
+		//	Sleep(1000);
+		//}
 		wsk.Close();
 		CM5_hThread = CreateThread(NULL,NULL, MSTP_Receive,NULL,NULL, &nThreadID_x);
+        CloseHandle(CM5_hThread);
 		return;
 	}
 	m_bac_scan_result_data.clear();
@@ -269,14 +271,15 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 	if (m_bac_scan_result_data.size() == 0)
 	{
 		AfxMessageBox(_T("No device found in remote area!"));
-		if (CM5_hThread != NULL)
-		{
-            system_connect_info.mstp_status = 0;
-			TerminateThread(CM5_hThread, 0);
-			CM5_hThread = NULL;
-		}
+		//if (CM5_hThread != NULL)
+		//{
+  //          system_connect_info.mstp_status = 0;
+		//	TerminateThread(CM5_hThread, 0);
+		//	CM5_hThread = NULL;
+		//}
 		wsk.Close();
 		CM5_hThread = CreateThread(NULL,NULL, MSTP_Receive,NULL,NULL, &nThreadID_x);
+        CloseHandle(CM5_hThread);
 		return;
 	}
 
@@ -406,7 +409,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 	bip_setgsm(false);
 	wsk.Close();
 	CM5_hThread = CreateThread(NULL,NULL, MSTP_Receive,NULL,NULL, &nThreadID_x);
-
+    CloseHandle(CM5_hThread);
 	Client_Info* temp_info2 = new Client_Info;
 	temp_info2->serialnumber = m_bac_scan_result_data.at(0).serialnumber;
 	PostMessage(m_tcp_server_hwnd,WM_REFRESH_LIST, DELETE_ITEM, (LPARAM)temp_info2);

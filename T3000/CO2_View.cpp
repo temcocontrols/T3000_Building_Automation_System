@@ -1655,169 +1655,173 @@ void CCO2_View::OnBnClickedBtnCo2Refresh()
 
 }
 extern  HANDLE Read_Mute;
-DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
-{
-    CCO2_View *pParent = (CCO2_View *)lpVoid;
-
-    while(TRUE){
-
-		 if (g_bPauseRefreshTree)
-		 {
-			Sleep(1000);
-			continue;
-		 }
-
-        if (pParent->m_product_type == 2)
-        {
-            Sleep(1000);
-            if(pParent->IsWindowVisible())
-            {
-                CString strTemp ;
-
-
-
-               bitset<16> AM(product_register_value[280]);
-
-               if (!AM[2])
-               {
-                  Read_Multi(g_tstat_id,&product_register_value[710],710,10);
-                  pParent->SendMessage(WM_REFRESH_BAC_INPUT_LIST,1,0);
-               }
-               else
-               {
-                 //  Read_Multi(g_tstat_id,&product_register_value[280],280,10);
-               }
-
-
-
-
-
-//                 bitset<16> AM(product_register_value[280]);
-//                 int Input_Value = -1;
-//                 if (!AM[2])
-//                 {
-//                     pParent->m_input_list.SetItemText(0,2,Global_String_AUTO);
-//                     Input_Value = (short)product_register_value[711] ;
-//                 }
-//                 else
-//                 {
-//                     pParent->m_input_list.SetItemText(0,2,Global_String_MANUAL);
-//                     Input_Value = (short)product_register_value[283] ;
-//                 }
+//DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
+//{
+//    CCO2_View *pParent = (CCO2_View *)lpVoid;
 //
-//                 unsigned char default_unit = product_register_value[702];
-//                 unsigned char current_unit = product_register_value[701];
-//                 float input_rate   = pParent->get_units_ratio(current_unit,default_unit);
-//                 float input_value = 0;
-//                 int decimal_x = 0;
-//                 if (default_unit == 0)
-//                 {
-//                     decimal_x = 0 ;
-//                 }
-//                 else
-//                 {
-//                     decimal_x = 1;
-//                 }
-//                 int decimal_number = decimal_num[decimal_x][current_unit];
-//                 if (default_unit == 0)
-//                 {
-//                     input_value=input_rate*Input_Value ;
-//                     input_value =input_value/100;
-//                 }
-//                 else
-//                 {
-//                     input_value=input_rate*Input_Value ;
-//                     input_value =input_value/10;
-//                 }
-//                 CString dataformat;
-//                 dataformat.Format(_T("%%0.%df"),decimal_number);
-//                 strTemp.Format(dataformat,input_value);
-//                  pParent->m_input_list.SetItemText(0,3,strTemp);
-            }
-            continue;
-        }
-        if (pParent->m_product_type == 3)
-        {
-            Sleep(1000);
-            if(pParent->IsWindowVisible())
-            {
-                if (!is_connect()||g_bPauseMultiRead)
-                {
-                    Sleep(1000);
-                    continue;
-                }
-                CString strTemp ;
-                Read_Multi(g_tstat_id,&product_register_value[100],100,50);
-                pParent->m_list_type = 0;
-                pParent->SendMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
-            }
-            continue;
-        }
-        if (!is_connect()||g_bPauseMultiRead)
-        {
-            Sleep(1000);
-            continue;
-        }
-        if (!pParent->m_fresh_Grid)
-        {
-            Sleep(2000);
-            continue;
-        }
-
-        if(!no_mouse_keyboard_event_enable_refresh)
-        {
-            Sleep(3000);
-            continue ;
-        }
-        else
-        {
-            Sleep(2000);
-        }
-
-
-
-
-        int read_ret=0;
-        register_critical_section.Lock();
-        for(int i=0;i<7;i++)
-        {
-            if(!no_mouse_keyboard_event_enable_refresh)
-            {break ;}
-            if (!pParent->m_fresh_Grid)
-            {
-                break ;
-            }
-            if(Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100)>0)
-                read_ret++;
-        }
-		Read_Multi(g_tstat_id,pParent->ValueData,10000,10);
-        register_critical_section.Unlock();
-        if(!no_mouse_keyboard_event_enable_refresh)
-        {continue ;}
-        if (!pParent->m_fresh_Grid)
-        {
-
-            continue;
-        }
-        if(read_ret<7)
-            pParent->SendMessage(WM_REFRESH_CO2_DLG,REFRESH_FAIL,0);
-
-        if(pParent->IsWindowVisible())
-        {
-            pParent->PostMessage(WM_REFRESH_CO2_DLG,REFRESH_DLG,0);
-            pParent->PostMessage(WM_REFRESH_CO2_DLG,ENABLE_REFRESH_BUTTON,0);
-
-            pParent->PostMessage(WM_REFRESH_BAC_INPUT_LIST,1,0);
-        }
-
-
-
-    }
-
-    /*pParent->RefreshThread=NULL;*/
-    return 0;
-
-}
+//    while(TRUE)
+//    {
+//		 if (b_pause_refresh_tree)
+//		 {
+//			Sleep(1000);
+//			continue;
+//		 }
+//
+//        if (pParent->m_product_type == 2)
+//        {
+//            Sleep(1000);
+//            if(pParent->IsWindowVisible())
+//            {
+//                CString strTemp ;
+//
+//
+//
+//               bitset<16> AM(product_register_value[280]);
+//
+//               if (!AM[2])
+//               {
+//                  Read_Multi(g_tstat_id,&product_register_value[710],710,10);
+//                  pParent->SendMessage(WM_REFRESH_BAC_INPUT_LIST,1,0);
+//               }
+//               else
+//               {
+//                 //  Read_Multi(g_tstat_id,&product_register_value[280],280,10);
+//               }
+//
+//
+//
+//
+//
+////                 bitset<16> AM(product_register_value[280]);
+////                 int Input_Value = -1;
+////                 if (!AM[2])
+////                 {
+////                     pParent->m_input_list.SetItemText(0,2,Global_String_AUTO);
+////                     Input_Value = (short)product_register_value[711] ;
+////                 }
+////                 else
+////                 {
+////                     pParent->m_input_list.SetItemText(0,2,Global_String_MANUAL);
+////                     Input_Value = (short)product_register_value[283] ;
+////                 }
+////
+////                 unsigned char default_unit = product_register_value[702];
+////                 unsigned char current_unit = product_register_value[701];
+////                 float input_rate   = pParent->get_units_ratio(current_unit,default_unit);
+////                 float input_value = 0;
+////                 int decimal_x = 0;
+////                 if (default_unit == 0)
+////                 {
+////                     decimal_x = 0 ;
+////                 }
+////                 else
+////                 {
+////                     decimal_x = 1;
+////                 }
+////                 int decimal_number = decimal_num[decimal_x][current_unit];
+////                 if (default_unit == 0)
+////                 {
+////                     input_value=input_rate*Input_Value ;
+////                     input_value =input_value/100;
+////                 }
+////                 else
+////                 {
+////                     input_value=input_rate*Input_Value ;
+////                     input_value =input_value/10;
+////                 }
+////                 CString dataformat;
+////                 dataformat.Format(_T("%%0.%df"),decimal_number);
+////                 strTemp.Format(dataformat,input_value);
+////                  pParent->m_input_list.SetItemText(0,3,strTemp);
+//            }
+//            continue;
+//        }
+//        if (pParent->m_product_type == 3)
+//        {
+//            Sleep(1000);
+//            if(pParent->IsWindowVisible())
+//            {
+//                if (!is_connect()||g_bPauseMultiRead)
+//                {
+//                    Sleep(1000);
+//                    continue;
+//                }
+//                CString strTemp ;
+//                Read_Multi(g_tstat_id,&product_register_value[100],100,50);
+//                pParent->m_list_type = 0;
+//                pParent->SendMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+//            }
+//            continue;
+//        }
+//        if (!is_connect()||g_bPauseMultiRead)
+//        {
+//            Sleep(1000);
+//            continue;
+//        }
+//        if (!pParent->m_fresh_Grid)
+//        {
+//            Sleep(2000);
+//            continue;
+//        }
+//
+//        if(!no_mouse_keyboard_event_enable_refresh)
+//        {
+//            Sleep(3000);
+//            continue ;
+//        }
+//        else
+//        {
+//            Sleep(2000);
+//        }
+//
+//
+//
+//
+//        int read_ret=0;
+//        register_critical_section.Lock();
+//        for(int i=0;i<7;i++)
+//        {
+//            if(!no_mouse_keyboard_event_enable_refresh)
+//            {break ;}
+//            if (!pParent->m_fresh_Grid)
+//            {
+//                break ;
+//            }
+//            if(Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100)>0)
+//                read_ret++;
+//        }
+//		Read_Multi(g_tstat_id,pParent->ValueData,10000,10);
+//        register_critical_section.Unlock();
+//        if(!no_mouse_keyboard_event_enable_refresh)
+//        {continue ;}
+//        if (!pParent->m_fresh_Grid)
+//        {
+//
+//            continue;
+//        }
+//        if(read_ret<7)
+//            pParent->SendMessage(WM_REFRESH_CO2_DLG,REFRESH_FAIL,0);
+//
+//        if(pParent->IsWindowVisible())
+//        {
+//            pParent->PostMessage(WM_REFRESH_CO2_DLG,REFRESH_DLG,0);
+//            pParent->PostMessage(WM_REFRESH_CO2_DLG,ENABLE_REFRESH_BUTTON,0);
+//
+//            pParent->PostMessage(WM_REFRESH_BAC_INPUT_LIST,1,0);
+//        }
+//        else
+//        {
+//
+//        }
+//
+//
+//
+//    }
+//
+//    /*pParent->RefreshThread=NULL;*/
+//    return 0;
+//
+//}
 
 LRESULT  CCO2_View::DealMessage(WPARAM wParam,LPARAM lParam)
 {

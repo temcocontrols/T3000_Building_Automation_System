@@ -1088,7 +1088,7 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 	if(auto_flash_mode)
     {
         auto_flash_mode = false;	//Flash completed, allow manual shutdown;
-        if(nRet)
+        if(nRet > 0)
         {
             WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("2"),AutoFlashConfigPath);	//FLASH_SUCCESS
         }

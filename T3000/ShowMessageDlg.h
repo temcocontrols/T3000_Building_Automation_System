@@ -10,6 +10,7 @@ const int EVENT_IP_STATIC_CHANGE = 2;
 const int EVENT_MSTP_CONNECTION_ESTABLISH = 3;
 const int EVENT_FIRST_LOAD_PROG = 4;
 const int EVENT_CHANGE_PROTOCOL = 5;
+const int EVENT_WARNING_CHANGE_PROTOCOL_BAUDRATE = 6;
 
 class CShowMessageDlg : public CDialogEx
 {
@@ -85,6 +86,9 @@ public:
     unsigned short cprotocol_nreg_value;
     unsigned char cprotocol_sub_device;         // 如果是子设备  ，数据库中的协议 比较特殊;
     CString cprotocol_Dbpath;
+    afx_msg void OnBnClickedOk();
+    afx_msg void OnBnClickedCancel();
+    int m_exit_by_hands;
 };
 
 

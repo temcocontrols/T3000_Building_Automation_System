@@ -70,9 +70,12 @@ LRESULT  CBacnetOutput::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		if((pInvoke->mRow < BAC_OUTPUT_ITEM_COUNT) && (pInvoke->mRow >= 0))
 		{
-			Post_Refresh_One_Message(g_bac_instance,READOUTPUT_T3000,
-				pInvoke->mRow,pInvoke->mRow,sizeof(Str_out_point));
-			SetTimer(2,2000,NULL);
+            if (!SPECIAL_BAC_TO_MODBUS) //不是转Modbus的协议的 就调用下面的刷新单条.
+            {
+                Post_Refresh_One_Message(g_bac_instance, READOUTPUT_T3000,
+                    pInvoke->mRow, pInvoke->mRow, sizeof(Str_out_point));
+                SetTimer(2, 2000, NULL);
+            }
 		}
 		//Save_OutputData_to_db(pInvoke->mRow);
 	}
@@ -371,24 +374,28 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		digital_special_output_count = BIG_MINIPANEL_OUT_D;
 		analog_special_output_count = BIG_MINIPANEL_OUT_A;
+        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
 	else if(bacnet_device_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB)
 	{
 		digital_special_output_count = SMALL_MINIPANEL_OUT_D;
 		analog_special_output_count = SMALL_MINIPANEL_OUT_A;
+        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
 	else if(bacnet_device_type == TINY_MINIPANEL)
 	{
 		digital_special_output_count = TINY_MINIPANEL_OUT_D;
 		analog_special_output_count = TINY_MINIPANEL_OUT_A;
+        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
 	else if (bacnet_device_type == TINY_EX_MINIPANEL || bacnet_device_type == MINIPANELARM_TB)
 	{
 		digital_special_output_count = TINYEX_MINIPANEL_OUT_D;
 		analog_special_output_count = TINYEX_MINIPANEL_OUT_A;
+        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
 	else if(bacnet_device_type == T38AI8AO6DO)
@@ -409,6 +416,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		digital_special_output_count = PWM_TRANSDUCER_OUT_D;
 		analog_special_output_count = PWM_TRANSDUCER_OUT_A;
+        OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count  + analog_special_output_count;
 		Minipanel_device = 0;
 	}
     //else if (bacnet_device_type == BACNET_ROUTER)
@@ -588,12 +596,12 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		if(m_Output_data.at(i).low_voltage == 0)
 			low_voltage.Empty();
 		else
-			low_voltage.Format(_T("%.1f"),m_Output_data.at(i).low_voltage/10);
+			low_voltage.Format(_T("%.1f"),m_Output_data.at(i).low_voltage/10.0);
 
 		if(m_Output_data.at(i).high_voltage == 0)
 			high_voltage.Empty();
 		else
-			high_voltage.Format(_T("%.1f"),m_Output_data.at(i).high_voltage/10);
+			high_voltage.Format(_T("%.1f"),m_Output_data.at(i).high_voltage/10.0);
 		
 		m_output_list.SetItemText(i,OUTPUT_LOW_VOLTAGE,low_voltage);	
 		m_output_list.SetItemText(i,OUTPUT_HIGH_VOLTAGE,high_voltage);	
@@ -1409,13 +1417,17 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 				if((bac_select_device_online) && (g_protocol == PROTOCOL_BACNET_IP))
 					Post_Refresh_Message(g_bac_instance,READOUTPUT_T3000,0,BAC_OUTPUT_ITEM_COUNT - 1,sizeof(Str_out_point),BAC_OUTPUT_GROUP);
-				else if((bac_select_device_online) && ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)))
+				else if((bac_select_device_online) && 
+                    ((g_protocol == MODBUS_RS485) || 
+                     (g_protocol == MODBUS_TCPIP) || 
+                     (g_protocol == PROTOCOL_MSTP_TO_MODBUS) ||   //MSTP协议 接 T322 或者 T3-8 这些设备不支持BB的结构，需要用MSTP转Modbus的协议;
+                     (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)))
 				{
 					if(read_each_485_fun_thread == NULL)
 					{
 						hide_485_progress = true;
                         //经常性的在load file 的时候锁死 ，待解决 2019 06 19
-						//::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_OUT);//第二个参数 OUT
+						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_OUT);//第二个参数 OUT
 					}
 				}
 			}

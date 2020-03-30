@@ -71,6 +71,16 @@ static uint16_t Treply_timeout = 260;
 /* larger values for this timeout, not to exceed 100 milliseconds.) */
 static uint8_t Tusage_timeout = 95/*50*/;
 
+
+unsigned long hThread1 = 0;
+unsigned long hThread2 = 0;
+
+bool thread1_run_flag = 1;
+bool thread2_run_flag = 1;
+
+static unsigned char source_addr[255] = { 0 };
+static unsigned char source_addr_count = 0;
+
 /* Timer that indicates line silence - and functions */
 static uint32_t Timer_Silence(
     void *pArg)
@@ -139,7 +149,8 @@ uint16_t dlmstp_receive(
     /* see if there is a packet available, and a place
        to put the reply (if necessary) and process it */
     wait_status = WaitForSingleObject(Receive_Packet_Flag, timeout);
-    if (wait_status == WAIT_OBJECT_0) {
+    if (wait_status == WAIT_OBJECT_0) 
+    {
         if (Receive_Packet.ready) {
             if (Receive_Packet.pdu_len) {
                 MSTP_Packets++;
@@ -156,6 +167,10 @@ uint16_t dlmstp_receive(
             Receive_Packet.ready = false;
         }
     }
+    else if (wait_status == STATUS_TIMEOUT)
+    {
+        Sleep(1);
+    }
 
     return pdu_len;
 }
@@ -168,7 +183,9 @@ static void dlmstp_receive_fsm_task(
     (void) pArg;
     (void) SetThreadPriority(GetCurrentThread(),
         THREAD_PRIORITY_TIME_CRITICAL);
-    for (;;) {
+    //for (;;) 
+    while(thread1_run_flag)
+    {
         /* only do receive state machine while we don't have a frame */
         if ((MSTP_Port.ReceivedValidFrame == false) &&
             (MSTP_Port.ReceivedInvalidFrame == false)) {
@@ -186,15 +203,58 @@ static void dlmstp_receive_fsm_task(
     }
 }
 
+//
+///**
+//* Description:数组去重算法
+//*/
+//int arraydiff(unsigned char *A, unsigned char max, int len)
+//{
+//    unsigned char arrayflag[256];
+//    int i, j;
+//
+//    //初始化标志数组
+//    for (i = 0; i <= max; i++)
+//    {
+//        arrayflag[i] = false;
+//    }
+//
+//    //剔除算法
+//    for (i = 0; i < len; i++)
+//    {
+//        arrayflag[A[i]] = A[i];
+//    }
+//
+//    for (int i = 0; i < max; i++)
+//    {
+//        A[i] = 0;
+//    }
+//
+//    //取出有效数
+//    for (i = 0, j = 0; i <= max; i++)
+//    {
+//        if (arrayflag[i] != false)
+//        {
+//            A[j++] = arrayflag[i];
+//        }
+//    }
+//    return j;
+//}
+
+
+
+volatile struct mstp_port_struct_t MSTP_Port_Debug;
 static void dlmstp_master_fsm_task(
     void *pArg)
 {
     DWORD dwMilliseconds = 0;
-
+    memset(source_addr, 0, 255);
+    source_addr_count = 0;
     (void) pArg;
     (void) SetThreadPriority(GetCurrentThread(),
         THREAD_PRIORITY_TIME_CRITICAL);
-    for (;;) {
+    //for (;;) 
+    while(thread2_run_flag)
+    {
         switch (MSTP_Port.master_state) {
             case MSTP_MASTER_STATE_IDLE:
                 dwMilliseconds = Tno_token;
@@ -212,6 +272,52 @@ static void dlmstp_master_fsm_task(
         if (dwMilliseconds)
             WaitForSingleObject(Received_Frame_Flag, dwMilliseconds);
         MSTP_Master_Node_FSM(&MSTP_Port);
+        memcpy(&MSTP_Port_Debug, &MSTP_Port, sizeof(MSTP_Port_Debug));
+
+        //static int n_count = 0;
+        //n_count++;
+        //remove("C:\\log.txt");
+        //FILE *st_dout;
+        //st_dout = fopen("C:\\log.txt", "a");
+        //fprintf(st_dout, "Count = %d Start\r\n", n_count);
+        ////fprintf(st_dout, "test%d:\r\n", MSTP_Port.);
+        //fprintf(st_dout, "Count = %d End\r\n", n_count);
+        //fclose(st_dout);
+
+
+        if (MSTP_Port_Debug.SourceAddress != 0)
+        {
+            int find_exsit = 0;
+            for (int i = 0; i < source_addr_count; i++)
+            {
+                if (MSTP_Port_Debug.SourceAddress == source_addr[i])
+                {
+                    find_exsit = 1;
+                    break;
+                }
+            }
+
+            if (find_exsit == 0)
+            {
+                source_addr[source_addr_count] = MSTP_Port_Debug.SourceAddress;
+                source_addr_count++;
+            }
+        }
+
+        //if (source_addr_count > 0)
+        //{
+        //    unsigned char max_addr = 0;
+        //    for (int j = 1; j < source_addr_count; j++)
+        //    {
+        //        if (max_addr < source_addr[j])
+        //            max_addr = source_addr[j];
+        //    }
+
+
+        //    arraydiff(source_addr, max_addr, source_addr_count);
+        //}
+
+
     }
 }
 
@@ -581,24 +687,48 @@ void dlmstp_get_broadcast_address(
 
     return;
 }
- unsigned long hThread1 = 0;
-  unsigned long hThread2 = 0;
 
- unsigned long  Get_Thread1()
+
+  void Set_Thread1_Status(bool nstatus)
   {
-return hThread1;
+      thread1_run_flag = nstatus;
   }
 
-unsigned long  Get_Thread2()
- {
-return hThread2;
- }
+  void Set_Thread2_Status(bool nstatus)
+  {
+      thread2_run_flag = nstatus;
+  }
+
+  void Get_MSTP_STRUCT(struct mstp_port_struct_t * mstp_port)
+  {
+      memcpy(mstp_port, &MSTP_Port_Debug, sizeof(MSTP_Port_Debug));
+  }
+
+
+  void Get_MSTP_Nodes(unsigned char * node_address , unsigned char *ncount)
+  {
+      memcpy(node_address, source_addr, 255);
+      *ncount = source_addr_count;
+  }
+
+
+  unsigned long  Get_Thread1()
+  {
+      return hThread1;
+  }
+
+  unsigned long  Get_Thread2()
+  {
+      return hThread2;
+  }
 
 bool dlmstp_init(
     char *ifname)
 {
   //  unsigned long hThread = 0;
     uint32_t arg_value = 0;
+    thread1_run_flag = 1;
+    thread2_run_flag = 1;
 	Sleep(1);
     /* initialize packet queue */
     Receive_Packet.ready = false;

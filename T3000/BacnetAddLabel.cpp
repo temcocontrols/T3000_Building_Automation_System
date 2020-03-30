@@ -93,7 +93,7 @@ BOOL CBacnetAddLabel::PreTranslateMessage(MSG* pMsg)
 				CString temp_point;
 				char * temp_char = new char[200];
 				m_add_label_edit.GetWindowTextW(temp_point);
-				if (temp_point.IsEmpty() || temp_point.GetLength() >= 20)
+				if (temp_point.IsEmpty() || temp_point.GetLength() >= 40)
 				{
 					return CDialogEx::PreTranslateMessage(pMsg);
 				}

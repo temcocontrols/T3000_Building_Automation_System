@@ -63,7 +63,7 @@ const int DLG_DIALOG_THIRD_PARTY_BAC = 33;
 const int NUMVIEWS = 34;
 
 
-
+#define  WM_REFRESH_TREEVIEW_MAP WM_USER + 2008
 extern int g_gloab_bac_comport;
 extern int g_gloab_bac_baudrate;
 const int REGISTER_USE_ZIGBEE_485 = 640;
@@ -142,7 +142,8 @@ typedef struct _tree_product//////////////////////
     unsigned int note_parent_serial_number;
     unsigned char panel_number;
     unsigned int object_instance;
-
+    UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
+    UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 //
 
@@ -373,7 +374,6 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	//  below Added by zgq; from 2010-11-29; 
 	//
-
 	void DoConnectToANode( const HTREEITEM& hTreeItem );
 	//void InitTreeNodeConn();
 	void GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItems  );
@@ -409,6 +409,7 @@ public:
 	CString						m_strCurSelNodeName;  // 记录当前点击树节点的name
 	BOOL m_isCM5;
 	BOOL m_isMiniPanel;
+
 	//HTREEITEM				m_htiCurSel;  // 记录当前点击树节点
 	CString						m_strFileVersion;
 
@@ -562,4 +563,5 @@ public:
 		afx_msg void OnControlModbus();
 		afx_msg void OnControlIoNetConfig();
         afx_msg void OnDatabaseLogdetail();
+        afx_msg void OnUpdateAppAbout(CCmdUI *pCmdUI);
 };

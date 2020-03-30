@@ -6,7 +6,7 @@
 #include "ZigbeeInformationDlg.h"
 #include "afxdialogex.h"
 #include "MainFrm.h"
-
+#include "TstatZigbeeLogic.h"
 
 // CZigbeeInformationDlg dialog
 
@@ -220,20 +220,20 @@ BOOL CZigbeeInformationDlg::OnInitDialog()
 				  // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-extern bool b_pause_refresh_tree;
-#include "TstatZigbeeLogic.h"
+
+
 void CZigbeeInformationDlg::OnBnClickedBtnTopological()
 {
-	int temp_pause = g_bPauseRefreshTree;	//resume all the status.
+	int temp_pause = b_pause_refresh_tree;	//resume all the status.
 	int temp_g_id = g_tstat_id;
 	int temp_value = b_pause_refresh_tree;
 	bool temp_pasueread = g_bPauseMultiRead;
+	b_pause_refresh_tree = BTNTOPOLOGICAL;
 	b_pause_refresh_tree = true;
-	g_bPauseRefreshTree = true;
 	g_bPauseMultiRead = true;
 	CTstatZigbeeLogic dlg;
 	dlg.DoModal();
-	g_bPauseRefreshTree = temp_pause;
+	b_pause_refresh_tree = temp_pause;
 	g_tstat_id = temp_g_id;
 	b_pause_refresh_tree = temp_value;
 	g_bPauseMultiRead = temp_pasueread;

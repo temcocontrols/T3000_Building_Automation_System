@@ -12,6 +12,7 @@ DWORD WINAPI HanlePanelNumber(LPVOID lpvoid);
 DWORD WINAPI DuplicatedProcess(LPVOID lPvoid);
 DWORD WINAPI CheckIPvalidThread(LPVOID lpvoid);
 DWORD WINAPI  ChangeDuplicateIPthread(LPVOID lpvoid);
+unsigned char close_duplicate_window = false;
 CString temp_controller_ip;
 int controller_port = 0;
 bool first_need_changed = false;
@@ -79,6 +80,7 @@ BEGIN_MESSAGE_MAP(CDuplicateIdDetected, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_DUPLICATE_DONE, &CDuplicateIdDetected::OnBnClickedButtonDuplicateDone)
 	ON_BN_CLICKED(IDC_BUTTON_DUPLICATE_CANCEL, &CDuplicateIdDetected::OnBnClickedButtonDuplicateCancel)
 	ON_WM_TIMER()
+    ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -91,6 +93,7 @@ HANDLE hChangeDuplicateIP = NULL;
 BOOL CDuplicateIdDetected::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+    close_duplicate_window = false;
 	first_need_changed = false;
 	second_need_changed = false;
 	auto_close_seconds = 60;
@@ -141,7 +144,8 @@ DWORD WINAPI CheckIPvalidThread(LPVOID lpvoid)
     {
         if (i == local_ip)
             continue;
-
+        if (close_duplicate_window)
+            break;
         CString strIP;
         strIP.Format(_T("%s.%s.%s.%u"), temp_ip_array.GetAt(0), temp_ip_array.GetAt(1), temp_ip_array.GetAt(2), (unsigned char)i);
         CPing p1;
@@ -1021,3 +1025,23 @@ END_CHANGEIP_SCAN:
 
 
 
+
+
+void CDuplicateIdDetected::OnClose()
+{
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    close_duplicate_window = true;
+    do
+    {
+        Sleep(100);
+    } while (hCheckIPHandle != NULL);
+    CDialogEx::OnClose();
+}
+
+
+void CDuplicateIdDetected::OnCancel()
+{
+    // TODO: 在此添加专用代码和/或调用基类
+
+    CDialogEx::OnCancel();
+}

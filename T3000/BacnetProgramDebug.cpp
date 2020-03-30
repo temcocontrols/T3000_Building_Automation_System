@@ -436,12 +436,12 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				if(m_Output_data.at(point_number).low_voltage == 0)
 					low_voltage.Empty();
 				else
-					low_voltage.Format(_T("%.1f"),m_Output_data.at(point_number).low_voltage/10);
+					low_voltage.Format(_T("%.1f"),m_Output_data.at(point_number).low_voltage/10.0);
 
 				if(m_Output_data.at(point_number).high_voltage == 0)
 					high_voltage.Empty();
 				else
-					high_voltage.Format(_T("%.1f"),m_Output_data.at(point_number).high_voltage/10);
+					high_voltage.Format(_T("%.1f"),m_Output_data.at(point_number).high_voltage/10.0);
 
 				m_program_debug_list.SetItemText(0,OUTPUT_LOW_VOLTAGE,low_voltage);	
 				m_program_debug_list.SetItemText(0,OUTPUT_HIGH_VOLTAGE,high_voltage);	
@@ -707,7 +707,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
                             temp_cal.Format(_T("%.2f"), ((float)temp_cal_value) / 100);
                         }
                         else
-						    temp_cal.Format(_T("%.1f"),((float)temp_cal_value)/10);
+						    temp_cal.Format(_T("%.1f"),((float)temp_cal_value)/10.0);
 						m_program_debug_list.SetItemText(0,INPUT_CAL,temp_cal);
 						if(m_Input_data.at(point_number).calibration_sign == 0)
 						{
@@ -1268,7 +1268,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 
 				if(bacnet_device_type == STM32_HUM_NET)
 				{
-					temp_des3.Format(_T("%.2f"),((float)m_controller_data.at(point_number).setpoint_value)/1000);
+					temp_des3.Format(_T("%.2f"),((float)m_controller_data.at(point_number).setpoint_value)/1000.0);
 				}
 
 				m_program_debug_list.SetItemText(0,CONTROLLER_SETPOINT,temp_des2);
@@ -1329,7 +1329,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 
 				if(m_controller_data.at(point_number).rate<=200)
 				{
-					temp_des3.Format(_T("%.2f"),((float)m_controller_data.at(point_number).rate)/100);
+					temp_des3.Format(_T("%.2f"),((float)m_controller_data.at(point_number).rate)/100.0);
 					m_program_debug_list.SetItemText(0,CONTROLLER_RATE,temp_des3);
 				}
 				else
@@ -2550,7 +2550,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
                         cstemp_value.Format(_T("%.2f"), ((float)temp_cal_value) / 100);
                     }
                     else
-					    cstemp_value.Format(_T("%.1f"),((float)temp_cal_value)/10);
+					    cstemp_value.Format(_T("%.1f"),((float)temp_cal_value)/10.0);
 					m_program_debug_list.SetItemText(0,INPUT_CAL,cstemp_value);
 
 

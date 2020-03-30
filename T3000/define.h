@@ -157,6 +157,7 @@
 #define MODBUS_TSTAT6_HUM_FILTER 152
 #define MODBUS_TSTAT6_CO2_FILTER 151
 
+#define MODBUS_TSTAT_LUX_FILTER 627
 
 #define MaxAddressNum   255
 #define MaxRegisterNum  320

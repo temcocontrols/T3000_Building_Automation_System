@@ -539,6 +539,6 @@ void CBacnetAlarmLog::OnBnClickedButtonEmailAlarm()
         MessageBox(_T("Read data timeout"));
         return;
     }
-    CBacnetEmailAlarm Dlg;
-    Dlg.DoModal();
+    //CBacnetEmailAlarm Dlg;
+    //Dlg.DoModal();
 }

@@ -124,7 +124,7 @@ struct variable_table {
 
 struct buf_str {
 	int v;
-	char var[20];
+	char var[40];
 	float fvar;
 	char op[10];
 };

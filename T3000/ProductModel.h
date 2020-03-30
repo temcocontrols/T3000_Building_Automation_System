@@ -63,7 +63,7 @@
 #define PM_PWMETER			          73
 #define PM_MINIPANEL_ARM              74
 #define PM_WEATHER_STATION            75
-#define PWM_TRANSDUCER_2              90  //Lijun transudcer 新板子;
+#define PWM_TEMPERATURE_TRANSDUCER    90  //Lijun transudcer 新板子;
 #define PM_TSTAT8_WIFI                91
 #define PM_TSTAT8_OCC                 92
 #define PM_TSTAT7_ARM                 93

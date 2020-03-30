@@ -205,7 +205,7 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	POINT insert_point;
 	memcpy(&insert_point,(void *)lParam,sizeof(POINT));
 
-	if((strlen(temp_point) == 0) || ((strlen(temp_point) > 16)))
+	if((strlen(temp_point) == 0) || ((strlen(temp_point) > 40)))
 	{
 		if(temp_point!=NULL)
 		{
@@ -236,8 +236,19 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	if(temp_number != 0)	//Vector 里面是 0开始 , 这里如果是INPUT1  那值为1  直接减一 存起来 用;
 		temp_number = temp_number - 1;
 
-    char temp_1 = temp_point_type & 0x1F;
-		if((temp_1 == COIL_REG) || (temp_1 == DIS_INPUT_REG) || (temp_1 == INPUT_REG) || (temp_1 == MB_REG))
+    unsigned char temp_1 = temp_point_type & 0x1F;
+    unsigned char type_highest_2bytes = k & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+    temp_1 = temp_1 | type_highest_2bytes;
+
+		if(
+            (temp_1 == BAC_FLOAT_ABCD) ||
+            (temp_1 == BAC_FLOAT_CDAB) ||
+            (temp_1 == BAC_FLOAT_BADC) ||
+            (temp_1 == BAC_FLOAT_CDBA) ||
+            (temp_1 == COIL_REG) || 
+            (temp_1 == DIS_INPUT_REG) || 
+            (temp_1 == INPUT_REG) || 
+            (temp_1 == MB_REG))
 		{
 			temp_number = temp_number + 1;
 		}

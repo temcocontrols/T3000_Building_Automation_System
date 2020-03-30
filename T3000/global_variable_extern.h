@@ -19,6 +19,7 @@ extern CString USB_Serial;
 extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
+extern DWORD nThreadIDConnectPannel;
 extern DWORD nThreadID;
 extern DWORD nThreadID_mstp;
 extern HWND hMbpollWnd;
@@ -53,7 +54,7 @@ extern BOOL Flexflash;
 extern BOOL FlexSP;
 extern int FlexSPN;
 extern int  MDAY,MNIGHT;
-
+extern int MAWAY , MSLEEP ;
 
 extern int nCom;
 extern	CString program_path;
@@ -72,7 +73,7 @@ extern  CString g_achive_folder_temp_db;
 extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
-
+extern CString g_ext_database_path ; //额外的配置档数据库路径;
 extern  CString g_achive_monitor_datatbase_path ;
 
 extern BOOL g_mstp_flag;
@@ -145,7 +146,7 @@ extern int g_ifanStatus;
 extern CString g_strFan;
 
 extern BOOL g_bEnableRefreshTreeView;
-extern BOOL g_bPauseRefreshTree;
+
 extern unsigned int g_llTxCount;
 extern unsigned int g_llRxCount;
 extern int g_llerrCount ;
@@ -909,10 +910,11 @@ extern CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
 //extern int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //自定义的  正向逻辑还是反向逻辑;
 extern CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 extern CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
-extern bool read_var_analog_cus_units;          //Var Cus units 自定义
 extern bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
 extern bool receive_customer_unit; //收到回复，flag就置 true;
 extern bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
+extern bool read_msv_table; //MSV table 
+extern CString Custom_Msv_Range[BAC_MSV_COUNT];// 存储客户多态  例如显示  AAA/BBB/CCC
 extern CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 extern CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
 extern unsigned char bacnet_add_id[254];
@@ -954,8 +956,8 @@ extern bool bac_graphic_label_read_results;
 extern bool bac_remote_point_read_results;
 extern bool bac_cm5_graphic;
 
-extern int bac_gloab_panel;
-
+extern unsigned char  bac_gloab_panel;
+extern unsigned char g_thread_max_mac_id ; //客户上次点击的mstp mac ID
 extern int input_list_line;
 extern int output_list_line;
 extern int program_list_line ;
@@ -1022,6 +1024,7 @@ extern vector <bacnet_standard_Info> m_standard_graphic_refresh_data;
 extern vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 extern vector <Alarm_point> m_alarmlog_data;
 extern vector <refresh_net_device> m_refresh_net_device_data;
+extern vector <refresh_subnet_device> m_refresh_subnet_status;
 extern vector <refresh_net_device> m_T3BB_device_data;
 extern vector <Str_TstatInfo_point> m_Tstat_data;
 extern Str_Remote_TstDB m_remote_device_db;
@@ -1039,6 +1042,7 @@ extern vector <Scan_Info> m_scan_info_buffer;
 extern vector <Client_Info> m_tcp_connect_info;
 extern vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
 extern vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
+extern vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 新的setpoint表格; 以前的完全改不动了;
 extern Str_Setting_Info Device_Basic_Setting;
 extern Str_Email_point  Device_Email_Point;
 extern Str_MISC Device_Misc_Data;
@@ -1189,7 +1193,7 @@ extern Str_weekly_routine_point m_temp_weekly_data[BAC_SCHEDULE_COUNT];
 extern Str_annual_routine_point m_temp_annual_data[BAC_HOLIDAY_COUNT];
 extern Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
 extern Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
-
+extern int b_pause_refresh_tree; // 全局变量，控制主线程里面的 是否刷新网络数据;
 extern int debug_item_show;
 
 extern char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
@@ -1269,3 +1273,5 @@ extern panelname_map g_panelname_map;
 extern bacnet_instance_reg_map g_bacnet_reg_ins_map;  //用来区分每个instance 存放在那两个字节，不同产品，不同处理;
 extern connect_Info system_connect_info;
 extern CString HolLable[BAC_HOLIDAY_COUNT]; //用于动态加载List中的下拉框
+extern int m_special_customer ;      //客户自定义T3000的名字;  // 1为CPR_Bestek
+extern CString cs_special_name;         //对应该改的名字;

@@ -408,14 +408,14 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
             break;
         case FLASH_SUCCESS:
         {
-            ret_message.Format(_T("Sending firmware to device succeed!"));
+            ret_message.Format(_T("Firmware update succeeded!"));
             m_download_info.InsertString(m_download_info.GetCount(), ret_message);
             m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
         }
         break;
         case FAILED_UNKNOW_ERROR:
         {
-            ret_message.Format(_T("Sending firmware to device failed! "));
+            ret_message.Format(_T("Firmware update was not successful, please try again.  "));
             m_download_info.InsertString(m_download_info.GetCount(), ret_message);
             m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
         }
@@ -807,7 +807,11 @@ BOOL Dowmloadfile::OnInitDialog()
 
 	productfolder = GetProdcutFtpPath(m_product_isp_auto_flash.product_class_id);
 
+    if (m_special_customer == 1)
+    {
 
+        GetDlgItem(IDC_BUTTON_UPDATE_T3000)->SetWindowTextW(_T("Update ") + cs_special_name);
+    }
 
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Bootloader"));
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Main Firmware"));
@@ -1131,6 +1135,13 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
 
             delete pBuf;
         }
+        else
+        {
+            CS_Info.Format(_T("Download failded!"));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+            goto ftp_download_end;
+        }
     }
 
     if ((local_version_date == ftp_version_date) && (ftp_version_date != 0) && tempfind.FindFile(DesDownloadFilePath))  //与FTP上相等 并且存在;
@@ -1144,16 +1155,20 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     {
         DeleteUrlCacheEntry(T3000FtpPath); // 清理缓存
         Sleep(2000);
-
-        download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.下载到指定目录，并记录目录位置;
-        if (download_ret == S_FALSE)
+        int retry_count_hex = 0;
+        while (retry_count_hex<10)
         {
-            CS_Info.Format(_T("Download failded!"));
-            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
-            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
-            goto ftp_download_end;
+            download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.下载到指定目录，并记录目录位置;
+            if (download_ret != S_OK)
+            {
+                retry_count_hex++;
+                CS_Info.Format(_T("Network is not stable, download file is interrupted, retry(%d / 10)."), retry_count_hex);
+                pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            }
+            else
+                break;
         }
-        else
+        if (download_ret == S_OK)
         {
             //GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, CheckVersionIniFilePath);
             CString temp_version;
@@ -1163,6 +1178,15 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
             CS_Info.Format(_T("Download finished."));
             pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
             pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+
+
+        }
+        else
+        {
+            CS_Info.Format(_T("Download failded!"));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+            goto ftp_download_end;
         }
     }
 

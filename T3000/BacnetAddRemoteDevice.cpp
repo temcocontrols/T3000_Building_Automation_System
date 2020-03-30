@@ -145,7 +145,8 @@ int Remote_Get_PanelName(unsigned char nmodbusid, unsigned char npid_type,CStrin
 int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/, LPCTSTR remote_ip, int udp_port, int tcp_port)
 {
 
-
+    int main_device = 0;
+    int sub_device = 0;
     for (int x = 0; x < nlocal_ip_address.size(); x++)
     {
         m_bac_handle_Iam_data.clear();
@@ -155,8 +156,8 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
         Initial_bac(0, local_ip);
         bool n_connect_type = 0; // 0 bacnet   1 modbus;
         int ready_to_read_count = 0;
-        int main_device = 0;
-        int sub_device = 0;
+        main_device = 0;
+        sub_device = 0;
         for (int j = 0; j < 5; j++)
         {
             static_info.Format(_T("Scanning using network adapter:%s , please wait! (%d)"), local_ip,j);
@@ -432,8 +433,18 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
         static_info.Format(_T("Network adapter:%s Scan finished!Found %d device"), local_ip, main_device + sub_device);
         Sleep(2000);
     }
-
-    static_info.Format(_T("All operations have been completed!"));
+    if (main_device + sub_device == 0)
+    {
+        static_info.Format(_T("Unable to connect to remote device!"));
+        Sleep(1000);
+        static_info.Format(_T("The possible reason is that the device is offline!"));
+        Sleep(1000);
+        static_info.Format(_T("The possible reason is that port forwarding is not working!"));
+        Sleep(1000);
+        static_info.Format(_T("Please Check your router ,Configure port forwarding correctly!"));
+    }
+    else
+        static_info.Format(_T("All operations have been completed!"));
     Sleep(1000);
     return 0;
 }

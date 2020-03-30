@@ -199,13 +199,13 @@ LRESULT CBacnetTstat::Fresh_Tstat_List(WPARAM wParam,LPARAM lParam)
 		}
 		m_tstat_list.SetItemText(i,TSTAT_OCCUPIED,OCCUPIED);
 
-		Cool_Setpoint.Format(_T("%.1f"),((float)m_Tstat_data.at(i).cool_setpoint)/10);
+		Cool_Setpoint.Format(_T("%.1f"),((float)m_Tstat_data.at(i).cool_setpoint)/10.0);
 		m_tstat_list.SetItemText(i,TSTAT_COOL_SETPOINT,Cool_Setpoint);	
-		Heat_Setpoint.Format(_T("%.1f"),((float)m_Tstat_data.at(i).heat_setpoint)/10);
+		Heat_Setpoint.Format(_T("%.1f"),((float)m_Tstat_data.at(i).heat_setpoint)/10.0);
 		m_tstat_list.SetItemText(i,TSTAT_HEAT_SETPOINT,Heat_Setpoint);	
-		Room_Setpoint.Format(_T("%.1f"),((float)m_Tstat_data.at(i).setpoint)/10);
+		Room_Setpoint.Format(_T("%.1f"),((float)m_Tstat_data.at(i).setpoint)/10.0);
 		m_tstat_list.SetItemText(i,TSTAT_ROOM_SETPOINT,Room_Setpoint);
-		RoomTemperature.Format(_T("%.1f"),((float)m_Tstat_data.at(i).temperature)/10);
+		RoomTemperature.Format(_T("%.1f"),((float)m_Tstat_data.at(i).temperature)/10.0);
 		m_tstat_list.SetItemText(i,TSTAT_ROOM_TEM,RoomTemperature);
 		CS_TSTAT_MODE.Format(_T("%d"),m_Tstat_data.at(i).mode);
 		m_tstat_list.SetItemText(i,TSTAT_MODE,CS_TSTAT_MODE);
