@@ -469,7 +469,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						digital_special_output_count = TINYEX_MINIPANEL_OUT_D;
 						analog_special_output_count = TINYEX_MINIPANEL_OUT_A;
 					}
-                    else if (bacnet_device_type == BACNET_ROUTER)
+                    else if (bacnet_device_type == MINIPANELARM_NB)
                     {
                         digital_special_output_count = BACNET_ROUTER_OUT_D;
                         analog_special_output_count = BACNET_ROUTER_OUT_A;

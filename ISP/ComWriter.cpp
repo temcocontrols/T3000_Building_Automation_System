@@ -1626,17 +1626,16 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
     if (n_check_temco_firmware == 0)
         return 1;
     CString strtips;
-    unsigned short Device_infor[10];
+    unsigned short Device_infor[18];
     CString str_ret,temp;
  
     CString hexproductname=_T("");
 
-    //  int ret=read_multi(ID,&Device_infor[0],0,10);
     int ret=0;
     int resend_count = 0;
     do
     {
-        ret = read_multi_tap(ID,&Device_infor[0],0,10);
+        ret = read_multi_tap(ID,&Device_infor[0],0,18);
         if(ret >= 0)
             break;
         resend_count ++ ;
@@ -1645,6 +1644,14 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
             strtips.Format(_T("Device is offline,Please check the connection!"));
             OutPutsStatusInfo(strtips,false);
             return FALSE;
+        }
+        else
+        {
+            strtips.Format(_T("Reading device version information!(%d)"), resend_count);
+            if(resend_count == 1)
+                OutPutsStatusInfo(strtips, false);
+            else
+                OutPutsStatusInfo(strtips, true);
         }
         Sleep(1000);
 
@@ -1658,7 +1665,7 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
 	 
     
 
-    CString prodcutname=GetProductName(Device_infor[7]);
+    CString prodcutname= GetFirmwareUpdateName(Device_infor[7]);
 
     
 
@@ -1866,14 +1873,14 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 if (nRet <= 0)
                 {
                     bool read_bootloader_ret = false;
-                    for (int i = 0; i < 10; i++)
+                    for (int x = 0; x < 10; x++)
                     {
                         Sleep(2000);
                         nRet = Read_One(pWriter->m_szMdbIDs[i], 11);
                         if (nRet <= 0)
                         {
                             CString srtInfo;
-                            srtInfo.Format(_T("|Reading bootloader version (%d)!"), i + 1);
+                            srtInfo.Format(_T("|Firmware update is being prepared, please wait! (%d)!"), x + 1);
                             pWriter->OutPutsStatusInfo(srtInfo);
                             continue;
                         }
@@ -1881,7 +1888,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         {
                             CString srtInfo;
                             read_bootloader_ret = true;
-                            srtInfo.Format(_T("|Reading bootloader version OK!"));
+                            srtInfo.Format(_T("|Reading bootloader version OK,ready to update!"));
                             pWriter->OutPutsStatusInfo(srtInfo);
                             break;
                         }

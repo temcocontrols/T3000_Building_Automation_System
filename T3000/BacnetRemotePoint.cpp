@@ -88,7 +88,7 @@ void CBacnetRemotePoint::Initial_List()
 	m_remote_point_list.InsertColumn(REMOTE_VALUE, _T("Value"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_DEVICE_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_DESCRIPTION, _T("Description"), 200, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-    m_remote_point_list.InsertColumn(REMOTE_TIME_REMAINING, _T("Time Remaining"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+    m_remote_point_list.InsertColumn(REMOTE_TIME_REMAINING, _T("Last Contact"), 150, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
     
 	m_remote_point_hwnd = this->m_hWnd;
 	m_remote_point_list.SetListHwnd(this->m_hWnd);
@@ -255,7 +255,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 
         temp_reg_number.Format(_T("%u"), dev_reg);
 
-        temp_reg_value.Format(_T("%d"), (m_remote_point_data.at(i).point_value));
+        
         temp_time_remaining.Format(_T("%d"), m_remote_point_data.at(i).time_remaining);
 
 
@@ -291,8 +291,18 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
             temp_type = _T("BAC_FLOAT_CDAB");
         else if (t_type == BAC_FLOAT_BADC + 1)
             temp_type = _T("BAC_FLOAT_BADC");
-        else if (t_type == BAC_FLOAT_CDBA + 1)
-            temp_type = _T("BAC_FLOAT_CDBA");
+        else if (t_type == BAC_FLOAT_DCBA + 1)
+            temp_type = _T("BAC_FLOAT_DCBA");
+
+        if ((t_type == BAC_FLOAT_ABCD + 1) ||
+            (t_type == BAC_FLOAT_CDAB + 1) ||
+            (t_type == BAC_FLOAT_BADC + 1) ||
+            (t_type == BAC_FLOAT_DCBA + 1))
+        {
+            temp_reg_value.Format(_T("%.3f"), ((float)m_remote_point_data.at(i).point_value)/1000);
+        }
+        else
+            temp_reg_value.Format(_T("%d"), (m_remote_point_data.at(i).point_value) / 1000);
 #if 0
 		if(dev_reg == 0)
 		{

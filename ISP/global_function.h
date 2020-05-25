@@ -19,6 +19,7 @@ BOOL BinFileValidation(const CString& strFileName);
 int read_one(unsigned char device_var,unsigned short address,int retry_times=3);
 //read modbus register value
 CString GetProductName(int ModelID); 
+CString GetFirmwareUpdateName(int ModelID);
 //According to ModelID ,getting the product model name.
 CString GetSysTime(); 
 //得到系统的时间 精确到秒

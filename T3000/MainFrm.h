@@ -130,7 +130,7 @@ typedef struct _tree_product//////////////////////
     int product_id;
     float software_version;
     float hardware_version;
-    int nhardware_info;
+    int nhardware_info;  ////bit0 zigbee   bit1 wifi
     CString strImgPathName;
     int protocol;
     unsigned int ncomport;
@@ -144,6 +144,7 @@ typedef struct _tree_product//////////////////////
     unsigned int object_instance;
     UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
     UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
+    UCHAR  expand; //是否树形结构展开; 1为默认展开 或者 非2 为展开       2 为折叠
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 //
 

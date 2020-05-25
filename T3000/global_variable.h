@@ -2270,7 +2270,14 @@ CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
 int m_special_customer = 0;      //客户自定义T3000的名字;  // 1为CPR_Bestek
 CString cs_special_name;         //对应该改的名字;
 
+unsigned char n_ignore_sync_time;  //是否忽略同步时间;
+unsigned int last_ignore_sync_time;  //上次点击忽略同步时间的 时间节点;  比如用于3天后继续提醒;
+
+unsigned char check_revert_daxiaoduan = 0; //大小端是否需要反转，正常旧版本不要反转;
 
 
+int n_read_product_type = 0; //这三个变量 确定 modbus协议 去读取 bacnet东西的时候 ，读哪些寄存器;
+int n_read_list_flag = -1; // 读取那一个，例如读Input 还是Output
+int n_read_item_index = 0; // 读哪一个 例如Schedule3 的时间 ，不能用weekly_list 因为界面上的容易变。
 
-
+unsigned int DEBUG_DELAY_TIME = 0; //测试用调试Wifi 延迟时间;

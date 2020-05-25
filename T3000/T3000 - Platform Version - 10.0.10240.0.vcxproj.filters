@@ -762,6 +762,9 @@
     <ClCompile Include="TstatSetpointDetail.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TstatAQI_Detail.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -1931,6 +1934,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TstatSetpointDetail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TstatAQI_Detail.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

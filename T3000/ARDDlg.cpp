@@ -293,7 +293,7 @@ void CARDDlg::OnBnClickedOk()
            CString temp_panel_number;
            int count;
            temp_serial_number.Format(_T("%u"), temp_info.serialnumber);
-           str_temp.Format(_T("select * from ALL_NODE where Serial_ID = '%s'"), temp_info.serialnumber);
+           str_temp.Format(_T("select * from ALL_NODE where Serial_ID = '%i'"), temp_info.serialnumber);
            temp_baud.Format(_T("%u"), nbaudrate);
            q = SqliteDBBuilding.execQuery((UTF8MBSTR)str_temp);
            table = SqliteDBBuilding.getTable((UTF8MBSTR)str_temp);

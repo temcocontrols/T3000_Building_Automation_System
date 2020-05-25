@@ -66,6 +66,8 @@ public:
 	afx_msg LRESULT OnAddStatusInfo(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnReplaceStatusInfo(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnFlashFinish(WPARAM wParam, LPARAM lParam);
+    afx_msg LRESULT OnFlashBoot_Update_boot(WPARAM wParam, LPARAM lParam);
+    afx_msg LRESULT OnFlashNewBootFinish(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedButtonFindnc();
 	afx_msg void OnClose();
 	afx_msg void OnBnClickedRadioFlhfirmware();
@@ -271,4 +273,6 @@ public:
     CStaticEx m_static_info;
     static DWORD WINAPI  SN_MAC_Threadfun(LPVOID lpVoid);
     afx_msg LRESULT Fresh_CloseSN_fcuntion(WPARAM wParam, LPARAM lParam);
+    afx_msg void OnCbnSelchangeComboPm();
+    void Enable_Sensor_Window(bool nenable);
 };

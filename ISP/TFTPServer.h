@@ -69,7 +69,7 @@ public:
 
 	// flash 完成。
 	void WriteFinish(int nFlashFlag);
-	
+    void NewBootWriteFinish(int nFlashFlag);
 	// 发送数据流程
 	int SendProcess();
 

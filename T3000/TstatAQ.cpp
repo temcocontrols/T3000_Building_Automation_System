@@ -9,6 +9,7 @@
 // CTstatAQ
 #define     WM_TSTAT_AQ_THREAD_READ                     WM_USER + 502
 HANDLE h_tstat_aq_thread = NULL;
+static int aqi_level = 0;
 IMPLEMENT_DYNCREATE(CTstatAQ, CFormView)
 
 CTstatAQ::CTstatAQ()
@@ -23,7 +24,9 @@ CTstatAQ::~CTstatAQ()
 
 void CTstatAQ::DoDataExchange(CDataExchange* pDX)
 {
-	CFormView::DoDataExchange(pDX);
+    CFormView::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_STATIC_AQI_INFO, m_aqi_title);
+    DDX_Control(pDX, IDC_STATIC_AQI, m_static_info);
 }
 
 BEGIN_MESSAGE_MAP(CTstatAQ, CFormView)
@@ -32,6 +35,15 @@ BEGIN_MESSAGE_MAP(CTstatAQ, CFormView)
     ON_EN_KILLFOCUS(IDC_EDIT_CO2_OFF_TIME, &CTstatAQ::OnEnKillfocusEditCo2OffTime)
     ON_EN_KILLFOCUS(IDC_EDIT_PM_ON_TIME, &CTstatAQ::OnEnKillfocusEditPmOnTime)
     ON_EN_KILLFOCUS(IDC_EDIT_PM_OFF_TIME, &CTstatAQ::OnEnKillfocusEditPmOffTime)
+    ON_BN_CLICKED(IDC_RADIO_DEG_C, &CTstatAQ::OnBnClickedRadioDegC)
+    ON_BN_CLICKED(IDC_RADIO_DEG_F, &CTstatAQ::OnBnClickedRadioDegF)
+    ON_CBN_SELCHANGE(IDC_COMBO_AQI_REGION, &CTstatAQ::OnCbnSelchangeComboAqiRegion)
+    ON_EN_KILLFOCUS(IDC_EDIT_LEVEL_1, &CTstatAQ::OnEnKillfocusEditLevel1)
+    ON_EN_KILLFOCUS(IDC_EDIT_LEVEL_2, &CTstatAQ::OnEnKillfocusEditLevel2)
+    ON_EN_KILLFOCUS(IDC_EDIT_LEVEL_3, &CTstatAQ::OnEnKillfocusEditLevel3)
+    ON_EN_KILLFOCUS(IDC_EDIT_LEVEL_4, &CTstatAQ::OnEnKillfocusEditLevel4)
+    ON_EN_KILLFOCUS(IDC_EDIT_LEVEL_5, &CTstatAQ::OnEnKillfocusEditLevel5)
+    ON_BN_CLICKED(IDC_BUTTON_CUS_AQI, &CTstatAQ::OnBnClickedButtonCusAqi)
 END_MESSAGE_MAP()
 
 
@@ -51,11 +63,12 @@ void CTstatAQ::Dump(CDumpContext& dc) const
 #endif
 #endif //_DEBUG
 CString AQ_image_fordor;
+CString bmp_AQI;
 void CTstatAQ::Fresh()
 {
     CStatic* pWnd = (CStatic*)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE); // 得到 Picture Control 句柄 ;
     CString icon_temperature;
-    
+
    
     CString ApplicationFolder;
     GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
@@ -63,14 +76,25 @@ void CTstatAQ::Fresh()
     ApplicationFolder.ReleaseBuffer();
     AQ_image_fordor = ApplicationFolder + _T("\\ResourceFile");
     icon_temperature = AQ_image_fordor + _T("\\temperature.bmp");
+    bmp_AQI = AQ_image_fordor + _T("\\AQI.bmp");
     HBITMAP bitmap;
     bitmap = (HBITMAP)LoadImage(AfxGetInstanceHandle(), icon_temperature, IMAGE_BITMAP, 40, 120, LR_LOADFROMFILE);
-
     CStatic *p = (CStatic *)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE);
     //设置静态控件窗口风格为位图居中显示  
     p->ModifyStyle(0xf, SS_BITMAP | SS_CENTERIMAGE);
     //将图片设置到Picture控件上  
     p->SetBitmap(bitmap);
+
+    //HBITMAP bitmap_api;
+    //bitmap_api = (HBITMAP)LoadImage(AfxGetInstanceHandle(), bmp_AQI, IMAGE_BITMAP, 646, 437, LR_LOADFROMFILE);
+    //CStatic *p2 = (CStatic *)GetDlgItem(IDC_STATIC_AQI);
+    ////设置静态控件窗口风格为位图居中显示  
+    //p2->ModifyStyle(0xf, SS_BITMAP | SS_CENTERIMAGE);
+    ////将图片设置到Picture控件上  
+    //p2->SetBitmap(bitmap_api);
+
+
+
 
 
 
@@ -100,10 +124,29 @@ void CTstatAQ::Fresh()
 
    
 
+
+}
+
+void CTstatAQ::EnableCus(bool flag)
+{
+    if (!flag)
+    {
+        GetDlgItem(IDC_EDIT_LEVEL_1)->SetWindowTextW(_T(" "));
+        GetDlgItem(IDC_EDIT_LEVEL_2)->SetWindowTextW(_T(" "));
+        GetDlgItem(IDC_EDIT_LEVEL_3)->SetWindowTextW(_T(" "));
+        GetDlgItem(IDC_EDIT_LEVEL_4)->SetWindowTextW(_T(" "));
+        GetDlgItem(IDC_EDIT_LEVEL_5)->SetWindowTextW(_T(" "));
+    }
+    GetDlgItem(IDC_EDIT_LEVEL_1)->EnableWindow(flag);
+    GetDlgItem(IDC_EDIT_LEVEL_2)->EnableWindow(flag);
+    GetDlgItem(IDC_EDIT_LEVEL_3)->EnableWindow(flag);
+    GetDlgItem(IDC_EDIT_LEVEL_4)->EnableWindow(flag);
+    GetDlgItem(IDC_EDIT_LEVEL_5)->EnableWindow(flag);
 }
 
 void CTstatAQ::UpdateUI()
 {
+
     CString cs_temp;
     cs_temp.Format(_T("%.1f"), ((float)product_register_value[TSTAT_AQ_TEMPERATURE]) / 10);
 
@@ -114,7 +157,10 @@ void CTstatAQ::UpdateUI()
     cs_ppm.Format(_T("%d"), product_register_value[TSTAT_AQ_CO2]);
 
     CString cs_VOC;
-    cs_VOC.Format(_T("%d"), product_register_value[TSTAT_AQ_VOC]);
+    if(product_register_value[7] == PM_TSTAT_AQ)
+        cs_VOC.Format(_T("%u"), product_register_value[TSTAT_AQ_VOC_AIRLAB]);
+    else
+        cs_VOC.Format(_T("%u"), product_register_value[TSTAT_AQ_VOC]);
 
     CString cs_light;
     cs_light.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT]);
@@ -135,13 +181,100 @@ void CTstatAQ::UpdateUI()
     GetDlgItem(IDC_STATIC_HUM_VALUE)->SetWindowTextW(cs_hum);
     GetDlgItem(IDC_STATIC_CO2_VALUE)->SetWindowTextW(cs_ppm);
     GetDlgItem(IDC_STATIC_VOC_VALUE)->SetWindowTextW(cs_VOC);
-    GetDlgItem(IDC_STATIC_LIGHT_VALUE)->SetWindowTextW(cs_light);
-    GetDlgItem(IDC_STATIC_SOUND_VALUE)->SetWindowTextW(cs_sound);
 
-    GetDlgItem(IDC_EDIT_CO2_ON_TIME)->SetWindowTextW(cs_co2_on);
-    GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->SetWindowTextW(cs_co2_off);
-    GetDlgItem(IDC_EDIT_PM_ON_TIME)->SetWindowTextW(cs_pm_on);
-    GetDlgItem(IDC_EDIT_PM_OFF_TIME)->SetWindowTextW(cs_pm_off);
+
+    CString cs_api_value;
+    cs_api_value.Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI]);
+    CString cs_api_level;
+    cs_api_level.Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_LEVEL] + 1);
+
+    if ((aqi_level != product_register_value[TATAT_AQ_MODBUS_AQI_LEVEL]) && product_register_value[TATAT_AQ_MODBUS_AQI_LEVEL]<=5)
+    {
+       aqi_level = product_register_value[TATAT_AQ_MODBUS_AQI_LEVEL];
+        m_aqi_title.SetWindowTextW(AQI_Info_Status[aqi_level]);
+        m_aqi_title.textColor(AQI_Info_Status_Color[aqi_level]);
+        m_aqi_title.bkColor(AQI_Info_Status_Back_Color[aqi_level]);
+    }
+
+    CString temp_cus_api[5];
+    temp_cus_api[0].Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FIRST_LINE]);
+    temp_cus_api[1].Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_SECOND_LINE]);
+    temp_cus_api[2].Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_THIRD_LINE]);
+    temp_cus_api[3].Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FOURTH_LINE]);
+    temp_cus_api[4].Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FIFTH_LINE]);
+
+    if (product_register_value[7] == PM_MULTI_SENSOR)
+    {
+        GetDlgItem(IDC_EDIT_CO2_ON_TIME)->EnableWindow(1);
+        GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->EnableWindow(1);
+        GetDlgItem(IDC_EDIT_PM_ON_TIME)->EnableWindow(1);
+        GetDlgItem(IDC_EDIT_PM_OFF_TIME)->EnableWindow(1);
+        GetDlgItem(IDC_EDIT_CO2_ON_TIME)->SetWindowTextW(cs_co2_on);
+        GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->SetWindowTextW(cs_co2_off);
+        GetDlgItem(IDC_EDIT_PM_ON_TIME)->SetWindowTextW(cs_pm_on);
+        GetDlgItem(IDC_EDIT_PM_OFF_TIME)->SetWindowTextW(cs_pm_off);
+        GetDlgItem(IDC_STATIC_LIGHT_VALUE)->SetWindowTextW(cs_light);
+        GetDlgItem(IDC_STATIC_SOUND_VALUE)->SetWindowTextW(cs_sound);
+
+        GetDlgItem(IDC_EDIT_AQI_VALUE)->SetWindowTextW(_T(" "));
+        GetDlgItem(IDC_EDIT_AQI_LEVEL)->SetWindowTextW(_T(" "));
+        GetDlgItem(IDC_COMBO_AQI_REGION)->SetWindowTextW(_T(" "));
+
+        EnableCus(0);
+    }
+    else
+    {
+        GetDlgItem(IDC_EDIT_CO2_ON_TIME)->EnableWindow(0);
+        GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->EnableWindow(0);
+        GetDlgItem(IDC_EDIT_PM_ON_TIME)->EnableWindow(0);
+        GetDlgItem(IDC_EDIT_PM_OFF_TIME)->EnableWindow(0);
+        GetDlgItem(IDC_EDIT_CO2_ON_TIME)->SetWindowTextW(_T(" "));
+        GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->SetWindowTextW(_T(" "));
+        GetDlgItem(IDC_EDIT_PM_ON_TIME)->SetWindowTextW(_T(" "));
+        GetDlgItem(IDC_EDIT_PM_OFF_TIME)->SetWindowTextW(_T(" "));
+        GetDlgItem(IDC_STATIC_LIGHT_VALUE)->SetWindowTextW(_T("-"));
+        GetDlgItem(IDC_STATIC_SOUND_VALUE)->SetWindowTextW(_T("-"));
+
+
+        GetDlgItem(IDC_EDIT_AQI_VALUE)->SetWindowTextW(cs_api_value);
+        GetDlgItem(IDC_EDIT_AQI_LEVEL)->SetWindowTextW(cs_api_level);
+        CString cs_api_region;
+        if (product_register_value[TATAT_AQ_MODBUS_AQI_AREA] == 0)
+        {
+            ((CComboBox *)GetDlgItem(IDC_COMBO_AQI_REGION))->SetCurSel(0);
+            EnableCus(0);
+        }
+        else if (product_register_value[TATAT_AQ_MODBUS_AQI_AREA] == 1)
+        {
+            ((CComboBox *)GetDlgItem(IDC_COMBO_AQI_REGION))->SetCurSel(1);
+            EnableCus(0);
+        }
+        else 
+        {
+            ((CComboBox *)GetDlgItem(IDC_COMBO_AQI_REGION))->SetCurSel(2);
+            EnableCus(1);
+        }
+        
+        GetDlgItem(IDC_EDIT_LEVEL_1)->SetWindowTextW(temp_cus_api[0]);
+        GetDlgItem(IDC_EDIT_LEVEL_2)->SetWindowTextW(temp_cus_api[1]);
+        GetDlgItem(IDC_EDIT_LEVEL_3)->SetWindowTextW(temp_cus_api[2]);
+        GetDlgItem(IDC_EDIT_LEVEL_4)->SetWindowTextW(temp_cus_api[3]);
+        GetDlgItem(IDC_EDIT_LEVEL_5)->SetWindowTextW(temp_cus_api[4]);
+    }
+
+    if (product_register_value[TSTAT_AQ_TEMP_UNIT] == 0)
+    {
+        ((CButton *)GetDlgItem(IDC_RADIO_DEG_C))->SetCheck(1);
+        ((CButton *)GetDlgItem(IDC_RADIO_DEG_F))->SetCheck(0);
+        GetDlgItem(IDC_STATIC_TEMP_UNITS)->SetWindowTextW(_T("Deg.C"));
+        
+    }
+    else if (product_register_value[TSTAT_AQ_TEMP_UNIT] == 1)
+    {
+        ((CButton *)GetDlgItem(IDC_RADIO_DEG_C))->SetCheck(0);
+        ((CButton *)GetDlgItem(IDC_RADIO_DEG_F))->SetCheck(1);
+        GetDlgItem(IDC_STATIC_TEMP_UNITS)->SetWindowTextW(_T("Deg.F"));
+    }
 
     CString cs_weight_pm1;
     if (product_register_value[TSTAT_AQ_WEIGHT_1] != 0)
@@ -215,6 +348,15 @@ void CTstatAQ::UpdateUI()
 void CTstatAQ::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
+    m_aqi_title.SetWindowTextW(_T(""));
+    m_aqi_title.textColor(RGB(255, 255, 255));
+    m_aqi_title.bkColor(RGB(0, 0, 255));
+    m_aqi_title.setFont(28, 26, NULL, _T("Arial"));
+
+    m_static_info.SetWindowTextW(_T("Air Quality"));
+    m_static_info.textColor(RGB(255, 255, 255));
+    m_static_info.bkColor(RGB(0, 0, 255));
+    m_static_info.setFont(28, 26, NULL, _T("Arial"));
     // TODO: 在此添加专用代码和/或调用基类
 }
 
@@ -313,4 +455,131 @@ void CTstatAQ::OnEnKillfocusEditPmOffTime()
 
     Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_PM_OFF, nValue,
         product_register_value[TATAT_AQ_PM_OFF], this->m_hWnd, IDC_EDIT_DTERM, _T("PM Off Time"));
+}
+
+
+void CTstatAQ::OnBnClickedRadioDegC()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    int nValue = 0;
+
+
+    if (product_register_value[TSTAT_AQ_TEMP_UNIT] == nValue)	//Add this to judge weather this value need to change.
+        return;
+
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TSTAT_AQ_TEMP_UNIT, nValue,
+        product_register_value[TSTAT_AQ_TEMP_UNIT], this->m_hWnd, IDC_EDIT_DTERM, _T(" Deg.C "));
+}
+
+
+void CTstatAQ::OnBnClickedRadioDegF()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    int nValue = 1;
+
+
+    if (product_register_value[TSTAT_AQ_TEMP_UNIT] == nValue)	//Add this to judge weather this value need to change.
+        return;
+
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TSTAT_AQ_TEMP_UNIT, nValue,
+        product_register_value[TSTAT_AQ_TEMP_UNIT], this->m_hWnd, IDC_EDIT_DTERM, _T(" Deg.F "));
+}
+
+
+void CTstatAQ::OnCbnSelchangeComboAqiRegion()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    int n_value = 0;
+    CString temp_string;
+    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_AQI_REGION))->GetCurSel();
+    ((CComboBox *)GetDlgItem(IDC_COMBO_AQI_REGION))->GetLBText(nSel, temp_string);
+    if (temp_string.CompareNoCase(_T("USA")) == 0)
+    {
+        n_value = 0;
+    }
+    else if (temp_string.CompareNoCase(_T("China")) == 0)
+    {
+        n_value = 1;
+    }
+    else if (temp_string.CompareNoCase(_T("Custom")) == 0)
+    {
+        n_value = 2;
+    }
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_AREA, n_value,
+        product_register_value[TATAT_AQ_MODBUS_AQI_AREA], this->m_hWnd, IDC_EDIT_DTERM, _T(" AQI Region "));
+}
+
+
+
+void CTstatAQ::OnEnKillfocusEditLevel1()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    CString temp_cstring;
+    GetDlgItemTextW(IDC_EDIT_LEVEL_1, temp_cstring);
+    unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_FIRST_LINE, temp_value,
+        product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FIRST_LINE], this->m_hWnd, IDC_EDIT_LEVEL_1, _T(" Custom Value "));
+}
+
+
+void CTstatAQ::OnEnKillfocusEditLevel2()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_cstring;
+    GetDlgItemTextW(IDC_EDIT_LEVEL_2, temp_cstring);
+    unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_SECOND_LINE, temp_value,
+        product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_SECOND_LINE], this->m_hWnd, IDC_EDIT_LEVEL_2, _T(" Custom Value "));
+}
+
+
+void CTstatAQ::OnEnKillfocusEditLevel3()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_cstring;
+    GetDlgItemTextW(IDC_EDIT_LEVEL_3, temp_cstring);
+    unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_THIRD_LINE, temp_value,
+        product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_THIRD_LINE], this->m_hWnd, IDC_EDIT_LEVEL_3, _T(" Custom Value "));
+}
+
+
+void CTstatAQ::OnEnKillfocusEditLevel4()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_cstring;
+    GetDlgItemTextW(IDC_EDIT_LEVEL_4, temp_cstring);
+    unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_FOURTH_LINE, temp_value,
+        product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FOURTH_LINE], this->m_hWnd, IDC_EDIT_LEVEL_4, _T(" Custom Value "));
+}
+
+
+void CTstatAQ::OnEnKillfocusEditLevel5()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_cstring;
+    GetDlgItemTextW(IDC_EDIT_LEVEL_5, temp_cstring);
+    unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
+
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_FIFTH_LINE, temp_value,
+        product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FIFTH_LINE], this->m_hWnd, IDC_EDIT_LEVEL_5, _T(" Custom Value "));
+}
+
+
+
+#include "TstatAQI_Detail.h"
+void CTstatAQ::OnBnClickedButtonCusAqi()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CTstatAQI_Detail dlg;
+    dlg.DoModal();
 }

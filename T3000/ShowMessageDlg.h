@@ -11,6 +11,7 @@ const int EVENT_MSTP_CONNECTION_ESTABLISH = 3;
 const int EVENT_FIRST_LOAD_PROG = 4;
 const int EVENT_CHANGE_PROTOCOL = 5;
 const int EVENT_WARNING_CHANGE_PROTOCOL_BAUDRATE = 6;
+const int EVENT_SYNC_TIME = 7;
 
 class CShowMessageDlg : public CDialogEx
 {

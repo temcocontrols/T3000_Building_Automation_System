@@ -1106,7 +1106,7 @@ struct commands {
  "ENABLE",  ENABLEX,
  "END",     ENDPRG,
  "FOR",     FOR,
- "TO",      TO,
+ "TO ",      TO,
  "STEP",    STEP,
  "GOSUB",	  GOSUB,
  "GOTO",    GOTO,
@@ -3625,7 +3625,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
                         (k != BAC_FLOAT_ABCD) &&  // 2020 03 25
                         (k != BAC_FLOAT_CDAB) &&
                         (k != BAC_FLOAT_BADC) &&
-                        (k != BAC_FLOAT_CDBA) &&
+                        (k != BAC_FLOAT_DCBA) &&
                       (k!= COIL_REG) && 
                       (k!= DIS_INPUT_REG) && 
                       (k!= INPUT_REG) && 
@@ -3702,7 +3702,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
                             ((k == BAC_FLOAT_ABCD) ||
                              (k == BAC_FLOAT_CDAB) ||
                              (k == BAC_FLOAT_BADC) ||
-                             (k == BAC_FLOAT_CDBA) ||
+                             (k == BAC_FLOAT_DCBA) ||
                             (k == MB_REG)  )&& 
                             (*num_point >=2000))
                         {
@@ -5851,7 +5851,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                                 (temp_point_type == BAC_FLOAT_ABCD) ||
                                 (temp_point_type == BAC_FLOAT_CDAB) ||
                                 (temp_point_type == BAC_FLOAT_BADC) ||
-                                (temp_point_type == BAC_FLOAT_CDBA) ||
+                                (temp_point_type == BAC_FLOAT_DCBA) ||
                                 (temp_point_type == COIL_REG) ||
                                 (temp_point_type == DIS_INPUT_REG) ||
                                 (temp_point_type == INPUT_REG) ||
@@ -5940,7 +5940,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                                 (temp_point_type == BAC_FLOAT_ABCD) ||
                                 (temp_point_type == BAC_FLOAT_CDAB) ||
                                 (temp_point_type == BAC_FLOAT_BADC) ||
-                                (temp_point_type == BAC_FLOAT_CDBA) ||
+                                (temp_point_type == BAC_FLOAT_DCBA) ||
                                 (temp_point_type == COIL_REG) ||
 								(temp_point_type == DIS_INPUT_REG) ||
 								(temp_point_type == INPUT_REG) ||
@@ -5986,7 +5986,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                                 (temp_point_type == BAC_FLOAT_ABCD) ||
                                 (temp_point_type == BAC_FLOAT_CDAB) ||
                                 (temp_point_type == BAC_FLOAT_BADC) ||
-                                (temp_point_type == BAC_FLOAT_CDBA) ||
+                                (temp_point_type == BAC_FLOAT_DCBA) ||
                                 (temp_point_type == DIS_INPUT_REG) ||
 								(temp_point_type == INPUT_REG) ||
 								(temp_point_type == MB_REG) ||
@@ -7055,7 +7055,7 @@ int pointtotext(char *buf,Point_Net *point)
          (point_type == BAC_FLOAT_ABCD) ||
          (point_type == BAC_FLOAT_CDAB) ||
          (point_type == BAC_FLOAT_BADC) ||
-         (point_type == BAC_FLOAT_CDBA) 
+         (point_type == BAC_FLOAT_DCBA)
         )&& (point->network >=128))
     {
         num = (point->number)  + ((point->network & 0x1f )   *8 + high_3_bit)*256;
@@ -7108,7 +7108,7 @@ int pointtotext(char *buf,Point_Net *point)
         if ((point_type == BAC_FLOAT_ABCD) ||
             (point_type == BAC_FLOAT_CDAB) ||
             (point_type == BAC_FLOAT_BADC) ||
-            (point_type == BAC_FLOAT_CDBA) ||
+            (point_type == BAC_FLOAT_DCBA) ||
             (point_type == BAC_AV) ||
             (point_type == BAC_AI) ||
             (point_type == BAC_AO) ||
@@ -7132,7 +7132,7 @@ int pointtotext(char *buf,Point_Net *point)
         (point_type != BAC_FLOAT_ABCD) &&
         (point_type != BAC_FLOAT_CDAB) &&
         (point_type != BAC_FLOAT_BADC) &&
-        (point_type != BAC_FLOAT_CDBA) &&
+        (point_type != BAC_FLOAT_DCBA) &&
         (point_type != BAC_VAR)) // 说明是新的格式，最高位用来标识.
     {
         if ((point_type == BAC_BI) || (point_type == BAC_BV) ||
@@ -7172,7 +7172,7 @@ int pointtotext(char *buf,Point_Net *point)
         if ((point->point_type == BAC_FLOAT_ABCD) ||
             (point->point_type == BAC_FLOAT_CDAB) ||
             (point->point_type == BAC_FLOAT_BADC) ||
-            (point->point_type == BAC_FLOAT_CDBA) ||
+            (point->point_type == BAC_FLOAT_DCBA) ||
             (point->point_type == COIL_REG) ||
             (point->point_type == DIS_INPUT_REG) ||
             (point->point_type == INPUT_REG) ||
@@ -7215,7 +7215,7 @@ int pointtotext(char *buf,Point_Net *point)
         (point->point_type == BAC_FLOAT_ABCD) ||
         (point->point_type == BAC_FLOAT_CDAB) ||
         (point->point_type == BAC_FLOAT_BADC) ||
-        (point->point_type == BAC_FLOAT_CDBA) ||
+        (point->point_type == BAC_FLOAT_DCBA) ||
         (point->point_type == COIL_REG) ||
 		(point->point_type == DIS_INPUT_REG) ||
 		(point->point_type == INPUT_REG) ||
@@ -7865,8 +7865,8 @@ void init_info_table( void )
             case BAC_FLOAT_BADC:
                 ptr_panel.info[i].name = "MB_REG_FLOAT_BADC";
                 break;
-            case BAC_FLOAT_CDBA:
-                ptr_panel.info[i].name = "MB_REG_FLOAT_CDBA";
+            case BAC_FLOAT_DCBA:
+                ptr_panel.info[i].name = "MB_REG_FLOAT_DCBA";
                 break;
 			default:
 				{
@@ -8182,7 +8182,7 @@ void check_each_point(char *richeditchar,int item_count ,int ntype)
 			{
 				temp_pos_color.startpos = find_char_pos - richeditchar ;
 				temp_pos_color.endpos = temp_pos_color.startpos + look_str_length ;
-				temp_pos_color.key_type = KEY_INPUT;
+                temp_pos_color.key_type = ntype + 1;// KEY_INPUT;
 				temp_pos_color.ncolor = char_color;
 				m_prg_char_color.push_back(temp_pos_color);
 				char_source = find_char_pos + look_str_length;
@@ -8242,7 +8242,7 @@ void check_each_point(char *richeditchar,int item_count ,int ntype)
 				{
 					temp_pos_color.startpos = find_char_pos - richeditchar ;
 					temp_pos_color.endpos = temp_pos_color.startpos + look_str_length ;
-					temp_pos_color.key_type = KEY_INPUT;
+                    temp_pos_color.key_type = ntype + 1;// KEY_INPUT;
 					temp_pos_color.ncolor = char_color;
 					m_prg_char_color.push_back(temp_pos_color);
 					char_source = find_char_pos + look_str_length;

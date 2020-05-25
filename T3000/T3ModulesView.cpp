@@ -50,6 +50,7 @@ DWORD WINAPI _ReadMultiRegisters_T3_Input(LPVOID pParam)
         }
         PostMessage(g_hwnd_now,WM_REFRESH_BAC_INPUT_LIST,0,0);
     }
+    pFrame->hFirstThread = NULL;
     return 0;
 
 }
@@ -812,13 +813,11 @@ void CT3ModulesView::Fresh()
     }
     m_T3_Input_List.ShowWindow(SW_SHOW);
 
-
-    if(hFirstThread != NULL)
-        TerminateThread(hFirstThread, 0);
-    hFirstThread=NULL;
     if (!hFirstThread)
     {
         hFirstThread = CreateThread(NULL,NULL,_ReadMultiRegisters_T3_Input,this,NULL,0);
+        CloseHandle(hFirstThread);
+        hFirstThread = NULL;
     }
 
 }

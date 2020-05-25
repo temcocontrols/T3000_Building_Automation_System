@@ -14,7 +14,7 @@ extern HANDLE hwait_read_thread;
 // CShowMessageDlg 对话框
 extern bool mstp_read_result ; //0  没读到    1  读成功    MSTP 设备 记录 建立连接时，是否为客户手动中断操作;
 IMPLEMENT_DYNAMIC(CShowMessageDlg, CDialogEx)
-
+int ok_button_press = 0; //确定按钮
 CShowMessageDlg::CShowMessageDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_AA_SHOWMESSAGE, pParent)
 {
@@ -134,7 +134,7 @@ BOOL CShowMessageDlg::OnInitDialog()
     CDialogEx::OnInitDialog();
 
     // TODO:  在此添加额外的初始化
-
+    ok_button_press = 2; //初始化状态 未知;
     m_static_title.SetWindowTextW(static_text);
     m_static_title.textColor(static_textcolor);
     if(b_set_backcolor)
@@ -151,6 +151,16 @@ BOOL CShowMessageDlg::OnInitDialog()
         m_static_persent.ShowWindow(false);
         m_progress_showmessage.ShowWindow(false);
     }
+
+    if (mevent == EVENT_SYNC_TIME)
+    {
+        GetDlgItem(IDC_CHECK_DONT_POP)->ShowWindow(SW_SHOW);
+    }
+    else
+    {
+        GetDlgItem(IDC_CHECK_DONT_POP)->ShowWindow(SW_HIDE);
+    }
+
     ::SetWindowPos(this->m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
     SetTimer(1, 200, NULL);
     if(hShowMessageHandle == NULL)
@@ -419,6 +429,24 @@ failed_path:
             Sleep(mparent->auto_close_time);
             ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
         }
+        else if (EVENT_SYNC_TIME == mparent->mevent)
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                if ((ok_button_press != 0) && (ok_button_press != 1))
+                {
+                    Sleep(1000);
+                }
+                else
+                {
+                    ::PostMessage(mparent->m_hWnd,WM_CLOSE, NULL, NULL);
+                    break;
+                }
+
+            }
+
+                
+        }
     hShowMessageHandle = NULL;
     return true;
 }
@@ -456,7 +484,7 @@ void CShowMessageDlg::OnTimer(UINT_PTR nIDEvent)
 void CShowMessageDlg::OnClose()
 {
     // TODO: 在此添加消息处理程序代码和/或调用默认值
-
+    Sleep(1);
     CDialogEx::OnClose();
 }
 
@@ -471,6 +499,7 @@ void CShowMessageDlg::OnCancel()
     //}
     //TerminateThread(hShowMessageHandle, 0);
     //hShowMessageHandle = NULL;
+    Sleep(1);
     CDialogEx::OnCancel();
 }
 
@@ -478,10 +507,30 @@ void CShowMessageDlg::OnCancel()
 void CShowMessageDlg::OnBnClickedOk()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_exit_by_hands = 1;
-    system_connect_info.mstp_status = 0; //没有扫描到对应的 下次点击需要重新初始化;
-    PostMessage(WM_CLOSE, NULL);
-    Sleep(2000);
+
+    if (mevent == EVENT_SYNC_TIME)
+    {
+        if (((CButton *)GetDlgItem(IDC_CHECK_DONT_POP))->GetCheck())
+        {
+            unsigned long  temp_time_long = time(NULL);
+            CString temp_cstring;
+            temp_cstring.Format(_T("%u"), temp_time_long);
+            WritePrivateProfileString(_T("SYNC_Time"), _T("ignore_pop"), _T("1"), g_cstring_ini_path);
+            WritePrivateProfileString(_T("SYNC_Time"), _T("ignore_pop_time"), temp_cstring, g_cstring_ini_path);
+        }
+
+
+
+        ok_button_press = 1;
+    }
+    else
+    {
+        m_exit_by_hands = 1;
+        system_connect_info.mstp_status = 0; //没有扫描到对应的 下次点击需要重新初始化;
+        PostMessage(WM_CLOSE, NULL);
+        Sleep(2000);
+    }
+
     CDialogEx::OnOK();
 }
 
@@ -489,9 +538,27 @@ void CShowMessageDlg::OnBnClickedOk()
 void CShowMessageDlg::OnBnClickedCancel()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_exit_by_hands = 1;
-    system_connect_info.mstp_status = 0; //没有扫描到对应的 下次点击需要重新初始化;
-    PostMessage(WM_CLOSE, NULL);
-    Sleep(2000);
+
+    if (mevent == EVENT_SYNC_TIME)
+    {
+        if (((CButton *)GetDlgItem(IDC_CHECK_DONT_POP))->GetCheck())
+        {
+            unsigned long  temp_time_long = time(NULL);
+            CString temp_cstring;
+            temp_cstring.Format(_T("%u"), temp_time_long);
+            WritePrivateProfileString(_T("SYNC_Time"), _T("ignore_pop"), _T("1"), g_cstring_ini_path);
+            WritePrivateProfileString(_T("SYNC_Time"), _T("ignore_pop_time"), temp_cstring, g_cstring_ini_path);
+        }
+        Sleep(1);
+    }
+    else
+    {
+        m_exit_by_hands = 1;
+        //system_connect_info.mstp_status = 0; //没有扫描到对应的 下次点击需要重新初始化;
+        PostMessage(WM_CLOSE, NULL);
+        Sleep(2000);
+    }
+
+
     CDialogEx::OnCancel();
 }

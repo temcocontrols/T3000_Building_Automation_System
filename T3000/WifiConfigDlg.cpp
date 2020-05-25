@@ -75,6 +75,7 @@ BEGIN_MESSAGE_MAP(CWifiConfigDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CWifiConfigDlg::OnBnClickedOk)
     ON_BN_CLICKED(IDC_RADIO_IP_AUTO, &CWifiConfigDlg::OnBnClickedRadioIpAuto)
     ON_BN_CLICKED(IDC_RADIO_IP_STATIC, &CWifiConfigDlg::OnBnClickedRadioIpStatic)
+    ON_BN_CLICKED(IDC_BUTTON_WIFI_DEFAULT, &CWifiConfigDlg::OnBnClickedButtonWifiDefault)
 END_MESSAGE_MAP()
 
 
@@ -103,6 +104,8 @@ void CWifiConfigDlg::ChangeWifiWindowStatus(bool b_value)
 BOOL CWifiConfigDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+    GetDlgItem(IDC_BUTTON_WIFI_DEFAULT)->EnableWindow(0);
     GetDlgItem(IDC_EDIT_WIFI_MODBUS_PORT)->EnableWindow(1);
     GetDlgItem(IDC_EDIT_WIFI_BACNET_PORT)->EnableWindow(1);
     if (m_ui_type == UI_TYPE_WIFI_REV1)
@@ -230,6 +233,31 @@ BOOL CWifiConfigDlg::OnInitDialog()
 
             m_version = 1;
         }
+
+        if (wifi_register_value[WIFI_MOUDLE_SOFTWARE_VERSION - WIFI_ENABLE] >= 3)
+        {
+            GetDlgItem(IDC_RADIO_WIFI_ENABLE)->EnableWindow(1);
+            GetDlgItem(IDC_RADIO_WIFI_DISABLE)->EnableWindow(1);
+            if (wifi_register_value[WIFI_ENABLE] == 2)
+            {
+                ((CButton *)GetDlgItem(IDC_RADIO_WIFI_DISABLE))->SetCheck(true);
+                ((CButton *)GetDlgItem(IDC_RADIO_WIFI_ENABLE))->SetCheck(false);
+            }
+            else
+            {
+                ((CButton *)GetDlgItem(IDC_RADIO_WIFI_ENABLE))->SetCheck(true);
+                ((CButton *)GetDlgItem(IDC_RADIO_WIFI_DISABLE))->SetCheck(false);
+            }
+
+            GetDlgItem(IDC_BUTTON_WIFI_DEFAULT)->EnableWindow(true);
+        }
+        else
+        {
+            GetDlgItem(IDC_RADIO_WIFI_ENABLE)->EnableWindow(0);
+            GetDlgItem(IDC_RADIO_WIFI_DISABLE)->EnableWindow(0);
+            GetDlgItem(IDC_BUTTON_WIFI_DEFAULT)->EnableWindow(0);
+        }
+
 
         memcpy(wifi_info.reg.username, &wifi_register_value[10], sizeof(str_wifi_point) - 10);
 
@@ -450,6 +478,21 @@ void CWifiConfigDlg::OnBnClickedOk()
     }
     else if (m_ui_type == UI_TYPE_WIFI_REV2)
     {
+        if (m_version >= 3)
+        {
+            bool isstatic_enablewifi = ((CButton *)GetDlgItem(IDC_RADIO_WIFI_ENABLE))->GetCheck(); //返回1表示选上，0表示没选上;
+            bool isstatic_disablewifi = ((CButton *)GetDlgItem(IDC_RADIO_WIFI_DISABLE))->GetCheck(); //返回1表示选上，0表示没选上;
+            if (isstatic_disablewifi)
+            {
+                int ret2 = write_one(g_tstat_id, WIFI_ENABLE, 2, 10);
+                if (ret2 >= 0)
+                {
+                    MessageBox(_T("Wifi disabled!"));
+                }
+            }
+
+        }
+
         CString str_ssid;
         m_Edit_SSID.GetWindowTextW(str_ssid);
         if (str_ssid.GetLength() <= 0)
@@ -638,4 +681,11 @@ void CWifiConfigDlg::OnBnClickedRadioIpStatic()
     {
         ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS1))->SetAddress(255, 255, 255, subnet4);
     }
+}
+
+
+void CWifiConfigDlg::OnBnClickedButtonWifiDefault()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    write_one(g_tstat_id, WIFI_LOAD_DEFAULT, 1, 10);
 }

@@ -379,6 +379,18 @@ BOOL CParameterDlg::OnInitDialog()
 
 	CDialog::OnInitDialog();
 
+    if (product_type == T3000_6_ADDRESS)
+    {
+        GetDlgItem(IDC_TIMERLEFT)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_TIMELEFT)->ShowWindow(SW_HIDE);
+    }
+    else
+    {
+        GetDlgItem(IDC_TIMERLEFT)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_STATIC_TIMELEFT)->ShowWindow(SW_SHOW);
+    }
+
+
     if (product_register_value[7] == PM_TSTAT7 ||
         product_register_value[7] == PM_TSTAT7_ARM ||
         product_register_value[7] == PM_TSTAT8 ||

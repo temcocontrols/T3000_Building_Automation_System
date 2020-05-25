@@ -26,7 +26,7 @@
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const unsigned int g_versionNO= 20200327;
+const unsigned int g_versionNO= 20200522;
 
 
 #ifdef _DEBUG
@@ -424,6 +424,11 @@ BOOL CT3000App::InitInstance()
 				product_sort_way = SORT_BY_CONNECTION;
 			}
 
+            DEBUG_DELAY_TIME = GetPrivateProfileInt(_T("Debug"), _T("SEND_COMMAND_DELAY_TIME"), 350, g_cstring_ini_path);
+            if (DEBUG_DELAY_TIME == 350)
+            {
+                WritePrivateProfileStringW(_T("Debug"), _T("SEND_COMMAND_DELAY_TIME"), _T("350"), g_cstring_ini_path);
+            }
 			CString temp_cs_version;
 			temp_cs_version.Format(_T("%d"),T3000_Version);
 

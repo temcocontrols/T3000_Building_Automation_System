@@ -417,6 +417,10 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 				m_health_persent = 0;
 		}
 	}
+    else if ((g_llTxCount == g_llRxCount) && (g_llTxCount > 0))
+    {
+        m_health_persent = 100;
+    }
 
     if (bac_select_device_online == false)
         m_health_persent = 0;

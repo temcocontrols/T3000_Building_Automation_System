@@ -259,6 +259,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		}
 
 
+
 		if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
 			
@@ -273,15 +274,15 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			}
             else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
             {
-                if(read_msv_table)
+                if (read_msv_table)
                     m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
                 int get_name_ret = 0;
                 CString cstemp_value2;
                 float temp_float_value1;
                 temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
                 get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
-                if(get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
-                   cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+                if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+                    cstemp_value2.Format(_T("%.3f"), temp_float_value1);
                 m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
             }
 			else
@@ -352,7 +353,29 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			}
             else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
             {
-                m_variable_list.SetItemText(i, VARIABLE_UNITE, _T("MSV"));
+                if (read_msv_table)
+                    m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
+                int get_name_ret = 0;
+                CString cstemp_value2;
+                float temp_float_value1;
+                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
+                if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+                    cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+                m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
+            }
+            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
+            {
+                if (read_msv_table)
+                    m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
+                int get_name_ret = 0;
+                CString cstemp_value2;
+                float temp_float_value1;
+                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
+                if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+                    cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+                m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
             }
 			else
 			{
@@ -862,6 +885,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
                             temp1 = Custom_Msv_Range[bac_range_number_choose - 101];
                         else
                             temp1 = _T("MSV");
+                        m_Variable_data.at(lRow).digital_analog = VARIABLE_RANGE_ANALOG_TYPE;
                 }
                     
 				SplitCStringA(temparray,temp1,_T("/"));

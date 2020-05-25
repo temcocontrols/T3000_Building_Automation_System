@@ -333,6 +333,218 @@ int read_one(unsigned char device_var,unsigned short address,int retry_times)
 	//SetPaneString(0,str);
 	return j;
 }
+
+
+CString GetFirmwareUpdateName(int ModelID) //TBD: Change this to an array
+{
+    CString strProductName;
+    switch (ModelID)
+    {
+    case PM_TSTAT5A:
+        strProductName = _T("TStat5A");	//
+        break;
+    case PM_TSTAT5B:
+        strProductName = _T("TStat5B");	 //
+        break;
+    case PM_TSTAT5B2:
+        strProductName = _T("TStat5B2");	//
+        break;
+    case PM_TSTAT5C:
+        strProductName = _T("TStat5C");  //
+        break;
+    case PM_TSTAT10:
+        strProductName = _T("PID10");
+        break;
+    case PM_TSTAT5D:
+        strProductName = _T("TStat5D");	 //
+        break;
+    case PM_TSTAT5E:
+        strProductName = _T("TStat5E");  //
+        break;
+    case PM_PM5E_ARM:
+        strProductName = _T("PM5EARM");  //
+        break;
+    case PM_PM5E:
+        strProductName = _T("PM5E");  //
+        break;
+    case PM_TSTAT5F:
+        strProductName = _T("TStat5F");  //
+        break;
+    case PM_TSTAT5G:
+        strProductName = _T("TStat5G");	//
+        break;
+    case PM_TSTAT5H:
+        strProductName = _T("TStat5H"); //
+        break;
+    case PM_TSTAT6:
+        strProductName = _T("TStat6");   //
+        break;
+    case PM_TSTAT5i:
+        strProductName = _T("TStat5I");   //
+        break;
+    case PM_TSTAT7:
+        strProductName = _T("TStat7");   //
+        break;
+    case PM_TSTAT8:
+        strProductName = L"TStat8";
+        break;
+    case PM_TSTAT8_WIFI:
+        strProductName = "TStat8Wifi";
+        break;
+    case PM_TSTAT8_OCC:
+        strProductName = "TStat8Occ";
+        break;
+    case PM_TSTAT7_ARM:
+        strProductName = "TStat7ARM";
+        break;
+    case PM_TSTAT8_220V:
+        strProductName = "TStat8220V";
+        break;
+    case PM_NC:					//
+        strProductName = _T("NC");
+        break;
+    case PM_CM5:
+        strProductName = _T("CM5");
+        break;					   //
+    case PM_LightingController:
+        strProductName = _T("LC");	  //
+        break;
+    case PM_T38I13O:
+        strProductName = _T("T3-8I13O");	  //
+        break;
+    case PM_T3IOA:
+        strProductName = _T("T3-8IOA");	  //
+        break;
+    case PM_T332AI:
+        strProductName = _T("T3-32AI");	  //
+        break;
+    case  PM_T38AI16O:
+        strProductName = _T("T3-8AI160");	  //
+        break;
+    case PM_ZIGBEE:
+        strProductName = _T("ZigBee");	  //
+        break;
+    case PM_FLEXDRIVER:
+        strProductName = _T("FlexDriver");	  //
+        break;
+    case PM_T3PT10:
+        strProductName = _T("T3-PT10");	  //
+        break;
+    case PM_T3PERFORMANCE:
+        strProductName = _T("T3-PERFORMANCE");	  //
+        break;
+    case PM_T34AO:
+        strProductName = _T("T3-4AO");	  //
+        break;
+    case PM_T36CT:
+        strProductName = _T("T3-6CT");	  //
+        break;
+    case PM_SOLAR:
+        strProductName = _T("Solar");	  //
+        break;
+    case PM_FWMTRANSDUCER:
+        strProductName = _T("FWMTRANSDUCER");	  //
+        break;
+    case PM_MINIPANEL:
+    case PM_MINIPANEL_ARM:
+        strProductName = _T("MiniPanel");	  //
+        break;
+    case PM_PRESSURE:
+        strProductName = _T("Pressure");	  //
+        break;
+    case PM_AirQuality:
+        strProductName = _T("AirQuality");	  //
+        break;
+    case PM_HUMTEMPSENSOR:
+        strProductName = _T("TstatHUM");	  //
+        break;
+    case PM_HUM_R:
+        strProductName = _T("HUM-R");
+        break;
+    case PM_TSTATRUNAR:
+        strProductName = "TStatRunar";
+        break;
+    case  PM_CO2_NET:
+        strProductName = "CO2 Net";
+        break;
+    case  PM_CO2_RS485:
+        strProductName = "CO2";
+        break;
+    case  PM_PRESSURE_SENSOR:
+        strProductName = "Pressure";
+        break;
+    case  PM_T3PT12:
+        strProductName = "T3PT12";
+        break;
+    case  PM_T36CTA:
+        strProductName = "T36CTA";
+        break;
+    case  PM_CO2_NODE:
+        strProductName = "CO2 Node";
+        break;
+    case PM_T322AI:
+        strProductName = "T322I";
+        break;
+    case PM_T38AI8AO6DO:
+        strProductName = "T38IO";
+        break;
+    case PM_BTU_METER:
+        strProductName = "BTU METER";
+        break;
+    case PM_T322AIVG:
+        strProductName = "T322AIVG";
+        break;
+    case PM_T38IOVG:
+        strProductName = "T38IOVG";
+        break;
+    case PM_T3PTVG:
+        strProductName = "T3PTVG";
+        break;
+    case STM32_CO2_NET:
+        strProductName = "CO2NET";
+        break;
+    case STM32_CO2_RS485:
+        strProductName = "CO2RS485";
+        break;
+    case STM32_HUM_NET:
+        strProductName = "HUMNET";
+        break;
+    case STM32_HUM_RS485:
+        strProductName = "HUMRS485";
+        break;
+    case PWM_TRANSDUCER:
+        strProductName = _T("PWMTRANX");	  //
+        break;
+    case STM32_PRESSURE_NET:
+        strProductName = "PSNET";
+        break;
+    case STM32_PRESSURE_RS3485:
+        strProductName = "PSRS485";
+        break;
+    case STM32_CO2_NODE:
+        strProductName = "CO2 NODE";
+        break;
+    case PM_PWMETER:
+        strProductName = "PWMETER";
+        break;
+    case PM_WEATHER_STATION:
+        strProductName = "WS";
+        break;
+    case STM32_PM25:
+        strProductName = "PM2.5";
+        break;
+    default:
+    {
+        strProductName.Format(_T("PID%d"), ModelID);
+    }
+    //strProductName.Format(_T("Model ID:%d is not valid"),ModelID);
+    break;
+    }
+    return strProductName;
+}
+
+
+
 CString GetProductName(int ModelID) //TBD: Change this to an array
 {
 	CString strProductName;
@@ -350,6 +562,9 @@ CString GetProductName(int ModelID) //TBD: Change this to an array
 	case PM_TSTAT5C:
 		strProductName=_T("TStat5C");  //
 		break;
+    case PM_TSTAT10:
+        strProductName = _T("TStat10");
+        break;
 	case PM_TSTAT5D:
 		strProductName=_T("TStat5D");	 //
 		break;

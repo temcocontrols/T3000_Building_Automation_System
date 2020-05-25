@@ -595,7 +595,7 @@ void CBacnetMonitor::Set_Input_Range_And_count()
             (and_pointtype == BAC_FLOAT_ABCD + 1) || //2020 03 25 ÐÂÔö
             (and_pointtype == BAC_FLOAT_CDAB + 1) ||
             (and_pointtype == BAC_FLOAT_BADC + 1) ||
-            (and_pointtype == BAC_FLOAT_CDBA + 1) 
+            (and_pointtype == BAC_FLOAT_DCBA + 1)
             )
         {
             temp_input_count++;
@@ -680,7 +680,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
             (temp_point == BAC_FLOAT_ABCD) ||   //20200325
             (temp_point == BAC_FLOAT_CDAB) ||
             (temp_point == BAC_FLOAT_BADC) ||
-            (temp_point == BAC_FLOAT_CDBA)
+            (temp_point == BAC_FLOAT_DCBA)
             )
         {
             num_point = num_point;

@@ -353,6 +353,7 @@
     <ClCompile Include="TrendLogWnd.cpp" />
     <ClCompile Include="TroubleShootDlg.cpp" />
     <ClCompile Include="TstatAQ.cpp" />
+    <ClCompile Include="TstatAQI_Detail.cpp" />
     <ClCompile Include="TstatIconSetting.cpp" />
     <ClCompile Include="TStatInputView.cpp" />
     <ClCompile Include="TStatOutputView.cpp" />
@@ -685,6 +686,7 @@
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="TroubleShootDlg.h" />
     <ClInclude Include="TstatAQ.h" />
+    <ClInclude Include="TstatAQI_Detail.h" />
     <ClInclude Include="TstatIconSetting.h" />
     <ClInclude Include="TStatInputView.h" />
     <ClInclude Include="TStatOutputView.h" />

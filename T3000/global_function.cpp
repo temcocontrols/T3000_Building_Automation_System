@@ -50,7 +50,7 @@
 extern char mycode[2000];
 extern int my_lengthcode;// the length of the edit of code
 #pragma endregion
-
+extern int panel_time_to_basic_delt;
 int test_count_special = 0;
 extern uint8_t global_network_number ;
 extern BacnetScreen *Screen_Window;
@@ -67,7 +67,7 @@ extern CBacnetTstat *Tstat_Window ;
 extern CBacnetSetting * Setting_Window ;
 extern CBacnetUserlogin* User_Login_Window ;
 extern CBacnetRemotePoint* Remote_Point_Window ;
- 
+extern int pc_time_to_basic_delt; //用于时间转换 ，各个时区之间。
 int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length)
 {
     int retVal;
@@ -1084,7 +1084,7 @@ BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,i
     pmy_write_info->hWnd = hWnd;
     pmy_write_info->ItemInfo.nRow = nRow;
     pmy_write_info->ItemInfo.nCol = nCol;
-    if ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    if ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))
 	{
 		if(!PostThreadMessage(nThreadID,MY_RS485_WRITE_LIST,(WPARAM)pmy_write_info,NULL))//post thread msg
 		{
@@ -1883,25 +1883,50 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
 ****************************************************/
 int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t nstop_index,unsigned int write_object_list)
 {
-    if (g_protocol == MODBUS_RS485)
+    if ((g_protocol == MODBUS_RS485) || (PROTOCOL_MB_TCPIP_TO_MB_RS485 == g_protocol))
     {
         int test_value1 = 0;
         int test_value2 = 0;
         unsigned short write_buffer[200];
-        memset(write_buffer, 0, 400);
-        memcpy(write_buffer, &Device_Basic_Setting, sizeof(Str_Setting_Info));
-        for (int j = 0;j < 200;j++)
+        switch (ncommand)
         {
-            write_buffer[j] = htons(write_buffer[j]);
-        }
-        test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_SETTING_START_REG, 100, 4);
+            case WRITE_SETTING_COMMAND:
+            {
+                memset(write_buffer, 0, 400);
+                memcpy(write_buffer, &Device_Basic_Setting, sizeof(Str_Setting_Info));
+                for (int j = 0;j < 200;j++)
+                {
+                    write_buffer[j] = htons(write_buffer[j]);
+                }
+                test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_SETTING_START_REG, 100, 4);
 
-        test_value2 = Write_Multi_org_short(g_tstat_id, &write_buffer[100], BAC_SETTING_START_REG + 100, 100, 4);
-        if ((test_value1 >= 0) && (test_value2 >= 0))
-        {
-            return 1;
+                test_value2 = Write_Multi_org_short(g_tstat_id, &write_buffer[100], BAC_SETTING_START_REG + 100, 100, 4);
+                if ((test_value1 >= 0) && (test_value2 >= 0))
+                {
+                    return 1;
+                }
+                return -1;
+            }
+            break;
+            case WRITE_SCHEDUAL_TIME_FLAG:
+            {
+                memcpy(write_buffer, &m_Schedual_time_flag.at(nstart_index), sizeof(Str_schedual_time_flag));
+                for (int j = 0;j<200;j++)
+                {
+                    write_buffer[j] = htons(write_buffer[j]);
+                }
+                test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_WR_FLAG_FIRST + 36 * nstart_index, 36, 4); //Variable 是39个字节，占用20个寄存器;
+                if ((test_value1 >= 0))
+                {
+                    return 1;
+                }
+                return -1;
+            }
+            break;
+        default:
+            break;
         }
-        return -1;
+
     }
 	int temp_invoke_id = -1;
 	int send_status = true;
@@ -2096,6 +2121,10 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
     }
     else
     {
+        Send_WhoIs_Global(-1, -1);
+        //test_string.Format(_T("test_count = %d , status = %d failed ,Sleep3000\r\n"), test_count, status);
+        //TRACE(test_string);
+
         Sleep(3000);  //address 
         return -2;
     }
@@ -3916,8 +3945,8 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 				bacnet_device_type = MINIPANELARM_LB;
 			else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
 				bacnet_device_type = MINIPANELARM_TB;
-            else if (Device_Basic_Setting.reg.mini_type == BACNET_ROUTER)
-                bacnet_device_type = BACNET_ROUTER;
+            else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB)
+                bacnet_device_type = MINIPANELARM_NB;
 			else
 				bacnet_device_type = PM_CM5;
 			my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
@@ -4613,10 +4642,16 @@ int Bacnet_Read_Property_Multiple()
     char *argv[1024];
     //char **argv = NULL;
     //argv[1] = "10001";
-    argv[1] = "115909";
-    argv[2] = "8";
-    argv[3] = "115909";
-    argv[4] = "8";
+
+    argv[1] = "30";
+    argv[2] = "4";
+    argv[3] = "3";
+    argv[4] = "87";
+
+    //argv[1] = "115909";
+    //argv[2] = "8";
+    //argv[3] = "115909";
+    //argv[4] = "8";
     /* decode the command line parameters */
     Target_Device_Object_Instance = strtol(argv[1], NULL, 0);
     if (Target_Device_Object_Instance >= BACNET_MAX_INSTANCE) 
@@ -5416,7 +5451,7 @@ void Inial_Product_Input_map()
         case PM_TSTAT_AQ:
         {
 
-            unsigned char  temp[20] = { 1,1,1,0,  1,1,0,1,  1,1,0,0,   1,0,0,0  ,0,0,0,0 };
+            unsigned char  temp[20] = { 1,1,1,0,  1,1,0,1,  1,1,0,0,   1,1,0,0  ,0,0,0,0 };
             memcpy(product_input[i], temp, 20);
         }
         break;
@@ -5860,6 +5895,7 @@ void close_bac_com()
 
         CloseHandle(temphandle);
         Set_RS485_Handle(NULL);
+        m_bac_handle_Iam_data.clear();
         //g_mstp_com.status = 0;
     }
     system_connect_info.mstp_status = 0;
@@ -5891,6 +5927,15 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
     g_Print.Format(_T("The initial T3000 Object Instance value is %d"),temp_value);
     //DFTrace(g_Print);
     Device_Set_Object_Instance_Number(temp_value);
+
+    if (!bac_net_initial_once)
+    {
+        bac_net_initial_once = true;
+        timesec1970 = (unsigned long)time(NULL);
+        timestart = 0;
+        init_info_table();
+        Init_table_bank();
+    }
     address_init();
     Init_Service_Handlers();
 
@@ -5922,6 +5967,7 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
             if (port_bind_results)  //如果绑定47808端口失败 尝试绑定其他端口
                 break;
         }
+
         if(!port_bind_results)
             return false;
 
@@ -6052,14 +6098,7 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         system_connect_info.nbaudrate = n_baudrate;
     }
 
-    if(!bac_net_initial_once)
-    {
-        bac_net_initial_once =true;
-        timesec1970 = (unsigned long)time(NULL);
-        timestart = 0;
-        init_info_table();
-        Init_table_bank();
-    }
+
     return true;
 }
 //#include "datalink.h"
@@ -7313,8 +7352,8 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
         test_count_special = 0;
         int time_out=0;
         BOOL bTimeOut = FALSE;
-        while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
-        {
+        //while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
+        //{
             time_out++;
             if(time_out>1)
                 bTimeOut = TRUE;
@@ -7500,7 +7539,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                 bTimeOut = TRUE;
                 //g_llTxCount++;//不合理
             }
-        }//end of while
+        //}//end of while
 END_REFRESH_SCAN:
 
         closesocket(h_Broad);
@@ -12236,6 +12275,7 @@ int handle_bacnet_to_modbus_data(char *npoint, int nlength)
 
 bool Open_Socket_Retry(CString strIPAdress, short nPort,int retry_time)
 {
+    close_bac_com();//只要建立 网络连接，就清空串口设置 以及串口的连接;
     for (int i = 0; i < retry_time; i++)
     {
         bool nreslts = false;
@@ -12303,12 +12343,21 @@ unsigned int GetDeviceInstance(unsigned char pid_type)
 
     int ret_low = 0;
     int ret_high = 0;
-    ret_low = read_one(g_tstat_id, temp_low, 6);
-    ret_high = read_one(g_tstat_id, temp_high, 6);
+    //ret_low = read_one(g_tstat_id, temp_low, 6);
+    //ret_high = read_one(g_tstat_id, temp_high, 6);
+
+    unsigned short temp_ret_low[2] = { 0 };
+    unsigned short temp_ret_high[2] = { 0 };
+    ret_low = Read_Multi(g_tstat_id, temp_ret_low, temp_low, 2, 6);
+
+    ret_high = Read_Multi(g_tstat_id, temp_ret_high, temp_high, 2, 6);
+
+
+
 
     if ((ret_low >= 0) && (ret_high >= 0))
     {
-        return ret_high * 65536 + ret_low;
+        return temp_ret_high[0] * 65536 + temp_ret_low[0];
     }
     else
     {
@@ -12583,6 +12632,70 @@ int Get_Msv_Item_Name(int ntable, int nitemvalue,CString &csItemString)
     return -1;
 }
 
+
+void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
+{
+    CTime	TimeTemp;
+    //ntime = Device_time.new_time.n_time;
+    short computer_DaylightBias;
+        //unsigned long  temp_time_long123 = time(NULL);
+        unsigned long  temp_time_long = ntime;
+        TIME_ZONE_INFORMATION tzi;
+
+        
+        if (Bacnet_Private_Device(nproduct_id))
+        {
+            //**********************************************************
+            //2019 05 20 Fance 用于处理 电脑勾选了夏令时 引起的 T3 显示时间 与实际时间总是相差一小时的问题;
+
+            GetTimeZoneInformation(&tzi);
+            computer_DaylightBias = tzi.DaylightBias * 60;
+            //**********************************************************
+            panel_time_to_basic_delt = Device_Basic_Setting.reg.time_zone * 360 / 10;
+
+            //因为本地CDateTimeCtrl 在设置时间的时候 会默认 加上 电脑的时区，但是显示的时候要显示 设备所选时区，所以 要 变换.
+            time_t scale_time;
+            if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
+                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
+            else if (Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
+                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
+            else
+                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
+            TimeTemp = scale_time + computer_DaylightBias;
+        }
+        else
+        {
+            //GetTimeZoneInformation(&tzi);
+            //computer_DaylightBias = tzi.DaylightBias * 60;
+            TimeTemp = temp_time_long ;
+        }
+
+
+    outputtime = TimeTemp.Format(_T("%Y-%m-%d %H:%M"));
+    //outputtime = TimeTemp.getbuf;
+}
+
+int Check_DaXiaoDuan(unsigned char npid, unsigned char Mainsw, unsigned char subsw)
+{
+    switch (npid)
+    {
+    case PM_TSTAT10:
+    case PM_MINIPANEL:
+    case PM_MINIPANEL_ARM:
+    case PM_CM5:
+    {
+        if (Mainsw * 10 + subsw > 51.3)
+        {
+            return 1;
+        }
+    }
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
+
 int Get_Msv_Table_Name(int x)
 {
     if (x >= BAC_MSV_COUNT)
@@ -12613,3 +12726,259 @@ int Get_Msv_Table_Name(int x)
     }
     return 1;
 }
+
+
+//返回值   判断输出类型  是数字的还是模拟的 还是扩展的  
+int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获取输出状态
+{
+    //portindex 采用1为基址 ;
+    int nret_type = 0;
+    switch (nproductid)
+    {
+    case PM_MINIPANEL:
+    case PM_MINIPANEL_ARM:
+    {
+        switch (nproductsubid)
+        {
+        case BIG_MINIPANEL:   //12DO  ,12AO
+        case MINIPANELARM:
+        {
+            if (portindex <= 12)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= 24)
+                nret_type = OUTPUT_ANALOG_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
+        case SMALL_MINIPANEL:
+        case MINIPANELARM_LB:   //6DO   4AO
+        {
+            if (portindex <= 6)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= 10)
+                nret_type = OUTPUT_ANALOG_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
+        case TINY_MINIPANEL:  //6DO  2AO
+        {
+            if (portindex <= 6)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= 8)
+                nret_type = OUTPUT_ANALOG_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
+        case TINY_EX_MINIPANEL:
+        case MINIPANELARM_TB:  //6DO   8AO
+        {
+            if (portindex <= 6)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= 14)
+                nret_type = OUTPUT_ANALOG_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
+        default:
+            break;
+        }
+    }
+    break;
+    case PM_TSTAT10:  //5DO   2AO
+    {
+        if (portindex <= 5)
+            nret_type = OUTPUT_DIGITAL_PORT;
+        else if (portindex <= 7)
+            nret_type = OUTPUT_ANALOG_PORT;
+        else
+            nret_type = OUTPUT_VIRTUAL_PORT;
+    }
+        break;
+    case PM_T38AI8AO6DO:
+    {
+
+    }
+    break;
+
+    case PM_T322AI:
+    {
+
+    }
+    break;
+    case PWM_TRANSDUCER:
+    {
+
+    }
+    break;
+    case STM32_CO2_NET:
+    case STM32_HUM_NET:
+    case STM32_PRESSURE_NET:
+    {
+
+    }
+    break;
+    case PM_T3_LC:
+        break;
+    case PM_T36CTA:
+    {
+
+    }
+    break;
+    default:
+        break;
+    }
+
+    return nret_type;
+}
+
+//返回值 判断类型  是数字的还是模拟的 还是扩展的  
+int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n_digital_analog) //获取输出状态
+{
+    //portindex 采用1为基址 ;
+    int nret_type = 0;
+    switch (nproductid)
+    {
+    case PM_MINIPANEL:
+    case PM_MINIPANEL_ARM:
+    {
+        switch (nproductsubid)
+        {
+        case BIG_MINIPANEL:   //12DO  ,12AO
+        case MINIPANELARM:
+        {
+            if (portindex <= 32)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    nret_type = INPUT_DIGITAL_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+
+
+        }
+        break;
+        case SMALL_MINIPANEL:
+        case MINIPANELARM_LB:   //6DO   4AO
+        {
+            if (portindex <= 16)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    nret_type = INPUT_DIGITAL_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+        }
+        break;
+        case TINY_MINIPANEL:  //6DO  2AO
+        case TINY_EX_MINIPANEL:
+        case MINIPANELARM_TB:  //6DO   8AO
+        {
+            if (portindex <= 8)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    nret_type = INPUT_DIGITAL_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+        }
+        break;
+        default:
+            break;
+        }
+    }
+    break;
+    case PM_TSTAT10:  //5DO   2AO
+    {
+        if (portindex <= 10)
+        {
+            nret_type = INPUT_ANALOG_PORT;
+            if (portindex <= 8)
+            {
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                {
+                    nret_type = INPUT_DIGITAL_PORT;
+                }
+            }
+
+        }
+        else
+            nret_type = INPUT_VIRTUAL_PORT;
+    }
+    break;
+    case PM_T38AI8AO6DO:
+    {
+        if (portindex <= 8)
+        {
+            nret_type = INPUT_ANALOG_PORT;
+            if (n_digital_analog == BAC_UNITS_DIGITAL)
+            {
+                nret_type = INPUT_DIGITAL_PORT;
+            }
+        }
+        else
+            nret_type = INPUT_VIRTUAL_PORT;
+    }
+    break;
+
+    case PM_T322AI:
+    {
+        if (portindex <= 22)
+        {
+            nret_type = INPUT_ANALOG_PORT;
+            if (n_digital_analog == BAC_UNITS_DIGITAL)
+            {
+                nret_type = INPUT_DIGITAL_PORT;
+            }
+        }
+        else
+            nret_type = INPUT_VIRTUAL_PORT;
+    }
+    break;
+    case PWM_TRANSDUCER:
+    {
+
+    }
+    break;
+    case STM32_CO2_NET:
+    case STM32_HUM_NET:
+    case STM32_PRESSURE_NET:
+    {
+
+    }
+    break;
+    case PM_T3_LC:
+        break;
+    case PM_T36CTA:
+    {
+        if (portindex <= 24)
+        {
+            nret_type = INPUT_ANALOG_PORT;
+            if (n_digital_analog == BAC_UNITS_DIGITAL)
+            {
+                nret_type = INPUT_DIGITAL_PORT;
+            }
+        }
+        else
+            nret_type = INPUT_VIRTUAL_PORT;
+    }
+    break;
+    case PM_TSTAT_AQ:
+    {
+        nret_type = INPUT_INTERNAL;
+    }
+        break;
+    default:
+        break;
+    }
+
+    return nret_type;
+}
+
+

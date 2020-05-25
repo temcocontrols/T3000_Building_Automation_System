@@ -326,6 +326,7 @@
 #define IDD_DIALOG_BACNET_THIRD_PARTY_MAIN 753
 #define IDD_DIALOG17                    755
 #define IDD_DIALOG_TSTAT_SETPOINT       755
+#define IDD_DIALOG_AQI                  758
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -2505,6 +2506,26 @@
 #define IDC_STATIC_MASK                 2524
 #define IDC_STATIC_GATEWAY              2525
 #define IDC_LIST_TSTAT_SETPOINT         2527
+#define IDC_CHECK_DONT_POP              2529
+#define IDC_RADIO_WIFI_ENABLE           2531
+#define IDC_RADIO_WIFI_DISABLE          2532
+#define IDC_BUTTON_WIFI_DEFAULT         2533
+#define IDC_STATIC_TEMP_UNITS           2534
+#define IDC_RADIO_DEG_C                 2535
+#define IDC_RADIO_DEG_F                 2536
+#define IDC_EDIT_AQI_VALUE              2537
+#define IDC_EDIT_AQI_LEVEL              2538
+#define IDC_COMBO_AQI_REGION            2539
+#define IDC_EDIT_LEVEL_1                2540
+#define IDC_EDIT_LEVEL_2                2541
+#define IDC_EDIT_LEVEL_3                2542
+#define IDC_EDIT_LEVEL_4                2543
+#define IDC_EDIT_LEVEL_5                2544
+#define IDC_BUTTON_DONE                 2545
+#define IDC_BUTTON_CUS_AQI              2549
+#define IDC_STATIC_AQI_INFO             2550
+#define IDC_STATIC_AQI_INFO2            2551
+#define IDC_STATIC_AQI                  2551
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2611,6 +2632,7 @@
 #define IDC_RADIO_T_14                  9865
 #define IDC_STATIC_SPLIT_WINDOW         9866
 #define IDC_CHANGE_ID                   9867
+#define ID_DISCONNECT_COM               9868
 #define IDC_EDIT_INTER                  10000
 #define IDC_STATIC_SEETING_SERIAL_NUMBER 15491
 #define IDC_STATIC_INPUT_ITEM_INFO      15492
@@ -2833,7 +2855,6 @@
 #define ID_CONNECTMENU_DISCONNECT       32813
 #define ID_BUTTON32814                  32814
 #define ID_BUTTON32815                  32815
-#define ID_DISCONNECT2                  32816
 #define ID_BUILDINGSEL_SELECT           32817
 #define ID_BUILDINGSEL_UNSLECT          32818
 #define ID_DATABASE_USERACCOUNT         32819
@@ -3055,9 +3076,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        757
+#define _APS_NEXT_RESOURCE_VALUE        760
 #define _APS_NEXT_COMMAND_VALUE         34077
-#define _APS_NEXT_CONTROL_VALUE         2528
+#define _APS_NEXT_CONTROL_VALUE         2551
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

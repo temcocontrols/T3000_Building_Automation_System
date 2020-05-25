@@ -24,8 +24,32 @@
 #define BAC_AR_TIME_FIRST           32620
 #define BAC_PID_CONTROL_START_REG   32712
 #define BAC_CUSTOMER_TABLE_START    32936
+#define BAC_WR_FLAG_FIRST           33201
+/*
+Schedule flag 1 33201 - 33236           36Reg
+...
+...
+Schedule flag 8 33201 + (7 *36 )        36Reg
 
+Schedule 1 32044 - 32115              72Reg
+Schedule 2 32116 - 32187              72Reg
+Schedule 3 32188 - 32259              72Reg
+Schedule 4 32260 - 32331              72Reg
+Schedule 5 32332 - 32403              72Reg
+Schedule 6 32404 - 32475              72Reg
+Schedule 7 32476 - 32547              72Reg
+Schedule 8 32548 - 32619              72Reg
 
+Schedule List1 15808	15828	21REG
+Schedule List2 15829	15849	21REG
+Schedule List3 15850	15870	21REG
+Schedule List4 15871	15891	21REG
+Schedule List5 15892	15912	21REG
+Schedule List6 15913	15933	21REG
+Schedule List7 15934	15954	21REG
+Schedule List8 15955	15975	21REG
+
+*/
 const int SORT_UNKNOW = 0;
 const int SORT_BY_CONNECTION = 1;
 const int SORT_BY_BUILDING_FLOOR = 2;
@@ -1108,7 +1132,7 @@ typedef enum
 	MINIPANELARM = 5,
 	MINIPANELARM_LB = 6,
 	MINIPANELARM_TB = 7,
-    BACNET_ROUTER = 8,
+    MINIPANELARM_NB = 8,
     T3_TSTAT10    = 9,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
@@ -1836,7 +1860,7 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_FLOAT_ABCD  32
 #define BAC_FLOAT_CDAB  33
 #define BAC_FLOAT_BADC  34
-#define BAC_FLOAT_CDBA  35
+#define BAC_FLOAT_DCBA  35
 
 #define BAC_MAX       36
 #define BAC_MAIN      255
@@ -2212,7 +2236,10 @@ typedef struct
 }connect_Info;
 #pragma endregion
 
-#define SPECIAL_BAC_TO_MODBUS   ((g_protocol == MODBUS_BACNET_MSTP)|| (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))
+//#define SPECIAL_BAC_TO_MODBUS   ((g_protocol == MODBUS_BACNET_MSTP)|| (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))
+
+//|| (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) 杜帆去掉  网络转485 协议不用
+#define SPECIAL_BAC_TO_MODBUS   ((g_protocol == MODBUS_BACNET_MSTP)|| (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
 
 #define CHELSEA_TEST  0
 
@@ -2238,3 +2265,42 @@ const int ONHELPUSINGUPDATE = 7;
 const int SCANALL = 8;
 const int BTNTOPOLOGICAL = 9;
 const int SCAN_PRODUCT = 10;
+
+enum OUTPUT_TYPE {
+    OUTPUT_VIRTUAL_PORT = 0x00,
+    OUTPUT_DIGITAL_PORT = 0x01,
+    OUTPUT_ANALOG_PORT = 0x02,
+    OUTPUT_DIGITAL_PORT_EXT = 0x03,
+    OUTPUT_ANALOG_PORT_EXT = 0x04
+};
+
+enum INPUT_TYPE {
+    INPUT_VIRTUAL_PORT = 0x00,
+    INPUT_DIGITAL_PORT = 0x01,
+    INPUT_ANALOG_PORT = 0x02,
+    INPUT_DIGITAL_PORT_EXT = 0x03,
+    INPUT_ANALOG_PORT_EXT = 0x04,
+    INPUT_INTERNAL = 0x05
+};
+
+const CString AQI_Info_Status[] =
+{
+    _T("Good"),
+    _T("Medium"),
+    _T("Unhealthy for sensitive groups"),
+    _T("Unhealthy"),
+    _T("Very Unhealthy"),
+    _T("Poisonous")
+};
+
+
+
+const CString Output_Type_String[] =
+{
+    _T("Virtual"),
+    _T("Digital"),       //1
+    _T("Ananlog"),
+    _T("Extend Digital"),
+    _T("Extend Ananlog"),
+    _T("Internal")
+};

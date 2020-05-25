@@ -35,9 +35,10 @@ public:
     afx_msg void OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult);
 private:
 int m_sn;
-HANDLE hFirstThread;
+
 public:
 BOOL m_ThreadStop;
+HANDLE hFirstThread;
     afx_msg void OnDestroy();
 };
 

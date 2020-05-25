@@ -82,6 +82,39 @@
 #define IDC_EDIT_RESTART_TIME           1056
 #define IDC_CHECK_FLASH_MAC             1058
 #define IDC_STATIC_SN_INFO              1059
+#define IDC_CHECK_ITEM1                 1060
+#define IDC_CHECK_ITEM2                 1061
+#define IDC_CHECK_ITEM3                 1062
+#define IDC_CHECK_ITEM4                 1063
+#define IDC_CHECK_ITEM5                 1064
+#define IDC_CHECK_ITEM6                 1065
+#define IDC_CHECK_ITEM7                 1066
+#define IDC_CHECK_ITEM8                 1067
+#define IDC_CHECK_ITEM9                 1068
+#define IDC_CHECK_ITEM10                1069
+#define IDC_CHECK_ITEM11                1070
+#define IDC_CHECK_ITEM12                1071
+#define IDC_CHECK_ITEM13                1072
+#define IDC_CHECK_ITEM14                1073
+#define IDC_CHECK_ITEM15                1074
+#define IDC_CHECK_ITEM16                1075
+#define IDC_STATIC_COM_NAME             1076
+#define IDC_CHECK_ITEM17                1077
+#define IDC_CHECK_ITEM18                1078
+#define IDC_CHECK_ITEM19                1079
+#define IDC_CHECK_ITEM20                1080
+#define IDC_CHECK_ITEM21                1081
+#define IDC_CHECK_ITEM22                1082
+#define IDC_CHECK_ITEM23                1083
+#define IDC_CHECK_ITEM24                1084
+#define IDC_CHECK_ITEM25                1085
+#define IDC_CHECK_ITEM26                1086
+#define IDC_CHECK_ITEM27                1087
+#define IDC_CHECK_ITEM28                1088
+#define IDC_CHECK_ITEM29                1089
+#define IDC_CHECK_ITEM30                1090
+#define IDC_CHECK_ITEM31                1091
+#define IDC_CHECK_ITEM32                1092
 #define IDC_BUTTON_SETTING_OK           6001
 #define IDC_EDIT_SETTING_TIMEOUT        6021
 #define IDC_EDIT_SETTING_RESPONSE_TIME  6022
@@ -107,7 +140,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        145
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1060
+#define _APS_NEXT_CONTROL_VALUE         1077
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

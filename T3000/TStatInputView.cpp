@@ -1080,6 +1080,19 @@ void CTStatInputView::Fresh()
     b_co2_sensor = false;
     b_lux_sensor = false;
   Initial_ListFor_Tstat();
+  g_progress_persent = 0;
+  for (int i = 0; i < 8; i++)
+  {
+      if ((i != 1) && (i != 4) && (i != 6))
+          continue;
+      int itemp = 0;
+      itemp = Read_Multi(g_tstat_id, &product_register_value[i * 100], i * 100, 100, 3);
+      if (itemp < 0)
+          break;
+      g_progress_persent = (i+1) * 100 / 8;
+      Sleep(SEND_COMMAND_DELAY_TIME);
+  }
+  g_progress_persent = 100;
   PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
   if (m_Fresh_BackgroundThreadHandle!=NULL)
   {

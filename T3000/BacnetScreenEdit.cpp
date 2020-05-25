@@ -244,7 +244,7 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
             (temp_1 == BAC_FLOAT_ABCD) ||
             (temp_1 == BAC_FLOAT_CDAB) ||
             (temp_1 == BAC_FLOAT_BADC) ||
-            (temp_1 == BAC_FLOAT_CDBA) ||
+            (temp_1 == BAC_FLOAT_DCBA) ||
             (temp_1 == COIL_REG) || 
             (temp_1 == DIS_INPUT_REG) || 
             (temp_1 == INPUT_REG) || 

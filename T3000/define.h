@@ -68,6 +68,7 @@
 #define WM_MYMSG_REFRESHBUILDING					80001
 
 #define WM_MAIN_MSG_SCAN_BAC                        10010
+#define WM_MAIN_MSG_UPDATE_PRODUCT_TREE             10011
 //scan
 
 

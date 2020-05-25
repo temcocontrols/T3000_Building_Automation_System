@@ -16,7 +16,7 @@
 #include "TFTPServer.h"
 #include "FlashSN.h"
 #include "ISPSetting.h"
-
+#include <bitset>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -37,7 +37,7 @@ int g_mac_port;
 int b_com_or_ip = 0;
 int n_mac_reboot_time = 15;
 int n_need_write_pid = 0;
-
+vector <int> support_sensor_id;
 
 extern Bin_Info        global_fileInfor;
 //int g_CommunicationType;
@@ -48,6 +48,12 @@ bool auto_flash_mode = false;
 CString AutoFlashConfigPath;
 CString g_strExePath;
 CString SettingPath;
+CString g_repair_bootloader_file_path;
+CString g_update_newfirmware_file_path; //最新的要烧写的正常的代码路径;
+unsigned int n_hex_file_pid;//hex文件的产品PID；
+int c1_need_update_boot = 0;  //0 不用更新boot   1 需要更新bootload;   C1为hex
+int firmware_update_version_mini = 60;
+int new_bootload = 0; //如果等于1 就说明现在烧写的是新的BootLoader;
 //HANDLE get_file_thread_handle = NULL;
 CString g_strFlashInfo;
 const TCHAR c_strLogFileName[]=_T("Log_info.txt");				//log information file name
@@ -59,6 +65,16 @@ const TCHAR c_strDBFileName[]=_T("Database\\t3000.mdb") ;
 
 /* These variables are the same as the variables in the communications DLL but they are separate, the variables in the DLL are encapsulated. If you want to change the G_commu_type in the DLL use the function Setcommunicationtype */
  
+
+int handle_write_sensor_info = 0;
+int n_component_count = 0; //所有勾选的组件的个数
+unsigned short sensor_value1 = 0; //前16位的值
+unsigned short sensor_value2 = 0; //后16位的值 ， 预留
+unsigned short FUNCTION_CHECK_SUM_REG = 65000;
+unsigned short FUNCTION_CHECK_SUM_VALUE = 0x55ff;
+unsigned short FUNCTION_SENSOR1_REG = 65001;
+unsigned short FUNCTION_SENSOR2_REG = 65002;
+
 int g_Commu_type=0;
 UINT _PingThread(LPVOID pParam);
 unsigned int n_check_temco_firmware = 1;
@@ -267,6 +283,9 @@ BEGIN_MESSAGE_MAP(CISPDlg, CDialog)
     ON_MESSAGE(WM_ADD_STATUSINFO, OnAddStatusInfo)
     //Finish 通知 Flash按钮是否可用
     ON_MESSAGE(WM_FLASH_FINISH, OnFlashFinish)
+    ON_MESSAGE(WM_FLASH_RESTATR_BOOT, OnFlashBoot_Update_boot)
+    ON_MESSAGE(WM_FLASH_NEW_BOOT_FINISH, OnFlashNewBootFinish)
+    
     ON_MESSAGE(WM_UPDATA_DEVICE_INFORMATION,Show_Flash_DeviceInfor)
     ON_WM_CLOSE()
     //ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, &CISPDlg::OnTcnSelchangeTab1)
@@ -293,6 +312,7 @@ BEGIN_MESSAGE_MAP(CISPDlg, CDialog)
     ON_BN_CLICKED(IDC_BUTTON_FLASH_SN, &CISPDlg::OnBnClickedButtonFlashSn)
 
     ON_MESSAGE(WM_CLOSE_THREAD_MESSAGE, &CISPDlg::Fresh_CloseSN_fcuntion)
+    ON_CBN_SELCHANGE(IDC_COMBO_PM, &CISPDlg::OnCbnSelchangeComboPm)
 END_MESSAGE_MAP()
 
 
@@ -354,7 +374,7 @@ BOOL CISPDlg::OnInitDialog()
     g_strExePath=GetExePath(true);
     m_strLogoFileName=g_strExePath + _T("ResourceFile\\") + c_strLogoFileName;
     SettingPath = g_strExePath + _T("\\Setting.ini");
-
+    //g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_BB_rev1.hex");
     //从文件中读取配置参数
     m_cfgFileHandler.SetParentWnd(this);
     // m_cfgFileHandler.CreateConfigFile(g_strExePath + c_strCfgFileName);
@@ -643,7 +663,7 @@ struct ALL_PRODUCT_NAME_NODE {
 
 vector <ALL_PRODUCT_NAME_NODE> pid_name_map;
 
-
+CString cs_component_name[32];
 void CISPDlg::ShowProductNameFromIni()
 {
     m_static_info.SetWindowTextW(_T(""));
@@ -652,7 +672,9 @@ void CISPDlg::ShowProductNameFromIni()
     m_static_info.setFont(26, 18, NULL, _T("Arial"));
 
     CString AllID;
+
     GetPrivateProfileStringW(_T("ProductName"), _T("AllName"), _T(""), AllID.GetBuffer(MAX_PATH*10), MAX_PATH*10, _T("Z:\\Serial_Records\\ProductMode.ini"));
+
     AllID.ReleaseBuffer();
 
     if (AllID.IsEmpty())
@@ -707,7 +729,60 @@ void CISPDlg::ShowProductNameFromIni()
         pid_name_map.push_back(temp_value);
         ((CComboBox *)GetDlgItem(IDC_COMBO_PM))->AddString(cs_name);
     }
-    Sleep(1);
+
+
+    CString nsection;
+    n_component_count = GetPrivateProfileInt(_T("ComponentType"), _T("Count"), 0,  _T("Z:\\Serial_Records\\ProductMode.ini"));
+    GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("请勾选包含的组件"));
+    
+    CString AllSupportProduct_Sensor;
+    GetPrivateProfileStringW(_T("ComponentType"), _T("SupportProduct"), _T(""), AllSupportProduct_Sensor.GetBuffer(MAX_PATH * 10), MAX_PATH * 10, _T("Z:\\Serial_Records\\ProductMode.ini"));
+    AllSupportProduct_Sensor.ReleaseBuffer();
+    support_sensor_id.clear();
+    CStringArray temp_support_sensor_id_array;
+    SplitCStringA(temp_support_sensor_id_array, AllSupportProduct_Sensor, _T(","));
+    for (int i = 0; i < temp_support_sensor_id_array.GetSize(); i++)
+    {
+        CString temp_cs;
+        temp_cs = temp_support_sensor_id_array.GetAt(i);
+        int temp_int = 0;
+        temp_int = _wtoi(temp_cs);
+        support_sensor_id.push_back(temp_int);
+    }
+
+    //Part 1 第1个寄存器的 16个 模组;
+    for (int i = 0; i < 16; i++)
+    {
+        if (i >= n_component_count)
+        {
+            GetDlgItem(IDC_CHECK_ITEM1 + i)->ShowWindow(SW_HIDE);
+            continue;
+        }
+        cs_component_name[i].Empty();
+        nsection.Format(_T("Name_%u"),i);
+        GetPrivateProfileStringW(_T("ComponentType"), nsection, _T(""), cs_component_name[i].GetBuffer(MAX_PATH ), MAX_PATH , _T("Z:\\Serial_Records\\ProductMode.ini"));
+        cs_component_name[i].ReleaseBuffer();
+        GetDlgItem(IDC_CHECK_ITEM1 + i)->SetWindowTextW(cs_component_name[i]);
+    }
+
+
+    //Part 2 第2个寄存器的 16个 模组;
+    for (int i = 0; i < 16; i++)
+    {
+        if (i+16 >= n_component_count)
+        {
+            GetDlgItem(IDC_CHECK_ITEM17 + i)->ShowWindow(SW_HIDE);
+            continue;
+        }
+        cs_component_name[i+16].Empty();
+        nsection.Format(_T("Name_%u"), i+16);
+        GetPrivateProfileStringW(_T("ComponentType"), nsection, _T(""), cs_component_name[i+16].GetBuffer(MAX_PATH), MAX_PATH, _T("Z:\\Serial_Records\\ProductMode.ini"));
+        cs_component_name[i+16].ReleaseBuffer();
+        GetDlgItem(IDC_CHECK_ITEM17 + i)->SetWindowTextW(cs_component_name[i+16]);
+    }
+
+    
+
 
 }
 
@@ -717,6 +792,7 @@ void CISPDlg::InitISPUI()
     if(m_enable_sn_mac)
     //if(m_bShowSN)
     {
+        Enable_Sensor_Window(false);
         ShowProductNameFromIni();
         WINDOWPLACEMENT wp;
 
@@ -727,8 +803,10 @@ void CISPDlg::InitISPUI()
         CRect rc;
         CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
         pWnd->GetWindowRect(&rc);
-
-
+        if(n_component_count>16)
+            wp.rcNormalPosition.right = rc.right + 500;
+        else
+            wp.rcNormalPosition.right = rc.right +250;
         wp.rcNormalPosition.bottom = rc.bottom + 150;
 
         SetWindowPlacement(&wp);
@@ -744,8 +822,11 @@ void CISPDlg::InitISPUI()
         CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
         pWnd->GetWindowRect(&rc);
         //ScreenToClient(&rc);
-
-        wp.rcNormalPosition.bottom = rc.bottom /*-10*/;//- 20;
+        if (!auto_flash_mode)
+        {
+            wp.rcNormalPosition.right = rc.right + 8;
+        }
+        wp.rcNormalPosition.bottom = rc.bottom + 5;
         SetWindowPlacement(&wp);
 
         GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE);
@@ -959,8 +1040,7 @@ void CISPDlg::SaveParamToConfigFile()
 
 void CISPDlg::OnBnClickedButtonFlash()
 {
-
-
+    c1_need_update_boot = 0;
     UpdateData();
     SaveParamToConfigFile();	//Save data entered by the user
 
@@ -1031,8 +1111,83 @@ unsigned int CISPDlg::Judge_Flash_Type()
 
 }
 
+afx_msg LRESULT CISPDlg::OnFlashBoot_Update_boot(WPARAM wParam, LPARAM lParam)
+{
+
+    if (m_pComWriter)
+    {
+        delete m_pComWriter;
+        m_pComWriter = NULL;
+    }
+    if (m_pFileBuffer)
+    {
+        delete[] m_pFileBuffer;
+        m_pFileBuffer = NULL;
+    }
+
+    if (m_pTCPFlasher)
+    {
+        delete m_pTCPFlasher;
+        m_pTCPFlasher = NULL;
+    }
+    EnableFlash(TRUE);
+
+    if (m_pTFTPServer)
+    {
+        delete m_pTFTPServer;
+        m_pTFTPServer = NULL;
+    }
+
+        g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader.hex");
+        //g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_NB_rev1.hex");
+
+    //更改要烧写的代码路径;
+    GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(g_repair_bootloader_file_path);
+    new_bootload = 1;
+    SetTimer(1, 200, NULL);
+
+    return 1;
+}
+
+afx_msg LRESULT CISPDlg::OnFlashNewBootFinish(WPARAM wParam, LPARAM lParam)
+{
+    int nRet = lParam;
+    if (m_pComWriter)
+    {
+        delete m_pComWriter;
+        m_pComWriter = NULL;
+    }
+    if (m_pFileBuffer)
+    {
+        delete[] m_pFileBuffer;
+        m_pFileBuffer = NULL;
+    }
+
+    if (m_pTCPFlasher)
+    {
+        delete m_pTCPFlasher;
+        m_pTCPFlasher = NULL;
+    }
+    EnableFlash(TRUE);
+
+    if (m_pTFTPServer)
+    {
+        delete m_pTFTPServer;
+        m_pTFTPServer = NULL;
+    }
+
+    //更改要烧写的新的固件的  代码路径;
+    GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(g_update_newfirmware_file_path);
+    new_bootload = 0;
+    SetTimer(1, 200, NULL);
+
+    return 1;
+}
+
+
 static int total_test_count = 0;
 static int total_success_count = 0;
+
 
 // NC 是使用tftp协议来进行flash的
 afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
@@ -1098,6 +1253,18 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
         }
         PostMessage(WM_CLOSE,NULL,NULL);
     }
+    if (nRet > 0)
+    {
+        CString strTips = _T("Programming successful. ");
+        UpdateStatusInfo(strTips, FALSE);
+    }
+
+    if (m_pTFTPServer)
+    {
+        delete m_pTFTPServer;
+        m_pTFTPServer = NULL;
+    }
+
     return 1;
 }
 int Add_log_count = 0;
@@ -1967,11 +2134,15 @@ void CISPDlg::FlashByEthernet()
     }
     if(HexFileValidation (m_strHexFileName))
     {
+        if(new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径;
+            g_update_newfirmware_file_path = m_strHexFileName;
         CHexFileParser* pHexFile = new CHexFileParser;
         pHexFile->SetFileName(m_strHexFileName);
 
         m_pFileBuffer = new char[c_nBinFileBufLen];
         memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+        //CString str2Tips = _T("Reading firmware file.Please wait..");
+        //UpdateStatusInfo(str2Tips, FALSE);
         nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nBinFileBufLen);//Get the file's buffer
 
 
@@ -1996,8 +2167,33 @@ void CISPDlg::FlashByEthernet()
 
     if(nDataSize > 0)
     {
-        CString strTips = _T("|Firmware bin file verified okay.");
+        CString strTips = _T("Firmware loading successful.");
         UpdateStatusInfo(strTips, FALSE);
+
+
+        CString strTips_version;// = _T("|Firmware bin file verified okay.");
+        float hex_version = 0;
+        hex_version = ((float)(global_fileInfor.software_high * 256 + global_fileInfor.software_low))/100;
+        strTips_version.Format(_T("Hex file firmware version : %.2f"), hex_version);
+
+
+        CString temp_hex_pid_name;
+        MultiByteToWideChar(CP_ACP, 0, (char *)global_fileInfor.product_name, (int)strlen((char *)global_fileInfor.product_name) + 1, temp_hex_pid_name.GetBuffer(MAX_PATH), MAX_PATH);
+        temp_hex_pid_name.ReleaseBuffer();
+        temp_hex_pid_name.Trim();
+        temp_hex_pid_name.MakeUpper();
+        //只有Hex PID 为minipanel arm 版本时  ， 才可能要修复 bootload 的版本;
+        if ((temp_hex_pid_name.CompareNoCase(_T("MINI_ARM")) == 0 ) ||
+            (temp_hex_pid_name.CompareNoCase(_T("MINIPANEL")) == 0))
+        {
+            n_hex_file_pid = PM_MINIPANEL_ARM;
+            if (hex_version >= firmware_update_version_mini) //大于这个版本就说明需要512的flash ，必须先更新bootload;
+            {
+                c1_need_update_boot = 1;
+            }
+        }
+
+        UpdateStatusInfo(strTips_version, FALSE);
 
         m_pTFTPServer=new TFTPServer;
         DWORD dwIP = GetIPAddress();
@@ -3128,9 +3324,11 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     sn_mac_info.Format(_T("获取到的序列号: %u"), ready_towrite_sn);
 
     CTime Time_Click = CTime::GetCurrentTime();
-
+    CString temp_g_write_hardware_version;
+    temp_g_write_hardware_version.Format(_T("%u"), g_write_hardware_version);
+    CString temp_serial_pid_type_name = GetProductName(temp_read_reg[7]);
     CString temp_time_format = Time_Click.Format(_T("%y/%m/%d %H:%M:%S"));
-    strSql.Format(_T("insert into serial_records values(%i,'%s','%s','%s','%s')"), ready_towrite_sn, _T("Productname"), _T("Hardware"), _T("S"), temp_time_format);
+    strSql.Format(_T("insert into serial_records values(%i,'%s','%s','%s','%s')"), ready_towrite_sn, temp_serial_pid_type_name, temp_g_write_hardware_version, _T("S"), temp_time_format);
     monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
     Sleep(1000);
 
@@ -3285,10 +3483,10 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
             ready_towrite_mac[1] = 0;
             ready_towrite_mac[0]++;
         }
-
+        CString temp_pid_type_name = GetProductName(temp_read_reg[7]);
         strSql.Format(_T("insert into MAC(100,101,102,103,104,105,Product_Name,Serial_Number,Record_Date) values(%i,%i,%i,%i,%i,%i,'%s',%i,'%s')"),
             ready_towrite_mac[0], ready_towrite_mac[1], ready_towrite_mac[2], ready_towrite_mac[3], ready_towrite_mac[4], ready_towrite_mac[5],
-            _T("MMM"), ready_towrite_sn, temp_time_format);
+            temp_pid_type_name, ready_towrite_sn, temp_time_format);
         monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
 
         sn_mac_info.Format(_T("准备写入MAC地址:%x-%x-%x-%x-%x-%x"), g_write_hardware_version,
@@ -3339,6 +3537,55 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         }
     }
 
+
+    if (handle_write_sensor_info == 1)
+    {
+        //先要确认 是否支持写入sensor 标志;
+        unsigned short sensor_check_flag = 0;
+        sensor_check_flag = read_one(temp_read_reg[6], FUNCTION_CHECK_SUM_REG,6);
+        if (sensor_check_flag != FUNCTION_CHECK_SUM_VALUE)
+        {
+            sn_mac_info.Format(_T("固件不是最新的固件，不需要写入"));
+            Sleep(2000);
+        }
+        else
+        {
+            sn_mac_info.Format(_T("正在写入此设备的模块信息"));
+            Sleep(1000);
+            int n_ret_sensor1 = Write_One_Retry(temp_read_reg[6], FUNCTION_SENSOR1_REG, sensor_value1, 6);
+            if (n_ret_sensor1 < 0)
+            {
+                sn_mac_info.Format(_T("写入组合模块信息 第1部分 失败"));
+                Sleep(1000);
+                ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
+                return 1;
+            }
+            else
+            {
+                sn_mac_info.Format(_T("写入组合模块信息 第1部分 成功"));
+                Sleep(1000);
+            }
+
+            int n_ret_sensor2 = Write_One_Retry(temp_read_reg[6], FUNCTION_SENSOR2_REG, sensor_value2, 6);
+            if (n_ret_sensor2 < 0)
+            {
+                sn_mac_info.Format(_T("写入组合模块信息 第2部分 失败"));
+                Sleep(1000);
+                ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
+                return 1;
+            }
+            else
+            {
+                sn_mac_info.Format(_T("写入组合模块信息 第2部分 成功"));
+                Sleep(1000);
+            }
+
+        }
+
+
+
+    }
+
     sn_mac_info.Format(_T("所有操作已成功完成！"));
     Sleep(1000);
     monitor_bado.CloseRecordset();
@@ -3350,6 +3597,8 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
 void CISPDlg::OnBnClickedButtonFlashSn()
 {
+
+
     // TODO: 在此添加控件通知处理程序代码
     GetDlgItem(IDC_EDIT_MAC_ADDRESS)->SetWindowTextW(_T(""));
     GetDlgItem(IDC_EDIT_SN)->SetWindowTextW(_T(""));
@@ -3426,6 +3675,52 @@ void CISPDlg::OnBnClickedButtonFlashSn()
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(true);
         return;
     }
+    if (handle_write_sensor_info)
+    {
+        sensor_value1 = 0;
+        bitset<16> sensor_bit(sensor_value1);
+        int n_index_1 = 0;
+        if (n_component_count > 16)
+            n_index_1 = 16;
+        else
+            n_index_1 = n_component_count;
+        for (int i = 0; i < n_index_1; i++)
+        {
+            if (((CButton *)GetDlgItem(IDC_CHECK_ITEM1 + i))->GetCheck())
+            {
+                sensor_bit[i] = 1;
+            }
+            else
+            {
+                sensor_bit[i] = 0;
+            }
+        }
+        sensor_value1 = (unsigned short)sensor_bit.to_ulong();
+        Sleep(1);
+
+        sensor_value2 = 0;
+        bitset<16> sensor2_bit(sensor_value2);
+
+        int n_index_2 = 0;
+        if (n_component_count <= 16)
+            n_index_2 = 0;
+        else
+            n_index_2 = n_component_count - 16;
+        for (int i = 0; i < n_index_2; i++)
+        {
+            if (((CButton *)GetDlgItem(IDC_CHECK_ITEM17 + i))->GetCheck())
+            {
+                sensor2_bit[i] = 1;
+            }
+            else
+            {
+                sensor2_bit[i] = 0;
+            }
+        }
+        sensor_value2 = (unsigned short)sensor2_bit.to_ulong();
+        Sleep(1);
+
+    }
     
     if (h_sn_mac_thread == NULL)
     {
@@ -3435,6 +3730,64 @@ void CISPDlg::OnBnClickedButtonFlashSn()
     }
 
 }
+
+
+
+
+void CISPDlg::OnCbnSelchangeComboPm()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString strModel;
+    CComboBox* pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_PM);
+    int nSel = pCbx->GetCurSel();
+
+    pCbx->GetLBText(nSel, strModel);
+
+
+    vector<int>::iterator itr_sensor = support_sensor_id.begin();
+    vector<ALL_PRODUCT_NAME_NODE>::iterator itr = pid_name_map.begin();
+    handle_write_sensor_info = false;
+    for (; itr != pid_name_map.end(); itr++)
+    {
+        if (strModel.CompareNoCase(itr->name) == 0)
+        {
+           
+            for (; itr_sensor != support_sensor_id.end(); itr_sensor++)
+            {
+                Sleep(1);
+                if (itr->id == itr_sensor[0])
+                {
+                    handle_write_sensor_info = true;
+                    break;
+                }
+            }
+
+            
+            break;
+        }
+    }
+
+    Enable_Sensor_Window(handle_write_sensor_info);
+    
+}
+
+void CISPDlg::Enable_Sensor_Window(bool nenable)
+{
+    for (int i = 0; i < 16; i++)
+    {
+        ((CButton *)GetDlgItem(IDC_CHECK_ITEM1 + i))->EnableWindow(nenable);
+    }
+    for (int i = 0; i < 16; i++)
+    {
+        ((CButton *)GetDlgItem(IDC_CHECK_ITEM17 + i))->EnableWindow(nenable);
+    }
+    if(nenable)
+        GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("必须勾选包含的组件"));
+    else
+        GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("无需勾选包含的组件"));
+}
+
+
 
 
 
@@ -3452,6 +3805,10 @@ BOOL CAboutDlg::OnInitDialog()
     // TODO:  在此添加额外的初始化
     CString release_note;
     CString temp;
+    temp.Format(_T("Rev6.1.0  (2020-05-19)\r\n  1.Support update T3BB_LB_TB_NB bootloader  .\r\n  2.If firmware version bigger than 60.0 \r\n    bootloader smaller than 58 \r\n    it will auto update bootloader\r\n"));
+    release_note = release_note + temp;
+    temp.Format(_T("Rev6.0.9  (2020-05-09)\r\n  1.Internal functions, support different modules  .\r\n"));
+    release_note = release_note + temp;
     temp.Format(_T("Rev6.0.8  (2019-09-19)\r\n  1.Support CM5 arm version firmware update  .\r\n"));
     release_note = release_note + temp;
     temp.Format(_T("Rev6.0.7  (2019-07-29)\r\n  1.Support TSTAT9 Wifi firmware update  .\r\n"));

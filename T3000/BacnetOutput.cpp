@@ -19,6 +19,7 @@ static int show_output_external =  -1;
 int OUTPUT_LIMITE_ITEM_COUNT = 0;
 #define UPDATE_OUTPUT_ONE_ITEM_TIMER 3
 int changed_output_item = -1; //// 用于改变某一列后 ，立即刷新 当前列的其他变化;
+extern tree_product selected_product_Node; // 选中的设备信息;
 
 IMPLEMENT_DYNAMIC(CBacnetOutput, CDialogEx)
 
@@ -289,7 +290,7 @@ void CBacnetOutput::Initial_List()
 	m_output_list.InsertColumn(OUTPUT_DECOM, _T("Status"), 70, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_LABLE, _T("Label"), 70, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
-	m_output_list.InsertColumn(OUTPUT_EXTERNAL, _T("External"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_EXTERNAL, _T("Type"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_PRODUCT, _T("Product Name"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_EXT_NUMBER, _T("Product Output"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.Setlistcolcharlimit(OUTPUT_FULL_LABLE,STR_OUT_DESCRIPTION_LENGTH -1);
@@ -354,7 +355,7 @@ void CBacnetOutput::OnBnClickedButtonOutputRead()
 		PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 }
 
-       // PostMessage(g_hwnd_now,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+
 
 LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 {
@@ -398,14 +399,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
         OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
-	else if(bacnet_device_type == T38AI8AO6DO)
+	else if(bacnet_device_type == PM_T38AI8AO6DO)
 	{
 		digital_special_output_count = T38AI8AO6DO_OUT_D;
 		analog_special_output_count = T38AI8AO6DO_OUT_A;
         OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
 		Minipanel_device = 0;
 	}
-	else if (bacnet_device_type == PID_T322AI)
+	else if (bacnet_device_type == PM_T322AI)
 	{
 		digital_special_output_count = T322AI_OUT_D;
 		analog_special_output_count = T322AI_OUT_A;
@@ -500,37 +501,25 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		show_output_external = temp_need_show_external;
 		if(temp_need_show_external)
 		{
-			//CRect temp_rect;
-			//temp_rect = Output_rect;
-			//temp_rect.right = 1150;
-			//temp_rect.top = temp_rect.top + 24;
-			//m_output_list.MoveWindow(temp_rect);
-			m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,60);
+			//m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,60);
 			m_output_list.SetColumnWidth(OUTPUT_PRODUCT,80);
 			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,80);
 		}
 		else
 		{
-			//CRect temp_rect;
-			//temp_rect = Output_rect;
-			//temp_rect.right = 950;
-			//temp_rect.top = temp_rect.top + 24;
-			//m_output_list.MoveWindow(temp_rect);
-
-			m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
+            for (int i = 0;i < (int)m_Output_data.size();i++)
+            {
+                m_output_list.SetItemTextColor(i, OUTPUT_EXTERNAL, RGB(0, 0, 0), FALSE);
+                m_output_list.SetItemTextColor(i, -1, RGB(0, 0, 0), 0);
+            }
+			//m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
 			m_output_list.SetColumnWidth(OUTPUT_PRODUCT,0);
 			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,0);
 		}
 	}
 	if(Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
 	{
-		//CRect temp_rect;
-		//temp_rect = Output_rect;
-		//temp_rect.right = 950;
-		//temp_rect.top = temp_rect.top + 24;
-		//m_output_list.MoveWindow(temp_rect);
-
-		m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
+		//m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
 		m_output_list.SetColumnWidth(OUTPUT_PRODUCT,0);
 		m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,0);
 	}
@@ -843,6 +832,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 				
 				m_output_list.SetItemText(i,OUTPUT_EXTERNAL,_T("External"));
+
 				m_output_list.SetItemTextColor(i,OUTPUT_EXTERNAL,RGB(0,0,255),FALSE);
 				m_output_list.SetItemText(i,OUTPUT_PRODUCT,temp_name);
 				m_output_list.SetItemText(i,OUTPUT_EXT_NUMBER,temp_number);
@@ -866,7 +856,13 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			//main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
 			//m_output_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
 
-			m_output_list.SetItemText(i,OUTPUT_EXTERNAL,_T(""));
+            UCHAR OutputType = 0;
+            OutputType = GetOutputType(selected_product_Node.product_class_id, bacnet_device_type,i+1 );
+
+           
+            m_output_list.SetItemText(i, OUTPUT_EXTERNAL, Output_Type_String[OutputType]);
+
+			
 			m_output_list.SetItemText(i,OUTPUT_PRODUCT,_T(""));
 			m_output_list.SetItemText(i,OUTPUT_EXT_NUMBER,_T(""));
 		}
@@ -1427,7 +1423,7 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 					{
 						hide_485_progress = true;
                         //经常性的在load file 的时候锁死 ，待解决 2019 06 19
-						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_OUT);//第二个参数 OUT
+						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type, READOUTPUT_T3000/*BAC_OUT*/);//第二个参数 OUT
 					}
 				}
 			}

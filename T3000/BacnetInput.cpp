@@ -13,6 +13,7 @@
 #include "global_define.h"
 #include "BacnetRange.h"
 #include "MainFrm.h"
+extern tree_product selected_product_Node; // 选中的设备信息;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 static bool show_external =  false;
@@ -242,7 +243,7 @@ void CBacnetInput::Reload_Unit_Type()
 			}
 		}
 	}
-    else if (bacnet_device_type == BACNET_ROUTER)
+    else if (bacnet_device_type == MINIPANELARM_NB)
     {
         if (BACNET_ROUTER_IN_A > (int)m_Input_data.size())
             initial_count = (int)m_Input_data.size();
@@ -296,7 +297,7 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_JUMPER, _T("Signal Type"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
-	m_input_list.InsertColumn(INPUT_EXTERNAL, _T("External"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_EXTERNAL, _T("Type"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_PRODUCT, _T("Product Name"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_EXT_NUMBER, _T("Product Input"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.Setlistcolcharlimit(INPUT_FULL_LABLE,STR_IN_DESCRIPTION_LENGTH -1);
@@ -632,7 +633,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
     }
     else if (bacnet_device_type == PM_TSTAT_AQ)
     {
-        INPUT_LIMITE_ITEM_COUNT = 11;
+        INPUT_LIMITE_ITEM_COUNT = 32;
         Minipanel_device = 0;
     }
     //else if (bacnet_device_type == BACNET_ROUTER)
@@ -693,7 +694,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	{
 	 
 
-		m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
+		//m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
 		m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
 		m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
 	}
@@ -701,18 +702,18 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	{
 			if(temp_need_show_external)
 			{
-				m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
+				//m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
 				m_input_list.SetColumnWidth(INPUT_PRODUCT,80);
 				m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,80);
 			}
 			else
 			{
-				m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
+				//m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
 				m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
 				m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
 			}
 	}
-
+    m_input_list.SetColumnWidth(INPUT_EXTERNAL, 60);
 
 	if(isFreshOne == (int)REFRESH_ON_ITEM)
 	{
@@ -1042,7 +1043,12 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			//main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
 			//m_input_list.SetItemText(i,INPUT_PANEL,main_sub_panel);
 
-			m_input_list.SetItemText(i,INPUT_EXTERNAL,_T(""));
+            int InputType = 0;
+            InputType = GetInputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1 , m_Input_data.at(i).digital_analog);
+            m_input_list.SetItemText(i, INPUT_EXTERNAL, Output_Type_String[InputType]);
+
+
+			//m_input_list.SetItemText(i,INPUT_EXTERNAL,_T(""));
 			m_input_list.SetItemText(i,INPUT_PRODUCT,_T(""));
 			m_input_list.SetItemText(i,INPUT_EXT_NUMBER,_T(""));
 		}
@@ -1602,7 +1608,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 					{
 						hide_485_progress = true;
                         //经常性的在load file 的时候锁死 ，待解决 2019 06 19
-						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_IN);//第二个参数 OUT
+						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type, READINPUT_T3000/*BAC_IN*/);//第二个参数 OUT
 					}
 				}
 			}

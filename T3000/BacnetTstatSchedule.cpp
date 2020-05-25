@@ -111,7 +111,7 @@ LRESULT CBacnetTstatSchedule::Fresh_TSTAT_Schedule_List(WPARAM wParam, LPARAM lP
 
         CString temp_id;
         CString temp_online_status;
-        temp_id.Format(_T("%d"), m_tatat_schedule_data.at(i).tstat.id);
+        temp_id.Format(_T("%u"), (unsigned char)m_tatat_schedule_data.at(i).tstat.id);
         if (m_tatat_schedule_data.at(i).tstat.on_line)
         {
             temp_online_status = _T("Online");

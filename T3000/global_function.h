@@ -281,4 +281,8 @@ int Get_Msv_Table_Name(int x);// 获取MSV的表缩略名称
 int Get_Msv_Item_Name(int ntable, int nitemvalue, CString &csItemString); // 匹配MSV 对应的值显示哪一个 名称
 int Get_Msv_next_Name_and_Value_BySearchName(int ntable, CString nitemname, CString  &csNextItemString, int &nNextValue);
 int Get_Msv_next_Name_and_Value_BySearchValue(int ntable, int nitemvalue, CString  &csNextItemString, int &nNextValue);
+int Check_DaXiaoDuan(unsigned char npid, unsigned char Mainsw, unsigned char subsw);
+void Time32toCString(unsigned long ntime, CString &outputtime, int nproduct_id = 74);
+int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex); //获取输出状态
+int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n_digital_analog); //获取输出状态
 #endif
