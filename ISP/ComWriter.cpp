@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "ComWriter.h"
 #include "ISPDlg.h"
+extern int new_bootload ; //如果等于1 就说明现在烧写的是新的BootLoader;
+extern int com_port_flash_status ;  // 0 正常模式   1 烧写boot模式
 extern unsigned int n_check_temco_firmware;
 extern bool auto_flash_mode;
 extern CString g_strFlashInfo;
@@ -12,9 +14,12 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam);
 UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam);
 int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
+extern int c1_need_update_boot ;  //0 不用更新boot   1 需要更新bootload;   C1为hex
+extern CString g_repair_bootloader_file_path;
 CComWriter::CComWriter(void)
 {
     m_pFileBuffer = NULL;
+    m_pFileRepairBuffer = NULL;
     m_nBufLen = 0;
 
     m_nComPort = -1;
@@ -1621,7 +1626,7 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
 
 
 
-BOOL CComWriter::UpdataDeviceInformation(int& ID)
+int CComWriter::UpdataDeviceInformation(int& ID)
 {
     if (n_check_temco_firmware == 0)
         return 1;
@@ -1662,8 +1667,7 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
 	{
 		return TRUE;
 	}
-	 
-    
+	
 
     CString prodcutname= GetFirmwareUpdateName(Device_infor[7]);
 
@@ -1742,9 +1746,8 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
 		&& (hexproductname.CompareNoCase(_T("co2all")) == 0)
 		)
 	{
-		return TRUE;
+        Ret_Result = TRUE;
 	}
-
     else if ((hexproductname.CompareNoCase(_T("tstat6"))==0)&&(prodcutname.CompareNoCase(_T("tstat5i"))==0))
     {
         Ret_Result= TRUE;
@@ -1757,8 +1760,51 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
     {
         strtips.Format(_T("Your device is %s   but the hex file is for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
         OutPutsStatusInfo(strtips,false);
-        return FALSE;
+        Ret_Result = FALSE;
     }
+
+    if (com_port_flash_status == 0)
+    {
+        if ((Device_infor[7] == PM_TSTAT8) ||
+            (Device_infor[7] == PM_TSTAT9))
+        {
+            int device_version = 0;
+            device_version = Device_infor[4] + Device_infor[5] * 65536;
+
+            int c2_update_boot = false;
+            //判断是在boot里面还是App里面
+            if (Device_infor[11] == 0)
+            {
+                //主代码
+                if ((device_version < 101) && (c1_need_update_boot == 1))  //大于101就代表使用的是新的bootloader ， 就不用更新bootloader
+                {
+                    c2_update_boot = true;
+                }
+                else
+                    c2_update_boot = false;
+            }
+            else
+            {
+                if (Device_infor[11] < 53)
+                    c2_update_boot = true;
+                else
+                    c2_update_boot = false;
+            }
+
+            if (c2_update_boot)
+            {
+                strtips.Format(_T("New bootloader available ,need update!"), resend_count);
+                OutPutsStatusInfo(strtips, false);
+                PostMessage(m_pParentWnd->m_hWnd, WM_FLASH_RESTATR_BOOT, Device_infor[7], 0);
+                Ret_Result = 2;
+            }
+        }
+    }
+
+
+
+
+
     return Ret_Result;
     if (Ret_Result)
     {
@@ -1862,7 +1908,8 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             pWriter->OutPutsStatusInfo(strID);
 
             BOOL Flag_HEX_BIN=FALSE;
-            if (pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]))
+            int nret_device_info = pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
+            if (nret_device_info == 1)
             {
                 Flag_HEX_BIN =TRUE;
                 int  nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
@@ -2192,6 +2239,11 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 #endif
 
             }
+            else if (nret_device_info == 2)
+            {
+                Sleep(1);
+                return 1;
+            }
             else
             {
                 continue;
@@ -2319,6 +2371,10 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 end_isp_flash:
     Sleep(500);
     pWriter->WriteFinish(nFlashRet);
+    if (new_bootload == 1)
+    {
+        PostMessage(pWriter->m_pParentWnd->m_hWnd, WM_FLASH_NEW_BOOT_FINISH, 0, LPARAM(nFlashRet));
+    }
     Sleep(500);
 
     close_com();

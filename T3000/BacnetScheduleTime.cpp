@@ -432,16 +432,25 @@ void CBacnetScheduleTime::OnBnClickedClearSchedual()
                 m_Schedual_time_flag.at(weekly_list_line).Time_flag[i][j] = 255;
                 m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_hours = 0;
                 m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes = 0;
-                if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line) > 0)
-                {
-                    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change schedule success!"));
-                }
-                CString temp_task_info;
-                temp_task_info.Format(_T("Write Schedule Time Item%d .Clear schedule "), weekly_list_line + 1);
-                Post_Write_Message(g_bac_instance, WRITETIMESCHEDULE_T3000, weekly_list_line, weekly_list_line, WEEKLY_SCHEDULE_SIZE, BacNet_hwd, temp_task_info);
-                PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST, NULL, NULL);
+
 
             }
+        }
+
+        if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line) > 0)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change schedule part 1 success!"));
+        }
+        //CString temp_task_info;
+        //temp_task_info.Format(_T("Write Schedule Time Item%d .Clear schedule "), weekly_list_line + 1);
+        //Post_Write_Message(g_bac_instance, WRITETIMESCHEDULE_T3000, weekly_list_line, weekly_list_line, WEEKLY_SCHEDULE_SIZE, BacNet_hwd, temp_task_info);
+        //PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST, NULL, NULL);
+
+        memset(m_Schedual_time_flag.at(weekly_list_line).Time_flag, 255, 72);
+        if (Write_Private_Data_Blocking(WRITETIMESCHEDULE_T3000, weekly_list_line, weekly_list_line) > 0)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change schedule part 2 success!"));
+            PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST, NULL, NULL);
         }
 
     }

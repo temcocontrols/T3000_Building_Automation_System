@@ -50,7 +50,7 @@ DWORD prg_local_var_color;
 DWORD prg_function_color;
 CString prg_character_font;
 bool prg_color_change;
-
+extern unsigned int debug_point_main;
 extern unsigned int point_number;
 extern unsigned int point_type;
 POINT right_click_Point;
@@ -622,9 +622,20 @@ void CBacnetProgramEdit::OnSend()
 						return;
 					}
 					temp_invoke_id =  WriteProgramData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line,j);
-
 					Sleep(SEND_COMMAND_DELAY_TIME);
+                    if ((g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) && (temp_invoke_id >= 0))
+                    {
+                        break;
+                    }
+                        
 				} while (temp_invoke_id<0);
+
+                if ((g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) && (temp_invoke_id >= 0))
+                {
+                    continue;
+                }
+
+
 
 				if(send_status)
 				{
@@ -1055,6 +1066,14 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 	tempcs = ispoint_ex(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,sub_panel,Station_NUM,&k);
 	if(tempcs == NULL)
 		return false;
+    if (temp_panel != Station_NUM)
+    {
+        MessageBox(_T("The remote panel is not supported at this time. \r\nThis feature will be added soon."));
+        return -2;
+        debug_point_main = temp_panel;
+    }
+    else
+        debug_point_main = Station_NUM;
 	point_number = temp_number - 1;
 	point_type = temp_point_type;
 

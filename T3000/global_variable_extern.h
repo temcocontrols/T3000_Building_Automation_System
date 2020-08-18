@@ -59,6 +59,9 @@ extern int MAWAY , MSLEEP ;
 extern int nCom;
 extern	CString program_path;
 extern	volatile int g_tstat_id;
+extern int g_protocol_support_ptp ;
+extern int g_output_support_relinquish ;
+extern unsigned short output_relinquish_value[128];
 extern  int g_mstp_deviceid; //ÓÃÓÚÈ«¾Ö¸ù¾İDevice id ·ÃÎÊ MSTP ¡£
 extern unsigned int g_serialNum;
 extern	BOOL g_tstat_id_changed;
@@ -1266,6 +1269,7 @@ extern CString offline_prg_path;   //ÀëÏßÄ£Ê½µÃprg ±£´æÂ·¾¶;
 extern bac_mstp_com g_mstp_com; // È«¾Ömstp com ¿Ú Á¬½Ó×´Ì¬
 extern bool custom_bacnet_register_listview;
 extern bool n_wifi_connection;  //ºóÌ¨ÁĞ±í Ë¢ĞÂ¿ª¹Ø
+extern int MODE_SUPPORT_PTRANSFER; // 1 Ö§³Öbip ptransfer 
 extern bool initial_bip ;
 extern Str_modbus_reg bacnet_to_modbus_struct; //ÓÃÓÚbacnet Ğ­Òé×ª»»Îªmodbus Ğ­ÒéµÄ½á¹¹
 extern vector <str_bacnet_rp_info> standard_bacnet_data; // ÓÃÓÚbacnet ±ê×¼ ¶ÁĞ´ ±äÁ¿´æÈ¡;
@@ -1282,4 +1286,5 @@ extern int n_read_product_type ; //ÕâÈı¸ö±äÁ¿ È·¶¨ modbusĞ­Òé È¥¶ÁÈ¡ bacnet¶«Î÷µ
 extern int n_read_list_flag ; // ¶ÁÈ¡ÄÇÒ»¸ö£¬ÀıÈç¶ÁInput »¹ÊÇOutput
 extern int n_read_item_index ; // ¶ÁÄÄÒ»¸ö ÀıÈçSchedule3 µÄÊ±¼ä £¬²»ÄÜÓÃweekly_list ÒòÎª½çÃæÉÏµÄÈİÒ×±ä¡£
 extern unsigned int DEBUG_DELAY_TIME ; //²âÊÔÓÃµ÷ÊÔWifi ÑÓ³ÙÊ±¼ä;
+extern CString bacnet_string; // ´ı½âÎöµÄ×Ö´®
 

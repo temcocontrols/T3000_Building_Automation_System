@@ -118,8 +118,7 @@ BOOL CBacnetInput::OnInitDialog()
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
    
-
-	SetTimer(INPUT_REFRESH_DATA_TIMER,BAC_LIST_REFRESH_TIME,NULL);
+	SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_INPUT_TIME,NULL);
 
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_INPUT_DEFAULT);
 	SetIcon(m_hIcon,TRUE);
@@ -1044,6 +1043,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			//m_input_list.SetItemText(i,INPUT_PANEL,main_sub_panel);
 
             int InputType = 0;
+            if (selected_product_Node.product_class_id == PM_TSTAT10)
+                bacnet_device_type = Device_Basic_Setting.reg.mini_type;
             InputType = GetInputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1 , m_Input_data.at(i).digital_analog);
             m_input_list.SetItemText(i, INPUT_EXTERNAL, Output_Type_String[InputType]);
 
@@ -1055,6 +1056,13 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 #pragma endregion External info
 
+        if (selected_product_Node.product_class_id == PM_TSTAT_AQ) //针对Airlab 特殊显示不同的range
+        {
+
+                if((i>=3) && (i<11))
+                m_input_list.SetItemText(i, INPUT_UNITE, Airlab_Unit_String[i]);
+
+        }
 
 		CString temp_des2;
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).label, (int)strlen((char *)m_Input_data.at(i).label)+1, 
@@ -1596,8 +1604,11 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 			else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_INPUT))  )	//GSM连接时不要刷新;
 			{
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-				if((bac_select_device_online)&& (g_protocol == PROTOCOL_BACNET_IP))
-					Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
+                if ((bac_select_device_online) && (g_protocol == PROTOCOL_BACNET_IP))
+                {
+                    
+                    Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), BAC_INPUT_GROUP);
+                }
 				else if((bac_select_device_online) && 
                     ((g_protocol == MODBUS_RS485) || 
                      (g_protocol == MODBUS_TCPIP) || 

@@ -111,7 +111,7 @@ BOOL BacnetRange::OnInitDialog()
 			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
 		}
 
-		for (int i = IDC_RADIO101;i <= IDC_RADIO102;i++)
+		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
 		{
 			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
 		}
@@ -149,10 +149,10 @@ BOOL BacnetRange::OnInitDialog()
 	}
     else
     {
-        GetDlgItem(IDC_RADIO55)->SetWindowTextW(_T("31.  Y3K -40 to 150 Deg.C"));//除了PT12 其他的默认 用3K的传感器
-        GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("32.  Y3K -40 to 300 Deg.F"));
-        GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("35.  G3K -40 to 120 Deg.C"));
-        GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("36.  G3K -40 to 250 Deg.F"));
+        GetDlgItem(IDC_RADIO55)->SetWindowTextW(_T("31.  Deg.C 3K YSI 44005 "));//除了PT12 其他的默认 用3K的传感器
+        GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("32.  Deg.F 3K YSI 44005 "));
+        GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("35.  Deg.C Allerton/Walker/ASI"));
+        GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("36.  Deg.F Allerton/Walker/ASI"));
     }
 	return FALSE;
 	//return TRUE;  // return TRUE unless you set the focus to a control
@@ -348,7 +348,7 @@ void BacnetRange::Initial_static()
 		}
         GetDlgItem(IDC_STATIC_CUSTOM_RANGE_GROUPBOX)->ShowWindow(false);
 
-		for (int i = IDC_RADIO101;i <= IDC_RADIO102;i++)
+		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
 		{
 			GetDlgItem(i)->ShowWindow(false);
 		}
@@ -497,7 +497,7 @@ void BacnetRange::Initial_static()
 			GetDlgItem(i)->ShowWindow(false);
 		}
         GetDlgItem(IDC_STATIC_CUSTOM_RANGE_GROUPBOX)->ShowWindow(false);
-		for (int i = IDC_RADIO101;i <= IDC_RADIO102;i++)
+		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
 		{
 			GetDlgItem(i)->ShowWindow(false);
 		}
@@ -539,7 +539,7 @@ void BacnetRange::Initial_static()
 			else
 			{
 				temp_cs.Format(_T("%d"),bac_range_number_choose + 30);
-				GetDlgItem(IDC_RADIO54 + bac_range_number_choose)->SetFocus();
+				//GetDlgItem(IDC_RADIO54 + bac_range_number_choose)->SetFocus();
 			}
 		}
 		else
@@ -626,7 +626,7 @@ void BacnetRange::Initial_static()
         ((CButton *)GetDlgItem(IDC_STATIC_CUSTOM_RANGE_GROUPBOX))->ShowWindow(1);
 
 
-		for (int i = IDC_RADIO101;i <= IDC_RADIO102;i++)
+		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
 		{
 			CRect c1;
 			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
@@ -678,41 +678,48 @@ void BacnetRange::Initial_static()
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE); //使能RPM选项
 		}
 		else if((bacnet_device_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB) && (input_list_line >=10) && (input_list_line <=16))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
 		}
 		else if((bacnet_device_type == TINY_MINIPANEL) && (input_list_line >=5) && (input_list_line <=11))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
 		}
 		else if ((bacnet_device_type == TINY_EX_MINIPANEL ) && (input_list_line >= 0) && (input_list_line <= 7))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
 		}
         else if ((bacnet_device_type == MINIPANELARM_TB) && (input_list_line >= 0) && (input_list_line <= 7))
         {
             GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
             GetDlgItem(IDC_RADIO69)->EnableWindow(TRUE);
             GetDlgItem(IDC_RADIO87)->EnableWindow(FALSE);
+            GetDlgItem(IDC_RADIO103)->EnableWindow(FALSE);//禁用RPM选项
         }
 		else if((bacnet_device_type == PID_T322AI) && (input_list_line >= 0) && (input_list_line <=10))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
 		}
 		else
 		{
 			GetDlgItem(IDC_RADIO69)->EnableWindow(TRUE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(FALSE);
+            GetDlgItem(IDC_RADIO103)->EnableWindow(FALSE);//禁用RPM选项
 		}
         
         if ((Device_Basic_Setting.reg.special_flag & 0x01) == 0x01)
@@ -921,7 +928,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				break;
 
 
-			if(((nfocusid >= IDC_RADIO54) && (nfocusid <= IDC_RADIO72)) || ((nfocusid >= IDC_RADIO81) && (nfocusid <= IDC_RADIO88)) || ( (nfocusid>= IDC_RADIO101) && (nfocusid <= IDC_RADIO102)))
+			if(((nfocusid >= IDC_RADIO54) && (nfocusid <= IDC_RADIO72)) || ((nfocusid >= IDC_RADIO81) && (nfocusid <= IDC_RADIO88)) || ( (nfocusid>= IDC_RADIO101) && (nfocusid <= IDC_RADIO113)))
 			{
 				bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
 				click_radio = true;
@@ -1067,7 +1074,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 					}
 				}
 
-				for (int i = IDC_RADIO101;i <= IDC_RADIO102;i++)
+				for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
 				{
 					if (((CButton *)GetDlgItem(i))->GetCheck())
 					{
@@ -1422,7 +1429,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							((CButton *)GetDlgItem(i))->SetCheck(false);
 						}
 
-						for (int i = IDC_RADIO101;i <= IDC_RADIO102;i++)
+						for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
 						{
 							((CButton *)GetDlgItem(i))->SetCheck(false);
 						}
@@ -1812,7 +1819,7 @@ void BacnetRange::Timer2_handle()
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
 
-			for (int i = IDC_RADIO101;i <= IDC_RADIO102;i++)
+			for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
@@ -1963,7 +1970,7 @@ void BacnetRange::Timer2_handle()
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
-			for (int i = IDC_RADIO101;i <= IDC_RADIO102;i++)
+			for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
@@ -2376,8 +2383,13 @@ void BacnetRange::DisableAnalogVarRadio()
         ((CButton *)GetDlgItem(i))->SetCheck(false);
     }
 
-    ((CButton *)GetDlgItem(IDC_RADIO101))->SetCheck(false);
-    ((CButton *)GetDlgItem(IDC_RADIO102))->SetCheck(false);
+    for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
+    {
+        ((CButton *)GetDlgItem(i))->SetCheck(false);
+    }
+    //((CButton *)GetDlgItem(IDC_RADIO101))->SetCheck(false);
+    //((CButton *)GetDlgItem(IDC_RADIO102))->SetCheck(false);
+    //((CButton *)GetDlgItem(IDC_RADIO103))->SetCheck(false);
 }
 
 void BacnetRange::OnBnClickedRadioMsv1()

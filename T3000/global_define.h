@@ -1,6 +1,7 @@
 #pragma once
 #include "RelayLabel.h"
-
+//#define ENABLE_HTTP_FUCTION  //定义是否使用http api
+//#define ENABLE_T3_EMAIL
 #include <map>
 //minipanel 寄存器表
 //  9800	-	9999    200个寄存器   setting
@@ -244,6 +245,7 @@ const int PROTOCOL_BIP_TO_MSTP = 10;
 const int PROTOCOL_MSTP_TO_MODBUS = 11;
 const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;    //网络下面的设备，子口跑MSTP设备 ，只能通过Ptransfer 转10000以后寄存器读取
 const int PROTOCOL_MB_TCPIP_TO_MB_RS485 = 13;     //20200306 TSTAT10或者T3BB  使用MODBUS MODBUS485 接到  T3BB下面 
+const int PROTOCOL_MB_PTP_TRANSFER = 14;          //MODBUS485采用ptp 的方式获取 T3私有数据;
 const int PROTOCOL_THIRD_PARTY_BAC_BIP = 253;
 const int PROTOCOL_VIRTUAL = 254;
 const int PROTOCOL_UNKNOW = 255;
@@ -477,9 +479,10 @@ const int BAC_TSTAT_SCHEDULE_GROUP = (BAC_TSTAT_SCHEDULE + BAC_READ_TSTAT_SCHEDU
 const int BAC_MSV_GROUP = (BAC_MSV_COUNT + BAC_MSV_GROUP_NUMBER - 1) / BAC_MSV_GROUP_NUMBER;
 const int BAC_SHOW_CONNECT_RESULTS = 1;
 const int BAC_SHOW_MISSION_RESULTS = 3;
-
+const int BAC_LIST_REFRESH_INPUT_TIME = 30000;//ms
+const int BAC_LIST_REFRESH_OUTPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_TIME = 45000;//ms
-
+const int BAC_LIST_REFRESH_ETHERNET_TIME = 20000;  //判断是接的网络就用20秒的刷新;
 
 const int SCHEDULE_TIME_NUM = 0;
 const int SCHEDULE_TIME_MONDAY = 1;
@@ -867,9 +870,19 @@ const CString Input_List_Analog_Units[] =
 	_T(""),
 	_T("counts"),
 	_T("HZ"),
-
 	_T("%"),
-	_T("PPM")
+	_T("PPM"),
+    _T("RPM"),
+    _T("PPB"),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T("")
 };
 
 const CString Input_Analog_Units_Array[] =
@@ -902,7 +915,18 @@ const CString Input_Analog_Units_Array[] =
 	_T("Pulse Count (Fast 100Hz)"),
 	_T("Frequency"),
 	_T("Humidty %"),
-	_T("CO2  PPM")
+	_T("CO2  PPM"),
+    _T("Revolutions Per Minute"),
+    _T("TVOC PPB"),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T("")
 };
 
 const CString Output_Analog_Units_Array[] =
@@ -1134,6 +1158,7 @@ typedef enum
 	MINIPANELARM_TB = 7,
     MINIPANELARM_NB = 8,
     T3_TSTAT10    = 9,
+    T3_OEM        = 11,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1700,19 +1725,20 @@ const int OUTPUT_FULL_LABLE = 2;
 const int OUTPUT_AUTO_MANUAL = 3;
 const int OUTPUT_HW_SWITCH = 4;
 const int OUTPUT_VALUE = 5;
-const int OUTPUT_UNITE = 6;
-const int OUTPUT_RANGE = 7;
+const int OUTPUT_RELINQUISH_VALUE = 6;
+const int OUTPUT_UNITE = 7;
+const int OUTPUT_RANGE = 8;
 
-const int OUTPUT_LOW_VOLTAGE = 8;
-const int OUTPUT_HIGH_VOLTAGE = 9;
+const int OUTPUT_LOW_VOLTAGE = 9;
+const int OUTPUT_HIGH_VOLTAGE = 10;
 
-const int OUTPUT_PWM_PERIOD = 10;
-const int OUTPUT_DECOM = 11;
-const int OUTPUT_LABLE = 12;
-const int OUTPUT_EXTERNAL = 13;
-const int OUTPUT_PRODUCT = 14;
-const int OUTPUT_EXT_NUMBER = 15;
-const int OUTPUT_COL_NUMBER = 16;
+const int OUTPUT_PWM_PERIOD = 11;
+const int OUTPUT_DECOM = 12;
+const int OUTPUT_LABLE = 13;
+const int OUTPUT_EXTERNAL = 14;
+const int OUTPUT_PRODUCT = 15;
+const int OUTPUT_EXT_NUMBER = 16;
+const int OUTPUT_COL_NUMBER = 17;
 
 const CString Output_Decom_Array[2] =
 {
@@ -2239,7 +2265,7 @@ typedef struct
 //#define SPECIAL_BAC_TO_MODBUS   ((g_protocol == MODBUS_BACNET_MSTP)|| (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))
 
 //|| (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) 杜帆去掉  网络转485 协议不用
-#define SPECIAL_BAC_TO_MODBUS   ((g_protocol == MODBUS_BACNET_MSTP)|| (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+#define SPECIAL_BAC_TO_MODBUS   ((g_protocol == MODBUS_BACNET_MSTP)|| (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || (MODE_SUPPORT_PTRANSFER == 1))
 
 #define CHELSEA_TEST  0
 
@@ -2293,7 +2319,53 @@ const CString AQI_Info_Status[] =
     _T("Poisonous")
 };
 
+const CString Output_Priority_Arry[] = 
+{
+    _T("Manual Life Safety"),
+    _T("Automatic Life Safety"),
+    _T("Unspecified Level 3"),
+    _T("Unspecified Level 4"),
+    _T("Critical Equipment Control"),
+    _T("Minimum On Off"),
+    _T("Unspecified Level 7"),
+    _T("Manual Operator"),
+    _T("Unspecified Level 9"),
+    _T("Unspecified Level 10"),
+    _T("Unspecified Level 11"),
+    _T("Unspecified Level 12"),
+    _T("Unspecified Level 13"),
+    _T("Unspecified Level 14"),
+    _T("Unspecified Level 15"),
+    _T("Lowest And Default")
+};
 
+const CString Output_Priority_Description_Arry[] =
+{
+    _T("Manual Life Safety"),
+    _T("Automatic Life Safety"),
+    _T("Unspecified Level 3"),
+    _T("Unspecified Level 4"),
+    _T("Critical Equipment Control"),
+    _T("Minimum On Off"),
+    _T("Hand-Off-Auto switches on the controller front cover"),
+    _T("Manual Operator ,T3000 front end Auto/Manual setting"),
+    _T("Unspecified Level 9"),
+    _T("T3 Controller programs"),
+    _T("Commands sent over the network from external masters"),
+    _T("Unspecified Level 12"),
+    _T("Unspecified Level 13"),
+    _T("Unspecified Level 14"),
+    _T("Unspecified Level 15"),
+    _T("Lowest And Default"),
+    _T("Relinquish Default / Dead Master /all entries above are empty")
+};
+
+const CString CO2_Node_Auto_Cal[] =
+{
+
+    _T("Disable"),
+    _T("Enable")
+};
 
 const CString Output_Type_String[] =
 {
@@ -2303,4 +2375,19 @@ const CString Output_Type_String[] =
     _T("Extend Digital"),
     _T("Extend Ananlog"),
     _T("Internal")
+};
+
+const CString Airlab_Unit_String[] =
+{
+    _T(""),
+    _T(""),
+    _T(""),
+    _T("-"),
+    _T("PPB"),
+    _T("ug/m3"),
+    _T("ug/m3"),
+    _T("#/cm3"),
+    _T("#/cm3"),
+    _T("dB"),
+    _T("Lux")
 };

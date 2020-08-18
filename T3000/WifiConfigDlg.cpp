@@ -95,7 +95,9 @@ void CWifiConfigDlg::ChangeWifiWindowStatus(bool b_value)
     GetDlgItem(IDC_IPADDRESS1)->EnableWindow(b_value);
     GetDlgItem(IDC_IPADDRESS2)->EnableWindow(b_value);
     GetDlgItem(IDC_IPADDRESS3)->EnableWindow(b_value);
-    
+    GetDlgItem(IDC_RADIO_WIFI_ENABLE)->EnableWindow(b_value);
+    GetDlgItem(IDC_RADIO_WIFI_DISABLE)->EnableWindow(b_value);
+    GetDlgItem(IDC_EDIT_WIFI_MODBUS_PORT)->EnableWindow(b_value);
     
     //GetDlgItem(IDCANCEL)->EnableWindow(b_value);
 }
@@ -176,8 +178,8 @@ BOOL CWifiConfigDlg::OnInitDialog()
 
         
 
-        m_combox_NetType.EnableWindow(false);
-        GetDlgItem(IDC_STATIC_NET_WORK_TYPE)->EnableWindow(false);
+        m_combox_NetType.ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_NET_WORK_TYPE)->ShowWindow(SW_HIDE);
 
         int itemp = Read_Multi(g_tstat_id, wifi_register_value, WIFI_ENABLE, 100, 6);
         if (itemp < 0)
@@ -195,6 +197,7 @@ BOOL CWifiConfigDlg::OnInitDialog()
         if (wifi_register_value[IP_WIFI_STATUS - WIFI_ENABLE] == WIFI_NO_WIFI)
         {
             ChangeWifiWindowStatus(0);
+            return TRUE;
         }
         else
         {

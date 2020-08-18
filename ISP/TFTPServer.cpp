@@ -1505,6 +1505,8 @@ bool TFTPServer::Send_Tftp_File()
             OutPutsStatusInfo(strTips, TRUE);
             //}
             nRet = SendDataNew(pBuf, nSendNum);
+            if (package_number == 1)
+                Sleep(2000);   //发送第一包的时候 设备接收到会做擦除flash的动作，需要等待.
             for (int i=0; i<Remote_timeout; i++)
             {
                 //if(IP_is_Local())
@@ -1992,7 +1994,7 @@ void TFTPServer::FlashByEthernet()
             OutPutsStatusInfo(strTips_Ethernet, FALSE);
             int temp_mu_ret = 0;
             unsigned short temp_read_reg[100] = { 0 };
-            temp_mu_ret = read_multi_tap(255, temp_read_reg, 0, 100);
+            temp_mu_ret = read_multi_retry(255, temp_read_reg, 0, 100,3);
             if (temp_mu_ret < 0)
             {
                 strTips_Ethernet = _T("Read bootloader version failed.");
@@ -2007,34 +2009,36 @@ void TFTPServer::FlashByEthernet()
                     temp_ver_boot = temp_read_reg[14];
                 strTips_Ethernet.Format(_T("Bootloader version :%u"), temp_ver_boot);
                 OutPutsStatusInfo(strTips_Ethernet, FALSE);
-            }
 
-            if ((temp_read_reg[11] >= 58) || (temp_read_reg[14] >= 58))
-            {
-
-                strTips_Ethernet = _T("Check bootloader version success.");
-                OutPutsStatusInfo(strTips_Ethernet, FALSE);
-            }
-            else
-            {
-                if (temp_mu_ret >= 0)
-                {
-                    strTips_Ethernet.Format(_T("Serial Number: %u"), temp_read_reg[3] * 65536 * 256 + temp_read_reg[2] * 65536 + temp_read_reg[1] * 256 + temp_read_reg[0]);
-                    OutPutsStatusInfo(strTips_Ethernet, FALSE);
-
-                }
-                
-                if (c1_need_update_boot)
+                if ((temp_read_reg[11] >= 64) || (temp_read_reg[14] >= 64))
                 {
 
-                    strTips_Ethernet = _T("Bootloader version is too old,need update now.");
+                    strTips_Ethernet = _T("Check bootloader version success.");
                     OutPutsStatusInfo(strTips_Ethernet, FALSE);
-                    //这里设置标志 需要自动引到ISP来更新 repaire boot 
-                    //HexFileValidation(g_repair_bootloader_file_path);
-                    PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, 0, 0);
-                    return;
+                }
+                else
+                {
+                    if (temp_mu_ret >= 0)
+                    {
+                        strTips_Ethernet.Format(_T("Serial Number: %u"), temp_read_reg[3] * 65536 * 256 + temp_read_reg[2] * 65536 + temp_read_reg[1] * 256 + temp_read_reg[0]);
+                        OutPutsStatusInfo(strTips_Ethernet, FALSE);
+
+                    }
+
+                    if (c1_need_update_boot)
+                    {
+
+                        strTips_Ethernet = _T("Bootloader version is too old,need update now.");
+                        OutPutsStatusInfo(strTips_Ethernet, FALSE);
+                        //这里设置标志 需要自动引到ISP来更新 repaire boot 
+                        //HexFileValidation(g_repair_bootloader_file_path);
+                        PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, temp_read_reg[7], 0);
+                        return;
+                    }
                 }
             }
+
+            
 
         }
         else

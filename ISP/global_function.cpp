@@ -939,6 +939,24 @@ BOOL Ping(const CString& strIP, CWnd* pWndEcho)
 	return FALSE;
 }
 
+int read_multi_retry(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length , int retry_time)
+{
+    int nret = 0;
+    for (int i = 0; i < retry_time; i++)
+    {
+        nret = read_multi_tap(device_var, put_data_into_here, start_address, length);
+        if (nret < 0)
+        {
+            Sleep(300);
+            continue;
+        }
+        else
+            return nret;
+    }
+    return nret;
+   
+}
+
 int Write_One_Retry(unsigned char device_var, unsigned short address, unsigned short value,int retry_time)
 {
     int nret = 0;

@@ -10340,4 +10340,403 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
 }
 
 
+#if 1
+OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_here, TS_UC command, TS_UC start_instance, TS_UC end_instance, TS_US entitysize)
+{
+    if (g_Commu_type == 0)
+    {
+        //device_var is the modbus ID
+        //the return value == -1 ,no connecting
+        unsigned short data_length = 0;
+        TS_UC read_buffer_data[600] = { '\0' };
+        TS_UC data_to_send[16] = { '\0' }; //the array to used in writefile()
+        data_to_send[0] = device_var;//slave address
+        data_to_send[1] = 0xFF;//function multiple
+        data_to_send[2] = 0x54; //T
+        data_to_send[3] = 0x45; //E
+        data_to_send[4] = 0x4D; //M
+        data_to_send[5] = 0x43; //C
+        data_to_send[6] = 0x4F; //O
+
+        data_to_send[7] = 0x07;  
+        data_to_send[8] = 0x00;  // 这前面两个只给prg和monitor使用
+        data_to_send[9] = command;
+        data_to_send[10] = start_instance;
+        data_to_send[11] = end_instance;
+        data_to_send[12] = (entitysize & 0x00ff) ;
+        data_to_send[13] = (entitysize & 0xff00)>>8;
+        TS_US crc = CRC16(data_to_send, 14);
+        data_to_send[14] = (crc >> 8) & 0xff;
+        data_to_send[15] = crc & 0xff;
+
+        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        if (m_hSerial == NULL)
+        {
+            return -1;
+        }
+        ////////////////////////////////////////////////clear com error
+        COMSTAT ComStat;
+        DWORD dwErrorFlags;
+
+        ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+        PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
+                                                                                            ////////////////////////////////////////////////////////////overlapped declare
+        memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
+        if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, _T("Write"))) == NULL)
+            return -2;
+        m_osMulWrite.Offset = 0;
+        m_osMulWrite.OffsetHigh = 0;
+        ///////////////////////////////////////////////////////send the to read message
+
+
+
+        int fState = WriteFile(m_hSerial,// 句柄
+            data_to_send,// 数据缓冲区地址
+            16,// 数据大小
+            &m_had_send_data_number,// 返回发送出去的字节数
+            &m_osMulWrite);
+        if (!fState)// 不支持重叠
+        {
+            if (GetLastError() == ERROR_IO_PENDING)
+            {
+                //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+            }
+            else
+                m_had_send_data_number = 0;
+        }
+        ///////////////////////////up is write
+        /////////////**************down is read
+
+        Sleep(LATENCY_TIME_COM);
+        ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+        memset(&m_osRead, 0, sizeof(OVERLAPPED));
+        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+            return -2;
+        m_osRead.Offset = 0;
+        m_osRead.OffsetHigh = 0;
+        ////////////////////////////////////////////////clear com error
+        if (command == 16)
+        {
+            data_length = 400;
+        }
+        else
+        {
+            data_length = (end_instance - start_instance + 1)*entitysize;
+        }
+        
+        fState = ReadFile(m_hSerial,// 句柄
+            read_buffer_data,// 数据缓冲区地址
+            data_length + 14 + 2,// 数据大小
+            &m_had_send_data_number,// 返回发送出去的字节数
+            &m_osRead);
+        if (!fState)// 不支持重叠
+        {
+            if (GetLastError() == ERROR_IO_PENDING)
+            {
+                //WaitForSingleObject(m_osRead.hEvent,INFINITE);
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+            }
+            else
+                m_had_send_data_number = 0;
+        }
+        ///////////////////////////////////////////////////////////
+        for (int x = 0; x < 14; x++)
+        {
+            if (read_buffer_data[x] != data_to_send[x])
+                return -2;
+        }
+        crc = CRC16(read_buffer_data, data_length + 14);
+        if (read_buffer_data[data_length + 14] != ((crc & 0xff00) >> 8))
+            return -2;
+        if (read_buffer_data[data_length + 15] != (crc & 0xff))
+            return -2;
+
+        for (int i = 0; i < data_length+7; i++)
+            put_data_into_here[i] = read_buffer_data[7 + i];
+        return data_length+7;
+    }
+    if (g_Commu_type == 1)//tcp.
+    {
+        //device_var is the modbus ID
+        //the return value == -1 ,no connecting
+        unsigned short data_length = 0;
+        TS_UC read_buffer_data[600] = { '\0' };
+        TS_UC data_to_send[16 + 6] = { '\0' }; //the array to used in writefile()
+
+        data_to_send[0] = 1;
+        data_to_send[1] = 2;
+        data_to_send[2] = 3;
+        data_to_send[3] = 4;
+        data_to_send[4] = 5;
+        data_to_send[5] = 6;
+
+        data_to_send[0+6] = device_var;//slave address
+        data_to_send[1+6] = 0xFF;//function multiple
+        data_to_send[2+6] = 0x54; //T
+        data_to_send[3+6] = 0x45; //E
+        data_to_send[4+6] = 0x4D; //M
+        data_to_send[5+6] = 0x43; //C
+        data_to_send[6+6] = 0x4F; //O
+
+        data_to_send[7+6] = 0x07;
+        data_to_send[8+6] = 0x00;  // 这前面两个只给prg和monitor使用
+        data_to_send[9+6] = command;
+        data_to_send[10+6] = start_instance;
+        data_to_send[11+6] = end_instance;
+        data_to_send[12+6] = (entitysize & 0x00ff);
+        data_to_send[13+6] = (entitysize & 0xff00) >> 8;
+        TS_US crc = CRC16(data_to_send + 6 , 14);
+        data_to_send[14+6] = (crc >> 8) & 0xff;
+        data_to_send[15+6] = crc & 0xff;
+
+        if (m_hSocket == INVALID_SOCKET)
+        {
+            return -1;
+        }
+
+        int nLen = 22;
+        int xx = ::send(m_hSocket, (char*)&data_to_send, 22, 0);
+
+        if (xx < 0)
+        {
+            if (last_connected_port != 0)
+                Open_Socket2(last_connected_ip, last_connected_port);
+        }
+        ////////////////////////////////////////////////clear com error
+
+
+        Sleep(LATENCY_TIME_NET);//Sleep(SLEEP_TIME);
+                                //DataPack rvData;
+                                //Sleep(SLEEP_TIME+10);
+
+        TS_UC rvData[600];
+        int nRecv = ::recv(m_hSocket, (char*)&rvData, sizeof(rvData), 0);
+
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                {
+                    Open_Socket2(last_connected_ip, last_connected_port);
+                    return -1;
+                }
+            }
+        }
+        if (command == 16)
+        {
+            data_length = 400;
+        }
+        else
+        {
+            data_length = (end_instance - start_instance + 1)*entitysize;
+        }
+
+        memcpy((void*)read_buffer_data, rvData + 6, data_length + 14 + 2);// 数据大小
+
+        for (int x = 0; x < 14; x++)
+        {
+            if (read_buffer_data[x] != data_to_send[x+6])
+                return -2;
+        }
+
+        crc = CRC16(read_buffer_data, data_length + 14);
+        if (read_buffer_data[data_length + 14] != ((crc & 0xff00) >> 8))
+            return -2;
+        if (read_buffer_data[data_length + 15] != (crc & 0xff))
+            return -2;
+
+        for (int i = 0; i < data_length + 7; i++)
+            put_data_into_here[i] = read_buffer_data[7 + i];
+        return data_length + 7;
+    }
+
+    return -1;
+}
+
+#if 1
+OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned short nlength)
+{
+    if (g_Commu_type == 0)//
+    {
+        unsigned short data_length = 0;
+        TS_UC read_buffer_data[20] = { '\0' };
+        TS_UC data_to_send[600] = { '\0' }; //the array to used in writefile()
+        data_to_send[0] = device_var;//slave address
+        data_to_send[1] = 0xFF;//function multiple
+        data_to_send[2] = 0x54; //T
+        data_to_send[3] = 0x45; //E
+        data_to_send[4] = 0x4D; //M
+        data_to_send[5] = 0x43; //C
+        data_to_send[6] = 0x4F; //O
+
+        memcpy(&data_to_send[7], to_write, nlength);
+        TS_US crc = CRC16(data_to_send,7 + nlength);
+        data_to_send[nlength + 7] = (crc >> 8) & 0xff;
+        data_to_send[nlength + 8] = crc & 0xff;
+
+        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        if (m_hSerial == NULL)
+        {
+            return -1;
+        }
+        ////////////////////////////////////////////////clear com error
+        COMSTAT ComStat;
+        DWORD dwErrorFlags;
+
+        ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+        PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
+                                                                                            ////////////////////////////////////////////////////////////overlapped declare
+        memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
+        if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, _T("MulWrite"))) == NULL)
+            return -2;
+        m_osMulWrite.Offset = 0;
+        m_osMulWrite.OffsetHigh = 0;
+        ///////////////////////////////////////////////////////send the to read message
+        int fState = WriteFile(m_hSerial,// 句柄
+            data_to_send,// 数据缓冲区地址
+            nlength + 9,// 数据大小
+            &m_had_send_data_number,// 返回发送出去的字节数
+            &m_osMulWrite);
+        if (!fState)// 不支持重叠
+        {
+            if (GetLastError() == ERROR_IO_PENDING)
+            {
+                //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+            }
+            else
+                m_had_send_data_number = 0;
+        }
+        ///////////////////////////up is write
+        /////////////**************down is read
+        ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+        memset(&m_osRead, 0, sizeof(OVERLAPPED));
+        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+            return -2;
+        m_osRead.Offset = 0;
+        m_osRead.OffsetHigh = 0;
+        Sleep(LATENCY_TIME_COM);
+        fState = ReadFile(m_hSerial,// 句柄
+            read_buffer_data,// 数据缓冲区地址
+            7 + 7 + 2,// 数据大小
+            &m_had_send_data_number,// 返回发送出去的字节数
+            &m_osRead);
+        if (!fState)// 不支持重叠
+        {
+            if (GetLastError() == ERROR_IO_PENDING)
+            {
+                //WaitForSingleObject(m_osRead.hEvent,INFINITE);
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+            }
+            else
+                m_had_send_data_number = 0;
+        }
+
+        for (int x = 0; x < 14; x++)
+        {
+            if (read_buffer_data[x] != data_to_send[x])
+                return -2;
+        }
+        crc = CRC16(read_buffer_data, data_length + 14);
+        if (read_buffer_data[data_length + 14] != ((crc & 0xff00) >> 8))
+            return -2;
+        if (read_buffer_data[data_length + 15] != (crc & 0xff))
+            return -2;
+
+        return 1;
+    }
+    else if (g_Commu_type == 1)//tcp.
+    {
+        //device_var is the modbus ID
+        //the return value == -1 ,no connecting
+        unsigned short data_length = 0;
+        TS_UC read_buffer_data[30] = { '\0' };
+        TS_UC data_to_send[600] = { '\0' }; //the array to used in writefile()
+
+        data_to_send[0] = 1;
+        data_to_send[1] = 2;
+        data_to_send[2] = 3;
+        data_to_send[3] = 4;
+        data_to_send[4] = 5;
+        data_to_send[5] = 6;
+
+        data_to_send[0 + 6] = device_var;//slave address
+        data_to_send[1 + 6] = 0xFF;//function multiple
+        data_to_send[2 + 6] = 0x54; //T
+        data_to_send[3 + 6] = 0x45; //E
+        data_to_send[4 + 6] = 0x4D; //M
+        data_to_send[5 + 6] = 0x43; //C
+        data_to_send[6 + 6] = 0x4F; //O
+
+        memcpy(&data_to_send[7 + 6], to_write, nlength);
+        TS_US crc = CRC16(data_to_send + 6, 7 + nlength);
+        data_to_send[nlength + 7 + 6] = (crc >> 8) & 0xff;
+        data_to_send[nlength + 8 + 6] = crc & 0xff;
+
+
+
+        if (m_hSocket == INVALID_SOCKET)
+        {
+            return -1;
+        }
+
+        int nLen = nlength + 8 + 6 + 1;
+        int xx = ::send(m_hSocket, (char*)&data_to_send, nLen, 0);
+
+        if (xx < 0)
+        {
+            if (last_connected_port != 0)
+                Open_Socket2(last_connected_ip, last_connected_port);
+        }
+        ////////////////////////////////////////////////clear com error
+
+        Sleep(LATENCY_TIME_NET);//Sleep(SLEEP_TIME);
+                                //DataPack rvData;
+                                //Sleep(SLEEP_TIME+10);
+
+        TS_UC rvData[600];
+        int nRecv = ::recv(m_hSocket, (char*)&rvData, sizeof(rvData), 0);
+
+        if (nRecv < 0)
+        {
+            int nErr = WSAGetLastError();
+            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            {
+                if (last_connected_port != 0)
+                {
+                    Open_Socket2(last_connected_ip, last_connected_port);
+                    return -1;
+                }
+            }
+        }
+
+
+        memcpy((void*)read_buffer_data, rvData + 6, nlength + 8  + 1);// 数据大小
+
+
+        for (int x = 0; x < 14; x++)
+        {
+            if (read_buffer_data[x] != data_to_send[x])
+                return -2;
+        }
+        crc = CRC16(read_buffer_data, data_length + 14);
+        if (read_buffer_data[data_length + 14] != ((crc & 0xff00) >> 8))
+            return -2;
+        if (read_buffer_data[data_length + 15] != (crc & 0xff))
+            return -2;
+
+        return 1;
+    }
+
+
+}
+#endif
+
+#endif
+
+
+
 

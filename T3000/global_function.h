@@ -6,7 +6,7 @@
 #include "Bacnet_Include.h"
 #include "T3000RegAddress.h"
 #include "msflexgrid1.h"
- 
+
 #pragma endregion For_Bacnet
 
 
@@ -17,6 +17,11 @@
 #define ORANGE_COLOR RGB(255,165,0)
 
 #include "global_variable_extern.h"
+
+#include "HttpApiDefine.h"
+#ifdef ENABLE_HTTP_FUCTION
+#include "..\BravocontrolAPI\BravocontrolAPI\HttpAPI\HttpAPI.h"
+#endif
 #include <afxinet.h>
 BOOL CheckForUpdate(
 	LPCTSTR szFtpServer,
@@ -124,7 +129,7 @@ int WritePrivateData_Blocking(uint32_t deviceid, unsigned char n_command, unsign
 int Write_Private_Data_Blocking(uint8_t ncommand, uint8_t nstart_index, uint8_t nstop_index, unsigned int write_object_list = 0);
 int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
 int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
-
+int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, bool &end_flag);
 int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag);
 bool Check_Label_Exsit(LPCTSTR m_new_label);
 bool Check_FullLabel_Exsit(LPCTSTR m_new_fulllabel);
@@ -133,6 +138,7 @@ void local_handler_conf_private_trans_ack(
 	uint16_t service_len,
 	BACNET_ADDRESS * src,
 	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
+void local_handler_update_bacnet_ui(int receive_data_type, bool each_end_flag);
 
 void local_handler_read_property_multiple_ack(
     uint8_t * service_request,
@@ -200,6 +206,7 @@ void Copy_Data_From_485_to_Bacnet(unsigned short *start_point);
 int handle_read_monitordata_ex(char *npoint,int nlength);
 int handle_read_pic_data_ex(char *npoint,int nlength);
 bool IP_is_Local(LPCTSTR ip_address);
+bool Support_relinquish_device(unsigned short n_product_class_id);
 bool Bacnet_Private_Device(unsigned short n_product_class_id);
 BOOL DirectoryExist(CString Path);
 BOOL CreateDirectory(CString path);

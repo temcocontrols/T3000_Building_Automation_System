@@ -115,6 +115,8 @@
 #define IDC_CHECK_ITEM30                1090
 #define IDC_CHECK_ITEM31                1091
 #define IDC_CHECK_ITEM32                1092
+#define IDC_CHECK_ITEM33                1093
+#define IDC_CHECK_NO_ITEM               1093
 #define IDC_BUTTON_SETTING_OK           6001
 #define IDC_EDIT_SETTING_TIMEOUT        6021
 #define IDC_EDIT_SETTING_RESPONSE_TIME  6022

@@ -66,6 +66,8 @@ volatile HANDLE GraphicLable_Mutex = NULL;
 #define YStart 0
 CRect mynew_rect;	//用来存储 窗体应该有多大;
 HANDLE h_read_standard_thread = NULL;
+HANDLE h_refresh_group_thread = NULL;
+HANDLE h_read_all_panel_des_thread = NULL;
 vector <int> screnn_sequence;
 
 bool show_not_exsit_dlg = true;
@@ -221,7 +223,7 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	int temp_panel = -1;
 	int temp_net = -1;
 	int k=0;
-	unsigned char sub_panel = -1;
+	unsigned char sub_panel = 0;
 	char * tempcs=NULL;
 	//int temp1;
 	//tempcs = ispoint(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,Station_NUM,&k);
@@ -889,11 +891,11 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	Invalidate(1);
 	::SetWindowPos(this->m_hWnd,HWND_TOP,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 
-    //if(h_read_all_panel_des_thread == NULL)
-    //   h_read_all_panel_des_thread = CreateThread(NULL, NULL, ReadAllPanelThreadfun, this, NULL, NULL);
+    if(h_read_all_panel_des_thread == NULL)
+       h_read_all_panel_des_thread = CreateThread(NULL, NULL, ReadAllPanelThreadfun, this, NULL, NULL);
+    if(h_refresh_group_thread == NULL)
+       h_refresh_group_thread = CreateThread(NULL, NULL, ReadGroupDataThreadfun, this, NULL, NULL);
 
-    //if(h_refresh_group_thread == NULL)
-    //   h_refresh_group_thread = CreateThread(NULL, NULL, ReadGroupDataThreadfun, this, NULL, NULL);
 
     if(h_read_standard_thread == NULL)
         h_read_standard_thread = CreateThread(NULL, NULL, ReadStandardThreadfun, this, NULL, NULL);
@@ -1061,12 +1063,12 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
                                                     
             }
         }
-        Sleep(3000);
+        Sleep(10000);
 
         //至少让先运行一次，以便下次打开的时候显示非常快速
         if (ScreenEdit_Window == NULL)
         {
-            //h_refresh_group_thread = NULL;
+            h_refresh_group_thread = NULL;
             return true;
         }
     }
@@ -1146,12 +1148,12 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         sort(m_remote_screen_data.begin(), m_remote_screen_data.end(), sort_by_panelnumber);
-        Sleep(1);
+        Sleep(15000);
         //读取所有在线panel的label和description;
 
         if (ScreenEdit_Window == NULL)
         {
-            //h_read_all_panel_des_thread = NULL;
+            h_read_all_panel_des_thread = NULL;
             return true;
         }
     }

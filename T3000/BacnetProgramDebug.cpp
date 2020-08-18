@@ -7,6 +7,7 @@
 #include "global_function.h"
 #include "afxdialogex.h"
 #include "BacnetRange.h"
+unsigned int debug_point_main = 0;
 unsigned int point_number = 0;
 unsigned int point_type = 0;
 extern int initial_dialog;
@@ -136,7 +137,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 				//CString temp_units;
 
 
-				temp_item.Format(_T("%u-OUT%d"),Station_NUM, point_number+1);
+				temp_item.Format(_T("%u-OUT%d"), debug_point_main, point_number+1);
 				m_program_debug_list.InsertItem(0,temp_item);
 
 
@@ -203,7 +204,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 				//CString temp_units;
 
 
-				temp_item.Format(_T("%u-IN%d"),Station_NUM, point_number+1);
+				temp_item.Format(_T("%u-IN%d"), debug_point_main, point_number+1);
 				m_program_debug_list.InsertItem(0,temp_item);
 
 
@@ -254,7 +255,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 
 
 			CString temp_item;
-			temp_item.Format(_T("%u-VAR%d"),Station_NUM, point_number+1);
+			temp_item.Format(_T("%u-VAR%d"), debug_point_main, point_number+1);
 			m_program_debug_list.InsertItem(0,temp_item);
 
 			ListCtrlEx::CStrList strlist;
@@ -295,7 +296,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 			m_program_debug_list.SetListHwnd(this->m_hWnd);
 
 			CString temp_item;
-			temp_item.Format(_T("%u-PID%d"),Station_NUM, point_number+1);
+			temp_item.Format(_T("%u-PID%d"), debug_point_main, point_number+1);
 			m_program_debug_list.InsertItem(0,temp_item);
 
 
@@ -974,6 +975,29 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						cstemp_value.Format(_T("%.3f"),temp_float_value);
 						m_program_debug_list.SetItemText(0,VARIABLE_VALUE,cstemp_value);
 					}
+                    else if ((m_Variable_data.at(point_number).range >= 34) && (m_Variable_data.at(point_number).range <= 38))
+                    {
+                        m_program_debug_list.SetItemText(0, VARIABLE_UNITE, Analog_Variable_Units[m_Variable_data.at(point_number).range - 34]);
+
+                        CString cstemp_value;
+                        float temp_float_value;
+                        temp_float_value = ((float)m_Variable_data.at(point_number).value) / 1000;
+                        cstemp_value.Format(_T("%.3f"), temp_float_value);
+                        m_program_debug_list.SetItemText(0, VARIABLE_VALUE, cstemp_value);
+                    }
+                    else if ((m_Variable_data.at(point_number).range >= 101) && (m_Variable_data.at(point_number).range <= 103))
+                    {
+                        if (read_msv_table)
+                            m_program_debug_list.SetItemText(0, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(point_number).range - 101]);
+                        int get_name_ret = 0;
+                        CString cstemp_value2;
+                        float temp_float_value1;
+                        temp_float_value1 = ((float)m_Variable_data.at(point_number).value) / 1000;
+                        get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(point_number).range - 101, (int)temp_float_value1, cstemp_value2);
+                        if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+                            cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+                        m_program_debug_list.SetItemText(0, VARIABLE_VALUE, cstemp_value2);
+                    }
 					else
 					{
 						m_program_debug_list.SetItemText(0,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
@@ -2712,6 +2736,23 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				m_prg_debug_variable_time_picker.Invalidate();
 				SetTimer(2,100,NULL);
 			}
+            else if ((lCol == VARIABLE_VALUE) &&
+                (m_Variable_data.at(point_number).digital_analog == BAC_UNITS_ANALOG) &&
+                (m_Variable_data.at(point_number).auto_manual == BAC_MANUAL)
+                && ((m_Variable_data.at(point_number).range == 101) || (m_Variable_data.at(point_number).range == 102) || (m_Variable_data.at(point_number).range == 103)))
+            {
+                m_program_debug_list.Set_Edit(false);
+                int range_index = m_Variable_data.at(point_number).range - 101;
+                CString cstempNextItemString;
+                int ntempNextValue;
+                int find_ret = 0;
+                find_ret = Get_Msv_next_Name_and_Value_BySearchValue(range_index, m_Variable_data.at(point_number).value / 1000, cstempNextItemString, ntempNextValue);;
+                if (find_ret >= 0)
+                {
+                    m_Variable_data.at(point_number).value = ntempNextValue * 1000;
+                    m_program_debug_list.SetItemText(0, VARIABLE_VALUE, cstempNextItemString);
+                }
+            }
 			else if(lCol == VARIABLE_VALUE)
 			{
 				if(m_Variable_data.at(point_number).auto_manual == BAC_AUTO)
@@ -2988,10 +3029,20 @@ void CBacnetProgramDebug::OnTimer(UINT_PTR nIDEvent)
 					}
 					break;
 				case BAC_IN:
+
 					if(point_number < BAC_INPUT_ITEM_COUNT)
 					{
-						Post_Refresh_One_Message(g_bac_instance,READINPUT_T3000,point_number,point_number,	sizeof(Str_in_point));
-						Fresh_Program_List(point_type);
+                        if (debug_point_main != Station_NUM)
+                        {
+                            //GetPrivateData_Blocking(g_bac_instance, READINPUT_T3000, point_number, point_number, sizeof(Str_in_point));
+
+                        }
+                        else
+                        {
+                            Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, point_number, point_number, sizeof(Str_in_point));
+                            Fresh_Program_List(point_type);
+                        }
+
 					}
 					break;
 				case BAC_VAR:

@@ -682,6 +682,25 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		m_variable_time_picker.Invalidate();
 		SetTimer(2,100,NULL);
 	}
+    else if ((lCol == VARIABLE_VALUE) && 
+              (m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG) && 
+              (m_Variable_data.at(lRow).auto_manual == BAC_MANUAL) 
+              && ((m_Variable_data.at(lRow).range == 101) || (m_Variable_data.at(lRow).range == 102) || (m_Variable_data.at(lRow).range == 103) ))
+    {
+        m_variable_list.Set_Edit(false);
+        int range_index = m_Variable_data.at(lRow).range - 101;
+        CString cstempNextItemString;
+        int ntempNextValue;
+        int find_ret = 0;
+        find_ret = Get_Msv_next_Name_and_Value_BySearchValue(range_index,m_Variable_data.at(lRow).value/1000, cstempNextItemString, ntempNextValue);;
+        if (find_ret >= 0)
+        {
+            m_Variable_data.at(lRow).value = ntempNextValue * 1000;
+            m_variable_list.SetItemText(lRow, VARIABLE_VALUE, cstempNextItemString);
+        }
+
+        //Custom_Msv_Range[range_index]
+    }
 	else if(lCol == VARIABLE_VALUE)
 	{
 		if(m_Variable_data.at(lRow).auto_manual == BAC_AUTO)
@@ -885,7 +904,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
                             temp1 = Custom_Msv_Range[bac_range_number_choose - 101];
                         else
                             temp1 = _T("MSV");
-                        m_Variable_data.at(lRow).digital_analog = VARIABLE_RANGE_ANALOG_TYPE;
+                        m_Variable_data.at(lRow).digital_analog = BAC_UNITS_ANALOG;
                 }
                     
 				SplitCStringA(temparray,temp1,_T("/"));
@@ -1217,7 +1236,8 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 	{
 		if(m_Variable_data.at(i).range == 20)	//如果是时间;
 		{
-			ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
+            ret_unit.Empty(); //不显示 time 
+			//ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
 			char temp_char[50];
 			int time_seconds = m_Variable_data.at(i).value / 1000;
 			intervaltotextfull(temp_char,time_seconds,0,0);

@@ -50,4 +50,5 @@ public:
     BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
     virtual BOOL OnInitDialog();
     void ClearSubNetInfo();
+    afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 };

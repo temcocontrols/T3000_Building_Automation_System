@@ -62,7 +62,7 @@ extern CDialog_Progess *WaitRead_Data_Dlg;
 #include "CustomSource/Splash.h"
 extern CBacnetAddLabel * Add_Label_Window;
 extern CBacnetUserlogin * User_Login_Window;
-
+extern CString Re_Initial_Bac_Socket_IP;
 extern unsigned char already_check_tstat_timesync; //每个TSTAT设备 只有点击的时候在确认时间;
 HANDLE hretryThread = NULL;
 extern CString AutoFlashConfigPath;
@@ -112,6 +112,7 @@ const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
 extern bool b_statusbarthreadflag;
 extern tree_product	m_product_isp_auto_flash;
+extern void intial_bip_socket();
 #pragma region Fance Test
 //For Test
 // 在没有鼠标和键盘消息的时候 就启用自动刷新 treeview,如果有就 不要刷新，因为如果正在刷新，客户肯能就无法第一时间读到自己想要的数据;
@@ -713,9 +714,7 @@ void CMainFrame::ShowSplashWnd(int nMillisecond)
         cs_special_name = _T("T3000 Building Automation System");
     }
 }
-#ifdef ENABLE_HTTP_FUCTION
-  #include "..\BravocontrolAPI\BravocontrolAPI\HttpAPI\HttpAPI.h"
-#endif
+
 
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -738,13 +737,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     // prevent the menu bar from taking the focus on activation
     SEND_COMMAND_DELAY_TIME = 100;
     srand(time(NULL));
-#ifdef DEBUG
-#ifdef ENABLE_HTTP_FUCTION
-    https_get();
-#endif
-    unsigned long  temp_time_long = time(NULL);
-    Sleep(1);
-#endif // DEBUG
+
 
 
 
@@ -2131,17 +2124,18 @@ void CMainFrame::LoadProductFromDB()
 						if(is_online == 1)
 						{
 							m_product_temp.status = is_online;
-							m_product_temp.status_last_time[0] = m_product_temp.status;
+							m_product_temp.status_last_time[4] = m_product_temp.status;
 						}
 						else
 						{
 							m_product_temp.status = false;
-							m_product_temp.status_last_time[0] = false;
+							m_product_temp.status_last_time[4] = false;
 						}
+                        m_product_temp.status_last_time[0] = false;
                         m_product_temp.status_last_time[1] = false;
                         m_product_temp.status_last_time[2] = false;
                         m_product_temp.status_last_time[3] = false;
-                        m_product_temp.status_last_time[4] = false;
+
 
 						m_product_temp.Custom=q.getValuebyName(L"Custom");
 
@@ -2408,19 +2402,20 @@ void CMainFrame::LoadProductFromDB()
 							if(is_online == 1)
 							{
 								m_product_temp.status = is_online;
-								m_product_temp.status_last_time[0] = m_product_temp.status;
+								m_product_temp.status_last_time[4] = m_product_temp.status;
 
 							}
 							else
 							{
 								m_product_temp.status = false;
-								m_product_temp.status_last_time[0] = false;
+								m_product_temp.status_last_time[4] = false;
 
 							}
+                            m_product_temp.status_last_time[0] = false;
                             m_product_temp.status_last_time[1] = false;
                             m_product_temp.status_last_time[2] = false;
                             m_product_temp.status_last_time[3] = false;
-                            m_product_temp.status_last_time[4] = false;
+
 
 
 							m_product_temp.NameShowOnTree=q.getValuebyName(L"Product_name");//
@@ -2663,18 +2658,18 @@ void CMainFrame::LoadProductFromDB()
 				if(is_online == 1)
 				{
 					m_product_temp.status = is_online;
-					m_product_temp.status_last_time[0] = m_product_temp.status;
+					m_product_temp.status_last_time[4] = m_product_temp.status;
 				}
 				else
 				{
 					m_product_temp.status = false;
-					m_product_temp.status_last_time[0] = false;
+					m_product_temp.status_last_time[4] = false;
 				}
-
+                m_product_temp.status_last_time[0] = false;
                 m_product_temp.status_last_time[1] = false;
                 m_product_temp.status_last_time[2] = false;
                 m_product_temp.status_last_time[3] = false;
-                m_product_temp.status_last_time[4] = false;
+
 
 
 				m_product_temp.Custom=q.getValuebyName(L"Custom");
@@ -3253,64 +3248,6 @@ void CMainFrame::OnFileOpen()
 {
     
     AfxMessageBox(_T("Open configuration file."));
-}
-void CMainFrame::OnLoadConfigFile()
-{
-	LoadConfigFilePath.Empty();
-    if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP))
-    {
-        MainFram_hwd = this->m_hWnd;
-        LoadBacnetBinaryFile(true,NULL);
-        return;
-    }
-	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
-		((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PM_T3_LC) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PID_T36CTA) || (bacnet_device_type == PWM_TRANSDUCER)))
-	{
-		CFileDialog dlg(true,_T("*.prog"),_T(" "),OFN_HIDEREADONLY ,_T("Prog files (*.prog)|*.prog||"),NULL,0);
-		if(IDOK!=dlg.DoModal())
-			return ;
-		LoadConfigFilePath=dlg.GetPathName();
-
-		if(hwait_write_modbus10000==NULL)
-		{
-			hwait_write_modbus10000 =CreateThread(NULL,NULL,Write_Modbus_10000,this,NULL, NULL);
-		}
-	}
-    else if ((product_register_value[7] == PM_TSTAT6) || 
-        (product_register_value[7] == PM_PM5E) ||
-        (product_register_value[7] == PM_PM5E_ARM) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i) || (product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
-        || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
-    {
-        CFileDialog dlg(true, _T("*.txt"), _T(" "), OFN_HIDEREADONLY, _T("Txt files (*.txt)|*.txt||"), NULL, 0);
-        if (IDOK != dlg.DoModal())
-            return;
-        LoadConfigFilePath = dlg.GetPathName();
-
-        if (hwait_write_tstat_cfg != NULL)
-        {
-            TerminateThread(hwait_write_tstat_cfg, 0);
-            hwait_write_tstat_cfg = NULL;
-        }
-        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Loading config file , Please wait!"));
-        hwait_write_tstat_cfg = CreateThread(NULL, NULL, Write_Modbus_tstat_cfg, this, NULL, NULL);
-    }
-
-    //AfxMessageBox(_T("Load configuration file."));
-    if(g_LoadConfigLevel==1)
-    {
-        CAfxMessageDialog dlg;
-        CString strPromption;
-        strPromption.LoadString(IDS_STRNOPRIVILEGE2);
-        dlg.SetPromtionTxt(strPromption);
-        dlg.DoModal();
-        return;
-    }
-
-    //int nCurID=g_tstat_id;
-    //g_bPauseMultiRead=TRUE;
-    //g_tstat_id=nCurID;
-    //ReFresh();
-    //g_bPauseMultiRead=FALSE;
 }
 
 #include "Flash_Multy.h"
@@ -4785,7 +4722,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
              Sleep(SEND_COMMAND_DELAY_TIME);
              continue;
          }
-		 if(GetPrivateData_Blocking(g_bac_instance,READANNUALSCHEDULE_T3000,i,i, 48) > 0)
+		 if(GetPrivateData_Blocking(g_bac_instance,READANNUALSCHEDULE_T3000,i,i, ANNUAL_CODE_SIZE) > 0)
 		 {
 			 Mession_ret.Format(_T("Read holiday form %d to %d success."),i,i);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
@@ -5920,163 +5857,6 @@ LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-void CMainFrame::SaveConfigFile()
-{
-    if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == MODBUS_BACNET_MSTP))
-    {
-        MainFram_hwd = this->m_hWnd;
-
-        CFileDialog dlg(false,_T("*.prog"),_T(" "),OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,_T("prog files (*.prog)|*.prog|All Files (*.*)|*.*||"),NULL,0);
-        if(IDOK==dlg.DoModal())
-        {
-
-            SaveConfigFilePath=dlg.GetPathName();
-            //CFileFind cfindtempfile;
-            //if(cfindtempfile.FindFile(SaveConfigFilePath))
-            //{
-            //    DeleteFile(SaveConfigFilePath);
-            //}
-
-            //协议时bacnet ，用户点击 File save时 先调用线程读取所有需要存的资料；在发送消息回来 调用Save
-            //::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
-
-            if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP))
-            {
-				Show_Wait_Dialog_And_ReadBacnet(0);
-            }
-            else
-            {
-                Create_Thread_Read_Item(TYPE_ALL);
-            }
-
-
-        }
-        else
-        {
-            SaveConfigFilePath.Empty();
-        }
-        return;
-    }
-	else if(((g_protocol == MODBUS_RS485) || (g_protocol ==MODBUS_TCPIP)) &&  
-		    ((bacnet_device_type == T38AI8AO6DO) || 
-             (bacnet_device_type == PID_T322AI) || 
-             (bacnet_device_type == PM_T3_LC) || 
-             (bacnet_device_type == PID_T3PT12) || 
-             (bacnet_device_type == PID_T36CTA) || 
-             (bacnet_device_type == PWM_TRANSDUCER)))
-	{
-		//T3的设备支持minipanel的 input output 就读10000以后的寄存器;
-		MainFram_hwd = this->m_hWnd;
-
-		CFileDialog dlg(false,_T("*.prog"),_T(" "),OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,_T("prog files (*.prog)|*.prog|All Files (*.*)|*.*||"),NULL,0);
-		if(IDOK==dlg.DoModal())
-		{
-
-			SaveConfigFilePath=dlg.GetPathName();
-			CFileFind cfindtempfile;
-			if(cfindtempfile.FindFile(SaveConfigFilePath))
-			{
-				DeleteFile(SaveConfigFilePath);
-			}
-
-			if(hwait_read_modbus10000==NULL)
-			{
-				
-				hwait_read_modbus10000 =CreateThread(NULL,NULL,Read_Modbus_10000,this,NULL, NULL);
-			}
-
-		}
-		return;
-	}
-    int nret=0;
-    g_bEnableRefreshTreeView = FALSE;
-    int IDFlag=read_one(g_tstat_id,7);
-    product_register_value[7]=IDFlag;
-    if(IDFlag<=0)
-        return;
-    float version=get_curtstat_version();
-    CString strFilter;
-    CString strFilename;
-    strFilter =_T( "Text File|*.txt|All File|*.*|");
-    CFileDialog dlg(false,_T("txt"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
-    if (dlg.DoModal() != IDOK)
-        return;
-    strFilename=dlg.GetPathName();
-
-    BeginWaitCursor();
-    CString strTips = _T("T3000 is ready to save config file, start now?");
-
-    SetPaneString(1, strTips);
-    if(product_register_value[7]==100||product_register_value[7]==PM_LightingController)//NC
-    {
-        strTips.Format(_T("Config file \" %s \" is saving, please wait..."), strFilename);
-        SetPaneString(1, strTips);
-        if (product_register_value[7]==100)
-        {
-            save_schedule_2_file((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
-        }
-        else
-        {
-            save_schedule_2_file_LC((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
-        }
-
-
-        strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
-        SetPaneString(1, strTips);
-    }
-    else if (product_register_value[7]==PM_T3PT10||
-             product_register_value[7]==PM_T3IOA||
-             product_register_value[7]==PM_T332AI||
-             product_register_value[7]== PM_T38AI16O||
-             product_register_value[7]==PM_T38I13O||
-             product_register_value[7]==PM_T3PERFORMANCE||
-             product_register_value[7]==PM_T34AO||
-             product_register_value[7]==PM_T36CT ||
-             product_register_value[7] == PM_T322AI||
-			 product_register_value[7] == PM_T3PT12||
-			  product_register_value[7] == PM_T36CTA||
-             product_register_value[7] == PM_T38AI8AO6DO
-            )
-    {
-        strTips.Format(_T("Config file \" %s \" is saving, please wait..."), strFilename);
-        SetPaneString(1, strTips);
-
-        save_T3Modules_file((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
-
-        strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
-        SetPaneString(1, strTips);
-    }
-    else if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
-		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
-    {
-
-        int index = 0;
-
-
-        memcpy(product_register_value,tempchange,sizeof(product_register_value));
-
-
-        Save2File_ForTwoFilesTSTAT67((LPTSTR)(LPCTSTR)strFilename);
-
-
-        //strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
-
-        //SetPaneString(3, strTips);
-    }
-    else if (product_register_value[7] == PM_CO2_NODE)
-    {
-        Save2File_ForCO2Node((LPTSTR)(LPCTSTR)strFilename);
-    }
-    else//save tstat config file:
-    {
-        Save2File_ForTwoFiles((LPTSTR)(LPCTSTR)strFilename);
-        strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
-        SetPaneString(1, strTips);
-    }
-
-    EndWaitCursor();
-    g_bEnableRefreshTreeView = TRUE;
-}
 
 HTREEITEM hItem_for_ping;
 
@@ -6772,7 +6552,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
     BOOL bOnLine = FALSE;
     UINT nSerialNumber = 0;
     int Device_Type = 0;
+    MODE_SUPPORT_PTRANSFER = 0;
     check_revert_daxiaoduan = 0; //换设备情况大小端反转为默认不反转
+    g_protocol_support_ptp = PROTOCOL_UNKNOW; //默认点击任何设备  ，初始化  为不知道是否支持;
+    g_output_support_relinquish = 0;
     int Scan_Product_ID;
     unsigned short read_data[10];
     CString strTemp;
@@ -6848,6 +6631,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 g_llerrCount = g_llTxCount = g_llRxCount = 0;//click tree, clear all count;
                 hLastTreeItem = hSelItem;
             }
+
 
 
 
@@ -6984,7 +6768,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             pDlg = NULL;
                             BOOL is_OK = FALSE;
 
-                            if (m_product.at(i).status_last_time[0] == true)
+                            if (m_product.at(i).status == true)
                             {
                                 if (CheckTheSameSubnet(m_product.at(i).NetworkCard_Address, m_product.at(i).BuildingInfo.strIp) == false)
                                 {
@@ -7117,9 +6901,32 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             SetCommunicationType(1);
                             if ((selected_product_Node.nhardware_info & 0x02) == 2) //说明是wifi 连接 ，延时要加长，并关闭后台刷新;
                             {
-                                n_wifi_connection = true; //关闭后台刷新;
-                                SEND_COMMAND_DELAY_TIME = DEBUG_DELAY_TIME;
-                                SetResponseTime(SEND_COMMAND_DELAY_TIME);
+                                if (((selected_product_Node.product_class_id == PM_TSTAT10) && (selected_product_Node.software_version >= 52.3)) ||
+                                    ((selected_product_Node.product_class_id == PM_MINIPANEL_ARM) && (selected_product_Node.software_version >= 52.3))||
+                                    ((selected_product_Node.product_class_id == PM_TSTAT8) && (selected_product_Node.software_version >= 10.0)) ||
+                                    ((selected_product_Node.product_class_id == PM_TSTAT9) && (selected_product_Node.software_version >= 10.0))
+                                   )
+                                {
+                                    n_wifi_connection = false; //新改的 
+                                    MODE_SUPPORT_PTRANSFER = 1;//支持bip ptransfer
+                                    SEND_COMMAND_DELAY_TIME = 100;
+                                    SetResponseTime(SEND_COMMAND_DELAY_TIME);
+                                }
+                                //else if (
+                                //    )
+                                //{
+                                //    n_wifi_connection = true; //新改的 
+                                //    SEND_COMMAND_DELAY_TIME = 350;
+                                //    SetResponseTime(SEND_COMMAND_DELAY_TIME);
+                                //}
+                                else
+                                {
+                                    n_wifi_connection = true; //关闭后台刷新;
+                                    SEND_COMMAND_DELAY_TIME = DEBUG_DELAY_TIME;
+                                    SetResponseTime(SEND_COMMAND_DELAY_TIME);
+                                }
+                                
+
                             }
                             else
                             {
@@ -7449,10 +7256,20 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 {
                     strTemp.Format(_T("Connect\n"));
                     TRACE(strTemp);
-                    if ((selected_product_Node.protocol != PROTOCOL_MSTP_TO_MODBUS) && (selected_product_Node.protocol != MODBUS_BACNET_MSTP))
-                        ConnectDevice(selected_product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
+                    if (MODE_SUPPORT_PTRANSFER)
+                    {
+                        g_CommunicationType = 1;
+                    }
+                    else if ((selected_product_Node.protocol == MODBUS_RS485)||
+                        (selected_product_Node.protocol == MODBUS_TCPIP))
+                        ConnectDevice(selected_product_Node);
                     else
                         g_CommunicationType = 0;
+
+                    //if ((selected_product_Node.protocol != PROTOCOL_MSTP_TO_MODBUS) && (selected_product_Node.protocol != MODBUS_BACNET_MSTP))
+                    //    ConnectDevice(selected_product_Node);
+                    //else
+                    //    g_CommunicationType = 0;
                     // SetLastCommunicationType(1); //不可理解为什么要这么做，屏蔽 by 杜帆 06 03 31;
                     ip = selected_product_Node.BuildingInfo.strIp;
                     ipport.Format(_T("%d"), selected_product_Node.ncomport);
@@ -7763,8 +7580,38 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 SetLastCommunicationType(1);
                 g_protocol = MODBUS_TCPIP;
+
+
+                if (MODE_SUPPORT_PTRANSFER)
+                {
+                    intial_bip_socket();
+                    //if (Re_Initial_Bac_Socket_IP.CompareNoCase(selected_product_Node.NetworkCard_Address) != 0)
+                    //{
+                    //    Initial_bac(0, selected_product_Node.NetworkCard_Address);
+                    //}
+                    //if (selected_product_Node.NetworkCard_Address.CompareNoCase(Re_Initial_Bac_Socket_IP) != 0)
+                    //{
+                    //    int temp_add_port = rand() % 10000;
+                    //    closesocket(my_sokect);
+                    //    int ret_1 = Open_bacnetSocket2(selected_product_Node.NetworkCard_Address, BACNETIP_PORT + temp_add_port, my_sokect);
+                    //    if (ret_1 >= 0)
+                    //    {
+                    //        Re_Initial_Bac_Socket_IP = selected_product_Node.NetworkCard_Address;
+                    //    }
+                    //}
+
+
+                    Send_WhoIs_Global(-1, -1);
+                    Sleep(SEND_COMMAND_DELAY_TIME);
+                    g_protocol = PROTOCOL_BIP_T0_MSTP_TO_MODBUS;
+                }
+
+                int nmultyRet = 0;
                 // SetResponseTime (2000);   For Kaiyin's TstatHUM
-                int nmultyRet = Read_Multi(g_tstat_id, &read_data[0], 0, 10, 6);
+                if(SPECIAL_BAC_TO_MODBUS)
+                    nmultyRet = Read_Multi(g_tstat_id, &read_data[0], 0, 10, 10);
+                else
+                    nmultyRet = Read_Multi(g_tstat_id, &read_data[0], 0, 10, 6);
 
                 //
                 if (nmultyRet <0)
@@ -7789,7 +7636,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 else
                 {
                     if ((selected_product_Node.nhardware_info & 0x02) == 2)
-                        Sleep(1000);
+                        Sleep(SEND_COMMAND_DELAY_TIME);
                     UINT nSerialNumber = 0;
                     m_product.at(i).status = true;
                     bac_select_device_online = true;
@@ -7929,6 +7776,11 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 {
                     int length = 10;
                     nFlag = Device_Type;
+                    if (Device_Type == PM_PM5E_ARM)
+                    {
+                        nFlag = PM_TSTAT8;
+                        Device_Type = PM_TSTAT8;
+                    }
                     int it = 0;
                     if ((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) || (nFlag == PM_TSTAT9) || (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8) || (nFlag == PM_TSTAT9)
                         || (nFlag == PM_TSTAT8_WIFI) || (nFlag == PM_TSTAT8_OCC) || (nFlag == PM_TSTAT7_ARM) || (nFlag == PM_TSTAT8_220V))
@@ -8565,7 +8417,11 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             }
             else if (nFlag<PM_NC)
             {
-
+                if (nFlag == PM_PM5E_ARM)
+                {
+                    //nFlag = PM_TSTAT8;
+                    //product_register_value[7] = PM_TSTAT8;
+                }
                 //Use product_type to change the address map
                 //if product module is TSTAT6 or TSTAT7 use T3000_6_ADDRESS. T3000_6_ADDRESS is a register table in t3000.mdb  T3000_Register_Address_By_Name
                 //else if product module is PM_TSTAT5E PM_TSTAT5H use T3000_5EH_LCD_ADDRESS
@@ -9420,6 +9276,8 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
     for (UINT i = 0; i < m_product.size(); i++)
     {
         tree_product tp = m_product.at(i);
+        if (tp.protocol == P_MODBUS_485)
+            continue;
         if (tp.status > 0)    // 如果online，更新显示图片
         {
             m_pTreeViewCrl->turn_item_image(tp.product_item, true);
@@ -10101,6 +9959,13 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
                     continue;
                 }
             }
+            else if (My_Receive_msg.size() > 100)
+            {
+                MyCriticalSection.Lock();
+                My_Receive_msg.clear();
+                MyCriticalSection.Unlock();
+                continue;
+            }
 
             switch(msg.message)
             {
@@ -10545,7 +10410,40 @@ loop1:
                     break;
                     case WRITETIMESCHEDULE_T3000:
                     {
-                        memcpy(write_buffer, &m_Schedual_Time_data.at(My_WriteList_Struct->start_instance), sizeof(Str_schedual_time_point));
+                        unsigned short temp_data[72] = { 0 };
+                        unsigned short * temp_point = temp_data;
+                        memcpy(temp_point, &m_Schedual_Time_data.at(weekly_list_line), 72 * 2);
+
+                        unsigned short * temp_write_point = write_buffer;
+
+                        for (int z = 0; z < 9; z++)
+                        {
+                            for (int y = 0;y < 8;y++)
+                            {
+                                *temp_write_point = temp_point[y * 9 + z];
+                                temp_write_point++;
+                            }
+                        }
+
+
+
+
+
+
+
+                        //unsigned short temp_data[72] = { 0 };
+                        //memcpy(temp_data, &m_Schedual_Time_data.at(My_WriteList_Struct->start_instance), sizeof(Str_schedual_time_point));
+                        //unsigned short * temp_point = temp_data;
+                        //for (int z = 0; z < 8; z++)
+                        //{
+                        //    for (int y = 0;y < 9;y++)
+                        //    {
+                        //        write_buffer[z * 9 + y] = *temp_point;
+                        //        temp_point++;
+                        //    }
+                        //}
+
+                        //memcpy(write_buffer, &m_Schedual_Time_data.at(My_WriteList_Struct->start_instance), sizeof(Str_schedual_time_point));
                         for (int j = 0;j<200;j++)
                         {
                             write_buffer[j] = htons(write_buffer[j]);
@@ -10567,6 +10465,25 @@ loop1:
                         }
                     }
                     break;
+                    case WRITE_SETTING_COMMAND:
+                    {
+                        test_value1 = Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0);
+
+                        _MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
+                        pMy_Invoke_id->hwnd = My_WriteList_Struct->hWnd;
+                        pMy_Invoke_id->mCol = My_WriteList_Struct->ItemInfo.nCol;
+                        pMy_Invoke_id->mRow = My_WriteList_Struct->ItemInfo.nRow;
+                        pMy_Invoke_id->task_info = My_WriteList_Struct->Write_Info;
+                        if (test_value1 > 0)
+                        {
+                            ::PostMessage(pMy_Invoke_id->hwnd, MY_RESUME_DATA, (WPARAM)WRITE_SUCCESS, (LPARAM)pMy_Invoke_id);
+                        }
+                        else
+                        {
+                            ::PostMessage(pMy_Invoke_id->hwnd, MY_RESUME_DATA, (WPARAM)WRITE_FAIL, (LPARAM)pMy_Invoke_id);
+                        }
+                    }
+                        break;
 					default:
 						break;
 					}	
@@ -10847,7 +10764,10 @@ void CMainFrame::OnControlMain()
     temp_ui.Format(_T("%u"), TYPE_MAIN);
     WritePrivateProfileString(_T("LastView"), _T("FistLevelViewUI"), temp_ui, g_cstring_ini_path);
 
-    if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == MODBUS_BACNET_MSTP))
+    if((g_protocol == PROTOCOL_BACNET_IP) || 
+        (g_protocol == PROTOCOL_BIP_TO_MSTP) || 
+        (g_protocol == MODBUS_BACNET_MSTP) ||
+        (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
     {
         OnControlSettings();
     }
@@ -10948,6 +10868,7 @@ void CMainFrame::OnControlMain()
 
 void CMainFrame::OnControlInputs()
 {
+
 #if 0
 //    m_testtoolbar.RemoveAllButtons();
    // CMFCToolBar::ResetAllImages();
@@ -10982,8 +10903,17 @@ void CMainFrame::OnControlInputs()
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
 
 
-    if (product_type == CS3000 || product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT5i || product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
-        || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
+    if (product_type == CS3000 || 
+        product_register_value[7] == PM_TSTAT6 || 
+        product_register_value[7] == PM_TSTAT5i || 
+        product_register_value[7] == PM_TSTAT7 || 
+        product_register_value[7] == PM_TSTAT8 || 
+        product_register_value[7] == PM_PM5E_ARM ||
+        product_register_value[7] == PM_TSTAT9 || 
+        product_register_value[7] == PM_TSTAT8_WIFI || 
+        product_register_value[7] == PM_TSTAT8_OCC || 
+        product_register_value[7] == PM_TSTAT7_ARM || 
+        product_register_value[7] == PM_TSTAT8_220V)
     {
 
         SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
@@ -11102,6 +11032,8 @@ void CMainFrame::OnControlInputs()
 
         if(g_protocol == PROTOCOL_BIP_TO_MSTP)
         {
+            Input_Window->KillTimer(INPUT_REFRESH_DATA_TIMER);
+            Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_TIME, NULL); //点击按钮手动刷新后，开启计时避免频繁刷新;
             Create_Thread_Read_Item(TYPE_INPUT);
         }
 		else if((g_protocol == MODBUS_RS485) || 
@@ -11120,6 +11052,12 @@ void CMainFrame::OnControlInputs()
 		}
         else
         {
+            Input_Window->KillTimer(INPUT_REFRESH_DATA_TIMER);
+            if(n_wifi_connection)
+                Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_TIME, NULL);
+            else
+                Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_ETHERNET_TIME, NULL);
+
             ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_INPUT);
         }
     }
@@ -11269,7 +11207,10 @@ void CMainFrame::OnControlOutputs()
 
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
 
-    if (product_type == T3000_6_ADDRESS || product_register_value[7] == PM_CS_RSM_AC || product_register_value[7] == PM_CS_RSM_DC)
+    if (product_type == T3000_6_ADDRESS || 
+        product_register_value[7] == PM_PM5E_ARM ||
+        product_register_value[7] == PM_CS_RSM_AC || 
+        product_register_value[7] == PM_CS_RSM_DC)
     {
         SwitchToPruductType(DLG_DIALOG_TSTAT_OUTPUT_VIEW);
         bacnet_view_number = TYPE_OUTPUT;
@@ -11602,11 +11543,15 @@ void CMainFrame::OnControlWeekly()
 void CMainFrame::OnControlAnnualroutines()
 { 
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
-    if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
+    if((g_protocol == PROTOCOL_BACNET_IP) || 
+        (g_protocol == MODBUS_BACNET_MSTP) || 
+        (g_protocol == PROTOCOL_BIP_TO_MSTP) ||
+        (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
     {
         if((m_user_level !=	LOGIN_SUCCESS_ROUTINE_MODE) &&
                 (m_user_level != LOGIN_SUCCESS_FULL_ACCESS) &&
-                (m_user_level != LOGIN_SUCCESS_READ_ONLY))
+                (m_user_level != LOGIN_SUCCESS_READ_ONLY)
+            )
         {
             MessageBox(_T("Please use the administrator to access data!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
             return;
@@ -11719,7 +11664,12 @@ void CMainFrame::OnControlSettings()
             Create_Thread_Read_Item(TYPE_SETTING);
         }
 		else if((g_protocol == MODBUS_RS485) || (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))
-		{
+        {
+            if(g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+            {
+                ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_SETTING);
+            }
+            else
 			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,0,READ_SETTING_COMMAND);//第二个参数 In
 		}
         else
@@ -11906,7 +11856,10 @@ void CMainFrame::OnControlControllers()
 
 void CMainFrame::OnControlScreens()
 {
-    if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
+    if((g_protocol == PROTOCOL_BACNET_IP) || 
+        (g_protocol == MODBUS_BACNET_MSTP) || 
+        (g_protocol == PROTOCOL_BIP_TO_MSTP) ||
+        (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
     {
         if((m_user_level !=	LOGIN_SUCCESS_GRAPHIC_MODE) &&
                 (m_user_level != LOGIN_SUCCESS_FULL_ACCESS) &&
@@ -12001,7 +11954,8 @@ void CMainFrame::OnControlMonitors()
 {
     
 
-    if(g_protocol == PROTOCOL_BACNET_IP)
+    if((g_protocol == PROTOCOL_BACNET_IP) ||
+        (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
     {
         if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) ||
                 (m_user_level == LOGIN_SUCCESS_ROUTINE_MODE))
@@ -12145,7 +12099,8 @@ void CMainFrame::OnDatabaseBacnettool()
 void CMainFrame::OnControlAlarmLog()
 {
     
-    if(g_protocol == PROTOCOL_BACNET_IP)
+    if((g_protocol == PROTOCOL_BACNET_IP) ||
+        (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
     {
         if(pDialog[WINDOW_ALARMLOG] != NULL)
         {
@@ -12250,7 +12205,9 @@ void CMainFrame::OnControlRemotePoint()
 {
     
 
-    if(g_protocol == PROTOCOL_BACNET_IP)
+    if((g_protocol == PROTOCOL_BACNET_IP) ||
+        (g_protocol == MODBUS_BACNET_MSTP) ||
+        (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
     {
         if(pDialog[WINDOW_REMOTE_POINT] != NULL)
         {
@@ -14332,6 +14289,227 @@ void CMainFrame::OnDatabaseLogdetail()
 {
     // TODO: 在此添加命令处理程序代码
     ShowDebugWindow();
+}
+
+void CMainFrame::OnLoadConfigFile()
+{
+    LoadConfigFilePath.Empty();
+    if ((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
+    {
+        MainFram_hwd = this->m_hWnd;
+        LoadBacnetBinaryFile(true, NULL);
+        return;
+    }
+    else if (((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP)) &&
+        ((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PM_T3_LC) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PID_T36CTA) || (bacnet_device_type == PWM_TRANSDUCER)))
+    {
+        CFileDialog dlg(true, _T("*.prog"), _T(" "), OFN_HIDEREADONLY, _T("Prog files (*.prog)|*.prog||"), NULL, 0);
+        if (IDOK != dlg.DoModal())
+            return;
+        LoadConfigFilePath = dlg.GetPathName();
+
+        if (hwait_write_modbus10000 == NULL)
+        {
+            hwait_write_modbus10000 = CreateThread(NULL, NULL, Write_Modbus_10000, this, NULL, NULL);
+        }
+    }
+    else if ((product_register_value[7] == PM_TSTAT6) ||
+        (product_register_value[7] == PM_PM5E) ||
+        (product_register_value[7] == PM_PM5E_ARM) ||
+        (product_register_value[7] == PM_TSTAT7) ||
+        (product_register_value[7] == PM_TSTAT5i) ||
+        (product_register_value[7] == PM_TSTAT5G) ||
+        (product_register_value[7] == PM_TSTAT8) ||
+        (product_register_value[7] == PM_TSTAT9) ||
+        (product_register_value[7] == PM_TSTAT8_WIFI) ||
+        (product_register_value[7] == PM_TSTAT8_OCC) ||
+        (product_register_value[7] == PM_TSTAT7_ARM) ||
+        (product_register_value[7] == PM_TSTAT8_220V))
+    {
+        CFileDialog dlg(true, _T("*.txt"), _T(" "), OFN_HIDEREADONLY, _T("Txt files (*.txt)|*.txt||"), NULL, 0);
+        if (IDOK != dlg.DoModal())
+            return;
+        LoadConfigFilePath = dlg.GetPathName();
+
+        if (hwait_write_tstat_cfg != NULL)
+        {
+            TerminateThread(hwait_write_tstat_cfg, 0);
+            hwait_write_tstat_cfg = NULL;
+        }
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Loading config file , Please wait!"));
+        hwait_write_tstat_cfg = CreateThread(NULL, NULL, Write_Modbus_tstat_cfg, this, NULL, NULL);
+    }
+
+    //AfxMessageBox(_T("Load configuration file."));
+    if (g_LoadConfigLevel == 1)
+    {
+        CAfxMessageDialog dlg;
+        CString strPromption;
+        strPromption.LoadString(IDS_STRNOPRIVILEGE2);
+        dlg.SetPromtionTxt(strPromption);
+        dlg.DoModal();
+        return;
+    }
+
+}
+
+void CMainFrame::SaveConfigFile()
+{
+    if ((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
+    {
+        MainFram_hwd = this->m_hWnd;
+
+        CFileDialog dlg(false, _T("*.prog"), _T(" "), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, _T("prog files (*.prog)|*.prog|All Files (*.*)|*.*||"), NULL, 0);
+        if (IDOK == dlg.DoModal())
+        {
+
+            SaveConfigFilePath = dlg.GetPathName();
+            //CFileFind cfindtempfile;
+            //if(cfindtempfile.FindFile(SaveConfigFilePath))
+            //{
+            //    DeleteFile(SaveConfigFilePath);
+            //}
+
+            //协议时bacnet ，用户点击 File save时 先调用线程读取所有需要存的资料；在发送消息回来 调用Save
+            //::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
+
+            if ((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
+            {
+                Show_Wait_Dialog_And_ReadBacnet(0);
+            }
+            else
+            {
+                Create_Thread_Read_Item(TYPE_ALL);
+            }
+
+
+        }
+        else
+        {
+            SaveConfigFilePath.Empty();
+        }
+        return;
+    }
+    else if (((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP)) &&
+        ((bacnet_device_type == T38AI8AO6DO) ||
+        (bacnet_device_type == PID_T322AI) ||
+            (bacnet_device_type == PM_T3_LC) ||
+            (bacnet_device_type == PID_T3PT12) ||
+            (bacnet_device_type == PID_T36CTA) ||
+            (bacnet_device_type == PWM_TRANSDUCER)))
+    {
+        //T3的设备支持minipanel的 input output 就读10000以后的寄存器;
+        MainFram_hwd = this->m_hWnd;
+
+        CFileDialog dlg(false, _T("*.prog"), _T(" "), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, _T("prog files (*.prog)|*.prog|All Files (*.*)|*.*||"), NULL, 0);
+        if (IDOK == dlg.DoModal())
+        {
+
+            SaveConfigFilePath = dlg.GetPathName();
+            CFileFind cfindtempfile;
+            if (cfindtempfile.FindFile(SaveConfigFilePath))
+            {
+                DeleteFile(SaveConfigFilePath);
+            }
+
+            if (hwait_read_modbus10000 == NULL)
+            {
+
+                hwait_read_modbus10000 = CreateThread(NULL, NULL, Read_Modbus_10000, this, NULL, NULL);
+            }
+
+        }
+        return;
+    }
+    int nret = 0;
+    g_bEnableRefreshTreeView = FALSE;
+    int IDFlag = read_one(g_tstat_id, 7);
+    product_register_value[7] = IDFlag;
+    if (IDFlag <= 0)
+        return;
+    float version = get_curtstat_version();
+    CString strFilter;
+    CString strFilename;
+    strFilter = _T("Text File|*.txt|All File|*.*|");
+    CFileDialog dlg(false, _T("txt"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
+    if (dlg.DoModal() != IDOK)
+        return;
+    strFilename = dlg.GetPathName();
+
+    BeginWaitCursor();
+    CString strTips = _T("T3000 is ready to save config file, start now?");
+
+    SetPaneString(1, strTips);
+    if (product_register_value[7] == 100 || product_register_value[7] == PM_LightingController)//NC
+    {
+        strTips.Format(_T("Config file \" %s \" is saving, please wait..."), strFilename);
+        SetPaneString(1, strTips);
+        if (product_register_value[7] == 100)
+        {
+            save_schedule_2_file((LPTSTR)(LPCTSTR)strFilename, g_tstat_id);
+        }
+        else
+        {
+            save_schedule_2_file_LC((LPTSTR)(LPCTSTR)strFilename, g_tstat_id);
+        }
+
+
+        strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
+        SetPaneString(1, strTips);
+    }
+    else if (product_register_value[7] == PM_T3PT10 ||
+        product_register_value[7] == PM_T3IOA ||
+        product_register_value[7] == PM_T332AI ||
+        product_register_value[7] == PM_T38AI16O ||
+        product_register_value[7] == PM_T38I13O ||
+        product_register_value[7] == PM_T3PERFORMANCE ||
+        product_register_value[7] == PM_T34AO ||
+        product_register_value[7] == PM_T36CT ||
+        product_register_value[7] == PM_T322AI ||
+        product_register_value[7] == PM_T3PT12 ||
+        product_register_value[7] == PM_T36CTA ||
+        product_register_value[7] == PM_T38AI8AO6DO
+        )
+    {
+        strTips.Format(_T("Config file \" %s \" is saving, please wait..."), strFilename);
+        SetPaneString(1, strTips);
+
+        save_T3Modules_file((LPTSTR)(LPCTSTR)strFilename, g_tstat_id);
+
+        strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
+        SetPaneString(1, strTips);
+    }
+    else if ((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i) || (product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
+        || (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V))
+    {
+
+        int index = 0;
+
+
+        memcpy(product_register_value, tempchange, sizeof(product_register_value));
+
+
+        Save2File_ForTwoFilesTSTAT67((LPTSTR)(LPCTSTR)strFilename);
+
+
+        //strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
+
+        //SetPaneString(3, strTips);
+    }
+    else if (product_register_value[7] == PM_CO2_NODE)
+    {
+        Save2File_ForCO2Node((LPTSTR)(LPCTSTR)strFilename);
+    }
+    else//save tstat config file:
+    {
+        Save2File_ForTwoFiles((LPTSTR)(LPCTSTR)strFilename);
+        strTips.Format(_T("Config file \" %s \" saved successfully."), strFilename);
+        SetPaneString(1, strTips);
+        MessageBox(strTips);
+    }
+
+    EndWaitCursor();
+    g_bEnableRefreshTreeView = TRUE;
 }
 
 

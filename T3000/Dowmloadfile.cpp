@@ -1137,7 +1137,7 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
         }
         else
         {
-            CS_Info.Format(_T("Download failded!"));
+            CS_Info.Format(_T("Download failed!"));
             pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
             pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
             goto ftp_download_end;
@@ -1183,7 +1183,7 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
         }
         else
         {
-            CS_Info.Format(_T("Download failded!"));
+            CS_Info.Format(_T("Download failed!"));
             pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
             pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
             goto ftp_download_end;

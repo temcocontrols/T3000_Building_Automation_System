@@ -449,6 +449,30 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			Post_Write_Message(g_bac_instance,WRITEOUTPUT_T3000,label_info.nPoint_number,label_info.nPoint_number,sizeof(Str_out_point),m_edit_label ,temp_task_info);
 		}
 		break;
+    case BAC_PID://PID
+        {
+        if (ncommand == CHANGE_AUTO_MANUAL)
+        {
+            if (m_AutoManual.CompareNoCase(_T("Manual")) == 0)
+            {
+                m_controller_data.at(label_info.nPoint_number).auto_manual = 0;	//Auto = 0;
+                show_temp = _T("Auto");
+                m_edit_value.EnableWindow(false);
+            }
+            else
+            {
+                m_controller_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
+                show_temp = _T("Manual");
+
+            }
+            m_AutoManual = show_temp;
+            m_edit_auto_manual.SetWindowTextW(show_temp);
+        }
+        CString temp_task_info;
+        temp_task_info.Format(_T("Write Pid List Item%d .Changed to \"%s\" "), label_info.nPoint_number, show_temp);
+        Post_Write_Message(g_bac_instance, WRITEPID_T3000, label_info.nPoint_number, label_info.nPoint_number, sizeof(Str_controller_point), m_edit_label, temp_task_info);
+        }
+        break;
 	case BAC_VAR://variable
 		{
 			if(ncommand == CHANGE_AUTO_MANUAL)

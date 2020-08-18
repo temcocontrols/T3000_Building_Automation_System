@@ -796,8 +796,8 @@ typedef union
 		uint8_t mac_addr[6];
 		uint8_t tcp_type;   /* 0 -- DHCP, 1-- STATIC */
 		uint8_t mini_type;
-		uint8_t debug;
-		Str_Pro_Info   pro_info;
+		uint8_t debug;             //21
+		Str_Pro_Info   pro_info;   //17
 		uint8_t com0_config;
 		uint8_t com1_config;
 		uint8_t com2_config;
@@ -818,13 +818,13 @@ typedef union
 
 		char panel_name[20];
 
-		uint8_t en_panel_name;
-		uint8_t panel_number;
+		uint8_t en_panel_name; 
+		uint8_t panel_number;  //74
 
 		char dyndns_user[DYNDNS_MAX_USERNAME_SIZE];
 		char dyndns_pass[DYNDNS_MAX_PASSWORD_SIZE];
 		char dyndns_domain[DYNDNS_MAX_DOMAIN_SIZE];
-		uint8_t en_dyndns;  // 0 - no  1 - disable 2 - enable
+		uint8_t en_dyndns;  //Item171 0 - no  1 - disable 2 - enable
 		uint8_t dyndns_provider;  // 0- www.3322.org 1-www.dyndns.com  2 - www.no-ip.com
 		uint16_t dyndns_update_time;  // xx min
 		uint8_t en_sntp;  // 0 - no  1 - disable  
@@ -832,8 +832,8 @@ typedef union
 		//0x1838b28c            24.56.178.140 time.nist.gov			3
 		//0xd248912d			210.72.145.45  NTSC					4
         //自动要求跟PC同步                                          200 
-		signed short time_zone;
-		unsigned int n_serial_number;
+		signed short time_zone; 
+		unsigned int n_serial_number; 
 
 		 UN_Time update_dyndns; 
 
@@ -841,13 +841,13 @@ typedef union
 		 uint8_t BBMD_EN;
 		 uint8_t sd_exist;  // 1 -no    2- yes         3 文件格式不对.
 		 unsigned short modbus_port;
-		 unsigned char modbus_id;
+		 unsigned char modbus_id; //198
 		 unsigned int object_instance ;
 		 unsigned int time_update_since_1970;
 		 unsigned char time_zone_summer_daytime;
 
 		 char sntp_server[30];
-		 unsigned char zegbee_exsit;
+		 unsigned char zegbee_exsit;//238
          unsigned char LCD_Display; //1: 常亮  0：常闭;
          unsigned char flag_time_sync_pc;  // 0: 不需要   1:同步.
          unsigned char time_sync_auto_manual;  // 0 和时间服务器同步   1：和PC 时间同步
@@ -859,7 +859,8 @@ typedef union
          unsigned char special_flag; // bit 0  代表是否支持 PT1K snesor 0 不支持 1支持;
                                      // bit 1 PT100
          unsigned char uart_parity[3];
-         unsigned char uart_stopbit[3];
+         unsigned char uart_stopbit[3];   //总共253
+
 	}reg;
 }Str_Setting_Info;
 

@@ -56,7 +56,7 @@
  * @param [in] data portion of the ACK
  */
 void rp_ack_print_data(
-    BACNET_READ_PROPERTY_DATA * data)
+    BACNET_READ_PROPERTY_DATA * data )
 {
     BACNET_OBJECT_PROPERTY_VALUE object_value;  /* for bacapp printing */
     BACNET_APPLICATION_DATA_VALUE value;        /* for decode value data */
@@ -65,6 +65,9 @@ void rp_ack_print_data(
     int application_data_len;
     bool first_value = true;
     bool print_brace = false;
+    remove("C:\\log.txt");
+    FILE * std_out;
+    std_out = fopen("C:\\log.txt", "a");
 
     if (data) 
 	{
@@ -79,7 +82,7 @@ void rp_ack_print_data(
 			{
                 first_value = false;
 #if PRINT_ENABLED
-                fprintf(stdout, "{");
+                fprintf(std_out, "{");
 #endif
                 print_brace = true;
             }
@@ -89,7 +92,7 @@ void rp_ack_print_data(
             object_value.array_index = data->array_index;
             object_value.value = &value;
 
-            bacapp_print_value(stdout, &object_value);
+            bacapp_print_value(std_out, &object_value);
             if (len > 0) 
 			{
                 if (len < application_data_len) 
@@ -99,7 +102,7 @@ void rp_ack_print_data(
                     /* there's more! */
 					
 #if PRINT_ENABLED
-                    fprintf(stdout, ",");
+                    fprintf(std_out, ",");
 #endif
                 } 
 				else 
@@ -114,10 +117,11 @@ void rp_ack_print_data(
         }
 #if PRINT_ENABLED
         if (print_brace)
-            fprintf(stdout, "}");
-        fprintf(stdout, "\r\n");
+            fprintf(std_out, "}");
+        fprintf(std_out, "\r\n");
 #endif
     }
+    fclose(std_out);
 }
 
 

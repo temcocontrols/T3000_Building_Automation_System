@@ -52,6 +52,7 @@ public:
     afx_msg void OnBnClickedButtonCusAqi();
     CStaticEx m_aqi_title;
     CStaticEx m_static_info;
+    afx_msg void OnBnClickedButtonAutoCal();
 };
 
 const COLORREF AQI_Info_Status_Color[] =

@@ -22,6 +22,36 @@ CBacnetSettingBasicInfo::~CBacnetSettingBasicInfo()
 {
 }
 
+
+LRESULT  CBacnetSettingBasicInfo::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+    _MessageInvokeIDInfo *pInvoke = (_MessageInvokeIDInfo *)lParam;
+    bool msg_result = WRITE_FAIL;
+    msg_result = MKBOOL(wParam);
+    CString Show_Results;
+    CString temp_cs = pInvoke->task_info;
+    if (msg_result)
+    {
+        Show_Results = temp_cs + _T("Success!");
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
+
+    }
+    else
+    {
+        //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//还原没有改对的值
+        PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
+        Show_Results = temp_cs + _T("Fail!");
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
+
+    }
+
+    if (pInvoke)
+        delete pInvoke;
+    return 0;
+}
+
+
+
 void CBacnetSettingBasicInfo::DoDataExchange(CDataExchange* pDX)
 {
     DDX_Control(pDX, IDC_EDIT_SETTING_OBJ_INSTANCE, m_setting_obj_instance);
@@ -47,11 +77,12 @@ BEGIN_MESSAGE_MAP(CBacnetSettingBasicInfo, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_ON, &CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdOn)
     ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_OFF, &CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdOff)
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_MAX_MASTER, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMaxMaster)
-
+    ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
 
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_PANEL, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingPanel)
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_NODES_LABEL_SETTING, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingNodesLabelSetting)
 
+    ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_DELAY_OFF, &CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdDelayOff)
 END_MESSAGE_MAP()
 
 
@@ -175,10 +206,19 @@ void CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdOn()
     // TODO: 在此添加控件通知处理程序代码
     CString temp_task_info;
     temp_task_info.Format(_T(" Change LCD Background Light ON "));
-
-    Device_Basic_Setting.reg.LCD_Display = 1;
-
+    if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 519)//519
+    {
+        Device_Basic_Setting.reg.LCD_Display = 1;
+    }
+    else
+    {
+        GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
+        Device_Basic_Setting.reg.LCD_Display = 255;
+    }
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+
+
+
 }
 
 
@@ -187,9 +227,29 @@ void CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdOff()
     // TODO: 在此添加控件通知处理程序代码
     CString temp_task_info;
     temp_task_info.Format(_T(" Change LCD Background Light OFF "));
-
     Device_Basic_Setting.reg.LCD_Display = 0;
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+    GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
+}
 
+void CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdDelayOff()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_task_info;
+    temp_task_info.Format(_T(" Change LCD Background Light ON "));
+    CString temp_cstring;
+    GetDlgItemTextW(IDC_EDIT_LCD_DELAY_OFF_TIME, temp_cstring);
+    int n_delay_time;
+    n_delay_time = (unsigned char)(_wtoi(temp_cstring));
+    if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 519)//519
+    {
+        GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(true);
+        Device_Basic_Setting.reg.LCD_Display = n_delay_time;
+    }
+    else
+    {
+        return;
+    }
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
 }
 
@@ -323,3 +383,6 @@ BOOL CBacnetSettingBasicInfo::OnInitDialog()
     return false;  // return TRUE unless you set the focus to a control
                   // 异常: OCX 属性页应返回 FALSE
 }
+
+
+

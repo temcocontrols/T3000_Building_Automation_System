@@ -12,6 +12,7 @@
 #include "global_define.h"
 #include "BacnetRange.h"
 #include "MainFrm.h"
+#include "BancetProperty.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 CRect Output_rect;
@@ -52,6 +53,7 @@ BEGIN_MESSAGE_MAP(CBacnetOutput, CDialogEx)
 	ON_WM_HELPINFO()
 	ON_WM_SIZE()
 	ON_WM_SYSCOMMAND()
+    ON_NOTIFY(NM_RCLICK, IDC_LIST_OUTPUT, &CBacnetOutput::OnNMRClickListOutput)
 END_MESSAGE_MAP()
 
 
@@ -117,7 +119,7 @@ BOOL CBacnetOutput::OnInitDialog()
 	((CButton *)GetDlgItem(IDC_BUTTON_OUTPUT_READ))->SetIcon(hIcon);	
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
 	((CButton *)GetDlgItem(IDC_BUTTON_OUTPUT_APPLY))->SetIcon(hIcon);
-	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
+	SetTimer(1, BAC_LIST_REFRESH_OUTPUT_TIME,NULL);
 
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_OUTPUT);
 	SetIcon(m_hIcon,TRUE);
@@ -277,6 +279,7 @@ void CBacnetOutput::Initial_List()
 	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HOA Switch"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+    m_output_list.InsertColumn(OUTPUT_RELINQUISH_VALUE, _T("Relinquish"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_RANGE, _T("Range"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	
@@ -445,41 +448,6 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
         OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
     }
 
-	//if((bacnet_device_type == T38AI8AO6DO) ||
-	//	(bacnet_device_type == PID_T322AI))
-	//{
-	//	OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
-	//}
-	//else if((bacnet_device_type == PID_T322AI) ||
-	//	    (bacnet_device_type == PID_T3PT12))
-	//{
-	//	OUTPUT_LIMITE_ITEM_COUNT = 0;
-	//}
-    //else if ((bacnet_device_type == STM32_CO2_NET) || (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
-    //{
-    //    OUTPUT_LIMITE_ITEM_COUNT = 3;
-    //}
-	//else if (bacnet_device_type == PM_T3_LC)
-	//{
-	//	OUTPUT_LIMITE_ITEM_COUNT = 8;
-	//}
-	//else if ((bacnet_device_type == PID_T36CTA))
-	//{
-	//	OUTPUT_LIMITE_ITEM_COUNT = 2;
-	//}
-	//else if (bacnet_device_type == TINY_EX_MINIPANEL)
-	//{
-	//	//OUTPUT_LIMITE_ITEM_COUNT = 14;
-	//}
-    //else if (bacnet_device_type == PWM_TRANSDUCER)
-    //{
-    //    OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
-    //}
-	//else
-	//{
-	//	OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
-	//}
-
 	int temp_need_show_external = 0;
 	for (int z= 0 ;z < (int)m_Output_data.size();z++)
 	{
@@ -496,6 +464,15 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 
 	}
+
+    if (g_output_support_relinquish != 0)
+    {
+        m_output_list.SetColumnWidth(OUTPUT_RELINQUISH_VALUE, 80);
+    }
+    else
+    {
+        m_output_list.SetColumnWidth(OUTPUT_RELINQUISH_VALUE, 0);
+    }
 	if(show_output_external != temp_need_show_external)
 	{
 		show_output_external = temp_need_show_external;
@@ -572,6 +549,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		CString temp_des;
 		CString temp_units;
 		CString low_voltage,high_voltage;
+        CString temp_relinquish_value;
+        
+
+
 
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).description, (int)strlen((char *)m_Output_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
@@ -672,6 +653,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 
 			m_output_list.SetCellEnabled(i,OUTPUT_UNITE,0);
+            CString temp_digital_value2;
+            CStringArray temparray;
 		if(m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG)
 		{
 			m_output_list.SetCellEnabled(i,OUTPUT_LOW_VOLTAGE,1);
@@ -708,9 +691,9 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 			if(m_Output_data.at(i).range == 0)
 			{
-				CString temp_value2;
-				temp_value2.Format(_T("%.2f"),((float)m_Output_data.at(i).value) / 1000);
-				m_output_list.SetItemText(i,OUTPUT_VALUE,temp_value2);
+				
+                temp_digital_value2.Format(_T("%.2f"),((float)m_Output_data.at(i).value) / 1000);
+				m_output_list.SetItemText(i,OUTPUT_VALUE, temp_digital_value2);
 
 				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[0]);
 			}
@@ -738,7 +721,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			else
 			{
 				
-				CStringArray temparray;
+				
 
 				if((m_Output_data.at(i).range < 23) &&(m_Output_data.at(i).range !=0))
 					temp1 = Digital_Units_Array[m_Output_data.at(i).range];
@@ -764,6 +747,31 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			}
 		}
 
+        if (g_output_support_relinquish != 0)
+        {
+            int relinquish_value = 0;
+            relinquish_value = output_relinquish_value[2 * i] * 65536 + output_relinquish_value[i * 2 + 1];
+            if ((m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG) ||
+                ((m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL) && (m_Output_data.at(i).range == 0)))
+            {
+                temp_relinquish_value.Format(_T("%.3f"), (output_relinquish_value[2 * i] * 65536 + output_relinquish_value[i * 2 + 1]) / 1000.0);
+            }
+            else if (m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+            {
+                if ((temparray.GetSize() == 2))
+                {
+                    if (relinquish_value == 0)
+                        temp_relinquish_value = temparray.GetAt(0);
+                    else if (relinquish_value == 1000)
+                        temp_relinquish_value = temparray.GetAt(1);
+                    else
+                        temp_relinquish_value = _T("");
+                }
+            }
+
+
+            m_output_list.SetItemText(i, OUTPUT_RELINQUISH_VALUE, temp_relinquish_value);
+        }
 
 			CString main_sub_panel;
 
@@ -1025,6 +1033,40 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 	}
 
 
+    if (Changed_SubItem == OUTPUT_RELINQUISH_VALUE)
+    {
+        if (g_output_support_relinquish == 1)
+        {
+            CString temp_cs = m_output_list.GetItemText(Changed_Item, Changed_SubItem);
+            int temp_int = (int)(_wtof(temp_cs) * 1000);
+            unsigned short temp_high_byte = 0;  //高字节在前 低字节在后
+            unsigned short temp_low_byte = 0;
+            temp_high_byte = (temp_int&0xffff0000) >> 16;
+            temp_low_byte = temp_int & 0x0000ffff;
+            int ret_write_high = write_one(g_tstat_id, 9400 + 2*Changed_Item, temp_high_byte);
+            int ret_write_low = write_one(g_tstat_id, 9400 + 2*Changed_Item + 1, temp_low_byte);
+            if ((ret_write_high < 0) || (ret_write_low < 0))
+            {
+                MessageBox(_T("Write data timeout!"), _T("Warning"));
+                m_output_list.SetItemText(Changed_Item, Changed_SubItem, _T(" "));
+                return 0;
+            }
+            else
+            {
+                CString temp_info;
+                temp_info.Format(_T("Write Output List Item%d .Changed to \"%s\" success"), Changed_Item, temp_cs);
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_info);
+            }
+
+            
+        }
+        else
+        {
+            return 0;
+        }
+
+    }
+
 	if(Changed_SubItem == OUTPUT_DECOM)
 	{
 		CString temp_cs = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
@@ -1202,6 +1244,60 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 			New_CString = temparray.GetAt(0);
 		}
 	}
+    else if (lCol == OUTPUT_RELINQUISH_VALUE)
+    {
+        if (g_output_support_relinquish != 0)
+        {
+            int relinquish_value = 0;
+            relinquish_value = output_relinquish_value[2 * lRow] * 65536 + output_relinquish_value[lRow * 2 + 1];
+            if (m_Output_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
+            {
+                if ((m_Output_data.at(lRow).range < 23) && (m_Output_data.at(lRow).range != 0))
+                    temp1 = Digital_Units_Array[m_Output_data.at(lRow).range];
+                else if ((m_Output_data.at(lRow).range >= 23) && (m_Output_data.at(lRow).range <= 30))
+                {
+                    if (receive_customer_unit)
+                        temp1 = Custom_Digital_Range[m_Output_data.at(lRow).range - 23];
+                    else
+                    {
+                        m_output_list.Set_Edit(false);
+                        return;
+                    }
+                }
+                else
+                    return;
+
+                if (relinquish_value == 1000)
+                    relinquish_value = 0;
+                else
+                    relinquish_value = 1000;
+                int ret_write_high = write_one(g_tstat_id, 9400 + 2 * lRow, 0);
+                int ret_write_low = write_one(g_tstat_id, 9400 + 2 * lRow + 1, relinquish_value);
+                if ((ret_write_high < 0) || (ret_write_low < 0))
+                {
+                    MessageBox(_T("Write data timeout!"), _T("Warning"));
+                    return ;
+                }
+                else
+                {
+                    SplitCStringA(temparray, temp1, _T("/"));
+                    CString temp_change_value;
+                    if(relinquish_value == 0)
+                        temp_change_value =  temparray.GetAt(0);
+                    else
+                        temp_change_value = temparray.GetAt(1);
+                    m_output_list.SetItemText(lRow, OUTPUT_RELINQUISH_VALUE, temp_change_value);
+                    CString temp_cs;
+                    temp_cs.Format(_T("Write Output List Item%d .Changed to \"%s\" success"), lRow, temp_change_value);
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
+                }
+                m_output_list.Set_Edit(false);
+                return;
+            }
+        }
+        else
+            return;
+    }
 	else if(lCol == OUTPUT_AUTO_MANUAL)
 	{
 		memcpy_s(&m_temp_output_data[lRow],sizeof(Str_out_point),&m_Output_data.at(lRow),sizeof(Str_out_point));
@@ -1756,4 +1852,67 @@ void CBacnetOutput::Reset_Output_Rect()
 
 		return;
 
+}
+
+
+void CBacnetOutput::OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+    // TODO: 在此添加控件通知处理程序代码
+    *pResult = 0;
+
+
+    long lRow, lCol;
+    m_output_list.Set_Edit(true);
+    DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+    CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+    m_output_list.ScreenToClient(&point);
+    LVHITTESTINFO lvinfo;
+    lvinfo.pt = point;
+    lvinfo.flags = LVHT_ABOVE;
+    int nItem = m_output_list.SubItemHitTest(&lvinfo);
+    lRow = lvinfo.iItem;
+    lCol = lvinfo.iSubItem;
+
+    if (lRow >= OUTPUT_LIMITE_ITEM_COUNT)
+        return;
+
+    if (lRow>m_output_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+        return;
+    if (lRow<0)
+        return;
+
+    CString New_CString;
+    CString temp_task_info;
+    CString temp1;
+    CStringArray temparray;
+
+    if (lCol == OUTPUT_VALUE)
+    {
+        if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BACNET_IP) || (PROTOCOL_BIP_TO_MSTP == g_protocol))
+        {
+            BACNET_APPLICATION_DATA_VALUE temp_value;
+            int invoke_id;
+            if (m_Output_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
+                invoke_id = Bacnet_Read_Properties_Blocking(Device_Basic_Setting.reg.object_instance, (BACNET_OBJECT_TYPE)OBJECT_BINARY_OUTPUT, lRow + 1, PROP_PRIORITY_ARRAY, temp_value, 3);
+            else
+                invoke_id = Bacnet_Read_Properties_Blocking(Device_Basic_Setting.reg.object_instance, (BACNET_OBJECT_TYPE)OBJECT_ANALOG_OUTPUT, lRow + 1, PROP_PRIORITY_ARRAY, temp_value, 3);
+            if (invoke_id >= 0)
+            {
+                CString temp_title;
+                temp_title.Format(_T("Bacnet Output %d Priority Array"), lRow + 1);
+                CBancetProperty Dlg;
+                Dlg.SetParameter(PROP_PRIORITY_ARRAY);
+                Dlg.SetBacnetReadString(bacnet_string);
+                Dlg.SetTitle(temp_title);
+                Dlg.DoModal();
+                //MessageBox(bacnet_string);
+            }
+        }
+        else
+        {
+            MessageBox(_T("This communication protocol for this product does not support viewing priority array"));
+        }
+
+    }
 }

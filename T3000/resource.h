@@ -327,6 +327,8 @@
 #define IDD_DIALOG17                    755
 #define IDD_DIALOG_TSTAT_SETPOINT       755
 #define IDD_DIALOG_AQI                  758
+#define IDD_DIALOG_BACNET_PROPERTY      760
+#define IDD_DIALOG_FIRMWARE_AUTO_CAL    762
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -382,6 +384,7 @@
 #define IDC_EDIT_CITY                   1029
 #define IDC_EDIT57                      1029
 #define IDC_EDIT_MAX_VOLT_VALUE3        1029
+#define IDC_BUTTON_ABC_HELP             1029
 #define IDC_OUTPUT4_DELAY_OFF_EDIT      1030
 #define IDC_HUM1                        1030
 #define IDC_EDIT43                      1030
@@ -2319,6 +2322,7 @@
 #define IDC_RADIO_SETTING_LCD_ON        2380
 #define IDC_RADIO_SETTING_LCD_OFF       2381
 #define ID_CHANGE_ID_OK                 2382
+#define IDC_RADIO_SETTING_LCD_DELAY_OFF 2382
 #define IDC_BUTTON_SCHEDULE_SUBNET      2383
 #define IDC_STATIC_BOTTOM               2384
 #define IDC_STATIC_BOTTOM_0             2384
@@ -2524,8 +2528,19 @@
 #define IDC_BUTTON_DONE                 2545
 #define IDC_BUTTON_CUS_AQI              2549
 #define IDC_STATIC_AQI_INFO             2550
-#define IDC_STATIC_AQI_INFO2            2551
 #define IDC_STATIC_AQI                  2551
+#define IDC_EDIT_LCD_DELAY_OFF_TIME     2551
+#define IDC_LIST_BACNET_PROPERTY        2553
+#define IDC_BUTTON_DEBUG                2554
+#define IDC_COMBO_DLG_CO2_FIRMWARE_AUTO_CAL 2555
+#define IDC_EDIT_DLG_FIRMWARE_NATURE_CO2 2556
+#define IDC_EDIT_DLG_FIRMWARE_MAX_MIN_ADJ_PERDAY 2557
+#define IDC_EDIT_DLG_FIRMWARE_LOOK_DAYS 2558
+#define IDC_BUTTON_FIRMWARE_AUTO_CAL    2559
+#define IDC_BUTTON_AUTO_CAL             2560
+#define IDC_EDIT_LOWEST_X_DAYS          2562
+#define IDC_EDIT_FIGURE                 2563
+#define IDC_EDIT_USER_ADJ               2564
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2744,6 +2759,17 @@
 #define IDC_RADIO_VAR_CUS_5             15597
 #define IDC_RADIO101                    15598
 #define IDC_RADIO102                    15599
+#define IDC_RADIO103                    15600
+#define IDC_RADIO104                    15601
+#define IDC_RADIO105                    15602
+#define IDC_RADIO106                    15603
+#define IDC_RADIO107                    15604
+#define IDC_RADIO108                    15605
+#define IDC_RADIO109                    15606
+#define IDC_RADIO110                    15607
+#define IDC_RADIO111                    15608
+#define IDC_RADIO112                    15609
+#define IDC_RADIO113                    15610
 #define IDC_RADIO_NEW200                19484
 #define ID_TIMEBASE_1HOUR               19485
 #define IDC_RADIO_NEW201                19485
@@ -2845,7 +2871,7 @@
 #define ID_ALLNODESDATABASE             32802
 #define ID_IOSELECTMENU_INPUT           32803
 #define ID_IOSELECTMENU_OUTPUT          32804
-#define ID_FILE_BATCHBURNHEX            32805
+#define ID_FILE_BATCHBURNHEX            32806
 #define ID_HELP_HELP                    32807
 #define ID_DELEMENUBTN_DELETECURRENTLABEL 32808
 #define ID_Menu                         32809
@@ -3076,9 +3102,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        760
+#define _APS_NEXT_RESOURCE_VALUE        764
 #define _APS_NEXT_COMMAND_VALUE         34077
-#define _APS_NEXT_CONTROL_VALUE         2551
+#define _APS_NEXT_CONTROL_VALUE         2565
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

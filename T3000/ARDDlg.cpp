@@ -242,7 +242,7 @@ void CARDDlg::OnBnClickedOk()
 	   temp_baud = L"19200";
 	   StrProtocol = _T("0");
    }
-
+   MODE_SUPPORT_PTRANSFER = 0; //ÔÝÊ±¹Ø±Õ;
    if (is_open && (offline_mode == false))
    {
        unsigned short test_array[1000];

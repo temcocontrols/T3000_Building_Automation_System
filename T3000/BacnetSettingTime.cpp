@@ -165,7 +165,6 @@ void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
     int nyear, nmonth, nday, nhour, nmin, nsec;
 
     unsigned long  temp_time_long = time(NULL);
-
     time_t scale_time = temp_time_long;
 
     if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)
@@ -211,7 +210,14 @@ void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
     //暂时屏蔽TSTAT10 同步时间 后就不通讯;
    // if (g_selected_product_id == PM_TSTAT10)
     //    return;
-    Write_Private_Data_Blocking(WRITE_TIMECOMMAND, 0, 0);
+    if (WritePrivateData_Blocking(g_bac_instance, WRITE_TIMECOMMAND, 0, 0, sizeof(Time_block_mini)) < 0)
+    {
+        MessageBox(_T("An error occurred while device synchronizing with local PC. This operation returned because the timeout period expired."));
+    }
+    else
+    {
+        MessageBox(_T("The clock was successfully synchronized with local PC."));
+    }
 }
 
 void CBacnetSettingTime::OnBnClickedBtnBacWriteTime()

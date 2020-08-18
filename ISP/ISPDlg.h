@@ -275,4 +275,5 @@ public:
     afx_msg LRESULT Fresh_CloseSN_fcuntion(WPARAM wParam, LPARAM lParam);
     afx_msg void OnCbnSelchangeComboPm();
     void Enable_Sensor_Window(bool nenable);
+    afx_msg void OnBnClickedCheckNoItem();
 };

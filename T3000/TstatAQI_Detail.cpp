@@ -10,6 +10,9 @@
 #include "TstatAQ.h"
 // CTstatAQI_Detail 对话框
 
+const int aqi_picture_x = 1022;
+const int aqi_picture_y = 530;
+
 IMPLEMENT_DYNAMIC(CTstatAQI_Detail, CDialogEx)
 
 CTstatAQI_Detail::CTstatAQI_Detail(CWnd* pParent /*=NULL*/)
@@ -41,7 +44,9 @@ HICON default_select;
 BOOL CTstatAQI_Detail::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
-
+    CRect Temp_Rect;
+    GetWindowRect(Temp_Rect);
+    MoveWindow(Temp_Rect.left, Temp_Rect.top, aqi_picture_x, aqi_picture_y);
     // TODO:  在此添加额外的初始化
     default_select = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_SELECT), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 
@@ -62,16 +67,16 @@ cus_value  value4;
 cus_value  value5;
 cus_value  value6;
 
-PointF      pointF_C1(30, 150);
-PointF      pointF_C2(27, 200);
-PointF      pointF_C3(24, 250);
-PointF      pointF_C4(22, 300);
-PointF      pointF_C5(22, 350);
-PointF      pointF_C6(22, 400);
+PointF      pointF_C1(90, 230);
+PointF      pointF_C2(90 - 4, 275);
+PointF      pointF_C3(90 - 8, 320);
+PointF      pointF_C4(90 - 12, 365);
+PointF      pointF_C5(90 - 16, 410);
+PointF      pointF_C6(90 - 16, 455);
 
-PointF  Cus_Select(0, 100);
-PointF  China_Select(115, 100);
-PointF  USA_Select(225, 100);
+PointF  Cus_Select(45, 170);
+PointF  China_Select(190, 170);
+PointF  USA_Select(360, 170);
 
 
 
@@ -119,21 +124,22 @@ void CTstatAQI_Detail::OnPaint()
     memDC.GetDC().FillSolidRect(&rcClient, RGB(202, 208, 216));
     Graphics graphics(memDC.GetDC());
     Bitmap bitmap(bmp_AQI);
-    graphics.DrawImage(&bitmap, 0, 0, rcClient.Width(), rcClient.Height());
+    graphics.DrawImage(&bitmap, 0, 0, aqi_picture_x , aqi_picture_y );
 
     Graphics *mygraphics;
     mygraphics = new Graphics(memDC.GetDC());
 
-    SolidBrush  txt_color_brush(Color(255, 255, 0, 0));
+    SolidBrush  txt_color_brush1(Color(255, 0, 0, 0));
+    SolidBrush  txt_color_brush2(Color(255, 255, 255, 255));
     FontFamily  UnitfontFamily(_T("Arial"));
-    Gdiplus::Font        unitfont(&UnitfontFamily, 16, FontStyleRegular, UnitPixel);
+    Gdiplus::Font        unitfont(&UnitfontFamily, 20, FontStyleRegular, UnitPixel);
 
-    mygraphics->DrawString(temp_value_1, -1, &unitfont, pointF_C1, &txt_color_brush);
-    mygraphics->DrawString(temp_value_2, -1, &unitfont, pointF_C2, &txt_color_brush);
-    mygraphics->DrawString(temp_value_3, -1, &unitfont, pointF_C3, &txt_color_brush);
-    mygraphics->DrawString(temp_value_4, -1, &unitfont, pointF_C4, &txt_color_brush);
-    mygraphics->DrawString(temp_value_5, -1, &unitfont, pointF_C5, &txt_color_brush);
-    mygraphics->DrawString(temp_value_6, -1, &unitfont, pointF_C6, &txt_color_brush);
+    mygraphics->DrawString(temp_value_1, -1, &unitfont, pointF_C1, &txt_color_brush1);
+    mygraphics->DrawString(temp_value_2, -1, &unitfont, pointF_C2, &txt_color_brush1);
+    mygraphics->DrawString(temp_value_3, -1, &unitfont, pointF_C3, &txt_color_brush1);
+    mygraphics->DrawString(temp_value_4, -1, &unitfont, pointF_C4, &txt_color_brush2);
+    mygraphics->DrawString(temp_value_5, -1, &unitfont, pointF_C5, &txt_color_brush2);
+    mygraphics->DrawString(temp_value_6, -1, &unitfont, pointF_C6, &txt_color_brush2);
 
     Bitmap icon_bitmap(default_select);
     if (product_register_value[TATAT_AQ_MODBUS_AQI_AREA] == 0)
@@ -164,7 +170,7 @@ void CTstatAQI_Detail::OnLButtonDown(UINT nFlags, CPoint point)
     //CString temp1;
     //temp1.Format(_T("%d,%d"), point.x, point.y);
     //MessageBox(temp1);
-    if ((point.x >= 638) && (point.y <= 23))
+    if ((point.x >= (aqi_picture_x - 23)) && (point.y <= 23))
     {
         PostMessage(WM_CLOSE, NULL, NULL);
     }

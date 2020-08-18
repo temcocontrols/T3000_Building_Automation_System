@@ -9,6 +9,7 @@
 #include "BacnetEmailAlarm.h"
 #include "BacnetUserConfig.h"
 #include "BacnetIOConfig.h"
+#include "WifiConfigDlg.h"
 // CBacnetSetting dialog
 
 const int SETTING_BASIC = 0;
@@ -18,6 +19,8 @@ const int SETTING_DYNDNS = 3;
 const int SETTING_EMAIL = 4;
 const int SETTING_USER_LOGIN = 5;
 const int SETTING_EXPANSION_IO = 6;
+
+//const int SETTING_WIFI = 7;
 const int MAX_SETTING = 7;
 
 class CBacnetSetting : public CDialogEx
@@ -87,6 +90,7 @@ public:
     CBacnetEmailAlarm m_page_email;
     CBacnetUserConfig m_page_user;
     CBacnetIOConfig   m_page_expansion_io;
+    CWifiConfigDlg m_page_wifi;
     CDialog* tab_dialog[MAX_SETTING];
     afx_msg void OnTcnSelchangeTabSetting(NMHDR *pNMHDR, LRESULT *pResult);
 };

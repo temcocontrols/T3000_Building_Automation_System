@@ -33,6 +33,7 @@ BOOL ReadLineFromHexFile(CFile& file, char* pBuffer);
 BOOL DoHEXCRC( TS_UC* szBuf, int nLen);
 BOOL Ping(const CString& strIP, CWnd* pWndEcho);
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
+int read_multi_retry(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length, int retry_time = 3);
 int Write_One_Retry(unsigned char device_var, unsigned short address, unsigned short value, int retry_time = 3);
 bool Open_Socket_Retry(CString strIPAdress, short nPort, int retry_time = 3);
 #endif

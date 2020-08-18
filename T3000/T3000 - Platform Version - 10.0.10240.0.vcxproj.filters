@@ -765,6 +765,12 @@
     <ClCompile Include="TstatAQI_Detail.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BancetProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CO2_AUTO_CALIBRATION.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -1937,6 +1943,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TstatAQI_Detail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BancetProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CO2_AUTO_CALIBRATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

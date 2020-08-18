@@ -56,7 +56,38 @@ BEGIN_MESSAGE_MAP(CBacnetSettingTcpip, CDialogEx)
     ON_CBN_SELCHANGE(IDC_COMBO_STOP_BIT, &CBacnetSettingTcpip::OnCbnSelchangeComboStopBit)
     ON_CBN_SELCHANGE(IDC_COMBO_STOP_BIT3, &CBacnetSettingTcpip::OnCbnSelchangeComboStopBit3)
     ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
+    ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
 END_MESSAGE_MAP()
+
+
+
+
+LRESULT  CBacnetSettingTcpip::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+    _MessageInvokeIDInfo *pInvoke = (_MessageInvokeIDInfo *)lParam;
+    bool msg_result = WRITE_FAIL;
+    msg_result = MKBOOL(wParam);
+    CString Show_Results;
+    CString temp_cs = pInvoke->task_info;
+    if (msg_result)
+    {
+        Show_Results = temp_cs + _T("Success!");
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
+
+    }
+    else
+    {
+        //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//还原没有改对的值
+        PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
+        Show_Results = temp_cs + _T("Fail!");
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
+
+    }
+
+    if (pInvoke)
+        delete pInvoke;
+    return 0;
+}
 
 
 // CBacnetSettingTcpip 消息处理程序
@@ -370,7 +401,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
         
         return;
     }
-
+    Device_Basic_Setting.reg.reset_default = 150;
     CString temp_task_info;
     temp_task_info.Format(_T("Change serial port 0 "));
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
@@ -490,7 +521,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
         }
     }
 #endif
-
+    Device_Basic_Setting.reg.reset_default = 150;
     CString temp_task_info;
     temp_task_info.Format(_T("Change serial port 2 "));
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);

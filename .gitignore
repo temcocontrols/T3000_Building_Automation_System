@@ -81,3 +81,19 @@ T3000 - VS2010.VC.db
 .vs/T3000 - VS2017/v15/Server/sqlite3/storage.ide-shm
 .vs/T3000 - VS2017/v15/Server/sqlite3/storage.ide-wal
 T3000 - VS2015 -  Platform Version - 10.0.10240.0.VC.db
+
+/T3000InstallShield
+/T3000InstallShield
+/ipch
+/Archive
+/BacnetExplore/Yabe/bin
+/BacnetExplore/Yabe/obj
+BacnetExplore/CodeExamples/AnotherStorageImplementation/DataPersistence/Newtonsoft.Json.dll
+BacnetExplore/CodeExamples/LibBacnet/bin/Release/LibBacnet.dll
+BacnetExplore/CodeExamples/Xamarin/YabeStack/bin/Release/YabeStack.dll
+/T3000Controls/bin/Release/T3000Controls.pdb
+/T3000Controls/bin/Release/T3000Controls.dll
+/T3000Controls/bin/Release/T3000Controls.dll
+/T3000Controls/bin/Release/T3000Controls.pdb
+/T3000Controls/obj/Release/T3000Controls.dll
+/T3000Controls/obj/Release/T3000Controls.csproj.FileListAbsolute.txt

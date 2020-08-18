@@ -141,8 +141,41 @@ CString Check_Time(unsigned long local_time , unsigned int device_time)
 	return ret_cstring;
 }
 
+void Getminitypename(unsigned char nmini_type, CString &ret_name)
+{
+    switch (nmini_type)
+    {
+    case PRODUCT_CM5:
+        ret_name = _T("CM5");
+        break;
+    case MINIPANELARM:
+    case BIG_MINIPANEL:
+        ret_name = _T("T3-BB");
+        break;
+    case MINIPANELARM_LB:
+    case SMALL_MINIPANEL:
+        ret_name = _T("T3-LB");
+        break;
+    case MINIPANELARM_TB:
+    case TINY_MINIPANEL:
+    case TINY_EX_MINIPANEL:
+        ret_name = _T("T3-TB");
+        break;
+    case MINIPANELARM_NB:
+        ret_name = _T("T3-NB");
+        break;
+    case T3_TSTAT10:
+        ret_name = _T("TSTAT10");
+        break;
+    case T3_OEM:
+        ret_name = _T("T3-OEM");
+        break;
+    default:
+        ret_name = _T(" ");
+        break;
+    }
 
-
+}
 
 LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 {
@@ -186,7 +219,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->SetAddress(Device_Basic_Setting.reg.gate_addr[0],
             Device_Basic_Setting.reg.gate_addr[1], Device_Basic_Setting.reg.gate_addr[2], Device_Basic_Setting.reg.gate_addr[3]);
         bacnet_device_type = Device_Basic_Setting.reg.mini_type;
-        if (Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
+        if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
+            (Device_Basic_Setting.reg.mini_type == T3_OEM))
         {
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->EnableWindow(FALSE);
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->EnableWindow(FALSE);
@@ -474,21 +508,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             ((CEdit *)m_page_tcpip.GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->EnableWindow(FALSE);
         }
 
-        if (Device_Basic_Setting.reg.LCD_Display == 0)
-        {
-            //1 常灭
-            ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
-            ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(true);
-        }
-        else if (Device_Basic_Setting.reg.LCD_Display == 1)
-        {
-            //1 常亮
-            ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
-            ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
-        }
-
         if ((Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
             Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL ||
+            Device_Basic_Setting.reg.mini_type == T3_TSTAT10 ||
+            Device_Basic_Setting.reg.mini_type == T3_OEM ||
             Device_Basic_Setting.reg.mini_type == MINIPANELARM)
         {
             ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->EnableWindow(true);
@@ -499,6 +522,61 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->EnableWindow(false);
             ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->EnableWindow(false);
         }
+
+        if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 519)//519
+        {
+            m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
+            ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->EnableWindow(false);
+            if (Device_Basic_Setting.reg.LCD_Display == 0)
+            {
+                //1 常灭
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(true);
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
+            }
+            else if (Device_Basic_Setting.reg.LCD_Display == 1)
+            {
+                //1 常亮
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
+            }
+        }
+        else
+        {
+            ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->EnableWindow(true);
+           
+            if (Device_Basic_Setting.reg.LCD_Display == 0)
+            {
+                //1 常灭
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(true);
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
+                m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
+            }
+            else if (Device_Basic_Setting.reg.LCD_Display == 255)
+            {
+                //255 常亮
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
+                m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
+            }
+            else
+            {
+                CString temp_lcd_delay_time;
+                //1 常亮
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(true);
+                m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(true);
+                temp_lcd_delay_time.Format(_T("%d"), Device_Basic_Setting.reg.LCD_Display);
+                m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->SetWindowText(temp_lcd_delay_time);
+            }
+        }
+
+
+
 
         if (Device_Basic_Setting.reg.en_sntp == 0)
         {
@@ -655,6 +733,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             bacnet_device_type == TINY_EX_MINIPANEL ||
             bacnet_device_type == MINIPANELARM_NB ||
             bacnet_device_type == T3_TSTAT10 ||
+            bacnet_device_type == T3_OEM ||
             bacnet_device_type == PRODUCT_CM5)
         {
             ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->ResetContent();
@@ -697,6 +776,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB) ||
                 (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
+                (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
                 (Device_Basic_Setting.reg.mini_type == T3_TSTAT10) )
             {
                 for (int x = 0;x< (sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0]));x++)
@@ -725,6 +805,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB) ||
                 (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
+                (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
                 (Device_Basic_Setting.reg.mini_type == T3_TSTAT10))
             {
                 if (Device_Basic_Setting.reg.com_baudrate0 < sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0]))
@@ -764,7 +845,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->SetCurSel(Device_Basic_Setting.reg.com_baudrate2);
 
 
-            if (bacnet_device_type == T3_TSTAT10)
+            if ((bacnet_device_type == T3_TSTAT10) ||
+                (bacnet_device_type == T3_OEM))
             {
                 ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->EnableWindow(0);
                 ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(0);
@@ -773,47 +855,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             }
 
         }
-
-        if (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5)
-        {
-            ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("CM5"));
-        }
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM)
-        {
-            ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-BB"));
-        }
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB)
-        {
-            ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-LB"));
-        }
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
-        {
-            ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-TB"));
-        }
-        else if (Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
-        {
-            ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-BB"));
-        }
-        else if (Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL)
-        {
-            ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-LB"));
-        }
-        else if ((Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL) || (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL))
-        {
-            ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-TB"));
-        }
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB)
-        {
-            ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("T3-NB"));
-        }
-        else if (Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
-        {
-            ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("TSTAT10"));
-        }
-        else
-        {
-            ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Unknown device"));
-        }
+        CString temp_productname;
+        Getminitypename(Device_Basic_Setting.reg.mini_type, temp_productname);
+        ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(temp_productname);
+        
 
         if (
             (bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM) ||
@@ -822,6 +867,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL) ||
             (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
             (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
+            (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
             (Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
 
             )
@@ -833,7 +879,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             temp_mcu_version.Format(_T("%d.%d"), Device_Basic_Setting.reg.pro_info.firmware0_rev_main, Device_Basic_Setting.reg.pro_info.firmware0_rev_sub);
             temp_bootloader_version.Format(_T("%d"), Device_Basic_Setting.reg.pro_info.bootloader_rev);
         }
-        if (Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
+        if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
+            (Device_Basic_Setting.reg.mini_type == T3_OEM))
         {
             temp_pic_version.Format(_T(" "));
             temp_c8051_version.Format(_T(" ") );
@@ -941,7 +988,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                     Time32toCString(temp_time_long, cs_pc_time);
 
                     CString temp_message;
-                    temp_message.Format(_T("This device is set to automatically synchronize with a locally connected computer.\r\nDo you want to synchronize it?\r\n%s (Device's Time) \r\n%s (PC's Time) \r\n"), panel_time, cs_pc_time);
+                    temp_message.Format(_T("This device is set to automatically synchronize with a locally connected computer.\r\nAre you sure you want to sync to your PC?\r\n%s (Device's Time) \r\n%s (PC's Time) \r\n"), panel_time, cs_pc_time);
                     dlg.SetStaticText(temp_message);
                     //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
                     dlg.SetStaticTextColor(RGB(0, 0, 255));
@@ -982,7 +1029,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             //2019 05 20 Fance 用于处理 电脑勾选了夏令时 引起的 T3 显示时间 与实际时间总是相差一小时的问题;
             TIME_ZONE_INFORMATION tzi;
             GetTimeZoneInformation(&tzi);
-            short computer_DaylightBias = tzi.DaylightBias * 60;
+            //short computer_DaylightBias = tzi.DaylightBias * 60;
 
             //CString temp_debug;
             //temp_debug.Format(_T("Time(NULL) = %u\r\ntzi.DaylightBias = %d\r\ntzi.StandardBias=%d\r\n\Device Time=%u"), temp_time_long123, tzi.DaylightBias, tzi.StandardBias, temp_time_long);
@@ -998,7 +1045,15 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
             else
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
-            TimeTemp = scale_time + computer_DaylightBias;
+            //TimeTemp = scale_time + computer_DaylightBias; //20200525
+            TimeTemp = scale_time;//+ computer_DaylightBias;
+            //CString temp_string;
+            //temp_string.Format(_T("%d PC\r\n%d Panel\r\ntzi.DaylightBias = %d\r\n PC_tziBias = %d"), 
+            //    temp_time_long123, 
+            //    temp_time_long, 
+            //    tzi.DaylightBias, 
+            //    tzi.Bias);
+            //MessageBox(temp_string);
         }
 
         //减去系统现在的时区 ，然后在加上 minipanel自己的时区.
@@ -1033,6 +1088,7 @@ void CBacnetSetting::InitialTab()
     m_setting_tab.InsertItem(SETTING_EMAIL,      _T("Email                  "));
     m_setting_tab.InsertItem(SETTING_USER_LOGIN, _T("User Login             "));
     m_setting_tab.InsertItem(SETTING_EXPANSION_IO, _T("Expansion IO           "));
+    //m_setting_tab.InsertItem(SETTING_WIFI, _T("Wifi           "));
     //创建两个对话框
     m_page_basic_info.Create(IDD_DIALOG_BACNET_SETTING_BASIC, &m_setting_tab);
     m_page_tcpip.Create(IDD_DIALOG_BACNET_SETTING_TCPIP, &m_setting_tab);
@@ -1041,6 +1097,13 @@ void CBacnetSetting::InitialTab()
     m_page_email.Create(IDD_DIALOG_BACNET_EMAIL_ALARM, &m_setting_tab);
     m_page_user.Create(IDD_DIALOG_BACNET_USER_CONFIG, &m_setting_tab);
     m_page_expansion_io.Create(IDD_DIALOG_BACNET_EXT_IO_CONFIG, &m_setting_tab);
+    m_page_wifi.Create(IDD_DIALOG_WIFI_CONFIG, &m_setting_tab);
+    //m_page_wifi.ModifyStyle(WS_CAPTION , WS_CLIPCHILDREN, NULL);
+
+    m_page_wifi.ModifyStyle(WS_CAPTION | WS_POPUP | WS_SYSMENU | WS_CLIPSIBLINGS | DS_MODALFRAME,
+        WS_CHILD | WS_CLIPCHILDREN, SWP_NOMOVE);
+
+    //m_page_wifi.ModifyStyleEx(WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE, NULL, NULL);
     //IDD_DIALOG_BACNET_USER_CONFIG
     //设定在Tab内显示的范围
     CRect rc;
@@ -1056,6 +1119,7 @@ void CBacnetSetting::InitialTab()
     m_page_email.MoveWindow(&rc);
     m_page_user.MoveWindow(&rc);
     m_page_expansion_io.MoveWindow(&rc);
+    //m_page_wifi.MoveWindow(&rc);
     //把对话框对象指针保存起来
     tab_dialog[SETTING_BASIC] = &m_page_basic_info;
     tab_dialog[SETTING_TCP] = &m_page_tcpip;
@@ -1064,6 +1128,8 @@ void CBacnetSetting::InitialTab()
     tab_dialog[SETTING_EMAIL] = &m_page_email;
     tab_dialog[SETTING_USER_LOGIN] = &m_page_user;
     tab_dialog[SETTING_EXPANSION_IO] = &m_page_expansion_io;
+
+    //tab_dialog[SETTING_WIFI] = &m_page_wifi;
     //显示初始页面
     tab_dialog[SETTING_BASIC]->ShowWindow(SW_SHOW);
     tab_dialog[SETTING_TCP]->ShowWindow(SW_HIDE);
@@ -1072,6 +1138,7 @@ void CBacnetSetting::InitialTab()
     tab_dialog[SETTING_EMAIL]->ShowWindow(SW_HIDE);
     tab_dialog[SETTING_USER_LOGIN]->ShowWindow(SW_HIDE);
     tab_dialog[SETTING_EXPANSION_IO]->ShowWindow(SW_HIDE);
+    //tab_dialog[SETTING_WIFI]->ShowWindow(SW_HIDE);
     //保存当前选择
     m_CurSelTab = 0;
 
@@ -1382,10 +1449,24 @@ BOOL CBacnetSetting::OnHelpInfo(HELPINFO* pHelpInfo)
 
 void CBacnetSetting::OnBnClickedButtonBacSettingOk()
 {
-#ifdef _DEBUG
-    Bacnet_Read_Property_Multiple();
-    return;
-#endif
+    //unsigned long  temp_time_long = time(NULL);
+    //g_Print.Format(_T("PC Time is %d  ,Panel's Time is %d"), temp_time_long, Device_time.new_time.n_time);
+    //DFTrace(g_Print);
+    //MessageBox(g_Print);
+    //return;
+
+//#ifdef _DEBUG
+//
+//    BACNET_APPLICATION_DATA_VALUE temp_value;
+//    int invoke_id = Bacnet_Read_Properties_Blocking(133641, (BACNET_OBJECT_TYPE)4, 2, PROP_PRIORITY_ARRAY, temp_value, 3);
+//
+//    Sleep(1);
+//    return;
+//
+//
+//    Bacnet_Read_Property_Multiple();
+//    return;
+//#endif
 	if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
 	{
 		CString temp_task_info;
@@ -1713,6 +1794,10 @@ void CBacnetSetting::OnTcnSelchangeTabSetting(NMHDR *pNMHDR, LRESULT *pResult)
         }
 
     }
+    //else if (SETTING_WIFI == m_CurSelTab)
+    //{
+    //    //m_page_wifi.OnInitDialog();
+    //}
     //把新的页面显示出来
     tab_dialog[m_CurSelTab]->ShowWindow(SW_SHOW);
     *pResult = 0;

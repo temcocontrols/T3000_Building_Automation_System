@@ -44,6 +44,7 @@ BEGIN_MESSAGE_MAP(CTstatAQ, CFormView)
     ON_EN_KILLFOCUS(IDC_EDIT_LEVEL_4, &CTstatAQ::OnEnKillfocusEditLevel4)
     ON_EN_KILLFOCUS(IDC_EDIT_LEVEL_5, &CTstatAQ::OnEnKillfocusEditLevel5)
     ON_BN_CLICKED(IDC_BUTTON_CUS_AQI, &CTstatAQ::OnBnClickedButtonCusAqi)
+    ON_BN_CLICKED(IDC_BUTTON_AUTO_CAL, &CTstatAQ::OnBnClickedButtonAutoCal)
 END_MESSAGE_MAP()
 
 
@@ -76,7 +77,9 @@ void CTstatAQ::Fresh()
     ApplicationFolder.ReleaseBuffer();
     AQ_image_fordor = ApplicationFolder + _T("\\ResourceFile");
     icon_temperature = AQ_image_fordor + _T("\\temperature.bmp");
-    bmp_AQI = AQ_image_fordor + _T("\\AQI.bmp");
+    //bmp_AQI = AQ_image_fordor + _T("\\AQI.bmp");
+    bmp_AQI = AQ_image_fordor + _T("\\AQI.jpg");
+    
     HBITMAP bitmap;
     bitmap = (HBITMAP)LoadImage(AfxGetInstanceHandle(), icon_temperature, IMAGE_BITMAP, 40, 120, LR_LOADFROMFILE);
     CStatic *p = (CStatic *)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE);
@@ -366,15 +369,13 @@ DWORD WINAPI Update_TstatAQ_Thread(LPVOID lPvoid)
     while (mparent->IsWindowVisible())
     {
          Read_Multi(g_tstat_id, &product_register_value[100],100, 100, 5);
+         Sleep(SEND_COMMAND_DELAY_TIME);
          Read_Multi(g_tstat_id, &product_register_value[700], 700, 100, 5);
+         Sleep(SEND_COMMAND_DELAY_TIME);
          Read_Multi(g_tstat_id, &product_register_value[950], 950, 100, 5);
-        //for (int i = 0; i < 5; i++)
-        //{
-        //    int itemp = 0;
-        //    itemp = Read_Multi(g_tstat_id, &product_register_value[i * 100], i * 100, 100, 5);
-        //}
+         Sleep(SEND_COMMAND_DELAY_TIME);
         PostMessage(mparent->m_hWnd, WM_TSTAT_AQ_THREAD_READ, NULL, NULL);
-        Sleep(7000);
+        Sleep(30000);
     }
 
 
@@ -582,4 +583,13 @@ void CTstatAQ::OnBnClickedButtonCusAqi()
     // TODO: 在此添加控件通知处理程序代码
     CTstatAQI_Detail dlg;
     dlg.DoModal();
+}
+
+#include "CO2_AUTO_CALIBRATION.h"
+void CTstatAQ::OnBnClickedButtonAutoCal()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CCO2_AUTO_CALIBRATION Dlg;
+    Dlg.DoModal();
+
 }

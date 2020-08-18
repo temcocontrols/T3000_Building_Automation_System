@@ -15,6 +15,7 @@ extern HANDLE hwait_read_thread;
 extern bool mstp_read_result ; //0  没读到    1  读成功    MSTP 设备 记录 建立连接时，是否为客户手动中断操作;
 IMPLEMENT_DYNAMIC(CShowMessageDlg, CDialogEx)
 int ok_button_press = 0; //确定按钮
+int m_sync_time_auto_close_time;
 CShowMessageDlg::CShowMessageDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_AA_SHOWMESSAGE, pParent)
 {
@@ -155,6 +156,9 @@ BOOL CShowMessageDlg::OnInitDialog()
     if (mevent == EVENT_SYNC_TIME)
     {
         GetDlgItem(IDC_CHECK_DONT_POP)->ShowWindow(SW_SHOW);
+        m_sync_time_auto_close_time = 60;
+        SetTimer(2, 1000, NULL);
+        Sleep(1);
     }
     else
     {
@@ -462,6 +466,7 @@ BOOL CShowMessageDlg::PreTranslateMessage(MSG* pMsg)
 void CShowMessageDlg::OnTimer(UINT_PTR nIDEvent)
 {
     // TODO: 在此添加消息处理程序代码和/或调用默认值
+    CString temp_left_close_string;
     switch (nIDEvent)
     {
     case 1:
@@ -469,6 +474,19 @@ void CShowMessageDlg::OnTimer(UINT_PTR nIDEvent)
         m_static_title.SetWindowTextW(static_text);
                 m_static_persent.SetWindowTextW(static_percent);
                 m_progress_showmessage.SetPos(m_pos);
+    }
+        break;
+    case 2:       //SYNC Time auto close timer
+    {
+        if (m_sync_time_auto_close_time > 0)
+            m_sync_time_auto_close_time--;
+        else
+        {
+            KillTimer(2);
+            PostMessage(WM_CLOSE, NULL, NULL);
+        }
+        temp_left_close_string.Format(_T("Cancel (%d)"), m_sync_time_auto_close_time);
+        GetDlgItem(IDCANCEL)->SetWindowTextW(temp_left_close_string);
     }
         break;
     default:

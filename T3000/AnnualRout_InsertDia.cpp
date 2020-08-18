@@ -346,7 +346,8 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 	else
 	{
 		int nFlag = product_register_value[7];
-		if (g_protocol == PROTOCOL_BACNET_IP)
+        if (Bacnet_Private_Device(nFlag))
+		//if (g_protocol == PROTOCOL_BACNET_IP)
 		{								//器件。产品本来不同 界面就会有差异 都还要用一个界面。木有办法，只能 加在一起了。;
 			GetDlgItem(IDC_LIST1)->ShowWindow(0);
 			GetDlgItem(IDC_YEARSTATIC)->ShowWindow(0);
@@ -936,7 +937,8 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	else
 	{
 		int nFlag = product_register_value[7];
-		if (g_protocol != PROTOCOL_BACNET_IP)
+        if(Bacnet_Private_Device(nFlag) == false)
+		//if (g_protocol != PROTOCOL_BACNET_IP)
 		{
 			//CString str;
 			//str.Format(_T("%d-%d"), Clicked_month, Clicked_day);
@@ -1019,16 +1021,16 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 
 
 
-			if (g_protocol == PROTOCOL_BACNET_IP)
-			{
+			//if (g_protocol == PROTOCOL_BACNET_IP)
+			//{
 				//for (int i=0;i<12;i++)
 				//{
 				//	memcpy_s(&g_DayState[annual_list_line][i*4],4,&pBacDayState[i],4);
 				//}
 				CString temp_task_info;
 				temp_task_info.Format(_T("Write annual schedual List Item%d ."), annual_list_line + 1);
-				Post_Write_Message(g_bac_instance, WRITEANNUALSCHEDULE_T3000, annual_list_line, annual_list_line, 48, this->m_hWnd, temp_task_info);
-			}
+				Post_Write_Message(g_bac_instance, WRITEANNUALSCHEDULE_T3000, annual_list_line, annual_list_line, ANNUAL_CODE_SIZE, this->m_hWnd, temp_task_info);
+			//}
 
 		}
 	}

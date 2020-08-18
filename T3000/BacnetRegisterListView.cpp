@@ -629,9 +629,11 @@ int Read_Data_From_DB(int* m_max_retreg)
             continue;
         }
 
-
-        if (m_max_reg <= register_dbdata[temp_count].m_register_address)
-            m_max_reg = register_dbdata[temp_count].m_register_address;
+        if (register_dbdata[temp_count].m_register_address < 10000) //不想读几万个，等那么久
+        {
+            if (m_max_reg <= register_dbdata[temp_count].m_register_address)
+                m_max_reg = register_dbdata[temp_count].m_register_address;
+        }
         temp_count++;
         monitor_bado.m_pRecordset->MoveNext();
     }
@@ -801,12 +803,17 @@ LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lPara
 
         CString n_value;
         int n_start_add = register_dbdata[i].m_register_address;
+        unsigned short product_temp_value = 0;
         if (n_start_add >= 20000)
         {
-            continue;
+            product_temp_value = 0;
+        }
+        else
+        {
+            product_temp_value = product_register_value[n_start_add];
         }
 
-        n_value.Format(_T("%d"), product_register_value[n_start_add]);
+        n_value.Format(_T("%d"), product_temp_value);
 #if 1
 
         switch (register_dbdata[i].m_data_format)

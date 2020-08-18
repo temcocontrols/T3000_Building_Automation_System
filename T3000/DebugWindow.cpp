@@ -43,6 +43,7 @@ ON_WM_DESTROY()
 ON_BN_CLICKED(IDC_BUTTON_DEBUG_NUM_TO_TIME, &CDebugWindow::OnBnClickedButtonDebugNumToTime)
 ON_BN_CLICKED(IDC_BUTTON_DEBUG_TIME_TO_NUM, &CDebugWindow::OnBnClickedButtonDebugTimeToNum)
 ON_CBN_SELCHANGE(IDC_COMBO_DEBUG_CHOOSE, &CDebugWindow::OnCbnSelchangeComboDebugChoose)
+ON_BN_CLICKED(IDC_BUTTON_DEBUG, &CDebugWindow::OnBnClickedButtonDebug)
 END_MESSAGE_MAP()
 
 
@@ -54,7 +55,9 @@ BOOL CDebugWindow::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	::SetWindowPos(this->m_hWnd, HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 	//::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
-	
+#ifdef DEBUG
+    GetDlgItem(IDC_BUTTON_DEBUG)->ShowWindow(SW_SHOW);
+#endif
 	Logfile_path.Empty();
 	m_is_pause = false;
 	SetWindowLong(this->GetSafeHwnd(),GWL_EXSTYLE,GetWindowLong(this->GetSafeHwnd(),GWL_EXSTYLE)^0x80000);  
@@ -296,4 +299,60 @@ void CDebugWindow::OnCbnSelchangeComboDebugChoose()
 			break;
 		}
 	}
+}
+
+
+void CDebugWindow::OnBnClickedButtonDebug()
+{
+    // TODO: 在此添加控件通知处理程序代码
+//#ifdef DEBUG
+//    int test_pid = 126;
+//    StrPostProductID test2 = { 0 };
+//    test2.k_serialNumber.tValue.n_value = 123;
+//    test2.k_serialNumber.nStatus = VALUE_TYPE_INT;
+//    test2.k_ipAddress.nStatus = VALUE_TYPE_CSTRING;
+//    test2.k_ipAddress.tValue.cs_value = _T("192.168.0.33");
+//    test2.k_ipPort.nStatus = VALUE_TYPE_INT;
+//    test2.k_ipPort.tValue.n_value = 666;
+//
+//    test2.k_hardwareVer.nStatus = VALUE_TYPE_CSTRING;
+//    test2.k_hardwareVer.tValue.cs_value = _T("123");
+//
+//    test2.k_softwareVer.nStatus = VALUE_TYPE_CSTRING;
+//    test2.k_softwareVer.tValue.cs_value = _T("56");
+//    https_post(test_pid, test2);
+//#endif
+//    return;
+
+
+#ifdef DEBUG
+#ifdef ENABLE_HTTP_FUCTION
+    StrGetProductID test1 = { 0 };
+    int test_pid2 = 126;
+    https_get(test_pid2, test1);
+    CString cs_temp;
+    cs_temp.Format(_T("\
+%s : %d\r\n \
+%s : %d\r\n \
+%s : %s\r\n \
+%s : %d\r\n \
+%s : %.1f\r\n \
+%s : %.1f\r\n \
+%s : %s\r\n \
+%s : %s\r\n \
+%s : %s\r\n "),
+test1.k_productID.KeyName, test1.k_productID.tValue.n_value,
+test1.k_serialNumber.KeyName, test1.k_serialNumber.tValue.n_value,
+test1.k_ipAddress.KeyName, test1.k_ipAddress.tValue.cs_value,
+test1.k_ipPort.KeyName, test1.k_ipPort.tValue.n_value,
+test1.k_hardwareVer.KeyName, test1.k_hardwareVer.tValue.f_value,
+test1.k_softwareVer.KeyName, test1.k_softwareVer.tValue.f_value,
+test1.k_lastCommunicationDate.KeyName, test1.k_lastCommunicationDate.tValue.cs_value,
+test1.k_createdAt.KeyName, test1.k_createdAt.tValue.cs_value,
+test1.k_updatedAt.KeyName, test1.k_updatedAt.tValue.cs_value);
+    MessageBox(cs_temp);
+    Sleep(1);
+#endif
+
+#endif // DEBUG
 }

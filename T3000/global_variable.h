@@ -43,6 +43,9 @@ CString CurrentT3000Version ;
 int nCom;
 //CString program_path=_T("");
 volatile int g_tstat_id=255;
+int g_protocol_support_ptp = PROTOCOL_UNKNOW;
+int g_output_support_relinquish = 0;
+unsigned short output_relinquish_value[128] ;
 int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。 
 unsigned int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
@@ -2251,6 +2254,7 @@ CString offline_prg_path;   //离线模式得prg 保存路径;
 
 bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
 bool n_wifi_connection;  //后台列表 刷新开关
+int MODE_SUPPORT_PTRANSFER; //  支持bip ptransfer 等于1时   wifi设备 和 T3BB系列的不在连接502端口
 bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
@@ -2281,3 +2285,4 @@ int n_read_list_flag = -1; // 读取那一个，例如读Input 还是Output
 int n_read_item_index = 0; // 读哪一个 例如Schedule3 的时间 ，不能用weekly_list 因为界面上的容易变。
 
 unsigned int DEBUG_DELAY_TIME = 0; //测试用调试Wifi 延迟时间;
+CString bacnet_string; // 待解析的字串
