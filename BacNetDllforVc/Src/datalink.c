@@ -32,6 +32,11 @@
  -------------------------------------------
 ####COPYRIGHTEND####*/
 #include "datalink.h"
+#include "dlmstp.h"
+#include "bip.h"
+#include "bvlc.h"
+#include "ptp.h"
+
 #include <string.h>
 #include <stdio.h>
 /** @file datalink.c  Optional run-time assignment of datalink transport */

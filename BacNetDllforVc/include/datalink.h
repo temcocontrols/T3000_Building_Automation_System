@@ -26,18 +26,7 @@
 
 #include "config.h"
 #include "bacdef.h"
-
-
-
-#include "ethernet.h"
-#include "arcnet.h"
-#include "dlmstp.h"
-#include "bip.h"
-#include "bvlc.h"
 #include "npdu.h"
-#include "ptp.h"
-
-
 
 #ifdef __cplusplus
 extern "C" {
