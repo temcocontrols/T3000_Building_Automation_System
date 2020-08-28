@@ -18,7 +18,7 @@
     <ProjectGuid>{F7226464-C41C-4909-BF74-97328B72FFC8}</ProjectGuid>
     <RootNamespace>T3000</RootNamespace>
     <Keyword>MFCProj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -27,17 +27,17 @@
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -139,9 +139,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\ISP\JPGLoader.cpp" />
     <ClCompile Include="..\ISP\MyPing.cpp" />
-    <ClCompile Include="..\ISP\Splash.cpp" />
     <ClCompile Include="..\SQLiteDriver\CppSQLite3.cpp" />
     <ClCompile Include="AddBuilding.cpp" />
     <ClCompile Include="AfxMessageDialog.cpp" />
@@ -164,7 +162,6 @@
     <ClCompile Include="BacnetController.cpp" />
     <ClCompile Include="BacnetCustomerDigitalRange.cpp" />
     <ClCompile Include="BacnetEditLabel.cpp" />
-    <ClCompile Include="BacnetEmailAlarm.cpp" />
     <ClCompile Include="BacnetGraphic.cpp" />
     <ClCompile Include="BacnetGraphicSetting.cpp" />
     <ClCompile Include="BacnetInput.cpp" />
@@ -184,12 +181,7 @@
     <ClCompile Include="BacnetScreen.cpp" />
     <ClCompile Include="BacnetScreenEdit.cpp" />
     <ClCompile Include="BacnetSetting.cpp" />
-    <ClCompile Include="BacnetSettingBasicInfo.cpp" />
-    <ClCompile Include="BacnetSettingDyndns.cpp" />
     <ClCompile Include="BacnetSettingHealth.cpp" />
-    <ClCompile Include="BacnetSettingTcpip.cpp" />
-    <ClCompile Include="BacnetSettingTime.cpp" />
-    <ClCompile Include="BacnetThirdPartyMain.cpp" />
     <ClCompile Include="BacnetTool.cpp" />
     <ClCompile Include="BacnetToolReadProperty.cpp" />
     <ClCompile Include="BacnetTstat.cpp" />
@@ -202,7 +194,6 @@
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="Bacnet_Range_Msv.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
-    <ClCompile Include="BancetProperty.cpp" />
     <ClCompile Include="BatchSNDlg.cpp" />
     <ClCompile Include="BinFileParser.cpp" />
     <ClCompile Include="BoatMonitorViewer.cpp" />
@@ -244,7 +235,6 @@
     <ClCompile Include="CM5\MyOwnListCtrl.cpp" />
     <ClCompile Include="CM5\PointItem.cpp" />
     <ClCompile Include="CO2NetView.cpp" />
-    <ClCompile Include="CO2_AUTO_CALIBRATION.cpp" />
     <ClCompile Include="CO2_NodeView.cpp" />
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="ConfigFileHandler.cpp" />
@@ -354,12 +344,10 @@
     <ClCompile Include="TrendLogWnd.cpp" />
     <ClCompile Include="TroubleShootDlg.cpp" />
     <ClCompile Include="TstatAQ.cpp" />
-    <ClCompile Include="TstatAQI_Detail.cpp" />
     <ClCompile Include="TstatIconSetting.cpp" />
     <ClCompile Include="TStatInputView.cpp" />
     <ClCompile Include="TStatOutputView.cpp" />
     <ClCompile Include="TstatRangeDlg.cpp" />
-    <ClCompile Include="TstatSetpointDetail.cpp" />
     <ClCompile Include="TstatZigbeeLogic.cpp" />
     <ClCompile Include="TStat_Dev.cpp" />
     <ClCompile Include="TStat_Net.cpp" />
