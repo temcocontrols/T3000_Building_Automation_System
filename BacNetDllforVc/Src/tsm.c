@@ -35,17 +35,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
-#include "bits.h"
-#include "apdu.h"
-#include "bacdef.h"
-#include "bacdcode.h"
-#include "bacenum.h"
 #include "tsm.h"
-#include "config.h"
-#include "datalink.h"
-#include "handlers.h"
-#include "address.h"
+#include "apdu.h"
 #include "bacaddr.h"
+#include "datalink.h"
 
 /** @file tsm.c  BACnet Transaction State Machine operations  */
 
