@@ -22,10 +22,7 @@
  
 #include <windows.h>  
 #include <tchar.h> 
-
-typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
-
-LPFN_ISWOW64PROCESS fnIsWow64Process;  
+ 
 const unsigned int g_versionNO= 20200814;
 
 
@@ -34,7 +31,7 @@ const unsigned int g_versionNO= 20200814;
 #endif
 
 #include "global_variable.h"
-ULONG_PTR g_gdiplusToken;
+
 BEGIN_MESSAGE_MAP(CT3000App, CWinAppEx)
 	ON_COMMAND(ID_APP_ABOUT, &CT3000App::OnAppAbout)
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
@@ -70,19 +67,9 @@ CT3000App::CT3000App()
 
 	m_lastinterface=19;
 }
+
 // The one and only CT3000App object
 CT3000App theApp;
-
-UINT UpdateT3000Background(LPVOID pParam)
-{
-  CT3000App* T3000App = (CT3000App*)pParam;
-  TCHAR exeFullPath[MAX_PATH+1]; //
-  GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
-  (_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
-
-return TRUE;
-}
-
 
 BOOL CT3000App::IsWow64()  
 {  
@@ -91,9 +78,10 @@ BOOL CT3000App::IsWow64()
     //IsWow64Process is not available on all supported versions of Windows.  
     //Use GetModuleHandle to get a handle to the DLL that contains the function  
     //and GetProcAddress to get a pointer to the function if available.  
+	typedef BOOL(WINAPI* LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 
-    fnIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress(  
-        GetModuleHandle(TEXT("kernel32")),"IsWow64Process");  
+	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
+		GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
 
     if(NULL != fnIsWow64Process)  
     {  
@@ -399,13 +387,6 @@ BOOL CT3000App::InitInstance()
 #if 1	
 		try
 		{
-
-			TCHAR exeFullPath[MAX_PATH+1]; //
-			GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
-			(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
-			g_strDatabasefilepath=exeFullPath;//
-			g_strExePth=g_strDatabasefilepath;//
-
             CreateDirectory(g_strExePth + _T("ResourceFile"), NULL);//creat database folder;//
             CString cs_update_folder;
             cs_update_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("Update");
@@ -691,7 +672,7 @@ BOOL CT3000App::InitInstance()
 			ttParams.m_bVislManagerTheme = TRUE;
 			theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
 				RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams); 
-#if 1
+#if 0
 			hr=CoInitialize(NULL);//
 			if(FAILED(hr)) 	//
 			{
@@ -745,6 +726,7 @@ BOOL CT3000App::InitInstance()
 
 
 		GdiplusStartupInput gdiplusStartupInput;//
+		ULONG_PTR g_gdiplusToken;
 		GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//
 
 
@@ -976,15 +958,11 @@ BOOL CT3000App::haveRegister()
 
 void CT3000App::GetModulePath()
 {
- 
-
 	TCHAR exeFullPath[MAX_PATH + 1]; //
 	GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
 	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
 	g_strDatabasefilepath = exeFullPath;//
 	g_strExePth = g_strDatabasefilepath;//
-
-	
 }
 
 int CT3000App::GetSoftInstallDays()
