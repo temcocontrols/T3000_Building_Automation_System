@@ -203,10 +203,10 @@ void CT3000App::UpdateDB()
 		for (int i = 0 ;i<m_Building_ALL.size();i++)
 		{
 			StrSql.Format(_T("Insert Into Building_ALL(Building_Name,Default_Build,Telephone,Address)  Values('%s',%d,'%s','%s')"),
-				m_Building_ALL.at(i).Building_Name
-				, m_Building_ALL.at(i).Default_Building
-				, m_Building_ALL.at(i).Telephone
-				, m_Building_ALL.at(i).Address);
+				m_Building_ALL[i].Building_Name
+				, m_Building_ALL[i].Default_Building
+				, m_Building_ALL[i].Telephone
+				, m_Building_ALL[i].Address);
 			SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
 		}
 
@@ -216,24 +216,24 @@ void CT3000App::UpdateDB()
 		for (int j=0;j<m_Building.size();j++)
 		{
 			StrSql.Format(_T("Insert Into Building(Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate,Default_SubBuilding,Building_Path,Longitude,Elevation,ID,country,state,city,street,ZIP,EngineeringUnits) Values('%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s',%d,'%s','%s','%s','%s','%s','%s')"),
-				m_Building.at(j).Main_BuildingName,
-				m_Building.at(j).Building_Name,
-				m_Building.at(j).Protocal,
-				m_Building.at(j).Com_Port,
-				m_Building.at(j).Ip_Address,
-				m_Building.at(j).Ip_Port,
-				m_Building.at(j).Baudrate,
-				m_Building.at(j).Default_SubBuilding,
-				m_Building.at(j).Building_Path,
-				m_Building.at(j).Longitude,
-				m_Building.at(j).Elevation,
-				m_Building.at(j).ID,
-				m_Building.at(j).country,
-				m_Building.at(j).state,
-				m_Building.at(j).city,
-				m_Building.at(j).street,
-				m_Building.at(j).ZIP,
-				m_Building.at(j).EngineeringUnits);
+				m_Building[j].Main_BuildingName,
+				m_Building[j].Building_Name,
+				m_Building[j].Protocal,
+				m_Building[j].Com_Port,
+				m_Building[j].Ip_Address,
+				m_Building[j].Ip_Port,
+				m_Building[j].Baudrate,
+				m_Building[j].Default_SubBuilding,
+				m_Building[j].Building_Path,
+				m_Building[j].Longitude,
+				m_Building[j].Elevation,
+				m_Building[j].ID,
+				m_Building[j].country,
+				m_Building[j].state,
+				m_Building[j].city,
+				m_Building[j].street,
+				m_Building[j].ZIP,
+				m_Building[j].EngineeringUnits);
 			SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
 		}
 		SqliteDBT3000.closedb();
@@ -641,7 +641,7 @@ BOOL CT3000App::InitInstance()
 			ttParams.m_bVislManagerTheme = TRUE;
 			theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
 				RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams); 
-#if 0
+#if 1
 			hr=CoInitialize(NULL);//
 			if(FAILED(hr)) 	//
 			{
