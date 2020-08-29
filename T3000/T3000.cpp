@@ -102,39 +102,8 @@ BOOL CT3000App::user_login()
 		return false;
 	return true;
 }
-// CT3000App initialization
-BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
-{
-	LPCTSTR   pszDllName   =   OcxFileName   ;			//ActiveX控件的路径及文件名       
-	HINSTANCE   hLib   =   LoadLibrary(pszDllName);    //装载ActiveX控件   
-	if   (hLib   <   (HINSTANCE)HINSTANCE_ERROR)   
-	{   
-		return   FALSE;   
-	}   
-	FARPROC   lpDllEntryPoint;     
-	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));     //获取注册函数DllRegisterServer地址   
-	if(lpDllEntryPoint!=NULL)														 //调用注册函数DllRegisterServer   
-	{   
-		if(FAILED((*lpDllEntryPoint)()))   
-		{//   AfxMessageBox(_T("false"));
-			FreeLibrary(hLib);   
-			return   FALSE;   
-			
-		}   
-		return   TRUE;   
-	}   
-	else   
-	{
-	//	AfxMessageBox(_T("false"));
-			return   FALSE;
 
-
-	}
-	
-}
  
-
-
 void CT3000App::UpdateDB()
 {
     BOOL is_update = FALSE;
