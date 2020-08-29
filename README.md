@@ -19,7 +19,6 @@ maurice (at) temcocontrols (dot) com
 
 ![T3000_Building_Automation_System](image/T3_Bacnet_Controller_1.jpg "T3000 Bacnet Controllers")
 ![T3000_Building_Automation_System](image/T3_Bacnet_Controller_2.jpg "T3000 Bacnet Controller Overview")
-![T3000_Building_Automation_System](image/T3_Bacnet_Controller_3.jpg "T3000 Software Screenshot")
 ![T3000_Building_Automation_System](image/T3_Bacnet_Controller_4.jpg "T3000 Bacnet Controller IO List")
 ![T3000_Building_Automation_System](image/T3_Bacnet_Controller_5.jpg "T3000 Bacnet Controller Network Structure")
-
+![T3000_Building_Automation_System](image/T3000UserInterface.png "T3000 Software Screenshot")
