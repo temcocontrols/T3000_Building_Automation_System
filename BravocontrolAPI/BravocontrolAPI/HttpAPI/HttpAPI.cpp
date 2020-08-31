@@ -92,7 +92,7 @@ OUTPUT int https_get(int npid, StrGetProductID &sGetPIDInfo)
 #endif
 
     CString apiPath = _T("/customerProduct/") + temp_pid;
-    
+    //CString apiPath = _T("/customerProduct/") + temp_pid + _T("/software");
 
     char cTemp1[255];
     memset(cTemp1, 0, 255);

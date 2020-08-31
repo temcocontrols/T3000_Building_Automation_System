@@ -907,8 +907,16 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         CString temp_modbus_id;
         CString temp_mstp_id;
         temp_object.Format(_T("%u"), Device_Basic_Setting.reg.object_instance);
-        temp_mac_address.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"), Device_Basic_Setting.reg.mac_addr[0], Device_Basic_Setting.reg.mac_addr[1], Device_Basic_Setting.reg.mac_addr[2],
-            Device_Basic_Setting.reg.mac_addr[3], Device_Basic_Setting.reg.mac_addr[4], Device_Basic_Setting.reg.mac_addr[5]);
+        if (((Device_Basic_Setting.reg.mac_addr[0] == 0) && (Device_Basic_Setting.reg.mac_addr[1] == 0) && (Device_Basic_Setting.reg.mac_addr[2] == 0) && (Device_Basic_Setting.reg.mac_addr[3] == 0) && (Device_Basic_Setting.reg.mac_addr[4] == 0) && (Device_Basic_Setting.reg.mac_addr[5] == 0) ) ||
+            ((Device_Basic_Setting.reg.mac_addr[0] == 0xff) && (Device_Basic_Setting.reg.mac_addr[1] == 0xff) && (Device_Basic_Setting.reg.mac_addr[2] == 0xff) && (Device_Basic_Setting.reg.mac_addr[3] == 0xff) && (Device_Basic_Setting.reg.mac_addr[4] == 0xff) && (Device_Basic_Setting.reg.mac_addr[5] == 0xff)) )
+        {
+            temp_mac_address.Empty();
+        }
+        else
+        {
+            temp_mac_address.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"), Device_Basic_Setting.reg.mac_addr[0], Device_Basic_Setting.reg.mac_addr[1], Device_Basic_Setting.reg.mac_addr[2],
+                Device_Basic_Setting.reg.mac_addr[3], Device_Basic_Setting.reg.mac_addr[4], Device_Basic_Setting.reg.mac_addr[5]);
+        }
         temp_mac_address.MakeUpper();
         temp_mstp_network.Format(_T("%u"), Device_Basic_Setting.reg.mstp_network_number);
         temp_bip_network.Format(_T("%u"), Device_Basic_Setting.reg.network_number);
@@ -958,12 +966,12 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                     if (Device_time.new_time.n_time > (temp_time_long + 60))  //大于本地一分钟以上 需同步
                         temp_need_sync = 1;
                 }
-                else if(Device_time.new_time.n_time > temp_time_long - 120) // 比本地时间小2分钟以内 ， 不用不同步
+                else if(Device_time.new_time.n_time > temp_time_long - 180) // 比本地时间小3分钟以内 ， 不同步
                 {
                         temp_need_sync = 0;
                 }
                 else
-                    temp_need_sync = 1; //小两分钟以上，需要同步;
+                    temp_need_sync = 1; //小3分钟以上，需要同步;
 
                 n_ignore_sync_time = GetPrivateProfileInt(_T("SYNC_Time"), _T("ignore_pop"), 0, g_cstring_ini_path);
                 last_ignore_sync_time = GetPrivateProfileInt(_T("SYNC_Time"), _T("ignore_pop_time"), 0, g_cstring_ini_path);

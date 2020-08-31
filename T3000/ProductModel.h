@@ -57,6 +57,7 @@
 #define PM_TSTAT_AQ                   62   //TSTAT AQ 没有各种控制 输入输出的版本; 
 #define PM_ZIGBEE_REPEATER            63   //zigbee的中继器
 #define PM_TSTAT6_HUM_Chamber         64
+#define PM_AIRLAB_ESP32               65   //和Airlab 功能一模一样  带wifi的芯片
 #define PM_BEENY                      70
 #define PM_WATER_SENSOR               71
 #define PM_T3_LC                      72

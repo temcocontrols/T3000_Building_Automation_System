@@ -8147,6 +8147,15 @@ void check_function_table(char *richeditchar ,int ntype)
 
 }
 
+
+void clear_local_var()
+{
+    for (int xy = 0; xy < 40; xy++)
+    {
+        memset(local_var_new_name[xy], 0, 40);
+    }
+}
+
 void check_each_point(char *richeditchar,int item_count ,int ntype)
 {
 	Str_char_pos_color temp_pos_color;

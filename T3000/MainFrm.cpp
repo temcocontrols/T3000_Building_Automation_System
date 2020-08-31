@@ -4593,7 +4593,8 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 		  BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT +
 		  BAC_PROGRAM_ITEM_COUNT*5 +   //乘以5 是因为每个program都有5包，共2000个字节要读;
 		  1 +		//这个1是Setting
-		  1;		//这个1是Variable Custmer Units.	
+		  1 +
+          BAC_SCHEDULE_FLAG_GROUP;		//这个1是Variable Custmer Units.	
 
 
 	  int read_all_step = 1000 / read_total_count;
@@ -5036,6 +5037,29 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
          g_progress_persent = read_success_count * 100 / read_total_count;
      }
 
+     for (int i = 0; i<BAC_SCHEDULE_FLAG_GROUP; i++)
+     {
+         end_temp_instance = BAC_READ_SCHEDULE_FLAG_REMAINDER + (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i;
+         if (end_temp_instance >= BAC_SCHEDULE_COUNT)
+             end_temp_instance = BAC_SCHEDULE_COUNT - 1;
+         if (GetPrivateData_Blocking(g_bac_instance, READ_SCHEDUAL_TIME_FLAG, (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_schedual_time_flag)) > 0)
+         {
+             Mession_ret.Format(_T("Read schedule flag list form %d to %d success."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
+             SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+             read_success_count++;
+             Sleep(SEND_COMMAND_DELAY_TIME);
+         }
+         else
+         {
+             Mession_ret.Format(_T("Read schedule flag list form %d to %d timeout."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
+             SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+             goto read_end_thread;
+         }
+         g_progress_persent = read_success_count * 100 / read_total_count;
+     }
+
+
+
 	 read_write_bacnet_config = false;
 	 hwait_read_thread = NULL;
 	 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data success!"));
@@ -5164,6 +5188,29 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
             + 1		//Setting
             + 1;    //Variable_Cus_Units
+    }
+    else if (temp_prg_version == 8)
+    {
+        write_total_count = BAC_INPUT_GROUP +
+            BAC_OUTPUT_GROUP +
+            BAC_PROGRAM_GROUP +
+            BAC_VARIABLE_GROUP +
+            BAC_PID_GROUP +
+            BAC_PROGRAMCODE_GROUP +
+            BAC_SCREEN_GROUP +
+            BAC_MONITOR_GROUP +
+            BAC_SCHEDULE_GROUP +
+            BAC_HOLIDAY_GROUP +
+            BAC_SCHEDULECODE_GOUP +
+            BAC_HOLIDAYCODE_GROUP +
+            BAC_GRPHIC_LABEL_GROUP +
+            BAC_CUSTOMER_UNIT_GROUP +
+            BAC_USER_LOGIN_GROUP +
+            BAC_MSV_GROUP +
+            BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
+            + 1		//Setting
+            + 1     //Variable_Cus_Units
+            + BAC_SCHEDULE_FLAG_GROUP;    // Schedule time flag 需要两包能读取完成;
     }
 	else
 	{
@@ -5596,6 +5643,32 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 
 	}
 
+
+
+    if (temp_prg_version >= 8)	 // version 8  schedule flag time 中才加的这玩意;
+    {
+        for (int i = 0; i < BAC_SCHEDULE_FLAG_GROUP; i++)
+        {
+            end_temp_instance = BAC_READ_SCHEDULE_FLAG_REMAINDER + (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i;
+            if (end_temp_instance >= BAC_SCHEDULE_COUNT)
+                end_temp_instance = BAC_SCHEDULE_COUNT - 1;
+            if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance) > 0)
+            {
+                Mession_ret.Format(_T("Write schedule flag form %d to %d success."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+                write_success_count++;
+                Sleep(SEND_COMMAND_DELAY_TIME);
+            }
+            else
+            {
+                Mession_ret.Format(_T("Write schedule flag form %d to %d timeout."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+                goto write_end_thread;
+            }
+            g_progress_persent = write_success_count * 100 / write_total_count;
+        }
+
+    }
 
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,WRITEPRGFLASH_COMMAND);
 

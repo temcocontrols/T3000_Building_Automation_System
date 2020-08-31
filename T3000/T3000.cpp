@@ -67,7 +67,6 @@ CT3000App::CT3000App()
 
 	m_lastinterface=19;
 }
-
 // The one and only CT3000App object
 CT3000App theApp;
 
@@ -104,6 +103,8 @@ BOOL CT3000App::user_login()
 }
 
  
+
+
 void CT3000App::UpdateDB()
 {
     BOOL is_update = FALSE;

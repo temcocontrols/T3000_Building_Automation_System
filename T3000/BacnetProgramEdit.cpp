@@ -16,10 +16,11 @@
 extern CBacnetProgramEdit *ProgramEdit_Window;
 #define  WM_RICHEDIT_RIGHT_CLICK  WM_USER + 1001
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
+extern void clear_local_var();
 CBacnetProgramDebug * Program_Debug_Window = NULL;
 extern int error;
 extern char *pmes;
-
+int refresh_program_text_color = false;  //控制点击刷新按钮后，更新所有的数据颜色;
 vector <Str_char_pos_color> m_prg_label_error_color;	//用于highlight 关键字用;
 vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
 vector <Str_char_pos_color> buffer_prg_char_color; //用于防止频繁更新界面引起的闪烁问题;
@@ -224,6 +225,7 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 {
 
 	CDialogEx::OnInitDialog();
+    clear_local_var();
 	CString ShowProgramText;
 	CString temp_label;
 	MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(program_list_line).label,(int)strlen((char *)m_Program_data.at(program_list_line).label)+1, 
@@ -892,7 +894,8 @@ void CBacnetProgramEdit::OnEnSetfocusRichedit2Program()
 void CBacnetProgramEdit::OnRefresh()
 {
 	
-
+    refresh_program_text_color = true;
+    copy_data_to_ptrpanel(TYPE_ALL);
 	memset(mycode,0,2000);
 
 
@@ -1160,8 +1163,9 @@ void CBacnetProgramEdit::UpdateDataProgramText()
 {
 	CString Edit_Buffer;
 	GetDlgItemText(IDC_RICHEDIT2_PROGRAM,Edit_Buffer);
-	if(AnalysisString.CompareNoCase(Edit_Buffer) != 0)
+	if((AnalysisString.CompareNoCase(Edit_Buffer) != 0) || (refresh_program_text_color == true))
 	{
+        refresh_program_text_color = false;
 		AnalysisString = Edit_Buffer;
 		CString tempcs;
 		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);

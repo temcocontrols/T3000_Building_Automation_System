@@ -26,6 +26,7 @@
 unsigned char ready_towrite_mac[6] = { 0 };
 unsigned int ready_towrite_sn = 0;
 int g_write_mac = 0;
+int g_write_wifi_mac = 0;
 HANDLE h_sn_mac_thread = NULL;
 int g_sn_product_id = 0;
 int g_write_hardware_version = 0;
@@ -3120,7 +3121,7 @@ void CISPDlg::OnTimer(UINT_PTR nIDEvent)
         else
             GetDlgItem(IDC_EDIT_SN)->SetWindowTextW(_T(""));
 
-        if (g_write_mac == 1)
+        if ((g_write_mac == 1) || (g_write_wifi_mac == 1))
         {
             CString temp_mac;
             temp_mac.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"), ready_towrite_mac[0], ready_towrite_mac[1], ready_towrite_mac[2], ready_towrite_mac[3], ready_towrite_mac[4], ready_towrite_mac[5] );
@@ -3262,6 +3263,7 @@ LRESULT CISPDlg::Fresh_CloseSN_fcuntion(WPARAM wParam, LPARAM lParam)
     KillTimer(SN_MAC_SHOW_TIMER);
     GetDlgItem(IDC_BUTTON_FLASH_SN)->EnableWindow(TRUE);
     GetDlgItem(IDC_CHECK_FLASH_MAC)->EnableWindow(TRUE);
+    GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC)->EnableWindow(TRUE);
     close_com();
     h_sn_mac_thread = NULL;
     return 1;
@@ -3610,6 +3612,126 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     }
 
 
+    //if(0)
+    if (g_write_wifi_mac == 1)
+    {
+        strSql.Format(_T("select top 1 * from MAC order by ID desc"));
+        monitor_bado.m_pRecordset = monitor_bado.OpenRecordset(strSql);
+        device_id_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
+
+        while (VARIANT_FALSE == monitor_bado.m_pRecordset->EndOfFile)
+        {
+            unsigned char Temp_MAC[6];
+            temp_variant = monitor_bado.m_pRecordset->GetCollect("100");
+            if (temp_variant.vt != VT_NULL)
+                Temp_MAC[0] = temp_variant;
+
+            temp_variant = monitor_bado.m_pRecordset->GetCollect("101");
+            if (temp_variant.vt != VT_NULL)
+                Temp_MAC[1] = temp_variant;
+            temp_variant = monitor_bado.m_pRecordset->GetCollect("102");
+            if (temp_variant.vt != VT_NULL)
+                Temp_MAC[2] = temp_variant;
+            temp_variant = monitor_bado.m_pRecordset->GetCollect("103");
+            if (temp_variant.vt != VT_NULL)
+                Temp_MAC[3] = temp_variant;
+            temp_variant = monitor_bado.m_pRecordset->GetCollect("104");
+            if (temp_variant.vt != VT_NULL)
+                Temp_MAC[4] = temp_variant;
+            temp_variant = monitor_bado.m_pRecordset->GetCollect("105");
+            if (temp_variant.vt != VT_NULL)
+                Temp_MAC[5] = temp_variant;
+
+            memcpy(ready_towrite_mac, Temp_MAC, 6 * sizeof(char));
+            monitor_bado.m_pRecordset->MoveNext();
+        }
+
+        ready_towrite_mac[5] ++;
+        if (ready_towrite_mac[5] > 254)
+        {
+            ready_towrite_mac[5] = 0;
+            ready_towrite_mac[4]++;
+        }
+
+        if (ready_towrite_mac[4] > 254)
+        {
+            ready_towrite_mac[4] = 0;
+            ready_towrite_mac[3]++;
+        }
+
+        if (ready_towrite_mac[3] > 254)
+        {
+            ready_towrite_mac[3] = 0;
+            ready_towrite_mac[2]++;
+        }
+
+        if (ready_towrite_mac[2] > 254)
+        {
+            ready_towrite_mac[2] = 0;
+            ready_towrite_mac[1]++;
+        }
+
+        if (ready_towrite_mac[1] > 254)
+        {
+            ready_towrite_mac[1] = 0;
+            ready_towrite_mac[0]++;
+        }
+        CString temp_pid_type_name = GetProductName(temp_read_reg[7]);
+        strSql.Format(_T("insert into MAC(100,101,102,103,104,105,Product_Name,Serial_Number,Record_Date) values(%i,%i,%i,%i,%i,%i,'%s',%i,'%s')"),
+            ready_towrite_mac[0], ready_towrite_mac[1], ready_towrite_mac[2], ready_towrite_mac[3], ready_towrite_mac[4], ready_towrite_mac[5],
+            temp_pid_type_name, ready_towrite_sn, temp_time_format);
+        monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+        sn_mac_info.Format(_T("准备写入WIFI MAC地址:%x-%x-%x-%x-%x-%x"), g_write_hardware_version,
+            ready_towrite_mac[1], ready_towrite_mac[2], ready_towrite_mac[3], ready_towrite_mac[4], ready_towrite_mac[5]);
+        Sleep(1000);
+
+
+#if 1 //写 wifi mac 地址
+        //STATIC_IP_START_REG  2070  6 个寄存器
+
+        unsigned short write_value[6];
+        for (int i = 0; i < 6; i++)
+        {
+            write_value[i] = ready_towrite_mac[i];
+        }
+        write_value[0] = 0x18;
+        int n_mac_ret = 0;
+
+            n_mac_ret = write_multi_Short(temp_read_reg[6], write_value, 2070, 6);
+
+        if (n_mac_ret < 0)
+        {
+            sn_mac_info.Format(_T("写入WIFI MAC地址失败"));
+            Sleep(1000);
+            ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
+            return 1;
+        }
+        else
+        {
+            sn_mac_info.Format(_T("写入WIFI MAC地址成功"));
+            Sleep(1000);
+        }
+
+        sn_mac_info.Format(_T("校验WIFI MAC地址"));
+        Sleep(3000);
+        unsigned short temp_read_mac[6] = { 0 };
+        temp_mu_ret = read_multi_tap(temp_read_reg[6], temp_read_mac, 2070, 6);
+
+        int ret_com = memcmp(write_value, temp_read_mac, 6);
+        if (ret_com != 0)
+        {
+            sn_mac_info.Format(_T("校验WIFI MAC地址  失败"));
+            Sleep(1000);
+            ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
+            return 1;
+        }
+
+
+#endif
+    }
+
+
     if (handle_write_sensor_info == 1)
     {
         //先要确认 是否支持写入sensor 标志;
@@ -3686,6 +3808,8 @@ void CISPDlg::OnBnClickedButtonFlashSn()
     GetDlgItem(IDC_EDIT_SN)->SetWindowTextW(_T(""));
 
     ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(false);
+    ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(false);
+    
     if (((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->GetCheck())
     {
         g_write_mac = 1;
@@ -3694,6 +3818,16 @@ void CISPDlg::OnBnClickedButtonFlashSn()
     {
         g_write_mac = 0;
     }
+
+    if (((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->GetCheck())
+    {
+        g_write_wifi_mac = 1;
+    }
+    else
+    {
+        g_write_wifi_mac = 0;
+    }
+
     CString ProductName;
     ((CComboBox *)GetDlgItem(IDC_COMBO_PM))->GetWindowTextW(ProductName);
     
@@ -3731,6 +3865,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
     {
         m_static_info.SetWindowTextW(_T("硬件产品号不能为零"));
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(true);
+        ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(true);
         return;
     }
 
@@ -3755,6 +3890,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
     {
         m_static_info.SetWindowTextW(_T("产品号未定义"));
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(true);
+        ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(true);
         return;
     }
     if (handle_write_sensor_info)

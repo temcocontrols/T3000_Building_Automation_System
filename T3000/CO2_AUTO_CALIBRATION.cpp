@@ -115,7 +115,7 @@ void CCO2_AUTO_CALIBRATION::OnBnClickedButton1()
     temp_int = _wtoi(temp_cstring);
     if ((temp_int < 7) || (temp_int > 30))
     {
-        MessageBox(_T("Maximum adjustment per day should be in this range (7 - 30)"));
+        MessageBox(_T("Watch days for lowest PPM reading should be in this range (7 - 30)"));
         return;
     }
 

@@ -1915,7 +1915,11 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
 
 
     int send_status = true;
-    
+    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) //如果支持 转接头协议 ，并且默认重试10次，就改默认3次，没必要那么久;
+    {
+        if (retrytime == 10)
+            retrytime = 1;
+    }
     for (int z=0; z<retrytime; z++)
     {
 		int temp_invoke_id = -1;
@@ -1924,7 +1928,7 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
         do
         {
             resend_count ++;
-            if(resend_count>retrytime)
+            if(resend_count>3)
             {
                 send_status = false;
                 break;
@@ -2442,7 +2446,10 @@ int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance
         bool end_flag = false;
         int ret_length = 0;
         ret_length = read_ptp_data(g_tstat_id, test_data, READPROGRAMCODE_T3000, start_instance, end_instance, entitysize);
-        ret_results = Bacnet_PrivateData_Deal((char *)test_data, ret_length, end_flag);
+        if (ret_length >= 0)
+            ret_results = Bacnet_PrivateData_Deal((char *)test_data, ret_length, end_flag);
+        else
+            ret_results = -3; //读转接头命令超时;
         return ret_results;
     }
 
@@ -5444,6 +5451,8 @@ void local_handler_conf_private_trans_ack(
     }
 	bac_select_device_online = true;
     local_handler_update_bacnet_ui(receive_data_type, each_end_flag);
+    if (each_end_flag)
+        copy_data_to_ptrpanel(TYPE_ALL);
 #if 0
     switch(receive_data_type)
     {
@@ -8013,7 +8022,8 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
 //杜帆Load 
 int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 {
-    if((g_mac!=0) &&(g_bac_instance!=0))
+    //if((g_mac!=0) &&(g_bac_instance!=0))
+    if (1)
     {
         CString FilePath;
         if(write_to_device)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
@@ -8958,6 +8968,16 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
                     temp_point = temp_point + sizeof(Str_MSV);
                 }
             }
+
+            if (ntemp_version >= 8)	//第8版中新增的 schedule flag 要读写 
+            {
+                for (int i = 0; i<BAC_SCHEDULE_COUNT; i++)
+                {
+                    memcpy(&m_Schedual_time_flag.at(i), temp_point, sizeof(Str_schedual_time_flag));
+                    temp_point = temp_point + sizeof(Str_schedual_time_flag);
+                }
+            }
+
 		}
 
 
@@ -9013,7 +9033,7 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
     }
 
 
-    return 0;
+    return 1;
 }
 
 //杜帆Save
@@ -9024,7 +9044,7 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
     memset(pBuf, 0, 200000);
     pBuf[0] = 0x55;
     pBuf[1] = 0xff;
-    pBuf[2] = 0x07;//version
+    pBuf[2] = 0x08;//version
     char * original_point = NULL;
     char * temp_point = NULL;
     original_point = pBuf;
@@ -9141,6 +9161,13 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
     {
         memcpy(temp_point, &m_msv_data.at(i), sizeof(Str_MSV));
         temp_point = temp_point + sizeof(Str_MSV);
+    }
+
+    //version 8 新增 schedule time flag
+    for (int i = 0; i < BAC_SCHEDULE_COUNT; i++)
+    {
+        memcpy(temp_point, &m_Schedual_time_flag.at(i), sizeof(Str_schedual_time_flag));
+        temp_point = temp_point + sizeof(Str_schedual_time_flag);
     }
 
 
@@ -13261,9 +13288,9 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
         }
         break;
         case TINY_EX_MINIPANEL:
-        case MINIPANELARM_TB:  //6DO   8AO
+        case MINIPANELARM_TB:  //8DO   6AO
         {
-            if (portindex <= 6)
+            if (portindex <= 8)
                 nret_type = OUTPUT_DIGITAL_PORT;
             else if (portindex <= 14)
                 nret_type = OUTPUT_ANALOG_PORT;

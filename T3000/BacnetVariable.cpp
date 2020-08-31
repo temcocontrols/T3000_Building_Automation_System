@@ -11,9 +11,10 @@
 #include "global_function.h"
 #include "global_define.h"
 #include "BacnetRange.h"
+#include "MainFrm.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
-
+extern tree_product selected_product_Node; // 选中的设备信息;
 
 
 
@@ -68,9 +69,13 @@ LRESULT  CBacnetVariable::VariableMessageCallBack(WPARAM wParam, LPARAM lParam)
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		if((pInvoke->mRow < BAC_VARIABLE_ITEM_COUNT) && (pInvoke->mRow >= 0))
 		{
-			Post_Refresh_One_Message(g_bac_instance,READVARIABLE_T3000,
-				pInvoke->mRow,pInvoke->mRow,sizeof(Str_variable_point));
-			SetTimer(3,2000,NULL);
+            if ((!SPECIAL_BAC_TO_MODBUS) && (Bacnet_Private_Device(selected_product_Node.product_class_id))) //不是转Modbus的协议的 就调用下面的刷新单条.)
+            {
+                Post_Refresh_One_Message(g_bac_instance, READVARIABLE_T3000,
+                    pInvoke->mRow, pInvoke->mRow, sizeof(Str_variable_point));
+                SetTimer(3, 2000, NULL);
+            }
+
 		}
 	}
 	else

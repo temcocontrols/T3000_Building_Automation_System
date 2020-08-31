@@ -8,6 +8,10 @@
 MSFLXGRD.MSM
 COMCAT.MSM
 拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
+
+2020 08 17
+1.修复在input和output界面 ，写入值时，会造成T3-22I以及T38AI8AO 重启的问题.
+
 2019 11 25
 1. 加入Yabe
 2. 修改ScreenEdit 当lable 很多时 ，根据数量动态 调整读取时间，并在退出时清空队列;
@@ -941,7 +945,7 @@ AnnualRout_InsertDia *HolidayEdit_Window = NULL;
 ControlBasicEditorView *ProgramNEWEdit_Window = NULL;
 extern char mycode[2000];
 int click_resend_time = 0;//当点击的时候，要切换device时 发送whois的次数;
-
+int load_prg_cache_ret = 0; //读取缓存文件的状态；
 // CDialogCM5_BacNet
 CString IP_ADDRESS;
 _Refresh_Info Bacnet_Refresh_Info;
@@ -2318,7 +2322,15 @@ void CDialogCM5_BacNet::Fresh()
 	{
 		return;
 	}
-    
+
+    load_prg_cache_ret = -1;
+    CString achive_file_path;
+    CString temp_serial;
+    temp_serial.Format(_T("%d.prog"), g_selected_serialnumber);
+    achive_file_path = g_achive_folder + _T("\\") + temp_serial;
+    load_prg_cache_ret = LoadBacnetBinaryFile(false, achive_file_path);
+
+
 //	g_NEED_MULTI_READ = FALSE;
 	already_retry = false;
 	read_write_bacnet_config = false;
@@ -4119,6 +4131,11 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             }
             else
             {
+                if (bac_read_which_list == BAC_READ_TIME_COMMAND)
+                {
+                    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+                    pFrame->HideBacnetWindow();
+                }
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read system time timeout!"));
             }
             Sleep(SEND_COMMAND_DELAY_TIME);
@@ -4162,6 +4179,12 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             }
             else
             {
+                if (bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND)
+                {
+                    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+                    pFrame->HideBacnetWindow();
+                }
+
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read setting timeout!"));
             }
             Sleep(SEND_COMMAND_DELAY_TIME*3);
@@ -5320,14 +5343,16 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	}
 	else
 	{	
-		if(g_protocol != PROTOCOL_BIP_TO_MSTP)
+        if(Bacnet_Private_Device(g_selected_product_id))
+		//if(g_protocol != PROTOCOL_BIP_TO_MSTP)
 		{
 			if(offline_mode)
 			{
 				LoadBacnetBinaryFile(false,offline_prg_path);
 				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 			}
-            else if(LoadBacnetBinaryFile(false, achive_file_path) < 0)
+            //else if(LoadBacnetBinaryFile(false, achive_file_path) < 0)
+            else if (load_prg_cache_ret < 0)
 			{
                 if (g_protocol == PROTOCOL_BACNET_IP)
                 {
@@ -5516,7 +5541,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			
 		}
 	}
-	if((!read_customer_unit) && selected_product_Node.protocol != MODBUS_RS485 
+	//if((!read_customer_unit) && selected_product_Node.protocol != MODBUS_RS485    20200820 只要点击 就在读一遍 ，老毛一直叫 没刷新 MSV的 unit 以前是 只读第一遍
+    if ( selected_product_Node.protocol != MODBUS_RS485
 		&& (
 			(selected_product_Node.product_class_id ==PM_CM5 ) 
 			||
@@ -6000,13 +6026,23 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
                 memcpy(&m_Output_data.at(i), &read_data_buffer[i * 23], sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
             }
 
+
             CString str_serialid;
             str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
-            CString achive_file_path;
-            CString temp_serial;
-            achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+            if (Bacnet_Private_Device(n_read_product_type))
+            {
+                SaveConfigFilePath = g_achive_folder + _T("\\") + str_serialid + _T(".prog");
+                ::PostMessageW(MainFram_hwd, MY_BAC_CONFIG_READ_RESULTS, 1, NULL);
+            }
+            else
+            {
+                CString achive_file_path;
+                CString temp_serial;
+                achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+                SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+            }
 
-            SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+
 
             unsigned short temp_read_data[128] = { 0 };
             int read_ret = 0;
@@ -6071,14 +6107,24 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 
                 memcpy(&m_Input_data.at(i), &read_data_buffer[i * 23], sizeof(Str_in_point));//因为Input 只有45个字节，两个byte放到1个 modbus的寄存器里面;
             }
-
             CString str_serialid;
             str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
-            CString achive_file_path;
-            CString temp_serial;
-            achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+            if (Bacnet_Private_Device(n_read_product_type))
+            {
+                SaveConfigFilePath = g_achive_folder + _T("\\")  + str_serialid + _T(".prog");
+                ::PostMessageW(MainFram_hwd, MY_BAC_CONFIG_READ_RESULTS, 1, NULL);
+            }
+            else
+            {
 
-            SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+                CString achive_file_path;
+                CString temp_serial;
+                achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+
+                SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+            }
+
+
 
 
             if (Input_Window->IsWindowVisible())
@@ -6169,11 +6215,21 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 
             CString str_serialid;
             str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
-            CString achive_file_path;
-            CString temp_serial;
-            achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+            if (Bacnet_Private_Device(n_read_product_type))
+            {
+                SaveConfigFilePath = g_achive_folder + _T("\\") + str_serialid + _T(".prog");
+                ::PostMessageW(MainFram_hwd, MY_BAC_CONFIG_READ_RESULTS, 1, NULL);
+            }
+            else
+            {
+                CString achive_file_path;
+                CString temp_serial;
+                achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+                SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+            }
 
-            SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+
+
 
             if (Variable_Window->IsWindowVisible())
                 ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
@@ -6266,13 +6322,23 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
                 memcpy(&m_Weekly_data.at(i), &read_data_buffer[i * 21], sizeof(Str_weekly_routine_point));
             }
 
+
             CString str_serialid;
             str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
-            CString achive_file_path;
-            CString temp_serial;
-            achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+            if (Bacnet_Private_Device(n_read_product_type))
+            {
+                SaveConfigFilePath = g_achive_folder + _T("\\") + str_serialid + _T(".prog");
+                ::PostMessageW(MainFram_hwd, MY_BAC_CONFIG_READ_RESULTS, 1, NULL);
+            }
+            else
+            {
+                CString achive_file_path;
+                CString temp_serial;
+                achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
 
-            SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+                SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+            }
+
 
             if (WeeklyRoutine_Window->IsWindowVisible())
                 ::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
@@ -6505,11 +6571,21 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 
             CString str_serialid;
             str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
-            CString achive_file_path;
-            CString temp_serial;
-            achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+            if (Bacnet_Private_Device(n_read_product_type))
+            {
+                SaveConfigFilePath = g_achive_folder + _T("\\") + str_serialid + _T(".prog");
+                ::PostMessageW(MainFram_hwd, MY_BAC_CONFIG_READ_RESULTS, 1, NULL);
+            }
+            else
+            {
+                CString achive_file_path;
+                CString temp_serial;
+                achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
 
-            SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+                SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+            }
+
+
 
 
             if (Setting_Window->IsWindowVisible())
@@ -6565,8 +6641,8 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
     }
     else if (connect_way == 2)
     {
-        //int nret = Open_Socket_Retry(selected_product_Node.BuildingInfo.strIp, selected_product_Node.ncomport, 3);
-        int nret = Open_Socket_Retry(_T("127.0.0.1"), selected_product_Node.ncomport, 3);
+        int nret = Open_Socket_Retry(selected_product_Node.BuildingInfo.strIp, selected_product_Node.ncomport, 3);
+        //int nret = Open_Socket_Retry(_T("127.0.0.1"), selected_product_Node.ncomport, 3);
         if (nret <= 0)
         {
             CString temp_cs2;
@@ -6628,6 +6704,10 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
      //}
      //else
      //{
+     if (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485)
+     {
+        // bip_to_modbus_socket(my_sokect);
+     }
          if ((Bacnet_Private_Device(read_data[7])) && (software_version >= 525))
          {
              g_protocol_support_ptp = PROTOCOL_MB_PTP_TRANSFER;

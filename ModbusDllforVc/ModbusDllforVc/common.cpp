@@ -29,6 +29,7 @@ static int baudrate_in_dll=0;
 static int open_com_port_number_in_dll=65535;
 static int old_or_new_scan_protocal_in_dll=1;//1==new protocal;2==old protocal
 extern 	SOCKET m_hSocket;
+extern SOCKET m_bip_socket;
 extern  SOCKET m_hSocket_for_list;
 extern 	SOCKET m_tcp_hSocket[256];  //用于多线程扫描
 int g_Commu_type=0;//0:serial modus//
@@ -10341,6 +10342,13 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
 
 
 #if 1
+
+//OUTPUT void bip_to_modbus_socket(int sock_fd)
+//{
+//    m_bip_socket  = sock_fd;
+//}
+
+
 OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_here, TS_UC command, TS_UC start_instance, TS_UC end_instance, TS_US entitysize)
 {
     if (g_Commu_type == 0)
@@ -10456,7 +10464,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
             put_data_into_here[i] = read_buffer_data[7 + i];
         return data_length+7;
     }
-    if (g_Commu_type == 1)//tcp.
+    else if (g_Commu_type == 1)//tcp.
     {
         //device_var is the modbus ID
         //the return value == -1 ,no connecting
@@ -10524,6 +10532,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
                     return -1;
                 }
             }
+            return -3;
         }
         if (command == 16)
         {
@@ -10719,13 +10728,13 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
 
         for (int x = 0; x < 14; x++)
         {
-            if (read_buffer_data[x] != data_to_send[x])
+            if (read_buffer_data[x] != data_to_send[x+6])
                 return -2;
         }
-        crc = CRC16(read_buffer_data, data_length + 14);
-        if (read_buffer_data[data_length + 14] != ((crc & 0xff00) >> 8))
+        crc = CRC16(read_buffer_data,  14);
+        if (read_buffer_data[ 14] != ((crc & 0xff00) >> 8))
             return -2;
-        if (read_buffer_data[data_length + 15] != (crc & 0xff))
+        if (read_buffer_data[ 15] != (crc & 0xff))
             return -2;
 
         return 1;

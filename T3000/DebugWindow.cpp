@@ -328,7 +328,7 @@ void CDebugWindow::OnBnClickedButtonDebug()
 #ifdef DEBUG
 #ifdef ENABLE_HTTP_FUCTION
     StrGetProductID test1 = { 0 };
-    int test_pid2 = 126;
+    int test_pid2 = 74;
     https_get(test_pid2, test1);
     CString cs_temp;
     cs_temp.Format(_T("\

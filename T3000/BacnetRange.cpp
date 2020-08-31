@@ -715,6 +715,13 @@ void BacnetRange::Initial_static()
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
             GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
 		}
+        else if ((bacnet_device_type == T3_OEM) && (input_list_line >= 8) && (input_list_line <= 11))
+        {
+            GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
+            GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);
+            GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
+        }
 		else
 		{
 			GetDlgItem(IDC_RADIO69)->EnableWindow(TRUE);	
