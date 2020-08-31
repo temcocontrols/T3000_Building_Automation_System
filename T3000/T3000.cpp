@@ -22,10 +22,7 @@
  
 #include <windows.h>  
 #include <tchar.h> 
-
-typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
-
-LPFN_ISWOW64PROCESS fnIsWow64Process;  
+ 
 const unsigned int g_versionNO= 20200814;
 
 
@@ -34,7 +31,7 @@ const unsigned int g_versionNO= 20200814;
 #endif
 
 #include "global_variable.h"
-ULONG_PTR g_gdiplusToken;
+
 BEGIN_MESSAGE_MAP(CT3000App, CWinAppEx)
 	ON_COMMAND(ID_APP_ABOUT, &CT3000App::OnAppAbout)
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
@@ -70,19 +67,9 @@ CT3000App::CT3000App()
 
 	m_lastinterface=19;
 }
+
 // The one and only CT3000App object
 CT3000App theApp;
-
-UINT UpdateT3000Background(LPVOID pParam)
-{
-  CT3000App* T3000App = (CT3000App*)pParam;
-  TCHAR exeFullPath[MAX_PATH+1]; //
-  GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
-  (_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
-
-return TRUE;
-}
-
 
 BOOL CT3000App::IsWow64()  
 {  
@@ -91,9 +78,10 @@ BOOL CT3000App::IsWow64()
     //IsWow64Process is not available on all supported versions of Windows.  
     //Use GetModuleHandle to get a handle to the DLL that contains the function  
     //and GetProcAddress to get a pointer to the function if available.  
+	typedef BOOL(WINAPI* LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 
-    fnIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress(  
-        GetModuleHandle(TEXT("kernel32")),"IsWow64Process");  
+	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
+		GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
 
     if(NULL != fnIsWow64Process)  
     {  
@@ -114,39 +102,8 @@ BOOL CT3000App::user_login()
 		return false;
 	return true;
 }
-// CT3000App initialization
-BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
-{
-	LPCTSTR   pszDllName   =   OcxFileName   ;			//ActiveX控件的路径及文件名       
-	HINSTANCE   hLib   =   LoadLibrary(pszDllName);    //装载ActiveX控件   
-	if   (hLib   <   (HINSTANCE)HINSTANCE_ERROR)   
-	{   
-		return   FALSE;   
-	}   
-	FARPROC   lpDllEntryPoint;     
-	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));     //获取注册函数DllRegisterServer地址   
-	if(lpDllEntryPoint!=NULL)														 //调用注册函数DllRegisterServer   
-	{   
-		if(FAILED((*lpDllEntryPoint)()))   
-		{//   AfxMessageBox(_T("false"));
-			FreeLibrary(hLib);   
-			return   FALSE;   
-			
-		}   
-		return   TRUE;   
-	}   
-	else   
-	{
-	//	AfxMessageBox(_T("false"));
-			return   FALSE;
 
-
-	}
-	
-}
  
-
-
 void CT3000App::UpdateDB()
 {
     BOOL is_update = FALSE;
@@ -246,10 +203,10 @@ void CT3000App::UpdateDB()
 		for (int i = 0 ;i<m_Building_ALL.size();i++)
 		{
 			StrSql.Format(_T("Insert Into Building_ALL(Building_Name,Default_Build,Telephone,Address)  Values('%s',%d,'%s','%s')"),
-				m_Building_ALL.at(i).Building_Name
-				, m_Building_ALL.at(i).Default_Building
-				, m_Building_ALL.at(i).Telephone
-				, m_Building_ALL.at(i).Address);
+				m_Building_ALL[i].Building_Name
+				, m_Building_ALL[i].Default_Building
+				, m_Building_ALL[i].Telephone
+				, m_Building_ALL[i].Address);
 			SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
 		}
 
@@ -259,24 +216,24 @@ void CT3000App::UpdateDB()
 		for (int j=0;j<m_Building.size();j++)
 		{
 			StrSql.Format(_T("Insert Into Building(Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate,Default_SubBuilding,Building_Path,Longitude,Elevation,ID,country,state,city,street,ZIP,EngineeringUnits) Values('%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s',%d,'%s','%s','%s','%s','%s','%s')"),
-				m_Building.at(j).Main_BuildingName,
-				m_Building.at(j).Building_Name,
-				m_Building.at(j).Protocal,
-				m_Building.at(j).Com_Port,
-				m_Building.at(j).Ip_Address,
-				m_Building.at(j).Ip_Port,
-				m_Building.at(j).Baudrate,
-				m_Building.at(j).Default_SubBuilding,
-				m_Building.at(j).Building_Path,
-				m_Building.at(j).Longitude,
-				m_Building.at(j).Elevation,
-				m_Building.at(j).ID,
-				m_Building.at(j).country,
-				m_Building.at(j).state,
-				m_Building.at(j).city,
-				m_Building.at(j).street,
-				m_Building.at(j).ZIP,
-				m_Building.at(j).EngineeringUnits);
+				m_Building[j].Main_BuildingName,
+				m_Building[j].Building_Name,
+				m_Building[j].Protocal,
+				m_Building[j].Com_Port,
+				m_Building[j].Ip_Address,
+				m_Building[j].Ip_Port,
+				m_Building[j].Baudrate,
+				m_Building[j].Default_SubBuilding,
+				m_Building[j].Building_Path,
+				m_Building[j].Longitude,
+				m_Building[j].Elevation,
+				m_Building[j].ID,
+				m_Building[j].country,
+				m_Building[j].state,
+				m_Building[j].city,
+				m_Building[j].street,
+				m_Building[j].ZIP,
+				m_Building[j].EngineeringUnits);
 			SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
 		}
 		SqliteDBT3000.closedb();
@@ -399,13 +356,6 @@ BOOL CT3000App::InitInstance()
 #if 1	
 		try
 		{
-
-			TCHAR exeFullPath[MAX_PATH+1]; //
-			GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
-			(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
-			g_strDatabasefilepath=exeFullPath;//
-			g_strExePth=g_strDatabasefilepath;//
-
             CreateDirectory(g_strExePth + _T("ResourceFile"), NULL);//creat database folder;//
             CString cs_update_folder;
             cs_update_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("Update");
@@ -745,6 +695,7 @@ BOOL CT3000App::InitInstance()
 
 
 		GdiplusStartupInput gdiplusStartupInput;//
+		ULONG_PTR g_gdiplusToken;
 		GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//
 
 
@@ -976,15 +927,11 @@ BOOL CT3000App::haveRegister()
 
 void CT3000App::GetModulePath()
 {
- 
-
 	TCHAR exeFullPath[MAX_PATH + 1]; //
 	GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
 	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
 	g_strDatabasefilepath = exeFullPath;//
 	g_strExePth = g_strDatabasefilepath;//
-
-	
 }
 
 int CT3000App::GetSoftInstallDays()
