@@ -107,32 +107,17 @@ BOOL CT3000App::user_login()
 
 void CT3000App::UpdateDB()
 {
-    BOOL is_update = FALSE;
     CppSQLite3DB SqliteDBT3000;
     SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath); 
-    CppSQLite3Query q;
-    q = SqliteDBT3000.execQuery("Select * from Version");
-    int version =0;
-    while(!q.eof())
-    {
-        int tempversion = q.getIntField("VersionNO");
-        if (tempversion !=0)
-        {
-            version = tempversion;
-        }
-        q.nextRow();
-    }
+    CppSQLite3Query q = SqliteDBT3000.execQuery("SELECT * from Version ORDER BY VersionNO DESC");
+    int version = q.getIntField("VersionNO");
     q.finalize();
     SqliteDBT3000.closedb();
-    if (version <g_versionNO)
-    {
-        is_update = TRUE;
-    }
+
+	BOOL is_update = (version < g_versionNO);
     if (is_update)
     {
-		CppSQLite3DB SqliteDBT3000;
 		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-		CppSQLite3Query q;
 		q = SqliteDBT3000.execQuery("Select * from Building_ALL");
 		Building_ALL stemp_building_all;
 		while (!q.eof())
