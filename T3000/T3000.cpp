@@ -70,28 +70,6 @@ CT3000App::CT3000App()
 // The one and only CT3000App object
 CT3000App theApp;
 
-BOOL CT3000App::IsWow64()  
-{  
-    BOOL bIsWow64 = FALSE;  
-
-    //IsWow64Process is not available on all supported versions of Windows.  
-    //Use GetModuleHandle to get a handle to the DLL that contains the function  
-    //and GetProcAddress to get a pointer to the function if available.  
-	typedef BOOL(WINAPI* LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
-
-	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
-		GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
-
-    if(NULL != fnIsWow64Process)  
-    {  
-        if (!fnIsWow64Process(GetCurrentProcess(),&bIsWow64))  
-        {  
-            //handle error  
-        }  
-    }  
-    return bIsWow64;  
-}  
-
 BOOL CT3000App::user_login()
 {
 	BOOL bRet=FALSE;
@@ -720,18 +698,7 @@ BOOL CT3000App::InitInstance()
         file.Close();    
         ::UnlockResource(hGlobal);   
         ::FreeResource(hGlobal);
-		CString str_msado;
 		
-		if (IsWow64())
-		{
-			str_msado.Format(_T("%sREG_MSFLXGRD64.bat"), g_strExePth.GetBuffer());
-			::ShellExecute(NULL, _T("open"), str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
-		}
-		else
-		{
-			str_msado.Format(_T("%sREG_MSFLXGRD32.bat"), g_strExePth.GetBuffer());
-			::ShellExecute(NULL, _T("open"), str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
-		}
 		//vcredist_x86.zip
 
 		//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);

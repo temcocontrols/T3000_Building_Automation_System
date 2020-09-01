@@ -221,7 +221,7 @@ public:
 // Implementation
 	UINT  m_nAppLook;
 	BOOL  m_bHiColorIcons;
-    BOOL IsWow64() ;
+
 	virtual void PreLoadState();
 	virtual void LoadCustomState();
 	virtual void SaveCustomState();
