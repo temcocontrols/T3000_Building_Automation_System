@@ -734,7 +734,6 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedOk();
 	virtual BOOL OnInitDialog();
 };
@@ -749,7 +748,6 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-	ON_BN_CLICKED(IDC_BUTTON1, &CAboutDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDOK, &CAboutDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
@@ -821,21 +819,7 @@ void CT3000App::InitModeName()
 	}
 	FindClose(hFile);
 }
-// CT3000App message handlers
-void CAboutDlg::OnBnClickedButton1()
-{
-	
-	CString m_strWebLinker;
-	m_strWebLinker.Format(_T("mailto:alex@temcocontrols.com?subject=feedback to temco &body=please add the attachment in the \n%sT3000.log "),g_strExePth);
-	try{
-          ShellExecute(GetSafeHwnd(), NULL,m_strWebLinker,   NULL, NULL,   SW_SHOWNORMAL);
-	}
-	catch(...)
-	{
-		AfxMessageBox(_T("Error:Can't find the email client in your pc!"));
-	}
-	
-}
+
 int CT3000App::ExitInstance()
 {
 	
