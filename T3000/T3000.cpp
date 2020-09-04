@@ -70,28 +70,6 @@ CT3000App::CT3000App()
 // The one and only CT3000App object
 CT3000App theApp;
 
-BOOL CT3000App::IsWow64()  
-{  
-    BOOL bIsWow64 = FALSE;  
-
-    //IsWow64Process is not available on all supported versions of Windows.  
-    //Use GetModuleHandle to get a handle to the DLL that contains the function  
-    //and GetProcAddress to get a pointer to the function if available.  
-	typedef BOOL(WINAPI* LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
-
-	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
-		GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
-
-    if(NULL != fnIsWow64Process)  
-    {  
-        if (!fnIsWow64Process(GetCurrentProcess(),&bIsWow64))  
-        {  
-            //handle error  
-        }  
-    }  
-    return bIsWow64;  
-}  
-
 BOOL CT3000App::user_login()
 {
 	BOOL bRet=FALSE;
@@ -107,32 +85,17 @@ BOOL CT3000App::user_login()
 
 void CT3000App::UpdateDB()
 {
-    BOOL is_update = FALSE;
     CppSQLite3DB SqliteDBT3000;
     SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath); 
-    CppSQLite3Query q;
-    q = SqliteDBT3000.execQuery("Select * from Version");
-    int version =0;
-    while(!q.eof())
-    {
-        int tempversion = q.getIntField("VersionNO");
-        if (tempversion !=0)
-        {
-            version = tempversion;
-        }
-        q.nextRow();
-    }
+    CppSQLite3Query q = SqliteDBT3000.execQuery("SELECT * from Version ORDER BY VersionNO DESC");
+    int version = q.getIntField("VersionNO");
     q.finalize();
     SqliteDBT3000.closedb();
-    if (version <g_versionNO)
-    {
-        is_update = TRUE;
-    }
+
+	BOOL is_update = (version < g_versionNO);
     if (is_update)
     {
-		CppSQLite3DB SqliteDBT3000;
 		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-		CppSQLite3Query q;
 		q = SqliteDBT3000.execQuery("Select * from Building_ALL");
 		Building_ALL stemp_building_all;
 		while (!q.eof())
@@ -735,18 +698,7 @@ BOOL CT3000App::InitInstance()
         file.Close();    
         ::UnlockResource(hGlobal);   
         ::FreeResource(hGlobal);
-		CString str_msado;
 		
-		if (IsWow64())
-		{
-			str_msado.Format(_T("%sREG_MSFLXGRD64.bat"), g_strExePth.GetBuffer());
-			::ShellExecute(NULL, _T("open"), str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
-		}
-		else
-		{
-			str_msado.Format(_T("%sREG_MSFLXGRD32.bat"), g_strExePth.GetBuffer());
-			::ShellExecute(NULL, _T("open"), str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
-		}
 		//vcredist_x86.zip
 
 		//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
@@ -782,7 +734,6 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedOk();
 	virtual BOOL OnInitDialog();
 };
@@ -797,7 +748,6 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-	ON_BN_CLICKED(IDC_BUTTON1, &CAboutDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDOK, &CAboutDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
@@ -869,21 +819,7 @@ void CT3000App::InitModeName()
 	}
 	FindClose(hFile);
 }
-// CT3000App message handlers
-void CAboutDlg::OnBnClickedButton1()
-{
-	
-	CString m_strWebLinker;
-	m_strWebLinker.Format(_T("mailto:alex@temcocontrols.com?subject=feedback to temco &body=please add the attachment in the \n%sT3000.log "),g_strExePth);
-	try{
-          ShellExecute(GetSafeHwnd(), NULL,m_strWebLinker,   NULL, NULL,   SW_SHOWNORMAL);
-	}
-	catch(...)
-	{
-		AfxMessageBox(_T("Error:Can't find the email client in your pc!"));
-	}
-	
-}
+
 int CT3000App::ExitInstance()
 {
 	
