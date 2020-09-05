@@ -3,25 +3,18 @@
 //
 
 #include "stdafx.h"
-#include "afxwinappex.h"
 #include "T3000.h"
-#include "MainFrm.h"
 #include "T3000DefaultView.h"
 #include "T3000Doc.h"
 #include "T3000View.h"
-#include "DialogCM5_BacNet.h"
 
 #include "LoginDlg.h"
-
 #include "iniFile.h"
-#include "afxinet.h"
-#include "T3000DefaultView.h"
-#include "bado/BADO.h"
+
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
  
 #include <windows.h>  
-#include <tchar.h> 
  
 const unsigned int g_versionNO= 20200814;
 
