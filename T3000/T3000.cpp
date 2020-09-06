@@ -692,19 +692,8 @@ BOOL CT3000App::InitInstance()
         ::UnlockResource(hGlobal);   
         ::FreeResource(hGlobal);
 		
-		//vcredist_x86.zip
-
-		//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
-		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
-
-
 		AfxMessageBox(_T("Database error! Please restart again ."));
-		//::ShellExecute(NULL, _T("open"), _T("www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip"), _T(""), _T(""), SW_SHOW);
-		//AfxMessageBox(_T("Open'T3000'Again,Please!"));
-
-
 		return TRUE;
-
 	}
 
 	//Create_T3000_log_file();
@@ -893,15 +882,7 @@ void CT3000App::WriteNumber( CRegKey& key,CStringW valueName,DWORD value )
 
 BOOL CT3000App::ReadNameber( CRegKey& key,CStringW valueName,DWORD& value )
 {
-	DWORD s;
-	if (key.QueryDWORDValue(valueName,s) == ERROR_SUCCESS)
-	{
-		value = s;
-		return TRUE;
-	}else
-	{
-		return FALSE;
-	}
+	return key.QueryDWORDValue(valueName, value) == ERROR_SUCCESS;
 }
 
 void CT3000App::Judgestore()
