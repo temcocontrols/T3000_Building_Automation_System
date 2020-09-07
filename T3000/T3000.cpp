@@ -3,25 +3,18 @@
 //
 
 #include "stdafx.h"
-#include "afxwinappex.h"
 #include "T3000.h"
-#include "MainFrm.h"
 #include "T3000DefaultView.h"
 #include "T3000Doc.h"
 #include "T3000View.h"
-#include "DialogCM5_BacNet.h"
 
 #include "LoginDlg.h"
-
 #include "iniFile.h"
-#include "afxinet.h"
-#include "T3000DefaultView.h"
-#include "bado/BADO.h"
+
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
  
 #include <windows.h>  
-#include <tchar.h> 
  
 const unsigned int g_versionNO= 20200814;
 
@@ -699,19 +692,8 @@ BOOL CT3000App::InitInstance()
         ::UnlockResource(hGlobal);   
         ::FreeResource(hGlobal);
 		
-		//vcredist_x86.zip
-
-		//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
-		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
-
-
 		AfxMessageBox(_T("Database error! Please restart again ."));
-		//::ShellExecute(NULL, _T("open"), _T("www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip"), _T(""), _T(""), SW_SHOW);
-		//AfxMessageBox(_T("Open'T3000'Again,Please!"));
-
-
 		return TRUE;
-
 	}
 
 	//Create_T3000_log_file();
@@ -900,15 +882,7 @@ void CT3000App::WriteNumber( CRegKey& key,CStringW valueName,DWORD value )
 
 BOOL CT3000App::ReadNameber( CRegKey& key,CStringW valueName,DWORD& value )
 {
-	DWORD s;
-	if (key.QueryDWORDValue(valueName,s) == ERROR_SUCCESS)
-	{
-		value = s;
-		return TRUE;
-	}else
-	{
-		return FALSE;
-	}
+	return key.QueryDWORDValue(valueName, value) == ERROR_SUCCESS;
 }
 
 void CT3000App::Judgestore()
