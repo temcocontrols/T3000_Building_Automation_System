@@ -60,21 +60,9 @@ CT3000App::CT3000App()
 
 	m_lastinterface=19;
 }
+
 // The one and only CT3000App object
 CT3000App theApp;
-
-BOOL CT3000App::user_login()
-{
-	BOOL bRet=FALSE;
-	CLoginDlg dlg(bRet);
-	dlg.DoModal();
-	if(g_buser_log_in==false)
-		return false;
-	return true;
-}
-
- 
-
 
 void CT3000App::UpdateDB()
 {
@@ -438,17 +426,8 @@ BOOL CT3000App::InitInstance()
 				::UnlockResource(hGlobal);   
 				::FreeResource(hGlobal);
 			}
-
-
-		 
-			 
-			
-
-
 		 
 			g_strDatabasefilepath+=_T("Database\\T3000.db");//
-
-
 
 #if 1//如果沒有T3000 的情況下
 
@@ -851,28 +830,6 @@ void CT3000App::GetModulePath()
 	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
 	g_strDatabasefilepath = exeFullPath;//
 	g_strExePth = g_strDatabasefilepath;//
-}
-
-int CT3000App::GetSoftInstallDays()
-{
-	CFileStatus fileStatus;
-	CTime curTime;
-	CString strPath;
-	CTimeSpan timeSpan;
-
-	curTime=CTime::GetCurrentTime();
-	//strPath=GetModulePath();
-
-	strPath=strPath.Left(strPath.ReverseFind(_T('\\'))+1);
-	strPath+=_T("T3000_Rev2.5.0.99.exe");
-
-//	strPath+=_T("T3000.exe");
-	CFile::GetStatus(strPath,fileStatus);
-
-	//timeSpan=curTime-fileStatus.m_ctime;
-	timeSpan=curTime-fileStatus.m_mtime;//这个是修改时间，不论你CUT，COPY都不会修改的
-
-	return (int)timeSpan.GetDays();
 }
 
 void CT3000App::WriteNumber( CRegKey& key,CStringW valueName,DWORD value )
