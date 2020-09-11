@@ -312,39 +312,41 @@ BOOL CT3000App::InitInstance()
 			g_achive_folder_temp_txt = g_achive_folder + _T("\\") + _T("prg_txt_file");
 			g_achive_folder_temp_db = g_achive_folder + _T("\\") + _T("MonitorDatabaseFolder");
 			g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
-			product_sort_way  = GetPrivateProfileInt(_T("Setting"),_T("ProductSort"),0,g_cstring_ini_path);
+			
+			// Use CIniFile to read and write .ini files
+			CIniFile monitorindexfile(g_cstring_ini_path);
+			product_sort_way = monitorindexfile.GetProfileIntW(_T("Setting"), _T("ProductSort"), 0);
 			if(product_sort_way == 0)
 			{
-				WritePrivateProfileStringW(_T("Setting"),_T("ProductSort"),_T("1"),g_cstring_ini_path);
+				monitorindexfile.WriteProfileStringW(_T("Setting"), _T("ProductSort"), _T("1"));
 				product_sort_way = SORT_BY_CONNECTION;
 			}
 
+#if 0
             DEBUG_DELAY_TIME = 350;/*GetPrivateProfileInt(_T("Debug"), _T("SEND_COMMAND_DELAY_TIME"), 350, g_cstring_ini_path);
             if (DEBUG_DELAY_TIME == 350)
             {
                 WritePrivateProfileStringW(_T("Debug"), _T("SEND_COMMAND_DELAY_TIME"), _T("350"), g_cstring_ini_path);
             }*/
+#endif
+
 			CString temp_cs_version;
 			temp_cs_version.Format(_T("%d"),T3000_Version);
+			monitorindexfile.WriteProfileStringW(_T("Version"), _T("T3000"), temp_cs_version);
 
-			WritePrivateProfileStringW(_T("Version"),_T("T3000"),temp_cs_version,g_cstring_ini_path);
-
-
-			monitor_ignore_enable = GetPrivateProfileInt(_T("Setting"),_T("EnableMonitorValueIgnore"),0,g_cstring_ini_path);
-			if(monitor_ignore_enable == 0)
+			monitor_ignore_enable = monitorindexfile.GetProfileIntW(_T("Setting"), _T("EnableMonitorValueIgnore"), 0);
+			if (monitor_ignore_enable == 0)
 			{
-				WritePrivateProfileString(_T("Setting"),_T("EnableMonitorValueIgnore"),_T("0"),g_cstring_ini_path);
-				WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMax"),_T("10000000"),g_cstring_ini_path);
-				WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMin"),_T("-100000"),g_cstring_ini_path);
-			}
-			else if(monitor_ignore_enable == 1)
-			{
-				monitor_ignore_max_value = GetPrivateProfileInt(_T("Setting"),_T("MonitorValueIgnoreMax"),1000000,g_cstring_ini_path);
-				monitor_ignore_min_value = GetPrivateProfileInt(_T("Setting"),_T("MonitorValueIgnoreMin"),-100000,g_cstring_ini_path);
+				monitorindexfile.WriteProfileStringW(_T("Setting"), _T("EnableMonitorValueIgnore"), _T("0"));
+				monitorindexfile.WriteProfileStringW(_T("Setting"), _T("MonitorValueIgnoreMax"), _T("10000000"));
+				monitorindexfile.WriteProfileStringW(_T("Setting"), _T("MonitorValueIgnoreMin"), _T("-100000"));
 			}
 
-
-
+			if (monitor_ignore_enable == 1)
+			{
+				monitor_ignore_max_value = monitorindexfile.GetProfileIntW(_T("Setting"), _T("MonitorValueIgnoreMax"), 1000000);
+				monitor_ignore_min_value = monitorindexfile.GetProfileIntW(_T("Setting"), _T("MonitorValueIgnoreMin"), -100000);
+			}
 
 			g_achive_monitor_datatbase_path = g_achive_folder;
 			g_achive_monitor_datatbase_path = g_achive_monitor_datatbase_path + _T("\\MonitorData.mdb");
