@@ -30,4 +30,5 @@ jobs:
       - name: cmake-build
         run: |
           echo CMake configuration successful. Going for build...
+          cd build
           cmake --build .
