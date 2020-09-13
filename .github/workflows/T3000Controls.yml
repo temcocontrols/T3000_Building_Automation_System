@@ -28,6 +28,6 @@ jobs:
           cmake ../T3000Controls
 
       - name: cmake-build
-        run: |
+      - run: |
           echo CMake configuration successful. Going for build...
           cmake --build .
