@@ -532,7 +532,7 @@ void CBacnetSettingTcpip::ClearSubNetInfo()
 {
     CShowMessageDlg dlg;
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    dlg.SetStaticText(_T("After changing the protocol or baud rate\r\nmake sure that the devices for RS485 Main and RS485 Sub keep the same with this"));
+    dlg.SetStaticText(_T("Changing Subnet Baud Rate and Protocol\r\nMake sure all subnet devices share these same settings"));
     //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
     dlg.SetStaticTextColor(RGB(0, 0, 255));
     dlg.SetStaticTextSize(25, 20);

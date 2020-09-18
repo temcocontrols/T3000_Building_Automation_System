@@ -5172,7 +5172,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
 
         if(count>= 1)
         {
-            str_temp.Format(_T("update ALL_NODE set Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Object_Instance = '%s',Panal_Number = ' %s' where Serial_ID = '%s'"),temp_baud,temp_port_string,temp_product_id_string,temp_protocol,
+            str_temp.Format(_T("update ALL_NODE set Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Object_Instance = '%s',Panal_Number = ' %s' ,Parent_SerialNum = 0 where Serial_ID = '%s'"),temp_baud,temp_port_string,temp_product_id_string,temp_protocol,
                             temp_view_name,temp_object_instance,temp_panel_number,temp_serial_number);
         }
         else

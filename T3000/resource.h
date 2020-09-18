@@ -2541,6 +2541,12 @@
 #define IDC_EDIT_LOWEST_X_DAYS          2562
 #define IDC_EDIT_FIGURE                 2563
 #define IDC_EDIT_USER_ADJ               2564
+#define IDC_STATIC_VOLTS_OR_CURRENT     2565
+#define IDC_EDIT_OBJ_INSTANCE           2566
+#define IDC_COMBO_OBJ_TYPE              2567
+#define IDC_COMBO_PROPERTY_ID           2568
+#define IDC_EDIT_OBJ_INSTANCE2          2569
+#define IDC_EDIT_DEVICE_ID              2569
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3104,7 +3110,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        764
 #define _APS_NEXT_COMMAND_VALUE         34077
-#define _APS_NEXT_CONTROL_VALUE         2565
+#define _APS_NEXT_CONTROL_VALUE         2568
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

@@ -259,7 +259,7 @@ BEGIN
     LTEXT           "",IDC_Model_FIRMVER2,192,205,114,8
     LTEXT           "",IDC_Model_HARDWAREVER2,192,217,114,8
     COMBOBOX        IDC_EDIT_BAUDRATE,228,42,73,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Flash MAC",IDC_CHECK_FLASH_MAC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,2,313,47,10
+    CONTROL         "Flash MAC",IDC_CHECK_FLASH_MAC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,3,313,47,10
     EDITTEXT        IDC_EDIT_MAC_ADDRESS,59,317,74,14,ES_AUTOHSCROLL
     PUSHBUTTON      "FLASH SN",IDC_BUTTON_FLASH_SN,258,314,57,19
     CTEXT           "Static",IDC_STATIC_SN_INFO,4,341,420,21
@@ -300,7 +300,7 @@ BEGIN
     CONTROL         "",IDC_CHECK_ITEM31,"Button",BS_AUTOCHECKBOX,431,255,90,10
     CONTROL         "",IDC_CHECK_ITEM32,"Button",BS_AUTOCHECKBOX,431,271,90,10
     CONTROL         "",IDC_CHECK_NO_ITEM,"Button",BS_AUTOCHECKBOX,322,14,90,10
-    CONTROL         "Flash Wifi MAC",IDC_CHECK_FLASH_WIFI_MAC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,2,324,54,10
+    CONTROL         "Flash Wifi MAC",IDC_CHECK_FLASH_WIFI_MAC,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,2,326,54,10
 END
 
 
@@ -335,8 +335,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 6,1,7,0
- PRODUCTVERSION 6,1,7,0
+ FILEVERSION 6,2,0,0
+ PRODUCTVERSION 6,2,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -351,12 +351,12 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileVersion", "6.1.7.0"
+            VALUE "FileVersion", "6.2.0.0"
             VALUE "InternalName", "ISP.exe"
             VALUE "OriginalFilename", "ISP.exe"
             VALUE "ProductName", "ISP Tool"
-            VALUE "ProductVersion", "6.1.7.0"
-            VALUE "SpecialBuild", "6.1.7"
+            VALUE "ProductVersion", "6.2.0.0"
+            VALUE "SpecialBuild", "6.2.0"
             VALUE "TemcoCopyright", "Copyright 1999-2020 (c).  All rights reserved."
         END
     END
@@ -446,7 +446,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About NEWISP..."
-    IDS_STR_VIRSIONNUM      "Version 6.1.7"
+    IDS_STR_VIRSIONNUM      "Version 6.2.0"
     IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
 END
 

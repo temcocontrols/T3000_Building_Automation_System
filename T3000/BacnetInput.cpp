@@ -119,7 +119,7 @@ BOOL CBacnetInput::OnInitDialog()
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
    
-	SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_INPUT_TIME,NULL);
+	//SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_INPUT_TIME,NULL);
 
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_INPUT_DEFAULT);
 	SetIcon(m_hIcon,TRUE);
@@ -581,7 +581,8 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 
 LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 {
-
+    //static int test_count1234 = 0;
+    //TRACE(_T("Fresh_Input_List = %d\r\n"), test_count1234++);
 	int Fresh_Item;
 	int isFreshOne = (bool)lParam;
 	int  Minipanel_device = 1;
@@ -1059,9 +1060,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
         if (selected_product_Node.product_class_id == PM_TSTAT_AQ) //针对Airlab 特殊显示不同的range
         {
-
-                if((i>=3) && (i<11))
-                m_input_list.SetItemText(i, INPUT_UNITE, Airlab_Unit_String[i]);
+            if (selected_product_Node.software_version < 10.6)
+            {
+                if ((i >= 3) && (i < 11))
+                    m_input_list.SetItemText(i, INPUT_UNITE, Airlab_Unit_String[i]);
+            }
 
         }
 
@@ -1438,6 +1441,12 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 					m_input_list.SetItemText(lRow,INPUT_RANGE,Input_Analog_Units_Array[bac_range_number_choose]);		
 					New_CString = Input_Analog_Units_Array[bac_range_number_choose];
 				}
+
+                if ((bac_range_number_choose >= 20) && (bac_range_number_choose <= 24))//选择的是cus range 需要去选择single type
+                {
+                    m_Input_data.at(lRow).decom = m_dialog_signal_type;
+                }
+
 				m_input_list.SetItemText(lRow,INPUT_UNITE,Input_List_Analog_Units[bac_range_number_choose]);	
 				
 				unsigned short temp_cal_value;

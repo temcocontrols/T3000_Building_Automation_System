@@ -2436,8 +2436,9 @@ void CDialogCM5_BacNet::Fresh()
 		BacNet_hwd = this->m_hWnd;
         if (read_rs485_thread != NULL)
         {
-            TerminateThread(read_rs485_thread, 0);
-            read_rs485_thread = NULL;
+            return;
+            //TerminateThread(read_rs485_thread, 0);
+            //read_rs485_thread = NULL;
         }
         connect_way = 1;
 		if(read_rs485_thread == NULL)
@@ -2449,8 +2450,9 @@ void CDialogCM5_BacNet::Fresh()
         BacNet_hwd = this->m_hWnd;
         if (read_rs485_thread != NULL)
         {
-            TerminateThread(read_rs485_thread, 0);
-            read_rs485_thread = NULL;
+            return;
+            //TerminateThread(read_rs485_thread, 0);
+            //read_rs485_thread = NULL;
         }
         connect_way = 2;
         if (read_rs485_thread == NULL)
@@ -2560,7 +2562,10 @@ void CDialogCM5_BacNet::Fresh()
 	}
 	if(!offline_mode)
 	{
-        MODE_SUPPORT_PTRANSFER = 1;
+        //if(selected_product_Node.software_version >= 52.8)
+            MODE_SUPPORT_PTRANSFER = 1;
+        //else
+        //    MODE_SUPPORT_PTRANSFER = 0;
         ret = 1;
         if (MODE_SUPPORT_PTRANSFER != 1)  //Ptransfer 模式下直接用47808端口访问 T3或者带Wifi的设备;
         {
@@ -6794,65 +6799,72 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 
 	 CString achive_file_path;
 	 CString temp_serial;
-	 achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+	 
 
+     if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+     {
+         achive_file_path = g_achive_folder + _T("\\")  + str_serialid + _T(".prog");
+         load_prg_cache_ret = LoadBacnetBinaryFile(false, achive_file_path);
+         Sleep(1);
+     }
+     else
+     {
+         achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+         if (LoadModbusConfigFile_Cache(achive_file_path)< 0)
+         {
 
-	 if(LoadModbusConfigFile_Cache(achive_file_path)< 0)
-	 {
+             bool read_result = true;
+             unsigned int buffer_length = 3200;
+             unsigned short read_data_buffer[3200];
+             memset(read_data_buffer, 0, sizeof(unsigned short) * 3200);
+             //output 45 按46算  *64  + input 46  *64  需要读2944;
+             for (int i = 0; i<32; i++)
+             {
+                 int itemp = 0;
+                 itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_SETTING_START_REG + i * 100, 100, 4);
+                 if (itemp < 0)
+                 {
+                     read_result = false;
+                     break;
+                 }
+                 else
+                 {
+                     g_progress_persent = (i + 1) * 100 / 32;
+                 }
+                 Sleep(100);
+             }
+             if (read_result)
+             {
+                 SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data OK!"));
+             }
+             else
+             {
+                 SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
+             }
 
-		 bool read_result = true;
-		 unsigned int buffer_length = 3200;
-		 unsigned short read_data_buffer[3200];
-		 memset(read_data_buffer,0,sizeof(unsigned short)*3200);
-		 //output 45 按46算  *64  + input 46  *64  需要读2944;
-		 for(int i=0; i<32; i++)
-		 {
-			 int itemp = 0;
-			 itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],BAC_SETTING_START_REG+i*100,100,4);
-			 if(itemp < 0 )
-			 {
-				 read_result = false;
-				 break; 
-			 }
-			 else
-			 {
-				 g_progress_persent = (i+1)*100 / 32;	
-			 }
-			 Sleep(100);
-		 }
-		 if(read_result)
-		 {
-			 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data OK!"));
-		 }
+             Copy_Data_From_485_to_Bacnet(&read_data_buffer[0]);
+             SaveModbusConfigFile_Cache(achive_file_path, (char *)read_data_buffer, buffer_length * 2);
+
+             if (temp_update)
+                 ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING, 0, 0);
+         }
          else
          {
-             SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
+             g_llTxCount++;
+             g_llRxCount++;
+
+             SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Reading data :OK"));
+             if (Input_Window->IsWindowVisible())
+                 ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+             else if (Output_Window->IsWindowVisible())
+                 ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+             else if (Variable_Window->IsWindowVisible())
+                 ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
+             else if (Setting_Window->IsWindowVisible())
+                 ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
          }
+     }
 
-		 Copy_Data_From_485_to_Bacnet(&read_data_buffer[0]);
-		 SaveModbusConfigFile_Cache(achive_file_path,(char *)read_data_buffer,buffer_length*2);
-
-		 if(temp_update)
-			 ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
-	 }
-	 else
-	 {
-		 g_llTxCount ++;
-		 g_llRxCount ++;
-
-		 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reading data :OK"));
-		 if(Input_Window->IsWindowVisible())
-			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-		 else if(Output_Window->IsWindowVisible())
-			::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-         else if (Variable_Window->IsWindowVisible())
-             ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
-		 else if(Setting_Window->IsWindowVisible())
-			  ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
-
-        
-
-	 }
 
      switch_product_last_view();
 	 //PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);

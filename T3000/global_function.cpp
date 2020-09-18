@@ -45,6 +45,7 @@
 #include "ptp.h"
 #include "HttpApiDefine.h"
 #include "../SQLiteDriver/CppSQLite3.h"
+extern tree_product selected_product_Node; // 选中的设备信息;
 //#include "CM5\PTP\ptp.h"
 #pragma region For_Bacnet_program_Use
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
@@ -4727,8 +4728,8 @@ int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, ui
 //    }
 //}
 
-
-int Bacnet_Read_Property_Multiple()
+//int Bacnet_Read_Property_Multiple()
+int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id)
 {
     BACNET_ADDRESS src = {
         0
@@ -4747,7 +4748,7 @@ int Bacnet_Read_Property_Multiple()
     //static BACNET_ADDRESS Target_Address;
     /* needed for return value of main application */
     static bool Error_Detected = false;
-
+    Error_Detected = false;
 
     uint16_t pdu_len = 0;
     unsigned timeout = 100;     /* milliseconds */
@@ -4764,7 +4765,7 @@ int Bacnet_Read_Property_Multiple()
     BACNET_READ_ACCESS_DATA *rpm_object;
     BACNET_PROPERTY_REFERENCE *rpm_property;
     char *property_token = NULL;
-    unsigned property_id = 0;
+    //unsigned property_id = 0;
     unsigned property_array_index = 0;
     int scan_count = 0;
     char *filename = NULL;
@@ -4827,14 +4828,28 @@ int Bacnet_Read_Property_Multiple()
     }
 #endif
     int argc = 5;
-    char *argv[1024];
+    //char *argv[1024];
+    char argv[6][1024];
+
     //char **argv = NULL;
     //argv[1] = "10001";
 
-    argv[1] = "133641";
-    argv[2] = "4";
-    argv[3] = "1";
-    argv[4] = "87";
+    char temp_device_instance[20] = { 0 };
+    char temp_obj_type[20] = { 0 };
+    char temp_obj_instance[20] = { 0 };
+    char temp_property_id[20] = {0};
+    itoa(deviceid, temp_device_instance,10);
+    itoa(object_type, temp_obj_type, 10);
+    itoa(object_instance, temp_obj_instance, 10);
+    itoa(property_id, temp_property_id, 10);
+    strcpy(argv[1], temp_device_instance);
+    strcpy(argv[2], temp_obj_type);
+    strcpy(argv[3], temp_obj_instance);
+    strcpy(argv[4], temp_property_id);
+    //argv[1] = "137445";
+    //argv[2] = "0";
+    //argv[3] = "2";
+    //argv[4] = "8";  //8是读取所有的属性;
 
     //argv[1] = "115909";
     //argv[2] = "8";
@@ -5798,7 +5813,7 @@ void Inial_Product_Input_map()
         case PM_TSTAT_AQ:
         {
 
-            unsigned char  temp[20] = { 1,1,1,0,  1,1,0,1,  1,1,0,0,   1,1,0,0  ,0,0,0,0 };
+            unsigned char  temp[20] = { 1,1,1,0,  1,1,1,1,  1,1,0,0,   1,1,0,0  ,0,0,0,0 };
             memcpy(product_input[i], temp, 20);
         }
         break;
@@ -6302,10 +6317,10 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         bool port_bind_results = false;
         for (int i = 1;i <= 3;i++)
         {
-            int temp_add_port = rand() % 10000;
+            int temp_add_port = i - 1;// rand() % 10000;
             if (bind_local_ip.IsEmpty())
             {
-                port_bind_results = Open_bacnetSocket2(_T("192.168.0.62"), BACNETIP_PORT + temp_add_port, my_sokect);
+                port_bind_results = Open_bacnetSocket2(_T(""), BACNETIP_PORT + temp_add_port, my_sokect);
             }
             else
             {
@@ -6813,12 +6828,21 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
     //2018 03 21 Fandu 解决 PCIP地址频繁变化导致的 bind 数据库以前的错误IP ，以至于 无法正常通讯的问题.
     bool find_network =false;
     GetIPMaskGetWay();
+
+    if (strIPAdress.IsEmpty())
+    {
+        strIPAdress = selected_product_Node.BuildingInfo.strIp;  //用设备的前三个 来确定bind哪一个 网卡;
+    }
+
     for (int i = 0; i < g_Vector_Subnet.size(); i++)
     {
         CStringArray temp_strip;
         SplitCStringA(temp_strip, strIPAdress, _T("."));
         CString temp_ip;
         temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
+
+
+
 
         CString PC_IP;
         PC_IP = g_Vector_Subnet.at(i).StrIP;
@@ -6856,6 +6880,15 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
         return FALSE;
     }
 
+    if (mysocket > 0)
+    {
+        ::closesocket(mysocket); //关闭之前可能存在的套接字;
+        mysocket = NULL;
+    }
+
+    
+
+
     //	mysocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     mysocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if(mysocket == INVALID_SOCKET)
@@ -6864,6 +6897,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
         mysocket=NULL;
         return FALSE;
     }
+
 
     sockaddr_in servAddr;
     servAddr.sin_family = AF_INET;
