@@ -1766,29 +1766,83 @@ int CComWriter::UpdataDeviceInformation(int& ID)
     if (com_port_flash_status == 0)
     {
         if ((Device_infor[7] == PM_TSTAT8) ||
-            (Device_infor[7] == PM_TSTAT9))
+            (Device_infor[7] == PM_TSTAT9)  ||
+            (Device_infor[7] == PM_TSTAT10))
         {
-            int device_version = 0;
-            device_version = Device_infor[4] + Device_infor[5] * 65536;
-
             int c2_update_boot = false;
-            //判断是在boot里面还是App里面
-            if (Device_infor[11] == 0)
+            int device_version = 0;
+            if (Device_infor[7] == PM_TSTAT10)
             {
-                //主代码
-                if ((device_version < 101) && (c1_need_update_boot == 1))  //大于101就代表使用的是新的bootloader ， 就不用更新bootloader
+                c2_update_boot = false;
+                device_version = Device_infor[5] * 10 + Device_infor[4]; //大于519就不用更新bootloader 
+                //11号 和 14 号 去最大值 就是 bootloader 版本号
+                if (Device_infor[14] > 40) //基本可以确定是在主代码
                 {
-                    c2_update_boot = true;
+                    //主代码
+                    if ((device_version <= 518) && (c1_need_update_boot == 1))  //大于101就代表使用的是新的bootloader ， 就不用更新bootloader
+                    {
+                        c2_update_boot = true;
+                    }
+                    else
+                        c2_update_boot = false;
                 }
                 else
-                    c2_update_boot = false;
+                {
+                    if (Device_infor[11] > 40) //基本可以确定是在bootloader
+                    {
+                        if (Device_infor[11] <= 53)
+                            c2_update_boot = true;
+                        else
+                            c2_update_boot = false;
+                    }
+                }
+
+
+                
+                //判断是在boot里面还是App里面
+                //if (Device_infor[11] == 0)
+                //{
+                //    //主代码
+                //    if ((device_version <= 518) && (c1_need_update_boot == 1))  //大于101就代表使用的是新的bootloader ， 就不用更新bootloader
+                //    {
+                //        c2_update_boot = true;
+                //    }
+                //    else
+                //        c2_update_boot = false;
+                //}
+                //else
+                //{
+                //    if (Device_infor[11] <= 53)
+                //        c2_update_boot = true;
+                //    else
+                //        c2_update_boot = false;
+                //}
+
+
             }
             else
             {
-                if (Device_infor[11] < 53)
-                    c2_update_boot = true;
+                device_version = Device_infor[4] + Device_infor[5] * 65536;
+
+                c2_update_boot = false;
+                //判断是在boot里面还是App里面
+                if (Device_infor[11] == 0)
+                {
+                    //主代码
+                    if ((device_version < 101) && (c1_need_update_boot == 1))  //大于101就代表使用的是新的bootloader ， 就不用更新bootloader
+                    {
+                        c2_update_boot = true;
+                    }
+                    else
+                        c2_update_boot = false;
+                }
                 else
-                    c2_update_boot = false;
+                {
+                    if (Device_infor[11] < 53)
+                        c2_update_boot = true;
+                    else
+                        c2_update_boot = false;
+                }
             }
 
             if (c2_update_boot)

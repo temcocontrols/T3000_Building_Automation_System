@@ -31,7 +31,16 @@ typedef struct
     Http_key k_lastCommunicationDate;
     Http_key k_createdAt;
     Http_key k_updatedAt;
+    CString cs_results;
 }StrGetProductID;
+
+typedef struct
+{
+    Http_key k_file_name;
+    Http_key k_version;
+    Http_key k_file_size;
+    Http_key k_updatedAt;
+}StrGetFileInfo;
 
 typedef struct
 {

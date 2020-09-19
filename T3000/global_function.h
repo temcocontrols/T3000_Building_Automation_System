@@ -22,6 +22,11 @@
 #ifdef ENABLE_HTTP_FUCTION
 #include "..\BravocontrolAPI\BravocontrolAPI\HttpAPI\HttpAPI.h"
 #endif
+#ifdef DEBUG
+#define USE_THIRD_PARTY_FUNC 1
+#endif // DEBUG
+
+
 #include <afxinet.h>
 BOOL CheckForUpdate(
 	LPCTSTR szFtpServer,
@@ -146,7 +151,8 @@ void local_handler_read_property_multiple_ack(
     BACNET_ADDRESS * src,
     BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
 
-int Bacnet_Read_Property_Multiple();
+//int Bacnet_Read_Property_Multiple();
+int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
 
 int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
 int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime = 3);

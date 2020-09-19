@@ -1,6 +1,6 @@
 #pragma once
 #include "RelayLabel.h"
-//#define ENABLE_HTTP_FUCTION  //定义是否使用http api
+#define ENABLE_HTTP_FUCTION  //定义是否使用http api
 //#define ENABLE_T3_EMAIL
 #include <map>
 //minipanel 寄存器表
@@ -486,7 +486,7 @@ const int BAC_SHOW_MISSION_RESULTS = 3;
 const int BAC_LIST_REFRESH_INPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_OUTPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_TIME = 45000;//ms
-const int BAC_LIST_REFRESH_ETHERNET_TIME = 20000;  //判断是接的网络就用20秒的刷新;
+const int BAC_LIST_REFRESH_ETHERNET_TIME = 45000;  //判断是接的网络就用20秒的刷新;
 
 const int SCHEDULE_TIME_NUM = 0;
 const int SCHEDULE_TIME_MONDAY = 1;
@@ -878,10 +878,10 @@ const CString Input_List_Analog_Units[] =
 	_T("PPM"),
     _T("RPM"),
     _T("PPB"),
-    _T(""),
-    _T(""),
-    _T(""),
-    _T(""),
+    _T("ug/m3"),
+    _T("#/cm3"),
+    _T("dB"),
+    _T("Lux"),
     _T(""),
     _T(""),
     _T(""),
@@ -922,10 +922,10 @@ const CString Input_Analog_Units_Array[] =
 	_T("CO2  PPM"),
     _T("Revolutions Per Minute"),
     _T("TVOC PPB"),
-    _T(""),
-    _T(""),
-    _T(""),
-    _T(""),
+    _T("ug/m3"),
+    _T("#/cm3"),
+    _T("dB"),
+    _T("Lux"),
     _T(""),
     _T(""),
     _T(""),

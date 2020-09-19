@@ -82,6 +82,7 @@ BEGIN_MESSAGE_MAP(CBacnetAnalogCusRang, CDialogEx)
     ON_EN_KILLFOCUS(IDC_EDIT_MAX_VALUE_VALUE, &CBacnetAnalogCusRang::OnEnKillfocusEditMaxValueValue)
     ON_BN_CLICKED(IDC_BUTTON_APPLY, &CBacnetAnalogCusRang::OnBnClickedButtonApply)
     ON_CBN_KILLFOCUS(IDC_COMBO_CUSRANGE_STIGNALTYPE, &CBacnetAnalogCusRang::OnCbnKillfocusComboCusrangeStignaltype)
+    ON_NOTIFY(NM_CLICK, IDD_DIALOG_BACNET_RANGE_LIST, &CBacnetAnalogCusRang::OnNMClickDialogBacnetRangeList)
 END_MESSAGE_MAP()
 
 
@@ -137,7 +138,7 @@ BOOL CBacnetAnalogCusRang::OnInitDialog()
 	Initial_List();
     InitialPointCount();
 	Fresh_AnalogCusRange_List(analog_range_tbl_line, analog_range_tbl_line);
-	SetTimer(1,1000,NULL);
+	SetTimer(1,5000,NULL);
     SetTimer(2, 500, NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -179,42 +180,45 @@ void CBacnetAnalogCusRang::Initial_List()
 	temp_jumper = (m_dialog_signal_type & 0xf0 ) >> 4;
 	if(temp_jumper == 1)
 	{
-        GetDlgItem(IDC_STATIC_CUS_MIN_LABLE)->SetWindowTextW(_T("First Point Current :"));
-        GetDlgItem(IDC_STATIC_CUS_MAX_LABLE2)->SetWindowTextW(_T("Last Point Current :"));
-            
+        GetDlgItem(IDC_STATIC_CUS_MIN_LABLE)->SetWindowTextW(_T("Current :"));
+        GetDlgItem(IDC_STATIC_CUS_MAX_LABLE2)->SetWindowTextW(_T("Current :"));
+        GetDlgItem(IDC_STATIC_VOLTS_OR_CURRENT)->SetWindowTextW(_T("Current (ma):"));
 		Unit_temp.Format(_T("Current (4-20ma)"));
 		C_or_V.Format(_T("ma"));
         ((CComboBox *)GetDlgItem(IDC_COMBO_CUSRANGE_STIGNALTYPE))->SetWindowText(JumperStatus[temp_jumper]);
 	}
 	else if(temp_jumper == 2)
 	{
-        GetDlgItem(IDC_STATIC_CUS_MIN_LABLE)->SetWindowTextW(_T("First Point Volts :"));
-        GetDlgItem(IDC_STATIC_CUS_MAX_LABLE2)->SetWindowTextW(_T("Last Point Volts :"));
-
+        GetDlgItem(IDC_STATIC_CUS_MIN_LABLE)->SetWindowTextW(_T("Volts :"));
+        GetDlgItem(IDC_STATIC_CUS_MAX_LABLE2)->SetWindowTextW(_T("Volts :"));
+        GetDlgItem(IDC_STATIC_VOLTS_OR_CURRENT)->SetWindowTextW(_T("Volts :"));
 		Unit_temp.Format(_T("Voltage (0-5V)"));
 		C_or_V.Format(_T("V"));
         ((CComboBox *)GetDlgItem(IDC_COMBO_CUSRANGE_STIGNALTYPE))->SetWindowText(JumperStatus[temp_jumper]);
 	}
 	else if(temp_jumper == 3)
 	{
-        GetDlgItem(IDC_STATIC_CUS_MIN_LABLE)->SetWindowTextW(_T("First Point Volts :"));
-        GetDlgItem(IDC_STATIC_CUS_MAX_LABLE2)->SetWindowTextW(_T("Last Point Volts :"));
+        GetDlgItem(IDC_STATIC_CUS_MIN_LABLE)->SetWindowTextW(_T("Volts :"));
+        GetDlgItem(IDC_STATIC_CUS_MAX_LABLE2)->SetWindowTextW(_T("Volts :"));
+        GetDlgItem(IDC_STATIC_VOLTS_OR_CURRENT)->SetWindowTextW(_T("Volts :"));
 		Unit_temp.Format(_T("Voltage (0-10V)"));
 		C_or_V.Format(_T("V"));
         ((CComboBox *)GetDlgItem(IDC_COMBO_CUSRANGE_STIGNALTYPE))->SetWindowText(JumperStatus[temp_jumper]);
 	}
     else if ((temp_jumper == 0) || (temp_jumper == 4))
     {
-        GetDlgItem(IDC_STATIC_CUS_MIN_LABLE)->SetWindowTextW(_T("First Point Volts :"));
-        GetDlgItem(IDC_STATIC_CUS_MAX_LABLE2)->SetWindowTextW(_T("Last Point Volts :"));
+        GetDlgItem(IDC_STATIC_CUS_MIN_LABLE)->SetWindowTextW(_T("Volts :"));
+        GetDlgItem(IDC_STATIC_CUS_MAX_LABLE2)->SetWindowTextW(_T("Volts :"));
+        GetDlgItem(IDC_STATIC_VOLTS_OR_CURRENT)->SetWindowTextW(_T("Volts :"));
         Unit_temp.Format(_T("Voltage"));
         C_or_V.Format(_T("V"));
         ((CComboBox *)GetDlgItem(IDC_COMBO_CUSRANGE_STIGNALTYPE))->SetWindowText(JumperStatus[temp_jumper]);
     }
 	else 
 	{
-        GetDlgItem(IDC_STATIC_CUS_MIN_LABLE)->SetWindowTextW(_T("First Point Volts :"));
-        GetDlgItem(IDC_STATIC_CUS_MAX_LABLE2)->SetWindowTextW(_T("Last Point Volts :"));
+        GetDlgItem(IDC_STATIC_CUS_MIN_LABLE)->SetWindowTextW(_T("Volts :"));
+        GetDlgItem(IDC_STATIC_CUS_MAX_LABLE2)->SetWindowTextW(_T("Volts :"));
+        GetDlgItem(IDC_STATIC_VOLTS_OR_CURRENT)->SetWindowTextW(_T("Volts :"));
 		Unit_temp.Format(_T("Voltage"));
 		C_or_V.Format(_T("V"));
 	}
@@ -334,9 +338,9 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
 	ret_check = CheckAllDataValid();
 	if(!ret_check)
 	{
-		MessageBox(_T("Please input a regular table"));
+		MessageBox(_T("Make sure table values are of steadily increasing or decreasing values, reversing inflection will cause the lookup function to fail."));
         m_static_data_status.ShowWindow(SW_SHOW);
-        m_static_data_status.SetWindowTextW(_T("Table Not Linear"));
+        m_static_data_status.SetWindowTextW(_T("Inflection point\r\n detected"));
 		return 0;
 	}
     else
@@ -802,9 +806,9 @@ void CBacnetAnalogCusRang::UpdateCusAnalogUnit()
 	ret_check = CheckAllDataValid();
 	if(!ret_check)
 	{
-		MessageBox(_T("Please input a regular table"));
+		MessageBox(_T("Make sure table values are of steadily increasing or decreasing values, reversing inflection will cause the lookup function to fail. "));
         m_static_data_status.ShowWindow(SW_SHOW);
-        m_static_data_status.SetWindowTextW(_T("Table Not Linear"));
+        m_static_data_status.SetWindowTextW(_T("Inflection point\r\n detected"));
 		return ;
 	}
     else
@@ -839,7 +843,7 @@ void CBacnetAnalogCusRang::OnTimer(UINT_PTR nIDEvent)
         static int n_loop_count = 0;
         n_loop_count = (++n_loop_count) % 4;
         if (n_loop_count == 0)
-            Post_Refresh_Message(g_bac_instance, READINPUT_T3000, input_item_select_for_range, input_item_select_for_range, sizeof(Str_in_point), BAC_INPUT_GROUP);
+            Post_Refresh_Message(g_bac_instance, READINPUT_T3000, input_item_select_for_range, input_item_select_for_range, sizeof(Str_in_point), 1 /*BAC_INPUT_GROUP*/);
 
         float real_voltage = ((float)m_Input_data.at(input_item_select_for_range).value) / 1000;
 
@@ -865,7 +869,10 @@ void CBacnetAnalogCusRang::OnTimer(UINT_PTR nIDEvent)
                 float x2 = m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of + 1].m_volts;
                 float x1 = m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].m_volts;
                 float x3 = real_voltage * 10;
-                show_value = (y2 - y1) / (x2 - x1)*(x3 - x1) + y1;
+                if (x2 == x1)
+                    show_value = 0;
+                else
+                    show_value = (y2 - y1) / (x2 - x1)*(x3 - x1) + y1;
                 //show_value =  ((float)(m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of+1].unit - m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].unit))/(((float)(m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of+1].value - m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].value))/10) *  (real_voltage -((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].value)/10) + m_analog_custmer_range.at(analog_range_tbl_line).dat[temp_index_of].value;
             }
         }
@@ -970,7 +977,7 @@ void CBacnetAnalogCusRang::InitialPointCount()
     if (!ret_check)
     {
         m_static_data_status.ShowWindow(SW_SHOW);
-        m_static_data_status.SetWindowTextW(_T("Table Not Linear"));
+        m_static_data_status.SetWindowTextW(_T("Inflection point\r\n detected"));
     }
     else
     {
@@ -1191,7 +1198,7 @@ void CBacnetAnalogCusRang::ReSetSlideAndList()
     if (!ret_check)
     {
         m_static_data_status.ShowWindow(SW_SHOW);
-        m_static_data_status.SetWindowTextW(_T("Table Not Linear"));
+        m_static_data_status.SetWindowTextW(_T("Inflection point\r\n detected"));
     }
     else
     {
@@ -1557,4 +1564,30 @@ void CBacnetAnalogCusRang::OnCbnKillfocusComboCusrangeStignaltype()
     Initial_List();
     InitialPointCount();
     Fresh_AnalogCusRange_List(analog_range_tbl_line, analog_range_tbl_line);
+}
+
+
+void CBacnetAnalogCusRang::OnNMClickDialogBacnetRangeList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+    // TODO: 在此添加控件通知处理程序代码
+    *pResult = 0;
+
+    long lRow, lCol;
+    m_analog_cus_range_list.Set_Edit(false);
+    DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+    CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+    m_analog_cus_range_list.ScreenToClient(&point);
+    LVHITTESTINFO lvinfo;
+    lvinfo.pt = point;
+    lvinfo.flags = LVHT_ABOVE;
+    int nItem = m_analog_cus_range_list.SubItemHitTest(&lvinfo);
+
+    lRow = lvinfo.iItem;
+    lCol = lvinfo.iSubItem;
+
+    if (lRow>=n_point_count) //如果点击区超过最大行号，则点击是无效的
+        return;
+
+    m_analog_cus_range_list.Set_Edit(true);
 }

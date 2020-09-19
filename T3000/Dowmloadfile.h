@@ -46,6 +46,7 @@ public:
 	void CreateProductFolderMap();
 	CString GetProdcutFtpPath(int nproductid);
     static DWORD WINAPI  FtpDownloadThread(LPVOID lpVoid);
+    static DWORD WINAPI  WebDownloadThread(LPVOID lpVoid);
     CStaticEx m_static_persent;
     CString download_file_name;
     void Update_File();

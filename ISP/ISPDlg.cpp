@@ -2536,6 +2536,19 @@ void CISPDlg::FlashByCom()
                 g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
+        else if ((temp_hex_pid_name.CompareNoCase(_T("PID10")) == 0) && (new_bootload == 0))
+        {
+            CString strTips_version;
+            hex_version = ((float)(global_fileInfor.software_high * 256 + global_fileInfor.software_low));
+            strTips_version.Format(_T("Hex file firmware version : %.2f"), hex_version);
+            n_hex_file_pid = PM_TSTAT10;
+            if (hex_version >= 5109) //大于这个版本就说明需要512的flash ，必须先更新bootload;
+            {
+                c1_need_update_boot = 1;
+                if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径;
+                    g_update_newfirmware_file_path = m_strHexFileName;
+            }
+        }
 
         int nRet = m_pComWriter->BeginWirteByCom();
 
@@ -3690,10 +3703,27 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 #if 1 //写 wifi mac 地址
         //STATIC_IP_START_REG  2070  6 个寄存器
 
+
+        int n_ret_wifi_enable = Write_One_Retry(temp_read_reg[6], 2008, 0, 6);
+        if (n_ret_wifi_enable < 0)
+        {
+            sn_mac_info.Format(_T("写入使能WIFI MAC地址标志位失败"));
+            Sleep(1000);
+            ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
+            return 1;
+        }
+        else
+        {
+            sn_mac_info.Format(_T("写入使能WIFI MAC地址标志位 成功"));
+            Sleep(1000);
+        }
+
         unsigned short write_value[6];
         for (int i = 0; i < 6; i++)
         {
             write_value[i] = ready_towrite_mac[i];
+            if (write_value[i] < 0x10)
+                write_value[i] = write_value[i] + 0x10;        //wifi的mac地址 有些位位小于0x10 写不进去
         }
         write_value[0] = 0x18;
         int n_mac_ret = 0;
@@ -3952,6 +3982,17 @@ void CISPDlg::OnBnClickedButtonFlashSn()
         sensor_value2 = (unsigned short)sensor2_bit.to_ulong();
         Sleep(1);
 
+    }
+
+    if ((sensor_value1 == 0) && (sensor_value2 == 0) && (handle_write_sensor_info == 1))
+    {
+        if (((CButton *)GetDlgItem(IDC_CHECK_NO_ITEM))->GetCheck()  == false)
+        {
+            m_static_info.SetWindowTextW(_T("请确认右侧传感器，若没有，请勾选 第零项"));
+            ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(true);
+            ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(true);
+            return;
+        }
     }
     
     if (h_sn_mac_thread == NULL)
