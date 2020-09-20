@@ -187,8 +187,8 @@ add_executable(${PROJECT_NAME}
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/level='requireAdministrator' /uiAccess='false'")
 
 
-# add_dependencies(${PROJECT_NAME} BACnetStackLibrary ModbusDllforVc)
-# Link with other dependencies.
+add_dependencies(${PROJECT_NAME} BACnet_Stack_Library ModbusDllforVc)
+# Link with other dependencies. Linking will happen using pragma directive.
 #target_link_libraries(${PROJECT_NAME} ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/BACnetStackLibrary.lib
 #  ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/ModbusDllforVc.lib)
   
