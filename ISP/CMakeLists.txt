@@ -174,6 +174,10 @@ set_source_files_properties(${RES_DIRECTORY}/ISP.ico PROPERTIES LANGUAGE RC)
 set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ../")
 set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ./")
 
+# Since we link to BACnet_Stack_Library through pragma directive, we need to specify the 
+# link directory path.
+link_directories(${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE})
+
 # Add executable to build.
 add_executable(${PROJECT_NAME} 
    ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES}
@@ -181,6 +185,7 @@ add_executable(${PROJECT_NAME}
 
 # This program requires admin previleges to run.
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/level='requireAdministrator' /uiAccess='false'")
+
 
 # add_dependencies(${PROJECT_NAME} BACnetStackLibrary ModbusDllforVc)
 # Link with other dependencies.
