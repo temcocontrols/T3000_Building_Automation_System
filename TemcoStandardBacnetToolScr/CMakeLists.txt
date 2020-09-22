@@ -138,7 +138,58 @@ set(PROPERTIES_FILES
   ${PROPERTIES_FOLDER}/Settings.settings
 )
 
-add_executable(BacnetExplore ${SRC_FILES} ${PROPERTIES_FILES} ${RESOURCE_FILES})
+add_executable(BacnetExplore WIN32 app.config ReadSinglePropDescr.xml ReadSinglePropDescrDefault.xml YabeDeviceDescriptor.xml ${SRC_FILES} ${PROPERTIES_FILES} ${RESOURCE_FILES})
+
+csharp_set_windows_forms_properties(  
+  ${SRC_FOLDER}/AlarmSummary.cs
+  ${SRC_FOLDER}/AlarmSummary.Designer.cs
+  ${SRC_FOLDER}/AlarmSummary.resx
+  ${SRC_FOLDER}/BBMDEditor.cs
+  ${SRC_FOLDER}/BBMDEditor.resx
+  ${SRC_FOLDER}/BBMDEditor.Designer.cs
+  ${SRC_FOLDER}/CalendarEditor.cs
+  ${SRC_FOLDER}/CalendarEditor.resx
+  ${SRC_FOLDER}/CalendarEditor.Designer.cs
+  ${SRC_FOLDER}/CreateObject.cs
+  ${SRC_FOLDER}/CreateObject.resx
+  ${SRC_FOLDER}/CreateObject.Designer.cs
+  ${SRC_FOLDER}/DeviceCommunicationControlDialog.cs
+  ${SRC_FOLDER}/DeviceCommunicationControlDialog.resx
+  ${SRC_FOLDER}/DeviceCommunicationControlDialog.Designer.cs
+  ${SRC_FOLDER}/ForeignRegistry.cs
+  ${SRC_FOLDER}/ForeignRegistry.resx
+  ${SRC_FOLDER}/ForeignRegistry.Designer.cs
+  ${SRC_FOLDER}/MainDialog.cs
+  ${SRC_FOLDER}/MainDialog.resx
+  ${SRC_FOLDER}/MainDialog.Designer.cs
+  ${SRC_FOLDER}/NotificationEditor.cs
+  ${SRC_FOLDER}/NotificationEditor.resx
+  ${SRC_FOLDER}/NotificationEditor.Designer.cs
+  ${SRC_FOLDER}/ProgressDialog.cs
+  ${SRC_FOLDER}/ProgressDialog.resx
+  ${SRC_FOLDER}/ProgressDialog.Designer.cs
+  ${SRC_FOLDER}/ScheduleDisplay.cs
+  ${SRC_FOLDER}/ScheduleDisplay.resx
+  ${SRC_FOLDER}/ScheduleDisplay.Designer.cs
+  ${SRC_FOLDER}/SearchDialog.cs
+  ${SRC_FOLDER}/SearchDialog.resx
+  ${SRC_FOLDER}/SearchDialog.Designer.cs
+  ${SRC_FOLDER}/SettingsDialog.cs
+  ${SRC_FOLDER}/SettingsDialog.resx
+  ${SRC_FOLDER}/SettingsDialog.Designer.cs
+  ${SRC_FOLDER}/SourceAddressDialog.cs
+  ${SRC_FOLDER}/SourceAddressDialog.resx
+  ${SRC_FOLDER}/SourceAddressDialog.Designer.cs
+  ${SRC_FOLDER}/T3000BacnetTool.cs
+  ${SRC_FOLDER}/T3000BacnetTool.resx
+  ${SRC_FOLDER}/T3000BacnetTool.Designer.cs
+  ${SRC_FOLDER}/TemcoBacnetTestTool.cs
+  ${SRC_FOLDER}/TemcoBacnetTestTool.resx
+  ${SRC_FOLDER}/TemcoBacnetTestTool.Designer.cs
+  ${SRC_FOLDER}/TrendLogDisplay.cs
+  ${SRC_FOLDER}/TrendLogDisplay.resx
+  ${SRC_FOLDER}/TrendLogDisplay.Designer.cs
+)
 
 csharp_set_designer_cs_properties(
   ${PROPERTIES_FOLDER}/AssemblyInfo.cs
@@ -146,42 +197,13 @@ csharp_set_designer_cs_properties(
   ${PROPERTIES_FOLDER}/Resources.resx
   ${PROPERTIES_FOLDER}/Settings.Designer.cs
   ${PROPERTIES_FOLDER}/Settings.settings
-  ${SRC_FOLDER}/AlarmSummary.Designer.cs
-  ${SRC_FOLDER}/AlarmSummary.resx
-  ${SRC_FOLDER}/BBMDEditor.resx
-  ${SRC_FOLDER}/BBMDEditor.Designer.cs
-  ${SRC_FOLDER}/CalendarEditor.resx
-  ${SRC_FOLDER}/CalendarEditor.Designer.cs
-  ${SRC_FOLDER}/CreateObject.resx
-  ${SRC_FOLDER}/CreateObject.Designer.cs
-  ${SRC_FOLDER}/DeviceCommunicationControlDialog.resx
-  ${SRC_FOLDER}/DeviceCommunicationControlDialog.Designer.cs
-  ${SRC_FOLDER}/ForeignRegistry.resx
-  ${SRC_FOLDER}/ForeignRegistry.Designer.cs
-  ${SRC_FOLDER}/MainDialog.resx
-  ${SRC_FOLDER}/MainDialog.Designer.cs
-  ${SRC_FOLDER}/NotificationEditor.resx
-  ${SRC_FOLDER}/NotificationEditor.Designer.cs
-  ${SRC_FOLDER}/ProgressDialog.resx
-  ${SRC_FOLDER}/ProgressDialog.Designer.cs
-  ${SRC_FOLDER}/ScheduleDisplay.resx
-  ${SRC_FOLDER}/ScheduleDisplay.Designer.cs
-  ${SRC_FOLDER}/SearchDialog.resx
-  ${SRC_FOLDER}/SearchDialog.Designer.cs
-  ${SRC_FOLDER}/SettingsDialog.resx
-  ${SRC_FOLDER}/SettingsDialog.Designer.cs
-  ${SRC_FOLDER}/SourceAddressDialog.resx
-  ${SRC_FOLDER}/SourceAddressDialog.Designer.cs
-  ${SRC_FOLDER}/T3000BacnetTool.resx
-  ${SRC_FOLDER}/T3000BacnetTool.Designer.cs
-  ${SRC_FOLDER}/TemcoBacnetTestTool.resx
-  ${SRC_FOLDER}/TemcoBacnetTestTool.Designer.cs
-  ${SRC_FOLDER}/TrendLogDisplay.resx
-  ${SRC_FOLDER}/TrendLogDisplay.Designer.cs
 )
 
 set_property(TARGET ${project} PROPERTY VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.0.0")
-set_property(TARGET ${project} PROPERTY WIN32_EXECUTABLE TRUE)
+set_target_properties(${project} PROPERTIES VS_GLOBAL_TargetFrameworkProfile "Client" )
+set_target_properties(${project} PROPERTIES VS_GLOBAL_ROOTNAMESPACE "Yabe")
+set_target_properties(${project} PROPERTIES VS_GLOBAL_ApplicationIcon "${SRC_FOLDER}/Search.ico")
+set_target_properties(${project} PROPERTIES WIN32_EXECUTABLE TRUE)
 set(CMAKE_CSharp_FLAGS "/langversion:latest")
 
 set(OUT_DIR ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE})
