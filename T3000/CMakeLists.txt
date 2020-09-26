@@ -38,7 +38,7 @@ set(BADO_SOURCE_DIR ./BADO)
 set(AIRQUALITY_SOURCE_DIR ./AirQuality)
 set(BACNET_SOURCE_DIR ./)
 set(BACNET_SOURCE_CM5_DIR ./CM5)
-set(CLASSCTRL_SOURCE_DIR ./Class)
+set(CLASS_SOURCE_DIR ./Class)
 set(CHARTCTRL_SOURCE_DIR ./ChartCtrl)
 set(SINGLESLIDER_SOURCE_DIR ./singleslider)
 set(SQLITE_DRIVER_DIR ../SQLiteDriver)
@@ -62,6 +62,8 @@ set(BACNET_DLL_VC_INCLUDE ../BacNetDllforVc/Include)
 set(BACNET_DLL_OBJECT_INCLUDE ../BacNetDllforVc/Object)
 set(BACNET_DLL_HANDLER_INCLUDE ../BacNetDllforVc/Handler)
 set(BACNET_MAIN_INCLUDE ../BacNetDllforVc/MainCpp)
+set(HTTP_API ../BravocontrolAPI/BravocontrolAPI/HttpAPI)
+set(CUSTOM_SOURCE_DIR ./CustomSource)
 
 ############## CMake Project ################
 #        The main options of project        #
@@ -116,6 +118,16 @@ endif(NOT MSVC)
 ################ Files ################
 #   --   Add files to project.   --   #
 #######################################
+
+set(ISP_SOURCE_FILES
+  ${ISP_SOURCE_DIR}/MyPing.cpp
+)
+
+# I don't know why Splash.cpp is there in both ISP and here. Refactor?
+set(CUSTOM_SOURCE_FILES
+  ${CUSTOM_SOURCE_DIR}/Splash.cpp
+  ${CUSTOM_SOURCE_DIR}/JPGLoader.cpp
+)
 
 set(AIRQUALITY_FILES 
   ${AIRQUALITY_SOURCE_DIR}/AirQuality.cpp
@@ -270,12 +282,10 @@ set(CHARTCTRL_SOURCE_FILES
 
 
 set(CLASS_SOURCE_FILES
-  ${CLASSCTRL_SOURCE_DIR}/md5.cpp
-  ${CLASSCTRL_SOURCE_DIR}/md5.h
-  ${CLASSCTRL_SOURCE_DIR}/MulitithreadSocket.cpp
-  ${CLASSCTRL_SOURCE_DIR}/MulitithreadSocket.h
-  ${CLASSCTRL_SOURCE_DIR}/MyPing.cpp
-  ${CLASSCTRL_SOURCE_DIR}/MyPing.h
+  ${CLASS_SOURCE_DIR}/md5.cpp
+  ${CLASS_SOURCE_DIR}/md5.h
+  ${CLASS_SOURCE_DIR}/MulitithreadSocket.cpp
+  ${CLASS_SOURCE_DIR}/MulitithreadSocket.h
 )
 
 set(BACNET_HEADER_FILES
@@ -488,6 +498,16 @@ set(BACNET_HEADER_FILES
   ${BACNET_HEADER_DIR}/WriteSingleRegDlg.h
   ${BACNET_HEADER_DIR}/ZigbeeInformationDlg.h
   ${BACNET_HEADER_DIR}/ZigbeeRepeater.h
+  ${BACNET_HEADER_DIR}/BancetProperty.h
+  ${BACNET_HEADER_DIR}/BacnetSettingBasicInfo.h
+  ${BACNET_HEADER_DIR}/BacnetSettingTcpip.h
+  ${BACNET_HEADER_DIR}/BacnetSettingTime.h
+  ${BACNET_HEADER_DIR}/BacnetSettingDyndns.h
+  ${BACNET_HEADER_DIR}/BacnetEmailAlarm.h
+  ${BACNET_HEADER_DIR}/CO2_AUTO_CALIBRATION.h
+  ${BACNET_HEADER_DIR}/BacnetThirdPartyMain.h
+  ${BACNET_HEADER_DIR}/TstatSetpointDetail.h
+  ${BACNET_HEADER_DIR}/TstatAQI_Detail.h
 )
 
 set(SINGLESLIDER_SOURCE_FILES
@@ -682,6 +702,16 @@ set(T3000_SOURCE_FILES
   ${T3000_SOURCE_DIR}/WriteSingleRegDlg.cpp
   ${T3000_SOURCE_DIR}/ZigbeeInformationDlg.cpp
   ${T3000_SOURCE_DIR}/ZigbeeRepeater.cpp
+  ${T3000_SOURCE_DIR}/BancetProperty.cpp
+  ${T3000_SOURCE_DIR}/BacnetSettingBasicInfo.cpp
+  ${T3000_SOURCE_DIR}/BacnetSettingTcpip.cpp
+  ${T3000_SOURCE_DIR}/BacnetSettingTime.cpp
+  ${T3000_SOURCE_DIR}/BacnetSettingDyndns.cpp
+  ${T3000_SOURCE_DIR}/BacnetEmailAlarm.cpp
+  ${T3000_SOURCE_DIR}/CO2_AUTO_CALIBRATION.cpp
+  ${T3000_SOURCE_DIR}/BacnetThirdPartyMain.cpp
+  ${T3000_SOURCE_DIR}/TstatSetpointDetail.cpp
+  ${T3000_SOURCE_DIR}/TstatAQI_Detail.cpp
 )
 
 set(LIGHTINGCONTROLLER_SRC_FILES
@@ -707,7 +737,7 @@ set(T3_DIALOG_FILES
 include_directories(${T3_HEADER_DIR} ${SQLITE_HEADER_DIR} ${T3000_SOURCE_DIR} ${SINGLESLIDER_SOURCE_DIR}
   ${BACNET_HEADER_DIR} ${CLASSCTRL_SOURCE_DIR} ${CHARTCTRL_SOURCE_DIR} ${BADO_SOURCE_DIR} ${BACNET_SOURCE_CM5_DIR}
   ${BACNET_SOURCE_CM5_DIR} ${AIRQUALITY_HEADER_DIR} ${BACNET_DLL_VC_INCLUDE} ${BACNET_DLL_OBJECT_INCLUDE}
-  ${BACNET_DLL_HANDLER_INCLUDE} ${BACNET_MAIN_INCLUDE} ${LIGHTINGCONTROLLER_SRC_DIR})
+  ${BACNET_DLL_HANDLER_INCLUDE} ${BACNET_MAIN_INCLUDE} ${LIGHTINGCONTROLLER_SRC_DIR} ${HTTP_API})
 
 set(RESOURCE_FILES
   ${T3_RESOURCE_DIR}/Alarms.ico
@@ -806,9 +836,10 @@ set(RESOURCE_FILES
 
 # Add executable to build.
 add_executable(${PROJECT_NAME} WIN32
-   ${AIRQUALITY_FILES} ${BACNET_FILES} ${BACNET_CM5_H_FILES} ${BADO_SOURCE_FILES} 
+   ${AIRQUALITY_FILES} ${BACNET_FILES} ${BACNET_CM5_H_FILES} ${BADO_SOURCE_FILES} ${CLASS_SOURCE_FILES} ${ISP_SOURCE_FILES} 
    ${CHARTCTRL_SOURCE_FILES} ${BACNET_HEADER_FILES} ${CLASSCTRL_SOURCE_FILES} ${BACNET_HEADER_FILES}
    ${SINGLESLIDER_SOURCE_FILES} ${T3000_SOURCE_FILES} ${SQLITE_FILES} ${T3_DIALOG_FILES} ${LIGHTINGCONTROLLER_SRC_FILES}
+   ${CUSTOM_SOURCE_FILES} 
 )
 
 if(MSVC)
@@ -817,7 +848,9 @@ if(MSVC)
    ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/ModbusDllforVc.lib 
    ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/FlexSlideBar.lib
    ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/BACnet_Stack_Library.lib
-   ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/MultipleMonthCal32.lib)
+   ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/MultipleMonthCal32.lib
+   ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/HttpAPI.lib
+   )
    target_link_libraries(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/../SQLiteDriver/sqlite3.lib)
    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
    ${CMAKE_CURRENT_SOURCE_DIR}/../SQLiteDriver/sqlite3.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE})
