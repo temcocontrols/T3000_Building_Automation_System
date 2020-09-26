@@ -1,0 +1,5 @@
+x86-windows/
+x86-windows/share/
+x86-windows/share/openssl/
+x86-windows/share/openssl/usage
+x86-windows/share/openssl/vcpkg_abi_info.txt
