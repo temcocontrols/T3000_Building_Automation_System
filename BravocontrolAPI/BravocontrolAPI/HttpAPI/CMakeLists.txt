@@ -63,6 +63,7 @@ else()
 endif()
 
 # We depend on OpenSSL 
+set(OPENSSL_ROOT_DIR "../../../vcpkg-export-openssl/installed/x86-windows")
 find_package(OpenSSL REQUIRED)
 
 ############## Artefacts Output #################

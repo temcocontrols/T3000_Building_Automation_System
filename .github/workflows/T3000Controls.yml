@@ -25,7 +25,7 @@ jobs:
           cd ${{ github.workspace }}
           mkdir build
           cd build
-          cmake -A Win32 .. -DCMAKE_TOOLCHAIN_FILE=../vcpkg-export-openssl/scripts/buildsystems/vcpkg.cmake -DOPENSSL_ROOT_DIR=../vcpkg-export-openssl/installed/x86-windows 
+          cmake -A Win32 .. -DCMAKE_TOOLCHAIN_FILE="..\vcpkg-export-openssl\scripts\buildsystems\vcpkg.cmake"  
 
       - name: cmake-build
         run: |
