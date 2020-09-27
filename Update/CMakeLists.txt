@@ -101,14 +101,14 @@ set(UPDATE_SOURCE_FILES
 include_directories(${UPDATE_HEADER_DIR})
 
 set(RESOURCE_FILES
-   ${UPDATE_RESOURCE_DIR}/Update.rc2
+   #${UPDATE_RESOURCE_DIR}/Update.rc2
    ${UPDATE_RESOURCE_DIR}/Step.ico
    ${UPDATE_RESOURCE_DIR}/temcologo.bmp
    ${UPDATE_SOURCE_DIR}/Update.rc
 )
 
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Update.rc2 PROPERTIES LANGUAGE RC)
-set_source_files_properties(${UPDATE_RESOURCE_DIR}/Update.rc2 PROPERTIES LANGUAGE RC)
+#set_source_files_properties(${UPDATE_RESOURCE_DIR}/Update.rc2 PROPERTIES LANGUAGE RC)
 
 # Add executable to build.
 add_executable(${PROJECT_NAME} WIN32 ${UPDATE_SOURCE_FILES} ${RESOURCE_FILES} 
