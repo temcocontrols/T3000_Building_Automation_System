@@ -198,6 +198,7 @@
     <ClCompile Include="BacnetVarCusRang.cpp" />
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
+    <ClCompile Include="BacnetWeb.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="Bacnet_Range_Msv.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
@@ -253,6 +254,7 @@
     <ClCompile Include="CustomSource\Splash.cpp" />
     <ClCompile Include="CustomSTable.cpp" />
     <ClCompile Include="BacnetView.cpp" />
+    <ClCompile Include="CWebBrowser2.cpp" />
     <ClCompile Include="DebugWindow.cpp" />
     <ClCompile Include="DetectOnlineDlg.cpp" />
     <ClCompile Include="DisplayConfig.cpp" />
@@ -552,6 +554,7 @@
     <ClInclude Include="BacnetVarCusRang.h" />
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
+    <ClInclude Include="BacnetWeb.h" />
     <ClInclude Include="Bacnet_Include.h" />
     <ClInclude Include="Bacnet_Range_Msv.h" />
     <ClInclude Include="BADO\BADO.h" />
@@ -616,6 +619,7 @@
     <ClInclude Include="CControlBasicEditorCOM.h" />
     <ClInclude Include="CRange0.h" />
     <ClInclude Include="CustomSTable.h" />
+    <ClInclude Include="CWebBrowser2.h" />
     <ClInclude Include="CWorkbook0.h" />
     <ClInclude Include="CWorkbooks0.h" />
     <ClInclude Include="CWorksheet0.h" />
@@ -793,7 +797,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties _x007B_E8789EA8-CA99-48DF-B920-1A1DCB4FF6AD_x007D_="CForms1" _x007B_3A2B370C-BA0A-11D1-B137-0000F8753F5D_x007D_="CMschart1" RESOURCE_FILE="T3000.rc" _x007B_6262D3A0-531B-11CF-91F6-C2863C385E30_x007D_="CMsflexgrid1" _x007B_232E456A-87C3-11D1-8BE3-0000F8754DA1_x007D_="CMonthview1" />
+      <UserProperties _x007B_E8789EA8-CA99-48DF-B920-1A1DCB4FF6AD_x007D_="CForms1" _x007B_8856F961-340A-11D0-A96B-00C04FD705A2_x007D_="CWebBrowser2" _x007B_3A2B370C-BA0A-11D1-B137-0000F8753F5D_x007D_="CMschart1" RESOURCE_FILE="T3000.rc" _x007B_6262D3A0-531B-11CF-91F6-C2863C385E30_x007D_="CMsflexgrid1" _x007B_232E456A-87C3-11D1-8BE3-0000F8754DA1_x007D_="CMonthview1" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

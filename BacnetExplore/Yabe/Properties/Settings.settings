@@ -74,7 +74,7 @@
     <Setting Name="Udp_MaxPayload" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1472</Value>
     </Setting>
-    <Setting Name="DefaultPreferStructuredView" Type="System.Boolean" Scope="User">
+    <Setting Name="GetStructuredView" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="DefaultUdpIp" Type="System.String" Scope="User">
@@ -98,8 +98,29 @@
     <Setting Name="IPv6_Support" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="DescriptionInAlarmSummary" Type="System.Boolean" Scope="User">
+    <Setting Name="ShowDescriptionWhenUsefull" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DisplayIdWithName" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Plugins" Type="System.String" Scope="User">
+      <Value Profile="(Default)">CheckReliability, CheckStatusFlags, ListOutOfService</Value>
+    </Setting>
+    <Setting Name="GraphDotStyle" Type="ZedGraph.SymbolType" Scope="User">
+      <Value Profile="(Default)">Circle</Value>
+    </Setting>
+    <Setting Name="GraphLineStep" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SettingsUpgradeRequired" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="COVTimeFormater" Type="System.String" Scope="User">
+      <Value Profile="(Default)">HH:mm:ss</Value>
+    </Setting>
+    <Setting Name="GUI_SubscriptionColumns" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

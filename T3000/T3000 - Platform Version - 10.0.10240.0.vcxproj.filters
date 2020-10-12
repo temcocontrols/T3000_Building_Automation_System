@@ -771,6 +771,12 @@
     <ClCompile Include="CO2_AUTO_CALIBRATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CWebBrowser2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetWeb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -1949,6 +1955,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CO2_AUTO_CALIBRATION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWebBrowser2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetWeb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

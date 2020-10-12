@@ -1180,25 +1180,25 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 		Auto_M.Empty();
 	}
 
-	if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
-	{
-        if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))  //ÅĞ¶ÏÊÇMSV range
+    if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))  //ÅĞ¶ÏÊÇMSV range
+    {
+        for (int z = 0; z < 3; z++)
         {
-            for (int z = 0; z < 3; z++)
+            int get_name_ret = 0;
+            float temp_float_value1;
+            temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+            get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, temp_float_value1, ret_cstring);
+            if (get_name_ret > 0)
             {
-                int get_name_ret = 0;
-                float temp_float_value1;
-                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
-                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, temp_float_value1, ret_cstring);
-                if (get_name_ret > 0)
-                {
-                    ret_unit.Empty();
-                    break;
-                }
+                ret_unit.Empty();
+                break;
             }
-
         }
-		else if(m_Variable_data.at(i).range>30)
+
+    }
+    else if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+	{
+        if(m_Variable_data.at(i).range>30)
 		{
 			ret_cstring = _T(" ");
 			return RANGE_ERROR;

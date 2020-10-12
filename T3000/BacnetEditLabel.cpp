@@ -498,7 +498,25 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			{
                 if (m_Variable_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //Èç¹ûÊÇ
                     return 0;
-				if(m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_ANALOG)
+                bool msv_status = 0;
+                if ((m_Variable_data.at(label_info.nPoint_number).range >= 101) && (m_Variable_data.at(label_info.nPoint_number).range <= 103))
+                {
+                    msv_status = 1;
+                    if (read_msv_table)
+                    {
+                        CString new_name;
+                        int new_value;
+                        int nret = 0;
+                        nret = Get_Msv_next_Name_and_Value_BySearchValue(m_Variable_data.at(label_info.nPoint_number).range - 101,
+                            (int)(m_Variable_data.at(label_info.nPoint_number).value / 1000), new_name, new_value);
+                        if (nret >= 0)
+                        {
+                            m_Variable_data.at(label_info.nPoint_number).value = new_value * 1000;
+                            show_temp = new_name;
+                        }
+                    }
+                }
+				else if(m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_ANALOG)
 				{
 					CString temp_analog_value;
 					GetDlgItemTextW(IDC_EDIT_LABEL_VALUE,temp_analog_value);
@@ -509,7 +527,6 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				}
 				else if(m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_DIGITAL)
 				{
-                    bool msv_status = 0;
 					if((m_Variable_data.at(label_info.nPoint_number).range < 23) &&(m_Variable_data.at(label_info.nPoint_number).range !=0))
 						temp_unit = Digital_Units_Array[m_Variable_data.at(label_info.nPoint_number).range];
 					else if((m_Variable_data.at(label_info.nPoint_number).range >=23) && (m_Variable_data.at(label_info.nPoint_number).range <= 30))
@@ -521,23 +538,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 							return 0;
 						}
 					}
-                    else if ((m_Variable_data.at(label_info.nPoint_number).range >= 101) && (m_Variable_data.at(label_info.nPoint_number).range <= 103))
-                    {
-                        msv_status = 1;
-                        if (read_msv_table)
-                        {
-                            CString new_name;
-                            int new_value;
-                            int nret = 0;
-                            nret = Get_Msv_next_Name_and_Value_BySearchValue(m_Variable_data.at(label_info.nPoint_number).range - 101,
-                                (int)(m_Variable_data.at(label_info.nPoint_number).value / 1000), new_name, new_value);
-                            if (nret >= 0)
-                            {
-                                m_Variable_data.at(label_info.nPoint_number).value = new_value *1000;
-                                show_temp = new_name;
-                            }
-                        }
-                    }
+                    
 					else
 						return 0;
                     if (msv_status == 0)

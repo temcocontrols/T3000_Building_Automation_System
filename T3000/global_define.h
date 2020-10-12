@@ -1,6 +1,6 @@
 #pragma once
 #include "RelayLabel.h"
-#define ENABLE_HTTP_FUCTION  //定义是否使用http api
+//#define ENABLE_HTTP_FUCTION  //定义是否使用http api
 //#define ENABLE_T3_EMAIL
 #include <map>
 //minipanel 寄存器表

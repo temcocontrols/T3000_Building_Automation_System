@@ -1,6 +1,6 @@
 ﻿/**************************************************************************
 *                           MIT License
-* 
+*
 * Copyright (C) 2014 Morten Kvistgaard <mk@pch-engineering.dk>
 *
 * Permission is hereby granted, free of charge, to any person obtaining
@@ -148,13 +148,11 @@ namespace System.IO.BACnet
         REJECT_REASON_UNDEFINED_ENUMERATION = 8,
         REJECT_REASON_UNRECOGNIZED_SERVICE = 9,
         /* Enumerated values 0-63 are reserved for definition by ASHRAE. */
-        /* Enumerated values 64-65535 may be used by others subject to */
+        /* Enumerated values 64-255 may be used by others subject to */
         /* the procedures and constraints described in Clause 23. */
         MAX_BACNET_REJECT_REASON = 10,
-        /* do the MAX here instead of outside of enum so that
-           compilers will allocate adequate sized datatype for enum */
         REJECT_REASON_PROPRIETARY_FIRST = 64,
-        REJECT_REASON_PROPRIETARY_LAST = 65535
+        REJECT_REASON_PROPRIETARY_LAST = 255
     };
 
     public enum BacnetErrorClasses
@@ -369,13 +367,15 @@ namespace System.IO.BACnet
         /* Alarm and Event Services */
         SERVICE_SUPPORTED_ACKNOWLEDGE_ALARM = 0,
         SERVICE_SUPPORTED_CONFIRMED_COV_NOTIFICATION = 1,
+        //SERVICE_SUPPORTED_CONFIRMED_COV_NOTIFICATION_MULTIPLE = 42,
         SERVICE_SUPPORTED_CONFIRMED_EVENT_NOTIFICATION = 2,
         SERVICE_SUPPORTED_GET_ALARM_SUMMARY = 3,
         SERVICE_SUPPORTED_GET_ENROLLMENT_SUMMARY = 4,
         SERVICE_SUPPORTED_GET_EVENT_INFORMATION = 39,
+        SERVICE_SUPPORTED_LIFE_SAFETY_OPERATION = 37,
         SERVICE_SUPPORTED_SUBSCRIBE_COV = 5,
         SERVICE_SUPPORTED_SUBSCRIBE_COV_PROPERTY = 38,
-        SERVICE_SUPPORTED_LIFE_SAFETY_OPERATION = 37,
+        //SERVICE_SUPPORTED_SUBSCRIBE_COV_PROPERTY_MULTIPLE = 41,
         /* File Access Services */
         SERVICE_SUPPORTED_ATOMIC_READ_FILE = 6,
         SERVICE_SUPPORTED_ATOMIC_WRITE_FILE = 7,
@@ -385,12 +385,12 @@ namespace System.IO.BACnet
         SERVICE_SUPPORTED_CREATE_OBJECT = 10,
         SERVICE_SUPPORTED_DELETE_OBJECT = 11,
         SERVICE_SUPPORTED_READ_PROPERTY = 12,
-        SERVICE_SUPPORTED_READ_PROP_CONDITIONAL = 13,
+        SERVICE_SUPPORTED_READ_PROP_CONDITIONAL = 13,//removed in version 1 revision 12
         SERVICE_SUPPORTED_READ_PROP_MULTIPLE = 14,
         SERVICE_SUPPORTED_READ_RANGE = 35,
+        SERVICE_SUPPORTED_WRITE_GROUP = 40,
         SERVICE_SUPPORTED_WRITE_PROPERTY = 15,
         SERVICE_SUPPORTED_WRITE_PROP_MULTIPLE = 16,
-        SERVICE_SUPPORTED_WRITE_GROUP = 40,
         /* Remote Device Management Services */
         SERVICE_SUPPORTED_DEVICE_COMMUNICATION_CONTROL = 17,
         SERVICE_SUPPORTED_PRIVATE_TRANSFER = 18,
@@ -401,11 +401,12 @@ namespace System.IO.BACnet
         SERVICE_SUPPORTED_VT_CLOSE = 22,
         SERVICE_SUPPORTED_VT_DATA = 23,
         /* Security Services */
-        SERVICE_SUPPORTED_AUTHENTICATE = 24,
-        SERVICE_SUPPORTED_REQUEST_KEY = 25,
+        SERVICE_SUPPORTED_AUTHENTICATE = 24, //removed in version 1 revision 11
+        SERVICE_SUPPORTED_REQUEST_KEY = 25, //removed in version 1 revision 11
         SERVICE_SUPPORTED_I_AM = 26,
         SERVICE_SUPPORTED_I_HAVE = 27,
         SERVICE_SUPPORTED_UNCONFIRMED_COV_NOTIFICATION = 28,
+        //SERVICE_SUPPORTED_UNCONFIRMED_COV_NOTIFICATION_MULTIPLE = 43,
         SERVICE_SUPPORTED_UNCONFIRMED_EVENT_NOTIFICATION = 29,
         SERVICE_SUPPORTED_UNCONFIRMED_PRIVATE_TRANSFER = 30,
         SERVICE_SUPPORTED_UNCONFIRMED_TEXT_MESSAGE = 31,
@@ -438,7 +439,8 @@ namespace System.IO.BACnet
         /* for definition by ASHRAE. */
         /* Proprietary extensions are made by using the */
         /* UnconfirmedPrivateTransfer service. See Clause 23. */
-        MAX_BACNET_UNCONFIRMED_SERVICE = 11,
+        UNCONFIRMED_COV_NOTIFICATION_MULTIPLE = 11,
+        MAX_BACNET_UNCONFIRMED_SERVICE = 12,
     };
 
     public enum BacnetConfirmedServices : byte
@@ -453,6 +455,8 @@ namespace System.IO.BACnet
         SERVICE_CONFIRMED_SUBSCRIBE_COV = 5,
         SERVICE_CONFIRMED_SUBSCRIBE_COV_PROPERTY = 28,
         SERVICE_CONFIRMED_LIFE_SAFETY_OPERATION = 27,
+        SERVICE_SUBSCRIBE_COV_PROPERTY_MULTIPLE = 30,
+        SERVICE_CONFIRMED_COV_NOTIFICATION_MULTIPLE = 31,
         /* File Access Services */
         SERVICE_CONFIRMED_ATOMIC_READ_FILE = 6,
         SERVICE_CONFIRMED_ATOMIC_WRITE_FILE = 7,
@@ -462,7 +466,7 @@ namespace System.IO.BACnet
         SERVICE_CONFIRMED_CREATE_OBJECT = 10,
         SERVICE_CONFIRMED_DELETE_OBJECT = 11,
         SERVICE_CONFIRMED_READ_PROPERTY = 12,
-        SERVICE_CONFIRMED_READ_PROP_CONDITIONAL = 13,
+        SERVICE_CONFIRMED_READ_PROP_CONDITIONAL = 13, //removed in version 1 revision 12
         SERVICE_CONFIRMED_READ_PROP_MULTIPLE = 14,
         SERVICE_CONFIRMED_READ_RANGE = 26,
         SERVICE_CONFIRMED_WRITE_PROPERTY = 15,
@@ -477,14 +481,19 @@ namespace System.IO.BACnet
         SERVICE_CONFIRMED_VT_CLOSE = 22,
         SERVICE_CONFIRMED_VT_DATA = 23,
         /* Security Services */
-        SERVICE_CONFIRMED_AUTHENTICATE = 24,
-        SERVICE_CONFIRMED_REQUEST_KEY = 25,
+        SERVICE_CONFIRMED_AUTHENTICATE = 24, //removed in version 1 revision 11
+        SERVICE_CONFIRMED_REQUEST_KEY = 25,  //removed in version 1 revision 11
         /* Services added after 1995 */
         /* readRange (26) see Object Access Services */
         /* lifeSafetyOperation (27) see Alarm and Event Services */
         /* subscribeCOVProperty (28) see Alarm and Event Services */
         /* getEventInformation (29) see Alarm and Event Services */
-        MAX_BACNET_CONFIRMED_SERVICE = 30
+
+        /* Services added after 2012
+         * -- subscribe-cov-property-multiple [30] see Alarm and Event Services
+           -- confirmed-cov-notification-multiple [31] see Alarm and Event Services*/
+
+        MAX_BACNET_CONFIRMED_SERVICE = 32
     };
 
     // Add FC : from Karg's Stack
@@ -686,7 +695,7 @@ namespace System.IO.BACnet
         UNITS_MILLION_STANDARD_CUBIC_FEET_PER_DAY = 47809,
         UNITS_THOUSAND_CUBIC_FEET_PER_DAY = 47810,
         UNITS_THOUSAND_STANDARD_CUBIC_FEET_PER_DAY = 47811,
-        UINITS_POUNDS_MASS_PER_DAY = 47812,
+        UNITS_POUNDS_MASS_PER_DAY = 47812,
         UNITS_CUBIC_METERS_PER_SECOND = 85,
         UNITS_CUBIC_METERS_PER_MINUTE = 165,
         UNITS_CUBIC_METERS_PER_HOUR = 135,
@@ -776,9 +785,13 @@ namespace System.IO.BACnet
         UNITS_CUBIC_METERS_PER_DAY = 249,
         UNITS_WATT_HOURS_PER_CUBIC_METER = 250,
         UNITS_JOULES_PER_CUBIC_METER = 251,
-        UNITS_MOLE_PERCENT  = 252,
+        UNITS_MOLE_PERCENT = 252,
         UNITS_PASCAL_SECONDS = 253,
         UNITS_MILLION_STANDARD_CUBIC_FEET_PER_MINUTE = 254
+        /*-- Enumerated values 0-255 and 47808-49999 are reserved for definition by ASHRAE. Enumerated values
+          -- 256-47807 and 50000-65535 may be used by others subject to the procedures and constraints described
+          -- in Clause 23.*/
+
     }
 
     public enum BacnetPolarity : byte
@@ -800,16 +813,27 @@ namespace System.IO.BACnet
         RELIABILITY_PROCESS_ERROR = 8,
         RELIABILITY_MULTI_STATE_FAULT = 9,
         RELIABILITY_CONFIGURATION_ERROR = 10,
-        RELIABILITY_MEMBER_FAULT = 11,
+        //-- enumeration value 11 is reserved for a future addendum
         RELIABILITY_COMMUNICATION_FAILURE = 12,
-        RELIABILITY_TRIPPED = 13,
+        RELIABILITY_MEMBER_FAULT = 13,
+        RELIABILITY_MONITORED_OBJECT_FAULT = 14,
+        RELIABILITY_TRIPPED = 15,
+        RELIABILITY_LAMP_FAILURE = 16,
+        RELIABILITY_ACTIVATION_FAILURE = 17,
+        RELIABILITY_RENEW_DHCP_FAILURE = 18,
+        RELIABILITY_RENEW_FD_REGISTRATION_FAILURE = 19,
+        RELIABILITY_RESTART_AUTO_NEGOTIATION_FAILURE = 20,
+        RELIABILITY_RESTART_FAILURE = 21,
+        RELIABILITY_PROPRIETARY_COMMAND_FAILURE = 22,
+        RELIABILITY_FAULTS_LISTED = 23,
+        RELIABILITY_REFERENCED_OBJECT_FAULT = 24
         /* Enumerated values 0-63 are reserved for definition by ASHRAE.  */
         /* Enumerated values 64-65535 may be used by others subject to  */
         /* the procedures and constraints described in Clause 23. */
         /* do the max range inside of enum so that
            compilers will allocate adequate sized datatype for enum
            which is used to store decoding */
-    } ;
+    };
 
     public enum BacnetMaxSegments : byte
     {
@@ -866,7 +890,7 @@ namespace System.IO.BACnet
         OBJECT_LOAD_CONTROL = 28,
         OBJECT_STRUCTURED_VIEW = 29,
         OBJECT_ACCESS_DOOR = 30,
-        OBJECT_TIMER = 31,                  /* Addendum 135-2012ay */        
+        OBJECT_TIMER = 31,                  /* Addendum 135-2012ay */
         OBJECT_ACCESS_CREDENTIAL = 32,      /* Addendum 2008-j */
         OBJECT_ACCESS_POINT = 33,
         OBJECT_ACCESS_RIGHTS = 34,
@@ -891,6 +915,11 @@ namespace System.IO.BACnet
         OBJECT_CHANNEL = 53,        /* Addendum 2010-aa */
         OBJECT_LIGHTING_OUTPUT = 54,        /* Addendum 2010-i */
         OBJECT_BINARY_LIGHTING_OUTPUT = 55,        /* Addendum 135-2012az */
+        OBJECT_NETWORK_PORT = 56,
+        OBJECT_ELEVATOR_GROUP = 57,
+        OBJECT_ESCALATOR = 58,
+        OBJECT_LIFT = 59,
+        OBJECT_STAGING = 60, //Addendum 135-2016bd
         /* Enumerated values 0-127 are reserved for definition by ASHRAE. */
         /* Enumerated values 128-1023 may be used by others subject to  */
         /* the procedures and constraints described in Clause 23. */
@@ -900,7 +929,7 @@ namespace System.IO.BACnet
         OBJECT_PROPRIETARY_MIN = 128,
         OBJECT_PROPRIETARY_MAX = 1023,
         MAX_BACNET_OBJECT_TYPE = 1024,
-        MAX_ASHRAE_OBJECT_TYPE = 56,
+        MAX_ASHRAE_OBJECT_TYPE = 60,
     };
 
     public enum BacnetApplicationTags
@@ -965,34 +994,38 @@ namespace System.IO.BACnet
         BACNET_APPLICATION_TAG_CONTEXT_SPECIFIC_ENCODED,
         /* BACnetLogRecord */
         BACNET_APPLICATION_TAG_LOG_RECORD,
+        BACNET_APPLICATION_CONTEXT_SPECIFIC
+
+
+
     };
 
     public enum BacnetWritePriority
     {
         NO_PRIORITY = 0,
-        MANUAL_LIFE_SAFETY=1,
-        AUTOMATIC_LIFE_SAFETY=2,
-        UNSPECIFIED_LEVEL_3=3,
-        UNSPECIFIED_LEVEL_4=4,
-        CRITICAL_EQUIPMENT_CONTROL=5,
-        MINIMUM_ON_OFF=6,
-        UNSPECIFIED_LEVEL_7=7,
-        MANUAL_OPERATOR=8,
-        UNSPECIFIED_LEVEL_9=9,
-        UNSPECIFIED_LEVEL_10=10,
-        UNSPECIFIED_LEVEL_11=11,
-        UNSPECIFIED_LEVEL_12=12,
-        UNSPECIFIED_LEVEL_13=13,
-        UNSPECIFIED_LEVEL_14=14,
-        UNSPECIFIED_LEVEL_15=15,
-        LOWEST_AND_DEFAULT=16
+        MANUAL_LIFE_SAFETY = 1,
+        AUTOMATIC_LIFE_SAFETY = 2,
+        UNSPECIFIED_LEVEL_3 = 3,
+        UNSPECIFIED_LEVEL_4 = 4,
+        CRITICAL_EQUIPMENT_CONTROL = 5,
+        MINIMUM_ON_OFF = 6,
+        UNSPECIFIED_LEVEL_7 = 7,
+        MANUAL_OPERATOR = 8,
+        UNSPECIFIED_LEVEL_9 = 9,
+        UNSPECIFIED_LEVEL_10 = 10,
+        UNSPECIFIED_LEVEL_11 = 11,
+        UNSPECIFIED_LEVEL_12 = 12,
+        UNSPECIFIED_LEVEL_13 = 13,
+        UNSPECIFIED_LEVEL_14 = 14,
+        UNSPECIFIED_LEVEL_15 = 15,
+        LOWEST_AND_DEFAULT = 16
     }
 
 
     public enum BacnetFileAccessMethod
     {
-        RECORD_ACCESS=0,
-        STREAM_ACCESS=1
+        RECORD_ACCESS = 0,
+        STREAM_ACCESS = 1
     }
 
     public enum BacnetCharacterStringEncodings
@@ -1001,7 +1034,7 @@ namespace System.IO.BACnet
         CHARACTER_UTF8 = 0,
         CHARACTER_MS_DBCS = 1,
         CHARACTER_JISC_6226 = 2, /* deprecated : Addendum 135-2008k  */
-        CHARACTER_JISX_0208 = 2, 
+        CHARACTER_JISX_0208 = 2,
         CHARACTER_UCS4 = 3,
         CHARACTER_UCS2 = 4,
         CHARACTER_ISO8859 = 5,
@@ -1025,11 +1058,11 @@ namespace System.IO.BACnet
             UNSIGNED_VALUE,
             LIFE_SAFETY_MODE,
             LIFE_SAFETY_STATE
-        } ;
+        };
 
         public BacnetPropertyStateTypes tag;
         public uint state;
-    } ;
+    };
 
     public struct BacnetObjectDescription
     {
@@ -1037,6 +1070,7 @@ namespace System.IO.BACnet
         public List<BacnetPropertyIds> propsId;
     }
 
+    [Serializable]
     public struct BacnetDeviceObjectPropertyReference : ASN1.IASN1encode
     {
         public BacnetObjectId objectIdentifier;
@@ -1044,7 +1078,7 @@ namespace System.IO.BACnet
         public UInt32 arrayIndex;
         public BacnetObjectId deviceIndentifier;
 
-        public BacnetDeviceObjectPropertyReference(BacnetObjectId objectIdentifier, BacnetPropertyIds propertyIdentifier, BacnetObjectId? deviceIndentifier=null, UInt32 arrayIndex = ASN1.BACNET_ARRAY_ALL)
+        public BacnetDeviceObjectPropertyReference(BacnetObjectId objectIdentifier, BacnetPropertyIds propertyIdentifier, BacnetObjectId? deviceIndentifier = null, UInt32 arrayIndex = ASN1.BACNET_ARRAY_ALL)
         {
             this.objectIdentifier = objectIdentifier;
             this.propertyIdentifier = propertyIdentifier;
@@ -1067,35 +1101,35 @@ namespace System.IO.BACnet
         }
         public Int32 ArrayIndex // shows -1 when it's ASN1.BACNET_ARRAY_ALL
         {
-            get 
+            get
             {
                 if (arrayIndex == ASN1.BACNET_ARRAY_ALL)
                     return -1;
                 else return (Int32)arrayIndex;
             }
-            set 
+            set
             {
                 if (value < 0)
                     arrayIndex = ASN1.BACNET_ARRAY_ALL;
                 else
-                    arrayIndex = (UInt32)value; 
+                    arrayIndex = (UInt32)value;
             }
         }
         public BacnetObjectId? DeviceId  // shows null when it's not OBJECT_DEVICE
         {
-            get 
+            get
             {
                 if (deviceIndentifier.type == BacnetObjectTypes.OBJECT_DEVICE)
                     return deviceIndentifier;
                 else
                     return null;
             }
-            set 
+            set
             {
                 if (value == null)
                     deviceIndentifier = new BacnetObjectId();
                 else
-                    deviceIndentifier = value.Value;             
+                    deviceIndentifier = value.Value;
             }
         }
         public BacnetPropertyIds PropertyId
@@ -1104,7 +1138,88 @@ namespace System.IO.BACnet
             set { propertyIdentifier = value; }
         }
 
-    } ;
+    };
+
+    [Serializable]
+    public struct BacnetDeviceObjectReference : ASN1.IASN1encode
+    {
+        public BacnetObjectId objectIdentifier;
+        public BacnetObjectId deviceIndentifier;
+
+        public BacnetDeviceObjectReference(BacnetObjectId objectIdentifier, BacnetObjectId? deviceIndentifier = null)
+        {
+            this.objectIdentifier = objectIdentifier;
+
+            if (deviceIndentifier != null)
+                this.deviceIndentifier = deviceIndentifier.Value;
+            else
+                this.deviceIndentifier = new BacnetObjectId(BacnetObjectTypes.MAX_BACNET_OBJECT_TYPE, 0);
+        }
+
+
+        public override string ToString()
+        {
+            if (deviceIndentifier.type == BacnetObjectTypes.OBJECT_DEVICE)
+                return objectIdentifier.ToString() + " on Device:" + deviceIndentifier.Instance.ToString();
+            else
+                return objectIdentifier.ToString();
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            if (deviceIndentifier.type == BacnetObjectTypes.OBJECT_DEVICE)
+            {
+                ASN1.encode_context_object_id(buffer, 0, deviceIndentifier.type, deviceIndentifier.instance);
+            }
+            ASN1.encode_context_object_id(buffer, 1, objectIdentifier.type, objectIdentifier.instance);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+
+            byte TagNum;
+            len += ASN1.decode_tag_number(buffer, offset, out TagNum);
+
+            if (TagNum == 0)
+            {
+                len += ASN1.decode_object_id(buffer, offset + len, out deviceIndentifier.type, out deviceIndentifier.instance);
+                len += ASN1.decode_tag_number(buffer, offset, out TagNum); // shall be 1
+            }
+            else
+                deviceIndentifier = new BacnetObjectId(BacnetObjectTypes.MAX_BACNET_OBJECT_TYPE, 0);
+
+            len += ASN1.decode_object_id(buffer, offset + len, out objectIdentifier.type, out objectIdentifier.instance);
+
+            return len;
+
+        }
+
+        public BacnetObjectId ObjectId
+        {
+            get { return objectIdentifier; }
+            set { objectIdentifier = value; }
+        }
+
+        public BacnetObjectId? DeviceId  // shows null when it's not OBJECT_DEVICE
+        {
+            get
+            {
+                if (deviceIndentifier.type == BacnetObjectTypes.OBJECT_DEVICE)
+                    return deviceIndentifier;
+                else
+                    return null;
+            }
+            set
+            {
+                if (value == null)
+                    deviceIndentifier = new BacnetObjectId(BacnetObjectTypes.MAX_BACNET_OBJECT_TYPE, 0);
+                else
+                    deviceIndentifier = value.Value;
+            }
+        }
+
+    };
 
     public struct BacnetEventNotificationData
     {
@@ -1127,10 +1242,11 @@ namespace System.IO.BACnet
             EVENT_STATE_FAULT = 1,
             EVENT_STATE_OFFNORMAL = 2,
             EVENT_STATE_HIGH_LIMIT = 3,
-            EVENT_STATE_LOW_LIMIT = 4
-        } ;
+            EVENT_STATE_LOW_LIMIT = 4,
+            EVENT_STATE_LIFE_SAFETY_ALARM = 5
+        };
 
-        public enum  BacnetEventEnable 
+        public enum BacnetEventEnable
         {
             EVENT_ENABLE_TO_OFFNORMAL = 1,
             EVENT_ENABLE_TO_FAULT = 2,
@@ -1148,7 +1264,7 @@ namespace System.IO.BACnet
             NOTIFY_ALARM = 0,
             NOTIFY_EVENT = 1,
             NOTIFY_ACK_NOTIFICATION = 2
-        } ;
+        };
 
         public enum BacnetEventTypes
         {
@@ -1164,6 +1280,17 @@ namespace System.IO.BACnet
             EVENT_EXTENDED = 9,
             EVENT_BUFFER_READY = 10,
             EVENT_UNSIGNED_RANGE = 11,
+            // enumeration 12 is reserved for future
+            EVENT_ACCESS_EVENT = 13,
+            EVENT_DOUBLE_OUT_OF_RANGE = 14,
+            EVENT_SIGNED_OUT_OF_RANGE = 15,
+            EVENT_UNSIGNED_OUT_OF_RANGE = 16,
+            EVENT_CHANGE_OF_CHARACTERSTRING = 17,
+            EVENT_CHANGE_OF_STATUS_FLAG = 18,
+            EVENT_CHANGE_OF_RELIABILITY = 19,
+            EVENT_NONE = 20,
+            EVENT_CHANGE_OF_DISCRETE_VALUE = 21,
+            EVENT_CHANGE_OF_TIMER = 22
             /* Enumerated values 0-63 are reserved for definition by ASHRAE.  */
             /* Enumerated values 64-65535 may be used by others subject to  */
             /* the procedures and constraints described in Clause 23.  */
@@ -1180,7 +1307,7 @@ namespace System.IO.BACnet
         {
             CHANGE_OF_VALUE_BITS,
             CHANGE_OF_VALUE_REAL
-        } ;
+        };
 
         public enum BacnetLifeSafetyStates
         {
@@ -1218,7 +1345,7 @@ namespace System.IO.BACnet
                which is used to store decoding */
             LIFE_SAFETY_STATE_PROPRIETARY_MIN = 256,
             LIFE_SAFETY_STATE_PROPRIETARY_MAX = 65535
-        } ;
+        };
 
         public enum BacnetLifeSafetyModes
         {
@@ -1247,7 +1374,7 @@ namespace System.IO.BACnet
                which is used to store decoding */
             LIFE_SAFETY_MODE_PROPRIETARY_MIN = 256,
             LIFE_SAFETY_MODE_PROPRIETARY_MAX = 65535
-        } ;
+        };
 
         public enum BacnetLifeSafetyOperations
         {
@@ -1269,7 +1396,7 @@ namespace System.IO.BACnet
                which is used to store decoding */
             LIFE_SAFETY_OP_PROPRIETARY_MIN = 64,
             LIFE_SAFETY_OP_PROPRIETARY_MAX = 65535
-        } ;
+        };
 
         /*
          ** Each of these structures in the union maps to a particular eventtype
@@ -1354,16 +1481,16 @@ namespace System.IO.BACnet
 
             //guess at the tag
             if (value != null)
-                Tag=TagFromType(value.GetType());                           
+                Tag = TagFromType(value.GetType());
         }
 
         public BacnetApplicationTags TagFromType(Type t)
         {
             if (t == typeof(string))
                 return BacnetApplicationTags.BACNET_APPLICATION_TAG_CHARACTER_STRING;
-            else if (t == typeof(int) || t == typeof(short) || t == typeof(sbyte))
+            else if (t == typeof(long) || t == typeof(int) || t == typeof(short) || t == typeof(sbyte))
                 return BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT;
-            else if (t == typeof(uint) || t == typeof(ushort) || t == typeof(byte))
+            else if (t == typeof(ulong) || t == typeof(uint) || t == typeof(ushort) || t == typeof(byte))
                 return BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT;
             else if (t == typeof(bool))
                 return BacnetApplicationTags.BACNET_APPLICATION_TAG_BOOLEAN;
@@ -1391,7 +1518,7 @@ namespace System.IO.BACnet
                     ret += b.ToString("X2");
                 return ret;
             }
-            else 
+            else
                 return Value.ToString();
         }
     }
@@ -1687,7 +1814,7 @@ namespace System.IO.BACnet
     public struct BacnetweekNDay : ASN1.IASN1encode
     {
         public byte month;  /* 1 January, 13 Odd, 14 Even, 255 Any */
-        public byte week;   /* Don't realy understand ??? 1 for day 1 to 7, 2 for ... what's the objective ?  boycott it*/
+        public byte week;   /* 255 any, 1 for day 1 to 7, 2 for day 8 to 14, ... 6 last 7 days of this month */
         public byte wday;   /* 1=Monday-7=Sunday, 255 any */
 
         public BacnetweekNDay(byte day, byte month, byte week = 255)
@@ -1728,10 +1855,20 @@ namespace System.IO.BACnet
             else
                 ret = "Every days";
 
-            if (month != 255)
+            if ((week >= 1) && (week <= 5))
+                ret = ret + " (days " + (((week - 1) * 7) + 1).ToString() + "-" + (week * 7).ToString() + ")";
+            if (week == 6)
+                ret = ret + " (last 7 days of month)";
+
+            if (month <= 12)
                 ret = ret + " on " + CultureInfo.CurrentCulture.DateTimeFormat.MonthNames[month - 1];
             else
-                ret = ret + " on every month";
+                if (month == 255)
+                ret = ret + " on every months";
+            else if (month == 13)
+                ret = ret + " on odd months";
+            else
+                ret = ret + " on even months";
 
             return ret;
         }
@@ -1746,7 +1883,19 @@ namespace System.IO.BACnet
             if ((month == 14) && ((date.Month & 1) == 1))
                 return false;
 
-            // What about week, too much stupid : boycott it !
+            //  week, wrong values not tested
+            if ((week >= 1) && (week <= 5))
+            {
+                if (date.Day <= (week - 1) * 7)
+                    return false;
+                if (date.Day > week * 7)
+                    return false;
+            }
+            if (week == 6) // last 7 days of the month
+            {
+                if (date.AddDays(7).Month == date.Month)
+                    return false;
+            }
 
             if (wday == 255)
                 return true;
@@ -1757,6 +1906,5438 @@ namespace System.IO.BACnet
 
             return false;
         }
+    }
+
+    public enum BACnetDoorStatus
+    {
+        CLOSED = 0,
+        OPENED = 1,
+        UNKNOWN = 2,
+        DOOR_FAULT = 3,
+        UNUSED = 4,
+        NONE = 5,
+        CLOSING = 6,
+        OPENING = 7,
+        SAFETY_LOCKED = 8,
+        LIMITED_OPENED = 9
+    }
+
+    public enum BACnetDoorValue
+    {
+        LOCK = 0,
+        UNLOCK = 1,
+        PULSE_UNLOCK = 2,
+        EXTENDED_PULSE_UNLOCK = 3
+
+    }
+
+    public enum BACnetAccessCredentialDisableReason
+    {
+        DISABLED = 0,
+        DISABLED_NEEDS_PROVISIONING = 1,
+        DISABLED_UNASSIGNED = 2,
+        DISABLED_NOT_YET_ACTIVE = 3,
+        DISABLED_EXPIRED = 4,
+        DISABLED_LOCKOUT = 5,
+        DISABLED_MAX_DAYS = 6,
+        DISABLED_MAX_USES = 7,
+        DISABLED_INACTIVITY = 8,
+        DISABLED_MANUAL = 9
+    }
+
+    public enum BACnetAccessCredentialDisable
+    {
+        NONE = 0,
+        DISABLE = 1,
+        DISABLE_MANUAL = 2,
+        DISABLE_LOCKOUT = 3
+    }
+
+    public enum BACnetAccessPassbackMode
+    {
+        PASSBACK_OFF = 0,
+        HARD_PASSBACK = 1,
+        SOFT_PASSBACK = 2
+    }
+
+    public enum BACnetAccessUserType
+    {
+        ASSET =0,
+        GROUP =1,
+        PERSON =2
+    }
+
+    public enum BACnetAccessZoneOccupancyState
+    {
+        NORMAL = 0,
+        BELOW_LOWER_LIMIT = 1,
+        AT_LOWER_LIMIT = 2,
+        AT_UPPER_LIMIT = 3,
+        ABOVE_UPPER_LIMIT = 4,
+        DISABLED = 5,
+        NOT_SUPPORTED = 6
+    }
+
+    public enum BACnetAuthenticationFactorType
+    {
+        UNDEFINED = 0,
+        ERROR = 1,
+        CUSTOM = 2,
+        SIMPLE_NUMBER16 = 3,
+        SIMPLE_NUMBER32 = 4,
+        SIMPLE_NUMBER56 = 5,
+        SIMPLE_ALPHA_NUMERIC = 6,
+        ABA_TRACK2 = 7,
+        WIEGAND26 = 8,
+        WIEGAND37 = 9,
+        WIEGAND37_FACILITY = 10,
+        FACILITY16_CARD32 = 11,
+        FACILITY32_CARD32 = 12,
+        FASC_N = 13,
+        FASC_N_BCD = 14,
+        FASC_N_LARGE = 15,
+        FASC_N_LARGE_BCD = 16,
+        GSA75 = 17,
+        CHUID = 18,
+        CHUID_FULL = 19,
+        GUID = 20,
+        CBEFF_A = 21,
+        CBEFF_B = 22,
+        CBEFF_C = 23,
+        USER_PASSWORD = 24
+    }
+
+    public enum BACnetAuthorizationExemption
+    {
+        PASSBACK = 0,
+        OCCUPANCY_CHECK = 1,
+        ACCESS_RIGHTS = 2,
+        LOCKOUT = 3,
+        DENY = 4,
+        VERIFICATION = 5,
+        AUTHORIZATION_DELAY = 6
+    }
+
+    public enum BACnetAuthorizationMode
+    {
+        AUTHORIZE = 0,
+        GRANT_ACTIVE = 1,
+        DENY_ALL = 2,
+        VERIFICATION_REQUIRED = 3,
+        AUTHORIZATION_DELAYED = 4,
+        NONE = 5
+    }
+
+    public enum BACnetAuthenticationStatus
+    {
+        NOT_READY = 0,
+        READY = 1,
+        DISABLED = 2,
+        WAITING_FOR_AUTHENTICATION_FACTOR = 3,
+        WAITING_FOR_ACCOMPANIMENT = 4,
+        WAITING_FOR_VERIFICATION = 5,
+        IN_PROGRESS = 6
+    }
+
+    public enum BACnetBinaryPV
+    {
+        inactive = 0,
+        active = 1
+    }
+
+    public enum BACnetBinaryLightingPV
+    {
+        OFF = 0,
+        ON = 1,
+        WARN = 2,
+        WARN_OFF = 3,
+        WARN_RELINQUISH = 4,
+        STOP = 5
+
+    }
+
+    public enum BACnetEscalatorFault
+    {
+        CONTROLLER_FAULT = 0,
+        DRIVE_AND_MOTOR_FAULT = 1,
+        MECHANICAL_COMPONENT_FAULT = 2,
+        OVERSPEED_FAULT = 3,
+        POWER_SUPPLY_FAULT = 4,
+        SAFETY_DEVICE_FAULT = 5,
+        CONTROLLER_SUPPLY_FAULT = 6,
+        DRIVE_TEMPERATURE_EXCEEDED = 7,
+        COMB_PLATE_FAULT = 8
+    }
+
+    public enum BACnetEscalatorMode
+    {
+        UNKNOWN = 0,
+        STOP = 1,
+        UP = 2,
+        DOWN = 3,
+        INSPECTION = 4,
+        OUT_OF_SERVICE = 5
+
+    }
+
+    public enum BACnetEscalatorOperationDirection
+    {
+        UNKNOWN = 0,
+        STOPPED = 1,
+        UP_RATED_SPEED = 2,
+        UP_REDUCED_SPEED = 3,
+        DOWN_RATED_SPEED = 4,
+        DOWN_REDUCED_SPEED = 5
+    }
+
+    public enum BACnetIPMode
+    {
+        NORMAL = 0,
+        FOREIGN = 1,
+        BBMD = 2
+    }
+
+    public enum BACnetLiftCarDirection
+    {
+        UNKNOWN = 0,
+        NONE = 1,
+        STOPPED = 2,
+        UP = 3,
+        DOWN = 4,
+        UP_AND_DOWN = 5
+    }
+
+    public enum BACnetLiftCarDoorCommand
+    {
+        NONE = 0,
+        OPEN = 1,
+        CLOSE = 2
+    }
+
+    public enum BACnetLiftCarDriveStatus
+    {
+        UNKNOWN = 0,
+        STATIONARY = 1,
+        BRAKING = 2,
+        ACCELERATE = 3,
+        DECELERATE = 4,
+        RATED_SPEED = 5,
+        SINGLE_FLOOR_JUMP = 6,
+        TWO_FLOOR_JUMP = 7,
+        THREE_FLOOR_JUMP = 8,
+        MULTI_FLOOR_JUMP = 9
+    }
+
+    public enum BACnetLiftCarMode
+    {
+        UNKNOWN = 0,
+        NORMAL = 1, //-- IN SERVICE
+        VIP = 2,
+        HOMING = 3,
+        PARKING = 4,
+        ATTENDANT_CONTROL = 5,
+        FIREFIGHTER_CONTROL = 6,
+        EMERGENCY_POWER = 7,
+        INSPECTION = 8,
+        CABINET_RECALL = 9,
+        EARTHQUAKE_OPERATION = 10,
+        FIRE_OPERATION = 11,
+        OUT_OF_SERVICE = 12,
+        OCCUPANT_EVACUATION = 13
+    }
+
+    public enum BACnetLiftFault
+    {
+        CONTROLLER_FAULT = 0,
+        DRIVE_AND_MOTOR_FAULT = 1,
+        GOVERNOR_AND_SAFETY_GEAR_FAULT = 2,
+        LIFT_SHAFT_DEVICE_FAULT = 3,
+        POWER_SUPPLY_FAULT = 4,
+        SAFETY_INTERLOCK_FAULT = 5,
+        DOOR_CLOSING_FAULT = 6,
+        DOOR_OPENING_FAULT = 7,
+        CAR_STOPPED_OUTSIDE_LANDING_ZONE = 8,
+        CALL_BUTTON_STUCK = 9,
+        START_FAILURE = 10,
+        CONTROLLER_SUPPLY_FAULT = 11,
+        SELF_TEST_FAILURE = 12,
+        RUNTIME_LIMIT_EXCEEDED = 13,
+        POSITION_LOST = 14,
+        DRIVE_TEMPERATURE_EXCEEDED = 15,
+        LOAD_MEASUREMENT_FAULT = 16
+    }
+
+    public enum BACnetLiftGroupMode
+    {
+        UNKNOWN = 0,
+        NORMAL = 1,
+        DOWN_PEAK = 2,
+        TWO_WAY = 3,
+        FOUR_WAY = 4,
+        EMERGENCY_POWER = 5,
+        UP_PEAK = 6
+    }
+
+    public enum BACnetLightingInProgress
+    {
+        IDLE = 0,
+        FADE_ACTIVE = 1,
+        RAMP_ACTIVE = 2,
+        NOT_CONTROLLED = 3,
+        OTHER = 4
+    }
+
+    public enum BACnetLightingOperation
+    {
+        NONE = 0,
+        FADE_TO = 1,
+        RAMP_TO = 2,
+        STEP_UP = 3,
+        STEP_DOWN = 4,
+        STEP_ON = 5,
+        STEP_OFF = 6,
+        WARN = 7,
+        WARN_OFF = 8,
+        WARN_RELINQUISH = 9,
+        STOP = 10
+    }
+
+    public enum BACnetLightingTransition
+    {
+        NONE = 0,
+        FADE = 1,
+        RAMP = 2
+    }
+
+    public enum BACnetLoggingType
+    {
+        POLLED = 0,
+        COV = 1,
+        TRIGGERED = 2
+    }
+
+    public enum BACnetLogStatus
+    {
+        LOG_DISABLED = 0,
+        BUFFER_PURGED = 1,
+        LOG_INTERRUPTED = 2
+    }
+
+    public enum BACnetLockStatus
+    {
+        LOCKED = 0,
+        UNLOCKED = 1,
+        LOCK_FAULT = 2,
+        UNUSED = 3,
+        UNKNOWN = 4
+    }
+
+    public enum BACnetMaintenance
+    {
+        NONE = 0,
+        PERIODIC_TEST = 1,
+        NEED_SERVICE_OPERATIONAL = 2,
+        NEED_SERVICE_INOPERATIVE = 3
+    }
+
+    public enum BACnetNetworkNumberQuality
+    {
+        UNKNOWN = 0,
+        LEARNED = 1,
+        LEARNED_CONFIGURED = 2,
+        CONFIGURED = 3
+    }
+
+    public enum BACnetNetworkPortCommand
+    {
+        IDLE = 0,
+        DISCARD_CHANGES = 1,
+        RENEW_FD_REGISTRATION = 2,
+        RESTART_SLAVE_DISCOVERY = 3,
+        RENEW_DHCP = 4,
+        RESTART_AUTONEGOTIATION = 5,
+        DISCONNECT = 6,
+        RESTART_PORT = 7
+    }
+
+    public enum BACnetNetworkType
+    {
+        ETHERNET = 0,
+        ARCNET = 1,
+        MSTP = 2,
+        PTP = 3,
+        LONTALK = 4,
+        IPV4 = 5,
+        ZIGBEE = 6,
+        VIRTUAL = 7,
+        NON_BACNET = 8,// REMOVED IN VERSION 1 REVISION 18
+        IPV6 = 9,
+        SERIAL = 10
+    }
+
+    public enum BACnetSecurityLevel
+    {
+        INCAPABLE = 0, // INDICATES THAT THE DEVICE IS CONFIGURED TO NOT USE SECURITY
+        PLAIN = 1,
+        SIGNED = 2,
+        ENCRYPTED = 3,
+        SIGNED_END_TO_END = 4,
+        ENCRYPTED_END_TO_END = 5
+    }
+
+    public enum BACnetProtocolLevel
+    {
+        PHYSICAL = 0,
+        PROTOCOL = 1,
+        BACNET_APPLICATION = 2,
+        NON_BACNET_APPLICATION = 3
+    }
+
+    public enum BACnetSecurityPolicy
+    {
+        PLAIN_NON_TRUSTED = 0,
+        PLAIN_TRUSTED = 1,
+        SIGNED_TRUSTED = 2,
+        ENCRYPTED_TRUSTED = 3
+    }
+
+    public enum BACnetRelationship
+    {
+        UNKNOWN = 0,
+        DEFAULT = 1,
+        CONTAINS = 2,
+        CONTAINED_BY = 3,
+        USES = 4,
+        USED_BY = 5,
+        COMMANDS = 6,
+        COMMANDED_BY = 7,
+        ADJUSTS = 8,
+        ADJUSTED_BY = 9,
+        INGRESS = 10,
+        EGRESS = 11,
+        SUPPLIES_AIR = 12,
+        RECEIVES_AIR = 13,
+        SUPPLIES_HOT_AIR = 14,
+        RECEIVES_HOT_AIR = 15,
+        SUPPLIES_COOL_AIR = 16,
+        RECEIVES_COOL_AIR = 17,
+        SUPPLIES_POWER = 18,
+        RECEIVES_POWER = 19,
+        SUPPLIES_GAS = 20,
+        RECEIVES_GAS = 21,
+        SUPPLIES_WATER = 22,
+        RECEIVES_WATER = 23,
+        SUPPLIES_HOT_WATER = 24,
+        RECEIVES_HOT_WATER = 25,
+        SUPPLIES_COOL_WATER = 26,
+        RECEIVES_COOL_WATER = 27,
+        SUPPLIES_STEAM = 28,
+        RECEIVES_STEAM = 29,
+    }
+    public enum BACnetShedState
+    {
+        SHED_INACTIVE = 0,
+        SHED_REQUEST_PENDING = 1,
+        SHED_COMPLIANT = 2,
+        SHED_NON_COMPLIANT = 3
+    }
+
+    public enum BACnetSilencedState
+    {
+        UNSILENCED = 0,
+        AUDIBLE_SILENCED = 1,
+        VISIBLE_SILENCED = 2,
+        ALL_SILENCED = 3
+    }
+
+    public enum BACnetTimerState
+    {
+        IDLE = 0,
+        RUNNING = 1,
+        EXPIRED = 2
+    }
+
+    public enum BACnetTimerTransition
+    {
+        NONE = 0,
+        IDLE_TO_RUNNING = 1,
+        RUNNING_TO_IDLE = 2,
+        RUNNING_TO_RUNNING = 3,
+        RUNNING_TO_EXPIRED = 4,
+        FORCED_TO_EXPIRED = 5,
+        EXPIRED_TO_IDLE = 6,
+        EXPIRED_TO_RUNNING = 7
+    }
+
+    public enum BACnetVTClass
+    {
+        DEFAULT_TERMINAL = 0,
+        ANSI_X3_64 = 1,
+        DEC_VT52 = 2,
+        DEC_VT100 = 3,
+        DEC_VT220 = 4,
+        HP_700_94 = 5,
+        IBM_3130 = 6
+    }
+
+    public enum BACnetWriteStatus
+    {
+        IDLE = 0,
+        IN_PROGRESS = 1,
+        SUCCESSFUL = 2,
+        FAILED = 3
+    }
+
+    public struct BACnetPropertyState : ASN1.IASN1encode //C. Günther
+    {
+        public enum BACnetPropertyStates
+        {
+            BOOLEAN_VALUE = 0,
+            BINARY_VALUE = 1,
+            EVENT_TYPE = 2,
+            POLARITY = 3,
+            PROGRAM_CHANGE = 4,
+            PROGRAM_STATE = 5,
+            REASON_FOR_HALT = 6,
+            RELIABILITY = 7,
+            STATE = 8,
+            SYSTEM_STATUS = 9,
+            UNITS = 10,
+            UNSIGNED_VALUE = 11,
+            LIFE_SAFETY_MODE = 12,
+            LIFE_SAFETY_STATE = 13,
+            RESTART_REASON = 14,
+            DOOR_ALARM_STATE = 15,
+            ACTION = 16,
+            DOOR_SECURED_STATUS = 17,
+            DOOR_STATUS = 18,
+            DOOR_VALUE = 19,
+            FILE_ACCESS_METHOD = 20,
+            LOCK_STATUS = 21,
+            LIFE_SAFETY_OPERATION = 22,
+            MAINTENANCE = 23,
+            NODE_TYPE = 24,
+            NOTIFY_TYPE = 25,
+            SECURITY_LEVEL = 26,
+            SHED_STATE = 27,
+            SILENCED_STATE = 28,
+            //-- context tag 29 reserved for future addenda
+            ACCESS_EVENT = 30,
+            ZONE_OCCUPANCY_STATE = 31,
+            ACCESS_CREDENTIAL_DISABLE_REASON = 32,
+            ACCESS_CREDENTIAL_DISABLE = 33,
+            AUTHENTICATION_STATUS = 34,
+            BACKUP_STATE = 36,
+            WRITE_STATUS = 37,
+            LIGHTING_IN_PROGRESS = 38,
+            LIGHTING_OPERATION = 39,
+            LIGHTING_TRANSITION = 40,
+            INTEGER_VALUE = 41,
+            BINARY_LIGHTING_VALUE = 42,
+            TIMER_STATE = 43,
+            TIMER_TRANSITION = 44,
+            BACNET_IP_MODE = 45,
+            NETWORK_PORT_COMMAND = 46,
+            NETWORK_TYPE = 47,
+            NETWORK_NUMBER_QUALITY = 48,
+            ESCALATOR_OPERATION_DIRECTION = 49,
+            ESCALATOR_FAULT = 50,
+            ESCALATOR_MODE = 51,
+            LIFT_CAR_DIRECTION = 52,
+            LIFT_CAR_DOOR_COMMAND = 53,
+            LIFT_CAR_DRIVE_STATUS = 54,
+            LIFT_CAR_MODE = 55,
+            LIFT_GROUP_MODE = 56,
+            LIFT_FAULT = 57,
+            PROTOCOL_LEVEL = 58,
+            EXTENDED_VALUE = 63
+
+        };
+
+        public BACnetPropertyStates type;
+        public object state;
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            //maybe get type form state!!!!
+            //only BOOLEAN_VALUE and INTEGER_VALUE differnt?
+            if (type == BACnetPropertyStates.BOOLEAN_VALUE)
+            {
+                if ((bool)state == true)
+                {
+                    ASN1.encode_context_enumerated(buffer, (byte)type, (uint)1);
+                }
+                else
+                    ASN1.encode_context_enumerated(buffer, (byte)type, (uint)0);
+
+            } else if (type == BACnetPropertyStates.INTEGER_VALUE)
+            {
+                ASN1.encode_context_signed(buffer, (byte)type, (int)state);
+
+            } else
+                ASN1.encode_context_enumerated(buffer, (byte)type, Convert.ToUInt32(state));
+
+        }
+
+        public int ASN1decode(byte[] buffer, int offset)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            type = (BACnetPropertyState.BACnetPropertyStates)tag;
+            uint val;
+            switch (type)
+            {
+                case BACnetPropertyState.BACnetPropertyStates.BINARY_VALUE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.BOOLEAN_VALUE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    bool bval = val > 0 ? true : false;
+                    state = bval;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.EVENT_TYPE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetEventNotificationData.BacnetEventTypes)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.POLARITY:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetPolarity)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.PROGRAM_CHANGE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetProgramRequest)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.PROGRAM_STATE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetProgramState)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.REASON_FOR_HALT:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetProgramError)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.RELIABILITY:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetReliability)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.STATE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetEventNotificationData.BacnetEventStates)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.SYSTEM_STATUS:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetDeviceStatus)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.UNITS:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetUnitsId)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.UNSIGNED_VALUE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIFE_SAFETY_MODE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetEventNotificationData.BacnetLifeSafetyModes)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIFE_SAFETY_STATE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetEventNotificationData.BacnetLifeSafetyStates)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.RESTART_REASON:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetRestartReason)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.DOOR_ALARM_STATE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetDoorAlarmState)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.ACTION:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetAction)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.DOOR_SECURED_STATUS:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetDoorSecuredStatus)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.DOOR_STATUS:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetDoorStatus)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.DOOR_VALUE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetDoorValue)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.FILE_ACCESS_METHOD:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetFileAccessMethod)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LOCK_STATUS:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetLockStatus)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIFE_SAFETY_OPERATION:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetEventNotificationData.BacnetLifeSafetyOperations)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.MAINTENANCE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetMaintenance)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.NODE_TYPE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetNodeTypes)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.NOTIFY_TYPE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BacnetEventNotificationData.BacnetNotifyTypes)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.SECURITY_LEVEL:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetSecurityLevel)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.SHED_STATE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetShedState)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.SILENCED_STATE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetSilencedState)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.ACCESS_EVENT:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetAccessEvents)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.ZONE_OCCUPANCY_STATE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetAccessZoneOccupancyState)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.ACCESS_CREDENTIAL_DISABLE_REASON:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetAccessCredentialDisableReason)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.ACCESS_CREDENTIAL_DISABLE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetAccessCredentialDisable)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.AUTHENTICATION_STATUS:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetAuthenticationStatus)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.BACKUP_STATE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetBackupState)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.WRITE_STATUS:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetWriteStatus)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIGHTING_IN_PROGRESS:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetLightingInProgress)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIGHTING_OPERATION:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetLightingOperation)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIGHTING_TRANSITION:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetLightingTransition)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.INTEGER_VALUE:
+                    int v;
+                    len += ASN1.decode_signed(buffer, offset + len, len_value_type, out v);
+                    state = v;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.BINARY_LIGHTING_VALUE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetBinaryLightingPV)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.TIMER_STATE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetTimerState)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.TIMER_TRANSITION:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetTimerTransition)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.BACNET_IP_MODE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetIPMode)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.NETWORK_PORT_COMMAND:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetNetworkPortCommand)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.NETWORK_TYPE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetNetworkType)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.NETWORK_NUMBER_QUALITY:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetNetworkNumberQuality)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.ESCALATOR_OPERATION_DIRECTION:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetEscalatorOperationDirection)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.ESCALATOR_FAULT:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetEscalatorFault)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.ESCALATOR_MODE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetEscalatorMode)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIFT_CAR_DIRECTION:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetLiftCarDirection)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIFT_CAR_DOOR_COMMAND:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetLiftCarDoorCommand)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIFT_CAR_DRIVE_STATUS:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetLiftCarDriveStatus)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIFT_CAR_MODE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetLiftCarMode)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIFT_GROUP_MODE:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetLiftGroupMode)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.LIFT_FAULT:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetLiftFault)val;
+                    break;
+                case BACnetPropertyState.BACnetPropertyStates.PROTOCOL_LEVEL:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = (BACnetProtocolLevel)val;
+                    break;
+                default:
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                    state = val;
+
+                    break;
+
+
+            }
+            return len;
+
+        }
+
+
+        public override string ToString()
+        {
+            if (state != null)
+                return state.ToString();
+            else
+                return "";
+        }
+    }
+
+    public struct BACnetScale : ASN1.IASN1encode
+    {
+        private object value;
+        private choicetype type;
+
+        public enum choicetype
+        {
+            REAL = 0,
+            INTEGER = 1
+        }
+
+        public BACnetScale(choicetype Type, object Value)
+        {
+            type = Type;
+            value = Value;
+        }
+
+        public choicetype Type
+        {
+            get
+            {
+                return type;
+            }
+            set
+            {
+
+                switch(value)
+                {
+                    case choicetype.REAL:
+                        if (this.value == null)
+                            this.value = (float)0;
+                        if (this.value.GetType() != typeof(float))
+                            this.value = (float)Convert.ChangeType(this.value, typeof(float));
+                        break;
+                    case choicetype.INTEGER:
+                        if (this.value == null)
+                            this.value = (int)0;
+                        if (this.value.GetType() != typeof(int))
+                            this.value = (int)Convert.ChangeType(this.value, typeof(int));
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+                this.type = value;
+            }
+
+        }
+
+        public object Value
+        {
+            get
+            {
+                if (type == choicetype.REAL)
+                    return (float)value;
+                if (type == choicetype.INTEGER)
+                    return (int)value;
+                else
+                    throw new NotSupportedException();
+            }
+            set
+            {
+                this.value = value;
+            }
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            if (value is float)
+                ASN1.encode_context_real(buffer, 0, (float)value);
+            if(value is int)
+                ASN1.encode_context_signed(buffer, 1, (int)value);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+            if (tag == 0)
+            {
+                //real
+                float v;
+                len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out v);
+                this.value = v;
+                type = choicetype.REAL;
+
+
+            }
+            else if (tag == 1)
+            {
+                //integer
+                int v;
+                len += ASN1.decode_signed(buffer, offset + len, len_value_type, out v);
+                this.value = v;
+                type = choicetype.INTEGER;
+
+            }
+            else return len - 1;
+
+            return len;
+
+
+
+        }
+
+    }
+
+
+
+    public struct BACnetPrescale : ASN1.IASN1encode //C. Günther
+    {
+        private uint multiplier;
+        private uint moduloDivide;
+
+        public uint Multiplier
+        {
+            get { return multiplier; }
+            set { multiplier = value; }
+
+        }
+
+        public uint Modulo_Divide
+        {
+            get { return moduloDivide; }
+            set { moduloDivide = value; }
+        }
+
+        public BACnetPrescale(uint Multiplier,uint Modul0_Divide)
+        {
+            multiplier = Multiplier;
+            moduloDivide = Modul0_Divide;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            //not done yet! CG
+            ASN1.encode_context_unsigned(buffer, 0, multiplier);
+            ASN1.encode_context_unsigned(buffer, 1, moduloDivide);
+
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            //CG
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            //multplier
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out multiplier);
+            else return len - 1;
+
+            //moduleDivide
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out moduloDivide);
+
+            return len;
+        }
+
+        public override string ToString()
+        {
+            return "multplier :" + multiplier.ToString() + " moduleDivide :" + moduloDivide.ToString();
+        }
+    }
+
+    public enum BACnetProgramRequest
+    {
+        READY = 0,
+        LOAD = 1,
+        RUN = 2,
+        HALT = 3,
+        RESTART = 4,
+        UNLOAD = 5
+
+    }
+
+    public enum BACnetProgramError
+    {
+        NORMAL = 0,
+        LOAD_FAILED = 1,
+        INTERNAL = 2,
+        PROGRAM = 3,
+        OTHER = 4,
+    }
+
+    public enum BACnetDoorAlarmState
+    {
+        NORMAL = 0,
+        ALARM = 1,
+        DOOR_OPEN_TOO_LONG = 2,
+        FORCED_OPEN = 3,
+        TAMPER = 4,
+        DOOR_FAULT = 5,
+        LOCK_DOWN = 6,
+        FREE_ACCESS = 7,
+        EGRESS_OPEN = 8
+    }
+
+    public enum BACnetAction
+    {
+        DIRECT = 0,
+        REVERSE = 1
+
+    }
+
+    public enum BACnetDoorSecuredStatus
+    {
+        SECURED = 0,
+        UNSECURED = 1,
+        UNKNOWN = 2
+    }
+
+    public enum BACnetAccessEvents
+    {
+        NONE = 0,
+        GRANTED = 1,
+        MUSTER = 2,
+        PASSBACK_DETECTED = 3,
+        DURESS = 4,
+        TRACE = 5,
+        LOCKOUT_MAX_ATTEMPTS = 6,
+        LOCKOUT_OTHER = 7,
+        LOCKOUT_RELINQUISHED = 8,
+        LOCKED_BY_HIGHER_PRIORITY = 9,
+        OUT_OF_SERVICE = 10,
+        OUT_OF_SERVICE_RELINQUISHED = 11,
+        ACCOMPANIMENT_BY = 12,
+        AUTHENTICATION_FACTOR_READ = 13,
+        AUTHORIZATION_DELAYED = 14,
+        VERIFICATION_REQUIRED = 15,
+        NO_ENTRY_AFTER_GRANT = 16,
+        //-- Enumerated values 128-511 are used for events which indicate that access has been denied.
+        DENIED_DENY_ALL = 128,
+        DENIED_UNKNOWN_CREDENTIAL = 129,
+        DENIED_AUTHENTICATION_UNAVAILABLE = 130,
+        DENIED_AUTHENTICATION_FACTOR_TIMEOUT = 131,
+        DENIED_INCORRECT_AUTHENTICATION_FACTOR = 132,
+        DENIED_ZONE_NO_ACCESS_RIGHTS = 133,
+        DENIED_POINT_NO_ACCESS_RIGHTS = 134,
+        DENIED_NO_ACCESS_RIGHTS = 135,
+        DENIED_OUT_OF_TIME_RANGE = 136,
+        DENIED_THREAT_LEVEL = 137,
+        DENIED_PASSBACK = 138,
+        DENIED_UNEXPECTED_LOCATION_USAGE = 139,
+        DENIED_MAX_ATTEMPTS = 140,
+        DENIED_LOWER_OCCUPANCY_LIMIT = 141,
+        DENIED_UPPER_OCCUPANCY_LIMIT = 142,
+        DENIED_AUTHENTICATION_FACTOR_LOST = 143,
+        DENIED_AUTHENTICATION_FACTOR_STOLEN = 144,
+        DENIED_AUTHENTICATION_FACTOR_DAMAGED = 145,
+        DENIED_AUTHENTICATION_FACTOR_DESTROYED = 146,
+        DENIED_AUTHENTICATION_FACTOR_DISABLED = 147,
+        DENIED_AUTHENTICATION_FACTOR_ERROR = 148,
+        DENIED_CREDENTIAL_UNASSIGNED = 149,
+        DENIED_CREDENTIAL_NOT_PROVISIONED = 150,
+        DENIED_CREDENTIAL_NOT_YET_ACTIVE = 151,
+        DENIED_CREDENTIAL_EXPIRED = 152,
+        DENIED_CREDENTIAL_MANUAL_DISABLE = 153,
+        DENIED_CREDENTIAL_LOCKOUT = 154,
+        DENIED_CREDENTIAL_MAX_DAYS = 155,
+        DENIED_CREDENTIAL_MAX_USES = 156,
+        DENIED_CREDENTIAL_INACTIVITY = 157,
+        DENIED_CREDENTIAL_DISABLED = 158,
+        DENIED_NO_ACCOMPANIMENT = 159,
+        DENIED_INCORRECT_ACCOMPANIMENT = 160,
+        DENIED_LOCKOUT = 161,
+        DENIED_VERIFICATION_FAILED = 162,
+        DENIED_VERIFICATION_TIMEOUT = 163,
+        DENIED_OTHER = 164
+
+        /*-- Enumerated values 0-511 are reserved for definition by ASHRAE.Enumerated values
+        -- 512-65535 may be used by others subject to the procedures and constraints described
+        -- in Clause 23.*/
+
+    }
+
+    public struct BACnetFaultParameter : ASN1.IASN1encode //C. Günther
+    {
+        public BACnetFaultType type;
+        public object Value;
+
+
+        public struct FaultExtended
+        {
+            public ushort vendorid;
+            public uint extended_fault_type;
+            public List<object> parameters;
+
+            public override string ToString()
+            {
+                string ret = "vendorid :" + vendorid.ToString() + "fault type :" + extended_fault_type;
+
+                int i = 1;
+
+                foreach (object obj in parameters)
+                {
+                    ret = ret + "parameter " + i.ToString() + ":" + obj.ToString() + " ";
+                    i++;
+                }
+
+                return ret;
+            }
+        }
+
+        public enum BACnetFaultType
+        {
+            NONE = 0,
+            FAULT_CHARACTERSTRING = 1,
+            FAULT_EXTENDED = 2,
+            FAULT_LIFE_SAFETY = 3,
+            FAULT_STATE = 4,
+            FAULT_STATUS_FLAGS = 5,
+            FAULT_OUT_OF_RANGE = 6,
+            FAULT_LISTED = 7
+        }
+
+        public struct FaultCharacterstring
+        {
+            public List<string> values;
+
+            public override string ToString()
+            {
+                string ret = "";
+
+                int i = 1;
+
+                foreach (string str in values)
+                {
+                    ret = ret + "value " + i.ToString() + ":" + str + " ";
+                    i++;
+                }
+
+                return ret;
+            }
+        }
+
+        public struct FaultLiveSafety
+        {
+            public List<BacnetEventNotificationData.BacnetLifeSafetyStates> fault_values;
+            public BacnetDeviceObjectPropertyReference reference;
+
+            public override string ToString()
+            {
+                string ret = "";
+                int i = 1;
+                foreach (BacnetEventNotificationData.BacnetLifeSafetyStates ls in fault_values)
+                {
+                    ret = ret + "faultvalue " + i.ToString() + ":" + ls.ToString() + " ";
+                    i++;
+                }
+                return ret + " Reference :" + reference.objectIdentifier + ":" + reference.propertyIdentifier;
+
+            }
+        }
+
+        public struct FaultOutOfRange
+        {
+            public object MaxNormalValue;
+            public object MinimalNormalValue;
+
+            public override string ToString()
+            {
+                return "MaxNormalValue :" + MaxNormalValue.ToString() + " MinimalNormalValue :" + MinimalNormalValue.ToString();
+            }
+        }
+
+        public struct FaultState
+        {
+            public List<BACnetPropertyState> values;
+
+            public override string ToString()
+            {
+                string ret = "";
+                int i = 1;
+                foreach (BACnetPropertyState ps in (List<BACnetPropertyState>)values)
+                {
+                    ret = ret + i.ToString() + ". " + ps.type.ToString() + " " + ps.state.ToString() + " ";
+                    i++;
+                }
+
+                return ret;
+            }
+        }
+
+        public struct FaultStatusFlags
+        {
+            public BacnetDeviceObjectPropertyReference reference;
+
+            public override string ToString()
+            {
+                return reference.objectIdentifier.ToString() + "-" + reference.propertyIdentifier.ToString();
+            }
+
+        }
+
+        public struct FaultListed
+        {
+            public BacnetDeviceObjectPropertyReference reference;
+
+            public override string ToString()
+            {
+                return reference.objectIdentifier.ToString() + "-" + reference.propertyIdentifier.ToString();
+            }
+
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            //not done yet!  CG
+            ASN1.encode_opening_tag(buffer, (byte)type);
+            switch (type)
+            {
+                case BACnetFaultType.FAULT_STATE:
+                    FaultState fs = (FaultState)Value;
+                    ASN1.encode_opening_tag(buffer, 0);
+                    foreach (BACnetPropertyState ps in (List<BACnetPropertyState>)fs.values)
+                    {
+                        ps.ASN1encode(buffer);
+                    }
+                    ASN1.encode_closing_tag(buffer, 0);
+                    break;
+                case BACnetFaultType.FAULT_STATUS_FLAGS:
+                    FaultStatusFlags sf = (FaultStatusFlags)Value;
+                    BacnetDeviceObjectPropertyReference dopr1 = (BacnetDeviceObjectPropertyReference)sf.reference;
+                    ASN1.encode_opening_tag(buffer, 0);
+                    ASN1.bacapp_encode_device_obj_property_ref(buffer, dopr1);
+                    ASN1.encode_closing_tag(buffer, 0);
+                    break;
+                case BACnetFaultType.FAULT_OUT_OF_RANGE:
+                    //wireshark no help again?!!! or SCADA Device Sim Wrong?
+                    FaultOutOfRange foor = (FaultOutOfRange)Value;
+                    ASN1.encode_opening_tag(buffer, 0);
+                    if (foor.MinimalNormalValue.GetType() == typeof(int))
+                    {
+                        ASN1.encode_application_signed(buffer, (int)foor.MinimalNormalValue);
+                    }
+                    else if (foor.MinimalNormalValue.GetType() == typeof(uint))
+                    {
+                        ASN1.encode_application_unsigned(buffer, (uint)foor.MinimalNormalValue);
+                    }
+                    else if (foor.MinimalNormalValue.GetType() == typeof(double))
+                    {
+                        ASN1.encode_application_double(buffer, (double)foor.MinimalNormalValue);
+                    }
+                    else if (foor.MinimalNormalValue.GetType() == typeof(float))
+                    {
+                        ASN1.encode_application_real(buffer, (float)foor.MinimalNormalValue);
+                    }
+                    ASN1.encode_closing_tag(buffer, 0);
+                    ASN1.encode_opening_tag(buffer, 1);
+                    if (foor.MaxNormalValue.GetType() == typeof(int))
+                    {
+                        ASN1.encode_application_signed(buffer, (int)foor.MaxNormalValue);
+                    }
+                    else if (foor.MaxNormalValue.GetType() == typeof(uint))
+                    {
+                        ASN1.encode_application_unsigned(buffer, (uint)foor.MaxNormalValue);
+                    }
+                    else if (foor.MaxNormalValue.GetType() == typeof(double))
+                    {
+                        ASN1.encode_application_double(buffer, (double)foor.MaxNormalValue);
+                    }
+                    else if (foor.MaxNormalValue.GetType() == typeof(float))
+                    {
+                        ASN1.encode_application_real(buffer, (float)foor.MaxNormalValue);
+                    }
+                    ASN1.encode_closing_tag(buffer, 1);
+                    break;
+                case BACnetFaultType.FAULT_EXTENDED:
+                    FaultExtended fe = (FaultExtended)Value;
+                    ASN1.encode_opening_tag(buffer, 0);
+                    ASN1.encode_application_unsigned(buffer, fe.vendorid);
+                    ASN1.encode_closing_tag(buffer, 0);
+                    ASN1.encode_opening_tag(buffer, 1);
+                    ASN1.encode_application_unsigned(buffer, fe.extended_fault_type);
+                    ASN1.encode_closing_tag(buffer, 1);
+                    ASN1.encode_opening_tag(buffer, 2);
+                    foreach (object obj in fe.parameters)
+                    {
+                        if (obj.GetType() == typeof(uint))
+                        {
+                            ASN1.encode_application_unsigned(buffer, (uint)obj);
+                        } else if (obj.GetType() == typeof(int))
+                        {
+                            ASN1.encode_application_signed(buffer, (int)obj);
+                        } else if (obj.GetType() == typeof(double))
+                        {
+                            ASN1.encode_application_double(buffer, (double)obj);
+                        } else if (obj.GetType() == typeof(float))
+                        {
+                            ASN1.encode_application_real(buffer, (float)obj);
+                        } else if (obj.GetType() == typeof(BacnetBitString))
+                        {
+                            ASN1.encode_application_bitstring(buffer, (BacnetBitString)obj);
+                        } else if (obj.GetType() == typeof(DateTime)) //how to get if is time or date???
+                        {
+                            ASN1.bacapp_encode_datetime(buffer, (DateTime)obj);
+                        } else if (obj.GetType() == typeof(BacnetObjectId))
+                        {
+                            BacnetObjectId objid = (BacnetObjectId)obj;
+                            ASN1.encode_application_object_id(buffer, objid.type, objid.instance);
+                        }
+                        /*  not finished
+                            null NULL,
+                            real REAL,
+                            unsigned Unsigned,
+                            boolean BOOLEAN,
+                            integer INTEGER,
+                            double Double,
+                            octetstring OCTET STRING,
+                            characterstring CharacterString,
+                            bitstring BIT STRING,
+                            enumerated ENUMERATED,
+                            date Date,
+                            time Time,
+                            objectidentifier BACnetObjectIdentifier,
+                            reference [0] BACnetDeviceObjectPropertyReference*/
+                    }
+                    ASN1.encode_closing_tag(buffer, 2);
+                    break;
+                case BACnetFaultType.FAULT_LISTED:
+                    FaultListed fl = (FaultListed)Value;
+                    BacnetDeviceObjectPropertyReference dopr = (BacnetDeviceObjectPropertyReference)fl.reference;
+                    ASN1.encode_opening_tag(buffer, 0);
+                    ASN1.bacapp_encode_device_obj_property_ref(buffer, dopr);
+                    ASN1.encode_closing_tag(buffer, 0);
+                    break;
+                case BACnetFaultType.NONE:
+                    break;
+                case BACnetFaultType.FAULT_CHARACTERSTRING:
+                    ASN1.encode_opening_tag(buffer, 0);
+                    FaultCharacterstring cs = (FaultCharacterstring)Value;
+                    foreach (string st in (List<string>)cs.values)
+                    {
+                        ASN1.encode_application_character_string(buffer, st);
+                    }
+                    ASN1.encode_closing_tag(buffer, 0);
+                    break;
+            }
+            ASN1.encode_closing_tag(buffer, (byte)type);
+
+
+
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            //CG
+            int len = 0;
+
+            byte tag;
+            uint len_value_type;
+            int tmp = 0;
+            byte faultType;
+
+            len += ASN1.decode_tag_number(buffer, offset + len, out faultType);
+
+            type = (BACnetFaultType)faultType;
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+            switch (type)
+            {
+                case BACnetFaultType.FAULT_CHARACTERSTRING:
+                    FaultCharacterstring fcs = new FaultCharacterstring();
+                    List<string> string_values = new List<string>();
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+                    {
+                        len++;
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 0))
+                        {
+
+                            tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                            if (tag == 7)
+                            {
+
+                                len += tmp;
+                                string string_value;
+                                len += ASN1.decode_character_string(buffer, offset + len, (int)len_value_type, len_value_type, out string_value);
+
+                                string_values.Add(string_value);
+
+                            }
+
+
+                        }
+                        len++;
+
+
+                    }
+                    else
+                        return len - 1;
+                    fcs.values = string_values;
+                    Value = fcs;
+
+                    break;
+                case BACnetFaultType.FAULT_EXTENDED:
+                    //guessed
+
+
+                    FaultExtended fe = new FaultExtended();
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+                    {
+                        len++;
+                        len += ASN1.decode_unsigned16(buffer, offset + len, out fe.vendorid);
+
+                    }
+                    //guessed
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 1))
+                    {
+                        len++;
+                        len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out fe.extended_fault_type);
+
+                    }
+                    //CG guessed
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 2))
+                    {
+                        len++;
+                        List<object> objlist = new List<object>();
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 2))
+                        {
+                            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            switch ((BacnetApplicationTags)tag)
+                            {
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_NULL: //null
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_REAL: //real
+                                    float float_value;
+                                    len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out float_value);
+                                    objlist.Add(float_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT: //unsigned
+                                    uint uint_value;
+                                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out uint_value);
+                                    objlist.Add(uint_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_BOOLEAN: //boolean
+                                    uint val;
+                                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                                    bool bval = val > 0 ? true : false;
+                                    objlist.Add(bval);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT: //integer
+                                    int int_value;
+                                    len += ASN1.decode_signed(buffer, offset + len, len_value_type, out int_value);
+                                    objlist.Add(int_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_DOUBLE: //double
+                                    double double_value;
+                                    len = ASN1.decode_double_safe(buffer, offset + len, len_value_type, out double_value);
+                                    objlist.Add(double_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING: //octetstring
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_CHARACTER_STRING: //characterstring
+                                    string string_value;
+                                    len += ASN1.decode_character_string(buffer, offset + len, (int)len_value_type, len_value_type, out string_value);
+                                    objlist.Add(string_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_BIT_STRING: //bitstring
+                                    BacnetBitString bit_value;
+                                    len += ASN1.decode_bitstring(buffer, offset + len, len_value_type, out bit_value);
+                                    objlist.Add(bit_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_ENUMERATED: //enumerated
+                                    uint e_value;
+                                    len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out e_value);
+                                    objlist.Add(e_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_DATE: //date
+                                    DateTime date_v;
+                                    len += ASN1.decode_date_safe(buffer, offset + len, len_value_type, out date_v);
+                                    objlist.Add(date_v);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_TIME: //time
+                                    DateTime time_value;
+                                    len += ASN1.decode_bacnet_time_safe(buffer, offset + len, len_value_type, out time_value);
+                                    objlist.Add(time_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID: //BACnetObjectIdentifier,
+                                    ushort object_type = 0;
+                                    uint instance = 0;
+                                    len += ASN1.decode_object_id_safe(buffer, offset + len, len_value_type, out object_type, out instance);
+                                    objlist.Add(new BacnetObjectId((BacnetObjectTypes)object_type, instance));
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_DEVICE_OBJECT_PROPERTY_REFERENCE: //BACnetDeviceObjectPropertyReference
+                                    BacnetDeviceObjectPropertyReference dopr;
+                                    len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -2000, out dopr);
+                                    objlist.Add(dopr);
+                                    break;
+
+                            }
+
+                        }
+                        fe.parameters = objlist;
+                        len++;
+
+                    }
+                    len++;
+                    Value = fe;
+
+
+                    break;
+                case BACnetFaultType.FAULT_LIFE_SAFETY:
+                    FaultLiveSafety fls = new FaultLiveSafety();
+
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+                    {
+                        len++;
+                        List<BacnetEventNotificationData.BacnetLifeSafetyStates> fv = new List<BacnetEventNotificationData.BacnetLifeSafetyStates>();
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 0))
+                        {
+                            uint val;
+                            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+
+                            fv.Add((BacnetEventNotificationData.BacnetLifeSafetyStates)val);
+                        }
+                        len++;
+                        fls.fault_values = fv;
+                    }
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 1))
+                    {
+                        len++;
+                        len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -100, out fls.reference);
+                        len++;
+
+                    }
+                    //len++;
+
+                    Value = fls;
+
+                    break;
+                case BACnetFaultType.FAULT_STATE:
+
+                    FaultState ft = new FaultState();
+                    List<BACnetPropertyState> psl = new List<BACnetPropertyState>(); //wrong written propetystate???
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+                    {
+                        len++;
+
+
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 0))
+                        {
+                            BACnetPropertyState ps = new BACnetPropertyState();
+                            len += ps.ASN1decode(buffer, offset + len);
+                            psl.Add(ps);
+                        }
+                    }
+                    else return len - 1;
+                    ft.values = psl;
+                    len++;
+                    Value = ft;
+
+                    break;
+                case BACnetFaultType.FAULT_STATUS_FLAGS:
+                    FaultStatusFlags fsf = new FaultStatusFlags();
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+                    {
+                        len++;
+                        len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -100, out fsf.reference); //why i need ADPU_LEN????
+
+                    }
+                    else return len - 1;
+                    len++;
+                    Value = fsf;
+                    break;
+                case BACnetFaultType.FAULT_OUT_OF_RANGE:
+                    //Wireshark no help with 135-2016??
+                    FaultOutOfRange foor = new FaultOutOfRange();
+                    //min
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+                    {
+
+                        len++;
+                        len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                        if ((BacnetApplicationTags)tag == BacnetApplicationTags.BACNET_APPLICATION_TAG_REAL)
+                        {
+                            //not tested!
+                            float v;
+                            len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out v);
+
+                            foor.MinimalNormalValue = v;
+
+                        }
+                        else if ((BacnetApplicationTags)tag == BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
+                        {
+                            uint v;
+                            len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out v);
+
+                            foor.MinimalNormalValue = v;
+
+                        }
+                        else if ((BacnetApplicationTags)tag == BacnetApplicationTags.BACNET_APPLICATION_TAG_DOUBLE)
+                        {
+                            //not tested!
+                            double v;
+                            len += ASN1.decode_double_safe(buffer, offset + len, len_value_type, out v);
+
+                            foor.MinimalNormalValue = v;
+                        }
+                        else if ((BacnetApplicationTags)tag == BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
+                        {
+                            //not tested!
+                            int v;
+                            len += ASN1.decode_signed(buffer, offset + len, len_value_type, out v);
+
+                            foor.MinimalNormalValue = v;
+                        }
+                        len++; //close
+                    }
+                    //max
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 1))
+                    {
+                        len++;
+                        len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                        if (tag == 1)
+                        {
+                            //not tested!
+                            float v;
+                            len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out v);
+
+                            foor.MaxNormalValue = v;
+
+                        }
+                        else if (tag == 2)
+                        {
+                            uint v;
+                            len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out v);
+
+                            foor.MaxNormalValue = v;
+
+                        }
+                        else if (tag == 3)
+                        {
+                            //not tested!
+                            double v;
+                            len += ASN1.decode_double_safe(buffer, offset + len, len_value_type, out v);
+
+                            foor.MaxNormalValue = v;
+                        }
+                        else if (tag == 4)
+                        {
+                            //not tested!
+                            int v;
+                            len += ASN1.decode_signed(buffer, offset + len, len_value_type, out v);
+
+                            foor.MaxNormalValue = v;
+                        }
+                        len++; //close
+                    }
+
+                    Value = foor;
+
+                    break;
+                case BACnetFaultType.FAULT_LISTED:
+                    FaultListed fl = new FaultListed();
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+                    {
+                        len++;
+                        len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -100, out fl.reference); //why i need ADPU_LEN????
+
+                    }
+                    else return len - 1;
+                    len++;
+                    Value = fl;
+
+                    break;
+
+                default:
+                    return len - 1;
+            }
+            len++;
+            return len;
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+    }
+
+    public struct BACnetAccessRule : ASN1.IASN1encode //C. Günther
+    {
+        private timerangerspecifier time_range_specifier;
+        private BacnetDeviceObjectPropertyReference time_range;
+        private locationspecifier location_specifier;
+        private BacnetDeviceObjectReference location;
+        private bool enable;
+
+        public enum timerangerspecifier
+        {
+            specified =0,
+            always = 1
+        }
+
+        public enum locationspecifier
+        {
+            specified =0,
+            all =1
+        }
+
+        public timerangerspecifier Time_Range_Specifier
+        {
+            get { return time_range_specifier; }
+            set { time_range_specifier = value; }
+        }
+
+        public BacnetDeviceObjectPropertyReference Time_Range
+        {
+            get { return time_range; }
+            set { time_range = value; }
+        }
+
+        public locationspecifier Location_Specifier
+        {
+            get { return location_specifier; }
+            set { location_specifier = value; }
+        }
+
+        public BacnetDeviceObjectReference Location
+        {
+            get { return location; }
+            set { location = value; }
+        }
+
+        public bool Enable
+        {
+            get { return enable; }
+            set { enable = value; }
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_enumerated(buffer, 0, Convert.ToUInt32(time_range_specifier));
+            if(time_range_specifier == timerangerspecifier.specified)
+            {
+                ASN1.encode_opening_tag(buffer, 1);
+                ASN1.bacapp_encode_device_obj_property_ref(buffer, time_range);
+                ASN1.encode_closing_tag(buffer, 1);
+            }
+            ASN1.encode_context_enumerated(buffer, 2, Convert.ToUInt32(location_specifier));
+            if (time_range_specifier == timerangerspecifier.specified)
+            {
+                ASN1.encode_opening_tag(buffer, 3);
+                location.ASN1encode(buffer);
+                ASN1.encode_closing_tag(buffer, 3);
+            }
+            ASN1.encode_context_boolean(buffer, 4, enable);
+        }
+
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+            {
+                uint u_val;
+                len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out u_val);
+                time_range_specifier = (timerangerspecifier)u_val;
+
+            }
+            else return len - 1;
+
+            if (time_range_specifier == 0) //specified (1 = always)
+            {
+                if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 1))
+                {
+                    len++;
+                    len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -5000, out this.time_range);
+                    len++; //closing tag
+
+                }
+
+            }
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+            if (tag == 2)
+            {
+                uint u_val;
+                len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out u_val);
+                location_specifier = (locationspecifier)u_val;
+            }
+            else return len - 1;
+            if (location_specifier == 0) //specified (1 = all)
+            {
+                if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 3))
+                {
+                    len++;
+                    BacnetDeviceObjectReference v = new BacnetDeviceObjectReference();
+                    len += v.ASN1decode(buffer, offset + len, (uint)len_value - (uint)len);
+                    len++; //closing tag
+                    this.location = v;
+
+                }
+
+            }
+            //boolean enable
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            uint val;
+            len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+            enable = val > 0 ? true : false;
+
+            //len++;
+            return len;
+        }
+
+    }
+
+    public struct BACnetLightingCommand : ASN1.IASN1encode //C. Günther
+    {
+        private BACnetLightingOperation operation;
+        private float target_level;
+        private float ramp_rate;
+        private float step_increment;
+        private uint fade_time;
+        private uint priority;
+
+        public BACnetLightingOperation Operation
+        {
+            get { return operation; }
+            set { operation = value; }
+
+        }
+
+        public float Target_Level
+        {
+            get { return target_level; }
+            set { target_level = value; }
+
+        }
+
+        public float Ramp_Rate
+        {
+            get { return ramp_rate; }
+            set { ramp_rate = value; }
+        }
+
+        public float Step_Increment
+        {
+            get { return step_increment; }
+            set { step_increment = value; }
+        }
+
+        public uint Fade_Time
+        {
+            get { return fade_time; }
+            set { fade_time = value; }
+        }
+
+        public uint Priority
+        {
+            get { return priority; }
+            set { priority = value; }
+        }
+
+        public BACnetLightingCommand(BACnetLightingOperation Operation)
+        {
+            operation = Operation;
+            target_level = -1;
+            ramp_rate = -1;
+            step_increment = -1;
+            fade_time = 0;
+            priority = 0;
+        }
+
+        public BACnetLightingCommand(BACnetLightingOperation Operation, float Target_Level, float Ramp_Rate, float Step_Increment, uint Fade_Time, uint Priority)
+        {
+
+            operation = Operation;
+            target_level = Target_Level;
+
+            ramp_rate = Ramp_Rate;
+            step_increment = Step_Increment;
+            fade_time = Fade_Time;
+            priority = Priority;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_unsigned(buffer, 0, Convert.ToUInt32(operation));
+            if (target_level >= 0 && target_level <= 100)
+                ASN1.encode_context_real(buffer, 1, target_level);
+            if (ramp_rate >= 0.1 && ramp_rate <= 100.0)
+                ASN1.encode_context_real(buffer, 2, ramp_rate);
+            if (step_increment >= 0.1 && step_increment <= 100.0)
+                ASN1.encode_context_real(buffer, 3, step_increment);
+            if (fade_time >= 100 && fade_time <= 86400000)
+                ASN1.encode_context_unsigned(buffer, 4, fade_time);
+            if (priority >= 1 && priority <= 16)
+                ASN1.encode_context_unsigned(buffer, 5, priority);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+
+            uint len_value_type;
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+            if (tag == 0) //operation
+            {
+                uint op;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out op);
+                operation = (BACnetLightingOperation)op;
+            }
+
+            //set values
+            target_level = -1;
+            ramp_rate = -1;
+            step_increment = -1;
+            fade_time = 0;
+            priority = 0;
+
+            if (len < (len_value - offset - 1)) //this works somehow
+            {
+                //optional Target Level
+                ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                if (tag == 1)
+                {
+                    len++;
+                    len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out target_level);
+                }
+            }
+            if (len < (len_value - offset - 1))
+            {
+                //optional ramp rate
+                ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                if (tag == 2)
+                {
+                    len++;
+                    len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out ramp_rate);
+                }
+            }
+            if (len < (len_value - offset - 1))
+            {
+                //optional step increment
+                ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                if (tag == 3)
+                {
+                    len++;
+                    len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out step_increment);
+                }
+            }
+            if (len < (len_value - offset - 1))
+            {
+                //optional fade time
+                ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                if (tag == 4)
+                {
+                    len++;
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out fade_time);
+                }
+            }
+
+            if (len < (len_value - offset - 1))
+            {
+                //optional priority
+                ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                if (tag == 5)
+                {
+                    len++;
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out priority);
+                }
+            }
+
+            return len;
+        }
+
+    }
+
+    public struct BACnetChannelValue : ASN1.IASN1encode //C. Günther
+    {
+
+        private ApplicationTag tag;
+        private object value;
+
+        public ApplicationTag Tag
+        {
+            get { return tag; }
+            set {
+                this.Value = null;
+                tag = value; }
+        }
+
+        public object Value
+        {
+            get
+            {
+                switch (tag)
+                {
+                    case ApplicationTag.NULL:
+                        return null;
+                    case ApplicationTag.BOOLEAN:
+                        return (bool)Convert.ChangeType(value, typeof(bool));
+                    case ApplicationTag.UNSIGNED_INT:
+                        return (uint)Convert.ChangeType(value, typeof(uint));
+                    case ApplicationTag.SIGNED_INT:
+                        return (int)Convert.ChangeType(value, typeof(int));
+                    case ApplicationTag.REAL:
+                        return (float)Convert.ChangeType(value, typeof(float));
+                    case ApplicationTag.DOUBLE:
+                        return (double)Convert.ChangeType(value, typeof(double));
+                    case ApplicationTag.OCTET_STRING:
+                        return (byte[])Convert.ChangeType(value, typeof(byte[]));
+                    case ApplicationTag.CHARACTER_STRING:
+                        return (string)Convert.ChangeType(value, typeof(string));
+                    case ApplicationTag.BIT_STRING:
+                        return (BacnetBitString)Convert.ChangeType(value, typeof(BacnetBitString));
+                    case ApplicationTag.ENUMERATED:
+                        return (uint)Convert.ChangeType(value, typeof(uint));
+                    case ApplicationTag.DATE:
+                    case ApplicationTag.TIME:
+                        return (DateTime)Convert.ChangeType(value, typeof(DateTime));
+                    case ApplicationTag.OBJECT_ID:
+                        return (BacnetObjectId)Convert.ChangeType(value, typeof(BacnetObjectId));
+                    case ApplicationTag.LIGHTING_COMMAND:
+                        return (BACnetLightingCommand)Convert.ChangeType(value, typeof(BACnetLightingCommand));
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+            set
+            {
+                switch (tag)
+                {
+                    case ApplicationTag.NULL:
+                        this.value = null;
+                        break;
+                    case ApplicationTag.BOOLEAN:
+                        if (value == null)
+                            value = (bool) false;
+                        if (value.GetType() != typeof(bool))
+                            value = (bool)Convert.ChangeType(value, typeof(bool));
+                        this.value = value;
+                        break;
+                    case ApplicationTag.SIGNED_INT:
+                        if (value == null)
+                            value = (int)0;
+                        if (value.GetType() != typeof(int))
+                            value = (int)Convert.ChangeType(value, typeof(int));
+                        this.value = value;
+                        break;
+                    case ApplicationTag.REAL:
+                        if (value == null)
+                            value = (float)0;
+                        if (value.GetType() != typeof(double))
+                            value = (float)Convert.ChangeType(value, typeof(float));
+                        this.value = value;
+                        break;
+                    case ApplicationTag.DOUBLE:
+                        if (value == null)
+                            value = (double)0;
+                        if (value.GetType() != typeof(double))
+                            value = (double)Convert.ChangeType(value, typeof(double));
+                        this.value = value;
+                        break;
+                    case ApplicationTag.OCTET_STRING:
+                        if (value == null)
+                            value = new byte[100];
+                        if (value.GetType() != typeof(byte[]))
+                            value = (byte[])Convert.ChangeType(value, typeof(byte[]));
+                        this.value = value;
+                        break;
+                    case ApplicationTag.CHARACTER_STRING:
+                        if (value == null)
+                            value = (string)"";
+                        if (value.GetType() != typeof(string))
+                            value = (string)Convert.ChangeType(value, typeof(string));
+                        this.value = value;
+                        break;
+                    case ApplicationTag.BIT_STRING:
+                        if (value == null)
+                            value = new BacnetBitString();
+                        if (value.GetType() != typeof(BacnetBitString))
+                            value = (BacnetBitString)Convert.ChangeType(value, typeof(BacnetBitString));
+                        this.value = value;
+                        break;
+                    case ApplicationTag.LIGHTING_COMMAND:
+                        if (value == null)
+                            value = new BACnetLightingCommand();
+                        if (value.GetType() != typeof(BACnetLightingCommand))
+                            value = (BACnetLightingCommand)Convert.ChangeType(value, typeof(BACnetLightingCommand));
+                        this.value = value;
+                        break;
+                    case ApplicationTag.OBJECT_ID:
+                        if (value == null)
+                            value = new BacnetObjectId();
+                        if (value.GetType() != typeof(BacnetObjectId))
+                            value = (BacnetObjectId)Convert.ChangeType(value, typeof(BacnetObjectId));
+                        this.value = value;
+                        break;
+                    case ApplicationTag.UNSIGNED_INT:
+                    case ApplicationTag.ENUMERATED:
+                        if (value == null)
+                            value = (uint)0;
+                        if (value.GetType() != typeof(uint))
+                            value = (uint)Convert.ChangeType(value, typeof(uint));
+                        this.value = value;
+                        break;
+                    case ApplicationTag.DATE:
+                    case ApplicationTag.TIME:
+                        if (value == null)
+                            value = new DateTime();
+                        if (value.GetType() != typeof(DateTime))
+                            value = (DateTime)Convert.ChangeType(value, typeof(DateTime));
+                        this.value = value;
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+
+        }
+
+        public enum ApplicationTag
+        {
+            NULL = 0,
+            BOOLEAN = 1,
+            UNSIGNED_INT = 2,
+            SIGNED_INT = 3,
+            REAL = 4,
+            DOUBLE = 5,
+            OCTET_STRING = 6,
+            CHARACTER_STRING = 7,
+            BIT_STRING = 8,
+            ENUMERATED = 9,
+            DATE = 10,
+            TIME = 11,
+            OBJECT_ID = 12,
+            LIGHTING_COMMAND = 13,
+        }
+
+        public BACnetChannelValue(ApplicationTag Tag, object Value)
+        {
+            this.tag = Tag;
+            this.value = Value;
+        }
+
+        public override string ToString()
+        {
+            return "tag :" + tag + " Value :" + value;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            if (value.GetType() == typeof(BACnetLightingCommand))
+            {
+                ASN1.encode_opening_tag(buffer, 0);
+                BACnetLightingCommand lc = (BACnetLightingCommand)value;
+                lc.ASN1encode(buffer);
+                ASN1.encode_closing_tag(buffer, 0);
+            }
+            else
+            {
+                switch (tag)
+                {
+                    case ApplicationTag.NULL:
+                        break;
+                    case ApplicationTag.BOOLEAN:
+                        ASN1.encode_application_boolean(buffer, Convert.ToBoolean(value));
+                        break;
+                    case ApplicationTag.UNSIGNED_INT:
+                        ASN1.encode_application_unsigned(buffer, Convert.ToUInt64(value));
+                        break;
+                    case ApplicationTag.SIGNED_INT:
+                        ASN1.encode_application_signed(buffer, Convert.ToInt64(value));
+                        break;
+                    case ApplicationTag.REAL:
+                        ASN1.encode_application_real(buffer, Convert.ToSingle(value));
+                        break;
+                    case ApplicationTag.DOUBLE:
+                        ASN1.encode_application_double(buffer, Convert.ToDouble(value));
+                        break;
+                    case ApplicationTag.OCTET_STRING:
+                        ASN1.encode_application_octet_string(buffer, (byte[])value, 0, ((byte[])value).Length);
+                        break;
+                    case ApplicationTag.CHARACTER_STRING:
+                        ASN1.encode_application_character_string(buffer, value.ToString());
+                        break;
+                    case ApplicationTag.BIT_STRING:
+                        ASN1.encode_application_bitstring(buffer, (BacnetBitString)value);
+                        break;
+                    case ApplicationTag.ENUMERATED:
+                        ASN1.encode_application_enumerated(buffer, Convert.ToUInt32(value));
+                        break;
+                    case ApplicationTag.DATE:
+                        ASN1.encode_application_date(buffer, Convert.ToDateTime(value));
+                        break;
+                    case ApplicationTag.TIME:
+                        ASN1.encode_application_date(buffer, Convert.ToDateTime(value));
+                        break;
+                    case ApplicationTag.OBJECT_ID:
+                        ASN1.encode_application_object_id(buffer, ((BacnetObjectId)value).type, ((BacnetObjectId)value).instance);
+                        break;
+                    default:
+                        throw new Exception("I cannot encode this, isn't BACnetChannelValue");
+
+                }
+
+            }
+
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte _tag;
+            uint len_value_type;
+
+
+            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+            {
+
+                len++;
+                BACnetLightingCommand lc = new BACnetLightingCommand();
+                len += lc.ASN1decode(buffer, offset + len, len_value);
+                value = lc;
+                len++;
+            }
+            else
+            {
+
+                len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _tag, out len_value_type);
+                tag = (ApplicationTag)_tag;
+                switch (tag)
+                {
+                    case ApplicationTag.NULL:
+                        value = null;
+                        break;
+                    case ApplicationTag.BOOLEAN:
+                        uint val;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                        bool bval = val > 0 ? true : false;
+                        value = bval;
+                        break;
+                    case ApplicationTag.UNSIGNED_INT:
+                        uint uint_value;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out uint_value);
+                        value = uint_value;
+                        break;
+                    case ApplicationTag.SIGNED_INT:
+                        int int_value;
+                        len += ASN1.decode_signed(buffer, offset + len, len_value_type, out int_value);
+                        value = int_value;
+                        break;
+                    case ApplicationTag.REAL:
+                        float float_value;
+                        len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out float_value);
+                        value = float_value;
+                        break;
+                    case ApplicationTag.DOUBLE:
+                        double double_value;
+                        len = ASN1.decode_double_safe(buffer, offset + len, len_value_type, out double_value);
+                        value = double_value;
+                        break;
+                    case ApplicationTag.OCTET_STRING:
+                        byte[] octet_string = new byte[len_value_type];
+                        len = ASN1.decode_octet_string(buffer, offset + len, (int)len_value_type, octet_string, 0, len_value_type); //maybe
+                        value = octet_string;
+                        break;
+                    case ApplicationTag.CHARACTER_STRING:
+                        string string_value;
+                        len += ASN1.decode_character_string(buffer, offset + len, (int)len_value_type, len_value_type, out string_value);
+                        value = string_value;
+                        break;
+                    case ApplicationTag.BIT_STRING:
+                        BacnetBitString bit_value;
+                        len += ASN1.decode_bitstring(buffer, offset + len, len_value_type, out bit_value);
+                        value = bit_value;
+                        break;
+                    case ApplicationTag.ENUMERATED:
+                        uint e_value;
+                        len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out e_value);
+                        value = e_value;
+                        break;
+                    case ApplicationTag.DATE:
+                        DateTime date_v;
+                        len += ASN1.decode_date_safe(buffer, offset + len, len_value_type, out date_v);
+                        value = date_v;
+                        break;
+                    case ApplicationTag.TIME:
+                        DateTime time_value;
+                        len += ASN1.decode_bacnet_time_safe(buffer, offset + len, len_value_type, out time_value);
+                        value = time_value;
+                        break;
+                    case ApplicationTag.OBJECT_ID:
+                        ushort object_type = 0;
+                        uint instance = 0;
+                        len += ASN1.decode_object_id_safe(buffer, offset + len, len_value_type, out object_type, out instance);
+                        value = new BacnetObjectId((BacnetObjectTypes)object_type, instance);
+                        break;
+                    default:
+                        throw new Exception("I cannot decode this, isn't BACnetChannelValue");
+
+                }
+            }
+
+
+            return len;
+
+        }
+
+    }
+
+    public struct BACnetGroupChannelValue : ASN1.IASN1encode //C. Günther
+    {
+        public ushort channel;
+        public uint overriding_priority;
+        public BACnetChannelValue value;
+
+        public BACnetGroupChannelValue(ushort Channel, BACnetChannelValue Value, uint Overriding_prio = 0)
+        {
+            channel = Channel;
+            overriding_priority = Overriding_prio;
+            value = Value;
+        }
+
+        public override string ToString()
+        {
+            return " channel :" + channel + " overrinding_prio :" + overriding_priority + " value :" + value;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_enumerated(buffer, 0, channel);
+            if (overriding_priority > 0 && overriding_priority < 17) //optional
+                ASN1.encode_context_unsigned(buffer, 1, overriding_priority);
+            value.ASN1encode(buffer);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+
+            int len = 0;
+
+            byte tag;
+            uint len_value_type;
+
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+            {
+                uint u_v;
+                len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out u_v);
+                channel = (ushort)u_v;
+            }
+            else
+                return len - 1;
+
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1) //optional
+            {
+                len++;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out overriding_priority);
+            }
+
+            value = new BACnetChannelValue();
+            len += value.ASN1decode(buffer, offset + len, len_value);
+
+            return len;
+        }
+
+
+    }
+
+    public struct BACnetActionCommand : ASN1.IASN1encode //christopher Günther
+    {
+        private bool opt_device_identifier;
+        private BacnetObjectId device_identifier;
+        private BacnetObjectId object_identifier;
+        private BacnetPropertyIds property_identifier;
+        private bool opt_property_array_index;
+        private uint property_array_index;
+        private BacnetValue property_value;
+        private bool opt_priority;
+        private uint priority;
+        private bool opt_post_delay;
+        private uint post_delay;
+        private bool quit_on_failure;
+        private bool write_successful;
+
+        public BacnetObjectId Device_Identifier
+        {
+            get { return device_identifier; }
+            set {
+                opt_device_identifier = true;
+                device_identifier = value; }
+        }
+
+        public BacnetObjectId Object_Identifier
+        {
+            get { return object_identifier; }
+            set { object_identifier = value; }
+
+        }
+        public BacnetPropertyIds Property_Identifier
+        {
+            get { return property_identifier; }
+            set { property_identifier = value; }
+        }
+
+        public uint Property_Array_Index
+        {
+            get { return property_array_index; }
+            set {
+                if((uint) value != ASN1.BACNET_ARRAY_ALL)
+                {
+                    opt_property_array_index = true;
+                }else
+                    opt_property_array_index = false;
+                property_array_index = value; }
+        }
+
+        public BacnetValue Property_Value
+        {
+            get { return property_value; }
+            set { property_value = value; }
+        }
+        public uint Priority
+        {
+            get { return priority; }
+            set {
+                if ((uint)value > 0 && (uint)value < 17)
+                    opt_priority = true;
+                else
+                    opt_priority = false;
+                priority = value; }
+        }
+        public uint Post_Delay
+        {
+            get { return post_delay; }
+            set {
+                opt_post_delay = true;
+                post_delay = value; }
+        }
+        public bool Quit_On_Failure
+        {
+            get { return quit_on_failure; }
+            set { quit_on_failure = value; }
+        }
+        public bool Write_Successful
+        {
+            get { return write_successful; }
+            set { write_successful = value; }
+        }
+
+        public BACnetActionCommand(BacnetObjectId Object_Identifier, BacnetPropertyIds Property_Identifier, BacnetValue Property_Value, bool Quit_On_Failure, bool Write_Successful, bool Opt_Device_Identifier = false, bool Opt_Property_Array_Index = false, bool Opt_Priority = false, bool Opt_Post_Delay = false)
+        {
+            opt_device_identifier = Opt_Device_Identifier;
+            device_identifier = new BacnetObjectId(); ;
+            object_identifier = Object_Identifier;
+            property_identifier = Property_Identifier;
+            opt_property_array_index = Opt_Property_Array_Index;
+            property_array_index = ASN1.BACNET_ARRAY_ALL;
+            property_value = Property_Value;
+            opt_priority = Opt_Priority;
+            priority = 0;
+            opt_post_delay = Opt_Post_Delay;
+            post_delay = 0;
+            quit_on_failure = Quit_On_Failure;
+            write_successful = Write_Successful;
+        }
+
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+
+            if (opt_device_identifier)
+                ASN1.encode_context_object_id(buffer, 0, device_identifier.type, device_identifier.instance);
+            ASN1.encode_context_object_id(buffer, 1, object_identifier.type, object_identifier.instance);
+            ASN1.encode_context_unsigned(buffer, 2, (uint)property_identifier);
+            if (opt_property_array_index)
+                ASN1.encode_context_unsigned(buffer, 3, (uint)property_array_index);
+            ASN1.encode_opening_tag(buffer, 4);
+            ASN1.bacapp_encode_application_data(buffer, property_value);
+            ASN1.encode_closing_tag(buffer, 4);
+            if (opt_priority)
+                ASN1.encode_context_unsigned(buffer, 5, priority);
+            if (opt_post_delay)
+                ASN1.encode_context_unsigned(buffer, 6, post_delay);
+            ASN1.encode_context_boolean(buffer, 7, quit_on_failure);
+            ASN1.encode_context_boolean(buffer, 8, write_successful);
+
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+            {
+                len++;
+                opt_device_identifier = true;
+                ushort obj_type;
+                uint instance;
+                len += ASN1.decode_object_id(buffer, offset + len, out obj_type, out instance);
+                device_identifier = new BacnetObjectId((BacnetObjectTypes)obj_type, instance);
+            }
+            else
+                opt_device_identifier = false;
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+            {
+                len++;
+                ushort obj_type;
+                uint instance;
+                len += ASN1.decode_object_id(buffer, offset + len, out obj_type, out instance);
+                object_identifier = new BacnetObjectId((BacnetObjectTypes)obj_type, instance);
+
+            }
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 2)
+            {
+                len++;
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                property_identifier = (BacnetPropertyIds)u_val;
+            }
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 3)
+            {
+                len++;
+                opt_property_array_index = true;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out property_array_index);
+
+            }
+            else
+            {
+                opt_property_array_index = false;
+                property_array_index = ASN1.BACNET_ARRAY_ALL;
+            }
+            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 4))
+            {
+                len++;
+                len += ASN1.bacapp_decode_application_data(buffer, offset + len, (int)len_value, object_identifier.type, property_identifier, out property_value);
+                len++;
+            }
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 5)
+            {
+                len++;
+                opt_priority = true;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out priority);
+
+            }
+            else
+                opt_priority = false;
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 6)
+            {
+                len++;
+                opt_post_delay = true;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out post_delay);
+
+            }
+            else
+                opt_post_delay = false;
+
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 7)
+            {
+                len++;
+                uint u_val;
+
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                quit_on_failure = u_val > 0 ? true : false;
+
+
+            }
+
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 8)
+            {
+                len++;
+                uint u_val;
+
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                write_successful = u_val > 0 ? true : false;
+
+
+            }
+
+            return len;
+        }
+
+
+    }
+
+    public struct BACnetActionList : ASN1.IASN1encode //christopher Günther
+    {
+        public List<BACnetActionCommand> actions { get; set; }
+
+        public override string ToString()
+        {
+            string ret = "";
+            int i = 0;
+            foreach (BACnetActionCommand ac in actions)
+            {
+                ret = ret + "Index" + i + " " + ac;
+            }
+            return ret;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_opening_tag(buffer, 0);
+            foreach (BACnetActionCommand ac in actions)
+            {
+                ac.ASN1encode(buffer);
+            }
+            ASN1.encode_closing_tag(buffer, 0);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+
+
+            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+            {
+                len++;
+                actions = new List<BACnetActionCommand>();
+                while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 0))
+                {
+
+                    BACnetActionCommand ac = new BACnetActionCommand();
+                    len += ac.ASN1decode(buffer, offset + len, len_value);
+                    actions.Add(ac);
+                }
+                len++;//closing tag
+
+            }
+            else
+                return len - 1;
+
+            return len;
+        }
+    }
+
+    public struct BACnetBDTEntry //C. Günther
+    {
+        public BACnetHostNPort bbmd_address;
+        public bool opt_broadcast_mask;
+        public byte[] broadcast_mask; //shall be present if BACnet/IP, and absent for BACnet/IPv6
+
+
+
+        public override string ToString()
+        {
+            string ret = bbmd_address.ToString();
+            if (opt_broadcast_mask)
+            {
+                ret += " broadcast_mask :" + BitConverter.ToString(broadcast_mask);
+            }
+            return ret;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_opening_tag(buffer, 0);
+            bbmd_address.ASN1encode(buffer);
+            ASN1.encode_closing_tag(buffer, 0);
+            if (opt_broadcast_mask)
+            {
+                ASN1.encode_tag(buffer, 1, true, (uint)broadcast_mask.Length);
+                foreach (byte b in broadcast_mask)
+                    buffer.Add(b);
+
+            }
+
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+            {
+                len++;
+                bbmd_address = new BACnetHostNPort();
+                len += bbmd_address.ASN1decode(buffer, offset + len, len_value);
+                len++;
+            }
+            else
+                return len - 1;
+            //optional broadcast-mask
+            if (len < len_value)
+            {
+                opt_broadcast_mask = true;
+                len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                byte[] b_val = new byte[len_value_type];
+                len += ASN1.decode_octet_string(buffer, offset + len, (int)len_value, b_val, 0, len_value_type);
+                broadcast_mask = b_val;
+
+            }
+            else
+                opt_broadcast_mask = false;
+
+
+            return len;
+        }
+
+    }
+
+    public struct BACnetHostAddress //C. Günther
+    {
+        public BACnetHostAddressType type_tag;
+        public object value;
+
+        public BACnetHostAddressType Type
+        {
+            get { return type_tag; }
+            set { type_tag = value; }
+        }
+
+        public object Value
+        {
+            get { return this.value; }
+            set { this.value = value; }
+        }
+
+        public enum BACnetHostAddressType
+        {
+            none = 0,
+            ip_address = 1,
+            name = 2
+        }
+
+        public override string ToString()
+        {
+            if (type_tag == BACnetHostAddressType.ip_address)
+            {
+                byte[] b_val = (byte[])value;
+                if (b_val.Length == 4) //ipv4
+                    return type_tag + " " + b_val[0] + "." + b_val[1] + "." + b_val[2] + "." + b_val[3];
+                return type_tag + " " + BitConverter.ToString(b_val); ; //needs to be fixed for ipv6
+            }
+            return type_tag + " " + value;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            switch (type_tag)
+            {
+                case BACnetHostAddressType.none:
+                    ASN1.encode_tag(buffer, 0, true, 0);
+                    break;
+                case BACnetHostAddressType.ip_address:
+                    if (value is byte[])
+                    {
+                        byte[] b_val = (byte[])value;
+                        ASN1.encode_tag(buffer, 1, true, (uint)b_val.Length);
+                        foreach (byte b in b_val)
+                            buffer.Add(b);
+                    }
+                    break;
+                case BACnetHostAddressType.name:
+                    if (value is string)
+                    {
+                        ASN1.encode_context_character_string(buffer, 2, (string)value);
+                    }
+                    break;
+
+            }
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+            type_tag = (BACnetHostAddressType)tag;
+            switch (type_tag)
+            {
+                case BACnetHostAddressType.none:
+                    value = null;
+                    break;
+                case BACnetHostAddressType.ip_address:
+                    byte[] b_val = new byte[len_value_type];
+                    len += ASN1.decode_octet_string(buffer, offset + len, (int)len_value, b_val, 0, len_value_type);
+                    value = b_val;
+                    break;
+                case BACnetHostAddressType.name:
+                    string st_v;
+                    len += ASN1.decode_character_string(buffer, offset + len, (int)len_value, len_value_type, out st_v);
+                    value = st_v;
+                    break;
+
+            }
+            return len;
+        }
+
+    }
+
+    public struct BACnetHostNPort //C. Günther
+    {
+        private BACnetHostAddress host;
+        private ushort port;
+
+        public BACnetHostAddress Host
+        {
+            get { return host; }
+            set { host = value; }
+        }
+
+        public ushort Port
+        {
+            get { return port; }
+            set { port = value; }
+        }
+
+        public override string ToString()
+        {
+            return host + " Port :" + port;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_opening_tag(buffer, 0);
+            host.ASN1encode(buffer);
+            ASN1.encode_closing_tag(buffer, 0);
+            ASN1.encode_context_unsigned(buffer, 1, port);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+            {
+                len++;
+                host = new BACnetHostAddress();
+                len += host.ASN1decode(buffer, offset + len, len_value);
+                len++;
+            }
+            else
+                return len - 1;
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+            {
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                port = (ushort)u_val;
+            }
+
+            return len;
+
+        }
+    }
+
+    public struct BACnetFDTEntry //C. Günther
+    {
+        public byte[] bacnetip_address;
+        public ushort time_to_live;
+        public ushort remaining_time_to_live;
+
+        public override string ToString()
+        {
+            string ret = "";
+            if (bacnetip_address.Length == 6) //ipv4
+            {
+                ret += "IPV4 Address :" + bacnetip_address[0] + "." + bacnetip_address[1] + "." + bacnetip_address[2] + "." + bacnetip_address[3] + ":" + (ushort)((bacnetip_address[4] << 8) | (bacnetip_address[5] << 0));
+            }
+            else if (bacnetip_address.Length == 18) //ipv6 no idea
+                ret += "IPV6 Address :" + bacnetip_address.ToString();
+            ret += " time to live :" + time_to_live + " remaining time to live :" + remaining_time_to_live;
+            return ret;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_tag(buffer, 0, true, (uint)bacnetip_address.Length);
+            foreach (byte b in bacnetip_address)
+                buffer.Add(b);
+            ASN1.encode_context_unsigned(buffer, 1, time_to_live);
+            ASN1.encode_context_unsigned(buffer, 2, remaining_time_to_live);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+            //ip address
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+            {
+                bacnetip_address = new byte[len_value_type];
+                len += ASN1.decode_octet_string(buffer, offset + len, (int)len_value, bacnetip_address, 0, len_value_type);
+
+            }
+            else
+                return len - 1;
+            //time to live
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+            {
+
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                time_to_live = (ushort)u_val;
+            }
+            //remaining_time_to_live
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 2)
+            {
+
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                remaining_time_to_live = (ushort)u_val;
+            }
+
+
+            return len;
+        }
+    }
+
+    public struct BACnetAddressBinding //C. Günther
+    {
+        private BacnetObjectId device_identifier;
+        private BacnetAddress device_address;
+
+        public BacnetObjectId Device_Identifier
+        {
+            get { return device_identifier; }
+            set { device_identifier = value; }
+        }
+        public BacnetAddress Device_Address
+        {
+            get { return device_address; }
+            set { device_address = value; }
+        }
+
+        public override string ToString()
+        {
+            try
+            {
+                return "Device_Identifier:" + device_identifier + "Network_Number:" + device_address.net + "mac_address:" + BitConverter.ToString(device_address.adr);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_application_object_id(buffer, device_identifier.type, device_identifier.instance);
+            ASN1.encode_application_unsigned(buffer, device_address.net);
+            ASN1.encode_application_octet_string(buffer, device_address.adr, 0, device_address.adr.Length);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            // device_identifier
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID)
+            {
+                ushort obj_typ;
+                uint obj_instance;
+                len += ASN1.decode_object_id_safe(buffer, offset + len, len_value_type, out obj_typ, out obj_instance);
+                device_identifier = new BacnetObjectId((BacnetObjectTypes)obj_typ, obj_instance);
+            }
+            else
+                return len;
+
+            //device_address
+            device_address = new BacnetAddress();
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+            if (tag == (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
+            {
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                device_address.net = (ushort)u_val;
+            }
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+            if (tag == (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING)
+            {
+                byte[] b_val = new byte[len_value_type];
+                len += ASN1.decode_octet_string(buffer, offset + len, (int)len_value, b_val, 0, len_value_type);
+                device_address.adr = b_val;
+            }
+            return len;
+        }
+
+    }
+
+    public struct BACnetVMACEntry : ASN1.IASN1encode  //C. Günther
+    {
+        public byte[] virtual_mac_address;
+        public byte[] native_mac_address;
+
+        public override string ToString()
+        {
+            return "Virtual MAC :" + BitConverter.ToString(virtual_mac_address) + " Native MAC :" + BitConverter.ToString(native_mac_address);
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_tag(buffer, 0, true, (uint)virtual_mac_address.Length);
+            foreach (byte b in virtual_mac_address)
+                buffer.Add(b);
+            ASN1.encode_tag(buffer, 1, true, (uint)native_mac_address.Length);
+            foreach (byte b in native_mac_address)
+                buffer.Add(b);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+            {
+                virtual_mac_address = new byte[len_value_type];
+                len += ASN1.decode_octet_string(buffer, offset + len, (int)len_value, virtual_mac_address, 0, len_value_type);
+
+            }
+            else
+                return len - 1;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+            {
+                native_mac_address = new byte[len_value_type];
+                len += ASN1.decode_octet_string(buffer, offset + len, (int)len_value, native_mac_address, 0, len_value_type);
+
+            }
+
+            return len;
+        }
+
+
+    }
+
+    public struct BACnetAccumulatorRecord : ASN1.IASN1encode //C. Günther
+    {
+        private DateTime timestamp;
+        private uint present_value;
+        private uint accumulated_value;
+        private status accumulator_status;
+
+        public DateTime Timestamp
+        {
+            get { return timestamp; }
+            set { timestamp = value; }
+        }
+
+        public uint Present_Value
+        {
+            get { return present_value; }
+            set { present_value = value; }
+        }
+
+        public uint Accumulated_Value
+        {
+            get { return accumulated_value; }
+            set { accumulated_value = value; }
+        }
+
+        public status Accumulator_Status
+        {
+            get { return accumulator_status; }
+            set { accumulator_status = value; }
+        }
+
+        public enum status
+        {
+            NORMAL = 0,
+            STARTING = 1,
+            RECOVERED = 2,
+            ABNORMAL = 3,
+            FAILED = 4
+        }
+
+        public BACnetAccumulatorRecord(DateTime Timestamp, uint Present_Value, uint Accumulated_Value, status Accumulator_Status)
+        {
+            timestamp = Timestamp;
+            present_value = Present_Value;
+            accumulated_value = Accumulated_Value;
+            accumulator_status = Accumulator_Status;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.bacapp_encode_context_datetime(buffer, 0, timestamp);
+            ASN1.encode_context_unsigned(buffer, 1, present_value);
+            ASN1.encode_context_unsigned(buffer, 2, accumulated_value);
+            ASN1.encode_context_enumerated(buffer, 3, Convert.ToUInt32(accumulator_status));
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+            {
+
+                len += ASN1.decode_bacnet_datetime(buffer, offset + len, out timestamp);
+
+            }
+            else
+                return len - 1;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+            {
+
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out present_value);
+
+            }
+            else
+                return len - 1;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 2)
+            {
+
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out accumulated_value);
+
+            }
+            else
+                return len - 1;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 3)
+            {
+                uint u_val;
+                len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out u_val);
+                accumulator_status = (status)u_val;
+
+            }
+            else
+                return len - 1;
+
+            return len;
+
+
+        }
+
+
+
+    }
+
+    public struct BACnetRouterEntry : ASN1.IASN1encode //christopher Günther
+    {
+        public ushort network_number;
+        public byte[] mac_address;
+        public BACnetNetworkReachability status;
+        public bool opt_performance_index;
+        public byte performance_index;
+
+
+        public enum BACnetNetworkReachability //name removed again from 135-2016??
+        {
+            available = 0,
+            busy = 1,
+            disconnected = 2
+        }
+
+        public override string ToString()
+        {
+
+            string ret = "network number :" + network_number + " MAC Address :" + BitConverter.ToString(mac_address) + " Status :" + status;
+            if (opt_performance_index)
+                ret += " performance Index :" + performance_index;
+            return ret;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_unsigned(buffer, 0, network_number);
+            ASN1.encode_tag(buffer, 1, true, (uint)mac_address.Length);
+            foreach (byte b in mac_address)
+                buffer.Add(b);
+            ASN1.encode_context_unsigned(buffer, 2, Convert.ToUInt32(status));
+            if (opt_performance_index)
+                ASN1.encode_context_unsigned(buffer, 3, performance_index);
+
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+            {
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                network_number = (ushort)u_val;
+            }
+            else
+                return len - 1;
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+            {
+                mac_address = new byte[len_value_type];
+                len += ASN1.decode_octet_string(buffer, offset + len, (int)len_value, mac_address, 0, len_value_type);
+
+            }
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 2)
+            {
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                status = (BACnetNetworkReachability)u_val;
+
+            }
+
+            if (len < len_value)
+            {
+
+                len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                if (tag == 3)
+                {
+                    opt_performance_index = true;
+                    uint u_val;
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                    performance_index = (byte)u_val;
+
+                }
+                else
+                    opt_performance_index = false;
+            }
+
+            return len;
+
+
+        }
+
+
+    }
+
+    public struct BACnetWriteGroupRequest : ASN1.IASN1encode //C. Günther
+    {
+        public uint group_number;
+        public uint write_priority;
+        public List<BACnetGroupChannelValue> change_list;
+        public bool inhibit_delay;
+
+        public BACnetWriteGroupRequest(uint Group_Number, uint write_prio, List<BACnetGroupChannelValue> Channel_List, bool Inhibit_Delay = false)
+        {
+            group_number = Group_Number;
+            write_priority = write_prio;
+            change_list = Channel_List;
+            inhibit_delay = Inhibit_Delay;
+        }
+
+        public override string ToString()
+        {
+            string ret = "group number :" + group_number + " write prio :" + write_priority + " inhibit delay :" + inhibit_delay;
+            foreach (BACnetGroupChannelValue gcv in change_list)
+                ret = ret + gcv.ToString();
+            return ret;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_unsigned(buffer, 0, group_number);
+            ASN1.encode_context_unsigned(buffer, 1, write_priority);
+            ASN1.encode_opening_tag(buffer, 2);
+
+            foreach (BACnetGroupChannelValue gcv in change_list)
+            {
+                gcv.ASN1encode(buffer);
+
+            }
+            ASN1.encode_closing_tag(buffer, 2);
+            if (inhibit_delay == true)
+                ASN1.encode_context_enumerated(buffer, 3, 1); //is optional
+
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+            //group number
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out group_number);
+            else
+                return len - 1;
+
+            //write priority
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out write_priority);
+
+            //Group Channel List
+            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 2))
+            {
+
+                len++;
+                change_list = new List<BACnetGroupChannelValue>();
+                while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 2))
+                {
+
+                    BACnetGroupChannelValue gcv = new BACnetGroupChannelValue();
+                    len += gcv.ASN1decode(buffer, offset + len, len_value);
+                    change_list.Add(gcv);
+                }
+
+
+                len++;//closing tag
+
+            }
+
+
+            if (len < len_value)
+            {
+                ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                if (tag == 3)//optional
+                {
+                    len++;
+                    uint tmp;
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out tmp);
+                    if (tmp != 0)
+                        inhibit_delay = true;
+                    else
+                        inhibit_delay = false;
+                }
+            }
+
+            return len;
+
+        }
+
+    }
+
+    public struct BACnetSubscribeCOVPropertyMultiple : ASN1.IASN1encode //C. Günther
+    {
+        //could also be used for BACnetCOVMultipleSubscription but than has
+        //BACnetRecipientProcess recipient instead of uint subscriber_process_identifier
+        public uint subscriber_process_identifier;
+        public bool issue_confirmed_notifications;
+        public bool option_lifetime;
+        public uint lifetime; //time-remaining
+        public bool option_max_notification_delay;
+        public uint max_notification_delay;
+
+        public List<cov_subscription_specification> list_of_cov_subscription_specifications;
+
+        public override string ToString()
+        {
+            string ret = "subscriber_process_identifier :" + subscriber_process_identifier + " issue_confirmed_notifications :" + issue_confirmed_notifications;
+            if (option_lifetime)
+                ret = ret + " lifetime :" + lifetime;
+            if (option_max_notification_delay)
+                ret = ret + " max_notification_delay :" + max_notification_delay;
+            foreach (cov_subscription_specification css in list_of_cov_subscription_specifications)
+                ret = ret + css;
+
+            return ret;
+        }
+
+        public BACnetSubscribeCOVPropertyMultiple(uint subsc_id, bool issue_confirmed, List<cov_subscription_specification> covsl, bool opt_lifet = false, bool opt_max_notify_delay = false)
+        {
+            subscriber_process_identifier = subsc_id;
+            issue_confirmed_notifications = issue_confirmed;
+            option_lifetime = opt_lifet;
+            lifetime = 0;
+            option_max_notification_delay = opt_max_notify_delay;
+            max_notification_delay = 0;
+            list_of_cov_subscription_specifications = covsl;
+
+        }
+
+        public struct cov_reference
+        {
+            public BacnetPropertyReference monitored_property;
+            public bool opt_cov_increment;
+            public float cov_increment;
+            public bool timestamped;
+
+            public override string ToString()
+            {
+                string ret = " monitored_property :" + ((BacnetPropertyIds)monitored_property.propertyIdentifier).ToString();
+                if (opt_cov_increment)
+                    ret = ret + " " + cov_increment;
+                ret = ret + " timestamped :" + timestamped;
+                return ret;
+
+
+            }
+
+            public cov_reference(BacnetPropertyReference mp, bool timesta, bool opt_cov_i = false)
+            {
+                monitored_property = mp;
+                timestamped = timesta;
+                opt_cov_increment = opt_cov_i;
+                cov_increment = 0;
+            }
+        }
+
+        public struct cov_subscription_specification
+        {
+            public BacnetObjectId monitored_object_identifier;
+            public List<cov_reference> list_of_cov_references;
+
+            public override string ToString()
+            {
+                string ret = monitored_object_identifier.ToString();
+
+                foreach (cov_reference cr in list_of_cov_references)
+                    ret = ret + " " + cr;
+
+                return ret;
+
+            }
+
+            public cov_subscription_specification(BacnetObjectId m_o_i, List<cov_reference> list_of_cov_ref)
+            {
+                monitored_object_identifier = m_o_i;
+                list_of_cov_references = list_of_cov_ref;
+            }
+
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_unsigned(buffer, 0, subscriber_process_identifier);
+            if (issue_confirmed_notifications)
+                ASN1.encode_context_boolean(buffer, 1, issue_confirmed_notifications);
+            if (option_lifetime)
+                ASN1.encode_context_unsigned(buffer, 2, lifetime);
+            if (option_max_notification_delay)
+                ASN1.encode_context_unsigned(buffer, 3, max_notification_delay);
+            ASN1.encode_opening_tag(buffer, 4);
+            foreach (cov_subscription_specification css in list_of_cov_subscription_specifications)
+            {
+
+                ASN1.encode_context_object_id(buffer, 0, css.monitored_object_identifier.type, (uint)css.monitored_object_identifier.instance);
+                ASN1.encode_opening_tag(buffer, 1);
+                foreach (cov_reference cr in css.list_of_cov_references)
+                {
+
+
+                    ASN1.encode_opening_tag(buffer, 0);
+                    ASN1.encode_context_enumerated(buffer, 0, cr.monitored_property.propertyIdentifier);
+                    ASN1.encode_closing_tag(buffer, 0);
+
+                    if (cr.opt_cov_increment)
+                        ASN1.encode_context_real(buffer, 1, cr.cov_increment);
+                    ASN1.encode_context_boolean(buffer, 2, cr.timestamped);
+
+                }
+                ASN1.encode_closing_tag(buffer, 1);
+            }
+            ASN1.encode_closing_tag(buffer, 4);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+
+            byte tag;
+            uint len_value_type;
+            //subscriber-process-identifier
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out subscriber_process_identifier);
+            else
+                return len - 1;
+
+            //issue-confirmed-notifications
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+            {
+                uint val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                bool bval = val > 0 ? true : false;
+                issue_confirmed_notifications = bval;
+            }
+            //intialize
+            option_lifetime = false;
+            lifetime = 0;
+            option_max_notification_delay = false;
+            max_notification_delay = 0;
+            //lifetime
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 2)
+            {
+                len++;
+                option_lifetime = true;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out lifetime);
+
+            }
+            //max notification delay
+            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 3)
+            {
+                len++;
+                option_max_notification_delay = true;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out max_notification_delay);
+            }
+            //list-of-cov-subscription-specifications
+            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 4))
+            {
+                List<cov_subscription_specification> css = new List<cov_subscription_specification>();
+                len++;
+                while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 4))
+                {
+
+                    cov_subscription_specification cs = new cov_subscription_specification();
+
+                    ushort object_type = 0;
+
+                    len += ASN1.decode_context_object_id(buffer, offset + len, 0, out object_type, out cs.monitored_object_identifier.instance);
+                    cs.monitored_object_identifier.type = (BacnetObjectTypes)object_type;
+
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 1))
+                    {
+                        len++;
+                        List<cov_reference> crl = new List<cov_reference>();
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 1))
+                        {
+                            cov_reference cr = new cov_reference();
+                            //initiliase
+                            cr.opt_cov_increment = false;
+                            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+                            {
+                                len++;
+                                len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                                len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out cr.monitored_property.propertyIdentifier);
+                                len++;
+                            }
+                            //cov-increment
+                            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            if (tag == 1)
+                            {
+                                len++;
+                                cr.opt_cov_increment = true;
+                                len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out cr.cov_increment);
+                            }
+                            //timestamped
+                            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            if (tag == 2)
+                            {
+                                len++;
+                                uint val;
+                                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                                bool bval = val > 0 ? true : false;
+                                cr.timestamped = bval;
+
+                            }
+
+                            crl.Add(cr);
+
+                        }
+                        len++;
+                        cs.list_of_cov_references = crl;
+                    }
+
+
+
+                    css.Add(cs);
+                }
+                len++;//closing tag
+                list_of_cov_subscription_specifications = css;
+            }
+
+
+
+
+            return len;
+
+        }
+    }
+
+    public struct BACnetCOVNotificationMultiple : ASN1.IASN1encode //C. Günther for UnconfirmedCOVNotificationMultiple and ConfirmedCOVNotificationMultiple
+    {
+        //cg
+        public uint subscriber_process_identifier;
+        public BacnetObjectId initiating_device_identifier;
+        public uint time_remaining;
+        public DateTime timestamp;
+        public List<cov_notification> list_of_cov_notifications;
+
+        public override string ToString()
+        {
+            string ret = "processid :" + subscriber_process_identifier + " initiating_device " + initiating_device_identifier.type.ToString() + " time remaining:" + time_remaining + " timestamp :" + timestamp;
+
+            foreach (cov_notification cn in list_of_cov_notifications)
+            {
+                ret = ret + cn.ToString();
+            }
+
+
+            return ret;
+        }
+
+        public struct value
+        {
+            public BacnetPropertyIds property_identifier;
+            public uint property_array_index;
+            public BacnetValue property_value;
+            public bool opt_time_of_change;
+            public DateTime time_of_change;
+
+            public override string ToString()
+            {
+                return "propid :" + property_identifier + " array :" + property_array_index + "value" + property_value.Value.ToString();
+            }
+
+        }
+
+        public struct cov_notification
+        {
+            public BacnetObjectId monitored_object_identifier;
+            public List<value> list_of_values;
+
+            public override string ToString()
+            {
+                string ret = "monitored object :" + monitored_object_identifier.type;
+                foreach (value v in list_of_values)
+                {
+                    ret = ret + v.ToString();
+                }
+                return ret;
+            }
+
+        }
+
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_unsigned(buffer, 0, subscriber_process_identifier);
+            ASN1.encode_context_object_id(buffer, 1, initiating_device_identifier.type, (uint)initiating_device_identifier.instance);
+            ASN1.encode_context_unsigned(buffer, 2, time_remaining);
+            ASN1.encode_opening_tag(buffer, 3);
+            ASN1.bacapp_encode_datetime(buffer, timestamp);
+            ASN1.encode_closing_tag(buffer, 3);
+            ASN1.encode_opening_tag(buffer, 4);
+            foreach (cov_notification cn in list_of_cov_notifications)
+            {
+
+                ASN1.encode_context_object_id(buffer, 0, cn.monitored_object_identifier.type, (uint)cn.monitored_object_identifier.instance);
+                ASN1.encode_opening_tag(buffer, 1);
+                foreach (value v in cn.list_of_values)
+                {
+
+                    ASN1.encode_context_enumerated(buffer, 0, (uint)v.property_identifier);
+                    if (v.property_array_index != ASN1.BACNET_ARRAY_ALL)
+                        ASN1.encode_context_unsigned(buffer, 1, v.property_array_index);
+                    ASN1.encode_opening_tag(buffer, 2);
+                    ASN1.bacapp_encode_application_data(buffer, v.property_value);
+                    ASN1.encode_closing_tag(buffer, 2);
+                    if (v.opt_time_of_change)
+                        ASN1.encode_context_time(buffer, 3, v.time_of_change);
+
+                }
+                ASN1.encode_closing_tag(buffer, 1);
+            }
+            ASN1.encode_closing_tag(buffer, 4);
+
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+
+            int len = 0;
+
+            byte tag;
+            uint len_value_type;
+            ushort obj_type;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+            {
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out subscriber_process_identifier);
+            }
+            else
+                return len - 1;
+
+            len += ASN1.decode_context_object_id(buffer, offset + len, 1, out obj_type, out initiating_device_identifier.instance);
+            initiating_device_identifier.type = (BacnetObjectTypes)obj_type;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 2)
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out time_remaining);
+
+
+            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 3))
+            {
+
+                len++;
+                len += ASN1.decode_bacnet_datetime(buffer, offset + len, out timestamp);
+                len++;
+            }
+
+            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 4))
+            {
+
+                len++;
+                List<cov_notification> cnl = new List<cov_notification>();
+                while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 4))
+                {
+
+
+                    cov_notification cn = new cov_notification();
+                    len += ASN1.decode_context_object_id(buffer, offset + len, 0, out obj_type, out cn.monitored_object_identifier.instance);
+                    cn.monitored_object_identifier.type = (BacnetObjectTypes)obj_type;
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 1))
+                    {
+                        len++;
+                        List<value> vl = new List<value>();
+
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 1))
+                        {
+                            value v = new value();
+
+                            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            if (tag == 0)
+                            {
+                                uint u_val;
+                                len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out u_val);
+                                v.property_identifier = (BacnetPropertyIds)u_val;
+
+
+                            }
+                            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                            if (tag == 1)
+                            {
+                                len++;
+                                len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out v.property_array_index);
+
+                            }
+                            else
+                                v.property_array_index = ASN1.BACNET_ARRAY_ALL;
+                            //decode timestamp opt.
+
+                            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 2))
+                            {
+                                len++;
+                                BacnetValue bv = new BacnetValue();
+                                len += ASN1.bacapp_decode_application_data(buffer, offset + len, (int)len_value, cn.monitored_object_identifier.type, v.property_identifier, out bv);
+                                v.property_value = bv;
+
+                                len++;
+
+                            }
+                            //decode timestamp opt.
+
+                            ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            if (tag == 3)
+                            {
+
+                                v.opt_time_of_change = true;
+                                len++;
+                                len += ASN1.decode_bacnet_time_safe(buffer, offset + len, len_value_type, out v.time_of_change);
+
+
+                            }
+                            else
+                                v.opt_time_of_change = false;
+
+                            vl.Add(v);
+
+
+                        }
+                        len++;
+
+                        cn.list_of_values = vl;
+
+
+                    }
+
+                    cnl.Add(cn);
+
+                }
+                len++;
+                list_of_cov_notifications = cnl;
+
+
+
+            }
+
+            return len;
+        }
+
+    }
+
+	public struct BACnetKeyIdentifier
+    {
+        byte algorithm;
+        byte key_id;
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_unsigned(buffer, 0, algorithm);
+            ASN1.encode_context_unsigned(buffer, 1, key_id);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0 && len_value_type == 1)
+            {
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                algorithm = (byte)u_val;
+            }
+            else
+                return len - 1;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1 && len_value_type == 1)
+            {
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                key_id = (byte)u_val;
+            }
+            else
+                return len - 1;
+
+            return len;
+
+        }
+    }
+
+    public struct BACnetSecurityKeySet
+    {
+        byte key_revision;
+        DateTime activation_time;
+        DateTime expiration_time;
+        List<BACnetKeyIdentifier> key_ids;
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_unsigned(buffer, 0, key_revision);
+            ASN1.bacapp_encode_context_datetime(buffer, 1, activation_time);
+            ASN1.bacapp_encode_context_datetime(buffer, 2, expiration_time);
+            ASN1.encode_opening_tag(buffer, 3);
+            foreach (BACnetKeyIdentifier ki in key_ids)
+                ki.ASN1encode(buffer);
+            ASN1.encode_closing_tag(buffer, 3);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+            //key revision
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0 && len_value_type == 1)
+            {
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                key_revision = (byte)u_val;
+            }
+            else
+                return len - 1;
+            //activation time
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+            {
+                len += ASN1.decode_bacnet_datetime(buffer, offset + len, out activation_time);
+            }
+            else
+                return len - 1;
+            //expiration_time
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 2)
+            {
+                len += ASN1.decode_bacnet_datetime(buffer, offset + len, out expiration_time);
+            }
+            else
+                return len - 1;
+
+            //key_ids
+            if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 3))
+            {
+
+                len++;
+                key_ids = new List<BACnetKeyIdentifier>();
+                while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 3))
+                {
+
+                    BACnetKeyIdentifier ki = new BACnetKeyIdentifier();
+                    len += ki.ASN1decode(buffer, offset + len, len_value);
+                    key_ids.Add(ki);
+                }
+
+
+                len++;//closing tag
+
+            }
+
+            return len;
+
+
+
+        }
+    }
+
+    public struct BACnetNetworkSecurityPolicy
+    {
+        byte port_id;
+        BACnetSecurityPolicy security_level;
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_unsigned(buffer, 0, port_id);
+            ASN1.encode_context_enumerated(buffer, 1, Convert.ToUInt32(security_level));
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0 && len_value_type == 1)
+            {
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                port_id = (byte)u_val;
+            }
+            else
+                return len - 1;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+            {
+                uint u_val;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                security_level = (BACnetSecurityPolicy)u_val;
+            }
+            else
+                return len - 1;
+
+
+            return len;
+
+
+        }
+    }
+
+    public struct BACnetObjectPropertyReference : ASN1.IASN1encode //C. Günther
+    {
+        private BacnetObjectId object_identifier;
+        private BacnetPropertyIds property_identifier;
+        private bool option_property_array_index;
+        private uint array_index;
+
+        public BACnetObjectPropertyReference(BacnetObjectId Objectid, BacnetPropertyIds Property_id, uint Array_Index = ASN1.BACNET_ARRAY_ALL)
+        {
+            object_identifier = Objectid;
+            property_identifier = Property_id;
+            option_property_array_index = false;
+            array_index = Array_Index;
+            if (array_index != ASN1.BACNET_ARRAY_ALL)
+            {
+                option_property_array_index = true;
+            }
+        }
+
+        public BacnetObjectId Object_Identifier
+        {
+            get { return object_identifier; }
+            set { object_identifier = value; }
+        }
+
+        public BacnetPropertyIds Property_Identifier
+        {
+            get { return property_identifier; }
+            set { property_identifier = value; }
+        }
+
+        public uint Array_Index
+        {
+            get { return array_index; }
+            set {
+                if ((uint)value == ASN1.BACNET_ARRAY_ALL)
+                    option_property_array_index = false;
+                else
+                    option_property_array_index = true;
+                array_index = value;
+            }
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_context_object_id(buffer, 0, object_identifier.type, object_identifier.instance);
+            ASN1.encode_context_enumerated(buffer, 1, Convert.ToUInt32(property_identifier));
+            if (option_property_array_index)
+                ASN1.encode_context_unsigned(buffer, 2, array_index);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+            int tmp = 0;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 0)
+            {
+                ushort u_val;
+                len += ASN1.decode_object_id(buffer, offset + len, out u_val, out object_identifier.instance);
+                object_identifier.type = (BacnetObjectTypes)u_val;
+            }
+            else
+                return len - 1;
+
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 1)
+            {
+                uint u_val;
+                len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out u_val);
+                property_identifier = (BacnetPropertyIds)u_val;
+            }
+            else
+                return len - 1;
+            option_property_array_index = false;
+
+            tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            if (tag == 2)
+            {
+                option_property_array_index = true;
+                len += tmp;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out array_index);
+            }
+            else
+                array_index = ASN1.BACNET_ARRAY_ALL;
+
+            return len;
+
+
+        }
+    }
+
+    public struct BACnetSetpointReference : ASN1.IASN1encode //C. Günther
+    {
+        public BACnetObjectPropertyReference setpoint_reference;
+
+        public BACnetObjectPropertyReference Setpoint_Reference
+        {
+            get { return setpoint_reference; }
+            set { setpoint_reference = value; }
+
+        }
+
+        public BACnetSetpointReference(BACnetObjectPropertyReference Setpoint_Reference)
+        {
+            setpoint_reference = Setpoint_Reference;
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            ASN1.encode_opening_tag(buffer, 0);
+            setpoint_reference.ASN1encode(buffer);
+            ASN1.encode_closing_tag(buffer, 0);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            if(ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+            {
+                len++;
+                BACnetObjectPropertyReference opr = new BACnetObjectPropertyReference();
+                len += opr.ASN1decode(buffer, offset + len, len_value);
+                setpoint_reference = opr;
+                len++;
+
+            }else
+                return len;
+
+            return len;
+
+        }
+    }
+
+    public struct BACnetShedLevel : ASN1.IASN1encode //C. Günther
+    {
+        private object value;
+        private ShedLevelType type;
+
+        public ShedLevelType Type
+        {
+            get { return type; }
+            set {
+                type = value;
+                switch (type)
+                {
+                    case ShedLevelType.LEVEL:
+                    case ShedLevelType.PERCENT:
+                        this.value = (uint)Convert.ChangeType(this.value, typeof(uint));
+                        break;
+                    case ShedLevelType.AMOUNT:
+                        this.value = (float)Convert.ChangeType(this.value, typeof(float));
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+
+                 }
+        }
+
+        public object Value
+        {
+            get {
+                switch (type)
+                {
+                    case ShedLevelType.LEVEL:
+                    case ShedLevelType.PERCENT:
+                        return (uint)Convert.ChangeType(this.value, typeof(uint));
+                    case ShedLevelType.AMOUNT:
+                        return (float)Convert.ChangeType(this.value, typeof(float));
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+            set {
+                switch (type)
+                {
+                    case ShedLevelType.LEVEL:
+                    case ShedLevelType.PERCENT:
+                        if (this.value == null)
+                            this.value = (uint)0;
+                        else if(this.value.GetType() != typeof(uint))
+                            this.value = (uint)Convert.ChangeType(this.value, typeof(uint));
+                        else this.value = value;
+                        break;
+                    case ShedLevelType.AMOUNT:
+                        if (this.value == null)
+                            this.value = (float)0;
+                        if (this.value.GetType() != typeof(float))
+                            this.value = (float)Convert.ChangeType(this.value, typeof(float));
+                        this.value = value;
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+        }
+
+        public enum ShedLevelType
+        {
+            PERCENT = 0,
+            LEVEL = 1,
+            AMOUNT = 2
+        }
+
+        public BACnetShedLevel(ShedLevelType Type, object Value)
+        {
+            type = Type;
+            value = Value;
+
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            switch(type)
+            {
+                case ShedLevelType.PERCENT:
+                    ASN1.encode_context_unsigned(buffer, 0, (uint)value);
+                    break;
+                case ShedLevelType.LEVEL:
+                    ASN1.encode_context_unsigned(buffer, 1, (uint)value);
+                    break;
+                case ShedLevelType.AMOUNT:
+                    ASN1.encode_context_real(buffer, 2, (float)value);
+                    break;
+
+            }
+        }
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            int len = 0;
+            byte tag;
+            uint len_value_type;
+
+            //percent
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+            type = (ShedLevelType)tag;
+            switch (type)
+            {
+                case ShedLevelType.PERCENT:
+                case ShedLevelType.LEVEL:
+                    uint u_val;
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out u_val);
+                    value = u_val;
+                    break;
+                case ShedLevelType.AMOUNT:
+                    float f_val;
+                    len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out f_val);
+                    value = f_val;
+                    break;
+                default:
+                    return len;
+            }
+
+            return len;
+        }
+
+
+    }
+
+    public struct BACnetEventParameter : ASN1.IASN1encode //C. Günther
+    {
+        /*BACnetNotificationParameters
+          -- These choices have a one-to-one correspondence with the Event_Type enumeration with the exception of the
+          -- complex-event-type, which is used for proprietary event types.*/
+        public BacnetEventNotificationData.BacnetEventTypes type;
+
+        public object Value;
+
+        public struct ChangeOfState
+        {
+            public uint time_delay;
+            public List<BACnetPropertyState> list_of_values;
+
+            public override string ToString()
+            {
+                string ret = "timedelay :" + time_delay.ToString();
+                int i = 1;
+                foreach (BACnetPropertyState ps in list_of_values)
+                {
+                    ret = ret + " alarmvalue " + i.ToString() + " :" + ps.ToString();
+                    i++;
+                }
+                return ret;
+            }
+
+        }
+
+        public struct ChangeOfBitstring
+        {
+            public uint time_delay;
+            public BacnetBitString bitmask;
+            public List<BacnetBitString> list_of_bitstring_values;
+
+            public override string ToString()
+            {
+                string ret = "timedelay :" + time_delay.ToString();
+                int i = 1;
+
+                ret = ret + " bitmask :" + bitmask.ToString();
+
+                foreach (BacnetBitString bs in list_of_bitstring_values)
+                {
+                    ret = ret + " alarmvalue " + i.ToString() + " :" + bs.ToString();
+                    i++;
+                }
+
+                return ret;
+
+            }
+
+        }
+
+        public struct ChangeOfValue
+        {
+            public enum covtype
+            {
+                bitmask = 0,
+                referenced_property_increment = 1
+
+            };
+
+            public uint time_delay;
+
+            public covtype type;
+
+            public object covcriteria;
+
+            public override string ToString()
+            {
+                string ret = "timedelay :" + time_delay.ToString();
+                return ret + " " + type.ToString() + ": " + covcriteria.ToString();
+            }
+        }
+
+        public struct CommandFailure
+        {
+            public uint time_delay;
+            public BacnetDeviceObjectPropertyReference feedback_property_reference;
+
+            public override string ToString()
+            {
+                string ret = "timedelay :" + time_delay.ToString();
+                return ret + " feedback reference :" + feedback_property_reference.deviceIndentifier.ToString() + ":" + feedback_property_reference.objectIdentifier.ToString() + ":" + feedback_property_reference.propertyIdentifier.ToString();
+
+            }
+        }
+
+        public struct FloatingLimit
+        {
+            public uint time_delay;
+            public BacnetDeviceObjectPropertyReference setpoint_reference;
+            public float low_diff_limit;
+            public float high_diff_limit;
+            public float deadband;
+
+            public override string ToString()
+            {
+                string ret = "timedelay :" + time_delay.ToString();
+                return ret + " setpointref :" + setpoint_reference.deviceIndentifier.ToString() + ":" + setpoint_reference.objectIdentifier.ToString() + ":" + setpoint_reference.propertyIdentifier.ToString() + " low diff :" + low_diff_limit.ToString() + " high diff :" + high_diff_limit.ToString() + " deadband :" + deadband.ToString();
+
+            }
+        }
+
+        public struct OutOfRange
+        {
+            public uint time_delay;
+            public float low_limit;
+            public float high_limit;
+            public float deadband;
+
+            public override string ToString()
+            {
+                string ret = "timedelay :" + time_delay.ToString();
+                return ret + " low limit :" + low_limit.ToString() + " high limit:" + high_limit.ToString() + " deadband :" + deadband.ToString();
+
+            }
+
+        }
+
+        public struct ChangeOfLifeSafety
+        {
+            public uint time_delay;
+            public List<BacnetEventNotificationData.BacnetLifeSafetyStates> list_of_life_safety_alarm_values;
+            public List<BacnetEventNotificationData.BacnetLifeSafetyStates> list_of_alarm_values;
+            public BacnetDeviceObjectPropertyReference mode_property_reference;
+        }
+
+        public struct Extended
+        {
+            public ushort vendor_id;
+            public uint extended_event_type;
+            public List<object> parameters;
+
+            public override string ToString()
+            {
+                string ret = "vendorid:" + vendor_id.ToString() + ":extendedventtype:" + extended_event_type.ToString();
+                int i = 1;
+                foreach (object obj in parameters)
+                {
+                    ret = ret + "parameter" + i.ToString() + ":" + obj.GetType() + ":" + obj.ToString() + " ";
+                    i++;
+                }
+                return ret;
+
+            }
+        }
+
+        public struct BufferReady
+        {
+            public uint notification_threshold;
+            public UInt32 previous_notification_count;
+
+            public override string ToString()
+            {
+                return "treshold :" + notification_threshold.ToString() + " count :" + previous_notification_count.ToString();
+            }
+
+        }
+
+        public struct UnsignedRange
+        {
+            public uint time_delay;
+            public uint low_limit;
+            public uint high_limit;
+
+            public override string ToString()
+            {
+                return "timedelay :" + time_delay.ToString() + " lowlimit :" + low_limit.ToString() + " highlimit :" + high_limit.ToString();
+            }
+        }
+
+        public struct AccessEvent
+        {
+            public List<BACnetAccessEvents> list_of_access_events;
+            public BacnetDeviceObjectPropertyReference access_event_time_reference;
+
+            public override string ToString()
+            {
+                string ret = "";
+                int i = 1;
+                foreach (BACnetAccessEvents ls in list_of_access_events)
+                {
+                    ret = ret + "accessevent " + i.ToString() + ":" + ls.ToString() + " ";
+                    i++;
+                }
+                return ret + " Reference :" + access_event_time_reference.objectIdentifier + ":" + access_event_time_reference.propertyIdentifier;
+
+            }
+
+
+        }
+
+        public struct DoubleOutOfRange
+        {
+            public uint time_delay;
+            public double low_limit;
+            public double high_limit;
+            public double deadband;
+
+            public override string ToString()
+            {
+                return "timedelay :" + time_delay.ToString() + " lowlimit :" + low_limit.ToString() + " high_limit :" + high_limit.ToString() + " deadband :" + deadband.ToString();
+            }
+
+        }
+
+        public struct SignedOutOfRange
+        {
+            public uint time_delay;
+            public int low_limit;
+            public int high_limit;
+            public uint deadband;
+
+            public override string ToString()
+            {
+                return "timedelay :" + time_delay.ToString() + " lowlimit :" + low_limit.ToString() + " highlimit :" + high_limit.ToString() + " deadband :" + deadband.ToString();
+            }
+        }
+
+        public struct UnsignedOutOfRange
+        {
+            public uint time_delay;
+            public uint low_limit;
+            public uint high_limit;
+            public uint deadband;
+
+
+
+            public override string ToString()
+            {
+                return "timedelay :" + time_delay.ToString() + " lowlimit :" + low_limit.ToString() + " highlimit :" + high_limit.ToString() + " deadband :" + deadband.ToString();
+            }
+        }
+
+        public struct ChangeOfCharacterString
+        {
+            public uint time_delay;
+            public List<string> list_of_alarm_values;
+
+            public override string ToString()
+            {
+                string ret = "timedelay :" + time_delay.ToString();
+                int i = 1;
+                foreach (string string_value in list_of_alarm_values)
+                {
+                    ret = ret + " alarmvalue " + i.ToString() + " :" + string_value;
+                    i++;
+                }
+                return ret;
+
+            }
+        }
+
+        public struct ChangeOfStatusFlag
+        {
+            public uint time_delay;
+            public List<BacnetStatusFlags> selected_flags; //??
+
+            public override string ToString()
+            {
+                string ret = "timedelay :" + time_delay.ToString() + "flags :" + selected_flags;
+                int i = 1;
+                foreach (BacnetStatusFlags flag in selected_flags)
+                {
+                    ret = ret + "flag " + i.ToString() + ":" + flag.ToString() + " ";
+                    i++;
+                }
+                return ret;
+
+            }
+
+        }
+
+        public struct ChangeOfDiscreteValue
+        {
+            public uint time_delay;
+
+            public override string ToString()
+            {
+                return "timedelay :" + time_delay.ToString();
+            }
+        }
+
+        public struct ChangeOfTimer
+        {
+            public uint time_delay;
+            public List<BACnetTimerState> alarm_values;
+            public BacnetDeviceObjectPropertyReference update_time_reference;
+
+            public override string ToString()
+            {
+                string ret = "timedelay :" + time_delay.ToString();
+                int i = 1;
+                foreach (BACnetTimerState value in alarm_values)
+                {
+                    ret = ret + " alarmvalue " + i.ToString() + " :" + value;
+                    i++;
+                }
+                return ret + update_time_reference.objectIdentifier.ToString() + "." + update_time_reference.propertyIdentifier.ToString();
+            }
+
+        }
+
+        public void ASN1encode(EncodeBuffer buffer)
+        {
+            //not all CG
+
+            ASN1.encode_opening_tag(buffer, (byte)type);
+            switch (type)
+            {
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_STATE:
+                    ChangeOfState cos = (ChangeOfState)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, cos.time_delay);
+                    ASN1.encode_opening_tag(buffer, 1);
+                    foreach (BACnetPropertyState ps in (List<BACnetPropertyState>)cos.list_of_values)
+                    {
+                        ps.ASN1encode(buffer);
+                    }
+                    ASN1.encode_closing_tag(buffer, 1);
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_OUT_OF_RANGE:
+                    OutOfRange oor = (OutOfRange)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, oor.time_delay);
+                    ASN1.encode_context_real(buffer, 1, oor.low_limit);
+                    ASN1.encode_context_real(buffer, 2, oor.high_limit);
+                    ASN1.encode_context_real(buffer, 3, oor.deadband);
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_UNSIGNED_RANGE:
+                    UnsignedRange ur = (UnsignedRange)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, ur.time_delay);
+                    ASN1.encode_context_unsigned(buffer, 1, ur.low_limit);
+                    ASN1.encode_context_unsigned(buffer, 2, ur.high_limit);
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_UNSIGNED_OUT_OF_RANGE:
+                    UnsignedOutOfRange uoor = (UnsignedOutOfRange)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, uoor.time_delay);
+                    ASN1.encode_context_unsigned(buffer, 1, uoor.low_limit);
+                    ASN1.encode_context_unsigned(buffer, 2, uoor.high_limit);
+                    ASN1.encode_context_unsigned(buffer, 3, uoor.deadband);
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_SIGNED_OUT_OF_RANGE:
+                    SignedOutOfRange soor = (SignedOutOfRange)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, soor.time_delay);
+                    ASN1.encode_context_signed(buffer, 1, soor.low_limit);
+                    ASN1.encode_context_signed(buffer, 2, soor.high_limit);
+                    ASN1.encode_context_unsigned(buffer, 3, soor.deadband);
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_DOUBLE_OUT_OF_RANGE:
+                    DoubleOutOfRange door = (DoubleOutOfRange)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, door.time_delay);
+                    ASN1.encode_context_double(buffer, 1, door.low_limit);
+                    ASN1.encode_context_double(buffer, 2, door.high_limit);
+                    ASN1.encode_context_double(buffer, 3, door.deadband);
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_FLOATING_LIMIT:
+                    FloatingLimit fl = (FloatingLimit)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, fl.time_delay);
+                    ASN1.encode_opening_tag(buffer, 1);
+                    ASN1.bacapp_encode_device_obj_property_ref(buffer, fl.setpoint_reference);
+                    ASN1.encode_closing_tag(buffer, 1);
+                    ASN1.encode_context_real(buffer, 2, fl.low_diff_limit);
+                    ASN1.encode_context_real(buffer, 3, fl.high_diff_limit);
+                    ASN1.encode_context_real(buffer, 4, fl.deadband);
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_COMMAND_FAILURE:
+                    CommandFailure cf = (CommandFailure)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, cf.time_delay);
+                    ASN1.encode_opening_tag(buffer, 1);
+                    ASN1.bacapp_encode_device_obj_property_ref(buffer, cf.feedback_property_reference);
+                    ASN1.encode_closing_tag(buffer, 1);
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_VALUE:
+                    ChangeOfValue cov = (ChangeOfValue)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, cov.time_delay);
+                    if (cov.covcriteria.GetType() == typeof(BacnetBitString))
+                        ASN1.encode_context_bitstring(buffer, 0, (BacnetBitString)cov.covcriteria);
+                    if (cov.covcriteria.GetType() == typeof(float))
+                        ASN1.encode_context_real(buffer, 1, (float)cov.covcriteria);
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_BITSTRING:
+                    ChangeOfBitstring cob = (ChangeOfBitstring)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, cob.time_delay);
+                    ASN1.encode_context_bitstring(buffer, 1, (BacnetBitString)cob.bitmask);
+                    ASN1.encode_opening_tag(buffer, 2);
+                    foreach (BacnetBitString bs in cob.list_of_bitstring_values)
+                        ASN1.encode_application_bitstring(buffer, (BacnetBitString)cob.bitmask);
+                    ASN1.encode_closing_tag(buffer, 2);
+                    break;
+                /*
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_EXTENDED:
+                    Extended e = (Extended)Value;
+                    ASN1.encode_context_unsigned(buffer, 0, e.vendor_id);
+                    ASN1.encode_context_unsigned(buffer, 1, e.extended_event_type);
+                    ASN1.encode_opening_tag(buffer, 2);
+                    //missing
+                    ASN1.encode_closing_tag(buffer, 2);
+                    break;
+                    //some missing!*/
+                default:
+                    //someone add missing!!
+                    throw new NotImplementedException();
+            }
+            ASN1.encode_closing_tag(buffer, (byte)type);
+        }
+
+        public int ASN1decode(byte[] buffer, int offset, uint len_value)
+        {
+            //CG
+            int len = 0;
+
+            byte tag;
+            uint len_value_type;
+            int tmp = 0;
+            Value = new object();
+
+            byte eventType;
+            float v;
+            len += ASN1.decode_tag_number(buffer, offset + len, out eventType);
+
+            type = (BacnetEventNotificationData.BacnetEventTypes)eventType;
+
+            switch (type)
+            {
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_BITSTRING:
+                    //EVENT_CHANGE_OF_BITSTRING
+                    //time delay
+                    ChangeOfBitstring cob = new ChangeOfBitstring();
+
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out cob.time_delay);
+
+                    }
+
+
+
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    BacnetBitString bs;
+                    len += ASN1.decode_bitstring(buffer, offset + len, len_value_type, out cob.bitmask);
+
+                    len++;
+
+                    List<BacnetBitString> bsl = new List<BacnetBitString>();
+                    while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 2))
+                    {
+
+                        len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                        len += ASN1.decode_bitstring(buffer, offset + len, len_value_type, out bs);
+
+                        bsl.Add(bs);
+
+                    }
+                    cob.list_of_bitstring_values = bsl;
+
+                    len++;
+
+
+                    Value = cob;
+
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_STATE:
+                    //EVENT_CHANGE_OF_STATE
+                    //time delay
+                    ChangeOfState cos = new ChangeOfState();
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out cos.time_delay);
+
+                    }
+
+                    len++;
+
+                    //propertystate list
+
+                    List<BACnetPropertyState> psl = new List<BACnetPropertyState>(); //wrong written propetystate???
+
+                    //decode Property state
+                    while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 1))
+                    {
+
+                        BACnetPropertyState ps = new BACnetPropertyState();
+                        len += ps.ASN1decode(buffer, offset + len);
+                        psl.Add(ps);
+
+                    }
+                    cos.list_of_values = psl;
+                    Value = cos;
+                    len++;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_VALUE:
+                    //change of value
+                    //time delay
+                    ChangeOfValue cov = new ChangeOfValue();
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out cov.time_delay);
+
+                    }
+
+                    len++;
+
+                    //decode cov-criteria
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 1)
+                    {
+                        cov.type = ChangeOfValue.covtype.referenced_property_increment;
+                        len += ASN1.decode_real(buffer, offset + len, out v);
+                        cov.covcriteria = v;
+
+                    }
+
+                    if (tag == 0)
+                    {
+                        cov.type = ChangeOfValue.covtype.bitmask;
+                        BacnetBitString bst;
+                        len += ASN1.decode_bitstring(buffer, offset + len, len_value_type, out bst);
+                        cov.covcriteria = bst;
+
+                    }
+                    len++;
+                    Value = cov;
+
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_COMMAND_FAILURE:
+                    //command-failure
+                    //time delay
+                    CommandFailure cf = new CommandFailure();
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out cf.time_delay);
+
+                    }
+
+                    len++;
+
+                    len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -100, out cf.feedback_property_reference); //why i need ADPU_LEN????
+                    len++;
+
+                    Value = cf;
+
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_FLOATING_LIMIT:
+                    //floating-limit
+                    //time delay
+                    FloatingLimit fl = new FloatingLimit();
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out fl.time_delay);
+
+                    }
+
+                    len++;
+
+                    len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -100, out fl.setpoint_reference); //why i need ADPU_LEN????
+
+                    len++;
+
+                    //low-diff-limit real
+                    len += ASN1.decode_tag_number(buffer, offset + len, out tag);
+
+                    if (tag == 2)
+                    {
+                        len += ASN1.decode_real(buffer, offset + len, out fl.low_diff_limit);
+
+                    }
+
+                    //high-diff-limit real
+                    len += ASN1.decode_tag_number(buffer, offset + len, out tag);
+
+                    if (tag == 3)
+                    {
+                        len += ASN1.decode_real(buffer, offset + len, out fl.high_diff_limit);
+
+                    }
+
+                    //deadband real
+                    len += ASN1.decode_tag_number(buffer, offset + len, out tag);
+
+                    if (tag == 4)
+                    {
+                        len += ASN1.decode_real(buffer, offset + len, out fl.deadband);
+
+                    }
+
+                    Value = fl;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_OUT_OF_RANGE:
+                    //EVENT_OUT_OF_RANGE
+                    OutOfRange oor = new OutOfRange();
+                    //timedelay
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out oor.time_delay);
+
+                    }
+
+                    //len++;
+                    //low-limit real
+                    len += ASN1.decode_tag_number(buffer, offset + len, out tag);
+
+                    if (tag == 1)
+                    {
+                        len += ASN1.decode_real(buffer, offset + len, out oor.low_limit);
+
+                    }
+
+                    //high-limit real
+                    len += ASN1.decode_tag_number(buffer, offset + len, out tag);
+
+                    if (tag == 2)
+                    {
+                        len += ASN1.decode_real(buffer, offset + len, out oor.high_limit);
+
+                    }
+
+                    //deadband real
+                    len += ASN1.decode_tag_number(buffer, offset + len, out tag);
+
+                    if (tag == 3)
+                    {
+                        len += ASN1.decode_real(buffer, offset + len, out oor.deadband);
+
+                    }
+                    Value = oor;
+
+
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_LIFE_SAFETY:
+                    //change-of-life-safety guessed!!!!
+                    ChangeOfLifeSafety cols = new ChangeOfLifeSafety();
+                    //timedelay
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out cols.time_delay);
+
+                    } else return len - 1;
+                    len++;
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 1))
+                    {
+                        len++;
+                        List<BacnetEventNotificationData.BacnetLifeSafetyStates> fvlsav = new List<BacnetEventNotificationData.BacnetLifeSafetyStates>();
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 0))
+                        {
+                            uint val;
+                            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+
+                            fvlsav.Add((BacnetEventNotificationData.BacnetLifeSafetyStates)val);
+                        }
+                        len++;
+                        cols.list_of_life_safety_alarm_values = fvlsav;
+                    }
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 2))
+                    {
+                        len++;
+                        List<BacnetEventNotificationData.BacnetLifeSafetyStates> fvav = new List<BacnetEventNotificationData.BacnetLifeSafetyStates>();
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 0))
+                        {
+                            uint val;
+                            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+
+                            fvav.Add((BacnetEventNotificationData.BacnetLifeSafetyStates)val);
+                        }
+                        len++;
+                        cols.list_of_alarm_values = fvav;
+
+                    }
+
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 3))
+                    {
+                        len++;
+                        len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -100, out cols.mode_property_reference);
+                        len++;
+
+                    }
+
+                    len++;
+                    Value = cols;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_EXTENDED:
+                    //extended guessed
+
+                    Extended ext = new Extended();
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        uint t = 0;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out t);// ext.vendorid);
+                        ext.vendor_id = (ushort)t;
+                    }
+                    else return len - 1;
+
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 1)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out ext.extended_event_type);
+
+                    }
+                    // CG guessed
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 2))
+                    {
+                        len++;
+                        List<object> objlist = new List<object>();
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 2))
+                        {
+                            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            switch ((BacnetApplicationTags)tag)
+                            {
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_NULL: //null
+                                    objlist.Add(null);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_REAL: //real
+                                    float float_value;
+                                    len += ASN1.decode_real_safe(buffer, offset + len, len_value_type, out float_value);
+                                    objlist.Add(float_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT: //unsigned
+                                    uint uint_value;
+                                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out uint_value);
+                                    objlist.Add(uint_value);
+
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_BOOLEAN: //boolean
+                                    uint val;
+                                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out val);
+                                    bool bval = val > 0 ? true : false;
+                                    objlist.Add(bval);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT: //integer
+                                    int int_value;
+                                    len += ASN1.decode_signed(buffer, offset + len, len_value_type, out int_value);
+                                    objlist.Add(int_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_DOUBLE: //double
+                                    double double_value;
+                                    len = ASN1.decode_double_safe(buffer, offset + len, len_value_type, out double_value);
+                                    objlist.Add(double_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING: //octetstring
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_CHARACTER_STRING: //characterstring
+                                    string string_value;
+                                    len += ASN1.decode_character_string(buffer, offset + len, (int)len_value_type, len_value_type, out string_value);
+                                    objlist.Add(string_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_BIT_STRING: //bitstring
+                                    BacnetBitString bit_value;
+                                    len += ASN1.decode_bitstring(buffer, offset + len, len_value_type, out bit_value);
+                                    objlist.Add(bit_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_ENUMERATED: //enumerated
+                                    uint e_value;
+                                    len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out e_value);
+                                    objlist.Add(e_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_DATE: //date
+                                    DateTime date_v;
+                                    len += ASN1.decode_date_safe(buffer, offset + len, len_value_type, out date_v);
+                                    objlist.Add(date_v);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_TIME: //time
+                                    DateTime time_value;
+                                    len += ASN1.decode_bacnet_time_safe(buffer, offset + len, len_value_type, out time_value);
+                                    objlist.Add(time_value);
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID: //BACnetObjectIdentifier,
+                                    ushort object_type = 0;
+                                    uint instance = 0;
+                                    len += ASN1.decode_object_id_safe(buffer, offset + len, len_value_type, out object_type, out instance);
+                                    objlist.Add(new BacnetObjectId((BacnetObjectTypes)object_type, instance));
+                                    break;
+                                case BacnetApplicationTags.BACNET_APPLICATION_TAG_DEVICE_OBJECT_PROPERTY_REFERENCE: //BACnetDeviceObjectPropertyReference
+                                    BacnetDeviceObjectPropertyReference dopr;
+                                    len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -2000, out dopr);
+                                    objlist.Add(dopr);
+                                    break;
+                            }
+
+                        }
+                        ext.parameters = objlist;
+                        len++;
+
+                    }
+
+                    Value = ext;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_BUFFER_READY:
+                    //buffer-ready guessed
+                    BufferReady br = new BufferReady();
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out br.notification_threshold);
+                    }
+                    else return len - 1;
+                    len++;
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 1)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out br.previous_notification_count);
+                    }
+                    len++;
+                    Value = br;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_UNSIGNED_RANGE:
+                    //unsigned-range
+                    //time delay
+                    UnsignedRange ur = new UnsignedRange();
+
+                    //timedelay
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out ur.time_delay);
+
+                    }
+
+                    //len++;
+                    //low-limit
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 1)
+                    {
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out ur.low_limit);
+
+                    }
+
+
+                    //high-limit
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 2)
+                    {
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out ur.high_limit);
+
+                    }
+
+                    Value = ur;
+
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_ACCESS_EVENT:
+                    //access-event guessed
+                    AccessEvent ea = new AccessEvent();
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
+                    {
+                        List<BACnetAccessEvents> ael = new List<BACnetAccessEvents>();
+                        len++;
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 0))
+                        {
+                            uint uv;
+                            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out uv);
+                            ael.Add((BACnetAccessEvents)uv);
+                        }
+                        ea.list_of_access_events = ael;
+                    }
+                    len++;
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 1))
+                    {
+                        len++;
+                        len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -100, out ea.access_event_time_reference);
+
+                        len++;
+
+                    }
+
+
+
+                    Value = ea;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_DOUBLE_OUT_OF_RANGE:
+                    //double-out-of-range
+                    DoubleOutOfRange door = new DoubleOutOfRange();
+                    //time delay
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out door.time_delay);
+
+                    }
+
+                    //low-limit
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 1)
+                    {
+                        len += ASN1.decode_double_safe(buffer, offset + len, len_value_type, out door.low_limit);
+
+                    }
+
+                    //high-limit
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 2)
+                    {
+                        len += ASN1.decode_double_safe(buffer, offset + len, len_value_type, out door.high_limit);
+
+                    }
+
+                    //deadband
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 3)
+                    {
+                        len += ASN1.decode_double_safe(buffer, offset + len, len_value_type, out door.deadband);
+
+                    }
+
+                    Value = door;
+                    len++;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_SIGNED_OUT_OF_RANGE:
+                    //signed-out-of-range
+                    SignedOutOfRange soor = new SignedOutOfRange();
+
+                    //timedelay
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out soor.time_delay);
+
+                    }
+
+                    //low-limit
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 1)
+                    {
+                        len += ASN1.decode_signed(buffer, offset + len, len_value_type, out soor.low_limit);
+
+                    }
+
+                    //high-limit
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 2)
+                    {
+                        len += ASN1.decode_signed(buffer, offset + len, len_value_type, out soor.high_limit);
+
+                    }
+
+                    //deadband
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 3)
+                    {
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out soor.deadband);
+
+                    }
+                    len++;
+                    Value = soor;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_UNSIGNED_OUT_OF_RANGE:
+                    //unsigned-out-of-range
+                    UnsignedOutOfRange uoor = new UnsignedOutOfRange();
+                    //timedelay
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out uoor.time_delay);
+
+                    }
+
+                    //len++;
+                    //low-limit
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 1)
+                    {
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out uoor.low_limit);
+
+                    }
+
+                    //high-limit
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 2)
+                    {
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out uoor.high_limit);
+
+                    }
+
+                    //deadband
+                    len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                    if (tag == 3)
+                    {
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out uoor.deadband);
+
+                    }
+                    len++;
+                    Value = uoor;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_CHARACTERSTRING:
+                    //change-of-character-string
+                    ChangeOfCharacterString cocs = new ChangeOfCharacterString();
+                    //timedelay
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out cocs.time_delay);
+
+                    }
+                    len++;
+
+
+                    List<string> string_values = new List<string>();
+                    while (!ASN1.decode_is_closing_tag_number(buffer, offset + len + 1, 17))
+                    {
+
+                        tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                        if (tag == 7)
+                        {
+
+                            len += tmp;
+                            string string_value;
+                            len += ASN1.decode_character_string(buffer, offset + len, (int)len_value_type, len_value_type, out string_value);
+
+                            string_values.Add(string_value);
+
+                        }
+
+
+                    }
+
+                    cocs.list_of_alarm_values = string_values;
+                    len++;
+                    len++;
+
+                    Value = cocs;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_STATUS_FLAG:
+                    //change-of-status-flags not finished
+                    return len - 1;
+                /*
+                ChangeOfStatusFlag cosf = new ChangeOfStatusFlag();
+                //timedelay
+                tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                if (tag == 0)
+                {
+                    len += tmp;
+                    len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out cosf.time_delay);
+
+                }
+                len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+
+                BacnetBitString flag_bitstring;
+                len += ASN1.decode_bitstring(buffer, offset + len, len_value_type, out flag_bitstring);
+                //somehow convert flag_bitstring to flags?????
+
+                Value = cosf;
+                break;*/
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_NONE:
+                    //none 20
+                    len++;
+                    Value = null;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_DISCRETE_VALUE:
+                    //EVENT_CHANGE_OF_DISCRETE_VALUE
+                    ChangeOfDiscreteValue codv = new ChangeOfDiscreteValue();
+
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out codv.time_delay);
+
+                    }
+                    len++;
+                    Value = codv;
+                    break;
+                case BacnetEventNotificationData.BacnetEventTypes.EVENT_CHANGE_OF_TIMER:
+                    ChangeOfTimer cot = new ChangeOfTimer();
+                    tmp = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                    if (tag == 0)
+                    {
+                        len += tmp;
+                        len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out cot.time_delay);
+
+                    }
+
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 1))
+                    {
+                        len++;
+
+                        List<BACnetTimerState> tsl = new List<BACnetTimerState>();
+
+                        while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 1))
+                        {
+                            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag, out len_value_type);
+                            uint ts;
+                            len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out ts);
+
+                            tsl.Add((BACnetTimerState)ts);
+                        }
+                        len++;
+                        cot.alarm_values = tsl;
+                    }
+
+                    if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 2))
+                    {
+                        len++;
+                        len += ASN1.decode_device_obj_property_ref(buffer, offset + len, -10000, out cot.update_time_reference); //adpu len is a joke???
+
+                    }
+                    len++;
+                    Value = cot;
+                    break;
+                default:
+                    return len - 1;
+            }
+            len++;
+            return len;
+
+        }
+
+        public override string ToString()
+        {
+            return type.ToString() + ":" + Value.ToString();
+        }
+
+
     }
 
     public struct BACnetCalendarEntry : ASN1.IASN1encode
@@ -1820,7 +7401,7 @@ namespace System.IO.BACnet
                         Entries.Add(bwd);
                         break;
                     default:
-                        return len-1; // closing Tag
+                        return len - 1; // closing Tag
                 }
             }
 
@@ -1898,7 +7479,7 @@ namespace System.IO.BACnet
         public BacnetPropertyReference monitoredProperty;
         /* BACnetCOVSubscription */
         public bool IssueConfirmedNotifications;
-        public uint TimeRemaining; 
+        public uint TimeRemaining;
         public float COVIncrement;
 
         // For Yabe PropertyGrid
@@ -1992,7 +7573,7 @@ namespace System.IO.BACnet
         public static BacnetBitString ConvertFromInt(uint value)
         {
             BacnetBitString ret = new BacnetBitString();
-            ret.value=BitConverter.GetBytes(value);
+            ret.value = BitConverter.GetBytes(value);
             ret.bits_used = (byte)Math.Ceiling(Math.Log(value, 2));
             return ret;
         }
@@ -2013,6 +7594,16 @@ namespace System.IO.BACnet
         TL_TYPE_ERROR = 8,
         TL_TYPE_DELTA = 9,
         TL_TYPE_ANY = 10
+    }
+
+    public enum BACnetAccessAuthenticationFactorDisable
+    {
+        NONE = 0,
+        DISABLED = 1,
+        DISABLED_LOST = 2,
+        DISABLED_STOLEN =3,
+        DISABLED_DAMAGED =4,
+        DISABLED_DESTROYED= 5
     }
 
     public struct BacnetLogRecord
@@ -2182,12 +7773,12 @@ namespace System.IO.BACnet
                 Id = (BacnetObjectId)v3.Value;
             else
             {
-                BacnetValue[] netdescr=(BacnetValue[])v3.Value;
-                ushort s = (ushort)(uint)netdescr[0].Value;
-                byte[] b=(byte[])netdescr[1].Value;
+                BacnetValue[] netdescr = (BacnetValue[])v3.Value;
+                ushort s = Convert.ToUInt16(netdescr[0].Value);
+                byte[] b = (byte[])netdescr[1].Value;
                 adr = new BacnetAddress(BacnetAddressTypes.IP, s, b);
             }
-            processIdentifier = (uint)v4.Value;
+            processIdentifier = Convert.ToUInt32(v4.Value);
             Ack_Required = (bool)v5.Value;
             evenType = (BacnetBitString)v6.Value;
         }
@@ -2279,7 +7870,7 @@ namespace System.IO.BACnet
                             String[] Cut = IpStrCut[0].Split('.');
                             adr=new byte[6];
                                 for (int i=0;i<4;i++)
-                                    adr[i]=Convert.ToByte(Cut[i]); 
+                                    adr[i]=Convert.ToByte(Cut[i]);
                             adr[4] = (byte)((Port & 0xff00) >> 8);
                             adr[5] = (byte)(Port & 0xff);
                         }
@@ -2346,10 +7937,10 @@ namespace System.IO.BACnet
                     if (adr == null) return "?";
 
                     if (adr.Length == 6) // certainly IP, but not sure (Newron System send it for internal usage with 4*0 bytes)
-                        return ToString(BacnetAddressTypes.IP);                   
+                        return ToString(BacnetAddressTypes.IP);
 
                     if (adr.Length == 18)   // Not sure it could appears, since NPDU may contains Vmac ?
-                        return ToString(BacnetAddressTypes.IPV6); 
+                        return ToString(BacnetAddressTypes.IPV6);
 
                     if (adr.Length==3)
                           return "IPv6 VMac : "+((int)(adr[0] << 16) | (adr[1] << 8) | adr[2]).ToString();
@@ -2363,7 +7954,7 @@ namespace System.IO.BACnet
 
         public String ToString(bool SourceOnly)
         {
-            if (this.RoutedSource == null) 
+            if (this.RoutedSource == null)
                 return ToString();
             if (SourceOnly)
                 return this.RoutedSource.ToString();
@@ -2385,7 +7976,7 @@ namespace System.IO.BACnet
 
                 // Modif FC
                 if ((RoutedSource == null) && (d.RoutedSource != null))
-                    return false;                  
+                    return false;
                 if ((d.RoutedSource==null)&&(RoutedSource == null)) return true;
                 return RoutedSource.Equals(d.RoutedSource);
 
@@ -2881,13 +8472,104 @@ namespace System.IO.BACnet
         PROP_STATE_CHANGE_VALUES = 396,
         PROP_TIMER_RUNNING = 397,
         PROP_TIMER_STATE = 398,
+        PROP_APDU_LENGTH = 399,
+        PROP_IP_ADDRESS = 400,
+        PROP_IP_DEFAULT_GATEWAY = 401,
+        PROP_IP_DHCP_ENABLE = 402,
+        PROP_IP_DHCP_LEASE_TIME = 403,
+        PROP_IP_DHCP_LEASE_TIME_REMAINING = 404,
+        PROP_IP_DHCP_SERVER = 405,
+        PROP_IP_DNS_SERVER = 406,
+        PROP_BACNET_IP_GLOBAL_ADDRESS = 407,
+        PROP_BACNET_IP_MODE = 408,
+        PROP_BACNET_IP_MULTICAST_ADDRESS = 409,
+        PROP_BACNET_IP_NAT_TRAVERSAL = 410,
+        PROP_IP_SUBNET_MASK = 411,
+        PROP_BACNET_IP_UDP_PORT = 412,
 
-        // Addendum-135-2012as
-        PROP_COMMAND_TIME_ARRAY	= 430,	
+        PROP_BBMD_ACCEPT_FD_REGISTRATIONS = 413,
+        PROP_BBMD_BROADCAST_DISTRIBUTION_TABLE = 414,
+        PROP_BBMD_FOREIGN_DEVICE_TABLE = 415,
+        PROP_CHANGES_PENDING = 416,
+        PROP_COMMAND = 417,
+        PROP_FD_BBMD_ADDRESS = 418,
+        PROP_FD_SUBSCRIPTION_LIFETIME = 419,
+        PROP_LINK_SPEED = 420,
+        PROP_LINK_SPEEDS = 421,
+        PROP_LINK_SPEED_AUTONEGOTIATE = 422,
+        PROP_MAC_ADDRESS = 423,
+        PROP_NETWORK_INTERFACE_NAME = 424,
+        PROP_NETWORK_NUMBER = 425,
+        PROP_NETWORK_NUMBER_QUALITY = 426,
+        PROP_NETWORK_TYPE = 427,
+        PROP_ROUTING_TABLE = 428,
+        PROP_VIRTUAL_MAC_ADDRESS_TABLE = 429,
+        // ADDENDUM_135_2012AS
+        PROP_COMMAND_TIME_ARRAY = 430,
         PROP_CURRENT_COMMAND_PRIORITY = 431,
         PROP_LAST_COMMAND_TIME = 432,
         PROP_VALUE_SOURCE = 433,
         PROP_VALUE_SOURCE_ARRAY = 434,
+        PROP_BACNET_IPV6_MODE = 435,
+        PROP_IPV6_ADDRESS = 436,
+        PROP_IPV6_PREFIX_LENGTH = 437,
+        PROP_BACNET_IPV6_UDP_PORT = 438,
+        PROP_IPV6_DEFAULT_GATEWAY = 439,
+        PROP_BACNET_IPV6_MULTICAST_ADDRESS = 440,
+        PROP_IPV6_DNS_SERVER = 441,
+        PROP_IPV6_AUTO_ADDRESSING_ENABLE = 442,
+        PROP_IPV6_DHCP_LEASE_TIME = 443,
+        PROP_IPV6_DHCP_LEASE_TIME_REMAINING = 444,
+        PROP_IPV6_DHCP_SERVER = 445,
+        PROP_IPV6_ZONE_INDEX = 446,
+        PROP_CAR_ASSIGNED_DIRECTION = 448,
+        PROP_CAR_DOOR_COMMAND = 449,
+        PROP_CAR_DOOR_STATUS = 450,
+        PROP_CAR_DOOR_TEXT = 451,
+        PROP_CAR_DOOR_ZONE = 452,
+        PROP_CAR_DRIVE_STATUS = 453,
+        PROP_CAR_LOAD = 454,
+        PROP_CAR_LOAD_UNITS = 455,
+        PROP_CAR_MODE = 456,
+        PROP_CAR_MOVING_DIRECTION = 457,
+        PROP_CAR_POSITION = 458,
+        PROP_ELEVATOR_GROUP = 459,
+        PROP_ENERGY_METER = 460,
+        PROP_ENERGY_METER_REF = 461,
+        PROP_ESCALATOR_MODE = 462,
+        PROP_FLOOR_TEXT = 464,
+        PROP_GROUP_ID = 465,
+        PROP_GROUP_MODE = 467,
+        PROP_HIGHER_DECK = 468,
+        PROP_INSTALLATION_ID = 469,
+
+        PROP_LANDING_CALLS = 470,
+        PROP_LANDING_CALL_CONTROL = 471,
+        PROP_LANDING_DOOR_STATUS = 472,
+        PROP_LOWER_DECK = 473,
+        PROP_MACHINE_ROOM_ID = 474,
+        PROP_MAKING_CAR_CALL = 475,
+        PROP_NEXT_STOPPING_FLOOR = 476,
+        PROP_OPERATION_DIRECTION = 477,
+        PROP_PASSENGER_ALARM = 478,
+        PROP_POWER_MODE = 479,
+        PROP_REGISTERED_CAR_CALL = 480,
+        PROP_ACTIVE_COV_MULTIPLE_SUBSCRIPTIONS = 481,
+        PROP_PROTOCOL_LEVEL = 482,
+        PROP_REFERENCE_PORT = 483,
+        PROP_DEPLOYED_PROFILE_LOCATION = 484,
+        PROP_PROFILE_LOCATION = 485,
+        PROP_TAGS = 486,
+        PROP_SUBORDINATE_NODE_TYPES = 487,
+        PROP_SUBORDINATE_RELATIONSHIPS = 489,
+        PROP_SUBORDINATE_TAGS = 488,
+        PROP_DEFAULT_SUBORDINATE_RELATIONSHIP = 490,
+        PROP_REPRESENTS = 491,
+        PROP_DEFAULT_PRESENT_VALUE = 492, //Addendum 135-2016bd
+        PROP_PRESENT_STAGE = 493, //Addendum 135-2016bd
+        PROP_STAGES = 494, //Addendum 135-2016bd
+        PROP_STAGE_NAMES = 495, //Addendum 135-2016bd
+        PROP_TARGET_REFERENCES = 496, //Addendum 135-2016bd
 
         /* The special property identifiers all, optional, and required  */
         /* are reserved for use in the ReadPropertyConditional and */
@@ -2903,21 +8585,32 @@ namespace System.IO.BACnet
 
     public enum BacnetNodeTypes
     {
-        NT_UNKNOWN,
-        NT_SYSTEM,
-        NT_NETWORK,
-        NT_DEVICE,
-        NT_ORGANIZATIONAL,
-        NT_AREA,
-        NT_EQUIPMENT,
-        NT_POINT,
-        NT_COLLECTION,
-        NT_PROPERTY,
-        NT_FUNCTIONAL,
-        NT_OTHER,
+        NT_UNKNOWN = 0,
+        NT_SYSTEM = 1,
+        NT_NETWORK = 2,
+        NT_DEVICE = 3,
+        NT_ORGANIZATIONAL = 4,
+        NT_AREA = 5,
+        NT_EQUIPMENT = 6,
+        NT_POINT = 7,
+        NT_COLLECTION= 8,
+        NT_PROPERTY = 9,
+        NT_FUNCTIONAL = 10,
+        NT_OTHER = 11,
+        NT_SUBSYSTEM = 12,
+        NT_BUILDING = 13,
+        NT_FLOOR = 14,
+        NT_SECTION = 15,
+        NT_MODULE = 16,
+        NT_TREE = 17,
+        NT_MEMBER = 18,
+        NT_PROTOCOL = 19,
+        NT_ROOM = 20,
+        NT_ZONE = 21
+
     }
 
-    
+
 
     [Flags]
     public enum BacnetNpduControls : byte
@@ -2961,6 +8654,7 @@ namespace System.IO.BACnet
         BACNET_REINIT_STARTRESTORE = 4,
         BACNET_REINIT_ENDRESTORE = 5,
         BACNET_REINIT_ABORTRESTORE = 6,
+        BACNET_REINIT_ACTIVATE_CHANGES = 7,
         BACNET_REINIT_IDLE = 255
     };
 }
@@ -3043,7 +8737,7 @@ namespace System.IO.BACnet.Serialize
                 frame_type = BacnetMstpFrameTypes.FRAME_TYPE_BACNET_DATA_EXPECTING_REPLY; // don't care
                 destination_address = source_address = 0;   // don't care
                 msg_length = 0;
-                return -1;   
+                return -1;
             }
             frame_type = (BacnetMstpFrameTypes)buffer[offset + 2];
             destination_address = buffer[offset + 3];
@@ -3194,7 +8888,7 @@ namespace System.IO.BACnet.Serialize
             {
                 buffer.buffer[buffer.offset++] = (byte)network_msg_type;
                 if (((byte)network_msg_type) >= 0x80) // who used this ??? sure nobody !
-                {                    
+                {
                     buffer.buffer[buffer.offset++] = (byte)((vendor_id & 0xFF00) >> 8);
                     buffer.buffer[buffer.offset++] = (byte)((vendor_id & 0x00FF) >> 0);
                 }
@@ -3232,18 +8926,14 @@ namespace System.IO.BACnet.Serialize
             {
                 buffer.buffer[buffer.offset++] =(byte)((source.net & 0xFF00) >> 8);
                 buffer.buffer[buffer.offset++] = (byte)((source.net & 0x00FF) >> 0);
-                // Modif FC
-                if (destination.net == 0xFFFF)
-                    buffer.buffer[buffer.offset++] = 0;
-                else
+
+                buffer.buffer[buffer.offset++] = (byte)source.adr.Length;
+                if (source.adr.Length > 0)
                 {
-                    buffer.buffer[buffer.offset++] = (byte)destination.adr.Length;
-                    if (destination.adr.Length > 0)
-                    {
-                        for (int i = 0; i < destination.adr.Length; i++)
-                            buffer.buffer[buffer.offset++] = destination.adr[i];
-                    }
+                    for (int i = 0; i < source.adr.Length; i++)
+                        buffer.buffer[buffer.offset++] = source.adr[i];
                 }
+
             }
 
             if (has_destination)
@@ -3551,6 +9241,14 @@ namespace System.IO.BACnet.Serialize
             buffer.Add(tmp1.buffer, tmp1.offset);
         }
 
+        public static void encode_application_unsigned(EncodeBuffer buffer, UInt64 value)
+        {
+            EncodeBuffer tmp1 = new EncodeBuffer();
+            encode_bacnet_unsigned(tmp1, value);
+            encode_tag(buffer, (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT, false, (uint)tmp1.offset);
+            buffer.Add(tmp1.buffer, tmp1.offset);
+        }
+
         public static void encode_application_enumerated(EncodeBuffer buffer, UInt32 value)
         {
             EncodeBuffer tmp1 = new EncodeBuffer();
@@ -3559,7 +9257,7 @@ namespace System.IO.BACnet.Serialize
             buffer.Add(tmp1.buffer, tmp1.offset);
         }
 
-        public static void encode_application_signed(EncodeBuffer buffer, Int32 value)
+        public static void encode_application_signed(EncodeBuffer buffer, Int64 value)
         {
             EncodeBuffer tmp1 = new EncodeBuffer();
             encode_bacnet_signed(tmp1, value);
@@ -3567,7 +9265,7 @@ namespace System.IO.BACnet.Serialize
             buffer.Add(tmp1.buffer, tmp1.offset);
         }
 
-        public static void encode_bacnet_unsigned(EncodeBuffer buffer, UInt32 value)
+        public static void encode_bacnet_unsigned(EncodeBuffer buffer, UInt64 value)
         {
             if (value < 0x100)
             {
@@ -3579,11 +9277,15 @@ namespace System.IO.BACnet.Serialize
             }
             else if (value < 0x1000000)
             {
-                encode_unsigned24(buffer, value);
+                encode_unsigned24(buffer, (UInt32)value);
+            }
+            else if (value < 0x100000000)
+            {
+                encode_unsigned32(buffer, (UInt32)value);
             }
             else
             {
-                encode_unsigned32(buffer, value);
+                encode_unsigned64(buffer, value);
             }
         }
 
@@ -3597,6 +9299,12 @@ namespace System.IO.BACnet.Serialize
         {
             encode_tag(buffer, tag_number, true, 4);
             encode_bacnet_real(buffer, value);
+        }
+
+        public static void encode_context_double(EncodeBuffer buffer, byte tag_number, double value)
+        {
+            encode_tag(buffer, tag_number, true, 8);
+            encode_bacnet_double(buffer, value);
         }
 
         public static void encode_context_unsigned(EncodeBuffer buffer, byte tag_number, UInt32 value)
@@ -3645,7 +9353,7 @@ namespace System.IO.BACnet.Serialize
             encode_bacnet_enumerated(buffer, value);
         }
 
-        public static void encode_bacnet_signed(EncodeBuffer buffer, Int32 value)
+        public static void encode_bacnet_signed(EncodeBuffer buffer, Int64 value)
         {
             /* don't encode the leading X'FF' or X'00' of the two's compliment.
                That is, the first octet of any multi-octet encoded value shall
@@ -3656,11 +9364,12 @@ namespace System.IO.BACnet.Serialize
                 buffer.Add((byte)(sbyte)value);
             else if ((value >= -32768) && (value < 32768))
                 encode_signed16(buffer, (Int16)value);
-            else if ((value > -8388608) && (value < 8388608))
-                encode_signed24(buffer, value);
+            else if ((value > -8388607) && (value < 8388608))
+                encode_signed24(buffer, (int)value);
+            else if ((value > -2147483648) && (value < 2147483648))
+                encode_signed32(buffer, (int)value);
             else
-                encode_signed32(buffer, value);
-
+                encode_signed64(buffer, value);
         }
 
         public static void encode_octet_string(EncodeBuffer buffer, byte[] octet_string, int octet_offset, int octet_count)
@@ -3756,7 +9465,7 @@ namespace System.IO.BACnet.Serialize
             {
                 out_byte |= 0x10;
             }
-            if ((in_byte & 16)> 0) 
+            if ((in_byte & 16)> 0)
             {
                 out_byte |= 0x8;
             }
@@ -3825,10 +9534,11 @@ namespace System.IO.BACnet.Serialize
 
         public static void bacapp_encode_application_data(EncodeBuffer buffer, BacnetValue value)
         {
+
+
             if (value.Value == null)
             {
-                // Modif FC
-                buffer.Add((byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_NULL);  
+                buffer.Add((byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_NULL);
                 return;
             }
 
@@ -3838,44 +9548,44 @@ namespace System.IO.BACnet.Serialize
                     /* don't encode anything */
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_BOOLEAN:
-                    encode_application_boolean(buffer, (bool)value.Value);
+                    encode_application_boolean(buffer, Convert.ToBoolean(value.Value));
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT:
-                    encode_application_unsigned(buffer, (uint)value.Value);
+                    encode_application_unsigned(buffer, Convert.ToUInt64(value.Value));
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT:
-                    encode_application_signed(buffer, (int)value.Value);
+                    encode_application_signed(buffer, Convert.ToInt64(value.Value));
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_REAL:
-                    encode_application_real(buffer, (float)value.Value);
+                    encode_application_real(buffer, Convert.ToSingle(value.Value));
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_DOUBLE:
-                    encode_application_double(buffer, (double)value.Value);
+                    encode_application_double(buffer, Convert.ToDouble(value.Value));
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING:
                     encode_application_octet_string(buffer, (byte[])value.Value, 0, ((byte[])value.Value).Length);
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_CHARACTER_STRING:
-                    encode_application_character_string(buffer, (string)value.Value);
+                    encode_application_character_string(buffer, value.Value.ToString());
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_BIT_STRING:
                     encode_application_bitstring(buffer, (BacnetBitString)value.Value);
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_ENUMERATED:
-                    encode_application_enumerated(buffer, (uint)value.Value);
+                    encode_application_enumerated(buffer, Convert.ToUInt32(value.Value));
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_DATE:
-                    encode_application_date(buffer, (DateTime)value.Value);
+                    encode_application_date(buffer, Convert.ToDateTime(value.Value));
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_TIME:
-                    encode_application_time(buffer, (DateTime)value.Value);
+                    encode_application_time(buffer, Convert.ToDateTime(value.Value));
                     break;
-                // Added for EventTimeStamp 
+                // Added for EventTimeStamp
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_TIMESTAMP:
                     bacapp_encode_timestamp(buffer, (BacnetGenericTime)value.Value);
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_DATETIME:
-                    bacapp_encode_datetime(buffer, (DateTime)value.Value);
+                    bacapp_encode_datetime(buffer, Convert.ToDateTime(value.Value));
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID:
                     encode_application_object_id(buffer, ((BacnetObjectId)value.Value).type, ((BacnetObjectId)value.Value).instance);
@@ -3888,9 +9598,97 @@ namespace System.IO.BACnet.Serialize
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_READ_ACCESS_SPECIFICATION:
                     encode_read_access_specification(buffer, ((BacnetReadAccessSpecification)value.Value));     //is this the right way to do it, I wonder?
-                    break;                    
+                    break;
                 default:
-                    //context specific
+                    Type with_type = value.Value.GetType();
+                    if (value.Value is Enum)
+                    {
+                        encode_application_enumerated(buffer, Convert.ToUInt32(value.Value));
+                    }else
+                    if (with_type == typeof(BACnetEventParameter))
+                    {
+                        BACnetEventParameter v = (BACnetEventParameter)value.Value;
+                        v.ASN1encode(buffer);
+
+                    }
+                    else if (with_type == typeof(BACnetFaultParameter))
+                    {
+                        BACnetFaultParameter v = (BACnetFaultParameter)value.Value;
+                        v.ASN1encode(buffer);
+
+                    }
+                    else if (with_type == typeof(BACnetLightingCommand))
+                    {
+                        BACnetLightingCommand v = (BACnetLightingCommand)value.Value;
+                        v.ASN1encode(buffer);
+
+
+                    }
+                    else if (with_type == typeof(BACnetActionList))
+                    {
+                        BACnetActionList v = (BACnetActionList)value.Value;
+                        v.ASN1encode(buffer);
+
+                    }
+                    else if (with_type == typeof(BACnetChannelValue))
+                    {
+                        BACnetChannelValue v = (BACnetChannelValue)value.Value;
+                        v.ASN1encode(buffer);
+                    }
+                    else if (with_type == typeof(BACnetRouterEntry))
+                    {
+                        BACnetRouterEntry v = (BACnetRouterEntry)value.Value;
+                        v.ASN1encode(buffer);
+                    }
+                    else if (with_type == typeof(BACnetVMACEntry))
+                    {
+                        BACnetVMACEntry v = (BACnetVMACEntry)value.Value;
+                        v.ASN1encode(buffer);
+                    }
+                    else if (with_type == typeof(BACnetAddressBinding))
+                    {
+                        BACnetAddressBinding v = (BACnetAddressBinding)value.Value;
+                        v.ASN1encode(buffer);
+                    }
+                    else if (with_type == typeof(BACnetFDTEntry))
+                    {
+                        BACnetFDTEntry v = (BACnetFDTEntry)value.Value;
+                        v.ASN1encode(buffer);
+
+                    }
+                    else if (with_type == typeof(BACnetHostNPort))
+                    {
+                        BACnetHostNPort v = (BACnetHostNPort)value.Value;
+                        v.ASN1encode(buffer);
+                    }
+                    else if (with_type == typeof(BACnetBDTEntry))
+                    {
+                        BACnetBDTEntry v = (BACnetBDTEntry)value.Value;
+                        v.ASN1encode(buffer);
+
+                    }
+                    else if (with_type == typeof(BACnetShedLevel))
+                    {
+                        BACnetShedLevel v = (BACnetShedLevel)value.Value;
+                        v.ASN1encode(buffer);
+                    }
+                    else if(with_type == typeof(BACnetObjectPropertyReference))
+                    {
+                        BACnetObjectPropertyReference v = (BACnetObjectPropertyReference)value.Value;
+                        v.ASN1encode(buffer);
+                    }
+                    else  if (with_type == typeof(BACnetSetpointReference))
+                    {
+                        BACnetSetpointReference v = (BACnetSetpointReference)value.Value;
+                        v.ASN1encode(buffer);
+
+                    }else if(with_type == typeof(BACnetAccumulatorRecord))
+                    {
+                        BACnetAccumulatorRecord v = (BACnetAccumulatorRecord)value.Value;
+                        v.ASN1encode(buffer);
+
+                    }else
+
                     if (value.Value is byte[])
                     {
                         byte[] arr = (byte[])value.Value;
@@ -3898,7 +9696,7 @@ namespace System.IO.BACnet.Serialize
                     }
                     else
                     {
-                        try 
+                        try
                         {
                             Type oType = value.Value.GetType();
                             if (oType.IsGenericType && (oType.GetGenericTypeDefinition() == typeof(List<>)))
@@ -3911,10 +9709,10 @@ namespace System.IO.BACnet.Serialize
                                     d.ASN1encode(buffer);
                                 }
                             }
-                            else 
+                            else
                             {
                                 // last chance to encode a value
-                                IASN1encode d = (IASN1encode)value.Value;    
+                                IASN1encode d = (IASN1encode)value.Value;
                                 d.ASN1encode(buffer);
                             }
                         }
@@ -4112,7 +9910,10 @@ namespace System.IO.BACnet.Serialize
 
             buffer.Add((byte)value.Month);
             buffer.Add((byte)value.Day);
-            buffer.Add((byte)value.DayOfWeek);
+            if (value.DayOfWeek==DayOfWeek.Sunday)
+                buffer.Add(7);
+            else
+                buffer.Add((byte)value.DayOfWeek);
         }
 
         public static void encode_application_date(EncodeBuffer buffer, DateTime value)
@@ -4190,7 +9991,7 @@ namespace System.IO.BACnet.Serialize
         public static void encode_bacnet_character_string(EncodeBuffer buffer, string value)
         {
             buffer.Add((byte)BacnetCharacterStringEncodings.CHARACTER_UTF8);
-            byte[] bufUTF8 = Encoding.UTF8.GetBytes(value); // Encoding.ASCII depreciated : Addendum 135-2008k 
+            byte[] bufUTF8 = Encoding.UTF8.GetBytes(value); // Encoding.ASCII depreciated : Addendum 135-2008k
             buffer.Add(bufUTF8, bufUTF8.Length);
          }
 
@@ -4215,6 +10016,18 @@ namespace System.IO.BACnet.Serialize
             buffer.Add((byte)((value & 0x000000ff) >> 0));
         }
 
+        public static void encode_unsigned64(EncodeBuffer buffer, UInt64 value)
+        {
+            buffer.Add((byte)(value >> 56));
+            buffer.Add((byte)((value & 0xff000000000000) >> 48));
+            buffer.Add((byte)((value & 0xff0000000000) >> 40));
+            buffer.Add((byte)((value & 0xff00000000) >> 32));
+            buffer.Add((byte)((value & 0xff000000) >> 24));
+            buffer.Add((byte)((value & 0x00ff0000) >> 16));
+            buffer.Add((byte)((value & 0x0000ff00) >> 8));
+            buffer.Add((byte)((value & 0x000000ff) >> 0));
+        }
+
         public static void encode_signed16(EncodeBuffer buffer, Int16 value)
         {
             buffer.Add((byte)((value & 0xff00) >> 8));
@@ -4230,6 +10043,19 @@ namespace System.IO.BACnet.Serialize
 
         public static void encode_signed32(EncodeBuffer buffer, Int32 value)
         {
+            buffer.Add((byte)((value & 0xff000000) >> 24));
+            buffer.Add((byte)((value & 0x00ff0000) >> 16));
+            buffer.Add((byte)((value & 0x0000ff00) >> 8));
+            buffer.Add((byte)((value & 0x000000ff) >> 0));
+        }
+
+        public static void encode_signed64(EncodeBuffer buffer, Int64 value)
+        {
+            buffer.Add((byte)(value>> 56));
+            buffer.Add((byte)((value & 0xff000000000000) >> 48));
+            buffer.Add((byte)((value & 0xff0000000000) >> 40));
+            buffer.Add((byte)((value & 0xff00000000) >> 32));
+
             buffer.Add((byte)((value & 0xff000000) >> 24));
             buffer.Add((byte)((value & 0x00ff0000) >> 16));
             buffer.Add((byte)((value & 0x0000ff00) >> 8));
@@ -4384,7 +10210,7 @@ namespace System.IO.BACnet.Serialize
                 }
 
                 _value_list.Add(new_entry);
-                    
+
             }
             value.values = _value_list;
 
@@ -4502,6 +10328,33 @@ namespace System.IO.BACnet.Serialize
             return len;
         }
 
+        public static int decode_unsigned(byte[] buffer, int offset, uint len_value, out ulong value)
+        {
+            uint unsigned_value = 0;
+
+            switch (len_value)
+            {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    decode_unsigned(buffer, offset, len_value, out unsigned_value);
+                    value=unsigned_value;
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                    decode_unsigned64(buffer, offset, out value, len_value);
+                    break;
+                default:
+                    value = 0;
+                    break;
+            }
+
+            return (int)len_value;
+        }
+
         public static int decode_unsigned(byte[] buffer, int offset, uint len_value, out uint value)
         {
             ushort unsigned16_value = 0;
@@ -4529,6 +10382,18 @@ namespace System.IO.BACnet.Serialize
             return (int)len_value;
         }
 
+        public static int decode_unsigned64(byte[] buffer, int offset, out ulong value, uint len=8)
+        {
+            value = 0;
+            int dec = 8 * ((int)len - 1);
+            for (int i = 0; i < len; i++)
+            {
+                value |=((ulong)(((ulong)buffer[offset + i]) << dec));
+                dec = dec - 8;
+            }
+            return (int)len;
+        }
+
         public static int decode_unsigned32(byte[] buffer, int offset, out uint value)
         {
             value = ((uint)((((uint)buffer[offset+0]) << 24) & 0xff000000));
@@ -4540,7 +10405,13 @@ namespace System.IO.BACnet.Serialize
 
         public static int decode_unsigned24(byte[] buffer, int offset, out uint value)
         {
-            value = ((uint)((((uint)buffer[offset + 0]) << 16) & 0x00ff0000));
+            /* negative - bit 7 is set */
+            if ((buffer[offset + 0] & 0x80)!=0)
+                value = 0xff000000;
+            else
+                value = 0;
+
+            value |= ((uint)((((uint)buffer[offset + 0]) << 16) & 0x00ff0000));
             value |= ((uint)((((uint)buffer[offset + 1]) << 8) & 0x0000ff00));
             value |= ((uint)(((uint)buffer[offset + 2]) & 0x000000ff));
             return 3;
@@ -4559,6 +10430,30 @@ namespace System.IO.BACnet.Serialize
             return 1;
         }
 
+        // variable lenght decoding of signed int 64
+        public static int decode_signed64(byte[] buffer, int offset, out long value, uint len=8)
+        {
+
+            value = 0;
+
+            int dec=56;
+
+            if ((buffer[offset + 0] & 0x80) != 0) /* negative - bit 7 is set */
+                for (int i = (int)len; i < 8; i++)
+                {
+                    value |= ((long)((long)0xFF << dec));
+                    dec = dec - 8;
+                }
+
+            dec = 8*((int)len-1);
+            for (int i = 0; i < len; i++)
+            {
+                value |= ((long)(((long)buffer[offset + i]) << dec));
+                dec = dec - 8;
+            }
+            return (int)len;
+        }
+
         public static int decode_signed32(byte[] buffer, int offset, out int value)
         {
             value = ((int)((((int)buffer[offset + 0]) << 24) & 0xff000000));
@@ -4571,6 +10466,7 @@ namespace System.IO.BACnet.Serialize
         public static int decode_signed24(byte[] buffer, int offset, out int value)
         {
             value = ((int)((((int)buffer[offset + 0]) << 16) & 0x00ff0000));
+            if ((value & 0x800000) != 0) value =  value | (0xff << 24); // signe is 1, so puts all high bits in the int32 to 1
             value |= ((int)((((int)buffer[offset + 1]) << 8) & 0x0000ff00));
             value |= ((int)(((int)buffer[offset + 2]) & 0x000000ff));
             return 3;
@@ -4589,7 +10485,7 @@ namespace System.IO.BACnet.Serialize
             return 1;
         }
 
-        public static bool IS_EXTENDED_TAG_NUMBER(byte x) 
+        public static bool IS_EXTENDED_TAG_NUMBER(byte x)
         {
             return ((x & 0xF0) == 0xF0);
         }
@@ -4631,6 +10527,32 @@ namespace System.IO.BACnet.Serialize
             }
 
             return len;
+        }
+
+        public static int decode_signed(byte[] buffer, int offset, uint len_value, out long value)
+        {
+            switch (len_value)
+            {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    int int_value;;
+                    decode_signed(buffer, offset, len_value, out int_value);
+                    value=int_value;
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                    decode_signed64(buffer, offset, out value, len_value);
+                    break;
+                default:
+                    value = 0;
+                    break;
+            }
+
+            return (int)len_value;
         }
 
         public static int decode_signed(byte[] buffer, int offset, uint len_value, out int value)
@@ -4763,7 +10685,7 @@ namespace System.IO.BACnet.Serialize
                     // http://hackipedia.org/Character%20sets/Unicode,%20UTF%20and%20UCS%20encodings/UCS-2.htm
                     // https://en.wikipedia.org/wiki/Byte_order_mark
                     case BacnetCharacterStringEncodings.CHARACTER_UCS2:
-                        if ((buffer[offset] == 0xFF) && (buffer[offset + 1] == 0xFE)) // Byte Order Mark 
+                        if ((buffer[offset] == 0xFF) && (buffer[offset + 1] == 0xFE)) // Byte Order Mark
                             e = Encoding.Unicode; // little endian encoding
                         else
                             e = Encoding.BigEndianUnicode; // big endian encoding if BOM is not set, or 0xFE-0xFF
@@ -4793,7 +10715,7 @@ namespace System.IO.BACnet.Serialize
                         e = Encoding.GetEncoding("shift_jis"); // maybe "iso-2022-jp" ?
                         break;
 
-                    // unknown code (wrong code, experimental, ...) 
+                    // unknown code (wrong code, experimental, ...)
                     // decoded as ISO-8859-1 (removing controls) : displays certainly a strange content !
                     default:
                         StringBuilder sb = new StringBuilder();
@@ -4808,14 +10730,14 @@ namespace System.IO.BACnet.Serialize
 
                 char_string = e.GetString(buffer, offset, (int)length);
             }
-            catch 
-            { 
-                char_string = "string decoding error !"; 
+            catch
+            {
+                char_string = "string decoding error !";
             }
 
             return true; // always OK
         }
-        
+
         public static int decode_character_string(byte[] buffer, int offset, int max_length, uint len_value, out string char_string)
         {
             int len = 0;        /* return value */
@@ -5105,7 +11027,9 @@ namespace System.IO.BACnet.Serialize
         {
             int len = 0;
             uint uint_value;
-            int int_value;
+
+            ulong ulong_value;
+            long long_value;
 
             value = new BacnetValue();
             value.Tag = tag_data_type;
@@ -5119,12 +11043,12 @@ namespace System.IO.BACnet.Serialize
                     value.Value = len_value_type > 0 ? true : false;
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT:
-                    len = decode_unsigned(buffer, offset, len_value_type, out uint_value);
-                    value.Value = uint_value;
+                    len = decode_unsigned(buffer, offset, len_value_type, out ulong_value);
+                    value.Value = ulong_value;
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT:
-                    len = decode_signed(buffer, offset, len_value_type, out int_value);
-                    value.Value = int_value;
+                    len = decode_signed(buffer, offset, len_value_type, out long_value);
+                    value.Value = long_value;
                     break;
                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_REAL:
                     float float_value;
@@ -5369,6 +11293,28 @@ namespace System.IO.BACnet.Serialize
             uint len_value_type = 0;
 
             value = new BacnetValue();
+            /*C. Günther*/
+            //put before because has otherwise would decode as not context specific!
+            if (property_id == BacnetPropertyIds.PROP_REQUESTED_SHED_LEVEL || property_id == BacnetPropertyIds.PROP_EXPECTED_SHED_LEVEL || property_id == BacnetPropertyIds.PROP_ACTUAL_SHED_LEVEL)
+            {
+                BACnetShedLevel v = new BACnetShedLevel();
+                tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                if (tag_len < 0) return -1;
+                value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                value.Value = v;
+
+                return tag_len;
+            }
+            if (property_id == BacnetPropertyIds.PROP_LAST_KEY_SERVER)
+            {
+                BACnetAddressBinding v = new BACnetAddressBinding();
+                tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                if (tag_len < 0) return -1;
+                value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                value.Value = v;
+
+                return tag_len;
+            }
 
             /* FIXME: use max_apdu_len! */
             if (!IS_CONTEXT_SPECIFIC(buffer[offset]))
@@ -5431,14 +11377,35 @@ namespace System.IO.BACnet.Serialize
                     value.Value = v;
                     return tag_len;
                 }
-                else if ((property_id == BacnetPropertyIds.PROP_LIST_OF_OBJECT_PROPERTY_REFERENCES)||(property_id == BacnetPropertyIds.PROP_LOG_DEVICE_OBJECT_PROPERTY))
+                else if ( (property_id == BacnetPropertyIds.PROP_LIST_OF_OBJECT_PROPERTY_REFERENCES) || (property_id == BacnetPropertyIds.PROP_LOG_DEVICE_OBJECT_PROPERTY) || (property_id == BacnetPropertyIds.PROP_OBJECT_PROPERTY_REFERENCE))
                 {
                     BacnetDeviceObjectPropertyReference v;
                     tag_len = ASN1.decode_device_obj_property_ref(buffer, offset, max_offset, out v);
+
                     if (tag_len < 0) return -1;
                     value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_PROPERTY_REFERENCE;
                     value.Value = v;
                     return tag_len;
+                }
+                else if (property_id == BacnetPropertyIds.PROP_SETPOINT_REFERENCE)
+                {
+                    BACnetSetpointReference v = new BACnetSetpointReference();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+                    return tag_len;
+
+                }
+                else if (property_id == BacnetPropertyIds.PROP_EVENT_ALGORITHM_INHIBIT_REF || property_id == BacnetPropertyIds.PROP_INPUT_REFERENCE || property_id == BacnetPropertyIds.PROP_CONTROLLED_VARIABLE_REFERENCE || property_id == BacnetPropertyIds.PROP_MANIPULATED_VARIABLE_REFERENCE)
+                {
+                    BACnetObjectPropertyReference v = new BACnetObjectPropertyReference();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+                    return tag_len;
+
                 }
                 else if (property_id == BacnetPropertyIds.PROP_DATE_LIST)
                 {
@@ -5449,12 +11416,21 @@ namespace System.IO.BACnet.Serialize
                     value.Value = v;
                     return tag_len;
                 }
-                else if (property_id == BacnetPropertyIds.PROP_EVENT_TIME_STAMPS) 
+                else if (property_id == BacnetPropertyIds.PROP_SUBORDINATE_LIST ||property_id == BacnetPropertyIds.PROP_LAST_ACCESS_POINT || property_id == BacnetPropertyIds.PROP_BELONGS_TO || property_id == BacnetPropertyIds.PROP_ACCESS_EVENT_CREDENTIAL || property_id == BacnetPropertyIds.PROP_ACCOMPANIMENT || property_id == BacnetPropertyIds.PROP_ZONE_FROM || property_id == BacnetPropertyIds.PROP_ZONE_TO || property_id == BacnetPropertyIds.PROP_LAST_CREDENTIAL_ADDED || property_id == BacnetPropertyIds.PROP_LAST_CREDENTIAL_REMOVED ||property_id == BacnetPropertyIds.PROP_ENTRY_POINTS || property_id == BacnetPropertyIds.PROP_EXIT_POINTS)
+                {
+                    BacnetDeviceObjectReference v=new BacnetDeviceObjectReference();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_DEVICE_OBJECT_REFERENCE;
+                    value.Value = v;
+                    return tag_len;
+                }
+                else if (property_id == BacnetPropertyIds.PROP_EVENT_TIME_STAMPS || property_id == BacnetPropertyIds.PROP_COMMAND_TIME_ARRAY || property_id == BacnetPropertyIds.PROP_LAST_COMMAND_TIME || property_id == BacnetPropertyIds.PROP_ACCESS_EVENT_TIME ||property_id == BacnetPropertyIds.PROP_UPDATE_TIME)
                 {
 
                     ASN1.decode_tag_number_and_value(buffer, offset + len, out tag_number, out len_value_type);
                     len++; // skip Tag
-                    
+
                     if (tag_number == 0) // Time without date
                     {
                         DateTime dt;
@@ -5481,9 +11457,155 @@ namespace System.IO.BACnet.Serialize
                         return -1;
 
                     return len;
+                }else if(property_id == BacnetPropertyIds.PROP_EVENT_PARAMETERS)
+                {
+                    BACnetEventParameter v = new BACnetEventParameter();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+
+                    value.Value = v;
+
+
+                    return tag_len;
+
+                }
+                else if (property_id == BacnetPropertyIds.PROP_PRESCALE)
+                {
+                    BACnetPrescale v = new BACnetPrescale();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+                    return tag_len;
+
+                }
+                else if (property_id == BacnetPropertyIds.PROP_SCALE)
+                {
+                    BACnetScale v = new BACnetScale();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+                    return tag_len;
+
+                }
+                else if (property_id == BacnetPropertyIds.PROP_FAULT_PARAMETERS)
+                {
+                    BACnetFaultParameter v = new BACnetFaultParameter();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+                    return tag_len;
+
+                }
+                else if(property_id == BacnetPropertyIds.PROP_NEGATIVE_ACCESS_RULES ||property_id == BacnetPropertyIds.PROP_POSITIVE_ACCESS_RULES)
+                {
+                    BACnetAccessRule v = new BACnetAccessRule();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+                    return tag_len;
+
+                }
+                else if (property_id == BacnetPropertyIds.PROP_LIGHTING_COMMAND)
+                {
+                    BACnetLightingCommand v = new BACnetLightingCommand();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+
+                    return tag_len;
+
+                }
+                else if(property_id == BacnetPropertyIds.PROP_ACTION  && object_type == BacnetObjectTypes.OBJECT_COMMAND)
+                {
+                    BACnetActionList v = new BACnetActionList();
+
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+
+                    return tag_len;
+                }
+                else if(property_id == BacnetPropertyIds.PROP_PRESENT_VALUE && object_type == BacnetObjectTypes.OBJECT_CHANNEL)
+                {
+                    BACnetChannelValue v = new BACnetChannelValue();
+
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+
+                    return tag_len;
+                }
+                else if(property_id == BacnetPropertyIds.PROP_ROUTING_TABLE)
+                {
+                    BACnetRouterEntry v = new BACnetRouterEntry();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+
+                    return tag_len;
+
+                }
+                else if(property_id == BacnetPropertyIds.PROP_VIRTUAL_MAC_ADDRESS_TABLE)
+                {
+                    BACnetVMACEntry v = new BACnetVMACEntry();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+
+                    return tag_len;
+                }
+                else if(property_id == BacnetPropertyIds.PROP_BBMD_FOREIGN_DEVICE_TABLE)
+                {
+                    BACnetFDTEntry v = new BACnetFDTEntry();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+                    return tag_len;
+                }
+                else if(property_id == BacnetPropertyIds.PROP_BACNET_IP_GLOBAL_ADDRESS || property_id == BacnetPropertyIds.PROP_FD_BBMD_ADDRESS )
+                {
+
+                    BACnetHostNPort v = new BACnetHostNPort();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+                    return tag_len;
+
+                }
+                else if(property_id == BacnetPropertyIds.PROP_BBMD_BROADCAST_DISTRIBUTION_TABLE)
+                {
+                    BACnetBDTEntry v = new BACnetBDTEntry();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+                    return tag_len;
+                }
+                else if(property_id == BacnetPropertyIds.PROP_LOGGING_RECORD && object_type == BacnetObjectTypes.OBJECT_ACCUMULATOR)
+                {
+                    BACnetAccumulatorRecord v = new BACnetAccumulatorRecord();
+                    tag_len = v.ASN1decode(buffer, offset, (uint)max_offset);
+                    if (tag_len < 0) return -1;
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC;
+                    value.Value = v;
+                    return tag_len;
+
                 }
 
-                value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_CONTEXT_SPECIFIC_DECODED;
+
+                    value.Tag = BacnetApplicationTags.BACNET_APPLICATION_TAG_CONTEXT_SPECIFIC_DECODED;
                 List<BacnetValue> list = new List<BacnetValue>();
 
                 decode_tag_number_and_value(buffer, offset + len, out tag_number, out len_value_type);
@@ -5804,7 +11926,7 @@ namespace System.IO.BACnet.Serialize
     {
         public byte[] buffer;           //buffer to serialize into
         public int offset;              //offset in buffer ... will go beyond max_offset (so that you may count what's needed)
-        public int max_offset;          //don't write beyond this offset 
+        public int max_offset;          //don't write beyond this offset
         public int serialize_counter;   //used with 'min_limit'
         public int min_limit;           //don't write before this limit (used for segmentation)
         public EncodeResult result;
@@ -6089,7 +12211,7 @@ namespace System.IO.BACnet.Serialize
             uint ObjInst;
 
             len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag_number, out len_value);
-                      
+
             if (tag_number == 0)
             {
                 len += ASN1.decode_unsigned(buffer, offset + len, len_value, out decoded_value);
@@ -6116,8 +12238,8 @@ namespace System.IO.BACnet.Serialize
             {
                 len += ASN1.decode_character_string(buffer, offset + len, apdu_len - (offset + len), len_value, out ObjName);
 
-            }                                
-            
+            }
+
             return len;
         }
         public static void EncodeAlarmAcknowledge(EncodeBuffer buffer, uint ackProcessIdentifier, BacnetObjectId eventObjectIdentifier, uint eventStateAcked, string ackSource, BacnetGenericTime eventTimeStamp, BacnetGenericTime ackTimeStamp)
@@ -6147,8 +12269,7 @@ namespace System.IO.BACnet.Serialize
                     ASN1.encode_application_unsigned(buffer, count);
                     ASN1.encode_closing_tag(buffer, 1);
                     break;
-                default:
-                    break;
+
             }
         }
 
@@ -6239,8 +12360,7 @@ namespace System.IO.BACnet.Serialize
                         ASN1.encode_application_octet_string(buffer, blocks[i], 0, counts[i]);
                     ASN1.encode_closing_tag(buffer, 1);
                     break;
-                default:
-                    break;
+
             }
         }
 
@@ -6263,8 +12383,7 @@ namespace System.IO.BACnet.Serialize
                         ASN1.encode_application_octet_string(buffer, blocks[i], 0, counts[i]);
                     ASN1.encode_closing_tag(buffer, 1);
                     break;
-                default:
-                    break;
+
             }
         }
 
@@ -6427,8 +12546,7 @@ namespace System.IO.BACnet.Serialize
                 case false:
                     ASN1.encode_context_signed(buffer, 1, position);
                     break;
-                default:
-                    break;
+
             }
         }
 
@@ -6550,7 +12668,7 @@ namespace System.IO.BACnet.Serialize
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag_number, out len_value);
                 len += ASN1.decode_unsigned(buffer, offset + len, len_value, out subscriberProcessIdentifier);
             }
-            else 
+            else
                 return -1;
             /* tag 1 - monitoredObjectIdentifier */
             if (ASN1.decode_is_context_tag(buffer, offset + len, 1))
@@ -6715,14 +12833,10 @@ namespace System.IO.BACnet.Serialize
             /* a tag number of 4 is not extended so only one octet */
             len++;
             /* tag 5 - covIncrement - optional */
-            if (ASN1.decode_is_context_tag(buffer, offset + len, 5))
+            if ((len < apdu_len)&&(ASN1.decode_is_context_tag(buffer, offset + len, 5)))
             {
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag_number, out len_value);
                 len += ASN1.decode_real(buffer, offset + len, out covIncrement);
-            }
-            else
-            {
-                covIncrement = 0;
             }
 
             return len;
@@ -6774,7 +12888,7 @@ namespace System.IO.BACnet.Serialize
                 len += ASN1.decode_application_date(buffer, offset+len, out date);
                 len += ASN1.decode_application_time(buffer, offset+len, out time);
                 EventData.timeStamp.Time= new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second, time.Millisecond);
-
+                EventData.timeStamp.Tag = BacnetTimestampTags.TIME_STAMP_DATETIME;
                 len+=2; // closing tag 2 then 3
             }
             else
@@ -7036,7 +13150,7 @@ namespace System.IO.BACnet.Serialize
             /* tag 2 - Acknowledged Transitions */
             ASN1.encode_application_bitstring(buffer, acknowledgedTransitions);
         }
-        
+
         // FChaxel
         public static int DecodeAlarmSummaryOrEvent(byte[] buffer, int offset, int apdu_len, bool GetEvent, ref IList<BacnetGetEventInformationData> Alarms, out bool MoreEvent)
         {
@@ -7422,7 +13536,7 @@ namespace System.IO.BACnet.Serialize
             ASN1.encode_context_bitstring(buffer, 3, ResultFlags);
             /* Context 4 Item Count */
             ASN1.encode_context_unsigned(buffer, 4, ItemCount);
-            /* Context 5 Property list - reading the standard it looks like an empty list still 
+            /* Context 5 Property list - reading the standard it looks like an empty list still
              * requires an opening and closing tag as the tagged parameter is not optional
              */
             ASN1.encode_opening_tag(buffer, 5);
@@ -7691,6 +13805,48 @@ namespace System.IO.BACnet.Serialize
             ASN1.encode_closing_tag(buffer, 3);
         }
 
+        public static int DecodeSubscribeCOVPropertyMultipleAcknowledge(byte[] buffer, int offset, int apdu_len, out BacnetObjectId object_id, out BacnetPropertyReference property, out uint error)
+        {
+            byte tag_number = 0;
+            uint len_value_type = 0;
+            int tag_len = 0;    /* length of tag decode */
+            int len = 0;        /* total length of decodes */
+
+            object_id = new BacnetObjectId();
+            property = new BacnetPropertyReference();
+            error = 0;
+
+            /* FIXME: check apdu_len against the len during decode   */
+            /* Tag 0: Object ID */
+            if (!ASN1.decode_is_context_tag(buffer, offset, 0))
+                return -1;
+            len = 1;
+            len += ASN1.decode_object_id(buffer, offset + len, out object_id.type, out object_id.instance);
+            /* Tag 1: Property ID */
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag_number, out len_value_type);
+            if (tag_number != 1)
+                return -1;
+            len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out property.propertyIdentifier);
+            /* Tag 2: Optional Array Index */
+            tag_len = ASN1.decode_tag_number_and_value(buffer, offset + len, out tag_number, out len_value_type);
+            if (tag_number == 2)
+            {
+                len += tag_len;
+                len += ASN1.decode_unsigned(buffer, offset + len, len_value_type, out property.propertyArrayIndex);
+            }
+            else
+                property.propertyArrayIndex = ASN1.BACNET_ARRAY_ALL;
+            //error-type
+            if (!ASN1.decode_is_context_tag(buffer, offset, 3))
+                return -1;
+            len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tag_number, out len_value_type);
+            len += ASN1.decode_enumerated(buffer, offset + len, len_value_type, out error);
+
+            return len;
+        }
+
+
+
         public static int DecodeReadPropertyAcknowledge(byte[] buffer, int offset, int apdu_len, out BacnetObjectId object_id, out BacnetPropertyReference property, out IList<BacnetValue> value_list)
         {
             byte tag_number = 0;
@@ -7881,11 +14037,11 @@ namespace System.IO.BACnet.Serialize
             }
             else
                 return -1;
-            
+
             /* tag 4: opening context tag - listOfValues */
             if (!ASN1.decode_is_opening_tag_number(buffer, offset + len, 4))
                 return -1;
-            
+
             /* a tag number of 4 is not extended so only one octet */
             len++;
             LinkedList<BacnetPropertyValue> _values = new LinkedList<BacnetPropertyValue>();
@@ -7983,7 +14139,7 @@ namespace System.IO.BACnet.Serialize
             if (!ASN1.decode_is_opening_tag_number(buffer, offset + len, 3))
                 return -1;
             len++;
-            
+
             //data
             List<BacnetValue> _value_list = new List<BacnetValue>();
             while ((apdu_len - len) > 1 && !ASN1.decode_is_closing_tag_number(buffer, offset + len, 3))
@@ -8350,7 +14506,7 @@ namespace System.IO.BACnet.Serialize
                 }
 
                 ASN1.encode_opening_tag(buffer, 1);
-                EncodeBuffer tmp1 = new System.IO.BACnet.Serialize.EncodeBuffer(); 
+                EncodeBuffer tmp1 = new System.IO.BACnet.Serialize.EncodeBuffer();
                 switch (record.type)
                 {
                     case BacnetTrendLogValueType.TL_TYPE_ANY:
@@ -8380,7 +14536,7 @@ namespace System.IO.BACnet.Serialize
                         ASN1.encode_bacnet_unsigned(tmp1, record.GetValue<uint>());
                         break;
                 }
-                ASN1.encode_tag(buffer, (byte)record.type, false, (uint)tmp1.offset); 
+                ASN1.encode_tag(buffer, (byte)record.type, false, (uint)tmp1.offset);
                 buffer.Add(tmp1.buffer, tmp1.offset);
                 ASN1.encode_closing_tag(buffer, 1);
             }

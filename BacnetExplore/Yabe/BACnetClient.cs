@@ -944,13 +944,39 @@ namespace System.IO.BACnet
             m_client.Send(b.buffer, m_client.HeaderLength, b.offset - m_client.HeaderLength, receiver, false, 0);
         }
 
-        public void Iam(uint device_id, BacnetSegmentations segmentation = BacnetSegmentations.SEGMENTATION_BOTH, ushort vendor_id = 260)
+        public void UnconfirmedCOVNotificationMultiple(BACnetCOVNotificationMultiple cnm, BacnetAddress source = null)
+        {
+            Trace.WriteLine("Sending UnconfirmedCOVNotificationMultiple ... ", null);
+
+            EncodeBuffer b = GetEncodeBuffer(m_client.HeaderLength);
+            BacnetAddress broadcast = m_client.GetBroadcastAddress();
+            NPDU.Encode(b, BacnetNpduControls.PriorityNormalMessage, broadcast, source);
+            APDU.EncodeUnconfirmedServiceRequest(b, BacnetPduTypes.PDU_TYPE_UNCONFIRMED_SERVICE_REQUEST, BacnetUnconfirmedServices.UNCONFIRMED_COV_NOTIFICATION_MULTIPLE);
+            cnm.ASN1encode(b);
+
+            m_client.Send(b.buffer, m_client.HeaderLength, b.offset - m_client.HeaderLength, broadcast, false, 0);
+        }
+
+        public void WriteGroupRequest(BACnetWriteGroupRequest wgr, BacnetAddress source = null)
+        {
+            Trace.WriteLine("Sending Unconfirmed Write Group ... ", null);
+
+            EncodeBuffer b = GetEncodeBuffer(m_client.HeaderLength);
+            BacnetAddress broadcast = m_client.GetBroadcastAddress();
+            NPDU.Encode(b, BacnetNpduControls.PriorityNormalMessage, broadcast, source);
+            APDU.EncodeUnconfirmedServiceRequest(b, BacnetPduTypes.PDU_TYPE_UNCONFIRMED_SERVICE_REQUEST, BacnetUnconfirmedServices.SERVICE_UNCONFIRMED_WRITE_GROUP);
+            wgr.ASN1encode(b);
+
+            m_client.Send(b.buffer, m_client.HeaderLength, b.offset - m_client.HeaderLength, broadcast, false, 0);
+        }
+
+        public void Iam(uint device_id, BacnetSegmentations segmentation = BacnetSegmentations.SEGMENTATION_BOTH, ushort vendor_id = 260, BacnetAddress source=null)
         {
             Trace.WriteLine("Sending Iam ... ", null);
 
             EncodeBuffer b = GetEncodeBuffer(m_client.HeaderLength);
             BacnetAddress broadcast=m_client.GetBroadcastAddress();
-            NPDU.Encode(b, BacnetNpduControls.PriorityNormalMessage, broadcast);
+            NPDU.Encode(b, BacnetNpduControls.PriorityNormalMessage, broadcast, source);
             APDU.EncodeUnconfirmedServiceRequest(b, BacnetPduTypes.PDU_TYPE_UNCONFIRMED_SERVICE_REQUEST, BacnetUnconfirmedServices.SERVICE_UNCONFIRMED_I_AM);
             Services.EncodeIamBroadcast(b, device_id, (uint)GetMaxApdu(), segmentation, vendor_id);
 
@@ -1350,6 +1376,67 @@ namespace System.IO.BACnet
             res.Dispose();
         }
 
+        public bool SubscribeCOVPropertyMultiple(BacnetAddress adr, BACnetSubscribeCOVPropertyMultiple s_cov_multiple, byte invoke_id = 0)
+        {
+            using (BacnetAsyncResult result = (BacnetAsyncResult)BeginSubscribeCOVPropertyMultipleRequest(adr, s_cov_multiple, true, invoke_id))
+            {
+                for (int r = 0; r < m_retries; r++)
+                {
+                    if (result.WaitForDone(m_timeout))
+                    {
+                        Exception ex;
+                        EndSubscribeCOVPropertyMultipleRequest(result, out ex);
+                        if (ex != null) throw ex;
+                        else return true;
+                    }
+                    if (r < (m_retries - 1))
+                        result.Resend();
+                }
+            }
+
+            return false;
+        }
+
+        public IAsyncResult BeginSubscribeCOVPropertyMultipleRequest(BacnetAddress adr, BACnetSubscribeCOVPropertyMultiple s_cov_multiple, bool wait_for_transmit, byte invoke_id = 0)
+        {
+            Trace.WriteLine("Sending SubscribeCOVPropertyMultipleRequest ... ", null);
+            if (invoke_id == 0) invoke_id = unchecked(m_invoke_id++);
+
+            EncodeBuffer b = GetEncodeBuffer(m_client.HeaderLength);
+            //BacnetNpduControls.PriorityNormalMessage 
+            NPDU.Encode(b, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource);
+
+            APDU.EncodeConfirmedServiceRequest(b, BacnetPduTypes.PDU_TYPE_CONFIRMED_SERVICE_REQUEST, BacnetConfirmedServices.SERVICE_SUBSCRIBE_COV_PROPERTY_MULTIPLE, m_max_segments, m_client.MaxAdpuLength, invoke_id);
+            s_cov_multiple.ASN1encode(b);
+
+            //send
+            BacnetAsyncResult ret = new BacnetAsyncResult(this, adr, invoke_id, b.buffer, b.offset - m_client.HeaderLength, wait_for_transmit, m_transmit_timeout);
+            ret.Resend();
+
+            return ret;
+        }
+
+        public void EndSubscribeCOVPropertyMultipleRequest(IAsyncResult result, out Exception ex)
+        {          
+            BacnetAsyncResult res = (BacnetAsyncResult)result;
+            ex = res.Error;
+            if (ex == null && !res.WaitForDone(m_timeout))
+                ex = new Exception("Wait Timeout");
+
+            if (ex == null)
+            {
+                //decode
+                BacnetObjectId monitored_object_identifier;
+                BacnetPropertyReference monitored_property_reference;
+                uint error;
+                if (Services.DecodeSubscribeCOVPropertyMultipleAcknowledge(res.Result, 0, res.Result.Length, out monitored_object_identifier, out monitored_property_reference, out error) < 0)
+                    ex = new Exception("Decode");
+                Trace.WriteLine(monitored_object_identifier+" "+ monitored_property_reference+" "+(BacnetErrorCodes) error, null);
+            }        
+
+            res.Dispose();
+        }
+
         public bool ReadPropertyRequest(BacnetAddress adr, BacnetObjectId object_id, BacnetPropertyIds property_id, out IList<BacnetValue> value_list, byte invoke_id = 0, uint array_index = ASN1.BACNET_ARRAY_ALL)
         {
             using (BacnetAsyncResult result = (BacnetAsyncResult)BeginReadPropertyRequest(adr, object_id, property_id, true, invoke_id, array_index))
@@ -1451,7 +1538,7 @@ namespace System.IO.BACnet
             }
             value_list = null;
             return false;
-        }
+        }        
 
         public IAsyncResult BeginWritePropertyRequest(BacnetAddress adr, BacnetObjectId object_id, BacnetPropertyIds property_id, IEnumerable<BacnetValue> value_list, bool wait_for_transmit, byte invoke_id = 0)
         {

@@ -174,6 +174,8 @@ void Getminitypename(unsigned char nmini_type, CString &ret_name)
         ret_name = _T(" ");
         break;
     }
+    if (nmini_type < 5)
+        ret_name = ret_name + _T("(Asix)");
 
 }
 

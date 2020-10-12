@@ -5162,7 +5162,9 @@ void localhandler_read_property_ack(
 #if 1
         if (data.object_property == PROP_PRIORITY_ARRAY)
         {
-            CFile myfile(_T("C:\\log.txt"), CFile::modeRead);
+            CString temp_bacnet_logfile;
+            temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
+            CFile myfile(temp_bacnet_logfile, CFile::modeRead);
             char *pBuf;
             DWORD dwFileLen;
             dwFileLen = myfile.GetLength();
@@ -6317,7 +6319,7 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         bool port_bind_results = false;
         for (int i = 1;i <= 3;i++)
         {
-            int temp_add_port = i - 1;// rand() % 10000;
+            int temp_add_port = i /*- 1*/;// rand() % 10000;
             if (bind_local_ip.IsEmpty())
             {
                 port_bind_results = Open_bacnetSocket2(_T(""), BACNETIP_PORT + temp_add_port, my_sokect);
@@ -7683,7 +7685,7 @@ void GetIPMaskGetWayForScan()
 
     }
 }
-
+#include "ping.h"
 UINT RefreshNetWorkDeviceListByUDPFunc()
 {
 
@@ -7695,6 +7697,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
     //}
 
     GetIPMaskGetWay();
+
     short nmsgType=UPD_BROADCAST_QRY_MSG;
 
     //////////////////////////////////////////////////////////////////////////
@@ -7705,10 +7708,11 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 
     fd_set fdSocket;
     BYTE buffer[512] = {0};
-
+    
     BYTE pSendBuf[1024];
     for (int index=0; index<g_Vector_Subnet.size(); index++)
     {
+        int temp_found_any_device = 0;
         if (g_Vector_Subnet[index].StrIP.Find(_T("0.0.0.0"))!=-1)
         {
             continue;
@@ -7793,6 +7797,14 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                         FD_ZERO(&fdSocket);
                         if(buffer[0]==RESPONSE_MSG)
                         {
+
+                            if (get_ping_ip_network == 0)
+                            {
+                                g_ipaddress_info.exist_device = true;
+                                g_ipaddress_info.adapter_info.StrIP = g_Vector_Subnet[index].StrIP;
+                                get_ping_ip_network = 1;
+                            }
+
 #ifdef DEBUG
                             //t2 = GetTickCount();
                             //CString temp_time_print;
@@ -7934,6 +7946,30 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                 bTimeOut = TRUE;
                 //g_llTxCount++;//不合理
             }
+
+#if 0
+            if (g_ipaddress_info[index].exist_device > 0) //这个网络适配器扫描到了一些设备  65 回复;
+            {
+                CString temp_head_ip;
+                CString temp_ip = g_ipaddress_info[index].ip_head;
+                for (int j = 1; j < 254; j++)
+                {
+                    CString temp_3;
+                    temp_3.Format(_T("%s%d"), temp_ip, j);
+                    CPing p1;
+                    CPingReply pr1;
+                    if (p1.Ping1((LPCTSTR)temp_3, pr1))
+                    {
+                        g_ipaddress_info[index].ip_status[j] = 1;
+                    }
+                    else
+                    {
+                        g_ipaddress_info[index].ip_status[j] = 0;
+                    }
+                }
+                Sleep(1);
+            }
+#endif
         //}//end of while
 END_REFRESH_SCAN:
 
@@ -7967,6 +8003,9 @@ END_REFRESH_SCAN:
         }
 
     }
+
+
+
     if (g_Vector_Subnet.size()==0)
     {
         SetPaneString(3,_T("No Network Card is installed in your PC"));

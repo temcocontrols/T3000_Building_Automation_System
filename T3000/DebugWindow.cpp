@@ -44,6 +44,7 @@ ON_BN_CLICKED(IDC_BUTTON_DEBUG_NUM_TO_TIME, &CDebugWindow::OnBnClickedButtonDebu
 ON_BN_CLICKED(IDC_BUTTON_DEBUG_TIME_TO_NUM, &CDebugWindow::OnBnClickedButtonDebugTimeToNum)
 ON_CBN_SELCHANGE(IDC_COMBO_DEBUG_CHOOSE, &CDebugWindow::OnCbnSelchangeComboDebugChoose)
 ON_BN_CLICKED(IDC_BUTTON_DEBUG, &CDebugWindow::OnBnClickedButtonDebug)
+ON_BN_CLICKED(IDC_BUTTON_WEB_TEST, &CDebugWindow::OnBnClickedButtonWebTest)
 END_MESSAGE_MAP()
 
 
@@ -57,6 +58,7 @@ BOOL CDebugWindow::OnInitDialog()
 	//::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 #ifdef DEBUG
     GetDlgItem(IDC_BUTTON_DEBUG)->ShowWindow(SW_SHOW);
+    GetDlgItem(IDC_BUTTON_WEB_TEST)->ShowWindow(SW_SHOW);
 #endif
 	Logfile_path.Empty();
 	m_is_pause = false;
@@ -354,5 +356,16 @@ test1.k_updatedAt.KeyName, test1.k_updatedAt.tValue.cs_value);
     Sleep(1);
 #endif
 
+#endif // DEBUG
+}
+
+#include "BacnetWeb.h"
+void CDebugWindow::OnBnClickedButtonWebTest()
+{
+    // TODO: 在此添加控件通知处理程序代码
+#ifdef DEBUG
+    CBacnetWeb testweb;
+    testweb.DoModal();
+    return;
 #endif // DEBUG
 }

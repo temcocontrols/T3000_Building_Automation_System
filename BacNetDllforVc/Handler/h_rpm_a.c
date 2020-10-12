@@ -41,7 +41,7 @@
 /* some demo stuff needed */
 #include "handlers.h"
 #include "txbuf.h"
-
+extern char bacnetlog_path[512];
 /** @file h_rpm_a.c  Handles Read Property Multiple Acknowledgments. */
 
 /** Decode the received RPM data and make a linked list of the results.
@@ -211,9 +211,9 @@ void rpm_ack_print_data(
     BACNET_APPLICATION_DATA_VALUE *value;
     bool array_value = false;
 
-    remove("C:\\log.txt");
+    remove(bacnetlog_path);
     FILE *st_dout;
-    st_dout = fopen("C:\\log.txt", "a");
+    st_dout = fopen(bacnetlog_path, "a");
     if (rpm_data) 
     {
 //#if PRINT_ENABLED

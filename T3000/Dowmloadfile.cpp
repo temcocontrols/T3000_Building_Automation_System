@@ -1012,17 +1012,17 @@ void Dowmloadfile::Start_Download_Ftp()
 
     m_static_persent.ShowWindow(SW_SHOW);
     GetDlgItem(IDC_PROGRESS_FTP_DOWNLOAD)->ShowWindow(SW_SHOW);
-#ifndef DEBUG
+//#ifndef DEBUG
     if (hDownloadFtpThread == NULL)
         hDownloadFtpThread = CreateThread(NULL, NULL, FtpDownloadThread, this, NULL, NULL);
-#endif // !DEBUG
+//#endif // !DEBUG
 
 
 
-#ifdef DEBUG
-    if (hDownloadWebThread == NULL)
-        hDownloadWebThread = CreateThread(NULL, NULL, WebDownloadThread, this, NULL, NULL);
-#endif // DEBUG
+//#ifdef DEBUG
+//    if (hDownloadWebThread == NULL)
+//        hDownloadWebThread = CreateThread(NULL, NULL, WebDownloadThread, this, NULL, NULL);
+//#endif // DEBUG
 
 }
 
@@ -1132,6 +1132,8 @@ web_download_end:
     return true;
 #endif
 
+    hDownloadWebThread = NULL;
+    return true;
 }
 
 DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)

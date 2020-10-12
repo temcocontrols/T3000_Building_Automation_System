@@ -115,8 +115,9 @@ void CBacnetThirdPartyMain::Fresh()
     if (nret >= 0)
     {
         CFile file;
-
-        file.Open(_T("C:\\log.txt"), CFile::modeRead, NULL);
+        CString temp_bacnet_logfile;
+        temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
+        file.Open(temp_bacnet_logfile, CFile::modeRead, NULL);
 
         DWORD len = file.GetLength();
 
@@ -199,8 +200,9 @@ void CBacnetThirdPartyMain::OnBnClickedButtonThirdOk()
     if (nret >= 0)
     {
         CFile file;
-
-        file.Open(_T("C:\\log.txt"), CFile::modeRead, NULL);
+        CString temp_bacnet_logfile;
+        temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
+        file.Open(temp_bacnet_logfile, CFile::modeRead, NULL);
         DWORD len = file.GetLength();
         char *Buf = new char[len + 1];
         Buf[len + 1] = 0;  //0ÖÕÖ¹×Ö·û´®£¬ÓÃÓÚÊä³ö¡£

@@ -374,9 +374,17 @@ namespace Yabe
 
             for (int i = 0; i < 12; i++)
                 month.Items.Add(CultureInfo.CurrentCulture.DateTimeFormat.MonthNames[i]);
-            month.Items.Add("Even");
             month.Items.Add("Odd");
+            month.Items.Add("Even");
             month.Items.Add("****");
+
+            week.Items.Add("days 1 to 7");
+            week.Items.Add("days 8 to 14");
+            week.Items.Add("days 15 to 21");
+            week.Items.Add("days 22 to 28");
+            week.Items.Add("days 29 to 31");
+            week.Items.Add("last 7 days of the month");
+            week.Items.Add("all days numbers");
         }
 
         public CalendarEntryEdit(object entry)
@@ -389,6 +397,7 @@ namespace Yabe
             {
                 dateRangeGrp.Visible = false;
                 DateGrp.Visible = true;
+                week.Visible = false;
                 DateGrp.Location = dateRangeGrp.Location;
 
                 BacnetDate bd = (BacnetDate)entry;
@@ -438,7 +447,7 @@ namespace Yabe
                 DateGrp.Location = dateRangeGrp.Location;
                 year.Visible = false;
                 day.Visible = false;
-                wday.Location=new Point(wday.Location.X+50,wday.Location.Y);
+                month.Location=new Point(month.Location.X+50,month.Location.Y);
 
                 BacnetweekNDay bwd = (BacnetweekNDay)entry;
 
@@ -451,6 +460,11 @@ namespace Yabe
                     month.SelectedIndex = bwd.month - 1;
                 else
                     month.SelectedIndex = 14;
+
+                if ((bwd.week < 7)&&(bwd.week !=0))
+                    week.SelectedIndex = bwd.week - 1;
+                else
+                    week.SelectedIndex = 6;
             }
         }
 
@@ -518,6 +532,9 @@ namespace Yabe
                 else
                     bwd.month = (byte)( month.SelectedIndex + 1);
 
+                bwd.week = (byte)(week.SelectedIndex + 1);
+                if (bwd.week==7) bwd.week=255;
+
                 return bwd;
             }
             return null;
@@ -556,6 +573,7 @@ namespace Yabe
             this.year = new System.Windows.Forms.TextBox();
             this.month = new System.Windows.Forms.ComboBox();
             this.day = new System.Windows.Forms.ComboBox();
+            this.week = new System.Windows.Forms.ComboBox();
             this.wday = new System.Windows.Forms.ComboBox();
             this.btOk = new System.Windows.Forms.Button();
             this.btCancel = new System.Windows.Forms.Button();
@@ -614,6 +632,7 @@ namespace Yabe
             this.DateGrp.Controls.Add(this.year);
             this.DateGrp.Controls.Add(this.month);
             this.DateGrp.Controls.Add(this.day);
+            this.DateGrp.Controls.Add(this.week);
             this.DateGrp.Controls.Add(this.wday);
             this.DateGrp.Location = new System.Drawing.Point(43, 125);
             this.DateGrp.Name = "DateGrp";
@@ -623,26 +642,34 @@ namespace Yabe
             // 
             // year
             // 
-            this.year.Location = new System.Drawing.Point(231, 27);
+            this.year.Location = new System.Drawing.Point(236, 27);
             this.year.Name = "year";
-            this.year.Size = new System.Drawing.Size(50, 20);
+            this.year.Size = new System.Drawing.Size(50, 21);
             this.year.TabIndex = 3;
             // 
             // month
             // 
             this.month.FormattingEnabled = true;
-            this.month.Location = new System.Drawing.Point(162, 27);
+            this.month.Location = new System.Drawing.Point(155, 27);
             this.month.Name = "month";
-            this.month.Size = new System.Drawing.Size(53, 21);
+            this.month.Size = new System.Drawing.Size(73, 21);
             this.month.TabIndex = 2;
             // 
             // day
             // 
             this.day.FormattingEnabled = true;
-            this.day.Location = new System.Drawing.Point(101, 27);
+            this.day.Location = new System.Drawing.Point(95, 27);
             this.day.Name = "day";
             this.day.Size = new System.Drawing.Size(53, 21);
             this.day.TabIndex = 1;
+            // 
+            // week
+            // 
+            this.week.FormattingEnabled = true;
+            this.week.Location = new System.Drawing.Point(95, 27);
+            this.week.Name = "week";
+            this.week.Size = new System.Drawing.Size(103, 21);
+            this.week.TabIndex = 1;
             // 
             // wday
             // 
@@ -703,6 +730,7 @@ namespace Yabe
         private System.Windows.Forms.TextBox year;
         private System.Windows.Forms.ComboBox month;
         private System.Windows.Forms.ComboBox day;
+        private System.Windows.Forms.ComboBox week;
         private System.Windows.Forms.ComboBox wday;
         private System.Windows.Forms.Button btOk;
         private System.Windows.Forms.Button btCancel;

@@ -16,7 +16,7 @@
  
 #include <windows.h>  
  
-const unsigned int g_versionNO= 20200918;
+const unsigned int g_versionNO= 20201012;
 
 
 #ifdef _DEBUG
@@ -939,6 +939,7 @@ void CT3000App::SetDLLRegAsm(DWORD Last) {
 	WriteNumber(key, _T("T3000"), Last);
 }
 #include "Dowmloadfile.h"
+#include "CWebBrowser2.h"
 extern tree_product	m_product_isp_auto_flash;
 bool update_t3000_only = false;
 void CAboutDlg::OnBnClickedOk()

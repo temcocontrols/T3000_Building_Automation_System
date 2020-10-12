@@ -50,11 +50,22 @@ const TCHAR c_strCfgSubID[] = _T("Default SubID : ");
 //
 const TCHAR c_strFlashMethodEthernet[] = _T("Ethernet");
 const TCHAR c_strFlashMethodCom[] = _T("COM");
+
+
+
 struct ALL_LOCAL_SUBNET_NODE{
 	CString StrIP;
 	CString StrMask;
 	CString StrGetway;
 	int NetworkCardType;
+};
+
+struct ipaddress_info
+{
+    int exist_device;
+    ALL_LOCAL_SUBNET_NODE adapter_info;
+    CString ip_head;
+    char ip_status[255];
 };
  
 //struct Reg_Infor{

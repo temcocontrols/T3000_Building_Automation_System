@@ -1118,8 +1118,12 @@ extern CString SaveConfigFilePath;
 extern CString LoadConfigFilePath;
 extern vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
 extern vector<ALL_LOCAL_SUBNET_NODE> g_Scan_Vector_Subnet;
+extern ipaddress_info g_ipaddress_info;
+extern int get_ping_ip_network ;
+extern int mul_ping_flag ;
 extern vector<Reg_Infor> g_Vector_Write_Error;
 extern CString g_strStartInterface_config;
+extern CString	g_configfile_path;
 extern bool need_read_bacnet_graphic_label_flag;
 extern bool read_write_bacnet_config ;	//¶ÁÐ´Bacnet config µÄÊ±ºò½ûÖ¹Ë¢ÐÂ List;
 

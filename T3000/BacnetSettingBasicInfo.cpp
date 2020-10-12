@@ -283,7 +283,6 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingPanel()
             }
         }
     }
-    GetDlgItem(IDC_BUTTON_BAC_SETTING_OK)->SetFocus();
 }
 
 

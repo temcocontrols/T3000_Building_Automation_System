@@ -1,6 +1,6 @@
 ﻿namespace Yabe
 {
-    partial class MainDialog
+    partial class YabeMainDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ImageList m_ImageList;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(YabeMainDialog));
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Devices");
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.m_SearchToolButton = new System.Windows.Forms.ToolStripButton();
@@ -67,6 +67,7 @@
             this.showCalendarToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pluginsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,10 +97,13 @@
             this.showNotificationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showCalendarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.label3 = new System.Windows.Forms.Label();
+            this.searchToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.AddSpaceLabel = new System.Windows.Forms.Label();
             this.m_SplitContainerRight = new System.Windows.Forms.SplitContainer();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.splitCOV = new System.Windows.Forms.SplitContainer();
+            this.labelDrop1 = new System.Windows.Forms.Label();
             this.m_SubscriptionView = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -107,8 +111,12 @@
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.m_EventSpaceMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.EventAlarmLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.labelDrop2 = new System.Windows.Forms.Label();
+            this.CovGraph = new ZedGraph.ZedGraphControl();
             this.m_DataGrid = new System.Windows.Forms.PropertyGrid();
             this.label1 = new System.Windows.Forms.Label();
             this.m_LogText = new System.Windows.Forms.TextBox();
@@ -137,6 +145,10 @@
             this.m_SplitContainerRight.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitCOV)).BeginInit();
+            this.splitCOV.Panel1.SuspendLayout();
+            this.splitCOV.Panel2.SuspendLayout();
+            this.splitCOV.SuspendLayout();
             this.m_EventSpaceMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -466,7 +478,8 @@
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.settingsToolStripMenuItem});
+            this.settingsToolStripMenuItem,
+            this.pluginsToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.optionsToolStripMenuItem.Text = "Options";
@@ -478,6 +491,13 @@
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            // 
+            // pluginsToolStripMenuItem
+            // 
+            this.pluginsToolStripMenuItem.Image = global::Yabe.Properties.Resources.plugin;
+            this.pluginsToolStripMenuItem.Name = "pluginsToolStripMenuItem";
+            this.pluginsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.pluginsToolStripMenuItem.Text = "Plugins";
             // 
             // helpToolStripMenuItem
             // 
@@ -555,7 +575,7 @@
             // splitContainer4.Panel2
             // 
             this.splitContainer4.Panel2.Controls.Add(this.m_AddressSpaceTree);
-            this.splitContainer4.Panel2.Controls.Add(this.label3);
+            this.splitContainer4.Panel2.Controls.Add(this.AddSpaceLabel);
             this.splitContainer4.Size = new System.Drawing.Size(164, 412);
             this.splitContainer4.SplitterDistance = 187;
             this.splitContainer4.TabIndex = 0;
@@ -717,9 +737,10 @@
             this.showScheduleToolStripMenuItem1,
             this.showNotificationToolStripMenuItem,
             this.showCalendarToolStripMenuItem,
-            this.deleteObjectToolStripMenuItem});
+            this.deleteObjectToolStripMenuItem,
+            this.searchToolStripMenuItem1});
             this.m_AddressSpaceMenuStrip.Name = "m_AddressSpaceMenuStrip";
-            this.m_AddressSpaceMenuStrip.Size = new System.Drawing.Size(170, 180);
+            this.m_AddressSpaceMenuStrip.Size = new System.Drawing.Size(170, 202);
             // 
             // subscribeToolStripMenuItem
             // 
@@ -785,15 +806,23 @@
             this.deleteObjectToolStripMenuItem.Text = "DeleteObject";
             this.deleteObjectToolStripMenuItem.Click += new System.EventHandler(this.deleteObjectToolStripMenuItem_Click);
             // 
-            // label3
+            // searchToolStripMenuItem1
             // 
-            this.label3.AutoSize = true;
-            this.label3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label3.Location = new System.Drawing.Point(0, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(79, 13);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "Address Space";
+            this.searchToolStripMenuItem1.Image = global::Yabe.Properties.Resources.find;
+            this.searchToolStripMenuItem1.Name = "searchToolStripMenuItem1";
+            this.searchToolStripMenuItem1.Size = new System.Drawing.Size(169, 22);
+            this.searchToolStripMenuItem1.Text = "Search";
+            this.searchToolStripMenuItem1.Click += new System.EventHandler(this.searchToolStripMenuItem1_Click);
+            // 
+            // AddSpaceLabel
+            // 
+            this.AddSpaceLabel.AutoSize = true;
+            this.AddSpaceLabel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.AddSpaceLabel.Location = new System.Drawing.Point(0, 0);
+            this.AddSpaceLabel.Name = "AddSpaceLabel";
+            this.AddSpaceLabel.Size = new System.Drawing.Size(79, 13);
+            this.AddSpaceLabel.TabIndex = 3;
+            this.AddSpaceLabel.Text = "Address Space";
             // 
             // m_SplitContainerRight
             // 
@@ -825,7 +854,7 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.m_SubscriptionView);
+            this.tabPage1.Controls.Add(this.splitCOV);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -834,8 +863,38 @@
             this.tabPage1.Text = "Subscriptions, Periodic Polling, Events/Alarms";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // splitCOV
+            // 
+            this.splitCOV.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitCOV.Location = new System.Drawing.Point(3, 3);
+            this.splitCOV.Name = "splitCOV";
+            this.splitCOV.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitCOV.Panel1
+            // 
+            this.splitCOV.Panel1.Controls.Add(this.labelDrop1);
+            this.splitCOV.Panel1.Controls.Add(this.m_SubscriptionView);
+            // 
+            // splitCOV.Panel2
+            // 
+            this.splitCOV.Panel2.Controls.Add(this.labelDrop2);
+            this.splitCOV.Panel2.Controls.Add(this.CovGraph);
+            this.splitCOV.Size = new System.Drawing.Size(382, 380);
+            this.splitCOV.SplitterDistance = 190;
+            this.splitCOV.TabIndex = 1;
+            // 
+            // labelDrop1
+            // 
+            this.labelDrop1.AutoSize = true;
+            this.labelDrop1.Location = new System.Drawing.Point(36, 42);
+            this.labelDrop1.Name = "labelDrop1";
+            this.labelDrop1.Size = new System.Drawing.Size(340, 13);
+            this.labelDrop1.TabIndex = 1;
+            this.labelDrop1.Text = "Drop .a cov file or objects from the Address Space here to subscribe ...";
+            // 
             // m_SubscriptionView
             // 
+            this.m_SubscriptionView.AllowColumnReorder = true;
             this.m_SubscriptionView.AllowDrop = true;
             this.m_SubscriptionView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
@@ -843,13 +902,15 @@
             this.columnHeader3,
             this.columnHeader4,
             this.columnHeader5,
-            this.columnHeader6});
+            this.columnHeader6,
+            this.columnHeader8,
+            this.columnHeader7});
             this.m_SubscriptionView.ContextMenuStrip = this.m_EventSpaceMenuStrip;
             this.m_SubscriptionView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_SubscriptionView.FullRowSelect = true;
-            this.m_SubscriptionView.Location = new System.Drawing.Point(3, 3);
+            this.m_SubscriptionView.Location = new System.Drawing.Point(0, 0);
             this.m_SubscriptionView.Name = "m_SubscriptionView";
-            this.m_SubscriptionView.Size = new System.Drawing.Size(382, 380);
+            this.m_SubscriptionView.Size = new System.Drawing.Size(382, 190);
             this.m_SubscriptionView.TabIndex = 0;
             this.m_SubscriptionView.UseCompatibleStateImageBehavior = false;
             this.m_SubscriptionView.View = System.Windows.Forms.View.Details;
@@ -881,6 +942,15 @@
             // 
             this.columnHeader6.Text = "Status";
             // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Text = "Description";
+            // 
+            // columnHeader7
+            // 
+            this.columnHeader7.Text = "";
+            this.columnHeader7.Width = 4;
+            // 
             // m_EventSpaceMenuStrip
             // 
             this.m_EventSpaceMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -895,6 +965,33 @@
             this.EventAlarmLogToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
             this.EventAlarmLogToolStripMenuItem.Text = "Start saving Cov/Event/Alarm Log";
             this.EventAlarmLogToolStripMenuItem.Click += new System.EventHandler(this.EventAlarmLogToolStripMenuItem_Click);
+            // 
+            // labelDrop2
+            // 
+            this.labelDrop2.AutoSize = true;
+            this.labelDrop2.Location = new System.Drawing.Point(39, 26);
+            this.labelDrop2.Name = "labelDrop2";
+            this.labelDrop2.Size = new System.Drawing.Size(153, 13);
+            this.labelDrop2.TabIndex = 1;
+            this.labelDrop2.Text = "... or here to subscribe and plot";
+            // 
+            // CovGraph
+            // 
+            this.CovGraph.AllowDrop = true;
+            this.CovGraph.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CovGraph.Location = new System.Drawing.Point(0, 0);
+            this.CovGraph.Name = "CovGraph";
+            this.CovGraph.ScrollGrace = 0D;
+            this.CovGraph.ScrollMaxX = 0D;
+            this.CovGraph.ScrollMaxY = 0D;
+            this.CovGraph.ScrollMaxY2 = 0D;
+            this.CovGraph.ScrollMinX = 0D;
+            this.CovGraph.ScrollMinY = 0D;
+            this.CovGraph.ScrollMinY2 = 0D;
+            this.CovGraph.Size = new System.Drawing.Size(382, 186);
+            this.CovGraph.TabIndex = 0;
+            this.CovGraph.DragDrop += new System.Windows.Forms.DragEventHandler(this.m_SubscriptionView_DragDrop);
+            this.CovGraph.DragEnter += new System.Windows.Forms.DragEventHandler(this.m_SubscriptionView_DragEnter);
             // 
             // m_DataGrid
             // 
@@ -941,7 +1038,7 @@
             // 
             this.m_subscriptionRenewTimer.Tick += new System.EventHandler(this.m_subscriptionRenewTimer_Tick);
             // 
-            // MainDialog
+            // YabeMainDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -952,7 +1049,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "MainDialog";
+            this.Name = "YabeMainDialog";
             this.Text = "Temco Standard Bacnet Tool";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainDialog_FormClosing);
             this.Load += new System.EventHandler(this.MainDialog_Load);
@@ -985,6 +1082,12 @@
             this.m_SplitContainerRight.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.splitCOV.Panel1.ResumeLayout(false);
+            this.splitCOV.Panel1.PerformLayout();
+            this.splitCOV.Panel2.ResumeLayout(false);
+            this.splitCOV.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitCOV)).EndInit();
+            this.splitCOV.ResumeLayout(false);
             this.m_EventSpaceMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -1002,12 +1105,11 @@
         private System.Windows.Forms.SplitContainer m_SplitContainerRight;
         private System.Windows.Forms.TextBox m_LogText;
         private System.Windows.Forms.SplitContainer splitContainer4;
-        private System.Windows.Forms.TreeView m_DeviceTree;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.PropertyGrid m_DataGrid;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label AddSpaceLabel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ToolStripMenuItem searchToolStripMenuItem;
@@ -1057,7 +1159,6 @@
         private System.Windows.Forms.ToolStripMenuItem showScheduleToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem showNotificationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showNotificationToolStripMenuItem1;
-        private CodersLab.Windows.Controls.TreeView m_AddressSpaceTree;
         private System.Windows.Forms.ToolStripMenuItem showCalendarToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showCalendarToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem alarmSummaryToolStripMenuItem1;
@@ -1075,6 +1176,16 @@
         private System.Windows.Forms.ToolStripMenuItem sendUnicastUdpWhoIsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem iPFunctionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editBBMDTablesToolStripMenuItem;
+        public System.Windows.Forms.TreeView m_DeviceTree;
+        public CodersLab.Windows.Controls.TreeView m_AddressSpaceTree;
+        public System.Windows.Forms.ToolStripMenuItem pluginsToolStripMenuItem;
+        private System.Windows.Forms.SplitContainer splitCOV;
+        private ZedGraph.ZedGraphControl CovGraph;
+        private System.Windows.Forms.Label labelDrop1;
+        private System.Windows.Forms.Label labelDrop2;
+        private System.Windows.Forms.ColumnHeader columnHeader7;
+        private System.Windows.Forms.ColumnHeader columnHeader8;
+        private System.Windows.Forms.ToolStripMenuItem searchToolStripMenuItem1;
     }
 }
 

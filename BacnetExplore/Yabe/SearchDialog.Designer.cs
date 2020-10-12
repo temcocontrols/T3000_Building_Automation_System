@@ -50,6 +50,10 @@
             this.label4 = new System.Windows.Forms.Label();
             this.m_SerialPortCombo = new System.Windows.Forms.ComboBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.WhoLimitHigh = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.WhoLimitLow = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
             this.m_TimeoutValue = new System.Windows.Forms.NumericUpDown();
             this.m_RetriesValue = new System.Windows.Forms.NumericUpDown();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -88,7 +92,7 @@
             this.groupBox1.Controls.Add(this.m_AddUdpButton);
             this.groupBox1.Controls.Add(this.m_PortValue);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(12, 70);
+            this.groupBox1.Location = new System.Drawing.Point(12, 108);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(274, 82);
             this.groupBox1.TabIndex = 0;
@@ -113,6 +117,8 @@
             this.m_localUdpEndpointsCombo.Size = new System.Drawing.Size(170, 21);
             this.m_localUdpEndpointsCombo.TabIndex = 7;
             this.m_localUdpEndpointsCombo.Text = global::Yabe.Properties.Settings.Default.DefaultUdpIp;
+
+
             // 
             // m_AddUdpButton
             // 
@@ -182,7 +188,7 @@
             this.groupBox2.Controls.Add(this.m_AddSerialButton);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.m_SerialPortCombo);
-            this.groupBox2.Location = new System.Drawing.Point(12, 158);
+            this.groupBox2.Location = new System.Drawing.Point(12, 196);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(274, 160);
             this.groupBox2.TabIndex = 1;
@@ -323,16 +329,52 @@
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this.WhoLimitHigh);
+            this.groupBox3.Controls.Add(this.label15);
+            this.groupBox3.Controls.Add(this.WhoLimitLow);
+            this.groupBox3.Controls.Add(this.label14);
             this.groupBox3.Controls.Add(this.m_TimeoutValue);
             this.groupBox3.Controls.Add(this.label2);
             this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Controls.Add(this.m_RetriesValue);
             this.groupBox3.Location = new System.Drawing.Point(12, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(274, 52);
+            this.groupBox3.Size = new System.Drawing.Size(274, 90);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "General";
+            // 
+            // WhoLimitHigh
+            // 
+            this.WhoLimitHigh.Location = new System.Drawing.Point(175, 55);
+            this.WhoLimitHigh.Name = "WhoLimitHigh";
+            this.WhoLimitHigh.Size = new System.Drawing.Size(52, 20);
+            this.WhoLimitHigh.TabIndex = 9;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(144, 58);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(27, 13);
+            this.label15.TabIndex = 8;
+            this.label15.Text = "high";
+            // 
+            // WhoLimitLow
+            // 
+            this.WhoLimitLow.Location = new System.Drawing.Point(86, 55);
+            this.WhoLimitLow.Name = "WhoLimitLow";
+            this.WhoLimitLow.Size = new System.Drawing.Size(52, 20);
+            this.WhoLimitLow.TabIndex = 7;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(10, 58);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(77, 13);
+            this.label14.TabIndex = 6;
+            this.label14.Text = "WhoIs limit low";
             // 
             // m_TimeoutValue
             // 
@@ -378,7 +420,7 @@
             this.groupBox4.Controls.Add(this.m_AddPtpSerialButton);
             this.groupBox4.Controls.Add(this.label13);
             this.groupBox4.Controls.Add(this.m_SerialPtpPortCombo);
-            this.groupBox4.Location = new System.Drawing.Point(12, 324);
+            this.groupBox4.Location = new System.Drawing.Point(12, 362);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(274, 108);
             this.groupBox4.TabIndex = 3;
@@ -458,7 +500,7 @@
             this.groupBox5.Controls.Add(this.m_EthernetInterfaceCombo);
             this.groupBox5.Controls.Add(this.label11);
             this.groupBox5.Controls.Add(this.m_AddEthernetButton);
-            this.groupBox5.Location = new System.Drawing.Point(12, 438);
+            this.groupBox5.Location = new System.Drawing.Point(12, 476);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(274, 85);
             this.groupBox5.TabIndex = 4;
@@ -497,7 +539,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(298, 535);
+            this.ClientSize = new System.Drawing.Size(298, 564);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
@@ -529,7 +571,6 @@
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
-
         }
 
         #endregion
@@ -569,5 +610,9 @@
         private System.Windows.Forms.ComboBox m_EthernetInterfaceCombo;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button m_AddEthernetButton;
+        public System.Windows.Forms.TextBox WhoLimitHigh;
+        private System.Windows.Forms.Label label15;
+        public System.Windows.Forms.TextBox WhoLimitLow;
+        private System.Windows.Forms.Label label14;
     }
 }

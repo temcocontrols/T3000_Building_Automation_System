@@ -48,7 +48,11 @@
 #include <stdint.h>
 #include "bacapp.h"
 
-
+char bacnetlog_path[512];
+void set_bacnet_log_path(char *strpath)
+{
+    strcpy(bacnetlog_path, strpath);
+}
 
 /** @file h_rp_a.c  Handles Read Property Acknowledgments. */
 
@@ -65,9 +69,9 @@ void rp_ack_print_data(
     int application_data_len;
     bool first_value = true;
     bool print_brace = false;
-    remove("C:\\log.txt");
+    remove(bacnetlog_path);
     FILE * std_out;
-    std_out = fopen("C:\\log.txt", "a");
+    std_out = fopen(bacnetlog_path, "a");
 
     if (data) 
 	{

@@ -70,9 +70,9 @@ namespace Yabe
                 // priorities are common to all recipients
                 if (aProp.property.propertyIdentifier == (uint)BacnetPropertyIds.PROP_PRIORITY)
                 {
-                    P_Off.Text = ((uint)aProp.value[0].Value).ToString();
-                    P_Fault.Text = ((uint)aProp.value[1].Value).ToString();
-                    P_Normal.Text = ((uint)aProp.value[2].Value).ToString();
+                    P_Off.Text = aProp.value[0].Value.ToString();
+                    P_Fault.Text = aProp.value[1].Value.ToString();
+                    P_Normal.Text = aProp.value[2].Value.ToString();
                 }
                 else
                 {

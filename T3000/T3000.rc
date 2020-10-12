@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -1288,6 +1288,7 @@ BEGIN
     COMBOBOX        IDC_COMBO_DEBUG_CHOOSE,291,39,96,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Show Debug Info :",IDC_STATIC,211,41,65,8
     PUSHBUTTON      "Test Button",IDC_BUTTON_DEBUG,17,44,50,14,NOT WS_VISIBLE
+    PUSHBUTTON      "Web Test",IDC_BUTTON_WEB_TEST,85,44,50,14,NOT WS_VISIBLE
 END
 
 IDD_DIALOG_NET_CO2 DIALOGEX 0, 0, 755, 681
@@ -6842,12 +6843,12 @@ BEGIN
     ID_TOOLS_MODBUSTOBACNETROUTER "Subnet Devices"
 END
 
-#endif    // Chinese (Simplified, PRC) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// 英语(美国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -8585,6 +8586,13 @@ BEGIN
     PUSHBUTTON      "?",IDC_BUTTON_ABC_HELP,162,193,50,14
 END
 
+IDD_DIALOG_WEB DIALOGEX 0, 0, 891, 458
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -9084,6 +9092,14 @@ BEGIN
         RIGHTMARGIN, 230
         TOPMARGIN, 7
         BOTTOMMARGIN, 261
+    END
+
+    IDD_DIALOG_WEB, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 884
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 451
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -11006,6 +11022,11 @@ BEGIN
     0
 END
 
+IDD_DIALOG_WEB AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -11250,12 +11271,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // English (United States) resources
+#endif    // 英语(美国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United Kingdom) resources
+// 英语(英国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -11361,7 +11382,7 @@ BEGIN
     0
 END
 
-#endif    // English (United Kingdom) resources
+#endif    // 英语(英国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

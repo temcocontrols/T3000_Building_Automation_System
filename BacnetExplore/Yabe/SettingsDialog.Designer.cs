@@ -37,9 +37,10 @@
             this.m_SettingsGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_SettingsGrid.LineColor = System.Drawing.SystemColors.ControlDark;
             this.m_SettingsGrid.Location = new System.Drawing.Point(12, 12);
             this.m_SettingsGrid.Name = "m_SettingsGrid";
-            this.m_SettingsGrid.Size = new System.Drawing.Size(348, 420);
+            this.m_SettingsGrid.Size = new System.Drawing.Size(467, 420);
             this.m_SettingsGrid.TabIndex = 0;
             // 
             // label1
@@ -56,7 +57,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(372, 457);
+            this.ClientSize = new System.Drawing.Size(491, 457);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.m_SettingsGrid);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;

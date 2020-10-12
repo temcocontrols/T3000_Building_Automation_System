@@ -127,6 +127,8 @@ HANDLE hwait_read_thread = NULL;
 HANDLE hwait_read_modbus10000 = NULL;
 HANDLE hwait_write_modbus10000 = NULL;
 HANDLE hwait_write_tstat_cfg = NULL;
+HANDLE h_mul_ping_thread = NULL;
+int mul_ping_flag = 1;
 _Refresh_Write_Info Write_Config_Info;
 HANDLE hStartEvent; // thread start event
 extern int isp_product_id;
@@ -721,8 +723,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
         return -1;
-
-
+    CString temp_bacnet_logfile;
+    temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
+    char temp_path[512] = { 0 };
+    WideCharToMultiByte(CP_ACP, 0, temp_bacnet_logfile.GetBuffer(), -1, temp_path, 512, NULL, NULL);
+    set_bacnet_log_path(temp_path);
     system_connect_info.mstp_status = 0;
     BOOL bNameValid;
     // set the visual manager and style based on persisted value
@@ -835,7 +840,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
     //  2011,7,4, 先判断是否第一次运行，是否要导入数据库。
     //ImportDataBaseForFirstRun();
-    CString g_configfile_path =g_strExePth + g_strStartInterface_config;
+    g_configfile_path =g_strExePth + g_strStartInterface_config;
     g_selected_serialnumber=0;//GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
     m_lastinterface=19;//GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path);
     if (m_lastinterface != 19 && m_lastinterface!=24)
@@ -1084,7 +1089,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		set_offline_mode(offline_mode);
 	}
 	
-
+    if (h_mul_ping_thread == NULL)
+    {
+        h_mul_ping_thread = CreateThread(NULL, NULL, Mul_Ping_Thread, this, NULL, NULL);
+    }
 
     return 0;
 }
@@ -5078,6 +5086,8 @@ read_end_thread:
 
 }
 
+
+
 DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 {
     //Write_Config_Info
@@ -5931,6 +5941,70 @@ LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
 }
 
 
+DWORD WINAPI  CMainFrame::Mul_Ping_Thread(LPVOID lpVoid)
+{
+    CMainFrame* pDlg = (CMainFrame*)(lpVoid);
+
+    while (get_ping_ip_network == 0) 
+    {
+        if (mul_ping_flag == 0)
+        {
+            h_mul_ping_thread = NULL;
+            return 0;
+        }
+        Sleep(1000);
+    }
+
+    CString temp_adaper_ip = g_ipaddress_info.adapter_info.StrIP;
+
+    CStringArray temp_array;
+    SplitCStringA(temp_array, temp_adaper_ip, _T("."));
+    if (temp_array.GetSize() != 4)
+    {
+        h_mul_ping_thread = NULL;
+        return 0;
+    }
+
+    g_ipaddress_info.ip_head.Format(_T("%s.%s.%s."), temp_array.GetAt(0), temp_array.GetAt(1), temp_array.GetAt(2));
+
+    CString temp_head_ip;
+    CString temp_ip = g_ipaddress_info.ip_head;
+
+    while (mul_ping_flag)
+    {
+        for (int j = 1; j < 254; j++)
+        {
+            if (mul_ping_flag == 0)
+            {
+                h_mul_ping_thread = NULL;
+                return 0;
+            }
+            CString temp_3;
+            temp_3.Format(_T("%s%d"), temp_ip, j);
+            CPing p1;
+            CPingReply pr1;
+            if (p1.Ping1((LPCTSTR)temp_3, pr1))
+            {
+                TRACE(_T("%s online\r\n"), temp_3);
+                g_ipaddress_info.ip_status[j] = 1;
+            }
+            else
+            {
+                TRACE(_T("%s offline\r\n"), temp_3);
+                g_ipaddress_info.ip_status[j] = 0;
+            }
+            Sleep(10);
+        }
+        
+    }
+
+
+
+    Sleep(1);
+    h_mul_ping_thread = NULL;
+    return 0;
+}
+
 HTREEITEM hItem_for_ping;
 
 
@@ -5989,6 +6063,7 @@ LRESULT CMainFrame::OnFreshStatusBar(WPARAM wParam, LPARAM lParam)
 
 void CMainFrame::OnDestroy()
 {
+    mul_ping_flag = false; //关闭 ping 的命令;
     g_mstp_flag = false;
     b_statusbarthreadflag = FALSE; //close the status bar thread;
     OnDisconnect();
@@ -6705,8 +6780,11 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 hLastTreeItem = hSelItem;
             }
 
-
-
+            CString temp_cs_obj;
+            temp_cs_obj.Format(_T("%u"), m_product.at(i).object_instance);
+            WritePrivateProfileStringW(_T("Yabe"), _T("Auto"), _T("1"), g_configfile_path);
+            WritePrivateProfileStringW(_T("Yabe"), _T("ObjInstance"), temp_cs_obj, g_configfile_path);
+            WritePrivateProfileStringW(_T("Yabe"), _T("LocalPCIPaddress"), m_product.at(i).NetworkCard_Address, g_configfile_path);
 
             g_llTxCount = g_llTxCount + 1;
             Scan_Product_ID = m_product.at(i).product_class_id;
@@ -9351,12 +9429,43 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
         tree_product tp = m_product.at(i);
         if (tp.protocol == P_MODBUS_485)
             continue;
+
+#pragma region hanlde_ping
+        CStringArray temp_array;
+        SplitCStringA(temp_array, tp.BuildingInfo.strIp, _T("."));
+        if (temp_array.GetSize() == 4)
+        {
+            CString temp_head_ip;
+            temp_head_ip.Format(_T("%s.%s.%s."), temp_array.GetAt(0), temp_array.GetAt(1), temp_array.GetAt(2));
+            if (temp_head_ip.CompareNoCase(g_ipaddress_info.ip_head) == 0)
+            {
+                CString temp_last_ip;
+                temp_last_ip = temp_array.GetAt(3);
+                unsigned char nlastip = (unsigned char)(_wtoi(temp_last_ip));
+                if (tp.note_parent_serial_number == 0) //处理 父节点为0的情况;
+                {
+                    if (tp.status == 0)
+                    {
+                        if (g_ipaddress_info.ip_status[nlastip] == 1)
+                        {
+                            tp.status = 1;
+                            m_product.at(i).status = 1;
+                            TRACE(_T("Change %s.%d status to 1\r\n"), temp_head_ip, nlastip);
+                        }
+                    }
+                }
+            }
+        }
+#pragma endregion
+
+
         if (tp.status > 0)    // 如果online，更新显示图片
         {
             m_pTreeViewCrl->turn_item_image(tp.product_item, true);
         }
         else  // 替换offline的图片
         {
+            //如果设备不在线了，毛总的意思是Ping一次，确认是否在线;再次确认
             m_pTreeViewCrl->turn_item_image(tp.product_item, false);
         }
         if (g_selected_serialnumber == m_product.at(i).serial_number)
@@ -9529,6 +9638,7 @@ UINT _FreshTreeView(LPVOID pParam )
                 DFTrace(g_Print);
             }
             ReleaseMutex(Read_Mutex);//Add by Fance .
+            b_pause_refresh_tree = false;
             continue;
         }
 
@@ -12133,18 +12243,12 @@ CTemcoStandardBacnetToolDlg *BacnetTool_Window = NULL;;
 void CMainFrame::OnDatabaseBacnettool()
 {
 
-#ifdef DEBUG
-    //if (CM5_hThread != NULL)
-    //{
-    //    system_connect_info.mstp_status = 0;
-    //    TerminateThread(CM5_hThread, 0);
-    //    CM5_hThread = NULL;
-    //}
-    close_bac_com();
-    CBacnetTool dlg;
-    dlg.DoModal();
-    return;
-#endif // DEBUG
+//#ifdef DEBUG
+    //close_bac_com();
+    //CBacnetTool dlg;
+    //dlg.DoModal();
+    //return;
+//#endif // DEBUG
 
     CString CS_BacnetExplore_Path;
     CString ApplicationFolder;

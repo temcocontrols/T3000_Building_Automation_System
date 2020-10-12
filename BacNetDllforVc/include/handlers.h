@@ -219,6 +219,9 @@ __declspec(dllexport)    int rpm_ack_decode_service_request(
         uint8_t * apdu,
         int apdu_len,
         BACNET_READ_ACCESS_DATA * read_access_data);
+
+__declspec(dllexport) void set_bacnet_log_path(char *strpath);
+
     /* print the RP Ack data to stdout */
 __declspec(dllexport)    void rp_ack_print_data(
         BACNET_READ_PROPERTY_DATA * data);

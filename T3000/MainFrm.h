@@ -311,7 +311,7 @@ public:
 	void  Show_Wait_Dialog_And_SendConfigMessage();
     void  Show_Wait_Dialog_And_ReadBacnet(int ncontrol);
 	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
-
+    static DWORD WINAPI  Mul_Ping_Thread(LPVOID lpVoid);
     int m_read_control;   // 0 默认全部读取     1  读缓存的时候使用 ;
 	static DWORD WINAPI  Read_Bacnet_Thread(LPVOID lpVoid);
 	static DWORD WINAPI  Read_Modbus_10000(LPVOID lpVoid);
