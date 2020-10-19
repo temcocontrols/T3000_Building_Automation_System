@@ -39,7 +39,7 @@ namespace Yabe
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string []arguments)
         {
             // Load Embbeded dll
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
@@ -65,14 +65,14 @@ namespace Yabe
                 }
                 return null;
             };
-            Run();
+            Run(arguments);
         }
 
-        static void Run()
+        static void Run(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new YabeMainDialog());
+            Application.Run(new YabeMainDialog(args));
         }
     }
 }
