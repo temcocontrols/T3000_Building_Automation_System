@@ -177,6 +177,8 @@ set(BACNET_FILES
   ${BACNET_SOURCE_DIR}/BacnetVariable.cpp
   ${BACNET_SOURCE_DIR}/BacnetView.cpp
   ${BACNET_SOURCE_DIR}/BacnetWait.cpp
+  ${BACNET_SOURCE_DIR}/BacnetWeb.cpp
+  ${BACNET_SOURCE_DIR}/CWebBrowser2.cpp
   ${BACNET_SOURCE_DIR}/BacnetWeeklyRoutine.cpp
   ${BACNET_SOURCE_DIR}/Bacnet_Range_Msv.cpp
   ${BACNET_SOURCE_CM5_DIR}/BacNetProgram_transplant.cpp
