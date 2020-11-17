@@ -308,6 +308,11 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 	m_offline = FALSE;
 	CTime temp_time =  CTime::GetCurrentTime();
 	unsigned short this_year = temp_time.GetYear();
+
+    if (this_year % 4 == 0)
+        m_leap_year = 1;
+    else
+        m_leap_year = 0;
     if (product_register_value[7]==0 && (g_protocol == MODBUS_RS485 || g_protocol == MODBUS_TCPIP))
     {
 		m_offline = TRUE;
@@ -822,6 +827,8 @@ LRESULT AnnualRout_InsertDia::Fresh_Schedule_Day_Cal(WPARAM wParam,LPARAM lParam
 
 	for (int i=0;i<12;i++)
 	{
+        //MONTHDAYSTATE	pBacDayState
+            memset(&pBacDayState[i], 0, sizeof(MONTHDAYSTATE));
 		//pDayState[i] = (DWORD)g_DayState[annual_list_line]
 		//memset((void *)pDayState[i],0,sizeof(pDayState)/sizeof(pDayState[0]));
 
@@ -906,13 +913,21 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	{
 		current = current->next;
 	}
-
+    int Clicked_year = current->date.wYear;
+    m_leap_year = 0;
+    if (Clicked_year % 4 == 0)
+        m_leap_year = 1;
+    else
+        m_leap_year = 0;
     int Clicked_month = current->date.wMonth;
     int Clicked_day = current->date.wDay;
 
     m_month_ctrl.MONTHCAL_GetSelDay_Month(&Clicked_month, &Clicked_day);
 
-
+    if (Clicked_month > 12)
+        return;
+    if (Clicked_day > 31)
+        return;
 
     
 	if (m_offline)

@@ -54,7 +54,7 @@
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\T3000 Output\debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\T3000 Output\T3000 object\debug\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</EmbedManifest>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\T3000 object\release\</IntDir>
@@ -186,6 +186,7 @@
     <ClCompile Include="BacnetSettingBasicInfo.cpp" />
     <ClCompile Include="BacnetSettingDyndns.cpp" />
     <ClCompile Include="BacnetSettingHealth.cpp" />
+    <ClCompile Include="BacnetSettingParamter.cpp" />
     <ClCompile Include="BacnetSettingTcpip.cpp" />
     <ClCompile Include="BacnetSettingTime.cpp" />
     <ClCompile Include="BacnetThirdPartyMain.cpp" />
@@ -542,6 +543,7 @@
     <ClInclude Include="BacnetSettingBasicInfo.h" />
     <ClInclude Include="BacnetSettingDyndns.h" />
     <ClInclude Include="BacnetSettingHealth.h" />
+    <ClInclude Include="BacnetSettingParamter.h" />
     <ClInclude Include="BacnetSettingTcpip.h" />
     <ClInclude Include="BacnetSettingTime.h" />
     <ClInclude Include="BacnetThirdPartyMain.h" />

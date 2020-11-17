@@ -2164,6 +2164,15 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp_data.reg.hw_version =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 	my_temp_point= my_temp_point + 2;
 
+    if ((my_temp_point[0] == my_temp_point[1]) &&
+        (my_temp_point[0] == my_temp_point[2]) &&
+        (my_temp_point[0] == my_temp_point[3]) &&
+        (my_temp_point[0] != 0))
+    {
+        //如果谁回复的父节点信息 4个字节都相同就认为是和Airlab一样 有Bug ,将回复的父节点清零确保能够在Tree中显示出来;
+        my_temp_point[0] = 0;my_temp_point[1] = 0;my_temp_point[2] = 0;my_temp_point[3] = 0;
+    }
+
 	temp_data.reg.parent_serial_number =  ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 	my_temp_point= my_temp_point + 4;
 
@@ -4889,8 +4898,12 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
     CTStatScanner* pScan = (CTStatScanner*)(lpVoid);
     vector <_Bac_Scan_Com_Info> m_temp_com_data;
     vector <_Bac_Scan_results_Info> m_temp_result_data;
-
+    CppSQLite3DB SqliteDBBuilding;
+    CppSQLite3Table table;
+    CppSQLite3Query q;
     int n_count = 0;
+    CString strInfo1;
+    CString strInfo;
     while ((pScan->m_com_scan_end == false) && (n_count < 60))
     {
         n_count++;
@@ -4980,7 +4993,15 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
     int ret_results;
 
     bac_gloab_panel = 254; //扫描的时候 全局扫描，连接的时候就不用轮询那么多;
-    Initial_bac(temp_port,_T(""), n_mstp_baudrate);
+
+    bool init_ret = false;
+    Set_MSTP_Polling_Node(0);
+    init_ret = Initial_bac(temp_port,_T(""), n_mstp_baudrate);
+    if (init_ret == 0)
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Initial Bacnet MSTP com port failed!"));
+        goto end_mstp_thread;
+    }
     TRACE(_T("Now scan with COM%d\r\n"),temp_port);
     Sleep(5000);//等待几秒让MSTP 的token 运行起来.
     int last_poll_node = 0;
@@ -4995,7 +5016,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
         if ((Temp_MSTP_Port.SoleMaster == 1))
         {
             CString strInfo;
-            strInfo.Format(_T("No other master node exsit,please wait."));
+            strInfo.Format(_T("No response from device, please check the communication protocol and check the RS485 hardware connection."));
             memset(m_scan_info.at(scan_bacnet_ip_item).scan_notes, 0, 250);
             char temp_char[250];
             WideCharToMultiByte(CP_ACP, 0, strInfo.GetBuffer(), -1, temp_char, 250, NULL, NULL);
@@ -5034,8 +5055,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
 
         int ready_to_read_count =	m_bac_handle_Iam_data.size();
         m_temp_com_data = m_bac_handle_Iam_data;
-        CString strInfo1;
-        CString strInfo;
+
 
 
         strInfo1.Format(_T("Scan  Bacnet mstp.Found %d BACNET device relpy who is"),ready_to_read_count);
@@ -5111,9 +5131,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
 
 
 
-    CppSQLite3DB SqliteDBBuilding;
-    CppSQLite3Table table;
-    CppSQLite3Query q;
+
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 

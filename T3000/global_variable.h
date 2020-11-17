@@ -28,6 +28,7 @@ bool list_mouse_click = false;
 unsigned short multi_register_value[4096]={-1};
 unsigned short multi_register_value_tcp[10000]={-1};
 unsigned short product_register_value[20000]={-1};
+unsigned short product_register_sensor_flag[5] = { 0 };
 
 int product_type = 0;
 int old_product_type = 0;
@@ -2288,3 +2289,6 @@ int n_read_item_index = 0; // 读哪一个 例如Schedule3 的时间 ，不能用weekly_list 
 
 unsigned int DEBUG_DELAY_TIME = 0; //测试用调试Wifi 延迟时间;
 CString bacnet_string; // 待解析的字串
+
+
+

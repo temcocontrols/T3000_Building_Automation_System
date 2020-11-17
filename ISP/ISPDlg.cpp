@@ -1148,7 +1148,8 @@ afx_msg LRESULT CISPDlg::OnFlashBoot_Update_boot(WPARAM wParam, LPARAM lParam)
         else if (npid == PM_TSTAT8)
             g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_T8.hex");
         else if (npid == PM_TSTAT9)
-            g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_T9.hex");
+            return 1;
+            //g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_T9.hex");
         else 
             return 1;
         //g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_NB_rev1.hex");
@@ -2154,6 +2155,7 @@ void CISPDlg::FlashByEthernet()
         m_pFileBuffer=new char[c_nBinFileBufLen];
         memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
         nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
+
       //  ShowHexBinInfor(2);
         delete pBinFile;
         pBinFile = NULL;
@@ -2253,9 +2255,6 @@ void CISPDlg::FlashByEthernet()
     {
         CString strTips1 =_T("|Error: The file is not a properly formatted BIN file.");
         UpdateStatusInfo(strTips1, FALSE);
-        CString strTips2 =_T("|Please select another file.");
-        UpdateStatusInfo(strTips2, FALSE);
-        //AfxMessageBox(strTips1+strTips2, MB_OK);
     }
 
 //    delete pBinFile;
@@ -3075,7 +3074,8 @@ void CISPDlg::OnMenuCheckhex()
         memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
 
         int nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
-
+        if (nDataSize < 0)
+            return;
         CString strFilesize;
         strFilesize.Format(_T("Bin size=%d Bs"),nDataSize);
         GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);

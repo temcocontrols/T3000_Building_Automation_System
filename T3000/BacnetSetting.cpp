@@ -18,6 +18,7 @@
 #include "ShowMessageDlg.h"
 #include "BacnetTstatSchedule.h"
 #include "BacnetRemotePortWarning.h"
+
 // CBacnetSetting dialog
 extern HTREEITEM  hTreeItem_retry;
 extern bool cancle_send ;
@@ -262,7 +263,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         }
 
 
-        //硬件版本大于 26 代表是arm的版本. 
+        //硬件版本大于 26 代表是arm的版本.
         if (Device_Basic_Setting.reg.pro_info.harware_rev >= 26)
         {
             m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(FALSE);
@@ -995,10 +996,18 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                     CString cs_pc_time;
                     CString panel_time;
                     Time32toCString(Device_time.new_time.n_time, panel_time);
+//#ifdef DEBUG
+//
+//                    CString temp_test;
+//                    temp_test.Format(_T("%u"), Device_time.new_time.n_time);
+//                    MessageBox(temp_test);
+//#endif // DEBUG
+
+                    
                     Time32toCString(temp_time_long, cs_pc_time);
 
                     CString temp_message;
-                    temp_message.Format(_T("This device is set to automatically synchronize with a locally connected computer.\r\nAre you sure you want to sync to your PC?\r\n%s (Device's Time) \r\n%s (PC's Time) \r\n"), panel_time, cs_pc_time);
+                    temp_message.Format(_T("This device is set to automatically synchronize with a locally connected computer.\r\nAre you sure you want to sync to your PC?\r\n%s (Current Time) \r\n%s (New Time) \r\n"), panel_time, cs_pc_time);
                     dlg.SetStaticText(temp_message);
                     //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
                     dlg.SetStaticTextColor(RGB(0, 0, 255));
@@ -1052,7 +1061,22 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
             else if (Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
-                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
+            {
+                CTime	temptimevalue;
+                time_t temp_t_time;
+                temp_t_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
+                temptimevalue = temp_t_time;
+                int temp_month =temptimevalue.GetMonth();
+                int temp_day = temptimevalue.GetDay();
+                int day_of_year = temp_month * 30 + temp_day;
+                if ((day_of_year > 135) && (day_of_year < 255))
+                {
+                    scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
+                }
+                else
+                    scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt ; //如果选中夏令时 需要显示的时候加一个小时
+                
+            }
             else
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
             //TimeTemp = scale_time + computer_DaylightBias; //20200525
@@ -1238,23 +1262,25 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 	{
 	case TIMER_SYNC_TIMER:
 		{
-			   ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SETTING);
-			   KillTimer(TIMER_SYNC_TIMER);
-               //判断同步结果是否成功
-               if(Device_Basic_Setting.reg.sync_time_results != 1)
-			   {
-				   MessageBox(_T("SYNC time failed , No Reply from server"));
-			   }
-			   else
-			   {
-				   CTime time_scaletime;
-				   CString strTime;
-				   time_t scale_time  = Device_Basic_Setting.reg.time_update_since_1970;
-				   time_scaletime = scale_time;
-				   strTime = time_scaletime.Format("%y/%m/%d %H:%M:%S");
-				    SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("SYNC time sucess")); 
-					((CEdit *)m_page_time.GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(strTime);
-			   }
+               KillTimer(TIMER_SYNC_TIMER);
+               if (GetPrivateData_Blocking(g_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
+               {
+                   //判断同步结果是否成功
+                   if (Device_Basic_Setting.reg.sync_time_results != 1)
+                   {
+                       MessageBox(_T("SYNC time failed , No Reply from server"));
+                   }
+                   else
+                   {
+                       CTime time_scaletime;
+                       CString strTime;
+                       time_t scale_time = Device_Basic_Setting.reg.time_update_since_1970;
+                       time_scaletime = scale_time;
+                       strTime = time_scaletime.Format("%y/%m/%d %H:%M:%S");
+                       SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("SYNC time sucess"));
+                       ((CEdit *)m_page_time.GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(strTime);
+                   }
+               }
                m_page_time.GetDlgItem(IDC_BUTTON_SYNC_TIME)->EnableWindow(TRUE);
 
 		}

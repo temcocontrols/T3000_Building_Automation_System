@@ -40,20 +40,41 @@ int CBinFileParser::GetBinFileBuffer(char* pFileBuf, int nFileBufLen)
         {
             if (linenum==1)
             {
+                CString temp_identify;
+                //判断AXIS 0x100位置
+
+                //判断ESP8266 0x200位置
+
                 m_strASIX.Format(_T("%C%C%C%C"),pBuf[0],pBuf[1],pBuf[2],pBuf[3]);
-                for (int i=0; i<20; i++) //固定长度20个
+                if (m_strASIX.CompareNoCase(_T("ASIX") ) == 0)
                 {
-                    if (pBuf[256+i]!=0)
+                    for (int i = 0; i<20; i++) //固定长度20个
                     {
-                        CString temp;
-                        temp.Format(_T("%C"),pBuf[256+i]);
-                        m_strProductName+=temp;
-                    }
-                    else
-                    {
-                        break;
+                        if (pBuf[256 + i] != 0)
+                        {
+                            CString temp;
+                            temp.Format(_T("%C"), pBuf[256 + i]);
+                            m_strProductName += temp;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
+                else //在去0x200位置判断是不是ESP8266的固件;
+                {
+                    	MultiByteToWideChar( CP_ACP, 0, (char *)(&pBuf[512]),20,temp_identify.GetBuffer(MAX_PATH), MAX_PATH );
+                        temp_identify.ReleaseBuffer();
+                        if (temp_identify.Find(_T("Temco")) != -1)
+                            m_strProductName = temp_identify;
+                        else
+                        {
+                            m_strProductName.Empty();
+                            return -1;
+                        }
+                }
+
                 // m_strProductName.Format(_T("%C%C%C%C%C%C%C%C%C%C%C%C"),pBuf[256+0],pBuf[256+1],pBuf[256+2],pBuf[256+3],pBuf[256+4],pBuf[256+5],pBuf[256+6],pBuf[256+7],pBuf[256+8],pBuf[256+9],pBuf[256+10],pBuf[256+11]);
             }
 

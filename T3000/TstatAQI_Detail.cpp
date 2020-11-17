@@ -170,7 +170,7 @@ void CTstatAQI_Detail::OnLButtonDown(UINT nFlags, CPoint point)
     //CString temp1;
     //temp1.Format(_T("%d,%d"), point.x, point.y);
     //MessageBox(temp1);
-    if ((point.x >= (aqi_picture_x - 23)) && (point.y <= 23))
+    if ((point.x >= (aqi_picture_x - 43)) && (point.y <= 23))
     {
         PostMessage(WM_CLOSE, NULL, NULL);
     }

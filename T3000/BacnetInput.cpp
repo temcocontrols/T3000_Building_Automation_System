@@ -1312,6 +1312,8 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else if(lCol == INPUT_RANGE)
 	{
+        if (g_selected_product_id == PM_TSTAT_AQ)
+            return;;
         m_dialog_signal_type = 0xff;
 		BacnetRange dlg;
 

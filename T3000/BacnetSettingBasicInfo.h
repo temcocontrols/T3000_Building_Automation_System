@@ -46,4 +46,6 @@ public:
     virtual BOOL OnInitDialog();
     afx_msg void OnBnClickedRadioSettingLcdDelayOff();
     afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+    afx_msg void OnBnClickedButtonLcdSetting();
+
 };

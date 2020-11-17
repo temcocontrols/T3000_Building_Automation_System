@@ -844,7 +844,7 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
 		if (!pFrame->m_product.at(i).status)
 		{
 			CString strSql;
-			strSql.Format(_T("Delete from ALL_NODE Where Serial_ID = '%d' "), pFrame->m_product.at(i).serial_number);
+			strSql.Format(_T("Delete from ALL_NODE Where Serial_ID = '%u' "), pFrame->m_product.at(i).serial_number);
 			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 		}
 	}
@@ -852,7 +852,7 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
 	ReloadAddBuildingDB();
 	m_bChanged = TRUE;
 
-	AfxMessageBox(L"Delete all off line devices ,successfully!");
+	AfxMessageBox(L"Delete all offline devices ,success!");
 
 
 }

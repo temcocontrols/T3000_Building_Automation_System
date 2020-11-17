@@ -80,7 +80,7 @@ bool thread2_run_flag = 1;
 
 static unsigned char source_addr[255] = { 0 };
 static unsigned char source_addr_count = 0;
-
+unsigned char mstp_polling_node = 0;
 /* Timer that indicates line silence - and functions */
 static uint32_t Timer_Silence(
     void *pArg)
@@ -711,6 +711,13 @@ void dlmstp_get_broadcast_address(
       *ncount = source_addr_count;
   }
 
+  void Set_MSTP_Polling_Node(unsigned char node)
+  {
+      if (node > 2)
+          node = node - 2;
+      mstp_polling_node = node;
+  }
+
 
   unsigned long  Get_Thread1()
   {
@@ -755,6 +762,7 @@ bool dlmstp_init(
     MSTP_Port.OutputBufferSize = sizeof(TxBuffer);
     MSTP_Port.SilenceTimer = Timer_Silence;
     MSTP_Port.SilenceTimerReset = Timer_Silence_Reset;
+    MSTP_Port.This_Station = 0;
     MSTP_Init(&MSTP_Port);
 #if 0
     uint8_t data;

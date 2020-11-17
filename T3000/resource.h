@@ -329,8 +329,8 @@
 #define IDD_DIALOG_AQI                  758
 #define IDD_DIALOG_BACNET_PROPERTY      760
 #define IDD_DIALOG_FIRMWARE_AUTO_CAL    762
-#define IDD_DIALOG18                    764
 #define IDD_DIALOG_WEB                  764
+#define IDD_DIALOG_BACNET_SETTING_LCD_PARAMETER 766
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -759,6 +759,7 @@
 #define IDC_COMBO_SETTING_CO2           1129
 #define IDC_COMBO_MSTP_MODBUS           1129
 #define IDC_COMBO_CO2_NODE_PROTOCOL     1129
+#define IDC_COMBO_NUMBER                1129
 #define IDC_POWERMODELCOMBO             1130
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
@@ -2483,6 +2484,7 @@
 #define IDC_STATIC_SOUND_VALUE          2504
 #define IDC_STATIC_SOUND                2505
 #define IDC_BUTTON_EMAIL_ALARM          2506
+#define IDC_STATIC_OCC_STATUS           2506
 #define IDC_EDIT_SMTP_SERVER            2507
 #define IDC_EDIT_PORT_NUMBER            2508
 #define IDC_EDIT_EMAIL                  2509
@@ -2550,6 +2552,10 @@
 #define IDC_BUTTON_WEB_TEST             2568
 #define IDC_EDIT_OBJ_INSTANCE2          2569
 #define IDC_EDIT_DEVICE_ID              2569
+#define IDC_LIST_AIRLAB                 2573
+#define IDC_BUTTON_LCD_SETTING          2574
+#define IDC_RADIO_LCD_DEFAULT           2575
+#define IDC_RADIO_CUS_DEF               2576
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3111,9 +3117,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        766
+#define _APS_NEXT_RESOURCE_VALUE        768
 #define _APS_NEXT_COMMAND_VALUE         34077
-#define _APS_NEXT_CONTROL_VALUE         2569
+#define _APS_NEXT_CONTROL_VALUE         2577
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

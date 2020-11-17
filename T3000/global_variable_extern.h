@@ -36,6 +36,7 @@ extern CString CurrentT3000Version;
 extern BOOL g_SelectChanged;
 //Fance_4
 extern unsigned short product_register_value[20000];
+extern unsigned short product_register_sensor_flag[5] ;
 extern int product_type ;
 extern int old_product_type;
 extern HWND      m_building_config_hwnd;
@@ -1291,4 +1292,5 @@ extern int n_read_list_flag ; // 读取那一个，例如读Input 还是Output
 extern int n_read_item_index ; // 读哪一个 例如Schedule3 的时间 ，不能用weekly_list 因为界面上的容易变。
 extern unsigned int DEBUG_DELAY_TIME ; //测试用调试Wifi 延迟时间;
 extern CString bacnet_string; // 待解析的字串
+
 

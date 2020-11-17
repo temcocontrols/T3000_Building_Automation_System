@@ -6051,7 +6051,7 @@ void CT3000View::FreshCtrl()
             Time32toCString(temp_time_long, cs_pc_time , product_register_value[7]);
 
             CString temp_message;
-            temp_message.Format(_T("This device is set to automatically synchronize with a locally connected computer.\r\nDo you want to synchronize it?\r\n%s (Device's Time) \r\n%s (PC's Time) \r\n"), panel_time, cs_pc_time);
+            temp_message.Format(_T("This device is set to automatically synchronize with a locally connected computer.\r\nDo you want to synchronize it?\r\n%s (Device's Time) \r\n%s (New Time) \r\n"), panel_time, cs_pc_time);
             dlg.SetStaticText(temp_message);
             //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
             dlg.SetStaticTextColor(RGB(0, 0, 255));

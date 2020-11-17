@@ -174,7 +174,7 @@ bool MSTP_Line_Active(
 {
     return (mstp_port->EventCount > Nmin_octets);
 }
-
+ extern unsigned char mstp_polling_node ;
 uint16_t MSTP_Create_Frame(
     uint8_t * buffer,   /* where frame is loaded */
     uint16_t buffer_len,        /* amount of space available */
@@ -911,8 +911,8 @@ bool MSTP_Master_Node_FSM(
         case MSTP_MASTER_STATE_INITIALIZE:
             /* DoneInitializing */
             /* indicate that the next station is unknown */
-            mstp_port->Next_Station = mstp_port->This_Station;
-            mstp_port->Poll_Station = mstp_port->This_Station;
+            mstp_port->Next_Station = mstp_polling_node;// mstp_port->This_Station;
+            mstp_port->Poll_Station = mstp_polling_node;//mstp_port->This_Station;
             /* cause a Poll For Master to be sent when this node first */
             /* receives the token */
             mstp_port->TokenCount = Npoll;
@@ -1528,6 +1528,7 @@ void MSTP_Init(
         mstp_port->Index = 0;
         mstp_port->Next_Station = mstp_port->This_Station;
         mstp_port->Poll_Station = mstp_port->This_Station;
+
         mstp_port->ReceivedInvalidFrame = false;
         mstp_port->ReceivedValidFrame = false;
         mstp_port->ReceivedValidFrameNotForUs = false;

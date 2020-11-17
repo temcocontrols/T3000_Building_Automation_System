@@ -363,6 +363,12 @@ test1.k_updatedAt.KeyName, test1.k_updatedAt.tValue.cs_value);
 void CDebugWindow::OnBnClickedButtonWebTest()
 {
     // TODO: 在此添加控件通知处理程序代码
+    mul_ping_flag = false; //关闭 ping 的命令;
+    for (int j = 1; j < 254; j++)
+    {
+        g_ipaddress_info.ip_status[j] = 0;
+    }
+    DFTrace(_T("Close Ping thread success!!"));
 #ifdef DEBUG
     CBacnetWeb testweb;
     testweb.DoModal();

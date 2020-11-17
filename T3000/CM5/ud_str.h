@@ -785,6 +785,26 @@ typedef union
 	}Clk;
 }UN_Time;
 
+
+typedef union
+{
+    uint8_t lcddisplay[7];
+    struct
+    {
+        uint8_t display_type; // 0:使用原来显示的温度    1：modbus 方式自定义显示的格式
+        Point_Net npoint;     //用来描述是input output var 的结构
+    }lcd_mod_reg;
+
+    struct
+    {
+        uint8_t display_type; // 0:使用原来显示的温度    2：Bacnet 自定义的显示的格式
+        unsigned int obj_instance;
+        uint8_t point_type;
+        uint8_t point_number;
+    }lcd_bac_reg;
+
+}lcdconfig;
+
 typedef union
 {
 	uint8_t all[400];
@@ -860,7 +880,7 @@ typedef union
                                      // bit 1 PT100
          unsigned char uart_parity[3];
          unsigned char uart_stopbit[3];   //总共253
-
+         lcdconfig display_lcd;
 	}reg;
 }Str_Setting_Info;
 

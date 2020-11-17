@@ -721,6 +721,7 @@ void CMainFrame::ShowSplashWnd(int nMillisecond)
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
         return -1;
     CString temp_bacnet_logfile;
@@ -2044,27 +2045,7 @@ void CMainFrame::LoadProductFromDB()
 
 
 						strSql=q.getValuebyName(L"Serial_ID");
-
-						long temp_serial_id = (long)(_wtoi64(strSql));
 						unsigned int correct_id = (DWORD)(_wtoi64(strSql));
-						//用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
-						if(temp_serial_id < 0)
-						{
-							CString wrong_serial_id;
-							wrong_serial_id = strSql;
-							CString correct_serial_id;
-							CString str_temp;
-							correct_serial_id.Format(_T("%u"),correct_id);
-							try
-							{
-								str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
-								SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
-							}
-							catch(_com_error *e)
-							{
-								AfxMessageBox(e->ErrorMessage());
-							}
-						}
 						m_product_temp.serial_number= correct_id;
 
                         if (hParent != NULL)
@@ -6067,7 +6048,7 @@ void CMainFrame::OnDestroy()
     g_mstp_flag = false;
     b_statusbarthreadflag = FALSE; //close the status bar thread;
     OnDisconnect();
-	g_mstp_flag=FALSE;
+
 
 #if 1
 	CppSQLite3DB SqliteDBBuilding;
@@ -6190,7 +6171,7 @@ void CMainFrame::OnDestroy()
 				}
 
 		}
-        g_mstp_flag = false;
+
         //if (CM5_hThread != NULL)
         //{
         //    system_connect_info.mstp_status = 0;
@@ -7073,7 +7054,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                 else
                                 {
                                     n_wifi_connection = true; //关闭后台刷新;
-                                    SEND_COMMAND_DELAY_TIME = DEBUG_DELAY_TIME;
+                                    SEND_COMMAND_DELAY_TIME = 350;// DEBUG_DELAY_TIME;
                                     SetResponseTime(SEND_COMMAND_DELAY_TIME);
                                 }
                                 
@@ -7573,7 +7554,15 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 if (initial_bip == false)
                 {
-                    Initial_bac(0, selected_product_Node.NetworkCard_Address);
+
+                    bool intial_ret = false;
+                    intial_ret = Initial_bac(0, selected_product_Node.NetworkCard_Address);
+                    if (intial_ret == false)
+                    {
+                        MessageBox(_T("Failed to initialize Bacnet MSTP serial port information. Please try again"));
+                        return;
+                    }
+                    
                     initial_bip = true;
                     Sleep(50);
                     Send_WhoIs_Global(-1, -1);
@@ -7611,6 +7600,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     {
                         int init_ret = 0;
                         //m_bac_handle_Iam_data.clear();
+                        Set_MSTP_Polling_Node(selected_product_Node.panel_number);
                         init_ret = Initial_bac(selected_product_Node.ncomport, _T(""), selected_product_Node.baudrate);
                         if (init_ret == 0)
                         {
@@ -7624,7 +7614,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
                     TempDlg.SetStaticTextColor(RGB(0, 0, 255));
                     TempDlg.SetStaticTextSize(25, 20);
-                    TempDlg.SetProgressAutoClose(250, 100, EVENT_MSTP_CONNECTION_ESTABLISH);
+                    TempDlg.SetProgressAutoClose(500, 120, EVENT_MSTP_CONNECTION_ESTABLISH);
 
                     _Bac_Scan_Com_Info tempinfo;
                     tempinfo.device_id = g_mstp_deviceid;
@@ -8108,6 +8098,11 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                                 Sleep(SEND_COMMAND_DELAY_TIME);
                         }
                         g_tstat_id_changed = FALSE;
+                        int read_ret = 0;
+                        read_ret = Read_Multi(g_tstat_id, product_register_sensor_flag, 65000, 3, 5);
+
+                        
+
                         register_critical_section.Unlock();
                     }
                     else
@@ -9091,6 +9086,23 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
             product_class_id.Format(_T("%u"),m_refresh_net_device_data.at(y).product_id);
 
 			CppSQLite3Query query_serial;
+
+            //删掉 存在的序列号
+            try
+            {
+
+                CString strSql;
+
+                strSql.Format(_T("Delete  from ALL_NODE where Serial_ID='%s'"), str_serialid);
+                SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+            }
+            catch (...)
+            {
+
+            }
+
+
+
 			strSql.Format(_T("select * from ALL_NODE where Serial_ID='%s'"), str_serialid);
 
 			query_serial = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
@@ -9582,9 +9594,7 @@ UINT _FreshTreeView(LPVOID pParam )
 
 		}
 #endif
-//#ifdef DEBUG
-//        return 0;
-//#endif // DEBUG
+
 
 
 		if(scaning_mode)
@@ -11807,6 +11817,7 @@ void CMainFrame::OnControlSettings()
             && 
             (product_type == PM_MINIPANEL  ||
 		     product_type == PM_MINIPANEL_ARM  ||
+             //product_type == PM_TSTAT_AQ ||
              product_type == PM_TSTAT10)
 			
 			) )

@@ -23,7 +23,7 @@
 #include "..\BravocontrolAPI\BravocontrolAPI\HttpAPI\HttpAPI.h"
 #endif
 #ifdef DEBUG
-#define USE_THIRD_PARTY_FUNC 1
+//#define USE_THIRD_PARTY_FUNC 1
 #endif // DEBUG
 
 

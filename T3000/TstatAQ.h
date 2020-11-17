@@ -2,7 +2,8 @@
 #include "afxwin.h"
 
 #include "CM5\CStatic\staticex.h"
-
+#include "afxcmn.h"
+#include "CM5/ListCtrlEx.h"
 // CTstatAQ ¥∞ÃÂ ”Õº
 
 class CTstatAQ : public CFormView
@@ -53,7 +54,27 @@ public:
     CStaticEx m_aqi_title;
     CStaticEx m_static_info;
     afx_msg void OnBnClickedButtonAutoCal();
+
+    ListCtrlEx::CListCtrlEx m_airlab_list;
+    void Initial_List();
+    afx_msg LRESULT Fresh_Airlab_Item(WPARAM wParam, LPARAM lParam);
+    afx_msg void OnTimer(UINT_PTR nIDEvent);
+    afx_msg LRESULT  AirlabMessageCallBack(WPARAM wParam, LPARAM lParam);
 };
+#define AIRLAB_TYPE    0
+#define AIRLAB_VALUE   1
+#define AIRLAB_UNIT    2
+#define AIRLAB_TRIGGER 3
+#define AIRLAB_TIME    4
+#define AIRLAB_TIME_LEFT 5
+#define AIRLAB_ALARM   6
+#define AIRLAB_MAX_COUNT 7
+
+
+const int AIRLAB_CO2 = 0;
+const int AIRLAB_OCC = 1;
+const int AIRLAB_SOUND = 2;
+const int AIRLAB_LIGHT = 3;
 
 const COLORREF AQI_Info_Status_Color[] =
 {
@@ -95,6 +116,30 @@ const int TSTAT_AQ_INDEX_2_5 = 765;
 const int TSTAT_AQ_INDEX_4 = 766;
 const int TSTAT_AQ_INDEX_10 = 767;
 const int TSTAT_AQ_LIGHT = 628;
+
+
+
+const int TSTAT_AQ_SOUND_TRIGGER = 613;
+const int TSTAT_AQ_SOUND_TIMER = 614;
+const int TSTAT_AQ_SOUND_ALARM_ON = 615;
+const int TSTAT_AQ_SOUND_COUNT_DOWN = 616;
+
+const int TSTAT_AQ_LIGHT_TRIGGER = 617;
+const int TSTAT_AQ_LIGHT_TIMER = 618;
+const int TSTAT_AQ_LIGHT_ALARM_ON = 619;
+const int TSTAT_AQ_LIGHT_COUNT_DOWN = 620;
+
+const int TSTAT_AQ_OCC_VALUE = 630;
+const int TSTAT_AQ_OCC_TRIGGER = 633;
+const int TSTAT_AQ_OCC_TIMER = 634;
+const int TSTAT_AQ_OCC_ALARM_ON = 635;
+const int TSTAT_AQ_OCC_COUNT_DOWN = 636;
+
+const int TSTAT_AQ_CO2_TRIGGER = 621;
+const int TSTAT_AQ_CO2_TIMER = 622;
+const int TSTAT_AQ_CO2_ALARM_ON = 623;
+const int TSTAT_AQ_CO2_COUNT_DOWN = 624;
+
 const int TSTAT_AQ_SOUND = 640;
 const int TATAT_AQ_CO2_ON = 1009;
 const int TATAT_AQ_CO2_OFF = 1010;

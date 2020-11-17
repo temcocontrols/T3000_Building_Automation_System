@@ -777,6 +777,9 @@
     <ClCompile Include="BacnetWeb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BacnetSettingParamter.cpp">
+      <Filter>Bacnet\Setting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -1961,6 +1964,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetWeb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetSettingParamter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

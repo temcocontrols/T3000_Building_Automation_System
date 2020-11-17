@@ -250,7 +250,7 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
         }
         else if (mparent->mevent == EVENT_MSTP_CONNECTION_ESTABLISH)
         {
-            for (int i = 0; i<60; i++)
+            for (int i = 0; i<90; i++)
             {
                 if (mparent->m_exit_by_hands)
                     break;
@@ -275,7 +275,7 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
                 {
                     Get_MSTP_STRUCT(&Temp_MSTP_Port);
                     Sleep(200);
-                    mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Des node %d\r\nNo other master node exsit,please wait.\r\nScanning"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
+                    mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Des node %d\r\nNo response from device\r\nPlease check the communication protocol and check the RS485 hardware connection\r\nScanning"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
                     CString temp_net;
                     for (int i = 0; i < temp_wait_count; i++)
                     {
@@ -296,6 +296,12 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
                     if ((mparent->m_mstp_device_info.device_id == m_bac_handle_Iam_data.at(j).device_id) /*&&
                         (mparent->m_mstp_device_info.macaddress == m_bac_handle_Iam_data.at(j).macaddress)*/)   //暂时拿掉 pannal number的 核对，茶洗说不是一一对应了
                     {
+                        g_progress_persent = 33;
+                        Sleep(200);
+                        g_progress_persent = 66;
+                        Sleep(200);
+                        g_progress_persent = 100;
+                        Sleep(200);
                         mstp_read_result = true;  // 读值成功;收到返回I am 设备;
                         ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
                         hShowMessageHandle = NULL;
@@ -365,8 +371,13 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
             {
                 if (mparent->cprotocol_sub_device)
                 {
+                    Sleep(1);
                     //这里要做很多特殊情况处理 ，例如母设备下的   总线上还有没有其他mstp设备在运行;
-                    //SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), temp_protocol, get_serialnumber());
+                    //先把这个子节点的信息更改
+                    if (Bacnet_Private_Device(selected_product_Node.product_class_id))
+                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), PROTOCOL_MB_TCPIP_TO_MB_RS485, g_selected_serialnumber);
+                    else
+                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_TCPIP, g_selected_serialnumber);
                 }
                 else //
                 {
@@ -385,8 +396,17 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
             {
                 if (mparent->cprotocol_sub_device) //BIP下的mstp
                 {
+                    Sleep(1);
                     //这里要做很多特殊情况处理 ，例如母设备下的   总线上还有没有其他mstp设备在运行;
-                    //SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), temp_protocol, get_serialnumber());
+                    if (selected_product_Node.note_parent_serial_number != 0)
+                    {
+                        //挂在父节点下面的,更改协议成MSTP ，如果自己本身是T3控制器 就直接用MSTP的协议
+                        if(Bacnet_Private_Device(selected_product_Node.product_class_id))
+                            SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, selected_product_Node.serial_number);
+                        else
+                            SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS, selected_product_Node.serial_number);
+                    }
+                    
                 }
                 else //单纯的 mstp 协议 
                 {
@@ -421,12 +441,25 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
             mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
             Sleep(1000);
 
+            if (selected_product_Node.note_parent_serial_number != 0)
+            {
+                CString temp_product;
+                temp_product = GetProductName(selected_product_Node.product_class_id);
+                mparent->static_text.Format(_T("%s protocal and baudrate changed success"), temp_product);
+                Sleep(1000);
+                mparent->static_text.Format(_T("The controller's protocol and baud rate also need to be changed to communicate properly"));
+                Sleep(2000);
+            }
+
+
 failed_path:
             pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
             pFrame->PostMessage(WM_MYMSG_REFRESHBUILDING, 0, 0);
             mparent->PostMessage(WM_CLOSE, NULL, NULL);
-            pFrame->SetTimer(5, 2000, NULL);
-
+            if (selected_product_Node.note_parent_serial_number == 0)
+            {
+                pFrame->SetTimer(5, 2000, NULL);
+            }
         }
         else if (mparent->mevent == EVENT_WARNING_CHANGE_PROTOCOL_BAUDRATE)
         {

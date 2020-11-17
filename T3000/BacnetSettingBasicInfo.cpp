@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 #include "BacnetSettingHealth.h"
+#include "BacnetSettingParamter.h"
 #include "MainFrm.h"
 // CBacnetSettingBasicInfo 对话框
 
@@ -83,6 +84,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingBasicInfo, CDialogEx)
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_NODES_LABEL_SETTING, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingNodesLabelSetting)
 
     ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_DELAY_OFF, &CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdDelayOff)
+    ON_BN_CLICKED(IDC_BUTTON_LCD_SETTING, &CBacnetSettingBasicInfo::OnBnClickedButtonLcdSetting)
 END_MESSAGE_MAP()
 
 
@@ -377,7 +379,6 @@ BOOL CBacnetSettingBasicInfo::PreTranslateMessage(MSG* pMsg)
 BOOL CBacnetSettingBasicInfo::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
-
     // TODO:  在此添加额外的初始化
 
     return false;  // return TRUE unless you set the focus to a control
@@ -386,3 +387,9 @@ BOOL CBacnetSettingBasicInfo::OnInitDialog()
 
 
 
+void CBacnetSettingBasicInfo::OnBnClickedButtonLcdSetting()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CBacnetSettingParamter Dlg;
+    Dlg.DoModal();
+}

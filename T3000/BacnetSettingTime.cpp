@@ -174,7 +174,22 @@ void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
         if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
             scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
         else if (Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
-            scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
+        {
+            CTime	temptimevalue;
+            time_t temp_t_time;
+            temp_t_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
+            temptimevalue = temp_t_time;
+            int temp_month = temptimevalue.GetMonth();
+            int temp_day = temptimevalue.GetDay();
+            int day_of_year = temp_month * 30 + temp_day;
+            if ((day_of_year > 135) && (day_of_year < 255))
+            {
+                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
+            }
+            else
+                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; //如果选中夏令时 需要显示的时候加一个小时
+        }
+            
         else
             scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
 

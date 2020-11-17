@@ -223,6 +223,10 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
         WritePrivateProfileStringW(_T("Data"), _T("Command"), _T("1"), AutoFlashConfigPath);
         if (m_product_isp_auto_flash.BuildingInfo.strIp.IsEmpty() ||
             (m_product_isp_auto_flash.baudrate == 19200) ||
+            (m_product_isp_auto_flash.baudrate == 9600) ||
+            (m_product_isp_auto_flash.baudrate == 38400) ||
+            (m_product_isp_auto_flash.baudrate == 57600) ||
+            (m_product_isp_auto_flash.baudrate == 76800) ||
             (m_product_isp_auto_flash.baudrate == 115200))//´®¿Ú
         {
             CString temp_baudrate;

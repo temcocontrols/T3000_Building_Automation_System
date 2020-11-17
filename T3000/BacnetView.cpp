@@ -2390,13 +2390,19 @@ void CDialogCM5_BacNet::Fresh()
         else
         {
             //m_bac_handle_Iam_data.clear();
-            Initial_bac(g_gloab_bac_comport, _T(""), g_gloab_bac_baudrate);
+            bool intial_ret = false;
+            intial_ret = Initial_bac(g_gloab_bac_comport, _T(""), g_gloab_bac_baudrate);
+            if (intial_ret == false)
+            {
+                MessageBox(_T("Failed to initialize Bacnet MSTP serial port information. Please try again"));
+                return;
+            }
             CShowMessageDlg TempDlg;
             TempDlg.SetStaticText(_T("Establishing Bacnet MSTP connection , please wait!"));
             //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
             TempDlg.SetStaticTextColor(RGB(0, 0, 255));
             TempDlg.SetStaticTextSize(25, 20);
-            TempDlg.SetProgressAutoClose(250, 100, EVENT_MSTP_CONNECTION_ESTABLISH);
+            TempDlg.SetProgressAutoClose(500, 120, EVENT_MSTP_CONNECTION_ESTABLISH);
 
             _Bac_Scan_Com_Info tempinfo;
             tempinfo.device_id = g_mstp_deviceid;
@@ -2562,10 +2568,10 @@ void CDialogCM5_BacNet::Fresh()
 	}
 	if(!offline_mode)
 	{
-        //if(selected_product_Node.software_version >= 52.8)
+        if(selected_product_Node.software_version >= 52.8)
             MODE_SUPPORT_PTRANSFER = 1;
-        //else
-        //    MODE_SUPPORT_PTRANSFER = 0;
+        else
+            MODE_SUPPORT_PTRANSFER = 0;
         ret = 1;
         if (MODE_SUPPORT_PTRANSFER != 1)  //Ptransfer 模式下直接用47808端口访问 T3或者带Wifi的设备;
         {
@@ -6750,7 +6756,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
          int nmultyRet2 = Read_Multi(g_tstat_id, &read_data_low[0], temp_low, 1, 3);
          if ((nmultyRet >=0) && (nmultyRet2 >= 0))
          {
-             temp_object_instance = read_data[temp_high] * 65536 + read_data[temp_low];
+             temp_object_instance = read_data_high[0] * 65536 + read_data_low[0];
              g_bac_instance = temp_object_instance;
             
          }
@@ -7041,7 +7047,7 @@ DWORD WINAPI Handle_Bip_whois_Thread(LPVOID lpvoid)
 
 void intial_bip_socket()
 {
-    if (initial_bip == false)
+    if (1/*initial_bip == false*/)
     {
 
         g_gloab_bac_comport = 0;
@@ -7070,8 +7076,8 @@ Device IP : %s \r\n"), selected_product_Node.NetworkCard_Address, selected_produ
 
         if (g_bac_instance > 0)
         {
-            Send_WhoIs_Global(g_bac_instance, g_bac_instance);
-            Sleep(300);
+            Send_WhoIs_Global(-1, -1);
+            Sleep(1000);
         }
     }
     else

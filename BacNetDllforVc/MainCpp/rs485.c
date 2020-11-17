@@ -495,9 +495,16 @@ void RS485_Check_UART_Data(
         /* check for data */
         if (!ReadFile(RS485_Handle, lpBuf, sizeof(lpBuf), &dwRead, NULL)) {
             if (GetLastError() != ERROR_IO_PENDING) {
-			//	int tempa = GetLastError();
+				int temp_error = GetLastError();
+                if (temp_error == 995) // (995)- 由于线程退出或应用程序请求，已放弃 I/O 操作。
+                {
+                    DWORD lpErrors = 0;
+                    COMSTAT lpStat = { 0 };
+                    ClearCommError(RS485_Handle, &lpErrors, &lpStat);
+                }
+
                 mstp_port->ReceiveError = TRUE;
-			//	PurgeComm(RS485_Handle, PURGE_TXABORT| PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//每次读都清空一次，多次调用后会触发错误,重叠模式
+				//PurgeComm(RS485_Handle, PURGE_TXABORT| PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//每次读都清空一次，多次调用后会触发错误,重叠模式
 			//	RS485_Cleanup();//Fance 添加，原来没有
 			//	 RS485_Initialize();//Fance 添加，原来没有
             }

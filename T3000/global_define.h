@@ -997,6 +997,14 @@ const CString Com_Parity_bit[] =
     _T("Even")
 };
 
+
+const CString DisplayType[] =
+{
+    _T("Output"),
+    _T("Input"),
+    _T("Variable")
+};
+
 const CString Com_Stop_bit[] =
 {
     _T("1"),
@@ -1963,7 +1971,7 @@ typedef struct
 const int day_of_month[] =
 {
 	31,
-	28,
+	29,
 	31,
 	30,
 	31,
@@ -1975,6 +1983,7 @@ const int day_of_month[] =
 	30,
 	31
 };
+
 
 const int day_in_this_year[] =
 {
@@ -2395,3 +2404,20 @@ const CString Airlab_Unit_String[] =
     _T("dB"),
     _T("Lux")
 };
+
+
+#define SENSOR_BIT_WIFI          0
+#define SENSOR_BIT_10K_TEMP      1
+#define SENSOR_BIT_HUM           2
+#define SENSOR_BIT_OCC           3
+#define SENSOR_BIT_CO2           4
+#define SENSOR_BIT_PRESSURE      5
+#define SENSOR_BIT_TVOC          6
+#define SENSOR_BIT_LIGHT         7
+#define SENSOR_BIT_SOUND         8
+#define SENSOR_BIT_ZIGBEE        9
+#define SENSOR_BIT_PM2_5         10
+#define SENSOR_BIT_AI_PT12       11
+
+
+

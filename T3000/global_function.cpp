@@ -1186,17 +1186,21 @@ BOOL Post_Thread_Message(UINT MsgType,
     My_Write_Struct->CTRL_ID = CTRL_ID;
     My_Write_Struct->Changed_Name = Changed_Name;
 
-    //search the id ,if not in the vector, push back into the vector.
-    bool find_id=false;
-    for (int i=0; i<(int)Change_Color_ID.size(); i++)
+    if (CTRL_ID != 0)
     {
-        if(Change_Color_ID.at(i)!=CTRL_ID)
-            continue;
-        else
-            find_id = true;
+        //search the id ,if not in the vector, push back into the vector.
+        bool find_id = false;
+        for (int i = 0; i<(int)Change_Color_ID.size(); i++)
+        {
+            if (Change_Color_ID.at(i) != CTRL_ID)
+                continue;
+            else
+                find_id = true;
+        }
+        if (!find_id)
+            Change_Color_ID.push_back(CTRL_ID);
     }
-    if(!find_id)
-        Change_Color_ID.push_back(CTRL_ID);
+
     //else
     //    return FALSE;
 
@@ -1765,6 +1769,11 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         break;
     case WRITE_TIMECOMMAND:
     {
+//#ifdef DEBUG
+//        CString temp_test;
+//        temp_test.Format(_T("%u"), Device_time.new_time.n_time);
+//        AfxMessageBox(temp_test);
+//#endif
         memcpy_s(SendBuffer + HEADER_LENGTH,sizeof(Time_block_mini),&Device_time,sizeof(Time_block_mini));
     }
     break;
@@ -6341,8 +6350,18 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
 		
 
         static in_addr BIP_Broadcast_Address;
-        BIP_Broadcast_Address.S_un.S_addr =  inet_addr("255.255.255.255");
-        //BIP_Broadcast_Address.S_un.S_addr =  inet_addr("192.168.0.177");
+        
+        CString temp_ip;
+        temp_ip = selected_product_Node.BuildingInfo.strIp;
+        char cTemp_ip[255];
+        memset(cTemp_ip, 0, 255);
+        WideCharToMultiByte(CP_ACP, 0, temp_ip.GetBuffer(), -1, cTemp_ip, 255, NULL, NULL);
+
+        if((g_protocol == PROTOCOL_BACNET_IP) && (selected_product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("Remote Device")) == 0))
+            BIP_Broadcast_Address.S_un.S_addr =  inet_addr(cTemp_ip);
+        else
+            BIP_Broadcast_Address.S_un.S_addr = inet_addr("255.255.255.255");
+
         bip_set_broadcast_addr((uint32_t)BIP_Broadcast_Address.S_un.S_addr);
 
         PHOSTENT  hostinfo;
@@ -6456,6 +6475,13 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
             CM5_hThread = CreateThread(NULL, NULL, MSTP_Receive, comport_parameter, NULL, &nThreadID_x);
             CloseHandle(CM5_hThread);
         }
+        else
+        {
+            g_mstp_flag = false;
+            Sleep(3500);
+            CM5_hThread = CreateThread(NULL, NULL, MSTP_Receive, comport_parameter, NULL, &nThreadID_x);
+            CloseHandle(CM5_hThread);
+        }
 
         system_connect_info.mstp_status = 1;
         system_connect_info.ncomport = comport;
@@ -6476,7 +6502,7 @@ DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
     g_mstp_flag=true;
     while(g_mstp_flag)
     {
-        pdu_len = datalink_receive(&src,&Rx_Buf[0],MAX_MPDU,6000);
+        pdu_len = datalink_receive(&src,&Rx_Buf[0],MAX_MPDU,3000);
         if(pdu_len==0)
         {
             Sleep(1);
@@ -7230,7 +7256,16 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	temp_data.reg.hw_version =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 	my_temp_point= my_temp_point + 2;
 
-	temp_data.reg.parent_serial_number =  ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+    if ((my_temp_point[0] == my_temp_point[1]) &&
+        (my_temp_point[0] == my_temp_point[2]) &&
+        (my_temp_point[0] == my_temp_point[3]) &&
+        (my_temp_point[0] != 0))
+    {
+        //如果谁回复的父节点信息 4个字节都相同就认为是和Airlab一样 有Bug ,清零;
+        my_temp_point[0] = 0;my_temp_point[1] = 0;my_temp_point[2] = 0;my_temp_point[3] = 0;
+    }
+
+    temp_data.reg.parent_serial_number =  ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 	my_temp_point= my_temp_point + 4;
 
 	temp_data.reg.object_instance_2 = *(my_temp_point++);
@@ -7259,6 +7294,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
             my_temp_point = my_temp_point + 2;
         }
     }
+
 
 	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
 	CString nip_address;
@@ -7329,7 +7365,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 	if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
 	{
-		g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  , Product name : %s ,Name:%s, obj = %u ,panel = %u,isp_mode = %d"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name, cs_temp_label,temp.object_instance,temp.panal_number,temp_data.reg.isp_mode);
+		g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  , Product name : %s ,Name:%s, obj = %u ,panel = %u,isp_mode = %d，pserial = %u"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name, cs_temp_label,temp.object_instance,temp.panal_number,temp_data.reg.isp_mode, temp_data.reg.parent_serial_number);
 		DFTrace(g_Print);
 	}
 
@@ -13190,7 +13226,7 @@ void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
         {
             //**********************************************************
             //2019 05 20 Fance 用于处理 电脑勾选了夏令时 引起的 T3 显示时间 与实际时间总是相差一小时的问题;
-
+            
             GetTimeZoneInformation(&tzi);
             computer_DaylightBias = tzi.DaylightBias * 60;
             //**********************************************************
@@ -13201,7 +13237,21 @@ void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
             if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
             else if (Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
-                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
+            {
+                CTime	temptimevalue;
+                time_t temp_t_time;
+                temp_t_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
+                temptimevalue = temp_t_time;
+                int temp_month = temptimevalue.GetMonth();
+                int temp_day = temptimevalue.GetDay();
+                int day_of_year = temp_month * 30 + temp_day;
+                if ((day_of_year > 135) && (day_of_year < 255))
+                {
+                    scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
+                }
+                else
+                    scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; //如果选中夏令时 需要显示的时候加一个小时
+            }
             else
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
             TimeTemp = scale_time + computer_DaylightBias;
@@ -13212,6 +13262,7 @@ void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
             //computer_DaylightBias = tzi.DaylightBias * 60;
             TimeTemp = temp_time_long ;
         }
+
 
 
     outputtime = TimeTemp.Format(_T("%Y-%m-%d %H:%M"));
