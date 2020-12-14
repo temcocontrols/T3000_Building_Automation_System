@@ -525,7 +525,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
                 break;
             }
 
-            if (retry_count_ini > 10)
+            if (retry_count_ini > 1000)
                 break;
         }
         T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
@@ -578,7 +578,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
                 break;
             }
 
-            if (retry_count > 10)
+            if (retry_count > 1000)
                 break;
         }
 

@@ -25,7 +25,7 @@ extern int new_bootload ; //如果等于1 就说明现在烧写的是新的BootLoader;
 /*extern*/ CRITICAL_SECTION g_cs;
 /*extern*/ CString showing_text;
 /*extern*/ int writing_row;
-extern int c1_need_update_boot ;  //0 不用更新boot   1 需要更新bootload;   C1为hex
+extern int firmware_must_use_new_bootloader ;  //0 不用更新boot   1 需要更新bootload;   C1为hex
 const int TFTP_PORT = 69;
 
 const int nLocalDhcp_Port = 67;			// Server Local 67
@@ -65,7 +65,7 @@ TFTPServer::TFTPServer(void)
     m_sock = NULL;
     m_soRecv = NULL;
     m_soSend = NULL;
-
+    m_tcp_connect_results = 0;
     WSADATA wsaData;
     int err;
     WORD wVersionRequested;
@@ -1104,6 +1104,7 @@ BOOL TFTPServer::StartServer()
 	   TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
 	   Sleep(2000);
 
+
    //  for (int i = 0; i<m_FlashTimes ; i++)
    // { 
 		CString strTips;
@@ -1363,6 +1364,87 @@ BOOL TFTPServer::StartServer()
                 SendUDP_Flash_Socket.SetSockOpt(  SO_SNDTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
                 SendUDP_Flash_Socket.SetSockOpt(  SO_RCVTIMEO, ( char * )&nReceiveNetTimeout, sizeof( int ) );
 
+                if (m_tcp_connect_results == 0)
+                {
+                    //说明在此之前没有检查过bootloader 版本信息,不确定要不要先升级Bootloader;
+                    CString temp_real_ip;
+                    temp_real_ip.Format(_T("%d.%d.%d.%d"), Byte_ISP_Device_IP[0], Byte_ISP_Device_IP[1], Byte_ISP_Device_IP[2], Byte_ISP_Device_IP[3]);
+                    ISP_Device_IP = temp_real_ip;
+
+                    int connect_ret = Open_Socket_Retry(temp_real_ip, m_nClientPort, 2);
+                    if (connect_ret)
+                    {
+                        CString strTips_Ethernet;
+                        m_tcp_connect_results = 1;
+                        strTips_Ethernet = _T("Reading bootloader version.");
+                        OutPutsStatusInfo(strTips_Ethernet, FALSE);
+                        int temp_mu_ret = 0;
+                        unsigned short temp_read_reg[100] = { 0 };
+                        temp_mu_ret = read_multi_retry(255, temp_read_reg, 0, 100, 3);
+                        if (temp_mu_ret < 0)
+                        {
+                            strTips_Ethernet = _T("Read bootloader version failed.");
+                            OutPutsStatusInfo(strTips_Ethernet, FALSE);
+                        }
+                        else
+                        {
+                            unsigned short temp_ver_boot = 0;
+                            if (temp_read_reg[11] >= temp_read_reg[14])
+                                temp_ver_boot = temp_read_reg[11];
+                            else
+                                temp_ver_boot = temp_read_reg[14];
+                            strTips_Ethernet.Format(_T("Bootloader version :%u"), temp_ver_boot);
+                            OutPutsStatusInfo(strTips_Ethernet, FALSE);
+
+#pragma region check_boot_version
+                            int c2_update_boot = 0;
+                            check_bootloader_and_frimware(temp_read_reg[7], 1, temp_read_reg[11], temp_read_reg[14], c2_update_boot);
+
+                            if (c2_update_boot == 1)
+                            {
+                                CString strtips;
+                                strtips.Format(_T("New bootloader available ,need update!"));
+                                OutPutsStatusInfo(strtips, false);
+                                ISP_STEP = ISP_SEND_FLASH_COMMAND;
+                                PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, temp_read_reg[7], 0);
+                                return 0;
+                            }
+#pragma endregion
+
+#if 0
+                            if ((temp_read_reg[11] >= 62) || (temp_read_reg[14] >= 62))
+                            {
+
+                                strTips_Ethernet = _T("Check bootloader version success.");
+                                OutPutsStatusInfo(strTips_Ethernet, FALSE);
+                            }
+                            else
+                            {
+                                if (temp_mu_ret >= 0)
+                                {
+                                    strTips_Ethernet.Format(_T("Serial Number: %u"), temp_read_reg[3] * 65536 * 256 + temp_read_reg[2] * 65536 + temp_read_reg[1] * 256 + temp_read_reg[0]);
+                                    OutPutsStatusInfo(strTips_Ethernet, FALSE);
+
+                                }
+
+                                if (firmware_must_use_new_bootloader)
+                                {
+                                    strTips_Ethernet = _T("Bootloader version is too old,need update now.");
+                                    OutPutsStatusInfo(strTips_Ethernet, FALSE);
+                                    //这里设置标志 需要自动引到ISP来更新 repaire boot 
+                                    //HexFileValidation(g_repair_bootloader_file_path);
+                                    ISP_STEP = ISP_SEND_FLASH_COMMAND;
+                                    PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, temp_read_reg[7], 0);
+                                    return 0;
+                                }
+                            }
+#endif
+                        }
+
+
+
+                    }
+                }
                 strTips.Format(_T("Updating firmware. Device IP : %d.%d.%d.%d"),Byte_ISP_Device_IP[0],Byte_ISP_Device_IP[1],Byte_ISP_Device_IP[2],Byte_ISP_Device_IP[3]);
                 OutPutsStatusInfo(strTips, FALSE);
                 OutPutsStatusInfo(_T(""), FALSE);
@@ -1990,6 +2072,7 @@ void TFTPServer::FlashByEthernet()
         int connect_ret = Open_Socket_Retry(ISP_Device_IP, m_nClientPort, 2);
         if (connect_ret)
         {
+            m_tcp_connect_results = 1;
             strTips_Ethernet = _T("Reading bootloader version.");
             OutPutsStatusInfo(strTips_Ethernet, FALSE);
             int temp_mu_ret = 0;
@@ -2002,6 +2085,9 @@ void TFTPServer::FlashByEthernet()
             }
             else
             {
+
+
+
                 unsigned short temp_ver_boot = 0;
                 if(temp_read_reg[11] >= temp_read_reg[14])
                     temp_ver_boot = temp_read_reg[11];
@@ -2010,7 +2096,23 @@ void TFTPServer::FlashByEthernet()
                 strTips_Ethernet.Format(_T("Bootloader version :%u"), temp_ver_boot);
                 OutPutsStatusInfo(strTips_Ethernet, FALSE);
 
-                if ((temp_read_reg[11] >= 64) || (temp_read_reg[14] >= 64))
+                int c2_update_boot = 0;
+                int Ret_Result = 0;
+                Ret_Result = check_bootloader_and_frimware(temp_read_reg[7], 1 , temp_read_reg[11], temp_read_reg[14], c2_update_boot);
+
+                if (c2_update_boot == 1)
+                {
+                    CString strtips;
+                    strtips.Format(_T("New bootloader available ,need update!"));
+                    OutPutsStatusInfo(strtips, false);
+                    PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, temp_read_reg[7], 0);
+                    Ret_Result = 2;
+                    return;
+                }
+
+
+#if 0
+                if ((temp_read_reg[11] >= 62) || (temp_read_reg[14] >= 62))
                 {
 
                     strTips_Ethernet = _T("Check bootloader version success.");
@@ -2025,7 +2127,7 @@ void TFTPServer::FlashByEthernet()
 
                     }
 
-                    if (c1_need_update_boot)
+                    if (firmware_must_use_new_bootloader)
                     {
 
                         strTips_Ethernet = _T("Bootloader version is too old,need update now.");
@@ -2036,6 +2138,7 @@ void TFTPServer::FlashByEthernet()
                         return;
                     }
                 }
+#endif
             }
 
             
@@ -2043,6 +2146,7 @@ void TFTPServer::FlashByEthernet()
         }
         else
         {
+            m_tcp_connect_results = 0;
             strTips_Ethernet.Format(_T("Can't connect to IP:%s port:%d."), ISP_Device_IP, m_nClientPort);
             OutPutsStatusInfo(strTips_Ethernet, FALSE);
             strTips_Ethernet.Format(_T(" "));

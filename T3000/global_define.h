@@ -1171,6 +1171,7 @@ typedef enum
     MINIPANELARM_NB = 8,
     T3_TSTAT10    = 9,
     T3_OEM        = 11,
+    T3_TB_11I = 12,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1191,6 +1192,10 @@ const int TINY_MINIPANEL_IN_D = 0;
 const int TINYEX_MINIPANEL_IN_A = 8;
 const int TINYEX_MINIPANEL_IN_D = 0;
 
+const int TB_11I_IN_A = 11;
+const int TB_11I_IN_D = 0;
+
+
 const int BACNET_ROUTER_IN_A = 0;
 const int BACNET_ROUTER_IN_D = 0;
 const int BACNET_ROUTER_OUT_A = 0;
@@ -1208,6 +1213,10 @@ const int TINY_MINIPANEL_OUT_A = 2;
 
 const int TINYEX_MINIPANEL_OUT_D = 8;
 const int TINYEX_MINIPANEL_OUT_A = 6;
+
+const int T3_TB_11I_OUT_D = 6;
+const int T3_TB_11I_OUT_A = 5;
+
 
 const int T38AI8AO6DO_OUT_D = 6;
 const int T38AI8AO6DO_OUT_A = 8;

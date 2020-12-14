@@ -227,8 +227,8 @@ public:
 	void InitCombox(void);
 	//这个函数为COM_TStat的总函数
 	//当用户点击COM_FLASH的时候，
-	BOOL FlashTstat(void);
-	BOOL FlashNC_LC(void);
+	BOOL FlashByComport(void);
+	BOOL FlashByNetwork(void);
 	BOOL FlashSubID(void);
 	void OnFlashSubID(void);
 	BOOL ValidMdbIDStringSUBID();
@@ -266,7 +266,6 @@ public:
 
 
 	BOOL m_FlashEnable;
-	int m_isRAM;
 	int m_FlashTimes;
 	int m_Brandrate;
     afx_msg void OnBnClickedButtonFlashSn();

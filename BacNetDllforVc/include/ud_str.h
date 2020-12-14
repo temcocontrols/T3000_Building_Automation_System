@@ -33,76 +33,72 @@ typedef enum {
 		 READMONITOR_T3000         = ENUM_AMON+1,       /* read monitors       */
 		 READSCREEN_T3000          = ENUM_GRP+1,        /* read screens        */
 		 READARRAY_T3000           = ENUM_ARRAY+1,      /* read arrays         */
+		 READALARM_T3000		   = ENUM_ALARMM + 1, /* read alarm */
+		 READUNIT_T3000			   = 14,			
+		 READUSER_T3000            = 15,
 //		 READARRAYVALUE_T3000      = AYVALUE+1,    /* read array elements */
 		 READTIMESCHEDULE_T3000    = ENUM_WR_TIME+1,    /* read time schedule  */
 		 READANNUALSCHEDULE_T3000  = ENUM_AR_DATA+1,    /* read annual schedule*/
 		 READPROGRAMCODE_T3000     = 16,           /* read program code   */
 		 READGROUPELEMENTS_T3000   = 19,           /* read group elements */
-		 READPOINTINFOTABLE_T3000  = 24,           /* read pointinfo table*/
-		 UPDATEMEMMONITOR_T3000    = 23,           /* read monitor updates*/
-		 READMONITORDATA_T3000     = 22,           /* read monitor data   */
+
+	
+
 		 READINDIVIDUALPOINT_T3000 = 20,           /* read individual point*/
-		 READGROUPELEMENT_T3000    = 25,           /* read point info      */
 		 TIME_COMMAND              = 21,           /* read time            */
+		 READMONITORDATA_T3000     = 22,           /* read monitor data   */
+		 READPOINTINFOTABLE_T3000  = 24,           /* read pointinfo table*/
+		 READGROUPELEMENT_T3000    = 25,           /* read point info      */
+
 		 CLEARPANEL_T3000          = 28,           /* clear panel          */
 		 SEND_ALARM_COMMAND        = 32,
+		 READTSTAT_T3000		   = 33,
+		 READANALOG_CUS_TABLE_T3000    = 34,           /* read monitor updates*/
+		 READVARUNIT_T3000			= 36,
+		 READEXT_IO_T3000			= 37,
+		 READ_TSTATE_SCHEDULE_T3000 = 38,
+		 READ_REMOTE_POINT         = 40,
+         READ_SCHEDUAL_TIME_FLAG   = 41,
+         READ_MSV_COMMAND          = 42,
+         READ_EMAIL_ALARM          = 43,
+
+         READ_NEW_TIME_COMMAND = 88,           /* read new time            */  //2018 04 17 新的读时间命令
+         READMONITORPACKAGE_T3000 = 89,           /* read monitor belong to which package   */
+         READ_AT_COMMAND = 90,	//450 length
+         READ_GRPHIC_LABEL_COMMAND = 91,
+         READ_BACNET_TO_MODBUS_COMMAND = 94,
+         READPIC_T3000 = 95,
+         READ_MISC = 96,
+         READ_REMOTE_DEVICE_DB = 97,
+         READ_SETTING_COMMAND = 98,
+         GETSERIALNUMBERINFO = 99,
 
 		 WRITEOUTPUT_T3000         = 100+ENUM_OUT+1,  /* write outputs          */
 		 WRITEINPUT_T3000          = 100+ENUM_IN+1,   /* write inputs           */
 		 WRITEVARIABLE_T3000       = 100+ENUM_VAR+1,        /* write variables  */
-		 WRITECONTROLLER_T3000     = 100+ENUM_CON+1,        /* write controllers*/
-		 WRITEWEEKLYROUTINE_T3000  = 100+ENUM_WRT+1,         /* write weekly routines*/
-		 WRITEANNUALROUTINE_T3000  = 100+ENUM_AR+1,         /* write annual routines*/
+		 WRITEPID_T3000     = 100+ENUM_CON+1,        /* write controllers*/
+		 WRITESCHEDULE_T3000  = 100+ENUM_WRT+1,         /* write weekly routines*/
+		 WRITEHOLIDAY_T3000  = 100+ENUM_AR+1,         /* write annual routines*/
 		 WRITEPROGRAM_T3000        = 100+ENUM_PRG+1,        /* write programs       */
 		 WRITETABLE_T3000          = 100+ENUM_TBL+1,        /* write tables         */
      	 WRITETOTALIZER_T3000      = 100+ENUM_TZ+1,         /* write totalizers     */
 		 WRITEMONITOR_T3000        = 100+ENUM_AMON+1,       /* write monitors       */
 		 WRITESCREEN_T3000         = 100+ENUM_GRP+1,        /* write screens        */
 		 WRITEARRAY_T3000          = 100+ENUM_ARRAY+1,      /* write arrays         */
+		  WRITEALARM_T3000		   = 100+ ENUM_ALARMM + 1, /* write alarm */
+		  WRITEUNIT_T3000          = 114,                 /* write custom units*/
+		  WRITEUSER_T3000            = 115,
 		 WRITETIMESCHEDULE_T3000   = 100+ENUM_WR_TIME+1,    /* write time schedule  */
 		 WRITEANNUALSCHEDULE_T3000 = 100+ENUM_AR_DATA+1,     /* write annual schedule*/
 		 WRITEPROGRAMCODE_T3000    = 100+16,           /* write program code    */
 		 WRITEINDIVIDUALPOINT_T3000 = 100+READINDIVIDUALPOINT_T3000,  /* write individual point*/
+		 WRITETSTAT_T3000			= 100 + READTSTAT_T3000,
+		 //COMMAND_50                = 50,
+		 //READ_COMMAND_50           = 50,
 
-		 COMMAND_50                = 50,
-		 READ_COMMAND_50           = 50,
 		 WRITE_COMMAND_50          = 150,
-		 STATION_LIST_COMMAND      = 21,
-		 SAVEPROGRAM_COMMAND       = 30,
-		 LOADPROGRAM_COMMAND       = 31,
-		 DEFAULT_PRG_COMMAND       = 32, 
-		 READFILES_COMMAND         = 40,  /* read the files of type define in*/
-																					/* a previous SETFILETYPE_COMMAND command*/
-																					/* from the current path.                */
-																					/* The data returned are an array of type*/
-																					/*  S8_T [13];                           */
-		 READDIRECTORIES_COMMAND   = 41,  /* read the directories name from            */
-																					/* the current path.                     */
-																					/* The data returned are of type         */
-																					/*  (*S8_T)[13];                         */
-		 GETCURRENTPATH_COMMAND    = 42,  /* get the current path                      */
-																					/* The command is a read command:        */
-																					/*  command  = READ_COMMAND_50           */
-																					/*  arg      = GETCURRENTPATH_COMMAND    */
-		 SETCURRENTPATH_COMMAND    = 43,  /* set the current path for the subsequent   */
-																					/* read directories and read files command*/
-																					/* The command is a write command:        */
-																					/*  command  = WRITE_COMMAND_50           */
-																					/*  arg      = SETCURRENTPATH_COMMAND     */
-		 SETFILETYPE_COMMAND       = 44,  /* set the file type (ex. "*.*", "*.prg").    */
-																					/* the next read files command will       */
-																					/* return only the files of type          */
-																					/* set in a SETFILETYPE_COMMAND command.  */
-																					/* The command is a write command:        */
-																					/*  command  = WRITE_COMMAND_50           */
-																					/*  arg      = SETFILETYPE_COMMAND        */
-		 ALARM_NOTIFY_COMMAND       = 51,
-		 SEND_INFO_COMMAND          = 52,
-		 SEND_WANTPOINTS_COMMAND    = 72,
-		 SEND_NETWORKPOINTS_COMMAND = 73,
+		 
 
-
-		 TABLEPOINTS_COMMAND       = 75,
 		 PANEL_INFO1_COMMAND       = 110,
 		 PANEL_INFO2_COMMAND       = 111,
 		 MINICOMMINFO_COMMAND      = 112,
@@ -115,7 +111,24 @@ typedef enum {
 		 READSTATUSWRITEFLASH_COMMAND = 120,
 		 WRITE_TIMECOMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
-		 OPENSCREEN_COMMAND        = 123
+		 WRITEANALOG_CUS_TABLE_T3000	       = 134,
+		 WRITEVARUNIT_T3000			= 136,
+		 WRITEEXT_IO_T3000			= 137,
+		 WRITE_TSTATE_SCHEDULE_T3000= 138,
+		 WRITE_REMOTE_POINT         = 140,
+         WRITE_SCHEDUAL_TIME_FLAG   = 141,
+         WRITE_MSV_COMMAND          = 142,
+         WRITE_EMAIL_ALARM           = 143,
+         WRITE_NEW_TIME_COMMAND     = 188,  //2018 04 17 新的写时间命令
+		 WRITE_AT_COMMAND			= 190,	//100 length
+		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
+         WRITE_BACNET_TO_MODBUS_COMMAND = 194,
+		 WRITEPIC_T3000        = 195,
+		 WRITE_MISC                  = 196,
+		 WRITE_SPECIAL_COMMAND = 197,
+		 WRITE_SETTING_COMMAND		= 198,
+		 WRITE_SUB_ID_BY_HAND = 199,
+		 DELETE_MONITOR_DATABASE = 200
 
 } CommandRequest;	  
 
@@ -359,6 +372,25 @@ typedef struct
 	uint8_t unused;   //      : 8;
 
 } Str_program_point;	  /* 21+9+2+2 = 34 bytes*/
+
+typedef struct
+{
+    uint16_t  		total_length;        /*	total length to be received or sent	*/
+    uint8_t		command;
+    uint16_t    start_reg;            //开始的寄存器
+    uint16_t		nlength;          //读写的长度
+
+}Str_bacnet_to_modbus_header;
+
+typedef struct
+{
+    uint16_t start_add;
+    uint16_t nlength;
+    uint16_t org_start_add; // 用于校验数据的正确性
+    uint16_t org_nlength;   // 用于校验数据的正确性
+    unsigned short ndata[400];
+}Str_modbus_reg;
+
 #pragma pack(pop)//恢复对齐状态 
 
 

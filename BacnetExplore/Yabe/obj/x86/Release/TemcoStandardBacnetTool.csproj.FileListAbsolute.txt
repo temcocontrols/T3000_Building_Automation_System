@@ -9,7 +9,6 @@ C:\Work\T3000_Building_Automation_System\BacnetExplore\Yabe\obj\x86\Release\Yabe
 C:\Work\T3000_Building_Automation_System\BacnetExplore\Yabe\obj\x86\Release\Yabe.CreateObject.resources
 C:\Work\T3000_Building_Automation_System\BacnetExplore\Yabe\obj\x86\Release\Yabe.DeviceCommunicationControlDialog.resources
 C:\Work\T3000_Building_Automation_System\BacnetExplore\Yabe\obj\x86\Release\Yabe.ForeignRegistry.resources
-C:\Work\T3000_Building_Automation_System\BacnetExplore\Yabe\obj\x86\Release\Yabe.MainDialog.resources
 C:\Work\T3000_Building_Automation_System\BacnetExplore\Yabe\obj\x86\Release\Yabe.NotificationEditor.resources
 C:\Work\T3000_Building_Automation_System\BacnetExplore\Yabe\obj\x86\Release\Yabe.ProgressDialog.resources
 C:\Work\T3000_Building_Automation_System\BacnetExplore\Yabe\obj\x86\Release\Yabe.Properties.Resources.resources
@@ -32,3 +31,4 @@ C:\Work\T3000_Building_Automation_System\T3000 Output\release\ReadSinglePropDesc
 C:\Work\T3000_Building_Automation_System\T3000 Output\release\BacnetExplore.exe
 C:\Work\T3000_Building_Automation_System\T3000 Output\release\BacnetExplore.pdb
 C:\Work\T3000_Building_Automation_System\BacnetExplore\Yabe\obj\x86\Release\TemcoStandardBacnetTool.csprojResolveAssemblyReference.cache
+C:\Work\T3000_Building_Automation_System\BacnetExplore\Yabe\obj\x86\Release\Yabe.YabeMainDialog.resources

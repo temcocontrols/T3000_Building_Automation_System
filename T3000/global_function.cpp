@@ -4142,6 +4142,8 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             bacnet_device_type = MINIPANELARM_LB;
         else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
             bacnet_device_type = MINIPANELARM_TB;
+        else if (Device_Basic_Setting.reg.mini_type == T3_TB_11I)
+            bacnet_device_type = T3_TB_11I;
         else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB)
             bacnet_device_type = MINIPANELARM_NB;
         else
@@ -4232,6 +4234,10 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 3;
         memcpy_s(Device_Basic_Setting.reg.uart_stopbit, 3, my_temp_point, 3);
         my_temp_point = my_temp_point + 3;
+
+        memcpy_s(&Device_Basic_Setting.reg.display_lcd, 7, my_temp_point, 7);
+        my_temp_point = my_temp_point + 7;
+
         return READ_SETTING_COMMAND;
     }
     break;
@@ -5850,43 +5856,43 @@ int Get_Product_Input_Map(unsigned char product_tpye, int input_item)
 
 void Inial_Product_map()
 {
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT5B, _T("TStat5B")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5A,_T("TStat5A")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5B,_T("TStat5B")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5B2,_T("TStat5B2")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5C,_T("TStat5C")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5D,_T("TStat5D")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5E,_T("TStat5E")));
-
-
-	product_map.insert(map<int,CString>::value_type(PM_PM5E,_T("PM5E")));
-    product_map.insert(map<int, CString>::value_type(PM_PM5E_ARM, _T("PM5E_ARM")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5F,_T("TStat5F")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5G,_T("TStat5G")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5H,_T("TStat5H")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT6,_T("TStat6")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5i,_T("TStat5i")));
-
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT8,_T("TStat8")));
-    product_map.insert(map<int, CString>::value_type(PM_TSTAT9, _T("TStat9")));
-    
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT6, _T("TStat6")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT7, _T("TStat7")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT5i, _T("TStat5i")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT8, _T("TStat8")));
     product_map.insert(map<int, CString>::value_type(PM_TSTAT10, _T("TStat10")));
-
-
-	product_map.insert(map<int,CString>::value_type(PM_HUMTEMPSENSOR,_T("HUM Sensor")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5D,_T("TStat5D")));
+    product_map.insert(map<int, CString>::value_type(PM_AirQuality, _T("Air Quality")));
+    product_map.insert(map<int, CString>::value_type(PM_HUMTEMPSENSOR, _T("HUM Sensor")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTATRUNAR, _T("TStatRunar")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5E,_T("TStat5E")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT5F, _T("TStat5F")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT5G, _T("TStat5G")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT5H, _T("TStat5H")));
+    product_map.insert(map<int, CString>::value_type(PM_CO2_NET, _T("CO2 Net")));
+    product_map.insert(map<int, CString>::value_type(PM_CO2_RS485, _T("CO2")));
+    product_map.insert(map<int, CString>::value_type(PM_CO2_NODE, _T("CO2 Node")));
+	product_map.insert(map<int,CString>::value_type(PM_PM5E,_T("PM5E")));
+    product_map.insert(map<int, CString>::value_type(PM_CM5, _T("CM5")));
+    product_map.insert(map<int, CString>::value_type(PM_PM5E_ARM, _T("PM5E_ARM")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT9, _T("TStat9")));
 	product_map.insert(map<int,CString>::value_type(STM32_HUM_NET,_T("HUM Sensor")));
 	product_map.insert(map<int,CString>::value_type(STM32_HUM_RS485,_T("HUM Sensor")));
-	product_map.insert(map<int,CString>::value_type(PM_AirQuality,_T("Air Quality")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT7,_T("TStat7")));
+
+
 
 	product_map.insert(map<int,CString>::value_type(PM_NC,_T("NC")));
-	product_map.insert(map<int,CString>::value_type(PM_CM5,_T("CM5")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTATRUNAR,_T("TStatRunar")));
+
+
 	product_map.insert(map<int,CString>::value_type(PM_LightingController,_T("LC")));
-	product_map.insert(map<int,CString>::value_type(PM_CO2_NET,_T("CO2 Net")));
-	product_map.insert(map<int,CString>::value_type(PM_CO2_RS485,_T("CO2")));
+
 
 	product_map.insert(map<int,CString>::value_type(PM_PRESSURE_SENSOR,_T("Pressure")));
-	product_map.insert(map<int,CString>::value_type(PM_CO2_NODE,_T("CO2 Node")));
+
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT6_HUM_Chamber,_T("HumChamber")));
 	product_map.insert(map<int,CString>::value_type(PM_T3PT10,_T("T3-PT10")));
 	product_map.insert(map<int,CString>::value_type(PM_T3IOA,_T("T3-8O")));
@@ -13345,7 +13351,10 @@ int Get_Msv_Table_Name(int x)
     {
         CString temp_cs;
         if (index >= 3)
+        {
+            Custom_Msv_Range[x] = Custom_Msv_Range[x] + _T(" /...");
             break;
+        }
         if (m_msv_data.at(x).msv_data[k].status == 1)
         {
             MultiByteToWideChar(CP_ACP, 0, (char *)m_msv_data.at(x).msv_data[k].msv_name, (int)strlen((char *)m_msv_data.at(x).msv_data[k].msv_name) + 1,
@@ -13422,6 +13431,17 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //èŽ·å
                 nret_type = OUTPUT_VIRTUAL_PORT;
         }
         break;
+        case T3_TB_11I:  //6DO   5AO
+        {
+            if (portindex <= 6)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= 11)
+                nret_type = OUTPUT_ANALOG_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
+
         default:
             break;
         }
@@ -13557,11 +13577,23 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
                 nret_type = INPUT_VIRTUAL_PORT;
         }
         break;
-        case TINY_MINIPANEL:  //6DO  2AO
+        case TINY_MINIPANEL:  
         case TINY_EX_MINIPANEL:
-        case MINIPANELARM_TB:  //6DO   8AO
+        case MINIPANELARM_TB:  
         {
             if (portindex <= 8)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    nret_type = INPUT_DIGITAL_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+        }
+        break;
+        case T3_TB_11I:  //11AI
+        {
+            if (portindex <= TB_11I_IN_A)
             {
                 nret_type = INPUT_ANALOG_PORT;
                 if (n_digital_analog == BAC_UNITS_DIGITAL)

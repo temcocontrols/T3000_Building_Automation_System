@@ -23,6 +23,7 @@
 #endif
 
 #include "BADO\BADO.h"
+extern int SPECIAL_BAC_TO_MODBUS; //判断是否用MSTP来更新固件;
 unsigned char ready_towrite_mac[6] = { 0 };
 unsigned int ready_towrite_sn = 0;
 int g_write_mac = 0;
@@ -52,7 +53,7 @@ CString SettingPath;
 CString g_repair_bootloader_file_path;
 CString g_update_newfirmware_file_path; //最新的要烧写的正常的代码路径;
 unsigned int n_hex_file_pid;//hex文件的产品PID；
-int c1_need_update_boot = 0;  //0 不用更新boot   1 需要更新bootload;   C1为hex
+int firmware_must_use_new_bootloader = 0;  //0 不用更新boot   1 需要更新bootload;   C1为hex
 int new_bootload = 0; //如果等于1 就说明现在烧写的是新的BootLoader;
 int com_port_flash_status = 0;  // 0 正常模式   1 烧写boot模式    2 再次烧写正常模式的代码
 //HANDLE get_file_thread_handle = NULL;
@@ -596,6 +597,8 @@ BOOL CISPDlg::OnInitDialog()
         ((CButton *)GetDlgItem(IDC_COM))->SetCheck(FALSE);
         ((CButton *)GetDlgItem(IDC_NET))->SetCheck(TRUE);
 
+        ((CButton *)GetDlgItem(IDC_CHECK_MSTP_UPDATE))->SetCheck(false);
+        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->EnableWindow(0);
     }
     else
     {
@@ -605,7 +608,8 @@ BOOL CISPDlg::OnInitDialog()
         ((CButton *)GetDlgItem(IDC_COM))->SetCheck(TRUE);
         ((CButton *)GetDlgItem(IDC_NET))->SetCheck(FALSE);
 
-
+        ((CButton *)GetDlgItem(IDC_CHECK_MSTP_UPDATE))->SetCheck(false);
+        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->EnableWindow(1);
     }
     if(subnote.CompareNoCase(_T("1"))==0)
     {
@@ -946,44 +950,6 @@ void CISPDlg::OnBnClickedButtonSelfile()
     CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH);
     pEditFilePath->SetWindowText(m_strHexFileName);
 
-    //int ret=Judge_BinHexFile(m_strHexFileName);
-    //if (ret==0)
-    //{
-    //    pEditFilePath->SetWindowText(_T(""));
-    //    return;
-    //}
-    //if (ret == 1)
-    //{
-    //    char*			pFileBuffer;
-    //    CHexFileParser* pHexFile = new CHexFileParser;
-    //    pHexFile->SetFileName(m_strHexFileName);
-    //    pFileBuffer = new char[c_nHexFileBufLen];
-    //    memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
-    //    int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);
-                // Gets the file's buffer
-
-    //    if (!pHexFile->Is_RAM_HEXType())
-    //    {
-    //        m_isRAM = 0;
-    //        ShowHexBinInfor(ret);
-    //    }
-
-    //    if (pHexFile->Is_RAM_HEXType())
-    //    {
-    //        m_isRAM = 1;
-    //        ShowHexBinInfor(ret);
-    //    }
-
-    //    if (pFileBuffer)
-    //    {
-    //        delete []pFileBuffer;
-    //        pFileBuffer = NULL;
-    //    }
-    //    delete pFileBuffer;
-    //}
-
-
-
 }
 void CISPDlg::SaveParamToConfigFile()
 {
@@ -1043,19 +1009,27 @@ void CISPDlg::SaveParamToConfigFile()
 
 void CISPDlg::OnBnClickedButtonFlash()
 {
-    c1_need_update_boot = 0;
+    firmware_must_use_new_bootloader = 0;
     UpdateData();
     SaveParamToConfigFile();	//Save data entered by the user
 
     m_FlashTimes = m_cfgFileHandler.GetFlashTimes();
 
+    if (((CButton *)GetDlgItem(IDC_CHECK_MSTP_UPDATE))->GetCheck())
+    {
+        SPECIAL_BAC_TO_MODBUS = 1;
+    }
+    else
+    {
+        SPECIAL_BAC_TO_MODBUS = 0;
+    }
 
     switch(Judge_Flash_Type())
     {
     case FLASH_TSTAT_COM:
     {
         SetCommunicationType(0);
-        FlashTstat();
+        FlashByComport();
         break;
     }
     case FLASH_NC_LC_NET:
@@ -1064,7 +1038,7 @@ void CISPDlg::OnBnClickedButtonFlash()
 
         SetCommunicationType(1);
         SaveParamToConfigFile();
-        FlashNC_LC();
+        FlashByNetwork();
 
 
 
@@ -1141,7 +1115,7 @@ afx_msg LRESULT CISPDlg::OnFlashBoot_Update_boot(WPARAM wParam, LPARAM lParam)
         m_pTFTPServer = NULL;
     }
 
-        if(npid == PM_MINIPANEL_ARM)
+        if((npid == PM_MINIPANEL_ARM) || (PM_MINIPANEL == npid))
             g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader.hex");
         else if(npid == PM_TSTAT10)
             g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_T10.hex");
@@ -1580,11 +1554,12 @@ BOOL CISPDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 //Click the COM Port button setting
 void CISPDlg::OnBnClickedCom()
 {
-    GetDlgItem(IDC_COM)->SetWindowText(_T("Input more than one ID"));
-    GetDlgItem(IDC_NET)->SetWindowText(_T("NET FLASH"));
+    //GetDlgItem(IDC_COM)->SetWindowText(_T("Input ID"));
+    //GetDlgItem(IDC_NET)->SetWindowText(_T("NET FLASH"));
     COM_INPUT=TRUE;
     g_Commu_type=0;
     COM_NET_Set_ReadOnly();
+    GetDlgItem(IDC_CHECK_MSTP_UPDATE)->EnableWindow(1);
 }
 //Available Settings
 void CISPDlg::COM_NET_Set_ReadOnly()
@@ -1642,6 +1617,8 @@ void CISPDlg::OnBnClickedNet()
     GetDlgItem(IDC_COM)->SetWindowText(_T("COM FLASH"));
     GetDlgItem(IDC_NET)->SetWindowText(_T("Input IP and Port"));
     COM_NET_Set_ReadOnly();
+    ((CButton *)GetDlgItem(IDC_CHECK_MSTP_UPDATE))->SetCheck(false);
+    GetDlgItem(IDC_CHECK_MSTP_UPDATE)->EnableWindow(0);
 }
 
 void CISPDlg::OnBnClickedCheckFlashSubid()
@@ -1700,7 +1677,7 @@ void CISPDlg::InitCombox(void)
 // Function:
 // Choose com port,Flash Device.
 
-BOOL CISPDlg::FlashTstat(void)
+BOOL CISPDlg::FlashByComport(void)
 {
     int TempID=0;
     int times=0;
@@ -1878,7 +1855,7 @@ Date: 2012-10-30
 Function:
 Choose NET,Can Flash NC
 */
-BOOL CISPDlg::FlashNC_LC(void)
+BOOL CISPDlg::FlashByNetwork(void)
 {
 
     if(!FileValidation(m_strHexFileName))
@@ -2089,14 +2066,7 @@ void CISPDlg::OnFlashSubID()
 
         m_pTCPFlasher->m_hexbinfilepath=m_strFlashFileName;
 
-        /*m_pComWriter = new CComWriter;
-        m_pComWriter->SetModbusID(m_szMdbIDs);
-        m_pComWriter->SetHexInfor(temp1);
-        m_pComWriter->SetHexFileType(pHexFile->GetHexFileFormatType());
-        m_pComWriter->Is_Ram=pHexFile->Is_RAM_HEXType();
-        m_pComWriter->m_hexbinfilepath = m_strHexFileName;*/
-
-        m_pTCPFlasher->Is_Ram = pHexFile->Is_RAM_HEXType ();
+        m_pTCPFlasher->Is_Ram = pHexFile->GetFileType();
         m_pTCPFlasher->BeginWirteByTCP();
         EnableFlash(FALSE);
     }
@@ -2174,19 +2144,6 @@ void CISPDlg::FlashByEthernet()
         nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nBinFileBufLen);//Get the file's buffer
 
 
-//         if (!pHexFile->Is_RAM_HEXType())
-//         {
-//             m_isRAM = 0;
-//             ShowHexBinInfor(1);
-//         }
-// 
-//         if (pHexFile->Is_RAM_HEXType())
-//         {
-//             m_isRAM = 1;
-//             ShowHexBinInfor(1);
-//         }
-
-
         delete pHexFile;
         pHexFile = NULL;
 
@@ -2197,7 +2154,8 @@ void CISPDlg::FlashByEthernet()
     {
         CString strTips = _T("Firmware loading successful.");
         UpdateStatusInfo(strTips, FALSE);
-
+        strTips.Format(_T("Firmware size : %.1f KB"), ((float)nDataSize) / 1024);
+        UpdateStatusInfo(strTips, FALSE);
 
         CString strTips_version;// = _T("|Firmware bin file verified okay.");
         float hex_version = 0;
@@ -2218,7 +2176,7 @@ void CISPDlg::FlashByEthernet()
             n_hex_file_pid = PM_MINIPANEL_ARM;
             if (hex_version >= 60) //大于这个版本就说明需要512的flash ，必须先更新bootload;
             {
-                c1_need_update_boot = 1;
+                firmware_must_use_new_bootloader = 1;
             }
         }
         else if (temp_hex_pid_name.CompareNoCase(_T("PID10")) == 0)
@@ -2227,7 +2185,7 @@ void CISPDlg::FlashByEthernet()
             //暂时不让更新TSTAT10的bootloader
             //if (hex_version >= 51.08) //大于这个版本就说明需要512的flash ，必须先更新bootload;
             //{
-            //    c1_need_update_boot = 1;
+            //    firmware_must_use_new_bootloader = 1;
             //}
         }
 
@@ -2464,12 +2422,14 @@ void CISPDlg::FlashByCom()
     {
         CString strTips = _T("|Hex file verified okay.");
         UpdateStatusInfo(strTips, FALSE);
+        strTips.Format(_T("Firmware size : %.1f KB"), ((float)nDataSize) / 1024);
+        UpdateStatusInfo(strTips, FALSE);
 
         m_pComWriter = new CComWriter;
         m_pComWriter->SetModbusID(m_szMdbIDs);
         m_pComWriter->SetHexInfor(global_fileInfor);
         m_pComWriter->SetHexFileType(pHexFile->GetHexFileFormatType());
-        m_pComWriter->Is_Ram=pHexFile->Is_RAM_HEXType();
+        m_pComWriter->Is_Ram=pHexFile->GetFileType();
         m_pComWriter->m_hexbinfilepath = m_strHexFileName;
         CString strBaudrate;
         GetDlgItem(IDC_EDIT_BAUDRATE)->GetWindowText(strBaudrate);
@@ -2519,7 +2479,9 @@ void CISPDlg::FlashByCom()
             n_hex_file_pid = PM_MINIPANEL_ARM;
             if (hex_version >= 60) //大于这个版本就说明需要512的flash ，必须先更新bootload;
             {
-                c1_need_update_boot = 1;
+                firmware_must_use_new_bootloader = 1;
+                if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径;
+                    g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
         else if ((temp_hex_pid_name.CompareNoCase(_T("TSTAT8")) == 0) && (new_bootload == 0))
@@ -2530,7 +2492,7 @@ void CISPDlg::FlashByCom()
             n_hex_file_pid = PM_MINIPANEL_ARM;
             if (hex_version >= 101) //大于这个版本就说明需要512的flash ，必须先更新bootload;
             {
-                c1_need_update_boot = 1;
+                firmware_must_use_new_bootloader = 1;
                 if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径;
                 g_update_newfirmware_file_path = m_strHexFileName;
             }
@@ -2543,7 +2505,7 @@ void CISPDlg::FlashByCom()
             n_hex_file_pid = PM_TSTAT10;
             if (hex_version >= 5109) //大于这个版本就说明需要512的flash ，必须先更新bootload;
             {
-                c1_need_update_boot = 1;
+                firmware_must_use_new_bootloader = 1;
                 if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径;
                     g_update_newfirmware_file_path = m_strHexFileName;
             }

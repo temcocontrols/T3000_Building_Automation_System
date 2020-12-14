@@ -188,7 +188,8 @@ void CTstatAQ::EnableCus(bool flag)
 
 void CTstatAQ::UpdateUI()
 {
-
+    int temp_software_version = 0;
+    temp_software_version = product_register_value[4];
     CString cs_temp;
     cs_temp.Format(_T("%.1f"), ((float)product_register_value[TSTAT_AQ_TEMPERATURE]) / 10);
 
@@ -214,10 +215,21 @@ void CTstatAQ::UpdateUI()
     CString cs_co2_off;
     CString cs_pm_on;
     CString cs_pm_off;
-    cs_co2_on.Format(_T("%u"), product_register_value[TATAT_AQ_CO2_ON]);
-    cs_co2_off.Format(_T("%u"), product_register_value[TATAT_AQ_CO2_OFF]);
-    cs_pm_on.Format(_T("%u"), product_register_value[TATAT_AQ_PM_ON]);
-    cs_pm_off.Format(_T("%u"), product_register_value[TATAT_AQ_PM_OFF]);
+    if (product_register_value[7] == PM_TSTAT_AQ)
+    {
+        cs_co2_on.Format(_T("%u"), product_register_value[1020]);
+        cs_co2_off.Format(_T("%u"), product_register_value[1021]);
+        cs_pm_on.Format(_T("%u"), product_register_value[1022]);
+        cs_pm_off.Format(_T("%u"), product_register_value[1023]);
+    }
+    else
+    {
+        cs_co2_on.Format(_T("%u"), product_register_value[TATAT_AQ_CO2_ON]);
+        cs_co2_off.Format(_T("%u"), product_register_value[TATAT_AQ_CO2_OFF]);
+        cs_pm_on.Format(_T("%u"), product_register_value[TATAT_AQ_PM_ON]);
+        cs_pm_off.Format(_T("%u"), product_register_value[TATAT_AQ_PM_OFF]);
+    }
+
 
     GetDlgItem(IDC_STATIC_TEMPERATURE_VALUE)->SetWindowTextW(cs_temp);
     GetDlgItem(IDC_STATIC_HUM_VALUE)->SetWindowTextW(cs_hum);
@@ -226,8 +238,9 @@ void CTstatAQ::UpdateUI()
 
 
     CString cs_api_value;
-    cs_api_value.Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI]);
     CString cs_api_level;
+    cs_api_value.Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI]);
+
     cs_api_level.Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_LEVEL] + 1);
 
     if ((aqi_level != product_register_value[TATAT_AQ_MODBUS_AQI_LEVEL]) && product_register_value[TATAT_AQ_MODBUS_AQI_LEVEL]<=5)
@@ -245,12 +258,22 @@ void CTstatAQ::UpdateUI()
     temp_cus_api[3].Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FOURTH_LINE]);
     temp_cus_api[4].Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FIFTH_LINE]);
 
-    if (product_register_value[7] == PM_MULTI_SENSOR)
+    if ((product_register_value[7] == PM_MULTI_SENSOR) || (product_register_value[7] == PM_TSTAT_AQ))
     {
-        GetDlgItem(IDC_EDIT_CO2_ON_TIME)->EnableWindow(1);
-        GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->EnableWindow(1);
-        GetDlgItem(IDC_EDIT_PM_ON_TIME)->EnableWindow(1);
-        GetDlgItem(IDC_EDIT_PM_OFF_TIME)->EnableWindow(1);
+        if (temp_software_version >= 112)
+        {
+            GetDlgItem(IDC_EDIT_CO2_ON_TIME)->EnableWindow(1);
+            GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->EnableWindow(1);
+            GetDlgItem(IDC_EDIT_PM_ON_TIME)->EnableWindow(1);
+            GetDlgItem(IDC_EDIT_PM_OFF_TIME)->EnableWindow(1);
+        }
+        else
+        {
+            GetDlgItem(IDC_EDIT_CO2_ON_TIME)->EnableWindow(0);
+            GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->EnableWindow(0);
+            GetDlgItem(IDC_EDIT_PM_ON_TIME)->EnableWindow(0);
+            GetDlgItem(IDC_EDIT_PM_OFF_TIME)->EnableWindow(0);
+        }
         GetDlgItem(IDC_EDIT_CO2_ON_TIME)->SetWindowTextW(cs_co2_on);
         GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->SetWindowTextW(cs_co2_off);
         GetDlgItem(IDC_EDIT_PM_ON_TIME)->SetWindowTextW(cs_pm_on);
@@ -264,69 +287,19 @@ void CTstatAQ::UpdateUI()
 
         EnableCus(0);
     }
-    else
+    if (product_register_value[7] == PM_TSTAT_AQ)
     {
-        GetDlgItem(IDC_EDIT_CO2_ON_TIME)->EnableWindow(0);
-        GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->EnableWindow(0);
-        GetDlgItem(IDC_EDIT_PM_ON_TIME)->EnableWindow(0);
-        GetDlgItem(IDC_EDIT_PM_OFF_TIME)->EnableWindow(0);
-        GetDlgItem(IDC_EDIT_CO2_ON_TIME)->SetWindowTextW(_T(" "));
-        GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->SetWindowTextW(_T(" "));
-        GetDlgItem(IDC_EDIT_PM_ON_TIME)->SetWindowTextW(_T(" "));
-        GetDlgItem(IDC_EDIT_PM_OFF_TIME)->SetWindowTextW(_T(" "));
-#if 0
-        if (product_register_sensor_flag[0] == 0x55)
+        if (temp_software_version < 112)
         {
-            bitset<16> module_type(product_register_sensor_flag[1]);
-            if (module_type.test(SENSOR_BIT_LIGHT) == true)
-            {
-                GetDlgItem(IDC_STATIC_LIGHT_VALUE)->SetWindowTextW(cs_light);
-
-                CString temp_light_trigger;
-                temp_light_trigger.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT_TRIGGER]);
-
-                CString temp_light_timer;
-                temp_light_timer.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT_TIMER]);
-
-            }
-            else
-            {
-                GetDlgItem(IDC_STATIC_LIGHT_VALUE)->SetWindowTextW(_T("-"));
-            }
-
-            if (module_type.test(SENSOR_BIT_SOUND) == true)
-            {
-                GetDlgItem(IDC_STATIC_SOUND_VALUE)->SetWindowTextW(cs_sound);
-                CString temp_sound_trigger;
-                temp_sound_trigger.Format(_T("%u"), product_register_value[TSTAT_AQ_SOUND_TRIGGER]);
-
-                CString temp_sound_timer;
-                temp_sound_timer.Format(_T("%u"), product_register_value[TSTAT_AQ_SOUND_TIMER]);
-
-            }
-            else
-            {
-                GetDlgItem(IDC_STATIC_SOUND_VALUE)->SetWindowTextW(_T("-"));
-            }
-
-            if (module_type.test(SENSOR_BIT_OCC) == true)
-            {
-                if(product_register_value[736] == 1)
-                    GetDlgItem(IDC_STATIC_OCC_STATUS)->SetWindowTextW(_T("Occupied"));
-                else 
-                    GetDlgItem(IDC_STATIC_OCC_STATUS)->SetWindowTextW(_T("Unoccupied"));
-            }
-            else
-                GetDlgItem(IDC_STATIC_OCC_STATUS)->SetWindowTextW(_T("-"));
+            GetDlgItem(IDC_EDIT_CO2_ON_TIME)->EnableWindow(0);
+            GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->EnableWindow(0);
+            GetDlgItem(IDC_EDIT_PM_ON_TIME)->EnableWindow(0);
+            GetDlgItem(IDC_EDIT_PM_OFF_TIME)->EnableWindow(0);
+            GetDlgItem(IDC_EDIT_CO2_ON_TIME)->SetWindowTextW(_T(" "));
+            GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->SetWindowTextW(_T(" "));
+            GetDlgItem(IDC_EDIT_PM_ON_TIME)->SetWindowTextW(_T(" "));
+            GetDlgItem(IDC_EDIT_PM_OFF_TIME)->SetWindowTextW(_T(" "));
         }
-        else
-        {
-            GetDlgItem(IDC_STATIC_LIGHT_VALUE)->SetWindowTextW(_T("-"));
-            GetDlgItem(IDC_STATIC_SOUND_VALUE)->SetWindowTextW(_T("-"));
-            GetDlgItem(IDC_STATIC_OCC_STATUS)->SetWindowTextW(_T("-"));
-        }
-#endif
-
 
         GetDlgItem(IDC_EDIT_AQI_VALUE)->SetWindowTextW(cs_api_value);
         GetDlgItem(IDC_EDIT_AQI_LEVEL)->SetWindowTextW(cs_api_level);

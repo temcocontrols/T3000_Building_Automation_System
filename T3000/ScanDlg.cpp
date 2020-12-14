@@ -1941,7 +1941,7 @@ void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 	CString strScreenName;
 	strScreenName.Format(_T("Screen(S:%d--%d)"), pDev->GetSerialID(), pDev->GetDevID() );
 
-	CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
+	CString strBackground_bmp=_T("Modbus_and_Bacnet");
 
 	CString strHWV;
 	strHWV.Format(_T("%.1f"), pDev->GetHardwareVersion());
@@ -2003,7 +2003,7 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 	CString strScreenName;
 	strScreenName.Format(_T("Screen(S:%d--%d)"), pNet->GetSerialID(), pNet->GetDevID() );
 
-	CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
+	CString strBackground_bmp=_T("Modbus_and_Bacnet");
 
 	CString strHWV;
 	strHWV.Format(_T("%0.1f"), pNet->GetHardwareVersion());

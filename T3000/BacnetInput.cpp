@@ -196,7 +196,8 @@ void CBacnetInput::Reload_Unit_Type()
 			}
 		}
 	}
-	else if (bacnet_device_type == TINY_EX_MINIPANEL || bacnet_device_type == MINIPANELARM_TB)
+	else if (bacnet_device_type == TINY_EX_MINIPANEL || 
+             bacnet_device_type == MINIPANELARM_TB)
 	{
 		if (TINYEX_MINIPANEL_IN_A > (int)m_Input_data.size())
 			initial_count = (int)m_Input_data.size();
@@ -212,6 +213,22 @@ void CBacnetInput::Reload_Unit_Type()
 			}
 		}
 	}
+    else if (bacnet_device_type == T3_TB_11I)
+    {
+        if (TB_11I_IN_A > (int)m_Input_data.size())
+            initial_count = (int)m_Input_data.size();
+        else
+            initial_count = TB_11I_IN_A;
+        for (int i = 0;i<initial_count;i++)
+        {
+            if (ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
+            {
+                ListCtrlEx::CStrList strlist;
+                strlist.push_back(Units_Analog_Only);
+                m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);
+            }
+        }
+    }
 	else if(bacnet_device_type == PRODUCT_CM5)
 	{
 		int analog_count;
@@ -1314,12 +1331,26 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	{
         if (g_selected_product_id == PM_TSTAT_AQ)
             return;;
+        if (g_selected_product_id == PM_TSTAT10)
+        {
+            if (Device_Basic_Setting.reg.mini_type == T3_OEM)
+            {
+                if((lRow >= 13) && (lRow <= 17))
+                    return;
+            }
+            if (Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
+            {
+                if ((lRow >= 8) && (lRow <= 12))
+                    return;
+            }
+        }
         m_dialog_signal_type = 0xff;
 		BacnetRange dlg;
 
 
         if ((g_protocol == MODBUS_BACNET_MSTP) ||
-            (g_protocol == PROTOCOL_BACNET_IP))// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
+            (g_protocol == PROTOCOL_BACNET_IP) || 
+            (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
         {
            // if (!read_customer_unit)//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
             {

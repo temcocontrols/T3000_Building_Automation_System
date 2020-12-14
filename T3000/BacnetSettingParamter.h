@@ -23,9 +23,6 @@ protected:
 public:
     virtual BOOL OnInitDialog();
     void InitialUI();
-    void LCD_CUS_MODE(bool cus_mode);
-    afx_msg void OnBnClickedRadioCusDef();
-    afx_msg void OnBnClickedRadioLcdDefault();
     afx_msg void OnCbnSelchangeComboType();
     afx_msg void OnCbnSelchangeComboNumber();
 };

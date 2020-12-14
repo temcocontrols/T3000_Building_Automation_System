@@ -215,7 +215,9 @@ void CBacnetOutput::Reload_Unit_Type()
 		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH,80);
 	}
 	else if((bacnet_device_type == TINY_MINIPANEL) 
-		   || ((bacnet_device_type == TINY_EX_MINIPANEL) || bacnet_device_type == MINIPANELARM_TB))
+		   || ((bacnet_device_type == TINY_EX_MINIPANEL) || 
+               ( bacnet_device_type == T3_TB_11I) || 
+               bacnet_device_type == MINIPANELARM_TB))
 	{
 #ifdef NEED_ANALOG_DIGITAL_ONLY
 		if(TINY_MINIPANEL_OUT_D > (int)m_Output_data.size()) 
@@ -404,6 +406,13 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
         OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
+    else if (bacnet_device_type == T3_TB_11I)
+    {
+        digital_special_output_count = T3_TB_11I_OUT_D;
+        analog_special_output_count = T3_TB_11I_OUT_A;
+        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+        Minipanel_device = 1;
+    }
 	else if(bacnet_device_type == PM_T38AI8AO6DO)
 	{
 		digital_special_output_count = T38AI8AO6DO_OUT_D;
@@ -578,7 +587,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		m_output_list.SetItemText(i,OUTPUT_LOW_VOLTAGE,low_voltage);	
 		m_output_list.SetItemText(i,OUTPUT_HIGH_VOLTAGE,high_voltage);	
 		if(
-			(bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM || bacnet_device_type == MINIPANELARM_LB || bacnet_device_type == MINIPANELARM_TB)
+			(bacnet_device_type == BIG_MINIPANEL || 
+                bacnet_device_type == MINIPANELARM || 
+                bacnet_device_type == MINIPANELARM_LB || 
+                bacnet_device_type == T3_TB_11I ||
+                bacnet_device_type == MINIPANELARM_TB)
 			|| ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == TINY_EX_MINIPANEL) ||
 			(bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PWM_TRANSDUCER)
             )
