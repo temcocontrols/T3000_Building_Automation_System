@@ -27,6 +27,7 @@ public:
 	virtual void OnOK();
 	virtual void OnCancel();
 	void Initial_static();
+    void SetAllRadioButton(int button_index = 2);
 	CStaticEx m_static_range_units_select;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	int m_analog_select;
@@ -63,6 +64,10 @@ public:
     afx_msg void OnBnClickedRadioMsv2();
     afx_msg void OnBnClickedRadioMsv3();
     void DisableAnalogVarRadio();
+    afx_msg void OnBnClickedRadio57();
+    afx_msg void OnBnClickedRadio58();
+    afx_msg void OnBnClickedRadio87();
+    afx_msg void OnBnClickedRadio103();
 };
 
 const CString Range_Type[] =
@@ -71,3 +76,7 @@ const CString Range_Type[] =
 	_T("Digital Ranges"),
 	_T("Custom Digital Ranges")
 };
+
+#define RANGE_RADIO_KEEP    0
+#define RANGE_RADIO_ENABLE  1
+#define RANGE_RADIO_DISABLE 2

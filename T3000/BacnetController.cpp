@@ -1076,7 +1076,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
         
             if (m_controller_data.at(lRow).action == 0)
             {
-                if (IDYES == MessageBox(_T(" '+' is used for cooling?"), _T("Warning"), MB_YESNOCANCEL | MB_ICONINFORMATION))
+                if (IDYES == MessageBox(_T("Change to '+'?It is for a system that will react when the sensor is ABOVE the setpoint such as cooling."), _T("Warning"), MB_YESNOCANCEL | MB_ICONINFORMATION))
                 {
                     m_controller_data.at(lRow).action = 1;
                     m_controller_list.SetItemText(lRow, lCol, _T("+"));
@@ -1089,7 +1089,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
             }
             else
             {
-                if (IDYES == MessageBox(_T(" '-' is used for heating?"), _T("Warning"), MB_YESNOCANCEL | MB_ICONINFORMATION))
+                if (IDYES == MessageBox(_T("Change to '-'? It is used on a system that will react when the sensor is BELOW the setpoint such as heating."), _T("Note"), MB_YESNOCANCEL | MB_ICONINFORMATION))
                 {
                     m_controller_data.at(lRow).action = 0;
                     m_controller_list.SetItemText(lRow, lCol, _T("-"));

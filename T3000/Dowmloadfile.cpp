@@ -1209,7 +1209,7 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
         goto ftp_download_end;
     }
 
-    T3000FtpPath = _T("https://www.temcocontrols.com/ftp/firmware/") + temp_download_path;
+    T3000FtpPath = _T("https://temcocontrols.com/ftp/firmware/") + temp_download_path;
 
 
     strFileName  = PathFindFileName(T3000FtpPath);  //根据组合的下载路径，获取最后得文件名
@@ -1220,7 +1220,7 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     //若存在 版本信息文件路径 就去下载并显示出来;
     if (temp_revision_path.IsEmpty() == false)
     {
-        revisionFtpPath = _T("https://www.temcocontrols.com/ftp/firmware/") + temp_revision_path;
+        revisionFtpPath = _T("https://temcocontrols.com/ftp/firmware/") + temp_revision_path;
         strFileName = PathFindFileName(revisionFtpPath);  //根据组合的下载路径，获取最后得文件名
         DesDownloadRevisionPath = Folder_Path + _T("\\") + strFileName;
 

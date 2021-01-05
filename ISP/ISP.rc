@@ -230,7 +230,7 @@ BEGIN
     LTEXT           "IP Addr:",IDC_STATIC,193,70,28,8
     LTEXT           "IP Port:",IDC_STATIC,194,85,27,8
     GROUPBOX        "",IDC_STATIC_NET,190,63,116,74,BS_LEFT | BS_FLAT
-    CONTROL         "COM FLASH",IDC_COM,"Button",BS_AUTORADIOBUTTON,192,3,114,10
+    CONTROL         "COM FLASH",IDC_COM,"Button",BS_AUTORADIOBUTTON,192,3,50,10
     CONTROL         "NET FLASH",IDC_NET,"Button",BS_AUTORADIOBUTTON,190,56,113,10
     EDITTEXT        IDC_EDIT_MDBID2,207,123,97,12,ES_AUTOHSCROLL
     CONTROL         "Flash Subnet Device",IDC_CHECK_FLASH_SUBID,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,191,112,86,10
@@ -301,6 +301,7 @@ BEGIN
     CONTROL         "",IDC_CHECK_ITEM32,"Button",BS_AUTOCHECKBOX,431,271,90,10
     CONTROL         "",IDC_CHECK_NO_ITEM,"Button",BS_AUTOCHECKBOX,322,14,90,10
     CONTROL         "Flash Wifi MAC",IDC_CHECK_FLASH_WIFI_MAC,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,2,326,54,10
+    CONTROL         "MSTP Update",IDC_CHECK_MSTP_UPDATE,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,246,4,63,10
 END
 
 
@@ -331,12 +332,28 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_ISP_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ABOUTBOX AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // Version
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 6,2,1,0
- PRODUCTVERSION 6,2,1,0
+ FILEVERSION 6,2,5,0
+ PRODUCTVERSION 6,2,5,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -351,12 +368,12 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileVersion", "6.2.1.0"
+            VALUE "FileVersion", "6.2.5.0"
             VALUE "InternalName", "ISP.exe"
             VALUE "OriginalFilename", "ISP.exe"
             VALUE "ProductName", "ISP Tool"
-            VALUE "ProductVersion", "6.2.1.0"
-            VALUE "SpecialBuild", "6.2.1"
+            VALUE "ProductVersion", "6.2.5.0"
+            VALUE "SpecialBuild", "6.2.5"
             VALUE "TemcoCopyright", "Copyright 1999-2021 (c).  All rights reserved."
         END
     END
@@ -424,29 +441,13 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// AFX_DIALOG_LAYOUT
-//
-
-IDD_ISP_DIALOG AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_ABOUTBOX AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // String Table
 //
 
 STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About NEWISP..."
-    IDS_STR_VIRSIONNUM      "Version 6.2.1"
+    IDS_STR_VIRSIONNUM      "Version 6.2.5"
     IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
 END
 

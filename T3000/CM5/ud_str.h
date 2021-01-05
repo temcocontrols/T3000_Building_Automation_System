@@ -79,6 +79,17 @@ typedef enum {
          READ_MSV_COMMAND          = 42,
          READ_EMAIL_ALARM          = 43,
 
+         READ_NEW_TIME_COMMAND = 88,           /* read new time            */  //2018 04 17 新的读时间命令
+         READMONITORPACKAGE_T3000 = 89,           /* read monitor belong to which package   */
+         READ_AT_COMMAND = 90,	//450 length
+         READ_GRPHIC_LABEL_COMMAND = 91,
+         READ_BACNET_TO_MODBUS_COMMAND = 94,
+         READPIC_T3000 = 95,
+         READ_MISC = 96,
+         READ_REMOTE_DEVICE_DB = 97,
+         READ_SETTING_COMMAND = 98,
+         GETSERIALNUMBERINFO = 99,
+
 		 WRITEOUTPUT_T3000         = 100+ENUM_OUT+1,  /* write outputs          */
 		 WRITEINPUT_T3000          = 100+ENUM_IN+1,   /* write inputs           */
 		 WRITEVARIABLE_T3000       = 100+ENUM_VAR+1,        /* write variables  */
@@ -104,16 +115,7 @@ typedef enum {
 
 		 WRITE_COMMAND_50          = 150,
 		 
-         READ_NEW_TIME_COMMAND      = 88,           /* read new time            */  //2018 04 17 新的读时间命令
-         READMONITORPACKAGE_T3000   = 89,           /* read monitor belong to which package   */
-		 READ_AT_COMMAND			= 90,	//450 length
-		 READ_GRPHIC_LABEL_COMMAND  = 91,
-         READ_BACNET_TO_MODBUS_COMMAND   = 94,
-		 READPIC_T3000				= 95,
-		 READ_MISC					= 96,
-		 READ_REMOTE_DEVICE_DB		= 97,
-		 READ_SETTING_COMMAND		= 98,
-		  GETSERIALNUMBERINFO       = 99,
+
 		 PANEL_INFO1_COMMAND       = 110,
 		 PANEL_INFO2_COMMAND       = 111,
 		 MINICOMMINFO_COMMAND      = 112,

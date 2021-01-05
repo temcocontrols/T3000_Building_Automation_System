@@ -129,6 +129,6 @@ public:
     CString m_StrFileProductName;
     void Set_FileProductName(CString Name);
 	int total_retry;
-
+    int m_tcp_connect_results; // 点击Flash之后  标识TCP 套接字是否连上
 	int m_FlashTimes;
 };

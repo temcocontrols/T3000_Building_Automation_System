@@ -18,8 +18,10 @@
 
 #include "global_variable_extern.h"
 
-#include "HttpApiDefine.h"
+//#define USE_MOD_SHIFT_DF
+
 #ifdef ENABLE_HTTP_FUCTION
+#include "HttpApiDefine.h"
 #include "..\BravocontrolAPI\BravocontrolAPI\HttpAPI\HttpAPI.h"
 #endif
 #ifdef DEBUG

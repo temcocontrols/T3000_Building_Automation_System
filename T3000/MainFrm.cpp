@@ -933,13 +933,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[13],MOD_ALT,'D');
     if(!nRet)
         AfxMessageBox(_T("RegisterHotKey ALT + R failure"));
-
+#ifdef USE_MOD_SHIFT_DF
     nRet = RegisterHotKey(GetSafeHwnd(),1111,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'D'); //热键 ctrl + alt + shift + D
     if(!nRet)
         AfxMessageBox(_T("RegisterHotKey MOD_SHIFT + D failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),1112,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'F'); //热键 ctrl + alt + shift + F
     if(!nRet)
         AfxMessageBox(_T("RegisterHotKey MOD_SHIFT + F failure"));
+#endif // USE_MOD_SHIFT_DF
 #else //release版本   
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'I');
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'O');
@@ -955,8 +956,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[11],MOD_ALT,'C');
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[12],MOD_ALT,'B');
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[13],MOD_ALT,'D');
+#ifdef USE_MOD_SHIFT_DF
     RegisterHotKey(GetSafeHwnd(),1111,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'D');
     RegisterHotKey(GetSafeHwnd(),1112,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'F');
+#endif // USE_MOD_SHIFT_DF
 #endif
     for(int i=0; i<WINDOW_TAB_COUNT; i++)
     {
@@ -2017,6 +2020,7 @@ void CMainFrame::LoadProductFromDB()
 							    (temp_product_class_id == STM32_PRESSURE_NET) ||
 							    (temp_product_class_id == STM32_PRESSURE_RS3485) ||
 							    (temp_product_class_id == STM32_CO2_NET)||
+                                (temp_product_class_id == STM32_PM25) ||
 							    (temp_product_class_id == STM32_CO2_RS485) ||
                                 (temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28 修复 HUM 使用默认TSTAT图标的bug
                                 (temp_product_class_id == STM32_HUM_RS485))
@@ -2276,6 +2280,7 @@ void CMainFrame::LoadProductFromDB()
 								(temp_product_class_id == STM32_PRESSURE_NET) ||
 								(temp_product_class_id == STM32_PRESSURE_RS3485) ||
 								(temp_product_class_id == STM32_CO2_NET) ||
+                                (temp_product_class_id == STM32_PM25) ||
 								(temp_product_class_id == STM32_CO2_RS485) ||
                                 (temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28 修复 HUM 使用默认TSTAT图标的bug
                                 (temp_product_class_id == STM32_HUM_RS485))
@@ -2540,6 +2545,7 @@ void CMainFrame::LoadProductFromDB()
 					(temp_product_class_id == PM_PRESSURE_SENSOR) ||
 					(temp_product_class_id == STM32_PRESSURE_NET) ||
 					(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+                    (temp_product_class_id == STM32_PM25) ||
 					(temp_product_class_id == STM32_CO2_NET) ||
 					(temp_product_class_id == STM32_CO2_RS485))
 					TVINSERV_CO2
@@ -3080,6 +3086,7 @@ void CMainFrame::ScanTstatInDB(void)
 						(temp_product_class_id == STM32_PRESSURE_NET) ||
 						(temp_product_class_id == STM32_PRESSURE_RS3485) ||
 						(temp_product_class_id == STM32_CO2_NET) ||
+                        (temp_product_class_id == STM32_PM25) ||
 						(temp_product_class_id == STM32_CO2_RS485))
 						TVINSERV_CO2
 					else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
@@ -4598,14 +4605,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_INPUT_ITEM_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READINPUT_T3000,(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_in_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read input form %d to %d success."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read input from %d to %d success."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read input form %d to %d timeout."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read input from %d to %d timeout."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4619,14 +4626,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_OUTPUT_ITEM_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READOUTPUT_T3000,(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_out_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read output form %d to %d success."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read output from %d to %d success."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read input form %d to %d timeout."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read input from %d to %d timeout."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4644,14 +4651,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
          }
          if (GetPrivateData_Blocking(g_bac_instance, READTIMESCHEDULE_T3000, i, i, WEEKLY_SCHEDULE_SIZE) > 0)
          {
-             Mession_ret.Format(_T("Read schedule form %d to %d success."), i, i);
+             Mession_ret.Format(_T("Read schedule from %d to %d success."), i, i);
              SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
              read_success_count++;
              Sleep(SEND_COMMAND_DELAY_TIME);
          }
          else
          {
-             Mession_ret.Format(_T("Read schedule form %d to %d timeout."), i, i);
+             Mession_ret.Format(_T("Read schedule from %d to %d timeout."), i, i);
              SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
              goto read_end_thread;
          }
@@ -4665,14 +4672,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READVARIABLE_T3000,(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_variable_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read variable form %d to %d success."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read variable from %d to %d success."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read variable form %d to %d timeout."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read variable from %d to %d timeout."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4687,14 +4694,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_PROGRAM_ITEM_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READPROGRAM_T3000,(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_program_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read program form %d to %d success."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read program from %d to %d success."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read program form %d to %d timeout."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read program from %d to %d timeout."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4714,14 +4721,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
          }
 		 if(GetPrivateData_Blocking(g_bac_instance,READANNUALSCHEDULE_T3000,i,i, ANNUAL_CODE_SIZE) > 0)
 		 {
-			 Mession_ret.Format(_T("Read holiday form %d to %d success."),i,i);
+			 Mession_ret.Format(_T("Read holiday from %d to %d success."),i,i);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read holiday form %d to %d timeout."),i,i);
+			 Mession_ret.Format(_T("Read holiday from %d to %d timeout."),i,i);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4736,14 +4743,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_PID_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READCONTROLLER_T3000,(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_controller_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read PID form %d to %d success."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read PID from %d to %d success."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read PID form %d to %d timeout."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read PID from %d to %d timeout."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4758,14 +4765,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_SCREEN_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READSCREEN_T3000,(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance,sizeof(Control_group_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read screen form %d to %d success."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read screen from %d to %d success."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read screen form %d to %d timeout."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read screen from %d to %d timeout."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4780,14 +4787,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_HOLIDAY_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READANNUALROUTINE_T3000,(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_annual_routine_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read holiday list form %d to %d success."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read holiday list from %d to %d success."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read holiday list form %d to %d timeout."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read holiday list from %d to %d timeout."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4803,14 +4810,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_SCHEDULE_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READWEEKLYROUTINE_T3000,(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_weekly_routine_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read schedule list form %d to %d success."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read schedule list from %d to %d success."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read schedule list form %d to %d timeout."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read schedule list from %d to %d timeout."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4825,14 +4832,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_MONITOR_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READMONITOR_T3000,(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_monitor_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read monitor list form %d to %d success."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read monitor list from %d to %d success."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read monitor list form %d to %d timeout."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read monitor list from %d to %d timeout."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4847,14 +4854,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_CUSTOMER_UNITS_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READUNIT_T3000,(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_Units_element)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read custom unit form %d to %d success."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read custom unit from %d to %d success."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read custom unit form %d to %d timeout."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read custom unit from %d to %d timeout."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4870,14 +4877,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_USER_LOGIN_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READUSER_T3000,(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_userlogin_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read user login table form %d to %d success."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read user login table from %d to %d success."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read user login table form %d to %d timeout."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read user login table from %d to %d timeout."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4899,14 +4906,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_GRPHIC_LABEL_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READ_GRPHIC_LABEL_COMMAND,(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_label_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read screen data form %d to %d success."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read screen data from %d to %d success."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read screen data table form %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read screen data table from %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -4917,14 +4924,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 	 //下面是读Setting 结构的部分;
 	 if(GetPrivateData_Blocking(g_bac_instance,READ_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info)) > 0)
 	 {
-		 Mession_ret.Format(_T("Read device information form  success."));
+		 Mession_ret.Format(_T("Read device information success."));
 		 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 		 read_success_count ++ ;
 		 Sleep(SEND_COMMAND_DELAY_TIME);
 	 }
 	 else
 	 {
-		 Mession_ret.Format(_T("Read device information form  success."));
+		 Mession_ret.Format(_T("Read device information success."));
 		 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 		 goto read_end_thread;
 	 }
@@ -4967,14 +4974,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 	  {
 		  if(GetPrivateData_Blocking(g_bac_instance, READVARUNIT_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
 		  {
-			  Mession_ret.Format(_T("Read variable custom units form success."));
+			  Mession_ret.Format(_T("Read variable custom units success."));
 			  SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			  read_success_count ++ ;
 			  Sleep(SEND_COMMAND_DELAY_TIME);
 		  }
 		  else
 		  {
-			  Mession_ret.Format(_T("Read variable custom units form timeout."));
+			  Mession_ret.Format(_T("Read variable custom units timeout."));
 			  SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			  goto read_end_thread;
 		  }
@@ -4990,14 +4997,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 			 end_temp_instance = BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT - 1;
 		 if(GetPrivateData_Blocking(g_bac_instance,READANALOG_CUS_TABLE_T3000,(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_table_point)) > 0)
 		 {
-			 Mession_ret.Format(_T("Read Analog custom table form %d to %d success."),(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read Analog custom table from %d to %d success."),(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 read_success_count ++ ;
 			 Sleep(SEND_COMMAND_DELAY_TIME);
 		 }
 		 else
 		 {
-			 Mession_ret.Format(_T("Read Analog custom table form %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+			 Mession_ret.Format(_T("Read Analog custom table from %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
 			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 			 goto read_end_thread;
 		 }
@@ -5012,14 +5019,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
              end_temp_instance = BAC_MSV_COUNT - 1;
          if (GetPrivateData_Blocking(g_bac_instance, READ_MSV_COMMAND, (BAC_MSV_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_MSV)) > 0)
          {
-             Mession_ret.Format(_T("Read msv range form %d to %d success."), (BAC_MSV_GROUP_NUMBER)*i, end_temp_instance);
+             Mession_ret.Format(_T("Read msv range from %d to %d success."), (BAC_MSV_GROUP_NUMBER)*i, end_temp_instance);
              SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
              read_success_count++;
              Sleep(SEND_COMMAND_DELAY_TIME);
          }
          else
          {
-             Mession_ret.Format(_T("Read msv range form %d to %d timeout."), (BAC_MSV_GROUP_NUMBER)*i, end_temp_instance);
+             Mession_ret.Format(_T("Read msv range from %d to %d timeout."), (BAC_MSV_GROUP_NUMBER)*i, end_temp_instance);
              SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
              goto read_end_thread;
          }
@@ -5033,14 +5040,14 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
              end_temp_instance = BAC_SCHEDULE_COUNT - 1;
          if (GetPrivateData_Blocking(g_bac_instance, READ_SCHEDUAL_TIME_FLAG, (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_schedual_time_flag)) > 0)
          {
-             Mession_ret.Format(_T("Read schedule flag list form %d to %d success."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
+             Mession_ret.Format(_T("Read schedule flag list from %d to %d success."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
              SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
              read_success_count++;
              Sleep(SEND_COMMAND_DELAY_TIME);
          }
          else
          {
-             Mession_ret.Format(_T("Read schedule flag list form %d to %d timeout."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
+             Mession_ret.Format(_T("Read schedule flag list from %d to %d timeout."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
              SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
              goto read_end_thread;
          }
@@ -5267,14 +5274,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             end_temp_instance = BAC_INPUT_ITEM_COUNT - 1;
         if(Write_Private_Data_Blocking(WRITEINPUT_T3000,(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance) > 0)
         {
-            Mession_ret.Format(_T("Write input form %d to %d success."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write input from %d to %d success."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write input form %d to %d timeout."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write input from %d to %d timeout."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5289,14 +5296,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             end_temp_instance = BAC_OUTPUT_ITEM_COUNT - 1;
         if(Write_Private_Data_Blocking(WRITEOUTPUT_T3000,(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance) > 0)
         {
-            Mession_ret.Format(_T("Write output form %d to %d success."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write output from %d to %d success."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write output form %d to %d timeout."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write output from %d to %d timeout."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5310,14 +5317,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
         if(Write_Private_Data_Blocking(WRITEVARIABLE_T3000,(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance) > 0)
         {
-            Mession_ret.Format(_T("Write variable form %d to %d success."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write variable from %d to %d success."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write variable form %d to %d timeout."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write variable from %d to %d timeout."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5331,14 +5338,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             end_temp_instance = BAC_PROGRAM_ITEM_COUNT - 1;
         if(Write_Private_Data_Blocking(WRITEPROGRAM_T3000,(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance) > 0)
         {
-            Mession_ret.Format(_T("Write program form %d to %d success."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write program from %d to %d success."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write program form %d to %d timeout."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write program from %d to %d timeout."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5350,14 +5357,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
     {
         if(Write_Private_Data_Blocking(WRITETIMESCHEDULE_T3000,i,i) > 0)
         {
-            Mession_ret.Format(_T("Write schedule form %d to %d success."),i,i);
+            Mession_ret.Format(_T("Write schedule from %d to %d success."),i,i);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write schedule form %d to %d timeout."),i,i);
+            Mession_ret.Format(_T("Write schedule from %d to %d timeout."),i,i);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5368,14 +5375,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
     {
         if(Write_Private_Data_Blocking(WRITEANNUALSCHEDULE_T3000,i,i) > 0)
         {
-            Mession_ret.Format(_T("Write holiday form %d to %d success."),i,i);
+            Mession_ret.Format(_T("Write holiday from %d to %d success."),i,i);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write holiday form %d to %d timeout."),i,i);
+            Mession_ret.Format(_T("Write holiday from %d to %d timeout."),i,i);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5389,14 +5396,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             end_temp_instance = BAC_PID_COUNT - 1;
         if(Write_Private_Data_Blocking(WRITEPID_T3000,(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance) > 0)
         {
-            Mession_ret.Format(_T("Write PID form %d to %d success."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write PID from %d to %d success."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write PID form %d to %d timeout."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write PID from %d to %d timeout."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5410,14 +5417,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             end_temp_instance = BAC_SCREEN_COUNT - 1;
         if(Write_Private_Data_Blocking(WRITESCREEN_T3000,(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance) > 0)
         {
-            Mession_ret.Format(_T("Write screen form %d to %d success."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write screen from %d to %d success."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write screen form %d to %d timeout."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write screen from %d to %d timeout."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5431,14 +5438,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             end_temp_instance = BAC_HOLIDAY_COUNT - 1;
         if(Write_Private_Data_Blocking(WRITEHOLIDAY_T3000,(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance) > 0)
         {
-            Mession_ret.Format(_T("Write holiday form %d to %d success."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write holiday from %d to %d success."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write holiday form %d to %d timeout."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write holiday from %d to %d timeout."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5452,14 +5459,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             end_temp_instance = BAC_SCHEDULE_COUNT - 1;
         if(Write_Private_Data_Blocking(WRITESCHEDULE_T3000,(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance) > 0)
         {
-            Mession_ret.Format(_T("Write schedule form %d to %d success."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write schedule from %d to %d success."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write schedule form %d to %d timeout."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write schedule from %d to %d timeout."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5474,14 +5481,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             end_temp_instance = BAC_MONITOR_COUNT - 1;
         if(Write_Private_Data_Blocking(WRITEMONITOR_T3000,(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance) > 0)
         {
-            Mession_ret.Format(_T("Write monitor form %d to %d success."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write monitor from %d to %d success."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
-            Mession_ret.Format(_T("Write monitor form %d to %d timeout."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
+            Mession_ret.Format(_T("Write monitor from %d to %d timeout."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             goto write_end_thread;
         }
@@ -5531,14 +5538,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				end_temp_instance = BAC_CUSTOMER_UNITS_COUNT - 1;
 			if(Write_Private_Data_Blocking(WRITEUNIT_T3000,(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance) > 0)
 			{
-				Mession_ret.Format(_T("Write Custom unit form %d to %d success."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
+				Mession_ret.Format(_T("Write Custom unit from %d to %d success."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
 				Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
-				Mession_ret.Format(_T("Write Custom unit form %d to %d timeout."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
+				Mession_ret.Format(_T("Write Custom unit from %d to %d timeout."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				goto write_end_thread;
 			}
@@ -5554,14 +5561,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				end_temp_instance = BAC_GRPHIC_LABEL_COUNT - 1;
 			if(Write_Private_Data_Blocking(WRITE_GRPHIC_LABEL_COMMAND,(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance) > 0)
 			{
-				Mession_ret.Format(_T("Write graphic label form %d to %d success."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+				Mession_ret.Format(_T("Write graphic label from %d to %d success."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
 				Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
-				Mession_ret.Format(_T("Write graphic label form %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+				Mession_ret.Format(_T("Write graphic label from %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				goto write_end_thread;
 			}
@@ -5576,14 +5583,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				end_temp_instance = BAC_USER_LOGIN_COUNT - 1;
 			if(Write_Private_Data_Blocking(WRITEUSER_T3000,(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance) > 0)
 			{
-				Mession_ret.Format(_T("Write user login info form %d to %d success."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
+				Mession_ret.Format(_T("Write user login info from %d to %d success."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
 				Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
-				Mession_ret.Format(_T("Write user login info form %d to %d timeout."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
+				Mession_ret.Format(_T("Write user login info from %d to %d timeout."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				goto write_end_thread;
 			}
@@ -5600,14 +5607,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				end_temp_instance = BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT - 1;
 			if(Write_Private_Data_Blocking(WRITEANALOG_CUS_TABLE_T3000,(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance) > 0)
 			{
-				Mession_ret.Format(_T("Write Analog custom table form %d to %d success."),(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance);
+				Mession_ret.Format(_T("Write Analog custom table from %d to %d success."),(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
 				Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
-				Mession_ret.Format(_T("Write Analog custom table form %d to %d timeout."),(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance);
+				Mession_ret.Format(_T("Write Analog custom table from %d to %d timeout."),(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				goto write_end_thread;
 			}
@@ -5645,14 +5652,14 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
                 end_temp_instance = BAC_SCHEDULE_COUNT - 1;
             if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance) > 0)
             {
-                Mession_ret.Format(_T("Write schedule flag form %d to %d success."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Write schedule flag from %d to %d success."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 write_success_count++;
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
-                Mession_ret.Format(_T("Write schedule flag form %d to %d timeout."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Write schedule flag from %d to %d timeout."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 goto write_end_thread;
             }
@@ -6131,8 +6138,10 @@ void CMainFrame::OnDestroy()
         {
             UnregisterHotKey(GetSafeHwnd(), m_MainHotKeyID[i]);
         }
+#ifdef USE_MOD_SHIFT_DF
         UnregisterHotKey(GetSafeHwnd(), 1111);
         UnregisterHotKey(GetSafeHwnd(), 1112);
+#endif
 
 
         g_killMultiReadEvent.SetEvent();
@@ -6353,7 +6362,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             str_panel_number.Format(_T("%d"), pbac_iam->macaddress);
             CString str_object_instance;
             str_object_instance.Format(_T("%u"), pbac_iam->device_id);
-            strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Screen_Name,Bautrate,Background_imgID,Com_Port,Protocol,Online_Status,Panal_Number,Object_Instance)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_n_port + "','" + temp_pro2 + "','1','" + str_panel_number + "' ,'" + str_object_instance + "' )"));
+            strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Screen_Name,Bautrate,Background_imgID,Com_Port,Protocol,Online_Status,Panal_Number,Object_Instance)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_n_port + "','" + temp_pro2 + "','1','" + str_panel_number + "' ,'" + str_object_instance + "' )"));
             SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
             SqliteDBBuilding.closedb();
             PostMessage(WM_MYMSG_REFRESHBUILDING, 0, 0);
@@ -8556,9 +8565,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 SwitchToPruductType(DLG_DIALOG_BOATMONITOR);
             }
-            else if (nFlag == PWM_TEMPERATURE_TRANSDUCER)
+            else if ((nFlag == PWM_TEMPERATURE_TRANSDUCER) ||
+                     (nFlag == STM32_PM25))
             {
-                n_show_register_list = 1;
+                //SwitchToPruductType(DLG_AIRQUALITY_VIEW);
+                SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
+                
+                //n_show_register_list = 1;
                 break; //直接显示寄存器列表;
             }
             else if (nFlag<PM_NC)
@@ -9164,13 +9177,13 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
             {
                 CString temp_pro2;
                 temp_pro2.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
-                strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','"+ str_hardware_info +"','"+temp_pro2+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
+                strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','Modbus_and_Bacnet','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','"+ str_hardware_info +"','"+temp_pro2+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
             }
 			else if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device)
 			{
 				CString temp_pro3;
 				temp_pro3.Format(_T("%u"),PROTOCOL_BACNET_IP);
-				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','"+ str_hardware_info +"','"+temp_pro3+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
+				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','Modbus_and_Bacnet','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','"+ str_hardware_info +"','"+temp_pro3+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
 			}
             else if (m_refresh_net_device_data.at(y).nprotocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
             {
@@ -9184,7 +9197,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                         //str_serialid.Format(_T("%u"), mstp_array[0] + mstp_array[1] * 256 + mstp_array[2] * 256 * 256 + mstp_array[3] * 256 * 256 * 256);
                         CString temp_pro4;
                         temp_pro4.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
-                        strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','"+ str_hardware_info +"','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                        strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','"+ str_hardware_info +"','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
                 //    }
                 //    else if (nret_read_bac < 0)
                 //    {
@@ -11054,6 +11067,11 @@ void CMainFrame::OnControlMain()
         {
             SwitchToPruductType(DLG_DIALOG_TSTAT_AQ);
         }
+        else if ((product_register_value[7] == PWM_TEMPERATURE_TRANSDUCER) ||
+            (product_register_value[7] == STM32_PM25))
+        {
+            OnToolRegisterviewer();
+        }
     }
      bacnet_view_number = TYPE_MAIN		;
  	 global_interface = BAC_MAIN;
@@ -11883,6 +11901,7 @@ void CMainFrame::OnControlSettings()
         product_register_value[7] == PM_TSTAT_AQ   ||
         product_register_value[7] == PM_MULTI_SENSOR ||
         product_register_value[7] == STM32_CO2_NET ||
+        product_register_value[7] == STM32_PM25 ||
         product_register_value[7] == STM32_PRESSURE_NET ||
         product_register_value[7] == STM32_CO2_RS485 ||
         product_register_value[7] == STM32_HUM_RS485 ||
@@ -12268,9 +12287,11 @@ void CMainFrame::OnDatabaseBacnettool()
     ApplicationFolder.ReleaseBuffer();
     CS_BacnetExplore_Path = ApplicationFolder + _T("\\BacnetExplore.exe");
 
-    HTREEITEM item = m_pTreeViewCrl->GetSelectedItem();
-    CString selecteditemstr = (item != nullptr) ? m_pTreeViewCrl->GetItemText(item) : L"";
-    ShellExecute(NULL, L"open", CS_BacnetExplore_Path, selecteditemstr, NULL, SW_SHOWNORMAL);
+    ShellExecute(NULL, L"open", CS_BacnetExplore_Path, NULL, NULL, SW_SHOWNORMAL);
+
+    //HTREEITEM item = m_pTreeViewCrl->GetSelectedItem();
+    //CString selecteditemstr = (item != nullptr) ? m_pTreeViewCrl->GetItemText(item) : L"";
+    //ShellExecute(NULL, L"open", CS_BacnetExplore_Path, selecteditemstr, NULL, SW_SHOWNORMAL);
     return;
 #if 0
 

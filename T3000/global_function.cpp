@@ -1928,7 +1928,7 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
     if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) //如果支持 转接头协议 ，并且默认重试10次，就改默认3次，没必要那么久;
     {
         if (retrytime == 10)
-            retrytime = 1;
+            retrytime = 4;
     }
     for (int z=0; z<retrytime; z++)
     {
@@ -1964,7 +1964,7 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
 	
         if(send_status)
         {
-            for (int i=0; i<400; i++)
+            for (int i=0; i<300; i++)
             {
                 Sleep(10);
                 if(tsm_invoke_id_free(temp_invoke_id))
@@ -4142,6 +4142,8 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             bacnet_device_type = MINIPANELARM_LB;
         else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
             bacnet_device_type = MINIPANELARM_TB;
+        else if (Device_Basic_Setting.reg.mini_type == T3_TB_11I)
+            bacnet_device_type = T3_TB_11I;
         else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB)
             bacnet_device_type = MINIPANELARM_NB;
         else
@@ -4232,6 +4234,10 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 3;
         memcpy_s(Device_Basic_Setting.reg.uart_stopbit, 3, my_temp_point, 3);
         my_temp_point = my_temp_point + 3;
+
+        memcpy_s(&Device_Basic_Setting.reg.display_lcd, 7, my_temp_point, 7);
+        my_temp_point = my_temp_point + 7;
+
         return READ_SETTING_COMMAND;
     }
     break;
@@ -5789,6 +5795,12 @@ void Inial_Product_Menu_map()
             memcpy(product_menu[i], temp, 20);
         }
         break;
+        case STM32_PM25:
+        {
+            unsigned char  temp[20] = { 1,0,0,0,  0,0,0,0,  0,0,0,0,   0,1,1,1  ,0,0,0,0 };
+            memcpy(product_menu[i], temp, 20);
+        }
+            break;
         default:
             break;
         }
@@ -5850,43 +5862,43 @@ int Get_Product_Input_Map(unsigned char product_tpye, int input_item)
 
 void Inial_Product_map()
 {
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT5B, _T("TStat5B")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5A,_T("TStat5A")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5B,_T("TStat5B")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5B2,_T("TStat5B2")));
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT5C,_T("TStat5C")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5D,_T("TStat5D")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5E,_T("TStat5E")));
-
-
-	product_map.insert(map<int,CString>::value_type(PM_PM5E,_T("PM5E")));
-    product_map.insert(map<int, CString>::value_type(PM_PM5E_ARM, _T("PM5E_ARM")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5F,_T("TStat5F")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5G,_T("TStat5G")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5H,_T("TStat5H")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT6,_T("TStat6")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT5i,_T("TStat5i")));
-
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT8,_T("TStat8")));
-    product_map.insert(map<int, CString>::value_type(PM_TSTAT9, _T("TStat9")));
-    
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT6, _T("TStat6")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT7, _T("TStat7")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT5i, _T("TStat5i")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT8, _T("TStat8")));
     product_map.insert(map<int, CString>::value_type(PM_TSTAT10, _T("TStat10")));
-
-
-	product_map.insert(map<int,CString>::value_type(PM_HUMTEMPSENSOR,_T("HUM Sensor")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5D,_T("TStat5D")));
+    product_map.insert(map<int, CString>::value_type(PM_AirQuality, _T("Air Quality")));
+    product_map.insert(map<int, CString>::value_type(PM_HUMTEMPSENSOR, _T("HUM Sensor")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTATRUNAR, _T("TStatRunar")));
+	product_map.insert(map<int,CString>::value_type(PM_TSTAT5E,_T("TStat5E")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT5F, _T("TStat5F")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT5G, _T("TStat5G")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT5H, _T("TStat5H")));
+    product_map.insert(map<int, CString>::value_type(PM_CO2_NET, _T("CO2 Net")));
+    product_map.insert(map<int, CString>::value_type(PM_CO2_RS485, _T("CO2")));
+    product_map.insert(map<int, CString>::value_type(PM_CO2_NODE, _T("CO2 Node")));
+	product_map.insert(map<int,CString>::value_type(PM_PM5E,_T("PM5E")));
+    product_map.insert(map<int, CString>::value_type(PM_CM5, _T("CM5")));
+    product_map.insert(map<int, CString>::value_type(PM_PM5E_ARM, _T("PM5E_ARM")));
+    product_map.insert(map<int, CString>::value_type(PM_TSTAT9, _T("TStat9")));
 	product_map.insert(map<int,CString>::value_type(STM32_HUM_NET,_T("HUM Sensor")));
 	product_map.insert(map<int,CString>::value_type(STM32_HUM_RS485,_T("HUM Sensor")));
-	product_map.insert(map<int,CString>::value_type(PM_AirQuality,_T("Air Quality")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTAT7,_T("TStat7")));
+
+
 
 	product_map.insert(map<int,CString>::value_type(PM_NC,_T("NC")));
-	product_map.insert(map<int,CString>::value_type(PM_CM5,_T("CM5")));
-	product_map.insert(map<int,CString>::value_type(PM_TSTATRUNAR,_T("TStatRunar")));
+
+
 	product_map.insert(map<int,CString>::value_type(PM_LightingController,_T("LC")));
-	product_map.insert(map<int,CString>::value_type(PM_CO2_NET,_T("CO2 Net")));
-	product_map.insert(map<int,CString>::value_type(PM_CO2_RS485,_T("CO2")));
+
 
 	product_map.insert(map<int,CString>::value_type(PM_PRESSURE_SENSOR,_T("Pressure")));
-	product_map.insert(map<int,CString>::value_type(PM_CO2_NODE,_T("CO2 Node")));
+
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT6_HUM_Chamber,_T("HumChamber")));
 	product_map.insert(map<int,CString>::value_type(PM_T3PT10,_T("T3-PT10")));
 	product_map.insert(map<int,CString>::value_type(PM_T3IOA,_T("T3-8O")));
@@ -9144,12 +9156,12 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 
     return 1;
 }
-
+char pBuf[200000];
 //杜帆Save
 void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
 {
 
-    char pBuf[200000];
+
     memset(pBuf, 0, 200000);
     pBuf[0] = 0x55;
     pBuf[1] = 0xff;
@@ -9161,13 +9173,13 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
     temp_point = temp_point + 3;
     for (int i = 0; i<BAC_INPUT_ITEM_COUNT; i++)
     {
-        memcpy(temp_point, (char *)m_Input_data.at(i).description, sizeof(Str_in_point));
+        memcpy(temp_point, &m_Input_data.at(i), sizeof(Str_in_point));
         temp_point = temp_point + sizeof(Str_in_point);
     }
 
     for (int i = 0; i<BAC_OUTPUT_ITEM_COUNT; i++)
     {
-        memcpy(temp_point, (char *)m_Output_data.at(i).description, sizeof(Str_out_point));
+        memcpy(temp_point, &m_Output_data.at(i), sizeof(Str_out_point));
         temp_point = temp_point + sizeof(Str_out_point);
     }
 
@@ -9545,7 +9557,8 @@ void Copy_Data_From_485_to_Bacnet(unsigned short *start_point)
 }
 
 
-
+char temp_save_modbus_buffer[64 * 1024 + 5];
+char temp_save_modbus_update_buffer[50000];
 //第一个字节 版本
 //然后是 4个字节的 时间 如果时间太久了 也需要重新获取;
 int SaveModbusConfigFile(CString &SaveConfigFilePath)
@@ -9644,19 +9657,19 @@ int SaveModbusConfigFile(CString &SaveConfigFilePath)
 
 
 
-	char temp_buffer[64*1024 +5];
+
 	char * temp_point = NULL;
-	memset(temp_buffer ,0, 64 * 1024);
+	memset(temp_save_modbus_buffer,0, 64 * 1024);
 	//FilePath = SaveConfigFilePath.Left( config_file_length -  right_suffix);
 	//FilePath = FilePath + _T("ini");
-	temp_buffer[0] = 5;
-	temp_point = temp_buffer + 1;
+    temp_save_modbus_buffer[0] = 5;
+	temp_point = temp_save_modbus_buffer + 1;
     bufferlength = 64 * 1024;
 #pragma region get_time_area
 	CTime temp_save_prg_time = CTime::GetCurrentTime();
 	unsigned long prg_temp_long_time = temp_save_prg_time.GetTime();
 
-	memcpy(temp_buffer + 1,&prg_temp_long_time,4);
+	memcpy(temp_save_modbus_buffer + 1,&prg_temp_long_time,4);
 
 #pragma endregion get_time_area
 
@@ -9665,21 +9678,21 @@ int SaveModbusConfigFile(CString &SaveConfigFilePath)
 	DWORD dWrites;
 	if(npoint != NULL)
 	{
-		memcpy(temp_buffer + 5,npoint,bufferlength);
+		memcpy(temp_save_modbus_buffer + 5,npoint,bufferlength);
 		temp_point = temp_point + bufferlength;
-		dwFileLen = temp_point - temp_buffer;
+		dwFileLen = temp_point - temp_save_modbus_buffer;
 		hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
-		WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
+		WriteFile(hFile, temp_save_modbus_buffer,dwFileLen,&dWrites,NULL);
 		CloseHandle(hFile);
 	}
 	else //第二个参数 如果是Null 就是update;
 	{
-		char temp_update_buffer[50000];
-		memset(temp_update_buffer,0,50000);
 
-		memcpy(temp_update_buffer,&Device_Basic_Setting.reg,400); //Setting 的400个字节;
+		memset(temp_save_modbus_update_buffer,0,50000);
+
+		memcpy(temp_save_modbus_update_buffer,&Device_Basic_Setting.reg,400); //Setting 的400个字节;
         char * temp_point = NULL;
-        temp_point = temp_update_buffer + 400;
+        temp_point = temp_save_modbus_update_buffer + 400;
 		for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
 		{
             
@@ -9702,11 +9715,11 @@ int SaveModbusConfigFile(CString &SaveConfigFilePath)
         temp_point = temp_point + 256;
 
 
-		memcpy(temp_buffer + 5,temp_update_buffer,bufferlength);
+		memcpy(temp_save_modbus_buffer + 5, temp_save_modbus_update_buffer, 50000/*bufferlength*/);
 		temp_point = temp_point + bufferlength;
 		dwFileLen = bufferlength + 5;//这5个字节是 版本和时间 ;
 		hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
-		WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
+		WriteFile(hFile, temp_save_modbus_buffer,dwFileLen,&dWrites,NULL);
 		CloseHandle(hFile);
 	}
 
@@ -13345,7 +13358,10 @@ int Get_Msv_Table_Name(int x)
     {
         CString temp_cs;
         if (index >= 3)
+        {
+            Custom_Msv_Range[x] = Custom_Msv_Range[x] + _T(" /...");
             break;
+        }
         if (m_msv_data.at(x).msv_data[k].status == 1)
         {
             MultiByteToWideChar(CP_ACP, 0, (char *)m_msv_data.at(x).msv_data[k].msv_name, (int)strlen((char *)m_msv_data.at(x).msv_data[k].msv_name) + 1,
@@ -13422,6 +13438,17 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
                 nret_type = OUTPUT_VIRTUAL_PORT;
         }
         break;
+        case T3_TB_11I:  //6DO   5AO
+        {
+            if (portindex <= 6)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= 11)
+                nret_type = OUTPUT_ANALOG_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
+
         default:
             break;
         }
@@ -13557,11 +13584,23 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
                 nret_type = INPUT_VIRTUAL_PORT;
         }
         break;
-        case TINY_MINIPANEL:  //6DO  2AO
+        case TINY_MINIPANEL:  
         case TINY_EX_MINIPANEL:
-        case MINIPANELARM_TB:  //6DO   8AO
+        case MINIPANELARM_TB:  
         {
             if (portindex <= 8)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    nret_type = INPUT_DIGITAL_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+        }
+        break;
+        case T3_TB_11I:  //11AI
+        {
+            if (portindex <= TB_11I_IN_A)
             {
                 nret_type = INPUT_ANALOG_PORT;
                 if (n_digital_analog == BAC_UNITS_DIGITAL)

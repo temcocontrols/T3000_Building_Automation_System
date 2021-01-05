@@ -205,15 +205,15 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
-	bool need_refresh_all = false;
-	int Fresh_List_Now = (int)wParam;
-	if( Fresh_List_Now == REFRESH_LIST_NOW)
-	{
-		need_refresh_all = true;
-	}
+	//bool need_refresh_all = false;
+	//int Fresh_List_Now = (int)wParam;
+	//if( Fresh_List_Now == REFRESH_LIST_NOW)
+	//{
+	//	need_refresh_all = true;
+	//}
 
-	if(need_refresh_all == false)
-	{
+	//if(need_refresh_all == false)
+	//{
 		if(isFreshOne == REFRESH_ON_ITEM)
 		{
 			Fresh_Item = (int)wParam;
@@ -230,7 +230,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				return 0;
 			}
 		}
-	}
+	//}
 
 
 

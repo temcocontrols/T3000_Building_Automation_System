@@ -250,8 +250,11 @@ static void RS485_Cleanup(
     if (!SetCommTimeouts(RS485_Handle, &RS485_Timeouts)) {
         RS485_Print_Error();
     }
-
-    CloseHandle(RS485_Handle);
+    if (RS485_Handle != NULL)
+    {
+        CloseHandle(RS485_Handle);
+        RS485_Handle = NULL;
+    }
 }
 
 

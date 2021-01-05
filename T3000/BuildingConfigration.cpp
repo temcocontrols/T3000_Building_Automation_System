@@ -1760,7 +1760,7 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
             if(!CopyFile(strdatabasefile,strDestFileName,FALSE))
             {
                 CString strTips;
-                strTips.Format(_T("Copy file form %s to %s Failed"),strdatabasefile,strDestFileName);
+                strTips.Format(_T("Copy file from %s to %s Failed"),strdatabasefile,strDestFileName);
                 AfxMessageBox(strTips);
                 return;
             }

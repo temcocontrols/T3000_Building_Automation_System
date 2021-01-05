@@ -9,6 +9,13 @@ MSFLXGRD.MSM
 COMCAT.MSM
 拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
 
+2020 11 17
+1.Optimize the speed of accessing devices using the Bacnet MSTP protocol. Before tuning, if the node of the device was 254, it usually required a long poll of tokens, from 1 to 254, but now it is T3000 to get the token and immediately access the device to be connected
+2. Fix the time synchronization issue
+3. Added Tstat10 top custom display, once again only display temperature, can now be displayed by the customer custom display, such as display IN4, OUT5
+4.  Modify the Airlab user interface
+5. ISP tool support load esp8266 bootloader
+
 2020 08 17
 1.修复在input和output界面 ，写入值时，会造成T3-22I以及T38AI8AO 重启的问题.
 
@@ -2664,6 +2671,8 @@ void CDialogCM5_BacNet::Fresh()
 					bacnet_device_type = MINIPANELARM_LB;
 				else if (ret == MINIPANELARM_TB)
 					bacnet_device_type = MINIPANELARM_TB;
+                else if (ret == T3_TB_11I)
+                    bacnet_device_type = T3_TB_11I;
                 else if (ret == MINIPANELARM_NB)
                     bacnet_device_type = MINIPANELARM_NB;
 				else
@@ -3316,14 +3325,14 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
                 end_temp_instance = BAC_INPUT_ITEM_COUNT - 1;
             if (GetPrivateData_Blocking(g_bac_instance, READINPUT_T3000, (BAC_READ_INPUT_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_in_point)) > 0)
             {
-                Mession_ret.Format(_T("Read input form %d to %d success."), (BAC_READ_INPUT_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read input from %d to %d success."), (BAC_READ_INPUT_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 read_success_count++;
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
-                Mession_ret.Format(_T("Read input form %d to %d timeout."), (BAC_READ_INPUT_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read input from %d to %d timeout."), (BAC_READ_INPUT_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                // goto read_end_thread;
             }
@@ -3370,14 +3379,14 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
                 end_temp_instance = BAC_OUTPUT_ITEM_COUNT - 1;
             if (GetPrivateData_Blocking(g_bac_instance, READOUTPUT_T3000, (BAC_READ_OUTPUT_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_out_point)) > 0)
             {
-                Mession_ret.Format(_T("Read output form %d to %d success."), (BAC_READ_OUTPUT_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read output from %d to %d success."), (BAC_READ_OUTPUT_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 read_success_count++;
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
-                Mession_ret.Format(_T("Read input form %d to %d timeout."), (BAC_READ_OUTPUT_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read input from %d to %d timeout."), (BAC_READ_OUTPUT_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 //goto read_end_thread;
             }
@@ -3422,14 +3431,14 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
                 end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
             if (GetPrivateData_Blocking(g_bac_instance, READVARIABLE_T3000, (BAC_READ_VARIABLE_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_variable_point)) > 0)
             {
-                Mession_ret.Format(_T("Read variable form %d to %d success."), (BAC_READ_VARIABLE_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read variable from %d to %d success."), (BAC_READ_VARIABLE_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 read_success_count++;
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
-                Mession_ret.Format(_T("Read variable form %d to %d timeout."), (BAC_READ_VARIABLE_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read variable from %d to %d timeout."), (BAC_READ_VARIABLE_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 //goto read_end_thread;
             }
@@ -3474,14 +3483,14 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
                 end_temp_instance = BAC_PID_COUNT - 1;
             if (GetPrivateData_Blocking(g_bac_instance, READCONTROLLER_T3000, (BAC_READ_PID_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_controller_point)) > 0)
             {
-                Mession_ret.Format(_T("Read PID form %d to %d success."), (BAC_READ_PID_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read PID from %d to %d success."), (BAC_READ_PID_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 read_success_count++;
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
-                Mession_ret.Format(_T("Read PID form %d to %d timeout."), (BAC_READ_PID_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read PID from %d to %d timeout."), (BAC_READ_PID_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 //goto read_end_thread;
             }
@@ -3526,14 +3535,14 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
                 end_temp_instance = BAC_PROGRAM_ITEM_COUNT - 1;
             if (GetPrivateData_Blocking(g_bac_instance, READPROGRAM_T3000, (BAC_READ_PROGRAM_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_program_point)) > 0)
             {
-                Mession_ret.Format(_T("Read program form %d to %d success."), (BAC_READ_PROGRAM_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read program from %d to %d success."), (BAC_READ_PROGRAM_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 read_success_count++;
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
-                Mession_ret.Format(_T("Read program form %d to %d timeout."), (BAC_READ_PROGRAM_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read program from %d to %d timeout."), (BAC_READ_PROGRAM_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 //goto read_end_thread;
             }
@@ -3617,14 +3626,14 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
                 end_temp_instance = BAC_SCREEN_COUNT - 1;
             if (GetPrivateData_Blocking(g_bac_instance, READSCREEN_T3000, (BAC_READ_SCREEN_GROUP_NUMBER)*i, end_temp_instance, sizeof(Control_group_point)) > 0)
             {
-                Mession_ret.Format(_T("Read screen form %d to %d success."), (BAC_READ_SCREEN_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read screen from %d to %d success."), (BAC_READ_SCREEN_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 read_success_count++;
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
-                Mession_ret.Format(_T("Read screen form %d to %d timeout."), (BAC_READ_SCREEN_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read screen from %d to %d timeout."), (BAC_READ_SCREEN_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 //goto read_end_thread;
             }
@@ -3669,14 +3678,14 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
                 end_temp_instance = BAC_SCHEDULE_COUNT - 1;
             if (GetPrivateData_Blocking(g_bac_instance, READWEEKLYROUTINE_T3000, (BAC_READ_SCHEDULE_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_weekly_routine_point)) > 0)
             {
-                Mession_ret.Format(_T("Read schedule list form %d to %d success."), (BAC_READ_SCHEDULE_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read schedule list from %d to %d success."), (BAC_READ_SCHEDULE_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 read_success_count++;
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
-                Mession_ret.Format(_T("Read schedule list form %d to %d timeout."), (BAC_READ_SCHEDULE_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read schedule list from %d to %d timeout."), (BAC_READ_SCHEDULE_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 //goto read_end_thread;
             }
@@ -3721,14 +3730,14 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
                 end_temp_instance = BAC_HOLIDAY_COUNT - 1;
             if (GetPrivateData_Blocking(g_bac_instance, READANNUALROUTINE_T3000, (BAC_READ_HOLIDAY_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_annual_routine_point)) > 0)
             {
-                Mession_ret.Format(_T("Read holiday list form %d to %d success."), (BAC_READ_HOLIDAY_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read holiday list from %d to %d success."), (BAC_READ_HOLIDAY_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 read_success_count++;
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
-                Mession_ret.Format(_T("Read holiday list form %d to %d timeout."), (BAC_READ_HOLIDAY_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read holiday list from %d to %d timeout."), (BAC_READ_HOLIDAY_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 //goto read_end_thread;
             }
@@ -6870,7 +6879,14 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
                  ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
          }
      }
-
+     if (GetPrivateData_Blocking(g_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
+     {
+         SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read device info OK!"));
+     }
+     else
+     {
+         SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read device info Timeout!"));
+     }
 
      switch_product_last_view();
 	 //PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);

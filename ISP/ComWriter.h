@@ -50,6 +50,7 @@ public:
 	int BeginWirteByCom();
 	int WirteExtendHexFileByCom();
     int WirteExtendHexFileByCom_RAM();
+    int InitialBacnetMstp();
 	void WriteFinish(int nFlashFlag);
 	//***************************Release Func*********************//
   //  void Show_Device_Information(int comport ,int ID);
@@ -76,7 +77,7 @@ Bin_Info m_hexinfor;
         char*			m_pFileRepairBuffer;
         CString					m_strRepairHexFileName; // 修复的固件路径;
 		int					m_nBufLen;
-        BOOL Is_Ram;
+        int                 Is_Ram;
 		int					m_nComPort;
 		 
 		int					m_nBautrate;			// 波特率

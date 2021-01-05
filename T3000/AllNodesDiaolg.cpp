@@ -849,6 +849,8 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
 		}
 	}
 	SqliteDBBuilding.closedb();
+
+    pFrame->ScanTstatInDB();
 	ReloadAddBuildingDB();
 	m_bChanged = TRUE;
 

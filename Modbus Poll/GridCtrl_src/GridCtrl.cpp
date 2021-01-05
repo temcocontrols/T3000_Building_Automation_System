@@ -4,7 +4,7 @@
 //
 // Written by Chris Maunder <chris@codeproject.com>
 // Copyright (c) 1998-2005. All Rights Reserved.
-
+/
 // The code contained in this file was based on the original
 // WorldCom Grid control written by Joe Willcoxson,
 //        mailto:chinajoe@aol.com

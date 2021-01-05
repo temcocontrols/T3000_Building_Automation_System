@@ -320,14 +320,14 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                     CString temp_pro3;
                     temp_pro3.Format(_T("%u"), PROTOCOL_REMOTE_IP /*PROTOCOL_BACNET_IP*/);
                     strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)  \
-                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro3 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro3 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
                 }
                 else
                 {
                     CString temp_pro4;
                     temp_pro4.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS /*PROTOCOL_BIP_T0_MSTP_TO_MODBUS*/);
                     strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)  \
-                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "', '" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "', '" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
 
                 }
                 main_device++;
@@ -411,7 +411,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                                         CString temp_pro4;
                                         temp_pro4.Format(_T("%u"), MODBUS_TCPIP);
                                         strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)  \
-                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "', '" + NetwordCard_Address + "','" + str_sub_serialid + "','floor1','room1','" + cs_temp_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "', '" + NetwordCard_Address + "','" + str_sub_serialid + "','floor1','room1','" + cs_temp_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
 
                                         SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                                         sub_device++;

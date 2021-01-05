@@ -28,8 +28,6 @@ void CBacnetSettingParamter::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetSettingParamter, CDialogEx)
-    ON_BN_CLICKED(IDC_RADIO_CUS_DEF, &CBacnetSettingParamter::OnBnClickedRadioCusDef)
-    ON_BN_CLICKED(IDC_RADIO_LCD_DEFAULT, &CBacnetSettingParamter::OnBnClickedRadioLcdDefault)
     ON_CBN_SELCHANGE(IDC_COMBO_TYPE, &CBacnetSettingParamter::OnCbnSelchangeComboType)
     ON_CBN_SELCHANGE(IDC_COMBO_NUMBER, &CBacnetSettingParamter::OnCbnSelchangeComboNumber)
 END_MESSAGE_MAP()
@@ -48,27 +46,10 @@ BOOL CBacnetSettingParamter::OnInitDialog()
                   // 异常: OCX 属性页应返回 FALSE
 }
 
-void CBacnetSettingParamter::LCD_CUS_MODE(bool cus_mode)
-{
-    if (cus_mode)
-    {
-        ((CButton *)GetDlgItem(IDC_RADIO_LCD_DEFAULT))->SetCheck(0);
-        ((CButton *)GetDlgItem(IDC_RADIO_CUS_DEF))->SetCheck(1);
-
-
-    }
-    else
-    {
-        ((CButton *)GetDlgItem(IDC_RADIO_LCD_DEFAULT))->SetCheck(1);
-        ((CButton *)GetDlgItem(IDC_RADIO_CUS_DEF))->SetCheck(0);
-    }
-    ((CComboBox *)GetDlgItem(IDC_COMBO_TYPE))->EnableWindow(cus_mode);
-    ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->EnableWindow(cus_mode);
-
-}
-
 void CBacnetSettingParamter::InitialUI()
 {
+    ((CComboBox *)GetDlgItem(IDC_COMBO_TYPE))->EnableWindow(1);
+    ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->EnableWindow(1);
     ((CComboBox *)GetDlgItem(IDC_COMBO_TYPE))->ResetContent();
     ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->ResetContent();
     for (int i = 0; i < sizeof(DisplayType) / sizeof(DisplayType[0]); i++)
@@ -82,10 +63,6 @@ void CBacnetSettingParamter::InitialUI()
         temp_cs.Format(_T("%u"), i + 1);
         ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->AddString(temp_cs);
     }
-
-    if (Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.display_type == 1)
-    {
-        LCD_CUS_MODE(1);
 
         int dis_type = 0;
         dis_type = Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.npoint.point_type;
@@ -101,55 +78,11 @@ void CBacnetSettingParamter::InitialUI()
         CString temp_cs;
         temp_cs.Format(_T("%u"), temp_number);
         ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->SetWindowTextW(temp_cs);
-    }
-    else
-    {
-        LCD_CUS_MODE(0);
-    }
+
 }
 
 
 
-void CBacnetSettingParamter::OnBnClickedRadioCusDef()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    if (Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.display_type != 1)
-    {
-        Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.display_type = 1;
-        CString temp_task_info;
-        temp_task_info.Format(_T("Change LCD display "));
-        if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
-        {
-            CString temp_task_info;
-            temp_task_info.Format(_T("Change LCD display timeout!"));
-            SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
-            LCD_CUS_MODE(0);
-            return;
-        }
-        LCD_CUS_MODE(1);
-    }
-}
-
-
-void CBacnetSettingParamter::OnBnClickedRadioLcdDefault()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    if (Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.display_type != 0)
-    {
-        Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.display_type = 0;
-        CString temp_task_info;
-        temp_task_info.Format(_T("Change LCD display "));
-        if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
-        {
-            CString temp_task_info;
-            temp_task_info.Format(_T("Change LCD display timeout!"));
-            SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
-            LCD_CUS_MODE(1);
-            return;
-        }
-        LCD_CUS_MODE(0);
-    }
-}
 
 
 void CBacnetSettingParamter::OnCbnSelchangeComboType()

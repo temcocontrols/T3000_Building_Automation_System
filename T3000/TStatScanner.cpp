@@ -3282,7 +3282,7 @@ void CTStatScanner::AddNewNetToDB()
 			 is_custom = _T("0");
 			  CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 				
-			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+str_Product_name_view+"','"+temp_product_class_id+"','"+str_modbus_id+"','""','"+str_ip_address_exist+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','"+temp_pro4+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
+			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+str_Product_name_view+"','"+temp_product_class_id+"','"+str_modbus_id+"','""','"+str_ip_address_exist+"','Modbus_and_Bacnet','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','"+temp_pro4+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
 		/*	 bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);*/
              m_SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 		}
@@ -3419,7 +3419,7 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
     CString strScreenName;
     strScreenName.Format(_T("Screen(S:%d--%d)"), pInfo->m_pNet->GetSerialID(), pInfo->m_pNet->GetDevID() );
 
-    CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
+    CString strBackground_bmp=_T("Modbus_and_Bacnet");
 
 
 
@@ -3537,7 +3537,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
     CString strScreenName;
     strScreenName.Format(_T("Screen(S:%d--%d)"), pInfo->m_pDev->GetSerialID(), pInfo->m_pDev->GetDevID() );
 
-    CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
+    CString strBackground_bmp=_T("Modbus_and_Bacnet");
 
     CString strHWV;
     strHWV.Format(_T("%0.1f"), pInfo->m_pDev->GetHardwareVersion());

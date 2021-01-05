@@ -861,15 +861,19 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 		AfxMessageBox(_T("RegisterHotKey SHIFT + RIGHT failure"));  
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey  RIGHT failure"));  
+#ifdef USE_MOD_SHIFT_DF
 	nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[8],MOD_SHIFT,'M');
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey SHIFT + M failure"));  
+#endif
 #else //release°æ±¾   
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[0],MOD_SHIFT,VK_UP); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[1],MOD_SHIFT,VK_DOWN); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[2],MOD_SHIFT,VK_LEFT); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[3],MOD_SHIFT,VK_RIGHT); 
+#ifdef USE_MOD_SHIFT_DF
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[8],MOD_SHIFT,'M'); 
+#endif
 #endif  
 
 	
@@ -2936,7 +2940,7 @@ void CBacnetScreenEdit::OnCancel()
 	UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[1]);   
 	UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[2]);   
 	UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[3]);		
-	UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[8]);    
+	//UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[8]);    
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	::PostMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
 	

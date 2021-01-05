@@ -162,6 +162,9 @@ void Getminitypename(unsigned char nmini_type, CString &ret_name)
     case TINY_EX_MINIPANEL:
         ret_name = _T("T3-TB");
         break;
+    case T3_TB_11I:
+        ret_name = _T("T3-TB-11I");
+        break;
     case MINIPANELARM_NB:
         ret_name = _T("T3-NB");
         break;
@@ -511,6 +514,19 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             ((CEdit *)m_page_tcpip.GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->EnableWindow(FALSE);
         }
 
+        if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
+            (Device_Basic_Setting.reg.mini_type == T3_OEM))
+        {
+            if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 539)
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_BUTTON_LCD_SETTING))->EnableWindow(true);
+            else
+                ((CButton *)m_page_basic_info.GetDlgItem(IDC_BUTTON_LCD_SETTING))->EnableWindow(false);
+        }
+        else
+        {
+            ((CButton *)m_page_basic_info.GetDlgItem(IDC_BUTTON_LCD_SETTING))->EnableWindow(false);
+        }
+
         if ((Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
             Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL ||
             Device_Basic_Setting.reg.mini_type == T3_TSTAT10 ||
@@ -731,6 +747,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             bacnet_device_type == MINIPANELARM ||
             bacnet_device_type == MINIPANELARM_LB ||
             bacnet_device_type == MINIPANELARM_TB) ||
+            bacnet_device_type == T3_TB_11I ||
             bacnet_device_type == SMALL_MINIPANEL ||
             bacnet_device_type == TINY_MINIPANEL ||
             bacnet_device_type == TINY_EX_MINIPANEL ||
@@ -777,6 +794,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             if ((Device_Basic_Setting.reg.mini_type == MINIPANELARM) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB) ||
+                (Device_Basic_Setting.reg.mini_type == T3_TB_11I) ||
                 (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
@@ -806,6 +824,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             if ((Device_Basic_Setting.reg.mini_type == MINIPANELARM) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB) ||
+                (Device_Basic_Setting.reg.mini_type == T3_TB_11I) ||
                 (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
@@ -867,6 +886,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             (bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM) ||
             (Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB) ||
             (Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL || bacnet_device_type == MINIPANELARM_TB) ||
+            (bacnet_device_type == T3_TB_11I) ||
             (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL) ||
             (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
             (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
@@ -1796,14 +1816,14 @@ void CBacnetSetting::OnTcnSelchangeTabSetting(NMHDR *pNMHDR, LRESULT *pResult)
                 end_temp_instance = BAC_USER_LOGIN_COUNT - 1;
             if (GetPrivateData_Blocking(g_bac_instance, READUSER_T3000, (BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_userlogin_point)) > 0)
             {
-                Mession_ret.Format(_T("Read user login table form %d to %d success."), (BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read user login table from %d to %d success."), (BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
                 b_ret = false;
-                Mession_ret.Format(_T("Read user login table form %d to %d timeout."), (BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i, end_temp_instance);
+                Mession_ret.Format(_T("Read user login table from %d to %d timeout."), (BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
             }
         }

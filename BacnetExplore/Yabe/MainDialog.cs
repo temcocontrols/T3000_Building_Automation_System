@@ -191,8 +191,7 @@ namespace Yabe
 
         void AutoPopulateThisDialog()
         {
-            // This dialog never comes visible to the user as its autopopulated.
-            SearchDialog dlg = new SearchDialog();
+            SearchDialog dlg = new SearchDialog(false);
             BacnetClient comm = dlg.AutoSearch();
             m_devices.Add(comm, new BacnetDeviceLine(comm));
 
