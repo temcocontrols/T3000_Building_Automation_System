@@ -1203,7 +1203,7 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
 
     if (temp_download_path.IsEmpty())  //此产品没有找到对应的下载目录;
     {
-        CS_Info.Format(_T("Can't find the firmware file on the webside."));
+        CS_Info.Format(_T("Can't find the firmware file on the website."));
         pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
         pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
         goto ftp_download_end;
