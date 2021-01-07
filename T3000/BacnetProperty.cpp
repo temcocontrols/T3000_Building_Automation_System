@@ -1,41 +1,41 @@
-// BancetProperty.cpp : 实现文件
+// BacnetProperty.cpp : 实现文件
 //
 
 #include "stdafx.h"
 #include "T3000.h"
-#include "BancetProperty.h"
+#include "BacnetProperty.h"
 #include "afxdialogex.h"
 #include "global_function.h"
 
-// CBancetProperty 对话框
+// CBacnetProperty 对话框
 
-IMPLEMENT_DYNAMIC(CBancetProperty, CDialogEx)
+IMPLEMENT_DYNAMIC(CBacnetProperty, CDialogEx)
 
-CBancetProperty::CBancetProperty(CWnd* pParent /*=NULL*/)
+CBacnetProperty::CBacnetProperty(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_DIALOG_BACNET_PROPERTY, pParent)
 {
 
 }
 
-CBancetProperty::~CBancetProperty()
+CBacnetProperty::~CBacnetProperty()
 {
 }
 
-void CBancetProperty::DoDataExchange(CDataExchange* pDX)
+void CBacnetProperty::DoDataExchange(CDataExchange* pDX)
 {
     CDialogEx::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_LIST_BACNET_PROPERTY, m_bacnet_property_list);
 }
 
 
-BEGIN_MESSAGE_MAP(CBancetProperty, CDialogEx)
+BEGIN_MESSAGE_MAP(CBacnetProperty, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBancetProperty 消息处理程序
+// CBacnetProperty 消息处理程序
 
 
-BOOL CBancetProperty::OnInitDialog()
+BOOL CBacnetProperty::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
@@ -45,22 +45,22 @@ BOOL CBancetProperty::OnInitDialog()
                   // 异常: OCX 属性页应返回 FALSE
 }
 
-void CBancetProperty::SetParameter(int nBACNET_PROPERTY_ID)
+void CBacnetProperty::SetParameter(int nBACNET_PROPERTY_ID)
 {
     n_property_id = nBACNET_PROPERTY_ID;
 }
 
-void CBancetProperty::SetBacnetReadString(CString temp_cs)
+void CBacnetProperty::SetBacnetReadString(CString temp_cs)
 {
     cs_bacnet_string = temp_cs;
 }
 
-void CBancetProperty::SetTitle(CString temp_title)
+void CBacnetProperty::SetTitle(CString temp_title)
 {
     cs_window_title = temp_title;
 }
 
-void CBancetProperty::Initial_List()
+void CBacnetProperty::Initial_List()
 {
     m_bacnet_property_list.ShowWindow(SW_HIDE);
     m_bacnet_property_list.DeleteAllItems();

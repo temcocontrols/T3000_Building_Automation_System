@@ -2,15 +2,15 @@
 #include "afxcmn.h"
 #include "CM5\CStatic\staticex.h"
 #include "CM5/ListCtrlEx.h"
-// CBancetProperty 对话框
+// CBacnetProperty 对话框
 
-class CBancetProperty : public CDialogEx
+class CBacnetProperty : public CDialogEx
 {
-	DECLARE_DYNAMIC(CBancetProperty)
+	DECLARE_DYNAMIC(CBacnetProperty)
 
 public:
-	CBancetProperty(CWnd* pParent = NULL);   // 标准构造函数
-	virtual ~CBancetProperty();
+	CBacnetProperty(CWnd* pParent = NULL);   // 标准构造函数
+	virtual ~CBacnetProperty();
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
