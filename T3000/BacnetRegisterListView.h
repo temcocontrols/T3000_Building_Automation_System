@@ -27,24 +27,28 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
+    CString cs_clicked_cstring; //要修改的数据原始值;
     virtual BOOL OnInitDialog();
     virtual BOOL PreTranslateMessage(MSG* pMsg);
     void Test_Read_Excel();
     void InitialListData();
     void Initial_List();
-    void Read_Data_From_DB();
+
     void AddDataIntoList();
     ListCtrlEx::CListCtrlEx m_register_view;
     void Initial_List(int nrow,int ncol);
     afx_msg void OnSize(UINT nType, int cx, int cy);
     afx_msg LRESULT Fresh_Register_List(WPARAM wParam, LPARAM lParam);
+    afx_msg LRESULT Fresh_Register_Item(WPARAM wParam, LPARAM lParam);
     int m_record_count;
-    int m_data_format_count;
     int m_max_reg;
     static DWORD WINAPI  ReadRegDataThreadfun(LPVOID lpVoid);
     
+    afx_msg void OnClose();
+    afx_msg void OnLvnItemchangedListRegisterView(NMHDR *pNMHDR, LRESULT *pResult);
+    afx_msg void OnNMClickListRegisterView(NMHDR *pNMHDR, LRESULT *pResult);
 };
-
+int Read_Data_From_DB(int* m_max_retreg);
 const int REGISTER_LIST_ID = 0;
 const int REGISTER_LIST_ADDRESS = 1;
 const int REGUSTER_LIST_OPERATION = 2;

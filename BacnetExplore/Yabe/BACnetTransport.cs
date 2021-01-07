@@ -209,6 +209,9 @@ namespace System.IO.BACnet
 
                 try
                 {
+                    // restart data reception before the job is finish ... could be dangerous
+                    conn.BeginReceive(OnReceiveData, conn);
+
                     //verify message
                     BacnetAddress remote_address;
                     Convert((System.Net.IPEndPoint)ep, out remote_address);
@@ -259,7 +262,7 @@ namespace System.IO.BACnet
                 finally
                 {
                     //restart data receive
-                    conn.BeginReceive(OnReceiveData, conn);
+                    //conn.BeginReceive(OnReceiveData, conn);
                 }
             }
             catch (Exception ex)

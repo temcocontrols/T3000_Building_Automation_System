@@ -187,6 +187,7 @@ LRESULT CBacnet_Range_Msv::Fresh_Msv_Item(WPARAM wParam, LPARAM lParam)
     int write_ret = 0;
     write_ret = Write_Private_Data_Blocking(WRITE_MSV_COMMAND, msv_range_tbl_line, msv_range_tbl_line);
 
+    Get_Msv_Table_Name(msv_range_tbl_line);
     //cmp_ret = memcmp(&m_temp_program_data[Changed_Item], &m_Program_data.at(Changed_Item), sizeof(Str_program_point));
     //if (cmp_ret != 0)
     //{

@@ -454,6 +454,9 @@ void CFlash_Multy::OnBnClickedButtonApplyWoAllSelect()
         if(is_checked&&Product_Firmware_Check(Product_Name,Edit_File_Path))
         {
             m_flash_multy_list.SetItemText(i,FLASH_FILE_POSITION,Edit_File_Path);
+
+
+#if 0    //杜帆屏蔽  下面的 各种有误，获取不到固件信息，还会导致崩溃;
             BOOL is_good = FALSE;
             Bin_Info file_infor;
             if (HexFileValidation(Edit_File_Path))
@@ -492,6 +495,7 @@ void CFlash_Multy::OnBnClickedButtonApplyWoAllSelect()
                 CString  StrTemp = _T("");
             }
             m_flash_multy_list.SetItemText(i,FLASH_FILE_REV,StrTemp);
+#endif
         }
     }
 
@@ -500,6 +504,11 @@ void CFlash_Multy::OnBnClickedButtonApplyWoAllSelect()
 
 BOOL CFlash_Multy::Product_Firmware_Check(CString ProductName,CString FirmwareFilePath)
 {
+    return 1;   //不要在这里做重复的事情 ，校验固件的事情交给ISP tool 去完成;
+
+
+
+
     Bin_Info file_infor;
     CString hexproductname=_T("");
     BOOL is_good;

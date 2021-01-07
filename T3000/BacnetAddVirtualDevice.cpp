@@ -160,7 +160,7 @@ void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualOk()
 		Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Com_Port,EPsize,\
 		Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)  \
 		values('"+temp_main_building+"','"+temp_sub_building+"','"+str_serialid+"','"+virtual_floor+"','"+virtual_room+"','"+pid_name+"','"+pid_class_value+"','"+modbus_id+"','""',\
-		'"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_n_port+"','0','"+temp_pro3+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
+		'"+str_ip_address+"','Modbus_and_Bacnet','"+str_n_port+"','0','"+temp_pro3+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
 	SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 	SqliteDBBuilding.closedb();
 	MessageBox(_T("Add virtual device success"));

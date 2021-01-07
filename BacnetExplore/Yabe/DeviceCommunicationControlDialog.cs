@@ -64,11 +64,11 @@ namespace Yabe
         private void DeviceCommunicationControlDialog_Load(object sender, EventArgs e)
         {
             string[] names = Enum.GetNames(typeof(System.IO.BACnet.BacnetReinitializedStates));
-            for (int i = 0; i < names.Length; i++)
-                names[i] = names[i].Replace("BACNET_REINIT_", "");
-            m_StateCombo.Items.AddRange(names);
-            if (names.Length > 0)
-                m_StateCombo.Text = names[0];
+
+            for (int i = 0; i < names.Length - 1; i++) // BACNET_REINIT_IDLE is not puts into the combo list
+                m_StateCombo.Items.Add(names[i].Replace("BACNET_REINIT_", ""));
+
+            m_StateCombo.Text = m_StateCombo.Items[0].ToString();
         }
     }
 }

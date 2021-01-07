@@ -34,7 +34,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\T3000 Output\Debug\</OutputPath>
+    <OutputPath>..\..\T3000 Output\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -128,6 +128,7 @@
       <DependentUpon>ForeignRegistry.cs</DependentUpon>
     </Compile>
     <Compile Include="GenericInputBox.cs" />
+    <Compile Include="IYabePlugin.cs" />
     <Compile Include="MainDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -268,7 +269,9 @@
     <Content Include="ReadSinglePropDescr.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="ReadSinglePropDescrDefault.xml" />
+    <EmbeddedResource Include="ReadSinglePropDescrDefault.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <None Include="Resources\error.png" />
     <None Include="Resources\book_open.png" />
     <None Include="Resources\database_go1.png" />
@@ -283,6 +286,7 @@
     <EmbeddedResource Include="Resources\EmbeddedDll\PacketDotNet.dll" />
     <EmbeddedResource Include="Resources\EmbeddedDll\SharpPcap.dll" />
     <EmbeddedResource Include="Resources\EmbeddedDll\ZedGraph.dll" />
+    <None Include="Resources\plugin.png" />
     <Content Include="Search.ico" />
   </ItemGroup>
   <ItemGroup>

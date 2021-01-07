@@ -144,10 +144,13 @@ INPUT int Write_One2(unsigned char  device_var,unsigned short  address,unsigned 
 INPUT int Write_One2_nocretical(unsigned char device_var, unsigned short  address, unsigned short  val, bool bComm_Type, int ncomport);
 INPUT int read_multi2(unsigned char device_var,unsigned short  *put_data_into_here,unsigned short  start_address,int length, bool bComm_Type);
 INPUT int read_multi2_nocretical(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length, bool bComm_Type,int ncomport);
+INPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_here, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize);
+INPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned short nlength);
 INPUT void close_T3000_log_file();//scan
 INPUT void write_T3000_log_file( CString StrTips);//scan
 INPUT void Create_T3000_log_file();//scan
 INPUT int Test_Comport(int comport, baudrate_def * ntest_ret);
+INPUT int Set_Test_Comport_Status(int command);
 INPUT CString Get_NowTime();
 INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
 INPUT int Write_One_Multy_Thread(unsigned char device_var, unsigned short address, unsigned short val, int nindex);
@@ -222,6 +225,7 @@ typedef struct _STATUSBARINFO
 #include "fileRW.h"
 
 #include "T3000RegAddress.h"
+#include <afxdisp.h>
 
 
 #define MKBOOL(_VALUE) ((_VALUE) != 0)		//Add by Fance .Use this macro to solve the warning warning C4800: 'BOOL' : forcing value to bool 'true' or 'false'
@@ -310,4 +314,4 @@ typedef struct _MessageInvokeIDInfo
 //*********************************link to dll***************************
 
 
-#define USE_THIRD_PARTY_FUNC 0
+//#define USE_THIRD_PARTY_FUNC 1

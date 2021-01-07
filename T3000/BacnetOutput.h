@@ -50,6 +50,7 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	void Reset_Output_Rect();
+    afx_msg void OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 

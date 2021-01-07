@@ -31,6 +31,12 @@ public:
     CBacnetThirdPartyMain();           // 动态创建所使用的受保护的构造函数
     virtual ~CBacnetThirdPartyMain();
     void Fresh();
+    void Initial_combo();
+    afx_msg void OnBnClickedButtonThirdOk();
+    int device_id;
+    int object_identifier; 
+    int object_instance;
+    int property_identifier;
 };
 
 

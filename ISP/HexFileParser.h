@@ -20,7 +20,7 @@ public:
 	// 获得读取的Hex文件的有效数据，参数是缓冲区和缓冲区长度。
 	// 返回的是数据缓冲区中实际使用的字节数。即：return int < nLen
 	int GetHexFileBuffer(IN char* pBuf, IN int nLen);
-    BOOL Is_RAM_HEXType();
+    int GetFileType();
 	//Hex文件类型，00 ----数据记录01 ----扩展段地址记录02 ----扩展线性地址记录
 	HEXFILE_FORMAT GetHexFileFormatType();
 
@@ -34,6 +34,7 @@ protected:
 	BOOL DoCRC( TS_UC* szBuf, int nLen);
 	// 辅助函数，获得高位地址
 	WORD GetHighAddrFromFile(const CString& strLine);
+    int GetFileTypeFromLine(const CString& strLine);
 	// 从文件中读取一行，放到缓冲区
 	BOOL ReadLineFromFile(CFile& file, char* pBuffer);
 
@@ -59,5 +60,9 @@ private:
 	CString m_ProductName;
 	CString m_ChipName;
 	UINT m_ChipSize;
-    BOOL m_IsRAM;
+    int m_file_type;
 };
+
+#define HEX_TYPE_ASIX     0
+#define HEX_TYPE_ARM_32K  1
+#define HEX_TYPE_ARM_64K  2

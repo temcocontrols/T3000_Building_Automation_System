@@ -6,7 +6,8 @@
 #include "afxwin.h"
 #include "CM5/CStatic/staticex.h"
 // CBacnetInput dialog
-
+#define INPUT_REFRESH_DATA_TIMER  1
+#define UPDATE_INPUT_ONE_ITEM_TIMER 3
 class CBacnetInput : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnetInput)

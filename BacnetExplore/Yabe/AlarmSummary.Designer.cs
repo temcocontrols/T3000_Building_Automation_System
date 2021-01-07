@@ -42,14 +42,14 @@
             this.TAlarmList.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             this.TAlarmList.SelectionMode = CodersLab.Windows.Controls.TreeViewSelectionMode.MultiSelect;
             this.TAlarmList.ShowNodeToolTips = true;
-            this.TAlarmList.Size = new System.Drawing.Size(350, 357);
+            this.TAlarmList.Size = new System.Drawing.Size(420, 357);
             this.TAlarmList.TabIndex = 1;
             this.TAlarmList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TAlarmList_AfterSelect);
             // 
             // AckText
             // 
             this.AckText.Enabled = false;
-            this.AckText.Location = new System.Drawing.Point(208, 387);
+            this.AckText.Location = new System.Drawing.Point(288, 386);
             this.AckText.Name = "AckText";
             this.AckText.Size = new System.Drawing.Size(144, 20);
             this.AckText.TabIndex = 2;
@@ -68,7 +68,7 @@
             // AckBt
             // 
             this.AckBt.Enabled = false;
-            this.AckBt.Location = new System.Drawing.Point(24, 384);
+            this.AckBt.Location = new System.Drawing.Point(12, 384);
             this.AckBt.Name = "AckBt";
             this.AckBt.Size = new System.Drawing.Size(145, 23);
             this.AckBt.TabIndex = 4;
@@ -80,7 +80,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(374, 425);
+            this.ClientSize = new System.Drawing.Size(444, 425);
             this.Controls.Add(this.AckBt);
             this.Controls.Add(this.LblInfo);
             this.Controls.Add(this.AckText);

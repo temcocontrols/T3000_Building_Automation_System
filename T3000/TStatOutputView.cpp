@@ -945,6 +945,20 @@ void   CTStatOutputView::Fresh_One_Item(int row){
 void CTStatOutputView::Fresh()
 {
     Initial_ListFor_Tstat();
+    g_progress_persent = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        if ((i != 2) && (i != 4) && (i != 5))
+            continue;
+        int itemp = 0;
+        itemp = Read_Multi(g_tstat_id, &product_register_value[i * 100], i * 100, 100, 3);
+        if (itemp < 0)
+            break;
+        g_progress_persent = (i + 1) * 100 / 8;
+        Sleep(SEND_COMMAND_DELAY_TIME);
+    }
+    g_progress_persent = 100;
+    LoadTstat_OutputData();
     PostMessage(WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
 
 }

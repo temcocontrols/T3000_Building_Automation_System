@@ -9,6 +9,7 @@
 #include "BacnetEmailAlarm.h"
 #include "BacnetUserConfig.h"
 #include "BacnetIOConfig.h"
+#include "WifiConfigDlg.h"
 // CBacnetSetting dialog
 
 const int SETTING_BASIC = 0;
@@ -18,6 +19,8 @@ const int SETTING_DYNDNS = 3;
 const int SETTING_EMAIL = 4;
 const int SETTING_USER_LOGIN = 5;
 const int SETTING_EXPANSION_IO = 6;
+
+//const int SETTING_WIFI = 7;
 const int MAX_SETTING = 7;
 
 class CBacnetSetting : public CDialogEx
@@ -77,9 +80,6 @@ public:
     int m_reboot_time_left; //用来记录reboot 的时间;
     char m_tcp_type; //用于记录 IP地址是否是动态的，来判别是否有改变;
 
-
-    //afx_msg void OnEnKillfocusEditSettingMstpId();
-
     void InitialTab();
     CTabCtrl m_setting_tab;
     int m_CurSelTab;
@@ -90,6 +90,7 @@ public:
     CBacnetEmailAlarm m_page_email;
     CBacnetUserConfig m_page_user;
     CBacnetIOConfig   m_page_expansion_io;
+    CWifiConfigDlg m_page_wifi;
     CDialog* tab_dialog[MAX_SETTING];
     afx_msg void OnTcnSelchangeTabSetting(NMHDR *pNMHDR, LRESULT *pResult);
 };

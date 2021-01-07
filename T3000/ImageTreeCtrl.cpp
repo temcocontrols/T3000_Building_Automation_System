@@ -245,6 +245,7 @@ bool CImageTreeCtrl::HandleAddCustomDevice(HTREEITEM hItem)
 
 	CARDDlg popdlg;
 	popdlg.DoModal();
+    ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING, 0, 0);
 	return true;
 }
 
@@ -1398,7 +1399,7 @@ void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
 
 		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
         VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
-        VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device")));
+        VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Modbus Device")));
         VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_REMOTE_DEVICE, _T("Add Remote Device")));
         //VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_BACNET_DEVICE, _T("Add Third-Part Bac Device")));
         
@@ -1428,7 +1429,7 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 			VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
 			VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
 			VERIFY(menu.AppendMenu(MF_STRING, ID_PING_CMD, _T("Ping")));
-            VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Custom Device")));
+            VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Modbus Device")));
 		}
 	}
 

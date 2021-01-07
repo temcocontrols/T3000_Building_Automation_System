@@ -308,6 +308,11 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 	m_offline = FALSE;
 	CTime temp_time =  CTime::GetCurrentTime();
 	unsigned short this_year = temp_time.GetYear();
+
+    if (this_year % 4 == 0)
+        m_leap_year = 1;
+    else
+        m_leap_year = 0;
     if (product_register_value[7]==0 && (g_protocol == MODBUS_RS485 || g_protocol == MODBUS_TCPIP))
     {
 		m_offline = TRUE;
@@ -346,7 +351,8 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 	else
 	{
 		int nFlag = product_register_value[7];
-		if (g_protocol == PROTOCOL_BACNET_IP)
+        if (Bacnet_Private_Device(nFlag))
+		//if (g_protocol == PROTOCOL_BACNET_IP)
 		{								//器件。产品本来不同 界面就会有差异 都还要用一个界面。木有办法，只能 加在一起了。;
 			GetDlgItem(IDC_LIST1)->ShowWindow(0);
 			GetDlgItem(IDC_YEARSTATIC)->ShowWindow(0);
@@ -821,6 +827,8 @@ LRESULT AnnualRout_InsertDia::Fresh_Schedule_Day_Cal(WPARAM wParam,LPARAM lParam
 
 	for (int i=0;i<12;i++)
 	{
+        //MONTHDAYSTATE	pBacDayState
+            memset(&pBacDayState[i], 0, sizeof(MONTHDAYSTATE));
 		//pDayState[i] = (DWORD)g_DayState[annual_list_line]
 		//memset((void *)pDayState[i],0,sizeof(pDayState)/sizeof(pDayState[0]));
 
@@ -905,13 +913,21 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	{
 		current = current->next;
 	}
-
+    int Clicked_year = current->date.wYear;
+    m_leap_year = 0;
+    if (Clicked_year % 4 == 0)
+        m_leap_year = 1;
+    else
+        m_leap_year = 0;
     int Clicked_month = current->date.wMonth;
     int Clicked_day = current->date.wDay;
 
     m_month_ctrl.MONTHCAL_GetSelDay_Month(&Clicked_month, &Clicked_day);
 
-
+    if (Clicked_month > 12)
+        return;
+    if (Clicked_day > 31)
+        return;
 
     
 	if (m_offline)
@@ -936,7 +952,8 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	else
 	{
 		int nFlag = product_register_value[7];
-		if (g_protocol != PROTOCOL_BACNET_IP)
+        if(Bacnet_Private_Device(nFlag) == false)
+		//if (g_protocol != PROTOCOL_BACNET_IP)
 		{
 			//CString str;
 			//str.Format(_T("%d-%d"), Clicked_month, Clicked_day);
@@ -1019,16 +1036,16 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 
 
 
-			if (g_protocol == PROTOCOL_BACNET_IP)
-			{
+			//if (g_protocol == PROTOCOL_BACNET_IP)
+			//{
 				//for (int i=0;i<12;i++)
 				//{
 				//	memcpy_s(&g_DayState[annual_list_line][i*4],4,&pBacDayState[i],4);
 				//}
 				CString temp_task_info;
 				temp_task_info.Format(_T("Write annual schedual List Item%d ."), annual_list_line + 1);
-				Post_Write_Message(g_bac_instance, WRITEANNUALSCHEDULE_T3000, annual_list_line, annual_list_line, 48, this->m_hWnd, temp_task_info);
-			}
+				Post_Write_Message(g_bac_instance, WRITEANNUALSCHEDULE_T3000, annual_list_line, annual_list_line, ANNUAL_CODE_SIZE, this->m_hWnd, temp_task_info);
+			//}
 
 		}
 	}

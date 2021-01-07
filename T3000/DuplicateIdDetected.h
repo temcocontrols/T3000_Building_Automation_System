@@ -71,4 +71,6 @@ public:
 
     bool ip1_need_change;
     bool ip2_need_change;
+    afx_msg void OnClose();
+    virtual void OnCancel();
 };

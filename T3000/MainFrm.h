@@ -63,7 +63,7 @@ const int DLG_DIALOG_THIRD_PARTY_BAC = 33;
 const int NUMVIEWS = 34;
 
 
-
+#define  WM_REFRESH_TREEVIEW_MAP WM_USER + 2008
 extern int g_gloab_bac_comport;
 extern int g_gloab_bac_baudrate;
 const int REGISTER_USE_ZIGBEE_485 = 640;
@@ -130,7 +130,7 @@ typedef struct _tree_product//////////////////////
     int product_id;
     float software_version;
     float hardware_version;
-    int nhardware_info;
+    int nhardware_info;  ////bit0 zigbee   bit1 wifi
     CString strImgPathName;
     int protocol;
     unsigned int ncomport;
@@ -142,7 +142,9 @@ typedef struct _tree_product//////////////////////
     unsigned int note_parent_serial_number;
     unsigned char panel_number;
     unsigned int object_instance;
-
+    UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
+    UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
+    UCHAR  expand; //是否树形结构展开; 1为默认展开 或者 非2 为展开       2 为折叠
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 //
 
@@ -309,7 +311,7 @@ public:
 	void  Show_Wait_Dialog_And_SendConfigMessage();
     void  Show_Wait_Dialog_And_ReadBacnet(int ncontrol);
 	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
-
+    static DWORD WINAPI  Mul_Ping_Thread(LPVOID lpVoid);
     int m_read_control;   // 0 默认全部读取     1  读缓存的时候使用 ;
 	static DWORD WINAPI  Read_Bacnet_Thread(LPVOID lpVoid);
 	static DWORD WINAPI  Read_Modbus_10000(LPVOID lpVoid);
@@ -373,7 +375,6 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	//  below Added by zgq; from 2010-11-29; 
 	//
-
 	void DoConnectToANode( const HTREEITEM& hTreeItem );
 	//void InitTreeNodeConn();
 	void GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItems  );
@@ -409,6 +410,7 @@ public:
 	CString						m_strCurSelNodeName;  // 记录当前点击树节点的name
 	BOOL m_isCM5;
 	BOOL m_isMiniPanel;
+
 	//HTREEITEM				m_htiCurSel;  // 记录当前点击树节点
 	CString						m_strFileVersion;
 
@@ -562,4 +564,5 @@ public:
 		afx_msg void OnControlModbus();
 		afx_msg void OnControlIoNetConfig();
         afx_msg void OnDatabaseLogdetail();
+        afx_msg void OnUpdateAppAbout(CCmdUI *pCmdUI);
 };

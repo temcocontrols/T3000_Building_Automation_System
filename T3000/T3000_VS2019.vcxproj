@@ -1,0 +1,805 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Template|Win32">
+      <Configuration>Template</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F7226464-C41C-4909-BF74-97328B72FFC8}</ProjectGuid>
+    <RootNamespace>T3000</RootNamespace>
+    <Keyword>MFCProj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>T3000</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Static</UseOfMfc>
+    <UseOfAtl>false</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+    <CLRSupport>false</CLRSupport>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\T3000 Output\debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\T3000 Output\T3000 object\debug\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</EmbedManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\T3000 object\release\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</EmbedManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;MultipleMonthCal32.lib;HttpAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PreBuildEvent>
+      <Command>XCOPY "$(SolutionDir)"\SQLiteDriver\*.DLL "$(TargetDir)" /D /K /Y</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;$(SolutionDir)T3000 Output\release\MultipleMonthCal32.lib;$(SolutionDir)T3000 Output\release\HttpAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <UACUIAccess>false</UACUIAccess>
+    </Link>
+    <PreBuildEvent>
+      <Command>XCOPY "$(SolutionDir)"\SQLiteDriver\*.DLL "$(TargetDir)" /D /K /Y</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ISP\MyPing.cpp" />
+    <ClCompile Include="..\SQLiteDriver\CppSQLite3.cpp" />
+    <ClCompile Include="AddBuilding.cpp" />
+    <ClCompile Include="AfxMessageDialog.cpp" />
+    <ClCompile Include="AirflowSettingDlg.cpp" />
+    <ClCompile Include="AllNodesDiaolg.cpp" />
+    <ClCompile Include="Annual_Routines.cpp" />
+    <ClCompile Include="AnnualRout_InsertDia.cpp" />
+    <ClCompile Include="ApplyGraphicLabelsDlg.cpp" />
+    <ClCompile Include="AutoRichEditCtrl.cpp" />
+    <ClCompile Include="Bacnetaddintodb.cpp" />
+    <ClCompile Include="BacnetAddLabel.cpp" />
+    <ClCompile Include="BacnetAddRemoteDevice.cpp" />
+    <ClCompile Include="BacnetAddVirtualDevice.cpp" />
+    <ClCompile Include="BacnetAlarmLog.cpp" />
+    <ClCompile Include="ARDDlg.cpp" />
+    <ClCompile Include="BacnetAlarmWindow.cpp" />
+    <ClCompile Include="BacnetAnalogCusRang.cpp" />
+    <ClCompile Include="BacnetAnnualRoutine.cpp" />
+    <ClCompile Include="BacnetATCommand.cpp" />
+    <ClCompile Include="BacnetController.cpp" />
+    <ClCompile Include="BacnetCustomerDigitalRange.cpp" />
+    <ClCompile Include="BacnetEditLabel.cpp" />
+    <ClCompile Include="BacnetEmailAlarm.cpp" />
+    <ClCompile Include="BacnetGraphic.cpp" />
+    <ClCompile Include="BacnetGraphicSetting.cpp" />
+    <ClCompile Include="BacnetInput.cpp" />
+    <ClCompile Include="BacnetIOConfig.cpp" />
+    <ClCompile Include="BacnetMessageInput.cpp" />
+    <ClCompile Include="BacnetMonitor.cpp" />
+    <ClCompile Include="BacnetOutput.cpp" />
+    <ClCompile Include="BacnetProgram.cpp" />
+    <ClCompile Include="BacnetProgramDebug.cpp" />
+    <ClCompile Include="BacnetProgramEdit.cpp" />
+    <ClCompile Include="BacnetProgramSetting.cpp" />
+    <ClCompile Include="BacnetRange.cpp" />
+    <ClCompile Include="BacnetRegisterListView.cpp" />
+    <ClCompile Include="BacnetRemotePoint.cpp" />
+    <ClCompile Include="BacnetRemotePortWarning.cpp" />
+    <ClCompile Include="BacnetScheduleTime.cpp" />
+    <ClCompile Include="BacnetScreen.cpp" />
+    <ClCompile Include="BacnetScreenEdit.cpp" />
+    <ClCompile Include="BacnetSetting.cpp" />
+    <ClCompile Include="BacnetSettingBasicInfo.cpp" />
+    <ClCompile Include="BacnetSettingDyndns.cpp" />
+    <ClCompile Include="BacnetSettingHealth.cpp" />
+    <ClCompile Include="BacnetSettingParamter.cpp" />
+    <ClCompile Include="BacnetSettingTcpip.cpp" />
+    <ClCompile Include="BacnetSettingTime.cpp" />
+    <ClCompile Include="BacnetThirdPartyMain.cpp" />
+    <ClCompile Include="BacnetTool.cpp" />
+    <ClCompile Include="BacnetToolReadProperty.cpp" />
+    <ClCompile Include="BacnetTstat.cpp" />
+    <ClCompile Include="BacnetTstatSchedule.cpp" />
+    <ClCompile Include="BacnetUserConfig.cpp" />
+    <ClCompile Include="BacnetUserlogin.cpp" />
+    <ClCompile Include="BacnetVarCusRang.cpp" />
+    <ClCompile Include="BacnetVariable.cpp" />
+    <ClCompile Include="BacnetWait.cpp" />
+    <ClCompile Include="BacnetWeb.cpp" />
+    <ClCompile Include="BacnetWeeklyRoutine.cpp" />
+    <ClCompile Include="Bacnet_Range_Msv.cpp" />
+    <ClCompile Include="BADO\BADO.cpp" />
+    <ClCompile Include="BancetProperty.cpp" />
+    <ClCompile Include="BatchSNDlg.cpp" />
+    <ClCompile Include="BinFileParser.cpp" />
+    <ClCompile Include="BoatMonitorViewer.cpp" />
+    <ClCompile Include="BootFinderDlg.cpp" />
+    <ClCompile Include="BTUMeterDlg.cpp" />
+    <ClCompile Include="BuildingConfigEditDlg.cpp" />
+    <ClCompile Include="BuildingConfigration.cpp" />
+    <ClCompile Include="BuildTable1.cpp" />
+    <ClCompile Include="ChangePasswordDlg.cpp" />
+    <ClCompile Include="ChartCtrl\ChartAxis.cpp" />
+    <ClCompile Include="ChartCtrl\ChartAxisLabel.cpp" />
+    <ClCompile Include="ChartCtrl\ChartBarSerie.cpp" />
+    <ClCompile Include="ChartCtrl\ChartCandlestickSerie.cpp" />
+    <ClCompile Include="ChartCtrl\ChartCrossHairCursor.cpp" />
+    <ClCompile Include="ChartCtrl\ChartCtrl.cpp" />
+    <ClCompile Include="ChartCtrl\ChartCursor.cpp" />
+    <ClCompile Include="ChartCtrl\ChartDateTimeAxis.cpp" />
+    <ClCompile Include="ChartCtrl\ChartDragLineCursor.cpp" />
+    <ClCompile Include="ChartCtrl\ChartFont.cpp" />
+    <ClCompile Include="ChartCtrl\ChartGanttSerie.cpp" />
+    <ClCompile Include="ChartCtrl\ChartGradient.cpp" />
+    <ClCompile Include="ChartCtrl\ChartGrid.cpp" />
+    <ClCompile Include="ChartCtrl\ChartLegend.cpp" />
+    <ClCompile Include="ChartCtrl\ChartLineSerie.cpp" />
+    <ClCompile Include="ChartCtrl\ChartLogarithmicAxis.cpp" />
+    <ClCompile Include="ChartCtrl\ChartPointsSerie.cpp" />
+    <ClCompile Include="ChartCtrl\ChartScrollBar.cpp" />
+    <ClCompile Include="ChartCtrl\ChartSerie.cpp" />
+    <ClCompile Include="ChartCtrl\ChartStandardAxis.cpp" />
+    <ClCompile Include="ChartCtrl\ChartSurfaceSerie.cpp" />
+    <ClCompile Include="ChartCtrl\ChartTitle.cpp" />
+    <ClCompile Include="ChartCtrl\ChartXYSerie.cpp" />
+    <ClCompile Include="Class\md5.cpp" />
+    <ClCompile Include="Class\MulitithreadSocket.cpp" />
+    <ClCompile Include="CM5\BacNetProgram_transplant.cpp" />
+    <ClCompile Include="CM5\CStatic\staticex.cpp" />
+    <ClCompile Include="CM5\ListCtrlCellEx.cpp" />
+    <ClCompile Include="CM5\ListCtrlEx.cpp" />
+    <ClCompile Include="CM5\MyOwnListCtrl.cpp" />
+    <ClCompile Include="CM5\PointItem.cpp" />
+    <ClCompile Include="CO2NetView.cpp" />
+    <ClCompile Include="CO2_AUTO_CALIBRATION.cpp" />
+    <ClCompile Include="CO2_NodeView.cpp" />
+    <ClCompile Include="CO2_View.cpp" />
+    <ClCompile Include="ConfigFileHandler.cpp" />
+    <ClCompile Include="Config_Routines.cpp" />
+    <ClCompile Include="ConnectRemoteServer.cpp" />
+    <ClCompile Include="CustomSource\JPGLoader.cpp" />
+    <ClCompile Include="CustomSource\Splash.cpp" />
+    <ClCompile Include="CustomSTable.cpp" />
+    <ClCompile Include="BacnetView.cpp" />
+    <ClCompile Include="CWebBrowser2.cpp" />
+    <ClCompile Include="DebugWindow.cpp" />
+    <ClCompile Include="DetectOnlineDlg.cpp" />
+    <ClCompile Include="DisplayConfig.cpp" />
+    <ClCompile Include="DllFunction.cpp" />
+    <ClCompile Include="Dowmloadfile.cpp" />
+    <ClCompile Include="DownloadSocket.cpp" />
+    <ClCompile Include="DuplicateIdDetected.cpp" />
+    <ClCompile Include="EnterValueDlg.cpp" />
+    <ClCompile Include="Enter_Value_BinaryDlg.cpp" />
+    <ClCompile Include="FileOperations.cpp" />
+    <ClCompile Include="fileRW.cpp" />
+    <ClCompile Include="Flash_Multy.cpp" />
+    <ClCompile Include="global_function.cpp" />
+    <ClCompile Include="GraphicMode.cpp" />
+    <ClCompile Include="GroupScheduleDlg.cpp" />
+    <ClCompile Include="HexFileParser.cpp" />
+    <ClCompile Include="IONameConfig.cpp" />
+    <ClCompile Include="ISPModeSlove.cpp" />
+    <ClCompile Include="LanguageLocale.cpp" />
+    <ClCompile Include="LCOutNameConfig.cpp" />
+    <ClCompile Include="LightingController\configure.cpp" />
+    <ClCompile Include="Dialog_Progess.cpp" />
+    <ClCompile Include="DialogInfo.cpp" />
+    <ClCompile Include="EreaseDlg.cpp" />
+    <ClCompile Include="excel9.cpp" />
+    <ClCompile Include="FreeCoolDlg.cpp" />
+    <ClCompile Include="GraphicView.cpp" />
+    <ClCompile Include="GridButton.cpp" />
+    <ClCompile Include="GridLoad.cpp" />
+    <ClCompile Include="hangeIDDlg.cpp" />
+    <ClCompile Include="ImageTreeCtrl.cpp" />
+    <ClCompile Include="IniFile.cpp" />
+    <ClCompile Include="InputSetDlg.cpp" />
+    <ClCompile Include="LabelEditDlg.cpp" />
+    <ClCompile Include="LedsDialog.cpp" />
+    <ClCompile Include="LightingController\LightingController.cpp" />
+    <ClCompile Include="LightingController\LightingSet.cpp" />
+    <ClCompile Include="LoginDlg.cpp" />
+    <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="ManageAccountDlg.cpp" />
+    <ClCompile Include="ModbusToBacnetRouterDlg.cpp" />
+    <ClCompile Include="msflexgrid1.cpp" />
+    <ClCompile Include="MySocket.cpp" />
+    <ClCompile Include="NetworkControllView.cpp" />
+    <ClCompile Include="ControlBasicEditorView.cpp" />
+    <ClCompile Include="NewTstatSchedulesDlg.cpp" />
+    <ClCompile Include="OfficeStPtDlg.cpp" />
+    <ClCompile Include="OutPutDlg.cpp" />
+    <ClCompile Include="OutputSetDlg.cpp" />
+    <ClCompile Include="OutsidDailog.cpp" />
+    <ClCompile Include="OXBitmapButton.cpp" />
+    <ClCompile Include="OXToolTipCtrl.cpp" />
+    <ClCompile Include="ParameterDlg.cpp" />
+    <ClCompile Include="ParameterExtDlg.cpp" />
+    <ClCompile Include="ping.cpp" />
+    <ClCompile Include="Powermeter.cpp" />
+    <ClCompile Include="PowerMeterList.cpp" />
+    <ClCompile Include="PressureSensorForm.cpp" />
+    <ClCompile Include="ProductRegisterListView.cpp" />
+    <ClCompile Include="RefreshTreeThread.cpp" />
+    <ClCompile Include="RegisterWriteValueDlg.cpp" />
+    <ClCompile Include="RelayLabel.cpp" />
+    <ClCompile Include="RemotePtpLogin.cpp" />
+    <ClCompile Include="ScanDbWaitDlg.cpp" />
+    <ClCompile Include="ScanDlg.cpp" />
+    <ClCompile Include="SetPtDayDlg.cpp" />
+    <ClCompile Include="SetptGraphicBar.cpp" />
+    <ClCompile Include="SetTimeDlg.cpp" />
+    <ClCompile Include="ShowMessageDlg.cpp" />
+    <ClCompile Include="StatusbarCtrl.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="T3000.cpp" />
+    <ClCompile Include="T3000DefaultView.cpp" />
+    <ClCompile Include="T3000Doc.cpp" />
+    <ClCompile Include="T3000LogWindow.cpp" />
+    <ClCompile Include="T3000Option.cpp" />
+    <ClCompile Include="T3000RegAddress.cpp" />
+    <ClCompile Include="T3000UpdateDlg.cpp" />
+    <ClCompile Include="T3000View.cpp" />
+    <ClCompile Include="T3000_Default_MainView.cpp" />
+    <ClCompile Include="T328IN.cpp" />
+    <ClCompile Include="T332AI.cpp" />
+    <ClCompile Include="T36CT.cpp" />
+    <ClCompile Include="T38AI16O.cpp" />
+    <ClCompile Include="T38AI8AO.cpp" />
+    <ClCompile Include="T38I13O.cpp" />
+    <ClCompile Include="T3ModulesOutputDlg.cpp" />
+    <ClCompile Include="T3ModulesView.cpp" />
+    <ClCompile Include="T3RangeDlg.cpp" />
+    <ClCompile Include="T3RTDView.cpp" />
+    <ClCompile Include="TCP_Server.cpp" />
+    <ClCompile Include="TemcoDataGrid.cpp" />
+    <ClCompile Include="TemcoStandardBacnetToolDlg.cpp" />
+    <ClCompile Include="TempHumSensorForm.cpp" />
+    <ClCompile Include="Timer_Calibrate.cpp" />
+    <ClCompile Include="TrendLogView.cpp" />
+    <ClCompile Include="TrendLogWnd.cpp" />
+    <ClCompile Include="TroubleShootDlg.cpp" />
+    <ClCompile Include="TstatAQ.cpp" />
+    <ClCompile Include="TstatAQI_Detail.cpp" />
+    <ClCompile Include="TstatIconSetting.cpp" />
+    <ClCompile Include="TStatInputView.cpp" />
+    <ClCompile Include="TStatOutputView.cpp" />
+    <ClCompile Include="TstatRangeDlg.cpp" />
+    <ClCompile Include="TstatSetpointDetail.cpp" />
+    <ClCompile Include="TstatZigbeeLogic.cpp" />
+    <ClCompile Include="TStat_Dev.cpp" />
+    <ClCompile Include="TStat_Net.cpp" />
+    <ClCompile Include="TStatBase.cpp" />
+    <ClCompile Include="TStatScanner.cpp" />
+    <ClCompile Include="TStatScheduleDlg.cpp" />
+    <ClCompile Include="UserAcessSetDlg.cpp" />
+    <ClCompile Include="Weekly_Routines.cpp" />
+    <ClCompile Include="WeeklyRout_InsertDia.cpp" />
+    <ClCompile Include="WifiConfigDlg.cpp" />
+    <ClCompile Include="WorkspaceBar.cpp" />
+    <ClCompile Include="T3\DialogT3.cpp" />
+    <ClCompile Include="CM5\SliderBoth.cpp" />
+    <ClCompile Include="CM5\SliderBothBtn.cpp" />
+    <ClCompile Include="AirQuality\AirQuality.cpp" />
+    <ClCompile Include="singleslider\MacSliderCtrl.cpp" />
+    <ClCompile Include="WriteRegistersValueDlg.cpp" />
+    <ClCompile Include="WriteSingleRegDlg.cpp" />
+    <ClCompile Include="ZigbeeInformationDlg.cpp" />
+    <ClCompile Include="ZigbeeRepeater.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ChartCtrl\ChartBalloonLabel.inl" />
+    <None Include="ChartCtrl\ChartLabel.inl" />
+    <None Include="ChartCtrl\ChartPointsArray.inl" />
+    <None Include="ChartCtrl\ChartSerieBase.inl" />
+    <None Include="ClassDiagram.cd" />
+    <None Include="OutputTableDlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="res\AlarmsBrown.bmp" />
+    <None Include="res\AlarmsGreen.bmp" />
+    <None Include="res\AlarmsRed.bmp" />
+    <None Include="res\ApplyDisable.bmp" />
+    <None Include="res\ApplyDown.bmp" />
+    <None Include="res\ApplyFouct.bmp" />
+    <None Include="res\ApplyUp.bmp" />
+    <None Include="res\Back.bmp" />
+    <None Include="res\bacnet_menu_bit.bmp" />
+    <None Include="res\bitmap1.bmp" />
+    <None Include="res\bitmap2.bmp" />
+    <None Include="res\bitmap4.bmp" />
+    <None Include="C:\Users\pc\Desktop\bmp00001.bmp" />
+    <None Include="res\bitmap8.bmp" />
+    <None Include="res\bitmap9.bmp" />
+    <None Include="res\bitmap_v.bmp" />
+    <None Include="res\bitmap_v_Connected.bmp" />
+    <None Include="res\bmp00001.bmp" />
+    <None Include="res\bmp_bacnet.bmp" />
+    <None Include="res\bmp_down.bmp" />
+    <None Include="res\bmp_up.bmp" />
+    <None Include="res\building.bin" />
+    <None Include="res\Building.bmp" />
+    <None Include="res\Building.db" />
+    <None Include="res\check.bmp" />
+    <None Include="res\checkno.bmp" />
+    <None Include="res\ClearDisable.bmp" />
+    <None Include="res\ClearDown.bmp" />
+    <None Include="res\ClearFouct.bmp" />
+    <None Include="res\ClearUp.bmp" />
+    <None Include="res\coldtool.bmp" />
+    <None Include="res\default view.bmp" />
+    <None Include="res\default view.jpg" />
+    <None Include="res\default_icon\Alarms.ico" />
+    <None Include="res\default_icon\Configuration.ico" />
+    <None Include="res\default_icon\Graphics2.ico" />
+    <None Include="res\default_icon\Holidays.ico" />
+    <None Include="res\default_icon\inputs.ico" />
+    <None Include="res\default_icon\outputs2.ico" />
+    <None Include="res\default_icon\PID.ico" />
+    <None Include="res\default_icon\Programs.ico" />
+    <None Include="res\default_icon\RemotePoints.ico" />
+    <None Include="res\default_icon\schedual.ico" />
+    <None Include="res\default_icon\TrendLogs.ico" />
+    <None Include="res\default_icon\Variables.ico" />
+    <None Include="res\Exit.ico" />
+    <None Include="res\hottool.bmp" />
+    <None Include="res\Input.ico" />
+    <None Include="res\INPUT_DEFAULT.ico" />
+    <None Include="res\Input_Icon_Default.ico" />
+    <None Include="res\LCD Table Button.bmp" />
+    <None Include="res\LED Table Button.bmp" />
+    <None Include="res\loading_icon\Step1.ico" />
+    <None Include="res\loading_icon\Step2.ico" />
+    <None Include="res\loading_icon\Step3.ico" />
+    <None Include="res\loading_icon\Step4.ico" />
+    <None Include="res\loading_icon\Step5.ico" />
+    <None Include="res\loading_icon\Step6.ico" />
+    <None Include="res\lock.ico" />
+    <None Include="res\Login" />
+    <None Include="res\Login.bmp" />
+    <None Include="res\MDisable.bmp" />
+    <None Include="res\MDown.bmp" />
+    <None Include="res\menubaro.bmp" />
+    <None Include="res\menubaro_Connected.bmp" />
+    <None Include="res\menu_img.bmp" />
+    <None Include="res\menu_imgeOwn.bmp" />
+    <None Include="res\menu_imgeOwn16.bmp" />
+    <None Include="res\MFC16API.dll" />
+    <None Include="res\MFouct.bmp" />
+    <None Include="res\MonitorData.db" />
+    <None Include="res\MonitorData.mdb" />
+    <None Include="res\monitor_.bin" />
+    <None Include="res\MUp.bmp" />
+    <None Include="C:\Documents and Settings\lee\桌面\NWT3000.ico" />
+    <None Include="res\OK.ico" />
+    <None Include="res\PIDBUTTON.bmp" />
+    <None Include="res\Refresh.ico" />
+    <None Include="res\relay.ico" />
+    <None Include="res\Scan.ico" />
+    <None Include="res\Schedual_Icon_Default.ico" />
+    <None Include="res\Schedual_Icon_Default2.ico" />
+    <None Include="res\Schedule0607.bmp" />
+    <None Include="res\Select.ico" />
+    <None Include="res\serialnum.ico" />
+    <None Include="C:\Documents and Settings\lee\桌面\serialnum.ico" />
+    <None Include="res\switch_off.ico" />
+    <None Include="res\switch_on.ico" />
+    <None Include="res\T3000.db" />
+    <None Include="res\T3000.ico" />
+    <None Include="res\T3000.rc2" />
+    <None Include="res\T3000Building.bmp" />
+    <None Include="res\T3000Doc.ico" />
+    <None Include="res\T3000_DEFAULT.bmp" />
+    <None Include="res\temcologo.bmp" />
+    <None Include="res\temco_logo.bmp" />
+    <None Include="res\temco_logo.jpg" />
+    <None Include="res\Toolbar-48.bmp" />
+    <None Include="res\Toolbar.bmp" />
+    <None Include="res\toolbar1.bmp" />
+    <None Include="res\toolbar2.bmp" />
+    <None Include="res\Toolbar256.bmp" />
+    <None Include="res\toolbar_disable.bmp" />
+    <None Include="res\Toolbar_V25049.bmp" />
+    <None Include="res\ToolbarOwn.bmp" />
+    <None Include="res\treenode.bmp" />
+    <None Include="res\unlock.ico" />
+    <None Include="UserImages.bmp" />
+    <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
+    <None Include="Z:\Temp\lm\T3000\BluBuildings.ico" />
+    <None Include="Z:\Temp\lm\T3000\t3000_icon_output.ico" />
+    <None Include="Z:\Temp\lm\T3000\t3000_icon_output.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\SQLiteDriver\CppSQLite3.h" />
+    <ClInclude Include="..\SQLiteDriver\sqlite3.h" />
+    <ClInclude Include="AirflowSettingDlg.h" />
+    <ClInclude Include="AirQuality\AirQuality.h" />
+    <ClInclude Include="AutoRichEditCtrl.h" />
+    <ClInclude Include="Bacnetaddintodb.h" />
+    <ClInclude Include="BacnetAddLabel.h" />
+    <ClInclude Include="BacnetAddRemoteDevice.h" />
+    <ClInclude Include="BacnetAddVirtualDevice.h" />
+    <ClInclude Include="BacnetAlarmLog.h" />
+    <ClInclude Include="ARDDlg.h" />
+    <ClInclude Include="BacnetAlarmWindow.h" />
+    <ClInclude Include="BacnetAnalogCusRang.h" />
+    <ClInclude Include="BacnetATCommand.h" />
+    <ClInclude Include="BacnetCustomerDigitalRange.h" />
+    <ClInclude Include="BacnetEditLabel.h" />
+    <ClInclude Include="BacnetEmailAlarm.h" />
+    <ClInclude Include="BacnetGraphic.h" />
+    <ClInclude Include="BacnetGraphicSetting.h" />
+    <ClInclude Include="BacnetInput.h" />
+    <ClInclude Include="BacnetIOConfig.h" />
+    <ClInclude Include="BacnetMessageInput.h" />
+    <ClInclude Include="BacnetOutput.h" />
+    <ClInclude Include="BacnetProgram.h" />
+    <ClInclude Include="BacnetProgramDebug.h" />
+    <ClInclude Include="BacnetProgramEdit.h" />
+    <ClInclude Include="BacnetProgramSetting.h" />
+    <ClInclude Include="BacnetRange.h" />
+    <ClInclude Include="BacnetRegisterListView.h" />
+    <ClInclude Include="BacnetRemotePoint.h" />
+    <ClInclude Include="BacnetScreenEdit.h" />
+    <ClInclude Include="BacnetSetting.h" />
+    <ClInclude Include="BacnetSettingBasicInfo.h" />
+    <ClInclude Include="BacnetSettingDyndns.h" />
+    <ClInclude Include="BacnetSettingHealth.h" />
+    <ClInclude Include="BacnetSettingParamter.h" />
+    <ClInclude Include="BacnetSettingTcpip.h" />
+    <ClInclude Include="BacnetSettingTime.h" />
+    <ClInclude Include="BacnetThirdPartyMain.h" />
+    <ClInclude Include="BacnetTool.h" />
+    <ClInclude Include="BacnetToolReadProperty.h" />
+    <ClInclude Include="BacnetTstat.h" />
+    <ClInclude Include="BacnetTstatSchedule.h" />
+    <ClInclude Include="BacnetUserConfig.h" />
+    <ClInclude Include="BacnetUserlogin.h" />
+    <ClInclude Include="BacnetVarCusRang.h" />
+    <ClInclude Include="BacnetVariable.h" />
+    <ClInclude Include="BacnetWait.h" />
+    <ClInclude Include="BacnetWeb.h" />
+    <ClInclude Include="Bacnet_Include.h" />
+    <ClInclude Include="Bacnet_Range_Msv.h" />
+    <ClInclude Include="BADO\BADO.h" />
+    <ClInclude Include="BancetProperty.h" />
+    <ClInclude Include="BatchSNDlg.h" />
+    <ClInclude Include="BinFileParser.h" />
+    <ClInclude Include="BoatMonitorViewer.h" />
+    <ClInclude Include="BootFinderDlg.h" />
+    <ClInclude Include="BTUMeterDlg.h" />
+    <ClInclude Include="BuildingConfigEditDlg.h" />
+    <ClInclude Include="BuildingConfigration.h" />
+    <ClInclude Include="CalibartionHT.h" />
+    <ClInclude Include="CApplication0.h" />
+    <ClInclude Include="ChartCtrl\ChartAxis.h" />
+    <ClInclude Include="ChartCtrl\ChartAxisLabel.h" />
+    <ClInclude Include="ChartCtrl\ChartBalloonLabel.h" />
+    <ClInclude Include="ChartCtrl\ChartBarSerie.h" />
+    <ClInclude Include="ChartCtrl\ChartCandlestickSerie.h" />
+    <ClInclude Include="ChartCtrl\ChartCrossHairCursor.h" />
+    <ClInclude Include="ChartCtrl\ChartCtrl.h" />
+    <ClInclude Include="ChartCtrl\ChartCursor.h" />
+    <ClInclude Include="ChartCtrl\ChartDateTimeAxis.h" />
+    <ClInclude Include="ChartCtrl\ChartDragLineCursor.h" />
+    <ClInclude Include="ChartCtrl\ChartFont.h" />
+    <ClInclude Include="ChartCtrl\ChartGanttSerie.h" />
+    <ClInclude Include="ChartCtrl\ChartGradient.h" />
+    <ClInclude Include="ChartCtrl\ChartGrid.h" />
+    <ClInclude Include="ChartCtrl\ChartLabel.h" />
+    <ClInclude Include="ChartCtrl\ChartLegend.h" />
+    <ClInclude Include="ChartCtrl\ChartLineSerie.h" />
+    <ClInclude Include="ChartCtrl\ChartLogarithmicAxis.h" />
+    <ClInclude Include="ChartCtrl\ChartMouseListener.h" />
+    <ClInclude Include="ChartCtrl\ChartPointsArray.h" />
+    <ClInclude Include="ChartCtrl\ChartPointsSerie.h" />
+    <ClInclude Include="ChartCtrl\ChartScrollBar.h" />
+    <ClInclude Include="ChartCtrl\ChartSerie.h" />
+    <ClInclude Include="ChartCtrl\ChartSerieBase.h" />
+    <ClInclude Include="ChartCtrl\ChartSeriesMouseListener.h" />
+    <ClInclude Include="ChartCtrl\ChartStandardAxis.h" />
+    <ClInclude Include="ChartCtrl\ChartString.h" />
+    <ClInclude Include="ChartCtrl\ChartSurfaceSerie.h" />
+    <ClInclude Include="ChartCtrl\ChartTitle.h" />
+    <ClInclude Include="ChartCtrl\ChartXYSerie.h" />
+    <ClInclude Include="ChartCtrl\PointsOrdering.h" />
+    <ClInclude Include="Class\md5.h" />
+    <ClInclude Include="CM5\ListCtrlCellEx.h" />
+    <ClInclude Include="CM5\ListCtrlEx.h" />
+    <ClInclude Include="CM5\MyOwnListCtrl.h" />
+    <ClInclude Include="CM5\PARSER.H" />
+    <ClInclude Include="CM5\PerfTimer.h" />
+    <ClInclude Include="CM5\ROUTER.H" />
+    <ClInclude Include="CM5\T3000DEF.H" />
+    <ClInclude Include="CM5\ud_str.h" />
+    <ClInclude Include="CM5\user_data.h" />
+    <ClInclude Include="CO2NetView.h" />
+    <ClInclude Include="CO2_AUTO_CALIBRATION.h" />
+    <ClInclude Include="CO2_Node.h" />
+    <ClInclude Include="CO2_NodeView.h" />
+    <ClInclude Include="CO2_View.h" />
+    <ClInclude Include="ConfigFileHandler.h" />
+    <ClInclude Include="ConnectRemoteServer.h" />
+    <ClInclude Include="CControlBasicEditorCOM.h" />
+    <ClInclude Include="CRange0.h" />
+    <ClInclude Include="CustomSTable.h" />
+    <ClInclude Include="CWebBrowser2.h" />
+    <ClInclude Include="CWorkbook0.h" />
+    <ClInclude Include="CWorkbooks0.h" />
+    <ClInclude Include="CWorksheet0.h" />
+    <ClInclude Include="CWorksheets0.h" />
+    <ClInclude Include="DebugWindow.h" />
+    <ClInclude Include="DetectOnlineDlg.h" />
+    <ClInclude Include="DialogCM5_BacNet.h" />
+    <ClInclude Include="DisplayConfig.h" />
+    <ClInclude Include="DisplayLEDLCDConfig.h" />
+    <ClInclude Include="DllFunction.h" />
+    <ClInclude Include="Dowmloadfile.h" />
+    <ClInclude Include="DownloadSocket.h" />
+    <ClInclude Include="DuplicateIdDetected.h" />
+    <ClInclude Include="EnterValueDlg.h" />
+    <ClInclude Include="Enter_Value_BinaryDlg.h" />
+    <ClInclude Include="FileOperations.h" />
+    <ClInclude Include="fileRW.h" />
+    <ClInclude Include="Flash_Multy.h" />
+    <ClInclude Include="global_define.h" />
+    <ClInclude Include="global_function.h" />
+    <ClInclude Include="global_struct.h" />
+    <ClInclude Include="GraphicMode.h" />
+    <ClInclude Include="GroupScheduleDlg.h" />
+    <ClInclude Include="HexFileParser.h" />
+    <ClInclude Include="IONameConfig.h" />
+    <ClInclude Include="ISPModeSlove.h" />
+    <ClInclude Include="LanguageLocale.h" />
+    <ClInclude Include="LCOutNameConfig.h" />
+    <ClInclude Include="ModbusToBacnetRouterDlg.h" />
+    <ClInclude Include="ControlBasicEditorView.h" />
+    <ClInclude Include="NewTstatSchedulesDlg.h" />
+    <ClInclude Include="OXBitmapButton.h" />
+    <ClInclude Include="OXDllExt.h" />
+    <ClInclude Include="OXMainRes.h" />
+    <ClInclude Include="OXToolTipCtrl.h" />
+    <ClInclude Include="ParameterExtDlg.h" />
+    <ClInclude Include="ping.h" />
+    <ClInclude Include="Powermeter.h" />
+    <ClInclude Include="PowerMeterList.h" />
+    <ClInclude Include="PressureSensorForm.h" />
+    <ClInclude Include="ProductModel.h" />
+    <ClInclude Include="ProductRegisterListView.h" />
+    <ClInclude Include="RegisterViewerDlg.h" />
+    <ClInclude Include="RegisterWriteValueDlg.h" />
+    <ClInclude Include="RemotePtpLogin.h" />
+    <ClInclude Include="Scanwaydlg.h" />
+    <ClInclude Include="SetTimeDlg.h" />
+    <ClInclude Include="ShowMessageDlg.h" />
+    <ClInclude Include="StaticDlg.h" />
+    <ClInclude Include="StatusbarCtrl.h" />
+    <ClInclude Include="T3000DefaultView.h" />
+    <ClInclude Include="T3000LogWindow.h" />
+    <ClInclude Include="T3000Option.h" />
+    <ClInclude Include="T3000UpdateDlg.h" />
+    <ClInclude Include="T3000_Default_MainView.h" />
+    <ClInclude Include="T3000_Help_Map.h" />
+    <ClInclude Include="T328IN.h" />
+    <ClInclude Include="T332AI.h" />
+    <ClInclude Include="T36CT.h" />
+    <ClInclude Include="T38AI16O.h" />
+    <ClInclude Include="T38AI8AO.h" />
+    <ClInclude Include="T38I13O.h" />
+    <ClInclude Include="T3ControllerProgram.h" />
+    <ClInclude Include="T3ModulesOutputDlg.h" />
+    <ClInclude Include="T3ModulesView.h" />
+    <ClInclude Include="T3RangeDlg.h" />
+    <ClInclude Include="T3RTDView.h" />
+    <ClInclude Include="TCP_Server.h" />
+    <ClInclude Include="TemcoDataGrid.h" />
+    <ClInclude Include="TemcoStandardBacnetToolDlg.h" />
+    <ClInclude Include="TempHumSensorForm.h" />
+    <ClInclude Include="TrendLogWnd.h" />
+    <ClInclude Include="TroubleShootDlg.h" />
+    <ClInclude Include="TstatAQ.h" />
+    <ClInclude Include="TstatAQI_Detail.h" />
+    <ClInclude Include="TstatIconSetting.h" />
+    <ClInclude Include="TStatInputView.h" />
+    <ClInclude Include="TStatOutputView.h" />
+    <ClInclude Include="TstatRangeDlg.h" />
+    <ClInclude Include="TstatSetpointDetail.h" />
+    <ClInclude Include="TstatZigbeeLogic.h" />
+    <ClInclude Include="Tstat_HelpDoc.h" />
+    <ClInclude Include="AddBuilding.h" />
+    <ClInclude Include="AfxMessageDialog.h" />
+    <ClInclude Include="AllNodesDiaolg.h" />
+    <ClInclude Include="Annual_Routines.h" />
+    <ClInclude Include="AnnualRout_InsertDia.h" />
+    <ClInclude Include="ApplyGraphicLabelsDlg.h" />
+    <ClInclude Include="BuildTable1.h" />
+    <ClInclude Include="ChangePasswordDlg.h" />
+    <ClInclude Include="Config_Routines.h" />
+    <ClInclude Include="LightingController\configure.h" />
+    <ClInclude Include="define.h" />
+    <ClInclude Include="Dialog_Progess.h" />
+    <ClInclude Include="DialogInfo.h" />
+    <ClInclude Include="EreaseDlg.h" />
+    <ClInclude Include="excel9.h" />
+    <ClInclude Include="FreeCoolDlg.h" />
+    <ClInclude Include="global_variable.h" />
+    <ClInclude Include="global_variable_extern.h" />
+    <ClInclude Include="GraphicView.h" />
+    <ClInclude Include="GridButton.h" />
+    <ClInclude Include="GridFlashDlg.h" />
+    <ClInclude Include="GridLoad.h" />
+    <ClInclude Include="hangeIDDlg.h" />
+    <ClInclude Include="ImageTreeCtrl.h" />
+    <ClInclude Include="IniFile.h" />
+    <ClInclude Include="InputSetDlg.h" />
+    <ClInclude Include="IODisplayBar.h" />
+    <ClInclude Include="LabelEditDlg.h" />
+    <ClInclude Include="LedsDialog.h" />
+    <ClInclude Include="LightingController\LightingController.h" />
+    <ClInclude Include="LightingController\LightingSet.h" />
+    <ClInclude Include="LoginDlg.h" />
+    <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="ManageAccountDlg.h" />
+    <ClInclude Include="modbus.h" />
+    <ClInclude Include="monthview1.h" />
+    <ClInclude Include="msflexgrid1.h" />
+    <ClInclude Include="NcModbus.h" />
+    <ClInclude Include="NetworkControllView.h" />
+    <ClInclude Include="OfficeStPtDlg.h" />
+    <ClInclude Include="OutPutDlg.h" />
+    <ClInclude Include="OutputSetDlg.h" />
+    <ClInclude Include="OutsidDailog.h" />
+    <ClInclude Include="ParameterDlg.h" />
+    <ClInclude Include="RefreshTreeThread.h" />
+    <ClInclude Include="RelayLabel.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="ScanDbWaitDlg.h" />
+    <ClInclude Include="ScanDlg.h" />
+    <ClInclude Include="ScanSelectDlg.h" />
+    <ClInclude Include="schedule.h" />
+    <ClInclude Include="Schedule_grid.h" />
+    <ClInclude Include="SetPtDayDlg.h" />
+    <ClInclude Include="SetptGraphicBar.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="T3000.h" />
+    <ClInclude Include="T3000Doc.h" />
+    <ClInclude Include="T3000RegAddress.h" />
+    <ClInclude Include="T3000TableView.h" />
+    <ClInclude Include="T3000View.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="TDelayForm.h" />
+    <ClInclude Include="Timer_Calibrate.h" />
+    <ClInclude Include="TrendLogView.h" />
+    <ClInclude Include="TStat_Dev.h" />
+    <ClInclude Include="TStat_Net.h" />
+    <ClInclude Include="TStatBase.h" />
+    <ClInclude Include="TStatScanner.h" />
+    <ClInclude Include="TStatScheduleDlg.h" />
+    <ClInclude Include="UserAcessSetDlg.h" />
+    <ClInclude Include="vector_declare.h" />
+    <ClInclude Include="Weekly_Routines.h" />
+    <ClInclude Include="WeeklyRout_InsertDia.h" />
+    <ClInclude Include="WhichOneToChooseDlg.h" />
+    <ClInclude Include="WifiConfigDlg.h" />
+    <ClInclude Include="WifiConfiguration.h" />
+    <ClInclude Include="WorkspaceBar.h" />
+    <ClInclude Include="T3\DialogT3.h" />
+    <ClInclude Include="CM5\DialogCM5.h" />
+    <ClInclude Include="CM5\SliderBoth.h" />
+    <ClInclude Include="CM5\SliderBothBtn.h" />
+    <ClInclude Include="singleslider\MacSliderCtrl.h" />
+    <ClInclude Include="WriteRegistersValueDlg.h" />
+    <ClInclude Include="WriteSingleRegDlg.h" />
+    <ClInclude Include="ZigbeeInformationDlg.h" />
+    <ClInclude Include="ZigbeeRepeater.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="T3000.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties _x007B_E8789EA8-CA99-48DF-B920-1A1DCB4FF6AD_x007D_="CForms1" _x007B_8856F961-340A-11D0-A96B-00C04FD705A2_x007D_="CWebBrowser2" _x007B_3A2B370C-BA0A-11D1-B137-0000F8753F5D_x007D_="CMschart1" RESOURCE_FILE="T3000.rc" _x007B_6262D3A0-531B-11CF-91F6-C2863C385E30_x007D_="CMsflexgrid1" _x007B_232E456A-87C3-11D1-8BE3-0000F8754DA1_x007D_="CMonthview1" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

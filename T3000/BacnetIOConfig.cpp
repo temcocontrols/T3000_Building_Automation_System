@@ -170,7 +170,7 @@ void CBacnetIOConfig::Initial_List()
 	m_ext_io_config_list.ShowWindow(SW_SHOW);
 	PostMessage(WM_REFRESH_BAC_EXTIO_LIST,NULL,NULL);
 }
-
+extern void Getminitypename(unsigned char nmini_type, CString &ret_name);
 
 LRESULT CBacnetIOConfig::Fresh_Extio_List(WPARAM wParam, LPARAM lParam)
 {
@@ -216,7 +216,14 @@ LRESULT CBacnetIOConfig::Fresh_Extio_List(WPARAM wParam, LPARAM lParam)
 			temp_modbus_id.Format(_T("%u"), m_extio_config_data.at(i).reg.modbus_id);
 			temp_last_contact = _T("");
 		}
-		temp_product_name = GetProductName(m_extio_config_data.at(i).reg.product_id);
+        if ((i == 0) && Bacnet_Private_Device(m_extio_config_data.at(i).reg.product_id))
+        {
+
+            Getminitypename(Device_Basic_Setting.reg.mini_type, temp_product_name);
+
+        }
+        else
+		    temp_product_name = GetProductName(m_extio_config_data.at(i).reg.product_id);
 
 		temp_input_start.Format(_T("%u"), m_extio_config_data.at(i).reg.input_start);
 		temp_input_end.Format(_T("%u"), m_extio_config_data.at(i).reg.input_end);

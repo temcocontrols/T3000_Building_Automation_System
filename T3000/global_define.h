@@ -1,6 +1,7 @@
 #pragma once
 #include "RelayLabel.h"
-
+//#define ENABLE_HTTP_FUCTION  //定义是否使用http api
+//#define ENABLE_T3_EMAIL
 #include <map>
 //minipanel 寄存器表
 //  9800	-	9999    200个寄存器   setting
@@ -11,7 +12,7 @@
 //  15808   -   15974	21*8=336	  SCH			sizeof(Str_weekly_routine_point) = 42
 //	15975   -	16043		17*4=68		  HOL				sizeof(Str_annual_routine_point) = 33
 //  32712   - 32753		 14*16 =224								sizeof(Str_controller_point)	= 28
-
+//  32044 - 32619       
 //  32936   										sizeof(Str_table_point)	 = 105
 #define BAC_SETTING_START_REG		9800
 #define BAC_OUT_START_REG			10000
@@ -20,10 +21,36 @@
 #define BAC_PRG_START_REG			15504
 #define BAC_SCH_START_REG			15808
 #define BAC_HOL_START_REG			15976
+#define BAC_WR_TIME_FIRST           32044
+#define BAC_AR_TIME_FIRST           32620
 #define BAC_PID_CONTROL_START_REG   32712
 #define BAC_CUSTOMER_TABLE_START    32936
+#define BAC_WR_FLAG_FIRST           33201
+/*
+Schedule flag 1 33201 - 33236           36Reg
+...
+...
+Schedule flag 8 33201 + (7 *36 )        36Reg
 
+Schedule 1 32044 - 32115              72Reg
+Schedule 2 32116 - 32187              72Reg
+Schedule 3 32188 - 32259              72Reg
+Schedule 4 32260 - 32331              72Reg
+Schedule 5 32332 - 32403              72Reg
+Schedule 6 32404 - 32475              72Reg
+Schedule 7 32476 - 32547              72Reg
+Schedule 8 32548 - 32619              72Reg
 
+Schedule List1 15808	15828	21REG
+Schedule List2 15829	15849	21REG
+Schedule List3 15850	15870	21REG
+Schedule List4 15871	15891	21REG
+Schedule List5 15892	15912	21REG
+Schedule List6 15913	15933	21REG
+Schedule List7 15934	15954	21REG
+Schedule List8 15955	15975	21REG
+
+*/
 const int SORT_UNKNOW = 0;
 const int SORT_BY_CONNECTION = 1;
 const int SORT_BY_BUILDING_FLOOR = 2;
@@ -204,6 +231,7 @@ const int TEMCO_SERVER_PORT = 31234;
 const int UDP_BROADCAST_PORT = 1234;
 const int RECV_RESPONSE_PORT = 4321;
 #define UPD_BROADCAST_QRY_MSG 100
+#define RESPONSE_TOTAL_SUB_INFO 0x2f
 #define RESPONSE_MSG          UPD_BROADCAST_QRY_MSG+1
 #define RESPONSE_LABEL		  0x6A
 
@@ -215,7 +243,9 @@ const int PROTOCOL_GSM = 4;
 const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
 const int PROTOCOL_MSTP_TO_MODBUS = 11;
-const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;
+const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;    //网络下面的设备，子口跑MSTP设备 ，只能通过Ptransfer 转10000以后寄存器读取
+const int PROTOCOL_MB_TCPIP_TO_MB_RS485 = 13;     //20200306 TSTAT10或者T3BB  使用MODBUS MODBUS485 接到  T3BB下面 
+const int PROTOCOL_MB_PTP_TRANSFER = 14;          //MODBUS485采用ptp 的方式获取 T3私有数据;
 const int PROTOCOL_THIRD_PARTY_BAC_BIP = 253;
 const int PROTOCOL_VIRTUAL = 254;
 const int PROTOCOL_UNKNOW = 255;
@@ -343,7 +373,7 @@ const int BAC_READ_PROGRAM_GROUP_NUMBER = 10;
 const int BAC_READ_PID_GROUP_NUMBER = 10;
 const int BAC_READ_SCHEDULE_GROUP_NUMBER = 10;
 const int BAC_READ_HOLIDAY_GROUP_NUMBER = 8;
-
+const int BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER = 5;
 const int BAC_READ_TSTAT_SCHEDULE_GROUP_NUMBER = 10;
 
 const int BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER = 8;
@@ -367,6 +397,9 @@ const int BAC_READ_VARIABLE_REMAINDER = BAC_READ_VARIABLE_GROUP_NUMBER - 1;
 const int BAC_READ_PROGRAM_REMAINDER = BAC_READ_PROGRAM_GROUP_NUMBER - 1;
 const int BAC_READ_PID_REMAINDER = BAC_READ_PID_GROUP_NUMBER - 1;
 const int BAC_READ_SCHEDULE_REMAINDER = BAC_READ_SCHEDULE_GROUP_NUMBER - 1;
+
+const int BAC_READ_SCHEDULE_FLAG_REMAINDER = BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER - 1;
+
 const int BAC_READ_HOLIDAY_REMAINDER = BAC_READ_HOLIDAY_GROUP_NUMBER - 1;
 const int BAC_READ_USER_LOGIN_INFO_REMAINDER = BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER - 1;
 const int BAC_READ_MSV_REMAINDER = BAC_MSV_GROUP_NUMBER - 1;
@@ -431,6 +464,7 @@ const int BAC_PID_GROUP = (BAC_PID_COUNT + BAC_READ_PID_GROUP_NUMBER - 1) / BAC_
 
 const int BAC_SCHEDULE_GROUP = (BAC_SCHEDULE_COUNT + BAC_READ_SCHEDULE_GROUP_NUMBER - 1) / BAC_READ_SCHEDULE_GROUP_NUMBER;
 const int BAC_SCHEDULECODE_GOUP = BAC_WEEKLYCODE_ROUTINES_COUNT;
+const int BAC_SCHEDULE_FLAG_GROUP = (BAC_WEEKLYCODE_ROUTINES_COUNT + BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER - 1) / BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER;
 const int BAC_HOLIDAY_GROUP = (BAC_HOLIDAY_COUNT + BAC_READ_HOLIDAY_GROUP_NUMBER - 1) / BAC_READ_HOLIDAY_GROUP_NUMBER;
 const int BAC_TIME_COMMAND_GROUP = 1;
 const int BAC_BASIC_SETTING_GROUP = 1;
@@ -449,9 +483,10 @@ const int BAC_TSTAT_SCHEDULE_GROUP = (BAC_TSTAT_SCHEDULE + BAC_READ_TSTAT_SCHEDU
 const int BAC_MSV_GROUP = (BAC_MSV_COUNT + BAC_MSV_GROUP_NUMBER - 1) / BAC_MSV_GROUP_NUMBER;
 const int BAC_SHOW_CONNECT_RESULTS = 1;
 const int BAC_SHOW_MISSION_RESULTS = 3;
-
-const int BAC_LIST_REFRESH_TIME = 15000;//ms
-
+const int BAC_LIST_REFRESH_INPUT_TIME = 30000;//ms
+const int BAC_LIST_REFRESH_OUTPUT_TIME = 30000;//ms
+const int BAC_LIST_REFRESH_TIME = 45000;//ms
+const int BAC_LIST_REFRESH_ETHERNET_TIME = 45000;  //判断是接的网络就用20秒的刷新;
 
 const int SCHEDULE_TIME_NUM = 0;
 const int SCHEDULE_TIME_MONDAY = 1;
@@ -529,6 +564,20 @@ struct _Com_Scan_Read_Info
 	int retry_time;
 };
 
+typedef struct
+{
+    uint8_t nstatus; // 1 online   0  offline
+    uint8_t modbusid;
+}sub_net_status;
+
+struct refresh_subnet_device
+{
+    UCHAR device_count;
+    UINT parent_sn;
+    char reserved_data[15]; // 预留
+    sub_net_status device_status[255];
+};
+
 struct refresh_net_device
 {
 	DWORD nSerial;
@@ -546,6 +595,9 @@ struct refresh_net_device
 	unsigned short bacnetip_port;
     int hardware_info;     //bit  0x74 zigbee   bit1 wifi
     int nprotocol;
+    UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
+    UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
+    UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
 };
 
 struct refresh_net_label_info
@@ -659,26 +711,30 @@ const CString ExtIO_Product[] =
 {
 	_T("T3_8AI8AO6DO"),
 	_T("T3_22I"),
-    _T("T3_PT12")
+    _T("T3_PT12"),
+    _T("PWM_IO_Transducer")
 };
 const int ExtIO_ProductId[] =
 {
 	44,
 	43,
-    46
+    46,
+    104
 };
 
 const int ExtIO_INPUT_COUNT[] =
 {
 	8,
 	22,
-    12
+    12,
+    6
 };
 const int ExtIO_OUTPUT_COUNT[] =
 {
 	14,
 	0,
-    0
+    0,
+    6
 };
 
 const CString ExtIO_Port[] =
@@ -818,9 +874,19 @@ const CString Input_List_Analog_Units[] =
 	_T(""),
 	_T("counts"),
 	_T("HZ"),
-
 	_T("%"),
-	_T("PPM")
+	_T("PPM"),
+    _T("RPM"),
+    _T("PPB"),
+    _T("ug/m3"),
+    _T("#/cm3"),
+    _T("dB"),
+    _T("Lux"),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T("")
 };
 
 const CString Input_Analog_Units_Array[] =
@@ -853,7 +919,18 @@ const CString Input_Analog_Units_Array[] =
 	_T("Pulse Count (Fast 100Hz)"),
 	_T("Frequency"),
 	_T("Humidty %"),
-	_T("CO2  PPM")
+	_T("CO2  PPM"),
+    _T("Revolutions Per Minute"),
+    _T("TVOC PPB"),
+    _T("ug/m3"),
+    _T("#/cm3"),
+    _T("dB"),
+    _T("Lux"),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T(""),
+    _T("")
 };
 
 const CString Output_Analog_Units_Array[] =
@@ -918,6 +995,14 @@ const CString Com_Parity_bit[] =
     _T("None"),
     _T("Odd"),
     _T("Even")
+};
+
+
+const CString DisplayType[] =
+{
+    _T("Output"),
+    _T("Input"),
+    _T("Variable")
 };
 
 const CString Com_Stop_bit[] =
@@ -1083,8 +1168,10 @@ typedef enum
 	MINIPANELARM = 5,
 	MINIPANELARM_LB = 6,
 	MINIPANELARM_TB = 7,
-    BACNET_ROUTER = 8,
+    MINIPANELARM_NB = 8,
     T3_TSTAT10    = 9,
+    T3_OEM        = 11,
+    T3_TB_11I = 12,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1105,6 +1192,10 @@ const int TINY_MINIPANEL_IN_D = 0;
 const int TINYEX_MINIPANEL_IN_A = 8;
 const int TINYEX_MINIPANEL_IN_D = 0;
 
+const int TB_11I_IN_A = 11;
+const int TB_11I_IN_D = 0;
+
+
 const int BACNET_ROUTER_IN_A = 0;
 const int BACNET_ROUTER_IN_D = 0;
 const int BACNET_ROUTER_OUT_A = 0;
@@ -1122,6 +1213,10 @@ const int TINY_MINIPANEL_OUT_A = 2;
 
 const int TINYEX_MINIPANEL_OUT_D = 8;
 const int TINYEX_MINIPANEL_OUT_A = 6;
+
+const int T3_TB_11I_OUT_D = 6;
+const int T3_TB_11I_OUT_A = 5;
+
 
 const int T38AI8AO6DO_OUT_D = 6;
 const int T38AI8AO6DO_OUT_A = 8;
@@ -1651,19 +1746,20 @@ const int OUTPUT_FULL_LABLE = 2;
 const int OUTPUT_AUTO_MANUAL = 3;
 const int OUTPUT_HW_SWITCH = 4;
 const int OUTPUT_VALUE = 5;
-const int OUTPUT_UNITE = 6;
-const int OUTPUT_RANGE = 7;
+const int OUTPUT_RELINQUISH_VALUE = 6;
+const int OUTPUT_UNITE = 7;
+const int OUTPUT_RANGE = 8;
 
-const int OUTPUT_LOW_VOLTAGE = 8;
-const int OUTPUT_HIGH_VOLTAGE = 9;
+const int OUTPUT_LOW_VOLTAGE = 9;
+const int OUTPUT_HIGH_VOLTAGE = 10;
 
-const int OUTPUT_PWM_PERIOD = 10;
-const int OUTPUT_DECOM = 11;
-const int OUTPUT_LABLE = 12;
-const int OUTPUT_EXTERNAL = 13;
-const int OUTPUT_PRODUCT = 14;
-const int OUTPUT_EXT_NUMBER = 15;
-const int OUTPUT_COL_NUMBER = 16;
+const int OUTPUT_PWM_PERIOD = 11;
+const int OUTPUT_DECOM = 12;
+const int OUTPUT_LABLE = 13;
+const int OUTPUT_EXTERNAL = 14;
+const int OUTPUT_PRODUCT = 15;
+const int OUTPUT_EXT_NUMBER = 16;
+const int OUTPUT_COL_NUMBER = 17;
 
 const CString Output_Decom_Array[2] =
 {
@@ -1807,10 +1903,16 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_AO        29
 #define BAC_BO        30
 
-#define BAC_MAX       31
+//31弃用 
+#define BAC_FLOAT_ABCD  32
+#define BAC_FLOAT_CDAB  33
+#define BAC_FLOAT_BADC  34
+#define BAC_FLOAT_DCBA  35
+
+#define BAC_MAX       36
 #define BAC_MAIN      255
 
-#define MAX_FUNCTION_COUNT    31
+#define MAX_FUNCTION_COUNT    BAC_MAX   
 #define MAX_OBJ_INSTANCE  4194303
 
 
@@ -1878,7 +1980,7 @@ typedef struct
 const int day_of_month[] =
 {
 	31,
-	28,
+	29,
 	31,
 	30,
 	31,
@@ -1890,6 +1992,7 @@ const int day_of_month[] =
 	30,
 	31
 };
+
 
 const int day_in_this_year[] =
 {
@@ -2021,6 +2124,10 @@ typedef union
 		USHORT bacnetip_port;	//bacnet 的端口号;
 		UCHAR  hardware_info;	//  //bit0 zigbee   bit1 wifi
         UCHAR  subnet_protocol;   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
+
+        UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
+        UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
+        UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
 	}reg;
 }Str_UPD_SCAN;
 
@@ -2059,14 +2166,16 @@ const CString RegisterView_Format[] =
     _T("32 Bit Unsigned Integer LO_HI"),
     _T("32 Bit Signed Integer HI_LO"),
     _T("32 Bit Signed Integer LO_HI"),
-    _T("Floating HI_LO / 10"),
-    _T("Floating LO_HI / 10"),
-    _T("Floating HI_LO / 100"),
-    _T("Floating LO_HI / 100"),
-    _T("Floating HI_LO / 1000"),
-    _T("Floating LO_HI / 1000"),
+    _T("Floating HI_LO/10"),
+    _T("Floating LO_HI/10"),
+    _T("Floating HI_LO/100"),
+    _T("Floating LO_HI/100"),
+    _T("Floating HI_LO/1000"),
+    _T("Floating LO_HI/1000"),
     _T("Character String HI_LO"),
-    _T("Character String LO_HI")
+    _T("Character String LO_HI"),
+    _T("16 Bit Signed Integer/10") ,  //17
+    _T("16 Bit Unsigned Integer/10")  // 18
 };
 const int REGISTER_UNKNOWN = 0;
 const int REGISTER_8_BIT_UNSIGNED_INTEGER = 1;
@@ -2085,7 +2194,8 @@ const int REGISTER_FLOATING_HI_LO_DIV_1000 = 13;
 const int REGISTER_FLOATING_LO_HI_DIV_1000 = 14;
 const int REGISTER_CHARACTER_STRING_HI_LO = 15;
 const int REGISTER_CHARACTER_STRING_LO_HI = 16;
-
+const int REGISTER_16_BIT_SIGNED_INTEGER_DIV_10 = 17;
+const int REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_10 = 18;
 
 const CString Wifi_Module_Status[] =
 {
@@ -2152,6 +2262,18 @@ const int TPYE_BACAPP_OBJECT_ID = 12;
 #pragma endregion
 
 
+struct str_register_db_data
+{
+    int auto_id;
+    int m_register_address;
+    char cs_operation[MAX_PATH];
+    int m_register_length;
+    char cs_register_name[MAX_PATH];
+    char cs_data_format[MAX_PATH];
+    char cs_description[5 * MAX_PATH];
+    int m_data_format;
+};
+
 #pragma region connect_region
 //用于标识目前整个系统的协议状态；
 typedef struct 
@@ -2162,5 +2284,151 @@ typedef struct
 }connect_Info;
 #pragma endregion
 
+//#define SPECIAL_BAC_TO_MODBUS   ((g_protocol == MODBUS_BACNET_MSTP)|| (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))
+
+//|| (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) 杜帆去掉  网络转485 协议不用
+#define SPECIAL_BAC_TO_MODBUS   ((g_protocol == MODBUS_BACNET_MSTP)|| (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || (MODE_SUPPORT_PTRANSFER == 1))
 
 #define CHELSEA_TEST  0
+
+typedef enum
+{
+    F_EXPANSION_IO, //Minipanel 的扩展IO界面
+    F_SETTING_USER_LOGIN,
+    FUNCTION_C
+}FunctionNumber;
+
+#define HOME_MODE 1
+#define WORK_MODE 2
+#define AWAY_MODE 3
+#define SLEEP_MODE 4
+
+const int BATCH_FLASH_HEX = 1;
+const int ADD_BUILDING_CONFIG = 2;
+const int All_NODE_DATABASE = 3;
+const int HANDLE_ISP_MODE = 4;
+const int HANDLE_DUPLICATE_ID = 5;
+const int ISPTOOLFORONE = 6;
+const int ONHELPUSINGUPDATE = 7;
+const int SCANALL = 8;
+const int BTNTOPOLOGICAL = 9;
+const int SCAN_PRODUCT = 10;
+
+enum OUTPUT_TYPE {
+    OUTPUT_VIRTUAL_PORT = 0x00,
+    OUTPUT_DIGITAL_PORT = 0x01,
+    OUTPUT_ANALOG_PORT = 0x02,
+    OUTPUT_DIGITAL_PORT_EXT = 0x03,
+    OUTPUT_ANALOG_PORT_EXT = 0x04
+};
+
+enum INPUT_TYPE {
+    INPUT_VIRTUAL_PORT = 0x00,
+    INPUT_DIGITAL_PORT = 0x01,
+    INPUT_ANALOG_PORT = 0x02,
+    INPUT_DIGITAL_PORT_EXT = 0x03,
+    INPUT_ANALOG_PORT_EXT = 0x04,
+    INPUT_INTERNAL = 0x05
+};
+
+const CString AQI_Info_Status[] =
+{
+    _T("Good"),
+    _T("Medium"),
+    _T("Unhealthy for sensitive groups"),
+    _T("Unhealthy"),
+    _T("Very Unhealthy"),
+    _T("Poisonous")
+};
+
+const CString Output_Priority_Arry[] = 
+{
+    _T("Manual Life Safety"),
+    _T("Automatic Life Safety"),
+    _T("Unspecified Level 3"),
+    _T("Unspecified Level 4"),
+    _T("Critical Equipment Control"),
+    _T("Minimum On Off"),
+    _T("Unspecified Level 7"),
+    _T("Manual Operator"),
+    _T("Unspecified Level 9"),
+    _T("Unspecified Level 10"),
+    _T("Unspecified Level 11"),
+    _T("Unspecified Level 12"),
+    _T("Unspecified Level 13"),
+    _T("Unspecified Level 14"),
+    _T("Unspecified Level 15"),
+    _T("Lowest And Default")
+};
+
+const CString Output_Priority_Description_Arry[] =
+{
+    _T("Manual Life Safety"),
+    _T("Automatic Life Safety"),
+    _T("Unspecified Level 3"),
+    _T("Unspecified Level 4"),
+    _T("Critical Equipment Control"),
+    _T("Minimum On Off"),
+    _T("Hand-Off-Auto switches on the controller front cover"),
+    _T("Manual Operator ,T3000 front end Auto/Manual setting"),
+    _T("Unspecified Level 9"),
+    _T("T3 Controller programs"),
+    _T("Commands sent over the network from external masters"),
+    _T("Unspecified Level 12"),
+    _T("Unspecified Level 13"),
+    _T("Unspecified Level 14"),
+    _T("Unspecified Level 15"),
+    _T("Lowest And Default"),
+    _T("Relinquish Default / Dead Master /all entries above are empty")
+};
+
+const CString CO2_Node_Auto_Cal[] =
+{
+
+    _T("Disable"),
+    _T("Enable")
+};
+
+const CString Output_Type_String[] =
+{
+    _T("Virtual"),
+    _T("Digital"),       //1
+    _T("Ananlog"),
+    _T("Extend Digital"),
+    _T("Extend Ananlog"),
+    _T("Internal")
+};
+
+const CString SensorStatus = _T("Not populated");
+
+const CString Airlab_Unit_String[] =
+{
+    _T(""),
+    _T(""),
+    _T(""),
+    _T("-"),
+    _T("PPB"),
+    _T("ug/m3"),
+    _T("ug/m3"),
+    _T("#/cm3"),
+    _T("#/cm3"),
+    _T("dB"),
+    _T("Lux")
+};
+
+
+#define SENSOR_BIT_WIFI          0
+#define SENSOR_BIT_10K_TEMP      1
+#define SENSOR_BIT_HUM           2
+#define SENSOR_BIT_OCC           3
+#define SENSOR_BIT_CO2           4
+#define SENSOR_BIT_PRESSURE      5
+#define SENSOR_BIT_TVOC          6
+#define SENSOR_BIT_LIGHT         7
+#define SENSOR_BIT_SOUND         8
+#define SENSOR_BIT_ZIGBEE        9
+#define SENSOR_BIT_PM2_5         10
+#define SENSOR_BIT_AI_PT12       11
+
+
+

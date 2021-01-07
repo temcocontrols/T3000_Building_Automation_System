@@ -34,36 +34,69 @@ using System.Linq;
 using System.Windows.Forms;
 using System.IO.BACnet;
 using SharpPcap.LibPcap;
-
+using System.Runtime.InteropServices;
 namespace Yabe
 {
+
+
     public partial class SearchDialog : Form
     {
+        public static int autocrun = 1;
         private BacnetClient m_result;
 
         public BacnetClient Result { get { return m_result; } }
 
-        public SearchDialog()
+        public void theout(object source, System.Timers.ElapsedEventArgs e)
         {
+            if (autocrun == 1)
+            {
+                autocrun = 0;
+                m_SearchIpButton_Click(this, null);//Fandu
+            }
+        }
+
+        public SearchDialog(bool bIsVisible = true)
+        {
+            //System.Timers.Timer t = new System.Timers.Timer(1000);//实例化Timer类，设置间隔时间为10000毫秒；
+            //t.Elapsed += new System.Timers.ElapsedEventHandler(theout);//到达时间的时候执行事件；
+            //t.AutoReset = false;//设置是执行一次（false）还是一直执行(true)；
+            //t.Enabled = true;//是否执行System.Timers.Timer.Elapsed事件；
             InitializeComponent();
+            this.Visible = bIsVisible;
 
             //find all serial ports
             string[] ports = System.IO.Ports.SerialPort.GetPortNames();
             m_SerialPortCombo.Items.AddRange(ports);
             m_SerialPtpPortCombo.Items.AddRange(ports);
 
-            //find all pipe transports that's pretending to be com ports
-            ports = BacnetPipeTransport.AvailablePorts;
-            foreach (string str in ports)
-                if (str.StartsWith("com", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    m_SerialPortCombo.Items.Add(str);
-                    m_SerialPtpPortCombo.Items.Add(str);
-                }
+            if (Environment.OSVersion.Platform == System.PlatformID.Win32Windows) 
+            {
+                //find all pipe transports that's pretending to be com ports  : fail on Linux
+                ports = BacnetPipeTransport.AvailablePorts;
+                foreach (string str in ports)
+                    if (str.StartsWith("com", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        m_SerialPortCombo.Items.Add(str);
+                        m_SerialPtpPortCombo.Items.Add(str);
+                    }
 
-            //select first
-            if (m_SerialPortCombo.Items.Count > 0) m_SerialPortCombo.SelectedItem = m_SerialPortCombo.Items[0];
-            if (m_SerialPtpPortCombo.Items.Count > 0) m_SerialPtpPortCombo.SelectedItem = m_SerialPtpPortCombo.Items[0];
+                //select first
+                if (m_SerialPortCombo.Items.Count > 0) m_SerialPortCombo.SelectedItem = m_SerialPortCombo.Items[0];
+                if (m_SerialPtpPortCombo.Items.Count > 0) m_SerialPtpPortCombo.SelectedItem = m_SerialPtpPortCombo.Items[0];
+            }
+            //this.m_AddUdpButton.Click += new System.EventHandler(this.m_AddSerialButton_Click);
+            //m_AddUdpButton.PerformClick();
+            //m_SearchIpButton_Click(this,);
+            //m_SearchIpButton_Click(this, null);//Fandu
+        }
+
+        public BacnetClient AutoSearch()
+        {
+            String adr = Properties.Settings.Default.DefaultUdpIp;
+            if (adr.Contains(':'))
+                return new BacnetClient(new BacnetIpV6UdpProtocolTransport((int)m_PortValue.Value, Properties.Settings.Default.YabeDeviceId, Properties.Settings.Default.Udp_ExclusiveUseOfSocket, Properties.Settings.Default.Udp_DontFragment, Properties.Settings.Default.Udp_MaxPayload, adr), (int)m_TimeoutValue.Value, (int)m_RetriesValue.Value);
+            else
+                return new BacnetClient(new BacnetIpUdpProtocolTransport((int)m_PortValue.Value, Properties.Settings.Default.Udp_ExclusiveUseOfSocket, Properties.Settings.Default.Udp_DontFragment, Properties.Settings.Default.Udp_MaxPayload, adr), (int)m_TimeoutValue.Value, (int)m_RetriesValue.Value);
         }
 
         private void m_SearchIpButton_Click(object sender, EventArgs e)
@@ -140,11 +173,15 @@ namespace Yabe
             {
                 if (device.Opened == false) // Don't re-open and lists an already open interface
                 {
-                    device.Open();
-                    if (device.LinkType == PacketDotNet.LinkLayers.Ethernet
-                        && device.Interface.MacAddress != null)
-                        m_EthernetInterfaceCombo.Items.Add(device.Interface.FriendlyName + ": " + device.Interface.Description);
-                    device.Close();
+                    try
+                    {
+                        device.Open();
+                        if (device.LinkType == PacketDotNet.LinkLayers.Ethernet
+                            && device.Interface.MacAddress != null)
+                            m_EthernetInterfaceCombo.Items.Add(device.Interface.FriendlyName + ": " + device.Interface.Description);
+                        device.Close();
+                    }
+                    catch { }
                 }
             }
         }
@@ -156,6 +193,13 @@ namespace Yabe
             m_localUdpEndpointsCombo.Items.Clear();
             m_localUdpEndpointsCombo.Items.AddRange(local_endpoints);
 
+            string str3 = System.IO.Directory.GetCurrentDirectory();// System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+            str3 = str3 + "\\T3000_config.ini";
+            StringBuilder AutoLocalIP = new StringBuilder();
+            GetPrivateProfileString("Yabe", "LocalPCIPaddress", "", AutoLocalIP, 255, str3);
+            //WritePrivateProfileString("Yabe", "LocalPCIPaddress", "", str3);
+
+            this.m_localUdpEndpointsCombo.Text = AutoLocalIP.ToString();// "192.168.0.38"; //fandu
             // try to get Ethernet interfaces
             try
             {
@@ -163,6 +207,13 @@ namespace Yabe
             }
             catch { }
         }
+
+        [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool WritePrivateProfileString(string lpAppName, string lpKeyName, string lpString, string lpFileName);
+
+        [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern int GetPrivateProfileString(string lpAppName, string lpKeyName, string lpDefault, StringBuilder lpReturnedString, int nSize, string lpFileName);
+
 
         public static string[] GetAvailableIps()
         {

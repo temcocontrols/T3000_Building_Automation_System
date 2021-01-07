@@ -66,6 +66,8 @@ public:
 	afx_msg LRESULT OnAddStatusInfo(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnReplaceStatusInfo(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnFlashFinish(WPARAM wParam, LPARAM lParam);
+    afx_msg LRESULT OnFlashBoot_Update_boot(WPARAM wParam, LPARAM lParam);
+    afx_msg LRESULT OnFlashNewBootFinish(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedButtonFindnc();
 	afx_msg void OnClose();
 	afx_msg void OnBnClickedRadioFlhfirmware();
@@ -225,8 +227,8 @@ public:
 	void InitCombox(void);
 	//这个函数为COM_TStat的总函数
 	//当用户点击COM_FLASH的时候，
-	BOOL FlashTstat(void);
-	BOOL FlashNC_LC(void);
+	BOOL FlashByComport(void);
+	BOOL FlashByNetwork(void);
 	BOOL FlashSubID(void);
 	void OnFlashSubID(void);
 	BOOL ValidMdbIDStringSUBID();
@@ -264,11 +266,13 @@ public:
 
 
 	BOOL m_FlashEnable;
-	int m_isRAM;
 	int m_FlashTimes;
 	int m_Brandrate;
     afx_msg void OnBnClickedButtonFlashSn();
     CStaticEx m_static_info;
     static DWORD WINAPI  SN_MAC_Threadfun(LPVOID lpVoid);
     afx_msg LRESULT Fresh_CloseSN_fcuntion(WPARAM wParam, LPARAM lParam);
+    afx_msg void OnCbnSelchangeComboPm();
+    void Enable_Sensor_Window(bool nenable);
+    afx_msg void OnBnClickedCheckNoItem();
 };

@@ -20,8 +20,8 @@
 #include "DisplayConfig.h"
 #include "LedsDialog.h"
  #include "../SQLiteDriver/CppSQLite3.h"
-
-
+#include "TstatSetpointDetail.h"
+#include "ShowMessageDlg.h"
 #ifdef _DEBUG
     #define new DEBUG_NEW
 #endif
@@ -35,9 +35,10 @@
 extern T3000RegAddress GloabeAddress;
 extern int Mdb_Adress_Map;
 extern BOOL m_active_key_mouse;
+unsigned char already_check_tstat_timesync = 0; //每个TSTAT设备 只有点击的时候在确认时间;
 // CT3000View
 //extern BOOL g_bPauseMultiRead;
-
+extern int ok_button_press; //确定按钮
 IMPLEMENT_DYNCREATE(CT3000View, CFormView)
 BEGIN_MESSAGE_MAP(CT3000View, CFormView)
     ON_BN_CLICKED(IDC_COOL_RADIO, &CT3000View::OnBnClickedCoolRadio)
@@ -80,6 +81,7 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
     ON_EN_KILLFOCUS(IDC_DAY_EDIT, &CT3000View::OnEnKillfocusDayEdit)
     //ON_BN_CLICKED(IDC_TEST_SLIDER, &CT3000View::OnBnClickedTestSlider)
     ON_CBN_SELCHANGE(IDC_COMBO_SYS_MODE, &CT3000View::OnCbnSelchangeComboSysMode)
+    ON_BN_CLICKED(IDC_BUTTON_SETPOINT_DETAIL, &CT3000View::OnBnClickedButtonSetpointDetail)
 END_MESSAGE_MAP()
 
 #include "TStatInputView.h"
@@ -410,6 +412,8 @@ void CT3000View::OnFileOpen()
 /// </summary>
 void CT3000View::Fresh()
 {
+    Tstat_Setpoint_data.clear();
+
     CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 
     g_ifanStatus = product_register_value[MODBUS_FAN_SPEED];
@@ -508,10 +512,7 @@ void CT3000View::Fresh()
     {
         GetDlgItem(IDC_GRAPGICBUTTON)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_PARAMETERBTN)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_HIDE);
-
-
-
+        //GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_HIDE);  //杜帆添加 不懂为什么要用这玩意
     } 
     if (m_pFreshBackground==NULL)
     {
@@ -551,6 +552,7 @@ void CT3000View::Fresh()
 	{
 		InitFlexSliderBars_tstat6();
 	}
+
 
     switch_product_last_view();
 }
@@ -599,7 +601,6 @@ void CT3000View::Fresh_T3000View()
     FreshCtrl();
     FreshIOGridTable();
     InitFanSpeed();
-
 
 
 
@@ -3300,15 +3301,42 @@ void CT3000View::OnTimer(UINT_PTR nIDEvent)
 
     // 更新时间。
     CTime time = CTime::GetCurrentTime();
+    if (product_register_value[7] == PM_TSTAT8)
+    {
+        if ((product_register_value[MODBUS_YEAR] < 2000) || (product_register_value[MODBUS_YEAR] > 2049) ||
+            (product_register_value[MODBUS_MONTH] < 0) || (product_register_value[MODBUS_MONTH] > 12) ||
+            (product_register_value[MODBUS_DAY] < 0) || (product_register_value[MODBUS_DAY] > 31) ||
+            (product_register_value[MODBUS_HOUR] < 0) || (product_register_value[MODBUS_HOUR] > 23) ||
+            (product_register_value[MODBUS_MINUTE] < 0) || (product_register_value[MODBUS_MINUTE] > 59) ||
+            (product_register_value[MODBUS_SECOND] < 0) || (product_register_value[MODBUS_SECOND] > 59))
+        {
+            time = CTime::GetCurrentTime();
+        }
+        else
+        {
+            time = CTime(product_register_value[MODBUS_YEAR],
+                product_register_value[MODBUS_MONTH],
+                product_register_value[MODBUS_DAY],
+                product_register_value[MODBUS_HOUR],
+                product_register_value[MODBUS_MINUTE],
+                product_register_value[MODBUS_SECOND]);
+        }
+    }
+    else
+    {
+        CString strtime = time.Format(_T("%I:%M:%S %p"));
+        CEdit* pEdit = (CEdit*)GetDlgItem(IDC_EDIT_RTC_TIME);
+        pEdit->SetWindowText(strtime);
 
-    CString strtime = time.Format(_T("%I:%M:%S %p"));
-    //CString strtime = time.Format(_T("%m/%d/%Y %H:%M:%S %a"));
-    CEdit* pEdit = (CEdit*)GetDlgItem(IDC_EDIT_RTC_TIME);
-    pEdit->SetWindowText(strtime);
+        CString strDate = time.Format(_T("%A, %b %d, %Y"));
+        pEdit = (CEdit*)GetDlgItem(IDC_EDIT_RTC);
+        pEdit->SetWindowText(strDate);
+    }
 
-    CString strDate = time.Format(_T("%A, %b %d, %Y"));
-    pEdit = (CEdit*)GetDlgItem(IDC_EDIT_RTC);
-    pEdit->SetWindowText(strDate);
+
+
+
+
     int Increment=product_register_value[MODBUS_SETPOINT_INCREASE];
 
     if (nIDEvent == 10)
@@ -3522,7 +3550,7 @@ void CT3000View::OnBnClickedUnoccupiedMark()
         int ret=write_one(g_tstat_id,MODBUS_INFO_BYTE,0);	//184  109
         if (ret>0)
         {
-            product_register_value[MODBUS_CALIBRATION]=0;
+            //product_register_value[MODBUS_CALIBRATION]=0;  2020 03 09 杜帆屏蔽 TSTAT8 勾选 UNOCC 的时候  MODBUS_CALIBRATION 为-1 导致崩溃
         }
         product_register_value[MODBUS_INFO_BYTE] = 0;//184
         //if ((m_strModelName.CompareNoCase(_T("Tstat6")) == 0)||(m_strModelName.CompareNoCase(_T("Tstat7")) == 0))
@@ -4027,7 +4055,8 @@ LRESULT CT3000View::OnFreshView(WPARAM wParam, LPARAM lParam)
 //synchronization the time ,it's not use,this button is not visible.
 void CT3000View::OnBnClickedBtnSynctime()
 {
-
+    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The software is synchronizing the RTC time of the device."));
+    g_progress_persent = 5;
 #if 1
     CTime time = CTime::GetCurrentTime();
     BYTE szTime[8] = {0};
@@ -4040,62 +4069,75 @@ void CT3000View::OnBnClickedBtnSynctime()
     nRet[0] = write_one(g_tstat_id, MODBUS_YEAR, szTime[0]);
     if (nRet[0] < 0)
     {
-        AfxMessageBox(_T("Time synchronization failed!"));
+        MessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    product_register_value[MODBUS_YEAR] = szTime[0];
+    g_progress_persent = 15;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[1] = (BYTE)(time.GetMonth());
     nRet[1] = write_one(g_tstat_id, MODBUS_MONTH, szTime[1],6);
     if (nRet[1] < 0)
     {
-        AfxMessageBox(_T("Time synchronization failed!"));
+        MessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    product_register_value[MODBUS_MONTH] = szTime[1];
+    g_progress_persent = 25;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[2] = (BYTE)(time.GetDayOfWeek()-1);
     nRet[2] = write_one(g_tstat_id, MODBUS_WEEK, szTime[2], 6);
     if (nRet[2] < 0)
     {
-        AfxMessageBox(_T("Time synchronization failed!"));
+        MessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    product_register_value[MODBUS_WEEK] = szTime[2];
+    g_progress_persent = 40;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[3] = (BYTE)(time.GetDay());
     nRet[3] = write_one(g_tstat_id, MODBUS_DAY, szTime[3], 6);
     if (nRet[3] < 0)
     {
-        AfxMessageBox(_T("Time synchronization failed!"));
+        MessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    product_register_value[MODBUS_DAY] = szTime[3];
+    g_progress_persent = 60;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[4] = (BYTE)(time.GetHour());
     nRet[4] = write_one(g_tstat_id, MODBUS_HOUR, szTime[4], 6);
     if (nRet[4] < 0)
     {
-        AfxMessageBox(_T("Time synchronization failed!"));
+        MessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    product_register_value[MODBUS_HOUR] = szTime[4];
+    g_progress_persent = 70;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[5] = (BYTE)(time.GetMinute());
     nRet[5] = write_one(g_tstat_id, MODBUS_MINUTE, szTime[5], 6);
     if (nRet[5] < 0)
     {
-        AfxMessageBox(_T("Time synchronization failed!"));
+        MessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-    Sleep(200);
+    product_register_value[MODBUS_MINUTE] = szTime[5];
+    g_progress_persent = 80;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[6] = (BYTE)(time.GetSecond());
     nRet[6] = write_one(g_tstat_id, MODBUS_SECOND, szTime[6], 6);
     if (nRet[6] < 0)
     {
-        AfxMessageBox(_T("Time synchronization failed!"));
+        MessageBox(_T("Time synchronization failed!"));
         goto endsynctime;
     }
-
-    AfxMessageBox(_T("Time synchronization success!"));
+    product_register_value[MODBUS_SECOND] = szTime[6];
+    g_progress_persent = 100;
+    MessageBox(_T("Time synchronization success!"));
 endsynctime:
     GetDlgItem(IDC_BTN_SYNCTIME)->EnableWindow(TRUE);
-
+    g_progress_persent = 100;
     EndWaitCursor();
 #endif
 
@@ -5943,11 +5985,96 @@ void CT3000View::FreshCtrl()
     }
     UpdateData(FALSE);
     //time
-    CTime time = CTime::GetCurrentTime();
-    CString strtime = time.Format(_T("%I:%M:%S %p"));
+    CTime time_current = CTime::GetCurrentTime();
+
+    if (product_register_value[7] == PM_TSTAT8)
+    {
+        unsigned char temp_need_sync = 0;
+        if ((product_register_value[MODBUS_YEAR] < 2000) || (product_register_value[MODBUS_YEAR] > 2049) ||
+            (product_register_value[MODBUS_MONTH] < 0) || (product_register_value[MODBUS_MONTH] > 12) ||
+            (product_register_value[MODBUS_DAY] < 0) || (product_register_value[MODBUS_DAY] > 31) ||
+            (product_register_value[MODBUS_HOUR] < 0) || (product_register_value[MODBUS_HOUR] > 23) ||
+            (product_register_value[MODBUS_MINUTE] < 0) || (product_register_value[MODBUS_MINUTE] > 59) ||
+            (product_register_value[MODBUS_SECOND] < 0) || (product_register_value[MODBUS_SECOND] > 59))
+        {
+            temp_need_sync = 1;
+            time_current = CTime(2000,1,1,1,1,1);
+        }
+        else
+        {
+            time_current = CTime(product_register_value[MODBUS_YEAR],
+                product_register_value[MODBUS_MONTH],
+                product_register_value[MODBUS_DAY],
+                product_register_value[MODBUS_HOUR],
+                product_register_value[MODBUS_MINUTE],
+                product_register_value[MODBUS_SECOND]);
+        }
+
+
+        unsigned long  temp_time_long = time(NULL);
+
+
+        if (time_current >= temp_time_long)  //设备时间大于本地时间
+        {
+            if (time_current > (temp_time_long + 600))  //大于本地一分钟以上 需同步
+                temp_need_sync = 1;
+        }
+        else if (time_current > temp_time_long - 600) // 比本地时间小10分钟以内 ， 不用不同步
+        {
+            temp_need_sync = 0;
+        }
+        else
+            temp_need_sync = 1; //小10分钟以上，需要同步;
+
+        n_ignore_sync_time = GetPrivateProfileInt(_T("SYNC_Time"), _T("ignore_pop"), 0, g_cstring_ini_path);
+        last_ignore_sync_time = GetPrivateProfileInt(_T("SYNC_Time"), _T("ignore_pop_time"), 0, g_cstring_ini_path);
+        int delta_time = 0;
+        delta_time = temp_time_long - last_ignore_sync_time;
+        if ((n_ignore_sync_time == 1) && (delta_time  < 3600 * 24 * 3) && (delta_time >= 0))  //3天内 客户点了忽略，才不提醒;
+        {
+            temp_need_sync = 0;
+        }
+        else
+        {
+            WritePrivateProfileString(_T("SYNC_Time"), _T("ignore_pop"), _T("0"), g_cstring_ini_path);
+        }
+
+        if ((temp_need_sync == 1) && (already_check_tstat_timesync == false))
+        {
+            CShowMessageDlg dlg;
+
+            unsigned long temp_time_panel = 0;
+            temp_time_panel = time_current.GetTime();
+            CString cs_pc_time;
+            CString panel_time;
+            Time32toCString(temp_time_panel, panel_time , product_register_value[7]);
+            Time32toCString(temp_time_long, cs_pc_time , product_register_value[7]);
+
+            CString temp_message;
+            temp_message.Format(_T("This device is set to automatically synchronize with a locally connected computer.\r\nDo you want to synchronize it?\r\n%s (Device's Time) \r\n%s (New Time) \r\n"), panel_time, cs_pc_time);
+            dlg.SetStaticText(temp_message);
+            //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+            dlg.SetStaticTextColor(RGB(0, 0, 255));
+            dlg.SetStaticTextSize(25, 20);
+            dlg.SetEvent(EVENT_SYNC_TIME);
+            dlg.DoModal();
+
+            if (ok_button_press == 1)
+            {
+                OnBnClickedBtnSynctime();
+            }
+        }
+        already_check_tstat_timesync = 1; //此设备不点击的话，不在弹出;
+
+    }
+    else
+    {
+        time_current = CTime::GetCurrentTime();
+    }
+    CString strtime = time_current.Format(_T("%I:%M:%S %p"));
     CEdit * pEdit = (CEdit*)GetDlgItem(IDC_EDIT_RTC_TIME);
     pEdit->SetWindowText(strtime);
-    CString strDate = time.Format(_T("%A, %b %d, %Y"));
+    CString strDate = time_current.Format(_T("%A, %b %d, %Y"));
     pEdit = (CEdit*)GetDlgItem(IDC_EDIT_RTC);
     pEdit->SetWindowText(strDate);
 
@@ -7286,4 +7413,12 @@ void CT3000View::OnCbnSelchangeComboSysMode()
     {
         temp_cs = _T("Change system mode to ") + temp_string + _T(" failed!");
     }
+}
+
+
+void CT3000View::OnBnClickedButtonSetpointDetail()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CTstatSetpointDetail dlg;
+    dlg.DoModal();
 }

@@ -534,11 +534,15 @@ void CBacnetAlarmLog::OnSysCommand(UINT nID, LPARAM lParam)
 void CBacnetAlarmLog::OnBnClickedButtonEmailAlarm()
 {
     // TODO: 在此添加控件通知处理程序代码
+#ifdef ENABLE_T3_EMAIL
     if (GetPrivateData_Blocking(g_bac_instance, READ_EMAIL_ALARM, 0, 0, sizeof(Str_Email_point)) < 0)
     {
         MessageBox(_T("Read data timeout"));
         return;
     }
-    CBacnetEmailAlarm Dlg;
-    Dlg.DoModal();
+#endif
+
+
+    //CBacnetEmailAlarm Dlg;
+    //Dlg.DoModal();
 }

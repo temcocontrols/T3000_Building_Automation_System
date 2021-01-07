@@ -68,6 +68,7 @@
 #define WM_MYMSG_REFRESHBUILDING					80001
 
 #define WM_MAIN_MSG_SCAN_BAC                        10010
+#define WM_MAIN_MSG_UPDATE_PRODUCT_TREE             10011
 //scan
 
 
@@ -157,6 +158,7 @@
 #define MODBUS_TSTAT6_HUM_FILTER 152
 #define MODBUS_TSTAT6_CO2_FILTER 151
 
+#define MODBUS_TSTAT_LUX_FILTER 627
 
 #define MaxAddressNum   255
 #define MaxRegisterNum  320

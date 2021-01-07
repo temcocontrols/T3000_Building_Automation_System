@@ -6,9 +6,18 @@
 #include "CO2_NodeView.h"
 #include "global_function.h"
 #include "MainFrm.h"
+#include "CO2_AUTO_CALIBRATION.h"
 // CCO2_NodeView
 extern tree_product selected_product_Node; // 选中的设备信息;
 IMPLEMENT_DYNCREATE(CCO2_NodeView, CFormView)
+
+int CO2_MODBUS_CO2_BKCAL_ONOFF = 500;
+int CO2_MODBUS_CO2_NATURE_LEVEL = 501;
+int CO2_MODBUS_CO2_MIN_ADJ = 502;
+int CO2_MODBUS_CO2_CAL_DAYS = 503;
+int CO2_MODBUS_CO2_LOWEST_X_DAYS = 0;
+int CO2_MODBUS_CO2_FIGURE = 0;
+int CO2_MODBUS_CO2_USER_ADJ = 0;
 
 CCO2_NodeView::CCO2_NodeView()
 	: CFormView(IDD_DIALOG_CO2_NODE)
@@ -108,7 +117,12 @@ HANDLE h_co2_node_thread = NULL;
 void CCO2_NodeView::Fresh()
 {
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    pFrame->SetWindowTextW(_T("T3000 Building Automation System") + CurrentT3000Version);
+    pFrame->SetWindowTextW(cs_special_name + CurrentT3000Version);
+
+    CO2_MODBUS_CO2_BKCAL_ONOFF = 500;
+    CO2_MODBUS_CO2_NATURE_LEVEL = 501;
+    CO2_MODBUS_CO2_MIN_ADJ = 502;
+    CO2_MODBUS_CO2_CAL_DAYS = 503;
 
     if (h_co2_node_thread == NULL)
     {
@@ -146,11 +160,7 @@ DWORD WINAPI UpdateCO2_Note_Thread(LPVOID lPvoid)
 }
 
 
-const CString CO2_Node_Auto_Cal[] =
-{
-    _T("Enable"),
-    _T("Disable")
-};
+
 
 
 const CString CO2_Node_Baudrate_Array[] =

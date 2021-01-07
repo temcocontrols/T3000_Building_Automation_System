@@ -37,6 +37,7 @@ END_MESSAGE_MAP()
 
 void CBacnetEmailAlarm::OnBnClickedButton1()
 {
+#ifdef ENABLE_T3_EMAIL
     // TODO: 在此添加控件通知处理程序代码
     CString cs_smtp_server;
     CString cs_smtp_port;
@@ -88,7 +89,7 @@ void CBacnetEmailAlarm::OnBnClickedButton1()
         SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change Configuration success!"));
     }
 
-
+#endif
 
 }
 

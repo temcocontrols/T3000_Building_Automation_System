@@ -16,10 +16,11 @@
 extern CBacnetProgramEdit *ProgramEdit_Window;
 #define  WM_RICHEDIT_RIGHT_CLICK  WM_USER + 1001
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
+extern void clear_local_var();
 CBacnetProgramDebug * Program_Debug_Window = NULL;
 extern int error;
 extern char *pmes;
-
+int refresh_program_text_color = false;  //控制点击刷新按钮后，更新所有的数据颜色;
 vector <Str_char_pos_color> m_prg_label_error_color;	//用于highlight 关键字用;
 vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
 vector <Str_char_pos_color> buffer_prg_char_color; //用于防止频繁更新界面引起的闪烁问题;
@@ -50,7 +51,7 @@ DWORD prg_local_var_color;
 DWORD prg_function_color;
 CString prg_character_font;
 bool prg_color_change;
-
+extern unsigned int debug_point_main;
 extern unsigned int point_number;
 extern unsigned int point_type;
 POINT right_click_Point;
@@ -224,6 +225,7 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 {
 
 	CDialogEx::OnInitDialog();
+    clear_local_var();
 	CString ShowProgramText;
 	CString temp_label;
 	MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(program_list_line).label,(int)strlen((char *)m_Program_data.at(program_list_line).label)+1, 
@@ -622,9 +624,20 @@ void CBacnetProgramEdit::OnSend()
 						return;
 					}
 					temp_invoke_id =  WriteProgramData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line,j);
-
 					Sleep(SEND_COMMAND_DELAY_TIME);
+                    if ((g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) && (temp_invoke_id >= 0))
+                    {
+                        break;
+                    }
+                        
 				} while (temp_invoke_id<0);
+
+                if ((g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) && (temp_invoke_id >= 0))
+                {
+                    continue;
+                }
+
+
 
 				if(send_status)
 				{
@@ -881,7 +894,8 @@ void CBacnetProgramEdit::OnEnSetfocusRichedit2Program()
 void CBacnetProgramEdit::OnRefresh()
 {
 	
-
+    refresh_program_text_color = true;
+    copy_data_to_ptrpanel(TYPE_ALL);
 	memset(mycode,0,2000);
 
 
@@ -1055,6 +1069,14 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 	tempcs = ispoint_ex(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,sub_panel,Station_NUM,&k);
 	if(tempcs == NULL)
 		return false;
+    if (temp_panel != Station_NUM)
+    {
+        MessageBox(_T("The remote panel is not supported at this time. \r\nThis feature will be added soon."));
+        return -2;
+        debug_point_main = temp_panel;
+    }
+    else
+        debug_point_main = Station_NUM;
 	point_number = temp_number - 1;
 	point_type = temp_point_type;
 
@@ -1141,8 +1163,9 @@ void CBacnetProgramEdit::UpdateDataProgramText()
 {
 	CString Edit_Buffer;
 	GetDlgItemText(IDC_RICHEDIT2_PROGRAM,Edit_Buffer);
-	if(AnalysisString.CompareNoCase(Edit_Buffer) != 0)
+	if((AnalysisString.CompareNoCase(Edit_Buffer) != 0) || (refresh_program_text_color == true))
 	{
+        refresh_program_text_color = false;
 		AnalysisString = Edit_Buffer;
 		CString tempcs;
 		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);

@@ -29,9 +29,13 @@ DWORD WINAPI CAirQuality_BackMainUIFresh(LPVOID pParam)
 {
 	CAirQuality* pdlg = (CAirQuality*)pParam;
 	int heatbeat = 0;
+
+    pdlg->hFirstThread = NULL;
+    return 0;
+
 	//return 0;
-	while (pdlg->IsWindowVisible())
-	{
+	//while (pdlg->IsWindowVisible())
+	//{
 		Sleep(2000);
 		if (pdlg->IsWindowVisible())
 		{
@@ -48,7 +52,7 @@ DWORD WINAPI CAirQuality_BackMainUIFresh(LPVOID pParam)
 							pdlg->m_fresh_data = FALSE;
 							heatbeat = 0;
 						}
-						continue;
+                        goto end_aq_backthread;
 					}
 					int AddressValue = -1;
 					if (pdlg->m_product_model == PM_HUMTEMPSENSOR)
@@ -72,7 +76,7 @@ DWORD WINAPI CAirQuality_BackMainUIFresh(LPVOID pParam)
 							pdlg->m_fresh_data = FALSE;
 							heatbeat = 0;
 						}
-						continue;
+                        goto end_aq_backthread;
 					}
 
 
@@ -90,7 +94,7 @@ DWORD WINAPI CAirQuality_BackMainUIFresh(LPVOID pParam)
 
 					if (!pdlg->m_fresh_data)
 					{
-						continue;
+                        goto end_aq_backthread;
 					}
 
 					if (pdlg->m_product_model == PM_HUMTEMPSENSOR)
@@ -110,7 +114,9 @@ DWORD WINAPI CAirQuality_BackMainUIFresh(LPVOID pParam)
 				}
 			}
 		}
-	}
+	//}
+end_aq_backthread:
+    pdlg->hFirstThread = NULL;
 	return 0;
 }
 
@@ -293,12 +299,12 @@ void CAirQuality::Fresh()
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST, 0, 0);
 
 
-	if (hFirstThread != NULL)
-		TerminateThread(hFirstThread, 0);
 	hFirstThread = NULL;
 	if (!hFirstThread)
 	{
 		hFirstThread = CreateThread(NULL,NULL, CAirQuality_BackMainUIFresh, this,NULL, 0);
+        CloseHandle(hFirstThread);
+        hFirstThread = NULL;
 	}
 }
 
@@ -309,8 +315,11 @@ void CAirQuality::OnCbnSelendcancelBaudratecombo()
 
 	/* Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_BAUDRATE,m_baudRateCombox.GetCurSel(),
 	                     product_register_value[MODBUS_BAUDRATE],this->m_hWnd,IDC_BAUDRATECOMBO,_T("BAUDRATE"));*/
-
-	int ret = write_one(g_tstat_id, MODBUS_BAUDRATE, m_Combox_baudrate.GetCurSel());
+	int ret = 0;
+	if (product_register_value[7] == STM32_PM25)
+		ret = write_one(g_tstat_id, 15, m_Combox_baudrate.GetCurSel());
+	else
+	    ret = write_one(g_tstat_id, MODBUS_BAUDRATE, m_Combox_baudrate.GetCurSel());
 	int index_brandrate = m_Combox_baudrate.GetCurSel();
 	int brandrate = 19200;
 
@@ -568,7 +577,16 @@ void CAirQuality::ShowAirqualityDialog()
 	// 		strTemp=_T("19200");
 	// 	}
 	// 	m_edit_baudrate.SetWindowTextW(strTemp);
-	m_Combox_baudrate.SetCurSel(product_register_value[MODBUS_BAUDRATE]);
+	if (product_register_value[7] == STM32_PM25)
+	{
+		m_Combox_baudrate.SetCurSel(product_register_value[15]);
+		m_combox_displayer.ShowWindow(0);
+		GetDlgItem(IDC_LIST_INPUT_AQ)->ShowWindow(0);
+		GetDlgItem(IDC_LIST_OUTPUT_AQ)->ShowWindow(0);
+		GetDlgItem(IDC_LIST_USER)->ShowWindow(0);
+	}
+	else
+		m_Combox_baudrate.SetCurSel(product_register_value[MODBUS_BAUDRATE]);
 
 	m_combox_displayer.ResetContent();
 	if (product_register_value[7] == PM_HUM_R)
@@ -669,6 +687,8 @@ void CAirQuality::ShowAirqualityDialog()
 		GetDlgItem(IDC_STATIC_AQ)->EnableWindow(SW_HIDE);
 		GetDlgItem(IDC_EDIT_MAX_AQ)->EnableWindow(SW_HIDE);
 	}
+
+
 }
 
 void CAirQuality::Initial_UserList()
@@ -2431,8 +2451,8 @@ void CAirQuality::Initial_InputList()
 		strTemp = _T("lux");
 		m_input_list.SetItemText(2, 4, strTemp);
 	}
-
-	m_input_list.ShowWindow(SW_SHOW);
+    if (product_register_value[7] != STM32_PM25)
+		m_input_list.ShowWindow(SW_SHOW);
 }
 
 
@@ -3174,8 +3194,8 @@ void CAirQuality::Initial_OutputList()
 			m_output_list.SetItemText(2, 2, strTemp);
 		}
 	}
-
-	m_output_list.ShowWindow(SW_SHOW);
+	if (product_register_value[7] != STM32_PM25)
+		m_output_list.ShowWindow(SW_SHOW);
 }
 
 

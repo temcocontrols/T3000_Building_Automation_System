@@ -212,21 +212,14 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_BN_CLICKED(IDOK, &CParameterDlg::OnBnClickedOk)
     ON_BN_CLICKED(IDC_REFRESHBUTTON, &CParameterDlg::OnBnClickedRefreshbutton)
-//    ON_BN_CLICKED(IDC_ENABLEIDBUTTON, &CParameterDlg::OnBnClickedEnableidbutton)
     ON_CBN_SELENDCANCEL(IDC_BAUDRATECOMBO, &CParameterDlg::OnCbnSelendcancelBaudratecombo)
     ON_CBN_SELCHANGE(IDC_POWERMODELCOMBO, &CParameterDlg::OnCbnSelchangePowermodelcombo)
     ON_CBN_SELCHANGE(IDC_KEYPADLOCKCOMBO, &CParameterDlg::OnCbnSelchangeKeypadlockcombo)
     ON_CBN_SELCHANGE(IDC_DISPLAYCOMBO, &CParameterDlg::OnCbnSelchangeDisplaycombo)
-//	ON_CBN_SELCHANGE(IDC_AUTOONLYCOMBO, &CParameterDlg::OnCbnSelchangeAutoonlycombo)
-
     ON_CBN_SELCHANGE(IDC_KEYPADSELECT, &CParameterDlg::OnCbnSelchangekeypadcombo)
-
-//    ON_EN_KILLFOCUS(IDC_IDADDRESSEDIT, &CParameterDlg::OnEnKillfocusIdaddressedit)
     ON_WM_DESTROY()
-    //ON_CBN_KILLFOCUS(IDC_KEYPADSELECT, &CParameterDlg::OnCbnKillfocusKeypadselect)
     ON_EN_KILLFOCUS(IDC_VALUPOSEDIT, &CParameterDlg::OnEnKillfocusValuposedit)
     ON_CBN_SELCHANGE(IDC_SEQUENCECOMBOX, &CParameterDlg::OnCbnSelchangeSequencecombox)
-//	ON_EN_KILLFOCUS(IDC_VALVEEDIT, &CParameterDlg::OnEnKillfocusValveedit)
     ON_CBN_SELCHANGE(IDC_HCCHANGECOMBO, &CParameterDlg::OnCbnSelchangeHcchangecombo)
     ON_EN_KILLFOCUS(IDC_POWSETPOMITEDIT, &CParameterDlg::OnEnKillfocusPowsetpomitedit)
     ON_EN_KILLFOCUS(IDC_STINCREAEDIT, &CParameterDlg::OnEnKillfocusStincreaedit)
@@ -234,7 +227,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_EN_KILLFOCUS(IDC_SETPOINTCTLEDIT, &CParameterDlg::OnEnKillfocusSetpointctledit)
     ON_EN_KILLFOCUS(IDC_INFILEREDIT, &CParameterDlg::OnEnKillfocusInfileredit)
     ON_EN_KILLFOCUS(IDC_CYCLEEDIT, &CParameterDlg::OnEnKillfocusCycleedit)
- 
+
     ON_EN_KILLFOCUS(IDC_TIMERONEDIT, &CParameterDlg::OnEnKillfocusTimeronedit)
     ON_EN_KILLFOCUS(IDC_EDIT12, &CParameterDlg::OnEnKillfocusEdit12)
     ON_CBN_SELCHANGE(IDC_UNITCOMBO, &CParameterDlg::OnCbnSelchangeUnitcombo)
@@ -268,7 +261,6 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_BN_CLICKED(IDC_OUTPUTSTABLEBUTTON, &CParameterDlg::OnBnClickedOutputstablebutton)
     ON_EN_KILLFOCUS(IDC_ENIGNTHEATING, &CParameterDlg::OnEnKillfocusEnigntheating)
     ON_EN_KILLFOCUS(IDC_ENIGNTCOOLING1, &CParameterDlg::OnEnKillfocusEnigntcooling1)
-    //ON_EN_KILLFOCUS(IDC_ENIGNTCOOLING2, &CParameterDlg::OnEnKillfocusEnigntcooling2)
     ON_EN_KILLFOCUS(IDC_SETVALUE1, &CParameterDlg::OnEnKillfocusSetvalue1)
     ON_CBN_SELCHANGE(IDC_OCCUPIEDMODECOMBO, &CParameterDlg::OnCbnSelchangeOccupiedmodecombo)
     ON_CBN_SELCHANGE(IDC_COMBO_LCDSCRN1, &CParameterDlg::OnCbnSelchangeComboLcdscrn1)
@@ -290,16 +282,11 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_BN_CLICKED(IDCANCEL, &CParameterDlg::OnBnClickedCancel)
     ON_EN_KILLFOCUS(IDC_EDIT_ValueTravelTime, &CParameterDlg::OnEnKillfocusEditValuetraveltime)
     ON_EN_KILLFOCUS(IDC_EDIT_PID2OFFSETPOINT, &CParameterDlg::OnEnKillfocusEditPid2offsetpoint)
-
     ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
     ON_MESSAGE(MY_READ_DATA_CALLBACK, ReadDataCallBack)
     ON_MESSAGE(WM_KILLFOCS_READ_DATA, ReadDataRefreshUI)
-    
-
-    //ON_WM_KILLFOCUS()
     ON_WM_CTLCOLOR()
     ON_WM_TIMER()
-    //ON_EN_CHANGE(IDC_EDIT34, &CParameterDlg::OnEnChangeEdit34)
     ON_CBN_SELCHANGE(IDC_STATICUNINT2, &CParameterDlg::OnCbnSelchangeStaticunint2)
     ON_BN_CLICKED(IDC_CS_1, &CParameterDlg::OnBnClickedCs1)
     ON_BN_CLICKED(IDC_CS_2, &CParameterDlg::OnBnClickedCs2)
@@ -320,12 +307,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_EN_KILLFOCUS(IDC_EDIT_DEAD_MASTER, &CParameterDlg::OnEnKillfocusEditDeadMaster)
     ON_CBN_SELCHANGE(IDC_COMBO_ENABLE_DIS, &CParameterDlg::OnCbnSelchangeComboEnableDis)
     ON_EN_KILLFOCUS(IDC_EDIT_SENSITIVTY, &CParameterDlg::OnEnKillfocusEditSensitivty)
-   // ON_CBN_SELCHANGE(IDC_COMBO_ZIGBEETYPE, &CParameterDlg::OnCbnSelchangeComboZigbeetype)
- /*   ON_CBN_SELCHANGE(IDC_COMBO_CHANNEL, &CParameterDlg::OnCbnSelchangeComboChannel)*/
-//    ON_BN_CLICKED(IDC_BUTTON_ZIGBEE_REBOOT, &CParameterDlg::OnBnClickedButtonZigbeeReboot)
     ON_EN_KILLFOCUS(IDC_EDIT_PID2OFFSETPOINT6, &CParameterDlg::OnEnKillfocusEditPid2offsetpoint6)
-//    ON_BN_CLICKED(IDC_UNLOCK, &CParameterDlg::OnBnClickedUnlock)
-//    ON_BN_CLICKED(IDC_LOCK, &CParameterDlg::OnBnClickedLock)
     ON_BN_CLICKED(IDC_TRENDLOGVIEW, &CParameterDlg::OnBnClickedTrendlogview)
     ON_CBN_SELCHANGE(IDC_COMBO1, &CParameterDlg::OnCbnSelchangeCombo1)
     ON_CBN_SELCHANGE(IDC_COMBO4, &CParameterDlg::OnCbnSelchangeCombo4)
@@ -333,19 +315,20 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_EN_KILLFOCUS(IDC_EDIT_TRANDUCER_MIN, &CParameterDlg::OnEnKillfocusEditTranducerMin)
     ON_EN_KILLFOCUS(IDC_EDIT_CHANGE_OVER_TIME, &CParameterDlg::OnEnKillfocusEditChangeOverTime)
     ON_EN_KILLFOCUS(IDC_EDIT_TSTAT_NAME, &CParameterDlg::OnEnKillfocusEditTstatName)
-	ON_CBN_SELCHANGE(IDC_COMBO_MRD, &CParameterDlg::OnCbnSelchangeComboMrd)
-	ON_BN_CLICKED(IDC_BUTTON_APPLY_ALL, &CParameterDlg::OnBnClickedButtonApplyAll)
-	ON_BN_CLICKED(IDC_BUTTON_ZIGBEE, &CParameterDlg::OnBnClickedButtonZigbee)
-	ON_EN_KILLFOCUS(IDC_EDIT_SHOWID, &CParameterDlg::OnEnKillfocusEditShowid)
-	ON_BN_CLICKED(IDC_BUTTON_SHOW_MODBUS_ID, &CParameterDlg::OnBnClickedButtonShowModbusId)
-		ON_WM_HELPINFO()
-        ON_EN_KILLFOCUS(IDC_EDIT_DTERM, &CParameterDlg::OnEnKillfocusEditDterm)
-        ON_EN_KILLFOCUS(IDC_EDIT_SAMPLING_INTERVAL, &CParameterDlg::OnEnKillfocusEditSamplingInterval)
-        ON_BN_CLICKED(IDC_BUTTON_PARAMETER_EXT, &CParameterDlg::OnBnClickedButtonParameterExt)
-        ON_BN_CLICKED(IDC_BUTTON_ICON_SETTING, &CParameterDlg::OnBnClickedButtonIconSetting)
-        ON_CBN_SELCHANGE(IDC_DELTA_SELECT_1, &CParameterDlg::OnCbnSelchangeDeltaSelect1)
-        ON_CBN_SELCHANGE(IDC_DELTA_SELECT_2, &CParameterDlg::OnCbnSelchangeDeltaSelect2)
-        END_MESSAGE_MAP()
+    ON_CBN_SELCHANGE(IDC_COMBO_MRD, &CParameterDlg::OnCbnSelchangeComboMrd)
+    ON_BN_CLICKED(IDC_BUTTON_APPLY_ALL, &CParameterDlg::OnBnClickedButtonApplyAll)
+    ON_BN_CLICKED(IDC_BUTTON_ZIGBEE, &CParameterDlg::OnBnClickedButtonZigbee)
+    ON_EN_KILLFOCUS(IDC_EDIT_SHOWID, &CParameterDlg::OnEnKillfocusEditShowid)
+    ON_BN_CLICKED(IDC_BUTTON_SHOW_MODBUS_ID, &CParameterDlg::OnBnClickedButtonShowModbusId)
+    ON_WM_HELPINFO()
+    ON_EN_KILLFOCUS(IDC_EDIT_DTERM, &CParameterDlg::OnEnKillfocusEditDterm)
+    ON_EN_KILLFOCUS(IDC_EDIT_SAMPLING_INTERVAL, &CParameterDlg::OnEnKillfocusEditSamplingInterval)
+    ON_BN_CLICKED(IDC_BUTTON_PARAMETER_EXT, &CParameterDlg::OnBnClickedButtonParameterExt)
+    ON_BN_CLICKED(IDC_BUTTON_ICON_SETTING, &CParameterDlg::OnBnClickedButtonIconSetting)
+    ON_CBN_SELCHANGE(IDC_DELTA_SELECT_1, &CParameterDlg::OnCbnSelchangeDeltaSelect1)
+    ON_CBN_SELCHANGE(IDC_DELTA_SELECT_2, &CParameterDlg::OnCbnSelchangeDeltaSelect2)
+    ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)  //添加 高级选项界面对话框的提示语;
+END_MESSAGE_MAP()
 
 	/// <summary>
 	/// back fresh
@@ -395,6 +378,18 @@ BOOL CParameterDlg::OnInitDialog()
 	pMain->GetClientRect(&RECT_SET1);
 
 	CDialog::OnInitDialog();
+
+    if (product_type == T3000_6_ADDRESS)
+    {
+        GetDlgItem(IDC_TIMERLEFT)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_TIMELEFT)->ShowWindow(SW_HIDE);
+    }
+    else
+    {
+        GetDlgItem(IDC_TIMERLEFT)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_STATIC_TIMELEFT)->ShowWindow(SW_SHOW);
+    }
+
 
     if (product_register_value[7] == PM_TSTAT7 ||
         product_register_value[7] == PM_TSTAT7_ARM ||
@@ -663,7 +658,7 @@ BOOL CParameterDlg::OnInitDialog()
 
 
     UpdateData(FALSE);
-    
+    EnableToolTips(TRUE);
     //////////////////////////////////////////////////////////////////////////
     
     return TRUE;  // return TRUE unless you set the focus to a control
@@ -5155,19 +5150,19 @@ void CParameterDlg::OnEnKillfocusEditSensitivty()
 //    }
 //}
 
-extern bool b_pause_refresh_tree ;
+
 //void CParameterDlg::OnBnClickedBtnTopological()
 //{
-//    int temp_pause = g_bPauseRefreshTree;	//resume all the status.
+//    int temp_pause = b_pause_refresh_tree;	//resume all the status.
 //    int temp_g_id =  g_tstat_id;
 //    int temp_value = b_pause_refresh_tree;
 //    bool temp_pasueread = g_bPauseMultiRead;
 //    b_pause_refresh_tree = true;
-//    g_bPauseRefreshTree = true;
+//    b_pause_refresh_tree = true;
 //    g_bPauseMultiRead = true;
 //    CTstatZigbeeLogic dlg;
 //    dlg.DoModal();
-//    g_bPauseRefreshTree = temp_pause;
+//    b_pause_refresh_tree = temp_pause;
 //    g_tstat_id = temp_g_id ;
 //    b_pause_refresh_tree = temp_value;
 //    g_bPauseMultiRead = temp_pasueread;
@@ -5748,3 +5743,37 @@ void CParameterDlg::OnCbnSelchangeDeltaSelect2()
 
     Reflesh_ParameterDlg();
 }
+
+
+BOOL CParameterDlg::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
+{
+    TOOLTIPTEXT *pTTT = (TOOLTIPTEXT *)pNMHDR;
+    UINT nID = pNMHDR->idFrom;
+    if (pTTT->uFlags & TTF_IDISHWND)
+    {
+        // idFrom is actually the HWND of the tool
+        nID = ::GetDlgCtrlID((HWND)nID);
+        CString strToolTips;
+        switch (nID)
+        {
+        case IDC_TIMERONEDIT:
+        {
+
+            strToolTips.Format(_T("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAB"));
+
+
+           
+            
+        }
+            break;
+        default:
+            return(false);
+            break;
+        }
+        pTTT->lpszText = strToolTips.AllocSysString();
+        pTTT->hinst = NULL;
+    }
+
+    return(true);
+}
+

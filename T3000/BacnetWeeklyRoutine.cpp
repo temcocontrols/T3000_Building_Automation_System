@@ -701,7 +701,23 @@ void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
 		}
 	}
 
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLYCODE);
+    if ((g_protocol == MODBUS_RS485) || //RS485 下面挂T3 MINIPANEL
+        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
+    {
+        if ((product_type == PM_MINIPANEL) ||
+            (product_type == PM_TSTAT10) ||
+            (product_type == PM_MINIPANEL_ARM))
+        {
+            if ((n_read_item_index >= 0) && (n_read_item_index < BAC_SCHEDULE_COUNT))
+            {
+                n_read_item_index = weekly_list_line;
+                ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, product_type, READTIMESCHEDULE_T3000/*BAC_PRG*/);//第二个参数 In
+            }
+
+        }
+    }
+    else
+	    ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLYCODE);
 
 }
 

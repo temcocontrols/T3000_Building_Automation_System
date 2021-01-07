@@ -105,7 +105,7 @@ void CTCP_Server::OnBnClickedButtonStartServer()
 			CM5_hThread = NULL;
 		}
 		CM5_hThread = CreateThread(NULL,NULL, MSTP_Receive,NULL,NULL, &nThreadID_x);
-
+        CloseHandle(CM5_hThread);
 		if (!bac_net_initial_once)
 		{
 			bac_net_initial_once = true;
@@ -187,6 +187,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
     {
         system_connect_info.mstp_status = 0;
         CM5_hThread = CreateThread(NULL, NULL, MSTP_Receive, NULL, NULL, &nThreadID_x);
+        CloseHandle(CM5_hThread);
     }
 	char pSendBuf[1024] = {0x81, 0x0B, 0x00, 0x0C, 0x01, 0x20, 0xFF, 0xFF, 0x00, 0xFF, 0x10, 0x08};
 	int nSendLen = 12;
@@ -220,15 +221,16 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 	if (m_bac_handle_Iam_data.size() == 0)
 	{
 		AfxMessageBox(_T("No device response!"));
-		if (CM5_hThread != NULL)
-		{
-            system_connect_info.mstp_status = 0;
-			TerminateThread(CM5_hThread, 0);
-			CM5_hThread = NULL;
-			Sleep(1000);
-		}
+		//if (CM5_hThread != NULL)
+		//{
+  //          system_connect_info.mstp_status = 0;
+		//	TerminateThread(CM5_hThread, 0);
+		//	CM5_hThread = NULL;
+		//	Sleep(1000);
+		//}
 		wsk.Close();
 		CM5_hThread = CreateThread(NULL,NULL, MSTP_Receive,NULL,NULL, &nThreadID_x);
+        CloseHandle(CM5_hThread);
 		return;
 	}
 	m_bac_scan_result_data.clear();
@@ -269,14 +271,15 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 	if (m_bac_scan_result_data.size() == 0)
 	{
 		AfxMessageBox(_T("No device found in remote area!"));
-		if (CM5_hThread != NULL)
-		{
-            system_connect_info.mstp_status = 0;
-			TerminateThread(CM5_hThread, 0);
-			CM5_hThread = NULL;
-		}
+		//if (CM5_hThread != NULL)
+		//{
+  //          system_connect_info.mstp_status = 0;
+		//	TerminateThread(CM5_hThread, 0);
+		//	CM5_hThread = NULL;
+		//}
 		wsk.Close();
 		CM5_hThread = CreateThread(NULL,NULL, MSTP_Receive,NULL,NULL, &nThreadID_x);
+        CloseHandle(CM5_hThread);
 		return;
 	}
 
@@ -370,7 +373,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 		strmodbusid.Format(_T("%d"), m_bac_scan_result_data.at(0).modbus_addr);
 		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Custom)   values('"
 			+pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','"+str_serialid+"','floor1','room1','"
-			+str_screen_name+"','"+product_class_id+"','"+strmodbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"
+			+str_screen_name+"','"+product_class_id+"','"+strmodbusid+"','""','"+str_ip_address+"','Modbus_and_Bacnet','"
 			+str_hinstance+"','"+str_panelnumber+"','"+str_n_port+"','0','5','0')"));
 		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
@@ -406,7 +409,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 	bip_setgsm(false);
 	wsk.Close();
 	CM5_hThread = CreateThread(NULL,NULL, MSTP_Receive,NULL,NULL, &nThreadID_x);
-
+    CloseHandle(CM5_hThread);
 	Client_Info* temp_info2 = new Client_Info;
 	temp_info2->serialnumber = m_bac_scan_result_data.at(0).serialnumber;
 	PostMessage(m_tcp_server_hwnd,WM_REFRESH_LIST, DELETE_ITEM, (LPARAM)temp_info2);

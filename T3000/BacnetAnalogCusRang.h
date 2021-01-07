@@ -77,6 +77,7 @@ public:
       afx_msg void OnCbnKillfocusComboCusrangeStignaltype();
       
       CStaticEx m_static_data_status;
+      afx_msg void OnNMClickDialogBacnetRangeList(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 const int ANALOG_CUS_RANGE_RBL_VALUE = 0;

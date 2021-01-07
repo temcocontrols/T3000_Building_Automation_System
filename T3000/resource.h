@@ -324,6 +324,13 @@
 #define IDD_DIALOG_BACNET_SETTING_TIME  745
 #define IDD_DIALOG_BACNET_SETTING_DYNDNS 747
 #define IDD_DIALOG_BACNET_THIRD_PARTY_MAIN 753
+#define IDD_DIALOG17                    755
+#define IDD_DIALOG_TSTAT_SETPOINT       755
+#define IDD_DIALOG_AQI                  758
+#define IDD_DIALOG_BACNET_PROPERTY      760
+#define IDD_DIALOG_FIRMWARE_AUTO_CAL    762
+#define IDD_DIALOG_WEB                  764
+#define IDD_DIALOG_BACNET_SETTING_LCD_PARAMETER 766
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -379,6 +386,7 @@
 #define IDC_EDIT_CITY                   1029
 #define IDC_EDIT57                      1029
 #define IDC_EDIT_MAX_VOLT_VALUE3        1029
+#define IDC_BUTTON_ABC_HELP             1029
 #define IDC_OUTPUT4_DELAY_OFF_EDIT      1030
 #define IDC_HUM1                        1030
 #define IDC_EDIT43                      1030
@@ -751,6 +759,7 @@
 #define IDC_COMBO_SETTING_CO2           1129
 #define IDC_COMBO_MSTP_MODBUS           1129
 #define IDC_COMBO_CO2_NODE_PROTOCOL     1129
+#define IDC_COMBO_NUMBER                1129
 #define IDC_POWERMODELCOMBO             1130
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
@@ -2316,6 +2325,7 @@
 #define IDC_RADIO_SETTING_LCD_ON        2380
 #define IDC_RADIO_SETTING_LCD_OFF       2381
 #define ID_CHANGE_ID_OK                 2382
+#define IDC_RADIO_SETTING_LCD_DELAY_OFF 2382
 #define IDC_BUTTON_SCHEDULE_SUBNET      2383
 #define IDC_STATIC_BOTTOM               2384
 #define IDC_STATIC_BOTTOM_0             2384
@@ -2474,6 +2484,7 @@
 #define IDC_STATIC_SOUND_VALUE          2504
 #define IDC_STATIC_SOUND                2505
 #define IDC_BUTTON_EMAIL_ALARM          2506
+#define IDC_STATIC_OCC_STATUS           2506
 #define IDC_EDIT_SMTP_SERVER            2507
 #define IDC_EDIT_PORT_NUMBER            2508
 #define IDC_EDIT_EMAIL                  2509
@@ -2499,6 +2510,52 @@
 #define IDC_COMBO_PARITY_BIT2           2522
 #define IDC_BUTTON_THIRD_OK             2522
 #define IDC_COMBO_PARITY_BIT3           2523
+#define IDC_STATIC_IP                   2523
+#define IDC_STATIC_MASK                 2524
+#define IDC_STATIC_GATEWAY              2525
+#define IDC_LIST_TSTAT_SETPOINT         2527
+#define IDC_CHECK_DONT_POP              2529
+#define IDC_RADIO_WIFI_ENABLE           2531
+#define IDC_RADIO_WIFI_DISABLE          2532
+#define IDC_BUTTON_WIFI_DEFAULT         2533
+#define IDC_STATIC_TEMP_UNITS           2534
+#define IDC_RADIO_DEG_C                 2535
+#define IDC_RADIO_DEG_F                 2536
+#define IDC_EDIT_AQI_VALUE              2537
+#define IDC_EDIT_AQI_LEVEL              2538
+#define IDC_COMBO_AQI_REGION            2539
+#define IDC_EDIT_LEVEL_1                2540
+#define IDC_EDIT_LEVEL_2                2541
+#define IDC_EDIT_LEVEL_3                2542
+#define IDC_EDIT_LEVEL_4                2543
+#define IDC_EDIT_LEVEL_5                2544
+#define IDC_BUTTON_DONE                 2545
+#define IDC_BUTTON_CUS_AQI              2549
+#define IDC_STATIC_AQI_INFO             2550
+#define IDC_STATIC_AQI                  2551
+#define IDC_EDIT_LCD_DELAY_OFF_TIME     2551
+#define IDC_LIST_BACNET_PROPERTY        2553
+#define IDC_BUTTON_DEBUG                2554
+#define IDC_COMBO_DLG_CO2_FIRMWARE_AUTO_CAL 2555
+#define IDC_EDIT_DLG_FIRMWARE_NATURE_CO2 2556
+#define IDC_EDIT_DLG_FIRMWARE_MAX_MIN_ADJ_PERDAY 2557
+#define IDC_EDIT_DLG_FIRMWARE_LOOK_DAYS 2558
+#define IDC_BUTTON_FIRMWARE_AUTO_CAL    2559
+#define IDC_BUTTON_AUTO_CAL             2560
+#define IDC_EDIT_LOWEST_X_DAYS          2562
+#define IDC_EDIT_FIGURE                 2563
+#define IDC_EDIT_USER_ADJ               2564
+#define IDC_STATIC_VOLTS_OR_CURRENT     2565
+#define IDC_EDIT_OBJ_INSTANCE           2566
+#define IDC_COMBO_OBJ_TYPE              2567
+#define IDC_COMBO_PROPERTY_ID           2568
+#define IDC_BUTTON_WEB_TEST             2568
+#define IDC_EDIT_OBJ_INSTANCE2          2569
+#define IDC_EDIT_DEVICE_ID              2569
+#define IDC_LIST_AIRLAB                 2573
+#define IDC_BUTTON_LCD_SETTING          2574
+#define IDC_RADIO_LCD_DEFAULT           2575
+#define IDC_RADIO_CUS_DEF               2576
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2605,6 +2662,7 @@
 #define IDC_RADIO_T_14                  9865
 #define IDC_STATIC_SPLIT_WINDOW         9866
 #define IDC_CHANGE_ID                   9867
+#define ID_DISCONNECT_COM               9868
 #define IDC_EDIT_INTER                  10000
 #define IDC_STATIC_SEETING_SERIAL_NUMBER 15491
 #define IDC_STATIC_INPUT_ITEM_INFO      15492
@@ -2716,9 +2774,21 @@
 #define IDC_RADIO_VAR_CUS_5             15597
 #define IDC_RADIO101                    15598
 #define IDC_RADIO102                    15599
+#define IDC_RADIO103                    15600
+#define IDC_RADIO104                    15601
+#define IDC_RADIO105                    15602
+#define IDC_RADIO106                    15603
+#define IDC_RADIO107                    15604
+#define IDC_RADIO108                    15605
+#define IDC_RADIO109                    15606
+#define IDC_RADIO110                    15607
+#define IDC_RADIO111                    15608
+#define IDC_RADIO112                    15609
+#define IDC_RADIO113                    15610
 #define IDC_RADIO_NEW200                19484
 #define ID_TIMEBASE_1HOUR               19485
 #define IDC_RADIO_NEW201                19485
+#define IDC_BUTTON_SETPOINT_DETAIL      19486
 #define IDC_STATIC__LOGIN_NAME          32709
 #define IDC_STATIC_LOGIN_PASSWORD       32710
 #define IDC_EDIT_LOGIN_USERNAME         32711
@@ -2816,7 +2886,7 @@
 #define ID_ALLNODESDATABASE             32802
 #define ID_IOSELECTMENU_INPUT           32803
 #define ID_IOSELECTMENU_OUTPUT          32804
-#define ID_FILE_BATCHBURNHEX            32805
+#define ID_FILE_BATCHBURNHEX            32806
 #define ID_HELP_HELP                    32807
 #define ID_DELEMENUBTN_DELETECURRENTLABEL 32808
 #define ID_Menu                         32809
@@ -2826,7 +2896,6 @@
 #define ID_CONNECTMENU_DISCONNECT       32813
 #define ID_BUTTON32814                  32814
 #define ID_BUTTON32815                  32815
-#define ID_DISCONNECT2                  32816
 #define ID_BUILDINGSEL_SELECT           32817
 #define ID_BUILDINGSEL_UNSLECT          32818
 #define ID_DATABASE_USERACCOUNT         32819
@@ -2951,7 +3020,6 @@
 #define ID_TOOL_BOOTLOADER              34052
 #define ID_CONTROL_MAIN                 34053
 #define ID_HELP_CHECKUPDATE             34053
-#define ID_FILE_EXPORTREGISETERSLIST1   34054
 #define ID_TOOLS_PSYCHROMETRY           34055
 #define ID_TOOLS_OPTION                 34056
 #define ID_PROPERTIES_GOTODEFINITION    34057
@@ -2986,6 +3054,7 @@
 #define ID_MISCELLANEOUS_UPDATEMINI     42883
 #define ID_CONTROL_WEEKLY               42884
 #define ID_TOOL_REGISTERVIEWER          44012
+#define ID_FILE_EXPORTREGISETERSLIST1   44013
 #define ID_CONTROL_TSTAT                44020
 #define ID_CONTROL_SETTINGS             51637
 #define IDC_EDIT_RANGE_SELECT           51638
@@ -3048,9 +3117,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        755
+#define _APS_NEXT_RESOURCE_VALUE        768
 #define _APS_NEXT_COMMAND_VALUE         34077
-#define _APS_NEXT_CONTROL_VALUE         2523
+#define _APS_NEXT_CONTROL_VALUE         2577
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

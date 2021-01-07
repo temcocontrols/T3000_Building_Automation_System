@@ -11,9 +11,10 @@
 #include "global_function.h"
 #include "global_define.h"
 #include "BacnetRange.h"
+#include "MainFrm.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
-
+extern tree_product selected_product_Node; // 选中的设备信息;
 
 
 
@@ -68,9 +69,13 @@ LRESULT  CBacnetVariable::VariableMessageCallBack(WPARAM wParam, LPARAM lParam)
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		if((pInvoke->mRow < BAC_VARIABLE_ITEM_COUNT) && (pInvoke->mRow >= 0))
 		{
-			Post_Refresh_One_Message(g_bac_instance,READVARIABLE_T3000,
-				pInvoke->mRow,pInvoke->mRow,sizeof(Str_variable_point));
-			SetTimer(3,2000,NULL);
+            if ((!SPECIAL_BAC_TO_MODBUS) && (Bacnet_Private_Device(selected_product_Node.product_class_id))) //不是转Modbus的协议的 就调用下面的刷新单条.)
+            {
+                Post_Refresh_One_Message(g_bac_instance, READVARIABLE_T3000,
+                    pInvoke->mRow, pInvoke->mRow, sizeof(Str_variable_point));
+                SetTimer(3, 2000, NULL);
+            }
+
 		}
 	}
 	else
@@ -200,15 +205,15 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
-	bool need_refresh_all = false;
-	int Fresh_List_Now = (int)wParam;
-	if( Fresh_List_Now == REFRESH_LIST_NOW)
-	{
-		need_refresh_all = true;
-	}
+	//bool need_refresh_all = false;
+	//int Fresh_List_Now = (int)wParam;
+	//if( Fresh_List_Now == REFRESH_LIST_NOW)
+	//{
+	//	need_refresh_all = true;
+	//}
 
-	if(need_refresh_all == false)
-	{
+	//if(need_refresh_all == false)
+	//{
 		if(isFreshOne == REFRESH_ON_ITEM)
 		{
 			Fresh_Item = (int)wParam;
@@ -225,7 +230,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				return 0;
 			}
 		}
-	}
+	//}
 
 
 
@@ -259,10 +264,11 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		}
 
 
+
 		if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
 			
-			if((m_Variable_data.at(i).range == 0) || (m_Variable_data.at(i).range>30))
+			if((m_Variable_data.at(i).range == 0) || ((m_Variable_data.at(i).range>30) && (m_Variable_data.at(i).range<100)) )
 			{
 				CString cstemp_value2;
 				float temp_float_value1;
@@ -271,6 +277,19 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value2);
 				m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
 			}
+            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
+            {
+                if (read_msv_table)
+                    m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
+                int get_name_ret = 0;
+                CString cstemp_value2;
+                float temp_float_value1;
+                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
+                if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+                    cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+                m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
+            }
 			else
 			{
 				CString temp1;
@@ -339,7 +358,29 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			}
             else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
             {
-                m_variable_list.SetItemText(i, VARIABLE_UNITE, _T("MSV"));
+                if (read_msv_table)
+                    m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
+                int get_name_ret = 0;
+                CString cstemp_value2;
+                float temp_float_value1;
+                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
+                if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+                    cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+                m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
+            }
+            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
+            {
+                if (read_msv_table)
+                    m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
+                int get_name_ret = 0;
+                CString cstemp_value2;
+                float temp_float_value1;
+                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
+                if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+                    cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+                m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
             }
 			else
 			{
@@ -646,6 +687,25 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		m_variable_time_picker.Invalidate();
 		SetTimer(2,100,NULL);
 	}
+    else if ((lCol == VARIABLE_VALUE) && 
+              (m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG) && 
+              (m_Variable_data.at(lRow).auto_manual == BAC_MANUAL) 
+              && ((m_Variable_data.at(lRow).range == 101) || (m_Variable_data.at(lRow).range == 102) || (m_Variable_data.at(lRow).range == 103) ))
+    {
+        m_variable_list.Set_Edit(false);
+        int range_index = m_Variable_data.at(lRow).range - 101;
+        CString cstempNextItemString;
+        int ntempNextValue;
+        int find_ret = 0;
+        find_ret = Get_Msv_next_Name_and_Value_BySearchValue(range_index,m_Variable_data.at(lRow).value/1000, cstempNextItemString, ntempNextValue);;
+        if (find_ret >= 0)
+        {
+            m_Variable_data.at(lRow).value = ntempNextValue * 1000;
+            m_variable_list.SetItemText(lRow, VARIABLE_VALUE, cstempNextItemString);
+        }
+
+        //Custom_Msv_Range[range_index]
+    }
 	else if(lCol == VARIABLE_VALUE)
 	{
 		if(m_Variable_data.at(lRow).auto_manual == BAC_AUTO)
@@ -673,7 +733,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 	else if(lCol == VARIABLE_UNITE)
 	{
 
-
+        CString temp_info;
 		BacnetRange dlg;
 
 		//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
@@ -683,6 +743,22 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			int temp_invoke_id = -1;
 			int send_status = true;
 			int	resend_count = 0;
+            if ((g_protocol == P_BACNET_MSTP) || (g_protocol == P_BACNET_IP) || (g_protocol == P_MODBUS_TCP))
+            {
+                if (GetPrivateData_Blocking(g_bac_instance, READUNIT_T3000, 0, BAC_CUSTOMER_UNITS_COUNT - 1, sizeof(Str_Units_element), 5) > 0)
+                {
+                    temp_info.Format(_T("Read digital custom units success."));
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_info);
+                    read_customer_unit = true;
+                }
+                else
+                {
+                    temp_info.Format(_T("Read digital custom units success."));
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_info);
+                }
+
+            }
+#if 0
 			for (int z=0;z<3;z++)
 			{
 				do 
@@ -720,21 +796,24 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 				if(read_customer_unit)
 					break;
 			}
+#endif
 
 		}
 
-		CString temp_info;
 
-		if(GetPrivateData_Blocking(g_bac_instance, READVARUNIT_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
-		{
-			temp_info.Format(_T("Read variable custmer units success."));
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_info);
-		}
-		else
-		{
-			temp_info.Format(_T("Read variable custmer units success."));
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_info);
-		}
+        if ((g_protocol == P_BACNET_MSTP) || (g_protocol == P_BACNET_IP) || (g_protocol == P_MODBUS_TCP))
+        {
+            if (GetPrivateData_Blocking(g_bac_instance, READVARUNIT_T3000, 0, 4, sizeof(Str_variable_uint_point)) > 0)
+            {
+                temp_info.Format(_T("Read variable custmer units success."));
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_info);
+            }
+            else
+            {
+                temp_info.Format(_T("Read variable custmer units success."));
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_info);
+            }
+        }
 
 		if(m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
 		{
@@ -824,8 +903,15 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
                 }
                 else if (bac_range_number_choose < 23)
                     temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
-                else
-                    temp1 = _T("MSV");
+                else if((bac_range_number_choose >= 101) && (bac_range_number_choose <= 103))
+                {
+                        if (read_msv_table)
+                            temp1 = Custom_Msv_Range[bac_range_number_choose - 101];
+                        else
+                            temp1 = _T("MSV");
+                        m_Variable_data.at(lRow).digital_analog = BAC_UNITS_ANALOG;
+                }
+                    
 				SplitCStringA(temparray,temp1,_T("/"));
 
 
@@ -1094,9 +1180,25 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 		Auto_M.Empty();
 	}
 
-	if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+    if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))  //判断是MSV range
+    {
+        for (int z = 0; z < 3; z++)
+        {
+            int get_name_ret = 0;
+            float temp_float_value1;
+            temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+            get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, temp_float_value1, ret_cstring);
+            if (get_name_ret > 0)
+            {
+                ret_unit.Empty();
+                break;
+            }
+        }
+
+    }
+    else if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 	{
-		if(m_Variable_data.at(i).range>30)
+        if(m_Variable_data.at(i).range>30)
 		{
 			ret_cstring = _T(" ");
 			return RANGE_ERROR;
@@ -1139,7 +1241,8 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 	{
 		if(m_Variable_data.at(i).range == 20)	//如果是时间;
 		{
-			ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
+            ret_unit.Empty(); //不显示 time 
+			//ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
 			char temp_char[50];
 			int time_seconds = m_Variable_data.at(i).value / 1000;
 			intervaltotextfull(temp_char,time_seconds,0,0);

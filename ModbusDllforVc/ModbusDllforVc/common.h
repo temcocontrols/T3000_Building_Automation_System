@@ -62,6 +62,8 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
 //OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length);
 OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length, bool bComm_Type);
 OUTPUT int read_multi2_nocretical(TS_UC device_var, TS_US *put_data_into_here, TS_US start_address, int length, bool bComm_Type,int ncomport);
+OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_here, TS_UC command, TS_UC start_instance, TS_UC end_instance, TS_US entitysize);
+OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned short nlength);
 OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,TS_US length,

@@ -3,6 +3,12 @@
 #include "MyPing.h"
 #include "HexFileParser.h"
 extern bool auto_flash_mode;
+int SPECIAL_BAC_TO_MODBUS = 0;
+unsigned int g_mstp_deviceid = 0;
+
+int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t readlength, unsigned short *data_out);
+int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_t writelength, unsigned short *data_in);
+int WritePrivateBacnetToModbusCharData(uint32_t deviceid, int16_t start_reg, uint16_t writelength, unsigned char *data_in);
 int turn_hex_str_to_ten_num(char *source)
 {//can only turn two char(hex string) to int
 	//return -1,invalid input ,the char number>2;or the input char is not hex string;
@@ -333,6 +339,218 @@ int read_one(unsigned char device_var,unsigned short address,int retry_times)
 	//SetPaneString(0,str);
 	return j;
 }
+
+
+CString GetFirmwareUpdateName(int ModelID) //TBD: Change this to an array
+{
+    CString strProductName;
+    switch (ModelID)
+    {
+    case PM_TSTAT5A:
+        strProductName = _T("TStat5A");	//
+        break;
+    case PM_TSTAT5B:
+        strProductName = _T("TStat5B");	 //
+        break;
+    case PM_TSTAT5B2:
+        strProductName = _T("TStat5B2");	//
+        break;
+    case PM_TSTAT5C:
+        strProductName = _T("TStat5C");  //
+        break;
+    case PM_TSTAT10:
+        strProductName = _T("PID10");
+        break;
+    case PM_TSTAT5D:
+        strProductName = _T("TStat5D");	 //
+        break;
+    case PM_TSTAT5E:
+        strProductName = _T("TStat5E");  //
+        break;
+    case PM_PM5E_ARM:
+        strProductName = _T("PM5EARM");  //
+        break;
+    case PM_PM5E:
+        strProductName = _T("PM5E");  //
+        break;
+    case PM_TSTAT5F:
+        strProductName = _T("TStat5F");  //
+        break;
+    case PM_TSTAT5G:
+        strProductName = _T("TStat5G");	//
+        break;
+    case PM_TSTAT5H:
+        strProductName = _T("TStat5H"); //
+        break;
+    case PM_TSTAT6:
+        strProductName = _T("TStat6");   //
+        break;
+    case PM_TSTAT5i:
+        strProductName = _T("TStat5I");   //
+        break;
+    case PM_TSTAT7:
+        strProductName = _T("TStat7");   //
+        break;
+    case PM_TSTAT8:
+        strProductName = L"TStat8";
+        break;
+    case PM_TSTAT8_WIFI:
+        strProductName = "TStat8Wifi";
+        break;
+    case PM_TSTAT8_OCC:
+        strProductName = "TStat8Occ";
+        break;
+    case PM_TSTAT7_ARM:
+        strProductName = "TStat7ARM";
+        break;
+    case PM_TSTAT8_220V:
+        strProductName = "TStat8220V";
+        break;
+    case PM_NC:					//
+        strProductName = _T("NC");
+        break;
+    case PM_CM5:
+        strProductName = _T("CM5");
+        break;					   //
+    case PM_LightingController:
+        strProductName = _T("LC");	  //
+        break;
+    case PM_T38I13O:
+        strProductName = _T("T3-8I13O");	  //
+        break;
+    case PM_T3IOA:
+        strProductName = _T("T3-8IOA");	  //
+        break;
+    case PM_T332AI:
+        strProductName = _T("T3-32AI");	  //
+        break;
+    case  PM_T38AI16O:
+        strProductName = _T("T3-8AI160");	  //
+        break;
+    case PM_ZIGBEE:
+        strProductName = _T("ZigBee");	  //
+        break;
+    case PM_FLEXDRIVER:
+        strProductName = _T("FlexDriver");	  //
+        break;
+    case PM_T3PT10:
+        strProductName = _T("T3-PT10");	  //
+        break;
+    case PM_T3PERFORMANCE:
+        strProductName = _T("T3-PERFORMANCE");	  //
+        break;
+    case PM_T34AO:
+        strProductName = _T("T3-4AO");	  //
+        break;
+    case PM_T36CT:
+        strProductName = _T("T3-6CT");	  //
+        break;
+    case PM_SOLAR:
+        strProductName = _T("Solar");	  //
+        break;
+    case PM_FWMTRANSDUCER:
+        strProductName = _T("FWMTRANSDUCER");	  //
+        break;
+    case PM_MINIPANEL:
+    case PM_MINIPANEL_ARM:
+        strProductName = _T("MiniPanel");	  //
+        break;
+    case PM_PRESSURE:
+        strProductName = _T("Pressure");	  //
+        break;
+    case PM_AirQuality:
+        strProductName = _T("AirQuality");	  //
+        break;
+    case PM_HUMTEMPSENSOR:
+        strProductName = _T("TstatHUM");	  //
+        break;
+    case PM_HUM_R:
+        strProductName = _T("HUM-R");
+        break;
+    case PM_TSTATRUNAR:
+        strProductName = "TStatRunar";
+        break;
+    case  PM_CO2_NET:
+        strProductName = "CO2 Net";
+        break;
+    case  PM_CO2_RS485:
+        strProductName = "CO2";
+        break;
+    case  PM_PRESSURE_SENSOR:
+        strProductName = "Pressure";
+        break;
+    case  PM_T3PT12:
+        strProductName = "T3PT12";
+        break;
+    case  PM_T36CTA:
+        strProductName = "T36CTA";
+        break;
+    case  PM_CO2_NODE:
+        strProductName = "CO2 Node";
+        break;
+    case PM_T322AI:
+        strProductName = "T322I";
+        break;
+    case PM_T38AI8AO6DO:
+        strProductName = "T38IO";
+        break;
+    case PM_BTU_METER:
+        strProductName = "BTU METER";
+        break;
+    case PM_T322AIVG:
+        strProductName = "T322AIVG";
+        break;
+    case PM_T38IOVG:
+        strProductName = "T38IOVG";
+        break;
+    case PM_T3PTVG:
+        strProductName = "T3PTVG";
+        break;
+    case STM32_CO2_NET:
+        strProductName = "CO2NET";
+        break;
+    case STM32_CO2_RS485:
+        strProductName = "CO2RS485";
+        break;
+    case STM32_HUM_NET:
+        strProductName = "HUMNET";
+        break;
+    case STM32_HUM_RS485:
+        strProductName = "HUMRS485";
+        break;
+    case PWM_TRANSDUCER:
+        strProductName = _T("PWMTRANX");	  //
+        break;
+    case STM32_PRESSURE_NET:
+        strProductName = "PSNET";
+        break;
+    case STM32_PRESSURE_RS3485:
+        strProductName = "PSRS485";
+        break;
+    case STM32_CO2_NODE:
+        strProductName = "CO2 NODE";
+        break;
+    case PM_PWMETER:
+        strProductName = "PWMETER";
+        break;
+    case PM_WEATHER_STATION:
+        strProductName = "WS";
+        break;
+    case STM32_PM25:
+        strProductName = "PM2.5";
+        break;
+    default:
+    {
+        strProductName.Format(_T("PID%d"), ModelID);
+    }
+    //strProductName.Format(_T("Model ID:%d is not valid"),ModelID);
+    break;
+    }
+    return strProductName;
+}
+
+
+
 CString GetProductName(int ModelID) //TBD: Change this to an array
 {
 	CString strProductName;
@@ -350,6 +568,9 @@ CString GetProductName(int ModelID) //TBD: Change this to an array
 	case PM_TSTAT5C:
 		strProductName=_T("TStat5C");  //
 		break;
+    case PM_TSTAT10:
+        strProductName = _T("TStat10");
+        break;
 	case PM_TSTAT5D:
 		strProductName=_T("TStat5D");	 //
 		break;
@@ -724,6 +945,24 @@ BOOL Ping(const CString& strIP, CWnd* pWndEcho)
 	return FALSE;
 }
 
+int read_multi_retry(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length , int retry_time)
+{
+    int nret = 0;
+    for (int i = 0; i < retry_time; i++)
+    {
+        nret = read_multi_tap(device_var, put_data_into_here, start_address, length);
+        if (nret < 0)
+        {
+            Sleep(300);
+            continue;
+        }
+        else
+            return nret;
+    }
+    return nret;
+   
+}
+
 int Write_One_Retry(unsigned char device_var, unsigned short address, unsigned short value,int retry_time)
 {
     int nret = 0;
@@ -790,4 +1029,324 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
         }
     }
 
+}
+
+extern int com_port_flash_status;  // 0 正常模式   1 烧写boot模式
+extern int firmware_must_use_new_bootloader;  //0 不用更新boot   1 需要更新bootload;   C1为hex
+int check_bootloader_and_frimware(int npid ,int comport , unsigned short reg_11 , unsigned short reg_14, int &update_value, unsigned char app_already_version)
+{
+    unsigned short Device_infor[18] = {0};
+    Device_infor[7] = npid;
+    Device_infor[11] = reg_11;
+    Device_infor[14] = reg_14;
+	int c2_update_boot = false;
+	int device_version = 0;
+	int Ret_Result = 1;
+	if ((((npid >= STM32_CO2_NET) && (npid <= STM32_PRESSURE_RS3485)) ||
+		(npid == STM32_PM25)) &&
+		app_already_version >= 59) //不管读到没读到 boot version 都不用 再次更新boot
+	{
+		c2_update_boot = false;
+		return Ret_Result;
+	}
+
+
+    if (com_port_flash_status == 0)
+    {
+        if ((Device_infor[7] == PM_TSTAT8) ||
+            (Device_infor[7] == PM_TSTAT9) ||
+            (Device_infor[7] == PM_MINIPANEL_ARM) ||
+            (Device_infor[7] == PM_MINIPANEL) ||
+            (Device_infor[7] == PM_TSTAT10) ||
+			(Device_infor[7] == STM32_PM25) ||
+			(Device_infor[7] == STM32_CO2_NET) ||
+			(Device_infor[7] == STM32_CO2_RS485) ||
+			(Device_infor[7] == STM32_HUM_NET) ||
+			(Device_infor[7] == STM32_HUM_RS485) ||
+			(Device_infor[7] == STM32_PRESSURE_NET) ||
+			(Device_infor[7] == STM32_PRESSURE_RS3485))
+        {
+
+
+
+            if (firmware_must_use_new_bootloader == 0)
+                c2_update_boot = false;
+            else
+            {
+                int temp_bootloader_version = 0;
+                temp_bootloader_version = isp_max(Device_infor[11], Device_infor[14]);
+                if ((Device_infor[7] == PM_TSTAT8) && ((temp_bootloader_version <= 48) && (temp_bootloader_version != 0)))
+                {
+                    c2_update_boot = true;
+                }
+                else if ((Device_infor[7] == PM_MINIPANEL_ARM) && (temp_bootloader_version < 62))
+                {
+                    if (comport == 0)
+                    {
+                        c2_update_boot = false; //不支持串口更新
+                        Ret_Result = -1;
+                    }
+                    else
+                        c2_update_boot = true;
+
+                }
+                else if ((Device_infor[7] == PM_MINIPANEL) && (temp_bootloader_version < 62))
+                {
+                    if (comport == 0)
+                    {
+                        c2_update_boot = false; //不支持串口更新
+                        Ret_Result = -1;
+                    }
+                    else
+                        c2_update_boot = true;
+                }
+                else if ((Device_infor[7] == PM_TSTAT10) && (temp_bootloader_version < 54))
+                {
+                    c2_update_boot = true;
+                }
+				else if ((((Device_infor[7] >= STM32_CO2_NET) && 
+					      (Device_infor[7] <= STM32_PRESSURE_RS3485)) || (Device_infor[7] == STM32_PM25))
+					&& (temp_bootloader_version < 67))
+				{
+					c2_update_boot = true;
+				}
+                else
+                    c2_update_boot = false;
+            }
+            update_value = c2_update_boot;
+            //if (c2_update_boot == 1)
+            //{
+            //    CString strtips;
+            //    strtips.Format(_T("New bootloader available ,need update!"), resend_count);
+            //    OutPutsStatusInfo(strtips, false);
+            //    PostMessage(m_pParentWnd->m_hWnd, WM_FLASH_RESTATR_BOOT, Device_infor[7], 0);
+            //    Ret_Result = 2;
+            //}
+        }
+    }
+    return Ret_Result;
+}
+
+
+/**
+
+A wrapper for modbus_read_one_value which returns BOTH read value and error flag
+
+@param[in]   device_var	the modbus device address
+@param[in]   address		the offset of the value to be read in the device
+@param[in]   retry_times	the number of times to retry on read failure before giving up
+
+@return -1, -2, -3 on error, otherwise value read cast to integer
+
+This interface is provided for compatibility with existing code.
+New code should use modbus_read_one_value() directly,
+since it returns a separate error flag and read value -
+allowing simpler, more easily understood calling code design.
+CString* pstrInfo = new CString(strInfo);
+*/
+
+
+int mudbus_read_one(unsigned char device_var, unsigned short address, int retry_times)
+{
+    if (SPECIAL_BAC_TO_MODBUS)
+    {
+        unsigned short ret_value = 0;
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            n_ret = GetPrivateBacnetToModbusData(g_mstp_deviceid, address, 1, &ret_value);
+            if (n_ret >= 0)
+            {
+                return ret_value;
+            }
+            Sleep(1000);
+        }
+        return -2;
+    }
+    int value;
+
+    for (int i = 0; i < 3; i++)
+    {
+        value = Read_One(device_var, address);
+        if (value < 0)
+        {
+            // there was an error, so return the error flag
+            Sleep(200);
+            continue;
+        }
+        else
+        {
+            // no error, so return value read
+            return value;
+        }
+    }
+}
+
+
+
+int mudbus_write_one(unsigned char device_var, unsigned short address, short value, int retry_times)
+{
+    //2018 0606 在底层公共读写函数增加对不同协议的处理
+    if (SPECIAL_BAC_TO_MODBUS)
+    {
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+
+            n_ret = WritePrivateBacnetToModbusData(g_mstp_deviceid, address, 1, (unsigned short *)(&value));
+            if (n_ret >= 0)
+            {
+
+                return n_ret;
+            }
+            Sleep(1000);
+        }
+        return n_ret;
+    }
+    int  j = 0;
+    for (int i = 0; i < retry_times; i++)
+    {
+        int  j = Write_One(device_var, address, value);
+        if (j < 0)
+        {
+            Sleep(300);
+            continue;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return j;
+}
+
+
+
+int mudbus_read_multi(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length, int retry_times)
+{
+    CString data;
+    CString g_strT3000LogString;
+    //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    if (SPECIAL_BAC_TO_MODBUS)
+    {
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            n_ret = GetPrivateBacnetToModbusData(g_mstp_deviceid, start_address, length, put_data_into_here);
+            if (n_ret >= 0)
+            {
+                Sleep(100);
+                return n_ret;
+            }
+            Sleep(100);
+
+        }
+        return n_ret;
+    }
+
+    int ret = 0;
+    for (int i = 0; i < retry_times; i++)
+    {
+        ret = read_multi_tap(
+            
+            device_var,
+            put_data_into_here,
+            start_address,
+            length);
+        if (ret < 0)
+        {
+            Sleep(200);
+            continue;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+
+    return ret;
+}
+
+
+
+
+
+int mudbus_write_single_short(unsigned char device_var, unsigned char *to_write, unsigned short start_address, int length, int retry_times)
+{
+    //2018 0525 在底层公共读写函数增加对不同协议的处理
+    //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    if (SPECIAL_BAC_TO_MODBUS)
+    {
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            n_ret = WritePrivateBacnetToModbusCharData(g_mstp_deviceid, start_address, length, to_write);
+            if (n_ret >= 0)
+            {
+                return n_ret;
+            }
+            Sleep(1000);
+        }
+        return n_ret;
+    }
+
+    int j = 0;
+    for (int i = 0; i<retry_times; i++)
+    {
+
+        j = write_multi(device_var, to_write, start_address, length);
+
+        if (j < 0)
+        {
+            Sleep(300);
+            return j;
+        }
+        else
+        {
+            break;
+        }
+
+    }
+    return j;
+}
+
+
+
+int mudbus_write_multi_short(unsigned char device_var, unsigned short *to_write, unsigned short start_address, int length, int retry_times)
+{
+    //2018 0525 在底层公共读写函数增加对不同协议的处理
+    //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    if (SPECIAL_BAC_TO_MODBUS)
+    {
+        int n_ret = 0;
+        for (int i = 0; i < retry_times; i++)
+        {
+            n_ret = WritePrivateBacnetToModbusData(g_mstp_deviceid, start_address, length, to_write);
+            if (n_ret >= 0)
+            {
+                return n_ret;
+            }
+            Sleep(1000);
+        }
+        return n_ret;
+    }
+
+    int j = 0;
+    for (int i = 0; i<retry_times; i++)
+    {
+
+        j = write_multi_Short(device_var, to_write, start_address, length);
+
+        if (j < 0 )
+        {
+            Sleep(500);
+            return j;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return j;
 }

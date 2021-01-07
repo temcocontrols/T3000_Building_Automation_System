@@ -250,10 +250,13 @@ namespace CodersLab.Windows.Controls
 			{
                 return LastSelectedNode;
 			}
-			set
-			{
-               LastSelectedNode = value;
-			}
+            set
+            {
+                UnselectAllNodes(TreeViewAction.Unknown);
+                LastSelectedNode = value;
+                SelectNode(value, true, TreeViewAction.ByMouse);
+            }
+
 		}
 
 		/// <summary>

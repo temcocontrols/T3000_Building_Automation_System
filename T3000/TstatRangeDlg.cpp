@@ -166,7 +166,8 @@ void CTstatRangeDlg::Initial_window(){
 
 	  ((CButton *)GetDlgItem(IDC_RADIO_T_0+m_input_Analog_select))->SetCheck(1);
 	 
-      if ((m_input_Analog_select == 2) || // 0-100%
+      if ((m_input_Analog_select == 0) ||
+          (m_input_Analog_select == 2) || // 0-100%
           (m_input_Analog_select == 4) ||  //Custom 1
           (m_input_Analog_select == 6) ||  //Custom 2
           (m_input_Analog_select == 14))   //Voltage
@@ -564,14 +565,14 @@ void CTstatRangeDlg::OnBnClickedOk()
          GetDlgItemText(IDC_EDIT_TSTAT_4MA_VALUE, temp_4_value);
          GetDlgItemText(IDC_EDIT__20MA_VALUE, temp_20_value);
          int int_4_value = _wtof(temp_4_value) * 10;
-         if (int_4_value > 6553)
+         if (int_4_value > 65535)
          {
-             MessageBox(_T("Value can not larger thean 6553"));
+             MessageBox(_T("Value can not larger thean 65535"));
          }
          int int_20_value = _wtof(temp_20_value) * 10;
-         if (int_20_value > 6553)
+         if (int_20_value > 65535)
          {
-             MessageBox(_T("Value can not larger thean 6553"));
+             MessageBox(_T("Value can not larger thean 65535"));
          }
          if(temp_units.GetLength()>4)
             temp_units = temp_units.Left(4);

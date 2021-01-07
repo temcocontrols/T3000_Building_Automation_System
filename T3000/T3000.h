@@ -221,8 +221,7 @@ public:
 // Implementation
 	UINT  m_nAppLook;
 	BOOL  m_bHiColorIcons;
-        BOOL IsWow64() ;
-	BOOL RegisterOcx(LPCTSTR   OcxFileName);
+
 	virtual void PreLoadState();
 	virtual void LoadCustomState();
 	virtual void SaveCustomState();
@@ -232,13 +231,11 @@ public:
 	void OnVersionInfo();
 	DECLARE_MESSAGE_MAP()
 public:
-	BOOL user_login();
 	virtual int ExitInstance();
 	void CopyDirectory(CString strSrcPath,CString strDstPath);
 //	bool cm5_timer;	  //CM5
 	BOOL haveRegister();
 	void GetModulePath();
-	int GetSoftInstallDays();
 	void WriteNumber(CRegKey& key,CStringW valueName,DWORD value);
 	BOOL ReadNameber(CRegKey& key,CStringW valueName,DWORD& value);
 	void Judgestore();

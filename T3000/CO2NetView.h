@@ -508,6 +508,7 @@ public:
     afx_msg void OnBnClickedRadioHumidityHeatEnable();
 
     afx_msg LRESULT Fresh_Co2Output_Item(WPARAM wParam, LPARAM lParam);
+    afx_msg void OnBnClickedButtonFirmwareAutoCal();
 };
 
 const int CO2NET_NUM = 0;

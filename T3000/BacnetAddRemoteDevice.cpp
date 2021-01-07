@@ -145,7 +145,8 @@ int Remote_Get_PanelName(unsigned char nmodbusid, unsigned char npid_type,CStrin
 int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/, LPCTSTR remote_ip, int udp_port, int tcp_port)
 {
 
-
+    int main_device = 0;
+    int sub_device = 0;
     for (int x = 0; x < nlocal_ip_address.size(); x++)
     {
         m_bac_handle_Iam_data.clear();
@@ -155,8 +156,8 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
         Initial_bac(0, local_ip);
         bool n_connect_type = 0; // 0 bacnet   1 modbus;
         int ready_to_read_count = 0;
-        int main_device = 0;
-        int sub_device = 0;
+        main_device = 0;
+        sub_device = 0;
         for (int j = 0; j < 5; j++)
         {
             static_info.Format(_T("Scanning using network adapter:%s , please wait! (%d)"), local_ip,j);
@@ -319,14 +320,14 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                     CString temp_pro3;
                     temp_pro3.Format(_T("%u"), PROTOCOL_REMOTE_IP /*PROTOCOL_BACNET_IP*/);
                     strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)  \
-                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro3 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro3 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
                 }
                 else
                 {
                     CString temp_pro4;
                     temp_pro4.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS /*PROTOCOL_BIP_T0_MSTP_TO_MODBUS*/);
                     strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)  \
-                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "', '" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "', '" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
 
                 }
                 main_device++;
@@ -410,7 +411,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                                         CString temp_pro4;
                                         temp_pro4.Format(_T("%u"), MODBUS_TCPIP);
                                         strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)  \
-                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "', '" + NetwordCard_Address + "','" + str_sub_serialid + "','floor1','room1','" + cs_temp_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "', '" + NetwordCard_Address + "','" + str_sub_serialid + "','floor1','room1','" + cs_temp_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
 
                                         SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                                         sub_device++;
@@ -432,8 +433,18 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
         static_info.Format(_T("Network adapter:%s Scan finished!Found %d device"), local_ip, main_device + sub_device);
         Sleep(2000);
     }
-
-    static_info.Format(_T("All operations have been completed!"));
+    if (main_device + sub_device == 0)
+    {
+        static_info.Format(_T("Unable to connect to remote device!"));
+        Sleep(1000);
+        static_info.Format(_T("The possible reason is that the device is offline!"));
+        Sleep(1000);
+        static_info.Format(_T("The possible reason is that port forwarding is not working!"));
+        Sleep(1000);
+        static_info.Format(_T("Please Check your router ,Configure port forwarding correctly!"));
+    }
+    else
+        static_info.Format(_T("All operations have been completed!"));
     Sleep(1000);
     return 0;
 }

@@ -8,7 +8,7 @@
 #include "BADO/BADO.h"
 #include "global_function.h"
 // CBacnetRegisterListView
-CString cs_register_db_path;
+
 
 IMPLEMENT_DYNAMIC(CBacnetRegisterListView, CDialogEx)
 
@@ -33,6 +33,10 @@ void CBacnetRegisterListView::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CBacnetRegisterListView, CDialogEx)
     ON_WM_SIZE()
     ON_MESSAGE(WM_REFRESH_REGISTER_LIST, Fresh_Register_List)
+    ON_MESSAGE(WM_LIST_ITEM_CHANGED, Fresh_Register_Item)
+    ON_WM_CLOSE()
+    ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_REGISTER_VIEW, &CBacnetRegisterListView::OnLvnItemchangedListRegisterView)
+    ON_NOTIFY(NM_CLICK, IDC_LIST_REGISTER_VIEW, &CBacnetRegisterListView::OnNMClickListRegisterView)
 END_MESSAGE_MAP()
 
 HANDLE h_read_reg_date_thread = NULL;
@@ -48,11 +52,26 @@ DWORD WINAPI  CBacnetRegisterListView::ReadRegDataThreadfun(LPVOID lpVoid)
 
     //m_max_reg
     int section_part = 0;
-    section_part = pParent->m_max_reg % 100 + 1;
-
+    section_part = pParent->m_max_reg / 100 + 1;
+    int n_error_count = 0;
     for (int i = 0; i < section_part; i++)
     {
-        Read_Multi(g_tstat_id, &product_register_value[i * 100], i * 100, 100);
+        int temp_read_ret = 0;
+        temp_read_ret = Read_Multi(g_tstat_id, &product_register_value[i * 100], i * 100, 100);
+        if (temp_read_ret < 0)
+            n_error_count++;
+        if (n_error_count >= 3)
+        {
+            ::PostMessage(pParent->m_hWnd, WM_REFRESH_REGISTER_LIST, NULL, 1);
+            h_read_reg_date_thread = NULL;
+            return 1;
+        }
+        if ((product_register_value[7] == PM_MINIPANEL) || (product_register_value[7] == PM_MINIPANEL_ARM))
+        {
+            if (i == 4)
+                i = 68; //
+            //如果是T3 中间很多都不用读;
+        }
     }
     ::PostMessage(pParent->m_hWnd,WM_REFRESH_REGISTER_LIST, NULL, 1);
 
@@ -65,11 +84,7 @@ DWORD WINAPI  CBacnetRegisterListView::ReadRegDataThreadfun(LPVOID lpVoid)
 BOOL CBacnetRegisterListView::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
-    CString ApplicationFolder;
-    GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-    PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
-    ApplicationFolder.ReleaseBuffer();
-    cs_register_db_path = ApplicationFolder + _T("\\ResourceFile\\RegistersListDB.mdb");
+
     InitialListData();
     
     if (h_read_reg_date_thread == NULL)
@@ -310,7 +325,12 @@ void CBacnetRegisterListView::OnSize(UINT nType, int cx, int cy)
 void CBacnetRegisterListView::InitialListData()
 {
     Initial_List();
-    Read_Data_From_DB();
+    m_record_count = Read_Data_From_DB(&m_max_reg);
+    if (m_record_count <= 0)
+    {
+        MessageBox(_T("The register list for the corresponding product was not found !"));
+        
+    }
     AddDataIntoList();
     PostMessage(WM_REFRESH_REGISTER_LIST, NULL, NULL);
 }
@@ -326,27 +346,27 @@ typedef struct _str_data_format
     char cs_Sheet_name[MAX_PATH];
 }str_data_format;
 
-struct str_register_db_data
-{
-    int auto_id;
-    int m_register_address;
-    char cs_operation[MAX_PATH];
-    int m_register_length;
-    char cs_register_name[MAX_PATH];
-    char cs_data_format[MAX_PATH];
-    char cs_description[5*MAX_PATH];
-    int m_data_format;
-};
 
 str_data_format data_format[100];
 
 str_register_db_data * register_dbdata = NULL;
 
-void CBacnetRegisterListView::Read_Data_From_DB()
+//void CBacnetRegisterListView::Read_Data_From_DB()
+int Read_Data_From_DB(int* m_max_retreg)
 {
+    int m_max_reg = 0;
+    int temp_record_count = 0;
+    int m_data_format_count;
     CBADO monitor_bado;
     CString strSql;
     _variant_t temp_variant;
+    CString cs_register_db_path;
+    CString ApplicationFolder;
+    GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+    PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+    ApplicationFolder.ReleaseBuffer();
+    cs_register_db_path = ApplicationFolder + _T("\\ResourceFile\\RegistersListDB.mdb");
+
     monitor_bado.SetDBPath(cs_register_db_path);	//暂时不创建新数据库
     monitor_bado.OnInitADOConn();
 
@@ -357,21 +377,19 @@ void CBacnetRegisterListView::Read_Data_From_DB()
     if (m_data_format_count <= 0)
     {
         monitor_bado.CloseRecordset();//Ffff add
-        return;
+        return -1;
     }
 
     while (VARIANT_FALSE == monitor_bado.m_pRecordset->EndOfFile)
     {
         CString temp_cs;
-        temp_variant = monitor_bado.m_pRecordset->GetCollect("Data_Format");//
+
+        temp_variant = monitor_bado.m_pRecordset->GetCollect("Product_ID");//
         if (temp_variant.vt != VT_NULL)
-        {
-            temp_cs = temp_variant;
-            WideCharToMultiByte(CP_ACP, 0, temp_cs.GetBuffer(), -1, data_format[temp_count].cs_Data_Format, 255, NULL, NULL);
-        }
+            data_format[temp_count].n_product_id = temp_variant;
         else
         {
-            memset(data_format[temp_count].cs_Data_Format, 0, MAX_PATH);
+            data_format[temp_count].n_product_id = 0;
             temp_count++;
             monitor_bado.m_pRecordset->MoveNext();
             continue;
@@ -392,12 +410,15 @@ void CBacnetRegisterListView::Read_Data_From_DB()
             continue;
         }
 
-        temp_variant = monitor_bado.m_pRecordset->GetCollect("Product_ID");//
+        temp_variant = monitor_bado.m_pRecordset->GetCollect("Data_Format");//
         if (temp_variant.vt != VT_NULL)
-            data_format[temp_count].n_product_id = temp_variant;
+        {
+            temp_cs = temp_variant;
+            WideCharToMultiByte(CP_ACP, 0, temp_cs.GetBuffer(), -1, data_format[temp_count].cs_Data_Format, 255, NULL, NULL);
+        }
         else
         {
-            data_format[temp_count].n_product_id = 0;
+            memset(data_format[temp_count].cs_Data_Format, 0, MAX_PATH);
             temp_count++;
             monitor_bado.m_pRecordset->MoveNext();
             continue;
@@ -435,24 +456,24 @@ void CBacnetRegisterListView::Read_Data_From_DB()
 
     if (Sheet_Name.IsEmpty())
     {
-        PostMessage(WM_CLOSE, NULL, NULL);
-        return ;
+        //PostMessage(WM_CLOSE, NULL, NULL);
+        return -2;
     }
 
     strSql.Format(_T("select * from  %s"), Sheet_Name);
     monitor_bado.m_pRecordset = monitor_bado.OpenRecordset(strSql);
-    m_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
+    temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
 
 
-    if (m_record_count <= 0)
+    if (temp_record_count <= 0)
     {
         monitor_bado.CloseRecordset();//Ffff add
-        MessageBox(_T("The register list for the corresponding product was not found !"));
+        //MessageBox(_T("The register list for the corresponding product was not found !"));
         SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The register list for the corresponding product was not found !"));
-        return;
+        return -3;
     }
 
-    register_dbdata = new str_register_db_data[m_record_count];
+    register_dbdata = new str_register_db_data[temp_record_count];
 
 
 
@@ -608,14 +629,18 @@ void CBacnetRegisterListView::Read_Data_From_DB()
             continue;
         }
 
-
-        if (m_max_reg <= register_dbdata[temp_count].m_register_address)
-            m_max_reg = register_dbdata[temp_count].m_register_address;
+        if (register_dbdata[temp_count].m_register_address < 10000) //不想读几万个，等那么久
+        {
+            if (m_max_reg <= register_dbdata[temp_count].m_register_address)
+                m_max_reg = register_dbdata[temp_count].m_register_address;
+        }
         temp_count++;
         monitor_bado.m_pRecordset->MoveNext();
     }
-
+    *m_max_retreg = m_max_reg;
+    monitor_bado.CloseRecordset();
     monitor_bado.CloseConn();
+    return temp_record_count;
 }
 
 
@@ -634,7 +659,7 @@ void CBacnetRegisterListView::Initial_List()
     m_register_view.InsertColumn(REGUSTER_LIST_OPERATION, _T("Operation"), 130, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
     m_register_view.InsertColumn(REGISTER_LIST_REG_LENGTH, _T("Reg_Length"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_register_view.InsertColumn(REGISTER_LIST_REG_NAME, _T("Register_Name"), 140, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-    m_register_view.InsertColumn(REGISTER_LIST_VALUE, _T("Value"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_register_view.InsertColumn(REGISTER_LIST_VALUE, _T("Value"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_register_view.InsertColumn(REGISTER_LIST_DATA_FORMAT, _T("Data_Format"), 140, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
     m_register_view.InsertColumn(REGISTER_LIST_DESCRIPTION, _T("Description"), 350, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
     m_pragram_dlg_hwnd = this->m_hWnd;
@@ -665,6 +690,102 @@ void CBacnetRegisterListView::AddDataIntoList()
 
 }
 
+LRESULT CBacnetRegisterListView::Fresh_Register_Item(WPARAM wParam, LPARAM lParam)
+{
+    int cmp_ret;//compare if match it will 0;
+    int Changed_Item = (int)wParam;
+    int Changed_SubItem = (int)lParam;
+    if (Changed_SubItem == REGISTER_LIST_VALUE)
+    {
+        CString temp_task_info;
+        CString New_CString = m_register_view.GetItemText(Changed_Item, REGISTER_LIST_VALUE);
+        if (cs_clicked_cstring.CompareNoCase(New_CString) == 0)
+        {
+            return 0;
+        }
+        CString CStringAddress = m_register_view.GetItemText(Changed_Item, REGISTER_LIST_ADDRESS);
+
+        CString CStringOperation = m_register_view.GetItemText(Changed_Item, REGUSTER_LIST_OPERATION);
+        CString CStringDataFormat = m_register_view.GetItemText(Changed_Item, REGISTER_LIST_DATA_FORMAT);
+        
+        if ((CStringOperation.CompareNoCase(_T("03_06 Read Holding and Write Single")) == 0) ||
+            (CStringOperation.CompareNoCase(_T("06 Write Single Register")) == 0))
+        {
+            unsigned short m_value = 0;
+            int nret = 0;
+            if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_16_BIT_SIGNED_INTEGER_DIV_10]) == 0)
+            {
+               m_value = ((float)_wtof(New_CString)) * 10;
+               if ((m_value < -32768) || (m_value > 32767))
+               {
+                   MessageBox(_T("Please enter the required data!"));
+                   return 1;
+               }
+            }
+            else  if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_10]) == 0)
+            {
+                m_value = ((float)_wtof(New_CString)) * 10;
+                if ((m_value < 0) || (m_value > 65535))
+                {
+                    MessageBox(_T("Please enter the required data!"));
+                    return 1;
+                }
+            }
+            else if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_8_BIT_UNSIGNED_INTEGER]) == 0)
+            {
+                m_value = _wtoi(New_CString);
+                if ((m_value < 0) || (m_value >= 256))
+                {
+                    MessageBox(_T("Please enter the required data!"));
+                    return 1;
+                }
+            }
+            else if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_8_BIT_SIGNED_INTEGER]) == 0)
+            {
+                m_value = _wtoi(New_CString);
+                if ((m_value < -128) || (m_value > 127))
+                {
+                    MessageBox(_T("Please enter the required data!"));
+                    return 1;
+                }
+            }
+            else if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_16_BIT_UNSIGNED_INTEGER]) == 0)
+            {
+                m_value = _wtoi(New_CString);
+                if ((m_value < 0) || (m_value > 0xffff))
+                {
+                    MessageBox(_T("Please enter the required data!"));
+                    return 1;
+                }
+            }
+            else if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_16_BIT_SIGNED_INTEGER]) == 0)
+            {
+                m_value = _wtoi(New_CString);
+                if ((m_value < -32768) || (m_value > 32767))
+                {
+                    MessageBox(_T("Please enter the required data!"));
+                    return 1;
+                }
+            }
+            else
+            {
+                return 1;
+            }
+            nret = write_one(g_tstat_id, _wtoi(CStringAddress), m_value);
+            if (nret < 0)
+            {
+                MessageBox(_T("Write data timeout!"));
+            }
+            else
+            {
+                MessageBox(_T("Write data success!"));
+            }
+            //unsigned short
+        }
+
+    }
+    return 1;
+}
 
 LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lParam)
 {
@@ -682,12 +803,17 @@ LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lPara
 
         CString n_value;
         int n_start_add = register_dbdata[i].m_register_address;
+        unsigned short product_temp_value = 0;
         if (n_start_add >= 20000)
         {
-            continue;
+            product_temp_value = 0;
+        }
+        else
+        {
+            product_temp_value = product_register_value[n_start_add];
         }
 
-        n_value.Format(_T("%d"), product_register_value[n_start_add]);
+        n_value.Format(_T("%d"), product_temp_value);
 #if 1
 
         switch (register_dbdata[i].m_data_format)
@@ -756,34 +882,115 @@ LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lPara
         }
         case REGISTER_32_BIT_SIGNED_INTEGER_HI_LO: 
         {  
+            if (register_dbdata[i].m_register_length == 2)
+            {
+                signed int n_temp_int = 0;
+                n_temp_int = product_register_value[n_start_add] * 65536 + product_register_value[n_start_add + 1];
+                n_value.Format(_T("%d"), n_temp_int);
+            }
+            else if (register_dbdata[i].m_register_length == 4) //长度为4的是针对 序列号的，序列号是奇葩 占用8个字节 ;
+            {
+                unsigned int n_temp_int = 0;
+                n_temp_int = product_register_value[n_start_add] + product_register_value[n_start_add + 1] * 256 + product_register_value[n_start_add + 2] * 256 * 256 + product_register_value[n_start_add + 3] * 256 * 256 * 256;
+                n_value.Format(_T("%u"), n_temp_int);
+            }
             break;
+
         }
         case REGISTER_32_BIT_SIGNED_INTEGER_LO_HI: 
         {  
+            if (register_dbdata[i].m_register_length == 2)
+            {
+                signed int n_temp_int = 0;
+                n_temp_int = product_register_value[n_start_add]  + product_register_value[n_start_add + 1] * 65536;
+                n_value.Format(_T("%d"), n_temp_int);
+            }
             break;
         }
         case REGISTER_FLOATING_HI_LO_DIV_10: 
-        {  
+        {  //Done
+            if (register_dbdata[i].m_register_length == 2)
+            {
+                unsigned short temp1 = 0;
+                unsigned short temp2 = 0;
+                temp1 = product_register_value[n_start_add];
+                temp2 = product_register_value[n_start_add + 1];
+                float n_temp_float = 0;
+                n_temp_float = ((float)(temp1 * 65536 + temp2)) / 10.0;
+                n_value.Format(_T("%.1f"), n_temp_float);
+            }
             break;
         }
         case REGISTER_FLOATING_LO_HI_DIV_10: 
-        {  
+        {  //Done
+            if (register_dbdata[i].m_register_length == 2)
+            {
+                unsigned short temp1 = 0;
+                unsigned short temp2 = 0;
+                temp1 = product_register_value[n_start_add];
+                temp2 = product_register_value[n_start_add + 1];
+                float n_temp_float = 0;
+                n_temp_float = ((float)(temp1 + temp2 * 65536)) / 10.0;
+                n_value.Format(_T("%.1f"), n_temp_float);
+            }
             break;
         }
         case REGISTER_FLOATING_HI_LO_DIV_100: 
         {  
+            //Done
+            if (register_dbdata[i].m_register_length == 2)
+            {
+                unsigned short temp1 = 0;
+                unsigned short temp2 = 0;
+                temp1 = product_register_value[n_start_add];
+                temp2 = product_register_value[n_start_add + 1];
+                float n_temp_float = 0;
+                n_temp_float = ((float)(temp1 * 65536 + temp2)) / 100.0;
+                n_value.Format(_T("%.2f"), n_temp_float);
+            }
             break;
         }
         case REGISTER_FLOATING_LO_HI_DIV_100: 
         {  
+            //Done
+            if (register_dbdata[i].m_register_length == 2)
+            {
+                unsigned short temp1 = 0;
+                unsigned short temp2 = 0;
+                temp1 = product_register_value[n_start_add];
+                temp2 = product_register_value[n_start_add + 1];
+                float n_temp_float = 0;
+                n_temp_float = ((float)(temp1 + temp2 * 65536)) / 100.0;
+                n_value.Format(_T("%.2f"), n_temp_float);
+            }
             break;
         }
         case REGISTER_FLOATING_HI_LO_DIV_1000: 
-        {  
+        {  //Done
+            if (register_dbdata[i].m_register_length == 2)
+            {
+                unsigned short temp1 = 0;
+                unsigned short temp2 = 0;
+                temp1 = product_register_value[n_start_add];
+                temp2 = product_register_value[n_start_add + 1];
+                float n_temp_float = 0;
+                n_temp_float = ((float)(temp1 * 65536 + temp2))/1000.0;
+                n_value.Format(_T("%.3f"), n_temp_float);
+            }
             break;
         }
         case REGISTER_FLOATING_LO_HI_DIV_1000: 
-        {  
+        {   //Done
+            if (register_dbdata[i].m_register_length == 2)
+            {
+                unsigned short temp1 = 0;
+                unsigned short temp2 = 0;
+                temp1 = product_register_value[n_start_add];
+                temp2 = product_register_value[n_start_add + 1];
+                float n_temp_float = 0;
+                n_temp_float = ((float)(temp1  + temp2 * 65536)) / 1000.0;
+                n_value.Format(_T("%.3f"), n_temp_float);
+            }
             break;
         }
         case REGISTER_CHARACTER_STRING_HI_LO: 
@@ -792,6 +999,14 @@ LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lPara
         }
         case REGISTER_CHARACTER_STRING_LO_HI: 
         {  
+            break;
+        }
+        case REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_10:
+        case REGISTER_16_BIT_SIGNED_INTEGER_DIV_10:
+        {
+            float n_temp_float = 0;
+            n_temp_float = ((float)product_register_value[n_start_add])/10.0 ;
+            n_value.Format(_T("%.1f"), n_temp_float);
             break;
         }
         default :
@@ -831,6 +1046,13 @@ LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lPara
             m_register_view.SetItemText(i, REGISTER_LIST_ID, temp_id);
             m_register_view.SetItemText(i, REGISTER_LIST_ADDRESS, temp_register_address);
             m_register_view.SetItemText(i, REGUSTER_LIST_OPERATION, cs_operation);
+            if ((cs_operation.CompareNoCase(_T("03_06 Read Holding and Write Single")) == 0) ||
+                (cs_operation.CompareNoCase(_T("06 Write Single Register")) == 0))
+            {
+                m_register_view.SetCellEnabled(i, REGISTER_LIST_VALUE, 1);
+                //unsigned short
+            }
+
             m_register_view.SetItemText(i, REGISTER_LIST_REG_LENGTH, temp_register_length);
             m_register_view.SetItemText(i, REGISTER_LIST_REG_NAME, cs_register_name);
             m_register_view.SetItemText(i, REGISTER_LIST_VALUE, n_value);
@@ -859,4 +1081,61 @@ LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lPara
     }
 
     return 0;
+}
+
+
+void CBacnetRegisterListView::OnClose()
+{
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+
+    CDialogEx::OnClose();
+}
+
+
+void CBacnetRegisterListView::OnLvnItemchangedListRegisterView(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+    // TODO: 在此添加控件通知处理程序代码
+    *pResult = 0;
+}
+
+
+void CBacnetRegisterListView::OnNMClickListRegisterView(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+    // TODO: 在此添加控件通知处理程序代码
+    *pResult = 0;
+    long lRow, lCol;
+    m_register_view.Set_Edit(false);
+    DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+    CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+    m_register_view.ScreenToClient(&point);
+    LVHITTESTINFO lvinfo;
+    lvinfo.pt = point;
+    lvinfo.flags = LVHT_ABOVE;
+    int nItem = m_register_view.SubItemHitTest(&lvinfo);
+
+    lRow = lvinfo.iItem;
+    lCol = lvinfo.iSubItem;
+
+
+    if (lRow>m_register_view.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+        return;
+    if (lRow<0)
+        return;
+
+    if(lCol != REGISTER_LIST_VALUE)
+        return;
+
+    CString CStringOperation = m_register_view.GetItemText(lRow, REGUSTER_LIST_OPERATION);
+    CString CStringValue = m_register_view.GetItemText(lRow, REGISTER_LIST_VALUE);
+
+    if ((CStringOperation.CompareNoCase(_T("03_06 Read Holding and Write Single")) == 0) ||
+        (CStringOperation.CompareNoCase(_T("06 Write Single Register")) == 0))
+    {
+        m_register_view.Set_Edit(true);
+        cs_clicked_cstring = CStringValue;
+    }
+    else
+        return;
 }

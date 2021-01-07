@@ -1,6 +1,12 @@
 #include "StdAfx.h"
 #include "ComWriter.h"
 #include "ISPDlg.h"
+#include "BacnetMstp.h"
+extern vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
+extern unsigned int g_mstp_deviceid ;
+extern int SPECIAL_BAC_TO_MODBUS ;
+extern int new_bootload ; //如果等于1 就说明现在烧写的是新的BootLoader;
+extern int com_port_flash_status ;  // 0 正常模式   1 烧写boot模式
 extern unsigned int n_check_temco_firmware;
 extern bool auto_flash_mode;
 extern CString g_strFlashInfo;
@@ -12,9 +18,12 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam);
 UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam);
 int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
+extern int firmware_must_use_new_bootloader ;  //0 不用更新boot   1 需要更新bootload;   C1为hex
+extern CString g_repair_bootloader_file_path;
 CComWriter::CComWriter(void)
 {
     m_pFileBuffer = NULL;
+    m_pFileRepairBuffer = NULL;
     m_nBufLen = 0;
 
     m_nComPort = -1;
@@ -264,7 +273,8 @@ UINT Flash_Modebus_Device(LPVOID pParam)
         if(Open_Socket2(pWriter->m_strIPAddr, pWriter->m_nIPPort)==false)
         {
             CString srtInfo = _T("|Error : Network init failed.");
-            MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+            if (!auto_flash_mode)
+                MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
             //AddStringToOutPuts(_T("Error :The com port is occupied!"));
             pWriter->OutPutsStatusInfo(srtInfo, FALSE);
             pWriter->WriteFinish(0);
@@ -711,7 +721,7 @@ end_tcp_flash_mode :
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam)
 {
     CComWriter* pWriter = (CComWriter*)pParam;
-    const int  RETRY_TIMES = 5;
+    const int  RETRY_TIMES = 10;
     TS_UC *register_data=register_data_orginal;
     unsigned int ii=0;
 
@@ -971,7 +981,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam)
 {
     CComWriter* pWriter = (CComWriter*)pParam;
-    const int  RETRY_TIMES = 5;
+    const int  RETRY_TIMES = 10;
     TS_UC *register_data=register_data_orginal;
     unsigned int ii=0;
 
@@ -995,9 +1005,10 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
     do
     {
 
-        if(Write_One(m_ID,12,section)<0)
+        if(mudbus_write_one(m_ID,12,section)<0)
         {
             ii++;
+            Sleep(200);
         }
         else
         {
@@ -1012,7 +1023,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
         str.Format(_T("Write 12 = %d Failed"),section);
 		if(!auto_flash_mode)
 			AfxMessageBox(str);
-        return -8;
+        return -1;
 
     }
     //	while(ii<=the_max_register_number_parameter)
@@ -1040,9 +1051,11 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
             /*   if(itemp<RETRY_TIMES)
                {*/
             //ii+0x8000
-            if(write_multi(m_ID,&register_data[ii],ii,128)<0)//to write multiple 128 bytes
+            
+            if(mudbus_write_single_short(m_ID,&register_data[ii],ii,128)<0)//to write multiple 128 bytes
             {
                 itemp++;
+                Sleep(300); //写失败 休眠300ms后 重试;
             }
             else
             {
@@ -1055,10 +1068,10 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
 
 
         }
-        while(itemp<RETRY_TIMES);
+        while(itemp<RETRY_TIMES*2);
 
 
-        if (itemp >= RETRY_TIMES)
+        if (itemp >= RETRY_TIMES*2)
         {
             CString str;
             str.Format(_T("Write Flash ID = %d To = 128*%d "),m_ID,ii);
@@ -1171,32 +1184,51 @@ int CComWriter::WirteExtendHexFileByCom()
     return 1;
 }
 
+
+
+
 int CComWriter::WirteExtendHexFileByCom_RAM()
 {
-    //WriteCommandtoReset();
-
     HCURSOR hc;//load mouse cursor
     hc = LoadCursor(NULL,IDC_WAIT);
     hc = SetCursor(hc);
 
-    if(open_com(m_nComPort)==false)
+    if (SPECIAL_BAC_TO_MODBUS)
     {
-        CString srtInfo = _T("|Error :The com port is occupied!");
-
-        OutPutsStatusInfo(srtInfo, FALSE);
-		WriteFinish(0);
-        return 0;
+        int ret = Initial_bac(m_nComPort, _T(""), m_nBautrate);
+        CString temp_cs;
+        if (ret <= 0)
+        {
+            temp_cs.Format(_T("Initial Bacnet MSTP port :%d baudrate:%d Failed"), m_nComPort, m_nBautrate);
+            OutPutsStatusInfo(temp_cs, FALSE);
+        }
+        else
+        {
+            temp_cs.Format(_T("Initial Bacnet MSTP port :%d baudrate:%d success!"), m_nComPort, m_nBautrate);
+            OutPutsStatusInfo(temp_cs, FALSE);
+        }
+        Sleep(1);
     }
     else
     {
-        CString strTemp;
-        strTemp.Format(_T("COM%d"), m_nComPort);
-        CString strTips = _T("|Open ") +  strTemp + _T(" successful.");
-        OutPutsStatusInfo(strTips, FALSE);
-        Change_BaudRate (m_nBautrate);
-        // AddStringToOutPuts(strTips);
+        if (open_com(m_nComPort) == false)
+        {
+            CString srtInfo = _T("|Error :The com port is occupied!");
 
+            OutPutsStatusInfo(srtInfo, FALSE);
+            WriteFinish(0);
+            return 0;
+        }
+        else
+        {
+            CString strTemp;
+            strTemp.Format(_T("COM%d"), m_nComPort);
+            CString strTips = _T("|Open ") + strTemp + _T(" successful.");
+            OutPutsStatusInfo(strTips, FALSE);
+            Change_BaudRate(m_nBautrate);
+        }
     }
+
 
 
     CString strTips = _T("|Programming device...");
@@ -1618,22 +1650,21 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
 
 
 
-BOOL CComWriter::UpdataDeviceInformation(int& ID)
+int CComWriter::UpdataDeviceInformation(int& ID)
 {
     if (n_check_temco_firmware == 0)
         return 1;
     CString strtips;
-    unsigned short Device_infor[10];
+    unsigned short Device_infor[18] = {0};
     CString str_ret,temp;
  
     CString hexproductname=_T("");
 
-    //  int ret=read_multi(ID,&Device_infor[0],0,10);
     int ret=0;
     int resend_count = 0;
     do
     {
-        ret = read_multi_tap(ID,&Device_infor[0],0,10);
+        ret = mudbus_read_multi(ID,&Device_infor[0],0,18);
         if(ret >= 0)
             break;
         resend_count ++ ;
@@ -1642,6 +1673,14 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
             strtips.Format(_T("Device is offline,Please check the connection!"));
             OutPutsStatusInfo(strtips,false);
             return FALSE;
+        }
+        else
+        {
+            strtips.Format(_T("Reading device version information!(%d)"), resend_count);
+            if(resend_count == 1)
+                OutPutsStatusInfo(strtips, false);
+            else
+                OutPutsStatusInfo(strtips, true);
         }
         Sleep(1000);
 
@@ -1652,10 +1691,19 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
 	{
 		return TRUE;
 	}
-	 
-    
+	
 
-    CString prodcutname=GetProductName(Device_infor[7]);
+
+    int temp_boot_version = isp_max(Device_infor[11], Device_infor[14]);
+    CString strtips_version;
+    if(temp_boot_version != 0)
+        strtips_version.Format(_T("Bootloader version : %u"), temp_boot_version);
+    else
+        strtips_version.Format(_T("Bootloader version : unknown"));
+    OutPutsStatusInfo(strtips_version, false);
+
+
+    CString prodcutname= GetFirmwareUpdateName(Device_infor[7]);
 
     
 
@@ -1693,7 +1741,7 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
     hexproductname.MakeUpper();
 	hexproductname.TrimLeft();
 	hexproductname.TrimRight();
-    BOOL Ret_Result = TRUE;
+    int Ret_Result = 1;
 
 
     if(hexproductname.CompareNoCase(prodcutname)==0)
@@ -1732,9 +1780,8 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
 		&& (hexproductname.CompareNoCase(_T("co2all")) == 0)
 		)
 	{
-		return TRUE;
+        Ret_Result = TRUE;
 	}
-
     else if ((hexproductname.CompareNoCase(_T("tstat6"))==0)&&(prodcutname.CompareNoCase(_T("tstat5i"))==0))
     {
         Ret_Result= TRUE;
@@ -1747,8 +1794,76 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
     {
         strtips.Format(_T("Your device is %s   but the hex file is for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
         OutPutsStatusInfo(strtips,false);
-        return FALSE;
+        Ret_Result = FALSE;
+        return Ret_Result;
     }
+    int c2_update_boot = 0;
+
+   Ret_Result = check_bootloader_and_frimware(Device_infor[7], 0, Device_infor[11], Device_infor[14], c2_update_boot, Device_infor[4]);
+
+    if (c2_update_boot == 1)
+    {
+        CString str_temp_tips;
+        str_temp_tips.Format(_T("New bootloader available ,need update!"));
+        OutPutsStatusInfo(str_temp_tips, false);
+        PostMessage(m_pParentWnd->m_hWnd, WM_FLASH_RESTATR_BOOT, Device_infor[7], 0);
+        Ret_Result = 2;
+    }
+#if 0
+    if (com_port_flash_status == 0)
+    {
+        if ((Device_infor[7] == PM_TSTAT8) ||
+            (Device_infor[7] == PM_TSTAT9)  ||
+            (Device_infor[7] == PM_MINIPANEL_ARM) ||
+            (Device_infor[7] == PM_MINIPANEL) ||
+            (Device_infor[7] == PM_TSTAT10))
+        {
+            int c2_update_boot = false;
+            int device_version = 0;
+
+
+            if (firmware_must_use_new_bootloader == 0)
+                c2_update_boot = false;
+            else
+            {
+                int temp_bootloader_version = 0;
+                temp_bootloader_version = isp_max(Device_infor[11], Device_infor[14]);
+                if ((Device_infor[7] == PM_TSTAT8) && (temp_bootloader_version <= 48))
+                {
+                    c2_update_boot = true;
+                }
+                else if ((Device_infor[7] == PM_MINIPANEL_ARM) && (temp_bootloader_version < 62))
+                {
+                    c2_update_boot = false; //不支持串口更新
+                    Ret_Result = -1;
+                }
+                else if ((Device_infor[7] == PM_MINIPANEL) && (temp_bootloader_version < 62))
+                {
+                    c2_update_boot = false; //不支持串口更新
+                    Ret_Result = -1;
+                }
+                else if ((Device_infor[7] == PM_TSTAT10) && (temp_bootloader_version < 54))
+                {
+                    c2_update_boot = true;
+                }
+                else
+                    c2_update_boot = false;
+            }
+
+            if (c2_update_boot == 1)
+            {
+                strtips.Format(_T("New bootloader available ,need update!"), resend_count);
+                OutPutsStatusInfo(strtips, false);
+                PostMessage(m_pParentWnd->m_hWnd, WM_FLASH_RESTATR_BOOT, Device_infor[7], 0);
+                Ret_Result = 2;
+            }
+        }
+    }
+#endif
+
+
+
+
     return Ret_Result;
     if (Ret_Result)
     {
@@ -1787,7 +1902,8 @@ int CComWriter::BeginWirteByTCP()
             if(Open_Socket2(m_strIPAddr, m_nIPPort)==false)
             {
                 CString srtInfo = _T("|Error : Network init failed.");
-                MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+                if (!auto_flash_mode)
+                    MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
                 //AddStringToOutPuts(_T("Error :The com port is occupied!"));
                 OutPutsStatusInfo(srtInfo, FALSE);
                 WriteFinish(0);
@@ -1833,17 +1949,72 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
     int nFlashRet=0;
     UINT i=0;
     int nFailureNum = 0;
-
     UINT times=0;
 
+    g_mstp_deviceid = 0;
+    m_bac_handle_Iam_data.clear();
 #if 1
-    const int  RETRY_TIMES = 5;
+    const int  RETRY_TIMES = 10;
     CString StrCurrentTime;
     StrCurrentTime.Format(_T("|>>>StartTime:%s"),GetSysTime());
     pWriter->OutPutsStatusInfo(StrCurrentTime);
     BOOL Flag_HEX_BIN = FALSE;
+
+
+
     for(i = 0; i < pWriter->m_szMdbIDs.size(); i++)
     {
+
+        if (SPECIAL_BAC_TO_MODBUS)
+        {
+            //根据ID得到对应的 device id.
+            int temp_found_device_id = 0;
+            for (int x = 0; x < 30; x++)
+            {
+
+                Send_WhoIs_Global(-1, -1);
+                Sleep(2000);
+                if (m_bac_handle_Iam_data.size() > 0)
+                {
+                    for (int j = 0; j < m_bac_handle_Iam_data.size(); j++)
+                    {
+                        if (m_bac_handle_Iam_data.at(j).macaddress == pWriter->m_szMdbIDs[i])
+                        {
+                            temp_found_device_id = m_bac_handle_Iam_data.at(j).device_id;
+                            break;
+                        }
+                    }
+                }
+
+                if (temp_found_device_id > 0)
+                {
+                    g_mstp_deviceid = temp_found_device_id;
+                    break;
+                }
+            }
+        }
+
+
+        while (0)
+        {
+            Sleep(1000);
+           int  nRet = mudbus_read_one(pWriter->m_szMdbIDs[i], 7);
+           if (nRet > 0)
+           {
+               CString strID;
+               strID.Format(_T("|Read ID is : %d"), nRet);
+               pWriter->OutPutsStatusInfo(strID);
+           }
+           else
+           {
+               CString strID;
+               strID.Format(_T("|Read Error"));
+               pWriter->OutPutsStatusInfo(strID);
+           }
+            Sleep(1);
+        }
+
+
        //for (int Time =0; Time < pWriter->m_FlashTimes; Time++)
         {
             CString strID;
@@ -1851,25 +2022,28 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             pWriter->OutPutsStatusInfo(strID);
 
             BOOL Flag_HEX_BIN=FALSE;
-            if (pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]))
+            int nret_device_info = pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
+            if (nret_device_info == 1)
             {
                 Flag_HEX_BIN =TRUE;
-                int  nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
+                int  nRet = mudbus_write_one(pWriter->m_szMdbIDs[i],16,127,2);   // 进入ISP模式
+
+
 
                 Sleep (2000);
-                nRet = Read_One(pWriter->m_szMdbIDs[i],11);
+                nRet = mudbus_read_one(pWriter->m_szMdbIDs[i],11);
 				//Wait for the device to enter the ISP mode, some devices jump slower than others, can’t read after reboot, retry;
                 if (nRet <= 0)
                 {
                     bool read_bootloader_ret = false;
-                    for (int i = 0; i < 10; i++)
+                    for (int x = 0; x < 10; x++)
                     {
                         Sleep(2000);
-                        nRet = Read_One(pWriter->m_szMdbIDs[i], 11);
+                        nRet = mudbus_read_one(pWriter->m_szMdbIDs[i], 11);
                         if (nRet <= 0)
                         {
                             CString srtInfo;
-                            srtInfo.Format(_T("|Reading bootloader version (%d)!"), i + 1);
+                            srtInfo.Format(_T("|Firmware update is being prepared, please wait! (%d)!"), x + 1);
                             pWriter->OutPutsStatusInfo(srtInfo);
                             continue;
                         }
@@ -1877,7 +2051,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         {
                             CString srtInfo;
                             read_bootloader_ret = true;
-                            srtInfo.Format(_T("|Reading bootloader version OK!"));
+                            srtInfo.Format(_T("|Reading bootloader version OK,ready to update!"));
                             pWriter->OutPutsStatusInfo(srtInfo);
                             break;
                         }
@@ -1931,7 +2105,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 #if 1
                 //*************inspect the flash that last flash position ***********************
                 int ii=0;
-                while(Read_One(m_ID,0xee10)<0) //the return value == -1 ,no connecting
+                while(mudbus_read_one(m_ID,0xee10,1)<0) //the return value == -1 ,no connecting
                 {
                     if(ii<5)
                     {
@@ -1953,7 +2127,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 }
                 //************* begin to flash ***********************
                 ii=0;
-                if(Read_One(m_ID,0xee10)==0x40 || Read_One(m_ID,0xee10)==0x1f) // 读ee10， why？
+                if(mudbus_read_one(m_ID,0xee10)==0x40 || mudbus_read_one(m_ID,0xee10)==0x1f) // 读ee10， why？
                 {
                     if(IDOK==AfxMessageBox(_T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),MB_OKCANCEL))  // Select OK
                     {
@@ -1961,8 +2135,8 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         int l=0;//temp;<200
                         do
                         {
-                            int uc_temp1=Read_One(m_ID,ii);
-                            int uc_temp2=Read_One(m_ID,ii+1);
+                            int uc_temp1= mudbus_read_one(m_ID,ii);
+                            int uc_temp2= mudbus_read_one(m_ID,ii+1);
                             if(uc_temp1==0x00 && uc_temp2==0x00 )
                                 ii+=2;
                             else if(l==0)
@@ -1993,7 +2167,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         do
                         {
                             if(ii<RETRY_TIMES)
-                                if(-2==Write_One(m_ID,16,0x7f))
+                                if(-2== mudbus_write_one(m_ID,16,0x7f))
                                 {
                                     ii++;
                                     Sleep(6000);
@@ -2022,7 +2196,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         {
                             if(ii<RETRY_TIMES)
                             {
-                                if(-2==Write_One(m_ID,16,0x3f))
+                                if(-2== mudbus_write_one(m_ID,16,0x3f))
                                 {
                                     ii++;
                                 }
@@ -2049,7 +2223,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         do
                         {
                             if(ii<RETRY_TIMES)
-                                if(-2==Write_One(m_ID,16,0x1f))
+                                if(-2== mudbus_write_one(m_ID,16,0x1f))
                                     ii++;
 
                                 else
@@ -2088,7 +2262,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         if(ii<RETRY_TIMES)
 
                         {
-                            if(Write_One(m_ID,16,0x7f)<0)
+                            if(mudbus_write_one(m_ID,16,0x7f)<0)
                             {
                                 ii++;
                                 continue;
@@ -2122,7 +2296,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         if(ii<RETRY_TIMES)
                         {
                             //if(-2==Write_One(m_ID,16,0x3f))
-                            if(Write_One(m_ID,16,0x3f)<0)
+                            if(mudbus_write_one(m_ID,16,0x3f)<0)
                             {
                                 ii++;
                                 continue;
@@ -2151,7 +2325,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         if(ii<RETRY_TIMES)
                         {
                             //if(-2==Write_One(m_ID,16,0x1f))
-                            if(Write_One(m_ID,16,0x1f)<0)
+                            if(mudbus_write_one(m_ID,16,0x1f)<0)
                             {
                                 ii++;
                                 continue;
@@ -2180,6 +2354,24 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
 #endif
 
+            }
+            else if (nret_device_info == 2)
+            {
+                Sleep(1);
+                return 1;
+            }
+            else if (nret_device_info == -1)
+            {
+                CString srtInfo;
+                srtInfo.Format(_T("The new firmware needs update bootloader first."));
+                pWriter->OutPutsStatusInfo(srtInfo);
+                srtInfo.Format(_T("Do not support update bootloader through serial port."));
+                pWriter->OutPutsStatusInfo(srtInfo);
+                srtInfo.Format(_T("Please use the network to update the firmware"));
+                pWriter->OutPutsStatusInfo(srtInfo);
+                srtInfo.Format(_T(" "));
+                pWriter->OutPutsStatusInfo(srtInfo);
+                continue;
             }
             else
             {
@@ -2241,6 +2433,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         break;
                     }
                     pWriter->OutPutsStatusInfo(strTemp);
+                    Sleep(1000);
                     goto end_isp_flash;
 
                 }
@@ -2261,7 +2454,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             do
             {
 
-                if(Write_One(pWriter->m_szMdbIDs[i],16,1)<0)
+                if(mudbus_write_one(pWriter->m_szMdbIDs[i],16,1)<0)
                 {
                     ii++;
                 }
@@ -2305,7 +2498,16 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
 //*******************************************************************************
 end_isp_flash:
-    pWriter->WriteFinish(nFlashRet);
+    Sleep(500);
+    //pWriter->WriteFinish(nFlashRet);
+    if (new_bootload == 1)
+    {
+        PostMessage(pWriter->m_pParentWnd->m_hWnd, WM_FLASH_NEW_BOOT_FINISH, 0, LPARAM(nFlashRet));
+    }
+    else
+    {
+        pWriter->WriteFinish(nFlashRet);
+    }
     Sleep(500);
 
     close_com();
@@ -2313,4 +2515,12 @@ end_isp_flash:
 //	}while(1);
 
 
+}
+
+int CComWriter::InitialBacnetMstp()
+{
+    Set_MSTP_Polling_Node(0);
+  bool  init_ret = Initial_bac(3, _T(""),115200 );
+    //m_nComPort
+  return 0;
 }

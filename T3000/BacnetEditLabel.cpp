@@ -449,6 +449,30 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			Post_Write_Message(g_bac_instance,WRITEOUTPUT_T3000,label_info.nPoint_number,label_info.nPoint_number,sizeof(Str_out_point),m_edit_label ,temp_task_info);
 		}
 		break;
+    case BAC_PID://PID
+        {
+        if (ncommand == CHANGE_AUTO_MANUAL)
+        {
+            if (m_AutoManual.CompareNoCase(_T("Manual")) == 0)
+            {
+                m_controller_data.at(label_info.nPoint_number).auto_manual = 0;	//Auto = 0;
+                show_temp = _T("Auto");
+                m_edit_value.EnableWindow(false);
+            }
+            else
+            {
+                m_controller_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
+                show_temp = _T("Manual");
+
+            }
+            m_AutoManual = show_temp;
+            m_edit_auto_manual.SetWindowTextW(show_temp);
+        }
+        CString temp_task_info;
+        temp_task_info.Format(_T("Write Pid List Item%d .Changed to \"%s\" "), label_info.nPoint_number, show_temp);
+        Post_Write_Message(g_bac_instance, WRITEPID_T3000, label_info.nPoint_number, label_info.nPoint_number, sizeof(Str_controller_point), m_edit_label, temp_task_info);
+        }
+        break;
 	case BAC_VAR://variable
 		{
 			if(ncommand == CHANGE_AUTO_MANUAL)
@@ -474,7 +498,25 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			{
                 if (m_Variable_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //Èç¹ûÊÇ
                     return 0;
-				if(m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_ANALOG)
+                bool msv_status = 0;
+                if ((m_Variable_data.at(label_info.nPoint_number).range >= 101) && (m_Variable_data.at(label_info.nPoint_number).range <= 103))
+                {
+                    msv_status = 1;
+                    if (read_msv_table)
+                    {
+                        CString new_name;
+                        int new_value;
+                        int nret = 0;
+                        nret = Get_Msv_next_Name_and_Value_BySearchValue(m_Variable_data.at(label_info.nPoint_number).range - 101,
+                            (int)(m_Variable_data.at(label_info.nPoint_number).value / 1000), new_name, new_value);
+                        if (nret >= 0)
+                        {
+                            m_Variable_data.at(label_info.nPoint_number).value = new_value * 1000;
+                            show_temp = new_name;
+                        }
+                    }
+                }
+				else if(m_Variable_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_ANALOG)
 				{
 					CString temp_analog_value;
 					GetDlgItemTextW(IDC_EDIT_LABEL_VALUE,temp_analog_value);
@@ -496,22 +538,24 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 							return 0;
 						}
 					}
+                    
 					else
 						return 0;
-					SplitCStringA(temparray,temp_unit,_T("/"));
-
-
-
-					if(m_Variable_data.at(label_info.nPoint_number).control == 0)
-					{
-						m_Variable_data.at(label_info.nPoint_number).control = 1;
-						show_temp = temparray.GetAt(1);
-					}
-					else
-					{
-						m_Variable_data.at(label_info.nPoint_number).control = 0;
-						show_temp = temparray.GetAt(0);
-					}
+                    if (msv_status == 0)
+                    {
+                        SplitCStringA(temparray, temp_unit, _T("/"));
+                        if (m_Variable_data.at(label_info.nPoint_number).control == 0)
+                        {
+                            m_Variable_data.at(label_info.nPoint_number).control = 1;
+                            show_temp = temparray.GetAt(1);
+                        }
+                        else
+                        {
+                            m_Variable_data.at(label_info.nPoint_number).control = 0;
+                            show_temp = temparray.GetAt(0);
+                        }
+                    }
+					
 
 					m_edit_value.SetWindowTextW(show_temp);
 				}

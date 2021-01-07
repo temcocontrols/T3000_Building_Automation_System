@@ -28,6 +28,7 @@ bool list_mouse_click = false;
 unsigned short multi_register_value[4096]={-1};
 unsigned short multi_register_value_tcp[10000]={-1};
 unsigned short product_register_value[20000]={-1};
+unsigned short product_register_sensor_flag[5] = { 0 };
 
 int product_type = 0;
 int old_product_type = 0;
@@ -43,6 +44,9 @@ CString CurrentT3000Version ;
 int nCom;
 //CString program_path=_T("");
 volatile int g_tstat_id=255;
+int g_protocol_support_ptp = PROTOCOL_UNKNOW;
+int g_output_support_relinquish = 0;
+unsigned short output_relinquish_value[128] ;
 int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。 
 unsigned int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
@@ -62,6 +66,7 @@ CString g_achive_folder_temp_txt = _T("");
 CString g_achive_folder_temp_db = _T("");
 CString g_achive_device_name_path = _T("");
 CString g_achive_monitor_datatbase_path = _T("");
+CString g_ext_database_path = _T(""); //额外的配置档数据库路径;
 
 BOOL g_Scanfully=FALSE;
 BOOL g_ScanSecurity=TRUE;
@@ -142,7 +147,7 @@ CString g_strCurBuildingDatabasefilePath=L"";
 	CString m_str_curBuilding_Domain_Port;
 
 BOOL g_bEnableRefreshTreeView = TRUE;
-BOOL g_bPauseRefreshTree = FALSE;
+
 BOOL g_SelectChanged = TRUE;
 unsigned int g_llTxCount = 0;
 unsigned int g_llRxCount = 0;
@@ -154,6 +159,7 @@ BOOL g_unint = TRUE;//TREE = °C;FALSE = F;
 //int g_nIpPort=6001;
 //CString	g_strIpAdress;
 int MDAY=1,MNIGHT=1;
+int MAWAY = 1, MSLEEP = 1;
 
 
 
@@ -1836,7 +1842,10 @@ CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
 bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
 bool receive_customer_unit; //收到回复，flag就置 true;
 bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
-bool read_var_analog_cus_units;          //Var Cus units 自定义
+
+bool read_msv_table; //MSV table 
+CString Custom_Msv_Range[BAC_MSV_COUNT];// 存储客户多态  例如显示  AAA/BBB/CCC
+
 CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
 
@@ -1879,7 +1888,8 @@ bool bac_graphic_label_read_results;
 bool bac_remote_point_read_results;
 
 bool bac_cm5_graphic;
-int bac_gloab_panel;
+unsigned char bac_gloab_panel;
+unsigned char g_thread_max_mac_id = 254; //客户上次点击的mstp mac ID
 //int g_bac_instance;
 int input_list_line;
 int output_list_line;
@@ -1964,10 +1974,12 @@ Str_MISC Device_Misc_Data;
 Str_Special Device_Special_Data;
 char m_at_write_buf[100];
 char m_at_read_buf[450];
-
+vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 新的setpoint表格; 以前的完全改不动了;
 vector <int> exsit_panel_number;
 vector <refresh_net_device> m_T3BB_device_data;
 vector <refresh_net_device> m_refresh_net_device_data;
+vector <refresh_subnet_device> m_refresh_subnet_status;
+
 vector <GSM_connection_info> m_gsm_connect_info;
 vector <Scan_Info> m_scan_info;
 vector <Scan_Info> m_scan_info_buffer;
@@ -2045,10 +2057,12 @@ CString SaveConfigFilePath;
 CString LoadConfigFilePath;
 vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
 vector<ALL_LOCAL_SUBNET_NODE> g_Scan_Vector_Subnet;
+ipaddress_info g_ipaddress_info;
+int get_ping_ip_network = 0;
 
 CString g_strStartInterface_config = _T("T3000_config.ini");
 int g_SleepTimeForConfig = 3;
-
+CString	g_configfile_path;
 vector<Reg_Infor> g_Vector_Write_Error;
 bool need_read_bacnet_graphic_label_flag = true;	//用于防止重复读取 graphic label ;只有切换设备的时候才需要再次读取;
 bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
@@ -2163,6 +2177,7 @@ Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
 Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
 
 char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
+int b_pause_refresh_tree = false; // 全局变量，控制主线程里面的 是否刷新网络数据;
 int debug_item_show = 0;
 bool monitor_ignore_enable = false;
 int monitor_ignore_max_value = 0;
@@ -2242,6 +2257,7 @@ CString offline_prg_path;   //离线模式得prg 保存路径;
 
 bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
 bool n_wifi_connection;  //后台列表 刷新开关
+int MODE_SUPPORT_PTRANSFER; //  支持bip ptransfer 等于1时   wifi设备 和 T3BB系列的不在连接502端口
 bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
@@ -2257,6 +2273,22 @@ CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
     _T("AR3"),
     _T("AR4")
 };
+
+int m_special_customer = 0;      //客户自定义T3000的名字;  // 1为CPR_Bestek
+CString cs_special_name;         //对应该改的名字;
+
+unsigned char n_ignore_sync_time;  //是否忽略同步时间;
+unsigned int last_ignore_sync_time;  //上次点击忽略同步时间的 时间节点;  比如用于3天后继续提醒;
+
+unsigned char check_revert_daxiaoduan = 0; //大小端是否需要反转，正常旧版本不要反转;
+
+
+int n_read_product_type = 0; //这三个变量 确定 modbus协议 去读取 bacnet东西的时候 ，读哪些寄存器;
+int n_read_list_flag = -1; // 读取那一个，例如读Input 还是Output
+int n_read_item_index = 0; // 读哪一个 例如Schedule3 的时间 ，不能用weekly_list 因为界面上的容易变。
+
+unsigned int DEBUG_DELAY_TIME = 0; //测试用调试Wifi 延迟时间;
+CString bacnet_string; // 待解析的字串
 
 
 

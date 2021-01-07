@@ -223,6 +223,10 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
         WritePrivateProfileStringW(_T("Data"), _T("Command"), _T("1"), AutoFlashConfigPath);
         if (m_product_isp_auto_flash.BuildingInfo.strIp.IsEmpty() ||
             (m_product_isp_auto_flash.baudrate == 19200) ||
+            (m_product_isp_auto_flash.baudrate == 9600) ||
+            (m_product_isp_auto_flash.baudrate == 38400) ||
+            (m_product_isp_auto_flash.baudrate == 57600) ||
+            (m_product_isp_auto_flash.baudrate == 76800) ||
             (m_product_isp_auto_flash.baudrate == 115200))//串口
         {
             CString temp_baudrate;
@@ -408,14 +412,14 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
             break;
         case FLASH_SUCCESS:
         {
-            ret_message.Format(_T("Sending firmware to device succeed!"));
+            ret_message.Format(_T("Firmware update succeeded!"));
             m_download_info.InsertString(m_download_info.GetCount(), ret_message);
             m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
         }
         break;
         case FAILED_UNKNOW_ERROR:
         {
-            ret_message.Format(_T("Sending firmware to device failed! "));
+            ret_message.Format(_T("Firmware update was not successful, please try again.  "));
             m_download_info.InsertString(m_download_info.GetCount(), ret_message);
             m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
         }
@@ -807,7 +811,11 @@ BOOL Dowmloadfile::OnInitDialog()
 
 	productfolder = GetProdcutFtpPath(m_product_isp_auto_flash.product_class_id);
 
+    if (m_special_customer == 1)
+    {
 
+        GetDlgItem(IDC_BUTTON_UPDATE_T3000)->SetWindowTextW(_T("Update ") + cs_special_name);
+    }
 
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Bootloader"));
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Main Firmware"));
@@ -995,7 +1003,7 @@ void Dowmloadfile::Update_File()
 #endif
 }
 
-
+HANDLE hDownloadWebThread = NULL;
 HANDLE hDownloadFtpThread = NULL;
 void Dowmloadfile::Start_Download_Ftp()
 {
@@ -1008,14 +1016,132 @@ void Dowmloadfile::Start_Download_Ftp()
 
     m_static_persent.ShowWindow(SW_SHOW);
     GetDlgItem(IDC_PROGRESS_FTP_DOWNLOAD)->ShowWindow(SW_SHOW);
-    if(hDownloadFtpThread == NULL)
+//#ifndef DEBUG
+    if (hDownloadFtpThread == NULL)
         hDownloadFtpThread = CreateThread(NULL, NULL, FtpDownloadThread, this, NULL, NULL);
+//#endif // !DEBUG
+
+
+
+//#ifdef DEBUG
+//    if (hDownloadWebThread == NULL)
+//        hDownloadWebThread = CreateThread(NULL, NULL, WebDownloadThread, this, NULL, NULL);
+//#endif // DEBUG
+
 }
 
 
+DWORD WINAPI  Dowmloadfile::WebDownloadThread(LPVOID lpVoid)
+{
+    CString CS_Info;
+    Dowmloadfile *pParent = (Dowmloadfile *)lpVoid;
+#ifdef ENABLE_HTTP_FUCTION
+    StrGetProductID str_web_info = { 0 };
+    int nret = https_get(m_product_isp_auto_flash.product_class_id, str_web_info);
+    Sleep(1);
+    if (nret < 0)
+    {
+        AfxMessageBox(str_web_info.cs_results);
+    }
+    else if(nret == 1)
+    {
+        CString temp_firmware_name;
+        StrGetFileInfo str_file_info = { 0 };
+        int file_info_ret = https_get_file(m_product_isp_auto_flash.product_class_id, str_file_info);
+        if (file_info_ret == 1)
+        {
+            temp_firmware_name = str_file_info.k_file_name.tValue.cs_value;
+        }
+        else
+        {
+            CS_Info.Format(_T("Read firmware file information from the website failed!"));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+            goto web_download_end;
+        }
+        CString cs_temp;
+        CString DesDownloadFilePath;
+        cs_temp.Format(_T("Firmware file information"));
+        pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), cs_temp);
+
+        cs_temp.Format(_T("%s : %d\r\n "), str_web_info.k_productID.KeyName, str_web_info.k_productID.tValue.n_value);
+        pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), cs_temp);
+
+        cs_temp.Format(_T("%s : %.1f\r\n "), str_web_info.k_softwareVer.KeyName, str_web_info.k_softwareVer.tValue.f_value);
+        pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), cs_temp);
+
+        cs_temp.Format(_T("%s : %s\r\n "), str_web_info.k_updatedAt.KeyName, str_web_info.k_updatedAt.tValue.cs_value);
+        pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), cs_temp);
+
+        CString product_class_id;
+        product_class_id.Format(_T("%d"), m_product_isp_auto_flash.product_class_id);
+        CString T3000FtpPath;
+        T3000FtpPath = _T(" https://api.bravocontrols.com/customerProduct/") + product_class_id + _T("/firmware/download");
+
+        //temp_firmware_name.Format(_T("Pid%d_rev%.1f.hex"), m_product_isp_auto_flash.product_class_id, str_web_info.k_softwareVer.tValue.f_value);
+        
+        DesDownloadFilePath = Folder_Path + _T("\\") + temp_firmware_name  /*strFileName*/;
+
+
+        HRESULT download_ret = NULL;
+        CBindCallback cbc;
+        cbc.m_pdlg = pParent;
+        DeleteUrlCacheEntry(T3000FtpPath); // 清理缓存
+        Sleep(2000);
+        int retry_count_hex = 0;
+        while (retry_count_hex<10)
+        {
+            download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.下载到指定目录，并记录目录位置;
+            if (download_ret != S_OK)
+            {
+                retry_count_hex++;
+                CS_Info.Format(_T("Network is not stable, download file is interrupted, retry(%d / 10)."), retry_count_hex);
+                pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            }
+            else
+                break;
+        }
+        if (download_ret == S_OK)
+        {
+            /*GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, CheckVersionIniFilePath);
+            CString temp_version;
+            temp_version.Format(_T("%u"), ftp_version_date);
+            WritePrivateProfileStringW(_T("LastUpdateTime"), str_product_section, temp_version, CheckVersionIniFilePath);*/
+            pParent->download_file_name = DesDownloadFilePath;
+            CS_Info.Format(_T("Download finished."));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+
+
+        }
+        else
+        {
+            CS_Info.Format(_T("Download failed!"));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+            goto web_download_end;
+        }
+        ::PostMessage(downloadfile_hwnd, WM_DOWNLOADFILE_MESSAGE, DOWNLOAD_CLOSE_SOCKET, NULL);
+
+    }
+
+
+
+web_download_end:
+
+    hDownloadWebThread = NULL;
+    pParent->m_static_persent.ShowWindow(SW_HIDE);
+    pParent->GetDlgItem(IDC_PROGRESS_FTP_DOWNLOAD)->ShowWindow(SW_HIDE);
+
+    return true;
+#endif
+
+    hDownloadWebThread = NULL;
+    return true;
+}
+
 DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
 {
-    //Write_Config_Info
     Dowmloadfile *pParent = (Dowmloadfile *)lpVoid;
     CString CS_Info;
     CBindCallback cbc;
@@ -1077,13 +1203,13 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
 
     if (temp_download_path.IsEmpty())  //此产品没有找到对应的下载目录;
     {
-        CS_Info.Format(_T("Can't find the firmware file on the webside."));
+        CS_Info.Format(_T("Can't find the firmware file on the website."));
         pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
         pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
         goto ftp_download_end;
     }
 
-    T3000FtpPath = _T("https://www.temcocontrols.com/ftp/firmware/") + temp_download_path;
+    T3000FtpPath = _T("https://temcocontrols.com/ftp/firmware/") + temp_download_path;
 
 
     strFileName  = PathFindFileName(T3000FtpPath);  //根据组合的下载路径，获取最后得文件名
@@ -1094,7 +1220,7 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     //若存在 版本信息文件路径 就去下载并显示出来;
     if (temp_revision_path.IsEmpty() == false)
     {
-        revisionFtpPath = _T("https://www.temcocontrols.com/ftp/firmware/") + temp_revision_path;
+        revisionFtpPath = _T("https://temcocontrols.com/ftp/firmware/") + temp_revision_path;
         strFileName = PathFindFileName(revisionFtpPath);  //根据组合的下载路径，获取最后得文件名
         DesDownloadRevisionPath = Folder_Path + _T("\\") + strFileName;
 
@@ -1131,6 +1257,13 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
 
             delete pBuf;
         }
+        else
+        {
+            CS_Info.Format(_T("Download failed!"));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+            goto ftp_download_end;
+        }
     }
 
     if ((local_version_date == ftp_version_date) && (ftp_version_date != 0) && tempfind.FindFile(DesDownloadFilePath))  //与FTP上相等 并且存在;
@@ -1144,16 +1277,20 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     {
         DeleteUrlCacheEntry(T3000FtpPath); // 清理缓存
         Sleep(2000);
-
-        download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.下载到指定目录，并记录目录位置;
-        if (download_ret == S_FALSE)
+        int retry_count_hex = 0;
+        while (retry_count_hex<10)
         {
-            CS_Info.Format(_T("Download failded!"));
-            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
-            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
-            goto ftp_download_end;
+            download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.下载到指定目录，并记录目录位置;
+            if (download_ret != S_OK)
+            {
+                retry_count_hex++;
+                CS_Info.Format(_T("Network is not stable, download file is interrupted, retry(%d / 10)."), retry_count_hex);
+                pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            }
+            else
+                break;
         }
-        else
+        if (download_ret == S_OK)
         {
             //GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, CheckVersionIniFilePath);
             CString temp_version;
@@ -1163,6 +1300,15 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
             CS_Info.Format(_T("Download finished."));
             pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
             pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+
+
+        }
+        else
+        {
+            CS_Info.Format(_T("Download failed!"));
+            pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+            pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+            goto ftp_download_end;
         }
     }
 
@@ -1390,9 +1536,6 @@ void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 
 void Dowmloadfile::OnBnClickedButton1()
 {
-	
-
-
 	CString temp_folder_path;
 	CString ApplicationFolder;
 	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);

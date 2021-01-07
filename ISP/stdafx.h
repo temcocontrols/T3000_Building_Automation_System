@@ -69,6 +69,9 @@ INPUT void SetCommunicationType(int nType);
 INPUT int GetCommunicationType();
 INPUT void SetResponseTime(unsigned short Time);
 
+#define isp_max(a,b)    (((a) > (b)) ? (a) : (b))
+#define isp_min(a,b)    (((a) < (b)) ? (a) : (b))
+
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 
 #ifdef _UNICODE

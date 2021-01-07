@@ -54,7 +54,7 @@
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\T3000 Output\debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\T3000 Output\T3000 object\debug\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</EmbedManifest>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\T3000 object\release\</IntDir>
@@ -186,6 +186,7 @@
     <ClCompile Include="BacnetSettingBasicInfo.cpp" />
     <ClCompile Include="BacnetSettingDyndns.cpp" />
     <ClCompile Include="BacnetSettingHealth.cpp" />
+    <ClCompile Include="BacnetSettingParamter.cpp" />
     <ClCompile Include="BacnetSettingTcpip.cpp" />
     <ClCompile Include="BacnetSettingTime.cpp" />
     <ClCompile Include="BacnetThirdPartyMain.cpp" />
@@ -198,9 +199,11 @@
     <ClCompile Include="BacnetVarCusRang.cpp" />
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
+    <ClCompile Include="BacnetWeb.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="Bacnet_Range_Msv.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
+    <ClCompile Include="BancetProperty.cpp" />
     <ClCompile Include="BatchSNDlg.cpp" />
     <ClCompile Include="BinFileParser.cpp" />
     <ClCompile Include="BoatMonitorViewer.cpp" />
@@ -242,6 +245,7 @@
     <ClCompile Include="CM5\MyOwnListCtrl.cpp" />
     <ClCompile Include="CM5\PointItem.cpp" />
     <ClCompile Include="CO2NetView.cpp" />
+    <ClCompile Include="CO2_AUTO_CALIBRATION.cpp" />
     <ClCompile Include="CO2_NodeView.cpp" />
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="ConfigFileHandler.cpp" />
@@ -251,6 +255,7 @@
     <ClCompile Include="CustomSource\Splash.cpp" />
     <ClCompile Include="CustomSTable.cpp" />
     <ClCompile Include="BacnetView.cpp" />
+    <ClCompile Include="CWebBrowser2.cpp" />
     <ClCompile Include="DebugWindow.cpp" />
     <ClCompile Include="DetectOnlineDlg.cpp" />
     <ClCompile Include="DisplayConfig.cpp" />
@@ -353,10 +358,12 @@
     <ClCompile Include="TrendLogWnd.cpp" />
     <ClCompile Include="TroubleShootDlg.cpp" />
     <ClCompile Include="TstatAQ.cpp" />
+    <ClCompile Include="TstatAQI_Detail.cpp" />
     <ClCompile Include="TstatIconSetting.cpp" />
     <ClCompile Include="TStatInputView.cpp" />
     <ClCompile Include="TStatOutputView.cpp" />
     <ClCompile Include="TstatRangeDlg.cpp" />
+    <ClCompile Include="TstatSetpointDetail.cpp" />
     <ClCompile Include="TstatZigbeeLogic.cpp" />
     <ClCompile Include="TStat_Dev.cpp" />
     <ClCompile Include="TStat_Net.cpp" />
@@ -536,6 +543,7 @@
     <ClInclude Include="BacnetSettingBasicInfo.h" />
     <ClInclude Include="BacnetSettingDyndns.h" />
     <ClInclude Include="BacnetSettingHealth.h" />
+    <ClInclude Include="BacnetSettingParamter.h" />
     <ClInclude Include="BacnetSettingTcpip.h" />
     <ClInclude Include="BacnetSettingTime.h" />
     <ClInclude Include="BacnetThirdPartyMain.h" />
@@ -548,9 +556,11 @@
     <ClInclude Include="BacnetVarCusRang.h" />
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
+    <ClInclude Include="BacnetWeb.h" />
     <ClInclude Include="Bacnet_Include.h" />
     <ClInclude Include="Bacnet_Range_Msv.h" />
     <ClInclude Include="BADO\BADO.h" />
+    <ClInclude Include="BancetProperty.h" />
     <ClInclude Include="BatchSNDlg.h" />
     <ClInclude Include="BinFileParser.h" />
     <ClInclude Include="BoatMonitorViewer.h" />
@@ -602,6 +612,7 @@
     <ClInclude Include="CM5\ud_str.h" />
     <ClInclude Include="CM5\user_data.h" />
     <ClInclude Include="CO2NetView.h" />
+    <ClInclude Include="CO2_AUTO_CALIBRATION.h" />
     <ClInclude Include="CO2_Node.h" />
     <ClInclude Include="CO2_NodeView.h" />
     <ClInclude Include="CO2_View.h" />
@@ -610,6 +621,7 @@
     <ClInclude Include="CControlBasicEditorCOM.h" />
     <ClInclude Include="CRange0.h" />
     <ClInclude Include="CustomSTable.h" />
+    <ClInclude Include="CWebBrowser2.h" />
     <ClInclude Include="CWorkbook0.h" />
     <ClInclude Include="CWorkbooks0.h" />
     <ClInclude Include="CWorksheet0.h" />
@@ -684,10 +696,12 @@
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="TroubleShootDlg.h" />
     <ClInclude Include="TstatAQ.h" />
+    <ClInclude Include="TstatAQI_Detail.h" />
     <ClInclude Include="TstatIconSetting.h" />
     <ClInclude Include="TStatInputView.h" />
     <ClInclude Include="TStatOutputView.h" />
     <ClInclude Include="TstatRangeDlg.h" />
+    <ClInclude Include="TstatSetpointDetail.h" />
     <ClInclude Include="TstatZigbeeLogic.h" />
     <ClInclude Include="Tstat_HelpDoc.h" />
     <ClInclude Include="AddBuilding.h" />
@@ -785,7 +799,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties _x007B_E8789EA8-CA99-48DF-B920-1A1DCB4FF6AD_x007D_="CForms1" _x007B_3A2B370C-BA0A-11D1-B137-0000F8753F5D_x007D_="CMschart1" RESOURCE_FILE="T3000.rc" _x007B_6262D3A0-531B-11CF-91F6-C2863C385E30_x007D_="CMsflexgrid1" _x007B_232E456A-87C3-11D1-8BE3-0000F8754DA1_x007D_="CMonthview1" />
+      <UserProperties _x007B_E8789EA8-CA99-48DF-B920-1A1DCB4FF6AD_x007D_="CForms1" _x007B_8856F961-340A-11D0-A96B-00C04FD705A2_x007D_="CWebBrowser2" _x007B_3A2B370C-BA0A-11D1-B137-0000F8753F5D_x007D_="CMschart1" RESOURCE_FILE="T3000.rc" _x007B_6262D3A0-531B-11CF-91F6-C2863C385E30_x007D_="CMsflexgrid1" _x007B_232E456A-87C3-11D1-8BE3-0000F8754DA1_x007D_="CMonthview1" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

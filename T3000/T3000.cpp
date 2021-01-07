@@ -3,30 +3,21 @@
 //
 
 #include "stdafx.h"
-#include "afxwinappex.h"
 #include "T3000.h"
-#include "MainFrm.h"
 #include "T3000DefaultView.h"
 #include "T3000Doc.h"
 #include "T3000View.h"
-#include "DialogCM5_BacNet.h"
 
 #include "LoginDlg.h"
-
 #include "iniFile.h"
-#include "afxinet.h"
-#include "T3000DefaultView.h"
-#include "bado/BADO.h"
+
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
  
 #include <windows.h>  
-#include <tchar.h> 
+ 
 
-typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);  
-
-LPFN_ISWOW64PROCESS fnIsWow64Process;  
-const unsigned int g_versionNO= 20191126;
+const unsigned int g_versionNO= 20210104;
 
 
 #ifdef _DEBUG
@@ -34,7 +25,7 @@ const unsigned int g_versionNO= 20191126;
 #endif
 
 #include "global_variable.h"
-ULONG_PTR g_gdiplusToken;
+
 BEGIN_MESSAGE_MAP(CT3000App, CWinAppEx)
 	ON_COMMAND(ID_APP_ABOUT, &CT3000App::OnAppAbout)
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
@@ -70,111 +61,23 @@ CT3000App::CT3000App()
 
 	m_lastinterface=19;
 }
+
 // The one and only CT3000App object
 CT3000App theApp;
 
-UINT UpdateT3000Background(LPVOID pParam)
-{
-  CT3000App* T3000App = (CT3000App*)pParam;
-  TCHAR exeFullPath[MAX_PATH+1]; //
-  GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
-  (_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
-
-return TRUE;
-}
-
-
-BOOL CT3000App::IsWow64()  
-{  
-    BOOL bIsWow64 = FALSE;  
-
-    //IsWow64Process is not available on all supported versions of Windows.  
-    //Use GetModuleHandle to get a handle to the DLL that contains the function  
-    //and GetProcAddress to get a pointer to the function if available.  
-
-    fnIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress(  
-        GetModuleHandle(TEXT("kernel32")),"IsWow64Process");  
-
-    if(NULL != fnIsWow64Process)  
-    {  
-        if (!fnIsWow64Process(GetCurrentProcess(),&bIsWow64))  
-        {  
-            //handle error  
-        }  
-    }  
-    return bIsWow64;  
-}  
-
-BOOL CT3000App::user_login()
-{
-	BOOL bRet=FALSE;
-	CLoginDlg dlg(bRet);
-	dlg.DoModal();
-	if(g_buser_log_in==false)
-		return false;
-	return true;
-}
-// CT3000App initialization
-BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
-{
-	LPCTSTR   pszDllName   =   OcxFileName   ;			//ActiveX控件的路径及文件名       
-	HINSTANCE   hLib   =   LoadLibrary(pszDllName);    //装载ActiveX控件   
-	if   (hLib   <   (HINSTANCE)HINSTANCE_ERROR)   
-	{   
-		return   FALSE;   
-	}   
-	FARPROC   lpDllEntryPoint;     
-	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));     //获取注册函数DllRegisterServer地址   
-	if(lpDllEntryPoint!=NULL)														 //调用注册函数DllRegisterServer   
-	{   
-		if(FAILED((*lpDllEntryPoint)()))   
-		{//   AfxMessageBox(_T("false"));
-			FreeLibrary(hLib);   
-			return   FALSE;   
-			
-		}   
-		return   TRUE;   
-	}   
-	else   
-	{
-	//	AfxMessageBox(_T("false"));
-			return   FALSE;
-
-
-	}
-	
-}
- 
-
-
 void CT3000App::UpdateDB()
 {
-    BOOL is_update = FALSE;
     CppSQLite3DB SqliteDBT3000;
     SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath); 
-    CppSQLite3Query q;
-    q = SqliteDBT3000.execQuery("Select * from Version");
-    int version =0;
-    while(!q.eof())
-    {
-        int tempversion = q.getIntField("VersionNO");
-        if (tempversion !=0)
-        {
-            version = tempversion;
-        }
-        q.nextRow();
-    }
+    CppSQLite3Query q = SqliteDBT3000.execQuery("SELECT * from Version ORDER BY VersionNO DESC");
+    int version = q.getIntField("VersionNO");
     q.finalize();
     SqliteDBT3000.closedb();
-    if (version <g_versionNO)
-    {
-        is_update = TRUE;
-    }
+
+	BOOL is_update = (version < g_versionNO);
     if (is_update)
     {
-		CppSQLite3DB SqliteDBT3000;
 		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-		CppSQLite3Query q;
 		q = SqliteDBT3000.execQuery("Select * from Building_ALL");
 		Building_ALL stemp_building_all;
 		while (!q.eof())
@@ -246,10 +149,10 @@ void CT3000App::UpdateDB()
 		for (int i = 0 ;i<m_Building_ALL.size();i++)
 		{
 			StrSql.Format(_T("Insert Into Building_ALL(Building_Name,Default_Build,Telephone,Address)  Values('%s',%d,'%s','%s')"),
-				m_Building_ALL.at(i).Building_Name
-				, m_Building_ALL.at(i).Default_Building
-				, m_Building_ALL.at(i).Telephone
-				, m_Building_ALL.at(i).Address);
+				m_Building_ALL[i].Building_Name
+				, m_Building_ALL[i].Default_Building
+				, m_Building_ALL[i].Telephone
+				, m_Building_ALL[i].Address);
 			SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
 		}
 
@@ -259,24 +162,24 @@ void CT3000App::UpdateDB()
 		for (int j=0;j<m_Building.size();j++)
 		{
 			StrSql.Format(_T("Insert Into Building(Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate,Default_SubBuilding,Building_Path,Longitude,Elevation,ID,country,state,city,street,ZIP,EngineeringUnits) Values('%s','%s','%s','%s','%s','%s','%s',%d,'%s','%s','%s',%d,'%s','%s','%s','%s','%s','%s')"),
-				m_Building.at(j).Main_BuildingName,
-				m_Building.at(j).Building_Name,
-				m_Building.at(j).Protocal,
-				m_Building.at(j).Com_Port,
-				m_Building.at(j).Ip_Address,
-				m_Building.at(j).Ip_Port,
-				m_Building.at(j).Baudrate,
-				m_Building.at(j).Default_SubBuilding,
-				m_Building.at(j).Building_Path,
-				m_Building.at(j).Longitude,
-				m_Building.at(j).Elevation,
-				m_Building.at(j).ID,
-				m_Building.at(j).country,
-				m_Building.at(j).state,
-				m_Building.at(j).city,
-				m_Building.at(j).street,
-				m_Building.at(j).ZIP,
-				m_Building.at(j).EngineeringUnits);
+				m_Building[j].Main_BuildingName,
+				m_Building[j].Building_Name,
+				m_Building[j].Protocal,
+				m_Building[j].Com_Port,
+				m_Building[j].Ip_Address,
+				m_Building[j].Ip_Port,
+				m_Building[j].Baudrate,
+				m_Building[j].Default_SubBuilding,
+				m_Building[j].Building_Path,
+				m_Building[j].Longitude,
+				m_Building[j].Elevation,
+				m_Building[j].ID,
+				m_Building[j].country,
+				m_Building[j].state,
+				m_Building[j].city,
+				m_Building[j].street,
+				m_Building[j].ZIP,
+				m_Building[j].EngineeringUnits);
 			SqliteDBT3000.execDML((UTF8MBSTR)StrSql);
 		}
 		SqliteDBT3000.closedb();
@@ -399,13 +302,6 @@ BOOL CT3000App::InitInstance()
 #if 1	
 		try
 		{
-
-			TCHAR exeFullPath[MAX_PATH+1]; //
-			GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
-			(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
-			g_strDatabasefilepath=exeFullPath;//
-			g_strExePth=g_strDatabasefilepath;//
-
             CreateDirectory(g_strExePth + _T("ResourceFile"), NULL);//creat database folder;//
             CString cs_update_folder;
             cs_update_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("Update");
@@ -417,34 +313,41 @@ BOOL CT3000App::InitInstance()
 			g_achive_folder_temp_txt = g_achive_folder + _T("\\") + _T("prg_txt_file");
 			g_achive_folder_temp_db = g_achive_folder + _T("\\") + _T("MonitorDatabaseFolder");
 			g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
-			product_sort_way  = GetPrivateProfileInt(_T("Setting"),_T("ProductSort"),0,g_cstring_ini_path);
+			
+			// Use CIniFile to read and write .ini files
+			CIniFile monitorindexfile(g_cstring_ini_path);
+			product_sort_way = monitorindexfile.GetProfileIntW(_T("Setting"), _T("ProductSort"), 0);
 			if(product_sort_way == 0)
 			{
-				WritePrivateProfileStringW(_T("Setting"),_T("ProductSort"),_T("1"),g_cstring_ini_path);
+				monitorindexfile.WriteProfileStringW(_T("Setting"), _T("ProductSort"), _T("1"));
 				product_sort_way = SORT_BY_CONNECTION;
 			}
 
+#if 0
+            DEBUG_DELAY_TIME = 350;/*GetPrivateProfileInt(_T("Debug"), _T("SEND_COMMAND_DELAY_TIME"), 350, g_cstring_ini_path);
+            if (DEBUG_DELAY_TIME == 350)
+            {
+                WritePrivateProfileStringW(_T("Debug"), _T("SEND_COMMAND_DELAY_TIME"), _T("350"), g_cstring_ini_path);
+            }*/
+#endif
+
 			CString temp_cs_version;
 			temp_cs_version.Format(_T("%d"),T3000_Version);
+			monitorindexfile.WriteProfileStringW(_T("Version"), _T("T3000"), temp_cs_version);
 
-			WritePrivateProfileStringW(_T("Version"),_T("T3000"),temp_cs_version,g_cstring_ini_path);
-
-
-			monitor_ignore_enable = GetPrivateProfileInt(_T("Setting"),_T("EnableMonitorValueIgnore"),0,g_cstring_ini_path);
-			if(monitor_ignore_enable == 0)
+			monitor_ignore_enable = monitorindexfile.GetProfileIntW(_T("Setting"), _T("EnableMonitorValueIgnore"), 0);
+			if (monitor_ignore_enable == 0)
 			{
-				WritePrivateProfileString(_T("Setting"),_T("EnableMonitorValueIgnore"),_T("0"),g_cstring_ini_path);
-				WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMax"),_T("10000000"),g_cstring_ini_path);
-				WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMin"),_T("-100000"),g_cstring_ini_path);
-			}
-			else if(monitor_ignore_enable == 1)
-			{
-				monitor_ignore_max_value = GetPrivateProfileInt(_T("Setting"),_T("MonitorValueIgnoreMax"),1000000,g_cstring_ini_path);
-				monitor_ignore_min_value = GetPrivateProfileInt(_T("Setting"),_T("MonitorValueIgnoreMin"),-100000,g_cstring_ini_path);
+				monitorindexfile.WriteProfileStringW(_T("Setting"), _T("EnableMonitorValueIgnore"), _T("0"));
+				monitorindexfile.WriteProfileStringW(_T("Setting"), _T("MonitorValueIgnoreMax"), _T("10000000"));
+				monitorindexfile.WriteProfileStringW(_T("Setting"), _T("MonitorValueIgnoreMin"), _T("-100000"));
 			}
 
-
-
+			if (monitor_ignore_enable == 1)
+			{
+				monitor_ignore_max_value = monitorindexfile.GetProfileIntW(_T("Setting"), _T("MonitorValueIgnoreMax"), 1000000);
+				monitor_ignore_min_value = monitorindexfile.GetProfileIntW(_T("Setting"), _T("MonitorValueIgnoreMin"), -100000);
+			}
 
 			g_achive_monitor_datatbase_path = g_achive_folder;
 			g_achive_monitor_datatbase_path = g_achive_monitor_datatbase_path + _T("\\MonitorData.mdb");
@@ -526,17 +429,8 @@ BOOL CT3000App::InitInstance()
 				::UnlockResource(hGlobal);   
 				::FreeResource(hGlobal);
 			}
-
-
-		 
-			 
-			
-
-
 		 
 			g_strDatabasefilepath+=_T("Database\\T3000.db");//
-
-
 
 #if 1//如果沒有T3000 的情況下
 
@@ -740,12 +634,13 @@ BOOL CT3000App::InitInstance()
 
 
 		GdiplusStartupInput gdiplusStartupInput;//
+		ULONG_PTR g_gdiplusToken;
 		GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//
 
 
 		 ((CMainFrame*)m_pMainWnd)->InitViews();//
 		CString strTile;
-		strTile.Format(_T("T3000 Building Automation System"));
+        strTile = cs_special_name;
 		strTile+=CurrentT3000Version;
 		m_pMainWnd->SetWindowText(strTile);//
 		m_pMainWnd->ShowWindow(SW_SHOWMAXIMIZED);
@@ -754,7 +649,10 @@ BOOL CT3000App::InitInstance()
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
        m_szAppPath  = g_strExePth;
-       m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
+       if(m_special_customer == 1) //如果是第一个客户 就定义为CPR-1000-Help.chm
+           m_szHelpFile = theApp.m_szAppPath + L"CPR-1000-Help.chm";
+       else
+            m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
 	   m_szTstatHelpFile = theApp.m_szAppPath + L"HelpDoc//" + L"TStat8_Help.chm";
 
 	}
@@ -775,31 +673,9 @@ BOOL CT3000App::InitInstance()
         file.Close();    
         ::UnlockResource(hGlobal);   
         ::FreeResource(hGlobal);
-		CString str_msado;
 		
-		if (IsWow64())
-		{
-			str_msado.Format(_T("%sREG_MSFLXGRD64.bat"), g_strExePth.GetBuffer());
-			::ShellExecute(NULL, _T("open"), str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
-		}
-		else
-		{
-			str_msado.Format(_T("%sREG_MSFLXGRD32.bat"), g_strExePth.GetBuffer());
-			::ShellExecute(NULL, _T("open"), str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
-		}
-		//vcredist_x86.zip
-
-		//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
-		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
-
-
 		AfxMessageBox(_T("Database error! Please restart again ."));
-		//::ShellExecute(NULL, _T("open"), _T("www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip"), _T(""), _T(""), SW_SHOW);
-		//AfxMessageBox(_T("Open'T3000'Again,Please!"));
-
-
 		return TRUE;
-
 	}
 
 	//Create_T3000_log_file();
@@ -822,7 +698,6 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedOk();
 	virtual BOOL OnInitDialog();
 };
@@ -837,7 +712,6 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-	ON_BN_CLICKED(IDC_BUTTON1, &CAboutDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDOK, &CAboutDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
@@ -909,21 +783,7 @@ void CT3000App::InitModeName()
 	}
 	FindClose(hFile);
 }
-// CT3000App message handlers
-void CAboutDlg::OnBnClickedButton1()
-{
-	
-	CString m_strWebLinker;
-	m_strWebLinker.Format(_T("mailto:alex@temcocontrols.com?subject=feedback to temco &body=please add the attachment in the \n%sT3000.log "),g_strExePth);
-	try{
-          ShellExecute(GetSafeHwnd(), NULL,m_strWebLinker,   NULL, NULL,   SW_SHOWNORMAL);
-	}
-	catch(...)
-	{
-		AfxMessageBox(_T("Error:Can't find the email client in your pc!"));
-	}
-	
-}
+
 int CT3000App::ExitInstance()
 {
 	
@@ -968,37 +828,11 @@ BOOL CT3000App::haveRegister()
 
 void CT3000App::GetModulePath()
 {
- 
-
 	TCHAR exeFullPath[MAX_PATH + 1]; //
 	GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
 	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
 	g_strDatabasefilepath = exeFullPath;//
 	g_strExePth = g_strDatabasefilepath;//
-
-	
-}
-
-int CT3000App::GetSoftInstallDays()
-{
-	CFileStatus fileStatus;
-	CTime curTime;
-	CString strPath;
-	CTimeSpan timeSpan;
-
-	curTime=CTime::GetCurrentTime();
-	//strPath=GetModulePath();
-
-	strPath=strPath.Left(strPath.ReverseFind(_T('\\'))+1);
-	strPath+=_T("T3000_Rev2.5.0.99.exe");
-
-//	strPath+=_T("T3000.exe");
-	CFile::GetStatus(strPath,fileStatus);
-
-	//timeSpan=curTime-fileStatus.m_ctime;
-	timeSpan=curTime-fileStatus.m_mtime;//这个是修改时间，不论你CUT，COPY都不会修改的
-
-	return (int)timeSpan.GetDays();
 }
 
 void CT3000App::WriteNumber( CRegKey& key,CStringW valueName,DWORD value )
@@ -1008,15 +842,7 @@ void CT3000App::WriteNumber( CRegKey& key,CStringW valueName,DWORD value )
 
 BOOL CT3000App::ReadNameber( CRegKey& key,CStringW valueName,DWORD& value )
 {
-	DWORD s;
-	if (key.QueryDWORDValue(valueName,s) == ERROR_SUCCESS)
-	{
-		value = s;
-		return TRUE;
-	}else
-	{
-		return FALSE;
-	}
+	return key.QueryDWORDValue(valueName, value) == ERROR_SUCCESS;
 }
 
 void CT3000App::Judgestore()
@@ -1114,6 +940,7 @@ void CT3000App::SetDLLRegAsm(DWORD Last) {
 	WriteNumber(key, _T("T3000"), Last);
 }
 #include "Dowmloadfile.h"
+#include "CWebBrowser2.h"
 extern tree_product	m_product_isp_auto_flash;
 bool update_t3000_only = false;
 void CAboutDlg::OnBnClickedOk()
@@ -1134,7 +961,7 @@ BOOL CAboutDlg::OnInitDialog()
 
 	
 	CString temp_version;
-	temp_version = _T("T3000 Building Automation System") + CurrentT3000Version;
+	temp_version = cs_special_name + CurrentT3000Version;
 	
 	GetDlgItem(IDC_STATIC_ABOUT_INFO)->SetWindowText(temp_version);
 	return TRUE;  // return TRUE unless you set the focus to a control

@@ -60,13 +60,24 @@ void CEreaseDlg::OnBnClickedMyOk()
     int ID=_wtoi(newid);
     if (newid!=g_tstat_id)
     {
-        int ret=write_one(g_tstat_id,6,ID);
-        while (times>=0&&ret<0)
+        int ret = 0;
+        if ((product_register_value[7] == PM_TSTAT9)||
+            (product_register_value[7] == PM_TSTAT8))
         {
-            Sleep(1000);
-            ret=write_one(g_tstat_id,6,ID);
-            --times;
+            int write_ret = 0;
+            write_ret = write_one(g_tstat_id, 639, 0,5);
+            Sleep(200);
         }
+
+            ret = write_one(g_tstat_id, 6, ID);
+            while (times >= 0 && ret<0)
+            {
+                Sleep(1000);
+                ret = write_one(g_tstat_id, 6, ID);
+                --times;
+            }
+
+
 
         if (ret>0)
         {

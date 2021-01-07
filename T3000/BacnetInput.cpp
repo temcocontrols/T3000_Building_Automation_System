@@ -13,13 +13,14 @@
 #include "global_define.h"
 #include "BacnetRange.h"
 #include "MainFrm.h"
+extern tree_product selected_product_Node; // 选中的设备信息;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 static bool show_external =  false;
 CRect Input_rect;
 int INPUT_LIMITE_ITEM_COUNT = 0;
 // CBacnetInput dialog
-#define UPDATE_INPUT_ONE_ITEM_TIMER 3
+
 int changed_input_item = -1; // 用于改变某一列后 ，立即刷新 当前列的其他变化;
 
 IMPLEMENT_DYNAMIC(CBacnetInput, CDialogEx)
@@ -73,9 +74,13 @@ LRESULT  CBacnetInput::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		if((pInvoke->mRow < BAC_INPUT_ITEM_COUNT) && (pInvoke->mRow >= 0))
 		{
-			Post_Refresh_One_Message(g_bac_instance,READINPUT_T3000,
-				pInvoke->mRow,pInvoke->mRow,sizeof(Str_in_point));
-			SetTimer(2,2000,NULL);
+            //if (!SPECIAL_BAC_TO_MODBUS) //不是转Modbus的协议的 就调用下面的刷新单条.
+            if ((!SPECIAL_BAC_TO_MODBUS) && (Bacnet_Private_Device(selected_product_Node.product_class_id))) //不是转Modbus的协议的 就调用下面的刷新单条.)
+            {
+                Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000,
+                    pInvoke->mRow, pInvoke->mRow, sizeof(Str_in_point));
+                SetTimer(2, 2000, NULL);
+            }
 		}
 		//Save_InputData_to_db(pInvoke->mRow);
 	}
@@ -114,8 +119,7 @@ BOOL CBacnetInput::OnInitDialog()
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
    
-
-	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
+	//SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_INPUT_TIME,NULL);
 
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_INPUT_DEFAULT);
 	SetIcon(m_hIcon,TRUE);
@@ -192,7 +196,8 @@ void CBacnetInput::Reload_Unit_Type()
 			}
 		}
 	}
-	else if (bacnet_device_type == TINY_EX_MINIPANEL || bacnet_device_type == MINIPANELARM_TB)
+	else if (bacnet_device_type == TINY_EX_MINIPANEL || 
+             bacnet_device_type == MINIPANELARM_TB)
 	{
 		if (TINYEX_MINIPANEL_IN_A > (int)m_Input_data.size())
 			initial_count = (int)m_Input_data.size();
@@ -208,6 +213,22 @@ void CBacnetInput::Reload_Unit_Type()
 			}
 		}
 	}
+    else if (bacnet_device_type == T3_TB_11I)
+    {
+        if (TB_11I_IN_A > (int)m_Input_data.size())
+            initial_count = (int)m_Input_data.size();
+        else
+            initial_count = TB_11I_IN_A;
+        for (int i = 0;i<initial_count;i++)
+        {
+            if (ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
+            {
+                ListCtrlEx::CStrList strlist;
+                strlist.push_back(Units_Analog_Only);
+                m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);
+            }
+        }
+    }
 	else if(bacnet_device_type == PRODUCT_CM5)
 	{
 		int analog_count;
@@ -239,7 +260,7 @@ void CBacnetInput::Reload_Unit_Type()
 			}
 		}
 	}
-    else if (bacnet_device_type == BACNET_ROUTER)
+    else if (bacnet_device_type == MINIPANELARM_NB)
     {
         if (BACNET_ROUTER_IN_A > (int)m_Input_data.size())
             initial_count = (int)m_Input_data.size();
@@ -293,7 +314,7 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_JUMPER, _T("Signal Type"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
-	m_input_list.InsertColumn(INPUT_EXTERNAL, _T("External"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_EXTERNAL, _T("Type"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_PRODUCT, _T("Product Name"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_EXT_NUMBER, _T("Product Input"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.Setlistcolcharlimit(INPUT_FULL_LABLE,STR_IN_DESCRIPTION_LENGTH -1);
@@ -577,7 +598,8 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 
 LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 {
-
+    //static int test_count1234 = 0;
+    //TRACE(_T("Fresh_Input_List = %d\r\n"), test_count1234++);
 	int Fresh_Item;
 	int isFreshOne = (bool)lParam;
 	int  Minipanel_device = 1;
@@ -629,7 +651,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
     }
     else if (bacnet_device_type == PM_TSTAT_AQ)
     {
-        INPUT_LIMITE_ITEM_COUNT = 11;
+        INPUT_LIMITE_ITEM_COUNT = 32;
         Minipanel_device = 0;
     }
     //else if (bacnet_device_type == BACNET_ROUTER)
@@ -690,7 +712,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	{
 	 
 
-		m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
+		//m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
 		m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
 		m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
 	}
@@ -698,18 +720,18 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	{
 			if(temp_need_show_external)
 			{
-				m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
+				//m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
 				m_input_list.SetColumnWidth(INPUT_PRODUCT,80);
 				m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,80);
 			}
 			else
 			{
-				m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
+				//m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
 				m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
 				m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
 			}
 	}
-
+    m_input_list.SetColumnWidth(INPUT_EXTERNAL, 60);
 
 	if(isFreshOne == (int)REFRESH_ON_ITEM)
 	{
@@ -1039,13 +1061,72 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			//main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
 			//m_input_list.SetItemText(i,INPUT_PANEL,main_sub_panel);
 
-			m_input_list.SetItemText(i,INPUT_EXTERNAL,_T(""));
+            int InputType = 0;
+            if (selected_product_Node.product_class_id == PM_TSTAT10)
+                bacnet_device_type = Device_Basic_Setting.reg.mini_type;
+            InputType = GetInputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1 , m_Input_data.at(i).digital_analog);
+            m_input_list.SetItemText(i, INPUT_EXTERNAL, Output_Type_String[InputType]);
+
+
+			//m_input_list.SetItemText(i,INPUT_EXTERNAL,_T(""));
 			m_input_list.SetItemText(i,INPUT_PRODUCT,_T(""));
 			m_input_list.SetItemText(i,INPUT_EXT_NUMBER,_T(""));
 		}
 
 #pragma endregion External info
 
+        if (selected_product_Node.product_class_id == PM_TSTAT_AQ) //针对Airlab 特殊显示不同的range
+        {
+            if (product_register_value[4] < 106)
+            {
+                if ((i >= 3) && (i < 11))
+                    m_input_list.SetItemText(i, INPUT_UNITE, Airlab_Unit_String[i]);
+            }
+			else
+			{
+				bitset<16> module_type(product_register_sensor_flag[1]);
+				if (product_register_sensor_flag[0] == 0x55) //在出厂写过 传感器标志的情况下，显示是否有传感器
+				{
+					if (i == 2)
+					{
+						if (module_type.test(SENSOR_BIT_CO2) == false)
+						{
+							m_input_list.SetItemText(i, INPUT_RANGE, SensorStatus);
+						}
+					}
+					else if (i == 3)
+					{
+						if (module_type.test(SENSOR_BIT_TVOC) == false)
+						{
+							m_input_list.SetItemText(i, INPUT_RANGE, SensorStatus);
+						}
+					}
+					else if ((i >= 4) && (i <= 13))
+					{
+						if (module_type.test(SENSOR_BIT_PM2_5) == false)
+						{
+							m_input_list.SetItemText(i, INPUT_RANGE, SensorStatus);
+						}
+					}
+					else if (i == 14)
+					{
+						if (module_type.test(SENSOR_BIT_SOUND) == false)
+						{
+							m_input_list.SetItemText(i, INPUT_RANGE, SensorStatus);
+						}
+					}
+					else if (i == 15)
+					{
+						if (module_type.test(SENSOR_BIT_LIGHT) == false)
+						{
+							m_input_list.SetItemText(i, INPUT_RANGE, SensorStatus);
+						}
+					}
+
+				}
+			}
+
+        }
 
 		CString temp_des2;
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).label, (int)strlen((char *)m_Input_data.at(i).label)+1, 
@@ -1291,12 +1372,28 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else if(lCol == INPUT_RANGE)
 	{
+        if (g_selected_product_id == PM_TSTAT_AQ)
+            return;;
+        if (g_selected_product_id == PM_TSTAT10)
+        {
+            if (Device_Basic_Setting.reg.mini_type == T3_OEM)
+            {
+                if((lRow >= 13) && (lRow <= 17))
+                    return;
+            }
+            if (Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
+            {
+                if ((lRow >= 8) && (lRow <= 12))
+                    return;
+            }
+        }
         m_dialog_signal_type = 0xff;
 		BacnetRange dlg;
 
 
         if ((g_protocol == MODBUS_BACNET_MSTP) ||
-            (g_protocol == PROTOCOL_BACNET_IP))// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
+            (g_protocol == PROTOCOL_BACNET_IP) || 
+            (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
         {
            // if (!read_customer_unit)//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
             {
@@ -1420,6 +1517,12 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 					m_input_list.SetItemText(lRow,INPUT_RANGE,Input_Analog_Units_Array[bac_range_number_choose]);		
 					New_CString = Input_Analog_Units_Array[bac_range_number_choose];
 				}
+
+                if ((bac_range_number_choose >= 20) && (bac_range_number_choose <= 24))//选择的是cus range 需要去选择single type
+                {
+                    m_Input_data.at(lRow).decom = m_dialog_signal_type;
+                }
+
 				m_input_list.SetItemText(lRow,INPUT_UNITE,Input_List_Analog_Units[bac_range_number_choose]);	
 				
 				unsigned short temp_cal_value;
@@ -1575,7 +1678,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 
 	switch(nIDEvent)
 	{
-	case 1:
+	case INPUT_REFRESH_DATA_TIMER:
 		{
 			if(offline_mode)
 				break;
@@ -1587,15 +1690,22 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 			else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_INPUT))  )	//GSM连接时不要刷新;
 			{
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-				if((bac_select_device_online)&& (g_protocol == PROTOCOL_BACNET_IP))
-					Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
-				else if((bac_select_device_online) && ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)))
+                if ((bac_select_device_online) && (g_protocol == PROTOCOL_BACNET_IP))
+                {
+                    
+                    Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), BAC_INPUT_GROUP);
+                }
+				else if((bac_select_device_online) && 
+                    ((g_protocol == MODBUS_RS485) || 
+                     (g_protocol == MODBUS_TCPIP) || 
+                     (g_protocol == PROTOCOL_MSTP_TO_MODBUS) ||   //MSTP协议 接 T322 或者 T3-8 这些设备不支持BB的结构，需要用MSTP转Modbus的协议;
+                     (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)))
 				{
 					if(read_each_485_fun_thread == NULL)
 					{
 						hide_485_progress = true;
                         //经常性的在load file 的时候锁死 ，待解决 2019 06 19
-						//::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_IN);//第二个参数 OUT
+						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type, READINPUT_T3000/*BAC_IN*/);//第二个参数 OUT
 					}
 				}
 			}

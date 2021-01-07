@@ -1,20 +1,20 @@
 #pragma once
 #include "stdafx.h"
 
-const int MODBUS_RS485 = 0;
-const int MODBUS_TCPIP = 1;
-const int MODBUS_BACNET_MSTP = 2;
-const int PROTOCOL_BACNET_IP = 3;
-const int PROTOCOL_GSM = 4;
-const int PROTOCOL_REMOTE_IP = 6;
-const int PROTOCOL_BIP_TO_MSTP = 10;
-const int PROTOCOL_MSTP_TO_MODBUS = 11;
-const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;
-const int PROTOCOL_VIRTUAL = 254;
-const int PROTOCOL_UNKNOW = 255;
+#define MODBUS_RS485  0
+#define MODBUS_TCPIP  1
+#define MODBUS_BACNET_MSTP  2
+#define PROTOCOL_BACNET_IP  3
+#define PROTOCOL_GSM  4
+#define PROTOCOL_REMOTE_IP  6
+#define PROTOCOL_BIP_TO_MSTP  10
+#define PROTOCOL_MSTP_TO_MODBUS  11
+#define PROTOCOL_BIP_T0_MSTP_TO_MODBUS  12
+#define PROTOCOL_VIRTUAL  254
+#define PROTOCOL_UNKNOW  255
 
-const int HANDLE_I_AM_MSTP = 0;
-const int HANDLE_I_AM_BIP = 1;
+#define HANDLE_I_AM_MSTP  0
+#define HANDLE_I_AM_BIP  1
 
 struct _Bac_Scan_results_Info
 {
@@ -37,15 +37,15 @@ struct _Bac_Scan_Com_Info
     int device_id;
     int macaddress;
 };
+int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, bool &end_flag);
+int Bacnet_PrivateData_Handle(BACNET_PRIVATE_TRANSFER_DATA * data, bool &end_flag);
+void local_handler_conf_private_trans_ack(
+    uint8_t * service_request,
+    uint16_t service_len,
+    BACNET_ADDRESS * src,
+    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
+int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t readlength, unsigned short *data_out);
+int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_t writelength, unsigned short *data_in);
+int WritePrivateBacnetToModbusCharData(uint32_t deviceid, int16_t start_reg, uint16_t writelength, unsigned char *data_in);
 
-//struct _Bac_Scan_Com_Info
-//{
-//    int device_id;
-//    int macaddress;
-//};
-void LocalIAmHandler(uint8_t * service_request, uint16_t service_len, BACNET_ADDRESS * src);
-void Init_Service_Handlers(void);
-bool Initial_bac(int comport, CString bind_local_ip, int n_baudrate);
-static DWORD WINAPI   _ScanBacnetMSTPThread(LPVOID lpVoid);
-void close_bac_com();
 

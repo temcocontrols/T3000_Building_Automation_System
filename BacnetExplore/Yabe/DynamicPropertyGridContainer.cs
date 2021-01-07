@@ -722,6 +722,565 @@ namespace Utilities
          
     }
 
+    public class BACnetActionCommandConverter : ExpandableObjectConverter
+    {
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,
+                                  System.Type destinationType)
+        {
+            if (destinationType == typeof(BACnetActionCommand))
+                return true;
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        // Call to change the display
+        public override object ConvertTo(ITypeDescriptorContext context,
+                               CultureInfo culture,
+                               object value,
+                               System.Type destinationType)
+        {
+            if (destinationType == typeof(System.String) &&
+                 value is BACnetActionCommand)
+            {
+
+                BACnetActionCommand ac = (BACnetActionCommand)value;
+                
+                return ac.Device_Identifier + ":" + ac.Object_Identifier + ":" + ac.Property_Identifier + ":" + ac.Property_Array_Index + ":" + ac.Property_Value + ":" + ac.Priority + ":" + ac.Post_Delay + ":" + ac.Quit_On_Failure + ":" + ac.Write_Successful; 
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context,
+                              CultureInfo culture, object value)
+        {
+            if (value is string)
+            {
+                return null; //only read
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+    public class BACnetActionListConverter : ExpandableObjectConverter
+    {
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,
+                                  System.Type destinationType)
+        {
+            if (destinationType == typeof(BACnetActionList))
+                return true;
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        // Call to change the display
+        public override object ConvertTo(ITypeDescriptorContext context,
+                               CultureInfo culture,
+                               object value,
+                               System.Type destinationType)
+        {
+            if (destinationType == typeof(System.String) &&
+                 value is BACnetActionList)
+            {
+
+                BACnetActionList al = (BACnetActionList)value;
+                string ret = "";
+                foreach (BACnetActionCommand ac in al.actions)
+                    ret += ac + "\\";//.Device_Identifier + ":" + ac.Object_Identifier + ":" + ac.Property_Identifier + ":" + ac.Property_Array_Index + ":" + ac.Property_Value + ":" + ac.Priority + ":" + ac.Post_Delay + ":" + ac.Quit_On_Failure + ":" + ac.Write_Successful+ "\\";
+                return ret;
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context,
+                              CultureInfo culture, object value)
+        {
+            if (value is string)
+            {
+                return null; //only read
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+    public class BACnetAccumulatorRecordConverter : ExpandableObjectConverter
+    {
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,
+                                  System.Type destinationType)
+        {
+            if (destinationType == typeof(BACnetAccumulatorRecord))
+                return true;
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        // Call to change the display
+        public override object ConvertTo(ITypeDescriptorContext context,
+                               CultureInfo culture,
+                               object value,
+                               System.Type destinationType)
+        {
+            if (destinationType == typeof(System.String) &&
+                 value is BACnetAccumulatorRecord)
+            {
+
+                BACnetAccumulatorRecord spr = (BACnetAccumulatorRecord)value;
+
+                return spr.Timestamp+":"+spr.Present_Value+":"+spr.Accumulated_Value+":"+spr.Accumulator_Status;
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context,
+                              CultureInfo culture, object value)
+        {
+            if (value is string)
+            {
+                return null; //only read
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+    public class BACnetLightingCommandConverter : ExpandableObjectConverter
+    {
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,
+                                  System.Type destinationType)
+        {
+            if (destinationType == typeof(BACnetLightingCommand))
+                return true;
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        // Call to change the display
+        public override object ConvertTo(ITypeDescriptorContext context,
+                               CultureInfo culture,
+                               object value,
+                               System.Type destinationType)
+        {
+            if (destinationType == typeof(System.String) &&
+                 value is BACnetLightingCommand)
+            {
+
+                BACnetLightingCommand lc = (BACnetLightingCommand)value;
+
+                return lc.Operation+":"+lc.Target_Level+":"+lc.Ramp_Rate+":"+lc.Step_Increment+":"+lc.Fade_Time+":"+lc.Priority;
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context,
+                              CultureInfo culture, object value)
+        {
+            if (value is string)
+            {
+                try
+                {
+                    string[] s = (value as String).Split(':');
+                    return new BACnetLightingCommand((BACnetLightingOperation)Enum.Parse(typeof(BACnetLightingOperation), s[0]), Convert.ToSingle(s[1]), Convert.ToSingle(s[2]),Convert.ToSingle(s[3]),Convert.ToUInt32(s[4]),Convert.ToUInt32(s[5]));
+                    
+                }
+                catch { return null; }
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+    public class BACnetAccessRuleConverter : ExpandableObjectConverter
+    {
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,
+                                  System.Type destinationType)
+        {
+            if (destinationType == typeof(BACnetAccessRule))
+                return true;
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        // Call to change the display
+        public override object ConvertTo(ITypeDescriptorContext context,
+                               CultureInfo culture,
+                               object value,
+                               System.Type destinationType)
+        {
+            if (destinationType == typeof(System.String) &&
+                 value is BACnetAccessRule)
+            {
+
+                BACnetAccessRule s = (BACnetAccessRule)value;
+
+                return s;
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context,
+                              CultureInfo culture, object value)
+        {
+            if (value is string)
+            {
+
+                try
+                {
+
+                    return null;
+
+                }
+                catch { return null; }
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+    public class BACnetScaleConverter : ExpandableObjectConverter
+    {
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,
+                                  System.Type destinationType)
+        {
+            if (destinationType == typeof(BACnetScale))
+                return true;
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        // Call to change the display
+        public override object ConvertTo(ITypeDescriptorContext context,
+                               CultureInfo culture,
+                               object value,
+                               System.Type destinationType)
+        {
+            if (destinationType == typeof(System.String) &&
+                 value is BACnetScale)
+            {
+
+                BACnetScale s = (BACnetScale)value;
+
+                return s.Type+":"+s.Value;
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context,
+                              CultureInfo culture, object value)
+        {
+            if (value is string)
+            {        
+                
+                try
+                {
+                    
+                    BACnetScale.choicetype ct;
+                    string[] s = (value as String).Split(':');
+                    Enum.TryParse(s[0], out ct);
+                    
+                    switch (ct)
+                    {
+                        case BACnetScale.choicetype.REAL:
+                            return new BACnetScale(ct, Convert.ToSingle(s[1]));
+                        case BACnetScale.choicetype.INTEGER:
+                            return new BACnetScale(ct, Convert.ToInt32(s[1]));
+                        default:
+                            throw new NotSupportedException();
+
+                    }
+                    
+                }
+                catch { return null; }
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+
+    public class BACnetPrescaleConverter : ExpandableObjectConverter
+    {
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,
+                                  System.Type destinationType)
+        {
+            if (destinationType == typeof(BACnetPrescale))
+                return true;
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        // Call to change the display
+        public override object ConvertTo(ITypeDescriptorContext context,
+                               CultureInfo culture,
+                               object value,
+                               System.Type destinationType)
+        {
+            if (destinationType == typeof(System.String) &&
+                 value is BACnetPrescale)
+            {
+
+                BACnetPrescale ps = (BACnetPrescale)value;
+
+                return ps.Multiplier+":"+ps.Modulo_Divide;
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context,
+                              CultureInfo culture, object value)
+        {
+            if (value is string)
+            {
+                try
+                {
+                    string[] s = (value as String).Split(':');
+                    return new BACnetPrescale(Convert.ToUInt32(s[0]), Convert.ToUInt32(s[1]));
+
+
+                }
+                catch { return null; }
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+    public class BACnetSetpointReferenceConverter : ExpandableObjectConverter
+    {
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,
+                                  System.Type destinationType)
+        {
+            if (destinationType == typeof(BACnetSetpointReference))
+                return true;
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        // Call to change the display
+        public override object ConvertTo(ITypeDescriptorContext context,
+                               CultureInfo culture,
+                               object value,
+                               System.Type destinationType)
+        {
+            if (destinationType == typeof(System.String) &&
+                 value is BACnetSetpointReference)
+            {
+
+                BACnetSetpointReference spr = (BACnetSetpointReference)value;
+
+                return spr.setpoint_reference;
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context,
+                              CultureInfo culture, object value)
+        {
+            if (value is string)
+            {
+                try
+                {
+                    string[] s = (value as String).Split(':');
+
+                    return new BACnetSetpointReference(new BACnetObjectPropertyReference(new BacnetObjectId((BacnetObjectTypes)Enum.Parse(typeof(BacnetObjectTypes), s[0]), Convert.ToUInt16(s[1])), (BacnetPropertyIds)Convert.ToUInt32(s[2]), Convert.ToUInt32(s[3])));
+
+
+                }
+                catch { return null; }
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+    public class BACnetObjectPropertyReferenceConverter : ExpandableObjectConverter
+    {
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,
+                                  System.Type destinationType)
+        {
+            if (destinationType == typeof(BACnetObjectPropertyReference))
+                return true;
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        // Call to change the display
+        public override object ConvertTo(ITypeDescriptorContext context,
+                               CultureInfo culture,
+                               object value,
+                               System.Type destinationType)
+        {
+            if (destinationType == typeof(System.String) &&
+                 value is BACnetObjectPropertyReference)
+            {
+
+                BACnetObjectPropertyReference opr = (BACnetObjectPropertyReference)value;
+
+                return opr.Object_Identifier +
+                       ":" + opr.Property_Identifier+":"+opr.Array_Index;
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context,
+                              CultureInfo culture, object value)
+        {
+            if (value is string)
+            {
+                try
+                {
+                    string[] s = (value as String).Split(':');
+                    
+                    return new BACnetObjectPropertyReference(new BacnetObjectId((BacnetObjectTypes)Enum.Parse(typeof(BacnetObjectTypes), s[0]), Convert.ToUInt16(s[1])),(BacnetPropertyIds)Convert.ToUInt32(s[2]),Convert.ToUInt32(s[3]));
+                    
+
+                }
+                catch { return null; }
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+    public class BACnetShedLevelConverter : ExpandableObjectConverter
+    {
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,
+                                  System.Type destinationType)
+        {
+            if (destinationType == typeof(BACnetShedLevel))
+                return true;
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        // Call to change the display
+        public override object ConvertTo(ITypeDescriptorContext context,
+                               CultureInfo culture,
+                               object value,
+                               System.Type destinationType)
+        {
+            if (destinationType == typeof(System.String) &&
+                 value is BACnetShedLevel)
+            {
+
+                BACnetShedLevel sl = (BACnetShedLevel)value;
+
+                return sl.Type +
+                       ":" + sl.Value;
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context,
+                              CultureInfo culture, object value)
+        {
+            if (value is string)
+            {
+                try
+                {
+                    string[] s = (value as String).Split(':');
+                    BACnetShedLevel.ShedLevelType type = (BACnetShedLevel.ShedLevelType)Enum.Parse(typeof(BACnetShedLevel.ShedLevelType), s[0]);
+                    switch(type)
+                    {
+                        case BACnetShedLevel.ShedLevelType.PERCENT:
+                        case BACnetShedLevel.ShedLevelType.LEVEL:
+                            return new BACnetShedLevel((BACnetShedLevel.ShedLevelType)Enum.Parse(typeof(BACnetShedLevel.ShedLevelType), s[0]), Convert.ToUInt32(s[1]));
+                        case BACnetShedLevel.ShedLevelType.AMOUNT:
+                            return new BACnetShedLevel((BACnetShedLevel.ShedLevelType)Enum.Parse(typeof(BACnetShedLevel.ShedLevelType), s[0]), Convert.ToSingle(s[1]));
+                        default:
+                            throw new NotSupportedException();
+
+                    }
+
+                    
+                }
+                catch { return null; }
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
     public class BacnetObjectIdentifierConverter : ExpandableObjectConverter
     {
 
@@ -813,7 +1372,7 @@ namespace Utilities
           }
 
         public override object ConvertFrom(ITypeDescriptorContext context,
-                      CultureInfo culture, object value)
+                              CultureInfo culture, object value)
         {
             if (value is string)
             {
@@ -821,13 +1380,21 @@ namespace Utilities
                 {
                     // A realy hidden service !!!
                     // and remember that PRESENT_VALUE = 85
-                    // entry like OBJECT_ANALOG_INPUT:0:85
+                    // entry like OBJECT_ANALOG_INPUT:0:85 or OBJECT_ANALOG_INPUT:0:85:478 for device 478
                     //
                     string[] s = (value as String).Split(':');
-                    return new BacnetDeviceObjectPropertyReference(
-                            new BacnetObjectId((BacnetObjectTypes)Enum.Parse(typeof(BacnetObjectTypes), s[0]), Convert.ToUInt16(s[1])), 
-                            (BacnetPropertyIds)Convert.ToUInt16(s[2])
-                    );
+                    if (s.Length == 4)
+                        return new BacnetDeviceObjectPropertyReference(
+                                new BacnetObjectId((BacnetObjectTypes)Enum.Parse(typeof(BacnetObjectTypes), s[0]), Convert.ToUInt16(s[1])),
+                                (BacnetPropertyIds)Convert.ToUInt16(s[2]), new BacnetObjectId(BacnetObjectTypes.OBJECT_DEVICE, Convert.ToUInt32(s[3]))
+
+                        );
+                    if (s.Length == 3)
+                        return new BacnetDeviceObjectPropertyReference(
+                                new BacnetObjectId((BacnetObjectTypes)Enum.Parse(typeof(BacnetObjectTypes), s[0]), Convert.ToUInt16(s[1])),
+                                (BacnetPropertyIds)Convert.ToUInt16(s[2])
+                        );
+                    return null;
                 }
                 catch { return null; }
             }
@@ -1239,9 +1806,21 @@ namespace Utilities
             TypeDescriptor.AddAttributes(typeof(BacnetDeviceObjectPropertyReference), new TypeConverterAttribute(typeof(BacnetDeviceObjectPropertyReferenceConverter)));
             TypeDescriptor.AddAttributes(typeof(BacnetObjectId), new TypeConverterAttribute(typeof(BacnetObjectIdentifierConverter)));
             TypeDescriptor.AddAttributes(typeof(BacnetBitString), new TypeConverterAttribute(typeof(BacnetBitStringConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetScale), new TypeConverterAttribute(typeof(BACnetScaleConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetActionCommand), new TypeConverterAttribute(typeof(BACnetActionCommandConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetActionList), new TypeConverterAttribute(typeof(BACnetActionListConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetAccumulatorRecord), new TypeConverterAttribute(typeof(BACnetAccumulatorRecordConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetLightingCommand), new TypeConverterAttribute(typeof(BACnetLightingCommandConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetAccessRule), new TypeConverterAttribute(typeof(BACnetAccessRuleConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetScale), new TypeConverterAttribute(typeof(BACnetScaleConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetPrescale), new TypeConverterAttribute(typeof(BACnetPrescaleConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetSetpointReference), new TypeConverterAttribute(typeof(BACnetSetpointReferenceConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetObjectPropertyReference), new TypeConverterAttribute(typeof(BACnetObjectPropertyReferenceConverter)));
+            TypeDescriptor.AddAttributes(typeof(BACnetShedLevel), new TypeConverterAttribute(typeof(BACnetShedLevelConverter)));
+
         }
 
-		public CustomPropertyDescriptor(ref CustomProperty myProperty, Attribute [] attrs) :base(myProperty.Name, attrs)
+        public CustomPropertyDescriptor(ref CustomProperty myProperty, Attribute [] attrs) :base(myProperty.Name, attrs)
 		{
 			m_Property = myProperty;
 		}
@@ -1331,7 +1910,7 @@ namespace Utilities
                 if (m_Property.Options != null) return new DynamicEnumConverter(m_Property.Options);
                 else if (m_Property.Type == typeof(float)) return new CustomSingleConverter();
                 else if (m_Property.bacnetApplicationTags == BacnetApplicationTags.BACNET_APPLICATION_TAG_TIME) return new BacnetTimeConverter();
-
+                
                 // A lot of classic Bacnet Enum
                 BacnetPropertyReference bpr = (BacnetPropertyReference)m_Property.Tag;
                 switch ((BacnetPropertyIds)bpr.propertyIdentifier)
@@ -1347,6 +1926,12 @@ namespace Utilities
                     case BacnetPropertyIds.PROP_POLARITY:
                         return new BacnetEnumValueConverter(new BacnetPolarity());
                     case BacnetPropertyIds.PROP_UNITS:
+                    case BacnetPropertyIds.PROP_OUTPUT_UNITS:
+                    case BacnetPropertyIds.PROP_CONTROLLED_VARIABLE_UNITS:
+                    case BacnetPropertyIds.PROP_PROPORTIONAL_CONSTANT_UNITS:
+                    case BacnetPropertyIds.PROP_INTEGRAL_CONSTANT_UNITS:
+                    case BacnetPropertyIds.PROP_DERIVATIVE_CONSTANT_UNITS:
+                    case BacnetPropertyIds.PROP_CAR_LOAD_UNITS:
                         return new BacnetEnumValueConverter(new BacnetUnitsId());
                     case BacnetPropertyIds.PROP_RELIABILITY:
                         return new BacnetEnumValueConverter(new BacnetReliability());
@@ -1371,11 +1956,61 @@ namespace Utilities
                     case BacnetPropertyIds.PROP_PROGRAM_STATE:
                         return new BacnetEnumValueConverter(new BacnetProgramState());
                     case BacnetPropertyIds.PROP_REASON_FOR_HALT:
-                        return new BacnetEnumValueConverter(new BacnetReasonForHalt());
+                        return new BacnetEnumValueConverter(new BACnetProgramError());
                     case BacnetPropertyIds.PROP_BACKUP_AND_RESTORE_STATE:
                         return new BacnetEnumValueConverter(new BACnetBackupState());
                     case BacnetPropertyIds.PROP_FILE_ACCESS_METHOD:
                         return new BacnetEnumValueConverter(new BacnetFileAccessMethod());
+                    case BacnetPropertyIds.PROP_DOOR_STATUS:
+                    case BacnetPropertyIds.PROP_LOCK_STATUS:
+                    case BacnetPropertyIds.PROP_CAR_DOOR_STATUS:
+                        return new BacnetEnumValueConverter(new BACnetDoorStatus());
+                    case BacnetPropertyIds.PROP_CREDENTIAL_DISABLE:
+                        return new BacnetEnumValueConverter(new BACnetAccessCredentialDisable());
+                    case BacnetPropertyIds.PROP_OCCUPANCY_STATE:
+                        return new BacnetEnumValueConverter(new BACnetAccessZoneOccupancyState());
+                    case BacnetPropertyIds.PROP_AUTHENTICATION_STATUS:
+                        return new BacnetEnumValueConverter(new BACnetAuthenticationStatus());
+                    case BacnetPropertyIds.PROP_ESCALATOR_MODE:
+                        return new BacnetEnumValueConverter(new BACnetEscalatorMode());
+                    case BacnetPropertyIds.PROP_BACNET_IP_MODE:
+                        return new BacnetEnumValueConverter(new BACnetIPMode());
+                    case BacnetPropertyIds.PROP_MAINTENANCE_REQUIRED:
+                        return new BacnetEnumValueConverter(new BACnetMaintenance());
+                    case BacnetPropertyIds.PROP_NETWORK_NUMBER_QUALITY:
+                        return new BacnetEnumValueConverter(new BACnetNetworkNumberQuality());
+                    case BacnetPropertyIds.PROP_COMMAND:
+                        return new BacnetEnumValueConverter(new BACnetNetworkPortCommand());
+                    case BacnetPropertyIds.PROP_NETWORK_TYPE:
+                        return new BacnetEnumValueConverter(new BACnetNetworkType());
+                    case BacnetPropertyIds.PROP_BASE_DEVICE_SECURITY_POLICY:
+                        return new BacnetEnumValueConverter(new BACnetSecurityLevel());
+                    case BacnetPropertyIds.PROP_PROTOCOL_LEVEL:
+                        return new BacnetEnumValueConverter(new BACnetProtocolLevel());
+                    case BacnetPropertyIds.PROP_SILENCED:
+                        return new BacnetEnumValueConverter(new BACnetSilencedState());
+                    case BacnetPropertyIds.PROP_TIMER_STATE:
+                        return new BacnetEnumValueConverter(new BACnetTimerState());
+                    case BacnetPropertyIds.PROP_LAST_STATE_CHANGE:
+                        return new BacnetEnumValueConverter(new BACnetTimerTransition());
+                    case BacnetPropertyIds.PROP_WRITE_STATUS:
+                        return new BacnetEnumValueConverter(new BACnetWriteStatus());
+                    case BacnetPropertyIds.PROP_DOOR_ALARM_STATE:
+                        return new BacnetEnumValueConverter(new BACnetDoorAlarmState());
+                    case BacnetPropertyIds.PROP_SECURED_STATUS:
+                        return new BacnetEnumValueConverter(new BACnetDoorSecuredStatus());
+                    case BacnetPropertyIds.PROP_ACCESS_EVENT:
+                    case BacnetPropertyIds.PROP_LAST_ACCESS_EVENT:
+                    case BacnetPropertyIds.PROP_ACCESS_ALARM_EVENTS:
+                    case BacnetPropertyIds.PROP_ACCESS_TRANSACTION_EVENTS:
+                        return new BacnetEnumValueConverter(new BACnetAccessEvents());
+                    case BacnetPropertyIds.PROP_FAULT_TYPE:
+                        return new BacnetEnumValueConverter(new BACnetFaultParameter.BACnetFaultType());
+                    case BacnetPropertyIds.PROP_ACTION:
+                        //because Command Object Type also has PROP_ACTION wich decodes to BACnetActionList
+                        if (m_Property.bacnetApplicationTags != BacnetApplicationTags.BACNET_APPLICATION_CONTEXT_SPECIFIC)
+                            return new BacnetEnumValueConverter(new BACnetAction());
+                        return base.Converter;
                     default:
                         return base.Converter;
                 }
@@ -1418,6 +2053,12 @@ namespace Utilities
                 case BacnetPropertyIds.PROP_POLARITY:
                     return new BacnetEnumValueDisplay(new BacnetPolarity());
                 case BacnetPropertyIds.PROP_UNITS:
+                case BacnetPropertyIds.PROP_OUTPUT_UNITS:
+                case BacnetPropertyIds.PROP_CONTROLLED_VARIABLE_UNITS:
+                case BacnetPropertyIds.PROP_PROPORTIONAL_CONSTANT_UNITS:
+                case BacnetPropertyIds.PROP_INTEGRAL_CONSTANT_UNITS:
+                case BacnetPropertyIds.PROP_DERIVATIVE_CONSTANT_UNITS:
+                case BacnetPropertyIds.PROP_CAR_LOAD_UNITS:
                     return new BacnetEnumValueDisplay(new BacnetUnitsId());
                 case BacnetPropertyIds.PROP_RELIABILITY:
                     return new BacnetEnumValueDisplay(new BacnetReliability());
@@ -1437,6 +2078,7 @@ namespace Utilities
                     return new BacnetEnumValueDisplay(new BACnetBackupState());
                 case BacnetPropertyIds.PROP_FILE_ACCESS_METHOD:
                     return new BacnetEnumValueDisplay(new BacnetFileAccessMethod());
+
 
                 default :
                     return base.GetEditor(editorBaseType);

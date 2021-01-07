@@ -59,7 +59,7 @@ void CZigbeeRepeater::Dump(CDumpContext& dc) const
 void CZigbeeRepeater::Fresh()
 {
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    pFrame->SetWindowTextW(_T("T3000 Building Automation System") + CurrentT3000Version);
+    pFrame->SetWindowTextW(cs_special_name + CurrentT3000Version);
     Initial_List();
     Initial_Moudle_List();
     ((CComboBox *)GetDlgItem(IDC_COMBO_REPEATER_BAUDRATE))->ResetContent();
@@ -182,7 +182,7 @@ void CZigbeeRepeater::Fresh()
                     product_class_id, temp_baudrate, str_n_port, cs_temp_modbusid, str_parents_serial, cs_subdevice_serialnum);
             }
             else
-                strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','" + cs_subdevice_serialnum + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + cs_temp_modbusid + "','""','" + temp_baudrate + "','T3000_Default_Building_PIC.bmp','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','" + cs_subdevice_serialnum + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + cs_temp_modbusid + "','""','" + temp_baudrate + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
            
             SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 

@@ -158,7 +158,7 @@ namespace Yabe
             // add a new one
             lvi.Text = newText;
             lvi.Tag = bopr;
-            lvi.ImageIndex = MainDialog.GetIconNum(bopr.objectIdentifier.type);
+            lvi.ImageIndex = YabeMainDialog.GetIconNum(bopr.objectIdentifier.type);
             listReferences.Items.Add(lvi);
         }
 
@@ -443,12 +443,9 @@ namespace Yabe
 
             if (this.ActiveControl == Schedule)   // In the Schedule List
             {
-                // Do not delete A day entry, only a time schedule entry
-                if ((mySelectedScheduleNode != null) && (mySelectedScheduleNode.Parent != null))
-                {
-                    Schedule.Nodes.Remove(mySelectedScheduleNode);
-                    mySelectedScheduleNode = null;
-                }
+                foreach (TreeNode t in Schedule.SelectedNodes)
+                    if (t.Parent != null)
+                        Schedule.Nodes.Remove(t);
             }
             else
             {
@@ -515,7 +512,7 @@ namespace Yabe
             }
         }
 
-        List<String> StrScheduleCopy;
+        static List<String> StrScheduleCopy; // static to permit copy paste between different schedules
         ListViewItem PropertyReferenceCopy;
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
@@ -689,7 +686,7 @@ namespace Yabe
                 uint ArrayIdx = ASN1.BACNET_ARRAY_ALL;
 
                 if (Reference_Device.Text != "")
-                    device = new BacnetObjectId(BacnetObjectTypes.OBJECT_DEVICE, Convert.ToUInt16(Reference_Device.Text));
+                    device = new BacnetObjectId(BacnetObjectTypes.OBJECT_DEVICE, Convert.ToUInt32(Reference_Device.Text));
                 if (Reference_Array.Text != "")
                     ArrayIdx = Convert.ToUInt16(Reference_Array.Text);
 

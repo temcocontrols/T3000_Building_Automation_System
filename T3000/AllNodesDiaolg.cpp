@@ -18,9 +18,11 @@
 #define AN_ISONLINE 7
 #define AN_PRODUCTTYPE	8
 #define AN_PRODUCTID	9
-#define AN_SCREENID	    10
+//#define AN_SCREENID	    10
+#define AN_IP_ADDRESS	    10
 #define AN_BAUDRATE		11
-#define	AN_GRAPHICID	12
+//#define	AN_GRAPHICID	12
+#define	AN_PROTOCOL     12
 #define AN_HDVERSION	13
 #define AN_SWVERSION	14
 #define AN_EPSIZE		15
@@ -224,7 +226,7 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 	// 		m_productCombox.MoveWindow(rc); //移动到选中格的位置，覆盖		
 	// 	}
 	//	if(m_nCurCol==AN_PRUDUCTNAME||m_nCurCol==AN_ROOMNAME||m_nCurCol==AN_FLOORNAME)
-	if (m_nCurCol > 0 && m_nCurCol != AN_GRAPHICID  && m_nCurCol != AN_MAINNAME)
+	if (m_nCurCol > 0 && /*m_nCurCol != AN_GRAPHICID  &&*/ m_nCurCol != AN_MAINNAME)
 	{
 		m_InputTextEdt.ShowWindow(SW_SHOW);
 
@@ -238,6 +240,7 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 		m_InputTextEdt.MoveWindow(rc); //移动到选中格的位置，覆盖	
 
 	}
+#if 0
 	if (m_nCurCol == AN_GRAPHICID)
 	{
 		CString strFilter = _T("bmp file|*.bmp|jpg file|*.jpg|png file|*.png|tif file|*.tif|all file|*.*||");
@@ -282,6 +285,7 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 			SqliteDBBuilding.closedb();
 		}
 	}
+#endif
 }
 
 void CAllNodesDiaolg::OnCbnSelchangeCombo1()
@@ -503,7 +507,7 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 
 	// SCREEN ID
 	CString strScreenID;
-	strScreenID = m_FlexGrid.get_TextMatrix(nMaxRowIndext, AN_SCREENID);
+	strScreenID = m_FlexGrid.get_TextMatrix(nMaxRowIndext, AN_IP_ADDRESS);
 	if (strScreenID.IsEmpty())
 	{
 		strScreenID = _T("Screen(S:") + strSID + _T("--") + strProID + _T(")");
@@ -525,6 +529,8 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 		}
 	}
 
+    CString strProtocol;
+#if 0
 	// GRAPHIC ID 
 	CString strGraphicID;
 	strGraphicID = m_FlexGrid.get_TextMatrix(nMaxRowIndext, AN_GRAPHICID);
@@ -532,6 +538,7 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	{
 		strGraphicID = _T("Clicking here to add a image");
 	}
+#endif
 
 	// Hard VERSION
 	CString strHdVersion;
@@ -563,7 +570,7 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 
-	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('" + strMainBuildName + "','" + strSubBuildingName + "','" + strSID + "','" + strFloorName + "','" + strRoomName + "','" + strProName + "','" + strProType + "','" + strProID + "','" + strScreenID + "','" + strBaudrate + "','" + strGraphicID + "','" + strHdVersion + "','" + strStVersion + "','" + strCom + "','" + strEPSize + "')"));
+	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('" + strMainBuildName + "','" + strSubBuildingName + "','" + strSID + "','" + strFloorName + "','" + strRoomName + "','" + strProName + "','" + strProType + "','" + strProID + "','" + strScreenID + "','" + strBaudrate + "','" + strProtocol + "','" + strHdVersion + "','" + strStVersion + "','" + strCom + "','" + strEPSize + "')"));
 	try
 	{
 
@@ -616,33 +623,33 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 	m_FlexGrid.put_ColWidth(AN_ROOMNAME, 800);
 
 	m_FlexGrid.put_TextMatrix(0, AN_PRUDUCTNAME, _T("Product Name"));
-	m_FlexGrid.put_ColWidth(AN_PRUDUCTNAME, 1300);
+	m_FlexGrid.put_ColWidth(AN_PRUDUCTNAME, 1800);
 
-	m_FlexGrid.put_TextMatrix(0, AN_ISONLINE, _T("Product Status"));
+	m_FlexGrid.put_TextMatrix(0, AN_ISONLINE, _T("Status"));
 	m_FlexGrid.put_ColWidth(AN_ISONLINE, 600);
 
 	m_FlexGrid.put_TextMatrix(0, AN_PRODUCTTYPE, _T("Product ID"));
-	m_FlexGrid.put_ColWidth(AN_PRODUCTTYPE, 1300);
+	m_FlexGrid.put_ColWidth(AN_PRODUCTTYPE, 1000);
 
 	m_FlexGrid.put_TextMatrix(0, AN_PRODUCTID, _T("Address"));
 	m_FlexGrid.put_ColWidth(AN_PRODUCTID, 700);
 
-	m_FlexGrid.put_TextMatrix(0, AN_SCREENID, _T("Screen ID"));
-	m_FlexGrid.put_ColWidth(AN_SCREENID, 2000);
+	m_FlexGrid.put_TextMatrix(0, AN_IP_ADDRESS, _T("IP Address"));
+	m_FlexGrid.put_ColWidth(AN_IP_ADDRESS, 1300);
 
-	m_FlexGrid.put_TextMatrix(0, AN_BAUDRATE, _T("IP /Baud Rate"));
-	m_FlexGrid.put_ColWidth(AN_BAUDRATE, 1300);
+	m_FlexGrid.put_TextMatrix(0, AN_BAUDRATE, _T("Baud Rate"));
+	m_FlexGrid.put_ColWidth(AN_BAUDRATE, 1000);
 
-	m_FlexGrid.put_TextMatrix(0, AN_GRAPHICID, _T("Graphic Name"));
-	m_FlexGrid.put_ColWidth(AN_GRAPHICID, 1800);
+	m_FlexGrid.put_TextMatrix(0, AN_PROTOCOL, _T("Protocol"));
+	m_FlexGrid.put_ColWidth(AN_PROTOCOL, 1000);
 
-	m_FlexGrid.put_TextMatrix(0, AN_HDVERSION, _T("HardW_Ver"));
-	m_FlexGrid.put_ColWidth(AN_HDVERSION, 1300);
+	m_FlexGrid.put_TextMatrix(0, AN_HDVERSION, _T("HW Ver"));
+	m_FlexGrid.put_ColWidth(AN_HDVERSION, 900);
 
-	m_FlexGrid.put_TextMatrix(0, AN_SWVERSION, _T("SoftW_Ver"));
-	m_FlexGrid.put_ColWidth(AN_SWVERSION, 1300);
+	m_FlexGrid.put_TextMatrix(0, AN_SWVERSION, _T("SW Ver"));
+	m_FlexGrid.put_ColWidth(AN_SWVERSION, 900);
 	m_FlexGrid.put_TextMatrix(0, AN_EPSIZE, _T("EPSize"));
-	m_FlexGrid.put_ColWidth(AN_EPSIZE, 800);
+	m_FlexGrid.put_ColWidth(AN_EPSIZE, 1);
 
 	CppSQLite3DB SqliteDBBuilding;
 	CppSQLite3Table table;
@@ -664,12 +671,13 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 	_variant_t temp_variant;
 	while (!q.eof())
 	{
-
+        unsigned int nserial_number = 0;
 		//m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTTYPE,m_strID);
 
 		++temp_row;
 		m_strID = q.getValuebyName(L"Serial_ID");//
 		SN = m_strID;
+        nserial_number = _wtoi(SN);
 		m_FlexGrid.put_TextMatrix(temp_row, AN_SerialID, m_strID);
 
 		if (!IsOnline(_wtoi(SN)))
@@ -716,9 +724,9 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 
 		m_FlexGrid.put_TextMatrix(temp_row, AN_PRODUCTID, m_strID);
 
-		m_strID = q.getValuebyName(L"Screen_Name");//
+		//m_strID = q.getValuebyName(L"Screen_Name");//
 
-		m_FlexGrid.put_TextMatrix(temp_row, AN_SCREENID, m_strID);
+		
 
 
 
@@ -726,10 +734,24 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 
 		m_FlexGrid.put_TextMatrix(temp_row, AN_BAUDRATE, m_strID);
 
+        CString temp_cs;
+        CStringArray temp_cs_array;
+        temp_cs = m_strID;
+        SplitCStringA(temp_cs_array, temp_cs, _T("."));
+        if (temp_cs_array.GetSize() == 4)
+        {
+            m_FlexGrid.put_TextMatrix(temp_row, AN_IP_ADDRESS, m_strID);
+            m_FlexGrid.put_TextMatrix(temp_row, AN_BAUDRATE, _T(""));
+        }
+        else
+        {
+            m_FlexGrid.put_TextMatrix(temp_row, AN_BAUDRATE, m_strID);
+            m_FlexGrid.put_TextMatrix(temp_row, AN_IP_ADDRESS, _T(""));
+        }
 
-		m_strID = q.getValuebyName(L"Background_imgID");//
+		m_strID = q.getValuebyName(L"Background_imgID");// 这一列更改为 协议
 
-		m_FlexGrid.put_TextMatrix(temp_row, AN_GRAPHICID, m_strID);
+		m_FlexGrid.put_TextMatrix(temp_row, AN_PROTOCOL, m_strID);
 
 
 
@@ -822,15 +844,17 @@ void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
 		if (!pFrame->m_product.at(i).status)
 		{
 			CString strSql;
-			strSql.Format(_T("Delete from ALL_NODE Where Serial_ID = '%d' "), pFrame->m_product.at(i).serial_number);
+			strSql.Format(_T("Delete from ALL_NODE Where Serial_ID = '%u' "), pFrame->m_product.at(i).serial_number);
 			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 		}
 	}
 	SqliteDBBuilding.closedb();
+
+    pFrame->ScanTstatInDB();
 	ReloadAddBuildingDB();
 	m_bChanged = TRUE;
 
-	AfxMessageBox(L"Delete all off line devices ,successfully!");
+	AfxMessageBox(L"Delete all offline devices ,success!");
 
 
 }

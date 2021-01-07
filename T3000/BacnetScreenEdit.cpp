@@ -66,6 +66,8 @@ volatile HANDLE GraphicLable_Mutex = NULL;
 #define YStart 0
 CRect mynew_rect;	//用来存储 窗体应该有多大;
 HANDLE h_read_standard_thread = NULL;
+HANDLE h_refresh_group_thread = NULL;
+HANDLE h_read_all_panel_des_thread = NULL;
 vector <int> screnn_sequence;
 
 bool show_not_exsit_dlg = true;
@@ -205,7 +207,7 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	POINT insert_point;
 	memcpy(&insert_point,(void *)lParam,sizeof(POINT));
 
-	if((strlen(temp_point) == 0) || ((strlen(temp_point) > 16)))
+	if((strlen(temp_point) == 0) || ((strlen(temp_point) > 40)))
 	{
 		if(temp_point!=NULL)
 		{
@@ -221,7 +223,7 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	int temp_panel = -1;
 	int temp_net = -1;
 	int k=0;
-	unsigned char sub_panel = -1;
+	unsigned char sub_panel = 0;
 	char * tempcs=NULL;
 	//int temp1;
 	//tempcs = ispoint(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,Station_NUM,&k);
@@ -236,8 +238,19 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	if(temp_number != 0)	//Vector 里面是 0开始 , 这里如果是INPUT1  那值为1  直接减一 存起来 用;
 		temp_number = temp_number - 1;
 
-    char temp_1 = temp_point_type & 0x1F;
-		if((temp_1 == COIL_REG) || (temp_1 == DIS_INPUT_REG) || (temp_1 == INPUT_REG) || (temp_1 == MB_REG))
+    unsigned char temp_1 = temp_point_type & 0x1F;
+    unsigned char type_highest_2bytes = k & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+    temp_1 = temp_1 | type_highest_2bytes;
+
+		if(
+            (temp_1 == BAC_FLOAT_ABCD) ||
+            (temp_1 == BAC_FLOAT_CDAB) ||
+            (temp_1 == BAC_FLOAT_BADC) ||
+            (temp_1 == BAC_FLOAT_DCBA) ||
+            (temp_1 == COIL_REG) || 
+            (temp_1 == DIS_INPUT_REG) || 
+            (temp_1 == INPUT_REG) || 
+            (temp_1 == MB_REG))
 		{
 			temp_number = temp_number + 1;
 		}
@@ -848,15 +861,19 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 		AfxMessageBox(_T("RegisterHotKey SHIFT + RIGHT failure"));  
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey  RIGHT failure"));  
+#ifdef USE_MOD_SHIFT_DF
 	nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[8],MOD_SHIFT,'M');
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey SHIFT + M failure"));  
+#endif
 #else //release版本   
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[0],MOD_SHIFT,VK_UP); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[1],MOD_SHIFT,VK_DOWN); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[2],MOD_SHIFT,VK_LEFT); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[3],MOD_SHIFT,VK_RIGHT); 
+#ifdef USE_MOD_SHIFT_DF
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[8],MOD_SHIFT,'M'); 
+#endif
 #endif  
 
 	
@@ -878,11 +895,11 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	Invalidate(1);
 	::SetWindowPos(this->m_hWnd,HWND_TOP,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 
-    //if(h_read_all_panel_des_thread == NULL)
-    //   h_read_all_panel_des_thread = CreateThread(NULL, NULL, ReadAllPanelThreadfun, this, NULL, NULL);
+    if(h_read_all_panel_des_thread == NULL)
+       h_read_all_panel_des_thread = CreateThread(NULL, NULL, ReadAllPanelThreadfun, this, NULL, NULL);
+    if(h_refresh_group_thread == NULL)
+       h_refresh_group_thread = CreateThread(NULL, NULL, ReadGroupDataThreadfun, this, NULL, NULL);
 
-    //if(h_refresh_group_thread == NULL)
-    //   h_refresh_group_thread = CreateThread(NULL, NULL, ReadGroupDataThreadfun, this, NULL, NULL);
 
     if(h_read_standard_thread == NULL)
         h_read_standard_thread = CreateThread(NULL, NULL, ReadStandardThreadfun, this, NULL, NULL);
@@ -1050,12 +1067,12 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
                                                     
             }
         }
-        Sleep(3000);
+        Sleep(10000);
 
         //至少让先运行一次，以便下次打开的时候显示非常快速
         if (ScreenEdit_Window == NULL)
         {
-            //h_refresh_group_thread = NULL;
+            h_refresh_group_thread = NULL;
             return true;
         }
     }
@@ -1135,12 +1152,12 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
             Sleep(SEND_COMMAND_DELAY_TIME);
         }
         sort(m_remote_screen_data.begin(), m_remote_screen_data.end(), sort_by_panelnumber);
-        Sleep(1);
+        Sleep(15000);
         //读取所有在线panel的label和description;
 
         if (ScreenEdit_Window == NULL)
         {
-            //h_read_all_panel_des_thread = NULL;
+            h_read_all_panel_des_thread = NULL;
             return true;
         }
     }
@@ -2923,7 +2940,7 @@ void CBacnetScreenEdit::OnCancel()
 	UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[1]);   
 	UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[2]);   
 	UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[3]);		
-	UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[8]);    
+	//UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[8]);    
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	::PostMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
 	

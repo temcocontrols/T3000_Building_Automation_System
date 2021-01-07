@@ -8,7 +8,7 @@ extern bool auto_flash_mode;
 CHexFileParser::CHexFileParser(void)
 {
     m_nHexFileType = HEXFILE_DATA;
-    m_IsRAM=FALSE;
+    m_file_type = HEX_TYPE_ASIX;
 }
 
 CHexFileParser::~CHexFileParser(void)
@@ -54,10 +54,14 @@ int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 		}		
 	}
 
-	if (m_IsRAM)
+	if (m_file_type == HEX_TYPE_ARM_32K)
 	{
 		memcpy(&global_fileInfor,&pBuf[0x8200],sizeof(Bin_Info));
 	} 
+    else if(m_file_type == HEX_TYPE_ARM_64K)
+    {
+        memcpy(&global_fileInfor, &pBuf[0x10200], sizeof(Bin_Info));
+    }
 	else
 	{
 		memcpy(&global_fileInfor,&pBuf[0x100],sizeof(Bin_Info));
@@ -90,8 +94,8 @@ int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 
 }
 
-BOOL CHexFileParser::Is_RAM_HEXType(){
-    return m_IsRAM;
+int CHexFileParser::GetFileType(){
+    return m_file_type;
 }
 
 // 读第7，8个字符，00为Normal，02为扩展，04为扩展线性
@@ -225,6 +229,31 @@ BOOL CHexFileParser::DoCRC( TS_UC* szBuf, int nLen)
 	return TRUE;
 }
 
+int CHexFileParser::GetFileTypeFromLine(const CString& strLine)
+{
+    int temp_type = 0;
+    WORD dwTemp = 0;
+    char ch[128] = { 0 };
+    for (int i = 1; i < strLine.GetLength(); i++)
+    {
+        ch[i - 1] = (char)strLine.GetAt(i);
+    }
+    turn_hex_file_line_to_unsigned_char(ch);
+    TS_UC szBuf[64] = { 0 };
+    turn_int_to_unsigned_char(ch, strLine.GetLength() - 1, szBuf);
+    //dwTemp = szBuf[4]*0x100 + szBuf[5];  杜帆屏蔽
+    dwTemp = szBuf[4] * 256 + szBuf[5];
+    if (dwTemp == 0x0800)
+    {
+        temp_type = HEX_TYPE_ARM_32K;
+    }
+    else if (dwTemp >= 0x0801)
+    {
+        temp_type = HEX_TYPE_ARM_64K;
+    }
+    return temp_type;
+}
+
 WORD CHexFileParser::GetHighAddrFromFile(const CString& strLine)
 {	
 	WORD dwTemp = 0;
@@ -238,10 +267,10 @@ WORD CHexFileParser::GetHighAddrFromFile(const CString& strLine)
 	turn_int_to_unsigned_char(ch, strLine.GetLength()-1, szBuf);
 	//dwTemp = szBuf[4]*0x100 + szBuf[5];  杜帆屏蔽
     dwTemp = szBuf[4] * 256 + szBuf[5];
-    if (dwTemp>=800)
+    if (dwTemp>=0x0800)
     {
         dwTemp-=0x800;
-        m_IsRAM=TRUE;
+        //m_file_type = HEX_TYPE_ARM_32K;
     }
 	return dwTemp;
 }
@@ -405,10 +434,16 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 	char a[256];
 	ZeroMemory(a, 256);
 	
+    int temp_count = 0;
 	//while(NULL!=ar.ReadString(strGetData))	//循环读取文件，直到文件结束
 	while(ReadLineFromFile(hexfile, a))
 	{
-
+        if (temp_count == 0)
+        {
+            temp_count++;
+            CString strTemp(a);
+            m_file_type = GetFileTypeFromLine(strTemp);
+        }
 		// 取得高位地址，可能不止一处扩展
 		if( a[8] == '4') 
 		{
@@ -510,10 +545,10 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 
 		unsigned int ltemp;
 		ltemp=get_hex[1]*256+get_hex[2] + dwHiAddr;
-//         if (m_IsRAM)
-//         {
-//             ltemp-=0x00008000; 
-//         }
+        if (ltemp > nBufLen)
+        {
+            return 0;
+        }
 		for(int j=0;j<get_hex[0];j++)
 			pBuf[ltemp+j]=get_hex[4+j];//get the data
 		if((UINT)nBufCount<(ltemp+get_hex[0]))

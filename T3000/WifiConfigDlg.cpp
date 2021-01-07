@@ -73,6 +73,9 @@ BEGIN_MESSAGE_MAP(CWifiConfigDlg, CDialogEx)
 	ON_EN_KILLFOCUS(IDC_EDIT2, &CWifiConfigDlg::OnEnKillfocusEdit2)
 	//ON_WM_NCPAINT()
 	ON_BN_CLICKED(IDOK, &CWifiConfigDlg::OnBnClickedOk)
+    ON_BN_CLICKED(IDC_RADIO_IP_AUTO, &CWifiConfigDlg::OnBnClickedRadioIpAuto)
+    ON_BN_CLICKED(IDC_RADIO_IP_STATIC, &CWifiConfigDlg::OnBnClickedRadioIpStatic)
+    ON_BN_CLICKED(IDC_BUTTON_WIFI_DEFAULT, &CWifiConfigDlg::OnBnClickedButtonWifiDefault)
 END_MESSAGE_MAP()
 
 
@@ -92,7 +95,9 @@ void CWifiConfigDlg::ChangeWifiWindowStatus(bool b_value)
     GetDlgItem(IDC_IPADDRESS1)->EnableWindow(b_value);
     GetDlgItem(IDC_IPADDRESS2)->EnableWindow(b_value);
     GetDlgItem(IDC_IPADDRESS3)->EnableWindow(b_value);
-    
+    GetDlgItem(IDC_RADIO_WIFI_ENABLE)->EnableWindow(b_value);
+    GetDlgItem(IDC_RADIO_WIFI_DISABLE)->EnableWindow(b_value);
+    GetDlgItem(IDC_EDIT_WIFI_MODBUS_PORT)->EnableWindow(b_value);
     
     //GetDlgItem(IDCANCEL)->EnableWindow(b_value);
 }
@@ -101,6 +106,8 @@ void CWifiConfigDlg::ChangeWifiWindowStatus(bool b_value)
 BOOL CWifiConfigDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+    GetDlgItem(IDC_BUTTON_WIFI_DEFAULT)->EnableWindow(0);
     GetDlgItem(IDC_EDIT_WIFI_MODBUS_PORT)->EnableWindow(1);
     GetDlgItem(IDC_EDIT_WIFI_BACNET_PORT)->EnableWindow(1);
     if (m_ui_type == UI_TYPE_WIFI_REV1)
@@ -171,8 +178,8 @@ BOOL CWifiConfigDlg::OnInitDialog()
 
         
 
-        m_combox_NetType.EnableWindow(false);
-        GetDlgItem(IDC_STATIC_NET_WORK_TYPE)->EnableWindow(false);
+        m_combox_NetType.ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_NET_WORK_TYPE)->ShowWindow(SW_HIDE);
 
         int itemp = Read_Multi(g_tstat_id, wifi_register_value, WIFI_ENABLE, 100, 6);
         if (itemp < 0)
@@ -180,7 +187,7 @@ BOOL CWifiConfigDlg::OnInitDialog()
             AfxMessageBox(_T("Read wifi information timeout"));
             PostMessage(WM_CLOSE, NULL, NULL);
         }
-
+        wifi_info.reg.IP_Auto_Manual = wifi_register_value[IP_AUTO_MANUAL - WIFI_ENABLE];
         if (wifi_register_value[IP_WIFI_STATUS - WIFI_ENABLE] < (sizeof(Wifi_Module_Status) / sizeof(Wifi_Module_Status[0])))
         {
             GetDlgItem(IDC_EDIT_WIFI_STATUS)->SetWindowTextW(Wifi_Module_Status[wifi_register_value[IP_WIFI_STATUS - WIFI_ENABLE]]);
@@ -190,6 +197,7 @@ BOOL CWifiConfigDlg::OnInitDialog()
         if (wifi_register_value[IP_WIFI_STATUS - WIFI_ENABLE] == WIFI_NO_WIFI)
         {
             ChangeWifiWindowStatus(0);
+            return TRUE;
         }
         else
         {
@@ -228,6 +236,31 @@ BOOL CWifiConfigDlg::OnInitDialog()
 
             m_version = 1;
         }
+
+        if (wifi_register_value[WIFI_MOUDLE_SOFTWARE_VERSION - WIFI_ENABLE] >= 3)
+        {
+            GetDlgItem(IDC_RADIO_WIFI_ENABLE)->EnableWindow(1);
+            GetDlgItem(IDC_RADIO_WIFI_DISABLE)->EnableWindow(1);
+            if (wifi_register_value[WIFI_ENABLE] == 2)
+            {
+                ((CButton *)GetDlgItem(IDC_RADIO_WIFI_DISABLE))->SetCheck(true);
+                ((CButton *)GetDlgItem(IDC_RADIO_WIFI_ENABLE))->SetCheck(false);
+            }
+            else
+            {
+                ((CButton *)GetDlgItem(IDC_RADIO_WIFI_ENABLE))->SetCheck(true);
+                ((CButton *)GetDlgItem(IDC_RADIO_WIFI_DISABLE))->SetCheck(false);
+            }
+
+            GetDlgItem(IDC_BUTTON_WIFI_DEFAULT)->EnableWindow(true);
+        }
+        else
+        {
+            GetDlgItem(IDC_RADIO_WIFI_ENABLE)->EnableWindow(0);
+            GetDlgItem(IDC_RADIO_WIFI_DISABLE)->EnableWindow(0);
+            GetDlgItem(IDC_BUTTON_WIFI_DEFAULT)->EnableWindow(0);
+        }
+
 
         memcpy(wifi_info.reg.username, &wifi_register_value[10], sizeof(str_wifi_point) - 10);
 
@@ -278,11 +311,22 @@ BOOL CWifiConfigDlg::OnInitDialog()
         {
             ((CButton *)GetDlgItem(IDC_RADIO_IP_AUTO))->SetCheck(false);
             ((CButton *)GetDlgItem(IDC_RADIO_IP_STATIC))->SetCheck(true);
+            GetDlgItem(IDC_IPADDRESS1)->ShowWindow(true);
+            GetDlgItem(IDC_IPADDRESS3)->ShowWindow(true);
+            GetDlgItem(IDC_IPADDRESS2)->EnableWindow(true);
+            GetDlgItem(IDC_STATIC_MASK)->ShowWindow(true);
+            GetDlgItem(IDC_STATIC_GATEWAY)->ShowWindow(true);
+            
         }
         else
         {
             ((CButton *)GetDlgItem(IDC_RADIO_IP_AUTO))->SetCheck(true);
             ((CButton *)GetDlgItem(IDC_RADIO_IP_STATIC))->SetCheck(false);
+            GetDlgItem(IDC_IPADDRESS1)->ShowWindow(false);
+            GetDlgItem(IDC_IPADDRESS3)->ShowWindow(false);
+            GetDlgItem(IDC_IPADDRESS2)->EnableWindow(false);
+            GetDlgItem(IDC_STATIC_MASK)->ShowWindow(false);
+            GetDlgItem(IDC_STATIC_GATEWAY)->ShowWindow(false);
         }
     }
 
@@ -437,6 +481,21 @@ void CWifiConfigDlg::OnBnClickedOk()
     }
     else if (m_ui_type == UI_TYPE_WIFI_REV2)
     {
+        if (m_version >= 3)
+        {
+            bool isstatic_enablewifi = ((CButton *)GetDlgItem(IDC_RADIO_WIFI_ENABLE))->GetCheck(); //返回1表示选上，0表示没选上;
+            bool isstatic_disablewifi = ((CButton *)GetDlgItem(IDC_RADIO_WIFI_DISABLE))->GetCheck(); //返回1表示选上，0表示没选上;
+            if (isstatic_disablewifi)
+            {
+                int ret2 = write_one(g_tstat_id, WIFI_ENABLE, 2, 10);
+                if (ret2 >= 0)
+                {
+                    MessageBox(_T("Wifi disabled!"));
+                }
+            }
+
+        }
+
         CString str_ssid;
         m_Edit_SSID.GetWindowTextW(str_ssid);
         if (str_ssid.GetLength() <= 0)
@@ -578,12 +637,12 @@ void CWifiConfigDlg::OnBnClickedOk()
             return;
         }
         Sleep(SEND_COMMAND_DELAY_TIME * 2);
-        int ret1 = write_one(g_tstat_id, WIFI_ENABLE, wifi_info.reg.Wifi_Enable,10);
-        if (ret1 < 0)
-        {
-            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Configuration change enable flag failed "));
-            return;
-        }
+        int ret1 = write_one(g_tstat_id, WIFI_ENABLE, wifi_info.reg.Wifi_Enable,5);
+        //if (ret1 < 0)
+        //{
+        //    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Configuration change enable flag failed "));
+        //    return;
+        //}
         SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Configuration change success "));
 
     }
@@ -596,3 +655,40 @@ void CWifiConfigDlg::OnBnClickedOk()
 
 
   
+
+
+void CWifiConfigDlg::OnBnClickedRadioIpAuto()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    GetDlgItem(IDC_IPADDRESS1)->ShowWindow(false);
+    GetDlgItem(IDC_IPADDRESS3)->ShowWindow(false);
+    GetDlgItem(IDC_IPADDRESS2)->EnableWindow(false);
+    GetDlgItem(IDC_STATIC_MASK)->ShowWindow(false);
+    GetDlgItem(IDC_STATIC_GATEWAY)->ShowWindow(false);
+}
+
+
+void CWifiConfigDlg::OnBnClickedRadioIpStatic()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    GetDlgItem(IDC_IPADDRESS1)->ShowWindow(true);
+    GetDlgItem(IDC_IPADDRESS3)->ShowWindow(true);
+    GetDlgItem(IDC_IPADDRESS2)->EnableWindow(true);
+    GetDlgItem(IDC_STATIC_MASK)->ShowWindow(true);
+    GetDlgItem(IDC_STATIC_GATEWAY)->ShowWindow(true);
+
+    //如果客户改为静态IP ，而子网掩码又是 0.0.0.0  就默认给客户一个较为规范的255.255.255.0
+    BYTE subnet1, subnet2, subnet3, subnet4;
+    ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS1))->GetAddress(subnet1, subnet2, subnet3, subnet4);
+    if ((subnet1 == 0) && (subnet1 == 0) && (subnet1 == 0) && (subnet1 == 0))
+    {
+        ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS1))->SetAddress(255, 255, 255, subnet4);
+    }
+}
+
+
+void CWifiConfigDlg::OnBnClickedButtonWifiDefault()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    write_one(g_tstat_id, WIFI_LOAD_DEFAULT, 1, 10);
+}

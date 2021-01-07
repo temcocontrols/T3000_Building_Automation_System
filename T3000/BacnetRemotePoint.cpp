@@ -88,7 +88,7 @@ void CBacnetRemotePoint::Initial_List()
 	m_remote_point_list.InsertColumn(REMOTE_VALUE, _T("Value"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_DEVICE_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_remote_point_list.InsertColumn(REMOTE_DESCRIPTION, _T("Description"), 200, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-    m_remote_point_list.InsertColumn(REMOTE_TIME_REMAINING, _T("Time Remaining"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+    m_remote_point_list.InsertColumn(REMOTE_TIME_REMAINING, _T("Last Contact"), 150, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
     
 	m_remote_point_hwnd = this->m_hWnd;
 	m_remote_point_list.SetListHwnd(this->m_hWnd);
@@ -232,6 +232,10 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		unsigned char t_type;
 		t_type = m_remote_point_data.at(i).point.point_type & 0x1F;
 
+        unsigned char type_highest_2bytes = m_remote_point_data.at(i).point.network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+        t_type = t_type | type_highest_2bytes;
+
+
         temp_main_panel.Format(_T("%u"), m_remote_point_data.at(i).point.panel);
         temp_device_id.Format(_T("%u"), m_remote_point_data.at(i).point.sub_panel);
         unsigned char high_3bit;
@@ -251,7 +255,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 
         temp_reg_number.Format(_T("%u"), dev_reg);
 
-        temp_reg_value.Format(_T("%d"), (m_remote_point_data.at(i).point_value));
+        
         temp_time_remaining.Format(_T("%d"), m_remote_point_data.at(i).time_remaining);
 
 
@@ -281,6 +285,24 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
             temp_type = _T("BV");
         else if (t_type == BAC_BI + 1)
             temp_type = _T("BI");
+        else if (t_type == BAC_FLOAT_ABCD + 1)
+            temp_type = _T("BAC_FLOAT_ABCD");
+        else if (t_type == BAC_FLOAT_CDAB + 1)
+            temp_type = _T("BAC_FLOAT_CDAB");
+        else if (t_type == BAC_FLOAT_BADC + 1)
+            temp_type = _T("BAC_FLOAT_BADC");
+        else if (t_type == BAC_FLOAT_DCBA + 1)
+            temp_type = _T("BAC_FLOAT_DCBA");
+
+        if ((t_type == BAC_FLOAT_ABCD + 1) ||
+            (t_type == BAC_FLOAT_CDAB + 1) ||
+            (t_type == BAC_FLOAT_BADC + 1) ||
+            (t_type == BAC_FLOAT_DCBA + 1))
+        {
+            temp_reg_value.Format(_T("%.3f"), ((float)m_remote_point_data.at(i).point_value)/1000);
+        }
+        else
+            temp_reg_value.Format(_T("%d"), (m_remote_point_data.at(i).point_value) / 1000);
 #if 0
 		if(dev_reg == 0)
 		{

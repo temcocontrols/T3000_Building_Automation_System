@@ -213,7 +213,7 @@ __declspec(dllexport)    bool bacapp_parse_application_data(
         BACNET_APPLICATION_TAG tag_number,
         const char *argv,
         BACNET_APPLICATION_DATA_VALUE * value);
-    bool bacapp_print_value(
+__declspec(dllexport)    bool bacapp_print_value(
         FILE * stream,
         BACNET_OBJECT_PROPERTY_VALUE * value);
 #else

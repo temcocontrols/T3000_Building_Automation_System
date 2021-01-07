@@ -47,8 +47,13 @@ typedef struct dlmstp_packet {
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+    __declspec(dllexport)   void Get_MSTP_STRUCT(struct mstp_port_struct_t * mstp_port);
+    __declspec(dllexport)   void Get_MSTP_Nodes(unsigned char * node_address, unsigned char *ncount);
+    __declspec(dllexport)   void Set_MSTP_Polling_Node(unsigned char node);
 __declspec(dllexport) 	 unsigned long  Get_Thread1();
 __declspec(dllexport) unsigned long Get_Thread2();
+__declspec(dllexport) void Set_Thread1_Status(bool nstatus);
+__declspec(dllexport) void Set_Thread2_Status(bool nstatus);
 __declspec(dllexport)    bool dlmstp_init(
         char *ifname);
     void dlmstp_reset(

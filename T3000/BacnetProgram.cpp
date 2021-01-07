@@ -167,13 +167,13 @@ void CBacnetProgram::Initial_List()
 	m_program_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	//m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_program_list.InsertColumn(0, _T("Program"), 80, ListCtrlEx::CheckBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
-	m_program_list.InsertColumn(1, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_program_list.InsertColumn(2, _T("Status"), 100, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_program_list.InsertColumn(3, _T("Auto/Manual"), 100, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_program_list.InsertColumn(4, _T("Size"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_program_list.InsertColumn(5, _T("Run Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_program_list.InsertColumn(6, _T("Label"), 100, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(PROGRAM_NUM, _T("Program"), 80, ListCtrlEx::CheckBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_program_list.InsertColumn(PROGRAM_FULL_LABLE, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(PROGRAM_STATUS, _T("Status"), 100, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(PROGRAM_AUTO_MANUAL, _T("Auto/Manual"), 100, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(PROGRAM_SIZE_LIST, _T("Size"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(PROGRAM_RUN_STATUS, _T("Execution time"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(PROGRAM_LABEL, _T("Label"), 100, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_program_list.Setlistcolcharlimit(1,STR_PROGRAM_DESCRIPTION_LENGTH -1);
 	m_program_list.Setlistcolcharlimit(6,STR_PROGRAM_LABEL_LENGTH-1);
 	m_pragram_dlg_hwnd = this->m_hWnd;
@@ -391,11 +391,14 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		m_program_list.SetItemText(i,PROGRAM_SIZE_LIST,temp_value);
 
 
+        CString temp_exe_time;
 
-		if(m_Program_data.at(i).com_prg==0)
-			m_program_list.SetItemText(i,PROGRAM_RUN_STATUS,_T("Normal"));
-		else
-			m_program_list.SetItemText(i,PROGRAM_RUN_STATUS,_T("Abnormal"));
+        temp_exe_time.Format(_T("%u ms"), m_Program_data.at(i).com_prg);
+        m_program_list.SetItemText(i, PROGRAM_RUN_STATUS, temp_exe_time);
+		//if(m_Program_data.at(i).com_prg==0)
+		//	m_program_list.SetItemText(i,PROGRAM_RUN_STATUS,_T("Normal"));
+		//else
+		//	m_program_list.SetItemText(i,PROGRAM_RUN_STATUS,_T("Abnormal"));
 
 
 		CString temp_des2;

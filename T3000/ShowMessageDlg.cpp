@@ -14,7 +14,8 @@ extern HANDLE hwait_read_thread;
 // CShowMessageDlg 对话框
 extern bool mstp_read_result ; //0  没读到    1  读成功    MSTP 设备 记录 建立连接时，是否为客户手动中断操作;
 IMPLEMENT_DYNAMIC(CShowMessageDlg, CDialogEx)
-
+int ok_button_press = 0; //确定按钮
+int m_sync_time_auto_close_time;
 CShowMessageDlg::CShowMessageDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_AA_SHOWMESSAGE, pParent)
 {
@@ -39,6 +40,8 @@ void CShowMessageDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CShowMessageDlg, CDialogEx)
     ON_WM_TIMER()
     ON_WM_CLOSE()
+    ON_BN_CLICKED(IDOK, &CShowMessageDlg::OnBnClickedOk)
+    ON_BN_CLICKED(IDCANCEL, &CShowMessageDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
@@ -47,6 +50,7 @@ END_MESSAGE_MAP()
 void CShowMessageDlg::SetStaticText(LPCTSTR lpszTitleText)
 {
     static_text = lpszTitleText;
+    m_exit_by_hands = 0;
 }
 
 //设置需要显示的背景色
@@ -83,6 +87,10 @@ void CShowMessageDlg::SetProgressAutoClose( int mi_seconds,int time_count, int n
     auto_close_time_count_old = auto_close_time_count;
     mevent = nEvent;
 
+    if (nEvent == EVENT_WARNING_CHANGE_PROTOCOL_BAUDRATE)
+    {
+        b_show_progress = false;
+    }
 }
 
 void CShowMessageDlg::SetEvent(int nEvent)
@@ -90,14 +98,14 @@ void CShowMessageDlg::SetEvent(int nEvent)
     mevent = nEvent;
 }
 
-void CShowMessageDlg::SetChangeProtocol(bool modbus_to_bacnet,   // 0  modbus to bacnet          1  bacnet to modbus
+void CShowMessageDlg::SetChangeProtocol(bool modbus_to_bacnet,   // 0 modbus          1  bacnet 
     unsigned char modbus_id,
     unsigned short nreg_address,
     unsigned short nreg_value,
     unsigned char sub_device,         // 如果是子设备  ，数据库中的协议 比较特殊;
     LPCTSTR Dbpath)
 {
-     cprotocol_modbus_to_bacnet = modbus_to_bacnet;   // 0  modbus to bacnet          1  bacnet to modbus
+     cprotocol_modbus_to_bacnet = modbus_to_bacnet;   // 0 modbus          1  bacnet 
      cprotocol_modbus_id = modbus_id;
       cprotocol_nreg_address = nreg_address;
       cprotocol_nreg_value = nreg_value;
@@ -105,7 +113,7 @@ void CShowMessageDlg::SetChangeProtocol(bool modbus_to_bacnet,   // 0  modbus to
      cprotocol_Dbpath = Dbpath;
 
      b_show_progress = true;
-
+     
 }
 
 
@@ -127,7 +135,7 @@ BOOL CShowMessageDlg::OnInitDialog()
     CDialogEx::OnInitDialog();
 
     // TODO:  在此添加额外的初始化
-
+    ok_button_press = 2; //初始化状态 未知;
     m_static_title.SetWindowTextW(static_text);
     m_static_title.textColor(static_textcolor);
     if(b_set_backcolor)
@@ -144,6 +152,19 @@ BOOL CShowMessageDlg::OnInitDialog()
         m_static_persent.ShowWindow(false);
         m_progress_showmessage.ShowWindow(false);
     }
+
+    if (mevent == EVENT_SYNC_TIME)
+    {
+        GetDlgItem(IDC_CHECK_DONT_POP)->ShowWindow(SW_SHOW);
+        m_sync_time_auto_close_time = 60;
+        SetTimer(2, 1000, NULL);
+        Sleep(1);
+    }
+    else
+    {
+        GetDlgItem(IDC_CHECK_DONT_POP)->ShowWindow(SW_HIDE);
+    }
+
     ::SetWindowPos(this->m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
     SetTimer(1, 200, NULL);
     if(hShowMessageHandle == NULL)
@@ -229,8 +250,42 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
         }
         else if (mparent->mevent == EVENT_MSTP_CONNECTION_ESTABLISH)
         {
-            for (int i = 0; i<50; i++)
+            for (int i = 0; i<90; i++)
             {
+                if (mparent->m_exit_by_hands)
+                    break;
+                mstp_port_struct_t Temp_MSTP_Port;
+                Get_MSTP_STRUCT(&Temp_MSTP_Port);
+                unsigned char mstp_add[255] = {0};
+                unsigned char mstp_count = 0;
+
+                Get_MSTP_Nodes(mstp_add, &mstp_count);
+                //SetStaticText(_T("Establishing Bacnet MSTP connection , please wait!"));
+                mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Des node %d\r\n"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
+                for (int i = 0; i < mstp_count; i++)
+                {
+                    CString temp_nodes;
+                    temp_nodes.Format(_T("MSTP MAC ID : %d\r\n"), mstp_add[i]);
+                    mparent->static_text = mparent->static_text + temp_nodes;
+                }
+
+
+                int temp_wait_count = 0;
+                while ((Temp_MSTP_Port.SoleMaster == 1) && ( temp_wait_count < 10))
+                {
+                    Get_MSTP_STRUCT(&Temp_MSTP_Port);
+                    Sleep(200);
+                    mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Des node %d\r\nNo response from device\r\nPlease check the communication protocol and check the RS485 hardware connection\r\nScanning"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
+                    CString temp_net;
+                    for (int i = 0; i < temp_wait_count; i++)
+                    {
+                        temp_net = temp_net + _T(".");
+                    }
+                    mparent->static_text = mparent->static_text + temp_net;
+                    temp_wait_count++;
+                }
+
+
                 if(i%10 == 0)
                     Send_WhoIs_Global(-1, -1);
                 mparent->m_pos = i;
@@ -241,6 +296,12 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
                     if ((mparent->m_mstp_device_info.device_id == m_bac_handle_Iam_data.at(j).device_id) /*&&
                         (mparent->m_mstp_device_info.macaddress == m_bac_handle_Iam_data.at(j).macaddress)*/)   //暂时拿掉 pannal number的 核对，茶洗说不是一一对应了
                     {
+                        g_progress_persent = 33;
+                        Sleep(200);
+                        g_progress_persent = 66;
+                        Sleep(200);
+                        g_progress_persent = 100;
+                        Sleep(200);
                         mstp_read_result = true;  // 读值成功;收到返回I am 设备;
                         ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
                         hShowMessageHandle = NULL;
@@ -249,6 +310,9 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
                 }
 
             }
+            mparent->static_text = mparent->static_text + _T("\r\nDevice not responding.\r\nPlease Check the baudrate and protocol\r\nPlease check the RS485 cable.\r\n");
+            Sleep(1500);
+            system_connect_info.mstp_status = 0; //没有扫描到对应的 下次点击需要重新初始化;
             ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
         }
         else if (mparent->mevent == EVENT_FIRST_LOAD_PROG)
@@ -295,43 +359,69 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
             mparent->m_pos = 50;
             mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
             Sleep(1000);
+
+
             if (n_ret < 0)
             {
                 mparent->static_text.Format(_T("Writing command failed!!"));
                 goto failed_path;
             }
 
-            if (mparent->cprotocol_modbus_to_bacnet == 0)  //bacnet 切  modbus
+            if (mparent->cprotocol_modbus_to_bacnet == 0)  // 0 modbus          1  bacnet 
             {
-                if (mparent->cprotocol_sub_device) //BIP下的mstp
+                if (mparent->cprotocol_sub_device)
                 {
+                    Sleep(1);
                     //这里要做很多特殊情况处理 ，例如母设备下的   总线上还有没有其他mstp设备在运行;
-                    //SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), temp_protocol, get_serialnumber());
+                    //先把这个子节点的信息更改
+                    if (Bacnet_Private_Device(selected_product_Node.product_class_id))
+                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), PROTOCOL_MB_TCPIP_TO_MB_RS485, g_selected_serialnumber);
+                    else
+                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_TCPIP, g_selected_serialnumber);
                 }
-                else //单纯的 mstp 协议 
+                else //
                 {
-                    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_RS485, g_selected_serialnumber);
+                    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), MODBUS_RS485, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
+
+                    //if (Bacnet_Private_Device(selected_product_Node.product_class_id)) //如果是BB类似的
+                    //{
+                    //    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
+                    //}
+                    //else
+                    //    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), PROTOCOL_MSTP_TO_MODBUS, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
                 }
 
             }
-            else//modbus  切  bacnet  
+            else //  转换为 MSTP协议                 0 modbus          1  bacnet 
             {
                 if (mparent->cprotocol_sub_device) //BIP下的mstp
                 {
+                    Sleep(1);
                     //这里要做很多特殊情况处理 ，例如母设备下的   总线上还有没有其他mstp设备在运行;
-                    //SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), temp_protocol, get_serialnumber());
-                }
-                else //单纯的 modbus 485 qie mstp 协议 
-                {
-                    if ((selected_product_Node.product_class_id == PM_TSTAT10) ||
-                        (selected_product_Node.product_class_id == PM_MINIPANEL) ||
-                        (selected_product_Node.product_class_id == PM_MINIPANEL_ARM))
+                    if (selected_product_Node.note_parent_serial_number != 0)
                     {
-                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
+                        //挂在父节点下面的,更改协议成MSTP ，如果自己本身是T3控制器 就直接用MSTP的协议
+                        if(Bacnet_Private_Device(selected_product_Node.product_class_id))
+                            SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, selected_product_Node.serial_number);
+                        else
+                            SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS, selected_product_Node.serial_number);
                     }
-                    else
-                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), PROTOCOL_MSTP_TO_MODBUS, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
+                    
                 }
+                else //单纯的 mstp 协议 
+                {
+                    //SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_RS485, g_selected_serialnumber);
+                    if (Bacnet_Private_Device(product_register_value[7])) //如果是BB类似的 全支持的 就改为 全MSTP
+                    {
+                        //这里还要判断是不是通过网络在改 串口的协议？？？？？？？？？？？？？？？？？？？？？？
+                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d',Object_Instance = '%d',Panal_Number = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, temp_instance, selected_product_Node.product_id, g_selected_serialnumber);
+                    }
+                    else//否则就要改为鸡肋版本的 MSTP-Modbus寄存器
+                    {
+                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d',Object_Instance = '%d',Panal_Number = '%d' where Serial_ID='%d'"), PROTOCOL_MSTP_TO_MODBUS, temp_instance, selected_product_Node.product_id, g_selected_serialnumber);
+                    }
+                }
+               
             }
 
             mparent->static_text.Format(_T("Changing the local configuration file!"));
@@ -351,12 +441,48 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
             mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
             Sleep(1000);
 
+            if (selected_product_Node.note_parent_serial_number != 0)
+            {
+                CString temp_product;
+                temp_product = GetProductName(selected_product_Node.product_class_id);
+                mparent->static_text.Format(_T("%s protocal and baudrate changed success"), temp_product);
+                Sleep(1000);
+                mparent->static_text.Format(_T("The controller's protocol and baud rate also need to be changed to communicate properly"));
+                Sleep(2000);
+            }
+
+
 failed_path:
             pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
             pFrame->PostMessage(WM_MYMSG_REFRESHBUILDING, 0, 0);
             mparent->PostMessage(WM_CLOSE, NULL, NULL);
-            pFrame->SetTimer(5, 2000, NULL);
+            if (selected_product_Node.note_parent_serial_number == 0)
+            {
+                pFrame->SetTimer(5, 2000, NULL);
+            }
+        }
+        else if (mparent->mevent == EVENT_WARNING_CHANGE_PROTOCOL_BAUDRATE)
+        {
+            Sleep(mparent->auto_close_time);
+            ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+        }
+        else if (EVENT_SYNC_TIME == mparent->mevent)
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                if ((ok_button_press != 0) && (ok_button_press != 1))
+                {
+                    Sleep(1000);
+                }
+                else
+                {
+                    ::PostMessage(mparent->m_hWnd,WM_CLOSE, NULL, NULL);
+                    break;
+                }
 
+            }
+
+                
         }
     hShowMessageHandle = NULL;
     return true;
@@ -373,6 +499,7 @@ BOOL CShowMessageDlg::PreTranslateMessage(MSG* pMsg)
 void CShowMessageDlg::OnTimer(UINT_PTR nIDEvent)
 {
     // TODO: 在此添加消息处理程序代码和/或调用默认值
+    CString temp_left_close_string;
     switch (nIDEvent)
     {
     case 1:
@@ -380,6 +507,19 @@ void CShowMessageDlg::OnTimer(UINT_PTR nIDEvent)
         m_static_title.SetWindowTextW(static_text);
                 m_static_persent.SetWindowTextW(static_percent);
                 m_progress_showmessage.SetPos(m_pos);
+    }
+        break;
+    case 2:       //SYNC Time auto close timer
+    {
+        if (m_sync_time_auto_close_time > 0)
+            m_sync_time_auto_close_time--;
+        else
+        {
+            KillTimer(2);
+            PostMessage(WM_CLOSE, NULL, NULL);
+        }
+        temp_left_close_string.Format(_T("Cancel (%d)"), m_sync_time_auto_close_time);
+        GetDlgItem(IDCANCEL)->SetWindowTextW(temp_left_close_string);
     }
         break;
     default:
@@ -395,7 +535,7 @@ void CShowMessageDlg::OnTimer(UINT_PTR nIDEvent)
 void CShowMessageDlg::OnClose()
 {
     // TODO: 在此添加消息处理程序代码和/或调用默认值
-
+    Sleep(1);
     CDialogEx::OnClose();
 }
 
@@ -403,12 +543,73 @@ void CShowMessageDlg::OnClose()
 void CShowMessageDlg::OnCancel()
 {
     // TODO: 在此添加专用代码和/或调用基类
-    if (hShowMessageHandle != NULL)  //若是手动点击关闭窗口，则 需要关闭 bacnet 的 口;否则一直在哪里 循环去读一个没有 的matp设备;
+    //if (hShowMessageHandle != NULL)  //若是手动点击关闭窗口，则 需要关闭 bacnet 的 口;否则一直在哪里 循环去读一个没有 的matp设备;
+    //{
+    //    mstp_read_result = false;
+    //    close_bac_com();
+    //}
+    //TerminateThread(hShowMessageHandle, 0);
+    //hShowMessageHandle = NULL;
+    Sleep(1);
+    CDialogEx::OnCancel();
+}
+
+
+void CShowMessageDlg::OnBnClickedOk()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    if (mevent == EVENT_SYNC_TIME)
     {
-        mstp_read_result = false;
-        close_bac_com();
+        if (((CButton *)GetDlgItem(IDC_CHECK_DONT_POP))->GetCheck())
+        {
+            unsigned long  temp_time_long = time(NULL);
+            CString temp_cstring;
+            temp_cstring.Format(_T("%u"), temp_time_long);
+            WritePrivateProfileString(_T("SYNC_Time"), _T("ignore_pop"), _T("1"), g_cstring_ini_path);
+            WritePrivateProfileString(_T("SYNC_Time"), _T("ignore_pop_time"), temp_cstring, g_cstring_ini_path);
+        }
+
+
+
+        ok_button_press = 1;
     }
-    TerminateThread(hShowMessageHandle, 0);
-    hShowMessageHandle = NULL;
+    else
+    {
+        m_exit_by_hands = 1;
+        system_connect_info.mstp_status = 0; //没有扫描到对应的 下次点击需要重新初始化;
+        PostMessage(WM_CLOSE, NULL);
+        Sleep(2000);
+    }
+
+    CDialogEx::OnOK();
+}
+
+
+void CShowMessageDlg::OnBnClickedCancel()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    if (mevent == EVENT_SYNC_TIME)
+    {
+        if (((CButton *)GetDlgItem(IDC_CHECK_DONT_POP))->GetCheck())
+        {
+            unsigned long  temp_time_long = time(NULL);
+            CString temp_cstring;
+            temp_cstring.Format(_T("%u"), temp_time_long);
+            WritePrivateProfileString(_T("SYNC_Time"), _T("ignore_pop"), _T("1"), g_cstring_ini_path);
+            WritePrivateProfileString(_T("SYNC_Time"), _T("ignore_pop_time"), temp_cstring, g_cstring_ini_path);
+        }
+        Sleep(1);
+    }
+    else
+    {
+        m_exit_by_hands = 1;
+        //system_connect_info.mstp_status = 0; //没有扫描到对应的 下次点击需要重新初始化;
+        PostMessage(WM_CLOSE, NULL);
+        Sleep(2000);
+    }
+
+
     CDialogEx::OnCancel();
 }

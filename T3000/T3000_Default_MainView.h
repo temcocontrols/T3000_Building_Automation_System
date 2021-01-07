@@ -64,6 +64,7 @@ public:
     afx_msg void OnEnChangeEditAesEncrypt();
     afx_msg void OnEnKillfocusEditBacnetDeviceId();
     afx_msg void OnCbnSelchangeBaudratecombo();
+    afx_msg void OnEnKillfocusEditDeadMaster();
 };
 
 

@@ -48,10 +48,10 @@ public:
     CString cs_password;
     CString cs_macadd;
     void SetWifiRegStartAddress(int nstart_address = 2000);
-    int WIFI_ENABLE ;
+    int WIFI_ENABLE ;  //2 disable     1 enable 其他 默认enable
     int IP_AUTO_MANUAL ;
     int IP_WIFI_STATUS ;
-    int WIFI_LOAD_DEFAULT;
+    int WIFI_LOAD_DEFAULT; //2003     1 恢复出厂设置
     int WIFI_MODBUS_PORT;
     int WIFI_BACNET_PORT;
     int WIFI_MOUDLE_SOFTWARE_VERSION;
@@ -62,6 +62,10 @@ public:
     int m_version;
 private:
 	BYTE m_address[4];
+public:
+    afx_msg void OnBnClickedRadioIpAuto();
+    afx_msg void OnBnClickedRadioIpStatic();
+    afx_msg void OnBnClickedButtonWifiDefault();
 };
 
 

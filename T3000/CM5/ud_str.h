@@ -79,6 +79,17 @@ typedef enum {
          READ_MSV_COMMAND          = 42,
          READ_EMAIL_ALARM          = 43,
 
+         READ_NEW_TIME_COMMAND = 88,           /* read new time            */  //2018 04 17 新的读时间命令
+         READMONITORPACKAGE_T3000 = 89,           /* read monitor belong to which package   */
+         READ_AT_COMMAND = 90,	//450 length
+         READ_GRPHIC_LABEL_COMMAND = 91,
+         READ_BACNET_TO_MODBUS_COMMAND = 94,
+         READPIC_T3000 = 95,
+         READ_MISC = 96,
+         READ_REMOTE_DEVICE_DB = 97,
+         READ_SETTING_COMMAND = 98,
+         GETSERIALNUMBERINFO = 99,
+
 		 WRITEOUTPUT_T3000         = 100+ENUM_OUT+1,  /* write outputs          */
 		 WRITEINPUT_T3000          = 100+ENUM_IN+1,   /* write inputs           */
 		 WRITEVARIABLE_T3000       = 100+ENUM_VAR+1,        /* write variables  */
@@ -104,16 +115,7 @@ typedef enum {
 
 		 WRITE_COMMAND_50          = 150,
 		 
-         READ_NEW_TIME_COMMAND      = 88,           /* read new time            */  //2018 04 17 新的读时间命令
-         READMONITORPACKAGE_T3000   = 89,           /* read monitor belong to which package   */
-		 READ_AT_COMMAND			= 90,	//450 length
-		 READ_GRPHIC_LABEL_COMMAND  = 91,
-         READ_BACNET_TO_MODBUS_COMMAND   = 94,
-		 READPIC_T3000				= 95,
-		 READ_MISC					= 96,
-		 READ_REMOTE_DEVICE_DB		= 97,
-		 READ_SETTING_COMMAND		= 98,
-		  GETSERIALNUMBERINFO       = 99,
+
 		 PANEL_INFO1_COMMAND       = 110,
 		 PANEL_INFO2_COMMAND       = 111,
 		 MINICOMMINFO_COMMAND      = 112,
@@ -400,17 +402,17 @@ typedef struct
 	int8_t description[21];		     /* (21 bytes; string)*/
 	int8_t label[9];		      	     /*	(9 bytes; string)*/
 
-	uint8_t value ;  /* (1 bit; 0=off, 1=on)*/
-	uint8_t auto_manual;  /* (1 bit; 0=auto, 1=manual)*/
-	uint8_t override_1_value;  /* (1 bit; 0=off, 1=on)*/
-	uint8_t override_2_value;  /* (1 bit; 0=off, 1=on)*/
+	uint8_t value ;              /* (; 0=off, 1=on)*/
+	uint8_t auto_manual;         /* ( 0=auto, 1=manual)*/
+	uint8_t override_1_value;  /* ( 0=off, 1=on)*/
+	uint8_t override_2_value;  /* ( 0=off, 1=on)*/
 	uint8_t off  ;
-	uint8_t unused	; /* (11 bits)*/
+	uint8_t unused	; 
 
 	Point_T3000 override_1;	     /* (3 bytes; point)*/
 	Point_T3000 override_2;	     /* (3 bytes; point)*/
 
-} Str_weekly_routine_point; /* 21+9+2+3+3 = 38*/
+} Str_weekly_routine_point; /* */
 
 typedef struct  
 {
@@ -502,6 +504,7 @@ typedef struct
 } Str_program_point;	  /*37 bytes  fandu*/
 
 
+
 typedef struct
 {
 	Point_T3000 input;	        /* (3 bytes; point)*/
@@ -530,11 +533,11 @@ typedef union
 	int8_t all[39];
 	struct
 	{
-		int8_t id;
-		int8_t schedule;
-		int8_t flag;
+        uint8_t id;
+        uint8_t schedule;
+        uint8_t flag;
         unsigned short reserved_reg[6];
-        int8_t on_line; // 0: offline    1: online
+        uint8_t on_line; // 0: offline    1: online
 		char name[15];
 		unsigned short daysetpoint;
 		unsigned short nightsetpoint;
@@ -784,6 +787,26 @@ typedef union
 	}Clk;
 }UN_Time;
 
+
+typedef union
+{
+    uint8_t lcddisplay[7];
+    struct
+    {
+        uint8_t display_type; // 0:使用原来显示的温度    1：modbus 方式自定义显示的格式
+        Point_Net npoint;     //用来描述是input output var 的结构
+    }lcd_mod_reg;
+
+    struct
+    {
+        uint8_t display_type; // 0:使用原来显示的温度    2：Bacnet 自定义的显示的格式
+        unsigned int obj_instance;
+        uint8_t point_type;
+        uint8_t point_number;
+    }lcd_bac_reg;
+
+}lcdconfig;
+
 typedef union
 {
 	uint8_t all[400];
@@ -795,15 +818,15 @@ typedef union
 		uint8_t mac_addr[6];
 		uint8_t tcp_type;   /* 0 -- DHCP, 1-- STATIC */
 		uint8_t mini_type;
-		uint8_t debug;
-		Str_Pro_Info   pro_info;
+		uint8_t debug;             //21
+		Str_Pro_Info   pro_info;   //17
 		uint8_t com0_config;
 		uint8_t com1_config;
 		uint8_t com2_config;
 
 		uint8_t refresh_flash_timer;
 		uint8_t en_plug_n_play;
-		uint8_t reset_default;   // write 88
+		uint8_t reset_default;   // write 88  //第 37 个
 		uint8_t com_baudrate0; 
 		uint8_t com_baudrate1; 
 		uint8_t com_baudrate2; 
@@ -817,13 +840,13 @@ typedef union
 
 		char panel_name[20];
 
-		uint8_t en_panel_name;
-		uint8_t panel_number;
+		uint8_t en_panel_name; 
+		uint8_t panel_number;  //74
 
 		char dyndns_user[DYNDNS_MAX_USERNAME_SIZE];
 		char dyndns_pass[DYNDNS_MAX_PASSWORD_SIZE];
 		char dyndns_domain[DYNDNS_MAX_DOMAIN_SIZE];
-		uint8_t en_dyndns;  // 0 - no  1 - disable 2 - enable
+		uint8_t en_dyndns;  //Item171 0 - no  1 - disable 2 - enable
 		uint8_t dyndns_provider;  // 0- www.3322.org 1-www.dyndns.com  2 - www.no-ip.com
 		uint16_t dyndns_update_time;  // xx min
 		uint8_t en_sntp;  // 0 - no  1 - disable  
@@ -831,8 +854,8 @@ typedef union
 		//0x1838b28c            24.56.178.140 time.nist.gov			3
 		//0xd248912d			210.72.145.45  NTSC					4
         //自动要求跟PC同步                                          200 
-		signed short time_zone;
-		unsigned int n_serial_number;
+		signed short time_zone; 
+		unsigned int n_serial_number; 
 
 		 UN_Time update_dyndns; 
 
@@ -840,13 +863,13 @@ typedef union
 		 uint8_t BBMD_EN;
 		 uint8_t sd_exist;  // 1 -no    2- yes         3 文件格式不对.
 		 unsigned short modbus_port;
-		 unsigned char modbus_id;
+		 unsigned char modbus_id; //198
 		 unsigned int object_instance ;
 		 unsigned int time_update_since_1970;
 		 unsigned char time_zone_summer_daytime;
 
 		 char sntp_server[30];
-		 unsigned char zegbee_exsit;
+		 unsigned char zegbee_exsit;//238
          unsigned char LCD_Display; //1: 常亮  0：常闭;
          unsigned char flag_time_sync_pc;  // 0: 不需要   1:同步.
          unsigned char time_sync_auto_manual;  // 0 和时间服务器同步   1：和PC 时间同步
@@ -858,7 +881,8 @@ typedef union
          unsigned char special_flag; // bit 0  代表是否支持 PT1K snesor 0 不支持 1支持;
                                      // bit 1 PT100
          unsigned char uart_parity[3];
-         unsigned char uart_stopbit[3];
+         unsigned char uart_stopbit[3];   //总共253
+         lcdconfig display_lcd;
 	}reg;
 }Str_Setting_Info;
 
@@ -1150,7 +1174,24 @@ typedef union
     }reg;
 }str_wifi_point;
 
+typedef struct
+{
+    unsigned short modbus_reg;         /* (2 bytes; ) */
+    short m_value;         /* (4 bytes; ) */
+    CString showvalue;
+} register_point;     /* (size = 6 bytes); */
 
+typedef struct
+{
+    int mode;
+    register_point name;
+    register_point type;
+    register_point setpoint;
+    register_point heat_setpoint;
+    register_point cool_setpoint;
+    register_point cool_db;
+    register_point heat_db;
+}Str_tstat_setpoint;
 
 #pragma pack(pop)//恢复对齐状态 
 

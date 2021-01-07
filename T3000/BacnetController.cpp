@@ -1073,18 +1073,33 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 	if(lCol == CONTROLLER_ACTION)	
 	{
 		memcpy_s(&m_temp_controller_data[lRow],sizeof(Str_controller_point),&m_controller_data.at(lRow),sizeof(Str_controller_point));
-		if(m_controller_data.at(lRow).action == 0)
-		{
-			m_controller_data.at(lRow).action = 1;
-			m_controller_list.SetItemText(lRow,lCol,_T("+"));
-			New_CString.Format(_T("+"));
-		}
-		else
-		{
-			m_controller_data.at(lRow).action = 0;
-			m_controller_list.SetItemText(lRow,lCol,_T("-"));
-			New_CString.Format(_T("-"));
-		}
+        
+            if (m_controller_data.at(lRow).action == 0)
+            {
+                if (IDYES == MessageBox(_T("Change to '+'?It is for a system that will react when the sensor is ABOVE the setpoint such as cooling."), _T("Warning"), MB_YESNOCANCEL | MB_ICONINFORMATION))
+                {
+                    m_controller_data.at(lRow).action = 1;
+                    m_controller_list.SetItemText(lRow, lCol, _T("+"));
+                    New_CString.Format(_T("+"));
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (IDYES == MessageBox(_T("Change to '-'? It is used on a system that will react when the sensor is BELOW the setpoint such as heating."), _T("Note"), MB_YESNOCANCEL | MB_ICONINFORMATION))
+                {
+                    m_controller_data.at(lRow).action = 0;
+                    m_controller_list.SetItemText(lRow, lCol, _T("-"));
+                    New_CString.Format(_T("-"));
+                }
+                else
+                    return;
+            }
+
+
 	}
 	else if(lCol == CONTROLLER_AUTO_MANUAL)
 	{

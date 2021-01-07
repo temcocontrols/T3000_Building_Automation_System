@@ -268,4 +268,5 @@ public:
     afx_msg void OnBnClickedButtonIconSetting();
     afx_msg void OnCbnSelchangeDeltaSelect1();
     afx_msg void OnCbnSelchangeDeltaSelect2();
+    BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 };

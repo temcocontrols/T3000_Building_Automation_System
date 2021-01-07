@@ -153,7 +153,7 @@ public:
 
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedBtnCo2Refresh();
-	static DWORD WINAPI StartRefresh(LPVOID lpVoid);
+	//static DWORD WINAPI StartRefresh(LPVOID lpVoid);
 	afx_msg void OnEnKillfocusCo2AlarmOnTime();
 	afx_msg void OnEnKillfocusCo2AlarmOffTime();
 	//afx_msg void OnBnClickedBtnCo2ClearCal();

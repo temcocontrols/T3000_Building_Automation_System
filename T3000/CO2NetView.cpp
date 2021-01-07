@@ -7,6 +7,7 @@
 #include "MainFrm.h"
  #include "../SQLiteDriver/CppSQLite3.h"
 #include "Dialog_Progess.h"
+#include "CO2_AUTO_CALIBRATION.h"
 #define CO2NETVIEWFRESH   WM_USER+1008
 
 // CCO2NetView
@@ -156,6 +157,7 @@ BEGIN_MESSAGE_MAP(CCO2NetView, CFormView)
     ON_BN_CLICKED(IDC_RADIO_CO2_CAL_ENABLE, &CCO2NetView::OnBnClickedRadioCo2CalEnable)
     ON_BN_CLICKED(IDC_RADIO_CO2_CAL_DISABLE, &CCO2NetView::OnBnClickedRadioCo2CalDisable)
     ON_BN_CLICKED(IDC_RADIO_HUMIDITY_HEAT_ENABLE, &CCO2NetView::OnBnClickedRadioHumidityHeatEnable)
+    ON_BN_CLICKED(IDC_BUTTON_FIRMWARE_AUTO_CAL, &CCO2NetView::OnBnClickedButtonFirmwareAutoCal)
 END_MESSAGE_MAP()
 
 
@@ -242,6 +244,7 @@ void CCO2NetView::Fresh()
 		GetDlgItem(IDC_EDIT_ListeningPort)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_BUTTON_APPLY)->ShowWindow(SW_SHOW);
 	}
+
 
     if(hFirstThread != NULL)
         TerminateThread(hFirstThread, 0);
@@ -756,11 +759,6 @@ void CCO2NetView::Show_TCPIP()
 		CO2_NET_MODBUS_IP_MODE = 46;
 	}
     m_Combox_IpModel.SetCurSel(product_register_value[CO2_NET_MODBUS_IP_MODE]);
-    //CO2_NET_MODBUS_IP_ADDRESS_START
-    //CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_START
-    //CO2_NET_MODBUS_GATEWAY_ADDRESS_START
-    //CO2_NET_MODBUS_TCP_SERVER_ENABLE
-    //CO2_NET_MODBUS_LISTEN_PORT_AT_TCP_SERVER_MODE_START
 	if (product_register_value[7] == STM32_CO2_NET)
 	{
 		CO2_NET_MODBUS_IP_ADDRESS_START = 47;
@@ -1158,6 +1156,10 @@ void CCO2NetView::OnBnClickedButtonApply()
     n=write_one(g_tstat_id,CO2_NET_MODBUS_GATEWAY_ADDRESS_GHOST_START+2,address3);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_GATEWAY_ADDRESS_GHOST_START+3,address4);
 
+    int ip_mode_value = ((CComboBox *)GetDlgItem(IDC_COMBO_IPModel))->GetCurSel();
+
+
+    n=write_one(g_tstat_id, 61, ip_mode_value);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_ENABLE_GHOST,1);//使能之后
     Sleep(5*1000);
 
@@ -2118,4 +2120,12 @@ void CCO2NetView::OnBnClickedRadioCo2CalDisable()
 void CCO2NetView::OnBnClickedRadioHumidityHeatEnable()
 {
     // TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CCO2NetView::OnBnClickedButtonFirmwareAutoCal()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CCO2_AUTO_CALIBRATION Dlg;
+    Dlg.DoModal();
 }

@@ -213,7 +213,7 @@ int modbus_read_multi_value(
 		}
         else
         {
-            Sleep(100);
+            Sleep(SEND_COMMAND_DELAY_TIME);
         }
 	}
 	  	register_critical_section.Unlock();
@@ -308,7 +308,9 @@ int write_one_org(unsigned char device_var,unsigned short address,short value,in
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times)
 {
     //2018 0606 在底层公共读写函数增加对不同协议的处理
-    if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+
+    if(SPECIAL_BAC_TO_MODBUS)
     {
         int n_ret = 0;
         for (int i = 0; i < retry_times; i++)
@@ -329,6 +331,16 @@ int write_one(unsigned char device_var,unsigned short address,short value,int re
 	g_bEnableRefreshTreeView = FALSE;
 	int j = write_one_org(device_var,address,value,retry_times);
 	g_bEnableRefreshTreeView |= bTemp;
+
+#ifdef DEBUG
+    CString temp_debug;
+    if ((address >= 909) && (address <= 924))
+    {
+        temp_debug.Format(_T("add = %d ,value = %u ,status = %d\r\n"), address, value, j);
+        TRACE(temp_debug);
+    }
+#endif // DEBUG
+
 	return j;
 }
 

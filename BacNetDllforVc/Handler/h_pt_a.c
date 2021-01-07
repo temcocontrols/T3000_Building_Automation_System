@@ -45,6 +45,7 @@
 #include "h_pt_a.h"
 /** @file h_pt_a.c  Handles Confirmed Private Transfer Acknowledgment. */
 #include "bacstr.h"
+#include "ptp.h"
 extern uint8_t IOBufferPT[300]; /* Somewhere to build the encoded result block for Private Transfers */
 
 //#include "..\..\BacNetDllforVc\include\ud_str.h"

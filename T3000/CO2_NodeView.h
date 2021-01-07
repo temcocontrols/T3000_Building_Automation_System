@@ -113,7 +113,4 @@ const int ROW_CO2 = 0;
 const int ROW_TEMPERATURE = 1;
 const int ROW_HUMIDITY = 2;
 
-const int CO2_MODBUS_CO2_BKCAL_ONOFF = 500;
-const int CO2_MODBUS_CO2_NATURE_LEVEL = 501;
-const int CO2_MODBUS_CO2_MIN_ADJ = 502;
-const int CO2_MODBUS_CO2_CAL_DAYS = 503;
+

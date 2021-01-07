@@ -43,6 +43,8 @@ public:
 	CDateTimeCtrl m__time;
 	CComboBox m_debug_window_combo_show;
 	afx_msg void OnCbnSelchangeComboDebugChoose();
+    afx_msg void OnBnClickedButtonDebug();
+    afx_msg void OnBnClickedButtonWebTest();
 };
 
 

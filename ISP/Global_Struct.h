@@ -52,7 +52,7 @@ const TCHAR c_strFlashMethodCom[] = _T("COM");
 
 
 const DWORD c_nHexFileBufLen = 0x7FFFF;   // hex 最大64k
-const DWORD c_nBinFileBufLen = 0x7FFFF;  // bin 文件最大512k
+const DWORD c_nBinFileBufLen = 0x1FFFFF;  // bin 文件最大512k
 
 
 
@@ -60,6 +60,8 @@ const DWORD c_nBinFileBufLen = 0x7FFFF;  // bin 文件最大512k
 #define WM_ADD_STATUSINFO				WM_USER+1001 
 #define WM_FLASH_FINISH					WM_USER+1002
 #define WM_UPDATA_DEVICE_INFORMATION    WM_USER+1003
+#define WM_FLASH_RESTATR_BOOT           WM_USER+1004
+#define WM_FLASH_NEW_BOOT_FINISH		WM_USER+1005
 //#define WM_TCP_STATUSINFO				WM_USER+1003
 
 

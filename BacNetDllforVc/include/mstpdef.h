@@ -99,7 +99,7 @@ typedef enum {
 #define Npoll 50
 
 /* The number of retries on sending Token: 1. */
-#define Nretry_token 2
+#define Nretry_token 3
 //Fance_BAC_TEST
 //#define Nretry_token 10
 /* The maximum idle time a sending node may allow to elapse between octets */
@@ -120,7 +120,7 @@ typedef enum {
 /* 15 milliseconds. */
 #define Tusage_delay 15
 
-#define DEFAULT_MAX_INFO_FRAMES 1
+#define DEFAULT_MAX_INFO_FRAMES 5//1
 #define DEFAULT_MAX_MASTER 254
 #define DEFAULT_MAC_ADDRESS 127
 

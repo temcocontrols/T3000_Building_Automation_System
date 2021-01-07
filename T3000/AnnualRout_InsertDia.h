@@ -82,4 +82,6 @@ public:
 	BOOL m_offline;
 	CString m_configfile_path;
 
+    int m_leap_year;
+
 };

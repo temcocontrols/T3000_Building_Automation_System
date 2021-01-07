@@ -357,7 +357,8 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 
 		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
 		byte lowbyte_point_type = temp_point_type & 0x1F;	//高3位用于 存放
-
+        unsigned char type_highest_2bytes = temp_network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+        lowbyte_point_type = lowbyte_point_type | type_highest_2bytes;
         //2018 01 26   sub panel 可以为0 代表访问本地;
         //if (((temp_panel == 0) || (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == 0)) || (lowbyte_point_type > BAC_AV + 10))
 		if(((temp_panel == 0) && (temp_sub_panel == 0)) || (lowbyte_point_type > BAC_BO + 1))
@@ -470,6 +471,8 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
 
         char and_pointtype = temp_point_type & 0x1F;
+        unsigned char type_highest_2bytes = temp_network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+        and_pointtype = and_pointtype | type_highest_2bytes;
         //2018 01 26 fandu subpanel 可以为0  为0 代表访问本身的. 
 		//if((temp_panel == 0) || (temp_sub_panel == 0))
         if ((temp_panel == 0) && (temp_sub_panel == 0))
@@ -588,7 +591,12 @@ void CBacnetMonitor::Set_Input_Range_And_count()
         else if((and_pointtype == COIL_REG + 1) ||
             (and_pointtype == DIS_INPUT_REG + 1) ||
             (and_pointtype == INPUT_REG + 1) ||
-            (and_pointtype == MB_REG + 1))
+            (and_pointtype == MB_REG + 1) ||
+            (and_pointtype == BAC_FLOAT_ABCD + 1) || //2020 03 25 新增
+            (and_pointtype == BAC_FLOAT_CDAB + 1) ||
+            (and_pointtype == BAC_FLOAT_BADC + 1) ||
+            (and_pointtype == BAC_FLOAT_DCBA + 1)
+            )
         {
             temp_input_count++;
             temp_analog_count++;
@@ -657,6 +665,8 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 	{
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = temp_net_work;//目前不知道network 怎么处理;
         char temp_point = point_type & 0x1F;
+        unsigned char type_highest_2bytes = temp_net_work & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+        temp_point = temp_point | type_highest_2bytes;
         if ((temp_point == COIL_REG) ||
             (temp_point == DIS_INPUT_REG) ||
             (temp_point == INPUT_REG) ||
@@ -666,7 +676,12 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
             (temp_point == BAC_AV) ||
             (temp_point == BAC_AI) ||
             (temp_point == BAC_AO) ||
-            (temp_point == BAC_BO))
+            (temp_point == BAC_BO) ||
+            (temp_point == BAC_FLOAT_ABCD) ||   //20200325
+            (temp_point == BAC_FLOAT_CDAB) ||
+            (temp_point == BAC_FLOAT_BADC) ||
+            (temp_point == BAC_FLOAT_DCBA)
+            )
         {
             num_point = num_point;
         }
