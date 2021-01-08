@@ -194,6 +194,9 @@ set(BACNET_FILES
   ${BACNET_SOURCE_CM5_DIR}/SliderBothBtn.cpp
   ${BACNET_SOURCE_CM5_DIR}/CStatic/staticex.cpp
   ${BACNET_SOURCE_DIR}/StatusbarCtrl.cpp
+  ${BACNET_SOURCE_DIR}/BacnetWeb.cpp
+  ${BACNET_SOURCE_DIR}/BacnetSettingParamter.cpp
+  ${BACNET_SOURCE_DIR}/CWebBrowser2.cpp
 )
 
 set(BACNET_CM5_H_FILES
