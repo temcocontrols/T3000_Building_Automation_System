@@ -1,3 +1,16 @@
 {
+  "ExpandedNodes": [
+    "",
+    "\\BacnetExplore",
+    "\\BacnetExplore\\Docs",
+    "\\BacnetExplore\\Mstp.BacnetCapture",
+    "\\BacnetExplore\\OfflineDebug",
+    "\\BacnetExplore\\Yabe",
+    "\\Psychrometric Tool",
+    "\\Psychrometric Tool\\PH_Application",
+    "\\T3000\\CM5",
+    "\\T3000\\res"
+  ],
+  "SelectedNode": "\\T3000 - VS2019.sln",
   "PreviewInSolutionExplorer": false
 }
