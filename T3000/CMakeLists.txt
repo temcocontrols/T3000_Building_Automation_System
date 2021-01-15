@@ -501,7 +501,7 @@ set(BACNET_HEADER_FILES
   ${BACNET_HEADER_DIR}/WriteSingleRegDlg.h
   ${BACNET_HEADER_DIR}/ZigbeeInformationDlg.h
   ${BACNET_HEADER_DIR}/ZigbeeRepeater.h
-  ${BACNET_HEADER_DIR}/BancetProperty.h
+  ${BACNET_HEADER_DIR}/BacnetProperty.h
   ${BACNET_HEADER_DIR}/BacnetSettingBasicInfo.h
   ${BACNET_HEADER_DIR}/BacnetSettingTcpip.h
   ${BACNET_HEADER_DIR}/BacnetSettingTime.h
@@ -705,7 +705,7 @@ set(T3000_SOURCE_FILES
   ${T3000_SOURCE_DIR}/WriteSingleRegDlg.cpp
   ${T3000_SOURCE_DIR}/ZigbeeInformationDlg.cpp
   ${T3000_SOURCE_DIR}/ZigbeeRepeater.cpp
-  ${T3000_SOURCE_DIR}/BancetProperty.cpp
+  ${T3000_SOURCE_DIR}/BacnetProperty.cpp
   ${T3000_SOURCE_DIR}/BacnetSettingBasicInfo.cpp
   ${T3000_SOURCE_DIR}/BacnetSettingTcpip.cpp
   ${T3000_SOURCE_DIR}/BacnetSettingTime.cpp
