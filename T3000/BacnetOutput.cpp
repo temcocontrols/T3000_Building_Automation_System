@@ -12,7 +12,7 @@
 #include "global_define.h"
 #include "BacnetRange.h"
 #include "MainFrm.h"
-#include "BancetProperty.h"
+#include "BacnetProperty.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 CRect Output_rect;
@@ -1921,7 +1921,7 @@ void CBacnetOutput::OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
             {
                 CString temp_title;
                 temp_title.Format(_T("Bacnet Output %d Priority Array"), lRow + 1);
-                CBancetProperty Dlg;
+                CBacnetProperty Dlg;
                 Dlg.SetParameter(PROP_PRIORITY_ARRAY);
                 Dlg.SetBacnetReadString(bacnet_string);
                 Dlg.SetTitle(temp_title);
