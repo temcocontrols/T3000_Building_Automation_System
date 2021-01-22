@@ -3237,7 +3237,7 @@ void CAirQuality::OnNMClickList1_AQ(NMHDR* pNMHDR, LRESULT* pResult)
 	long lRow, lCol;
 	m_input_list.Set_Edit(true);
 	DWORD dwPos = GetMessagePos();//Get which line is clicked by user. Set the check box, when user enter Insert it will jump to dialog
-	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_input_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt = point;
@@ -3400,7 +3400,7 @@ void CAirQuality::OnNMClickList2_AQ(NMHDR* pNMHDR, LRESULT* pResult)
 	DWORD dwPos = GetMessagePos();
 	//Get which line has been clicked by user.
      //Set the check box, when user hits Insert jump to dialog
-	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_output_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt = point;
@@ -3430,7 +3430,7 @@ void CAirQuality::OnNMClickList_User(NMHDR* pNMHDR, LRESULT* pResult)
 	m_factory_list.Set_Edit(true);
 	DWORD dwPos = GetMessagePos();//Get which line has been clicked
       					//Set the check box, when user hits Insert jump to the dialog
-	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_factory_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt = point;

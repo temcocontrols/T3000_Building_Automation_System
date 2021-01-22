@@ -119,7 +119,7 @@ void CTstatIconSetting::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
     // TODO: 在此添加控件通知处理程序代码
     DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-    CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+    CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
     m_tstat_icon_list.ScreenToClient(&point);
     LVHITTESTINFO lvinfo;
     lvinfo.pt = point;

@@ -473,7 +473,7 @@ void CBacnetIOConfig::OnNMClickListIoconfig(NMHDR* pNMHDR, LRESULT* pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	
 	DWORD dwPos = GetMessagePos();
-	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_ext_io_config_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt = point;
