@@ -12287,11 +12287,12 @@ void CMainFrame::OnDatabaseBacnettool()
     ApplicationFolder.ReleaseBuffer();
     CS_BacnetExplore_Path = ApplicationFolder + _T("\\BacnetExplore.exe");
 
-    ShellExecute(NULL, L"open", CS_BacnetExplore_Path, NULL, NULL, SW_SHOWNORMAL);
+    //ShellExecute(NULL, L"open", CS_BacnetExplore_Path, NULL, NULL, SW_SHOWNORMAL);
 
-    //HTREEITEM item = m_pTreeViewCrl->GetSelectedItem();
-    //CString selecteditemstr = (item != nullptr) ? m_pTreeViewCrl->GetItemText(item) : L"";
-    //ShellExecute(NULL, L"open", CS_BacnetExplore_Path, selecteditemstr, NULL, SW_SHOWNORMAL);
+    HTREEITEM item = m_pTreeViewCrl->GetSelectedItem();
+    CString selecteditemstr = (item != nullptr) ? m_pTreeViewCrl->GetItemText(item) : L"";
+    CString selectednetwork = m_current_tree_node.NetworkCard_Address;
+    ShellExecute(NULL, L"open", CS_BacnetExplore_Path, selecteditemstr + " " + selectednetwork, NULL, SW_SHOWNORMAL);
     return;
 #if 0
 
