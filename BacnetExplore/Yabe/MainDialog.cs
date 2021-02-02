@@ -67,7 +67,7 @@ namespace Yabe
         private Dictionary<string, RollingPointPairList> m_subscription_points = new Dictionary<string, RollingPointPairList>();        
         Color[] GraphColor = {Color.Red, Color.Blue, Color.Green, Color.Violet, Color.Chocolate, Color.Orange};
         GraphPane Pane;
-        private string[] args;
+        private string[] m_AutoSearchArgs;
 
         // Memory of all object names already discovered, first string in the Tuple is the device network address hash
         // The tuple contains two value types, so it's ok for cross session
@@ -96,8 +96,7 @@ namespace Yabe
 
         public YabeMainDialog(string []args)
         {
-            yabeFrm = this;
-            this.args = args;
+            yabeFrm = this;            
             //StringBuilder AutoRunFlag = new StringBuilder();
             //GetPrivateProfileString("Yabe", "Auto", "", AutoRunFlag, 255, "C:\\Work\\T3000_Building_Automation_System\\T3000 Output\\debug\\T3000_config.ini");
 
@@ -110,7 +109,11 @@ namespace Yabe
 
             InitializeComponent();
             // addDevicesearchToolStripMenuItem_Click(this,null);//Fandu
-            AutoPopulateThisDialog();
+            if (args != null && args.Length == 2) //args[0] -> Name of device, args[1] -> Network it belongs
+            {
+                m_AutoSearchArgs = args;
+                AutoPopulateThisDialog();
+            }
             Trace.Listeners.Add(new MyTraceListener(this));
             // m_DeviceTree.ExpandAll();
 
@@ -191,8 +194,8 @@ namespace Yabe
 
         void AutoPopulateThisDialog()
         {
-            SearchDialog dlg = new SearchDialog(false);
-            BacnetClient comm = dlg.AutoSearch();
+            var searchBackend = new BACnetSearchBackend(m_AutoSearchArgs[1]);
+            BacnetClient comm = searchBackend.Result;
             m_devices.Add(comm, new BacnetDeviceLine(comm));
 
             //add to tree
@@ -240,12 +243,7 @@ namespace Yabe
                 comm.WaitForAllTransmits(2000);
 
                 // WhoIs Min & Max limits
-                int IdMin = -1, IdMax = -1;
-                Int32.TryParse(dlg.WhoLimitLow.Text, out IdMin); Int32.TryParse(dlg.WhoLimitHigh.Text, out IdMax);
-                if (IdMin == 0) IdMin = -1; if (IdMax == 0) IdMax = -1;
-                if ((IdMin != -1) && (IdMax == -1)) IdMax = 0x3FFFFF;
-                if ((IdMax != -1) && (IdMin == -1)) IdMin = 0;
-
+                int IdMin = 0, IdMax = 0x3FFFFF;
                 //start search
                 if (comm.Transport.Type == BacnetAddressTypes.IP || comm.Transport.Type == BacnetAddressTypes.Ethernet
                     || comm.Transport.Type == BacnetAddressTypes.IPV6
@@ -752,7 +750,7 @@ namespace Yabe
                 }
 
                 parent.Nodes.Add(basicnode);
-                if (args != null && args.Length > 0 && basicnode.Text.StartsWith(args[0]))
+                if (m_AutoSearchArgs != null && m_AutoSearchArgs.Length > 0 && basicnode.Text.StartsWith(m_AutoSearchArgs[0]))
                     m_DeviceTree.SelectedNode = basicnode;
                 m_DeviceTree.ExpandAll();
             });
