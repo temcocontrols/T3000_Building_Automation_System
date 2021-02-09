@@ -1,4 +1,4 @@
-![Build Status](https://github.com/chenecharry/T3000_Building_Automation_System/workflows/CI/badge.svg)
+![Build Status](workflows/CI/badge.svg "Build Status")
 
 T3000 Building Automation System
 ================================
