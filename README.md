@@ -1,4 +1,4 @@
-![Build Status](workflows/CI/badge.svg "Build Status")
+![Build Status](https://github.com/temcocontrols/T3000_Building_Automation_System/workflows/CI/badge.svg)
 
 T3000 Building Automation System
 ================================
