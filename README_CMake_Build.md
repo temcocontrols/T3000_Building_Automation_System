@@ -7,6 +7,13 @@ Prerequisites
 -------------
 T3000 uses MFC, so make sure you have MFC installed within Visual Studio. If you are working with version above Visual Studio 2017, CMake comes bundled with it. If not, please install [CMake](https://cmake.org/)
 
+Specific instructions for Visual Studio 2019 on Windows 10 are:
+* Download the Community edition of [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) installer.
+* Run the installer and select:
+** Desktop development with C++
+** C++ MFC for latest 142 build tools (x86 & x64)
+![T3000_VS2019_Installation](image/VS2019Installation.png "T3000 VS2019 Installation options")
+
 Getting a build (What to do if CI fails with a build error)
 -----------------------------------------------------------
 * Checkout T3000
