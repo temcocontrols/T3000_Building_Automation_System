@@ -14,14 +14,23 @@ Specific instructions for Visual Studio 2019 on Windows 10 are:
 	* C++ MFC for latest 142 build tools (x86 & x64)
 ![T3000_VS2019_Installation](image/VS2019Installation.png "T3000 VS2019 Installation options")
 
-Getting a build (What to do if CI fails with a build error)
+Launching a Build
 -----------------------------------------------------------
 * Checkout T3000
-* Open Visual Studio command prompt
-* Create a folder named build and switch to it
-* Issue the commands:
+* Open a Developer Command Prompt for VS (Visual Studio 2019 nomenclature, others may vary)
+* Switch to the folder T3000_Building_Automation_System\build
+* Run _Build.bat or Issue the commands:
    * cmake -A Win32 .. -DCMAKE_TOOLCHAIN_FILE="..\vcpkg-export-openssl\scripts\buildsystems\vcpkg.cmake" 
    * cmake --build .
+   
+Debugging with VS
+-----------------------------------------------------------
+* Follow the Launching a Build instructions
+* Run _Debug.bat or Issue the command:
+   * cmake --open .
+
+What to do if CI or local build fails with a build error
+-----------------------------------------------------------
 * If the above fails this is mostly due to:
    * Compilation errors in one or more CPP files
    * Developer _forgot_ to add new files to CMakeLists.txt
