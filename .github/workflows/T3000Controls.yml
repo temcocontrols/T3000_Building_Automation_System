@@ -23,7 +23,6 @@ jobs:
       - name: cmake
         run: |
           cd ${{ github.workspace }}
-          if not exist .\build\ (mkdir build)
           cd build
           cmake -A Win32 .. -DCMAKE_TOOLCHAIN_FILE="..\vcpkg-export-openssl\scripts\buildsystems\vcpkg.cmake"  
 
