@@ -572,7 +572,7 @@ void BacnetWeeklyRoutine::OnNMClickListBacWeekly(NMHDR *pNMHDR, LRESULT *pResult
 	
 
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point( GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_weeklyr_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt=point;

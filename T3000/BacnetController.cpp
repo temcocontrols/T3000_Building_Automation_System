@@ -1051,7 +1051,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 	long lRow,lCol;
 	m_controller_list.Set_Edit(true);
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point( GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_controller_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt=point;

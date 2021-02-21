@@ -571,7 +571,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 	
 	int device_obj_instance = g_bac_instance;
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point( GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_screen_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt=point;
@@ -1309,7 +1309,7 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 	
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point( GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_screen_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt=point;
