@@ -804,7 +804,7 @@ void CISPDlg::InitISPUI()
         WINDOWPLACEMENT wp;
 
         GetWindowPlacement(&wp);
-
+        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->ShowWindow(true);
 
 
         CRect rc;
@@ -824,7 +824,7 @@ void CISPDlg::InitISPUI()
     {
         WINDOWPLACEMENT wp;
         GetWindowPlacement(&wp);
-
+        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->ShowWindow(0);
         CRect rc;
         CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
         pWnd->GetWindowRect(&rc);

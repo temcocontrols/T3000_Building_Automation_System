@@ -48,4 +48,6 @@ public:
     afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
     afx_msg void OnBnClickedButtonLcdSetting();
 
+    CEdit m_edit_zone_name;
+    afx_msg void OnEnKillfocusEditSettingAliasName();
 };

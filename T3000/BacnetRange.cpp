@@ -107,8 +107,8 @@ BOOL BacnetRange::OnInitDialog()
 
 		GetDlgItem(IDC_RADIO55)->SetWindowTextW(_T("31.  PT100 -40 to 1000 Deg.C"));
 		GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("32.  PT100 -40 to 1800 Deg.F"));
-		GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("35.  PT1000 -40 to 450 Deg.C"));
-		GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("36.  PT1000 -40 to 800 Deg.F"));
+		GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("35.  PT1000 -200 to 600 Deg.C"));
+		GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("36.  PT1000 -328 to 1112 Deg.F"));
 		//ÏÈ½ûÓÃËùÓÐµÄÑ¡Ïî;
 		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
 		{
@@ -1364,11 +1364,11 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							}
 							if(bac_range_number_choose == 5)
 							{
-								m_show_unit.SetWindowTextW(_T("PT1000 -40 to 450"));
+								m_show_unit.SetWindowTextW(_T("PT1000 -200 to 600"));
 							}
 							if(bac_range_number_choose == 6)
 							{
-								m_show_unit.SetWindowTextW(_T("PT1000 -40 to 800"));
+								m_show_unit.SetWindowTextW(_T("PT1000 -328 to 1112"));
 							}
 						}
 						else

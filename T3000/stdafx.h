@@ -198,6 +198,11 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_EXTIO_LIST					WM_USER + 224
 #define     WM_REFRESH_BAC_TSTAT_SCHEDULE_LIST          WM_USER + 225
 #define    WM_REFRESH_BAC_MSV_LIST  					WM_USER + 226
+#define		WM_REFRESH_BAC_BUILDING_IO_LIST			    WM_USER + 300
+#define		WM_REFRESH_BAC_FLOOR_LIST					WM_USER + 301
+#define		WM_REFRESH_BAC_ROOM_LIST					WM_USER + 302
+#define     WM_LIST_FLOOR_CHANGED                       WM_USER + 303
+#define     WM_LIST_ROOM_CHANGED                        WM_USER + 304
 #define     WM_REFRESH_POWERMETER_LIST                   WM_USER + 2690
 #define     WM_SHOW_SCANN_RESULTS                       WM_USER + 2691
 #define     WM_CO2_NODE_THREAD_READ                     WM_USER + 2692

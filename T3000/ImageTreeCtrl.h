@@ -5,32 +5,56 @@
 
 // CImageTreeCtrl
  #include <map>
+#include "CBacnetBuildingManagement.h"
+
+
+
+typedef struct BM_Node
+{
+	int node_type;
+	int child_group;
+	int child_device;
+	int child_io;
+}BM_nodeinfo;
+
+
 class CImageTreeCtrl : public CTreeCtrl
 {
 	DECLARE_DYNAMIC(CImageTreeCtrl)
 
 public:
+	CBacnetBuildingManagement* m_BMpoint;
 	CImageTreeCtrl();
 	virtual ~CImageTreeCtrl();
 	virtual void	DisplayContextMenu(CPoint & point);
 	void    DisplayContextOtherMenu(CPoint & point);
+	void    BMContextMenu(CPoint& point , BM_nodeinfo nodeinfo);
 /*	virtual void	ExtendContextMenu(CMenu & menu);*/
 	afx_msg void	OnContextCmd(UINT uID);
 	void  SetVirtualTreeItem(HTREEITEM virtual_item);
+	virtual bool BM_Rename(HTREEITEM hItem);
+	virtual bool BM_Add_Groups(HTREEITEM hItem);
+	virtual bool BM_Add_Nodes(HTREEITEM hItem);
+	virtual bool BM_Add_Inputs(HTREEITEM hItem);
+	virtual bool BM_Add_Outputs(HTREEITEM hItem);
+	virtual bool BM_Add_Variable(HTREEITEM hItem);
+	void BM_Adds(HTREEITEM hItem, int nfunction, int ntype);
+	virtual bool BM_Delete(HTREEITEM hItem);
 	virtual bool SortByConnection(HTREEITEM hItem)  ;
 	virtual bool SortByFloor(HTREEITEM hItem)  ;
 	virtual bool PingDevice(HTREEITEM hItem) ;
+	virtual bool BM_Communicate(HTREEITEM hItem);
 	bool HandleAddVirtualDevice(HTREEITEM);
 	bool HandleAddCustomDevice(HTREEITEM hItem);
     bool HandleAddRemoteDevice(HTREEITEM);
     //bool HandleAddThirdPartBacnetDevice(HTREEITEM);
      virtual bool    DoDeleteItem(HTREEITEM);
-
-	
+	 BM_nodeinfo operation_nodeinfo;
+	 virtual bool	DoEditLabel(HTREEITEM);
 protected:
 	DECLARE_MESSAGE_MAP()
 	virtual bool	HandleKeyDown(WPARAM wParam, LPARAM lParam);
-	virtual bool	DoEditLabel(HTREEITEM);
+	
     
 protected:
 typedef bool (CImageTreeCtrl::*method)(HTREEITEM);
@@ -114,7 +138,7 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg void OnRclick(NMHDR* pNMHDR, LRESULT* pResult);
-
+	void CheckClickNode(HTREEITEM hItem, BM_nodeinfo & nodeinfo); //给管理模式使用的功能
 	void SetSelectSerialNumber(unsigned int nserial);
 	unsigned int GetSelectSerialNumber();
 	unsigned int m_serial_number;
@@ -134,5 +158,18 @@ public:
     afx_msg BOOL OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 
 };
+
+
+#define TREE_IMAGE_INPUT_ONLINE   35
+#define TREE_IMAGE_INPUT_OFFLINE  36
+#define TREE_IMAGE_INPUT_UNKNOWN  37
+
+#define TREE_IMAGE_OUTPUT_ONLINE   38
+#define TREE_IMAGE_OUTPUT_OFFLINE  39
+#define TREE_IMAGE_OUTPUT_UNKNOWN  40
+
+#define TREE_IMAGE_VARIABLE_ONLINE   41
+#define TREE_IMAGE_VARIABLE_OFFLINE  42
+#define TREE_IMAGE_VARIABLE_UNKNOWN  43
 
 

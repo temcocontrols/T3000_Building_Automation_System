@@ -107,6 +107,8 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "CO2_NodeView.h"
 #include "ZigbeeRepeater.h"
 #include "BacnetThirdPartyMain.h"
+#include "CBacnetBuildingManagement.h"
+#include "CBacnetBuildingMain.h"
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -239,29 +241,6 @@ BOOL m_active_key_mouse = FALSE;
 
 
 
-//tree0412  2017 05 11 fance change
-#if 1
-#define TVINSERV_BUILDING 		    {tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
-#define TVINSERV_FLOOR	 			{tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
-#define TVINSERV_ROOM				{tvInsert.item.iImage=2; tvInsert.item.iSelectedImage=2;}
-#define TVINSERV_TSTAT_DEFAULT 	    {tvInsert.item.iImage=6; tvInsert.item.iSelectedImage=6;}     //默认的产品图标
-#define TVINSERV_LED_TSTAT7 		{tvInsert.item.iImage=8; tvInsert.item.iSelectedImage=8;}   //TSTAT7
-#define TVINSERV_CMFIVE			    {tvInsert.item.iImage=10;tvInsert.item.iSelectedImage=10;}   //TSTAT7
-#define TVINSERV_NET_WORK		    {tvInsert.item.iImage=12;tvInsert.item.iSelectedImage=12;}
-#define TVINSERV_MINIPANEL		    {tvInsert.item.iImage=14;tvInsert.item.iSelectedImage=14;} //MiniPanel
-#define TVINSERV_LC				    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;} //Lightingcontroller
-#define TVINSERV_TSTAT6			    {tvInsert.item.iImage=16;tvInsert.item.iSelectedImage=16;}//tstat6
-#define TVINSERV_CO2			    {tvInsert.item.iImage=18;tvInsert.item.iSelectedImage=18;}//CO2
-#define TVINSERV_T3ARM			    {tvInsert.item.iImage=20;tvInsert.item.iSelectedImage=20;}//CO2
-#define TVINSERV_CS3000             {tvInsert.item.iImage=22;tvInsert.item.iSelectedImage=22;}//cs3000
-#define TVINSERV_TSTAT8			    {tvInsert.item.iImage=24;tvInsert.item.iSelectedImage=24;}//TSTAT8
-#define TVINSERV_T3LC			    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;}//LC
-#define TVINSERV_ZIGBEE_REPEATER    {tvInsert.item.iImage=28;tvInsert.item.iSelectedImage=28;}//zigbeerepeater
-#define TVINSERV_PM5E               {tvInsert.item.iImage=30;tvInsert.item.iSelectedImage=30;}//PM5E
-#define TVINSERV_THIRD_PARTY        {tvInsert.item.iImage=32;tvInsert.item.iSelectedImage=32;}//第三方设备
-#endif
-
-#define ITEM_MASK				TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_TEXT
 
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
 
@@ -388,6 +367,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_CONTROL_IO_NET_CONFIG, &CMainFrame::OnControlIoNetConfig)
         ON_COMMAND(ID_DATABASE_LOGDETAIL, &CMainFrame::OnDatabaseLogdetail)
         ON_UPDATE_COMMAND_UI(ID_APP_ABOUT, &CMainFrame::OnUpdateAppAbout)
+        ON_COMMAND(ID_DATABASE_BUILDINGMANAGEMENT, &CMainFrame::OnDatabaseBuildingManagement)
         END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -639,6 +619,7 @@ void CMainFrame::InitViews()
     m_pViews[DLG_DIALOG_ZIGBEE_REPEATER] = NULL /*(CView *)new CZigbeeRepeater;*/;
     m_pViews[DLG_DIALOG_TSTAT_AQ] = NULL /*(CView *)new CTstatAQ;*/;
     m_pViews[DLG_DIALOG_THIRD_PARTY_BAC] = NULL /*(CView *)new CBacnetThirdPartyMain;*/;
+    m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT] = NULL;
     CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
     newContext.m_pNewViewClass = NULL;
@@ -4011,6 +3992,17 @@ void CMainFrame::SwitchToPruductType(int nIndex)
                 m_pViews[DLG_DIALOG_THIRD_PARTY_BAC]->OnInitialUpdate();//?
 
                 break;
+            case DLG_DIALOG_BUILDING_MANAGEMENT:
+                //m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT] = (CView*)new CBacnetBuildingManagement();
+                m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT] = (CView*)new CBacnetBuildingMain();
+                m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT]->Create(NULL, NULL,
+                    (AFX_WS_DEFAULT_VIEW & ~WS_VISIBLE),
+                    rect, this,
+                    AFX_IDW_PANE_FIRST + DLG_DIALOG_BUILDING_MANAGEMENT, &newContext);
+
+                m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT]->OnInitialUpdate();//?
+
+                break;
             default:
                 return;
                     break;
@@ -4133,12 +4125,12 @@ here:
 		((CBTUMeterDlg*)m_pViews[m_nCurView])->Fresh();
 	}
 	break;
-    case  PM_CO2_NODE:
-    {
-        m_nCurView = DLG_CO2_VIEW;
-        ((CCO2_View*)m_pViews[m_nCurView])->Fresh();
-    }
-    break;
+    //case  PM_CO2_NODE:
+    //{
+    //    m_nCurView = DLG_CO2_VIEW;
+    //    ((CCO2_View*)m_pViews[m_nCurView])->Fresh();
+    //}
+    //break;
     case  DLG_CO2_NET_VIEW:
     {
         m_nCurView = DLG_CO2_NET_VIEW;
@@ -4267,6 +4259,13 @@ here:
     {
         m_nCurView = DLG_DIALOG_THIRD_PARTY_BAC;
         ((CBacnetThirdPartyMain*)m_pViews[m_nCurView])->Fresh();
+        PostMessage(WM_SIZE, 0, 0);
+    }
+    break;
+    case DLG_DIALOG_BUILDING_MANAGEMENT:
+    {
+        m_nCurView = DLG_DIALOG_BUILDING_MANAGEMENT;
+        ((CBacnetBuildingMain*)m_pViews[m_nCurView])->Fresh();
         PostMessage(WM_SIZE, 0, 0);
     }
     break;
@@ -4464,6 +4463,7 @@ void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 if(hwait_write_thread==NULL)    
 {
         hwait_write_thread =CreateThread(NULL,NULL,Send_Set_Config_Command_Thread,this,NULL, NULL);
+        CloseHandle(hwait_write_thread);
     }
 }
 
@@ -4473,6 +4473,7 @@ void CMainFrame::Show_Wait_Dialog_And_ReadBacnet(int ncontrol)
 	if(hwait_read_thread==NULL)
 	{
 		hwait_read_thread =CreateThread(NULL,NULL,Read_Bacnet_Thread,this,NULL, NULL);
+        CloseHandle(hwait_read_thread);
 	}
 }
 
@@ -6264,6 +6265,8 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
     
     if(message==WM_MYMSG_REFRESHBUILDING)
     {
+        if (b_Building_Management_Flag) //处于Building 管理模式 不要刷新Tree
+            return 0;
         //Sleep(1000);
         //AfxMessageBox(_T("There is no default building,please select a building First."));
         BOOL bTemp = g_bEnableRefreshTreeView ;
@@ -9451,6 +9454,9 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 {
     for (UINT i = 0; i < m_product.size(); i++)
     {
+        if (b_Building_Management_Flag) //处于Building编辑模式 ，就退出
+            return 0;
+
         tree_product tp = m_product.at(i);
         if (tp.protocol == P_MODBUS_485)
             continue;
@@ -9653,7 +9659,7 @@ UINT _FreshTreeView(LPVOID pParam )
 
 
         WaitForSingleObject(Read_Mutex, INFINITE);//Add by Fance .
-        if (b_pause_refresh_tree)
+        if ((b_pause_refresh_tree) || (b_Building_Management_Flag))
         {
             if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
             {
@@ -10881,21 +10887,21 @@ void CMainFrame::OnDatabaseIonameconfig()
 
 void CMainFrame::OnDatabaseMbpoll()
 {
-    if (is_connect())
-    {
+    //if (is_connect())
+    //{
         if (g_CommunicationType==0)
         {
             OnDisconnect();
         }
         CString strHistotyFile=g_strExePth+_T("ModbusPoll.exe");
         ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
-    }
-    else
-    {
-        AfxMessageBox(_T("Please config the way of your connection!"));
-        OnAddBuildingConfig();
-        OnConnect();
-    }
+   // }
+   // else
+    //{
+    //    AfxMessageBox(_T("Please config the way of your connection!"));
+    //    OnAddBuildingConfig();
+    //    OnConnect();
+    //}
 }
 
 
@@ -14738,4 +14744,18 @@ void CMainFrame::OnUpdateAppAbout(CCmdUI *pCmdUI)
             pCmdUI->SetText(_T("Update  ") + cs_special_name);
         }
     }
+}
+
+
+void CMainFrame::OnDatabaseBuildingManagement()
+{
+    //MessageBox(_T("This feature is in development!"));
+    //return;
+    // TODO: 在此添加命令处理程序代码
+    b_Building_Management_Flag = true;
+
+    ClearBuilding();
+    m_pTreeViewCrl->DeleteAllItems();
+    m_product.clear();
+    SwitchToPruductType(DLG_DIALOG_BUILDING_MANAGEMENT);
 }

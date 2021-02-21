@@ -1202,6 +1202,7 @@ extern Str_annual_routine_point m_temp_annual_data[BAC_HOLIDAY_COUNT];
 extern Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
 extern Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
 extern int b_pause_refresh_tree; // 全局变量，控制主线程里面的 是否刷新网络数据;
+extern int b_Building_Management_Flag ;//另一种 虚拟控制模式，yes就停止后台扫描以及刷新;
 extern int debug_item_show;
 
 extern char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
@@ -1292,5 +1293,8 @@ extern int n_read_list_flag ; // 读取那一个，例如读Input 还是Output
 extern int n_read_item_index ; // 读哪一个 例如Schedule3 的时间 ，不能用weekly_list 因为界面上的容易变。
 extern unsigned int DEBUG_DELAY_TIME ; //测试用调试Wifi 延迟时间;
 extern CString bacnet_string; // 待解析的字串
+
+extern vector < FloorInfo> bm_floor;
+extern vector < RoomInfo> bm_room;
 
 

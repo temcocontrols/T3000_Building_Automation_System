@@ -14,7 +14,7 @@
 #include "MainFrm.h"
 #include "WorkspaceBar.h"
 #include "../SQLiteDriver/CppSQLite3.h"
-
+#include "CBacnetBuildingMain.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -376,6 +376,11 @@ int CWorkspaceBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//m_image_list.Create(24,24,ILC_COLOR24,1,1);
 	m_image_list.Create(36, 24, ILC_COLOR24, 1, 1);
 	m_image_list.Add(&a,RGB(0,0,0));
+
+	CBitmap a_ext;
+	a_ext.LoadBitmap(IDB_TREENODE_BMP_EXT);
+	m_image_list.Add(&a_ext, RGB(0, 0, 0)); //此节点第一个元素序号为35
+
     m_TreeCtrl.SetImageList(&m_image_list,TVSIL_NORMAL);
 
 	return 0;
@@ -481,9 +486,14 @@ void CWorkspaceBar::OnTvnBeginlabeleditTree(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CWorkspaceBar::OnNMClickTree(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
+	if (b_Building_Management_Flag)
+	{
+		((CBacnetBuildingMain*)pMainFrame->m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT])->OnHTreeItemClick(pNMHDR, pResult);
+		return;
+	}
 	
 	
-	CMainFrame* pMainFrame= (CMainFrame*)AfxGetMainWnd();
 	pMainFrame->OnHTreeItemClick(pNMHDR,pResult);
 
 }

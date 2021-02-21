@@ -175,6 +175,7 @@
     <ClCompile Include="BacnetProgramDebug.cpp" />
     <ClCompile Include="BacnetProgramEdit.cpp" />
     <ClCompile Include="BacnetProgramSetting.cpp" />
+    <ClCompile Include="BacnetProperty.cpp" />
     <ClCompile Include="BacnetRange.cpp" />
     <ClCompile Include="BacnetRegisterListView.cpp" />
     <ClCompile Include="BacnetRemotePoint.cpp" />
@@ -203,7 +204,6 @@
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="Bacnet_Range_Msv.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
-    <ClCompile Include="BancetProperty.cpp" />
     <ClCompile Include="BatchSNDlg.cpp" />
     <ClCompile Include="BinFileParser.cpp" />
     <ClCompile Include="BoatMonitorViewer.cpp" />
@@ -212,6 +212,13 @@
     <ClCompile Include="BuildingConfigEditDlg.cpp" />
     <ClCompile Include="BuildingConfigration.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
+    <ClCompile Include="CBacnetBMD.cpp" />
+    <ClCompile Include="CBacnetBuildingCommunicate.cpp" />
+    <ClCompile Include="CBacnetBuildingIOPoints.cpp" />
+    <ClCompile Include="CBacnetBuildingMain.cpp" />
+    <ClCompile Include="CBacnetBuildingManagement.cpp" />
+    <ClCompile Include="CBacnetBuildingRoomEditor.cpp" />
+    <ClCompile Include="CBacnetBuilidngAddNode.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxis.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxisLabel.cpp" />
@@ -238,6 +245,7 @@
     <ClCompile Include="ChartCtrl\ChartXYSerie.cpp" />
     <ClCompile Include="Class\md5.cpp" />
     <ClCompile Include="Class\MulitithreadSocket.cpp" />
+    <ClCompile Include="CM5\BacnetDescription.cpp" />
     <ClCompile Include="CM5\BacNetProgram_transplant.cpp" />
     <ClCompile Include="CM5\CStatic\staticex.cpp" />
     <ClCompile Include="CM5\ListCtrlCellEx.cpp" />
@@ -570,6 +578,14 @@
     <ClInclude Include="BuildingConfigration.h" />
     <ClInclude Include="CalibartionHT.h" />
     <ClInclude Include="CApplication0.h" />
+    <ClInclude Include="CBacnetBMD.h" />
+    <ClInclude Include="CBacnetBuildingCommunicate.h" />
+    <ClInclude Include="CBacnetBuildingIOPoints.h" />
+    <ClInclude Include="CBacnetBuildingMain.h" />
+    <ClInclude Include="CBacnetBuildingManagement.h" />
+    <ClInclude Include="CBacnetBuildingRoomEditor.h" />
+    <ClInclude Include="CBacnetBuilidngAddNode.h" />
+    <ClInclude Include="CBacnetDescription.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />
     <ClInclude Include="ChartCtrl\ChartAxisLabel.h" />
     <ClInclude Include="ChartCtrl\ChartBalloonLabel.h" />
@@ -793,6 +809,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\treenode_ext.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

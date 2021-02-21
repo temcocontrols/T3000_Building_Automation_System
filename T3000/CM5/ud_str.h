@@ -883,6 +883,7 @@ typedef union
          unsigned char uart_parity[3];
          unsigned char uart_stopbit[3];   //总共253
          lcdconfig display_lcd;
+		 char zone_name[10];   //编程需要用的  别名;
 	}reg;
 }Str_Setting_Info;
 

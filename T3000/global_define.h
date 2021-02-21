@@ -997,6 +997,13 @@ const CString Com_Parity_bit[] =
     _T("Even")
 };
 
+const CString BM_Protocol[] =
+{
+	_T("Modbus RS485"),
+	_T("Modbus TCP"),
+	_T("Bacnet MSTP"),
+	_T("Bacnet IP")
+};
 
 const CString DisplayType[] =
 {
@@ -1749,10 +1756,8 @@ const int OUTPUT_VALUE = 5;
 const int OUTPUT_RELINQUISH_VALUE = 6;
 const int OUTPUT_UNITE = 7;
 const int OUTPUT_RANGE = 8;
-
 const int OUTPUT_LOW_VOLTAGE = 9;
 const int OUTPUT_HIGH_VOLTAGE = 10;
-
 const int OUTPUT_PWM_PERIOD = 11;
 const int OUTPUT_DECOM = 12;
 const int OUTPUT_LABLE = 13;
@@ -2416,6 +2421,19 @@ const CString Airlab_Unit_String[] =
     _T("Lux")
 };
 
+typedef struct FloorInfo
+{
+	CString csName;
+	int xindex;
+};
+
+typedef struct RoomInfo
+{
+	FloorInfo nFloor;
+	CString csName;
+	int yindex;
+};
+
 
 #define SENSOR_BIT_WIFI          0
 #define SENSOR_BIT_10K_TEMP      1
@@ -2429,6 +2447,13 @@ const CString Airlab_Unit_String[] =
 #define SENSOR_BIT_ZIGBEE        9
 #define SENSOR_BIT_PM2_5         10
 #define SENSOR_BIT_AI_PT12       11
+
+#define TYPE_BM_POINT_LIST  255
+#define TYPE_BM_GROUP       0
+#define TYPE_BM_NODES       1
+#define TYPE_BM_INPUT       2
+#define TYPE_BM_OUTPUT      3
+#define TYPE_BM_VARIABLE    4
 
 
 

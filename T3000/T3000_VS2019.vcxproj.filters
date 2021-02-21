@@ -765,9 +765,6 @@
     <ClCompile Include="TstatAQI_Detail.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BancetProperty.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CO2_AUTO_CALIBRATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -779,6 +776,33 @@
     </ClCompile>
     <ClCompile Include="BacnetSettingParamter.cpp">
       <Filter>Bacnet\Setting</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\BacnetDescription.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="CBacnetBMD.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="CBacnetBuildingManagement.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="CBacnetBuilidngAddNode.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="CBacnetBuildingMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBacnetBuildingIOPoints.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBacnetBuildingCommunicate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBacnetBuildingRoomEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetProperty.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1969,10 +1993,39 @@
     <ClInclude Include="BacnetSettingParamter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CBacnetDescription.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBacnetBuildingManagement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBacnetBMD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBacnetBuilidngAddNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBacnetBuildingMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBacnetBuildingIOPoints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBacnetBuildingCommunicate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBacnetBuildingRoomEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\treenode_ext.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
