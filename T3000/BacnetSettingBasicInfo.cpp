@@ -67,7 +67,8 @@ void CBacnetSettingBasicInfo::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_EDIT_SETTING_NODES_LABEL_SETTING, m_edit_nodes_label);
 
 
-	CDialogEx::DoDataExchange(pDX);
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_EDIT_SETTING_ALIAS_NAME, m_edit_zone_name);
 }
 
 
@@ -85,6 +86,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingBasicInfo, CDialogEx)
 
     ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_DELAY_OFF, &CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdDelayOff)
     ON_BN_CLICKED(IDC_BUTTON_LCD_SETTING, &CBacnetSettingBasicInfo::OnBnClickedButtonLcdSetting)
+    ON_EN_KILLFOCUS(IDC_EDIT_SETTING_ALIAS_NAME, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName)
 END_MESSAGE_MAP()
 
 
@@ -366,6 +368,7 @@ BOOL CBacnetSettingBasicInfo::PreTranslateMessage(MSG* pMsg)
         int temp_focus_id = GetFocus()->GetDlgCtrlID();
         if ((temp_focus_id == IDC_EDIT_SETTING_PANEL) ||
             (temp_focus_id == IDC_EDIT_SETTING_NODES_LABEL_SETTING) ||
+            (temp_focus_id == IDC_EDIT_SETTING_ALIAS_NAME) ||
             (temp_focus_id == IDC_EDIT_SETTING_OBJ_INSTANCE) )
         {
             GetDlgItem(IDC_STATIC_SEETING_SERIAL_NUMBER_2)->SetFocus();
@@ -392,4 +395,40 @@ void CBacnetSettingBasicInfo::OnBnClickedButtonLcdSetting()
     // TODO: 在此添加控件通知处理程序代码
     CBacnetSettingParamter Dlg;
     Dlg.DoModal();
+}
+
+
+void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_cstring;
+    m_edit_zone_name.GetWindowTextW(temp_cstring);
+    if (temp_cstring.GetLength() > 10)
+    {
+        MessageBox(_T("Nodes label length must between 1-10"), _T("Notice"), MB_OK | MB_ICONINFORMATION);
+        PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
+        return;
+    }
+
+    if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 600)
+    {
+        char temp_char[30];
+        WideCharToMultiByte(CP_ACP, NULL, temp_cstring.GetBuffer(), -1, temp_char, 20, NULL, NULL);
+        int n_ret = memcmp(temp_char, Device_Basic_Setting.reg.zone_name, 10);
+        if (n_ret == 0)
+            return;
+        memcpy(Device_Basic_Setting.reg.zone_name, temp_char, 10);
+        if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change Nodes label failed!"));
+            memset(Device_Basic_Setting.reg.zone_name, 0, 10);
+            PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
+        }
+        else
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change Nodes label success!"));
+        }
+    }
+
+
 }

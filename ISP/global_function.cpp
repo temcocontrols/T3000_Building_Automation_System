@@ -1106,7 +1106,7 @@ int check_bootloader_and_frimware(int npid ,int comport , unsigned short reg_11 
                 }
 				else if ((((Device_infor[7] >= STM32_CO2_NET) && 
 					      (Device_infor[7] <= STM32_PRESSURE_RS3485)) || (Device_infor[7] == STM32_PM25))
-					&& (temp_bootloader_version < 67))
+					&& (temp_bootloader_version < 56))
 				{
 					c2_update_boot = true;
 				}

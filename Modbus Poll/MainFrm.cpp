@@ -833,7 +833,7 @@ void Update_ViewData(CView* MBPollView){
 	
 	    pMBPollView->m_MultiReadReturnType=ret;
 			
-	
+#if 0
 		++g_Tx_Rx;
 		temp.Format(_T("Tx:%06d--"),g_Tx_Rx);
 		m_Tx+=temp;
@@ -849,6 +849,7 @@ void Update_ViewData(CView* MBPollView){
 		++g_Tx_Rx;
 		temp.Format(_T("Rx:%06d--"),g_Tx_Rx);
 		m_Rx+=temp;
+
 
 		for(int i=0;i<Rev_length;i++){
 			temp.Format(_T("%02X "),rev_back_rawData[i]);
@@ -870,7 +871,7 @@ void Update_ViewData(CView* MBPollView){
 			pMBPollView->m_isgetmodel=FALSE;
 		}
 		register_critical_section.Unlock();
-
+#endif
 		if (ret>0)//读的正确之后，我们才把值传给view显示
 		{
 			memcpy_s(pMBPollView->m_DataBuffer,sizeof(pMBPollView->m_DataBuffer),DataBuffer,sizeof(DataBuffer));

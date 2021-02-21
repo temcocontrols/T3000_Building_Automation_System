@@ -331,6 +331,13 @@
 #define IDD_DIALOG_FIRMWARE_AUTO_CAL    762
 #define IDD_DIALOG_WEB                  764
 #define IDD_DIALOG_BACNET_SETTING_LCD_PARAMETER 766
+#define IDD_DIALOG_BACNET_BUILDING_MANAGEMENT 768
+#define IDB_TREENODE_BMP_EXT            770
+#define IDD_DIALOG_BACNET_BUILDING_HANDLE_NODES 771
+#define IDD_DIALOG_BACNET_BUILDING_MAIN 773
+#define IDD_DIALOG_BACNET_BUILDING_IO_POINT 775
+#define IDD_DIALOG_BACNET_BUILDING_COMMUNICATE 777
+#define IDD_DIALOG_BACNET_BUILDING_EDIT_FLOOR 779
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -460,6 +467,7 @@
 #define IDC_COMBO_DATAFORMAT            1042
 #define IDC_COMBO_REV                   1042
 #define IDC_COMBO_STOP_BIT              1042
+#define IDC_COMBO_ENDPOINT              1042
 #define IDC_EDIT9                       1043
 #define IDC_TIMELEFT_EDIT               1043
 #define IDC_DEF_SETPOINT_EDT            1043
@@ -760,10 +768,12 @@
 #define IDC_COMBO_MSTP_MODBUS           1129
 #define IDC_COMBO_CO2_NODE_PROTOCOL     1129
 #define IDC_COMBO_NUMBER                1129
+#define IDC_COMBO_BM_COMPORT            1129
 #define IDC_POWERMODELCOMBO             1130
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
 #define IDC_COMBO_BACNET_SETTING_BAUDRATE2 1130
+#define IDC_COMBO_BM_BAUDRATE           1130
 #define IDC_BAUDRATECOMBO               1131
 #define IDC_CHECK57                     1131
 #define IDC_COMBO_ENABLE_INOUTPUT       1131
@@ -1700,6 +1710,7 @@
 #define IDC_STATIC_RANGE_UNITE_SHOW     1825
 #define IDC_TAB1                        1826
 #define IDC_LIST_TSTAT                  1826
+#define IDC_TAB_BUILDING_MAIN           1826
 #define IDC_ARD                         1827
 #define IDC_LED                         1827
 #define IDC_LIST_DEBUG                  1827
@@ -2556,6 +2567,34 @@
 #define IDC_BUTTON_LCD_SETTING          2574
 #define IDC_RADIO_LCD_DEFAULT           2575
 #define IDC_RADIO_CUS_DEF               2576
+#define IDC_BUTTON_BM_DONE              2577
+#define IDC_LIST_BM_ROOT                2578
+#define IDC_BUTTON_BM_ADD               2579
+#define IDC_BUTTON_BM_DELETE            2580
+#define IDC_COMBO_BM_FUNCTION           2580
+#define IDC_BUTTON_BM_SAVE              2581
+#define IDC_COMBO_BM_TYPE               2581
+#define IDC_EDIT_BM_COUNT               2582
+#define IDC_EDIT_BM_NODE_NAME           2583
+#define IDC_BUTTON_BM_NODE_OK           2584
+#define IDC_BUTTON_BM_NODE_CANCLE       2585
+#define IDC_LIST_BM_IO_POINTS           2586
+#define IDC_COMBO_PROTOCOL              2587
+#define IDC_EDIT_BM_PORT                2588
+#define IDC_BUTTON_BM_COM_OK            2589
+#define IDC_BUTTON_BM_COM_CANCEL        2590
+#define IDC_COMBO_FLOOR                 2591
+#define IDC_COMBO_ROOM                  2592
+#define IDC_BUTTON_MANAGE_BUILD         2593
+#define IDC_LIST_BM_FLOOR               2594
+#define IDC_LIST_BM_ROOM                2595
+#define IDC_STATIC_BM_FLOOR             2596
+#define IDC_STATIC_BM_ROOM              2597
+#define IDC_BUTTON_BM_FLOOR_ADD         2598
+#define IDC_BUTTON_BM_FLOOR_DELETE      2599
+#define IDC_BUTTON_BM_ROOM_ADD          2600
+#define IDC_BUTTON_BM_FLOOR_DELETE2     2601
+#define IDC_BUTTON_BM_FLOOR_DELETE3     2602
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -2605,6 +2644,7 @@
 #define IDC_COMBO_UPDATE_TYPE           5834
 #define IDC_EDIT_SETTING_PANEL2         5834
 #define IDC_EDIT_SETTING_PORT           5834
+#define IDC_EDIT_SETTING_ALIAS_NAME     5834
 #define IDC_IPADDRESS_TEMCO_IP          5835
 #define IDC_EDIT_SETTING_MODBUS_ID      5835
 #define IDC_BUTTON_START_DOWNLOAD       5836
@@ -3043,6 +3083,7 @@
 #define ID_REFRESH34074                 34074
 #define ID_SETTINGS34075                34075
 #define ID_DATABASE_LOGDETAIL           34076
+#define ID_DATABASE_BUILDINGMANAGEMENT  34077
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -3117,9 +3158,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        768
-#define _APS_NEXT_COMMAND_VALUE         34077
-#define _APS_NEXT_CONTROL_VALUE         2577
+#define _APS_NEXT_RESOURCE_VALUE        781
+#define _APS_NEXT_COMMAND_VALUE         34078
+#define _APS_NEXT_CONTROL_VALUE         2600
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

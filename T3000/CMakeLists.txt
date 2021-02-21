@@ -353,6 +353,14 @@ set(BACNET_HEADER_FILES
   ${BACNET_HEADER_DIR}/BuildingConfigEditDlg.h
   ${BACNET_HEADER_DIR}/BuildingConfigration.h
   ${BACNET_HEADER_DIR}/BuildTable1.h
+  ${BACNET_HEADER_DIR}/CBacnetBMD.h
+  ${BACNET_HEADER_DIR}/CBacnetBuildingCommunicate.h
+  ${BACNET_HEADER_DIR}/CBacnetBuildingIOPoints.h
+  ${BACNET_HEADER_DIR}/CBacnetBuildingMain.h
+  ${BACNET_HEADER_DIR}/CBacnetBuildingManagement.h
+  ${BACNET_HEADER_DIR}/CBacnetBuildingRoomEditor.h
+  ${BACNET_HEADER_DIR}/CBacnetBuilidngAddNode.h
+  ${BACNET_HEADER_DIR}/CBacnetDescription.h
   ${BACNET_HEADER_DIR}/CControlBasicEditorCOM.h
   ${BACNET_HEADER_DIR}/ChangePasswordDlg.h
   ${BACNET_HEADER_DIR}/CO2NetView.h
@@ -580,6 +588,14 @@ set(T3000_SOURCE_FILES
   ${T3000_SOURCE_DIR}/BuildingConfigEditDlg.cpp
   ${T3000_SOURCE_DIR}/BuildingConfigration.cpp
   ${T3000_SOURCE_DIR}/BuildTable1.cpp
+  ${T3000_SOURCE_DIR}/CBacnetBMD.cpp
+  ${T3000_SOURCE_DIR}/CBacnetBuildingCommunicate.cpp
+  ${T3000_SOURCE_DIR}/CBacnetBuildingIOPoints.cpp
+  ${T3000_SOURCE_DIR}/CBacnetBuildingMain.cpp
+  ${T3000_SOURCE_DIR}/CBacnetBuildingManagement.cpp
+  ${T3000_SOURCE_DIR}/CBacnetBuildingRoomEditor.cpp
+  ${T3000_SOURCE_DIR}/CBacnetBuilidngAddNode.cpp
+  ${BACNET_SOURCE_CM5_DIR}/BacnetDescription.cpp
   ${T3000_SOURCE_DIR}/ChangePasswordDlg.cpp
   ${T3000_SOURCE_DIR}/CO2NetView.cpp
   ${T3000_SOURCE_DIR}/CO2_NodeView.cpp
