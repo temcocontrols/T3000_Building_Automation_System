@@ -23,7 +23,8 @@ bld/
 [Ll]og/
 
 # Cmake folder
-build/
+build/*
+!build/_*
 
 # Visual Studio 2015 cache/options directory
 .vs/
