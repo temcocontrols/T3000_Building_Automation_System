@@ -865,7 +865,7 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	long lRow, lCol;
 
 	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	WeeklyList.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt = point;
@@ -1768,7 +1768,7 @@ void CNewTstatSchedulesDlg::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 	long lRow, lCol;
 
 	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	WeeklyList.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt = point;

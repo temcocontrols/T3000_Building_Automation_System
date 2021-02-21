@@ -194,6 +194,9 @@ set(BACNET_FILES
   ${BACNET_SOURCE_CM5_DIR}/SliderBothBtn.cpp
   ${BACNET_SOURCE_CM5_DIR}/CStatic/staticex.cpp
   ${BACNET_SOURCE_DIR}/StatusbarCtrl.cpp
+  ${BACNET_SOURCE_DIR}/BacnetWeb.cpp
+  ${BACNET_SOURCE_DIR}/BacnetSettingParamter.cpp
+  ${BACNET_SOURCE_DIR}/CWebBrowser2.cpp
 )
 
 set(BACNET_CM5_H_FILES
@@ -498,7 +501,7 @@ set(BACNET_HEADER_FILES
   ${BACNET_HEADER_DIR}/WriteSingleRegDlg.h
   ${BACNET_HEADER_DIR}/ZigbeeInformationDlg.h
   ${BACNET_HEADER_DIR}/ZigbeeRepeater.h
-  ${BACNET_HEADER_DIR}/BancetProperty.h
+  ${BACNET_HEADER_DIR}/BacnetProperty.h
   ${BACNET_HEADER_DIR}/BacnetSettingBasicInfo.h
   ${BACNET_HEADER_DIR}/BacnetSettingTcpip.h
   ${BACNET_HEADER_DIR}/BacnetSettingTime.h
@@ -702,7 +705,7 @@ set(T3000_SOURCE_FILES
   ${T3000_SOURCE_DIR}/WriteSingleRegDlg.cpp
   ${T3000_SOURCE_DIR}/ZigbeeInformationDlg.cpp
   ${T3000_SOURCE_DIR}/ZigbeeRepeater.cpp
-  ${T3000_SOURCE_DIR}/BancetProperty.cpp
+  ${T3000_SOURCE_DIR}/BacnetProperty.cpp
   ${T3000_SOURCE_DIR}/BacnetSettingBasicInfo.cpp
   ${T3000_SOURCE_DIR}/BacnetSettingTcpip.cpp
   ${T3000_SOURCE_DIR}/BacnetSettingTime.cpp
@@ -740,106 +743,18 @@ include_directories(${T3_HEADER_DIR} ${SQLITE_HEADER_DIR} ${T3000_SOURCE_DIR} ${
   ${BACNET_DLL_HANDLER_INCLUDE} ${BACNET_MAIN_INCLUDE} ${LIGHTINGCONTROLLER_SRC_DIR} ${HTTP_API})
 
 set(RESOURCE_FILES
-  ${T3_RESOURCE_DIR}/Alarms.ico
-  ${T3_RESOURCE_DIR}/AlarmsBrown.bmp
-  ${T3_RESOURCE_DIR}/AlarmsGreen.bmp
-  ${T3_RESOURCE_DIR}/AlarmsRed.bmp
-  ${T3_RESOURCE_DIR}/ApplyDisable.bmp
-  ${T3_RESOURCE_DIR}/ApplyDown.bmp
-  ${T3_RESOURCE_DIR}/ApplyFouct.bmp
-  ${T3_RESOURCE_DIR}/ApplyUp.bmp
-  ${T3_RESOURCE_DIR}/Back.bmp
-  ${T3_RESOURCE_DIR}/bacnet_menu_bit.bmp
-  ${T3_RESOURCE_DIR}/bitmap1.bmp
-  ${T3_RESOURCE_DIR}/bitmap2.bmp
-  ${T3_RESOURCE_DIR}/bitmap_v.bmp
-  ${T3_RESOURCE_DIR}/bitmap_v_Connected.bmp
-  ${T3_RESOURCE_DIR}/bmp00001.bmp
-  ${T3_RESOURCE_DIR}/bmp_bacnet.bmp
-  ${T3_RESOURCE_DIR}/bmp_down.bmp
-  ${T3_RESOURCE_DIR}/bmp_up.bmp
-  ${T3_RESOURCE_DIR}/Buildings.ico
-  ${T3_RESOURCE_DIR}/check.bmp
-  ${T3_RESOURCE_DIR}/checkno.bmp
-  ${T3_RESOURCE_DIR}/ClearDisable.bmp
-  ${T3_RESOURCE_DIR}/ClearDown.bmp
-  ${T3_RESOURCE_DIR}/ClearFouct.bmp
-  ${T3_RESOURCE_DIR}/ClearUp.bmp
-  ${T3_RESOURCE_DIR}/coldtool.bmp
-  ${T3_RESOURCE_DIR}/Configuration.ico
-  ${T3_RESOURCE_DIR}/default\ view.bmp
-  ${T3_RESOURCE_DIR}/default\ view.jpg
-  ${T3_RESOURCE_DIR}/Exit.ico
-  ${T3_RESOURCE_DIR}/Graphics2.ico
-  ${T3_RESOURCE_DIR}/hottool.bmp
-  ${T3_RESOURCE_DIR}/Input.ico
-  ${T3_RESOURCE_DIR}/inputs.ico
-  ${T3_RESOURCE_DIR}/Input_Icon_Default.ico
-  ${T3_RESOURCE_DIR}/LCD\ Table\ Button.bmp
-  ${T3_RESOURCE_DIR}/LED\ Table\ Button.bmp
-  ${T3_RESOURCE_DIR}/lock.ico
-  ${T3_RESOURCE_DIR}/Login.bmp
-  ${T3_RESOURCE_DIR}/MDisable.bmp
-  ${T3_RESOURCE_DIR}/MDown.bmp
-  ${T3_RESOURCE_DIR}/menubaro_Connected.bmp
-  ${T3_RESOURCE_DIR}/menu_images_16.bmp
-  ${T3_RESOURCE_DIR}/menu_img.bmp
-  ${T3_RESOURCE_DIR}/menu_imgeOwn.bmp
-  ${T3_RESOURCE_DIR}/menu_imgeOwn16.bmp
-  ${T3_RESOURCE_DIR}/menu_imgeOwn24.bmp
-  ${T3_RESOURCE_DIR}/MFouct.bmp
-  ${T3_RESOURCE_DIR}/monitor_.bin
-  ${T3_RESOURCE_DIR}/MUp.bmp
-  ${T3_RESOURCE_DIR}/OK.ico
-  ${T3_RESOURCE_DIR}/outputs2.ico
-  ${T3_RESOURCE_DIR}/PID.ico
-  ${T3_RESOURCE_DIR}/PIDBUTTON.bmp
-  ${T3_RESOURCE_DIR}/Programs.ico
-  ${T3_RESOURCE_DIR}/Refresh.ico
-  ${T3_RESOURCE_DIR}/relay.ico
-  ${T3_RESOURCE_DIR}/RemotePoints.ico
-  ${T3_RESOURCE_DIR}/Scan.ico
-  ${T3_RESOURCE_DIR}/schedual.ico
-  ${T3_RESOURCE_DIR}/Schedual_Icon_Default2.ico
-  ${T3_RESOURCE_DIR}/Schedule0607.bmp
-  ${T3_RESOURCE_DIR}/Select.ico
-  ${T3_RESOURCE_DIR}/serialnum.ico
-  ${T3_RESOURCE_DIR}/setpt.jpg
-  ${T3_RESOURCE_DIR}/SetptThumb.jpg
-  ${T3_RESOURCE_DIR}/Step1.ico
-  ${T3_RESOURCE_DIR}/Step2.ico
-  ${T3_RESOURCE_DIR}/Step3.ico
-  ${T3_RESOURCE_DIR}/Step4.ico
-  ${T3_RESOURCE_DIR}/Step5.ico
-  ${T3_RESOURCE_DIR}/Step6.ico
-  ${T3_RESOURCE_DIR}/switch_off.ico
-  ${T3_RESOURCE_DIR}/switch_on.ico
-  ${T3_RESOURCE_DIR}/T3000.rc
-  ${T3_RESOURCE_DIR}/T3000.rc2
-  ${T3_RESOURCE_DIR}/T3000Building.bmp
-  ${T3_RESOURCE_DIR}/T3000Doc.ico
-  ${T3_RESOURCE_DIR}/temcologo.bmp
-  ${T3_RESOURCE_DIR}/temco_logo.bmp
-  ${T3_RESOURCE_DIR}/temco_logo.jpg
-  ${T3_RESOURCE_DIR}/Toolbar-48.bmp
-  ${T3_RESOURCE_DIR}/toolbar1.bmp
-  ${T3_RESOURCE_DIR}/toolbar2.bmp
-  ${T3_RESOURCE_DIR}/Toolbar256.bmp
-  ${T3_RESOURCE_DIR}/ToolbarOwn.bmp
-  ${T3_RESOURCE_DIR}/Toolbar_V25049.bmp
-  ${T3_RESOURCE_DIR}/treenode.bmp
-  ${T3_RESOURCE_DIR}/treenode_temp.bmp
-  ${T3_RESOURCE_DIR}/TrendLogs.ico
-  ${T3_RESOURCE_DIR}/unlock.ico
-  ${T3_RESOURCE_DIR}/Variables.ico
+  ${T3000_SOURCE_DIR}/T3000.rc
 )
+
+set_source_files_properties(${T3000_SOURCE_DIR}/T3000.rc   PROPERTIES LANGUAGE RC)
+set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ../")
 
 # Add executable to build.
 add_executable(${PROJECT_NAME} WIN32
    ${AIRQUALITY_FILES} ${BACNET_FILES} ${BACNET_CM5_H_FILES} ${BADO_SOURCE_FILES} ${CLASS_SOURCE_FILES} ${ISP_SOURCE_FILES} 
    ${CHARTCTRL_SOURCE_FILES} ${BACNET_HEADER_FILES} ${CLASSCTRL_SOURCE_FILES} ${BACNET_HEADER_FILES}
    ${SINGLESLIDER_SOURCE_FILES} ${T3000_SOURCE_FILES} ${SQLITE_FILES} ${T3_DIALOG_FILES} ${LIGHTINGCONTROLLER_SRC_FILES}
-   ${CUSTOM_SOURCE_FILES} 
+   ${CUSTOM_SOURCE_FILES} ${RESOURCE_FILES}
 )
 
 if(MSVC)

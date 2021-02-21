@@ -12,7 +12,7 @@
 #include "global_define.h"
 #include "BacnetRange.h"
 #include "MainFrm.h"
-#include "BancetProperty.h"
+#include "BacnetProperty.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 CRect Output_rect;
@@ -1146,7 +1146,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	long lRow,lCol;
 	m_output_list.Set_Edit(true);
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point( GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_output_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt=point;
@@ -1885,7 +1885,7 @@ void CBacnetOutput::OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
     long lRow, lCol;
     m_output_list.Set_Edit(true);
     DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-    CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+    CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
     m_output_list.ScreenToClient(&point);
     LVHITTESTINFO lvinfo;
     lvinfo.pt = point;
@@ -1921,7 +1921,7 @@ void CBacnetOutput::OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
             {
                 CString temp_title;
                 temp_title.Format(_T("Bacnet Output %d Priority Array"), lRow + 1);
-                CBancetProperty Dlg;
+                CBacnetProperty Dlg;
                 Dlg.SetParameter(PROP_PRIORITY_ARRAY);
                 Dlg.SetBacnetReadString(bacnet_string);
                 Dlg.SetTitle(temp_title);

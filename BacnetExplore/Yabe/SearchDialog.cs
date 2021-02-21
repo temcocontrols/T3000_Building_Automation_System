@@ -37,7 +37,39 @@ using SharpPcap.LibPcap;
 using System.Runtime.InteropServices;
 namespace Yabe
 {
+    public class BACnetSearchBackend
+    {
+        #region Search_Constants
+        const int m_PortValue = 47808;
+        const int m_Udp_MaxPayload = 1472;
+        const int m_YabeDeviceId = -1;
+        const int m_TimeoutValue = 1000;
+        const int m_RetriesValue = 3;
+        const bool m_Udp_ExclusiveUseOfSocket = false;
+        const bool m_Udp_DontFragment = false;
+        #endregion
+        private string m_SearchNetwork;
+        private BacnetClient m_Result;
+        public BacnetClient Result
+        {
+            get
+            {
+                if (m_Result == null)
+                {
+                    m_Result = m_SearchNetwork.Contains(':')
+                        ? new BacnetClient(new BacnetIpV6UdpProtocolTransport(m_PortValue, m_YabeDeviceId, m_Udp_ExclusiveUseOfSocket, m_Udp_DontFragment, m_Udp_MaxPayload, m_SearchNetwork), m_TimeoutValue, m_RetriesValue)
+                        : new BacnetClient(new BacnetIpUdpProtocolTransport(m_PortValue, m_Udp_ExclusiveUseOfSocket, m_Udp_DontFragment, m_Udp_MaxPayload, m_SearchNetwork), m_TimeoutValue, m_RetriesValue);
+                }
 
+                return m_Result;
+            }
+        }
+
+        public BACnetSearchBackend(string networktosearch)
+        {
+            m_SearchNetwork = networktosearch;
+        }
+    }
 
     public partial class SearchDialog : Form
     {
@@ -88,15 +120,6 @@ namespace Yabe
             //m_AddUdpButton.PerformClick();
             //m_SearchIpButton_Click(this,);
             //m_SearchIpButton_Click(this, null);//Fandu
-        }
-
-        public BacnetClient AutoSearch()
-        {
-            String adr = Properties.Settings.Default.DefaultUdpIp;
-            if (adr.Contains(':'))
-                return new BacnetClient(new BacnetIpV6UdpProtocolTransport((int)m_PortValue.Value, Properties.Settings.Default.YabeDeviceId, Properties.Settings.Default.Udp_ExclusiveUseOfSocket, Properties.Settings.Default.Udp_DontFragment, Properties.Settings.Default.Udp_MaxPayload, adr), (int)m_TimeoutValue.Value, (int)m_RetriesValue.Value);
-            else
-                return new BacnetClient(new BacnetIpUdpProtocolTransport((int)m_PortValue.Value, Properties.Settings.Default.Udp_ExclusiveUseOfSocket, Properties.Settings.Default.Udp_DontFragment, Properties.Settings.Default.Udp_MaxPayload, adr), (int)m_TimeoutValue.Value, (int)m_RetriesValue.Value);
         }
 
         private void m_SearchIpButton_Click(object sender, EventArgs e)
