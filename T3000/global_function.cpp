@@ -4238,6 +4238,9 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         memcpy_s(&Device_Basic_Setting.reg.display_lcd, 7, my_temp_point, 7);
         my_temp_point = my_temp_point + 7;
 
+        memcpy_s(&Device_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
+        my_temp_point = my_temp_point + 10; //算上这个  长度是 270
+        
         return READ_SETTING_COMMAND;
     }
     break;
@@ -7608,6 +7611,11 @@ void GetIPMaskGetWay()
 
             Temp_Node.NetworkCardType=pAdapter->Type;
 
+            if (Temp_Node.StrIP.Find(_T("0.0.0")) != -1)
+            {
+                pAdapter = pAdapter->Next;
+                continue;
+            }
             g_Vector_Subnet.push_back(Temp_Node);
 
             /*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */

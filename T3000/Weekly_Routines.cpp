@@ -1,4 +1,4 @@
-D// Weekly_Routines.cpp : implementation file
+// Weekly_Routines.cpp : implementation file
 //
 
 #include "stdafx.h"

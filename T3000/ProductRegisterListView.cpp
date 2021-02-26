@@ -1990,7 +1990,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 	long lRow, lCol;
 	m_register_list.Set_Edit(true);
 	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_register_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt = point;
@@ -2159,7 +2159,7 @@ void CProductRegisterListView::OnNMDblclkListCustomList(NMHDR *pNMHDR, LRESULT *
 	long lRow, lCol;
 	m_register_list.Set_Edit(true);
 	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_register_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt = point;

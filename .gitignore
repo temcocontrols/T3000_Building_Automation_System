@@ -23,7 +23,8 @@ bld/
 [Ll]og/
 
 # Cmake folder
-build/
+build/*
+!build/_*
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -262,3 +263,8 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+T3000Controls/bin/Release/T3000Controls.dll
+T3000Controls/bin/Release/T3000Controls.dll
+T3000Controls/bin/Release/T3000Controls.dll
+T3000Controls/obj/Release/T3000Controls.csproj.FileListAbsolute.txt
+T3000Controls/obj/Release/T3000Controls.dll

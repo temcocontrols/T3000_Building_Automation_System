@@ -3853,7 +3853,7 @@ void CCO2_View::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
     long lRow,lCol;
     m_input_list.Set_Edit(true);
     DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-    CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+    CPoint point( GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
     m_input_list.ScreenToClient(&point);
     LVHITTESTINFO lvinfo;
     lvinfo.pt=point;
@@ -3960,7 +3960,7 @@ void CCO2_View::OnNMClickList_Output(NMHDR *pNMHDR, LRESULT *pResult){
     CString temp_cstring;
     m_output_list.Set_Edit(true);
     DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-    CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+    CPoint point( GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
     m_output_list.ScreenToClient(&point);
     LVHITTESTINFO lvinfo;
     lvinfo.pt=point;
@@ -3980,7 +3980,7 @@ void CCO2_View::OnNMClickList_Output(NMHDR *pNMHDR, LRESULT *pResult){
 //     long lRow,lCol;
 //     m_co2_external_sensor_list.Set_Edit(true);
 //     DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-//     CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+//     CPoint point( GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 //     m_co2_external_sensor_list.ScreenToClient(&point);
 //     LVHITTESTINFO lvinfo;
 //     lvinfo.pt=point;

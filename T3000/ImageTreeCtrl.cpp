@@ -7,6 +7,9 @@
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "MainFrm.h"
 #include "global_function.h"
+#include "CBacnetBuilidngAddNode.h"
+#include "BacnetAddRemoteDevice.h"
+#include "CBacnetBuildingCommunicate.h"
 // CImageTreeCtrl
 enum ECmdHandler {
 	ID_RENAME = 1,
@@ -22,7 +25,14 @@ enum ECmdHandler {
 	ID_ADD_VIRTUAL_DEVICE,
 	ID_ADD_CUSTOM_DEVICE,
     ID_ADD_REMOTE_DEVICE,
-    //ID_ADD_BACNET_DEVICE,
+	ID_BM_RENAME,
+	ID_BM_DELETE,
+	ID_BM_ADD_GROUPS,
+	ID_BM_ADD_NODES,
+	ID_BM_ADD_INPUT,
+	ID_BM_ADD_OUTPUT,
+	ID_BM_ADD_VARIABLE,
+	ID_BM_BUILDING_COMMUNICATE,
 	ID_MAX_CMD
 };
 
@@ -33,6 +43,8 @@ enum ERightDragHandler {
 
 	ID_MAX_DRH
 };
+extern BM_dlg_ret dlg_ret;
+
  DWORD WINAPI _Background_Write_Name(LPVOID pParam){
   CImageTreeCtrl* dlg=(CImageTreeCtrl*)(pParam);
      CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -133,7 +145,16 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_Commandmap[ID_ADD_CUSTOM_DEVICE]      = &CImageTreeCtrl::HandleAddCustomDevice;
     m_Commandmap[ID_ADD_REMOTE_DEVICE] =      &CImageTreeCtrl::HandleAddRemoteDevice;
     //m_Commandmap[ID_ADD_BACNET_DEVICE] =      &CImageTreeCtrl::HandleAddThirdPartBacnetDevice;
-    
+	m_Commandmap[ID_BM_RENAME] = &CImageTreeCtrl::DoEditLabel;
+    m_Commandmap[ID_BM_ADD_GROUPS] = &CImageTreeCtrl::BM_Add_Groups;
+	m_Commandmap[ID_BM_ADD_NODES] = &CImageTreeCtrl::BM_Add_Nodes;
+	m_Commandmap[ID_BM_ADD_INPUT] = &CImageTreeCtrl::BM_Add_Inputs;
+	m_Commandmap[ID_BM_ADD_OUTPUT] = &CImageTreeCtrl::BM_Add_Outputs;
+	m_Commandmap[ID_BM_ADD_VARIABLE] = &CImageTreeCtrl::BM_Add_Variable;
+	m_Commandmap[ID_BM_DELETE] = &CImageTreeCtrl::BM_Delete;
+	m_Commandmap[ID_BM_BUILDING_COMMUNICATE] = &CImageTreeCtrl::BM_Communicate;
+	
+
 	old_hItem = NULL;
 	m_serial_number = 0;
 	is_focus = false;
@@ -177,6 +198,38 @@ void CImageTreeCtrl::OnContextCmd(UINT id) {
 }
 bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem) 
 {
+	HTREEITEM hSelectItem = NULL;
+	if (b_Building_Management_Flag != 0)
+	{
+		if (operation_nodeinfo.node_type == TYPE_BM_POINT_LIST)
+		{
+			if (m_BMpoint->BuildingNode.h_treeitem != NULL)
+			{
+				hSelectItem = m_BMpoint->BuildingNode.h_treeitem;
+			}
+		}
+		else if (operation_nodeinfo.node_type == TYPE_BM_GROUP)
+		{
+			if (m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->h_treeitem != NULL)
+				hSelectItem = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->h_treeitem;
+		}
+		else if (operation_nodeinfo.node_type == TYPE_BM_NODES)
+		{
+			if (m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->h_treeitem != NULL)
+				hSelectItem = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->h_treeitem;
+		}
+		else if ((operation_nodeinfo.node_type == TYPE_BM_INPUT) ||
+			(operation_nodeinfo.node_type == TYPE_BM_OUTPUT) ||
+			(operation_nodeinfo.node_type == TYPE_BM_VARIABLE))
+		{
+			if (m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->pchild[operation_nodeinfo.child_io]->h_treeitem != NULL)
+				hSelectItem = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->pchild[operation_nodeinfo.child_io]->h_treeitem;
+		}
+		
+		return hSelectItem ? (EditLabel(hSelectItem) != 0) : false;
+		//BM_Rename(hItem);
+		//return 0;
+	}
 	m_hSelItem=hItem;
 
 
@@ -249,7 +302,7 @@ bool CImageTreeCtrl::HandleAddCustomDevice(HTREEITEM hItem)
 	return true;
 }
 
-#include "BacnetAddRemoteDevice.h"
+
 bool CImageTreeCtrl::HandleAddRemoteDevice(HTREEITEM)
 {
     CBacnetAddRemoteDevice RemoteDlg;
@@ -267,6 +320,277 @@ bool CImageTreeCtrl::HandleAddRemoteDevice(HTREEITEM)
 //    //::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING, 0, 0);
 //    return true;
 //}
+
+void reset_dlg_data()
+{
+	dlg_ret.m_BM_ret_count = 0;
+	dlg_ret.m_BM_AddDlg_resault = 0;
+	dlg_ret.m_BM_ret_function = 255;
+	dlg_ret.m_BM_ret_name.Empty();
+	dlg_ret.m_BM_ret_type = 255;
+}
+
+
+bool CImageTreeCtrl::BM_Communicate(HTREEITEM hItem)
+{
+	CBacnetBuildingCommunicate dlg;
+	dlg.DoModal();
+	return 0;
+}
+
+bool CImageTreeCtrl::BM_Delete(HTREEITEM hItem)
+{
+	//operation_nodeinfo
+	//DeleteItem(myiterator->product_item);
+
+	HTREEITEM htree_delete = NULL; //需要删除的节点;
+	if (operation_nodeinfo.node_type == TYPE_BM_POINT_LIST)
+	{
+		htree_delete = m_BMpoint->BuildingNode.h_treeitem;
+
+	}
+	else if (operation_nodeinfo.node_type == TYPE_BM_GROUP)
+	{
+		htree_delete = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->h_treeitem;
+		delete m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group];
+	}
+	else if (operation_nodeinfo.node_type == TYPE_BM_NODES)
+	{
+		htree_delete = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->h_treeitem;
+		delete m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device];
+	}
+	else if ((operation_nodeinfo.node_type == TYPE_BM_INPUT) ||
+		(operation_nodeinfo.node_type == TYPE_BM_OUTPUT) ||
+		(operation_nodeinfo.node_type == TYPE_BM_VARIABLE))
+	{
+		htree_delete = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->pchild[operation_nodeinfo.child_io]->h_treeitem;
+		delete m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->pchild[operation_nodeinfo.child_io];
+		Sleep(1);
+	}
+	else
+	{
+		return 0;
+	}
+	DeleteItem(htree_delete);
+
+	m_BMpoint->SaveAllIntoIniFile();
+	m_BMpoint->UpdateList();
+	return true;
+}
+
+
+
+bool CImageTreeCtrl::BM_Add_Groups(HTREEITEM hItem)
+{
+	BM_Adds(hItem, FUNCTION_BM_ADD, TYPE_BM_GROUP);
+	return true;
+}
+bool CImageTreeCtrl::BM_Add_Nodes(HTREEITEM hItem)
+{
+	BM_Adds(hItem, FUNCTION_BM_ADD, TYPE_BM_NODES);
+
+	return true;
+}
+
+void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
+{
+	reset_dlg_data();
+	CBacnetBuilidngAddNode Dlg;
+	Dlg.SetParameter(nfunction, ntype);
+	//Dlg.SetParameter(FUNCTION_BM_ADD, TYPE_BM_INPUT);
+	Dlg.DoModal();
+
+	if (dlg_ret.m_BM_AddDlg_resault == 1)
+	{
+		if ((ntype == TYPE_BM_INPUT) || (ntype == TYPE_BM_OUTPUT) || (ntype == TYPE_BM_VARIABLE))
+		{
+			//operation_nodeinfo.
+			HTREEITEM htree_node = NULL; //Input 的父节点
+			htree_node = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->h_treeitem;
+			int exist_count; // 此前的哥哥节点;
+			exist_count = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->m_child_count;
+			CBacnetBMD* temp_node = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]; //ABC123 的节点
+			TV_INSERTSTRUCT tvInsert;
+			for (int i = 0; i < dlg_ret.m_BM_ret_count; i++)
+			{
+				CString temp_number;
+				if (dlg_ret.m_BM_ret_count > 1)   //当添加的节点个数不唯一的时候才加上数字后缀
+					temp_number.Format(_T("%d"), exist_count + 1 + i);
+				else
+					temp_number.Empty();
+				CString strinfo = dlg_ret.m_BM_ret_name + temp_number;
+				tvInsert.hParent = htree_node; // 指定父句柄
+				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+				tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strinfo;
+				tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
+				if (ntype == TYPE_BM_INPUT)
+				{
+					temp_node->m_input_count++;
+					tvInsert.item.iImage = TREE_IMAGE_INPUT_UNKNOWN; tvInsert.item.iSelectedImage = TREE_IMAGE_INPUT_UNKNOWN;
+				}
+				else if (ntype == TYPE_BM_OUTPUT)
+				{
+					temp_node->m_output_count++;
+					tvInsert.item.iImage = TREE_IMAGE_OUTPUT_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_OUTPUT_ONLINE;
+				}
+				else if (ntype == TYPE_BM_VARIABLE)
+				{
+					temp_node->m_variable_count++;
+					tvInsert.item.iImage = TREE_IMAGE_VARIABLE_OFFLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_VARIABLE_OFFLINE;
+				}
+				HTREEITEM hTreeIOList = NULL;
+				hTreeIOList = InsertSubnetItem(&tvInsert);//插入PointList
+				m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->m_child_count++;
+
+				//因为已经有 old 个兄节点了，只能在后面创建
+				if (temp_node->pchild[exist_count + i] == NULL)
+					temp_node->pchild[exist_count + i] = new CBacnetBMD;
+				CBacnetBMD* io_node = temp_node->pchild[exist_count + i];
+				io_node->hParent = temp_node->h_treeitem;
+				io_node->h_treeitem = hTreeIOList;
+				io_node->m_child_count = 0;
+				io_node->m_csName = strinfo;
+				io_node->m_index = exist_count + i;
+				//io_node->m_node_type = TYPE_BM_INPUT;
+				io_node->m_node_type = ntype;
+				io_node->pfather = temp_node;
+				//新增节点，添加信息，保存到数据库;
+			}
+			if (htree_node != NULL)
+				Expand(htree_node, TVE_EXPAND);
+		}
+		else if (ntype == TYPE_BM_NODES)
+		{
+			HTREEITEM hgroup_node = NULL; //Input 的父节点
+			hgroup_node = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->h_treeitem;
+			int exist_device_count; // 此前的哥哥节点;
+			exist_device_count = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->m_child_count;
+			CBacnetBMD* temp_group = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]; //ABC Group 的节点
+			TV_INSERTSTRUCT tvInsert;
+			for (int i = 0; i < dlg_ret.m_BM_ret_count; i++)
+			{
+				CString temp_number;
+				if (dlg_ret.m_BM_ret_count > 1)   //当添加的节点个数不唯一的时候才加上数字后缀
+					temp_number.Format(_T("%d"), exist_device_count + 1 + i);
+				else
+					temp_number.Empty();
+				CString strinfo = dlg_ret.m_BM_ret_name + temp_number;
+				tvInsert.hParent = hgroup_node; // 指定父句柄
+				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+				tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strinfo;
+				tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
+
+				//这里选择device的图标
+				//if (i == 0)
+				//	TVINSERV_MINIPANEL   //这里到时候要判断到底是什么设备
+				//else if (i == 1)
+				//	TVINSERV_TSTAT8
+				//else if (i == 2)
+				//	TVINSERV_T3ARM
+				//else
+					TVINSERV_MINIPANEL
+
+
+				HTREEITEM hTreeDeviceList = NULL;
+				hTreeDeviceList = InsertSubnetItem(&tvInsert);//插入DeviceList
+				temp_group->m_child_count++;
+
+				//因为已经有 old 个兄节点了，只能在后面创建
+				if (temp_group->pchild[exist_device_count + i] == NULL)
+					temp_group->pchild[exist_device_count + i] = new CBacnetBMD;
+				CBacnetBMD* device_node = temp_group->pchild[exist_device_count + i];
+				device_node->hParent = temp_group->h_treeitem;
+				device_node->h_treeitem = hTreeDeviceList;
+				device_node->m_child_count = 0;
+				device_node->m_csName = strinfo;
+				device_node->m_index = exist_device_count + i;
+				//io_node->m_node_type = TYPE_BM_INPUT;
+				device_node->m_node_type = ntype;
+				device_node->pfather = temp_group;
+				//新增节点，添加信息，保存到数据库;
+			}
+			if (hgroup_node != NULL)
+				Expand(hgroup_node, TVE_EXPAND);
+			Sleep(1);
+		}
+		else if (ntype == TYPE_BM_GROUP)
+		{
+		HTREEITEM hpointlist_node = NULL; //Group 的父节点
+		hpointlist_node = m_BMpoint->BuildingNode.h_treeitem;
+		int exist_group_count; // 此前的哥哥节点;
+		exist_group_count = m_BMpoint->BuildingNode.m_child_count;
+		CBacnetBMD* temp_root = &(m_BMpoint->BuildingNode); //Group 的节点
+		TV_INSERTSTRUCT tvInsert;
+		for (int i = 0; i < dlg_ret.m_BM_ret_count; i++)
+		{
+			CString temp_number;
+			if (dlg_ret.m_BM_ret_count > 1)   //当添加的节点个数不唯一的时候才加上数字后缀
+				temp_number.Format(_T("%d"), exist_group_count + 1 + i);
+			else
+				temp_number.Empty();
+			CString strinfo = dlg_ret.m_BM_ret_name + temp_number;
+			tvInsert.hParent = hpointlist_node; // 指定父句柄
+			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strinfo;
+			tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
+			TVINSERV_ROOM
+
+				HTREEITEM hTreeGroupList = NULL;
+			hTreeGroupList = InsertSubnetItem(&tvInsert);//插入DeviceList
+			temp_root->m_child_count++;
+
+			//因为已经有 old 个兄节点了，只能在后面创建
+			if (temp_root->pchild[exist_group_count + i] == NULL)
+				temp_root->pchild[exist_group_count + i] = new CBacnetBMD;
+			CBacnetBMD* group_node = temp_root->pchild[exist_group_count + i];
+			group_node->hParent = temp_root->h_treeitem;
+			group_node->h_treeitem = hTreeGroupList;
+			group_node->m_child_count = 0;
+			group_node->m_csName = strinfo;
+			group_node->m_index = exist_group_count + i;
+			group_node->m_node_type = ntype;
+			group_node->pfather = temp_root;
+			//新增节点，添加信息，保存到数据库;
+		}
+		if (hpointlist_node != NULL)
+			Expand(hpointlist_node, TVE_EXPAND);
+		Sleep(1);
+
+		}
+		m_BMpoint->BuildingNode.UpdateCount();
+
+		Invalidate();
+		m_BMpoint->SaveAllIntoIniFile();
+		m_BMpoint->UpdateList();
+
+	}
+}
+
+bool CImageTreeCtrl::BM_Add_Inputs(HTREEITEM hItem)
+{
+	BM_Adds(hItem, FUNCTION_BM_ADD, TYPE_BM_INPUT);
+
+	return true;
+}
+
+bool CImageTreeCtrl::BM_Add_Outputs(HTREEITEM hItem)
+{
+	BM_Adds(hItem, FUNCTION_BM_ADD, TYPE_BM_OUTPUT);
+	return true;
+}
+
+bool CImageTreeCtrl::BM_Add_Variable(HTREEITEM hItem)
+{
+	BM_Adds(hItem, FUNCTION_BM_ADD, TYPE_BM_VARIABLE);
+	return true;
+}
+
+bool CImageTreeCtrl::BM_Rename(HTREEITEM hItem)
+{
+	AfxMessageBox(_T("Add Rename"));
+	Sleep(1);
+	return true;
+}
 
 bool CImageTreeCtrl::SortByConnection(HTREEITEM hItem) 
 {
@@ -887,7 +1211,44 @@ void CImageTreeCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 	TVITEM & item = pTVDispInfo->item;
 	*pResult = 1;
-
+	if (b_Building_Management_Flag == 1)
+	{
+		CString temp_cs;
+		temp_cs = item.pszText;
+		temp_cs.Trim();
+		if (temp_cs.IsEmpty()) //在不变更的情况下， 会是 一个空的字符;
+			return;
+		//if(m_BMpoint->BuildingNode)
+		//operation_nodeinfo
+		if (operation_nodeinfo.node_type == TYPE_BM_POINT_LIST)
+		{
+			if (m_BMpoint->BuildingNode.h_treeitem != NULL)
+				m_BMpoint->BuildingNode.m_csName = temp_cs;
+		}
+		else if (operation_nodeinfo.node_type == TYPE_BM_GROUP)
+		{
+			if (m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->h_treeitem != NULL)
+				m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->m_csName = temp_cs;
+		}
+		else if (operation_nodeinfo.node_type == TYPE_BM_NODES)
+		{
+			if (m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->h_treeitem != NULL)
+				m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->m_csName = temp_cs;
+		}
+		else if ((operation_nodeinfo.node_type == TYPE_BM_INPUT) ||
+				 (operation_nodeinfo.node_type == TYPE_BM_OUTPUT) ||
+				 (operation_nodeinfo.node_type == TYPE_BM_VARIABLE))
+		{
+			if (m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->pchild[operation_nodeinfo.child_io]->h_treeitem != NULL)
+				m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->pchild[operation_nodeinfo.child_io]->m_csName = temp_cs;
+		}
+		else
+		{
+			return;
+		}
+		m_BMpoint->SaveAllIntoIniFile();
+		return;
+	}
 	if(item.pszText && CanSetLabelText(item)) {
 	    if (m_name_new.IsEmpty())
 	    {
@@ -1386,6 +1747,67 @@ void CImageTreeCtrl::SetVirtualTreeItem(HTREEITEM virtual_item)
 	m_virtual_tree_item = virtual_item;
 }
 
+void CImageTreeCtrl::BMContextMenu(CPoint& point, BM_nodeinfo nodeinfo)
+{
+	CPoint pt(point);
+	ScreenToClient(&pt);
+	UINT flags = 0;
+	HTREEITEM hItem = HitTest(pt, &flags);
+
+	CMenu menu;
+	VERIFY(menu.CreatePopupMenu());
+	VERIFY(menu.AppendMenu(MF_STRING, ID_BM_RENAME, _T("Rename")));
+
+	CMenu Menu;
+	Menu.CreatePopupMenu();
+
+
+	VERIFY(menu.AppendMenu(MF_STRING, ID_BM_DELETE, _T("Delete")));
+
+	operation_nodeinfo = nodeinfo; //保存 操作的节点;
+
+	CMenu SubMenu;
+	SubMenu.CreatePopupMenu();
+	if (nodeinfo.node_type == TYPE_BM_POINT_LIST)
+	{
+		menu.AppendMenu(MF_STRING, ID_BM_BUILDING_COMMUNICATE, _T("Communication"));
+		SubMenu.AppendMenu(MF_STRING , ID_BM_ADD_GROUPS, _T("Add Groups"));
+		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_NODES, _T("Add Nodes"));
+		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_INPUT, _T("Add Inputs"));
+		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_OUTPUT, _T("Add Outputs"));
+		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_VARIABLE, _T("Add Variable"));
+	}
+	else if (nodeinfo.node_type == TYPE_BM_GROUP)
+	{
+		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_GROUPS, _T("Add Groups"));
+		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_NODES, _T("Add Nodes"));
+		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_INPUT, _T("Add Inputs"));
+		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_OUTPUT, _T("Add Outputs"));
+		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_VARIABLE, _T("Add Variable"));	
+	}
+	else if ((nodeinfo.node_type == TYPE_BM_NODES) ||
+		     (nodeinfo.node_type == TYPE_BM_INPUT) ||
+		     (nodeinfo.node_type == TYPE_BM_OUTPUT)  ||
+		     (nodeinfo.node_type == TYPE_BM_VARIABLE))
+	{
+		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_GROUPS, _T("Add Groups"));
+		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_NODES, _T("Add Nodes"));
+		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_INPUT, _T("Add Inputs"));
+		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_OUTPUT, _T("Add Outputs"));
+		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_VARIABLE, _T("Add Variable"));
+	}
+	else
+	{
+		return;
+	}
+
+	menu.AppendMenu(MF_STRING | MF_POPUP, (UINT_PTR)SubMenu.m_hMenu, _T("Add"));
+
+
+	if (menu.GetMenuItemCount() > 0)
+		menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
+}
+
 void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
 		CPoint pt(point);
 		ScreenToClient(&pt);
@@ -1439,6 +1861,74 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 	if(menu.GetMenuItemCount() > 0)
 		menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
 }
+
+void CImageTreeCtrl::CheckClickNode(HTREEITEM hItem ,BM_nodeinfo& nodeinfo) //给管理模式使用的功能
+{
+
+	if (hItem == m_BMpoint->BuildingNode.h_treeitem)
+	{
+		nodeinfo.child_device = -1;
+		nodeinfo.child_group = -1;
+		nodeinfo.child_io = -1;
+		nodeinfo.node_type = TYPE_BM_POINT_LIST;
+		return;
+	}
+	int temp_group_count = m_BMpoint->BuildingNode.m_child_count;
+	for (int i = 0; i < temp_group_count; i++)
+	{
+		CBacnetBMD* temp_group_point = NULL;
+		temp_group_point = m_BMpoint->BuildingNode.pchild[i];
+		if (hItem == temp_group_point->h_treeitem)
+		{
+			nodeinfo.child_group = i;
+			nodeinfo.child_device = -1;
+			nodeinfo.child_io = -1;
+			nodeinfo.node_type = temp_group_point->m_node_type;
+			return;
+		}
+
+		for (int j = 0; j < temp_group_point->m_child_count; j++) //判断GROUP 有几个 子节点
+		{
+			CBacnetBMD* temp_device_point = NULL;
+			temp_device_point = temp_group_point->pchild[j];   //这里得到类似
+			if (hItem == temp_device_point->h_treeitem)
+			{
+				nodeinfo.child_group = i;
+				nodeinfo.child_device = j;
+				nodeinfo.child_io = -1;
+				nodeinfo.node_type = temp_device_point->m_node_type ;
+				return;
+			}
+
+			for (int z = 0; z < temp_device_point->m_child_count; z++)
+			{
+				CBacnetBMD* temp_io_point = NULL;
+				temp_io_point = temp_device_point->pchild[z];   //IO节点
+				if (hItem == temp_io_point->h_treeitem)
+				{
+					nodeinfo.child_group = i;
+					nodeinfo.child_device = j;
+					nodeinfo.child_io = z;
+					nodeinfo.node_type = temp_io_point->m_node_type;
+					return;
+				}
+
+			}
+		}
+
+
+		
+	}
+
+	nodeinfo.child_device = -1;
+	nodeinfo.child_group = -1;
+	nodeinfo.child_io = -1;
+	nodeinfo.node_type = TYPE_BM_GROUP;
+	return;
+
+
+}
+//#include "CBacnetBMD.h"
 void CImageTreeCtrl::OnRclick(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	*pResult = 1;
@@ -1447,42 +1937,50 @@ void CImageTreeCtrl::OnRclick(NMHDR* pNMHDR, LRESULT* pResult)
 	GetCursorPos(&point);
 	ScreenToClient(&point);
 	HTREEITEM hItem = HitTest(point, &flags);
-	//::getroofi
-	HTREEITEM root_item = CImageTreeCtrl::GetRootItem();
-
-	if(CImageTreeCtrl::ItemHasChildren(root_item))
+	
+	if (b_Building_Management_Flag == 0)
 	{
-		HTREEITEM hChildItem =	CImageTreeCtrl::GetChildItem(root_item);
-		while(hChildItem != NULL)
+		HTREEITEM root_item = CImageTreeCtrl::GetRootItem();
+		if (CImageTreeCtrl::ItemHasChildren(root_item))
 		{
-			if(hChildItem == hItem)
+			HTREEITEM hChildItem = CImageTreeCtrl::GetChildItem(root_item);
+			while (hChildItem != NULL)
 			{
-				hItem = NULL;
-				break;
+				if (hChildItem == hItem)
+				{
+					hItem = NULL;
+					break;
+				}
+				hChildItem = CImageTreeCtrl::GetNextItem(hChildItem, TVGN_NEXT);
+
+
 			}
-			hChildItem = CImageTreeCtrl::GetNextItem(hChildItem, TVGN_NEXT);
-	
-
 		}
-	}
-	
-
-
-
-	if(root_item == hItem)
-		hItem = NULL;
-	if(hItem != NULL)
-	{
-		if(hItem && (flags & TVHT_ONITEM) && !(flags & TVHT_ONITEMRIGHT))
-			SelectItem(hItem);
-		ClientToScreen(&point);
-		DisplayContextMenu(point);
+		if (root_item == hItem)
+			hItem = NULL;
+		if (hItem != NULL)
+		{
+			if (hItem && (flags & TVHT_ONITEM) && !(flags & TVHT_ONITEMRIGHT))
+				SelectItem(hItem);
+			ClientToScreen(&point);
+			DisplayContextMenu(point);
+		}
+		else
+		{
+			ClientToScreen(&point);
+			DisplayContextOtherMenu(point);
+		}
 	}
 	else
 	{
+		int a = m_BMpoint->nGroupCount;
+		BM_nodeinfo temp_node;
+		CheckClickNode(hItem, temp_node);
 		ClientToScreen(&point);
-		DisplayContextOtherMenu(point);
+		BMContextMenu(point, temp_node);
+		Sleep(1);
 	}
+
 
 }
 #pragma endregion

@@ -166,7 +166,7 @@ void Getminitypename(unsigned char nmini_type, CString &ret_name)
         ret_name = _T("T3-TB-11I");
         break;
     case MINIPANELARM_NB:
-        ret_name = _T("T3-NB");
+        ret_name = _T("T3-Nano");
         break;
     case T3_TSTAT10:
         ret_name = _T("TSTAT10");
@@ -712,6 +712,21 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         m_page_basic_info.m_edit_panel.SetWindowTextW(temp_panel_number);
         m_page_basic_info.m_edit_nodes_label.SetWindowTextW(temp_nodes_label);
 
+        if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 600)
+        {
+            CString temp_zome_name;
+            MultiByteToWideChar(CP_ACP, 0, (char*)Device_Basic_Setting.reg.zone_name, (int)strlen((char*)Device_Basic_Setting.reg.zone_name) + 1, temp_zome_name.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_zome_name.ReleaseBuffer();
+            temp_zome_name.Trim();
+            m_page_basic_info.EnableWindow(true);
+            m_page_basic_info.m_edit_zone_name.SetWindowTextW(temp_zome_name);
+        }
+        else
+        {
+            m_page_basic_info.EnableWindow(false);
+            m_page_basic_info.m_edit_zone_name.SetWindowTextW(_T(""));
+        }
+
         if (Device_Basic_Setting.reg.usb_mode == 1)
         {
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_USB_DEVICE))->SetCheck(false);
@@ -1239,6 +1254,7 @@ BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 		int temp_focus_id = GetFocus()->GetDlgCtrlID();
 		if((temp_focus_id == IDC_EDIT_SETTING_PANEL ) ||
 		   (temp_focus_id == IDC_EDIT_SETTING_NODES_LABEL_SETTING) ||
+            (temp_focus_id == IDC_EDIT_SETTING_ALIAS_NAME) ||
 			(temp_focus_id == IDC_EDIT_DYNDNS_USER_NAME) ||
 			(temp_focus_id == IDC_EDIT_DYNDNS_PASSWORD) ||
 			(temp_focus_id == IDC_EDIT_DYNDNS_DOMAIN) ||
@@ -1502,9 +1518,16 @@ BOOL CBacnetSetting::OnHelpInfo(HELPINFO* pHelpInfo)
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
-
+#include "CM5/BacnetDescription.h"
+BacnetDescription * m_pDescription;
 void CBacnetSetting::OnBnClickedButtonBacSettingOk()
 {
+#ifdef DEBUG
+    m_pDescription = new BacnetDescription;
+    m_pDescription->GetAllPanels();
+    return;
+#endif // DEBUG
+
     //unsigned long  temp_time_long = time(NULL);
     //g_Print.Format(_T("PC Time is %d  ,Panel's Time is %d"), temp_time_long, Device_time.new_time.n_time);
     //DFTrace(g_Print);

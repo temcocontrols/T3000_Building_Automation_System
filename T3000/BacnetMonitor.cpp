@@ -965,7 +965,7 @@ void CBacnetMonitor::OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 	CString temp_task_info;
 	
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+	CPoint point( GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
 	m_monitor_list.ScreenToClient(&point);
 	LVHITTESTINFO lvinfo;
 	lvinfo.pt=point;
