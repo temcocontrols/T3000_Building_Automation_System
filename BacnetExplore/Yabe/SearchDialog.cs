@@ -37,40 +37,6 @@ using SharpPcap.LibPcap;
 using System.Runtime.InteropServices;
 namespace Yabe
 {
-    public class BACnetSearchBackend
-    {
-        #region Search_Constants
-        const int m_PortValue = 47808;
-        const int m_Udp_MaxPayload = 1472;
-        const int m_YabeDeviceId = -1;
-        const int m_TimeoutValue = 1000;
-        const int m_RetriesValue = 3;
-        const bool m_Udp_ExclusiveUseOfSocket = false;
-        const bool m_Udp_DontFragment = false;
-        #endregion
-        private string m_SearchNetwork;
-        private BacnetClient m_Result;
-        public BacnetClient Result
-        {
-            get
-            {
-                if (m_Result == null)
-                {
-                    m_Result = m_SearchNetwork.Contains(':')
-                        ? new BacnetClient(new BacnetIpV6UdpProtocolTransport(m_PortValue, m_YabeDeviceId, m_Udp_ExclusiveUseOfSocket, m_Udp_DontFragment, m_Udp_MaxPayload, m_SearchNetwork), m_TimeoutValue, m_RetriesValue)
-                        : new BacnetClient(new BacnetIpUdpProtocolTransport(m_PortValue, m_Udp_ExclusiveUseOfSocket, m_Udp_DontFragment, m_Udp_MaxPayload, m_SearchNetwork), m_TimeoutValue, m_RetriesValue);
-                }
-
-                return m_Result;
-            }
-        }
-
-        public BACnetSearchBackend(string networktosearch)
-        {
-            m_SearchNetwork = networktosearch;
-        }
-    }
-
     public partial class SearchDialog : Form
     {
         public static int autocrun = 1;
@@ -87,14 +53,13 @@ namespace Yabe
             }
         }
 
-        public SearchDialog(bool bIsVisible = true)
+        public SearchDialog()
         {
             //System.Timers.Timer t = new System.Timers.Timer(1000);//实例化Timer类，设置间隔时间为10000毫秒；
             //t.Elapsed += new System.Timers.ElapsedEventHandler(theout);//到达时间的时候执行事件；
             //t.AutoReset = false;//设置是执行一次（false）还是一直执行(true)；
             //t.Enabled = true;//是否执行System.Timers.Timer.Elapsed事件；
-            InitializeComponent();
-            this.Visible = bIsVisible;
+            InitializeComponent();            
 
             //find all serial ports
             string[] ports = System.IO.Ports.SerialPort.GetPortNames();
@@ -261,5 +226,39 @@ namespace Yabe
             return ips.ToArray();
         }
 
+    }
+
+    public class BACnetSearchBackend
+    {
+        #region Search_Constants
+        const int m_PortValue = 47808;
+        const int m_Udp_MaxPayload = 1472;
+        const int m_YabeDeviceId = -1;
+        const int m_TimeoutValue = 1000;
+        const int m_RetriesValue = 3;
+        const bool m_Udp_ExclusiveUseOfSocket = false;
+        const bool m_Udp_DontFragment = false;
+        #endregion
+        private string m_SearchNetwork;
+        private BacnetClient m_Result;
+        public BacnetClient Result
+        {
+            get
+            {
+                if (m_Result == null)
+                {
+                    m_Result = m_SearchNetwork.Contains(':')
+                        ? new BacnetClient(new BacnetIpV6UdpProtocolTransport(m_PortValue, m_YabeDeviceId, m_Udp_ExclusiveUseOfSocket, m_Udp_DontFragment, m_Udp_MaxPayload, m_SearchNetwork), m_TimeoutValue, m_RetriesValue)
+                        : new BacnetClient(new BacnetIpUdpProtocolTransport(m_PortValue, m_Udp_ExclusiveUseOfSocket, m_Udp_DontFragment, m_Udp_MaxPayload, m_SearchNetwork), m_TimeoutValue, m_RetriesValue);
+                }
+
+                return m_Result;
+            }
+        }
+
+        public BACnetSearchBackend(string networktosearch)
+        {
+            m_SearchNetwork = networktosearch;
+        }
     }
 }
