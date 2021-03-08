@@ -112,12 +112,11 @@ set(HEADER_FILES
 
 set(RESOURCE_FILES
   ${MODBUSDLLFORVC_SOURCE}/ModbusDllforVc.rc
-  ${RES_DIRECTORY}/ModbusDllforVc.rc2
 )
 
 set_source_files_properties(${MODBUSDLLFORVC_SOURCE}/ModbusDllforVc.rc  PROPERTIES LANGUAGE RC)
-set_source_files_properties(${RES_DIRECTORY}/ModbusDllforVc.rc2 PROPERTIES LANGUAGE RC)
-set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ../")
+set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ./")
+set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ./res/")
 
 include_directories(${MODBUSDLLFORVC_HEADER})
 

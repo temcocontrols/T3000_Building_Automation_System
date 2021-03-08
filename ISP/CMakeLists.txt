@@ -164,15 +164,11 @@ include_directories(${EXTERNAL_HEADER_DIR_BACNET_HANDLER})
 
 set(RESOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/isp.rc
-  ${RES_DIRECTORY}/ISP.rc2
-  ${RES_DIRECTORY}/ISP.ico
 )
 
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/isp.rc PROPERTIES LANGUAGE RC)
-set_source_files_properties(${RES_DIRECTORY}/ISP.rc2 PROPERTIES LANGUAGE RC)
-set_source_files_properties(${RES_DIRECTORY}/ISP.ico PROPERTIES LANGUAGE RC)
-set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ../")
 set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ./")
+set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ./res/")
 
 # Since we link to BACnet_Stack_Library through pragma directive, we need to specify the 
 # link directory path.

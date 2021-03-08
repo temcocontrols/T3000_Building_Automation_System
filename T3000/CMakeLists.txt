@@ -360,7 +360,7 @@ set(BACNET_HEADER_FILES
   ${BACNET_HEADER_DIR}/CBacnetBuildingManagement.h
   ${BACNET_HEADER_DIR}/CBacnetBuildingRoomEditor.h
   ${BACNET_HEADER_DIR}/CBacnetBuilidngAddNode.h
-  ${BACNET_HEADER_DIR}/CBacnetDescription.h
+  ${BACNET_SOURCE_CM5_DIR}/BacnetDescription.h
   ${BACNET_HEADER_DIR}/CControlBasicEditorCOM.h
   ${BACNET_HEADER_DIR}/ChangePasswordDlg.h
   ${BACNET_HEADER_DIR}/CO2NetView.h
