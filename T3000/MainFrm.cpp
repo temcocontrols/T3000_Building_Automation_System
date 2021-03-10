@@ -12275,6 +12275,7 @@ void CMainFrame::OnPaint()
 }
 
 #include "TemcoStandardBacnetToolDlg.h"
+#include <WinInet.h>
 CTemcoStandardBacnetToolDlg *BacnetTool_Window = NULL;;
 void CMainFrame::OnDatabaseBacnettool()
 {
@@ -12293,12 +12294,16 @@ void CMainFrame::OnDatabaseBacnettool()
     ApplicationFolder.ReleaseBuffer();
     CS_BacnetExplore_Path = ApplicationFolder + _T("\\BacnetExplore.exe");
 
-    //ShellExecute(NULL, L"open", CS_BacnetExplore_Path, NULL, NULL, SW_SHOWNORMAL);
-
     HTREEITEM item = m_pTreeViewCrl->GetSelectedItem();
     CString selecteditemstr = (item != nullptr) ? m_pTreeViewCrl->GetItemText(item) : L"";
+    // Selected controller may have embedded spaces in it. Let us use windows API 
+    // to encode those, so we will have to decode them in the BacnetTool.
+    CString canonicalizedstring;
+    DWORD bufferLength = 2048;
+    InternetCanonicalizeUrl(selecteditemstr, canonicalizedstring.GetBuffer(bufferLength), &bufferLength, ICU_ENCODE_SPACES_ONLY);
     CString selectednetwork = m_current_tree_node.NetworkCard_Address;
-    ShellExecute(NULL, L"open", CS_BacnetExplore_Path, selecteditemstr + " " + selectednetwork, NULL, SW_SHOWNORMAL);
+    ShellExecute(NULL, L"open", CS_BacnetExplore_Path, canonicalizedstring + " " + selectednetwork, NULL, SW_SHOWNORMAL);
+    canonicalizedstring.ReleaseBuffer();
     return;
 #if 0
 
