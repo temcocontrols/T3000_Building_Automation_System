@@ -126,12 +126,11 @@ set(HEADER_FILES
 
 set(RESOURCE_FILES
   ${CPP_SOURCE_DIR}/FlexSlideBar.rc
-  ${RES_DIRECTORY}/FlexSlideBar.rc2
 )
 
 set_source_files_properties(${CPP_SOURCE_DIR}/FlexSlideBar.rc PROPERTIES LANGUAGE RC)
-set_source_files_properties(${RES_DIRECTORY}/FlexSlideBar.rc2 PROPERTIES LANGUAGE RC)
-set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ../")
+set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ./")
+set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ./res/")
 
 include_directories(${CPP_HEADER_DIR})
 

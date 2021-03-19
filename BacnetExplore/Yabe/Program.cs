@@ -72,6 +72,13 @@ namespace Yabe
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            // There are two arguments that come to this program. First is the name of the
+            // device, and second is the network it is associated with. The name can contain
+            // spaces, so it is encoded which we need to decode.
+            if (args != null && args.Length > 0)
+            {
+                args[0] = Uri.UnescapeDataString(args[0]);
+            }
             Application.Run(new YabeMainDialog(args));
         }
     }
