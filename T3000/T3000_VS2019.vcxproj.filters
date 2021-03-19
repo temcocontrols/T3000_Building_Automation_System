@@ -804,6 +804,12 @@
     <ClCompile Include="BacnetProperty.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CAirFlowSensor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTstatAQ_Parameter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -2015,6 +2021,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CBacnetBuildingRoomEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAirFlowSensor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTstatAQ_Parameter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

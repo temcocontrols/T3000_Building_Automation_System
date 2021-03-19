@@ -6,10 +6,10 @@
 #include "WifiConfigDlg.h"
 #include "afxdialogex.h"
 #include "global_function.h"
-
+#include "MainFrm.h"
 str_wifi_point wifi_info;
 // CWifiConfigDlg dialog
-
+extern tree_product selected_product_Node; // 选中的设备信息;
 IMPLEMENT_DYNAMIC(CWifiConfigDlg, CDialogEx)
 
 CWifiConfigDlg::CWifiConfigDlg(CWnd* pParent /*=NULL*/)
@@ -327,6 +327,15 @@ BOOL CWifiConfigDlg::OnInitDialog()
             GetDlgItem(IDC_IPADDRESS2)->EnableWindow(false);
             GetDlgItem(IDC_STATIC_MASK)->ShowWindow(false);
             GetDlgItem(IDC_STATIC_GATEWAY)->ShowWindow(false);
+        }
+        //if(IDC_RADIO_WIFI_ENABLE)
+        if (selected_product_Node.product_class_id == PM_TSTAT_AQ)
+        {
+            if (product_register_value[4] <= 119)
+            {
+                GetDlgItem(IDC_RADIO_WIFI_ENABLE)->ShowWindow(false);
+                GetDlgItem(IDC_RADIO_WIFI_DISABLE)->ShowWindow(false);
+            }
         }
     }
 

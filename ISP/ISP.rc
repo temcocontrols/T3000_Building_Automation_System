@@ -199,7 +199,7 @@ CAPTION "About ISP"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     LTEXT           "ISP Tool",IDC_STATIC,37,193,27,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2005-2019",IDC_STATIC,101,193,129,8
+    LTEXT           "Copyright (C) 2005-2025",IDC_STATIC,101,193,129,8
     DEFPUSHBUTTON   "OK",IDOK,370,215,50,14,WS_GROUP
     CONTROL         "",IDC_LOGOPIC,"Static",SS_BLACKFRAME | NOT WS_VISIBLE,381,187,28,12
     ICON            IDR_MAINFRAME,IDC_STATIC,7,191,20,20
@@ -352,8 +352,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 6,2,5,0
- PRODUCTVERSION 6,2,5,0
+ FILEVERSION 6,2,9,0
+ PRODUCTVERSION 6,2,9,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -368,13 +368,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileVersion", "6.2.5.0"
+            VALUE "FileVersion", "6.2.9.0"
             VALUE "InternalName", "ISP.exe"
             VALUE "OriginalFilename", "ISP.exe"
             VALUE "ProductName", "ISP Tool"
-            VALUE "ProductVersion", "6.2.5.0"
-            VALUE "SpecialBuild", "6.2.5"
-            VALUE "TemcoCopyright", "Copyright 1999-2021 (c).  All rights reserved."
+            VALUE "ProductVersion", "6.2.9.0"
+            VALUE "SpecialBuild", "6.2.9"
+            VALUE "TemcoCopyright", "Copyright 2013-2025 (c).  All rights reserved."
         END
     END
     BLOCK "VarFileInfo"
@@ -447,7 +447,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About NEWISP..."
-    IDS_STR_VIRSIONNUM      "Version 6.2.6"
+    IDS_STR_VIRSIONNUM      "Version 6.2.9"
     IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
 END
 

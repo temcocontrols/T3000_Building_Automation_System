@@ -10,7 +10,7 @@
  
 #include "../SQLiteDriver/CppSQLite3.h"
 // CARDDlg dialog
-
+int Remote_Get_PanelName(unsigned char nmodbusid, unsigned char npid_type, CString& ret_name);
 IMPLEMENT_DYNAMIC(CARDDlg, CDialogEx)
 
 CARDDlg::CARDDlg(CWnd* pParent /*=NULL*/)
@@ -245,6 +245,10 @@ void CARDDlg::OnBnClickedOk()
    MODE_SUPPORT_PTRANSFER = 0; //ÔÝÊ±¹Ø±Õ;
    if (is_open && (offline_mode == false))
    {
+
+
+
+
        unsigned short test_array[1000];
        int ntest_ret = 0;
 
@@ -263,16 +267,27 @@ void CARDDlg::OnBnClickedOk()
            temp_info.device_id = 0;
            if (m_is_net_device)
            {
-               temp_info.ipaddress[0] = test_array[47];
-               temp_info.ipaddress[1] = test_array[48];
-               temp_info.ipaddress[2] = test_array[49];
-               temp_info.ipaddress[3] = test_array[50];
-               temp_info.m_protocol = MODBUS_TCPIP;
+			   //CIPAddressCtrl
+			   m_ipaddress.GetAddress(temp_info.ipaddress[0], temp_info.ipaddress[1], temp_info.ipaddress[2], temp_info.ipaddress[3]);
+			   temp_info.panel_number = test_array[36];
+			   temp_info.device_id = GetDeviceInstance(temp_info.product_type);
+               //temp_info.ipaddress[0] = test_array[47];
+               //temp_info.ipaddress[1] = test_array[48];
+               //temp_info.ipaddress[2] = test_array[49];
+               //temp_info.ipaddress[3] = test_array[50];
+				   if(ShowBacnetView(test_array[7]) )
+					   temp_info.m_protocol = PROTOCOL_BACNET_IP;
+				   else
+						temp_info.m_protocol = MODBUS_TCPIP;
            }
            else
            {
                temp_info.m_protocol = MODBUS_RS485;
            }
+		   CString temp_view_name;
+		   Remote_Get_PanelName(read_modbus_id, temp_info.product_type, temp_view_name);
+		   temp_view_name.Trim();
+
 
            CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
            CppSQLite3DB SqliteDBBuilding;
@@ -285,25 +300,30 @@ void CARDDlg::OnBnClickedOk()
            CString str_temp;
            CString temp_pname;
            CString temp_modbusid;
-           CString temp_view_name;
+
            CString temp_protocol;
            CString temp_product_id_string;
            CString temp_port_string;
            CString temp_object_instance;
            CString temp_panel_number;
+		   CString temp_ip;
+		   temp_ip.Format(_T("%d.%d.%d.%d"), temp_info.ipaddress[0], temp_info.ipaddress[1], temp_info.ipaddress[2], temp_info.ipaddress[3]);
            int count;
            temp_serial_number.Format(_T("%u"), temp_info.serialnumber);
-           str_temp.Format(_T("select * from ALL_NODE where Serial_ID = '%i'"), temp_info.serialnumber);
+           //str_temp.Format(_T("select * from ALL_NODE where Serial_ID = '%i'"), temp_info.serialnumber);
+		   str_temp.Format(_T("Delete from ALL_NODE Where Serial_ID = '%u' "), temp_info.serialnumber);
            temp_baud.Format(_T("%u"), nbaudrate);
            q = SqliteDBBuilding.execQuery((UTF8MBSTR)str_temp);
            table = SqliteDBBuilding.getTable((UTF8MBSTR)str_temp);
            count = table.numRows();
 
+		   temp_pname = GetProductName(temp_info.product_type);
+		   temp_modbusid.Format(_T("%u"), temp_info.modbus_addr);
+		   if (temp_view_name.IsEmpty())
+		   {
+			   temp_view_name = temp_pname + _T(":") + temp_serial_number + _T("-") + temp_modbusid;
+		   }
 
-
-           temp_pname = GetProductName(temp_info.product_type);
-           temp_modbusid.Format(_T("%u"), temp_info.modbus_addr);
-           temp_view_name = temp_pname + _T(":") + temp_serial_number + _T("-") + temp_modbusid;
            temp_protocol.Format(_T("%d"), temp_info.m_protocol);
            temp_product_id_string.Format(_T("%d"), temp_info.product_type);
            if (m_is_net_device)
@@ -316,16 +336,27 @@ void CARDDlg::OnBnClickedOk()
            temp_object_instance.Format(_T("%u"), temp_info.device_id);
            temp_panel_number.Format(_T("%u"), temp_info.panel_number);
 
-           if (count >= 1)
-           {
-               str_temp.Format(_T("update ALL_NODE set Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Object_Instance = '%s',Panal_Number = ' %s' where Serial_ID = '%s'"), temp_baud, temp_port_string, temp_product_id_string, temp_protocol,
-                   temp_view_name, temp_object_instance, temp_panel_number, temp_serial_number);
-           }
-           else
-           {
-               str_temp.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom,Parent_SerialNum,Panal_Number,Object_Instance)   values('"
-                   + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','""','" + temp_serial_number + "','floor1','room1','" + temp_view_name + "','" + temp_product_id_string + "','" + temp_modbusid + "','""','" + temp_baud + "','Default_Building_PIC.bmp','" + temp_object_instance + "','" + temp_panel_number + "','" + temp_port_string + "','0','" + temp_protocol + "','1','0','0', '" + temp_panel_number + "','" + temp_object_instance + "')"));
-           }
+           //if (count >= 1)
+           //{
+			   CString strSql;
+			   strSql.Format(_T("Delete from ALL_NODE Where Serial_ID = '%u' "), temp_info.serialnumber);
+			   SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+               //str_temp.Format(_T("update ALL_NODE set Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Object_Instance = '%s',Panal_Number = ' %s' where Serial_ID = '%s'"), temp_baud, temp_port_string, temp_product_id_string, temp_protocol,
+               //    temp_view_name, temp_object_instance, temp_panel_number, temp_serial_number);
+          // }
+           //else
+           //{
+			   if (m_is_net_device)
+			   {
+				   str_temp.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom,Parent_SerialNum,Panal_Number,Object_Instance)   values('"
+					   + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','""','" + temp_serial_number + "','floor1','room1','" + temp_view_name + "','" + temp_product_id_string + "','" + temp_modbusid + "','""','" + temp_ip + "','Modbus TCP / BacnetIP','" + temp_object_instance + "','" + temp_panel_number + "','" + temp_port_string + "','0','" + temp_protocol + "','1','0','0', '" + temp_panel_number + "','" + temp_object_instance + "')"));
+			   }
+			   else
+			   {
+				   str_temp.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom,Parent_SerialNum,Panal_Number,Object_Instance)   values('"
+					   + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','""','" + temp_serial_number + "','floor1','room1','" + temp_view_name + "','" + temp_product_id_string + "','" + temp_modbusid + "','""','" + temp_baud + "','Default_Building_PIC.bmp','" + temp_object_instance + "','" + temp_panel_number + "','" + temp_port_string + "','0','" + temp_protocol + "','1','0','0', '" + temp_panel_number + "','" + temp_object_instance + "')"));
+			   }
+           //}
            SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
            SqliteDBBuilding.closedb();
            MessageBox(_T("This operation succeeds.The addition is completed successfully."));

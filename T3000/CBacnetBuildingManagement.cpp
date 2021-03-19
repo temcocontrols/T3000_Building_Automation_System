@@ -7,7 +7,7 @@
 #include "MainFrm.h"
 CMainFrame* pFrame_BM;
 // CBacnetBuildingManagement
-
+CString cs_bm_ini;
 IMPLEMENT_DYNCREATE(CBacnetBuildingManagement, CDialogEx)
 
 CBacnetBuildingManagement::CBacnetBuildingManagement()
@@ -56,8 +56,7 @@ void CBacnetBuildingManagement::Dump(CDumpContext& dc) const
 
 void CBacnetBuildingManagement::Fresh()
 {
-	pFrame_BM = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	cs_bm_ini = g_strExePth + _T("Database\\Buildings\\") + pFrame_BM->m_strCurMainBuildingName + _T("\\BuildingManagement.ini");
+
 	pFrame_BM->SetWindowTextW(cs_special_name + CurrentT3000Version);
 	Initial_List();
 

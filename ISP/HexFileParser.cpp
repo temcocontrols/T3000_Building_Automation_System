@@ -450,11 +450,20 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 			CString strTemp(a);
 			dwHiAddr = GetHighAddrFromFile(strTemp);
 			dwHiAddr <<= 16;
-
-			if( nBufCount != 0)
+			if (m_file_type == HEX_TYPE_ARM_64K)  //如果是64K的起始地址 count是0 也压进去;
 			{
-				m_szFlags.push_back(nBufCount);
+				if (nBufCount == 0)
+					nBufCount = 0x10000;
+				  m_szFlags.push_back(nBufCount);
 			}
+			else
+			{
+				if (nBufCount != 0)
+				{
+					m_szFlags.push_back(nBufCount);
+				}
+			}
+
             // do CRC
             continue;
         }

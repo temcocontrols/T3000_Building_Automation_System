@@ -266,7 +266,7 @@ static void RS485_Cleanup(
 * ALGORITHM:   none
 * NOTES:       none
 *****************************************************************************/
-void RS485_Initialize(
+int RS485_Initialize(
     void)
 {
 	wchar_t Temp_wchar[500];
@@ -293,7 +293,7 @@ void RS485_Initialize(
     if (RS485_Handle == INVALID_HANDLE_VALUE) {
         fprintf(stderr, "Unable to open %s\n", RS485_Port_Name);
         RS485_Print_Error();
-		return; // if open com port fail , don't exit ;
+		return 0; // if open com port fail , don't exit ;
         //exit(1);
     }
     if (!GetCommTimeouts(RS485_Handle, &RS485_Timeouts)) {
@@ -306,7 +306,7 @@ void RS485_Initialize(
 
     atexit(RS485_Cleanup);
 
-    return;
+    return 1;
 }
 
 

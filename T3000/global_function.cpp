@@ -4128,26 +4128,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 6;
         Device_Basic_Setting.reg.tcp_type = *(my_temp_point++);
         Device_Basic_Setting.reg.mini_type = *(my_temp_point++);
-        if (Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
-            bacnet_device_type = BIG_MINIPANEL;
-        else if (Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL)
-            bacnet_device_type = SMALL_MINIPANEL;
-        else if (Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL)
-            bacnet_device_type = TINY_MINIPANEL;
-        else if (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL)
-            bacnet_device_type = TINY_EX_MINIPANEL;
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM)
-            bacnet_device_type = MINIPANELARM;
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB)
-            bacnet_device_type = MINIPANELARM_LB;
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
-            bacnet_device_type = MINIPANELARM_TB;
-        else if (Device_Basic_Setting.reg.mini_type == T3_TB_11I)
-            bacnet_device_type = T3_TB_11I;
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB)
-            bacnet_device_type = MINIPANELARM_NB;
-        else
-            bacnet_device_type = PM_CM5;
+
         my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
         Device_Basic_Setting.reg.pro_info.harware_rev = *(my_temp_point++);
         Device_Basic_Setting.reg.pro_info.firmware0_rev_main = *(my_temp_point++);
@@ -4238,9 +4219,56 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         memcpy_s(&Device_Basic_Setting.reg.display_lcd, 7, my_temp_point, 7);
         my_temp_point = my_temp_point + 7;
 
-        memcpy_s(&Device_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
-        my_temp_point = my_temp_point + 10; //算上这个  长度是 270
+        //memcpy_s(&Device_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
+        //my_temp_point = my_temp_point + 10; //算上这个  长度是 270
         
+
+        //额外处理不同CPU的 minitype
+           //最高位 次高位   10   主芯片 APM
+    //最高位 次高位   01   主芯片 GD
+        unsigned char temp_chip = Device_Basic_Setting.reg.mini_type;
+        Device_Basic_Setting.reg.mini_type = Device_Basic_Setting.reg.mini_type & 0x3F;
+        
+        temp_chip = (temp_chip & 0xc0);
+        T3_chip_type = temp_chip;
+        switch (temp_chip)
+        {
+        case 0x00:
+            break;
+        case 0x40:
+            T3_chip_name = _T("(GD)");
+            break;
+        case 0x80:
+            T3_chip_name = _T("(APM)");
+            break;
+        case 0xc0:
+            break;
+        default:
+            T3_chip_name.Empty();
+            break;
+        }
+
+        if (Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
+            bacnet_device_type = BIG_MINIPANEL;
+        else if (Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL)
+            bacnet_device_type = SMALL_MINIPANEL;
+        else if (Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL)
+            bacnet_device_type = TINY_MINIPANEL;
+        else if (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL)
+            bacnet_device_type = TINY_EX_MINIPANEL;
+        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM)
+            bacnet_device_type = MINIPANELARM;
+        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB)
+            bacnet_device_type = MINIPANELARM_LB;
+        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
+            bacnet_device_type = MINIPANELARM_TB;
+        else if (Device_Basic_Setting.reg.mini_type == T3_TB_11I)
+            bacnet_device_type = T3_TB_11I;
+        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB)
+            bacnet_device_type = MINIPANELARM_NB;
+        else
+            bacnet_device_type = PM_CM5;
+
         return READ_SETTING_COMMAND;
     }
     break;
@@ -5736,7 +5764,8 @@ void Inial_Product_Reglist_map()
     product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT7_ARM, _T("Tstat 5 I-6-7-8")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT8_220V, _T("Tstat 5 I-6-7-8")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_T3_LC, _T("T3-LightController")));
-
+    product_reglist_map.insert(map<int, CString>::value_type(PM_AFS, _T("AirFlow")));
+    
     product_reglist_map.insert(map<int, CString>::value_type(STM32_CO2_NET, _T("CO2-W+Ethernet")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_CO2_RS485, _T("CO2-W+Ethernet")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("STM32-hum-w")));
@@ -5799,6 +5828,12 @@ void Inial_Product_Menu_map()
         }
         break;
         case STM32_PM25:
+        {
+            unsigned char  temp[20] = { 1,0,0,0,  0,0,0,0,  0,0,0,0,   0,1,1,1  ,0,0,0,0 };
+            memcpy(product_menu[i], temp, 20);
+        }
+            break;
+        case PM_AFS:
         {
             unsigned char  temp[20] = { 1,0,0,0,  0,0,0,0,  0,0,0,0,   0,1,1,1  ,0,0,0,0 };
             memcpy(product_menu[i], temp, 20);
@@ -5891,6 +5926,7 @@ void Inial_Product_map()
     product_map.insert(map<int, CString>::value_type(PM_TSTAT9, _T("TStat9")));
 	product_map.insert(map<int,CString>::value_type(STM32_HUM_NET,_T("HUM Sensor")));
 	product_map.insert(map<int,CString>::value_type(STM32_HUM_RS485,_T("HUM Sensor")));
+    product_map.insert(map<int, CString>::value_type(PM_AFS, _T("AirFlow")));
 
 
 
@@ -12728,7 +12764,9 @@ int WriteBacnetPictureData(uint32_t deviceid,uint8_t index , unsigned short tran
 BOOL ShowBacnetView(unsigned char product_type)
 {
 	if((product_type == PM_MINIPANEL) || 
-		(product_type == PM_CM5) )
+        (product_type == PM_MINIPANEL_ARM) ||
+		(product_type == PM_CM5)  ||
+        (product_type == PM_TSTAT10))
 		return true;
 	else
 		return false;

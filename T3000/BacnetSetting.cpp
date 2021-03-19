@@ -178,8 +178,9 @@ void Getminitypename(unsigned char nmini_type, CString &ret_name)
         ret_name = _T(" ");
         break;
     }
-    if (nmini_type < 5)
+    if ((nmini_type > 0) && (nmini_type < 5))
         ret_name = ret_name + _T("(Asix)");
+    //ret_name = ret_name + T3_chip_name;
 
 }
 
@@ -198,7 +199,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
     CString temp_5964_version = _T("Unknown");
     CString temp_bootloader_version = _T("Unknown");
     CString temp_serial_number = _T("Unknown");
-
+    CString temp_mcu_type = _T("Unknown");
+    temp_mcu_type.Format(_T("0x%02x"), T3_chip_type);
     TIME_ZONE_INFORMATION lp_time_zone;
     memset(&lp_time_zone, 0, sizeof(TIME_ZONE_INFORMATION));
 
@@ -535,64 +537,71 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         {
             ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->EnableWindow(true);
             ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->EnableWindow(true);
+            ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->EnableWindow(true);
+            (CEdit *)m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(true);
+
+
+            if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 519)//519
+            {
+                m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
+                ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->EnableWindow(false);
+                if (Device_Basic_Setting.reg.LCD_Display == 0)
+                {
+                    //1 常灭
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(true);
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
+                }
+                else if (Device_Basic_Setting.reg.LCD_Display == 1)
+                {
+                    //1 常亮
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
+                }
+            }
+            else
+            {
+                ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->EnableWindow(true);
+
+                if (Device_Basic_Setting.reg.LCD_Display == 0)
+                {
+                    //1 常灭
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(true);
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
+                    m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
+                }
+                else if (Device_Basic_Setting.reg.LCD_Display == 255)
+                {
+                    //255 常亮
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
+                    m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
+                }
+                else
+                {
+                    CString temp_lcd_delay_time;
+                    //1 常亮
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
+                    ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(true);
+                    m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(true);
+                    temp_lcd_delay_time.Format(_T("%d"), Device_Basic_Setting.reg.LCD_Display);
+                    m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->SetWindowText(temp_lcd_delay_time);
+                }
+            }
         }
         else
         {
             ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->EnableWindow(false);
             ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->EnableWindow(false);
+            ((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->EnableWindow(false);
+            (CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
+
         }
 
-        if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 519)//519
-        {
-            m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
-            ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->EnableWindow(false);
-            if (Device_Basic_Setting.reg.LCD_Display == 0)
-            {
-                //1 常灭
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(true);
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
-            }
-            else if (Device_Basic_Setting.reg.LCD_Display == 1)
-            {
-                //1 常亮
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
-            }
-        }
-        else
-        {
-            ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->EnableWindow(true);
-           
-            if (Device_Basic_Setting.reg.LCD_Display == 0)
-            {
-                //1 常灭
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(true);
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
-                m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
-            }
-            else if (Device_Basic_Setting.reg.LCD_Display == 255)
-            {
-                //255 常亮
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
-                m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(false);
-            }
-            else
-            {
-                CString temp_lcd_delay_time;
-                //1 常亮
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
-                ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(true);
-                m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->EnableWindow(true);
-                temp_lcd_delay_time.Format(_T("%d"), Device_Basic_Setting.reg.LCD_Display);
-                m_page_basic_info.GetDlgItem(IDC_EDIT_LCD_DELAY_OFF_TIME)->SetWindowText(temp_lcd_delay_time);
-            }
-        }
 
 
 
@@ -620,12 +629,12 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 ((CComboBox *)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->AddString(Time_Server_Name[j]);
             }
             ((CComboBox *)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->ResetContent();
-            for (int z = 0;z < sizeof(Time_Zone_Name) / sizeof(Time_Zone_Name[0]);z++)
-            {
-                ((CComboBox *)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->AddString(Time_Zone_Name[z]);
-                if (Device_Basic_Setting.reg.time_zone == Time_Zone_Value[z])
-                    ((CComboBox *)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->SetWindowTextW(Time_Zone_Name[z]);
-            }
+            //for (int z = 0;z < sizeof(Time_Zone_Name) / sizeof(Time_Zone_Name[0]);z++)
+            //{
+            //    ((CComboBox *)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->AddString(Time_Zone_Name[z]);
+            //    if (Device_Basic_Setting.reg.time_zone == Time_Zone_Value[z])
+            //        ((CComboBox *)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->SetWindowTextW(Time_Zone_Name[z]);
+            //}
 
             if (Device_Basic_Setting.reg.time_sync_auto_manual == 0)
             {
@@ -714,17 +723,17 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
         if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 600)
         {
-            CString temp_zome_name;
-            MultiByteToWideChar(CP_ACP, 0, (char*)Device_Basic_Setting.reg.zone_name, (int)strlen((char*)Device_Basic_Setting.reg.zone_name) + 1, temp_zome_name.GetBuffer(MAX_PATH), MAX_PATH);
-            temp_zome_name.ReleaseBuffer();
-            temp_zome_name.Trim();
-            m_page_basic_info.EnableWindow(true);
-            m_page_basic_info.m_edit_zone_name.SetWindowTextW(temp_zome_name);
+            //CString temp_zome_name;
+            //MultiByteToWideChar(CP_ACP, 0, (char*)Device_Basic_Setting.reg.zone_name, (int)strlen((char*)Device_Basic_Setting.reg.zone_name) + 1, temp_zome_name.GetBuffer(MAX_PATH), MAX_PATH);
+            //temp_zome_name.ReleaseBuffer();
+            //temp_zome_name.Trim();
+            //m_page_basic_info.m_edit_zone_name.EnableWindow(true);
+            //m_page_basic_info.m_edit_zone_name.SetWindowTextW(temp_zome_name);
         }
         else
         {
-            m_page_basic_info.EnableWindow(false);
-            m_page_basic_info.m_edit_zone_name.SetWindowTextW(_T(""));
+            //m_page_basic_info.m_edit_zone_name.EnableWindow(false);
+            //m_page_basic_info.m_edit_zone_name.SetWindowTextW(_T(""));
         }
 
         if (Device_Basic_Setting.reg.usb_mode == 1)
@@ -936,7 +945,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         //((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_SM5964_VERSION2))->SetWindowTextW(temp_5964_version);
         ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_BOOTLOADER_VERSION))->SetWindowTextW(temp_bootloader_version);
         ((CEdit *)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_SERIAL_NUMBER_2))->SetWindowTextW(temp_serial_number);
-
+        ((CEdit*)m_page_basic_info.GetDlgItem(IDC_STATIC_SEETING_MCU_TYPE))->SetWindowTextW(temp_mcu_type);
 
         CString temp_object;
         CString temp_mac_address;

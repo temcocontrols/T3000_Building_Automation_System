@@ -158,6 +158,9 @@ BEGIN_MESSAGE_MAP(CCO2NetView, CFormView)
     ON_BN_CLICKED(IDC_RADIO_CO2_CAL_DISABLE, &CCO2NetView::OnBnClickedRadioCo2CalDisable)
     ON_BN_CLICKED(IDC_RADIO_HUMIDITY_HEAT_ENABLE, &CCO2NetView::OnBnClickedRadioHumidityHeatEnable)
     ON_BN_CLICKED(IDC_BUTTON_FIRMWARE_AUTO_CAL, &CCO2NetView::OnBnClickedButtonFirmwareAutoCal)
+    ON_BN_CLICKED(IDC_RADIO_CO2_LCD_ON, &CCO2NetView::OnBnClickedRadioCo2LcdOn)
+    ON_BN_CLICKED(IDC_RADIO_CO2_LCD_OFF, &CCO2NetView::OnBnClickedRadioCo2LcdOff)
+    ON_BN_CLICKED(IDC_RADIO_CO2_LCD_DELAY_OFF, &CCO2NetView::OnBnClickedRadioCo2LcdDelayOff)
 END_MESSAGE_MAP()
 
 
@@ -505,6 +508,27 @@ void CCO2NetView::Initial_Window()
     m_Edit_MenuBlockTimes.SetWindowText(strTemp);
     strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS]);
     m_Edit_BacklightTime.SetWindowText(strTemp);
+    if (product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS] == 0)
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_ON))->SetCheck(0);
+        ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_OFF))->SetCheck(1);
+        ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_DELAY_OFF))->SetCheck(0);
+        GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->EnableWindow(0);
+    }
+    else if (product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS] == 255)
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_ON))->SetCheck(1);
+        ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_OFF))->SetCheck(0);
+        ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_DELAY_OFF))->SetCheck(0);
+        GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->EnableWindow(0);
+    }
+    else
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_ON))->SetCheck(0);
+        ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_OFF))->SetCheck(0);
+        ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_DELAY_OFF))->SetCheck(1);
+        GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->EnableWindow(1);
+    }
 
     //Draw Grid
     //T("NUM"), 40, ListCtrlEx::Normal, LVC
@@ -2128,4 +2152,44 @@ void CCO2NetView::OnBnClickedButtonFirmwareAutoCal()
     // TODO: 在此添加控件通知处理程序代码
     CCO2_AUTO_CALIBRATION Dlg;
     Dlg.DoModal();
+}
+
+
+void CCO2NetView::OnBnClickedRadioCo2LcdOn()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_ON))->SetCheck(1);
+    ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_OFF))->SetCheck(0);
+    ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_DELAY_OFF))->SetCheck(0);
+    GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->EnableWindow(0);
+    product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS] = 255;
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS, 255,
+        product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS], this->m_hWnd, IDC_RADIO_CO2_LCD_ON, _T("LCD ON"));
+}
+
+
+void CCO2NetView::OnBnClickedRadioCo2LcdOff()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_ON))->SetCheck(0);
+    ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_OFF))->SetCheck(1);
+    ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_DELAY_OFF))->SetCheck(0);
+    GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->EnableWindow(0);
+    product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS] = 0;
+    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS, 0,
+        product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS], this->m_hWnd, IDC_RADIO_CO2_LCD_ON, _T("LCD OFF"));
+}
+
+
+void CCO2NetView::OnBnClickedRadioCo2LcdDelayOff()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_ON))->SetCheck(0);
+    ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_OFF))->SetCheck(0);
+    ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_DELAY_OFF))->SetCheck(1);
+    GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->EnableWindow(1);
+
 }

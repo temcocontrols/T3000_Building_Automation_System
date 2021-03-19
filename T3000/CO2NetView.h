@@ -509,6 +509,9 @@ public:
 
     afx_msg LRESULT Fresh_Co2Output_Item(WPARAM wParam, LPARAM lParam);
     afx_msg void OnBnClickedButtonFirmwareAutoCal();
+    afx_msg void OnBnClickedRadioCo2LcdOn();
+    afx_msg void OnBnClickedRadioCo2LcdOff();
+    afx_msg void OnBnClickedRadioCo2LcdDelayOff();
 };
 
 const int CO2NET_NUM = 0;

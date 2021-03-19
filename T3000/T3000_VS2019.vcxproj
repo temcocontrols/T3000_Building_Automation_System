@@ -107,7 +107,7 @@
       <ValidateAllParameters>true</ValidateAllParameters>
     </Midl>
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>MinSpace</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
@@ -212,6 +212,7 @@
     <ClCompile Include="BuildingConfigEditDlg.cpp" />
     <ClCompile Include="BuildingConfigration.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
+    <ClCompile Include="CAirFlowSensor.cpp" />
     <ClCompile Include="CBacnetBMD.cpp" />
     <ClCompile Include="CBacnetBuildingCommunicate.cpp" />
     <ClCompile Include="CBacnetBuildingIOPoints.cpp" />
@@ -259,6 +260,7 @@
     <ClCompile Include="ConfigFileHandler.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
     <ClCompile Include="ConnectRemoteServer.cpp" />
+    <ClCompile Include="CTstatAQ_Parameter.cpp" />
     <ClCompile Include="CustomSource\JPGLoader.cpp" />
     <ClCompile Include="CustomSource\Splash.cpp" />
     <ClCompile Include="CustomSTable.cpp" />
@@ -576,6 +578,7 @@
     <ClInclude Include="BTUMeterDlg.h" />
     <ClInclude Include="BuildingConfigEditDlg.h" />
     <ClInclude Include="BuildingConfigration.h" />
+    <ClInclude Include="CAirFlowSensor.h" />
     <ClInclude Include="CalibartionHT.h" />
     <ClInclude Include="CApplication0.h" />
     <ClInclude Include="CBacnetBMD.h" />
@@ -636,6 +639,7 @@
     <ClInclude Include="ConnectRemoteServer.h" />
     <ClInclude Include="CControlBasicEditorCOM.h" />
     <ClInclude Include="CRange0.h" />
+    <ClInclude Include="CTstatAQ_Parameter.h" />
     <ClInclude Include="CustomSTable.h" />
     <ClInclude Include="CWebBrowser2.h" />
     <ClInclude Include="CWorkbook0.h" />

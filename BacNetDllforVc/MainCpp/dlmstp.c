@@ -733,6 +733,7 @@ bool dlmstp_init(
     char *ifname)
 {
   //  unsigned long hThread = 0;
+    int rs485_ret = 0;
     uint32_t arg_value = 0;
     thread1_run_flag = 1;
     thread2_run_flag = 1;
@@ -755,7 +756,9 @@ bool dlmstp_init(
     if (ifname) {
         RS485_Set_Interface(ifname);
     }
-    RS485_Initialize();
+    rs485_ret = RS485_Initialize();
+    if (rs485_ret == 0)
+        return false;
     MSTP_Port.InputBuffer = &RxBuffer[0];
     MSTP_Port.InputBufferSize = sizeof(RxBuffer);
     MSTP_Port.OutputBuffer = &TxBuffer[0];

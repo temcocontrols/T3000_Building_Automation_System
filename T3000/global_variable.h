@@ -2294,6 +2294,9 @@ CString bacnet_string; // ´ý½âÎöµÄ×Ö´®
 vector < FloorInfo> bm_floor;
 vector < RoomInfo> bm_room;
 
+CString T3_chip_name;
+unsigned int T3_chip_type;
+
 
 
 

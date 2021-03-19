@@ -6,7 +6,7 @@
 #include "CBacnetBuildingRoomEditor.h"
 #include "afxdialogex.h"
 
-
+extern CString cs_bm_ini;
 // CBacnetBuildingRoomEditor 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetBuildingRoomEditor, CDialogEx)
@@ -59,6 +59,8 @@ LRESULT CBacnetBuildingRoomEditor::Fresh_Floor_Item(WPARAM wParam, LPARAM lParam
 	}
 	else if (Changed_Item == bm_floor.size())
 	{
+		//int last_index = 0;
+		//last_index = bm_floor.back().xindex + 1;
 		//新增的项目
 		//vector < RoomInfo> bm_room;
 		FloorInfo temp_floor;
@@ -71,8 +73,19 @@ LRESULT CBacnetBuildingRoomEditor::Fresh_Floor_Item(WPARAM wParam, LPARAM lParam
 		bm_floor.at(Changed_Item).csName = New_CString;
 	}
 	//保存至本地缓存;
-
-
+	CString temp_total_index;
+	for (int i = 0; i < bm_floor.size(); i++)
+	{
+		CString temp;
+		if (i != 0)
+			temp_total_index = temp_total_index + _T(",");
+		
+		temp.Format(_T("%d"), bm_floor.at(i).xindex);
+		temp_total_index = temp_total_index + temp;
+	}
+	//WritePrivateProfileStringW(_T("FloorInfo"), _T("FloorIndex"), temp_total_index, cs_bm_ini); //修改总
+	
+    
 	//PostMessage(WM_REFRESH_BAC_FLOOR_LIST,NULL,NULL);
 	//PostMessage(WM_REFRESH_BAC_ROOM_LIST, NULL, NULL);
 	return 1;

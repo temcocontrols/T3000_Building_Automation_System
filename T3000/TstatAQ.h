@@ -60,6 +60,12 @@ public:
     afx_msg LRESULT Fresh_Airlab_Item(WPARAM wParam, LPARAM lParam);
     afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg LRESULT  AirlabMessageCallBack(WPARAM wParam, LPARAM lParam);
+    CDateTimeCtrl m_time_trigger;
+    afx_msg void OnNMClickListAirlab(NMHDR* pNMHDR, LRESULT* pResult);
+    afx_msg void OnNMKillfocusDatetimepickerTimeRemain(NMHDR* pNMHDR, LRESULT* pResult);
+    int m_row;
+    int m_col;
+    afx_msg void OnBnClickedButtonAirlabParameter();
 };
 #define AIRLAB_TYPE    0
 #define AIRLAB_VALUE   1

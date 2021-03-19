@@ -1020,6 +1020,27 @@ const CString Com_Stop_bit[] =
     _T("1.5")
 };
 
+const CString AirFlowMode[] =
+{
+	_T("4-20ma"),
+	_T("0-10V")
+};
+
+const CString AirFlowRange[] =
+{
+	_T("0-50 Pascal"),
+	_T("0-100 Pascal"),
+	_T("0-250 Pascal"),
+	_T("0-500 Pascal")
+};
+
+const CString AirFlowUnit[] =
+{
+	_T("m3/s"),
+	_T("ft3/min"),
+	_T("L/min")
+};
+
 const CString Time_Zone_Name[] =
 {
 	_T("(UTC - 12:00) , Yankee Time Zone"),

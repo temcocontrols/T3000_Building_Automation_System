@@ -8069,17 +8069,20 @@ void check_function_table(char *richeditchar ,int ntype)
 		if(ntype == FUNCTION_TABEL)
 		{
 			strcat_s(temp_label,20,func_table[i].func_name);
+			strcat_s(temp_label, 20, " ");
 			char_color =prg_function_color;//  RGB(0,255,255);
 		}
 		else if(ntype == COMMAND_TABEL)
 		{
 			strcat_s(temp_label,20,table[i].command);
+			strcat_s(temp_label, 20, " ");
 			char_color =prg_command_color;// RGB(255,0,255);
 		}
         else if (ntype == LOCAL_VAR_TABEL)
         {
             //strcat_s(temp_label, 20, local_var_new_name[i]); ¶Å·«ÆÁ±Î
             strcat_s(temp_label, 40, local_var_new_name[i]);
+			strcat_s(temp_label, 40, " ");
             char_color = prg_local_var_color;//RGB(111, 111, 111);
         }
 		else
