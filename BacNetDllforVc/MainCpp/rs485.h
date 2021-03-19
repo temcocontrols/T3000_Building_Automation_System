@@ -53,7 +53,7 @@ extern "C" {
         void);
 		__declspec(dllexport) HANDLE Get_RS485_Handle();
 		__declspec(dllexport) void  Set_RS485_Handle(HANDLE temp_handle);
-  __declspec(dllexport)  void RS485_Initialize(
+  __declspec(dllexport)  int RS485_Initialize(
         void);
   __declspec(dllexport)  void RS485_Send_Frame(
         volatile struct mstp_port_struct_t *mstp_port,  /* port specific data */

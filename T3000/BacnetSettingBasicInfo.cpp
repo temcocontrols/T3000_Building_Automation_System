@@ -65,10 +65,8 @@ void CBacnetSettingBasicInfo::DoDataExchange(CDataExchange* pDX)
 
     DDX_Control(pDX, IDC_STATIC_SETTING_NODES_LABEL_TITLE, m_static_nodes_title);  //Panel Name  
     DDX_Control(pDX, IDC_EDIT_SETTING_NODES_LABEL_SETTING, m_edit_nodes_label);
-
-
+    //DDX_Control(pDX, IDC_EDIT_SETTING_ALIAS_NAME, m_edit_zone_name);
     CDialogEx::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_EDIT_SETTING_ALIAS_NAME, m_edit_zone_name);
 }
 
 
@@ -86,7 +84,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingBasicInfo, CDialogEx)
 
     ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_DELAY_OFF, &CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdDelayOff)
     ON_BN_CLICKED(IDC_BUTTON_LCD_SETTING, &CBacnetSettingBasicInfo::OnBnClickedButtonLcdSetting)
-    ON_EN_KILLFOCUS(IDC_EDIT_SETTING_ALIAS_NAME, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName)
+    //ON_EN_KILLFOCUS(IDC_EDIT_SETTING_ALIAS_NAME, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName)
 END_MESSAGE_MAP()
 
 
@@ -368,7 +366,7 @@ BOOL CBacnetSettingBasicInfo::PreTranslateMessage(MSG* pMsg)
         int temp_focus_id = GetFocus()->GetDlgCtrlID();
         if ((temp_focus_id == IDC_EDIT_SETTING_PANEL) ||
             (temp_focus_id == IDC_EDIT_SETTING_NODES_LABEL_SETTING) ||
-            (temp_focus_id == IDC_EDIT_SETTING_ALIAS_NAME) ||
+            //(temp_focus_id == IDC_EDIT_SETTING_ALIAS_NAME) ||
             (temp_focus_id == IDC_EDIT_SETTING_OBJ_INSTANCE) )
         {
             GetDlgItem(IDC_STATIC_SEETING_SERIAL_NUMBER_2)->SetFocus();
@@ -397,7 +395,7 @@ void CBacnetSettingBasicInfo::OnBnClickedButtonLcdSetting()
     Dlg.DoModal();
 }
 
-
+#if 0
 void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName()
 {
     // TODO: 在此添加控件通知处理程序代码
@@ -432,3 +430,4 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName()
 
 
 }
+#endif

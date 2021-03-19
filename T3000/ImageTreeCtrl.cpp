@@ -1332,6 +1332,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
     case 28:
     case 30:
     case 32:
+	case 35:
 		if(state == false)
 		{
 			brother_nImage++;
@@ -1352,6 +1353,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
     case 29:
     case 31:
     case 33:
+	case 36:
 		if(state == true)
 		{
 			brother_nImage--;

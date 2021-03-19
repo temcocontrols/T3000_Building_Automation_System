@@ -109,6 +109,7 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "BacnetThirdPartyMain.h"
 #include "CBacnetBuildingManagement.h"
 #include "CBacnetBuildingMain.h"
+#include "CAirFlowSensor.h"
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -620,6 +621,8 @@ void CMainFrame::InitViews()
     m_pViews[DLG_DIALOG_TSTAT_AQ] = NULL /*(CView *)new CTstatAQ;*/;
     m_pViews[DLG_DIALOG_THIRD_PARTY_BAC] = NULL /*(CView *)new CBacnetThirdPartyMain;*/;
     m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT] = NULL;
+    m_pViews[DLG_DIALOG_AIRFLOW] = NULL;
+    
     CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
     newContext.m_pNewViewClass = NULL;
@@ -1060,7 +1063,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 
-	SetTimer(FOR_LAST_VIEW_TIMER,2000,NULL);
+	SetTimer(FOR_LAST_VIEW_TIMER,4000,NULL);
 
 	CString	configfile_path = g_strExePth + _T("T3000_config.ini");
 	int isoffline = GetPrivateProfileInt(_T("ONOFFLINE_MODEL"), _T("ISONLINE"), -1, configfile_path);
@@ -2012,6 +2015,8 @@ void CMainFrame::LoadProductFromDB()
                             TVINSERV_PM5E
                         else if(temp_product_class_id == PM_THIRD_PARTY_DEVICE)
                             TVINSERV_THIRD_PARTY
+                        else if (temp_product_class_id == PM_AFS)
+                            TVINSERV_AIR_FLOW
 						else
 							TVINSERV_TSTAT_DEFAULT
 
@@ -2270,6 +2275,8 @@ void CMainFrame::LoadProductFromDB()
 								TVINSERV_CS3000
                             else if (temp_product_class_id == PM_THIRD_PARTY_DEVICE)
                                 TVINSERV_THIRD_PARTY
+                            else if (temp_product_class_id == PM_AFS)
+                                TVINSERV_AIR_FLOW
 							else
 								TVINSERV_TSTAT_DEFAULT
 
@@ -2534,6 +2541,8 @@ void CMainFrame::LoadProductFromDB()
 					TVINSERV_CS3000
                 else if (temp_product_class_id == PM_THIRD_PARTY_DEVICE)
                     TVINSERV_THIRD_PARTY
+                else if (temp_product_class_id == PM_AFS)
+                    TVINSERV_AIR_FLOW
 				else
 					TVINSERV_TSTAT_DEFAULT
 
@@ -3074,6 +3083,8 @@ void CMainFrame::ScanTstatInDB(void)
 						TVINSERV_CS3000
                     else if (temp_product_class_id == PM_THIRD_PARTY_DEVICE)
                         TVINSERV_THIRD_PARTY
+                    else if (temp_product_class_id == PM_AFS)
+                        TVINSERV_AIR_FLOW
 					else
 						TVINSERV_TSTAT_DEFAULT
 #endif
@@ -4003,6 +4014,15 @@ void CMainFrame::SwitchToPruductType(int nIndex)
                 m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT]->OnInitialUpdate();//?
 
                 break;
+            case DLG_DIALOG_AIRFLOW:
+                m_pViews[DLG_DIALOG_AIRFLOW] = (CView*)new CAirFlowSensor();
+                m_pViews[DLG_DIALOG_AIRFLOW]->Create(NULL, NULL,
+                    (AFX_WS_DEFAULT_VIEW & ~WS_VISIBLE),
+                    rect, this,
+                    AFX_IDW_PANE_FIRST + DLG_DIALOG_AIRFLOW, &newContext);
+
+                m_pViews[DLG_DIALOG_AIRFLOW]->OnInitialUpdate();//?
+                break;
             default:
                 return;
                     break;
@@ -4269,6 +4289,15 @@ here:
         PostMessage(WM_SIZE, 0, 0);
     }
     break;
+    case DLG_DIALOG_AIRFLOW:
+    {
+        m_nCurView = DLG_DIALOG_AIRFLOW;
+        ((CAirFlowSensor*)m_pViews[m_nCurView])->Fresh();
+        PostMessage(WM_SIZE, 0, 0);
+    }
+        break;
+    default :
+        break;
         //here
     }
 }
@@ -8113,7 +8142,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         int read_ret = 0;
                         read_ret = Read_Multi(g_tstat_id, product_register_sensor_flag, 65000, 3, 5);
 
-                        
+
 
                         register_critical_section.Unlock();
                     }
@@ -8121,6 +8150,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     {
                         //power_value = 1;
                         length = 9;
+                        if ((product_type == STM32_CO2_NET) || (product_type == STM32_CO2_RS485))
+                            length = 13;
                         register_critical_section.Lock();
                         int i;
                         it = 0;
@@ -8563,6 +8594,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 (nFlag == PM_MULTI_SENSOR))
             {
                 SwitchToPruductType(DLG_DIALOG_TSTAT_AQ);
+            }
+            else if (nFlag == PM_AFS)
+            {
+                SwitchToPruductType(DLG_DIALOG_AIRFLOW);
             }
             else if (Scan_Product_ID == 122)
             {
@@ -11073,6 +11108,10 @@ void CMainFrame::OnControlMain()
         {
             SwitchToPruductType(DLG_DIALOG_TSTAT_AQ);
         }
+        else if (product_register_value[7] == PM_AFS)
+        {
+            SwitchToPruductType(DLG_DIALOG_AIRFLOW);
+        }
         else if ((product_register_value[7] == PWM_TEMPERATURE_TRANSDUCER) ||
             (product_register_value[7] == STM32_PM25))
         {
@@ -11905,6 +11944,7 @@ void CMainFrame::OnControlSettings()
         product_register_value[7]==PM_T36CTA|| 
         product_register_value[7] == PM_T3_LC      || 
         product_register_value[7] == PM_TSTAT_AQ   ||
+        product_register_value[7] == PM_AFS ||
         product_register_value[7] == PM_MULTI_SENSOR ||
         product_register_value[7] == STM32_CO2_NET ||
         product_register_value[7] == STM32_PM25 ||
@@ -14754,8 +14794,14 @@ void CMainFrame::OnUpdateAppAbout(CCmdUI *pCmdUI)
 
 void CMainFrame::OnDatabaseBuildingManagement()
 {
-    //MessageBox(_T("This feature is in development!"));
-    //return;
+
+
+#ifndef DEBUG
+    MessageBox(_T("This feature is in development!"));
+    return;
+#endif // !1
+
+
     // TODO: 在此添加命令处理程序代码
     b_Building_Management_Flag = true;
 

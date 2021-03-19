@@ -7,7 +7,8 @@
 #include "MainFrm.h"
 
 // CBacnetBuildingMain
-
+extern CMainFrame* pFrame_BM;
+extern CString cs_bm_ini;
 IMPLEMENT_DYNCREATE(CBacnetBuildingMain, CFormView)
 
 CBacnetBuildingMain::CBacnetBuildingMain()
@@ -51,20 +52,36 @@ void CBacnetBuildingMain::InitBuildingFloor()
 {
     bm_floor.clear();
     bm_room.clear();
-    FloorInfo temp;
-    temp.csName = _T("Default Floor");
-    temp.xindex = 0;
-    bm_floor.push_back(temp);
-    RoomInfo temproom;
-    temproom.nFloor = temp;
-    temproom.csName = _T("Default Room");
-    temproom.yindex = 0;
-    bm_room.push_back(temproom);
+    CString temp_floor_manage;
+    temp_floor_manage = _T("FloorInfo");
+    CString csfloortotalindex;
+    GetPrivateProfileString(temp_floor_manage, _T("FloorIndex"), _T(""), csfloortotalindex.GetBuffer(MAX_PATH), MAX_PATH, cs_bm_ini);
+    csfloortotalindex.ReleaseBuffer();
+    if (csfloortotalindex.IsEmpty())
+    {
+        FloorInfo temp;
+        temp.csName = _T("Default Floor");
+        temp.xindex = 0;
+        bm_floor.push_back(temp);
+        RoomInfo temproom;
+        temproom.nFloor = temp;
+        temproom.csName = _T("Default Room");
+        temproom.yindex = 0;
+        bm_room.push_back(temproom);
+    }
+    else
+    {
+        Sleep(1);
+    }
+
+
+
 }
 
 void CBacnetBuildingMain::Fresh()
 {
-
+    pFrame_BM = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    cs_bm_ini = g_strExePth + _T("Database\\Buildings\\") + pFrame_BM->m_strCurMainBuildingName + _T("\\BuildingManagement.ini");
     InitBuildingFloor();
     //添加代码 加载楼层房间的 名字 
 

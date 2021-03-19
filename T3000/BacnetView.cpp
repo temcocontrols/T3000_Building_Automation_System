@@ -2068,6 +2068,8 @@ void CDialogCM5_BacNet::Tab_Initial()
 	User_Login_Window->Create(IDD_DIALOG_BACNET_USER_LOGIN, this);
 	Remote_Point_Window->Create(IDD_DIALOG_BACNET_REMOTE_POINT,&m_bac_main_tab);
 #else
+	User_Login_Window->Create(IDD_DIALOG_BACNET_USER_LOGIN, this);
+	Remote_Point_Window->Create(IDD_DIALOG_BACNET_REMOTE_POINT, this);
 	Input_Window->Create(IDD_DIALOG_BACNET_INPUT, this);
 	Output_Window->Create(IDD_DIALOG_BACNET_OUTPUT, this);
 	Variable_Window->Create(IDD_DIALOG_BACNET_VARIABLE, this);
@@ -2080,8 +2082,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	AlarmLog_Window->Create(IDD_DIALOG_BACNET_ALARMLOG,this);
 	Tstat_Window->Create(IDD_DIALOG_BACNET_TSTAT,this);
 	Setting_Window->Create(IDD_DIALOG_BACNET_SETTING,this);
-	User_Login_Window->Create(IDD_DIALOG_BACNET_USER_LOGIN, this);
-	Remote_Point_Window->Create(IDD_DIALOG_BACNET_REMOTE_POINT,this);
+
 #endif
 	//设定在Tab内显示的范围;
 	CRect rc;
@@ -2558,7 +2559,7 @@ void CDialogCM5_BacNet::Fresh()
         ::SendMessage(MainFram_hwd, WM_SHOW_PANNELINFOR, WPARAM(pstrInfo), LPARAM(3));
 
         BacNet_hwd = this->m_hWnd;
-        return;
+        //return;
     }
 
 	int ret = 0;
@@ -2699,6 +2700,12 @@ void CDialogCM5_BacNet::Fresh()
 
 		//temp_instance = read_one(g_tstat_id,35,5);
 		//temp_mac = read_one(g_tstat_id,36,5);
+		input_item_limit_count = BAC_INPUT_ITEM_COUNT;
+		output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;
+		variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;
+		program_item_limit_count = BAC_PROGRAM_ITEM_COUNT;
+		controller_item_limit_count = BAC_PID_COUNT;
+		screen_item_limit_count = BAC_SCREEN_COUNT;
 		if(selected_product_Node.protocol == PROTOCOL_BIP_TO_MSTP)
 		{
 			//g_sub_instace = g_bac_instance;
@@ -2721,12 +2728,6 @@ void CDialogCM5_BacNet::Fresh()
 			WaitRead_Data_Dlg->ShowWindow(SW_SHOW);
 
 
-			input_item_limit_count = 5;
-			output_item_limit_count = 5;
-			variable_item_limit_count = 5;
-			program_item_limit_count = 4;
-			controller_item_limit_count =4 ;
-			screen_item_limit_count = 4;
 
 			g_bac_need_read_setting = true;
 			((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->Initial_List();
@@ -2794,12 +2795,7 @@ void CDialogCM5_BacNet::Fresh()
 		}
 		else
 		{
-			input_item_limit_count = BAC_INPUT_ITEM_COUNT;
-			output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;
-			variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;
-			program_item_limit_count = BAC_PROGRAM_ITEM_COUNT;
-			controller_item_limit_count = BAC_PID_COUNT ;
-			screen_item_limit_count = BAC_SCREEN_COUNT;
+
 
 			((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->Initial_List();
 			((CBacnetProgram *)pDialog[WINDOW_PROGRAM])->Initial_List();

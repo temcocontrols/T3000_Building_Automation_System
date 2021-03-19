@@ -7,6 +7,7 @@
 #include "MainFrm.h"
 
 // CTstatAQ
+
 #define     WM_TSTAT_AQ_THREAD_READ                     WM_USER + 502
 HANDLE h_tstat_aq_thread = NULL;
 static int aqi_level = 0;
@@ -28,6 +29,7 @@ void CTstatAQ::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_STATIC_AQI_INFO, m_aqi_title);
     DDX_Control(pDX, IDC_STATIC_AQI, m_static_info);
     DDX_Control(pDX, IDC_LIST_AIRLAB, m_airlab_list);
+    DDX_Control(pDX, IDC_DATETIMEPICKER_TIME_REMAIN, m_time_trigger);
 }
 
 BEGIN_MESSAGE_MAP(CTstatAQ, CFormView)
@@ -49,6 +51,9 @@ BEGIN_MESSAGE_MAP(CTstatAQ, CFormView)
     ON_BN_CLICKED(IDC_BUTTON_CUS_AQI, &CTstatAQ::OnBnClickedButtonCusAqi)
     ON_BN_CLICKED(IDC_BUTTON_AUTO_CAL, &CTstatAQ::OnBnClickedButtonAutoCal)
     ON_WM_TIMER()
+    ON_NOTIFY(NM_CLICK, IDC_LIST_AIRLAB, &CTstatAQ::OnNMClickListAirlab)
+    ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER_TIME_REMAIN, &CTstatAQ::OnNMKillfocusDatetimepickerTimeRemain)
+    ON_BN_CLICKED(IDC_BUTTON_AIRLAB_PARAMETER, &CTstatAQ::OnBnClickedButtonAirlabParameter)
 END_MESSAGE_MAP()
 
 
@@ -97,6 +102,7 @@ LRESULT  CTstatAQ::AirlabMessageCallBack(WPARAM wParam, LPARAM lParam)
 
 CString AQ_image_fordor;
 CString bmp_AQI;
+CString jpg_airlab;
 void CTstatAQ::Fresh()
 {
     CStatic* pWnd = (CStatic*)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE); // 得到 Picture Control 句柄 ;
@@ -111,7 +117,7 @@ void CTstatAQ::Fresh()
     icon_temperature = AQ_image_fordor + _T("\\temperature.bmp");
     //bmp_AQI = AQ_image_fordor + _T("\\AQI.bmp");
     bmp_AQI = AQ_image_fordor + _T("\\AQI.jpg");
-    
+    jpg_airlab = AQ_image_fordor + _T("\\Airlab.jpg");
     HBITMAP bitmap;
     bitmap = (HBITMAP)LoadImage(AfxGetInstanceHandle(), icon_temperature, IMAGE_BITMAP, 40, 120, LR_LOADFROMFILE);
     CStatic *p = (CStatic *)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE);
@@ -425,10 +431,21 @@ void CTstatAQ::UpdateUI()
         {
             m_airlab_list.SetCellEnabled(0, AIRLAB_TRIGGER, 1);
             m_airlab_list.SetCellEnabled(0, AIRLAB_TIME, 1);
+
+            int temp_interval_time;
+            char temp_char[50];
+            temp_interval_time = product_register_value[TSTAT_AQ_CO2_TIMER]*60;
+            intervaltotext(temp_char, temp_interval_time, 0, 0);
+            CString temp_CO2_timer;
+            MultiByteToWideChar(CP_ACP, 0, temp_char, (int)strlen(temp_char) + 1,
+                temp_CO2_timer.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_CO2_timer.ReleaseBuffer();
+
+
             CString temp_CO2_trigger;
             temp_CO2_trigger.Format(_T("%u"), product_register_value[TSTAT_AQ_CO2_TRIGGER]);
-            CString temp_CO2_timer;
-            temp_CO2_timer.Format(_T("%u"), product_register_value[TSTAT_AQ_CO2_TIMER]);
+            //CString temp_CO2_timer;
+            //temp_CO2_timer.Format(_T("%u"), product_register_value[TSTAT_AQ_CO2_TIMER]);
             CString temp_CO2_timeleft;
             temp_CO2_timeleft.Format(_T("%u"), product_register_value[TSTAT_AQ_CO2_COUNT_DOWN]);
             CString temp_CO2_alarm;
@@ -462,6 +479,7 @@ void CTstatAQ::UpdateUI()
         m_airlab_list.SetItemText(0, AIRLAB_UNIT, _T("-"));
         m_airlab_list.SetItemText(0, AIRLAB_TRIGGER, _T("-"));
         m_airlab_list.SetItemText(0, AIRLAB_TIME, _T("-"));
+        m_airlab_list.SetCellEnabled(0, AIRLAB_TIME, 0);
         m_airlab_list.SetItemText(0, AIRLAB_TIME_LEFT, _T("-"));
     }
     if (product_register_sensor_flag[0] == 0x55)
@@ -474,10 +492,20 @@ void CTstatAQ::UpdateUI()
             m_airlab_list.SetCellEnabled(AIRLAB_OCC, AIRLAB_TRIGGER, 1);
             m_airlab_list.SetCellEnabled(AIRLAB_OCC, AIRLAB_TIME, 1);
             
+            int temp_interval_time;
+            char temp_char[50];
+            temp_interval_time = product_register_value[TSTAT_AQ_OCC_TIMER]*60;
+            intervaltotext(temp_char, temp_interval_time, 0, 0);
+            CString temp_OCC_timer;
+            MultiByteToWideChar(CP_ACP, 0, temp_char, (int)strlen(temp_char) + 1,
+                temp_OCC_timer.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_OCC_timer.ReleaseBuffer();
+
+
             CString temp_OCC_trigger;
             temp_OCC_trigger.Format(_T("%u"), product_register_value[TSTAT_AQ_OCC_TRIGGER]);
-            CString temp_OCC_timer;
-            temp_OCC_timer.Format(_T("%u"), product_register_value[TSTAT_AQ_OCC_TIMER]);
+            //CString temp_OCC_timer;
+            //temp_OCC_timer.Format(_T("%u"), product_register_value[TSTAT_AQ_OCC_TIMER]);
             CString temp_OCC_timeleft;
             temp_OCC_timeleft.Format(_T("%u"), product_register_value[TSTAT_AQ_OCC_COUNT_DOWN]);
             CString temp_OCC_alarm;
@@ -537,10 +565,18 @@ void CTstatAQ::UpdateUI()
             m_airlab_list.SetCellEnabled(AIRLAB_LIGHT, AIRLAB_TRIGGER, 1);
             m_airlab_list.SetCellEnabled(AIRLAB_LIGHT, AIRLAB_TIME, 1);
             GetDlgItem(IDC_STATIC_LIGHT_VALUE)->SetWindowTextW(temp_value);
+            int temp_interval_time;
+            char temp_char[50];
+            temp_interval_time = product_register_value[TSTAT_AQ_LIGHT_TIMER]*60;
+            intervaltotext(temp_char, temp_interval_time, 0, 0);
+            CString temp_light_timer;
+            MultiByteToWideChar(CP_ACP, 0, temp_char, (int)strlen(temp_char) + 1,
+                temp_light_timer.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_light_timer.ReleaseBuffer();
             CString temp_light_trigger;
             temp_light_trigger.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT_TRIGGER]);
-            CString temp_light_timer;
-            temp_light_timer.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT_TIMER]);
+            //CString temp_light_timer;
+            //temp_light_timer.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT_TIMER]);
             CString temp_light_timeleft;
             temp_light_timeleft.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT_COUNT_DOWN]);
             CString temp_light_alarm;
@@ -588,10 +624,20 @@ void CTstatAQ::UpdateUI()
             m_airlab_list.SetCellEnabled(AIRLAB_SOUND, AIRLAB_TRIGGER, 1);
             m_airlab_list.SetCellEnabled(AIRLAB_SOUND, AIRLAB_TIME, 1);
             GetDlgItem(IDC_STATIC_SOUND_VALUE)->SetWindowTextW(temp_value);
+
+            int temp_interval_time;
+            char temp_char[50];
+            temp_interval_time = product_register_value[TSTAT_AQ_SOUND_TIMER]*60;
+            intervaltotext(temp_char, temp_interval_time, 0, 0);
+            CString temp_sound_timer;
+            MultiByteToWideChar(CP_ACP, 0, temp_char, (int)strlen(temp_char) + 1,
+                temp_sound_timer.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_sound_timer.ReleaseBuffer();
+
             CString temp_sound_trigger;
             temp_sound_trigger.Format(_T("%u"), product_register_value[TSTAT_AQ_SOUND_TRIGGER]);
-            CString temp_sound_timer;
-            temp_sound_timer.Format(_T("%u"), product_register_value[TSTAT_AQ_SOUND_TIMER]);
+            //CString temp_sound_timer;
+            //temp_sound_timer.Format(_T("%u"), product_register_value[TSTAT_AQ_SOUND_TIMER]);
             CString temp_sound_timeleft;
             temp_sound_timeleft.Format(_T("%u"), product_register_value[TSTAT_AQ_SOUND_COUNT_DOWN]);
             CString temp_sound_alarm;
@@ -1002,49 +1048,211 @@ LRESULT CTstatAQ::Fresh_Airlab_Item(WPARAM wParam, LPARAM lParam)
 void CTstatAQ::OnTimer(UINT_PTR nIDEvent)
 {
     // TODO: 在此添加消息处理程序代码和/或调用默认值
-    if (product_register_sensor_flag[0] == 0x55)
+
+    switch (nIDEvent)
     {
-        CString temp_value;
-        
-        bitset<16> module_type(product_register_sensor_flag[1]);
-        if (module_type.test(4) == true) //CO2
+    case 1:
+    {
+
+        if (product_register_sensor_flag[0] == 0x55)
         {
-            if (product_register_value[TSTAT_AQ_CO2_COUNT_DOWN] > 0)
-                product_register_value[TSTAT_AQ_CO2_COUNT_DOWN] --;
-            temp_value.Format(_T("%u"), product_register_value[TSTAT_AQ_CO2_COUNT_DOWN]);
-            m_airlab_list.SetItemText(0, AIRLAB_TIME_LEFT, temp_value);
+            CString temp_value;
+
+            bitset<16> module_type(product_register_sensor_flag[1]);
+            if (module_type.test(4) == true) //CO2
+            {
+                if (product_register_value[TSTAT_AQ_CO2_COUNT_DOWN] > 0)
+                    product_register_value[TSTAT_AQ_CO2_COUNT_DOWN] --;
+                temp_value.Format(_T("%u"), product_register_value[TSTAT_AQ_CO2_COUNT_DOWN]);
+                m_airlab_list.SetItemText(0, AIRLAB_TIME_LEFT, temp_value);
+            }
+            if (module_type.test(3) == true) //OCC
+            {
+                if (product_register_value[TSTAT_AQ_OCC_COUNT_DOWN] > 0)
+                    product_register_value[TSTAT_AQ_OCC_COUNT_DOWN] --;
+                temp_value.Format(_T("%u"), product_register_value[TSTAT_AQ_OCC_COUNT_DOWN]);
+                m_airlab_list.SetItemText(1, AIRLAB_TIME_LEFT, temp_value);
+            }
+
+            if (module_type.test(8) == true) //sound
+            {
+                if (product_register_value[TSTAT_AQ_SOUND_COUNT_DOWN] > 0)
+                    product_register_value[TSTAT_AQ_SOUND_COUNT_DOWN] --;
+                temp_value.Format(_T("%u"), product_register_value[TSTAT_AQ_SOUND_COUNT_DOWN]);
+                m_airlab_list.SetItemText(2, AIRLAB_TIME_LEFT, temp_value);
+            }
+
+            if (module_type.test(7) == true) //Light
+            {
+                if (product_register_value[TSTAT_AQ_LIGHT_COUNT_DOWN] > 0)
+                    product_register_value[TSTAT_AQ_LIGHT_COUNT_DOWN] --;
+                temp_value.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT_COUNT_DOWN]);
+                m_airlab_list.SetItemText(3, AIRLAB_TIME_LEFT, temp_value);
+            }
         }
-        if (module_type.test(3) == true) //OCC
+    }
+        break;
+    case 2:
+        KillTimer(2);
+        m_time_trigger.Invalidate();
+        break;
+    default:
+        break;
+    }
+
+    CFormView::OnTimer(nIDEvent);
+}
+
+
+void CTstatAQ::OnNMClickListAirlab(NMHDR* pNMHDR, LRESULT* pResult)
+{
+    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+    // TODO: 在此添加控件通知处理程序代码
+    *pResult = 0;
+
+    DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+    CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
+    m_airlab_list.ScreenToClient(&point);
+    LVHITTESTINFO lvinfo;
+    lvinfo.pt = point;
+    lvinfo.flags = LVHT_ABOVE;
+    m_airlab_list.Set_Edit(true);
+    int nItem = m_airlab_list.SubItemHitTest(&lvinfo);
+
+    long lRow, lCol;
+    lRow = lvinfo.iItem;
+    lCol = lvinfo.iSubItem;
+
+    if (lRow > m_airlab_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+        return;
+    if (lRow < 0)
+        return;
+
+    if (lCol == AIRLAB_TIME)
+    {
+        CString Temp_CString = m_airlab_list.GetItemText(lRow, lCol);
+        Temp_CString.Trim();
+        if (Temp_CString.CompareNoCase(_T("-")) == 0)
+            return;
+        m_row = lRow;
+        m_col = lCol;
+        m_airlab_list.Set_Edit(false);
+        m_time_trigger.ShowWindow(SW_SHOW);
+        CRect list_rect, win_rect;
+        m_airlab_list.GetWindowRect(list_rect);
+        ScreenToClient(list_rect); //转换为客户区矩形	
+        GetWindowRect(win_rect);
+        CRect myrect;
+        m_airlab_list.GetSubItemRect(lRow, lCol, LVIR_BOUNDS, myrect);
+
+
+        myrect.left = myrect.left + list_rect.left ;
+        myrect.right = myrect.right + list_rect.left+2 ;
+        myrect.top = myrect.top + list_rect.top;
+        myrect.bottom = myrect.top + 20;
+
+
+        m_time_trigger.BringWindowToTop();
+        m_time_trigger.MoveWindow(myrect);
+
+
+
+        CStringArray TEMPCS;
+        int temp_hour, temp_minute, temp_second;
+        SplitCStringA(TEMPCS, Temp_CString, _T(":"));
+
+        if ((int)TEMPCS.GetSize() == 2)
         {
-            if (product_register_value[TSTAT_AQ_OCC_COUNT_DOWN] > 0)
-                product_register_value[TSTAT_AQ_OCC_COUNT_DOWN] --;
-            temp_value.Format(_T("%u"), product_register_value[TSTAT_AQ_OCC_COUNT_DOWN]);
-            m_airlab_list.SetItemText(1, AIRLAB_TIME_LEFT, temp_value);
-        }
+            temp_hour = _wtoi(TEMPCS.GetAt(0));
+            temp_minute = _wtoi(TEMPCS.GetAt(1));
 
-        if (module_type.test(8) == true) //sound
+            CTime TimeTemp(2021, 1, 1, temp_hour, temp_minute, 0);
+            m_time_trigger.SetFormat(_T("HH:mm"));
+            m_time_trigger.SetTime(&TimeTemp);
+            m_time_trigger.SetFocus();
+        }
+        else
         {
-            if (product_register_value[TSTAT_AQ_SOUND_COUNT_DOWN] > 0)
-                product_register_value[TSTAT_AQ_SOUND_COUNT_DOWN] --;
-            temp_value.Format(_T("%u"), product_register_value[TSTAT_AQ_SOUND_COUNT_DOWN]);
-            m_airlab_list.SetItemText(2, AIRLAB_TIME_LEFT, temp_value);
+            temp_hour = _wtoi(TEMPCS.GetAt(0));
+            temp_minute = _wtoi(TEMPCS.GetAt(1));
+            temp_second = _wtoi(TEMPCS.GetAt(2));
+            if (temp_hour >= 24)
+                temp_hour = 0;
+            if (temp_minute >= 60)
+                temp_minute = 0;
+            if (temp_second >= 60)
+                temp_second = 15;
+            CTime TimeTemp(2021, 1, 1, temp_hour, temp_minute, temp_second);
+            m_time_trigger.SetFormat(_T("HH:mm"));
+            m_time_trigger.SetTime(&TimeTemp);
+            m_time_trigger.SetFocus();
         }
+        m_airlab_list.SetItemText(lRow, lCol, _T(""));
+        m_time_trigger.Invalidate();
 
-        if (module_type.test(7) == true) //Light
-        {
-            if (product_register_value[TSTAT_AQ_LIGHT_COUNT_DOWN] > 0)
-                product_register_value[TSTAT_AQ_LIGHT_COUNT_DOWN] --;
-            temp_value.Format(_T("%u"), product_register_value[TSTAT_AQ_LIGHT_COUNT_DOWN]);
-            m_airlab_list.SetItemText(3, AIRLAB_TIME_LEFT, temp_value);
-        }
-        
-
-
-
-
-
+        SetTimer(2, 100, NULL);
     }
 
 
-    CFormView::OnTimer(nIDEvent);
+
+}
+
+
+void CTstatAQ::OnNMKillfocusDatetimepickerTimeRemain(NMHDR* pNMHDR, LRESULT* pResult)
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CTime temp_time; CString temp_cs;
+    int chour, cmin, csecond;
+    m_time_trigger.GetTime(temp_time);
+    chour = temp_time.GetHour();
+    cmin = temp_time.GetMinute();
+    csecond = temp_time.GetSecond();
+
+
+    if ((chour == 0) && (cmin == 0) && (csecond == 0))
+    {
+        temp_cs.Empty();
+    }
+    else
+        temp_cs.Format(_T("%02d:%02d"), chour, cmin);
+    m_airlab_list.SetItemText(m_row, m_col, temp_cs);
+
+    m_time_trigger.ShowWindow(SW_HIDE);
+    unsigned int temp_value = chour * 60 + cmin;
+    if (m_row == AIRLAB_LIGHT)
+    {
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TSTAT_AQ_LIGHT_TIMER, temp_value,
+            product_register_value[TSTAT_AQ_LIGHT_TRIGGER], this->m_hWnd, NULL, _T(" Light Trigger "));
+    }
+    else  if (m_row == AIRLAB_SOUND)
+    {
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TSTAT_AQ_SOUND_TIMER, temp_value,
+            product_register_value[TSTAT_AQ_SOUND_TIMER], this->m_hWnd, NULL, _T(" Sound Trigger "));
+    }
+    else  if (m_row == AIRLAB_OCC)
+    {
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TSTAT_AQ_OCC_TIMER, temp_value,
+            product_register_value[TSTAT_AQ_OCC_TIMER], this->m_hWnd, NULL, _T(" OCC Trigger "));
+    }
+    else  if (m_row == AIRLAB_CO2)
+    {
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TSTAT_AQ_CO2_TIMER, temp_value,
+            product_register_value[TSTAT_AQ_CO2_TIMER], this->m_hWnd, NULL, _T(" CO2 Trigger "));
+    }
+    *pResult = 0;
+}
+
+#include "CTstatAQ_Parameter.h"
+void CTstatAQ::OnBnClickedButtonAirlabParameter()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    int read_ret = 0;
+    read_ret = Read_Multi(g_tstat_id, &product_register_value[1900], 1900,100, 5);
+    if (read_ret < 0)
+    {
+        MessageBox(_T("Read data timeout!"));
+        return ;
+    }
+    CTstatAQ_Parameter dlg;
+    dlg.DoModal();
 }
