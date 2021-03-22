@@ -47,6 +47,7 @@ BEGIN_MESSAGE_MAP(BacnetScreen, CDialogEx)
 	ON_MESSAGE(WM_HOTKEY,&BacnetScreen::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_SCREENEDIT_CLOSE,&BacnetScreen::Screeenedit_close_handle)//快捷键消息映射手动加入
 	ON_BN_CLICKED(IDC_BUTTON_GRAPHIC_INSERT, &BacnetScreen::OnBnClickedInsert)
+	ON_BN_CLICKED(IDC_WEBVIEW_BUTTON, &BacnetScreen::OnBnClickedWebViewShow)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_SCREEN, &BacnetScreen::OnNMDblclkListScreen)
@@ -789,6 +790,25 @@ void BacnetScreen::OnBnClickedInsert()
 	PostMessage(WM_HOTKEY,KEY_INSERT,NULL);
 }
 
+#include "BacnetWebView.h"
+void BacnetScreen::OnBnClickedWebViewShow()
+{
+	CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
+	PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
+	temp_now_building_name.ReleaseBuffer();
+	CString temp_image_folder = temp_now_building_name + _T("\\image\\");
+	CString PicFileTips;
+	MultiByteToWideChar(CP_ACP, 0, (char*)m_screen_data.at(screen_list_line).picture_file, 
+		(int)strlen((char*)m_screen_data.at(screen_list_line).picture_file) + 1,
+		PicFileTips.GetBuffer(MAX_PATH), MAX_PATH);
+	PicFileTips.ReleaseBuffer();
+	CString fullpath = temp_image_folder + PicFileTips;
+
+	auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath));
+	auto result = BacnetWebViewAppWindow::RunMessagePump();
+	delete webviewwindow;
+}
+
 int GetScreenLabel(int index,CString &ret_label)
 {
 	if(index >= BAC_SCREEN_COUNT)
@@ -1296,6 +1316,7 @@ void BacnetScreen::OnSize(UINT nType, int cx, int cy)
 		m_screen_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
 
 		GetDlgItem(IDC_BUTTON_GRAPHIC_INSERT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+		GetDlgItem(IDC_WEBVIEW_BUTTON)->MoveWindow(rc.left + 160, rc.bottom - 60, 120, 50);
 	}
 }
 

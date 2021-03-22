@@ -37,6 +37,7 @@ public:
 	void Reg_Hotkey();
 	void Unreg_Hotkey();
 	afx_msg void OnBnClickedInsert();
+	afx_msg void OnBnClickedWebViewShow();
 	static	DWORD WINAPI  ReadScreenThreadfun(LPVOID lpVoid);
 	static DWORD WINAPI  WritePictureThread(LPVOID lpVoid);
 	static DWORD WINAPI  GetPictureThread(LPVOID lpVoid);
