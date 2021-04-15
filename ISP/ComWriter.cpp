@@ -993,6 +993,10 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
         CString srtInfo;
         srtInfo.Format(_T("|ID %d: Programming lines %d to %d.(0%%)"),m_ID,ii,ii+128);
         pWriter->OutPutsStatusInfo(srtInfo);
+        if (pWriter->Is_Ram == HEX_TYPE_ARM_64K)
+        {
+            return 1;
+        }
     }
     else
     {
@@ -1051,14 +1055,20 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
             /*   if(itemp<RETRY_TIMES)
                {*/
             //ii+0x8000
-            
+            static long temp_last_time = 0;
             if(mudbus_write_single_short(m_ID,&register_data[ii],ii,128)<0)//to write multiple 128 bytes
             {
+                long tempticktime = GetTickCount();
+                TRACE(_T("f(%d): %u  time:%u\r\n"),ii, tempticktime, tempticktime - temp_last_time);
+                temp_last_time = tempticktime;
                 itemp++;
                 Sleep(300); //写失败 休眠300ms后 重试;
             }
             else
             {
+                long nowticktime = GetTickCount();
+                TRACE(_T("s(%d): %u time:%u\r\n"),ii, nowticktime , nowticktime - temp_last_time);
+                temp_last_time = nowticktime;
                 itemp=0;
                 break;
             }
@@ -1199,8 +1209,10 @@ int CComWriter::WirteExtendHexFileByCom_RAM()
         CString temp_cs;
         if (ret <= 0)
         {
-            temp_cs.Format(_T("Initial Bacnet MSTP port :%d baudrate:%d Failed"), m_nComPort, m_nBautrate);
+            temp_cs.Format(_T("Failed to open serial port :%d"), m_nComPort);
             OutPutsStatusInfo(temp_cs, FALSE);
+            WriteFinish(0);
+            return 0;
         }
         else
         {
@@ -1668,7 +1680,7 @@ int CComWriter::UpdataDeviceInformation(int& ID)
         if(ret >= 0)
             break;
         resend_count ++ ;
-        if(resend_count >15)
+        if(resend_count >8)
         {
             strtips.Format(_T("Device is offline,Please check the connection!"));
             OutPutsStatusInfo(strtips,false);
@@ -1968,16 +1980,26 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
         if (SPECIAL_BAC_TO_MODBUS)
         {
             //根据ID得到对应的 device id.
+            CString strtemp;
+            strtemp.Format(_T("|Reading Device Object Instance"));
+            pWriter->OutPutsStatusInfo(strtemp);
+            strtemp.Format(_T(" "));
+            pWriter->OutPutsStatusInfo(strtemp);
             int temp_found_device_id = 0;
             for (int x = 0; x < 30; x++)
             {
-
+                CString temp_found_id = _T("Found MAC ID:");
                 Send_WhoIs_Global(-1, -1);
                 Sleep(2000);
                 if (m_bac_handle_Iam_data.size() > 0)
                 {
                     for (int j = 0; j < m_bac_handle_Iam_data.size(); j++)
                     {
+                        if (j != 0)
+                            temp_found_id = temp_found_id + _T(",");
+                        CString temp_id;
+                        temp_id.Format(_T("%d"), m_bac_handle_Iam_data.at(j).macaddress);
+                        temp_found_id = temp_found_id + temp_id;
                         if (m_bac_handle_Iam_data.at(j).macaddress == pWriter->m_szMdbIDs[i])
                         {
                             temp_found_device_id = m_bac_handle_Iam_data.at(j).device_id;
@@ -1989,10 +2011,23 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 if (temp_found_device_id > 0)
                 {
                     g_mstp_deviceid = temp_found_device_id;
+                    CString strtemp;
+                    strtemp.Format(_T("|ID %d is online.Device instance : %u!"), pWriter->m_szMdbIDs[i], g_mstp_deviceid);
+                    pWriter->OutPutsStatusInfo(strtemp);
                     break;
                 }
+                pWriter->OutPutsStatusInfo(temp_found_id,true);
+            }
+
+            if (g_mstp_deviceid == 0)
+            {
+                CString strtemp;
+                strtemp.Format(_T("|ID %d is offline.Update failed!"), pWriter->m_szMdbIDs[i]);
+                pWriter->OutPutsStatusInfo(strtemp);
+                goto end_isp_flash;
             }
         }
+
 
 
         while (0)
@@ -2517,10 +2552,4 @@ end_isp_flash:
 
 }
 
-int CComWriter::InitialBacnetMstp()
-{
-    Set_MSTP_Polling_Node(0);
-  bool  init_ret = Initial_bac(3, _T(""),115200 );
-    //m_nComPort
-  return 0;
-}
+

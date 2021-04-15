@@ -49,5 +49,5 @@ public:
     afx_msg void OnBnClickedButtonLcdSetting();
 
     CEdit m_edit_zone_name;
-    afx_msg void OnEnKillfocusEditSettingAliasName();
+    //afx_msg void OnEnKillfocusEditSettingAliasName();
 };

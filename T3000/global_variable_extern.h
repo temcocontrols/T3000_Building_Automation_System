@@ -1296,5 +1296,7 @@ extern CString bacnet_string; // ´ý½âÎöµÄ×Ö´®
 
 extern vector < FloorInfo> bm_floor;
 extern vector < RoomInfo> bm_room;
+extern CString T3_chip_name;
+extern unsigned int T3_chip_type;
 
 

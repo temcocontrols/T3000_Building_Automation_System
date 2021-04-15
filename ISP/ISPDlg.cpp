@@ -1184,7 +1184,7 @@ afx_msg LRESULT CISPDlg::OnFlashNewBootFinish(WPARAM wParam, LPARAM lParam)
 static int total_test_count = 0;
 static int total_success_count = 0;
 
-
+void close_bac_com();
 // NC 是使用tftp协议来进行flash的
 afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 {
@@ -1195,6 +1195,11 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
     {
         delete m_pComWriter;
         m_pComWriter = NULL;
+        if (SPECIAL_BAC_TO_MODBUS)
+        {
+            close_bac_com();
+            //int ret = Initial_bac(m_nComPort, _T(""), m_nBautrate);
+        }
     }
     if (m_pFileBuffer)
     {

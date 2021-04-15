@@ -50,7 +50,6 @@ public:
 	int BeginWirteByCom();
 	int WirteExtendHexFileByCom();
     int WirteExtendHexFileByCom_RAM();
-    int InitialBacnetMstp();
 	void WriteFinish(int nFlashFlag);
 	//***************************Release Func*********************//
   //  void Show_Device_Information(int comport ,int ID);

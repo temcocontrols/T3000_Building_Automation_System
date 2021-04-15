@@ -1608,15 +1608,15 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 
 		return 1; 
 	}
-    CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    if (pFrame->m_pDialogInfo != NULL&&pFrame->m_pDialogInfo->IsWindowVisible())
-    {
-        if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
-        {
-            //  pMain->m_pDialogInfo->ShowWindow(SW_HIDE);
-            ::PostMessage(MainFram_hwd,WM_LBUTTONDOWN,0,0);
-        }
-    }
+    //CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    //if (pFrame->m_pDialogInfo != NULL&&pFrame->m_pDialogInfo->IsWindowVisible())
+    //{
+    //    if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
+    //    {
+    //        //  pMain->m_pDialogInfo->ShowWindow(SW_HIDE);
+    //        ::PostMessage(MainFram_hwd,WM_LBUTTONDOWN,0,0);
+    //    }
+    //}
      
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
