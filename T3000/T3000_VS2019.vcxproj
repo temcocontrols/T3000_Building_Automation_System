@@ -201,6 +201,14 @@
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeb.cpp" />
+    <ClCompile Include="BacnetWebView.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="BacnetWebViewToolBar.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="Bacnet_Range_Msv.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
@@ -567,6 +575,8 @@
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="BacnetWeb.h" />
+    <ClInclude Include="BacnetWebView.h" />
+    <ClInclude Include="BacnetWebViewToolBar.h" />
     <ClInclude Include="Bacnet_Include.h" />
     <ClInclude Include="Bacnet_Range_Msv.h" />
     <ClInclude Include="BADO\BADO.h" />
@@ -817,7 +827,14 @@
   <ItemGroup>
     <Image Include="res\treenode_ext.bmp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.Web.WebView2.1.0.774.44\build\native\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.774.44\build\native\Microsoft.Web.WebView2.targets')" />
+    <Import Project="..\packages\Microsoft.Windows.ImplementationLibrary.1.0.210204.1\build\native\Microsoft.Windows.ImplementationLibrary.targets" Condition="Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.210204.1\build\native\Microsoft.Windows.ImplementationLibrary.targets')" />
+  </ImportGroup>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <ProjectExtensions>

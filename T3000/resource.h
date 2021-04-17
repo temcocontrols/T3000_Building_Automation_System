@@ -2627,6 +2627,7 @@
 #define IDC_RADIO_UNIT_M                2624
 #define IDC_RADIO_UNIT_M2               2625
 #define IDC_RADIO_UNIT_IN               2625
+#define IDC_WEBVIEW_BUTTON              2626
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998

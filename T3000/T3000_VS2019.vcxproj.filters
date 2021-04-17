@@ -52,6 +52,12 @@
     <Filter Include="CustomSource">
       <UniqueIdentifier>{babebbb7-6f0b-4fbf-9c8f-6cab0e6f5f69}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\WebView">
+      <UniqueIdentifier>{08ac9909-e9aa-4b9b-9d03-3e941182a96b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bacnet\WebView">
+      <UniqueIdentifier>{7a0388ad-ed3d-4293-af7d-82f2f990bf0c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AddBuilding.cpp">
@@ -810,6 +816,12 @@
     <ClCompile Include="CTstatAQ_Parameter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BacnetWebView.cpp">
+      <Filter>Bacnet\WebView</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetWebViewToolBar.cpp">
+      <Filter>Bacnet\WebView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -1151,6 +1163,7 @@
     </None>
     <None Include="ClassDiagram.cd" />
     <None Include="OutputTableDlg.htm" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -2028,6 +2041,12 @@
     </ClInclude>
     <ClInclude Include="CTstatAQ_Parameter.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetWebView.h">
+      <Filter>Header Files\WebView</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetWebViewToolBar.h">
+      <Filter>Header Files\WebView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
