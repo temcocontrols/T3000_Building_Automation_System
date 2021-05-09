@@ -8,8 +8,10 @@
 #include <regex>
 #include <gdiplus.h>
 
+#include <wil/com.h>
+#include <wrl.h>
 
-//using namespace Microsoft::WRL;
+using namespace Microsoft::WRL;
 size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
 
 BacnetWebViewAppWindow::BacnetWebViewAppWindow(
@@ -30,11 +32,12 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
     Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 
     ++s_appInstances;
-    std::wstring title = L"BacnetWebView Demo Application 0.1";
+    std::wstring title = L"BacnetWebView Demo Application 0.2";
     m_mainWindow = CreateWindowExW(WS_EX_CONTROLPARENT, GetWindowClass(), title.c_str(), 
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, 
         GetModuleHandle(nullptr), nullptr);
-
+    
+    /*
     if (initialUri != L"")
     {
         Gdiplus::Bitmap bitmap(initialUri.c_str(), false);
@@ -43,6 +46,7 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
         m_memHdc = CreateCompatibleDC(GetDC(m_mainWindow));
         SelectObject(m_memHdc, m_appBackgroundImageHandle);
     }
+    */
 
     if (shouldHaveToolbar)
         m_toolbar.Initialize(this);
@@ -50,6 +54,13 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
     SetWindowLongPtr(m_mainWindow, GWLP_USERDATA, (LONG_PTR)this);
     ShowWindow(m_mainWindow, SW_SHOWDEFAULT);
     UpdateWindow(m_mainWindow);
+
+    wil::unique_cotaskmem_string version_info;
+    HRESULT hr = GetAvailableCoreWebView2BrowserVersionString(nullptr, &version_info);
+    if (hr == S_OK && version_info != nullptr)
+    {
+        InitializeWebView();        
+    }
 }
 
 PCWSTR BacnetWebViewAppWindow::GetWindowClass()
@@ -60,7 +71,7 @@ PCWSTR BacnetWebViewAppWindow::GetWindowClass()
         
         WNDCLASSEX wcx;
         wcx.cbSize = sizeof(wcx);          
-        wcx.style = CS_HREDRAW | CS_VREDRAW;   
+        wcx.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
         wcx.lpfnWndProc = WndProcStatic;     
         wcx.cbClsExtra = 0;                
         wcx.cbWndExtra = 0;                
@@ -98,11 +109,35 @@ LRESULT CALLBACK BacnetWebViewAppWindow::WndProcStatic(HWND hWnd, UINT message, 
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
+// This is purely for proof of concept. I am not going to tie MFC into
+// a webview2 application.
+#include <afxdlgs.h>
 bool BacnetWebViewAppWindow::HandleWindowMessage(
     HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* result)
 {
     switch (message)
     {
+    case WM_LBUTTONDBLCLK:
+    {
+        const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
+
+        CFileDialog dlg(1, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, 
+            szFilter, CWnd::FromHandle(hWnd));
+        if (dlg.DoModal() == IDOK)
+        {
+            CString sFilePath = dlg.GetPathName();
+            m_initialUri = sFilePath;
+            wil::com_ptr<IUri> uri;
+            CreateUri(m_initialUri.c_str(), Uri_CREATE_ALLOW_IMPLICIT_FILE_SCHEME, 0, &uri);
+
+            wil::unique_bstr uriBstr;
+            uri->GetAbsoluteUri(&uriBstr);
+            auto hr = m_webView->Navigate(uriBstr.get());
+            if (SUCCEEDED(hr))
+                UpdateWindow(m_mainWindow);
+        }
+        break;
+    }
     case WM_SIZE:
     {
         // Don't resize the app or webview when the app is minimized
@@ -413,3 +448,59 @@ int BacnetWebViewAppWindow::RunMessagePump()
 
     return (int)msg.wParam;
 }
+
+#pragma region WebviewRelatedMethods
+#include <WebView2EnvironmentOptions.h>
+#include <wrl/event.h>
+using namespace Microsoft::WRL;
+void BacnetWebViewAppWindow::InitializeWebView()
+{
+    LPCWSTR subFolder = nullptr;
+    auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+    HRESULT hr = CreateCoreWebView2EnvironmentWithOptions(
+        subFolder, nullptr, options.Get(),
+        Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
+            this, &BacnetWebViewAppWindow::OnCreateEnvironmentCompleted)
+        .Get());
+}
+
+HRESULT BacnetWebViewAppWindow::OnCreateEnvironmentCompleted(HRESULT result,
+    ICoreWebView2Environment* environment)
+{
+    if (FAILED(result))
+        return result;
+
+    m_webViewEnvironment = environment;
+    return m_webViewEnvironment->CreateCoreWebView2Controller(
+        m_mainWindow, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
+            this, &BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted)
+        .Get());
+}
+
+HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
+    HRESULT result, ICoreWebView2Controller* controller)
+{
+    if (FAILED(result))
+        return result;
+
+    m_controller = controller;
+    RECT bounds;
+    GetClientRect(m_mainWindow, &bounds);
+    m_controller->put_Bounds(bounds);
+    wil::com_ptr<ICoreWebView2> coreWebView2;
+    auto hr = m_controller->get_CoreWebView2(&coreWebView2);
+    if (FAILED(hr))
+        return hr;
+
+    coreWebView2.query_to(&m_webView);
+
+	/*wil::com_ptr<ICoreWebView2CompositionController> compositionController =
+		m_controller.query<ICoreWebView2CompositionController>();*/
+    m_dropTarget = Make<DropTarget>();
+    m_dropTarget->Init(m_mainWindow, coreWebView2.get(), m_controller.get());
+    
+    if (m_webView != nullptr && m_initialUri != L"")
+        m_webView->Navigate(m_initialUri.c_str());
+}
+
+#pragma endregion WebviewRelatedMethods

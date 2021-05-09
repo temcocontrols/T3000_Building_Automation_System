@@ -793,6 +793,7 @@ void BacnetScreen::OnBnClickedInsert()
 #include "BacnetWebView.h"
 void BacnetScreen::OnBnClickedWebViewShow()
 {
+	/*
 	CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
 	PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
 	temp_now_building_name.ReleaseBuffer();
@@ -803,10 +804,19 @@ void BacnetScreen::OnBnClickedWebViewShow()
 		PicFileTips.GetBuffer(MAX_PATH), MAX_PATH);
 	PicFileTips.ReleaseBuffer();
 	CString fullpath = temp_image_folder + PicFileTips;
+	*/
+	const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
 
-	auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath));
-	auto result = BacnetWebViewAppWindow::RunMessagePump();
-	delete webviewwindow;
+	CFileDialog dlg(TRUE, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		szFilter, this->GetTopWindow());
+	if (dlg.DoModal() == IDOK)
+	{
+		CString sFilePath = dlg.GetPathName();
+		wstring fullpath = sFilePath;
+		auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath));
+		auto result = BacnetWebViewAppWindow::RunMessagePump();
+		delete webviewwindow;
+	}
 }
 
 int GetScreenLabel(int index,CString &ret_label)

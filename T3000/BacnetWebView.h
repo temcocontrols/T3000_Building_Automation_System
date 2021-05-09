@@ -8,6 +8,7 @@
 #include <wil/com.h>
 #include "webview2.h"
 #include "BacnetWebViewToolBar.h"
+#include "BacnetWebViewDropTarget.h"
 
 #pragma region defines
 #define IDM_GET_BROWSER_VERSION_AFTER_CREATION 170
@@ -109,6 +110,7 @@ private:
     wil::com_ptr<ICoreWebView2Controller> m_controller;
     wil::com_ptr<ICoreWebView2> m_webView;
     wil::com_ptr<ICoreWebView2_3> m_webView3;
+    wil::com_ptr<DropTarget> m_dropTarget;
 
     HBITMAP m_appBackgroundImageHandle;
     BITMAP m_appBackgroundImage;

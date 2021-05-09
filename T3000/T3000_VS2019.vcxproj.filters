@@ -2048,6 +2048,12 @@
     <ClInclude Include="BacnetWebViewToolBar.h">
       <Filter>Header Files\WebView</Filter>
     </ClInclude>
+    <ClInclude Include="BacnetWebViewDropTarget.h">
+      <Filter>Header Files\WebView</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetWebViewStdafx.h">
+      <Filter>Header Files\WebView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc">
