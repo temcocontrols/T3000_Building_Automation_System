@@ -14,8 +14,8 @@ extern TS_US LATENCY_TIME_COM ;
 extern  TS_US LATENCY_TIME_NET ;
 //******************************extern variable
  
- 
- 
+CString g_cs_com_section_mulwrite = _T("Write");
+CString g_cs_com_section_read = _T("Read");
  
 extern HANDLE m_hSerial;//´®¿Ú¾ä±ú
 extern HANDLE m_com_h_serial[100];
@@ -216,7 +216,7 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
@@ -1052,7 +1052,9 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
         ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+
+        
+        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_mulwrite))==NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
@@ -1076,7 +1078,7 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -1246,7 +1248,7 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
         ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_mulwrite))==NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
@@ -1270,7 +1272,7 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -1492,7 +1494,7 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
 																							////////////////////////////////////////////////////////////overlapped declare
 		memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-		if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, _T("MulWrite"))) == NULL)
+		if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_mulwrite)) == NULL)
 			return -2;
 		m_osMulWrite.Offset = 0;
 		m_osMulWrite.OffsetHigh = 0;
@@ -1516,7 +1518,7 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		/////////////**************down is read
 		ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
 		memset(&m_osRead, 0, sizeof(OVERLAPPED));
-		if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+		if ((m_osRead.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_read)) == NULL)
 			return -2;
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0;
@@ -1699,7 +1701,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         //////////////////////////////////////////the message had send ,now to read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -2011,7 +2013,7 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
         //////////////////////////////////////////the message had send ,now to read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -2392,7 +2394,7 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         /////////////**************down is read
         ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_read)) == NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
@@ -2734,7 +2736,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -3128,7 +3130,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -3498,7 +3500,7 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 		/////////////**************down is read
 		ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
 		memset(&m_osRead, 0, sizeof(OVERLAPPED));
-		if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+		if ((m_osRead.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_read)) == NULL)
 			return -2;
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0;
@@ -3701,7 +3703,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
         ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_mulwrite))==NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
@@ -3730,7 +3732,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         Sleep(LATENCY_TIME_COM);
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -3929,7 +3931,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
         ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_mulwrite))==NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0;
@@ -3962,7 +3964,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         Sleep(LATENCY_TIME_COM);
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -3;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -4204,7 +4206,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
         ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_mulwrite))==NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
@@ -4228,7 +4230,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -4365,7 +4367,7 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
         ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_mulwrite))==NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
@@ -4396,7 +4398,7 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -4714,7 +4716,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
@@ -5044,6 +5046,9 @@ OUTPUT bool open_com(int m_com)
     open_com_port_number_in_dll = m_com;
     baudrate_in_dll = 19200;
 
+    
+    g_cs_com_section_mulwrite.Format(_T("MulWrite%u"), m_com);
+    g_cs_com_section_read.Format(_T("Read%u"), m_com);
     return true;
 }
 
@@ -5219,7 +5224,7 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         //////////////////////////////////////////the message had send ,now to read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -5573,7 +5578,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -6042,7 +6047,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
@@ -6350,7 +6355,7 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
                                                                                             ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, _T("MulWrite"))) == NULL)
+        if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_mulwrite)) == NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0;
@@ -6376,7 +6381,7 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         Sleep(LATENCY_TIME_COM);
         ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_read)) == NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
@@ -7672,7 +7677,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
@@ -8459,7 +8464,7 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         //////////////////////////////////////////the message had send ,now to read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -8800,7 +8805,7 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -9095,7 +9100,7 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
         ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_mulwrite))==NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
@@ -9124,7 +9129,7 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         Sleep(LATENCY_TIME_COM);
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -9337,7 +9342,7 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
         ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_mulwrite))==NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
@@ -9361,7 +9366,7 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -9495,7 +9500,7 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
         ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+        if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_mulwrite))==NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
@@ -9534,7 +9539,7 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
         /////////////**************down is read
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+        if((m_osRead.hEvent = CreateEvent(NULL,true,false, g_cs_com_section_read))==NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
@@ -9688,7 +9693,7 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
 																							////////////////////////////////////////////////////////////overlapped declare
 		memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-		if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, _T("MulWrite"))) == NULL)
+		if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_mulwrite)) == NULL)
 			return -2;
 		m_osMulWrite.Offset = 0;
 		m_osMulWrite.OffsetHigh = 0;
@@ -9721,7 +9726,7 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		Sleep(LATENCY_TIME_COM);
 		ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
 		memset(&m_osRead, 0, sizeof(OVERLAPPED));
-		if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+		if ((m_osRead.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_read)) == NULL)
 			return -2;
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0;
@@ -10419,7 +10424,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
         Sleep(LATENCY_TIME_COM);
         ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_read)) == NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
@@ -10599,7 +10604,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear read buffer && write buffer
                                                                                             ////////////////////////////////////////////////////////////overlapped declare
         memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
-        if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, _T("MulWrite"))) == NULL)
+        if ((m_osMulWrite.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_mulwrite)) == NULL)
             return -2;
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0;
@@ -10623,7 +10628,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         /////////////**************down is read
         ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
         memset(&m_osRead, 0, sizeof(OVERLAPPED));
-        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, _T("Read"))) == NULL)
+        if ((m_osRead.hEvent = CreateEvent(NULL, true, false, g_cs_com_section_read)) == NULL)
             return -2;
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
@@ -10662,7 +10667,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         //device_var is the modbus ID
         //the return value == -1 ,no connecting
         unsigned short data_length = 0;
-        TS_UC read_buffer_data[30] = { '\0' };
+        TS_UC read_buffer_data[600] = { '\0' };
         TS_UC data_to_send[600] = { '\0' }; //the array to used in writefile()
 
         data_to_send[0] = 1;
@@ -10720,6 +10725,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
                     return -1;
                 }
             }
+            return -6;
         }
 
 

@@ -71,6 +71,7 @@ INPUT void SetResponseTime(unsigned short Time);
 
 #define isp_max(a,b)    (((a) > (b)) ? (a) : (b))
 #define isp_min(a,b)    (((a) < (b)) ? (a) : (b))
+//#define ISP_BURNING_MODE  1
 
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 

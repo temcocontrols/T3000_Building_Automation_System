@@ -20,26 +20,29 @@ typedef struct
     ValueType tValue;
 }Http_key;
 
-typedef struct
-{
-    Http_key k_productID;
-    Http_key k_serialNumber;
-    Http_key k_ipAddress;
-    Http_key k_ipPort;
-    Http_key k_hardwareVer;
-    Http_key k_softwareVer;
-    Http_key k_lastCommunicationDate;
-    Http_key k_createdAt;
-    Http_key k_updatedAt;
-    CString cs_results;
-}StrGetProductID;
+#define GETP_ID         0
+#define GETP_FIRMWARE   1
+#define GETP_SOFTWARE   2
+#define GETP_LASTUPDATE 3
+#define GETP_CREATED    4
+#define GETP_UPDATED    5
+#define GETP_MAX_KEY    6
 
 typedef struct
 {
-    Http_key k_file_name;
-    Http_key k_version;
-    Http_key k_file_size;
-    Http_key k_updatedAt;
+    Http_key key[GETP_MAX_KEY];
+    CString cs_results;
+}StrGetProductID;
+
+
+#define GETF_VERSION        0
+#define GETF_FILENAME       1
+#define GETF_FILESIZE       2
+#define GETF_UPDATED        3
+#define GETF_MAX_KEY        4
+typedef struct
+{
+    Http_key key[GETF_MAX_KEY];
 }StrGetFileInfo;
 
 typedef struct

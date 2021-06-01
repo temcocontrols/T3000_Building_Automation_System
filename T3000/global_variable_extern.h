@@ -78,6 +78,7 @@ extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
 extern CString g_ext_database_path ; //额外的配置档数据库路径;
+extern CString g_ext_mass_flash_path ; //保存多烧写  选中设备的 配置文件路径
 extern  CString g_achive_monitor_datatbase_path ;
 
 extern BOOL g_mstp_flag;
@@ -1298,5 +1299,9 @@ extern vector < FloorInfo> bm_floor;
 extern vector < RoomInfo> bm_room;
 extern CString T3_chip_name;
 extern unsigned int T3_chip_type;
+extern unsigned char daylight_start_month;
+extern unsigned char daylight_start_day;
+extern unsigned char daylight_end_month;
+extern unsigned char daylight_end_day;
 
 

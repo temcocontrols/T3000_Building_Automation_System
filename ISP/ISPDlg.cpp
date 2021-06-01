@@ -26,9 +26,14 @@
 extern int SPECIAL_BAC_TO_MODBUS; //判断是否用MSTP来更新固件;
 unsigned char ready_towrite_mac[6] = { 0 };
 unsigned int ready_towrite_sn = 0;
+#ifdef ISP_BURNING_MODE
+int burning_test_finished = 1;
+HANDLE h_BurningTest_thread = NULL;
+#endif
 int g_write_mac = 0;
 int g_write_wifi_mac = 0;
 HANDLE h_sn_mac_thread = NULL;
+
 int g_sn_product_id = 0;
 int g_write_hardware_version = 0;
 CString sn_mac_info;
@@ -79,6 +84,8 @@ unsigned short FUNCTION_SENSOR2_REG = 65002;
 
 int g_Commu_type=0;
 UINT _PingThread(LPVOID pParam);
+unsigned int com_error_delay_time = 0;
+unsigned int com_error_delay_count = 0;
 unsigned int n_check_temco_firmware = 1;
 unsigned int Remote_timeout = 1000;
 unsigned int nflash_receive_to_send_delay_time = 10;
@@ -308,14 +315,17 @@ BEGIN_MESSAGE_MAP(CISPDlg, CDialog)
     ON_COMMAND(ID_MENU_APP, &CISPDlg::OnMenuApp)
     ON_COMMAND(ID_MENU_ABOUT, &CISPDlg::OnMenuAbout)
     ON_COMMAND(ID_MENU_SETTING, &CISPDlg::OnMenuSetting)
-    ON_COMMAND(ID_MENU_CHECKHEX, &CISPDlg::OnMenuCheckhex)
+    //ON_COMMAND(ID_MENU_CHECKHEX, &CISPDlg::OnMenuCheckhex)
     ON_WM_TIMER()
-    ON_COMMAND(ID_MENU_FLASHSN, &CISPDlg::OnMenuFlashsn)
+
     ON_BN_CLICKED(IDC_BUTTON_FLASH_SN, &CISPDlg::OnBnClickedButtonFlashSn)
 
     ON_MESSAGE(WM_CLOSE_THREAD_MESSAGE, &CISPDlg::Fresh_CloseSN_fcuntion)
     ON_CBN_SELCHANGE(IDC_COMBO_PM, &CISPDlg::OnCbnSelchangeComboPm)
     ON_BN_CLICKED(IDC_CHECK_NO_ITEM, &CISPDlg::OnBnClickedCheckNoItem)
+#ifdef ISP_BURNING_MODE
+    ON_BN_CLICKED(IDC_BUTTON_LOOP_FLASH, &CISPDlg::OnBnClickedButtonLoopFlash)
+#endif
 END_MESSAGE_MAP()
 
 
@@ -403,6 +413,16 @@ BOOL CISPDlg::OnInitDialog()
     {
         WritePrivateProfileStringW(_T("Setting"), _T("Check_Temco_Firmware"), _T("1"), SettingPath);
     }
+
+    //com_error_delay_time = GetPrivateProfileInt(_T("Setting"), _T("ComPortFlashErrorDelay"), 300, SettingPath);
+    //com_error_delay_count = GetPrivateProfileInt(_T("Setting"), _T("ComPortFlashErrorCount"), 3, SettingPath);
+    //if (com_error_delay_time == 300)
+    //{
+    //    WritePrivateProfileStringW(_T("Setting"), _T("ComPortFlashErrorDelay"), _T("300"), SettingPath);
+    //    WritePrivateProfileStringW(_T("Setting"), _T("ComPortFlashErrorCount"), _T("1"), SettingPath);
+    //}
+
+
 
     Remote_timeout = GetPrivateProfileInt(_T("Setting"),_T("REMOTE_TIMEOUT"),1000,SettingPath);
     if(Remote_timeout < 50)
@@ -551,6 +571,14 @@ BOOL CISPDlg::OnInitDialog()
     m_strVersion.LoadString(IDS_STR_VIRSIONNUM);
     TitleShow = _T("ISP Tool ") + m_strVersion;
     SetWindowTextW(TitleShow);
+
+#ifdef ISP_BURNING_MODE
+    GetDlgItem(IDC_BUTTON_LOOP_FLASH)->EnableWindow(1);
+#endif
+
+#ifndef ISP_BURNING_MODE
+    GetDlgItem(IDC_BUTTON_LOOP_FLASH)->EnableWindow(0);
+#endif // DEBUG
 
 
     if(IsDlgButtonChecked(IDC_CHECK_FLASH_SUBID)==1)
@@ -1009,6 +1037,9 @@ void CISPDlg::SaveParamToConfigFile()
 
 void CISPDlg::OnBnClickedButtonFlash()
 {
+#ifdef ISP_BURNING_MODE
+    burning_test_finished = 0;
+#endif
     firmware_must_use_new_bootloader = 0;
     UpdateData();
     SaveParamToConfigFile();	//Save data entered by the user
@@ -1183,12 +1214,19 @@ afx_msg LRESULT CISPDlg::OnFlashNewBootFinish(WPARAM wParam, LPARAM lParam)
 
 static int total_test_count = 0;
 static int total_success_count = 0;
-
+#ifdef ISP_BURNING_MODE
+extern int temco_burning_mode;
+#endif
 void close_bac_com();
 // NC 是使用tftp协议来进行flash的
 afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 {
-
+#ifdef ISP_BURNING_MODE
+    if (temco_burning_mode == 1)
+    {
+        auto_flash_mode = false;
+    }
+#endif
     int nRet = lParam; // 线程中有消息弹出，这里就不弹了, popup message in the thread
     // flash all done, release the resources
     if (m_pComWriter)
@@ -1220,11 +1258,13 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
     }
 	if (m_FlashTimes>0)
 	{
+#ifdef ISP_BURNING_MODE
 		total_test_count ++ ;
 		if(nRet)
 		{
 			total_success_count ++;
 		}
+#endif
 		CString test_info;
 		test_info.Format(_T("Test : %u  ,success : %u"),total_test_count,total_success_count);
 
@@ -1272,7 +1312,9 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 
     if (com_port_flash_status == 2)
         com_port_flash_status = 0;
-
+#ifdef ISP_BURNING_MODE
+    burning_test_finished = 1;
+#endif
     return 1;
 }
 int Add_log_count = 0;
@@ -2145,11 +2187,10 @@ void CISPDlg::FlashByEthernet()
         pHexFile->SetFileName(m_strHexFileName);
 
         m_pFileBuffer = new char[c_nBinFileBufLen];
-        memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+        memset(m_pFileBuffer, 0x00, c_nBinFileBufLen);
         //CString str2Tips = _T("Reading firmware file.Please wait..");
         //UpdateStatusInfo(str2Tips, FALSE);
         nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nBinFileBufLen);//Get the file's buffer
-
 
         delete pHexFile;
         pHexFile = NULL;
@@ -2381,7 +2422,9 @@ int CISPDlg::GetModbusID(vector<int>& szMdbIDs)
 //0: not hex,not bin
 //1 hex
 //2 bin
- 
+#ifdef ISP_BURNING_MODE
+ unsigned short Check_sum = 0;
+#endif
 void CISPDlg::FlashByCom()
 {
     the_max_register_number_parameter_Count=0;
@@ -2430,11 +2473,14 @@ void CISPDlg::FlashByCom()
     //UpdateStatusInfo(temp,FALSE);
 
     m_pFileBuffer = new char[c_nHexFileBufLen];
-    memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
+    memset(m_pFileBuffer, 0x00, c_nHexFileBufLen);
     int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//Get the file's buffer
 
     if(nDataSize > 0)
     {
+#ifdef ISP_BURNING_MODE
+        Check_sum = 0;
+#endif
         CString strTips = _T("|Hex file verified okay.");
         UpdateStatusInfo(strTips, FALSE);
         strTips.Format(_T("Firmware size : %.1f KB"), ((float)nDataSize) / 1024);
@@ -3031,68 +3077,6 @@ void CISPDlg::OnMenuSetting()
     Dlg.DoModal();
 }
 
-void CISPDlg::OnMenuCheckhex()
-{
-    if (m_pFileBuffer)
-    {
-        delete[] m_pFileBuffer;
-        m_pFileBuffer= NULL;
-    }
-    if(HexFileValidation(m_strHexFileName))
-    {
-        CHexFileParser* pHexFile = new CHexFileParser;
-        pHexFile->SetFileName(m_strHexFileName);
-
-        m_pFileBuffer = new char[c_nHexFileBufLen];
-        memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
-        int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//Gets the file's buffer
-        CString hexinfor=_T("The Hex For ");
-        hexinfor+=pHexFile->Get_HexInfor();
-        CString strFilesize;
-        strFilesize.Format(_T("Hex size=%d Bs"),nDataSize);
-        GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
-
-        GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
-        delete pHexFile;
-        pHexFile=NULL;
-    }
-    if(BinFileValidation(m_strHexFileName))
-    {
-        CBinFileParser* pBinFile=new CBinFileParser;
-        pBinFile->SetBinFileName(m_strHexFileName);
-        m_pFileBuffer=new char[c_nBinFileBufLen];
-        memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
-
-        int nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
-        if (nDataSize < 0)
-            return;
-        CString strFilesize;
-        strFilesize.Format(_T("Bin size=%d Bs"),nDataSize);
-        GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
-        m_strASIX=pBinFile->m_strASIX;
-        m_strProductName=pBinFile->m_strProductName;
-
-        if (m_strASIX.Find(_T("ASIX"))!=-1)
-        {
-
-
-            CString hexinfor=_T("The Bin For ");
-            hexinfor.Format(_T("This Bin file is for a device called %s"),m_strProductName.GetBuffer());
-            GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
-
-
-        }
-        else
-        {
-            CString hexinfor=_T("The Bin For ");
-            hexinfor.Format(_T("The Bin file is for the bootloader of %s"),m_strProductName.GetBuffer());
-            GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
-
-
-
-        }
-    }
-}
 
 //DWORD WINAPI GetFWFileProc(LPVOID lPvoid)
 //{
@@ -3239,21 +3223,6 @@ BOOL CISPDlg::DetectBraudrate ()
 
 }
 
-
-
-void CISPDlg::OnMenuFlashsn()
-{
-
-    if (m_bShowSN)
-    {
-        m_bShowSN=FALSE;
-    }
-    else
-    {
-        //m_bShowSN=TRUE;
-    }
-    //initFlashSN();
-}
 
 
 
@@ -4110,3 +4079,47 @@ void CISPDlg::OnBnClickedCheckNoItem()
 
 
 }
+#ifdef ISP_BURNING_MODE
+DWORD WINAPI  CISPDlg::Thread_BurningTest_fun(LPVOID lpVoid)
+{
+    CISPDlg* m_parent = (CISPDlg*)lpVoid;
+    unsigned short temp_read_reg[10];
+    while (temco_burning_mode)
+    {
+        if (burning_test_finished == 1)
+        {
+            auto_flash_mode = 1;
+            ::PostMessage(m_parent->GetDlgItem(IDC_BUTTON_FLASH)->m_hWnd, WM_LBUTTONDOWN, NULL, NULL);
+            ::PostMessage(m_parent->GetDlgItem(IDC_BUTTON_FLASH)->m_hWnd, WM_LBUTTONUP, NULL, NULL);
+            Sleep(5000);
+        }
+    }
+    h_BurningTest_thread = NULL;
+    return 0;
+}
+int temco_burning_mode = 0;
+
+void CISPDlg::OnBnClickedButtonLoopFlash()
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    if (temco_burning_mode == 0)
+    {
+        temco_burning_mode = 1;
+        GetDlgItem(IDC_BUTTON_LOOP_FLASH)->SetWindowText(_T("Runing"));
+        burning_test_finished = 1;
+        h_BurningTest_thread = CreateThread(NULL, NULL, Thread_BurningTest_fun, this, NULL, NULL);
+        CloseHandle(h_BurningTest_thread);
+    }
+    else
+    {
+        temco_burning_mode = 0;
+        auto_flash_mode = 0;
+        GetDlgItem(IDC_BUTTON_LOOP_FLASH)->SetWindowText(_T("Burning Flash"));
+        OnBnClickedSaveLog();
+    }
+
+
+    
+}
+#endif

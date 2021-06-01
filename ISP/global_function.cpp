@@ -1163,7 +1163,7 @@ int mudbus_read_one(unsigned char device_var, unsigned short address, int retry_
         }
         return -2;
     }
-    int value;
+    int value = 0;
 
     for (int i = 0; i < 3; i++)
     {
@@ -1206,7 +1206,7 @@ int mudbus_write_one(unsigned char device_var, unsigned short address, short val
     int  j = 0;
     for (int i = 0; i < retry_times; i++)
     {
-        int  j = Write_One(device_var, address, value);
+        j = Write_One(device_var, address, value);
         if (j < 0)
         {
             Sleep(300);

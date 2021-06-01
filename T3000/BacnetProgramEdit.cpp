@@ -620,10 +620,12 @@ void CBacnetProgramEdit::OnSend()
 					{
 						send_status = false;
 						b_program_status = false;
-						MessageBox(_T("Write Program Code Timeout!"));
+						MessageBox(_T("Write Program Code Timeout."));
 						return;
 					}
 					temp_invoke_id =  WriteProgramData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line,j);
+
+
 					Sleep(SEND_COMMAND_DELAY_TIME);
                     if ((g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) && (temp_invoke_id >= 0))
                     {
@@ -652,7 +654,7 @@ void CBacnetProgramEdit::OnSend()
 						}
 					}
 					b_program_status = false;
-					MessageBox(_T("Write Program Code Timeout!"));
+					MessageBox(_T("Write Program Code Timeout!!"));
 					return;
 
 program_part_success:

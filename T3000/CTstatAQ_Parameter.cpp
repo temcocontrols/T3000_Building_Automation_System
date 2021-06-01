@@ -37,6 +37,7 @@ BEGIN_MESSAGE_MAP(CTstatAQ_Parameter, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO2, &CTstatAQ_Parameter::OnBnClickedRadio2)
 	ON_BN_CLICKED(IDC_BUTTON_DONE, &CTstatAQ_Parameter::OnBnClickedButtonDone)
 	ON_BN_CLICKED(IDC_BUTTON_DEFAULT, &CTstatAQ_Parameter::OnBnClickedButtonDefault)
+	ON_CBN_SELCHANGE(IDC_COMBO_AIRLAB_LINE5, &CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine5)
 END_MESSAGE_MAP()
 
 
@@ -90,6 +91,11 @@ void CTstatAQ_Parameter::InitialUI()
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE4))->AddString(AirLab_LCD[j]);
 	}
 
+	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->ResetContent();
+    ((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->AddString(_T("PM2.5"));
+	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->AddString(AirLab_LCD[4]);
+
+
 	if ((product_register_value[TATAT_AQ_CONFIG_LINE1] >= 0) && (product_register_value[TATAT_AQ_CONFIG_LINE1] <= 3))
 	{
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE1))->SetWindowText(AirLab_LCD[product_register_value[TATAT_AQ_CONFIG_LINE1]]);
@@ -126,6 +132,12 @@ void CTstatAQ_Parameter::InitialUI()
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE4))->SetWindowText(AirLab_LCD[4]);
 	}
 
+	if (product_register_value[TATAT_AQ_CONFIG_LINE5] == 20)
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->SetWindowText(AirLab_LCD[4]);
+	}
+	else
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->SetWindowText(_T("PM2.5"));
 
 }
 
@@ -293,4 +305,27 @@ void CTstatAQ_Parameter::OnBnClickedButtonDefault()
 	Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_CONFIG_LINE4, 3,
 		product_register_value[TATAT_AQ_CONFIG_LINE4], this->m_hWnd, NULL, _T(" Line 4 "));
 	PostMessage(WM_CLOSE, NULL, NULL);
+}
+
+
+void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine5()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString temp_string;
+	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->GetCurSel();
+	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->GetLBText(nSel, temp_string);
+	int nvalue = 0;
+
+	if (temp_string.CompareNoCase(AirLab_LCD[4]) == 0)
+	{
+		nvalue = 20;
+	}
+	else
+	{
+		nvalue = 5;
+	}
+
+	product_register_value[TATAT_AQ_CONFIG_LINE5] = nvalue;
+	Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_CONFIG_LINE5, nvalue,
+		product_register_value[TATAT_AQ_CONFIG_LINE5], this->m_hWnd, IDC_COMBO_AIRLAB_LINE5, _T(" Line 5 "));
 }

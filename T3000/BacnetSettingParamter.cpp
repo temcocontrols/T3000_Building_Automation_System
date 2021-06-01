@@ -28,8 +28,9 @@ void CBacnetSettingParamter::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetSettingParamter, CDialogEx)
-    ON_CBN_SELCHANGE(IDC_COMBO_TYPE, &CBacnetSettingParamter::OnCbnSelchangeComboType)
-    ON_CBN_SELCHANGE(IDC_COMBO_NUMBER, &CBacnetSettingParamter::OnCbnSelchangeComboNumber)
+    //ON_CBN_SELCHANGE(IDC_COMBO_TYPE, &CBacnetSettingParamter::OnCbnSelchangeComboType)
+    //ON_CBN_SELCHANGE(IDC_COMBO_NUMBER, &CBacnetSettingParamter::OnCbnSelchangeComboNumber)
+    ON_BN_CLICKED(IDC_BUTTON_LCD_OK, &CBacnetSettingParamter::OnBnClickedButtonLcdOk)
 END_MESSAGE_MAP()
 
 
@@ -85,43 +86,72 @@ void CBacnetSettingParamter::InitialUI()
 
 
 
-void CBacnetSettingParamter::OnCbnSelchangeComboType()
+//void CBacnetSettingParamter::OnCbnSelchangeComboType()
+//{
+//    // TODO: 在此添加控件通知处理程序代码
+//    CString temp_string;
+//    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_TYPE))->GetCurSel();
+//    ((CComboBox *)GetDlgItem(IDC_COMBO_TYPE))->GetLBText(nSel, temp_string);
+//    for (int i = 0;i<sizeof(DisplayType) / sizeof(DisplayType[0]);i++)
+//    {
+//        if (temp_string.CompareNoCase(DisplayType[i]) == 0)
+//        {
+//            Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.npoint.point_type = i;
+//            break;
+//        }
+//    }
+//    if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+//    {
+//        CString temp_task_info;
+//        temp_task_info.Format(_T("Change LCD point type timeout!"));
+//        SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
+//        return;
+//    }
+//}
+
+
+//void CBacnetSettingParamter::OnCbnSelchangeComboNumber()
+//{
+//    // TODO: 在此添加控件通知处理程序代码
+//    CString temp_string;
+//    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->GetCurSel();
+//    ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->GetLBText(nSel, temp_string);
+//    int temp_value;
+//    temp_value = (unsigned char)_wtoi(temp_string);
+//    Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.npoint.number = temp_value;
+//    if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+//    {
+//        CString temp_task_info;
+//        temp_task_info.Format(_T("Change LCD point number timeout!"));
+//        SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
+//        return;
+//    }
+//}
+
+
+void CBacnetSettingParamter::OnBnClickedButtonLcdOk()
 {
     // TODO: 在此添加控件通知处理程序代码
-    CString temp_string;
-    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_TYPE))->GetCurSel();
-    ((CComboBox *)GetDlgItem(IDC_COMBO_TYPE))->GetLBText(nSel, temp_string);
-    for (int i = 0;i<sizeof(DisplayType) / sizeof(DisplayType[0]);i++)
+    CString temp_type; CString temp_number;
+    GetDlgItemText(IDC_COMBO_TYPE, temp_type);
+    GetDlgItemText(IDC_COMBO_NUMBER, temp_number);
+
+    for (int i = 0; i < sizeof(DisplayType) / sizeof(DisplayType[0]); i++)
     {
-        if (temp_string.CompareNoCase(DisplayType[i]) == 0)
+        if (temp_type.CompareNoCase(DisplayType[i]) == 0)
         {
             Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.npoint.point_type = i;
             break;
         }
     }
+    int temp_value;
+    temp_value = (unsigned char)_wtoi(temp_number);
+    Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.npoint.number = temp_value;
+
     if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
     {
         CString temp_task_info;
         temp_task_info.Format(_T("Change LCD point type timeout!"));
-        SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
-        return;
-    }
-}
-
-
-void CBacnetSettingParamter::OnCbnSelchangeComboNumber()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    CString temp_string;
-    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->GetCurSel();
-    ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->GetLBText(nSel, temp_string);
-    int temp_value;
-    temp_value = (unsigned char)_wtoi(temp_string);
-    Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.npoint.number = temp_value;
-    if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
-    {
-        CString temp_task_info;
-        temp_task_info.Format(_T("Change LCD point number timeout!"));
         SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
         return;
     }

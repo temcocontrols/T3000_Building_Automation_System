@@ -30,6 +30,9 @@ const int  CHANGE_THE_ITEM_COLOR_DEFAULT = 4;//默认
 const int CHANGE_THE_ITEM_COLOR_MORE_GREEN = 5; //4>烧写成功&&配置文件，成功,
 const int CHANGE_THE_ITEM_COLOR_LESS_RED = 6;//5>配置文件，失败
 
+
+const int OPERATION_SUCCESS = 3; //成功;
+
 const int  CHANGE_ONE_ITEM = 10;
 
 #define FLASH_COLOR_BLUE RGB(50,50,180)
@@ -242,7 +245,7 @@ void CFlash_Multy::Initial_List()
     m_flash_multy_list.InsertColumn(FLASH_CONFIG_FILE_POSITION, _T("Configuration file"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_RESULTS, _T("Firmware Results"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_CONFIG_RESULTS, _T("Configuration Results"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_flash_multy_list.InsertColumn(FLASH_PRODUCT_ID, _T("Product ID"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_flash_multy_list.InsertColumn(FLASH_PRODUCT_ID, _T("PID"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_hwnd = this->m_hWnd;
     g_hwnd_now = m_flash_multy_hwnd;
 
@@ -285,7 +288,7 @@ void CFlash_Multy::Initial_List()
         nitem.Format(_T("%d"),i+1);
         nSerialNum.Format(_T("%d"),pFrame->m_product.at(i).serial_number);
         nID.Format(_T("%d"),pFrame->m_product.at(i).product_id);
-        nProductName = GetProductName(pFrame->m_product.at(i).product_class_id);
+        nProductName = pFrame->m_product.at(i).NameShowOnTree;//GetProductName(pFrame->m_product.at(i).product_class_id);
         nproduct_id.Format(_T("%u"),(unsigned char)pFrame->m_product.at(i).product_class_id);
 		if(pFrame->m_product.at(i).note_parent_serial_number == 0)
 		{
@@ -321,7 +324,14 @@ void CFlash_Multy::Initial_List()
         }
 
         m_flash_multy_list.InsertItem(i,nitem);
-       
+        int temp_checked = GetPrivateProfileInt(_T("MassFlash"), nSerialNum, 0, g_ext_mass_flash_path);
+        if (temp_checked)
+        {
+            m_flash_multy_list.SetCellChecked(i, FLASH_ITEM, 1);
+        }
+        else
+            m_flash_multy_list.SetCellChecked(i, FLASH_ITEM, 0);
+        m_flash_multy_list.SetCellEnabled(i, FLASH_ITEM,0);
         m_flash_multy_list.SetItemText(i,FLASH_SERIAL_NUMBER,nSerialNum);
         m_flash_multy_list.SetItemText(i,FLASH_ID,nID);
         m_flash_multy_list.SetItemText(i,FLASH_PRODUCT_NAME,nProductName);
@@ -334,12 +344,12 @@ void CFlash_Multy::Initial_List()
 		if (pFrame->m_product.at(i).status)
 		{
 			m_flash_multy_list.SetItemText(i, FLASH_ONLINE, _T("Online"));
-			m_flash_multy_list.SetCellChecked(i, 0, TRUE);
+			//m_flash_multy_list.SetCellChecked(i, 0, TRUE);
 		} 
 		else
 		{
 			m_flash_multy_list.SetItemText(i, FLASH_ONLINE, _T("Offline"));
-			m_flash_multy_list.SetCellChecked(i, 0, FALSE);
+			//m_flash_multy_list.SetCellChecked(i, 0, FALSE);
 		}
 		
         strSql.Format(_T("Select * from BatchFlashResult where SN=%d"),pFrame->m_product.at(i).serial_number);
@@ -775,7 +785,7 @@ void CFlash_Multy::OnBnClickedButtonStatrt()
         StrTemp=m_flash_multy_list.GetItemText(i,FLASH_RESULTS);
         if (StrTemp.CompareNoCase(_T("Sucessful"))==0)
         {
-            temp.nresult = 3;
+            temp.nresult = OPERATION_SUCCESS;
         }
         else
         {
@@ -785,7 +795,7 @@ void CFlash_Multy::OnBnClickedButtonStatrt()
         StrTemp=m_flash_multy_list.GetItemText(i,FLASH_CONFIG_RESULTS);
         if (StrTemp.CompareNoCase(_T("Sucessful"))==0)
         {
-            temp.cofnigresult = 3;
+            temp.cofnigresult = OPERATION_SUCCESS;
         }
         else
         {
@@ -821,6 +831,7 @@ void CFlash_Multy::OnBnClickedButtonStatrt()
         {
             temp.online = true;
         }
+        m_flash_multy_list.SetItemText(i, FLASH_RESULTS,_T("Waiting"));
         flash_device.push_back(temp);
     }
 
@@ -919,7 +930,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
 		//flash_device.at(i).need_flash
         if (true)
         {
-            if (flash_device.at(i).nresult != 3)
+            if (flash_device.at(i).nresult != OPERATION_SUCCESS)
             {
                 if (!flash_device.at(i).file_position.IsEmpty())
                 {
@@ -928,6 +939,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
                         Sleep(100);
                         continue;
                     }//检查现在是否为开始状态
+
                     log_file_opened=false;
                     pParent->SetAutoConfig(flash_device.at(i));
                     pParent->PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_BLUE,flash_device.at(i).nitem);
@@ -938,12 +950,12 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
                     if(nresult == FLASH_SUCCESS)
                     {
                         flash_device.at(i).nresult=CHANGE_THE_ITEM_COLOR_GREEN;
-                        //pParent->PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_GREEN,flash_device.at(i).nitem);
+                        pParent->PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_GREEN,flash_device.at(i).nitem);
                     }
                     else
                     {
                         flash_device.at(i).nresult=CHANGE_THE_ITEM_COLOR_RED;
-                       // pParent->PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_RED,flash_device.at(i).nitem);
+                        pParent->PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_RED,flash_device.at(i).nitem);
                     }
                     if (nresult!=FLASH_SUCCESS)
                     {
@@ -1489,38 +1501,38 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_FILE_REV,flash_device.at(sub_parameter-1).file_rev);
 
     }
-	CppSQLite3DB SqliteDBBuilding;
-	CppSQLite3Table table;
-	CppSQLite3Query q;
-	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	//CppSQLite3DB SqliteDBBuilding;
+	//CppSQLite3Table table;
+	//CppSQLite3Query q;
+	//SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
     CString StrSql;
     switch(main_command)
     {
     case CHANGE_THE_ITEM_COLOR_BLUE:
     {
-        m_flash_multy_list.SetItemTextColor(sub_parameter,-1,FLASH_COLOR_BLUE);
-        m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T(""));
+        m_flash_multy_list.SetItemTextColor(sub_parameter, FLASH_RESULTS,FLASH_COLOR_BLUE);
+        m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Running"));
     }
     break;
     case CHANGE_THE_ITEM_COLOR_GREEN:
     {
-        m_flash_multy_list.SetItemTextColor(sub_parameter,-1,FLASH_COLOR_GREEN);
+        m_flash_multy_list.SetItemTextColor(sub_parameter, FLASH_RESULTS,FLASH_COLOR_GREEN);
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Sucessful"));
-        StrSql.Format(_T("Update BatchFlashResult Set FirmwareResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter-1).strSN));
-        //bado.OpenRecordset(StrSql);
-		SqliteDBBuilding.execDML((UTF8MBSTR)StrSql);
+  //      StrSql.Format(_T("Update BatchFlashResult Set FirmwareResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter-1).strSN));
+  //      //bado.OpenRecordset(StrSql);
+		//SqliteDBBuilding.execDML((UTF8MBSTR)StrSql);
     }
     break;
     case CHANGE_THE_ITEM_COLOR_RED:
     {
-        m_flash_multy_list.SetItemTextColor(sub_parameter,-1,FLASH_COLOR_RED);
+        m_flash_multy_list.SetItemTextColor(sub_parameter, FLASH_RESULTS,FLASH_COLOR_RED);
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Fail"));
     }
     break;
     case CHANGE_THE_ITEM_COLOR_DEFAULT:
     {
-        m_flash_multy_list.SetItemTextColor(sub_parameter,-1,FLASH_COLOR_DEFAULT);
+        m_flash_multy_list.SetItemTextColor(sub_parameter, FLASH_RESULTS,FLASH_COLOR_DEFAULT);
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T(""));
         m_flash_multy_list.SetItemText(sub_parameter,FLASH_CONFIG_RESULTS,_T(""));
     }
@@ -1545,7 +1557,7 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
     }
     break;
     }
-    SqliteDBBuilding.closedb();
+    //SqliteDBBuilding.closedb();
     return 0;
 }
 
@@ -1570,13 +1582,41 @@ void CFlash_Multy::OnNMClickListFlashMulty(NMHDR *pNMHDR, LRESULT *pResult)
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
     CString Product_Name = m_flash_multy_list.GetItemText(lRow,FLASH_PRODUCT_NAME);
-
-    if(lRow>m_flash_multy_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+    int total_count = m_flash_multy_list.GetItemCount();
+    if(lRow> total_count) //如果点击区超过最大行号，则点击是无效的
         return;
     if(lRow<0)
         return;
-
-    if(lCol == FLASH_FILE_POSITION)
+    if (lCol == FLASH_ITEM)
+    {
+        
+        for (int z = 0; z < total_count; z++) //将目前选中的存储起来;下次直接显示这些已经选中的;
+        {
+            CString temp_serial = m_flash_multy_list.GetItemText(z, FLASH_SERIAL_NUMBER);
+            bool temp_check = m_flash_multy_list.GetCellChecked(z, FLASH_ITEM);
+            if (z == lRow)
+            {
+                if (temp_check)
+                {
+                    m_flash_multy_list.SetCellChecked(z, FLASH_ITEM, 0);
+                    WritePrivateProfileStringW(_T("MassFlash"), temp_serial, NULL, g_ext_mass_flash_path);
+                }
+                else
+                {
+                    m_flash_multy_list.SetCellChecked(z, FLASH_ITEM, 1);
+                    WritePrivateProfileStringW(_T("MassFlash"), temp_serial, _T("1"), g_ext_mass_flash_path);
+                }
+            }
+            else
+            {            
+                if (temp_check)
+                    WritePrivateProfileStringW(_T("MassFlash"), temp_serial, _T("1"), g_ext_mass_flash_path);
+                else
+                    WritePrivateProfileStringW(_T("MassFlash"), temp_serial, NULL, g_ext_mass_flash_path);
+            }
+        }
+    }
+    else if(lCol == FLASH_FILE_POSITION)
     {
         CString strFilter = _T("hex File;bin File|*.hex;*.bin|all File|*.*||");
         CFileDialog dlg(true,_T("hex"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
@@ -1596,7 +1636,7 @@ void CFlash_Multy::OnNMClickListFlashMulty(NMHDR *pNMHDR, LRESULT *pResult)
 
         }
     }
-    if(lCol == FLASH_CONFIG_FILE_POSITION)
+    else if(lCol == FLASH_CONFIG_FILE_POSITION)
     {
 
         CString strFilter = _T("txt File|*.txt|all File|*.*||");
@@ -1868,6 +1908,11 @@ void CFlash_Multy::OnBnClickedButtonUpdateFirmware()
     //将获取到的 最新版本的 填充至 表格;
     for (int i=0; i<flash_device.size(); i++)
     {
+        if (!m_flash_multy_list.GetCellChecked(i, FLASH_ITEM))
+        {
+            continue;
+        }
+
         bool find_product_and_firmware_exsit = false;
         for (int j=0; j<download_info_type.size(); j++)
         {
@@ -1900,10 +1945,10 @@ void CFlash_Multy::OnBnClickedButtonUpdateFirmware()
             }
         }
     }
-
+    
 
     flash_multi_auto = false;
-
+    OnBnClickedButtonStatrt();
 }
 
 //与 TemcoProductFirmware   里面的一致;

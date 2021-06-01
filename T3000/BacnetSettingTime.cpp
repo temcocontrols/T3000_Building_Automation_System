@@ -45,6 +45,10 @@ BEGIN_MESSAGE_MAP(CBacnetSettingTime, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO_SETTING_SYNC_PC, &CBacnetSettingTime::OnBnClickedRadioSettingSyncPc)
     ON_CBN_KILLFOCUS(IDC_COMBO_BACNET_SETTING_TIME_SERVER, &CBacnetSettingTime::OnCbnKillfocusComboBacnetSettingTimeServer)
     ON_BN_CLICKED(IDC_BUTTON_SYNC_TIME, &CBacnetSettingTime::OnBnClickedButtonSyncTime)
+    ON_CBN_SELCHANGE(IDC_COMBO_START_MONTH, &CBacnetSettingTime::OnCbnSelchangeComboStartMonth)
+    ON_CBN_SELCHANGE(IDC_COMBO_START_DAY, &CBacnetSettingTime::OnCbnSelchangeComboStartDay)
+    ON_CBN_SELCHANGE(IDC_COMBO_END_MONTH, &CBacnetSettingTime::OnCbnSelchangeComboEndMonth)
+    ON_CBN_SELCHANGE(IDC_COMBO_END_DAY, &CBacnetSettingTime::OnCbnSelchangeComboEndDay)
 END_MESSAGE_MAP()
 
 
@@ -158,6 +162,154 @@ void CBacnetSettingTime::OnNMSetfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
     *pResult = 0;
 }
 
+
+int CBacnetSettingTime::MonthType(unsigned char n_month)
+{
+    if ((n_month == 1) || (n_month == 3) || (n_month == 5) || (n_month == 7) || (n_month == 8) || (n_month == 10) || (n_month == 12))
+    {
+        return 1;
+    }
+    else if ((n_month == 4) || (n_month == 6) || (n_month == 9) || (n_month == 11))
+    {
+        return 0;
+    }
+    else if (n_month == 2)
+    {
+        return 2;
+    }
+    else
+        return -1;
+}
+
+
+void CBacnetSettingTime::UpdateDayNightStartEndUI()
+{
+	//初始化 夏令时的起止时间;
+	GetDlgItem(IDC_COMBO_START_MONTH)->EnableWindow(1);
+	GetDlgItem(IDC_COMBO_END_MONTH)->EnableWindow(1);
+	GetDlgItem(IDC_COMBO_START_DAY)->EnableWindow(1);
+	GetDlgItem(IDC_COMBO_END_DAY)->EnableWindow(1);
+	((CComboBox*)GetDlgItem(IDC_COMBO_START_MONTH))->ResetContent();
+	((CComboBox*)GetDlgItem(IDC_COMBO_END_MONTH))->ResetContent();
+	for (int z = 0; z < sizeof(Month_of_Year) / sizeof(Month_of_Year[0]); z++)
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_START_MONTH))->AddString(Month_of_Year[z]);
+		((CComboBox*)GetDlgItem(IDC_COMBO_END_MONTH))->AddString(Month_of_Year[z]);
+	}
+	if ((Device_Basic_Setting.reg.start_month >= 1) && (Device_Basic_Setting.reg.start_month <= 12))
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_START_MONTH))->SetWindowText(Month_of_Year[Device_Basic_Setting.reg.start_month - 1]);
+	}
+    else
+    {
+        Device_Basic_Setting.reg.start_month = 3; //默认2021夏令时的开始时间;
+        Device_Basic_Setting.reg.start_day = 14;
+    }
+	if ((Device_Basic_Setting.reg.end_month >= 1) && (Device_Basic_Setting.reg.end_month <= 12))
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_END_MONTH))->SetWindowText(Month_of_Year[Device_Basic_Setting.reg.end_month - 1]);
+	}
+    else
+    {
+        Device_Basic_Setting.reg.end_month = 11; //默认夏令时的结束时间;
+        Device_Basic_Setting.reg.end_day = 7;
+    }
+
+	((CComboBox*)GetDlgItem(IDC_COMBO_START_DAY))->ResetContent();
+	if (MonthType(Device_Basic_Setting.reg.start_month) == 1)
+	{
+		for (int i = 1; i <= 31; i++)
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), i);
+			((CComboBox*)GetDlgItem(IDC_COMBO_START_DAY))->AddString(temp_day);
+		}
+		if ((Device_Basic_Setting.reg.start_day >= 1) && (Device_Basic_Setting.reg.start_month <= 31))
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), Device_Basic_Setting.reg.start_day);
+			((CComboBox*)GetDlgItem(IDC_COMBO_START_DAY))->SetWindowText(temp_day);
+		}
+	}
+	else if (MonthType(Device_Basic_Setting.reg.start_month) == 0)
+	{
+		for (int i = 1; i <= 30; i++)
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), i);
+			((CComboBox*)GetDlgItem(IDC_COMBO_START_DAY))->AddString(temp_day);
+		}
+		if ((Device_Basic_Setting.reg.start_day >= 1) && (Device_Basic_Setting.reg.start_month <= 30))
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), Device_Basic_Setting.reg.start_day);
+			((CComboBox*)GetDlgItem(IDC_COMBO_START_DAY))->SetWindowText(temp_day);
+		}
+	}
+	else if (MonthType(Device_Basic_Setting.reg.start_month) == 2)
+	{
+		for (int i = 1; i <= 28; i++)
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), i);
+			((CComboBox*)GetDlgItem(IDC_COMBO_START_DAY))->AddString(temp_day);
+		}
+		if ((Device_Basic_Setting.reg.start_day >= 1) && (Device_Basic_Setting.reg.start_month <= 28))
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), Device_Basic_Setting.reg.start_day);
+			((CComboBox*)GetDlgItem(IDC_COMBO_START_DAY))->SetWindowText(temp_day);
+		}
+	}
+
+	((CComboBox*)GetDlgItem(IDC_COMBO_END_DAY))->ResetContent();
+	if (MonthType(Device_Basic_Setting.reg.end_month) == 1)
+	{
+		for (int i = 1; i <= 31; i++)
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), i);
+			((CComboBox*)GetDlgItem(IDC_COMBO_END_DAY))->AddString(temp_day);
+		}
+		if ((Device_Basic_Setting.reg.end_day >= 1) && (Device_Basic_Setting.reg.end_day <= 31))
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), Device_Basic_Setting.reg.end_day);
+			((CComboBox*)GetDlgItem(IDC_COMBO_END_DAY))->SetWindowText(temp_day);
+		}
+	}
+	else if (MonthType(Device_Basic_Setting.reg.end_month) == 0)
+	{
+		for (int i = 1; i <= 30; i++)
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), i);
+			((CComboBox*)GetDlgItem(IDC_COMBO_END_DAY))->AddString(temp_day);
+		}
+		if ((Device_Basic_Setting.reg.end_day >= 1) && (Device_Basic_Setting.reg.end_day <= 30))
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), Device_Basic_Setting.reg.end_day);
+			((CComboBox*)GetDlgItem(IDC_COMBO_END_DAY))->SetWindowText(temp_day);
+		}
+	}
+	else if (MonthType(Device_Basic_Setting.reg.end_month) == 2)
+	{
+		for (int i = 1; i <= 28; i++)
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), i);
+			((CComboBox*)GetDlgItem(IDC_COMBO_END_DAY))->AddString(temp_day);
+		}
+		if ((Device_Basic_Setting.reg.end_day >= 1) && (Device_Basic_Setting.reg.end_day <= 28))
+		{
+			CString temp_day;
+			temp_day.Format(_T("%d"), Device_Basic_Setting.reg.end_day);
+			((CComboBox*)GetDlgItem(IDC_COMBO_END_DAY))->SetWindowText(temp_day);
+		}
+	}
+}
+
 void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
 {
     CTime	TimeTemp;
@@ -169,41 +321,12 @@ void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
 
     if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)
     {
-        panel_time_to_basic_delt = Device_Basic_Setting.reg.time_zone * 360 / 10;
-        //因为本地CDateTimeCtrl 在设置时间的时候 会默认 加上 电脑的时区，但是显示的时候要显示 设备所选时区，所以 要 变换.
-        if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
-            scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
-        else if (Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
-        {
-            CTime	temptimevalue;
-            time_t temp_t_time;
-            temp_t_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
-            temptimevalue = temp_t_time;
-            int temp_month = temptimevalue.GetMonth();
-            int temp_day = temptimevalue.GetDay();
-            int day_of_year = temp_month * 30 + temp_day;
-            if ((day_of_year > 135) && (day_of_year < 255))
-            {
-                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
-            }
-            else
-                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; //如果选中夏令时 需要显示的时候加一个小时
-        }
-            
-        else
-            scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
-
-                                                                                            //如果本地是夏令时  要求传递给 设备的是 不带夏令时的时间.
-                                                                                            //if (DaylightBias != 0)
-                                                                                            //{
-                                                                                            //    scale_time = scale_time - 3600;
-                                                                                            //}
-
+        scale_time = temp_time_long;
     }
 
     temp_time = scale_time;
 
-    if (temp_time.GetYear()<2000)
+    if (temp_time.GetYear() < 2000)
         nyear = temp_time.GetYear() + 2000;
     else
         nyear = temp_time.GetYear();
@@ -219,7 +342,9 @@ void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
 
     m_cm5_date_picker.SetTime(&TimeTemp);
 
-    Get_Time_Edit_By_Control();
+    //Get_Time_Edit_By_Control();
+    Device_time.new_time.n_time = temp_time_long;
+
 
     //TSTAT10 有时候 写同步时间的时候 会通讯挂掉;
     //暂时屏蔽TSTAT10 同步时间 后就不通讯;
@@ -234,6 +359,83 @@ void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
         MessageBox(_T("The clock was successfully synchronized with local PC."));
     }
 }
+
+//void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
+//{
+//    CTime	TimeTemp;
+//    CTime temp_time;
+//    int nyear, nmonth, nday, nhour, nmin, nsec;
+//
+//    unsigned long  temp_time_long = time(NULL);
+//    time_t scale_time = temp_time_long;
+//
+//    if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)
+//    {
+//        panel_time_to_basic_delt = Device_Basic_Setting.reg.time_zone * 360 / 10;
+//        //因为本地CDateTimeCtrl 在设置时间的时候 会默认 加上 电脑的时区，但是显示的时候要显示 设备所选时区，所以 要 变换.
+//        if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
+//            scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
+//        else if (Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
+//        {
+//            CTime	temptimevalue;
+//            time_t temp_t_time;
+//            temp_t_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
+//            temptimevalue = temp_t_time;
+//            int temp_month = temptimevalue.GetMonth();
+//            int temp_day = temptimevalue.GetDay();
+//            int day_of_year = temp_month * 30 + temp_day;
+//            if ((day_of_year > 135) && (day_of_year < 255))
+//            {
+//                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
+//            }
+//            else
+//                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; //如果选中夏令时 需要显示的时候加一个小时
+//        }
+//            
+//        else
+//            scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
+//
+//                                                                                            //如果本地是夏令时  要求传递给 设备的是 不带夏令时的时间.
+//                                                                                            //if (DaylightBias != 0)
+//                                                                                            //{
+//                                                                                            //    scale_time = scale_time - 3600;
+//                                                                                            //}
+//
+//    }
+//
+//    temp_time = scale_time;
+//
+//    if (temp_time.GetYear()<2000)
+//        nyear = temp_time.GetYear() + 2000;
+//    else
+//        nyear = temp_time.GetYear();
+//    nmonth = temp_time.GetMonth();
+//    nday = temp_time.GetDay();
+//    nhour = temp_time.GetHour();
+//    nmin = temp_time.GetMinute();
+//    nsec = temp_time.GetSecond();
+//    TimeTemp = CTime(nyear, nmonth, nday, nhour, nmin, nsec);
+//
+//    m_cm5_time_picker.SetFormat(_T("HH:mm"));
+//    m_cm5_time_picker.SetTime(&TimeTemp);
+//
+//    m_cm5_date_picker.SetTime(&TimeTemp);
+//
+//    Get_Time_Edit_By_Control();
+//
+//    //TSTAT10 有时候 写同步时间的时候 会通讯挂掉;
+//    //暂时屏蔽TSTAT10 同步时间 后就不通讯;
+//   // if (g_selected_product_id == PM_TSTAT10)
+//    //    return;
+//    if (WritePrivateData_Blocking(g_bac_instance, WRITE_TIMECOMMAND, 0, 0, sizeof(Time_block_mini)) < 0)
+//    {
+//        MessageBox(_T("An error occurred while device synchronizing with local PC. This operation returned because the timeout period expired."));
+//    }
+//    else
+//    {
+//        MessageBox(_T("The clock was successfully synchronized with local PC."));
+//    }
+//}
 
 void CBacnetSettingTime::OnBnClickedBtnBacWriteTime()
 {
@@ -283,6 +485,7 @@ void CBacnetSettingTime::OnBnClickedCheckSettingZoneDaylightTime()
 
     Sleep(1000);
     OnBnClickedButtonRefreshTime();
+    ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
 }
 
 
@@ -466,4 +669,88 @@ BOOL CBacnetSettingTime::OnInitDialog()
     GetDlgItem(IDC_CHECK_SETTING_ZONE_DAYLIGHT_TIME)->SetFocus();
     return FALSE;  // return TRUE unless you set the focus to a control
                   // 异常: OCX 属性页应返回 FALSE
+}
+
+
+void CBacnetSettingTime::OnCbnSelchangeComboStartMonth()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_string;
+    int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_START_MONTH))->GetCurSel();
+    ((CComboBox*)GetDlgItem(IDC_COMBO_START_MONTH))->GetLBText(nSel, temp_string);
+    if (nSel >= sizeof(Month_of_Year) / sizeof(Month_of_Year[0]))
+        return;
+    Device_Basic_Setting.reg.start_month = nSel + 1;
+
+    CString temp_task_info;
+    temp_task_info.Format(_T("Change Daylight start month to "));
+    temp_task_info = temp_task_info + temp_string;
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+    ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
+}
+
+
+void CBacnetSettingTime::OnCbnSelchangeComboStartDay()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_string;
+    int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_START_DAY))->GetCurSel();
+    ((CComboBox*)GetDlgItem(IDC_COMBO_START_DAY))->GetLBText(nSel, temp_string);
+
+    int temp_start_day = 0;
+    temp_start_day = _wtoi(temp_string);
+    if ((temp_start_day < 0) && (temp_start_day > 31))
+    {
+        return;
+    }
+
+    Device_Basic_Setting.reg.start_day = temp_start_day;
+
+    CString temp_task_info;
+    temp_task_info.Format(_T("Change Daylight start day to "));
+    temp_task_info = temp_task_info + temp_string;
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+    ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
+}
+
+
+void CBacnetSettingTime::OnCbnSelchangeComboEndMonth()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_string;
+    int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_END_MONTH))->GetCurSel();
+    ((CComboBox*)GetDlgItem(IDC_COMBO_END_MONTH))->GetLBText(nSel, temp_string);
+    if (nSel >= sizeof(Month_of_Year) / sizeof(Month_of_Year[0]))
+        return;
+    Device_Basic_Setting.reg.end_month = nSel + 1;
+
+    CString temp_task_info;
+    temp_task_info.Format(_T("Change Daylight end month to "));
+    temp_task_info = temp_task_info + temp_string;
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+    ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
+}
+
+
+void CBacnetSettingTime::OnCbnSelchangeComboEndDay()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_string;
+    int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_END_DAY))->GetCurSel();
+    ((CComboBox*)GetDlgItem(IDC_COMBO_END_DAY))->GetLBText(nSel, temp_string);
+
+    int temp_end_day = 0;
+    temp_end_day = _wtoi(temp_string);
+    if ((temp_end_day < 0) && (temp_end_day > 31))
+    {
+        return;
+    }
+
+    Device_Basic_Setting.reg.end_day = temp_end_day;
+
+    CString temp_task_info;
+    temp_task_info.Format(_T("Change Daylight end day to "));
+    temp_task_info = temp_task_info + temp_string;
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+    ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
 }

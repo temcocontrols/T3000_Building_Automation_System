@@ -326,4 +326,5 @@ public:
 	CEdit m_max_scale_aq_edit;
 	int m_current_TstatID;
 	CComboBox m_Combox_baudrate;
+	afx_msg void OnCbnSelchangeCo2Baudratecombo();
 };

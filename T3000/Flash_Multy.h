@@ -24,6 +24,7 @@ typedef struct
     CString file_rev;
     bool need_flash;
 	unsigned char product_id;
+	bool select_status;
 }Str_flash_device;
 
 
@@ -58,6 +59,7 @@ public:
 	afx_msg void OnBnClickedButtonApplyWoAllSelect();
 	afx_msg void OnBnClickedButtonMultySel();
 	afx_msg void OnBnClickedButtonStatrt();
+	void ReloadListData();
 	void SetAutoConfig(Str_flash_device ndevice_info);
 	static DWORD WINAPI  multy_isp_thread(LPVOID lpVoid);
     static DWORD WINAPI  multy_check_online(LPVOID lpVoid);

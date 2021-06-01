@@ -1,6 +1,10 @@
 #pragma once
 #include "RelayLabel.h"
-//#define ENABLE_HTTP_FUCTION  //定义是否使用http api
+#ifdef DEBUG
+ #define ENABLE_HTTP_FUCTION  //定义是否使用http api
+#endif // DEBUG
+
+
 //#define ENABLE_T3_EMAIL
 #include <map>
 //minipanel 寄存器表
@@ -863,9 +867,12 @@ const CString Input_List_Analog_Units[] =
 	_T("ma"),
 	_T("psi"),
 	_T("counts"),
-	_T("%(0-10V)"),
-	_T("%(0-5V)"),
-	_T("%(4-20ma)"),
+	_T("%"),
+	_T("%"),
+	_T("%"),
+	//_T("%(0-10V)"),
+	//_T("%(0-5V)"),
+	//_T("%(4-20ma)"),
 	_T("Volts"),
 	_T(""),
 	_T(""),
@@ -1039,6 +1046,22 @@ const CString AirFlowUnit[] =
 	_T("m3/s"),
 	_T("ft3/min"),
 	_T("L/min")
+};
+
+const CString Month_of_Year[] =
+{
+	_T("Jan"),
+	_T("Feb"),
+	_T("Mar"),
+	_T("Apr"),
+	_T("May"),
+	_T("Jun"),
+	_T("Jul"),
+	_T("Aug"),
+	_T("Sept"),
+	_T("Oct"),
+	_T("Nov"),
+	_T("Dec")
 };
 
 const CString Time_Zone_Name[] =
@@ -2468,6 +2491,7 @@ typedef struct RoomInfo
 #define SENSOR_BIT_ZIGBEE        9
 #define SENSOR_BIT_PM2_5         10
 #define SENSOR_BIT_AI_PT12       11
+#define SENSOR_BIT_FAR_INFRA_RED 12
 
 #define TYPE_BM_POINT_LIST  255
 #define TYPE_BM_GROUP       0

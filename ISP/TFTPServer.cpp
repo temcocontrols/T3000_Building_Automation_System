@@ -6,6 +6,9 @@
 #include "Iphlpapi.h"
 #include "MySocket.h"
 #include "global_function.h"
+#ifdef ISP_BURNING_MODE
+extern  unsigned short Check_sum ;
+#endif
 CString local_enthernet_ip;
  Bin_Info        global_fileInfor;
 ////#include <vector>			//Vector templates
@@ -1099,10 +1102,14 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 CString ShowTFTPMessage;
 BOOL TFTPServer::StartServer()
 {
-
+#ifdef ISP_BURNING_MODE
+    Check_sum = 0;
+       CString strTips_checksum;
+#endif
 	   RefreshNetWorkDeviceListByUDPFunc();
 	   TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
 	   Sleep(2000);
+
 
 
    //  for (int i = 0; i<m_FlashTimes ; i++)
@@ -1448,12 +1455,18 @@ BOOL TFTPServer::StartServer()
                 strTips.Format(_T("Updating firmware. Device IP : %d.%d.%d.%d"),Byte_ISP_Device_IP[0],Byte_ISP_Device_IP[1],Byte_ISP_Device_IP[2],Byte_ISP_Device_IP[3]);
                 OutPutsStatusInfo(strTips, FALSE);
                 OutPutsStatusInfo(_T(""), FALSE);
+
                 nRet =Send_Tftp_File();
                 if(nRet==0) //break;
                      goto StopServer;
                 ISP_STEP = ISP_Send_TFTP_OVER;
                 break;
             case  ISP_Send_TFTP_OVER:
+#ifdef ISP_BURNING_MODE
+                strTips_checksum.Format(_T("NetWork CheckSum : 0x%04x"), Check_sum);
+                OutPutsStatusInfo(strTips_checksum, FALSE);
+#endif
+
                 if(mode_flash_over_try_time++<5)
                     SendUDP_Flash_Socket.SendTo(Flash_Done,sizeof(Flash_Done),FLASH_UDP_PORT,ISP_Device_IP,0);
                 else
@@ -1602,8 +1615,17 @@ bool TFTPServer::Send_Tftp_File()
                 Sleep(1);
                 if(next_package_number == package_number +1)
                 {
-                    if (nflash_receive_to_send_delay_time)
-                        Sleep(nflash_receive_to_send_delay_time);
+					if (nflash_receive_to_send_delay_time)
+						Sleep(nflash_receive_to_send_delay_time);
+#ifdef ISP_BURNING_MODE
+					if (next_package_number > 64)  //前32K是bootloader 不用算校验和;
+					{
+						for (int x = 0; x < nSendNum; x++)
+						{
+							Check_sum = Check_sum + pBuf[x];
+						}
+					}
+#endif
                     goto flash_new_package;
                 }
             }

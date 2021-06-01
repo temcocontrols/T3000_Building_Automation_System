@@ -811,10 +811,10 @@ BOOL Dowmloadfile::OnInitDialog()
 
 	productfolder = GetProdcutFtpPath(m_product_isp_auto_flash.product_class_id);
 
-    if (m_special_customer == 1)
+    if (m_special_customer != 0)
     {
 
-        GetDlgItem(IDC_BUTTON_UPDATE_T3000)->SetWindowTextW(_T("Update ") + cs_special_name);
+        GetDlgItem(IDC_BUTTON_UPDATE_T3000)->SetWindowTextW(_T("Update\r\n ") + cs_special_name);
     }
 
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Bootloader"));
@@ -1050,7 +1050,7 @@ DWORD WINAPI  Dowmloadfile::WebDownloadThread(LPVOID lpVoid)
         int file_info_ret = https_get_file(m_product_isp_auto_flash.product_class_id, str_file_info);
         if (file_info_ret == 1)
         {
-            temp_firmware_name = str_file_info.k_file_name.tValue.cs_value;
+            temp_firmware_name = str_file_info.key[GETF_FILENAME].tValue.cs_value;
         }
         else
         {
@@ -1064,13 +1064,13 @@ DWORD WINAPI  Dowmloadfile::WebDownloadThread(LPVOID lpVoid)
         cs_temp.Format(_T("Firmware file information"));
         pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), cs_temp);
 
-        cs_temp.Format(_T("%s : %d\r\n "), str_web_info.k_productID.KeyName, str_web_info.k_productID.tValue.n_value);
+        cs_temp.Format(_T("%s : %d\r\n "), str_web_info.key[GETP_ID].KeyName, str_web_info.key[GETP_ID].tValue.n_value);
         pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), cs_temp);
 
-        cs_temp.Format(_T("%s : %.1f\r\n "), str_web_info.k_softwareVer.KeyName, str_web_info.k_softwareVer.tValue.f_value);
+        cs_temp.Format(_T("%s : %.1f\r\n "), str_web_info.key[GETP_FIRMWARE].KeyName, str_web_info.key[GETP_FIRMWARE].tValue.f_value);
         pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), cs_temp);
 
-        cs_temp.Format(_T("%s : %s\r\n "), str_web_info.k_updatedAt.KeyName, str_web_info.k_updatedAt.tValue.cs_value);
+        cs_temp.Format(_T("%s : %s\r\n "), str_web_info.key[GETP_UPDATED].KeyName, str_web_info.key[GETP_UPDATED].tValue.cs_value);
         pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), cs_temp);
 
         CString product_class_id;
