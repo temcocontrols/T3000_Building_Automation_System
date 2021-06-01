@@ -231,7 +231,8 @@ BOOL CCO2_AUTO_CALIBRATION::OnInitDialog()
             PostMessage(WM_CLOSE, NULL, NULL);
         }
     }
-    else if (product_register_value[7] == PM_TSTAT_AQ)
+    else if ((product_register_value[7] == PM_TSTAT_AQ) ||
+             (product_register_value[7] == PM_AIRLAB_ESP32))
     {
         CO2_MODBUS_CO2_BKCAL_ONOFF = 1960;
         CO2_MODBUS_CO2_NATURE_LEVEL = 1961;
@@ -298,8 +299,25 @@ BOOL CCO2_AUTO_CALIBRATION::OnInitDialog()
         GetDlgItem(IDC_EDIT_DLG_FIRMWARE_NATURE_CO2)->EnableWindow(false);
         GetDlgItem(IDC_EDIT_DLG_FIRMWARE_MAX_MIN_ADJ_PERDAY)->EnableWindow(false);
         GetDlgItem(IDC_EDIT_DLG_FIRMWARE_LOOK_DAYS)->EnableWindow(false);
-
         GetDlgItem(IDC_EDIT_USER_ADJ)->EnableWindow(false);
+
+        if ((product_register_value[CO2_MODBUS_CO2_NATURE_LEVEL] < 390) || (product_register_value[CO2_MODBUS_CO2_NATURE_LEVEL] > 500))
+        {
+            GetDlgItem(IDC_EDIT_DLG_FIRMWARE_NATURE_CO2)->SetWindowText(_T("400"));
+        }
+
+        if ((product_register_value[CO2_MODBUS_CO2_MIN_ADJ] < 1) || (product_register_value[CO2_MODBUS_CO2_MIN_ADJ] > 10))
+        {
+            GetDlgItem(IDC_EDIT_DLG_FIRMWARE_MAX_MIN_ADJ_PERDAY)->SetWindowText(_T("1"));
+        }
+
+        if ((product_register_value[CO2_MODBUS_CO2_CAL_DAYS] < 7) || (product_register_value[CO2_MODBUS_CO2_CAL_DAYS] > 30))
+        {
+            GetDlgItem(IDC_EDIT_DLG_FIRMWARE_LOOK_DAYS)->SetWindowText(_T("7"));
+        }
+        
+
+
     }
     else
     {

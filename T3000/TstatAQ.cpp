@@ -1,4 +1,4 @@
-// TstatAQ.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// TstatAQ.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "MainFrm.h"
 
 // CTstatAQ
-
+//CString  show_fan_picture = _T("C:\\temp\\fan\\fan_0.png");; //
 #define     WM_TSTAT_AQ_THREAD_READ                     WM_USER + 502
 HANDLE h_tstat_aq_thread = NULL;
 static int aqi_level = 0;
@@ -54,10 +54,11 @@ BEGIN_MESSAGE_MAP(CTstatAQ, CFormView)
     ON_NOTIFY(NM_CLICK, IDC_LIST_AIRLAB, &CTstatAQ::OnNMClickListAirlab)
     ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER_TIME_REMAIN, &CTstatAQ::OnNMKillfocusDatetimepickerTimeRemain)
     ON_BN_CLICKED(IDC_BUTTON_AIRLAB_PARAMETER, &CTstatAQ::OnBnClickedButtonAirlabParameter)
+    ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
-// CTstatAQ Õï¶Ï
+// CTstatAQ è¯Šæ–­
 
 #ifdef _DEBUG
 void CTstatAQ::AssertValid() const
@@ -105,7 +106,7 @@ CString bmp_AQI;
 CString jpg_airlab;
 void CTstatAQ::Fresh()
 {
-    CStatic* pWnd = (CStatic*)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE); // µÃµ½ Picture Control ¾ä±ú ;
+    CStatic* pWnd = (CStatic*)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE); // å¾—åˆ° Picture Control å¥æŸ„ ;
     CString icon_temperature;
 
    
@@ -121,17 +122,17 @@ void CTstatAQ::Fresh()
     HBITMAP bitmap;
     bitmap = (HBITMAP)LoadImage(AfxGetInstanceHandle(), icon_temperature, IMAGE_BITMAP, 40, 120, LR_LOADFROMFILE);
     CStatic *p = (CStatic *)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE);
-    //ÉèÖÃ¾²Ì¬¿Ø¼ş´°¿Ú·ç¸ñÎªÎ»Í¼¾ÓÖĞÏÔÊ¾  
+    //è®¾ç½®é™æ€æ§ä»¶çª—å£é£æ ¼ä¸ºä½å›¾å±…ä¸­æ˜¾ç¤º  
     p->ModifyStyle(0xf, SS_BITMAP | SS_CENTERIMAGE);
-    //½«Í¼Æ¬ÉèÖÃµ½Picture¿Ø¼şÉÏ  
+    //å°†å›¾ç‰‡è®¾ç½®åˆ°Pictureæ§ä»¶ä¸Š  
     p->SetBitmap(bitmap);
 
     //HBITMAP bitmap_api;
     //bitmap_api = (HBITMAP)LoadImage(AfxGetInstanceHandle(), bmp_AQI, IMAGE_BITMAP, 646, 437, LR_LOADFROMFILE);
     //CStatic *p2 = (CStatic *)GetDlgItem(IDC_STATIC_AQI);
-    ////ÉèÖÃ¾²Ì¬¿Ø¼ş´°¿Ú·ç¸ñÎªÎ»Í¼¾ÓÖĞÏÔÊ¾  
+    ////è®¾ç½®é™æ€æ§ä»¶çª—å£é£æ ¼ä¸ºä½å›¾å±…ä¸­æ˜¾ç¤º  
     //p2->ModifyStyle(0xf, SS_BITMAP | SS_CENTERIMAGE);
-    ////½«Í¼Æ¬ÉèÖÃµ½Picture¿Ø¼şÉÏ  
+    ////å°†å›¾ç‰‡è®¾ç½®åˆ°Pictureæ§ä»¶ä¸Š  
     //p2->SetBitmap(bitmap_api);
 
 
@@ -153,7 +154,7 @@ void CTstatAQ::Fresh()
 
 
     CString sound_full_path;
-    CStatic* pWnd_sound_pic = (CStatic*)GetDlgItem(IDC_STATIC_SOUND); // µÃµ½ Picture Control ¾ä±ú ;
+    CStatic* pWnd_sound_pic = (CStatic*)GetDlgItem(IDC_STATIC_SOUND); // å¾—åˆ° Picture Control å¥æŸ„ ;
     if(product_register_value[TSTAT_AQ_SOUND] <= 10)
         sound_full_path = ApplicationFolder + _T("\\ResourceFile\\Icon\\sound_0.ico");
     else if (product_register_value[TSTAT_AQ_SOUND] <= 30)
@@ -169,9 +170,11 @@ void CTstatAQ::Fresh()
 
    
 
-    if (product_register_value[7] == PM_TSTAT_AQ)
+    if ((product_register_value[7] == PM_TSTAT_AQ) ||
+        (product_register_value[7] == PM_AIRLAB_ESP32))
+    {
         SetTimer(1, 1000, NULL);
-
+    }
     GetDlgItem(IDC_BUTTON_DONE)->SetFocus();
 }
 
@@ -206,7 +209,8 @@ void CTstatAQ::UpdateUI()
     cs_ppm.Format(_T("%d"), product_register_value[TSTAT_AQ_CO2]);
 
     CString cs_VOC;
-    if(product_register_value[7] == PM_TSTAT_AQ)
+    if((product_register_value[7] == PM_TSTAT_AQ) ||
+        (product_register_value[7] == PM_AIRLAB_ESP32))
         cs_VOC.Format(_T("%u"), product_register_value[TSTAT_AQ_VOC_AIRLAB]);
     else
         cs_VOC.Format(_T("%u"), product_register_value[TSTAT_AQ_VOC]);
@@ -221,7 +225,8 @@ void CTstatAQ::UpdateUI()
     CString cs_co2_off;
     CString cs_pm_on;
     CString cs_pm_off;
-    if (product_register_value[7] == PM_TSTAT_AQ)
+    if ((product_register_value[7] == PM_TSTAT_AQ) ||
+        (product_register_value[7] == PM_AIRLAB_ESP32))
     {
         cs_co2_on.Format(_T("%u"), product_register_value[1020]);
         cs_co2_off.Format(_T("%u"), product_register_value[1021]);
@@ -264,8 +269,20 @@ void CTstatAQ::UpdateUI()
     temp_cus_api[3].Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FOURTH_LINE]);
     temp_cus_api[4].Format(_T("%u"), product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FIFTH_LINE]);
 
-    if ((product_register_value[7] == PM_MULTI_SENSOR) || (product_register_value[7] == PM_TSTAT_AQ))
+    if ((product_register_value[7] == PM_MULTI_SENSOR) || 
+        (product_register_value[7] == PM_TSTAT_AQ) ||
+        (product_register_value[7] == PM_AIRLAB_ESP32))
     {
+
+        if (temp_software_version >= 118)
+        {
+            GetDlgItem(IDC_BUTTON_AIRLAB_PARAMETER)->EnableWindow(1);
+        }
+        else
+        {
+            GetDlgItem(IDC_BUTTON_AIRLAB_PARAMETER)->EnableWindow(0);
+        }
+
         if (temp_software_version >= 112)
         {
             GetDlgItem(IDC_EDIT_CO2_ON_TIME)->EnableWindow(1);
@@ -331,6 +348,10 @@ void CTstatAQ::UpdateUI()
         GetDlgItem(IDC_EDIT_LEVEL_3)->SetWindowTextW(temp_cus_api[2]);
         GetDlgItem(IDC_EDIT_LEVEL_4)->SetWindowTextW(temp_cus_api[3]);
         GetDlgItem(IDC_EDIT_LEVEL_5)->SetWindowTextW(temp_cus_api[4]);
+    }
+    else
+    {
+        ((CComboBox*)GetDlgItem(IDC_COMBO_AQI_REGION))->EnableWindow(0);
     }
 
     if (product_register_value[TSTAT_AQ_TEMP_UNIT] == 0)
@@ -420,7 +441,7 @@ void CTstatAQ::UpdateUI()
             m_airlab_list.SetCellEnabled(i, AIRLAB_TRIGGER, 0);
             m_airlab_list.SetCellEnabled(i, AIRLAB_TIME, 0);
         }
-        return;
+
     }
     if (product_register_sensor_flag[0] == 0x55)
     {
@@ -482,6 +503,34 @@ void CTstatAQ::UpdateUI()
         m_airlab_list.SetCellEnabled(0, AIRLAB_TIME, 0);
         m_airlab_list.SetItemText(0, AIRLAB_TIME_LEFT, _T("-"));
     }
+
+    if (product_register_sensor_flag[0] == 0x55)
+    {
+        CString temp_value;
+        temp_value.Format(_T("%u"), product_register_value[TSTAT_AQ_OCC_VALUE]);
+        bitset<16> module_type(product_register_sensor_flag[1]);
+        if (module_type.test(SENSOR_BIT_FAR_INFRA_RED) == true)
+        {
+            CString temp_ambient;
+            CString temp_remote;
+            temp_ambient.Format(_T("%.1f"), ((float)product_register_value[TSTAT_AQ_TEMP_AMBIENT]) / 10);
+            temp_remote.Format(_T("%.1f"), ((float)product_register_value[TSTAT_AQ_TEMP_REMOTE]) / 10);
+
+            GetDlgItem(IDC_STATIC_FIR_AMBIENT_TEMP)->SetWindowTextW(temp_ambient);
+            GetDlgItem(IDC_STATIC_FIR_REMOTE_TEMP2)->SetWindowTextW(temp_remote);
+        }
+        else
+        {
+            GetDlgItem(IDC_STATIC_FIR_AMBIENT_TEMP)->SetWindowTextW(_T("-"));
+            GetDlgItem(IDC_STATIC_FIR_REMOTE_TEMP2)->SetWindowTextW(_T("-"));
+        }
+    }
+    else
+    {
+        GetDlgItem(IDC_STATIC_FIR_AMBIENT_TEMP)->SetWindowTextW(_T("-"));
+        GetDlgItem(IDC_STATIC_FIR_REMOTE_TEMP2)->SetWindowTextW(_T("-"));
+    }
+
     if (product_register_sensor_flag[0] == 0x55)
     {
         CString temp_value;
@@ -666,7 +715,7 @@ void CTstatAQ::UpdateUI()
         }
     }
 }
-// CTstatAQ ÏûÏ¢´¦Àí³ÌĞò
+// CTstatAQ æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 
 
@@ -682,7 +731,7 @@ void CTstatAQ::OnInitialUpdate()
     m_static_info.textColor(RGB(255, 255, 255));
     m_static_info.bkColor(RGB(0, 0, 255));
     m_static_info.setFont(28, 26, NULL, _T("Arial"));
-    // TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+    // TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»
 }
 
 DWORD WINAPI Update_TstatAQ_Thread(LPVOID lPvoid)
@@ -716,7 +765,7 @@ LRESULT CTstatAQ::UpdateUI(WPARAM wParam, LPARAM lParam)
 
 void CTstatAQ::OnEnKillfocusEditCo2OnTime()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 
     CString strText;
     GetDlgItem(IDC_EDIT_CO2_ON_TIME)->GetWindowText(strText);
@@ -734,7 +783,7 @@ void CTstatAQ::OnEnKillfocusEditCo2OnTime()
 
 void CTstatAQ::OnEnKillfocusEditCo2OffTime()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CString strText;
     GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->GetWindowText(strText);
     int nValue = (int)(_wtoi(strText));
@@ -751,7 +800,7 @@ void CTstatAQ::OnEnKillfocusEditCo2OffTime()
 
 void CTstatAQ::OnEnKillfocusEditPmOnTime()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CString strText;
     GetDlgItem(IDC_EDIT_PM_ON_TIME)->GetWindowText(strText);
     int nValue = (int)(_wtoi(strText));
@@ -768,7 +817,7 @@ void CTstatAQ::OnEnKillfocusEditPmOnTime()
 
 void CTstatAQ::OnEnKillfocusEditPmOffTime()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CString strText;
     GetDlgItem(IDC_EDIT_PM_OFF_TIME)->GetWindowText(strText);
     int nValue = (int)(_wtoi(strText));
@@ -785,7 +834,7 @@ void CTstatAQ::OnEnKillfocusEditPmOffTime()
 
 void CTstatAQ::OnBnClickedRadioDegC()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     int nValue = 0;
 
 
@@ -800,7 +849,7 @@ void CTstatAQ::OnBnClickedRadioDegC()
 
 void CTstatAQ::OnBnClickedRadioDegF()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     int nValue = 1;
 
 
@@ -815,7 +864,7 @@ void CTstatAQ::OnBnClickedRadioDegF()
 
 void CTstatAQ::OnCbnSelchangeComboAqiRegion()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     int n_value = 0;
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_AQI_REGION))->GetCurSel();
@@ -841,7 +890,7 @@ void CTstatAQ::OnCbnSelchangeComboAqiRegion()
 
 void CTstatAQ::OnEnKillfocusEditLevel1()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_LEVEL_1, temp_cstring);
@@ -854,7 +903,7 @@ void CTstatAQ::OnEnKillfocusEditLevel1()
 
 void CTstatAQ::OnEnKillfocusEditLevel2()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_LEVEL_2, temp_cstring);
     unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
@@ -866,7 +915,7 @@ void CTstatAQ::OnEnKillfocusEditLevel2()
 
 void CTstatAQ::OnEnKillfocusEditLevel3()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_LEVEL_3, temp_cstring);
     unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
@@ -878,7 +927,7 @@ void CTstatAQ::OnEnKillfocusEditLevel3()
 
 void CTstatAQ::OnEnKillfocusEditLevel4()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_LEVEL_4, temp_cstring);
     unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
@@ -890,7 +939,7 @@ void CTstatAQ::OnEnKillfocusEditLevel4()
 
 void CTstatAQ::OnEnKillfocusEditLevel5()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_LEVEL_5, temp_cstring);
     unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
@@ -904,7 +953,7 @@ void CTstatAQ::OnEnKillfocusEditLevel5()
 #include "TstatAQI_Detail.h"
 void CTstatAQ::OnBnClickedButtonCusAqi()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CTstatAQI_Detail dlg;
     dlg.DoModal();
 }
@@ -912,7 +961,7 @@ void CTstatAQ::OnBnClickedButtonCusAqi()
 #include "CO2_AUTO_CALIBRATION.h"
 void CTstatAQ::OnBnClickedButtonAutoCal()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CCO2_AUTO_CALIBRATION Dlg;
     Dlg.DoModal();
 
@@ -1047,8 +1096,8 @@ LRESULT CTstatAQ::Fresh_Airlab_Item(WPARAM wParam, LPARAM lParam)
 
 void CTstatAQ::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
-
+    // TODO: åœ¨æ­¤æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç å’Œ/æˆ–è°ƒç”¨é»˜è®¤å€¼
+    static int  fan_status = 0;
     switch (nIDEvent)
     {
     case 1:
@@ -1107,7 +1156,7 @@ void CTstatAQ::OnTimer(UINT_PTR nIDEvent)
 void CTstatAQ::OnNMClickListAirlab(NMHDR* pNMHDR, LRESULT* pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     *pResult = 0;
 
     DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
@@ -1123,7 +1172,7 @@ void CTstatAQ::OnNMClickListAirlab(NMHDR* pNMHDR, LRESULT* pResult)
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
 
-    if (lRow > m_airlab_list.GetItemCount()) //Èç¹ûµã»÷Çø³¬¹ı×î´óĞĞºÅ£¬Ôòµã»÷ÊÇÎŞĞ§µÄ
+    if (lRow > m_airlab_list.GetItemCount()) //å¦‚æœç‚¹å‡»åŒºè¶…è¿‡æœ€å¤§è¡Œå·ï¼Œåˆ™ç‚¹å‡»æ˜¯æ— æ•ˆçš„
         return;
     if (lRow < 0)
         return;
@@ -1140,7 +1189,7 @@ void CTstatAQ::OnNMClickListAirlab(NMHDR* pNMHDR, LRESULT* pResult)
         m_time_trigger.ShowWindow(SW_SHOW);
         CRect list_rect, win_rect;
         m_airlab_list.GetWindowRect(list_rect);
-        ScreenToClient(list_rect); //×ª»»Îª¿Í»§Çø¾ØĞÎ	
+        ScreenToClient(list_rect); //è½¬æ¢ä¸ºå®¢æˆ·åŒºçŸ©å½¢	
         GetWindowRect(win_rect);
         CRect myrect;
         m_airlab_list.GetSubItemRect(lRow, lCol, LVIR_BOUNDS, myrect);
@@ -1200,7 +1249,7 @@ void CTstatAQ::OnNMClickListAirlab(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CTstatAQ::OnNMKillfocusDatetimepickerTimeRemain(NMHDR* pNMHDR, LRESULT* pResult)
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CTime temp_time; CString temp_cs;
     int chour, cmin, csecond;
     m_time_trigger.GetTime(temp_time);
@@ -1245,7 +1294,7 @@ void CTstatAQ::OnNMKillfocusDatetimepickerTimeRemain(NMHDR* pNMHDR, LRESULT* pRe
 #include "CTstatAQ_Parameter.h"
 void CTstatAQ::OnBnClickedButtonAirlabParameter()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     int read_ret = 0;
     read_ret = Read_Multi(g_tstat_id, &product_register_value[1900], 1900,100, 5);
     if (read_ret < 0)
@@ -1255,4 +1304,49 @@ void CTstatAQ::OnBnClickedButtonAirlabParameter()
     }
     CTstatAQ_Parameter dlg;
     dlg.DoModal();
+}
+
+//String show_fan_picture_old;
+void CTstatAQ::OnPaint()
+{
+    CPaintDC dc(this); // device context for painting
+                       // TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç 
+                       // ä¸ä¸ºç»˜å›¾æ¶ˆæ¯è°ƒç”¨ CFormView::OnPaint()
+    //CMemDC memDC(dc, this);
+    //CRect rcClient(100,100,200,200);
+    //memDC.GetDC().FillSolidRect(&rcClient, RGB(238, 245, 250));
+#if 0
+    int cx = 0;
+    int cy = 0;
+    CImage image;
+    CRect rect;
+    
+    image.Load(show_fan_picture);
+
+    cx = image.GetWidth();
+    cy = image.GetHeight();
+
+    //è·å–PictureÂ Controlæ§ä»¶çš„å¤§å°Â Â 
+    GetDlgItem(IDC_STATIC_AQ_PIC)->GetWindowRect(&rect);
+    //å°†å®¢æˆ·åŒºé€‰ä¸­åˆ°æ§ä»¶è¡¨ç¤ºçš„çŸ©å½¢åŒºåŸŸå†…Â Â 
+    ScreenToClient(&rect);
+    //çª—å£ç§»åŠ¨åˆ°æ§ä»¶è¡¨ç¤ºçš„åŒºåŸŸÂ Â 
+    GetDlgItem(IDC_STATIC_AQ_PIC)->MoveWindow(rect.left, rect.top, 150, 150, TRUE);
+   // GetDlgItem(IDC_STATIC_AQ_PIC)->MoveWindow(0, 0, rect.Width(), rect.Height(), TRUE);
+    CWnd* pWnd = NULL;
+    pWnd = GetDlgItem(IDC_STATIC_AQ_PIC);
+    pWnd->GetClientRect(&rect);
+    CDC* pDc = NULL;
+    pDc = pWnd->GetDC();
+    //pDc->DrawText(_T("1111"), rect, DT_WORDBREAK);
+    //pDc->Ellipse(rect);
+   // pDc->Ellipse(90,0,110,100);
+
+    //pDc->DrawDragRect(rect, { 10,10 }, rect, {2,2});
+    //PlgBlt(pDc,)
+    image.Draw(pDc->m_hDC, rect);
+    ReleaseDC(pDc);
+#endif
+
+
 }

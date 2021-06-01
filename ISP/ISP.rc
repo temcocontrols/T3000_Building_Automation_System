@@ -89,7 +89,7 @@ BEGIN
     LTEXT           "Baudrate:",IDC_STATIC,13,58,41,9
 END
 
-IDD_DIALOG_SETTING DIALOGEX 0, 0, 199, 84
+IDD_DIALOG_SETTING DIALOGEX 0, 0, 193, 84
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -97,8 +97,8 @@ BEGIN
     LTEXT           "TCP Flash Timeout :",IDC_STATIC,15,11,71,12
     EDITTEXT        IDC_EDIT_SETTING_TIMEOUT,90,8,54,14,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "(ms)",IDC_STATIC,153,11,15,8
-    PUSHBUTTON      "OK",IDC_BUTTON_SETTING_OK,31,51,50,14
-    PUSHBUTTON      "Cancel",IDC_BUTTON_SETTING_CANCEL,103,51,50,14
+    PUSHBUTTON      "OK",IDC_BUTTON_SETTING_OK,29,53,50,14
+    PUSHBUTTON      "Cancel",IDC_BUTTON_SETTING_CANCEL,101,53,50,14
     LTEXT           "Response Time :",IDC_STATIC,15,33,71,12
     EDITTEXT        IDC_EDIT_SETTING_RESPONSE_TIME,89,33,54,14,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "(ms)",IDC_STATIC,153,36,15,8
@@ -121,7 +121,7 @@ BEGIN
     IDD_DIALOG_SETTING, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 192
+        RIGHTMARGIN, 186
         BOTTOMMARGIN, 77
     END
 END
@@ -147,8 +147,6 @@ BEGIN
     POPUP "Menu"
     BEGIN
         MENUITEM "Setting",                     ID_MENU_SETTING
-        MENUITEM "Flash SN",                    ID_MENU_FLASHSN
-        MENUITEM "Check Hex/Bin File",          ID_MENU_CHECKHEX
         MENUITEM "About_ISP_Tool",              ID_MENU_ABOUT
         MENUITEM "EXIT_ISP_Tool",               ID_MENU_APP
     END
@@ -302,6 +300,7 @@ BEGIN
     CONTROL         "",IDC_CHECK_NO_ITEM,"Button",BS_AUTOCHECKBOX,322,14,90,10
     CONTROL         "Flash Wifi MAC",IDC_CHECK_FLASH_WIFI_MAC,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,2,326,54,10
     CONTROL         "MSTP Update",IDC_CHECK_MSTP_UPDATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,246,4,63,10
+    PUSHBUTTON      "Burning Flash",IDC_BUTTON_LOOP_FLASH,336,299,72,14
 END
 
 
@@ -352,8 +351,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 6,2,9,0
- PRODUCTVERSION 6,2,9,0
+ FILEVERSION 6,3,3,0
+ PRODUCTVERSION 6,3,3,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -368,12 +367,12 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileVersion", "6.2.9.0"
+            VALUE "FileVersion", "6.3.3.0"
             VALUE "InternalName", "ISP.exe"
             VALUE "OriginalFilename", "ISP.exe"
             VALUE "ProductName", "ISP Tool"
-            VALUE "ProductVersion", "6.2.9.0"
-            VALUE "SpecialBuild", "6.2.9"
+            VALUE "ProductVersion", "6.3.3.0"
+            VALUE "SpecialBuild", "6.3.3"
             VALUE "TemcoCopyright", "Copyright 2013-2025 (c).  All rights reserved."
         END
     END
@@ -447,7 +446,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About NEWISP..."
-    IDS_STR_VIRSIONNUM      "Version 6.2.9"
+    IDS_STR_VIRSIONNUM      "Version 6.3.3"
     IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
 END
 

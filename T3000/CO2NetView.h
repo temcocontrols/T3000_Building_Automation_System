@@ -431,6 +431,7 @@ CBrush m_brush;
     int	CO2_NET_MODBUS_SCAN_OCCUPY_START	;
     int	CO2_NET_MODBUS_SCAN_OCCUPY_END	;
     int	CO2_NET_MODBUS_SCAN_ONLINE_START	;
+    int MODBUS_CO2_FORCED_RE_CALIBRATION;
     int	CO2_NET_MODBUS_SCAN_ONLINE_END	;
     int	CO2_NET_MODBUS_IDLE_ID	;
     int	CO2_NET_MODBUS_HUMIDITY_SENSOR_TABLE_READ	;
@@ -512,6 +513,8 @@ public:
     afx_msg void OnBnClickedRadioCo2LcdOn();
     afx_msg void OnBnClickedRadioCo2LcdOff();
     afx_msg void OnBnClickedRadioCo2LcdDelayOff();
+    afx_msg void OnBnClickedButtonCo2Help();
+    afx_msg void OnBnClickedButtonReCalibrationDone();
 };
 
 const int CO2NET_NUM = 0;

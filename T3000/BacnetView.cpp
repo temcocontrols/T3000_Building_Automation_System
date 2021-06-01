@@ -2478,10 +2478,12 @@ void CDialogCM5_BacNet::Fresh()
 		 (selected_product_Node.product_class_id == PM_T322AI) ||
 			(selected_product_Node.product_class_id == PWM_TRANSDUCER) ||
             (selected_product_Node.product_class_id == PM_TSTAT_AQ) ||
+			(selected_product_Node.product_class_id == PM_AIRLAB_ESP32) ||
 			(selected_product_Node.product_class_id == PM_T36CTA) ||
 		 (selected_product_Node.product_class_id == PM_T3PT12)) ||
 			(selected_product_Node.product_class_id == PM_T3_LC)  ||
         (selected_product_Node.product_class_id == STM32_CO2_NET)||
+		(selected_product_Node.product_class_id == STM32_CO2_RS485) ||
 		 (selected_product_Node.product_class_id == STM32_HUM_NET))
 	{
 		BacNet_hwd = this->m_hWnd;
@@ -5975,7 +5977,8 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         input_reg = 1; //  23 * 3 = 69/100 = 1
         pid_con_reg = 1;		//28*3
     }
-    else if (n_read_product_type == STM32_CO2_NET)
+    else if ((n_read_product_type == STM32_CO2_NET) ||
+		     (n_read_product_type == STM32_CO2_RS485))
     {
         output_reg = 1; // (3)*23 = 69/100 = 1
         input_reg = 1; //  23 * 3 = 69/100 = 1
@@ -5985,7 +5988,8 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         output_reg = 1; // (3)*23 = 69/100 = 1
         input_reg = 1; //  23 * 3 = 69/100 = 1
     }
-    else if (n_read_product_type == PM_TSTAT_AQ)
+    else if ((n_read_product_type == PM_TSTAT_AQ) ||
+		     (n_read_product_type == PM_AIRLAB_ESP32))
     {
         input_reg = 8; //  23 * 32 = 736  
     }

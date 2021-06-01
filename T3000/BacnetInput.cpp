@@ -639,7 +639,10 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		//INPUT_LIMITE_ITEM_COUNT = 8;
 		Minipanel_device = 1;
 	}
-    else if ((bacnet_device_type == STM32_CO2_NET) || (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
+    else if ((bacnet_device_type == STM32_CO2_NET) || 
+		     (bacnet_device_type == STM32_CO2_RS485) ||
+		     (bacnet_device_type == STM32_HUM_NET) || 
+		     (bacnet_device_type == STM32_PRESSURE_NET))
     {
         INPUT_LIMITE_ITEM_COUNT = 3;
         Minipanel_device = 0;
@@ -649,7 +652,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
         INPUT_LIMITE_ITEM_COUNT = 15;
         Minipanel_device = 0;
     }
-    else if (bacnet_device_type == PM_TSTAT_AQ)
+    else if ((bacnet_device_type == PM_TSTAT_AQ) || (bacnet_device_type == PM_AIRLAB_ESP32))
     {
         INPUT_LIMITE_ITEM_COUNT = 32;
         Minipanel_device = 0;
@@ -1075,7 +1078,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 #pragma endregion External info
 
-        if (selected_product_Node.product_class_id == PM_TSTAT_AQ) //针对Airlab 特殊显示不同的range
+        if ((selected_product_Node.product_class_id == PM_TSTAT_AQ) || //针对Airlab 特殊显示不同的range
+			(selected_product_Node.product_class_id == PM_AIRLAB_ESP32))
         {
             if (product_register_value[4] < 106)
             {
@@ -1372,7 +1376,8 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else if(lCol == INPUT_RANGE)
 	{
-        if (g_selected_product_id == PM_TSTAT_AQ)
+        if ((g_selected_product_id == PM_TSTAT_AQ) ||
+			(g_selected_product_id == PM_AIRLAB_ESP32))
             return;;
         if (g_selected_product_id == PM_TSTAT10)
         {

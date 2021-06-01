@@ -159,8 +159,8 @@ public:
 
 };
 
-#define TVINSERV_AIR_FLOW        {tvInsert.item.iImage=35;tvInsert.item.iSelectedImage=35;}//第三方设备
-
+#define TVINSERV_SMALL_CASE        {tvInsert.item.iImage=35;tvInsert.item.iSelectedImage=35;}//Air flow
+#define TVINSERV_CO2_NODE        {tvInsert.item.iImage=46;tvInsert.item.iSelectedImage=46;}//Co2Node 小方盒
 #define TREE_IMAGE_INPUT_ONLINE   37
 #define TREE_IMAGE_INPUT_OFFLINE  38
 #define TREE_IMAGE_INPUT_UNKNOWN  39

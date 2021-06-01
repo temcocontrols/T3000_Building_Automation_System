@@ -696,8 +696,20 @@ void CMainFrame::ShowSplashWnd(int nMillisecond)
     }
     else
     {
-        WritePrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("T3000.exe"), temp_db_ini_folder);
-        cs_special_name = _T("T3000 Building Automation System");
+        //g_configfile_path
+        GetPrivateProfileString(_T("Parameter"), _T("SoftwareName"), _T(""), cs_special_name.GetBuffer(MAX_PATH), MAX_PATH, g_configfile_path);
+        cs_special_name.ReleaseBuffer();
+        if ((cs_special_name.IsEmpty()   ||  (cs_special_name.CompareNoCase(_T("T3000 Building Automation System")) == 0) ))
+        {
+            WritePrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("T3000.exe"), temp_db_ini_folder);
+            WritePrivateProfileString(_T("Parameter"), _T("SoftwareName"), _T("T3000 Building Automation System"), g_configfile_path);
+            cs_special_name = _T("T3000 Building Automation System");
+                m_special_customer= 0;
+        }
+        else
+        {
+            m_special_customer = 255; 
+        }
     }
 }
 
@@ -728,6 +740,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     SEND_COMMAND_DELAY_TIME = 100;
     srand(time(NULL));
 
+//#ifdef DEBUG
+//    unsigned long  temp_time_long = time(NULL);
+//    CString temp_debug_time;
+//    temp_debug_time.Format(_T("%u"), temp_time_long);
+//    MessageBox(temp_debug_time);
+//#endif // DEBUG
 
 
 
@@ -1579,7 +1597,7 @@ void CMainFrame::LoadProductFromDB()
     CString temp_folder;
     temp_folder = g_strExePth + _T("Database\\Buildings\\") + _T("external_data.ini");
     g_ext_database_path = temp_folder;
-
+    g_ext_mass_flash_path = g_strExePth + _T("Database\\Buildings\\") + _T("mass_flash_data.ini");
 	_variant_t temp_variant;
 	if(count<=0)
 	{
@@ -1992,6 +2010,7 @@ void CMainFrame::LoadProductFromDB()
                                 temp_product_class_id == PM_TSTAT8_WIFI || 
                                 temp_product_class_id == PM_TSTAT8_OCC || 
                                 temp_product_class_id == PM_TSTAT_AQ ||
+                                temp_product_class_id == PM_AIRLAB_ESP32 ||
                                 temp_product_class_id == PM_TSTAT8_220V)
 						TVINSERV_TSTAT8
                         else if(temp_product_class_id == PM_MULTI_SENSOR )
@@ -2016,7 +2035,11 @@ void CMainFrame::LoadProductFromDB()
                         else if(temp_product_class_id == PM_THIRD_PARTY_DEVICE)
                             TVINSERV_THIRD_PARTY
                         else if (temp_product_class_id == PM_AFS)
-                            TVINSERV_AIR_FLOW
+                            TVINSERV_SMALL_CASE
+                        else if (temp_product_class_id == PWM_TEMPERATURE_TRANSDUCER)
+                            TVINSERV_SMALL_CASE
+                        else if (temp_product_class_id == STM32_CO2_NODE)
+                            TVINSERV_CO2_NODE
 						else
 							TVINSERV_TSTAT_DEFAULT
 
@@ -2255,6 +2278,7 @@ void CMainFrame::LoadProductFromDB()
                                      temp_product_class_id == PM_TSTAT8_WIFI || 
                                      temp_product_class_id == PM_TSTAT8_OCC || 
                                      temp_product_class_id == PM_TSTAT_AQ ||
+                                     temp_product_class_id == PM_AIRLAB_ESP32 ||
                                      temp_product_class_id == PM_TSTAT8_220V)
 								TVINSERV_TSTAT8
                             else if (temp_product_class_id == PM_MULTI_SENSOR)
@@ -2276,7 +2300,11 @@ void CMainFrame::LoadProductFromDB()
                             else if (temp_product_class_id == PM_THIRD_PARTY_DEVICE)
                                 TVINSERV_THIRD_PARTY
                             else if (temp_product_class_id == PM_AFS)
-                                TVINSERV_AIR_FLOW
+                                TVINSERV_SMALL_CASE
+                            else if (temp_product_class_id == PWM_TEMPERATURE_TRANSDUCER)
+                                TVINSERV_SMALL_CASE
+                            else if (temp_product_class_id == STM32_CO2_NODE)
+                                TVINSERV_CO2_NODE
 							else
 								TVINSERV_TSTAT_DEFAULT
 
@@ -2523,6 +2551,7 @@ void CMainFrame::LoadProductFromDB()
                          temp_product_class_id == PM_TSTAT8_WIFI || 
                          temp_product_class_id == PM_TSTAT8_OCC || 
                          temp_product_class_id == PM_TSTAT_AQ ||
+                         temp_product_class_id == PM_AIRLAB_ESP32 ||
                          temp_product_class_id == PM_TSTAT8_220V)
 					TVINSERV_TSTAT8
                 else if (temp_product_class_id == PM_MULTI_SENSOR)
@@ -2542,7 +2571,11 @@ void CMainFrame::LoadProductFromDB()
                 else if (temp_product_class_id == PM_THIRD_PARTY_DEVICE)
                     TVINSERV_THIRD_PARTY
                 else if (temp_product_class_id == PM_AFS)
-                    TVINSERV_AIR_FLOW
+                    TVINSERV_SMALL_CASE
+                else if (temp_product_class_id == PWM_TEMPERATURE_TRANSDUCER)
+                    TVINSERV_SMALL_CASE
+                else if (temp_product_class_id == STM32_CO2_NODE)
+                    TVINSERV_CO2_NODE
 				else
 					TVINSERV_TSTAT_DEFAULT
 
@@ -3065,6 +3098,7 @@ void CMainFrame::ScanTstatInDB(void)
                              temp_product_class_id == PM_TSTAT8_WIFI || 
                              temp_product_class_id == PM_TSTAT8_OCC || 
                              temp_product_class_id == PM_TSTAT_AQ ||
+                             temp_product_class_id == PM_AIRLAB_ESP32 ||
                              temp_product_class_id == PM_TSTAT8_220V)
 						TVINSERV_TSTAT8
                     else if (temp_product_class_id == PM_MULTI_SENSOR)
@@ -3084,7 +3118,11 @@ void CMainFrame::ScanTstatInDB(void)
                     else if (temp_product_class_id == PM_THIRD_PARTY_DEVICE)
                         TVINSERV_THIRD_PARTY
                     else if (temp_product_class_id == PM_AFS)
-                        TVINSERV_AIR_FLOW
+                        TVINSERV_SMALL_CASE
+                    else if (temp_product_class_id == PWM_TEMPERATURE_TRANSDUCER)
+                        TVINSERV_SMALL_CASE
+                    else if (temp_product_class_id == STM32_CO2_NODE)
+                        TVINSERV_CO2_NODE
 					else
 						TVINSERV_TSTAT_DEFAULT
 #endif
@@ -7898,6 +7936,30 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             achive_file_path = g_achive_folder + _T("\\") + temp_serial;
             if (/*Load_Product_Value_Cache(achive_file_path) < 0*/1)
             {
+                int panel_name_start_reg = 0;
+                panel_name_start_reg = PanelName_Map(Device_Type);
+
+                int read_name = Read_Multi(g_tstat_id, &product_register_value[panel_name_start_reg - 1], panel_name_start_reg - 1, 9, 5);
+                if (read_name >= 0)
+                {
+                    CString CS_Name;
+                    CS_Name.Format(_T("%s"), GetTextFromReg(panel_name_start_reg));
+                    if (CS_Name.IsEmpty())
+                    {
+                        Sleep(1);
+                    }
+                    else
+                    {
+                        CString strSql;
+                        CString temp_serial;
+                        temp_serial.Format(_T("%u"), selected_product_Node.serial_number);
+                        strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"), CS_Name, temp_serial);
+                        SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+                        m_pTreeViewCrl->SetItemText(selected_product_Node.product_item, CS_Name);
+                    }
+
+                }
+
                 if (Device_Type == 100)
                 {
 
@@ -8105,7 +8167,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         g_tstat_id_changed = FALSE;
                         register_critical_section.Unlock();
                     }
-                    else if ((product_type == PM_TSTAT_AQ) || (product_type == PM_MULTI_SENSOR))
+                    else if ((product_type == PM_TSTAT_AQ) || 
+                             (product_type == PM_FAN_MODULE) ||
+                             (product_type == PM_AIRLAB_ESP32) ||
+                             (product_type == PM_MULTI_SENSOR))
                     {
 
                         length = 11;
@@ -8182,7 +8247,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 
                     memcpy_s(product_register_value, sizeof(product_register_value), multi_register_value, sizeof(multi_register_value));
-
 
                     if (product_register_value[714] == 0x56)
                     {
@@ -8591,6 +8655,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 SwitchToPruductType(DLG_DIALOG_ZIGBEE_REPEATER);
             }
             else if ((nFlag == PM_TSTAT_AQ) ||
+                     (nFlag == PM_FAN_MODULE) ||
+                     (nFlag == PM_AIRLAB_ESP32) ||
                 (nFlag == PM_MULTI_SENSOR))
             {
                 SwitchToPruductType(DLG_DIALOG_TSTAT_AQ);
@@ -11104,6 +11170,8 @@ void CMainFrame::OnControlMain()
 			SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 		} 
         else if ((product_register_value[7] == PM_TSTAT_AQ) ||
+                 (product_register_value[7] == PM_FAN_MODULE) ||
+                 (product_register_value[7] == PM_AIRLAB_ESP32) ||
                  (product_register_value[7] == PM_MULTI_SENSOR))
         {
             SwitchToPruductType(DLG_DIALOG_TSTAT_AQ);
@@ -11196,11 +11264,13 @@ void CMainFrame::OnControlInputs()
 			      || (bacnet_device_type == PID_T3PT12) 
 				  || (bacnet_device_type == PM_T3_LC)
                   || (bacnet_device_type == PM_TSTAT_AQ)
+                  || (bacnet_device_type == PM_AIRLAB_ESP32)
                   || (bacnet_device_type == PM_T36CTA)
 				  || (bacnet_device_type == PWM_TRANSDUCER)) 
                   || (product_type == PM_MULTI_SENSOR)
                   || (product_type == PM_TSTAT_AQ)
                   || (product_type == STM32_CO2_NET)
+                  || (product_type == STM32_CO2_RS485)
                   || (product_type == STM32_HUM_NET)
                   || (product_type == STM32_PRESSURE_NET)
 				/*&& new_device_support_mini_ui*/ ) ) ) ||
@@ -11211,8 +11281,10 @@ void CMainFrame::OnControlInputs()
 			|| (bacnet_device_type == PID_T3PT12) 
 			|| (bacnet_device_type == PM_T3_LC)
             || (bacnet_device_type == PM_TSTAT_AQ)
+            || (bacnet_device_type == PM_AIRLAB_ESP32)
 			|| (bacnet_device_type == PID_T36CTA)
             || (product_type == STM32_CO2_NET)
+            || (product_type == STM32_CO2_RS485)
             || (product_type == PWM_TRANSDUCER)
             || (product_type == STM32_HUM_NET)
             || (product_type == STM32_PRESSURE_NET)
@@ -11298,7 +11370,8 @@ void CMainFrame::OnControlInputs()
                 (g_protocol == PROTOCOL_MSTP_TO_MODBUS) ||
                 (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
 		{
-            if (product_type == STM32_CO2_NET)
+            if ((product_type == STM32_CO2_NET) ||
+                (product_type == STM32_CO2_RS485))
                 bacnet_device_type = product_type;
 			hide_485_progress = false;
 			::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, READINPUT_T3000 /*BAC_IN*/);//第二个参数 In
@@ -11491,6 +11564,7 @@ void CMainFrame::OnControlOutputs()
                 || (bacnet_device_type == PM_T36CTA)
 				|| (bacnet_device_type == PWM_TRANSDUCER) 
                 || (product_type == STM32_CO2_NET)
+                || (product_type == STM32_CO2_RS485)
                 || (product_type == STM32_HUM_NET)
                 || (product_type == STM32_PRESSURE_NET)
 				|| (bacnet_device_type == PID_T3PT12)  )  
@@ -11504,6 +11578,7 @@ void CMainFrame::OnControlOutputs()
 			(bacnet_device_type == PID_T3PT12) || 
 			(bacnet_device_type == PM_T3_LC)||
             (product_type == STM32_CO2_NET) ||
+              (product_type == STM32_CO2_RS485) ||
               (product_type == STM32_HUM_NET) ||
               (product_type == PWM_TRANSDUCER) ||
               (product_type == STM32_PRESSURE_NET) ||
@@ -11944,6 +12019,8 @@ void CMainFrame::OnControlSettings()
         product_register_value[7]==PM_T36CTA|| 
         product_register_value[7] == PM_T3_LC      || 
         product_register_value[7] == PM_TSTAT_AQ   ||
+        product_register_value[7] == PM_FAN_MODULE ||
+        product_register_value[7] == PM_AIRLAB_ESP32 ||
         product_register_value[7] == PM_AFS ||
         product_register_value[7] == PM_MULTI_SENSOR ||
         product_register_value[7] == STM32_CO2_NET ||

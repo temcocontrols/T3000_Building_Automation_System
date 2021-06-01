@@ -187,6 +187,7 @@ void CARDDlg::OnBnClickedOk()
    {
 	   temp_comport = GetLastOpenedComport();
 	   temp_baudrate = GetLastSuccessBaudrate();
+	   g_protocol = MODBUS_RS485;
    }
 
    if (!offline_mode)
@@ -362,6 +363,10 @@ void CARDDlg::OnBnClickedOk()
            MessageBox(_T("This operation succeeds.The addition is completed successfully."));
            return;
        }
+	   else
+	   {
+	   AfxMessageBox(_T("Read data timeout!"));
+		 }
 
    }
    else

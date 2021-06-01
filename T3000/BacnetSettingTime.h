@@ -42,4 +42,10 @@ public:
     afx_msg void OnBnClickedButtonSyncTime();
     virtual BOOL PreTranslateMessage(MSG* pMsg);
     virtual BOOL OnInitDialog();
+    void UpdateDayNightStartEndUI();
+    int MonthType(unsigned char n_month);
+    afx_msg void OnCbnSelchangeComboStartMonth();
+    afx_msg void OnCbnSelchangeComboStartDay();
+    afx_msg void OnCbnSelchangeComboEndMonth();
+    afx_msg void OnCbnSelchangeComboEndDay();
 };

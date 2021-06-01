@@ -2289,11 +2289,11 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
                 if (tsm_invoke_id_free(n_ret))
                 {
                     if (bacnet_to_modbus_struct.org_nlength != bacnet_to_modbus_struct.nlength)
-                        return -3;
+                        return -13;
                     if (bacnet_to_modbus_struct.org_start_add != bacnet_to_modbus_struct.start_add)
-                        return -4;
+                        return -14;
                     if (readlength != bacnet_to_modbus_struct.nlength)
-                        return -5;
+                        return -15;
                     memcpy(data_out, bacnet_to_modbus_struct.ndata, 2 * bacnet_to_modbus_struct.nlength);
                     return readlength;
                 }
@@ -2304,12 +2304,12 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
         else
         {
             Sleep(retry_count*3);
-            return -6;
+            return -16;
         }
     }
     else
     {
-        Send_WhoIs_Global(-1, -1);
+        Send_WhoIs_Global(deviceid, deviceid);
         //test_string.Format(_T("test_count = %d , status = %d failed ,Sleep3000\r\n"), test_count, status);
         //TRACE(test_string);
         if (MODE_SUPPORT_PTRANSFER)
@@ -2317,10 +2317,10 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
         else
             Sleep(1000);  //address 
 
-        return -2;
+        return -12;
     }
 
-    return -7;
+    return -17;
 }
 
 
@@ -4218,7 +4218,11 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
 
         memcpy_s(&Device_Basic_Setting.reg.display_lcd, 7, my_temp_point, 7);
         my_temp_point = my_temp_point + 7;
-
+        Device_Basic_Setting.reg.start_month = *(my_temp_point++);
+        Device_Basic_Setting.reg.start_day = *(my_temp_point++);
+        Device_Basic_Setting.reg.end_month = *(my_temp_point++);
+        Device_Basic_Setting.reg.end_day = *(my_temp_point++);
+        
         //memcpy_s(&Device_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
         //my_temp_point = my_temp_point + 10; //算上这个  长度是 270
         
@@ -5822,6 +5826,7 @@ void Inial_Product_Menu_map()
         break;
         case PM_MULTI_SENSOR:
         case PM_TSTAT_AQ:
+        case PM_AIRLAB_ESP32:
         {
             unsigned char  temp[20] = { 1,1,0,0,  0,0,0,0,  0,0,0,0,   0,1,1,1  ,0,0,0,0 };
             memcpy(product_menu[i], temp, 20);
@@ -5872,6 +5877,7 @@ void Inial_Product_Input_map()
         {
         case PM_MULTI_SENSOR:
         case PM_TSTAT_AQ:
+        case PM_AIRLAB_ESP32:
         {
 
             unsigned char  temp[20] = { 1,1,1,0,  1,1,1,1,  1,1,0,0,   1,1,0,0  ,0,0,0,0 };
@@ -5950,6 +5956,8 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_T36CT,_T("T3-6CT")));
 	product_map.insert(map<int,CString>::value_type(PM_MINIPANEL,_T("T3Controller")));
 	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3Controller")));
+    product_map.insert(map<int, CString>::value_type(PWM_TEMPERATURE_TRANSDUCER, _T("XDUCER")));
+    
 	product_map.insert(map<int,CString>::value_type(PM_PRESSURE,_T("Pressure Sensor")));
 	product_map.insert(map<int,CString>::value_type(PM_HUM_R,_T("HUM-R")));
 	product_map.insert(map<int,CString>::value_type(PM_T322AI,_T("T3-22I")));
@@ -5965,6 +5973,8 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_CS_RSM_DC,_T("CS-RSM-DC")));
 
     product_map.insert(map<int, CString>::value_type(PM_TSTAT_AQ, _T("Airlab")));
+    product_map.insert(map<int, CString>::value_type(PM_FAN_MODULE, _T("Fan Moudle")));
+    product_map.insert(map<int, CString>::value_type(PM_AIRLAB_ESP32, _T("Airlab-E32")));
     product_map.insert(map<int, CString>::value_type(PM_MULTI_SENSOR, _T("Multi Sensor")));
     product_map.insert(map<int, CString>::value_type(STM32_PM25, _T("PM2.5")));
     product_map.insert(map<int, CString>::value_type(PM_PWMETER, _T("Power_Meter")));
@@ -7356,7 +7366,12 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         if (temp_data.reg.product_id == 0)
         {
             //是0的情况下特殊处理 有可能是T3 没有读到对应的产品号信息;
-
+            if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
+            {
+                g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  product id error ,ignore this package!"), nSerial, temp_data.reg.modbus_id, nip_address);
+                DFTrace(g_Print);
+            }
+            return m_refresh_net_device_data.size();
         }
 		else if (temp_data.reg.product_id<220)
 		{
@@ -7368,6 +7383,16 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 			return m_refresh_net_device_data.size();
 		}
 	}
+
+    if (nSerial == 0)
+    {
+        if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
+        {
+            g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  product id error ,ignore this package!"), nSerial, temp_data.reg.modbus_id, nip_address);
+            DFTrace(g_Print);
+        }
+        return m_refresh_net_device_data.size();
+    }
 
 	temp.nport = temp_data.reg.modbus_port;
 	temp.sw_version = temp_data.reg.sw_version;
@@ -13075,6 +13100,7 @@ void Initial_Instance_Reg_Map()
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT8, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT9, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT_AQ, _T("991,992")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_AIRLAB_ESP32, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT7_ARM, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_PM5E_ARM, _T("991,992")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT10, _T("35,32")));
@@ -13283,6 +13309,7 @@ void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
         
         if (Bacnet_Private_Device(nproduct_id))
         {
+#if 1
             //**********************************************************
             //2019 05 20 Fance 用于处理 电脑勾选了夏令时 引起的 T3 显示时间 与实际时间总是相差一小时的问题;
             
@@ -13303,8 +13330,32 @@ void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
                 temptimevalue = temp_t_time;
                 int temp_month = temptimevalue.GetMonth();
                 int temp_day = temptimevalue.GetDay();
-                int day_of_year = temp_month * 30 + temp_day;
-                if ((day_of_year > 135) && (day_of_year < 255))
+
+                int check_daylight = 0;
+
+                if (daylight_start_month > daylight_end_month)
+                {
+                    check_daylight = 0;
+                }
+                else if ((temp_month == daylight_start_month) && (temp_day >= daylight_start_day))
+                {
+                    check_daylight = 1;
+                }
+                else if ((temp_month == daylight_end_month) && (temp_day <= daylight_end_day))
+                {
+                    check_daylight = 1;
+                }
+                else if ((temp_month > daylight_start_month) && (temp_month < daylight_end_month))
+                {
+                    check_daylight = 1;
+                }
+                else
+                    check_daylight = 0;
+
+
+                //int day_of_year = temp_month * 30 + temp_day;
+                //if ((day_of_year > 73) && (day_of_year < 311))
+                if(check_daylight)
                 {
                     scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
                 }
@@ -13314,6 +13365,7 @@ void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
             else
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
             TimeTemp = scale_time + computer_DaylightBias;
+#endif
         }
         else
         {
@@ -13327,6 +13379,7 @@ void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
     outputtime = TimeTemp.Format(_T("%Y-%m-%d %H:%M"));
     //outputtime = TimeTemp.getbuf;
 }
+
 
 int Check_DaXiaoDuan(unsigned char npid, unsigned char Mainsw, unsigned char subsw)
 {
@@ -13776,6 +13829,7 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
     }
     break;
     case PM_TSTAT_AQ:
+    case PM_AIRLAB_ESP32:
     {
         nret_type = INPUT_INTERNAL;
     }

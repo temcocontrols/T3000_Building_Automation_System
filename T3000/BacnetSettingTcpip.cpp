@@ -95,6 +95,8 @@ LRESULT  CBacnetSettingTcpip::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam
 
 void CBacnetSettingTcpip::OnBnClickedBtnBacIPAuto()
 {
+    Sleep(1);
+    return;
     UCHAR temp_data = 0;
     temp_data = Device_Basic_Setting.reg.tcp_type;
     Device_Basic_Setting.reg.tcp_type = 1;

@@ -71,6 +71,7 @@
 #define PM_TSTAT8_220V                94
 #define PM_T36CTA                     95
 #define PM_AFS                        96  //Air Floor Sensor
+#define PM_FAN_MODULE                 97  //Lijun  ESP32 new board fan  暂时没界面
 #define PM_NC                         100
 #define PM_TSTAT8_PROGRAM             101  //TSTAT8 的可编程版本;
 #define PWM_TRANSDUCER                104

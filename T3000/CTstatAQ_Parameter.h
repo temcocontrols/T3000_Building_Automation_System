@@ -32,12 +32,15 @@ public:
 	afx_msg void OnBnClickedRadio2();
 	afx_msg void OnBnClickedButtonDone();
 	afx_msg void OnBnClickedButtonDefault();
+	afx_msg void OnCbnSelchangeComboAirlabLine5();
 };
+
 const int TSTAT_AQ_BLANK_SCREEN = 1955;
 const int TATAT_AQ_CONFIG_LINE1 = 1956;
 const int TATAT_AQ_CONFIG_LINE2 = 1957;
 const int TATAT_AQ_CONFIG_LINE3 = 1958;
 const int TATAT_AQ_CONFIG_LINE4 = 1959;
+const int TATAT_AQ_CONFIG_LINE5 = 1954;
 
 const int HIDE_IN_ARRAY = 4;
 const CString AirLab_LCD[] =

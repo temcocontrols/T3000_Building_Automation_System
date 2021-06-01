@@ -67,6 +67,7 @@ CString g_achive_folder_temp_db = _T("");
 CString g_achive_device_name_path = _T("");
 CString g_achive_monitor_datatbase_path = _T("");
 CString g_ext_database_path = _T(""); //额外的配置档数据库路径;
+CString g_ext_mass_flash_path = _T(""); //保存多烧写  选中设备的 配置文件路径
 
 BOOL g_Scanfully=FALSE;
 BOOL g_ScanSecurity=TRUE;
@@ -2296,6 +2297,11 @@ vector < RoomInfo> bm_room;
 
 CString T3_chip_name;
 unsigned int T3_chip_type;
+
+unsigned char daylight_start_month;
+unsigned char daylight_start_day;
+unsigned char daylight_end_month;
+unsigned char daylight_end_day;
 
 
 

@@ -28,6 +28,7 @@ void CBacnetWeb::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetWeb, CDialogEx)
+    ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -47,14 +48,25 @@ BOOL CBacnetWeb::OnInitDialog()
         return 0;
     }
 
+
     // Initialize the first URL.
     COleVariant noArg;
     //
-    //CString strURL("file:///Z:/Temp/1.png");
-    CString strURL("https://temcocontrols.com/");
+    CString strURL("file:///Z:/TemcoSoftware/ToBeDone/3D/ArchDetail-Model.html");
+    //CString strURL("file:///Z:\\Temp\\setup\\wifi5.bmp");
+    //CString strURL("https://temcocontrols.com/");
+    
     m_browser.Navigate(strURL, &noArg, &noArg, &noArg, &noArg);
 
 
     return TRUE;  // return TRUE unless you set the focus to a control
                   // 异常: OCX 属性页应返回 FALSE
+}
+
+
+void CBacnetWeb::OnTimer(UINT_PTR nIDEvent)
+{
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+
+    CDialogEx::OnTimer(nIDEvent);
 }

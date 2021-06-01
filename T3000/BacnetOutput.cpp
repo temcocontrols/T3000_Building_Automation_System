@@ -441,7 +441,9 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
     //    OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
     //    Minipanel_device = 1;
     //}
-    else if ((bacnet_device_type == STM32_CO2_NET) || (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
+    else if ((bacnet_device_type == STM32_CO2_NET) || 
+		    (bacnet_device_type == STM32_CO2_RS485) ||
+		     (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
     {
         OUTPUT_LIMITE_ITEM_COUNT = 3;
         Minipanel_device = 0;
