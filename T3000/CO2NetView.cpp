@@ -216,6 +216,16 @@ void CCO2NetView::Fresh()
         ((CButton *)GetDlgItem(IDC_RADIO_CO2_CAL_ENABLE))->SetCheck(0);
         ((CButton *)GetDlgItem(IDC_RADIO_CO2_CAL_DISABLE))->SetCheck(1);
     }
+
+    if ((product_register_value[210] >= 0) &&  ( product_register_value[210] < sizeof(CO2_Type) / sizeof(CO2_Type[0])  ))
+    {
+        GetDlgItem(IDC_EDIT_CO2_TYPE)->SetWindowText(CO2_Type[product_register_value[210]]);
+    }
+    else
+    {
+        GetDlgItem(IDC_EDIT_CO2_TYPE)->SetWindowText(CO2_Type[0]);
+    }
+
 	if (product_register_value[7] == STM32_CO2_RS485)
 	{
 		GetDlgItem(IDC_STATIC_IP_INFOR)->ShowWindow(SW_HIDE);
@@ -582,7 +592,13 @@ void CCO2NetView::Initial_Window()
 	Initial_OutputList();
 	Initial_VarList();
 
-    if (product_register_value[CO2_NET_MODBUS_SOFTWARE_VERSION_LO] >= 60)
+    if (product_register_value[CO2_NET_MODBUS_SOFTWARE_VERSION_LO] < 60)
+    {
+        GetDlgItem(IDC_EDIT_CO2_RE_CALIBRATION)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_CO2_HELP)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_RE_CALIBRATION_DONE)->EnableWindow(0);
+    }
+    else if(product_register_value[210] == SENSOR_TYPE_SCD30)
     {
         CString temp_recal_value;
         temp_recal_value.Format(_T("%u"), product_register_value[MODBUS_CO2_FORCED_RE_CALIBRATION]);
@@ -597,6 +613,7 @@ void CCO2NetView::Initial_Window()
         GetDlgItem(IDC_BUTTON_CO2_HELP)->EnableWindow(0);
         GetDlgItem(IDC_BUTTON_RE_CALIBRATION_DONE)->EnableWindow(0);
     }
+
 
 }
 void CCO2NetView::Show_InputList()

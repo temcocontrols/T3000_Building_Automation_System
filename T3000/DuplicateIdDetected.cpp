@@ -973,7 +973,7 @@ BOOL CDuplicateIdDetected::ChangeNetDeviceIP(CString soldIP, CString newstrIP, u
 
                     //SaveNewIPAddress(strnewipadress, stroldipaddress);
                     ret = TRUE;
-                    MessageBox(_T("Successfull"));
+                    MessageBox(_T("Successful"));
                     CString strSql;
                     CppSQLite3DB SqliteDBBuilding;
                     CppSQLite3Table table;

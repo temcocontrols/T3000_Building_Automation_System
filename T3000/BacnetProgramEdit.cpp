@@ -414,7 +414,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetReadOnly(TRUE);
 	memset(program_code[program_list_line],0,2000);
 
-	renumvar = 0;
+	renumvar = 1;
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
@@ -523,7 +523,7 @@ void CBacnetProgramEdit::OnSend()
 	//reset the program buffer
 	memset(program_code[program_list_line],0,2000);
 
-	renumvar = 0;
+	renumvar = 1;
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);

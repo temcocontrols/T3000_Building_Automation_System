@@ -27,6 +27,7 @@ public:
 	virtual void OnOK();
 	virtual void OnCancel();
 	void Initial_static();
+	void Update_Custom_Units();
     void SetAllRadioButton(int button_index = 2);
 	CStaticEx m_static_range_units_select;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

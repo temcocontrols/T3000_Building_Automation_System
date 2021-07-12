@@ -2442,7 +2442,7 @@ const CString Output_Type_String[] =
 {
     _T("Virtual"),
     _T("Digital"),       //1
-    _T("Ananlog"),
+    _T("Analog"),
     _T("Extend Digital"),
     _T("Extend Ananlog"),
     _T("Internal")

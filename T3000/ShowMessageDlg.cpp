@@ -555,7 +555,6 @@ void CShowMessageDlg::OnTimer(UINT_PTR nIDEvent)
 void CShowMessageDlg::OnClose()
 {
     // TODO: 在此添加消息处理程序代码和/或调用默认值
-    Sleep(2000);
     CDialogEx::OnClose();
 }
 
@@ -593,6 +592,10 @@ void CShowMessageDlg::OnBnClickedOk()
 
 
         ok_button_press = 1;
+    }
+    else if (mevent == EVENT_MESSAGE_ONLY)
+    {
+        PostMessage(WM_CLOSE, NULL);
     }
     else
     {

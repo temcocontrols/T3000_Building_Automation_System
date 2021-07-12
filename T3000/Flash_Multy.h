@@ -21,10 +21,13 @@ typedef struct
     int cofnigresult;
     bool online;
     float software_rev;
+	float newest_rev;
     CString file_rev;
     bool need_flash;
 	unsigned char product_id;
 	bool select_status;
+	unsigned int lats_update_time;
+
 }Str_flash_device;
 
 
@@ -90,7 +93,9 @@ public:
     BOOL Configuration_File_Check(CString ProductName,CString ConfigurationFilePath);
     BOOL m_bool_flash_different_version;
 	afx_msg void OnBnClickedButtonUpdateFirmware();
+	void Get_Device_Firmware();
 	void GetProductType();
+	static DWORD WINAPI  CFlash_Multy::get_fwversion_thread(LPVOID lpVoid);
 };
 
 const int FLASH_ITEM = 0;
@@ -110,8 +115,8 @@ const int FLASH_CONFIG_FILE_POSITION = 13;
 const int FLASH_RESULTS = 14;
 const int FLASH_CONFIG_RESULTS = 15;
 const int FLASH_PRODUCT_ID = 16;
-
-const int FLASH_MAX_COUNT = 17;
+const int FLASH_FIRMWARE_VERSION = 17;
+const int FLASH_MAX_COUNT = 18;
 
 
 

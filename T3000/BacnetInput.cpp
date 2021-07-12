@@ -119,7 +119,7 @@ BOOL CBacnetInput::OnInitDialog()
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
    
-	//SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_INPUT_TIME,NULL);
+	SetTimer(INPUT_REFRESH_DATA_TIMER, 10000/*BAC_LIST_REFRESH_INPUT_TIME*/,NULL);
 
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_INPUT_DEFAULT);
 	SetIcon(m_hIcon,TRUE);
@@ -1408,47 +1408,6 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                     temp_task_info.Format(_T("Read custom units failed!"));
                     SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
                 }
-#if 0
-                int temp_invoke_id = -1;
-                int send_status = true;
-                int	resend_count = 0;
-                for (int z = 0;z < 3;z++)
-                {
-                    do
-                    {
-                        resend_count++;
-                        if (resend_count > 5)
-                        {
-                            send_status = false;
-                            break;
-                        }
-                        temp_invoke_id = GetPrivateData(
-                            g_bac_instance,
-                            READUNIT_T3000,
-                            0,
-                            BAC_CUSTOMER_UNITS_COUNT - 1,
-                            sizeof(Str_Units_element));
-                        Sleep(SEND_COMMAND_DELAY_TIME);
-                    } while (temp_invoke_id < 0);
-                    if (send_status)
-                    {
-                        for (int z = 0;z < 1000;z++)
-                        {
-                            Sleep(1);
-                            if (tsm_invoke_id_free(temp_invoke_id))
-                            {
-                                read_customer_unit = true;
-                                break;
-                            }
-                            else
-                                continue;
-                        }
-
-                    }
-                    if (read_customer_unit)
-                        break;
-                }
-#endif
             }
         }
 		bac_range_number_choose = m_Input_data.at(lRow).range;
@@ -1489,6 +1448,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,lRow,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
 				return ;
 			}
+
 			if(bac_range_number_choose == 0)	//如果选择的是 unused 就认为是analog 的unused;这样 能显示对应的value;
 			{
 				m_Input_data.at(lRow).digital_analog =  BAC_UNITS_ANALOG;
@@ -1523,12 +1483,15 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 					New_CString = Input_Analog_Units_Array[bac_range_number_choose];
 				}
 
+
+				m_input_list.SetItemText(lRow, INPUT_UNITE, Input_List_Analog_Units[bac_range_number_choose]);
                 if ((bac_range_number_choose >= 20) && (bac_range_number_choose <= 24))//选择的是cus range 需要去选择single type
                 {
                     m_Input_data.at(lRow).decom = m_dialog_signal_type;
+					m_input_list.SetItemText(lRow, INPUT_UNITE, Analog_Customer_Units[bac_range_number_choose - 20]);//需要将units 赋值给全局变量，刷新;
                 }
 
-				m_input_list.SetItemText(lRow,INPUT_UNITE,Input_List_Analog_Units[bac_range_number_choose]);	
+				
 				
 				unsigned short temp_cal_value;
 				temp_cal_value = (m_Input_data.at(lRow).calibration_h << 8 ) + m_Input_data.at(lRow).calibration_l;
@@ -1687,8 +1650,11 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 		{
 			if(offline_mode)
 				break;
-
-			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+			if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_INPUT) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
+			{
+				Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0);
+			}
+			else if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 			{
 				//PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 			}

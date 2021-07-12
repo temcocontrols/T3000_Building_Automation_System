@@ -526,3 +526,20 @@ const int CO2NET_MAX_OUT_SCALE = 5;
 const int CO2NET_AUTO_MANUAL = 6;
 
 
+const int SENSOR_TYPE_OGM200 = 3;
+const int SENSOR_TYPE_TEMCO = 4;
+const int SENSOR_TYPE_SCD30 = 5;
+const int SENSOR_TYPE_MH_Z19B = 6;
+
+const CString CO2_Type[] =
+{
+    _T("-"),
+    _T("-"),
+    _T("-"),
+    _T("OGM200"),
+    _T("Temco"),
+    _T("SCD30"),
+    _T("MH_Z19B")
+};
+
+
