@@ -41,7 +41,7 @@ protected:
 
 public:
 
-
+	void UpdateTreeName();
 	//afx_msg	void OnBnClickedBtnBacIPCancle();
 	afx_msg LRESULT Fresh_Setting_UI(WPARAM wParam,LPARAM lParam);
 		virtual BOOL OnInitDialog();

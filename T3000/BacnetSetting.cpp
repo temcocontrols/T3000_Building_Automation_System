@@ -184,6 +184,42 @@ void Getminitypename(unsigned char nmini_type, CString &ret_name)
 
 }
 
+void CBacnetSetting::UpdateTreeName()
+{
+    CString temp_name;
+    MultiByteToWideChar(CP_ACP, 0, (char*)Device_Basic_Setting.reg.panel_name, (int)strlen((char*)Device_Basic_Setting.reg.panel_name) + 1, temp_name.GetBuffer(MAX_PATH), MAX_PATH);
+    temp_name.ReleaseBuffer();
+    temp_name.Trim();
+
+    selected_product_Node.NameShowOnTree.Trim();
+    if (selected_product_Node.NameShowOnTree.CompareNoCase(temp_name) != 0)
+    {
+        CppSQLite3DB SqliteDBBuilding;
+        CppSQLite3Query q;
+        SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+
+        CString temp_serial;
+        CString strSql;
+        temp_serial.Format(_T("%u"), g_selected_serialnumber);
+        strSql.Format(_T("select * from ALL_NODE where Serial_ID='%s'"), temp_serial);
+
+        q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+        //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+        temp_serial.Format(_T("%u"), selected_product_Node.serial_number);
+        
+        while (!q.eof())
+        {
+            strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"), temp_name, temp_serial);
+            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+            q.nextRow();
+
+        }
+
+        SqliteDBBuilding.closedb();
+        ::PostMessage(MainFram_hwd,  WM_MYMSG_REFRESHBUILDING, 0, 0);
+    }
+}
+
 LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 {
 #if 1
@@ -220,6 +256,9 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
     {
     case READ_SETTING_COMMAND:
     {
+
+        UpdateTreeName();
+
         ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_IPADDRESS_BAC_IP))->SetAddress(Device_Basic_Setting.reg.ip_addr[0],
             Device_Basic_Setting.reg.ip_addr[1], Device_Basic_Setting.reg.ip_addr[2], Device_Basic_Setting.reg.ip_addr[3]);
         ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->SetAddress(Device_Basic_Setting.reg.subnet[0],

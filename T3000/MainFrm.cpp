@@ -6650,6 +6650,11 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
             }
             return 1;
         }
+        else if (pMsg->wParam == VK_F2)
+        {
+            m_pTreeViewCrl->DoEditLabel(selected_product_Node.product_item);
+            //DoEditLabel()
+        }
         if(((GetAsyncKeyState( VK_LCONTROL ) & 0x8000))&&(pMsg->wParam =='R'))
         {
             OnToolIsptoolforone();
@@ -9061,7 +9066,8 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
         CString str_hw_version;
         CString str_fw_version;
         str_hw_version.Format(_T("%.1f"),m_refresh_net_device_data.at(y).hw_version);
-        str_fw_version.Format(_T("%.1f"),m_refresh_net_device_data.at(y).sw_version/10.0);
+        //str_fw_version.Format(_T("%.1f"),m_refresh_net_device_data.at(y).sw_version/10.0);
+        str_fw_version.Format(_T("%.1f"), m_refresh_net_device_data.at(y).sw_version );
 
         str_object_instance.Format(_T("%u"),m_refresh_net_device_data.at(y).object_instance);
         str_panel_number.Format(_T("%u"),m_refresh_net_device_data.at(y).panal_number);
@@ -9085,7 +9091,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                     ((m_refresh_net_device_data.at(y).panal_number != m_product.at(n_index).panel_number) && (m_refresh_net_device_data.at(y).panal_number != 0)) ||
                     ((m_refresh_net_device_data.at(y).object_instance != m_product.at(n_index).object_instance) && (m_refresh_net_device_data.at(y).object_instance != 0)) ||
                     ((m_refresh_net_device_data.at(y).show_label_name.CompareNoCase(m_product.at(n_index).NameShowOnTree) != 0)&& (!m_refresh_net_device_data.at(y).show_label_name.IsEmpty()) && (m_refresh_net_device_data.at(y).nprotocol != PROTOCOL_BIP_T0_MSTP_TO_MODBUS) ) ||
-					(  abs((float)(m_refresh_net_device_data.at(y).sw_version - m_product.at(n_index).software_version*10)) >= 1 ) )
+					(  fabs((float)(m_refresh_net_device_data.at(y).sw_version - m_product.at(n_index).software_version)) >= 0.00001 ) )
             {
                 find_new_device = 1;
                 CString strSql;
@@ -10872,6 +10878,70 @@ loop1:
                 MyCriticalSection.Unlock();
                 if (n_wifi_connection)
                     break;
+                if (My_WriteList_Struct->block_size == 0) // 用寄存器来更新列表;
+                {
+                    if ((unsigned char)My_WriteList_Struct->command == READVARIABLE_T3000)
+                    {
+                        unsigned temp_ret[3] = { 0 };
+                        temp_ret[0] = Read_Multi(selected_product_Node.product_id, &product_register_value[8092], 8092, 100);
+                        if (temp_ret[0] != 100)
+                            break;
+                        temp_ret[1] = Read_Multi(selected_product_Node.product_id, &product_register_value[8192], 8192, 100);
+                        if (temp_ret[1] != 100)
+                            break;
+                        temp_ret[2] = Read_Multi(selected_product_Node.product_id, &product_register_value[8292], 8292, 100);
+                        if (temp_ret[2] != 100)
+                            break;
+                        for (int z = 0; z < 128; z++)
+                        {
+                            unsigned short temp_value[2] = {0};
+                            temp_value[1] = product_register_value[8092 + z * 2];
+                            temp_value[0] = product_register_value[8092 + z * 2 + 1];
+                            memcpy(&m_Variable_data.at(z).value, temp_value, 4);
+                            Sleep(1);
+                        }
+                        ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
+
+                    }
+                    else if ((unsigned char)My_WriteList_Struct->command == READINPUT_T3000)
+                    {
+                        unsigned temp_ret[2] = { 0 };
+                        temp_ret[0] = Read_Multi(selected_product_Node.product_id, &product_register_value[7484], 7484, 100);
+                        if (temp_ret[0] != 100)
+                            break;
+                        temp_ret[1] = Read_Multi(selected_product_Node.product_id, &product_register_value[7584], 7584, 100);
+                        if (temp_ret[1] != 100)
+                            break;
+                        for (int z = 0; z < 64; z++)
+                        {
+                            unsigned short temp_value[2] = { 0 };
+                            temp_value[1] = product_register_value[7484 + z * 2];
+                            temp_value[0] = product_register_value[7484 + z * 2 + 1];
+                            memcpy(&m_Input_data.at(z).value, temp_value, 4);
+                            Sleep(1);
+                        }
+                        ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+                    }
+                    else if ((unsigned char)My_WriteList_Struct->command == READOUTPUT_T3000)
+                    {
+                        unsigned temp_ret[2] = { 0 };
+                        temp_ret[0] = Read_Multi(selected_product_Node.product_id, &product_register_value[7100], 7100, 100);
+                        if (temp_ret[0] != 100)
+                            break;
+                        temp_ret[1] = Read_Multi(selected_product_Node.product_id, &product_register_value[7200], 7200, 100);
+                        if (temp_ret[1] != 100)
+                            break;
+                        for (int z = 0; z < 64; z++)
+                        {
+                            unsigned short temp_value[2] = { 0 };
+                            temp_value[1] = product_register_value[7100 + z * 2];
+                            temp_value[0] = product_register_value[7100 + z * 2 + 1];
+                            memcpy(&m_Output_data.at(z).value, temp_value, 4);
+                            Sleep(1);
+                        }
+                        ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+                    }
+                }
                 for (int i=0; i<My_WriteList_Struct->block_size; i++)
                 {
                     resend_count = 0;
@@ -12022,6 +12092,7 @@ void CMainFrame::OnControlSettings()
         product_register_value[7] == PM_FAN_MODULE ||
         product_register_value[7] == PM_AIRLAB_ESP32 ||
         product_register_value[7] == PM_AFS ||
+        product_register_value[7] == PWM_TEMPERATURE_TRANSDUCER ||
         product_register_value[7] == PM_MULTI_SENSOR ||
         product_register_value[7] == STM32_CO2_NET ||
         product_register_value[7] == STM32_PM25 ||
@@ -14634,7 +14705,11 @@ void CMainFrame::OnDatabaseLogdetail()
 void CMainFrame::OnLoadConfigFile()
 {
     LoadConfigFilePath.Empty();
-    if ((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
+    if ((g_protocol == PROTOCOL_BACNET_IP) || 
+        (g_protocol == MODBUS_BACNET_MSTP) || 
+        (g_protocol == PROTOCOL_BIP_TO_MSTP) ||
+        (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+        )
     {
         MainFram_hwd = this->m_hWnd;
         LoadBacnetBinaryFile(true, NULL);
@@ -14713,7 +14788,10 @@ void CMainFrame::SaveConfigFile()
             //协议时bacnet ，用户点击 File save时 先调用线程读取所有需要存的资料；在发送消息回来 调用Save
             //::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
 
-            if ((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
+            if ((g_protocol == PROTOCOL_BACNET_IP) || 
+                (g_protocol == MODBUS_BACNET_MSTP) || 
+                (g_protocol == PROTOCOL_BIP_TO_MSTP) ||
+                (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER))
             {
                 Show_Wait_Dialog_And_ReadBacnet(0);
             }

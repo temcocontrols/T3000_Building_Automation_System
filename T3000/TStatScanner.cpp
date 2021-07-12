@@ -1288,14 +1288,14 @@ void CTStatScanner::modbusip_to_modbus485(int nComPort, int nBaudrate, LPCTSTR s
 }
 
 //2018 03 30 这个函数还需要改造 ，多线程同事扫描时 需要保存好波特率
-void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo, BYTE devHi, int nItem , int nbaudrate)
+int CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo, BYTE devHi, int nItem , int nbaudrate)
 {
 
     if (m_bStopScan)
     {
 
 
-        return;
+        return 0;
     }
 
     g_strScanInfoPrompt.Format(_T("COM%d"), nComPort);
@@ -1333,7 +1333,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
         CString temp_cs;
         temp_cs.Format(_T("Com%d"),nComPort);
         m_bacnetComs.push_back(temp_cs);
-        return ;
+        return -6;
     }
     if (a == -3 || a > 0)
     {
@@ -1378,7 +1378,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
     {
         strlog.Format(_T("NO Response com%d to ID From %d to %d"),nComPort,devLo,devHi);
         //write_T3000_log_file(strlog);
-        return ;
+        return 0;
     }
     char c_array_temp[5]= {'0'};
     CString temp=_T("");
@@ -1545,9 +1545,9 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
             m_scan_info.at(nItem).scan_found ++;
         }
         else
-            return;
+            return 0;
     }
-
+    int binary_ret = 0;
     switch(a)
     {
 
@@ -1557,7 +1557,9 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
         //write_T3000_log_file(strlog);
         if(devLo!=devHi)
         {
-            binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2, nItem, nbaudrate);
+            binary_ret = binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2, nItem, nbaudrate);
+            if (binary_ret == -6)
+                return -6;
             binarySearchforComDevice(nComPort, bForTStat, (devLo+devHi)/2+1,devHi, nItem, nbaudrate);
         }
         else
@@ -1569,7 +1571,9 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
         //write_T3000_log_file(strlog);
         if(devLo!=devHi)
         {
-            binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2, nItem, nbaudrate);
+            binary_ret = binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2, nItem, nbaudrate);
+            if (binary_ret == -6)
+                return -6;
             binarySearchforComDevice(nComPort, bForTStat, (devLo+devHi)/2+1,devHi, nItem , nbaudrate);
         }
         else
@@ -1687,12 +1691,12 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 
                                         binarySearchforComDevice(nComPort, bForTStat, devLo,devHi);
                                     }
-                                    return;
+                                    return 0;
                                 }
                             }
                             else
                             {
-                                return;
+                                return 0;
                             }
                         }
                 }

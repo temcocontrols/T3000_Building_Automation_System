@@ -17,7 +17,7 @@
 #include <windows.h>  
  
 
-const unsigned int g_versionNO= 20210531;
+const unsigned int g_versionNO= 20210701;
 
 
 #ifdef _DEBUG
@@ -196,7 +196,6 @@ BOOL CT3000App::InitInstance()
 	 
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
-
     //2018 04 23 修复bug 默写操作系统不是C盘的情况安装控件失败
     //解决办法  获取系统所在盘符 ，然后采取对应操作.
     CString Local_System_Path;

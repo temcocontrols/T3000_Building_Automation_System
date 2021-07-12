@@ -275,6 +275,37 @@ void BacnetRange::SetAllRadioButton(int button_index ) // 0  keep     1 enable a
 
 }
 
+
+void BacnetRange::Update_Custom_Units()
+{
+			CString temp_cs_analog;
+		if (!Analog_Customer_Units[0].IsEmpty())
+		{
+			temp_cs_analog.Format(_T("50.  Table 1 ( %s )"),Analog_Customer_Units[0]);
+			GetDlgItem(IDC_RADIO82)->SetWindowTextW(temp_cs_analog);
+		}
+		if (!Analog_Customer_Units[1].IsEmpty())
+		{
+			temp_cs_analog.Format(_T("51.  Table 2 ( %s )"),Analog_Customer_Units[1]);
+			GetDlgItem(IDC_RADIO83)->SetWindowTextW(temp_cs_analog);
+		}
+		if (!Analog_Customer_Units[2].IsEmpty())
+		{
+			temp_cs_analog.Format(_T("52.  Table 3 ( %s )"),Analog_Customer_Units[2]);
+			GetDlgItem(IDC_RADIO84)->SetWindowTextW(temp_cs_analog);
+		}
+		if (!Analog_Customer_Units[3].IsEmpty())
+		{
+			temp_cs_analog.Format(_T("53.  Table 4 ( %s )"),Analog_Customer_Units[3]);
+			GetDlgItem(IDC_RADIO85)->SetWindowTextW(temp_cs_analog);
+		}
+		if (!Analog_Customer_Units[4].IsEmpty())
+		{
+			temp_cs_analog.Format(_T("54.  Table 5 ( %s )"),Analog_Customer_Units[4]);
+			GetDlgItem(IDC_RADIO86)->SetWindowTextW(temp_cs_analog);
+		}
+}
+
 void BacnetRange::Initial_static()
 {
 	CString temp_cs;
@@ -761,32 +792,33 @@ void BacnetRange::Initial_static()
 
 			((CButton *)GetDlgItem(i))->ShowWindow(1);
 		}
-		CString temp_cs_analog;
-		if(!Analog_Customer_Units[0].IsEmpty())
-		{
-			temp_cs_analog.Format(_T("50.  Table 1 ( %s )"),Analog_Customer_Units[0]);
-			GetDlgItem(IDC_RADIO82)->SetWindowTextW(temp_cs_analog);
-		}
-		if(!Analog_Customer_Units[1].IsEmpty())
-		{
-			temp_cs_analog.Format(_T("51.  Table 2 ( %s )"),Analog_Customer_Units[1]);
-			GetDlgItem(IDC_RADIO83)->SetWindowTextW(temp_cs_analog);
-		}
-		if(!Analog_Customer_Units[2].IsEmpty())
-		{
-			temp_cs_analog.Format(_T("52.  Table 3 ( %s )"),Analog_Customer_Units[2]);
-			GetDlgItem(IDC_RADIO84)->SetWindowTextW(temp_cs_analog);
-		}
-		if(!Analog_Customer_Units[3].IsEmpty())
-		{
-			temp_cs_analog.Format(_T("53.  Table 4 ( %s )"),Analog_Customer_Units[3]);
-			GetDlgItem(IDC_RADIO85)->SetWindowTextW(temp_cs_analog);
-		}
-		if(!Analog_Customer_Units[4].IsEmpty())
-		{
-			temp_cs_analog.Format(_T("54.  Table 5 ( %s )"),Analog_Customer_Units[4]);
-			GetDlgItem(IDC_RADIO86)->SetWindowTextW(temp_cs_analog);
-		}
+		Update_Custom_Units();
+		//CString temp_cs_analog;
+		//if(!Analog_Customer_Units[0].IsEmpty())
+		//{
+		//	temp_cs_analog.Format(_T("50.  Table 1 ( %s )"),Analog_Customer_Units[0]);
+		//	GetDlgItem(IDC_RADIO82)->SetWindowTextW(temp_cs_analog);
+		//}
+		//if(!Analog_Customer_Units[1].IsEmpty())
+		//{
+		//	temp_cs_analog.Format(_T("51.  Table 2 ( %s )"),Analog_Customer_Units[1]);
+		//	GetDlgItem(IDC_RADIO83)->SetWindowTextW(temp_cs_analog);
+		//}
+		//if(!Analog_Customer_Units[2].IsEmpty())
+		//{
+		//	temp_cs_analog.Format(_T("52.  Table 3 ( %s )"),Analog_Customer_Units[2]);
+		//	GetDlgItem(IDC_RADIO84)->SetWindowTextW(temp_cs_analog);
+		//}
+		//if(!Analog_Customer_Units[3].IsEmpty())
+		//{
+		//	temp_cs_analog.Format(_T("53.  Table 4 ( %s )"),Analog_Customer_Units[3]);
+		//	GetDlgItem(IDC_RADIO85)->SetWindowTextW(temp_cs_analog);
+		//}
+		//if(!Analog_Customer_Units[4].IsEmpty())
+		//{
+		//	temp_cs_analog.Format(_T("54.  Table 5 ( %s )"),Analog_Customer_Units[4]);
+		//	GetDlgItem(IDC_RADIO86)->SetWindowTextW(temp_cs_analog);
+		//}
 
 		// Big  input27 - 32  small 11 - 16  tiny 6 - 11 range  T3-22 1-11 ÀïÃæÓÐ¸ßËÙÂö³å.  ÆäËûµÄ ÉèÖÃ´Ërange ¶¼ÊÇµÍËÙÂö³å;
 		if((Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM) && (input_list_line >=26) && (input_list_line <=31))
@@ -2362,6 +2394,7 @@ void BacnetRange::OnBnClickedRadio82()
 
     m_input_Analog_select = 20;
     ShowAnalogCusRange();
+
 }
 
 
@@ -2379,6 +2412,7 @@ void BacnetRange::OnBnClickedRadio84()
     // TODO: 在此添加控件通知处理程序代码
     m_input_Analog_select = 22;
     ShowAnalogCusRange();
+
 }
 
 
@@ -2424,6 +2458,7 @@ void BacnetRange::ShowAnalogCusRange()
         CBacnetAnalogCusRang AnalogCusRangdlg;
         cs_windowtext.Format(_T("Custom Units %d"), m_input_Analog_select - 19);
         AnalogCusRangdlg.DoModal();
+		Update_Custom_Units();
     }
 }
 

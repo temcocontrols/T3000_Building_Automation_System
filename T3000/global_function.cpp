@@ -1056,7 +1056,7 @@ BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance
     pmy_refresh_info->start_instance = start_instance;
     pmy_refresh_info->end_instance = end_instance;
     pmy_refresh_info->entitysize = entitysize;
-    pmy_refresh_info->block_size = block_size;
+    pmy_refresh_info->block_size = block_size; //block_size 如果是0 表示 用寄存器去更新列表，只刷新value
     if ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     {
         //if (!PostThreadMessage(nThreadID, MY_RS485_WRITE_LIST, (WPARAM)pmy_write_info, NULL))//post thread msg
@@ -5839,6 +5839,7 @@ void Inial_Product_Menu_map()
         }
             break;
         case PM_AFS:
+        case PWM_TEMPERATURE_TRANSDUCER:
         {
             unsigned char  temp[20] = { 1,0,0,0,  0,0,0,0,  0,0,0,0,   0,1,1,1  ,0,0,0,0 };
             memcpy(product_menu[i], temp, 20);
@@ -7268,6 +7269,22 @@ int AddSubNetInfoIntoRefreshList(BYTE* buffer)
 
 }
 
+int get_firmware_version(unsigned char low_byte, unsigned char high_byte,unsigned char pid)
+{
+    switch (pid)
+    {
+    case PM_CM5:
+    case MINIPANELARM:
+       return (high_byte << 8 | low_byte);
+        break;
+    case PM_T3PT12:
+        return high_byte;
+        break;
+    default:
+        return (high_byte << 8 | low_byte);
+        break;
+    }
+}
 
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 {
@@ -7312,7 +7329,8 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 	temp_data.reg.modbus_port =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 	my_temp_point= my_temp_point + 2;
-	temp_data.reg.sw_version =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+    temp_data.reg.sw_version = get_firmware_version(my_temp_point[0], my_temp_point[1], temp_data.reg.product_id);
+	//temp_data.reg.sw_version =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 	my_temp_point= my_temp_point + 2;
 	temp_data.reg.hw_version =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 	my_temp_point= my_temp_point + 2;
@@ -7395,7 +7413,14 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
     }
 
 	temp.nport = temp_data.reg.modbus_port;
-	temp.sw_version = temp_data.reg.sw_version;
+    if((temp_data.reg.product_id == PM_TSTAT10) ||
+        (temp_data.reg.product_id == PM_MINIPANEL) ||
+        (temp_data.reg.product_id == PM_MINIPANEL_ARM) ||
+        (temp_data.reg.product_id == PM_TSTAT_AQ) ||    //罗列出版本号需要除以10 的 设备
+        (temp_data.reg.product_id == PM_CM5))
+        temp.sw_version = (float)temp_data.reg.sw_version / 10.0;
+    else
+	    temp.sw_version = temp_data.reg.sw_version;
 	temp.hw_version = temp_data.reg.hw_version;
 	temp.ip_address = nip_address;
 	temp.product_id = temp_data.reg.product_id;
@@ -7446,7 +7471,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	}
 
 #ifdef DEBUG
-    if (nip_address.CompareNoCase(_T("192.168.0.33"))== 0)
+    if (nip_address.CompareNoCase(_T("192.168.0.53"))== 0)
     {
         //t2 = GetTickCount();
         //CString temp_time_print;
@@ -9177,16 +9202,16 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 
         if(write_to_device)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
         {
-            if(g_protocol == PROTOCOL_BIP_TO_MSTP)
-            {
+            //if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+            //{
 
-            }
-            else
-            {
+            //}
+            //else
+            //{
                 CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 				pFrame->m_prg_version = ntemp_version;
                 pFrame->Show_Wait_Dialog_And_SendConfigMessage();
-            }
+            //}
 
         }
         else

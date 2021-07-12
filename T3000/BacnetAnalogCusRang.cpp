@@ -818,7 +818,7 @@ void CBacnetAnalogCusRang::UpdateCusAnalogUnit()
 	CString temp_task_info;
 	temp_task_info.Format(_T("Update Analog Range Unit : %s  "),temp_cs);
 	Post_Write_Message(g_bac_instance,WRITEANALOG_CUS_TABLE_T3000,analog_range_tbl_line,analog_range_tbl_line,sizeof(Str_table_point),analog_cus_range_dlg ,temp_task_info);
-
+    Analog_Customer_Units[analog_range_tbl_line] = temp_cs;
 }
 
 

@@ -121,7 +121,7 @@ BOOL CBacnetOutput::OnInitDialog()
 	((CButton *)GetDlgItem(IDC_BUTTON_OUTPUT_READ))->SetIcon(hIcon);	
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
 	((CButton *)GetDlgItem(IDC_BUTTON_OUTPUT_APPLY))->SetIcon(hIcon);
-	SetTimer(1, BAC_LIST_REFRESH_OUTPUT_TIME,NULL);
+	SetTimer(1, 10000/*BAC_LIST_REFRESH_OUTPUT_TIME*/,NULL);
 
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_OUTPUT);
 	SetIcon(m_hIcon,TRUE);
@@ -590,6 +590,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		m_output_list.SetItemText(i,OUTPUT_HIGH_VOLTAGE,high_voltage);	
 		if(
 			    bacnet_device_type == T3_TSTAT10 ||
+				bacnet_device_type == T3_OEM ||
 			    bacnet_device_type == BIG_MINIPANEL || 
                 bacnet_device_type == MINIPANELARM || 
                 bacnet_device_type == MINIPANELARM_LB || 
@@ -1521,8 +1522,11 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
-			
-			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+			if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_OUTPUT) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
+			{
+				Post_Refresh_Message(g_bac_instance, READOUTPUT_T3000, 0, BAC_OUTPUT_ITEM_COUNT - 1, sizeof(Str_out_point), 0);
+			}
+			else if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 			{
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			}

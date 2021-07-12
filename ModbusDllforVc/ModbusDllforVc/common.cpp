@@ -5094,8 +5094,6 @@ OUTPUT bool open_com_nocretical(int m_com)
          NULL);
 
 
-    m_com_h_serial[m_com] = m_hSerial;
-
     if(m_hSerial == INVALID_HANDLE_VALUE)
     {
         CloseHandle(m_hSerial);
@@ -5103,6 +5101,7 @@ OUTPUT bool open_com_nocretical(int m_com)
         m_com_h_serial[m_com] = NULL;
         return false;
     }
+    m_com_h_serial[m_com] = m_hSerial;
     //if(!SetupComm(m_hSerial, 1024*32, 1024*9))
     if(!SetupComm(m_hSerial, 1024*64, 1024*32))
     {
@@ -7332,6 +7331,8 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
             // new scan protocal,if many old tstat ,get into here ,scan result is oK too.
             old_or_new_scan_protocal_in_dll = 1;
             Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+            if ((devLo == devHi) && ((gval[9] != 0 || gval[10] != 0 || gval[11] != 0 || gval[12] != 0)))  //如果2分法 起始ID 一样 还收到垃圾数据，说明总线数据有错误;
+                return -6;
             if (gval[9] != 0 || gval[10] != 0 || gval[11] != 0 || gval[12] != 0)//to inspect
                 return -3;
             if ((gval[0] != pval[0]) || (gval[1] != 25))

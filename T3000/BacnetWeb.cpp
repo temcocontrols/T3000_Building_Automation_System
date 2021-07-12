@@ -52,10 +52,10 @@ BOOL CBacnetWeb::OnInitDialog()
     // Initialize the first URL.
     COleVariant noArg;
     //
-    CString strURL("file:///Z:/TemcoSoftware/ToBeDone/3D/ArchDetail-Model.html");
+    CString strURL("file:///D:/temp/python/render.html");
     //CString strURL("file:///Z:\\Temp\\setup\\wifi5.bmp");
     //CString strURL("https://temcocontrols.com/");
-    
+    m_browser.put_Silent(VARIANT_TRUE);
     m_browser.Navigate(strURL, &noArg, &noArg, &noArg, &noArg);
 
 

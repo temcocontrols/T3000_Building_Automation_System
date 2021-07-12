@@ -26,4 +26,6 @@ public:
     afx_msg void OnCbnSelchangeComboDlgCo2FirmwareAutoCal();
     afx_msg void OnBnClickedButton2();
     afx_msg void OnBnClickedButtonAbcHelp();
+	afx_msg void OnBnClickedButtonCo2ScdHelp();
+	afx_msg void OnBnClickedButtonReCalibrationScdDone();
 };

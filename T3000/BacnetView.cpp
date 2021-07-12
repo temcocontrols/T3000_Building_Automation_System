@@ -9,6 +9,19 @@ MSFLXGRD.MSM
 COMCAT.MSM
 拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
 
+
+2021 06 01
+1.Optimized ISP tool
+   1.1  Support to open multiple ISP tools on the same computer using different comports to update firmware on multiple devices.
+   1.2  Optimize the erasure of Flash (the old version of ISP tool may fail to erasure, resulting in the writing error of the first package of data of the device, and the final result will cause the device to not run after the device is burned)
+   1.3  Optimize some prompt message, for example, if the serial port fails to open the prompt user how to solve
+2. T3000
+	2.1 Supports ESP32 version of XDucer (TBD, poor communication 50% loss)
+	2.2 Fixed the following situation: if DHCP is used to obtain Device IP, the next time T3000 connects to this device, when Setting is selected in the interface, it may trigger the wrong command to write IP address.
+	2.3 About CO2 ，add new UI for Sensirion CO2 sensor RE-CALIBRATION.
+	2.4 Fixed an issue where the CO2 interface subnet mask and gateway action controls were opposite
+	2.5 Mass flash .Supports one button to automatically download the firmware of the selected device and update it one by one.Need to continue after closing T3000 software)
+
 2020 11 17
 1.Optimize the speed of accessing devices using the Bacnet MSTP protocol. Before tuning, if the node of the device was 254, it usually required a long poll of tokens, from 1 to 254, but now it is T3000 to get the token and immediately access the device to be connected
 2. Fix the time synchronization issue
@@ -2419,9 +2432,9 @@ void CDialogCM5_BacNet::Fresh()
 
             TempDlg.DoModal();
         }
-        Variable_Window->SetTimer(1, 60000, NULL);  //如果是MSTP协议不要刷新的那么频繁;
-        Input_Window->SetTimer(1, 60000, NULL);
-        Output_Window->SetTimer(1, 60000, NULL);
+        Variable_Window->SetTimer(1, 10000, NULL);  //如果是MSTP协议不要刷新的那么频繁;
+        Input_Window->SetTimer(1, 10000, NULL);
+        Output_Window->SetTimer(1, 10000, NULL);
 
 
         //switch_product_last_view();
@@ -2625,7 +2638,53 @@ void CDialogCM5_BacNet::Fresh()
             ::PostMessage(MainFram_hwd, MY_RX_TX_COUNT, 1, 0);
             memset(temp_buffer, 0, 5);
             multy_ret = Read_Multi(g_tstat_id, temp_buffer, 32, 72, 5);
-            if (multy_ret <= 0)
+			if (multy_ret == -12)//因为没有回复whois，可能设备的bacnet任务挂掉了
+			{
+				int nret = Open_Socket_Retry(nconnectionip, nport);
+				if (nret <= 0)
+				{
+					CString temp_cs2;
+					temp_cs2.Format(_T("Connect to IP %s ,port: %d failed!"), nconnectionip, nport);
+					MessageBox(temp_cs2);
+					return;
+				}
+
+				int temp_check_again = Read_Multi(g_tstat_id, temp_buffer, 32, 72, 5);
+				if (temp_check_again == -12)
+				{
+					MODE_SUPPORT_PTRANSFER = 0;
+					int n_ret_write = write_one(g_tstat_id, 33, 111, 3);
+
+					CShowMessageDlg dlg;
+					CString temp_message;
+					temp_message.Format(_T("Device Bacnet network abnormal, being repaired. Please reconnect later."));
+					CString cs_panel_name;
+					CString cs_ip_port;
+					cs_panel_name = _T("Panel Name:") + selected_product_Node.NameShowOnTree + _T("\r\n");
+					CString temp_port;
+					temp_port.Format(_T("%d"), nport);
+					cs_ip_port = _T("IP :") + nconnectionip + _T("  Port :") + temp_port + _T("\r\n");
+					CString cs_obj_instance;
+					CString temp1;
+					temp1.Format(_T("%u"), selected_product_Node.object_instance);
+					cs_obj_instance = _T("Device instance: ") + temp1 + _T("\r\n");
+					CString TotalMessage;
+					TotalMessage = cs_panel_name + cs_ip_port + cs_obj_instance + temp_message;
+
+					dlg.SetStaticText(TotalMessage);
+					//dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+					dlg.SetStaticTextColor(RGB(0, 0, 0));
+					dlg.SetStaticTextSize(22, 16);
+					dlg.SetEvent(EVENT_MESSAGE_ONLY);
+					dlg.DoModal();
+
+					return;
+				}
+
+
+
+			}
+            else if (multy_ret <= 0)
             {
                 pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item, false);
                 ::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, CONNECT_TO_MODBUS_FAILED, 0);
