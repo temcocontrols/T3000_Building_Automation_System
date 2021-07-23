@@ -6954,8 +6954,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 g_mstp_deviceid = selected_product_Node.object_instance;
                 Device_Type = selected_product_Node.product_class_id;
                 g_protocol = PROTOCOL_THIRD_PARTY_BAC_BIP;
-                SwitchToPruductType(DLG_DIALOG_THIRD_PARTY_BAC);
-
+                product_type = selected_product_Node.product_class_id;
+                //SwitchToPruductType(DLG_DIALOG_THIRD_PARTY_BAC);
+                SwitchToPruductType(DLG_BACNET_VIEW);
                 SqliteDBT3000.closedb();
 
                 g_bPauseMultiRead = true;
@@ -11358,7 +11359,7 @@ void CMainFrame::OnControlInputs()
             || (product_type == PWM_TRANSDUCER)
             || (product_type == STM32_HUM_NET)
             || (product_type == STM32_PRESSURE_NET)
-			) /*&& new_device_support_mini_ui*/  )  ))
+			) /*&& new_device_support_mini_ui*/  )  ) || product_type== PM_THIRD_PARTY_DEVICE)
     {
 
 		if(BacNet_hwd == NULL)
@@ -11652,8 +11653,8 @@ void CMainFrame::OnControlOutputs()
               (product_type == STM32_HUM_NET) ||
               (product_type == PWM_TRANSDUCER) ||
               (product_type == STM32_PRESSURE_NET) ||
-			(bacnet_device_type == PID_T36CTA)
-		  ) /*&& new_device_support_mini_ui */
+			(bacnet_device_type == PID_T36CTA) 
+		  ) /*&& new_device_support_mini_ui */ ||   product_type == PM_THIRD_PARTY_DEVICE
 		  )
 	 )
 	 

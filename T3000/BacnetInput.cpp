@@ -482,7 +482,16 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);
 			return 0;
 		}
-
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
+		{
+				BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+				temp_value->tag = TPYE_BACAPP_CHARACTER_STRING;
+				temp_value->context_specific = false;
+				WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
+				temp_value->type.Character_String.encoding = 0;
+				temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_ANALOG_INPUT, Changed_Item, PROP_DESCRIPTION, temp_value);			
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -825,7 +834,17 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			else
 				m_input_list.SetItemText(i,INPUT_RANGE,_T("Unused"));
 
-			if(m_Input_data.at(i).range == 0)
+			 if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
+			{
+				CString inputunit;
+				MultiByteToWideChar(CP_ACP, 0, (char*)bacnet_engineering_unit_names[m_Input_data.at(i).range].pString,
+					(int)strlen((char*)bacnet_engineering_unit_names[m_Input_data.at(i).range].pString) + 1,
+					inputunit.GetBuffer(MAX_PATH), MAX_PATH);
+				inputunit.ReleaseBuffer();
+				m_input_list.SetItemText(i, INPUT_UNITE, inputunit);
+				m_input_list.SetItemText(i, INPUT_RANGE, inputunit);
+			}
+			else if(m_Input_data.at(i).range == 0)
 				m_input_list.SetItemText(i,INPUT_RANGE,_T("Unused"));
 			else if(m_Input_data.at(i).range <  (sizeof(Input_Analog_Units_Array)/sizeof(Input_Analog_Units_Array[0])))
 			{
@@ -1573,8 +1592,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		m_input_list.Set_Edit(false);
 		return;
 	}
-	else
-	{
+	else{
 		return;
 	}
 
@@ -1583,10 +1601,11 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 	m_input_list.Set_Edit(false);
-
+	
 	int cmp_ret = memcmp(&m_temp_Input_data[lRow],&m_Input_data.at(lRow),sizeof(Str_in_point));
 	if(cmp_ret!=0)
 	{
+		
 		//if(Write_Private_Data_Blocking(WRITEINPUT_T3000,lRow,lRow) > 0)
 		//{
 		//	temp_task_info.Format(_T("Write Input List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
