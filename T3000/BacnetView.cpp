@@ -2608,7 +2608,7 @@ void CDialogCM5_BacNet::Fresh()
 		//g_hwnd_now = m_input_dlg_hwnd;
 		//Input_Window->m_input_list.SetFocus();
 		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
-		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+		::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
 		
 		return;
 		
@@ -7327,7 +7327,7 @@ BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 
 DWORD WINAPI Handle_Bip_whois_Thread(LPVOID lpvoid)
 {
-    //return 1;
+    return 1;
     Sleep(1);
     vector <_Bac_Scan_Com_Info> temp_vector;
     for (int i = 0; i < m_bac_handle_Iam_data.size(); i++)

@@ -6392,7 +6392,7 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
 
 
         bool port_bind_results = false;
-        for (int i = 1;i <= 3;i++)
+        for (int i = 0;i <= 3;i++)
         {
             int temp_add_port = i /*- 1*/;// rand() % 10000;
             if (bind_local_ip.IsEmpty())
@@ -6404,9 +6404,8 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
                 port_bind_results = Open_bacnetSocket2(bind_local_ip, BACNETIP_PORT + temp_add_port, my_sokect);
             }
             if (port_bind_results) { //如果绑定47808端口失败 尝试绑定其他端口
-                bip_set_socket(my_sokect);
-                //bip_set_port(49338);
-                bip_set_port(htons(BACNETIP_PORT + temp_add_port));
+                //bip_set_socket(my_sokect);
+                //bip_set_port(htons(BACNETIP_PORT + temp_add_port));
                 break;
             }
         }
@@ -6414,6 +6413,9 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         if(!port_bind_results)
             return false;
 		
+
+        bip_set_socket(my_sokect);
+        bip_set_port(htons(47808));
 
         static in_addr BIP_Broadcast_Address;
         
