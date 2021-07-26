@@ -107,7 +107,7 @@ set(RESOURCE_FILES
    ${UPDATE_SOURCE_DIR}/Update.rc
 )
 
-set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Update.rc2 PROPERTIES LANGUAGE RC)
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Update.rc PROPERTIES LANGUAGE RC)
 #set_source_files_properties(${UPDATE_RESOURCE_DIR}/Update.rc2 PROPERTIES LANGUAGE RC)
 
 # Add executable to build.
