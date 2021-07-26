@@ -45,6 +45,7 @@ DWORD * nScanTCPThreadID = NULL;
 const int TCP_COMM_PORT = 6001;
 extern int g_ScnnedNum;
 
+extern void intial_bip_socket();
 
 
 
@@ -1807,7 +1808,8 @@ UINT SCAN_TCP_TO485_THREAD(LPVOID pParam)
             if (hScanTCPData[i] != NULL)
             {
                 b_not_finished = true;
-                TRACE(_T("Thread ID %d    %d  not finished!\r\n"), nScanThreadID[i], i);
+                //if(nScanThreadID[i] !=NULL)
+                  //  TRACE(_T("Thread ID %d    %d  not finished!\r\n"), nScanThreadID[i], i);
             }
         }
 
@@ -4081,7 +4083,7 @@ void CTStatScanner::ScanAll()
 
     b_pause_refresh_tree = SCANALL;
 
-    ScanDetectComData();//检测串口数据;
+     ScanDetectComData();//检测串口数据;
 
     ScanComDevice();
 
@@ -4096,6 +4098,11 @@ void CTStatScanner::ScanAll()
 
     ScanTCPtoRS485SubPort();
 
+    // inilizing bacnet and its handlers for third party bacnet devices
+    intial_bip_socket();
+    Init_Service_Handlers();
+    Send_WhoIs_Global(-1, -1);
+    // hird party bacnet end
 	hwait_scan_thread =CreateThread(NULL,NULL,_WaitScanThread,this,NULL, NULL);
 
     //AfxBeginThread(_WaitScanThread, this);
@@ -4104,7 +4111,6 @@ void CTStatScanner::ScanAll()
 
 
 }
-
 DWORD WINAPI  Detect_Mstp_thread(LPVOID lpVoid)
 {
     Sleep(1000);
