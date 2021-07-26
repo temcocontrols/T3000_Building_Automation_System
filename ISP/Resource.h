@@ -119,7 +119,6 @@
 #define IDC_CHECK_FLASH_WIFI_MAC        1094
 #define IDC_CHECK1                      1095
 #define IDC_CHECK_MSTP_UPDATE           1095
-#define IDC_BUTTON3                     1097
 #define IDC_BUTTON_LOOP_FLASH           1097
 #define IDC_BUTTON_SETTING_OK           6001
 #define IDC_EDIT_SETTING_TIMEOUT        6021
@@ -132,6 +131,7 @@
 #define ID_Menu                         32772
 #define ID_SAVE_LOG_INFO                32773
 #define ID_MENU_APP                     32774
+#define ttimer                          32774
 #define ID_MENU_ABOUT                   32775
 #define ID_MENU_ABOUT32776              32776
 #define ID_MENU_EXIT                    32777

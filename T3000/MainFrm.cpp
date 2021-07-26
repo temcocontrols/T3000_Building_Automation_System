@@ -5301,7 +5301,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				Mession_ret.Format(_T("Write variable analog custom units success."));
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
-				Sleep(SEND_COMMAND_DELAY_TIME);
+                if (!offline_mode)
+				    Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
@@ -5322,7 +5323,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
                 Mession_ret.Format(_T("Write msv table from %d to %d success."), i, i);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 write_success_count++;
-                Sleep(SEND_COMMAND_DELAY_TIME);
+                if (!offline_mode)
+                    Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
@@ -5345,7 +5347,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write input from %d to %d success."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5367,7 +5370,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write output from %d to %d success."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5388,7 +5392,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write variable from %d to %d success."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5409,7 +5414,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write program from %d to %d success."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5428,7 +5434,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write schedule from %d to %d success."),i,i);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5446,7 +5453,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write holiday from %d to %d success."),i,i);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5467,7 +5475,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write PID from %d to %d success."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5488,7 +5497,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write screen from %d to %d success."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5509,7 +5519,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write holiday from %d to %d success."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5530,7 +5541,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write schedule from %d to %d success."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5552,7 +5564,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             Mession_ret.Format(_T("Write monitor from %d to %d success."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
             SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
             write_success_count ++ ;
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
         }
         else
         {
@@ -5569,8 +5582,11 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 
     for (int i=0; i<BAC_PROGRAMCODE_GROUP; i++)
     {
-
-        int npart = (program_code_length[i] / 401) + 1;
+        int npart = 0;
+        if (m_Program_data.at(i).bytes == 0)
+            npart = 1;
+        else
+            npart = (program_code_length[i] / 401) + 1;
 
 
 
@@ -5582,7 +5598,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             {
                 Mession_ret.Format(_T("Write program %d part %d success."),i,j+1);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
-                Sleep(SEND_COMMAND_DELAY_TIME);
+                if (!offline_mode)
+                    Sleep(SEND_COMMAND_DELAY_TIME);
                 continue;
             }
             else
@@ -5609,7 +5626,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				Mession_ret.Format(_T("Write Custom unit from %d to %d success."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
-				Sleep(SEND_COMMAND_DELAY_TIME);
+                if (!offline_mode)
+				    Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
@@ -5632,7 +5650,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				Mession_ret.Format(_T("Write graphic label from %d to %d success."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
-				Sleep(SEND_COMMAND_DELAY_TIME);
+                if (!offline_mode)
+				    Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
@@ -5654,7 +5673,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				Mession_ret.Format(_T("Write user login info from %d to %d success."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
-				Sleep(SEND_COMMAND_DELAY_TIME);
+                if (!offline_mode)
+				    Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
@@ -5678,7 +5698,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				Mession_ret.Format(_T("Write Analog custom table from %d to %d success."),(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
-				Sleep(SEND_COMMAND_DELAY_TIME);
+                if (!offline_mode)
+				    Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
@@ -5696,7 +5717,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 				Mession_ret.Format(_T("Write device information success."));
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
 				write_success_count ++ ;
-				Sleep(SEND_COMMAND_DELAY_TIME);
+                if (!offline_mode)
+				    Sleep(SEND_COMMAND_DELAY_TIME);
 			}
 			else
 			{
@@ -5723,7 +5745,8 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
                 Mession_ret.Format(_T("Write schedule flag from %d to %d success."), (BAC_READ_SCHEDULE_FLAG_GROUP_NUMBER)*i, end_temp_instance);
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                 write_success_count++;
-                Sleep(SEND_COMMAND_DELAY_TIME);
+                if (!offline_mode)
+                    Sleep(SEND_COMMAND_DELAY_TIME);
             }
             else
             {
@@ -8996,6 +9019,11 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
             {
                 continue;
             }
+            else if (tp.protocol == 254)
+            {
+                temp_online = true; //虚拟设备显示在线;
+                m_product.at(i).status = true;
+            }
             else
             {
                 temp_online = false;
@@ -11407,7 +11435,7 @@ void CMainFrame::OnControlInputs()
             }
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_INPUT);
-            Input_Window->m_input_list.SetFocus();
+            Input_Window->m_input_list.SetFocus();  
             bacnet_view_number = TYPE_INPUT;
             g_hwnd_now = m_input_dlg_hwnd;
 
@@ -11540,7 +11568,7 @@ void CMainFrame::OnControlPrograms()
                 pDialog[WINDOW_PROGRAM]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_PROGRAM);
-            Program_Window->m_program_list.SetFocus();
+            Program_Window->m_program_list.SetFocus();   
             Program_Window->Reg_Hotkey();
             bacnet_view_number = TYPE_PROGRAM;
             g_hwnd_now = m_pragram_dlg_hwnd;
@@ -11582,7 +11610,7 @@ void CMainFrame::OnControlPrograms()
                 pDialog[WINDOW_PROGRAM]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_PROGRAM);
-            Program_Window->m_program_list.SetFocus();
+            Program_Window->m_program_list.SetFocus();  
 
             CString temp_ui;
             temp_ui.Format(_T("%u"), TYPE_PROGRAM);
@@ -11702,7 +11730,7 @@ void CMainFrame::OnControlOutputs()
                 pDialog[WINDOW_OUTPUT]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_OUTPUT);
-            Output_Window->m_output_list.SetFocus();
+            Output_Window->m_output_list.SetFocus();   
             bacnet_view_number = TYPE_OUTPUT;
             g_hwnd_now = m_output_dlg_hwnd;
 
@@ -11776,7 +11804,7 @@ void CMainFrame::OnControlVariables()
                 pDialog[WINDOW_VARIABLE]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_VARIABLE);
-            Variable_Window->m_variable_list.SetFocus();
+            Variable_Window->m_variable_list.SetFocus();  
             bacnet_view_number = TYPE_VARIABLE;
             g_hwnd_now = m_variable_dlg_hwnd;
 
@@ -11827,7 +11855,7 @@ void CMainFrame::OnControlVariables()
                 pDialog[WINDOW_VARIABLE]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_VARIABLE);
-            Variable_Window->m_variable_list.SetFocus();
+            Variable_Window->m_variable_list.SetFocus();  
 
             CString temp_ui;
             temp_ui.Format(_T("%u"), TYPE_VARIABLE);
@@ -11870,7 +11898,7 @@ void CMainFrame::OnControlWeekly()
                 pDialog[WINDOW_WEEKLY]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_WEEKLY);
-            WeeklyRoutine_Window->m_weeklyr_list.SetFocus();
+            WeeklyRoutine_Window->m_weeklyr_list.SetFocus();  
             WeeklyRoutine_Window->Reg_Hotkey();
             bacnet_view_number = TYPE_WEEKLY;
             g_hwnd_now = m_weekly_dlg_hwnd;
@@ -11910,7 +11938,7 @@ void CMainFrame::OnControlWeekly()
                 pDialog[WINDOW_WEEKLY]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_WEEKLY);
-            WeeklyRoutine_Window->m_weeklyr_list.SetFocus();
+            WeeklyRoutine_Window->m_weeklyr_list.SetFocus();  
 
             CString temp_ui;
             temp_ui.Format(_T("%u"), TYPE_WEEKLY);
@@ -11974,7 +12002,7 @@ void CMainFrame::OnControlAnnualroutines()
                 pDialog[WINDOW_ANNUAL]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_ANNUAL);
-            AnnualRoutine_Window->m_annualr_list.SetFocus();
+            AnnualRoutine_Window->m_annualr_list.SetFocus();  
             AnnualRoutine_Window->Reg_Hotkey();
             bacnet_view_number = TYPE_ANNUAL;
             g_hwnd_now = m_annual_dlg_hwnd;
@@ -12044,7 +12072,7 @@ void CMainFrame::OnControlSettings()
 				Setting_Window->Reset_Setting_Rect();
 				Setting_Window->ShowWindow(SW_SHOW);
             }
-			Setting_Window->SetFocus();
+			//Setting_Window->SetFocus(); 暂时屏蔽 避免焦点切换导致无法F2变更名字;
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_SETTING);
             bacnet_view_number = TYPE_SETTING;
             g_hwnd_now = m_setting_dlg_hwnd;
@@ -12221,7 +12249,7 @@ void CMainFrame::OnControlControllers()
                 pDialog[WINDOW_CONTROLLER]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_CONTROLLER);
-            Controller_Window->m_controller_list.SetFocus();
+            Controller_Window->m_controller_list.SetFocus();  
             bacnet_view_number = TYPE_CONTROLLER;
             g_hwnd_now = m_controller_dlg_hwnd;
 
@@ -12289,7 +12317,7 @@ void CMainFrame::OnControlScreens()
                 pDialog[WINDOW_SCREEN]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_SCREEN);
-            Screen_Window->m_screen_list.SetFocus();
+            Screen_Window->m_screen_list.SetFocus();  
             Screen_Window->Reg_Hotkey();
             bacnet_view_number = TYPE_SCREENS;
             g_hwnd_now = m_screen_dlg_hwnd;
@@ -12387,7 +12415,7 @@ void CMainFrame::OnControlMonitors()
                 pDialog[WINDOW_MONITOR]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_MONITOR);
-            Monitor_Window->m_monitor_list.SetFocus();
+            Monitor_Window->m_monitor_list.SetFocus();   
             Monitor_Window->Reg_Hotkey();
             bacnet_view_number = TYPE_MONITOR;
             g_hwnd_now = m_monitor_dlg_hwnd;
@@ -12521,7 +12549,7 @@ void CMainFrame::OnControlAlarmLog()
                 pDialog[WINDOW_ALARMLOG]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_ALARMLOG);
-            AlarmLog_Window->m_alarmlog_list.SetFocus();
+            AlarmLog_Window->m_alarmlog_list.SetFocus();  
             bacnet_view_number = TYPE_ALARMLOG;
             g_hwnd_now = m_alarmlog_dlg_hwnd;
 			CString temp_ui;
@@ -12628,7 +12656,7 @@ void CMainFrame::OnControlRemotePoint()
                 pDialog[WINDOW_REMOTE_POINT]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(12);	//第12个插入的是远端的点;
-            Remote_Point_Window->m_remote_point_list.SetFocus();
+            Remote_Point_Window->m_remote_point_list.SetFocus();  
             bacnet_view_number = TYPE_READ_REMOTE_POINT_INFO;
 			CString temp_ui;
 			temp_ui.Format(_T("%u"),TYPE_READ_REMOTE_POINT_INFO);		

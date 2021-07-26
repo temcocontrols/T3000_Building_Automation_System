@@ -1305,8 +1305,10 @@ int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_
                 break;
             }
             temp_invoke_id = WriteProgramData(deviceid,n_command,start_instance,end_instance,npackage);
-
-            Sleep(SEND_COMMAND_DELAY_TIME);
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
+            else
+                return 1;
         }
         while (temp_invoke_id<0);
         if(send_status)
@@ -2105,8 +2107,10 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
 				temp_invoke_id = WritePrivateData(g_bac_instance,ncommand,nstart_index,nstop_index);
 			else
 				temp_invoke_id = WritePrivateData(write_object_list,ncommand,nstart_index,nstop_index);
-
-			Sleep(SEND_COMMAND_DELAY_TIME);
+            if (offline_mode)
+                return 1;
+            else
+			    Sleep(SEND_COMMAND_DELAY_TIME);
 		} while (temp_invoke_id<0);
 		if(send_status)
 		{
