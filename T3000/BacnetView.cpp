@@ -931,6 +931,7 @@ Update by Fance
 #include "ShowMessageDlg.h"
 
 #include "ControlBasicEditorView.h"
+
 int g_gloab_bac_comport = 1;
 int g_gloab_bac_baudrate = 19200;
 CString temp_device_id,temp_mac,temp_vendor_id;
@@ -980,6 +981,7 @@ HANDLE read_rs485_thread = NULL; // RS485的设备 通用;
 HANDLE write_indb_thread = NULL; //将资料写入数据库的线程;
 int connect_way = 0;  // 1 为MODBUS RS485    2 为 MODBUS TCP
 HANDLE hbip_whois_thread = NULL; //处理回复 I am 线程
+
 
 
 
@@ -2321,7 +2323,189 @@ void CDialogCM5_BacNet::InitialBacnetWindow()
 		Tab_Initial();
 	}
 }
+/*
+Function name : Read_Bacnet_Properties
+inputs :
+		uint32_t deviceid , device identification id
+		BACNET_OBJECT_TYPE object_type , device instance
+		uint32_t object_instance, device object instance
+		int property_id , Property to read
+		BACNET_APPLICATION_DATA_VALUE& value, return value of bacnet read data
+		uint8_t retrytime , count to retry request
+output :
+		Cstring
+Description: this function read all the requested property and return the result in string formate.
+*/
+CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE& value, uint8_t retrytime)
+{
+	BACNET_APPLICATION_DATA_VALUE temp_value;
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceid, object_type, object_instance, property_id, value, retrytime);
+	if (invoke_id >= 0)
+	{
+		CString tmpString;
+		CFile file;
+		CString temp_bacnet_logfile;
+		temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
+		file.Open(temp_bacnet_logfile, CFile::modeRead, NULL);
+		DWORD len = file.GetLength();
+		char* Buf = new char[len + 1];
+		Buf[len + 1] = 0;  //0ÖÕÖ¹×Ö·û´®£¬ÓÃÓÚÊä³ö¡£
+		file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufÊÇÓÃÓÚ½ÓÊÕ¶ÁÈ¡µ½µÄÊý¾ÝµÄBufÖ¸ÕënCountÊÇ´ÓÎÄ¼þ¶ÁÈ¡µÄ×Ö½ÚÊý
+		file.Close();
+		CString temp_cs;
+		MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, tmpString.GetBuffer(len), len);
+		tmpString.ReleaseBuffer();
 
+		tmpString.TrimRight();
+		tmpString.Replace(_T("{"), _T(" "));
+		tmpString.Replace(_T("}"), _T(" "));
+		tmpString.Replace(_T("("), _T(" "));
+		tmpString.Replace(_T(")"), _T(" "));
+
+		return tmpString;
+	}
+	return NULL;
+}
+/*
+Function name : AddBacnetInputData
+inputs : 
+		CString temp_string ,  define type of input
+		int deviceInstance , device instance
+		int objInstace ,  device object instance
+		int index , index of input_data array.
+output :
+		void
+Description: this function read all the required properties of bacnet device and add it to input_data list to populate in input grid.
+*/
+void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,int index)
+{
+	BACNET_OBJECT_TYPE objectType = OBJECT_ANALOG_INPUT;
+	BACNET_PROPERTY_ID propertyID ;
+	BACNET_APPLICATION_DATA_VALUE temp_value;
+	Str_in_point tmp = Str_in_point();
+
+	if (temp_string == "Analog Input")
+	{
+		tmp.digital_analog = BAC_UNITS_ANALOG;
+	}
+	else
+	{
+		tmp.digital_analog = BAC_UNITS_DIGITAL;
+	}
+
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+			memcpy_s(tmp.label, STR_IN_LABEL, temp_value.type.Character_String.value, STR_IN_LABEL);
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+			memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
+
+			tmp.value = temp_value.type.Unsigned_Int;
+		}
+		/*tmp.value = _ttoi(response);*/
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
+
+			tmp.range = temp_value.type.Enumerated;
+		}
+	}
+	/*response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, PROP_DEVICE_TYPE, temp_value, 3);
+		if (response)
+		{
+			unsigned* found_index = new unsigned();
+			bool flag = indtext_by_istring(bacnet_engineering_unit_names, (char*)response.GetBuffer(),
+				found_index);
+			tmp.range = *found_index;
+		}
+		*/
+	m_Input_data.at(index) = tmp;
+	
+}
+/*
+Function name : AddBacnetOutputData
+inputs :
+		CString temp_string ,  define type of input
+		int deviceInstance , device instance
+		int objInstace ,  device object instance
+		int index , index of input_data array.
+output :
+		void
+Description: this function read all the required properties of bacnet device and add it to input_data list to populate in input grid.
+*/
+
+void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace, int index)
+{
+	BACNET_OBJECT_TYPE objectType = OBJECT_ANALOG_OUTPUT;
+	BACNET_PROPERTY_ID propertyID;
+	BACNET_APPLICATION_DATA_VALUE temp_value;
+	Str_out_point tmp = Str_out_point();
+
+	if (temp_string == "Analog Output")
+	{
+		tmp.digital_analog = BAC_UNITS_ANALOG;
+	}
+	else
+	{
+		tmp.digital_analog = BAC_UNITS_DIGITAL;
+	}
+
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+			memcpy_s(tmp.label, STR_IN_LABEL, temp_value.type.Character_String.value, STR_IN_LABEL);
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+			memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
+
+			tmp.value = temp_value.type.Unsigned_Int;
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
+
+			tmp.range = temp_value.type.Enumerated;
+		}
+	}
+	/*response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, PROP_DEVICE_TYPE, temp_value, 3);
+		if (response)
+		{
+			unsigned* found_index = new unsigned();
+			bool flag = indtext_by_istring(bacnet_engineering_unit_names, (char*)response.GetBuffer(),
+				found_index);
+			tmp.range = *found_index;
+		}
+		*/
+	m_Output_data.at(index) = tmp;
+
+}
 static bool already_retry = false;
 
 //INPUT int test_function_return_value();
@@ -2339,7 +2523,8 @@ void CDialogCM5_BacNet::Fresh()
         (g_protocol != MODBUS_TCPIP) &&
         (g_protocol != PROTOCOL_BIP_T0_MSTP_TO_MODBUS) &&
         (g_protocol != PROTOCOL_MB_TCPIP_TO_MB_RS485) &&
-        (g_protocol != PROTOCOL_MSTP_TO_MODBUS))
+        (g_protocol != PROTOCOL_MSTP_TO_MODBUS) &&
+		(g_protocol != PROTOCOL_THIRD_PARTY_BAC_BIP))
 	{
 		return;
 	}
@@ -2369,7 +2554,66 @@ void CDialogCM5_BacNet::Fresh()
 
 	}
 	m_user_level = LOGIN_SUCCESS_FULL_ACCESS;
-	if(selected_product_Node.protocol == PROTOCOL_GSM)
+	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
+	{
+			Send_WhoIs_Global(-1, -1);
+			Sleep(10);
+			BACNET_OBJECT_TYPE objectType = OBJECT_DEVICE;
+			BACNET_PROPERTY_ID propertyID = PROP_OBJECT_LIST;
+			int deviceInstance = g_bac_instance;
+			int objInstace = g_bac_instance;
+			bacnet_device_type = PM_THIRD_PARTY_DEVICE;
+			BACNET_APPLICATION_DATA_VALUE temp_value;
+			CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 3);
+			if (response!="")
+			{
+				CStringArray temp_array;
+				SplitCStringA(temp_array, response, _T(","));
+				int inputcount=0,outputcount = 0;
+				for (int i = 0; i < temp_array.GetSize(); i++)
+				{
+					if (temp_array.GetAt(i) == "Device")
+					{
+						i++;
+						continue;
+					}
+
+					objInstace = atoi((char*)temp_array.GetAt(i + 1).GetString());
+					if (temp_array.GetAt(i) == "Analog Input")
+					{
+						objectType = OBJECT_ANALOG_INPUT;
+						AddBacnetInputData(temp_array.GetAt(i), deviceInstance, objInstace, inputcount);
+						inputcount++;
+					}
+					else if (temp_array.GetAt(i) == "Analog Output")
+					{
+						objectType = OBJECT_ANALOG_OUTPUT;
+						AddBacnetOutputData(temp_array.GetAt(i), deviceInstance, objInstace, outputcount);
+						outputcount++;
+					}
+					i++;
+				}
+			}
+			
+		//Variable_Window->SetTimer(1, 10000, NULL);  //如果是MSTP协议不要刷新的那么频繁;
+		//Input_Window->SetTimer(1, 10000, NULL);
+		//Output_Window->SetTimer(1, 10000, NULL);
+
+		//if (Input_Window->IsWindowVisible() == false)
+		//{
+		//	Input_Window->ShowWindow(SW_SHOW);
+		//	Input_Window->window_max = false;
+		//	Input_Window->Reset_Input_Rect();
+		//}
+		//g_hwnd_now = m_input_dlg_hwnd;
+		//Input_Window->m_input_list.SetFocus();
+		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+		
+		return;
+		
+	}
+	else if(selected_product_Node.protocol == PROTOCOL_GSM)
 	//if(0)	//GSM连接
 	{
 		Gsm_communication = true;
@@ -7083,7 +7327,7 @@ BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 
 DWORD WINAPI Handle_Bip_whois_Thread(LPVOID lpvoid)
 {
-    return 1;
+    //return 1;
     Sleep(1);
     vector <_Bac_Scan_Com_Info> temp_vector;
     for (int i = 0; i < m_bac_handle_Iam_data.size(); i++)

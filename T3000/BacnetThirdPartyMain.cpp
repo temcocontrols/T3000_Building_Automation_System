@@ -194,10 +194,30 @@ void CBacnetThirdPartyMain::OnBnClickedButtonThirdOk()
 
     GetDlgItem(IDC_EDIT_DEVICE_ID)->GetWindowTextW(temp_cs);
     device_id = _wtoi(temp_cs);
-    
 
-    int nret = Bacnet_Read_Property_Multiple(device_id, (BACNET_OBJECT_TYPE)object_identifier, object_instance, property_identifier);
-    if (nret >= 0)
+    CString product_name;
+    BACNET_APPLICATION_DATA_VALUE temp_value;
+    //for (int objId = 0; objId <= OBJECT_LIGHTING_OUTPUT; objId++)
+    {
+        int invoke_id = Bacnet_Read_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)object_identifier, object_instance, (BACNET_PROPERTY_ID)property_identifier, temp_value, 3);
+        if (invoke_id >= 0)
+        {
+            CFile file;
+            CString temp_bacnet_logfile;
+            temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
+            file.Open(temp_bacnet_logfile, CFile::modeRead, NULL);
+            DWORD len = file.GetLength();
+            char* Buf = new char[len + 1];
+            Buf[len + 1] = 0;  //0终止字符串，用于输出。
+            file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
+            CString temp_cs;
+            MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, bacnet_string.GetBuffer(len), len);
+            bacnet_string.ReleaseBuffer();
+            MessageBox(bacnet_string);
+        }
+    }
+    //int nret = Bacnet_Read_Properties(device_id, (BACNET_OBJECT_TYPE)object_identifier, object_instance, property_identifier);
+   /* if (nret >= 0)
     {
         CFile file;
         CString temp_bacnet_logfile;
@@ -211,5 +231,5 @@ void CBacnetThirdPartyMain::OnBnClickedButtonThirdOk()
         MultiByteToWideChar(CP_ACP, 0, (char *)Buf, (int)strlen((char *)Buf) + 1, temp_cs.GetBuffer(len), len);
         temp_cs.ReleaseBuffer();
         MessageBox(temp_cs);
-    }
+    }*/
 }

@@ -319,4 +319,4 @@ typedef struct _MessageInvokeIDInfo
 //*********************************link to dll***************************
 
 
-//#define USE_THIRD_PARTY_FUNC 1
+#define USE_THIRD_PARTY_FUNC 1

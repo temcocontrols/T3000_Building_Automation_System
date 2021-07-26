@@ -683,18 +683,30 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetCellEnabled(i,OUTPUT_LOW_VOLTAGE,1);
 			m_output_list.SetCellEnabled(i,OUTPUT_HIGH_VOLTAGE,1);
 			m_output_list.SetCellEnabled(i,OUTPUT_PWM_PERIOD,1);
-			if(m_Output_data.at(i).range == 0)
-				m_output_list.SetItemText(i,OUTPUT_RANGE,_T("Unused"));
-			else if(m_Output_data.at(i).range < (sizeof(OutPut_List_Analog_Range)/sizeof(OutPut_List_Analog_Range[0])))
-				m_output_list.SetItemText(i,OUTPUT_RANGE,OutPut_List_Analog_Range[m_Output_data.at(i).range]);
+			if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
+			{
+				CString outputunit;
+				MultiByteToWideChar(CP_ACP, 0, (char*)bacnet_engineering_unit_names[m_Output_data.at(i).range].pString,
+					(int)strlen((char*)bacnet_engineering_unit_names[m_Output_data.at(i).range].pString) + 1,
+					outputunit.GetBuffer(MAX_PATH), MAX_PATH);
+				outputunit.ReleaseBuffer();
+				m_output_list.SetItemText(i, OUTPUT_UNITE, outputunit);
+				m_output_list.SetItemText(i, OUTPUT_RANGE, outputunit);
+			}
 			else
-				m_output_list.SetItemText(i,OUTPUT_RANGE,_T("Out of range"));
+			{
+				if (m_Output_data.at(i).range == 0)
+					m_output_list.SetItemText(i, OUTPUT_RANGE, _T("Unused"));
+				else if (m_Output_data.at(i).range < (sizeof(OutPut_List_Analog_Range) / sizeof(OutPut_List_Analog_Range[0])))
+					m_output_list.SetItemText(i, OUTPUT_RANGE, OutPut_List_Analog_Range[m_Output_data.at(i).range]);
+				else
+					m_output_list.SetItemText(i, OUTPUT_RANGE, _T("Out of range"));
 
-			if(m_Output_data.at(i).range < (sizeof(OutPut_List_Analog_Units)/sizeof(OutPut_List_Analog_Units[0])))
-				m_output_list.SetItemText(i,OUTPUT_UNITE,OutPut_List_Analog_Units[m_Output_data.at(i).range]);
-			else
-				m_output_list.SetItemText(i,OUTPUT_UNITE,_T("Unused"));
-
+				if (m_Output_data.at(i).range < (sizeof(OutPut_List_Analog_Units) / sizeof(OutPut_List_Analog_Units[0])))
+					m_output_list.SetItemText(i, OUTPUT_UNITE, OutPut_List_Analog_Units[m_Output_data.at(i).range]);
+				else
+					m_output_list.SetItemText(i, OUTPUT_UNITE, _T("Unused"));
+			}
 			CString temp_low,temp_high;
 			temp_low.Format(_T("%d"),0);
 			temp_high.Format(_T("%d"),0);
@@ -1026,6 +1038,16 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		{
 			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,Changed_Item,REFRESH_ON_ITEM);
 			return 0;
+		}
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_CHARACTER_STRING;
+			temp_value->context_specific = false;
+			WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
+			temp_value->type.Character_String.encoding = 0;
+			temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_ANALOG_OUTPUT, Changed_Item, PROP_DESCRIPTION, temp_value);
 		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);

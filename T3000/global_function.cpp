@@ -4900,10 +4900,10 @@ int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_t
     strcpy(argv[2], temp_obj_type);
     strcpy(argv[3], temp_obj_instance);
     strcpy(argv[4], temp_property_id);
-    //argv[1] = "137445";
-    //argv[2] = "0";
-    //argv[3] = "2";
-    //argv[4] = "8";  //8是读取所有的属性;
+    //strcpy(argv[1] , "444");
+    //strcpy(argv[2] , "0");
+    //strcpy(argv[3] , "2");
+    //strcpy(argv[4] , "8");  //8是读取所有的属性;
 
     //argv[1] = "115909";
     //argv[2] = "8";
@@ -6403,16 +6403,16 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
             {
                 port_bind_results = Open_bacnetSocket2(bind_local_ip, BACNETIP_PORT + temp_add_port, my_sokect);
             }
-            if (port_bind_results)  //如果绑定47808端口失败 尝试绑定其他端口
+            if (port_bind_results) { //如果绑定47808端口失败 尝试绑定其他端口
+                bip_set_socket(my_sokect);
+                //bip_set_port(49338);
+                bip_set_port(htons(BACNETIP_PORT + temp_add_port));
                 break;
+            }
         }
 
         if(!port_bind_results)
             return false;
-
-        bip_set_socket(my_sokect);
-        //bip_set_port(49338);
-		bip_set_port(htons(47808));
 		
 
         static in_addr BIP_Broadcast_Address;
@@ -6933,6 +6933,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
         CStringArray temp_strip;
         SplitCStringA(temp_strip, strIPAdress, _T("."));
         CString temp_ip;
+        if(strIPAdress !="")
         temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
 
 
@@ -6949,7 +6950,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
             continue;
 
 
-        if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
+        //if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
         {
             find_network = true;
             strIPAdress = g_Vector_Subnet.at(i).StrIP;
@@ -13878,4 +13879,27 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
     return nret_type;
 }
 
+bool indtext_by_istring(
+    INDTEXT_DATA* data_list,
+    const char* search_name,
+    unsigned* found_index)
+{
+    bool found = false;
+    unsigned index = 0;
 
+    if (data_list && search_name) {
+        while (data_list->pString) {
+            if (stricmp(data_list->pString, search_name) == 0) {
+                index = data_list->index;
+                found = true;
+                break;
+            }
+            data_list++;
+        }
+    }
+
+    if (found && found_index)
+        *found_index = index;
+
+    return found;
+}
