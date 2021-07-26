@@ -171,7 +171,7 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_MENU_APP             "About ISPTool"
+    ttimer                  "About ISPTool"
     ID_MENU_ABOUT           "About ISPTool"
 END
 

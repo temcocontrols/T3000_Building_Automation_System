@@ -1024,9 +1024,9 @@ struct func_table {
  "ABS",ABS,
  "AVG",AVG,
  "COM1",COM_1,
- "CONPROP", CONPROP,
- "CONRATE", CONRATE,
- "CONRESET", CONRESET,
+ "PIDPROP", PIDPROP,
+ "PIDRATE", PIDRATE,
+ "PIDRESET", PIDRESET,
  "CLEARPORT", CLEARPORT,
  "DOW",DOW,
  "DOM",DOM,
@@ -3169,9 +3169,9 @@ void parse_atom( float  *value )
 				 case INKEYD:
 				 case OUTPUTD:
 								 address_item = 1;
-				 case CONPROP:
-				 case CONRATE:
-				 case CONRESET:
+				 case PIDPROP:
+				 case PIDRATE:
+				 case PIDRESET:
 				 case Tbl:
 				 case WR_ON:
 				 case WR_OFF:
@@ -6083,9 +6083,9 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				 case SQR:
 				 case _Status:
          case RUNTIME:
-				 case CONPROP:
-				 case CONRATE:
-				 case CONRESET:
+				 case PIDPROP:
+				 case PIDRATE:
+				 case PIDRESET:
 				 case Tbl:
 				 case WR_ON:
 				 case WR_OFF:
@@ -7469,9 +7469,9 @@ int	desexpr(void)
 				 case MIN:
 				 case INKEYD:
 				 case	OUTPUTD:
-				 case CONPROP:
-				 case CONRATE:
-				 case CONRESET:
+				 case PIDPROP:
+				 case PIDRATE:
+				 case PIDRESET:
 				 case Tbl:
 				 case WR_ON:
 				 case WR_OFF:
