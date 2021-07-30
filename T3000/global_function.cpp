@@ -4606,7 +4606,7 @@ int handle_read_pic_data_ex(char *npoint,int nlength)
 
 
 
-int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE  *object_value, uint8_t priority)
+int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE  *object_value, uint8_t priority, BACNET_READ_PROPERTY_DATA* objectData)
 {
     int n_invoke_id = 0;
     bool status = false;
@@ -4629,13 +4629,53 @@ int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, u
     //test123.type.Character_String.length = 10;
     //strcpy(test123.type.Character_String.value, "1123");
 
+    if (property_id = PROP_WEEKLY_SCHEDULE)
+    {
+        if (objectData != NULL)
+        {
+            
+            for (int i = 0; i < 3; i++)
+            {
+                int send_status = true;
+                int temp_invoke_id = -1;
+                int	resend_count = 0;
+                send_status = true;
+                do
+                {
+                    resend_count++;
+                    if (resend_count > 10)
+                    {
+                        send_status = false;
+                        break;
+                    }
+                    temp_invoke_id = Send_Write_Property_Request_Data(deviceid, object_type,
+                        object_instance, (BACNET_PROPERTY_ID)object_props[property], &objectData->application_data[0], objectData->application_data_len,
+                        priority, BACNET_ARRAY_ALL);
+                } while (temp_invoke_id < 0);
 
-
-    n_invoke_id = Send_Write_Property_Request(deviceid,
-        object_type, object_instance,
-        (BACNET_PROPERTY_ID)object_props[property], object_value,
-        priority,
-        BACNET_ARRAY_ALL);
+                if (send_status)
+                {
+                    for (int i = 0; i < 200; i++)
+                    {
+                        Sleep(10);
+                        if (tsm_invoke_id_free(temp_invoke_id))
+                        {
+                            return 1;
+                            Sleep(10);
+                        }
+                    }
+                }
+                Sleep(SEND_COMMAND_DELAY_TIME);
+            }
+        }
+    }
+    else {
+        n_invoke_id = Send_Write_Property_Request(deviceid,
+            object_type, object_instance,
+            (BACNET_PROPERTY_ID)object_props[property], object_value,
+            priority,
+            BACNET_ARRAY_ALL);
+    }
     return n_invoke_id;
 }
 
@@ -5198,17 +5238,41 @@ void localhandler_read_property_ack(
 {
     int len = 0;
     BACNET_READ_PROPERTY_DATA data;
-
     (void)src;
     (void)service_data;        /* we could use these... */
     len = rp_ack_decode_service_request(service_request, service_len, &data);
-
     if (len > 0)
     {
         //local_rp_ack_print_data(&data);
         BACNET_APPLICATION_DATA_VALUE value;
         local_value_rp_ack_print_data(&data,value);
         
+        if (data.object_property == PROP_WEEKLY_SCHEDULE)
+        {
+            int index = 0;
+            bool openTagFound = false;
+            for (int u = 0 ;u < data.application_data_len; u++)
+            {
+               
+                uint8_t tempval = data.application_data[u];
+                if (IS_OPENING_TAG(tempval) && !openTagFound) {
+                    openTagFound = true;
+                }
+                else if (IS_CLOSING_TAG(tempval)) {
+                    bacnet_string += "/n";
+                    index++;
+                    openTagFound = false;
+                }
+                else {
+                    bacnet_string += std::to_string(tempval).c_str();
+                    bacnet_string += ",";
+                }
+                int i = 0;
+                if (index > 7)
+                    break;
+            }
+            int i = 0;
+        }
 #if 1
         if (data.object_property == PROP_PRIORITY_ARRAY)
         {
@@ -6299,7 +6363,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
     {
         m_bac_handle_Iam_data.push_back(temp_1);
 #ifdef USE_THIRD_PARTY_FUNC
-        if (vendor_id != 148) //如果不是Temco的ID 才当作第三方设备
+        //if (vendor_id != 148) //如果不是Temco的ID 才当作第三方设备
         {
             _Bac_Scan_Com_Info *temp = new _Bac_Scan_Com_Info;
             memcpy(temp, &temp_1, sizeof(_Bac_Scan_Com_Info));
@@ -6402,7 +6466,7 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
             if (port_bind_results) { //如果绑定47808端口失败 尝试绑定其他端口
                 bip_set_socket(my_sokect);
                 //bip_set_port(49338);
-                bip_set_port(htons(BACNETIP_PORT + temp_add_port));
+                bip_set_port(htons(47808));
                 break;
             }
         }
@@ -6729,7 +6793,6 @@ void local_value_rp_ack_print_data(BACNET_READ_PROPERTY_DATA * data , BACNET_APP
     if (data)
     {
         rp_ack_print_data(data);
-
         //AfxMessageBox(test_pop_up);
 
 

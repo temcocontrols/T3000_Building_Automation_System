@@ -8,6 +8,7 @@
 
 #include "global_function.h"
 #include "global_define.h"
+
 // CBacnetScheduleTime dialog
 HWND m_WeeklyParent_Hwnd;
 IMPLEMENT_DYNAMIC(CBacnetScheduleTime, CDialogEx)
@@ -372,6 +373,7 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
 	m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[m_row][m_col - 1].time_hours = chour;
 	m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[m_row][m_col - 1].time_minutes = cmin;
 
+	
 
     if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 492)
     {
@@ -410,7 +412,46 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
             }
         }
     }
+	if (product_type == PM_THIRD_PARTY_DEVICE)
+	{
+		BACNET_READ_PROPERTY_DATA writeData;
+		writeData.object_instance = weekly_list_line + 1;
+		writeData.object_property = PROP_WEEKLY_SCHEDULE;
+		writeData.object_type = OBJECT_SCHEDULE;
+		writeData.application_data_len = 0;
+		writeData.application_data = new uint8_t;
+		writeData.application_data[MAX_APDU] = { 0 };
+		int len = encode_opening_tag(writeData.application_data, 3);
+		writeData.application_data_len += len;
+		for (int x = 0; x < 9; x++)
+		{
+			len = encode_opening_tag(writeData.application_data, 0);
+			writeData.application_data_len += len;
+			for (int y = 0; y < 8; y++)
+			{
 
+				writeData.application_data[writeData.application_data_len] = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours;
+				writeData.application_data_len += 1;
+				writeData.application_data[writeData.application_data_len] = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_minutes;
+				writeData.application_data_len += 1;
+				writeData.application_data[writeData.application_data_len] = 0;//sec
+				writeData.application_data_len += 1;
+				writeData.application_data[writeData.application_data_len] = 0;//millSec
+				writeData.application_data_len += 1;
+				writeData.application_data[writeData.application_data_len] = TPYE_BACAPP_ENUMERATED;//valueType
+				writeData.application_data_len += 1;
+				writeData.application_data[writeData.application_data_len] = (uint8_t)m_Schedual_time_flag.at(weekly_list_line).Time_flag[m_row][m_col - 1];//valueType
+				writeData.application_data_len += 1;
+			}
+
+			len = encode_closing_tag(writeData.application_data, 0);
+			writeData.application_data_len += len;
+		}
+		len = encode_closing_tag(writeData.application_data, 3);
+		writeData.application_data_len += len;
+		Bacnet_Write_Properties(g_bac_instance, writeData.object_type, writeData.object_instance, writeData.object_property, NULL, 16, &writeData);
+
+	}
 	m_schedule_time_list.SetItemText(m_row,m_col,temp_cs);
 
 	m_schedual_time_picker.ShowWindow(SW_HIDE);

@@ -148,7 +148,7 @@ __declspec(dllexport) void ShutDownMstpGlobal(uint8_t n_time);
         BACNET_APPLICATION_DATA_VALUE * object_value,
         uint8_t priority,
         uint32_t array_index);
-    uint8_t Send_Write_Property_Request_Data(
+ __declspec(dllexport)  uint8_t Send_Write_Property_Request_Data(
         uint32_t device_id,
         BACNET_OBJECT_TYPE object_type,
         uint32_t object_instance,

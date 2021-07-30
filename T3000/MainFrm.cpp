@@ -11845,7 +11845,7 @@ void CMainFrame::OnControlVariables()
 void CMainFrame::OnControlWeekly()
 {
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
-    if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
+    if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP))
     {
         if((m_user_level !=	LOGIN_SUCCESS_ROUTINE_MODE) &&
                 (m_user_level != LOGIN_SUCCESS_FULL_ACCESS) &&

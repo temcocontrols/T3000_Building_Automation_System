@@ -2506,6 +2506,87 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 	m_Output_data.at(index) = tmp;
 
 }
+/*
+Function name : AddBacnetOutputData
+inputs :
+		CString temp_string ,  define type of input
+		int deviceInstance , device instance
+		int objInstace ,  device object instance
+		int index , index of input_data array.
+output :
+		void
+Description: this function read all the required properties of bacnet device and add it to input_data list to populate in input grid.
+*/
+
+void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInstace, int index)
+{
+	BACNET_OBJECT_TYPE objectType = OBJECT_SCHEDULE;
+	BACNET_PROPERTY_ID propertyID;
+	BACNET_APPLICATION_DATA_VALUE temp_value;
+	Str_weekly_routine_point tmp = Str_weekly_routine_point();
+
+
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+			memcpy_s(tmp.description, STR_WEEKLY_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_WEEKLY_DESCRIPTION_LENGTH);
+		}
+	}
+
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+			memcpy_s(tmp.label, STR_WEEKLY_LABEL_LENGTH, temp_value.type.Character_String.value, STR_WEEKLY_LABEL_LENGTH);
+		}
+	}
+
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
+
+			tmp.value = temp_value.type.Unsigned_Int;
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+
+			tmp.auto_manual = temp_value.type.Boolean;
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_WEEKLY_SCHEDULE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (bacnet_string) 
+		{
+
+			CStringArray temp_array;
+			SplitCStringA(temp_array, bacnet_string, _T("/n"));
+			for (int i = 0; i < temp_array.GetSize(); i++)
+			{
+				CStringArray temp_schedule;
+				SplitCStringA(temp_schedule, temp_array[i], _T(","));
+				int offset = 0;
+					for (int j = 0; offset < temp_schedule.GetSize(); j++)
+					{
+						if (_ttoi(temp_schedule.GetAt(offset + 1)) != 0 || _ttoi(temp_schedule.GetAt(offset + 2)) != 0)
+						{
+							m_Schedual_Time_data.at(objInstace - 1).Schedual_Day_Time[j][i].time_hours = _ttoi(temp_schedule.GetAt(offset + 1));
+							m_Schedual_Time_data.at(objInstace - 1).Schedual_Day_Time[j][i].time_minutes = _ttoi(temp_schedule.GetAt(offset + 2));
+						}
+						offset += 7;
+					}
+			}
+			bacnet_string = "";
+		}
+	}
+	m_Weekly_data.at(index) = tmp;
+
+}
 static bool already_retry = false;
 
 //INPUT int test_function_return_value();
@@ -2569,29 +2650,49 @@ void CDialogCM5_BacNet::Fresh()
 			{
 				CStringArray temp_array;
 				SplitCStringA(temp_array, response, _T(","));
-				int inputcount=0,outputcount = 0;
-				for (int i = 0; i < temp_array.GetSize(); i++)
+				int inputcount=0,outputcount = 0, schedulecount = 0;
+				if (temp_array.GetSize() > 1)
 				{
-					if (temp_array.GetAt(i) == "Device")
+					for (int i = 0; i < temp_array.GetSize(); i++)
 					{
-						i++;
-						continue;
-					}
+						if (temp_array.GetAt(i) == "Device")
+						{
+							i++;
+							continue;
+						}
 
-					objInstace = atoi((char*)temp_array.GetAt(i + 1).GetString());
-					if (temp_array.GetAt(i) == "Analog Input")
-					{
-						objectType = OBJECT_ANALOG_INPUT;
-						AddBacnetInputData(temp_array.GetAt(i), deviceInstance, objInstace, inputcount);
-						inputcount++;
+						objInstace = atoi((char*)temp_array.GetAt(i + 1).GetString());
+						unsigned int index;
+
+						/*if (temp_array.GetAt(i) == "Analog Input")
+						{
+							if (outputcount < BAC_INPUT_ITEM_COUNT)
+							{
+								objectType = OBJECT_ANALOG_INPUT;
+								AddBacnetInputData(temp_array.GetAt(i), deviceInstance, objInstace, inputcount);
+								inputcount++;
+							}
+						}
+						else if (temp_array.GetAt(i) == "Analog Output")
+						{
+							if (outputcount < BAC_OUTPUT_ITEM_COUNT)
+							{
+								objectType = OBJECT_ANALOG_OUTPUT;
+								AddBacnetOutputData(temp_array.GetAt(i), deviceInstance, objInstace, outputcount);
+								outputcount++;
+							}
+						}
+						else*/ if (temp_array.GetAt(i) == "Schedule")
+						{
+							if (outputcount < BAC_SCHEDULE_COUNT)
+							{
+								objectType = OBJECT_ANALOG_OUTPUT;
+								AddBacnetScheduleData(temp_array.GetAt(i), deviceInstance, objInstace, schedulecount);
+								schedulecount++;
+							}
+						}
+						i++;
 					}
-					else if (temp_array.GetAt(i) == "Analog Output")
-					{
-						objectType = OBJECT_ANALOG_OUTPUT;
-						AddBacnetOutputData(temp_array.GetAt(i), deviceInstance, objInstace, outputcount);
-						outputcount++;
-					}
-					i++;
 				}
 			}
 			
@@ -2608,7 +2709,8 @@ void CDialogCM5_BacNet::Fresh()
 		//g_hwnd_now = m_input_dlg_hwnd;
 		//Input_Window->m_input_list.SetFocus();
 		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
-		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+		::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+		::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
 		
 		return;
 		
@@ -7319,7 +7421,7 @@ BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 
 DWORD WINAPI Handle_Bip_whois_Thread(LPVOID lpvoid)
 {
-    //return 1;
+    return 1;
     Sleep(1);
     vector <_Bac_Scan_Com_Info> temp_vector;
     for (int i = 0; i < m_bac_handle_Iam_data.size(); i++)
