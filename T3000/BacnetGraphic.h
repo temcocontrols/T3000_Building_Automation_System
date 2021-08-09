@@ -232,7 +232,7 @@ const int Y_HIGHT = 500;
 const int STATIC_INTERVAL = 200;	//14 个Lable 之间的间隔;
 const int STATIC_LABLE_WIDTH = 140; //每个Lable 的宽度;
 //const int STATIC_LABLE_HIGHT = 25; //高度;
-const int STATIC_LABLE_HIGHT = 40; //高度;
+const int STATIC_LABLE_HIGHT = 36; //高度;
 
 
 const int DIGITAL_X_ORIGIN = 200;	//draw the digital graphic in this range;

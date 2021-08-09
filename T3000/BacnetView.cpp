@@ -2138,7 +2138,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_USER_LOGIN]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_REMOTE_POINT]->ShowWindow(SW_HIDE);
     g_hwnd_now = m_input_dlg_hwnd;
-	Input_Window->m_input_list.SetFocus();
+	//Input_Window->m_input_list.SetFocus(); 暂时屏蔽 避免焦点切换导致无法F2变更名字;
 
 	SetTimer(BAC_RESET_WINDOW_TIMER,10,NULL);
 //保存当前选择
@@ -2998,31 +2998,39 @@ void CDialogCM5_BacNet::Fresh()
 				int temp_check_again = Read_Multi(g_tstat_id, temp_buffer, 32, 72, 5);
 				if (temp_check_again == -12)
 				{
+					CString temp_db_ini_folder;
+					temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
+
+					int is_local_temco_net = GetPrivateProfileInt(_T("Setting"), _T("LocalTemcoNet"), 0, temp_db_ini_folder);
+					if (is_local_temco_net) //Temco 本地局域网 显示debug窗口 用于工程师调试信息;
+					{
+						CShowMessageDlg dlg;
+						CString temp_message;
+						temp_message.Format(_T("Device Bacnet network abnormal, please check it. Please reconnect later."));
+						CString cs_panel_name;
+						CString cs_ip_port;
+						cs_panel_name = _T("Panel Name:") + selected_product_Node.NameShowOnTree + _T("\r\n");
+						CString temp_port;
+						temp_port.Format(_T("%d"), nport);
+						cs_ip_port = _T("IP :") + nconnectionip + _T("  Port :") + temp_port + _T("\r\n");
+						CString cs_obj_instance;
+						CString temp1;
+						temp1.Format(_T("%u"), selected_product_Node.object_instance);
+						cs_obj_instance = _T("Device instance: ") + temp1 + _T("\r\n");
+						CString TotalMessage;
+						TotalMessage = cs_panel_name + cs_ip_port + cs_obj_instance + temp_message;
+
+						dlg.SetStaticText(TotalMessage);
+						//dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+						dlg.SetStaticTextColor(RGB(0, 0, 0));
+						dlg.SetStaticTextSize(22, 16);
+						dlg.SetEvent(EVENT_MESSAGE_ONLY);
+						dlg.DoModal();
+						return;
+					}
+
 					MODE_SUPPORT_PTRANSFER = 0;
 					int n_ret_write = write_one(g_tstat_id, 33, 111, 3);
-
-					CShowMessageDlg dlg;
-					CString temp_message;
-					temp_message.Format(_T("Device Bacnet network abnormal, being repaired. Please reconnect later."));
-					CString cs_panel_name;
-					CString cs_ip_port;
-					cs_panel_name = _T("Panel Name:") + selected_product_Node.NameShowOnTree + _T("\r\n");
-					CString temp_port;
-					temp_port.Format(_T("%d"), nport);
-					cs_ip_port = _T("IP :") + nconnectionip + _T("  Port :") + temp_port + _T("\r\n");
-					CString cs_obj_instance;
-					CString temp1;
-					temp1.Format(_T("%u"), selected_product_Node.object_instance);
-					cs_obj_instance = _T("Device instance: ") + temp1 + _T("\r\n");
-					CString TotalMessage;
-					TotalMessage = cs_panel_name + cs_ip_port + cs_obj_instance + temp_message;
-
-					dlg.SetStaticText(TotalMessage);
-					//dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
-					dlg.SetStaticTextColor(RGB(0, 0, 0));
-					dlg.SetStaticTextSize(22, 16);
-					dlg.SetEvent(EVENT_MESSAGE_ONLY);
-					dlg.DoModal();
 
 					return;
 				}
@@ -5825,7 +5833,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
             Input_Window->Reset_Input_Rect();
         }
 		g_hwnd_now = m_input_dlg_hwnd;
-		Input_Window->m_input_list.SetFocus();
+		Input_Window->m_input_list.SetFocus();  
 		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 		break;
 	case TYPE_OUTPUT:
@@ -5835,7 +5843,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
             Output_Window->Reset_Output_Rect();
         }
 		g_hwnd_now = m_output_dlg_hwnd;
-		Output_Window->m_output_list.SetFocus();
+		Output_Window->m_output_list.SetFocus();  
 		::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST,NULL,REFRESH_LIST_NOW);
 		break;
 	case TYPE_VARIABLE:
@@ -5845,7 +5853,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
             Variable_Window->Reset_Variable_Rect();
         }
 		g_hwnd_now =  m_variable_dlg_hwnd;
-		Variable_Window->m_variable_list.SetFocus();
+		Variable_Window->m_variable_list.SetFocus();  
 		::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 		break;
 	case TYPE_PROGRAM:
@@ -5855,7 +5863,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
             Program_Window->Reset_Program_Rect();
         }
 		g_hwnd_now =  m_pragram_dlg_hwnd;
-		Program_Window->m_program_list.SetFocus();
+		Program_Window->m_program_list.SetFocus();   
 		::PostMessage(m_pragram_dlg_hwnd, WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 		break;
 	case TYPE_CONTROLLER:
@@ -5865,38 +5873,38 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
             Controller_Window->Reset_Controller_Rect();
         }
 		g_hwnd_now =  m_controller_dlg_hwnd;
-		Controller_Window->m_controller_list.SetFocus();
+		Controller_Window->m_controller_list.SetFocus();  
 		::PostMessage(m_controller_dlg_hwnd, WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
 		break;
 	case TYPE_SCREENS:
 		g_hwnd_now =  m_screen_dlg_hwnd;
-		Screen_Window->m_screen_list.SetFocus();
+		Screen_Window->m_screen_list.SetFocus();  
 		::PostMessage(m_screen_dlg_hwnd, WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 		break;
 	case TYPE_WEEKLY:
 		g_hwnd_now =  m_weekly_dlg_hwnd;
-		WeeklyRoutine_Window->m_weeklyr_list.SetFocus();
+		WeeklyRoutine_Window->m_weeklyr_list.SetFocus();  
 		::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 		break;
 	case TYPE_ANNUAL:
 		g_hwnd_now =  m_annual_dlg_hwnd;
-		AnnualRoutine_Window->m_annualr_list.SetFocus();
+		AnnualRoutine_Window->m_annualr_list.SetFocus();   
 		::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 		break;
 	case TYPE_MONITOR:
 		g_hwnd_now =  m_monitor_dlg_hwnd;
-		Monitor_Window->m_monitor_list.SetFocus();
+		Monitor_Window->m_monitor_list.SetFocus();  
 		::PostMessage(m_monitor_dlg_hwnd, WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
 		::PostMessage(m_monitor_dlg_hwnd, WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
 		break;
 	case TYPE_ALARMLOG:
 		g_hwnd_now =  m_alarmlog_dlg_hwnd;
-		AlarmLog_Window->m_alarmlog_list.SetFocus();
+		AlarmLog_Window->m_alarmlog_list.SetFocus();   
 		::PostMessage(m_alarmlog_dlg_hwnd, WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
 		break;
 	case TYPE_READ_REMOTE_POINT_INFO:
 		g_hwnd_now =  m_remote_point_hwnd;
-		Remote_Point_Window->m_remote_point_list.SetFocus();
+		Remote_Point_Window->m_remote_point_list.SetFocus();  
 		::PostMessage(m_remote_point_hwnd, WM_REFRESH_BAC_REMOTE_POINT_LIST,NULL,NULL);
 		break;
     case TYPE_SETTING:
