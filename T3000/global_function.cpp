@@ -4633,7 +4633,7 @@ int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, u
     //test123.type.Character_String.length = 10;
     //strcpy(test123.type.Character_String.value, "1123");
 
-    if (property_id = PROP_WEEKLY_SCHEDULE)
+    if (property_id == PROP_WEEKLY_SCHEDULE || property_id == PROP_DATE_LIST)
     {
         if (objectData != NULL)
         {
@@ -4671,6 +4671,7 @@ int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, u
                 }
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
+            return -1;
         }
     }
     else {
@@ -5262,7 +5263,7 @@ void localhandler_read_property_ack(
                 if (IS_OPENING_TAG(tempval) && !openTagFound) {
                     openTagFound = true;
                 }
-                else if (IS_CLOSING_TAG(tempval)) {
+                else if ( (IS_CLOSING_TAG(tempval)&& openTagFound && IS_OPENING_TAG(data.application_data[u + 1])) || (u+1 == data.application_data_len) ) {
                     bacnet_string += "/n";
                     index++;
                     openTagFound = false;
@@ -5274,6 +5275,21 @@ void localhandler_read_property_ack(
                 int i = 0;
                 if (index > 7)
                     break;
+            }
+            int i = 0;
+        }
+        else if (data.object_property == PROP_DATE_LIST)
+        {
+            int index = 0;
+            bool openTagFound = false;
+            bacnet_string = "";
+            for (int u = 0; u < data.application_data_len; u++)
+            {
+
+                uint8_t tempval = data.application_data[u];
+                
+                    bacnet_string += std::to_string(tempval).c_str();
+                    bacnet_string += ",";
             }
             int i = 0;
         }
@@ -5913,6 +5929,12 @@ void Inial_Product_Menu_map()
             memcpy(product_menu[i], temp, 20);
         }
             break;
+        case PM_THIRD_PARTY_DEVICE:
+        {
+            unsigned char  temp[20] = { 1,1,1,1  ,0,0,1,1 ,1,0,0,0   ,0 ,1,1,1   ,0,0,0,0 };
+            memcpy(product_menu[i], temp, 20);
+        }
+        break;
         default:
             break;
         }
@@ -10126,7 +10148,7 @@ bool Bacnet_Private_Device(unsigned short n_product_class_id)
     if(  (n_product_class_id == PM_CM5)            ||
          (n_product_class_id == PM_MINIPANEL)      ||
 		 (n_product_class_id == PM_MINIPANEL_ARM)  ||
-         (n_product_class_id == PM_TSTAT10)
+         (n_product_class_id == PM_TSTAT10)       
 		)
     {
         return true;

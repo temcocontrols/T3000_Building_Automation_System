@@ -37,41 +37,40 @@ protected:
 public:
 
 	virtual BOOL Create(DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID);
+
+	/*
+	* Utilities for T3000
+	*/
+
+	/*
+	 * ToSystemTimes
+	 * inputs:
+	 * int monthCount - returned value from CMonthCalCtrl::GetMonthRange(,,GMR_DAYSTATE)
+	 * MONTHDAYSTATE * states - array for states. Count of element equals monthCount
+	 * const SYSTEMTIME & start - first output value from CMonthCalCtrl::GetMonthRange(THIS_VALUE,,GMR_DAYSTATE)
+	 * output:
+	 * std::vector<SYSTEMTIME> - vector for CMultipleMonthCalCtrl::SelectDates();
+	 */
+	std::vector<SYSTEMTIME> ToSystemTimes(int monthCount, MONTHDAYSTATE* states, const SYSTEMTIME& start);
+
+	/*
+	* ToDayStates
+	* inputs:
+	* const std::vector<SYSTEMTIME> & days - vector contains needed SYSTEMTIME;
+	* output:
+	* int & mCount - count for CMonthCalCtrl::SetDayState();
+	* SYSTEMTIME & start - first element for CMonthCalCtrl::SetRange();
+	* MONTHDAYSTATE* - array for CMonthCalCtrl::SetDayState();
+	*/
+	MONTHDAYSTATE* ToDayStates(const std::vector<SYSTEMTIME>& days, int& mCount, SYSTEMTIME& start);
+
+	/*
+	* GetAllYearDaysForDayOfWeek
+	* inputs:
+	* int year - needed year
+	* int dayOfWeek - needed day of week. Default - sunday. 0 - sunday, 6 - monday
+	* output:
+	* std::vector<SYSTEMTIME> - vector for CMultipleMonthCalCtrl::SelectDates();
+	*/
+	std::vector<SYSTEMTIME>   GetAllYearDaysForDayOfWeek(int year, int dayOfWeek = 0);
 };
-
-
-/*
-* Utilities for T3000
-*/
-
-/*
- * ToSystemTimes
- * inputs:
- * int monthCount - returned value from CMonthCalCtrl::GetMonthRange(,,GMR_DAYSTATE)
- * MONTHDAYSTATE * states - array for states. Count of element equals monthCount
- * const SYSTEMTIME & start - first output value from CMonthCalCtrl::GetMonthRange(THIS_VALUE,,GMR_DAYSTATE)
- * output:
- * std::vector<SYSTEMTIME> - vector for CMultipleMonthCalCtrl::SelectDates();
- */
-std::vector<SYSTEMTIME> ToSystemTimes(int monthCount, MONTHDAYSTATE * states, const SYSTEMTIME & start);
-
-/*
-* ToDayStates
-* inputs:
-* const std::vector<SYSTEMTIME> & days - vector contains needed SYSTEMTIME;
-* output:
-* int & mCount - count for CMonthCalCtrl::SetDayState();
-* SYSTEMTIME & start - first element for CMonthCalCtrl::SetRange();
-* MONTHDAYSTATE* - array for CMonthCalCtrl::SetDayState();
-*/
-MONTHDAYSTATE*    ToDayStates(const std::vector<SYSTEMTIME> & days, int & mCount, SYSTEMTIME & start);
-
-/*
-* GetAllYearDaysForDayOfWeek
-* inputs:
-* int year - needed year
-* int dayOfWeek - needed day of week. Default - sunday. 0 - sunday, 6 - monday
-* output:
-* std::vector<SYSTEMTIME> - vector for CMultipleMonthCalCtrl::SelectDates();
-*/
-std::vector<SYSTEMTIME>   GetAllYearDaysForDayOfWeek(int year, int dayOfWeek = 0);

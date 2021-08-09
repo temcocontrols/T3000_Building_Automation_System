@@ -54,7 +54,7 @@ extern "C" {
         unsigned *found_index);
    __declspec(dllexport)    const char *bactext_property_name(
         unsigned index);
-    bool bactext_property_index(
+   __declspec(dllexport) bool bactext_property_index(
         const char *search_name,
         unsigned *found_index);
     __declspec(dllexport)  const char *bactext_engineering_unit_name(

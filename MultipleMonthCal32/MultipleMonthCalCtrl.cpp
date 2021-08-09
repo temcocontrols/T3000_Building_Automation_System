@@ -139,7 +139,7 @@ int     getDifference(const SYSTEMTIME & start, const SYSTEMTIME & end)
 	return ((int)(end.wYear * 12) + end.wMonth) - ((int)(start.wYear * 12) + start.wMonth);
 }
 
-std::vector<SYSTEMTIME> ToSystemTimes(int monthCount, MONTHDAYSTATE * states, const SYSTEMTIME & start)
+std::vector<SYSTEMTIME> CMultipleMonthCalCtrl::ToSystemTimes(int monthCount, MONTHDAYSTATE * states, const SYSTEMTIME & start)
 {
 	std::vector<SYSTEMTIME> days;
 
@@ -165,7 +165,7 @@ std::vector<SYSTEMTIME> ToSystemTimes(int monthCount, MONTHDAYSTATE * states, co
 	return days;
 }
 
-MONTHDAYSTATE*    ToDayStates(const std::vector<SYSTEMTIME> & days, int & mCount, SYSTEMTIME & start)
+MONTHDAYSTATE* CMultipleMonthCalCtrl::ToDayStates(const std::vector<SYSTEMTIME> & days, int & mCount, SYSTEMTIME & start)
 {
 	if (days.empty())
 	{
@@ -209,7 +209,7 @@ MONTHDAYSTATE*    ToDayStates(const std::vector<SYSTEMTIME> & days, int & mCount
 	return states;
 }
 
-std::vector<SYSTEMTIME>   GetAllYearDaysForDayOfWeek(int year, int dayOfWeek)
+std::vector<SYSTEMTIME>   CMultipleMonthCalCtrl::GetAllYearDaysForDayOfWeek(int year, int dayOfWeek)
 {
 	std::vector<SYSTEMTIME> days;
 

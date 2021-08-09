@@ -385,7 +385,11 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
                 m_Schedual_time_flag.at(weekly_list_line).Time_flag[m_row][m_col - 1] = 0;
 
 
-            if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line) > 0)
+			if (product_type == PM_THIRD_PARTY_DEVICE)
+			{
+				Write_SCeduleTime_ThirdPArtyBacnet(m_row,m_col);
+			}
+			else if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line) > 0)
             {
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change schedule success!"));
             }
@@ -393,7 +397,11 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
         else if ((chour == 0) && (cmin == 0) && (m_row != 0) && (m_row != 1))
         {
             m_Schedual_time_flag.at(weekly_list_line).Time_flag[m_row][m_col - 1] = 255;
-            if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line) > 0)
+			if (product_type == PM_THIRD_PARTY_DEVICE)
+			{
+				Write_SCeduleTime_ThirdPArtyBacnet(m_row, m_col);
+			}
+			else if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line) > 0)
             {
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change schedule success!"));
             }
@@ -405,53 +413,23 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
             else
                 m_Schedual_time_flag.at(weekly_list_line).Time_flag[m_row][m_col - 1] = 0;
             temp_cs.Format(_T("%02d:%02d"), chour, cmin);
-
-            if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line) > 0)
+			if (product_type == PM_THIRD_PARTY_DEVICE)
+			{
+				Write_SCeduleTime_ThirdPArtyBacnet(m_row, m_col);
+			}
+            else if (Write_Private_Data_Blocking(WRITE_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line) > 0)
             {
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change schedule success!"));
             }
         }
-    }
-	if (product_type == PM_THIRD_PARTY_DEVICE)
+    }else if (product_type == PM_THIRD_PARTY_DEVICE)
 	{
-		BACNET_READ_PROPERTY_DATA writeData;
-		writeData.object_instance = weekly_list_line + 1;
-		writeData.object_property = PROP_WEEKLY_SCHEDULE;
-		writeData.object_type = OBJECT_SCHEDULE;
-		writeData.application_data_len = 0;
-		writeData.application_data = new uint8_t;
-		writeData.application_data[MAX_APDU] = { 0 };
-		int len = encode_opening_tag(writeData.application_data, 3);
-		writeData.application_data_len += len;
-		for (int x = 0; x < 9; x++)
-		{
-			len = encode_opening_tag(writeData.application_data, 0);
-			writeData.application_data_len += len;
-			for (int y = 0; y < 8; y++)
-			{
-
-				writeData.application_data[writeData.application_data_len] = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours;
-				writeData.application_data_len += 1;
-				writeData.application_data[writeData.application_data_len] = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_minutes;
-				writeData.application_data_len += 1;
-				writeData.application_data[writeData.application_data_len] = 0;//sec
-				writeData.application_data_len += 1;
-				writeData.application_data[writeData.application_data_len] = 0;//millSec
-				writeData.application_data_len += 1;
-				writeData.application_data[writeData.application_data_len] = TPYE_BACAPP_ENUMERATED;//valueType
-				writeData.application_data_len += 1;
-				writeData.application_data[writeData.application_data_len] = (uint8_t)m_Schedual_time_flag.at(weekly_list_line).Time_flag[m_row][m_col - 1];//valueType
-				writeData.application_data_len += 1;
-			}
-
-			len = encode_closing_tag(writeData.application_data, 0);
-			writeData.application_data_len += len;
-		}
-		len = encode_closing_tag(writeData.application_data, 3);
-		writeData.application_data_len += len;
-		Bacnet_Write_Properties(g_bac_instance, writeData.object_type, writeData.object_instance, writeData.object_property, NULL, 16, &writeData);
-
+		Write_SCeduleTime_ThirdPArtyBacnet(m_row, m_col);
+		//m_schedule_time_list.SetItemText(m_row, m_col, temp_cs);
+		//m_schedual_time_picker.ShowWindow(SW_HIDE);
+		//return;
 	}
+	
 	m_schedule_time_list.SetItemText(m_row,m_col,temp_cs);
 
 	m_schedual_time_picker.ShowWindow(SW_HIDE);
@@ -461,7 +439,61 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
     PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST, NULL, NULL);
 	*pResult = 0;
 }
+void CBacnetScheduleTime::Write_SCeduleTime_ThirdPArtyBacnet(int row,int col)
+{
+	BACNET_READ_PROPERTY_DATA* writeData = new BACNET_READ_PROPERTY_DATA;
+	writeData->object_instance = weekly_list_line + 1;
+	writeData->object_property = PROP_WEEKLY_SCHEDULE;
+	writeData->object_type = OBJECT_SCHEDULE;
+	writeData->application_data_len = 0;
+	writeData->application_data = new uint8_t;
+	writeData->application_data[MAX_APDU] = { 0 };
+	int len = 0;
+	//encode_opening_tag(writeData->application_data, 3);
+	//writeData->application_data_len += len;
+	for (int x = 0; x < 9; x++)
+	{
+		//len = encode_opening_tag(writeData->application_data, 0);
+		//writeData->application_data_len += len;
+		writeData->application_data[writeData->application_data_len] = 0x0e;
+		writeData->application_data_len += 1;
+		for (int y = 0; y < 8; y++)
+		{
+			if (m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours == 0 &&
+				m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_minutes == 0)
+			{
+				continue;
+			}
+			writeData->application_data[writeData->application_data_len] = 0xb4;
+			writeData->application_data_len += 1;
+			writeData->application_data[writeData->application_data_len] = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours;
+			writeData->application_data_len += 1;
+			writeData->application_data[writeData->application_data_len] = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_minutes;
+			writeData->application_data_len += 1;
+			writeData->application_data[writeData->application_data_len] = 0;//sec
+			writeData->application_data_len += 1;
+			writeData->application_data[writeData->application_data_len] = 0;//millSec
+			writeData->application_data_len += 1;
+			writeData->application_data[writeData->application_data_len] = 0x91;//valueType
+			writeData->application_data_len += 1;
+			int flag = 1;
+			if (x % 2)
+				flag = 0;
 
+			writeData->application_data[writeData->application_data_len] = flag;//(uint8_t)m_Schedual_time_flag.at(weekly_list_line).Time_flag[row][col - 1];//valueType
+			writeData->application_data_len += 1;
+		}
+		writeData->application_data[writeData->application_data_len] = 0x0f;
+		writeData->application_data_len += 1;
+		/*len = encode_closing_tag(writeData->application_data, 0);
+		writeData->application_data_len += len;*/
+	}
+	//len = encode_closing_tag(writeData->application_data, 3);
+	//writeData->application_data_len += len;
+	int invoke_id = Bacnet_Write_Properties(g_bac_instance, writeData->object_type, writeData->object_instance, writeData->object_property, NULL, 16, writeData);
+	delete writeData;
+	writeData = NULL;
+}
 void CBacnetScheduleTime::OnBnClickedClearSchedual()
 {
     if (IDYES == MessageBox(_T("Are you sure you want clear the schedule ?"), _T("Confirm"), MB_YESNO))

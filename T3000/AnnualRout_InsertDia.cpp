@@ -351,7 +351,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 	else
 	{
 		int nFlag = product_register_value[7];
-        if (Bacnet_Private_Device(nFlag))
+        if (Bacnet_Private_Device(nFlag) ||	(g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP))
 		//if (g_protocol == PROTOCOL_BACNET_IP)
 		{								//器件。产品本来不同 界面就会有差异 都还要用一个界面。木有办法，只能 加在一起了。;
 			GetDlgItem(IDC_LIST1)->ShowWindow(0);
@@ -952,7 +952,7 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	else
 	{
 		int nFlag = product_register_value[7];
-        if(Bacnet_Private_Device(nFlag) == false)
+        if(Bacnet_Private_Device(nFlag) == false && g_protocol != PROTOCOL_THIRD_PARTY_BAC_BIP)
 		//if (g_protocol != PROTOCOL_BACNET_IP)
 		{
 			//CString str;
@@ -1018,6 +1018,8 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 		}
 		else
 		{
+			if (Clicked_month == 0)
+				return;
 			int day_in_year = day_in_this_year[Clicked_month - 1] + Clicked_day;
 			int charactor_control = (day_in_year - 1) / 8;
 			int control_bit = (day_in_year - 1) % 8;
@@ -1033,11 +1035,14 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 			}
 
 			m_month_ctrl.SetDayState(12, pBacDayState);
+			if (g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
+			{
+				Write_BACnet_ThirdParty_DateList(pBacDayState);
 
-
-
-			//if (g_protocol == PROTOCOL_BACNET_IP)
-			//{
+			}else
+			{ 
+				//if (g_protocol == PROTOCOL_BACNET_IP)
+				//{
 				//for (int i=0;i<12;i++)
 				//{
 				//	memcpy_s(&g_DayState[annual_list_line][i*4],4,&pBacDayState[i],4);
@@ -1045,19 +1050,47 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 				CString temp_task_info;
 				temp_task_info.Format(_T("Write annual schedual List Item%d ."), annual_list_line + 1);
 				Post_Write_Message(g_bac_instance, WRITEANNUALSCHEDULE_T3000, annual_list_line, annual_list_line, ANNUAL_CODE_SIZE, this->m_hWnd, temp_task_info);
-			//}
+				//}
+			}
 
 		}
 	}
-
-
 	
-
-	
-
 	*pResult = 0;
 }
+void AnnualRout_InsertDia::Write_BACnet_ThirdParty_DateList(MONTHDAYSTATE* states)
+{
+	SYSTEMTIME start, end;
+	m_month_ctrl.GetMonthRange(&start, &end, GMR_DAYSTATE);
+	std::vector<SYSTEMTIME> temp_days_vector = m_month_ctrl.ToSystemTimes(12, states, start);
 
+	BACNET_READ_PROPERTY_DATA* writeData = new BACNET_READ_PROPERTY_DATA;
+	writeData->object_instance = annual_list_line + 1;
+	writeData->object_property = PROP_DATE_LIST;
+	writeData->object_type = OBJECT_CALENDAR;
+	writeData->application_data_len = 0;
+	writeData->application_data = new uint8_t;
+	writeData->application_data[MAX_APDU] = { 0 };
+	int len = 0;// encode_opening_tag(writeData->application_data, 3);
+	//writeData->application_data_len += len;
+	for (int x = 0; x < temp_days_vector.size(); x++)
+	{
+		writeData->application_data[writeData->application_data_len] = 0x0c;
+		writeData->application_data_len += 1;
+		writeData->application_data[writeData->application_data_len] = temp_days_vector[x].wYear - 1900;
+		writeData->application_data_len += 1;
+		writeData->application_data[writeData->application_data_len] = temp_days_vector[x].wMonth ;
+		writeData->application_data_len += 1;
+		writeData->application_data[writeData->application_data_len] = temp_days_vector[x].wDay;
+		writeData->application_data_len += 1;
+		writeData->application_data[writeData->application_data_len] = temp_days_vector[x].wDayOfWeek;
+		writeData->application_data_len += 1;
+	}
+	//len = encode_closing_tag(writeData->application_data, 3);
+	//writeData->application_data_len += len;
+
+	int invoke_id = Bacnet_Write_Properties(g_bac_instance, writeData->object_type, writeData->object_instance, writeData->object_property, NULL, 16, writeData);
+}
 
 
 

@@ -510,7 +510,7 @@ void BacnetAnnualRoutine::OnBnClickedButtonAnnualEdit()
 			break;
 		}
 	}
-
+	
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUALCODE);
 
 }

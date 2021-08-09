@@ -1135,6 +1135,7 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
+
 //The window which created by the button ,will delete when the wait dialog send this message,to this window.
 //It means ,it has done .we don't needed.
 LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam)
@@ -2386,10 +2387,13 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 
 	if (temp_string == "Analog Input")
 	{
+
+		objectType = OBJECT_ANALOG_INPUT;
 		tmp.digital_analog = BAC_UNITS_ANALOG;
 	}
 	else
 	{
+		objectType = OBJECT_BINARY_INPUT;
 		tmp.digital_analog = BAC_UNITS_DIGITAL;
 	}
 
@@ -2397,22 +2401,33 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.label, STR_IN_LABEL, temp_value.type.Character_String.value, STR_IN_LABEL);
+			memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
 		}
 	}
 	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
+			memcpy_s(tmp.label, STR_IN_LABEL, temp_value.type.Character_String.value, STR_IN_LABEL);
 		}
 	}
 	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-
 			tmp.value = temp_value.type.Unsigned_Int;
+		}
+		else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
+			tmp.value = temp_value.type.Signed_Int;
+		}
+		else if (temp_value.tag == TPYE_BACAPP_REAL) {
+			tmp.value = temp_value.type.Real;
+		}
+		else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
+			tmp.value = temp_value.type.Double;
+		}
+		else {
+			tmp.value = 0;
 		}
 		/*tmp.value = _ttoi(response);*/
 	}
@@ -2457,10 +2472,13 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 
 	if (temp_string == "Analog Output")
 	{
+
+		objectType = OBJECT_ANALOG_OUTPUT;
 		tmp.digital_analog = BAC_UNITS_ANALOG;
 	}
 	else
 	{
+		objectType = OBJECT_BINARY_OUTPUT;
 		tmp.digital_analog = BAC_UNITS_DIGITAL;
 	}
 
@@ -2468,22 +2486,33 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.label, STR_IN_LABEL, temp_value.type.Character_String.value, STR_IN_LABEL);
+			memcpy_s(tmp.description, STR_OUT_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_OUT_DESCRIPTION_LENGTH);
 		}
 	}
 	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
+			memcpy_s(tmp.label, STR_OUT_LABEL, temp_value.type.Character_String.value, STR_OUT_LABEL);
 		}
 	}
 	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-
 			tmp.value = temp_value.type.Unsigned_Int;
+		}
+		else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
+			tmp.value = temp_value.type.Signed_Int;
+		}
+		else if (temp_value.tag == TPYE_BACAPP_REAL) {
+			tmp.value = temp_value.type.Real;
+		}
+		else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
+			tmp.value = temp_value.type.Double;
+		}
+		else {
+			tmp.value = 0;
 		}
 	}
 	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 3);
@@ -2494,16 +2523,100 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 			tmp.range = temp_value.type.Enumerated;
 		}
 	}
-	/*response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, PROP_DEVICE_TYPE, temp_value, 3);
-		if (response)
-		{
-			unsigned* found_index = new unsigned();
-			bool flag = indtext_by_istring(bacnet_engineering_unit_names, (char*)response.GetBuffer(),
-				found_index);
-			tmp.range = *found_index;
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+
+			tmp.auto_manual = temp_value.type.Boolean;
 		}
-		*/
+	}
+	
 	m_Output_data.at(index) = tmp;
+
+}
+/*
+Function name : AddBacnetVariableData
+inputs :
+		CString temp_string ,  define type of variable
+		int deviceInstance , device instance
+		int objInstace ,  device object instance
+		int index , index of m_Variable_data array.
+output :
+		void
+Description: this function read all the required properties of bacnet device and add it to m_Variable_data list to populate in variable grid.
+*/
+
+void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInstace, int index)
+{
+	BACNET_OBJECT_TYPE objectType = OBJECT_ANALOG_VALUE;
+	BACNET_PROPERTY_ID propertyID;
+	BACNET_APPLICATION_DATA_VALUE temp_value;
+	Str_variable_point tmp = Str_variable_point();
+
+	if (temp_string == "Analog Value")
+	{
+
+		objectType = OBJECT_ANALOG_VALUE;
+		tmp.digital_analog = BAC_UNITS_ANALOG;
+	}
+	else
+	{
+		objectType = OBJECT_BINARY_VALUE;
+		tmp.digital_analog = BAC_UNITS_DIGITAL;
+	}
+
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+			memcpy_s(tmp.description, VARIABLE_FULL_LABLE, temp_value.type.Character_String.value, VARIABLE_FULL_LABLE);
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+			memcpy_s(tmp.label, STR_VARIABLE_LABEL, temp_value.type.Character_String.value, STR_VARIABLE_LABEL);
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
+			tmp.value = temp_value.type.Unsigned_Int;
+		}
+		else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
+			tmp.value = temp_value.type.Signed_Int;
+		}
+		else if (temp_value.tag == TPYE_BACAPP_REAL) {
+			tmp.value = temp_value.type.Real;
+		}
+		else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
+			tmp.value = temp_value.type.Double;
+		}
+		else {
+			tmp.value = 0;
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
+
+			tmp.range = temp_value.type.Enumerated;
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+
+			tmp.auto_manual = temp_value.type.Boolean;
+		}
+	}
+	
+	m_Variable_data.at(index) = tmp;
 
 }
 /*
@@ -2512,10 +2625,10 @@ inputs :
 		CString temp_string ,  define type of input
 		int deviceInstance , device instance
 		int objInstace ,  device object instance
-		int index , index of input_data array.
+		int index , index of m_Weekly_data array.
 output :
 		void
-Description: this function read all the required properties of bacnet device and add it to input_data list to populate in input grid.
+Description: this function read Schedule Property of bacnet device and add it to m_Weekly_data list to populate in Schedule Grid and also the time schedule of week.
 */
 
 void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInstace, int index)
@@ -2587,6 +2700,89 @@ void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInsta
 	m_Weekly_data.at(index) = tmp;
 
 }
+
+/*
+Function name : AddBacnetCalenderData
+inputs :
+		CString temp_string ,  define type of input
+		int deviceInstance , device instance
+		int objInstace ,  device object instance
+		int index , index of input_data array.
+output :
+		void
+Description: this function read Calender Data of bacnet device and add it to anuallist Data list to populate in calender grid.
+*/
+
+void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInstace, int index)
+{
+	BACNET_OBJECT_TYPE objectType = OBJECT_CALENDAR;
+	BACNET_PROPERTY_ID propertyID;
+	BACNET_APPLICATION_DATA_VALUE temp_value;
+	Str_annual_routine_point tmp = Str_annual_routine_point();
+
+
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+			memcpy_s(tmp.description, 21, temp_value.type.Character_String.value, 21);
+		}
+	}
+
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+			memcpy_s(tmp.label, 9, temp_value.type.Character_String.value, 9);
+		}
+	}
+
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
+
+			tmp.value = temp_value.type.Unsigned_Int;
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+
+			tmp.auto_manual = temp_value.type.Boolean;
+		}
+	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DATE_LIST, temp_value, 3);
+	if (invoke_id)
+	{
+		if (bacnet_string!="")
+		{
+
+			
+				CStringArray temp_schedule;
+				SplitCStringA(temp_schedule, bacnet_string, _T(","));
+				for (int j = 0; j < temp_schedule.GetSize();)
+				{
+					int Clicked_month = _ttoi(temp_schedule.GetAt(j + 2));
+					int Clicked_day = _ttoi(temp_schedule.GetAt(j + 3));
+					int day_in_year = day_in_this_year[Clicked_month - 1] + Clicked_day;
+					int charactor_control = (day_in_year - 1) / 8;
+					int control_bit = (day_in_year - 1) % 8;
+					g_DayState[objInstace-1][charactor_control] |= 1 << control_bit;
+					
+					j=j+5;
+				}
+			bacnet_string = "";
+		}
+		else
+		{
+			memset(g_DayState[objInstace - 1], 0, ANNUAL_CODE_SIZE);
+		}
+	}
+	m_Annual_data.at(index) = tmp;
+
+}
 static bool already_retry = false;
 
 //INPUT int test_function_return_value();
@@ -2650,7 +2846,7 @@ void CDialogCM5_BacNet::Fresh()
 			{
 				CStringArray temp_array;
 				SplitCStringA(temp_array, response, _T(","));
-				int inputcount=0,outputcount = 0, schedulecount = 0;
+				int inputcount = 0, outputcount = 0, variablecount = 0 ,schedulecount = 0, calenderCount = 0;;
 				if (temp_array.GetSize() > 1)
 				{
 					for (int i = 0; i < temp_array.GetSize(); i++)
@@ -2661,56 +2857,62 @@ void CDialogCM5_BacNet::Fresh()
 							continue;
 						}
 
-						objInstace = atoi((char*)temp_array.GetAt(i + 1).GetString());
+						objInstace = _ttoi(temp_array.GetAt(i + 1).GetString());
 						unsigned int index;
 
-						/*if (temp_array.GetAt(i) == "Analog Input")
+						if (temp_array.GetAt(i) == "Analog Input" || temp_array.GetAt(i) == "Binary Input")
 						{
-							if (outputcount < BAC_INPUT_ITEM_COUNT)
+							if (inputcount < BAC_INPUT_ITEM_COUNT)
 							{
-								objectType = OBJECT_ANALOG_INPUT;
 								AddBacnetInputData(temp_array.GetAt(i), deviceInstance, objInstace, inputcount);
 								inputcount++;
 							}
 						}
-						else if (temp_array.GetAt(i) == "Analog Output")
+						else if (temp_array.GetAt(i) == "Analog Output" || temp_array.GetAt(i) == "Binary Output")
 						{
 							if (outputcount < BAC_OUTPUT_ITEM_COUNT)
 							{
-								objectType = OBJECT_ANALOG_OUTPUT;
 								AddBacnetOutputData(temp_array.GetAt(i), deviceInstance, objInstace, outputcount);
 								outputcount++;
 							}
 						}
-						else*/ if (temp_array.GetAt(i) == "Schedule")
+						else if (temp_array.GetAt(i) == "Analog Value" || temp_array.GetAt(i) == "Binary Value")
 						{
-							if (outputcount < BAC_SCHEDULE_COUNT)
+							if (variablecount < BAC_VARIABLE_ITEM_COUNT)
 							{
-								objectType = OBJECT_ANALOG_OUTPUT;
+								AddBacnetVariableData(temp_array.GetAt(i), deviceInstance, objInstace, variablecount);
+								variablecount++;
+							}
+						}
+						else if (temp_array.GetAt(i) == "Schedule")
+						{
+							if (schedulecount < BAC_SCHEDULE_COUNT)
+							{
+								objectType = OBJECT_SCHEDULE;
 								AddBacnetScheduleData(temp_array.GetAt(i), deviceInstance, objInstace, schedulecount);
 								schedulecount++;
+							}
+						}
+						else if (temp_array.GetAt(i) == "Calendar")
+						{
+							if (calenderCount < BAC_HOLIDAY_COUNT)
+							{
+								objectType = OBJECT_CALENDAR;
+								AddBacnetCalenderData(temp_array.GetAt(i), deviceInstance, objInstace, calenderCount);
+								calenderCount++;
 							}
 						}
 						i++;
 					}
 				}
 			}
-			
-		//Variable_Window->SetTimer(1, 10000, NULL);  //如果是MSTP协议不要刷新的那么频繁;
-		//Input_Window->SetTimer(1, 10000, NULL);
-		//Output_Window->SetTimer(1, 10000, NULL);
-
-		//if (Input_Window->IsWindowVisible() == false)
-		//{
-		//	Input_Window->ShowWindow(SW_SHOW);
-		//	Input_Window->window_max = false;
-		//	Input_Window->Reset_Input_Rect();
-		//}
-		//g_hwnd_now = m_input_dlg_hwnd;
-		//Input_Window->m_input_list.SetFocus();
+		
+		BacNet_hwd = this->m_hWnd;
 		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
 		::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+		::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
 		::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
+		::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
 		
 		return;
 		
@@ -3443,6 +3645,20 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 	int button_click = 0;
 	CString temp_cs;
 	CTime	TimeTemp;
+	if (g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP && lParam == TYPE_ANNUALCODE)
+	{
+		if (HolidayEdit_Window != NULL)
+		{
+			delete HolidayEdit_Window;
+			HolidayEdit_Window = NULL;
+		}
+		HolidayEdit_Window = new AnnualRout_InsertDia;
+		HolidayEdit_Window->Create(IDD_ANNUAL_ROUTINES_INSERT_DIA, this);
+		HolidayEdit_Window->ShowWindow(SW_SHOW);
+
+		::PostMessage(m_schedule_day_dlg_hwnd, WM_REFRESH_BAC_DAY_CAL, NULL, NULL);
+		return 0;
+	}
 	switch(command_type)
 	{
 	//case WM_COMMAND_WHO_IS:
@@ -5146,7 +5362,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	{
         CString temp_cs;
         temp_cs.Format(_T("Read Annual day List Item From %d to %d "), annual_list_line, annual_list_line);
-        if (GetPrivateData_Blocking(g_bac_instance, READANNUALSCHEDULE_T3000, annual_list_line, annual_list_line, ANNUAL_CODE_SIZE) > 0)
+		 if (GetPrivateData_Blocking(g_bac_instance, READANNUALSCHEDULE_T3000, annual_list_line, annual_list_line, ANNUAL_CODE_SIZE) > 0)
         {
             SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
             bac_annualcode_read_results = true;

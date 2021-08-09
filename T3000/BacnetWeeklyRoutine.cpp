@@ -316,7 +316,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 			WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
 			temp_value->type.Character_String.encoding = 0;
 			temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
-			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, Changed_Item, PROP_DESCRIPTION, temp_value);
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, Changed_Item+1, PROP_DESCRIPTION, temp_value);
 		}
 	}
 
@@ -346,7 +346,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 				WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
 				temp_value->type.Character_String.encoding = 0;
 				temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
-				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, Changed_Item, PROP_OBJECT_NAME, temp_value);
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, Changed_Item+1, PROP_OBJECT_NAME, temp_value);
 		}
 	}
 

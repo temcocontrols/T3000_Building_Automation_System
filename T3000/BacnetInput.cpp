@@ -448,6 +448,20 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);
 			return 0;
 		}
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_CHARACTER_STRING;
+			temp_value->context_specific = false;
+			WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
+			temp_value->type.Character_String.encoding = 0;
+			temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
+			int ObjectType = OBJECT_ANALOG_INPUT;
+			if (m_Input_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
+				ObjectType = OBJECT_BINARY_INPUT;
+
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance,(BACNET_OBJECT_TYPE)ObjectType, Changed_Item, PROP_DESCRIPTION, temp_value);
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -490,7 +504,10 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 				WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
 				temp_value->type.Character_String.encoding = 0;
 				temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
-				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_ANALOG_INPUT, Changed_Item, PROP_DESCRIPTION, temp_value);			
+				int ObjectType = OBJECT_ANALOG_INPUT;
+				if (m_Input_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
+					ObjectType = OBJECT_BINARY_INPUT;
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, Changed_Item, PROP_OBJECT_NAME, temp_value);
 		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
@@ -512,6 +529,16 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			//m_input_list.SetCellEnabled(Changed_Item,INPUT_VALUE,1);
 			m_Input_data.at(Changed_Item).auto_manual = BAC_MANUAL ;
 		}
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_BOOLEAN;
+			temp_value->type.Boolean = m_Input_data.at(Changed_Item).auto_manual;
+			int ObjectType = OBJECT_ANALOG_INPUT;
+			if (m_Input_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
+				ObjectType = OBJECT_BINARY_INPUT;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, Changed_Item, PROP_OUT_OF_SERVICE, temp_value);
+		}
 	}
 
 
@@ -523,6 +550,16 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		int temp_int = (int)(_wtof(temp_cs) * 1000);
 		//int temp_int = _wtoi(temp_cs);
 		m_Input_data.at(Changed_Item).value = temp_int;
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_UNSIGNED;
+			temp_value->type.Unsigned_Int = temp_int;
+			int ObjectType = OBJECT_ANALOG_INPUT;
+			if (m_Input_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
+				ObjectType = OBJECT_BINARY_INPUT;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, Changed_Item, PROP_PRESENT_VALUE, temp_value);
+		}
 	}
 
 	
@@ -1082,13 +1119,17 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 			//main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
 			//m_input_list.SetItemText(i,INPUT_PANEL,main_sub_panel);
-
-            int InputType = 0;
-            if (selected_product_Node.product_class_id == PM_TSTAT10)
-                bacnet_device_type = Device_Basic_Setting.reg.mini_type;
-            InputType = GetInputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1 , m_Input_data.at(i).digital_analog);
-            m_input_list.SetItemText(i, INPUT_EXTERNAL, Output_Type_String[InputType]);
-
+			if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
+			{
+				m_input_list.SetItemText(i, INPUT_EXTERNAL, Output_Type_String[m_Input_data.at(i).digital_analog+1]);
+			}
+			else {
+				int InputType = 0;
+				if (selected_product_Node.product_class_id == PM_TSTAT10)
+					bacnet_device_type = Device_Basic_Setting.reg.mini_type;
+				InputType = GetInputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1, m_Input_data.at(i).digital_analog);
+				m_input_list.SetItemText(i, INPUT_EXTERNAL, Output_Type_String[InputType]);
+			}
 
 			//m_input_list.SetItemText(i,INPUT_EXTERNAL,_T(""));
 			m_input_list.SetItemText(i,INPUT_PRODUCT,_T(""));

@@ -34,6 +34,7 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnBnClickedCopyMon_Fri();
     afx_msg void OnBnClickedClearSchedual();
+	void Write_SCeduleTime_ThirdPArtyBacnet(int row, int col);
 	//afx_msg LRESULT  SchedualTimeResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 private:
 	int m_row;
