@@ -48,10 +48,10 @@ extern "C" {
 
 /* from clause 20.2.1.3.2 Constructed Data */
 /* returns the number of apdu bytes consumed */
-    int encode_opening_tag(
+    __declspec(dllexport)    int encode_opening_tag(
         uint8_t * apdu,
         uint8_t tag_number);
-    int encode_closing_tag(
+    __declspec(dllexport)   int encode_closing_tag(
         uint8_t * apdu,
         uint8_t tag_number);
     int decode_tag_number(

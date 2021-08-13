@@ -935,3 +935,4 @@ BacnetExplore/CodeExamples/Xamarin/YabeStack/bin/Release/YabeStack.dll
 /.vs/T3000 - VS2019/v16/*.db-shm
 /.vs/T3000 - VS2019/v16/*.db-wal
 /.vs/T3000 - VS2019/v16/*.opendb
+/enc_temp_folder
