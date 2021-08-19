@@ -2341,6 +2341,7 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 {
 	BACNET_APPLICATION_DATA_VALUE temp_value;
 	int invoke_id = Bacnet_Read_Properties_Blocking(deviceid, object_type, object_instance, property_id, value, retrytime);
+	// invoke_id = Bacnet_Read_Property_Multiple(deviceid, object_type, object_instance, PROP_ALL);
 	if (invoke_id >= 0)
 	{
 		CString tmpString;
@@ -2842,6 +2843,7 @@ void CDialogCM5_BacNet::Fresh()
 			bacnet_device_type = PM_THIRD_PARTY_DEVICE;
 			BACNET_APPLICATION_DATA_VALUE temp_value;
 			CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 3);
+			
 			if (response!="")
 			{
 				CStringArray temp_array;

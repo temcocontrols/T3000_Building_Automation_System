@@ -1280,6 +1280,7 @@ extern int MODE_SUPPORT_PTRANSFER; // 1 支持bip ptransfer
 extern bool initial_bip ;
 extern Str_modbus_reg bacnet_to_modbus_struct; //用于bacnet 协议转换为modbus 协议的结构
 extern vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
+extern vector <str_segmented_bacnet_rp_info> segmented_bacnet_data;
 extern panelname_map g_panelname_map;
 extern bacnet_instance_reg_map g_bacnet_reg_ins_map;  //用来区分每个instance 存放在那两个字节，不同产品，不同处理;
 extern connect_Info system_connect_info;

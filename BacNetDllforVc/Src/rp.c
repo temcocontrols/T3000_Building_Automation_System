@@ -50,7 +50,7 @@ int rp_encode_apdu(
     int apdu_len = 0;   /* total length of the apdu, return value */
 
     if (apdu) {
-        apdu[0] = PDU_TYPE_CONFIRMED_SERVICE_REQUEST;
+        apdu[0] = 0x02;// PDU_TYPE_CONFIRMED_SERVICE_REQUEST; //aqeeb modify: for segmented packets accept flag
         //apdu[1] = encode_max_segs_max_apdu(0, MAX_APDU);
         apdu[1] = encode_max_segs_max_apdu(65, MAX_APDU); // fandu modify . Max Response Segments accepted: Greater than 64 segments (7)
         apdu[2] = invoke_id;

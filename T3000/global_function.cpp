@@ -5241,6 +5241,7 @@ void localhandler_read_property_ack(
     BACNET_ADDRESS * src,
     BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
 {
+    bool segmentedCompleted = true;
     int len = 0;
     BACNET_READ_PROPERTY_DATA data;
     (void)src;
@@ -5251,92 +5252,137 @@ void localhandler_read_property_ack(
         //local_rp_ack_print_data(&data);
         BACNET_APPLICATION_DATA_VALUE value;
         local_value_rp_ack_print_data(&data,value);
-        
-        if (data.object_property == PROP_WEEKLY_SCHEDULE)
+        if (service_data->segmented_message && service_data->sequence_number < service_data->proposed_window_number)
         {
-            int index = 0;
-            bool openTagFound = false;
-            for (int u = 0 ;u < data.application_data_len; u++)
+            vector<str_segmented_bacnet_rp_info>::iterator itr = segmented_bacnet_data.begin();
+
+            int find_exsit = false;
+            for (; itr != segmented_bacnet_data.end(); itr++)
             {
-               
-                uint8_t tempval = data.application_data[u];
-                if (IS_OPENING_TAG(tempval) && !openTagFound) {
-                    openTagFound = true;
+                if ((itr->invoke_id == service_data->invoke_id) &&
+                    (itr->bacnet_instance == data.object_instance) &&
+                    (itr->object_type == data.object_type) &&
+                    (itr->property_id == data.object_property))
+                {
+                    if (service_data->sequence_number == service_data->proposed_window_number - 1)
+                    {
+                        data.application_data = itr->application_data;
+                        data.application_data_len = itr->application_data_len;
+                        rp_ack_print_data(&data);
+                        int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                    }
+                    else 
+                    {
+                        strcat((char*)itr->application_data, (char*)data.application_data);
+                        itr->application_data_len += data.application_data_len;
+                        find_exsit = true;
+                        segmentedCompleted = false;
+                    }
                 }
-                else if ( (IS_CLOSING_TAG(tempval)&& openTagFound && IS_OPENING_TAG(data.application_data[u + 1])) || (u+1 == data.application_data_len) ) {
-                    bacnet_string += "/n";
-                    index++;
-                    openTagFound = false;
+            }
+            if (!find_exsit)
+            {
+                str_segmented_bacnet_rp_info temp_standard_bacnet_data = { 0 };
+                temp_standard_bacnet_data.invoke_id = service_data->invoke_id;
+                temp_standard_bacnet_data.bacnet_instance = data.object_instance;
+                temp_standard_bacnet_data.object_type = data.object_type;
+                temp_standard_bacnet_data.property_id = data.object_property;
+                temp_standard_bacnet_data.application_data = data.application_data;
+                temp_standard_bacnet_data.application_data_len = data.application_data_len;
+                segmented_bacnet_data.push_back(temp_standard_bacnet_data);
+                int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+               // Sleep(10);
+            }
+           
+        }
+        
+            if (data.object_property == PROP_WEEKLY_SCHEDULE)
+            {
+                int index = 0;
+                bool openTagFound = false;
+                for (int u = 0; u < data.application_data_len; u++)
+                {
+
+                    uint8_t tempval = data.application_data[u];
+                    if (IS_OPENING_TAG(tempval) && !openTagFound) {
+                        openTagFound = true;
+                    }
+                    else if ((IS_CLOSING_TAG(tempval) && openTagFound && IS_OPENING_TAG(data.application_data[u + 1])) || (u + 1 == data.application_data_len)) {
+                        bacnet_string += "/n";
+                        index++;
+                        openTagFound = false;
+                    }
+                    else {
+                        bacnet_string += std::to_string(tempval).c_str();
+                        bacnet_string += ",";
+                    }
+                    int i = 0;
+                    if (index > 7)
+                        break;
                 }
-                else {
+                int i = 0;
+            }
+            else if (data.object_property == PROP_DATE_LIST)
+            {
+                int index = 0;
+                bool openTagFound = false;
+                bacnet_string = "";
+                for (int u = 0; u < data.application_data_len; u++)
+                {
+
+                    uint8_t tempval = data.application_data[u];
+
                     bacnet_string += std::to_string(tempval).c_str();
                     bacnet_string += ",";
                 }
                 int i = 0;
-                if (index > 7)
-                    break;
             }
-            int i = 0;
-        }
-        else if (data.object_property == PROP_DATE_LIST)
-        {
-            int index = 0;
-            bool openTagFound = false;
-            bacnet_string = "";
-            for (int u = 0; u < data.application_data_len; u++)
-            {
-
-                uint8_t tempval = data.application_data[u];
-                
-                    bacnet_string += std::to_string(tempval).c_str();
-                    bacnet_string += ",";
-            }
-            int i = 0;
-        }
 #if 1
-        if (data.object_property == PROP_PRIORITY_ARRAY)
-        {
-            CString temp_bacnet_logfile;
-            temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
-            CFile myfile(temp_bacnet_logfile, CFile::modeRead);
-            char *pBuf;
-            DWORD dwFileLen;
-            dwFileLen = myfile.GetLength();
-            pBuf = new char[dwFileLen + 1];
-            memset(pBuf, 0, dwFileLen);
-            pBuf[dwFileLen] = 0;
-            myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
-            myfile.Close();
-            CString test_pop_up;
-            MultiByteToWideChar(CP_ACP, 0, (char *)pBuf, (int)strlen((char *)pBuf) + 1,
-                bacnet_string.GetBuffer(dwFileLen + 1), dwFileLen + 1);
-            bacnet_string.ReleaseBuffer();
-            delete[] pBuf;
-        }
+            if (data.object_property == PROP_PRIORITY_ARRAY)
+            {
+                CString temp_bacnet_logfile;
+                temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
+                CFile myfile(temp_bacnet_logfile, CFile::modeRead);
+                char* pBuf;
+                DWORD dwFileLen;
+                dwFileLen = myfile.GetLength();
+                pBuf = new char[dwFileLen + 1];
+                memset(pBuf, 0, dwFileLen);
+                pBuf[dwFileLen] = 0;
+                myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
+                myfile.Close();
+                CString test_pop_up;
+                MultiByteToWideChar(CP_ACP, 0, (char*)pBuf, (int)strlen((char*)pBuf) + 1,
+                    bacnet_string.GetBuffer(dwFileLen + 1), dwFileLen + 1);
+                bacnet_string.ReleaseBuffer();
+                delete[] pBuf;
+            }
 
 #endif
-
-        vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
-        vector<str_bacnet_rp_info>::iterator itrflag;
-
-
-        
-        int find_exsit = false;
-        for (; itr != standard_bacnet_data.end(); itr++)
-        {
-            if ((itr->invoke_id == service_data->invoke_id) &&
-                (itr->object_item_number == data.object_instance) &&
-                (itr->object_type == data.object_type) &&
-                (itr->property_id == data.object_property))
+            if(segmentedCompleted)
             {
-                itrflag = itr;  //找到曾经读过
-                itrflag->value = value;
-                find_exsit = true;
+                tsm_free_invoke_id(service_data->invoke_id);
+
+                vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+                vector<str_bacnet_rp_info>::iterator itrflag;
+
+
+
+                int find_exsit = false;
+                for (; itr != standard_bacnet_data.end(); itr++)
+                {
+                    if ((itr->invoke_id == service_data->invoke_id) &&
+                        (itr->object_item_number == data.object_instance) &&
+                        (itr->object_type == data.object_type) &&
+                        (itr->property_id == data.object_property))
+                    {
+                        itrflag = itr;  //找到曾经读过
+                        itrflag->value = value;
+                        find_exsit = true;
+                    }
+                }
             }
-        }
-
-
-        Sleep(1);
+         Sleep(1);
     }
 }
 
