@@ -6435,7 +6435,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
     {
         m_bac_handle_Iam_data.push_back(temp_1);
 #ifdef USE_THIRD_PARTY_FUNC
-        //if (vendor_id != 148) //如果不是Temco的ID 才当作第三方设备
+        if (vendor_id != 148) //如果不是Temco的ID 才当作第三方设备
         {
             _Bac_Scan_Com_Info *temp = new _Bac_Scan_Com_Info;
             memcpy(temp, &temp_1, sizeof(_Bac_Scan_Com_Info));
@@ -6546,9 +6546,6 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         if(!port_bind_results)
             return false;
 		
-
-        bip_set_socket(my_sokect);
-        bip_set_port(htons(47808));
 
         static in_addr BIP_Broadcast_Address;
         
@@ -7067,7 +7064,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
         CStringArray temp_strip;
         SplitCStringA(temp_strip, strIPAdress, _T("."));
         CString temp_ip;
-        if(strIPAdress !="")
+        //if(strIPAdress !="")
         temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
 
 
@@ -7084,7 +7081,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
             continue;
 
 
-        //if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
+        if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
         {
             find_network = true;
             strIPAdress = g_Vector_Subnet.at(i).StrIP;
