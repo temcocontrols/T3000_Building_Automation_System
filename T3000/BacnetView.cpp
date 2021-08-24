@@ -2571,7 +2571,7 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.description, VARIABLE_FULL_LABLE, temp_value.type.Character_String.value, VARIABLE_FULL_LABLE);
+			memcpy_s(tmp.description, STR_VARIABLE_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_VARIABLE_DESCRIPTION_LENGTH);
 		}
 	}
 	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
@@ -2834,8 +2834,8 @@ void CDialogCM5_BacNet::Fresh()
 	m_user_level = LOGIN_SUCCESS_FULL_ACCESS;
 	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
 	{
-			Send_WhoIs_Global(-1, -1);
-			Sleep(10);
+			//Send_WhoIs_Global(-1, -1);
+			//Sleep(10);
 			BACNET_OBJECT_TYPE objectType = OBJECT_DEVICE;
 			BACNET_PROPERTY_ID propertyID = PROP_OBJECT_LIST;
 			int deviceInstance = g_bac_instance;
@@ -2907,6 +2907,12 @@ void CDialogCM5_BacNet::Fresh()
 						i++;
 					}
 				}
+			}
+			else {
+				CString Temp_Error_Msg;
+				Temp_Error_Msg.Format(_T("Read Properties error\r\n\
+Not able to read Property list of BACnet Device,\r\nThis may be due to a connection error with device \r\n\ "));
+				AfxMessageBox(Temp_Error_Msg);
 			}
 		
 		BacNet_hwd = this->m_hWnd;

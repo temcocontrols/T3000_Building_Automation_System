@@ -5252,7 +5252,7 @@ void localhandler_read_property_ack(
         //local_rp_ack_print_data(&data);
         BACNET_APPLICATION_DATA_VALUE value;
         local_value_rp_ack_print_data(&data,value);
-        if (service_data->segmented_message && service_data->sequence_number < service_data->proposed_window_number)
+        if (service_data->segmented_message /*&& service_data->sequence_number < service_data->proposed_window_number*/)
         {
             vector<str_segmented_bacnet_rp_info>::iterator itr = segmented_bacnet_data.begin();
 
@@ -5264,12 +5264,13 @@ void localhandler_read_property_ack(
                     (itr->object_type == data.object_type) &&
                     (itr->property_id == data.object_property))
                 {
-                    if (service_data->sequence_number == service_data->proposed_window_number - 1)
+                    if (service_data->sequence_number == service_data->proposed_window_number)
                     {
                         data.application_data = itr->application_data;
                         data.application_data_len = itr->application_data_len;
                         rp_ack_print_data(&data);
                         int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                        segmented_bacnet_data.erase(itr);
                     }
                     else 
                     {
@@ -5277,6 +5278,8 @@ void localhandler_read_property_ack(
                         itr->application_data_len += data.application_data_len;
                         find_exsit = true;
                         segmentedCompleted = false;
+                        if(service_data->sequence_number == 0)
+                        int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
                     }
                 }
             }
@@ -5291,6 +5294,7 @@ void localhandler_read_property_ack(
                 temp_standard_bacnet_data.application_data_len = data.application_data_len;
                 segmented_bacnet_data.push_back(temp_standard_bacnet_data);
                 int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                segmentedCompleted = false;
                // Sleep(10);
             }
            
@@ -7064,7 +7068,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
         CStringArray temp_strip;
         SplitCStringA(temp_strip, strIPAdress, _T("."));
         CString temp_ip;
-        //if(strIPAdress !="")
+        if(strIPAdress !="")
         temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
 
 
@@ -7092,7 +7096,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
     if (find_network == false)
     {
         refresh_tree_status_immediately = true;
-        return false;
+        //return false;
     }
     
     int nNetTimeout=3000;//1 second.
