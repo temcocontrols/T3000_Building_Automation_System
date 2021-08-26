@@ -2449,6 +2449,7 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 			tmp.range = *found_index;
 		}
 		*/
+	tmp.instance_id = objInstace;
 	m_Input_data.at(index) = tmp;
 	
 }
@@ -2532,7 +2533,7 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 			tmp.auto_manual = temp_value.type.Boolean;
 		}
 	}
-	
+	tmp.instance_id = objInstace;
 	m_Output_data.at(index) = tmp;
 
 }
@@ -2832,6 +2833,11 @@ void CDialogCM5_BacNet::Fresh()
 
 	}
 	m_user_level = LOGIN_SUCCESS_FULL_ACCESS;
+	 
+	input_item_limit_count = BAC_INPUT_ITEM_COUNT;	
+	output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;
+	variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;
+
 	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
 	{
 			//Send_WhoIs_Global(-1, -1);
@@ -2907,6 +2913,9 @@ void CDialogCM5_BacNet::Fresh()
 						i++;
 					}
 				}
+				input_item_limit_count = inputcount;
+				output_item_limit_count = outputcount;
+				variable_item_limit_count = variablecount;
 			}
 			else {
 				CString Temp_Error_Msg;

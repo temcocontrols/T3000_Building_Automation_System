@@ -7062,13 +7062,16 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
     {
         strIPAdress = selected_product_Node.BuildingInfo.strIp;  //用设备的前三个 来确定bind哪一个 网卡;
     }
-
+    
     for (int i = 0; i < g_Vector_Subnet.size(); i++)
     {
+        if (strIPAdress.IsEmpty())
+        {
+            strIPAdress = g_Vector_Subnet.at(i).StrIP;
+        }
         CStringArray temp_strip;
         SplitCStringA(temp_strip, strIPAdress, _T("."));
         CString temp_ip;
-        if(strIPAdress !="")
         temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
 
 
@@ -7096,7 +7099,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
     if (find_network == false)
     {
         refresh_tree_status_immediately = true;
-        //return false;
+        return false;
     }
     
     int nNetTimeout=3000;//1 second.
