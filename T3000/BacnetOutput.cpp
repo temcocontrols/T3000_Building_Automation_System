@@ -963,14 +963,20 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		else
 		{
 			
-			m_output_list.SetItemText(i,OUTPUT_PANEL,Statuspanel);
 			//main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
 			//m_output_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
 			if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 			{
+
+				CString panelID;
+				panelID.Format(_T("%d"), (unsigned char)g_bac_instance);// temporarily assigned a bacnet_instance_id.
+
+				m_output_list.SetItemText(i, OUTPUT_PANEL, panelID);
 				m_output_list.SetItemText(i, OUTPUT_EXTERNAL, Output_Type_String[m_Output_data.at(i).digital_analog + 1]);
 			}
 			else {
+
+				m_output_list.SetItemText(i, OUTPUT_PANEL, Statuspanel);
 				UCHAR OutputType = 0;
 				OutputType = GetOutputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1);
 

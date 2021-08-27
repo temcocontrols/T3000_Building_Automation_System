@@ -1167,15 +1167,20 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		else
 		{
 
-			m_input_list.SetItemText(i,INPUT_PANEL,Statuspanel);
 
 			//main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
 			//m_input_list.SetItemText(i,INPUT_PANEL,main_sub_panel);
 			if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 			{
+				CString panelID;
+				panelID.Format(_T("%d"), (unsigned char)g_bac_instance);// temporarily assigned a bacnet_instance_id.
+
+					m_input_list.SetItemText(i, INPUT_PANEL, panelID);
 				m_input_list.SetItemText(i, INPUT_EXTERNAL, Output_Type_String[m_Input_data.at(i).digital_analog+1]);
 			}
 			else {
+
+				m_input_list.SetItemText(i, INPUT_PANEL, Statuspanel);
 				int InputType = 0;
 				if (selected_product_Node.product_class_id == PM_TSTAT10)
 					bacnet_device_type = Device_Basic_Setting.reg.mini_type;
