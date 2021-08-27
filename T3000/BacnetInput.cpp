@@ -649,9 +649,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	int Fresh_Item;
 	int isFreshOne = (bool)lParam;
 	int  Minipanel_device = 1;
-
-	Initial_List();
-
+	if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
+	{
+		Initial_List();
+		isFreshOne = false;
+	}
 	if(bacnet_device_type == T38AI8AO6DO)
 	{
 		INPUT_LIMITE_ITEM_COUNT = 8;
