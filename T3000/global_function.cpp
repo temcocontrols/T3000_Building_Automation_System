@@ -5269,7 +5269,7 @@ void localhandler_read_property_ack(
                         data.application_data = itr->application_data;
                         data.application_data_len = itr->application_data_len;
                         rp_ack_print_data(&data);
-                        int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                        //int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
                         segmented_bacnet_data.erase(itr);
                     }
                     else 
@@ -5365,7 +5365,7 @@ void localhandler_read_property_ack(
 #endif
             if(segmentedCompleted)
             {
-                tsm_free_invoke_id(service_data->invoke_id);
+                //tsm_free_invoke_id(service_data->invoke_id);
 
                 vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
                 vector<str_bacnet_rp_info>::iterator itrflag;
