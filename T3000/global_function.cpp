@@ -10079,6 +10079,7 @@ void ClearBacnetData()
         memset(m_Input_data.at(i).description, 0, sizeof(Str_in_point));
         sprintf((char *)m_Input_data.at(i).description, "IN%d", i + 1);
         sprintf((char *)m_Input_data.at(i).label, "IN%d", i + 1);
+        
     }
 
     for (int i = 0; i<BAC_OUTPUT_ITEM_COUNT; i++)

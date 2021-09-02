@@ -251,7 +251,6 @@ typedef struct
 	uint8_t sub_number;
 	//uint8_t delay_timer;      /* (2 bytes;  seconds,minutes)*/
 	uint8_t pwm_period;
-	uint8_t instance_id;	      			/* instance id of out object*/
 } Str_out_point;  /* 21+9+4+2+2+2 = 40 */
 
 typedef struct
@@ -277,7 +276,6 @@ typedef  struct
 	uint8_t calibration_h; /* (5 bits - spare )*/  //去掉了 unused 把 calibration改为了双字节
 	uint8_t calibration_l;  /* (8 bits; -25.6 to 25.6 / -256 to 256 )*/
 	uint8_t range;	      			/* (1 uint8_t ; input_range_equate)*/
-	uint8_t instance_id;	      			/* instance id of input object*/
 
 } Str_in_point; 
 

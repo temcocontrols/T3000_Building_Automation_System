@@ -16,6 +16,7 @@
 extern tree_product selected_product_Node; // 选中的设备信息;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
+extern vector <int>  m_Input_data_instance;
 static bool show_external =  false;
 CRect Input_rect;
 int INPUT_LIMITE_ITEM_COUNT = 0;
@@ -342,8 +343,11 @@ void CBacnetInput::Initial_List()
 		CString temp_des;
 		CString temp_units;
 
-		if(i>=input_item_limit_count)	//vector的大小始终不变 ,用次变量来 约束 要显示的 item 数量;
-			break;
+		if (i >= input_item_limit_count)	//vector的大小始终不变 ,用次变量来 约束 要显示的 item 数量;
+		{
+			m_input_list.DeleteItem(i);
+			continue;
+		}
 
 
 
@@ -460,7 +464,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			if (m_Input_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
 				ObjectType = OBJECT_BINARY_INPUT;
 
-			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance,(BACNET_OBJECT_TYPE)ObjectType, m_Input_data.at(Changed_Item).instance_id, PROP_DESCRIPTION, temp_value);
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance,(BACNET_OBJECT_TYPE)ObjectType, m_Input_data_instance.at(Changed_Item), PROP_DESCRIPTION, temp_value);
 		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
@@ -507,7 +511,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 				int ObjectType = OBJECT_ANALOG_INPUT;
 				if (m_Input_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
 					ObjectType = OBJECT_BINARY_INPUT;
-				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Input_data.at(Changed_Item).instance_id, PROP_OBJECT_NAME, temp_value);
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Input_data_instance.at(Changed_Item), PROP_OBJECT_NAME, temp_value);
 		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
@@ -537,7 +541,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			int ObjectType = OBJECT_ANALOG_INPUT;
 			if (m_Input_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
 				ObjectType = OBJECT_BINARY_INPUT;
-			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Input_data.at(Changed_Item).instance_id, PROP_OUT_OF_SERVICE, temp_value);
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Input_data_instance.at(Changed_Item), PROP_OUT_OF_SERVICE, temp_value);
 		}
 	}
 
@@ -558,7 +562,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			int ObjectType = OBJECT_ANALOG_INPUT;
 			if (m_Input_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
 				ObjectType = OBJECT_BINARY_INPUT;
-			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Input_data.at(Changed_Item).instance_id, PROP_PRESENT_VALUE, temp_value);
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Input_data_instance.at(Changed_Item), PROP_PRESENT_VALUE, temp_value);
 		}
 	}
 
@@ -649,10 +653,14 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	int Fresh_Item;
 	int isFreshOne = (bool)lParam;
 	int  Minipanel_device = 1;
-	if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
+	int listCount = m_input_list.GetItemCount();
+	if (listCount != input_item_limit_count ) // for bacnet devices hiding columns
 	{
 		Initial_List();
-		isFreshOne = false;
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
+		{
+			isFreshOne = false;
+		}
 	}
 	if(bacnet_device_type == T38AI8AO6DO)
 	{
@@ -863,10 +871,10 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		}
 		if (m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG) {
 
-			temp_item.Format(_T("AI%d"), m_Input_data.at(i).instance_id);
+			temp_item.Format(_T("AI%d"), m_Input_data_instance.at(i));
 		}
 		else {
-			temp_item.Format(_T("BI%d"), m_Input_data.at(i).instance_id);
+			temp_item.Format(_T("BI%d"), m_Input_data_instance.at(i));
 		}
 		m_input_list.SetItemText(i,INPUT_NUM,temp_item);
 
@@ -1485,13 +1493,20 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			{
 
 				m_Input_data.at(lRow).auto_manual = 1;
-				m_input_list.SetItemText(lRow, INPUT_AUTO_MANUAL, _T("False"));
+				m_input_list.SetItemText(lRow, INPUT_AUTO_MANUAL, _T("True"));
 			}
 			else
 			{
 				m_Input_data.at(lRow).auto_manual = 0;
-				m_input_list.SetItemText(lRow, INPUT_AUTO_MANUAL, _T("True"));
+				m_input_list.SetItemText(lRow, INPUT_AUTO_MANUAL, _T("False"));
 			}
+				BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+				temp_value->tag = TPYE_BACAPP_BOOLEAN;
+				temp_value->type.Boolean = m_Input_data.at(lRow).auto_manual;
+				int ObjectType = OBJECT_ANALOG_INPUT;
+				if (m_Input_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
+					ObjectType = OBJECT_BINARY_INPUT;
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Input_data_instance.at(lRow), PROP_OUT_OF_SERVICE, temp_value);
 		}
 		else
 		{

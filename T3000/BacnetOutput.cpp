@@ -22,6 +22,8 @@ int OUTPUT_LIMITE_ITEM_COUNT = 0;
 int changed_output_item = -1; //// 用于改变某一列后 ，立即刷新 当前列的其他变化;
 extern tree_product selected_product_Node; // 选中的设备信息;
 
+extern vector <int>  m_Output_data_instance;
+
 IMPLEMENT_DYNAMIC(CBacnetOutput, CDialogEx)
 
 CBacnetOutput::CBacnetOutput(CWnd* pParent /*=NULL*/)
@@ -315,8 +317,11 @@ void CBacnetOutput::Initial_List()
 		CString temp_units;
 
 
-		if(i>=output_item_limit_count)
-			break;
+		if (i >= output_item_limit_count)
+		{
+			m_output_list.DeleteItem(i);
+			continue;
+		}
 
 		temp_item.Format(_T("OUT%d"),i+1);
 		m_output_list.InsertItem(i,temp_item);
@@ -377,7 +382,15 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	//	need_refresh_all = true;
 	//}
 
-	Initial_List();
+	int listCount = m_output_list.GetItemCount();
+	if (listCount != output_item_limit_count) // for bacnet devices hiding columns
+	{
+		Initial_List();
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
+		{
+			isFreshOne = false;
+		}
+	}
 
 	int digital_special_output_count = 0;
 	int analog_special_output_count = 0;
@@ -596,10 +609,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
 		if (m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG){
-			temp_item.Format(_T("AO%d"), m_Input_data.at(i).instance_id);
+			temp_item.Format(_T("AO%d"), m_Output_data_instance.at(i));
 		}
 		else {
-			temp_item.Format(_T("BO%d"), m_Input_data.at(i).instance_id);
+			temp_item.Format(_T("BO%d"), m_Output_data_instance.at(i));
 		}
 		m_output_list.SetItemText(i,OUTPUT_NUM,temp_item);
 		m_output_list.SetItemText(i,OUTPUT_FULL_LABLE,temp_des);
@@ -677,7 +690,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 				if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 				{
-					if (m_Input_data.at(i).auto_manual == 0)
+					if (m_Output_data.at(i).auto_manual == 0)
 					{
 						m_output_list.SetItemText(i, OUTPUT_AUTO_MANUAL, _T("False"));
 					}
@@ -711,7 +724,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
 			if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 			{
-				if (m_Input_data.at(i).auto_manual == 0)
+				if (m_Output_data.at(i).auto_manual == 0)
 				{
 					m_output_list.SetItemText(i, OUTPUT_AUTO_MANUAL, _T("False"));
 				}
@@ -1098,7 +1111,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 			if (m_Output_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
 				ObjectType = OBJECT_BINARY_OUTPUT;
 
-			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Output_data.at(Changed_Item).instance_id, PROP_DESCRIPTION, temp_value);
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Output_data_instance.at(Changed_Item), PROP_DESCRIPTION, temp_value);
 		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
@@ -1143,7 +1156,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 			if (m_Output_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
 				ObjectType = OBJECT_BINARY_OUTPUT;
 			
-			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Output_data.at(Changed_Item).instance_id, PROP_OBJECT_NAME, temp_value);
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Output_data_instance.at(Changed_Item), PROP_OBJECT_NAME, temp_value);
 		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
@@ -1172,7 +1185,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 			int ObjectType = OBJECT_ANALOG_OUTPUT;
 			if (m_Output_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
 				ObjectType = OBJECT_BINARY_OUTPUT;
-			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Output_data.at(Changed_Item).instance_id, PROP_OUT_OF_SERVICE, temp_value);
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Output_data_instance.at(Changed_Item), PROP_OUT_OF_SERVICE, temp_value);
 		}
 	}
 
@@ -1189,7 +1202,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 			int ObjectType = OBJECT_ANALOG_OUTPUT;
 			if (m_Output_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
 				ObjectType = OBJECT_BINARY_OUTPUT;
-			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Output_data.at(Changed_Item).instance_id, PROP_PRESENT_VALUE, temp_value);
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Output_data_instance.at(Changed_Item), PROP_PRESENT_VALUE, temp_value);
 		}
 	}
 
@@ -1464,17 +1477,25 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 		memcpy_s(&m_temp_output_data[lRow],sizeof(Str_out_point),&m_Output_data.at(lRow),sizeof(Str_out_point));
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 		{
-			if (m_Input_data.at(lRow).auto_manual == 0)
+			if (m_Output_data.at(lRow).auto_manual == 0)
 			{
 
 				m_Output_data.at(lRow).auto_manual = 1;
-				m_output_list.SetItemText(lRow, OUTPUT_AUTO_MANUAL, _T("False"));
+				m_output_list.SetItemText(lRow, OUTPUT_AUTO_MANUAL, _T("True"));
 			}
 			else
 			{
 				m_Output_data.at(lRow).auto_manual = 0;
-				m_output_list.SetItemText(lRow, OUTPUT_AUTO_MANUAL, _T("True"));
+				m_output_list.SetItemText(lRow, OUTPUT_AUTO_MANUAL, _T("False"));
 			}
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_BOOLEAN;
+			temp_value->type.Boolean = m_Output_data.at(lRow).auto_manual;
+			int ObjectType = OBJECT_ANALOG_OUTPUT;
+			if (m_Output_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
+				ObjectType = OBJECT_BINARY_OUTPUT;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Output_data_instance.at(lRow), PROP_OUT_OF_SERVICE, temp_value);
+
 		}
 		else
 		{

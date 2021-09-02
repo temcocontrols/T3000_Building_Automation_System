@@ -1966,6 +1966,9 @@ vector <Str_table_point> m_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite;
 vector <Str_Extio_point> m_extio_config_data;
 
+vector <int>  m_Input_data_instance; // for input bacnet-thirdParty devices instance_is's
+vector <int>  m_Output_data_instance;// for output bacnet-thirdParty devices instance_is's
+
 vector <Str_MSV> m_msv_data;
 
 Time_block_mini Device_time;
