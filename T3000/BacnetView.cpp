@@ -982,6 +982,8 @@ HANDLE write_indb_thread = NULL; //将资料写入数据库的线程;
 int connect_way = 0;  // 1 为MODBUS RS485    2 为 MODBUS TCP
 HANDLE hbip_whois_thread = NULL; //处理回复 I am 线程
 
+extern vector <int>  m_Input_data_instance;
+extern vector <int>  m_Output_data_instance;
 
 
 
@@ -2166,6 +2168,8 @@ void CDialogCM5_BacNet::Initial_All_Point()
 	m_user_login_data.clear();
 	m_tatat_schedule_data.clear();
     m_msv_data.clear();
+	m_Input_data_instance.clear();
+	m_Output_data_instance.clear();
 	//vector <Str_TstatInfo_point> m_Tstat_data;
 	for(int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
 	{
@@ -2173,6 +2177,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		memset(temp_in.description,0,21);
 		memset(temp_in.label,0,9);
 		m_Input_data.push_back(temp_in);
+		m_Input_data_instance.push_back(i);
 
 	}
 	for(int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
@@ -2180,6 +2185,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		Str_out_point temp_out;
 		memset(&temp_out,0,sizeof(temp_out));
 		m_Output_data.push_back(temp_out);
+		m_Output_data_instance.push_back(i);
 	}
 	for (int i=0;i<BAC_VARIABLE_ITEM_COUNT;i++)
 	{
@@ -2341,6 +2347,7 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 {
 	BACNET_APPLICATION_DATA_VALUE temp_value;
 	int invoke_id = Bacnet_Read_Properties_Blocking(deviceid, object_type, object_instance, property_id, value, retrytime);
+	// invoke_id = Bacnet_Read_Property_Multiple(deviceid, object_type, object_instance, PROP_ALL);
 	if (invoke_id >= 0)
 	{
 		CString tmpString;
@@ -2439,6 +2446,14 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 			tmp.range = temp_value.type.Enumerated;
 		}
 	}
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 3);
+	if (invoke_id)
+	{
+		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+
+			tmp.auto_manual = temp_value.type.Boolean;
+		}
+	}
 	/*response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, PROP_DEVICE_TYPE, temp_value, 3);
 		if (response)
 		{
@@ -2448,6 +2463,8 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 			tmp.range = *found_index;
 		}
 		*/
+	//tmp.instance_id = objInstace;
+	m_Input_data_instance.at(index) = objInstace;
 	m_Input_data.at(index) = tmp;
 	
 }
@@ -2531,7 +2548,9 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 			tmp.auto_manual = temp_value.type.Boolean;
 		}
 	}
-	
+	//tmp.instance_id = objInstace;
+	//tmp.instance_id = objInstace;
+	m_Output_data_instance.at(index) = objInstace;
 	m_Output_data.at(index) = tmp;
 
 }
@@ -2570,7 +2589,7 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.description, VARIABLE_FULL_LABLE, temp_value.type.Character_String.value, VARIABLE_FULL_LABLE);
+			memcpy_s(tmp.description, STR_VARIABLE_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_VARIABLE_DESCRIPTION_LENGTH);
 		}
 	}
 	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
@@ -2831,10 +2850,17 @@ void CDialogCM5_BacNet::Fresh()
 
 	}
 	m_user_level = LOGIN_SUCCESS_FULL_ACCESS;
+	 
+	input_item_limit_count = BAC_INPUT_ITEM_COUNT;	
+	output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;
+	variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;
+
 	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
 	{
-			Send_WhoIs_Global(-1, -1);
-			Sleep(10);
+			//Send_WhoIs_Global(-1, -1);
+			//Sleep(10);
+			ClearBacnetData();
+			
 			BACNET_OBJECT_TYPE objectType = OBJECT_DEVICE;
 			BACNET_PROPERTY_ID propertyID = PROP_OBJECT_LIST;
 			int deviceInstance = g_bac_instance;
@@ -2842,6 +2868,7 @@ void CDialogCM5_BacNet::Fresh()
 			bacnet_device_type = PM_THIRD_PARTY_DEVICE;
 			BACNET_APPLICATION_DATA_VALUE temp_value;
 			CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 3);
+			
 			if (response!="")
 			{
 				CStringArray temp_array;
@@ -2905,6 +2932,15 @@ void CDialogCM5_BacNet::Fresh()
 						i++;
 					}
 				}
+				input_item_limit_count = inputcount;
+				output_item_limit_count = outputcount;
+				variable_item_limit_count = variablecount;
+			}
+			else {
+				CString Temp_Error_Msg;
+				Temp_Error_Msg.Format(_T("Read Properties error\r\n\
+Not able to read Property list of BACnet Device,\r\nThis may be due to a connection error with device \r\n\ "));
+				AfxMessageBox(Temp_Error_Msg);
 			}
 		
 		BacNet_hwd = this->m_hWnd;

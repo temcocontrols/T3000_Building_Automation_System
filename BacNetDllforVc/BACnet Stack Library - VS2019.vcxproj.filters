@@ -367,6 +367,9 @@
     <ClCompile Include="Testfunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Handler\s_ack_seg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Object\ai.h">

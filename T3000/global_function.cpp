@@ -5241,6 +5241,7 @@ void localhandler_read_property_ack(
     BACNET_ADDRESS * src,
     BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
 {
+    bool segmentedCompleted = true;
     int len = 0;
     BACNET_READ_PROPERTY_DATA data;
     (void)src;
@@ -5251,92 +5252,141 @@ void localhandler_read_property_ack(
         //local_rp_ack_print_data(&data);
         BACNET_APPLICATION_DATA_VALUE value;
         local_value_rp_ack_print_data(&data,value);
-        
-        if (data.object_property == PROP_WEEKLY_SCHEDULE)
+        if (service_data->segmented_message /*&& service_data->sequence_number < service_data->proposed_window_number*/)
         {
-            int index = 0;
-            bool openTagFound = false;
-            for (int u = 0 ;u < data.application_data_len; u++)
+            vector<str_segmented_bacnet_rp_info>::iterator itr = segmented_bacnet_data.begin();
+
+            int find_exsit = false;
+            for (; itr != segmented_bacnet_data.end(); itr++)
             {
-               
-                uint8_t tempval = data.application_data[u];
-                if (IS_OPENING_TAG(tempval) && !openTagFound) {
-                    openTagFound = true;
+                if ((itr->invoke_id == service_data->invoke_id) &&
+                    (itr->bacnet_instance == data.object_instance) &&
+                    (itr->object_type == data.object_type) &&
+                    (itr->property_id == data.object_property))
+                {
+                    if (service_data->sequence_number == service_data->proposed_window_number)
+                    {
+                        data.application_data = itr->application_data;
+                        data.application_data_len = itr->application_data_len;
+                        rp_ack_print_data(&data);
+                        //int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                        segmented_bacnet_data.erase(itr);
+                    }
+                    else 
+                    {
+                        strcat((char*)itr->application_data, (char*)data.application_data);
+                        itr->application_data_len += data.application_data_len;
+                        find_exsit = true;
+                        segmentedCompleted = false;
+                        if(service_data->sequence_number == 0)
+                        int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                    }
                 }
-                else if ( (IS_CLOSING_TAG(tempval)&& openTagFound && IS_OPENING_TAG(data.application_data[u + 1])) || (u+1 == data.application_data_len) ) {
-                    bacnet_string += "/n";
-                    index++;
-                    openTagFound = false;
+            }
+            if (!find_exsit)
+            {
+                str_segmented_bacnet_rp_info temp_standard_bacnet_data = { 0 };
+                temp_standard_bacnet_data.invoke_id = service_data->invoke_id;
+                temp_standard_bacnet_data.bacnet_instance = data.object_instance;
+                temp_standard_bacnet_data.object_type = data.object_type;
+                temp_standard_bacnet_data.property_id = data.object_property;
+                temp_standard_bacnet_data.application_data = data.application_data;
+                temp_standard_bacnet_data.application_data_len = data.application_data_len;
+                segmented_bacnet_data.push_back(temp_standard_bacnet_data);
+                int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                segmentedCompleted = false;
+               // Sleep(10);
+            }
+           
+        }
+        
+            if (data.object_property == PROP_WEEKLY_SCHEDULE)
+            {
+                int index = 0;
+                bool openTagFound = false;
+                for (int u = 0; u < data.application_data_len; u++)
+                {
+
+                    uint8_t tempval = data.application_data[u];
+                    if (IS_OPENING_TAG(tempval) && !openTagFound) {
+                        openTagFound = true;
+                    }
+                    else if ((IS_CLOSING_TAG(tempval) && openTagFound && IS_OPENING_TAG(data.application_data[u + 1])) || (u + 1 == data.application_data_len)) {
+                        bacnet_string += "/n";
+                        index++;
+                        openTagFound = false;
+                    }
+                    else {
+                        bacnet_string += std::to_string(tempval).c_str();
+                        bacnet_string += ",";
+                    }
+                    int i = 0;
+                    if (index > 7)
+                        break;
                 }
-                else {
+                int i = 0;
+            }
+            else if (data.object_property == PROP_DATE_LIST)
+            {
+                int index = 0;
+                bool openTagFound = false;
+                bacnet_string = "";
+                for (int u = 0; u < data.application_data_len; u++)
+                {
+
+                    uint8_t tempval = data.application_data[u];
+
                     bacnet_string += std::to_string(tempval).c_str();
                     bacnet_string += ",";
                 }
                 int i = 0;
-                if (index > 7)
-                    break;
             }
-            int i = 0;
-        }
-        else if (data.object_property == PROP_DATE_LIST)
-        {
-            int index = 0;
-            bool openTagFound = false;
-            bacnet_string = "";
-            for (int u = 0; u < data.application_data_len; u++)
-            {
-
-                uint8_t tempval = data.application_data[u];
-                
-                    bacnet_string += std::to_string(tempval).c_str();
-                    bacnet_string += ",";
-            }
-            int i = 0;
-        }
 #if 1
-        if (data.object_property == PROP_PRIORITY_ARRAY)
-        {
-            CString temp_bacnet_logfile;
-            temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
-            CFile myfile(temp_bacnet_logfile, CFile::modeRead);
-            char *pBuf;
-            DWORD dwFileLen;
-            dwFileLen = myfile.GetLength();
-            pBuf = new char[dwFileLen + 1];
-            memset(pBuf, 0, dwFileLen);
-            pBuf[dwFileLen] = 0;
-            myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
-            myfile.Close();
-            CString test_pop_up;
-            MultiByteToWideChar(CP_ACP, 0, (char *)pBuf, (int)strlen((char *)pBuf) + 1,
-                bacnet_string.GetBuffer(dwFileLen + 1), dwFileLen + 1);
-            bacnet_string.ReleaseBuffer();
-            delete[] pBuf;
-        }
+            if (data.object_property == PROP_PRIORITY_ARRAY)
+            {
+                CString temp_bacnet_logfile;
+                temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
+                CFile myfile(temp_bacnet_logfile, CFile::modeRead);
+                char* pBuf;
+                DWORD dwFileLen;
+                dwFileLen = myfile.GetLength();
+                pBuf = new char[dwFileLen + 1];
+                memset(pBuf, 0, dwFileLen);
+                pBuf[dwFileLen] = 0;
+                myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
+                myfile.Close();
+                CString test_pop_up;
+                MultiByteToWideChar(CP_ACP, 0, (char*)pBuf, (int)strlen((char*)pBuf) + 1,
+                    bacnet_string.GetBuffer(dwFileLen + 1), dwFileLen + 1);
+                bacnet_string.ReleaseBuffer();
+                delete[] pBuf;
+            }
 
 #endif
-
-        vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
-        vector<str_bacnet_rp_info>::iterator itrflag;
-
-
-        
-        int find_exsit = false;
-        for (; itr != standard_bacnet_data.end(); itr++)
-        {
-            if ((itr->invoke_id == service_data->invoke_id) &&
-                (itr->object_item_number == data.object_instance) &&
-                (itr->object_type == data.object_type) &&
-                (itr->property_id == data.object_property))
+            if(segmentedCompleted)
             {
-                itrflag = itr;  //找到曾经读过
-                itrflag->value = value;
-                find_exsit = true;
+                //tsm_free_invoke_id(service_data->invoke_id);
+
+                vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+                vector<str_bacnet_rp_info>::iterator itrflag;
+
+
+
+                int find_exsit = false;
+                for (; itr != standard_bacnet_data.end(); itr++)
+                {
+                    if ((itr->invoke_id == service_data->invoke_id) &&
+                        (itr->object_item_number == data.object_instance) &&
+                        (itr->object_type == data.object_type) &&
+                        (itr->property_id == data.object_property))
+                    {
+                        itrflag = itr;  //找到曾经读过
+                        itrflag->value = value;
+                        find_exsit = true;
+                    }
+                }
             }
-        }
-
-
-        Sleep(1);
+         Sleep(1);
     }
 }
 
@@ -6389,7 +6439,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
     {
         m_bac_handle_Iam_data.push_back(temp_1);
 #ifdef USE_THIRD_PARTY_FUNC
-        //if (vendor_id != 148) //如果不是Temco的ID 才当作第三方设备
+        if (vendor_id != 148) //如果不是Temco的ID 才当作第三方设备
         {
             _Bac_Scan_Com_Info *temp = new _Bac_Scan_Com_Info;
             memcpy(temp, &temp_1, sizeof(_Bac_Scan_Com_Info));
@@ -6500,9 +6550,6 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         if(!port_bind_results)
             return false;
 		
-
-        bip_set_socket(my_sokect);
-        bip_set_port(htons(47808));
 
         static in_addr BIP_Broadcast_Address;
         
@@ -7015,13 +7062,16 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
     {
         strIPAdress = selected_product_Node.BuildingInfo.strIp;  //用设备的前三个 来确定bind哪一个 网卡;
     }
-
+    
     for (int i = 0; i < g_Vector_Subnet.size(); i++)
     {
+        if (strIPAdress.IsEmpty())
+        {
+            strIPAdress = g_Vector_Subnet.at(i).StrIP;
+        }
         CStringArray temp_strip;
         SplitCStringA(temp_strip, strIPAdress, _T("."));
         CString temp_ip;
-        if(strIPAdress !="")
         temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
 
 
@@ -7038,7 +7088,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
             continue;
 
 
-        //if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
+        if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
         {
             find_network = true;
             strIPAdress = g_Vector_Subnet.at(i).StrIP;
@@ -10029,6 +10079,7 @@ void ClearBacnetData()
         memset(m_Input_data.at(i).description, 0, sizeof(Str_in_point));
         sprintf((char *)m_Input_data.at(i).description, "IN%d", i + 1);
         sprintf((char *)m_Input_data.at(i).label, "IN%d", i + 1);
+        
     }
 
     for (int i = 0; i<BAC_OUTPUT_ITEM_COUNT; i++)
