@@ -499,7 +499,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
                 if (m_Variable_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //Èç¹ûÊÇ
                     return 0;
                 bool msv_status = 0;
-                if ((m_Variable_data.at(label_info.nPoint_number).range >= 101) && (m_Variable_data.at(label_info.nPoint_number).range <= 103))
+                if ((m_Variable_data.at(label_info.nPoint_number).range >= 101) && (m_Variable_data.at(label_info.nPoint_number).range <= 104))
                 {
                     msv_status = 1;
                     if (read_msv_table)
@@ -563,6 +563,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				{
 					return 0;
 				}
+				m_edit_value.SetWindowTextW(show_temp);
 			}
 
 			CString temp_task_info;

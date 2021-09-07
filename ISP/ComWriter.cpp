@@ -36,7 +36,7 @@ CComWriter::CComWriter(void)
     m_nComPort = -1;
     //m_nModbusID;
     m_nBautrate = 0;			// ²¨ÌØÂÊ
-
+    m_com_flash_binfile = 0;
     m_pWorkThread = NULL;
 
     m_bStopWrite = FALSE;
@@ -136,6 +136,28 @@ int CComWriter::BeginWirteByCom()
 
     else if(m_nHexFileType == 2)
     {
+        if (open_com(m_nComPort) == false)
+        {
+            CString srtInfo = _T("|Error :The com port is occupied!");
+            //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+            //AddStringToOutPuts(_T("Error :The com port is occupied!"));
+            OutPutsStatusInfo(srtInfo, FALSE);
+            srtInfo = _T("You need to shut down all other applications and ");
+            OutPutsStatusInfo(srtInfo, FALSE);
+            srtInfo = _T("background tasks that might be occupying this COM port!");
+            OutPutsStatusInfo(srtInfo, FALSE);
+            return 0;
+        }
+        else
+        {
+            CString strTemp;
+            strTemp.Format(_T("COM%d"), m_nComPort);
+            CString strTips = _T("|Open ") + strTemp + _T(" successful.");
+            OutPutsStatusInfo(strTips, FALSE);
+            Change_BaudRate(m_nBautrate);
+
+        }
+
         if (Is_Ram)
         {
             WirteExtendHexFileByCom_RAM();
@@ -1449,11 +1471,14 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 #endif
 
             }
-
-            if (!Flag_HEX_BIN)
+            if (pWriter->m_com_flash_binfile == 0)
             {
-                continue;
+                if (!Flag_HEX_BIN)
+                {
+                    continue;
+                }
             }
+
 
             int nCount = 0;
             for(UINT p = 0; p < pWriter->m_szHexFileFlags.size(); p++)

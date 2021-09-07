@@ -71,6 +71,7 @@ public:
     afx_msg void OnBnClickedRadio103();
 	void RadioDegC_DegF(bool n_enable, bool n_deg_c= 1);
 
+	afx_msg void OnBnClickedRadioMsv4();
 };
 
 const CString Range_Type[] =

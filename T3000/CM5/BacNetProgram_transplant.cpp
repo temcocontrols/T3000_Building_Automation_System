@@ -1092,7 +1092,7 @@ struct func_table {
 
 struct commands {
  char command[15] ;
- char tok ;
+ unsigned char tok ;
 } table[] = { /* Commands must be enetered lower case */
  "ALARM",   Alarm,
  "ALARM-AT",ALARM_AT,
@@ -1106,7 +1106,7 @@ struct commands {
  "ENABLE",  ENABLEX,
  "END",     ENDPRG,
  "FOR",     FOR,
- "TO ",      TO,
+ "TO",      TO,
  "STEP",    STEP,
  "GOSUB",	  GOSUB,
  "GOTO",    GOTO,
@@ -2460,8 +2460,11 @@ p = s ;
 //	 while (*p) { * p = toupper(*p) ; p++ ; }
 
 /* see if token is in table */
-for( i = 0 ; *table[i].command ; i++ )
-	if (!strcmp(table[i].command , s)) return table[i].tok;
+for (i = 0; *table[i].command; i++)
+{
+	if (!strcmp(table[i].command, s)) 
+		return table[i].tok;
+}
 return 0 ; /* unkown command */
 }
 

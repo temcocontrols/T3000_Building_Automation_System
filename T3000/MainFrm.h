@@ -568,6 +568,7 @@ public:
         afx_msg void OnDatabaseLogdetail();
         afx_msg void OnUpdateAppAbout(CCmdUI *pCmdUI);
 		afx_msg void OnDatabaseBuildingManagement();
+		afx_msg void OnViewRefresh();
 };
 
 //tree0412  2017 05 11 fance change

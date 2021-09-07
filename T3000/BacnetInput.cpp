@@ -1540,7 +1540,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
             }
             if (Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
             {
-                if ((lRow >= 8) && (lRow <= 12))
+                if ((lRow >= 9) && (lRow <= 12))
                     return;
             }
         }
@@ -2008,6 +2008,11 @@ BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
 		}
 
 		return 1; 
+	}
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
+	{
+		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_INPUT);
+		return TRUE;
 	}
 
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);

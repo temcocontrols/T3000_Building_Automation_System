@@ -369,6 +369,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
         ON_COMMAND(ID_DATABASE_LOGDETAIL, &CMainFrame::OnDatabaseLogdetail)
         ON_UPDATE_COMMAND_UI(ID_APP_ABOUT, &CMainFrame::OnUpdateAppAbout)
         ON_COMMAND(ID_DATABASE_BUILDINGMANAGEMENT, &CMainFrame::OnDatabaseBuildingManagement)
+        ON_COMMAND(ID_VIEW_REFRESH, &CMainFrame::OnViewRefresh)
         END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -6675,7 +6676,24 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
         }
         else if (pMsg->wParam == VK_F2)
         {
-            m_pTreeViewCrl->DoEditLabel(selected_product_Node.product_item);
+            switch (bacnet_view_number)
+            {
+            case TYPE_INPUT:
+            case TYPE_OUTPUT:
+            case TYPE_VARIABLE:
+            case TYPE_PROGRAM:
+            case TYPE_CONTROLLER:
+            case TYPE_WEEKLY:
+            case TYPE_ANNUAL:
+            case TYPE_SCREENS:
+            case TYPE_MONITOR:
+
+                ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, bacnet_view_number);
+                break;
+            }
+
+            //m_pTreeViewCrl->DoEditLabel(selected_product_Node.product_item);
+            return 1;
             //DoEditLabel()
         }
         if(((GetAsyncKeyState( VK_LCONTROL ) & 0x8000))&&(pMsg->wParam =='R'))
@@ -6696,7 +6714,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
         if(pMsg->wParam == VK_F2)
         {
             //OnToolErease();
-            return 1;
+            //return 1;
         }
     }
 
@@ -9465,6 +9483,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 
 LRESULT  CMainFrame::HandleIspModedivice(WPARAM wParam, LPARAM lParam)
 {
+    int run_isp = 0;
 	CString ApplicationFolder;
 	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
 	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
@@ -9511,9 +9530,10 @@ LRESULT  CMainFrame::HandleIspModedivice(WPARAM wParam, LPARAM lParam)
 			Dowmloadfile Dlg;
 		if(isp_mode_is_cancel)
 		{
+            run_isp = 0;
 			goto finished_detect;
 		}
-
+        run_isp = 1;
 	SetCommunicationType(0);//关闭串口，供ISP 使用;
 	close_com();
 
@@ -9521,17 +9541,21 @@ LRESULT  CMainFrame::HandleIspModedivice(WPARAM wParam, LPARAM lParam)
 
 
 finished_detect:
+    if (run_isp)
+    {
+        if (temp_type == 0)
+        {
+            int comport = GetLastOpenedComport();
+            open_com(comport);
+        }
+        else
+        {
 
-	if(temp_type == 0)
-	{
-		int comport = GetLastOpenedComport();
-		open_com(comport);
-	}
-	else
-	{
+        }
+        SetCommunicationType(temp_type);
 
-	}
-	SetCommunicationType(temp_type);
+    }
+
 
 	//Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
 	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
@@ -11472,6 +11496,58 @@ void CMainFrame::OnControlInputs()
             if ((product_type == STM32_CO2_NET) ||
                 (product_type == STM32_CO2_RS485))
                 bacnet_device_type = product_type;
+            if ((g_selected_product_id == PM_T38AI8AO6DO) ||
+                (g_selected_product_id == PM_T322AI))
+            {
+                unsigned short read_data_buffer[600];
+                memset(read_data_buffer, 0, sizeof(unsigned short) * 600);
+                int read_result = 1;
+                //cus table  106 按106算  *5    106x5  需要读530   需要读取6包;
+                for (int i = 0; i < 6; i++)
+                {
+                    int itemp = 0;
+                    itemp = Read_Multi(selected_product_Node.product_id, &read_data_buffer[i * 100], BAC_CUS_TABLE_FIRST + i * 100, 100, 4);
+                    if (itemp < 0)
+                    {
+                        read_result = false;
+                        break;
+                    }
+                    else
+                    {
+                        if (!hide_485_progress)
+                            g_progress_persent = (i + 1) * 100 / 6;
+                        else
+                        {
+                            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Reading custom ranges..."));
+                        }
+                    }
+                    Sleep(100);
+                }
+                if (read_result)
+                {
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read custom ranges OK!"));
+                    for (int i = 0; i < BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
+                    {
+                        if (check_revert_daxiaoduan)
+                        {
+                            for (int j = 0; j < 53; j++)  //   sizeof(Str_table_point)  = 106
+                            {
+                                read_data_buffer[i * 53 + j] = htons(read_data_buffer[i * 53 + j]);
+                            }
+                        }
+                        memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//因为Str_table_point 只有106个字节，两个byte放到1个 modbus的寄存器里面;
+
+                        MultiByteToWideChar(CP_ACP, 0, (char*)m_analog_custmer_range.at(i).table_name,
+                            (int)strlen((char*)m_analog_custmer_range.at(i).table_name) + 1,
+                            Analog_Customer_Units[i].GetBuffer(MAX_PATH), MAX_PATH);
+                        Analog_Customer_Units[i].ReleaseBuffer();
+                    }
+
+                }
+                g_progress_persent = 100;
+
+
+            }
 			hide_485_progress = false;
 			::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, READINPUT_T3000 /*BAC_IN*/);//第二个参数 In
 			::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
@@ -12073,7 +12149,7 @@ void CMainFrame::OnControlSettings()
 				Setting_Window->Reset_Setting_Rect();
 				Setting_Window->ShowWindow(SW_SHOW);
             }
-			//Setting_Window->SetFocus(); 暂时屏蔽 避免焦点切换导致无法F2变更名字;
+			Setting_Window->SetFocus(); 
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_SETTING);
             bacnet_view_number = TYPE_SETTING;
             g_hwnd_now = m_setting_dlg_hwnd;
@@ -12503,7 +12579,7 @@ void CMainFrame::OnDatabaseBacnettool()
     //dlg.DoModal();
     //return;
 //#endif // DEBUG
-
+    close_bac_com(); //这里需要bacnet 任务占用的端口，如果不释放会倒是 Yabe 无法bind端口;
     CString CS_BacnetExplore_Path;
     CString ApplicationFolder;
     GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
@@ -14993,4 +15069,11 @@ void CMainFrame::OnDatabaseBuildingManagement()
     m_pTreeViewCrl->DeleteAllItems();
     m_product.clear();
     SwitchToPruductType(DLG_DIALOG_BUILDING_MANAGEMENT);
+}
+
+
+void CMainFrame::OnViewRefresh()
+{
+    // TODO: 在此添加命令处理程序代码
+    ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, bacnet_view_number);
 }

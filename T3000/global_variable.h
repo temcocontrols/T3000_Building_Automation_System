@@ -1845,7 +1845,7 @@ bool receive_customer_unit; //收到回复，flag就置 true;
 bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
 
 bool read_msv_table; //MSV table 
-CString Custom_Msv_Range[BAC_MSV_COUNT];// 存储客户多态  例如显示  AAA/BBB/CCC
+CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// 存储客户多态  例如显示  AAA/BBB/CCC
 
 CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];

@@ -5300,67 +5300,67 @@ void localhandler_read_property_ack(
            
         }
         
-            if (data.object_property == PROP_WEEKLY_SCHEDULE)
+        if (data.object_property == PROP_WEEKLY_SCHEDULE)
+        {
+            int index = 0;
+            bool openTagFound = false;
+            for (int u = 0 ;u < data.application_data_len; u++)
             {
-                int index = 0;
-                bool openTagFound = false;
-                for (int u = 0; u < data.application_data_len; u++)
-                {
-
-                    uint8_t tempval = data.application_data[u];
-                    if (IS_OPENING_TAG(tempval) && !openTagFound) {
-                        openTagFound = true;
-                    }
-                    else if ((IS_CLOSING_TAG(tempval) && openTagFound && IS_OPENING_TAG(data.application_data[u + 1])) || (u + 1 == data.application_data_len)) {
-                        bacnet_string += "/n";
-                        index++;
-                        openTagFound = false;
-                    }
-                    else {
-                        bacnet_string += std::to_string(tempval).c_str();
-                        bacnet_string += ",";
-                    }
-                    int i = 0;
-                    if (index > 7)
-                        break;
+               
+                uint8_t tempval = data.application_data[u];
+                if (IS_OPENING_TAG(tempval) && !openTagFound) {
+                    openTagFound = true;
                 }
-                int i = 0;
-            }
-            else if (data.object_property == PROP_DATE_LIST)
-            {
-                int index = 0;
-                bool openTagFound = false;
-                bacnet_string = "";
-                for (int u = 0; u < data.application_data_len; u++)
-                {
-
-                    uint8_t tempval = data.application_data[u];
-
+                else if ( (IS_CLOSING_TAG(tempval)&& openTagFound && IS_OPENING_TAG(data.application_data[u + 1])) || (u+1 == data.application_data_len) ) {
+                    bacnet_string += "/n";
+                    index++;
+                    openTagFound = false;
+                }
+                else {
                     bacnet_string += std::to_string(tempval).c_str();
                     bacnet_string += ",";
                 }
                 int i = 0;
+                if (index > 7)
+                    break;
             }
-#if 1
-            if (data.object_property == PROP_PRIORITY_ARRAY)
+            int i = 0;
+        }
+        else if (data.object_property == PROP_DATE_LIST)
+        {
+            int index = 0;
+            bool openTagFound = false;
+            bacnet_string = "";
+            for (int u = 0; u < data.application_data_len; u++)
             {
-                CString temp_bacnet_logfile;
-                temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
-                CFile myfile(temp_bacnet_logfile, CFile::modeRead);
-                char* pBuf;
-                DWORD dwFileLen;
-                dwFileLen = myfile.GetLength();
-                pBuf = new char[dwFileLen + 1];
-                memset(pBuf, 0, dwFileLen);
-                pBuf[dwFileLen] = 0;
-                myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
-                myfile.Close();
-                CString test_pop_up;
-                MultiByteToWideChar(CP_ACP, 0, (char*)pBuf, (int)strlen((char*)pBuf) + 1,
-                    bacnet_string.GetBuffer(dwFileLen + 1), dwFileLen + 1);
-                bacnet_string.ReleaseBuffer();
-                delete[] pBuf;
+
+                uint8_t tempval = data.application_data[u];
+                
+                    bacnet_string += std::to_string(tempval).c_str();
+                    bacnet_string += ",";
             }
+            int i = 0;
+        }
+#if 1
+        if (data.object_property == PROP_PRIORITY_ARRAY)
+        {
+            CString temp_bacnet_logfile;
+            temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
+            CFile myfile(temp_bacnet_logfile, CFile::modeRead);
+            char *pBuf;
+            DWORD dwFileLen;
+            dwFileLen = myfile.GetLength();
+            pBuf = new char[dwFileLen + 1];
+            memset(pBuf, 0, dwFileLen);
+            pBuf[dwFileLen] = 0;
+            myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
+            myfile.Close();
+            CString test_pop_up;
+            MultiByteToWideChar(CP_ACP, 0, (char *)pBuf, (int)strlen((char *)pBuf) + 1,
+                bacnet_string.GetBuffer(dwFileLen + 1), dwFileLen + 1);
+            bacnet_string.ReleaseBuffer();
+            delete[] pBuf;
+        }
 
 #endif
             if(segmentedCompleted)
@@ -6462,6 +6462,12 @@ void close_bac_com()
     temphandle = Get_RS485_Handle();
     if (temphandle != NULL)
     {
+        g_mstp_flag = false;//关闭
+        int remp_socket = bip_socket();
+        closesocket(remp_socket);
+        remp_socket = NULL;
+        bip_set_socket(remp_socket); //关闭此前bind的套接字
+
         Set_Thread1_Status(0);
         Set_Thread2_Status(0);
         Sleep(500);
@@ -6540,9 +6546,8 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
                 port_bind_results = Open_bacnetSocket2(bind_local_ip, BACNETIP_PORT + temp_add_port, my_sokect);
             }
             if (port_bind_results) { //如果绑定47808端口失败 尝试绑定其他端口
-                bip_set_socket(my_sokect);
-                //bip_set_port(49338);
-                bip_set_port(htons(47808));
+                //bip_set_socket(my_sokect);
+                //bip_set_port(htons(BACNETIP_PORT + temp_add_port));
                 break;
             }
         }
@@ -6550,6 +6555,9 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
         if(!port_bind_results)
             return false;
 		
+
+        bip_set_socket(my_sokect);
+        bip_set_port(htons(47808));
 
         static in_addr BIP_Broadcast_Address;
         
@@ -7062,7 +7070,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
     {
         strIPAdress = selected_product_Node.BuildingInfo.strIp;  //用设备的前三个 来确定bind哪一个 网卡;
     }
-    
+
     for (int i = 0; i < g_Vector_Subnet.size(); i++)
     {
         if (strIPAdress.IsEmpty())
@@ -7072,6 +7080,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
         CStringArray temp_strip;
         SplitCStringA(temp_strip, strIPAdress, _T("."));
         CString temp_ip;
+
         temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
 
 
@@ -10079,7 +10088,6 @@ void ClearBacnetData()
         memset(m_Input_data.at(i).description, 0, sizeof(Str_in_point));
         sprintf((char *)m_Input_data.at(i).description, "IN%d", i + 1);
         sprintf((char *)m_Input_data.at(i).label, "IN%d", i + 1);
-        
     }
 
     for (int i = 0; i<BAC_OUTPUT_ITEM_COUNT; i++)
@@ -13618,7 +13626,7 @@ int Check_DaXiaoDuan(unsigned char npid, unsigned char Mainsw, unsigned char sub
 
 int Get_Msv_Table_Name(int x)
 {
-    if (x >= BAC_MSV_COUNT)
+    if (x >= BAC_MSV_COUNT + 1)
         return -1;
     int index = 0; //最多显示三个  例如AAA/BB/CC
     Custom_Msv_Range[x].Empty();

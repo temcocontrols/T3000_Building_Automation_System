@@ -742,12 +742,14 @@ LRESULT CBacnetRegisterListView::Fresh_Register_Item(WPARAM wParam, LPARAM lPara
             }
             else if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_8_BIT_SIGNED_INTEGER]) == 0)
             {
-                m_value = _wtoi(New_CString);
-                if ((m_value < -128) || (m_value > 127))
+                short m_value_temp = 0;
+                m_value_temp = _wtoi(New_CString);
+                if ((m_value_temp < -128) || (m_value_temp > 127))
                 {
                     MessageBox(_T("Please enter the required data!"));
                     return 1;
                 }
+                m_value = m_value_temp;
             }
             else if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_16_BIT_UNSIGNED_INTEGER]) == 0)
             {
@@ -760,12 +762,14 @@ LRESULT CBacnetRegisterListView::Fresh_Register_Item(WPARAM wParam, LPARAM lPara
             }
             else if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_16_BIT_SIGNED_INTEGER]) == 0)
             {
-                m_value = _wtoi(New_CString);
-                if ((m_value < -32768) || (m_value > 32767))
+                short m_value_temp = 0;
+                m_value_temp = _wtoi(New_CString);
+                if ((m_value_temp < -32768) || (m_value_temp > 32767))
                 {
                     MessageBox(_T("Please enter the required data!"));
                     return 1;
                 }
+                m_value = m_value_temp;
             }
             else
             {
