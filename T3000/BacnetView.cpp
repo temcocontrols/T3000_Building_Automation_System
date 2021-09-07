@@ -2803,6 +2803,109 @@ void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInsta
 }
 static bool already_retry = false;
 
+DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid)
+{
+	BACNET_OBJECT_TYPE objectType = OBJECT_DEVICE;
+	BACNET_PROPERTY_ID propertyID = PROP_OBJECT_LIST;
+	int deviceInstance = g_bac_instance;
+	int objInstace = g_bac_instance;
+	bacnet_device_type = PM_THIRD_PARTY_DEVICE;
+	BACNET_APPLICATION_DATA_VALUE temp_value;
+	CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 3);
+
+	if (response != "")
+	{
+
+		Sleep(100);
+		CStringArray temp_array;
+		SplitCStringA(temp_array, response, _T(","));
+		int inputcount = 0, outputcount = 0, variablecount = 0, schedulecount = 0, calenderCount = 0;;
+		if (temp_array.GetSize() > 1)
+		{
+			for (int i = 0; i < temp_array.GetSize(); i++)
+			{
+				if (temp_array.GetAt(i) == "Device")
+				{
+					i++;
+					continue;
+				}
+
+				objInstace = _ttoi(temp_array.GetAt(i + 1).GetString());
+				unsigned int index;
+
+				if (temp_array.GetAt(i) == "Analog Input" || temp_array.GetAt(i) == "Binary Input")
+				{
+					if (inputcount < BAC_INPUT_ITEM_COUNT)
+					{
+						AddBacnetInputData(temp_array.GetAt(i), deviceInstance, objInstace, inputcount);
+						::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, inputcount, REFRESH_ON_ITEM);
+						inputcount++;
+					}
+				}
+				else if (temp_array.GetAt(i) == "Analog Output" || temp_array.GetAt(i) == "Binary Output")
+				{
+					if (outputcount < BAC_OUTPUT_ITEM_COUNT)
+					{
+						AddBacnetOutputData(temp_array.GetAt(i), deviceInstance, objInstace, outputcount);
+
+						::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, outputcount, REFRESH_ON_ITEM);
+						outputcount++;
+					}
+				}
+				else if (temp_array.GetAt(i) == "Analog Value" || temp_array.GetAt(i) == "Binary Value")
+				{
+					if (variablecount < BAC_VARIABLE_ITEM_COUNT)
+					{
+						AddBacnetVariableData(temp_array.GetAt(i), deviceInstance, objInstace, variablecount);
+						::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, variablecount, REFRESH_ON_ITEM);
+						variablecount++;
+					}
+				}
+				else if (temp_array.GetAt(i) == "Schedule")
+				{
+					if (schedulecount < BAC_SCHEDULE_COUNT)
+					{
+						objectType = OBJECT_SCHEDULE;
+						AddBacnetScheduleData(temp_array.GetAt(i), deviceInstance, objInstace, schedulecount);
+
+						::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, schedulecount, REFRESH_ON_ITEM);
+						schedulecount++;
+					}
+				}
+				else if (temp_array.GetAt(i) == "Calendar")
+				{
+					if (calenderCount < BAC_HOLIDAY_COUNT)
+					{
+						objectType = OBJECT_CALENDAR;
+						AddBacnetCalenderData(temp_array.GetAt(i), deviceInstance, objInstace, calenderCount);
+						::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, calenderCount, REFRESH_ON_ITEM);
+						calenderCount++;
+					}
+				}
+				i++;
+			}
+		}
+		input_item_limit_count = inputcount;
+		output_item_limit_count = outputcount;
+		variable_item_limit_count = variablecount;
+	}
+	else {
+		CString Temp_Error_Msg;
+		Temp_Error_Msg.Format(_T("Read Properties error\r\n\
+Not able to read Property list of BACnet Device,\r\nThis may be due to a connection error with device \r\n\ "));
+		AfxMessageBox(Temp_Error_Msg);
+	}
+
+	::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+	::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+	::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
+	::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
+	::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
+	
+	click_read_thread = NULL;
+	return 0;
+}
+
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
@@ -2859,95 +2962,18 @@ void CDialogCM5_BacNet::Fresh()
 			//Send_WhoIs_Global(-1, -1);
 			//Sleep(10);
 			ClearBacnetData();
-			
-			BACNET_OBJECT_TYPE objectType = OBJECT_DEVICE;
-			BACNET_PROPERTY_ID propertyID = PROP_OBJECT_LIST;
-			int deviceInstance = g_bac_instance;
-			int objInstace = g_bac_instance;
-			bacnet_device_type = PM_THIRD_PARTY_DEVICE;
-			BACNET_APPLICATION_DATA_VALUE temp_value;
-			CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 3);
-			if (response!="")
+			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+			::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+			::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
+			::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
+			::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
+			if (click_read_thread == NULL)
 			{
-				CStringArray temp_array;
-				SplitCStringA(temp_array, response, _T(","));
-				int inputcount = 0, outputcount = 0, variablecount = 0 ,schedulecount = 0, calenderCount = 0;;
-				if (temp_array.GetSize() > 1)
-				{
-					for (int i = 0; i < temp_array.GetSize(); i++)
-					{
-						if (temp_array.GetAt(i) == "Device")
-						{
-							i++;
-							continue;
-						}
-
-						objInstace = _ttoi(temp_array.GetAt(i + 1).GetString());
-						unsigned int index;
-
-						if (temp_array.GetAt(i) == "Analog Input" || temp_array.GetAt(i) == "Binary Input")
-						{
-							if (inputcount < BAC_INPUT_ITEM_COUNT)
-							{
-								AddBacnetInputData(temp_array.GetAt(i), deviceInstance, objInstace, inputcount);
-								inputcount++;
-							}
-						}
-						else if (temp_array.GetAt(i) == "Analog Output" || temp_array.GetAt(i) == "Binary Output")
-						{
-							if (outputcount < BAC_OUTPUT_ITEM_COUNT)
-							{
-								AddBacnetOutputData(temp_array.GetAt(i), deviceInstance, objInstace, outputcount);
-								outputcount++;
-							}
-						}
-						else if (temp_array.GetAt(i) == "Analog Value" || temp_array.GetAt(i) == "Binary Value")
-						{
-							if (variablecount < BAC_VARIABLE_ITEM_COUNT)
-							{
-								AddBacnetVariableData(temp_array.GetAt(i), deviceInstance, objInstace, variablecount);
-								variablecount++;
-							}
-						}
-						else if (temp_array.GetAt(i) == "Schedule")
-						{
-							if (schedulecount < BAC_SCHEDULE_COUNT)
-							{
-								objectType = OBJECT_SCHEDULE;
-								AddBacnetScheduleData(temp_array.GetAt(i), deviceInstance, objInstace, schedulecount);
-								schedulecount++;
-							}
-						}
-						else if (temp_array.GetAt(i) == "Calendar")
-						{
-							if (calenderCount < BAC_HOLIDAY_COUNT)
-							{
-								objectType = OBJECT_CALENDAR;
-								AddBacnetCalenderData(temp_array.GetAt(i), deviceInstance, objInstace, calenderCount);
-								calenderCount++;
-							}
-						}
-						i++;
-					}
-				}
-				input_item_limit_count = inputcount;
-				output_item_limit_count = outputcount;
-				variable_item_limit_count = variablecount;
+				click_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
 			}
-			else {
-				CString Temp_Error_Msg;
-				Temp_Error_Msg.Format(_T("Read Properties error\r\n\
-Not able to read Property list of BACnet Device,\r\nThis may be due to a connection error with device \r\n\ "));
-				AfxMessageBox(Temp_Error_Msg);
-			}
-		
-		BacNet_hwd = this->m_hWnd;
-		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
-		::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
-		::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
-		::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
-		::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
-		
+
+			switch_product_last_view();
+			BacNet_hwd = this->m_hWnd;
 		return;
 		
 	}

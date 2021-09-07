@@ -552,8 +552,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	//}
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
 		{
-			m_output_list.DeleteColumn(INPUT_AUTO_MANUAL);
-			m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Out of service"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+			LVCOLUMN col;
+			m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
+			col.pszText = _T("Out of Service");
+			m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
+
 			m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH, 0);
 			m_output_list.SetColumnWidth(OUTPUT_RANGE, 0);
 			m_output_list.SetColumnWidth(OUTPUT_LOW_VOLTAGE, 0);
@@ -564,8 +567,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
 		}
 		else { // to show the column for non-bacnet devices
-			m_output_list.DeleteColumn(INPUT_AUTO_MANUAL);
-			m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+			LVCOLUMN col;
+			m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
+			col.pszText = _T("Auto/Manual");
+			m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
 			m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH, 80);
 			m_output_list.SetColumnWidth(OUTPUT_RANGE, 100);
 			m_output_list.SetColumnWidth(OUTPUT_LOW_VOLTAGE, 50);
@@ -732,10 +737,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				{
 					m_output_list.SetItemText(i, OUTPUT_AUTO_MANUAL, _T("True"));
 				}
-				if ((i % 2) == 0)
-					m_output_list.SetItemBkColor(i, OUTPUT_AUTO_MANUAL, LIST_ITEM_DEFAULT_BKCOLOR);
-				else
-					m_output_list.SetItemBkColor(i, OUTPUT_AUTO_MANUAL, LIST_ITEM_DEFAULT_BKCOLOR_GRAY);
+				
 			}
 			else
 			{

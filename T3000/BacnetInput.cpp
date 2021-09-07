@@ -820,8 +820,12 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	}
 	if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
 	{
-		m_input_list.DeleteColumn(INPUT_AUTO_MANUAL);
-		m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Out of service"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+		//m_input_list.DeleteColumn(INPUT_AUTO_MANUAL);
+		//m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Out of service"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+		LVCOLUMN col;
+		m_input_list.GetColumn(INPUT_AUTO_MANUAL, &col);
+		col.pszText = _T("Out of Service");
+		m_input_list.SetColumn(INPUT_AUTO_MANUAL, &col);
 		m_input_list.SetColumnWidth(INPUT_RANGE, 0); // range and unit dupilcate value's no need to show.
 		m_input_list.SetColumnWidth(INPUT_CAL, 0);
 		m_input_list.SetColumnWidth(INPUT_CAL_OPERATION, 0);
@@ -830,10 +834,15 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		m_input_list.SetColumnWidth(INPUT_JUMPER, 0);
 		m_input_list.SetColumnWidth(INPUT_PRODUCT, 0);
 		m_input_list.SetColumnWidth(INPUT_EXT_NUMBER, 0);
+		
 	}
 	else { // to show the column for non-bacnet devices
-		m_input_list.DeleteColumn(INPUT_AUTO_MANUAL);
-		m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+		//m_input_list.DeleteColumn(INPUT_AUTO_MANUAL);
+		//m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+		LVCOLUMN col;
+		m_input_list.GetColumn(INPUT_AUTO_MANUAL, &col);
+		col.pszText = _T("Auto/Manual");
+		m_input_list.SetColumn(INPUT_AUTO_MANUAL, &col);
 		m_input_list.SetColumnWidth(INPUT_RANGE, 100); 
 		m_input_list.SetColumnWidth(INPUT_CAL, 70);
 		m_input_list.SetColumnWidth(INPUT_CAL_OPERATION, 50);
@@ -841,7 +850,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		m_input_list.SetColumnWidth(INPUT_DECOM, 60);
 		m_input_list.SetColumnWidth(INPUT_JUMPER, 60);
 	}
-
+	
 	CString temp1;
 	//m_input_list.DeleteAllItems();
 	for (int i=0;i<(int)m_Input_data.size();i++)
@@ -869,6 +878,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			}
 			continue;
 		}
+		
 		if (m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG) {
 
 			temp_item.Format(_T("AI%d"), m_Input_data_instance.at(i));
@@ -894,10 +904,6 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			{
 				m_input_list.SetItemText(i, INPUT_AUTO_MANUAL, _T("True"));
 			}
-			if ((i % 2) == 0)
-				m_input_list.SetItemBkColor(i, INPUT_AUTO_MANUAL, LIST_ITEM_DEFAULT_BKCOLOR);
-			else
-				m_input_list.SetItemBkColor(i, INPUT_AUTO_MANUAL, LIST_ITEM_DEFAULT_BKCOLOR_GRAY);
 		}
 		else
 		{

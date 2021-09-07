@@ -12597,6 +12597,12 @@ void CMainFrame::OnDatabaseBacnettool()
     CString selectednetwork = m_current_tree_node.NetworkCard_Address;
     ShellExecute(NULL, L"open", CS_BacnetExplore_Path, canonicalizedstring + " " + selectednetwork, NULL, SW_SHOWNORMAL);
     canonicalizedstring.ReleaseBuffer();
+    if (bip_socket() > 0) // closing socket on Yabe opend , BACnet port dont conflict with both applications.
+    {
+        ::closesocket(bip_socket()); 
+        bip_set_socket(NULL);
+        bip_set_port(htons(-1));
+    }
     return;
 #if 0
 
