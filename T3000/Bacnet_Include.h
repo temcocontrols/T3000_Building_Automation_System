@@ -112,6 +112,16 @@
 #define BACNET_TYPE_TIME                      11
 #define BACNET_TYPE_OBJECT_ID                 12
 
+typedef struct segmented_bacnet_rp_info  
+{
+    unsigned int bacnet_instance;
+    BACNET_OBJECT_TYPE object_type;
+    int property_id;
+    int invoke_id;
+    uint8_t* application_data;
+    int application_data_len;
+}str_segmented_bacnet_rp_info;
+
 typedef struct bacnet_rp_info  //bacnet 相关的部分必须放在 bacnet include 的头文件中;//Fan
 {
     unsigned int bacnet_instance;

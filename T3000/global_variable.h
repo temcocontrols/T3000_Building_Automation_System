@@ -1966,6 +1966,9 @@ vector <Str_table_point> m_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite;
 vector <Str_Extio_point> m_extio_config_data;
 
+vector <int>  m_Input_data_instance; // for input bacnet-thirdParty devices instance_is's
+vector <int>  m_Output_data_instance;// for output bacnet-thirdParty devices instance_is's
+
 vector <Str_MSV> m_msv_data;
 
 Time_block_mini Device_time;
@@ -2264,6 +2267,7 @@ bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
 vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
+vector <str_segmented_bacnet_rp_info> segmented_bacnet_data;
 unsigned char m_dialog_signal_type;
 connect_Info system_connect_info;
 panelname_map g_panelname_map; 

@@ -194,7 +194,8 @@ void tsm_set_confirmed_unsegmented_transaction(
         index = tsm_find_invokeID_index(invokeID);
         if (index < MAX_TSM_TRANSACTIONS) {
             /* SendConfirmedUnsegmented */
-            TSM_List[index].state = TSM_STATE_AWAIT_CONFIRMATION;
+            //TSM_List[index].state = TSM_STATE_AWAIT_CONFIRMATION
+            TSM_List[index].state = TSM_STATE_SEGMENTED_REQUEST;
             TSM_List[index].RetryCount = 0;
             /* start the timer */
             TSM_List[index].RequestTimer = apdu_timeout();
