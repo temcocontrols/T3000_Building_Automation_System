@@ -277,7 +277,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value2);
 				m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
 			}
-            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
+            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))
             {
                 if (read_msv_table)
                     m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
@@ -356,7 +356,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				cstemp_value.Format(_T("%.3f"),temp_float_value);
 				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value);
 			}
-            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
+            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))
             {
                 if (read_msv_table)
                     m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
@@ -369,7 +369,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
                     cstemp_value2.Format(_T("%.3f"), temp_float_value1);
                 m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
             }
-            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))
+            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))
             {
                 if (read_msv_table)
                     m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
@@ -690,7 +690,10 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
     else if ((lCol == VARIABLE_VALUE) && 
               (m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG) && 
               (m_Variable_data.at(lRow).auto_manual == BAC_MANUAL) 
-              && ((m_Variable_data.at(lRow).range == 101) || (m_Variable_data.at(lRow).range == 102) || (m_Variable_data.at(lRow).range == 103) ))
+              && ((m_Variable_data.at(lRow).range == 101) || 
+				  (m_Variable_data.at(lRow).range == 102) || 
+				  (m_Variable_data.at(lRow).range == 103) ||
+				  (m_Variable_data.at(lRow).range == 104)))
     {
         m_variable_list.Set_Edit(false);
         int range_index = m_Variable_data.at(lRow).range - 101;
@@ -703,6 +706,16 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
             m_Variable_data.at(lRow).value = ntempNextValue * 1000;
             m_variable_list.SetItemText(lRow, VARIABLE_VALUE, cstempNextItemString);
         }
+		else if(find_ret == -2)
+		{
+			m_Variable_data.at(lRow).value = m_msv_data.at(range_index).msv_data[0].msv_value * 1000;
+			find_ret = Get_Msv_next_Name_and_Value_BySearchValue(range_index, m_Variable_data.at(lRow).value / 1000, cstempNextItemString, ntempNextValue);
+			if (find_ret >= 0)
+			{
+				m_Variable_data.at(lRow).value = ntempNextValue * 1000;
+				m_variable_list.SetItemText(lRow, VARIABLE_VALUE, cstempNextItemString);
+			}
+		}
 
         //Custom_Msv_Range[range_index]
     }
@@ -829,7 +842,10 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		{
 			bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
 			if(  ( m_Variable_data.at(lRow).range > (sizeof(Variable_Analog_Units_Array) / sizeof(Variable_Analog_Units_Array[0]))) &&
-                 (m_Variable_data.at(lRow).range != 101) && (m_Variable_data.at(lRow).range != 102) && (m_Variable_data.at(lRow).range != 103)
+                 (m_Variable_data.at(lRow).range != 101) && 
+				 (m_Variable_data.at(lRow).range != 102) && 
+				 (m_Variable_data.at(lRow).range != 103) &&
+				 (m_Variable_data.at(lRow).range != 104)
                 ) 
 			{
 				m_Variable_data.at(lRow).range = 0;
@@ -913,7 +929,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
                 }
                 else if (bac_range_number_choose < 23)
                     temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
-                else if((bac_range_number_choose >= 101) && (bac_range_number_choose <= 103))
+                else if((bac_range_number_choose >= 101) && (bac_range_number_choose <= 104))
                 {
                         if (read_msv_table)
                             temp1 = Custom_Msv_Range[bac_range_number_choose - 101];
@@ -1007,7 +1023,8 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 	int cmp_ret = memcmp(&m_temp_variable_data[lRow],&m_Variable_data.at(lRow),sizeof(Str_variable_point));
 	if(cmp_ret!=0)
 	{
-		Post_Write_Message(g_bac_instance, WRITEVARIABLE_T3000, lRow, lRow, sizeof(Str_variable_point), m_variable_dlg_hwnd, temp_task_info, lRow, lCol);
+		m_variable_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
+		Post_Write_Message(g_bac_instance,WRITEVARIABLE_T3000,lRow,lRow,sizeof(Str_variable_point),m_variable_dlg_hwnd,temp_task_info,lRow,lCol);
 	}
 	*pResult = 0;
 }
@@ -1100,11 +1117,8 @@ void CBacnetVariable::OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESUL
 BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 {
 	
-	if(pMsg->message == WM_KEYDOWN  )
+	if((pMsg->message == WM_KEYDOWN  ) && (pMsg->wParam == VK_RETURN))
 	{
-		if(pMsg->wParam == VK_RETURN)
-		{
-
 			CRect list_rect,win_rect;
 			m_variable_list.GetWindowRect(list_rect);
 			ScreenToClient(&list_rect);
@@ -1118,7 +1132,6 @@ BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 			GetDlgItem(IDC_BUTTON_VARIABLE_READ)->SetFocus();
 			temp_focus->SetFocus();
 			return 1;
-		}
 	}
 	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
 	{
@@ -1139,6 +1152,11 @@ BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 
 
 		return 1; 
+	}
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
+	{
+		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_VARIABLE);
+		return TRUE;
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -1245,7 +1263,7 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 		Auto_M.Empty();
 	}
 
-    if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 103))  //判断是MSV range
+    if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))  //判断是MSV range
     {
         for (int z = 0; z < 3; z++)
         {

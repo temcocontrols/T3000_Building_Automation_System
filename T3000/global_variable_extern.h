@@ -919,7 +919,7 @@ extern bool read_customer_unit;	//Èç¹ûÕâ¸öÉè±¸Ã»ÓĞ¶Á¹ı customer unitÕâÒ»Ïî,¾ÍÒª³
 extern bool receive_customer_unit; //ÊÕµ½»Ø¸´£¬flag¾ÍÖÃ true;
 extern bool read_analog_customer_unit;  // Õâ¸öÊÇÄ£ÄâµÄcus tabel ;
 extern bool read_msv_table; //MSV table 
-extern CString Custom_Msv_Range[BAC_MSV_COUNT];// ´æ´¢¿Í»§¶àÌ¬  ÀıÈçÏÔÊ¾  AAA/BBB/CCC
+extern CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// ´æ´¢¿Í»§¶àÌ¬  ÀıÈçÏÔÊ¾  AAA/BBB/CCC
 extern CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 extern CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
 extern unsigned char bacnet_add_id[254];

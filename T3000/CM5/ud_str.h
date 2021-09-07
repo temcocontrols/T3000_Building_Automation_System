@@ -276,7 +276,6 @@ typedef  struct
 	uint8_t calibration_h; /* (5 bits - spare )*/  //去掉了 unused 把 calibration改为了双字节
 	uint8_t calibration_l;  /* (8 bits; -25.6 to 25.6 / -256 to 256 )*/
 	uint8_t range;	      			/* (1 uint8_t ; input_range_equate)*/
-
 } Str_in_point; 
 
 

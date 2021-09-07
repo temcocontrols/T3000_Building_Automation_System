@@ -27,6 +27,7 @@
 #define BAC_HOL_START_REG			15976
 #define BAC_WR_TIME_FIRST           32044
 #define BAC_AR_TIME_FIRST           32620
+#define BAC_CUS_TABLE_FIRST         32936
 #define BAC_PID_CONTROL_START_REG   32712
 #define BAC_CUSTOMER_TABLE_START    32936
 #define BAC_WR_FLAG_FIRST           33201

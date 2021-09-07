@@ -998,7 +998,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
                         cstemp_value.Format(_T("%.3f"), temp_float_value);
                         m_program_debug_list.SetItemText(0, VARIABLE_VALUE, cstemp_value);
                     }
-                    else if ((m_Variable_data.at(point_number).range >= 101) && (m_Variable_data.at(point_number).range <= 103))
+                    else if ((m_Variable_data.at(point_number).range >= 101) && (m_Variable_data.at(point_number).range <= 104))
                     {
                         if (read_msv_table)
                             m_program_debug_list.SetItemText(0, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(point_number).range - 101]);
@@ -2752,7 +2752,10 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
             else if ((lCol == VARIABLE_VALUE) &&
                 (m_Variable_data.at(point_number).digital_analog == BAC_UNITS_ANALOG) &&
                 (m_Variable_data.at(point_number).auto_manual == BAC_MANUAL)
-                && ((m_Variable_data.at(point_number).range == 101) || (m_Variable_data.at(point_number).range == 102) || (m_Variable_data.at(point_number).range == 103)))
+                && ((m_Variable_data.at(point_number).range == 101) || 
+					(m_Variable_data.at(point_number).range == 102) || 
+					(m_Variable_data.at(point_number).range == 103) ||
+					(m_Variable_data.at(point_number).range == 104)))
             {
                 m_program_debug_list.Set_Edit(false);
                 int range_index = m_Variable_data.at(point_number).range - 101;

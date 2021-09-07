@@ -186,6 +186,8 @@ void Getminitypename(unsigned char nmini_type, CString &ret_name)
 
 void CBacnetSetting::UpdateTreeName()
 {
+    if (Device_Basic_Setting.reg.n_serial_number != selected_product_Node.serial_number)
+        return;
     CString temp_name;
     MultiByteToWideChar(CP_ACP, 0, (char*)Device_Basic_Setting.reg.panel_name, (int)strlen((char*)Device_Basic_Setting.reg.panel_name) + 1, temp_name.GetBuffer(MAX_PATH), MAX_PATH);
     temp_name.ReleaseBuffer();

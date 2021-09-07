@@ -2440,48 +2440,54 @@ void CISPDlg::FlashByCom()
         delete[] m_pFileBuffer;
         m_pFileBuffer= NULL;
     }
-
+    int com_bin = 0;
     CHexFileParser* pHexFile = new CHexFileParser;
     pHexFile->SetFileName(m_strHexFileName);
+    int nDataSize = 0;
+    CString temp_name;
+    temp_name = m_strHexFileName.Right(4);
+    temp_name.MakeUpper();
+    if (temp_name.CompareNoCase(_T(".BIN")) == 0)
+    {
+
+        CString strTips2 = _T("Checking firmware file,please wait!");
+        UpdateStatusInfo(strTips2, FALSE);
+        if (BinFileValidation(m_strHexFileName))
+        {
+            CBinFileParser* pBinFile = new CBinFileParser;
+            pBinFile->SetBinFileName(m_strHexFileName);
+            m_pFileBuffer = new char[c_nBinFileBufLen];
+            memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+            nDataSize = pBinFile->GetBinFileBuffer(m_pFileBuffer, c_nBinFileBufLen);
+
+            CString strTips = _T("|Bin file verified okay.");
+            UpdateStatusInfo(strTips, FALSE);
+            strTips.Format(_T("Firmware size : %.1f KB"), ((float)nDataSize) / 1024);
+            UpdateStatusInfo(strTips, FALSE);
+
+            //  ShowHexBinInfor(2);
+            delete pBinFile;
+            pBinFile = NULL;
+            com_bin = 1;
+        }
+    }
+    else
+    {
+
+        m_pFileBuffer = new char[c_nHexFileBufLen];
+        memset(m_pFileBuffer, 0x00, c_nHexFileBufLen);
+        nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//Get the file's buffer
 
 
+    }
 
 
-// 	 CString temp;
-// 	 UpdateStatusInfo(_T(">>>>>Hex File Information<<<<<"), FALSE);
-//
-// 	 temp.Format(_T("Company Name: "));
-// 	 for (int i=0;i<5;i++)
-// 	 {
-// 		 temp.AppendFormat(_T("%c"),temp1.company[i]);
-// 	 }
-// 	 UpdateStatusInfo(temp,FALSE);
-// 	 temp.Format(_T("Product Name: "));
-// 	 for (int i=0;i<10;i++)
-// 	 {
-// 		 temp.AppendFormat(_T("%c"),temp1.product_name[i]);
-// 	 }
-//
-// 	 UpdateStatusInfo(temp,FALSE);
-// 	 float rev;
-// 	 rev=((float)(temp1.software_high*256+temp1.software_low))/10;
-// 	 temp.Format(_T("Hex File Version: %0.1f"),rev);
-// 	 UpdateStatusInfo(temp,FALSE);
-    //ShowHexBinInfor();
-    //unsigned short chip_size=temp1.reserved[2];
-    //temp.Format(_T("Chip Size=%d"),chip_size);
-    //UpdateStatusInfo(temp,FALSE);
-
-    m_pFileBuffer = new char[c_nHexFileBufLen];
-    memset(m_pFileBuffer, 0x00, c_nHexFileBufLen);
-    int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//Get the file's buffer
-
-    if(nDataSize > 0)
+    if (nDataSize > 0)
     {
 #ifdef ISP_BURNING_MODE
         Check_sum = 0;
 #endif
-        CString strTips = _T("|Hex file verified okay.");
+        CString strTips = _T("|Firmware file verified okay.");
         UpdateStatusInfo(strTips, FALSE);
         strTips.Format(_T("Firmware size : %.1f KB"), ((float)nDataSize) / 1024);
         UpdateStatusInfo(strTips, FALSE);
@@ -2489,46 +2495,61 @@ void CISPDlg::FlashByCom()
         m_pComWriter = new CComWriter;
         m_pComWriter->SetModbusID(m_szMdbIDs);
         m_pComWriter->SetHexInfor(global_fileInfor);
-        m_pComWriter->SetHexFileType(pHexFile->GetHexFileFormatType());
-        m_pComWriter->Is_Ram=pHexFile->GetFileType();
+        if(com_bin)
+            m_pComWriter->SetHexFileType(HEXFILE_LINERADDR);
+        else
+            m_pComWriter->SetHexFileType(pHexFile->GetHexFileFormatType());
+        m_pComWriter->Is_Ram = pHexFile->GetFileType();
         m_pComWriter->m_hexbinfilepath = m_strHexFileName;
         CString strBaudrate;
         GetDlgItem(IDC_EDIT_BAUDRATE)->GetWindowText(strBaudrate);
-        int nBautrate = _wtoi (strBaudrate.GetBuffer());
+        int nBautrate = _wtoi(strBaudrate.GetBuffer());
         m_pComWriter->SetBautrate(nBautrate);
         SetResponseTime(30);
         int Baudrate_Index;
-        for (int i = 0; i<NUMBER_BAUDRATE; i++)
+        for (int i = 0; i < NUMBER_BAUDRATE; i++)
         {
             if (strBaudrate.CompareNoCase(c_strBaudate[i]) == 0)
             {
                 Baudrate_Index = i;
             }
         }
-        m_pComWriter->m_index_Baudrate =Baudrate_Index; //m_combox_baudrate.GetCurSel ();
-        m_pComWriter-> m_FlashTimes = m_FlashTimes;
+        m_pComWriter->m_index_Baudrate = Baudrate_Index; //m_combox_baudrate.GetCurSel ();
+        m_pComWriter->m_FlashTimes = m_FlashTimes;
         int nPort = GetComPortNo();
         m_pComWriter->SetParentWnd(this);
 
         m_pComWriter->SetComPortNO(nPort);
-        if(pHexFile->GetHexFileFormatType() == HEXFILE_DATA)
-        {
-            m_pComWriter->SetFileBuffer((TS_UC*)m_pFileBuffer, nDataSize);
-        }
-        else if(pHexFile->GetHexFileFormatType() == HEXFILE_LINERADDR)
+        if (com_bin)
         {
             vector<int> szFlags;
-            pHexFile->GetExtendHexFileSectionFlag(szFlags);
+            int packet_flag = nDataSize;
+            szFlags.push_back(packet_flag);
+            m_pComWriter->m_com_flash_binfile = 1;
             m_pComWriter->SetExtendHexFileParam(szFlags, (TS_UC*)m_pFileBuffer);
         }
+        else
+        {
+            if (pHexFile->GetHexFileFormatType() == HEXFILE_DATA)
+            {
+                m_pComWriter->SetFileBuffer((TS_UC*)m_pFileBuffer, nDataSize);
+            }
+            else if (pHexFile->GetHexFileFormatType() == HEXFILE_LINERADDR)
+            {
+                vector<int> szFlags;
+                pHexFile->GetExtendHexFileSectionFlag(szFlags);
+                m_pComWriter->SetExtendHexFileParam(szFlags, (TS_UC*)m_pFileBuffer);
+            }
+        }
+
 
         CString temp_hex_pid_name;
-        MultiByteToWideChar(CP_ACP, 0, (char *)global_fileInfor.product_name, (int)strlen((char *)global_fileInfor.product_name) + 1, temp_hex_pid_name.GetBuffer(MAX_PATH), MAX_PATH);
+        MultiByteToWideChar(CP_ACP, 0, (char*)global_fileInfor.product_name, (int)strlen((char*)global_fileInfor.product_name) + 1, temp_hex_pid_name.GetBuffer(MAX_PATH), MAX_PATH);
         temp_hex_pid_name.ReleaseBuffer();
         temp_hex_pid_name.Trim();
         temp_hex_pid_name.MakeUpper();
         //只有Hex PID 为minipanel arm 版本时  ， 才可能要修复 bootload 的版本;
- 
+
         float hex_version = 0;
 
 
@@ -2555,7 +2576,7 @@ void CISPDlg::FlashByCom()
             {
                 firmware_must_use_new_bootloader = 1;
                 if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径;
-                g_update_newfirmware_file_path = m_strHexFileName;
+                    g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
         else if ((temp_hex_pid_name.CompareNoCase(_T("PID10")) == 0) && (new_bootload == 0))
@@ -2595,14 +2616,15 @@ void CISPDlg::FlashByCom()
     }
     else
     {
-        CString strTips1 =_T("|File error: The file is not a properly formatted HEX file.");
+        CString strTips1 = _T("|File error: The file is not a properly formatted firmware file.");
         UpdateStatusInfo(strTips1, FALSE);
-        CString strTips2 =_T("|Please select another file.");
+        CString strTips2 = _T("|Please select another file.");
         UpdateStatusInfo(strTips2, FALSE);
-        if(!auto_flash_mode)
-            AfxMessageBox(strTips1+strTips2, MB_OK);
+        if (!auto_flash_mode)
+            AfxMessageBox(strTips1 + strTips2, MB_OK);
 
     }
+
     delete pHexFile;
 }
 

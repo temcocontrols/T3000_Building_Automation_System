@@ -2480,6 +2480,7 @@
 #define IDC_RADIO_MSV_3                 2488
 #define IDC_STATIC_TEMPERATURE_VALUE    2488
 #define IDC_STATIC_HUM_VALUE            2489
+#define IDC_RADIO_MSV_4                 2489
 #define IDC_STATIC_CO2_VALUE            2490
 #define IDC_STATIC_AQ_VALUE             2491
 #define IDC_STATIC_VOC_VALUE            2491
@@ -3141,6 +3142,7 @@
 #define ID_SETTINGS34075                34075
 #define ID_DATABASE_LOGDETAIL           34076
 #define ID_DATABASE_BUILDINGMANAGEMENT  34077
+#define ID_VIEW_REFRESH                 34078
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -3216,7 +3218,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        788
-#define _APS_NEXT_COMMAND_VALUE         34078
+#define _APS_NEXT_COMMAND_VALUE         34079
 #define _APS_NEXT_CONTROL_VALUE         2640
 #define _APS_NEXT_SYMED_VALUE           320
 #endif

@@ -2310,7 +2310,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		m_tatat_schedule_data.push_back(temp_tstat_schedule);
 	}
 
-    for (int i = 0;i < BAC_MSV_COUNT;i++)
+    for (int i = 0;i < BAC_MSV_COUNT + 1;i++)
     {
         Str_MSV temp_msv_point;
         memset(&temp_msv_point, 0, sizeof(Str_MSV));
@@ -2347,7 +2347,6 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 {
 	BACNET_APPLICATION_DATA_VALUE temp_value;
 	int invoke_id = Bacnet_Read_Properties_Blocking(deviceid, object_type, object_instance, property_id, value, retrytime);
-	// invoke_id = Bacnet_Read_Property_Multiple(deviceid, object_type, object_instance, PROP_ALL);
 	if (invoke_id >= 0)
 	{
 		CString tmpString;
@@ -2868,7 +2867,6 @@ void CDialogCM5_BacNet::Fresh()
 			bacnet_device_type = PM_THIRD_PARTY_DEVICE;
 			BACNET_APPLICATION_DATA_VALUE temp_value;
 			CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 3);
-			
 			if (response!="")
 			{
 				CStringArray temp_array;
@@ -3440,7 +3438,7 @@ Not able to read Property list of BACnet Device,\r\nThis may be due to a connect
 
 			if(click_read_thread==NULL)
 			{
-				click_read_thread =CreateThread(NULL,NULL,MSTP_Send_read_Command_Thread,this,NULL, NULL);
+				//click_read_thread =CreateThread(NULL,NULL,MSTP_Send_read_Command_Thread,this,NULL, NULL);
 
 			}
 
@@ -6225,46 +6223,95 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		}
 	}
 	//if((!read_customer_unit) && selected_product_Node.protocol != MODBUS_RS485    20200820 只要点击 就在读一遍 ，老毛一直叫 没刷新 MSV的 unit 以前是 只读第一遍
-    if ( selected_product_Node.protocol != MODBUS_RS485
+	if (selected_product_Node.protocol != MODBUS_RS485
 		&& (
-			(selected_product_Node.product_class_id ==PM_CM5 ) 
+			(selected_product_Node.product_class_id == PM_CM5)
 			||
-            (selected_product_Node.product_class_id == PM_TSTAT10)
-            ||
-			(selected_product_Node.product_class_id ==PM_MINIPANEL )	
+			(selected_product_Node.product_class_id == PM_TSTAT10)
+			||
+			(selected_product_Node.product_class_id == PM_MINIPANEL)
 			||
 			(selected_product_Node.product_class_id == PM_MINIPANEL_ARM)
 			)
-	  )
+		)
 	{
-		if(GetPrivateData_Blocking(g_bac_instance,READUNIT_T3000,0,BAC_CUSTOMER_UNITS_COUNT - 1,sizeof(Str_Units_element)) > 0)
+		if (GetPrivateData_Blocking(g_bac_instance, READUNIT_T3000, 0, BAC_CUSTOMER_UNITS_COUNT - 1, sizeof(Str_Units_element)) > 0)
 		{
 			read_customer_unit = true;
 		}
-        Sleep(50);
+		Sleep(50);
 
-        int read_ret[3] = {0};
-        for (int x = 0; x < 3; x++)
-        {
-            CString temp_cs;
-            if (GetPrivateData_Blocking(g_bac_instance, READ_MSV_COMMAND, x, x, sizeof(Str_MSV)) > 0)
-            {
-                int index = 0;
+		for (int m = 0; m < 4; m++)
+		{
+			Custom_Msv_Range[m].Empty();
+		}
+		int read_ret[4] = { 0 };
+		if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub <= 607)
+		{
+			CString temp_cs;
+			if (GetPrivateData_Blocking(g_bac_instance, READ_MSV_COMMAND, 0, 1, sizeof(Str_MSV)) > 0)
+			{
+				int index = 0;
 
-                temp_cs.Format(_T("Read MSV table %d OK."),x + 1);
+				temp_cs.Format(_T("Read MSV table 0-1 OK."));
 
 
-                Get_Msv_Table_Name(x);
-                read_ret[x] = 1;
-            }
-            else
-                temp_cs.Format(_T("Read MSV table %d timeout."), x + 1);
-            SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
-            Sleep(SEND_COMMAND_DELAY_TIME);
-        }
-        read_msv_table = read_ret[0] && read_ret[1] && read_ret[2];
+				Get_Msv_Table_Name(0);
+				Get_Msv_Table_Name(1);
+				read_ret[0] = 1;
+				read_ret[1] = 1;
+			}
+			else
+				temp_cs.Format(_T("Read MSV table 0-1 timeout."));
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
+			Sleep(SEND_COMMAND_DELAY_TIME);
 
+			if (GetPrivateData_Blocking(g_bac_instance, READ_MSV_COMMAND, 2, 2, sizeof(Str_MSV)) > 0)
+			{
+				int index = 0;
+
+				temp_cs.Format(_T("Read MSV table 2 OK."));
+
+
+				Get_Msv_Table_Name(2);
+				read_ret[2] = 1;
+			}
+			else
+				temp_cs.Format(_T("Read MSV table 2 timeout."));
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
+			Sleep(SEND_COMMAND_DELAY_TIME);
+
+			read_msv_table = read_ret[0] && read_ret[1] && read_ret[2];
+		}
+		else
+		{
+			for (int x = 0; x < 2; x++)
+			{
+				Custom_Msv_Range[x].Empty();
+				CString temp_cs;
+				if (GetPrivateData_Blocking(g_bac_instance, READ_MSV_COMMAND, 2 * x, 2*x + 1, sizeof(Str_MSV)) > 0)
+				{
+					int index = 0;
+
+					temp_cs.Format(_T("Read MSV table %d OK."), 2 * x);
+
+
+					Get_Msv_Table_Name(2 * x);
+					Get_Msv_Table_Name(2 * x + 1);
+					read_ret[2 * x] = 1;
+					read_ret[2 * x + 1] = 1;
+				}
+				else
+					temp_cs.Format(_T("Read MSV table %d timeout."), 2 * x);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
+				Sleep(SEND_COMMAND_DELAY_TIME);
+			}
+
+				read_msv_table = read_ret[0] && read_ret[1] && read_ret[2] && read_ret[3];
+
+		}
 	}
+	
 
 	//if ((!read_analog_customer_unit) && selected_product_Node.protocol != MODBUS_RS485 && ((selected_product_Node.product_class_id == PM_CM5) ||
 	//	(selected_product_Node.product_class_id == PM_MINIPANEL)))
@@ -7280,6 +7327,63 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 
     }
     break;
+	case READANALOG_CUS_TABLE_T3000/*BAC_OUT*/:   //OUT
+	{
+		//cus table  106 按106算  *5    106x5  需要读530   需要读取6包;
+		for (int i = 0; i < 6; i++)
+		{
+			int itemp = 0;
+			itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_CUS_TABLE_FIRST + i * 100, 100, 4);
+			if (itemp < 0)
+			{
+				read_result = false;
+				break;
+			}
+			else
+			{
+				if (!hide_485_progress)
+					g_progress_persent = (i + 1) * 100 / 6;
+				else
+				{
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Reading custom ranges..."));
+				}
+			}
+			Sleep(100);
+		}
+		if (read_result)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read custom ranges OK!"));
+			for (int i = 0; i < BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
+			{
+				if (check_revert_daxiaoduan)
+				{
+					for (int j = 0; j < 53; j++)  //   sizeof(Str_table_point)  = 106
+					{
+						read_data_buffer[i * 53 + j] = htons(read_data_buffer[i * 53 + j]);
+					}
+				}
+				memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//因为Str_table_point 只有106个字节，两个byte放到1个 modbus的寄存器里面;
+			}
+
+
+			CString str_serialid;
+			str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
+			if (Bacnet_Private_Device(n_read_product_type))
+			{
+				SaveConfigFilePath = g_achive_folder + _T("\\") + str_serialid + _T(".prog");
+				::PostMessageW(MainFram_hwd, MY_BAC_CONFIG_READ_RESULTS, 1, NULL);
+			}
+			else
+			{
+				CString achive_file_path;
+				CString temp_serial;
+				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prog");
+				SaveModbusConfigFile_Cache(achive_file_path, NULL, 3200 * 2);
+			}
+		}
+		g_progress_persent = 100;
+	}
+	break;
     default:
         break;
     }
