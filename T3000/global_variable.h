@@ -1968,6 +1968,9 @@ vector <Str_Extio_point> m_extio_config_data;
 
 vector <int>  m_Input_data_instance; // for input bacnet-thirdParty devices instance_is's
 vector <int>  m_Output_data_instance;// for output bacnet-thirdParty devices instance_is's
+vector <int>  m_Variable_data_instance;
+vector <int>  m_Weekly_data_instance; 
+vector <int>  m_Annual_data_instance;
 
 vector <Str_MSV> m_msv_data;
 

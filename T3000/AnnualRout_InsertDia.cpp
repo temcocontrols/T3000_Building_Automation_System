@@ -14,6 +14,9 @@
 // AnnualRout_InsertDia ¶Ô»°¿ò
 #define TO_CLEAR_MONTH_CTRL _T("clear")
 IMPLEMENT_DYNAMIC(AnnualRout_InsertDia, CDialog)
+
+extern vector <int>  m_Annual_data_instance;
+
 AnnualRout_InsertDia::AnnualRout_InsertDia(unsigned char row,CString strtype,CWnd* pParent /*=NULL*/)
 	: CDialog(AnnualRout_InsertDia::IDD, pParent)
 	, m_date_time(COleDateTime::GetCurrentTime())
@@ -780,16 +783,16 @@ void AnnualRout_InsertDia::OnBnClickedOk()
 	OnOK();
 }
 
-LRESULT AnnualRout_InsertDia::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	
-	if(message == WM_LBUTTONDBLCLK )
-	{
-
-		
-	}
-	return CDialog::WindowProc(message, wParam, lParam);
-}
+//LRESULT AnnualRout_InsertDia::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+//{
+//	
+//	if(message == WM_LBUTTONDBLCLK )
+//	{
+//
+//		
+//	}
+//	return CDialog::WindowProc(message, wParam, lParam);
+//}
 
 void AnnualRout_InsertDia::OnCbnSelchangeCombo1()
 {
@@ -1065,7 +1068,7 @@ void AnnualRout_InsertDia::Write_BACnet_ThirdParty_DateList(MONTHDAYSTATE* state
 	std::vector<SYSTEMTIME> temp_days_vector = m_month_ctrl.ToSystemTimes(12, states, start);
 
 	BACNET_READ_PROPERTY_DATA* writeData = new BACNET_READ_PROPERTY_DATA;
-	writeData->object_instance = annual_list_line + 1;
+	writeData->object_instance = m_Annual_data_instance.at(annual_list_line);
 	writeData->object_property = PROP_DATE_LIST;
 	writeData->object_type = OBJECT_CALENDAR;
 	writeData->application_data_len = 0;
@@ -1090,6 +1093,10 @@ void AnnualRout_InsertDia::Write_BACnet_ThirdParty_DateList(MONTHDAYSTATE* state
 	//writeData->application_data_len += len;
 
 	int invoke_id = Bacnet_Write_Properties(g_bac_instance, writeData->object_type, writeData->object_instance, writeData->object_property, NULL, 16, writeData);
+	writeData->application_data = NULL;
+	writeData = NULL;
+	delete writeData;
+	Sleep(10);
 }
 
 

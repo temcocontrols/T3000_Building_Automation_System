@@ -10,6 +10,7 @@
 #include "bip.h"
 #include "rs485.h" // For call Get_RS485_Handle() function
 #include "T3000Option.h"
+#include "datalink.h"
 //#include "global_variable.h"
 //#include "global_define.h"
 //AB means Add Building
@@ -94,7 +95,7 @@ CTStatScanner::CTStatScanner(void)
     m_eScanNCEnd = new CEvent(false, false);
     m_eScanBacnetIpEnd = new CEvent(false, false);
     m_eScanRemoteIPEnd =  new CEvent(false, false);
-
+    m_eScanThirdPartyBacnetIpEnd = new CEvent(false, false);
     m_eScan_tcp_to_485_End = new CEvent(false, false);
 //	m_eScanBacnetMstpEnd = new CEvent(false,false);
     m_bNetScanFinish = FALSE;
@@ -173,7 +174,11 @@ CTStatScanner::~CTStatScanner(void)
     {
         delete m_eScanBacnetIpEnd;
     }
-
+    if (m_eScanThirdPartyBacnetIpEnd != NULL)
+    {
+        delete m_eScanThirdPartyBacnetIpEnd;
+    }
+    
     if(m_eScanRemoteIPEnd !=NULL)
     {
         delete m_eScanRemoteIPEnd;
@@ -247,6 +252,12 @@ void CTStatScanner::Release() // this function never be used
         SetEvent(m_eScanRemoteIPEnd);
         TerminateThread(m_pScanRemoteIPThread,0);
     }
+    if (WaitForSingleObject(m_eScanThirdPartyBacnetIpEnd, 0) != WAIT_OBJECT_0)
+    {
+        SetEvent(m_eScanThirdPartyBacnetIpEnd);
+        TerminateThread(m_pScanThirdPartyBacnetIPThread, 0);
+    }
+    
 
     //if( WaitForSingleObject(m_eScanBacnetMstpEnd, 0) != WAIT_OBJECT_0 )
     //{
@@ -4098,11 +4109,8 @@ void CTStatScanner::ScanAll()
 
     ScanTCPtoRS485SubPort();
 
-    // inilizing bacnet and its handlers for third party bacnet devices
-    intial_bip_socket();
-    Init_Service_Handlers();
-    Send_WhoIs_Global(-1, -1);
-    // hird party bacnet end
+    ScanThirdPartyBACnetDevice();
+    
 	hwait_scan_thread =CreateThread(NULL,NULL,_WaitScanThread,this,NULL, NULL);
 
     //AfxBeginThread(_WaitScanThread, this);
@@ -4213,6 +4221,8 @@ DWORD WINAPI  _WaitScanThread(LPVOID lpVoid)
             }
         }
     }
+
+    WaitForSingleObject(pScanner->m_eScanThirdPartyBacnetIpEnd->m_hObject, INFINITE);
 
     WaitForSingleObject(pScanner->m_eScan_tcp_to_485_End->m_hObject, INFINITE);
 
@@ -4526,14 +4536,20 @@ void CTStatScanner::writetxt()
         m_pFile->Close();
     }
 }
+BOOL CTStatScanner::ScanThirdPartyBACnetDevice()
+{
+    m_pScanThirdPartyBacnetIPThread = CreateThread(NULL, NULL, _ScanThirdPartyBacnetThread, this, NULL, NULL);
+    return TRUE;
+}
 BOOL CTStatScanner::ScanBacnetMSTPDevice()
 {
     m_szComs.clear();
     GetSerialComPortNumber1(m_szComs);
-   // m_pScanBacnetIPThread = AfxBeginThread(_ScanBacnetMSTPThread,this);
+    // m_pScanBacnetIPThread = AfxBeginThread(_ScanBacnetMSTPThread,this);
     m_pScanBacnetIPThread = CreateThread(NULL, NULL, _ScanBacnetMSTPThread, this, NULL, NULL);
     return TRUE;
 }
+
 
 BOOL CTStatScanner::ScanRemoteIPDevice()
 {
@@ -4898,6 +4914,48 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 
 int n_mstp_comport = 0;
 int n_mstp_baudrate = 19200;
+DWORD WINAPI   CTStatScanner::_ScanThirdPartyBacnetThread(LPVOID lpVoid)
+//UINT _ScanBacnetMSTPThread(LPVOID pParam)
+{
+    CTStatScanner* pScan = (CTStatScanner*)(lpVoid);
+    // inilizing bacnet and its handlers for third party bacnet devices
+    GetIPMaskGetWay();
+
+   
+    g_gloab_bac_comport = 0;
+    set_datalink_protocol(2);
+    for (int i = 0; i < g_Vector_Subnet.size(); i++)
+    {
+        CString PC_IP;
+        PC_IP = g_Vector_Subnet.at(i).StrIP;
+        CStringArray temp_pc_strip;
+        SplitCStringA(temp_pc_strip, PC_IP, _T("."));
+        CString temp_pc_ip;
+        temp_pc_ip.Format(_T("%s.%s.%s"), temp_pc_strip.GetAt(0), temp_pc_strip.GetAt(1), temp_pc_strip.GetAt(2));
+
+        if (temp_pc_ip.CompareNoCase(_T("0.0.0")) == 0)
+            continue;
+         
+        if (Initial_bac(g_gloab_bac_comport, g_Vector_Subnet.at(i).StrIP))
+        {
+            Send_WhoIs_Global(-1, -1);
+            Sleep(5000);
+        }
+    }
+   // intial_bip_socket();
+    //Init_Service_Handlers();
+   
+    // hird party bacnet end
+    if (pScan->m_eScanThirdPartyBacnetIpEnd->m_hObject)
+    {
+        pScan->m_eScanThirdPartyBacnetIpEnd->SetEvent();
+    }
+    pScan->m_pScanThirdPartyBacnetIPThread = NULL;
+    return 1;
+}
+
+
+
 
 //需要先让串口的modbus 扫完，那里会记录有哪些串口存在 bacnet的协议.
 //在扫描bacnet的时候 将bacnet ip 扫描完后，要去依次扫描 串口的MS/TP

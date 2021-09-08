@@ -8,11 +8,14 @@
 
 #include "global_function.h"
 #include "global_define.h"
+#include <mutex>          // std::mutex
 
+std::mutex SCHEDULE_TIME_LIST;           // mutex for critical section
 // CBacnetScheduleTime dialog
 HWND m_WeeklyParent_Hwnd;
 IMPLEMENT_DYNAMIC(CBacnetScheduleTime, CDialogEx)
 
+extern vector <int>  m_Weekly_data_instance;
 CBacnetScheduleTime::CBacnetScheduleTime(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetScheduleTime::IDD, pParent)
 {
@@ -206,6 +209,7 @@ void CBacnetScheduleTime::OnClose()
 
 LRESULT CBacnetScheduleTime::Fresh_Schedual_List(WPARAM wParam,LPARAM lParam)
 {
+	SCHEDULE_TIME_LIST.lock();
 	CString temp_show;
     for (int i = 0;i < 8;i++)
     {
@@ -238,10 +242,12 @@ LRESULT CBacnetScheduleTime::Fresh_Schedual_List(WPARAM wParam,LPARAM lParam)
                 temp_show.Format(_T("00:00"));
             }
 #endif
+			
             m_schedule_time_list.SetItemText(i, j + 1, temp_show);
+			
         }
     }
-
+	SCHEDULE_TIME_LIST.unlock();
 	return 0;
 }
 
@@ -429,20 +435,23 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
 		//m_schedual_time_picker.ShowWindow(SW_HIDE);
 		//return;
 	}
-	
+	if (product_type != PM_THIRD_PARTY_DEVICE) {
+		CString temp_task_info;
+		temp_task_info.Format(_T("Write Schedule Time Item%d .Changed Time to \"%s\" "), weekly_list_line + 1, temp_cs);
+		Post_Write_Message(g_bac_instance, WRITETIMESCHEDULE_T3000, weekly_list_line, weekly_list_line, WEEKLY_SCHEDULE_SIZE, BacNet_hwd, temp_task_info);
+		
+	}
+	PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST, NULL, NULL);
 	m_schedule_time_list.SetItemText(m_row,m_col,temp_cs);
 
 	m_schedual_time_picker.ShowWindow(SW_HIDE);
-	CString temp_task_info;
-	temp_task_info.Format(_T("Write Schedule Time Item%d .Changed Time to \"%s\" "),weekly_list_line + 1,temp_cs);
-	Post_Write_Message(g_bac_instance,WRITETIMESCHEDULE_T3000,weekly_list_line,weekly_list_line,WEEKLY_SCHEDULE_SIZE,BacNet_hwd,temp_task_info);
-    PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST, NULL, NULL);
+	
 	*pResult = 0;
 }
 void CBacnetScheduleTime::Write_SCeduleTime_ThirdPArtyBacnet(int row,int col)
 {
 	BACNET_READ_PROPERTY_DATA* writeData = new BACNET_READ_PROPERTY_DATA;
-	writeData->object_instance = weekly_list_line + 1;
+	writeData->object_instance = m_Weekly_data_instance.at(weekly_list_line);
 	writeData->object_property = PROP_WEEKLY_SCHEDULE;
 	writeData->object_type = OBJECT_SCHEDULE;
 	writeData->application_data_len = 0;
@@ -451,7 +460,7 @@ void CBacnetScheduleTime::Write_SCeduleTime_ThirdPArtyBacnet(int row,int col)
 	int len = 0;
 	//encode_opening_tag(writeData->application_data, 3);
 	//writeData->application_data_len += len;
-	for (int x = 0; x < 9; x++)
+	for (int x = 0; x < 7; x++)
 	{
 		//len = encode_opening_tag(writeData->application_data, 0);
 		//writeData->application_data_len += len;
@@ -477,7 +486,7 @@ void CBacnetScheduleTime::Write_SCeduleTime_ThirdPArtyBacnet(int row,int col)
 			writeData->application_data[writeData->application_data_len] = 0x91;//valueType
 			writeData->application_data_len += 1;
 			int flag = 1;
-			if (x % 2)
+			if (y % 2)
 				flag = 0;
 
 			writeData->application_data[writeData->application_data_len] = flag;//(uint8_t)m_Schedual_time_flag.at(weekly_list_line).Time_flag[row][col - 1];//valueType
@@ -491,8 +500,10 @@ void CBacnetScheduleTime::Write_SCeduleTime_ThirdPArtyBacnet(int row,int col)
 	//len = encode_closing_tag(writeData->application_data, 3);
 	//writeData->application_data_len += len;
 	int invoke_id = Bacnet_Write_Properties(g_bac_instance, writeData->object_type, writeData->object_instance, writeData->object_property, NULL, 16, writeData);
+	writeData->application_data = NULL;
 	delete writeData;
 	writeData = NULL;
+	Sleep(10);
 }
 void CBacnetScheduleTime::OnBnClickedClearSchedual()
 {

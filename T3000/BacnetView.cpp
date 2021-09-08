@@ -984,6 +984,9 @@ HANDLE hbip_whois_thread = NULL; //处理回复 I am 线程
 
 extern vector <int>  m_Input_data_instance;
 extern vector <int>  m_Output_data_instance;
+extern vector <int>  m_Variable_data_instance;
+extern vector <int>  m_Weekly_data_instance;
+extern vector <int>  m_Annual_data_instance;
 
 
 
@@ -992,6 +995,7 @@ extern vector <int>  m_Output_data_instance;
 #define BAC_READ_SETTING_TIMER   4
 #define BAC_RESET_WINDOW_TIMER   6
 #define BAC_SET_LAST_UI			7
+#define BAC_READ_PROPERTIES	 8
 
 //#define WM_SEND_OVER     WM_USER + 1287
 // int m_Input_data_length;
@@ -2192,6 +2196,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		Str_variable_point temp_variable;
 		memset(&temp_variable,0,sizeof(temp_variable));
 		m_Variable_data.push_back(temp_variable);
+		m_Variable_data_instance.push_back(i);
 	}
 	for(int i=0;i<BAC_PROGRAM_ITEM_COUNT;i++)
 	{
@@ -2205,12 +2210,14 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		Str_weekly_routine_point temp_weekly;
 		memset(&temp_weekly,0,sizeof(temp_weekly));
 		m_Weekly_data.push_back(temp_weekly);
+		m_Weekly_data_instance.push_back(i);
 	}
 	for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
 	{
 		Str_annual_routine_point temp_annual;
 		memset(&temp_annual,0,sizeof(temp_annual));
 		m_Annual_data.push_back(temp_annual);
+		m_Annual_data_instance.push_back(i);
 	}
 
 	for (int i=0;i<BAC_SCHEDULE_COUNT;i++)
@@ -2633,7 +2640,7 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 			tmp.auto_manual = temp_value.type.Boolean;
 		}
 	}
-	
+	m_Variable_data_instance.at(index) = objInstace;
 	m_Variable_data.at(index) = tmp;
 
 }
@@ -2696,18 +2703,19 @@ void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInsta
 		{
 
 			CStringArray temp_array;
-			SplitCStringA(temp_array, bacnet_string, _T("/n"));
+			SplitCStringA(temp_array, bacnet_string, _T("n"));
 			for (int i = 0; i < temp_array.GetSize(); i++)
 			{
 				CStringArray temp_schedule;
 				SplitCStringA(temp_schedule, temp_array[i], _T(","));
 				int offset = 0;
-					for (int j = 0; offset < temp_schedule.GetSize(); j++)
+					for (int j = 0; (offset+6) < temp_schedule.GetSize(); j++)
 					{
 						if (_ttoi(temp_schedule.GetAt(offset + 1)) != 0 || _ttoi(temp_schedule.GetAt(offset + 2)) != 0)
 						{
-							m_Schedual_Time_data.at(objInstace - 1).Schedual_Day_Time[j][i].time_hours = _ttoi(temp_schedule.GetAt(offset + 1));
-							m_Schedual_Time_data.at(objInstace - 1).Schedual_Day_Time[j][i].time_minutes = _ttoi(temp_schedule.GetAt(offset + 2));
+							m_Schedual_Time_data.at(objInstace).Schedual_Day_Time[j][i].time_hours = _ttoi(temp_schedule.GetAt(offset + 1));
+							m_Schedual_Time_data.at(objInstace).Schedual_Day_Time[j][i].time_minutes = _ttoi(temp_schedule.GetAt(offset + 2));
+							m_Schedual_time_flag.at(objInstace).Time_flag[j][i] = _ttoi(temp_schedule.GetAt(offset + 6));
 						}
 						offset += 7;
 					}
@@ -2715,6 +2723,7 @@ void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInsta
 			bacnet_string = "";
 		}
 	}
+	m_Weekly_data_instance.at(index) = objInstace;
 	m_Weekly_data.at(index) = tmp;
 
 }
@@ -2787,7 +2796,7 @@ void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInsta
 					int day_in_year = day_in_this_year[Clicked_month - 1] + Clicked_day;
 					int charactor_control = (day_in_year - 1) / 8;
 					int control_bit = (day_in_year - 1) % 8;
-					g_DayState[objInstace-1][charactor_control] |= 1 << control_bit;
+					g_DayState[index][charactor_control] |= 1 << control_bit;
 					
 					j=j+5;
 				}
@@ -2795,9 +2804,10 @@ void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInsta
 		}
 		else
 		{
-			memset(g_DayState[objInstace - 1], 0, ANNUAL_CODE_SIZE);
+			memset(g_DayState[index ], 0, ANNUAL_CODE_SIZE);
 		}
 	}
+	m_Annual_data_instance.at(index) = objInstace;
 	m_Annual_data.at(index) = tmp;
 
 }
@@ -2815,8 +2825,7 @@ DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid)
 
 	if (response != "")
 	{
-
-		Sleep(100);
+		
 		CStringArray temp_array;
 		SplitCStringA(temp_array, response, _T(","));
 		int inputcount = 0, outputcount = 0, variablecount = 0, schedulecount = 0, calenderCount = 0;;
@@ -2897,11 +2906,15 @@ Not able to read Property list of BACnet Device,\r\nThis may be due to a connect
 	}
 
 	::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+	Sleep(100);
 	::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
+	Sleep(100);
 	::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
+	Sleep(100);
 	::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
+	Sleep(100);
 	::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
-	
+	Sleep(100);
 	click_read_thread = NULL;
 	return 0;
 }
@@ -2957,23 +2970,35 @@ void CDialogCM5_BacNet::Fresh()
 	output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;
 	variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;
 
+	KillTimer(BAC_READ_PROPERTIES);
 	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
 	{
 			//Send_WhoIs_Global(-1, -1);
 			//Sleep(10);
 			ClearBacnetData();
-			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
+			
+			((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
+			((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->Initial_List();
+			((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->Initial_List();
+			((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Initial_List();
+			((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Initial_List();
+			/*::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
 			::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
 			::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
 			::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
-			::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
+			::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);*/
+			Sleep(100);
 			if (click_read_thread == NULL)
 			{
 				click_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
+				switch_product_last_view();
 			}
 
-			switch_product_last_view();
+			
+
+			SetTimer(BAC_READ_PROPERTIES, 60000, NULL);
 			BacNet_hwd = this->m_hWnd;
+
 		return;
 		
 	}
@@ -5714,6 +5739,14 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 	bool is_connected = false;
 	switch(nIDEvent)
 	{
+	case BAC_READ_PROPERTIES:
+	{
+		if (click_read_thread == NULL)
+		{
+			click_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
+		}
+		break;
+	}
 	case BAC_TIMER_2_WHOIS:
 		{
 			if(offline_mode)

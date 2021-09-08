@@ -7073,10 +7073,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
 
     for (int i = 0; i < g_Vector_Subnet.size(); i++)
     {
-        if (strIPAdress.IsEmpty())
-        {
-            strIPAdress = g_Vector_Subnet.at(i).StrIP;
-        }
+       
         CStringArray temp_strip;
         SplitCStringA(temp_strip, strIPAdress, _T("."));
         CString temp_ip;

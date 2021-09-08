@@ -9038,7 +9038,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
             {
                 continue;
             }
-            else if (tp.protocol == 254)
+            else if (tp.protocol == 254 || tp.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
             {
                 temp_online = true; //虚拟设备显示在线;
                 m_product.at(i).status = true;
@@ -9618,7 +9618,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
             return 0;
 
         tree_product tp = m_product.at(i);
-        if (tp.protocol == P_MODBUS_485)
+        if (tp.protocol == P_MODBUS_485 )
             continue;
 
 #pragma region hanlde_ping
