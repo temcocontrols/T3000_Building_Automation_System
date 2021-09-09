@@ -84,5 +84,5 @@ public:
 
     int m_leap_year;
 
-	void Write_BACnet_ThirdParty_DateList(MONTHDAYSTATE* states);
+	void Write_BACnet_ThirdParty_DateList();
 };

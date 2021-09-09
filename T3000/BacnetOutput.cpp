@@ -385,7 +385,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	int listCount = m_output_list.GetItemCount();
 	if (listCount != output_item_limit_count) // for bacnet devices hiding columns
 	{
-		Initial_List();
+		//Initial_List();
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
 		{
 			isFreshOne = false;

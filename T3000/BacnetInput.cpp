@@ -656,7 +656,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	int listCount = m_input_list.GetItemCount();
 	if (listCount != input_item_limit_count ) // for bacnet devices hiding columns
 	{
-		Initial_List();
+		//Initial_List();
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
 		{
 			isFreshOne = false;
@@ -723,7 +723,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
     //}
 	else
 	{
-		    INPUT_LIMITE_ITEM_COUNT = BAC_INPUT_ITEM_COUNT;
+		INPUT_LIMITE_ITEM_COUNT =  BAC_INPUT_ITEM_COUNT;
 	}
 
 

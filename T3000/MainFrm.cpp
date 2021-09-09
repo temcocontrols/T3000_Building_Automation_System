@@ -7001,7 +7001,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 SqliteDBT3000.closedb();
 
                 g_bPauseMultiRead = true;
-
+                if (pDlg)
+                {
+                    pDlg->ShowWindow(SW_HIDE);
+                    delete pDlg;//20120220
+                    pDlg = NULL;
+                }
 
                 goto do_connect_success;
             }

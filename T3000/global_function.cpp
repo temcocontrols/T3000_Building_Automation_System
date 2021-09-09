@@ -4637,8 +4637,10 @@ int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, u
     {
         if (objectData != NULL)
         {
-            
-            for (int i = 0; i < 3; i++)
+            n_invoke_id = Send_Write_Property_Request_Data(deviceid, object_type,
+                object_instance, (BACNET_PROPERTY_ID)object_props[property], &objectData->application_data[0], objectData->application_data_len,
+                priority, BACNET_ARRAY_ALL);
+            /*for (int i = 0; i < 3; i++)
             {
                 int send_status = true;
                 int temp_invoke_id = -1;
@@ -4652,9 +4654,7 @@ int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, u
                         send_status = false;
                         break;
                     }
-                    temp_invoke_id = Send_Write_Property_Request_Data(deviceid, object_type,
-                        object_instance, (BACNET_PROPERTY_ID)object_props[property], &objectData->application_data[0], objectData->application_data_len,
-                        priority, BACNET_ARRAY_ALL);
+                   
                 } while (temp_invoke_id < 0);
 
                 if (send_status)
@@ -4671,7 +4671,7 @@ int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, u
                 }
                 Sleep(SEND_COMMAND_DELAY_TIME);
             }
-            return -1;
+            return -1;*/
         }
     }
     else {
@@ -5221,7 +5221,7 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
                     {
                         continue;  //没有找到对应的点，没有赋值 value成功;
                     }
-                    //standard_bacnet_data.erase(itrflag);
+                    standard_bacnet_data.erase(itrflag);
                     return 1;
                 }
                 else
@@ -6364,7 +6364,12 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
     if(textbuf) strcpy(textbuf, buf);
     return( buf ) ;
 }
+void LocalBacnetAbortHandler(BACNET_ADDRESS* src, uint8_t invoke_id, uint8_t abort_reason, bool server)
+{
 
+    int i = 0;
+
+}
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src)
 {
 
@@ -6741,7 +6746,7 @@ void Init_Service_Handlers(	void)
     
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROP_MULTIPLE, local_handler_read_property_multiple_ack);
     
-
+    apdu_set_abort_handler(LocalBacnetAbortHandler);
     /* set the handler for all the services we don't implement */
     /* It is required to send the proper reject message... */
     apdu_set_unrecognized_service_handler_handler

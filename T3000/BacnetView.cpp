@@ -1012,6 +1012,7 @@ CDialogCM5_BacNet::CDialogCM5_BacNet()
 	m_MSTP_THREAD = true;
 	m_cur_tab_sel = 0;
 	//CM5_hThread = NULL;
+	BACnet_read_thread = NULL;
 }
 
 CDialogCM5_BacNet::~CDialogCM5_BacNet()
@@ -2915,7 +2916,7 @@ Not able to read Property list of BACnet Device,\r\nThis may be due to a connect
 	Sleep(100);
 	::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
 	Sleep(100);
-	click_read_thread = NULL;
+	BACnet_read_thread = NULL;
 	return 0;
 }
 
@@ -2970,27 +2971,36 @@ void CDialogCM5_BacNet::Fresh()
 	output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;
 	variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;
 
-	KillTimer(BAC_READ_PROPERTIES);
+	KillTimer(BAC_READ_PROPERTIES); 
+	/*if (BACnet_read_thread != NULL)
+	{
+		TerminateThread(BACnet_read_thread, 0);
+		BACnet_read_thread = NULL;
+	}*/
 	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
 	{
 			//Send_WhoIs_Global(-1, -1);
 			//Sleep(10);
 			ClearBacnetData();
 			
-			((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
-			((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->Initial_List();
-			((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->Initial_List();
-			((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Initial_List();
-			((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Initial_List();
+				((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
+			
+				((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->Initial_List();
+			
+				((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->Initial_List();
+			
+				((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Initial_List();
+			
+				((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Initial_List();
 			/*::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
 			::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
 			::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
 			::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
 			::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);*/
 			Sleep(100);
-			if (click_read_thread == NULL)
+			if (BACnet_read_thread == NULL)
 			{
-				click_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
+				BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
 				switch_product_last_view();
 			}
 
@@ -5741,10 +5751,10 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 	{
 	case BAC_READ_PROPERTIES:
 	{
-		if (click_read_thread == NULL)
+		/*if (BACnet_read_thread == NULL)
 		{
-			click_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
-		}
+			BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
+		}*/
 		break;
 	}
 	case BAC_TIMER_2_WHOIS:

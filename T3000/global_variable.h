@@ -2035,6 +2035,7 @@ int g_new_old_IDE = 0;
 int g_bac_read_type;	//用于记录将要读取哪一个，input 还是output,给线程使用;
 bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
 HANDLE click_read_thread;
+HANDLE BACnet_read_thread;
 bool bac_net_initial_once;
 unsigned char my_ip[4];
 int connect_invoke_id = -1;

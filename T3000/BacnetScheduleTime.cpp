@@ -450,13 +450,13 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
 }
 void CBacnetScheduleTime::Write_SCeduleTime_ThirdPArtyBacnet(int row,int col)
 {
-	BACNET_READ_PROPERTY_DATA* writeData = new BACNET_READ_PROPERTY_DATA;
-	writeData->object_instance = m_Weekly_data_instance.at(weekly_list_line);
-	writeData->object_property = PROP_WEEKLY_SCHEDULE;
-	writeData->object_type = OBJECT_SCHEDULE;
-	writeData->application_data_len = 0;
-	writeData->application_data = new uint8_t;
-	writeData->application_data[MAX_APDU] = { 0 };
+	BACNET_READ_PROPERTY_DATA writeData;// = new BACNET_READ_PROPERTY_DATA;
+	writeData.object_instance = m_Weekly_data_instance.at(weekly_list_line);
+	writeData.object_property = PROP_WEEKLY_SCHEDULE;
+	writeData.object_type = OBJECT_SCHEDULE;
+	writeData.application_data_len = 0;
+	writeData.application_data = new uint8_t;
+	writeData.application_data[MAX_APDU] = { 0 };
 	int len = 0;
 	//encode_opening_tag(writeData->application_data, 3);
 	//writeData->application_data_len += len;
@@ -464,8 +464,8 @@ void CBacnetScheduleTime::Write_SCeduleTime_ThirdPArtyBacnet(int row,int col)
 	{
 		//len = encode_opening_tag(writeData->application_data, 0);
 		//writeData->application_data_len += len;
-		writeData->application_data[writeData->application_data_len] = 0x0e;
-		writeData->application_data_len += 1;
+		writeData.application_data[writeData.application_data_len] = 0x0e;
+		writeData.application_data_len += 1;
 		for (int y = 0; y < 8; y++)
 		{
 			if (m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours == 0 &&
@@ -473,36 +473,36 @@ void CBacnetScheduleTime::Write_SCeduleTime_ThirdPArtyBacnet(int row,int col)
 			{
 				continue;
 			}
-			writeData->application_data[writeData->application_data_len] = 0xb4;
-			writeData->application_data_len += 1;
-			writeData->application_data[writeData->application_data_len] = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours;
-			writeData->application_data_len += 1;
-			writeData->application_data[writeData->application_data_len] = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_minutes;
-			writeData->application_data_len += 1;
-			writeData->application_data[writeData->application_data_len] = 0;//sec
-			writeData->application_data_len += 1;
-			writeData->application_data[writeData->application_data_len] = 0;//millSec
-			writeData->application_data_len += 1;
-			writeData->application_data[writeData->application_data_len] = 0x91;//valueType
-			writeData->application_data_len += 1;
+			writeData.application_data[writeData.application_data_len] = 0xb4;
+			writeData.application_data_len += 1;
+			writeData.application_data[writeData.application_data_len] = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours;
+			writeData.application_data_len += 1;
+			writeData.application_data[writeData.application_data_len] = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_minutes;
+			writeData.application_data_len += 1;
+			writeData.application_data[writeData.application_data_len] = 0;//sec
+			writeData.application_data_len += 1;
+			writeData.application_data[writeData.application_data_len] = 0;//millSec
+			writeData.application_data_len += 1;
+			writeData.application_data[writeData.application_data_len] = 0x91;//valueType
+			writeData.application_data_len += 1;
 			int flag = 1;
 			if (y % 2)
 				flag = 0;
 
-			writeData->application_data[writeData->application_data_len] = flag;//(uint8_t)m_Schedual_time_flag.at(weekly_list_line).Time_flag[row][col - 1];//valueType
-			writeData->application_data_len += 1;
+			writeData.application_data[writeData.application_data_len] = flag;//(uint8_t)m_Schedual_time_flag.at(weekly_list_line).Time_flag[row][col - 1];//valueType
+			writeData.application_data_len += 1;
 		}
-		writeData->application_data[writeData->application_data_len] = 0x0f;
-		writeData->application_data_len += 1;
+		writeData.application_data[writeData.application_data_len] = 0x0f;
+		writeData.application_data_len += 1;
 		/*len = encode_closing_tag(writeData->application_data, 0);
 		writeData->application_data_len += len;*/
 	}
 	//len = encode_closing_tag(writeData->application_data, 3);
 	//writeData->application_data_len += len;
-	int invoke_id = Bacnet_Write_Properties(g_bac_instance, writeData->object_type, writeData->object_instance, writeData->object_property, NULL, 16, writeData);
-	writeData->application_data = NULL;
+	int invoke_id = Bacnet_Write_Properties(g_bac_instance, writeData.object_type, writeData.object_instance, writeData.object_property, NULL, 16, &writeData);
+	/*writeData.application_data = NULL;
 	delete writeData;
-	writeData = NULL;
+	writeData = NULL;*/
 	Sleep(10);
 }
 void CBacnetScheduleTime::OnBnClickedClearSchedual()

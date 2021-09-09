@@ -4917,6 +4917,11 @@ int n_mstp_baudrate = 19200;
 DWORD WINAPI   CTStatScanner::_ScanThirdPartyBacnetThread(LPVOID lpVoid)
 //UINT _ScanBacnetMSTPThread(LPVOID pParam)
 {
+    if (BACnet_read_thread != NULL)
+    {
+        TerminateThread(BACnet_read_thread, 0);
+        BACnet_read_thread = NULL;
+    }
     CTStatScanner* pScan = (CTStatScanner*)(lpVoid);
     // inilizing bacnet and its handlers for third party bacnet devices
     GetIPMaskGetWay();
@@ -4939,7 +4944,7 @@ DWORD WINAPI   CTStatScanner::_ScanThirdPartyBacnetThread(LPVOID lpVoid)
         if (Initial_bac(g_gloab_bac_comport, g_Vector_Subnet.at(i).StrIP))
         {
             Send_WhoIs_Global(-1, -1);
-            Sleep(5000);
+            Sleep(10000);
         }
     }
    // intial_bip_socket();

@@ -169,6 +169,8 @@ void localhandler_read_property_ack(
 
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src);
 
+void LocalBacnetAbortHandler(BACNET_ADDRESS* src,uint8_t invoke_id,	uint8_t abort_reason,	bool server);
+
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
 char * intervaltotext(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c =":");
 char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsigned hours,char *c =":");
