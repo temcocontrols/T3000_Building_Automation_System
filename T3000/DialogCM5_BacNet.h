@@ -88,6 +88,7 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid);
 DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid);
 DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid);
 DWORD WINAPI Handle_Bip_whois_Thread(LPVOID lpvoid);
+DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid);
 
 
 

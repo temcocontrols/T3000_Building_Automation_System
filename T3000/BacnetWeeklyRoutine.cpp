@@ -18,7 +18,7 @@
 extern CBacnetScheduleTime* ScheduleEdit_Window;
 extern CBacnetTstatSchedule *BacnetTstatSchedule_Window ;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
-
+extern vector <int>  m_Weekly_data_instance;
 
 
 CString Hol_Old_Lable[BAC_HOLIDAY_COUNT] =
@@ -321,7 +321,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 			WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
 			temp_value->type.Character_String.encoding = 0;
 			temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
-			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, Changed_Item+1, PROP_DESCRIPTION, temp_value);
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, m_Weekly_data_instance.at(Changed_Item), PROP_DESCRIPTION, temp_value);
 		}
 	}
 
@@ -351,7 +351,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 				WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
 				temp_value->type.Character_String.encoding = 0;
 				temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
-				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, Changed_Item+1, PROP_OBJECT_NAME, temp_value);
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, m_Weekly_data_instance.at(Changed_Item), PROP_OBJECT_NAME, temp_value);
 		}
 	}
 
@@ -365,6 +365,14 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 		else
 		{
 			m_Weekly_data.at(Changed_Item).value=1;
+		}
+		if (product_type == PM_THIRD_PARTY_DEVICE)
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_BOOLEAN;
+			temp_value->context_specific = false;
+			temp_value->type.Boolean = m_Weekly_data.at(Changed_Item).value;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, m_Weekly_data_instance.at(Changed_Item), PROP_PRESENT_VALUE, temp_value);
 		}
 	}
 	if(Changed_SubItem == WEEKLY_ROUTINE_AUTO_MANUAL)
@@ -386,7 +394,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 				temp_value->tag = TPYE_BACAPP_BOOLEAN;
 				temp_value->context_specific = false;
 				temp_value->type.Boolean = m_Weekly_data.at(Changed_Item).auto_manual;
-				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, Changed_Item, PROP_OUT_OF_SERVICE, temp_value);
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, m_Weekly_data_instance.at(Changed_Item), PROP_OUT_OF_SERVICE, temp_value);
 		}
 	}
 

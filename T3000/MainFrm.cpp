@@ -7001,7 +7001,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 SqliteDBT3000.closedb();
 
                 g_bPauseMultiRead = true;
-
+                if (pDlg)
+                {
+                    pDlg->ShowWindow(SW_HIDE);
+                    delete pDlg;//20120220
+                    pDlg = NULL;
+                }
 
                 goto do_connect_success;
             }
@@ -9038,7 +9043,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
             {
                 continue;
             }
-            else if (tp.protocol == 254)
+            else if (tp.protocol == 254 || tp.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
             {
                 temp_online = true; //虚拟设备显示在线;
                 m_product.at(i).status = true;
@@ -9618,7 +9623,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
             return 0;
 
         tree_product tp = m_product.at(i);
-        if (tp.protocol == P_MODBUS_485)
+        if (tp.protocol == P_MODBUS_485 )
             continue;
 
 #pragma region hanlde_ping
@@ -12597,6 +12602,12 @@ void CMainFrame::OnDatabaseBacnettool()
     CString selectednetwork = m_current_tree_node.NetworkCard_Address;
     ShellExecute(NULL, L"open", CS_BacnetExplore_Path, canonicalizedstring + " " + selectednetwork, NULL, SW_SHOWNORMAL);
     canonicalizedstring.ReleaseBuffer();
+    if (bip_socket() > 0) // closing socket on Yabe opend , BACnet port dont conflict with both applications.
+    {
+        ::closesocket(bip_socket()); 
+        bip_set_socket(NULL);
+        bip_set_port(htons(-1));
+    }
     return;
 #if 0
 

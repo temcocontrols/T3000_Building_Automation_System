@@ -15,7 +15,7 @@
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 extern tree_product selected_product_Node; // 选中的设备信息;
-
+extern vector <int>  m_Variable_data_instance;
 
 
 IMPLEMENT_DYNAMIC(CBacnetVariable, CDialogEx)
@@ -749,7 +749,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			int ObjectType = OBJECT_ANALOG_VALUE;
 			if (m_Variable_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
 				ObjectType = OBJECT_BINARY_VALUE;
-			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, lRow, PROP_OUT_OF_SERVICE, temp_value);
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Variable_data_instance.at(lRow), PROP_OUT_OF_SERVICE, temp_value);
 		}
 		temp_task_info.Format(_T("Write Variable List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
 	}
@@ -970,7 +970,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 				int ObjectType = OBJECT_ANALOG_VALUE;
 				if (m_Output_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
 					ObjectType = OBJECT_BINARY_VALUE;
-				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, lRow, PROP_PRESENT_VALUE, temp_value);
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Variable_data_instance.at(lRow), PROP_PRESENT_VALUE, temp_value);
 			}
 	}
 	else if (lCol == VARIABLE_FULL_LABLE)
@@ -990,7 +990,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 					if (m_Output_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
 						ObjectType = OBJECT_BINARY_VALUE;
 
-				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, lRow, PROP_OBJECT_NAME, temp_value);
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Variable_data_instance.at(lRow), PROP_OBJECT_NAME, temp_value);
 			}
 		}
 	}
@@ -1011,7 +1011,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 				if (m_Output_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
 					ObjectType = OBJECT_BINARY_VALUE;
 
-				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, lRow, PROP_DESCRIPTION, temp_value);
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Variable_data_instance.at(lRow), PROP_DESCRIPTION, temp_value);
 			}
 		}
 	}
