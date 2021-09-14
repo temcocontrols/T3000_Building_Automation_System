@@ -571,7 +571,11 @@ void apdu_handler(
                                 (service_request, service_request_len, src,
                                 &service_ack_data);
                         }
-                        tsm_free_invoke_id(invoke_id); //aqeeb: for segmanted packets handling
+                        if (!service_ack_data.segmented_message)//aqeeb: for segmanted packets handling
+                        {
+                            tsm_free_invoke_id(invoke_id); 
+                        }
+                            
                         break;
                     default:
                         break;
