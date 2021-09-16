@@ -1240,7 +1240,7 @@ void CCO2_View::OnEnKillfocusCo2PrepareAlarmSetpoint()
         if(m_edit_pre_alarm_setpoint != product_register_value[112])
         {
             Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,112,m_edit_pre_alarm_setpoint,
-                product_register_value[112],this->m_hWnd,IDC_CO2_PREPARE_ALARM_SETPOINT,_T("Prepare Alarm Setpoint"));
+                product_register_value[112],this->m_hWnd,IDC_CO2_PREPARE_ALARM_SETPOINT,_T("Previous Alarm Setpoint"));
         }
     }
     else
@@ -1251,7 +1251,7 @@ void CCO2_View::OnEnKillfocusCo2PrepareAlarmSetpoint()
         if(m_edit_pre_alarm_setpoint != product_register_value[CO2_485_MODBUS_INT_PRE_ALARM_SETPOINT])
         {
             Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_INT_PRE_ALARM_SETPOINT,m_edit_pre_alarm_setpoint,
-                product_register_value[CO2_485_MODBUS_INT_PRE_ALARM_SETPOINT],this->m_hWnd,IDC_CO2_PREPARE_ALARM_SETPOINT,_T("Prepare Alarm Setpoint"));
+                product_register_value[CO2_485_MODBUS_INT_PRE_ALARM_SETPOINT],this->m_hWnd,IDC_CO2_PREPARE_ALARM_SETPOINT,_T("Previous Alarm Setpoint"));
         }
     }
 }

@@ -1224,6 +1224,7 @@ typedef enum
     T3_TSTAT10    = 9,
     T3_OEM        = 11,
     T3_TB_11I = 12,
+	T3_FAN_MODULE = 13,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,

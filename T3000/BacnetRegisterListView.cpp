@@ -66,7 +66,10 @@ DWORD WINAPI  CBacnetRegisterListView::ReadRegDataThreadfun(LPVOID lpVoid)
             h_read_reg_date_thread = NULL;
             return 1;
         }
-        if ((product_register_value[7] == PM_MINIPANEL) || (product_register_value[7] == PM_MINIPANEL_ARM))
+        if ((product_register_value[7] == PM_MINIPANEL) || 
+            (product_register_value[7] == PM_MINIPANEL_ARM) ||
+            (product_register_value[7] == PM_ESP32_T3_SERIES)
+            )
         {
             if (i == 4)
                 i = 68; //

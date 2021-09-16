@@ -1336,7 +1336,7 @@ BEGIN
     GROUPBOX        "Alarm Setting",IDC_STATIC,17,142,114,45
     LTEXT           "Alarm On (s)",IDC_STATIC,318,122,43,8
     LTEXT           "Alarm Off (s)",IDC_STATIC,318,138,46,8
-    LTEXT           "Prepare Alarm Setpoint",IDC_STATIC,148,59,78,8
+    LTEXT           "Previous Alarm Setpoint",IDC_STATIC,148,59,78,8
     LTEXT           "Alarm Setpoint",IDC_STATIC,148,76,78,8
     LTEXT           "Calibrating Offset",IDC_STATIC,148,95,76,8
     GROUPBOX        "CO2",IDC_STATIC,139,33,158,76

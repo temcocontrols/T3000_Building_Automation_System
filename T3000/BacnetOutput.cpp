@@ -613,12 +613,17 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).description, (int)strlen((char *)m_Output_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
-		if (m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG){
-			temp_item.Format(_T("AO%d"), m_Output_data_instance.at(i));
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
+		{
+			if (m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG) {
+				temp_item.Format(_T("AO%d"), m_Output_data_instance.at(i));
+			}
+			else {
+				temp_item.Format(_T("BO%d"), m_Output_data_instance.at(i));
+			}
 		}
-		else {
-			temp_item.Format(_T("BO%d"), m_Output_data_instance.at(i));
-		}
+		else
+			temp_item.Format(_T("OUT%d"), i + 1);
 		m_output_list.SetItemText(i,OUTPUT_NUM,temp_item);
 		m_output_list.SetItemText(i,OUTPUT_FULL_LABLE,temp_des);
 		m_output_list.SetCellEnabled(i,OUTPUT_HW_SWITCH,0);

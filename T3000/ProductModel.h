@@ -64,6 +64,10 @@
 #define PM_PWMETER			          73
 #define PM_MINIPANEL_ARM              74
 #define PM_WEATHER_STATION            75
+#define PM_ESP32_T38AI8AO6DO          87
+//产品号是 88   用于最新的 ESP32版本的 T3 BB LB TB Nano
+#define PM_ESP32_T3_SERIES            88
+#define PM_ESP32_T322AI               89
 #define PWM_TEMPERATURE_TRANSDUCER    90  //Lijun transudcer 新板子;
 #define PM_TSTAT8_WIFI                91
 #define PM_TSTAT8_OCC                 92
