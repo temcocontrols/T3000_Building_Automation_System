@@ -5194,9 +5194,9 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
 
         if (send_status)
         {
-            for (int i = 0; i<400; i++)
+            for (int i = 0; i<100; i++)
             {
-                Sleep(10);
+                Sleep(100);
                 if (tsm_invoke_id_free(temp_invoke_id))
                 {
                     Sleep(10);
@@ -5247,11 +5247,8 @@ void localhandler_read_property_ack(
     (void)src;
     (void)service_data;        /* we could use these... */
     len = rp_ack_decode_service_request(service_request, service_len, &data);
-    if (len > 0)
-    {
-        //local_rp_ack_print_data(&data);
-        BACNET_APPLICATION_DATA_VALUE value;
-        local_value_rp_ack_print_data(&data,value);
+    
+       
         if (service_data->segmented_message /*&& service_data->sequence_number < service_data->proposed_window_number*/)
         {
             vector<str_segmented_bacnet_rp_info>::iterator itr = segmented_bacnet_data.begin();
@@ -5259,47 +5256,102 @@ void localhandler_read_property_ack(
             int find_exsit = false;
             for (; itr != segmented_bacnet_data.end(); itr++)
             {
-                if ((itr->invoke_id == service_data->invoke_id) &&
-                    (itr->bacnet_instance == data.object_instance) &&
-                    (itr->object_type == data.object_type) &&
-                    (itr->property_id == data.object_property))
+                if ((itr->invoke_id == service_data->invoke_id) //&&
+                    //(itr->bacnet_instance == data.object_instance) &&
+                   // (itr->object_type == data.object_type) &&
+                    //(itr->property_id == data.object_property))
+                    )
                 {
                     if (service_data->sequence_number == service_data->proposed_window_number)
                     {
-                        data.application_data = itr->application_data;
-                        data.application_data_len = itr->application_data_len;
-                        rp_ack_print_data(&data);
-                        //int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                        BACNET_READ_PROPERTY_DATA tempData;
+                        tempData.object_instance = itr->bacnet_instance;
+                        tempData.object_property = (BACNET_PROPERTY_ID)itr->property_id;
+                        tempData.object_type = itr->object_type;
+                      
+                        for (int u = 0; u < service_len; u++)
+                        {
+                            itr->application_data[itr->application_data_len + (u + 1)] = service_request[u];
+                        }
+                        itr->application_data_len = itr->application_data_len + service_len;
+                      
+                        tempData.application_data = &itr->application_data[0];
+                        tempData.application_data_len = itr->application_data_len;
+                       if(!Bacnet_debug_fileRead)
+                        {
+                            rp_ack_print_data(&tempData);
+                            
+                        }
+                        itr->last_seq_no = service_data->sequence_number;
+
+                        delete tempData.application_data;
+                        delete itr->application_data;
+                        itr->application_data = NULL;
+                        tempData.application_data = NULL;
+
                         segmented_bacnet_data.erase(itr);
+                        segmented_bacnet_data.clear();
+                        Sleep(100);
+                        tsm_free_invoke_id(service_data->invoke_id);
+                        find_exsit = true;
+                        break;
                     }
                     else 
-                    {
-                        strcat((char*)itr->application_data, (char*)data.application_data);
-                        itr->application_data_len += data.application_data_len;
-                        find_exsit = true;
-                        segmentedCompleted = false;
-                        if(service_data->sequence_number == 0)
-                        int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                    { 
+                        if (service_data->sequence_number > 0 && service_data->sequence_number > itr->last_seq_no  )
+                        {
+                            for (int u = 0; u < service_len; u++)
+                            {
+                                itr->application_data[itr->application_data_len+(u+1)] = service_request[u];
+                            }
+                            itr->application_data_len = itr->application_data_len + service_len;
+                          
+                            itr->last_seq_no = service_data->sequence_number;
+                        
+                        int i = 0;
+                        }
+                        else
+                        {
+                            //int inv_id = Send_Segment_Ack(itr->bacnet_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                        }
                     }
+                    find_exsit = true;
+                    segmentedCompleted = false;
                 }
+
             }
-            if (!find_exsit)
+            if (!find_exsit && len > 0)
             {
                 str_segmented_bacnet_rp_info temp_standard_bacnet_data = { 0 };
                 temp_standard_bacnet_data.invoke_id = service_data->invoke_id;
                 temp_standard_bacnet_data.bacnet_instance = data.object_instance;
                 temp_standard_bacnet_data.object_type = data.object_type;
                 temp_standard_bacnet_data.property_id = data.object_property;
-                temp_standard_bacnet_data.application_data = data.application_data;
+                temp_standard_bacnet_data.application_data = new uint8_t;
+                for (int u = 0; u < data.application_data_len; u++)
+                {
+                    temp_standard_bacnet_data.application_data[u] = data.application_data[u];
+                }
+               // temp_standard_bacnet_data.application_data = data.application_data;
                 temp_standard_bacnet_data.application_data_len = data.application_data_len;
+                temp_standard_bacnet_data.last_seq_no = service_data->sequence_number;
                 segmented_bacnet_data.push_back(temp_standard_bacnet_data);
                 int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
                 segmentedCompleted = false;
-               // Sleep(10);
             }
            
         }
-        
+
+
+    if (len > 0)
+        {
+    //local_rp_ack_print_data(&data);
+        if (segmentedCompleted)
+        {
+        BACNET_APPLICATION_DATA_VALUE value;
+        if (!Bacnet_debug_fileRead)
+         local_value_rp_ack_print_data(&data, value);
+
         if (data.object_property == PROP_WEEKLY_SCHEDULE)
         {
             int index = 0;
@@ -5363,10 +5415,7 @@ void localhandler_read_property_ack(
         }
 
 #endif
-            if(segmentedCompleted)
-            {
-                //tsm_free_invoke_id(service_data->invoke_id);
-
+            
                 vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
                 vector<str_bacnet_rp_info>::iterator itrflag;
 

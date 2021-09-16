@@ -6415,6 +6415,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             }
         }
+
         CString product_name;
         if (find_exsit == false)
         {
@@ -6437,7 +6438,36 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             {
                 product_name = _T("Third-party Device");
             }
+            GetIPMaskGetWay();
+            CString str_ip_address;
+            CString str_netwrok_address;
+            CString str_n_port;
+            str_ip_address.Format(_T("%u.%u.%u.%u"), pbac_iam->ipaddress[0], pbac_iam->ipaddress[1], pbac_iam->ipaddress[2], pbac_iam->ipaddress[3]);
+            str_n_port.Format(_T("%u"), pbac_iam->ipaddress[4] * 256 + pbac_iam->ipaddress[5]);
             
+            for (int i = 0; i < g_Vector_Subnet.size(); i++)
+            {
+                CStringArray temp_strip;
+                SplitCStringA(temp_strip, str_ip_address, _T("."));
+                CString temp_ip;
+
+                temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
+                CString PC_IP;
+                PC_IP = g_Vector_Subnet.at(i).StrIP;
+                CStringArray temp_pc_strip;
+                SplitCStringA(temp_pc_strip, PC_IP, _T("."));
+                CString temp_pc_ip;
+                temp_pc_ip.Format(_T("%s.%s.%s"), temp_pc_strip.GetAt(0), temp_pc_strip.GetAt(1), temp_pc_strip.GetAt(2));
+
+                if (temp_pc_ip.CompareNoCase(_T("0.0.0")) == 0)
+                    continue;
+
+                if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
+                {
+                    str_netwrok_address = g_Vector_Subnet.at(i).StrIP;
+                    break;
+                }
+            }
             SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
             CppSQLite3DB SqliteDBBuilding;
             SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
@@ -6446,17 +6476,13 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             CString str_serialid;
             str_serialid.Format(_T("%u"), serial_id);
             CString product_class_id = _T("254");
-            CString str_ip_address;
-            CString str_n_port;
-            str_ip_address.Format(_T("%u.%u.%u.%u"), pbac_iam->ipaddress[0], pbac_iam->ipaddress[1], pbac_iam->ipaddress[2], pbac_iam->ipaddress[3]);
-            str_n_port.Format(_T("%u"), pbac_iam->ipaddress[4] * 256 + pbac_iam->ipaddress[5]);
             CString temp_pro2;
             temp_pro2.Format(_T("%d"), PROTOCOL_THIRD_PARTY_BAC_BIP);
             CString str_panel_number;
             str_panel_number.Format(_T("%d"), pbac_iam->macaddress);
             CString str_object_instance;
             str_object_instance.Format(_T("%u"), pbac_iam->device_id);
-            strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Screen_Name,Bautrate,Background_imgID,Com_Port,Protocol,Online_Status,Panal_Number,Object_Instance)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_n_port + "','" + temp_pro2 + "','1','" + str_panel_number + "' ,'" + str_object_instance + "' )"));
+            strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Screen_Name,Bautrate,Background_imgID,Com_Port,Protocol,Online_Status,Panal_Number,Object_Instance,NetworkCard_Address)   values('" + m_strCurMainBuildingName + "','" + m_strCurSubBuldingName + "','" + str_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_n_port + "','" + temp_pro2 + "','1','" + str_panel_number + "' ,'" + str_object_instance + "','" + str_netwrok_address + "' )"));
             SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
             SqliteDBBuilding.closedb();
             PostMessage(WM_MYMSG_REFRESHBUILDING, 0, 0);
@@ -11561,13 +11587,17 @@ void CMainFrame::OnControlInputs()
 		}
         else
         {
-            Input_Window->KillTimer(INPUT_REFRESH_DATA_TIMER);
-            if(n_wifi_connection)
-                Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_TIME, NULL);
-            else
-                Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_ETHERNET_TIME, NULL);
-
-            ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_INPUT);
+            
+                Input_Window->KillTimer(INPUT_REFRESH_DATA_TIMER);
+            if (product_type != PM_THIRD_PARTY_DEVICE)
+            {
+                if (n_wifi_connection)
+                    Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_TIME, NULL);
+                else
+                    Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_ETHERNET_TIME, NULL);
+                ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_INPUT);
+            }
+            
         }
     }
     else

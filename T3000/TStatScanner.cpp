@@ -49,7 +49,6 @@ extern int g_ScnnedNum;
 extern void intial_bip_socket();
 
 
-
 extern char local_network_ip[255];
 extern CString local_enthernet_ip;
 typedef struct infopack
@@ -2618,6 +2617,25 @@ void CTStatScanner::SendScanEndMsg()
         ((CMainFrame*)m_pParent)->m_bScanALL = FALSE;
         ((CMainFrame*)m_pParent)->m_bScanFinished = TRUE;
 
+#ifdef USE_THIRD_PARTY_FUNC
+        bool find_exsit = false;
+        CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+        if (pFrame)
+        {
+            for (int i = 0; i < (int)pFrame->m_product.size(); i++)
+            {
+                if (pFrame->m_product.at(i).protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
+                {
+                    find_exsit = true;
+                    break;
+                }
+            }
+            if (find_exsit)
+            {
+                AfxMessageBox(_T("T3000 will be occupying Bacnet Port 47808 in order to show 3rd party devices !"));
+            }
+        }
+#endif
 
         if( m_refresh_net_device_data.size() == 0 && m_szNCScanRet.size()==0 && m_szTstatScandRet.size() == 0)
         {
@@ -4248,6 +4266,7 @@ DWORD WINAPI  _WaitScanThread(LPVOID lpVoid)
         pScanner->m_bNetScanFinish = TRUE;
 
     }
+    
     pScanner->m_bNetScanFinish = TRUE;
     hwait_scan_thread = NULL;
     return 1;
@@ -4925,7 +4944,12 @@ DWORD WINAPI   CTStatScanner::_ScanThirdPartyBacnetThread(LPVOID lpVoid)
     CTStatScanner* pScan = (CTStatScanner*)(lpVoid);
     // inilizing bacnet and its handlers for third party bacnet devices
     GetIPMaskGetWay();
-
+    if (bip_socket() > 0) // closing socket on Yabe opend , BACnet port dont conflict with both applications.
+    {
+        ::closesocket(bip_socket());
+        bip_set_socket(NULL);
+        bip_set_port(htons(-1));
+    }
    
     g_gloab_bac_comport = 0;
     set_datalink_protocol(2);
@@ -4945,6 +4969,12 @@ DWORD WINAPI   CTStatScanner::_ScanThirdPartyBacnetThread(LPVOID lpVoid)
         {
             Send_WhoIs_Global(-1, -1);
             Sleep(10000);
+            if (bip_socket() > 0) // closing socket on Yabe opend , BACnet port dont conflict with both applications.
+            {
+                ::closesocket(bip_socket());
+                bip_set_socket(NULL);
+                bip_set_port(htons(-1));
+            }
         }
     }
    // intial_bip_socket();

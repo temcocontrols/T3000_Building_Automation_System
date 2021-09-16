@@ -2312,6 +2312,6 @@ unsigned char daylight_end_month;
 unsigned char daylight_end_day;
 
 
-
+bool Bacnet_debug_fileRead = false;
 
 

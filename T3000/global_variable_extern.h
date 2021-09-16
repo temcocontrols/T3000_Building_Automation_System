@@ -1307,3 +1307,4 @@ extern unsigned char daylight_end_month;
 extern unsigned char daylight_end_day;
 
 
+extern bool Bacnet_debug_fileRead;
