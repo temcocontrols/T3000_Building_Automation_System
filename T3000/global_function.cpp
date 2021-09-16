@@ -5931,6 +5931,7 @@ void Inial_Product_Reglist_map()
     product_reglist_map.insert(map<int, CString>::value_type(PM_T36CT, _T("T3 Modules")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_MINIPANEL, _T("T3BBSeries")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3BBSeries")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_ESP32_T3_SERIES, _T("T3BBSeries")));  
     product_reglist_map.insert(map<int, CString>::value_type(PM_PRESSURE, _T("Pressure")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_HUM_R, _T("CO2-R")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_T322AI, _T("T3 Modules")));
@@ -6146,6 +6147,7 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_T36CT,_T("T3-6CT")));
 	product_map.insert(map<int,CString>::value_type(PM_MINIPANEL,_T("T3Controller")));
 	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3Controller")));
+    product_map.insert(map<int, CString>::value_type(PM_ESP32_T3_SERIES, _T("T3Controller")));
     product_map.insert(map<int, CString>::value_type(PWM_TEMPERATURE_TRANSDUCER, _T("XDUCER")));
     
 	product_map.insert(map<int,CString>::value_type(PM_PRESSURE,_T("Pressure Sensor")));
@@ -7619,6 +7621,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
     if((temp_data.reg.product_id == PM_TSTAT10) ||
         (temp_data.reg.product_id == PM_MINIPANEL) ||
         (temp_data.reg.product_id == PM_MINIPANEL_ARM) ||
+        (temp_data.reg.product_id == PM_ESP32_T3_SERIES) ||
         (temp_data.reg.product_id == PM_TSTAT_AQ) ||    //罗列出版本号需要除以10 的 设备
         (temp_data.reg.product_id == PM_CM5))
         temp.sw_version = (float)temp_data.reg.sw_version / 10.0;
@@ -9175,7 +9178,8 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
             }
 
             if ((Device_Basic_Setting.reg.panel_type == PM_MINIPANEL) ||
-                (Device_Basic_Setting.reg.panel_type == PM_MINIPANEL_ARM))
+                (Device_Basic_Setting.reg.panel_type == PM_MINIPANEL_ARM) ||
+                (Device_Basic_Setting.reg.panel_type == PM_ESP32_T3_SERIES))
             {
                 original_panel = Device_Basic_Setting.reg.panel_number;
             }
@@ -10243,6 +10247,7 @@ bool Support_relinquish_device(unsigned short n_product_class_id)
     if ((n_product_class_id == PM_CM5) ||
         (n_product_class_id == PM_MINIPANEL) ||
         (n_product_class_id == PM_MINIPANEL_ARM) ||
+        (n_product_class_id == PM_ESP32_T3_SERIES) ||
         (n_product_class_id == PM_T38AI8AO6DO) ||
         (n_product_class_id == PM_TSTAT10)
         )
@@ -10258,6 +10263,7 @@ bool Bacnet_Private_Device(unsigned short n_product_class_id)
     if(  (n_product_class_id == PM_CM5)            ||
          (n_product_class_id == PM_MINIPANEL)      ||
 		 (n_product_class_id == PM_MINIPANEL_ARM)  ||
+         (n_product_class_id == PM_ESP32_T3_SERIES) ||
          (n_product_class_id == PM_TSTAT10)       
 		)
     {
@@ -13018,6 +13024,7 @@ BOOL ShowBacnetView(unsigned char product_type)
 {
 	if((product_type == PM_MINIPANEL) || 
         (product_type == PM_MINIPANEL_ARM) ||
+        (product_type == PM_ESP32_T3_SERIES) ||
 		(product_type == PM_CM5)  ||
         (product_type == PM_TSTAT10))
 		return true;
@@ -13334,6 +13341,7 @@ void Initial_Instance_Reg_Map()
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_TSTAT10, _T("35,32")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_MINIPANEL, _T("35,32")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("35,32")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_ESP32_T3_SERIES, _T("35,32")));
 
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T322AI, _T("23,22")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T38AI8AO6DO, _T("23,22")));
@@ -13616,6 +13624,7 @@ int Check_DaXiaoDuan(unsigned char npid, unsigned char Mainsw, unsigned char sub
     case PM_TSTAT10:
     case PM_MINIPANEL:
     case PM_MINIPANEL_ARM:
+    case PM_ESP32_T3_SERIES:
     case PM_CM5:
     {
         if (Mainsw * 10 + subsw > 51.3)
@@ -13719,6 +13728,7 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
     {
     case PM_MINIPANEL:
     case PM_MINIPANEL_ARM:
+    case PM_ESP32_T3_SERIES:
     {
         switch (nproductsubid)
         {
@@ -13880,6 +13890,7 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
     {
     case PM_MINIPANEL:
     case PM_MINIPANEL_ARM:
+    case PM_ESP32_T3_SERIES:
     {
         switch (nproductsubid)
         {

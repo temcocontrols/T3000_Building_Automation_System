@@ -523,9 +523,11 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 }
 
 
+
 CMainFrame::CMainFrame()
 {
-    
+
+
     theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_VS_2005);
     m_nStyle=0;
 	m_pFreshTree = NULL;
@@ -1354,7 +1356,9 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
                 DoConnectToANode(hSelItem);
                 break;
             }
-            else if (m_product.at(i).product_class_id == PM_MINIPANEL|| m_product.at(i).product_class_id == PM_MINIPANEL_ARM)
+            else if (m_product.at(i).product_class_id == PM_MINIPANEL|| 
+                     m_product.at(i).product_class_id == PM_MINIPANEL_ARM ||
+                     m_product.at(i).product_class_id == PM_ESP32_T3_SERIES)
             {
 				g_bPauseMultiRead=TRUE;
                 g_tstat_id = m_product.at(i).product_id;
@@ -1995,7 +1999,7 @@ void CMainFrame::LoadProductFromDB()
 							temp_product_class_id == PM_T38AI8AO6DO
 							)
 							TVINSERV_T3ARM
-						else if (temp_product_class_id ==PM_MINIPANEL|| temp_product_class_id == PM_MINIPANEL_ARM)//Mini Panel
+						else if (temp_product_class_id ==PM_MINIPANEL|| temp_product_class_id == PM_MINIPANEL_ARM || temp_product_class_id == PM_ESP32_T3_SERIES)//Mini Panel
 						TVINSERV_MINIPANEL
 						else if (temp_product_class_id == PM_AirQuality)//AirQuality
 							TVINSERV_TSTAT_DEFAULT
@@ -2263,7 +2267,7 @@ void CMainFrame::LoadProductFromDB()
 								
 								temp_product_class_id == PM_T38AI8AO6DO)
 								TVINSERV_T3ARM
-							else if (temp_product_class_id == PM_MINIPANEL|| temp_product_class_id == PM_MINIPANEL_ARM)//Mini Panel
+							else if (temp_product_class_id == PM_MINIPANEL|| temp_product_class_id == PM_MINIPANEL_ARM || temp_product_class_id == PM_ESP32_T3_SERIES)//Mini Panel
 								TVINSERV_MINIPANEL
 							else if (temp_product_class_id == PM_AirQuality) //AirQuality
 								TVINSERV_TSTAT_DEFAULT
@@ -2536,7 +2540,7 @@ void CMainFrame::LoadProductFromDB()
 					
 					temp_product_class_id == PM_T38AI8AO6DO)
 					TVINSERV_T3ARM
-				else if (temp_product_class_id == PM_MINIPANEL|| temp_product_class_id == PM_MINIPANEL_ARM)//Mini Panel
+				else if (temp_product_class_id == PM_MINIPANEL|| temp_product_class_id == PM_MINIPANEL_ARM || temp_product_class_id == PM_ESP32_T3_SERIES)//Mini Panel
 					TVINSERV_MINIPANEL
 				else if (temp_product_class_id == PM_AirQuality) //AirQuality
 					TVINSERV_TSTAT_DEFAULT
@@ -3084,7 +3088,7 @@ void CMainFrame::ScanTstatInDB(void)
 						temp_product_class_id == PM_T36CTA ||
 						temp_product_class_id == PM_T38AI8AO6DO)
 						TVINSERV_T3ARM
-					else if (temp_product_class_id == PM_MINIPANEL|| temp_product_class_id == PM_MINIPANEL_ARM)//Mini Panel
+					else if (temp_product_class_id == PM_MINIPANEL|| temp_product_class_id == PM_MINIPANEL_ARM || temp_product_class_id == PM_ESP32_T3_SERIES)//Mini Panel
 						TVINSERV_MINIPANEL
 					else if (temp_product_class_id == PM_AirQuality) //AirQuality
 						TVINSERV_TSTAT_DEFAULT
@@ -3957,14 +3961,13 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		serial_number = (unsigned int)GetPrivateProfileInt(_T("LastView"),_T("ViewSerialNumber"),0,g_cstring_ini_path);
 		first_view_ui = GetPrivateProfileInt(_T("LastView"),_T("FistLevelViewUI"),0,g_cstring_ini_path);
 
-		if((serial_number != 0)/* && (temp_pid == PM_MINIPANEL|| temp_pid == PM_MINIPANEL_ARM)*/)
+		if(serial_number != 0)
 		{
 			bool find_product = false;
 			vector <tree_product>::iterator temp_it;
 			for (temp_it = m_product.begin();temp_it!= m_product.end();++temp_it)
 			{
-				if((temp_it->serial_number == serial_number)/* &&
-					(temp_it->product_class_id == PM_MINIPANEL|| temp_it->product_class_id == PM_MINIPANEL_ARM)*/)
+				if(temp_it->serial_number == serial_number)
 				{
 					DoConnectToANode(temp_it->product_item);
                     break;
@@ -6415,7 +6418,6 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             }
         }
-
         CString product_name;
         if (find_exsit == false)
         {
@@ -7192,6 +7194,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             {
                                 if (((selected_product_Node.product_class_id == PM_TSTAT10) && (selected_product_Node.software_version >= 52.3)) ||
                                     ((selected_product_Node.product_class_id == PM_MINIPANEL_ARM) && (selected_product_Node.software_version >= 52.3))||
+                                    ((selected_product_Node.product_class_id == PM_ESP32_T3_SERIES) && (selected_product_Node.software_version >= 52.3)) ||
                                     ((selected_product_Node.product_class_id == PM_TSTAT8) && (selected_product_Node.software_version >= 10.0)) ||
                                     ((selected_product_Node.product_class_id == PM_TSTAT9) && (selected_product_Node.software_version >= 10.0))
                                    )
@@ -7265,9 +7268,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             if ((selected_product_Node.product_class_id == PM_CM5) ||
                 (selected_product_Node.product_class_id == PM_MINIPANEL) ||
                 (selected_product_Node.product_class_id == PM_TSTAT10) ||
-                (selected_product_Node.product_class_id == PM_MINIPANEL_ARM)
-                /*|| */
-                /*(product_Node.product_class_id == PM_T38AI8AO6DO) */)	//如果是CM5或者MINIPANEL 才有 bacnet协议;
+                (selected_product_Node.product_class_id == PM_MINIPANEL_ARM) ||
+                (selected_product_Node.product_class_id == PM_ESP32_T3_SERIES)
+                )	//如果是CM5或者MINIPANEL 才有 bacnet协议;
             {
 
                 product_type = selected_product_Node.product_class_id;
@@ -7319,7 +7322,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     bacnet_device_type = PID_T36CTA;
                 else if (selected_product_Node.product_class_id == PM_T3_LC)
                     bacnet_device_type = PM_T3_LC;
-
+                else
+                    bacnet_device_type = selected_product_Node.product_class_id;
                 if (m_product.at(i).protocol == PROTOCOL_GSM)
                 {
                     if (!TCP_Server_Running)
@@ -7467,6 +7471,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     (selected_product_Node.note_parent_serial_number != 0) &&   //如 TSTAT10 用485协议挂在T3BB下
                     ((selected_product_Node.product_class_id == PM_TSTAT10) ||
                     (selected_product_Node.product_class_id == PM_MINIPANEL) ||
+                    (selected_product_Node.product_class_id == PM_ESP32_T3_SERIES) ||
                     (selected_product_Node.product_class_id == PM_MINIPANEL_ARM)))
                 {
                     g_protocol = PROTOCOL_MB_TCPIP_TO_MB_RS485;
@@ -7475,6 +7480,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 {
                     if ((selected_product_Node.product_class_id == PM_TSTAT10) ||
                         (selected_product_Node.product_class_id == PM_MINIPANEL) ||
+                        (selected_product_Node.product_class_id == PM_ESP32_T3_SERIES) ||
                         (selected_product_Node.product_class_id == PM_MINIPANEL_ARM))
                     {
                         g_protocol = PROTOCOL_BIP_TO_MSTP;
@@ -8654,7 +8660,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 SwitchToPruductType(DLG_DIALOG_BTUMETER);
             }
-            else if (nFlag == PM_MINIPANEL || nFlag == PM_MINIPANEL_ARM)
+            else if (nFlag == PM_MINIPANEL || nFlag == PM_MINIPANEL_ARM || nFlag == PM_ESP32_T3_SERIES)
             {
                 SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
             }
@@ -8904,7 +8910,9 @@ void CMainFrame::CheckDuplicate()
 	temp_device.clear();
 	for (int y=0;y<m_refresh_net_device_data.size();y++)
 	{
-		if(m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL|| m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL_ARM)
+		if(m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL || 
+            m_refresh_net_device_data.at(y).product_id == PM_ESP32_T3_SERIES ||
+            m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL_ARM)
 		{
 			temp_device.push_back(m_refresh_net_device_data.at(y));
 			continue;
@@ -9216,7 +9224,10 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                     }
 
                     bool is_bacnet_device = false;
-                    if((m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL)|| (m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL_ARM) || (m_refresh_net_device_data.at(y).product_id == PM_CM5))
+                    if((m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL) || 
+                        (m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL_ARM) || 
+                        (m_refresh_net_device_data.at(y).product_id == PM_ESP32_T3_SERIES) ||
+                        (m_refresh_net_device_data.at(y).product_id == PM_CM5))
                         is_bacnet_device = true;
 
                     if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device && (m_refresh_net_device_data.at(y).parent_serial_number != 0))
@@ -11411,6 +11422,7 @@ void CMainFrame::OnControlInputs()
 		  (
              (product_type == PM_TSTAT10) ||
 			 (product_type == PM_MINIPANEL)||
+              (product_type == PM_ESP32_T3_SERIES) ||
 			  (product_type == PM_MINIPANEL_ARM) 
 			  ||
 			  ( ( (bacnet_device_type == T38AI8AO6DO) 
@@ -11706,6 +11718,7 @@ void CMainFrame::OnControlPrograms()
     {
         if ((product_type == PM_MINIPANEL) ||
             (product_type == PM_TSTAT10) ||
+            (product_type == PM_ESP32_T3_SERIES) ||
             (product_type == PM_MINIPANEL_ARM))
         {
             if (BacNet_hwd == NULL)
@@ -11767,7 +11780,7 @@ void CMainFrame::OnControlOutputs()
 		  
 			 (g_protocol == MODBUS_RS485 ) &&
 		    (
-				((product_type == PM_TSTAT10) || product_type == PM_MINIPANEL|| product_type == PM_MINIPANEL_ARM)
+				((product_type == PM_TSTAT10) || product_type == PM_MINIPANEL|| product_type == PM_MINIPANEL_ARM || product_type == PM_ESP32_T3_SERIES)
 				|| (( ( (bacnet_device_type == T38AI8AO6DO)
 				|| (bacnet_device_type == PID_T322AI) 
 				|| (bacnet_device_type == PM_T3_LC)
@@ -11777,8 +11790,7 @@ void CMainFrame::OnControlOutputs()
                 || (product_type == STM32_CO2_RS485)
                 || (product_type == STM32_HUM_NET)
                 || (product_type == STM32_PRESSURE_NET)
-				|| (bacnet_device_type == PID_T3PT12)  )  
-			    /*&& new_device_support_mini_ui*/ ) ) 
+				|| (bacnet_device_type == PID_T3PT12))) ) 
 		    ) 
 			 ||
 		 
@@ -11951,6 +11963,7 @@ void CMainFrame::OnControlVariables()
     {
         if ((product_type == PM_MINIPANEL) ||
             (product_type == PM_TSTAT10) ||
+            (product_type == PM_ESP32_T3_SERIES) ||
             (product_type == PM_MINIPANEL_ARM))
         {
             if (BacNet_hwd == NULL)
@@ -12165,7 +12178,7 @@ void CMainFrame::OnControlSettings()
             && 
             (product_type == PM_MINIPANEL  ||
 		     product_type == PM_MINIPANEL_ARM  ||
-             //product_type == PM_TSTAT_AQ ||
+             product_type == PM_ESP32_T3_SERIES ||
              product_type == PM_TSTAT10)
 			
 			) )
@@ -12314,6 +12327,7 @@ void CMainFrame::OnControlControllers()
             (
               (product_type == PM_MINIPANEL) || 
               (product_type == PM_TSTAT10) || 
+              (product_type == PM_ESP32_T3_SERIES) ||
               (product_type == PM_MINIPANEL_ARM) 
              )
             )

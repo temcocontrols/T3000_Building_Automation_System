@@ -761,7 +761,7 @@ void CProductRegisterListView::LoadDataSheet() {
 
 	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 
-    if (ProductModel == PM_MINIPANEL_ARM)
+    if ((ProductModel == PM_MINIPANEL_ARM) || (ProductModel == PM_ESP32_T3_SERIES))
         ProductModel = PM_MINIPANEL;
 
 	if (m_sort_type == 0)

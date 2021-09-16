@@ -558,7 +558,7 @@ void CCO2NetView::Initial_Window()
 	m_msflexgrid.put_TextMatrix(0,1,_T("Device ID"));
 	m_msflexgrid.put_TextMatrix(0,2,_T("Serial Number"));
 	m_msflexgrid.put_TextMatrix(0,3,_T("External PPM"));
-	m_msflexgrid.put_TextMatrix(0,4,_T("Prepare Alarm Setpoint"));
+	m_msflexgrid.put_TextMatrix(0,4,_T("Previous Alarm Setpoint"));
 	m_msflexgrid.put_TextMatrix(0,5,_T("Alarm Setpoint"));
 	m_msflexgrid.put_TextMatrix(0,6,_T("Calibrating Offset"));
 
