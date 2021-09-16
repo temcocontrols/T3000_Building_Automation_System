@@ -2357,6 +2357,7 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 	int invoke_id = Bacnet_Read_Properties_Blocking(deviceid, object_type, object_instance, property_id, value, retrytime);
 	if (invoke_id >= 0)
 	{
+		Bacnet_debug_fileRead = true;
 		CString tmpString;
 		CFile file;
 		CString temp_bacnet_logfile;
@@ -2367,6 +2368,7 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 		Buf[len + 1] = 0;  //0ÖÕÖ¹×Ö·û´®£¬ÓÃÓÚÊä³ö¡£
 		file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufÊÇÓÃÓÚ½ÓÊÕ¶ÁÈ¡µ½µÄÊý¾ÝµÄBufÖ¸ÕënCountÊÇ´ÓÎÄ¼þ¶ÁÈ¡µÄ×Ö½ÚÊý
 		file.Close();
+		Bacnet_debug_fileRead = false;
 		CString temp_cs;
 		MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, tmpString.GetBuffer(len), len);
 		tmpString.ReleaseBuffer();
@@ -2376,9 +2378,10 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 		tmpString.Replace(_T("}"), _T(" "));
 		tmpString.Replace(_T("("), _T(" "));
 		tmpString.Replace(_T(")"), _T(" "));
-
+		tmpString.Replace(_T("Null,"), _T(" "));
 		return tmpString;
 	}
+	Bacnet_debug_fileRead = false;
 	return NULL;
 }
 /*
@@ -2411,21 +2414,21 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 		tmp.digital_analog = BAC_UNITS_DIGITAL;
 	}
 
-	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 3);
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
 			memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
 			memcpy_s(tmp.label, STR_IN_LABEL, temp_value.type.Character_String.value, STR_IN_LABEL);
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
@@ -2445,7 +2448,7 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 		}
 		/*tmp.value = _ttoi(response);*/
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
@@ -2453,7 +2456,7 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 			tmp.range = temp_value.type.Enumerated;
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
@@ -2506,21 +2509,21 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 		tmp.digital_analog = BAC_UNITS_DIGITAL;
 	}
 
-	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 3);
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
 			memcpy_s(tmp.description, STR_OUT_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_OUT_DESCRIPTION_LENGTH);
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
 			memcpy_s(tmp.label, STR_OUT_LABEL, temp_value.type.Character_String.value, STR_OUT_LABEL);
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
@@ -2539,7 +2542,7 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 			tmp.value = 0;
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
@@ -2547,7 +2550,7 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 			tmp.range = temp_value.type.Enumerated;
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
@@ -2592,21 +2595,21 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 		tmp.digital_analog = BAC_UNITS_DIGITAL;
 	}
 
-	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 3);
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
 			memcpy_s(tmp.description, STR_VARIABLE_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_VARIABLE_DESCRIPTION_LENGTH);
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
 			memcpy_s(tmp.label, STR_VARIABLE_LABEL, temp_value.type.Character_String.value, STR_VARIABLE_LABEL);
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
@@ -2625,7 +2628,7 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 			tmp.value = 0;
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
@@ -2633,7 +2636,7 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 			tmp.range = temp_value.type.Enumerated;
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
@@ -2665,7 +2668,7 @@ void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInsta
 	Str_weekly_routine_point tmp = Str_weekly_routine_point();
 
 
-	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 3);
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
@@ -2673,7 +2676,7 @@ void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInsta
 		}
 	}
 
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
@@ -2681,7 +2684,7 @@ void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInsta
 		}
 	}
 
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
@@ -2689,7 +2692,7 @@ void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInsta
 			tmp.value = temp_value.type.Unsigned_Int;
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
@@ -2697,7 +2700,7 @@ void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInsta
 			tmp.auto_manual = temp_value.type.Boolean;
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_WEEKLY_SCHEDULE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_WEEKLY_SCHEDULE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (bacnet_string) 
@@ -2749,7 +2752,7 @@ void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInsta
 	Str_annual_routine_point tmp = Str_annual_routine_point();
 
 
-	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 3);
+	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
@@ -2757,7 +2760,7 @@ void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInsta
 		}
 	}
 
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
@@ -2765,7 +2768,7 @@ void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInsta
 		}
 	}
 
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
@@ -2773,7 +2776,7 @@ void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInsta
 			tmp.value = temp_value.type.Unsigned_Int;
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
 	if (invoke_id)
 	{
 		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
@@ -2781,7 +2784,7 @@ void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInsta
 			tmp.auto_manual = temp_value.type.Boolean;
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DATE_LIST, temp_value, 3);
+	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DATE_LIST, temp_value, 1);
 	if (invoke_id)
 	{
 		if (bacnet_string!="")
@@ -2822,7 +2825,7 @@ DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid)
 	int objInstace = g_bac_instance;
 	bacnet_device_type = PM_THIRD_PARTY_DEVICE;
 	BACNET_APPLICATION_DATA_VALUE temp_value;
-	CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 3);
+	CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 1);
 
 	if (response != "")
 	{
@@ -2904,6 +2907,7 @@ DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid)
 		Temp_Error_Msg.Format(_T("Read Properties error\r\n\
 Not able to read Property list of BACnet Device,\r\nThis may be due to a connection error with device \r\n\ "));
 		AfxMessageBox(Temp_Error_Msg);
+		
 	}
 
 	::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
@@ -2917,6 +2921,7 @@ Not able to read Property list of BACnet Device,\r\nThis may be due to a connect
 	::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
 	Sleep(100);
 	BACnet_read_thread = NULL;
+	
 	return 0;
 }
 
@@ -2979,32 +2984,24 @@ void CDialogCM5_BacNet::Fresh()
 	}*/
 	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
 	{
-			//Send_WhoIs_Global(-1, -1);
-			//Sleep(10);
-			ClearBacnetData();
 			
-				((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
-			
-				((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->Initial_List();
-			
-				((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->Initial_List();
-			
-				((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Initial_List();
-			
-				((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Initial_List();
-			/*::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
-			::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
-			::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
-			::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
-			::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);*/
-			Sleep(100);
 			if (BACnet_read_thread == NULL)
 			{
+				ClearBacnetData();
+
+				((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
+
+				((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->Initial_List();
+
+				((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->Initial_List();
+
+				((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Initial_List();
+
+				((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Initial_List();
+				Sleep(100);
 				BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
 				switch_product_last_view();
 			}
-
-			
 
 			SetTimer(BAC_READ_PROPERTIES, 60000, NULL);
 			BacNet_hwd = this->m_hWnd;
@@ -5747,14 +5744,32 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 	 
 
 	bool is_connected = false;
+	if (scaning_mode)
+		KillTimer(BAC_READ_PROPERTIES);
+
 	switch(nIDEvent)
 	{
 	case BAC_READ_PROPERTIES:
 	{
-		/*if (BACnet_read_thread == NULL)
+		if (BACnet_read_thread == NULL)
 		{
-			BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
-		}*/
+			if (g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
+			{
+				if (bip_socket() < 0) // closing socket on Yabe opend , BACnet port dont conflict with both applications.
+				{
+					Initial_bac(0, selected_product_Node.NetworkCard_Address);
+					Sleep(50);
+					Send_WhoIs_Global(-1, -1);
+					Sleep(50);
+				}
+				
+
+				g_mstp_deviceid = selected_product_Node.object_instance;
+				g_protocol = PROTOCOL_THIRD_PARTY_BAC_BIP;
+				product_type = selected_product_Node.product_class_id;
+				BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
+			}
+		}
 		break;
 	}
 	case BAC_TIMER_2_WHOIS:

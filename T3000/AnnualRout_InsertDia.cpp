@@ -1068,32 +1068,33 @@ void AnnualRout_InsertDia::Write_BACnet_ThirdParty_DateList()
 	SYSTEMTIME start, end;
 	m_month_ctrl.GetMonthRange(&start, &end, GMR_DAYSTATE);
 	std::vector<SYSTEMTIME> temp_days_vector = m_month_ctrl.ToSystemTimes(12, pBacDayState, start);
-
+	uint8_t Temp_Buf[MAX_APDU] = { 0 };
 	BACNET_READ_PROPERTY_DATA writeData;// = new BACNET_READ_PROPERTY_DATA;
 	writeData.object_instance = m_Annual_data_instance.at(annual_list_line);
 	writeData.object_property = PROP_DATE_LIST;
 	writeData.object_type = OBJECT_CALENDAR;
 	writeData.application_data_len = 0;
-	writeData.application_data = new uint8_t;
-	writeData.application_data[MAX_APDU] = { 0 };
+	//writeData.application_data = new uint8_t;
+	//writeData.application_data[MAX_APDU] = { 0 };
 	int len = 0;// encode_opening_tag(writeData->application_data, 3);
 	//writeData->application_data_len += len;
 	for (int x = 0; x < temp_days_vector.size(); x++)
 	{
-		writeData.application_data[writeData.application_data_len] = 0x0c;
+		Temp_Buf[writeData.application_data_len] = 0x0c;
 		writeData.application_data_len += 1;
-		writeData.application_data[writeData.application_data_len] = temp_days_vector[x].wYear - 1900;
+		Temp_Buf[writeData.application_data_len] = temp_days_vector[x].wYear - 1900;
 		writeData.application_data_len += 1;
-		writeData.application_data[writeData.application_data_len] = temp_days_vector[x].wMonth ;
+		Temp_Buf[writeData.application_data_len] = temp_days_vector[x].wMonth ;
 		writeData.application_data_len += 1;
-		writeData.application_data[writeData.application_data_len] = temp_days_vector[x].wDay;
+		Temp_Buf[writeData.application_data_len] = temp_days_vector[x].wDay;
 		writeData.application_data_len += 1;
-		writeData.application_data[writeData.application_data_len] = temp_days_vector[x].wDayOfWeek;
+		Temp_Buf[writeData.application_data_len] = temp_days_vector[x].wDayOfWeek;
 		writeData.application_data_len += 1;
 	}
+	writeData.application_data = &Temp_Buf[0];
 	//len = encode_closing_tag(writeData->application_data, 3);
 	//writeData->application_data_len += len;
-
+	
 	int invoke_id = Bacnet_Write_Properties(g_bac_instance, writeData.object_type, writeData.object_instance, writeData.object_property, NULL, 16, &writeData);
 	/*writeData->application_data = NULL;
 	writeData = NULL;
