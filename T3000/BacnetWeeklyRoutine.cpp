@@ -748,7 +748,8 @@ void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
     {
         if ((product_type == PM_MINIPANEL) ||
             (product_type == PM_TSTAT10) ||
-            (product_type == PM_MINIPANEL_ARM))
+            (product_type == PM_MINIPANEL_ARM) ||
+			(product_type == PM_ESP32_T3_SERIES))
         {
             if ((n_read_item_index >= 0) && (n_read_item_index < BAC_SCHEDULE_COUNT))
             {

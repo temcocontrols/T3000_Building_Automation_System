@@ -76,7 +76,7 @@ OUTPUT int GetLastSuccessBaudrate()
 
 OUTPUT int GetLastOpenedComport()
 {
-    return successful_com_port;
+    return open_com_port_number_in_dll;
 }
 
 OUTPUT int GetLastCommunicationType()

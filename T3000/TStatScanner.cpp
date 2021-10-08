@@ -49,6 +49,7 @@ extern int g_ScnnedNum;
 extern void intial_bip_socket();
 
 
+
 extern char local_network_ip[255];
 extern CString local_enthernet_ip;
 typedef struct infopack
@@ -401,6 +402,7 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
     //判断所回复的网络设备 是否能支持向下扩展 设备.Fandu
     if ((m_T3BB_device_data.at(ncount).product_id != PM_MINIPANEL)
         && (m_T3BB_device_data.at(ncount).product_id != PM_MINIPANEL_ARM)
+        && (m_T3BB_device_data.at(ncount).product_id != PM_ESP32_T3_SERIES)
         && (m_T3BB_device_data.at(ncount).product_id != PM_CM5))
     {
         //清空 句柄和线程ID；
@@ -2760,7 +2762,10 @@ int CTStatScanner::GetAllNodeFromDataBase()
                 
                     str_product_id=m_q.getValuebyName(L"Product_class_ID");
 
-                if((_wtoi(str_product_id) == PM_MINIPANEL) ||(_wtoi(str_product_id) == PM_CM5)|| (_wtoi(str_product_id) == PM_MINIPANEL_ARM))
+                if((_wtoi(str_product_id) == PM_MINIPANEL) ||
+                    (_wtoi(str_product_id) == PM_CM5)|| 
+                    (_wtoi(str_product_id) == PM_ESP32_T3_SERIES) ||
+                    (_wtoi(str_product_id) == PM_MINIPANEL_ARM))
                 {
                     CString strprotocol;
 
@@ -3307,7 +3312,10 @@ void CTStatScanner::AddNewNetToDB()
 			//插入
 			CString temp_pro4;
 			bool is_bacnet_device = false;
-			if((m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL)|| (m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL_ARM) || (m_refresh_net_device_data.at(i).product_id == PM_CM5))
+			if((m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL)|| 
+                (m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL_ARM) || 
+                (m_refresh_net_device_data.at(i).product_id == PM_ESP32_T3_SERIES) ||
+                (m_refresh_net_device_data.at(i).product_id == PM_CM5))
 				is_bacnet_device = true;
 			if(is_bacnet_device)
 				temp_pro4.Format(_T("%d"),PROTOCOL_BACNET_IP);
@@ -3796,7 +3804,10 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 
 	for (int i=0;i<m_refresh_net_device_data.size();i++)
 	{
-		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL)&& (m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL_ARM) && (m_refresh_net_device_data.at(i).product_id != PM_CM5))
+		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL)&& 
+            (m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL_ARM) && 
+            (m_refresh_net_device_data.at(i).product_id != PM_ESP32_T3_SERIES) &&
+            (m_refresh_net_device_data.at(i).product_id != PM_CM5))
 		{
 			continue;
 		}
@@ -4266,7 +4277,6 @@ DWORD WINAPI  _WaitScanThread(LPVOID lpVoid)
         pScanner->m_bNetScanFinish = TRUE;
 
     }
-    
     pScanner->m_bNetScanFinish = TRUE;
     hwait_scan_thread = NULL;
     return 1;
@@ -4524,7 +4534,8 @@ BOOL CTStatScanner::IsNetDevice(const CString& strDevType)
             || nDeviceType == PM_NC
             || nDeviceType == PM_CO2_NET
             || nDeviceType == PM_MINIPANEL
-		|| nDeviceType == PM_MINIPANEL_ARM
+		    || nDeviceType == PM_MINIPANEL_ARM
+            || nDeviceType == PM_ESP32_T3_SERIES
             || nDeviceType == PM_CM5
 			|| nDeviceType == STM32_CO2_NET
 		|| nDeviceType == STM32_HUM_NET
@@ -5210,6 +5221,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
                     temp_info.hardware_version = 0;
                     if((temp_info.product_type == PM_MINIPANEL) || 
                         (temp_info.product_type == PM_MINIPANEL_ARM) || 
+                        (temp_info.product_type == PM_ESP32_T3_SERIES) ||
                         (temp_info.product_type == PM_TSTAT10) ||
                         (temp_info.product_type == PM_CM5))
                         temp_info.m_protocol = MODBUS_BACNET_MSTP;

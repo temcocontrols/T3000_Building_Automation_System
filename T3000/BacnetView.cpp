@@ -1078,7 +1078,8 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 		{
 			if((pFrame->m_product.at(i).product_class_id != PM_MINIPANEL) &&
 				(pFrame->m_product.at(i).product_class_id !=PM_CM5) &&
-				(pFrame->m_product.at(i).product_class_id != PM_MINIPANEL_ARM))
+				(pFrame->m_product.at(i).product_class_id != PM_MINIPANEL_ARM) &&
+				(pFrame->m_product.at(i).product_class_id != PM_ESP32_T3_SERIES))
 			{
 				continue;
 			}
@@ -1104,7 +1105,8 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 		{
 			if((pFrame->m_product.at(i).product_class_id != PM_MINIPANEL) &&
 				(pFrame->m_product.at(i).product_class_id !=PM_CM5) &&
-				(pFrame->m_product.at(i).product_class_id != PM_MINIPANEL_ARM))
+				(pFrame->m_product.at(i).product_class_id != PM_MINIPANEL_ARM)&&
+				(pFrame->m_product.at(i).product_class_id != PM_ESP32_T3_SERIES))
 			{
 				continue;
 			}
@@ -6441,6 +6443,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			(selected_product_Node.product_class_id == PM_MINIPANEL)
 			||
 			(selected_product_Node.product_class_id == PM_MINIPANEL_ARM)
+			||
+			(selected_product_Node.product_class_id == PM_ESP32_T3_SERIES)
 			)
 		)
 	{
@@ -6529,7 +6533,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		((selected_product_Node.product_class_id ==PM_CM5 ) ||
 		(selected_product_Node.product_class_id ==PM_MINIPANEL )||
             (selected_product_Node.product_class_id == PM_TSTAT10) ||
-			(selected_product_Node.product_class_id == PM_MINIPANEL_ARM)
+			(selected_product_Node.product_class_id == PM_MINIPANEL_ARM) ||
+			(selected_product_Node.product_class_id == PM_ESP32_T3_SERIES)
 			))
 	{
 		CString temp_cs;

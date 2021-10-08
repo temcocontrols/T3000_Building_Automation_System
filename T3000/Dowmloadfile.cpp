@@ -777,6 +777,7 @@ void Dowmloadfile::CreateProductFolderMap()
 	product_folder_map.insert(map <int,CString>::value_type(PM_TSTAT5B,_T("Tstat5/Tstat5LED")));
 	product_folder_map.insert(map <int,CString>::value_type(PM_MINIPANEL,_T("T3_BB_LB_TB")));
 	product_folder_map.insert(map <int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3_BB_LB_TB")));
+    product_folder_map.insert(map <int, CString>::value_type(PM_ESP32_T3_SERIES, _T("T3_BB_LB_TB"))); 
 	product_folder_map.insert(map <int,CString>::value_type(PM_TSTAT6,_T("Tstat6/128kChip")));
 	Sleep(1);
 }
@@ -1446,6 +1447,7 @@ BOOL Dowmloadfile::IsNetDevice(int DevType)
 		|| DevType == PM_CO2_NET
 		|| DevType == PM_MINIPANEL
 		|| DevType == PM_MINIPANEL_ARM
+        || DevType == PM_ESP32_T3_SERIES
 		|| DevType == PM_CM5
 		|| DevType == PM_T322AI
 		|| DevType == PM_T38AI8AO6DO)

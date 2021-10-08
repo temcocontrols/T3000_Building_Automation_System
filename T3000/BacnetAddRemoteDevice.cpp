@@ -249,7 +249,6 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 temp_struct.product_type = read_data[7];
                 temp_struct.modbus_port = tcp_port;
                 if(Bacnet_Private_Device(temp_struct.product_type))
-                //if ((temp_struct.product_type == PM_MINIPANEL_ARM) || (temp_struct.product_type == PM_MINIPANEL))
                 {
                     temp_struct.m_protocol = PROTOCOL_BACNET_IP;
                 }
@@ -315,7 +314,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 CString str_hw_version;
                 CString str_fw_version;
                 CString str_panel_number = _T("0");
-                if ((read_data[7] == PM_MINIPANEL) || (read_data[7] == PM_MINIPANEL_ARM))
+                if ((read_data[7] == PM_MINIPANEL) || (read_data[7] == PM_MINIPANEL_ARM) || (read_data[7] == PM_ESP32_T3_SERIES))
                 {
                     CString temp_pro3;
                     temp_pro3.Format(_T("%u"), PROTOCOL_REMOTE_IP /*PROTOCOL_BACNET_IP*/);

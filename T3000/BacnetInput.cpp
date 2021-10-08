@@ -878,14 +878,18 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			}
 			continue;
 		}
-		
-		if (m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG) {
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
+		{
+			if (m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG) {
 
-			temp_item.Format(_T("AI%d"), m_Input_data_instance.at(i));
+				temp_item.Format(_T("AI%d"), m_Input_data_instance.at(i));
+			}
+			else {
+				temp_item.Format(_T("BI%d"), m_Input_data_instance.at(i));
+			}
 		}
-		else {
-			temp_item.Format(_T("BI%d"), m_Input_data_instance.at(i));
-		}
+		else
+			temp_item.Format(_T("IN%d"), i + 1);
 		m_input_list.SetItemText(i,INPUT_NUM,temp_item);
 
 
