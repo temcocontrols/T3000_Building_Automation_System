@@ -118,8 +118,8 @@ typedef struct segmented_bacnet_rp_info
     BACNET_OBJECT_TYPE object_type;
     int property_id;
     int invoke_id;
-   uint8_t* application_data;
-    int application_data_len;
+    vector <uint8_t*> application_data;
+    vector <int> application_data_len;
     int last_seq_no;
 }str_segmented_bacnet_rp_info;
 

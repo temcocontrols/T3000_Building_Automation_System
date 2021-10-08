@@ -4721,7 +4721,7 @@ int Bacnet_Write_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE objec
 
 }
 
-int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id)
+int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, uint32_t index)
 {
     int n_invoke_id = 0;
     // uint32_t device_id = 0;
@@ -4729,7 +4729,7 @@ int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, ui
     unsigned max_apdu = 0;
     BACNET_ADDRESS src;
     bool next_device = false;
-    static unsigned index = 0;
+    //static unsigned index = 0;
     static unsigned property = 0;
     /* list of required (and some optional) properties in the
     Device Object
@@ -4738,7 +4738,7 @@ int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, ui
     int object_props[] = {
         property_id//PROP_MODEL_NAME//PROP_OBJECT_LIST
     };
-    n_invoke_id = Send_Read_Property_Request(deviceid, object_type, object_instance, (BACNET_PROPERTY_ID)object_props[property], BACNET_ARRAY_ALL);
+    n_invoke_id = Send_Read_Property_Request(deviceid, object_type, object_instance, (BACNET_PROPERTY_ID)object_props[property], index);
 
     return n_invoke_id;
 }
@@ -5128,7 +5128,7 @@ int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_t
 }
 
 
-int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime)
+int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime, uint32_t index)
 {
     int send_status = true;
 
@@ -5173,7 +5173,7 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
                 send_status = false;
                 break;
             }
-            temp_invoke_id = Bacnet_Read_Properties(deviceid, object_type, object_instance, property_id);
+            temp_invoke_id = Bacnet_Read_Properties(deviceid, object_type, object_instance, property_id, index);
 
             if (temp_invoke_id < 0)
                 Sleep(500);
@@ -5262,34 +5262,62 @@ void localhandler_read_property_ack(
                     //(itr->property_id == data.object_property))
                     )
                 {
-                    if (service_data->sequence_number == service_data->proposed_window_number)
+                    if (service_data->sequence_number == ( service_data->proposed_window_number -1 ))
                     {
+                        uint8_t* app_data = new uint8_t[service_len];
+                        memcpy_s(app_data, service_len, service_request, service_len);
+                        /*for (int u = 0; u < service_len; u++)
+                        {
+                            app_data[u] = service_request[u];
+
+                        }*/
+                        itr->application_data.push_back(app_data);
+                        itr->application_data_len.push_back(service_len);
+                        //uint8_t* app_data = service_request;
+                        //itr->application_data.push_back(app_data);
+                        //itr->application_data_len.push_back(service_len);
+
                         BACNET_READ_PROPERTY_DATA tempData;
                         tempData.object_instance = itr->bacnet_instance;
                         tempData.object_property = (BACNET_PROPERTY_ID)itr->property_id;
                         tempData.object_type = itr->object_type;
-                      
-                        for (int u = 0; u < service_len; u++)
+                        int length = 0;
+                        for (int u = 0; u < itr->application_data_len.size(); u++)
                         {
-                            itr->application_data[itr->application_data_len + (u + 1)] = service_request[u];
+                            length += itr->application_data_len[u];
                         }
-                        itr->application_data_len = itr->application_data_len + service_len;
-                      
-                        tempData.application_data = &itr->application_data[0];
-                        tempData.application_data_len = itr->application_data_len;
-                       if(!Bacnet_debug_fileRead)
+                        tempData.application_data = new uint8_t[length];
+
+                        int inv_id = Send_Segment_Ack(tempData.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                       // strcat((char*)itr->application_data, (char*)service_request);
+                        int lengthCount = 0;
+                        for (int i = 0; i < itr->application_data.size(); i++)
                         {
+                            char arr[475];
+                            memcpy_s(arr, 475, itr->application_data[i], itr->application_data_len[i]);
+                            for (int u = 0; u < itr->application_data_len[i]; u++)
+                            {
+                                
+                                tempData.application_data[lengthCount] = itr->application_data[i][u];
+                                lengthCount++;
+                            }
+                           // lengthCount += itr->application_data_len[i];
+                        }
+                        
+                       // tempData.application_data = itr->application_data;
+                        tempData.application_data_len = length;
+                       
                             rp_ack_print_data(&tempData);
-                            
-                        }
+                            Sleep(100);
                         itr->last_seq_no = service_data->sequence_number;
 
-                        delete tempData.application_data;
-                        delete itr->application_data;
-                        itr->application_data = NULL;
+                        //delete tempData.application_data;
+                        //delete itr->application_data;
+                        itr->application_data.clear();
+                        itr->application_data_len.clear();
                         tempData.application_data = NULL;
 
-                        segmented_bacnet_data.erase(itr);
+                       // segmented_bacnet_data.erase(itr);
                         segmented_bacnet_data.clear();
                         Sleep(100);
                         tsm_free_invoke_id(service_data->invoke_id);
@@ -5300,19 +5328,28 @@ void localhandler_read_property_ack(
                     { 
                         if (service_data->sequence_number > 0 && service_data->sequence_number > itr->last_seq_no  )
                         {
-                            for (int u = 0; u < service_len; u++)
+                            uint8_t* app_data = new uint8_t[service_len];
+
+                            memcpy_s(app_data, service_len, service_request, service_len);
+                            /*for (int u = 0; u < service_len; u++)
+                            {
+                                app_data[u] = service_request[u];
+
+                            }*/
+                            itr->application_data.push_back(app_data);
+                            itr->application_data_len.push_back(service_len);
+                           // strcat((char*)itr->application_data, (char*)service_request);
+                            //uint8_t* app_data = service_request;
+                            //itr->application_data.push_back(app_data);
+                            //itr->application_data_len.push_back(service_len);
+                            /*for (int u = 0; u < service_len; u++)
                             {
                                 itr->application_data[itr->application_data_len+(u+1)] = service_request[u];
-                            }
+                            } 
                             itr->application_data_len = itr->application_data_len + service_len;
-                          
+                            */
                             itr->last_seq_no = service_data->sequence_number;
-                        
-                        int i = 0;
-                        }
-                        else
-                        {
-                            //int inv_id = Send_Segment_Ack(itr->bacnet_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                       
                         }
                     }
                     find_exsit = true;
@@ -5327,13 +5364,20 @@ void localhandler_read_property_ack(
                 temp_standard_bacnet_data.bacnet_instance = data.object_instance;
                 temp_standard_bacnet_data.object_type = data.object_type;
                 temp_standard_bacnet_data.property_id = data.object_property;
-                temp_standard_bacnet_data.application_data = new uint8_t;
-                for (int u = 0; u < data.application_data_len; u++)
+                uint8_t* app_data = new uint8_t[data.application_data_len+1];
+                memcpy_s(app_data, data.application_data_len + 1, data.application_data, data.application_data_len + 1);
+                /*for (int u = 0; u < data.application_data_len; u++)
+                {
+                    app_data[u] = data.application_data[u];
+
+                }*/
+                temp_standard_bacnet_data.application_data.push_back(app_data);// = new uint8_t;
+                /*for (int u = 0; u < data.application_data_len; u++)
                 {
                     temp_standard_bacnet_data.application_data[u] = data.application_data[u];
-                }
+                }*/
                // temp_standard_bacnet_data.application_data = data.application_data;
-                temp_standard_bacnet_data.application_data_len = data.application_data_len;
+                temp_standard_bacnet_data.application_data_len.push_back(data.application_data_len + 1);
                 temp_standard_bacnet_data.last_seq_no = service_data->sequence_number;
                 segmented_bacnet_data.push_back(temp_standard_bacnet_data);
                 int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
@@ -5349,7 +5393,6 @@ void localhandler_read_property_ack(
         if (segmentedCompleted)
         {
         BACNET_APPLICATION_DATA_VALUE value;
-        if (!Bacnet_debug_fileRead)
          local_value_rp_ack_print_data(&data, value);
 
         if (data.object_property == PROP_WEEKLY_SCHEDULE)
@@ -6417,6 +6460,7 @@ void LocalBacnetAbortHandler(BACNET_ADDRESS* src, uint8_t invoke_id, uint8_t abo
 {
 
     int i = 0;
+    BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
 
 }
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src)

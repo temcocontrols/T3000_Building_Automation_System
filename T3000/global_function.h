@@ -157,8 +157,8 @@ void local_handler_read_property_multiple_ack(
 //int Bacnet_Read_Property_Multiple();
 int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
 
-int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
-int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime = 3);
+int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, uint32_t index = BACNET_ARRAY_ALL);
+int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime = 3, uint32_t index = BACNET_ARRAY_ALL);
 int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE * object_value, uint8_t priority = 16,BACNET_READ_PROPERTY_DATA * objectData=NULL );
 int Bacnet_Write_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE * object_value, uint8_t priority = 16, uint8_t retrytime = 3);
 void localhandler_read_property_ack(
