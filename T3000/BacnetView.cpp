@@ -2400,7 +2400,7 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 	BACNET_PROPERTY_ID propertyID ;
 	BACNET_APPLICATION_DATA_VALUE temp_value;
 	Str_in_point tmp = Str_in_point();
-
+	tmp.range = -1;
 	if (temp_string == "Analog Input")
 	{
 
@@ -2413,66 +2413,156 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 		tmp.digital_analog = BAC_UNITS_DIGITAL;
 	}
 
-	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
-		}
-	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.label, STR_IN_LABEL, temp_value.type.Character_String.value, STR_IN_LABEL);
-		}
-	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-			tmp.value = temp_value.type.Unsigned_Int;
-		}
-		else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
-			tmp.value = temp_value.type.Signed_Int;
-		}
-		else if (temp_value.tag == TPYE_BACAPP_REAL) {
-			tmp.value = temp_value.type.Real;
-		}
-		else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
-			tmp.value = temp_value.type.Double;
-		}
-		else {
-			tmp.value = 0;
-		}
-		/*tmp.value = _ttoi(response);*/
-	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
+	//int invoke_id = Bacnet_Read_Property_Multiple(deviceInstance, objectType, objInstace, PROP_ALL);
+	BACNET_READ_ACCESS_DATA rpm_data;
 
-			tmp.range = temp_value.type.Enumerated;
-		}
-	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
-	if (invoke_id)
+	//rpm_data = (BACNET_READ_ACCESS_DATA*)calloc(1, sizeof(BACNET_READ_ACCESS_DATA));
+	int invoke_id = Bacnet_Read_Properties_Multiple_Blocking(deviceInstance, objectType, objInstace, PROP_ALL, rpm_data, 1);
+	if (rpm_data.listOfProperties && invoke_id > 0)
 	{
-		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+		BACNET_READ_ACCESS_DATA* old_rpm_data;
+		BACNET_PROPERTY_REFERENCE* rpm_property;
+		BACNET_PROPERTY_REFERENCE* old_rpm_property;
+		BACNET_APPLICATION_DATA_VALUE* value;
+		BACNET_APPLICATION_DATA_VALUE* old_value;
 
-			tmp.auto_manual = temp_value.type.Boolean;
-		}
-	}
-	/*response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, PROP_DEVICE_TYPE, temp_value, 3);
-		if (response)
+		//while (rpm_data)
 		{
-			unsigned* found_index = new unsigned();
-			bool flag = indtext_by_istring(bacnet_engineering_unit_names, (char*)response.GetBuffer(),
-				found_index);
-			tmp.range = *found_index;
+			rpm_property = rpm_data.listOfProperties;
+			while (rpm_property) {
+				value = rpm_property->value;
+				/*while (value) {
+					old_value = value;*/
+
+				switch (rpm_property->propertyIdentifier) {
+				case PROP_OBJECT_NAME:
+					if (value->tag == TPYE_BACAPP_CHARACTER_STRING) {
+						memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, value->type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
+					}
+					break;
+				case PROP_DESCRIPTION:
+					if (value->tag == TPYE_BACAPP_CHARACTER_STRING) {
+						memcpy_s(tmp.label, STR_IN_LABEL, value->type.Character_String.value, STR_IN_LABEL);
+					}
+					break;
+				case PROP_PRESENT_VALUE:
+					if (value->tag == TPYE_BACAPP_UNSIGNED) {
+						tmp.value = value->type.Unsigned_Int;
+					}
+					else if (value->tag == TPYE_BACAPP_SIGNED) {
+						tmp.value = value->type.Signed_Int;
+					}
+					else if (value->tag == TPYE_BACAPP_REAL) {
+						tmp.value = value->type.Real;
+					}
+					else if (value->tag == TPYE_BACAPP_DOUBLE) {
+						tmp.value = value->type.Double;
+					}
+					else {
+						tmp.value = 0;
+					}
+					break;
+				case PROP_UNITS:
+					if (value->tag == TPYE_BACAPP_ENUMERATED) {
+						tmp.range = value->type.Enumerated;
+					}
+					break;
+				case PROP_OUT_OF_SERVICE:
+					if (value->tag == TPYE_BACAPP_BOOLEAN) {
+						tmp.auto_manual = value->type.Boolean;
+					}
+					break;
+				}
+				/*value = value->next;
+				free(old_value);
+			}*/
+				old_rpm_property = rpm_property;
+				if (rpm_property->next)
+					rpm_property = rpm_property->next;
+				else
+					break;
+				free(old_rpm_property);
+			}
+			//old_rpm_data = rpm_data;
+			//rpm_data = rpm_data->next;
+			//free(old_rpm_data);
 		}
-		*/
-	//tmp.instance_id = objInstace;
+		if (tmp.range < -1)
+		{
+			invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
+			if (invoke_id)
+			{
+				if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
+
+					tmp.range = temp_value.type.Enumerated;
+				}
+			}
+		}
+	}
+	else {
+
+
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+				memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+				memcpy_s(tmp.label, STR_IN_LABEL, temp_value.type.Character_String.value, STR_IN_LABEL);
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
+				tmp.value = temp_value.type.Unsigned_Int;
+			}
+			else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
+				tmp.value = temp_value.type.Signed_Int;
+			}
+			else if (temp_value.tag == TPYE_BACAPP_REAL) {
+				tmp.value = temp_value.type.Real;
+			}
+			else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
+				tmp.value = temp_value.type.Double;
+			}
+			else {
+				tmp.value = 0;
+			}
+			/*tmp.value = _ttoi(response);*/
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
+
+				tmp.range = temp_value.type.Enumerated;
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+
+				tmp.auto_manual = temp_value.type.Boolean;
+			}
+		}
+		/*response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, PROP_DEVICE_TYPE, temp_value, 3);
+			if (response)
+			{
+				unsigned* found_index = new unsigned();
+				bool flag = indtext_by_istring(bacnet_engineering_unit_names, (char*)response.GetBuffer(),
+					found_index);
+				tmp.range = *found_index;
+			}
+			*/
+			//tmp.instance_id = objInstace;
+	}
 	m_Input_data_instance.at(index) = objInstace;
 	m_Input_data.at(index) = tmp;
 	
@@ -2495,7 +2585,7 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 	BACNET_PROPERTY_ID propertyID;
 	BACNET_APPLICATION_DATA_VALUE temp_value;
 	Str_out_point tmp = Str_out_point();
-
+	tmp.range = -1;
 	if (temp_string == "Analog Output")
 	{
 
@@ -2507,54 +2597,140 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 		objectType = OBJECT_BINARY_OUTPUT;
 		tmp.digital_analog = BAC_UNITS_DIGITAL;
 	}
+	BACNET_READ_ACCESS_DATA rpm_data;
 
-	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
-	if (invoke_id)
+	//rpm_data = (BACNET_READ_ACCESS_DATA*)calloc(1, sizeof(BACNET_READ_ACCESS_DATA));
+	int invoke_id = Bacnet_Read_Properties_Multiple_Blocking(deviceInstance, objectType, objInstace, PROP_ALL, rpm_data, 1);
+	if (rpm_data.listOfProperties && invoke_id > 0)
 	{
-		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.description, STR_OUT_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_OUT_DESCRIPTION_LENGTH);
-		}
-	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.label, STR_OUT_LABEL, temp_value.type.Character_String.value, STR_OUT_LABEL);
-		}
-	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-			tmp.value = temp_value.type.Unsigned_Int;
-		}
-		else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
-			tmp.value = temp_value.type.Signed_Int;
-		}
-		else if (temp_value.tag == TPYE_BACAPP_REAL) {
-			tmp.value = temp_value.type.Real;
-		}
-		else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
-			tmp.value = temp_value.type.Double;
-		}
-		else {
-			tmp.value = 0;
-		}
-	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
+		BACNET_READ_ACCESS_DATA* old_rpm_data;
+		BACNET_PROPERTY_REFERENCE* rpm_property;
+		BACNET_PROPERTY_REFERENCE* old_rpm_property;
+		BACNET_APPLICATION_DATA_VALUE* value;
+		BACNET_APPLICATION_DATA_VALUE* old_value;
 
-			tmp.range = temp_value.type.Enumerated;
+		//while (rpm_data)
+		{
+			rpm_property = rpm_data.listOfProperties;
+			while (rpm_property) {
+				value = rpm_property->value;
+				/*while (value) {
+					old_value = value;*/
+
+				switch (rpm_property->propertyIdentifier) {
+				case PROP_OBJECT_NAME:
+					if (value->tag == TPYE_BACAPP_CHARACTER_STRING) {
+						memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, value->type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
+					}
+					break;
+				case PROP_DESCRIPTION:
+					if (value->tag == TPYE_BACAPP_CHARACTER_STRING) {
+						memcpy_s(tmp.label, STR_IN_LABEL, value->type.Character_String.value, STR_IN_LABEL);
+					}
+					break;
+				case PROP_PRESENT_VALUE:
+					if (value->tag == TPYE_BACAPP_UNSIGNED) {
+						tmp.value = value->type.Unsigned_Int;
+					}
+					else if (value->tag == TPYE_BACAPP_SIGNED) {
+						tmp.value = value->type.Signed_Int;
+					}
+					else if (value->tag == TPYE_BACAPP_REAL) {
+						tmp.value = value->type.Real;
+					}
+					else if (value->tag == TPYE_BACAPP_DOUBLE) {
+						tmp.value = value->type.Double;
+					}
+					else {
+						tmp.value = 0;
+					}
+					break;
+				case PROP_UNITS:
+					if (value->tag == TPYE_BACAPP_ENUMERATED) {
+						tmp.range = value->type.Enumerated;
+					}
+					break;
+				case PROP_OUT_OF_SERVICE:
+					if (value->tag == TPYE_BACAPP_BOOLEAN) {
+						tmp.auto_manual = value->type.Boolean;
+					}
+					break;
+				}
+				/*value = value->next;
+				free(old_value);
+			}*/
+				old_rpm_property = rpm_property;
+				if (rpm_property->next)
+					rpm_property = rpm_property->next;
+				else
+					break;
+				free(old_rpm_property);
+			}
+			//old_rpm_data = rpm_data;
+			//rpm_data = rpm_data->next;
+			//free(old_rpm_data);
+		}
+		if (tmp.range < 0)
+		{
+			invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
+			if (invoke_id)
+			{
+				if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
+
+					tmp.range = temp_value.type.Enumerated;
+				}
+			}
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+	else {
+		int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+				memcpy_s(tmp.description, STR_OUT_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_OUT_DESCRIPTION_LENGTH);
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+				memcpy_s(tmp.label, STR_OUT_LABEL, temp_value.type.Character_String.value, STR_OUT_LABEL);
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
+				tmp.value = temp_value.type.Unsigned_Int;
+			}
+			else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
+				tmp.value = temp_value.type.Signed_Int;
+			}
+			else if (temp_value.tag == TPYE_BACAPP_REAL) {
+				tmp.value = temp_value.type.Real;
+			}
+			else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
+				tmp.value = temp_value.type.Double;
+			}
+			else {
+				tmp.value = 0;
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
 
-			tmp.auto_manual = temp_value.type.Boolean;
+				tmp.range = temp_value.type.Enumerated;
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+
+				tmp.auto_manual = temp_value.type.Boolean;
+			}
 		}
 	}
 	//tmp.instance_id = objInstace;
@@ -2581,7 +2757,7 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 	BACNET_PROPERTY_ID propertyID;
 	BACNET_APPLICATION_DATA_VALUE temp_value;
 	Str_variable_point tmp = Str_variable_point();
-
+	tmp.range = -1;
 	if (temp_string == "Analog Value")
 	{
 
@@ -2593,54 +2769,140 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 		objectType = OBJECT_BINARY_VALUE;
 		tmp.digital_analog = BAC_UNITS_DIGITAL;
 	}
+	BACNET_READ_ACCESS_DATA rpm_data;
 
-	int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
-	if (invoke_id)
+	//rpm_data = (BACNET_READ_ACCESS_DATA*)calloc(1, sizeof(BACNET_READ_ACCESS_DATA));
+	int invoke_id = Bacnet_Read_Properties_Multiple_Blocking(deviceInstance, objectType, objInstace, PROP_ALL, rpm_data, 1);
+	if (rpm_data.listOfProperties && invoke_id > 0)
 	{
-		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.description, STR_VARIABLE_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_VARIABLE_DESCRIPTION_LENGTH);
-		}
-	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
-			memcpy_s(tmp.label, STR_VARIABLE_LABEL, temp_value.type.Character_String.value, STR_VARIABLE_LABEL);
-		}
-	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-			tmp.value = temp_value.type.Unsigned_Int;
-		}
-		else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
-			tmp.value = temp_value.type.Signed_Int;
-		}
-		else if (temp_value.tag == TPYE_BACAPP_REAL) {
-			tmp.value = temp_value.type.Real;
-		}
-		else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
-			tmp.value = temp_value.type.Double;
-		}
-		else {
-			tmp.value = 0;
-		}
-	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
+		BACNET_READ_ACCESS_DATA* old_rpm_data;
+		BACNET_PROPERTY_REFERENCE* rpm_property;
+		BACNET_PROPERTY_REFERENCE* old_rpm_property;
+		BACNET_APPLICATION_DATA_VALUE* value;
+		BACNET_APPLICATION_DATA_VALUE* old_value;
 
-			tmp.range = temp_value.type.Enumerated;
+		//while (rpm_data)
+		{
+			rpm_property = rpm_data.listOfProperties;
+			while (rpm_property) {
+				value = rpm_property->value;
+				/*while (value) {
+					old_value = value;*/
+
+				switch (rpm_property->propertyIdentifier) {
+				case PROP_OBJECT_NAME:
+					if (value->tag == TPYE_BACAPP_CHARACTER_STRING) {
+						memcpy_s(tmp.description, STR_IN_DESCRIPTION_LENGTH, value->type.Character_String.value, STR_IN_DESCRIPTION_LENGTH);
+					}
+					break;
+				case PROP_DESCRIPTION:
+					if (value->tag == TPYE_BACAPP_CHARACTER_STRING) {
+						memcpy_s(tmp.label, STR_IN_LABEL, value->type.Character_String.value, STR_IN_LABEL);
+					}
+					break;
+				case PROP_PRESENT_VALUE:
+					if (value->tag == TPYE_BACAPP_UNSIGNED) {
+						tmp.value = value->type.Unsigned_Int;
+					}
+					else if (value->tag == TPYE_BACAPP_SIGNED) {
+						tmp.value = value->type.Signed_Int;
+					}
+					else if (value->tag == TPYE_BACAPP_REAL) {
+						tmp.value = value->type.Real;
+					}
+					else if (value->tag == TPYE_BACAPP_DOUBLE) {
+						tmp.value = value->type.Double;
+					}
+					else {
+						tmp.value = 0;
+					}
+					break;
+				case PROP_UNITS:
+					if (value->tag == TPYE_BACAPP_ENUMERATED) {
+						tmp.range = value->type.Enumerated;
+					}
+					break;
+				case PROP_OUT_OF_SERVICE:
+					if (value->tag == TPYE_BACAPP_BOOLEAN) {
+						tmp.auto_manual = value->type.Boolean;
+					}
+					break;
+				}
+				/*value = value->next;
+				free(old_value);
+			}*/
+				old_rpm_property = rpm_property;
+				if (rpm_property->next)
+					rpm_property = rpm_property->next;
+				else
+					break;
+				free(old_rpm_property);
+			}
+			//old_rpm_data = rpm_data;
+			//rpm_data = rpm_data->next;
+			//free(old_rpm_data);
+		}
+		if (tmp.range < -1)
+		{
+			invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
+			if (invoke_id)
+			{
+				if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
+
+					tmp.range = temp_value.type.Enumerated;
+				}
+			}
 		}
 	}
-	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
-	if (invoke_id)
-	{
-		if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+	else {
+		int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_NAME, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+				memcpy_s(tmp.description, STR_VARIABLE_DESCRIPTION_LENGTH, temp_value.type.Character_String.value, STR_VARIABLE_DESCRIPTION_LENGTH);
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_DESCRIPTION, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_CHARACTER_STRING) {
+				memcpy_s(tmp.label, STR_VARIABLE_LABEL, temp_value.type.Character_String.value, STR_VARIABLE_LABEL);
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_PRESENT_VALUE, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
+				tmp.value = temp_value.type.Unsigned_Int;
+			}
+			else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
+				tmp.value = temp_value.type.Signed_Int;
+			}
+			else if (temp_value.tag == TPYE_BACAPP_REAL) {
+				tmp.value = temp_value.type.Real;
+			}
+			else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
+				tmp.value = temp_value.type.Double;
+			}
+			else {
+				tmp.value = 0;
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_UNITS, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_ENUMERATED) {
 
-			tmp.auto_manual = temp_value.type.Boolean;
+				tmp.range = temp_value.type.Enumerated;
+			}
+		}
+		invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OUT_OF_SERVICE, temp_value, 1);
+		if (invoke_id)
+		{
+			if (temp_value.tag == TPYE_BACAPP_BOOLEAN) {
+
+				tmp.auto_manual = temp_value.type.Boolean;
+			}
 		}
 	}
 	m_Variable_data_instance.at(index) = objInstace;

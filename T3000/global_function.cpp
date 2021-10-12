@@ -5045,6 +5045,11 @@ int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_t
             break;
         }
     }
+    Request_Invoke_ID =
+        Send_Read_Property_Multiple_Request(&buffer[0],
+            sizeof(buffer), Target_Device_Object_Instance,
+            Read_Access_Data);
+    return Request_Invoke_ID;
     /* setup my info */
     //Device_Set_Object_Instance_Number(BACNET_MAX_INSTANCE);
     //address_init();
@@ -5176,7 +5181,7 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
             temp_invoke_id = Bacnet_Read_Properties(deviceid, object_type, object_instance, property_id, index);
 
             if (temp_invoke_id < 0)
-                Sleep(500);
+                Sleep(200);
             else
             {
                 if (find_exsit)
@@ -5196,10 +5201,10 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
         {
             for (int i = 0; i<100; i++)
             {
-                Sleep(100);
+                Sleep(20);
                 if (tsm_invoke_id_free(temp_invoke_id))
                 {
-                    Sleep(10);
+                   // Sleep(10);
 
                     vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
                     vector<str_bacnet_rp_info>::iterator itrflag;
@@ -5482,6 +5487,115 @@ void localhandler_read_property_ack(
     }
 }
 
+
+int Bacnet_Read_Properties_Multiple_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_READ_ACCESS_DATA& value, uint8_t retrytime, uint32_t index)
+{
+    int send_status = true;
+
+    str_bacnet_rp_info temp_standard_bacnet_data = { 0 };
+    temp_standard_bacnet_data.bacnet_instance = deviceid;
+    temp_standard_bacnet_data.object_item_number = object_instance;
+    temp_standard_bacnet_data.object_type = object_type;
+    temp_standard_bacnet_data.property_id = property_id;
+
+    vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+    vector<str_bacnet_rp_info>::iterator itrflag;
+    int find_exsit = false;
+    for (; itr != standard_bacnet_data.end(); itr++)
+    {
+        if ((itr->bacnet_instance == deviceid) &&
+            (itr->object_item_number == object_instance) &&
+            (itr->object_type == object_type) &&
+            (itr->property_id == property_id))
+        {
+            itrflag = itr;  //找到曾经读过
+            find_exsit = true;
+        }
+    }
+
+    if (!find_exsit)
+    {
+        standard_bacnet_data.push_back(temp_standard_bacnet_data);
+    }
+
+
+
+    for (int z = 0; z < retrytime; z++)
+    {
+        int temp_invoke_id = -1;
+        int	resend_count = 0;
+        send_status = true;
+        do
+        {
+            resend_count++;
+            if (resend_count > retrytime)
+            {
+                send_status = false;
+                break;
+            }
+            temp_invoke_id = Bacnet_Read_Property_Multiple(deviceid, object_type, object_instance, property_id);
+
+             if (temp_invoke_id < 0)
+                Sleep(500);
+            else
+            {
+                if (find_exsit)
+                {
+                    itrflag->invoke_id = temp_invoke_id;
+                }
+                else
+                {
+                    itrflag = standard_bacnet_data.end() - 1;
+                    itrflag->invoke_id = temp_invoke_id;
+                }
+                send_status = true;
+            }
+        } while (temp_invoke_id < 0);
+
+        if (send_status)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                Sleep(100);
+                if (tsm_invoke_id_free(temp_invoke_id))
+                {
+                    Sleep(10);
+
+                    vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+                    vector<str_bacnet_rp_info>::iterator itrflag;
+                    int find_exsit = false;
+                    for (; itr != standard_bacnet_data.end(); itr++)
+                    {
+                        if ((itr->invoke_id == temp_invoke_id) &&
+                            (itr->object_item_number == object_instance) &&
+                            (itr->object_type == object_type) &&
+                            (itr->property_id == property_id))
+                        {
+                            itrflag = itr;  //找到曾经读过
+                            value = itrflag->rpm_data;
+                           // memcpy_s(value, sizeof(BACNET_READ_ACCESS_DATA), itrflag->rpm_data, sizeof(BACNET_READ_ACCESS_DATA));
+                            find_exsit = true;
+                            break;
+                        }
+                    }
+                    if (!find_exsit)
+                    {
+                        continue;  //没有找到对应的点，没有赋值 value成功;
+                    }
+                    standard_bacnet_data.erase(itrflag);
+                    return 1;
+                }
+                else
+                    continue;
+            }
+        }
+    }
+
+    return -1;
+
+
+}
+
 /** Handler for a ReadPropertyMultiple ACK.
 * @ingroup DSRPM
 * For each read property, print out the ACK'd data for debugging,
@@ -5500,7 +5614,7 @@ void local_handler_read_property_multiple_ack(
     BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
 {
     int len = 0;
-    BACNET_READ_ACCESS_DATA *rpm_data;
+    BACNET_READ_ACCESS_DATA rpm_data;
     BACNET_READ_ACCESS_DATA *old_rpm_data;
     BACNET_PROPERTY_REFERENCE *rpm_property;
     BACNET_PROPERTY_REFERENCE *old_rpm_property;
@@ -5510,18 +5624,19 @@ void local_handler_read_property_multiple_ack(
     (void)src;
     (void)service_data;        /* we could use these... */
 
-    rpm_data = (BACNET_READ_ACCESS_DATA *)calloc(1, sizeof(BACNET_READ_ACCESS_DATA));
-    if (rpm_data) {
+   // rpm_data = (BACNET_READ_ACCESS_DATA *)calloc(1, sizeof(BACNET_READ_ACCESS_DATA));
+    //if (rpm_data) 
+    {
         len =
             rpm_ack_decode_service_request(service_request, service_len,
-                rpm_data);
+                &rpm_data);
     }
 #if 1
     fprintf(stderr, "Received Read-Property-Multiple Ack!\n");
 #endif
     if (len > 0) 
     {
-        while (rpm_data) 
+       /* while (rpm_data) 
         {
             rpm_ack_print_data(rpm_data);
 #if 0
@@ -5545,7 +5660,7 @@ void local_handler_read_property_multiple_ack(
 #endif
             free(rpm_data);
             rpm_data = NULL;
-        }
+        }*/
 
 
     }
@@ -5553,7 +5668,26 @@ void local_handler_read_property_multiple_ack(
 #if 1
         fprintf(stderr, "RPM Ack Malformed! Freeing memory...\n");
 #endif
-        while (rpm_data) {
+        vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+        vector<str_bacnet_rp_info>::iterator itrflag;
+
+
+
+        int find_exsit = false;
+        for (; itr != standard_bacnet_data.end(); itr++)
+        {
+            if ((itr->invoke_id == service_data->invoke_id) &&
+                (itr->object_item_number == rpm_data.object_instance) &&
+                (itr->object_type == rpm_data.object_type) /*&&
+                (itr->property_id == rpm_data->object_property)*/)
+            {
+                itrflag = itr;  //找到曾经读过
+                itrflag->rpm_data = rpm_data;
+                find_exsit = true;
+            }
+        }
+    Sleep(1);
+       /* while (rpm_data) {
             rpm_property = rpm_data->listOfProperties;
             while (rpm_property) {
                 value = rpm_property->value;
@@ -5569,7 +5703,7 @@ void local_handler_read_property_multiple_ack(
             old_rpm_data = rpm_data;
             rpm_data = rpm_data->next;
             free(old_rpm_data);
-        }
+        }*/
     }
 }
 
@@ -6465,6 +6599,34 @@ void LocalBacnetAbortHandler(BACNET_ADDRESS* src, uint8_t invoke_id, uint8_t abo
     BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
 
 }
+void LocalBacnetErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERROR_CLASS error_class, BACNET_ERROR_CODE error_code)
+{
+
+    int i = 0;
+    CString info;
+    info.Format(_T("ERROR While Writing Property Error Code:%d"), error_code);
+    AfxMessageBox(info);
+   // AfxMessageBox("ERROR While Writing Property : \n Error Class" + (BACNET_ERROR_CLASS)error_class + " \n Error Code:" +(BACNET_ERROR_CODE)error_code);
+   // BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
+
+}
+void Localhandler_write_property_ack(
+    uint8_t* service_request,
+    uint16_t service_len,
+    BACNET_ADDRESS* src,
+    BACNET_CONFIRMED_SERVICE_ACK_DATA* service_data)
+{
+    int len = 0;
+    BACNET_READ_PROPERTY_DATA data;
+
+    (void)src;
+    (void)service_data;        /* we could use these... */
+    len = rp_ack_decode_service_request(service_request, service_len, &data);
+    //char my_pro_name[100];
+    //char * temp = get_prop_name();
+    //strcpy_s(my_pro_name,100,temp);
+    Sleep(1);
+}
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src)
 {
 
@@ -6842,6 +7004,9 @@ void Init_Service_Handlers(	void)
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROP_MULTIPLE, local_handler_read_property_multiple_ack);
     
     apdu_set_abort_handler(LocalBacnetAbortHandler);
+    apdu_set_error_handler(SERVICE_CONFIRMED_WRITE_PROPERTY,LocalBacnetErrorHandler);
+
+    apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_WRITE_PROPERTY, Localhandler_write_property_ack);
     /* set the handler for all the services we don't implement */
     /* It is required to send the proper reject message... */
     apdu_set_unrecognized_service_handler_handler

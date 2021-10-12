@@ -13,6 +13,7 @@
 #include "BacnetRange.h"
 #include "MainFrm.h"
 #include "BacnetProperty.h"
+#include "CBacnetUnitsSelection.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 CRect Output_rect;
@@ -1669,6 +1670,29 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 					m_output_list.SetCellEnabled(lRow,OUTPUT_HIGH_VOLTAGE,0);
 				}
 			
+	}
+	else if (lCol == OUTPUT_UNITE && bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet Thirdparty devices Units
+	{
+	CBacnetUnitsSelection unitDlg;
+	bac_range_number_choose = m_Output_data.at(lRow).range ;
+	unitDlg.DoModal();
+		if (!range_cancel)
+		{
+			m_Output_data.at(lRow).range = bac_range_number_choose;
+			CString inputunit;
+			MultiByteToWideChar(CP_ACP, 0, (char*)bacnet_engineering_unit_names[m_Output_data.at(lRow).range].pString,
+				(int)strlen((char*)bacnet_engineering_unit_names[m_Output_data.at(lRow).range].pString) + 1,
+				inputunit.GetBuffer(MAX_PATH), MAX_PATH);
+			inputunit.ReleaseBuffer();
+			m_output_list.SetItemText(lRow, INPUT_UNITE, inputunit);
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_ENUMERATED;
+			temp_value->type.Enumerated = m_Output_data.at(lRow).range;
+			int ObjectType = OBJECT_ANALOG_INPUT;
+			if (m_Output_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
+				ObjectType = OBJECT_BINARY_INPUT;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Output_data_instance.at(lRow), PROP_UNITS, temp_value);
+		}
 	}
 	else
 	{
