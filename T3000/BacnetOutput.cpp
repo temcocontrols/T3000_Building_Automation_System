@@ -1205,8 +1205,19 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
 		{
 			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
-			temp_value->tag = TPYE_BACAPP_UNSIGNED;
-			temp_value->type.Unsigned_Int = temp_int;
+			temp_value->tag = m_Input_data.at(Changed_Item).control;
+			if (temp_value->tag == TPYE_BACAPP_UNSIGNED) {
+				temp_value->type.Unsigned_Int = temp_int;
+			}
+			else if (temp_value->tag == TPYE_BACAPP_SIGNED) {
+				temp_value->type.Signed_Int = temp_int;
+			}
+			else if (temp_value->tag == TPYE_BACAPP_REAL) {
+				temp_value->type.Real = temp_int;
+			}
+			else if (temp_value->tag == TPYE_BACAPP_DOUBLE) {
+				temp_value->type.Double = temp_int;
+			}
 			int ObjectType = OBJECT_ANALOG_OUTPUT;
 			if (m_Output_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
 				ObjectType = OBJECT_BINARY_OUTPUT;

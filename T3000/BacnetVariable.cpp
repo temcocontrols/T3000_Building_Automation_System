@@ -231,7 +231,26 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			}
 		}
 	//}
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
+		{
+			//m_input_list.DeleteColumn(INPUT_AUTO_MANUAL);
+			//m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Out of service"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+			LVCOLUMN col;
+			m_variable_list.GetColumn(VARIABLE_AUTO_MANUAL, &col);
+			col.pszText = _T("Out of Service");
+			m_variable_list.SetColumn(VARIABLE_AUTO_MANUAL, &col);
+		
 
+		}
+		else { // to show the column for non-bacnet devices
+			//m_input_list.DeleteColumn(INPUT_AUTO_MANUAL);
+			//m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+			LVCOLUMN col;
+			m_variable_list.GetColumn(VARIABLE_AUTO_MANUAL, &col);
+			col.pszText = _T("Auto/Manual");
+			m_variable_list.SetColumn(VARIABLE_AUTO_MANUAL, &col);
+			
+		}
 
 
 	for (int i=0;i<(int)m_Variable_data.size();i++)
@@ -254,15 +273,27 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
 		m_variable_list.SetItemText(i,VARIABLE_FULL_LABLE,temp_des);
-		if(m_Variable_data.at(i).auto_manual==0)
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 		{
-			m_variable_list.SetItemText(i,VARIABLE_AUTO_MANUAL,_T("Auto"));
+			if (m_Variable_data.at(i).auto_manual == 0)
+			{
+				m_variable_list.SetItemText(i, VARIABLE_AUTO_MANUAL, _T("False"));
+			}
+			else
+			{
+				m_variable_list.SetItemText(i, VARIABLE_AUTO_MANUAL, _T("True"));
+			}
 		}
-		else
-		{
-			m_variable_list.SetItemText(i,VARIABLE_AUTO_MANUAL,_T("Manual"));
+		else {
+			if (m_Variable_data.at(i).auto_manual == 0)
+			{
+				m_variable_list.SetItemText(i, VARIABLE_AUTO_MANUAL, _T("Auto"));
+			}
+			else
+			{
+				m_variable_list.SetItemText(i, VARIABLE_AUTO_MANUAL, _T("Manual"));
+			}
 		}
-
 
 
 		if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
@@ -394,6 +425,16 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			}
 
 		}
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
+			{
+				CString varunit;
+				MultiByteToWideChar(CP_ACP, 0, (char*)bacnet_engineering_unit_names[m_Variable_data.at(i).range].pString,
+					(int)strlen((char*)bacnet_engineering_unit_names[m_Variable_data.at(i).range].pString) + 1,
+					varunit.GetBuffer(MAX_PATH), MAX_PATH);
+				varunit.ReleaseBuffer();
+				m_variable_list.SetItemText(i, VARIABLE_UNITE, varunit);
+				//m_input_list.SetItemText(i, INPUT_RANGE, inputunit);
+			}
 		
 		CString temp_des2;
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).label, (int)strlen((char *)m_Variable_data.at(i).label)+1, 
@@ -453,6 +494,20 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 			PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,Changed_Item,REFRESH_ON_ITEM);
 			return 0;
 		}
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_CHARACTER_STRING;
+			temp_value->context_specific = false;
+			WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
+			temp_value->type.Character_String.encoding = 0;
+			temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
+			int ObjectType = OBJECT_ANALOG_INPUT;
+			if (m_Variable_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
+				ObjectType = OBJECT_BINARY_INPUT;
+
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Variable_data_instance.at(Changed_Item), PROP_DESCRIPTION, temp_value);
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -484,6 +539,19 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 			PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,Changed_Item,REFRESH_ON_ITEM);
 			return 0;
 		}
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_CHARACTER_STRING;
+			temp_value->context_specific = false;
+			WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
+			temp_value->type.Character_String.encoding = 0;
+			temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
+			int ObjectType = OBJECT_ANALOG_INPUT;
+			if (m_Variable_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
+				ObjectType = OBJECT_BINARY_INPUT;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Variable_data_instance.at(Changed_Item), PROP_OBJECT_NAME, temp_value);
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -494,7 +562,7 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == VARIABLE_AUTO_MANUAL)
 	{
 		CString temp_cs = m_variable_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(temp_cs.CompareNoCase(_T("Auto"))==0)
+		if(temp_cs.CompareNoCase(_T("Auto"))==0 || temp_cs.CompareNoCase(_T("False")) == 0 )
 		{
 			//m_variable_list.SetCellEnabled(Changed_Item,VARIABLE_VALUE,0);
 			m_Variable_data.at(Changed_Item).auto_manual = BAC_AUTO;
@@ -504,6 +572,16 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 			//m_variable_list.SetCellEnabled(Changed_Item,VARIABLE_VALUE,1);
 			m_Variable_data.at(Changed_Item).auto_manual = BAC_MANUAL;
 		}
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_BOOLEAN;
+			temp_value->type.Boolean = m_Variable_data.at(Changed_Item).auto_manual;
+			int ObjectType = OBJECT_ANALOG_INPUT;
+			if (m_Variable_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
+				ObjectType = OBJECT_BINARY_INPUT;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Variable_data_instance.at(Changed_Item), PROP_OUT_OF_SERVICE, temp_value);
+		}
 	}
 	if(Changed_SubItem == VARIABLE_VALUE)//这里只用处理 ANALOG 的值就看要了， DIGITAL 的值在Click 事件中处理过了;
 	{
@@ -511,6 +589,28 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 
 		int temp_int = (int)(_wtof(temp_cs) * 1000);
 		m_Variable_data.at(Changed_Item).value = temp_int;
+		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = m_Variable_data.at(Changed_Item).control;
+			if (temp_value->tag == TPYE_BACAPP_UNSIGNED) {
+				temp_value->type.Unsigned_Int = temp_int;
+			}
+			else if (temp_value->tag == TPYE_BACAPP_SIGNED) {
+				temp_value->type.Signed_Int = temp_int;
+			}
+			else if (temp_value->tag == TPYE_BACAPP_REAL) {
+				temp_value->type.Real = temp_int;
+			}
+			else if (temp_value->tag == TPYE_BACAPP_DOUBLE) {
+				temp_value->type.Double = temp_int;
+			}
+			//temp_value->type.Unsigned_Int = temp_int;
+			int ObjectType = OBJECT_ANALOG_INPUT;
+			if (m_Variable_data.at(Changed_Item).digital_analog == BAC_UNITS_DIGITAL)
+				ObjectType = OBJECT_BINARY_INPUT;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Variable_data_instance.at(Changed_Item), PROP_PRESENT_VALUE, temp_value);
+		}
 	}
 
 	cmp_ret = memcmp(&m_temp_variable_data[Changed_Item],&m_Variable_data.at(Changed_Item),sizeof(Str_variable_point));
