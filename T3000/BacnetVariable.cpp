@@ -843,6 +843,17 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
 		{
+			if (m_Variable_data.at(lRow).auto_manual == 0)
+			{
+
+				m_Variable_data.at(lRow).auto_manual = 1;
+				m_variable_list.SetItemText(lRow, VARIABLE_AUTO_MANUAL, _T("True"));
+			}
+			else
+			{
+				m_Variable_data.at(lRow).auto_manual = 0;
+				m_variable_list.SetItemText(lRow, VARIABLE_AUTO_MANUAL, _T("False"));
+			}
 			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
 			temp_value->tag = TPYE_BACAPP_BOOLEAN;
 			temp_value->type.Boolean = m_Variable_data.at(lRow).auto_manual;
