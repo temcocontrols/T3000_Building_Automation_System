@@ -130,6 +130,7 @@ HANDLE hwait_read_thread = NULL;
 HANDLE hwait_read_modbus10000 = NULL;
 HANDLE hwait_write_modbus10000 = NULL;
 HANDLE hwait_write_tstat_cfg = NULL;
+HANDLE hDetectYabeThread = NULL;
 HANDLE h_mul_ping_thread = NULL;
 int mul_ping_flag = 1;
 _Refresh_Write_Info Write_Config_Info;
@@ -6400,6 +6401,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
     }
     else if (message == WM_MAIN_MSG_SCAN_BAC)
     {
+#ifdef USE_THIRD_PARTY_FUNC
         _Bac_Scan_Com_Info *pbac_iam = (_Bac_Scan_Com_Info *)wParam;
         if (pbac_iam == NULL)
             return 0;
@@ -6492,6 +6494,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
         if (pbac_iam)
             delete pbac_iam;
+#endif
     }
     else if (message == WM_MAIN_MSG_UPDATE_PRODUCT_TREE)
     {
@@ -12652,6 +12655,15 @@ void CMainFrame::OnDatabaseBacnettool()
         bip_set_socket(NULL);
         bip_set_port(htons(-1));
     }
+
+    WritePrivateProfileString(_T("Yabe"), _T("Yabe_Status"), _T("1"), g_configfile_path);
+
+    if (hDetectYabeThread == NULL)
+    {
+        hDetectYabeThread = CreateThread(NULL, NULL, DetectYabbeThread, this, NULL, NULL);
+        CloseHandle(hDetectYabeThread);
+    }
+    
     return;
 #if 0
 
@@ -15132,3 +15144,23 @@ void CMainFrame::OnViewRefresh()
     // TODO: 在此添加命令处理程序代码
     ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, bacnet_view_number);
 }
+
+DWORD WINAPI  CMainFrame::DetectYabbeThread(LPVOID lpVoid)
+{
+    CMainFrame* pParent = (CMainFrame*)lpVoid;
+    int n_yabe_status = 0;
+    while (1)
+    {
+        n_yabe_status = GetPrivateProfileInt(_T("Yabe"), _T("Yabe_Status"), 1, g_configfile_path);
+        if (n_yabe_status == 0)
+            break;
+        Sleep(3000);
+    }
+
+    ::PostMessage(pParent->m_hWnd,MY_RETRY_IP_CHANGE_MESSAGE, NULL, NULL);
+
+
+    hDetectYabeThread = NULL;
+    return 1;
+}
+

@@ -4274,6 +4274,8 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             bacnet_device_type = T3_TB_11I;
         else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB)
             bacnet_device_type = MINIPANELARM_NB;
+        else if (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE)
+            bacnet_device_type = T3_FAN_MODULE;
         else
             bacnet_device_type = PM_CM5;
 
@@ -5980,6 +5982,7 @@ void Inial_Product_Menu_map()
         case PM_TSTAT10:
         case PM_MINIPANEL:
         case PM_MINIPANEL_ARM:
+        case PM_ESP32_T3_SERIES:
         {
             unsigned char  temp[20] = { 1,1,1,1,  1,1,1,1,  1,1,1,1,   1,1,1,1  ,0,0,0,0 };
             memcpy(product_menu[i], temp, 20);
@@ -7677,7 +7680,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	}
 
 #ifdef DEBUG
-    if (nip_address.CompareNoCase(_T("192.168.0.53"))== 0)
+    if (nip_address.CompareNoCase(_T("192.168.0.132"))== 0)
     {
         //t2 = GetTickCount();
         //CString temp_time_print;

@@ -113,8 +113,8 @@ BOOL CBacnetVariable::OnInitDialog()
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_VARIABLE);
 	SetIcon(m_hIcon,TRUE);
 
-	SetTimer(1,10000,NULL);
-
+	SetTimer(1, BAC_LIST_REFRESH_TIME,NULL);
+	SetTimer(4, 15000, NULL);
 	//SetTimer(6,250,NULL);
 	ShowWindow(FALSE);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -1040,11 +1040,7 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
-			if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_VARIABLE) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
-			{
-				Post_Refresh_Message(g_bac_instance, READVARIABLE_T3000, 0, BAC_VARIABLE_ITEM_COUNT - 1, sizeof(Str_variable_point), 0);
-			}
-			else if ((bacnet_view_number == TYPE_VARIABLE) && (g_protocol == PROTOCOL_BIP_TO_MSTP))
+            if ((bacnet_view_number == TYPE_VARIABLE) && (g_protocol == PROTOCOL_BIP_TO_MSTP))
 			{
 				PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 			}
@@ -1071,6 +1067,13 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 			KillTimer(3);
 
 		}
+		break;
+	case 4:
+		if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_VARIABLE) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
+		{
+			Post_Refresh_Message(g_bac_instance, READVARIABLE_T3000, 0, BAC_VARIABLE_ITEM_COUNT - 1, sizeof(Str_variable_point), 0);
+		}
+		
 		break;
 	default:
 		break;

@@ -15,6 +15,7 @@ extern unsigned int the_max_register_number_parameter_Count;
 extern unsigned int the_max_register_number_parameter_Finished;
 extern unsigned int com_error_delay_time ;
 extern unsigned int com_error_delay_count ;
+unsigned short Device_infor[18] = { 0 };
 #ifdef ISP_BURNING_MODE
 extern  unsigned short Check_sum ;
 extern int temco_burning_mode;
@@ -944,15 +945,24 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
     CString srtInfo;
     srtInfo.Format(_T("|ID %d: Programming lines %d to %d.(0%%)"),m_ID,ii,ii+128);
     pWriter->OutPutsStatusInfo(srtInfo);
+    if (Device_infor[7] == 88)
+    {
+        if(pWriter->continue_com_flash_count < 0)
+            pWriter->continue_com_flash_count = 0;
+        ii = pWriter->continue_com_flash_count;
+        the_max_register_number_parameter = the_max_register_number_parameter + ii;
+        Sleep(4000);
+    }
     while(ii<the_max_register_number_parameter)
     {
         if (pWriter->m_bStopWrite)
         {
             return -9;
         }
+
         TS_UC data_to_send[160]= {0}; // buffer that writefile() will to use
         int itemp=0;
-
+        
         persentfinished = ((ii+128)*100)/the_max_register_number_parameter;
         if(persentfinished>100)
             persentfinished=100;
@@ -964,10 +974,11 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             if(itemp<RETRY_TIMES)
             {
 
-                if(-2==write_multi(m_ID,&register_data[ii],ii,128))//to write multiple 128 bytes
-                    itemp++;
-                else
-                    itemp=0;
+                    if (-2 == write_multi(m_ID, &register_data[ii], ii, 128))//to write multiple 128 bytes
+                        itemp++;
+                    else
+                        itemp = 0;
+
             }
             else
             {
@@ -1310,7 +1321,7 @@ int CComWriter::WirteExtendHexFileByCom_RAM()
     return 1;
 }
 
-
+extern unsigned char firmware_md5[32] ;
 UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 {
     CComWriter* pWriter = (CComWriter*)(pParam);
@@ -1334,7 +1345,62 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
             BOOL Flag_HEX_BIN=FALSE;
             if (pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]))
             {
+                if ((Device_infor[4] == Device_infor[14]) &&   
+                    (Device_infor[14] >= 20) &&
+                    (Device_infor[7] == 88))
+                {
+                    unsigned short wirte_md5[4];
+                    int compare_ret = 1;
 
+
+                    //如果88esp的设备在bootloader 里面
+                    int n_ret = mudbus_read_multi(pWriter->m_szMdbIDs[i], &pWriter->update_firmware_info[0], 1994, 6);
+                    if (n_ret > 0)
+                    {
+                        //比对MD5
+                        for (int x = 0; x < 4; x++)
+                        {
+                            wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
+                            if (pWriter->update_firmware_info[x + 1] != wirte_md5[x])
+                            {
+                                compare_ret = -1;
+                                //break;
+                            }
+                        }
+
+                        if ((compare_ret == 1) && (pWriter->update_firmware_info[0] != 0))
+                        {
+                            pWriter->continue_com_flash_count = pWriter->update_firmware_info[0] * 128; // 1994存放的是串口烧写了多少包;
+                        }
+                        else
+                        {
+                            
+
+
+                            pWriter->continue_com_flash_count = 0;
+                        }
+
+
+
+                       
+                    }
+                    else
+                    {
+                        pWriter->continue_com_flash_count = 0;
+                    }
+
+                    if (pWriter->continue_com_flash_count == 0)
+                    {
+                        for (int y = 0; y < 4; y++)
+                        {
+                            int ret = mudbus_write_one(pWriter->m_szMdbIDs[i], 1995 + y, wirte_md5[y],3);
+
+
+                        }
+                        
+                    }
+                    //continue_com_flash_count =
+                }
                 int nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
                 if(nRet < 0)
                     Write_One(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
@@ -1441,6 +1507,8 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     int ii=0;
                     while(ii<=5)
                     {
+                        if (Device_infor[7] == 88)
+                            break;
                         int ret=Write_One(pWriter->m_szMdbIDs[i],16,1);
                         if (ret>0)
                         {
@@ -1481,11 +1549,26 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
 
             int nCount = 0;
+            if (pWriter->continue_com_flash_count > 0)
+            {
+                CString strTips;
+                nCount = pWriter->continue_com_flash_count ;
+                strTips.Format(_T("Resume at breakpoint, starting from package %u"), pWriter->continue_com_flash_count/128);
+                pWriter->OutPutsStatusInfo(strTips, FALSE);
+            }
             for(UINT p = 0; p < pWriter->m_szHexFileFlags.size(); p++)
             {
                 int nBufLen = pWriter->m_szHexFileFlags[p]-nCount;
-
-                if((nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer+nCount), pParam)) < 0 )
+                if (Device_infor[7] == 88)
+                {
+                    nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer), pParam);
+                }
+                else
+                {
+                    nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer + nCount), pParam);
+                }
+                //if((nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer+nCount), pParam)) < 0 )
+                if(nFlashRet < 0)
                 {
                     nFailureNum++;
                     CString strTemp=_T("");
@@ -1727,7 +1810,7 @@ int CComWriter::UpdataDeviceInformation(int& ID)
     if (n_check_temco_firmware == 0)
         return 1;
     CString strtips;
-    unsigned short Device_infor[18] = {0};
+
     CString str_ret,temp;
  
     CString hexproductname=_T("");

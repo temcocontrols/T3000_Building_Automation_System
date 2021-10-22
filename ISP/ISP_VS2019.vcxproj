@@ -146,6 +146,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\T3000\Class\md5.cpp" />
     <ClCompile Include="BacnetMstp.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
     <ClCompile Include="BinFileParser.cpp" />

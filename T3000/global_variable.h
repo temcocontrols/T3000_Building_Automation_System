@@ -25,9 +25,9 @@ HWND hMbpollWritePopWnd;
 int regDetailsOpenedFrom = 0;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
 bool list_mouse_click = false;
 //#include "stdafx.h"
-unsigned short multi_register_value[4096]={-1};
-unsigned short multi_register_value_tcp[10000]={-1};
-unsigned short product_register_value[20000]={-1};
+unsigned short multi_register_value[4096]={0};
+unsigned short multi_register_value_tcp[10000]={0};
+unsigned short product_register_value[20000]={0};
 unsigned short product_register_sensor_flag[5] = { 0 };
 
 int product_type = 0;
