@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体，中国) resources
+// Chinese (Simplified, PRC) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -7132,12 +7132,12 @@ BEGIN
     ID_TOOLS_MODBUSTOBACNETROUTER "Subnet Devices"
 END
 
-#endif    // 中文(简体，中国) resources
+#endif    // Chinese (Simplified, PRC) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(美国) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -8937,6 +8937,17 @@ BEGIN
     PUSHBUTTON      "OK",IDC_BUTTON_LCD_OK,102,65,50,14
 END
 
+IDD_DIALOG_BACNET_UNITS DIALOGEX 0, 0, 265, 125
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "BACnet Units"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,115,63,50,19
+    PUSHBUTTON      "Cancel",IDCANCEL,175,62,50,20
+    COMBOBOX        IDC_COMBO_BACNETIP_UNIT,89,28,133,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "BACNET UNIT: ",IDC_STATIC_BACNETIP_UNIT,27,32,50,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -9452,6 +9463,14 @@ BEGIN
         RIGHTMARGIN, 284
         TOPMARGIN, 7
         BOTTOMMARGIN, 208
+    END
+
+    IDD_DIALOG_BACNET_UNITS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 258
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 118
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -11386,6 +11405,11 @@ BEGIN
     0
 END
 
+IDD_DIALOG_BACNET_UNITS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -11630,12 +11654,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // 英语(美国) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(英国) resources
+// English (United Kingdom) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -11741,7 +11765,7 @@ BEGIN
     0
 END
 
-#endif    // 英语(英国) resources
+#endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
