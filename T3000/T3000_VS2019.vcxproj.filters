@@ -810,6 +810,9 @@
     <ClCompile Include="CTstatAQ_Parameter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CBacnetUnitsSelection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -2027,6 +2030,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CTstatAQ_Parameter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBacnetUnitsSelection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

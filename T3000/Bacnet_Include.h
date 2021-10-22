@@ -118,8 +118,8 @@ typedef struct segmented_bacnet_rp_info
     BACNET_OBJECT_TYPE object_type;
     int property_id;
     int invoke_id;
-   uint8_t* application_data;
-    int application_data_len;
+    vector <uint8_t*> application_data;
+    vector <int> application_data_len;
     int last_seq_no;
 }str_segmented_bacnet_rp_info;
 
@@ -130,6 +130,7 @@ typedef struct bacnet_rp_info  //bacnet 相关的部分必须放在 bacnet include 的头文
     uint32_t object_item_number;
     int property_id;
     BACNET_APPLICATION_DATA_VALUE value;
+    BACNET_READ_ACCESS_DATA rpm_data;
     int invoke_id;
 }str_bacnet_rp_info;
 

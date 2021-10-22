@@ -4723,7 +4723,7 @@ int Bacnet_Write_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE objec
 
 }
 
-int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id)
+int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, uint32_t index)
 {
     int n_invoke_id = 0;
     // uint32_t device_id = 0;
@@ -4731,7 +4731,7 @@ int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, ui
     unsigned max_apdu = 0;
     BACNET_ADDRESS src;
     bool next_device = false;
-    static unsigned index = 0;
+    //static unsigned index = 0;
     static unsigned property = 0;
     /* list of required (and some optional) properties in the
     Device Object
@@ -4740,7 +4740,7 @@ int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, ui
     int object_props[] = {
         property_id//PROP_MODEL_NAME//PROP_OBJECT_LIST
     };
-    n_invoke_id = Send_Read_Property_Request(deviceid, object_type, object_instance, (BACNET_PROPERTY_ID)object_props[property], BACNET_ARRAY_ALL);
+    n_invoke_id = Send_Read_Property_Request(deviceid, object_type, object_instance, (BACNET_PROPERTY_ID)object_props[property], index);
 
     return n_invoke_id;
 }
@@ -5047,6 +5047,11 @@ int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_t
             break;
         }
     }
+    Request_Invoke_ID =
+        Send_Read_Property_Multiple_Request(&buffer[0],
+            sizeof(buffer), Target_Device_Object_Instance,
+            Read_Access_Data);
+    return Request_Invoke_ID;
     /* setup my info */
     //Device_Set_Object_Instance_Number(BACNET_MAX_INSTANCE);
     //address_init();
@@ -5130,7 +5135,7 @@ int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_t
 }
 
 
-int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime)
+int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime, uint32_t index)
 {
     int send_status = true;
 
@@ -5175,10 +5180,10 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
                 send_status = false;
                 break;
             }
-            temp_invoke_id = Bacnet_Read_Properties(deviceid, object_type, object_instance, property_id);
+            temp_invoke_id = Bacnet_Read_Properties(deviceid, object_type, object_instance, property_id, index);
 
             if (temp_invoke_id < 0)
-                Sleep(500);
+                Sleep(200);
             else
             {
                 if (find_exsit)
@@ -5198,10 +5203,10 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
         {
             for (int i = 0; i<100; i++)
             {
-                Sleep(100);
+                Sleep(20);
                 if (tsm_invoke_id_free(temp_invoke_id))
                 {
-                    Sleep(10);
+                   // Sleep(10);
 
                     vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
                     vector<str_bacnet_rp_info>::iterator itrflag;
@@ -5264,34 +5269,62 @@ void localhandler_read_property_ack(
                     //(itr->property_id == data.object_property))
                     )
                 {
-                    if (service_data->sequence_number == service_data->proposed_window_number)
+                    if (service_data->sequence_number == ( service_data->proposed_window_number -1 ))
                     {
+                        uint8_t* app_data = new uint8_t[service_len];
+                        memcpy_s(app_data, service_len, service_request, service_len);
+                        /*for (int u = 0; u < service_len; u++)
+                        {
+                            app_data[u] = service_request[u];
+
+                        }*/
+                        itr->application_data.push_back(app_data);
+                        itr->application_data_len.push_back(service_len);
+                        //uint8_t* app_data = service_request;
+                        //itr->application_data.push_back(app_data);
+                        //itr->application_data_len.push_back(service_len);
+
                         BACNET_READ_PROPERTY_DATA tempData;
                         tempData.object_instance = itr->bacnet_instance;
                         tempData.object_property = (BACNET_PROPERTY_ID)itr->property_id;
                         tempData.object_type = itr->object_type;
-                      
-                        for (int u = 0; u < service_len; u++)
+                        int length = 0;
+                        for (int u = 0; u < itr->application_data_len.size(); u++)
                         {
-                            itr->application_data[itr->application_data_len + (u + 1)] = service_request[u];
+                            length += itr->application_data_len[u];
                         }
-                        itr->application_data_len = itr->application_data_len + service_len;
-                      
-                        tempData.application_data = &itr->application_data[0];
-                        tempData.application_data_len = itr->application_data_len;
-                       if(!Bacnet_debug_fileRead)
+                        tempData.application_data = new uint8_t[length];
+
+                        int inv_id = Send_Segment_Ack(tempData.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                       // strcat((char*)itr->application_data, (char*)service_request);
+                        int lengthCount = 0;
+                        for (int i = 0; i < itr->application_data.size(); i++)
                         {
+                            char arr[475];
+                            memcpy_s(arr, 475, itr->application_data[i], itr->application_data_len[i]);
+                            for (int u = 0; u < itr->application_data_len[i]; u++)
+                            {
+                                
+                                tempData.application_data[lengthCount] = itr->application_data[i][u];
+                                lengthCount++;
+                            }
+                           // lengthCount += itr->application_data_len[i];
+                        }
+                        
+                       // tempData.application_data = itr->application_data;
+                        tempData.application_data_len = length;
+                       
                             rp_ack_print_data(&tempData);
-                            
-                        }
+                            Sleep(100);
                         itr->last_seq_no = service_data->sequence_number;
 
-                        delete tempData.application_data;
-                        delete itr->application_data;
-                        itr->application_data = NULL;
+                        //delete tempData.application_data;
+                        //delete itr->application_data;
+                        itr->application_data.clear();
+                        itr->application_data_len.clear();
                         tempData.application_data = NULL;
 
-                        segmented_bacnet_data.erase(itr);
+                       // segmented_bacnet_data.erase(itr);
                         segmented_bacnet_data.clear();
                         Sleep(100);
                         tsm_free_invoke_id(service_data->invoke_id);
@@ -5302,19 +5335,28 @@ void localhandler_read_property_ack(
                     { 
                         if (service_data->sequence_number > 0 && service_data->sequence_number > itr->last_seq_no  )
                         {
-                            for (int u = 0; u < service_len; u++)
+                            uint8_t* app_data = new uint8_t[service_len];
+
+                            memcpy_s(app_data, service_len, service_request, service_len);
+                            /*for (int u = 0; u < service_len; u++)
+                            {
+                                app_data[u] = service_request[u];
+
+                            }*/
+                            itr->application_data.push_back(app_data);
+                            itr->application_data_len.push_back(service_len);
+                           // strcat((char*)itr->application_data, (char*)service_request);
+                            //uint8_t* app_data = service_request;
+                            //itr->application_data.push_back(app_data);
+                            //itr->application_data_len.push_back(service_len);
+                            /*for (int u = 0; u < service_len; u++)
                             {
                                 itr->application_data[itr->application_data_len+(u+1)] = service_request[u];
-                            }
+                            } 
                             itr->application_data_len = itr->application_data_len + service_len;
-                          
+                            */
                             itr->last_seq_no = service_data->sequence_number;
-                        
-                        int i = 0;
-                        }
-                        else
-                        {
-                            //int inv_id = Send_Segment_Ack(itr->bacnet_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
+                       
                         }
                     }
                     find_exsit = true;
@@ -5329,13 +5371,20 @@ void localhandler_read_property_ack(
                 temp_standard_bacnet_data.bacnet_instance = data.object_instance;
                 temp_standard_bacnet_data.object_type = data.object_type;
                 temp_standard_bacnet_data.property_id = data.object_property;
-                temp_standard_bacnet_data.application_data = new uint8_t;
-                for (int u = 0; u < data.application_data_len; u++)
+                uint8_t* app_data = new uint8_t[data.application_data_len+1];
+                memcpy_s(app_data, data.application_data_len + 1, data.application_data, data.application_data_len + 1);
+                /*for (int u = 0; u < data.application_data_len; u++)
+                {
+                    app_data[u] = data.application_data[u];
+
+                }*/
+                temp_standard_bacnet_data.application_data.push_back(app_data);// = new uint8_t;
+                /*for (int u = 0; u < data.application_data_len; u++)
                 {
                     temp_standard_bacnet_data.application_data[u] = data.application_data[u];
-                }
+                }*/
                // temp_standard_bacnet_data.application_data = data.application_data;
-                temp_standard_bacnet_data.application_data_len = data.application_data_len;
+                temp_standard_bacnet_data.application_data_len.push_back(data.application_data_len + 1);
                 temp_standard_bacnet_data.last_seq_no = service_data->sequence_number;
                 segmented_bacnet_data.push_back(temp_standard_bacnet_data);
                 int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
@@ -5351,7 +5400,6 @@ void localhandler_read_property_ack(
         if (segmentedCompleted)
         {
         BACNET_APPLICATION_DATA_VALUE value;
-        if (!Bacnet_debug_fileRead)
          local_value_rp_ack_print_data(&data, value);
 
         if (data.object_property == PROP_WEEKLY_SCHEDULE)
@@ -5441,6 +5489,115 @@ void localhandler_read_property_ack(
     }
 }
 
+
+int Bacnet_Read_Properties_Multiple_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_READ_ACCESS_DATA& value, uint8_t retrytime, uint32_t index)
+{
+    int send_status = true;
+
+    str_bacnet_rp_info temp_standard_bacnet_data = { 0 };
+    temp_standard_bacnet_data.bacnet_instance = deviceid;
+    temp_standard_bacnet_data.object_item_number = object_instance;
+    temp_standard_bacnet_data.object_type = object_type;
+    temp_standard_bacnet_data.property_id = property_id;
+
+    vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+    vector<str_bacnet_rp_info>::iterator itrflag;
+    int find_exsit = false;
+    for (; itr != standard_bacnet_data.end(); itr++)
+    {
+        if ((itr->bacnet_instance == deviceid) &&
+            (itr->object_item_number == object_instance) &&
+            (itr->object_type == object_type) &&
+            (itr->property_id == property_id))
+        {
+            itrflag = itr;  //找到曾经读过
+            find_exsit = true;
+        }
+    }
+
+    if (!find_exsit)
+    {
+        standard_bacnet_data.push_back(temp_standard_bacnet_data);
+    }
+
+
+
+    for (int z = 0; z < retrytime; z++)
+    {
+        int temp_invoke_id = -1;
+        int	resend_count = 0;
+        send_status = true;
+        do
+        {
+            resend_count++;
+            if (resend_count > retrytime)
+            {
+                send_status = false;
+                break;
+            }
+            temp_invoke_id = Bacnet_Read_Property_Multiple(deviceid, object_type, object_instance, property_id);
+
+             if (temp_invoke_id < 0)
+                Sleep(500);
+            else
+            {
+                if (find_exsit)
+                {
+                    itrflag->invoke_id = temp_invoke_id;
+                }
+                else
+                {
+                    itrflag = standard_bacnet_data.end() - 1;
+                    itrflag->invoke_id = temp_invoke_id;
+                }
+                send_status = true;
+            }
+        } while (temp_invoke_id < 0);
+
+        if (send_status)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                Sleep(100);
+                if (tsm_invoke_id_free(temp_invoke_id))
+                {
+                    Sleep(10);
+
+                    vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+                    vector<str_bacnet_rp_info>::iterator itrflag;
+                    int find_exsit = false;
+                    for (; itr != standard_bacnet_data.end(); itr++)
+                    {
+                        if ((itr->invoke_id == temp_invoke_id) &&
+                            (itr->object_item_number == object_instance) &&
+                            (itr->object_type == object_type) &&
+                            (itr->property_id == property_id))
+                        {
+                            itrflag = itr;  //找到曾经读过
+                            value = itrflag->rpm_data;
+                           // memcpy_s(value, sizeof(BACNET_READ_ACCESS_DATA), itrflag->rpm_data, sizeof(BACNET_READ_ACCESS_DATA));
+                            find_exsit = true;
+                            break;
+                        }
+                    }
+                    if (!find_exsit)
+                    {
+                        continue;  //没有找到对应的点，没有赋值 value成功;
+                    }
+                    standard_bacnet_data.erase(itrflag);
+                    return 1;
+                }
+                else
+                    continue;
+            }
+        }
+    }
+
+    return -1;
+
+
+}
+
 /** Handler for a ReadPropertyMultiple ACK.
 * @ingroup DSRPM
 * For each read property, print out the ACK'd data for debugging,
@@ -5459,7 +5616,7 @@ void local_handler_read_property_multiple_ack(
     BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
 {
     int len = 0;
-    BACNET_READ_ACCESS_DATA *rpm_data;
+    BACNET_READ_ACCESS_DATA rpm_data;
     BACNET_READ_ACCESS_DATA *old_rpm_data;
     BACNET_PROPERTY_REFERENCE *rpm_property;
     BACNET_PROPERTY_REFERENCE *old_rpm_property;
@@ -5469,18 +5626,19 @@ void local_handler_read_property_multiple_ack(
     (void)src;
     (void)service_data;        /* we could use these... */
 
-    rpm_data = (BACNET_READ_ACCESS_DATA *)calloc(1, sizeof(BACNET_READ_ACCESS_DATA));
-    if (rpm_data) {
+   // rpm_data = (BACNET_READ_ACCESS_DATA *)calloc(1, sizeof(BACNET_READ_ACCESS_DATA));
+    //if (rpm_data) 
+    {
         len =
             rpm_ack_decode_service_request(service_request, service_len,
-                rpm_data);
+                &rpm_data);
     }
 #if 1
     fprintf(stderr, "Received Read-Property-Multiple Ack!\n");
 #endif
     if (len > 0) 
     {
-        while (rpm_data) 
+       /* while (rpm_data) 
         {
             rpm_ack_print_data(rpm_data);
 #if 0
@@ -5504,7 +5662,7 @@ void local_handler_read_property_multiple_ack(
 #endif
             free(rpm_data);
             rpm_data = NULL;
-        }
+        }*/
 
 
     }
@@ -5512,7 +5670,26 @@ void local_handler_read_property_multiple_ack(
 #if 1
         fprintf(stderr, "RPM Ack Malformed! Freeing memory...\n");
 #endif
-        while (rpm_data) {
+        vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
+        vector<str_bacnet_rp_info>::iterator itrflag;
+
+
+
+        int find_exsit = false;
+        for (; itr != standard_bacnet_data.end(); itr++)
+        {
+            if ((itr->invoke_id == service_data->invoke_id) &&
+                (itr->object_item_number == rpm_data.object_instance) &&
+                (itr->object_type == rpm_data.object_type) /*&&
+                (itr->property_id == rpm_data->object_property)*/)
+            {
+                itrflag = itr;  //找到曾经读过
+                itrflag->rpm_data = rpm_data;
+                find_exsit = true;
+            }
+        }
+    Sleep(1);
+       /* while (rpm_data) {
             rpm_property = rpm_data->listOfProperties;
             while (rpm_property) {
                 value = rpm_property->value;
@@ -5528,7 +5705,7 @@ void local_handler_read_property_multiple_ack(
             old_rpm_data = rpm_data;
             rpm_data = rpm_data->next;
             free(old_rpm_data);
-        }
+        }*/
     }
 }
 
@@ -6422,7 +6599,36 @@ void LocalBacnetAbortHandler(BACNET_ADDRESS* src, uint8_t invoke_id, uint8_t abo
 {
 
     int i = 0;
+    BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
 
+}
+void LocalBacnetErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERROR_CLASS error_class, BACNET_ERROR_CODE error_code)
+{
+
+    int i = 0;
+    CString info;
+    info.Format(_T("ERROR While Writing Property Error Code:%d"), error_code);
+    AfxMessageBox(info);
+   // AfxMessageBox("ERROR While Writing Property : \n Error Class" + (BACNET_ERROR_CLASS)error_class + " \n Error Code:" +(BACNET_ERROR_CODE)error_code);
+   // BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
+
+}
+void Localhandler_write_property_ack(
+    uint8_t* service_request,
+    uint16_t service_len,
+    BACNET_ADDRESS* src,
+    BACNET_CONFIRMED_SERVICE_ACK_DATA* service_data)
+{
+    int len = 0;
+    BACNET_READ_PROPERTY_DATA data;
+
+    (void)src;
+    (void)service_data;        /* we could use these... */
+    len = rp_ack_decode_service_request(service_request, service_len, &data);
+    //char my_pro_name[100];
+    //char * temp = get_prop_name();
+    //strcpy_s(my_pro_name,100,temp);
+    Sleep(1);
 }
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src)
 {
@@ -6801,6 +7007,9 @@ void Init_Service_Handlers(	void)
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROP_MULTIPLE, local_handler_read_property_multiple_ack);
     
     apdu_set_abort_handler(LocalBacnetAbortHandler);
+    apdu_set_error_handler(SERVICE_CONFIRMED_WRITE_PROPERTY,LocalBacnetErrorHandler);
+
+    apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_WRITE_PROPERTY, Localhandler_write_property_ack);
     /* set the handler for all the services we don't implement */
     /* It is required to send the proper reject message... */
     apdu_set_unrecognized_service_handler_handler
