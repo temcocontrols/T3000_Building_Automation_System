@@ -17,7 +17,7 @@
 #include "FlashSN.h"
 #include "ISPSetting.h"
 #include <bitset>
-
+#include "../T3000/Class/md5.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -30,6 +30,7 @@ unsigned int ready_towrite_sn = 0;
 int burning_test_finished = 1;
 HANDLE h_BurningTest_thread = NULL;
 #endif
+unsigned char firmware_md5[32] = { 0 };
 int g_write_mac = 0;
 int g_write_wifi_mac = 0;
 HANDLE h_sn_mac_thread = NULL;
@@ -1054,6 +1055,24 @@ void CISPDlg::OnBnClickedButtonFlash()
     {
         SPECIAL_BAC_TO_MODBUS = 0;
     }
+
+    GetDlgItem(IDC_EDIT_FILEPATH)->GetWindowText(m_strHexFileName);
+    string temp_md5 = MD5(ifstream(m_strHexFileName)).toString();
+
+    //char md5_temp[32];
+    //firmware_md5
+    memcpy(firmware_md5, MD5(ifstream(m_strHexFileName)).digest(), 16);
+    //for (int i = 0; i < 32; i++)
+    //{
+    //    firmware_md5[i] = ((unsigned short)md5_temp[i]  & 0x00ff);
+    //}
+    // =  MD5(ifstream(m_strHexFileName)).digest();
+    CString MD5_value;
+    MD5_value = temp_md5.c_str();
+    CString temp_show;
+    temp_show.Format(_T("Firmware MD5:"));
+    temp_show = temp_show + MD5_value;
+    UpdateStatusInfo(temp_show, FALSE);
 
     switch(Judge_Flash_Type())
     {

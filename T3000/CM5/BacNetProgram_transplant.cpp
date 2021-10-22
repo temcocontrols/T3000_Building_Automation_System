@@ -28,7 +28,7 @@ extern DWORD prg_function_color;
 
 extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 extern int program_list_line ;
-
+int then_else = 0;
 char *index_stack;
 char stack[300];
 
@@ -953,7 +953,7 @@ int int_value,cur_scope,cur_index,len_cod_linie;
 int ncod;
 int error;
 //int panel,panel_sub;
-int n_var,n_var1,n_var2,for_count,then_else,ind_cod_line,next_then_else,next_else_else;
+int n_var,n_var1,n_var2,for_count,ind_cod_line,next_then_else,next_else_else;
 char eoi=0;
 char eol;
 char argcall[40];
@@ -1253,6 +1253,7 @@ int Encode_Program ( /*GEdit *ppedit*/)
 //	t=0;
 //	n_local=n_global=0;
 	error = -1;
+	then_else = 0;
 	ncod/*=error*/=n_var=n_var1=for_count=then_else=ind_cod_line=next_then_else=0;//Fance marked error
 	next_else_else=ret_value=index_vars_table=lline=index_buf=index_op=type_eval=0;
 	index_wait=index_go_to=index_dalarm=ind_renum=0;
@@ -2864,7 +2865,8 @@ void sntx_err(int err, int err_true )
 	 "Input number is too large",
 	 "Variable number is too large",
 	 "Program code larger than 2000",
-     "Use instance only support AV AI AO DO"      // 29 
+     "Use instance only support AV AI AO DO",      // 29 
+	 "Object identifier instance cannot be greater than 2048" //30
 	} ;
 	if(!pmes) return;
 	if(pmes < mesbuf + ( 1024 - 100 ) )
@@ -3685,6 +3687,11 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 #if 1
 						itoa(*num_panel,&buf[strlen(buf)],10);
 						*num_point=atoi(p);
+						if ((*num_point > 2048) && (b_is_instance))
+						{
+							sntx_err(TOO_LARGE_IDENTIFIER_INSTANCE);
+							error = 1; return 0;
+						}
 						unsigned char high_3bit =  0;
 						if(*num_point % 0x100 == 0)
 						{
@@ -6249,14 +6256,20 @@ unsigned char cod;//,xtemp[15];
  memcpy(remote_local_list,code+2,ind_remote_local_list*sizeof(/*struct*/ remote_local_list));
 #endif
  code = pcode;
- int then_else = 0;
+  then_else = 0;
+  int temp_x = 0;
  while(((unsigned char)*code)!=0xFE)
  {
+	 if (code - pcode > code_length + 20)
+		 break;
+	 temp_x++;
+	 TRACE(_T("temp_x = %d\r\n"), temp_x);
 	 if(!then_else)
 	 {
 		 if ((unsigned char)*code!=0x01)
 		 {
 			//printf("ERROR!!!!Desassambler!!!!!!!!!!!!!\n");
+			 error = 1;
 			return NULL;
 		 }
 		memcpy(&lline,++code,2);
