@@ -5267,7 +5267,8 @@ void localhandler_read_property_ack(
                     //(itr->property_id == data.object_property))
                     )
                 {
-                    if (service_data->sequence_number == ( service_data->proposed_window_number -1 ))
+                    
+                    if (( service_data->sequence_number % service_data->proposed_window_number == 0) || !service_data->more_follows)
                     {
                         uint8_t* app_data = new uint8_t[service_len];
                         memcpy_s(app_data, service_len, service_request, service_len);
