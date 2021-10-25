@@ -6592,10 +6592,19 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
     if(textbuf) strcpy(textbuf, buf);
     return( buf ) ;
 }
+void LocalBacnetRejectHandler(BACNET_ADDRESS* src,uint8_t invoke_id,uint8_t reject_reason)
+{
+
+    int i = 0;
+    if(reject_reason== REJECT_REASON_UNRECOGNIZED_SERVICE && bacnetIpDataRead == false)
+         BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
+
+}
 void LocalBacnetAbortHandler(BACNET_ADDRESS* src, uint8_t invoke_id, uint8_t abort_reason, bool server)
 {
 
     int i = 0;
+   // if(abort_reason== BACNET_ABORT_REASON::MAX_BACNET_ABORT_REASON)
     BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
 
 }
@@ -7002,7 +7011,7 @@ void Init_Service_Handlers(	void)
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY, localhandler_read_property_ack);
     
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROP_MULTIPLE, local_handler_read_property_multiple_ack);
-    
+    apdu_set_reject_handler(LocalBacnetRejectHandler);
     apdu_set_abort_handler(LocalBacnetAbortHandler);
     apdu_set_error_handler(SERVICE_CONFIRMED_WRITE_PROPERTY,LocalBacnetErrorHandler);
 

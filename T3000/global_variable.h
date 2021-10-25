@@ -2272,6 +2272,7 @@ bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
 vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
 vector <str_segmented_bacnet_rp_info> segmented_bacnet_data;
+bool bacnetIpDataRead = false;
 unsigned char m_dialog_signal_type;
 connect_Info system_connect_info;
 panelname_map g_panelname_map; 
