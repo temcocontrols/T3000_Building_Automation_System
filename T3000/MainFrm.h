@@ -318,6 +318,7 @@ public:
 	static DWORD WINAPI  Read_Bacnet_Thread(LPVOID lpVoid);
 	static DWORD WINAPI  Read_Modbus_10000(LPVOID lpVoid);
 	static DWORD WINAPI  Write_Modbus_10000(LPVOID lpVoid);
+	static DWORD WINAPI  DetectYabbeThread(LPVOID lpVoid);
     static DWORD WINAPI  Write_Modbus_tstat_cfg(LPVOID lpVoid);
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();

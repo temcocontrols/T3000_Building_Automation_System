@@ -19,6 +19,9 @@
     <Filter Include="Source Files\BADO">
       <UniqueIdentifier>{29f34de1-2c45-4ee4-9b0e-5dd189f54956}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\MD5">
+      <UniqueIdentifier>{8306e8bd-272f-49ea-9b0b-1e44b50c8b35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BinFileParser.cpp">
@@ -83,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="BacnetMstp.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\T3000\Class\md5.cpp">
+      <Filter>Source Files\MD5</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
