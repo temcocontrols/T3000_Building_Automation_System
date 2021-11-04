@@ -490,8 +490,8 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
                     }
 					else if (bacnet_device_type == T3_FAN_MODULE)
 					{
-						digital_special_output_count = FAN_MOUDLE_OUT_D;
-						analog_special_output_count = FAN_MOUDLE_OUT_A;
+						/*digital_special_output_count = FAN_MOUDLE_OUT_D;
+						analog_special_output_count = FAN_MOUDLE_OUT_A;*/
 					}
 					if(point_number < (digital_special_output_count +analog_special_output_count) )
 					{

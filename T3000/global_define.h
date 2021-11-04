@@ -1,7 +1,7 @@
 #pragma once
 #include "RelayLabel.h"
 #ifdef DEBUG
- #define ENABLE_HTTP_FUCTION  //定义是否使用http api
+#define ENABLE_HTTP_FUCTION  //定义是否使用http api
 #endif // DEBUG
 
 
@@ -513,10 +513,10 @@ const int HANDLE_I_AM_BIP = 1;
 
 struct _Bac_Scan_Com_Info
 {
-    int nprotocol;  // 0 MSTP     1 BIP
-    unsigned char ipaddress[6];   //前四位位IP地址  后两位位端口号
-    int device_id;
-    int macaddress;
+	int nprotocol;  // 0 MSTP     1 BIP
+	unsigned char ipaddress[6];   //前四位位IP地址  后两位位端口号
+	int device_id;
+	int macaddress;
 };
 struct _Bac_Scan_results_Info
 {
@@ -571,16 +571,16 @@ struct _Com_Scan_Read_Info
 
 typedef struct
 {
-    uint8_t nstatus; // 1 online   0  offline
-    uint8_t modbusid;
+	uint8_t nstatus; // 1 online   0  offline
+	uint8_t modbusid;
 }sub_net_status;
 
 struct refresh_subnet_device
 {
-    UCHAR device_count;
-    UINT parent_sn;
-    char reserved_data[15]; // 预留
-    sub_net_status device_status[255];
+	UCHAR device_count;
+	UINT parent_sn;
+	char reserved_data[15]; // 预留
+	sub_net_status device_status[255];
 };
 
 struct refresh_net_device
@@ -598,11 +598,11 @@ struct refresh_net_device
 	CString NetCard_Address;
 	CString show_label_name;
 	unsigned short bacnetip_port;
-    int hardware_info;     //bit  0x74 zigbee   bit1 wifi
-    int nprotocol;
-    UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
-    UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
-    UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
+	int hardware_info;     //bit  0x74 zigbee   bit1 wifi
+	int nprotocol;
+	UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
+	UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
+	UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
 };
 
 struct refresh_net_label_info
@@ -716,30 +716,30 @@ const CString ExtIO_Product[] =
 {
 	_T("T3_8AI8AO6DO"),
 	_T("T3_22I"),
-    _T("T3_PT12"),
-    _T("PWM_IO_Transducer")
+	_T("T3_PT12"),
+	_T("PWM_IO_Transducer")
 };
 const int ExtIO_ProductId[] =
 {
 	44,
 	43,
-    46,
-    104
+	46,
+	104
 };
 
 const int ExtIO_INPUT_COUNT[] =
 {
 	8,
 	22,
-    12,
-    6
+	12,
+	6
 };
 const int ExtIO_OUTPUT_COUNT[] =
 {
 	14,
 	0,
-    0,
-    6
+	0,
+	6
 };
 
 const CString ExtIO_Port[] =
@@ -820,8 +820,8 @@ const CString Output_Analog_Units_Show[] =
 	_T("%"),
 	_T("%Cls"),
 	_T("ma"),
-    _T("Volts"),
-    _T("%"),
+	_T("Volts"),
+	_T("%"),
 };
 
 const CString OutPut_List_Analog_Range[] =
@@ -834,7 +834,7 @@ const CString OutPut_List_Analog_Range[] =
 	_T("0.0 -> 100"),
 	_T("4   -> 20"),
 	_T("0.0 -> 100"),
-    _T("2   -> 10"),
+	_T("2   -> 10"),
 };
 
 const CString OutPut_List_Analog_Units[] =
@@ -847,7 +847,7 @@ const CString OutPut_List_Analog_Units[] =
 	_T("%Cls"),
 	_T("ma"),
 	_T("%PWM"),
-    _T("%")
+	_T("%")
 };
 
 const CString Input_List_Analog_Units[] =
@@ -884,28 +884,28 @@ const CString Input_List_Analog_Units[] =
 	_T("HZ"),
 	_T("%"),
 	_T("PPM"),
-    _T("RPM"),
-    _T("PPB"),
-    _T("ug/m3"),
-    _T("#/cm3"),
-    _T("dB"),
-    _T("Lux"),
-    _T(""),
-    _T(""),
-    _T(""),
-    _T(""),
-    _T("")
+	_T("RPM"),
+	_T("PPB"),
+	_T("ug/m3"),
+	_T("#/cm3"),
+	_T("dB"),
+	_T("Lux"),
+	_T(""),
+	_T(""),
+	_T(""),
+	_T(""),
+	_T("")
 };
 
 const CString Input_Analog_Units_Array[] =
 {
 	_T("Unused"),
-    _T("Y3K -40 to 150"),
-    _T("Y3K -40 to 300"),
+	_T("Y3K -40 to 150"),
+	_T("Y3K -40 to 300"),
 	_T("10K Type2"),
 	_T("10K Type2"),
-    _T("G3K -40 to 120"),
-    _T("G3K -40 to 250"),
+	_T("G3K -40 to 120"),
+	_T("G3K -40 to 250"),
 	_T("10K Type3"),
 	_T("10K Type3"),
 	_T("PT 1K -200 to 300"),
@@ -928,17 +928,17 @@ const CString Input_Analog_Units_Array[] =
 	_T("Frequency"),
 	_T("Humidty %"),
 	_T("CO2  PPM"),
-    _T("Revolutions Per Minute"),
-    _T("TVOC PPB"),
-    _T("ug/m3"),
-    _T("#/cm3"),
-    _T("dB"),
-    _T("Lux"),
-    _T(""),
-    _T(""),
-    _T(""),
-    _T(""),
-    _T("")
+	_T("Revolutions Per Minute"),
+	_T("TVOC PPB"),
+	_T("ug/m3"),
+	_T("#/cm3"),
+	_T("dB"),
+	_T("Lux"),
+	_T(""),
+	_T(""),
+	_T(""),
+	_T(""),
+	_T("")
 };
 
 const CString Output_Analog_Units_Array[] =
@@ -951,7 +951,7 @@ const CString Output_Analog_Units_Array[] =
 	_T("0.0 -> 100  %Cls"),
 	_T("4   -> 20   ma"),
 	_T("0.0 -> 100  PWM"),
-    _T("2   -> 10   Volts"),
+	_T("2   -> 10   Volts"),
 };
 
 const CString Time_Server_Name[] =
@@ -973,7 +973,7 @@ const signed short Time_Zone_Value[] =
 	-600,
 	-500,
 	-400,
-    -350,
+	-350,
 	-300,
 	-200,
 	-100,
@@ -981,17 +981,17 @@ const signed short Time_Zone_Value[] =
 	100,
 	200,
 	300,
-    350,
+	350,
 	400,
-    450,
+	450,
 	500,
-    550,
+	550,
 	600,
-    650,
+	650,
 	700,
 	800,
 	900,
-    950,
+	950,
 	1000,
 	1100,
 	1200,
@@ -1000,9 +1000,9 @@ const signed short Time_Zone_Value[] =
 
 const CString Com_Parity_bit[] =
 {
-    _T("None"),
-    _T("Odd"),
-    _T("Even")
+	_T("None"),
+	_T("Odd"),
+	_T("Even")
 };
 
 const CString BM_Protocol[] =
@@ -1015,17 +1015,17 @@ const CString BM_Protocol[] =
 
 const CString DisplayType[] =
 {
-    _T("Output"),
-    _T("Input"),
-    _T("Variable")
+	_T("Output"),
+	_T("Input"),
+	_T("Variable")
 };
 
 const CString Com_Stop_bit[] =
 {
-    _T("1"),
-    _T("0.5"),
-    _T("2"),
-    _T("1.5")
+	_T("1"),
+	_T("0.5"),
+	_T("2"),
+	_T("1.5")
 };
 
 const CString AirFlowMode[] =
@@ -1076,7 +1076,7 @@ const CString Time_Zone_Name[] =
 	_T("(UTC - 06:00) , Central Standard Time , Galapagos Time"),
 	_T("(UTC - 05:00) , Eastern Standard Time"),
 	_T("(UTC - 04:00) , Atlantic Standard Time , Bolivia Time"),
-    _T("(UTC - 03:30) , Newfoundland"),
+	_T("(UTC - 03:30) , Newfoundland"),
 	_T("(UTC - 03:00) , Atlantic Daylight Time , Amazon Summer Time"),
 	_T("(UTC - 02:00) , Fernando de Noronha Time , Oscar Time Zone"),
 	_T("(UTC - 01:00) , Azores Time , Cape Verde Time"),
@@ -1084,17 +1084,17 @@ const CString Time_Zone_Name[] =
 	_T("(UTC + 01:00) , Alpha Time Zone"),
 	_T("(UTC + 02:00) , Central Africa Time , Central European Summer Time"),
 	_T("(UTC + 03:00) , Charlie Time Zone , Eastern Africa Time"),
-    _T("(UTC + 03:30) , Tehran"),
+	_T("(UTC + 03:30) , Tehran"),
 	_T("(UTC + 04:00) , Armenia Time , Azerbaijan Time"),
-    _T("(UTC + 04:30) , Kabul"),
+	_T("(UTC + 04:30) , Kabul"),
 	_T("(UTC + 05:00) , Armenia Summer Time , Aqtobe Time"),
-    _T("(UTC + 05:30) , Sri Jayawardenepura"),
+	_T("(UTC + 05:30) , Sri Jayawardenepura"),
 	_T("(UTC + 06:00) , Bangladesh Standard Time , Bhutan Time"),
-    _T("(UTC + 06:30) , Yangon"),
+	_T("(UTC + 06:30) , Yangon"),
 	_T("(UTC + 07:00) , Christmas Island Time , Davis Time"),
 	_T("(UTC + 08:00) , China Standard Time , Hotel Time Zone"),
 	_T("(UTC + 09:00) , Australian Western Daylight Time"),
-    _T("(UTC + 09:30) , Darwin"),
+	_T("(UTC + 09:30) , Darwin"),
 	_T("(UTC + 10:00) , Chamorro Standard Time , Kilo Time Zone"),
 	_T("(UTC + 11:00) , Lima ,Vanuatu , Lima "),
 	_T("(UTC + 12:00) , Anadyr Time , Fiji Time , Gilbert Island Time"),
@@ -1106,15 +1106,15 @@ const CString DDNS_Server_Name[] =
 	_T("www.3322.org"),
 	_T("www.dyndns.com"),
 	_T("www.no-ip.com"),
-    _T("dynu.com"),
-    _T("bravocontrols.com")
+	_T("dynu.com"),
+	_T("bravocontrols.com")
 };
 
 const CString Sys_Tstat_Mode_Name[] =
 {
-    _T("Auto Mode"),
-    _T("Cool Mode"),
-    _T("Heat Mode")
+	_T("Auto Mode"),
+	_T("Cool Mode"),
+	_T("Heat Mode")
 };
 
 const CString Device_Serial_Port_Status[] =
@@ -1174,16 +1174,16 @@ const CString Variable_Analog_Units_Array[] =
 struct _Graphic_Value_Info
 {
 	uint32_t deviceid;
-    uint8_t command;
+	uint8_t command;
 	int8_t value_type;
 	int8_t value_item;
 	unsigned short entitysize;
 	CRelayLabel* control_pt;
 	HWND hWnd;
-    //int8_t standard_command;  //0  非标      1 标准;
-    //int object_type;
-    //uint32_t object_instance;
-    //int property_id;
+	//int8_t standard_command;  //0  非标      1 标准;
+	//int object_type;
+	//uint32_t object_instance;
+	//int property_id;
 };
 
 
@@ -1220,10 +1220,10 @@ typedef enum
 	MINIPANELARM = 5,
 	MINIPANELARM_LB = 6,
 	MINIPANELARM_TB = 7,
-    MINIPANELARM_NB = 8,
-    T3_TSTAT10    = 9,
-    T3_OEM        = 11,
-    T3_TB_11I = 12,
+	MINIPANELARM_NB = 8,
+	T3_TSTAT10 = 9,
+	T3_OEM = 11,
+	T3_TB_11I = 12,
 	T3_FAN_MODULE = 13,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
@@ -1279,12 +1279,6 @@ const int T322AI_OUT_A = 0;
 
 const int PWM_TRANSDUCER_OUT_D = 0;
 const int PWM_TRANSDUCER_OUT_A = 6;
-
-const int FAN_MODULE_IN_A = 12; // ESP32 版本 子设备  Fan module 输入;
-const int FAN_MODULE_IN_D = 0;
-const int FAN_MOUDLE_OUT_A = 1; 
-const int FAN_MOUDLE_OUT_D = 0;
-
 enum
 {
 	UART_1200 = 0,
@@ -1321,7 +1315,7 @@ const CString Baudrate_Array[] =
 	_T("76800"),
 	_T("115200"),	//9
 	_T("921600"),
-    _T("57600")  //11
+	_T("57600")  //11
 };
 
 typedef struct
@@ -1347,7 +1341,7 @@ enum
 	SCAN_STATUS_FINISHED,
 	SCAN_STATUS_FAILED,
 	SCAN_STATUS_SKIP,
-    SCAN_STATUS_DETECTING
+	SCAN_STATUS_DETECTING
 };
 
 typedef struct
@@ -1379,17 +1373,17 @@ typedef struct
 	uint8_t nMouse_Status;
 	char ico_name[20];
 	char ico_name_2[20];
-    uint8_t network_point;
+	uint8_t network_point;
 	uint8_t ntext_place;
 	uint8_t n_iconsize;
-    int x_length; // 用来确定标签是否点击，以及点击的宽度.
+	int x_length; // 用来确定标签是否点击，以及点击的宽度.
 }Bacnet_Label_Info;
 
 
 typedef struct
 {
-    unsigned int ndeviceid;
-    unsigned char npanelnum;
+	unsigned int ndeviceid;
+	unsigned char npanelnum;
 
 }Bacnet_RemotePoint_Info;
 
@@ -1521,7 +1515,7 @@ const CString Building_Protocol[] =
 	_T("Modbus 485"),
 	_T("Modbus TCP"),
 	_T("Bacnet MSTP"),
-	_T("Remote Device"),
+	_T("Remote System"),
 	_T("Auto")
 };
 
@@ -1568,8 +1562,8 @@ const CString JumperStatus[] =
 	_T("4-20 ma"),//_T("4-20 ma / 0-24 V"),
 	_T("0-5 V"),
 	_T("0-10 V"),
-    _T("Thermistor Dry Contact"),
-    _T("PT 1K")
+	_T("Thermistor Dry Contact"),
+	_T("PT 1K")
 };
 
 
@@ -1774,12 +1768,12 @@ const CString Decom_Array[3] =
 	_T("Shorted")
 };
 
-const CString Scan_Ret_Info[4] = 
+const CString Scan_Ret_Info[4] =
 {
-    _T("Scaning results are being merged."),
-    _T("Confirm scanning results."),
-    _T("Resolving Modbus ID and IP conflicts."),
-    _T("Scan finished,saving data into database.Please wait!"),
+	_T("Scaning results are being merged."),
+	_T("Confirm scanning results."),
+	_T("Resolving Modbus ID and IP conflicts."),
+	_T("Scan finished,saving data into database.Please wait!"),
 };
 
 #pragma endregion INPUT_DEFINE
@@ -2180,19 +2174,19 @@ typedef union
 		UCHAR isp_mode;  //非0 在isp mode   , 0 在应用代码;    第60个字节
 		USHORT bacnetip_port;	//bacnet 的端口号;
 		UCHAR  hardware_info;	//  //bit0 zigbee   bit1 wifi
-        UCHAR  subnet_protocol;   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
+		UCHAR  subnet_protocol;   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
 
-        UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
-        UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
-        UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
+		UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
+		UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
+		UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
 	}reg;
 }Str_UPD_SCAN;
 
 typedef struct bac_mstp_com
 {
-    bool status;
-    int  ncomport;
-    int  nbaudrate;
+	bool status;
+	int  ncomport;
+	int  nbaudrate;
 }Str_bac_mstp_com;
 
 const int REFRESH_LIST_NOW = 2000;
@@ -2214,25 +2208,25 @@ typedef map<int, int> panelname_map;
 typedef map<int, CString> bacnet_instance_reg_map;
 const CString RegisterView_Format[] =
 {
-    _T("Data_Format"),
-    _T("8 Bit Unsigned Integer"),
-    _T("8 Bit Signed Integer"),
-    _T("16 Bit Unsigned Integer"),
-    _T("16 Bit Signed Integer"),
-    _T("32 Bit Unsigned Integer HI_LO"),
-    _T("32 Bit Unsigned Integer LO_HI"),
-    _T("32 Bit Signed Integer HI_LO"),
-    _T("32 Bit Signed Integer LO_HI"),
-    _T("Floating HI_LO/10"),
-    _T("Floating LO_HI/10"),
-    _T("Floating HI_LO/100"),
-    _T("Floating LO_HI/100"),
-    _T("Floating HI_LO/1000"),
-    _T("Floating LO_HI/1000"),
-    _T("Character String HI_LO"),
-    _T("Character String LO_HI"),
-    _T("16 Bit Signed Integer/10") ,  //17
-    _T("16 Bit Unsigned Integer/10")  // 18
+	_T("Data_Format"),
+	_T("8 Bit Unsigned Integer"),
+	_T("8 Bit Signed Integer"),
+	_T("16 Bit Unsigned Integer"),
+	_T("16 Bit Signed Integer"),
+	_T("32 Bit Unsigned Integer HI_LO"),
+	_T("32 Bit Unsigned Integer LO_HI"),
+	_T("32 Bit Signed Integer HI_LO"),
+	_T("32 Bit Signed Integer LO_HI"),
+	_T("Floating HI_LO/10"),
+	_T("Floating LO_HI/10"),
+	_T("Floating HI_LO/100"),
+	_T("Floating LO_HI/100"),
+	_T("Floating HI_LO/1000"),
+	_T("Floating LO_HI/1000"),
+	_T("Character String HI_LO"),
+	_T("Character String LO_HI"),
+	_T("16 Bit Signed Integer/10") ,  //17
+	_T("16 Bit Unsigned Integer/10")  // 18
 };
 const int REGISTER_UNKNOWN = 0;
 const int REGISTER_8_BIT_UNSIGNED_INTEGER = 1;
@@ -2256,23 +2250,23 @@ const int REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_10 = 18;
 
 const CString Wifi_Module_Status[] =
 {
-    _T("Wifi Abnormal"),
-    _T("No Wifi Module"),       //1
-    _T("Wifi Normal"),
-    _T("Wifi Connected"),
-    _T("Wifi Disconnected"),
-    _T("Wifi No Connect"),
-    _T("Wifi SSID Password Error")
+	_T("Wifi Abnormal"),
+	_T("No Wifi Module"),       //1
+	_T("Wifi Normal"),
+	_T("Wifi Connected"),
+	_T("Wifi Disconnected"),
+	_T("Wifi No Connect"),
+	_T("Wifi SSID Password Error")
 };
 
 typedef enum
 {
-    WIFI_NONE,
-    WIFI_NO_WIFI,
-    WIFI_NORMAL,
-    WIFI_CONNECTED,
-    WIFI_DISCONNECTED,
-    WIFI_NO_CONNECT
+	WIFI_NONE,
+	WIFI_NO_WIFI,
+	WIFI_NORMAL,
+	WIFI_CONNECTED,
+	WIFI_DISCONNECTED,
+	WIFI_NO_CONNECT
 };
 
 
@@ -2321,23 +2315,23 @@ const int TPYE_BACAPP_OBJECT_ID = 12;
 
 struct str_register_db_data
 {
-    int auto_id;
-    int m_register_address;
-    char cs_operation[MAX_PATH];
-    int m_register_length;
-    char cs_register_name[MAX_PATH];
-    char cs_data_format[MAX_PATH];
-    char cs_description[5 * MAX_PATH];
-    int m_data_format;
+	int auto_id;
+	int m_register_address;
+	char cs_operation[MAX_PATH];
+	int m_register_length;
+	char cs_register_name[MAX_PATH];
+	char cs_data_format[MAX_PATH];
+	char cs_description[5 * MAX_PATH];
+	int m_data_format;
 };
 
 #pragma region connect_region
 //用于标识目前整个系统的协议状态；
-typedef struct 
+typedef struct
 {
-    unsigned char mstp_status;  // 0 stop    1 running
-    unsigned char ncomport;
-    int nbaudrate;
+	unsigned char mstp_status;  // 0 stop    1 running
+	unsigned char ncomport;
+	int nbaudrate;
 }connect_Info;
 #pragma endregion
 
@@ -2350,9 +2344,9 @@ typedef struct
 
 typedef enum
 {
-    F_EXPANSION_IO, //Minipanel 的扩展IO界面
-    F_SETTING_USER_LOGIN,
-    FUNCTION_C
+	F_EXPANSION_IO, //Minipanel 的扩展IO界面
+	F_SETTING_USER_LOGIN,
+	FUNCTION_C
 }FunctionNumber;
 
 #define HOME_MODE 1
@@ -2372,105 +2366,105 @@ const int BTNTOPOLOGICAL = 9;
 const int SCAN_PRODUCT = 10;
 
 enum OUTPUT_TYPE {
-    OUTPUT_VIRTUAL_PORT = 0x00,
-    OUTPUT_DIGITAL_PORT = 0x01,
-    OUTPUT_ANALOG_PORT = 0x02,
-    OUTPUT_DIGITAL_PORT_EXT = 0x03,
-    OUTPUT_ANALOG_PORT_EXT = 0x04
+	OUTPUT_VIRTUAL_PORT = 0x00,
+	OUTPUT_DIGITAL_PORT = 0x01,
+	OUTPUT_ANALOG_PORT = 0x02,
+	OUTPUT_DIGITAL_PORT_EXT = 0x03,
+	OUTPUT_ANALOG_PORT_EXT = 0x04
 };
 
 enum INPUT_TYPE {
-    INPUT_VIRTUAL_PORT = 0x00,
-    INPUT_DIGITAL_PORT = 0x01,
-    INPUT_ANALOG_PORT = 0x02,
-    INPUT_DIGITAL_PORT_EXT = 0x03,
-    INPUT_ANALOG_PORT_EXT = 0x04,
-    INPUT_INTERNAL = 0x05
+	INPUT_VIRTUAL_PORT = 0x00,
+	INPUT_DIGITAL_PORT = 0x01,
+	INPUT_ANALOG_PORT = 0x02,
+	INPUT_DIGITAL_PORT_EXT = 0x03,
+	INPUT_ANALOG_PORT_EXT = 0x04,
+	INPUT_INTERNAL = 0x05
 };
 
 const CString AQI_Info_Status[] =
 {
-    _T("Good"),
-    _T("Medium"),
-    _T("Unhealthy for sensitive groups"),
-    _T("Unhealthy"),
-    _T("Very Unhealthy"),
-    _T("Poisonous")
+	_T("Good"),
+	_T("Medium"),
+	_T("Unhealthy for sensitive groups"),
+	_T("Unhealthy"),
+	_T("Very Unhealthy"),
+	_T("Poisonous")
 };
 
-const CString Output_Priority_Arry[] = 
+const CString Output_Priority_Arry[] =
 {
-    _T("Manual Life Safety"),
-    _T("Automatic Life Safety"),
-    _T("Unspecified Level 3"),
-    _T("Unspecified Level 4"),
-    _T("Critical Equipment Control"),
-    _T("Minimum On Off"),
-    _T("Unspecified Level 7"),
-    _T("Manual Operator"),
-    _T("Unspecified Level 9"),
-    _T("Unspecified Level 10"),
-    _T("Unspecified Level 11"),
-    _T("Unspecified Level 12"),
-    _T("Unspecified Level 13"),
-    _T("Unspecified Level 14"),
-    _T("Unspecified Level 15"),
-    _T("Lowest And Default")
+	_T("Manual Life Safety"),
+	_T("Automatic Life Safety"),
+	_T("Unspecified Level 3"),
+	_T("Unspecified Level 4"),
+	_T("Critical Equipment Control"),
+	_T("Minimum On Off"),
+	_T("Unspecified Level 7"),
+	_T("Manual Operator"),
+	_T("Unspecified Level 9"),
+	_T("Unspecified Level 10"),
+	_T("Unspecified Level 11"),
+	_T("Unspecified Level 12"),
+	_T("Unspecified Level 13"),
+	_T("Unspecified Level 14"),
+	_T("Unspecified Level 15"),
+	_T("Lowest And Default")
 };
 
 const CString Output_Priority_Description_Arry[] =
 {
-    _T("Manual Life Safety"),
-    _T("Automatic Life Safety"),
-    _T("Unspecified Level 3"),
-    _T("Unspecified Level 4"),
-    _T("Critical Equipment Control"),
-    _T("Minimum On Off"),
-    _T("Hand-Off-Auto switches on the controller front cover"),
-    _T("Manual Operator ,T3000 front end Auto/Manual setting"),
-    _T("Unspecified Level 9"),
-    _T("T3 Controller programs"),
-    _T("Commands sent over the network from external masters"),
-    _T("Unspecified Level 12"),
-    _T("Unspecified Level 13"),
-    _T("Unspecified Level 14"),
-    _T("Unspecified Level 15"),
-    _T("Lowest And Default"),
-    _T("Relinquish Default / Dead Master /all entries above are empty")
+	_T("Manual Life Safety"),
+	_T("Automatic Life Safety"),
+	_T("Unspecified Level 3"),
+	_T("Unspecified Level 4"),
+	_T("Critical Equipment Control"),
+	_T("Minimum On Off"),
+	_T("Hand-Off-Auto switches on the controller front cover"),
+	_T("Manual Operator ,T3000 front end Auto/Manual setting"),
+	_T("Unspecified Level 9"),
+	_T("T3 Controller programs"),
+	_T("Commands sent over the network from external masters"),
+	_T("Unspecified Level 12"),
+	_T("Unspecified Level 13"),
+	_T("Unspecified Level 14"),
+	_T("Unspecified Level 15"),
+	_T("Lowest And Default"),
+	_T("Relinquish Default / Dead Master /all entries above are empty")
 };
 
 const CString CO2_Node_Auto_Cal[] =
 {
 
-    _T("Disable"),
-    _T("Enable")
+	_T("Disable"),
+	_T("Enable")
 };
 
 const CString Output_Type_String[] =
 {
-    _T("Virtual"),
-    _T("Digital"),       //1
-    _T("Analog"),
-    _T("Extend Digital"),
-    _T("Extend Ananlog"),
-    _T("Internal")
+	_T("Virtual"),
+	_T("Digital"),       //1
+	_T("Analog"),
+	_T("Extend Digital"),
+	_T("Extend Ananlog"),
+	_T("Internal")
 };
 
 const CString SensorStatus = _T("Not populated");
 
 const CString Airlab_Unit_String[] =
 {
-    _T(""),
-    _T(""),
-    _T(""),
-    _T("-"),
-    _T("PPB"),
-    _T("ug/m3"),
-    _T("ug/m3"),
-    _T("#/cm3"),
-    _T("#/cm3"),
-    _T("dB"),
-    _T("Lux")
+	_T(""),
+	_T(""),
+	_T(""),
+	_T("-"),
+	_T("PPB"),
+	_T("ug/m3"),
+	_T("ug/m3"),
+	_T("#/cm3"),
+	_T("#/cm3"),
+	_T("dB"),
+	_T("Lux")
 };
 
 typedef struct FloorInfo
