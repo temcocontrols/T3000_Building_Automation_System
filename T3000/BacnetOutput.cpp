@@ -575,6 +575,9 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		else { // to show the column for non-bacnet devices
 			TCHAR szBuffer[80];
 			LVCOLUMN col;
+			col.mask = LVCF_TEXT;
+			col.pszText = szBuffer;
+			col.cchTextMax = 80;
 			m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
 			col.pszText = _T("Auto/Manual");
 			m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
