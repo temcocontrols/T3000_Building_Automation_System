@@ -235,7 +235,11 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		{
 			//m_input_list.DeleteColumn(INPUT_AUTO_MANUAL);
 			//m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Out of service"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+			TCHAR szBuffer[80];
 			LVCOLUMN col;
+			col.mask = LVCF_TEXT;
+			col.pszText = szBuffer;
+			col.cchTextMax = 80;
 			m_variable_list.GetColumn(VARIABLE_AUTO_MANUAL, &col);
 			col.pszText = _T("Out of Service");
 			m_variable_list.SetColumn(VARIABLE_AUTO_MANUAL, &col);
@@ -245,7 +249,11 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		else { // to show the column for non-bacnet devices
 			//m_input_list.DeleteColumn(INPUT_AUTO_MANUAL);
 			//m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+			TCHAR szBuffer[80];
 			LVCOLUMN col;
+			col.mask = LVCF_TEXT;
+			col.pszText = szBuffer;
+			col.cchTextMax = 80;
 			m_variable_list.GetColumn(VARIABLE_AUTO_MANUAL, &col);
 			col.pszText = _T("Auto/Manual");
 			m_variable_list.SetColumn(VARIABLE_AUTO_MANUAL, &col);

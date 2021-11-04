@@ -6597,7 +6597,7 @@ void LocalBacnetRejectHandler(BACNET_ADDRESS* src,uint8_t invoke_id,uint8_t reje
 {
 
     int i = 0;
-    if(reject_reason== REJECT_REASON_UNRECOGNIZED_SERVICE && bacnetIpDataRead == false)
+    if(reject_reason== REJECT_REASON_UNRECOGNIZED_SERVICE && bacnetIpDataRead == false && !BACnet_read_thread && bacnet_device_type == PM_THIRD_PARTY_DEVICE)
          BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
 
 }
@@ -6606,7 +6606,8 @@ void LocalBacnetAbortHandler(BACNET_ADDRESS* src, uint8_t invoke_id, uint8_t abo
 
     int i = 0;
    // if(abort_reason== BACNET_ABORT_REASON::MAX_BACNET_ABORT_REASON)
-    BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
+    if(!BACnet_read_thread)
+        BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
 
 }
 void LocalBacnetErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERROR_CLASS error_class, BACNET_ERROR_CODE error_code)

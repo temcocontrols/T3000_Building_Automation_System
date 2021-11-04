@@ -553,7 +553,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	//}
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
 		{
+			TCHAR szBuffer[80];
 			LVCOLUMN col;
+			col.mask = LVCF_TEXT;
+			col.pszText = szBuffer;
+			col.cchTextMax = 80;
 			m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
 			col.pszText = _T("Out of Service");
 			m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
@@ -568,6 +572,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
 		}
 		else { // to show the column for non-bacnet devices
+			TCHAR szBuffer[80];
 			LVCOLUMN col;
 			m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
 			col.pszText = _T("Auto/Manual");
