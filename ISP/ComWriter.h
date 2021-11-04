@@ -92,6 +92,6 @@ Bin_Info m_hexinfor;
 
 		CString			m_strIPAddr;
 		int				m_nIPPort;
-	    
-
+		int             continue_com_flash_count; // 继续从多少包开始烧入; 目前只支持产品为88 的 ESP32 芯片的板子;
+		unsigned short  update_firmware_info[6];
 };

@@ -164,6 +164,8 @@ BEGIN_MESSAGE_MAP(CCO2NetView, CFormView)
     ON_BN_CLICKED(IDC_RADIO_CO2_LCD_DELAY_OFF, &CCO2NetView::OnBnClickedRadioCo2LcdDelayOff)
     ON_BN_CLICKED(IDC_BUTTON_CO2_HELP, &CCO2NetView::OnBnClickedButtonCo2Help)
     ON_BN_CLICKED(IDC_BUTTON_RE_CALIBRATION_DONE, &CCO2NetView::OnBnClickedButtonReCalibrationDone)
+    ON_BN_CLICKED(IDC_RADIO_SCROLL_ENABLE, &CCO2NetView::OnBnClickedRadioScrollEnable)
+    ON_BN_CLICKED(IDC_RADIO_SCROLLBAR_DISABLE, &CCO2NetView::OnBnClickedRadioScrollbarDisable)
 END_MESSAGE_MAP()
 
 
@@ -204,8 +206,19 @@ void CCO2NetView::Fresh()
       //register_critical_section.Unlock();
 
     Initial_Window();
-   
-    product_register_value[3131] = read_one(g_tstat_id, 3131);
+
+    Read_Multi(g_tstat_id, &product_register_value[3100], 3100, 100, 6);
+    if (product_register_value[3138] == 1)
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_SCROLL_ENABLE))->SetCheck(1);
+        ((CButton*)GetDlgItem(IDC_RADIO_SCROLLBAR_DISABLE))->SetCheck(0);
+    }
+    else
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_SCROLL_ENABLE))->SetCheck(0);
+        ((CButton*)GetDlgItem(IDC_RADIO_SCROLLBAR_DISABLE))->SetCheck(1);
+    }
+    //product_register_value[3131] = read_one(g_tstat_id, 3131);
     if (product_register_value[3131] == 0)
     {
         ((CButton *)GetDlgItem(IDC_RADIO_CO2_CAL_ENABLE))->SetCheck(1);
@@ -2270,5 +2283,36 @@ void CCO2NetView::OnBnClickedButtonReCalibrationDone()
     else
     {
         MessageBox(_T("Write data success!"));
+    }
+}
+
+
+void CCO2NetView::OnBnClickedRadioScrollEnable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (write_one(g_tstat_id, SCROLL_BAR_REG, 1, 3) < 0)
+    {
+        MessageBox(_T("Enable Scroll bar failed,Please try again"));
+        return;
+    }
+    else
+    {
+        MessageBox(_T("Enable Scroll bar success!"));
+    }
+}
+
+
+
+void CCO2NetView::OnBnClickedRadioScrollbarDisable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (write_one(g_tstat_id, SCROLL_BAR_REG, 0, 3) < 0)
+    {
+        MessageBox(_T("Disable Scroll bar failed,Please try again"));
+        return;
+    }
+    else
+    {
+        MessageBox(_T("Disable Scroll bar success!"));
     }
 }

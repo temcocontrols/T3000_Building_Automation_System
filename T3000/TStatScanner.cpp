@@ -4952,7 +4952,9 @@ DWORD WINAPI   CTStatScanner::_ScanThirdPartyBacnetThread(LPVOID lpVoid)
         TerminateThread(BACnet_read_thread, 0);
         BACnet_read_thread = NULL;
     }
+
     CTStatScanner* pScan = (CTStatScanner*)(lpVoid);
+#ifdef USE_THIRD_PARTY_FUNC
     // inilizing bacnet and its handlers for third party bacnet devices
     GetIPMaskGetWay();
     if (bip_socket() > 0) // closing socket on Yabe opend , BACnet port dont conflict with both applications.
@@ -4990,7 +4992,7 @@ DWORD WINAPI   CTStatScanner::_ScanThirdPartyBacnetThread(LPVOID lpVoid)
     }
    // intial_bip_socket();
     //Init_Service_Handlers();
-   
+#endif
     // hird party bacnet end
     if (pScan->m_eScanThirdPartyBacnetIpEnd->m_hObject)
     {

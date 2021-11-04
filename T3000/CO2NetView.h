@@ -515,6 +515,9 @@ public:
     afx_msg void OnBnClickedRadioCo2LcdDelayOff();
     afx_msg void OnBnClickedButtonCo2Help();
     afx_msg void OnBnClickedButtonReCalibrationDone();
+    afx_msg void OnBnClickedRadioScrollEnable();
+
+    afx_msg void OnBnClickedRadioScrollbarDisable();
 };
 
 const int CO2NET_NUM = 0;
@@ -530,6 +533,8 @@ const int SENSOR_TYPE_OGM200 = 3;
 const int SENSOR_TYPE_TEMCO = 4;
 const int SENSOR_TYPE_SCD30 = 5;
 const int SENSOR_TYPE_MH_Z19B = 6;
+
+const int SCROLL_BAR_REG = 3138;
 
 const CString CO2_Type[] =
 {

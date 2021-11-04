@@ -124,8 +124,8 @@ BOOL CBacnetOutput::OnInitDialog()
 	((CButton *)GetDlgItem(IDC_BUTTON_OUTPUT_READ))->SetIcon(hIcon);	
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
 	((CButton *)GetDlgItem(IDC_BUTTON_OUTPUT_APPLY))->SetIcon(hIcon);
-	SetTimer(1, 10000/*BAC_LIST_REFRESH_OUTPUT_TIME*/,NULL);
-
+	SetTimer(1, BAC_LIST_REFRESH_OUTPUT_TIME,NULL);
+	SetTimer(4, 15000, NULL);
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_OUTPUT);
 	SetIcon(m_hIcon,TRUE);
 
@@ -551,6 +551,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			}
 		}
 	//}
+#ifdef USE_THIRD_PARTY_FUNC
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
 		{
 			TCHAR szBuffer[80];
@@ -584,7 +585,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetColumnWidth(OUTPUT_PWM_PERIOD, 80);
 			m_output_list.SetColumnWidth(OUTPUT_DECOM, 70);
 		}
-
+#endif
 
 	CString temp1;
 	for (int i=0;i<(int)m_Output_data.size();i++)
@@ -1745,11 +1746,7 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
-			if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_OUTPUT) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
-			{
-				Post_Refresh_Message(g_bac_instance, READOUTPUT_T3000, 0, BAC_OUTPUT_ITEM_COUNT - 1, sizeof(Str_out_point), 0);
-			}
-			else if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+            if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 			{
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			}
@@ -1792,7 +1789,12 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,changed_output_item,REFRESH_ON_ITEM);
 		}
 		break;
-
+	case 4:
+		if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_OUTPUT) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
+		{
+			Post_Refresh_Message(g_bac_instance, READOUTPUT_T3000, 0, BAC_OUTPUT_ITEM_COUNT - 1, sizeof(Str_out_point), 0); //Ö»Ë¢ÐÂValue
+		}
+		break;
 	default:
 		break;
 	}

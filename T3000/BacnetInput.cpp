@@ -121,8 +121,8 @@ BOOL CBacnetInput::OnInitDialog()
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
    
-	SetTimer(INPUT_REFRESH_DATA_TIMER, 10000/*BAC_LIST_REFRESH_INPUT_TIME*/,NULL);
-
+	SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_INPUT_TIME,NULL);
+	SetTimer(4, 15000, NULL);
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_INPUT_DEFAULT);
 	SetIcon(m_hIcon,TRUE);
 	//SetIcon(m_hIcon,FALSE);
@@ -269,6 +269,13 @@ void CBacnetInput::Reload_Unit_Type()
         else
             initial_count = BACNET_ROUTER_IN_A;
     }
+	else if (bacnet_device_type == T3_FAN_MODULE)
+	{
+	if (FAN_MODULE_IN_A > (int)m_Input_data.size())
+		initial_count = (int)m_Input_data.size();
+	else
+		initial_count = FAN_MODULE_IN_A;
+	}
 
 
 
@@ -831,6 +838,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		m_input_list.Get_Selected_Item(temp_select_raw,temp_select_col);
 		m_input_list.SetItemBkColor(temp_select_raw,temp_select_col,LIST_ITEM_SELECTED,0);
 	}
+#ifdef USE_THIRD_PARTY_FUNC
 	if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
 	{
 		//m_input_list.DeleteColumn(INPUT_AUTO_MANUAL);
@@ -874,7 +882,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		m_input_list.SetColumnWidth(INPUT_DECOM, 60);
 		m_input_list.SetColumnWidth(INPUT_JUMPER, 60);
 	}
-	
+#endif
 	CString temp1;
 	//m_input_list.DeleteAllItems();
 	for (int i=0;i<(int)m_Input_data.size();i++)
@@ -1860,11 +1868,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 		{
 			if(offline_mode)
 				break;
-			if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_INPUT) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
-			{
-				Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0);
-			}
-			else if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+            if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 			{
 				//PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 			}
@@ -1911,6 +1915,12 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 			
 
 			PostMessage(WM_REFRESH_BAC_INPUT_LIST,changed_input_item,REFRESH_ON_ITEM);
+		}
+		break;
+	case 4:
+		if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_INPUT) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
+		{
+			Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0); //只刷新Value
 		}
 		break;
 	case 5:

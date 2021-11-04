@@ -999,6 +999,7 @@ LRESULT CBacnetGraphic::Fresh_Static_Function(WPARAM wParam,LPARAM lParam)
 void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 {
 	Graphics *mygraphics;
+
 	mygraphics = new Graphics(my_hdc);
 	mygraphics->SetSmoothingMode(SmoothingModeAntiAlias);
 	Pen *myRectangle_pen;

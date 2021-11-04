@@ -25,6 +25,7 @@ extern unsigned int nflash_receive_to_send_delay_time;
 extern int c2_need_update_boot;  //0 不用更新boot   1 需要更新bootload;   C2为bootload  同时要更新就必须更新;
 extern CString g_repair_bootloader_file_path;
 extern int new_bootload ; //如果等于1 就说明现在烧写的是新的BootLoader;
+extern unsigned char firmware_md5[32];
 /*extern*/ CRITICAL_SECTION g_cs;
 /*extern*/ CString showing_text;
 /*extern*/ int writing_row;
@@ -69,6 +70,7 @@ TFTPServer::TFTPServer(void)
     m_soRecv = NULL;
     m_soSend = NULL;
     m_tcp_connect_results = 0;
+    continue_flash_count = 0;
     WSADATA wsaData;
     int err;
     WORD wVersionRequested;
@@ -81,6 +83,8 @@ TFTPServer::TFTPServer(void)
     //some_device_reply_the_broadcast=false;
     device_jump_from_runtime = false;
     dhcp_package_is_broadcast=false;
+
+    memset(read_reg, 0, sizeof(read_reg));
 }
 
 TFTPServer::~TFTPServer(void)
@@ -673,7 +677,7 @@ UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
 
 	int nRet = 0;
 
-	GetIPMaskGetWay();
+	//GetIPMaskGetWay();
 	short nmsgType= 100;
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1381,12 +1385,13 @@ BOOL TFTPServer::StartServer()
                     int connect_ret = Open_Socket_Retry(temp_real_ip, m_nClientPort, 1);
                     if (connect_ret)
                     {
+                        m_tcp_connect_results = 1;
                         CString strTips_Ethernet;
                         strTips_Ethernet = _T("Reading bootloader version.");
                         OutPutsStatusInfo(strTips_Ethernet, FALSE);
                         int temp_mu_ret = 0;
-                        unsigned short temp_read_reg[100] = { 0 };
-                        temp_mu_ret = read_multi_retry(255, temp_read_reg, 0, 100, 3);
+                        //unsigned short temp_read_reg[100] = { 0 };
+                        temp_mu_ret = read_multi_retry(255, read_reg, 0, 100, 3);
                         if (temp_mu_ret < 0)
                         {
                             strTips_Ethernet = _T("Read bootloader version failed.");
@@ -1395,16 +1400,16 @@ BOOL TFTPServer::StartServer()
                         else
                         {
                             unsigned short temp_ver_boot = 0;
-                            if (temp_read_reg[11] >= temp_read_reg[14])
-                                temp_ver_boot = temp_read_reg[11];
+                            if (read_reg[11] >= read_reg[14])
+                                temp_ver_boot = read_reg[11];
                             else
-                                temp_ver_boot = temp_read_reg[14];
+                                temp_ver_boot = read_reg[14];
                             strTips_Ethernet.Format(_T("Bootloader version :%u"), temp_ver_boot);
                             OutPutsStatusInfo(strTips_Ethernet, FALSE);
 
 #pragma region check_boot_version
                             int c2_update_boot = 0;
-                            check_bootloader_and_frimware(temp_read_reg[7], 1, temp_read_reg[11], temp_read_reg[14], c2_update_boot, temp_read_reg[4]);
+                            check_bootloader_and_frimware(read_reg[7], 1, read_reg[11], read_reg[14], c2_update_boot, read_reg[4]);
 
                             if (c2_update_boot == 1)
                             {
@@ -1412,7 +1417,7 @@ BOOL TFTPServer::StartServer()
                                 strtips.Format(_T("New bootloader available ,need update!"));
                                 OutPutsStatusInfo(strtips, false);
                                 ISP_STEP = ISP_SEND_FLASH_COMMAND;
-                                PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, temp_read_reg[7], 0);
+                                PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, read_reg[7], 0);
                                 return 0;
                             }
 #pragma endregion
@@ -1450,12 +1455,63 @@ BOOL TFTPServer::StartServer()
 
 
                     }
-                    m_tcp_connect_results = 1;
+                    
                 }
                 strTips.Format(_T("Updating firmware. Device IP : %d.%d.%d.%d"),Byte_ISP_Device_IP[0],Byte_ISP_Device_IP[1],Byte_ISP_Device_IP[2],Byte_ISP_Device_IP[3]);
                 OutPutsStatusInfo(strTips, FALSE);
-                OutPutsStatusInfo(_T(""), FALSE);
 
+
+                if (m_tcp_connect_results)
+                {
+                    unsigned short temp_reg[100];
+                    unsigned short temp_reg2[5];
+                    int nret_read = read_multi_retry(255, temp_reg, 0, 100, 3);
+                    if (nret_read > 0)
+                    {
+                        unsigned short wirte_md5[4];
+                        unsigned short temp_md5[5];
+                        int compare_ret = 1;
+                        int nret = read_multi_retry(255, temp_reg2, 1995, 5, 3);
+                        for (int x = 0; x < 4; x++)
+                        {
+                            wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
+                            if (temp_reg2[x] != wirte_md5[x])
+                            {
+                                compare_ret = -1;
+                                break;
+                            }
+                        }
+
+                        if (read_reg[7] == 88)
+                        {
+                            //获取上次烧写的 MD5值 ，需要同时满足MD5以及 没有烧写完毕 才开启  断点续传;
+
+                            if ((temp_reg2[4] != 0) && (compare_ret == 1))
+                            {
+                                continue_flash_count = temp_reg2[4];
+                                strTips.Format(_T("Resume at breakpoint, starting from package %u"), continue_flash_count);
+                                OutPutsStatusInfo(strTips, FALSE);
+                            }
+                            else
+                            {
+                                int md5_write_ret[4];
+                                int total_ret = 1;
+                                for (int x = 0; x < 4; x++)
+                                {
+                                    wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
+                                    md5_write_ret[x] = mudbus_write_one(read_reg[6], 1995 + x, wirte_md5[x], 3);
+                                    if (md5_write_ret[x] < 0)
+                                        break;
+                                }
+
+                            }
+
+                            Sleep(1);
+                        }
+                    }
+ 
+                }
+                OutPutsStatusInfo(_T(""), FALSE);
                 nRet =Send_Tftp_File();
                 if(nRet==0) //break;
                      goto StopServer;
@@ -1571,6 +1627,7 @@ bool TFTPServer::Send_Tftp_File()
     BYTE pBuf[512];
     while(nCount < m_nDataBufLen)
     {
+
         ZeroMemory(pBuf, 512);
         nSendNum = m_nDataBufLen - nCount;
         nSendNum = nSendNum > 512 ?  512 : nSendNum;
@@ -1583,6 +1640,14 @@ bool TFTPServer::Send_Tftp_File()
         int retry =0;
         nCount+= nSendNum;
         persent_finished=(nCount*100)/m_nDataBufLen;
+
+        if (continue_flash_count > 0)
+        {
+            if (package_number < continue_flash_count)
+            {
+                continue;
+            }
+        }
 
 
         do
@@ -1612,7 +1677,7 @@ bool TFTPServer::Send_Tftp_File()
                 //{
                 //	Sleep(1);
                 //}
-                Sleep(1);
+                Sleep(2);
                 if(next_package_number == package_number +1)
                 {
 					if (nflash_receive_to_send_delay_time)
@@ -2038,9 +2103,46 @@ void TFTPServer::NewBootWriteFinish(int nFlashFlag)
 
 void TFTPServer::FlashByEthernet()
 {
+    GetIPMaskGetWay();
+    GetDeviceIP_String();
+    //确认绑定哪一个本地IP地址来建立UDP通讯
+    CString bind_local_pc_ip;
+    CString temp_device_ip = ISP_Device_IP;
+    CString temp_compare_ip;
+    CStringArray temparray;
+    SplitCStringA(temparray, temp_device_ip, _T("."));
+    CString strTips_ip;
+	if (temparray.GetSize() == 4)
+	{
+		temp_compare_ip = temparray.GetAt(0) + _T(".")  + temparray.GetAt(1) + _T(".")  + temparray.GetAt(2);
+		for (int index = 0; index < g_Vector_Subnet.size(); index++)
+		{
+            if (g_Vector_Subnet[index].StrIP.Find(_T("0.0.")) != -1)
+            {
+                continue;
+            }
+            strTips_ip = _T("Local computer IP :");
+            strTips_ip = strTips_ip + g_Vector_Subnet[index].StrIP;
+            OutPutsStatusInfo(strTips_ip, FALSE);
+			if (g_Vector_Subnet[index].StrIP.Find(temp_compare_ip) != -1)
+			{
+                bind_local_pc_ip = g_Vector_Subnet[index].StrIP;
+                //break;
+			}
+
+		}
+	}
+    strTips_ip = _T("Use local network card's IP  ")  ;
+    strTips_ip = strTips_ip + bind_local_pc_ip;
+    strTips_ip = strTips_ip + _T(" to communicate");
+    OutPutsStatusInfo(strTips_ip, FALSE);
+
+    int Udp_resualt;
     device_has_replay_lan_IP =false;
-    
-    int Udp_resualt=SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT,SOCK_DGRAM);
+    if(bind_local_pc_ip.IsEmpty())
+        Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT,SOCK_DGRAM);
+    else
+        Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT, SOCK_DGRAM,63L, bind_local_pc_ip); //测试
     if(Udp_resualt == 0)
     {
         DWORD error_msg=GetLastError();
@@ -2064,7 +2166,7 @@ void TFTPServer::FlashByEthernet()
     //else
     //	add_port= rand() % 100+ 1;
 
-    GetDeviceIP_String();
+
     int resualt=TCP_Flash_CMD_Socket.Create(0,SOCK_STREAM);//SOCK_STREAM
 
     if(resualt == 0)
@@ -2098,8 +2200,8 @@ void TFTPServer::FlashByEthernet()
             strTips_Ethernet = _T("Reading bootloader version.");
             OutPutsStatusInfo(strTips_Ethernet, FALSE);
             int temp_mu_ret = 0;
-            unsigned short temp_read_reg[100] = { 0 };
-            temp_mu_ret = read_multi_retry(255, temp_read_reg, 0, 100,3);
+
+            temp_mu_ret = read_multi_retry(255, read_reg, 0, 100,3);
             if (temp_mu_ret < 0)
             {
                 strTips_Ethernet = _T("Read bootloader version failed.");
@@ -2111,24 +2213,24 @@ void TFTPServer::FlashByEthernet()
 
 
                 unsigned short temp_ver_boot = 0;
-                if(temp_read_reg[11] >= temp_read_reg[14])
-                    temp_ver_boot = temp_read_reg[11];
+                if(read_reg[11] >= read_reg[14])
+                    temp_ver_boot = read_reg[11];
                 else
-                    temp_ver_boot = temp_read_reg[14];
+                    temp_ver_boot = read_reg[14];
                 strTips_Ethernet.Format(_T("Bootloader version :%u"), temp_ver_boot);
                 OutPutsStatusInfo(strTips_Ethernet, FALSE);
 
                 int c2_update_boot = 0;
                 int Ret_Result = 0;
 
-                Ret_Result = check_bootloader_and_frimware(temp_read_reg[7], 1 , temp_read_reg[11], temp_read_reg[14], c2_update_boot, temp_read_reg[4]);
+                Ret_Result = check_bootloader_and_frimware(read_reg[7], 1 , read_reg[11], read_reg[14], c2_update_boot, read_reg[4]);
 
                 if (c2_update_boot == 1)
                 {
                     CString strtips;
                     strtips.Format(_T("New bootloader available ,need update!"));
                     OutPutsStatusInfo(strtips, false);
-                    PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, temp_read_reg[7], 0);
+                    PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, read_reg[7], 0);
                     Ret_Result = 2;
                     return;
                 }
