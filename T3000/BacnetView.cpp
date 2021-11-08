@@ -1013,6 +1013,7 @@ CDialogCM5_BacNet::CDialogCM5_BacNet()
 	m_cur_tab_sel = 0;
 	//CM5_hThread = NULL;
 	BACnet_read_thread = NULL;
+	BACnet_abort_read_thread = NULL;
 }
 
 CDialogCM5_BacNet::~CDialogCM5_BacNet()
@@ -3201,7 +3202,7 @@ DWORD WINAPI  Bacnet_Handle_Abort_Request(LPVOID lpVoid)
 	Sleep(100);
 	::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
 	Sleep(100);
-	BACnet_read_thread = NULL;
+	BACnet_abort_read_thread = NULL;
 	return 0;
 }
 void Handle_Bacnet_Property_List_Response(CString response,int deviceInstance,int objInstace, int &inputcount , int &outputcount , int &variablecount , int &schedulecount , int &calenderCount)
@@ -3291,7 +3292,7 @@ DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid)
 	bacnet_device_type = PM_THIRD_PARTY_DEVICE;
 	BACNET_APPLICATION_DATA_VALUE temp_value;
 	bacnetIpDataRead = true;
-	CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 1, BACNET_ARRAY_ALL);
+	CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 3, BACNET_ARRAY_ALL);
 
 	if (response != "")
 	{
@@ -3451,6 +3452,11 @@ void CDialogCM5_BacNet::Fresh()
 	{
 		TerminateThread(BACnet_read_thread, 0);
 		BACnet_read_thread = NULL;
+	}
+	if (BACnet_abort_read_thread != NULL)
+	{
+		TerminateThread(BACnet_abort_read_thread, 0);
+		BACnet_abort_read_thread = NULL;
 	}
 	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
 	{

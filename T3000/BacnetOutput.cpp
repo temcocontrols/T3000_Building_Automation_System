@@ -1214,7 +1214,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
 		{
 			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
-			temp_value->tag = m_Input_data.at(Changed_Item).control;
+			temp_value->tag = m_Output_data.at(Changed_Item).control;
 			if (temp_value->tag == TPYE_BACAPP_UNSIGNED) {
 				temp_value->type.Unsigned_Int = temp_int;
 			}
@@ -1704,7 +1704,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 				(int)strlen((char*)bacnet_engineering_unit_names[m_Output_data.at(lRow).range].pString) + 1,
 				inputunit.GetBuffer(MAX_PATH), MAX_PATH);
 			inputunit.ReleaseBuffer();
-			m_output_list.SetItemText(lRow, INPUT_UNITE, inputunit);
+			m_output_list.SetItemText(lRow, OUTPUT_UNITE, inputunit);
 			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
 			temp_value->tag = TPYE_BACAPP_ENUMERATED;
 			temp_value->type.Enumerated = m_Output_data.at(lRow).range;
