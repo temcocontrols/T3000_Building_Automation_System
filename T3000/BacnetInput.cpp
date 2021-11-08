@@ -271,10 +271,10 @@ void CBacnetInput::Reload_Unit_Type()
     }
 	else if (bacnet_device_type == T3_FAN_MODULE)
 	{
-	/*if (FAN_MODULE_IN_A > (int)m_Input_data.size())
+	if (FAN_MODULE_IN_A > (int)m_Input_data.size())
 		initial_count = (int)m_Input_data.size();
 	else
-		initial_count = FAN_MODULE_IN_A;*/
+		initial_count = FAN_MODULE_IN_A;
 	}
 
 

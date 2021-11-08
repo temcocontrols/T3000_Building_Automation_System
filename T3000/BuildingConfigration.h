@@ -7,7 +7,7 @@
 #include "../SQLiteDriver/CppSQLite3.h"
 // CBuildingConfigration dialog
 
-typedef struct Building_Config 
+typedef struct Building_Config
 {
 	bool b_selected;
 	int ID;
@@ -28,7 +28,8 @@ typedef struct Building_Config
 	CString Status;
 	//unsigned int protocol_index;    //2017 12 12 由fandu 取消index ，用index 代码太过于混乱，新加其他协议时 不方便判断
 	CString BuildingPath;
-
+	CString filepath;
+	CString filename;
 	CString Longitude;
 	CString Latitude;
 	CString Elevation;
@@ -43,7 +44,7 @@ public:
 	CBuildingConfigration(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CBuildingConfigration();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = IDD_BUILDING_CONFIG };
 
 protected:
@@ -57,7 +58,7 @@ public:
 	void Fresh_List_Row();
 	void RemoteVPNConnectivity();
 	void RemoteVPNDisConnectivity();
-	void OnconfigFileOpen();
+	//void OnconfigFileOpen();
 	void LoadBuildingConfigDB();
 	afx_msg LRESULT Fresh_Building_Config_Item(WPARAM wParam, LPARAM lParam);
 	ListCtrlEx::CListCtrlEx m_building_config_list;

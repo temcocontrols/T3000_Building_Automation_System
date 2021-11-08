@@ -136,54 +136,54 @@ BOOL CBuildingConfigration::PreTranslateMessage(MSG* pMsg)
     }
     return CDialogEx::PreTranslateMessage(pMsg);
 }
-
+//CString filepath= "D:\configfile.conf";
 void CBuildingConfigration::RemoteVPNConnectivity() {
 
 
     //system("runas cmd.exe");
   //  system("cmd.exe /c wireguard.exe/installtunnelservice D:\configfile.conf");
-    bool result = system("cmd.exe /c wireguard.exe/installtunnelservice D:\configfile.conf");
-    m_building_config_list.SetItemText(m_changedRow, BC_STATUS, _T("Connected"));
+    system("cmd.exe /c wireguard.exe/installtunnelservice '+ filepath +' ");
+    // m_building_config_list.SetItemText(m_changedRow, BC_STATUS, _T("Connected"));
     // pDC->SetTextColor(RGB(255, 0, 0));
 
+   
+    // if (result == true)
+    // {
+    //  
+    //  
+    //    // m_building_config_list.SetItemText(m_changedRow, BC_STATUS, _T("Connected"));
 
-    if (result == true)
-    {
-
-
-        // m_building_config_list.SetItemText(m_changedRow, BC_STATUS, _T("Connected"));
-
-
-    }
-
-
-
-    //ShRun.lpFile = _T("/ C \"C:\Program Files\WireGuard\wireguard.exe\"/installtunnelservice D:\configfile.conf");
-   //  ShRun.lpFile = _T("/ C \"C:\Program Files\WireGuard\wireguard.exe\"/installtunnelservice D:\configfile.conf");
-  //  ShRun.lpParameters = _T("/ C \"C:\\Program Files\\WireGuard\\wireguard.exe\"/installtunnelservice D:\\configfile.conf");
-  // ShRun.lpDirectory = _T("C:\\windows\\System32");
-    //ShRun.nShow = SW_SHOW;
-    //ShRun.hInstApp = NULL;
-
-    //// Execute the file with the parameters
-    //if (!ShellExecuteEx(&ShRun))
-    //{
-    //    MessageBox(_T("Unable to open file!"));
+    //     
     //}
 
 
 
-   // system("runas cmd.exe");
-   // system("wireguard.exe/ installtunnelservice D:\\configfile.conf");
+     //ShRun.lpFile = _T("/ C \"C:\Program Files\WireGuard\wireguard.exe\"/installtunnelservice D:\configfile.conf");
+    //  ShRun.lpFile = _T("/ C \"C:\Program Files\WireGuard\wireguard.exe\"/installtunnelservice D:\configfile.conf");
+   //  ShRun.lpParameters = _T("/ C \"C:\\Program Files\\WireGuard\\wireguard.exe\"/installtunnelservice D:\\configfile.conf");
+   // ShRun.lpDirectory = _T("C:\\windows\\System32");
+     //ShRun.nShow = SW_SHOW;
+     //ShRun.hInstApp = NULL;
+
+     //// Execute the file with the parameters
+     //if (!ShellExecuteEx(&ShRun))
+     //{
+     //    MessageBox(_T("Unable to open file!"));
+     //}
 
 
 
- // adErrInvalidArgument("/ C \"C:\\Program Files\\WireGuard\\wireguard.exe\"/installtunnelservice D:\\configfile.conf");
+    // system("runas cmd.exe");
+    // system("wireguard.exe/ installtunnelservice D:\\configfile.conf");
 
-   //  system("powershell -Command Start-Process 'C:\\Windows\\System32\\cmd.exe' -Verb runAs");
 
 
-  // system("C:\\Program Files\\WireGuard\\wireguard.exe/ installtunnelservice D:\\configfile.conf");
+  // adErrInvalidArgument("/ C \"C:\\Program Files\\WireGuard\\wireguard.exe\"/installtunnelservice D:\\configfile.conf");
+
+    //  system("powershell -Command Start-Process 'C:\\Windows\\System32\\cmd.exe' -Verb runAs");
+
+
+   // system("C:\\Program Files\\WireGuard\\wireguard.exe/ installtunnelservice D:\\configfile.conf");
 
 
 
@@ -425,7 +425,7 @@ void CBuildingConfigration::Initial_Building_List()
         m_building_config_list.SetItemText(i, BC_BACNET, m_BuildNameLst.at(i).BacnetPort);
         m_building_config_list.SetItemText(i, BC_BAUDRATE, m_BuildNameLst.at(i).BaudRate);
         m_building_config_list.SetItemText(i, BC_STATUS, m_BuildNameLst.at(i).Status);
-        m_building_config_list.SetItemText(i, BC_STATUS, m_BuildNameLst.at(i).ConfigFile);
+        m_building_config_list.SetItemText(i, BC_Config, m_BuildNameLst.at(i).ConfigFile);
         m_building_config_list.SetItemText(i, BC_BUILDINGPATH, m_BuildNameLst.at(i).BuildingPath);
 
         if (ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_PROTOCOL))
@@ -691,7 +691,7 @@ void CBuildingConfigration::Update_Building()
     try
     {
         CString strSql;
-        strSql.Format(_T("update Building set Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s',ConfigFile='%s' where Building_Path='%s'  "),
+        strSql.Format(_T("update Building set Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Path='%s'  "),
             BuildingTemp.Protocol, BuildingTemp.IPAddress_Domain, BuildingTemp.IP_Port, BuildingTemp.Comport, BuildingTemp.BaudRate, BuildingTemp.BuildingPath);
         SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
@@ -1686,7 +1686,7 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
     try
     {
         BOOL bDefault = FALSE;
-        strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate,ConfigFile) values('" + strMainBuildName + "','" + strSubBuildingName + "','" + strProtocol + "','" + strCOMPort + "','" + strIP + "','" + strIpPort + "','" + strCOMPortBaud + "','" + strConfigFilePath + "')"));
+        strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate) values('" + strMainBuildName + "','" + strSubBuildingName + "','" + strProtocol + "','" + strCOMPort + "','" + strIP + "','" + strIpPort + "','" + strCOMPortBaud + "')"));
         m_SqliteDBT3000.execDML((UTF8MBSTR)strSql);
     }
     catch (_com_error* e)
@@ -1776,7 +1776,7 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR* pNMHDR, LRESULT* 
     if (BC_Config == lCol)
     {
         CStringArray  ArrayFileName;
-        CString strFilter = _T("Config File|*.conf|all file|*.*||");
+        CString strFilter = _T("Config File|*.conf|");
         CFileDialog dlg(true, _T("Select Config file"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
         if (IDOK == dlg.DoModal())
         {
@@ -1787,10 +1787,11 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR* pNMHDR, LRESULT* 
             CString strMainBuildingName = m_building_config_list.GetItemText(lRow, BC_MAINNAME);
             CppSQLite3DB SqliteDBT3000;
             SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
+            system("cmd.exe /c wireguard.exe/installtunnelservice" " filepath ");
             sql.Format(_T("update Building set PATH = '%s'  where  Main_BuildingName = '%s' "),
                 filepath.GetBuffer(), strMainBuildingName.GetBuffer());
 
-            SqliteDBT3000.execDML((UTF8MBSTR)sql);
+            //  SqliteDBT3000.execDML((UTF8MBSTR)sql);
         }
     }
     else if (BC_BUILDINGPATH == lCol)//当点击选择一个数据库的时候，把Building的名字已经数据库的信息都获取过来

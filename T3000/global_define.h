@@ -1279,6 +1279,12 @@ const int T322AI_OUT_A = 0;
 
 const int PWM_TRANSDUCER_OUT_D = 0;
 const int PWM_TRANSDUCER_OUT_A = 6;
+
+const int FAN_MODULE_IN_A = 12; // ESP32 版本 子设备  Fan module 输入;
+const int FAN_MODULE_IN_D = 0;
+const int FAN_MOUDLE_OUT_A = 1;
+const int FAN_MOUDLE_OUT_D = 0;
+
 enum
 {
 	UART_1200 = 0,
