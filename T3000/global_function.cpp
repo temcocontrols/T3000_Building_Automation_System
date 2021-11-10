@@ -6619,10 +6619,9 @@ void LocalBacnetAbortHandler(BACNET_ADDRESS* src, uint8_t invoke_id, uint8_t abo
 void LocalBacnetErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERROR_CLASS error_class, BACNET_ERROR_CODE error_code)
 {
     tsm_free_invoke_id(invoke_id);
-
     int i = 0;
     CString info;
-    info.Format(_T("ERROR While Writing BACnet Property %s : %s"), bactext_error_class_name((int)error_class), bactext_error_code_name((int)error_code));
+    info.Format(_T("ERROR BACnet  %S : %S"), bactext_error_class_name((int)error_class), bactext_error_code_name((int)error_code));
     AfxMessageBox(info);
    // AfxMessageBox("ERROR While Writing Property : \n Error Class" + (BACNET_ERROR_CLASS)error_class + " \n Error Code:" +(BACNET_ERROR_CODE)error_code);
    // BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
