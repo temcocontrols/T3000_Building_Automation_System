@@ -66,9 +66,9 @@ extern "C" {
         unsigned index);
     const char *bactext_abort_reason_name(
         unsigned index);
-    const char *bactext_error_class_name(
+    __declspec(dllexport) const char *bactext_error_class_name(
         unsigned index);
-    const char *bactext_error_code_name(
+    __declspec(dllexport) const char *bactext_error_code_name(
         unsigned index);
     unsigned bactext_property_id(
         const char *name);
