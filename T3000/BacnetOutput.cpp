@@ -1038,6 +1038,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 	}
 	copy_data_to_ptrpanel(TYPE_OUTPUT);
+#ifdef LOCAL_DB_FUNCTION
+	if(selected_product_Node.serial_number != 0)
+	   WriteDeviceDataIntoAccessDB(BAC_OUT, output_item_limit_count, selected_product_Node.serial_number);
+#endif
 	//Invalidate();
 	return 0;
 }

@@ -312,11 +312,11 @@ typedef struct _MessageInvokeIDInfo
 	int mRow;
 	int mCol;
 }MessageInvokeODInfo;
-
+//#define  LOCAL_DB_FUNCTION  1
 #define  CPING_USE_ICMP 1
 //#include "Bacnet_Include.h"
 //#define _DEBUG
 //*********************************link to dll***************************
 
 
-#define USE_THIRD_PARTY_FUNC 1
+//#define USE_THIRD_PARTY_FUNC 1

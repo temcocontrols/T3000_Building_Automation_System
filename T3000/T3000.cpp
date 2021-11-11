@@ -17,7 +17,7 @@
 #include <windows.h>  
  
 
-const unsigned int g_versionNO= 20211020;
+const unsigned int g_versionNO= 20211111;
 
 
 #ifdef _DEBUG

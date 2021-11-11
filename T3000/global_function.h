@@ -219,6 +219,7 @@ int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path);
 
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path);
 //For MINIPanel ARM
+int WriteDeviceDataIntoAccessDB(int nTableType, int ncount, int device_serialnumber);
 
 void Copy_Data_From_485_to_Bacnet(unsigned short *start_point);
 int handle_read_monitordata_ex(char *npoint,int nlength);

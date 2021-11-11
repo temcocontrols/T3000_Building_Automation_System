@@ -13,6 +13,8 @@
 #include "global_define.h"
 #include "BacnetProgramSetting.h"
 #include "BacnetProgramDebug.h"
+#include "MainFrm.h"
+extern tree_product selected_product_Node; // 选中的设备信息;
 extern CBacnetProgramEdit *ProgramEdit_Window;
 #define  WM_RICHEDIT_RIGHT_CLICK  WM_USER + 1001
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
@@ -349,9 +351,10 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(temp1);
 	m_edit_changed = false;
 	program_string = temp1;
-
-
-
+#ifdef LOCAL_DB_FUNCTION
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(READPROGRAMCODE_T3000, program_list_line, selected_product_Node.serial_number);
+#endif
 	UpdateDataProgramText();
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
 	return 0;

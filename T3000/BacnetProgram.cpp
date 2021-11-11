@@ -20,7 +20,7 @@ extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure t
 #include "DialogCM5_BacNet.h"
 extern CDialog_Progess *WaitRead_Data_Dlg;
 #include "MainFrm.h"
-
+extern tree_product selected_product_Node; // 选中的设备信息;
 // CBacnetProgram dialog
 
 IMPLEMENT_DYNAMIC(CBacnetProgram, CDialogEx)
@@ -416,6 +416,9 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 	}
 
 	copy_data_to_ptrpanel(TYPE_PROGRAM);
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_PRG, program_item_limit_count, selected_product_Node.serial_number);
+
 	return 0;
 }
 //click to show new ide

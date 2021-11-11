@@ -1318,6 +1318,10 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		}
 	}
 	copy_data_to_ptrpanel(TYPE_INPUT);
+#ifdef LOCAL_DB_FUNCTION
+	if(selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_IN, input_item_limit_count, selected_product_Node.serial_number);
+#endif
 	return 0;
 }
 

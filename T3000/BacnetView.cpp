@@ -1173,6 +1173,8 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
                     SaveBacnetBinaryFile(temp_file);
+
+					//SaveDeviceDataIntoAccessDB()
 				}
 
 
@@ -8059,6 +8061,10 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
          {
              g_protocol_support_ptp = PROTOCOL_MB_PTP_TRANSFER;
          }
+		 else if (read_data[7] == PM_ESP32_T3_SERIES)
+		 {
+			 g_protocol_support_ptp = PROTOCOL_MB_PTP_TRANSFER;
+		 }
          else
          {
              g_protocol_support_ptp = PROTOCOL_UNKNOW;

@@ -20,6 +20,7 @@ HANDLE h_read_screenlabel_thread = NULL;
 HANDLE h_write_pic_thread = NULL;
 HANDLE h_get_pic_thread = NULL;
 CString Change_File_Path;
+extern tree_product selected_product_Node; // 选中的设备信息;
 IMPLEMENT_DYNAMIC(BacnetScreen, CDialogEx)
 
 BacnetScreen::BacnetScreen(CWnd* pParent /*=NULL*/)
@@ -460,6 +461,11 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 			break;
 		}
 	}
+#ifdef LOCAL_DB_FUNCTION
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_GRP, screen_item_limit_count, selected_product_Node.serial_number);
+#endif
+
 	return 0;
 }
 

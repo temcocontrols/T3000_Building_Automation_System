@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -828,7 +828,7 @@ BEGIN
     CONTROL         "53.  Table 4",IDC_RADIO85,"Button",BS_AUTORADIOBUTTON,221,246,72,10
     CONTROL         "54.  Table 5",IDC_RADIO86,"Button",BS_AUTORADIOBUTTON,221,265,72,10
     CONTROL         "55.  Pulse Count (Fast 100Hz)",IDC_RADIO87,"Button",BS_AUTORADIOBUTTON,221,283,96,10
-    CONTROL         "56.  HZ",IDC_RADIO88,"Button",BS_AUTORADIOBUTTON,221,302,92,10
+    CONTROL         "56.  Hz",IDC_RADIO88,"Button",BS_AUTORADIOBUTTON,221,302,92,10
     CONTROL         "57.  Humidty %",IDC_RADIO101,"Button",BS_AUTORADIOBUTTON,221,320,92,10
     CONTROL         "58.  CO2  PPM",IDC_RADIO102,"Button",BS_AUTORADIOBUTTON,221,337,92,10
     CONTROL         "59.  Revolutions Per Minute",IDC_RADIO103,"Button",BS_AUTORADIOBUTTON,222,353,96,10
@@ -7135,12 +7135,12 @@ BEGIN
     ID_TOOLS_MODBUSTOBACNETROUTER "Subnet Devices"
 END
 
-#endif    // Chinese (Simplified, PRC) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// 英语(美国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -11657,12 +11657,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // English (United States) resources
+#endif    // 英语(美国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United Kingdom) resources
+// 英语(英国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -11768,7 +11768,7 @@ BEGIN
     0
 END
 
-#endif    // English (United Kingdom) resources
+#endif    // 英语(英国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -12,12 +12,12 @@
 #include "Bacnet_Include.h"
 #include "global_function.h"
 #include "global_define.h"
-
+#include "MainFrm.h"
 //extern int Station_NUM;
 // BacnetController dialog
 int PID_CONTROLLER_LIMITE_ITEM_COUNT = 0;
 
-
+extern tree_product selected_product_Node; // 选中的设备信息;
 extern int pointtotext_for_controller(char *buf,Point_T3000 *point);
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
 
@@ -635,7 +635,10 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		}
 	
 	}
-	
+#ifdef LOCAL_DB_FUNCTION
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_PID, controller_item_limit_count, selected_product_Node.serial_number);
+#endif
 	return	 0;
 }
 

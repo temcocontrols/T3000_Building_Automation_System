@@ -881,7 +881,7 @@ const CString Input_List_Analog_Units[] =
 	_T(""),
 	_T(""),
 	_T("counts"),
-	_T("HZ"),
+	_T("Hz"),
 	_T("%"),
 	_T("PPM"),
     _T("RPM"),
@@ -2508,5 +2508,163 @@ typedef struct RoomInfo
 #define TYPE_BM_OUTPUT      3
 #define TYPE_BM_VARIABLE    4
 
+
+typedef  struct
+{
+	int nSerialNumber;
+	CString Input_index;
+	CString Panel;
+	CString Full_Label;
+	CString Auto_Manual;
+	CString fValue;
+	CString Units;
+	CString Range;
+	CString Calibration;
+	CString Sign;
+	CString Filter;
+	CString csStatus;
+	CString Signal_Type;
+	CString Label;
+	CString Type;
+	CString BinaryArray;
+} Str_in_DB;
+
+
+typedef  struct
+{
+	int nSerialNumber;
+	CString Output_index;
+	CString Panel;
+	CString Full_Label;
+	CString Auto_Manual;
+	CString HOA_Switch;
+	CString fValue;
+	CString Units;
+	CString Range;
+	CString Low_Voltage;
+	CString High_Voltage;
+	CString PWM_Period;
+    CString csStatus;
+	CString Label;
+	CString Type;
+	CString BinaryArray;
+} Str_out_DB;
+
+typedef  struct
+{
+	int nSerialNumber;
+	CString Variable_index;
+	CString Full_Label;
+	CString Auto_Manual;
+	CString fValue;
+	CString Units;
+	CString Label;
+	CString BinaryArray;
+} Str_var_DB;
+
+
+typedef  struct
+{
+	int nSerialNumber;
+	CString Program_index;
+	CString Full_Label;
+	CString Status;
+	CString Auto_Manual;
+	CString Size;
+	CString Execution_Time;
+	CString Label;
+	CString BinaryArray;
+} Str_program_DB;
+
+typedef  struct
+{
+	int nSerialNumber;
+	CString Pid_index;
+	CString Input;
+	CString Input_Value;
+	CString Input_Units;
+	CString Auto_Manual;
+	CString Output;
+	CString Setpoint;
+	CString Setpoint_Value;
+	CString Setpoint_Units;
+	CString Action;
+	CString PID_Prop;
+	CString PID_Int;
+	CString PID_Der;
+	CString PID_Time;
+	CString Bias;
+	CString BinaryArray;
+} Str_pid_DB;
+
+typedef  struct
+{
+	int nSerialNumber;
+	CString Graphic_index;
+	CString Full_Label;
+	CString Label;
+	CString Picture_File;
+	CString Element_Count;
+	CString BinaryArray;
+} Str_graphic_DB;
+
+typedef  struct
+{
+	int nSerialNumber;
+	CString Holiday_index;
+	CString Full_Label;
+	CString Auto_Manual;
+	CString fValue;
+	CString Label;
+	CString BinaryArray;
+} Str_holiday_DB;
+
+typedef  struct
+{
+	int nSerialNumber;
+	CString Schedule_index;
+	CString Full_Label;
+	CString Auto_Manual;
+	CString Output;
+	CString Holiday1;
+	CString Status1;
+	CString Holiday2;
+	CString Status2;
+	CString Label;
+	CString BinaryArray;
+} Str_schedule_DB;
+
+typedef  struct
+{
+	int nSerialNumber;
+	CString Trendlog_index;
+	CString Label;
+	CString Interval;
+	CString Status;
+	CString Data_Size;
+	CString BinaryArray;
+} Str_trendlog_DB;
+
+typedef  struct
+{
+	int nSerialNumber;
+	CString Alarm_index;
+	CString Panel;
+	CString Message;
+	CString Time;
+	CString Acknowlege;
+	CString Res;
+	CString Delete;
+	CString BinaryArray;
+} Str_alarm_DB;
+
+
+typedef  struct
+{
+	int nSerialNumber;
+	int Program_index;
+	CString ProgramText;
+	CString BinaryArray;
+} Str_programtext_DB;
 
 

@@ -450,7 +450,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 
 	}
 	copy_data_to_ptrpanel(TYPE_VARIABLE);
-
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_VAR, variable_item_limit_count, selected_product_Node.serial_number);
 	return 0;
 }
 LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
