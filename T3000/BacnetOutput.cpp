@@ -554,7 +554,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 #ifdef USE_THIRD_PARTY_FUNC
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
 		{
+			TCHAR szBuffer[80];
 			LVCOLUMN col;
+			col.mask = LVCF_TEXT;
+			col.pszText = szBuffer;
+			col.cchTextMax = 80;
 			m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
 			col.pszText = _T("Out of Service");
 			m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
@@ -569,7 +573,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
 		}
 		else { // to show the column for non-bacnet devices
+			TCHAR szBuffer[80];
 			LVCOLUMN col;
+			col.mask = LVCF_TEXT;
+			col.pszText = szBuffer;
+			col.cchTextMax = 80;
 			m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
 			col.pszText = _T("Auto/Manual");
 			m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
@@ -1210,7 +1218,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // handled the full label changes for third party bacnet device
 		{
 			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
-			temp_value->tag = m_Input_data.at(Changed_Item).control;
+			temp_value->tag = m_Output_data.at(Changed_Item).control;
 			if (temp_value->tag == TPYE_BACAPP_UNSIGNED) {
 				temp_value->type.Unsigned_Int = temp_int;
 			}
@@ -1700,7 +1708,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 				(int)strlen((char*)bacnet_engineering_unit_names[m_Output_data.at(lRow).range].pString) + 1,
 				inputunit.GetBuffer(MAX_PATH), MAX_PATH);
 			inputunit.ReleaseBuffer();
-			m_output_list.SetItemText(lRow, INPUT_UNITE, inputunit);
+			m_output_list.SetItemText(lRow, OUTPUT_UNITE, inputunit);
 			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
 			temp_value->tag = TPYE_BACAPP_ENUMERATED;
 			temp_value->type.Enumerated = m_Output_data.at(lRow).range;

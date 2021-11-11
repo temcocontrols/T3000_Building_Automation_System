@@ -1059,7 +1059,7 @@ BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance
     pmy_refresh_info->end_instance = end_instance;
     pmy_refresh_info->entitysize = entitysize;
     pmy_refresh_info->block_size = block_size; //block_size 如果是0 表示 用寄存器去更新列表，只刷新value
-    if ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+    if ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
     {
         //if (!PostThreadMessage(nThreadID, MY_RS485_WRITE_LIST, (WPARAM)pmy_write_info, NULL))//post thread msg
         //{
@@ -1919,7 +1919,8 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
     if (g_protocol_support_ptp != PROTOCOL_MB_PTP_TRANSFER)
     {
         if ((g_protocol == MODBUS_RS485) ||
-            (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))
+            (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) || 
+            g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
         {
             //if (READVARUNIT_T3000 == command)
             return -1;
@@ -5271,7 +5272,8 @@ void localhandler_read_property_ack(
                     //(itr->property_id == data.object_property))
                     )
                 {
-                    if (service_data->sequence_number == ( service_data->proposed_window_number -1 ))
+                    
+                    if (( service_data->sequence_number % service_data->proposed_window_number == 0) || !service_data->more_follows)
                     {
                         uint8_t* app_data = new uint8_t[service_len];
                         memcpy_s(app_data, service_len, service_request, service_len);
@@ -6597,19 +6599,31 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
     if(textbuf) strcpy(textbuf, buf);
     return( buf ) ;
 }
+void LocalBacnetRejectHandler(BACNET_ADDRESS* src,uint8_t invoke_id,uint8_t reject_reason)
+{
+
+    int i = 0;
+    if(reject_reason== REJECT_REASON_UNRECOGNIZED_SERVICE && bacnetIpDataRead && !BACnet_abort_read_thread && bacnet_device_type == PM_THIRD_PARTY_DEVICE)
+         BACnet_abort_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL); 
+    
+    tsm_free_invoke_id(invoke_id);
+}
 void LocalBacnetAbortHandler(BACNET_ADDRESS* src, uint8_t invoke_id, uint8_t abort_reason, bool server)
 {
 
     int i = 0;
-    BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
+   // if(abort_reason== BACNET_ABORT_REASON::MAX_BACNET_ABORT_REASON)
+    if( !BACnet_abort_read_thread && bacnet_device_type == PM_THIRD_PARTY_DEVICE)
+        BACnet_abort_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
 
+    tsm_free_invoke_id(invoke_id);
 }
 void LocalBacnetErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERROR_CLASS error_class, BACNET_ERROR_CODE error_code)
 {
-
+    tsm_free_invoke_id(invoke_id);
     int i = 0;
     CString info;
-    info.Format(_T("ERROR While Writing Property Error Code:%d"), error_code);
+    info.Format(_T("ERROR BACnet  %S : %S"), bactext_error_class_name((int)error_class), bactext_error_code_name((int)error_code));
     AfxMessageBox(info);
    // AfxMessageBox("ERROR While Writing Property : \n Error Class" + (BACNET_ERROR_CLASS)error_class + " \n Error Code:" +(BACNET_ERROR_CODE)error_code);
    // BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
@@ -7007,7 +7021,7 @@ void Init_Service_Handlers(	void)
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY, localhandler_read_property_ack);
     
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROP_MULTIPLE, local_handler_read_property_multiple_ack);
-    
+    apdu_set_reject_handler(LocalBacnetRejectHandler);
     apdu_set_abort_handler(LocalBacnetAbortHandler);
     apdu_set_error_handler(SERVICE_CONFIRMED_WRITE_PROPERTY,LocalBacnetErrorHandler);
 

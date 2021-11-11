@@ -4080,6 +4080,10 @@ void CMainFrame::SwitchToPruductType(int nIndex)
    /* CView**/ pNewView = m_pViews[nIndex];
     if (!pNewView)
         return;
+    if (!::IsWindow(pNewView->m_hWnd))
+    {
+        return;
+    }
     CView* pActiveView =GetActiveView();
     if ( !pActiveView )    // No currently active view
         return;
