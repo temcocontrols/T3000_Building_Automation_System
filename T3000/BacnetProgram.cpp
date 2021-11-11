@@ -416,8 +416,10 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 	}
 
 	copy_data_to_ptrpanel(TYPE_PROGRAM);
+#ifdef LOCAL_DB_FUNCTION
 	if (selected_product_Node.serial_number != 0)
 		WriteDeviceDataIntoAccessDB(BAC_PRG, program_item_limit_count, selected_product_Node.serial_number);
+#endif
 
 	return 0;
 }

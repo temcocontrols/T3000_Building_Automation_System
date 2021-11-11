@@ -603,8 +603,10 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 	}
 	
 	copy_data_to_ptrpanel(TYPE_WEEKLY);
+#ifdef LOCAL_DB_FUNCTION
 	if (selected_product_Node.serial_number != 0)
 		WriteDeviceDataIntoAccessDB(BAC_SCH, 8, selected_product_Node.serial_number);
+#endif
 	return 0;
 }
 

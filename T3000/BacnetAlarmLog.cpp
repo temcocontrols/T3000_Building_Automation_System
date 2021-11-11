@@ -302,10 +302,10 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 			break;
 		}
 	}
-
+#ifdef LOCAL_DB_FUNCTION
 	if (selected_product_Node.serial_number != 0)
 		WriteDeviceDataIntoAccessDB(BAC_ALARMM, 16, selected_product_Node.serial_number);
-	
+#endif
 
 	return 0;
 }
