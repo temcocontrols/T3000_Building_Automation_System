@@ -171,6 +171,7 @@ void localhandler_read_property_ack(
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src);
 
 void LocalBacnetAbortHandler(BACNET_ADDRESS* src,uint8_t invoke_id,	uint8_t abort_reason,	bool server);
+void LocalBacnetReadErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERROR_CLASS error_class, BACNET_ERROR_CODE error_code);
 void LocalBacnetErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERROR_CLASS error_class,BACNET_ERROR_CODE error_code);
 void Localhandler_write_property_ack(
 	uint8_t* service_request,

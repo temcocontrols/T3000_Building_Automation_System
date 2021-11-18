@@ -5240,6 +5240,7 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
         }
     }
 
+    standard_bacnet_data.clear();
     return -1;
 
 
@@ -6602,7 +6603,7 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
 void LocalBacnetRejectHandler(BACNET_ADDRESS* src,uint8_t invoke_id,uint8_t reject_reason)
 {
 
-    int i = 0;
+    standard_bacnet_data.clear();
     if(reject_reason== REJECT_REASON_UNRECOGNIZED_SERVICE && bacnetIpDataRead && !BACnet_abort_read_thread && bacnet_device_type == PM_THIRD_PARTY_DEVICE)
          BACnet_abort_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL); 
     
@@ -6610,8 +6611,8 @@ void LocalBacnetRejectHandler(BACNET_ADDRESS* src,uint8_t invoke_id,uint8_t reje
 }
 void LocalBacnetAbortHandler(BACNET_ADDRESS* src, uint8_t invoke_id, uint8_t abort_reason, bool server)
 {
-
-    int i = 0;
+   
+    standard_bacnet_data.clear();
    // if(abort_reason== BACNET_ABORT_REASON::MAX_BACNET_ABORT_REASON)
     if( !BACnet_abort_read_thread && bacnet_device_type == PM_THIRD_PARTY_DEVICE)
         BACnet_abort_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
@@ -6628,6 +6629,10 @@ void LocalBacnetErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERRO
    // AfxMessageBox("ERROR While Writing Property : \n Error Class" + (BACNET_ERROR_CLASS)error_class + " \n Error Code:" +(BACNET_ERROR_CODE)error_code);
    // BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
 
+}
+void LocalBacnetReadErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERROR_CLASS error_class, BACNET_ERROR_CODE error_code)
+{
+    tsm_free_invoke_id(invoke_id);
 }
 void Localhandler_write_property_ack(
     uint8_t* service_request,
@@ -7024,6 +7029,7 @@ void Init_Service_Handlers(	void)
     apdu_set_reject_handler(LocalBacnetRejectHandler);
     apdu_set_abort_handler(LocalBacnetAbortHandler);
     apdu_set_error_handler(SERVICE_CONFIRMED_WRITE_PROPERTY,LocalBacnetErrorHandler);
+    apdu_set_error_handler(SERVICE_CONFIRMED_READ_PROPERTY, LocalBacnetReadErrorHandler);
 
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_WRITE_PROPERTY, Localhandler_write_property_ack);
     /* set the handler for all the services we don't implement */

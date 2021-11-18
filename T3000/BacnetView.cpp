@@ -2366,23 +2366,28 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 		CFile file;
 		CString temp_bacnet_logfile;
 		temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
-		file.Open(temp_bacnet_logfile, CFile::modeRead, NULL);
-		DWORD len = file.GetLength();
-		char* Buf = new char[len + 1];
-		Buf[len + 1] = 0;  //0ÖÕÖ¹×Ö·û´®£¬ÓÃÓÚÊä³ö¡£
-		file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufÊÇÓÃÓÚ½ÓÊÕ¶ÁÈ¡µ½µÄÊý¾ÝµÄBufÖ¸ÕënCountÊÇ´ÓÎÄ¼þ¶ÁÈ¡µÄ×Ö½ÚÊý
-		file.Close();
-		CString temp_cs;
-		MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, tmpString.GetBuffer(len), len);
-		tmpString.ReleaseBuffer();
+		if (file.Open(temp_bacnet_logfile, CFile::modeRead, NULL))
+		{
+			DWORD len = file.GetLength();
+			char* Buf = new char[len + 1];
+			Buf[len + 1] = 0;  //0ÖÕÖ¹×Ö·û´®£¬ÓÃÓÚÊä³ö¡£
+			file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufÊÇÓÃÓÚ½ÓÊÕ¶ÁÈ¡µ½µÄÊý¾ÝµÄBufÖ¸ÕënCountÊÇ´ÓÎÄ¼þ¶ÁÈ¡µÄ×Ö½ÚÊý
+			file.Close();
+			CString temp_cs;
+			MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, tmpString.GetBuffer(len), len);
+			tmpString.ReleaseBuffer();
 
-		tmpString.TrimRight();
-		tmpString.Replace(_T("{"), _T(" "));
-		tmpString.Replace(_T("}"), _T(" "));
-		tmpString.Replace(_T("("), _T(" "));
-		tmpString.Replace(_T(")"), _T(" "));
-		tmpString.Replace(_T("Null,"), _T(" "));
-		return tmpString;
+			tmpString.TrimRight();
+			tmpString.Replace(_T("{"), _T(" "));
+			tmpString.Replace(_T("}"), _T(" "));
+			tmpString.Replace(_T("("), _T(" "));
+			tmpString.Replace(_T(")"), _T(" "));
+			tmpString.Replace(_T("Null,"), _T(" "));
+			return tmpString;
+		}
+		else {
+			return NULL;
+		}
 	}
 	return NULL;
 }
@@ -3452,13 +3457,17 @@ void CDialogCM5_BacNet::Fresh()
 	KillTimer(BAC_READ_PROPERTIES); 
 	if (BACnet_read_thread != NULL)
 	{
+		standard_bacnet_data.clear();
 		TerminateThread(BACnet_read_thread, 0);
 		BACnet_read_thread = NULL;
+		Sleep(100);
 	}
 	if (BACnet_abort_read_thread != NULL)
 	{
+		standard_bacnet_data.clear();
 		TerminateThread(BACnet_abort_read_thread, 0);
 		BACnet_abort_read_thread = NULL;
+		Sleep(100);
 	}
 	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
 	{
@@ -3466,6 +3475,7 @@ void CDialogCM5_BacNet::Fresh()
 			if (BACnet_read_thread == NULL)
 			{
 				ClearBacnetData();
+				
 
 				((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
 
