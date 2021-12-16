@@ -2331,6 +2331,7 @@ void CDialogCM5_BacNet::Fresh()
 		return;
 	}
 
+	BacNet_hwd = this->m_hWnd;
     load_prg_cache_ret = -1;
     CString achive_file_path;
     CString temp_serial;
