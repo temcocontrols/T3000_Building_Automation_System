@@ -85,7 +85,6 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnMove(int x, int y);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	void GetInputUnitandValue(int i, CString& unit, CString& value);
 };
 //int GetPrivateData();
 //int WritePrivateData();

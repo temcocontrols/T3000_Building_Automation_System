@@ -85,8 +85,6 @@ void SetPaneString(int nIndext,CString str);
 UINT get_serialnumber();
 
 
-int Find_Index_Input_By_Label(CString strLabel);
-
 BOOL IS_Temco_Product(int product_model);
 //CString GetTempUnit(int analog1_or_analog2=-1);
 CString GetTempUnit(int nRange=-1,int nPIDNO = 0);

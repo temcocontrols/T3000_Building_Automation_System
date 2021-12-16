@@ -1,6 +1,7 @@
 ﻿
 #include "stdafx.h"
 #include "../ISP/MyPing.h"
+#include "global_function.h"
 #include "Windows.h"
 #include "T3000.h"
  
@@ -13792,20 +13793,6 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
     }
 
     return nret_type;
-}
-
-int Find_Index_Input_By_Label(CString strLabel)
-{
-    char cTemp1[255];
-    memset(cTemp1, 0, 255);
-    WideCharToMultiByte(CP_ACP, 0, strLabel.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
-    for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++)
-    {
-        if (strcmp((char *) m_Input_data.at(i).label , cTemp1)==0)
-        {
-            return i;
-       }
-    }
 }
 
 

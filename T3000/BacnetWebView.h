@@ -9,7 +9,6 @@
 #include "webview2.h"
 #include "BacnetWebViewToolBar.h"
 #include "BacnetWebViewDropTarget.h"
-#include <vector>
 
 #pragma region defines
 #define IDM_GET_BROWSER_VERSION_AFTER_CREATION 170
@@ -79,25 +78,6 @@ public:
 #pragma endregion
 
 private:
-    std::string JsonData = R"~(
-        {
-					'action':2,
-					'type':'input',
-					'device_id':'3000',
-                    'variable' : {
-						'name':"abc",
-						'index':0,
-                        'type' : 1,
-                        'value' : 10
-                    },
-                    'target_variable' : {
-						'name' : "abc",
-						'index':0,
-						'type' : 1,
-						'value' : 'wwe'
-                    }
-                }
-        )~";
     static PCWSTR GetWindowClass();    
     static LRESULT CALLBACK WndProcStatic(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     bool HandleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* result);
@@ -107,11 +87,6 @@ private:
     void InitializeWebView();
     HRESULT OnCreateEnvironmentCompleted(HRESULT result, ICoreWebView2Environment* environment);
     HRESULT OnCreateCoreWebView2ControllerCompleted(HRESULT result, ICoreWebView2Controller* controller);
-
-    HRESULT WebMessageReceived(ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args);
-    HRESULT ExecuteScriptResponse(HRESULT errorCode, LPCWSTR result);
-    void ProcessWebviewMsg(CString msg); 
-    static VOID CALLBACK onTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
     void RegisterEventHandlers();
     void ReinitializeWebViewWithNewBrowser();
     void RestartApp();
@@ -119,9 +94,6 @@ private:
     void CloseAppWindow();
     void ChangeLanguage();
     void UpdateCreationModeMenu();
-
-    std::vector<std::string> GetGraphicFiles(CString path);
-    void get_png_image_dimensions(CString& file_path, unsigned int& width, unsigned int& height);
     std::wstring GetLocalPath(std::wstring path, bool keep_exe_path);
 
     std::wstring m_initialUri;
@@ -144,6 +116,4 @@ private:
     BITMAP m_appBackgroundImage;
     HDC m_memHdc;
 };
-
-
 #endif
