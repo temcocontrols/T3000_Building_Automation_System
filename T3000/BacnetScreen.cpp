@@ -807,12 +807,18 @@ void BacnetScreen::OnBnClickedWebViewShow()
 	*/
 	const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
 
-	CFileDialog dlg(TRUE, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-		szFilter, this->GetTopWindow());
-	if (dlg.DoModal() == IDOK)
+	//CFileDialog dlg(TRUE, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+	//	szFilter, this->GetTopWindow());
+	//if (dlg.DoModal() == IDOK)
 	{
-		CString sFilePath = dlg.GetPathName();
-		wstring fullpath = sFilePath;
+		CString ApplicationFolder;
+		CString webviewFolder;
+		GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+		ApplicationFolder.ReleaseBuffer();
+		webviewFolder = ApplicationFolder + _T("\\Database\\webview\\webview.html");
+		//CString sFilePath = dlg.GetPathName();
+		wstring fullpath = webviewFolder;
 		auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath));
 		auto result = BacnetWebViewAppWindow::RunMessagePump();
 		delete webviewwindow;

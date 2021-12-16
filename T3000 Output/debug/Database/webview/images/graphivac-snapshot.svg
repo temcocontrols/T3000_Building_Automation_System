@@ -1,0 +1,599 @@
+<svg text-anchor="middle" font-size="12" xmlns:xlink="http://www.w3.org/1999/xlink" width="2000" xmlns="http://www.w3.org/2000/svg" class="graphivac unselectable " version="1.1" viewBox="28.224 93.01406 846.88475859375 426.86158" height="1008.0625" style="flex: 1 1 auto; cursor: default;"><g><g><g class="mouse-action"><g/></g><g class="shortcuts"><g/><g/><g/><g/><g/><g/><g/><g/></g><g class="background-grid"><defs><pattern id="pattern-1125" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 0 0 H 60 V 60 H 0 L 0 0" fill="none" stroke-width="0.5" class="grid"/></pattern></defs><rect width="846.88475859375" height="426.86158" x="28.224" y="93.01406" fill="url(#pattern-1125)" opacity="0.5"/></g><g/><g><g class="rectangle-select"><g class="background-grid"><rect width="846.88475859375" height="426.86158" x="28.224" y="93.01406" fill="rgba(0,0,0,0.0)" opacity="0.5"/></g></g><g><!-- react-empty: 1902 --><g><g class="conduits"><g id="duct-z2JoYtvp0R"><g/><g><g/><g><g><g id="mov-1128"><g stroke="black" id="duct-z2JoYtvp0R"><g fill="grey"><g id="duct-z2JoYtvp0R-body" transform="translate(450,150)"><g transform="rotate(180)"><polygon points="-384 24, -360 0, -384 -24, 360 -24, 384 0, 360 24"/></g></g></g></g></g></g></g></g></g><g id="duct-kVsQWar4A9"><g/><g><g/><g><g><g id="mov-1131"><g stroke="black" id="duct-kVsQWar4A9"><g fill="grey"><g id="duct-kVsQWar4A9-body" transform="translate(450,270)"><g transform="rotate(0)"><polygon points="-384 24, -360 0, -384 -24, 360 -24, 384 0, 360 24"/></g></g></g></g></g></g></g></g></g><g id="duct-76qxlMxrIp"><g/><g><g/><g><g><g id="mov-1134"><g stroke="black" id="duct-76qxlMxrIp"><g fill="grey"><g id="duct-76qxlMxrIp-body" transform="translate(690,450)"><g transform="rotate(0)"><polygon points="-144 24, -120 0, -144 -24, 120 -24, 144 0, 120 24"/></g></g></g></g></g></g></g></g></g><g id="duct-ln0Hjob3rp"><g/><g><g/><g><g><g id="mov-1137"><g stroke="black" id="duct-ln0Hjob3rp"><g fill="grey"><g id="duct-ln0Hjob3rp-body" transform="translate(570,360)"><g transform="rotate(90)"><polygon points="-114 24, -90 0, -114 -24, 90 -24, 114 0, 90 24"/></g></g></g></g></g></g></g></g></g><g id="duct-XiD2SdWiLH"><g/><g><g/><g><g><g id="mov-1140"><g stroke="black" id="duct-XiD2SdWiLH"><g fill="grey"><g id="duct-XiD2SdWiLH-body" transform="translate(210,210)"><g transform="rotate(90)"><polygon points="-84 24, -60 0, -84 -24, 60 -24, 84 0, 60 24"/></g></g></g></g></g></g></g></g></g><g class="conduit-nodes"><g stroke="black"><g fill="grey"/><g fill="grey"/><g><g/><g><g/></g></g></g><g stroke="black"><g fill="grey"/><g fill="grey"/><g><g/><g><g/></g></g></g><g stroke="black"><g fill="grey"><g><defs><g id="duct-76qxlMxrIp-n1-shape"><rect x="542.4" y="422.4" width="55.199999999999996" height="55.199999999999996"/></g><mask id="duct-76qxlMxrIp-n1-mask"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-76qxlMxrIp-n1-shape" fill="none" stroke-width="3" stroke="white"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-76qxlMxrIp-body" stroke-width="0" stroke="none" fill="black"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-body" stroke-width="0" stroke="none" fill="black"/></mask><mask id="duct-76qxlMxrIp-n1-mask-2"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-76qxlMxrIp-n1-shape" fill="black" stroke-width="2" stroke="white" mask="url(#duct-76qxlMxrIp-n1-mask)"/></mask><g id="duct-76qxlMxrIp-n1"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-76qxlMxrIp-n1-shape" stroke="none"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-76qxlMxrIp-n1-shape" stroke-width="1" mask="url(#duct-76qxlMxrIp-n1-mask-2)"/></g></defs><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-76qxlMxrIp-n1"/></g></g><g fill="grey"/><g><g/><g><g/></g></g></g><g stroke="black"><g fill="grey"><g><defs><g id="duct-ln0Hjob3rp-n1-shape"><rect x="542.4" y="242.4" width="55.199999999999996" height="55.199999999999996"/></g><mask id="duct-ln0Hjob3rp-n1-mask"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-n1-shape" fill="none" stroke-width="3" stroke="white"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-kVsQWar4A9-body" stroke-width="0" stroke="none" fill="black"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-body" stroke-width="0" stroke="none" fill="black"/></mask><mask id="duct-ln0Hjob3rp-n1-mask-2"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-n1-shape" fill="black" stroke-width="2" stroke="white" mask="url(#duct-ln0Hjob3rp-n1-mask)"/></mask><g id="duct-ln0Hjob3rp-n1"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-n1-shape" stroke="none"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-n1-shape" stroke-width="1" mask="url(#duct-ln0Hjob3rp-n1-mask-2)"/></g></defs><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-n1"/></g></g><g fill="grey"><g><defs><g id="duct-ln0Hjob3rp-n2-shape"><rect x="542.4" y="422.4" width="55.199999999999996" height="55.199999999999996"/></g><mask id="duct-ln0Hjob3rp-n2-mask"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-n2-shape" fill="none" stroke-width="3" stroke="white"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-76qxlMxrIp-body" stroke-width="0" stroke="none" fill="black"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-body" stroke-width="0" stroke="none" fill="black"/></mask><mask id="duct-ln0Hjob3rp-n2-mask-2"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-n2-shape" fill="black" stroke-width="2" stroke="white" mask="url(#duct-ln0Hjob3rp-n2-mask)"/></mask><g id="duct-ln0Hjob3rp-n2"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-n2-shape" stroke="none"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-n2-shape" stroke-width="1" mask="url(#duct-ln0Hjob3rp-n2-mask-2)"/></g></defs><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-ln0Hjob3rp-n2"/></g></g><g><g/><g/></g></g><g stroke="black"><g fill="grey"><g><defs><g id="duct-XiD2SdWiLH-n1-shape"><rect x="182.4" y="122.4" width="55.199999999999996" height="55.199999999999996"/></g><mask id="duct-XiD2SdWiLH-n1-mask"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-n1-shape" fill="none" stroke-width="3" stroke="white"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-z2JoYtvp0R-body" stroke-width="0" stroke="none" fill="black"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-body" stroke-width="0" stroke="none" fill="black"/></mask><mask id="duct-XiD2SdWiLH-n1-mask-2"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-n1-shape" fill="black" stroke-width="2" stroke="white" mask="url(#duct-XiD2SdWiLH-n1-mask)"/></mask><g id="duct-XiD2SdWiLH-n1"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-n1-shape" stroke="none"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-n1-shape" stroke-width="1" mask="url(#duct-XiD2SdWiLH-n1-mask-2)"/></g></defs><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-n1"/></g></g><g fill="grey"><g><defs><g id="duct-XiD2SdWiLH-n2-shape"><rect x="182.4" y="242.4" width="55.199999999999996" height="55.199999999999996"/></g><mask id="duct-XiD2SdWiLH-n2-mask"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-n2-shape" fill="none" stroke-width="3" stroke="white"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-kVsQWar4A9-body" stroke-width="0" stroke="none" fill="black"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-body" stroke-width="0" stroke="none" fill="black"/></mask><mask id="duct-XiD2SdWiLH-n2-mask-2"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-n2-shape" fill="black" stroke-width="2" stroke="white" mask="url(#duct-XiD2SdWiLH-n2-mask)"/></mask><g id="duct-XiD2SdWiLH-n2"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-n2-shape" stroke="none"/><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-n2-shape" stroke-width="1" mask="url(#duct-XiD2SdWiLH-n2-mask-2)"/></g></defs><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#duct-XiD2SdWiLH-n2"/></g></g><g><g/><g/></g></g></g><g class="handles"/></g><g><g id="obj-NtL1gf9fjp"><g/><g><g/><g><g><g id="mov-1143"><g transform="translate(600,420)"><g class="object-cell"><g class="object-name"><g class="unselectable"><text stroke="none" x="30" y="-5"><tspan x="30">Heating Z2</tspan></text></g></g><g class="graphivac-object"><g class="transform"><g class="active value-80"><g class="symbol"><svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg3033" viewBox="0 0 32 32" height="60" width="60" version="1.1">
+  <defs id="defs3">   
+    <style type="text/css"><![CDATA[
+    .graphivac-object .in-alarm .heating-coil {animation:heating-coil-alarm 1s infinite;}
+    @keyframes heating-coil-alarm {
+    0% { fill: red; }
+    50% { fill: #659dc5;}
+    100% { fill: red; }}
+
+    .graphivac-object .active:not(.in-alarm) .heating-coil {animation:heating-coil-active 1.5s infinite;}
+    @keyframes heating-coil-active {
+    0% { fill: #fff600; }
+    50% { fill: #ffae00;}
+    100% { fill: #fff600; }}
+
+    .graphivac-object .value-100 .heating-coil {
+    transform: scale(1, 1);
+    }
+
+    .graphivac-object .value-90 .heating-coil {
+    transform: scale(1, 0.9);
+    }
+
+    .graphivac-object .value-80 .heating-coil {
+    transform: scale(1, 0.8);
+    }
+
+    .graphivac-object .value-70 .heating-coil {
+    transform: scale(1, 0.7);
+    }
+
+    .graphivac-object .value-60 .heating-coil {
+    transform: scale(1, 0.6);
+    }
+
+    .graphivac-object .value-50 .heating-coil {
+    transform: scale(1, 0.5);
+    }
+
+    .graphivac-object .value-40 .heating-coil {
+    transform: scale(1, 0.4);
+    }
+
+    .graphivac-object .value-30 .heating-coil {
+    transform: scale(1, 0.3);
+    }
+
+    .graphivac-object .value-20 .heating-coil {
+    transform: scale(1, 0.2);
+    }
+    
+    .graphivac-object .value-10 .heating-coil {
+    transform: scale(1, 0.1);
+    }
+
+    .graphivac-object .value-0 .heating-coil {
+    transform: scale(1, 0);
+    }
+
+
+    ]]></style>
+    <rect id="heating-coil-rect" height="27.246" width="17.868" x="0" y="0"/>
+  </defs>
+  <g stroke="#000">
+    <use xlink:href="#heating-coil-rect" fill="#659dc5" stroke="none" x="7.066" y="2.3772"/>
+    <g transform="translate(24.9334,29.6232) rotate(180)">
+      <use xlink:href="#heating-coil-rect" class="heating-coil" x="0" y="0" fill="#659dc5" stroke="none"/>
+    </g>
+    <use xlink:href="#heating-coil-rect" stroke-width="1" fill="none" x="7.066" y="2.3772"/>
+    <path id="path3003" stroke-linejoin="miter" d="M24.929,2.3734,7.2868,29.555" stroke="#000" stroke-linecap="butt" stroke-width="1px" fill="none"/>
+  </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"><g class="unselectable"><text stroke="none" x="30" y="75"><tspan x="30">77.11</tspan></text></g></g></g></g></g></g></g></g></g><g id="obj-viGENKtiBd"><g/><g><g/><g><g><g id="mov-1147"><g transform="translate(120,120)"><g class="object-cell"><g class="object-name"><g class="unselectable"><text stroke="none" x="30" y="-5"><tspan x="30">DP-2</tspan></text></g></g><g class="graphivac-object"><g class="transform"><g class="inactive"><g class="symbol"><svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg3033" viewBox="0 0 32 32" height="60" width="60" version="1.1">
+ <metadata id="metadata3038">
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+   <style type="text/css"><![CDATA[
+
+   .graphivac-object .in-alarm .damper {animation:damper-alarm 1s infinite;}
+   @keyframes damper-alarm {
+   0% { fill: red; }
+   50% { fill: #659dc5;}
+   100% { fill: red; }}
+   
+   .graphivac-object .damper-line {
+   transform: rotate(35deg);
+   }
+   
+   .graphivac-object .value-100 .damper-line {
+   transform: rotate(0deg);
+   }
+   .graphivac-object .value-90 .damper-line {
+   transform: rotate(8deg);
+   }
+   .graphivac-object .value-80 .damper-line {
+   transform: rotate(16deg);
+   }
+   .graphivac-object .value-70 .damper-line {
+   transform: rotate(24deg);
+   }
+   .graphivac-object .value-60 .damper-line {
+   transform: rotate(32deg);
+   }
+   .graphivac-object .value-50 .damper-line {
+   transform: rotate(40deg);
+   }
+   .graphivac-object .value-40 .damper-line {
+   transform: rotate(48deg);
+   }
+   .graphivac-object .value-30 .damper-line {
+   transform: rotate(56deg);
+   }
+   .graphivac-object .value-20 .damper-line {
+   transform: rotate(64deg);
+   }
+   .graphivac-object .value-10 .damper-line {
+   transform: rotate(72deg);
+   }
+   .graphivac-object .value-0 .damper-line {
+   transform: rotate(80deg);
+   }
+   ]]></style>
+ </defs>
+
+ <rect id="rect4367" class="damper" height="27.5" width="12" stroke="#000" stroke-miterlimit="4" x="10" y="2.25" stroke-dasharray="none" stroke-width="1" fill="#659dc5"/>
+ <g stroke="black" stroke-width="1.5px">
+   <g transform="translate(16 7)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+   <g transform="translate(16 13)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+   <g transform="translate(16 19)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+   <g transform="translate(16 25)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+ </g>
+ <g id="g4877" stroke-linejoin="miter" transform="matrix(1.2268237,0,0,0.94845469,-3.9945788,0.38726261)" stroke="#000" stroke-linecap="butt" fill="none">
+
+  <path id="path4317" stroke-width="1.06272972px" d="m16.298,2.2402,0,28.442"/>
+
+ </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"/></g></g></g></g></g></g></g><g id="obj-FyIEaeehAk"><g/><g><g/><g><g><g id="mov-1151"><g transform="translate(480,120)"><g class="object-cell"><g class="object-name"><g class="unselectable"><text stroke="none" x="30" y="-5"><tspan x="30">Return</tspan></text></g></g><g class="graphivac-object"><g class="transform mirror" transform="rotate(0 30 30)scale(-1,1)translate(-60,0)"><g class="active value-100"><g class="symbol"><svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" id="fan" height="60" viewBox="0 0 32 32" width="60" version="1.1">
+  <defs id="defs3">
+    <style type="text/css"><![CDATA[
+    .graphivac-object .in-alarm .fan {animation:fan-alarm 1s infinite;}
+    @keyframes fan-alarm {
+    0% { fill: red; }
+    50% { fill: #659dc5;}
+    100% { fill: red; }}
+    .graphivac-object .active .fan .rotating-middle {
+    animation:fan-spin 3s linear infinite;
+    }
+    
+    .graphivac-object .active:not(.in-alarm) .fan .fan-background {
+    fill: #66c492;
+    }
+
+    
+    
+    @keyframes fan-spin { 100% {transform:rotate(360deg);} }
+    ]]></style>
+  </defs>
+  <g fill="#659dc5">
+    <g class="fan">
+      <g id="g8">
+	<path class="fan-background" d="m12.297 5.154c-6.117 0-11.066 4.9492-11.066 11.066 0 6.117 4.9492 11.066 11.066 11.066 5.7137 0 10.408-4.3091 11.003-9.8647h7.525v-12.268h-18.148c-0.12601-0.0043-0.25236 0-0.37941 0z" fill-rule="evenodd" stroke="#000" stroke-width="1px" fill="inherit">inkscape:connector-curvature="0"</path>
+      </g>
+      <g id="g4148" transform="translate(12.464 16.395)">
+	<g id="g4162" stroke="#000" stroke-width="1.5" fill="none" class="rotating-middle">
+	  <path id="use3009" d="m-1.8112-3.9787 3.6227-4.4971"/>
+	  <path id="use3011" d="m0.87376-4.2835 5.5741-1.5089"/>
+	  <path id="use3013" d="m3.2243-2.9521 5.3965 2.0557"/>
+	  <path id="use3015" d="m4.3433-0.4935 3.1575 4.835"/>
+	  <path id="use3017" d="m3.8043 2.1547-0.28747 5.7676"/>
+	  <path id="use3019" d="m1.8113 3.9787-3.6227 4.4971"/>
+	  <path id="use3021" d="m-0.87324 4.2837-5.5741 1.5089"/>
+	  <path id="use3023" d="m-3.2242 2.9527-5.3965-2.0559"/>
+	  <path id="use3025" d="m-4.3432 0.4935-3.158-4.8353"/>
+	  <path id="use3027" d="m-3.8032-2.1541 0.2875-5.7676"/>
+	</g>
+      </g>
+    </g>
+  </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"><g class="unselectable"><text stroke="none" x="30" y="75"><tspan x="30">On</tspan></text></g></g></g></g></g></g></g></g></g><g id="obj-gjwTKYrJaC"><g/><g><g/><g><g><g id="mov-1155"><g transform="translate(600,240)"><g class="object-cell"><g class="object-name"><g class="unselectable"><text stroke="none" x="30" y="-5"><tspan x="30">Heating Z1</tspan></text></g></g><g class="graphivac-object"><g class="transform"><g class="active value-10"><g class="symbol"><svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg3033" viewBox="0 0 32 32" height="60" width="60" version="1.1">
+  <defs id="defs3">   
+    <style type="text/css"><![CDATA[
+    .graphivac-object .in-alarm .heating-coil {animation:heating-coil-alarm 1s infinite;}
+    @keyframes heating-coil-alarm {
+    0% { fill: red; }
+    50% { fill: #659dc5;}
+    100% { fill: red; }}
+
+    .graphivac-object .active:not(.in-alarm) .heating-coil {animation:heating-coil-active 1.5s infinite;}
+    @keyframes heating-coil-active {
+    0% { fill: #fff600; }
+    50% { fill: #ffae00;}
+    100% { fill: #fff600; }}
+
+    .graphivac-object .value-100 .heating-coil {
+    transform: scale(1, 1);
+    }
+
+    .graphivac-object .value-90 .heating-coil {
+    transform: scale(1, 0.9);
+    }
+
+    .graphivac-object .value-80 .heating-coil {
+    transform: scale(1, 0.8);
+    }
+
+    .graphivac-object .value-70 .heating-coil {
+    transform: scale(1, 0.7);
+    }
+
+    .graphivac-object .value-60 .heating-coil {
+    transform: scale(1, 0.6);
+    }
+
+    .graphivac-object .value-50 .heating-coil {
+    transform: scale(1, 0.5);
+    }
+
+    .graphivac-object .value-40 .heating-coil {
+    transform: scale(1, 0.4);
+    }
+
+    .graphivac-object .value-30 .heating-coil {
+    transform: scale(1, 0.3);
+    }
+
+    .graphivac-object .value-20 .heating-coil {
+    transform: scale(1, 0.2);
+    }
+    
+    .graphivac-object .value-10 .heating-coil {
+    transform: scale(1, 0.1);
+    }
+
+    .graphivac-object .value-0 .heating-coil {
+    transform: scale(1, 0);
+    }
+
+
+    ]]></style>
+    <rect id="heating-coil-rect" height="27.246" width="17.868" x="0" y="0"/>
+  </defs>
+  <g stroke="#000">
+    <use xlink:href="#heating-coil-rect" fill="#659dc5" stroke="none" x="7.066" y="2.3772"/>
+    <g transform="translate(24.9334,29.6232) rotate(180)">
+      <use xlink:href="#heating-coil-rect" class="heating-coil" x="0" y="0" fill="#659dc5" stroke="none"/>
+    </g>
+    <use xlink:href="#heating-coil-rect" stroke-width="1" fill="none" x="7.066" y="2.3772"/>
+    <path id="path3003" stroke-linejoin="miter" d="M24.929,2.3734,7.2868,29.555" stroke="#000" stroke-linecap="butt" stroke-width="1px" fill="none"/>
+  </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"><g class="unselectable"><text stroke="none" x="30" y="75"><tspan x="30">9.65</tspan></text></g></g></g></g></g></g></g></g></g><g id="obj-dNUlQY7dEC"><g/><g><g/><g><g><g id="mov-1159"><g transform="translate(120,240)"><g class="object-cell"><g class="object-name"><g class="unselectable"><text stroke="none" x="30" y="-5"><tspan x="30">DP-1</tspan></text></g></g><g class="graphivac-object"><g class="transform"><g class="inactive value-0"><g class="symbol"><svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg3033" viewBox="0 0 32 32" height="60" width="60" version="1.1">
+ <metadata id="metadata3038">
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+   <style type="text/css"><![CDATA[
+
+   .graphivac-object .in-alarm .damper {animation:damper-alarm 1s infinite;}
+   @keyframes damper-alarm {
+   0% { fill: red; }
+   50% { fill: #659dc5;}
+   100% { fill: red; }}
+   
+   .graphivac-object .damper-line {
+   transform: rotate(35deg);
+   }
+   
+   .graphivac-object .value-100 .damper-line {
+   transform: rotate(0deg);
+   }
+   .graphivac-object .value-90 .damper-line {
+   transform: rotate(8deg);
+   }
+   .graphivac-object .value-80 .damper-line {
+   transform: rotate(16deg);
+   }
+   .graphivac-object .value-70 .damper-line {
+   transform: rotate(24deg);
+   }
+   .graphivac-object .value-60 .damper-line {
+   transform: rotate(32deg);
+   }
+   .graphivac-object .value-50 .damper-line {
+   transform: rotate(40deg);
+   }
+   .graphivac-object .value-40 .damper-line {
+   transform: rotate(48deg);
+   }
+   .graphivac-object .value-30 .damper-line {
+   transform: rotate(56deg);
+   }
+   .graphivac-object .value-20 .damper-line {
+   transform: rotate(64deg);
+   }
+   .graphivac-object .value-10 .damper-line {
+   transform: rotate(72deg);
+   }
+   .graphivac-object .value-0 .damper-line {
+   transform: rotate(80deg);
+   }
+   ]]></style>
+ </defs>
+
+ <rect id="rect4367" class="damper" height="27.5" width="12" stroke="#000" stroke-miterlimit="4" x="10" y="2.25" stroke-dasharray="none" stroke-width="1" fill="#659dc5"/>
+ <g stroke="black" stroke-width="1.5px">
+   <g transform="translate(16 7)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+   <g transform="translate(16 13)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+   <g transform="translate(16 19)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+   <g transform="translate(16 25)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+ </g>
+ <g id="g4877" stroke-linejoin="miter" transform="matrix(1.2268237,0,0,0.94845469,-3.9945788,0.38726261)" stroke="#000" stroke-linecap="butt" fill="none">
+
+  <path id="path4317" stroke-width="1.06272972px" d="m16.298,2.2402,0,28.442"/>
+
+ </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"><g class="unselectable"><text stroke="none" x="30" y="75"><tspan x="30">0.00</tspan></text></g></g></g></g></g></g></g></g></g><g id="obj-1XkOaonIU3"><g/><g><g/><g><g><g id="mov-1163"><g transform="translate(720,240)"><g class="object-cell"><g class="object-name"><g class="unselectable"><text stroke="none" x="30" y="-5"><tspan x="30">Supply Temp Z1</tspan></text></g></g><g class="graphivac-object"><g class="transform"><g class="active value-20"><g class="symbol"><svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" id="svg2986" height="60" width="60" version="1.1" viewBox="0 0 32 32" inkscape:version="0.91 r" sodipodi:docname="sensor-temperature.svg">
+  <defs id="defs9"/>
+  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="1247" inkscape:window-height="1388" id="namedview7" showgrid="false" inkscape:zoom="5.2149125" inkscape:cx="-7.577538" inkscape:cy="-36.615109" inkscape:window-x="1312" inkscape:window-y="24" inkscape:window-maximized="0" inkscape:current-layer="svg2986"/>
+  <metadata id="metadata2991">
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <dc:title/>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g id="layer1" stroke="#000" stroke-width="1px">
+    <rect id="rect3012" height="14.505" width="2.901" y="9.9128" x="14.557" fill="#ff0"/>
+    <path id="path3010" stroke-width="1.2px" transform="matrix(.74098 0 0 .74098 7.3047 15.679)" fill="#659dc5" d="m17.949 15.898-3.1021 5.373h-6.2042l-3.1021-5.373 3.1021-5.373h6.2042z"/>
+  </g>
+  <g id="g4141" transform="translate(9.6012392,1.1026072)">
+    <circle r="0.77312505" cy="28.129852" cx="6.4061227" id="path4137" style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+    <path inkscape:connector-curvature="0" id="path4139" d="m 6.4061205,27.157211 0,-3.503721" style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+  </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"><g class="unselectable"><text stroke="none" x="30" y="75"><tspan x="30">17.89 °C</tspan></text></g></g></g></g></g></g></g></g></g><g id="obj-By9sdrzGc1"><g/><g><g/><g><g><g id="mov-1167"><g transform="translate(300,240)"><g class="object-cell"><g class="object-name"><g class="unselectable"><text stroke="none" x="30" y="-5"><tspan x="30">Cooling</tspan></text></g></g><g class="graphivac-object"><g class="transform"><g class="active value-40"><g class="symbol"><svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg3033" viewBox="0 0 32 32" height="60" width="60" version="1.1">
+ <metadata id="metadata3038">
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs id="defs3">  
+   <style type="text/css"><![CDATA[
+   .graphivac-object .in-alarm .cooling-coil {
+   animation:cooling-coil-alarm 1s infinite;
+   }
+   
+   @keyframes cooling-coil-alarm {
+   0% { fill: red; }
+   50% { fill: #659dc5;}
+   100% { fill: red; }}
+
+   .graphivac-object .active:not(.in-alarm) .cooling-coil {animation:cooling-coil-active 1.5s infinite;}
+   @keyframes cooling-coil-active {
+   0% { fill: #98EEFF; }
+   50% { fill: #4bb7d8;}
+   100% { fill: #98EEFF; }}
+
+   .graphivac-object .value-100 .cooling-coil {
+   transform: scale(1, 1);
+   }
+
+   .graphivac-object .value-90 .cooling-coil {
+   transform: scale(1, 0.9);
+   }
+
+   .graphivac-object .value-80 .cooling-coil {
+   transform: scale(1, 0.8);
+   }
+
+   .graphivac-object .value-70 .cooling-coil {
+   transform: scale(1, 0.7);
+   }
+
+   .graphivac-object .value-60 .cooling-coil {
+   transform: scale(1, 0.6);
+   }
+
+   .graphivac-object .value-50 .cooling-coil {
+   transform: scale(1, 0.5);
+   }
+
+   .graphivac-object .value-40 .cooling-coil {
+   transform: scale(1, 0.4);
+   }
+
+   .graphivac-object .value-30 .cooling-coil {
+   transform: scale(1, 0.3);
+   }
+
+   .graphivac-object .value-20 .cooling-coil {
+   transform: scale(1, 0.2);
+   }
+   
+   .graphivac-object .value-10 .cooling-coil {
+   transform: scale(1, 0.1);
+   }
+
+   .graphivac-object .value-0 .cooling-coil {
+   transform: scale(1, 0);
+   }
+   ]]></style>
+ </defs>
+ <g stroke="#000">
+   <rect id="rect4367" height="27.246" width="17.868" x="7.066" y="2.3772" fill="#659dc5"/>
+   <g transform="translate(24.9334,29.6232) rotate(180)">
+     <rect id="rect4367" class="cooling-coil" height="27.246" width="17.875" x="0" y="0" fill="#659dc5" stroke="none"/>
+   </g>
+   <rect id="rect4367" height="27.246" width="17.868" x="7.066" y="2.3772" fill="none"/>
+   <path id="path3001" d="m7.322 2.3729 17.424 27.254" stroke-width="1px" fill="none"/>
+   <path id="path3003" d="m24.929 2.3734-17.642 27.182" stroke-width="1px" fill="none"/>
+ </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"><g class="unselectable"><text stroke="none" x="30" y="75"><tspan x="30">39.94</tspan></text></g></g></g></g></g></g></g></g></g><g id="obj-qY2J3a5bdE"><g/><g><g/><g><g><g id="mov-1171"><g transform="translate(420,240)"><g class="object-cell"><g class="object-name"><g class="unselectable"><text stroke="none" x="30" y="-5"><tspan x="30">Supply</tspan></text></g></g><g class="graphivac-object"><g class="transform"><g class="active value-100"><g class="symbol"><svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" id="fan" height="60" viewBox="0 0 32 32" width="60" version="1.1">
+  <defs id="defs3">
+    <style type="text/css"><![CDATA[
+    .graphivac-object .in-alarm .fan {animation:fan-alarm 1s infinite;}
+    @keyframes fan-alarm {
+    0% { fill: red; }
+    50% { fill: #659dc5;}
+    100% { fill: red; }}
+    .graphivac-object .active .fan .rotating-middle {
+    animation:fan-spin 3s linear infinite;
+    }
+    
+    .graphivac-object .active:not(.in-alarm) .fan .fan-background {
+    fill: #66c492;
+    }
+
+    
+    
+    @keyframes fan-spin { 100% {transform:rotate(360deg);} }
+    ]]></style>
+  </defs>
+  <g fill="#659dc5">
+    <g class="fan">
+      <g id="g8">
+	<path class="fan-background" d="m12.297 5.154c-6.117 0-11.066 4.9492-11.066 11.066 0 6.117 4.9492 11.066 11.066 11.066 5.7137 0 10.408-4.3091 11.003-9.8647h7.525v-12.268h-18.148c-0.12601-0.0043-0.25236 0-0.37941 0z" fill-rule="evenodd" stroke="#000" stroke-width="1px" fill="inherit">inkscape:connector-curvature="0"</path>
+      </g>
+      <g id="g4148" transform="translate(12.464 16.395)">
+	<g id="g4162" stroke="#000" stroke-width="1.5" fill="none" class="rotating-middle">
+	  <path id="use3009" d="m-1.8112-3.9787 3.6227-4.4971"/>
+	  <path id="use3011" d="m0.87376-4.2835 5.5741-1.5089"/>
+	  <path id="use3013" d="m3.2243-2.9521 5.3965 2.0557"/>
+	  <path id="use3015" d="m4.3433-0.4935 3.1575 4.835"/>
+	  <path id="use3017" d="m3.8043 2.1547-0.28747 5.7676"/>
+	  <path id="use3019" d="m1.8113 3.9787-3.6227 4.4971"/>
+	  <path id="use3021" d="m-0.87324 4.2837-5.5741 1.5089"/>
+	  <path id="use3023" d="m-3.2242 2.9527-5.3965-2.0559"/>
+	  <path id="use3025" d="m-4.3432 0.4935-3.158-4.8353"/>
+	  <path id="use3027" d="m-3.8032-2.1541 0.2875-5.7676"/>
+	</g>
+      </g>
+    </g>
+  </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"><g class="unselectable"><text stroke="none" x="30" y="75"><tspan x="30">On</tspan></text></g></g></g></g></g></g></g></g></g><g id="obj-ize6ykIlSU"><g/><g><g/><g><g><g id="mov-1175"><g transform="translate(660,120)"><g class="object-cell"><g class="object-name"><g class="unselectable"><text stroke="none" x="30" y="-5"><tspan x="30">CA2_CO2_RET</tspan></text></g></g><g class="graphivac-object"><g class="transform"><g class="inactive value-500"><g class="symbol"><svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg3033" viewBox="0 0 32 32" height="60" width="60" version="1.1">
+ <metadata id="metadata3038">
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g stroke="#000">
+   <rect id="rect3994" stroke-linejoin="round" stroke-dasharray="none" fill-rule="nonzero" height="27.718" width="27.718" stroke-linecap="butt" stroke-miterlimit="4" y="2.141" x="2.141" stroke-width="1.0868" fill="#659dc5"/>
+   <path id="path4033" stroke="none" fill="black" style="" d="m13.858,23.015,2.8144,0,0,3.5215-2.8144,0,0-3.5215m2.7312-2.038-2.648,0,0-2.1351c-0.000005-0.9335,0.12939-1.7006,0.38819-2.3014,0.25879-0.60076,0.80411-1.2986,1.636-2.0935l1.2478-1.2339c0.52682-0.48985,0.90577-0.95198,1.1369-1.3864,0.2403-0.43439,0.36046-0.87804,0.36046-1.3309-0.00001-0.82258-0.30502-1.4881-0.91503-1.9964-0.60078-0.50833-1.4003-0.7625-2.3985-0.76252-0.73018,0.0000188-1.5112,0.16177-2.343,0.48524-0.8226,0.32351-1.6822,0.79489-2.5787,1.4141v-2.6064c0.86881-0.52681,1.7469-0.91963,2.6342-1.1784,0.89654-0.25877,1.8208-0.38817,2.7728-0.38819,1.7006,0.000021,3.0639,0.44829,4.0899,1.3448,1.0352,0.89656,1.5528,2.0796,1.5528,3.5492-0.000013,0.70246-0.16638,1.3726-0.49911,2.0103-0.33275,0.62852-0.91504,1.3402-1.7469,2.1351l-1.22,1.1923c-0.43442,0.43442-0.74404,0.7764-0.92889,1.0259-0.17562,0.24032-0.3004,0.47601-0.37433,0.70707-0.05547,0.19411-0.09706,0.42979-0.12478,0.70707-0.02774,0.27729-0.0416,0.65624-0.04159,1.1369v1.7053"/>
+ </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"><g class="unselectable"><text stroke="none" x="30" y="75"><tspan x="30">497.91 ppm</tspan></text></g></g></g></g></g></g></g></g></g><g id="obj-wuokkosFXr"><g/><g><g/><g><g><g id="mov-1179"><g transform="translate(720,420)"><g class="object-cell"><g class="object-name"><g class="unselectable"><text stroke="none" x="30" y="-5"><tspan x="30">Supply Temp Z2</tspan></text></g></g><g class="graphivac-object"><g class="transform"><g class="active value-20"><g class="symbol"><svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" id="svg2986" height="60" width="60" version="1.1" viewBox="0 0 32 32" inkscape:version="0.91 r" sodipodi:docname="sensor-temperature.svg">
+  <defs id="defs9"/>
+  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="1247" inkscape:window-height="1388" id="namedview7" showgrid="false" inkscape:zoom="5.2149125" inkscape:cx="-7.577538" inkscape:cy="-36.615109" inkscape:window-x="1312" inkscape:window-y="24" inkscape:window-maximized="0" inkscape:current-layer="svg2986"/>
+  <metadata id="metadata2991">
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <dc:title/>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g id="layer1" stroke="#000" stroke-width="1px">
+    <rect id="rect3012" height="14.505" width="2.901" y="9.9128" x="14.557" fill="#ff0"/>
+    <path id="path3010" stroke-width="1.2px" transform="matrix(.74098 0 0 .74098 7.3047 15.679)" fill="#659dc5" d="m17.949 15.898-3.1021 5.373h-6.2042l-3.1021-5.373 3.1021-5.373h6.2042z"/>
+  </g>
+  <g id="g4141" transform="translate(9.6012392,1.1026072)">
+    <circle r="0.77312505" cy="28.129852" cx="6.4061227" id="path4137" style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+    <path inkscape:connector-curvature="0" id="path4139" d="m 6.4061205,27.157211 0,-3.503721" style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+  </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"><g class="unselectable"><text stroke="none" x="30" y="75"><tspan x="30">21.47 °C</tspan></text></g></g></g></g></g></g></g></g></g><g id="obj-KHvb36iOAk"><g/><g><g/><g><g><g id="mov-1183"><g transform="translate(180,180)"><g class="object-cell"><g class="object-name"/><g class="graphivac-object"><g class="transform" transform="rotate(90 30 30)"><g class="active value-100"><g class="symbol"><svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg3033" viewBox="0 0 32 32" height="60" width="60" version="1.1">
+ <metadata id="metadata3038">
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+   <style type="text/css"><![CDATA[
+
+   .graphivac-object .in-alarm .damper {animation:damper-alarm 1s infinite;}
+   @keyframes damper-alarm {
+   0% { fill: red; }
+   50% { fill: #659dc5;}
+   100% { fill: red; }}
+   
+   .graphivac-object .damper-line {
+   transform: rotate(35deg);
+   }
+   
+   .graphivac-object .value-100 .damper-line {
+   transform: rotate(0deg);
+   }
+   .graphivac-object .value-90 .damper-line {
+   transform: rotate(8deg);
+   }
+   .graphivac-object .value-80 .damper-line {
+   transform: rotate(16deg);
+   }
+   .graphivac-object .value-70 .damper-line {
+   transform: rotate(24deg);
+   }
+   .graphivac-object .value-60 .damper-line {
+   transform: rotate(32deg);
+   }
+   .graphivac-object .value-50 .damper-line {
+   transform: rotate(40deg);
+   }
+   .graphivac-object .value-40 .damper-line {
+   transform: rotate(48deg);
+   }
+   .graphivac-object .value-30 .damper-line {
+   transform: rotate(56deg);
+   }
+   .graphivac-object .value-20 .damper-line {
+   transform: rotate(64deg);
+   }
+   .graphivac-object .value-10 .damper-line {
+   transform: rotate(72deg);
+   }
+   .graphivac-object .value-0 .damper-line {
+   transform: rotate(80deg);
+   }
+   ]]></style>
+ </defs>
+
+ <rect id="rect4367" class="damper" height="27.5" width="12" stroke="#000" stroke-miterlimit="4" x="10" y="2.25" stroke-dasharray="none" stroke-width="1" fill="#659dc5"/>
+ <g stroke="black" stroke-width="1.5px">
+   <g transform="translate(16 7)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+   <g transform="translate(16 13)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+   <g transform="translate(16 19)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+   <g transform="translate(16 25)">
+     <line x1="-5" x2="5" y1="0" y2="0" transform="rotate(-35)" class="damper-line"/>
+   </g>
+ </g>
+ <g id="g4877" stroke-linejoin="miter" transform="matrix(1.2268237,0,0,0.94845469,-3.9945788,0.38726261)" stroke="#000" stroke-linecap="butt" fill="none">
+
+  <path id="path4317" stroke-width="1.06272972px" d="m16.298,2.2402,0,28.442"/>
+
+ </g>
+</svg></g></g></g><g class="status-flags"/></g><g class="object-text"><g class="unselectable"><text stroke="none" x="65" y="35" text-anchor="start"><tspan x="65">100.00</tspan></text></g></g></g></g></g></g></g></g></g></g><g><g id="txt-yOi5k33blg"><g/><g><g/><g><g><g id="mov-1187"><g transform="translate(720,300)"><g class="unselectable"><text stroke="none" x="30" y="30" font-size="12"><tspan x="30">SP 17.04 °C</tspan></text></g></g></g></g></g></g></g><g id="txt-gk6h9b3omn"><g/><g><g/><g><g><g id="mov-1190"><g transform="translate(720,480)"><g class="unselectable"><text stroke="none" x="30" y="30" font-size="12"><tspan x="30">SP 23.00 °C</tspan></text></g></g></g></g></g></g></g></g></g><!-- react-empty: 2330 --></g><g class="selection"/><g class="selecting-rectangle"/></g><g class="drag-n-drop" style="pointer-events: none;"/><g/></g></g></svg>
