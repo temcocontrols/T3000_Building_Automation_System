@@ -12,6 +12,7 @@ const int EVENT_FIRST_LOAD_PROG = 4;
 const int EVENT_CHANGE_PROTOCOL = 5;
 const int EVENT_WARNING_CHANGE_PROTOCOL_BAUDRATE = 6;
 const int EVENT_SYNC_TIME = 7;
+const int EVENT_MESSAGE_ONLY = 8;
 
 class CShowMessageDlg : public CDialogEx
 {

@@ -117,7 +117,19 @@ __declspec(dllexport) void ShutDownMstpGlobal(uint8_t n_time);
         uint32_t device_id,
         BACNET_SUBSCRIBE_COV_DATA * cov_data);
 
-
+    __declspec(dllexport)   uint8_t Send_Segment_Ack(
+        uint32_t device_id, /* destination device */
+        uint32_t invoke_id,
+        uint32_t sequence_num,
+        uint32_t window_size,
+        uint32_t array_index);
+       uint8_t Send_Segment_Ack_Address(
+        BACNET_ADDRESS* dest,
+        uint16_t max_apdu,
+        uint32_t invoke_id,
+        uint32_t sequence_num,
+        uint32_t window_size,
+        uint32_t array_index);
 
 /* returns the invoke ID for confirmed request, or 0 if failed */
     uint8_t Send_Read_Property_Request_Address(
@@ -148,7 +160,7 @@ __declspec(dllexport) void ShutDownMstpGlobal(uint8_t n_time);
         BACNET_APPLICATION_DATA_VALUE * object_value,
         uint8_t priority,
         uint32_t array_index);
-    uint8_t Send_Write_Property_Request_Data(
+ __declspec(dllexport)  uint8_t Send_Write_Property_Request_Data(
         uint32_t device_id,
         BACNET_OBJECT_TYPE object_type,
         uint32_t object_instance,

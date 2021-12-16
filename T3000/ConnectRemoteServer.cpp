@@ -143,7 +143,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 #endif
 
 
-	ConnectMessage[static_step].Format(_T("Connect to Temco Sever!"));
+	ConnectMessage[static_step].Format(_T("Connect to Sever!"));
 	static_step ++;
 	pParent->Invalidate(1);
 

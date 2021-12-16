@@ -66,7 +66,7 @@ public:
 	
 //	CMonthview1 m_monthViewCtrl;
 protected:
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	//virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 public:
 	CComboBox m_yearComBox;
 	afx_msg void OnCbnSelchangeCombo1();
@@ -84,4 +84,5 @@ public:
 
     int m_leap_year;
 
+	void Write_BACnet_ThirdParty_DateList();
 };

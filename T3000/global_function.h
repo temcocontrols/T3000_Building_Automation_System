@@ -38,6 +38,7 @@ BOOL CheckForUpdate(
 	LPCTSTR szCurrentVersion,
 	LPTSTR szLastVersion );
 
+
 void FLEX_GRID_PUT_STR(CMsflexgrid m_FlexGri,int row,int col,CString str);
 int Set_Communication_Count(bool b_transmission,int bac_instanceid);
 int modbus_read_one_value( 
@@ -156,11 +157,12 @@ void local_handler_read_property_multiple_ack(
     BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
 
 //int Bacnet_Read_Property_Multiple();
-int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
+int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id); 
+int Bacnet_Read_Properties_Multiple_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_READ_ACCESS_DATA &value, uint8_t retrytime, uint32_t index = BACNET_ARRAY_ALL);
 
-int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
-int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime = 3);
-int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE * object_value, uint8_t priority = 16);
+int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, uint32_t index = BACNET_ARRAY_ALL);
+int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime = 3, uint32_t index = BACNET_ARRAY_ALL);
+int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE * object_value, uint8_t priority = 16,BACNET_READ_PROPERTY_DATA * objectData=NULL );
 int Bacnet_Write_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE * object_value, uint8_t priority = 16, uint8_t retrytime = 3);
 void localhandler_read_property_ack(
     uint8_t * service_request,
@@ -169,6 +171,15 @@ void localhandler_read_property_ack(
     BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data); //标准的读属性;
 
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src);
+
+void LocalBacnetAbortHandler(BACNET_ADDRESS* src,uint8_t invoke_id,	uint8_t abort_reason,	bool server);
+void LocalBacnetReadErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERROR_CLASS error_class, BACNET_ERROR_CODE error_code);
+void LocalBacnetErrorHandler(BACNET_ADDRESS* src, uint8_t invoke_id, BACNET_ERROR_CLASS error_class,BACNET_ERROR_CODE error_code);
+void Localhandler_write_property_ack(
+	uint8_t* service_request,
+	uint16_t service_len,
+	BACNET_ADDRESS* src,
+	BACNET_CONFIRMED_SERVICE_ACK_DATA* service_data);
 
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
 char * intervaltotext(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c =":");

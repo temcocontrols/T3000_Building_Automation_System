@@ -78,6 +78,7 @@ extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
 extern CString g_ext_database_path ; //¶îÍâµÄÅäÖÃµµÊı¾İ¿âÂ·¾¶;
+extern CString g_ext_mass_flash_path ; //±£´æ¶àÉÕĞ´  Ñ¡ÖĞÉè±¸µÄ ÅäÖÃÎÄ¼şÂ·¾¶
 extern  CString g_achive_monitor_datatbase_path ;
 
 extern BOOL g_mstp_flag;
@@ -918,7 +919,7 @@ extern bool read_customer_unit;	//Èç¹ûÕâ¸öÉè±¸Ã»ÓĞ¶Á¹ı customer unitÕâÒ»Ïî,¾ÍÒª³
 extern bool receive_customer_unit; //ÊÕµ½»Ø¸´£¬flag¾ÍÖÃ true;
 extern bool read_analog_customer_unit;  // Õâ¸öÊÇÄ£ÄâµÄcus tabel ;
 extern bool read_msv_table; //MSV table 
-extern CString Custom_Msv_Range[BAC_MSV_COUNT];// ´æ´¢¿Í»§¶àÌ¬  ÀıÈçÏÔÊ¾  AAA/BBB/CCC
+extern CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// ´æ´¢¿Í»§¶àÌ¬  ÀıÈçÏÔÊ¾  AAA/BBB/CCC
 extern CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 extern CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
 extern unsigned char bacnet_add_id[254];
@@ -1076,7 +1077,9 @@ extern int g_protocol;
 extern int g_new_old_IDE;
 extern int g_bac_read_type;
 extern bool g_bac_need_read_setting;  //Èç¹ûÊÇµÚÒ»´Îµã»÷ ĞèÒª¶ÁSettingÀïÃæµÄ Êı¾İ;ÅĞ¶ÏÊÇ·ñĞèÒª¸ü¸ÄLabelÖ®ÀàµÄ;
-extern HANDLE click_read_thread;
+extern HANDLE click_read_thread; 
+extern HANDLE BACnet_read_thread;
+extern HANDLE BACnet_abort_read_thread;
 extern bool bac_net_initial_once;
 extern unsigned char my_ip[4];
 extern byte	g_DayState[8][ANNUAL_CODE_SIZE];
@@ -1279,6 +1282,7 @@ extern int MODE_SUPPORT_PTRANSFER; // 1 Ö§³Öbip ptransfer
 extern bool initial_bip ;
 extern Str_modbus_reg bacnet_to_modbus_struct; //ÓÃÓÚbacnet Ğ­Òé×ª»»Îªmodbus Ğ­ÒéµÄ½á¹¹
 extern vector <str_bacnet_rp_info> standard_bacnet_data; // ÓÃÓÚbacnet ±ê×¼ ¶ÁĞ´ ±äÁ¿´æÈ¡;
+extern vector <str_segmented_bacnet_rp_info> segmented_bacnet_data;
 extern panelname_map g_panelname_map;
 extern bacnet_instance_reg_map g_bacnet_reg_ins_map;  //ÓÃÀ´Çø·ÖÃ¿¸öinstance ´æ·ÅÔÚÄÇÁ½¸ö×Ö½Ú£¬²»Í¬²úÆ·£¬²»Í¬´¦Àí;
 extern connect_Info system_connect_info;
@@ -1298,5 +1302,11 @@ extern vector < FloorInfo> bm_floor;
 extern vector < RoomInfo> bm_room;
 extern CString T3_chip_name;
 extern unsigned int T3_chip_type;
+extern unsigned char daylight_start_month;
+extern unsigned char daylight_start_day;
+extern unsigned char daylight_end_month;
+extern unsigned char daylight_end_day;
 
 
+extern bool Bacnet_debug_fileRead;
+extern bool bacnetIpDataRead;

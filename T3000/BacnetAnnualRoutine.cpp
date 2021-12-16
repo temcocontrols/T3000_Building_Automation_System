@@ -18,6 +18,7 @@ extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure t
 
 IMPLEMENT_DYNAMIC(BacnetAnnualRoutine, CDialogEx)
 
+extern vector <int>  m_Annual_data_instance;
 BacnetAnnualRoutine::BacnetAnnualRoutine(CWnd* pParent /*=NULL*/)
 	: CDialogEx(BacnetAnnualRoutine::IDD, pParent)
 {
@@ -124,6 +125,11 @@ BOOL BacnetAnnualRoutine::PreTranslateMessage(MSG* pMsg)
 		}
 
 		return 1; 
+	}
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
+	{
+		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_ANNUAL);
+		return TRUE;
 	}
 
 	return CDialogEx::PreTranslateMessage(pMsg);
@@ -429,6 +435,16 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_Annual_data.at(Changed_Item).label,STR_ANNUAL_LABEL_LENGTH,cTemp1,STR_ANNUAL_LABEL_LENGTH);
+		if (product_type == PM_THIRD_PARTY_DEVICE)
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_CHARACTER_STRING;
+			temp_value->context_specific = false;
+			WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
+			temp_value->type.Character_String.encoding = 0;
+			temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_CALENDAR, m_Annual_data_instance.at(Changed_Item), PROP_DESCRIPTION, temp_value);
+		}
 	}
 
 	if(Changed_SubItem == ANNUAL_ROUTINE_FULL_LABEL)
@@ -449,6 +465,16 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_Annual_data.at(Changed_Item).description,STR_ANNUAL_DESCRIPTION_LENGTH,cTemp1,STR_ANNUAL_DESCRIPTION_LENGTH);
+		if (product_type == PM_THIRD_PARTY_DEVICE)
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_CHARACTER_STRING;
+			temp_value->context_specific = false;
+			WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
+			temp_value->type.Character_String.encoding = 0;
+			temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_CALENDAR, m_Annual_data_instance.at(Changed_Item), PROP_OBJECT_NAME, temp_value);
+		}
 	}
 
 	if(Changed_SubItem == ANNUAL_ROUTINE_VALUE)
@@ -461,6 +487,14 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 		else
 		{
 			m_Annual_data.at(Changed_Item).value=1;
+		}
+		if (product_type == PM_THIRD_PARTY_DEVICE)
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_BOOLEAN;
+			temp_value->context_specific = false;
+			temp_value->type.Boolean = m_Annual_data.at(Changed_Item).value;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_CALENDAR, m_Annual_data_instance.at(Changed_Item), PROP_PRESENT_VALUE, temp_value);
 		}
 	}
 	if(Changed_SubItem == ANNUAL_ROUTINE_AUTO_MANUAL)
@@ -475,6 +509,14 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 		{
 			m_Annual_data.at(Changed_Item).auto_manual=1;
 			m_annualr_list.SetCellEnabled(Changed_Item,ANNUAL_ROUTINE_VALUE,1);
+		}
+		if (product_type == PM_THIRD_PARTY_DEVICE)
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_BOOLEAN;
+			temp_value->context_specific = false;
+			temp_value->type.Boolean = m_Annual_data.at(Changed_Item).auto_manual;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_CALENDAR, m_Annual_data_instance.at(Changed_Item), PROP_OUT_OF_SERVICE, temp_value);
 		}
 	}
 	cmp_ret = memcmp(&m_temp_annual_data[Changed_Item],&m_Annual_data.at(Changed_Item),sizeof(Str_annual_routine_point));
@@ -510,7 +552,7 @@ void BacnetAnnualRoutine::OnBnClickedButtonAnnualEdit()
 			break;
 		}
 	}
-
+	
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUALCODE);
 
 }

@@ -6,7 +6,7 @@
 #include "CO2_AUTO_CALIBRATION.h"
 #include "afxdialogex.h"
 #include "global_function.h"
-
+#include "ShowMessageDlg.h"
 // CCO2_AUTO_CALIBRATION 对话框
 
 extern int CO2_MODBUS_CO2_BKCAL_ONOFF;
@@ -40,6 +40,8 @@ BEGIN_MESSAGE_MAP(CCO2_AUTO_CALIBRATION, CDialogEx)
     ON_CBN_SELCHANGE(IDC_COMBO_DLG_CO2_FIRMWARE_AUTO_CAL, &CCO2_AUTO_CALIBRATION::OnCbnSelchangeComboDlgCo2FirmwareAutoCal)
     ON_BN_CLICKED(IDC_BUTTON2, &CCO2_AUTO_CALIBRATION::OnBnClickedButton2)
     ON_BN_CLICKED(IDC_BUTTON_ABC_HELP, &CCO2_AUTO_CALIBRATION::OnBnClickedButtonAbcHelp)
+    ON_BN_CLICKED(IDC_BUTTON_CO2_SCD_HELP, &CCO2_AUTO_CALIBRATION::OnBnClickedButtonCo2ScdHelp)
+    ON_BN_CLICKED(IDC_BUTTON_RE_CALIBRATION_SCD_DONE, &CCO2_AUTO_CALIBRATION::OnBnClickedButtonReCalibrationScdDone)
 END_MESSAGE_MAP()
 
 
@@ -204,7 +206,7 @@ BOOL CCO2_AUTO_CALIBRATION::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-
+    GetDlgItem(IDC_EDIT_CO2_CALIBRATION_SCD)->SetWindowText(_T("0"));
 
 
     if ((product_register_value[7] == STM32_CO2_NET) ||
@@ -231,7 +233,8 @@ BOOL CCO2_AUTO_CALIBRATION::OnInitDialog()
             PostMessage(WM_CLOSE, NULL, NULL);
         }
     }
-    else if (product_register_value[7] == PM_TSTAT_AQ)
+    else if ((product_register_value[7] == PM_TSTAT_AQ) ||
+             (product_register_value[7] == PM_AIRLAB_ESP32))
     {
         CO2_MODBUS_CO2_BKCAL_ONOFF = 1960;
         CO2_MODBUS_CO2_NATURE_LEVEL = 1961;
@@ -298,8 +301,25 @@ BOOL CCO2_AUTO_CALIBRATION::OnInitDialog()
         GetDlgItem(IDC_EDIT_DLG_FIRMWARE_NATURE_CO2)->EnableWindow(false);
         GetDlgItem(IDC_EDIT_DLG_FIRMWARE_MAX_MIN_ADJ_PERDAY)->EnableWindow(false);
         GetDlgItem(IDC_EDIT_DLG_FIRMWARE_LOOK_DAYS)->EnableWindow(false);
-
         GetDlgItem(IDC_EDIT_USER_ADJ)->EnableWindow(false);
+
+        if ((product_register_value[CO2_MODBUS_CO2_NATURE_LEVEL] < 390) || (product_register_value[CO2_MODBUS_CO2_NATURE_LEVEL] > 500))
+        {
+            GetDlgItem(IDC_EDIT_DLG_FIRMWARE_NATURE_CO2)->SetWindowText(_T("400"));
+        }
+
+        if ((product_register_value[CO2_MODBUS_CO2_MIN_ADJ] < 1) || (product_register_value[CO2_MODBUS_CO2_MIN_ADJ] > 10))
+        {
+            GetDlgItem(IDC_EDIT_DLG_FIRMWARE_MAX_MIN_ADJ_PERDAY)->SetWindowText(_T("1"));
+        }
+
+        if ((product_register_value[CO2_MODBUS_CO2_CAL_DAYS] < 7) || (product_register_value[CO2_MODBUS_CO2_CAL_DAYS] > 30))
+        {
+            GetDlgItem(IDC_EDIT_DLG_FIRMWARE_LOOK_DAYS)->SetWindowText(_T("7"));
+        }
+        
+
+
     }
     else
     {
@@ -352,4 +372,53 @@ void CCO2_AUTO_CALIBRATION::OnBnClickedButtonAbcHelp()
     CString temp_ABC_Info;
     temp_ABC_Info.Format(_T("The Co2 sensor will watch for the lowest concentration measured over the previous week, this is assumed to be the natural background C02 concentration on the earth of fresh air, currently this is 400ppm. If the sensor has been over or below 400 ppm a small nudge factor is added or subtracted from the actual reading to self compensate for variation over time of the sensing element and infrared light source. You can disable this feature if the building isn’t hitting 400 ppm regularly during a given week. "));
     MessageBox(temp_ABC_Info);
+}
+
+
+void CCO2_AUTO_CALIBRATION::OnBnClickedButtonCo2ScdHelp()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CShowMessageDlg dlg;
+    CString temp_message;
+    temp_message.Format(_T("Sensirion CO2 sensor RE-CALIBRATION \r\nLocate the device in an environment with air having a stable CO2 concentration in the range of 400 ppm to 2000 ppm. \r\n \
+1.Setting and controlling a known CO2 concentration in a sealed environment with the set CO2concentration acting as the reference value for FRC .\r\n \
+2.Fresh air from the outside can be used as a reference. Outside air typically has a CO2 concentration of 400 ppm . expose the device to outside air, e.g. by placing it close to an open window or outside. Direct sun light, extreme temperatures,and strong air flow have to be prevented,After 5 minutes, apply FRC with the reference value 400 ppm ."));
+    dlg.SetStaticText(temp_message);
+    //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+    dlg.SetStaticTextColor(RGB(0, 0, 255));
+    dlg.SetStaticTextSize(18, 14);
+    dlg.SetEvent(EVENT_MESSAGE_ONLY);
+    dlg.DoModal();
+}
+
+
+void CCO2_AUTO_CALIBRATION::OnBnClickedButtonReCalibrationScdDone()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString strCalibration;
+    GetDlgItem(IDC_EDIT_CO2_CALIBRATION_SCD)->GetWindowText(strCalibration);
+
+    unsigned short IntCalValue = _wtoi(strCalibration);
+    if (IntCalValue >= 5000)
+    {
+        MessageBox(_T("Out of range . Calibration value range (0-4999)"));
+        return;
+    }
+
+    CString cs_message;
+    cs_message.Format(_T("Are you sure you want to write this calibration value (%d)? The CO2 sensor is in a %d PPM environment"), IntCalValue, IntCalValue);
+    if (IDYES == MessageBox(cs_message, _T("Message"), MB_YESNOCANCEL))
+    {
+        if (write_one(g_tstat_id, 1951, IntCalValue, 3) < 0)
+        {
+            MessageBox(_T("Write data timeout,Please try again"));
+            return;
+        }
+        else
+        {
+            MessageBox(_T("Write data success!"));
+        }
+    }
+
+
 }

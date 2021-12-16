@@ -258,11 +258,11 @@ public:
 	afx_msg void OnMenuAbout();
 	afx_msg void OnMenuSetting();
 
-	afx_msg void OnMenuCheckhex();
+	//afx_msg void OnMenuCheckhex();
 	void CheckAutoFlash();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
     CComboBox m_combox_baudrate;
-    afx_msg void OnMenuFlashsn();
+
 
 
 	BOOL m_FlashEnable;
@@ -275,4 +275,8 @@ public:
     afx_msg void OnCbnSelchangeComboPm();
     void Enable_Sensor_Window(bool nenable);
     afx_msg void OnBnClickedCheckNoItem();
+#ifdef ISP_BURNING_MODE
+	afx_msg void OnBnClickedButtonLoopFlash();
+	static DWORD WINAPI  Thread_BurningTest_fun(LPVOID lpVoid);
+#endif
 };

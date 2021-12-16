@@ -10,6 +10,7 @@
 #include "bip.h"
 #include "rs485.h" // For call Get_RS485_Handle() function
 #include "T3000Option.h"
+#include "datalink.h"
 //#include "global_variable.h"
 //#include "global_define.h"
 //AB means Add Building
@@ -45,6 +46,7 @@ DWORD * nScanTCPThreadID = NULL;
 const int TCP_COMM_PORT = 6001;
 extern int g_ScnnedNum;
 
+extern void intial_bip_socket();
 
 
 
@@ -93,7 +95,7 @@ CTStatScanner::CTStatScanner(void)
     m_eScanNCEnd = new CEvent(false, false);
     m_eScanBacnetIpEnd = new CEvent(false, false);
     m_eScanRemoteIPEnd =  new CEvent(false, false);
-
+    m_eScanThirdPartyBacnetIpEnd = new CEvent(false, false);
     m_eScan_tcp_to_485_End = new CEvent(false, false);
 //	m_eScanBacnetMstpEnd = new CEvent(false,false);
     m_bNetScanFinish = FALSE;
@@ -172,7 +174,11 @@ CTStatScanner::~CTStatScanner(void)
     {
         delete m_eScanBacnetIpEnd;
     }
-
+    if (m_eScanThirdPartyBacnetIpEnd != NULL)
+    {
+        delete m_eScanThirdPartyBacnetIpEnd;
+    }
+    
     if(m_eScanRemoteIPEnd !=NULL)
     {
         delete m_eScanRemoteIPEnd;
@@ -246,6 +252,12 @@ void CTStatScanner::Release() // this function never be used
         SetEvent(m_eScanRemoteIPEnd);
         TerminateThread(m_pScanRemoteIPThread,0);
     }
+    if (WaitForSingleObject(m_eScanThirdPartyBacnetIpEnd, 0) != WAIT_OBJECT_0)
+    {
+        SetEvent(m_eScanThirdPartyBacnetIpEnd);
+        TerminateThread(m_pScanThirdPartyBacnetIPThread, 0);
+    }
+    
 
     //if( WaitForSingleObject(m_eScanBacnetMstpEnd, 0) != WAIT_OBJECT_0 )
     //{
@@ -390,6 +402,7 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
     //判断所回复的网络设备 是否能支持向下扩展 设备.Fandu
     if ((m_T3BB_device_data.at(ncount).product_id != PM_MINIPANEL)
         && (m_T3BB_device_data.at(ncount).product_id != PM_MINIPANEL_ARM)
+        && (m_T3BB_device_data.at(ncount).product_id != PM_ESP32_T3_SERIES)
         && (m_T3BB_device_data.at(ncount).product_id != PM_CM5))
     {
         //清空 句柄和线程ID；
@@ -1288,14 +1301,14 @@ void CTStatScanner::modbusip_to_modbus485(int nComPort, int nBaudrate, LPCTSTR s
 }
 
 //2018 03 30 这个函数还需要改造 ，多线程同事扫描时 需要保存好波特率
-void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo, BYTE devHi, int nItem , int nbaudrate)
+int CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo, BYTE devHi, int nItem , int nbaudrate)
 {
 
     if (m_bStopScan)
     {
 
 
-        return;
+        return 0;
     }
 
     g_strScanInfoPrompt.Format(_T("COM%d"), nComPort);
@@ -1333,7 +1346,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
         CString temp_cs;
         temp_cs.Format(_T("Com%d"),nComPort);
         m_bacnetComs.push_back(temp_cs);
-        return ;
+        return -6;
     }
     if (a == -3 || a > 0)
     {
@@ -1378,7 +1391,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
     {
         strlog.Format(_T("NO Response com%d to ID From %d to %d"),nComPort,devLo,devHi);
         //write_T3000_log_file(strlog);
-        return ;
+        return 0;
     }
     char c_array_temp[5]= {'0'};
     CString temp=_T("");
@@ -1545,9 +1558,9 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
             m_scan_info.at(nItem).scan_found ++;
         }
         else
-            return;
+            return 0;
     }
-
+    int binary_ret = 0;
     switch(a)
     {
 
@@ -1557,7 +1570,9 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
         //write_T3000_log_file(strlog);
         if(devLo!=devHi)
         {
-            binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2, nItem, nbaudrate);
+            binary_ret = binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2, nItem, nbaudrate);
+            if (binary_ret == -6)
+                return -6;
             binarySearchforComDevice(nComPort, bForTStat, (devLo+devHi)/2+1,devHi, nItem, nbaudrate);
         }
         else
@@ -1569,7 +1584,9 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
         //write_T3000_log_file(strlog);
         if(devLo!=devHi)
         {
-            binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2, nItem, nbaudrate);
+            binary_ret = binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2, nItem, nbaudrate);
+            if (binary_ret == -6)
+                return -6;
             binarySearchforComDevice(nComPort, bForTStat, (devLo+devHi)/2+1,devHi, nItem , nbaudrate);
         }
         else
@@ -1687,12 +1704,12 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 
                                         binarySearchforComDevice(nComPort, bForTStat, devLo,devHi);
                                     }
-                                    return;
+                                    return 0;
                                 }
                             }
                             else
                             {
-                                return;
+                                return 0;
                             }
                         }
                 }
@@ -1803,7 +1820,8 @@ UINT SCAN_TCP_TO485_THREAD(LPVOID pParam)
             if (hScanTCPData[i] != NULL)
             {
                 b_not_finished = true;
-                TRACE(_T("Thread ID %d    %d  not finished!\r\n"), nScanThreadID[i], i);
+                //if(nScanThreadID[i] !=NULL)
+                  //  TRACE(_T("Thread ID %d    %d  not finished!\r\n"), nScanThreadID[i], i);
             }
         }
 
@@ -2601,6 +2619,25 @@ void CTStatScanner::SendScanEndMsg()
         ((CMainFrame*)m_pParent)->m_bScanALL = FALSE;
         ((CMainFrame*)m_pParent)->m_bScanFinished = TRUE;
 
+#ifdef USE_THIRD_PARTY_FUNC
+        bool find_exsit = false;
+        CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+        if (pFrame)
+        {
+            for (int i = 0; i < (int)pFrame->m_product.size(); i++)
+            {
+                if (pFrame->m_product.at(i).protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
+                {
+                    find_exsit = true;
+                    break;
+                }
+            }
+            if (find_exsit)
+            {
+                AfxMessageBox(_T("T3000 will be occupying Bacnet Port 47808 in order to show 3rd party devices !"));
+            }
+        }
+#endif
 
         if( m_refresh_net_device_data.size() == 0 && m_szNCScanRet.size()==0 && m_szTstatScandRet.size() == 0)
         {
@@ -2725,7 +2762,10 @@ int CTStatScanner::GetAllNodeFromDataBase()
                 
                     str_product_id=m_q.getValuebyName(L"Product_class_ID");
 
-                if((_wtoi(str_product_id) == PM_MINIPANEL) ||(_wtoi(str_product_id) == PM_CM5)|| (_wtoi(str_product_id) == PM_MINIPANEL_ARM))
+                if((_wtoi(str_product_id) == PM_MINIPANEL) ||
+                    (_wtoi(str_product_id) == PM_CM5)|| 
+                    (_wtoi(str_product_id) == PM_ESP32_T3_SERIES) ||
+                    (_wtoi(str_product_id) == PM_MINIPANEL_ARM))
                 {
                     CString strprotocol;
 
@@ -3272,7 +3312,10 @@ void CTStatScanner::AddNewNetToDB()
 			//插入
 			CString temp_pro4;
 			bool is_bacnet_device = false;
-			if((m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL)|| (m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL_ARM) || (m_refresh_net_device_data.at(i).product_id == PM_CM5))
+			if((m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL)|| 
+                (m_refresh_net_device_data.at(i).product_id == PM_MINIPANEL_ARM) || 
+                (m_refresh_net_device_data.at(i).product_id == PM_ESP32_T3_SERIES) ||
+                (m_refresh_net_device_data.at(i).product_id == PM_CM5))
 				is_bacnet_device = true;
 			if(is_bacnet_device)
 				temp_pro4.Format(_T("%d"),PROTOCOL_BACNET_IP);
@@ -3761,7 +3804,10 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 
 	for (int i=0;i<m_refresh_net_device_data.size();i++)
 	{
-		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL)&& (m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL_ARM) && (m_refresh_net_device_data.at(i).product_id != PM_CM5))
+		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL)&& 
+            (m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL_ARM) && 
+            (m_refresh_net_device_data.at(i).product_id != PM_ESP32_T3_SERIES) &&
+            (m_refresh_net_device_data.at(i).product_id != PM_CM5))
 		{
 			continue;
 		}
@@ -4077,7 +4123,7 @@ void CTStatScanner::ScanAll()
 
     b_pause_refresh_tree = SCANALL;
 
-    ScanDetectComData();//检测串口数据;
+     ScanDetectComData();//检测串口数据;
 
     ScanComDevice();
 
@@ -4092,6 +4138,8 @@ void CTStatScanner::ScanAll()
 
     ScanTCPtoRS485SubPort();
 
+    ScanThirdPartyBACnetDevice();
+    
 	hwait_scan_thread =CreateThread(NULL,NULL,_WaitScanThread,this,NULL, NULL);
 
     //AfxBeginThread(_WaitScanThread, this);
@@ -4100,7 +4148,6 @@ void CTStatScanner::ScanAll()
 
 
 }
-
 DWORD WINAPI  Detect_Mstp_thread(LPVOID lpVoid)
 {
     Sleep(1000);
@@ -4203,6 +4250,8 @@ DWORD WINAPI  _WaitScanThread(LPVOID lpVoid)
             }
         }
     }
+
+    WaitForSingleObject(pScanner->m_eScanThirdPartyBacnetIpEnd->m_hObject, INFINITE);
 
     WaitForSingleObject(pScanner->m_eScan_tcp_to_485_End->m_hObject, INFINITE);
 
@@ -4485,7 +4534,8 @@ BOOL CTStatScanner::IsNetDevice(const CString& strDevType)
             || nDeviceType == PM_NC
             || nDeviceType == PM_CO2_NET
             || nDeviceType == PM_MINIPANEL
-		|| nDeviceType == PM_MINIPANEL_ARM
+		    || nDeviceType == PM_MINIPANEL_ARM
+            || nDeviceType == PM_ESP32_T3_SERIES
             || nDeviceType == PM_CM5
 			|| nDeviceType == STM32_CO2_NET
 		|| nDeviceType == STM32_HUM_NET
@@ -4516,14 +4566,20 @@ void CTStatScanner::writetxt()
         m_pFile->Close();
     }
 }
+BOOL CTStatScanner::ScanThirdPartyBACnetDevice()
+{
+    m_pScanThirdPartyBacnetIPThread = CreateThread(NULL, NULL, _ScanThirdPartyBacnetThread, this, NULL, NULL);
+    return TRUE;
+}
 BOOL CTStatScanner::ScanBacnetMSTPDevice()
 {
     m_szComs.clear();
     GetSerialComPortNumber1(m_szComs);
-   // m_pScanBacnetIPThread = AfxBeginThread(_ScanBacnetMSTPThread,this);
+    // m_pScanBacnetIPThread = AfxBeginThread(_ScanBacnetMSTPThread,this);
     m_pScanBacnetIPThread = CreateThread(NULL, NULL, _ScanBacnetMSTPThread, this, NULL, NULL);
     return TRUE;
 }
+
 
 BOOL CTStatScanner::ScanRemoteIPDevice()
 {
@@ -4888,6 +4944,66 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 
 int n_mstp_comport = 0;
 int n_mstp_baudrate = 19200;
+DWORD WINAPI   CTStatScanner::_ScanThirdPartyBacnetThread(LPVOID lpVoid)
+//UINT _ScanBacnetMSTPThread(LPVOID pParam)
+{
+    if (BACnet_read_thread != NULL)
+    {
+        TerminateThread(BACnet_read_thread, 0);
+        BACnet_read_thread = NULL;
+    }
+
+    CTStatScanner* pScan = (CTStatScanner*)(lpVoid);
+#ifdef USE_THIRD_PARTY_FUNC
+    // inilizing bacnet and its handlers for third party bacnet devices
+    GetIPMaskGetWay();
+    if (bip_socket() > 0) // closing socket on Yabe opend , BACnet port dont conflict with both applications.
+    {
+        ::closesocket(bip_socket());
+        bip_set_socket(NULL);
+        bip_set_port(htons(-1));
+    }
+   
+    g_gloab_bac_comport = 0;
+    set_datalink_protocol(2);
+    for (int i = 0; i < g_Vector_Subnet.size(); i++)
+    {
+        CString PC_IP;
+        PC_IP = g_Vector_Subnet.at(i).StrIP;
+        CStringArray temp_pc_strip;
+        SplitCStringA(temp_pc_strip, PC_IP, _T("."));
+        CString temp_pc_ip;
+        temp_pc_ip.Format(_T("%s.%s.%s"), temp_pc_strip.GetAt(0), temp_pc_strip.GetAt(1), temp_pc_strip.GetAt(2));
+
+        if (temp_pc_ip.CompareNoCase(_T("0.0.0")) == 0)
+            continue;
+         
+        if (Initial_bac(g_gloab_bac_comport, g_Vector_Subnet.at(i).StrIP))
+        {
+            Send_WhoIs_Global(-1, -1);
+            Sleep(10000);
+            if (bip_socket() > 0) // closing socket on Yabe opend , BACnet port dont conflict with both applications.
+            {
+                ::closesocket(bip_socket());
+                bip_set_socket(NULL);
+                bip_set_port(htons(-1));
+            }
+        }
+    }
+   // intial_bip_socket();
+    //Init_Service_Handlers();
+#endif
+    // hird party bacnet end
+    if (pScan->m_eScanThirdPartyBacnetIpEnd->m_hObject)
+    {
+        pScan->m_eScanThirdPartyBacnetIpEnd->SetEvent();
+    }
+    pScan->m_pScanThirdPartyBacnetIPThread = NULL;
+    return 1;
+}
+
+
+
 
 //需要先让串口的modbus 扫完，那里会记录有哪些串口存在 bacnet的协议.
 //在扫描bacnet的时候 将bacnet ip 扫描完后，要去依次扫描 串口的MS/TP
@@ -5107,6 +5223,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
                     temp_info.hardware_version = 0;
                     if((temp_info.product_type == PM_MINIPANEL) || 
                         (temp_info.product_type == PM_MINIPANEL_ARM) || 
+                        (temp_info.product_type == PM_ESP32_T3_SERIES) ||
                         (temp_info.product_type == PM_TSTAT10) ||
                         (temp_info.product_type == PM_CM5))
                         temp_info.m_protocol = MODBUS_BACNET_MSTP;

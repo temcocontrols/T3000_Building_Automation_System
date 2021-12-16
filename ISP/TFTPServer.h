@@ -131,4 +131,6 @@ public:
 	int total_retry;
     int m_tcp_connect_results; // 点击Flash之后  标识TCP 套接字是否连上
 	int m_FlashTimes;
+	unsigned short read_reg[100] ;
+	int continue_flash_count; // 继续从多少包开始烧入; 目前只支持产品为88 的 ESP32 芯片的板子;
 };

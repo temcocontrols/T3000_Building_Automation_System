@@ -98,6 +98,7 @@ public:
     BOOL ScanDetectComData();
 	BOOL ScanRemoteIPDevice(); //扫描 远程设备;
 	BOOL ScanBacnetMSTPDevice();//扫描Bacnet MSTP 设备;
+	BOOL ScanThirdPartyBACnetDevice();
 	void SetComPort(int nCom);
 	BOOL CheckTheSameSubnet(CString strIP);
 public:
@@ -112,7 +113,7 @@ public:
 
 
 	// bForTstat = TRUE : scan tstat, = FALSE : scan NC
-	void		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254, int nItem = 0,int nbaudrate = 19200);
+	int		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254, int nItem = 0,int nbaudrate = 19200);
 	// bForTstat = TRUE : scan tstat, = FALSE : scan  MINI Pannel
 	//void		MINI_binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254,int NET_COM=1);
 	void        OneByOneSearchforComDevice(int nComPort, bool bForTStat=FALSE, BYTE devLo=1, BYTE devHi=254);
@@ -220,6 +221,7 @@ public:
 	CEvent*						m_eScanBacnetIpEnd;
 	CEvent*						m_eScanRemoteIPEnd;
 	//CEvent*						m_eScanBacnetMstpEnd;
+	CEvent*						m_eScanThirdPartyBacnetIpEnd;
 
 	BOOL								m_bStopScan;					// 强制结束SCAN，由用户选择exit时，停止两个搜索线程
 	BOOL								m_bNetScanFinish;			// 网络scan完成
@@ -231,6 +233,7 @@ public:
 	//CWinThread*					m_pScanBacnetMstpThread;
 	CWinThread*					m_pScanRemoteIPThread;
 	HANDLE					m_pScanBacnetIPThread;
+	HANDLE					m_pScanThirdPartyBacnetIPThread;
 	CWinThread*					m_pScanNCThread;
 	CWinThread*                  m_pCheckSubnetThread;
 	CWinThread*					m_pScanTstatThread;
@@ -254,6 +257,7 @@ public:
     static DWORD WINAPI   _ScanBacnetMSTPThread(LPVOID lpVoid);
     static	DWORD WINAPI   ScanComThreadNoCritical(LPVOID lpVoid);
     static	DWORD WINAPI   ScanTCPSubPortThreadNoCritical(LPVOID lpVoid);
+	static DWORD WINAPI   _ScanThirdPartyBacnetThread(LPVOID lpVoid);
     unsigned int               scan_com_value;
 protected:
 	BOOL								m_bComScanRunning;		// 是否是Com scan, TRUE = scan com, FALSE = scan net

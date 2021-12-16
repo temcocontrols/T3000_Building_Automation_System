@@ -27,6 +27,7 @@ public:
 	virtual void OnOK();
 	virtual void OnCancel();
 	void Initial_static();
+	void Update_Custom_Units();
     void SetAllRadioButton(int button_index = 2);
 	CStaticEx m_static_range_units_select;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -68,6 +69,9 @@ public:
     afx_msg void OnBnClickedRadio58();
     afx_msg void OnBnClickedRadio87();
     afx_msg void OnBnClickedRadio103();
+	void RadioDegC_DegF(bool n_enable, bool n_deg_c= 1);
+
+	afx_msg void OnBnClickedRadioMsv4();
 };
 
 const CString Range_Type[] =

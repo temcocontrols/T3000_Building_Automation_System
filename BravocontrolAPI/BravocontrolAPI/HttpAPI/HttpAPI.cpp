@@ -47,34 +47,32 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
     }
 
 }
-Http_key k_productID;
-Http_key k_serialNumber;
-Http_key k_ipAddress;
-Http_key k_ipPort;
-Http_key k_hardwareVer;
-Http_key k_softwareVer;
-Http_key k_lastCommunicationDate;
-Http_key k_createdAt;
-Http_key k_updatedAt;
+//Http_key k_productID;
+//Http_key k_serialNumber;
+//Http_key k_ipAddress;
+//Http_key k_ipPort;
+//Http_key k_hardwareVer;
+//Http_key k_softwareVer;
+//Http_key k_lastCommunicationDate;
+//Http_key k_createdAt;
+//Http_key k_updatedAt;
 void Initial_GetProductID(StrGetProductID &sGetPIDInfo)
 {
-    sGetPIDInfo.k_productID.KeyName = _T("productID");
-    sGetPIDInfo.k_serialNumber.KeyName = _T("serialNumber");
-    sGetPIDInfo.k_ipAddress.KeyName = _T("ipAddress");
-    sGetPIDInfo.k_ipPort.KeyName = _T("ipPort");
-    sGetPIDInfo.k_hardwareVer.KeyName = _T("hardwareVer");
-    sGetPIDInfo.k_softwareVer.KeyName = _T("softwareVer");
-    sGetPIDInfo.k_lastCommunicationDate.KeyName = _T("lastCommunicationDate");
-    sGetPIDInfo.k_createdAt.KeyName = _T("createdAt");
-    sGetPIDInfo.k_updatedAt.KeyName = _T("updatedAt");
+
+    sGetPIDInfo.key[GETP_ID].KeyName = _T("id");
+    sGetPIDInfo.key[GETP_FIRMWARE].KeyName = _T("firmwareVer");
+    sGetPIDInfo.key[GETP_SOFTWARE].KeyName = _T("softwareVer");
+    sGetPIDInfo.key[GETP_LASTUPDATE].KeyName = _T("lastUpdate");
+    sGetPIDInfo.key[GETP_CREATED].KeyName = _T("createdAt");
+    sGetPIDInfo.key[GETP_UPDATED].KeyName = _T("updatedAt");
 }
 
 void Initial_GetFileInfo(StrGetFileInfo &sGetFileInfo)
 {
-    sGetFileInfo.k_file_name.KeyName = _T("\"name\"");
-    sGetFileInfo.k_file_size.KeyName = _T("\"size\"");
-    sGetFileInfo.k_version.KeyName = _T("\"version\"");
-    sGetFileInfo.k_updatedAt.KeyName = _T("\"updatedAt\"");
+    sGetFileInfo.key[GETF_FILENAME].KeyName = _T("name");
+    sGetFileInfo.key[GETF_FILESIZE].KeyName = _T("size");
+    sGetFileInfo.key[GETF_VERSION].KeyName = _T("version");
+    sGetFileInfo.key[GETF_UPDATED].KeyName = _T("updatedAt");
 }
 
 void Initial_PostProductID(StrPostProductID &sPostPIDInfo)
@@ -98,7 +96,7 @@ OUTPUT int https_get_file(int npid, StrGetFileInfo &sGetFileInfo)
     httplib::Client cli("api.bravocontrols.com");
 #endif
 
-    CString apiPath = _T("/customerProduct/") + temp_pid + _T("/firmware");
+    CString apiPath = _T("/firmwareProduct/") + temp_pid + _T("/firmware/latest");
     char cTemp1[255];
     memset(cTemp1, 0, 255);
     WideCharToMultiByte(CP_ACP, 0, apiPath.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
@@ -111,12 +109,11 @@ OUTPUT int https_get_file(int npid, StrGetFileInfo &sGetFileInfo)
         string nret = res->body;
         CString cstr(nret.c_str());
         int n_find_ret = 0;
-        //n_find_ret = cstr.Find(_T("No product found!"));
-        //if (n_find_ret != -1)
-        //{
-        //    sGetPIDInfo.cs_results = cstr;
-        //    return -2;
-        //}
+        n_find_ret = cstr.Find(_T("The firmware file not found!"));
+        if (n_find_ret != -1)
+        {
+            return -2;
+        }
         CStringArray temp_array;
         SplitCStringA(temp_array, cstr, _T(","));
 
@@ -127,9 +124,9 @@ OUTPUT int https_get_file(int npid, StrGetFileInfo &sGetFileInfo)
             n_find_ret = 0;
 
 
-            if (sGetFileInfo.k_version.nStatus == 0)
+            if (sGetFileInfo.key[GETF_VERSION].nStatus == 0)
             {
-                n_find_ret = temp_cs.Find(sGetFileInfo.k_version.KeyName);
+                n_find_ret = temp_cs.Find(sGetFileInfo.key[GETF_VERSION].KeyName);
                 if (n_find_ret != -1) //找到了对应的关键字
                 {
                     //解析出对应的值;
@@ -139,88 +136,88 @@ OUTPUT int https_get_file(int npid, StrGetFileInfo &sGetFileInfo)
                     {
                         CString cs_part2;
                         cs_part2 = temp_array_key.GetAt(1);
-                        sGetFileInfo.k_version.nStatus = VALUE_TYPE_FLOAT;
-                        sGetFileInfo.k_version.tValue.cs_value = cs_part2;
-                        sGetFileInfo.k_version.tValue.cs_value.Trim(_T("\""));
-                        sGetFileInfo.k_version.tValue.f_value = _wtof(sGetFileInfo.k_version.tValue.cs_value);
+                        sGetFileInfo.key[GETF_VERSION].nStatus = VALUE_TYPE_FLOAT;
+                        sGetFileInfo.key[GETF_VERSION].tValue.cs_value = cs_part2;
+                        sGetFileInfo.key[GETF_VERSION].tValue.cs_value.Trim(_T("\""));
+                        sGetFileInfo.key[GETF_VERSION].tValue.f_value = _wtof(sGetFileInfo.key[GETF_VERSION].tValue.cs_value);
                     }
                     else
                     {
-                        sGetFileInfo.k_version.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
+                        sGetFileInfo.key[GETF_VERSION].nStatus = VALUE_TYPE_ANALYSIS_ERROR;
                     }
                     continue;
                 }
             }
 
 
-            if (sGetFileInfo.k_file_name.nStatus == 0)
+            if (sGetFileInfo.key[GETF_FILENAME].nStatus == 0)
             {
-                n_find_ret = temp_cs.Find(sGetFileInfo.k_file_name.KeyName);
+                n_find_ret = temp_cs.Find(sGetFileInfo.key[GETF_FILENAME].KeyName);
                 if (n_find_ret != -1) //找到了对应的关键字
                 {
                     //解析出对应的值;
                     CStringArray temp_array_key;
-                    SplitCStringA(temp_array_key, temp_cs, sGetFileInfo.k_file_name.KeyName + _T(":"));
+                    SplitCStringA(temp_array_key, temp_cs, _T(":"));
                     if (temp_array_key.GetSize() >= 1)  //时间不用强制分成两段 ， 因为里面含有冒号
                     {
                         CString cs_part2;
-                        cs_part2 = temp_array_key.GetAt(temp_array_key.GetSize() - 1);
-                        sGetFileInfo.k_file_name.nStatus = VALUE_TYPE_CSTRING;
-                        sGetFileInfo.k_file_name.tValue.cs_value = cs_part2;
-                        sGetFileInfo.k_file_name.tValue.cs_value.Trim(_T("\""));
+                        cs_part2 = temp_array_key.GetAt(1);
+                        sGetFileInfo.key[GETF_FILENAME].nStatus = VALUE_TYPE_CSTRING;
+                        sGetFileInfo.key[GETF_FILENAME].tValue.cs_value = cs_part2;
+                        sGetFileInfo.key[GETF_FILENAME].tValue.cs_value.Trim(_T("\""));
                     }
                     else
                     {
-                        sGetFileInfo.k_file_name.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
+                        sGetFileInfo.key[GETF_FILENAME].nStatus = VALUE_TYPE_ANALYSIS_ERROR;
                     }
                     continue;
                 }
             }
 
-            if (sGetFileInfo.k_file_size.nStatus == 0)
+            if (sGetFileInfo.key[GETF_FILESIZE].nStatus == 0)
             {
-                n_find_ret = temp_cs.Find(sGetFileInfo.k_file_size.KeyName);
+                n_find_ret = temp_cs.Find(sGetFileInfo.key[GETF_FILESIZE].KeyName);
                 if (n_find_ret != -1) //找到了对应的关键字
                 {
                     //解析出对应的值;
                     CStringArray temp_array_key;
-                    SplitCStringA(temp_array_key, temp_cs, sGetFileInfo.k_file_size.KeyName + _T(":"));
+                    SplitCStringA(temp_array_key, temp_cs, /*sGetFileInfo.key[GETF_FILESIZE].KeyName +*/ _T(":"));
                     if (temp_array_key.GetSize() >= 2)  //时间不用强制分成两段 ， 因为里面含有冒号
                     {
                         CString cs_part2;
                         cs_part2 = temp_array_key.GetAt(1);
-                        sGetFileInfo.k_file_size.nStatus = VALUE_TYPE_FLOAT;
-                        sGetFileInfo.k_file_size.tValue.cs_value = cs_part2;
-                        sGetFileInfo.k_file_size.tValue.cs_value.Trim(_T("\""));
-                        sGetFileInfo.k_file_size.tValue.f_value = _wtof(sGetFileInfo.k_file_size.tValue.cs_value);
+                        sGetFileInfo.key[GETF_FILESIZE].nStatus = VALUE_TYPE_FLOAT;
+                        sGetFileInfo.key[GETF_FILESIZE].tValue.cs_value = cs_part2;
+                        sGetFileInfo.key[GETF_FILESIZE].tValue.cs_value.Trim(_T("\""));
+                        sGetFileInfo.key[GETF_FILESIZE].tValue.f_value = _wtof(sGetFileInfo.key[GETF_FILESIZE].tValue.cs_value);
                     }
                     else
                     {
-                        sGetFileInfo.k_file_size.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
+                        sGetFileInfo.key[GETF_FILESIZE].nStatus = VALUE_TYPE_ANALYSIS_ERROR;
                     }
                     continue;
                 }
             }
 
-            if (sGetFileInfo.k_updatedAt.nStatus == 0)
+            if (sGetFileInfo.key[GETF_UPDATED].nStatus == 0)
             {
-                n_find_ret = temp_cs.Find(sGetFileInfo.k_updatedAt.KeyName);
+                n_find_ret = temp_cs.Find(sGetFileInfo.key[GETF_UPDATED].KeyName);
                 if (n_find_ret != -1) //找到了对应的关键字
                 {
                     //解析出对应的值;
                     CStringArray temp_array_key;
-                    SplitCStringA(temp_array_key, temp_cs, sGetFileInfo.k_updatedAt.KeyName + _T("\":"));
+                    SplitCStringA(temp_array_key, temp_cs, sGetFileInfo.key[GETF_UPDATED].KeyName + _T("\":"));
                     if (temp_array_key.GetSize() >= 2)  //时间不用强制分成两段 ， 因为里面含有冒号
                     {
                         CString cs_part2;
                         cs_part2 = temp_array_key.GetAt(1);
-                        sGetFileInfo.k_updatedAt.nStatus = VALUE_TYPE_CSTRING;
-                        sGetFileInfo.k_updatedAt.tValue.cs_value = cs_part2;
-                        sGetFileInfo.k_updatedAt.tValue.cs_value.Trim(_T("\""));
+                        sGetFileInfo.key[GETF_UPDATED].nStatus = VALUE_TYPE_CSTRING;
+                        sGetFileInfo.key[GETF_UPDATED].tValue.cs_value = cs_part2;
+                        sGetFileInfo.key[GETF_UPDATED].tValue.cs_value.Trim(_T("\""));
                     }
                     else
                     {
-                        sGetFileInfo.k_updatedAt.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
+                        sGetFileInfo.key[GETF_UPDATED].nStatus = VALUE_TYPE_ANALYSIS_ERROR;
                     }
                     continue;
                 }
@@ -262,7 +259,7 @@ OUTPUT int https_get(int npid, StrGetProductID &sGetPIDInfo)
     httplib::Client cli("api.bravocontrols.com");
 #endif
 
-    CString apiPath = _T("/customerProduct/") + temp_pid;
+    CString apiPath = _T("/firmwareProduct/") + temp_pid;
     //CString apiPath = _T("/customerProduct/") + temp_pid + _T("/software");
 
     char cTemp1[255];
@@ -292,9 +289,9 @@ OUTPUT int https_get(int npid, StrGetProductID &sGetPIDInfo)
             temp_cs = temp_array.GetAt(i);
             n_find_ret = 0;
 
-            if (sGetPIDInfo.k_productID.nStatus == 0)
+            if (sGetPIDInfo.key[GETP_ID].nStatus == 0)
             {
-                n_find_ret = temp_cs.Find(sGetPIDInfo.k_productID.KeyName);
+                n_find_ret = temp_cs.Find(sGetPIDInfo.key[GETP_ID].KeyName);
                 if (n_find_ret != -1) //找到了对应的关键字
                 {
                     //解析出对应的值;
@@ -304,21 +301,21 @@ OUTPUT int https_get(int npid, StrGetProductID &sGetPIDInfo)
                     {
                         CString cs_part2;
                         cs_part2 = temp_array_key.GetAt(1);
-                        sGetPIDInfo.k_productID.nStatus = VALUE_TYPE_INT;
-                        sGetPIDInfo.k_productID.tValue.cs_value = cs_part2;
-                        sGetPIDInfo.k_productID.tValue.n_value = _wtoi(cs_part2);
+                        sGetPIDInfo.key[GETP_ID].nStatus = VALUE_TYPE_INT;
+                        sGetPIDInfo.key[GETP_ID].tValue.cs_value = cs_part2;
+                        sGetPIDInfo.key[GETP_ID].tValue.n_value = _wtoi(cs_part2);
                     }
                     else
                     {
-                        sGetPIDInfo.k_productID.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
+                        sGetPIDInfo.key[GETP_ID].nStatus = VALUE_TYPE_ANALYSIS_ERROR;
                     }
                     continue;
                 }
             }
 
-            if (sGetPIDInfo.k_serialNumber.nStatus == 0)
+            if (sGetPIDInfo.key[GETP_FIRMWARE].nStatus == 0)
             {
-                n_find_ret = temp_cs.Find(sGetPIDInfo.k_serialNumber.KeyName);
+                n_find_ret = temp_cs.Find(sGetPIDInfo.key[GETP_FIRMWARE].KeyName);
                 if (n_find_ret != -1) //找到了对应的关键字
                 {
                     //解析出对应的值;
@@ -328,21 +325,22 @@ OUTPUT int https_get(int npid, StrGetProductID &sGetPIDInfo)
                     {
                         CString cs_part2;
                         cs_part2 = temp_array_key.GetAt(1);
-                        sGetPIDInfo.k_serialNumber.nStatus = VALUE_TYPE_INT;
-                        sGetPIDInfo.k_serialNumber.tValue.cs_value = cs_part2;
-                        sGetPIDInfo.k_serialNumber.tValue.n_value = _wtoi(cs_part2);
+                        sGetPIDInfo.key[GETP_FIRMWARE].nStatus = VALUE_TYPE_FLOAT;
+                        sGetPIDInfo.key[GETP_FIRMWARE].tValue.cs_value = cs_part2;
+                        sGetPIDInfo.key[GETP_FIRMWARE].tValue.cs_value.Trim(_T("\""));
+                        sGetPIDInfo.key[GETP_FIRMWARE].tValue.f_value = _wtof(sGetPIDInfo.key[GETP_FIRMWARE].tValue.cs_value);
                     }
                     else
                     {
-                        sGetPIDInfo.k_serialNumber.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
+                        sGetPIDInfo.key[GETP_FIRMWARE].nStatus = VALUE_TYPE_ANALYSIS_ERROR;
                     }
                     continue;
                 }
             }
 
-            if (sGetPIDInfo.k_ipAddress.nStatus == 0)
+            if (sGetPIDInfo.key[GETP_SOFTWARE].nStatus == 0)
             {
-                n_find_ret = temp_cs.Find(sGetPIDInfo.k_ipAddress.KeyName);
+                n_find_ret = temp_cs.Find(sGetPIDInfo.key[GETP_SOFTWARE].KeyName);
                 if (n_find_ret != -1) //找到了对应的关键字
                 {
                     //解析出对应的值;
@@ -352,159 +350,86 @@ OUTPUT int https_get(int npid, StrGetProductID &sGetPIDInfo)
                     {
                         CString cs_part2;
                         cs_part2 = temp_array_key.GetAt(1);
-                        sGetPIDInfo.k_ipAddress.nStatus = VALUE_TYPE_CSTRING;
-                        sGetPIDInfo.k_ipAddress.tValue.cs_value = cs_part2;
-                        sGetPIDInfo.k_ipAddress.tValue.cs_value.Trim(_T("\""));
+                        sGetPIDInfo.key[GETP_SOFTWARE].nStatus = VALUE_TYPE_FLOAT;
+                        sGetPIDInfo.key[GETP_SOFTWARE].tValue.cs_value = cs_part2;
+                        sGetPIDInfo.key[GETP_SOFTWARE].tValue.cs_value.Trim(_T("\""));
+                        sGetPIDInfo.key[GETP_SOFTWARE].tValue.f_value = _wtof(sGetPIDInfo.key[GETP_SOFTWARE].tValue.cs_value);
                     }
                     else
                     {
-                        sGetPIDInfo.k_ipAddress.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
+                        sGetPIDInfo.key[GETP_SOFTWARE].nStatus = VALUE_TYPE_ANALYSIS_ERROR;
                     }
                     continue;
                 }
             }
 
-            if (sGetPIDInfo.k_ipPort.nStatus == 0)
+            if (sGetPIDInfo.key[GETP_LASTUPDATE].nStatus == 0)
             {
-                n_find_ret = temp_cs.Find(sGetPIDInfo.k_ipPort.KeyName);
+                n_find_ret = temp_cs.Find(sGetPIDInfo.key[GETP_LASTUPDATE].KeyName);
                 if (n_find_ret != -1) //找到了对应的关键字
                 {
                     //解析出对应的值;
                     CStringArray temp_array_key;
-                    SplitCStringA(temp_array_key, temp_cs, _T(":"));
-                    if (temp_array_key.GetSize() == 2)  //必须是分成两段
-                    {
-                        CString cs_part2;
-                        cs_part2 = temp_array_key.GetAt(1);
-                        sGetPIDInfo.k_ipPort.nStatus = VALUE_TYPE_INT;
-                        sGetPIDInfo.k_ipPort.tValue.cs_value = cs_part2;
-                        sGetPIDInfo.k_ipPort.tValue.n_value = _wtoi(cs_part2);
-                    }
-                    else
-                    {
-                        sGetPIDInfo.k_ipPort.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
-                    }
-                    continue;
-                }
-            }
-
-            if (sGetPIDInfo.k_hardwareVer.nStatus == 0)
-            {
-                n_find_ret = temp_cs.Find(sGetPIDInfo.k_hardwareVer.KeyName);
-                if (n_find_ret != -1) //找到了对应的关键字
-                {
-                    //解析出对应的值;
-                    CStringArray temp_array_key;
-                    SplitCStringA(temp_array_key, temp_cs, _T(":"));
-                    if (temp_array_key.GetSize() == 2)  //必须是分成两段
-                    {
-                        CString cs_part2;
-                        cs_part2 = temp_array_key.GetAt(1);
-                        sGetPIDInfo.k_hardwareVer.nStatus = VALUE_TYPE_FLOAT;
-                        sGetPIDInfo.k_hardwareVer.tValue.cs_value = cs_part2;
-                        sGetPIDInfo.k_hardwareVer.tValue.cs_value.Trim(_T("\""));
-                        sGetPIDInfo.k_hardwareVer.tValue.f_value = _wtof(sGetPIDInfo.k_hardwareVer.tValue.cs_value);
-                    }
-                    else
-                    {
-                        sGetPIDInfo.k_hardwareVer.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
-                    }
-                    continue;
-                }
-            }
-
-            if (sGetPIDInfo.k_softwareVer.nStatus == 0)
-            {
-                n_find_ret = temp_cs.Find(sGetPIDInfo.k_softwareVer.KeyName);
-                if (n_find_ret != -1) //找到了对应的关键字
-                {
-                    //解析出对应的值;
-                    CStringArray temp_array_key;
-                    SplitCStringA(temp_array_key, temp_cs, _T(":"));
-                    if (temp_array_key.GetSize() == 2)  //必须是分成两段
-                    {
-                        CString cs_part2;
-                        cs_part2 = temp_array_key.GetAt(1);
-                        sGetPIDInfo.k_softwareVer.nStatus = VALUE_TYPE_FLOAT;
-                        sGetPIDInfo.k_softwareVer.tValue.cs_value = cs_part2;
-                        sGetPIDInfo.k_softwareVer.tValue.cs_value.Trim(_T("\""));
-                        sGetPIDInfo.k_softwareVer.tValue.f_value = _wtof(sGetPIDInfo.k_softwareVer.tValue.cs_value);
-                    }
-                    else
-                    {
-                        sGetPIDInfo.k_softwareVer.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
-                    }
-                    continue;
-                }
-            }
-
-            if (sGetPIDInfo.k_lastCommunicationDate.nStatus == 0)
-            {
-                n_find_ret = temp_cs.Find(sGetPIDInfo.k_lastCommunicationDate.KeyName);
-                if (n_find_ret != -1) //找到了对应的关键字
-                {
-                    //解析出对应的值;
-                    CStringArray temp_array_key;
-                    SplitCStringA(temp_array_key, temp_cs, sGetPIDInfo.k_lastCommunicationDate.KeyName + _T("\":"));
+                    SplitCStringA(temp_array_key, temp_cs, sGetPIDInfo.key[GETP_LASTUPDATE].KeyName + _T("\":"));
                     if (temp_array_key.GetSize() >= 2)  //时间不用强制分成两段 ， 因为里面含有冒号
                     {
                         CString cs_part2;
                         cs_part2 = temp_array_key.GetAt(1);
-                        sGetPIDInfo.k_lastCommunicationDate.nStatus = VALUE_TYPE_CSTRING;
-                        sGetPIDInfo.k_lastCommunicationDate.tValue.cs_value = cs_part2;
-                        sGetPIDInfo.k_lastCommunicationDate.tValue.cs_value.Trim(_T("\""));
+                        sGetPIDInfo.key[GETP_LASTUPDATE].nStatus = VALUE_TYPE_CSTRING;
+                        sGetPIDInfo.key[GETP_LASTUPDATE].tValue.cs_value = cs_part2;
+                        sGetPIDInfo.key[GETP_LASTUPDATE].tValue.cs_value.Trim(_T("\""));
                     }
                     else
                     {
-                        sGetPIDInfo.k_lastCommunicationDate.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
+                        sGetPIDInfo.key[GETP_LASTUPDATE].nStatus = VALUE_TYPE_ANALYSIS_ERROR;
                     }
                     continue;
                 }
             }
 
-            if (sGetPIDInfo.k_createdAt.nStatus == 0)
+            if (sGetPIDInfo.key[GETP_CREATED].nStatus == 0)
             {
-                n_find_ret = temp_cs.Find(sGetPIDInfo.k_createdAt.KeyName);
+                n_find_ret = temp_cs.Find(sGetPIDInfo.key[GETP_CREATED].KeyName);
                 if (n_find_ret != -1) //找到了对应的关键字
                 {
                     //解析出对应的值;
                     CStringArray temp_array_key;
-                    SplitCStringA(temp_array_key, temp_cs, sGetPIDInfo.k_createdAt.KeyName + _T("\":"));
+                    SplitCStringA(temp_array_key, temp_cs, sGetPIDInfo.key[GETP_CREATED].KeyName + _T("\":"));
                     if (temp_array_key.GetSize() >= 2)  //时间不用强制分成两段 ， 因为里面含有冒号
                     {
                         CString cs_part2;
                         cs_part2 = temp_array_key.GetAt(1);
-                        sGetPIDInfo.k_createdAt.nStatus = VALUE_TYPE_CSTRING; 
-                        sGetPIDInfo.k_createdAt.tValue.cs_value = cs_part2;
-                        sGetPIDInfo.k_createdAt.tValue.cs_value.Trim(_T("\""));
+                        sGetPIDInfo.key[GETP_CREATED].nStatus = VALUE_TYPE_CSTRING;
+                        sGetPIDInfo.key[GETP_CREATED].tValue.cs_value = cs_part2;
+                        sGetPIDInfo.key[GETP_CREATED].tValue.cs_value.Trim(_T("\""));
                     }
                     else
                     {
-                        sGetPIDInfo.k_createdAt.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
+                        sGetPIDInfo.key[GETP_CREATED].nStatus = VALUE_TYPE_ANALYSIS_ERROR;
                     }
                     continue;
                 }
             }
 
-            if (sGetPIDInfo.k_updatedAt.nStatus == 0)
+            if (sGetPIDInfo.key[GETP_UPDATED].nStatus == 0)
             {
-                n_find_ret = temp_cs.Find(sGetPIDInfo.k_updatedAt.KeyName);
+                n_find_ret = temp_cs.Find(sGetPIDInfo.key[GETP_UPDATED].KeyName);
                 if (n_find_ret != -1) //找到了对应的关键字
                 {
                     //解析出对应的值;
                     CStringArray temp_array_key;
-                    SplitCStringA(temp_array_key, temp_cs, sGetPIDInfo.k_updatedAt.KeyName + _T("\":"));
+                    SplitCStringA(temp_array_key, temp_cs, sGetPIDInfo.key[GETP_UPDATED].KeyName + _T("\":"));
                     if (temp_array_key.GetSize() >= 2)  //时间不用强制分成两段 ， 因为里面含有冒号
                     {
                         CString cs_part2;
                         cs_part2 = temp_array_key.GetAt(1);
-                        sGetPIDInfo.k_updatedAt.nStatus = VALUE_TYPE_CSTRING;
-                        sGetPIDInfo.k_updatedAt.tValue.cs_value = cs_part2;
-                        sGetPIDInfo.k_updatedAt.tValue.cs_value.Trim(_T("\""));
+                        sGetPIDInfo.key[GETP_UPDATED].nStatus = VALUE_TYPE_CSTRING;
+                        sGetPIDInfo.key[GETP_UPDATED].tValue.cs_value = cs_part2;
+                        sGetPIDInfo.key[GETP_UPDATED].tValue.cs_value.Trim(_T("\""));
                     }
                     else
                     {
-                        sGetPIDInfo.k_updatedAt.nStatus = VALUE_TYPE_ANALYSIS_ERROR;
+                        sGetPIDInfo.key[GETP_UPDATED].nStatus = VALUE_TYPE_ANALYSIS_ERROR;
                     }
                     continue;
                 }

@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 生成的包含文件。
-// 供 T3000.rc 使用
+// Microsoft Visual C++ generated include file.
+// Used by T3000.rc
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -340,6 +340,7 @@
 #define IDD_DIALOG_BACNET_BUILDING_EDIT_FLOOR 779
 #define IDD_DIALOG_AIRFLOW              781
 #define IDD_DIALOG_AIRLAB_PARAMETER     783
+#define IDD_DIALOG_BACNET_UNITS         788
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -405,6 +406,7 @@
 #define IDC_EDIT_                       1030
 #define IDC_EDIT_STREET1                1030
 #define IDC_EDIT_MAX_VALUE_VALUE        1030
+#define IDC_EDIT_CO2_RE_CALIBRATION     1030
 #define IDC_OUTPUTBTN                   1031
 #define IDC_NUM_SENSOR                  1031
 #define IDC_EDIT44                      1031
@@ -2479,6 +2481,7 @@
 #define IDC_RADIO_MSV_3                 2488
 #define IDC_STATIC_TEMPERATURE_VALUE    2488
 #define IDC_STATIC_HUM_VALUE            2489
+#define IDC_RADIO_MSV_4                 2489
 #define IDC_STATIC_CO2_VALUE            2490
 #define IDC_STATIC_AQ_VALUE             2491
 #define IDC_STATIC_VOC_VALUE            2491
@@ -2499,7 +2502,9 @@
 #define IDC_BUTTON_EMAIL_ALARM          2506
 #define IDC_STATIC_OCC_STATUS           2506
 #define IDC_EDIT_SMTP_SERVER            2507
+#define IDC_STATIC_FIR_AMBIENT_TEMP     2507
 #define IDC_EDIT_PORT_NUMBER            2508
+#define IDC_STATIC_FIR_REMOTE_TEMP2     2508
 #define IDC_EDIT_EMAIL                  2509
 #define IDC_EDIT_USERNAME               2510
 #define IDC_COMBO_SECURE_TYPE           2511
@@ -2619,15 +2624,42 @@
 #define IDC_COMBO_AIRLAB_LINE4          2616
 #define IDC_BUTTON_DEFAULT              2617
 #define IDC_RADIO_CIRCULAR              2618
+#define IDC_COMBO_AIRLAB_LINE5          2618
 #define IDC_RADIO_RECTANGULAR           2619
 #define IDC_STATIC_CIRCULAR_UNIT        2620
 #define IDC_STATIC_RECTANGULAR_UNIT_LENGTH 2621
 #define IDC_STATIC_RECTANGULAR_UNIT_WIDTH 2622
 #define IDC_STATIC_SHAPE                2623
 #define IDC_RADIO_UNIT_M                2624
-#define IDC_RADIO_UNIT_M2               2625
 #define IDC_RADIO_UNIT_IN               2625
-#define IDC_WEBVIEW_BUTTON              2626
+#define IDC_COMBO_START_MONTH           2625
+#define IDC_COMBO_START_DAY             2626
+#define IDC_BUTTON_LCD_OK               2626
+#define IDC_COMBO_END_MONTH             2627
+#define IDC_RADIO_KEY_TEMP_SET_ENABLE   2627
+#define IDC_COMBO_END_DAY               2628
+#define IDC_RADIO_KEY_TEMP_SET_DISABLE  2628
+#define IDC_RADIO_KEY_HUM_SET_ENABLE    2629
+#define IDC_BUTTON_CO2_HELP             2629
+#define IDC_RADIO_KEY_HUM_SET_DISABLE   2630
+#define IDC_BUTTON_RE_CALIBRATION_DONE  2630
+#define IDC_RADIO_KEY_CO2_SET_ENABLE    2631
+#define IDC_EDIT_CO2_TYPE               2631
+#define IDC_RADIO_KEY_CO2_SET_DISABLE   2632
+#define IDC_EDIT_CO2_CALIBRATION_SCD    2632
+#define IDC_BUTTON_CO2_SCD_HELP         2633
+#define IDC_BUTTON_RE_CALIBRATION_SCD_DONE 2634
+#define IDC_RADIO_DEGC                  2636
+#define IDC_RADIO_DEGF                  2637
+#define IDC_STATIC_TEMP_SENSOR          2638
+#define IDC_COMBO_BACNET_UNITS          2639
+
+#define IDC_STATIC_BACNETIP_UNIT        2640
+#define IDC_COMBO_BACNETIP_UNIT         2641
+
+#define IDC_RADIO_SCROLL_ENABLE         2694
+#define IDC_RADIO_SCROLLBAR_DISABLE     2695
+
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3118,6 +3150,7 @@
 #define ID_SETTINGS34075                34075
 #define ID_DATABASE_LOGDETAIL           34076
 #define ID_DATABASE_BUILDINGMANAGEMENT  34077
+#define ID_VIEW_REFRESH                 34078
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -3192,9 +3225,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        785
-#define _APS_NEXT_COMMAND_VALUE         34078
-#define _APS_NEXT_CONTROL_VALUE         2625
+#define _APS_NEXT_RESOURCE_VALUE        790
+#define _APS_NEXT_COMMAND_VALUE         34079
+#define _APS_NEXT_CONTROL_VALUE         2642
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

@@ -225,6 +225,11 @@ BOOL CBacnetMonitor::PreTranslateMessage(MSG* pMsg)
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		return 1; 
 	}
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
+	{
+		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_MONITOR);
+		return TRUE;
+	}
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }

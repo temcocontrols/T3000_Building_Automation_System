@@ -8,6 +8,7 @@
  #include "../SQLiteDriver/CppSQLite3.h"
 #include "Dialog_Progess.h"
 #include "CO2_AUTO_CALIBRATION.h"
+#include "ShowMessageDlg.h"
 #define CO2NETVIEWFRESH   WM_USER+1008
 
 // CCO2NetView
@@ -161,6 +162,10 @@ BEGIN_MESSAGE_MAP(CCO2NetView, CFormView)
     ON_BN_CLICKED(IDC_RADIO_CO2_LCD_ON, &CCO2NetView::OnBnClickedRadioCo2LcdOn)
     ON_BN_CLICKED(IDC_RADIO_CO2_LCD_OFF, &CCO2NetView::OnBnClickedRadioCo2LcdOff)
     ON_BN_CLICKED(IDC_RADIO_CO2_LCD_DELAY_OFF, &CCO2NetView::OnBnClickedRadioCo2LcdDelayOff)
+    ON_BN_CLICKED(IDC_BUTTON_CO2_HELP, &CCO2NetView::OnBnClickedButtonCo2Help)
+    ON_BN_CLICKED(IDC_BUTTON_RE_CALIBRATION_DONE, &CCO2NetView::OnBnClickedButtonReCalibrationDone)
+    ON_BN_CLICKED(IDC_RADIO_SCROLL_ENABLE, &CCO2NetView::OnBnClickedRadioScrollEnable)
+    ON_BN_CLICKED(IDC_RADIO_SCROLLBAR_DISABLE, &CCO2NetView::OnBnClickedRadioScrollbarDisable)
 END_MESSAGE_MAP()
 
 
@@ -201,8 +206,19 @@ void CCO2NetView::Fresh()
       //register_critical_section.Unlock();
 
     Initial_Window();
-   
-    product_register_value[3131] = read_one(g_tstat_id, 3131);
+
+    Read_Multi(g_tstat_id, &product_register_value[3100], 3100, 100, 6);
+    if (product_register_value[3138] == 1)
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_SCROLL_ENABLE))->SetCheck(1);
+        ((CButton*)GetDlgItem(IDC_RADIO_SCROLLBAR_DISABLE))->SetCheck(0);
+    }
+    else
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_SCROLL_ENABLE))->SetCheck(0);
+        ((CButton*)GetDlgItem(IDC_RADIO_SCROLLBAR_DISABLE))->SetCheck(1);
+    }
+    //product_register_value[3131] = read_one(g_tstat_id, 3131);
     if (product_register_value[3131] == 0)
     {
         ((CButton *)GetDlgItem(IDC_RADIO_CO2_CAL_ENABLE))->SetCheck(1);
@@ -213,6 +229,16 @@ void CCO2NetView::Fresh()
         ((CButton *)GetDlgItem(IDC_RADIO_CO2_CAL_ENABLE))->SetCheck(0);
         ((CButton *)GetDlgItem(IDC_RADIO_CO2_CAL_DISABLE))->SetCheck(1);
     }
+
+    if ((product_register_value[210] >= 0) &&  ( product_register_value[210] < sizeof(CO2_Type) / sizeof(CO2_Type[0])  ))
+    {
+        GetDlgItem(IDC_EDIT_CO2_TYPE)->SetWindowText(CO2_Type[product_register_value[210]]);
+    }
+    else
+    {
+        GetDlgItem(IDC_EDIT_CO2_TYPE)->SetWindowText(CO2_Type[0]);
+    }
+
 	if (product_register_value[7] == STM32_CO2_RS485)
 	{
 		GetDlgItem(IDC_STATIC_IP_INFOR)->ShowWindow(SW_HIDE);
@@ -381,6 +407,7 @@ void CCO2NetView::Initial_Registerlist()
     CO2_NET_MODBUS_GET_NODES_PARA_END 	=	2568	;
     CO2_NET_MODBUS_SCAN_OCCUPY_START	=	2600	;
     CO2_NET_MODBUS_SCAN_OCCUPY_END	=	2632	;
+    MODBUS_CO2_FORCED_RE_CALIBRATION = 3141;
     CO2_NET_MODBUS_SCAN_ONLINE_START	=	10000	;
     CO2_NET_MODBUS_SCAN_ONLINE_END	=	10001	;
     CO2_NET_MODBUS_IDLE_ID	=	10002	;
@@ -544,7 +571,7 @@ void CCO2NetView::Initial_Window()
 	m_msflexgrid.put_TextMatrix(0,1,_T("Device ID"));
 	m_msflexgrid.put_TextMatrix(0,2,_T("Serial Number"));
 	m_msflexgrid.put_TextMatrix(0,3,_T("External PPM"));
-	m_msflexgrid.put_TextMatrix(0,4,_T("Prepare Alarm Setpoint"));
+	m_msflexgrid.put_TextMatrix(0,4,_T("Previous Alarm Setpoint"));
 	m_msflexgrid.put_TextMatrix(0,5,_T("Alarm Setpoint"));
 	m_msflexgrid.put_TextMatrix(0,6,_T("Calibrating Offset"));
 
@@ -577,6 +604,30 @@ void CCO2NetView::Initial_Window()
     Show_InputList();
 	Initial_OutputList();
 	Initial_VarList();
+
+    if (product_register_value[CO2_NET_MODBUS_SOFTWARE_VERSION_LO] < 60)
+    {
+        GetDlgItem(IDC_EDIT_CO2_RE_CALIBRATION)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_CO2_HELP)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_RE_CALIBRATION_DONE)->EnableWindow(0);
+    }
+    else if(product_register_value[210] == SENSOR_TYPE_SCD30)
+    {
+        CString temp_recal_value;
+        temp_recal_value.Format(_T("%u"), product_register_value[MODBUS_CO2_FORCED_RE_CALIBRATION]);
+        GetDlgItem(IDC_EDIT_CO2_RE_CALIBRATION)->SetWindowText(temp_recal_value);
+        GetDlgItem(IDC_EDIT_CO2_RE_CALIBRATION)->EnableWindow(1);
+        GetDlgItem(IDC_BUTTON_CO2_HELP)->EnableWindow(1);
+        GetDlgItem(IDC_BUTTON_RE_CALIBRATION_DONE)->EnableWindow(1);
+    }
+    else
+    {
+        GetDlgItem(IDC_EDIT_CO2_RE_CALIBRATION)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_CO2_HELP)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_RE_CALIBRATION_DONE)->EnableWindow(0);
+    }
+
+
 }
 void CCO2NetView::Show_InputList()
 {
@@ -794,11 +845,11 @@ void CCO2NetView::Show_TCPIP()
                                   (BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START+1],
                                   (BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START+2],
                                   (BYTE)product_register_value[CO2_NET_MODBUS_IP_ADDRESS_START+3]);
-    m_IpCtrl_Gateway.SetAddress((BYTE)product_register_value[CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_START],
+    m_IpCtrl_Subnet.SetAddress((BYTE)product_register_value[CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_START],
                                 (BYTE)product_register_value[CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_START+1],
                                 (BYTE)product_register_value[CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_START+2],
                                 (BYTE)product_register_value[CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_START+3]);
-    m_IpCtrl_Subnet.SetAddress((BYTE)product_register_value[CO2_NET_MODBUS_GATEWAY_ADDRESS_START],
+    m_IpCtrl_Gateway.SetAddress((BYTE)product_register_value[CO2_NET_MODBUS_GATEWAY_ADDRESS_START],
                                (BYTE)product_register_value[CO2_NET_MODBUS_GATEWAY_ADDRESS_START+1],
                                (BYTE)product_register_value[CO2_NET_MODBUS_GATEWAY_ADDRESS_START+2],
                                (BYTE)product_register_value[CO2_NET_MODBUS_GATEWAY_ADDRESS_START+3]);
@@ -1168,13 +1219,13 @@ void CCO2NetView::OnBnClickedButtonApply()
     n=write_one(g_tstat_id,CO2_NET_MODBUS_IP_ADDRESS_GHOST_START+1,address2);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_IP_ADDRESS_GHOST_START+2,address3);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_IP_ADDRESS_GHOST_START+3,address4);
-
-    m_IpCtrl_Gateway.GetAddress(address1,address2,address3,address4);
+    
+    m_IpCtrl_Subnet.GetAddress(address1,address2,address3,address4);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_GHOST_START+0,address1);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_GHOST_START+1,address2);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_GHOST_START+2,address3);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_GHOST_START+3,address4);
-    m_IpCtrl_Subnet.GetAddress(address1,address2,address3,address4);
+    m_IpCtrl_Gateway.GetAddress(address1,address2,address3,address4);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_GATEWAY_ADDRESS_GHOST_START,address1);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_GATEWAY_ADDRESS_GHOST_START+1,address2);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_GATEWAY_ADDRESS_GHOST_START+2,address3);
@@ -2192,4 +2243,76 @@ void CCO2NetView::OnBnClickedRadioCo2LcdDelayOff()
     GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->SetWindowText(_T(""));
     GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->EnableWindow(1);
 
+}
+
+
+void CCO2NetView::OnBnClickedButtonCo2Help()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CShowMessageDlg dlg;
+    CString temp_message;
+    temp_message.Format(_T("Sensirion CO2 sensor RE-CALIBRATION \r\nLocate the device in an environment with air having a stable CO2 concentration in the range of 400 ppm to 2000 ppm. \r\n \
+1.Setting and controlling a known CO2 concentration in a sealed environment with the set CO2concentration acting as the reference value for FRC .\r\n \
+2.Fresh air from the outside can be used as a reference. Outside air typically has a CO2 concentration of 400 ppm . expose the device to outside air, e.g. by placing it close to an open window or outside. Direct sun light, extreme temperatures,and strong air flow have to be prevented,After 5 minutes, apply FRC with the reference value 400 ppm ."));
+    dlg.SetStaticText(temp_message);
+    //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+    dlg.SetStaticTextColor(RGB(0, 0, 255));
+    dlg.SetStaticTextSize(18, 14);
+    dlg.SetEvent(EVENT_MESSAGE_ONLY);
+    dlg.DoModal();
+}
+
+
+void CCO2NetView::OnBnClickedButtonReCalibrationDone()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString strCalibration;
+    GetDlgItem(IDC_EDIT_CO2_RE_CALIBRATION)->GetWindowText(strCalibration);
+    
+    unsigned short IntCalValue = _wtoi(strCalibration);
+    if (IntCalValue >= 5000)
+    {
+        MessageBox(_T("Out of range . Calibration value range (0-4999)"));
+        return;
+    }
+    if (write_one(g_tstat_id, MODBUS_CO2_FORCED_RE_CALIBRATION, IntCalValue, 3) < 0)
+    {
+        MessageBox(_T("Write data timeout,Please try again"));
+        return;
+    }
+    else
+    {
+        MessageBox(_T("Write data success!"));
+    }
+}
+
+
+void CCO2NetView::OnBnClickedRadioScrollEnable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (write_one(g_tstat_id, SCROLL_BAR_REG, 1, 3) < 0)
+    {
+        MessageBox(_T("Enable Scroll bar failed,Please try again"));
+        return;
+    }
+    else
+    {
+        MessageBox(_T("Enable Scroll bar success!"));
+    }
+}
+
+
+
+void CCO2NetView::OnBnClickedRadioScrollbarDisable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (write_one(g_tstat_id, SCROLL_BAR_REG, 0, 3) < 0)
+    {
+        MessageBox(_T("Disable Scroll bar failed,Please try again"));
+        return;
+    }
+    else
+    {
+        MessageBox(_T("Disable Scroll bar success!"));
+    }
 }

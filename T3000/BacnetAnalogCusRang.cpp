@@ -347,11 +347,17 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
     {
         m_static_data_status.ShowWindow(SW_HIDE);
     }
+    //if ((g_selected_product_id == PM_T38AI8AO6DO) ||
+    //    (g_selected_product_id == PM_T322AI))
+    //{
 
-	CString temp_task_info;
-	temp_task_info.Format(_T("Update Analog Range  "));
-	Post_Write_Message(g_bac_instance,WRITEANALOG_CUS_TABLE_T3000,analog_range_tbl_line,analog_range_tbl_line,sizeof(Str_table_point),analog_cus_range_dlg ,temp_task_info,Changed_Item,Changed_SubItem);
-
+    //}
+    //else
+    //{
+        CString temp_task_info;
+        temp_task_info.Format(_T("Update Analog Range  "));
+        Post_Write_Message(g_bac_instance, WRITEANALOG_CUS_TABLE_T3000, analog_range_tbl_line, analog_range_tbl_line, sizeof(Str_table_point), analog_cus_range_dlg, temp_task_info, Changed_Item, Changed_SubItem);
+    //}
 
 	return 0;
 }
@@ -818,7 +824,7 @@ void CBacnetAnalogCusRang::UpdateCusAnalogUnit()
 	CString temp_task_info;
 	temp_task_info.Format(_T("Update Analog Range Unit : %s  "),temp_cs);
 	Post_Write_Message(g_bac_instance,WRITEANALOG_CUS_TABLE_T3000,analog_range_tbl_line,analog_range_tbl_line,sizeof(Str_table_point),analog_cus_range_dlg ,temp_task_info);
-
+    Analog_Customer_Units[analog_range_tbl_line] = temp_cs;
 }
 
 

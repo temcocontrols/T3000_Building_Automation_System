@@ -1,6 +1,10 @@
 #pragma once
 #include "RelayLabel.h"
-//#define ENABLE_HTTP_FUCTION  //定义是否使用http api
+#ifdef DEBUG
+ #define ENABLE_HTTP_FUCTION  //定义是否使用http api
+#endif // DEBUG
+
+
 //#define ENABLE_T3_EMAIL
 #include <map>
 //minipanel 寄存器表
@@ -23,6 +27,7 @@
 #define BAC_HOL_START_REG			15976
 #define BAC_WR_TIME_FIRST           32044
 #define BAC_AR_TIME_FIRST           32620
+#define BAC_CUS_TABLE_FIRST         32936
 #define BAC_PID_CONTROL_START_REG   32712
 #define BAC_CUSTOMER_TABLE_START    32936
 #define BAC_WR_FLAG_FIRST           33201
@@ -863,9 +868,12 @@ const CString Input_List_Analog_Units[] =
 	_T("ma"),
 	_T("psi"),
 	_T("counts"),
-	_T("%(0-10V)"),
-	_T("%(0-5V)"),
-	_T("%(4-20ma)"),
+	_T("%"),
+	_T("%"),
+	_T("%"),
+	//_T("%(0-10V)"),
+	//_T("%(0-5V)"),
+	//_T("%(4-20ma)"),
 	_T("Volts"),
 	_T(""),
 	_T(""),
@@ -1041,6 +1049,22 @@ const CString AirFlowUnit[] =
 	_T("L/min")
 };
 
+const CString Month_of_Year[] =
+{
+	_T("Jan"),
+	_T("Feb"),
+	_T("Mar"),
+	_T("Apr"),
+	_T("May"),
+	_T("Jun"),
+	_T("Jul"),
+	_T("Aug"),
+	_T("Sept"),
+	_T("Oct"),
+	_T("Nov"),
+	_T("Dec")
+};
+
 const CString Time_Zone_Name[] =
 {
 	_T("(UTC - 12:00) , Yankee Time Zone"),
@@ -1200,6 +1224,7 @@ typedef enum
     T3_TSTAT10    = 9,
     T3_OEM        = 11,
     T3_TB_11I = 12,
+	T3_FAN_MODULE = 13,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1254,6 +1279,12 @@ const int T322AI_OUT_A = 0;
 
 const int PWM_TRANSDUCER_OUT_D = 0;
 const int PWM_TRANSDUCER_OUT_A = 6;
+
+const int FAN_MODULE_IN_A = 12; // ESP32 版本 子设备  Fan module 输入;
+const int FAN_MODULE_IN_D = 0;
+const int FAN_MOUDLE_OUT_A = 1; 
+const int FAN_MOUDLE_OUT_D = 0;
+
 enum
 {
 	UART_1200 = 0,
@@ -2419,7 +2450,7 @@ const CString Output_Type_String[] =
 {
     _T("Virtual"),
     _T("Digital"),       //1
-    _T("Ananlog"),
+    _T("Analog"),
     _T("Extend Digital"),
     _T("Extend Ananlog"),
     _T("Internal")
@@ -2468,6 +2499,7 @@ typedef struct RoomInfo
 #define SENSOR_BIT_ZIGBEE        9
 #define SENSOR_BIT_PM2_5         10
 #define SENSOR_BIT_AI_PT12       11
+#define SENSOR_BIT_FAR_INFRA_RED 12
 
 #define TYPE_BM_POINT_LIST  255
 #define TYPE_BM_GROUP       0

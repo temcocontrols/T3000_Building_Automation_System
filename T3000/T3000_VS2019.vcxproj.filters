@@ -816,6 +816,9 @@
     <ClCompile Include="CTstatAQ_Parameter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CBacnetUnitsSelection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="BacnetWebView.cpp">
       <Filter>Bacnet\WebView</Filter>
     </ClCompile>
@@ -2041,18 +2044,6 @@
     </ClInclude>
     <ClInclude Include="CTstatAQ_Parameter.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BacnetWebView.h">
-      <Filter>Header Files\WebView</Filter>
-    </ClInclude>
-    <ClInclude Include="BacnetWebViewToolBar.h">
-      <Filter>Header Files\WebView</Filter>
-    </ClInclude>
-    <ClInclude Include="BacnetWebViewDropTarget.h">
-      <Filter>Header Files\WebView</Filter>
-    </ClInclude>
-    <ClInclude Include="BacnetWebViewStdafx.h">
-      <Filter>Header Files\WebView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -112,7 +112,7 @@ public:
 	 afx_msg void OnEnKillfocusEdit2();
 	 afx_msg void OnBnClickedButtonScan();
 	 BOOL	binary_search_crc(int a);
-	void binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo, BYTE devHi,int index);
+	int binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo, BYTE devHi,int index);
 	CEdit m_edit_serialNo;
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnBnClickedButton1();

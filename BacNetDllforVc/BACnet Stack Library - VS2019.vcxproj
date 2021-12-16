@@ -36,6 +36,7 @@
     <ClCompile Include="Handler\h_wpm.c" />
     <ClCompile Include="Handler\noserv.c" />
     <ClCompile Include="Handler\objects.c" />
+    <ClCompile Include="Handler\s_ack_seg.c" />
     <ClCompile Include="Handler\s_arfs.c" />
     <ClCompile Include="Handler\s_awfs.c" />
     <ClCompile Include="Handler\s_cov.c" />

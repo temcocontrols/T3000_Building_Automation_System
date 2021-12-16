@@ -182,6 +182,7 @@ BEGIN_MESSAGE_MAP(CAirQuality, CFormView)
 	ON_BN_CLICKED(IDC_RADIO_TRANDUCER, &CAirQuality::OnBnClickedButton_Tranducer)
 	ON_BN_CLICKED(IDC_RADIO_pid, &CAirQuality::OnBnClickedButton_PID)
 	ON_CBN_SELENDCANCEL(IDC_CO2_BAUDRATECOMBO, &CAirQuality::OnCbnSelendcancelBaudratecombo)
+	ON_CBN_SELCHANGE(IDC_CO2_BAUDRATECOMBO, &CAirQuality::OnCbnSelchangeCo2Baudratecombo)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CAirQuality, CDialog)
@@ -213,7 +214,7 @@ void CAirQuality::Fresh()
 	m_Combox_baudrate.AddString(_T("38400"));
 	m_Combox_baudrate.AddString(_T("57600"));
 	m_Combox_baudrate.AddString(_T("115200"));
-
+	m_Combox_baudrate.AddString(L"76800");  //新增76800的处理;
 	g_NEED_MULTI_READ = FALSE;
 	int AddressValue = -1;
 	m_current_TstatID = g_tstat_id;
@@ -310,53 +311,53 @@ void CAirQuality::Fresh()
 
 void CAirQuality::OnCbnSelendcancelBaudratecombo()
 {
-	if (product_register_value[MODBUS_BAUDRATE] == m_Combox_baudrate.GetCurSel()) //Add this to judge weather this value need to change.
-		return;
+	//if (product_register_value[MODBUS_BAUDRATE] == m_Combox_baudrate.GetCurSel()) //Add this to judge weather this value need to change.
+	//	return;
 
-	/* Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_BAUDRATE,m_baudRateCombox.GetCurSel(),
-	                     product_register_value[MODBUS_BAUDRATE],this->m_hWnd,IDC_BAUDRATECOMBO,_T("BAUDRATE"));*/
-	int ret = 0;
-	if (product_register_value[7] == STM32_PM25)
-		ret = write_one(g_tstat_id, 15, m_Combox_baudrate.GetCurSel());
-	else
-	    ret = write_one(g_tstat_id, MODBUS_BAUDRATE, m_Combox_baudrate.GetCurSel());
-	int index_brandrate = m_Combox_baudrate.GetCurSel();
-	int brandrate = 19200;
+	///* Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_BAUDRATE,m_baudRateCombox.GetCurSel(),
+	//                     product_register_value[MODBUS_BAUDRATE],this->m_hWnd,IDC_BAUDRATECOMBO,_T("BAUDRATE"));*/
+	//int ret = 0;
+	//if (product_register_value[7] == STM32_PM25)
+	//	ret = write_one(g_tstat_id, 15, m_Combox_baudrate.GetCurSel());
+	//else
+	//    ret = write_one(g_tstat_id, MODBUS_BAUDRATE, m_Combox_baudrate.GetCurSel());
+	//int index_brandrate = m_Combox_baudrate.GetCurSel();
+	//int brandrate = 19200;
 
-	if (index_brandrate == 0)
-	{
-		brandrate = 9600;
-	}
-	else if (index_brandrate == 1)
-	{
-		brandrate = 19200;
-	}
-	else if (index_brandrate == 2)
-	{
-		brandrate = 38400;
-	}
-	else if (index_brandrate == 3)
-	{
-		brandrate = 57600;
-	}
-	else if (index_brandrate == 4)
-	{
-		brandrate = 115200;
-	}
-	CString SqlText;
+	//if (index_brandrate == 0)
+	//{
+	//	brandrate = 9600;
+	//}
+	//else if (index_brandrate == 1)
+	//{
+	//	brandrate = 19200;
+	//}
+	//else if (index_brandrate == 2)
+	//{
+	//	brandrate = 38400;
+	//}
+	//else if (index_brandrate == 3)
+	//{
+	//	brandrate = 57600;
+	//}
+	//else if (index_brandrate == 4)
+	//{
+	//	brandrate = 115200;
+	//}
+	//CString SqlText;
 
-	SqlText.Format(_T("update ALL_NODE set Baudrate = '%d' where Serial_ID='%d'"), brandrate, get_serialnumber());
-	Change_BaudRate(brandrate);
+	//SqlText.Format(_T("update ALL_NODE set Baudrate = '%d' where Serial_ID='%d'"), brandrate, get_serialnumber());
+	//Change_BaudRate(brandrate);
 
-	CppSQLite3DB SqliteDBBuilding;
-	CppSQLite3Table table;
-	CppSQLite3Query q;
-	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
-	SqliteDBBuilding.execDML((UTF8MBSTR)SqlText);
-	SqliteDBBuilding.closedb();
+	//CppSQLite3DB SqliteDBBuilding;
+	//CppSQLite3Table table;
+	//CppSQLite3Query q;
+	//SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	//SqliteDBBuilding.execDML((UTF8MBSTR)SqlText);
+	//SqliteDBBuilding.closedb();
 
-	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	pFrame->ScanTstatInDB();
+	//CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	//pFrame->ScanTstatInDB();
 }
 
 void CAirQuality::OnCbnSelchangeComboDisplay()
@@ -4346,4 +4347,63 @@ void CAirQuality::Fresh_Input_Output()
 	Initial_UserList();
 
 #endif
+}
+
+
+void CAirQuality::OnCbnSelchangeCo2Baudratecombo()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (product_register_value[MODBUS_BAUDRATE] == m_Combox_baudrate.GetCurSel()) //Add this to judge weather this value need to change.
+		return;
+
+	/* Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_BAUDRATE,m_baudRateCombox.GetCurSel(),
+						 product_register_value[MODBUS_BAUDRATE],this->m_hWnd,IDC_BAUDRATECOMBO,_T("BAUDRATE"));*/
+	int ret = 0;
+	if (product_register_value[7] == STM32_PM25)
+		ret = write_one(g_tstat_id, 15, m_Combox_baudrate.GetCurSel());
+	else
+		ret = write_one(g_tstat_id, MODBUS_BAUDRATE, m_Combox_baudrate.GetCurSel());
+	int index_brandrate = m_Combox_baudrate.GetCurSel();
+	int brandrate = 19200;
+
+	if (index_brandrate == 0)
+	{
+		brandrate = 9600;
+	}
+	else if (index_brandrate == 1)
+	{
+		brandrate = 19200;
+	}
+	else if (index_brandrate == 2)
+	{
+		brandrate = 38400;
+	}
+	else if (index_brandrate == 3)
+	{
+		brandrate = 57600;
+	}
+	else if (index_brandrate == 4)
+	{
+		brandrate = 115200;
+	}
+	else if (index_brandrate == 5)
+	{
+		brandrate = 76800;
+	}
+	else
+		return;
+	CString SqlText;
+
+	SqlText.Format(_T("update ALL_NODE set Bautrate = '%d' where Serial_ID='%d'"), brandrate, get_serialnumber());
+	Change_BaudRate(brandrate);
+
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	SqliteDBBuilding.execDML((UTF8MBSTR)SqlText);
+	SqliteDBBuilding.closedb();
+
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	pFrame->ScanTstatInDB();
 }

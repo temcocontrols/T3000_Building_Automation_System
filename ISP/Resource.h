@@ -119,6 +119,7 @@
 #define IDC_CHECK_FLASH_WIFI_MAC        1094
 #define IDC_CHECK1                      1095
 #define IDC_CHECK_MSTP_UPDATE           1095
+#define IDC_BUTTON_LOOP_FLASH           1097
 #define IDC_BUTTON_SETTING_OK           6001
 #define IDC_EDIT_SETTING_TIMEOUT        6021
 #define IDC_EDIT_SETTING_RESPONSE_TIME  6022
@@ -130,6 +131,7 @@
 #define ID_Menu                         32772
 #define ID_SAVE_LOG_INFO                32773
 #define ID_MENU_APP                     32774
+#define ttimer                          32774
 #define ID_MENU_ABOUT                   32775
 #define ID_MENU_ABOUT32776              32776
 #define ID_MENU_EXIT                    32777
@@ -144,7 +146,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        145
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1096
+#define _APS_NEXT_CONTROL_VALUE         1098
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

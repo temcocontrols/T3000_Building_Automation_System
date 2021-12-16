@@ -25,9 +25,9 @@ HWND hMbpollWritePopWnd;
 int regDetailsOpenedFrom = 0;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
 bool list_mouse_click = false;
 //#include "stdafx.h"
-unsigned short multi_register_value[4096]={-1};
-unsigned short multi_register_value_tcp[10000]={-1};
-unsigned short product_register_value[20000]={-1};
+unsigned short multi_register_value[4096]={0};
+unsigned short multi_register_value_tcp[10000]={0};
+unsigned short product_register_value[20000]={0};
 unsigned short product_register_sensor_flag[5] = { 0 };
 
 int product_type = 0;
@@ -67,6 +67,7 @@ CString g_achive_folder_temp_db = _T("");
 CString g_achive_device_name_path = _T("");
 CString g_achive_monitor_datatbase_path = _T("");
 CString g_ext_database_path = _T(""); //额外的配置档数据库路径;
+CString g_ext_mass_flash_path = _T(""); //保存多烧写  选中设备的 配置文件路径
 
 BOOL g_Scanfully=FALSE;
 BOOL g_ScanSecurity=TRUE;
@@ -1844,7 +1845,7 @@ bool receive_customer_unit; //收到回复，flag就置 true;
 bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
 
 bool read_msv_table; //MSV table 
-CString Custom_Msv_Range[BAC_MSV_COUNT];// 存储客户多态  例如显示  AAA/BBB/CCC
+CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// 存储客户多态  例如显示  AAA/BBB/CCC
 
 CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
@@ -1965,6 +1966,12 @@ vector <Str_table_point> m_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite;
 vector <Str_Extio_point> m_extio_config_data;
 
+vector <int>  m_Input_data_instance; // for input bacnet-thirdParty devices instance_is's
+vector <int>  m_Output_data_instance;// for output bacnet-thirdParty devices instance_is's
+vector <int>  m_Variable_data_instance;
+vector <int>  m_Weekly_data_instance; 
+vector <int>  m_Annual_data_instance;
+
 vector <Str_MSV> m_msv_data;
 
 Time_block_mini Device_time;
@@ -2028,6 +2035,8 @@ int g_new_old_IDE = 0;
 int g_bac_read_type;	//用于记录将要读取哪一个，input 还是output,给线程使用;
 bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
 HANDLE click_read_thread;
+HANDLE BACnet_read_thread;
+HANDLE BACnet_abort_read_thread;
 bool bac_net_initial_once;
 unsigned char my_ip[4];
 int connect_invoke_id = -1;
@@ -2263,6 +2272,8 @@ bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
 vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
+vector <str_segmented_bacnet_rp_info> segmented_bacnet_data;
+bool bacnetIpDataRead = false;
 unsigned char m_dialog_signal_type;
 connect_Info system_connect_info;
 panelname_map g_panelname_map; 
@@ -2297,7 +2308,12 @@ vector < RoomInfo> bm_room;
 CString T3_chip_name;
 unsigned int T3_chip_type;
 
+unsigned char daylight_start_month;
+unsigned char daylight_start_day;
+unsigned char daylight_end_month;
+unsigned char daylight_end_day;
 
 
+bool Bacnet_debug_fileRead = false;
 
 

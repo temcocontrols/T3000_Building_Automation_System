@@ -785,7 +785,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                         int  int_product_type = pFrame->m_product.at(i).product_class_id;
 
 
-                        if((int_product_type == PM_MINIPANEL) || (int_product_type == PM_CM5) || (int_product_type == PM_MINIPANEL_ARM))//||(int_product_type == PM_TSTAT6)
+                        if((int_product_type == PM_MINIPANEL) || (int_product_type == PM_CM5) || (int_product_type == PM_MINIPANEL_ARM) || (int_product_type == PM_ESP32_T3_SERIES))//||(int_product_type == PM_TSTAT6)
                         {
                             WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
                             WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
@@ -951,20 +951,13 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
             int  int_product_type = pFrame->m_product.at(i).product_class_id;
             int panel_name_start_reg = 0;  //获取对应产品号
             panel_name_start_reg = PanelName_Map(int_product_type);
-            /* if( int_product_type == PM_TSTAT6) 
-            {
-            WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
-            WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
-            }
-            return TRUE;*/
+
 
              WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
              WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
 
             
-             // int_product_type == PM_TSTAT6
-            //if ((int_product_type != PM_MINIPANEL) && (int_product_type != PM_MINIPANEL_ARM))
-            //{
+
                 int communicationType = pFrame->m_product.at(i).protocol;  
                 ModbusID = pFrame->m_product.at(i).product_id;
                 SetCommunicationType(communicationType);
@@ -1018,7 +1011,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
                     }
                       
                 }
-            //}
+
 			CppSQLite3DB SqliteDBBuilding;
 			CppSQLite3Table table;
 			CppSQLite3Query q;
@@ -1333,6 +1326,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
     case 30:
     case 32:
 	case 35:
+	case 46:
 		if(state == false)
 		{
 			brother_nImage++;
@@ -1354,6 +1348,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
     case 31:
     case 33:
 	case 36:
+	case 47:
 		if(state == true)
 		{
 			brother_nImage--;

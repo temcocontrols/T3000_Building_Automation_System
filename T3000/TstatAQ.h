@@ -66,6 +66,7 @@ public:
     int m_row;
     int m_col;
     afx_msg void OnBnClickedButtonAirlabParameter();
+    afx_msg void OnPaint();
 };
 #define AIRLAB_TYPE    0
 #define AIRLAB_VALUE   1
@@ -104,7 +105,8 @@ const COLORREF AQI_Info_Status_Back_Color[] =
 
 
 static DWORD WINAPI Update_TstatAQ_Thread(LPVOID lPvoid);
-
+const int TSTAT_AQ_TEMP_AMBIENT = 101;
+const int TSTAT_AQ_TEMP_REMOTE = 102;  //红外传感器的两个温度值;
 const int TSTAT_AQ_TEMP_UNIT = 104;   //温度单位   0 摄氏度     1华氏度
 const int TSTAT_AQ_TEMPERATURE = 121;
 const int TSTAT_AQ_HUM = 140;

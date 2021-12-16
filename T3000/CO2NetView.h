@@ -431,6 +431,7 @@ CBrush m_brush;
     int	CO2_NET_MODBUS_SCAN_OCCUPY_START	;
     int	CO2_NET_MODBUS_SCAN_OCCUPY_END	;
     int	CO2_NET_MODBUS_SCAN_ONLINE_START	;
+    int MODBUS_CO2_FORCED_RE_CALIBRATION;
     int	CO2_NET_MODBUS_SCAN_ONLINE_END	;
     int	CO2_NET_MODBUS_IDLE_ID	;
     int	CO2_NET_MODBUS_HUMIDITY_SENSOR_TABLE_READ	;
@@ -512,6 +513,11 @@ public:
     afx_msg void OnBnClickedRadioCo2LcdOn();
     afx_msg void OnBnClickedRadioCo2LcdOff();
     afx_msg void OnBnClickedRadioCo2LcdDelayOff();
+    afx_msg void OnBnClickedButtonCo2Help();
+    afx_msg void OnBnClickedButtonReCalibrationDone();
+    afx_msg void OnBnClickedRadioScrollEnable();
+
+    afx_msg void OnBnClickedRadioScrollbarDisable();
 };
 
 const int CO2NET_NUM = 0;
@@ -521,5 +527,24 @@ const int CO2NET_RANGE = 3;
 const int CO2NET_MIN_OUT_SCALE = 4;
 const int CO2NET_MAX_OUT_SCALE = 5;
 const int CO2NET_AUTO_MANUAL = 6;
+
+
+const int SENSOR_TYPE_OGM200 = 3;
+const int SENSOR_TYPE_TEMCO = 4;
+const int SENSOR_TYPE_SCD30 = 5;
+const int SENSOR_TYPE_MH_Z19B = 6;
+
+const int SCROLL_BAR_REG = 3138;
+
+const CString CO2_Type[] =
+{
+    _T("-"),
+    _T("-"),
+    _T("-"),
+    _T("OGM200"),
+    _T("Temco"),
+    _T("SCD30"),
+    _T("MH_Z19B")
+};
 
 

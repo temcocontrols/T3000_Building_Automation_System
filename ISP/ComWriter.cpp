@@ -13,6 +13,13 @@ extern CString g_strFlashInfo;
  extern Bin_Info        global_fileInfor;
 extern unsigned int the_max_register_number_parameter_Count;
 extern unsigned int the_max_register_number_parameter_Finished;
+extern unsigned int com_error_delay_time ;
+extern unsigned int com_error_delay_count ;
+unsigned short Device_infor[18] = { 0 };
+#ifdef ISP_BURNING_MODE
+extern  unsigned short Check_sum ;
+extern int temco_burning_mode;
+#endif
 UINT Flash_Modebus_Device(LPVOID pParam);
 UINT flashThread_ForExtendFormatHexfile(LPVOID pParam);
 UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam);
@@ -20,6 +27,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
 extern int firmware_must_use_new_bootloader ;  //0 不用更新boot   1 需要更新bootload;   C1为hex
 extern CString g_repair_bootloader_file_path;
+
 CComWriter::CComWriter(void)
 {
     m_pFileBuffer = NULL;
@@ -29,7 +37,7 @@ CComWriter::CComWriter(void)
     m_nComPort = -1;
     //m_nModbusID;
     m_nBautrate = 0;			// 波特率
-
+    m_com_flash_binfile = 0;
     m_pWorkThread = NULL;
 
     m_bStopWrite = FALSE;
@@ -101,6 +109,10 @@ int CComWriter::BeginWirteByCom()
             //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
             //AddStringToOutPuts(_T("Error :The com port is occupied!"));
             OutPutsStatusInfo(srtInfo, FALSE);
+            srtInfo = _T("You need to shut down all other applications and ");
+            OutPutsStatusInfo(srtInfo, FALSE);
+            srtInfo = _T("background tasks that might be occupying this COM port!");
+            OutPutsStatusInfo(srtInfo, FALSE);
             return 0;
         }
         else
@@ -125,6 +137,28 @@ int CComWriter::BeginWirteByCom()
 
     else if(m_nHexFileType == 2)
     {
+        if (open_com(m_nComPort) == false)
+        {
+            CString srtInfo = _T("|Error :The com port is occupied!");
+            //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+            //AddStringToOutPuts(_T("Error :The com port is occupied!"));
+            OutPutsStatusInfo(srtInfo, FALSE);
+            srtInfo = _T("You need to shut down all other applications and ");
+            OutPutsStatusInfo(srtInfo, FALSE);
+            srtInfo = _T("background tasks that might be occupying this COM port!");
+            OutPutsStatusInfo(srtInfo, FALSE);
+            return 0;
+        }
+        else
+        {
+            CString strTemp;
+            strTemp.Format(_T("COM%d"), m_nComPort);
+            CString strTips = _T("|Open ") + strTemp + _T(" successful.");
+            OutPutsStatusInfo(strTips, FALSE);
+            Change_BaudRate(m_nBautrate);
+
+        }
+
         if (Is_Ram)
         {
             WirteExtendHexFileByCom_RAM();
@@ -149,6 +183,10 @@ BOOL CComWriter::WriteCommandtoReset()
     {
         strTips = _T("|Error :The com port is occupied!");
         OutPutsStatusInfo(strTips);
+        strTips = _T("You need to shut down all other applications and");
+        OutPutsStatusInfo(strTips, FALSE);
+        strTips = _T("background tasks that might be occupying this COM port!");
+        OutPutsStatusInfo(strTips, FALSE);
         return FALSE;
     }
 
@@ -720,6 +758,7 @@ end_tcp_flash_mode :
 //the return value 1,successful,   return < 0 , fail
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam)
 {
+
     CComWriter* pWriter = (CComWriter*)pParam;
     const int  RETRY_TIMES = 10;
     TS_UC *register_data=register_data_orginal;
@@ -906,15 +945,24 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
     CString srtInfo;
     srtInfo.Format(_T("|ID %d: Programming lines %d to %d.(0%%)"),m_ID,ii,ii+128);
     pWriter->OutPutsStatusInfo(srtInfo);
+    if (Device_infor[7] == 88)
+    {
+        if(pWriter->continue_com_flash_count < 0)
+            pWriter->continue_com_flash_count = 0;
+        ii = pWriter->continue_com_flash_count;
+        the_max_register_number_parameter = the_max_register_number_parameter + ii;
+        Sleep(4000);
+    }
     while(ii<the_max_register_number_parameter)
     {
         if (pWriter->m_bStopWrite)
         {
             return -9;
         }
+
         TS_UC data_to_send[160]= {0}; // buffer that writefile() will to use
         int itemp=0;
-
+        
         persentfinished = ((ii+128)*100)/the_max_register_number_parameter;
         if(persentfinished>100)
             persentfinished=100;
@@ -926,10 +974,11 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             if(itemp<RETRY_TIMES)
             {
 
-                if(-2==write_multi(m_ID,&register_data[ii],ii,128))//to write multiple 128 bytes
-                    itemp++;
-                else
-                    itemp=0;
+                    if (-2 == write_multi(m_ID, &register_data[ii], ii, 128))//to write multiple 128 bytes
+                        itemp++;
+                    else
+                        itemp = 0;
+
             }
             else
             {
@@ -1061,11 +1110,22 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
                 long tempticktime = GetTickCount();
                 TRACE(_T("f(%d): %u  time:%u\r\n"),ii, tempticktime, tempticktime - temp_last_time);
                 temp_last_time = tempticktime;
+                if (itemp <= com_error_delay_count)
+                    Sleep(com_error_delay_time);
+                else
+                    Sleep(300 + itemp*100); //写失败 休眠300ms后 重试;
                 itemp++;
-                Sleep(300); //写失败 休眠300ms后 重试;
+                
             }
             else
             {
+#ifdef ISP_BURNING_MODE
+                    for (int j = 0; j < 128; j++)
+                    {
+                        Check_sum = Check_sum + register_data[ii + j];
+                    }
+                //Check_sum = Check_sum % 0x10000;
+#endif
                 long nowticktime = GetTickCount();
                 TRACE(_T("s(%d): %u time:%u\r\n"),ii, nowticktime , nowticktime - temp_last_time);
                 temp_last_time = nowticktime;
@@ -1172,6 +1232,10 @@ int CComWriter::WirteExtendHexFileByCom()
     {
         CString srtInfo = _T("|Error :The com port is occupied!");
         OutPutsStatusInfo(srtInfo, FALSE);
+        srtInfo = _T("You need to shut down all other applications and");
+        OutPutsStatusInfo(srtInfo, FALSE);
+        srtInfo = _T("background tasks that might be occupying this COM port!");
+        OutPutsStatusInfo(srtInfo, FALSE);
 		WriteFinish(0);
         return 0;
     }
@@ -1228,6 +1292,10 @@ int CComWriter::WirteExtendHexFileByCom_RAM()
             CString srtInfo = _T("|Error :The com port is occupied!");
 
             OutPutsStatusInfo(srtInfo, FALSE);
+            srtInfo = _T("You need to shut down all other applications and");
+            OutPutsStatusInfo(srtInfo, FALSE);
+            srtInfo = _T("background tasks that might be occupying this COM port!");
+            OutPutsStatusInfo(srtInfo, FALSE);
             WriteFinish(0);
             return 0;
         }
@@ -1253,7 +1321,7 @@ int CComWriter::WirteExtendHexFileByCom_RAM()
     return 1;
 }
 
-
+extern unsigned char firmware_md5[32] ;
 UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 {
     CComWriter* pWriter = (CComWriter*)(pParam);
@@ -1277,7 +1345,62 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
             BOOL Flag_HEX_BIN=FALSE;
             if (pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]))
             {
+                if ((Device_infor[4] == Device_infor[14]) &&   
+                    (Device_infor[14] >= 20) &&
+                    (Device_infor[7] == 88))
+                {
+                    unsigned short wirte_md5[4];
+                    int compare_ret = 1;
 
+
+                    //如果88esp的设备在bootloader 里面
+                    int n_ret = mudbus_read_multi(pWriter->m_szMdbIDs[i], &pWriter->update_firmware_info[0], 1994, 6);
+                    if (n_ret > 0)
+                    {
+                        //比对MD5
+                        for (int x = 0; x < 4; x++)
+                        {
+                            wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
+                            if (pWriter->update_firmware_info[x + 1] != wirte_md5[x])
+                            {
+                                compare_ret = -1;
+                                //break;
+                            }
+                        }
+
+                        if ((compare_ret == 1) && (pWriter->update_firmware_info[0] != 0))
+                        {
+                            pWriter->continue_com_flash_count = pWriter->update_firmware_info[0] * 128; // 1994存放的是串口烧写了多少包;
+                        }
+                        else
+                        {
+                            
+
+
+                            pWriter->continue_com_flash_count = 0;
+                        }
+
+
+
+                       
+                    }
+                    else
+                    {
+                        pWriter->continue_com_flash_count = 0;
+                    }
+
+                    if (pWriter->continue_com_flash_count == 0)
+                    {
+                        for (int y = 0; y < 4; y++)
+                        {
+                            int ret = mudbus_write_one(pWriter->m_szMdbIDs[i], 1995 + y, wirte_md5[y],3);
+
+
+                        }
+                        
+                    }
+                    //continue_com_flash_count =
+                }
                 int nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
                 if(nRet < 0)
                     Write_One(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
@@ -1384,6 +1507,8 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     int ii=0;
                     while(ii<=5)
                     {
+                        if (Device_infor[7] == 88)
+                            break;
                         int ret=Write_One(pWriter->m_szMdbIDs[i],16,1);
                         if (ret>0)
                         {
@@ -1414,18 +1539,36 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 #endif
 
             }
-
-            if (!Flag_HEX_BIN)
+            if (pWriter->m_com_flash_binfile == 0)
             {
-                continue;
+                if (!Flag_HEX_BIN)
+                {
+                    continue;
+                }
             }
 
+
             int nCount = 0;
+            if (pWriter->continue_com_flash_count > 0)
+            {
+                CString strTips;
+                nCount = pWriter->continue_com_flash_count ;
+                strTips.Format(_T("Resume at breakpoint, starting from package %u"), pWriter->continue_com_flash_count/128);
+                pWriter->OutPutsStatusInfo(strTips, FALSE);
+            }
             for(UINT p = 0; p < pWriter->m_szHexFileFlags.size(); p++)
             {
                 int nBufLen = pWriter->m_szHexFileFlags[p]-nCount;
-
-                if((nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer+nCount), pParam)) < 0 )
+                if (Device_infor[7] == 88)
+                {
+                    nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer), pParam);
+                }
+                else
+                {
+                    nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer + nCount), pParam);
+                }
+                //if((nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer+nCount), pParam)) < 0 )
+                if(nFlashRet < 0)
                 {
                     nFailureNum++;
                     CString strTemp=_T("");
@@ -1667,7 +1810,7 @@ int CComWriter::UpdataDeviceInformation(int& ID)
     if (n_check_temco_firmware == 0)
         return 1;
     CString strtips;
-    unsigned short Device_infor[18] = {0};
+
     CString str_ret,temp;
  
     CString hexproductname=_T("");
@@ -1976,7 +2119,9 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
     for(i = 0; i < pWriter->m_szMdbIDs.size(); i++)
     {
-
+#ifdef ISP_BURNING_MODE
+        Check_sum = 0;
+#endif
         if (SPECIAL_BAC_TO_MODBUS)
         {
             //根据ID得到对应的 device id.
@@ -2294,10 +2439,10 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                     //********************write register 16 value 0x7f **************
                     do
                     {
-                        if(ii<RETRY_TIMES)
+                        if(ii<3)
 
                         {
-                            if(mudbus_write_one(m_ID,16,0x7f)<0)
+                            if(mudbus_write_one(m_ID,16,0x7f)<0)  //T3系列的 是不会回复此命令的 ，T3 直接就复位了.
                             {
                                 ii++;
                                 continue;
@@ -2323,12 +2468,12 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
                     //********************write register 16 value 0x3f **************
                     ii=0;
-                    srtInfo = _T("|Erasing device...";);
+                    srtInfo = _T("|Erasing device";);
                     pWriter->OutPutsStatusInfo(srtInfo);
                     //writing_row++;
                     do
                     {
-                        if(ii<RETRY_TIMES)
+                        if(ii<3)
                         {
                             //if(-2==Write_One(m_ID,16,0x3f))
                             if(mudbus_write_one(m_ID,16,0x3f)<0)
@@ -2353,7 +2498,29 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                     while(ii<RETRY_TIMES);
                     //********************write register 16 value 0x1f **************
                     ii=0;
-                    Sleep(7000);//must have this ,the Tstat need
+
+                    CString temp_net;
+                    temp_net = _T(".");
+                    srtInfo = _T("|Erasing device";);
+                    for (size_t x = 0; x < 14; x++)
+                    {
+                        srtInfo = srtInfo + _T(".");                       
+                        pWriter->OutPutsStatusInfo(srtInfo,1);
+                        Sleep(500);
+                    }
+                    //Sleep(7000);//must have this ,the Tstat need
+
+                    int Cpu_Type = mudbus_read_one(m_ID, 65010, 3);
+                    if ((Cpu_Type == 1) || (Cpu_Type == 2))
+                    {
+                        com_error_delay_time = 3000;
+                        com_error_delay_count = 10;
+                    }
+                    else
+                    {
+                        com_error_delay_time = 300;
+                        com_error_delay_count = 0;
+                    }
 
                     do
                     {
@@ -2474,6 +2641,8 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 }
                 else
                 {
+
+
                     nCount += nBufLen;
                     the_max_register_number_parameter_Finished=nCount;
 
@@ -2484,7 +2653,13 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             }
 
 
-#if 1
+
+#ifdef ISP_BURNING_MODE
+            CString strTips_checksum;
+            strTips_checksum.Format(_T("Serial Port CheckSum : 0x%04x"), Check_sum);
+            pWriter->OutPutsStatusInfo(strTips_checksum, FALSE);
+#endif
+
             int ii=0;
             do
             {
@@ -2503,7 +2678,53 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 }
             }
             while(ii<RETRY_TIMES);
+#ifdef ISP_BURNING_MODE
+            unsigned short temp_check_sum[4] ;
+            int nret = mudbus_read_multi(pWriter->m_szMdbIDs[i], &temp_check_sum[0], 28, 4,5);
+            if (nret >= 0)
+            {
+                CString srtInfoSum;
+                srtInfoSum.Format(_T("Read Device CheckSum : 0x%04x"), temp_check_sum[0]);
+                pWriter->OutPutsStatusInfo(srtInfoSum);
+            }
+            else
+            {
+                CString srtInfoSum;
+                srtInfoSum.Format(_T("Read Device CheckSum : Timeout"));
+                pWriter->OutPutsStatusInfo(srtInfoSum);
+            }
+
+            if (temco_burning_mode)
+            {
+                static int total_count = 0;
+                static int total_error = 0;
+                static int total_success = 0;
+                total_count++;
+                if (temp_check_sum[0] != Check_sum)
+                {
+                    total_error++;
+                }
+                else
+                {
+                    total_success++;
+                }
+                CString srtInfoRet;
+                srtInfoRet.Format(_T("Success %d ,error %d , total %d"), total_success, total_error, total_count);
+                pWriter->OutPutsStatusInfo(srtInfoRet);
+                for (int z = 0; z < 15; z++)
+                {
+                    Sleep(1000);
+                    CString temp_info;
+                    temp_info.Format(_T("Wait for device jump to normal mode!(%d)"), 15 - z);
+                    if(z == 0)
+                        pWriter->OutPutsStatusInfo(temp_info,0);
+                    else
+                        pWriter->OutPutsStatusInfo(temp_info, 1);
+                }
+                
+            }
 #endif
+
             Sleep (6000);
 
             //if (GetCommunicationType () == 0)

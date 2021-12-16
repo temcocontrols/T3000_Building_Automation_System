@@ -85,13 +85,13 @@ Bin_Info m_hexinfor;
 		CString m_hexbinfilepath;
 		CWinThread*	m_pWorkThread;
 		vector<int>		m_szMdbIDs;			// 所有的需要flash的Modbus ID
-		
+		int             m_com_flash_binfile;
 		BOOL				m_bStopWrite;			// =false - write ; =true - stop write
 		TS_UC*			m_pExtendFileBuffer;// 用于保存扩展文件格式的hex 文件的缓冲区。
 		vector<int>		m_szHexFileFlags;		// 所有的Hex文件段的标记，每个元素表示每个hex扩展文件格式的段的有效字节的长度。
 
 		CString			m_strIPAddr;
 		int				m_nIPPort;
-	    
-
+		int             continue_com_flash_count; // 继续从多少包开始烧入; 目前只支持产品为88 的 ESP32 芯片的板子;
+		unsigned short  update_firmware_info[6];
 };

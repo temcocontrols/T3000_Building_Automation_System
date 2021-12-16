@@ -41,7 +41,7 @@ protected:
 
 public:
 
-
+	void UpdateTreeName();
 	//afx_msg	void OnBnClickedBtnBacIPCancle();
 	afx_msg LRESULT Fresh_Setting_UI(WPARAM wParam,LPARAM lParam);
 		virtual BOOL OnInitDialog();
@@ -93,6 +93,7 @@ public:
     CWifiConfigDlg m_page_wifi;
     CDialog* tab_dialog[MAX_SETTING];
     afx_msg void OnTcnSelchangeTabSetting(NMHDR *pNMHDR, LRESULT *pResult);
+
 };
 
 

@@ -15,9 +15,10 @@
 #include "BacnetRange.h"
 #include "BacnetScheduleTime.h"
 #include "BacnetTstatSchedule.h"
+extern CBacnetScheduleTime* ScheduleEdit_Window;
 extern CBacnetTstatSchedule *BacnetTstatSchedule_Window ;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
-
+extern vector <int>  m_Weekly_data_instance;
 
 
 CString Hol_Old_Lable[BAC_HOLIDAY_COUNT] =
@@ -136,6 +137,11 @@ BOOL BacnetWeeklyRoutine::PreTranslateMessage(MSG* pMsg)
 		}
 
 		return 1; 
+	}
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
+	{
+		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_WEEKLY);
+		return TRUE;
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -307,6 +313,16 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_Weekly_data.at(Changed_Item).label,STR_WEEKLY_LABEL_LENGTH,cTemp1,STR_WEEKLY_LABEL_LENGTH);
+		if (product_type == PM_THIRD_PARTY_DEVICE)
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_CHARACTER_STRING;
+			temp_value->context_specific = false;
+			WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
+			temp_value->type.Character_String.encoding = 0;
+			temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, m_Weekly_data_instance.at(Changed_Item), PROP_DESCRIPTION, temp_value);
+		}
 	}
 
 	if(Changed_SubItem == WEEKLY_ROUTINE_FULL_LABLE)
@@ -327,6 +343,16 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_Weekly_data.at(Changed_Item).description,STR_WEEKLY_DESCRIPTION_LENGTH,cTemp1,STR_WEEKLY_DESCRIPTION_LENGTH);
+		if (product_type == PM_THIRD_PARTY_DEVICE)
+		{
+				BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+				temp_value->tag = TPYE_BACAPP_CHARACTER_STRING;
+				temp_value->context_specific = false;
+				WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, temp_value->type.Character_String.value, MAX_CHARACTER_STRING_BYTES, NULL, NULL);
+				temp_value->type.Character_String.encoding = 0;
+				temp_value->type.Character_String.length = cs_temp.GetLength() + 1;
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, m_Weekly_data_instance.at(Changed_Item), PROP_OBJECT_NAME, temp_value);
+		}
 	}
 
 	if(Changed_SubItem == WEEKLY_ROUTINE_OUTPUT)
@@ -339,6 +365,14 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 		else
 		{
 			m_Weekly_data.at(Changed_Item).value=1;
+		}
+		if (product_type == PM_THIRD_PARTY_DEVICE)
+		{
+			BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+			temp_value->tag = TPYE_BACAPP_BOOLEAN;
+			temp_value->context_specific = false;
+			temp_value->type.Boolean = m_Weekly_data.at(Changed_Item).value;
+			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, m_Weekly_data_instance.at(Changed_Item), PROP_PRESENT_VALUE, temp_value);
 		}
 	}
 	if(Changed_SubItem == WEEKLY_ROUTINE_AUTO_MANUAL)
@@ -353,6 +387,14 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 		{
 			m_Weekly_data.at(Changed_Item).auto_manual=1;
 			m_weeklyr_list.SetCellEnabled(Changed_Item,WEEKLY_ROUTINE_OUTPUT,1);
+		}
+		if (product_type == PM_THIRD_PARTY_DEVICE)
+		{
+				BACNET_APPLICATION_DATA_VALUE* temp_value = new BACNET_APPLICATION_DATA_VALUE();
+				temp_value->tag = TPYE_BACAPP_BOOLEAN;
+				temp_value->context_specific = false;
+				temp_value->type.Boolean = m_Weekly_data.at(Changed_Item).auto_manual;
+				int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, OBJECT_SCHEDULE, m_Weekly_data_instance.at(Changed_Item), PROP_OUT_OF_SERVICE, temp_value);
 		}
 	}
 
@@ -702,11 +744,12 @@ void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
 	}
 
     if ((g_protocol == MODBUS_RS485) || //RS485 下面挂T3 MINIPANEL
-        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
+        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) || (g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP))   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
     {
         if ((product_type == PM_MINIPANEL) ||
             (product_type == PM_TSTAT10) ||
-            (product_type == PM_MINIPANEL_ARM))
+            (product_type == PM_MINIPANEL_ARM) ||
+			(product_type == PM_ESP32_T3_SERIES))
         {
             if ((n_read_item_index >= 0) && (n_read_item_index < BAC_SCHEDULE_COUNT))
             {
@@ -715,6 +758,12 @@ void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
             }
 
         }
+		else if(product_type == PM_THIRD_PARTY_DEVICE)
+		{
+			ScheduleEdit_Window = new CBacnetScheduleTime;
+			ScheduleEdit_Window->Create(IDD_DIALOG_BACNET_SCHEDULE_TIME, this);
+			ScheduleEdit_Window->ShowWindow(SW_SHOW);
+		}
     }
     else
 	    ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLYCODE);

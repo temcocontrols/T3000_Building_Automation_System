@@ -318,6 +318,7 @@ public:
 	static DWORD WINAPI  Read_Bacnet_Thread(LPVOID lpVoid);
 	static DWORD WINAPI  Read_Modbus_10000(LPVOID lpVoid);
 	static DWORD WINAPI  Write_Modbus_10000(LPVOID lpVoid);
+	static DWORD WINAPI  DetectYabbeThread(LPVOID lpVoid);
     static DWORD WINAPI  Write_Modbus_tstat_cfg(LPVOID lpVoid);
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
@@ -568,6 +569,7 @@ public:
         afx_msg void OnDatabaseLogdetail();
         afx_msg void OnUpdateAppAbout(CCmdUI *pCmdUI);
 		afx_msg void OnDatabaseBuildingManagement();
+		afx_msg void OnViewRefresh();
 };
 
 //tree0412  2017 05 11 fance change

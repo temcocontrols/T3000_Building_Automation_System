@@ -229,6 +229,7 @@
     <ClCompile Include="CBacnetBuildingManagement.cpp" />
     <ClCompile Include="CBacnetBuildingRoomEditor.cpp" />
     <ClCompile Include="CBacnetBuilidngAddNode.cpp" />
+    <ClCompile Include="CBacnetUnitsSelection.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxis.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxisLabel.cpp" />
@@ -602,6 +603,7 @@
     <ClInclude Include="CBacnetBuildingRoomEditor.h" />
     <ClInclude Include="CBacnetBuilidngAddNode.h" />
     <ClInclude Include="CBacnetDescription.h" />
+    <ClInclude Include="CBacnetUnitsSelection.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />
     <ClInclude Include="ChartCtrl\ChartAxisLabel.h" />
     <ClInclude Include="ChartCtrl\ChartBalloonLabel.h" />

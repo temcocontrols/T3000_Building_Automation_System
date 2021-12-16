@@ -93,6 +93,12 @@ BEGIN_MESSAGE_MAP(CCO2_NodeView, CFormView)
     ON_EN_KILLFOCUS(IDC_EDIT_DLG_MAX_MIN_ADJ_PERDAY, &CCO2_NodeView::OnEnKillfocusEditMaxMinAdjPerday)
     ON_EN_KILLFOCUS(IDC_EDIT_DLG_LOOK_DAYS, &CCO2_NodeView::OnEnKillfocusEditLookDays)
     ON_CBN_SELCHANGE(IDC_COMBO_DLG_CO2_AUTO_CAL, &CCO2_NodeView::OnCbnSelchangeComboCo2AutoCal)
+    ON_BN_CLICKED(IDC_RADIO_KEY_TEMP_SET_ENABLE, &CCO2_NodeView::OnBnClickedRadioKeyTempSetEnable)
+    ON_BN_CLICKED(IDC_RADIO_KEY_TEMP_SET_DISABLE, &CCO2_NodeView::OnBnClickedRadioKeyTempSetDisable)
+    ON_BN_CLICKED(IDC_RADIO_KEY_HUM_SET_ENABLE, &CCO2_NodeView::OnBnClickedRadioKeyHumSetEnable)
+    ON_BN_CLICKED(IDC_RADIO_KEY_HUM_SET_DISABLE, &CCO2_NodeView::OnBnClickedRadioKeyHumSetDisable)
+    ON_BN_CLICKED(IDC_RADIO_KEY_CO2_SET_ENABLE, &CCO2_NodeView::OnBnClickedRadioKeyCo2SetEnable)
+    ON_BN_CLICKED(IDC_RADIO_KEY_CO2_SET_DISABLE, &CCO2_NodeView::OnBnClickedRadioKeyCo2SetDisable)
 END_MESSAGE_MAP()
 
 
@@ -123,6 +129,8 @@ void CCO2_NodeView::Fresh()
     CO2_MODBUS_CO2_NATURE_LEVEL = 501;
     CO2_MODBUS_CO2_MIN_ADJ = 502;
     CO2_MODBUS_CO2_CAL_DAYS = 503;
+    int read_ret = 0;
+    read_ret = Read_Multi(g_tstat_id, product_register_sensor_flag, 65000, 3, 5);
 
     if (h_co2_node_thread == NULL)
     {
@@ -487,6 +495,7 @@ void CCO2_NodeView::Update_Static_UI()
 
     Show_Main_radio();
     Show_Scroll_radio();
+    Show_Keypad_radio();
 }
 
 LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
@@ -525,41 +534,106 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
         }
     //}
 
-    cs_Hum_value.Format(_T("%.1f"), ((float)product_register_value[116]) / 10);
-
-    m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_TYPE_VALUE, cs_co2_value);
-    m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_TYPE_VALUE, cs_temp_value);
-    m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_TYPE_VALUE, cs_Hum_value);
-
-    m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_NAME_UNIT, _T("ppm"));
-    if (product_register_value[125] == 0)
-        m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_NAME_UNIT, _T("Deg.C"));
-    else if (product_register_value[125] == 1)
-        m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_NAME_UNIT, _T("Deg.F"));
-    m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_NAME_UNIT, _T("%"));
-
 
     CString cs_co2_setpoint;
-    CString cs_temp_setpoint;
-    CString cs_hum_setpoint;
-    cs_co2_setpoint.Format(_T("%d"), product_register_value[166]);
-    cs_temp_setpoint.Format(_T("%.1f"), ((float)product_register_value[167]) / 10);
-    cs_hum_setpoint.Format(_T("%.1f"), ((float)product_register_value[168]) / 10);
-
-    m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_SETPOINT, cs_co2_setpoint);
-    m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_SETPOINT, cs_temp_setpoint);
-    m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_SETPOINT, cs_hum_setpoint);
-
     CString cs_output_co2;
-    CString cs_output_temp;
-    CString cs_output_hum;
-    cs_output_co2.Format(_T("%.1f"), ((float)product_register_value[141]) / 10);
-    cs_output_temp.Format(_T("%.1f"), ((float)product_register_value[142]) / 10);
-    cs_output_hum.Format(_T("%.1f"), ((float)product_register_value[143]) / 10);
+    CString temp_co2_min_value;
+    CString temp_co2_max_value;
 
-    m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_OUTPUT_VALUE, cs_output_co2);
-    m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_OUTPUT_VALUE, cs_output_temp);
-    m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_OUTPUT_VALUE, cs_output_hum);
+    bitset<16> module_type(product_register_sensor_flag[1]);
+    if ((product_register_sensor_flag[0] == 0x55) && (module_type.test(SENSOR_BIT_CO2) == false))
+    {
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_TYPE_VALUE, _T("Not present"));
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_NAME_UNIT, _T("-"));
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_SETPOINT, _T("-"));
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_OUTPUT_VALUE, _T("-"));
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_MAX_VALUE, _T("-"));
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_MIN_VALUE, _T("-"));
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_TYPE_VALUE, 0);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_NAME_UNIT, 0);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_SETPOINT, 0);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_OUTPUT_VALUE, 0);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_MAX_VALUE, 0);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_MIN_VALUE, 0);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_CALIBRATION, 0);
+        
+    }
+    else
+    {
+        temp_co2_min_value.Format(_T("%d"), product_register_value[132]);
+        temp_co2_max_value.Format(_T("%d"), product_register_value[133]);
+        cs_co2_setpoint.Format(_T("%d"), product_register_value[166]);
+        cs_output_co2.Format(_T("%.1f"), ((float)product_register_value[141]) / 10);
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_TYPE_VALUE, cs_co2_value);
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_NAME_UNIT, _T("ppm"));
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_SETPOINT, cs_co2_setpoint);
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_OUTPUT_VALUE, cs_output_co2);
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_MAX_VALUE, temp_co2_max_value);
+        m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_MIN_VALUE, temp_co2_min_value);
+
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_TYPE_VALUE, 1);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_NAME_UNIT, 1);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_SETPOINT, 1);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_OUTPUT_VALUE, 1);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_MAX_VALUE, 1);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_MIN_VALUE, 1);
+        m_co2_node_list.SetCellEnabled(ROW_CO2, CO2_NODE_CALIBRATION, 1);
+    }
+
+    CString temp_hum_min_value;
+    CString temp_hum_max_value;
+    CString cs_hum_setpoint;
+    CString cs_output_hum;
+
+    if ((product_register_sensor_flag[0] == 0x55) && (module_type.test(SENSOR_BIT_HUM) == false))
+    {
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_TYPE_VALUE, _T("Not present"));
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_NAME_UNIT, _T("-"));
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_SETPOINT, _T("-"));
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_OUTPUT_VALUE, _T("-"));
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_MAX_VALUE, _T("-"));
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_MIN_VALUE, _T("-"));
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_TYPE_VALUE, 0);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_NAME_UNIT, 0);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_SETPOINT, 0);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_OUTPUT_VALUE, 0);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_MAX_VALUE, 0);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_MIN_VALUE, 0);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_CALIBRATION, 0);
+
+    }
+    else
+    {
+        cs_hum_setpoint.Format(_T("%.1f"), ((float)product_register_value[168]) / 10);
+        cs_output_hum.Format(_T("%.1f"), ((float)product_register_value[143]) / 10);
+        temp_hum_min_value.Format(_T("%.1f"), ((float)product_register_value[130]) / 10);
+        temp_hum_max_value.Format(_T("%.1f"), ((float)product_register_value[131]) / 10);
+        cs_Hum_value.Format(_T("%.1f"), ((float)product_register_value[116]) / 10);
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_TYPE_VALUE, cs_Hum_value);
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_NAME_UNIT, _T("%"));
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_SETPOINT, cs_hum_setpoint);
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_OUTPUT_VALUE, cs_output_hum);
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_MAX_VALUE, temp_hum_max_value);
+        m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_MIN_VALUE, temp_hum_min_value);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_TYPE_VALUE, 1);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_NAME_UNIT, 1);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_SETPOINT, 1);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_OUTPUT_VALUE, 1);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_MAX_VALUE, 1);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_MIN_VALUE, 1);
+        m_co2_node_list.SetCellEnabled(ROW_HUMIDITY, CO2_NODE_CALIBRATION, 1);
+    }
+
+    CString cs_temp_setpoint;
+    CString cs_output_temp;
+    CString cs_calibration_co2;
+    CString cs_calibration_temp;
+    CString cs_calibration_hum;
+    CString temp_temp_min_value;
+    CString temp_temp_max_value;
+    
+    cs_temp_setpoint.Format(_T("%.1f"), ((float)product_register_value[167]) / 10);
+    cs_output_temp.Format(_T("%.1f"), ((float)product_register_value[142]) / 10);
     if (product_register_value[127] == 1)
     {
         m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_OUTPUT_RANGE, _T("4-20ma"));
@@ -579,9 +653,6 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
         m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_OUTPUT_RANGE, _T("0-10V"));
     }
 
-    CString cs_calibration_co2;
-    CString cs_calibration_temp;
-    CString cs_calibration_hum;
     if (product_register_value[127] == 1)
     {
         cs_calibration_co2.Format(_T("%d"), product_register_value[147]);
@@ -594,35 +665,23 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
         cs_calibration_temp.Format(_T("%d"), product_register_value[145]);
         cs_calibration_hum.Format(_T("%d"), product_register_value[146]);
     }
+
     m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_CALIBRATION, cs_calibration_co2);
     m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_CALIBRATION, cs_calibration_temp);
     m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_CALIBRATION, cs_calibration_hum);
 
-
-    CString temp_co2_min_value;
-    CString temp_co2_max_value;
-
-    CString temp_temp_min_value;
-    CString temp_temp_max_value;
-
-    CString temp_hum_min_value;
-    CString temp_hum_max_value;
-    temp_co2_min_value.Format(_T("%d"), product_register_value[132]);
-    temp_co2_max_value.Format(_T("%d"), product_register_value[133]);
-
     temp_temp_min_value.Format(_T("%.1f"), ((float)product_register_value[128])/10);
     temp_temp_max_value.Format(_T("%.1f"), (float)product_register_value[129]/10);
-
-    temp_hum_min_value.Format(_T("%.1f"), ((float)product_register_value[130])/10);
-    temp_hum_max_value.Format(_T("%.1f"), ((float)product_register_value[131])/10);
-
-    m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_MIN_VALUE, temp_co2_min_value);
+    if (product_register_value[125] == 0)
+        m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_NAME_UNIT, _T("Deg.C"));
+    else if (product_register_value[125] == 1)
+        m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_NAME_UNIT, _T("Deg.F"));
+    m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_TYPE_VALUE, cs_temp_value);
+    m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_SETPOINT, cs_temp_setpoint);
+    m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_OUTPUT_VALUE, cs_output_temp);
     m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_MIN_VALUE, temp_temp_min_value);
-    m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_MIN_VALUE, temp_hum_min_value);
-
-    m_co2_node_list.SetItemText(ROW_CO2, CO2_NODE_MAX_VALUE, temp_co2_max_value);
     m_co2_node_list.SetItemText(ROW_TEMPERATURE, CO2_NODE_MAX_VALUE, temp_temp_max_value);
-    m_co2_node_list.SetItemText(ROW_HUMIDITY, CO2_NODE_MAX_VALUE, temp_hum_max_value);
+
     return 0;
 }
 
@@ -696,7 +755,7 @@ void CCO2_NodeView::Show_Scroll_radio()
         ((CButton *)GetDlgItem(IDC_RADIO_SCROLL12))->SetCheck(1);
     }
 
-    if (Temp_bitset[6])
+    if (Temp_bitset[7])
     {
         ((CButton *)GetDlgItem(IDC_RADIO_SCROLL13))->SetCheck(1);
         ((CButton *)GetDlgItem(IDC_RADIO_SCROLL14))->SetCheck(0);
@@ -752,6 +811,44 @@ void CCO2_NodeView::Show_Scroll_radio()
     }
 }
 
+
+void CCO2_NodeView::Show_Keypad_radio()
+{
+    bitset<16> keypad_bitset(product_register_value[178]);
+    if (keypad_bitset[0])
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_TEMP_SET_ENABLE))->SetCheck(1);
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_TEMP_SET_DISABLE))->SetCheck(0);
+    }
+    else
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_TEMP_SET_ENABLE))->SetCheck(0);
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_TEMP_SET_DISABLE))->SetCheck(1);
+    }
+
+    if (keypad_bitset[1])
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_HUM_SET_ENABLE))->SetCheck(1);
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_HUM_SET_DISABLE))->SetCheck(0);
+    }
+    else
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_HUM_SET_ENABLE))->SetCheck(0);
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_HUM_SET_DISABLE))->SetCheck(1);
+    }
+
+    if (keypad_bitset[2])
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_CO2_SET_ENABLE))->SetCheck(1);
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_CO2_SET_DISABLE))->SetCheck(0);
+    }
+    else
+    {
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_CO2_SET_ENABLE))->SetCheck(0);
+        ((CButton*)GetDlgItem(IDC_RADIO_KEY_CO2_SET_DISABLE))->SetCheck(1);
+    }
+
+}
 void CCO2_NodeView::Show_Main_radio()
 {
     bitset<16> Temp_bitset(product_register_value[169]);
@@ -1121,6 +1218,52 @@ void CCO2_NodeView::UpdateRadio_ScrollDisplay()
     }
 
     ((CButton *)GetDlgItem(IDC_BUTTON_OK))->SetFocus();
+}
+
+
+void CCO2_NodeView::UpdateRadio_Keypad()
+{
+    bitset<16> Temp_bitset(product_register_value[178]);
+    if (((CButton*)GetDlgItem(IDC_RADIO_KEY_TEMP_SET_ENABLE))->GetCheck() == true)
+    {
+        Temp_bitset[0] = 1;
+    }
+    else if (((CButton*)GetDlgItem(IDC_RADIO_KEY_TEMP_SET_DISABLE))->GetCheck() == true)
+    {
+        Temp_bitset[0] = 0;
+    }
+
+    if (((CButton*)GetDlgItem(IDC_RADIO_KEY_HUM_SET_ENABLE))->GetCheck() == true)
+    {
+        Temp_bitset[1] = 1;
+    }
+    else if (((CButton*)GetDlgItem(IDC_RADIO_KEY_HUM_SET_DISABLE))->GetCheck() == true)
+    {
+        Temp_bitset[1] = 0;
+    }
+
+    if (((CButton*)GetDlgItem(IDC_RADIO_KEY_CO2_SET_ENABLE))->GetCheck() == true)
+    {
+        Temp_bitset[2] = 1;
+    }
+    else if (((CButton*)GetDlgItem(IDC_RADIO_KEY_CO2_SET_DISABLE))->GetCheck() == true)
+    {
+        Temp_bitset[2] = 0;
+    }
+
+    product_register_value[178] = (unsigned short)Temp_bitset.to_ulong();
+    int nret = write_one(g_tstat_id, 178, product_register_value[178]);
+    if (nret <= 0)
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Operation failed!"));
+        PostMessage(WM_CO2_NODE_THREAD_READ, NULL, NULL);
+    }
+    else
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Operation Done!"));
+    }
+
+    ((CButton*)GetDlgItem(IDC_BUTTON_OK))->SetFocus();
 }
 
 void CCO2_NodeView::UpdateRadio_Main()
@@ -1706,4 +1849,46 @@ void CCO2_NodeView::OnCbnSelchangeComboCo2AutoCal()
     }
 
     ((CButton *)GetDlgItem(IDC_BUTTON_OK))->SetFocus();
+}
+
+
+void CCO2_NodeView::OnBnClickedRadioKeyTempSetEnable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    UpdateRadio_Keypad();
+}
+
+
+void CCO2_NodeView::OnBnClickedRadioKeyTempSetDisable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    UpdateRadio_Keypad();
+}
+
+
+void CCO2_NodeView::OnBnClickedRadioKeyHumSetEnable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    UpdateRadio_Keypad();
+}
+
+
+void CCO2_NodeView::OnBnClickedRadioKeyHumSetDisable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    UpdateRadio_Keypad();
+}
+
+
+void CCO2_NodeView::OnBnClickedRadioKeyCo2SetEnable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    UpdateRadio_Keypad();
+}
+
+
+void CCO2_NodeView::OnBnClickedRadioKeyCo2SetDisable()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    UpdateRadio_Keypad();
 }

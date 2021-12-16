@@ -60,7 +60,7 @@ void CBacnetAddVirtualDevice::UI_Initial()
 	for (mtiterator=product_map.begin();mtiterator!=product_map.end();++mtiterator)
 	{
 		((CComboBox *)GetDlgItem(IDC_COMBO_VIRTUAL_PID_NAME))->AddString(mtiterator->second);
-		if(mtiterator->first== PM_MINIPANEL|| mtiterator->first == PM_MINIPANEL_ARM)
+		if(mtiterator->first== PM_MINIPANEL|| mtiterator->first == PM_MINIPANEL_ARM  || mtiterator->first == PM_ESP32_T3_SERIES)
 		{
 			((CComboBox *)GetDlgItem(IDC_COMBO_VIRTUAL_PID_NAME))->SetWindowTextW(mtiterator->second);
 			GetDlgItem(IDC_EDIT_VIRTUAL_PID)->SetWindowTextW(_T("35"));
@@ -139,7 +139,7 @@ void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualOk()
 	CString strSql;
 	temp_pro3.Format(_T("%u"), PROTOCOL_VIRTUAL);
 
-    if ((nproduct_id == PM_MINIPANEL) || (nproduct_id == PM_MINIPANEL_ARM))
+    if ((nproduct_id == PM_MINIPANEL) || (nproduct_id == PM_MINIPANEL_ARM) || (nproduct_id == PM_ESP32_T3_SERIES))
     {
         CString offline_folder;
         offline_folder = g_strBuildingFolder + pFrame->m_strCurMainBuildingName;

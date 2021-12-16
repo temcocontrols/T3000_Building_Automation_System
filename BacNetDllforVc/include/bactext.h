@@ -54,10 +54,10 @@ extern "C" {
         unsigned *found_index);
    __declspec(dllexport)    const char *bactext_property_name(
         unsigned index);
-    bool bactext_property_index(
+   __declspec(dllexport) bool bactext_property_index(
         const char *search_name,
         unsigned *found_index);
-    const char *bactext_engineering_unit_name(
+    __declspec(dllexport)  const char *bactext_engineering_unit_name(
         unsigned index);
     bool bactext_engineering_unit_index(
         const char *search_name,
@@ -66,9 +66,9 @@ extern "C" {
         unsigned index);
     const char *bactext_abort_reason_name(
         unsigned index);
-    const char *bactext_error_class_name(
+    __declspec(dllexport) const char *bactext_error_class_name(
         unsigned index);
-    const char *bactext_error_code_name(
+    __declspec(dllexport) const char *bactext_error_code_name(
         unsigned index);
     unsigned bactext_property_id(
         const char *name);

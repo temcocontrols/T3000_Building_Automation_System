@@ -999,6 +999,7 @@ LRESULT CBacnetGraphic::Fresh_Static_Function(WPARAM wParam,LPARAM lParam)
 void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 {
 	Graphics *mygraphics;
+
 	mygraphics = new Graphics(my_hdc);
 	mygraphics->SetSmoothingMode(SmoothingModeAntiAlias);
 	Pen *myRectangle_pen;
@@ -1047,8 +1048,8 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 	//mygraphics->FillRectangle(Static_blackground_Brush,0,window_hight - 200,window_width,200);
 	//mygraphics->DrawRectangle(mystaticRectangle_pen,2,window_hight - 200,window_width-15,200 -55);
-	mygraphics->FillRectangle(Static_blackground_Brush,4,4,9 + STATIC_LABLE_WIDTH + 40,740);
-	mygraphics->DrawRectangle(mystaticRectangle_pen,6,4,9 + STATIC_LABLE_WIDTH + 40,740);
+	mygraphics->FillRectangle(Static_blackground_Brush,4,4,9 + STATIC_LABLE_WIDTH + 40,663);
+	mygraphics->DrawRectangle(mystaticRectangle_pen,6,4,9 + STATIC_LABLE_WIDTH + 40,663);
 
 
 	FontFamily  ScrollfontFamily(_T("Arial"));
@@ -1057,18 +1058,19 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	SolidBrush  Font_brush_on_off(MY_COLOR_ON_OFF);
 	Gdiplus::Font  Scroll_font(&ScrollfontFamily, 18, FontStyleRegular, UnitPixel);
 
+	PointF      scrollpointF(0, 0);
+	scrollpointF.X = 25;
+	scrollpointF.Y = 15 + 13 * (STATIC_LABLE_HIGHT + 9) + STATIC_LABLE_HIGHT + 8;// 715;
+	mygraphics->DrawString(_T("Auto Scroll"), -1, &Scroll_font, scrollpointF, &Font_brush_temp);
+	scrollpointF.X = 122;
+	scrollpointF.Y = 15 + 13 * (STATIC_LABLE_HIGHT + 9) + STATIC_LABLE_HIGHT + 8; //714;
 
 	SolidBrush *Static_scroll_blackground_Brush;
 	Static_scroll_blackground_Brush =new SolidBrush(MY_COLOR_14LABLE_BGD);	//This part is draw the 14 label and it's background;
-	mygraphics->FillRectangle(Static_scroll_blackground_Brush,120,714,50,20);
+	mygraphics->FillRectangle(Static_scroll_blackground_Brush,120,(int)scrollpointF.Y,50,20);
 
 
-	PointF      scrollpointF(0, 0);
-	scrollpointF.X = 25;
-	scrollpointF.Y = 715;
-	mygraphics->DrawString(_T("Auto Scroll"), -1, &Scroll_font, scrollpointF,&Font_brush_temp);
-	scrollpointF.X = 122;
-	scrollpointF.Y = 714;
+
 	if(flag_auto_scroll)
 		mygraphics->DrawString(_T("ON"), -1, &Scroll_font, scrollpointF,&Font_brush_on_off);
 	else
@@ -1202,9 +1204,9 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 			Static_blackground_Brush =new SolidBrush(Graphic_Color[i+1]);	//This part is draw the 14 label and it's background;
 
 		RectPosition[i].left = 15 ;
-		RectPosition[i].top = 15 + i* 50;
+		RectPosition[i].top = 15 + i* (STATIC_LABLE_HIGHT + 9);
 		RectPosition[i].right = 15   + STATIC_LABLE_WIDTH;
-		RectPosition[i].bottom = 15 + i* 50  + STATIC_LABLE_HIGHT;
+		RectPosition[i].bottom = 15 + i* (STATIC_LABLE_HIGHT + 9) + STATIC_LABLE_HIGHT;
 		mygraphics->FillRectangle(Static_blackground_Brush,RectPosition[i].left,RectPosition[i].top,STATIC_LABLE_WIDTH,STATIC_LABLE_HIGHT);
 		mygraphics->DrawLine(static_write_bord,RectPosition[i].left - 2,  RectPosition[i].top -2   ,RectPosition[i].right     ,RectPosition[i].top -2);
 		mygraphics->DrawLine(static_write_bord,RectPosition[i].left - 2,  RectPosition[i].top -2   ,RectPosition[i].left - 2  ,RectPosition[i].bottom);
@@ -1218,7 +1220,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		//FontFamily  StaticfontFamily(_T("Times New Roman"));
 		FontFamily  StaticfontFamily(_T("Arial"));
 		
-		Gdiplus::Font        Input_font(&StaticfontFamily, 14, FontStyleRegular, UnitPixel);
+		Gdiplus::Font        Input_font(&StaticfontFamily, 12, FontStyleRegular, UnitPixel);
 		
 		PointF      staticpointF(0, 0);
 		SolidBrush *   pen_unit_brush = new SolidBrush(Graphic_Color[i+1]);
@@ -1227,7 +1229,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		staticpointF.X = RectPosition[i].left + 4;
 		staticpointF.Y = RectPosition[i].top + 4 ;
 		UnitpointF.X = RectPosition[i].left + 4;
-		UnitpointF.Y =  RectPosition[i].top + 4  + 18;
+		UnitpointF.Y =  RectPosition[i].top + 0  + 18;
 
 		mygraphics->DrawString(temp_cs, -1, &Input_font, staticpointF,&Font_brush);
 
@@ -1706,8 +1708,8 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 	//点击时间轴是否 自动 卷动的 自绘按钮;
 	if((point.x > 122) &&
 		(point.x <172) &&
-		(point.y > 710) &&
-		(point.y < 710+ 20))
+		(point.y > (15 + 13 * (STATIC_LABLE_HIGHT + 9) + STATIC_LABLE_HIGHT + 8)) &&
+		(point.y < (15 + 13 * (STATIC_LABLE_HIGHT + 9) + STATIC_LABLE_HIGHT + 8 + 20)))
 	{
 		if(flag_auto_scroll)
 		{
@@ -2238,21 +2240,22 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 	//	SetDigital_X_WIDTH(1200);
 	//	SetDigital_Y_Hight(150);
 	//}
-
+	int iWidth = GetSystemMetrics(SM_CXSCREEN);
+	int iHeight = GetSystemMetrics(SM_CYSCREEN);
 	if(contain_digital == false)
 	{
 		Set_XAxis_Length(1000);
-		Set_YAxis_Length(650);
+		Set_YAxis_Length(580);
 		SetDigital_X_WIDTH(0);
 		SetDigital_Y_Hight(0);
 	}
 	else
 	{
 		Set_XAxis_Length(1000);
-		Set_YAxis_Length(500);
+		Set_YAxis_Length(450);
 		SetDigital_X_WIDTH(1000);
-		//SetDigital_Y_Hight(150);
-		SetDigital_Y_Hight(180);
+		SetDigital_Y_Hight(150);
+		//SetDigital_Y_Hight(180);
 	}
 
 
@@ -2260,7 +2263,7 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 //	SetYaxisScale(5);
 	SetYaxisScale(2);
 	SetAnalogOrignPoint(PointF(250,30));
-	SetDigitalOrignPoint(PointF(250,560));
+	SetDigitalOrignPoint(PointF(250,510));
 	Set_Time_Scale(base_time);
 
 

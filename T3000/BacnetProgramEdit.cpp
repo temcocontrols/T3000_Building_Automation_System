@@ -414,7 +414,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetReadOnly(TRUE);
 	memset(program_code[program_list_line],0,2000);
 
-	renumvar = 0;
+	renumvar = 1;
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
@@ -523,7 +523,7 @@ void CBacnetProgramEdit::OnSend()
 	//reset the program buffer
 	memset(program_code[program_list_line],0,2000);
 
-	renumvar = 0;
+	renumvar = 1;
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
@@ -620,10 +620,12 @@ void CBacnetProgramEdit::OnSend()
 					{
 						send_status = false;
 						b_program_status = false;
-						MessageBox(_T("Write Program Code Timeout!"));
+						MessageBox(_T("Write Program Code Timeout."));
 						return;
 					}
 					temp_invoke_id =  WriteProgramData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line,j);
+
+
 					Sleep(SEND_COMMAND_DELAY_TIME);
                     if ((g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) && (temp_invoke_id >= 0))
                     {
@@ -652,7 +654,7 @@ void CBacnetProgramEdit::OnSend()
 						}
 					}
 					b_program_status = false;
-					MessageBox(_T("Write Program Code Timeout!"));
+					MessageBox(_T("Write Program Code Timeout!!"));
 					return;
 
 program_part_success:

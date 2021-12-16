@@ -232,7 +232,11 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 
 		return 1; 
 	}
-	
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
+	{
+		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_SCREENS);
+		return TRUE;
+	}
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }

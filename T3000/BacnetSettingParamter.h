@@ -23,6 +23,7 @@ protected:
 public:
     virtual BOOL OnInitDialog();
     void InitialUI();
-    afx_msg void OnCbnSelchangeComboType();
-    afx_msg void OnCbnSelchangeComboNumber();
+//    afx_msg void OnCbnSelchangeComboType();
+//    afx_msg void OnCbnSelchangeComboNumber();
+	afx_msg void OnBnClickedButtonLcdOk();
 };

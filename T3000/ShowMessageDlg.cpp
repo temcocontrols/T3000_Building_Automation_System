@@ -152,13 +152,18 @@ BOOL CShowMessageDlg::OnInitDialog()
         m_static_persent.ShowWindow(false);
         m_progress_showmessage.ShowWindow(false);
     }
-
+   
     if (mevent == EVENT_SYNC_TIME)
     {
         GetDlgItem(IDC_CHECK_DONT_POP)->ShowWindow(SW_SHOW);
         m_sync_time_auto_close_time = 60;
         SetTimer(2, 1000, NULL);
         Sleep(1);
+
+    }
+    else if (mevent == EVENT_MESSAGE_ONLY)
+    {
+        m_static_title.SetWindowPos(NULL, 10, 10, 500, 250, SWP_NOZORDER );
     }
     else
     {
@@ -311,7 +316,7 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
 
             }
             mparent->static_text = mparent->static_text + _T("\r\nDevice not responding.\r\nPlease Check the baudrate and protocol\r\nPlease check the RS485 cable.\r\n");
-            Sleep(1500);
+            Sleep(1000);
             system_connect_info.mstp_status = 0; //没有扫描到对应的 下次点击需要重新初始化;
             ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
         }
@@ -484,6 +489,21 @@ failed_path:
 
                 
         }
+		else if (EVENT_MESSAGE_ONLY == mparent->mevent)
+		{
+		    for (int i = 0; i < 20; i++)
+		    {
+			    if ((ok_button_press != 0) && (ok_button_press != 1))
+			    {
+				    Sleep(1000);
+			    }
+			    else
+			    {
+				    ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+				    break;
+			    }
+		    }
+		}
     hShowMessageHandle = NULL;
     return true;
 }
@@ -535,7 +555,6 @@ void CShowMessageDlg::OnTimer(UINT_PTR nIDEvent)
 void CShowMessageDlg::OnClose()
 {
     // TODO: 在此添加消息处理程序代码和/或调用默认值
-    Sleep(1);
     CDialogEx::OnClose();
 }
 
@@ -573,6 +592,10 @@ void CShowMessageDlg::OnBnClickedOk()
 
 
         ok_button_press = 1;
+    }
+    else if (mevent == EVENT_MESSAGE_ONLY)
+    {
+        PostMessage(WM_CLOSE, NULL);
     }
     else
     {

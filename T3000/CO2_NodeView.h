@@ -62,8 +62,10 @@ public:
     afx_msg void OnBnClickedRadio16();
     void UpdateRadio_Main();
     void UpdateRadio_ScrollDisplay();
+    void UpdateRadio_Keypad();
     void Show_Main_radio();
     void Show_Scroll_radio();
+    void Show_Keypad_radio();
     afx_msg void OnBnClickedButtonOk();
     afx_msg void OnEnKillfocusEditCo2NodeModbusId();
     afx_msg void OnEnKillfocusEditCo2NodeRollTimeInterval();
@@ -96,6 +98,12 @@ public:
     afx_msg void OnEnKillfocusEditMaxMinAdjPerday();
     afx_msg void OnEnKillfocusEditLookDays();
     afx_msg void OnCbnSelchangeComboCo2AutoCal();
+    afx_msg void OnBnClickedRadioKeyTempSetEnable();
+    afx_msg void OnBnClickedRadioKeyTempSetDisable();
+    afx_msg void OnBnClickedRadioKeyHumSetEnable();
+    afx_msg void OnBnClickedRadioKeyHumSetDisable();
+    afx_msg void OnBnClickedRadioKeyCo2SetEnable();
+    afx_msg void OnBnClickedRadioKeyCo2SetDisable();
 };
 static DWORD WINAPI UpdateCO2_Note_Thread(LPVOID lPvoid);
 const int CO2_NODE_TYPE_NAME        = 0;
