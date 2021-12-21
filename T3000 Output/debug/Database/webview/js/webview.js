@@ -95,13 +95,17 @@ $deleteBtn.click(function(){
 	drawRectangleOnCanvas.drawAll(scale, translatePos);
 });
 $doBtn.click(function(){
-	Images.push(DoElements.pop());
-	drawRectangleOnCanvas.drawAll(scale, translatePos);
+    if(DoElements.length > 0){
+        Images.push(DoElements.pop());
+        drawRectangleOnCanvas.drawAll(scale, translatePos);
+    }
 });
 
 $unDoBtn.click(function(){
-    DoElements.push(Images.pop());
-	drawRectangleOnCanvas.drawAll(scale, translatePos);
+    if(Images.length > 0){    
+        DoElements.push(Images.pop());
+        drawRectangleOnCanvas.drawAll(scale, translatePos);
+    }
 });
 $box_3.click(function(){
 		if(!rec_toggled)
@@ -467,13 +471,13 @@ var drawRectangleOnCanvas = {
 		  //ctx.fillStyle = r.color;
 		 // ctx.fill();
 
-		  var text = drawCount;
+		  /*var text = drawCount;
 		  ctx.fillStyle = "blue";
 		  var font = "bold " + 20 + "px serif";
 		  ctx.font = font;
 		  var width = ctx.measureText(text).width;
 		  var height = ctx.measureText("w").width; // this is a GUESS of height
-		  ctx.fillText(text, r.x , r.y -2 );
+		  ctx.fillText(text, r.x , r.y -2 );*/
 		  
 		}else if(Images[i].type === "circle"){
 			var r = Images[i];
@@ -797,7 +801,11 @@ function PopulateVariableList(response)
 	{
 		$dropdown.empty(); 
 		$.each(response["Data"], function() {
-			$dropdown.append($("<option />").val(this.index).text(this.desc));
+            var value = this.desc
+            if(this.desc == "")
+                 value = this.id
+                 
+			$dropdown.append($("<option />").val(this.index).text(value));
 		});
 		
 	}
@@ -1160,6 +1168,8 @@ $('.dropdown-menu li').on('click', function() {
     //alert('clicked');
     var val = $(this).find('a').html();
     var img = $(this).find('img').attr('src');
+    if(img=="")
+        return;
     //alert(img);
     var selVal = $(this).attr('value');
     //alert(selVal);

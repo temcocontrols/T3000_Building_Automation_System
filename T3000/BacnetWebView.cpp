@@ -621,6 +621,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
                          for (int i = 0; i < m_Input_data.size(); i++)
                          {
                              tempjson["Data"][i]["index"] = i;
+                             tempjson["Data"][i]["id"] = "IN"+ to_string(i);
                              tempjson["Data"][i]["desc"] = (char*)m_Input_data.at(i).description;
                              tempjson["Data"][i]["label"] = (char*)m_Input_data.at(i).label;
                              tempjson["Data"][i]["unit"] = m_Input_data.at(i).range;
@@ -633,6 +634,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
                          for (int i = 0; i < m_Output_data.size(); i++)
                          {
                              tempjson["Data"][i]["index"] = i;
+                             tempjson["Data"][i]["id"] = "OUT" + to_string(i);
                              tempjson["Data"][i]["desc"] = (char*)m_Output_data.at(i).description;
                              tempjson["Data"][i]["label"] = (char*)m_Output_data.at(i).label;
                              tempjson["Data"][i]["unit"] = m_Output_data.at(i).range;
@@ -645,6 +647,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
                          for (int i = 0; i < m_Variable_data.size(); i++)
                          {
                              tempjson["Data"][i]["index"] = i;
+                             tempjson["Data"][i]["id"] = "VAR" + to_string(i);
                              tempjson["Data"][i]["desc"] = (char*)m_Variable_data.at(i).description;
                              tempjson["Data"][i]["label"] = (char*)m_Variable_data.at(i).label;
                              tempjson["Data"][i]["unit"] = m_Variable_data.at(i).range;
@@ -657,6 +660,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
                          for (int i = 0; i < m_Weekly_data.size(); i++)
                          {
                              tempjson["Data"][i]["index"] = i;
+                             tempjson["Data"][i]["id"] = "SCH" + to_string(i);
                              tempjson["Data"][i]["desc"] = (char*)m_Weekly_data.at(i).description;
                              tempjson["Data"][i]["label"] = (char*)m_Weekly_data.at(i).label;
                              tempjson["Data"][i]["unit"] ="";
@@ -669,6 +673,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
                          for (int i = 0; i < m_Annual_data.size(); i++)
                          {
                              tempjson["Data"][i]["index"] = i;
+                             tempjson["Data"][i]["id"] = "CAL" + to_string(i);
                              tempjson["Data"][i]["desc"] = (char*)m_Annual_data.at(i).description;
                              tempjson["Data"][i]["label"] = (char*)m_Annual_data.at(i).label;
                              tempjson["Data"][i]["unit"] = "";
@@ -681,6 +686,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
                          for (int i = 0; i < m_Program_data.size(); i++)
                          {
                              tempjson["Data"][i]["index"] = i;
+                             tempjson["Data"][i]["id"] = "PRG" + to_string(i);
                              tempjson["Data"][i]["desc"] = (char*)m_Program_data.at(i).description;
                              tempjson["Data"][i]["label"] = (char*)m_Program_data.at(i).label;
                              tempjson["Data"][i]["unit"] = "";
@@ -820,7 +826,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
              temp_now_building_name.ReleaseBuffer();
              CFile file;
              CString tempfile;
-             tempfile = temp_now_building_name + _T("\\Graphic\\"+ filename);
+             tempfile = temp_now_building_name + _T("\\Graphic\\"+ filename+".grp");
              if (file.Open(tempfile, CFile::modeCreate | CFile::modeWrite, NULL))
              {
                  file.Write(tmpString.c_str(), tmpString.size()); 
@@ -846,7 +852,10 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
                  for (int i = 0; i < files.size(); i++)
                  {
-                     tempjson["files"][i] = files.at(i);
+                    char* token = strtok(&files.at(i)[0], ".");
+                    if (token) {
+                        tempjson["files"][i] = token;
+                    }
                  }
                  Json::StyledWriter styleWriter;
                  Json::String writeStr = styleWriter.write(tempjson);
@@ -864,7 +873,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
                  CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
                  PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
                  temp_now_building_name.ReleaseBuffer();
-                 CString path = temp_now_building_name + _T("\\Graphic\\"+ filename);
+                 CString path = temp_now_building_name + _T("\\Graphic\\"+ filename+".grp");
                  
 
                  Json::Reader reader;
@@ -1155,8 +1164,12 @@ std::vector<std::string> BacnetWebViewAppWindow::GetGraphicFiles(CString path )
         /* print all the files and directories within directory */
         while ((ent = readdir(dir)) != NULL) {
           //  printf("%s\n", ent->d_name);
-            if(ent->d_namlen > 2)
-             files.push_back(ent->d_name);
+            const char* ext = strrchr(ent->d_name, '.');
+            if ((ext) || (ext != ent->d_name))
+            {
+                if (ent->d_namlen > 2 && (strcmp(ext, ".grp") == 0))
+                    files.push_back(ent->d_name);
+            }
         }
         closedir(dir);
     }

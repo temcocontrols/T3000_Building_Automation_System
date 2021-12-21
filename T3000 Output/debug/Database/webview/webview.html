@@ -3,10 +3,20 @@
 <head>
 <link href="css/bootstrap.min.css" rel="stylesheet" >	
 <link href="css/bootstrap-select.css" rel="stylesheet" />
+<link href="css/font-awesome.min.css" rel="stylesheet" />
 
-
+<style type="text/css" media="screen">
+    @font-face {
+      font-family: 'FontAwesome';
+      src: url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.eot?v=4.2.0');
+      src: url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'), url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.woff?v=4.2.0') format('woff'), url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.ttf?v=4.2.0') format('truetype'), url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg');
+      font-weight: normal;
+      font-style: normal;
+    }
+</style>
 
 <style type="text/css">
+
 .box {
    /* background:red;*/
     width:50px;
@@ -156,9 +166,11 @@ tr.selected {
 				</h2>
 				<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" >
 				<div class="accordion-body">
-					<div class="col-6 col-md-4" style="margin-top: 5px;">
-						<img id="box_3" class="box" src="images/rectangle.jfif"/>
-						<input type="button" id="circleBtn"  value="Circle"/>
+					<div class="col-12 col-md-12" style="margin-top: 5px;">
+						<!--<img id="box_3" class="box" src="images/rectangle.jfif" />-->
+						
+						<input type="button" id="box_3" class="btn btn-outline-info"  value="Rectangle"/>
+						<input type="button" id="circleBtn" class="btn btn-outline-info"  value="Circle"/>
 					</div>
 				</div>
 				</div>
@@ -171,17 +183,19 @@ tr.selected {
 				</h2>
 				<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" >
 				<div class="accordion-body">
-					<input type="button" id="selectBtn"  value="Select"/>
-					<input type="button" id="deleteBtn"  value="Delete"/>
+					<input type="button" class="btn btn-outline-primary" id="selectBtn"  value="Select"/>
+					<input type="button" class="btn btn-outline-danger " id="deleteBtn"  value="Delete"/>
 					<br><br>
-					<input type="button" id="doBtn"  value="Do"/>
-					<input type="button" id="unDoBtn"  value="Undo"/>
+					<i class="fas fa-redo"></i>
+					<!--<button  id="doBtn" class="btn btn-outline-primary"  style="font-size:24px" >Redo</button>-->
+					<input type="button" id="doBtn"  class="btn btn-outline-primary" value="Redo"/>
+					<input type="button" id="unDoBtn"  class="btn btn-outline-info" value="Undo"/>
 					<br><br>
-					<input type="button" id="NewBtn"  value="New"/>
-					<input type="button" id="saveBtn"  value="Save"/>
-					<input type="button" id="loadBtn"  value="Load"/>
+					<input type="button" class="btn btn-outline-primary" id="NewBtn"  value="New"/>
+					<input type="button" id="saveBtn" class="btn btn-outline-success"  value="Save"/>
+					<input type="button" id="loadBtn" class="btn btn-outline-info"  value="Load"/>
 					<br><br>
-					<input type="button" id="backgroundImgBtn"  value="Set Background"/>
+					<input type="button" id="backgroundImgBtn" class="btn btn-outline-info"  value="Add Background Image"/>
 				</div>
 				</div>
 			</div>
@@ -316,6 +330,9 @@ tr.selected {
 					  
 								<ul class="dropdown-menu" 
 									aria-labelledby="dropdownMenuButton">
+									<li class="dropdown-item" value="Default">
+										<img src=""
+										width="20" height="15" > <a href="#">Default symbol</a></li>
 									<li class="dropdown-item" value="input">
 										<img src="images/inputs.ico"
 										width="20" height="15" > <a href="#">Input</a></li>
@@ -326,8 +343,17 @@ tr.selected {
 										<img src="images/Variables.ico"  
 										width="20" height="15" > <a href="#">Variable</a></li>
 									<li class="dropdown-item" value="schedual">
-										<img src="images/outputs2.ico" 
+										<img src="images/schedual.ico" 
 										width="20" height="15" > <a href="#">Schedual</a></li>
+									<li class="dropdown-item" value="Holidays">
+											<img src="images/Holidays.ico" 
+											width="20" height="15" > <a href="#">Holidays</a></li>
+									<li class="dropdown-item" value="Programs">
+										<img src="images/Programs.ico" 
+										width="20" height="15" > <a href="#">Programs</a></li>
+									<li class="dropdown-item" value="Graphics">
+										<img src="images/Graphics2.ico" 
+										width="20" height="15" > <a href="#">Graphics</a></li>
 									<li class="dropdown-item" value="Temprature">
 										<img src="images/temp.jfif" 
 										width="20" height="15" > <a href="#">Temprature</a></li>

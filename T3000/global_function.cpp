@@ -14340,6 +14340,9 @@ bool indtext_by_istring(
 
     if (found && found_index)
         *found_index = index;
+
+    return found;
+}
 int Find_Index_Input_By_Label(CString strLabel)
 {
     char cTemp1[255];
@@ -14347,13 +14350,9 @@ int Find_Index_Input_By_Label(CString strLabel)
     WideCharToMultiByte(CP_ACP, 0, strLabel.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
     for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++)
     {
-        if (strcmp((char *) m_Input_data.at(i).label , cTemp1)==0)
+        if (strcmp((char*)m_Input_data.at(i).label, cTemp1) == 0)
         {
             return i;
-       }
+        }
     }
-}
-
-
-    return found;
 }
