@@ -3212,6 +3212,7 @@ DWORD WINAPI  Bacnet_Handle_Abort_Request(LPVOID lpVoid)
 	BACnet_abort_read_thread = NULL;
 	return 0;
 }
+/*function handle all instances of all objects type avaiable on thirdparty bacnet device*/
 void Handle_Bacnet_Property_List_Response(CString response,int deviceInstance,int objInstace, int &inputcount , int &outputcount , int &variablecount , int &schedulecount , int &calenderCount)
 {
 	if (response != "")
@@ -3289,7 +3290,7 @@ void Handle_Bacnet_Property_List_Response(CString response,int deviceInstance,in
 		
 	}
 }
-
+/*Thread function to read all porperties of thirdparty bacnet device*/
 DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid)
 {
 	BACNET_OBJECT_TYPE objectType = OBJECT_DEVICE;
@@ -3474,9 +3475,16 @@ void CDialogCM5_BacNet::Fresh()
 			
 			if (BACnet_read_thread == NULL)
 			{
+				/*To check if device is online then go futher to read the properties*/
+				BACNET_APPLICATION_DATA_VALUE temp_value;
+				int invoke_id = Bacnet_Read_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)OBJECT_DEVICE, g_bac_instance, PROP_OBJECT_NAME, temp_value, 3);
+				if (invoke_id < 0)
+				{
+					return;
+				}
 				ClearBacnetData();
 				
-
+				/*reseting the dialuges tables to pupulate the new device Data */
 				((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
 
 				((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->Initial_List();
