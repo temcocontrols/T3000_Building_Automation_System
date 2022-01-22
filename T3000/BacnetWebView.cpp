@@ -1071,8 +1071,18 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
                      CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
                      PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
                      temp_now_building_name.ReleaseBuffer();
-                     destination = temp_now_building_name + _T("\\image\\" + dlg.GetFileName());
-                     CopyFile(sFilePath, destination, 1);
+                     if (CreateDirectory(temp_now_building_name + _T("\\image\\"), NULL) ||
+                         ERROR_ALREADY_EXISTS == GetLastError())
+                     {
+                         destination = temp_now_building_name + _T("\\image\\" + dlg.GetFileName());
+                         CopyFile(sFilePath, destination, 1);                        
+                     }
+                     else {
+                         CString error = "Not Able to Create Directory at:  " + temp_now_building_name + _T("\\image");
+                         app->m_webView->ExecuteScript(L"DisplayError( " + error + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
+                         return;
+                     }
+                   
                  }
                  if(destination!=""){
                      unsigned int width;
