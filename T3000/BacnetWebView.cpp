@@ -820,18 +820,30 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
          }
          case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC:
          {
-             CString filename = json.get("graphic_name", Json::nullValue).asCString();
-            Json::String tmpString = json.get("Data", Json::nullValue).asString();
-             CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
-             PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
-             temp_now_building_name.ReleaseBuffer();
-             CFile file;
-             CString tempfile;
-             tempfile = temp_now_building_name + _T("\\Graphic\\"+ filename+".grp");
-             if (file.Open(tempfile, CFile::modeCreate | CFile::modeWrite, NULL))
+             if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
              {
-                 file.Write(tmpString.c_str(), tmpString.size()); 
-                 file.Close();
+                 CString filename = json.get("graphic_name", Json::nullValue).asCString();
+                 Json::String tmpString = json.get("Data", Json::nullValue).asString();
+                 CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
+                 PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
+                 temp_now_building_name.ReleaseBuffer();
+                 CFile file;
+                 CString tempfile;
+                 if (CreateDirectory(temp_now_building_name + _T("\\Graphic"), NULL) ||
+                     ERROR_ALREADY_EXISTS == GetLastError())
+                 {
+
+                     tempfile = temp_now_building_name + _T("\\Graphic\\" + filename + ".grp");
+                     if (file.Open(tempfile, CFile::modeCreate | CFile::modeWrite, NULL))
+                     {
+                         file.Write(tmpString.c_str(), tmpString.size());
+                         file.Close();
+                     }  // CopyFile(...)
+                 }
+                 else {
+                     CString error = "Not Able to Create Directory at:  " + temp_now_building_name + _T("\\Graphic");
+                     app->m_webView->ExecuteScript(L"DisplayError( " + error + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
+                 }
              }
              break;
          }

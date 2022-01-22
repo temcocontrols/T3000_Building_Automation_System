@@ -1405,12 +1405,12 @@ void BacnetScreen::OnBnClickedWebViewShow()
 	//	szFilter, this->GetTopWindow());
 	//if (dlg.DoModal() == IDOK)
 	{
-		CString ApplicationFolder;
+		//CString ApplicationFolder;
 		CString webviewFolder;
-		GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+		/*GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
 		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
-		ApplicationFolder.ReleaseBuffer();
-		webviewFolder = ApplicationFolder + _T("\\Database\\webview\\webview.html");
+		ApplicationFolder.ReleaseBuffer();*/
+		webviewFolder = SOLUTION_DIR  _T("T3000\\webview\\webview.html");
 		//CString sFilePath = dlg.GetPathName();
 		wstring fullpath = webviewFolder;
 		auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath));

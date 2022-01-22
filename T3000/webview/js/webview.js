@@ -320,13 +320,13 @@ function dragDrop(e,ui){
     var ImageName = imagePath.replace(/^.*[\\\/]/, '');
     var objectType = element.attr("object-type");
     
-	console.log("Src: images/"+ImageName);
+	console.log("Src: ../res/default_icon/"+ImageName);
     var image = {
         x: x,
         y: y,
         width: 50,
         height: 50,
-        image: "images/"+ImageName,
+        image: "../res/default_icon/"+ImageName,
         type : "image",
         color: "red",
         fontType:1,
@@ -1063,7 +1063,7 @@ function showContextMenu(r,x,y){
   $("#lockAction").click(function(){
    
     if(LockEnabled){
-        $("#lockIcon").attr("src", "images/unlock.ico")
+        $("#lockIcon").attr("src", "../res/unlock.ico")
         LockEnabled = false;
         //$("#accordionExample").attr('disabled','disabled');
         $("#accordionExample .accordion-button").attr("aria-expanded","true");
@@ -1073,7 +1073,7 @@ function showContextMenu(r,x,y){
         $("#accordionExample").show();
     }
     else{
-        $("#lockIcon").attr("src", "images/lock.ico")
+        $("#lockIcon").attr("src", "../res/lock.ico")
         LockEnabled = true;
         selectedDragableObject = -1;
 
@@ -1181,3 +1181,8 @@ $('.dropdown-menu li').on('click', function() {
     }
     $('#dropdownMenuButton').html("<img src="+img+" width='20'height='15' > " + val+" &nbsp");
 });
+
+function DisplayError(response)
+{
+    alert(response);
+}
