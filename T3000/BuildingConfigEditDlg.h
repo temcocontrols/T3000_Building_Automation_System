@@ -29,6 +29,9 @@ public:
 	CString m_strstate;
 	CString m_strstreet;
 	CString m_strZip;
+	CString m_PrivateKey;
+	CString m_PublicKey;
+	CString m_PresharedKey;
 	Building_Config m_currentBuilding;
 	afx_msg void OnBnClickedOk();
 	virtual BOOL OnInitDialog();

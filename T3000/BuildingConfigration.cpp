@@ -69,14 +69,18 @@ END_MESSAGE_MAP()
 
 
 // CBuildingConfigration message handlers
+void CBuildingConfigration::RemoteVPNConnectivity()
+{
 
+    
+  // system("runas cmd.exe");
+    system("C:/Users/Admin/OneDrive/Desktop/T3000/T3000VPN/csharp/bin/x86/Debug/net5.0-windows/T3000VPN.exe");
+}
 
 BOOL CBuildingConfigration::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
     Deal_BuildingPath();
-   
-    
     GetSerialComPortNumber1(m_szBuildingComs);
 	m_SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
     m_building_config_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
@@ -89,8 +93,15 @@ BOOL CBuildingConfigration::OnInitDialog()
     m_building_config_list.InsertColumn(BC_IPPORT, _T("Modbus TCP Port"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_building_config_list.InsertColumn(BC_COMPORT, _T("COM Port"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_building_config_list.InsertColumn(BC_BAUDRATE, _T("Baud Rate"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_building_config_list.InsertColumn(BC_STATUS, _T("Status"),50, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+   /* m_building_config_list.InsertColumn(BC_PrivateKey, _T("PrivateKey"),100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_building_config_list.InsertColumn(BC_PublicKey, _T("PublicKey"),100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_building_config_list.InsertColumn(BC_PresharedKey, _T("PresharedKey"),100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);*/
     m_building_config_list.InsertColumn(BC_BUILDINGPATH, _T("Building Path"), 600, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
+   
+    
+    
     m_building_config_hwnd = this->m_hWnd;
     g_hwnd_now = m_building_config_hwnd;
 
@@ -311,6 +322,7 @@ void CBuildingConfigration::Initial_Building_List()
             m_building_config_list.SetCellEnabled(i,BC_IPPORT,0);
             m_building_config_list.SetCellEnabled(i,BC_COMPORT,0);
             m_building_config_list.SetCellEnabled(i,BC_BAUDRATE,0);
+         
         }
 
         if(m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Remote Device")) == 0)   // == REMOTE_DEVICE  需要使能的表格
@@ -319,6 +331,9 @@ void CBuildingConfigration::Initial_Building_List()
             m_building_config_list.SetCellEnabled(i,BC_IPPORT,1);
             m_building_config_list.SetCellEnabled(i,BC_COMPORT,0);
             m_building_config_list.SetCellEnabled(i,BC_BAUDRATE,0);
+           
+           // RemoteVPNConnectivity();
+           
         }
 
 		if ((m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Modbus 485")) == 0) ||     //   MODBUS_485
@@ -328,6 +343,7 @@ void CBuildingConfigration::Initial_Building_List()
             m_building_config_list.SetCellEnabled(i,BC_IPPORT,0);
             m_building_config_list.SetCellEnabled(i,BC_COMPORT,1);
             m_building_config_list.SetCellEnabled(i,BC_BAUDRATE,1);
+          
         }
         if(m_BuildNameLst.at(i).b_selected)
             m_building_config_list.SetItemText(i,BC_ITEM,_T("Selected"));
@@ -353,6 +369,7 @@ void CBuildingConfigration::Initial_Building_List()
         m_building_config_list.SetItemText(i,BC_IPPORT,m_BuildNameLst.at(i).IP_Port);
         m_building_config_list.SetItemText(i,BC_COMPORT,m_BuildNameLst.at(i).Comport);
         m_building_config_list.SetItemText(i,BC_BAUDRATE,m_BuildNameLst.at(i).BaudRate);
+     
         m_building_config_list.SetItemText(i,BC_BUILDINGPATH,m_BuildNameLst.at(i).BuildingPath);
 
         if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_PROTOCOL))
@@ -436,7 +453,15 @@ void CBuildingConfigration::Initial_Building_List()
         }
         m_building_config_list.SetCellStringList(last_new_item, BC_COMPORT, strlist);
     }
-
+    /*if (ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_COMPORT))
+    {
+        ListCtrlEx::CStrList strlist;
+        for (int j = 0; j < m_szBuildingComs.size(); j++)
+        {
+            strlist.push_back(m_szBuildingComs.at(j));
+        }
+        m_building_config_list.SetCellStringList(last_new_item, BC_COMPORT, strlist);
+    }*/
 
 
 }
@@ -478,6 +503,10 @@ void CBuildingConfigration::Fresh_List_Row()
 			m_building_config_list.SetCellEnabled(i, BC_IPPORT, 0);
 			m_building_config_list.SetCellEnabled(i, BC_COMPORT, 0);
 			m_building_config_list.SetCellEnabled(i, BC_BAUDRATE, 0);
+           /* m_building_config_list.SetCellEnabled(i, BC_PrivateKey, 0);
+            m_building_config_list.SetCellEnabled(i, BC_PublicKey, 0);
+            m_building_config_list.SetCellEnabled(i, BC_PresharedKey, 0);*/
+
 		}
 
 		if (m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Modbus TCP")) == 0)     //   MODBUS_TCP
@@ -486,6 +515,9 @@ void CBuildingConfigration::Fresh_List_Row()
 			m_building_config_list.SetCellEnabled(i, BC_IPPORT, 1);
 			m_building_config_list.SetCellEnabled(i, BC_COMPORT, 0);
 			m_building_config_list.SetCellEnabled(i, BC_BAUDRATE, 0);
+           /* m_building_config_list.SetCellEnabled(i, BC_PrivateKey, 0);
+            m_building_config_list.SetCellEnabled(i, BC_PublicKey, 0);
+            m_building_config_list.SetCellEnabled(i, BC_PresharedKey, 0);*/
 		}
 
 		if ((m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Modbus 485")) == 0) ||    //   MODBUS_485
@@ -495,6 +527,9 @@ void CBuildingConfigration::Fresh_List_Row()
             m_building_config_list.SetCellEnabled(i,BC_IPPORT,0);
             m_building_config_list.SetCellEnabled(i,BC_COMPORT,1);
             m_building_config_list.SetCellEnabled(i,BC_BAUDRATE,1);
+           /* m_building_config_list.SetCellEnabled(i, BC_PrivateKey, 0);
+            m_building_config_list.SetCellEnabled(i, BC_PublicKey, 0);
+            m_building_config_list.SetCellEnabled(i, BC_PresharedKey, 0);*/
         }
         if(m_BuildNameLst.at(i).b_selected)
             m_building_config_list.SetItemText(i,BC_ITEM,_T("Selected"));
@@ -506,6 +541,9 @@ void CBuildingConfigration::Fresh_List_Row()
         m_building_config_list.SetItemText(i,BC_COMPORT,m_BuildNameLst.at(i).Comport);
         m_building_config_list.SetItemText(i,BC_BAUDRATE,m_BuildNameLst.at(i).BaudRate);
         m_building_config_list.SetItemText(i,BC_BUILDINGPATH,m_BuildNameLst.at(i).BuildingPath);
+       /* m_building_config_list.SetCellEnabled(i, BC_PrivateKey, 0);
+        m_building_config_list.SetCellEnabled(i, BC_PublicKey, 0);
+        m_building_config_list.SetCellEnabled(i, BC_PresharedKey, 0);*/
 
         if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_PROTOCOL))
         {
@@ -587,11 +625,15 @@ void CBuildingConfigration::Update_Building()
     BuildingTemp.IP_Port=m_building_config_list.GetItemText(m_changedRow,BC_IPPORT);
     BuildingTemp.Comport=m_building_config_list.GetItemText(m_changedRow,BC_COMPORT);
     BuildingTemp.BaudRate=m_building_config_list.GetItemText(m_changedRow,BC_BAUDRATE);
+   /* BuildingTemp.PrivateKey = m_building_config_list.GetItemText(m_changedRow,BC_PrivateKey);
+    BuildingTemp.PublicKey = m_building_config_list.GetItemText(m_changedRow, BC_PublicKey);
+    BuildingTemp.PresharedKey = m_building_config_list.GetItemText(m_changedRow, BC_PresharedKey);*/
     try
     {
         CString strSql;
-        strSql.Format(_T("update Building set Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Path='%s'  "),
-                      BuildingTemp.Protocol,BuildingTemp.IPAddress_Domain,BuildingTemp.IP_Port,BuildingTemp.Comport,BuildingTemp.BaudRate,BuildingTemp.BuildingPath);
+
+        strSql.Format(_T("update Building set Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s',PrivateKey='%s',PublicKey='%s',PresharedKey='%s' where Building_Path='%s'"),
+                      BuildingTemp.Protocol,BuildingTemp.IPAddress_Domain,BuildingTemp.IP_Port,BuildingTemp.Comport,BuildingTemp.BaudRate,BuildingTemp.BuildingPath,BuildingTemp.PrivateKey,BuildingTemp.PublicKey,BuildingTemp.PresharedKey);
         SqliteDBT3000.execDML((UTF8MBSTR)strSql);
 
     }
@@ -673,7 +715,9 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
         CString ComPort = m_building_config_list.GetItemText(m_changedRow,BC_COMPORT);
         CString Baudrate = m_building_config_list.GetItemText(m_changedRow,BC_BAUDRATE);
         CString Protocol = m_building_config_list.GetItemText(m_curRow,BC_PROTOCOL);
-
+       /* CString PrivateKey = m_building_config_list.GetItemText(m_changedRow, BC_PrivateKey);
+        CString PublicKey = m_building_config_list.GetItemText(m_changedRow,BC_PublicKey);
+        CString PresharedKey = m_building_config_list.GetItemText(m_changedRow, BC_PresharedKey);*/
         LoadBuildingConfigDB();
         BOOL Is_Changed=FALSE;
         CString path=m_building_config_list.GetItemText(Changed_Item,BC_BUILDINGPATH);
@@ -1004,12 +1048,16 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                         sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),BCTemp.MainBuildingName.GetBuffer(),0);
                         SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
-                        sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Protocal,Default_SubBuilding,Building_Path,Com_Port,Ip_Address,IP_Port,Braudrate) values('%s','%s','%s','%d','%s' ,'%s','%s','%s','%s')"),
+                        sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Protocal,Default_SubBuilding,Building_Path,Com_Port,Ip_Address,IP_Port,Braudrate,PrivateKey,PublicKey,PresharedKey) values('%s','%s','%s','%d','%s' ,'%s','%s','%s','%s','%s','%s','%s')"),
                                    BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),BCTemp.Protocol.GetBuffer(),0,BCTemp.BuildingPath.GetBuffer(),
                                    BCTemp.Comport,
                                    BCTemp.IPAddress_Domain,
                                    BCTemp.IP_Port,
-                                   BCTemp.BaudRate);
+                                   BCTemp.BaudRate,
+                                   BCTemp.PrivateKey,
+                                   BCTemp.PublicKey,
+                                   BCTemp.PresharedKey
+                            );
                         SqliteDBT3000.execDML((UTF8MBSTR)sql);
 
                     }
@@ -1096,7 +1144,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                     }
                     m_building_config_list.SetCellStringList(last_new_item, BC_COMPORT, strlist);
                 }
-
+               
 
             }
             catch(_com_error *e)
@@ -1123,7 +1171,9 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             m_building_config_list.SetCellEnabled(Changed_Item,BC_IPPORT,0);
             m_building_config_list.SetCellEnabled(Changed_Item,BC_COMPORT,0);
             m_building_config_list.SetCellEnabled(Changed_Item,BC_BAUDRATE,0);
-
+          /*  m_building_config_list.SetCellEnabled(Changed_Item, BC_PrivateKey, 0);
+            m_building_config_list.SetCellEnabled(Changed_Item, BC_PublicKey, 0);
+            m_building_config_list.SetCellEnabled(Changed_Item, BC_PresharedKey, 0);*/
         }
         //m_changedRow=m_curRow;
         //PostMessage(WM_FRESH_DB,0,0);
@@ -1161,8 +1211,9 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 
             m_building_config_list.SetCellEnabled(Changed_Item,BC_COMPORT,0);
             m_building_config_list.SetCellEnabled(Changed_Item,BC_BAUDRATE,0);
+          //  RemoteVPNConnectivity();
             if (!dbpath.IsEmpty())
-            {
+            { 
                 GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),_T("192.168.0.3"),IP.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
                 GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_Port"),_T("10000"),Port.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
             }
@@ -1175,8 +1226,19 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 			{
 				return 0;
 			}
-			  WritePrivateProfileStringW(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),IP,g_achive_device_name_path);
-            m_building_config_list.SetItemText(m_changedRow,BC_COMPORT,NO_APPLICATION);
+			WritePrivateProfileStringW(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),IP,g_achive_device_name_path);
+
+            if (cs_temp.CompareNoCase(_T("Remote Device")) == 0)
+            {
+                m_building_config_list.SetItemText(m_changedRow, BC_COMPORT, _T("Tunnel"));
+                RemoteVPNConnectivity();
+            }
+            else {
+
+                m_building_config_list.SetItemText(m_changedRow, BC_COMPORT, NO_APPLICATION);
+            }
+
+           
             m_building_config_list.SetItemText(m_changedRow,BC_BAUDRATE,NO_APPLICATION);
 
             m_building_config_list.SetItemText(m_changedRow,BC_IPADDRESS,IP);
@@ -1252,7 +1314,9 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 						return 0;
 					CConnectRemoteServer Connectdlg;
 					Connectdlg.DoModal();
+                 /*   RemoteVPNConnectivity();*/
 					return 0;
+                   
 				}
 			}
 
@@ -1395,9 +1459,10 @@ void CBuildingConfigration::LoadBuildingConfigDB()
 
 		temp_building.EngineeringUnits=m_q.getValuebyName(L"EngineeringUnits");//
 		 
-
+        temp_building.PrivateKey = m_q.getValuebyName(L"PrivateKey");
 	 
-
+        temp_building.PublicKey= m_q.getValuebyName(L"PublicKey");
+        temp_building.PresharedKey = m_q.getValuebyName(L"PresharedKey");
 		 
         m_BuildNameLst.push_back(temp_building);
 
@@ -1455,6 +1520,9 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
     CString strIpPort;
     CString strCOMPort;
     CString strCOMPortBaud;
+    CString strPrivateKey;
+    CString strPublicKey;
+    CString strPresharedKey;
     strMainBuildName =  m_building_config_list.GetItemText(last_count,BC_MAINNAME);
 //	strSubBuildingName = m_building_config_list.GetItemText(last_count,BC_SUBNAME);
     strProtocol =  m_building_config_list.GetItemText(last_count,BC_PROTOCOL);
@@ -1462,6 +1530,9 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
     strIpPort = m_building_config_list.GetItemText(last_count,BC_IPPORT);
     strCOMPort = m_building_config_list.GetItemText(last_count,BC_COMPORT);
     strCOMPortBaud = m_building_config_list.GetItemText(last_count,BC_BAUDRATE);
+   /* strPrivateKey = m_building_config_list.GetItemText(last_count, BC_PrivateKey);
+    strPublicKey = m_building_config_list.GetItemText(last_count, BC_PublicKey);
+    strPresharedKey = m_building_config_list.GetItemText(last_count, BC_PresharedKey);*/
     if(strMainBuildName.IsEmpty())
     {
         MessageBox(_T("Warning!Main Building is empty!"));
@@ -1573,7 +1644,7 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
     try
     {
         BOOL bDefault =FALSE;
-        strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBaud+"')"));
+        strSql.Format(_T("insert into Building (Main_BuildingName,Building_Name,Protocal,Com_Port,Ip_Address,Ip_Port,Braudrate,Privatekey,Publickey,PresharedKey) values('"+strMainBuildName+"','"+strSubBuildingName+"','"+strProtocol+"','"+strCOMPort+"','"+strIP+"','"+strIpPort+"','"+strCOMPortBaud+"','" + strPrivateKey + "','" + strPublicKey + "','" + strPresharedKey + "')"));
         m_SqliteDBT3000.execDML((UTF8MBSTR)strSql);
     }
     catch(_com_error *e)
@@ -2272,14 +2343,20 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 			 state = '%s' ,\
 			 city = '%s' ,\
 			 street = '%s' ,\
-			 EngineeringUnits = '%s'\
+			 EngineeringUnits = '%s',\
+             PrivateKey = '%s',\
+             PublicKey = '%s',\
+             PresharedKey = '%s'\
 			 where Building_Path = '%s' \
 			  "),
 			  m_BuildNameLst.at(m_curRow).country,
 			  m_BuildNameLst.at(m_curRow).state,
-			  m_BuildNameLst.at(m_curRow).city,
+			  m_BuildNameLst.at(m_curRow).city, 
 			  m_BuildNameLst.at(m_curRow).street,
 			  m_BuildNameLst.at(m_curRow).EngineeringUnits,
+              m_BuildNameLst.at(m_curRow).PrivateKey,
+              m_BuildNameLst.at(m_curRow).PublicKey,
+              m_BuildNameLst.at(m_curRow).PresharedKey,
 			  m_BuildNameLst.at(m_curRow).BuildingPath
 			  );
 			  

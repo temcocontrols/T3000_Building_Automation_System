@@ -30,6 +30,9 @@ typedef struct Building_Config
 	CString Latitude ;
 	CString Elevation;
 	CString EngineeringUnits;
+	CString PrivateKey;
+	CString PublicKey;
+	CString PresharedKey;
 };
 
 class CBuildingConfigration : public CDialogEx
@@ -53,6 +56,7 @@ public:
 	void Initial_Building_List();
 	void Fresh_List_Row();
 	void LoadBuildingConfigDB();
+	void RemoteVPNConnectivity();
 	afx_msg LRESULT Fresh_Building_Config_Item(WPARAM wParam,LPARAM lParam);
 	ListCtrlEx::CListCtrlEx m_building_config_list;
 	CppSQLite3DB m_SqliteDBT3000;
@@ -92,9 +96,14 @@ const int BC_IPADDRESS = 3;
 const int BC_IPPORT = 4;
 const int BC_COMPORT = 5;
 const int BC_BAUDRATE = 6;
-const int BC_BUILDINGPATH = 7;
+const int BC_STATUS = 7;
+//const int BC_PrivateKey = 8;
+//const int BC_PublicKey = 9;
+//const int BC_PresharedKey = 10;
 
-const int BC_COL_NUMBER = 8;
+const int BC_BUILDINGPATH =8;
+
+const int BC_COL_NUMBER =8;
 
 
 

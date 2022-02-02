@@ -441,15 +441,18 @@
 #define IDC_START_POINT                 1036
 #define IDC_EDIT49                      1036
 #define IDC_DTS8                        1036
+#define IDC_EDIT_PrivateKey             1036
 #define IDC_HARDWAREV_EDIT              1037
 #define IDC_TEMP_TOL                    1037
 #define IDC_EDIT50                      1037
 #define IDC_DTS9                        1037
+#define IDC_EDIT_PublicKey              1037
 #define IDC_SERIALNUM_EDIT              1038
 #define IDC_HUM_TOL                     1038
 #define IDC_EDIT51                      1038
 #define IDC_DTS10                       1038
 #define IDC_EDIT_FAN_AUTO_NAME          1038
+#define IDC_EDIT_PresharedKey           1038
 #define IDC_TEMPERATURE_EDIT            1039
 #define IDC_TEST_STATE                  1039
 #define IDC_EDIT_FAN_HEAT_NAME          1039
@@ -2653,13 +2656,10 @@
 #define IDC_RADIO_DEGF                  2637
 #define IDC_STATIC_TEMP_SENSOR          2638
 #define IDC_COMBO_BACNET_UNITS          2639
-
 #define IDC_STATIC_BACNETIP_UNIT        2640
 #define IDC_COMBO_BACNETIP_UNIT         2641
-
 #define IDC_RADIO_SCROLL_ENABLE         2694
 #define IDC_RADIO_SCROLLBAR_DISABLE     2695
-
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3225,7 +3225,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        790
+#define _APS_NEXT_RESOURCE_VALUE        791
 #define _APS_NEXT_COMMAND_VALUE         34079
 #define _APS_NEXT_CONTROL_VALUE         2642
 #define _APS_NEXT_SYMED_VALUE           320

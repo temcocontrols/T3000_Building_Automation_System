@@ -25,6 +25,9 @@ CBuildingConfigEditDlg::CBuildingConfigEditDlg(CWnd* pParent /*=NULL*/)
 	m_strstreet = _T("");
 	m_strZip = _T("");
 	m_strEngineeringUnits = _T("SI");
+	m_PrivateKey = _T("");
+	m_PublicKey = _T("");
+	m_PresharedKey = _T("");
 }
 
 CBuildingConfigEditDlg::~CBuildingConfigEditDlg()
@@ -45,6 +48,9 @@ void CBuildingConfigEditDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_STREET1, m_strstreet);
 	DDX_Text(pDX, IDC_EDIT_ZIP, m_strZip);
 	DDX_Text(pDX, IDC_EDIT_EUNITS, m_strEngineeringUnits);
+	DDX_Text(pDX, IDC_EDIT_PrivateKey, m_PrivateKey);
+	DDX_Text(pDX, IDC_EDIT_PublicKey, m_PublicKey);
+	DDX_Text(pDX, IDC_EDIT_PresharedKey, m_PresharedKey);
 }
 
 
@@ -75,6 +81,9 @@ void CBuildingConfigEditDlg::OnBnClickedOk()
 	 m_currentBuilding.street = m_strstreet;
 /*	 m_currentBuilding.Zip = _wtoi(m_strZip);*/
 	 m_currentBuilding.EngineeringUnits = m_strEngineeringUnits;
+	 m_currentBuilding.PrivateKey =m_PrivateKey;
+	 m_currentBuilding.PublicKey = m_PublicKey;
+	 m_currentBuilding.PresharedKey = m_PresharedKey;
 	 CDialog::OnOK();
 }
 
@@ -88,6 +97,9 @@ void CBuildingConfigEditDlg::BoundDataUpdate()
 	m_strlongitude = m_currentBuilding.Longitude;
 	m_strstate = m_currentBuilding.state;
 	m_strstreet = m_currentBuilding.street;
+	m_PrivateKey= m_currentBuilding.PrivateKey;
+	m_PublicKey = m_currentBuilding.PublicKey;
+	m_PresharedKey = m_currentBuilding.PresharedKey;
 	/*m_strZip.Format(_T("%d"),m_currentBuilding.Zip);*/
 	if(!m_currentBuilding.EngineeringUnits.IsEmpty())
 	{
