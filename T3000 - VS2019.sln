@@ -25,7 +25,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T3000", "T3000\T3000_VS2019
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HttpAPI", "BravocontrolAPI\BravocontrolAPI\HttpAPI\HttpAPI.vcxproj", "{45AA955A-259F-434A-988D-77D1889C5DBD}"
 EndProject
+<<<<<<< HEAD
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "T300VPN", "T3000VPN\csharp\T300VPN.csproj", "{73FB2E4B-54C6-42F6-B4A8-E8594F55C44A}"
+=======
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "T300VPN", "T3000VPN\csharp\T300VPN.csproj", "{8C800223-5C7C-4C9C-8FB3-E3254C99C518}"
+>>>>>>> master
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -207,6 +211,7 @@ Global
 		{45AA955A-259F-434A-988D-77D1889C5DBD}.Template|x64.Build.0 = Debug|x64
 		{45AA955A-259F-434A-988D-77D1889C5DBD}.Template|x86.ActiveCfg = Debug|Win32
 		{45AA955A-259F-434A-988D-77D1889C5DBD}.Template|x86.Build.0 = Debug|Win32
+<<<<<<< HEAD
 		{73FB2E4B-54C6-42F6-B4A8-E8594F55C44A}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{73FB2E4B-54C6-42F6-B4A8-E8594F55C44A}.Debug|x64.ActiveCfg = Debug|x64
 		{73FB2E4B-54C6-42F6-B4A8-E8594F55C44A}.Debug|x64.Build.0 = Debug|x64
@@ -223,6 +228,24 @@ Global
 		{73FB2E4B-54C6-42F6-B4A8-E8594F55C44A}.Template|x64.Build.0 = Debug|x64
 		{73FB2E4B-54C6-42F6-B4A8-E8594F55C44A}.Template|x86.ActiveCfg = Debug|x86
 		{73FB2E4B-54C6-42F6-B4A8-E8594F55C44A}.Template|x86.Build.0 = Debug|x86
+=======
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Debug|x64.ActiveCfg = Debug|x64
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Debug|x64.Build.0 = Debug|x64
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Debug|x86.ActiveCfg = Debug|x86
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Debug|x86.Build.0 = Debug|x86
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Release|Any CPU.ActiveCfg = Release|x86
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Release|x64.ActiveCfg = Release|x64
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Release|x64.Build.0 = Release|x64
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Release|x86.ActiveCfg = Release|x86
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Release|x86.Build.0 = Release|x86
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Template|Any CPU.ActiveCfg = Debug|x64
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Template|Any CPU.Build.0 = Debug|x64
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Template|x64.ActiveCfg = Debug|x64
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Template|x64.Build.0 = Debug|x64
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Template|x86.ActiveCfg = Debug|x86
+		{8C800223-5C7C-4C9C-8FB3-E3254C99C518}.Template|x86.Build.0 = Debug|x86
+>>>>>>> master
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

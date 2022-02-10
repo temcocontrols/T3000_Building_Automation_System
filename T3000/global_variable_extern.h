@@ -1079,6 +1079,7 @@ extern int g_bac_read_type;
 extern bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
 extern HANDLE click_read_thread; 
 extern HANDLE BACnet_read_thread;
+extern HANDLE BACnet_abort_read_thread;
 extern bool bac_net_initial_once;
 extern unsigned char my_ip[4];
 extern byte	g_DayState[8][ANNUAL_CODE_SIZE];
@@ -1308,3 +1309,4 @@ extern unsigned char daylight_end_day;
 
 
 extern bool Bacnet_debug_fileRead;
+extern bool bacnetIpDataRead;

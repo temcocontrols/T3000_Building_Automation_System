@@ -2036,6 +2036,7 @@ int g_bac_read_type;	//用于记录将要读取哪一个，input 还是output,给线程使用;
 bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
 HANDLE click_read_thread;
 HANDLE BACnet_read_thread;
+HANDLE BACnet_abort_read_thread;
 bool bac_net_initial_once;
 unsigned char my_ip[4];
 int connect_invoke_id = -1;
@@ -2272,6 +2273,7 @@ bool initial_bip = false;
 Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
 vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
 vector <str_segmented_bacnet_rp_info> segmented_bacnet_data;
+bool bacnetIpDataRead = false;
 unsigned char m_dialog_signal_type;
 connect_Info system_connect_info;
 panelname_map g_panelname_map; 

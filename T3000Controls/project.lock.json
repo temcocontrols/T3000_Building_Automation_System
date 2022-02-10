@@ -10,21 +10,28 @@
     ".NETFramework,Version=v4.0": []
   },
   "packageFolders": {
-    "C:\\Users\\DELL\\.nuget\\packages\\": {}
+    "C:\\Users\\Admin\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\Users\\DELL\\Documents\\GitHub\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
+      "projectUniqueName": "C:\\Users\\Admin\\OneDrive\\Desktop\\T3000\\T3000Controls\\T3000Controls.csproj",
       "projectName": "T3000Controls",
-      "projectPath": "C:\\Users\\DELL\\Documents\\GitHub\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
-      "projectJsonPath": "C:\\Users\\DELL\\Documents\\GitHub\\T3000_Building_Automation_System\\T3000Controls\\project.json",
-      "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\DELL\\Documents\\GitHub\\T3000_Building_Automation_System\\T3000Controls\\obj\\",
+      "projectPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\T3000\\T3000Controls\\T3000Controls.csproj",
+      "projectJsonPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\T3000\\T3000Controls\\project.json",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\T3000\\T3000Controls\\obj\\",
       "projectStyle": "ProjectJson",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       }
     },

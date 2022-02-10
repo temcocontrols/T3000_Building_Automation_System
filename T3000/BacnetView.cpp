@@ -1013,6 +1013,7 @@ CDialogCM5_BacNet::CDialogCM5_BacNet()
 	m_cur_tab_sel = 0;
 	//CM5_hThread = NULL;
 	BACnet_read_thread = NULL;
+	BACnet_abort_read_thread = NULL;
 }
 
 CDialogCM5_BacNet::~CDialogCM5_BacNet()
@@ -2363,23 +2364,28 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 		CFile file;
 		CString temp_bacnet_logfile;
 		temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
-		file.Open(temp_bacnet_logfile, CFile::modeRead, NULL);
-		DWORD len = file.GetLength();
-		char* Buf = new char[len + 1];
-		Buf[len + 1] = 0;  //0ÖÕÖ¹×Ö·û´®£¬ÓÃÓÚÊä³ö¡£
-		file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufÊÇÓÃÓÚ½ÓÊÕ¶ÁÈ¡µ½µÄÊý¾ÝµÄBufÖ¸ÕënCountÊÇ´ÓÎÄ¼þ¶ÁÈ¡µÄ×Ö½ÚÊý
-		file.Close();
-		CString temp_cs;
-		MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, tmpString.GetBuffer(len), len);
-		tmpString.ReleaseBuffer();
+		if (file.Open(temp_bacnet_logfile, CFile::modeRead, NULL))
+		{
+			DWORD len = file.GetLength();
+			char* Buf = new char[len + 1];
+			Buf[len + 1] = 0;  //0ÖÕÖ¹×Ö·û´®£¬ÓÃÓÚÊä³ö¡£
+			file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufÊÇÓÃÓÚ½ÓÊÕ¶ÁÈ¡µ½µÄÊý¾ÝµÄBufÖ¸ÕënCountÊÇ´ÓÎÄ¼þ¶ÁÈ¡µÄ×Ö½ÚÊý
+			file.Close();
+			CString temp_cs;
+			MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, tmpString.GetBuffer(len), len);
+			tmpString.ReleaseBuffer();
 
-		tmpString.TrimRight();
-		tmpString.Replace(_T("{"), _T(" "));
-		tmpString.Replace(_T("}"), _T(" "));
-		tmpString.Replace(_T("("), _T(" "));
-		tmpString.Replace(_T(")"), _T(" "));
-		tmpString.Replace(_T("Null,"), _T(" "));
-		return tmpString;
+			tmpString.TrimRight();
+			tmpString.Replace(_T("{"), _T(" "));
+			tmpString.Replace(_T("}"), _T(" "));
+			tmpString.Replace(_T("("), _T(" "));
+			tmpString.Replace(_T(")"), _T(" "));
+			tmpString.Replace(_T("Null,"), _T(" "));
+			return tmpString;
+		}
+		else {
+			return NULL;
+		}
 	}
 	return NULL;
 }
@@ -3167,7 +3173,7 @@ DWORD WINAPI  Bacnet_Handle_Abort_Request(LPVOID lpVoid)
 	BACNET_APPLICATION_DATA_VALUE temp_value;
 	int objectCount = -1;
 	//int invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_OBJECT_LIST, temp_value, 1,0);
-
+	bacnetIpDataRead = true;
 	CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 1, 0);
 	if (response)
 	{
@@ -3186,7 +3192,7 @@ DWORD WINAPI  Bacnet_Handle_Abort_Request(LPVOID lpVoid)
 			Handle_Bacnet_Property_List_Response(response, deviceInstance, objInstace, inputcount, outputcount, variablecount, schedulecount, calenderCount);
 		}
 	}
-
+	bacnetIpDataRead = false;
 	input_item_limit_count = inputcount;
 	output_item_limit_count = outputcount;
 	variable_item_limit_count = variablecount;
@@ -3201,9 +3207,10 @@ DWORD WINAPI  Bacnet_Handle_Abort_Request(LPVOID lpVoid)
 	Sleep(100);
 	::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
 	Sleep(100);
-	BACnet_read_thread = NULL;
+	BACnet_abort_read_thread = NULL;
 	return 0;
 }
+/*function handle all instances of all objects type avaiable on thirdparty bacnet device*/
 void Handle_Bacnet_Property_List_Response(CString response,int deviceInstance,int objInstace, int &inputcount , int &outputcount , int &variablecount , int &schedulecount , int &calenderCount)
 {
 	if (response != "")
@@ -3281,7 +3288,7 @@ void Handle_Bacnet_Property_List_Response(CString response,int deviceInstance,in
 		
 	}
 }
-
+/*Thread function to read all porperties of thirdparty bacnet device*/
 DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid)
 {
 	BACNET_OBJECT_TYPE objectType = OBJECT_DEVICE;
@@ -3290,7 +3297,8 @@ DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid)
 	int objInstace = g_bac_instance;
 	bacnet_device_type = PM_THIRD_PARTY_DEVICE;
 	BACNET_APPLICATION_DATA_VALUE temp_value;
-	CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 1, BACNET_ARRAY_ALL);
+	bacnetIpDataRead = true;
+	CString response = Read_Bacnet_Properties(deviceInstance, objectType, objInstace, propertyID, temp_value, 3, BACNET_ARRAY_ALL);
 
 	if (response != "")
 	{
@@ -3378,7 +3386,7 @@ Not able to read Property list of BACnet Device,\r\nThis may be due to a connect
 		//AfxMessageBox(Temp_Error_Msg);
 		
 	}
-
+	bacnetIpDataRead = false;
 	::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
 	Sleep(100);
 	::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
@@ -3446,18 +3454,35 @@ void CDialogCM5_BacNet::Fresh()
 	variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;
 
 	KillTimer(BAC_READ_PROPERTIES); 
-	/*if (BACnet_read_thread != NULL)
+	if (BACnet_read_thread != NULL)
 	{
+		standard_bacnet_data.clear();
 		TerminateThread(BACnet_read_thread, 0);
 		BACnet_read_thread = NULL;
-	}*/
+		Sleep(100);
+	}
+	if (BACnet_abort_read_thread != NULL)
+	{
+		standard_bacnet_data.clear();
+		TerminateThread(BACnet_abort_read_thread, 0);
+		BACnet_abort_read_thread = NULL;
+		Sleep(100);
+	}
 	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
 	{
 			
 			if (BACnet_read_thread == NULL)
 			{
+				/*To check if device is online then go futher to read the properties*/
+				BACNET_APPLICATION_DATA_VALUE temp_value;
+				int invoke_id = Bacnet_Read_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)OBJECT_DEVICE, g_bac_instance, PROP_OBJECT_NAME, temp_value, 3);
+				if (invoke_id < 0)
+				{
+					return;
+				}
 				ClearBacnetData();
-
+				
+				/*reseting the dialuges tables to pupulate the new device Data */
 				((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
 
 				((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->Initial_List();

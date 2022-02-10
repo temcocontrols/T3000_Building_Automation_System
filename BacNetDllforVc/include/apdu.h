@@ -164,7 +164,7 @@ __declspec(dllexport)    void apdu_set_unconfirmed_handler(
 __declspec(dllexport)  void apdu_set_abort_handler(
         abort_function pFunction);
 
-    void apdu_set_reject_handler(
+__declspec(dllexport)    void apdu_set_reject_handler(
         reject_function pFunction);
 
     uint16_t apdu_decode_confirmed_service_request(

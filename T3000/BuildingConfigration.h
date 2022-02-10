@@ -34,6 +34,9 @@ typedef struct Building_Config
 	CString Latitude;
 	CString Elevation;
 	CString EngineeringUnits;
+	CString PrivateKey;
+	CString PublicKey;
+	CString PresharedKey;
 };
 
 class CBuildingConfigration : public CDialogEx
@@ -60,7 +63,12 @@ public:
 	void RemoteVPNDisConnectivity();
 	//void OnconfigFileOpen();
 	void LoadBuildingConfigDB();
+<<<<<<< HEAD
 	afx_msg LRESULT Fresh_Building_Config_Item(WPARAM wParam, LPARAM lParam);
+=======
+	void RemoteVPNConnectivity();
+	afx_msg LRESULT Fresh_Building_Config_Item(WPARAM wParam,LPARAM lParam);
+>>>>>>> master
 	ListCtrlEx::CListCtrlEx m_building_config_list;
 	CppSQLite3DB m_SqliteDBT3000;
 	CppSQLite3Query m_q;
@@ -98,6 +106,7 @@ const int BC_MAINNAME = 1;
 const int BC_PROTOCOL = 2;
 const int BC_IPADDRESS = 3;
 const int BC_IPPORT = 4;
+<<<<<<< HEAD
 const int BC_BACNET = 5;
 const int BC_COMPORT = 6;
 const int BC_BAUDRATE = 7;
@@ -106,6 +115,18 @@ const int BC_Config = 9;
 const int BC_BUILDINGPATH = 10;
 
 const int BC_COL_NUMBER = 11;
+=======
+const int BC_COMPORT = 5;
+const int BC_BAUDRATE = 6;
+const int BC_STATUS = 7;
+//const int BC_PrivateKey = 8;
+//const int BC_PublicKey = 9;
+//const int BC_PresharedKey = 10;
+
+const int BC_BUILDINGPATH =8;
+
+const int BC_COL_NUMBER =9;
+>>>>>>> master
 
 
 
