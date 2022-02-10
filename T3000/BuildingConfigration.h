@@ -103,7 +103,7 @@ const int BC_STATUS = 7;
 
 const int BC_BUILDINGPATH =8;
 
-const int BC_COL_NUMBER =8;
+const int BC_COL_NUMBER =9;
 
 
 

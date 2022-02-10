@@ -65,16 +65,15 @@ BEGIN_MESSAGE_MAP(CBuildingConfigration, CDialogEx)
     ON_COMMAND(ID_BUILDINGCONFIG_DELETE, &CBuildingConfigration::OnBuildingconfigDelete)
     ON_BN_CLICKED(IDOK, &CBuildingConfigration::OnBnClickedOk)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_BUILDING_CONFIG, &CBuildingConfigration::OnNMDblclkListBuildingConfig)
-END_MESSAGE_MAP()
-
-
+    END_MESSAGE_MAP()
 // CBuildingConfigration message handlers
 void CBuildingConfigration::RemoteVPNConnectivity()
 {
 
     
-  // system("runas cmd.exe");
-    system("C:/Users/Admin/OneDrive/Desktop/T3000/T3000VPN/csharp/bin/x86/Debug/net5.0-windows/T3000VPN.exe");
+    system("runas cmd.exe");
+    system("C:\\ProgrameFiles(X86)\\T3000\\T3000VPN.exe");
+
 }
 
 BOOL CBuildingConfigration::OnInitDialog()
@@ -332,7 +331,7 @@ void CBuildingConfigration::Initial_Building_List()
             m_building_config_list.SetCellEnabled(i,BC_COMPORT,0);
             m_building_config_list.SetCellEnabled(i,BC_BAUDRATE,0);
            
-           // RemoteVPNConnectivity();
+             RemoteVPNConnectivity();
            
         }
 
@@ -1211,7 +1210,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 
             m_building_config_list.SetCellEnabled(Changed_Item,BC_COMPORT,0);
             m_building_config_list.SetCellEnabled(Changed_Item,BC_BAUDRATE,0);
-          //  RemoteVPNConnectivity();
+            RemoteVPNConnectivity();
             if (!dbpath.IsEmpty())
             { 
                 GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),_T("192.168.0.3"),IP.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
@@ -1314,7 +1313,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 						return 0;
 					CConnectRemoteServer Connectdlg;
 					Connectdlg.DoModal();
-                 /*   RemoteVPNConnectivity();*/
+                    RemoteVPNConnectivity();
 					return 0;
                    
 				}
