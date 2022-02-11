@@ -52,6 +52,18 @@
     <Filter Include="CustomSource">
       <UniqueIdentifier>{babebbb7-6f0b-4fbf-9c8f-6cab0e6f5f69}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Webview">
+      <UniqueIdentifier>{f4772070-858e-40cc-9c9b-530b10758494}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WebView">
+      <UniqueIdentifier>{a08bbb93-cfb4-4551-aacd-262f4c0da7a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\JsonCpp">
+      <UniqueIdentifier>{b56f0dbf-9bd8-49f9-a0a5-99d614ef4839}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\JsonCpp">
+      <UniqueIdentifier>{aed7621d-d450-4ef1-b09a-558136c0b07f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AddBuilding.cpp">
@@ -813,6 +825,15 @@
     <ClCompile Include="CBacnetUnitsSelection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BacnetWebView.cpp">
+      <Filter>Source Files\WebView</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetWebViewToolBar.cpp">
+      <Filter>Source Files\WebView</Filter>
+    </ClCompile>
+    <ClCompile Include="Json-cpp\dist\jsoncpp.cpp">
+      <Filter>Source Files\JsonCpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -1154,6 +1175,7 @@
     </None>
     <None Include="ClassDiagram.cd" />
     <None Include="OutputTableDlg.htm" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -2033,6 +2055,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CBacnetUnitsSelection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetWebView.h">
+      <Filter>Header Files\Webview</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetWebViewDropTarget.h">
+      <Filter>Header Files\Webview</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetWebViewToolBar.h">
+      <Filter>Header Files\Webview</Filter>
+    </ClInclude>
+    <ClInclude Include="Json-cpp\dist\json\json.h">
+      <Filter>Header Files\JsonCpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Json-cpp\dist\json\json-forwards.h">
+      <Filter>Header Files\JsonCpp</Filter>
+    </ClInclude>
+    <ClInclude Include="dirent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
