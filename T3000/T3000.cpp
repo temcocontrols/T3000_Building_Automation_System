@@ -17,8 +17,7 @@
 #include <windows.h>  
  
 
-const unsigned int g_versionNO= 20211111;
-
+const unsigned int g_versionNO= 20220118;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -53,7 +52,7 @@ CT3000App::CT3000App()
     memcpy(strTime, __TIME__, 2);
     MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
     Test_Version.ReleaseBuffer();
-	CurrentT3000Version= CurrentT3000Version + _T(" . ") + Test_Version; //杜帆 : Release 版发布的时候 这句屏蔽掉就好了 ，会自动获取编译的日期.
+	CurrentT3000Version= CurrentT3000Version  + Test_Version; //杜帆 : Release 版发布的时候 这句屏蔽掉就好了 ，会自动获取编译的日期.
 //#endif 
     //*******************************************************
     

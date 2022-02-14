@@ -2501,12 +2501,12 @@ typedef struct RoomInfo
 #define SENSOR_BIT_AI_PT12       11
 #define SENSOR_BIT_FAR_INFRA_RED 12
 
-#define TYPE_BM_POINT_LIST  255
-#define TYPE_BM_GROUP       0
-#define TYPE_BM_NODES       1
-#define TYPE_BM_INPUT       2
-#define TYPE_BM_OUTPUT      3
-#define TYPE_BM_VARIABLE    4
+//#define TYPE_BM_POINT_LIST  255
+//#define TYPE_BM_GROUP       0
+//#define TYPE_BM_NODES       1
+//#define TYPE_BM_INPUT       2
+//#define TYPE_BM_OUTPUT      3
+//#define TYPE_BM_VARIABLE    4
 
 
 typedef  struct
@@ -2666,5 +2666,36 @@ typedef  struct
 	CString ProgramText;
 	CString BinaryArray;
 } Str_programtext_DB;
+
+typedef union
+{
+	struct
+	{
+		unsigned char panel;
+		unsigned char ntype;
+		unsigned int object_number;
+	}pan_str;
+	struct
+	{
+		unsigned int device_instance;
+		unsigned char ntype;
+		unsigned int object_number;
+	}ins_str;
+}Str_points;
+
+typedef  struct
+{
+	int group_index;  //标识三维 属于哪一个节点;
+	int category_index;
+	int hw_index;
+	CString Group_Name;
+	CString Category_Name;
+	CString HW_Point_Name;
+	CString type_string;
+	int type; //标识是input output 还是var
+	int nstatus; // 0  offline    1  online      2 在线不可用
+	Str_points nproperty;  //
+	CString cs_property_name; //例如  1234IN56
+} Str_BM_IO;
 
 

@@ -76,6 +76,7 @@ BEGIN_MESSAGE_MAP(CWifiConfigDlg, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO_IP_AUTO, &CWifiConfigDlg::OnBnClickedRadioIpAuto)
     ON_BN_CLICKED(IDC_RADIO_IP_STATIC, &CWifiConfigDlg::OnBnClickedRadioIpStatic)
     ON_BN_CLICKED(IDC_BUTTON_WIFI_DEFAULT, &CWifiConfigDlg::OnBnClickedButtonWifiDefault)
+    ON_BN_CLICKED(IDC_RADIO_WIFI_DISABLE, &CWifiConfigDlg::OnBnClickedRadioWifiDisable)
 END_MESSAGE_MAP()
 
 
@@ -241,7 +242,7 @@ BOOL CWifiConfigDlg::OnInitDialog()
         {
             GetDlgItem(IDC_RADIO_WIFI_ENABLE)->EnableWindow(1);
             GetDlgItem(IDC_RADIO_WIFI_DISABLE)->EnableWindow(1);
-            if (wifi_register_value[WIFI_ENABLE] == 2)
+            if (wifi_register_value[WIFI_ENABLE - 2000] == 2)
             {
                 ((CButton *)GetDlgItem(IDC_RADIO_WIFI_DISABLE))->SetCheck(true);
                 ((CButton *)GetDlgItem(IDC_RADIO_WIFI_ENABLE))->SetCheck(false);
@@ -529,9 +530,9 @@ void CWifiConfigDlg::OnBnClickedOk()
             n_modbus_port = _wtoi(modbus_port);
             n_bacnet_port = _wtoi(bacnet_port);
             if (n_modbus_port == 0)
-                return;
+                n_modbus_port = 502;
             if (n_bacnet_port == 0)
-                return;
+                n_bacnet_port = 47808;
         }
 
         BYTE address1, address2, address3, address4;
@@ -700,4 +701,10 @@ void CWifiConfigDlg::OnBnClickedButtonWifiDefault()
 {
     // TODO: 在此添加控件通知处理程序代码
     write_one(g_tstat_id, WIFI_LOAD_DEFAULT, 1, 10);
+}
+
+
+void CWifiConfigDlg::OnBnClickedRadioWifiDisable()
+{
+    // TODO: 在此添加控件通知处理程序代码
 }

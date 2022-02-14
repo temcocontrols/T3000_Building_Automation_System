@@ -55,7 +55,7 @@ extern BYTE Rev[4];
 //extern bool some_device_reply_the_broadcast;
 MySocket::MySocket()
 {
-	
+	receive_not_want_ip_times = 0;
 }
 
 MySocket::~MySocket()
@@ -70,7 +70,7 @@ void MySocket::OnAccept(int nErrorCode)
 {
 	CAsyncSocket::OnAccept(nErrorCode);
 }
-
+extern CString ISP_Device_IP;
 //Code by Fance 2013 05 06
 void MySocket::OnReceive(int nErrorCode) 
 {
@@ -108,6 +108,18 @@ void MySocket::OnReceive(int nErrorCode)
                 memset(Product_Name, 0, 12);
 				memcpy_s(Byte_ISP_Device_IP,sizeof(Byte_ISP_Device_IP),receive_buf+11,4);//copy the first 11 byte and check
                 memcpy_s(Product_Name,sizeof(Product_Name),receive_buf+15,11);//copy the first 11 byte and check
+
+				//先检查是不是目标IP地址回复的，优先处理目标IP地址回复的
+				CString temp_reply_ip;
+				temp_reply_ip.Format(_T("%u.%u.%u.%u"), Byte_ISP_Device_IP[0], Byte_ISP_Device_IP[1], Byte_ISP_Device_IP[2], Byte_ISP_Device_IP[3]);
+				if ((temp_reply_ip.CompareNoCase(ISP_Device_IP) != 0) && (receive_not_want_ip_times <10))
+				{
+					receive_not_want_ip_times++;
+					CAsyncSocket::OnReceive(nErrorCode);
+					return;
+				}
+				
+
 			    CString DeviceProductName ,FileProductName;
 
                 MultiByteToWideChar(CP_ACP, 0, (char *)Product_Name,(int)strlen((char *)Product_Name) + 1, DeviceProductName.GetBuffer(MAX_PATH), MAX_PATH);

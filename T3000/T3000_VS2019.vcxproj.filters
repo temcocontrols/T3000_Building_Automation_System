@@ -813,6 +813,9 @@
     <ClCompile Include="CBacnetUnitsSelection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CBacnetBuildingProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -2033,6 +2036,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CBacnetUnitsSelection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBacnetBuildingProperty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

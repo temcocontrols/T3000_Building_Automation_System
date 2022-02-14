@@ -1097,7 +1097,7 @@ BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,i
 
     if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
     {
-        int ret1 = WritePrivateData(deviceid, command, start_instance, end_instance);
+        int ret1 = WritePrivateData_Blocking(deviceid, command, start_instance, end_instance);
         _MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
         pMy_Invoke_id->Invoke_ID = 0;
         pMy_Invoke_id->hwnd = hWnd;
@@ -6558,6 +6558,66 @@ char * intervaltotext(char *textbuf, long seconds , unsigned minutes , unsigned 
     if(textbuf) strcpy(textbuf, buf);
     //return( buf ) ;
     return NULL;
+}
+
+char* intervaltotext_2022_full(char* textbuf, unsigned long var_value, char* c)
+{
+    char buf[12], * textbuffer;
+    char* separator = ":";//c;
+    textbuffer = buf;
+    if (var_value >= 2400000)
+    {
+        strcpy(textbuffer++, "-");
+        return(buf);
+    }
+
+    int hours = 0;
+    int minutes = 0;
+    int seconds = 0;
+    int temp_value = 0;
+    hours = var_value / 100000;
+    temp_value  = var_value % 100000;
+
+    minutes = temp_value / 1000;
+    temp_value = temp_value % 1000;
+
+    seconds = temp_value / 10;
+    if (seconds >= 60)
+    {
+        strcpy(textbuffer++, "-");
+        return(buf);
+    }
+
+
+    if (seconds < 0)
+    {
+        seconds = -seconds;
+        strcpy(textbuffer++, "-");        /* add the '-' */
+    }
+
+    if (hours < 10)
+    {
+        strcpy(textbuffer++, "0");        /* add the leading zero 0#:##:## */
+    }
+    itoa(hours, textbuffer, 10);
+    textbuffer += strlen(textbuffer);
+    strcpy(textbuffer++, separator);        /* add the ":" separator*/
+
+    if (minutes < 10)
+    {
+        strcpy(textbuffer++, "0");        /* add the leading zero ##:0#:## */
+    }
+    itoa(minutes, textbuffer, 10);
+    textbuffer += strlen(textbuffer);
+    strcpy(textbuffer++, separator);        /* add the ":" separator*/
+    if (seconds < 10)
+    {
+        strcpy(textbuffer++, "0");        /* add the leading zero ##:##:0# */
+    }
+    itoa(seconds, textbuffer, 10);
+
+    if (textbuf) strcpy(textbuf, buf);
+    return(buf);
 }
 
 char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c)
@@ -12316,11 +12376,61 @@ void LoadInputData_CS3000()
     m_tstat_input_data.at(0).Filter.StrValue.Format(_T("%d"),product_register_value[136]);
 
     m_tstat_input_data.at(1).Filter.Reg_Property=REG_READ_WRITE;
-    m_tstat_input_data.at(1).Filter.regAddress=136;
-    m_tstat_input_data.at(1).Filter.RegValue=product_register_value[136];
-    m_tstat_input_data.at(1).Filter.StrValue.Format(_T("%d"),product_register_value[136]);
+    m_tstat_input_data.at(1).Filter.regAddress=137;
+    m_tstat_input_data.at(1).Filter.RegValue=product_register_value[137];
+    m_tstat_input_data.at(1).Filter.StrValue.Format(_T("%d"),product_register_value[137]);
 
 }
+
+
+CString GetTextFromRegLength(unsigned short reg,int reg_nlength)
+{
+    CString str_temp = _T("");
+    unsigned short temp_buffer[32];
+    unsigned short temp_buffer_Char[32];
+    unsigned char p[64 + 1] = { '\0' };
+
+    if(reg_nlength > 32)
+        return str_temp;
+
+    for (int i = 0; i < reg_nlength; i++)
+    {
+        temp_buffer[i] = product_register_value[reg + i];
+    }
+
+
+    if (temp_buffer[0] == 0 || temp_buffer[0] == 65535)
+    {
+        return str_temp;
+    }
+    unsigned short Hi_Char, Low_Char;
+
+    for (int i = 0; i < reg_nlength; i++)
+    {
+        Hi_Char = temp_buffer[i];
+        Hi_Char = Hi_Char & 0xff00;
+        Hi_Char = Hi_Char >> 8;
+        Low_Char = temp_buffer[i];
+        Low_Char = Low_Char & 0x00ff;
+        temp_buffer_Char[2 * i] = Hi_Char;
+        temp_buffer_Char[2 * i + 1] = Low_Char;
+    }
+
+
+
+    for (int i = 0; i < reg_nlength * 2; i++)
+    {
+        p[i] = (unsigned char)temp_buffer_Char[i];
+    }
+
+    MultiByteToWideChar(CP_ACP, 0, (char*)p, (int)strlen((char*)p) + 1,
+        str_temp.GetBuffer(MAX_PATH), MAX_PATH);
+    str_temp.ReleaseBuffer();
+
+    return str_temp;
+}
+
+
 #define  THE_CHAR_LENGTH 8
 CString GetTextFromReg(unsigned short reg)
 {
@@ -14276,7 +14386,8 @@ bool bac_Invalid_range(unsigned char nrange)
     if ((nrange > 30) &&
         (nrange != 101) &&
         (nrange != 102) &&
-        (nrange != 103))
+        (nrange != 103) &&
+        (nrange != 104))
     {
         return true;
     }
@@ -14344,7 +14455,7 @@ int Get_Msv_next_Name_and_Value_BySearchName(int ntable, CString nitemname, CStr
     int index = -1;
     for (int i = 0; i < STR_MSV_MULTIPLE_COUNT; i++)
     {
-        if (m_msv_data.at(ntable).msv_data[i].status) //首先要确保 这一行是使能的;
+        if (m_msv_data.at(ntable).msv_data[i].status == 1) //首先要确保 这一行是使能的;
         {
             CString temp_name;
             MultiByteToWideChar(CP_ACP, 0, (char *)m_msv_data.at(ntable).msv_data[i].msv_name,
@@ -14360,7 +14471,7 @@ int Get_Msv_next_Name_and_Value_BySearchName(int ntable, CString nitemname, CStr
                 //顺着找一遍 ,找到对应的下一个;
                 for (int j = i + 1; j < STR_MSV_MULTIPLE_COUNT; j++)
                 {
-                    if (m_msv_data.at(ntable).msv_data[j].status)
+                    if (m_msv_data.at(ntable).msv_data[j].status == 1)
                     {
                         csNextItemString = m_msv_data.at(ntable).msv_data[j].msv_name;
                         nNextValue = m_msv_data.at(ntable).msv_data[j].msv_value;
@@ -14371,7 +14482,7 @@ int Get_Msv_next_Name_and_Value_BySearchName(int ntable, CString nitemname, CStr
                 //如果顺着找没有找到，就回到顺着的第一个;
                 for (int j = 0; j < i; j++)
                 {
-                    if (m_msv_data.at(ntable).msv_data[j].status)
+                    if (m_msv_data.at(ntable).msv_data[j].status == 1)
                     {
                         csNextItemString = m_msv_data.at(ntable).msv_data[j].msv_name;
                         nNextValue = m_msv_data.at(ntable).msv_data[j].msv_value;
@@ -14394,14 +14505,14 @@ int Get_Msv_next_Name_and_Value_BySearchValue(int ntable, int nitemvalue, CStrin
     int index = -1;
     for (int i = 0; i < STR_MSV_MULTIPLE_COUNT; i++)
     {
-        if (m_msv_data.at(ntable).msv_data[i].status) //首先要确保 这一行是使能的;
+        if (m_msv_data.at(ntable).msv_data[i].status == 1) //首先要确保 这一行是使能的;
         {
             if (nitemvalue == m_msv_data.at(ntable).msv_data[i].msv_value)
             {
                 //顺着找一遍 ,找到对应的下一个;
                 for (int j = i+1; j < STR_MSV_MULTIPLE_COUNT; j++)
                 {
-                    if (m_msv_data.at(ntable).msv_data[j].status)
+                    if (m_msv_data.at(ntable).msv_data[j].status == 1)
                     {
                         csNextItemString = m_msv_data.at(ntable).msv_data[j].msv_name;
                         nNextValue = m_msv_data.at(ntable).msv_data[j].msv_value;
@@ -14412,7 +14523,7 @@ int Get_Msv_next_Name_and_Value_BySearchValue(int ntable, int nitemvalue, CStrin
                 //如果顺着找没有找到，就回到顺着的第一个;
                 for (int j = 0; j < i; j++)
                 {
-                    if (m_msv_data.at(ntable).msv_data[j].status)
+                    if (m_msv_data.at(ntable).msv_data[j].status == 1)
                     {
                         csNextItemString = m_msv_data.at(ntable).msv_data[j].msv_name;
                         nNextValue = m_msv_data.at(ntable).msv_data[j].msv_value;
@@ -14432,7 +14543,7 @@ int Get_Msv_Item_Name(int ntable, int nitemvalue,CString &csItemString)
         return  -1;
     for (int i = 0; i < STR_MSV_MULTIPLE_COUNT; i++)
     {
-        if (m_msv_data.at(ntable).msv_data[i].status) //首先要确保 这一行是使能的;
+        if (m_msv_data.at(ntable).msv_data[i].status == 1) //首先要确保 这一行是使能的;
         {
             if (nitemvalue == m_msv_data.at(ntable).msv_data[i].msv_value)
             {

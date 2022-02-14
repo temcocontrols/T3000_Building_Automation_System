@@ -627,7 +627,7 @@ void CCO2NetView::Initial_Window()
         GetDlgItem(IDC_BUTTON_RE_CALIBRATION_DONE)->EnableWindow(0);
     }
 
-
+    m_grid_input.ShowWindow(false);  //隐藏CO2界面的 input  表格
 }
 void CCO2NetView::Show_InputList()
 {

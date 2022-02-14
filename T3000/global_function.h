@@ -24,9 +24,7 @@
 #include "HttpApiDefine.h"
 #include "..\BravocontrolAPI\BravocontrolAPI\HttpAPI\HttpAPI.h"
 #endif
-#ifdef DEBUG
-//#define USE_THIRD_PARTY_FUNC 1
-#endif // DEBUG
+
 
 
 #include <afxinet.h>
@@ -182,6 +180,7 @@ void Localhandler_write_property_ack(
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
 char * intervaltotext(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c =":");
 char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsigned hours,char *c =":");
+char* intervaltotext_2022_full(char* textbuf, unsigned long var_value, char* c);
  DWORD WINAPI   MSTP_Receive(LPVOID lpVoid);
   void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data);
   void local_value_rp_ack_print_data(BACNET_READ_PROPERTY_DATA * data, BACNET_APPLICATION_DATA_VALUE &value);
@@ -254,6 +253,7 @@ void TraverseFolder( const CString& strDir,std::vector<CString>& vecFile);
 void LoadTstat_InputData();
 void LoadInputData_CS3000();
 CString GetTextFromReg(unsigned short reg);
+CString GetTextFromRegLength(unsigned short reg, int reg_nlength);
 CString GetTextFromReg_Buffer(unsigned short reg,unsigned short *Buffer);
 void LoadTstat_OutputData();
 void LoadOutputData_CS3000();

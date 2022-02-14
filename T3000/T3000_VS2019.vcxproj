@@ -218,6 +218,7 @@
     <ClCompile Include="CBacnetBuildingIOPoints.cpp" />
     <ClCompile Include="CBacnetBuildingMain.cpp" />
     <ClCompile Include="CBacnetBuildingManagement.cpp" />
+    <ClCompile Include="CBacnetBuildingProperty.cpp" />
     <ClCompile Include="CBacnetBuildingRoomEditor.cpp" />
     <ClCompile Include="CBacnetBuilidngAddNode.cpp" />
     <ClCompile Include="CBacnetUnitsSelection.cpp" />
@@ -587,6 +588,7 @@
     <ClInclude Include="CBacnetBuildingIOPoints.h" />
     <ClInclude Include="CBacnetBuildingMain.h" />
     <ClInclude Include="CBacnetBuildingManagement.h" />
+    <ClInclude Include="CBacnetBuildingProperty.h" />
     <ClInclude Include="CBacnetBuildingRoomEditor.h" />
     <ClInclude Include="CBacnetBuilidngAddNode.h" />
     <ClInclude Include="CBacnetDescription.h" />

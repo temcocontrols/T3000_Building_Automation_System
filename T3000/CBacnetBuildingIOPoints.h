@@ -26,14 +26,14 @@ public:
 	void Initial_List();
 	ListCtrlEx::CListCtrlEx m_io_list;
 	LRESULT Fresh_Building_IO_List(WPARAM wParam, LPARAM lParam);
+	LRESULT Change_Building_IO_Item(WPARAM wParam, LPARAM lParam);
 	void Fresh_Building_IO_Test_List();
 };
 
-const int BM_IO_NAME = 0;
-const int BM_IO_FULL_LABLE = 1;
-const int BM_IO_AUTO_MANUAL = 2;
-const int BM_IO_VALUE = 3;
-const int BM_IO_UNITE = 4;
-const int BM_IO_RANGE = 5;
-const int BM_IO_DECOM = 6;
-const int BM_IO_TYPE = 7; // Input:dry contact or else    output : digital  annalog 
+const int BM_IO_ITEM = 0;
+const int BM_IO_GROUP_NAME = 1;
+const int BM_IO_CATEGORY_NAME = 2;
+const int BM_IO_HW_POINT = 3;
+const int BM_IO_POINT = 4;
+const int BM_IO_TYPE = 5;
+const int BM_IO_STATUS = 6; // 0 offline   1  online   2 在线未知

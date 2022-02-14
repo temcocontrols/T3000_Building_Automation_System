@@ -42,6 +42,6 @@ typedef struct _BM_dlg_ret
 	int m_BM_ret_type;
 	int m_BM_ret_count;
 	CString m_BM_ret_name;
-	int m_BM_AddDlg_resault;
+	int m_bm_add_dlg_resault;
 }BM_dlg_ret;
 
