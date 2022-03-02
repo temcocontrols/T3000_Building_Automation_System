@@ -1,207 +1,357 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<link href="css/bootstrap.min.css" rel="stylesheet" >	
-<link href="css/bootstrap-select.css" rel="stylesheet" />
-<link href="css/font-awesome.min.css" rel="stylesheet" />
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-select.css" rel="stylesheet" />
+    <link href="css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
 
-<style type="text/css" media="screen">
-    @font-face {
-      font-family: 'FontAwesome';
-      src: url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.eot?v=4.2.0');
-      src: url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'), url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.woff?v=4.2.0') format('woff'), url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.ttf?v=4.2.0') format('truetype'), url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg');
-      font-weight: normal;
-      font-style: normal;
-    }
-</style>
 
-<style type="text/css">
+    <style type="text/css" media="screen">
+        @font-face {
+            font-family: 'FontAwesome';
+            src: url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.eot?v=4.2.0');
+            src: url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'), url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.woff?v=4.2.0') format('woff'), url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.ttf?v=4.2.0') format('truetype'), url('ms-appx-web:///Assets/HTML/fonts/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg');
+            src: url();
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
 
-.box {
-   /* background:red;*/
-    width:50px;
-    height:50px;
-    /*border:black 1px solid;
+    <style type="text/css">
+        .box {
+            /* background:red;*/
+            width: 50px;
+            height: 50px;
+            /*border:black 1px solid;
    /* position:relative;*/
-}
-#box_2 {
-    left:35px;top:35px; /* NOT aligned with grid */
-	background:red;
-    width:50px;
-    height:50px;
-    border:black 1px solid;
-}
-#box_2 {
-    left:65px;top:65px; /* NOT aligned with grid */
-	background:red;
-    width:50px;
-    height:50px;
-    border:black 1px solid;
-}
-
-#canvas {
-    border:solid blue 1px;
-    position: relative;
-    background:whitesmoke url('../res/grid_20.png') repeat;
-}
-tr.selected {
+        }
+        
+        .arrowright {
+            border: solid black;
+            border-width: 0 40px 40px 0;
+            display: inline-block;
+            padding: 40px;
+            transform: rotate(-45deg);
+        }
+        
+        .info {
+            position: absolute;
+            background: transparent;
+            width: 500px;
+            height: auto;
+            border-width: 0px;
+            border: transparent;
+        }
+        
+        #draggable {
+            width: 100px;
+            height: 100px;
+            background: #ccc;
+        }
+        
+        #box_2 {
+            left: 35px;
+            top: 35px;
+            /* NOT aligned with grid */
+            background: red;
+            width: 50px;
+            height: 50px;
+            border: black 1px solid;
+        }
+        
+        #box_2 {
+            left: 65px;
+            top: 65px;
+            /* NOT aligned with grid */
+            background: red;
+            width: 50px;
+            height: 50px;
+            border: black 1px solid;
+        }
+        
+        #canvas {
+            border: solid blue 1px;
+            position: relative;
+            background: whitesmoke url('../res/grid_20.png') repeat;
+        }
+        
+        tr.selected {
             background-color: #e92929 !important;
-    		color:#fff;
+            color: #fff;
             vertical-align: middle;
             padding: 1.5em;
         }
-#graphicFileTable {
-	width: 100%;
-	border-collapse:collapse;
-	text-align:left;
-	color: #606060;
-}
-#graphicFileTable tbody tr:hover
-        {
-            cursor:pointer;
+        
+        #graphicFileTable {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            color: #606060;
+        }
+        
+        #graphicFileTable tbody tr:hover {
+            cursor: pointer;
             /* add gradient */
             background-color: #808080;
             background: -webkit-gradient(linear, left top, left bottom, from(#606060), to(#909090));
             background: -moz-linear-gradient(top, #606060, #909090);
             color: #dadada;
         }
-
-#contextMenu{position:absolute;}
-#contextMenu{
-	border: 1px solid rgb(120 119 119);
-    background: rgb(163 163 163);
-    list-style: none;
-    padding: 1px;
-    border-radius: 5px;
-    color: white;
-    font-size: 14px;
-}
-#contextMenu li{
-	width: 60px;
-    border-radius: 1.5px;
-    padding-left: 6px;
-}
-#contextMenu li:hover
-        {
-            cursor:pointer;
+        
+        #contextMenu {
+            position: absolute;
+        }
+        
+        #contextMenu {
+            border: 1px solid rgb(120 119 119);
+            background: rgb(163 163 163);
+            list-style: none;
+            padding: 1px;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        #contextMenu li {
+            width: 100px;
+            border-radius: 1.5px;
+            padding-left: 6px;
+        }
+        
+        #contextMenu li:hover {
+            cursor: pointer;
             /* add gradient */
             background-color: #808080;
             background: -webkit-gradient(linear, left top, left bottom, from(#606060), to(#909090));
             background: -moz-linear-gradient(top, #606060, #909090);
             color: #dadada;
         }
-#zoomdiv {
-  position: absolute;
-  width: 30px;
-  right: 2px;
-  bottom: 2px;
-}
-
-.zoombtn {
-  padding: 5px;
-  width: 30px;
-  margin: 0px 0px 2px 0px;
-}
-.dropdown-item img{
-
-	width: 20px;
-	height: 20px;
-}
-.dropdown-menu{
-	height: 170px;
-    overflow-y: scroll;
-}
-</style>
+        
+        #FontChange {
+            position: absolute;
+            border: 1px solid rgb(120 119 119);
+            background: rgb(163 163 163);
+            list-style: none;
+            padding: 1px;
+            border-radius: 2px;
+            color: white;
+            font-size: 14px;
+            width: 3px;
+        }
+        
+        #FontChange li {
+            width: 10px;
+            text-align: center;
+            padding-left: 1px;
+        }
+        
+        #FontChange li:hover {
+            cursor: pointer;
+            /* add gradient */
+            background-color: #808080;
+            background: -webkit-gradient(linear, left top, left bottom, from(#606060), to(#909090));
+            background: -moz-linear-gradient(top, #606060, #909090);
+            color: #dadada;
+        }
+        
+        #textmenu {
+            position: absolute;
+        }
+        
+        #textmenu {
+            border: 1px solid rgb(120 119 119);
+            background: rgb(163 163 163);
+            list-style: none;
+            padding: 1px;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .wrap,
+        .wrap canvas {
+            width: 400px;
+            height: 300px
+        }
+        
+        .wrap {
+            position: relative
+        }
+        
+        .wrap>* {
+            position: absolute
+        }
+        
+        .wrap * {
+            position: absolute
+        }
+        
+        #goZX {
+            top: 20px;
+            left: 40px;
+            width: 150px;
+            height: 60px
+        }
+        
+        #textmenu li {
+            width: 100px;
+            border-radius: 1.5px;
+            padding-left: 6px;
+        }
+        
+        #textmenu li:hover {
+            cursor: pointer;
+            /* add gradient */
+            background-color: #808080;
+            background: -webkit-gradient(linear, left top, left bottom, from(#606060), to(#909090));
+            background: -moz-linear-gradient(top, #606060, #909090);
+            color: #dadada;
+        }
+        
+        #zoomdiv {
+            position: absolute;
+            width: 30px;
+            right: 2px;
+            bottom: 2px;
+        }
+        
+        .zoombtn {
+            padding: 5px;
+            width: 30px;
+            margin: 0px 0px 2px 0px;
+        }
+        
+        .dropdown-item img {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .dropdown-menu {
+            height: 170px;
+            overflow-y: scroll;
+        }
+    </style>
 </head>
+
 <body>
-<div class="row" style="margin-left: 5px;">
-		<div id="canvasDiv" class="col-8 col-md-8">
-			<span id="lockAction"><img id="lockIcon" src="../res/unlock.ico" style="height: 5%;position: absolute;top: 4px;z-index: 10;left: 15px;"></span>
-			<canvas id="canvas" >
+
+    <div class="row" style="margin-left: 5px;">
+        <div id="canvasDiv" class="col-8 col-md-8">
+            <span id="lockAction"><img id="lockIcon" src="../res/unlock.ico" style="height: 5%;position: absolute;top: 4px;z-index: 10;left: 15px;"></span>
+            <canvas id="canvas">
 			</canvas>
-			<div id="zoomdiv">
-				<input type="button" class="zoombtn" id="zoomin" value="+" ><input type="button" class="zoombtn" id="zoomout" value="-" >
-			</div>
-			
-		</div>
-		<div class="accordion col-4 col-md-4" id="accordionExample" style="z-index: 10;height: 70%;">
-			<div class="accordion-item">
-				<h2 class="accordion-header" id="headingOne">
-				<button class="accordion-button" id="tab1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            <div id="zoomdiv">
+                <input type="button" class="zoombtn" id="zoomin" value="+"><input type="button" class="zoombtn" id="zoomout" value="-">
+            </div>
+
+        </div>
+        <div class="accordion col-4 col-md-4" id="accordionExample" style="z-index: 10;height: 70%;">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" id="tab1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
 					Objects
 				</button>
-				</h2>
-				<div id="collapseOne" class=" accordion-collapse collapse show" aria-labelledby="headingOne" >
-					<div class="accordion-body">
-						<div class="row">
-							<div class="col-3 col-md-3">
-								<img id="inputElement" object-type="0" class="box" src="../res/default_icon/inputs.ico"/>
-							</div>
-							<div class="col-3 col-md-3" style="margin-top: 5px;">
-								<img id="outputElement" object-type="1" class="box" src="../res/default_icon/outputs2.ico"/>
-							</div>
-							<div class="col-3 col-md-3">
-								<img id="variableElement" object-type="2" class="box" src="../res/default_icon/Variables.ico"/>
-							</div>
-							<div class="col-3 col-md-3" style="margin-top: 5px;">
-								<img id="schedualElement" object-type="3" class="box" src="../res/default_icon/schedual.ico"/>
-							</div>
-							<div class="col-3 col-md-3" style="margin-top: 5px;">
-								<img id="holidayElement" object-type="4" class="box" src="../res/default_icon/Holidays.ico"/>
-							</div>
-							<div class="col-3 col-md-3" style="margin-top: 5px;">
-								<img id="programElement" object-type="5" class="box" src="../res/default_icon/Programs.ico"/>
-							</div><div class="col-3 col-md-3" style="margin-top: 5px;">
-								<img id="graphicElement" object-type="6" class="box" src="../res/default_icon/Graphics2.ico"/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="accordion-item">
-				<h2 class="accordion-header" id="headingTwo">
-				<button class="accordion-button collapsed"  id="tab2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                </h2>
+                <div id="collapseOne" class=" accordion-collapse collapse show" aria-labelledby="headingOne">
+                    <div class="accordion-body">
+                        <div class="row">
+                            <div class="col-3 col-md-3">
+                                <img id="inputElement" object-type="0" class="box" src="../res/default_icon/inputs.ico" />
+                            </div>
+                            <div class="col-3 col-md-3" style="margin-top: 5px;">
+                                <img id="outputElement" object-type="1" class="box" src="../res/default_icon/outputs2.ico" />
+                            </div>
+                            <div class="col-3 col-md-3">
+                                <img id="variableElement" object-type="2" class="box" src="../res/default_icon/Variables.ico" />
+                            </div>
+                            <div class="col-3 col-md-3" style="margin-top: 5px;">
+                                <img id="schedualElement" object-type="3" class="box" src="../res/default_icon/schedual.ico" />
+                            </div>
+                            <div class="col-3 col-md-3" style="margin-top: 5px;">
+                                <img id="holidayElement" object-type="4" class="box" src="../res/default_icon/Holidays.ico" />
+                            </div>
+                            <div class="col-3 col-md-3" style="margin-top: 5px;">
+                                <img id="programElement" object-type="5" class="box" src="../res/default_icon/Programs.ico" />
+                            </div>
+                            <div class="col-3 col-md-3" style="margin-top: 5px;">
+                                <img id="graphicElement" object-type="6" class="box" src="../res/default_icon/Graphics2.ico" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" id="tab2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
 					Shapes
 				</button>
-				</h2>
-				<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" >
-				<div class="accordion-body">
-					<div class="col-12 col-md-12" style="margin-top: 5px;">
-						<!--<img id="box_3" class="box" src="images/rectangle.jfif" />-->
-						
-						<input type="button" id="box_3" class="btn btn-outline-info"  value="Rectangle"/>
-						<input type="button" id="circleBtn" class="btn btn-outline-info"  value="Circle"/>
-					</div>
-				</div>
-				</div>
-			</div>
-			<div class="accordion-item">
-				<h2 class="accordion-header" id="headingThree">
-				<button class="accordion-button collapsed"  id="tab3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+                    <div class="accordion-body">
+                        <div class="col-12 col-md-12" style="margin-top: 5px;">
+                            <!--<img id="box_3" class="box" src="images/rectangle.jfif" />-->
+
+                            <input type="button" id="box_3" class="btn btn-outline-info" value="Rectangle" />
+                            <input type="button" id="circleBtn" class="btn btn-outline-info" value="Circle" />
+                            <input type="button" id="linebtn" class="btn btn-outline-info" value="line" />
+                            <input type="button" id="textbtn" class="btn btn-outline-info" value="text" />
+                            <input type="button" id="pipebtn" class="btn btn-outline-info" value="Pipe" /><br><br>
+                            <input type="button" id="ductbtn" class="btn btn-outline-info" value="duct" /><br><br>
+
+                            <label for="display_color" class=" col-form-label">Change Color</label>
+                            <input type="color" class="btn btn-outline-info" id="display_color" value="changeColor" />
+
+
+                            <label for="Font_Change" class=" col-form-label">Change Font</label>
+                            <select id="Font_Change" class="btn btn-outline-info">
+                                <option value="11">11px</option>
+                                <option value="20">15px </option>
+                                <option value="35">20px </option>
+                                <option value="55">25px </option>
+                                <option value="75">30px </option>
+                                <option value="90">35px </option>
+                                <option value="105">40px </option>
+                                <option value="120">45px</option>
+                                <option value="140">50px</option>
+                                <option value="160">55px</option>
+                                <option value="200">60px</option>
+                        </select>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" id="tab3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
 					Actions
 				</button>
-				</h2>
-				<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" >
-				<div class="accordion-body">
-					<input type="button" class="btn btn-outline-primary" id="selectBtn"  value="Select"/>
-					<input type="button" class="btn btn-outline-danger " id="deleteBtn"  value="Delete"/>
-					<br><br>
-					<i class="fas fa-redo"></i>
-					<!--<button  id="doBtn" class="btn btn-outline-primary"  style="font-size:24px" >Redo</button>-->
-					<input type="button" id="doBtn"  class="btn btn-outline-primary" value="Redo"/>
-					<input type="button" id="unDoBtn"  class="btn btn-outline-info" value="Undo"/>
-					<br><br>
-					<input type="button" class="btn btn-outline-primary" id="NewBtn"  value="New"/>
-					<input type="button" id="saveBtn" class="btn btn-outline-success"  value="Save"/>
-					<input type="button" id="loadBtn" class="btn btn-outline-info"  value="Load"/>
-					<br><br>
-					<input type="button" id="backgroundImgBtn" class="btn btn-outline-info"  value="Add Background Image"/>
-				</div>
-				</div>
-			</div>
-		</div>
-		
-		<!--
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree">
+                    <div class="accordion-body">
+                        <input type="button" class="btn btn-outline-primary" id="selectBtn" value="Select" />
+                        <input type="button" class="btn btn-outline-danger " id="deleteBtn" value="Delete" />
+                        <br><br>
+                        <i class="fas fa-redo"></i>
+                        <!--<button  id="doBtn" class="btn btn-outline-primary"  style="font-size:24px" >Redo</button>-->
+                        <input type="button" id="doBtn" class="btn btn-outline-primary" value="Redo" />
+                        <input type="button" id="unDoBtn" class="btn btn-outline-info" value="Undo" />
+                        <br><br>
+                        <input type="button" class="btn btn-outline-primary" id="NewBtn" value="New" />
+                        <input type="button" id="saveBtn" class="btn btn-outline-success" value="Save" />
+                        <input type="button" id="loadBtn" class="btn btn-outline-info" value="Load" />
+                        <br><br>
+                        <input type="button" id="backgroundImgBtn" class="btn btn-outline-info" value="Add Background Image" />
+                        <br><br></div>
+                </div>
+            </div>
+        </div>
+
+        <!--
 		<div class="col-6 col-md-4">
 			<div class="col-6 col-md-4">
 			<img id="box_1" class="box" src="images/pipe.png"/>
@@ -213,52 +363,54 @@ tr.selected {
 				<img id="box_3" class="box" src="images/rectangle.jfif"/>
 			</div>
 		</div>-->
-	</div>
+    </div>
 
 
-<div class="modal fade" id="selectVariableModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Configuration</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <div class="modal fade" id="selectVariableModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Configuration</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-      </div>
-      <div class="modal-body">
-		  <div class="row"> 
-			<div id="object_details" style="display:none;border: 2px groove;border-radius: 10px;padding-bottom: 10px;margin-bottom: 10px;">
-				<label for="object_type" class="col-form-label obj_value">Object Value:</label>
-					<input class="form-control obj_value" type="text" id="object_value">
-					<br>
-				<label for="object_type" class="col-form-label">Auto/Manual:</label>	
-				<select class="form-control" id="object_auto_manual">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div id="object_details" style="display:none;border: 2px groove;border-radius: 10px;padding-bottom: 10px;margin-bottom: 10px;">
+                            <label for="
+                            " class="col-form-label obj_value">Object Value:</label>
+                            <input class="form-control obj_value" type="text" id="object_value">
+                            <br>
+                            <label for="object_type" class="col-form-label">Auto/Manual:</label>
+                            <select class="form-control" id="object_auto_manual">
 					<option value="0"> Auto </option>
 					<option value="1"> Manual </option>
 				</select>
-				<label for="object_type" class="col-form-label obj_status ">Status:</label>	
-				<select class="form-control obj_status"  id="object_status">
+                            <label for="object_type" class="col-form-label obj_status ">Status:</label>
+                            <select class="form-control obj_status" id="object_status">
 					<option value="0"> OFF </option>
 					<option value="1"> ON </option>
 				</select>
-			</div>
-			<br><hr>
-			 <form>
-				 
-				<div class="row"> 
-					
-					<div class="col-12 col-md-12">
-						<div class="form-group">
-							<label for="object_name" class="col-form-label obj_value">Object Name:</label>
-							<input class="form-control obj_value" type="text" id="object_name">
-						
-						</div>
-					</div>
-					
-					<div class="col-6 col-md-6">
-						<div class="form-group">
-							<label for="object_type" class="col-form-label">Object Type:</label>
-								<select class="form-control" id="object_type" disabled="disabled">
+                        </div>
+                        <br>
+                        <hr>
+                        <form>
+
+                            <div class="row">
+
+                                <div class="col-12 col-md-12">
+                                    <div class="form-group">
+                                        <label for="object_name" class="col-form-label obj_value">Object Name:</label>
+                                        <input class="form-control obj_value" type="text" id="object_name">
+
+                                    </div>
+                                </div>
+
+                                <div class="col-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="object_type" class="col-form-label">Object Type:</label>
+                                        <select class="form-control" id="object_type" disabled="disabled">
 								<option value="0"> Input </option>
 								<option value="1"> Output </option>
 								<option value="2"> Variable </option>
@@ -266,212 +418,193 @@ tr.selected {
 								<option value="4"> Holiday </option>
 								<option value="5"> Program </option>
 								</select>
-						</div>
-					</div>
-					
-					<div class="col-6 col-md-6">
-						<div class="form-group">
-							<label for="object_variables" class="col-form-label">Object Name:</label>
-								<select class="form-control" id="object_variables">
+                                    </div>
+                                </div>
+
+                                <div class="col-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="object_variables" class="col-form-label">Object Name:</label>
+                                        <select class="form-control" id="object_variables">
 								</select>
-						</div>
-					</div>
-					<div class="col-6 col-md-6">
-						<div class="form-group ">
-								<label for="object_display_type" class="col-form-label">Display:</label>
-								<select class="form-control input-group-lg" id="object_display_type">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-6">
+                                    <div class="form-group ">
+                                        <label for="object_display_type" class="col-form-label">Display:</label>
+                                        <select class="form-control input-group-lg" id="object_display_type">
 									
 									<option value="0"> ICON </option>
 									<option value="1"> VALUE </option>
 									<option value="2"> DESCRIPTION </option>
 									<option value="3"> LABEL </option>
 								</select>
-						</div>
-					</div>
-					<div class="col-6 col-md-6">
-						<div class="form-group" >
-							<label for="object_display_color" class=" col-form-label">Color:</label>
-							<input type="color" class="form-control input-group-lg" id="object_display_color" >
-						</div>
-					</div>
-					<div class="col-6 col-md-6">
-						<div class="form-group">
-							<label for="object_display_pos" class="col-form-label">Text Position:</label>
-							<select class="form-control input-group-lg" id="object_display_pos">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="object_display_color" class=" col-form-label">Color:</label>
+                                        <input type="color" class="form-control input-group-lg" id="object_display_color">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="object_display_pos" class="col-form-label">Text Position:</label>
+                                        <select class="form-control input-group-lg" id="object_display_pos">
 								<option value="1"> Top </option>
 								<option value="2"> Bottom </option>
 								<option value="3"> right </option>
 								<option value="4"> Left </option>
 							</select>
-						</div>
-					</div>
-					<div class="col-6 col-md-6">
-						<div class="form-group">
-							<label for="object_display_Size" class="col-form-label">Font Size:</label>
-							<select class="form-control input-group-lg" id="object_display_Size">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="object_display_Size" class="col-form-label">Font Size:</label>
+                                        <select class="form-control input-group-lg" id="object_display_Size">
 								<option value="11"> Small </option>
 								<option value="15"> Normal </option>
 								<option value="20"> Large </option>
 							</select>
-						</div>
-					</div>
-					<div class="col-6 col-md-6">
-						<div class="form-group">
-							<label for="object_icon_size" class="col-form-label">Symbol:</label>
-							<div class="dropdown">
-								<button class="btn  
-										dropdown-toggle" type="button" 
-										id="dropdownMenuButton" 
-										data-toggle="dropdown"
-										aria-haspopup="true" 
-										aria-expanded="false">
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="object_icon_size" class="col-form-label">Symbol:</label>
+                                        <div class="dropdown">
+                                            <button class="btn  
+										dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									Default symbol
 								</button>
-					  
-								<ul class="dropdown-menu" 
-									aria-labelledby="dropdownMenuButton">
-									<li class="dropdown-item" value="Default">
-										<img src=""
-										width="20" height="15" > <a href="#">Default symbol</a></li>
-									<li class="dropdown-item" value="input">
-										<img src="../res/default_icon/inputs.ico"
-										width="20" height="15" > <a href="#">Input</a></li>
-									<li class="dropdown-item"value="output">
-										<img src="../res/default_icon/outputs2.ico" 
-										width="20" height="15" > <a href="#">Output</a></li>
-									<li class="dropdown-item"  value="variable">
-										<img src="../res/default_icon/Variables.ico"  
-										width="20" height="15" > <a href="#">Variable</a></li>
-									<li class="dropdown-item" value="schedual">
-										<img src="../res/default_icon/schedual.ico" 
-										width="20" height="15" > <a href="#">Schedual</a></li>
-									<li class="dropdown-item" value="Holidays">
-											<img src="../res/default_icon/Holidays.ico" 
-											width="20" height="15" > <a href="#">Holidays</a></li>
-									<li class="dropdown-item" value="Programs">
-										<img src="../res/default_icon/Programs.ico" 
-										width="20" height="15" > <a href="#">Programs</a></li>
-									<li class="dropdown-item" value="Graphics">
-										<img src="../res/default_icon/Graphics2.ico" 
-										width="20" height="15" > <a href="#">Graphics</a></li>
-									<li class="dropdown-item" value="Temprature">
-										<img src="../res/default_icon/temp.jfif" 
-										width="20" height="15" > <a href="#">Temprature</a></li>
-									<li class="dropdown-item" value="Temprature">
-											<img src="../res/default_icon/pipe.png" 
-											width="20" height="15" > <a href="#">Pipe</a></li>
-								</ul>
-							</div>
-						</div>
-					</div>
-					<div class="col-6 col-md-6">
-						<div class="form-group">
-							<label for="object_icon_size" class="col-form-label">Symbol Size:</label>
-							<select class="form-control input-group-lg" id="object_icon_size">
+
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <li class="dropdown-item" value="Default">
+                                                    <img src="" width="20" height="15"> <a href="#">Default symbol</a></li>
+                                                <li class="dropdown-item" value="input">
+                                                    <img src="../res/default_icon/inputs.ico" width="20" height="15"> <a href="#">Input</a></li>
+                                                <li class="dropdown-item" value="output">
+                                                    <img src="../res/default_icon/outputs2.ico" width="20" height="15"> <a href="#">Output</a></li>
+                                                <li class="dropdown-item" value="variable">
+                                                    <img src="../res/default_icon/Variables.ico" width="20" height="15"> <a href="#">Variable</a></li>
+                                                <li class="dropdown-item" value="schedual">
+                                                    <img src="../res/default_icon/schedual.ico" width="20" height="15"> <a href="#">Schedual</a></li>
+                                                <li class="dropdown-item" value="Holidays">
+                                                    <img src="../res/default_icon/Holidays.ico" width="20" height="15"> <a href="#">Holidays</a></li>
+                                                <li class="dropdown-item" value="Programs">
+                                                    <img src="../res/default_icon/Programs.ico" width="20" height="15"> <a href="#">Programs</a></li>
+                                                <li class="dropdown-item" value="Graphics">
+                                                    <img src="../res/default_icon/Graphics2.ico" width="20" height="15"> <a href="#">Graphics</a></li>
+                                                <li class="dropdown-item" value="Temprature">
+                                                    <img src="../res/default_icon/temp.jfif" width="20" height="15"> <a href="#">Temprature</a></li>
+                                                <li class="dropdown-item" value="Pipe">
+                                                    <img src="../res/default_icon/pipe.png" width="20" height="15"> <a href="#">Pipe</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="object_icon_size" class="col-form-label">Symbol Size:</label>
+                                        <select class="form-control input-group-lg" id="object_icon_size">
 								<option value="40"> Normal </option>
 								<option value="60"> Small </option>
 								<option value="80"> Large </option>
 							</select>
-						</div>
-					</div>
-			</div>
-			</form>
-		  </div>
-	  </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="selectVariableClose">Cancel</button>
-        <button type="button" class="btn btn-primary" id="selectVariableSave">Save</button>
-      </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="selectVariableClose">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="selectVariableSave">Save</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-
-<div class="modal fade" id="selectGraphicFileModel" tabindex="-1" role="dialog" aria-labelledby="GraphicFileModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-	  <div class="modal-content">
-		<div class="modal-header">
-		  <h5 class="modal-title" id="GraphicFileModalLabel">Select Graphic</h5>
-		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
+    <div class="modal fade " id="selectGraphicFileModel " tabindex="-1 " role="dialog " aria-labelledby="GraphicFileModalLabel " aria-hidden="true ">
+        <div class="modal-dialog " role="document ">
+            <div class="modal-content ">
+                <div class="modal-header ">
+                    <h5 class="modal-title " id="GraphicFileModalLabel ">Select Graphic</h5>
+                    <button type="button " class="close " data-dismiss="modal " aria-label="Close ">
+			<span aria-hidden="true ">&times;</span>
 		  </button>
-		</div>
-		<div class="modal-body">
-			<div class="row"> 
-				<table id="graphicFileTable" >
-				 <thead>
-					 <tr>
-						 <th>Graphic</th>
-					 </tr>
-				 </thead>
-				 <tbody>
-					 <tr>
+                </div>
+                <div class="modal-body ">
+                    <div class="row ">
+                        <table id="graphicFileTable ">
+                            <thead>
+                                <tr>
+                                    <th>Graphic</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer ">
+                    <button type="button " class="btn btn-secondary " data-dismiss="modal " id="selectGraphicClose ">Cancel</button>
+                    <button type="button " class="btn btn-primary " id="selectGraphicSelect " style="display: none; ">Select</button>
+                    <button type="button " class="btn btn-primary " id="selectGraphicLoad ">Load</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-					 </tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-		<div class="modal-footer">
-		  <button type="button" class="btn btn-secondary" data-dismiss="modal" id="selectGraphicClose">Cancel</button>
-		  <button type="button" class="btn btn-primary" id="selectGraphicSelect" style="display: none;">Select</button>
-		  <button type="button" class="btn btn-primary" id="selectGraphicLoad">Load</button>
-		</div>
-	  </div>
-	</div>
-  </div>
-
-  <div class="modal fade" id="NewGraphicNameFileModel" tabindex="-1" role="dialog" aria-labelledby="NewGraphicNameFileModel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-	  <div class="modal-content">
-		<div class="modal-header">
-		  <h5 class="modal-title" id="NewGraphicNameFileModel">New Graphic Name</h5>
-		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
+    <div class="modal fade " id="NewGraphicNameFileModel " tabindex="-1 " role="dialog " aria-labelledby="NewGraphicNameFileModel " aria-hidden="true ">
+        <div class="modal-dialog " role="document ">
+            <div class="modal-content ">
+                <div class="modal-header ">
+                    <h5 class="modal-title " id="NewGraphicNameFileModel ">New Graphic Name</h5>
+                    <button type="button " class="close " data-dismiss="modal " aria-label="Close ">
+			<span aria-hidden="true ">&times;</span>
 		  </button>
-		</div>
-		<div class="modal-body">
-			<div class="row"> 
-				<input type="text" value="" placeholder="Graphic Name" id="NewGraphicName" style="text-transform:uppercase"/>
-			</div>
-		</div>
-		<div class="modal-footer">
-		  <button type="button" class="btn btn-secondary" data-dismiss="modal" id="NewGraphicClose">Cancel</button>
-		  <button type="button" class="btn btn-primary" id="NewGraphicSave">Save</button>
-		</div>
-	  </div>
-	</div>
-  </div>
-  <ul id=contextMenu><li id="menuView" style="display: none;">View</li><li id="menuEdit">Edit</li><li id="menuDelete">Delete</li><li id="menuRotate">Rotate</li></ul>
-</body>
-<script>
-	function ChangeText(oFileInput, sTargetID) {
+                </div>
+                <div class="modal-body ">
+                    <div class="row ">
+                        <input type="text " value=" " placeholder="Graphic Name " id="NewGraphicName " style="text-transform:uppercase " />
+                    </div>
+                </div>
+                <div class="modal-footer ">
+                    <button type="button " class="btn btn-secondary " data-dismiss="modal " id="NewGraphicClose ">Cancel</button>
+                    <button type="button " class="btn btn-primary " id="NewGraphicSave ">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-		document.getElementById(sTargetID).value = oFileInput.value;
-}
-</script>
-<script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity=
-"sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-        crossorigin="anonymous">
+
+    <ul id=contextMenu>
+        <li id="menuView " style="display: none; ">View</li>
+        <li id="menuEdit">Edit</li>
+        <li id="menuDelete">Delete</li>
+        <li id="menuRotate">Rotate</li>
+        <li id="changeFont">Change Font</li>
+        </li>
+    </ul>
+    <script type="text/javascript " src="js/jquery-3.6.0.min.js "></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js " integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj " crossorigin="anonymous ">
     </script>
-      
-    <script src=
-"https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity=
-"sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js " integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo " crossorigin="anonymous ">
     </script>
-      
-    <script src=
-"https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
-        integrity=
-"sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
-        crossorigin="anonymous">
+    <script type="text/javascript " src="js/fabric.min.js "></script>
+    <script type="text/javascript " src="js/fabric.js "></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js " integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI " crossorigin="anonymous ">
     </script>
-<script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/jquery-ui.min.js"></script>
-<script type="text/javascript" src="js/bootstrap.bundle.min.js" ></script>
-<script type="text/javascript" src="js/webview.js"></script>
-   
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+
+    <script type="text/javascript " src="js/bootstrap.min.js "></script>
+    <script type="text/javascript " src="js/jquery-ui.min.js "></script>
+    <script type="text/javascript " src="js/bootstrap.bundle.min.js "></script>
+    <script type="text/javascript " src="js/webview.js "></script>
+    <script></script>
+
 </html>
