@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ …˙≥…µƒ∞¸∫¨Œƒº˛°£
-// π© T3000.rc  π”√
+// Microsoft Visual C++ ÁîüÊàêÁöÑÂåÖÂê´Êñá‰ª∂„ÄÇ
+// ‰æõ T3000.rc ‰ΩøÁî®
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -2657,8 +2657,12 @@
 #define IDC_COMBO_BACNET_UNITS          2639
 #define IDC_STATIC_BACNETIP_UNIT        2640
 #define IDC_COMBO_BACNETIP_UNIT         2641
+
+#define IDC_WEBVIEW_BUTTON              2635
+
 #define IDC_EDIT_NODE_NAME              2642
 #define IDC_COMBO_NODE_TYPE             2643
+
 #define IDC_RADIO_SCROLL_ENABLE         2694
 #define IDC_RADIO_SCROLLBAR_DISABLE     2695
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
@@ -3227,9 +3231,12 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
+
+
 #define _APS_NEXT_RESOURCE_VALUE        792
 #define _APS_NEXT_COMMAND_VALUE         34080
 #define _APS_NEXT_CONTROL_VALUE         2644
+
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

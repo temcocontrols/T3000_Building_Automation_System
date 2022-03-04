@@ -27,7 +27,7 @@
     <UseOfMfc>Static</UseOfMfc>
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -56,10 +56,10 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\T3000 Output\T3000 object\debug\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</EmbedManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\T3000 object\release\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\T3000 object\debug\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</EmbedManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(IncludePath)</IncludePath>
@@ -107,16 +107,19 @@
       <ValidateAllParameters>true</ValidateAllParameters>
     </Midl>
     <ClCompile>
-      <Optimization>MinSpace</Optimization>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SOLUTION_DIR=R"($(SolutionDir))";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>Json-cpp\include;..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -201,6 +204,12 @@
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeb.cpp" />
+    <ClCompile Include="BacnetWebView.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="BacnetWebViewToolBar.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="Bacnet_Range_Msv.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
@@ -286,6 +295,10 @@
     <ClCompile Include="HexFileParser.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
     <ClCompile Include="ISPModeSlove.cpp" />
+    <ClCompile Include="Json-cpp\dist\jsoncpp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</BasicRuntimeChecks>
+    </ClCompile>
     <ClCompile Include="LanguageLocale.cpp" />
     <ClCompile Include="LCOutNameConfig.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
@@ -406,6 +419,7 @@
     <None Include="OutputTableDlg.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="packages.config" />
     <None Include="res\AlarmsBrown.bmp" />
     <None Include="res\AlarmsGreen.bmp" />
     <None Include="res\AlarmsRed.bmp" />
@@ -569,6 +583,9 @@
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="BacnetWeb.h" />
+    <ClInclude Include="BacnetWebView.h" />
+    <ClInclude Include="BacnetWebViewDropTarget.h" />
+    <ClInclude Include="BacnetWebViewToolBar.h" />
     <ClInclude Include="Bacnet_Include.h" />
     <ClInclude Include="Bacnet_Range_Msv.h" />
     <ClInclude Include="BADO\BADO.h" />
@@ -653,6 +670,7 @@
     <ClInclude Include="DebugWindow.h" />
     <ClInclude Include="DetectOnlineDlg.h" />
     <ClInclude Include="DialogCM5_BacNet.h" />
+    <ClInclude Include="dirent.h" />
     <ClInclude Include="DisplayConfig.h" />
     <ClInclude Include="DisplayLEDLCDConfig.h" />
     <ClInclude Include="DllFunction.h" />
@@ -672,6 +690,8 @@
     <ClInclude Include="HexFileParser.h" />
     <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="ISPModeSlove.h" />
+    <ClInclude Include="Json-cpp\dist\json\json-forwards.h" />
+    <ClInclude Include="Json-cpp\dist\json\json.h" />
     <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="LCOutNameConfig.h" />
     <ClInclude Include="ModbusToBacnetRouterDlg.h" />
@@ -823,10 +843,19 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1072.54\build\native\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1072.54\build\native\Microsoft.Web.WebView2.targets')" />
+    <Import Project="..\packages\Microsoft.Windows.ImplementationLibrary.1.0.211019.2\build\native\Microsoft.Windows.ImplementationLibrary.targets" Condition="Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.211019.2\build\native\Microsoft.Windows.ImplementationLibrary.targets')" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties _x007B_E8789EA8-CA99-48DF-B920-1A1DCB4FF6AD_x007D_="CForms1" _x007B_8856F961-340A-11D0-A96B-00C04FD705A2_x007D_="CWebBrowser2" _x007B_3A2B370C-BA0A-11D1-B137-0000F8753F5D_x007D_="CMschart1" RESOURCE_FILE="T3000.rc" _x007B_6262D3A0-531B-11CF-91F6-C2863C385E30_x007D_="CMsflexgrid1" _x007B_232E456A-87C3-11D1-8BE3-0000F8754DA1_x007D_="CMonthview1" />
     </VisualStudio>
   </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.1072.54\build\native\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.1072.54\build\native\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.211019.2\build\native\Microsoft.Windows.ImplementationLibrary.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.ImplementationLibrary.1.0.211019.2\build\native\Microsoft.Windows.ImplementationLibrary.targets'))" />
+  </Target>
 </Project>

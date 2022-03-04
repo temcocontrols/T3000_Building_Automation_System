@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ÷–Œƒ(ºÚÃÂ£¨÷–π˙) resources
+// ‰∏≠Êñá(ÁÆÄ‰ΩìÔºå‰∏≠ÂõΩ) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -268,7 +268,7 @@ BEGIN
     LTEXT           "Panel",IDC_STATIC,451,223,19,8,NOT WS_VISIBLE
     LTEXT           "Output Board",IDC_STATIC,449,283,43,8
     LTEXT           "Output",IDC_STATIC,451,313,22,8
-    PUSHBUTTON      "°˚ADD",IDC_BUTTON_ADD,416,310,28,14
+    PUSHBUTTON      "‚ÜêADD",IDC_BUTTON_ADD,416,310,28,14
     LTEXT           "OUTPUTS",IDC_STATIC,210,217,36,8
     LTEXT           "ADD OUTPUTS",IDC_STATIC,420,210,53,8
     LTEXT           "MAP MODE",IDC_STATIC,503,216,40,8
@@ -1129,7 +1129,7 @@ CAPTION "Register Viewer"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     EDITTEXT        IDC_EDIT_PRODUCTNAME,68,8,60,14,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "ProductName£∫",IDC_STATIC_PRODUCTNAME,10,11,52,8
+    LTEXT           "ProductNameÔºö",IDC_STATIC_PRODUCTNAME,10,11,52,8
     EDITTEXT        IDC_CELLEDIT,155,8,40,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
     PUSHBUTTON      "Button1",IDOK,305,7,50,14,NOT WS_VISIBLE
     LTEXT           "",IDC_COLNAME,367,13,30,8
@@ -1146,6 +1146,7 @@ BEGIN
     CONTROL         "",IDC_LIST_SCREEN,"SysListView32",LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,15,461,304
     PUSHBUTTON      "Show Graphic",IDC_BUTTON_GRAPHIC_INSERT,7,321,84,31
     EDITTEXT        IDC_EDIT_BACNET_SCREEN_PIC_FILE,244,326,62,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    PUSHBUTTON      "WEBVIEW (Beta)",IDC_WEBVIEW_BUTTON,97,323,77,29
 END
 
 IDD_GRID_LAB DIALOGEX 0, 0, 93, 21
@@ -1696,7 +1697,7 @@ BEGIN
     EDITTEXT        IDC_NUM_SENSOR,235,7,45,14,ES_AUTOHSCROLL
     LTEXT           "Test State:",IDC_STATIC,122,77,37,8
     GROUPBOX        "Calibration Points",IDC_STATIC,7,110,229,222,BS_CENTER
-    LTEXT           "Temp[°Ê]",IDC_STATIC_TEMP_CP,26,141,35,8
+    LTEXT           "Temp[‚ÑÉ]",IDC_STATIC_TEMP_CP,26,141,35,8
     LTEXT           "Hum[%]",IDC_STATIC,60,141,31,8
     LTEXT           "NO",IDC_STATIC_NO_CALIPOINT,11,141,11,8
     LTEXT           "Time[min]",IDC_STATIC_CP_TIME,130,141,33,8
@@ -7076,7 +7077,14 @@ BEGIN
     0
 END
 
+
+IDD_DIALOG_BACNET_SCREENS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 IDD_DIALOG_BACNET_BUILDING_PROPERTY AFX_DIALOG_LAYOUT
+
 BEGIN
     0
 END
@@ -7161,12 +7169,12 @@ BEGIN
     ID_TOOLS_MODBUSTOBACNETROUTER "Subnet Devices"
 END
 
-#endif    // ÷–Œƒ(ºÚÃÂ£¨÷–π˙) resources
+#endif    // ‰∏≠Êñá(ÁÆÄ‰ΩìÔºå‰∏≠ÂõΩ) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// ”¢”Ô(√¿π˙) resources
+// Ëã±ËØ≠(ÁæéÂõΩ) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -7452,7 +7460,7 @@ BEGIN
                     "{6262D3A0-531B-11CF-91F6-C2863C385E30}",WS_TABSTOP,16,283,143,164
     CONTROL         "",IDC_OUTPUT_MSFLEXGRID,
                     "{6262D3A0-531B-11CF-91F6-C2863C385E30}",WS_TABSTOP,170,283,143,164
-    LTEXT           "∞C",IDC_STATICUNINT_T,174,128,9,8,NOT WS_VISIBLE
+    LTEXT           "Áôà",IDC_STATICUNINT_T,174,128,9,8,NOT WS_VISIBLE
     GROUPBOX        "Home",IDC_STATIC2SP,293,16,110,171,BS_LEFT,WS_EX_TRANSPARENT
     GROUPBOX        "Work",IDC_STATIC1SP,410,16,93,170,BS_LEFT,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,294,27,109,160,0,WS_EX_TRANSPARENT
@@ -11684,12 +11692,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // ”¢”Ô(√¿π˙) resources
+#endif    // Ëã±ËØ≠(ÁæéÂõΩ) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// ”¢”Ô(”¢π˙) resources
+// Ëã±ËØ≠(Ëã±ÂõΩ) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -11795,7 +11803,7 @@ BEGIN
     0
 END
 
-#endif    // ”¢”Ô(”¢π˙) resources
+#endif    // Ëã±ËØ≠(Ëã±ÂõΩ) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -33,7 +33,7 @@ public:
 	afx_msg LRESULT InputMessageCallBack(WPARAM wParam, LPARAM lParam);
 
 	LRESULT InputMessageCallBack_Tstat(WPARAM wParam, LPARAM lParam);
-
+	void GetInputUnitandValue(int i, CString& unit, CString& value);
 	void Initial_List();
 	void Initial_ListFor_Tstat();
 	void Reload_Unit_Type();
