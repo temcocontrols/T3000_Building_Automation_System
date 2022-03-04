@@ -355,7 +355,7 @@ bool address_get_by_device(
 
     pMatch = Address_Cache;
     while (pMatch <= &Address_Cache[MAX_ADDRESS_CACHE - 1]) {
-        if (/*((pMatch->Flags & BAC_ADDR_IN_USE) != 0) &&*/
+        if (((pMatch->Flags & BAC_ADDR_IN_USE) != 0) &&
             (pMatch->device_id == device_id)) {
             if ((pMatch->Flags & BAC_ADDR_BIND_REQ) == 0) {     /* If bound then fetch data */
                 *src = pMatch->address;

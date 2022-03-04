@@ -45,7 +45,7 @@ public:
 private:
 	char receive_buf[4096];
 	int Receive_data_length;
-	
+	int receive_not_want_ip_times;
 };
 
 

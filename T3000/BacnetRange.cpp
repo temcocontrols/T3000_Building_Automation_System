@@ -399,9 +399,9 @@ void BacnetRange::Initial_static()
 		
 		if(bac_ranges_type == VARIABLE_RANGE_ANALOG_TYPE)
 		{
-			if((bac_range_number_choose> 33) &&
-                (bac_range_number_choose != 101) && (bac_range_number_choose != 102) && (bac_range_number_choose != 103) && (bac_range_number_choose != 104))
-				bac_range_number_choose = 1;
+			//if((bac_range_number_choose> 33) &&
+   //             (bac_range_number_choose != 101) && (bac_range_number_choose != 102) && (bac_range_number_choose != 103) && (bac_range_number_choose != 104))
+			//	bac_range_number_choose = 1;
 			if(bac_range_number_choose == 0)
 			{
 				temp_cs.Format(_T("%d"),bac_range_number_choose);
@@ -929,7 +929,10 @@ void BacnetRange::Initial_static()
                 GetDlgItem(IDC_RADIO58)->EnableWindow(1);
             }
         }
-        
+		else if ((Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) && (input_list_line == 4))
+		{
+			GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
+		}
 		else
 		{
 			GetDlgItem(IDC_RADIO69)->EnableWindow(TRUE);	

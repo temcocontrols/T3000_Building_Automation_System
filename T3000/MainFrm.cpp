@@ -371,6 +371,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
         ON_UPDATE_COMMAND_UI(ID_APP_ABOUT, &CMainFrame::OnUpdateAppAbout)
         ON_COMMAND(ID_DATABASE_BUILDINGMANAGEMENT, &CMainFrame::OnDatabaseBuildingManagement)
         ON_COMMAND(ID_VIEW_REFRESH, &CMainFrame::OnViewRefresh)
+        ON_COMMAND(ID_FILE_NEWPROJECT, &CMainFrame::OnFileNewproject)
+#ifndef LOCAL_DB_FUNCTION
+        ON_UPDATE_COMMAND_UI(ID_FILE_NEWPROJECT, &CMainFrame::OnUpdateFileNewproject)
+#endif
         END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -1012,6 +1016,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 #endif
 
+#ifdef LOCAL_DB_FUNCTION
+
+#endif
+
     // 需要执行线程中的操作时
 #if 0      //2018 0409 fandu 屏蔽
     if (m_lasttime_tree_node.protocol == Modbus_Serial)
@@ -1283,6 +1291,13 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
     hSelItem = m_pTreeViewCrl->HitTest(pt);
     if(hSelItem == NULL)
         return;
+
+    if (b_building_management_flag)
+    {
+        DoConnectToANode(hSelItem);
+        return;
+    }
+
     RECT r;
     if (pt.x <= 104)  //点击展开或者折叠时，不会像以前一样还拼命加载界面;
     {
@@ -6364,7 +6379,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
     
     if(message==WM_MYMSG_REFRESHBUILDING)
     {
-        if (b_Building_Management_Flag) //处于Building 管理模式 不要刷新Tree
+        if (b_building_management_flag) //处于Building 管理模式 不要刷新Tree
             return 0;
         //Sleep(1000);
         //AfxMessageBox(_T("There is no default building,please select a building First."));
@@ -6910,6 +6925,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
     UINT nSelectSerialNumber;
     bac_gloab_panel = 0;
     CString temp_serial_number;
+
+#ifdef LOCAL_DB_FUNCTION
+    if (DoConnectDB_TreeNode(hTreeItem))
+        return;
+#endif
+
     for (UINT i = 0; i<m_product.size(); i++)
     {
         if (hSelItem == m_product.at(i).product_item)
@@ -8034,7 +8055,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 if (read_name >= 0)
                 {
                     CString CS_Name;
-                    CS_Name.Format(_T("%s"), GetTextFromReg(panel_name_start_reg));
+                    //CS_Name.Format(_T("%s"), GetTextFromReg(panel_name_start_reg));
+                    CS_Name = GetTextFromRegLength(panel_name_start_reg, 8);
                     if (CS_Name.IsEmpty())
                     {
                         Sleep(1);
@@ -9663,7 +9685,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 {
     for (UINT i = 0; i < m_product.size(); i++)
     {
-        if (b_Building_Management_Flag) //处于Building编辑模式 ，就退出
+        if (b_building_management_flag) //处于Building编辑模式 ，就退出
             return 0;
 
         tree_product tp = m_product.at(i);
@@ -9868,7 +9890,7 @@ UINT _FreshTreeView(LPVOID pParam )
 
 
         WaitForSingleObject(Read_Mutex, INFINITE);//Add by Fance .
-        if ((b_pause_refresh_tree) || (b_Building_Management_Flag))
+        if ((b_pause_refresh_tree) || (b_building_management_flag))
         {
             if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
             {
@@ -12051,11 +12073,11 @@ void CMainFrame::OnControlWeekly()
 
 
     }
-    else if ((g_protocol == MODBUS_RS485) ||  //RS485 下面挂T3 MINIPANEL
-        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
+    else if (((g_protocol == MODBUS_RS485) ||  //RS485 下面挂T3 MINIPANEL
+        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485)) &&   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
+        Bacnet_Private_Device(product_type))
     {
-        if(Bacnet_Private_Device(product_type))
-        {
+
             if (BacNet_hwd == NULL)
             {
                 SwitchToPruductType(DLG_BACNET_VIEW);
@@ -12075,7 +12097,7 @@ void CMainFrame::OnControlWeekly()
             CString temp_ui;
             temp_ui.Format(_T("%u"), TYPE_WEEKLY);
             WritePrivateProfileString(_T("LastView"), _T("FistLevelViewUI"), temp_ui, g_cstring_ini_path);
-        }
+
     }
     else
     {
@@ -15134,7 +15156,7 @@ void CMainFrame::OnDatabaseBuildingManagement()
 
 
     // TODO: 在此添加命令处理程序代码
-    b_Building_Management_Flag = true;
+    b_building_management_flag = true;
 
     ClearBuilding();
     m_pTreeViewCrl->DeleteAllItems();
@@ -15168,3 +15190,101 @@ DWORD WINAPI  CMainFrame::DetectYabbeThread(LPVOID lpVoid)
     return 1;
 }
 
+
+#include "BacnetMessageInput.h"
+void CMainFrame::OnFileNewproject()
+{
+#ifdef LOCAL_DB_FUNCTION
+
+    CString temp_device_db;
+    // TODO: 在此添加命令处理程序代码
+    bacnet_message_input_title.Format(_T("Please input a project name "));
+    CBacnetMessageInput temp_dlg;
+    temp_dlg.DoModal();
+    CString temp_project_name = bacnet_message_return_string;
+    temp_project_name.Trim();
+    if (temp_project_name.IsEmpty())
+    {
+        return;
+    }
+    
+    //1. 检查当前building下是否存在 DeviceDatabase.mdb ， 如果没有 就拷贝资源文件的数据库至Building文件夹下.
+    //2. PathFileExists
+    //CString 
+#endif
+
+
+}
+
+#ifndef LOCAL_DB_FUNCTION
+
+
+void CMainFrame::OnUpdateFileNewproject(CCmdUI* pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    pCmdUI->SetCheck(0);
+    pCmdUI->Enable(0);
+}
+#else
+int CMainFrame::DoConnectDB_TreeNode(const HTREEITEM& hTreeItem)
+{
+    if (b_building_management_flag)
+    {
+        CBacnetBMD* temp_bnode = NULL;
+        temp_bnode = &m_pTreeViewCrl->m_BMpoint->BuildingNode;
+        if (temp_bnode->h_treeitem == hTreeItem)
+        {
+            MessageBox(temp_bnode->m_csName);
+            return 1;
+        }
+        else
+        {
+            for (int i = 0; i < temp_bnode->m_child_count; i++)
+            {
+                CBacnetBMD* temp_group = NULL;
+                temp_group = temp_bnode->pchild[i];
+                if (hTreeItem == temp_group->h_treeitem)
+                {
+                    MessageBox(temp_group->m_csName);
+                    return 1;
+                }
+                else
+                {
+                    for (int j = 0; j < temp_group->m_child_count; j++)
+                    {
+                        CBacnetBMD* temp_device_node = NULL;
+                        temp_device_node = temp_group->pchild[j];
+                        if (hTreeItem == temp_device_node->h_treeitem)
+                        {
+                            if (temp_device_node->m_node_type == TYPE_BM_NODES)
+                            {
+
+                            }
+                            MessageBox(temp_device_node->m_csName);
+                            return 1;
+                        }
+                        else
+                        {
+                            for (int k = 0; k < temp_device_node->m_child_count; k++)
+                            {
+                                CBacnetBMD* temp_io_node = NULL;
+                                temp_io_node = temp_device_node->pchild[k];
+
+                                if (hTreeItem == temp_io_node->h_treeitem)
+                                {
+                                    MessageBox(temp_io_node->m_csName);
+                                    return 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+       
+
+        return 1;
+    }
+    return 0;
+}
+#endif // LOCAL_DB_FUNCTION

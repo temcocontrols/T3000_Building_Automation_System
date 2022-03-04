@@ -570,6 +570,13 @@ public:
         afx_msg void OnUpdateAppAbout(CCmdUI *pCmdUI);
 		afx_msg void OnDatabaseBuildingManagement();
 		afx_msg void OnViewRefresh();
+		afx_msg void OnFileNewproject();
+#ifndef LOCAL_DB_FUNCTION
+		afx_msg void OnUpdateFileNewproject(CCmdUI* pCmdUI);
+		
+#else
+		int    DoConnectDB_TreeNode(const HTREEITEM& hTreeItem);
+#endif
 };
 
 //tree0412  2017 05 11 fance change
