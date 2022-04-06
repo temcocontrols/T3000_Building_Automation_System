@@ -39,7 +39,7 @@ CComWriter::CComWriter(void)
     m_nBautrate = 0;			// ²¨ÌØÂÊ
     m_com_flash_binfile = 0;
     m_pWorkThread = NULL;
-
+    continue_com_flash_count = 0;
     m_bStopWrite = FALSE;
 
     m_nHexFileType = HEXFILE_DATA;
@@ -974,10 +974,13 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             if(itemp<RETRY_TIMES)
             {
 
-                    if (-2 == write_multi(m_ID, &register_data[ii], ii, 128))//to write multiple 128 bytes
-                        itemp++;
-                    else
-                        itemp = 0;
+                if (-2 == write_multi(m_ID, &register_data[ii], ii, 128))//to write multiple 128 bytes
+                {
+                    itemp++;
+                    Sleep(300);
+                }
+                else
+                    itemp = 0;
 
             }
             else
@@ -1649,6 +1652,41 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
                 Sleep(500); //Must delay here
 
+            }
+
+            if ((Device_infor[7] == 88) && (nFlashRet > 0))
+            {
+                int temp_flag = 0;
+                temp_flag = read_one(pWriter->m_szMdbIDs[i], 23, 5);
+                CString strText;
+                if (temp_flag == 0x51)
+                {
+                    strText.Format(_T("|ID %d: update esp_ota_end failed."), pWriter->m_szMdbIDs[i]);
+                    pWriter->OutPutsStatusInfo(strText);
+                    nFlashRet = -1;
+                }
+                else if (temp_flag == 0x52)
+                {
+                    strText.Format(_T("|ID %d: esp_ota_set_boot_partition  failed."), pWriter->m_szMdbIDs[i]);
+                    pWriter->OutPutsStatusInfo(strText);
+                    nFlashRet = -1;
+                }
+                else if (temp_flag == 0x53)
+                {
+                    strText.Format(_T("|ID %d: esp ota success."), pWriter->m_szMdbIDs[i]);
+                    pWriter->OutPutsStatusInfo(strText);
+                    nFlashRet = 1;
+                }
+                else if (temp_flag < 0)
+                {
+                    nFlashRet = 1;
+                }
+                else
+                {
+                    strText.Format(_T("|ID %d: Device update status unknown."), pWriter->m_szMdbIDs[i]);
+                    pWriter->OutPutsStatusInfo(strText);
+                    nFlashRet = 1;
+                }
             }
 
             if(nFlashRet > 0) // flash success            {
@@ -2502,7 +2540,12 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                     CString temp_net;
                     temp_net = _T(".");
                     srtInfo = _T("|Erasing device";);
-                    for (size_t x = 0; x < 14; x++)
+                    int delay_count = 14;
+                    if ((Device_infor[7] >= 210) && (Device_infor[7] <= 216))
+                    {
+                        delay_count = 4;
+                    }
+                    for (size_t x = 0; x < delay_count; x++)
                     {
                         srtInfo = srtInfo + _T(".");                       
                         pWriter->OutPutsStatusInfo(srtInfo,1);

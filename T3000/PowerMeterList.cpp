@@ -151,7 +151,7 @@ void CPowerMeterList::Initial_List()
     CString temp_item;
     temp_item.Format(_T("Voltage Frequency"));
     m_powermeter_list.InsertItem(POWERMETER_VOLTAGE_FREQUENCY, temp_item);
-    m_powermeter_list.SetItemText(POWERMETER_VOLTAGE_FREQUENCY, 4, _T("HZ"));
+    m_powermeter_list.SetItemText(POWERMETER_VOLTAGE_FREQUENCY, 4, _T("Hz"));
     //temp_item.Format(_T("Powermeter Period"));
     //m_powermeter_list.InsertItem(POWERMETER_PERIOD, temp_item);
 

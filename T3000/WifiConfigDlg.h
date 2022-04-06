@@ -66,6 +66,7 @@ public:
     afx_msg void OnBnClickedRadioIpAuto();
     afx_msg void OnBnClickedRadioIpStatic();
     afx_msg void OnBnClickedButtonWifiDefault();
+	afx_msg void OnBnClickedRadioWifiDisable();
 };
 
 

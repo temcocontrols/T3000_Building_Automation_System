@@ -123,7 +123,7 @@ protected:
 	CWinThread*	m_pThread;
 
 public:
-	CString ISP_Device_IP;
+	
     CString m_StrProductName;
     CString m_StrRev;
     CString m_StrFileProductName;

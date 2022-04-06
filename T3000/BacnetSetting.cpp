@@ -255,7 +255,14 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
     temp_time = CTime::GetCurrentTime();
 
     pc_time_to_basic_delt = n_tempBias * 360 / 10;
-
+    CString temp_debug;
+    CString temp_debug1;
+    CString temp_debug2;
+    CString temp_debug3;
+    temp_debug1.Format(_T("lp_time_zone.Bias = %d\r\n"), lp_time_zone.Bias);
+    temp_debug2.Format(_T("n_tempBias = %d\r\n"), n_tempBias);
+    temp_debug3.Format(_T("pc_time_to_basic_delt = %d\r\n"), pc_time_to_basic_delt);
+    //MessageBox(temp_debug1);
 
     switch (command_type)
     {
@@ -1169,10 +1176,17 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             //short computer_DaylightBias = tzi.DaylightBias * 60;
 #pragma region MyRegion
             short computer_DaylightBias;
-            GetTimeZoneInformation(&tzi);
-            computer_DaylightBias = tzi.DaylightBias * 60;
+            int temp_ret = GetTimeZoneInformation(&tzi); // 茶洗的电脑 没有开 夏令时 获取tzi.DaylightBias 居然等于-60 导致 显示少一个小时;
+            //if (temp_ret == TIME_ZONE_ID_INVALID)
+                computer_DaylightBias = 0;
+           // else
+            //    computer_DaylightBias = tzi.DaylightBias * 60;
             //**********************************************************
             panel_time_to_basic_delt = Device_Basic_Setting.reg.time_zone * 360 / 10;
+
+            CString temp_debug4;
+
+            temp_debug4.Format(_T("panel_time_to_basic_delt = %d\r\n"), panel_time_to_basic_delt);
 
             //因为本地CDateTimeCtrl 在设置时间的时候 会默认 加上 电脑的时区，但是显示的时候要显示 设备所选时区，所以 要 变换.
             time_t scale_time;
@@ -1219,6 +1233,12 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             else
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
             TimeTemp = scale_time + computer_DaylightBias;
+            CString temp_debug5;
+            temp_debug5.Format(_T("computer_DaylightBias = %d\r\n"), computer_DaylightBias);
+            CString temp_debug6;
+            temp_debug6.Format(_T("GetTimeZoneInformation = %d\r\n"), temp_ret);
+            temp_debug = temp_debug1 + temp_debug2 + temp_debug3 + temp_debug4 + temp_debug5 + temp_debug6;
+            //MessageBox(temp_debug);
 #pragma endregion
 
 #if 0
@@ -1455,6 +1475,8 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
                        ((CEdit *)m_page_time.GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(strTime);
                    }
                }
+               else
+                   SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("SYNC Timer Server failed.Please try again."));
                m_page_time.GetDlgItem(IDC_BUTTON_SYNC_TIME)->EnableWindow(TRUE);
 
 		}

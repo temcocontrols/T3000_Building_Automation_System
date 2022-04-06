@@ -1174,6 +1174,8 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
                     SaveBacnetBinaryFile(temp_file);
+
+					//SaveDeviceDataIntoAccessDB()
 				}
 
 
@@ -6869,7 +6871,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		{
 			for (int x = 0; x < 2; x++)
 			{
-				Custom_Msv_Range[x].Empty();
+				Custom_Msv_Range[2 * x].Empty();
+				Custom_Msv_Range[2 * x + 1].Empty();
 				CString temp_cs;
 				if (GetPrivateData_Blocking(g_bac_instance, READ_MSV_COMMAND, 2 * x, 2*x + 1, sizeof(Str_MSV)) > 0)
 				{
@@ -7408,7 +7411,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         }
         if (read_result)
         {
-            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Iutputs OK!"));
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Inputs OK!"));
 
             for (int i = 0;i < BAC_INPUT_ITEM_COUNT;i++)
             {
@@ -8084,6 +8087,10 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
          {
              g_protocol_support_ptp = PROTOCOL_MB_PTP_TRANSFER;
          }
+		 else if (read_data[7] == PM_ESP32_T3_SERIES)
+		 {
+			 g_protocol_support_ptp = PROTOCOL_MB_PTP_TRANSFER;
+		 }
          else
          {
              g_protocol_support_ptp = PROTOCOL_UNKNOW;

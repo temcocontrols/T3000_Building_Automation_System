@@ -6,9 +6,9 @@
 #include "BacnetAlarmLog.h"
 #include "afxdialogex.h"
 #include "global_function.h"
+#include "MainFrm.h"
 
-
-
+extern tree_product selected_product_Node; // 选中的设备信息;
 // CBacnetAlarmLog dialog
 
 IMPLEMENT_DYNAMIC(CBacnetAlarmLog, CDialogEx)
@@ -302,7 +302,10 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 			break;
 		}
 	}
-	
+#ifdef LOCAL_DB_FUNCTION
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_ALARMM, 16, selected_product_Node.serial_number);
+#endif
 
 	return 0;
 }
