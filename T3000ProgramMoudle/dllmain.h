@@ -15,5 +15,5 @@ typedef struct
 
 }decode_str;
 
-extern "C" __declspec(dllexport) int Encode_function(char* input_text, encode_str * encodestr);
+extern "C" __declspec(dllexport) encode_str* Encode_function(char* input_text);
 extern "C" __declspec(dllexport) char* Decode_function(char* input_code, decode_str * decodestr);
