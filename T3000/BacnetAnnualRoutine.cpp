@@ -11,11 +11,12 @@
 #include "global_function.h"
 #include "global_define.h"
 #include "BacnetRange.h"
-
+#include "MainFrm.h"
 #include "AnnualRout_InsertDia.h"
+
 // BacnetAnnualRoutine dialog
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
-
+extern tree_product selected_product_Node; // 选中的设备信息;
 IMPLEMENT_DYNAMIC(BacnetAnnualRoutine, CDialogEx)
 
 extern vector <int>  m_Annual_data_instance;
@@ -399,7 +400,11 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_List(WPARAM wParam,LPARAM lPar
 		}
 	}
 	copy_data_to_ptrpanel(TYPE_WEEKLY);
-	//MessageBox("1");
+#ifdef LOCAL_DB_FUNCTION
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_HOL, 4, selected_product_Node.serial_number);
+#endif
+	
 	return 0;
 }
 

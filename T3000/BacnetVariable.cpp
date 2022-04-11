@@ -360,14 +360,23 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		{
 			if(m_Variable_data.at(i).range == 20)	//如果是时间;
 			{
-				m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
+				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
 				char temp_char[50];
-				int time_seconds = m_Variable_data.at(i).value / 1000;
-				intervaltotextfull(temp_char,time_seconds,0,0);
 				CString temp_11;
-				MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
-					temp_11.GetBuffer(MAX_PATH), MAX_PATH );
-				temp_11.ReleaseBuffer();		
+				if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
+				{			
+					int time_seconds = m_Variable_data.at(i).value / 1000;
+					intervaltotextfull(temp_char, time_seconds, 0, 0);
+
+				}
+				else
+				{
+					int time_seconds = m_Variable_data.at(i).value;
+					intervaltotext_2022_full(temp_char, time_seconds, 0);
+				}
+				MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1,
+					temp_11.GetBuffer(MAX_PATH), MAX_PATH);
+				temp_11.ReleaseBuffer();
 				m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_11);
 
 			}
@@ -454,7 +463,10 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 
 	}
 	copy_data_to_ptrpanel(TYPE_VARIABLE);
-
+#ifdef LOCAL_DB_FUNCTION
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_VAR, variable_item_limit_count, selected_product_Node.serial_number);
+#endif
 	return 0;
 }
 LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
@@ -983,7 +995,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		if(m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
 		{
 			bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
-			if(  ( m_Variable_data.at(lRow).range > (sizeof(Variable_Analog_Units_Array) / sizeof(Variable_Analog_Units_Array[0]))) &&
+			if(  ( m_Variable_data.at(lRow).range > ((sizeof(Variable_Analog_Units_Array) / sizeof(Variable_Analog_Units_Array[0])) ) + 6) &&
                  (m_Variable_data.at(lRow).range != 101) && 
 				 (m_Variable_data.at(lRow).range != 102) && 
 				 (m_Variable_data.at(lRow).range != 103) &&
@@ -1035,14 +1047,23 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 				if(m_Variable_data.at(lRow).range == 20)	//如果是时间;
 				{
 					char temp_char[50];
-					int time_seconds = m_Variable_data.at(lRow).value / 1000;
-					intervaltotextfull(temp_char,time_seconds,0,0);
+					if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
+					{
+						int time_seconds = m_Variable_data.at(lRow).value / 1000;
+						intervaltotextfull(temp_char, time_seconds, 0, 0);
 
+					}
+					else
+					{
+						int time_seconds = m_Variable_data.at(lRow).value;
+						intervaltotext_2022_full(temp_char, time_seconds, 0);
+					}
 					CString temp_11;
-					MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
-						temp_11.GetBuffer(MAX_PATH), MAX_PATH );
-					temp_11.ReleaseBuffer();		
-					m_variable_list.SetItemText(lRow,VARIABLE_VALUE,temp_11);
+					MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1,
+						temp_11.GetBuffer(MAX_PATH), MAX_PATH);
+					temp_11.ReleaseBuffer();
+					m_variable_list.SetItemText(lRow, VARIABLE_VALUE, temp_11);
+
 
 				}
 				else
@@ -1247,7 +1268,15 @@ void CBacnetVariable::OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESUL
 	m_variable_time_picker.ShowWindow(SW_HIDE);
 
 	int write_value;
-	write_value =( chour*3600 + cmin * 60 + csend) * 1000;
+	if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
+	{
+		write_value = (chour * 3600 + cmin * 60 + csend) * 1000;
+	}
+	else
+	{
+		write_value = (chour * 100 * 1000 + cmin * 1000 + csend * 10);
+	}
+
 	m_Variable_data.at(m_row).value = write_value;
 	CString temp_task_info;
 	temp_task_info.Format(_T("Write Variable Time Item%d .Changed Time to \"%s\" "),m_row + 1,temp_cs);

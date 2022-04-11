@@ -284,7 +284,7 @@ void CBacnetOutput::Initial_List()
 	m_output_list.InsertColumn(OUTPUT_NUM, _T("Output"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	m_output_list.InsertColumn(OUTPUT_PANEL, _T("Panel"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	m_output_list.InsertColumn(OUTPUT_FULL_LABLE, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Man"), 65, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HOA Switch"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
     m_output_list.InsertColumn(OUTPUT_RELINQUISH_VALUE, _T("Relinquish"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
@@ -577,9 +577,9 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			LVCOLUMN col;
 			col.mask = LVCF_TEXT;
 			col.pszText = szBuffer;
-			col.cchTextMax = 80;
+			col.cchTextMax = 65;
 			m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
-			col.pszText = _T("Auto/Manual");
+			col.pszText = _T("Auto/Man");
 			m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
 			m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH, 80);
 			m_output_list.SetColumnWidth(OUTPUT_RANGE, 100);
@@ -1046,6 +1046,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 	}
 	copy_data_to_ptrpanel(TYPE_OUTPUT);
+#ifdef LOCAL_DB_FUNCTION
+	if(selected_product_Node.serial_number != 0)
+	   WriteDeviceDataIntoAccessDB(BAC_OUT, output_item_limit_count, selected_product_Node.serial_number);
+#endif
 	//Invalidate();
 	return 0;
 }

@@ -6,7 +6,7 @@
 #include "CBacnetBuilidngAddNode.h"
 #include "afxdialogex.h"
 #include "CBacnetBuildingRoomEditor.h"
-
+#include "CBacnetBMD.h"
 BM_dlg_ret dlg_ret;
 // CBacnetBuilidngAddNode 对话框
 
@@ -151,7 +151,7 @@ void CBacnetBuilidngAddNode::OnBnClickedButtonBmNodeOk()
 	if ((dlg_ret.m_BM_ret_count == 0) || (dlg_ret.m_BM_ret_count > 255))
 	{
 		MessageBox(_T("Invalid number of nodes added (normal value is 1-255)"));
-		dlg_ret.m_BM_AddDlg_resault = 0;
+		dlg_ret.m_bm_add_dlg_resault = 0;
 		return;
 	}
 	
@@ -162,7 +162,7 @@ void CBacnetBuilidngAddNode::OnBnClickedButtonBmNodeOk()
 		if ((temp_csname.GetLength() > 9) || temp_csname.IsEmpty())
 		{
 			MessageBox(_T("Invalid name length, the length of the name should be less than 9"));
-			dlg_ret.m_BM_AddDlg_resault = 0;
+			dlg_ret.m_bm_add_dlg_resault = 0;
 			return;
 		}
 		else
@@ -173,14 +173,14 @@ void CBacnetBuilidngAddNode::OnBnClickedButtonBmNodeOk()
 		if ((temp_csname.GetLength() > 30) || temp_csname.IsEmpty())
 		{
 			MessageBox(_T("Invalid name length, the length of the name should be less than 30"));
-			dlg_ret.m_BM_AddDlg_resault = 0;
+			dlg_ret.m_bm_add_dlg_resault = 0;
 			return;
 		}
 		else
 			dlg_ret.m_BM_ret_name = temp_csname;
 	}
 
-	dlg_ret.m_BM_AddDlg_resault = 1;
+	dlg_ret.m_bm_add_dlg_resault = 1;
 	PostMessage(WM_CLOSE,NULL,NULL);
 	
 }

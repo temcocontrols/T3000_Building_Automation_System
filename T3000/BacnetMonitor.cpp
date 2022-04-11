@@ -14,6 +14,8 @@
 #include "BacnetGraphic.h"
 #include "BacnetWait.h"
 #include "BADO/BADO.h"
+#include "MainFrm.h"
+extern tree_product selected_product_Node; // 选中的设备信息;
 void BitToString(int digtal_or_analog, int nIndex);
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
 #define  WM_FLASH_CHANGE         WM_USER + 903
@@ -927,6 +929,10 @@ LRESULT CBacnetMonitor::Fresh_Monitor_List(WPARAM wParam,LPARAM lParam)
 		}
 
 	}
+#ifdef LOCAL_DB_FUNCTION
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_AMON, 12, selected_product_Node.serial_number);
+#endif
 	return 0;
 }
 //对于一个对话框里面有多个List 只能通过确认焦点 来发送Changed 消息;
