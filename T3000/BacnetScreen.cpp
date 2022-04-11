@@ -1384,6 +1384,7 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 }
 
 
+
 #include "BacnetWebView.h"
 void BacnetScreen::OnBnClickedWebViewShow()
 {
@@ -1418,5 +1419,3 @@ void BacnetScreen::OnBnClickedWebViewShow()
 		delete webviewwindow;
 	}
 }
-
-

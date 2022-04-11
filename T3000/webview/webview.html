@@ -74,7 +74,7 @@
         #canvas {
             border: solid blue 1px;
             position: relative;
-            background: whitesmoke url('../res/grid_20.png') repeat;
+            background: whitesmoke url('images/grid_20.png') repeat;
         }
         
         tr.selected {
@@ -239,7 +239,7 @@
 
     <div class="row" style="margin-left: 5px;">
         <div id="canvasDiv" class="col-8 col-md-8">
-            <span id="lockAction"><img id="lockIcon" src="../res/unlock.ico" style="height: 5%;position: absolute;top: 4px;z-index: 10;left: 15px;"></span>
+            <span id="lockAction"><img id="lockIcon" src="images/unlock.ico" style="height: 5%;position: absolute;top: 4px;z-index: 10;left: 15px;"></span>
             <canvas id="canvas">
 			</canvas>
             <div id="zoomdiv">
@@ -258,25 +258,25 @@
                     <div class="accordion-body">
                         <div class="row">
                             <div class="col-3 col-md-3">
-                                <img id="inputElement" object-type="0" class="box" src="../res/default_icon/inputs.ico" />
+                                <img id="inputElement" object-type="0" class="box" src="images/inputs.ico" />
                             </div>
                             <div class="col-3 col-md-3" style="margin-top: 5px;">
-                                <img id="outputElement" object-type="1" class="box" src="../res/default_icon/outputs2.ico" />
+                                <img id="outputElement" object-type="1" class="box" src="images/outputs2.ico" />
                             </div>
                             <div class="col-3 col-md-3">
-                                <img id="variableElement" object-type="2" class="box" src="../res/default_icon/Variables.ico" />
+                                <img id="variableElement" object-type="2" class="box" src="images/Variables.ico" />
                             </div>
                             <div class="col-3 col-md-3" style="margin-top: 5px;">
-                                <img id="schedualElement" object-type="3" class="box" src="../res/default_icon/schedual.ico" />
+                                <img id="schedualElement" object-type="3" class="box" src="images/schedual.ico" />
                             </div>
                             <div class="col-3 col-md-3" style="margin-top: 5px;">
-                                <img id="holidayElement" object-type="4" class="box" src="../res/default_icon/Holidays.ico" />
+                                <img id="holidayElement" object-type="4" class="box" src="images/Holidays.ico" />
                             </div>
                             <div class="col-3 col-md-3" style="margin-top: 5px;">
-                                <img id="programElement" object-type="5" class="box" src="../res/default_icon/Programs.ico" />
+                                <img id="programElement" object-type="5" class="box" src="images/Programs.ico" />
                             </div>
                             <div class="col-3 col-md-3" style="margin-top: 5px;">
-                                <img id="graphicElement" object-type="6" class="box" src="../res/default_icon/Graphics2.ico" />
+                                <img id="graphicElement" object-type="6" class="box" src="images/Graphics2.ico" />
                             </div>
 
                         </div>
@@ -299,13 +299,18 @@
                             <input type="button" id="linebtn" class="btn btn-outline-info" value="line" />
                             <input type="button" id="textbtn" class="btn btn-outline-info" value="text" />
                             <input type="button" id="pipebtn" class="btn btn-outline-info" value="Pipe" /><br><br>
-                            <input type="button" id="ductbtn" class="btn btn-outline-info" value="duct" /><br><br>
-
-                            <label for="display_color" class=" col-form-label">Change Color</label>
-                            <input type="color" class="btn btn-outline-info" id="display_color" value="changeColor" />
+                            <input type="button" id="ductbtn" class="btn btn-outline-info" value="duct" />
+                            <input type="button" id="guagebtn" class="btn btn-outline-info" value="guages" /><br><br>
 
 
-                            <label for="Font_Change" class=" col-form-label">Change Font</label>
+                            <input type="button" id="changeColorbtn" class="btn btn-outline-info" value="ChangeColor" />
+                            <label for="display_color" class=" col-form-label"></label>
+                            <input type="color" class="btn btn-outline-info" id="display_color" value="changeColor" /><br><br>
+
+
+
+                            <input type="button" id="changeFontbtn" class="btn btn-outline-info" value="ChangeFont" />
+                            <label for="Font_Change" class=" col-form-label"></label>
                             <select id="Font_Change" class="btn btn-outline-info">
                                 <option value="11">11px</option>
                                 <option value="20">15px </option>
@@ -480,23 +485,23 @@
                                                 <li class="dropdown-item" value="Default">
                                                     <img src="" width="20" height="15"> <a href="#">Default symbol</a></li>
                                                 <li class="dropdown-item" value="input">
-                                                    <img src="../res/default_icon/inputs.ico" width="20" height="15"> <a href="#">Input</a></li>
+                                                    <img src="images/inputs.ico" width="20" height="15"> <a href="#">Input</a></li>
                                                 <li class="dropdown-item" value="output">
-                                                    <img src="../res/default_icon/outputs2.ico" width="20" height="15"> <a href="#">Output</a></li>
+                                                    <img src="images/outputs2.ico" width="20" height="15"> <a href="#">Output</a></li>
                                                 <li class="dropdown-item" value="variable">
-                                                    <img src="../res/default_icon/Variables.ico" width="20" height="15"> <a href="#">Variable</a></li>
+                                                    <img src="images/Variables.ico" width="20" height="15"> <a href="#">Variable</a></li>
                                                 <li class="dropdown-item" value="schedual">
-                                                    <img src="../res/default_icon/schedual.ico" width="20" height="15"> <a href="#">Schedual</a></li>
+                                                    <img src="images/schedual.ico" width="20" height="15"> <a href="#">Schedual</a></li>
                                                 <li class="dropdown-item" value="Holidays">
-                                                    <img src="../res/default_icon/Holidays.ico" width="20" height="15"> <a href="#">Holidays</a></li>
+                                                    <img src="images/Holidays.ico" width="20" height="15"> <a href="#">Holidays</a></li>
                                                 <li class="dropdown-item" value="Programs">
-                                                    <img src="../res/default_icon/Programs.ico" width="20" height="15"> <a href="#">Programs</a></li>
+                                                    <img src="images/Programs.ico" width="20" height="15"> <a href="#">Programs</a></li>
                                                 <li class="dropdown-item" value="Graphics">
-                                                    <img src="../res/default_icon/Graphics2.ico" width="20" height="15"> <a href="#">Graphics</a></li>
+                                                    <img src="images/Graphics2.ico" width="20" height="15"> <a href="#">Graphics</a></li>
                                                 <li class="dropdown-item" value="Temprature">
-                                                    <img src="../res/default_icon/temp.jfif" width="20" height="15"> <a href="#">Temprature</a></li>
+                                                    <img src="images/temp.jfif" width="20" height="15"> <a href="#">Temprature</a></li>
                                                 <li class="dropdown-item" value="Pipe">
-                                                    <img src="../res/default_icon/pipe.png" width="20" height="15"> <a href="#">Pipe</a></li>
+                                                    <img src="images/pipe.png" width="20" height="15"> <a href="#">Pipe</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -579,7 +584,6 @@
         <li id="menuEdit">Edit</li>
         <li id="menuDelete">Delete</li>
         <li id="menuRotate">Rotate</li>
-        <li id="changeFont">Change Font</li>
         </li>
     </ul>
     <script type="text/javascript " src="js/jquery-3.6.0.min.js "></script>
