@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : 定义 DLL 应用程序的入口点。
+// dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "pch.h"
 #include "stdafx.h"
 #include "dllmain.h"
@@ -74,7 +74,7 @@ int look_up_func(char* s);
 int isarray(char* tok);
 int varoffsetlast(int cur);
 int checkonlyarray(char* tok);
-int Encode_Program(char* input_text, char* ret_code);
+int Encode_Program(char* input_text, encode_str* encode_str);
 //int Encode_Program( /*GEdit *ppedit*/);
 void put_line_num(int line_value);
 
@@ -8763,17 +8763,17 @@ void check_each_point(char* richeditchar, int item_count, int ntype)
 
 #endif
 
-
-int Encode_function(char* input_text, encode_str* encodestr)
+encode_str* Encode_function(char* input_text)
 {
-	int ret_return = 0;
+	encode_str* encodestr = new encode_str;
 	init_info_table();
 	Init_table_bank();
-	ret_return = Encode_Program(input_text, encodestr);
+	Encode_Program(input_text, encodestr);
 	//char display_text[10000];
 	//desassembler_program(ret_code, display_text);
 	//Sleep(1);
-	return ret_return;
+
+	return encodestr;
 }
 
 
