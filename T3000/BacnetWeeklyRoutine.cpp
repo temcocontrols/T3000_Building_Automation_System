@@ -15,11 +15,12 @@
 #include "BacnetRange.h"
 #include "BacnetScheduleTime.h"
 #include "BacnetTstatSchedule.h"
+#include "MainFrm.h"
 extern CBacnetScheduleTime* ScheduleEdit_Window;
 extern CBacnetTstatSchedule *BacnetTstatSchedule_Window ;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern vector <int>  m_Weekly_data_instance;
-
+extern tree_product selected_product_Node; // 选中的设备信息;
 
 CString Hol_Old_Lable[BAC_HOLIDAY_COUNT] =
 {
@@ -602,6 +603,10 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 	}
 	
 	copy_data_to_ptrpanel(TYPE_WEEKLY);
+#ifdef LOCAL_DB_FUNCTION
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_SCH, 8, selected_product_Node.serial_number);
+#endif
 	return 0;
 }
 

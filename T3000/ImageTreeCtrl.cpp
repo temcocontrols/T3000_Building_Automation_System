@@ -10,6 +10,7 @@
 #include "CBacnetBuilidngAddNode.h"
 #include "BacnetAddRemoteDevice.h"
 #include "CBacnetBuildingCommunicate.h"
+#include "CBacnetBuildingProperty.h"
 // CImageTreeCtrl
 enum ECmdHandler {
 	ID_RENAME = 1,
@@ -32,6 +33,7 @@ enum ECmdHandler {
 	ID_BM_ADD_INPUT,
 	ID_BM_ADD_OUTPUT,
 	ID_BM_ADD_VARIABLE,
+	ID_BM_IO_PROPERTY,
 	ID_BM_BUILDING_COMMUNICATE,
 	ID_MAX_CMD
 };
@@ -151,6 +153,7 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_Commandmap[ID_BM_ADD_INPUT] = &CImageTreeCtrl::BM_Add_Inputs;
 	m_Commandmap[ID_BM_ADD_OUTPUT] = &CImageTreeCtrl::BM_Add_Outputs;
 	m_Commandmap[ID_BM_ADD_VARIABLE] = &CImageTreeCtrl::BM_Add_Variable;
+	m_Commandmap[ID_BM_IO_PROPERTY] = &CImageTreeCtrl::BM_IO_Property;
 	m_Commandmap[ID_BM_DELETE] = &CImageTreeCtrl::BM_Delete;
 	m_Commandmap[ID_BM_BUILDING_COMMUNICATE] = &CImageTreeCtrl::BM_Communicate;
 	
@@ -199,7 +202,7 @@ void CImageTreeCtrl::OnContextCmd(UINT id) {
 bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem) 
 {
 	HTREEITEM hSelectItem = NULL;
-	if (b_Building_Management_Flag != 0)
+	if (b_building_management_flag != 0)
 	{
 		if (operation_nodeinfo.node_type == TYPE_BM_POINT_LIST)
 		{
@@ -324,7 +327,7 @@ bool CImageTreeCtrl::HandleAddRemoteDevice(HTREEITEM)
 void reset_dlg_data()
 {
 	dlg_ret.m_BM_ret_count = 0;
-	dlg_ret.m_BM_AddDlg_resault = 0;
+	dlg_ret.m_bm_add_dlg_resault = 0;
 	dlg_ret.m_BM_ret_function = 255;
 	dlg_ret.m_BM_ret_name.Empty();
 	dlg_ret.m_BM_ret_type = 255;
@@ -392,6 +395,12 @@ bool CImageTreeCtrl::BM_Add_Nodes(HTREEITEM hItem)
 	return true;
 }
 
+void CImageTreeCtrl::BM_Property(HTREEITEM hItem)
+{
+	//确定选中的节点是Node 还是IO  并且是哪一个Node 哪一个IO
+	
+}
+
 void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
 {
 	reset_dlg_data();
@@ -400,7 +409,7 @@ void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
 	//Dlg.SetParameter(FUNCTION_BM_ADD, TYPE_BM_INPUT);
 	Dlg.DoModal();
 
-	if (dlg_ret.m_BM_AddDlg_resault == 1)
+	if (dlg_ret.m_bm_add_dlg_resault == 1)
 	{
 		if ((ntype == TYPE_BM_INPUT) || (ntype == TYPE_BM_OUTPUT) || (ntype == TYPE_BM_VARIABLE))
 		{
@@ -584,6 +593,15 @@ bool CImageTreeCtrl::BM_Add_Variable(HTREEITEM hItem)
 	BM_Adds(hItem, FUNCTION_BM_ADD, TYPE_BM_VARIABLE);
 	return true;
 }
+
+bool CImageTreeCtrl::BM_IO_Property(HTREEITEM hItem)
+{
+	BM_Property(hItem);
+	CBacnetBuildingProperty PropertyDlg;
+	PropertyDlg.DoModal();
+	return true;
+}
+
 
 bool CImageTreeCtrl::BM_Rename(HTREEITEM hItem)
 {
@@ -1204,7 +1222,7 @@ void CImageTreeCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 	TVITEM & item = pTVDispInfo->item;
 	*pResult = 1;
-	if (b_Building_Management_Flag == 1)
+	if (b_building_management_flag == 1)
 	{
 		CString temp_cs;
 		temp_cs = item.pszText;
@@ -1792,6 +1810,7 @@ void CImageTreeCtrl::BMContextMenu(CPoint& point, BM_nodeinfo nodeinfo)
 		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_INPUT, _T("Add Inputs"));
 		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_OUTPUT, _T("Add Outputs"));
 		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_VARIABLE, _T("Add Variable"));
+		SubMenu.AppendMenu(MF_STRING, ID_BM_IO_PROPERTY, _T("Property Setting"));
 	}
 	else
 	{
@@ -1935,7 +1954,7 @@ void CImageTreeCtrl::OnRclick(NMHDR* pNMHDR, LRESULT* pResult)
 	ScreenToClient(&point);
 	HTREEITEM hItem = HitTest(point, &flags);
 	
-	if (b_Building_Management_Flag == 0)
+	if (b_building_management_flag == 0)
 	{
 		HTREEITEM root_item = CImageTreeCtrl::GetRootItem();
 		if (CImageTreeCtrl::ItemHasChildren(root_item))

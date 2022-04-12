@@ -42,7 +42,7 @@ public:
 
 	int nGroupCount ; // 有多少个Group 
 	CString groupname[255];
-	int n_group_count[255];
+	int n_group_kids_count[255];
 	void SaveAllIntoIniFile();
 	CBacnetBMD BuildingNode;
 	afx_msg void OnBnClickedButtonBmSave();

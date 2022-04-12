@@ -13,7 +13,7 @@ IMPLEMENT_DYNCREATE(CBacnetBuildingManagement, CDialogEx)
 CBacnetBuildingManagement::CBacnetBuildingManagement()
 	: CDialogEx(IDD_DIALOG_BACNET_BUILDING_MANAGEMENT)
 {
-	memset(n_group_count, 0, 255);
+	memset(n_group_kids_count, 0, 255);
 }
 
 CBacnetBuildingManagement::~CBacnetBuildingManagement()
@@ -189,7 +189,7 @@ void CBacnetBuildingManagement::OnBnClickedButtonBmDone()
 
 void CBacnetBuildingManagement::LoadFileShowToList()
 {
-	b_Building_Management_Flag = true;
+	b_building_management_flag = true;
 	pFrame_BM->ClearBuilding();
 	pFrame_BM->m_pTreeViewCrl->DeleteAllItems();
 	nGroupCount = GetPrivateProfileInt(_T("Setting"), _T("TotalGroup"), 0, cs_bm_ini);
@@ -206,9 +206,9 @@ void CBacnetBuildingManagement::LoadFileShowToList()
 		temp_lpAppname.Format(_T("Group%d"), i);
 		GetPrivateProfileString(temp_lpAppname, _T("GroupName"), _T(""), groupname[i].GetBuffer(MAX_PATH), MAX_PATH, cs_bm_ini);
 		groupname[i].ReleaseBuffer();
-		n_group_count[i] = GetPrivateProfileInt(temp_lpAppname, _T("GroupChildCount"), 0,  cs_bm_ini);
+		n_group_kids_count[i] = GetPrivateProfileInt(temp_lpAppname, _T("GroupChildCount"), 0,  cs_bm_ini);
 		CString temp_group_count;
-		//temp_group_count.Format(_T("%d"), n_group_count[i]);
+		//temp_group_count.Format(_T("%d"), n_group_kids_count[i]);
 		m_root_list.SetItemText(i, 1, groupname[i]);
 		//m_root_list.SetItemText(i, 2, temp_group_count);
 
@@ -224,7 +224,7 @@ void CBacnetBuildingManagement::ShowListToTree()
 		CString temp_group_count;
 		groupname[i] = m_root_list.GetItemText(i, 1);
 		temp_group_count = m_root_list.GetItemText(i, 2);
-		n_group_count[i] = _wtoi(temp_group_count);
+		n_group_kids_count[i] = _wtoi(temp_group_count);
 	}
 
 	if (nGroupCount == 0)
@@ -277,7 +277,7 @@ void CBacnetBuildingManagement::TreeInital()
 
 		BuildingNode.pchild[i]->hParent = hTreePointList;
 		BuildingNode.pchild[i]->h_treeitem = hTreeGroup;
-		BuildingNode.pchild[i]->m_child_count = n_group_count[i];
+		BuildingNode.pchild[i]->m_child_count = n_group_kids_count[i];
 		BuildingNode.pchild[i]->m_csName = groupname[i];
 		BuildingNode.pchild[i]->m_index = i;
 		BuildingNode.pchild[i]->pfather = &BuildingNode;

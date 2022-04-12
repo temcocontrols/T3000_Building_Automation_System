@@ -59,7 +59,7 @@ bool dhcp_package_is_broadcast=false;
 //int broadcast_flash_count=0;
 //int now_flash_count=0;
 
-
+CString ISP_Device_IP;
 bool has_enter_dhcp_has_lanip_block=false;
 
 TFTPServer::TFTPServer(void)
@@ -83,7 +83,7 @@ TFTPServer::TFTPServer(void)
     //some_device_reply_the_broadcast=false;
     device_jump_from_runtime = false;
     dhcp_package_is_broadcast=false;
-
+    ISP_Device_IP.Empty();
     memset(read_reg, 0, sizeof(read_reg));
 }
 
@@ -1460,7 +1460,7 @@ BOOL TFTPServer::StartServer()
                 strTips.Format(_T("Updating firmware. Device IP : %d.%d.%d.%d"),Byte_ISP_Device_IP[0],Byte_ISP_Device_IP[1],Byte_ISP_Device_IP[2],Byte_ISP_Device_IP[3]);
                 OutPutsStatusInfo(strTips, FALSE);
 
-
+#if 0
                 if (m_tcp_connect_results)
                 {
                     unsigned short temp_reg[100];
@@ -1511,6 +1511,7 @@ BOOL TFTPServer::StartServer()
                     }
  
                 }
+#endif
                 OutPutsStatusInfo(_T(""), FALSE);
                 nRet =Send_Tftp_File();
                 if(nRet==0) //break;

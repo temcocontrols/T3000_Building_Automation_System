@@ -501,6 +501,7 @@ void CBacnetSettingTime::OnBnClickedButtonSyncTime()
     SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("SYNC Timer Server Now.Please Wait....."));
     if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
     {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("SYNC Timer Server Failed.Please try again."));
         Sleep(1);
     }
     else

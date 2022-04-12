@@ -1,4 +1,10 @@
 #pragma once
+#define TYPE_BM_POINT_LIST  255
+#define TYPE_BM_GROUP       0
+#define TYPE_BM_NODES       1
+#define TYPE_BM_INPUT       2
+#define TYPE_BM_OUTPUT      3
+#define TYPE_BM_VARIABLE    4
 class CBacnetBMD
 {
 public:

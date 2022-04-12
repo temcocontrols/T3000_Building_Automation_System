@@ -39,11 +39,13 @@ public:
 	virtual bool BM_Add_Outputs(HTREEITEM hItem);
 	virtual bool BM_Add_Variable(HTREEITEM hItem);
 	void BM_Adds(HTREEITEM hItem, int nfunction, int ntype);
+	void BM_Property(HTREEITEM hItem);
 	virtual bool BM_Delete(HTREEITEM hItem);
 	virtual bool SortByConnection(HTREEITEM hItem)  ;
 	virtual bool SortByFloor(HTREEITEM hItem)  ;
 	virtual bool PingDevice(HTREEITEM hItem) ;
 	virtual bool BM_Communicate(HTREEITEM hItem);
+	virtual bool BM_IO_Property(HTREEITEM hItem);
 	bool HandleAddVirtualDevice(HTREEITEM);
 	bool HandleAddCustomDevice(HTREEITEM hItem);
     bool HandleAddRemoteDevice(HTREEITEM);

@@ -93,7 +93,7 @@ void CBacnetBuildingMain::Fresh()
 
 void CBacnetBuildingMain::OnHTreeItemClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
-    Sleep(1);
+    pFrame_BM->OnHTreeItemClick(pNMHDR, pResult);
 }
 
 

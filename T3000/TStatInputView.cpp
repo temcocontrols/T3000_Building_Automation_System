@@ -140,8 +140,10 @@ UINT BackMainUIFresh_TstatInput(LPVOID pParam)
             temp_serial.Format(_T("%d.prog"),g_selected_serialnumber);
             achive_file_path = g_achive_folder + _T("\\") + temp_serial;
             Save_Product_Value_Cache(achive_file_path);
-
-            LoadTstat_InputData();
+            if (product_type == CS3000)
+                LoadInputData_CS3000();
+            else
+                LoadTstat_InputData();
             
             PostMessage(g_hwnd_now,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 
@@ -394,6 +396,8 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	
       if ((Changed_Item >= 9) && (Changed_SubItem != 7))
         return 0;
+      //if (product_type == CS3000)
+      //    return 0;
     //if ((Changed_Item == 9) && (b_hum_sensor == false))
     //{
     //    return 0;
@@ -691,7 +695,8 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
         return;
     if(lRow<0)
         return;
-
+    if (product_type == CS3000)  //Fandu 2021 12 16 不响应 点击;
+        return;
     //判断有无此传感器 没有 就不显示，并且不可操作.
     if ((lRow == 9) && (b_hum_sensor == false))
     {
@@ -1127,8 +1132,15 @@ void CTStatInputView::Initial_ListFor_Tstat(){
         {
             strTemp.Format(_T("%d"),i+1);
             m_input_list.InsertItem(i,strTemp);
+
+            
             for (int x=0;x<INPUT_COL_NUMBER;x++)
             {
+                
+                m_input_list.SetCellEnabled(i, 2, 0);
+                m_input_list.SetCellEnabled(i, 6, 0);
+                m_input_list.SetCellEnabled(i, 8, 0);
+                m_input_list.SetCellEnabled(i, 9, 0);
                 if((i%2)==0)
                     m_input_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
                 else

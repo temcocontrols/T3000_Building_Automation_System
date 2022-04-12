@@ -312,7 +312,7 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_NUM, _T("Input"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	m_input_list.InsertColumn(INPUT_PANEL, _T("Panel"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	m_input_list.InsertColumn(INPUT_FULL_LABLE, _T("Full Label"), 100, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Man"), 65, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_RANGE, _T("Range"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
@@ -871,9 +871,9 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		LVCOLUMN col;
 		col.mask = LVCF_TEXT;
 		col.pszText = szBuffer;
-		col.cchTextMax = 80;
+		col.cchTextMax = 65;
 		m_input_list.GetColumn(INPUT_AUTO_MANUAL, &col);
-		col.pszText = _T("Auto/Manual");
+		col.pszText = _T("Auto/Man");
 		m_input_list.SetColumn(INPUT_AUTO_MANUAL, &col);
 		m_input_list.SetColumnWidth(INPUT_RANGE, 100); 
 		m_input_list.SetColumnWidth(INPUT_CAL, 70);
@@ -1329,6 +1329,10 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		}
 	}
 	copy_data_to_ptrpanel(TYPE_INPUT);
+#ifdef LOCAL_DB_FUNCTION
+	if(selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_IN, input_item_limit_count, selected_product_Node.serial_number);
+#endif
 	return 0;
 }
 

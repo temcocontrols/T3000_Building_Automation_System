@@ -487,7 +487,7 @@ void CWorkspaceBar::OnTvnBeginlabeleditTree(NMHDR *pNMHDR, LRESULT *pResult)
 void CWorkspaceBar::OnNMClickTree(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
-	if (b_Building_Management_Flag)
+	if (b_building_management_flag)
 	{
 		((CBacnetBuildingMain*)pMainFrame->m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT])->OnHTreeItemClick(pNMHDR, pResult);
 		return;
