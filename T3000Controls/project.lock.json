@@ -10,21 +10,23 @@
     ".NETFramework,Version=v4.0": []
   },
   "packageFolders": {
-    "C:\\Users\\DELL\\.nuget\\packages\\": {}
+    "C:\\Users\\PLC\\.nuget\\packages\\": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\Users\\DELL\\Documents\\GitHub\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
+      "projectUniqueName": "C:\\Users\\PLC\\Source\\Repos\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
       "projectName": "T3000Controls",
-      "projectPath": "C:\\Users\\DELL\\Documents\\GitHub\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
-      "projectJsonPath": "C:\\Users\\DELL\\Documents\\GitHub\\T3000_Building_Automation_System\\T3000Controls\\project.json",
-      "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\DELL\\Documents\\GitHub\\T3000_Building_Automation_System\\T3000Controls\\obj\\",
+      "projectPath": "C:\\Users\\PLC\\Source\\Repos\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
+      "projectJsonPath": "C:\\Users\\PLC\\Source\\Repos\\T3000_Building_Automation_System\\T3000Controls\\project.json",
+      "packagesPath": "C:\\Users\\PLC\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\PLC\\Source\\Repos\\T3000_Building_Automation_System\\T3000Controls\\obj\\",
       "projectStyle": "ProjectJson",
       "configFilePaths": [
-        "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\PLC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       }
     },
