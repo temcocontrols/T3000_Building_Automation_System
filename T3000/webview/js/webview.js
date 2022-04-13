@@ -32,21 +32,23 @@ var $linebtn = $("#linebtn");
 var $textbtn = $("#textbtn");
 var $pipebtn = $("#pipebtn");
 var $ductbtn = $("#ductbtn");
-
 var $selectBtn = $("#selectBtn");
 var $doBtn = $("#doBtn");
 var $unDoBtn = $("#unDoBtn");
 var $deleteBtn = $("#deleteBtn");
-
 var $textmenu = $('#textmenu');
 var $Font_Change = $('#Font_Change');
 var $menu = $('#contextMenu');
 var $display_color = $('#display_color');
+var $changeColorbtn = $('#changeColorbtn');
+var $changeFontbtn = $('#changeFontbtn');
 var $menuEdit = $('#menuEdit');
 $display_color.hide();
+$changeColorbtn.hide();
+$changeFontbtn.hide();
+
 
 $Font_Change.hide();
-
 var isMouseDown = false;
 var selectedDragableObject;
 
@@ -219,7 +221,7 @@ $pipebtn.click(function() {
         canvas.addEventListener("mousedown", drawpipeOnCanvas.handleMouseDown, false);
         canvas.addEventListener("mouseup", drawpipeOnCanvas.handleMouseUp, false);
         canvas.addEventListener("mouseout", drawpipeOnCanvas.handleMouseOut, false);
-        canvas.addEventListener("contextmenu", drawpipeOnCanvas.handlerightclick, false);
+        canvas.addEventListener("dblclick", drawpipeOnCanvas.handlerightclick, false);
         SetdefaultCanvasEvents(false);
     } else {
         pipe_toggled = false;
@@ -230,7 +232,7 @@ $pipebtn.click(function() {
         canvas.removeEventListener('mousedown', drawpipeOnCanvas.handleMouseDown, false);
         canvas.removeEventListener('mouseup', drawpipeOnCanvas.handleMouseUp, false);
         canvas.removeEventListener('mouseout', drawpipeOnCanvas.handleMouseOut, false);
-        canvas.removeEventListener("contextmenu", drawpipeOnCanvas.handlerightclick, false);
+        canvas.removeEventListener("dblclick", drawpipeOnCanvas.handlerightclick, false);
         SetdefaultCanvasEvents(true);
 
     }
@@ -262,48 +264,38 @@ $ductbtn.click(function() {
     }
 });
 let colorpicker = document.getElementById('display_color');
-
 $textbtn.click(function() {
     if (!text_toggled) {
         $display_color.show();
         $Font_Change.show();
+
+        $changeColorbtn.show();
+        $changeFontbtn.show();
         //alert ("enabled")
         resetButtonToggles();
         text_toggled = true;
         $textbtn.attr('style', ' box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);');
-        canvas.addEventListener('dblclick', drawtextoncanvas.handlemousedblclick, false);
-        colorpicker.addEventListener('input', function(e) {
-            //alert(e.target.value);
-            selObj = window.getSelection();
-            //alert(selObj + "selobj");
-            //var selection = window.getSelection().getRangeAt(0);
-            //alert(selection + "w");
-            var selectedText = window.getSelection ? window.getSelection() : document.selection.createRange(); // second one for IE
-            //alert(selectedText + "selectedText");
-            if (selectedText.getRangeAt) {
-                var range = selectedText.getRangeAt(0);
-                var newNode = document.createElement("span");
-                newNode.setAttribute('class', 'highlightedText');
-                newNode.style.color = e.target.value;
-                range.surroundContents(newNode);
-                newNode.appendChild(selectedText);
-            }
-        })
+        canvas.addEventListener('dblclick', writeTextOnCanvas.handlemousedblclick, false);
+
+
 
         SetdefaultCanvasEvents(false);
     } else {
         text_toggled = false;
         $display_color.hide();
         $Font_Change.hide();
+        $changeColorbtn.hide();
+        $changeFontbtn.hide();
         $textbtn.attr('style', 'box-shadow: 0 0 0 0;');
         //alert("called");
 
+        canvas.removeEventListener("dblclick", writeTextOnCanvas.handlemousedblclick, false);
         SetdefaultCanvasEvents(true);
 
     }
 });
-// set the data payloadvar canvas = document.getElementById("c"),
 
+// set the data payloadvar canvas = document.getElementById("c"),
 containsPoint = function(rect, x, y) {
     //alert("contains point");
     return !(x < rect.x ||
@@ -464,7 +456,7 @@ function dragDrop(e, ui) {
         y: y,
         width: 50,
         height: 50,
-        image: "../res/default_icon/" + ImageName,
+        image: "images/" + ImageName,
         type: "image",
         color: "red",
         fontType: 1,
@@ -629,7 +621,8 @@ var drawRectangleOnCanvas = {
                 }
                 ctx.lineJoin = "miter";
                 ctx.strokeStyle = "#63B1EC";
-                ctx.lineWidth = "5";
+                ctx.lineWidth = r.width;
+                ctx.height = r.height;
                 //alert("writting and saving line");
                 ctx.beginPath();
                 ctx.moveTo(r.x1, r.y1);
@@ -638,65 +631,43 @@ var drawRectangleOnCanvas = {
             } else if (Images[i].type === "pipe") {
                 var r = Images[i];
                 if (selectedDragableObject == i) {
-                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = "#63B1EC";
                 }
-                ctx.fillStyle = "#999494";
+                ctx.fillStyle = "#63B1EC";
+                ctx.strokeStyle = "#63B1EC";
+                drawPipe11(ctx, r.x1, r.y1, r.x2, r.y2, 25);
+            } else if (Images[i].type === "pipe1") {
+                var r = Images[i];
+                color = r.color;
+                if (selectedDragableObject == i) {
+                    ctx.strokeStyle = "#63B1EC";
+                }
+                ctx.fillStyle = "#63B1EC";
+                ctx.strokeStyle = "#63B1EC";
                 ctx.beginPath();
-                ctx.arc(r.x1, r.y1, 15, 0, 2 * Math.PI);
+                ctx.arc(r.x1, r.y1, 20, 0, 2 * Math.PI);
                 ctx.fill();
-
-                ctx.strokeStyle = "#999494";
-                ctx.lineWidth = "25";
-                ctx.lineJoin = "miter";
-                //alert("writting and saving line");
-                ctx.beginPath();
-                ctx.moveTo(r.x1, r.y1);
-                ctx.lineTo(r.x2, r.y2);
                 ctx.stroke();
-
-                ctx.fillStyle = "#999494";
-                ctx.beginPath();
-                ctx.arc(r.x1, r.y1, 15, 0, 2 * Math.PI);
-                ctx.fill();
             } else if (Images[i].type === "duct") {
                 var r = Images[i];
                 if (selectedDragableObject == i) {
-                    ctx.strokeStyle = "#413E3E";
+                    ctx.strokeStyle = "#999494";
                 }
-                /*
-                ctx.lineWidth = "45";
-                ctx.lineJoin = "miter";
-                //alert("writting and saving line");
-                ctx.beginPath();
-                ctx.moveTo(r.x1, r.y1);
-                ctx.lineTo(r.x2, r.y2);
-                ctx.stroke();
-                //ctx.beginPath();
-                //ctx.rect(r.x1, r.y1, 4, 4);
-                //ctx.fill();
-                //ctx.stroke();
-                ctx.strokeStyle = 'red';
-                ctx.beginPath();
-                ctx.moveTo(r.x11, r.y11);
-                ctx.lineTo(r.x22, r.y22);
-                ctx.lineTo(r.y22, r.y22);
-                ctx.closePath();
-                ctx.stroke();*/
-                drawArrow(ctx, r.x1, r.y1, r.x2, r.y2, 50, '#413E3E');
+                ctx.strokeStyle = "#999494";
+                ctx.fillStyle = "#999494";
+                drawArrow(ctx, r.x1, r.y1, r.x2, r.y2, 50);
             } else if (Images[i].type === "duct1") {
                 var r = Images[i];
                 color = r.color;
                 if (selectedDragableObject == i) {
-                    ctx.strokeStyle = "#413E3E";
+                    ctx.strokeStyle = "#999494";
                 }
+                ctx.strokeStyle = "#999494";
+                ctx.fillStyle = "#999494";
                 ctx.beginPath();
-                ctx.rect(r.x1, r.y1, 60, 60);
+                ctx.rect(r.x1 - 15, r.y1 - 25, 75, 75);
                 ctx.fill();
                 ctx.stroke();
-
-            } else if (Images[i].type === "text") {
-                showinput(x, y);
-
             } else if (Images[i].type === "image") {
                 //alert("Images[i].type =image ")
                 if (selectedDragableObject == i) {
@@ -932,6 +903,8 @@ var drawlineOnCanvas = {
             y1: y1,
             x2: x2,
             y2: y2,
+            width: "5",
+            height: "5",
             color: "#63B1EC",
             type: "line",
         }
@@ -939,6 +912,8 @@ var drawlineOnCanvas = {
         ctx.lineJoin = "miter";
         ctx.strokeStyle = "#63B1EC";
         ctx.lineWidth = "5";
+        ctx.lineWidth = newline.width;
+        ctx.height = newline.height;
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
@@ -961,7 +936,7 @@ function drawLine(position) {
     ctx.stroke();
 }
 
-var ispipeDown = false;
+ispipeDown = false;
 /// start points
 var newpipe;
 var position1;
@@ -991,44 +966,77 @@ var drawpipeOnCanvas = {
             x2: x2,
             y2: y2,
             type: "pipe",
-            color: "#999494",
+            color: "#63B1EC",
             width: "25",
             height: "10",
         }
-        ctx.fillStyle = "#999494";
-        ctx.beginPath();
-        ctx.arc(x1, y1, 15, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.strokeStyle = "#999494";
-        ctx.lineJoin = "round";
-        ctx.lineCap = "round";
-        ctx.lineWidth = "25";
-        ctx.linearGradient.color = "#4B4949";
 
-
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
         drawRectangleOnCanvas.drawAll(scale, translatePos);
+        ctx.fillStyle = "#63B1EC";
+        ctx.strokeStyle = "#63B1EC";
+        drawPipe11(ctx, r.x1, r.y1, r.x2, r.y2, 25);
     },
     handlerightclick: function(e) {
-        // tell the browser we're handling this event
+        newpipe11 = {
+            x1: x1,
+            y1: y1,
+            type: "pipe1",
+        }
+        Images.push(newpipe11);
+        ctx.fillStyle = "#63B1EC";
+        ctx.strokeStyle = "#63B1EC";
+        ctx.beginPath();
+        ctx.arc(r.x1, r.y1, 20, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
         e.preventDefault();
         e.stopPropagation();
-        ctx.fillStyle = "#999494";
-        ctx.beginPath();
-        ctx.arc(r.x1, r.y1, 15, 0, 2 * Math.PI);
-        ctx.fill();
-        // Put your mouseOut stuff here
-        ispipeDown = false;
+        // Put your rightclick stuff here
+        isductDown = false;
     }
+}
+
+function drawPipe11(ctx, x1, y1, x2, y2, arrowWidth) {
+    //variables to be used when creating the arrow
+    var headlen = 10;
+    var angle = Math.atan2(y2 - y1, x2 - x1);
+
+    ctx.save();
+    ctx.fillStyle = "#63B1EC";
+    ctx.strokeStyle = "#63B1EC";
+
+    //starting path of the arrow from the start square to the end square
+    //and drawing the stroke
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.lineWidth = arrowWidth;
+    ctx.stroke();
+
+    //starting a new path from the head of the arrow to one of the sides of
+    //the point
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    //path from the side point of the arrow, to the other side point
+    ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6),
+        y2 - headlen * Math.sin(angle + Math.PI / 6));
+
+    //path from the side point back to the tip of the arrow, and then
+    //again to the opposite side point
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6),
+        y2 - headlen * Math.sin(angle - Math.PI / 6));
+
+    //draws the paths created above
+    ctx.stroke();
+    ctx.restore();
 }
 
 
 var isductDown = false;
-/// start points
+// start points
 var newduct;
+var newduct1;
 var spanElement;
 var position1;
 var drawductOnCanvas = {
@@ -1068,8 +1076,9 @@ var drawductOnCanvas = {
             //spanElement.show();
             // Fill with gradient
         drawRectangleOnCanvas.drawAll(scale, translatePos);
-        ctx.fillStyle = "#413E3E";
-        drawArrow(ctx, x1, y1, x2, y2, 50, '#413E3E');
+        ctx.fillStyle = "#999494";
+        ctx.strokeStyle = "#999494";
+        drawArrow(ctx, x1, y1, x2, y2, 50);
     },
     handlerightclick: function(e) {
         newduct1 = {
@@ -1078,9 +1087,10 @@ var drawductOnCanvas = {
             type: "duct1",
         }
         Images.push(newduct1);
-        ctx.strokeStyle = "#413E3E";
+        ctx.fillStyle = "#999494";
+        ctx.strokeStyle = "#999494";
         ctx.beginPath();
-        ctx.rect(x1, y1, 60, 60);
+        ctx.rect(x1 - 15, y1 - 25, 75, 75);
         ctx.fill();
         ctx.stroke();
         e.preventDefault();
@@ -1090,13 +1100,14 @@ var drawductOnCanvas = {
     }
 }
 
-function drawArrow(ctx, x1, y1, x2, y2, arrowWidth, color) {
+function drawArrow(ctx, x1, y1, x2, y2, arrowWidth) {
     //variables to be used when creating the arrow
     var headlen = 10;
     var angle = Math.atan2(y2 - y1, x2 - x1);
 
     ctx.save();
-    ctx.strokeStyle = color;
+    ctx.fillStyle = "#999494";
+    ctx.strokeStyle = "#999494";
 
     //starting path of the arrow from the start square to the end square
     //and drawing the stroke
@@ -1111,34 +1122,34 @@ function drawArrow(ctx, x1, y1, x2, y2, arrowWidth, color) {
     ctx.beginPath();
     ctx.moveTo(x2, y2);
     //path from the side point of the arrow, to the other side point
-    ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6.5),
-        y2 - headlen * Math.sin(angle + Math.PI / 6.5));
+    ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 7),
+        y2 - headlen * Math.sin(angle + Math.PI / 7));
 
     //path from the side point back to the tip of the arrow, and then
     //again to the opposite side point
     ctx.lineTo(x2, y2);
-    ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6),
-        y2 - headlen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6.5),
+        y2 - headlen * Math.sin(angle - Math.PI / 6.5));
 
     //draws the paths created above
     ctx.stroke();
     ctx.restore();
 }
 
+var textObj;
 var hasInput = false;
 var textarea = null;
-drawtextoncanvas = {
+var writeTextOnCanvas = {
     handlemousedblclick: function(e) {
         textarea = document.createElement('textarea');
         textarea.className = 'info';
+        textarea.contentEditable = "true"
         textarea.addEventListener('mousedown', mouseDownOnTextarea);
         document.body.appendChild(textarea);
         var x = e.clientX - canvas.offsetLeft,
             y = e.clientY - canvas.offsetTop;
-        textarea.style.top = (e.clientY - x) + 'px';
-        textarea.style.left = (e.clientX - y) + 'px';
-
-
+        x1 = textarea.style.left = (x) + 'px';
+        y1 = textarea.style.top = (y) + 'px';
         colorwell = document.querySelector("#display_color");
         defaultcolor = colorwell.value;
         colorEdit = textarea.style.color = defaultcolor;
@@ -1146,6 +1157,7 @@ drawtextoncanvas = {
         textarea.style.fontSize = fONT + "px";
     }
 }
+
 
 function mouseDownOnTextarea(e) {
     var x1 = e.clientX - textarea.offsetLeft,
@@ -1162,6 +1174,16 @@ function mouseDownOnTextarea(e) {
     }
     document.addEventListener('mousemove', drag);
     document.addEventListener('mouseup', stopDrag);
+}
+
+document.getElementById("changeColorbtn").onclick = function() {
+    // Get Selection
+    sel = window.getSelection();
+    //alert(sel);
+    if (sel.rangeCount && sel.getRangeAt) {
+        range = sel.getRangeAt(0);
+        alert(range);
+    }
 }
 
 
@@ -1547,7 +1569,7 @@ var LockEnabled = false;
 $("#lockAction").click(function() {
 
     if (LockEnabled) {
-        $("#lockIcon").attr("src", "../res/default_icon/unlock.ico")
+        $("#lockIcon").attr("src", "images/unlock.ico")
         LockEnabled = false;
         //$("#accordionExample").attr('disabled','disabled');
         $("#accordionExample .accordion-button").attr("aria-expanded", "true");
@@ -1555,7 +1577,7 @@ $("#lockAction").click(function() {
         $("#accordionExample .accordion-button").click();
         $("#accordionExample").show();
     } else {
-        $("#lockIcon").attr("src", "../res/default_icon/lock.ico")
+        $("#lockIcon").attr("src", "images/lock.ico")
         LockEnabled = true;
         selectedDragableObject = -1;
 
