@@ -10429,7 +10429,7 @@ char pBuf[200000];
 void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
 {
 #ifdef DEBUG
-    UpdateDeviceDataIntoAccessDB();
+    //UpdateDeviceDataIntoAccessDB();
     //WriteDeviceDataIntoAccessDB(BAC_IN,g_selected_serialnumber);
 #endif // DEBUG
 

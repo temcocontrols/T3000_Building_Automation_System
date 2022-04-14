@@ -597,8 +597,8 @@ bool CImageTreeCtrl::BM_Add_Variable(HTREEITEM hItem)
 bool CImageTreeCtrl::BM_IO_Property(HTREEITEM hItem)
 {
 	BM_Property(hItem);
-	CBacnetBuildingProperty PropertyDlg;
-	PropertyDlg.DoModal();
+	//CBacnetBuildingProperty PropertyDlg;
+	//PropertyDlg.DoModal();
 	return true;
 }
 
