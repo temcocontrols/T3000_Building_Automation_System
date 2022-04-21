@@ -736,6 +736,8 @@ set(T3000_SOURCE_FILES
   ${T3000_SOURCE_DIR}/TstatSetpointDetail.cpp
   ${T3000_SOURCE_DIR}/TstatAQI_Detail.cpp
   ${T3000_SOURCE_DIR}/CBacnetUnitsSelection.cpp
+  ${T3000_SOURCE_DIR}/CAirFlowSensor.cpp
+  ${T3000_SOURCE_DIR}/CTstatAQ_Parameter.cpp
   ${T3000_SOURCE_DIR}/Json-cpp/dist/jsoncpp.cpp
   ${T3000_SOURCE_DIR}/BacnetWebViewToolBar.cpp
   ${T3000_SOURCE_DIR}/BacnetWebView.cpp
@@ -774,6 +776,14 @@ set(RESOURCE_FILES
 set_source_files_properties(${T3000_SOURCE_DIR}/T3000.rc   PROPERTIES LANGUAGE RC)
 set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ../")
 
+# Get nuget packages for webview2. I couldn't get this to work
+#if(WIN32)
+#	exec_program(powershell
+#    	ARGS Install-Package -Name "Microsoft.Web.WebView2" -MinimumVersion 1.0.1150.38 -Confirm -Destination ${CMAKE_BINARY_DIR}/packages)
+#	exec_program(powershell
+#    	ARGS Install-Package -Name "Microsoft.Windows.ImplementationLibrary" -Confirm -Destination ${CMAKE_BINARY_DIR}/packages)
+#endif(WIN32)
+
 # Add executable to build.
 add_executable(${PROJECT_NAME} WIN32
    ${AIRQUALITY_FILES} ${BACNET_FILES} ${BACNET_CM5_H_FILES} ${BADO_SOURCE_FILES} ${CLASS_SOURCE_FILES} ${ISP_SOURCE_FILES} 
@@ -794,6 +804,8 @@ if(MSVC)
    ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/HttpAPI.lib
    )
    target_link_libraries(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/../SQLiteDriver/sqlite3.lib)
+   target_link_libraries(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/../packages/Microsoft.Web.WebView2.1.0.1150.38/build/native/x86/WebView2LoaderStatic.lib)
+   target_link_libraries(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/../packages/Microsoft.Windows.ImplementationLibrary.1.0.220201.1/build/native/Microsoft.Windows.ImplementationLibrary.targets)
    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different 
    ${CMAKE_CURRENT_SOURCE_DIR}/../SQLiteDriver/sqlite3.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE})
    SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/level='requireAdministrator' /uiAccess='false'")
@@ -802,5 +814,7 @@ endif(MSVC)
 if(MSVC)
      SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/Yustdafx.h")
      set_source_files_properties(stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx.h")	 
-     set_source_files_properties(jsoncpp.cpp PROPERTIES COMPILE_FLAGS "/Y-")	 
+     set_source_files_properties(${T3000_SOURCE_DIR}/Json-cpp/dist/jsoncpp.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON) 
+     set_source_files_properties(BacnetWebView.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+     set_source_files_properties(BacnetWebViewToolBar.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 endif(MSVC)
