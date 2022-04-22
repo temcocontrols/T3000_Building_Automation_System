@@ -834,9 +834,6 @@
     <ClCompile Include="Json-cpp\dist\jsoncpp.cpp">
       <Filter>Source Files\JsonCpp</Filter>
     </ClCompile>
-    <ClCompile Include="CBacnetBuildingProperty.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">

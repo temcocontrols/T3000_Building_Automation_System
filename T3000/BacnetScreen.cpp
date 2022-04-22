@@ -1389,7 +1389,32 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+int check_webview_runtime()
+{
+	LPCTSTR strRegEntry = _T("SOFTWARE\\WOW6432Node\\Microsoft\\EdgeUpdate\\Clients\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}\\");
 
+	HKEY   hKey;
+	LONG   lReturnCode = 0;
+	lReturnCode = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE, strRegEntry, 0, KEY_READ, &hKey);
+
+	if (lReturnCode != ERROR_SUCCESS)
+	{
+		return 0;
+	}
+
+
+	LPBYTE userversion_get = new BYTE[100];
+	DWORD type_1 = REG_SZ;
+	DWORD cbDate_1 = 80;
+	LONG return1 = ::RegQueryValueEx(hKey, _T("pv"), NULL, &type_1, userversion_get, &cbDate_1);
+	if (return1 != ERROR_SUCCESS)
+	{
+		return 0;
+	}
+
+	
+	return 1;
+}
 
 #include "BacnetWebView.h"
 void BacnetScreen::OnBnClickedWebViewShow()
@@ -1406,6 +1431,15 @@ void BacnetScreen::OnBnClickedWebViewShow()
 	PicFileTips.ReleaseBuffer();
 	CString fullpath = temp_image_folder + PicFileTips;
 	*/
+	int nversion = check_webview_runtime();
+	if (nversion == 0)
+	{
+		MessageBox(_T("To use this feature properly,Please download the latest WebView RumTime.\r\n https://developer.microsoft.com/en-us/microsoft-edge/webview2/"));
+		ShellExecute(this->m_hWnd, _T("open"), _T("https://developer.microsoft.com/en-us/microsoft-edge/webview2/"), NULL, NULL, SW_SHOWNORMAL);
+		ShellExecute(this->m_hWnd, _T("open"), _T("https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/f1ef4889-266b-41d8-9725-76f5b1e37f7f/Microsoft.WebView2.FixedVersionRuntime.100.0.1185.50.x64.cab"), NULL, NULL, SW_SHOWNORMAL);
+		return;
+	}
+
 	const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
 
 	//CFileDialog dlg(TRUE, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
