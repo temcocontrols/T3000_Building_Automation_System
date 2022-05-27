@@ -4229,7 +4229,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         Device_Basic_Setting.reg.start_day = *(my_temp_point++);
         Device_Basic_Setting.reg.end_month = *(my_temp_point++);
         Device_Basic_Setting.reg.end_day = *(my_temp_point++);
-        
+        Device_Basic_Setting.reg.network_number_hi = *(my_temp_point++);
         //memcpy_s(&Device_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
         //my_temp_point = my_temp_point + 10; //算上这个  长度是 270
         
@@ -8731,7 +8731,31 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
 
 }
 
-
+int bacnet_set_read_result(int nret)
+{
+ bac_read_all_results = nret;
+ bac_input_read_results = nret;
+ bac_output_read_results = nret;
+ bac_variable_read_results = nret;
+ bac_program_read_results = nret;
+ bac_weekly_read_results = nret;
+ bac_annual_read_results = nret;
+ bac_time_command_read_results = nret;
+ bac_controller_read_results = nret;
+ bac_screen_read_results = nret;
+ bac_monitor_read_results = nret;
+ bac_programcode_read_results = nret;
+ bac_weeklycode_read_results = nret;
+ bac_annualcode_read_results = nret;
+ bac_alarmlog_read_results = nret;
+ bac_tstat_read_results = nret;
+ bac_basic_setting_read_results = nret;
+ bac_customer_unit_read_results = nret;
+ bac_user_login_read_results = nret;
+ bac_graphic_label_read_results = nret;
+ bac_remote_point_read_results = nret;
+ return 1;
+}
 
 
 //杜帆Load 
@@ -9762,8 +9786,31 @@ vector <Str_schedule_DB>    m_DB_Schedule;
 vector <Str_trendlog_DB>    m_DB_Trendlog;
 vector <Str_alarm_DB>       m_DB_Alarm;
 
+
+//如果没有数据库就复制一个过去;
+int CheckDeviceDatabase()
+{
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    CString temp_building_data_db;
+    temp_building_data_db = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\DeviceDatabase.mdb");
+    CFileFind fFind;
+    if (fFind.FindFile(temp_building_data_db))
+    {
+        return 1;
+    }
+    else
+    {
+        CString temp_file;
+        temp_file = g_strExePth + _T("ResourceFile\\DeviceDatabase.mdb");
+        CopyFile(temp_file, temp_building_data_db, false);
+        return 1;
+    }
+    return 0;
+}
+
 int UpdateDeviceDataIntoAccessDB()
 {
+    return 1;
     m_DB_Input.clear();
     int ret_value = 0;
     _variant_t temp_variant;
@@ -9976,6 +10023,47 @@ end_SaveDeviceDataIntoAccessDB_function:
     return ret_value;
 }
 
+#ifdef LOCAL_DB_FUNCTION
+void init_product_list()
+{
+
+    m_product_iocount.clear();
+    CString AllData;
+    CString product_list_path;
+    product_list_path = GetExePath(true) + _T("ResourceFile\\ProductMode.ini");
+    int ncount = 0;
+    ncount = GetPrivateProfileInt(_T("ProductName"), _T("nCount"), 0, product_list_path);
+    for (int i = 0; i < ncount; i++)
+    {
+        Str_product_io_count temp = { 0 };
+        CString temp_index;
+        temp_index.Format(_T("%d"), i + 1);
+        GetPrivateProfileStringW(_T("ProductName"), temp_index, _T(""), AllData.GetBuffer(MAX_PATH * 10), MAX_PATH * 10, product_list_path);
+        AllData.ReleaseBuffer();
+        if (AllData.IsEmpty())
+        {
+            continue;
+        }
+
+        CStringArray temparray;
+        SplitCStringA(temparray, AllData, _T(","));
+        if (temparray.GetSize() != 6)
+            continue;
+
+        temp.cs_name = temparray.GetAt(0);
+        temp.ai_count = _wtoi(temparray.GetAt(1));
+        temp.bi_count = 0;
+        temp.input_count = temp.ai_count + temp.bi_count;
+        temp.ao_count = _wtoi(temparray.GetAt(2));
+        temp.bo_count = _wtoi(temparray.GetAt(3));
+        temp.output_count = temp.ao_count + temp.bo_count;
+        temp.pid = _wtoi(temparray.GetAt(4));
+        temp.sub_pid = _wtoi(temparray.GetAt(5));
+
+        m_product_iocount.push_back(temp);
+    }
+}
+#endif
 int WriteDeviceDataIntoAccessDB(int nTableType,int ncount ,int device_serialnumber)
 {
 #ifdef LOCAL_DB_FUNCTION
@@ -10417,6 +10505,40 @@ int WriteDeviceDataIntoAccessDB(int nTableType,int ncount ,int device_serialnumb
         accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
     }
         break;
+    case BAC_SETTING:
+    {
+        strSql.Format(_T("delete * from Parameter where nSerialNumber = %d"), device_serialnumber);
+        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+            Str_parameter_DB temp_parameter_db;
+            temp_parameter_db.nSerialNumber = device_serialnumber;
+            Setting_Window->m_page_basic_info.m_edit_panel.GetWindowTextW(temp_parameter_db.PanelNumber);
+            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_OBJ_INSTANCE, temp_parameter_db.BacnetInstance);
+            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_MODBUS_ID, temp_parameter_db.ModbusRTU_BacnetMac_ID);
+            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_BIP_NETWORK2, temp_parameter_db.Bip_Network);
+
+            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_MAX_MASTER, temp_parameter_db.MaxMaster);
+            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_PANEL, temp_parameter_db.PanelNumber);
+            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_NODES_LABEL_SETTING, temp_parameter_db.PanelName);
+            for (int x = 0; x < (int)sizeof(Str_Setting_Info); x++)
+            {
+                CString temp_char;
+                if (x != 0)
+                    temp_parameter_db.BinaryArray = temp_parameter_db.BinaryArray + _T(",");
+
+                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&Device_Basic_Setting + x));
+                temp_parameter_db.BinaryArray = temp_parameter_db.BinaryArray + temp_char;
+            }
+            temp_parameter_db.BinaryArray.MakeUpper();
+
+            strSql.Format(_T("insert into Parameter (nSerialNumber,BacnetInstance,ModbusRTU_BacnetMac_ID,Bip_Network,MaxMaster,PanelNumber,PanelName,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+                temp_parameter_db.BacnetInstance, temp_parameter_db.ModbusRTU_BacnetMac_ID, temp_parameter_db.Bip_Network, temp_parameter_db.MaxMaster, \
+                temp_parameter_db.PanelNumber, temp_parameter_db.PanelName, temp_parameter_db.BinaryArray);
+            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+        
+    }
+        break;
     default:
         break;
     }
@@ -10429,7 +10551,7 @@ char pBuf[200000];
 void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
 {
 #ifdef DEBUG
-    //UpdateDeviceDataIntoAccessDB();
+    UpdateDeviceDataIntoAccessDB();
     //WriteDeviceDataIntoAccessDB(BAC_IN,g_selected_serialnumber);
 #endif // DEBUG
 
@@ -10563,7 +10685,7 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
         memcpy(temp_point, &m_Schedual_time_flag.at(i), sizeof(Str_schedual_time_flag));
         temp_point = temp_point + sizeof(Str_schedual_time_flag);
     }
-
+    // BAC_EXTIO_COUNT
 
     int write_length = temp_point - original_point;
 
@@ -15110,6 +15232,198 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
 
     return nret_type;
 }
+void Initial_Virtual_Device_Setting()
+{
+    Device_Basic_Setting.reg.com_baudrate0 = UART_115200;
+    Device_Basic_Setting.reg.com_baudrate2 = UART_115200;
+    Device_Basic_Setting.reg.ip_addr[0] = 192;
+    Device_Basic_Setting.reg.ip_addr[1] = 168;
+    Device_Basic_Setting.reg.ip_addr[2] = 0;
+    Device_Basic_Setting.reg.ip_addr[3] = 3;
+    Device_Basic_Setting.reg.modbus_port = 502;
+}
+
+void Initial_All_Point()
+{
+    m_Input_data.clear();
+    m_Variable_data.clear();
+    m_Output_data.clear();
+    m_Program_data.clear();
+    m_Weekly_data.clear();
+    m_Annual_data.clear();
+    m_Schedual_Time_data.clear();
+    m_Schedual_time_flag.clear();
+    m_controller_data.clear();
+    m_screen_data.clear();
+    m_monitor_data.clear();
+    m_alarmlog_data.clear();
+    m_Tstat_data.clear();
+    m_customer_unit_data.clear();
+    m_user_login_data.clear();
+    m_tatat_schedule_data.clear();
+    m_msv_data.clear();
+    m_Input_data_instance.clear();
+    m_Output_data_instance.clear();
+    //vector <Str_TstatInfo_point> m_Tstat_data;
+    for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++)
+    {
+        Str_in_point temp_in = {0};
+        memset(temp_in.description, 0, 21);
+        memset(temp_in.label, 0, 9);
+        temp_in.filter = 5;
+        sprintf((char *)temp_in.description, "IN%d", i + 1);
+        m_Input_data.push_back(temp_in);
+        m_Input_data_instance.push_back(i);
+
+    }
+    for (int i = 0; i < BAC_OUTPUT_ITEM_COUNT; i++)
+    {
+        Str_out_point temp_out = { 0 };
+        memset(&temp_out, 0, sizeof(temp_out));
+        sprintf((char*)temp_out.description, "OUT%d", i + 1);
+        temp_out.hw_switch_status = 1;
+        m_Output_data.push_back(temp_out);
+        m_Output_data_instance.push_back(i);
+    }
+    for (int i = 0; i < BAC_VARIABLE_ITEM_COUNT; i++)
+    {
+        Str_variable_point temp_variable = { 0 };
+        memset(&temp_variable, 0, sizeof(temp_variable));
+        sprintf((char*)temp_variable.description, "VAR%d", i + 1);
+        m_Variable_data.push_back(temp_variable);
+        m_Variable_data_instance.push_back(i);
+    }
+    for (int i = 0; i < BAC_PROGRAM_ITEM_COUNT; i++)
+    {
+        Str_program_point temp_program = { 0 };
+        memset(&temp_program, 0, sizeof(temp_program));
+        sprintf((char*)temp_program.description, "PRG%d", i + 1);
+        temp_program.bytes = 0;//初始化时默认为400的长度，避免读不到数据;
+        m_Program_data.push_back(temp_program);
+    }
+    for (int i = 0; i < BAC_SCHEDULE_COUNT; i++)
+    {
+        Str_weekly_routine_point temp_weekly = { 0 };
+        memset(&temp_weekly, 0, sizeof(temp_weekly));
+        m_Weekly_data.push_back(temp_weekly);
+        m_Weekly_data_instance.push_back(i);
+    }
+    for (int i = 0; i < BAC_HOLIDAY_COUNT; i++)
+    {
+        Str_annual_routine_point temp_annual = { 0 };
+        memset(&temp_annual, 0, sizeof(temp_annual));
+        m_Annual_data.push_back(temp_annual);
+        m_Annual_data_instance.push_back(i);
+    }
+
+    for (int i = 0; i < BAC_SCHEDULE_COUNT; i++)
+    {
+        Str_schedual_time_point temp_schedual = { 0 };
+        memset(&temp_schedual, 0, sizeof(temp_schedual));
+        m_Schedual_Time_data.push_back(temp_schedual);
+
+        Str_schedual_time_flag temp_time_flag;
+        memset(&temp_time_flag, 255, sizeof(Str_schedual_time_flag));
+        m_Schedual_time_flag.push_back(temp_time_flag);
+    }
+
+    for (int i = 0; i < BAC_PID_COUNT; i++)
+    {
+        Str_controller_point temp_controller = { 0 };
+        memset(&temp_controller, 0, sizeof(temp_controller));
+        m_controller_data.push_back(temp_controller);
+    }
+    for (int i = 0; i < BAC_SCREEN_COUNT; i++)
+    {
+        Control_group_point temp_screen = { 0 };
+        memset(&temp_screen, 0, sizeof(temp_screen));
+        m_screen_data.push_back(temp_screen);
+    }
+    for (int i = 0; i < BAC_MONITOR_COUNT; i++)
+    {
+        Str_monitor_point temp_monitor = { 0 };
+        memset(&temp_monitor, 0, sizeof(temp_monitor));
+        m_monitor_data.push_back(temp_monitor);
+    }
+
+    for (int i = 0; i < BAC_ALARMLOG_COUNT; i++)
+    {
+        Alarm_point temp_alarmpoint = { 0 };
+        memset(&temp_alarmpoint, 0, sizeof(temp_alarmpoint));
+        m_alarmlog_data.push_back(temp_alarmpoint);
+    }
+    for (int i = 0; i < BAC_TSTAT_COUNT; i++)
+    {
+        Str_TstatInfo_point temp_tststpoint = { 0 };
+        memset(&temp_tststpoint, 0, sizeof(temp_tststpoint));
+        temp_tststpoint.product_model = 255;  //default 255  means no device;
+        m_Tstat_data.push_back(temp_tststpoint);
+
+    }
+
+    for (int i = 0; i < BAC_CUSTOMER_UNITS_COUNT; i++)
+    {
+        Str_Units_element temp_customer_units = { 0 };
+        memset(&temp_customer_units, 0, sizeof(Str_Units_element));
+        m_customer_unit_data.push_back(temp_customer_units);
+    }
+
+    for (int i = 0; i < BAC_USER_LOGIN_COUNT; i++)
+    {
+        Str_userlogin_point temp_user_login = { 0 };
+        memset(&temp_user_login, 0, sizeof(Str_userlogin_point));
+        m_user_login_data.push_back(temp_user_login);
+    }
+    for (int i = 0; i < BAC_GRPHIC_LABEL_COUNT; i++)
+    {
+        Str_label_point temp_label_point = { 0 };
+        memset(&temp_label_point, 0, sizeof(Str_label_point));
+        m_graphic_label_data.push_back(temp_label_point);
+    }
+    for (int i = 0; i < BAC_REMOTE_POINT_COUNT; i++)
+    {
+        Str_remote_point temp_remote_point = { 0 };
+        memset(&temp_remote_point, 0, sizeof(Str_remote_point));
+        m_remote_point_data.push_back(temp_remote_point);
+    }
+    for (int i = 0; i < BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
+    {
+        Str_table_point temp_table_point = { 0 };
+        memset(&temp_table_point, 0, sizeof(Str_table_point));
+        m_analog_custmer_range.push_back(temp_table_point);
+    }
+    for (int i = 0; i < BAC_VARIABLE_CUS_UNIT_COUNT; i++)
+    {
+        Str_variable_uint_point temp_var_unit_point = { 0 };
+        memset(&temp_var_unit_point, 0, sizeof(Str_variable_uint_point));
+        m_variable_analog_unite.push_back(temp_var_unit_point);
+    }
+
+    for (int i = 0; i < BAC_EXTIO_COUNT; i++)
+    {
+        Str_Extio_point temp_extio_point = { 0 };
+        memset(&temp_extio_point, 0, sizeof(Str_Extio_point));
+        m_extio_config_data.push_back(temp_extio_point);
+    }
+
+    for (int i = 0; i < BAC_TSTAT_SCHEDULE; i++)
+    {
+        Str_tstat_schedule temp_tstat_schedule = { 0 };
+        memset(&temp_tstat_schedule, 0, sizeof(Str_tstat_schedule));
+        m_tatat_schedule_data.push_back(temp_tstat_schedule);
+    }
+
+    for (int i = 0; i < BAC_MSV_COUNT + 1; i++)
+    {
+        Str_MSV temp_msv_point = { 0 };
+        memset(&temp_msv_point, 0, sizeof(Str_MSV));
+        m_msv_data.push_back(temp_msv_point);
+    }
+    memset(&Device_Basic_Setting, 0, sizeof(Str_Setting_Info));
+
+}
+
+
 
 bool indtext_by_istring(
     INDTEXT_DATA* data_list,

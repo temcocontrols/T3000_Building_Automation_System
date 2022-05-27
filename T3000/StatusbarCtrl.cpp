@@ -340,7 +340,10 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 	mygraphics->DrawString(_T("Tx"), -1, &character_font, staticpointF, &Font_brush);
 
 	staticpointF.X = tx_start_pos + STATUS_CHARACTER_VALUE_OFFSET;
-	temp_value.Format(_T("%u"), g_llTxCount);
+	if(offline_mode)
+		temp_value.Format(_T("Offline Mode"));
+	else
+		temp_value.Format(_T("%u"), g_llTxCount);
 	mygraphics->DrawString(temp_value, -1, &character_font, staticpointF, &Font_brush);
 
 
@@ -348,7 +351,10 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 	mygraphics->DrawString(_T("Rx"), -1, &character_font, staticpointF, &Font_brush);
 
 	staticpointF.X = rx_start_pos + STATUS_CHARACTER_VALUE_OFFSET;
-	temp_value.Format(_T("%u"), g_llRxCount);
+	if (offline_mode)
+		temp_value.Format(_T("Virtual Device"));
+	else
+		temp_value.Format(_T("%u"), g_llRxCount);
 	mygraphics->DrawString(temp_value, -1, &character_font, staticpointF, &Font_brush);
 
 
@@ -424,8 +430,10 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 
     if (bac_select_device_online == false)
         m_health_persent = 0;
-
-	temp_value.Format(_T("%u"), g_llerrCount);
+	if (offline_mode)
+		temp_value.Format(_T(" "));
+	else
+		temp_value.Format(_T("%u"), g_llerrCount);
 	mygraphics->DrawString(temp_value, -1, &character_font, staticpointF, &Font_brush);
 
 	CString cs_health_persent;

@@ -16,7 +16,7 @@
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 extern tree_product selected_product_Node; // 选中的设备信息;
-extern vector <int>  m_Variable_data_instance;
+
 
 
 IMPLEMENT_DYNAMIC(CBacnetVariable, CDialogEx)

@@ -1040,7 +1040,11 @@ extern vector <Str_variable_uint_point> m_variable_analog_unite;
 extern vector <Str_Extio_point> m_extio_config_data;
 
 extern vector <Str_MSV> m_msv_data;
-
+extern vector <int>  m_Input_data_instance;
+extern vector <int>  m_Output_data_instance;
+extern vector <int>  m_Variable_data_instance;
+extern vector <int>  m_Weekly_data_instance;
+extern vector <int>  m_Annual_data_instance;
 extern vector <GSM_connection_info> m_gsm_connect_info;
 extern vector <Scan_Info> m_scan_info;
 extern vector <Scan_Info> m_scan_info_buffer;
@@ -1308,5 +1312,6 @@ extern unsigned char daylight_end_month;
 extern unsigned char daylight_end_day;
 
 extern vector <Str_BM_IO> m_bm_io_data;
+extern vector <Str_product_io_count> m_product_iocount;  // 用来存储不同设备包含的IO数量;
 extern bool Bacnet_debug_fileRead;
 extern bool bacnetIpDataRead;

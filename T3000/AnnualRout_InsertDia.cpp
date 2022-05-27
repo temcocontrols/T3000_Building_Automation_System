@@ -15,7 +15,7 @@
 #define TO_CLEAR_MONTH_CTRL _T("clear")
 IMPLEMENT_DYNAMIC(AnnualRout_InsertDia, CDialog)
 
-extern vector <int>  m_Annual_data_instance;
+
 
 AnnualRout_InsertDia::AnnualRout_InsertDia(unsigned char row,CString strtype,CWnd* pParent /*=NULL*/)
 	: CDialog(AnnualRout_InsertDia::IDD, pParent)

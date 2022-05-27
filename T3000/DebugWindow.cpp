@@ -302,18 +302,38 @@ void CDebugWindow::OnCbnSelchangeComboDebugChoose()
 		}
 	}
 }
-
-
+#include "..\T3000ProgramMoudle\dllmain.h"
 void CDebugWindow::OnBnClickedButtonDebug()
 {
     // TODO: 在此添加控件通知处理程序代码
 
 
 #ifdef DEBUG
+#if 0
+	//char test_program[] = "10 REM TEST PROGRAM ";
+	char test_program[] = "10 REM TEST PROGRAM \r\n20 VAR = VAR1 + 1\r\n";
+	char ret_value[2000] = { 0 };
+	encode_str *Myencodestr ;
+	int encode_ret=0;
+	Myencodestr = Encode_function(test_program);
+	if (Myencodestr->errorcode != -1)
+	{
+		MessageBox(_T("Decode error!"));
+	}
+
+	Sleep(1);
+	return;
+#endif
+
+	//获取对应产品的 固件信息
+#if 0
 	StrGetFileInfo test1 = { 0 };
 	int test_pid2 = 74;
 	https_get_file(test_pid2, test1);
 	Sleep(1);
+#endif
+
+	//获取对应产品的 固件信息
 #if 0
 #ifdef ENABLE_HTTP_FUCTION
     StrGetProductID test1 = { 0 };

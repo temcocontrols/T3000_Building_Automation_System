@@ -120,6 +120,11 @@ typedef struct _BUILDING_TAG
 	CString strConnectionType;
 }Building_info;
 
+typedef struct ext_info
+{
+	int virtual_device;  // 0  default    1  verture device
+	int mini_type;       //对应 Setting 界面的  mini_type
+};
 
 typedef struct _tree_product//////////////////////
 {//for vector 
@@ -147,6 +152,8 @@ typedef struct _tree_product//////////////////////
     UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
     UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
     UCHAR  expand; //是否树形结构展开; 1为默认展开 或者 非2 为展开       2 为折叠
+	ext_info m_ext_info;
+	
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 //
 
@@ -336,6 +343,7 @@ public:
 	void Scan_Product();
 	void LoadProductFromDB();
 	void OnCheckIOPane();
+	void GetExtProductInfo(tree_product& m_product_temp, CString temp_ext);
 	void ScanTstatInDB(void);
 	void DeleteConflictInDB();
 	void SwitchToGraphicView();
@@ -556,7 +564,7 @@ public:
 		afx_msg void OnToolsOption();
 		afx_msg void OnSize(UINT nType, int cx, int cy);
 		void HideBacnetWindow();
-
+		void VirtualDeviceMode();
 		void CreateOfflinePrgFile();
 		afx_msg void OnModeOnlinemode();
 		afx_msg void OnModeOfflinemode();
@@ -568,7 +576,7 @@ public:
 		afx_msg void OnControlIoNetConfig();
         afx_msg void OnDatabaseLogdetail();
         afx_msg void OnUpdateAppAbout(CCmdUI *pCmdUI);
-		afx_msg void OnDatabaseBuildingManagement();
+		void OnDatabaseBuildingManagement();
 		afx_msg void OnViewRefresh();
 		afx_msg void OnFileNewproject();
 #ifndef LOCAL_DB_FUNCTION
@@ -596,7 +604,7 @@ public:
 #define TVINSERV_CS3000             {tvInsert.item.iImage=22;tvInsert.item.iSelectedImage=22;}//cs3000
 #define TVINSERV_TSTAT8			    {tvInsert.item.iImage=24;tvInsert.item.iSelectedImage=24;}//TSTAT8
 #define TVINSERV_T3LC			    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;}//LC
-#define TVINSERV_ZIGBEE_REPEATER    {tvInsert.item.iImage=28;tvInsert.item.iSelectedImage=28;}//zigbeerepeater
+#define TVINSERV_T3_NANO    {tvInsert.item.iImage=28;tvInsert.item.iSelectedImage=28;}//zigbeerepeater
 #define TVINSERV_PM5E               {tvInsert.item.iImage=30;tvInsert.item.iSelectedImage=30;}//PM5E
 #define TVINSERV_THIRD_PARTY        {tvInsert.item.iImage=32;tvInsert.item.iSelectedImage=32;}//第三方设备
 #define ITEM_MASK				TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_TEXT

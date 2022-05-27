@@ -23,7 +23,7 @@ int OUTPUT_LIMITE_ITEM_COUNT = 0;
 int changed_output_item = -1; //// 用于改变某一列后 ，立即刷新 当前列的其他变化;
 extern tree_product selected_product_Node; // 选中的设备信息;
 
-extern vector <int>  m_Output_data_instance;
+
 
 IMPLEMENT_DYNAMIC(CBacnetOutput, CDialogEx)
 
@@ -1008,6 +1008,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 				m_output_list.SetItemText(i, OUTPUT_PANEL, Statuspanel);
 				UCHAR OutputType = 0;
+				if (Bacnet_Private_Device(selected_product_Node.product_class_id))
+					bacnet_device_type = Device_Basic_Setting.reg.mini_type;
 				OutputType = GetOutputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1);
 
 

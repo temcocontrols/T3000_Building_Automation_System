@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 生成的包含文件。
-// 供 T3000.rc 使用
+// Microsoft Visual C++ Éú³ÉµÄ°üº¬ÎÄ¼þ¡£
+// ¹© T3000.rc Ê¹ÓÃ
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -375,6 +375,7 @@
 #define IDC_EDIT_COUNTRYNAME            1027
 #define IDC_EDIT_PARA_EXT_TIME_REMAINING 1027
 #define IDC_EDIT_MIN_VOLT_VALUE         1027
+#define IDC_EDIT_BN_OUTPUT_COUNT        1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
@@ -387,6 +388,7 @@
 #define IDC_EDIT_STATE                  1028
 #define IDC_EDIT_PARA_EXT_MIN_PWM       1028
 #define IDC_EDIT_MIN_VALUE_VALUE        1028
+#define IDC_EDIT_BN_VARIABLE_COUNT      1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
@@ -398,6 +400,7 @@
 #define IDC_EDIT57                      1029
 #define IDC_EDIT_MAX_VOLT_VALUE3        1029
 #define IDC_BUTTON_ABC_HELP             1029
+#define IDC_EDIT_BN_PROGRAM_COUNT       1029
 #define IDC_OUTPUT4_DELAY_OFF_EDIT      1030
 #define IDC_HUM1                        1030
 #define IDC_EDIT43                      1030
@@ -408,6 +411,7 @@
 #define IDC_EDIT_STREET1                1030
 #define IDC_EDIT_MAX_VALUE_VALUE        1030
 #define IDC_EDIT_CO2_RE_CALIBRATION     1030
+#define IDC_EDIT_BN_SCHEDULE_COUNT      1030
 #define IDC_OUTPUTBTN                   1031
 #define IDC_NUM_SENSOR                  1031
 #define IDC_EDIT44                      1031
@@ -415,6 +419,8 @@
 #define IDC_EDIT_AQ                     1031
 #define IDC_EDIT_ZIP                    1031
 #define IDC_EDIT_VIRTUAL_FLOOR          1031
+#define IDC_EDIT_HOLIDAY_COUNT          1031
+#define IDC_EDIT_BN_HOLIDAY_COUNT       1031
 #define IDC_PARAMETERBTN                1032
 #define IDC_EDIT45                      1032
 #define IDC_DTS4                        1032
@@ -2267,10 +2273,18 @@
 #define IDC_BUTTON_VIRTUAL_OK           2303
 #define IDC_BUTTON_VIRTUAL_CANCEL       2304
 #define IDC_STATIC_AEC_ENCRYPT          2305
+#define IDC_EDIT_VIRTUAL_SUB_PID        2305
 #define IDC_EDIT_AES_ENCRYPT            2306
+#define IDC_EDIT_VIRTUAL_AI_COUNTS      2306
 #define IDC_CHECK_PASSWORD              2307
+#define IDC_EDIT_VIRTUAL_DI_COUNTS      2307
+#define IDC_EDIT_VIRTUAL_AO_COUNTS      2308
+#define IDC_EDIT_VIRTUAL_DO_COUNTS      2309
 #define IDC_TLABEL1                     2310
+#define IDC_EDIT_VIRTUAL_TOTAL_INPUT_COUNTS 2310
 #define IDC_TLABEL2                     2311
+#define IDC_EDIT_VIRTUAL_TOTAL_INPUT_COUNTS2 2311
+#define IDC_EDIT_VIRTUAL_TOTAL_OUTPUT_COUNTS2 2311
 #define IDC_TLABEL3                     2312
 #define IDC_TLABEL4                     2313
 #define IDC_TLABEL23                    2314
@@ -2588,6 +2602,7 @@
 #define IDC_BUTTON_BM_NODE_OK           2584
 #define IDC_BUTTON_BM_NODE_CANCLE       2585
 #define IDC_LIST_BM_IO_POINTS           2586
+#define IDC_COMBO_BM_MOUDLE             2586
 #define IDC_COMBO_PROTOCOL              2587
 #define IDC_EDIT_BM_PORT                2588
 #define IDC_BUTTON_BM_COM_OK            2589
@@ -2657,6 +2672,19 @@
 #define IDC_COMBO_BACNET_UNITS          2639
 #define IDC_STATIC_BACNETIP_UNIT        2640
 #define IDC_COMBO_BACNETIP_UNIT         2641
+#define IDC_EDIT_GROUP_NAME             2642
+#define IDC_BUTTON_DB_DONE              2643
+#define IDC_EDIT_CATEGORY_NAME          2644
+#define IDC_LIST_DB_PROPERTY            2645
+#define IDC_BUTTON_DB_PROPERTY_OK       2646
+#define IDC_BUTTON_DB_PROPERTY_CANCEL   2647
+#define IDC_TREE1                       2648
+#define IDC_EDIT_BN_INPUT_COUNT         2649
+
+
+
+
+
 
 #define IDC_WEBVIEW_BUTTON              2635
 
@@ -3231,12 +3259,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-
-
 #define _APS_NEXT_RESOURCE_VALUE        792
 #define _APS_NEXT_COMMAND_VALUE         34080
-#define _APS_NEXT_CONTROL_VALUE         2644
-
+#define _APS_NEXT_CONTROL_VALUE         2650
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

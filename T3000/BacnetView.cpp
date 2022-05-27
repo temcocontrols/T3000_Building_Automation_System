@@ -2159,179 +2159,6 @@ void CDialogCM5_BacNet::Tab_Initial()
 
 }
 
-void CDialogCM5_BacNet::Initial_All_Point()
-{
-	m_Input_data.clear();
-	m_Variable_data.clear();
-	m_Output_data.clear();
-	m_Program_data.clear();
-	m_Weekly_data.clear();
-	m_Annual_data.clear();
-	m_Schedual_Time_data.clear();
-    m_Schedual_time_flag.clear();
-	m_controller_data.clear();
-	m_screen_data.clear();
-	m_monitor_data.clear();
-	m_alarmlog_data.clear();
-	m_Tstat_data.clear();
-	m_customer_unit_data.clear();
-	m_user_login_data.clear();
-	m_tatat_schedule_data.clear();
-    m_msv_data.clear();
-	m_Input_data_instance.clear();
-	m_Output_data_instance.clear();
-	//vector <Str_TstatInfo_point> m_Tstat_data;
-	for(int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
-	{
-		Str_in_point temp_in;
-		memset(temp_in.description,0,21);
-		memset(temp_in.label,0,9);
-		m_Input_data.push_back(temp_in);
-		m_Input_data_instance.push_back(i);
-
-	}
-	for(int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
-	{
-		Str_out_point temp_out;
-		memset(&temp_out,0,sizeof(temp_out));
-		m_Output_data.push_back(temp_out);
-		m_Output_data_instance.push_back(i);
-	}
-	for (int i=0;i<BAC_VARIABLE_ITEM_COUNT;i++)
-	{
-		Str_variable_point temp_variable;
-		memset(&temp_variable,0,sizeof(temp_variable));
-		m_Variable_data.push_back(temp_variable);
-		m_Variable_data_instance.push_back(i);
-	}
-	for(int i=0;i<BAC_PROGRAM_ITEM_COUNT;i++)
-	{
-		Str_program_point temp_program;
-		memset(&temp_program,0,sizeof(temp_program));
-		temp_program.bytes = 0;//初始化时默认为400的长度，避免读不到数据;
-		m_Program_data.push_back(temp_program);
-	}
-	for(int i=0;i<BAC_SCHEDULE_COUNT;i++)
-	{
-		Str_weekly_routine_point temp_weekly;
-		memset(&temp_weekly,0,sizeof(temp_weekly));
-		m_Weekly_data.push_back(temp_weekly);
-		m_Weekly_data_instance.push_back(i);
-	}
-	for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
-	{
-		Str_annual_routine_point temp_annual;
-		memset(&temp_annual,0,sizeof(temp_annual));
-		m_Annual_data.push_back(temp_annual);
-		m_Annual_data_instance.push_back(i);
-	}
-
-	for (int i=0;i<BAC_SCHEDULE_COUNT;i++)
-	{
-		Str_schedual_time_point temp_schedual;
-		memset(&temp_schedual,0,sizeof(temp_schedual));
-		m_Schedual_Time_data.push_back(temp_schedual);
-
-        Str_schedual_time_flag temp_time_flag;
-        memset(&temp_time_flag, 0, sizeof(Str_schedual_time_flag));
-        m_Schedual_time_flag.push_back(temp_time_flag);
-	}
-
-	for (int i=0;i<BAC_PID_COUNT;i++)
-	{
-		Str_controller_point temp_controller;
-		memset(&temp_controller,0,sizeof(temp_controller));
-		m_controller_data.push_back(temp_controller);
-	}
-	for (int i=0;i<BAC_SCREEN_COUNT;i++)
-	{
-		Control_group_point temp_screen;
-		memset(&temp_screen,0,sizeof(temp_screen));
-		m_screen_data.push_back(temp_screen);
-	}
-	for (int i=0;i<BAC_MONITOR_COUNT;i++)
-	{
-		Str_monitor_point temp_monitor;
-		memset(&temp_monitor,0,sizeof(temp_monitor));
-		m_monitor_data.push_back(temp_monitor);
-	}
-
-	for (int i=0;i<BAC_ALARMLOG_COUNT;i++)
-	{
-		Alarm_point temp_alarmpoint;
-		memset(&temp_alarmpoint,0,sizeof(temp_alarmpoint));
-		m_alarmlog_data.push_back(temp_alarmpoint);
-	}
-	for(int i=0;i<BAC_TSTAT_COUNT;i++)
-	{
-		Str_TstatInfo_point temp_tststpoint;
-		memset(&temp_tststpoint,0,sizeof(temp_tststpoint));
-		temp_tststpoint.product_model = 255;  //default 255  means no device;
-		m_Tstat_data.push_back(temp_tststpoint);
-		
-	}
-
-	for (int i=0;i<BAC_CUSTOMER_UNITS_COUNT;i++)
-	{
-		Str_Units_element temp_customer_units;
-		memset(&temp_customer_units,0,sizeof(Str_Units_element));
-		m_customer_unit_data.push_back(temp_customer_units);
-	}
-	
-	for (int i=0;i<BAC_USER_LOGIN_COUNT;i++)
-	{
-		Str_userlogin_point temp_user_login;
-		memset(&temp_user_login,0,sizeof(Str_userlogin_point));
-		m_user_login_data.push_back(temp_user_login);
-	}
-	for(int i=0;i<BAC_GRPHIC_LABEL_COUNT;i++)
-	{
-		Str_label_point temp_label_point;
-		memset(&temp_label_point,0,sizeof(Str_label_point));
-		m_graphic_label_data.push_back(temp_label_point);
-	}
-	for (int i=0;i<BAC_REMOTE_POINT_COUNT;i++)
-	{
-		Str_remote_point temp_remote_point;
-		memset(&temp_remote_point,0,sizeof(Str_remote_point));
-		m_remote_point_data.push_back(temp_remote_point);
-	}
-	for (int i=0;i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT;i++)
-	{
-		Str_table_point temp_table_point;
-		memset(&temp_table_point,0,sizeof(Str_table_point));
-		m_analog_custmer_range.push_back(temp_table_point);
-	}
-	for (int i=0;i< BAC_VARIABLE_CUS_UNIT_COUNT ; i ++)
-	{
-			Str_variable_uint_point temp_var_unit_point;
-			memset(&temp_var_unit_point,0,sizeof(Str_variable_uint_point));
-			m_variable_analog_unite.push_back(temp_var_unit_point);
-	}
-
-	for (int i=0;i<BAC_EXTIO_COUNT;i++)
-	{
-		Str_Extio_point temp_extio_point;
-		memset(&temp_extio_point,0,sizeof(Str_Extio_point));
-		m_extio_config_data.push_back(temp_extio_point);
-	}
-
-	for (int i=0;i<BAC_TSTAT_SCHEDULE;i++)
-	{
-		Str_tstat_schedule temp_tstat_schedule;
-		memset(&temp_tstat_schedule, 0, sizeof(Str_tstat_schedule));
-		m_tatat_schedule_data.push_back(temp_tstat_schedule);
-	}
-
-    for (int i = 0;i < BAC_MSV_COUNT + 1;i++)
-    {
-        Str_MSV temp_msv_point;
-        memset(&temp_msv_point, 0, sizeof(Str_MSV));
-        m_msv_data.push_back(temp_msv_point);
-    }
-}
-
-
 
 
 
@@ -5039,6 +4866,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	if(offline_mode)
 	{
 		LoadBacnetBinaryFile(false,offline_prg_path);
+		bacnet_set_read_result(1);
 		hwait_thread = NULL;
 		if(bac_read_which_list == BAC_READ_PROGRAMCODE_LIST)
 		{
@@ -5050,6 +4878,8 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		{
 			::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
 		}
+
+		::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, 0, 0);
 		return 0;
 
 	}

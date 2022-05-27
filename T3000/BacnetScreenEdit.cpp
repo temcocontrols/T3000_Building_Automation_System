@@ -1088,7 +1088,7 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
     while (1)
     {
         Send_WhoIs_Global(-1, -1);
-        Sleep(1000);
+        Sleep(10000);
         int ncount = address_count();
         for (int i = 0;i < ncount;i++)
         {
@@ -1105,7 +1105,7 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
                     find_device = true;
                 }
             }
-            if (find_device)
+            if (find_device == false)
                 continue;
 
 
@@ -2893,6 +2893,7 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 			ret_return = Write_Private_Data_Blocking(WRITE_GRPHIC_LABEL_COMMAND,i*BAC_READ_GRPHIC_LABEL_GROUP_NUMBER , BAC_READ_GRPHIC_LABEL_GROUP_NUMBER*(i +1)  - 1,control_object_instance);
 			if(ret_return < 0)
 				return false;
+			Sleep(50);
 		}
 
 	}

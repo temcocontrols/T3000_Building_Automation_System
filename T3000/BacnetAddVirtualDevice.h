@@ -24,4 +24,5 @@ public:
 	void UI_Initial();
 	afx_msg void OnBnClickedButtonVirtualOk();
 	afx_msg void OnBnClickedButtonVirtualCancel();
+	afx_msg void OnCbnSelchangeComboVirtualPidName();
 };

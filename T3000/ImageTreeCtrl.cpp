@@ -22,6 +22,7 @@ enum ECmdHandler {
 	ID_SORT_LEVELANDBELOW,
 	ID_SORT_BY_CONNECTION,
 	ID_SORT_BY_FLOOR,
+	ID_PROJECT_POINT_VIEW,
 	ID_PING_CMD,
 	ID_ADD_VIRTUAL_DEVICE,
 	ID_ADD_CUSTOM_DEVICE,
@@ -30,14 +31,17 @@ enum ECmdHandler {
 	ID_BM_DELETE,
 	ID_BM_ADD_GROUPS,
 	ID_BM_ADD_NODES,
+	ID_BM_ADD_MODULE,
 	ID_BM_ADD_INPUT,
 	ID_BM_ADD_OUTPUT,
 	ID_BM_ADD_VARIABLE,
 	ID_BM_IO_PROPERTY,
 	ID_BM_BUILDING_COMMUNICATE,
-	ID_MAX_CMD
+	ID_BM_VIRTUAL_TREE,
+	ID_SAVE_INTO_TREE_DEVICE,
+	
 };
-
+int ID_MAX_CMD = 1000;
 enum ERightDragHandler {
 	ID_DRAG_COPY = 15,
 	ID_DRAG_MOVE,
@@ -46,7 +50,7 @@ enum ERightDragHandler {
 	ID_MAX_DRH
 };
 extern BM_dlg_ret dlg_ret;
-
+BM_nodeinfo operation_nodeinfo;
  DWORD WINAPI _Background_Write_Name(LPVOID pParam){
   CImageTreeCtrl* dlg=(CImageTreeCtrl*)(pParam);
      CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -142,6 +146,8 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_Commandmap[ID_DELETE]             = &CImageTreeCtrl::DoDeleteItem;
 	m_Commandmap[ID_SORT_BY_CONNECTION]		     = &CImageTreeCtrl::SortByConnection;
 	m_Commandmap[ID_SORT_BY_FLOOR]		        = &CImageTreeCtrl::SortByFloor;
+	m_Commandmap[ID_PROJECT_POINT_VIEW] = &CImageTreeCtrl::ProjectPointView;
+	
 	m_Commandmap[ID_PING_CMD]		        = &CImageTreeCtrl::PingDevice;
 	m_Commandmap[ID_ADD_VIRTUAL_DEVICE]     = &CImageTreeCtrl::HandleAddVirtualDevice;
 	m_Commandmap[ID_ADD_CUSTOM_DEVICE]      = &CImageTreeCtrl::HandleAddCustomDevice;
@@ -150,14 +156,16 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_Commandmap[ID_BM_RENAME] = &CImageTreeCtrl::DoEditLabel;
     m_Commandmap[ID_BM_ADD_GROUPS] = &CImageTreeCtrl::BM_Add_Groups;
 	m_Commandmap[ID_BM_ADD_NODES] = &CImageTreeCtrl::BM_Add_Nodes;
+	m_Commandmap[ID_BM_ADD_MODULE] = &CImageTreeCtrl::BM_Add_Module;
 	m_Commandmap[ID_BM_ADD_INPUT] = &CImageTreeCtrl::BM_Add_Inputs;
 	m_Commandmap[ID_BM_ADD_OUTPUT] = &CImageTreeCtrl::BM_Add_Outputs;
 	m_Commandmap[ID_BM_ADD_VARIABLE] = &CImageTreeCtrl::BM_Add_Variable;
-	m_Commandmap[ID_BM_IO_PROPERTY] = &CImageTreeCtrl::BM_IO_Property;
+	m_Commandmap[ID_BM_IO_PROPERTY] = &CImageTreeCtrl::BM_IO_Mapping;
 	m_Commandmap[ID_BM_DELETE] = &CImageTreeCtrl::BM_Delete;
 	m_Commandmap[ID_BM_BUILDING_COMMUNICATE] = &CImageTreeCtrl::BM_Communicate;
+	m_Commandmap[ID_BM_VIRTUAL_TREE] = &CImageTreeCtrl::ShowEquipmentView;
+	m_Commandmap[ID_SAVE_INTO_TREE_DEVICE] = &CImageTreeCtrl::SyncToController;
 	
-
 	old_hItem = NULL;
 	m_serial_number = 0;
 	is_focus = false;
@@ -192,6 +200,11 @@ BEGIN_MESSAGE_MAP(CImageTreeCtrl, CTreeCtrl)
 END_MESSAGE_MAP()
 void CImageTreeCtrl::OnContextCmd(UINT id) {
 	HTREEITEM hCur = GetSelectedItem();
+	if (id >= 100)
+	{
+		Sleep(1);
+		return;
+	}
 	method fnc = m_Commandmap[id];
 	if(fnc) {
 		(this->*fnc)(hCur);
@@ -202,7 +215,7 @@ void CImageTreeCtrl::OnContextCmd(UINT id) {
 bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem) 
 {
 	HTREEITEM hSelectItem = NULL;
-	if (b_building_management_flag != 0)
+	if (b_building_management_flag == SYS_DB_BUILDING_MODE)
 	{
 		if (operation_nodeinfo.node_type == TYPE_BM_POINT_LIST)
 		{
@@ -266,7 +279,10 @@ bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem)
 
 
 
-
+bool CImageTreeCtrl::SyncToController(HTREEITEM hItem)
+{
+	return 1;
+}
 
 bool CImageTreeCtrl::PingDevice(HTREEITEM hItem) 
 {
@@ -333,6 +349,34 @@ void reset_dlg_data()
 	dlg_ret.m_BM_ret_type = 255;
 }
 
+bool CImageTreeCtrl::ShowEquipmentView(HTREEITEM hItem)
+{
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	if (b_building_management_flag == SYS_DB_BUILDING_MODE)
+	{
+		b_building_management_flag = SYS_NORMAL_MODE;
+		pFrame->ClearBuilding();
+		DeleteAllItems();
+		pFrame->m_product.clear();
+		pFrame->ScanTstatInDB();
+	}
+	else if (b_building_management_flag == SYS_NORMAL_MODE)
+	{
+		b_building_management_flag = SYS_DB_BUILDING_MODE;
+		pFrame->ClearBuilding();
+		pFrame->m_pTreeViewCrl->DeleteAllItems();
+		pFrame->m_product.clear();
+		pFrame->SwitchToPruductType(DLG_DIALOG_BUILDING_MANAGEMENT);
+	}
+
+
+
+
+
+	return 0;
+
+
+}
 
 bool CImageTreeCtrl::BM_Communicate(HTREEITEM hItem)
 {
@@ -368,6 +412,7 @@ bool CImageTreeCtrl::BM_Delete(HTREEITEM hItem)
 	{
 		htree_delete = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->pchild[operation_nodeinfo.child_io]->h_treeitem;
 		delete m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->pchild[operation_nodeinfo.child_io];
+
 		Sleep(1);
 	}
 	else
@@ -378,6 +423,8 @@ bool CImageTreeCtrl::BM_Delete(HTREEITEM hItem)
 
 	m_BMpoint->SaveAllIntoIniFile();
 	m_BMpoint->UpdateList();
+	m_BMpoint->LoadFileShowToList();
+
 	return true;
 }
 
@@ -391,14 +438,18 @@ bool CImageTreeCtrl::BM_Add_Groups(HTREEITEM hItem)
 bool CImageTreeCtrl::BM_Add_Nodes(HTREEITEM hItem)
 {
 	BM_Adds(hItem, FUNCTION_BM_ADD, TYPE_BM_NODES);
-
+	return true;
+}
+bool CImageTreeCtrl::BM_Add_Module(HTREEITEM hItem)
+{
+	BM_Adds(hItem, FUNCTION_BM_ADD, TYPE_BM_MODULE);
 	return true;
 }
 
 void CImageTreeCtrl::BM_Property(HTREEITEM hItem)
 {
 	//确定选中的节点是Node 还是IO  并且是哪一个Node 哪一个IO
-	
+	Sleep(1);
 }
 
 void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
@@ -463,6 +514,7 @@ void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
 				//io_node->m_node_type = TYPE_BM_INPUT;
 				io_node->m_node_type = ntype;
 				io_node->pfather = temp_node;
+
 				//新增节点，添加信息，保存到数据库;
 			}
 			if (htree_node != NULL)
@@ -594,11 +646,60 @@ bool CImageTreeCtrl::BM_Add_Variable(HTREEITEM hItem)
 	return true;
 }
 
-bool CImageTreeCtrl::BM_IO_Property(HTREEITEM hItem)
+bool CImageTreeCtrl::BM_IO_Mapping(HTREEITEM hItem)
 {
+	//先删除本group下其他兄弟节点下面的 所有数据
+
+
+	CBacnetBMD* group_point;
+	CBacnetBMD* node_point;
+	CBacnetBMD* source_point;
+
+	group_point = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group];
+	
+
+	for (int i = 0; i < group_point->m_child_count; i++)
+	{
+		node_point = group_point->pchild[i];
+		if (node_point->m_index == operation_nodeinfo.child_device)
+			continue;
+		source_point = group_point->pchild[operation_nodeinfo.child_device];
+		for (int j = 0; node_point->m_child_count!=0; j = 0)  //循环删除兄弟  节点下面的 子节点
+		{
+			delete node_point->pchild[j];
+			DeleteItem(node_point->h_treeitem);
+		}
+
+		//添加一模一样的   兄弟  节点下面的 子节点
+		for (int k = 0; k < source_point->m_child_count; k++)
+		{
+			node_point->m_child_count++;
+
+
+			node_point->pchild[k] = new CBacnetBMD;
+			CBacnetBMD* io_node = node_point->pchild[k];
+			io_node->hParent = node_point->h_treeitem;
+			//io_node->h_treeitem = hTreeIOList;
+			io_node->m_child_count = 0;
+			io_node->m_csName = source_point->pchild[k]->m_csName;
+			io_node->m_index = k;
+			//io_node->m_node_type = TYPE_BM_INPUT;
+			io_node->m_node_type = source_point->pchild[k]->m_node_type;
+			io_node->pfather = node_point;
+		}
+
+	}
+
+	m_BMpoint->BuildingNode.UpdateCount();
+
+
+	m_BMpoint->SaveAllIntoIniFile();
+	m_BMpoint->UpdateList();
+	m_BMpoint->LoadFileShowToList();
+
 	BM_Property(hItem);
-	//CBacnetBuildingProperty PropertyDlg;
-	//PropertyDlg.DoModal();
+	CBacnetBuildingProperty PropertyDlg;
+	PropertyDlg.DoModal();
 	return true;
 }
 
@@ -610,6 +711,13 @@ bool CImageTreeCtrl::BM_Rename(HTREEITEM hItem)
 	return true;
 }
 
+
+bool CImageTreeCtrl::ProjectPointView(HTREEITEM hItem)
+{
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	pFrame->OnDatabaseBuildingManagement();
+	return 0;
+}
 bool CImageTreeCtrl::SortByConnection(HTREEITEM hItem) 
 {
 	if(product_sort_way != SORT_BY_CONNECTION)
@@ -1222,7 +1330,7 @@ void CImageTreeCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 	TVITEM & item = pTVDispInfo->item;
 	*pResult = 1;
-	if (b_building_management_flag == 1)
+	if (b_building_management_flag == SYS_DB_BUILDING_MODE)
 	{
 		CString temp_cs;
 		temp_cs = item.pszText;
@@ -1771,6 +1879,9 @@ void CImageTreeCtrl::BMContextMenu(CPoint& point, BM_nodeinfo nodeinfo)
 
 	CMenu menu;
 	VERIFY(menu.CreatePopupMenu());
+	if(b_building_management_flag == SYS_DB_BUILDING_MODE)
+		VERIFY(menu.AppendMenu(MF_STRING, ID_BM_VIRTUAL_TREE, _T("Show ShowEquipment View")));
+
 	VERIFY(menu.AppendMenu(MF_STRING, ID_BM_RENAME, _T("Rename")));
 
 	CMenu Menu;
@@ -1783,39 +1894,49 @@ void CImageTreeCtrl::BMContextMenu(CPoint& point, BM_nodeinfo nodeinfo)
 
 	CMenu SubMenu;
 	SubMenu.CreatePopupMenu();
-	if (nodeinfo.node_type == TYPE_BM_POINT_LIST)
+	if (b_building_management_flag == SYS_DB_BUILDING_MODE)
 	{
-		menu.AppendMenu(MF_STRING, ID_BM_BUILDING_COMMUNICATE, _T("Communication"));
-		SubMenu.AppendMenu(MF_STRING , ID_BM_ADD_GROUPS, _T("Add Groups"));
-		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_NODES, _T("Add Nodes"));
-		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_INPUT, _T("Add Inputs"));
-		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_OUTPUT, _T("Add Outputs"));
-		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_VARIABLE, _T("Add Variable"));
+		if (nodeinfo.node_type == TYPE_BM_POINT_LIST)
+		{
+			menu.AppendMenu(MF_STRING, ID_BM_BUILDING_COMMUNICATE, _T("Communication"));
+			SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_GROUPS, _T("Add Groups"));
+			SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_NODES, _T("Add Nodes"));
+			SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_INPUT, _T("Add Inputs"));
+			SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_OUTPUT, _T("Add Outputs"));
+			SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_VARIABLE, _T("Add Variable"));
+		}
+		else if (nodeinfo.node_type == TYPE_BM_GROUP)
+		{
+			SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_GROUPS, _T("Add Groups"));
+			SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_NODES, _T("Add Nodes"));
+		    SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_MODULE, _T("Add Module"));
+			SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_INPUT, _T("Add Inputs"));
+			SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_OUTPUT, _T("Add Outputs"));
+			SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_VARIABLE, _T("Add Variable"));
+		}
+		else if ((nodeinfo.node_type == TYPE_BM_NODES) ||
+			(nodeinfo.node_type == TYPE_BM_INPUT) ||
+			(nodeinfo.node_type == TYPE_BM_OUTPUT) ||
+			(nodeinfo.node_type == TYPE_BM_VARIABLE))
+		{
+			SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_GROUPS, _T("Add Groups"));
+			SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_NODES, _T("Add Nodes"));
+			SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_INPUT, _T("Add Inputs"));
+			SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_OUTPUT, _T("Add Outputs"));
+			SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_VARIABLE, _T("Add Variable"));
+			SubMenu.AppendMenu(MF_STRING, ID_BM_IO_PROPERTY, _T("Property Setting"));
+			VERIFY(menu.AppendMenu(MF_STRING, ID_BM_IO_PROPERTY, _T("Map to others")));
+		}
+		else
+		{
+			return;
+		}
 	}
-	else if (nodeinfo.node_type == TYPE_BM_GROUP)
-	{
-		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_GROUPS, _T("Add Groups"));
-		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_NODES, _T("Add Nodes"));
-		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_INPUT, _T("Add Inputs"));
-		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_OUTPUT, _T("Add Outputs"));
-		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_VARIABLE, _T("Add Variable"));	
-	}
-	else if ((nodeinfo.node_type == TYPE_BM_NODES) ||
-		     (nodeinfo.node_type == TYPE_BM_INPUT) ||
-		     (nodeinfo.node_type == TYPE_BM_OUTPUT)  ||
-		     (nodeinfo.node_type == TYPE_BM_VARIABLE))
-	{
-		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_GROUPS, _T("Add Groups"));
-		SubMenu.AppendMenu(MF_STRING | MF_DISABLED, ID_BM_ADD_NODES, _T("Add Nodes"));
-		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_INPUT, _T("Add Inputs"));
-		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_OUTPUT, _T("Add Outputs"));
-		SubMenu.AppendMenu(MF_STRING, ID_BM_ADD_VARIABLE, _T("Add Variable"));
-		SubMenu.AppendMenu(MF_STRING, ID_BM_IO_PROPERTY, _T("Property Setting"));
-	}
-	else
-	{
-		return;
-	}
+	//else if (b_building_management_flag == SYS_VIRTUAL_MODE)
+	//{
+	//	SubMenu.AppendMenu(MF_STRING, ID_ADD_VIRTUAL_DEVICE, _T("Add Virtual Device"));
+	//}
+	
 
 	menu.AppendMenu(MF_STRING | MF_POPUP, (UINT_PTR)SubMenu.m_hMenu, _T("Add"));
 
@@ -1834,20 +1955,19 @@ void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
 
 		CMenu menu;
 		VERIFY(menu.CreatePopupMenu());
-
+		
+	    VERIFY(menu.AppendMenu(MF_STRING, ID_PROJECT_POINT_VIEW, _T("Project Point View")));
 		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
         VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
         VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Modbus Device")));
         VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_REMOTE_DEVICE, _T("Add Remote Device")));
-        //VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_BACNET_DEVICE, _T("Add Third-Part Bac Device")));
+        VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_VIRTUAL_DEVICE, _T("Add Virtual Device")));
         
-        if ((m_virtual_tree_item != NULL) && (hItem == m_virtual_tree_item))
-        {
-            VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_VIRTUAL_DEVICE, _T("Add Virtual Device")));
-        }
         if (menu.GetMenuItemCount() > 0)
             menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
 }
+
+
 
 void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 	CPoint pt(point);
@@ -1868,6 +1988,13 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 			VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
 			VERIFY(menu.AppendMenu(MF_STRING, ID_PING_CMD, _T("Ping")));
             VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Modbus Device")));
+			CMenu subMenu;
+			subMenu.CreateMenu();
+
+			subMenu.AppendMenu(MF_STRING, 100, _T("Testing"));
+			subMenu.AppendMenu(MF_STRING, 101, _T("Testing"));
+			subMenu.AppendMenu(MF_STRING, 102, _T("Testing"));
+			VERIFY(menu.AppendMenu(MF_POPUP, (UINT)subMenu.m_hMenu, _T("Sync to Controller")));
 		}
 	}
 
@@ -1954,7 +2081,7 @@ void CImageTreeCtrl::OnRclick(NMHDR* pNMHDR, LRESULT* pResult)
 	ScreenToClient(&point);
 	HTREEITEM hItem = HitTest(point, &flags);
 	
-	if (b_building_management_flag == 0)
+	if (b_building_management_flag == SYS_NORMAL_MODE)
 	{
 		HTREEITEM root_item = CImageTreeCtrl::GetRootItem();
 		if (CImageTreeCtrl::ItemHasChildren(root_item))

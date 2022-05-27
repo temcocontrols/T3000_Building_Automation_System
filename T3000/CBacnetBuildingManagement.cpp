@@ -5,6 +5,7 @@
 #include "T3000.h"
 #include "CBacnetBuildingManagement.h"
 #include "MainFrm.h"
+extern HWND h_db_io_hwnd;
 CMainFrame* pFrame_BM;
 // CBacnetBuildingManagement
 CString cs_bm_ini;
@@ -31,6 +32,7 @@ BEGIN_MESSAGE_MAP(CBacnetBuildingManagement, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_BM_DELETE, &CBacnetBuildingManagement::OnBnClickedButtonBmDelete)
 	ON_BN_CLICKED(IDC_BUTTON_BM_DONE, &CBacnetBuildingManagement::OnBnClickedButtonBmDone)
 	ON_BN_CLICKED(IDC_BUTTON_BM_SAVE, &CBacnetBuildingManagement::OnBnClickedButtonBmSave)
+	ON_BN_CLICKED(IDC_BUTTON_DB_DONE, &CBacnetBuildingManagement::OnBnClickedButtonDbDone)
 END_MESSAGE_MAP()
 
 
@@ -189,7 +191,7 @@ void CBacnetBuildingManagement::OnBnClickedButtonBmDone()
 
 void CBacnetBuildingManagement::LoadFileShowToList()
 {
-	b_building_management_flag = true;
+	b_building_management_flag = 1;
 	pFrame_BM->ClearBuilding();
 	pFrame_BM->m_pTreeViewCrl->DeleteAllItems();
 	nGroupCount = GetPrivateProfileInt(_T("Setting"), _T("TotalGroup"), 0, cs_bm_ini);
@@ -214,6 +216,7 @@ void CBacnetBuildingManagement::LoadFileShowToList()
 
 	}
 	TreeInital();
+	::PostMessage(h_db_io_hwnd, WM_REFRESH_BAC_BUILDING_IO_LIST, NULL, NULL);
 }
 
 void CBacnetBuildingManagement::ShowListToTree()
@@ -322,6 +325,9 @@ void CBacnetBuildingManagement::TreeInital()
 			CBacnetBMD* temp_bmd_point = NULL;
 
 			temp_bmd_point = BuildingNode.pchild[i]->pchild[j];
+			temp_bmd_point->m_input_count = 0;
+			temp_bmd_point->m_output_count = 0;
+			temp_bmd_point->m_variable_count = 0;
 			temp_bmd_point->hParent = hTreeGroup;
 			temp_bmd_point->h_treeitem = hTreeABC123;
 			temp_bmd_point->m_child_count = temp_io_count;
@@ -343,6 +349,18 @@ void CBacnetBuildingManagement::TreeInital()
 				GetPrivateProfileString(temp_lpAppname, section_io_name, _T(""), io_name.GetBuffer(MAX_PATH), MAX_PATH, cs_bm_ini);
 				io_name.ReleaseBuffer();
 				io_type = GetPrivateProfileInt(temp_lpAppname, section_io_type, 0, cs_bm_ini);
+
+				CString section_property;
+				section_property.Format(_T("nPropertyArray_%d_%d"), j, z);
+				CString temp_property_cstring;
+				GetPrivateProfileString(temp_lpAppname, section_property, _T(""), temp_property_cstring.GetBuffer(MAX_PATH), MAX_PATH, cs_bm_ini);
+				temp_property_cstring.ReleaseBuffer();
+
+
+
+
+
+
 
 				tvInsert.hParent = hTreeABC123; // 指定父句柄
 				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
@@ -378,6 +396,26 @@ void CBacnetBuildingManagement::TreeInital()
 				temp_io_point->m_index = z;
 				temp_io_point->m_node_type = io_type;
 				temp_io_point->pfather = temp_bmd_point;
+
+				if (temp_property_cstring.IsEmpty() == false)
+				{
+					CStringArray temp_array;
+					SplitCStringA(temp_array, temp_property_cstring, _T(","));
+					unsigned char temp_char[250];
+					if (temp_array.GetSize() == sizeof(Str_points))
+					{
+						for (int x = 0; x < (int)sizeof(Str_points); x++)
+						{
+							temp_char[x] = wcstol(temp_array.GetAt(x), NULL, 16);
+							 //= _wtoi(temp_array.GetAt(x));
+						}
+						memcpy_s(&temp_io_point->m_property, sizeof(Str_points), temp_char, sizeof(Str_points));
+					}
+
+				}
+				Sleep(1);
+
+
 			}
 			if (hTreeGroup != NULL)
 				pFrame_BM->m_pTreeViewCrl->Expand(hTreeABC123, TVE_EXPAND);
@@ -439,4 +477,12 @@ void CBacnetBuildingManagement::OnBnClickedButtonBmSave()
 void CBacnetBuildingManagement::SetDataTreeCtrl()
 {
 	pFrame_BM->m_pTreeViewCrl->m_BMpoint = this;
+}
+
+
+void CBacnetBuildingManagement::OnBnClickedButtonDbDone()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	LoadFileShowToList();
+	::PostMessage(h_db_io_hwnd,WM_REFRESH_BAC_BUILDING_IO_LIST, NULL, NULL);
 }

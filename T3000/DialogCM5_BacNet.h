@@ -58,7 +58,7 @@ public:
 
 
 	//static	DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
-	void Initial_All_Point();
+
 	void Show_Wait_Dialog_And_SendMessage(int read_list_type);
 	void WriteFlash();
 	void SetConnected_IP(LPCTSTR myip);

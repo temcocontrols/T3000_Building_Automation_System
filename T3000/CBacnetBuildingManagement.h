@@ -49,6 +49,7 @@ public:
 	void UpdateList();
 	void SetDataTreeCtrl();
 	//CImageTreeCtrl* tree_ctrl;
+	afx_msg void OnBnClickedButtonDbDone();
 };
 
 const int BM_ROOT_ITEM = 0;

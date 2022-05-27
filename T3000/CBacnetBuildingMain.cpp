@@ -84,8 +84,12 @@ void CBacnetBuildingMain::Fresh()
     cs_bm_ini = g_strExePth + _T("Database\\Buildings\\") + pFrame_BM->m_strCurMainBuildingName + _T("\\BuildingManagement.ini");
     InitBuildingFloor();
     //添加代码 加载楼层房间的 名字 
-
-    InitialTab();
+    static int inital_once = false;
+    if (inital_once == false)
+    {
+        InitialTab();
+        inital_once = 1;
+    }
     m_page_building_info.Fresh();
     m_page_building_io.Fresh();
    // InitScrollbar();

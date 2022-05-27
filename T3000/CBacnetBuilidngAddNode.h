@@ -24,6 +24,7 @@ public:
 	virtual BOOL OnInitDialog();
 	void SetParameter(int nfunction, int ntype);
 	void InitalUI();
+	void ResetMoudleCount(int nmoudle_type); //通过例子 展示不同的输入输出个数;
 	int m_function;
 	int m_type;
 	afx_msg void OnBnClickedButtonBmNodeOk();

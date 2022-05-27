@@ -17,7 +17,7 @@
 extern tree_product selected_product_Node; // 选中的设备信息;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
-extern vector <int>  m_Input_data_instance;
+
 static bool show_external =  false;
 CRect Input_rect;
 int INPUT_LIMITE_ITEM_COUNT = 0;
@@ -1234,7 +1234,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 				m_input_list.SetItemText(i, INPUT_PANEL, Statuspanel);
 				int InputType = 0;
-				if (selected_product_Node.product_class_id == PM_TSTAT10)
+				//if (selected_product_Node.product_class_id == PM_TSTAT10)
+				  if(Bacnet_Private_Device(selected_product_Node.product_class_id))
 					bacnet_device_type = Device_Basic_Setting.reg.mini_type;
 				InputType = GetInputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1, m_Input_data.at(i).digital_analog);
 				m_input_list.SetItemText(i, INPUT_EXTERNAL, Output_Type_String[InputType]);
@@ -1912,11 +1913,14 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 	case UPDATE_INPUT_ONE_ITEM_TIMER:
 		{
 			KillTimer(UPDATE_INPUT_ONE_ITEM_TIMER);
+			if (offline_mode)
+			{
+				break;
+			}
 			if((bac_select_device_online) && (g_protocol == PROTOCOL_BACNET_IP))
 			{
 				GetPrivateData_Blocking(g_bac_instance,READINPUT_T3000,changed_input_item,changed_input_item,sizeof(Str_in_point));
 			}
-			
 
 			PostMessage(WM_REFRESH_BAC_INPUT_LIST,changed_input_item,REFRESH_ON_ITEM);
 		}
@@ -1924,6 +1928,10 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 	case 4:
 		if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_INPUT) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
 		{
+			if (offline_mode)
+			{
+				break;
+			}
 			Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0); //只刷新Value
 		}
 		break;

@@ -15,6 +15,7 @@ CBacnetBMD::CBacnetBMD(void)
 	m_csName.Empty();
 	m_floor = 0;
 	m_room = 0;
+	m_property = { 0 };
 }
 
 CBacnetBMD::~CBacnetBMD(void)

@@ -2187,7 +2187,7 @@ Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
 
 char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
 int b_pause_refresh_tree = false; // 全局变量，控制主线程里面的 是否刷新网络数据;
-int b_building_management_flag = false; //另一种 虚拟控制模式，yes就停止后台扫描以及刷新;
+int b_building_management_flag = 0; //另一种 虚拟控制模式，yes就停止后台扫描以及刷新;
 int debug_item_show = 0;
 bool monitor_ignore_enable = false;
 int monitor_ignore_max_value = 0;
@@ -2318,4 +2318,4 @@ bool Bacnet_debug_fileRead = false;
 
 vector <Str_BM_IO> m_bm_io_data; //用来存储BM 系统  IO表数据
 
-
+vector <Str_product_io_count> m_product_iocount;  // 用来存储不同设备包含的IO数量;

@@ -220,7 +220,9 @@ int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path);
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path);
 //For MINIPanel ARM
 int WriteDeviceDataIntoAccessDB(int nTableType, int ncount, int device_serialnumber);
-
+#ifdef LOCAL_DB_FUNCTION
+void init_product_list();
+#endif
 void Copy_Data_From_485_to_Bacnet(unsigned short *start_point);
 int handle_read_monitordata_ex(char *npoint,int nlength);
 int handle_read_pic_data_ex(char *npoint,int nlength);
@@ -312,4 +314,10 @@ int Check_DaXiaoDuan(unsigned char npid, unsigned char Mainsw, unsigned char sub
 void Time32toCString(unsigned long ntime, CString &outputtime, int nproduct_id = 74);
 int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex); //获取输出状态
 int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n_digital_analog); //获取输出状态
+char* decode_point(char* token, Str_points& temp);
+void Initial_All_Point();
+void Initial_Virtual_Device_Setting();
+void product_list();
+int bacnet_set_read_result(int nret);
+int CheckDeviceDatabase();
 #endif
