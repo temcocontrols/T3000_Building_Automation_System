@@ -1434,10 +1434,19 @@ void BacnetScreen::OnBnClickedWebViewShow()
 	int nversion = check_webview_runtime();
 	if (nversion == 0)
 	{
-		MessageBox(_T("To use this feature properly,Please download the latest WebView RumTime.\r\n https://developer.microsoft.com/en-us/microsoft-edge/webview2/"));
-		ShellExecute(this->m_hWnd, _T("open"), _T("https://developer.microsoft.com/en-us/microsoft-edge/webview2/"), NULL, NULL, SW_SHOWNORMAL);
-		ShellExecute(this->m_hWnd, _T("open"), _T("https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/f1ef4889-266b-41d8-9725-76f5b1e37f7f/Microsoft.WebView2.FixedVersionRuntime.100.0.1185.50.x64.cab"), NULL, NULL, SW_SHOWNORMAL);
-		return;
+
+		int Answer;
+
+		Answer = AfxMessageBox(L"To use this feature properly,Please download the latest WebView RumTime.\r\n https://developer.microsoft.com/en-us/microsoft-edge/webview2/", MB_YESNO | MB_ICONWARNING);
+
+
+		if (Answer == IDYES)
+		{
+			ShellExecute(this->m_hWnd, _T("open"), _T("https://developer.microsoft.com/en-us/microsoft-edge/webview2/"), NULL, NULL, SW_SHOWNORMAL);
+			ShellExecute(this->m_hWnd, _T("open"), _T("https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/f1ef4889-266b-41d8-9725-76f5b1e37f7f/Microsoft.WebView2.FixedVersionRuntime.100.0.1185.50.x64.cab"), NULL, NULL, SW_SHOWNORMAL);
+			return;
+		}
+
 	}
 
 	const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
