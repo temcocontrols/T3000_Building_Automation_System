@@ -16,7 +16,15 @@ CString BM_Cstring_Type[]
 	_T("Node"),
 	_T("Input"),
 	_T("Output"),
-	_T("Variable")
+	_T("Variable"),
+	_T("Moudle")
+};
+const int MOUDLE_FAN_1 = 0;
+const int MOUDLE_FAN_2 = 1;
+CString BM_Cstring_Moudle[]
+{
+	_T("Fan Example 1"),
+	_T("Fan Example 2")
 };
 
 CString BM_Cstring_Function[]
@@ -59,6 +67,19 @@ void CBacnetBuilidngAddNode::SetParameter(int nfunction,int ntype)
 	m_type = ntype;
 }
 
+void CBacnetBuilidngAddNode::ResetMoudleCount(int nmoudle_type)
+{
+	switch (nmoudle_type)
+	{
+	case MOUDLE_FAN_1:
+		break;
+	case MOUDLE_FAN_2:
+		break;
+	default:
+		break;
+	}
+}
+
 void CBacnetBuilidngAddNode::InitalUI()
 {
 	((CComboBox*)GetDlgItem(IDC_COMBO_BM_FUNCTION))->ResetContent();
@@ -70,6 +91,13 @@ void CBacnetBuilidngAddNode::InitalUI()
 	{
 		((CComboBox*)GetDlgItem(IDC_COMBO_BM_TYPE))->AddString(BM_Cstring_Type[i]);
 	}
+	for (int i = 0; i < sizeof(BM_Cstring_Moudle) / sizeof(BM_Cstring_Moudle[0]); i++)
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_BM_MOUDLE))->AddString(BM_Cstring_Moudle[i]);
+	}
+
+	
+
 	if (m_function != 255)
 	{
 		((CComboBox*)GetDlgItem(IDC_COMBO_BM_FUNCTION))->EnableWindow(false);
@@ -84,6 +112,19 @@ void CBacnetBuilidngAddNode::InitalUI()
 		if ((m_type < sizeof(BM_Cstring_Type)) && m_type >= 0)
 		{
 			((CComboBox*)GetDlgItem(IDC_COMBO_BM_TYPE))->SetWindowText(BM_Cstring_Type[m_type].GetBuffer());
+		}
+
+		if (m_type == TYPE_BM_MODULE)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_BM_MOUDLE))->SetWindowText(BM_Cstring_Moudle[0]);
+			((CComboBox*)GetDlgItem(IDC_COMBO_BM_MOUDLE))->EnableWindow(1);
+			//GetDlgItem(IDC_EDIT_BN_INPUT_COUNT)
+		}
+		else
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_BM_MOUDLE))->EnableWindow(0);
+			
+
 		}
 	}
 

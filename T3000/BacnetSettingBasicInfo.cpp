@@ -85,6 +85,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingBasicInfo, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO_SETTING_LCD_DELAY_OFF, &CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdDelayOff)
     ON_BN_CLICKED(IDC_BUTTON_LCD_SETTING, &CBacnetSettingBasicInfo::OnBnClickedButtonLcdSetting)
     //ON_EN_KILLFOCUS(IDC_EDIT_SETTING_ALIAS_NAME, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName)
+    ON_EN_KILLFOCUS(IDC_EDIT_SETTING_BIP_NETWORK2, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingBipNetwork2)
 END_MESSAGE_MAP()
 
 
@@ -431,3 +432,37 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName()
 
 }
 #endif
+
+void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingBipNetwork2()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_cstring;
+    ((CEdit*)GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->GetWindowTextW(temp_cstring);
+    unsigned int temp_bip_network = unsigned int(_wtoi(temp_cstring));
+    if ((temp_bip_network > 0) && (temp_bip_network <= 65535) && (temp_bip_network != Device_Basic_Setting.reg.network_number_hi * 256 + Device_Basic_Setting.reg.network_number))
+    {
+        CString temp_warning;
+        temp_warning.Format(_T("Do you really want to change the bacnet network to %u ?"), temp_bip_network);
+        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        {
+            unsigned int old_network = Device_Basic_Setting.reg.network_number_hi * 256 + Device_Basic_Setting.reg.network_number;	//写之前先保存起来；写失败 恢复原值;
+            Device_Basic_Setting.reg.network_number = (unsigned int)temp_bip_network%256;
+            Device_Basic_Setting.reg.network_number_hi = (unsigned int)temp_bip_network / 256;
+            if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+            {
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change bacnet network failed!"));
+                Device_Basic_Setting.reg.network_number = old_network % 256;;
+                Device_Basic_Setting.reg.network_number_hi = old_network / 256;;
+                PostMessage(WM_FRESH_CM_LIST, READ_SETTING_COMMAND, NULL);
+            }
+            else
+            {      
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Change bacnet network success!"));
+            }
+        }
+        else
+        {
+            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
+        }
+    }
+}

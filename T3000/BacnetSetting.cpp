@@ -317,7 +317,12 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 ((CIPAddressCtrl *)m_page_tcpip.GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
             }
         }
-
+        if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 623)
+        {
+            ((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->EnableWindow(0);
+        }
+        else
+            ((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->EnableWindow(1);
 
         //硬件版本大于 26 代表是arm的版本.
         if (Device_Basic_Setting.reg.pro_info.harware_rev >= 26)
@@ -1043,7 +1048,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         }
         temp_mac_address.MakeUpper();
         temp_mstp_network.Format(_T("%u"), Device_Basic_Setting.reg.mstp_network_number);
-        temp_bip_network.Format(_T("%u"), Device_Basic_Setting.reg.network_number);
+        if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 623)
+            temp_bip_network.Format(_T("%u"), Device_Basic_Setting.reg.network_number);
+        else
+            temp_bip_network.Format(_T("%u"), Device_Basic_Setting.reg.network_number_hi*256 + Device_Basic_Setting.reg.network_number);
         if (Device_Basic_Setting.reg.modbus_id == 0)
         {
             temp_modbus_id.Empty();
@@ -1072,6 +1080,13 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         ((CEdit *)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_MAX_MASTER))->SetWindowTextW(csmax_master);
 
     }
+
+#ifdef LOCAL_DB_FUNCTION
+    if (selected_product_Node.serial_number != 0)
+        WriteDeviceDataIntoAccessDB(BAC_SETTING, 0, selected_product_Node.serial_number);
+#endif
+
+
     break;
 
     case TIME_COMMAND:

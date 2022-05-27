@@ -369,7 +369,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_CONTROL_IO_NET_CONFIG, &CMainFrame::OnControlIoNetConfig)
         ON_COMMAND(ID_DATABASE_LOGDETAIL, &CMainFrame::OnDatabaseLogdetail)
         ON_UPDATE_COMMAND_UI(ID_APP_ABOUT, &CMainFrame::OnUpdateAppAbout)
-        ON_COMMAND(ID_DATABASE_BUILDINGMANAGEMENT, &CMainFrame::OnDatabaseBuildingManagement)
         ON_COMMAND(ID_VIEW_REFRESH, &CMainFrame::OnViewRefresh)
         ON_COMMAND(ID_FILE_NEWPROJECT, &CMainFrame::OnFileNewproject)
 #ifndef LOCAL_DB_FUNCTION
@@ -869,6 +868,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 //	Check_Local_TemcoUpdate();
 
     ScanTstatInDB();
+
    // DeleteConflictInDB();//用于处理数据库中重复的数据，这些数据有相同的序列号;
     PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);
 
@@ -1292,7 +1292,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
     if(hSelItem == NULL)
         return;
 
-    if (b_building_management_flag)
+    if (b_building_management_flag == SYS_DB_BUILDING_MODE)
     {
         DoConnectToANode(hSelItem);
         return;
@@ -1598,6 +1598,26 @@ void CMainFrame::DeleteConflictInDB()
         PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
 }
 
+
+void CMainFrame::GetExtProductInfo(tree_product &m_product_temp,CString temp_ext)
+{
+    CStringArray temp_array_2;
+    temp_ext.Trim();
+    SplitCStringA(temp_array_2, temp_ext, _T("^"));
+    if ((temp_array_2.GetSize() == 0) || (temp_ext.IsEmpty()))
+    {
+        m_product_temp.m_ext_info.virtual_device = 0;
+    }
+    else
+    {
+        if (temp_array_2.GetSize() >= 2)
+        {
+            m_product_temp.m_ext_info.virtual_device = _wtoi(temp_array_2.GetAt(0).GetString());
+            m_product_temp.m_ext_info.mini_type = _wtoi(temp_array_2.GetAt(1).GetString());
+        }
+    }
+}
+
 void CMainFrame::LoadProductFromDB()
 {
 	ClearBuilding();
@@ -1810,7 +1830,8 @@ void CMainFrame::LoadProductFromDB()
 	{
 		if((current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_AUTO))
 		{
-			CString strNetWrokName= _T("Local Network");
+            CString strNetWrokName;
+			     strNetWrokName= _T("Local Network");
 			///*********tree***********************************
 			tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
 			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
@@ -1830,6 +1851,9 @@ void CMainFrame::LoadProductFromDB()
 		if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP) || (current_building_protocol == P_AUTO))
 		{
 			CString strSerialRootName= _T("Serial Port");
+
+                strSerialRootName = _T("Serial Port");
+
 			///*********tree***********************************
 			tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
 			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
@@ -1964,7 +1988,18 @@ void CMainFrame::LoadProductFromDB()
 								continue;
 							}
 						}
-
+                        tree_product m_product_temp = {0};
+                        CString temp_ext;
+                        temp_ext = q.getValuebyName(L"Screen_Name");
+                        GetExtProductInfo(m_product_temp, temp_ext);
+                        //if (b_building_management_flag == SYS_VIRTUAL_MODE)
+                        //{
+                        //    if (m_product_temp.m_ext_info.virtual_device == 0)
+                        //    {
+                        //        q.nextRow();
+                        //        continue;
+                        //    }
+                        //}
 
 						temp_parent_serialnum=q.getValuebyName(L"Parent_SerialNum");
 						unsigned int temp_int_serial;
@@ -2015,8 +2050,22 @@ void CMainFrame::LoadProductFromDB()
 							temp_product_class_id == PM_T38AI8AO6DO
 							)
 							TVINSERV_T3ARM
-						else if (temp_product_class_id ==PM_MINIPANEL|| temp_product_class_id == PM_MINIPANEL_ARM || temp_product_class_id == PM_ESP32_T3_SERIES)//Mini Panel
-						TVINSERV_MINIPANEL
+                        else if (temp_product_class_id == PM_MINIPANEL || temp_product_class_id == PM_MINIPANEL_ARM || temp_product_class_id == PM_ESP32_T3_SERIES)//Mini Panel
+                        {
+                            if (m_product_temp.m_ext_info.virtual_device == 1)
+                            {
+                                if(m_product_temp.m_ext_info.mini_type == MINIPANELARM)
+                                    TVINSERV_MINIPANEL
+                                else if (m_product_temp.m_ext_info.mini_type == MINIPANELARM_LB)
+                                    TVINSERV_T3ARM
+                                else if(m_product_temp.m_ext_info.mini_type == MINIPANELARM_TB)
+                                    TVINSERV_T3ARM
+                                else if (m_product_temp.m_ext_info.mini_type == MINIPANELARM_NB)
+                                    TVINSERV_T3_NANO
+                            }
+                            else
+                                TVINSERV_MINIPANEL
+                        }
 						else if (temp_product_class_id == PM_AirQuality)//AirQuality
 							TVINSERV_TSTAT_DEFAULT
 						else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
@@ -2037,7 +2086,7 @@ void CMainFrame::LoadProductFromDB()
                         else if(temp_product_class_id == PM_MULTI_SENSOR )
                         TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
                         else if(temp_product_class_id == PM_ZIGBEE_REPEATER)
-                        TVINSERV_ZIGBEE_REPEATER
+                        TVINSERV_T3_NANO
 						else if((temp_product_class_id == PM_CO2_NET) ||
                                 (temp_product_class_id == PM_CO2_RS485)||
 							    (temp_product_class_id == PM_PRESSURE_SENSOR)|| 
@@ -2066,7 +2115,7 @@ void CMainFrame::LoadProductFromDB()
 
 							HTREEITEM hProductItem=m_pTreeViewCrl->InsertItem(&tvInsert);
 
-                        tree_product m_product_temp;
+
                         m_product_temp.product_item = hProductItem;
 
 						HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hProductItem);
@@ -2188,8 +2237,20 @@ void CMainFrame::LoadProductFromDB()
 
 						//m_product_temp.BuildingInfo.strIpPort = _T("10000");
                         m_product_temp.BuildingInfo.strIpPort.Format(_T("%d"), m_product_temp.ncomport);
+
 						m_product_temp.strImgPathName=q.getValuebyName(L"Background_imgID");
 
+                        //CStringArray temp_array_2;
+                        //SplitCStringA(temp_array_2, temp_ext, _T("^"));
+                        //if (temp_array_2.GetSize() == 0)
+                        //{
+                        //    m_product_temp.m_ext_info.virtual_device = 0;
+                        //}
+                        //else
+                        //{
+                        //    m_product_temp.m_ext_info.virtual_device = _wtoi(temp_array_2.GetAt(0).GetString());
+                        //}
+                        
 						m_product_temp.note_parent_serial_number=q.getIntField("Parent_SerialNum");
 
 						m_product_temp.panel_number=q.getIntField("Panal_Number");
@@ -2248,6 +2309,18 @@ void CMainFrame::LoadProductFromDB()
 								break;
 							}
 						}
+                        tree_product m_product_temp = {0};
+                        CString temp_ext;
+                        temp_ext = q.getValuebyName(L"Screen_Name");
+                        GetExtProductInfo(m_product_temp, temp_ext);
+                        //if (b_building_management_flag == SYS_VIRTUAL_MODE)
+                        //{
+                        //    if (m_product_temp.m_ext_info.virtual_device == 0)
+                        //    {
+                        //        q.nextRow();
+                        //        continue;
+                        //    }
+                        //}
 
 						if(find_parents)
 						{
@@ -2305,7 +2378,7 @@ void CMainFrame::LoadProductFromDB()
                             else if (temp_product_class_id == PM_MULTI_SENSOR)
                                 TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
                             else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
-                                TVINSERV_ZIGBEE_REPEATER
+                                TVINSERV_T3_NANO
 							else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
 								(temp_product_class_id == PM_PRESSURE_SENSOR) ||
 								(temp_product_class_id == STM32_PRESSURE_NET) ||
@@ -2339,7 +2412,7 @@ void CMainFrame::LoadProductFromDB()
 
 
 
-							tree_product m_product_temp;
+
 							m_product_temp.product_item  =hSubItem;
 
                             if (hParent != NULL)
@@ -2470,7 +2543,6 @@ void CMainFrame::LoadProductFromDB()
 							m_product_temp.BuildingInfo.strIpPort = _T("10000");
 							m_product_temp.strImgPathName=q.getValuebyName(L"Background_imgID");
 
-
 							m_product_temp.note_parent_serial_number=q.getIntField("Parent_SerialNum");
 
 
@@ -2490,8 +2562,9 @@ void CMainFrame::LoadProductFromDB()
 			}
 		}
 	}
-
+#if 0
 	HTREEITEM hrootvirtualdevice=NULL;
+    if(b_building_management_flag != SYS_VIRTUAL_MODE)   //最新的 虚拟设备不在单独在这里列出来
 	{
 		CString strVirtualDevice= _T("Virtual Device");
 		///*********tree***********************************
@@ -2522,7 +2595,18 @@ void CMainFrame::LoadProductFromDB()
 				temp_parent_serialnum=q.getValuebyName(L"Parent_SerialNum");
 				unsigned int temp_int_serial;
 				temp_int_serial = (unsigned int)_wtoi(temp_parent_serialnum);
-
+                tree_product m_product_temp;
+                CString temp_ext;
+                temp_ext = q.getValuebyName(L"Screen_Name");
+                GetExtProductInfo(m_product_temp, temp_ext);
+                if (b_building_management_flag == SYS_VIRTUAL_MODE)
+                {
+                    if (m_product_temp.m_ext_info.virtual_device == 0)
+                    {
+                        q.nextRow();
+                        continue;
+                    }
+                }
 
 				CString strProdcut=q.getValuebyName(L"Product_name");
 
@@ -2578,7 +2662,7 @@ void CMainFrame::LoadProductFromDB()
                 else if (temp_product_class_id == PM_MULTI_SENSOR)
                     TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
                 else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
-                    TVINSERV_ZIGBEE_REPEATER
+                    TVINSERV_T3_NANO
 				else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
 					(temp_product_class_id == PM_PRESSURE_SENSOR) ||
 					(temp_product_class_id == STM32_PRESSURE_NET) ||
@@ -2606,7 +2690,7 @@ void CMainFrame::LoadProductFromDB()
 				//if (hParent != NULL)
 				//	m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
 
-				tree_product m_product_temp;
+
 				m_product_temp.product_item  =hProductItem;
 
                 if (hParent != NULL)
@@ -2759,9 +2843,9 @@ void CMainFrame::LoadProductFromDB()
 			}
 		}
 	}
+    
+#endif
     m_pTreeViewCrl->Expand(hTreeSubbuilding, TVE_EXPAND);
-
-
     for (int i = 0; i < (int)m_product.size(); i++)
     {
         if (m_product.at(i).note_parent_serial_number != 0)
@@ -3080,7 +3164,18 @@ void CMainFrame::ScanTstatInDB(void)
                     //TRACE(strProdcut);
                     tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
                     int temp_product_class_id=q.getIntField("Product_class_ID");
-
+                    CString temp_ext;
+                    tree_product m_product_temp = {0};
+                    temp_ext = q.getValuebyName(L"Screen_Name");
+                    GetExtProductInfo(m_product_temp, temp_ext);
+                    //if (b_building_management_flag == SYS_VIRTUAL_MODE)
+                    //{
+                    //    if (m_product_temp.m_ext_info.virtual_device == 0)
+                    //    {
+                    //        q.nextRow();
+                    //        continue;
+                    //    }
+                    //}
 #if 1
 					if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR )
 						TVINSERV_NET_WORK
@@ -3125,7 +3220,7 @@ void CMainFrame::ScanTstatInDB(void)
                     else if (temp_product_class_id == PM_MULTI_SENSOR)
                         TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
                     else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
-                        TVINSERV_ZIGBEE_REPEATER
+                        TVINSERV_T3_NANO
 					else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
 						(temp_product_class_id == PM_PRESSURE_SENSOR) ||
 						(temp_product_class_id == STM32_PRESSURE_NET) ||
@@ -3155,7 +3250,7 @@ void CMainFrame::ScanTstatInDB(void)
                         m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
 
 
-                    tree_product m_product_temp;
+
                     m_product_temp.product_item  =hTreeRoom;
 
                     long temp_serial_id = q.getInt64Field("Serial_ID");
@@ -3254,6 +3349,7 @@ void CMainFrame::ScanTstatInDB(void)
                     m_product_temp.BuildingInfo.strIpPort = _T("10000");
 
 					m_product_temp.strImgPathName = q.getValuebyName(L"Background_imgID");
+
                      m_product_temp.Custom =    q.getValuebyName(L"Custom");
 
                     if (g_selected_serialnumber == m_product_temp.serial_number)
@@ -3969,6 +4065,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 	if(FOR_LAST_VIEW_TIMER == nIDEvent)
 	{
+        CheckDeviceDatabase();
 		KillTimer(FOR_LAST_VIEW_TIMER);
 		int temp_pid;
 		unsigned int serial_number = 0;
@@ -4385,6 +4482,7 @@ void CMainFrame::OnAllNodeDatabase()
     if(Dlg.m_bChanged)
     {
         ScanTstatInDB();
+        CheckDeviceDatabase();
     }
     b_pause_refresh_tree = temp_status;
 
@@ -6379,7 +6477,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
     
     if(message==WM_MYMSG_REFRESHBUILDING)
     {
-        if (b_building_management_flag) //处于Building 管理模式 不要刷新Tree
+        if (b_building_management_flag != SYS_NORMAL_MODE) //处于Building 管理模式 不要刷新Tree
             return 0;
         //Sleep(1000);
         //AfxMessageBox(_T("There is no default building,please select a building First."));
@@ -7017,7 +7115,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     }
                 }
             }
-            if (m_product.at(i).protocol == PROTOCOL_VIRTUAL)
+            if(m_product.at(i).m_ext_info.virtual_device == 1)
             {
                 offline_mode = true;
                 set_offline_mode(offline_mode);
@@ -7517,6 +7615,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 }
                 else
                     g_protocol = PROTOCOL_BACNET_IP;
+                if (selected_product_Node.m_ext_info.virtual_device)
+                    offline_mode = true;
+                else
+                    offline_mode = false;
                 SwitchToPruductType(DLG_BACNET_VIEW);
 
                 pDlg->ShowWindow(SW_HIDE);
@@ -9685,7 +9787,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 {
     for (UINT i = 0; i < m_product.size(); i++)
     {
-        if (b_building_management_flag) //处于Building编辑模式 ，就退出
+        if (b_building_management_flag != SYS_NORMAL_MODE) //处于Building编辑模式 ，就退出
             return 0;
 
         tree_product tp = m_product.at(i);
@@ -9890,7 +9992,7 @@ UINT _FreshTreeView(LPVOID pParam )
 
 
         WaitForSingleObject(Read_Mutex, INFINITE);//Add by Fance .
-        if ((b_pause_refresh_tree) || (b_building_management_flag))
+        if ((b_pause_refresh_tree) || (b_building_management_flag != SYS_NORMAL_MODE))
         {
             if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
             {
@@ -15156,12 +15258,22 @@ void CMainFrame::OnDatabaseBuildingManagement()
 
 
     // TODO: 在此添加命令处理程序代码
-    b_building_management_flag = true;
+
+    b_building_management_flag = SYS_DB_BUILDING_MODE;
 
     ClearBuilding();
     m_pTreeViewCrl->DeleteAllItems();
     m_product.clear();
     SwitchToPruductType(DLG_DIALOG_BUILDING_MANAGEMENT);
+}
+
+void CMainFrame::VirtualDeviceMode()
+{
+   // b_building_management_flag = SYS_VIRTUAL_MODE;
+
+   // m_product.clear();
+   // LoadProductFromDB();
+   // PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);
 }
 
 

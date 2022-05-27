@@ -1967,6 +1967,7 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_FLOAT_DCBA  35
 
 #define BAC_MAX       36
+#define BAC_SETTING   254
 #define BAC_MAIN      255
 
 #define MAX_FUNCTION_COUNT    BAC_MAX   
@@ -2579,6 +2580,19 @@ typedef  struct
 typedef  struct
 {
 	int nSerialNumber;
+	CString BacnetInstance;
+	CString ModbusRTU_BacnetMac_ID;
+	CString Bip_Network;
+	CString MaxMaster;
+	CString PanelNumber;
+	CString PanelName;
+	CString BinaryArray;
+} Str_parameter_DB;
+
+
+typedef  struct
+{
+	int nSerialNumber;
 	CString Pid_index;
 	CString Input;
 	CString Input_Value;
@@ -2667,13 +2681,16 @@ typedef  struct
 	CString BinaryArray;
 } Str_programtext_DB;
 
-typedef union
+typedef struct
 {
+	int n_option;  // 0 = NULL    1 = panel           2 = instance;
 	struct
 	{
-		unsigned char panel;
+		unsigned char main_panel;
+		unsigned char sub_panel;
 		unsigned char ntype;
 		unsigned int object_number;
+		unsigned char network; //原有结构;
 	}pan_str;
 	struct
 	{
@@ -2697,5 +2714,30 @@ typedef  struct
 	Str_points nproperty;  //
 	CString cs_property_name; //例如  1234IN56
 } Str_BM_IO;
+
+typedef struct BM_Node
+{
+	int node_type;
+	int child_group;
+	int child_device;
+	int child_io;
+}BM_nodeinfo;
+
+#define SYS_NORMAL_MODE      0
+#define SYS_DB_BUILDING_MODE 1
+
+typedef  struct
+{
+	int pid;
+	int sub_pid;
+	int ai_count;
+	int bi_count;
+	int input_count;
+	int ao_count;
+	int bo_count;
+	int output_count;
+	CString cs_name;
+} Str_product_io_count;
+
 
 

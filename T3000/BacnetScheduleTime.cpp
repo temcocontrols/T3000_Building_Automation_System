@@ -15,7 +15,7 @@ std::mutex SCHEDULE_TIME_LIST;           // mutex for critical section
 HWND m_WeeklyParent_Hwnd;
 IMPLEMENT_DYNAMIC(CBacnetScheduleTime, CDialogEx)
 
-extern vector <int>  m_Weekly_data_instance;
+
 CBacnetScheduleTime::CBacnetScheduleTime(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetScheduleTime::IDD, pParent)
 {

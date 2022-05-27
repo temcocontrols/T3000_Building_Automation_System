@@ -825,6 +825,9 @@
     <ClCompile Include="CBacnetUnitsSelection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+        <ClCompile Include="CBacnetBuildingProperty.cpp">
+      <Filter>Source Files</Filter>
+       </ClCompile>
     <ClCompile Include="BacnetWebView.cpp">
       <Filter>Source Files\WebView</Filter>
     </ClCompile>
@@ -2056,6 +2059,9 @@
     </ClInclude>
     <ClInclude Include="CBacnetUnitsSelection.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+        <ClInclude Include="CBacnetBuildingProperty.h">
+	 <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetWebView.h">
       <Filter>Header Files\Webview</Filter>

@@ -1019,7 +1019,7 @@ char infile[65];
 
 struct func_table {
  char func_name[15] ;
- char tok ;
+ unsigned char tok ;
 } func_table[] = {
  "ABS",ABS,
  "AVG",AVG,
@@ -1087,6 +1087,9 @@ struct func_table {
  "OCTOBER", OCT,
  "NOVEMBER", NOV,
  "DECEMBER", DEC,
+ "MB_BLOCKREAD",MB_BR,
+ "MB_BLOCKWRITE",MB_BW,
+ "MB_BWCOIL",MB_BW_COIL,
  "",ENDPRG
  };
 
@@ -1699,7 +1702,7 @@ int prescan1 (void)
 							if(!res)
 								{sntx_err(SYNTAX);get_nl();break;}
 							get_token();
-							if (*token!=')')
+							if (*token != ')')  //fandu  因为 MB_BWCOIL  屏蔽这两行
 								{sntx_err(SYNTAX);get_nl();break;}
 						  }
 						  get_token();
@@ -3143,6 +3146,9 @@ void parse_atom( float  *value )
 				 case AVG:
 				 case MAX:
 				 case MIN:
+				 case MB_BR:
+				 case MB_BW:
+				 case MB_BW_COIL:
 				 case COM_1:
 							  {
 								 char eoiold = eoi;
@@ -3459,8 +3465,261 @@ void parse_atom( float  *value )
 		}
 	}   /* end of switch statement */
 }     /* end of atom() */
+extern  Panel ptr_panel;
+char* decode_point(char* token, Str_points &temp)
+{
+	if (strlen(token) == 0)
+	{
+		temp.n_option = 0;
+		return 0;
+	}
+	int l = 0;
+	int k = 0;
+	char* q = NULL;
+	char* p = NULL;
+	char pc[30];
+	char* fance_tok;
+	char fance_sub_pc[30];
+	int b_is_instance = false;
+	char* temp_next = token + 3;
+	int token_length = strlen(token);
+	char* temp_last = token + token_length - 1;
+	int num_panel_value;
+	int* num_panel = &num_panel_value;
+	unsigned char sub_panel = 0;
+	unsigned char panel_value;
+	unsigned char* panel = &panel_value;
+	int num_point_value;
+	int* num_point = &num_point_value;
+	if (((q = strstr(token, "INS")) != NULL) && ((*(temp_next) >= '0') && (*(temp_next) <= '9')) && ((*(temp_last) >= '0') && (*(temp_last) <= '9')))
+	{
+		b_is_instance = true;
+		Sleep(1);
+	}
+
+	if (((q = strchr(token, '-')) != NULL) || ((q = strchr(token, '.')) != NULL))
+	{
+		memcpy(pc, token, min((int)(q - token), 10));
+		pc[min((int)(q - token), 10)] = 0;
+
+#if 1
+		if ((*(q + 1) >= '0') && (*(q + 1) <= '9'))	//说明存在sub panel;
+		{
+			q++;
+			fance_tok = q;
+			if ((q = strchr(fance_tok, '-')) != NULL)  //妈的，老毛不要第二个 杠 ， 又得改;
+			{
+				memcpy(fance_sub_pc, fance_tok, min((int)(q - fance_tok), 10));
+				fance_sub_pc[min((int)(q - fance_tok), 10)] = 0;
+
+				q++;
+				*num_panel = atoi(pc);
+
+				sub_panel = atoi(fance_sub_pc);
+			}
+			else if ((q = strchr(fance_tok, '.')) != NULL)  //妈的，要改成用冒号来当分隔符，想一出是一出;
+			{
+				memcpy(fance_sub_pc, fance_tok, min((int)(q - fance_tok), 10));
+				fance_sub_pc[min((int)(q - fance_tok), 10)] = 0;
+
+				q++;
+				*num_panel = atoi(pc);
+
+				sub_panel = atoi(fance_sub_pc);
+			}
+			else
+			{
+				return 0;
+			}
+
+		}
+		else
+		{
+			q++;
+			*num_panel = atoi(pc);
+			sub_panel = *num_panel;
+			itoa((int)(*num_panel), (char*)fance_sub_pc, 10);
+
+			// = ;
+		}
+#endif
+		//Fance		recode;		
+#if 0
+		memcpy(pc, token, min((int)(q - token), 10));
+		pc[min((int)(q - token), 10)] = 0;
+		q++;
+		*num_panel = atoi(pc);
+		//if ( *num_panel>32 || *num_panel==0 )
+		//	q=token;
+#endif
+	}
+	else	//如果是直接var1 就代表 使用的是自己的 main和sub都是一个;Fance
+	{
+		//因为要支持instance 所以数比较大，不局限于以前的 255那么大
+		//for(l=0;l<3 && token[l]!=0;l++)
+		//	if (token[l]<'0' || token[l]>'9')
+		//		break;
+		if (b_is_instance)
+			token = token + 3; //因为前面加了M
+
+		for (l = 0; l < 10 && token[l] != 0; l++)
+			if (token[l] < '0' || token[l]>'9')
+				break;
 
 
+		q = token + l;
+		memcpy(pc, token, l);
+		pc[l] = 0;
+		*num_panel = atoi(pc);
+		//if (*num_panel == 0)
+		//{
+		//	*num_panel = panel;
+		//	//sub_panel = *num_panel; //填VAR1 之类的 subpanel 改为0 
+		//	sub_panel = 0;
+		//	itoa((int)(*num_panel), (char*)fance_sub_pc, 10);
+		//}
+#if 0   //需要支持 bacnet 的 instance 所以 屏蔽下面的255 主panel的限制.
+		if (*num_panel > 255 && strlen(pc))
+			return(islabel(token, num_point, var_type, point_type, num_panel));
+#endif
+	}
+	//	strcpy_s(my_info_panel[0].name,4,"VAR");
+
+	if ((p = strpbrk(q, "0123456789")) != NULL)
+	{
+		memcpy(pc, q, p - q);
+		pc[p - q] = 0;
+		for (k = OUT; k <= MAX_FUNCTION_COUNT; k++)
+		{
+			if (k != DMON)
+			{
+				if (!strcmp(pc, ptr_panel.info[k].name))
+					break;
+				else if (strcmp(pc, "REG") == 0)
+				{
+					k = VAR;
+					break;
+				}
+			}
+		}
+
+
+		if (k <= MAX_FUNCTION_COUNT)
+		{
+			if ((k == BAC_BI) || (k == BAC_BV) ||
+				(k == BAC_AV) || (k == BAC_AI) ||
+				(k == BAC_AO) || (k == BAC_BO))
+			{
+				b_is_instance = true;
+			}
+			if (p == NULL)
+			{
+				memcpy(pmes, "error line : ", 13);
+				pmes += 13;
+				itoa(lline, pmes, 10);
+				pmes += strlen(pmes);
+				*pmes++ = 0x0d;
+				//												fprintf(pmes,"error line %d\n",line);
+				error = 1; return 0;
+			}
+			else  if
+				(
+					((strlen(p) == 1) && (*p == '0')) &&
+					(
+						(k != BAC_FLOAT_ABCD) &&  // 2020 03 25
+						(k != BAC_FLOAT_CDAB) &&
+						(k != BAC_FLOAT_BADC) &&
+						(k != BAC_FLOAT_DCBA) &&
+						(k != COIL_REG) &&
+						(k != DIS_INPUT_REG) &&
+						(k != INPUT_REG) &&
+						(k != MB_REG) &&
+						(k != BAC_AV) &&
+						(k != BAC_AI) &&
+						(k != BAC_AO) &&
+						(k != BAC_BO) &&
+						(k != BAC_BV) &&
+						(k != BAC_BI)
+						)
+					)
+			{
+				memcpy(pmes, "error line : ", 13);
+				pmes += 13;
+				itoa(lline, pmes, 10);
+				pmes += strlen(pmes);
+				*pmes++ = 0x0d;
+				//								fprintf(pmes,"error line %d\n",line);
+				error = 1; return 0;
+			}
+			else
+			{
+				for (l = 0; l < (int)strlen(p); l++)//括号 Fance 加
+				{
+					if (p[l] < '0' || p[l]>'9')
+						break;
+				}
+				if (l < (int)strlen(p))
+					//return(islabel(token, num_point, var_type, point_type, num_panel));
+					return 0;
+				else
+				{
+					*num_point = atoi(p);
+					if (b_is_instance == 1)
+					{
+						temp.n_option = 2;
+						temp.ins_str.device_instance = num_panel_value;
+						temp.ins_str.object_number = *num_point;
+						temp.ins_str.ntype = k;
+					}
+					else
+					{
+						if (num_panel_value >= 255)
+						{
+							temp.n_option = 0; 
+						}
+						temp.n_option = 1;
+						temp.pan_str.main_panel = num_panel_value;
+						temp.pan_str.sub_panel = sub_panel;
+						temp.pan_str.ntype = k;
+						temp.pan_str.object_number = *num_point;
+						temp.pan_str.network = 0;
+					}
+					return NULL;
+					//														itoa(panel,buf,10);
+					//buf[0] = 0;
+#if 0   //2018 07 10   network point 用来复用 给 object instance .
+					if (netpresent)
+						if (*netpresent)
+						{
+							itoa(*num_net, buf, 10);
+							strcat(buf, ".");
+						}
+#endif
+#if 0
+					itoa(*num_panel, &buf[strlen(buf)], 10);
+					*num_point = atoi(p);
+					*point_type = k;
+					if (*num_panel < 10 || *num_point < 100)
+						strcat(buf, "-");
+					strcat(buf, pc);
+					strcat(buf, p);
+					strcpy(tok, buf);
+
+#endif
+
+					//itoa(*num_panel, &buf[strlen(buf)], 10);
+					//*num_point = atoi(p);
+
+				}
+			}
+		}
+	}
+
+
+
+
+	return NULL;
+}
 
 char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent)
 {
@@ -6062,7 +6321,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 		if (op!=NULL)
 			while(op[i] && i<MAX_OP)
 			{
-			  switch (op[i])
+			  switch ((unsigned char)op[i])
 			  {
 				 case '+':	 cod_line[Byte++]=PLUS;break;
 				 case '-':	 cod_line[Byte++]=MINUS;break;
@@ -6177,6 +6436,9 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				 case MAX:
 				 case MIN:
 				 case COM_1:
+				 case MB_BR:
+				 case MB_BW:
+				 case MB_BW_COIL:
 								cod_line[Byte++]=op[i++];
 								cod_line[Byte++]=op[i];
 								break;
@@ -7279,7 +7541,7 @@ char *look_func( char cod )
 /* convert to lower case */
 /* see if token is in table */
 for( i = 0 ; *func_table[i].func_name ; i++ )
-	if (func_table[i].tok==cod ) return func_table[i].func_name;
+	if (func_table[i].tok== (unsigned char)cod ) return func_table[i].func_name;
 return "" ; /* unkown command */
 }
 
@@ -7483,6 +7745,9 @@ int	desexpr(void)
 				 case AVG:
 				 case MAX:
 				 case MIN:
+				 case MB_BR:
+				 case MB_BW:
+				 case MB_BW_COIL:
 				 case INKEYD:
 				 case	OUTPUTD:
 				 case PIDPROP:
@@ -7493,7 +7758,9 @@ int	desexpr(void)
 				 case WR_OFF:
 				         {
 								par=0;
-								if (*(code-1)==AVG || *(code-1)==MIN || *(code-1)==MAX  || *(code-1)==COM_1)
+								//if (*(code-1)==AVG || *(code-1)==MIN || *(code-1)==MAX  || *(code-1)==COM_1)
+								if (*(code - 1) == AVG || *(code - 1) == MIN || *(code - 1) == MAX || *(code - 1) == COM_1 || 
+									((unsigned char)*(code - 1)) == MB_BR || ((unsigned char)*(code - 1)) == MB_BW || ((unsigned char)*(code - 1)) == MB_BW_COIL)
 								{
 										 i = *(code-1);
 										 n = *code++;
@@ -7701,6 +7968,17 @@ void Init_table_bank()
 	ptr_panel.info[0].name = "OUT";
 }
 
+int get_key_name(int nfunction,CString &temp_cs)
+{
+	if (nfunction > MAX_FUNCTION_COUNT)
+	{
+		return 0;
+	}
+	MultiByteToWideChar(CP_ACP, 0, (char*)ptr_panel.info[nfunction].name,
+		(int)strlen((char*)ptr_panel.info[nfunction].name) + 1,
+		temp_cs.GetBuffer(MAX_PATH), MAX_PATH);
+	temp_cs.ReleaseBuffer();
+}
 
 void init_info_table( void )
 {

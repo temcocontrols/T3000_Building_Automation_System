@@ -886,6 +886,7 @@ typedef union
 		 unsigned char start_day;
 		 unsigned char end_month;
 		 unsigned char end_day;
+		 unsigned char network_number_hi;
 	}reg;
 }Str_Setting_Info;
 

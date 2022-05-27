@@ -9,13 +9,7 @@
 
 
 
-typedef struct BM_Node
-{
-	int node_type;
-	int child_group;
-	int child_device;
-	int child_io;
-}BM_nodeinfo;
+
 
 
 class CImageTreeCtrl : public CTreeCtrl
@@ -35,23 +29,26 @@ public:
 	virtual bool BM_Rename(HTREEITEM hItem);
 	virtual bool BM_Add_Groups(HTREEITEM hItem);
 	virtual bool BM_Add_Nodes(HTREEITEM hItem);
+	virtual bool BM_Add_Module(HTREEITEM hItem);
 	virtual bool BM_Add_Inputs(HTREEITEM hItem);
 	virtual bool BM_Add_Outputs(HTREEITEM hItem);
 	virtual bool BM_Add_Variable(HTREEITEM hItem);
 	void BM_Adds(HTREEITEM hItem, int nfunction, int ntype);
 	void BM_Property(HTREEITEM hItem);
+	virtual bool BM_IO_Mapping(HTREEITEM hItem);
 	virtual bool BM_Delete(HTREEITEM hItem);
 	virtual bool SortByConnection(HTREEITEM hItem)  ;
 	virtual bool SortByFloor(HTREEITEM hItem)  ;
 	virtual bool PingDevice(HTREEITEM hItem) ;
 	virtual bool BM_Communicate(HTREEITEM hItem);
-	virtual bool BM_IO_Property(HTREEITEM hItem);
+	virtual bool ShowEquipmentView(HTREEITEM hItem);
+	virtual bool SyncToController(HTREEITEM hItem);
 	bool HandleAddVirtualDevice(HTREEITEM);
 	bool HandleAddCustomDevice(HTREEITEM hItem);
     bool HandleAddRemoteDevice(HTREEITEM);
     //bool HandleAddThirdPartBacnetDevice(HTREEITEM);
      virtual bool    DoDeleteItem(HTREEITEM);
-	 BM_nodeinfo operation_nodeinfo;
+	 virtual bool ProjectPointView(HTREEITEM hItem);
 	 virtual bool	DoEditLabel(HTREEITEM);
 protected:
 	DECLARE_MESSAGE_MAP()
