@@ -18,11 +18,7 @@ MD.Shapelib = function(){
     symbol: 'Symbols',
     arrow: 'Arrows',
     flowchart: 'Flowchart',
-    nature: 'Nature',
-    game: 'Cards & Chess',
-    dialog_balloon: 'Dialog baloons',
-    music: 'Music',
-    weather: 'Weather &amp; Time',
+    temco: 'T3000',
     ui: 'User Interface',
     social: 'Social Web'
   };
@@ -188,6 +184,7 @@ MD.Shapelib = function(){
   
     },
     mouseDown: function(opts) {
+      
       var mode = canv.getMode();
       if(mode !== mode_id) return;
       
