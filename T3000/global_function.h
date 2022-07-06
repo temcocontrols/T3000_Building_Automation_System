@@ -125,6 +125,7 @@ BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,i
 int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
 int GetProgramData_Blocking(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
 int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
+int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize, uint8_t retrytime = 10);
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize, uint8_t retrytime = 10);
 int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t readlength, unsigned short *data_out);//Bacnet 协议转换为 modbus 协议;
 int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_t writelength, unsigned short *data_in);
@@ -135,8 +136,8 @@ int WritePrivateData_Blocking(uint32_t deviceid, unsigned char n_command, unsign
 int Write_Private_Data_Blocking(uint8_t ncommand, uint8_t nstart_index, uint8_t nstop_index, unsigned int write_object_list = 0);
 int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
 int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
-int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, bool &end_flag);
-int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag);
+int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, bool &end_flag, short invoke_id = -1);
+int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag , short invoke_id = -1);
 bool Check_Label_Exsit(LPCTSTR m_new_label);
 bool Check_FullLabel_Exsit(LPCTSTR m_new_fulllabel);
 void local_handler_conf_private_trans_ack(
@@ -214,14 +215,17 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath);
 
 int SaveModbusConfigFile(CString &SaveConfigFilePath);
 void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigned int bufferlength);
-int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path);
+int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path);
 int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path);
-
+int GetDeviceCountTable(int device_serialnumber, int ntype, device_io_status &temp_device_io_status);
+int UpdateDeviceCountTable(int device_serialnumber, int ntype, device_io_status temp_device_io_status);
+int CheckDeviceCountTable(int device_serialnumber, int objectinstance = 0);
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path);
 //For MINIPanel ARM
 int WriteDeviceDataIntoAccessDB(int nTableType, int ncount, int device_serialnumber);
 #ifdef LOCAL_DB_FUNCTION
 void init_product_list();
+int CheckDeviceDataDBAndUpdateDB();
 #endif
 void Copy_Data_From_485_to_Bacnet(unsigned short *start_point);
 int handle_read_monitordata_ex(char *npoint,int nlength);
@@ -317,7 +321,15 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
 char* decode_point(char* token, Str_points& temp);
 void Initial_All_Point();
 void Initial_Virtual_Device_Setting();
-void product_list();
 int bacnet_set_read_result(int nret);
 int CheckDeviceDatabase();
+int GetInputLabelEx(Str_in_point temp_in, CString& ret_label, Point_Net* npoint);
+int GetInputValueEx(Str_in_point temp_in, CString& ret_cstring, CString& ret_unit, CString& Auto_M, int& digital_value);
+int GetInputFullLabelEx(Str_in_point temp_in, CString& ret_full_label, Point_Net* npoint);
+int GetOutputLabelEx(Str_out_point temp_out, CString& ret_label, Point_Net* npoint);
+int GetOutputFullLabelEx(Str_out_point temp_out, CString& ret_full_label, Point_Net* npoint);
+int GetOutputValueEx(Str_out_point temp_out, CString& ret_cstring, CString& ret_unit, CString& Auto_M, int& digital_value);
+int GetVariableLabelEx(Str_variable_point temp_var, CString& ret_label, Point_Net* npoint);
+int GetVariableFullLabelEx(Str_variable_point temp_var, CString& ret_full_label, Point_Net* npoint);
+int GetVariableValueEx(Str_variable_point temp_var, CString& ret_cstring, CString& ret_unit, CString& Auto_M, int& digital_value);
 #endif

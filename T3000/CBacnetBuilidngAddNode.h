@@ -29,6 +29,7 @@ public:
 	int m_type;
 	afx_msg void OnBnClickedButtonBmNodeOk();
 	afx_msg void OnBnClickedButtonManageBuild();
+	afx_msg void OnCbnSelchangeComboBmMoudle();
 };
 
 #define FUNCTION_BM_ADD         0

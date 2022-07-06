@@ -277,6 +277,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
+		temp_des = temp_des.Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
 		m_variable_list.SetItemText(i,VARIABLE_FULL_LABLE,temp_des);
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 		{
@@ -377,6 +378,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1,
 					temp_11.GetBuffer(MAX_PATH), MAX_PATH);
 				temp_11.ReleaseBuffer();
+				temp_11 = temp_11.Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
+
 				m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_11);
 
 			}
@@ -453,6 +456,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).label, (int)strlen((char *)m_Variable_data.at(i).label)+1, 
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
+		temp_des2 = temp_des2.Left(STR_VARIABLE_LABEL).Trim();
 		m_variable_list.SetItemText(i,VARIABLE_LABLE,temp_des2);
 
 
@@ -1357,7 +1361,26 @@ void CBacnetVariable::OnCancel()
 	//CDialogEx::OnCancel();
 }
 
+int GetVariableLabelEx(Str_variable_point temp_var, CString& ret_label, Point_Net* npoint)
+{
+	CString temp_des2;
+	MultiByteToWideChar(CP_ACP, 0, (char*)temp_var.label, (int)strlen((char*)temp_var.label) + 1,
+		ret_label.GetBuffer(MAX_PATH), MAX_PATH);
+	ret_label.ReleaseBuffer();
 
+	CString temp_cs;
+	temp_cs = ret_label;
+	temp_cs = temp_cs.Trim();
+	if (temp_cs.IsEmpty())
+	{
+		if (npoint == NULL)
+			temp_cs.Format(_T("VAR%u"), npoint->number + 1);
+		else
+			temp_cs.Format(_T("%dVAR%u"), npoint->panel, npoint->number + 1);
+		ret_label = temp_cs;
+	}
+	return 1;
+}
 
 int GetVariableLabel(int index,CString &ret_label, Point_Net * npoint)
 {
@@ -1367,23 +1390,26 @@ int GetVariableLabel(int index,CString &ret_label, Point_Net * npoint)
 		return -1;
 	}
 	int i = index;
-	CString temp_des2;
-	MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).label, (int)strlen((char *)m_Variable_data.at(i).label)+1, 
-		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
-	ret_label.ReleaseBuffer();
+	return GetVariableLabelEx(m_Variable_data.at(i), ret_label, npoint);
+}
+
+int GetVariableFullLabelEx(Str_variable_point temp_var, CString& ret_full_label, Point_Net* npoint)
+{
+	MultiByteToWideChar(CP_ACP, 0, (char*)temp_var.description, (int)strlen((char*)temp_var.description) + 1,
+		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH);
+	ret_full_label.ReleaseBuffer();
 
 	CString temp_cs;
-	temp_cs = ret_label;
+	temp_cs = ret_full_label;
 	temp_cs = temp_cs.Trim();
-	if(temp_cs.IsEmpty())
+	if (temp_cs.IsEmpty())
 	{
-        if (npoint == NULL)
-            temp_cs.Format(_T("VAR%u"), index + 1);
-        else
-            temp_cs.Format(_T("%dVAR%u"), npoint->panel, index + 1);
-		ret_label = temp_cs;
+		if (npoint == NULL)
+			temp_cs.Format(_T("VAR%u"), npoint->number + 1);
+		else
+			temp_cs.Format(_T("%dVAR%u"), npoint->panel, npoint->number + 1);
+		ret_full_label = temp_cs;
 	}
-
 
 	return 1;
 }
@@ -1396,39 +1422,15 @@ int GetVariableFullLabel(int index,CString &ret_full_label, Point_Net * npoint)
 		return -1;
 	}
 	int i = index;
-	MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description)+1, 
-		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH );
-	ret_full_label.ReleaseBuffer();
-
-	CString temp_cs;
-	temp_cs = ret_full_label;
-	temp_cs = temp_cs.Trim();
-	if(temp_cs.IsEmpty())
-	{
-        if (npoint == NULL)
-		    temp_cs.Format(_T("VAR%u"),index + 1);
-        else
-            temp_cs.Format(_T("%dVAR%u"), npoint->panel, index + 1);
-		ret_full_label = temp_cs;
-	}
-
-	return 1;
+	return GetVariableFullLabelEx(m_Variable_data.at(i), ret_full_label, npoint);
 }
 
-int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value)
+int GetVariableValueEx(Str_variable_point temp_var, CString& ret_cstring, CString& ret_unit, CString& Auto_M, int& digital_value)
 {
 	CStringArray temparray;
 	CString temp1;
-	if(index >= BAC_VARIABLE_ITEM_COUNT)
-	{
-		ret_cstring.Empty();
-		ret_unit.Empty();
-		Auto_M.Empty();
-		return -1;
-	}
-	int i = index;
-
-	if(m_Variable_data.at(i).auto_manual == 1)
+	
+	if(temp_var.auto_manual == 1)
 	{
 		Auto_M = _T("M");
 	}
@@ -1437,14 +1439,14 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 		Auto_M.Empty();
 	}
 
-    if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))  //判断是MSV range
+    if ((temp_var.range >= 101) && (temp_var.range <= 104))  //判断是MSV range
     {
         for (int z = 0; z < 3; z++)
         {
             int get_name_ret = 0;
             float temp_float_value1;
-            temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
-            get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, temp_float_value1, ret_cstring);
+            temp_float_value1 = ((float)temp_var.value) / 1000;
+            get_name_ret = Get_Msv_Item_Name(temp_var.range - 101, temp_float_value1, ret_cstring);
             if (get_name_ret > 0)
             {
                 ret_unit.Empty();
@@ -1453,21 +1455,21 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
         }
 
     }
-    else if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+    else if(temp_var.digital_analog == BAC_UNITS_DIGITAL)
 	{
-        if(m_Variable_data.at(i).range>30)
+        if(temp_var.range>30)
 		{
 			ret_cstring = _T(" ");
 			return RANGE_ERROR;
 		}
 		else
 		{
-			if((m_Variable_data.at(i).range < 23) /*&&(m_Variable_data.at(i).range !=0)*/)
-				temp1 = Digital_Units_Array[m_Variable_data.at(i).range];
-			else if((m_Variable_data.at(i).range >=23) && (m_Variable_data.at(i).range <= 30))
+			if((temp_var.range < 23) /*&&(temp_var.range !=0)*/)
+				temp1 = Digital_Units_Array[temp_var.range];
+			else if((temp_var.range >=23) && (temp_var.range <= 30))
 			{
 				if(receive_customer_unit)
-					temp1 = Custom_Digital_Range[m_Variable_data.at(i).range - 23];
+					temp1 = Custom_Digital_Range[temp_var.range - 23];
 			}
 			else
 			{
@@ -1479,7 +1481,7 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 			SplitCStringA(temparray,temp1,_T("/"));
 			if((temparray.GetSize()==2))
 			{
-				if(m_Variable_data.at(i).control == 0)
+				if(temp_var.control == 0)
 				{
 					digital_value = 0;
 					ret_cstring = temparray.GetAt(0);
@@ -1496,12 +1498,12 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 	}
 	else
 	{
-		if(m_Variable_data.at(i).range == 20)	//如果是时间;
+		if(temp_var.range == 20)	//如果是时间;
 		{
             ret_unit.Empty(); //不显示 time 
-			//ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
+			//ret_unit = Variable_Analog_Units_Array[temp_var.range];
 			char temp_char[50];
-			int time_seconds = m_Variable_data.at(i).value / 1000;
+			int time_seconds = temp_var.value / 1000;
 			intervaltotextfull(temp_char,time_seconds,0,0);
 
 			MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
@@ -1510,24 +1512,24 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 			digital_value = 2;
 
 		}
-		else if((m_Variable_data.at(i).range<sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))/* && (m_Variable_data.at(i).range != 0)*/)
+		else if((temp_var.range<sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))/* && (temp_var.range != 0)*/)
 		{
-			ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
-			if(m_Variable_data.at(i).range == 0)
+			ret_unit = Variable_Analog_Units_Array[temp_var.range];
+			if(temp_var.range == 0)
 				ret_unit.Empty();
 			CString cstemp_value;
 			float temp_float_value;
-			temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+			temp_float_value = ((float)temp_var.value) / 1000;
 			ret_cstring.Format(_T("%.1f"),temp_float_value);
 			digital_value = 2;
 		}
-        else if ((m_Variable_data.at(i).range >= 34) && (m_Variable_data.at(i).range <= 38))
+        else if ((temp_var.range >= 34) && (temp_var.range <= 38))
         {
-            ret_unit= Analog_Variable_Units[m_Variable_data.at(i).range - 34];
+            ret_unit= Analog_Variable_Units[temp_var.range - 34];
 
             CString cstemp_value;
             float temp_float_value;
-            temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+            temp_float_value = ((float)temp_var.value) / 1000;
             ret_cstring.Format(_T("%.1f"), temp_float_value);
 
         }
@@ -1541,6 +1543,20 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 	}
 
 	return 1;
+}
+
+int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value)
+{
+
+	if(index >= BAC_VARIABLE_ITEM_COUNT)
+	{
+		ret_cstring.Empty();
+		ret_unit.Empty();
+		Auto_M.Empty();
+		return -1;
+	}
+	int i = index;
+	return GetVariableValueEx(m_Variable_data.at(i), ret_cstring, ret_unit, Auto_M, digital_value);
 }
 
 

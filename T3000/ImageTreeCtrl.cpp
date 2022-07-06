@@ -136,6 +136,14 @@ BM_nodeinfo operation_nodeinfo;
 IMPLEMENT_DYNAMIC(CImageTreeCtrl, CTreeCtrl)
 CImageTreeCtrl::CImageTreeCtrl()
 {
+	m_dwDrawStart = 0;
+	m_nMsMoveTimerID = 0;
+	m_nScrollTimerID = 0;
+	m_nTicks = 0;
+	m_bDraged = false;
+	m_pDragImage = NULL;
+
+
 	m_nSubnetItemData = 9000;
 	m_nFloorItemData = 1000;
 	m_nRoomItemData = 2000;
@@ -197,11 +205,39 @@ BEGIN_MESSAGE_MAP(CImageTreeCtrl, CTreeCtrl)
     ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, OnToolTipText)
     ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTA, 0, 0xFFFF, OnToolTipText)
 
+	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, &CImageTreeCtrl::OnNMCustomdraw)
+	ON_NOTIFY_REFLECT(TVN_BEGINDRAG, &CImageTreeCtrl::OnBegindrag)
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
+	ON_WM_TIMER()
+	//ON_MESSAGE(WM_RETRIEVE_CHECKSTATE, &CImageTreeCtrl::OnRetriveCheckState)
+	ON_NOTIFY_REFLECT_EX(NM_CLICK, &CImageTreeCtrl::OnNMClick)
+	ON_NOTIFY_REFLECT(TVN_ENDLABELEDIT, &CImageTreeCtrl::OnTvnEndlabeledit)
+
+	//ON_NOTIFY_REFLECT(TVN_ENDLABELEDIT, &CImageTreeCtrl::OnTvnEndlabeledit)
+
 END_MESSAGE_MAP()
 void CImageTreeCtrl::OnContextCmd(UINT id) {
 	HTREEITEM hCur = GetSelectedItem();
 	if (id >= 100)
 	{
+		int original_serial = 0;
+		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		for (UINT i = 0; i < pFrame->m_product.size(); i++)
+		{
+			if (hCur == pFrame->m_product.at(i).product_item)
+			{
+				original_serial = pFrame->m_product.at(i).serial_number;
+				break;
+			}
+		}
+		if (original_serial == 0)
+		{
+			MessageBox(_T("Sync to controller failed , please select a device first!"));
+			return;
+		}
+		::PostMessage(MainFram_hwd, WM_WRITE_INTO_NEW_DEVICE, WPARAM(original_serial), LPARAM(m_online_serial.at(id - 100).nserialnumber));
 		Sleep(1);
 		return;
 	}
@@ -741,6 +777,42 @@ bool CImageTreeCtrl::SortByFloor(HTREEITEM hItem)
 		::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
 	}
 	return true;
+}
+
+int CImageTreeCtrl::GetOnlineDevice()
+{
+	m_online_serial.clear();
+	CppSQLite3DB SqliteDBT3000;
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	;
+	CString building_path;
+	building_path = g_strBuildingFolder +  pFrame->m_strCurSubBuldingName + _T("\\") + pFrame->m_strCurSubBuldingName + _T(".db");
+	SqliteDBT3000.open((UTF8MBSTR)building_path);
+
+	CString strSql;
+	CString str_temp_name;
+	CString str_temp_serialnumber;
+	strSql.Format(_T("select * from ALL_NODE where Online_Status = 1 and (Product_class_ID = 74 or Product_class_ID = 88 or Product_class_ID = 35)"));
+	q = SqliteDBT3000.execQuery((UTF8MBSTR)strSql);
+
+
+	while (!q.eof())
+	{
+		Str_online_serialnumber temp;
+		str_temp_name.Empty();
+		str_temp_name = q.getValuebyName(L"Product_name");
+		str_temp_serialnumber.Empty();
+		str_temp_serialnumber = q.getValuebyName(L"Serial_ID");
+		temp.online_name = str_temp_name;
+		temp.nserialnumber = _wtoi(str_temp_serialnumber);
+		q.nextRow();
+		m_online_serial.push_back(temp);
+	}
+	return 1;
 }
 
 BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
@@ -1929,7 +2001,7 @@ void CImageTreeCtrl::BMContextMenu(CPoint& point, BM_nodeinfo nodeinfo)
 		}
 		else
 		{
-			return;
+			VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_VIRTUAL_DEVICE, _T("Add Virtual Device")));
 		}
 	}
 	//else if (b_building_management_flag == SYS_VIRTUAL_MODE)
@@ -1975,7 +2047,7 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 	UINT flags;
 	HTREEITEM hItem = HitTest(pt, &flags);
 	bool bOnItem = (flags & TVHT_ONITEM) != 0;
-
+	GetOnlineDevice();
 	CMenu menu;
 	VERIFY(menu.CreatePopupMenu());
 	if(bOnItem) 
@@ -1990,10 +2062,12 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
             VERIFY(menu.AppendMenu(MF_STRING, ID_ADD_CUSTOM_DEVICE, _T("Add Modbus Device")));
 			CMenu subMenu;
 			subMenu.CreateMenu();
+			
+			for (int i = 0; i < m_online_serial.size(); i++)
+			{
+				subMenu.AppendMenu(MF_STRING, 100 + i, m_online_serial.at(i).online_name);
+			}
 
-			subMenu.AppendMenu(MF_STRING, 100, _T("Testing"));
-			subMenu.AppendMenu(MF_STRING, 101, _T("Testing"));
-			subMenu.AppendMenu(MF_STRING, 102, _T("Testing"));
 			VERIFY(menu.AppendMenu(MF_POPUP, (UINT)subMenu.m_hMenu, _T("Sync to Controller")));
 		}
 	}
@@ -2066,7 +2140,7 @@ void CImageTreeCtrl::CheckClickNode(HTREEITEM hItem ,BM_nodeinfo& nodeinfo) //�
 	nodeinfo.child_device = -1;
 	nodeinfo.child_group = -1;
 	nodeinfo.child_io = -1;
-	nodeinfo.node_type = TYPE_BM_GROUP;
+	nodeinfo.node_type = TYPE_BM_VIRTUAL_DEVICE;
 	return;
 
 
@@ -2140,7 +2214,71 @@ void CImageTreeCtrl::OnSetFocus(CWnd* pOldWnd)
 
 void CImageTreeCtrl::OnTimer(UINT_PTR nIDEvent)
 {
-	 
+	if (nIDEvent == m_nMsMoveTimerID)
+	{
+		KillTimer(m_nMsMoveTimerID);
+		m_nMsMoveTimerID = 0;
+		HTREEITEM hItem = NULL;
+		UINT uFlag = 0;
+		hItem = HitTest(m_ptMouseMove, &uFlag);
+		if (hItem && m_bDraged)
+		{
+			SelectItem(hItem);
+			Expand(m_hDragDist, TVE_EXPAND);
+}
+	}
+	//滚动响应
+	else if (nIDEvent == m_nScrollTimerID)
+	{
+		m_nTicks++;
+		CPoint pt;
+		GetCursorPos(&pt);
+		CRect clientRt;
+		GetClientRect(&clientRt);
+		ClientToScreen(&clientRt);
+
+		HTREEITEM hItem = GetFirstVisibleItem();
+
+		//向上滚动
+		if (pt.y < (clientRt.top + 10))
+		{
+			//响应延迟
+			if (0 == (m_nTicks % 4))
+			{
+				CImageList::DragShowNolock(FALSE);
+				SendMessage(WM_VSCROLL, SB_LINEUP);
+				if (hItem)
+				{
+					SelectDropTarget(hItem);
+					m_hDragDist = hItem;
+				}
+				CImageList::DragShowNolock(TRUE);
+			}
+		}
+		else if (pt.y > (clientRt.bottom - 10))
+		{
+			//响应延迟
+			if (0 == (m_nTicks % 4))
+			{
+				CImageList::DragShowNolock(FALSE);
+				SendMessage(WM_VSCROLL, SB_LINEDOWN);
+				UINT count = GetVisibleCount();
+				for (size_t i = 0; i < count; i++)
+				{
+					hItem = GetNextVisibleItem(hItem);
+				}
+				if (hItem)
+				{
+					SelectDropTarget(hItem);
+					m_hDragDist = hItem;
+				}
+				CImageList::DragShowNolock(TRUE);
+			}
+		}
+	}
+	else
+		CTreeCtrl::OnTimer(nIDEvent);
+#if 0
 	if(tree_offline_mode == false)
 	{
 		KillTimer(1);
@@ -2151,6 +2289,7 @@ void CImageTreeCtrl::OnTimer(UINT_PTR nIDEvent)
 	//temp_item_text = offline_mode_string + _T("  Offline Mode");
 	//SetItemText(m_hSelItem,temp_item_text);
 	CTreeCtrl::OnTimer(nIDEvent);
+#endif
 }
 
 
@@ -2226,14 +2365,23 @@ INT_PTR CImageTreeCtrl::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 
     return CTreeCtrl::OnToolHitTest(point, pTI);
 }
+char tooltipchar[1024];
 
 BOOL CImageTreeCtrl::OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 {
     // need to handle both ANSI and UNICODE versions of the message
+
+	AFX_MODULE_THREAD_STATE* pThreadState = AfxGetModuleThreadState();
+	CToolTipCtrl* pToolTip = pThreadState->m_pToolTip;
+	pToolTip->SetMaxTipWidth(350);
+	//pToolTip->SetDelayTime(5000);
     TOOLTIPTEXTA* pTTTA = (TOOLTIPTEXTA*)pNMHDR;
     TOOLTIPTEXTW* pTTTW = (TOOLTIPTEXTW*)pNMHDR;
-    CString strTipText;
+	CString strTipText;
     UINT nID = pNMHDR->idFrom;
+
+
+
 
     // Do not process the message from built in tooltip
     if (nID == (UINT)m_hWnd &&
@@ -2252,11 +2400,63 @@ BOOL CImageTreeCtrl::OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
     UINT nFlags;
     HTREEITEM hitem = HitTest(pt, &nFlags);
 
-    strTipText.Format(_T("%s"), GetItemText((HTREEITEM)nID));  //get item text
+	bool find_match_device = false;
+	tree_product tooltip_product;
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	for (UINT i = 0; i < pFrame->m_product.size(); i++)
+	{
+		if (hitem == pFrame->m_product.at(i).product_item)
+		{
+			//memcpy(&tooltip_product, &pFrame->m_product.at(i), sizeof(tree_product));
+			tooltip_product = pFrame->m_product.at(i);
+			find_match_device = true;
+			break;
+		}
+	}
+
+	if (!find_match_device)
+	{
+		return true;
+	}
+
+	CString temp_bacnet_info;
+	CString temp_tcp_info;
+	CString temp_rs485_info;
+	CString temp_parent_info;
+	CString temp_virtual_device;
+	if (tooltip_product.object_instance != 0)
+	{
+		temp_bacnet_info.Format(_T("Bacnet Object Instance : %u \nBacnet MSTP Mac ID : %u \n\n"),tooltip_product.object_instance, tooltip_product.product_id );
+	}
+	if (tooltip_product.m_ext_info.virtual_device == 1)
+	{
+		temp_virtual_device = _T("Virtual device\n");
+	}
+	else if (!tooltip_product.BuildingInfo.strIp.Trim().IsEmpty())
+	{
+		temp_tcp_info.Format(_T("IP address : %s \nPort : %u \nModbus  ID : %d \nPC IP address : %s\n\n"),
+			tooltip_product.BuildingInfo.strIp, tooltip_product.ncomport, tooltip_product.product_id, tooltip_product.NetworkCard_Address);
+	}
+	else
+	{
+		temp_rs485_info.Format(_T("RS485 Information \nComPort :Com%d\nBaudrate :%d\nModbus  ID : %d \n"), 
+			tooltip_product.ncomport, tooltip_product.baudrate, tooltip_product.product_id);
+	}
+
+	if (tooltip_product.note_parent_serial_number != 0)
+	{
+		temp_parent_info.Format(_T("Parent node SerialNumber :%u\n"), tooltip_product.note_parent_serial_number);
+	}
+
+	strmyTipText.Format(_T("Panel Name : %s \nProduct Type : %s \nSeiralNumber :%u \n\n"),
+tooltip_product.NameShowOnTree.GetBuffer(), GetProductName(tooltip_product.product_class_id).GetBuffer(), tooltip_product.serial_number);
+	strmyTipText = strmyTipText + temp_bacnet_info + temp_tcp_info + temp_rs485_info + temp_parent_info + temp_virtual_device;
+	int length111 = strTipText.GetLength();
+    //strTipText.Format(_T("%s"), GetItemText((HTREEITEM)nID));  //get item text
 
     DWORD dw = (DWORD)GetItemData((HTREEITEM)nID); //get item data
 
-    CString* ItemData = (CString*)dw; //CAST item data
+    //CString* ItemData = (CString*)dw; //CAST item data
 #if 0
     if (ItemData != NULL)
 
@@ -2279,7 +2479,21 @@ BOOL CImageTreeCtrl::OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
         _mbstowcsz(pTTTW->szText, strTipText, 80);
 
 #else
+	//for (int i = 0; i < 1024; i++)
+	//{
+	//	tooltipchar[i] = 0x30 + i % 10;
+	//}
+	//pTTTA->lpszText = tooltipchar;
 
+	//WideCharToMultiByte(CP_ACP, 0, strTipText.GetBuffer(), -1, tooltipchar, 1024, 0, 0);
+	//if (pNMHDR->code == TTN_NEEDTEXTA)
+	//	pTTTA->lpszText = (LPSTR)(LPWSTR)(LPCWSTR)tooltipchar;
+	//else
+	//	pTTTW->lpszText = (LPWSTR)(LPCWSTR)strTipText;
+
+	pTTTW->lpszText = (LPWSTR)(LPCWSTR)strmyTipText;
+
+#if 0
     if (pNMHDR->code == TTN_NEEDTEXTA)
 
         _wcstombsz(pTTTA->szText, strTipText, 80);
@@ -2288,10 +2502,11 @@ BOOL CImageTreeCtrl::OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 
         lstrcpyn(pTTTW->szText, strTipText, 80);
 
-    CString TestAA;
-    TestAA = _T("\r\n111111111111111\r\n22222222222222");
-    lstrcatW(pTTTW->szText, TestAA);
+   // CString TestAA;
+  //  TestAA = _T("AA");
+   // lstrcatW(pTTTW->szText, TestAA);
     //lstrcpyn(pTTTW->szText, TestAA, 80);
+#endif
 #endif
 
 #if 0
@@ -2324,3 +2539,300 @@ BOOL CImageTreeCtrl::OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 
     return TRUE; // message was handled
 }
+
+
+void CImageTreeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	//LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	//*pResult = 0;
+
+
+	*pResult = CDRF_DODEFAULT;
+	NMTVCUSTOMDRAW* plvoid = reinterpret_cast<NMTVCUSTOMDRAW*>(pNMHDR);
+#if 1
+	if (CDDS_PREPAINT == plvoid->nmcd.dwDrawStage)
+	{
+		*pResult = CDRF_NOTIFYITEMDRAW;
+	}
+	else if (CDDS_ITEMPREPAINT == plvoid->nmcd.dwDrawStage)
+	{
+		COLORREF crText, crBkgnd;
+		if (b_building_management_flag == SYS_DB_BUILDING_MODE)
+		{
+			if (plvoid->iLevel == 1)  //判断节点所在的层次，根节点在第0层
+			{
+				if (plvoid->nmcd.lItemlParam == TREE_LP_VIRTUAL_DEVICE) //在添加节点时设置了节点的lParam属性，在这里就利用来判定具体是哪个节点
+				{
+					crText = RGB(200, 200, 200);
+					crBkgnd = RGB(66, 66, 66);
+
+					plvoid->clrText = crText;  //设置文字颜色
+					plvoid->clrTextBk = crBkgnd;  //设置背景颜色
+				}
+				else
+				{
+					crText = RGB(0, 0, 0);
+					crBkgnd = RGB(255, 255, 255);
+				}
+			}
+		}
+		else
+		{
+			if (plvoid->iLevel == 2)  //判断节点所在的层次，根节点在第0层
+			{
+				if (plvoid->nmcd.lItemlParam == TREE_LP_VIRTUAL_DEVICE) //在添加节点时设置了节点的lParam属性，在这里就利用来判定具体是哪个节点
+				{
+					crText = RGB(200, 200, 200);
+					crBkgnd = RGB(66, 66, 66);
+
+					plvoid->clrText = crText;  //设置文字颜色
+					plvoid->clrTextBk = crBkgnd;  //设置背景颜色
+				}
+				else if (plvoid->nmcd.lItemlParam == 2000)
+				{
+					crText = RGB(0, 0, 0);
+					crBkgnd = RGB(125, 125, 0);
+
+					plvoid->clrText = crText;
+					plvoid->clrTextBk = crBkgnd;
+				}
+				else
+				{
+					crText = RGB(0, 0, 0);
+					crBkgnd = RGB(255, 255, 255);
+				}
+			}
+			else
+			{
+				crText = RGB(0, 0, 0);
+				crBkgnd = RGB(255, 255, 255);
+			}
+		}
+		*pResult = CDRF_DODEFAULT;
+	}
+#endif 
+}
+
+#define   DRAG_DELAY   100
+void CImageTreeCtrl::OnBegindrag(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	*pResult = 0;
+	if ((GetTickCount() - m_dwDrawStart) < DRAG_DELAY)
+		return;
+	m_hDragSrc = pNMTreeView->itemNew.hItem;
+	m_hDragDist = NULL;
+
+	if (!m_pDragImage)
+	{
+		m_pDragImage = CreateDragImage(m_hDragSrc);
+	}
+	else
+		return;
+
+	if (!m_pDragImage)
+		return;
+
+	m_bDraged = true;
+	m_pDragImage->BeginDrag(0, CPoint(8, 8));
+
+	CPoint pt = pNMTreeView->ptDrag;
+	ClientToScreen(&pt);
+	m_pDragImage->DragEnter(this, pt);
+	SetCapture();
+	//设置滚动检测计时器
+	m_nScrollTimerID = SetTimer(2, 50, NULL);
+}
+
+void CImageTreeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	m_dwDrawStart = GetTickCount();
+
+	// 	CPoint pt;
+	// 	GetCursorPos(&pt); 
+	// 	ScreenToClient(&pt);
+	// 	HTREEITEM hItem = HitTest(pt,&nFlags);
+	// 	//点击图标区域（复选框）
+	// 	if(hItem && (nFlags & TVHT_ONITEMSTATEICON))
+	// 	{
+	// 		SelectItem(hItem);
+	// 		HTREEITEM hSelect = GetSelectedItem();
+	// 		PostMessage(WM_RETRIEVE_CHECKSTATE,0,reinterpret_cast<LPARAM>(hItem)); 
+	// 	}	
+
+	CTreeCtrl::OnLButtonDown(nFlags, point);
+
+}
+
+void CImageTreeCtrl::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值	
+	if (m_bDraged)
+	{
+		m_bDraged = false;
+		//释放窗口锁定
+		CImageList::DragLeave(this);
+		//终止拖动
+		CImageList::EndDrag();
+		//释放鼠标捕捉，将鼠标操作交还给操作系统
+		ReleaseCapture();
+		if (m_pDragImage)
+		{
+			delete m_pDragImage;
+			m_pDragImage = NULL;
+		}
+
+		SelectDropTarget(NULL);
+		//未拖动
+		if (m_hDragSrc == m_hDragDist)
+		{
+			KillTimer(m_nScrollTimerID);
+			return;
+		}
+		//展开目标节点
+		Expand(m_hDragDist, TVE_EXPAND);
+		//节点拷贝，禁止父节点到子节点的拖动
+		HTREEITEM hParent = m_hDragDist;
+		while (hParent = GetParentItem(hParent))
+		{
+			if (hParent == m_hDragSrc)
+			{
+				AfxMessageBox(_T("禁止向子节点拷贝"));
+				KillTimer(m_nScrollTimerID);
+				return;
+			}
+		}
+		//DragBranch(m_hDragSrc, m_hDragDist)
+		HTREEITEM hNewItem = CopyBranch(m_hDragSrc, m_hDragDist, TVI_LAST);
+		//删除被拖动节点
+		//DeleteItem(m_hDragSrc);
+		//SelectItem(hNewItem);
+		KillTimer(m_nScrollTimerID);
+	}
+	CTreeCtrl::OnLButtonUp(nFlags, point);
+}
+
+void CImageTreeCtrl::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	if (m_nMsMoveTimerID)
+	{
+		KillTimer(m_nMsMoveTimerID);
+		m_nMsMoveTimerID = 0;
+	}
+	m_nMsMoveTimerID = SetTimer(1, 500, NULL);	//0.5秒展开节点组
+	m_ptMouseMove = point;
+
+	if (m_bDraged)
+	{
+		CImageList::DragMove(point);
+
+		//设置鼠标经过节点的节点高亮显示
+		CImageList::DragShowNolock(FALSE);	//擦除拖动痕迹
+		HTREEITEM hItem;
+		if (hItem = HitTest(point, &nFlags))
+		{
+			SelectDropTarget(hItem);
+			m_hDragDist = hItem;
+		}
+		CImageList::DragShowNolock(TRUE);	//显示当前拖动图像列表
+	}
+
+	CTreeCtrl::OnMouseMove(nFlags, point);
+}
+
+//拖动一个节点至另一个节点
+int CImageTreeCtrl::DragBranch(HTREEITEM horgitem, HTREEITEM hdesitem)
+{
+	//检查org 属于哪一个item
+	//m_BMpoint->
+	CBacnetBMD pointlistnode = m_BMpoint->BuildingNode;
+	for (int i = 0; i < pointlistnode.m_child_count; i++)
+	{
+		for (int j = 0; j < pointlistnode.pchild[i]->m_child_count; j++)
+		{
+
+		}
+	}
+	return 0;
+}
+
+HTREEITEM CImageTreeCtrl::CopyBranch(HTREEITEM hChildBruch, HTREEITEM hNewParent, HTREEITEM hInsertAfter)
+{
+#if 0
+	HTREEITEM hChild = NULL;
+	//先将拖动节点树的根节点拷贝至目标节点下
+	HTREEITEM hInsert = CopyItem(hChildBruch, hNewParent, hInsertAfter);
+	//递归调用，拷贝孩子节点
+	hChild = GetChildItem(hChildBruch);
+	while (hChild)
+	{
+		CopyBranch(hChild, hInsert, hInsertAfter);
+		//获取兄弟节点
+		hChild = GetNextSiblingItem(hChild);
+	}
+	return hInsert;
+#endif
+	return 0;
+	
+}
+HTREEITEM CImageTreeCtrl::CopyItem(HTREEITEM hItem, HTREEITEM hParent, HTREEITEM hInsertAfter)
+{
+	HTREEITEM hInsert;
+#if 0
+	TVINSERTSTRUCT tvItemST;
+	CString strText;
+
+	//获取插入节点源信息
+	tvItemST.item.hItem = hItem;
+	tvItemST.item.mask = TVIF_CHILDREN | TVIF_HANDLE | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+	GetItem(&tvItemST.item);
+	strText = GetItemText(hItem);
+	tvItemST.item.cchTextMax = strText.GetLength() + 1;
+	tvItemST.item.pszText = strText.LockBuffer();
+
+	//插入节点
+	tvItemST.hParent = hParent;
+	tvItemST.hInsertAfter = hInsertAfter;
+	tvItemST.item.mask = TVIF_IMAGE | TVIF_TEXT | TVIF_SELECTEDIMAGE;
+	hInsert = InsertItem(&tvItemST);
+	strText.ReleaseBuffer();
+
+	//为节点绑定数据用以标识
+	SetItemData(hInsert, GetItemData(hInsert));
+	//设置节点状态
+	SetItemState(hInsert, GetItemState(hInsert, TVIS_STATEIMAGEMASK), TVIS_STATEIMAGEMASK);
+#endif
+	return hInsert;
+}
+
+
+BOOL CImageTreeCtrl::OnNMClick(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	*pResult = 0;
+	return FALSE;
+}
+
+#if 1
+void CImageTreeCtrl::OnTvnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMTVDISPINFO pTVDispInfo = reinterpret_cast<LPNMTVDISPINFO>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	*pResult = 0;
+	CString strName = pTVDispInfo->item.pszText;
+	HTREEITEM hItem = GetSelectedItem();
+	if (0 == strName.GetLength())
+	{
+		return;
+	}
+	if (hItem != NULL)
+	{
+		SetItemText(hItem, strName);
+	}
+}
+#endif

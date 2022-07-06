@@ -3252,11 +3252,13 @@ void CDialogCM5_BacNet::Fresh()
 		return;
 	}
 
+
     load_prg_cache_ret = -1;
     CString achive_file_path;
     CString temp_serial;
     temp_serial.Format(_T("%d.prog"), g_selected_serialnumber);
     achive_file_path = g_achive_folder + _T("\\") + temp_serial;
+	CheckDeviceCountTable(g_selected_serialnumber, selected_product_Node.object_instance);
     load_prg_cache_ret = LoadBacnetBinaryFile(false, achive_file_path);
 
 

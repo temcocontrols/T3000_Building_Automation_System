@@ -358,6 +358,7 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_List(WPARAM wParam,LPARAM lPar
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Annual_data.at(i).description, (int)strlen((char *)m_Annual_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
+		temp_des = temp_des.Left(STR_ANNUAL_DESCRIPTION_LENGTH).Trim();
 		m_annualr_list.SetItemText(i,ANNUAL_ROUTINE_FULL_LABEL,temp_des);
 		if(m_Annual_data.at(i).auto_manual==0)
 		{
@@ -382,6 +383,7 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_List(WPARAM wParam,LPARAM lPar
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Annual_data.at(i).label, (int)strlen((char *)m_Annual_data.at(i).label)+1, 
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
+		temp_des2 = temp_des2.Left(STR_ANNUAL_LABEL_LENGTH).Trim();
 		m_annualr_list.SetItemText(i,ANNUAL_ROUTINE_LABLE,temp_des2);
 
         if (temp_des2.IsEmpty())

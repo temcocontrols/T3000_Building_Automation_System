@@ -623,6 +623,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).description, (int)strlen((char *)m_Output_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
+		temp_des = temp_des.Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 		{
 			if (m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG) {
@@ -787,6 +788,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				MultiByteToWideChar(CP_ACP, 0, (char*)bacnet_engineering_unit_names[m_Output_data.at(i).range].pString,
 					(int)strlen((char*)bacnet_engineering_unit_names[m_Output_data.at(i).range].pString) + 1,
 					outputunit.GetBuffer(MAX_PATH), MAX_PATH);
+				outputunit = outputunit.Left(50).Trim();
 				outputunit.ReleaseBuffer();
 				m_output_list.SetItemText(i, OUTPUT_UNITE, outputunit);
 				m_output_list.SetItemText(i, OUTPUT_RANGE, outputunit);
@@ -1041,6 +1043,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).label, (int)strlen((char *)m_Output_data.at(i).label)+1, 
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
+		temp_des2 = temp_des2.Left(STR_OUT_LABEL).Trim();
 		m_output_list.SetItemText(i,OUTPUT_LABLE,temp_des2);
 		if(isFreshOne)
 		{
@@ -1887,6 +1890,28 @@ void CBacnetOutput::OnCancel()
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 }
 
+int GetOutputLabelEx(Str_out_point temp_out, CString& ret_label, Point_Net* npoint)
+{
+	CString temp_des2;
+	MultiByteToWideChar(CP_ACP, 0, (char*)temp_out.label, (int)strlen((char*)temp_out.label) + 1,
+		ret_label.GetBuffer(MAX_PATH), MAX_PATH);
+	ret_label.ReleaseBuffer();
+
+	CString temp_cs;
+	temp_cs = ret_label;
+	temp_cs = temp_cs.Trim();
+	if (temp_cs.IsEmpty())
+	{
+		if (npoint == NULL)
+			temp_cs.Format(_T("OUT%u"), npoint->number + 1);
+		else
+			temp_cs.Format(_T("%dOUT%u"), npoint->panel, npoint->number + 1);
+		ret_label = temp_cs;
+	}
+
+	return 1;
+}
+
 int GetOutputLabel(int index, CString &ret_label, Point_Net * npoint)
 {
 	if(index >= BAC_OUTPUT_ITEM_COUNT)
@@ -1895,21 +1920,25 @@ int GetOutputLabel(int index, CString &ret_label, Point_Net * npoint)
 		return -1;
 	}
 	int i = index;
-	CString temp_des2;
-	MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).label, (int)strlen((char *)m_Output_data.at(i).label)+1, 
-		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
-	ret_label.ReleaseBuffer();
+	return GetOutputLabelEx(m_Output_data.at(index), ret_label, npoint);
+
+}
+int GetOutputFullLabelEx(Str_out_point temp_out, CString& ret_full_label, Point_Net* npoint)
+{
+	MultiByteToWideChar(CP_ACP, 0, (char*)temp_out.description, (int)strlen((char*)temp_out.description) + 1,
+		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH);
+	ret_full_label.ReleaseBuffer();
 
 	CString temp_cs;
-	temp_cs = ret_label;
+	temp_cs = ret_full_label;
 	temp_cs = temp_cs.Trim();
-	if(temp_cs.IsEmpty())
+	if (temp_cs.IsEmpty())
 	{
-        if(npoint == NULL)
-		    temp_cs.Format(_T("OUT%u"),index + 1);
-        else
-            temp_cs.Format(_T("%dOUT%u"),npoint->panel, index + 1);
-		ret_label = temp_cs;
+		if (npoint == NULL)
+			temp_cs.Format(_T("OUT%u"), npoint->number + 1);
+		else
+			temp_cs.Format(_T("%dOUT%u"), npoint->panel, npoint->number + 1);
+		ret_full_label = temp_cs;
 	}
 
 	return 1;
@@ -1923,40 +1952,14 @@ int GetOutputFullLabel(int index,CString &ret_full_label , Point_Net * npoint)
 		return -1;
 	}
 	int i = index;
-	MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).description, (int)strlen((char *)m_Output_data.at(i).description)+1, 
-		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH );
-	ret_full_label.ReleaseBuffer();
-
-	CString temp_cs;
-	temp_cs = ret_full_label;
-	temp_cs = temp_cs.Trim();
-	if(temp_cs.IsEmpty())
-	{
-        if (npoint == NULL)
-		    temp_cs.Format(_T("OUT%u"),index + 1);
-        else
-            temp_cs.Format(_T("%dOUT%u"), npoint->panel, index + 1);
-		ret_full_label = temp_cs;
-	}
-
-	return 1;
+	return GetOutputFullLabelEx(m_Output_data.at(index), ret_full_label, npoint);
 }
 
-
-int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value)
+int GetOutputValueEx(Str_out_point temp_out, CString& ret_cstring, CString& ret_unit, CString& Auto_M, int& digital_value)
 {
 	CStringArray temparray;
 	CString temp1;
-	if(index >= BAC_OUTPUT_ITEM_COUNT)
-	{
-		ret_cstring.Empty();
-		ret_unit.Empty();
-		Auto_M.Empty();
-		return -1;
-	}
-	int i = index;
-
-	if(m_Output_data.at(i).auto_manual == 1)
+	if (temp_out.auto_manual == 1)
 	{
 		Auto_M = _T("M");
 	}
@@ -1965,59 +1968,59 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 		Auto_M.Empty();
 	}
 
-	if(m_Output_data.at(i).range == 0)
+	if (temp_out.range == 0)
 	{
-		m_Output_data.at(i).digital_analog = BAC_UNITS_ANALOG;
+		temp_out.digital_analog = BAC_UNITS_ANALOG;
 	}
 
-	if(m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG)
+	if (temp_out.digital_analog == BAC_UNITS_ANALOG)
 	{
 
-		if(m_Output_data.at(i).range < (sizeof(OutPut_List_Analog_Units)/sizeof(OutPut_List_Analog_Units[0])))
+		if (temp_out.range < (sizeof(OutPut_List_Analog_Units) / sizeof(OutPut_List_Analog_Units[0])))
 		{
-			ret_unit = OutPut_List_Analog_Units[m_Output_data.at(i).range];
-			if(m_Output_data.at(i).range == 0)
+			ret_unit = OutPut_List_Analog_Units[temp_out.range];
+			if (temp_out.range == 0)
 				ret_unit.Empty();
 		}
 		else
 		{
 			ret_unit.Empty();
-            return RANGE_ERROR;
+			return RANGE_ERROR;
 		}
 
 		CString temp_value;
-		ret_cstring.Format(_T("%.1f"),((float)m_Output_data.at(i).value) / 1000);
+		ret_cstring.Format(_T("%.1f"), ((float)temp_out.value) / 1000);
 		digital_value = 2;//analog;
 	}
-	else if(m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+	else if (temp_out.digital_analog == BAC_UNITS_DIGITAL)
 	{
 		ret_unit.Empty();
 
-		if(m_Output_data.at(i).range>30)
+		if (temp_out.range > 30)
 		{
 			ret_cstring.Empty();
-            return RANGE_ERROR;
+			return RANGE_ERROR;
 		}
 		else
 		{
-			if((m_Output_data.at(i).range < 23) &&(m_Output_data.at(i).range !=0))
-				temp1 = Digital_Units_Array[m_Output_data.at(i).range];
-			else if((m_Output_data.at(i).range >=23) && (m_Output_data.at(i).range <= 30))
+			if ((temp_out.range < 23) && (temp_out.range != 0))
+				temp1 = Digital_Units_Array[temp_out.range];
+			else if ((temp_out.range >= 23) && (temp_out.range <= 30))
 			{
-				if(receive_customer_unit)
-					temp1 = Custom_Digital_Range[m_Output_data.at(i).range - 23];
+				if (receive_customer_unit)
+					temp1 = Custom_Digital_Range[temp_out.range - 23];
 			}
 			else
 			{
 				temp1.Empty();
 				ret_cstring.Empty();
-                return RANGE_ERROR;
+				return RANGE_ERROR;
 			}
 
-			SplitCStringA(temparray,temp1,_T("/"));
-			if((temparray.GetSize()==2))
+			SplitCStringA(temparray, temp1, _T("/"));
+			if ((temparray.GetSize() == 2))
 			{
-				if(m_Output_data.at(i).control == 0)
+				if (temp_out.control == 0)
 				{
 					digital_value = 0;
 					ret_cstring = temparray.GetAt(0);
@@ -2034,6 +2037,20 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 	}
 
 	return 1;
+}
+
+int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value)
+{
+
+	if(index >= BAC_OUTPUT_ITEM_COUNT)
+	{
+		ret_cstring.Empty();
+		ret_unit.Empty();
+		Auto_M.Empty();
+		return -1;
+	}
+	int i = index;
+	return GetOutputValueEx(m_Output_data.at(i), ret_cstring, ret_unit, Auto_M, digital_value);
 }
 
 

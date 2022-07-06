@@ -80,7 +80,7 @@ extern  CString g_strBuildingFolder;
 extern CString g_ext_database_path ; //额外的配置档数据库路径;
 extern CString g_ext_mass_flash_path ; //保存多烧写  选中设备的 配置文件路径
 extern  CString g_achive_monitor_datatbase_path ;
-
+extern CString g_building_devicedatabase; //DeviceDatabase.mdb 全路径
 extern BOOL g_mstp_flag;
 extern	BOOL g_Scanfully;
 extern	BOOL g_ScanSecurity;
@@ -1011,6 +1011,10 @@ extern HWND      m_tstat_schedule_dlg_hwnd ;
 extern HWND      m_t3000_log_window ;
 extern HWND      m_msv_dlg_hwnd;
 
+extern Str_in_point s_Input_data;
+extern Str_out_point s_Output_data;
+extern Str_variable_point s_Variable_data;
+
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
@@ -1052,6 +1056,7 @@ extern vector <Client_Info> m_tcp_connect_info;
 extern vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
 extern vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
 extern vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 新的setpoint表格; 以前的完全改不动了;
+extern Str_Setting_Info s_Basic_Setting;
 extern Str_Setting_Info Device_Basic_Setting;
 extern Str_Email_point  Device_Email_Point;
 extern Str_MISC Device_Misc_Data;
@@ -1310,8 +1315,11 @@ extern unsigned char daylight_start_month;
 extern unsigned char daylight_start_day;
 extern unsigned char daylight_end_month;
 extern unsigned char daylight_end_day;
-
+extern unsigned char gsp_invoke;
+extern int gsp_invoke_instance[256];
+extern device_io_status select_device_io_status;
 extern vector <Str_BM_IO> m_bm_io_data;
 extern vector <Str_product_io_count> m_product_iocount;  // 用来存储不同设备包含的IO数量;
+extern vector <Str_online_serialnumber> m_online_serial; //在线的设备，用于动态菜单
 extern bool Bacnet_debug_fileRead;
 extern bool bacnetIpDataRead;

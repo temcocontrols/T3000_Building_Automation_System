@@ -7,6 +7,7 @@
 #define TYPE_BM_OUTPUT      3
 #define TYPE_BM_VARIABLE    4
 #define TYPE_BM_MODULE      5
+#define TYPE_BM_VIRTUAL_DEVICE      6
 class CBacnetBMD
 {
 public:

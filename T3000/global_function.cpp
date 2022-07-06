@@ -1914,8 +1914,78 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     return -2;
 }
 
+int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize, uint8_t retrytime)
+{
+    if (g_protocol_support_ptp != PROTOCOL_MB_PTP_TRANSFER)
+    {
+        if ((g_protocol == MODBUS_RS485) ||
+            (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) ||
+            g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
+        {
+            //if (READVARUNIT_T3000 == command)
+            return -1;
+        }
+    }
+    gsp_invoke = -1;
+    int send_status = true;
+    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) //如果支持 转接头协议 ，并且默认重试10次，就改默认3次，没必要那么久;
+    {
+        if (retrytime == 10)
+            retrytime = 4;
+    }
+    for (int z = 0; z < retrytime; z++)
+    {
+        int temp_invoke_id = -1;
+        int	resend_count = 0;
+        send_status = true;
+        do
+        {
+            resend_count++;
+            if (resend_count > 3)
+            {
+                send_status = false;
+                break;
+            }
+            if (deviceid == 0)
+                temp_invoke_id = GetPrivateData(g_bac_instance, command, start_instance, end_instance, entitysize);
+            else
+                temp_invoke_id = GetPrivateData(deviceid, command, start_instance, end_instance, entitysize);
+            if (temp_invoke_id < 0)
+                Sleep(500);
+            else if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+            {
+                gsp_invoke = -1;
+                return 1;
+            }
+            else
+            {
+                gsp_invoke = temp_invoke_id;
+                send_status = true;
+            }
+
+        } while (temp_invoke_id < 0);
+
+        if (send_status)
+        {
+            for (int i = 0; i < 300; i++)
+            {
+                Sleep(10);
+                if (tsm_invoke_id_free(temp_invoke_id))
+                {
+                    gsp_invoke = -1;
+                    return 1;
+                }
+                else
+                    continue;
+            }
+        }
+    }
+    return -1;
+}
+
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize,uint8_t retrytime)
 {
+    gsp_invoke = -1;
     if (g_protocol_support_ptp != PROTOCOL_MB_PTP_TRANSFER)
     {
         if ((g_protocol == MODBUS_RS485) ||
@@ -2817,7 +2887,7 @@ bool Check_Label_Exsit(LPCTSTR m_new_label)
 ** Code by Fance
 ****************************************************/
 
-int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
+int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag, short invoke_id )
 {
     int i;
 
@@ -2872,13 +2942,176 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 		DFTrace(total_char_test);
 	}
     int ret_value = 0;
-    ret_value = Bacnet_PrivateData_Deal(bacnet_apud_point, len_value_type, end_flag);
+    ret_value = Bacnet_PrivateData_Deal(bacnet_apud_point, len_value_type, end_flag , invoke_id);
     return ret_value;
 
 }
+int fill_in_output(Str_out_point* temp_output, char* temp_point)
+{
+    int temp_struct_value;
+    char* my_temp_point = temp_point;
+    if (strlen(my_temp_point) > STR_OUT_DESCRIPTION_LENGTH - 2)
+    {
+        memcpy_s(temp_output->description, STR_OUT_DESCRIPTION_LENGTH - 2, my_temp_point, STR_OUT_DESCRIPTION_LENGTH - 2);
+        temp_output->description[18] = 0;
+    }
+    else
+        memcpy_s(temp_output->description, STR_OUT_DESCRIPTION_LENGTH - 2, my_temp_point, STR_OUT_DESCRIPTION_LENGTH - 2);
+
+    my_temp_point = my_temp_point + STR_OUT_DESCRIPTION_LENGTH - 2;
+
+    temp_output->low_voltage = *(my_temp_point++);
+    temp_output->high_voltage = *(my_temp_point++);
+    if (temp_output->low_voltage > 120)
+        temp_output->low_voltage = 0;
+    if (temp_output->high_voltage > 120)
+        temp_output->high_voltage = 0;
 
 
-int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, bool &end_flag)
+    if (strlen(my_temp_point) > STR_OUT_LABEL)
+        memset(temp_output->label, 0, STR_OUT_LABEL);
+    else
+        memcpy_s(temp_output->label, STR_OUT_LABEL, my_temp_point, STR_OUT_LABEL);
+    my_temp_point = my_temp_point + STR_OUT_LABEL;
+
+
+    CString cs_temp;
+    MultiByteToWideChar(CP_ACP, 0, (char*)temp_output->label, (int)strlen((char*)temp_output->label) + 1,
+        cs_temp.GetBuffer(MAX_PATH), MAX_PATH);
+    cs_temp.ReleaseBuffer();
+
+    int ret_1 = cs_temp.Replace(_T("-"), _T("_"));
+    int ret_2 = cs_temp.Replace(_T("."), _T("_"));
+    if ((ret_1 != 0) || (ret_2 != 0))
+    {
+        char cTemp1[255];
+        memset(cTemp1, 0, 255);
+        WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+        memcpy_s(temp_output->label, STR_OUT_LABEL, cTemp1, STR_OUT_LABEL);
+    }
+
+
+
+    temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    temp_output->value = temp_struct_value;
+    //memcpy_s(Private_data[i].value,4,temp_struct_value,4);
+    my_temp_point = my_temp_point + 4;
+
+    temp_output->auto_manual = *(my_temp_point++);
+    temp_output->digital_analog = *(my_temp_point++);
+    temp_output->hw_switch_status = *(my_temp_point++);
+    temp_output->control = *(my_temp_point++);
+    temp_output->digital_control = *(my_temp_point++);
+    temp_output->decom = *(my_temp_point++);
+    temp_output->range = *(my_temp_point++);
+    temp_output->sub_id = *(my_temp_point++);
+    temp_output->sub_product = *(my_temp_point++);
+    temp_output->sub_number = *(my_temp_point++);
+
+    //temp_out.delay_timer = *(my_temp_point++);  Output 这个Delay time先不管 清0
+    temp_output->pwm_period = *(my_temp_point++);
+    return 0;
+}
+int fill_in_input(Str_in_point *temp_input, char* temp_point)
+{
+    int temp_struct_value;
+    char* my_temp_point = temp_point;
+    //	Str_in_point temp_in;
+    if (strlen(my_temp_point) > STR_IN_DESCRIPTION_LENGTH)
+        memset(temp_input->description, 0, STR_IN_DESCRIPTION_LENGTH);
+    else
+        memcpy_s(temp_input->description, STR_IN_DESCRIPTION_LENGTH, my_temp_point, STR_IN_DESCRIPTION_LENGTH);
+    my_temp_point = my_temp_point + STR_IN_DESCRIPTION_LENGTH;
+    if (strlen(my_temp_point) > STR_IN_LABEL)
+        memset(temp_input->label, 0, STR_IN_LABEL);
+    else
+        memcpy_s(temp_input->label, STR_IN_LABEL, my_temp_point, STR_IN_LABEL);
+    my_temp_point = my_temp_point + STR_IN_LABEL;
+
+
+
+    CString cs_temp;
+    MultiByteToWideChar(CP_ACP, 0, (char*)temp_input->label, (int)strlen((char*)temp_input->label) + 1,
+        cs_temp.GetBuffer(MAX_PATH), MAX_PATH);
+    cs_temp.ReleaseBuffer();
+
+    int ret_1 = cs_temp.Replace(_T("-"), _T("_"));
+    int ret_2 = cs_temp.Replace(_T("."), _T("_"));
+    if ((ret_1 != 0) || (ret_2 != 0))
+    {
+        char cTemp1[255];
+        memset(cTemp1, 0, 255);
+        WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+        memcpy_s(temp_input->label, STR_IN_LABEL, cTemp1, STR_IN_LABEL);
+    }
+    temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    temp_input->value = temp_struct_value;
+
+    my_temp_point = my_temp_point + 4;
+    temp_input->filter = *(my_temp_point++);
+    temp_input->decom = *(my_temp_point++);
+    temp_input->sub_id = *(my_temp_point++);
+    temp_input->sub_product = *(my_temp_point++);
+    temp_input->control = *(my_temp_point++);
+    temp_input->auto_manual = *(my_temp_point++);
+    temp_input->digital_analog = *(my_temp_point++);
+    temp_input->calibration_sign = *(my_temp_point++);
+    temp_input->sub_number = *(my_temp_point++);
+    temp_input->calibration_h = *(my_temp_point++);
+    temp_input->calibration_l = *(my_temp_point++);
+    temp_input->range = *(my_temp_point++);
+    return 0;
+}
+
+int fill_in_variable(Str_variable_point* temp_var, char* temp_point)
+{
+    int temp_struct_value;
+    char* my_temp_point = temp_point;
+    if (strlen(my_temp_point) > STR_VARIABLE_DESCRIPTION_LENGTH)
+        memset(temp_var->description, 0, STR_VARIABLE_DESCRIPTION_LENGTH);
+    else
+        memcpy_s(temp_var->description, STR_VARIABLE_DESCRIPTION_LENGTH, my_temp_point, STR_VARIABLE_DESCRIPTION_LENGTH);
+    my_temp_point = my_temp_point + STR_VARIABLE_DESCRIPTION_LENGTH;
+    if (strlen(my_temp_point) > STR_VARIABLE_LABEL)
+        memset(temp_var->label, 0, STR_VARIABLE_LABEL);
+    else
+        memcpy_s(temp_var->label, STR_VARIABLE_LABEL, my_temp_point, STR_VARIABLE_LABEL);
+    my_temp_point = my_temp_point + STR_VARIABLE_LABEL;
+
+
+    CString cs_temp;
+    MultiByteToWideChar(CP_ACP, 0, (char*)temp_var->label, (int)strlen((char*)temp_var->label) + 1,
+        cs_temp.GetBuffer(MAX_PATH), MAX_PATH);
+    cs_temp.ReleaseBuffer();
+
+    int ret_1 = cs_temp.Replace(_T("-"), _T("_"));
+    int ret_2 = cs_temp.Replace(_T("."), _T("_"));
+    if ((ret_1 != 0) || (ret_2 != 0))
+    {
+        char cTemp1[255];
+        memset(cTemp1, 0, 255);
+        WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+        memcpy_s(temp_var->label, STR_VARIABLE_LABEL, cTemp1, STR_VARIABLE_LABEL);
+    }
+
+
+
+    temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    temp_var->value = temp_struct_value;
+    //memcpy_s(Private_data[i].value,4,temp_struct_value,4);
+    my_temp_point = my_temp_point + 4;
+
+
+    temp_var->auto_manual = *(my_temp_point++);
+    temp_var->digital_analog = *(my_temp_point++);
+    temp_var->control = *(my_temp_point++);
+    temp_var->unused = *(my_temp_point++);
+    temp_var->range = *(my_temp_point++);
+
+    return 0;
+}
+
+int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, bool &end_flag, short invoke_id)
 {
     int temp_struct_value;
     int command_type;
@@ -3136,69 +3369,25 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (start_instance >= BAC_OUTPUT_ITEM_COUNT)
             return -1;//超过长度了;
 
-        for (i = start_instance; i <= end_instance; i++)
+        if (invoke_id == gsp_invoke)
         {
-            if (strlen(my_temp_point) > STR_OUT_DESCRIPTION_LENGTH - 2)
+            for (i = start_instance; i <= end_instance; i++)
             {
-                memcpy_s(m_Output_data.at(i).description, STR_OUT_DESCRIPTION_LENGTH - 2, my_temp_point, STR_OUT_DESCRIPTION_LENGTH - 2);
-                m_Output_data.at(i).description[18] = 0;
+                fill_in_output(&s_Output_data, my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_out_point);
             }
-            else
-                memcpy_s(m_Output_data.at(i).description, STR_OUT_DESCRIPTION_LENGTH - 2, my_temp_point, STR_OUT_DESCRIPTION_LENGTH - 2);
-
-            my_temp_point = my_temp_point + STR_OUT_DESCRIPTION_LENGTH - 2;
-
-            m_Output_data.at(i).low_voltage = *(my_temp_point++);
-            m_Output_data.at(i).high_voltage = *(my_temp_point++);
-            if (m_Output_data.at(i).low_voltage > 120)
-                m_Output_data.at(i).low_voltage = 0;
-            if (m_Output_data.at(i).high_voltage > 120)
-                m_Output_data.at(i).high_voltage = 0;
-
-
-            if (strlen(my_temp_point) > STR_OUT_LABEL)
-                memset(m_Output_data.at(i).label, 0, STR_OUT_LABEL);
-            else
-                memcpy_s(m_Output_data.at(i).label, STR_OUT_LABEL, my_temp_point, STR_OUT_LABEL);
-            my_temp_point = my_temp_point + STR_OUT_LABEL;
-
-
-            CString cs_temp;
-            MultiByteToWideChar(CP_ACP, 0, (char *)m_Output_data.at(i).label, (int)strlen((char *)m_Output_data.at(i).label) + 1,
-                cs_temp.GetBuffer(MAX_PATH), MAX_PATH);
-            cs_temp.ReleaseBuffer();
-
-            int ret_1 = cs_temp.Replace(_T("-"), _T("_"));
-            int ret_2 = cs_temp.Replace(_T("."), _T("_"));
-            if ((ret_1 != 0) || (ret_2 != 0))
-            {
-                char cTemp1[255];
-                memset(cTemp1, 0, 255);
-                WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
-                memcpy_s(m_Output_data.at(i).label, STR_OUT_LABEL, cTemp1, STR_OUT_LABEL);
-            }
-
-
-
-            temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
-            m_Output_data.at(i).value = temp_struct_value;
-            //memcpy_s(Private_data[i].value,4,temp_struct_value,4);
-            my_temp_point = my_temp_point + 4;
-
-            m_Output_data.at(i).auto_manual = *(my_temp_point++);
-            m_Output_data.at(i).digital_analog = *(my_temp_point++);
-            m_Output_data.at(i).hw_switch_status = *(my_temp_point++);
-            m_Output_data.at(i).control = *(my_temp_point++);
-            m_Output_data.at(i).digital_control = *(my_temp_point++);
-            m_Output_data.at(i).decom = *(my_temp_point++);
-            m_Output_data.at(i).range = *(my_temp_point++);
-            m_Output_data.at(i).sub_id = *(my_temp_point++);
-            m_Output_data.at(i).sub_product = *(my_temp_point++);
-            m_Output_data.at(i).sub_number = *(my_temp_point++);
-
-            //temp_out.delay_timer = *(my_temp_point++);  Output 这个Delay time先不管 清0
-            m_Output_data.at(i).pwm_period = *(my_temp_point++);
         }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_output(&m_Output_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_out_point);
+
+               
+            }
+        }
+       
         return READOUTPUT_T3000;
     }
     break;
@@ -3220,53 +3409,21 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
 
         if (start_instance >= BAC_INPUT_ITEM_COUNT)
             return -1;//超过长度了;
-        for (i = start_instance; i <= end_instance; i++)
+        if (invoke_id == gsp_invoke)
         {
-            //	Str_in_point temp_in;
-            if (strlen(my_temp_point) > STR_IN_DESCRIPTION_LENGTH)
-                memset(m_Input_data.at(i).description, 0, STR_IN_DESCRIPTION_LENGTH);
-            else
-                memcpy_s(m_Input_data.at(i).description, STR_IN_DESCRIPTION_LENGTH, my_temp_point, STR_IN_DESCRIPTION_LENGTH);
-            my_temp_point = my_temp_point + STR_IN_DESCRIPTION_LENGTH;
-            if (strlen(my_temp_point) > STR_IN_LABEL)
-                memset(m_Input_data.at(i).label, 0, STR_IN_LABEL);
-            else
-                memcpy_s(m_Input_data.at(i).label, STR_IN_LABEL, my_temp_point, STR_IN_LABEL);
-            my_temp_point = my_temp_point + STR_IN_LABEL;
-
-
-
-            CString cs_temp;
-            MultiByteToWideChar(CP_ACP, 0, (char *)m_Input_data.at(i).label, (int)strlen((char *)m_Input_data.at(i).label) + 1,
-                cs_temp.GetBuffer(MAX_PATH), MAX_PATH);
-            cs_temp.ReleaseBuffer();
-
-            int ret_1 = cs_temp.Replace(_T("-"), _T("_"));
-            int ret_2 = cs_temp.Replace(_T("."), _T("_"));
-            if ((ret_1 != 0) || (ret_2 != 0))
+            for (i = start_instance; i <= end_instance; i++)
             {
-                char cTemp1[255];
-                memset(cTemp1, 0, 255);
-                WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
-                memcpy_s(m_Input_data.at(i).label, STR_IN_LABEL, cTemp1, STR_IN_LABEL);
+                fill_in_input(&s_Input_data, my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_in_point);
             }
-            temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
-            m_Input_data.at(i).value = temp_struct_value;
-
-            my_temp_point = my_temp_point + 4;
-            m_Input_data.at(i).filter = *(my_temp_point++);
-            m_Input_data.at(i).decom = *(my_temp_point++);
-            m_Input_data.at(i).sub_id = *(my_temp_point++);
-            m_Input_data.at(i).sub_product = *(my_temp_point++);
-            m_Input_data.at(i).control = *(my_temp_point++);
-            m_Input_data.at(i).auto_manual = *(my_temp_point++);
-            m_Input_data.at(i).digital_analog = *(my_temp_point++);
-            m_Input_data.at(i).calibration_sign = *(my_temp_point++);
-            m_Input_data.at(i).sub_number = *(my_temp_point++);
-            m_Input_data.at(i).calibration_h = *(my_temp_point++);
-            m_Input_data.at(i).calibration_l = *(my_temp_point++);
-            m_Input_data.at(i).range = *(my_temp_point++);
-
+        }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_input(&m_Input_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_in_point);
+            }
         }
         return READINPUT_T3000;
     }
@@ -3288,52 +3445,23 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (start_instance >= BAC_VARIABLE_ITEM_COUNT)
             return -1;//超过长度了;
 
-        for (i = start_instance; i <= end_instance; i++)
+        if (invoke_id == gsp_invoke)
         {
-            //Str_variable_point temp_variable;
-            if (strlen(my_temp_point) > STR_VARIABLE_DESCRIPTION_LENGTH)
-                memset(m_Variable_data.at(i).description, 0, STR_VARIABLE_DESCRIPTION_LENGTH);
-            else
-                memcpy_s(m_Variable_data.at(i).description, STR_VARIABLE_DESCRIPTION_LENGTH, my_temp_point, STR_VARIABLE_DESCRIPTION_LENGTH);
-            my_temp_point = my_temp_point + STR_VARIABLE_DESCRIPTION_LENGTH;
-            if (strlen(my_temp_point) > STR_VARIABLE_LABEL)
-                memset(m_Variable_data.at(i).label, 0, STR_VARIABLE_LABEL);
-            else
-                memcpy_s(m_Variable_data.at(i).label, STR_VARIABLE_LABEL, my_temp_point, STR_VARIABLE_LABEL);
-            my_temp_point = my_temp_point + STR_VARIABLE_LABEL;
-
-
-            CString cs_temp;
-            MultiByteToWideChar(CP_ACP, 0, (char *)m_Variable_data.at(i).label, (int)strlen((char *)m_Variable_data.at(i).label) + 1,
-                cs_temp.GetBuffer(MAX_PATH), MAX_PATH);
-            cs_temp.ReleaseBuffer();
-
-            int ret_1 = cs_temp.Replace(_T("-"), _T("_"));
-            int ret_2 = cs_temp.Replace(_T("."), _T("_"));
-            if ((ret_1 != 0) || (ret_2 != 0))
+            for (i = start_instance; i <= end_instance; i++)
             {
-                char cTemp1[255];
-                memset(cTemp1, 0, 255);
-                WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
-                memcpy_s(m_Variable_data.at(i).label, STR_VARIABLE_LABEL, cTemp1, STR_VARIABLE_LABEL);
+                fill_in_variable(&s_Variable_data, my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_variable_point);
             }
-
-
-
-            temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
-            m_Variable_data.at(i).value = temp_struct_value;
-            //memcpy_s(Private_data[i].value,4,temp_struct_value,4);
-            my_temp_point = my_temp_point + 4;
-
-
-            m_Variable_data.at(i).auto_manual = *(my_temp_point++);
-            m_Variable_data.at(i).digital_analog = *(my_temp_point++);
-            m_Variable_data.at(i).control = *(my_temp_point++);
-            m_Variable_data.at(i).unused = *(my_temp_point++);
-            m_Variable_data.at(i).range = *(my_temp_point++);
-
-            //m_Variable_data.push_back(temp_variable);
         }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_variable(&m_Variable_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_variable_point);
+            }
+        }
+
         return READVARIABLE_T3000;
     }
     break;
@@ -4125,162 +4253,170 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (block_length != sizeof(Str_Setting_Info))
             return -1;
 
-        memcpy_s(Device_Basic_Setting.reg.ip_addr, 4, my_temp_point, 4);
-        my_temp_point = my_temp_point + 4;
-        memcpy_s(Device_Basic_Setting.reg.subnet, 4, my_temp_point, 4);
-        my_temp_point = my_temp_point + 4;
-        memcpy_s(Device_Basic_Setting.reg.gate_addr, 4, my_temp_point, 4);
-        my_temp_point = my_temp_point + 4;
-        memcpy_s(Device_Basic_Setting.reg.mac_addr, 6, my_temp_point, 6);
-        my_temp_point = my_temp_point + 6;
-        Device_Basic_Setting.reg.tcp_type = *(my_temp_point++);
-        Device_Basic_Setting.reg.mini_type = *(my_temp_point++);
+            memcpy_s(s_Basic_Setting.reg.ip_addr, 4, my_temp_point, 4);
+            my_temp_point = my_temp_point + 4;
+            memcpy_s(s_Basic_Setting.reg.subnet, 4, my_temp_point, 4);
+            my_temp_point = my_temp_point + 4;
+            memcpy_s(s_Basic_Setting.reg.gate_addr, 4, my_temp_point, 4);
+            my_temp_point = my_temp_point + 4;
+            memcpy_s(s_Basic_Setting.reg.mac_addr, 6, my_temp_point, 6);
+            my_temp_point = my_temp_point + 6;
+            s_Basic_Setting.reg.tcp_type = *(my_temp_point++);
+            s_Basic_Setting.reg.mini_type = *(my_temp_point++);
 
-        my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
-        Device_Basic_Setting.reg.pro_info.harware_rev = *(my_temp_point++);
-        Device_Basic_Setting.reg.pro_info.firmware0_rev_main = *(my_temp_point++);
-        Device_Basic_Setting.reg.pro_info.firmware0_rev_sub = *(my_temp_point++);
+            my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
+            s_Basic_Setting.reg.pro_info.harware_rev = *(my_temp_point++);
+            s_Basic_Setting.reg.pro_info.firmware0_rev_main = *(my_temp_point++);
+            s_Basic_Setting.reg.pro_info.firmware0_rev_sub = *(my_temp_point++);
 
-        Device_Basic_Setting.reg.pro_info.frimware1_rev = *(my_temp_point++);
-        Device_Basic_Setting.reg.pro_info.frimware2_rev = *(my_temp_point++);
-        Device_Basic_Setting.reg.pro_info.frimware3_rev = *(my_temp_point++);
-        Device_Basic_Setting.reg.pro_info.bootloader_rev = *(my_temp_point++);
-        my_temp_point = my_temp_point + 10;
-        Device_Basic_Setting.reg.com0_config = *(my_temp_point++);
-        Device_Basic_Setting.reg.com1_config = *(my_temp_point++);
-        Device_Basic_Setting.reg.com2_config = *(my_temp_point++);
-        Device_Basic_Setting.reg.refresh_flash_timer = *(my_temp_point++);
-        Device_Basic_Setting.reg.en_plug_n_play = *(my_temp_point++);
-        Device_Basic_Setting.reg.reset_default = *(my_temp_point++);
+            s_Basic_Setting.reg.pro_info.frimware1_rev = *(my_temp_point++);
+            s_Basic_Setting.reg.pro_info.frimware2_rev = *(my_temp_point++);
+            s_Basic_Setting.reg.pro_info.frimware3_rev = *(my_temp_point++);
+            s_Basic_Setting.reg.pro_info.bootloader_rev = *(my_temp_point++);
+            my_temp_point = my_temp_point + 10;
+            s_Basic_Setting.reg.com0_config = *(my_temp_point++);
+            s_Basic_Setting.reg.com1_config = *(my_temp_point++);
+            s_Basic_Setting.reg.com2_config = *(my_temp_point++);
+            s_Basic_Setting.reg.refresh_flash_timer = *(my_temp_point++);
+            s_Basic_Setting.reg.en_plug_n_play = *(my_temp_point++);
+            s_Basic_Setting.reg.reset_default = *(my_temp_point++);
 
-        Device_Basic_Setting.reg.com_baudrate0 = *(my_temp_point++);
-        Device_Basic_Setting.reg.com_baudrate1 = *(my_temp_point++);
-        Device_Basic_Setting.reg.com_baudrate2 = *(my_temp_point++);
+            s_Basic_Setting.reg.com_baudrate0 = *(my_temp_point++);
+            s_Basic_Setting.reg.com_baudrate1 = *(my_temp_point++);
+            s_Basic_Setting.reg.com_baudrate2 = *(my_temp_point++);
 
-        Device_Basic_Setting.reg.user_name = *(my_temp_point++);
-        Device_Basic_Setting.reg.custmer_unite = *(my_temp_point++);
+            s_Basic_Setting.reg.user_name = *(my_temp_point++);
+            s_Basic_Setting.reg.custmer_unite = *(my_temp_point++);
 
-        Device_Basic_Setting.reg.usb_mode = *(my_temp_point++);
-        Device_Basic_Setting.reg.network_number = *(my_temp_point++);
-        Device_Basic_Setting.reg.panel_type = *(my_temp_point++);
-        memcpy_s(Device_Basic_Setting.reg.panel_name, 20, my_temp_point, 20);
-        my_temp_point = my_temp_point + 20;
-        Device_Basic_Setting.reg.en_panel_name = *(my_temp_point++);
-        Device_Basic_Setting.reg.panel_number = *(my_temp_point++);
+            s_Basic_Setting.reg.usb_mode = *(my_temp_point++);
+            s_Basic_Setting.reg.network_number = *(my_temp_point++);
+            s_Basic_Setting.reg.panel_type = *(my_temp_point++);
+            memcpy_s(s_Basic_Setting.reg.panel_name, 20, my_temp_point, 20);
+            my_temp_point = my_temp_point + 20;
+            s_Basic_Setting.reg.en_panel_name = *(my_temp_point++);
+            s_Basic_Setting.reg.panel_number = *(my_temp_point++);
 
 
-        uint8_t en_dyndns;  // 0 - no  1 - disable 2 - enable
-        uint8_t en_sntp;  // 0 - no  1 - disable
-        memcpy_s(Device_Basic_Setting.reg.dyndns_user, DYNDNS_MAX_USERNAME_SIZE, my_temp_point, DYNDNS_MAX_USERNAME_SIZE);
-        my_temp_point = my_temp_point + DYNDNS_MAX_USERNAME_SIZE;
-        memcpy_s(Device_Basic_Setting.reg.dyndns_pass, DYNDNS_MAX_PASSWORD_SIZE, my_temp_point, DYNDNS_MAX_PASSWORD_SIZE);
-        my_temp_point = my_temp_point + DYNDNS_MAX_PASSWORD_SIZE;
-        memcpy_s(Device_Basic_Setting.reg.dyndns_domain, DYNDNS_MAX_DOMAIN_SIZE, my_temp_point, DYNDNS_MAX_DOMAIN_SIZE);
-        my_temp_point = my_temp_point + DYNDNS_MAX_DOMAIN_SIZE;
-        Device_Basic_Setting.reg.en_dyndns = *(my_temp_point++);
-        Device_Basic_Setting.reg.dyndns_provider = *(my_temp_point++);
-        Device_Basic_Setting.reg.dyndns_update_time = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
-        my_temp_point = my_temp_point + 2;
-        Device_Basic_Setting.reg.en_sntp = *(my_temp_point++);
-        Device_Basic_Setting.reg.time_zone = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
-        my_temp_point = my_temp_point + 2;
-        Device_Basic_Setting.reg.n_serial_number = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
-        my_temp_point = my_temp_point + 4;
+            uint8_t en_dyndns;  // 0 - no  1 - disable 2 - enable
+            uint8_t en_sntp;  // 0 - no  1 - disable
+            memcpy_s(s_Basic_Setting.reg.dyndns_user, DYNDNS_MAX_USERNAME_SIZE, my_temp_point, DYNDNS_MAX_USERNAME_SIZE);
+            my_temp_point = my_temp_point + DYNDNS_MAX_USERNAME_SIZE;
+            memcpy_s(s_Basic_Setting.reg.dyndns_pass, DYNDNS_MAX_PASSWORD_SIZE, my_temp_point, DYNDNS_MAX_PASSWORD_SIZE);
+            my_temp_point = my_temp_point + DYNDNS_MAX_PASSWORD_SIZE;
+            memcpy_s(s_Basic_Setting.reg.dyndns_domain, DYNDNS_MAX_DOMAIN_SIZE, my_temp_point, DYNDNS_MAX_DOMAIN_SIZE);
+            my_temp_point = my_temp_point + DYNDNS_MAX_DOMAIN_SIZE;
+            s_Basic_Setting.reg.en_dyndns = *(my_temp_point++);
+            s_Basic_Setting.reg.dyndns_provider = *(my_temp_point++);
+            s_Basic_Setting.reg.dyndns_update_time = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
+            my_temp_point = my_temp_point + 2;
+            s_Basic_Setting.reg.en_sntp = *(my_temp_point++);
+            s_Basic_Setting.reg.time_zone = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
+            my_temp_point = my_temp_point + 2;
+            s_Basic_Setting.reg.n_serial_number = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 4;
 
-        //CString test_serial_number;
-        //test_serial_number.Format(_T("Read Setting %u"),Device_Basic_Setting.reg.n_serial_number);
-        //DFTrace(test_serial_number);
-        memcpy_s(&Device_Basic_Setting.reg.update_dyndns, UN_TIME_LENGTH, my_temp_point, UN_TIME_LENGTH);
-        my_temp_point = my_temp_point + UN_TIME_LENGTH;
+            //CString test_serial_number;
+            //test_serial_number.Format(_T("Read Setting %u"),s_Basic_Setting.reg.n_serial_number);
+            //DFTrace(test_serial_number);
+            memcpy_s(&s_Basic_Setting.reg.update_dyndns, UN_TIME_LENGTH, my_temp_point, UN_TIME_LENGTH);
+            my_temp_point = my_temp_point + UN_TIME_LENGTH;
 
-        Device_Basic_Setting.reg.mstp_network_number = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
-        my_temp_point = my_temp_point + 2;
-        Device_Basic_Setting.reg.BBMD_EN = *(my_temp_point++);
-        Device_Basic_Setting.reg.sd_exist = *(my_temp_point++);
-        Device_Basic_Setting.reg.modbus_port = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
-        my_temp_point = my_temp_point + 2;
-        Device_Basic_Setting.reg.modbus_id = *(my_temp_point++);
-        Device_Basic_Setting.reg.object_instance = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
-        my_temp_point = my_temp_point + 4;
-        Device_Basic_Setting.reg.time_update_since_1970 = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
-        my_temp_point = my_temp_point + 4;
-        Device_Basic_Setting.reg.time_zone_summer_daytime = *(my_temp_point++);
-        memcpy_s(Device_Basic_Setting.reg.sntp_server, 30, my_temp_point, 30);
-        my_temp_point = my_temp_point + 30;
-        Device_Basic_Setting.reg.zegbee_exsit = *(my_temp_point++);
-        Device_Basic_Setting.reg.LCD_Display = *(my_temp_point++);
-        Device_Basic_Setting.reg.flag_time_sync_pc = *(my_temp_point++);
-        Device_Basic_Setting.reg.time_sync_auto_manual = *(my_temp_point++);
-        Device_Basic_Setting.reg.sync_time_results = *(my_temp_point++);
-        Device_Basic_Setting.reg.mstp_id = *(my_temp_point++);
-        Device_Basic_Setting.reg.zigbee_panid = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
-        my_temp_point = my_temp_point + 2;
-        Device_Basic_Setting.reg.max_master = *(my_temp_point++);
-        Device_Basic_Setting.reg.special_flag = *(my_temp_point++);
+            s_Basic_Setting.reg.mstp_network_number = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
+            my_temp_point = my_temp_point + 2;
+            s_Basic_Setting.reg.BBMD_EN = *(my_temp_point++);
+            s_Basic_Setting.reg.sd_exist = *(my_temp_point++);
+            s_Basic_Setting.reg.modbus_port = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
+            my_temp_point = my_temp_point + 2;
+            s_Basic_Setting.reg.modbus_id = *(my_temp_point++);
+            s_Basic_Setting.reg.object_instance = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 4;
+            s_Basic_Setting.reg.time_update_since_1970 = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point + 4;
+            s_Basic_Setting.reg.time_zone_summer_daytime = *(my_temp_point++);
+            memcpy_s(s_Basic_Setting.reg.sntp_server, 30, my_temp_point, 30);
+            my_temp_point = my_temp_point + 30;
+            s_Basic_Setting.reg.zegbee_exsit = *(my_temp_point++);
+            s_Basic_Setting.reg.LCD_Display = *(my_temp_point++);
+            s_Basic_Setting.reg.flag_time_sync_pc = *(my_temp_point++);
+            s_Basic_Setting.reg.time_sync_auto_manual = *(my_temp_point++);
+            s_Basic_Setting.reg.sync_time_results = *(my_temp_point++);
+            s_Basic_Setting.reg.mstp_id = *(my_temp_point++);
+            s_Basic_Setting.reg.zigbee_panid = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
+            my_temp_point = my_temp_point + 2;
+            s_Basic_Setting.reg.max_master = *(my_temp_point++);
+            s_Basic_Setting.reg.special_flag = *(my_temp_point++);
 
-        memcpy_s(Device_Basic_Setting.reg.uart_parity, 3, my_temp_point, 3);
-        my_temp_point = my_temp_point + 3;
-        memcpy_s(Device_Basic_Setting.reg.uart_stopbit, 3, my_temp_point, 3);
-        my_temp_point = my_temp_point + 3;
+            memcpy_s(s_Basic_Setting.reg.uart_parity, 3, my_temp_point, 3);
+            my_temp_point = my_temp_point + 3;
+            memcpy_s(s_Basic_Setting.reg.uart_stopbit, 3, my_temp_point, 3);
+            my_temp_point = my_temp_point + 3;
 
-        memcpy_s(&Device_Basic_Setting.reg.display_lcd, 7, my_temp_point, 7);
-        my_temp_point = my_temp_point + 7;
-        Device_Basic_Setting.reg.start_month = *(my_temp_point++);
-        Device_Basic_Setting.reg.start_day = *(my_temp_point++);
-        Device_Basic_Setting.reg.end_month = *(my_temp_point++);
-        Device_Basic_Setting.reg.end_day = *(my_temp_point++);
-        Device_Basic_Setting.reg.network_number_hi = *(my_temp_point++);
-        //memcpy_s(&Device_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
-        //my_temp_point = my_temp_point + 10; //算上这个  长度是 270
-        
+            memcpy_s(&s_Basic_Setting.reg.display_lcd, 7, my_temp_point, 7);
+            my_temp_point = my_temp_point + 7;
+            s_Basic_Setting.reg.start_month = *(my_temp_point++);
+            s_Basic_Setting.reg.start_day = *(my_temp_point++);
+            s_Basic_Setting.reg.end_month = *(my_temp_point++);
+            s_Basic_Setting.reg.end_day = *(my_temp_point++);
+            s_Basic_Setting.reg.network_number_hi = *(my_temp_point++);
+            //memcpy_s(&s_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
+            //my_temp_point = my_temp_point + 10; //算上这个  长度是 270
 
-        //额外处理不同CPU的 minitype
-           //最高位 次高位   10   主芯片 APM
-    //最高位 次高位   01   主芯片 GD
-        unsigned char temp_chip = Device_Basic_Setting.reg.mini_type;
-        Device_Basic_Setting.reg.mini_type = Device_Basic_Setting.reg.mini_type & 0x3F;
-        
-        temp_chip = (temp_chip & 0xc0);
-        T3_chip_type = temp_chip;
-        switch (temp_chip)
-        {
-        case 0x00:
-            break;
-        case 0x40:
-            T3_chip_name = _T("(GD)");
-            break;
-        case 0x80:
-            T3_chip_name = _T("(APM)");
-            break;
-        case 0xc0:
-            break;
-        default:
-            T3_chip_name.Empty();
-            break;
-        }
 
-        if (Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
-            bacnet_device_type = BIG_MINIPANEL;
-        else if (Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL)
-            bacnet_device_type = SMALL_MINIPANEL;
-        else if (Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL)
-            bacnet_device_type = TINY_MINIPANEL;
-        else if (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL)
-            bacnet_device_type = TINY_EX_MINIPANEL;
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM)
-            bacnet_device_type = MINIPANELARM;
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB)
-            bacnet_device_type = MINIPANELARM_LB;
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
-            bacnet_device_type = MINIPANELARM_TB;
-        else if (Device_Basic_Setting.reg.mini_type == T3_TB_11I)
-            bacnet_device_type = T3_TB_11I;
-        else if (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB)
-            bacnet_device_type = MINIPANELARM_NB;
-        else if (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE)
-            bacnet_device_type = T3_FAN_MODULE;
-        else
-            bacnet_device_type = PM_CM5;
+            //额外处理不同CPU的 minitype
+               //最高位 次高位   10   主芯片 APM
+        //最高位 次高位   01   主芯片 GD
+            unsigned char temp_chip = s_Basic_Setting.reg.mini_type;
+            s_Basic_Setting.reg.mini_type = s_Basic_Setting.reg.mini_type & 0x3F;
+
+            temp_chip = (temp_chip & 0xc0);
+            T3_chip_type = temp_chip;
+            switch (temp_chip)
+            {
+            case 0x00:
+                break;
+            case 0x40:
+                T3_chip_name = _T("(GD)");
+                break;
+            case 0x80:
+                T3_chip_name = _T("(APM)");
+                break;
+            case 0xc0:
+                break;
+            default:
+                T3_chip_name.Empty();
+                break;
+            }
+
+            if (s_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
+                bacnet_device_type = BIG_MINIPANEL;
+            else if (s_Basic_Setting.reg.mini_type == SMALL_MINIPANEL)
+                bacnet_device_type = SMALL_MINIPANEL;
+            else if (s_Basic_Setting.reg.mini_type == TINY_MINIPANEL)
+                bacnet_device_type = TINY_MINIPANEL;
+            else if (s_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL)
+                bacnet_device_type = TINY_EX_MINIPANEL;
+            else if (s_Basic_Setting.reg.mini_type == MINIPANELARM)
+                bacnet_device_type = MINIPANELARM;
+            else if (s_Basic_Setting.reg.mini_type == MINIPANELARM_LB)
+                bacnet_device_type = MINIPANELARM_LB;
+            else if (s_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
+                bacnet_device_type = MINIPANELARM_TB;
+            else if (s_Basic_Setting.reg.mini_type == T3_TB_11I)
+                bacnet_device_type = T3_TB_11I;
+            else if (s_Basic_Setting.reg.mini_type == MINIPANELARM_NB)
+                bacnet_device_type = MINIPANELARM_NB;
+            else if (s_Basic_Setting.reg.mini_type == T3_FAN_MODULE)
+                bacnet_device_type = T3_FAN_MODULE;
+            else
+                bacnet_device_type = PM_CM5;
+            if (invoke_id == gsp_invoke)
+            {
+                Sleep(1);
+            }
+            else
+            {
+                memcpy(&Device_Basic_Setting, &s_Basic_Setting, sizeof(Str_Setting_Info));
+            }
 
         return READ_SETTING_COMMAND;
     }
@@ -5877,7 +6013,7 @@ void local_handler_conf_private_trans_ack(
     }
     int receive_data_type;
     bool each_end_flag = false;
-    receive_data_type = Bacnet_PrivateData_Handle(&data,each_end_flag);
+    receive_data_type = Bacnet_PrivateData_Handle(&data,each_end_flag, service_data->invoke_id);
     if(receive_data_type < 0)
     {
         g_llerrCount ++;
@@ -6179,6 +6315,7 @@ void Inial_Product_Menu_map()
         }
             break;
         case PWM_TRANSDUCER:
+        case PM_T38AI8AO6DO:
         {
             unsigned char  temp[20] = { 1,1,1,0,  0,0,0,0,  0,0,0,0,   0,1,1,1  ,0,0,0,0 };
             memcpy(product_menu[i], temp, 20);
@@ -6188,6 +6325,7 @@ void Inial_Product_Menu_map()
         case PM_CS_SM_DC:
         case PM_CS_RSM_AC:
         case PM_CS_RSM_DC:
+        case PM_T322AI:
         {
             unsigned char  temp[20] = { 1,1,0,0,  0,0,0,0,  0,0,0,0,   0,1,1,1  ,0,0,0,0 };
             memcpy(product_menu[i], temp, 20);
@@ -6299,7 +6437,7 @@ void Inial_Product_map()
     product_map.insert(map<int, CString>::value_type(PM_TSTAT5F, _T("TStat5F")));
     product_map.insert(map<int, CString>::value_type(PM_TSTAT5G, _T("TStat5G")));
     product_map.insert(map<int, CString>::value_type(PM_TSTAT5H, _T("TStat5H")));
-    product_map.insert(map<int, CString>::value_type(PM_CO2_NET, _T("CO2 Net")));
+    product_map.insert(map<int, CString>::value_type(PM_CO2_NET, _T("CO2")));
     product_map.insert(map<int, CString>::value_type(PM_CO2_RS485, _T("CO2")));
     product_map.insert(map<int, CString>::value_type(PM_CO2_NODE, _T("CO2 Node")));
 	product_map.insert(map<int,CString>::value_type(PM_PM5E,_T("PM5E")));
@@ -6361,11 +6499,11 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_TSTAT8_220V,_T("TStat8_220V")));
 	product_map.insert(map<int, CString>::value_type(PM_T3_LC, _T("T3_LC")));
     product_map.insert(map<int, CString>::value_type(PM_T36CTA, _T("T3-6CTA")));
-	product_map.insert(map<int, CString>::value_type(STM32_CO2_NET, _T("CO2 Net")));
+	product_map.insert(map<int, CString>::value_type(STM32_CO2_NET, _T("CO2")));
 	product_map.insert(map<int, CString>::value_type(STM32_CO2_RS485, _T("CO2")));
-	product_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("Hum Net")));
+	product_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("Hum")));
 	product_map.insert(map<int, CString>::value_type(STM32_HUM_RS485, _T("Hum")));
-	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_NET, _T("Pressure Net")));
+	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_NET, _T("Pressure")));
 	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS3485, _T("Pressure")));
 	product_map.insert(map<int, CString>::value_type(STM32_CO2_NODE, _T("CO2 Node")));
 
@@ -8758,14 +8896,253 @@ int bacnet_set_read_result(int nret)
 }
 
 
-//杜帆Load 
-int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
+int GetDeviceCountTable(int device_serialnumber, int ntype, device_io_status &temp_device_io_status)
 {
+    _variant_t temp_variant;
+    int ret_value = 0;
+    CString strSql;
+    CBADO count_bado;
+    count_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
+    count_bado.OnInitADOConn();
+    strSql.Format(_T("select * from CountTable  where nSerialNumber = %d"),  device_serialnumber);
+    count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+    int temp_record_count = 0;
+    count_bado.m_pRecordset = count_bado.OpenRecordset(strSql);
+    temp_record_count = count_bado.GetRecordCount(count_bado.m_pRecordset);
+
+
+    if (temp_record_count <= 0)
+    {
+        device_io_status temp1 = { 0 };
+        temp_device_io_status = temp1;
+        ret_value = -2;
+        goto end_getcount_function;
+    }
+
+    while (VARIANT_FALSE == count_bado.m_pRecordset->EndOfFile)
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            char collect_string[30];
+            memset(collect_string, 0, 30);
+                   
+            if(i == 0)
+                strcpy_s(collect_string, strlen("Outputs") + 1, "Outputs");
+            else if(i == 1)
+                strcpy_s(collect_string, strlen("Inputs") + 1, "Inputs");
+            else if (i == 2)
+                strcpy_s(collect_string, strlen("Variables") + 1, "Variables");
+            else if (i == 3)
+                strcpy_s(collect_string, strlen("Pids") + 1, "Pids");
+            else if (i == 4)
+                strcpy_s(collect_string, strlen("Schedules") + 1, "Schedules");
+            else if (i == 5)
+                strcpy_s(collect_string, strlen("Holidays") + 1, "Holidays");
+            else if (i == 6)
+                strcpy_s(collect_string, strlen("Programs") + 1, "Programs");
+            else if (i == 7)
+                strcpy_s(collect_string, strlen("Graphics") + 1, "Graphics");
+            else if (i == 8)
+                strcpy_s(collect_string, strlen("Trendlogs") + 1, "Trendlogs");
+            temp_variant = count_bado.m_pRecordset->GetCollect(collect_string);//
+            if (temp_variant.vt != VT_NULL)
+            {
+                CString temp_value;
+                temp_value = temp_variant;
+                CStringArray temp_array;
+                SplitCStringA(temp_array, temp_value, _T("/"));
+                if (temp_array.GetSize() == 2)
+                {
+                    temp_device_io_status.device_use[i] = _wtoi(temp_array.GetAt(0));
+                    temp_device_io_status.device_capacity[i] = _wtoi(temp_array.GetAt(1));
+                }
+            }
+            else
+            {
+                temp_device_io_status.device_use[i] = 0;
+            }
+        }
+
+#if 0
+        temp_variant = count_bado.m_pRecordset->GetCollect("Inputs");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            CString temp_value;
+            temp_value = temp_variant;
+            CStringArray temp_array;
+            SplitCStringA(temp_array, temp_value, _T("/"));
+            if (temp_array.GetSize() == 2)
+            {    
+                temp_device_io_status.device_use[TREE_IN] = _wtoi(temp_array.GetAt(0));
+                temp_device_io_status.device_capacity[TREE_IN] = _wtoi(temp_array.GetAt(1));
+            }
+        }
+        else
+        {
+            temp_device_io_status.device_use[TREE_IN] = 0;
+        }
+
+        temp_variant = count_bado.m_pRecordset->GetCollect("Outputs");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            CString temp_value;
+            temp_value = temp_variant;
+            CStringArray temp_array;
+            SplitCStringA(temp_array, temp_value, _T("/"));
+            if (temp_array.GetSize() == 2)
+            {
+                temp_device_io_status.device_use[TREE_OUT] = _wtoi(temp_array.GetAt(0));
+                temp_device_io_status.device_capacity[TREE_OUT] = _wtoi(temp_array.GetAt(1));
+            }
+        }
+        else
+        {
+            temp_device_io_status.device_use[TREE_OUT] = 0;
+        }
+
+        temp_variant = count_bado.m_pRecordset->GetCollect("Variables");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            CString temp_value;
+            temp_value = temp_variant;
+            CStringArray temp_array;
+            SplitCStringA(temp_array, temp_value, _T("/"));
+            if (temp_array.GetSize() == 2)
+            {
+                temp_device_io_status.device_use[TREE_VAR] = _wtoi(temp_array.GetAt(0));
+                temp_device_io_status.device_capacity[TREE_VAR] = _wtoi(temp_array.GetAt(1));
+            }
+        }
+        else
+        {
+            temp_device_io_status.device_use[TREE_VAR] = 0;
+        }
+#endif
+        ret_value = 1;
+        goto end_getcount_function;
+    }
+
+
+end_getcount_function:
+    return ret_value;
+
+}
+
+int UpdateDeviceCountTable(int device_serialnumber ,int ntype, device_io_status temp_device_io_status)
+{
+	try
+	{
+
+		int ret_value = 0;
+
+		CString strSql;
+		CBADO count_bado;
+		count_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
+		count_bado.OnInitADOConn();
+		if ((ntype == BAC_READ_INPUT_LIST) || (ntype == BAC_READ_ALL_LIST))
+		{
+			strSql.Format(_T("update CountTable set Inputs  = '%d/%d' where nSerialNumber = %d"), temp_device_io_status.device_use[TREE_IN], temp_device_io_status.device_capacity[TREE_IN], device_serialnumber);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+		}
+		if ((ntype == BAC_READ_OUTPUT_LIST) || (ntype == BAC_READ_ALL_LIST))
+		{
+			strSql.Format(_T("update CountTable set Outputs  = '%d/%d' where nSerialNumber = %d"), temp_device_io_status.device_use[TREE_OUT], temp_device_io_status.device_capacity[TREE_OUT], device_serialnumber);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+		}
+		if ((ntype == BAC_READ_VARIABLE_LIST) || (ntype == BAC_READ_ALL_LIST))
+		{
+			strSql.Format(_T("update CountTable set Variables  = '%d/%d' where nSerialNumber = %d"), temp_device_io_status.device_use[TREE_VAR], temp_device_io_status.device_capacity[TREE_VAR], device_serialnumber);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+		}
+		if ((ntype == BAC_READ_CONTROLLER_LIST) || (ntype == BAC_READ_ALL_LIST))
+		{
+			strSql.Format(_T("update CountTable set Pids  = '%d/%d' where nSerialNumber = %d"), temp_device_io_status.device_use[TREE_PID], temp_device_io_status.device_capacity[TREE_PID], device_serialnumber);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+		}
+		if ((ntype == BAC_READ_PROGRAM_LIST) || (ntype == BAC_READ_ALL_LIST))
+		{
+			strSql.Format(_T("update CountTable set Programs  = '%d/%d' where nSerialNumber = %d"), temp_device_io_status.device_use[TREE_PRG], temp_device_io_status.device_capacity[TREE_PRG], device_serialnumber);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+		}
+		if ((ntype == BAC_READ_ANNUAL_LIST) || (ntype == BAC_READ_ALL_LIST))
+		{
+			strSql.Format(_T("update CountTable set Holidays  = '%d/%d' where nSerialNumber = %d"), temp_device_io_status.device_use[TREE_HOL], temp_device_io_status.device_capacity[TREE_HOL], device_serialnumber);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+		}
+		if ((ntype == BAC_READ_WEEKLY_LIST) || (ntype == BAC_READ_ALL_LIST))
+		{
+			strSql.Format(_T("update CountTable set Schedules  = '%d/%d' where nSerialNumber = %d"), temp_device_io_status.device_use[TREE_SCH], temp_device_io_status.device_capacity[TREE_SCH], device_serialnumber);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+		}
+		if ((ntype == BAC_READ_MONITOR_LIST) || (ntype == BAC_READ_ALL_LIST))
+		{
+			strSql.Format(_T("update CountTable set Trendlogs  = '%d/%d' where nSerialNumber = %d"), temp_device_io_status.device_use[TREE_TRENDLOG], temp_device_io_status.device_capacity[TREE_TRENDLOG], device_serialnumber);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+		}
+		if ((ntype == BAC_READ_SCREEN_LIST) || (ntype == BAC_READ_ALL_LIST))
+		{
+			strSql.Format(_T("update CountTable set Graphics  = '%d/%d' where nSerialNumber = %d"), temp_device_io_status.device_use[TREE_SCREEN], temp_device_io_status.device_capacity[TREE_SCREEN], device_serialnumber);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+		}
+		if ((ntype == BAC_READ_ALARMLOG_LIST) || (ntype == BAC_READ_ALL_LIST))
+		{
+			strSql.Format(_T("update CountTable set Alarms  = '%d/%d' where nSerialNumber = %d"), temp_device_io_status.device_use[TREE_ALARM], temp_device_io_status.device_capacity[TREE_ALARM], device_serialnumber);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+		}
+		count_bado.CloseConn();
+	}
+	catch (_com_error* e)
+	{
+        Sleep(1);
+	}
+	return 1;
+}
+
+//检查CountTable 如果存在序列号  就不要动，否则就插入一笔数据，后面就只用更新数据.
+int CheckDeviceCountTable(int device_serialnumber, int objectinstance)
+{
+	int ret_value = 0;
+	_variant_t temp_variant;
+	int nversion_number = 0;
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	g_building_devicedatabase = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\DeviceDatabase.mdb");
+	try
+	{
+		int temp_record_count = 0;
+		CString strSql;
+		CBADO count_bado;
+		count_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
+		count_bado.OnInitADOConn();
+		strSql.Format(_T("select * from CountTable where nSerialNumber = %d"), device_serialnumber);
+		count_bado.m_pRecordset = count_bado.OpenRecordset(strSql);
+		temp_record_count = count_bado.GetRecordCount(count_bado.m_pRecordset);
+		if (temp_record_count <= 0)
+		{
+			strSql.Format(_T("insert into CountTable (nSerialNumber,ObjectInstance,Inputs,Outputs,Variables,Pids,Programs,Holidays,Schedules,Trendlogs,Graphics,Alarms)   \
+              values(%d,%d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)"), device_serialnumber, objectinstance);
+			count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+		}
+		count_bado.CloseConn();
+	}
+	catch (_com_error e)
+	{
+		return 1;
+	}
+    return 1;
+}
+
+//杜帆Load 
+int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
+{
+
+    Str_Setting_Info GetPrgSetting;
     //if((g_mac!=0) &&(g_bac_instance!=0))
     if (1)
     {
         CString FilePath;
-        if(write_to_device)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
+        if(write_to_device == 1)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
         {
             CFileDialog dlg(true,_T("*.prog"),_T(" "),OFN_HIDEREADONLY ,_T("Prg files (*.prog)|*.prog||"),NULL,0);
             if(IDOK!=dlg.DoModal())
@@ -9483,17 +9860,40 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
                 + BAC_USER_LOGIN_COUNT * sizeof(Str_userlogin_point)
                 + BAC_CUSTOMER_UNITS_COUNT * sizeof(Str_Units_element)
                 + BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT* sizeof(Str_table_point);
+
             if (offline_mode)
             {
                 //如果是离线模式 才把Setting的数据读出来，避免 Setting 那里 来回乱变.
                 memcpy(&Device_Basic_Setting, cacl_panel, sizeof(Str_Setting_Info));
+                memcpy(&GetPrgSetting, cacl_panel, sizeof(Str_Setting_Info));
             }
             else
             {
-                Str_Setting_Info GetPrgSetting;
+
                 memcpy(&GetPrgSetting, cacl_panel, sizeof(Str_Setting_Info));
                 prg_panel = GetPrgSetting.reg.panel_number;
             }
+
+
+                for (int i = 0; i < m_product_iocount.size(); i++)
+                {
+                    if (GetPrgSetting.reg.mini_type == m_product_iocount.at(i).sub_pid)
+                    {
+                        select_device_io_status.device_capacity[TREE_IN] = m_product_iocount.at(i).input_count;
+                        select_device_io_status.device_capacity[TREE_OUT] = m_product_iocount.at(i).output_count;
+                        break;
+                    }
+ 
+                }
+                select_device_io_status.device_capacity[TREE_VAR] = BAC_VARIABLE_ITEM_COUNT;
+                select_device_io_status.device_capacity[TREE_PID] = BAC_PID_COUNT;
+                select_device_io_status.device_capacity[TREE_PRG] = BAC_PROGRAM_ITEM_COUNT;
+                select_device_io_status.device_capacity[TREE_HOL] = BAC_HOLIDAY_COUNT;
+                select_device_io_status.device_capacity[TREE_SCH] = BAC_SCHEDULE_COUNT;
+                select_device_io_status.device_capacity[TREE_TRENDLOG] = BAC_MONITOR_COUNT;
+                select_device_io_status.device_capacity[TREE_SCREEN] = BAC_SCREEN_COUNT;
+                select_device_io_status.device_capacity[TREE_ALARM] = BAC_ALARMLOG_COUNT;
+
 
             if ((Device_Basic_Setting.reg.panel_type == PM_MINIPANEL) ||
                 (Device_Basic_Setting.reg.panel_type == PM_MINIPANEL_ARM) ||
@@ -9501,31 +9901,57 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
             {
                 original_panel = Device_Basic_Setting.reg.panel_number;
             }
-
+            select_device_io_status.device_use[TREE_IN] = 0;
 			for (int i=0; i<BAC_INPUT_ITEM_COUNT; i++)
 			{
 				memcpy(&m_Input_data.at(i),temp_point ,sizeof(Str_in_point));
 				temp_point = temp_point + sizeof(Str_in_point);
-			}
+                if (i < select_device_io_status.device_capacity[TREE_IN])
+                {
+                    if (m_Input_data.at(i).range != 0)
+                    {
+                        select_device_io_status.device_use[TREE_IN]++;
+                    }                  
+                }
 
+
+			}
+            select_device_io_status.device_use[TREE_OUT] = 0;
 			for (int i=0; i<BAC_OUTPUT_ITEM_COUNT; i++)
 			{
 				memcpy(&m_Output_data.at(i),temp_point,sizeof(Str_out_point));
 				temp_point = temp_point + sizeof(Str_out_point);
+                if (i < select_device_io_status.device_capacity[TREE_OUT])
+                {
+                    if (m_Output_data.at(i).range != 0)
+                    {
+                        select_device_io_status.device_use[TREE_OUT]++;
+                    }
+                }
 			}
-
+            select_device_io_status.device_use[TREE_VAR] = 0;
 			for (int i=0; i<BAC_VARIABLE_ITEM_COUNT; i++)
 			{
 				memcpy(&m_Variable_data.at(i),temp_point,sizeof(Str_variable_point));
 				temp_point = temp_point + sizeof(Str_variable_point);
+                if (m_Variable_data.at(i).range != 0)
+                {
+                    select_device_io_status.device_use[TREE_VAR]++;
+                }
 			}
 
+            select_device_io_status.device_use[TREE_PRG] = 0;
 			for (int i=0; i<BAC_PROGRAM_ITEM_COUNT; i++)
 			{
 				memcpy(&m_Program_data.at(i),temp_point,sizeof(Str_program_point));
 				temp_point = temp_point + sizeof(Str_program_point);
+                if (m_Program_data.at(i).bytes != 0)
+                {
+                    select_device_io_status.device_use[TREE_PRG]++;
+                }
 			}
 
+            select_device_io_status.device_use[TREE_PID] = 0;
 			for (int i=0; i<BAC_PID_COUNT; i++)
 			{
 				memcpy(&m_controller_data.at(i),temp_point,sizeof(Str_controller_point));
@@ -9545,12 +9971,19 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 				//	m_controller_data.at(i).input.panel = Station_NUM;
 				//if((m_controller_data.at(i).setpoint.panel != Station_NUM) &&  (m_controller_data.at(i).setpoint.panel != 0) )	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
 				//	m_controller_data.at(i).setpoint.panel = Station_NUM;
+                if ((m_controller_data.at(i).input.number != 0) || (m_controller_data.at(i).input.point_type != 0))
+                {
+                    select_device_io_status.device_use[TREE_PID]++;
+                }
 			}
 
+            select_device_io_status.device_use[TREE_SCREEN] = 0;
 			for (int i=0; i<BAC_SCREEN_COUNT; i++)
 			{
 				memcpy(&m_screen_data.at(i),temp_point,sizeof(Control_group_point));
 				temp_point = temp_point + sizeof(Control_group_point);
+                if ((m_screen_data.at(i).label[0] != 0) || (m_screen_data.at(i).description[0] != 0) || (m_screen_data.at(i).picture_file[0] != 0))
+                    select_device_io_status.device_use[TREE_SCREEN]++;
 			}
 
 			for (int i=0; i<BAC_GRPHIC_LABEL_COUNT; i++)
@@ -9612,13 +10045,17 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
             }
 			temp_point = temp_point + sizeof(Str_Setting_Info);
 
-
+            select_device_io_status.device_use[TREE_SCH] = 0;
 			for (int i=0; i<BAC_SCHEDULE_COUNT; i++)
 			{
 				memcpy(&m_Weekly_data.at(i),temp_point,sizeof(Str_weekly_routine_point));
 				temp_point = temp_point + sizeof(Str_weekly_routine_point);
+
+                if ((m_Weekly_data.at(i).label[0] != 0) || (m_Weekly_data.at(i).description[0] != 0))
+                    select_device_io_status.device_use[TREE_SCH]++;
 			}
 
+            select_device_io_status.device_use[TREE_HOL] = 0;
 			for (int i=0; i<BAC_HOLIDAY_COUNT; i++)
 			{
 				memcpy(&m_Annual_data.at(i),temp_point,sizeof(Str_annual_routine_point));
@@ -9636,9 +10073,12 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
                 {
                     HolLable[i] = temp_des2;
                 }
+
+                if ((m_Annual_data.at(i).label[0] != 0) || (m_Annual_data.at(i).description[0] != 0))
+                    select_device_io_status.device_use[TREE_HOL]++;
 			}
 
-
+            select_device_io_status.device_use[TREE_TRENDLOG] = 0;
 			for (int i=0; i<BAC_MONITOR_COUNT; i++)
 			{
 				memcpy(&m_monitor_data.at(i),temp_point,sizeof(Str_monitor_point));
@@ -9651,6 +10091,9 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
                             m_monitor_data.at(i).inputs[x].panel = original_panel;
                     }
 				}
+
+                if ((m_monitor_data.at(i).label[0] != 0) || (m_monitor_data.at(i).num_inputs != 0))
+                    select_device_io_status.device_use[TREE_TRENDLOG]++;
 			}
 
 
@@ -9769,7 +10212,7 @@ int LoadBacnetBinaryFile(bool write_to_device,LPCTSTR tem_read_path)
 				
 
         }
-
+        UpdateDeviceCountTable(GetPrgSetting.reg.n_serial_number, BAC_READ_ALL_LIST, select_device_io_status);
     }
 
 
@@ -9791,21 +10234,84 @@ vector <Str_alarm_DB>       m_DB_Alarm;
 int CheckDeviceDatabase()
 {
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    CString temp_building_data_db;
-    temp_building_data_db = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\DeviceDatabase.mdb");
+
+    g_building_devicedatabase = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\DeviceDatabase.mdb");
     CFileFind fFind;
-    if (fFind.FindFile(temp_building_data_db))
+    if (fFind.FindFile(g_building_devicedatabase))
     {
+        CheckDeviceDataDBAndUpdateDB();
         return 1;
     }
     else
     {
         CString temp_file;
         temp_file = g_strExePth + _T("ResourceFile\\DeviceDatabase.mdb");
-        CopyFile(temp_file, temp_building_data_db, false);
+        CopyFile(temp_file, g_building_devicedatabase, false);
         return 1;
     }
     return 0;
+}
+
+
+int CheckDeviceDataDBAndUpdateDB()
+{
+	try
+	{
+		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		g_building_devicedatabase = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\DeviceDatabase.mdb");
+		int ret_value = 0;
+		int temp_record_count = 0;
+		_variant_t temp_variant;
+		int nversion_number = 0;
+		CString strSql;
+		CBADO monitor_bado;
+		monitor_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
+		monitor_bado.OnInitADOConn();
+		strSql.Format(_T("select * from Version"));
+		monitor_bado.m_pRecordset = monitor_bado.OpenRecordset(strSql);
+		temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
+		if (temp_record_count <= 0)
+		{
+			ret_value = -1;
+			goto end_SaveDeviceDataIntoAccessDB_function;
+
+		}
+
+		while (VARIANT_FALSE == monitor_bado.m_pRecordset->EndOfFile)
+		{
+			temp_variant = monitor_bado.m_pRecordset->GetCollect("DB_Version");//
+			if (temp_variant.vt != VT_NULL)
+				nversion_number = temp_variant;
+			else
+			{
+				nversion_number = 0;
+				monitor_bado.m_pRecordset->MoveNext();
+				continue;
+			}
+
+			monitor_bado.m_pRecordset->MoveNext();
+		}
+
+
+	end_SaveDeviceDataIntoAccessDB_function:
+		monitor_bado.CloseConn();
+
+
+		if (nversion_number < 3)
+		{
+			DeleteFile(g_building_devicedatabase);
+
+			CString temp_file;
+			temp_file = g_strExePth + _T("ResourceFile\\DeviceDatabase.mdb");
+			CopyFile(temp_file, g_building_devicedatabase, false);
+		}
+		return 1;
+	}
+	catch (_com_error e)
+	{
+		return 1;
+	}
+
 }
 
 int UpdateDeviceDataIntoAccessDB()
@@ -9815,14 +10321,14 @@ int UpdateDeviceDataIntoAccessDB()
     int ret_value = 0;
     _variant_t temp_variant;
     int nversion_number = 0;
-    CString temp_building_data_db;
+
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    temp_building_data_db = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName +_T("\\DeviceDatabase.mdb");
+    g_building_devicedatabase = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName +_T("\\DeviceDatabase.mdb");
 
     int temp_record_count = 0;
     CString strSql;
     CBADO monitor_bado;
-    monitor_bado.SetDBPath(temp_building_data_db);	//删除里面的临时数据;
+    monitor_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
     monitor_bado.OnInitADOConn();
     strSql.Format(_T("select * from Version"));
    
@@ -10026,7 +10532,65 @@ end_SaveDeviceDataIntoAccessDB_function:
 #ifdef LOCAL_DB_FUNCTION
 void init_product_list()
 {
+    m_product_iocount.clear();
+    Str_product_io_count temp = { 0 };
+    temp.cs_name = _T("T3-BB");
+    temp.ai_count = 32;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 12;
+    temp.bo_count = 12;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 74;
+    temp.sub_pid = MINIPANELARM;
+    m_product_iocount.push_back(temp);
 
+    temp.cs_name = _T("T3-LB");
+    temp.ai_count = 16;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 6;
+    temp.bo_count = 4;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 74;
+    temp.sub_pid = MINIPANELARM_LB;
+    m_product_iocount.push_back(temp);
+
+    temp.cs_name = _T("T3-TB");
+    temp.ai_count = 8;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 8;
+    temp.bo_count = 6;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 74;
+    temp.sub_pid = MINIPANELARM_TB;
+    m_product_iocount.push_back(temp);
+
+    temp.cs_name = _T("T3-Nano");
+    temp.ai_count = 0;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 0;
+    temp.bo_count = 0;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 74;
+    temp.sub_pid = MINIPANELARM_NB;
+    m_product_iocount.push_back(temp);
+
+    temp.cs_name = _T("Tstat10");
+    temp.ai_count = 8;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 5;
+    temp.bo_count = 2;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 74;
+    temp.sub_pid = T3_TSTAT10;
+    m_product_iocount.push_back(temp);
+
+
+#if 0
     m_product_iocount.clear();
     CString AllData;
     CString product_list_path;
@@ -10062,8 +10626,12 @@ void init_product_list()
 
         m_product_iocount.push_back(temp);
     }
+#endif
 }
 #endif
+
+
+
 int WriteDeviceDataIntoAccessDB(int nTableType,int ncount ,int device_serialnumber)
 {
 #ifdef LOCAL_DB_FUNCTION
@@ -10071,480 +10639,516 @@ int WriteDeviceDataIntoAccessDB(int nTableType,int ncount ,int device_serialnumb
     int ret_value = 0;
     _variant_t temp_variant;
     int nversion_number = 0;
-    CString temp_building_data_db;
+
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    temp_building_data_db = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\DeviceDatabase.mdb");
+    g_building_devicedatabase = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\DeviceDatabase.mdb");
 
     int temp_record_count = 0;
     CString strSql;
     CBADO accessdb_bado;
-    accessdb_bado.SetDBPath(temp_building_data_db);	//删除里面的临时数据;
-    accessdb_bado.OnInitADOConn();
-   
-
-    switch (nTableType)
-    {
-	case BAC_IN:
+	try
 	{
-        strSql.Format(_T("delete * from Inputs where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-
-		for (int i = 0; i < ncount; i++)
+		accessdb_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
+		accessdb_bado.OnInitADOConn();
+		switch (nTableType)
 		{
-            Str_in_DB temp_input_db;
-            temp_input_db.nSerialNumber = device_serialnumber;
-            temp_input_db.Input_index = Input_Window->m_input_list.GetItemText(i, INPUT_NUM);
-            temp_input_db.Panel = Input_Window->m_input_list.GetItemText(i, INPUT_PANEL);
-            temp_input_db.Full_Label = Input_Window->m_input_list.GetItemText(i, INPUT_FULL_LABLE);
-            temp_input_db.Auto_Manual = Input_Window->m_input_list.GetItemText(i, INPUT_AUTO_MANUAL);
+		case BAC_IN:
+		{
+			strSql.Format(_T("delete * from Inputs where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			select_device_io_status.device_use[TREE_IN] = 0;;
+			for (int i = 0; i < ncount; i++)
+			{
+				Str_in_DB temp_input_db;
+				temp_input_db.nSerialNumber = device_serialnumber;
+				temp_input_db.Input_index = Input_Window->m_input_list.GetItemText(i, INPUT_NUM).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Panel = Input_Window->m_input_list.GetItemText(i, INPUT_PANEL).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Full_Label = Input_Window->m_input_list.GetItemText(i, INPUT_FULL_LABLE).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Auto_Manual = Input_Window->m_input_list.GetItemText(i, INPUT_AUTO_MANUAL).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.fValue = Input_Window->m_input_list.GetItemText(i, INPUT_VALUE).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Units = Input_Window->m_input_list.GetItemText(i, INPUT_UNITE).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Range = Input_Window->m_input_list.GetItemText(i, INPUT_RANGE).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Calibration = Input_Window->m_input_list.GetItemText(i, INPUT_CAL).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Sign = Input_Window->m_input_list.GetItemText(i, INPUT_CAL_OPERATION).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Filter = Input_Window->m_input_list.GetItemText(i, INPUT_FITLER).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.csStatus = Input_Window->m_input_list.GetItemText(i, INPUT_DECOM).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Signal_Type = Input_Window->m_input_list.GetItemText(i, INPUT_JUMPER).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Label = Input_Window->m_input_list.GetItemText(i, INPUT_LABLE).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+				temp_input_db.Type = Input_Window->m_input_list.GetItemText(i, INPUT_EXTERNAL).Left(STR_IN_DESCRIPTION_LENGTH).Trim();
 
-            temp_input_db.fValue = Input_Window->m_input_list.GetItemText(i, INPUT_VALUE);
-            temp_input_db.Units = Input_Window->m_input_list.GetItemText(i, INPUT_UNITE);
-            temp_input_db.Range = Input_Window->m_input_list.GetItemText(i, INPUT_RANGE);
-            temp_input_db.Calibration = Input_Window->m_input_list.GetItemText(i, INPUT_CAL);
+				for (int x = 0; x < (int)sizeof(Str_in_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_input_db.BinaryArray = temp_input_db.BinaryArray + _T(",");
 
-            temp_input_db.Sign = Input_Window->m_input_list.GetItemText(i, INPUT_CAL_OPERATION);
-            temp_input_db.Filter = Input_Window->m_input_list.GetItemText(i, INPUT_FITLER);
-            temp_input_db.csStatus = Input_Window->m_input_list.GetItemText(i, INPUT_DECOM);
-            temp_input_db.Signal_Type = Input_Window->m_input_list.GetItemText(i, INPUT_JUMPER);
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Input_data.at(i) + x));
+					temp_input_db.BinaryArray = temp_input_db.BinaryArray + temp_char;
+				}
+				temp_input_db.BinaryArray.MakeUpper();
 
-            temp_input_db.Label = Input_Window->m_input_list.GetItemText(i, INPUT_LABLE);
-            temp_input_db.Type = Input_Window->m_input_list.GetItemText(i, INPUT_EXTERNAL);
-
-            for (int x = 0; x < (int)sizeof(Str_in_point); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_input_db.BinaryArray = temp_input_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char *)&m_Input_data.at(i) + x) );
-                temp_input_db.BinaryArray = temp_input_db.BinaryArray + temp_char;
-            }
-            temp_input_db.BinaryArray.MakeUpper();
-
-			strSql.Format(_T("insert into Inputs (nSerialNumber,Input_index,Panel,Full_Label,Auto_Manual,fValue,Units,Range,Calibration,Sign,Filter,Status,Signal_Type,Label,Type,BinaryArray)   \
+				strSql.Format(_T("insert into Inputs (nSerialNumber,Input_index,Panel,Full_Label,Auto_Manual,fValue,Units,Range,Calibration,Sign,Filter,Status,Signal_Type,Label,Type,BinaryArray)   \
               values(%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_input_db.Input_index, temp_input_db.Panel, temp_input_db.Full_Label, temp_input_db.Auto_Manual,\
-                temp_input_db.fValue, temp_input_db.Units, temp_input_db.Range, temp_input_db.Calibration,\
-                temp_input_db.Sign, temp_input_db.Filter, temp_input_db.csStatus, temp_input_db.Signal_Type,\
-                temp_input_db.Label, temp_input_db.Type, temp_input_db.BinaryArray);
+					temp_input_db.Input_index, temp_input_db.Panel, temp_input_db.Full_Label, temp_input_db.Auto_Manual, \
+					temp_input_db.fValue, temp_input_db.Units, temp_input_db.Range, temp_input_db.Calibration, \
+					temp_input_db.Sign, temp_input_db.Filter, temp_input_db.csStatus, temp_input_db.Signal_Type, \
+					temp_input_db.Label, temp_input_db.Type, temp_input_db.BinaryArray);
+				accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+				if (i < select_device_io_status.device_capacity[TREE_IN])
+				{
+					if (m_Input_data.at(i).range != 0)
+					{
+						select_device_io_status.device_use[TREE_IN]++;
+					}
+				}
+			}
+			UpdateDeviceCountTable(device_serialnumber, BAC_READ_INPUT_LIST, select_device_io_status);
+
+		}
+		break;
+		case BAC_OUT:
+		{
+			strSql.Format(_T("delete * from Inputs where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			select_device_io_status.device_use[TREE_OUT] = 0;;
+			for (int i = 0; i < ncount; i++)
+			{
+				Str_out_DB temp_out_db;
+				temp_out_db.nSerialNumber = device_serialnumber;
+				temp_out_db.Output_index = Output_Window->m_output_list.GetItemText(i, OUTPUT_NUM).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.Panel = Output_Window->m_output_list.GetItemText(i, OUTPUT_PANEL).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.Full_Label = Output_Window->m_output_list.GetItemText(i, OUTPUT_FULL_LABLE).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.Auto_Manual = Output_Window->m_output_list.GetItemText(i, OUTPUT_AUTO_MANUAL).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.HOA_Switch = Output_Window->m_output_list.GetItemText(i, OUTPUT_HW_SWITCH).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.fValue = Output_Window->m_output_list.GetItemText(i, OUTPUT_VALUE).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.Units = Output_Window->m_output_list.GetItemText(i, OUTPUT_UNITE).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.Range = Output_Window->m_output_list.GetItemText(i, OUTPUT_RANGE).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.Low_Voltage = Output_Window->m_output_list.GetItemText(i, OUTPUT_LOW_VOLTAGE).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.High_Voltage = Output_Window->m_output_list.GetItemText(i, OUTPUT_HIGH_VOLTAGE).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.PWM_Period = Output_Window->m_output_list.GetItemText(i, OUTPUT_PWM_PERIOD).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.csStatus = Output_Window->m_output_list.GetItemText(i, OUTPUT_DECOM).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.Label = Output_Window->m_output_list.GetItemText(i, OUTPUT_LABLE).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+				temp_out_db.Type = Output_Window->m_output_list.GetItemText(i, OUTPUT_EXTERNAL).Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+
+				for (int x = 0; x < (int)sizeof(Str_out_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_out_db.BinaryArray = temp_out_db.BinaryArray + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Output_data.at(i) + x));
+					temp_out_db.BinaryArray = temp_out_db.BinaryArray + temp_char;
+				}
+				temp_out_db.BinaryArray.MakeUpper();
+
+				strSql.Format(_T("insert into Outputs (nSerialNumber,Output_index,Panel,Full_Label,Auto_Manual,HOA_Switch,fValue,Units,Range,Low_Voltage,High_Voltage,PWM_Period,Status,Label,Type,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+					temp_out_db.Output_index, temp_out_db.Panel, temp_out_db.Full_Label, temp_out_db.Auto_Manual, \
+					temp_out_db.HOA_Switch, temp_out_db.fValue, temp_out_db.Units, temp_out_db.Range, \
+					temp_out_db.Low_Voltage, temp_out_db.High_Voltage, temp_out_db.PWM_Period, temp_out_db.csStatus, \
+					temp_out_db.Label, temp_out_db.Type, temp_out_db.BinaryArray);
+				accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+				if (i < select_device_io_status.device_capacity[TREE_OUT])
+				{
+					if (m_Output_data.at(i).range != 0)
+					{
+						select_device_io_status.device_use[TREE_OUT]++;
+					}
+				}
+			}
+			UpdateDeviceCountTable(device_serialnumber, BAC_READ_OUTPUT_LIST, select_device_io_status);
+		}
+		break;
+		case BAC_VAR:
+		{
+			strSql.Format(_T("delete * from Variables where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			select_device_io_status.device_use[TREE_VAR] = 0;;
+			for (int i = 0; i < ncount; i++)
+			{
+				Str_var_DB temp_var_db;
+				temp_var_db.nSerialNumber = device_serialnumber;
+				temp_var_db.Variable_index = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_NUM).Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
+
+				temp_var_db.Full_Label = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_FULL_LABLE).Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
+				temp_var_db.Auto_Manual = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_AUTO_MANUAL).Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
+				temp_var_db.fValue = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_VALUE).Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
+				temp_var_db.Units = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_UNITE).Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
+				temp_var_db.Label = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_LABLE).Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
+
+
+
+				for (int x = 0; x < (int)sizeof(Str_variable_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_var_db.BinaryArray = temp_var_db.BinaryArray + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Variable_data.at(i) + x));
+					temp_var_db.BinaryArray = temp_var_db.BinaryArray + temp_char;
+				}
+				temp_var_db.BinaryArray.MakeUpper();
+
+				strSql.Format(_T("insert into Variables (nSerialNumber,Variable_index,Full_Label,Auto_Manual,fValue,Units,Label,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+					temp_var_db.Variable_index, temp_var_db.Full_Label, temp_var_db.Auto_Manual, temp_var_db.fValue, \
+					temp_var_db.Units, temp_var_db.Label, temp_var_db.BinaryArray);
+				accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+				if (m_Variable_data.at(i).range != 0)
+				{
+					select_device_io_status.device_use[TREE_VAR]++;
+				}
+
+			}
+			UpdateDeviceCountTable(device_serialnumber, BAC_READ_VARIABLE_LIST, select_device_io_status);
+		}
+		break;
+		case BAC_PRG:
+		{
+			strSql.Format(_T("delete * from Programs where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			for (int i = 0; i < ncount; i++)
+			{
+				Str_program_DB temp_program_db;
+				temp_program_db.nSerialNumber = device_serialnumber;
+				temp_program_db.Program_index = Program_Window->m_program_list.GetItemText(i, PROGRAM_NUM).Left(21).Trim();
+
+				temp_program_db.Full_Label = Program_Window->m_program_list.GetItemText(i, PROGRAM_FULL_LABLE).Left(21).Trim();
+				temp_program_db.Status = Program_Window->m_program_list.GetItemText(i, PROGRAM_STATUS).Left(21).Trim();
+				temp_program_db.Auto_Manual = Program_Window->m_program_list.GetItemText(i, PROGRAM_AUTO_MANUAL).Left(21).Trim();
+				temp_program_db.Size = Program_Window->m_program_list.GetItemText(i, PROGRAM_SIZE_LIST).Left(21).Trim();
+				temp_program_db.Execution_Time = Program_Window->m_program_list.GetItemText(i, PROGRAM_RUN_STATUS).Left(21).Trim();
+				temp_program_db.Label = Program_Window->m_program_list.GetItemText(i, PROGRAM_LABEL).Left(21).Trim();
+
+				for (int x = 0; x < (int)sizeof(Str_program_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_program_db.BinaryArray = temp_program_db.BinaryArray + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Program_data.at(i) + x));
+					temp_program_db.BinaryArray = temp_program_db.BinaryArray + temp_char;
+				}
+				temp_program_db.BinaryArray.MakeUpper();
+
+				strSql.Format(_T("insert into Programs (nSerialNumber,Program_index,Full_Label,Status,Auto_Manual,nSize,Execution_Time,Label,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+					temp_program_db.Program_index, temp_program_db.Full_Label, temp_program_db.Status, temp_program_db.Auto_Manual, \
+					temp_program_db.Size, temp_program_db.Execution_Time, temp_program_db.Label, temp_program_db.BinaryArray);
+				accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			}
+		}
+		break;
+		case BAC_PID:
+		{
+			strSql.Format(_T("delete * from Pid_Table where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			for (int i = 0; i < ncount; i++)
+			{
+				Str_pid_DB temp_pid_db;
+				temp_pid_db.nSerialNumber = device_serialnumber;
+				temp_pid_db.Pid_index = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_NUM).Left(21).Trim();
+
+				temp_pid_db.Input = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_INPUT).Left(21).Trim();
+				temp_pid_db.Input_Value = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_INPUTVALUE).Left(21).Trim();
+				temp_pid_db.Input_Units = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_INPUTUNITS).Left(21).Trim();
+				temp_pid_db.Auto_Manual = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_AUTO_MANUAL).Left(21).Trim();
+				temp_pid_db.Output = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_OUTPUT).Left(21).Trim();
+				temp_pid_db.Setpoint = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_SETPOINT).Left(21).Trim();
+				temp_pid_db.Setpoint_Value = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_SETVALUE).Left(21).Trim();
+				temp_pid_db.Setpoint_Units = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_SETPOINTUNITS).Left(21).Trim();
+				temp_pid_db.Action = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_ACTION).Left(21).Trim();
+				temp_pid_db.PID_Prop = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_PROPORTIONAL).Left(21).Trim();
+				temp_pid_db.PID_Int = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_RESET).Left(21).Trim();
+				temp_pid_db.PID_Der = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_RATE).Left(21).Trim();
+				temp_pid_db.PID_Time = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_I_TIME).Left(21).Trim();
+				temp_pid_db.Bias = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_BIAS).Left(21).Trim();
+
+				for (int x = 0; x < (int)sizeof(Str_controller_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_pid_db.BinaryArray = temp_pid_db.BinaryArray + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_controller_data.at(i) + x));
+					temp_pid_db.BinaryArray = temp_pid_db.BinaryArray + temp_char;
+				}
+				temp_pid_db.BinaryArray.MakeUpper();
+
+				strSql.Format(_T("insert into Pid_Table (nSerialNumber,Pid_index,Input_,Input_Value,Input_Units,Auto_Manual,Output_,Setpoint,Setpoint_Value,Setpoint_Units,Action_,PID_Prop,PID_Int,PID_Der,PID_Time,Bias,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+					temp_pid_db.Pid_index, temp_pid_db.Input, temp_pid_db.Input_Value, temp_pid_db.Input_Units, \
+					temp_pid_db.Auto_Manual, temp_pid_db.Output, temp_pid_db.Setpoint, temp_pid_db.Setpoint_Value, \
+					temp_pid_db.Setpoint_Units, temp_pid_db.Action, temp_pid_db.PID_Prop, temp_pid_db.PID_Int, \
+					temp_pid_db.PID_Der, temp_pid_db.PID_Time, temp_pid_db.Bias, temp_pid_db.BinaryArray);
+				accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+			}
+		}
+		break;
+		case BAC_GRP:
+		{
+			strSql.Format(_T("delete * from Graphics where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			for (int i = 0; i < ncount; i++)
+			{
+				Str_graphic_DB temp_graphic_db;
+				temp_graphic_db.nSerialNumber = device_serialnumber;
+				temp_graphic_db.Graphic_index = Screen_Window->m_screen_list.GetItemText(i, SCREEN_NUM).Left(21).Trim();
+
+				temp_graphic_db.Full_Label = Screen_Window->m_screen_list.GetItemText(i, SCREEN_DESCRIPTION).Left(21).Trim();
+				temp_graphic_db.Label = Screen_Window->m_screen_list.GetItemText(i, SCREEN_LABEL).Left(21).Trim();
+				temp_graphic_db.Picture_File = Screen_Window->m_screen_list.GetItemText(i, SCREEN_PIC_FILE).Left(21).Trim();
+				temp_graphic_db.Element_Count = Screen_Window->m_screen_list.GetItemText(i, SCREEN_ELEMENT_COUNT).Left(21).Trim();
+
+
+				for (int x = 0; x < (int)sizeof(Control_group_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_graphic_db.BinaryArray = temp_graphic_db.BinaryArray + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_screen_data.at(i) + x));
+					temp_graphic_db.BinaryArray = temp_graphic_db.BinaryArray + temp_char;
+				}
+				temp_graphic_db.BinaryArray.MakeUpper();
+
+				strSql.Format(_T("insert into Graphics (nSerialNumber,Graphic_index,Full_Label,Label,Picture_File,Element_Count,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+					temp_graphic_db.Graphic_index, temp_graphic_db.Full_Label, temp_graphic_db.Label, temp_graphic_db.Picture_File, \
+					temp_graphic_db.Element_Count, temp_graphic_db.BinaryArray);
+				accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			}
+		}
+		break;
+		case BAC_HOL:
+		{
+			strSql.Format(_T("delete * from Holidays where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			for (int i = 0; i < ncount; i++)
+			{
+				Str_holiday_DB temp_holiday_db;
+				temp_holiday_db.nSerialNumber = device_serialnumber;
+				temp_holiday_db.Holiday_index = AnnualRoutine_Window->m_annualr_list.GetItemText(i, ANNUAL_ROUTINE_NUM).Left(21).Trim();
+				temp_holiday_db.Full_Label = AnnualRoutine_Window->m_annualr_list.GetItemText(i, ANNUAL_ROUTINE_FULL_LABEL).Left(21).Trim();
+				temp_holiday_db.Auto_Manual = AnnualRoutine_Window->m_annualr_list.GetItemText(i, ANNUAL_ROUTINE_AUTO_MANUAL).Left(21).Trim();
+				temp_holiday_db.fValue = AnnualRoutine_Window->m_annualr_list.GetItemText(i, ANNUAL_ROUTINE_VALUE).Left(21).Trim();
+				temp_holiday_db.Label = AnnualRoutine_Window->m_annualr_list.GetItemText(i, ANNUAL_ROUTINE_LABLE).Left(21).Trim();
+
+				for (int x = 0; x < (int)sizeof(Str_annual_routine_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_holiday_db.BinaryArray = temp_holiday_db.BinaryArray + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Annual_data.at(i) + x));
+					temp_holiday_db.BinaryArray = temp_holiday_db.BinaryArray + temp_char;
+				}
+				temp_holiday_db.BinaryArray.MakeUpper();
+
+				strSql.Format(_T("insert into Holidays (nSerialNumber,Holiday_index,Full_Label,Auto_Manual,fValue,Label,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+					temp_holiday_db.Holiday_index, temp_holiday_db.Full_Label, temp_holiday_db.Auto_Manual, temp_holiday_db.fValue, \
+					temp_holiday_db.Label, temp_holiday_db.BinaryArray);
+				accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			}
+		}
+		break;
+		case BAC_SCH:
+		{
+			strSql.Format(_T("delete * from Schedules where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			for (int i = 0; i < ncount; i++)
+			{
+				Str_schedule_DB temp_schedule_db;
+				temp_schedule_db.nSerialNumber = device_serialnumber;
+				temp_schedule_db.Schedule_index = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_NUM).Left(21).Trim();
+
+				temp_schedule_db.Full_Label = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_FULL_LABLE).Left(21).Trim();
+				temp_schedule_db.Auto_Manual = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_AUTO_MANUAL).Left(21).Trim();
+				temp_schedule_db.Output = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_OUTPUT).Left(21).Trim();
+				temp_schedule_db.Holiday1 = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_HOLIDAY1).Left(21).Trim();
+				temp_schedule_db.Status1 = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_STATE1).Left(21).Trim();
+				temp_schedule_db.Holiday2 = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_HOLIDAY2).Left(21).Trim();
+				temp_schedule_db.Status2 = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_STATE2).Left(21).Trim();
+				temp_schedule_db.Label = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_LABEL).Left(21).Trim();
+
+
+
+				for (int x = 0; x < (int)sizeof(Str_annual_routine_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_schedule_db.BinaryArray = temp_schedule_db.BinaryArray + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Weekly_data.at(i) + x));
+					temp_schedule_db.BinaryArray = temp_schedule_db.BinaryArray + temp_char;
+				}
+				temp_schedule_db.BinaryArray.MakeUpper();
+
+				strSql.Format(_T("insert into Schedules (nSerialNumber,Schedule_index,Full_Label,Auto_Manual,Output_,Holiday1,Status1,Holiday2,Status2,Label,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+					temp_schedule_db.Schedule_index, temp_schedule_db.Full_Label, temp_schedule_db.Auto_Manual, temp_schedule_db.Output, \
+					temp_schedule_db.Holiday1, temp_schedule_db.Status1, temp_schedule_db.Holiday2, temp_schedule_db.Status2, \
+					temp_schedule_db.Label, temp_schedule_db.BinaryArray);
+				accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			}
+		}
+		break;
+		case BAC_AMON:
+		{
+			strSql.Format(_T("delete * from Trend_logs where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			for (int i = 0; i < ncount; i++)
+			{
+				Str_trendlog_DB temp_trendlog_db;
+				temp_trendlog_db.nSerialNumber = device_serialnumber;
+
+				temp_trendlog_db.Trendlog_index = Monitor_Window->m_monitor_list.GetItemText(i, MONITOR_NUM).Left(21).Trim();
+				temp_trendlog_db.Label = Monitor_Window->m_monitor_list.GetItemText(i, MONITOR_LABEL).Left(21).Trim();
+				temp_trendlog_db.Interval = Monitor_Window->m_monitor_list.GetItemText(i, MONITOR_INTERVAL).Left(21).Trim();
+				temp_trendlog_db.Status = Monitor_Window->m_monitor_list.GetItemText(i, MONITOR_STATUS).Left(21).Trim();
+				temp_trendlog_db.Data_Size = Monitor_Window->m_monitor_list.GetItemText(i, MONITOR_DATA_SIZE).Left(21).Trim();
+
+
+				for (int x = 0; x < (int)sizeof(Str_monitor_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_trendlog_db.BinaryArray = temp_trendlog_db.BinaryArray + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_monitor_data.at(i) + x));
+					temp_trendlog_db.BinaryArray = temp_trendlog_db.BinaryArray + temp_char;
+				}
+				temp_trendlog_db.BinaryArray.MakeUpper();
+
+				strSql.Format(_T("insert into Trend_logs (nSerialNumber,TrendLog_index,Label,Interval_,Status_,Data_Size,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+					temp_trendlog_db.Trendlog_index, temp_trendlog_db.Label, temp_trendlog_db.Interval, temp_trendlog_db.Status, temp_trendlog_db.Data_Size, temp_trendlog_db.BinaryArray);
+				accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			}
+		}
+		break;
+		case BAC_ALARMM:
+		{
+			strSql.Format(_T("delete * from Alarms where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			for (int i = 0; i < ncount; i++)
+			{
+				Str_alarm_DB temp_alarm_db;
+				temp_alarm_db.nSerialNumber = device_serialnumber;
+
+				temp_alarm_db.Alarm_index = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_NUM).Left(21).Trim();
+
+				temp_alarm_db.Panel = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_PANEL).Left(21).Trim();
+				temp_alarm_db.Message = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_MESSAGE).Left(200).Trim();
+				temp_alarm_db.Time = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_TIME).Left(21).Trim();
+				temp_alarm_db.Acknowlege = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_ACK).Left(21).Trim();
+				temp_alarm_db.Res = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_RES).Left(21).Trim();
+				temp_alarm_db.Delete = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_DEL).Left(21).Trim();
+
+
+				for (int x = 0; x < (int)sizeof(Alarm_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_alarm_db.BinaryArray = temp_alarm_db.BinaryArray + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_alarmlog_data.at(i) + x));
+					temp_alarm_db.BinaryArray = temp_alarm_db.BinaryArray + temp_char;
+				}
+				temp_alarm_db.BinaryArray.MakeUpper();
+
+				strSql.Format(_T("insert into Alarms (nSerialNumber,Alarm_index,Panel,Message,Time_,Acknowlege,Res,Delete_,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+					temp_alarm_db.Alarm_index, temp_alarm_db.Panel, temp_alarm_db.Message, temp_alarm_db.Time, temp_alarm_db.Acknowlege, \
+					temp_alarm_db.Res, temp_alarm_db.Delete, temp_alarm_db.BinaryArray);
+				accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			}
+		}
+		break;
+		case READPROGRAMCODE_T3000:
+		{
+			strSql.Format(_T("delete * from ProgramText where nSerialNumber = %d and Program_index = %d"), device_serialnumber, ncount);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+			Str_programtext_DB temp_programtext_db;
+			temp_programtext_db.nSerialNumber = device_serialnumber;
+			temp_programtext_db.Program_index = ncount;
+			temp_programtext_db.ProgramText = program_string;
+
+			for (int x = 0; x < 2000; x++)
+			{
+				CString temp_char;
+				if (x != 0)
+					temp_programtext_db.BinaryArray = temp_programtext_db.BinaryArray + _T(",");
+
+				temp_char.Format(_T("%02x"), (unsigned char)*((char*)mycode + x));
+				temp_programtext_db.BinaryArray = temp_programtext_db.BinaryArray + temp_char;
+			}
+			temp_programtext_db.BinaryArray.MakeUpper();
+
+			////strSql.Format(_T("insert into ProgramText (nSerialNumber,Program_index,Program_Text,BinaryArray)   \
+   ////            values(%d,%d,'%s','%s')"), device_serialnumber, \
+			////	temp_programtext_db.Program_index, temp_programtext_db.ProgramText.GetBuffer(), temp_programtext_db.BinaryArray.GetBuffer());
+			////accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+              strSql.Format(_T("insert into ProgramText (nSerialNumber,Program_index,BinaryArray)   \
+values(%d,%d,'%s')"), device_serialnumber, 	temp_programtext_db.Program_index,  temp_programtext_db.BinaryArray.GetBuffer());
+            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+                strSql.Format(_T("update  ProgramText set Program_Text = '%s' where  nSerialNumber = %d and Program_index = %d "), temp_programtext_db.ProgramText.GetBuffer(), device_serialnumber, temp_programtext_db.Program_index);
+                accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+
+		}
+		break;
+		case BAC_SETTING:
+		{
+			strSql.Format(_T("delete * from Parameter where nSerialNumber = %d"), device_serialnumber);
+			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+
+			Str_parameter_DB temp_parameter_db;
+			temp_parameter_db.nSerialNumber = device_serialnumber;
+			Setting_Window->m_page_basic_info.m_edit_panel.GetWindowTextW(temp_parameter_db.PanelNumber);
+			Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_OBJ_INSTANCE, temp_parameter_db.BacnetInstance);
+			Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_MODBUS_ID, temp_parameter_db.ModbusRTU_BacnetMac_ID);
+			Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_BIP_NETWORK2, temp_parameter_db.Bip_Network);
+
+			Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_MAX_MASTER, temp_parameter_db.MaxMaster);
+			Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_PANEL, temp_parameter_db.PanelNumber);
+			Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_NODES_LABEL_SETTING, temp_parameter_db.PanelName);
+			for (int x = 0; x < (int)sizeof(Str_Setting_Info); x++)
+			{
+				CString temp_char;
+				if (x != 0)
+					temp_parameter_db.BinaryArray = temp_parameter_db.BinaryArray + _T(",");
+
+				temp_char.Format(_T("%02x"), (unsigned char)*((char*)&Device_Basic_Setting + x));
+				temp_parameter_db.BinaryArray = temp_parameter_db.BinaryArray + temp_char;
+			}
+			temp_parameter_db.BinaryArray.MakeUpper();
+
+			strSql.Format(_T("insert into Parameter (nSerialNumber,BacnetInstance,ModbusRTU_BacnetMac_ID,Bip_Network,MaxMaster,PanelNumber,PanelName,BinaryArray)   \
+              values(%d,'%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
+				temp_parameter_db.BacnetInstance, temp_parameter_db.ModbusRTU_BacnetMac_ID, temp_parameter_db.Bip_Network, temp_parameter_db.MaxMaster, \
+				temp_parameter_db.PanelNumber, temp_parameter_db.PanelName, temp_parameter_db.BinaryArray);
 			accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
 
 		}
-
+		break;
+		default:
+			break;
+		}
+		accessdb_bado.CloseConn();
 	}
-	break;
-	case BAC_OUT:
-    {
-        strSql.Format(_T("delete * from Inputs where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        for (int i = 0; i < ncount; i++)
-        {
-            Str_out_DB temp_out_db;
-            temp_out_db.nSerialNumber = device_serialnumber;
-            temp_out_db.Output_index = Output_Window->m_output_list.GetItemText(i, OUTPUT_NUM);
-            temp_out_db.Panel = Output_Window->m_output_list.GetItemText(i, OUTPUT_PANEL);
-            temp_out_db.Full_Label = Output_Window->m_output_list.GetItemText(i, OUTPUT_FULL_LABLE);
-            temp_out_db.Auto_Manual = Output_Window->m_output_list.GetItemText(i, OUTPUT_AUTO_MANUAL);
-            temp_out_db.HOA_Switch = Output_Window->m_output_list.GetItemText(i, OUTPUT_HW_SWITCH);
-            temp_out_db.fValue = Output_Window->m_output_list.GetItemText(i, OUTPUT_VALUE);
-            temp_out_db.Units = Output_Window->m_output_list.GetItemText(i, OUTPUT_UNITE);
-            temp_out_db.Range = Output_Window->m_output_list.GetItemText(i, OUTPUT_RANGE);
-            temp_out_db.Low_Voltage = Output_Window->m_output_list.GetItemText(i, OUTPUT_LOW_VOLTAGE);
-            temp_out_db.High_Voltage = Output_Window->m_output_list.GetItemText(i, OUTPUT_HIGH_VOLTAGE);
-            temp_out_db.PWM_Period = Output_Window->m_output_list.GetItemText(i, OUTPUT_PWM_PERIOD);
-            temp_out_db.csStatus = Output_Window->m_output_list.GetItemText(i, OUTPUT_DECOM);
-            temp_out_db.Label = Output_Window->m_output_list.GetItemText(i, OUTPUT_LABLE);
-            temp_out_db.Type = Output_Window->m_output_list.GetItemText(i, OUTPUT_EXTERNAL);
-
-            for (int x = 0; x < (int)sizeof(Str_out_point); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_out_db.BinaryArray = temp_out_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Output_data.at(i) + x));
-                temp_out_db.BinaryArray = temp_out_db.BinaryArray + temp_char;
-            }
-            temp_out_db.BinaryArray.MakeUpper();
-
-            strSql.Format(_T("insert into Outputs (nSerialNumber,Output_index,Panel,Full_Label,Auto_Manual,HOA_Switch,fValue,Units,Range,Low_Voltage,High_Voltage,PWM_Period,Status,Label,Type,BinaryArray)   \
-              values(%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_out_db.Output_index, temp_out_db.Panel, temp_out_db.Full_Label, temp_out_db.Auto_Manual, \
-                temp_out_db.HOA_Switch, temp_out_db.fValue, temp_out_db.Units, temp_out_db.Range, \
-                temp_out_db.Low_Voltage, temp_out_db.High_Voltage, temp_out_db.PWM_Period, temp_out_db.csStatus, \
-                temp_out_db.Label, temp_out_db.Type, temp_out_db.BinaryArray);
-            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        }
-    }
-        break;
-    case BAC_VAR:
-    {
-        strSql.Format(_T("delete * from Variables where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        for (int i = 0; i < ncount; i++)
-        {
-            Str_var_DB temp_var_db;
-            temp_var_db.nSerialNumber = device_serialnumber;
-            temp_var_db.Variable_index = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_NUM);
-
-            temp_var_db.Full_Label = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_FULL_LABLE);
-            temp_var_db.Auto_Manual = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_AUTO_MANUAL);
-            temp_var_db.fValue = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_VALUE);
-            temp_var_db.Units = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_UNITE);
-            temp_var_db.Label = Variable_Window->m_variable_list.GetItemText(i, VARIABLE_LABLE);
-
-
-
-            for (int x = 0; x < (int)sizeof(Str_variable_point); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_var_db.BinaryArray = temp_var_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Variable_data.at(i) + x));
-                temp_var_db.BinaryArray = temp_var_db.BinaryArray + temp_char;
-            }
-            temp_var_db.BinaryArray.MakeUpper();
-
-            strSql.Format(_T("insert into Variables (nSerialNumber,Variable_index,Full_Label,Auto_Manual,fValue,Units,Label,BinaryArray)   \
-              values(%d,'%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_var_db.Variable_index, temp_var_db.Full_Label, temp_var_db.Auto_Manual, temp_var_db.fValue, \
-                temp_var_db.Units, temp_var_db.Label, temp_var_db.BinaryArray);
-            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        }
-    }
-        break;
-    case BAC_PRG:
-    {
-        strSql.Format(_T("delete * from Programs where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        for (int i = 0; i < ncount; i++)
-        {
-            Str_program_DB temp_program_db;
-            temp_program_db.nSerialNumber = device_serialnumber;
-            temp_program_db.Program_index = Program_Window->m_program_list.GetItemText(i, PROGRAM_NUM);
-
-            temp_program_db.Full_Label = Program_Window->m_program_list.GetItemText(i, PROGRAM_FULL_LABLE);
-            temp_program_db.Status = Program_Window->m_program_list.GetItemText(i, PROGRAM_STATUS);
-            temp_program_db.Auto_Manual = Program_Window->m_program_list.GetItemText(i, PROGRAM_AUTO_MANUAL);
-            temp_program_db.Size = Program_Window->m_program_list.GetItemText(i, PROGRAM_SIZE_LIST);
-            temp_program_db.Execution_Time = Program_Window->m_program_list.GetItemText(i, PROGRAM_RUN_STATUS);
-            temp_program_db.Label = Program_Window->m_program_list.GetItemText(i, PROGRAM_LABEL);
-
-            for (int x = 0; x < (int)sizeof(Str_program_point); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_program_db.BinaryArray = temp_program_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Program_data.at(i) + x));
-                temp_program_db.BinaryArray = temp_program_db.BinaryArray + temp_char;
-            }
-            temp_program_db.BinaryArray.MakeUpper();
-
-            strSql.Format(_T("insert into Programs (nSerialNumber,Program_index,Full_Label,Status,Auto_Manual,nSize,Execution_Time,Label,BinaryArray)   \
-              values(%d,'%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_program_db.Program_index, temp_program_db.Full_Label, temp_program_db.Status, temp_program_db.Auto_Manual, \
-                temp_program_db.Size, temp_program_db.Execution_Time, temp_program_db.Label, temp_program_db.BinaryArray);
-            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        }
-    }
-        break;
-    case BAC_PID:
-    {
-        strSql.Format(_T("delete * from Pid_Table where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        for (int i = 0; i < ncount; i++)
-        {
-            Str_pid_DB temp_pid_db;
-            temp_pid_db.nSerialNumber = device_serialnumber;
-            temp_pid_db.Pid_index = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_NUM);
-
-            temp_pid_db.Input = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_INPUT);
-            temp_pid_db.Input_Value = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_INPUTVALUE);
-            temp_pid_db.Input_Units = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_INPUTUNITS);
-            temp_pid_db.Auto_Manual = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_AUTO_MANUAL);
-            temp_pid_db.Output = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_OUTPUT);
-            temp_pid_db.Setpoint = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_SETPOINT);
-            temp_pid_db.Setpoint_Value = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_SETVALUE);
-            temp_pid_db.Setpoint_Units = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_SETPOINTUNITS);
-            temp_pid_db.Action =  Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_ACTION);
-            temp_pid_db.PID_Prop = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_PROPORTIONAL);
-            temp_pid_db.PID_Int = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_RESET);
-            temp_pid_db.PID_Der = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_RATE);
-            temp_pid_db.PID_Time = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_I_TIME);
-            temp_pid_db.Bias = Controller_Window->m_controller_list.GetItemText(i, CONTROLLER_BIAS);
-
-            for (int x = 0; x < (int)sizeof(Str_controller_point); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_pid_db.BinaryArray = temp_pid_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_controller_data.at(i) + x));
-                temp_pid_db.BinaryArray = temp_pid_db.BinaryArray + temp_char;
-            }
-            temp_pid_db.BinaryArray.MakeUpper();
-
-            strSql.Format(_T("insert into Pid_Table (nSerialNumber,Pid_index,Input_,Input_Value,Input_Units,Auto_Manual,Output_,Setpoint,Setpoint_Value,Setpoint_Units,Action_,PID_Prop,PID_Int,PID_Der,PID_Time,Bias,BinaryArray)   \
-              values(%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_pid_db.Pid_index, temp_pid_db.Input, temp_pid_db.Input_Value, temp_pid_db.Input_Units, \
-                temp_pid_db.Auto_Manual, temp_pid_db.Output, temp_pid_db.Setpoint, temp_pid_db.Setpoint_Value, \
-                temp_pid_db.Setpoint_Units, temp_pid_db.Action, temp_pid_db.PID_Prop, temp_pid_db.PID_Int, \
-                temp_pid_db.PID_Der, temp_pid_db.PID_Time, temp_pid_db.Bias, temp_pid_db.BinaryArray);
-            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-
-        }
-    }
-        break;
-    case BAC_GRP:
-    {
-        strSql.Format(_T("delete * from Graphics where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        for (int i = 0; i < ncount; i++)
-        {
-            Str_graphic_DB temp_graphic_db;
-            temp_graphic_db.nSerialNumber = device_serialnumber;
-            temp_graphic_db.Graphic_index = Screen_Window->m_screen_list.GetItemText(i, SCREEN_NUM);
-
-            temp_graphic_db.Full_Label = Screen_Window->m_screen_list.GetItemText(i, SCREEN_DESCRIPTION);
-            temp_graphic_db.Label = Screen_Window->m_screen_list.GetItemText(i, SCREEN_LABEL);
-            temp_graphic_db.Picture_File = Screen_Window->m_screen_list.GetItemText(i, SCREEN_PIC_FILE);
-            temp_graphic_db.Element_Count = Screen_Window->m_screen_list.GetItemText(i, SCREEN_ELEMENT_COUNT);
-
-
-            for (int x = 0; x < (int)sizeof(Control_group_point); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_graphic_db.BinaryArray = temp_graphic_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_screen_data.at(i) + x));
-                temp_graphic_db.BinaryArray = temp_graphic_db.BinaryArray + temp_char;
-            }
-            temp_graphic_db.BinaryArray.MakeUpper();
-
-            strSql.Format(_T("insert into Graphics (nSerialNumber,Graphic_index,Full_Label,Label,Picture_File,Element_Count,BinaryArray)   \
-              values(%d,'%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_graphic_db.Graphic_index, temp_graphic_db.Full_Label, temp_graphic_db.Label, temp_graphic_db.Picture_File, \
-                temp_graphic_db.Element_Count, temp_graphic_db.BinaryArray);
-            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        }
-    }
-        break;
-    case BAC_HOL:
-    {
-        strSql.Format(_T("delete * from Holidays where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        for (int i = 0; i < ncount; i++)
-        {
-            Str_holiday_DB temp_holiday_db;
-            temp_holiday_db.nSerialNumber = device_serialnumber;
-            temp_holiday_db.Holiday_index = AnnualRoutine_Window->m_annualr_list.GetItemText(i, ANNUAL_ROUTINE_NUM);
-            temp_holiday_db.Full_Label = AnnualRoutine_Window->m_annualr_list.GetItemText(i, ANNUAL_ROUTINE_FULL_LABEL);
-            temp_holiday_db.Auto_Manual = AnnualRoutine_Window->m_annualr_list.GetItemText(i, ANNUAL_ROUTINE_AUTO_MANUAL);
-            temp_holiday_db.fValue = AnnualRoutine_Window->m_annualr_list.GetItemText(i, ANNUAL_ROUTINE_VALUE);
-            temp_holiday_db.Label = AnnualRoutine_Window->m_annualr_list.GetItemText(i, ANNUAL_ROUTINE_LABLE);
-
-            for (int x = 0; x < (int)sizeof(Str_annual_routine_point); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_holiday_db.BinaryArray = temp_holiday_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Annual_data.at(i) + x));
-                temp_holiday_db.BinaryArray = temp_holiday_db.BinaryArray + temp_char;
-            }
-            temp_holiday_db.BinaryArray.MakeUpper();
-
-            strSql.Format(_T("insert into Holidays (nSerialNumber,Holiday_index,Full_Label,Auto_Manual,fValue,Label,BinaryArray)   \
-              values(%d,'%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_holiday_db.Holiday_index, temp_holiday_db.Full_Label, temp_holiday_db.Auto_Manual, temp_holiday_db.fValue, \
-                temp_holiday_db.Label, temp_holiday_db.BinaryArray);
-            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        }
-    }
-        break;
-    case BAC_SCH:
-    {
-        strSql.Format(_T("delete * from Schedules where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        for (int i = 0; i < ncount; i++)
-        {
-            Str_schedule_DB temp_schedule_db;
-            temp_schedule_db.nSerialNumber = device_serialnumber;
-            temp_schedule_db.Schedule_index = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_NUM);
-
-            temp_schedule_db.Full_Label = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_FULL_LABLE);
-            temp_schedule_db.Auto_Manual = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_AUTO_MANUAL);
-            temp_schedule_db.Output = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_OUTPUT);
-            temp_schedule_db.Holiday1 = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_HOLIDAY1);
-            temp_schedule_db.Status1 = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_STATE1);
-            temp_schedule_db.Holiday2 = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_HOLIDAY2);
-            temp_schedule_db.Status2 = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_STATE2);
-            temp_schedule_db.Label = WeeklyRoutine_Window->m_weeklyr_list.GetItemText(i, WEEKLY_ROUTINE_LABEL);
-
-
-
-            for (int x = 0; x < (int)sizeof(Str_annual_routine_point); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_schedule_db.BinaryArray = temp_schedule_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_Weekly_data.at(i) + x));
-                temp_schedule_db.BinaryArray = temp_schedule_db.BinaryArray + temp_char;
-            }
-            temp_schedule_db.BinaryArray.MakeUpper();
-
-            strSql.Format(_T("insert into Schedules (nSerialNumber,Schedule_index,Full_Label,Auto_Manual,Output_,Holiday1,Status1,Holiday2,Status2,Label,BinaryArray)   \
-              values(%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_schedule_db.Schedule_index, temp_schedule_db.Full_Label, temp_schedule_db.Auto_Manual, temp_schedule_db.Output, \
-                temp_schedule_db.Holiday1, temp_schedule_db.Status1, temp_schedule_db.Holiday2, temp_schedule_db.Status2,\
-                temp_schedule_db.Label, temp_schedule_db.BinaryArray);
-            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        }
-    }
-        break;
-    case BAC_AMON:
-    {
-        strSql.Format(_T("delete * from Trend_logs where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        for (int i = 0; i < ncount; i++)
-        {
-            Str_trendlog_DB temp_trendlog_db;
-            temp_trendlog_db.nSerialNumber = device_serialnumber;
-
-            temp_trendlog_db.Trendlog_index = Monitor_Window->m_monitor_list.GetItemText(i, MONITOR_NUM);
-            temp_trendlog_db.Label = Monitor_Window->m_monitor_list.GetItemText(i, MONITOR_LABEL);
-            temp_trendlog_db.Interval = Monitor_Window->m_monitor_list.GetItemText(i, MONITOR_INTERVAL);
-            temp_trendlog_db.Status = Monitor_Window->m_monitor_list.GetItemText(i, MONITOR_STATUS);
-            temp_trendlog_db.Data_Size = Monitor_Window->m_monitor_list.GetItemText(i, MONITOR_DATA_SIZE);
-
-
-            for (int x = 0; x < (int)sizeof(Str_monitor_point); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_trendlog_db.BinaryArray = temp_trendlog_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_monitor_data.at(i) + x));
-                temp_trendlog_db.BinaryArray = temp_trendlog_db.BinaryArray + temp_char;
-            }
-            temp_trendlog_db.BinaryArray.MakeUpper();
-
-            strSql.Format(_T("insert into Trend_logs (nSerialNumber,TrendLog_index,Label,Interval_,Status_,Data_Size,BinaryArray)   \
-              values(%d,'%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_trendlog_db.Trendlog_index, temp_trendlog_db.Label, temp_trendlog_db.Interval, temp_trendlog_db.Status, temp_trendlog_db.Data_Size,  temp_trendlog_db.BinaryArray);
-            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        }
-    }
-        break;
-    case BAC_ALARMM:
-    {
-        strSql.Format(_T("delete * from Alarms where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        for (int i = 0; i < ncount; i++)
-        {
-            Str_alarm_DB temp_alarm_db;
-            temp_alarm_db.nSerialNumber = device_serialnumber;
-
-            temp_alarm_db.Alarm_index = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_NUM);
-
-            temp_alarm_db.Panel = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_PANEL);
-            temp_alarm_db.Message = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_MESSAGE);
-            temp_alarm_db.Time = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_TIME);
-            temp_alarm_db.Acknowlege = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_ACK);
-            temp_alarm_db.Res = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_RES);
-            temp_alarm_db.Delete = AlarmLog_Window->m_alarmlog_list.GetItemText(i, ALARMLOG_DEL);
-            
-
-            for (int x = 0; x < (int)sizeof(Alarm_point); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_alarm_db.BinaryArray = temp_alarm_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&m_alarmlog_data.at(i) + x));
-                temp_alarm_db.BinaryArray = temp_alarm_db.BinaryArray + temp_char;
-            }
-            temp_alarm_db.BinaryArray.MakeUpper();
-
-            strSql.Format(_T("insert into Alarms (nSerialNumber,Alarm_index,Panel,Message,Time_,Acknowlege,Res,Delete_,BinaryArray)   \
-              values(%d,'%s','%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_alarm_db.Alarm_index, temp_alarm_db.Panel, temp_alarm_db.Message, temp_alarm_db.Time, temp_alarm_db.Acknowlege,\
-                temp_alarm_db.Res, temp_alarm_db.Delete, temp_alarm_db.BinaryArray);
-            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        }
-    }
-        break;
-    case READPROGRAMCODE_T3000:
-    {
-        strSql.Format(_T("delete * from ProgramText where nSerialNumber = %d and Program_index = %d"), device_serialnumber,ncount);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        Str_programtext_DB temp_programtext_db;
-        temp_programtext_db.nSerialNumber = device_serialnumber;
-        temp_programtext_db.Program_index = ncount;
-        temp_programtext_db.ProgramText = program_string;
-
-        for (int x = 0; x < (int)sizeof(Alarm_point); x++)
-        {
-            CString temp_char;
-            if (x != 0)
-                temp_programtext_db.BinaryArray = temp_programtext_db.BinaryArray + _T(",");
-
-            temp_char.Format(_T("%02x"), (unsigned char)*((char*)mycode + x));
-            temp_programtext_db.BinaryArray = temp_programtext_db.BinaryArray + temp_char;
-        }
-        temp_programtext_db.BinaryArray.MakeUpper();
-        
-        strSql.Format(_T("insert into ProgramText (nSerialNumber,Program_index,Program_Text,BinaryArray)   \
-              values(%d,%d,'%s','%s')"), device_serialnumber, \
-            temp_programtext_db.Program_index, temp_programtext_db.ProgramText, temp_programtext_db.BinaryArray);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-    }
-        break;
-    case BAC_SETTING:
-    {
-        strSql.Format(_T("delete * from Parameter where nSerialNumber = %d"), device_serialnumber);
-        accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-
-            Str_parameter_DB temp_parameter_db;
-            temp_parameter_db.nSerialNumber = device_serialnumber;
-            Setting_Window->m_page_basic_info.m_edit_panel.GetWindowTextW(temp_parameter_db.PanelNumber);
-            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_OBJ_INSTANCE, temp_parameter_db.BacnetInstance);
-            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_MODBUS_ID, temp_parameter_db.ModbusRTU_BacnetMac_ID);
-            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_BIP_NETWORK2, temp_parameter_db.Bip_Network);
-
-            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_MAX_MASTER, temp_parameter_db.MaxMaster);
-            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_PANEL, temp_parameter_db.PanelNumber);
-            Setting_Window->m_page_basic_info.GetDlgItemTextW(IDC_EDIT_SETTING_NODES_LABEL_SETTING, temp_parameter_db.PanelName);
-            for (int x = 0; x < (int)sizeof(Str_Setting_Info); x++)
-            {
-                CString temp_char;
-                if (x != 0)
-                    temp_parameter_db.BinaryArray = temp_parameter_db.BinaryArray + _T(",");
-
-                temp_char.Format(_T("%02x"), (unsigned char)*((char*)&Device_Basic_Setting + x));
-                temp_parameter_db.BinaryArray = temp_parameter_db.BinaryArray + temp_char;
-            }
-            temp_parameter_db.BinaryArray.MakeUpper();
-
-            strSql.Format(_T("insert into Parameter (nSerialNumber,BacnetInstance,ModbusRTU_BacnetMac_ID,Bip_Network,MaxMaster,PanelNumber,PanelName,BinaryArray)   \
-              values(%d,'%s','%s','%s','%s','%s','%s','%s')"), device_serialnumber, \
-                temp_parameter_db.BacnetInstance, temp_parameter_db.ModbusRTU_BacnetMac_ID, temp_parameter_db.Bip_Network, temp_parameter_db.MaxMaster, \
-                temp_parameter_db.PanelNumber, temp_parameter_db.PanelName, temp_parameter_db.BinaryArray);
-            accessdb_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
-        
-    }
-        break;
-    default:
-        break;
-    }
-    accessdb_bado.CloseConn();
+	catch (_com_error e)
+	{
+		Sleep(1);
+	}
 #endif
-    return 1;
+			return 1;
 }
 char pBuf[200000];
 //杜帆Save

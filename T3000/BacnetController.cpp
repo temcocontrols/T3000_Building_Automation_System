@@ -300,7 +300,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 						(int)strlen((char *)m_Input_data.at(m_controller_data.at(i).input.number ).label)+1, 
 						temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 					temp_des2.ReleaseBuffer();	
-
+					temp_des2 = temp_des2.Left(STR_IN_LABEL).Trim();
 					//如果是小叶的设备,因为没有input 就直接显示in2之类.
 					if(bacnet_device_type == STM32_HUM_NET)
 					{
@@ -349,7 +349,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 						(int)strlen((char *)m_Variable_data.at(m_controller_data.at(i).input.number ).label)+1, 
 						temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 					temp_des2.ReleaseBuffer();	
-
+					temp_des2 = temp_des2.Left(STR_VARIABLE_LABEL).Trim();
 
 
 					if(temp_des2.GetLength()>9)

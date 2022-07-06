@@ -71,7 +71,7 @@ void CBacnetBuildingIOPoints::Initial_List()
 	m_io_list.Set_My_WindowRect(win_rect);
 	m_io_list.Set_My_ListRect(list_rect);
 	m_io_list.ShowWindow(SW_SHOW);
-	product_list();
+
 }
 
 struct ALL_PRODUCT_NAME_NODE {
@@ -206,6 +206,7 @@ LRESULT CBacnetBuildingIOPoints::Fresh_Building_IO_List(WPARAM wParam, LPARAM lP
 void product_list()
 {
 
+#if 0
 	m_product_iocount.clear();
 	CString AllData;
 	CString product_list_path;
@@ -241,6 +242,7 @@ void product_list()
 
 		m_product_iocount.push_back(temp);
 	}
+#endif
 }
 extern CString cs_bm_ini;
 LRESULT CBacnetBuildingIOPoints::Change_Building_IO_Item(WPARAM wParam, LPARAM lParam)
