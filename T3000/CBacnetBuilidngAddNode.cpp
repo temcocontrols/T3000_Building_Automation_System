@@ -27,6 +27,8 @@ CString BM_Cstring_Moudle[]
 	_T("Fan Example 2")
 };
 
+
+
 CString BM_Cstring_Function[]
 {
 	_T("Add"),
@@ -56,6 +58,7 @@ void CBacnetBuilidngAddNode::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CBacnetBuilidngAddNode, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_BM_NODE_OK, &CBacnetBuilidngAddNode::OnBnClickedButtonBmNodeOk)
 	ON_BN_CLICKED(IDC_BUTTON_MANAGE_BUILD, &CBacnetBuilidngAddNode::OnBnClickedButtonManageBuild)
+	ON_CBN_SELCHANGE(IDC_COMBO_BM_MOUDLE, &CBacnetBuilidngAddNode::OnCbnSelchangeComboBmMoudle)
 END_MESSAGE_MAP()
 
 
@@ -232,4 +235,47 @@ void CBacnetBuilidngAddNode::OnBnClickedButtonManageBuild()
 	// TODO: 在此添加控件通知处理程序代码
 	CBacnetBuildingRoomEditor dlg;
 	dlg.DoModal();
+}
+
+
+void CBacnetBuilidngAddNode::OnCbnSelchangeComboBmMoudle()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int example_index = 0;
+	CString temp_string;
+	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_BM_MOUDLE))->GetCurSel();
+	((CComboBox*)GetDlgItem(IDC_COMBO_BM_MOUDLE))->GetLBText(nSel, temp_string);
+	for (int i = 0; i < sizeof(BM_Cstring_Moudle) / sizeof(BM_Cstring_Moudle[0]); i++)
+	{
+		if (temp_string.CompareNoCase(BM_Cstring_Moudle[i]) == 0)
+		{
+			example_index = i;
+			break;
+		}
+	}
+	CString input_count;
+	CString output_count;
+	CString var_count;
+	CString prg_count;
+	if (example_index == 0)
+	{
+		input_count = _T("4");
+		output_count = _T("7");
+		var_count = _T("25");
+		prg_count = _T("1");
+	}
+	else
+	{
+		input_count = _T("4");
+		output_count = _T("7");
+		var_count = _T("25");
+		prg_count = _T("1");
+	}
+	GetDlgItem(IDC_EDIT_BN_INPUT_COUNT)->SetWindowTextW(input_count);
+	GetDlgItem(IDC_EDIT_BN_OUTPUT_COUNT)->SetWindowTextW(output_count);
+	GetDlgItem(IDC_EDIT_BN_VARIABLE_COUNT)->SetWindowTextW(var_count);
+	GetDlgItem(IDC_EDIT_BN_PROGRAM_COUNT)->SetWindowTextW(prg_count);
+	GetDlgItem(IDC_EDIT_BN_SCHEDULE_COUNT)->SetWindowTextW(_T("0"));
+	GetDlgItem(IDC_EDIT_BN_HOLIDAY_COUNT)->SetWindowTextW(_T("0"));
+
 }

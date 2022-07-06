@@ -68,6 +68,7 @@ CString g_achive_device_name_path = _T("");
 CString g_achive_monitor_datatbase_path = _T("");
 CString g_ext_database_path = _T(""); //额外的配置档数据库路径;
 CString g_ext_mass_flash_path = _T(""); //保存多烧写  选中设备的 配置文件路径
+CString g_building_devicedatabase = _T(""); //DeviceDatabase.mdb 全路径
 
 BOOL g_Scanfully=FALSE;
 BOOL g_ScanSecurity=TRUE;
@@ -1940,6 +1941,11 @@ HWND analog_cus_range_dlg=NULL;
 
 HWND	  m_statusbar_hwnd = NULL;
 HWND      m_t3000_log_window = NULL;
+
+Str_in_point s_Input_data;
+Str_out_point s_Output_data;
+Str_variable_point s_Variable_data;
+
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
 vector <Str_program_point>  m_Program_data;
@@ -1975,6 +1981,7 @@ vector <int>  m_Annual_data_instance;
 vector <Str_MSV> m_msv_data;
 
 Time_block_mini Device_time;
+Str_Setting_Info s_Basic_Setting;
 Str_Setting_Info Device_Basic_Setting;
 Str_Email_point  Device_Email_Point;
 Str_MISC Device_Misc_Data;
@@ -2313,9 +2320,10 @@ unsigned char daylight_start_day;
 unsigned char daylight_end_month;
 unsigned char daylight_end_day;
 
-
+unsigned char gsp_invoke;
 bool Bacnet_debug_fileRead = false;
-
+device_io_status select_device_io_status;
 vector <Str_BM_IO> m_bm_io_data; //用来存储BM 系统  IO表数据
 
 vector <Str_product_io_count> m_product_iocount;  // 用来存储不同设备包含的IO数量;
+vector <Str_online_serialnumber> m_online_serial; //在线的设备，用于动态菜单

@@ -447,7 +447,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, tempchar, (int)strlen(tempchar)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
-
+		temp_des = temp_des.Left(50).Trim();
 		m_monitor_input_list.SetItemText(i,1,temp_des);
 
 	}
@@ -878,6 +878,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_monitor_data.at(i).label, (int)strlen((char *)m_monitor_data.at(i).label)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
+		temp_des = temp_des.Left(STR_MONITOR_LABEL_LENGTH).Trim();
 		m_monitor_list.SetItemText(i,MONITOR_LABEL,temp_des);
 
 		int temp_interval_time;

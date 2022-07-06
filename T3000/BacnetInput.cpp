@@ -928,6 +928,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).description, (int)strlen((char *)m_Input_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
+		temp_des.Left(STR_IN_DESCRIPTION_LENGTH).Trim();
 
 		m_input_list.SetItemText(i,INPUT_FULL_LABLE,temp_des);
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
@@ -1306,7 +1307,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).label, (int)strlen((char *)m_Input_data.at(i).label)+1, 
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
-
+		temp_des2 = temp_des2.Left(STR_IN_LABEL).Trim();
 		m_input_list.SetItemText(i,INPUT_LABLE,temp_des2);
 
         for (int j = 0; j < INPUT_COL_NUMBER; j++)
@@ -2107,6 +2108,32 @@ BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
+int GetInputLabelEx(Str_in_point temp_in, CString& ret_label, Point_Net* npoint)
+{
+
+
+	CString temp_des2;
+	MultiByteToWideChar(CP_ACP, 0, (char*)temp_in.label, (int)strlen((char*)temp_in.label) + 1,
+		ret_label.GetBuffer(MAX_PATH), MAX_PATH);
+	ret_label.ReleaseBuffer();
+	ret_label = ret_label.Trim();
+
+	if (ret_label.IsEmpty())
+	{
+		if (npoint == NULL)
+		{
+			ret_label.Format(_T("IN%d"), npoint->number + 1);
+		}
+		else
+		{
+			ret_label.Format(_T("%dIN%d"), npoint->panel, npoint->number + 1);
+		}
+	}
+
+
+	return 1;
+}
+
 int GetInputLabel(int index, CString &ret_label, Point_Net * npoint )
 {
 	if(index >= BAC_INPUT_ITEM_COUNT)
@@ -2114,26 +2141,30 @@ int GetInputLabel(int index, CString &ret_label, Point_Net * npoint )
 		ret_label.Empty();
 		return -1;
 	}
+
 	int i = index;
-	CString temp_des2;
-	MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).label, (int)strlen((char *)m_Input_data.at(i).label)+1, 
-		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
-	ret_label.ReleaseBuffer();
-	ret_label = ret_label.Trim();
-
-        if (ret_label.IsEmpty())
-        {
-            if (npoint == NULL)
-            {
-                ret_label.Format(_T("IN%d"), index + 1);
-            }
-            else
-            {
-                ret_label.Format(_T("%dIN%d"), npoint->panel, npoint->number + 1);
-            }
-        }
+	return GetInputLabelEx(m_Input_data.at(i),  ret_label,  npoint);
+}
 
 
+int GetInputFullLabelEx(Str_in_point temp_in, CString& ret_full_label, Point_Net* npoint)
+{
+
+	MultiByteToWideChar(CP_ACP, 0, (char*)temp_in.description, (int)strlen((char*)temp_in.description) + 1,
+		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH);
+	ret_full_label.ReleaseBuffer();
+	ret_full_label = ret_full_label.Trim();
+	if (ret_full_label.IsEmpty())
+	{
+		if (npoint == NULL)
+		{
+			ret_full_label.Format(_T("IN%d"), npoint->number + 1);
+		}
+		else
+		{
+			ret_full_label.Format(_T("%dIN%d"), npoint->panel, npoint->number + 1);
+		}
+	}
 	return 1;
 }
 
@@ -2145,38 +2176,15 @@ int GetInputFullLabel(int index,CString &ret_full_label, Point_Net * npoint)
 		return -1;
 	}
 	int i = index;
-	MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).description, (int)strlen((char *)m_Input_data.at(i).description)+1, 
-		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH );
-	ret_full_label.ReleaseBuffer();
-	ret_full_label = ret_full_label.Trim();
-	if(ret_full_label.IsEmpty())
-	{
-        if (npoint == NULL)
-        {
-            ret_full_label.Format(_T("IN%d"), index + 1);
-        }
-        else
-        {
-            ret_full_label.Format(_T("%dIN%d"), npoint->panel, npoint->number + 1);
-        }
-	}
-	return 1;
+	return GetInputFullLabelEx(m_Input_data.at(i), ret_full_label, npoint);
 }
 
-int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value)
+int GetInputValueEx(Str_in_point temp_in, CString& ret_cstring, CString& ret_unit, CString& Auto_M, int& digital_value)
 {
 	CStringArray temparray;
 	CString temp1;
-	if(index >= BAC_INPUT_ITEM_COUNT)
-	{
-		ret_cstring.Empty();
-		ret_unit.Empty();
-		Auto_M.Empty();
-		return -1;
-	}
-	int i = index;
 
-	if(m_Input_data.at(i).auto_manual == 1)
+	if (temp_in.auto_manual == 1)
 	{
 		Auto_M = _T("M");
 	}
@@ -2185,16 +2193,16 @@ int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Aut
 		Auto_M.Empty();
 	}
 
-	if(m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG)
+	if (temp_in.digital_analog == BAC_UNITS_ANALOG)
 	{
 		float temp_float_value;
-		temp_float_value = ((float)m_Input_data.at(i).value) / 1000;
-		ret_cstring.Format(_T("%.1f"),temp_float_value);
+		temp_float_value = ((float)temp_in.value) / 1000;
+		ret_cstring.Format(_T("%.1f"), temp_float_value);
 
-		if(m_Input_data.at(i).range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
+		if (temp_in.range < (sizeof(Input_List_Analog_Units) / sizeof(Input_List_Analog_Units[0])))
 		{
-			ret_unit =Input_List_Analog_Units[m_Input_data.at(i).range];
-			if(m_Input_data.at(i).range == 0)
+			ret_unit = Input_List_Analog_Units[temp_in.range];
+			if (temp_in.range == 0)
 				ret_unit.Empty();
 		}
 		else
@@ -2205,15 +2213,15 @@ int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Aut
 		digital_value = 2;//analog;
 		return 1;
 	}
-	else if(m_Input_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+	else if (temp_in.digital_analog == BAC_UNITS_DIGITAL)
 	{
-		if((m_Input_data.at(i).range == 0))
+		if ((temp_in.range == 0))
 		{
 			float temp_float_value;
-			temp_float_value = ((float)m_Input_data.at(i).value) / 1000;
-			ret_cstring.Format(_T("%.1f"),temp_float_value);
+			temp_float_value = ((float)temp_in.value) / 1000;
+			ret_cstring.Format(_T("%.1f"), temp_float_value);
 		}
-		else if((m_Input_data.at(i).range>30))
+		else if ((temp_in.range > 30))
 		{
 			ret_cstring.Empty();
 			return -1;
@@ -2221,19 +2229,19 @@ int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Aut
 		else
 		{
 
-			if((m_Input_data.at(i).range < 23) &&(m_Input_data.at(i).range !=0))
-				temp1 = Digital_Units_Array[m_Input_data.at(i).range];
-			else if((m_Input_data.at(i).range >=23) && (m_Input_data.at(i).range <= 30))
+			if ((temp_in.range < 23) && (temp_in.range != 0))
+				temp1 = Digital_Units_Array[temp_in.range];
+			else if ((temp_in.range >= 23) && (temp_in.range <= 30))
 			{
-				if(receive_customer_unit)
-					temp1 = Custom_Digital_Range[m_Input_data.at(i).range - 23];
+				if (receive_customer_unit)
+					temp1 = Custom_Digital_Range[temp_in.range - 23];
 			}
 
 
-			SplitCStringA(temparray,temp1,_T("/"));
-			if((temparray.GetSize()==2))
+			SplitCStringA(temparray, temp1, _T("/"));
+			if ((temparray.GetSize() == 2))
 			{
-				if(m_Input_data.at(i).control == 0)
+				if (temp_in.control == 0)
 				{
 					digital_value = 0;//analog;
 					ret_cstring = temparray.GetAt(0);
@@ -2250,6 +2258,95 @@ int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Aut
 
 	}
 	return 1;
+}
+
+int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value)
+{
+	CStringArray temparray;
+	CString temp1;
+	if(index >= BAC_INPUT_ITEM_COUNT)
+	{
+		ret_cstring.Empty();
+		ret_unit.Empty();
+		Auto_M.Empty();
+		return -1;
+	}
+	return GetInputValueEx(m_Input_data.at(index), ret_cstring, ret_unit, Auto_M, digital_value);
+
+	//if(m_Input_data.at(i).auto_manual == 1)
+	//{
+	//	Auto_M = _T("M");
+	//}
+	//else
+	//{
+	//	Auto_M.Empty();
+	//}
+
+	//if(m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG)
+	//{
+	//	float temp_float_value;
+	//	temp_float_value = ((float)m_Input_data.at(i).value) / 1000;
+	//	ret_cstring.Format(_T("%.1f"),temp_float_value);
+
+	//	if(m_Input_data.at(i).range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
+	//	{
+	//		ret_unit =Input_List_Analog_Units[m_Input_data.at(i).range];
+	//		if(m_Input_data.at(i).range == 0)
+	//			ret_unit.Empty();
+	//	}
+	//	else
+	//	{
+	//		ret_unit.Empty();
+	//		return -2;
+	//	}
+	//	digital_value = 2;//analog;
+	//	return 1;
+	//}
+	//else if(m_Input_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+	//{
+	//	if((m_Input_data.at(i).range == 0))
+	//	{
+	//		float temp_float_value;
+	//		temp_float_value = ((float)m_Input_data.at(i).value) / 1000;
+	//		ret_cstring.Format(_T("%.1f"),temp_float_value);
+	//	}
+	//	else if((m_Input_data.at(i).range>30))
+	//	{
+	//		ret_cstring.Empty();
+	//		return -1;
+	//	}
+	//	else
+	//	{
+
+	//		if((m_Input_data.at(i).range < 23) &&(m_Input_data.at(i).range !=0))
+	//			temp1 = Digital_Units_Array[m_Input_data.at(i).range];
+	//		else if((m_Input_data.at(i).range >=23) && (m_Input_data.at(i).range <= 30))
+	//		{
+	//			if(receive_customer_unit)
+	//				temp1 = Custom_Digital_Range[m_Input_data.at(i).range - 23];
+	//		}
+
+
+	//		SplitCStringA(temparray,temp1,_T("/"));
+	//		if((temparray.GetSize()==2))
+	//		{
+	//			if(m_Input_data.at(i).control == 0)
+	//			{
+	//				digital_value = 0;//analog;
+	//				ret_cstring = temparray.GetAt(0);
+	//				return 1;
+	//			}
+	//			else
+	//			{
+	//				digital_value = 1;//analog;
+	//				ret_cstring = temparray.GetAt(1);
+	//				return 1;
+	//			}
+	//		}
+	//	}
+
+	//}
+	//return 1;
 }
 
 

@@ -39,7 +39,7 @@ public:
 	void ShowListToTree();
 	void TreeInital();
 	//CMainFrame* pFrame;
-
+	void LoadDevice();
 	int nGroupCount ; // 有多少个Group 
 	CString groupname[255];
 	int n_group_kids_count[255];

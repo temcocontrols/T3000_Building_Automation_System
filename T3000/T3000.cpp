@@ -17,7 +17,7 @@
 #include <windows.h>  
  
 
-const unsigned int g_versionNO= 20220527;
+const unsigned int g_versionNO= 20220621;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -676,6 +676,9 @@ BOOL CT3000App::InitInstance()
 		return TRUE;
 	}
 
+#ifdef LOCAL_DB_FUNCTION
+	init_product_list();
+#endif
 	//Create_T3000_log_file();
 	return TRUE;
 }

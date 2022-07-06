@@ -5,6 +5,8 @@
 #include "T3000.h"
 #include "CBacnetBuildingManagement.h"
 #include "MainFrm.h"
+#include "global_function.h"
+
 extern HWND h_db_io_hwnd;
 CMainFrame* pFrame_BM;
 // CBacnetBuildingManagement
@@ -239,7 +241,7 @@ void CBacnetBuildingManagement::ShowListToTree()
 	TreeInital();
 }
 
-
+HTREEITEM hTreeDeviceList = NULL;
 void CBacnetBuildingManagement::TreeInital()
 {
 	TV_INSERTSTRUCT tvInsert;////added
@@ -342,14 +344,17 @@ void CBacnetBuildingManagement::TreeInital()
 					temp_bmd_point->pchild[z] = new CBacnetBMD;
 				CString section_io_name;
 				CString section_io_type;
+				CString section_io_status;
 				section_io_name.Format(_T("IO_%d_%d_Name"), j, z);
 				section_io_type.Format(_T("IO_%d_%d_Type"), j, z);
+				section_io_status.Format(_T("IO_%d_%d_Status"), j, z);
 				CString io_name;
 				int io_type;
+				int io_status;
 				GetPrivateProfileString(temp_lpAppname, section_io_name, _T(""), io_name.GetBuffer(MAX_PATH), MAX_PATH, cs_bm_ini);
 				io_name.ReleaseBuffer();
 				io_type = GetPrivateProfileInt(temp_lpAppname, section_io_type, 0, cs_bm_ini);
-
+				io_status = GetPrivateProfileInt(temp_lpAppname, section_io_status, TREE_IO_UNKNOWN, cs_bm_ini);
 				CString section_property;
 				section_property.Format(_T("nPropertyArray_%d_%d"), j, z);
 				CString temp_property_cstring;
@@ -371,17 +376,50 @@ void CBacnetBuildingManagement::TreeInital()
 				if (io_type == TYPE_BM_INPUT)
 				{
 					temp_bmd_point->m_input_count++;
-					tvInsert.item.iImage = TREE_IMAGE_INPUT_UNKNOWN; tvInsert.item.iSelectedImage = TREE_IMAGE_INPUT_UNKNOWN;
+					if (io_status == TREE_IO_UNKNOWN)
+					{
+						tvInsert.item.iImage = TREE_IMAGE_INPUT_UNKNOWN; tvInsert.item.iSelectedImage = TREE_IMAGE_INPUT_UNKNOWN;
+					}
+					else if (io_status == TREE_IO_OFFLINE)
+					{
+						tvInsert.item.iImage = TREE_IMAGE_INPUT_OFFLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_INPUT_OFFLINE;
+					}
+					else if (io_status == TREE_IO_ONLINE)
+					{
+						tvInsert.item.iImage = TREE_IMAGE_INPUT_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_INPUT_ONLINE;
+					}
 				}
 				else if (io_type == TYPE_BM_OUTPUT)
 				{
 					temp_bmd_point->m_output_count++;
-					tvInsert.item.iImage = TREE_IMAGE_OUTPUT_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_OUTPUT_ONLINE;
+					if (io_status == TREE_IO_UNKNOWN)
+					{
+						tvInsert.item.iImage = TREE_IMAGE_OUTPUT_UNKNOWN; tvInsert.item.iSelectedImage = TREE_IMAGE_OUTPUT_UNKNOWN;
+					}
+					else if (io_status == TREE_IO_OFFLINE)
+					{
+						tvInsert.item.iImage = TREE_IMAGE_OUTPUT_OFFLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_OUTPUT_OFFLINE;
+					}
+					else if (io_status == TREE_IO_ONLINE)
+					{
+						tvInsert.item.iImage = TREE_IMAGE_OUTPUT_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_OUTPUT_ONLINE;
+					}
 				}
 				else if (io_type == TYPE_BM_VARIABLE)
 				{
 					temp_bmd_point->m_variable_count++;
-					tvInsert.item.iImage = TREE_IMAGE_VARIABLE_OFFLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_VARIABLE_OFFLINE;
+					if (io_status == TREE_IO_UNKNOWN)
+					{
+						tvInsert.item.iImage = TREE_IMAGE_VARIABLE_UNKNOWN; tvInsert.item.iSelectedImage = TREE_IMAGE_VARIABLE_UNKNOWN;
+					}
+					else if (io_status == TREE_IO_OFFLINE)
+					{
+						tvInsert.item.iImage = TREE_IMAGE_VARIABLE_OFFLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_VARIABLE_OFFLINE;
+					}
+					else if (io_status == TREE_IO_ONLINE)
+					{
+						tvInsert.item.iImage = TREE_IMAGE_VARIABLE_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_VARIABLE_ONLINE;
+					}
 				}
 				HTREEITEM hTreeIO = NULL;
 				hTreeIO = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
@@ -407,7 +445,7 @@ void CBacnetBuildingManagement::TreeInital()
 						for (int x = 0; x < (int)sizeof(Str_points); x++)
 						{
 							temp_char[x] = wcstol(temp_array.GetAt(x), NULL, 16);
-							 //= _wtoi(temp_array.GetAt(x));
+							//= _wtoi(temp_array.GetAt(x));
 						}
 						memcpy_s(&temp_io_point->m_property, sizeof(Str_points), temp_char, sizeof(Str_points));
 					}
@@ -423,7 +461,7 @@ void CBacnetBuildingManagement::TreeInital()
 			//temp_group_input = temp_group_input + temp_bmd_point->m_input_count;
 			//temp_group_output = temp_group_output + temp_bmd_point->m_output_count;
 			//temp_group_variable = temp_group_variable + temp_bmd_point->m_variable_count;
-			
+
 		}
 		//BuildingNode.pchild[i]->m_input_count = temp_group_input;
 		//BuildingNode.pchild[i]->m_output_count = temp_group_output;
@@ -440,6 +478,751 @@ void CBacnetBuildingManagement::TreeInital()
 	UpdateList();
 
 	SetDataTreeCtrl();
+
+
+	CString strvirtualdevice = _T("System List");//m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
+	tvInsert.hParent = TVI_ROOT; // 指定父句柄
+	tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+	tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strvirtualdevice;
+	tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
+	TVINSERV_BUILDING
+
+
+
+	hTreeDeviceList = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
+
+	LoadDevice();
+	pFrame_BM->m_pTreeViewCrl->Expand(hTreeDeviceList, TVE_EXPAND);
+}
+
+void CBacnetBuildingManagement::LoadDevice()
+{
+	CString strBuilding = pFrame_BM->m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
+	CppSQLite3DB SqliteDBBuilding;
+	CppSQLite3Table table;
+	CppSQLite3Query q;
+	CString strSql;
+	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
+	strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' "), strBuilding);
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+	CString temp_parent_serialnum;
+	TV_INSERTSTRUCT tvInsert;
+	if (!q.eof())
+	{
+		while (!q.eof())//所有 设备;
+		{
+
+			tree_product m_product_temp = { 0 };
+			CString temp_ext;
+			temp_ext = q.getValuebyName(L"Screen_Name");
+			pFrame_BM->GetExtProductInfo(m_product_temp, temp_ext);
+			if (m_product_temp.m_ext_info.virtual_device == 1)
+			{
+				tvInsert.item.mask = TVIF_TEXT | TVIF_PARAM | ITEM_MASK;
+				tvInsert.item.lParam = TREE_LP_VIRTUAL_DEVICE;
+			}
+			else
+			{
+				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+				//q.nextRow();
+				//continue;
+			}
+			temp_parent_serialnum = q.getValuebyName(L"Parent_SerialNum");
+			unsigned int temp_int_serial;
+			temp_int_serial = (unsigned int)_wtoi(temp_parent_serialnum);
+			if ((!temp_parent_serialnum.IsEmpty()) && (temp_int_serial != 0))	//说明有父节点;先插入父节点
+			{
+				q.nextRow();
+				continue;
+			}
+
+			CString strProdcut = q.getValuebyName(L"Product_name");
+
+			tvInsert.hParent = hTreeDeviceList;
+
+
+			// tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strProdcut;
+			//TRACE(strProdcut);
+			tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
+			int temp_product_class_id = q.getIntField("Product_class_ID");
+			if ((temp_product_class_id != PM_MINIPANEL) && (temp_product_class_id != PM_MINIPANEL_ARM) && (temp_product_class_id != PM_ESP32_T3_SERIES))//Mini Panel)
+			{//不是T3 minipanel 系列
+				q.nextRow();
+				continue;
+			}
+			if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR)
+				TVINSERV_NET_WORK
+			else if (temp_product_class_id == PM_CM5) //CM5
+				TVINSERV_CMFIVE
+			else if (temp_product_class_id == PM_T3_LC) //CM5
+				TVINSERV_T3LC
+			else if (temp_product_class_id == PM_T3PT10 ||
+				temp_product_class_id == PM_T3IOA ||
+				temp_product_class_id == PM_T332AI ||
+				temp_product_class_id == PM_T38AI16O ||
+				temp_product_class_id == PM_T38I13O ||
+				temp_product_class_id == PM_T34AO ||
+				temp_product_class_id == PM_T36CT) //T3
+				TVINSERV_NET_WORK
+			else if (
+				temp_product_class_id == PM_T322AI ||
+				temp_product_class_id == PM_T3PT12 ||
+				temp_product_class_id == PM_T36CTA ||
+				temp_product_class_id == PM_T3_LC ||
+				temp_product_class_id == PM_T38AI8AO6DO
+				)
+				TVINSERV_T3ARM
+			else if (temp_product_class_id == PM_MINIPANEL || temp_product_class_id == PM_MINIPANEL_ARM || temp_product_class_id == PM_ESP32_T3_SERIES)//Mini Panel
+			{
+				if (m_product_temp.m_ext_info.virtual_device == 1)
+				{
+					if (m_product_temp.m_ext_info.mini_type == MINIPANELARM)
+						TVINSERV_MINIPANEL
+					else if (m_product_temp.m_ext_info.mini_type == MINIPANELARM_LB)
+						TVINSERV_T3ARM
+					else if (m_product_temp.m_ext_info.mini_type == MINIPANELARM_TB)
+						TVINSERV_T3ARM
+					else if (m_product_temp.m_ext_info.mini_type == MINIPANELARM_NB)
+						TVINSERV_T3_NANO
+					else if(m_product_temp.m_ext_info.mini_type == T3_TSTAT10)
+						TVINSERV_TSTAT8
+				}
+				else
+					TVINSERV_MINIPANEL
+			}
+			else if (temp_product_class_id == PM_AirQuality)//AirQuality
+				TVINSERV_TSTAT_DEFAULT
+			else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
+				TVINSERV_LC          //tree0412
+			else if (temp_product_class_id == PM_TSTAT7 || temp_product_class_id == PM_TSTAT7_ARM)//TSTAT7 &TSTAT6 //tree0412
+				TVINSERV_LED_TSTAT7 //tree0412
+			else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
+				TVINSERV_TSTAT6
+			else if (temp_product_class_id == PM_TSTAT10 ||
+				temp_product_class_id == PM_TSTAT8 ||
+				temp_product_class_id == PM_TSTAT9 ||
+				temp_product_class_id == PM_TSTAT8_WIFI ||
+				temp_product_class_id == PM_TSTAT8_OCC ||
+				temp_product_class_id == PM_TSTAT_AQ ||
+				temp_product_class_id == PM_AIRLAB_ESP32 ||
+				temp_product_class_id == PM_TSTAT8_220V)
+				TVINSERV_TSTAT8
+			else if (temp_product_class_id == PM_MULTI_SENSOR)
+				TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
+			else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
+				TVINSERV_T3_NANO
+			else if ((temp_product_class_id == PM_CO2_NET) ||
+				(temp_product_class_id == PM_CO2_RS485) ||
+				(temp_product_class_id == PM_PRESSURE_SENSOR) ||
+				(temp_product_class_id == STM32_PRESSURE_NET) ||
+				(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+				(temp_product_class_id == STM32_CO2_NET) ||
+				(temp_product_class_id == STM32_PM25) ||
+				(temp_product_class_id == STM32_CO2_RS485) ||
+				(temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28 修复 HUM 使用默认TSTAT图标的bug
+				(temp_product_class_id == STM32_HUM_RS485))
+				TVINSERV_CO2
+			else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
+				TVINSERV_CS3000
+			else if (temp_product_class_id == PM_PM5E || temp_product_class_id == PM_PM5E_ARM)
+				TVINSERV_PM5E
+			else if (temp_product_class_id == PM_THIRD_PARTY_DEVICE)
+				TVINSERV_THIRD_PARTY
+			else if (temp_product_class_id == PM_AFS)
+				TVINSERV_SMALL_CASE
+			else if (temp_product_class_id == PWM_TEMPERATURE_TRANSDUCER)
+				TVINSERV_SMALL_CASE
+			else if (temp_product_class_id == STM32_CO2_NODE)
+				TVINSERV_CO2_NODE
+			else
+				TVINSERV_TSTAT_DEFAULT
+
+				HTREEITEM hProductItem = pFrame_BM->m_pTreeViewCrl->InsertItem(&tvInsert);
+
+
+			m_product_temp.product_item = hProductItem;
+
+			HTREEITEM hParent = pFrame_BM->m_pTreeViewCrl->GetParentItem(hProductItem);
+			if (hParent != NULL)
+			{
+				pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
+			}
+
+
+
+			strSql = q.getValuebyName(L"Serial_ID");
+			unsigned int correct_id = (DWORD)(_wtoi64(strSql));
+			m_product_temp.serial_number = correct_id;
+
+			if (hParent != NULL)
+			{
+				CString temp_cs_serial;
+				temp_cs_serial.Format(_T("%u"), m_product_temp.serial_number);
+				//如果父节点 是要求折叠的 就不要展开;
+				m_product_temp.expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //默认是都展开的;
+				if (m_product_temp.expand != 2)
+					pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
+				else
+					pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_COLLAPSE); //2就折叠
+			}
+
+
+
+			strSql = q.getValuebyName(L"Product_ID");
+			m_product_temp.product_id = _wtoi(strSql);
+
+
+			strSql = q.getValuebyName(L"NetworkCard_Address");
+			m_product_temp.NetworkCard_Address = strSql;
+
+			strSql = q.getValuebyName(L"Product_class_ID");
+			m_product_temp.product_class_id = _wtoi(strSql);
+
+			strSql = q.getValuebyName(L"Hardware_Ver");
+			m_product_temp.hardware_version = (float)_wtof(strSql);
+
+
+			strSql = q.getValuebyName(L"Software_Ver");
+			m_product_temp.software_version = (float)_wtof(strSql);
+
+
+			strSql = q.getValuebyName(L"EPsize");
+			m_product_temp.nhardware_info = (int)_wtol(strSql);
+
+
+			strSql = q.getValuebyName(L"Protocol");
+			m_product_temp.protocol = (int)_wtoi(strSql);
+
+
+			strSql = q.getValuebyName(L"Bautrate");
+			if (_wtoi(strSql) != 0)
+				m_product_temp.baudrate = _wtoi(strSql);
+			else
+				m_product_temp.baudrate = 19200;
+			if (m_product_temp.protocol == PROTOCOL_BACNET_IP)
+			{
+				char cTemp1[255];
+				memset(cTemp1, 0, 255);
+				WideCharToMultiByte(CP_ACP, 0, strSql.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+				DWORD dwIP = inet_addr(cTemp1);
+
+				m_product_temp.baudrate = dwIP;//_wtoi(strTemp);
+			}
+			else
+				m_product_temp.baudrate = _wtoi(strSql);
+			if (m_product_temp.product_class_id == PM_NC)
+			{
+				m_product_temp.baudrate = 19200;
+			}
+			////
+			int is_online = q.getIntField("Online_Status");//
+			if (is_online == 1)
+			{
+				m_product_temp.status = is_online;
+				m_product_temp.status_last_time[4] = m_product_temp.status;
+			}
+			else
+			{
+				m_product_temp.status = false;
+				m_product_temp.status_last_time[4] = false;
+			}
+			m_product_temp.status_last_time[0] = false;
+			m_product_temp.status_last_time[1] = false;
+			m_product_temp.status_last_time[2] = false;
+			m_product_temp.status_last_time[3] = false;
+
+
+			m_product_temp.Custom = q.getValuebyName(L"Custom");
+
+
+			m_product_temp.NameShowOnTree = q.getValuebyName(L"Product_name");
+
+
+
+
+			m_product_temp.BuildingInfo = pFrame_BM->m_subNetLst.at(pFrame_BM->m_nCurSubBuildingIndex);
+			//20120423
+			if (((strSql.CompareNoCase(_T("19200")) == 0)) ||
+				(strSql.CompareNoCase(_T("9600")) == 0) ||
+				(strSql.CompareNoCase(_T("38400")) == 0) ||
+				(strSql.CompareNoCase(_T("57600")) == 0) ||
+				(strSql.CompareNoCase(_T("115200")) == 0))
+			{
+				m_product_temp.BuildingInfo.strIp.Empty();
+				m_product_temp.BuildingInfo.strBaudRate = strSql;
+			}
+			else
+			{
+				m_product_temp.BuildingInfo.strIp = strSql;
+			}
+
+			m_product_temp.ncomport = q.getIntField("Com_Port");//
+
+			//m_product_temp.BuildingInfo.strIpPort = _T("10000");
+			m_product_temp.BuildingInfo.strIpPort.Format(_T("%d"), m_product_temp.ncomport);
+
+			m_product_temp.strImgPathName = q.getValuebyName(L"Background_imgID");
+
+			//CStringArray temp_array_2;
+			//SplitCStringA(temp_array_2, temp_ext, _T("^"));
+			//if (temp_array_2.GetSize() == 0)
+			//{
+			//    m_product_temp.m_ext_info.virtual_device = 0;
+			//}
+			//else
+			//{
+			//    m_product_temp.m_ext_info.virtual_device = _wtoi(temp_array_2.GetAt(0).GetString());
+			//}
+
+			m_product_temp.note_parent_serial_number = q.getIntField("Parent_SerialNum");
+
+			m_product_temp.panel_number = q.getIntField("Panal_Number");
+
+
+			m_product_temp.object_instance = q.getIntField("Object_Instance");
+
+
+
+			pFrame_BM->m_product.push_back(m_product_temp);
+			device_io_status temp_device_io_status;
+			GetDeviceCountTable(m_product_temp.serial_number, BAC_READ_ALL_LIST, temp_device_io_status);
+
+			for (int x = 0; x < 9; x++) //TREE_MAX_TYPE
+			{
+				CString temp_cs;
+				m_product_temp.sub_io_info[x].h_item_type = x;
+				m_product_temp.sub_io_info[x].capacity = temp_device_io_status.device_capacity[x];
+				m_product_temp.sub_io_info[x].already_use = temp_device_io_status.device_use[x];
+				switch (x)
+				{
+					case TREE_OUT:
+					{
+						if (temp_device_io_status.device_capacity[x] == 0)
+							temp_cs = _T("Output( ?/? )");
+						else
+							temp_cs.Format(_T("Output( %d/%d )"), temp_device_io_status.device_use[x], temp_device_io_status.device_capacity[x]);
+						tvInsert.item.iImage = TREE_IMAGE_OUTPUT_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_OUTPUT_ONLINE;
+					}
+					break;
+					case TREE_IN:
+					{
+						if (temp_device_io_status.device_capacity[x] == 0)
+							temp_cs = _T("Input( ?/? )");
+						else
+							temp_cs.Format(_T("Input( %d/%d )"), temp_device_io_status.device_use[x], temp_device_io_status.device_capacity[x]);
+						tvInsert.item.iImage = TREE_IMAGE_INPUT_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_INPUT_ONLINE;
+					}
+					break;
+					case TREE_VAR:
+					{
+						if (temp_device_io_status.device_capacity[x] == 0)
+							temp_cs = _T("Variable( ?/? )");
+						else
+							temp_cs.Format(_T("Variable( %d/%d )"), temp_device_io_status.device_use[x], temp_device_io_status.device_capacity[x]);
+						tvInsert.item.iImage = TREE_IMAGE_VARIABLE_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_VARIABLE_ONLINE;
+					}
+						break;
+					case TREE_PID:
+					{
+						if (temp_device_io_status.device_capacity[x] == 0)
+							temp_cs = _T("Pid( ?/? )");
+						else
+							temp_cs.Format(_T("Pid( %d/%d )"), temp_device_io_status.device_use[x], temp_device_io_status.device_capacity[x]);
+						tvInsert.item.iImage = TREE_IMAGE_PID_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_PID_ONLINE;
+					}
+						break;
+					case TREE_SCH:
+					{
+						if (temp_device_io_status.device_capacity[x] == 0)
+							temp_cs = _T("Schedule( ?/? )");
+						else
+							temp_cs.Format(_T("Schedule( %d/%d )"), temp_device_io_status.device_use[x], temp_device_io_status.device_capacity[x]);
+						tvInsert.item.iImage = TREE_IMAGE_SCH_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_SCH_ONLINE;
+					}
+					break;
+					case TREE_HOL:
+					{
+						if (temp_device_io_status.device_capacity[x] == 0)
+							temp_cs = _T("Holiday( ?/? )");
+						else
+							temp_cs.Format(_T("Holiday( %d/%d )"), temp_device_io_status.device_use[x], temp_device_io_status.device_capacity[x]);
+						tvInsert.item.iImage = TREE_IMAGE_HOLIDAY_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_HOLIDAY_ONLINE;
+					}
+					break;
+					case TREE_PRG:
+					{
+						if (temp_device_io_status.device_capacity[x] == 0)
+							temp_cs = _T("Program( ?/? )");
+						else
+							temp_cs.Format(_T("Program( %d/%d )"), temp_device_io_status.device_use[x], temp_device_io_status.device_capacity[x]);
+						tvInsert.item.iImage = TREE_IMAGE_PROGRAM_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_PROGRAM_ONLINE;
+					}
+					break;
+					case TREE_SCREEN:
+					{
+						if (temp_device_io_status.device_capacity[x] == 0)
+							temp_cs = _T("Graphic( ?/? )");
+						else
+							temp_cs.Format(_T("Graphic( %d/%d )"), temp_device_io_status.device_use[x], temp_device_io_status.device_capacity[x]);
+						tvInsert.item.iImage = TREE_IMAGE_SCREEN_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_SCREEN_ONLINE;
+					}
+					break;
+					case TREE_TRENDLOG:
+					{
+						if (temp_device_io_status.device_capacity[x] == 0)
+							temp_cs = _T("Trendlog( ?/? )");
+						else
+							temp_cs.Format(_T("Trendlog( %d/%d )"), temp_device_io_status.device_use[x], temp_device_io_status.device_capacity[x]);
+						tvInsert.item.iImage = TREE_IMAGE_TRENDLOG_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_TRENDLOG_ONLINE;
+					}
+					break;
+				default:
+					break;
+				}
+				tvInsert.hParent = hProductItem;
+				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+				tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_cs;
+				tvInsert.hInsertAfter = TVI_LAST;// TVI_LAST; // 项目插入方式
+				HTREEITEM hsubItem = pFrame_BM->m_pTreeViewCrl->InsertItem(&tvInsert);
+				m_product_temp.sub_io_info[x].h_tree_item = hsubItem;
+				m_product_temp.sub_io_info[x].h_parent_item = hProductItem;
+			}
+#if 0
+			for (int j = 0; j < 3; j++)
+			{
+				CString temp_cs;
+				if (j == 0)
+				{
+					if (temp_device_io_status.device_capacity.cinputs == 0)
+						temp_cs = _T("INPUT( ?/? )");
+					else
+						temp_cs.Format(_T("INPUT( %d/%d )"), temp_device_io_status.device_use.cinputs, temp_device_io_status.device_capacity.cinputs);
+					tvInsert.hParent = hProductItem;
+					tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+					tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_cs;
+					tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
+					tvInsert.item.iImage = TREE_IMAGE_INPUT_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_INPUT_ONLINE;
+				}
+				else if (j == 1)
+				{
+					if(temp_device_io_status.device_capacity.coutputs == 0)
+						temp_cs = _T("OUTPUT( ?/? )");
+					else
+						temp_cs.Format(_T("OUTPUT( %d/%d )"), temp_device_io_status.device_use.coutputs, temp_device_io_status.device_capacity.coutputs);
+					tvInsert.hParent = hProductItem;
+					tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+					tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_cs;
+					tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
+					tvInsert.item.iImage = TREE_IMAGE_OUTPUT_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_OUTPUT_ONLINE;
+				}
+				else if (j == 2)
+				{
+					if(temp_device_io_status.device_capacity.cvariables == 0)
+						temp_cs = _T("VARIABLE( ?/? )");
+					else
+						temp_cs.Format(_T("VARIABLE( %d/%d )"), temp_device_io_status.device_use.cvariables, temp_device_io_status.device_capacity.cvariables);
+					tvInsert.hParent = hProductItem;
+					tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+					tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_cs;
+					tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
+					tvInsert.item.iImage = TREE_IMAGE_VARIABLE_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_VARIABLE_ONLINE;
+				}
+				HTREEITEM hsubItem = pFrame_BM->m_pTreeViewCrl->InsertItem(&tvInsert);
+
+			}
+#endif
+
+			CString temp_cs_serial;
+			temp_cs_serial.Format(_T("%u"), m_product_temp.serial_number);
+			//如果父节点 是要求折叠的 就不要展开;
+			m_product_temp.expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //默认是都展开的;
+			if (m_product_temp.expand != 2)
+				pFrame_BM->m_pTreeViewCrl->Expand(hProductItem, TVE_EXPAND);
+			else
+				pFrame_BM->m_pTreeViewCrl->Expand(hProductItem, TVE_COLLAPSE); //2就折叠
+
+
+			q.nextRow();
+
+		}
+	}
+
+
+	strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s'  and  Parent_SerialNum <> '0' and Parent_SerialNum <> '' "), strBuilding);
+	q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
+
+	if (!q.eof())//就说明这个节点下面有 挂在父节点下面的;
+	{
+		while (!q.eof())
+		{
+			_variant_t temp_variant_parent;
+			CString cs_parents_serial_number;
+			unsigned int uint_p_serial_number;
+			cs_parents_serial_number = q.getValuebyName(L"Parent_SerialNum");
+
+			uint_p_serial_number = _wtoi(cs_parents_serial_number);
+			bool find_parents = false;
+			HTREEITEM parents_item;
+			for (int z = 0; z < pFrame_BM->m_product.size(); z++)
+			{
+				if (uint_p_serial_number == pFrame_BM->m_product.at(z).serial_number)
+				{
+					find_parents = true;
+					parents_item = pFrame_BM->m_product.at(z).product_item;
+					break;
+				}
+			}
+			tree_product m_product_temp = { 0 };
+			CString temp_ext;
+			temp_ext = q.getValuebyName(L"Screen_Name");
+			pFrame_BM->GetExtProductInfo(m_product_temp, temp_ext);
+			//if (b_building_management_flag == SYS_VIRTUAL_MODE)
+			//{
+			//    if (m_product_temp.m_ext_info.virtual_device == 0)
+			//    {
+			//        q.nextRow();
+			//        continue;
+			//    }
+			//}
+
+			if (find_parents)
+			{
+				CString strProdcut = q.getValuebyName(L"Product_name");
+				tvInsert.hParent = parents_item; // 指定父句柄
+				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+				tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strProdcut;
+				//TRACE(strProdcut);
+				tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
+
+
+				int temp_product_class_id = q.getIntField("Product_class_ID");
+				if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR)
+					TVINSERV_NET_WORK
+				else if (temp_product_class_id == PM_PM5E || temp_product_class_id == PM_PM5E_ARM)
+					TVINSERV_PM5E
+				else if (temp_product_class_id == PM_CM5) //CM5
+					TVINSERV_CMFIVE
+				else if (temp_product_class_id == PM_T3_LC) //CM5
+					TVINSERV_T3LC
+				else if (temp_product_class_id == PM_T3PT10 ||
+					temp_product_class_id == PM_T3IOA ||
+					temp_product_class_id == PM_T332AI ||
+					temp_product_class_id == PM_T38AI16O ||
+					temp_product_class_id == PM_T38I13O ||
+					temp_product_class_id == PM_T34AO ||
+					temp_product_class_id == PM_T36CT) //T3
+					TVINSERV_NET_WORK
+				else if (
+					temp_product_class_id == PM_T322AI ||
+					temp_product_class_id == PM_T3PT12 ||
+					temp_product_class_id == PM_T36CTA ||
+
+					temp_product_class_id == PM_T38AI8AO6DO)
+					TVINSERV_T3ARM
+				else if (temp_product_class_id == PM_MINIPANEL || temp_product_class_id == PM_MINIPANEL_ARM || temp_product_class_id == PM_ESP32_T3_SERIES)//Mini Panel
+					TVINSERV_MINIPANEL
+				else if (temp_product_class_id == PM_AirQuality) //AirQuality
+					TVINSERV_TSTAT_DEFAULT
+				else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
+					TVINSERV_LC          //tree0412
+				else if (temp_product_class_id == PM_TSTAT7 || temp_product_class_id == PM_TSTAT7_ARM)//TSTAT7 &TSTAT6 //tree0412
+					TVINSERV_LED_TSTAT7 //tree0412
+				else if (temp_product_class_id == PM_TSTAT6 || temp_product_class_id == PM_TSTAT5i)
+					TVINSERV_TSTAT6
+				else if (temp_product_class_id == PM_TSTAT10 ||
+					temp_product_class_id == PM_TSTAT8 ||
+					temp_product_class_id == PM_TSTAT9 ||
+					temp_product_class_id == PM_TSTAT8_WIFI ||
+					temp_product_class_id == PM_TSTAT8_OCC ||
+					temp_product_class_id == PM_TSTAT_AQ ||
+					temp_product_class_id == PM_AIRLAB_ESP32 ||
+					temp_product_class_id == PM_TSTAT8_220V)
+					TVINSERV_TSTAT8
+				else if (temp_product_class_id == PM_MULTI_SENSOR)
+					TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
+				else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
+					TVINSERV_T3_NANO
+				else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
+					(temp_product_class_id == PM_PRESSURE_SENSOR) ||
+					(temp_product_class_id == STM32_PRESSURE_NET) ||
+					(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+					(temp_product_class_id == STM32_CO2_NET) ||
+					(temp_product_class_id == STM32_PM25) ||
+					(temp_product_class_id == STM32_CO2_RS485) ||
+					(temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28 修复 HUM 使用默认TSTAT图标的bug
+					(temp_product_class_id == STM32_HUM_RS485))
+					TVINSERV_CO2
+				else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
+					TVINSERV_CS3000
+				else if (temp_product_class_id == PM_THIRD_PARTY_DEVICE)
+					TVINSERV_THIRD_PARTY
+				else if (temp_product_class_id == PM_AFS)
+					TVINSERV_SMALL_CASE
+				else if (temp_product_class_id == PWM_TEMPERATURE_TRANSDUCER)
+					TVINSERV_SMALL_CASE
+				else if (temp_product_class_id == STM32_CO2_NODE)
+					TVINSERV_CO2_NODE
+				else
+					TVINSERV_TSTAT_DEFAULT
+
+					HTREEITEM hSubItem = pFrame_BM->m_pTreeViewCrl->InsertItem(&tvInsert);
+
+				HTREEITEM hParent = pFrame_BM->m_pTreeViewCrl->GetParentItem(hSubItem);
+				//if (hParent != NULL)
+				//	m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
+
+
+
+
+
+
+				m_product_temp.product_item = hSubItem;
+
+				if (hParent != NULL)
+				{
+					CString temp_cs_serial;
+					temp_cs_serial.Format(_T("%u"), uint_p_serial_number);
+					//如果父节点 是要求折叠的 就不要展开;
+					unsigned char temp_expand = 0;
+					temp_expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //默认是都展开的;
+					if (temp_expand != 2)
+						pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
+					else
+						pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_COLLAPSE); //2就折叠
+				}
+
+				strSql = q.getValuebyName(L"Serial_ID");
+
+				long temp_serial_id = (long)(_wtoi64(strSql));
+				unsigned int correct_id = (DWORD)(_wtoi64(strSql));
+				//用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
+				//if(temp_serial_id < 0)
+				//{
+				//	CString wrong_serial_id;
+				//	wrong_serial_id = strSql;
+				//	CString correct_serial_id;
+				//	CString str_temp;
+				//	correct_serial_id.Format(_T("%u"),correct_id);
+				//	try
+				//	{
+				//		str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
+				//		SqliteDBBuilding.execDML((UTF8MBSTR)str_temp);
+				//	}
+				//	catch(_com_error *e)
+				//	{
+				//		AfxMessageBox(e->ErrorMessage());
+				//	}
+				//}
+				m_product_temp.serial_number = correct_id;
+
+
+				strSql = q.getValuebyName(_T("Product_ID"));
+				m_product_temp.product_id = _wtoi(strSql);
+
+				strSql = q.getValuebyName(_T("Custom"));
+				m_product_temp.Custom = strSql;
+
+				strSql = q.getValuebyName(_T("NetworkCard_Address"));
+				m_product_temp.NetworkCard_Address = strSql;
+
+				strSql = q.getValuebyName(L"Product_class_ID");
+				m_product_temp.product_class_id = _wtoi(strSql);
+
+				strSql = q.getValuebyName(L"Hardware_Ver");
+				m_product_temp.hardware_version = (float)_wtof(strSql);
+
+
+				strSql = q.getValuebyName(L"Software_Ver");
+				m_product_temp.software_version = (float)_wtof(strSql);
+
+
+				strSql = q.getValuebyName(L"EPsize");
+				m_product_temp.nhardware_info = (int)_wtol(strSql);
+
+
+				strSql = q.getValuebyName(L"Protocol");
+				m_product_temp.protocol = (int)_wtoi(strSql);
+
+
+				strSql = q.getValuebyName(L"Bautrate");
+				if (_wtoi(strSql) != 0)
+					m_product_temp.baudrate = _wtoi(strSql);
+				else
+					m_product_temp.baudrate = 19200;
+				if (m_product_temp.protocol == PROTOCOL_BACNET_IP)
+				{
+					char cTemp1[255];
+					memset(cTemp1, 0, 255);
+					WideCharToMultiByte(CP_ACP, 0, strSql.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+					DWORD dwIP = inet_addr(cTemp1);
+
+					m_product_temp.baudrate = dwIP;//_wtoi(strTemp);
+				}
+				else
+					m_product_temp.baudrate = _wtoi(strSql);
+				if (m_product_temp.product_class_id == PM_NC)
+				{
+					m_product_temp.baudrate = 19200;
+				}
+				////
+				int is_online = q.getIntField("Online_Status");//
+				if (is_online == 1)
+				{
+					m_product_temp.status = is_online;
+					m_product_temp.status_last_time[4] = m_product_temp.status;
+
+				}
+				else
+				{
+					m_product_temp.status = false;
+					m_product_temp.status_last_time[4] = false;
+
+				}
+				m_product_temp.status_last_time[0] = false;
+				m_product_temp.status_last_time[1] = false;
+				m_product_temp.status_last_time[2] = false;
+				m_product_temp.status_last_time[3] = false;
+
+
+
+				m_product_temp.NameShowOnTree = q.getValuebyName(L"Product_name");//
+
+
+
+				m_product_temp.BuildingInfo = pFrame_BM->m_subNetLst.at(pFrame_BM->m_nCurSubBuildingIndex);
+				//20120423
+				if (((strSql.CompareNoCase(_T("19200")) == 0)) || (strSql.CompareNoCase(_T("9600")) == 0) || ((strSql.CompareNoCase(_T("38400")) == 0)))
+				{
+					m_product_temp.BuildingInfo.strIp.Empty();
+					m_product_temp.BuildingInfo.strBaudRate = strSql;
+				}
+				else
+				{
+					m_product_temp.BuildingInfo.strIp = strSql;
+				}
+
+
+				m_product_temp.ncomport = q.getIntField("Com_Port");
+				m_product_temp.BuildingInfo.strIpPort = _T("10000");
+				m_product_temp.strImgPathName = q.getValuebyName(L"Background_imgID");
+
+				m_product_temp.note_parent_serial_number = q.getIntField("Parent_SerialNum");
+
+
+				m_product_temp.panel_number = q.getIntField("Panal_Number");
+
+
+				m_product_temp.object_instance = q.getIntField("Object_Instance");
+
+
+				pFrame_BM->m_product.push_back(m_product_temp);
+
+			}
+			q.nextRow();
+		}
+	}
+
 }
 
 

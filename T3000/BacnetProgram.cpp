@@ -367,7 +367,8 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).description, (int)strlen((char *)m_Program_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
-
+		temp_des = temp_des.Left(STR_PROGRAM_DESCRIPTION_LENGTH).Trim();
+		
 		m_program_list.SetItemText(i,PROGRAM_FULL_LABLE,temp_des);
 
 
@@ -408,7 +409,7 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).label, (int)strlen((char *)m_Program_data.at(i).label)+1, 
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
-
+		temp_des2 = temp_des2.Left(STR_PROGRAM_LABEL_LENGTH).Trim();
 		m_program_list.SetItemText(i,PROGRAM_LABEL,temp_des2);
 
 		if(isFreshOne)

@@ -1350,10 +1350,11 @@ void CBacnetSetting::InitialTab()
     //设定在Tab内显示的范围
     CRect rc;
     m_setting_tab.GetClientRect(rc);
-    rc.top += 25;
-    rc.bottom -= 10;
-    rc.left += 10;
-    rc.right -= 10;
+    rc.top += 21;
+    rc.bottom -= 2;
+    rc.left += 2;
+    rc.right -= 4;
+
     m_page_basic_info.MoveWindow(&rc);
     m_page_tcpip.MoveWindow(&rc);
     m_page_time.MoveWindow(&rc);

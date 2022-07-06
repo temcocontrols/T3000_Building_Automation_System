@@ -126,6 +126,15 @@ typedef struct ext_info
 	int mini_type;       //对应 Setting 界面的  mini_type
 };
 
+typedef struct tree_io_info
+{
+	HTREEITEM h_tree_item; //子节点树句柄
+	HTREEITEM h_parent_item; // 父节点的句柄
+	int h_item_type; // input or output or ......
+	int capacity;   //最大个数
+	int already_use; //已经使用;
+}tree_sub_io;
+
 typedef struct _tree_product//////////////////////
 {//for vector 
  //every product leaf of the leaf
@@ -153,6 +162,7 @@ typedef struct _tree_product//////////////////////
     UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
     UCHAR  expand; //是否树形结构展开; 1为默认展开 或者 非2 为展开       2 为折叠
 	ext_info m_ext_info;
+	tree_sub_io sub_io_info[TREE_MAX_TYPE];
 	
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 //
@@ -305,6 +315,7 @@ protected:
 	afx_msg void OnUserMannageMentUpdate(CCmdUI *pCmdUI);
 	afx_msg LRESULT OnAddTreeNode(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT  AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT HandleWriteNewDevice(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Retry_Connect_Message(WPARAM wParam, LPARAM lParam);
     afx_msg LRESULT ReConnect_Message(WPARAM wParam, LPARAM lParam);

@@ -226,6 +226,7 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 #define  MY_FRESH_TESTO_GRAPHIC      WM_USER + 2004
 #define  WM_HADNLE_DUPLICATE_ID  WM_USER + 2005
 #define  WM_HADNLE_ISP_MODE_DEVICE  WM_USER + 2006
+#define  WM_WRITE_INTO_NEW_DEVICE WM_USER + 2007
 #define  WM_LIST_MONITOR_CHANGED WM_USER+ 976
 #define  WM_LIST_MONITOR_INPUT_CHANGED WM_USER+ 977
 #define WM_SCREENEDIT_CLOSE WM_USER + 1232
@@ -1927,6 +1928,20 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 
 #define  RANGE_ERROR   -2
 
+enum sub_io_type
+{
+	TREE_OUT = 0,
+	TREE_IN = 1,
+	TREE_VAR = 2,
+	TREE_PID = 3,
+	TREE_SCH = 4,
+	TREE_HOL = 5,
+	TREE_PRG = 6,
+	TREE_SCREEN = 7,
+	TREE_TRENDLOG = 8,
+	TREE_ALARM = 9,
+	TREE_MAX_TYPE = 10
+};
 
 
 #define BAC_OUT 		 0
@@ -2342,9 +2357,7 @@ typedef struct
 }connect_Info;
 #pragma endregion
 
-//#define SPECIAL_BAC_TO_MODBUS   ((g_protocol == MODBUS_BACNET_MSTP)|| (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))
 
-//|| (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) 杜帆去掉  网络转485 协议不用
 #define SPECIAL_BAC_TO_MODBUS   ((g_protocol == MODBUS_BACNET_MSTP)|| (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || (MODE_SUPPORT_PTRANSFER == 1))
 
 #define CHELSEA_TEST  0
@@ -2453,7 +2466,7 @@ const CString Output_Type_String[] =
     _T("Digital"),       //1
     _T("Analog"),
     _T("Extend Digital"),
-    _T("Extend Ananlog"),
+    _T("Extend Analog"),
     _T("Internal")
 };
 
@@ -2502,12 +2515,6 @@ typedef struct RoomInfo
 #define SENSOR_BIT_AI_PT12       11
 #define SENSOR_BIT_FAR_INFRA_RED 12
 
-//#define TYPE_BM_POINT_LIST  255
-//#define TYPE_BM_GROUP       0
-//#define TYPE_BM_NODES       1
-//#define TYPE_BM_INPUT       2
-//#define TYPE_BM_OUTPUT      3
-//#define TYPE_BM_VARIABLE    4
 
 
 typedef  struct
@@ -2728,6 +2735,12 @@ typedef struct BM_Node
 
 typedef  struct
 {
+	CString online_name;
+	int nserialnumber;
+}Str_online_serialnumber;
+
+typedef  struct
+{
 	int pid;
 	int sub_pid;
 	int ai_count;
@@ -2738,6 +2751,27 @@ typedef  struct
 	int output_count;
 	CString cs_name;
 } Str_product_io_count;
+
+typedef struct
+{
+	int nserialnumber;
+	int objectinstance;
+	UINT device_capacity[TREE_MAX_TYPE];
+	UINT device_use[TREE_MAX_TYPE];
+}device_io_status;
+
+enum {
+	TREE_LP_VIRTUAL_DEVICE = 1000,
+	TREE_LP_MAX_DEFINE
+};
+
+
+enum
+{
+	TREE_IO_OFFLINE = 0,
+	TREE_IO_ONLINE,
+	TREE_IO_UNKNOWN,
+};
 
 
 

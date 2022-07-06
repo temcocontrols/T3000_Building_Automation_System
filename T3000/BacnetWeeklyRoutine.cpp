@@ -529,6 +529,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Weekly_data.at(i).description, (int)strlen((char *)m_Weekly_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
+		temp_des = temp_des.Left(STR_WEEKLY_DESCRIPTION_LENGTH).Trim();
 		m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_FULL_LABLE,temp_des);
 		if(m_Weekly_data.at(i).auto_manual==0)
 		{
@@ -567,6 +568,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Weekly_data.at(i).label, (int)strlen((char *)m_Weekly_data.at(i).label)+1, 
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
+		temp_des2 = temp_des2.Left(STR_WEEKLY_LABEL_LENGTH).Trim();
 		m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_LABEL,temp_des2);
 
 
