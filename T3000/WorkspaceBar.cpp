@@ -47,14 +47,36 @@ BEGIN_MESSAGE_MAP(CWorkspaceBar, CDockablePane)
 
 	//ON_NOTIFY(TVN_SELCHANGED,ID_SHELLTREE,OnKYDOWNClickTree)
 	ON_WM_NCHITTEST()
+
+
 	ON_WM_LBUTTONDOWN()
+	ON_WM_MOUSEMOVE()
 //	ON_WM_RBUTTONDOWN()
 //ON_WM_CONTEXTMENU()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CWorkspaceBar construction/destruction
+void CWorkspaceBar::OnMouseMove(UINT nFlags, CPoint point)
+{
+	//CRect rt;
+	//GetDlgItem(IDC_EXPAND)->GetWindowRect(&rt);
+	//CPoint pt;
+	//pt = point;
+	//ClientToScreen(&pt);
 
+	//if (pt.x >= rt.left - 5 && pt.x <= rt.right + 5 && pt.y >= rt.top - 5 && pt.y <= rt.bottom + 5)
+	//{
+	//	GetDlgItem(IDC_EXPAND)->ModifyStyle(0, SS_SUNKEN);
+	//}
+	//else
+	//{
+	//	// 		preStyle &= ~SS_ETCHEDFRAME;
+	//	// 		GetDlgItem(IDC_EXPAND)->ModifyStyle(0,preStyle);	
+	//}
+
+	CWorkspaceBar::OnMouseMove(nFlags, point);
+}
 CWorkspaceBar::CWorkspaceBar()
 {
 	// 
@@ -364,9 +386,12 @@ int CWorkspaceBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	CRect rectDummy (0, 0,200, 600);
-	const DWORD dwViewStyle =	WS_VISIBLE | WS_TABSTOP | WS_CHILD | WS_BORDER
-   | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_HASLINES
-   | TVS_DISABLEDRAGDROP | TVS_EDITLABELS;
+	//const DWORD dwViewStyle =	WS_VISIBLE | WS_TABSTOP | WS_CHILD | WS_BORDER
+ //  | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_HASLINES
+ //  | TVS_DISABLEDRAGDROP | TVS_EDITLABELS;
+
+	const DWORD dwViewStyle = WS_VISIBLE | WS_TABSTOP | WS_CHILD | WS_BORDER
+		| TVS_HASBUTTONS | TVS_LINESATROOT | TVS_HASLINES | TVS_EDITLABELS;
 
 
    m_TreeCtrl.Create(dwViewStyle,CRect(10, 10, 300, 100), this,ID_SHELLTREE);

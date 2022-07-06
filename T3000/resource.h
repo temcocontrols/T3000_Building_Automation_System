@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 脡煤鲁脡碌脛掳眉潞卢脦脛录镁隆拢
-// 鹿漏 T3000.rc 脢鹿脫脙
+// Microsoft Visual C++ 生成的包含文件。
+// 供 T3000.rc 使用
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -47,6 +47,7 @@
 #define ID_VIEW_APPLOOK_OFF_2007_SILVER 217
 #define ID_VIEW_APPLOOK_OFF_2007_AQUA   218
 #define IDS_EDIT_MENU                   306
+#define ID_TAB_CTRL                     309
 #define IDR_MYTOOLBAR                   310
 #define ID_SHELLTREE                    311
 #define ID_VIEW_WORKSPACE               312

@@ -75,6 +75,7 @@ typedef std::map<UINT, method>				cmdmap_t;
 keymap_t	m_Keymap;
 cmdmap_t	m_Commandmap;
 public:
+	int GetOnlineDevice();
 BOOL UpdateDataToDB_Floor();
 BOOL UpdateDataToDB_Connect();
 //void Inial_ProductName_map();
@@ -156,6 +157,36 @@ public:
 
     afx_msg BOOL OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 
+	afx_msg void OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult);
+	CString strmyTipText;
+
+	private:
+		CImageList	m_ImageList;		//节点图标
+		CImageList* m_pDragImage;		//拖动是的图像列表
+		DWORD		m_dwDrawStart;		//开始拖动时刻
+		HTREEITEM	m_hDragSrc;			//被拖动节点
+		HTREEITEM	m_hDragDist;		//接收拖动的节点
+		bool		m_bDraged;			//拖动标识符
+		UINT		m_nMsMoveTimerID;	//检测鼠标移动的定时器
+		UINT		m_nScrollTimerID;	//滚动检测定时器
+		UINT		m_nTicks;			//计算滚动历时
+		CPoint		m_ptMouseMove;		//鼠标位置
+
+		afx_msg void OnBegindrag(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+		afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+		afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+		LRESULT OnRetriveCheckState(WPARAM sParam, LPARAM lParam);
+
+		int DragBranch(HTREEITEM horgitem, HTREEITEM hdesitem);
+		HTREEITEM CopyBranch(HTREEITEM hChildBruch, HTREEITEM hNewParent, HTREEITEM hInsertAfter);
+		HTREEITEM CopyItem(HTREEITEM hItem, HTREEITEM hParent, HTREEITEM hInsertAfter);
+
+		public:
+			afx_msg BOOL OnNMClick(NMHDR* pNMHDR, LRESULT* pResult);
+			//afx_msg void OnTvnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult);
+			afx_msg void OnTvnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult);
+
 };
 
 #define TVINSERV_SMALL_CASE        {tvInsert.item.iImage=35;tvInsert.item.iSelectedImage=35;}//Air flow
@@ -172,4 +203,22 @@ public:
 #define TREE_IMAGE_VARIABLE_OFFLINE  44
 #define TREE_IMAGE_VARIABLE_UNKNOWN  45
 
+#define TREE_IMAGE_PROGRAM_ONLINE		46
+#define TREE_IMAGE_PROGRAM_OFFLINE		47
+#define TREE_IMAGE_PROGRAM_UNKNOWN		48
+#define TREE_IMAGE_PID_ONLINE			49
+#define TREE_IMAGE_PID_OFFLINE			50
+#define TREE_IMAGE_PID_UNKNOWN			51
+#define TREE_IMAGE_SCREEN_ONLINE		52
+#define TREE_IMAGE_SCREEN_OFFLINE		53
+#define TREE_IMAGE_SCREEN_UNKNOWN		54
+#define TREE_IMAGE_SCH_ONLINE		55
+#define TREE_IMAGE_SCH_OFFLINE		56
+#define TREE_IMAGE_SCH_UNKNOWN		57
+#define TREE_IMAGE_HOLIDAY_ONLINE		58
+#define TREE_IMAGE_HOLIDAY_OFFLINE		59
+#define TREE_IMAGE_HOLIDAY_UNKNOWN		60
+#define TREE_IMAGE_TRENDLOG_ONLINE		61
+#define TREE_IMAGE_TRENDLOG_OFFLINE		62
+#define TREE_IMAGE_TRENDLOG_UNKNOWN		63
 

@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 脰脨脦脛(录貌脤氓拢卢脰脨鹿煤) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -1122,8 +1122,6 @@ BEGIN
                     "{6262D3A0-531B-11CF-91F6-C2863C385E30}",WS_TABSTOP,7,7,763,260
     EDITTEXT        IDC_EDIT1,776,57,10,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
 END
-
-
 
 IDD_DIALOG_BACNET_SCREENS DIALOGEX 0, 0, 475, 359
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
@@ -3462,14 +3460,6 @@ BEGIN
         BOTTOMMARGIN, 267
     END
 
-    IDD_REGISTER_VIEWER, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 458
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 400
-    END
-
     IDD_DIALOG_BACNET_SCREENS, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -4575,7 +4565,7 @@ END
 
 IDD_REGISTER_VIEWER DLGINIT
 BEGIN
-    IDC_INPUT_MSFLEXGRID, 0x37a, 322, 0
+    IDC_MSFLEXGRID2, 0x37a, 322, 0
 0x0024, 0x0000, 0x0037, 0x0032, 0x0045, 0x0036, 0x0037, 0x0031, 0x0032, 
 0x0030, 0x002d, 0x0035, 0x0039, 0x0035, 0x0039, 0x002d, 0x0031, 0x0031, 
 0x0063, 0x0066, 0x002d, 0x0039, 0x0031, 0x0046, 0x0036, 0x002d, 0x0043, 
@@ -7182,12 +7172,12 @@ BEGIN
     ID_TOOLS_MODBUSTOBACNETROUTER "Subnet Devices"
 END
 
-#endif    // 脰脨脦脛(录貌脤氓拢卢脰脨鹿煤) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 脫垄脫茂(脙脌鹿煤) resources
+// 英语(美国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -11704,12 +11694,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // 脫垄脫茂(脙脌鹿煤) resources
+#endif    // 英语(美国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 脫垄脫茂(脫垄鹿煤) resources
+// 英语(英国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -11815,7 +11805,7 @@ BEGIN
     0
 END
 
-#endif    // 脫垄脫茂(脫垄鹿煤) resources
+#endif    // 英语(英国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -439,13 +439,13 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).description, (int)strlen((char *)m_screen_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
-
+		temp_des = temp_des.Left(STR_SCREEN_DESCRIPTION_LENGTH).Trim();
 		m_screen_list.SetItemText(i,SCREEN_DESCRIPTION,temp_des);
 
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).label, (int)strlen((char *)m_screen_data.at(i).label)+1, 
 			temp_label.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_label.ReleaseBuffer();
-
+		temp_label = temp_label.Left(STR_SCREEN_LABLE_LENGTH).Trim();
 		m_screen_list.SetItemText(i,SCREEN_LABEL,temp_label);
 
 
@@ -1460,7 +1460,15 @@ void BacnetScreen::OnBnClickedWebViewShow()
 		/*GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
 		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
 		ApplicationFolder.ReleaseBuffer();*/
-		webviewFolder = SOLUTION_DIR  _T("T3000\\webview\\webview.html");
+		CString Resource_folder;
+		CString ApplicationFolder;
+		GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+		ApplicationFolder.ReleaseBuffer();
+		Resource_folder = ApplicationFolder + _T("\\ResourceFile");
+		webviewFolder = Resource_folder + _T("\\webview\\webview.html");
+
+		//webviewFolder = SOLUTION_DIR  _T("T3000\\webview\\webview.html");
 		//CString sFilePath = dlg.GetPathName();
 		wstring fullpath = webviewFolder;
 		auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath));

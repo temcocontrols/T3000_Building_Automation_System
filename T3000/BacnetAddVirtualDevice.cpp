@@ -41,10 +41,10 @@ END_MESSAGE_MAP()
 BOOL CBacnetAddVirtualDevice::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-#ifdef LOCAL_DB_FUNCTION
-	init_product_list();
-#endif
-	product_list();
+//#ifdef LOCAL_DB_FUNCTION
+//	init_product_list();
+//#endif
+
 	HICON temp_icon_ok = AfxGetApp()->LoadIconW(IDI_ICON_OK);
 	HICON temp_icon_cancel = AfxGetApp()->LoadIconW(IDI_ICON_EXIT);
 
