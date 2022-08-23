@@ -6,9 +6,10 @@
 #include "CBacnetBuildingIOPoints.h"
 #include "afxdialogex.h"
 #include "MainFrm.h"
-
+#include "BacnetRange.h"
 // CBacnetBuildingIOPoints 对话框
-
+extern CString cs_bm_ini;
+extern int initial_dialog;
 IMPLEMENT_DYNAMIC(CBacnetBuildingIOPoints, CDialogEx)
 
 CBacnetBuildingIOPoints::CBacnetBuildingIOPoints(CWnd* pParent /*=nullptr*/)
@@ -31,6 +32,7 @@ void CBacnetBuildingIOPoints::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CBacnetBuildingIOPoints, CDialogEx)
 	ON_MESSAGE(WM_REFRESH_BAC_BUILDING_IO_LIST, Fresh_Building_IO_List)
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,         Change_Building_IO_Item)
+	ON_NOTIFY(NM_CLICK, IDC_LIST_BM_IO_POINTS, &CBacnetBuildingIOPoints::OnNMClickListBmIoPoints)
 END_MESSAGE_MAP()
 
 HWND h_db_io_hwnd;
@@ -53,14 +55,24 @@ void CBacnetBuildingIOPoints::Initial_List()
 	//m_io_list.SetExtendedStyle(m_io_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_io_list.SetExtendedStyle(m_io_list.GetExtendedStyle() | LVS_EX_GRIDLINES & (~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_io_list.InsertColumn(BM_IO_ITEM, _T("Num"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
-	m_io_list.InsertColumn(BM_IO_GROUP_NAME, _T("Group"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
-	m_io_list.InsertColumn(BM_IO_CATEGORY_NAME, _T("Category"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_io_list.InsertColumn(BM_IO_HW_POINT, _T("Items"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_io_list.InsertColumn(BM_IO_POINT, _T("Points"), 100, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_io_list.InsertColumn(BM_IO_TYPE, _T("Type"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_io_list.InsertColumn(BM_ID_PRODUCT, _T("Related Products"), 180, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_io_list.InsertColumn(BM_IO_GROUP_NAME, _T("Group"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_io_list.InsertColumn(BM_IO_CATEGORY_NAME, _T("Category"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_io_list.InsertColumn(BM_IO_HW_POINT, _T("Items"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_io_list.InsertColumn(BM_IO_POINT, _T("Points"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_io_list.InsertColumn(BM_IO_PANEL, _T("Panel"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_io_list.InsertColumn(BM_IO_FULLLABEL, _T("FullLabel"), 90, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_io_list.InsertColumn(BM_AUTO_MANUAL, _T("A/M"), 90, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_io_list.InsertColumn(BM_IO_VALUE, _T("Value"), 70, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_io_list.InsertColumn(BM_IO_UNITS, _T("Units"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_io_list.InsertColumn(BM_IO_RANGE, _T("Range"), 90, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_io_list.InsertColumn(BM_IO_LABEL, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+
+
+	//m_io_list.InsertColumn(BM_ID_PRODUCT, _T("Related Products"), 180, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	
-	m_io_list.InsertColumn(BM_IO_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+
+
+	//m_io_list.InsertColumn(BM_IO_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_pragram_dlg_hwnd = this->m_hWnd;
 	//g_hwnd_now = m_pragram_dlg_hwnd;
 	m_io_list.SetListHwnd(this->m_hWnd);
@@ -152,6 +164,55 @@ LRESULT CBacnetBuildingIOPoints::Fresh_Building_IO_List(WPARAM wParam, LPARAM lP
 								temp_point.Format(_T("%d%s%d"), temp_bm_io.nproperty.ins_str.device_instance, temp_type.GetBuffer(), temp_bm_io.nproperty.ins_str.object_number);
 							}
 							temp_bm_io.cs_property_name = temp_point;
+
+							CString temp_lpAppname;
+							temp_lpAppname.Format(_T("Group%d"), temp_bm_io.group_index);
+							CString temp_keyname;
+							CString temp_array_value;
+							//temp_keyname.Format(_T("nPropertyArray_%d_%d"), temp_bm_io.category_index, temp_bm_io.hw_index);
+							//GetPrivateProfileStringW(temp_lpAppname, temp_keyname,_T(""), temp_array_value.GetBuffer(MAX_PATH * 10), MAX_PATH * 10, cs_bm_ini);							
+							//temp_array_value.ReleaseBuffer();
+
+							temp_keyname.Format(_T("nDataArray_%d_%d"), temp_bm_io.category_index, temp_bm_io.hw_index);
+							GetPrivateProfileStringW(temp_lpAppname, temp_keyname, _T(""), temp_array_value.GetBuffer(MAX_PATH * 10), MAX_PATH * 10, cs_bm_ini);
+							temp_array_value.ReleaseBuffer();
+
+
+
+							if (temp_array_value.IsEmpty() == false)
+							{
+								CStringArray temparray;
+								str_group_point temp_data;
+								//temp_data.data.m_group_input_data
+								SplitCStringA(temparray, temp_array_value, _T(","));
+								unsigned char temp_chardata[255] = { 0 };
+								for (int m = 0; m < temparray.GetSize(); m++)
+								{
+									temp_chardata[m] = wcstol(temparray.GetAt(m), NULL, 16);									
+								}
+								if (temp_bm_io.type == TYPE_BM_INPUT)
+								{
+									memcpy(&temp_data.data.m_group_input_data, temp_chardata, sizeof(Str_in_point));
+									Input_CString temp_input;
+									InputDataToString(temp_data.data.m_group_input_data, &temp_input);
+									temp_bm_io.input_cstring = temp_input;
+								}
+								else if (temp_bm_io.type == TYPE_BM_OUTPUT)
+								{
+									memcpy(&temp_data.data.m_group_output_data, temp_chardata, sizeof(Str_out_point));
+									Output_CString temp_output;
+									OutputDataToString(temp_data.data.m_group_output_data, &temp_output);
+									temp_bm_io.output_cstring = temp_output;
+								}
+								else if (temp_bm_io.type == TYPE_BM_VARIABLE)
+								{
+									memcpy(&temp_data.data.m_group_variable_data, temp_chardata, sizeof(Str_variable_point));
+									Variable_CString temp_variable;
+									VariableDataToString(temp_data.data.m_group_variable_data, &temp_variable);
+									temp_bm_io.variable_cstring = temp_variable;
+								}
+
+							}
 							m_bm_io_data.push_back(temp_bm_io);
 						}
 					}
@@ -171,30 +232,50 @@ LRESULT CBacnetBuildingIOPoints::Fresh_Building_IO_List(WPARAM wParam, LPARAM lP
 		m_io_list.SetItemText(i, BM_IO_GROUP_NAME, m_bm_io_data.at(i).Group_Name);
 		m_io_list.SetItemText(i, BM_IO_CATEGORY_NAME, m_bm_io_data.at(i).Category_Name);
 		m_io_list.SetItemText(i, BM_IO_HW_POINT, m_bm_io_data.at(i).HW_Point_Name);
-		CString temp_status;
-		if (m_bm_io_data.at(i).nstatus == 1)
-			temp_status = _T("Online");
-		else if (m_bm_io_data.at(i).nstatus == 2)
-			temp_status = _T("Online but not available");
-		else
-			temp_status = _T("Offline");
-		m_io_list.SetItemText(i, BM_IO_STATUS, temp_status);
 
 		m_io_list.SetItemText(i, BM_IO_POINT, m_bm_io_data.at(i).cs_property_name);
-		m_io_list.SetItemText(i, BM_IO_TYPE, m_bm_io_data.at(i).type_string);
-
-		if (ListCtrlEx::ComboBox == m_io_list.GetColumnType(BM_ID_PRODUCT))
+		if (m_bm_io_data.at(i).nproperty.n_option == 1)
 		{
-			ListCtrlEx::CStrList strlist;
-			for (int j = 0; j < pid_name_map.size(); j++)
-			{
-				strlist.push_back(pid_name_map.at(j).name);
-			}
-			m_io_list.SetCellStringList(i, BM_ID_PRODUCT, strlist);
+			CString temp_panel;
+			temp_panel.Format(_T("%d"), m_bm_io_data.at(i).nproperty.pan_str.main_panel);
+			m_io_list.SetItemText(i, BM_IO_PANEL, temp_panel);
 		}
-
-
-
+		if (m_bm_io_data.at(i).type == TYPE_BM_INPUT)
+		{
+			CString temp_panel;
+			temp_panel.Format(_T("%d"), m_bm_io_data.at(i).nproperty.pan_str.main_panel);
+			m_io_list.SetItemText(i, BM_IO_PANEL, temp_panel);
+			m_io_list.SetItemText(i, BM_IO_FULLLABEL, m_bm_io_data.at(i).input_cstring.des);
+			m_io_list.SetItemText(i, BM_AUTO_MANUAL, m_bm_io_data.at(i).input_cstring.automanual);
+			m_io_list.SetItemText(i, BM_IO_VALUE, m_bm_io_data.at(i).input_cstring.value);
+			m_io_list.SetItemText(i, BM_IO_UNITS, m_bm_io_data.at(i).input_cstring.units);
+			m_io_list.SetItemText(i, BM_IO_RANGE, m_bm_io_data.at(i).input_cstring.range);
+			m_io_list.SetItemText(i, BM_IO_LABEL, m_bm_io_data.at(i).input_cstring.lable);
+		}
+		else if (m_bm_io_data.at(i).type == TYPE_BM_OUTPUT)
+		{
+			CString temp_panel;
+			temp_panel.Format(_T("%d"), m_bm_io_data.at(i).nproperty.pan_str.main_panel);
+			m_io_list.SetItemText(i, BM_IO_PANEL, temp_panel);
+			m_io_list.SetItemText(i, BM_IO_FULLLABEL, m_bm_io_data.at(i).output_cstring.des);
+			m_io_list.SetItemText(i, BM_AUTO_MANUAL, m_bm_io_data.at(i).output_cstring.automanual);
+			m_io_list.SetItemText(i, BM_IO_VALUE, m_bm_io_data.at(i).output_cstring.value);
+			m_io_list.SetItemText(i, BM_IO_UNITS, m_bm_io_data.at(i).output_cstring.units);
+			m_io_list.SetItemText(i, BM_IO_RANGE, m_bm_io_data.at(i).output_cstring.range);
+			m_io_list.SetItemText(i, BM_IO_LABEL, m_bm_io_data.at(i).output_cstring.lable);
+		}
+		else if (m_bm_io_data.at(i).type == TYPE_BM_VARIABLE)
+		{
+			CString temp_panel;
+			temp_panel.Format(_T("%d"), m_bm_io_data.at(i).nproperty.pan_str.main_panel);
+			m_io_list.SetItemText(i, BM_IO_PANEL, temp_panel);
+			m_io_list.SetItemText(i, BM_IO_FULLLABEL, m_bm_io_data.at(i).variable_cstring.des);
+			m_io_list.SetItemText(i, BM_AUTO_MANUAL, m_bm_io_data.at(i).variable_cstring.automanual);
+			m_io_list.SetItemText(i, BM_IO_VALUE, m_bm_io_data.at(i).variable_cstring.value);
+			m_io_list.SetItemText(i, BM_IO_UNITS, m_bm_io_data.at(i).variable_cstring.units);
+			m_io_list.SetItemText(i, BM_IO_RANGE, m_bm_io_data.at(i).variable_cstring.range);
+			m_io_list.SetItemText(i, BM_IO_LABEL, m_bm_io_data.at(i).variable_cstring.lable);
+		}
 	}
 
 
@@ -244,7 +325,11 @@ void product_list()
 	}
 #endif
 }
-extern CString cs_bm_ini;
+
+
+
+
+
 LRESULT CBacnetBuildingIOPoints::Change_Building_IO_Item(WPARAM wParam, LPARAM lParam)
 {
 	int Changed_Item = (int)wParam;
@@ -267,8 +352,110 @@ LRESULT CBacnetBuildingIOPoints::Change_Building_IO_Item(WPARAM wParam, LPARAM l
 			return 0;
 		}
 		m_bm_io_data.at(Changed_Item).nproperty = temp_p;
+		str_group_point temp_data;
 		CString temp_lpAppname;
 		temp_lpAppname.Format(_T("Group%d"), m_bm_io_data.at(Changed_Item).group_index);
+		if (GetPriavteDataByPanelBlocking(&temp_p, &temp_data) > 0)
+		{
+			if (temp_p.pan_str.ntype == BAC_IN)
+			{
+				Input_CString temp_input;
+				InputDataToString(temp_data.data.m_group_input_data, &temp_input);
+
+
+				CString temp_panel;
+				temp_panel.Format(_T("%d"), temp_p.pan_str.main_panel);
+				m_io_list.SetItemText(Changed_Item, BM_IO_PANEL, temp_panel);
+				m_io_list.SetItemText(Changed_Item, BM_IO_FULLLABEL, temp_input.des);
+				m_io_list.SetItemText(Changed_Item, BM_AUTO_MANUAL, temp_input.automanual);
+				m_io_list.SetItemText(Changed_Item, BM_IO_VALUE, temp_input.value);
+				m_io_list.SetItemText(Changed_Item, BM_IO_UNITS, temp_input.units);
+				m_io_list.SetItemText(Changed_Item, BM_IO_RANGE, temp_input.range);
+				m_io_list.SetItemText(Changed_Item, BM_IO_LABEL, temp_input.lable);
+
+
+				CString temp_array_value;
+				for (int x = 0; x < (int)sizeof(Str_in_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_array_value = temp_array_value + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&temp_data.data.m_group_input_data + x));
+					temp_array_value = temp_array_value + temp_char;
+				}
+				temp_array_value.MakeUpper();
+				CString temp_keyname;
+				temp_keyname.Format(_T("nDataArray_%d_%d"), m_bm_io_data.at(Changed_Item).category_index, m_bm_io_data.at(Changed_Item).hw_index);
+				WritePrivateProfileStringW(temp_lpAppname, temp_keyname, temp_array_value, cs_bm_ini);
+			}
+			else if (temp_p.pan_str.ntype == BAC_OUT)
+			{
+				Output_CString temp_output;
+				OutputDataToString(temp_data.data.m_group_output_data, &temp_output);
+
+				CString temp_panel;
+				temp_panel.Format(_T("%d"), temp_p.pan_str.main_panel);
+				m_io_list.SetItemText(Changed_Item, BM_IO_PANEL, temp_panel);
+				m_io_list.SetItemText(Changed_Item, BM_IO_FULLLABEL, temp_output.des);
+				m_io_list.SetItemText(Changed_Item, BM_AUTO_MANUAL, temp_output.automanual);
+				m_io_list.SetItemText(Changed_Item, BM_IO_VALUE, temp_output.value);
+				m_io_list.SetItemText(Changed_Item, BM_IO_UNITS, temp_output.units);
+				m_io_list.SetItemText(Changed_Item, BM_IO_RANGE, temp_output.range);
+				m_io_list.SetItemText(Changed_Item, BM_IO_LABEL, temp_output.lable);
+
+
+				CString temp_array_value;
+				for (int x = 0; x < (int)sizeof(Str_out_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_array_value = temp_array_value + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&temp_data.data.m_group_output_data + x));
+					temp_array_value = temp_array_value + temp_char;
+				}
+				temp_array_value.MakeUpper();
+				CString temp_keyname;
+				temp_keyname.Format(_T("nDataArray_%d_%d"), m_bm_io_data.at(Changed_Item).category_index, m_bm_io_data.at(Changed_Item).hw_index);
+				WritePrivateProfileStringW(temp_lpAppname, temp_keyname, temp_array_value, cs_bm_ini);
+			}
+			else if (temp_p.pan_str.ntype == BAC_VAR)
+			{
+				Variable_CString temp_variable;
+				VariableDataToString(temp_data.data.m_group_variable_data, &temp_variable);
+
+				CString temp_panel;
+				temp_panel.Format(_T("%d"), temp_p.pan_str.main_panel);
+				m_io_list.SetItemText(Changed_Item, BM_IO_PANEL, temp_panel);
+				m_io_list.SetItemText(Changed_Item, BM_IO_FULLLABEL, temp_variable.des);
+				m_io_list.SetItemText(Changed_Item, BM_AUTO_MANUAL, temp_variable.automanual);
+				m_io_list.SetItemText(Changed_Item, BM_IO_VALUE, temp_variable.value);
+				m_io_list.SetItemText(Changed_Item, BM_IO_UNITS, temp_variable.units);
+				m_io_list.SetItemText(Changed_Item, BM_IO_RANGE, temp_variable.range);
+				m_io_list.SetItemText(Changed_Item, BM_IO_LABEL, temp_variable.lable);
+
+
+				CString temp_array_value;
+				for (int x = 0; x < (int)sizeof(Str_variable_point); x++)
+				{
+					CString temp_char;
+					if (x != 0)
+						temp_array_value = temp_array_value + _T(",");
+
+					temp_char.Format(_T("%02x"), (unsigned char)*((char*)&temp_data.data.m_group_variable_data + x));
+					temp_array_value = temp_array_value + temp_char;
+				}
+				temp_array_value.MakeUpper();
+				CString temp_keyname;
+				temp_keyname.Format(_T("nDataArray_%d_%d"), m_bm_io_data.at(Changed_Item).category_index, m_bm_io_data.at(Changed_Item).hw_index);
+				WritePrivateProfileStringW(temp_lpAppname, temp_keyname, temp_array_value, cs_bm_ini);
+			}
+			Sleep(1);
+		}
+		else
+			return 0;
+
 		CString temp_array_value;
 
 		for (int x = 0; x < (int)sizeof(Str_points); x++)
@@ -289,4 +476,49 @@ LRESULT CBacnetBuildingIOPoints::Change_Building_IO_Item(WPARAM wParam, LPARAM l
 		Sleep(1);
 	}
 	return 1;
+}
+
+
+
+
+void CBacnetBuildingIOPoints::OnNMClickListBmIoPoints(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	*pResult = 0;
+
+
+
+	CString temp_cstring;
+	long lRow, lCol;
+	//m_input_list.Set_Edit(true);
+	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+	CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
+	m_io_list.ScreenToClient(&point);
+	LVHITTESTINFO lvinfo;
+	lvinfo.pt = point;
+	lvinfo.flags = LVHT_ABOVE;
+	int nItem = m_io_list.SubItemHitTest(&lvinfo);
+
+	lRow = lvinfo.iItem;
+	lCol = lvinfo.iSubItem;
+
+	if (lRow >= m_io_list.GetItemCount())
+		return;
+	if (lRow < 0)
+		return;
+
+	if (m_bm_io_data.at(lRow).type == TYPE_BM_INPUT)
+	{
+		if (lCol == BM_IO_VALUE)
+		{
+		
+		}
+		else if (lCol == BM_IO_RANGE)
+		{
+			BacnetRange dlg;
+			initial_dialog = 2;
+			dlg.DoModal();
+		}
+	}
 }

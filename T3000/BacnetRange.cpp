@@ -929,6 +929,26 @@ void BacnetRange::Initial_static()
                 GetDlgItem(IDC_RADIO58)->EnableWindow(1);
             }
         }
+		else if ((Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
+		{
+			if ((input_list_line >= 12) && (input_list_line <= 15))
+			{
+				SetAllRadioButton();
+				GetDlgItem(IDC_RADIO87)->EnableWindow(1); //  55.  Pulse Count (Fast 100Hz)
+				GetDlgItem(IDC_RADIO103)->EnableWindow(1); // 59.  Revolutions Per Minute
+
+				GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
+				GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);
+			}
+			else if (input_list_line == 16)
+			{
+				SetAllRadioButton();
+				GetDlgItem(IDC_RADIO57)->SetWindowText(_T("33. Deg.C"));
+				GetDlgItem(IDC_RADIO58)->SetWindowText(_T("34. Deg.F"));
+				GetDlgItem(IDC_RADIO57)->EnableWindow(1);
+				GetDlgItem(IDC_RADIO58)->EnableWindow(1);
+			}
+		}
 		else if ((Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) && (input_list_line == 4))
 		{
 			GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项

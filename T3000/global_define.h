@@ -1,4 +1,5 @@
 #pragma once
+
 #include "RelayLabel.h"
 #ifdef DEBUG
  #define ENABLE_HTTP_FUCTION  //定义是否使用http api
@@ -1226,6 +1227,7 @@ typedef enum
     T3_OEM        = 11,
     T3_TB_11I = 12,
 	T3_FAN_MODULE = 13,
+	T3_OEM_12I   = 14,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1927,6 +1929,26 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 
 
 #define  RANGE_ERROR   -2
+#define TYPE_BM_INPUT		1
+#define TYPE_BM_OUTPUT		0
+#define TYPE_BM_VARIABLE    2
+
+
+const CString cssub_io_type[] =
+{
+	_T("OUT"),
+	_T("IN"),
+	_T("VAR"),
+	_T("PID"),
+	_T("SCH"),
+	_T("HOL"),
+	_T("PRG"),
+	_T("GRP"),
+	_T("MON"),
+	_T("ALM"),
+	_T("MAXDEF"),
+};
+
 
 enum sub_io_type
 {
@@ -2153,6 +2175,13 @@ typedef struct IspModeInfo
 
 #define  CONTROLLER_DUPLICATE_ID         5100
 
+typedef struct
+{
+	int panel_number;
+	int object_instance;
+	int online_time;
+	int npid;
+}_panel_info;
 
 typedef union
 {
@@ -2707,6 +2736,47 @@ typedef struct
 	}ins_str;
 }Str_points;
 
+typedef struct
+{
+	CString cal;
+	CString filter;
+	CString des;
+	CString value;
+	CString units;
+	CString range;
+	CString automanual;
+	CString cal_sign;
+	CString lable;
+	CString type;
+}Input_CString;
+
+typedef struct
+{
+	CString des;
+	CString automanual;
+	CString hoa_switch;
+	CString value;
+	CString units;
+	CString range;
+	CString low_v;
+	CString high_v;
+	CString pwm_period;
+	CString status;
+	CString lable;
+	CString type;
+}Output_CString;
+
+
+typedef struct
+{
+	CString des;
+	CString automanual;
+	CString value;
+	CString units;
+	CString range;
+	CString lable;
+}Variable_CString;
+
 typedef  struct
 {
 	int group_index;  //标识三维 属于哪一个节点;
@@ -2718,8 +2788,24 @@ typedef  struct
 	CString type_string;
 	int type; //标识是input output 还是var
 	int nstatus; // 0  offline    1  online      2 在线不可用
+
+	int n_index;
+	int n_panel;
+	CString FullLabel;
+	int nAuto_Manual;
+	CString csAuto_Manual;
+	int n_value;
+	CString csUnite;
+	int n_range;
+	CString cs_range;
+	CString Label;
+	CString iotype; // digital   ananlog  virtual
+
 	Str_points nproperty;  //
 	CString cs_property_name; //例如  1234IN56
+	Input_CString input_cstring;
+	Output_CString output_cstring;
+	Variable_CString variable_cstring;
 } Str_BM_IO;
 
 typedef struct BM_Node
@@ -2766,12 +2852,15 @@ enum {
 };
 
 
+
 enum
 {
 	TREE_IO_OFFLINE = 0,
 	TREE_IO_ONLINE,
 	TREE_IO_UNKNOWN,
 };
+
+
 
 
 

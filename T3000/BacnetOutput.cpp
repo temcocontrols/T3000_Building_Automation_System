@@ -655,6 +655,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		if(
 			    bacnet_device_type == T3_TSTAT10 ||
 				bacnet_device_type == T3_OEM ||
+				bacnet_device_type == T3_OEM_12I ||
 			    bacnet_device_type == BIG_MINIPANEL || 
                 bacnet_device_type == MINIPANELARM || 
                 bacnet_device_type == MINIPANELARM_LB || 

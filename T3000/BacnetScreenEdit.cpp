@@ -81,17 +81,7 @@ extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_t
 
 
 
-typedef union
-{
-    Str_in_point  m_group_input_data;
-    Str_out_point m_group_output_data;
-    Str_variable_point m_group_variable_data;
-    Str_program_point m_group_program_data;
-    Str_weekly_routine_point m_group_schedual_data;
-    Str_annual_routine_point m_group_annual_data;
-    Str_controller_point  m_group_pid_data;
-    Str_monitor_point     m_monitor_data;
-}groupdata;
+
 
 //用于刷新 group的结构;
 struct _Group_Data

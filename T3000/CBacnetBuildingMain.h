@@ -44,8 +44,9 @@ public:
 };
 
 // CBacnetBuildingMain 消息处理程序
-const int BUILDING_BASIC = 0;
-const int BUILDING_IO = 1;
+const int BUILDING_IO = 0;
+const int BUILDING_BASIC = 1;
+
 const int BUILDING_COMMUNICATION = 2;
 
 

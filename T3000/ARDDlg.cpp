@@ -63,21 +63,21 @@ BOOL CARDDlg::OnInitDialog()
 
 
 
-	if (offline_mode)
-	{
-		GetDlgItem(IDOK)->SetWindowTextW(L"Add");
+	//if (offline_mode)
+	//{
+	//	GetDlgItem(IDOK)->SetWindowTextW(L"Add");
 
-		GetDlgItem(IDC_RADIO_NET_DEVICE)->EnableWindow(FALSE);
-		GetDlgItem(IDC_IPADDRESS1)->EnableWindow(FALSE);
-		GetDlgItem(IDC_PORT)->EnableWindow(FALSE);
-		GetDlgItem(IDC_COMBO1)->EnableWindow(FALSE);
-		GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
-		GetDlgItem(IDC_COMBO_ADD_DEVICE_COMPORT)->EnableWindow(FALSE);
-		GetDlgItem(IDC_COMBO_ADD_DEVICE_BAUDRATE)->EnableWindow(FALSE);
+	//	GetDlgItem(IDC_RADIO_NET_DEVICE)->EnableWindow(FALSE);
+	//	GetDlgItem(IDC_IPADDRESS1)->EnableWindow(FALSE);
+	//	GetDlgItem(IDC_PORT)->EnableWindow(FALSE);
+	//	GetDlgItem(IDC_COMBO1)->EnableWindow(FALSE);
+	//	GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
+	//	GetDlgItem(IDC_COMBO_ADD_DEVICE_COMPORT)->EnableWindow(FALSE);
+	//	GetDlgItem(IDC_COMBO_ADD_DEVICE_BAUDRATE)->EnableWindow(FALSE);
 
-	}
-	else
-	{
+	//}
+	//else
+	//{
 		GetDlgItem(IDOK)->SetWindowTextW(L"Connect");
 		GetDlgItem(IDC_RADIO_NET_DEVICE)->EnableWindow(TRUE);
 		GetDlgItem(IDC_IPADDRESS1)->EnableWindow(TRUE);
@@ -86,7 +86,7 @@ BOOL CARDDlg::OnInitDialog()
 		GetDlgItem(IDC_RADIO2)->EnableWindow(TRUE);
 		GetDlgItem(IDC_COMBO_ADD_DEVICE_COMPORT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_COMBO_ADD_DEVICE_BAUDRATE)->EnableWindow(TRUE);
-	}
+	//}
     Enable_Net_UI(true);
 	return TRUE; 
 }

@@ -125,7 +125,7 @@ enum error_msg { SYNTAX ,
 //};
 
 struct variable_table {
-	char name[20];
+	char name[35];
 	char label[9];
     unsigned char type;
     unsigned char var_type;

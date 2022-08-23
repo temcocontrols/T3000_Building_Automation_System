@@ -10,6 +10,24 @@
 #pragma endregion For_Bacnet
 
 
+typedef union
+{
+	Str_in_point  m_group_input_data;
+	Str_out_point m_group_output_data;
+	Str_variable_point m_group_variable_data;
+	Str_program_point m_group_program_data;
+	Str_weekly_routine_point m_group_schedual_data;
+	Str_annual_routine_point m_group_annual_data;
+	Str_controller_point  m_group_pid_data;
+	Str_monitor_point     m_monitor_data;
+}groupdata;
+
+typedef struct
+{
+	groupdata data;
+}str_group_point;
+
+
 #include "global_variable_extern.h"
 #define FLEXGRID_CELL_COLOR RGB(128,128,128) 
 #define GREEN_COLOR RGB(0,255,0)
@@ -125,6 +143,7 @@ BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,i
 int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
 int GetProgramData_Blocking(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
 int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
+int GetPriavteDataByPanelBlocking(Str_points* npoint, str_group_point* temp_data, uint8_t retrytime = 5);
 int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize, uint8_t retrytime = 10);
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize, uint8_t retrytime = 10);
 int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t readlength, unsigned short *data_out);//Bacnet 协议转换为 modbus 协议;
@@ -218,6 +237,7 @@ void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigne
 int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path);
 int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path);
 int GetDeviceCountTable(int device_serialnumber, int ntype, device_io_status &temp_device_io_status);
+void Create_DeviceDatabase();
 int UpdateDeviceCountTable(int device_serialnumber, int ntype, device_io_status temp_device_io_status);
 int CheckDeviceCountTable(int device_serialnumber, int objectinstance = 0);
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path);
@@ -332,4 +352,8 @@ int GetOutputValueEx(Str_out_point temp_out, CString& ret_cstring, CString& ret_
 int GetVariableLabelEx(Str_variable_point temp_var, CString& ret_label, Point_Net* npoint);
 int GetVariableFullLabelEx(Str_variable_point temp_var, CString& ret_full_label, Point_Net* npoint);
 int GetVariableValueEx(Str_variable_point temp_var, CString& ret_cstring, CString& ret_unit, CString& Auto_M, int& digital_value);
+
+void InputDataToString(Str_in_point source_input, Input_CString* ret_string);
+void OutputDataToString(Str_out_point source_output, Output_CString* ret_string);
+void VariableDataToString(Str_variable_point source_variable, Variable_CString* ret_string);
 #endif

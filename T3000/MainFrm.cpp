@@ -1341,6 +1341,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
     CString g_strT3000LogString;
 
 	g_bPauseMultiRead=FALSE;
+   
 #if 1
     for(UINT i=0; i<m_product.size(); i++)
     {
@@ -1501,7 +1502,15 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
         }
     }
 #endif
-    
+    if(b_building_management_flag)
+        DoConnectDB_TreeNode(hSelItem);
+    //for (int j = 0; j < m_pTreeViewCrl->m_BMpoint->BuildingNode.m_child_count; j++)
+    //{
+    //    if (hSelItem == m_product.at(i).product_item)
+    //    {
+
+    //    }
+    //}
 
     EndWaitCursor();
     b_pause_refresh_tree = FALSE;
@@ -6833,8 +6842,9 @@ LRESULT CMainFrame::HandleWriteNewDevice(WPARAM wParam, LPARAM lParam)
 
 
         CString offline_folder;
-        offline_folder = g_strBuildingFolder + m_strCurMainBuildingName;
-        offline_folder = offline_folder + _T("\\VirtualDeviceData");
+        //offline_folder = g_strBuildingFolder + m_strCurMainBuildingName;
+        //offline_folder = offline_folder + _T("\\VirtualDeviceData");
+        offline_folder = g_strExePth + _T("Database\\temp");
         temp_path = offline_folder + _T("\\") + temp_serial + _T(".prog");
 
         //temp_path = 
@@ -7975,9 +7985,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 set_offline_mode(offline_mode);
 
                 CString offline_folder;
-                offline_folder = g_strBuildingFolder + m_strCurMainBuildingName;
-
-                offline_folder = offline_folder + _T("\\VirtualDeviceData");
+                //offline_folder = g_strBuildingFolder + m_strCurMainBuildingName;
+                offline_folder = g_strExePth + _T("Database\\temp");
+                //offline_folder = offline_folder + _T("\\VirtualDeviceData");
 
                 CString virtual_prg_filename;
                 virtual_prg_filename.Format(_T("%d"), m_product.at(i).serial_number);
@@ -9910,7 +9920,8 @@ void CMainFrame::CheckDuplicate()
 		exsit_panel_number.clear();
 		for (int i=0;i<temp_device.size();i++)
 		{
-
+            if (find_same_panel)
+                break;
 			exsit_panel_number.push_back((int)temp_device.at(i).panal_number);
 			for (int j=i+1;j<temp_device.size();j++)
 			{
@@ -9918,8 +9929,11 @@ void CMainFrame::CheckDuplicate()
 				{
 					device_id_data_1 = temp_device.at(i);
 					device_id_data_2 = temp_device.at(j);
-					find_same_panel = true;
-					break;
+                    if ((device_id_data_1.parent_serial_number == 0) && (device_id_data_2.parent_serial_number == 0))
+                    {
+                        find_same_panel = true;
+                        break;
+                    }
 				}
 			}
 		}
@@ -16252,7 +16266,8 @@ int CMainFrame::DoConnectDB_TreeNode(const HTREEITEM& hTreeItem)
 
                                 if (hTreeItem == temp_io_node->h_treeitem)
                                 {
-                                    MessageBox(temp_io_node->m_csName);
+                                    //OnControlInputs();
+                                    //MessageBox(temp_io_node->m_csName);
                                     return 1;
                                 }
                             }

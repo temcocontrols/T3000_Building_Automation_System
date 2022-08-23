@@ -200,6 +200,8 @@ private:
 	BOOL m_bDialogOpen;
 //	LONG OnDlgClose(UINT wParam, LONG lParam);
 public: // create from serialization only
+	void OnLoadConfigFile(); //Load File
+    void SaveConfigFile();
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
 	void OnToolErease();
@@ -321,7 +323,7 @@ protected:
     afx_msg LRESULT ReConnect_Message(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam);
-    afx_msg void SaveConfigFile();
+
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -341,7 +343,7 @@ public:
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
     
-	void OnLoadConfigFile();
+	
 	void OnBatchFlashHex();
 	void OnConnect();
 	void OnDisconnect();

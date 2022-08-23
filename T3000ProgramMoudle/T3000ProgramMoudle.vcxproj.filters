@@ -30,12 +30,24 @@
     <ClInclude Include="dllmain.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="global_define.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="global_function.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="scan.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="global_function.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

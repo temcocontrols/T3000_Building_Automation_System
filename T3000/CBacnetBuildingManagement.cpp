@@ -784,11 +784,11 @@ void CBacnetBuildingManagement::LoadDevice()
 
 
 
-			pFrame_BM->m_product.push_back(m_product_temp);
+
 			device_io_status temp_device_io_status;
 			GetDeviceCountTable(m_product_temp.serial_number, BAC_READ_ALL_LIST, temp_device_io_status);
 
-			for (int x = 0; x < 9; x++) //TREE_MAX_TYPE
+			for (int x = 0; x < TREE_MAX_TYPE - 1; x++) 
 			{
 				CString temp_cs;
 				m_product_temp.sub_io_info[x].h_item_type = x;
@@ -888,51 +888,6 @@ void CBacnetBuildingManagement::LoadDevice()
 				m_product_temp.sub_io_info[x].h_tree_item = hsubItem;
 				m_product_temp.sub_io_info[x].h_parent_item = hProductItem;
 			}
-#if 0
-			for (int j = 0; j < 3; j++)
-			{
-				CString temp_cs;
-				if (j == 0)
-				{
-					if (temp_device_io_status.device_capacity.cinputs == 0)
-						temp_cs = _T("INPUT( ?/? )");
-					else
-						temp_cs.Format(_T("INPUT( %d/%d )"), temp_device_io_status.device_use.cinputs, temp_device_io_status.device_capacity.cinputs);
-					tvInsert.hParent = hProductItem;
-					tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
-					tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_cs;
-					tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
-					tvInsert.item.iImage = TREE_IMAGE_INPUT_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_INPUT_ONLINE;
-				}
-				else if (j == 1)
-				{
-					if(temp_device_io_status.device_capacity.coutputs == 0)
-						temp_cs = _T("OUTPUT( ?/? )");
-					else
-						temp_cs.Format(_T("OUTPUT( %d/%d )"), temp_device_io_status.device_use.coutputs, temp_device_io_status.device_capacity.coutputs);
-					tvInsert.hParent = hProductItem;
-					tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
-					tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_cs;
-					tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
-					tvInsert.item.iImage = TREE_IMAGE_OUTPUT_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_OUTPUT_ONLINE;
-				}
-				else if (j == 2)
-				{
-					if(temp_device_io_status.device_capacity.cvariables == 0)
-						temp_cs = _T("VARIABLE( ?/? )");
-					else
-						temp_cs.Format(_T("VARIABLE( %d/%d )"), temp_device_io_status.device_use.cvariables, temp_device_io_status.device_capacity.cvariables);
-					tvInsert.hParent = hProductItem;
-					tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
-					tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_cs;
-					tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
-					tvInsert.item.iImage = TREE_IMAGE_VARIABLE_ONLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_VARIABLE_ONLINE;
-				}
-				HTREEITEM hsubItem = pFrame_BM->m_pTreeViewCrl->InsertItem(&tvInsert);
-
-			}
-#endif
-
 			CString temp_cs_serial;
 			temp_cs_serial.Format(_T("%u"), m_product_temp.serial_number);
 			//如果父节点 是要求折叠的 就不要展开;
@@ -942,7 +897,7 @@ void CBacnetBuildingManagement::LoadDevice()
 			else
 				pFrame_BM->m_pTreeViewCrl->Expand(hProductItem, TVE_COLLAPSE); //2就折叠
 
-
+			pFrame_BM->m_product.push_back(m_product_temp);
 			q.nextRow();
 
 		}

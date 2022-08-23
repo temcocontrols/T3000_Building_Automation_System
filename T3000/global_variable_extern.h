@@ -1014,7 +1014,7 @@ extern HWND      m_msv_dlg_hwnd;
 extern Str_in_point s_Input_data;
 extern Str_out_point s_Output_data;
 extern Str_variable_point s_Variable_data;
-
+extern vector <_panel_info> g_bacnet_panel_info; //全局的 object instance 与 panel number 对应的容器
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
