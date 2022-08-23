@@ -3,7 +3,7 @@
 #ifdef DEBUG
  #define ENABLE_HTTP_FUCTION  //定义是否使用http api
 #endif // DEBUG
-
+using namespace std;
 
 //#define ENABLE_T3_EMAIL
 #include <map>
@@ -2452,7 +2452,7 @@ const CString Output_Type_String[] =
     _T("Digital"),       //1
     _T("Analog"),
     _T("Extend Digital"),
-    _T("Extend Ananlog"),
+    _T("Extend Analog"),
     _T("Internal")
 };
 
@@ -2724,6 +2724,9 @@ typedef  struct
 	int output_count;
 	CString cs_name;
 } Str_product_io_count;
+
+typedef map<int, CString> pidname_map;
+
 
 
 

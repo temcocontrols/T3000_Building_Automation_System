@@ -343,6 +343,7 @@
 #define IDD_DIALOG_AIRLAB_PARAMETER     783
 #define IDD_DIALOG_BACNET_UNITS         788
 #define IDD_DIALOG_BACNET_BUILDING_PROPERTY 790
+#define IDR_DEVICEDATABASE_DB           793
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -2667,6 +2668,7 @@
 #define IDC_EDIT_CO2_CALIBRATION_SCD    2632
 #define IDC_BUTTON_CO2_SCD_HELP         2633
 #define IDC_BUTTON_RE_CALIBRATION_SCD_DONE 2634
+#define IDC_WEBVIEW_BUTTON              2635
 #define IDC_RADIO_DEGC                  2636
 #define IDC_RADIO_DEGF                  2637
 #define IDC_STATIC_TEMP_SENSOR          2638
@@ -2674,24 +2676,15 @@
 #define IDC_STATIC_BACNETIP_UNIT        2640
 #define IDC_COMBO_BACNETIP_UNIT         2641
 #define IDC_EDIT_GROUP_NAME             2642
+#define IDC_EDIT_NODE_NAME              2642
 #define IDC_BUTTON_DB_DONE              2643
+#define IDC_COMBO_NODE_TYPE             2643
 #define IDC_EDIT_CATEGORY_NAME          2644
 #define IDC_LIST_DB_PROPERTY            2645
 #define IDC_BUTTON_DB_PROPERTY_OK       2646
 #define IDC_BUTTON_DB_PROPERTY_CANCEL   2647
 #define IDC_TREE1                       2648
 #define IDC_EDIT_BN_INPUT_COUNT         2649
-
-
-
-
-
-
-#define IDC_WEBVIEW_BUTTON              2635
-
-#define IDC_EDIT_NODE_NAME              2642
-#define IDC_COMBO_NODE_TYPE             2643
-
 #define IDC_RADIO_SCROLL_ENABLE         2694
 #define IDC_RADIO_SCROLLBAR_DISABLE     2695
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
@@ -3260,7 +3253,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        792
+#define _APS_NEXT_RESOURCE_VALUE        794
 #define _APS_NEXT_COMMAND_VALUE         34080
 #define _APS_NEXT_CONTROL_VALUE         2650
 #define _APS_NEXT_SYMED_VALUE           320

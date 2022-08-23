@@ -190,7 +190,8 @@ void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualOk()
         offline_folder = g_strBuildingFolder + pFrame->m_strCurMainBuildingName;
         pFrame->HideBacnetWindow();
         CreateDirectory(offline_folder, NULL);//
-        offline_folder = offline_folder + _T("\\VirtualDeviceData");
+        //offline_folder = offline_folder + _T("\\VirtualDeviceData");
+		offline_folder = g_strExePth + _T("Database\\temp");
         CreateDirectory(offline_folder, NULL);//
         CString virtual_prg_filename;
         virtual_prg_filename.Format(_T("%s"), str_serialid);

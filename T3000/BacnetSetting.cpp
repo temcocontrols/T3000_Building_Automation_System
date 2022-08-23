@@ -174,6 +174,9 @@ void Getminitypename(unsigned char nmini_type, CString &ret_name)
     case T3_OEM:
         ret_name = _T("T3-OEM");
         break;
+    case T3_OEM_12I:
+        ret_name = _T("T3-OEM-12I");
+        break;
     case T3_FAN_MODULE:
         ret_name = _T("T3-FAN-MODULE");
         break;
@@ -279,7 +282,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             Device_Basic_Setting.reg.gate_addr[1], Device_Basic_Setting.reg.gate_addr[2], Device_Basic_Setting.reg.gate_addr[3]);
         bacnet_device_type = Device_Basic_Setting.reg.mini_type;
         if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
-            (Device_Basic_Setting.reg.mini_type == T3_OEM))
+            (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
+            (Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
         {
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->EnableWindow(FALSE);
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->EnableWindow(FALSE);
@@ -595,7 +599,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         }
 
         if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
-            (Device_Basic_Setting.reg.mini_type == T3_OEM))
+            (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
+            (Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
         {
             if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 539)
                 ((CButton *)m_page_basic_info.GetDlgItem(IDC_BUTTON_LCD_SETTING))->EnableWindow(true);
@@ -611,6 +616,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL ||
             Device_Basic_Setting.reg.mini_type == T3_TSTAT10 ||
             Device_Basic_Setting.reg.mini_type == T3_OEM ||
+            Device_Basic_Setting.reg.mini_type == T3_OEM_12I ||
             Device_Basic_Setting.reg.mini_type == MINIPANELARM)
         {
             ((CButton *)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->EnableWindow(true);
@@ -814,18 +820,23 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             //m_page_basic_info.m_edit_zone_name.SetWindowTextW(_T(""));
         }
 
+        if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 625)
+        {
+            (CButton *)GetDlgItem(IDC_BUTTON_SETTING_GSM_MODUAL)->EnableWindow(TRUE);
+        }
+        else
+            (CButton*)GetDlgItem(IDC_BUTTON_SETTING_GSM_MODUAL)->EnableWindow(false);
+
+
         if (Device_Basic_Setting.reg.usb_mode == 1)
         {
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_USB_DEVICE))->SetCheck(false);
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_USB_HOST))->SetCheck(true);
-            (CButton *)GetDlgItem(IDC_BUTTON_SETTING_GSM_MODUAL)->EnableWindow(TRUE);
         }
         else if (Device_Basic_Setting.reg.usb_mode == 0)
         {
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_USB_DEVICE))->SetCheck(true);
             ((CButton *)m_page_tcpip.GetDlgItem(IDC_RADIO_USB_HOST))->SetCheck(false);
-            (CButton *)GetDlgItem(IDC_BUTTON_SETTING_GSM_MODUAL)->EnableWindow(FALSE);
-
         }
 
         if (Device_Basic_Setting.reg.sd_exist == SD_STATUS_NO)
@@ -857,6 +868,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             bacnet_device_type == T3_FAN_MODULE ||
             bacnet_device_type == T3_TSTAT10 ||
             bacnet_device_type == T3_OEM ||
+            bacnet_device_type == T3_OEM_12I ||
             bacnet_device_type == PRODUCT_CM5)
         {
             ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->ResetContent();
@@ -902,6 +914,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
                 (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
+                (Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
                 (Device_Basic_Setting.reg.mini_type == T3_TSTAT10) )
             {
                 for (int x = 0;x< (sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0]));x++)
@@ -933,6 +946,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
                 (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
+                (Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
                 (Device_Basic_Setting.reg.mini_type == T3_TSTAT10))
             {
                 if (Device_Basic_Setting.reg.com_baudrate0 < sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0]))
@@ -973,7 +987,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 
             if ((bacnet_device_type == T3_TSTAT10) ||
-                (bacnet_device_type == T3_OEM))
+                (bacnet_device_type == T3_OEM) ||
+                (bacnet_device_type == T3_OEM_12I))
             {
                 ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->EnableWindow(0);
                 ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(0);
@@ -997,6 +1012,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
             (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
             (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
+            (Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
             (Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
 
             )
@@ -1009,7 +1025,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             temp_bootloader_version.Format(_T("%d"), Device_Basic_Setting.reg.pro_info.bootloader_rev);
         }
         if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
-            (Device_Basic_Setting.reg.mini_type == T3_OEM))
+            (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
+            (Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
         {
             temp_pic_version.Format(_T(" "));
             temp_c8051_version.Format(_T(" ") );
@@ -1657,9 +1674,14 @@ void CBacnetSetting::OnBnClickedButtonSettingAddIntoDb()
 
 void CBacnetSetting::OnBnClickedButtonSettingGsmModual()
 {
-	
+    Device_Basic_Setting.reg.reset_default = 77;
+    CString temp_task_info;
+    temp_task_info.Format(_T("Identify Device, LED lights and LCD flash within five seconds"));
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+#if 0
 	CBacnetATCommand Dlg;
 	Dlg.DoModal();
+#endif
 }
 
 

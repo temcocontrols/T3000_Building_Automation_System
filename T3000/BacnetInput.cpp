@@ -666,6 +666,8 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
+
+
 LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 {
     //static int test_count1234 = 0;
@@ -1586,6 +1588,11 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                 if((lRow >= 13) && (lRow <= 17))
                     return;
             }
+			if (Device_Basic_Setting.reg.mini_type == T3_OEM_12I)
+			{
+				if ((lRow >= 17) && (lRow <= 21))
+					return;
+			}
             if (Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
             {
                 if ((lRow >= 9) && (lRow <= 12))

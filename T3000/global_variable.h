@@ -1945,7 +1945,7 @@ HWND      m_t3000_log_window = NULL;
 Str_in_point s_Input_data;
 Str_out_point s_Output_data;
 Str_variable_point s_Variable_data;
-
+vector <_panel_info> g_bacnet_panel_info;  //全局的 object instance 与 panel number 对应的容器
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
 vector <Str_program_point>  m_Program_data;
@@ -2327,3 +2327,5 @@ vector <Str_BM_IO> m_bm_io_data; //用来存储BM 系统  IO表数据
 
 vector <Str_product_io_count> m_product_iocount;  // 用来存储不同设备包含的IO数量;
 vector <Str_online_serialnumber> m_online_serial; //在线的设备，用于动态菜单
+
+

@@ -11,6 +11,7 @@
 #include "BacnetAddRemoteDevice.h"
 #include "CBacnetBuildingCommunicate.h"
 #include "CBacnetBuildingProperty.h"
+extern CString cs_bm_ini;
 // CImageTreeCtrl
 enum ECmdHandler {
 	ID_RENAME = 1,
@@ -2706,8 +2707,8 @@ void CImageTreeCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 				return;
 			}
 		}
-		//DragBranch(m_hDragSrc, m_hDragDist)
-		HTREEITEM hNewItem = CopyBranch(m_hDragSrc, m_hDragDist, TVI_LAST);
+		DragBranch(m_hDragSrc, m_hDragDist);
+		//HTREEITEM hNewItem = CopyBranch(m_hDragSrc, m_hDragDist, TVI_LAST);
 		//删除被拖动节点
 		//DeleteItem(m_hDragSrc);
 		//SelectItem(hNewItem);
@@ -2745,18 +2746,128 @@ void CImageTreeCtrl::OnMouseMove(UINT nFlags, CPoint point)
 	CTreeCtrl::OnMouseMove(nFlags, point);
 }
 
+
 //拖动一个节点至另一个节点
 int CImageTreeCtrl::DragBranch(HTREEITEM horgitem, HTREEITEM hdesitem)
 {
 	//检查org 属于哪一个item
 	//m_BMpoint->
-	CBacnetBMD pointlistnode = m_BMpoint->BuildingNode;
-	for (int i = 0; i < pointlistnode.m_child_count; i++)
+	CBacnetBMD *pointlistnode = &m_BMpoint->BuildingNode;
+	TRACE(_T("%s\r\n"), pointlistnode->m_csName);
+	int index_group = -1;
+	int index_device = -1;
+	int index_io = -1;
+	int index_type = TYPE_BM_POINT_LIST;
+	int index_io_type = TREE_MAX_TYPE;
+	for (int i = 0; i < pointlistnode->m_child_count; i++)
 	{
-		for (int j = 0; j < pointlistnode.pchild[i]->m_child_count; j++)
-		{
 
+		CBacnetBMD* groupnode = pointlistnode->pchild[i];
+		TRACE(_T("%s\r\n"), groupnode->m_csName);
+		if (horgitem == groupnode->h_treeitem)
+		{
+			index_group = i;
+			index_device = -1;
+			index_io = -1;
+			index_type = TYPE_BM_GROUP;
+			goto endtreesearch;
 		}
+		for (int j = 0; j < groupnode->m_child_count; j++)
+		{		
+			CBacnetBMD* devicenode = groupnode->pchild[j];
+			TRACE(_T("%s\r\n"), devicenode->m_csName);
+			if (horgitem == devicenode->h_treeitem)
+			{
+				index_group = i;
+				index_device = j;
+				index_io = -1;
+				index_type = TYPE_BM_NODES;
+				goto endtreesearch;
+			}
+			for (int k = 0; k < devicenode->m_child_count; k++)
+			{
+				CBacnetBMD* deviceio = devicenode->pchild[k];
+				TRACE(_T("%s\r\n"), deviceio->m_csName);
+				if (horgitem == deviceio->h_treeitem)
+				{
+					index_group = i;
+					index_device = j;
+					index_io = k;
+					index_type = TYPE_BM_IO;
+					index_io_type = deviceio->m_node_type;
+					goto endtreesearch;
+				}
+			}
+		}
+	}
+	return -1; //原始tree item 不是Point list中的 节点
+
+endtreesearch:
+	TRACE(_T("%d,%d,%d\r\n"), index_group, index_device, index_io);
+
+	int find_des = 0;
+	int index_des = 0;
+	int index_des_io_type = TREE_MAX_TYPE;
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	for (UINT i = 0; i < pFrame->m_product.size(); i++)
+	{
+		if (hdesitem == pFrame->m_product.at(i).product_item)
+		{
+			index_des = i;
+			index_des_io_type = TREE_MAX_TYPE;
+			find_des = 1;
+			goto enddestreesearch;
+		}
+
+		for (int j = 0; j < TREE_MAX_TYPE; j++)
+		{
+			if (hdesitem == pFrame->m_product.at(i).sub_io_info[j].h_tree_item)
+			{
+				if((pFrame->m_product.at(i).sub_io_info[j].already_use < pFrame->m_product.at(i).sub_io_info[j].capacity) &&
+					pFrame->m_product.at(i).sub_io_info[j].capacity > 0)
+					{
+						index_des = i;
+						index_des_io_type = pFrame->m_product.at(i).sub_io_info[j].h_item_type;
+						find_des = 1;
+						goto enddestreesearch;
+					}
+			}
+		}
+
+		Sleep(1);
+	}
+
+
+enddestreesearch:
+	if (find_des)
+	{
+		//确认赋予给哪一个IO  并且需要变更 个数 以及 更新数据库的个数;
+
+
+		TRACE(_T("%d\r\n"), index_des);
+		CString temp_lpAppname;
+
+		temp_lpAppname.Format(_T("Group%d"), index_group);
+		CString section_io_status;
+		section_io_status.Format(_T("IO_%d_%d_Status"), index_device, index_io);
+		CString status_value;
+		status_value.Format(_T("%d"), TREE_IO_ONLINE);
+		WritePrivateProfileStringW(temp_lpAppname, section_io_status, status_value, cs_bm_ini);
+
+		CString cs_property_section;
+		CString cs_property_value;
+		cs_property_section.Format(_T("IO_%d_%d_property"), index_device, index_io);
+		cs_property_value.Format(_T(""));
+		//存储格式 例如      序列号,122IN4
+		CString des_points_value;
+		CString temp_type;
+		temp_type = cssub_io_type[index_des_io_type];//index_des_io_type
+		//打开缓存数据库 ，确认放置在哪个IO  暂时没有完成 ，待定;
+
+		cs_property_value.Format(_T("%u,%d%s"), pFrame->m_product.at(index_des).serial_number,pFrame->m_product.at(index_des).panel_number, temp_type);
+		WritePrivateProfileStringW(temp_lpAppname, cs_property_section, cs_property_value, cs_bm_ini);
+
+
 	}
 	return 0;
 }
