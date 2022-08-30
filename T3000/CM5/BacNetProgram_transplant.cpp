@@ -8287,14 +8287,6 @@ void check_high_light()
 		return;
 
 	high_light_string.Replace(_T("\r\n"),_T("\n"));
-	//CStringArray mytemp_array;
-	//SplitCStringA(mytemp_array,high_light_string,_T("\r\n"));
-	//CString new_high_light_str;
-	//new_high_light_str.Empty();
-	//for (int i=0;i<mytemp_array.GetSize();i++)
-	//{
-	//	new_high_light_str = new_high_light_str + mytemp_array.GetAt(i);
-	//}
 
 	WideCharToMultiByte( CP_ACP, 0, high_light_string.GetBuffer(), -1, temp_char, 4000, NULL, NULL );
 	m_prg_char_color.clear();

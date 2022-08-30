@@ -825,9 +825,9 @@
     <ClCompile Include="CBacnetUnitsSelection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-        <ClCompile Include="CBacnetBuildingProperty.cpp">
+    <ClCompile Include="CBacnetBuildingProperty.cpp">
       <Filter>Source Files</Filter>
-       </ClCompile>
+    </ClCompile>
     <ClCompile Include="BacnetWebView.cpp">
       <Filter>Source Files\WebView</Filter>
     </ClCompile>
@@ -1179,6 +1179,10 @@
     <None Include="ClassDiagram.cd" />
     <None Include="OutputTableDlg.htm" />
     <None Include="packages.config" />
+    <None Include="res\t3000db2.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ResourceFile\DeviceDatabase.mdb" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -2060,8 +2064,8 @@
     <ClInclude Include="CBacnetUnitsSelection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-        <ClInclude Include="CBacnetBuildingProperty.h">
-	 <Filter>Header Files</Filter>
+    <ClInclude Include="CBacnetBuildingProperty.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetWebView.h">
       <Filter>Header Files\Webview</Filter>

@@ -1913,7 +1913,85 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 	}
     return -2;
 }
+#if 1
+int GetPriavteDataByPanelBlocking(Str_points * npoint  , str_group_point* temp_data, uint8_t retrytime)
+{
+    int device_object_instance = 0;
+    int find_obj = 0;
+    uint8_t command = -1;
+    uint8_t start_instance = -1;
+    uint8_t end_instance = -1;
+    int16_t entitysize = 0;
+    int nret = 0;
+    if (npoint->n_option == 1)
+    {
+         for (int i = 0; i < g_bacnet_panel_info.size(); i++)
+        {
+             if (npoint->pan_str.main_panel == g_bacnet_panel_info.at(i).panel_number)
+             {
+                 find_obj = 1;
+                 device_object_instance = g_bacnet_panel_info.at(i).object_instance;
+                 break;
+             }
+        }
+         if (find_obj == 0)
+         {
+             return 0;
+         }
+         if (npoint->pan_str.ntype == BAC_IN)
+         {
+             command = READINPUT_T3000;
+             entitysize = sizeof(Str_in_point);
+         }
+         else if (npoint->pan_str.ntype == BAC_OUT)
+         {
+             command = READOUTPUT_T3000;
+             entitysize = sizeof(Str_out_point);
+         }
+         else if (npoint->pan_str.ntype == BAC_VAR)
+         {
+             command = READVARIABLE_T3000;
+             entitysize = sizeof(Str_variable_point);
+         }
+         else
+             return 0;
+         if ((npoint->pan_str.object_number <= 128) && ((npoint->pan_str.object_number > 0)))
+         {
+             start_instance = npoint->pan_str.object_number - 1;
+             end_instance = npoint->pan_str.object_number - 1;
+         }
+         else
+             return 0;
+         nret = GetPrivateDataSaveSPBlocking(device_object_instance, command, start_instance, end_instance, entitysize, retrytime);
+         if (nret > 0)
+         {
+             
+             memset(temp_data, 0, sizeof(groupdata));
+             Sleep(1);
+             if (command == READINPUT_T3000)
+             {
+                 memcpy(&temp_data->data.m_group_input_data, &s_Input_data, sizeof(Str_in_point));
 
+             }
+             else if (command == READOUTPUT_T3000)
+             {
+                 memcpy(&temp_data->data.m_group_output_data, &s_Output_data, sizeof(Str_out_point));
+
+             }
+             else if (command == READVARIABLE_T3000)
+             {
+                 memcpy(&temp_data->data.m_group_variable_data, &s_Variable_data, sizeof(Str_variable_point));
+
+             }
+             else
+                 return 0;
+         }
+
+
+         return nret;
+    }
+}
+#endif
 int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize, uint8_t retrytime)
 {
     if (g_protocol_support_ptp != PROTOCOL_MB_PTP_TRANSFER)
@@ -8198,6 +8276,40 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		m_refresh_net_device_data.push_back(temp);
 	}
 
+    //通过64命令来更新panel number 与object instance 的对应表  .
+    if ((temp.object_instance != 0) && (temp.panal_number != 0) && (temp.panal_number < 255) && (temp.object_instance < 0x3fffff))
+    {
+        _panel_info temp_panel;
+        temp_panel.npid = temp.product_id;
+        temp_panel.object_instance = temp.object_instance;
+        temp_panel.panel_number = temp.panal_number;
+        temp_panel.online_time = time(NULL);
+
+        int find_in_list = false;
+        for (int j = 0; j < g_bacnet_panel_info.size(); j++)
+        {
+            //判断主键  panel  以这个为依据更新 其他数据;
+            if (temp_panel.panel_number == g_bacnet_panel_info.at(j).panel_number)
+            {
+                //更新表格数据;
+                find_in_list = true;
+                g_bacnet_panel_info.at(j).npid = temp_panel.npid;
+                g_bacnet_panel_info.at(j).object_instance = temp_panel.object_instance;
+                g_bacnet_panel_info.at(j).online_time = temp_panel.online_time;
+                break;
+            }
+        }
+
+        if (find_in_list == false)
+        {
+            //插入最新得到数据至表格;
+            g_bacnet_panel_info.push_back(temp_panel);
+        }
+
+            //
+    }
+    
+
 
 
 	return m_refresh_net_device_data.size();
@@ -9029,10 +9141,34 @@ end_getcount_function:
 
 }
 
+void Create_DeviceDatabase()
+{
+    CString FilePath;
+    HANDLE hFind;
+    WIN32_FIND_DATA wfd;
+    hFind = FindFirstFile(g_building_devicedatabase, &wfd);//
+    if (hFind == INVALID_HANDLE_VALUE)//不存在该文件
+    {
+        FilePath = g_strExePth + _T("ResourceFile\\DeviceDatabase.mdb");
+        HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_DEVICEDATABASE_DB), _T("T3000DB"));
+        HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);
+        LPVOID lpExe = LockResource(hGlobal);
+        CFile file;
+        if (file.Open(FilePath, CFile::modeCreate | CFile::modeWrite))
+            file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));
+        file.Close();
+        ::UnlockResource(hGlobal);
+        ::FreeResource(hGlobal);
+
+    }
+}
+
 int UpdateDeviceCountTable(int device_serialnumber ,int ntype, device_io_status temp_device_io_status)
 {
 	try
 	{
+
+
 
 		int ret_value = 0;
 
@@ -9848,7 +9984,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
             char * cacl_panel = temp_buffer;
             if (offline_mode)
             {
-                memset(&Device_Basic_Setting, 0, sizeof(Str_Setting_Info));
+                //memset(&Device_Basic_Setting, 0, sizeof(Str_Setting_Info));
             }
             cacl_panel = cacl_panel + BAC_INPUT_ITEM_COUNT*sizeof(Str_in_point)
                 + BAC_OUTPUT_ITEM_COUNT* sizeof(Str_out_point)
@@ -9864,8 +10000,10 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
             if (offline_mode)
             {
                 //如果是离线模式 才把Setting的数据读出来，避免 Setting 那里 来回乱变.
-                memcpy(&Device_Basic_Setting, cacl_panel, sizeof(Str_Setting_Info));
+                //memcpy(&Device_Basic_Setting, cacl_panel, sizeof(Str_Setting_Info));
+                //original_panel = Device_Basic_Setting.reg.panel_number;
                 memcpy(&GetPrgSetting, cacl_panel, sizeof(Str_Setting_Info));
+                prg_panel = GetPrgSetting.reg.panel_number;
             }
             else
             {
@@ -9990,7 +10128,8 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_graphic_label_data.at(i),temp_point,sizeof(Str_label_point));
 				temp_point = temp_point + sizeof(Str_label_point);
-
+                if (write_to_device == 1)
+                    m_graphic_label_data.at(i).reg.nSerialNum = Device_Basic_Setting.reg.n_serial_number;
                 //fandu  20180130  原来panel 1 的  1.2.var3   加载至  panel 4  ,   要修改为4.2.var3.
                 if ((m_graphic_label_data.at(i).reg.nMain_Panel == prg_panel) && (original_panel != 0) && (prg_panel != 0))
                 {
@@ -10040,8 +10179,28 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 
             if (offline_mode)
             {
-                //如果是离线模式 才把Setting的数据读出来，避免 Setting 那里 来回乱变.
-                memcpy(&Device_Basic_Setting, temp_point, sizeof(Str_Setting_Info));
+                if (write_to_device == 0)
+                {
+                    //如果是离线模式 才把Setting的数据读出来，避免 Setting 那里 来回乱变.
+                    memcpy(&Device_Basic_Setting, temp_point, sizeof(Str_Setting_Info));
+                }
+                else
+                {
+                    //写入虚拟设备时 保留一些最基本的参数不变;
+                    int temp_serial = Device_Basic_Setting.reg.n_serial_number;
+                    unsigned int temp_bacnet_obj = Device_Basic_Setting.reg.object_instance;
+                    uint8_t temp_mini_type = Device_Basic_Setting.reg.mini_type;
+                    Str_Pro_Info temp_pro_info;
+                    memcpy(&temp_pro_info, &Device_Basic_Setting.reg.pro_info, sizeof(Str_Pro_Info));
+                    char temp_name[20];
+                    memcpy(temp_name, Device_Basic_Setting.reg.panel_name, 20);
+                    memcpy(&Device_Basic_Setting, temp_point, sizeof(Str_Setting_Info));
+                    Device_Basic_Setting.reg.n_serial_number = temp_serial;
+                    Device_Basic_Setting.reg.mini_type = temp_mini_type;
+                    memcpy( Device_Basic_Setting.reg.panel_name, temp_name, 20);
+                    memcpy(&Device_Basic_Setting.reg.pro_info, &temp_pro_info, sizeof(Str_Pro_Info));
+                     Device_Basic_Setting.reg.object_instance =  temp_bacnet_obj;
+                }
             }
 			temp_point = temp_point + sizeof(Str_Setting_Info);
 
@@ -10236,6 +10395,9 @@ int CheckDeviceDatabase()
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 
     g_building_devicedatabase = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\DeviceDatabase.mdb");
+
+    Create_DeviceDatabase(); //检查资源文件目录是否存在 DeviceDatabase.mdb ，不存在就解压一个出来.
+
     CFileFind fFind;
     if (fFind.FindFile(g_building_devicedatabase))
     {
@@ -15555,12 +15717,15 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
         }
             break;
         case T3_OEM:
+        case T3_OEM_12I:
+        {
             if (portindex <= 5)
                 nret_type = OUTPUT_DIGITAL_PORT;
-            else if (portindex <= 5+4)
+            else if (portindex <= 5 + 4)
                 nret_type = OUTPUT_ANALOG_PORT;
             else
                 nret_type = OUTPUT_VIRTUAL_PORT;
+        }
             break;
         default:
             break;
@@ -15732,6 +15897,16 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
                 nret_type = INPUT_VIRTUAL_PORT;
         }
             break;
+        case T3_OEM_12I:
+        {
+            if (portindex <= 16)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+        }
+        break;
         default:
             break;
         }
@@ -16053,3 +16228,456 @@ bool indtext_by_istring(
 
     return found;
 }
+
+void VariableDataToString(Str_variable_point source_variable, Variable_CString* ret_string)
+{
+    CString temp_item, temp_value, temp_cal, temp_filter, temp_status, temp_lable;
+    CString temp_des;
+    CString temp_units;
+    MultiByteToWideChar(CP_ACP, 0, (char*)source_variable.description, (int)strlen((char*)source_variable.description) + 1,
+        temp_des.GetBuffer(MAX_PATH), MAX_PATH);
+    temp_des.ReleaseBuffer();
+    temp_des = temp_des.Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
+    ret_string->des = temp_des;
+    if (source_variable.auto_manual == 0)
+    {
+        ret_string->automanual = _T("Auto");       
+    }
+    else
+    {
+        ret_string->automanual = _T("Manual");
+    }
+
+    if (source_variable.digital_analog == BAC_UNITS_DIGITAL)
+    {
+
+        if ((source_variable.range == 0) || ((source_variable.range > 30) && (source_variable.range < 100)))
+        {
+            CString cstemp_value2;
+            float temp_float_value1;
+            temp_float_value1 = ((float)source_variable.value) / 1000;
+            cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+            ret_string->value = cstemp_value2;
+            ret_string->units = Variable_Analog_Units_Array[0];
+        }
+        else if ((source_variable.range >= 101) && (source_variable.range <= 104))
+        {
+            if (read_msv_table)
+                ret_string->units = Custom_Msv_Range[source_variable.range - 101];
+            int get_name_ret = 0;
+            CString cstemp_value2;
+            float temp_float_value1;
+            temp_float_value1 = ((float)source_variable.value) / 1000;
+            get_name_ret = Get_Msv_Item_Name(source_variable.range - 101, (int)temp_float_value1, cstemp_value2);
+            if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+                cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+            ret_string->value = cstemp_value2;
+        }
+        else
+        {
+            CString temp1;
+            CStringArray temparray;
+
+            if ((source_variable.range < 23) && (source_variable.range != 0))
+                temp1 = Digital_Units_Array[source_variable.range];
+            else if ((source_variable.range >= 23) && (source_variable.range <= 30))
+            {
+                if (receive_customer_unit)
+                    temp1 = Custom_Digital_Range[source_variable.range - 23];
+            }
+            else
+            {
+                temp1 = Digital_Units_Array[0];
+                ret_string->units = temp1;
+            }
+
+            SplitCStringA(temparray, temp1, _T("/"));
+            if ((temparray.GetSize() == 2))
+            {
+                if (source_variable.control == 0)
+                    ret_string->value = temparray.GetAt(0);
+                else
+                    ret_string->value = temparray.GetAt(1);
+                ret_string->units = temp1;
+            }
+
+        }
+    }
+    else
+    {
+        if (source_variable.range == 20)	//如果是时间;
+        {
+            ret_string->units = Variable_Analog_Units_Array[source_variable.range];
+            char temp_char[50];
+            CString temp_11;
+            if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
+            {
+                int time_seconds = source_variable.value / 1000;
+                intervaltotextfull(temp_char, time_seconds, 0, 0);
+
+            }
+            else
+            {
+                int time_seconds = source_variable.value;
+                intervaltotext_2022_full(temp_char, time_seconds, 0);
+            }
+            MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1,
+                temp_11.GetBuffer(MAX_PATH), MAX_PATH);
+            temp_11.ReleaseBuffer();
+            temp_11 = temp_11.Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
+            ret_string->value = temp_11;
+        }
+
+        else if (source_variable.range < sizeof(Variable_Analog_Units_Array) / sizeof(Variable_Analog_Units_Array[0]))
+        {
+            ret_string->units = Variable_Analog_Units_Array[source_variable.range];
+            CString cstemp_value;
+            float temp_float_value;
+            temp_float_value = ((float)source_variable.value) / 1000;
+            cstemp_value.Format(_T("%.3f"), temp_float_value);
+            ret_string->value = cstemp_value;
+
+        }
+        else if ((source_variable.range >= 34) && (source_variable.range <= 38))
+        {
+            ret_string->units = Analog_Variable_Units[source_variable.range - 34];
+
+            CString cstemp_value;
+            float temp_float_value;
+            temp_float_value = ((float)source_variable.value) / 1000;
+            cstemp_value.Format(_T("%.3f"), temp_float_value);
+            ret_string->value = cstemp_value;
+        }
+        else if ((source_variable.range >= 101) && (source_variable.range <= 104))
+        {
+            if (read_msv_table)
+                ret_string->units = Custom_Msv_Range[source_variable.range - 101];
+        
+            int get_name_ret = 0;
+            CString cstemp_value2;
+            float temp_float_value1;
+            temp_float_value1 = ((float)source_variable.value) / 1000;
+            get_name_ret = Get_Msv_Item_Name(source_variable.range - 101, (int)temp_float_value1, cstemp_value2);
+            if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+                cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+            ret_string->value = cstemp_value2;
+        }
+        else
+        {
+            ret_string->units = Variable_Analog_Units_Array[0];          
+            CString cstemp_value;
+            float temp_float_value;
+            temp_float_value = ((float)source_variable.value) / 1000;
+            cstemp_value.Format(_T("%.3f"), temp_float_value);
+            ret_string->value = cstemp_value;
+        }
+
+    }
+}
+
+void OutputDataToString(Str_out_point source_output, Output_CString* ret_string)
+{
+    CString temp_item, temp_value, temp_cal, temp_filter, temp_status, temp_lable;
+    CString temp_des;
+    CString temp_units;
+    CString low_voltage, high_voltage;
+    CString temp_relinquish_value;
+
+    MultiByteToWideChar(CP_ACP, 0, (char*)source_output.description, (int)strlen((char*)source_output.description) + 1,
+        temp_des.GetBuffer(MAX_PATH), MAX_PATH);
+    temp_des.ReleaseBuffer();
+    temp_des = temp_des.Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
+
+    if (source_output.low_voltage == 0)
+        low_voltage.Empty();
+    else
+        low_voltage.Format(_T("%.1f"), source_output.low_voltage / 10.0);
+
+    if (source_output.high_voltage == 0)
+        high_voltage.Empty();
+    else
+        high_voltage.Format(_T("%.1f"), source_output.high_voltage / 10.0);
+
+    if (source_output.hw_switch_status == HW_SW_OFF)
+    {
+        ret_string->hoa_switch = _T("MAN-OFF");
+    }
+    else if (source_output.hw_switch_status == HW_SW_HAND)
+    {
+        ret_string->hoa_switch = _T("MAN-ON");
+    }
+    else
+    {
+        ret_string->hoa_switch = _T("AUTO");
+    }
+
+    if (source_output.auto_manual == 0)	//In output table if it is auto ,the value can't be edit by user
+    {
+        ret_string->automanual = _T("Auto");
+    }
+    else
+    {
+        ret_string->automanual = _T("Manual");
+    }
+
+	if (source_output.digital_analog == BAC_UNITS_ANALOG)
+	{
+
+		if (source_output.range == 0)
+			ret_string->range = _T("Unused");
+		else if (source_output.range < (sizeof(OutPut_List_Analog_Range) / sizeof(OutPut_List_Analog_Range[0])))
+			ret_string->range = OutPut_List_Analog_Range[source_output.range];
+		else
+			ret_string->range = _T("Out of range");
+
+		if (source_output.range < (sizeof(OutPut_List_Analog_Units) / sizeof(OutPut_List_Analog_Units[0])))
+			ret_string->range = OutPut_List_Analog_Units[source_output.range];
+		else
+			ret_string->range = _T("Unused");
+
+        CString temp_low, temp_high;
+        temp_low.Format(_T("%d"), 0);
+        temp_high.Format(_T("%d"), 0);
+
+        CString temp_value;
+        temp_value.Format(_T("%.2f"), ((float)source_output.value) / 1000);
+        ret_string->value = temp_value;
+    }
+    else if (source_output.digital_analog == BAC_UNITS_DIGITAL)
+    {
+        ret_string->units = _T("");
+        if (source_output.range == 0)
+        {
+            ret_string->value.Format(_T("%.2f"), ((float)source_output.value) / 1000);
+            ret_string->range = Digital_Units_Array[0];
+        }
+        else if (source_output.range <= 22)
+            ret_string->range = Digital_Units_Array[source_output.range];
+        else if ((source_output.range >= 23) && (source_output.range <= 30))
+        {
+            if (receive_customer_unit)
+                ret_string->range = Custom_Digital_Range[source_output.range - 23];
+            else
+                ret_string->range = Digital_Units_Array[0];
+        }
+        else
+            ret_string->range = Digital_Units_Array[0];
+
+        if ((source_output.range > 30) || (source_output.range == 0))
+        {
+            //m_output_list.SetItemText(i,OUTPUT_UNITE,Digital_Units_Array[0]);
+        }
+        else
+        {
+            CString temp1;
+            CStringArray temparray;
+            if ((source_output.range < 23) && (source_output.range != 0))
+                temp1 = Digital_Units_Array[source_output.range];
+            else if ((source_output.range >= 23) && (source_output.range <= 30))
+            {
+                if (receive_customer_unit)
+                    temp1 = Custom_Digital_Range[source_output.range - 23];
+            }
+            else
+            {
+                temp1.Empty();
+                ret_string->value = _T("");
+            }
+
+            SplitCStringA(temparray, temp1, _T("/"));
+            if ((temparray.GetSize() == 2))
+            {
+                if (source_output.control == 0)
+                    ret_string->value = temparray.GetAt(0);
+                else
+                    ret_string->value = temparray.GetAt(1);
+            }
+        }
+    }
+
+    if (source_output.decom == 0)
+        temp_status.Format(Output_Decom_Array[0]);
+    else if (source_output.decom == 1)
+        temp_status.Format(Output_Decom_Array[1]);
+    else
+        temp_status.Empty();
+    ret_string->status = temp_status;
+
+
+    CString temp_pwm_period;
+    temp_pwm_period.Format(_T("%u"), (unsigned char)source_output.pwm_period);
+    ret_string->pwm_period = temp_pwm_period;
+
+    CString temp_des2;
+    MultiByteToWideChar(CP_ACP, 0, (char*)source_output.label, (int)strlen((char*)source_output.label) + 1,
+        temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
+    temp_des2.ReleaseBuffer();
+    temp_des2 = temp_des2.Left(STR_OUT_LABEL).Trim();
+    ret_string->lable = temp_des2;
+
+}
+
+void InputDataToString(Str_in_point source_input, Input_CString* ret_string)
+{
+    CString temp_item, temp_cal, temp_filter, temp_status, temp_lable;
+    CString temp_des;		CString cstemp_value;
+    CString temp_units;
+    CString temp_range;
+    CString temp_automanual;
+    CString temp_cal_sign;
+    MultiByteToWideChar(CP_ACP, 0, (char*)source_input.description, (int)strlen((char*)source_input.description) + 1,
+        temp_des.GetBuffer(MAX_PATH), MAX_PATH);
+    temp_des.ReleaseBuffer();
+    temp_des.Left(STR_IN_DESCRIPTION_LENGTH).Trim();
+
+    if (source_input.auto_manual == 0)
+    {
+        temp_automanual = _T("Auto");
+    }
+    else
+    {
+        temp_automanual = _T("Manual");
+    }
+
+    if (source_input.digital_analog == BAC_UNITS_ANALOG)
+    {
+        if ((source_input.range >= 20) && (source_input.range <= 24))
+        {
+            temp_units = Analog_Customer_Units[source_input.range - 20];
+
+        }
+        else if (source_input.range < (sizeof(Input_List_Analog_Units) / sizeof(Input_List_Analog_Units[0])))
+            temp_units = Input_List_Analog_Units[source_input.range];
+        else if (source_input.range < (sizeof(Input_Analog_Units_Array) / sizeof(Input_Analog_Units_Array[0])))
+            temp_units = _T("");
+        else
+            temp_range = _T("Unused");
+
+
+        if (source_input.range == 0)
+            temp_range = _T("Unused");
+        else if (source_input.range < (sizeof(Input_Analog_Units_Array) / sizeof(Input_Analog_Units_Array[0])))
+        {
+#if 0
+            if (bacnet_device_type == PM_T3PT12)
+            {
+
+                if (m_Input_data.at(i).range == 1)
+                    m_input_list.SetItemText(i, INPUT_RANGE, _T("PT-100 Deg.C"));
+                else if (m_Input_data.at(i).range == 2)
+                    m_input_list.SetItemText(i, INPUT_RANGE, _T("PT-100 Deg.F"));
+                else if (m_Input_data.at(i).range == 5)
+                    m_input_list.SetItemText(i, INPUT_RANGE, _T("PT-1000 Deg.C"));
+                else if (m_Input_data.at(i).range == 6)
+                    m_input_list.SetItemText(i, INPUT_RANGE, _T("PT-1000 Deg.F"));
+                else
+                {
+                    if (m_Input_data.at(i).range <= (sizeof(Input_Analog_Units_Array) / sizeof(Input_Analog_Units_Array[0])))
+                        m_input_list.SetItemText(i, INPUT_RANGE, Input_Analog_Units_Array[m_Input_data.at(i).range]);
+                }
+
+            }
+            else
+#endif
+                temp_range = Input_Analog_Units_Array[source_input.range];
+        }
+        else
+        {
+            temp_range = _T("Out of range");
+        }
+
+
+        float temp_float_value;
+        temp_float_value = ((float)source_input.value) / 1000;
+        cstemp_value.Format(_T("%.2f"), temp_float_value);
+
+
+        unsigned short temp_cal_value = ((unsigned char)(source_input.calibration_h)) * 256 + (unsigned char)source_input.calibration_l;
+        temp_cal.Format(_T("%.1f"), ((float)temp_cal_value) / 10);
+
+        if (source_input.calibration_sign == 0)
+        {
+            temp_cal_sign = _T("+");
+        }
+        else
+        {
+            temp_cal_sign = _T("-");
+        }
+    }
+    else if (source_input.digital_analog == BAC_UNITS_DIGITAL)
+    {
+        temp_cal = _T("");
+
+        if (source_input.range == 0)
+        {
+            CString cstemp_value1;
+            float temp_float_value1;
+            temp_float_value1 = ((float)source_input.value) / 1000;
+            cstemp_value1.Format(_T("%.2f"), temp_float_value1);
+
+            cstemp_value = cstemp_value1;
+            temp_range = Digital_Units_Array[0];
+        }
+        else if (source_input.range <= 22)
+            temp_range = Digital_Units_Array[source_input.range];
+        else if ((source_input.range >= 23) && (source_input.range <= 30))
+        {
+            if (receive_customer_unit)
+                temp_range = Custom_Digital_Range[source_input.range - 23];
+            else
+                temp_range = Digital_Units_Array[0];
+        }
+        else
+            temp_range = Digital_Units_Array[0];
+
+        temp_units = _T("");
+        if ((source_input.range > 30) || (source_input.range == 0))
+        {
+
+        }
+        else
+        {
+            CString temp1;
+            CStringArray temparray;
+
+            if ((source_input.range < 23) && (source_input.range != 0))
+                temp1 = Digital_Units_Array[source_input.range];
+            else if ((source_input.range >= 23) && (source_input.range <= 30))
+            {
+                if (receive_customer_unit)
+                    temp1 = Custom_Digital_Range[source_input.range - 23];
+            }
+
+            SplitCStringA(temparray, temp1, _T("/"));
+            if ((temparray.GetSize() == 2))
+            {
+                if (source_input.control == 0)
+                    cstemp_value = temparray.GetAt(0);
+                else
+                    cstemp_value = temparray.GetAt(1);
+            }
+        }
+
+    }
+
+
+    MultiByteToWideChar(CP_ACP, 0, (char*)source_input.label, (int)strlen((char*)source_input.label) + 1,
+        temp_lable.GetBuffer(MAX_PATH), MAX_PATH);
+    temp_lable.ReleaseBuffer();
+    temp_lable = temp_lable.Left(STR_IN_LABEL).Trim();
+
+
+
+
+    ret_string->automanual = temp_automanual;
+    ret_string->cal = temp_cal;
+    ret_string->cal_sign = temp_cal_sign;
+    ret_string->des = temp_des;
+    ret_string->filter = temp_filter;
+    ret_string->range = temp_range;
+    //ret_string->type = 
+    ret_string->units = temp_units;
+    ret_string->value = cstemp_value;
+    ret_string->lable = temp_lable;;
+}
+

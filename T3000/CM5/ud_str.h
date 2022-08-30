@@ -824,8 +824,8 @@ typedef union
 		uint8_t com2_config;
 
 		uint8_t refresh_flash_timer;
-		uint8_t en_plug_n_play;
-		uint8_t reset_default;   // write 88  //第 37 个
+		uint8_t en_plug_n_play;   
+		uint8_t reset_default;   // write 88  //第 37 个     写77 就是启用 闪灯识别设备;
 		uint8_t com_baudrate0; 
 		uint8_t com_baudrate1; 
 		uint8_t com_baudrate2; 

@@ -104,9 +104,9 @@ void CBacnetBuildingMain::OnHTreeItemClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CBacnetBuildingMain::InitialTab()
 {
-
-    m_main_building_tab.InsertItem(BUILDING_BASIC, _T("Basic information      "));
     m_main_building_tab.InsertItem(BUILDING_IO, _T("IO Points    "));
+    m_main_building_tab.InsertItem(BUILDING_BASIC, _T("IO Information      "));
+
     //m_main_building_tab.InsertItem(BUILDING_COMMUNICATION, _T("Communication          "));
 
     //m_main_building_tab.InsertItem(SETTING_WIFI, _T("Wifi           "));
@@ -121,22 +121,24 @@ void CBacnetBuildingMain::InitialTab()
     //设定在Tab内显示的范围
     CRect rc;
     m_main_building_tab.GetClientRect(rc);
-    rc.top += 25;
-    rc.bottom -= 10;
-    rc.left += 10;
-    rc.right -= 10;
+    rc.top += 21;
+    rc.bottom -= 2;
+    rc.left += 2;
+    rc.right -= 4;
     m_page_building_info.MoveWindow(&rc);
     m_page_building_io.MoveWindow(&rc);
 #if 1
     //m_page_wifi.MoveWindow(&rc);
     //把对话框对象指针保存起来
-    building_tab_dialog[BUILDING_BASIC] = &m_page_building_info;
     building_tab_dialog[BUILDING_IO] = &m_page_building_io;
+    building_tab_dialog[BUILDING_BASIC] = &m_page_building_info;
+
 
     //tab_dialog[SETTING_WIFI] = &m_page_wifi;
     //显示初始页面
-    building_tab_dialog[BUILDING_BASIC]->ShowWindow(SW_SHOW);
-    building_tab_dialog[BUILDING_IO]->ShowWindow(SW_HIDE);
+    building_tab_dialog[BUILDING_IO]->ShowWindow(SW_SHOW);
+    building_tab_dialog[BUILDING_BASIC]->ShowWindow(SW_HIDE);
+
 
     //tab_dialog[SETTING_WIFI]->ShowWindow(SW_HIDE);
     //保存当前选择

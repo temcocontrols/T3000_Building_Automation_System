@@ -219,6 +219,8 @@ char turn_unsigned_to_char(unsigned short source)
 }
 BOOL GetSerialComm_ISP(vector<CString>& szComm)
 {
+
+
 	LPCTSTR strRegEntry = _T("HARDWARE\\DEVICEMAP\\SERIALCOMM\\");
 
 	HKEY   hKey;   

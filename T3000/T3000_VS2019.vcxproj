@@ -423,6 +423,7 @@
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="packages.config" />
+    <None Include="ResourceFile\DeviceDatabase.mdb" />
     <None Include="res\AlarmsBrown.bmp" />
     <None Include="res\AlarmsGreen.bmp" />
     <None Include="res\AlarmsRed.bmp" />
@@ -515,6 +516,7 @@
     <None Include="res\T3000.ico" />
     <None Include="res\T3000.rc2" />
     <None Include="res\T3000Building.bmp" />
+    <None Include="res\t3000db2.bin" />
     <None Include="res\T3000Doc.ico" />
     <None Include="res\T3000_DEFAULT.bmp" />
     <None Include="res\temcologo.bmp" />

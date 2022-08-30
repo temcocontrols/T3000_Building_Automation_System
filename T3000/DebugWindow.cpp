@@ -302,13 +302,26 @@ void CDebugWindow::OnCbnSelchangeComboDebugChoose()
 		}
 	}
 }
-#include "..\T3000ProgramMoudle\dllmain.h"
+//#define USE_T3000PROGRAM_MOUDLE
+
+#ifdef USE_T3000PROGRAM_MOUDLE
+	#include "..\T3000ProgramMoudle\dllmain.h"
+	#pragma  comment(lib,"T3000ProgramMoudle.lib")
+#endif // USE_T3000PROGRAM_MOUDLE
+
+
+
 void CDebugWindow::OnBnClickedButtonDebug()
 {
     // TODO: 在此添加控件通知处理程序代码
 
 
-#ifdef DEBUG
+
+#ifdef USE_T3000PROGRAM_MOUDLE
+	vector<refresh_net_device_dll> temp_receive_scan;
+	 int reply_count = ScanByUDPFunc(temp_receive_scan);
+	 Sleep(1);
+#endif
 #if 0
 	//char test_program[] = "10 REM TEST PROGRAM ";
 	char test_program[] = "10 REM TEST PROGRAM \r\n20 VAR = VAR1 + 1\r\n";
@@ -320,10 +333,10 @@ void CDebugWindow::OnBnClickedButtonDebug()
 	{
 		MessageBox(_T("Decode error!"));
 	}
-
+#endif
 	Sleep(1);
 	return;
-#endif
+
 
 	//获取对应产品的 固件信息
 #if 0
@@ -358,7 +371,7 @@ test1.key[GETP_UPDATED].KeyName, test1.key[GETP_UPDATED].tValue.cs_value);
 #endif
 #endif
 
-#endif // DEBUG
+
 }
 
 #include "BacnetWeb.h"
