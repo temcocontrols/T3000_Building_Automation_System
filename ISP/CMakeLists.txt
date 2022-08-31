@@ -121,6 +121,7 @@ set(SOURCE_FILES
   ${CPP_SOURCE_DIR}/TstatFlashDlg.cpp
   ${CPP_SOURCE_DIR}/BADO/BADO.cpp
   ${CPP_SOURCE_DIR}/StaticEx/staticex.cpp
+  ${CPP_SOURCE_DIR}/../T3000/class/md5.cpp
 )
 
 set(HEADER_FILES

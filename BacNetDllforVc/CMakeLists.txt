@@ -155,6 +155,7 @@ set(HANDLER_FILES
   ${C_DIR_HANDLER}/s_whois.c
   ${C_DIR_HANDLER}/s_wp.c
   ${C_DIR_HANDLER}/txbuf.c
+  ${C_DIR_HANDLER}/s_ack_seg.c
 )
 
 set(MAIN_FILES  
