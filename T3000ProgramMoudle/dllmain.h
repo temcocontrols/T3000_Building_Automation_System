@@ -1,6 +1,10 @@
 #pragma once
 #include <vector>
 using namespace std;
+
+#define  TRUE 1
+#define  FALSE 0
+
 typedef struct 
 {
 	int  errorcode;
@@ -40,7 +44,13 @@ struct refresh_net_device_dll
 	unsigned char  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
 };
 
+#ifdef _WINDOWS
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT __attribute__((visibility("default")))
+#endif /*_WINDOWS*/
 
-extern "C" __declspec(dllexport) encode_str* Encode_function(char* input_text);
-extern "C" __declspec(dllexport) char* Decode_function(char* input_code, decode_str * decodestr);
-extern "C" __declspec(dllexport)  int ScanByUDPFunc(vector<refresh_net_device_dll> &ret_scan_results);
+
+extern "C" EXPORT encode_str* Encode_function(char* input_text);
+extern "C" EXPORT char* Decode_function(char* input_code, decode_str * decodestr);
+extern "C" EXPORT  int ScanByUDPFunc(vector<refresh_net_device_dll> &ret_scan_results);

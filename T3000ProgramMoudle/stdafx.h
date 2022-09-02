@@ -8,6 +8,7 @@
 #include "targetver.h"
 
 #include <stdio.h>
+#ifdef _WINDOWS
 #include <tchar.h>
 
 
@@ -21,4 +22,5 @@
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 //// TODO:  在此处引用程序需要的其他头文件
+#endif
 

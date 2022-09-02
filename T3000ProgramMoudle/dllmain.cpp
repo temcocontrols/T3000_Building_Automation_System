@@ -2,6 +2,76 @@
 #include "pch.h"
 #include "stdafx.h"
 #include "dllmain.h"
+
+#ifndef _WINDOWS
+template<typename T>
+int template_itoa(T val, char* buf, int radix_unused)
+{
+	const unsigned int radix = 10;
+
+	char* p;
+	unsigned int a;        //every digit
+	int len;
+	char* b;            //start of the digit char
+	char temp;
+	unsigned int u;
+
+	p = buf;
+
+	if (val < 0)
+	{
+		*p++ = '-';
+		val = 0 - val;
+	}
+	u = (unsigned int)val;
+
+	b = p;
+
+	do
+	{
+		a = u % radix;
+		u /= radix;
+
+		*p++ = a + '0';
+
+	} while (u > 0);
+
+	len = (int)(p - buf);
+
+	*p-- = 0;
+
+	//swap
+	do
+	{
+		temp = *p;
+		*p = *b;
+		*b = temp;
+		--p;
+		++b;
+
+	} while (b < p);
+
+	return len;
+}
+
+#define itoa template_itoa<int>
+#define ltoa template_itoa<long>
+#include <unistd.h>
+#define Sleep sleep
+
+#include <cctype>
+char* strupr(char* s)
+{
+	char* tmp = s;
+
+	for (; *tmp; ++tmp) {
+		*tmp = toupper((unsigned char)*tmp);
+	}
+
+	return s;
+}
+#endif
+
 //BOOL APIENTRY DllMain( HMODULE hModule,
 //                       DWORD  ul_reason_for_call,
 //                       LPVOID lpReserved
@@ -49,8 +119,7 @@ char local_var_new_name[40][40] = { 0 };
 
 char editbuf[25000]; //extern char editbuf[25000];//For Bacnet Program use
 static int time_count = 0; //Fance add for wait function.
-#define  TRUE 1
-#define  FALSE 0
+
 
 #define min(a,b)    (((a) < (b)) ? (a) : (b))
 
@@ -1284,6 +1353,7 @@ int Encode_Program( char * input_text, encode_str* encode_str )
 
 	//	char fname[65];//,*p;
 	unsigned int Byte;
+	long length;
 	//	int lx,ly,rx,ry;
 	eoi = NL;
 	eol = 0;
@@ -1368,7 +1438,9 @@ int Encode_Program( char * input_text, encode_str* encode_str )
 		}
 	}
 	prog = p_buf;
-	long length = 1;
+	// TODO: Check with Fance. Changing this line of code since in GCC jump to label 
+    // crosses initialization of long length.
+	length = 1;
 	while (*prog != 0)
 	{
 		if (*prog++ == 13) length++;
@@ -1386,7 +1458,10 @@ int Encode_Program( char * input_text, encode_str* encode_str )
 		sizeof(go_to_str) * MAX_GOTO);
 
 	prog = p_buf;
-	int ret = prescan1(); // find the location of all functions and global
+	// TODO: Check with Fance. Changing this line of code since in GCC jump to label 
+	// crosses initialization of int ret.
+	//int ret = prescan1(); // find the location of all functions and global
+	prescan1();
 	if (error != -1)
 	{
 		goto end_encode;
@@ -2427,7 +2502,9 @@ int get_token(void)
 				}
 			}
 			temp++;
-			temp = '\0';
+			//TODO : Check with Fance.
+			//temp = '\0';
+			*temp = '\0';
 			break;
 
 		case '>': if ((unsigned char)*(prog + 1) == '=') {
@@ -2440,7 +2517,9 @@ int get_token(void)
 			*temp = GT;
 		}
 				temp++;
-				temp = '\0';
+				//TODO : Check with Fance.
+				//temp = '\0';
+				*temp = '\0';
 				break;
 		} 		 /* end of the switch statement */
 		if (*token) {
@@ -6665,6 +6744,7 @@ char* desassembler_program( char * input_code, decode_str* decodestr)
 	int n;
 	buf[0] = 0;
 	int bytes = 0;
+	int temp_x;
 
 	int code_length = ((unsigned char)code[1]) * 256 + (unsigned char)code[0];
 	if ((code_length == 0) || (code_length > 2000)) //如果传过来的是无效的 大于500的编码 就说明是错的 直接清空;
@@ -6702,13 +6782,15 @@ char* desassembler_program( char * input_code, decode_str* decodestr)
 #endif
 	code = pcode;
 	then_else = 0;
-	int temp_x = 0;
+	// TODO: Check with Fance. In GCC this gives an error "crosses initialization of ‘int temp_x’"
+	temp_x = 0;
 	while (((unsigned char)*code) != 0xFE)
 	{
 		if (code - pcode > code_length + 20)
 			break;
 		temp_x++;
-		TRACE(_T("temp_x = %d\r\n"), temp_x);
+		//TODO: Fance to review. Commented TRACE for cross platform compatiablity
+		//TRACE(_T("temp_x = %d\r\n"), temp_x);
 		if (!then_else)
 		{
 			if ((unsigned char)*code != 0x01)
@@ -7464,7 +7546,9 @@ int pointtotext_for_controller(char* buf, Point_T3000* point)
 	//	ptr_panel.info[point_type-1].name = "VAR";
 	strcat(buf, ptr_panel.info[point_type].name);
 	//	strcat(buf,ptr_panel->info[point_type-1].name);
-	strcat(buf, itoa(num, x, 10));
+	// Todo: Fance to review.
+	itoa(num, x, 10);
+	strcat(buf, x);
 	return 0;
 }
 
@@ -7499,7 +7583,9 @@ int pointtotext(char* buf, Point_T3000* point)
 //	ptr_panel.info[point_type-1].name = "VAR";
 	strcat(buf, ptr_panel.info[point_type - 1].name);
 	//	strcat(buf,ptr_panel->info[point_type-1].name);
-	strcat(buf, itoa(num + 1, x, 10));
+    // TODO: Fance to review
+	itoa(num + 1, x, 10);
+	strcat(buf, x);
 	return 0;
 }
 
@@ -7577,7 +7663,8 @@ int pointtotext(char* buf, Point_Net* point)
 		((point->panel == point->sub_panel) && (point->panel == Station_NUM)))
 	{
 		//不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
-		strcat(buf, itoa(point->panel, x, 10));
+		itoa(point->panel, x, 10);
+		strcat(buf, x);
 		strcat(buf, ptr_panel.info[point_type].name);//Fance
 		if ((point_type == BAC_FLOAT_ABCD) ||
 			(point_type == BAC_FLOAT_CDAB) ||
@@ -7594,10 +7681,16 @@ int pointtotext(char* buf, Point_Net* point)
 			(point_type == INPUT_REG) ||
 			(point_type == MB_REG))
 		{
-			strcat(buf, itoa(num, x, 10));
+			// TODO: Fance to review
+			itoa(num, x, 10);
+			strcat(buf, x);
 		}
 		else
-			strcat(buf, itoa(num + 1, x, 10));
+		{
+			// TODO: Fance to review
+			itoa(num + 1, x, 10);
+			strcat(buf, x);
+		}
 		return 0;
 	}
 
@@ -7617,9 +7710,11 @@ int pointtotext(char* buf, Point_Net* point)
 			temp_value = ((point->network & 0x7F) << 16) + (point->panel << 8) + (point->sub_panel);
 			char temp_object_instance[10];
 			memset(temp_object_instance, 0, 10);
-			strcat(buf, itoa(temp_value, temp_object_instance, 10));
+			itoa(temp_value, temp_object_instance, 10);
+			strcat(buf, temp_object_instance);
 			strcat(buf, ptr_panel.info[point_type].name);
-			strcat(buf, itoa(num, x, 10));
+			itoa(num, x, 10);
+			strcat(buf, x);
 			return 0;
 		}
 
@@ -7630,10 +7725,14 @@ int pointtotext(char* buf, Point_Net* point)
 		if (temp_value < 256)
 		{
 			strcpy(buf, "INS");
-			strcat(buf + 1, itoa(temp_value, temp_object_instance, 10));
+			itoa(temp_value, temp_object_instance, 10);
+			strcat(buf + 1, temp_object_instance);
 		}
 		else
-			strcat(buf, itoa(temp_value, temp_object_instance, 10));
+		{
+			itoa(temp_value, temp_object_instance, 10);
+			strcat(buf, temp_object_instance);
+		}
 		if ((point->panel != point->sub_panel) && (point_type == VAR))
 			strcat(buf, "REG");//Fance	曰了狗了 ，3-25-VAR100  非要支持  3-25-REG100.
 		else
@@ -7658,21 +7757,27 @@ int pointtotext(char* buf, Point_Net* point)
 			(point->point_type == BAC_AO) ||
 			(point->point_type == BAC_BO))
 		{
-			strcat(buf, itoa(num, x, 10));
+			itoa(num, x, 10);
+			strcat(buf, x);
 		}
 		else
-			strcat(buf, itoa(num + 1, x, 10));
+		{
+			itoa(num + 1, x, 10);
+			strcat(buf, x);
+		}
 		return 0;
 
 	}
 
-	strcat(buf, itoa(panel, x, 10));
+	itoa(panel, x, 10);
+	strcat(buf, x);
 	//strcat(buf,itoa(panel+1,x,10));//2015-03-03修改，从此panel number 不在减一;
 	//if(panel+1<10 || num+1 < 100)
 	//	strcat(buf,"-");
 	//if(panel+1<10 || num+1 < (8*256))
 	strcat(buf, ".");
-	strcat(buf, itoa(sub_panel, x, 10));
+	itoa(sub_panel, x, 10);
+	strcat(buf, x);
 	strcat(buf, ".");
 	//strcat(token,ptr_panel.info[point_type-1].name);	//Fance
 	if ((point->panel != point->sub_panel) && (point_type == VAR))
@@ -7701,10 +7806,14 @@ int pointtotext(char* buf, Point_Net* point)
 		(point->point_type == BAC_AO) ||
 		(point->point_type == BAC_BO))
 	{
-		strcat(buf, itoa(num, x, 10));
+		itoa(num, x, 10);
+		strcat(buf, x);
 	}
 	else
-		strcat(buf, itoa(num + 1, x, 10));
+	{
+		itoa(num + 1, x, 10);
+		strcat(buf, x);
+	}
 	return 0;
 }
 
@@ -8165,18 +8274,6 @@ void Init_table_bank()
 	ptr_panel.info[0].name = "OUT";
 }
 
-int get_key_name(int nfunction, CString& temp_cs)
-{
-	if (nfunction > MAX_FUNCTION_COUNT)
-	{
-		return 0;
-	}
-	MultiByteToWideChar(CP_ACP, 0, (char*)ptr_panel.info[nfunction].name,
-		(int)strlen((char*)ptr_panel.info[nfunction].name) + 1,
-		temp_cs.GetBuffer(MAX_PATH), MAX_PATH);
-	temp_cs.ReleaseBuffer();
-}
-
 void init_info_table(void)
 {
 	int i;
@@ -8472,7 +8569,7 @@ void copy_data_to_ptrpanel(int Data_type)
 #define  LOCAL_VAR_TABEL 2
 void check_each_point(char* richeditchar, int item_count, int ntype);
 void check_function_table(char* richeditchar, int ntype);
-void SplitCStringA(CStringArray& saArray, CString sSource, CString sToken);
+//void SplitCStringA(CStringArray& saArray, CString sSource, CString sToken);
 extern vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
 extern CString high_light_string;
 #if 0

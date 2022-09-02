@@ -1,23 +1,48 @@
-#pragma once
-//#include "RelayLabel.h"
+#ifndef __GLOBAL_DEFINE_HEADER__
+#define __GLOBAL_DEFINE_HEADER__
+
+
 #ifdef DEBUG
  #define ENABLE_HTTP_FUCTION  //定义是否使用http api
 #endif // DEBUG
 using namespace std;
 
-//#define ENABLE_T3_EMAIL
 #include <map>
-//minipanel 寄存器表
-//  9800	-	9999    200个寄存器   setting
-//  10000	-   11471   1472		  OUT
-//  11472   -   12943   1472		  IN
-//	12944   -   15503	2560		  VAR					sizeof(Str_variable_point)= 39
-//	15504   -  	15807	16*19=304	  PRG	                sizeof(Str_program_point) = 37
-//  15808   -   15974	21*8=336	  SCH			sizeof(Str_weekly_routine_point) = 42
-//	15975   -	16043		17*4=68		  HOL				sizeof(Str_annual_routine_point) = 33
-//  32712   - 32753		 14*16 =224								sizeof(Str_controller_point)	= 28
-//  32044 - 32619       
-//  32936   										sizeof(Str_table_point)	 = 105
+#ifndef _WINDOWS
+#include <cstring>
+#include <string>
+#include <cstdlib>
+#define CString std::wstring
+#define MAX_PATH 260
+
+typedef unsigned long ULONG;
+typedef ULONG* PULONG;
+typedef unsigned short USHORT;
+typedef USHORT* PUSHORT;
+typedef unsigned char UCHAR;
+typedef UCHAR* PUCHAR;
+
+typedef unsigned long       DWORD;
+typedef int                 BOOL;
+typedef unsigned char       BYTE;
+typedef unsigned short      WORD;
+typedef float               FLOAT;
+typedef FLOAT* PFLOAT;
+
+typedef int                 INT;
+typedef unsigned int        UINT;
+typedef unsigned int* PUINT;
+typedef DWORD   COLORREF;
+
+#define __T(x)      L ## x
+#define _T(x)       __T(x)
+
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+typedef unsigned int        SOCKET;
+#endif
+
 #define BAC_SETTING_START_REG		9800
 #define BAC_OUT_START_REG			10000
 #define BAC_IN_START_REG			11472
@@ -31,31 +56,7 @@ using namespace std;
 #define BAC_PID_CONTROL_START_REG   32712
 #define BAC_CUSTOMER_TABLE_START    32936
 #define BAC_WR_FLAG_FIRST           33201
-/*
-Schedule flag 1 33201 - 33236           36Reg
-...
-...
-Schedule flag 8 33201 + (7 *36 )        36Reg
 
-Schedule 1 32044 - 32115              72Reg
-Schedule 2 32116 - 32187              72Reg
-Schedule 3 32188 - 32259              72Reg
-Schedule 4 32260 - 32331              72Reg
-Schedule 5 32332 - 32403              72Reg
-Schedule 6 32404 - 32475              72Reg
-Schedule 7 32476 - 32547              72Reg
-Schedule 8 32548 - 32619              72Reg
-
-Schedule List1 15808	15828	21REG
-Schedule List2 15829	15849	21REG
-Schedule List3 15850	15870	21REG
-Schedule List4 15871	15891	21REG
-Schedule List5 15892	15912	21REG
-Schedule List6 15913	15933	21REG
-Schedule List7 15934	15954	21REG
-Schedule List8 15955	15975	21REG
-
-*/
 const int SORT_UNKNOW = 0;
 const int SORT_BY_CONNECTION = 1;
 const int SORT_BY_BUILDING_FLOOR = 2;
@@ -266,11 +267,6 @@ const int READ_DIGITAL = 2;
 #define WM_COMMAND_WHO_IS  1
 #define MENU_CLICK			2
 
-const COLORREF LIST_ITEM_CHANGED_BKCOLOR = RGB(255, 0, 0);
-const COLORREF LIST_ITEM_DEFAULT_BKCOLOR = GetSysColor(COLOR_WINDOW);
-const COLORREF LIST_ITEM_DEFAULT_BKCOLOR_GRAY = RGB(225, 225, 225);
-const COLORREF LIST_ITEM_SELECTED = RGB(150, 150, 200);
-const COLORREF LIST_ITEM_DISABLE = RGB(180, 180, 200);
 const bool REFRESH_ON_ITEM = TRUE;
 
 //const int SEND_COMMAND_DELAY_TIME = 100;
@@ -669,29 +665,6 @@ struct Changed_Item_Info
 	int nCol;
 };
 
-/*typedef*/ struct _MessageWriteListInfo
-{
-	uint32_t deviceid;
-	int8_t command;
-	int8_t start_instance;
-	int8_t end_instance;
-	unsigned short entitysize;
-	CString Write_Info;
-	HWND hWnd;
-	Changed_Item_Info ItemInfo;
-};
-
-/*typedef*/ struct _MessageRefreshListInfo
-{
-	uint32_t deviceid;
-	int8_t command;
-	int8_t start_instance;
-	int8_t end_instance;
-	unsigned short entitysize;
-	int8_t block_size;
-	HWND hWnd;
-};
-
 struct Data_Time_Match
 {
 	int analogdata;
@@ -1071,7 +1044,7 @@ const CString Time_Zone_Name[] =
 	_T("(UTC - 11:00) , X-ray Time Zone"),
 	_T("(UTC - 10:00) , Cook Island , Hawaii-Aleutian Standard Time"),
 	_T("(UTC - 09:00) , Alaska Standard Time , Gambier Time"),
-	_T("(UTC - 08:00) , Pacific Standard Time , Tiempo del Pacífico"),
+	_T("(UTC - 08:00) , Pacific Standard Time , Tiempo del Pacfico"),
 	_T("(UTC - 07:00) , Mountain Standard Time , Pacific Daylight Time"),
 	_T("(UTC - 06:00) , Central Standard Time , Galapagos Time"),
 	_T("(UTC - 05:00) , Eastern Standard Time"),
@@ -1716,8 +1689,14 @@ const CString Input_Filter_Array[8] =
 const CString Input_Unit[42] =
 {
 	_T("Not Used"),
+// TODO: Check with Fance about the validity of these units
+#ifdef _WINDOWS
 	_T("℃"),
 	_T("℉"),
+#else
+	_T("i"),
+	_T("H"),
+#endif	
 	_T("FPM"),
 	_T("Pa"),
 	_T("KPa"),
@@ -2727,6 +2706,6 @@ typedef  struct
 
 typedef map<int, CString> pidname_map;
 
-
+#endif
 
 
