@@ -40,7 +40,13 @@ typedef DWORD   COLORREF;
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <ifaddrs.h>
+#define SO_DONTLINGER   (int)(~SO_LINGER)
 typedef unsigned int        SOCKET;
+
+#define TRUE 1
 #endif
 
 #define BAC_SETTING_START_REG		9800

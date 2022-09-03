@@ -20,17 +20,33 @@ using namespace std;  // Ensure that the namespace is set to std
 vector <refresh_net_device_dll> m_refresh_net_device_data;
 
 int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind);
+
+#ifdef _WINDOWS
 struct ALL_LOCAL_SUBNET_NODE {
     CString StrIP;
     CString StrMask;
     CString StrGetway;
     int NetworkCardType;
 };
+#else
+#define SOCKADDR_IN sockaddr_in
+#define SOCKADDR sockaddr
+#define SOCKET_ERROR            (-1)
+#define closesocket close
+typedef struct timeval TIMEVAL;
+typedef struct timeval* PTIMEVAL;
+#define FAR
+struct ALL_LOCAL_SUBNET_NODE {
+    in_addr addr;
+    CString StrIP;
+};
+#endif
 
 vector <ALL_LOCAL_SUBNET_NODE> g_Scan_Vector_Subnet;
 void GetIPMaskGetWayForScan()
 {
     g_Scan_Vector_Subnet.clear();
+#ifdef _WINDOWS
     PIP_ADAPTER_INFO pAdapterInfo;
     PIP_ADAPTER_INFO pAdapter = NULL;
     DWORD dwRetVal = 0;
@@ -74,9 +90,39 @@ void GetIPMaskGetWayForScan()
     {
 
     }
+#else
+    ifaddrs* ifaddr, * ifa;
+    if (getifaddrs(&ifaddr) == -1)
+    {        
+        return; // g_Scan_Vector_Subnet is not filled. 
+    }
+    
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr == NULL)
+            continue;
+        ALL_LOCAL_SUBNET_NODE  Temp_Node;
+        Temp_Node.addr = ((sockaddr_in*)(ifa->ifa_addr))->sin_addr;
+        g_Scan_Vector_Subnet.push_back(Temp_Node);
+        // TODO: How to fill StrIP? Do we need it?
+    }
+
+    freeifaddrs(ifaddr);
+#endif
 }
+
+#ifdef _WINDOWS
 #include <winsock.h>
 #include <winsock2.h>
+#else
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#define Sleep sleep
+#endif
+
+
 unsigned int g_llTxCount = 0;
 unsigned int g_llRxCount = 0;
 CString local_enthernet_ip;
@@ -91,10 +137,17 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
 
     for (int index = 0; index < g_Scan_Vector_Subnet.size(); index++)
     {
+#ifdef _WINDOWS
         if (g_Scan_Vector_Subnet[index].StrIP.Find(_T("0.0.0.0")) != -1)
         {
             continue;
         }
+#else
+        if (g_Scan_Vector_Subnet[index].StrIP.find(_T("0.0.0.0")) != -1)
+        {
+            continue;
+        }
+#endif
         SOCKET sListen = NULL;
 #pragma region new_socket
         SOCKET h_scan_Broad = NULL;
@@ -104,7 +157,11 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
         BOOL bBroadcast = TRUE;
         ::setsockopt(h_scan_Broad, SOL_SOCKET, SO_BROADCAST, (char*)&bBroadcast, sizeof(BOOL));
         int iMode = 1;
+#ifdef _WINDOWS
         ioctlsocket(h_scan_Broad, FIONBIO, (u_long FAR*) & iMode);
+#else
+        ioctl(h_scan_Broad, FIONBIO, (u_long FAR*) & iMode);
+#endif
 
         BOOL bDontLinger = FALSE;
         setsockopt(h_scan_Broad, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));
@@ -124,11 +181,15 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
 
 #pragma endregion new_socket
 
-
+#ifdef _WINDOWS
         local_enthernet_ip = g_Scan_Vector_Subnet[index].StrIP;
         WideCharToMultiByte(CP_ACP, 0, local_enthernet_ip.GetBuffer(), -1, local_network_ip, 255, NULL, NULL);
         h_siBind.sin_family = AF_INET;
         h_siBind.sin_addr.s_addr = inet_addr(local_network_ip);
+#else
+        h_siBind.sin_family = AF_INET;
+        h_siBind.sin_addr.s_addr = g_Scan_Vector_Subnet[index].addr.s_addr;
+#endif
         //	h_siBind.sin_port=
         h_siBind.sin_port = htons(57629);
         if (-1 == bind(h_scan_Broad, (SOCKADDR*)&h_siBind, sizeof(h_siBind)))//把网卡地址强行绑定到Socket
@@ -153,7 +214,9 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
         BYTE buffer[512] = { 0 };
 
         BYTE pSendBuf[1024];
-        ZeroMemory(pSendBuf, 255);
+        // Fance to review: Cross platform
+        // ZeroMemory(pSendBuf, 255);
+        memset(pSendBuf, 0, 255); // Why not sizeof(pSendBuf)?
         pSendBuf[0] = 100;
         //pSendBuf[1] = END_FLAG;
         memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
@@ -170,29 +233,36 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
             nRet = ::sendto(h_scan_Broad, (char*)pSendBuf, nSendLen, 0, (sockaddr*)&h_scan_bcast, sizeof(h_scan_bcast));
             if (nRet == SOCKET_ERROR)
             {
+#ifdef _WINDOWS
                 int  nError = WSAGetLastError();
-
+#endif
                 goto END_SCAN;
                 //return 0;
             }
 
-
+#ifdef _WINDOWS
             int nLen = sizeof(h_scan_siBind);
+#else
+            unsigned int nLen = sizeof(h_scan_siBind);
+#endif
 
 
             fd_set fdRead = fdSocket;
             int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
             if (nSelRet == SOCKET_ERROR)
             {
+#ifdef _WINDOWS
                 int nError = WSAGetLastError();
-
+#endif
                 goto END_SCAN;
                 return 0;
             }
 
             if (nSelRet > 0)
             {
-                ZeroMemory(buffer, 512);
+                // Fance to review...
+                // ZeroMemory(buffer, 512);
+                memset(buffer, 0, 512);
 
                 do
                 {
@@ -211,12 +281,14 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
                             szIPAddr[1] = buffer[18];
                             szIPAddr[2] = buffer[20];
                             szIPAddr[3] = buffer[22];
+#ifdef _WINDOWS
                             CString StrIp;
                             StrIp.Format(_T("%d.%d.%d.%d"), szIPAddr[0], szIPAddr[1], szIPAddr[2], szIPAddr[3]);
                             if (StrIp.GetLength() <= 16)
                             {
 
                             }
+#endif
 
 
                             int n = 1;
@@ -380,9 +452,18 @@ int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind)
     }
     DWORD nSerial = temp_data.reg.serial_low + temp_data.reg.serial_low_2 * 256 + temp_data.reg.serial_low_3 * 256 * 256 + temp_data.reg.serial_low_4 * 256 * 256 * 256;
     CString nip_address;
+#ifdef _WINDOWS
     nip_address.Format(_T("%u.%u.%u.%u"), temp_data.reg.ip_address_1, temp_data.reg.ip_address_2, temp_data.reg.ip_address_3, temp_data.reg.ip_address_4);
+#else
+    nip_address.reserve(255);
+    swprintf(&nip_address[0], 255, _T("%u.%u.%u.%u"), temp_data.reg.ip_address_1, temp_data.reg.ip_address_2, temp_data.reg.ip_address_3, temp_data.reg.ip_address_4);
+#endif
     CString nproduct_name = GetProductName(temp_data.reg.product_id);
+#ifdef _WINDOWS
     if (nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
+#else
+    if (nproduct_name.empty())
+#endif
     {
         if (temp_data.reg.product_id < 220)
         {
@@ -394,14 +475,25 @@ int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind)
     temp.sw_version = temp_data.reg.sw_version;
     temp.hw_version = temp_data.reg.hw_version;
     //temp.ip_address = nip_address;
+#ifdef _WINDOWS
     WideCharToMultiByte(CP_ACP, 0, nip_address.GetBuffer(), -1, temp.ip_address, 30, NULL, NULL);
-    //memcpy_s(temp.ip_address, 30, nip_address, 30);
+#else
+    memcpy(temp.ip_address, nip_address.c_str(), 30);
+#endif
     temp.product_id = temp_data.reg.product_id;
     temp.modbusID = temp_data.reg.modbus_id;
     temp.nSerial = nSerial;
-    WideCharToMultiByte(CP_ACP, 0, local_enthernet_ip.GetBuffer(), -1, temp.NetCard_Address, 30, NULL, NULL);
 
+    // Fance to review: NetCard_Address seems not be used 
+#ifdef _WINDOWS
+    WideCharToMultiByte(CP_ACP, 0, local_enthernet_ip.GetBuffer(), -1, temp.NetCard_Address, 30, NULL, NULL);
+#endif
+
+#ifdef _WINDOWS
     memcpy_s(temp.show_label_name, 50, temp_data.reg.panel_name, 20);
+#else
+    memcpy(temp.show_label_name, temp_data.reg.panel_name, 20);
+#endif
 
     temp.parent_serial_number = temp_data.reg.parent_serial_number;
 
@@ -435,12 +527,14 @@ int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind)
     {
         memcpy(temp_label.label_name, &temp_point[0], 20);
         temp_point = temp_point + 20;
+#ifdef _WINDOWS
         CString cs_temp_label;
         MultiByteToWideChar(CP_ACP, 0, (char*)temp_label.label_name, (int)strlen((char*)temp_label.label_name) + 1,
             cs_temp_label.GetBuffer(MAX_PATH), MAX_PATH);
         cs_temp_label.ReleaseBuffer();
         if (cs_temp_label.GetLength() > 20)
             cs_temp_label = cs_temp_label.Left(20);
+#endif
         temp_label.serial_number = (unsigned int)nSerial;
     }
 
