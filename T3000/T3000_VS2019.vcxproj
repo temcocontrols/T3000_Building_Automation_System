@@ -273,6 +273,7 @@
     <ClCompile Include="ConfigFileHandler.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
     <ClCompile Include="ConnectRemoteServer.cpp" />
+    <ClCompile Include="CTransducer.cpp" />
     <ClCompile Include="CTstatAQ_Parameter.cpp" />
     <ClCompile Include="CustomSource\JPGLoader.cpp" />
     <ClCompile Include="CustomSource\Splash.cpp" />
@@ -399,6 +400,7 @@
     <ClCompile Include="TStatScanner.cpp" />
     <ClCompile Include="TStatScheduleDlg.cpp" />
     <ClCompile Include="UserAcessSetDlg.cpp" />
+    <ClCompile Include="WebView\WebViewHvacDraw.cpp" />
     <ClCompile Include="Weekly_Routines.cpp" />
     <ClCompile Include="WeeklyRout_InsertDia.cpp" />
     <ClCompile Include="WifiConfigDlg.cpp" />
@@ -665,6 +667,7 @@
     <ClInclude Include="ConnectRemoteServer.h" />
     <ClInclude Include="CControlBasicEditorCOM.h" />
     <ClInclude Include="CRange0.h" />
+    <ClInclude Include="CTransducer.h" />
     <ClInclude Include="CTstatAQ_Parameter.h" />
     <ClInclude Include="CustomSTable.h" />
     <ClInclude Include="CWebBrowser2.h" />

@@ -287,7 +287,7 @@ void CBacnetOutput::Initial_List()
 	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Man"), 65, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HOA Switch"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-    m_output_list.InsertColumn(OUTPUT_RELINQUISH_VALUE, _T("Relinquish"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+    //m_output_list.InsertColumn(OUTPUT_RELINQUISH_VALUE, _T("Relinquish"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_RANGE, _T("Range"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	
@@ -495,14 +495,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 	}
 
-    if (g_output_support_relinquish != 0)
-    {
-        m_output_list.SetColumnWidth(OUTPUT_RELINQUISH_VALUE, 80);
-    }
-    else
-    {
-        m_output_list.SetColumnWidth(OUTPUT_RELINQUISH_VALUE, 0);
-    }
+    //if (g_output_support_relinquish != 0)
+    //{
+    //    m_output_list.SetColumnWidth(OUTPUT_RELINQUISH_VALUE, 80);
+    //}
+    //else
+    //{
+    //    m_output_list.SetColumnWidth(OUTPUT_RELINQUISH_VALUE, 0);
+    //}
 	if(show_output_external != temp_need_show_external)
 	{
 		show_output_external = temp_need_show_external;
@@ -882,7 +882,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				}
 			}
 		}
-
+#if 0
         if (g_output_support_relinquish != 0)
         {
             int relinquish_value = 0;
@@ -908,7 +908,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
             m_output_list.SetItemText(i, OUTPUT_RELINQUISH_VALUE, temp_relinquish_value);
         }
-
+#endif
 			CString main_sub_panel;
 
 #pragma region External info
@@ -1244,7 +1244,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		}
 	}
 
-
+#if 0
     if (Changed_SubItem == OUTPUT_RELINQUISH_VALUE)
     {
         if (g_output_support_relinquish == 1)
@@ -1278,7 +1278,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
         }
 
     }
-
+#endif
 	if(Changed_SubItem == OUTPUT_DECOM)
 	{
 		CString temp_cs = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
@@ -1456,60 +1456,60 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 			New_CString = temparray.GetAt(0);
 		}
 	}
-    else if (lCol == OUTPUT_RELINQUISH_VALUE)
-    {
-        if (g_output_support_relinquish != 0)
-        {
-            int relinquish_value = 0;
-            relinquish_value = output_relinquish_value[2 * lRow] * 65536 + output_relinquish_value[lRow * 2 + 1];
-            if (m_Output_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
-            {
-                if ((m_Output_data.at(lRow).range < 23) && (m_Output_data.at(lRow).range != 0))
-                    temp1 = Digital_Units_Array[m_Output_data.at(lRow).range];
-                else if ((m_Output_data.at(lRow).range >= 23) && (m_Output_data.at(lRow).range <= 30))
-                {
-                    if (receive_customer_unit)
-                        temp1 = Custom_Digital_Range[m_Output_data.at(lRow).range - 23];
-                    else
-                    {
-                        m_output_list.Set_Edit(false);
-                        return;
-                    }
-                }
-                else
-                    return;
+    //else if (lCol == OUTPUT_RELINQUISH_VALUE)
+    //{
+    //    if (g_output_support_relinquish != 0)
+    //    {
+    //        int relinquish_value = 0;
+    //        relinquish_value = output_relinquish_value[2 * lRow] * 65536 + output_relinquish_value[lRow * 2 + 1];
+    //        if (m_Output_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL)
+    //        {
+    //            if ((m_Output_data.at(lRow).range < 23) && (m_Output_data.at(lRow).range != 0))
+    //                temp1 = Digital_Units_Array[m_Output_data.at(lRow).range];
+    //            else if ((m_Output_data.at(lRow).range >= 23) && (m_Output_data.at(lRow).range <= 30))
+    //            {
+    //                if (receive_customer_unit)
+    //                    temp1 = Custom_Digital_Range[m_Output_data.at(lRow).range - 23];
+    //                else
+    //                {
+    //                    m_output_list.Set_Edit(false);
+    //                    return;
+    //                }
+    //            }
+    //            else
+    //                return;
 
-                if (relinquish_value == 1000)
-                    relinquish_value = 0;
-                else
-                    relinquish_value = 1000;
-                int ret_write_high = write_one(g_tstat_id, 9400 + 2 * lRow, 0);
-                int ret_write_low = write_one(g_tstat_id, 9400 + 2 * lRow + 1, relinquish_value);
-                if ((ret_write_high < 0) || (ret_write_low < 0))
-                {
-                    MessageBox(_T("Write data timeout!"), _T("Warning"));
-                    return ;
-                }
-                else
-                {
-                    SplitCStringA(temparray, temp1, _T("/"));
-                    CString temp_change_value;
-                    if(relinquish_value == 0)
-                        temp_change_value =  temparray.GetAt(0);
-                    else
-                        temp_change_value = temparray.GetAt(1);
-                    m_output_list.SetItemText(lRow, OUTPUT_RELINQUISH_VALUE, temp_change_value);
-                    CString temp_cs;
-                    temp_cs.Format(_T("Write Output List Item%d .Changed to \"%s\" success"), lRow, temp_change_value);
-                    SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
-                }
-                m_output_list.Set_Edit(false);
-                return;
-            }
-        }
-        else
-            return;
-    }
+    //            if (relinquish_value == 1000)
+    //                relinquish_value = 0;
+    //            else
+    //                relinquish_value = 1000;
+    //            int ret_write_high = write_one(g_tstat_id, 9400 + 2 * lRow, 0);
+    //            int ret_write_low = write_one(g_tstat_id, 9400 + 2 * lRow + 1, relinquish_value);
+    //            if ((ret_write_high < 0) || (ret_write_low < 0))
+    //            {
+    //                MessageBox(_T("Write data timeout!"), _T("Warning"));
+    //                return ;
+    //            }
+    //            else
+    //            {
+    //                SplitCStringA(temparray, temp1, _T("/"));
+    //                CString temp_change_value;
+    //                if(relinquish_value == 0)
+    //                    temp_change_value =  temparray.GetAt(0);
+    //                else
+    //                    temp_change_value = temparray.GetAt(1);
+    //                m_output_list.SetItemText(lRow, OUTPUT_RELINQUISH_VALUE, temp_change_value);
+    //                CString temp_cs;
+    //                temp_cs.Format(_T("Write Output List Item%d .Changed to \"%s\" success"), lRow, temp_change_value);
+    //                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
+    //            }
+    //            m_output_list.Set_Edit(false);
+    //            return;
+    //        }
+    //    }
+    //    else
+    //        return;
+    //}
 	else if(lCol == OUTPUT_AUTO_MANUAL)
 	{
 		memcpy_s(&m_temp_output_data[lRow],sizeof(Str_out_point),&m_Output_data.at(lRow),sizeof(Str_out_point));
@@ -1904,7 +1904,7 @@ int GetOutputLabelEx(Str_out_point temp_out, CString& ret_label, Point_Net* npoi
 	if (temp_cs.IsEmpty())
 	{
 		if (npoint == NULL)
-			temp_cs.Format(_T("OUT%u"), npoint->number + 1);
+			temp_cs.Empty();
 		else
 			temp_cs.Format(_T("%dOUT%u"), npoint->panel, npoint->number + 1);
 		ret_label = temp_cs;
@@ -1921,7 +1921,8 @@ int GetOutputLabel(int index, CString &ret_label, Point_Net * npoint)
 		return -1;
 	}
 	int i = index;
-	return GetOutputLabelEx(m_Output_data.at(index), ret_label, npoint);
+
+		return GetOutputLabelEx(m_Output_data.at(index), ret_label, npoint);
 
 }
 int GetOutputFullLabelEx(Str_out_point temp_out, CString& ret_full_label, Point_Net* npoint)
@@ -1936,7 +1937,7 @@ int GetOutputFullLabelEx(Str_out_point temp_out, CString& ret_full_label, Point_
 	if (temp_cs.IsEmpty())
 	{
 		if (npoint == NULL)
-			temp_cs.Format(_T("OUT%u"), npoint->number + 1);
+			temp_cs.Empty();
 		else
 			temp_cs.Format(_T("%dOUT%u"), npoint->panel, npoint->number + 1);
 		ret_full_label = temp_cs;
@@ -1953,7 +1954,8 @@ int GetOutputFullLabel(int index,CString &ret_full_label , Point_Net * npoint)
 		return -1;
 	}
 	int i = index;
-	return GetOutputFullLabelEx(m_Output_data.at(index), ret_full_label, npoint);
+
+		return GetOutputFullLabelEx(m_Output_data.at(index), ret_full_label, npoint);
 }
 
 int GetOutputValueEx(Str_out_point temp_out, CString& ret_cstring, CString& ret_unit, CString& Auto_M, int& digital_value)

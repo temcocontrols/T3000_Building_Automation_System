@@ -820,7 +820,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             //m_page_basic_info.m_edit_zone_name.SetWindowTextW(_T(""));
         }
 
-        if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 625)
+        if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 626)
         {
             (CButton *)GetDlgItem(IDC_BUTTON_SETTING_GSM_MODUAL)->EnableWindow(TRUE);
         }
@@ -1201,6 +1201,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             unsigned long  temp_time_long123 = time(NULL);
             unsigned long  temp_time_long = Device_time.new_time.n_time;
 
+
             //**********************************************************
             //2019 05 20 Fance 用于处理 电脑勾选了夏令时 引起的 T3 显示时间 与实际时间总是相差一小时的问题;
             TIME_ZONE_INFORMATION tzi;
@@ -1255,6 +1256,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
   
                 //int day_of_year = temp_month * 30 + temp_day;
                 //if ((day_of_year >= 73) && (day_of_year < 311))
+
                 if(check_daylight)
                 {
                     scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
@@ -1273,52 +1275,42 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             //MessageBox(temp_debug);
 #pragma endregion
 
-#if 0
-            //CString temp_debug;
-            //temp_debug.Format(_T("Time(NULL) = %u\r\ntzi.DaylightBias = %d\r\ntzi.StandardBias=%d\r\n\Device Time=%u"), temp_time_long123, tzi.DaylightBias, tzi.StandardBias, temp_time_long);
-            //MessageBox(temp_debug);
-            //**********************************************************
-            panel_time_to_basic_delt = Device_Basic_Setting.reg.time_zone * 360 / 10;
-
-            //因为本地CDateTimeCtrl 在设置时间的时候 会默认 加上 电脑的时区，但是显示的时候要显示 设备所选时区，所以 要 变换.
-            time_t scale_time;
-            if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
-                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
-            else if (Device_Basic_Setting.reg.time_zone_summer_daytime == 1)
-            {
-                CTime	temptimevalue;
-                time_t temp_t_time;
-                temp_t_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
-                temptimevalue = temp_t_time;
-                int temp_month =temptimevalue.GetMonth();
-                int temp_day = temptimevalue.GetDay();
-                int day_of_year = temp_month * 30 + temp_day;
-                if ((day_of_year > 73) && (day_of_year < 311))
-                {
-                    scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
-                }
-                else
-                    scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt ; //如果选中夏令时 需要显示的时候加一个小时
-                
-            }
-            else
-                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
-            //TimeTemp = scale_time + computer_DaylightBias; //20200525
-            TimeTemp = scale_time;//+ computer_DaylightBias;
-#endif
-            //CString temp_string;
-            //temp_string.Format(_T("%d PC\r\n%d Panel\r\ntzi.DaylightBias = %d\r\n PC_tziBias = %d"), 
-            //    temp_time_long123, 
-            //    temp_time_long, 
-            //    tzi.DaylightBias, 
-            //    tzi.Bias);
-            //MessageBox(temp_string);
         }
 
         //减去系统现在的时区 ，然后在加上 minipanel自己的时区.
         m_page_time.m_cm5_time_picker.SetFormat(_T("HH:mm"));
-        m_page_time.m_cm5_time_picker.SetTime(&TimeTemp);
-        m_page_time.m_cm5_date_picker.SetTime(&TimeTemp);
+        unsigned short read_data[10];
+        int nmultyRet = Read_Multi(g_tstat_id, &read_data[0], 200, 10, 3);
+        if ((nmultyRet > 0) &&
+            ((read_data[3] > 0) && (read_data[3] <=31)) &&
+            ((read_data[5] > 0) && (read_data[5] <= 12)) &&
+            ((read_data[6]> 0) && (read_data[6] <= 50)) &&
+            ((read_data[2]>=0) && (read_data[2]<24)) &&
+            ((read_data[1]>=0) && (read_data[1] < 60 )))
+        {
+
+            int temp_int_hour;
+            int temp_int_min;
+            int temp_year;
+            int temp_month;
+            int temp_day;
+            temp_day = read_data[3];
+            temp_month = read_data[5];
+            temp_year = read_data[6] + 2000;
+            temp_int_hour = read_data[2];
+            temp_int_min = read_data[1];
+            CTime TimeTemp_reg(temp_year, temp_month, temp_day, temp_int_hour, temp_int_min, 0);
+            m_page_time.m_cm5_date_picker.SetTime(&TimeTemp_reg);
+            m_page_time.m_cm5_time_picker.SetTime(&TimeTemp_reg);
+        }
+        else
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read Time information timeout"));
+            m_page_time.m_cm5_date_picker.SetTime(&TimeTemp);
+            m_page_time.m_cm5_time_picker.SetTime(&TimeTemp);
+        }
+
+
 #pragma endregion about_time
     }
     break;

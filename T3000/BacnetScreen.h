@@ -38,6 +38,7 @@ public:
 	void Unreg_Hotkey();
 	afx_msg void OnBnClickedInsert();
 	static	DWORD WINAPI  ReadScreenThreadfun(LPVOID lpVoid);
+	static DWORD WINAPI  CreateWebServerThreadfun(LPVOID lpVoid);
 	static DWORD WINAPI  WritePictureThread(LPVOID lpVoid);
 	static DWORD WINAPI  GetPictureThread(LPVOID lpVoid);
 	bool read_screen_label();
@@ -52,6 +53,7 @@ public:
 	void OnSysCommand(UINT nID, LPARAM lParam);
 	bool window_max; // 标记是否已经最大化;
 	void OnBnClickedWebViewShow();
+
 };
 
 

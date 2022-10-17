@@ -67,11 +67,11 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 {
     if (FAILED(OleInitialize(NULL)))
         throw std::runtime_error("Could not initialize COM!");
-    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput; 
     Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 
     ++s_appInstances;
-    std::wstring title = L"BacnetWebView Demo Application 0.2";
+    std::wstring title = L"BacnetWebView Demo Application 0.3";
     m_mainWindow = CreateWindowExW(0, GetWindowClass(), title.c_str(), 
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, BacNet_hwd, nullptr,
         GetModuleHandle(nullptr), nullptr);
@@ -197,6 +197,8 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
     break;
     case WM_PAINT:
     {
+        if (m_webView)
+         m_webView->PostWebMessageAsJson(L"{\"SetInput\":{\"id\":\"IN2\",\"value\":\"On\"}}");
         PAINTSTRUCT ps;
         HDC hdc;
         RECT mainWindowBounds;

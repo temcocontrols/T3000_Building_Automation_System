@@ -2449,8 +2449,8 @@ BOOL CImageTreeCtrl::OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 		temp_parent_info.Format(_T("Parent node SerialNumber :%u\n"), tooltip_product.note_parent_serial_number);
 	}
 
-	strmyTipText.Format(_T("Panel Name : %s \nProduct Type : %s \nSeiralNumber :%u \n\n"),
-tooltip_product.NameShowOnTree.GetBuffer(), GetProductName(tooltip_product.product_class_id).GetBuffer(), tooltip_product.serial_number);
+	strmyTipText.Format(_T("Panel Name : %s \nProduct Type : %s \nSeiralNumber :%u \nPanel Number : %u\n\n"),
+tooltip_product.NameShowOnTree.GetBuffer(), GetProductName(tooltip_product.product_class_id).GetBuffer(), tooltip_product.serial_number, tooltip_product.panel_number);
 	strmyTipText = strmyTipText + temp_bacnet_info + temp_tcp_info + temp_rs485_info + temp_parent_info + temp_virtual_device;
 	int length111 = strTipText.GetLength();
     //strTipText.Format(_T("%s"), GetItemText((HTREEITEM)nID));  //get item text

@@ -2008,6 +2008,7 @@ int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t sta
     int send_status = true;
     if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) //如果支持 转接头协议 ，并且默认重试10次，就改默认3次，没必要那么久;
     {
+        gsp_invoke = -1;
         if (retrytime == 10)
             retrytime = 4;
     }
@@ -6986,7 +6987,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
     temp_1.device_id = device_id;
     //	temp_1.vendor_id = vendor_id;
     temp_1.macaddress = _wtoi(bac_cs_mac);
-
+    temp_1.vendor_id = vendor_id;
     int find_exsit = false;
     for (int i=0; i<(int)m_bac_handle_Iam_data.size(); i++)
     {
@@ -8177,7 +8178,12 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         temp_serial_number.Format(_T("%u"), temp_label.serial_number);
         temp.show_label_name = cs_temp_label;
     }
-
+    if ((temp.panal_number <= 255) && temp.parent_serial_number == 0)
+    {
+        g_bac_panel[temp.panal_number].object_instance = temp.object_instance;
+        g_bac_panel[temp.panal_number].panel_number = temp.panal_number;
+        g_bac_panel[temp.panal_number].last_update_time = time(NULL);
+    }
 
 
 	if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))

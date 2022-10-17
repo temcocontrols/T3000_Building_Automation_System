@@ -1374,7 +1374,7 @@ int GetVariableLabelEx(Str_variable_point temp_var, CString& ret_label, Point_Ne
 	if (temp_cs.IsEmpty())
 	{
 		if (npoint == NULL)
-			temp_cs.Format(_T("VAR%u"), npoint->number + 1);
+			temp_cs.Empty();
 		else
 			temp_cs.Format(_T("%dVAR%u"), npoint->panel, npoint->number + 1);
 		ret_label = temp_cs;
@@ -1405,7 +1405,7 @@ int GetVariableFullLabelEx(Str_variable_point temp_var, CString& ret_full_label,
 	if (temp_cs.IsEmpty())
 	{
 		if (npoint == NULL)
-			temp_cs.Format(_T("VAR%u"), npoint->number + 1);
+			temp_cs.Empty();
 		else
 			temp_cs.Format(_T("%dVAR%u"), npoint->panel, npoint->number + 1);
 		ret_full_label = temp_cs;
@@ -1414,9 +1414,9 @@ int GetVariableFullLabelEx(Str_variable_point temp_var, CString& ret_full_label,
 	return 1;
 }
 
-int GetVariableFullLabel(int index,CString &ret_full_label, Point_Net * npoint)
+int GetVariableFullLabel(int index, CString& ret_full_label, Point_Net* npoint)
 {
-	if(index >= BAC_VARIABLE_ITEM_COUNT)
+	if (index >= BAC_VARIABLE_ITEM_COUNT)
 	{
 		ret_full_label.Empty();
 		return -1;
