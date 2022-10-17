@@ -96,6 +96,7 @@ BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
 	ON_WM_TIMER()
 //	ON_WM_RBUTTONDOWN()
 	ON_COMMAND(ID_PROPERTIES_GOTODEFINITION, &CBacnetProgramEdit::OnPropertiesGotodefinition)
+	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_EDIT_HELP, &CBacnetProgramEdit::OnBnClickedButtonProgramEditHelp)
 END_MESSAGE_MAP()
 
 
@@ -1339,3 +1340,16 @@ void CBacnetProgramEdit::OnPropertiesGotodefinition()
 	PostMessage(WM_KEYDOWN, VK_INSERT,1); 
 }
 
+
+
+void CBacnetProgramEdit::OnBnClickedButtonProgramEditHelp()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString temp_demo_prog;
+	temp_demo_prog = g_strExePth + _T("ResourceFile\\DemoPrg.txt");
+	ShellExecute(this->m_hWnd, _T("open"), temp_demo_prog, NULL, NULL, SW_SHOWNORMAL);
+
+	temp_demo_prog = g_strExePth + _T("T3000_Help.chm");
+	ShellExecute(this->m_hWnd, _T("open"), temp_demo_prog, NULL, NULL, SW_SHOWNORMAL);
+
+}

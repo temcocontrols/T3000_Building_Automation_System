@@ -17,7 +17,7 @@
 #include <windows.h>  
  
 
-const unsigned int g_versionNO= 20220819;
+const unsigned int g_versionNO= 20221008;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -679,6 +679,12 @@ BOOL CT3000App::InitInstance()
 #ifdef LOCAL_DB_FUNCTION
 	init_product_list();
 #endif
+	for (int i = 0; i < 256; i++)
+	{
+		g_bac_panel[i].panel_number = i;
+		g_bac_panel[i].object_instance = 0;
+		g_bac_panel[i].last_update_time = 0;
+	}
 	//Create_T3000_log_file();
 	return TRUE;
 }

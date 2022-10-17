@@ -73,4 +73,7 @@ public:
     bool ip2_need_change;
     afx_msg void OnClose();
     virtual void OnCancel();
+	CStaticEx m_edit_ipaddress_1;
+	CStaticEx m_edit_ipaddress_2;
+	CStaticEx m_static_ipaddress;
 };

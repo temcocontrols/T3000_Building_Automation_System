@@ -19,6 +19,7 @@ CBacnetScreenEdit * ScreenEdit_Window = NULL;
 extern vector <MSG> My_Receive_msg;
 extern CCriticalSection MyCriticalSection;
 HANDLE h_read_screenlabel_thread = NULL;
+HANDLE h_create_webview_server_thread = NULL;
 HANDLE h_write_pic_thread = NULL;
 HANDLE h_get_pic_thread = NULL;
 CString Change_File_Path;
@@ -1448,7 +1449,11 @@ void BacnetScreen::OnBnClickedWebViewShow()
 		}
 
 	}
-
+	if (h_create_webview_server_thread == NULL)
+	{
+		h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
+	}
+	Sleep(1000);
 	const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
 
 	//CFileDialog dlg(TRUE, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
@@ -1466,8 +1471,9 @@ void BacnetScreen::OnBnClickedWebViewShow()
 		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
 		ApplicationFolder.ReleaseBuffer();
 		Resource_folder = ApplicationFolder + _T("\\ResourceFile");
-		webviewFolder = Resource_folder + _T("\\webview\\webview.html");
-
+		//webviewFolder = Resource_folder + _T("\\webview\\webview.html");
+		webviewFolder = _T("http://localhost:9103/");
+	
 		//webviewFolder = SOLUTION_DIR  _T("T3000\\webview\\webview.html");
 		//CString sFilePath = dlg.GetPathName();
 		wstring fullpath = webviewFolder;
@@ -1476,3 +1482,16 @@ void BacnetScreen::OnBnClickedWebViewShow()
 		delete webviewwindow;
 	}
 }
+
+int main_webview();
+
+
+DWORD WINAPI  BacnetScreen::CreateWebServerThreadfun(LPVOID lpVoid)
+{
+	BacnetScreen* pParent = (BacnetScreen*)lpVoid;
+
+	main_webview();
+	h_create_webview_server_thread = NULL;
+	return 0;
+}
+

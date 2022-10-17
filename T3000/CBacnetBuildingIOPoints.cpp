@@ -193,9 +193,11 @@ LRESULT CBacnetBuildingIOPoints::Fresh_Building_IO_List(WPARAM wParam, LPARAM lP
 								if (temp_bm_io.type == TYPE_BM_INPUT)
 								{
 									memcpy(&temp_data.data.m_group_input_data, temp_chardata, sizeof(Str_in_point));
+
 									Input_CString temp_input;
 									InputDataToString(temp_data.data.m_group_input_data, &temp_input);
 									temp_bm_io.input_cstring = temp_input;
+									
 								}
 								else if (temp_bm_io.type == TYPE_BM_OUTPUT)
 								{
@@ -211,7 +213,7 @@ LRESULT CBacnetBuildingIOPoints::Fresh_Building_IO_List(WPARAM wParam, LPARAM lP
 									VariableDataToString(temp_data.data.m_group_variable_data, &temp_variable);
 									temp_bm_io.variable_cstring = temp_variable;
 								}
-
+								memcpy(&temp_bm_io.m_data, &temp_data.data, sizeof(str_group_point));
 							}
 							m_bm_io_data.push_back(temp_bm_io);
 						}
@@ -518,6 +520,115 @@ void CBacnetBuildingIOPoints::OnNMClickListBmIoPoints(NMHDR* pNMHDR, LRESULT* pR
 		{
 			BacnetRange dlg;
 			initial_dialog = 2;
+			dlg.DoModal();
+		}
+	}
+	else if (m_bm_io_data.at(lRow).type == TYPE_BM_OUTPUT)
+	{
+		Str_out_point temp_out;
+		memcpy(&temp_out, m_bm_io_data.at(lRow).m_data, sizeof(Str_out_point));
+		if (lCol == BM_IO_VALUE)
+		{
+
+		}
+		else if (lCol == BM_IO_RANGE)
+		{
+
+			CString temp1;
+			BacnetRange dlg;
+			initial_dialog = 3;
+			dlg.DoModal();
+#if 1
+			if (range_cancel)
+			{
+				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST, lRow, REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+				return;
+			}
+
+			if (bac_range_number_choose == 0)	//如果选择的是 unused 就认为是analog 的unused;这样 能显示对应的value;
+			{
+				//m_Output_data.at(lRow).digital_analog = BAC_UNITS_ANALOG;
+				bac_ranges_type = OUTPUT_RANGE_ANALOG_TYPE;
+			}
+
+			if (bac_ranges_type == OUTPUT_RANGE_ANALOG_TYPE)
+			{
+				temp_out.digital_analog = BAC_UNITS_ANALOG;
+				temp_out.range = bac_range_number_choose;
+				m_io_list.SetItemText(lRow, BM_IO_UNITS, Output_Analog_Units_Show[bac_range_number_choose]);
+				m_io_list.SetItemText(lRow, BM_IO_RANGE, OutPut_List_Analog_Range[bac_range_number_choose]);
+
+
+				CString cstemp_value;
+				cstemp_value.Format(_T("%.2f"), ((float)m_Output_data.at(lRow).value) / 1000);
+				m_io_list.SetItemText(lRow, BM_IO_VALUE, cstemp_value);
+			}
+			else if ((bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE) || (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE) || (bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE))
+			{
+				temp_out.digital_analog = BAC_UNITS_DIGITAL;
+				temp_out.range = bac_range_number_choose;
+
+				CStringArray temparray;
+
+				if ((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
+				{
+					//temp1.Format(_T("%s"), Custom_Digital_Range[bac_range_number_choose - 23]);
+					temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
+				}
+				else
+					temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
+
+
+
+				SplitCStringA(temparray, temp1, _T("/"));
+
+				if (temp_out.control == 1)
+				{
+					if ((temparray.GetSize() == 2) && (!temparray.GetAt(1).IsEmpty()))
+					{
+						m_io_list.SetItemText(lRow, BM_IO_VALUE, temparray.GetAt(1));
+					}
+				}
+				else
+				{
+					if ((temparray.GetSize() == 2) && (!temparray.GetAt(0).IsEmpty()))
+					{
+						m_io_list.SetItemText(lRow, BM_IO_VALUE, temparray.GetAt(0));
+					}
+				}
+				m_io_list.SetItemText(lRow, BM_IO_RANGE, temp1);
+				m_io_list.SetItemText(lRow, BM_IO_UNITS, _T(""));//如果是数字单位 Unit 要清空;
+			}
+#endif
+		}
+
+		CString temp_array_value;
+		for (int x = 0; x < (int)sizeof(Str_out_point); x++)
+		{
+			CString temp_char;
+			if (x != 0)
+				temp_array_value = temp_array_value + _T(",");
+
+			temp_char.Format(_T("%02x"), (unsigned char)*((char*)&temp_out + x));
+			temp_array_value = temp_array_value + temp_char;
+		}
+		temp_array_value.MakeUpper();
+		CString temp_lpAppname;
+		temp_lpAppname.Format(_T("Group%d"), m_bm_io_data.at(lRow).group_index);
+		CString temp_keyname;
+		temp_keyname.Format(_T("nDataArray_%d_%d"), m_bm_io_data.at(lRow).category_index, m_bm_io_data.at(lRow).hw_index);
+		WritePrivateProfileStringW(temp_lpAppname, temp_keyname, temp_array_value, cs_bm_ini);
+	}
+	else if (m_bm_io_data.at(lRow).type == TYPE_BM_VARIABLE)
+	{
+		if (lCol == BM_IO_VALUE)
+		{
+
+		}
+		else if (lCol == BM_IO_RANGE)
+		{
+			BacnetRange dlg;
+			initial_dialog = 1;
 			dlg.DoModal();
 		}
 	}

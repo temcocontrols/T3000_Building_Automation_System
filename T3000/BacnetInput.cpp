@@ -2129,7 +2129,7 @@ int GetInputLabelEx(Str_in_point temp_in, CString& ret_label, Point_Net* npoint)
 	{
 		if (npoint == NULL)
 		{
-			ret_label.Format(_T("IN%d"), npoint->number + 1);
+			ret_label.Empty();
 		}
 		else
 		{
@@ -2150,7 +2150,13 @@ int GetInputLabel(int index, CString &ret_label, Point_Net * npoint )
 	}
 
 	int i = index;
-	return GetInputLabelEx(m_Input_data.at(i),  ret_label,  npoint);
+	//if (npoint == NULL)
+	//{
+	//	ret_label.Format(_T("IN%u"), index + 1);
+	//	return 1;
+	//}
+	//else
+		return GetInputLabelEx(m_Input_data.at(i),  ret_label,  npoint);
 }
 
 
@@ -2165,7 +2171,7 @@ int GetInputFullLabelEx(Str_in_point temp_in, CString& ret_full_label, Point_Net
 	{
 		if (npoint == NULL)
 		{
-			ret_full_label.Format(_T("IN%d"), npoint->number + 1);
+			ret_full_label.Empty();
 		}
 		else
 		{
@@ -2183,7 +2189,13 @@ int GetInputFullLabel(int index,CString &ret_full_label, Point_Net * npoint)
 		return -1;
 	}
 	int i = index;
-	return GetInputFullLabelEx(m_Input_data.at(i), ret_full_label, npoint);
+	//if (npoint == NULL)
+	//{
+	//	ret_full_label.Format(_T("IN%u"), index + 1);
+	//	return 1;
+	//}
+	//else
+		return GetInputFullLabelEx(m_Input_data.at(i), ret_full_label, npoint);
 }
 
 int GetInputValueEx(Str_in_point temp_in, CString& ret_cstring, CString& ret_unit, CString& Auto_M, int& digital_value)

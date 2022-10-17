@@ -323,6 +323,7 @@ void CBacnetSettingTcpip::OnBnClickedButtonWifiConfiguration()
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
 {
+    int reg_address = 59;
     unsigned char temp_com0_data = Device_Basic_Setting.reg.com0_config;
     UpdateData();
     CString temp_string;
@@ -399,7 +400,11 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
                 Device_Basic_Setting.reg.com0_config = 2;  //2 是TSTAT10的modbus协议
 
         }
-        ChangeDeviceProtocol(modbus_0_bacnet_1, Device_Basic_Setting.reg.modbus_id, 59, Device_Basic_Setting.reg.com0_config, 0, g_strCurBuildingDatabasefilePath);
+        else if (g_selected_product_id == PM_ESP32_T3_SERIES)
+        {
+            reg_address = 19;
+        }
+        ChangeDeviceProtocol(modbus_0_bacnet_1, Device_Basic_Setting.reg.modbus_id, reg_address, Device_Basic_Setting.reg.com0_config, 0, g_strCurBuildingDatabasefilePath);
         
         return;
     }
@@ -435,6 +440,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingCom1()
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
 {
+    int reg_address = 61;
     unsigned char temp_main_value = Device_Basic_Setting.reg.com2_config;
     UpdateData();
     CString temp_string;
@@ -504,7 +510,11 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
         //        Device_Basic_Setting.reg.com0_config = 2;  //2 是TSTAT10的modbus协议
 
         //}
-        ChangeDeviceProtocol(modbus_0_bacnet_1, Device_Basic_Setting.reg.modbus_id, 61, Device_Basic_Setting.reg.com2_config, 0, g_strCurBuildingDatabasefilePath);
+        if (g_selected_product_id == PM_ESP32_T3_SERIES)
+        {
+            reg_address = 21;
+        }
+        ChangeDeviceProtocol(modbus_0_bacnet_1, Device_Basic_Setting.reg.modbus_id, reg_address, Device_Basic_Setting.reg.com2_config, 0, g_strCurBuildingDatabasefilePath);
 
         return;
     }

@@ -110,6 +110,7 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "CBacnetBuildingManagement.h"
 #include "CBacnetBuildingMain.h"
 #include "CAirFlowSensor.h"
+#include "CTransducer.h"
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -630,7 +631,7 @@ void CMainFrame::InitViews()
     m_pViews[DLG_DIALOG_THIRD_PARTY_BAC] = NULL /*(CView *)new CBacnetThirdPartyMain;*/;
     m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT] = NULL;
     m_pViews[DLG_DIALOG_AIRFLOW] = NULL;
-    
+    m_pViews[DLG_DIALOG_TRANSDUCER] = NULL;
     CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
     newContext.m_pNewViewClass = NULL;
@@ -5005,6 +5006,15 @@ void CMainFrame::SwitchToPruductType(int nIndex)
 
                 m_pViews[DLG_DIALOG_AIRFLOW]->OnInitialUpdate();//?
                 break;
+            case DLG_DIALOG_TRANSDUCER:
+                m_pViews[DLG_DIALOG_TRANSDUCER] = (CView*)new CTransducer();
+                m_pViews[DLG_DIALOG_TRANSDUCER]->Create(NULL, NULL,
+                    (AFX_WS_DEFAULT_VIEW & ~WS_VISIBLE),
+                    rect, this,
+                    AFX_IDW_PANE_FIRST + DLG_DIALOG_TRANSDUCER, &newContext);
+
+                m_pViews[DLG_DIALOG_TRANSDUCER]->OnInitialUpdate();//?
+                break;
             default:
                 return;
                     break;
@@ -5282,6 +5292,13 @@ here:
         PostMessage(WM_SIZE, 0, 0);
     }
         break;
+    case DLG_DIALOG_TRANSDUCER:
+    {
+        m_nCurView = DLG_DIALOG_TRANSDUCER;
+        ((CTransducer*)m_pViews[m_nCurView])->Fresh();
+        PostMessage(WM_SIZE, 0, 0);
+    }
+    break;
     default :
         break;
         //here
@@ -9751,8 +9768,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             else if ((nFlag == PWM_TEMPERATURE_TRANSDUCER) ||
                      (nFlag == STM32_PM25))
             {
-                //SwitchToPruductType(DLG_AIRQUALITY_VIEW);
-                SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
+                SwitchToPruductType(DLG_DIALOG_TRANSDUCER);
+                //SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
                 
                 //n_show_register_list = 1;
                 break; //直接显示寄存器列表;
@@ -12351,8 +12368,11 @@ void CMainFrame::OnControlMain()
         {
             SwitchToPruductType(DLG_DIALOG_AIRFLOW);
         }
-        else if ((product_register_value[7] == PWM_TEMPERATURE_TRANSDUCER) ||
-            (product_register_value[7] == STM32_PM25))
+        else if (product_register_value[7] == PWM_TEMPERATURE_TRANSDUCER)
+        {
+            SwitchToPruductType(DLG_DIALOG_TRANSDUCER);
+        }
+        else if ((product_register_value[7] == STM32_PM25))
         {
             OnToolRegisterviewer();
         }

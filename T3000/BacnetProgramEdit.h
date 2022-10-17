@@ -58,6 +58,7 @@ public:
 //	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnPropertiesGotodefinition();
 
+	afx_msg void OnBnClickedButtonProgramEditHelp();
 };
 
 

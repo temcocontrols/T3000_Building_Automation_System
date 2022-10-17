@@ -22,7 +22,7 @@ typedef union
 	Str_monitor_point     m_monitor_data;
 }groupdata;
 
-typedef struct
+typedef struct grouppoint
 {
 	groupdata data;
 }str_group_point;

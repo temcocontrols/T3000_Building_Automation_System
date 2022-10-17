@@ -45,34 +45,37 @@ CDuplicateIdDetected::~CDuplicateIdDetected()
 
 void CDuplicateIdDetected::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_STATIC_DUPLICATE_TITLE, m_static_title);
-	DDX_Control(pDX, IDC_STATIC_NETWORK_TITLE, m_network_title);
-	DDX_Control(pDX, IDC_STATIC_DUP_NETWORK_ID, m_dup_network_id);
-	DDX_Control(pDX, IDC_STATIC_DUP_NETWORK_CURRENT_ID, m_dup_current_id);
-	DDX_Control(pDX, IDC_STATIC_DUP_NETWORK_PROPOSED_ID, m_dup_propsed_id);
-	DDX_Control(pDX, IDC_STATIC_DUP_SERIAL_NUMBER, m_dup_serial_number);
-	DDX_Control(pDX, IDC_STATIC_DUP_MODEL, m_dup_model);
-	DDX_Control(pDX, IDC_STATIC_DUP_LABLE, m_dup_user_test);
-	DDX_Control(pDX, IDC_STATIC_DUP_IN_DATABASE, m_dup_in_database);
-	DDX_Control(pDX, IDC_STATIC_DUP_IN_DATABASE_INFO, m_dup_id_from_database);
-	DDX_Control(pDX, IDC_STATIC_DUP_CURRENT_DEVICE_ID1, m_current_id_1);
-	DDX_Control(pDX, IDC_STATIC_DUP_CURRENT_DEVICE_ID2, m_current_id_2);
-	DDX_Control(pDX, IDC_EDIT_DEVICE_1, m_edit_propsed_id_1);
-	DDX_Control(pDX, IDC_EDIT_DEVICE_2, m_edit_propsed_id_2);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_SERIAL_1, m_static_serial_1);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_SERIAL_2, m_static_serial_2);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_MODEL_1, m_device_model_1);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_MODEL_2, m_device_model_2);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_USERNAME_1, m_user_text_1);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_USERNAME_2, m_user_text_2);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_YES_NO_1, m_device_yes_no_1);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_YES_NO_2, m_device_yes_no_2);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_DATABASE_ID_1, m_id_from_db_1);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_DATABASE_ID_2, m_id_from_db_2);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_1, m_device1_title);
-	DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_2, m_device2_title);
-	DDX_Control(pDX, IDC_STATIC_DUPLICATE_INFO, m_duplicate_ret_info);
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_STATIC_DUPLICATE_TITLE, m_static_title);
+    DDX_Control(pDX, IDC_STATIC_NETWORK_TITLE, m_network_title);
+    DDX_Control(pDX, IDC_STATIC_DUP_NETWORK_ID, m_dup_network_id);
+    DDX_Control(pDX, IDC_STATIC_DUP_NETWORK_CURRENT_ID, m_dup_current_id);
+    DDX_Control(pDX, IDC_STATIC_DUP_NETWORK_PROPOSED_ID, m_dup_propsed_id);
+    DDX_Control(pDX, IDC_STATIC_DUP_SERIAL_NUMBER, m_dup_serial_number);
+    DDX_Control(pDX, IDC_STATIC_DUP_MODEL, m_dup_model);
+    DDX_Control(pDX, IDC_STATIC_DUP_LABLE, m_dup_user_test);
+    DDX_Control(pDX, IDC_STATIC_DUP_IN_DATABASE, m_dup_in_database);
+    DDX_Control(pDX, IDC_STATIC_DUP_IN_DATABASE_INFO, m_dup_id_from_database);
+    DDX_Control(pDX, IDC_STATIC_DUP_CURRENT_DEVICE_ID1, m_current_id_1);
+    DDX_Control(pDX, IDC_STATIC_DUP_CURRENT_DEVICE_ID2, m_current_id_2);
+    DDX_Control(pDX, IDC_EDIT_DEVICE_1, m_edit_propsed_id_1);
+    DDX_Control(pDX, IDC_EDIT_DEVICE_2, m_edit_propsed_id_2);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_SERIAL_1, m_static_serial_1);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_SERIAL_2, m_static_serial_2);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_MODEL_1, m_device_model_1);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_MODEL_2, m_device_model_2);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_USERNAME_1, m_user_text_1);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_USERNAME_2, m_user_text_2);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_YES_NO_1, m_device_yes_no_1);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_YES_NO_2, m_device_yes_no_2);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_DATABASE_ID_1, m_id_from_db_1);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_DATABASE_ID_2, m_id_from_db_2);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_1, m_device1_title);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_2, m_device2_title);
+    DDX_Control(pDX, IDC_STATIC_DUPLICATE_INFO, m_duplicate_ret_info);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_IP_1, m_edit_ipaddress_1);
+    DDX_Control(pDX, IDC_STATIC_DUP_DEVICE_IP_2, m_edit_ipaddress_2);
+    DDX_Control(pDX, IDC_STATIC_DUP_SERIAL_NUMBER2, m_static_ipaddress);
 }
 
 
@@ -372,31 +375,50 @@ void CDuplicateIdDetected::Initial_static()
 	CString temp_current_id_1;CString temp_current_id_2;
 	CString temp_user_text_1;CString temp_user_text_2;
 	CString temp_product_id_1;CString temp_product_id_2;
-
+    CString temp_ip_address_1; CString temp_ip_address_2;
 	temp_serial_1.Format(_T("%u"),device_id_data_1.nSerial);
 	temp_serial_2.Format(_T("%u"),device_id_data_2.nSerial);
+
+    temp_user_text_1 = _T("Unknown");//device_id_data_1.show_label_name;
+    temp_user_text_2 = _T("Unknown");//device_id_data_2.show_label_name;
+
+    temp_product_id_1 = _T(" ");//GetProductName(device_id_data_1.product_id);
+    temp_product_id_2 = _T(" ");//GetProductName(device_id_data_2.product_id);
+
 	if(duplicate_mode == CONFILIC_SUBID)
 	{
 		temp_current_id_1.Format(_T("%u"),device_id_data_1.modbusID);
 		temp_current_id_2.Format(_T("%u"),device_id_data_2.modbusID);
+        temp_ip_address_1 = device_id_data_1.ip_address;
+        temp_ip_address_2 = device_id_data_2.ip_address;
 	}
 	else if(duplicate_mode == CONFILIC_PANEL_ID)
 	{
 		temp_current_id_1.Format(_T("%u"),device_id_data_1.panal_number);
 		temp_current_id_2.Format(_T("%u"),device_id_data_2.panal_number);
+        temp_user_text_1 = device_id_data_1.show_label_name;
+        temp_user_text_2 = device_id_data_2.show_label_name;
+        temp_product_id_1 =  GetProductName(device_id_data_1.product_id);
+        temp_product_id_2 =  GetProductName(device_id_data_2.product_id);
+        temp_ip_address_1 = device_id_data_1.ip_address;
+        temp_ip_address_2 = device_id_data_2.ip_address;
 	}
     else if (duplicate_mode == CONFILIC_IPADDRESS)
     {
         temp_current_id_1.Format(_T("%s"), device_id_data_1.ip_address);
         temp_current_id_2.Format(_T("%s"), device_id_data_2.ip_address);
+        temp_user_text_1 = device_id_data_1.show_label_name;
+        temp_user_text_2 = device_id_data_2.show_label_name;
+        temp_product_id_1 = GetProductName(device_id_data_1.product_id);
+        temp_product_id_2 = GetProductName(device_id_data_2.product_id);
+        temp_ip_address_1 = device_id_data_1.ip_address;
+        temp_ip_address_2 = device_id_data_2.ip_address;
     }
 
 
-    temp_user_text_1 = _T("Unknown");//device_id_data_1.show_label_name;
-	temp_user_text_2 = _T("Unknown");//device_id_data_2.show_label_name;
 
-	temp_product_id_1 = _T(" ");//GetProductName(device_id_data_1.product_id);
-	temp_product_id_2 = _T(" ");//GetProductName(device_id_data_2.product_id);
+
+
 
 	m_network_title.SetWindowTextW(temp_subnet);
 	m_network_title.textColor(RGB(0,0,0));
@@ -436,7 +458,9 @@ void CDuplicateIdDetected::Initial_static()
 	m_dup_propsed_id.textColor(RGB(0,0,0));
 	m_dup_propsed_id.setFont(24,16,NULL,_T("Arial"));
 
-
+    
+    m_static_ipaddress.textColor(RGB(0, 0, 0));
+    m_static_ipaddress.setFont(24, 16, NULL, _T("Arial"));
 	m_dup_serial_number.textColor(RGB(0,0,0));
 	m_dup_serial_number.setFont(24,16,NULL,_T("Arial"));
 
@@ -484,16 +508,32 @@ void CDuplicateIdDetected::Initial_static()
 	m_edit_propsed_id_2.bkColor(RGB(255,255,255));
 	m_edit_propsed_id_2.setFont(24,16,NULL,_T("Arial"));
 
-	m_static_serial_1.SetWindowTextW(temp_serial_1);
-	m_static_serial_1.textColor(RGB(0,0,0));
-	//m_static_serial_1.bkColor(RGB(0,255,255));
-	m_static_serial_1.setFont(24,16,NULL,_T("Arial"));
+    
+
+
+    m_edit_ipaddress_1.SetWindowTextW(temp_ip_address_1);
+    m_edit_ipaddress_1.textColor(RGB(0,0,0));
+	//m_edit_ipaddress_1.bkColor(RGB(0,255,255));
+    m_edit_ipaddress_1.setFont(24,16,NULL,_T("Arial"));
+
+    m_edit_ipaddress_2.SetWindowTextW(temp_ip_address_2);
+    m_edit_ipaddress_2.textColor(RGB(0, 0, 0));
+    //m_edit_ipaddress_2.bkColor(RGB(0,255,255));
+    m_edit_ipaddress_2.setFont(24, 16, NULL, _T("Arial"));
+
+
+    m_static_serial_1.SetWindowTextW(temp_serial_1);
+    m_static_serial_1.textColor(RGB(0, 0, 0));
+    //m_edit_ipaddress_1.bkColor(RGB(0,255,255));
+    m_static_serial_1.setFont(24, 16, NULL, _T("Arial"));
 
 	m_static_serial_2.SetWindowTextW(temp_serial_2);
 	m_static_serial_2.textColor(RGB(0,0,0));
 	//m_static_serial_2.bkColor(RGB(0,255,255));
 	m_static_serial_2.setFont(24,16,NULL,_T("Arial"));
 	
+
+
 	m_device_model_1.SetWindowTextW(temp_product_id_1);
 	m_device_model_1.textColor(RGB(0,0,0));
 	//m_device_model_1.bkColor(RGB(0,255,255));

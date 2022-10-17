@@ -707,4 +707,7 @@ void CWifiConfigDlg::OnBnClickedButtonWifiDefault()
 void CWifiConfigDlg::OnBnClickedRadioWifiDisable()
 {
     // TODO: 在此添加控件通知处理程序代码
+    write_one(g_tstat_id, WIFI_ENABLE, 2, 10);
+    Sleep(1000);
+    PostMessage(WM_CLOSE, NULL, NULL);
 }

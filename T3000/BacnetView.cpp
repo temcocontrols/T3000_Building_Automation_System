@@ -5534,24 +5534,25 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             }
             Sleep(SEND_COMMAND_DELAY_TIME);
 
-            if (i == 0)
-            {
-                unsigned short temp_read_data[128] = { 0 };
-                int read_ret = 0;
-                read_ret = Read_Multi(selected_product_Node.product_id, &temp_read_data[0], 0, 100, 4);
-                if ( (read_ret > 0) && ( temp_read_data[30] != 0) && Support_relinquish_device(temp_read_data[7]))
-                {
+			g_output_support_relinquish = 0; //删除relinquish 
+            //if (i == 0)
+            //{
+            //    unsigned short temp_read_data[128] = { 0 };
+            //    int read_ret = 0;
+            //    read_ret = Read_Multi(selected_product_Node.product_id, &temp_read_data[0], 0, 100, 4);
+            //    if ( (read_ret > 0) && ( temp_read_data[30] != 0) && Support_relinquish_device(temp_read_data[7]))
+            //    {
 
-                    int read_ret = Read_Multi(g_tstat_id, &output_relinquish_value[0], 9400, 120, 4);
-                    if (read_ret < 0)
-                    {
-                        g_output_support_relinquish = 0;
-                    }
-                    else
-                        g_output_support_relinquish = 1;
-                }
-                Sleep(1);
-            }
+            //        int read_ret = Read_Multi(g_tstat_id, &output_relinquish_value[0], 9400, 120, 4);
+            //        if (read_ret < 0)
+            //        {
+            //            g_output_support_relinquish = 0;
+            //        }
+            //        else
+            //            g_output_support_relinquish = 1;
+            //    }
+            //    Sleep(1);
+            //}
 		}
 
 	}
@@ -7193,7 +7194,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
             }
 
 
-
+#if 0
             unsigned short temp_read_data[128] = { 0 };
             int read_ret = 0;
             read_ret = Read_Multi(selected_product_Node.product_id, &temp_read_data[0], 0, 100, 4);
@@ -7209,6 +7210,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
                     g_output_support_relinquish = 1;
             }
             Sleep(1);
+#endif
 
 
             if (Output_Window->IsWindowVisible())
