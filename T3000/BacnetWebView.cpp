@@ -565,9 +565,9 @@ HRESULT BacnetWebViewAppWindow::WebMessageReceived(ICoreWebView2* sender, ICoreW
     if (!receivedMessage.IsEmpty())
     {
        
-        ProcessWebviewMsg(receivedMessage);
+        // ProcessWebviewMsg(receivedMessage);
 
-       // AfxMessageBox(L"Message  from Javascript : ");
+       AfxMessageBox(L"Message  from Javascript : " + receivedMessage);
         //m_webView->PostWebMessageAsJson(L"test");
        // m_webView->ExecuteScript(L"MessageReceived('Sent From MFC-APP "+receivedMessage+ "')", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(this, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
     }
@@ -927,7 +927,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
                      if ((n_read_item_index >= 0) && (n_read_item_index < BAC_SCHEDULE_COUNT))
                      {
                          n_read_item_index = weekly_list_line;
-                         ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, product_type, READTIMESCHEDULE_T3000/*BAC_PRG*/);//µÚ¶þ¸ö²ÎÊý In
+                         ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, product_type, READTIMESCHEDULE_T3000/*BAC_PRG*/);//ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ In
                      }
 
                  }
@@ -1055,7 +1055,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
                  }*/
 
 
-                 if (temp_number != 0)	//Vector ÀïÃæÊÇ 0¿ªÊ¼ , ÕâÀïÈç¹ûÊÇINPUT1  ÄÇÖµÎª1  Ö±½Ó¼õÒ» ´æÆðÀ´ ÓÃ;
+                 if (temp_number != 0)	//Vector ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½Ê¼ , ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½INPUT1  ï¿½ï¿½ÖµÎª1  Ö±ï¿½Ó¼ï¿½Ò» ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½;
                      temp_number = temp_number - 1;
              }
              break;
