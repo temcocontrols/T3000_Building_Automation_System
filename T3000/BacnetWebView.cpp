@@ -565,7 +565,7 @@ HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
     
     if (m_webView != nullptr && m_initialUri != L"")
         m_webView->Navigate(m_initialUri.c_str());
-    InitialWebPoint();
+    //InitialWebPoint();
 }
 
 HRESULT BacnetWebViewAppWindow::WebMessageReceived(ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
@@ -679,25 +679,20 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
         {
             break;
         }
+        tempjson["action"] = "setInput";
+        tempjson["panelId"] = panel_id;
+        tempjson["inputId"] = input_id;
 
-        //tempjson["Data"]["index"] = input_id - 1;
-        //tempjson["Data"]["id"] = "IN" + to_string(input_id - 1);
-        //tempjson["Data"]["desc"] = (char*)m_Input_data.at(input_id - 1).description;
-        //tempjson["Data"]["label"] = (char*)m_Input_data.at(input_id - 1).label;
-        //tempjson["Data"]["unit"] = m_Input_data.at(input_id - 1).range;
-        //tempjson["Data"]["auto_manual"] = m_Input_data.at(input_id - 1).auto_manual;
+        tempjson["Data"]["index"] = input_id - 1;
+        tempjson["Data"]["id"] = "IN" + to_string(input_id - 1);
+        tempjson["Data"]["desc"] = (char*)m_Input_data.at(input_id - 1).description;
+        tempjson["Data"]["label"] = (char*)m_Input_data.at(input_id - 1).label;
+        tempjson["Data"]["unit"] = m_Input_data.at(input_id - 1).range;
+        tempjson["Data"]["auto_manual"] = m_Input_data.at(input_id - 1).auto_manual;
+        tempjson["Data"]["value"] = m_Input_data.at(input_id - 1).value;
+        tempjson["Data"]["filter"] = m_Input_data.at(input_id - 1).filter;
 
 
-        tempjson["size"] = m_Input_data.size() - 1;
-        for (int i = 0; i < m_Input_data.size(); i++)
-        {
-            tempjson["Data"][i]["index"] = i;
-            tempjson["Data"][i]["id"] = "IN"+ to_string(i);
-            tempjson["Data"][i]["desc"] = (char*)m_Input_data.at(i).description;
-            tempjson["Data"][i]["label"] = (char*)m_Input_data.at(i).label;
-            tempjson["Data"][i]["unit"] = m_Input_data.at(i).range;
-            tempjson["Data"][i]["auto_manual"] = m_Input_data.at(i).auto_manual;
-        }
 
         Json::StreamWriterBuilder builder;
         builder["indentation"] = ""; // If you want whitespace-less output
@@ -705,7 +700,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
         CString temp_cs(output.c_str());
 
         m_webView->PostWebMessageAsJson(temp_cs);
-        Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0); 
+        Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, input_id - 1, input_id - 1, sizeof(Str_in_point));
         TRACE(temp_cs);
         break;
     }
