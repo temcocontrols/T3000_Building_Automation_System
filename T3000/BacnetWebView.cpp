@@ -107,7 +107,10 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
     {
         InitializeWebView();        
     }
+   
 }
+
+
 
 PCWSTR BacnetWebViewAppWindow::GetWindowClass()
 {
@@ -204,8 +207,8 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
     break;
     case WM_PAINT:
     {
-        if (m_webView)
-         m_webView->PostWebMessageAsJson(L"{\"SetInput\":{\"id\":\"IN2\",\"value\":\"On\"}}");
+        //if (m_webView)
+        // m_webView->PostWebMessageAsJson(L"{\"SetInput\":{\"id\":\"IN2\",\"value\":\"On\"}}");
         PAINTSTRUCT ps;
         HDC hdc;
         RECT mainWindowBounds;
@@ -562,6 +565,7 @@ HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
     
     if (m_webView != nullptr && m_initialUri != L"")
         m_webView->Navigate(m_initialUri.c_str());
+    //InitialWebPoint();
 }
 
 HRESULT BacnetWebViewAppWindow::WebMessageReceived(ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
@@ -574,7 +578,7 @@ HRESULT BacnetWebViewAppWindow::WebMessageReceived(ICoreWebView2* sender, ICoreW
        
         ProcessWebviewMsg(receivedMessage);
 
-       AfxMessageBox(L"Message  from Javascript : " + receivedMessage);
+       //AfxMessageBox(L"Message  from Javascript : " + receivedMessage);
         //m_webView->PostWebMessageAsJson(L"test");
        // m_webView->ExecuteScript(L"MessageReceived('Sent From MFC-APP "+receivedMessage+ "')", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(this, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
     }
@@ -585,6 +589,75 @@ HRESULT BacnetWebViewAppWindow::ExecuteScriptResponse(HRESULT errorCode, LPCWSTR
     //AfxMessageBox(L"MFC Application Popup : Message Sent Successfully");
     //console
     return S_OK;
+}
+
+void BacnetWebViewAppWindow::InitialWebPoint()
+{
+    Json::Value json;
+    Json::Reader reader;
+    Json::Value tempjson;
+    vector <Str_label_point> m_temp_graphic_label_data;
+    for (int i = 0; i < m_graphic_label_data.size(); i++)
+    {
+        for (int i = 0; i < m_graphic_label_data.size(); i++)
+        {
+            m_graphic_label_data.at(i).reg.nLabel_index = i;
+            if (m_graphic_label_data.at(i).reg.label_status == NO_UNSED_LABEL)
+            {
+                break;
+            }
+
+            //dufan �����ɾ������label �ͼ���ȡ��һ��.
+            if (m_graphic_label_data.at(i).reg.label_status == EMPTY_LABEL)
+            {
+                continue;
+            }
+
+            Bacnet_Label_Info bac_label;
+            memset(&bac_label, 0, sizeof(Bacnet_Label_Info));
+            if ((m_graphic_label_data.at(i).reg.nSerialNum == g_serialNum) && (m_graphic_label_data.at(i).reg.nScreen_index == screen_list_line))
+            {
+                m_temp_graphic_label_data.push_back(m_graphic_label_data.at(i));
+            }
+        }
+    }
+
+    tempjson["size"] = m_temp_graphic_label_data.size() - 1;
+    for (int i = 0; i < m_temp_graphic_label_data.size(); i++)
+    {
+        tempjson["Data"][i]["label_status"] = m_temp_graphic_label_data.at(i).reg.label_status;
+        tempjson["Data"][i]["nSerialNum"] = m_temp_graphic_label_data.at(i).reg.nSerialNum;
+        tempjson["Data"][i]["nScreen_index"] = m_temp_graphic_label_data.at(i).reg.nScreen_index;
+        tempjson["Data"][i]["nLabel_index"] = m_temp_graphic_label_data.at(i).reg.nLabel_index;
+        tempjson["Data"][i]["nMain_Panel"] = m_temp_graphic_label_data.at(i).reg.nMain_Panel;
+        tempjson["Data"][i]["nSub_Panel"] = m_temp_graphic_label_data.at(i).reg.nSub_Panel;
+        tempjson["Data"][i]["nPoint_type"] = m_temp_graphic_label_data.at(i).reg.nPoint_type;
+        tempjson["Data"][i]["nPoint_number"] = m_temp_graphic_label_data.at(i).reg.nPoint_number;
+        tempjson["Data"][i]["nPoint_x"] = m_temp_graphic_label_data.at(i).reg.nPoint_x;
+        tempjson["Data"][i]["nPoint_y"] = m_temp_graphic_label_data.at(i).reg.nPoint_y;
+        tempjson["Data"][i]["nclrTxt"] = m_temp_graphic_label_data.at(i).reg.nclrTxt;
+        tempjson["Data"][i]["nDisplay_Type"] = m_temp_graphic_label_data.at(i).reg.nDisplay_Type;
+        tempjson["Data"][i]["nIcon_size"] = m_temp_graphic_label_data.at(i).reg.nIcon_size;
+        tempjson["Data"][i]["nIcon_place"] = m_temp_graphic_label_data.at(i).reg.nIcon_place;
+        tempjson["Data"][i]["icon_name_1"] = (char*)m_temp_graphic_label_data.at(i).reg.icon_name_1;
+        tempjson["Data"][i]["icon_name_2"] = (char*)m_temp_graphic_label_data.at(i).reg.icon_name_2;
+        tempjson["Data"][i]["network"] = m_temp_graphic_label_data.at(i).reg.network;
+        //tempjson["Data"][i]["id"] = "IN" + to_string(i);
+        //tempjson["Data"][i]["desc"] = (char*)m_Input_data.at(i).description;
+        //tempjson["Data"][i]["label"] = (char*)m_Input_data.at(i).label;
+        //tempjson["Data"][i]["unit"] = m_Input_data.at(i).range;
+        //tempjson["Data"][i]["auto_manual"] = m_Input_data.at(i).auto_manual;
+    }
+
+    Json::StreamWriterBuilder builder;
+    builder["indentation"] = ""; // If you want whitespace-less output
+    const std::string output = Json::writeString(builder, tempjson);
+    CString temp_cs(output.c_str());
+
+    m_webView->PostWebMessageAsJson(temp_cs);
+    //Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0);
+    AfxMessageBox(temp_cs);
+    TRACE(temp_cs);
 }
 
 void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
@@ -601,35 +674,37 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
         Json::Reader reader;
         Json::Value tempjson;
         int panel_id =  json.get("panelId", Json::nullValue).asInt();
-        int input_id = json.get("inputId", Json::nullValue).asInt();
-        tempjson["size"] = m_Input_data.size() - 1;
-        for (int i = 0; i < m_Input_data.size(); i++)
+        int input_id = json.get("inputId", Json::nullValue).asInt();   
+        if ((input_id > 0) && input_id > BAC_INPUT_ITEM_COUNT)
         {
-            tempjson["Data"][i]["index"] = i;
-            tempjson["Data"][i]["id"] = "IN"+ to_string(i);
-            tempjson["Data"][i]["desc"] = (char*)m_Input_data.at(i).description;
-            tempjson["Data"][i]["label"] = (char*)m_Input_data.at(i).label;
-            tempjson["Data"][i]["unit"] = m_Input_data.at(i).range;
-            tempjson["Data"][i]["auto_manual"] = m_Input_data.at(i).auto_manual;
+            break;
         }
+        tempjson["action"] = "setInput";
+        tempjson["panelId"] = panel_id;
+        tempjson["inputId"] = input_id;
+
+        tempjson["Data"]["index"] = input_id - 1;
+        tempjson["Data"]["id"] = "IN" + to_string(input_id - 1);
+        tempjson["Data"]["desc"] = (char*)m_Input_data.at(input_id - 1).description;
+        tempjson["Data"]["label"] = (char*)m_Input_data.at(input_id - 1).label;
+        tempjson["Data"]["unit"] = m_Input_data.at(input_id - 1).range;
+        tempjson["Data"]["auto_manual"] = m_Input_data.at(input_id - 1).auto_manual;
+        tempjson["Data"]["value"] = m_Input_data.at(input_id - 1).value;
+        tempjson["Data"]["filter"] = m_Input_data.at(input_id - 1).filter;
+        tempjson["Data"]["control"] = m_Input_data.at(input_id - 1).control;
+        tempjson["Data"]["digital_analog"] = m_Input_data.at(input_id - 1).digital_analog;
+        tempjson["Data"]["calibration_sign"] = m_Input_data.at(input_id - 1).calibration_sign;
+        tempjson["Data"]["calibration_h"] = m_Input_data.at(input_id - 1).calibration_h;
+        tempjson["Data"]["calibration_l"] = m_Input_data.at(input_id - 1).calibration_l;
 
         Json::StreamWriterBuilder builder;
         builder["indentation"] = ""; // If you want whitespace-less output
         const std::string output  = Json::writeString(builder, tempjson);
-
-
         CString temp_cs(output.c_str());
 
-
-        //char temp_buffer[255] = { 0 };
-        //strcpy(temp_buffer, output.c_str());
-
-        ////temp_cs.Format(_T("%s"), output.c_str());
-        //MultiByteToWideChar(CP_ACP, 0, temp_buffer, (int)strlen(temp_buffer) + 1,
-        //    temp_cs.GetBuffer(MAX_PATH), MAX_PATH);
-        //temp_cs.ReleaseBuffer();
-        // AfxMessageBox(temp_cs);
         m_webView->PostWebMessageAsJson(temp_cs);
+        Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, input_id - 1, input_id - 1, sizeof(Str_in_point));
+        TRACE(temp_cs);
         break;
     }
     }
@@ -983,7 +1058,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 //                     if ((n_read_item_index >= 0) && (n_read_item_index < BAC_SCHEDULE_COUNT))
 //                     {
 //                         n_read_item_index = weekly_list_line;
-//                         ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, product_type, READTIMESCHEDULE_T3000/*BAC_PRG*/);//�ڶ������� In
+//                         ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, product_type, READTIMESCHEDULE_T3000/*BAC_PRG*/);//
 //                     }
 //
 //                 }
@@ -1111,7 +1186,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 //                 }*/
 //
 //
-//                 if (temp_number != 0)	//Vector ������ 0��ʼ , ���������INPUT1  ��ֵΪ1  ֱ�Ӽ�һ ������ ��;
+//                 if (temp_number != 0)	//
 //                     temp_number = temp_number - 1;
 //             }
 //             break;
@@ -1213,6 +1288,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 //}
 VOID CALLBACK BacnetWebViewAppWindow::onTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
+    
     /*if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(hwnd, GWLP_USERDATA))
     {
         printf("Timer called\n");
