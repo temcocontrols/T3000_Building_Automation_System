@@ -691,8 +691,11 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
         tempjson["Data"]["auto_manual"] = m_Input_data.at(input_id - 1).auto_manual;
         tempjson["Data"]["value"] = m_Input_data.at(input_id - 1).value;
         tempjson["Data"]["filter"] = m_Input_data.at(input_id - 1).filter;
-
-
+        tempjson["Data"]["control"] = m_Input_data.at(input_id - 1).control;
+        tempjson["Data"]["digital_analog"] = m_Input_data.at(input_id - 1).digital_analog;
+        tempjson["Data"]["calibration_sign"] = m_Input_data.at(input_id - 1).calibration_sign;
+        tempjson["Data"]["calibration_h"] = m_Input_data.at(input_id - 1).calibration_h;
+        tempjson["Data"]["calibration_l"] = m_Input_data.at(input_id - 1).calibration_l;
 
         Json::StreamWriterBuilder builder;
         builder["indentation"] = ""; // If you want whitespace-less output
