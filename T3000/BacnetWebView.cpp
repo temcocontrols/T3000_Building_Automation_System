@@ -607,7 +607,7 @@ void BacnetWebViewAppWindow::InitialWebPoint()
                 break;
             }
 
-            //dufan Èç¹ûÊÇÉ¾µô¹ýµÄlabel ¾Í¼ÌÐøÈ¡ÏÂÒ»¸ö.
+            //dufan ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½label ï¿½Í¼ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ò»ï¿½ï¿½.
             if (m_graphic_label_data.at(i).reg.label_status == EMPTY_LABEL)
             {
                 continue;
