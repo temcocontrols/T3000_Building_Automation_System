@@ -46,7 +46,8 @@ enum WEBVIEW_MESSAGE_TYPE
 {
     GET_INPUT = 0,
     GET_INITIAL_DATA = 1,
-
+    SAVE_GRAPHIC_DATA = 2, // Handle saving the data to the graphic entry
+    SAVE_INPUT_CHANGE = 3, // Handle saving input entry changes that come from JS side
 };
 #define READ_INPUT_VARIABLE  0
 #define READ_OUTPUT_VARIABLE 1
