@@ -32,6 +32,8 @@
 class BacnetWebViewAppWindow
 {
 public:
+    CString des_file;
+public:
     BacnetWebViewAppWindow(
         UINT creationModeId,
         std::wstring initialUri = L"",
