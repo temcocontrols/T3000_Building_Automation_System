@@ -741,7 +741,6 @@ set(T3000_SOURCE_FILES
   ${T3000_SOURCE_DIR}/Json-cpp/dist/jsoncpp.cpp
   ${T3000_SOURCE_DIR}/BacnetWebViewToolBar.cpp
   ${T3000_SOURCE_DIR}/BacnetWebView.cpp
-  ${T3000_SOURCE_DIR}/CBacnetBuildingProperty.cpp
 )
 
 set(LIGHTINGCONTROLLER_SRC_FILES

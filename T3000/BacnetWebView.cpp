@@ -23,6 +23,7 @@
 #include "BacnetProgram.h"
 
 #include "BacnetWebView.h"
+#include "MainFrm.h"
 using namespace Microsoft::WRL;
 size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
 
@@ -97,6 +98,12 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 
     if (shouldHaveToolbar)
         m_toolbar.Initialize(this);
+
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+    CString temp_item;
+    temp_item.Format(_T("%u_%d.txt"),g_selected_serialnumber, screen_list_line);
+    des_file = image_fordor + _T("\\") + temp_item;
 
     SetWindowLongPtr(m_mainWindow, GWLP_USERDATA, (LONG_PTR)this);
     ShowWindow(m_mainWindow, SW_SHOWDEFAULT);
@@ -568,7 +575,20 @@ HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
         m_webView->Navigate(m_initialUri.c_str());
     //InitialWebPoint();
 }
+bool ParseString2Json(CString strIn, Json::Value& jsonOut)
+{
+    bool bRet = false;
+    std::string szIn = CT2A(strIn.GetString());
+    //string szIn = wstring_to_string(strIn.GetBuffer(0));
+    strIn.ReleaseBuffer();
+    Json::Reader reader;
+    if (reader.parse(szIn, jsonOut, false))
+    {
+        bRet = true;
+    }
 
+    return bRet;
+}
 HRESULT BacnetWebViewAppWindow::WebMessageReceived(ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
 {
     LPWSTR pwStr;
@@ -576,9 +596,9 @@ HRESULT BacnetWebViewAppWindow::WebMessageReceived(ICoreWebView2* sender, ICoreW
     CString receivedMessage = pwStr;
     if (!receivedMessage.IsEmpty())
     {
-       
+        TRACE(receivedMessage);
         ProcessWebviewMsg(receivedMessage);
-
+        
        //AfxMessageBox(L"Message  from Javascript : " + receivedMessage);
         //m_webView->PostWebMessageAsJson(L"test");
        // m_webView->ExecuteScript(L"MessageReceived('Sent From MFC-APP "+receivedMessage+ "')", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(this, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
@@ -663,52 +683,93 @@ void BacnetWebViewAppWindow::InitialWebPoint()
 
 void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 {
-    Json::Value json;
-    std::string message = CT2A(msg);
-    Json::Reader reader;
-    reader.parse(message, json, false);
-    int type = json.get("action", Json::nullValue).asInt();
-    switch (type)
-    {
-    case WEBVIEW_MESSAGE_TYPE::GET_INPUT: // I need to get only the input that I requested
-    {
-        Json::Reader reader;
-        Json::Value tempjson;
-        int panel_id =  json.get("panelId", Json::nullValue).asInt();
-        int input_id = json.get("inputId", Json::nullValue).asInt();   
-        if ((input_id > 0) && input_id > BAC_INPUT_ITEM_COUNT)
+	Json::Value json;
+	std::string message = CT2A(msg);
+	Json::Reader reader;
+	reader.parse(message, json, false);
+	int type = json.get("action", Json::nullValue).asInt();
+	switch (type)
+	{
+	case WEBVIEW_MESSAGE_TYPE::GET_INPUT: // I need to get only the input that I requested
+	{
+		Json::Value tempjson;
+		int panel_id = json.get("panelId", Json::nullValue).asInt();
+		int input_id = json.get("inputId", Json::nullValue).asInt();
+		if ((input_id > 0) && input_id > BAC_INPUT_ITEM_COUNT)
+		{
+			break;
+		}
+		tempjson["action"] = "setInput";
+		tempjson["panelId"] = panel_id;
+		tempjson["inputId"] = input_id;
+
+		tempjson["data"]["index"] = input_id - 1;
+		tempjson["data"]["id"] = "IN" + to_string(input_id - 1);
+		tempjson["data"]["desc"] = (char*)m_Input_data.at(input_id - 1).description;
+		tempjson["data"]["label"] = (char*)m_Input_data.at(input_id - 1).label;
+		tempjson["data"]["unit"] = m_Input_data.at(input_id - 1).range;
+		tempjson["data"]["auto_manual"] = m_Input_data.at(input_id - 1).auto_manual;
+		tempjson["data"]["value"] = m_Input_data.at(input_id - 1).value;
+		tempjson["data"]["filter"] = m_Input_data.at(input_id - 1).filter;
+		tempjson["data"]["control"] = m_Input_data.at(input_id - 1).control;
+		tempjson["data"]["digital_analog"] = m_Input_data.at(input_id - 1).digital_analog;
+		tempjson["data"]["calibration_sign"] = m_Input_data.at(input_id - 1).calibration_sign;
+		tempjson["data"]["calibration_h"] = m_Input_data.at(input_id - 1).calibration_h;
+		tempjson["data"]["calibration_l"] = m_Input_data.at(input_id - 1).calibration_l;
+
+		Json::StreamWriterBuilder builder;
+		builder["indentation"] = ""; // If you want whitespace-less output
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+
+		m_webView->PostWebMessageAsJson(temp_cs);
+		Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, input_id - 1, input_id - 1, sizeof(Str_in_point));
+		TRACE(temp_cs);
+
+	}
+	break;
+	case WEBVIEW_MESSAGE_TYPE::GET_INITIAL_DATA:
+	{
+        CFile file;
+
+
+        CFileFind temp_find;
+        if (temp_find.FindFile(des_file) == 0)
         {
             break;
         }
-        tempjson["action"] = "setInput";
-        tempjson["panelId"] = panel_id;
-        tempjson["inputId"] = input_id;
 
-        tempjson["data"]["index"] = input_id - 1;
-        tempjson["data"]["id"] = "IN" + to_string(input_id - 1);
-        tempjson["data"]["desc"] = (char*)m_Input_data.at(input_id - 1).description;
-        tempjson["data"]["label"] = (char*)m_Input_data.at(input_id - 1).label;
-        tempjson["data"]["unit"] = m_Input_data.at(input_id - 1).range;
-        tempjson["data"]["auto_manual"] = m_Input_data.at(input_id - 1).auto_manual;
-        tempjson["data"]["value"] = m_Input_data.at(input_id - 1).value;
-        tempjson["data"]["filter"] = m_Input_data.at(input_id - 1).filter;
-        tempjson["data"]["control"] = m_Input_data.at(input_id - 1).control;
-        tempjson["data"]["digital_analog"] = m_Input_data.at(input_id - 1).digital_analog;
-        tempjson["data"]["calibration_sign"] = m_Input_data.at(input_id - 1).calibration_sign;
-        tempjson["data"]["calibration_h"] = m_Input_data.at(input_id - 1).calibration_h;
-        tempjson["data"]["calibration_l"] = m_Input_data.at(input_id - 1).calibration_l;
-
-        Json::StreamWriterBuilder builder;
-        builder["indentation"] = ""; // If you want whitespace-less output
-        const std::string output  = Json::writeString(builder, tempjson);
-        CString temp_cs(output.c_str());
-
-        m_webView->PostWebMessageAsJson(temp_cs);
-        Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, input_id - 1, input_id - 1, sizeof(Str_in_point));
+        file.Open(des_file, CFile::modeRead, NULL);
+        DWORD len = file.GetLength();
+        if (len == 0)
+            break;
+        WCHAR * nbuff = new WCHAR[len + 1];
+        memset(nbuff, 0, 2*(len+1));
+        file.Read(nbuff, len*2+1);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
+        CString temp_cs(nbuff);
+        AfxMessageBox(temp_cs);
         TRACE(temp_cs);
+        m_webView->PostWebMessageAsJson(temp_cs);
+        delete nbuff;
+		//Json::Value json;
+		//int panel_id = json.get("panelId", Json::nullValue).asInt();
+		//int input_id = json.get("inputId", Json::nullValue).asInt();
+		break;
+	}
+	case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
+	{
+        CFile file;
+
+        file.Open(des_file, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
+        file.Write(msg, msg.GetLength()*2);
+        file.Close();
+
+        //CString data = json["data"].toStyledString().c_str();
+        //Sleep(1);
         break;
-    }
-    }
+	}
+	break;
+	}
 }
   
 //void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
