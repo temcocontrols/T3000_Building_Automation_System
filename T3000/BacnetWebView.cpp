@@ -76,15 +76,15 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 {
     if (FAILED(OleInitialize(NULL)))
         throw std::runtime_error("Could not initialize COM!");
-    Gdiplus::GdiplusStartupInput gdiplusStartupInput; 
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 
     ++s_appInstances;
     std::wstring title = L"BacnetWebView Demo Application 0.3";
-    m_mainWindow = CreateWindowExW(0, GetWindowClass(), title.c_str(), 
+    m_mainWindow = CreateWindowExW(0, GetWindowClass(), title.c_str(),
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, BacNet_hwd, nullptr,
         GetModuleHandle(nullptr), nullptr);
-    
+
     /*
     if (initialUri != L"")
     {
@@ -113,9 +113,9 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
     HRESULT hr = GetAvailableCoreWebView2BrowserVersionString(nullptr, &version_info);
     if (hr == S_OK && version_info != nullptr)
     {
-        InitializeWebView();        
+        InitializeWebView();
     }
-   
+
 }
 
 
@@ -125,20 +125,20 @@ PCWSTR BacnetWebViewAppWindow::GetWindowClass()
     // Only do this once
     static PCWSTR windowClass = [] () {
         static std::wstring windowClass = L"BacnetWebViewWindowClass";
-        
+
         WNDCLASSEX wcx;
-        wcx.cbSize = sizeof(wcx);          
+        wcx.cbSize = sizeof(wcx);
         wcx.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-        wcx.lpfnWndProc = WndProcStatic;     
-        wcx.cbClsExtra = 0;                
-        wcx.cbWndExtra = 0;                
-        wcx.hInstance = GetModuleHandle(nullptr);         
+        wcx.lpfnWndProc = WndProcStatic;
+        wcx.cbClsExtra = 0;
+        wcx.cbWndExtra = 0;
+        wcx.hInstance = GetModuleHandle(nullptr);
         wcx.hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-        wcx.hCursor = LoadCursor(NULL, IDC_ARROW);                    
-        wcx.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);                  
-        wcx.lpszMenuName = L"MainMenu";    
-        wcx.lpszClassName = windowClass.c_str();  
-        wcx.hIconSm = (HICON)LoadImage(GetModuleHandle(nullptr), 
+        wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wcx.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+        wcx.lpszMenuName = L"MainMenu";
+        wcx.lpszClassName = windowClass.c_str();
+        wcx.hIconSm = (HICON)LoadImage(GetModuleHandle(nullptr),
             MAKEINTRESOURCE(5),
             IMAGE_ICON,
             GetSystemMetrics(SM_CXSMICON),
@@ -178,7 +178,7 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
     {
         const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
 
-        CFileDialog dlg(1, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, 
+        CFileDialog dlg(1, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
             szFilter, CWnd::FromHandle(hWnd));
         if (dlg.DoModal() == IDOK)
         {
@@ -207,7 +207,7 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
                 GetClientRect(m_mainWindow, &bounds);
                 m_controller->put_Bounds(bounds);
             }
-            
+
             ResizeEverything();
             return true;
         }
@@ -227,11 +227,11 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
         GetClientRect(hWnd, &mainWindowBounds);
         StretchBlt(hdc, mainWindowBounds.left, mainWindowBounds.top, mainWindowBounds.right, mainWindowBounds.bottom,
             m_memHdc, 0, 0, m_appBackgroundImage.bmWidth, m_appBackgroundImage.bmHeight, SRCCOPY);
-        
+
         EndPaint(hWnd, &ps);
         return true;
     }
-    break;    
+    break;
     case WM_NCDESTROY:
     {
         int retValue = 0;
@@ -264,7 +264,7 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
             return true;
         }
     }
-    break;    
+    break;
     case WM_COMMAND:
     {
         return ExecuteWebViewCommands(wParam, lParam) || ExecuteAppCommands(wParam, lParam);
@@ -436,18 +436,18 @@ std::wstring BacnetWebViewAppWindow::GetLocalPath(std::wstring relativePath, boo
 
 void BacnetWebViewAppWindow::ResizeEverything()
 {
- /*   RECT availableBounds = { 0 };
-    GetClientRect(m_mainWindow, &availableBounds);
+    /*   RECT availableBounds = { 0 };
+       GetClientRect(m_mainWindow, &availableBounds);
 
-    if (!m_containsFullscreenElement)
-    {
-        availableBounds = m_toolbar.Resize(availableBounds);
-    }
+       if (!m_containsFullscreenElement)
+       {
+           availableBounds = m_toolbar.Resize(availableBounds);
+       }
 
-    if (auto view = GetComponent<ViewComponent>())
-    {
-        view->SetBounds(availableBounds);
-    }*/
+       if (auto view = GetComponent<ViewComponent>())
+       {
+           view->SetBounds(availableBounds);
+       }*/
 }
 
 //! [Close]
@@ -500,7 +500,7 @@ void BacnetWebViewAppWindow::CloseAppWindow()
 int BacnetWebViewAppWindow::RunMessagePump()
 {
     // HACCEL hAccelTable = LoadAccelerators(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDC_WEBVIEW2APISAMPLE));
-     MSG msg;
+    MSG msg;
 
     // Main message loop:
     //! [MoveFocus0]
@@ -562,15 +562,15 @@ HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
     SetTimer(m_mainWindow, 1, 1000, onTimer);
 
     /* START Resgister the listner for message handling */
-        EventRegistrationToken token;
-        m_webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(this, &BacnetWebViewAppWindow::WebMessageReceived).Get(), &token);
+    EventRegistrationToken token;
+    m_webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(this, &BacnetWebViewAppWindow::WebMessageReceived).Get(), &token);
     /* END Resgister the listner for message handling */
 
-	/*wil::com_ptr<ICoreWebView2CompositionController> compositionController =
-		m_controller.query<ICoreWebView2CompositionController>();*/
+    /*wil::com_ptr<ICoreWebView2CompositionController> compositionController =
+        m_controller.query<ICoreWebView2CompositionController>();*/
     m_dropTarget = Make<DropTarget>();
     m_dropTarget->Init(m_mainWindow, coreWebView2.get(), m_controller.get());
-    
+
     if (m_webView != nullptr && m_initialUri != L"")
         m_webView->Navigate(m_initialUri.c_str());
     //InitialWebPoint();
@@ -598,10 +598,10 @@ HRESULT BacnetWebViewAppWindow::WebMessageReceived(ICoreWebView2* sender, ICoreW
     {
         TRACE(receivedMessage);
         ProcessWebviewMsg(receivedMessage);
-        
-       //AfxMessageBox(L"Message  from Javascript : " + receivedMessage);
-        //m_webView->PostWebMessageAsJson(L"test");
-       // m_webView->ExecuteScript(L"MessageReceived('Sent From MFC-APP "+receivedMessage+ "')", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(this, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
+
+        //AfxMessageBox(L"Message  from Javascript : " + receivedMessage);
+         //m_webView->PostWebMessageAsJson(L"test");
+        // m_webView->ExecuteScript(L"MessageReceived('Sent From MFC-APP "+receivedMessage+ "')", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(this, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
     }
     return S_OK;
 }
@@ -683,53 +683,53 @@ void BacnetWebViewAppWindow::InitialWebPoint()
 
 void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 {
-	Json::Value json;
-	std::string message = CT2A(msg);
-	Json::Reader reader;
-	reader.parse(message, json, false);
-	int type = json.get("action", Json::nullValue).asInt();
-	switch (type)
-	{
-	case WEBVIEW_MESSAGE_TYPE::GET_INPUT: // I need to get only the input that I requested
-	{
-		Json::Value tempjson;
-		int panel_id = json.get("panelId", Json::nullValue).asInt();
-		int input_id = json.get("inputId", Json::nullValue).asInt();
-		if ((input_id > 0) && input_id > BAC_INPUT_ITEM_COUNT)
-		{
-			break;
-		}
-		tempjson["action"] = "setInput";
-		tempjson["panelId"] = panel_id;
-		tempjson["inputId"] = input_id;
+    Json::Value json;
+    std::string message = CT2A(msg);
+    Json::Reader reader;
+    reader.parse(message, json, false);
+    int type = json.get("action", Json::nullValue).asInt();
+    switch (type)
+    {
+    case WEBVIEW_MESSAGE_TYPE::GET_INPUT: // I need to get only the input that I requested
+    {
+        Json::Value tempjson;
+        int panel_id = json.get("panelId", Json::nullValue).asInt();
+        int input_id = json.get("inputId", Json::nullValue).asInt();
+        if ((input_id > 0) && input_id > BAC_INPUT_ITEM_COUNT)
+        {
+            break;
+        }
+        tempjson["action"] = "setInput";
+        tempjson["panelId"] = panel_id;
+        tempjson["inputId"] = input_id;
 
-		tempjson["data"]["index"] = input_id - 1;
-		tempjson["data"]["id"] = "IN" + to_string(input_id - 1);
-		tempjson["data"]["desc"] = (char*)m_Input_data.at(input_id - 1).description;
-		tempjson["data"]["label"] = (char*)m_Input_data.at(input_id - 1).label;
-		tempjson["data"]["unit"] = m_Input_data.at(input_id - 1).range;
-		tempjson["data"]["auto_manual"] = m_Input_data.at(input_id - 1).auto_manual;
-		tempjson["data"]["value"] = m_Input_data.at(input_id - 1).value;
-		tempjson["data"]["filter"] = m_Input_data.at(input_id - 1).filter;
-		tempjson["data"]["control"] = m_Input_data.at(input_id - 1).control;
-		tempjson["data"]["digital_analog"] = m_Input_data.at(input_id - 1).digital_analog;
-		tempjson["data"]["calibration_sign"] = m_Input_data.at(input_id - 1).calibration_sign;
-		tempjson["data"]["calibration_h"] = m_Input_data.at(input_id - 1).calibration_h;
-		tempjson["data"]["calibration_l"] = m_Input_data.at(input_id - 1).calibration_l;
+        tempjson["data"]["index"] = input_id - 1;
+        tempjson["data"]["id"] = "IN" + to_string(input_id - 1);
+        tempjson["data"]["desc"] = (char*)m_Input_data.at(input_id - 1).description;
+        tempjson["data"]["label"] = (char*)m_Input_data.at(input_id - 1).label;
+        tempjson["data"]["unit"] = m_Input_data.at(input_id - 1).range;
+        tempjson["data"]["auto_manual"] = m_Input_data.at(input_id - 1).auto_manual;
+        tempjson["data"]["value"] = m_Input_data.at(input_id - 1).value;
+        tempjson["data"]["filter"] = m_Input_data.at(input_id - 1).filter;
+        tempjson["data"]["control"] = m_Input_data.at(input_id - 1).control;
+        tempjson["data"]["digital_analog"] = m_Input_data.at(input_id - 1).digital_analog;
+        tempjson["data"]["calibration_sign"] = m_Input_data.at(input_id - 1).calibration_sign;
+        tempjson["data"]["calibration_h"] = m_Input_data.at(input_id - 1).calibration_h;
+        tempjson["data"]["calibration_l"] = m_Input_data.at(input_id - 1).calibration_l;
 
-		Json::StreamWriterBuilder builder;
-		builder["indentation"] = ""; // If you want whitespace-less output
-		const std::string output = Json::writeString(builder, tempjson);
-		CString temp_cs(output.c_str());
+        Json::StreamWriterBuilder builder;
+        builder["indentation"] = ""; // If you want whitespace-less output
+        const std::string output = Json::writeString(builder, tempjson);
+        CString temp_cs(output.c_str());
 
-		m_webView->PostWebMessageAsJson(temp_cs);
-		Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, input_id - 1, input_id - 1, sizeof(Str_in_point));
-		TRACE(temp_cs);
+        m_webView->PostWebMessageAsJson(temp_cs);
+        Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, input_id - 1, input_id - 1, sizeof(Str_in_point));
+        TRACE(temp_cs);
 
-	}
-	break;
-	case WEBVIEW_MESSAGE_TYPE::GET_INITIAL_DATA:
-	{
+    }
+    break;
+    case WEBVIEW_MESSAGE_TYPE::GET_INITIAL_DATA:
+    {
         CFile file;
 
 
@@ -743,35 +743,45 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
         DWORD len = file.GetLength();
         if (len == 0)
             break;
-        WCHAR * nbuff = new WCHAR[len + 1];
+        WCHAR* nbuff = new WCHAR[len + 1];
         memset(nbuff, 0, 2*(len+1));
         file.Read(nbuff, len*2+1);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
-        CString temp_cs(nbuff);
-        AfxMessageBox(temp_cs);
-        TRACE(temp_cs);
-        m_webView->PostWebMessageAsJson(temp_cs);
+        Json::Value tempjson;
+        tempjson["action"] = "setInitialData";
+        wstring nbuff_wstring(nbuff);
+        string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
+        tempjson["data"] = nbuff_str;
+        Json::StreamWriterBuilder builder;
+        builder["indentation"] = ""; // If you want whitespace-less output
+        const std::string output = Json::writeString(builder, tempjson);
+        CString tempjson_str(output.c_str());
+        TRACE(nbuff);
+        m_webView->PostWebMessageAsJson(tempjson_str);
         delete nbuff;
-		//Json::Value json;
-		//int panel_id = json.get("panelId", Json::nullValue).asInt();
-		//int input_id = json.get("inputId", Json::nullValue).asInt();
-		break;
-	}
-	case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
-	{
+        //Json::Value json;
+        //int panel_id = json.get("panelId", Json::nullValue).asInt();
+        //int input_id = json.get("inputId", Json::nullValue).asInt();
+        break;
+    }
+    case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
+    {
         CFile file;
-
+        Json::StreamWriterBuilder builder;
+        builder["indentation"] = ""; // If you want whitespace-less output
+        const std::string output = Json::writeString(builder, json["data"]);
+        CString temp_cs(output.c_str());
         file.Open(des_file, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
-        file.Write(msg, msg.GetLength()*2);
+        file.Write(temp_cs, temp_cs.GetLength() * 2);
         file.Close();
 
         //CString data = json["data"].toStyledString().c_str();
         //Sleep(1);
         break;
-	}
-	break;
-	}
+    }
+    break;
+    }
 }
-  
+
 //void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 //{
 //   
@@ -1350,7 +1360,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 //}
 VOID CALLBACK BacnetWebViewAppWindow::onTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-    
+
     /*if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(hwnd, GWLP_USERDATA))
     {
         printf("Timer called\n");
@@ -1382,7 +1392,7 @@ std::vector<std::string> BacnetWebViewAppWindow::GetGraphicFiles(CString path )
     if ((dir = opendir((const char*)charstr)) != NULL) {
         /* print all the files and directories within directory */
         while ((ent = readdir(dir)) != NULL) {
-          //  printf("%s\n", ent->d_name);
+            //  printf("%s\n", ent->d_name);
             const char* ext = strrchr(ent->d_name, '.');
             if ((ext) || (ext != ent->d_name))
             {
@@ -1397,7 +1407,7 @@ std::vector<std::string> BacnetWebViewAppWindow::GetGraphicFiles(CString path )
         perror("");
     }
     return files;
-   
+
 }
 void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsigned int& width, unsigned int& height)
 {
