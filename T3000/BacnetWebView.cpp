@@ -47,8 +47,8 @@ enum WEBVIEW_MESSAGE_TYPE
 {
     GET_INPUT = 0,
     GET_INITIAL_DATA = 1,
-    SAVE_GRAPHIC_DATA = 2, // Handle saving the data to the graphic entry
-    SAVE_INPUT_CHANGE = 3, // Handle saving input entry changes that come from JS side
+    SAVE_GRAPHIC_DATA = 2,
+    SAVE_INPUT_CHANGE = 3,
 };
 #define READ_INPUT_VARIABLE  0
 #define READ_OUTPUT_VARIABLE 1
@@ -688,8 +688,10 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
     Json::Reader reader;
     reader.parse(message, json, false);
     int type = json.get("action", Json::nullValue).asInt();
-    switch (type)
-    {
+    Json::StreamWriterBuilder builder;
+    builder["indentation"] = ""; // If you want whitespace-less output
+  switch (type)
+  {
     case WEBVIEW_MESSAGE_TYPE::GET_INPUT: // I need to get only the input that I requested
     {
         Json::Value tempjson;
@@ -717,8 +719,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
         tempjson["data"]["calibration_h"] = m_Input_data.at(input_id - 1).calibration_h;
         tempjson["data"]["calibration_l"] = m_Input_data.at(input_id - 1).calibration_l;
 
-        Json::StreamWriterBuilder builder;
-        builder["indentation"] = ""; // If you want whitespace-less output
         const std::string output = Json::writeString(builder, tempjson);
         CString temp_cs(output.c_str());
 
@@ -751,8 +751,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
         wstring nbuff_wstring(nbuff);
         string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
         tempjson["data"] = nbuff_str;
-        Json::StreamWriterBuilder builder;
-        builder["indentation"] = ""; // If you want whitespace-less output
         const std::string output = Json::writeString(builder, tempjson);
         CString tempjson_str(output.c_str());
         TRACE(nbuff);
@@ -766,20 +764,46 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
     case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
     {
         CFile file;
-        Json::StreamWriterBuilder builder;
-        builder["indentation"] = ""; // If you want whitespace-less output
-        const std::string output = Json::writeString(builder, json["data"]);
-        CString temp_cs(output.c_str());
+       
+        const std::string file_output = Json::writeString(builder, json["data"]);
+        CString file_temp_cs(file_output.c_str());
         file.Open(des_file, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
-        file.Write(temp_cs, temp_cs.GetLength() * 2);
+        file.Write(file_temp_cs, file_temp_cs.GetLength() * 2);
         file.Close();
+        Json::Value tempjson;
+        tempjson["action"] = "saveGraphicResponse";
+        tempjson["data"]["status"] = true;
+        const std::string output = Json::writeString(builder, tempjson);
+        CString temp_cs(output.c_str());
 
-        //CString data = json["data"].toStyledString().c_str();
-        //Sleep(1);
+        m_webView->PostWebMessageAsJson(temp_cs);
+        
         break;
     }
-    break;
+    case WEBVIEW_MESSAGE_TYPE::SAVE_INPUT_CHANGE:
+    {
+        Json::Value tempjson;
+        int panel_id = json.get("panelId", Json::nullValue).asInt();
+        int input_id = json.get("inputId", Json::nullValue).asInt();
+        if ((input_id > 0) && input_id > BAC_INPUT_ITEM_COUNT)
+        {
+            break;
+        }
+        int var_index = input_id - 1;
+        m_Input_data.at(var_index).control = json["data"]["control"].asInt();
+        Write_Private_Data_Blocking(WRITEINPUT_T3000, var_index, var_index, g_bac_instance);
+        ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, var_index, REFRESH_ON_ITEM);
+        tempjson["action"] = "saveInputChangeResponse";
+        tempjson["data"]["status"] = true;
+        const std::string output = Json::writeString(builder, tempjson);
+        CString temp_cs(output.c_str());
+
+        m_webView->PostWebMessageAsJson(temp_cs);
+
+        break;
     }
+  break;
+  }
 }
 
 //void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
