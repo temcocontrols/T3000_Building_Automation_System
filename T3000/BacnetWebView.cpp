@@ -45,11 +45,22 @@ size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
 
 enum WEBVIEW_MESSAGE_TYPE
 {
-    GET_INPUT = 0,
-    GET_INITIAL_DATA = 1,
-    SAVE_GRAPHIC_DATA = 2,
-    SAVE_INPUT_CHANGE = 3,
+	GET_ENTRY = 0,
+	GET_INITIAL_DATA = 1,
+	SAVE_GRAPHIC_DATA = 2,
+	UPDATE_ENTRY = 3,
 };
+
+enum WEBVIEW_ENTRY_TYPE
+{
+	INPUT_TYPE = 0,
+	OUTPUT = 1,
+	VARIABLE = 2,
+	PROGRAM = 3,
+	SCHEDULE = 4,
+	HOLIDAY = 5
+};
+
 #define READ_INPUT_VARIABLE  0
 #define READ_OUTPUT_VARIABLE 1
 #define READ_VARIABLE 2
@@ -63,58 +74,58 @@ extern char* ispoint_ex(char* token, int* num_point, byte* var_type, byte* point
 extern CBacnetProgram* Program_Window;
 
 BacnetWebViewAppWindow::BacnetWebViewAppWindow(
-    UINT creationModeId,
-    std::wstring initialUri,
-    bool isMainWindow,
-    std::function<void()> webviewCreatedCallback,
-    bool customWindowRect,
-    RECT windowRect,
-    bool shouldHaveToolbar)
-    : m_creationModeId(creationModeId),
-    m_initialUri(initialUri),
-    m_onWebViewFirstInitialized(webviewCreatedCallback)
+	UINT creationModeId,
+	std::wstring initialUri,
+	bool isMainWindow,
+	std::function<void()> webviewCreatedCallback,
+	bool customWindowRect,
+	RECT windowRect,
+	bool shouldHaveToolbar)
+	: m_creationModeId(creationModeId),
+	m_initialUri(initialUri),
+	m_onWebViewFirstInitialized(webviewCreatedCallback)
 {
-    if (FAILED(OleInitialize(NULL)))
-        throw std::runtime_error("Could not initialize COM!");
-    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-    Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
+	if (FAILED(OleInitialize(NULL)))
+		throw std::runtime_error("Could not initialize COM!");
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 
-    ++s_appInstances;
-    std::wstring title = L"BacnetWebView Demo Application 0.3";
-    m_mainWindow = CreateWindowExW(0, GetWindowClass(), title.c_str(),
-        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, BacNet_hwd, nullptr,
-        GetModuleHandle(nullptr), nullptr);
+	++s_appInstances;
+	std::wstring title = L"BacnetWebView Demo Application 0.3";
+	m_mainWindow = CreateWindowExW(0, GetWindowClass(), title.c_str(),
+		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, BacNet_hwd, nullptr,
+		GetModuleHandle(nullptr), nullptr);
 
-    /*
-    if (initialUri != L"")
-    {
-        Gdiplus::Bitmap bitmap(initialUri.c_str(), false);
-        bitmap.GetHBITMAP(0, &m_appBackgroundImageHandle);
-        GetObject(m_appBackgroundImageHandle, sizeof(m_appBackgroundImage), &m_appBackgroundImage);
-        m_memHdc = CreateCompatibleDC(GetDC(m_mainWindow));
-        SelectObject(m_memHdc, m_appBackgroundImageHandle);
-    }
-    */
+	/*
+	if (initialUri != L"")
+	{
+		Gdiplus::Bitmap bitmap(initialUri.c_str(), false);
+		bitmap.GetHBITMAP(0, &m_appBackgroundImageHandle);
+		GetObject(m_appBackgroundImageHandle, sizeof(m_appBackgroundImage), &m_appBackgroundImage);
+		m_memHdc = CreateCompatibleDC(GetDC(m_mainWindow));
+		SelectObject(m_memHdc, m_appBackgroundImageHandle);
+	}
+	*/
 
-    if (shouldHaveToolbar)
-        m_toolbar.Initialize(this);
+	if (shouldHaveToolbar)
+		m_toolbar.Initialize(this);
 
-    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
-    CString temp_item;
-    temp_item.Format(_T("%u_%d.txt"),g_selected_serialnumber, screen_list_line);
-    des_file = image_fordor + _T("\\") + temp_item;
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+	CString temp_item;
+	temp_item.Format(_T("%u_%d.txt"), g_selected_serialnumber, screen_list_line);
+	des_file = image_fordor + _T("\\") + temp_item;
 
-    SetWindowLongPtr(m_mainWindow, GWLP_USERDATA, (LONG_PTR)this);
-    ShowWindow(m_mainWindow, SW_SHOWDEFAULT);
-    UpdateWindow(m_mainWindow);
+	SetWindowLongPtr(m_mainWindow, GWLP_USERDATA, (LONG_PTR)this);
+	ShowWindow(m_mainWindow, SW_SHOWDEFAULT);
+	UpdateWindow(m_mainWindow);
 
-    wil::unique_cotaskmem_string version_info;
-    HRESULT hr = GetAvailableCoreWebView2BrowserVersionString(nullptr, &version_info);
-    if (hr == S_OK && version_info != nullptr)
-    {
-        InitializeWebView();
-    }
+	wil::unique_cotaskmem_string version_info;
+	HRESULT hr = GetAvailableCoreWebView2BrowserVersionString(nullptr, &version_info);
+	if (hr == S_OK && version_info != nullptr)
+	{
+		InitializeWebView();
+	}
 
 }
 
@@ -122,396 +133,396 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 
 PCWSTR BacnetWebViewAppWindow::GetWindowClass()
 {
-    // Only do this once
-    static PCWSTR windowClass = [] () {
-        static std::wstring windowClass = L"BacnetWebViewWindowClass";
+	// Only do this once
+	static PCWSTR windowClass = []() {
+		static std::wstring windowClass = L"BacnetWebViewWindowClass";
 
-        WNDCLASSEX wcx;
-        wcx.cbSize = sizeof(wcx);
-        wcx.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-        wcx.lpfnWndProc = WndProcStatic;
-        wcx.cbClsExtra = 0;
-        wcx.cbWndExtra = 0;
-        wcx.hInstance = GetModuleHandle(nullptr);
-        wcx.hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-        wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
-        wcx.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-        wcx.lpszMenuName = L"MainMenu";
-        wcx.lpszClassName = windowClass.c_str();
-        wcx.hIconSm = (HICON)LoadImage(GetModuleHandle(nullptr),
-            MAKEINTRESOURCE(5),
-            IMAGE_ICON,
-            GetSystemMetrics(SM_CXSMICON),
-            GetSystemMetrics(SM_CYSMICON),
-            LR_DEFAULTCOLOR);
+		WNDCLASSEX wcx;
+		wcx.cbSize = sizeof(wcx);
+		wcx.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+		wcx.lpfnWndProc = WndProcStatic;
+		wcx.cbClsExtra = 0;
+		wcx.cbWndExtra = 0;
+		wcx.hInstance = GetModuleHandle(nullptr);
+		wcx.hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+		wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wcx.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+		wcx.lpszMenuName = L"MainMenu";
+		wcx.lpszClassName = windowClass.c_str();
+		wcx.hIconSm = (HICON)LoadImage(GetModuleHandle(nullptr),
+			MAKEINTRESOURCE(5),
+			IMAGE_ICON,
+			GetSystemMetrics(SM_CXSMICON),
+			GetSystemMetrics(SM_CYSMICON),
+			LR_DEFAULTCOLOR);
 
-        // Register the window class. 
-        RegisterClassEx(&wcx);
-        return windowClass.c_str();
-    }();
+		// Register the window class. 
+		RegisterClassEx(&wcx);
+		return windowClass.c_str();
+	}();
 
-    return windowClass;
+	return windowClass;
 }
 
 LRESULT CALLBACK BacnetWebViewAppWindow::WndProcStatic(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(hWnd, GWLP_USERDATA))
-    {
-        LRESULT result = 0;
-        if (app->HandleWindowMessage(hWnd, message, wParam, lParam, &result))
-        {
-            return result;
-        }
-    }
-    return DefWindowProc(hWnd, message, wParam, lParam);
+	if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(hWnd, GWLP_USERDATA))
+	{
+		LRESULT result = 0;
+		if (app->HandleWindowMessage(hWnd, message, wParam, lParam, &result))
+		{
+			return result;
+		}
+	}
+	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
 // This is purely for proof of concept. I am not going to tie MFC into
 // a webview2 application.
 #include <afxdlgs.h>
 bool BacnetWebViewAppWindow::HandleWindowMessage(
-    HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* result)
+	HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* result)
 {
-    switch (message)
-    {
-    case WM_LBUTTONDBLCLK:
-    {
-        const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
+	switch (message)
+	{
+	case WM_LBUTTONDBLCLK:
+	{
+		const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
 
-        CFileDialog dlg(1, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-            szFilter, CWnd::FromHandle(hWnd));
-        if (dlg.DoModal() == IDOK)
-        {
-            CString sFilePath = dlg.GetPathName();
-            m_initialUri = sFilePath;
-            wil::com_ptr<IUri> uri;
-            CreateUri(m_initialUri.c_str(), Uri_CREATE_ALLOW_IMPLICIT_FILE_SCHEME, 0, &uri);
+		CFileDialog dlg(1, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+			szFilter, CWnd::FromHandle(hWnd));
+		if (dlg.DoModal() == IDOK)
+		{
+			CString sFilePath = dlg.GetPathName();
+			m_initialUri = sFilePath;
+			wil::com_ptr<IUri> uri;
+			CreateUri(m_initialUri.c_str(), Uri_CREATE_ALLOW_IMPLICIT_FILE_SCHEME, 0, &uri);
 
-            wil::unique_bstr uriBstr;
-            uri->GetAbsoluteUri(&uriBstr);
-            auto hr = m_webView->Navigate(uriBstr.get());
-            if (SUCCEEDED(hr))
-                UpdateWindow(m_mainWindow);
-        }
-        break;
-    }
-    case WM_SIZE:
-    {
-        // Don't resize the app or webview when the app is minimized
-        // let WM_SYSCOMMAND to handle it
-        if (lParam != 0)
-        {
-            if (m_controller)
-            {
-                RECT bounds;
-                GetClientRect(m_mainWindow, &bounds);
-                m_controller->put_Bounds(bounds);
-            }
+			wil::unique_bstr uriBstr;
+			uri->GetAbsoluteUri(&uriBstr);
+			auto hr = m_webView->Navigate(uriBstr.get());
+			if (SUCCEEDED(hr))
+				UpdateWindow(m_mainWindow);
+		}
+		break;
+	}
+	case WM_SIZE:
+	{
+		// Don't resize the app or webview when the app is minimized
+		// let WM_SYSCOMMAND to handle it
+		if (lParam != 0)
+		{
+			if (m_controller)
+			{
+				RECT bounds;
+				GetClientRect(m_mainWindow, &bounds);
+				m_controller->put_Bounds(bounds);
+			}
 
-            ResizeEverything();
-            return true;
-        }
-    }
-    break;
-    case WM_PAINT:
-    {
-        //if (m_webView)
-        // m_webView->PostWebMessageAsJson(L"{\"SetInput\":{\"id\":\"IN2\",\"value\":\"On\"}}");
-        PAINTSTRUCT ps;
-        HDC hdc;
-        RECT mainWindowBounds;
-        RECT webViewBounds = { 0 };
-        BeginPaint(hWnd, &ps);
+			ResizeEverything();
+			return true;
+		}
+	}
+	break;
+	case WM_PAINT:
+	{
+		//if (m_webView)
+		// m_webView->PostWebMessageAsJson(L"{\"SetInput\":{\"id\":\"IN2\",\"value\":\"On\"}}");
+		PAINTSTRUCT ps;
+		HDC hdc;
+		RECT mainWindowBounds;
+		RECT webViewBounds = { 0 };
+		BeginPaint(hWnd, &ps);
 
-        hdc = GetDC(hWnd);
-        GetClientRect(hWnd, &mainWindowBounds);
-        StretchBlt(hdc, mainWindowBounds.left, mainWindowBounds.top, mainWindowBounds.right, mainWindowBounds.bottom,
-            m_memHdc, 0, 0, m_appBackgroundImage.bmWidth, m_appBackgroundImage.bmHeight, SRCCOPY);
+		hdc = GetDC(hWnd);
+		GetClientRect(hWnd, &mainWindowBounds);
+		StretchBlt(hdc, mainWindowBounds.left, mainWindowBounds.top, mainWindowBounds.right, mainWindowBounds.bottom,
+			m_memHdc, 0, 0, m_appBackgroundImage.bmWidth, m_appBackgroundImage.bmHeight, SRCCOPY);
 
-        EndPaint(hWnd, &ps);
-        return true;
-    }
-    break;
-    case WM_NCDESTROY:
-    {
-        int retValue = 0;
-        SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
-        NotifyClosed();
-        if (--s_appInstances == 0)
-        {
-            PostQuitMessage(retValue);
-        }
-        DeleteObject(m_appBackgroundImageHandle);
-        DeleteDC(m_memHdc);
-    }
-    break;
-    //! [RestartManager]
-    case WM_QUERYENDSESSION:
-    {
-        // yes, we can shut down
-        // Register how we might be restarted
-        RegisterApplicationRestart(L"--restore", RESTART_NO_CRASH | RESTART_NO_HANG);
-        *result = TRUE;
-        return true;
-    }
-    break;
-    case WM_ENDSESSION:
-    {
-        if (wParam == TRUE)
-        {
-            // save app state and exit.
-            PostQuitMessage(0);
-            return true;
-        }
-    }
-    break;
-    case WM_COMMAND:
-    {
-        return ExecuteWebViewCommands(wParam, lParam) || ExecuteAppCommands(wParam, lParam);
-    }
-    break;
-    }
-    return false;
+		EndPaint(hWnd, &ps);
+		return true;
+	}
+	break;
+	case WM_NCDESTROY:
+	{
+		int retValue = 0;
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
+		NotifyClosed();
+		if (--s_appInstances == 0)
+		{
+			PostQuitMessage(retValue);
+		}
+		DeleteObject(m_appBackgroundImageHandle);
+		DeleteDC(m_memHdc);
+	}
+	break;
+	//! [RestartManager]
+	case WM_QUERYENDSESSION:
+	{
+		// yes, we can shut down
+		// Register how we might be restarted
+		RegisterApplicationRestart(L"--restore", RESTART_NO_CRASH | RESTART_NO_HANG);
+		*result = TRUE;
+		return true;
+	}
+	break;
+	case WM_ENDSESSION:
+	{
+		if (wParam == TRUE)
+		{
+			// save app state and exit.
+			PostQuitMessage(0);
+			return true;
+		}
+	}
+	break;
+	case WM_COMMAND:
+	{
+		return ExecuteWebViewCommands(wParam, lParam) || ExecuteAppCommands(wParam, lParam);
+	}
+	break;
+	}
+	return false;
 }
 
 bool BacnetWebViewAppWindow::ExecuteWebViewCommands(WPARAM wParam, LPARAM lParam)
 {
-    if (!m_webView)
-        return false;
-    switch (LOWORD(wParam))
-    {
-    case IDM_GET_BROWSER_VERSION_AFTER_CREATION:
-    {
-        //! [GetBrowserVersionString]
-        wil::unique_cotaskmem_string version_info;
-        m_webViewEnvironment->get_BrowserVersionString(&version_info);
-        MessageBox(
-            m_mainWindow, version_info.get(), L"Browser Version Info After WebView Creation",
-            MB_OK);
-        //! [GetBrowserVersionString]
-        return true;
-    }
-    case IDM_CLOSE_WEBVIEW:
-    {
-        CloseWebView();
-        return true;
-    }
-    case IDM_CLOSE_WEBVIEW_CLEANUP:
-    {
-        CloseWebView(true);
-        return true;
-    }
-    case IDM_SCENARIO_POST_WEB_MESSAGE:
-    {
-        //NewComponent<ScenarioWebMessage>(this);
-        return true;
-    }
-    case IDM_SCENARIO_ADD_HOST_OBJECT:
-    {
-        //NewComponent<ScenarioAddHostObject>(this);
-        return true;
-    }
-    case IDM_SCENARIO_WEB_VIEW_EVENT_MONITOR:
-    {
-        //NewComponent<ScenarioWebViewEventMonitor>(this);
-        return true;
-    }
-    case IDM_SCENARIO_JAVA_SCRIPT:
-    {
-        WCHAR c_scriptPath[] = L"ScenarioJavaScriptDebugIndex.html";
-        std::wstring m_scriptUri = GetLocalUri(c_scriptPath);
-        m_webView->Navigate(m_scriptUri.c_str());
-        return true;
-    }
-    case IDM_SCENARIO_TYPE_SCRIPT:
-    {
-        WCHAR c_scriptPath[] = L"ScenarioTypeScriptDebugIndex.html";
-        std::wstring m_scriptUri = GetLocalUri(c_scriptPath);
-        m_webView->Navigate(m_scriptUri.c_str());
-    }
-    case IDM_SCENARIO_AUTHENTICATION:
-    {
-        //NewComponent<ScenarioAuthentication>(this);
+	if (!m_webView)
+		return false;
+	switch (LOWORD(wParam))
+	{
+	case IDM_GET_BROWSER_VERSION_AFTER_CREATION:
+	{
+		//! [GetBrowserVersionString]
+		wil::unique_cotaskmem_string version_info;
+		m_webViewEnvironment->get_BrowserVersionString(&version_info);
+		MessageBox(
+			m_mainWindow, version_info.get(), L"Browser Version Info After WebView Creation",
+			MB_OK);
+		//! [GetBrowserVersionString]
+		return true;
+	}
+	case IDM_CLOSE_WEBVIEW:
+	{
+		CloseWebView();
+		return true;
+	}
+	case IDM_CLOSE_WEBVIEW_CLEANUP:
+	{
+		CloseWebView(true);
+		return true;
+	}
+	case IDM_SCENARIO_POST_WEB_MESSAGE:
+	{
+		//NewComponent<ScenarioWebMessage>(this);
+		return true;
+	}
+	case IDM_SCENARIO_ADD_HOST_OBJECT:
+	{
+		//NewComponent<ScenarioAddHostObject>(this);
+		return true;
+	}
+	case IDM_SCENARIO_WEB_VIEW_EVENT_MONITOR:
+	{
+		//NewComponent<ScenarioWebViewEventMonitor>(this);
+		return true;
+	}
+	case IDM_SCENARIO_JAVA_SCRIPT:
+	{
+		WCHAR c_scriptPath[] = L"ScenarioJavaScriptDebugIndex.html";
+		std::wstring m_scriptUri = GetLocalUri(c_scriptPath);
+		m_webView->Navigate(m_scriptUri.c_str());
+		return true;
+	}
+	case IDM_SCENARIO_TYPE_SCRIPT:
+	{
+		WCHAR c_scriptPath[] = L"ScenarioTypeScriptDebugIndex.html";
+		std::wstring m_scriptUri = GetLocalUri(c_scriptPath);
+		m_webView->Navigate(m_scriptUri.c_str());
+	}
+	case IDM_SCENARIO_AUTHENTICATION:
+	{
+		//NewComponent<ScenarioAuthentication>(this);
 
-        return true;
-    }
-    case IDM_SCENARIO_COOKIE_MANAGEMENT:
-    {
-        //NewComponent<ScenarioCookieManagement>(this);
-        return true;
-    }
-    case IDM_SCENARIO_DOM_CONTENT_LOADED:
-    {
-        //NewComponent<ScenarioDOMContentLoaded>(this);
-        return true;
-    }
-    case IDM_SCENARIO_NAVIGATEWITHWEBRESOURCEREQUEST:
-    {
-        //NewComponent<ScenarioNavigateWithWebResourceRequest>(this);
-        return true;
-    }
-    }
-    return false;
+		return true;
+	}
+	case IDM_SCENARIO_COOKIE_MANAGEMENT:
+	{
+		//NewComponent<ScenarioCookieManagement>(this);
+		return true;
+	}
+	case IDM_SCENARIO_DOM_CONTENT_LOADED:
+	{
+		//NewComponent<ScenarioDOMContentLoaded>(this);
+		return true;
+	}
+	case IDM_SCENARIO_NAVIGATEWITHWEBRESOURCEREQUEST:
+	{
+		//NewComponent<ScenarioNavigateWithWebResourceRequest>(this);
+		return true;
+	}
+	}
+	return false;
 }
 
 bool BacnetWebViewAppWindow::ExecuteAppCommands(WPARAM wParam, LPARAM lParam)
 {
-    switch (LOWORD(wParam))
-    {
-    case IDM_GET_BROWSER_VERSION_BEFORE_CREATION:
-    {
-        wil::unique_cotaskmem_string version_info;
-        GetAvailableCoreWebView2BrowserVersionString(
-            nullptr,
-            &version_info);
-        MessageBox(
-            m_mainWindow, version_info.get(), L"Browser Version Info Before WebView Creation",
-            MB_OK);
-        return true;
-    }
-    case IDM_EXIT:
-        CloseAppWindow();
-        return true;
-    }
-    return false;
+	switch (LOWORD(wParam))
+	{
+	case IDM_GET_BROWSER_VERSION_BEFORE_CREATION:
+	{
+		wil::unique_cotaskmem_string version_info;
+		GetAvailableCoreWebView2BrowserVersionString(
+			nullptr,
+			&version_info);
+		MessageBox(
+			m_mainWindow, version_info.get(), L"Browser Version Info Before WebView Creation",
+			MB_OK);
+		return true;
+	}
+	case IDM_EXIT:
+		CloseAppWindow();
+		return true;
+	}
+	return false;
 }
 
 void BacnetWebViewAppWindow::AddRef()
 {
-    InterlockedIncrement((LONG*)&m_refCount);
+	InterlockedIncrement((LONG*)&m_refCount);
 }
 
 void BacnetWebViewAppWindow::Release()
 {
-    uint32_t refCount = InterlockedDecrement((LONG*)&m_refCount);
-    if (refCount == 0)
-    {
-        delete this;
-    }
+	uint32_t refCount = InterlockedDecrement((LONG*)&m_refCount);
+	if (refCount == 0)
+	{
+		delete this;
+	}
 }
 
 void BacnetWebViewAppWindow::NotifyClosed()
 {
-    m_isClosed = true;
+	m_isClosed = true;
 }
 
 std::wstring BacnetWebViewAppWindow::GetLocalUri(std::wstring relativePath)
 {
-    if (m_webView3)
-    {
-        //! [LocalUrlUsage]
-        const std::wstring localFileRootUrl = L"https://appassets.example/";
-        return localFileRootUrl + regex_replace(relativePath, std::wregex(L"\\\\"), L"/");
-        //! [LocalUrlUsage]
-    }
-    else
-    {
-        std::wstring path = GetLocalPath(L"assets\\" + relativePath, false);
+	if (m_webView3)
+	{
+		//! [LocalUrlUsage]
+		const std::wstring localFileRootUrl = L"https://appassets.example/";
+		return localFileRootUrl + regex_replace(relativePath, std::wregex(L"\\\\"), L"/");
+		//! [LocalUrlUsage]
+	}
+	else
+	{
+		std::wstring path = GetLocalPath(L"assets\\" + relativePath, false);
 
-        wil::com_ptr<IUri> uri;
-        CreateUri(path.c_str(), Uri_CREATE_ALLOW_IMPLICIT_FILE_SCHEME, 0, &uri);
+		wil::com_ptr<IUri> uri;
+		CreateUri(path.c_str(), Uri_CREATE_ALLOW_IMPLICIT_FILE_SCHEME, 0, &uri);
 
-        wil::unique_bstr uriBstr;
-        uri->GetAbsoluteUri(&uriBstr);
-        return std::wstring(uriBstr.get());
-    }
+		wil::unique_bstr uriBstr;
+		uri->GetAbsoluteUri(&uriBstr);
+		return std::wstring(uriBstr.get());
+	}
 }
 
 std::wstring BacnetWebViewAppWindow::GetLocalPath(std::wstring relativePath, bool keep_exe_path)
 {
-    WCHAR rawPath[MAX_PATH];
-    GetModuleFileNameW(GetModuleHandle(nullptr), rawPath, MAX_PATH);
-    std::wstring path(rawPath);
-    if (keep_exe_path)
-    {
-        path.append(relativePath);
-    }
-    else
-    {
-        std::size_t index = path.find_last_of(L"\\") + 1;
-        path.replace(index, path.length(), relativePath);
-    }
-    return path;
+	WCHAR rawPath[MAX_PATH];
+	GetModuleFileNameW(GetModuleHandle(nullptr), rawPath, MAX_PATH);
+	std::wstring path(rawPath);
+	if (keep_exe_path)
+	{
+		path.append(relativePath);
+	}
+	else
+	{
+		std::size_t index = path.find_last_of(L"\\") + 1;
+		path.replace(index, path.length(), relativePath);
+	}
+	return path;
 }
 
 void BacnetWebViewAppWindow::ResizeEverything()
 {
-    /*   RECT availableBounds = { 0 };
-       GetClientRect(m_mainWindow, &availableBounds);
+	/*   RECT availableBounds = { 0 };
+	   GetClientRect(m_mainWindow, &availableBounds);
 
-       if (!m_containsFullscreenElement)
-       {
-           availableBounds = m_toolbar.Resize(availableBounds);
-       }
+	   if (!m_containsFullscreenElement)
+	   {
+		   availableBounds = m_toolbar.Resize(availableBounds);
+	   }
 
-       if (auto view = GetComponent<ViewComponent>())
-       {
-           view->SetBounds(availableBounds);
-       }*/
+	   if (auto view = GetComponent<ViewComponent>())
+	   {
+		   view->SetBounds(availableBounds);
+	   }*/
 }
 
 //! [Close]
 // Close the WebView and deinitialize related state. This doesn't close the app window.
 void BacnetWebViewAppWindow::CloseWebView(bool cleanupUserDataFolder)
 {
-    //DeleteAllComponents();
-    if (m_controller)
-    {
-        m_controller->Close();
-        m_controller = nullptr;
-        m_webView = nullptr;
-    }
+	//DeleteAllComponents();
+	if (m_controller)
+	{
+		m_controller->Close();
+		m_controller = nullptr;
+		m_webView = nullptr;
+	}
 
-    Gdiplus::GdiplusShutdown(m_gdiplusToken);
-    m_webViewEnvironment = nullptr;
-    if (cleanupUserDataFolder)
-    {
-        // For non-UWP apps, the default user data folder {Executable File Name}.WebView2
-        // is in the same directory next to the app executable. If end
-        // developers specify userDataFolder during WebView environment
-        // creation, they would need to pass in that explicit value here.
-        // For more information about userDataFolder:
-        // https://docs.microsoft.com/microsoft-edge/webview2/reference/win32/webview2-idl#createcorewebview2environmentwithoptions
-        WCHAR userDataFolder[MAX_PATH] = L"";
-        // Obtain the absolute path for relative paths that include "./" or "../"
-        _wfullpath(
-            userDataFolder, GetLocalPath(L".WebView2", true).c_str(), MAX_PATH);
-        std::wstring userDataFolderPath(userDataFolder);
+	Gdiplus::GdiplusShutdown(m_gdiplusToken);
+	m_webViewEnvironment = nullptr;
+	if (cleanupUserDataFolder)
+	{
+		// For non-UWP apps, the default user data folder {Executable File Name}.WebView2
+		// is in the same directory next to the app executable. If end
+		// developers specify userDataFolder during WebView environment
+		// creation, they would need to pass in that explicit value here.
+		// For more information about userDataFolder:
+		// https://docs.microsoft.com/microsoft-edge/webview2/reference/win32/webview2-idl#createcorewebview2environmentwithoptions
+		WCHAR userDataFolder[MAX_PATH] = L"";
+		// Obtain the absolute path for relative paths that include "./" or "../"
+		_wfullpath(
+			userDataFolder, GetLocalPath(L".WebView2", true).c_str(), MAX_PATH);
+		std::wstring userDataFolderPath(userDataFolder);
 
-        std::wstring message = L"Are you sure you want to clean up the user data folder at\n";
-        message += userDataFolderPath;
-        message += L"\n?\nWarning: This action is not reversible.\n\n";
-        message += L"Click No if there are other open WebView instances.\n";
+		std::wstring message = L"Are you sure you want to clean up the user data folder at\n";
+		message += userDataFolderPath;
+		message += L"\n?\nWarning: This action is not reversible.\n\n";
+		message += L"Click No if there are other open WebView instances.\n";
 
-        if (MessageBox(m_mainWindow, message.c_str(), L"Cleanup User Data Folder", MB_YESNO) ==
-            IDYES)
-        {
-            //CHECK_FAILURE(DeleteFileRecursive(userDataFolderPath));
-        }
-    }
+		if (MessageBox(m_mainWindow, message.c_str(), L"Cleanup User Data Folder", MB_YESNO) ==
+			IDYES)
+		{
+			//CHECK_FAILURE(DeleteFileRecursive(userDataFolderPath));
+		}
+	}
 }
 
 void BacnetWebViewAppWindow::CloseAppWindow()
 {
-    CloseWebView();
-    DestroyWindow(m_mainWindow);
+	CloseWebView();
+	DestroyWindow(m_mainWindow);
 }
 
 int BacnetWebViewAppWindow::RunMessagePump()
 {
-    // HACCEL hAccelTable = LoadAccelerators(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDC_WEBVIEW2APISAMPLE));
-    MSG msg;
+	// HACCEL hAccelTable = LoadAccelerators(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDC_WEBVIEW2APISAMPLE));
+	MSG msg;
 
-    // Main message loop:
-    //! [MoveFocus0]
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-    //! [MoveFocus0]
+	// Main message loop:
+	//! [MoveFocus0]
+	while (GetMessage(&msg, nullptr, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	//! [MoveFocus0]
 
-    return (int)msg.wParam;
+	return (int)msg.wParam;
 }
 
 #pragma region WebviewRelatedMethods
@@ -520,290 +531,340 @@ int BacnetWebViewAppWindow::RunMessagePump()
 using namespace Microsoft::WRL;
 void BacnetWebViewAppWindow::InitializeWebView()
 {
-    LPCWSTR subFolder = nullptr;
-    auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
-    HRESULT hr = CreateCoreWebView2EnvironmentWithOptions(
-        subFolder, nullptr, options.Get(),
-        Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
-            this, &BacnetWebViewAppWindow::OnCreateEnvironmentCompleted)
-        .Get());
+	LPCWSTR subFolder = nullptr;
+	auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+	HRESULT hr = CreateCoreWebView2EnvironmentWithOptions(
+		subFolder, nullptr, options.Get(),
+		Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
+			this, &BacnetWebViewAppWindow::OnCreateEnvironmentCompleted)
+		.Get());
 }
 
 HRESULT BacnetWebViewAppWindow::OnCreateEnvironmentCompleted(HRESULT result,
-    ICoreWebView2Environment* environment)
+	ICoreWebView2Environment* environment)
 {
-    if (FAILED(result))
-        return result;
+	if (FAILED(result))
+		return result;
 
-    m_webViewEnvironment = environment;
-    return m_webViewEnvironment->CreateCoreWebView2Controller(
-        m_mainWindow, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
-            this, &BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted)
-        .Get());
+	m_webViewEnvironment = environment;
+	return m_webViewEnvironment->CreateCoreWebView2Controller(
+		m_mainWindow, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
+			this, &BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted)
+		.Get());
 }
 
 HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
-    HRESULT result, ICoreWebView2Controller* controller)
+	HRESULT result, ICoreWebView2Controller* controller)
 {
-    if (FAILED(result))
-        return result;
+	if (FAILED(result))
+		return result;
 
-    m_controller = controller;
-    RECT bounds;
-    GetClientRect(m_mainWindow, &bounds);
-    m_controller->put_Bounds(bounds);
-    wil::com_ptr<ICoreWebView2> coreWebView2;
-    auto hr = m_controller->get_CoreWebView2(&coreWebView2);
-    if (FAILED(hr))
-        return hr;
+	m_controller = controller;
+	RECT bounds;
+	GetClientRect(m_mainWindow, &bounds);
+	m_controller->put_Bounds(bounds);
+	wil::com_ptr<ICoreWebView2> coreWebView2;
+	auto hr = m_controller->get_CoreWebView2(&coreWebView2);
+	if (FAILED(hr))
+		return hr;
 
-    coreWebView2.query_to(&m_webView);
+	coreWebView2.query_to(&m_webView);
 
-    SetTimer(m_mainWindow, 1, 1000, onTimer);
+	SetTimer(m_mainWindow, 1, 1000, onTimer);
 
-    /* START Resgister the listner for message handling */
-    EventRegistrationToken token;
-    m_webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(this, &BacnetWebViewAppWindow::WebMessageReceived).Get(), &token);
-    /* END Resgister the listner for message handling */
+	/* START Resgister the listner for message handling */
+	EventRegistrationToken token;
+	m_webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(this, &BacnetWebViewAppWindow::WebMessageReceived).Get(), &token);
+	/* END Resgister the listner for message handling */
 
-    /*wil::com_ptr<ICoreWebView2CompositionController> compositionController =
-        m_controller.query<ICoreWebView2CompositionController>();*/
-    m_dropTarget = Make<DropTarget>();
-    m_dropTarget->Init(m_mainWindow, coreWebView2.get(), m_controller.get());
+	/*wil::com_ptr<ICoreWebView2CompositionController> compositionController =
+		m_controller.query<ICoreWebView2CompositionController>();*/
+	m_dropTarget = Make<DropTarget>();
+	m_dropTarget->Init(m_mainWindow, coreWebView2.get(), m_controller.get());
 
-    if (m_webView != nullptr && m_initialUri != L"")
-        m_webView->Navigate(m_initialUri.c_str());
-    //InitialWebPoint();
+	if (m_webView != nullptr && m_initialUri != L"")
+		m_webView->Navigate(m_initialUri.c_str());
 }
 bool ParseString2Json(CString strIn, Json::Value& jsonOut)
 {
-    bool bRet = false;
-    std::string szIn = CT2A(strIn.GetString());
-    //string szIn = wstring_to_string(strIn.GetBuffer(0));
-    strIn.ReleaseBuffer();
-    Json::Reader reader;
-    if (reader.parse(szIn, jsonOut, false))
-    {
-        bRet = true;
-    }
+	bool bRet = false;
+	std::string szIn = CT2A(strIn.GetString());
+	//string szIn = wstring_to_string(strIn.GetBuffer(0));
+	strIn.ReleaseBuffer();
+	Json::Reader reader;
+	if (reader.parse(szIn, jsonOut, false))
+	{
+		bRet = true;
+	}
 
-    return bRet;
+	return bRet;
 }
 HRESULT BacnetWebViewAppWindow::WebMessageReceived(ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
 {
-    LPWSTR pwStr;
-    args->get_WebMessageAsJson(&pwStr);// TryGetWebMessageAsString(&pwStr);
-    CString receivedMessage = pwStr;
-    if (!receivedMessage.IsEmpty())
-    {
-        TRACE(receivedMessage);
-        ProcessWebviewMsg(receivedMessage);
+	LPWSTR pwStr;
+	args->get_WebMessageAsJson(&pwStr);// TryGetWebMessageAsString(&pwStr);
+	CString receivedMessage = pwStr;
+	if (!receivedMessage.IsEmpty())
+	{
+		TRACE(receivedMessage);
+		ProcessWebviewMsg(receivedMessage);
 
-        //AfxMessageBox(L"Message  from Javascript : " + receivedMessage);
-         //m_webView->PostWebMessageAsJson(L"test");
-        // m_webView->ExecuteScript(L"MessageReceived('Sent From MFC-APP "+receivedMessage+ "')", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(this, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-    }
-    return S_OK;
+		//AfxMessageBox(L"Message  from Javascript : " + receivedMessage);
+		 //m_webView->PostWebMessageAsJson(L"test");
+		// m_webView->ExecuteScript(L"MessageReceived('Sent From MFC-APP "+receivedMessage+ "')", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(this, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
+	}
+	return S_OK;
 }
 HRESULT BacnetWebViewAppWindow::ExecuteScriptResponse(HRESULT errorCode, LPCWSTR result)
 {
-    //AfxMessageBox(L"MFC Application Popup : Message Sent Successfully");
-    //console
-    return S_OK;
-}
-
-void BacnetWebViewAppWindow::InitialWebPoint()
-{
-    Json::Value json;
-    Json::Reader reader;
-    Json::Value tempjson;
-    vector <Str_label_point> m_temp_graphic_label_data;
-    for (int i = 0; i < m_graphic_label_data.size(); i++)
-    {
-        for (int i = 0; i < m_graphic_label_data.size(); i++)
-        {
-            m_graphic_label_data.at(i).reg.nLabel_index = i;
-            if (m_graphic_label_data.at(i).reg.label_status == NO_UNSED_LABEL)
-            {
-                break;
-            }
-
-            //dufan �����ɾ������label �ͼ���ȡ��һ��.
-            if (m_graphic_label_data.at(i).reg.label_status == EMPTY_LABEL)
-            {
-                continue;
-            }
-
-            Bacnet_Label_Info bac_label;
-            memset(&bac_label, 0, sizeof(Bacnet_Label_Info));
-            if ((m_graphic_label_data.at(i).reg.nSerialNum == g_serialNum) && (m_graphic_label_data.at(i).reg.nScreen_index == screen_list_line))
-            {
-                m_temp_graphic_label_data.push_back(m_graphic_label_data.at(i));
-            }
-        }
-    }
-
-    tempjson["size"] = m_temp_graphic_label_data.size() - 1;
-    for (int i = 0; i < m_temp_graphic_label_data.size(); i++)
-    {
-        tempjson["data"][i]["label_status"] = m_temp_graphic_label_data.at(i).reg.label_status;
-        tempjson["data"][i]["nSerialNum"] = m_temp_graphic_label_data.at(i).reg.nSerialNum;
-        tempjson["data"][i]["nScreen_index"] = m_temp_graphic_label_data.at(i).reg.nScreen_index;
-        tempjson["data"][i]["nLabel_index"] = m_temp_graphic_label_data.at(i).reg.nLabel_index;
-        tempjson["data"][i]["nMain_Panel"] = m_temp_graphic_label_data.at(i).reg.nMain_Panel;
-        tempjson["data"][i]["nSub_Panel"] = m_temp_graphic_label_data.at(i).reg.nSub_Panel;
-        tempjson["data"][i]["nPoint_type"] = m_temp_graphic_label_data.at(i).reg.nPoint_type;
-        tempjson["data"][i]["nPoint_number"] = m_temp_graphic_label_data.at(i).reg.nPoint_number;
-        tempjson["data"][i]["nPoint_x"] = m_temp_graphic_label_data.at(i).reg.nPoint_x;
-        tempjson["data"][i]["nPoint_y"] = m_temp_graphic_label_data.at(i).reg.nPoint_y;
-        tempjson["data"][i]["nclrTxt"] = m_temp_graphic_label_data.at(i).reg.nclrTxt;
-        tempjson["data"][i]["nDisplay_Type"] = m_temp_graphic_label_data.at(i).reg.nDisplay_Type;
-        tempjson["data"][i]["nIcon_size"] = m_temp_graphic_label_data.at(i).reg.nIcon_size;
-        tempjson["data"][i]["nIcon_place"] = m_temp_graphic_label_data.at(i).reg.nIcon_place;
-        tempjson["data"][i]["icon_name_1"] = (char*)m_temp_graphic_label_data.at(i).reg.icon_name_1;
-        tempjson["data"][i]["icon_name_2"] = (char*)m_temp_graphic_label_data.at(i).reg.icon_name_2;
-        tempjson["data"][i]["network"] = m_temp_graphic_label_data.at(i).reg.network;
-        //tempjson["data"][i]["id"] = "IN" + to_string(i);
-        //tempjson["data"][i]["desc"] = (char*)m_Input_data.at(i).description;
-        //tempjson["data"][i]["label"] = (char*)m_Input_data.at(i).label;
-        //tempjson["data"][i]["unit"] = m_Input_data.at(i).range;
-        //tempjson["data"][i]["auto_manual"] = m_Input_data.at(i).auto_manual;
-    }
-
-    Json::StreamWriterBuilder builder;
-    builder["indentation"] = ""; // If you want whitespace-less output
-    const std::string output = Json::writeString(builder, tempjson);
-    CString temp_cs(output.c_str());
-
-    m_webView->PostWebMessageAsJson(temp_cs);
-    //Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0);
-    AfxMessageBox(temp_cs);
-    TRACE(temp_cs);
+	//AfxMessageBox(L"MFC Application Popup : Message Sent Successfully");
+	//console
+	return S_OK;
 }
 
 void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 {
-    Json::Value json;
-    std::string message = CT2A(msg);
-    Json::Reader reader;
-    reader.parse(message, json, false);
-    int type = json.get("action", Json::nullValue).asInt();
-    Json::StreamWriterBuilder builder;
-    builder["indentation"] = ""; // If you want whitespace-less output
-  switch (type)
-  {
-    case WEBVIEW_MESSAGE_TYPE::GET_INPUT: // I need to get only the input that I requested
-    {
-        Json::Value tempjson;
-        int panel_id = json.get("panelId", Json::nullValue).asInt();
-        int input_id = json.get("inputId", Json::nullValue).asInt();
-        if ((input_id > 0) && input_id > BAC_INPUT_ITEM_COUNT)
-        {
-            break;
-        }
-        tempjson["action"] = "setInput";
-        tempjson["panelId"] = panel_id;
-        tempjson["inputId"] = input_id;
+	Json::Value json;
+	std::string message = CT2A(msg);
+	Json::Reader reader;
+	reader.parse(message, json, false);
+	int type = json.get("action", Json::nullValue).asInt();
+	Json::StreamWriterBuilder builder;
+	builder["indentation"] = ""; // If you want whitespace-less output
+	Json::Value tempjson;
+	switch (type)
+	{
+	case WEBVIEW_MESSAGE_TYPE::GET_ENTRY:
+	{
+		int panel_id = json.get("panelId", Json::nullValue).asInt();
+		int entry_id = json.get("entryId", Json::nullValue).asInt();
+		int entry_type = json.get("entryType", Json::nullValue).asInt();
 
-        tempjson["data"]["index"] = input_id - 1;
-        tempjson["data"]["id"] = "IN" + to_string(input_id - 1);
-        tempjson["data"]["desc"] = (char*)m_Input_data.at(input_id - 1).description;
-        tempjson["data"]["label"] = (char*)m_Input_data.at(input_id - 1).label;
-        tempjson["data"]["unit"] = m_Input_data.at(input_id - 1).range;
-        tempjson["data"]["auto_manual"] = m_Input_data.at(input_id - 1).auto_manual;
-        tempjson["data"]["value"] = m_Input_data.at(input_id - 1).value;
-        tempjson["data"]["filter"] = m_Input_data.at(input_id - 1).filter;
-        tempjson["data"]["control"] = m_Input_data.at(input_id - 1).control;
-        tempjson["data"]["digital_analog"] = m_Input_data.at(input_id - 1).digital_analog;
-        tempjson["data"]["calibration_sign"] = m_Input_data.at(input_id - 1).calibration_sign;
-        tempjson["data"]["calibration_h"] = m_Input_data.at(input_id - 1).calibration_h;
-        tempjson["data"]["calibration_l"] = m_Input_data.at(input_id - 1).calibration_l;
+		int entry_index = entry_id -1;
 
-        const std::string output = Json::writeString(builder, tempjson);
-        CString temp_cs(output.c_str());
+		tempjson["action"] = "updateEntry";
+		tempjson["panelId"] = panel_id;
+		tempjson["entryId"] = entry_id;
+		tempjson["entryType"] = entry_type;
 
-        m_webView->PostWebMessageAsJson(temp_cs);
-        Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, input_id - 1, input_id - 1, sizeof(Str_in_point));
-        TRACE(temp_cs);
+		switch (entry_type)
+		{
+		case WEBVIEW_ENTRY_TYPE::INPUT_TYPE:
+		{
+			if ((entry_id > 0) && entry_id > BAC_INPUT_ITEM_COUNT)
+			{
+				break;
+			}
 
-    }
-    break;
-    case WEBVIEW_MESSAGE_TYPE::GET_INITIAL_DATA:
-    {
-        CFile file;
+			tempjson["data"]["index"] = entry_index;
+			tempjson["data"]["id"] = "IN" + to_string(entry_id);
+			tempjson["data"]["description"] = (char*)m_Input_data.at(entry_index).description;
+			tempjson["data"]["label"] = (char*)m_Input_data.at(entry_index).label;
+			tempjson["data"]["unit"] = m_Input_data.at(entry_index).range;
+			tempjson["data"]["auto_manual"] = m_Input_data.at(entry_index).auto_manual;
+			tempjson["data"]["value"] = m_Input_data.at(entry_index).value;
+			tempjson["data"]["filter"] = m_Input_data.at(entry_index).filter;
+			tempjson["data"]["control"] = m_Input_data.at(entry_index).control;
+			tempjson["data"]["digital_analog"] = m_Input_data.at(entry_index).digital_analog;
+			tempjson["data"]["range"] = m_Input_data.at(entry_index).range;
+			tempjson["data"]["calibration_sign"] = m_Input_data.at(entry_index).calibration_sign;
+			tempjson["data"]["calibration_h"] = m_Input_data.at(entry_index).calibration_h;
+			tempjson["data"]["calibration_l"] = m_Input_data.at(entry_index).calibration_l;
+
+			break;
+		}
+		case WEBVIEW_ENTRY_TYPE::OUTPUT:
+		{
+			if ((entry_id > 0) && entry_id > BAC_OUTPUT_ITEM_COUNT)
+			{
+				break;
+			}
+
+			tempjson["data"]["index"] = entry_index;
+			tempjson["data"]["id"] = "OUT" + to_string(entry_id);
+			tempjson["data"]["description"] = (char*)m_Output_data.at(entry_index).description;
+			tempjson["data"]["label"] = (char*)m_Output_data.at(entry_index).label;
+			tempjson["data"]["auto_manual"] = m_Output_data.at(entry_index).auto_manual;
+			tempjson["data"]["value"] = m_Output_data.at(entry_index).value;
+			tempjson["data"]["low_voltage"] = m_Output_data.at(entry_index).low_voltage;
+			tempjson["data"]["high_voltage"] = m_Output_data.at(entry_index).high_voltage;
+			tempjson["data"]["range"] = m_Output_data.at(entry_index).range;
+			tempjson["data"]["control"] = m_Output_data.at(entry_index).control;
+			tempjson["data"]["digital_analog"] = m_Output_data.at(entry_index).digital_analog;
+			tempjson["data"]["hw_switch_status"] = m_Output_data.at(entry_index).hw_switch_status;
+
+			break;
+		}
+		case WEBVIEW_ENTRY_TYPE::VARIABLE:
+		{
+			if ((entry_id > 0) && entry_id > BAC_VARIABLE_ITEM_COUNT)
+			{
+				break;
+			}
+
+			tempjson["data"]["index"] = entry_index;
+			tempjson["data"]["id"] = "VAR" + to_string(entry_id);
+			tempjson["data"]["description"] = (char*)m_Variable_data.at(entry_index).description;
+			tempjson["data"]["label"] = (char*)m_Variable_data.at(entry_index).label;
+			tempjson["data"]["auto_manual"] = m_Variable_data.at(entry_index).auto_manual;
+			tempjson["data"]["value"] = m_Variable_data.at(entry_index).value;
+			tempjson["data"]["range"] = m_Variable_data.at(entry_index).range;
+			tempjson["data"]["control"] = m_Variable_data.at(entry_index).control;
+			tempjson["data"]["digital_analog"] = m_Variable_data.at(entry_index).digital_analog;
+
+			break;
+		}
+		case WEBVIEW_ENTRY_TYPE::PROGRAM:
+		{
+			if ((entry_id > 0) && entry_id > BAC_PROGRAM_ITEM_COUNT)
+			{
+				break;
+			}
+
+			tempjson["data"]["index"] = entry_index;
+			tempjson["data"]["id"] = "PRG" + to_string(entry_id);
+			tempjson["data"]["description"] = (char*)m_Program_data.at(entry_index).description;
+			tempjson["data"]["label"] = (char*)m_Program_data.at(entry_index).label;
+			tempjson["data"]["auto_manual"] = m_Program_data.at(entry_index).auto_manual;
+			tempjson["data"]["status"] = m_Program_data.at(entry_index).on_off;
+
+			break;
+		}
+		case WEBVIEW_ENTRY_TYPE::SCHEDULE:
+		{
+			if ((entry_id > 0) && entry_id > BAC_SCHEDULE_COUNT)
+			{
+				break;
+			}
+
+			tempjson["data"]["index"] = entry_index;
+			tempjson["data"]["id"] = "SCH" + to_string(entry_id);
+			tempjson["data"]["description"] = (char*)m_Weekly_data.at(entry_index).description;
+			tempjson["data"]["label"] = (char*)m_Weekly_data.at(entry_index).label;
+			tempjson["data"]["auto_manual"] = m_Weekly_data.at(entry_index).auto_manual;
+			tempjson["data"]["output"] = m_Weekly_data.at(entry_index).value;
+			tempjson["data"]["state1"] = m_Weekly_data.at(entry_index).override_1_value;
+			tempjson["data"]["state2"] = m_Weekly_data.at(entry_index).override_2_value;
+
+			break;
+		}
+		case WEBVIEW_ENTRY_TYPE::HOLIDAY:
+		{
+			if ((entry_id > 0) && entry_id > BAC_HOLIDAY_COUNT)
+			{
+				break;
+			}
+
+			tempjson["data"]["index"] = entry_index;
+			tempjson["data"]["id"] = "CAL" + to_string(entry_id);
+			tempjson["data"]["description"] = (char*)m_Annual_data.at(entry_index).description;
+			tempjson["data"]["label"] = (char*)m_Annual_data.at(entry_index).label;
+			tempjson["data"]["auto_manual"] = m_Annual_data.at(entry_index).auto_manual;
+			tempjson["data"]["value"] = m_Annual_data.at(entry_index).value;
+
+			break;
+		}
+
+		break;
+		}
+
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+
+		m_webView->PostWebMessageAsJson(temp_cs);
+		//Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, entry_index, entry_index, sizeof(Str_in_point));
+		break;
+	}
+	case WEBVIEW_MESSAGE_TYPE::GET_INITIAL_DATA:
+	{
+		CFile file;
 
 
-        CFileFind temp_find;
-        if (temp_find.FindFile(des_file) == 0)
-        {
-            break;
-        }
+		CFileFind temp_find;
+		if (temp_find.FindFile(des_file) == 0)
+		{
+			break;
+		}
 
-        file.Open(des_file, CFile::modeRead, NULL);
-        DWORD len = file.GetLength();
-        if (len == 0)
-            break;
-        WCHAR* nbuff = new WCHAR[len + 1];
-        memset(nbuff, 0, 2*(len+1));
-        file.Read(nbuff, len*2+1);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
-        Json::Value tempjson;
-        tempjson["action"] = "setInitialData";
-        wstring nbuff_wstring(nbuff);
-        string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
-        tempjson["data"] = nbuff_str;
-        const std::string output = Json::writeString(builder, tempjson);
-        CString tempjson_str(output.c_str());
-        TRACE(nbuff);
-        m_webView->PostWebMessageAsJson(tempjson_str);
-        delete nbuff;
-        //Json::Value json;
-        //int panel_id = json.get("panelId", Json::nullValue).asInt();
-        //int input_id = json.get("inputId", Json::nullValue).asInt();
-        break;
-    }
-    case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
-    {
-        CFile file;
-       
-        const std::string file_output = Json::writeString(builder, json["data"]);
-        CString file_temp_cs(file_output.c_str());
-        file.Open(des_file, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
-        file.Write(file_temp_cs, file_temp_cs.GetLength() * 2);
-        file.Close();
-        Json::Value tempjson;
-        tempjson["action"] = "saveGraphicResponse";
-        tempjson["data"]["status"] = true;
-        const std::string output = Json::writeString(builder, tempjson);
-        CString temp_cs(output.c_str());
+		file.Open(des_file, CFile::modeRead, NULL);
+		DWORD len = file.GetLength();
+		if (len == 0)
+			break;
+		WCHAR* nbuff = new WCHAR[len + 1];
+		memset(nbuff, 0, 2 * (len + 1));
+		file.Read(nbuff, len * 2 + 1);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
+		Json::Value tempjson;
+		tempjson["action"] = "setInitialData";
+		wstring nbuff_wstring(nbuff);
+		string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
+		tempjson["data"] = nbuff_str;
+		const std::string output = Json::writeString(builder, tempjson);
+		CString tempjson_str(output.c_str());
+		TRACE(nbuff);
+		m_webView->PostWebMessageAsJson(tempjson_str);
+		delete nbuff;
+		break;
+	}
+	case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
+	{
+		CFile file;
 
-        m_webView->PostWebMessageAsJson(temp_cs);
-        
-        break;
-    }
-    case WEBVIEW_MESSAGE_TYPE::SAVE_INPUT_CHANGE:
-    {
-        Json::Value tempjson;
-        int panel_id = json.get("panelId", Json::nullValue).asInt();
-        int input_id = json.get("inputId", Json::nullValue).asInt();
-        if ((input_id > 0) && input_id > BAC_INPUT_ITEM_COUNT)
-        {
-            break;
-        }
-        int var_index = input_id - 1;
-        m_Input_data.at(var_index).control = json["data"]["control"].asInt();
-        Write_Private_Data_Blocking(WRITEINPUT_T3000, var_index, var_index, g_bac_instance);
-        ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, var_index, REFRESH_ON_ITEM);
-        tempjson["action"] = "saveInputChangeResponse";
-        tempjson["data"]["status"] = true;
-        const std::string output = Json::writeString(builder, tempjson);
-        CString temp_cs(output.c_str());
+		const std::string file_output = Json::writeString(builder, json["data"]);
+		CString file_temp_cs(file_output.c_str());
+		file.Open(des_file, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
+		file.Write(file_temp_cs, file_temp_cs.GetLength() * 2);
+		file.Close();
+		Json::Value tempjson;
+		tempjson["action"] = "saveGraphicResponse";
+		tempjson["data"]["status"] = true;
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
 
-        m_webView->PostWebMessageAsJson(temp_cs);
+		m_webView->PostWebMessageAsJson(temp_cs);
 
-        break;
-    }
-  break;
-  }
+		break;
+	}
+	case WEBVIEW_MESSAGE_TYPE::UPDATE_ENTRY:
+	{
+		Json::Value tempjson;
+		int panel_id = json.get("panelId", Json::nullValue).asInt();
+		int entry_id = json.get("entryId", Json::nullValue).asInt();
+		int entry_type = json.get("entryType", Json::nullValue).asInt();
+		const std::string field = json.get("field", Json::nullValue).asString();
+
+		int entry_index = entry_id - 1;
+		switch (entry_type)
+		{
+		case WEBVIEW_ENTRY_TYPE::INPUT_TYPE:
+		{
+
+			if ((entry_id > 0) && entry_id > BAC_INPUT_ITEM_COUNT)
+			{
+				break;
+			}
+			if (field.compare("control") == 0) {
+				m_Input_data.at(entry_index).control = json["data"][field].asInt();
+			}
+			else if (field.compare("auto_manual") == 0) {
+				m_Input_data.at(entry_index).auto_manual = json["data"][field].asInt();
+			}
+			
+			Write_Private_Data_Blocking(WRITEINPUT_T3000, entry_index, entry_index, g_bac_instance);
+			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, entry_index, REFRESH_ON_ITEM);
+			break;
+		}
+		}
+		tempjson["action"] = "updateEntryResponse";
+		tempjson["data"]["status"] = true;
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+
+		m_webView->PostWebMessageAsJson(temp_cs);
+
+		break;
+	}
+	break;
+	}
 }
 
 //void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
@@ -1385,63 +1446,63 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 VOID CALLBACK BacnetWebViewAppWindow::onTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
 
-    /*if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(hwnd, GWLP_USERDATA))
-    {
-        printf("Timer called\n");
-        Json::Reader reader;
-        Json::Value json;
-        reader.parse(app->JsonData, json, false);
-        int index = Find_Index_Input_By_Label("IDT");
-        json["variable"]["name"] = "IDT";
-        json["variable"]["value"] = m_Input_data.at(index).value / 1000;
-        Json::StyledWriter styleWriter;
-        Json::String writeStr = styleWriter.write(json);
-        CString Response = writeStr.c_str();
-        app->m_webView->ExecuteScript(L"MessageReceived(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-        index = Find_Index_Input_By_Label("ODT");
-        json["variable"]["name"] = "ODT";
-        json["variable"]["value"] = m_Input_data.at(index).value / 1000;
-        writeStr = styleWriter.write(json);
-        Response = writeStr.c_str();
-        app->m_webView->ExecuteScript(L"MessageReceived(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-    }*/
+	/*if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(hwnd, GWLP_USERDATA))
+	{
+		printf("Timer called\n");
+		Json::Reader reader;
+		Json::Value json;
+		reader.parse(app->JsonData, json, false);
+		int index = Find_Index_Input_By_Label("IDT");
+		json["variable"]["name"] = "IDT";
+		json["variable"]["value"] = m_Input_data.at(index).value / 1000;
+		Json::StyledWriter styleWriter;
+		Json::String writeStr = styleWriter.write(json);
+		CString Response = writeStr.c_str();
+		app->m_webView->ExecuteScript(L"MessageReceived(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
+		index = Find_Index_Input_By_Label("ODT");
+		json["variable"]["name"] = "ODT";
+		json["variable"]["value"] = m_Input_data.at(index).value / 1000;
+		writeStr = styleWriter.write(json);
+		Response = writeStr.c_str();
+		app->m_webView->ExecuteScript(L"MessageReceived(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
+	}*/
 }
 
-std::vector<std::string> BacnetWebViewAppWindow::GetGraphicFiles(CString path )
+std::vector<std::string> BacnetWebViewAppWindow::GetGraphicFiles(CString path)
 {
-    vector<string> files;
-    DIR* dir;
-    struct dirent* ent;
-    CStringA charstr(path);
-    if ((dir = opendir((const char*)charstr)) != NULL) {
-        /* print all the files and directories within directory */
-        while ((ent = readdir(dir)) != NULL) {
-            //  printf("%s\n", ent->d_name);
-            const char* ext = strrchr(ent->d_name, '.');
-            if ((ext) || (ext != ent->d_name))
-            {
-                if (ent->d_namlen > 2 && (strcmp(ext, ".grp") == 0))
-                    files.push_back(ent->d_name);
-            }
-        }
-        closedir(dir);
-    }
-    else {
-        /* could not open directory */
-        perror("");
-    }
-    return files;
+	vector<string> files;
+	DIR* dir;
+	struct dirent* ent;
+	CStringA charstr(path);
+	if ((dir = opendir((const char*)charstr)) != NULL) {
+		/* print all the files and directories within directory */
+		while ((ent = readdir(dir)) != NULL) {
+			//  printf("%s\n", ent->d_name);
+			const char* ext = strrchr(ent->d_name, '.');
+			if ((ext) || (ext != ent->d_name))
+			{
+				if (ent->d_namlen > 2 && (strcmp(ext, ".grp") == 0))
+					files.push_back(ent->d_name);
+			}
+		}
+		closedir(dir);
+	}
+	else {
+		/* could not open directory */
+		perror("");
+	}
+	return files;
 
 }
 void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsigned int& width, unsigned int& height)
 {
-    unsigned char buf[8];
+	unsigned char buf[8];
 
-    std::ifstream in(file_path);
-    in.seekg(16);
-    in.read(reinterpret_cast<char*>(&buf), 8);
+	std::ifstream in(file_path);
+	in.seekg(16);
+	in.read(reinterpret_cast<char*>(&buf), 8);
 
-    width = (buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + (buf[3] << 0);
-    height = (buf[4] << 24) + (buf[5] << 16) + (buf[6] << 8) + (buf[7] << 0);
+	width = (buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + (buf[3] << 0);
+	height = (buf[4] << 24) + (buf[5] << 16) + (buf[6] << 8) + (buf[7] << 0);
 }
 #pragma endregion WebviewRelatedMethods
