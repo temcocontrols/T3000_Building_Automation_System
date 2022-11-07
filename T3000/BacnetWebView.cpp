@@ -91,7 +91,7 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 
 	++s_appInstances;
-	std::wstring title = L"BacnetWebView Demo Application 0.3";
+	std::wstring title = L"HVAC Drawer 0.2";
 	m_mainWindow = CreateWindowExW(0, GetWindowClass(), title.c_str(),
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, BacNet_hwd, nullptr,
 		GetModuleHandle(nullptr), nullptr);
