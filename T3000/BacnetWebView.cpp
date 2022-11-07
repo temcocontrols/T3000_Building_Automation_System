@@ -45,7 +45,7 @@ size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
 
 enum WEBVIEW_MESSAGE_TYPE
 {
-	GET_ENTRY = 0,
+	GET_CURRENT_PANEL_DATA = 0,
 	GET_INITIAL_DATA = 1,
 	SAVE_GRAPHIC_DATA = 2,
 	UPDATE_ENTRY = 3,
@@ -634,139 +634,102 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	Json::Value tempjson;
 	switch (type)
 	{
-	case WEBVIEW_MESSAGE_TYPE::GET_ENTRY:
+	case WEBVIEW_MESSAGE_TYPE::GET_CURRENT_PANEL_DATA:
 	{
-		int panel_id = json.get("panelId", Json::nullValue).asInt();
-		int entry_id = json.get("entryId", Json::nullValue).asInt();
-		int entry_type = json.get("entryType", Json::nullValue).asInt();
 
-		int entry_index = entry_id -1;
-
-		tempjson["action"] = "updateEntry";
-		tempjson["panelId"] = panel_id;
-		tempjson["entryId"] = entry_id;
-		tempjson["entryType"] = entry_type;
-
-		switch (entry_type)
-		{
-		case WEBVIEW_ENTRY_TYPE::INPUT_TYPE:
-		{
-			if ((entry_id > 0) && entry_id > BAC_INPUT_ITEM_COUNT)
-			{
-				break;
-			}
-
-			tempjson["data"]["index"] = entry_index;
-			tempjson["data"]["id"] = "IN" + to_string(entry_id);
-			tempjson["data"]["description"] = (char*)m_Input_data.at(entry_index).description;
-			tempjson["data"]["label"] = (char*)m_Input_data.at(entry_index).label;
-			tempjson["data"]["unit"] = m_Input_data.at(entry_index).range;
-			tempjson["data"]["auto_manual"] = m_Input_data.at(entry_index).auto_manual;
-			tempjson["data"]["value"] = m_Input_data.at(entry_index).value;
-			tempjson["data"]["filter"] = m_Input_data.at(entry_index).filter;
-			tempjson["data"]["control"] = m_Input_data.at(entry_index).control;
-			tempjson["data"]["digital_analog"] = m_Input_data.at(entry_index).digital_analog;
-			tempjson["data"]["range"] = m_Input_data.at(entry_index).range;
-			tempjson["data"]["calibration_sign"] = m_Input_data.at(entry_index).calibration_sign;
-			tempjson["data"]["calibration_h"] = m_Input_data.at(entry_index).calibration_h;
-			tempjson["data"]["calibration_l"] = m_Input_data.at(entry_index).calibration_l;
-
-			break;
-		}
-		case WEBVIEW_ENTRY_TYPE::OUTPUT:
-		{
-			if ((entry_id > 0) && entry_id > BAC_OUTPUT_ITEM_COUNT)
-			{
-				break;
-			}
-
-			tempjson["data"]["index"] = entry_index;
-			tempjson["data"]["id"] = "OUT" + to_string(entry_id);
-			tempjson["data"]["description"] = (char*)m_Output_data.at(entry_index).description;
-			tempjson["data"]["label"] = (char*)m_Output_data.at(entry_index).label;
-			tempjson["data"]["auto_manual"] = m_Output_data.at(entry_index).auto_manual;
-			tempjson["data"]["value"] = m_Output_data.at(entry_index).value;
-			tempjson["data"]["low_voltage"] = m_Output_data.at(entry_index).low_voltage;
-			tempjson["data"]["high_voltage"] = m_Output_data.at(entry_index).high_voltage;
-			tempjson["data"]["range"] = m_Output_data.at(entry_index).range;
-			tempjson["data"]["control"] = m_Output_data.at(entry_index).control;
-			tempjson["data"]["digital_analog"] = m_Output_data.at(entry_index).digital_analog;
-			tempjson["data"]["hw_switch_status"] = m_Output_data.at(entry_index).hw_switch_status;
-
-			break;
-		}
-		case WEBVIEW_ENTRY_TYPE::VARIABLE:
-		{
-			if ((entry_id > 0) && entry_id > BAC_VARIABLE_ITEM_COUNT)
-			{
-				break;
-			}
-
-			tempjson["data"]["index"] = entry_index;
-			tempjson["data"]["id"] = "VAR" + to_string(entry_id);
-			tempjson["data"]["description"] = (char*)m_Variable_data.at(entry_index).description;
-			tempjson["data"]["label"] = (char*)m_Variable_data.at(entry_index).label;
-			tempjson["data"]["auto_manual"] = m_Variable_data.at(entry_index).auto_manual;
-			tempjson["data"]["value"] = m_Variable_data.at(entry_index).value;
-			tempjson["data"]["range"] = m_Variable_data.at(entry_index).range;
-			tempjson["data"]["control"] = m_Variable_data.at(entry_index).control;
-			tempjson["data"]["digital_analog"] = m_Variable_data.at(entry_index).digital_analog;
-
-			break;
-		}
-		case WEBVIEW_ENTRY_TYPE::PROGRAM:
-		{
-			if ((entry_id > 0) && entry_id > BAC_PROGRAM_ITEM_COUNT)
-			{
-				break;
-			}
-
-			tempjson["data"]["index"] = entry_index;
-			tempjson["data"]["id"] = "PRG" + to_string(entry_id);
-			tempjson["data"]["description"] = (char*)m_Program_data.at(entry_index).description;
-			tempjson["data"]["label"] = (char*)m_Program_data.at(entry_index).label;
-			tempjson["data"]["auto_manual"] = m_Program_data.at(entry_index).auto_manual;
-			tempjson["data"]["status"] = m_Program_data.at(entry_index).on_off;
-
-			break;
-		}
-		case WEBVIEW_ENTRY_TYPE::SCHEDULE:
-		{
-			if ((entry_id > 0) && entry_id > BAC_SCHEDULE_COUNT)
-			{
-				break;
-			}
-
-			tempjson["data"]["index"] = entry_index;
-			tempjson["data"]["id"] = "SCH" + to_string(entry_id);
-			tempjson["data"]["description"] = (char*)m_Weekly_data.at(entry_index).description;
-			tempjson["data"]["label"] = (char*)m_Weekly_data.at(entry_index).label;
-			tempjson["data"]["auto_manual"] = m_Weekly_data.at(entry_index).auto_manual;
-			tempjson["data"]["output"] = m_Weekly_data.at(entry_index).value;
-			tempjson["data"]["state1"] = m_Weekly_data.at(entry_index).override_1_value;
-			tempjson["data"]["state2"] = m_Weekly_data.at(entry_index).override_2_value;
-
-			break;
-		}
-		case WEBVIEW_ENTRY_TYPE::HOLIDAY:
-		{
-			if ((entry_id > 0) && entry_id > BAC_HOLIDAY_COUNT)
-			{
-				break;
-			}
-
-			tempjson["data"]["index"] = entry_index;
-			tempjson["data"]["id"] = "CAL" + to_string(entry_id);
-			tempjson["data"]["description"] = (char*)m_Annual_data.at(entry_index).description;
-			tempjson["data"]["label"] = (char*)m_Annual_data.at(entry_index).label;
-			tempjson["data"]["auto_manual"] = m_Annual_data.at(entry_index).auto_manual;
-			tempjson["data"]["value"] = m_Annual_data.at(entry_index).value;
-
-			break;
+		tempjson["action"] = "GET_CURRENT_PANEL_DATA_RES";
+		int p_i = 0;
+		for (int i = 0; i < m_Input_data.size(); i++) {
+			tempjson["data"][p_i]["type"] = "INPUT";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "IN" + to_string(i +1);
+			tempjson["data"][p_i]["description"] = (char*)m_Input_data.at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)m_Input_data.at(i).label;
+			tempjson["data"][p_i]["unit"] = m_Input_data.at(i).range;
+			tempjson["data"][p_i]["auto_manual"] = m_Input_data.at(i).auto_manual;
+			tempjson["data"][p_i]["value"] = m_Input_data.at(i).value;
+			tempjson["data"][p_i]["filter"] = m_Input_data.at(i).filter;
+			tempjson["data"][p_i]["control"] = m_Input_data.at(i).control;
+			tempjson["data"][p_i]["digital_analog"] = m_Input_data.at(i).digital_analog;
+			tempjson["data"][p_i]["range"] = m_Input_data.at(i).range;
+			tempjson["data"][p_i]["calibration_sign"] = m_Input_data.at(i).calibration_sign;
+			tempjson["data"][p_i]["calibration_h"] = m_Input_data.at(i).calibration_h;
+			tempjson["data"][p_i]["calibration_l"] = m_Input_data.at(i).calibration_l;
+			p_i++;
 		}
 
-		break;
+
+
+		for (int i = 0; i < m_Output_data.size(); i++) {
+			tempjson["data"][p_i]["type"] = "OUTPUT";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "OUT" + to_string(i +1);
+			tempjson["data"][p_i]["description"] = (char*)m_Output_data.at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)m_Output_data.at(i).label;
+			tempjson["data"][p_i]["auto_manual"] = m_Output_data.at(i).auto_manual;
+			tempjson["data"][p_i]["value"] = m_Output_data.at(i).value;
+			tempjson["data"][p_i]["low_voltage"] = m_Output_data.at(i).low_voltage;
+			tempjson["data"][p_i]["high_voltage"] = m_Output_data.at(i).high_voltage;
+			tempjson["data"][p_i]["range"] = m_Output_data.at(i).range;
+			tempjson["data"][p_i]["control"] = m_Output_data.at(i).control;
+			tempjson["data"][p_i]["digital_analog"] = m_Output_data.at(i).digital_analog;
+			tempjson["data"][p_i]["hw_switch_status"] = m_Output_data.at(i).hw_switch_status;
+			p_i++;
 		}
+
+
+		for (int i = 0; i < m_Variable_data.size(); i++) {
+			tempjson["data"][p_i]["type"] = "VARIABLE";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "VAR" + to_string(i +1);
+			tempjson["data"][p_i]["description"] = (char*)m_Variable_data.at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)m_Variable_data.at(i).label;
+			tempjson["data"][p_i]["auto_manual"] = m_Variable_data.at(i).auto_manual;
+			tempjson["data"][p_i]["value"] = m_Variable_data.at(i).value;
+			tempjson["data"][p_i]["range"] = m_Variable_data.at(i).range;
+			tempjson["data"][p_i]["control"] = m_Variable_data.at(i).control;
+			tempjson["data"][p_i]["digital_analog"] = m_Variable_data.at(i).digital_analog;
+			p_i++;
+		}
+
+
+		for (int i = 0; i < m_Program_data.size(); i++) {
+			tempjson["data"][p_i]["type"] = "PROGRAM";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "PRG" + to_string(i +1);
+			tempjson["data"][p_i]["description"] = (char*)m_Program_data.at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)m_Program_data.at(i).label;
+			tempjson["data"][p_i]["auto_manual"] = m_Program_data.at(i).auto_manual;
+			tempjson["data"][p_i]["status"] = m_Program_data.at(i).on_off;
+			p_i++;
+		}
+
+
+		for (int i = 0; i < m_Weekly_data.size(); i++) {
+			tempjson["data"][p_i]["type"] = "SCHEDULE";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "SCH" + to_string(i +1);
+			tempjson["data"][p_i]["description"] = (char*)m_Weekly_data.at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)m_Weekly_data.at(i).label;
+			tempjson["data"][p_i]["auto_manual"] = m_Weekly_data.at(i).auto_manual;
+			tempjson["data"][p_i]["output"] = m_Weekly_data.at(i).value;
+			tempjson["data"][p_i]["state1"] = m_Weekly_data.at(i).override_1_value;
+			tempjson["data"][p_i]["state2"] = m_Weekly_data.at(i).override_2_value;
+			p_i++;
+		}
+
+
+		for (int i = 0; i < m_Annual_data.size(); i++) {
+			tempjson["data"][p_i]["type"] = "HOLIDAY";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "CAL" + to_string(i +1);
+			tempjson["data"][p_i]["description"] = (char*)m_Annual_data.at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)m_Annual_data.at(i).label;
+			tempjson["data"][p_i]["auto_manual"] = m_Annual_data.at(i).auto_manual;
+			tempjson["data"][p_i]["value"] = m_Annual_data.at(i).value;
+			p_i++;
+		}
+
 
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
@@ -794,7 +757,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		memset(nbuff, 0, 2 * (len + 1));
 		file.Read(nbuff, len * 2 + 1);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
 		Json::Value tempjson;
-		tempjson["action"] = "setInitialData";
+		tempjson["action"] = "GET_INITIAL_DATA_RES";
 		wstring nbuff_wstring(nbuff);
 		string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
 		tempjson["data"] = nbuff_str;
@@ -815,7 +778,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		file.Write(file_temp_cs, file_temp_cs.GetLength() * 2);
 		file.Close();
 		Json::Value tempjson;
-		tempjson["action"] = "saveGraphicResponse";
+		tempjson["action"] = "SAVE_GRAPHIC_DATA_RES";
 		tempjson["data"]["status"] = true;
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
@@ -827,43 +790,140 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	case WEBVIEW_MESSAGE_TYPE::UPDATE_ENTRY:
 	{
 		Json::Value tempjson;
-		int panel_id = json.get("panelId", Json::nullValue).asInt();
-		int entry_id = json.get("entryId", Json::nullValue).asInt();
+		int panel_id = json.get("panelId", Json::nullValue).asInt(); // Ignored for now because we have only local panel data
+		int entry_index = json.get("entryIndex", Json::nullValue).asInt();
 		int entry_type = json.get("entryType", Json::nullValue).asInt();
 		const std::string field = json.get("field", Json::nullValue).asString();
 
-		int entry_index = entry_id - 1;
 		switch (entry_type)
 		{
 		case WEBVIEW_ENTRY_TYPE::INPUT_TYPE:
 		{
 
-			if ((entry_id > 0) && entry_id > BAC_INPUT_ITEM_COUNT)
+			if ((entry_index >= 0) && entry_index + 1 > BAC_INPUT_ITEM_COUNT)
 			{
 				break;
 			}
 			if (field.compare("control") == 0) {
-				m_Input_data.at(entry_index).control = json["data"][field].asInt();
+				m_Input_data.at(entry_index).control = json["value"].asInt();
+			}
+			else if (field.compare("value") == 0) {
+				m_Input_data.at(entry_index).value = json["value"].asInt() * 1000;
 			}
 			else if (field.compare("auto_manual") == 0) {
-				m_Input_data.at(entry_index).auto_manual = json["data"][field].asInt();
+				m_Input_data.at(entry_index).auto_manual = json["value"].asInt();
 			}
-			
+
 			Write_Private_Data_Blocking(WRITEINPUT_T3000, entry_index, entry_index, g_bac_instance);
 			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
+		case WEBVIEW_ENTRY_TYPE::OUTPUT:
+		{
+
+			if ((entry_index >= 0) && entry_index + 1 > BAC_OUTPUT_ITEM_COUNT)
+			{
+				break;
+			}
+			if (field.compare("control") == 0) {
+				m_Output_data.at(entry_index).control = json["value"].asInt();
+			}
+			else if (field.compare("value") == 0) {
+				m_Output_data.at(entry_index).value = json["value"].asInt() * 1000;
+			}
+			else if (field.compare("auto_manual") == 0) {
+				m_Output_data.at(entry_index).auto_manual = json["value"].asInt();
+			}
+
+			Write_Private_Data_Blocking(WRITEOUTPUT_T3000, entry_index, entry_index, g_bac_instance);
+			::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, entry_index, REFRESH_ON_ITEM);
+			break;
 		}
-		tempjson["action"] = "updateEntryResponse";
+		case WEBVIEW_ENTRY_TYPE::VARIABLE:
+		{
+
+			if ((entry_index >= 0) && entry_index + 1 > BAC_VARIABLE_ITEM_COUNT)
+			{
+				break;
+			}
+			if (field.compare("control") == 0) {
+				m_Variable_data.at(entry_index).control = json["value"].asInt();
+			}
+			else if (field.compare("value") == 0) {
+				m_Variable_data.at(entry_index).value = json["value"].asInt() * 1000;
+			}
+			else if (field.compare("auto_manual") == 0) {
+				m_Variable_data.at(entry_index).auto_manual = json["value"].asInt();
+			}
+
+			Write_Private_Data_Blocking(WRITEVARIABLE_T3000, entry_index, entry_index, g_bac_instance);
+			::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, entry_index, REFRESH_ON_ITEM);
+			break;
+		}
+		case WEBVIEW_ENTRY_TYPE::PROGRAM:
+		{
+
+			if ((entry_index >= 0) && entry_index + 1 > BAC_PROGRAM_ITEM_COUNT)
+			{
+				break;
+			}
+			if (field.compare("status") == 0) {
+				m_Program_data.at(entry_index).on_off = json["value"].asInt();
+			}
+			else if (field.compare("auto_manual") == 0) {
+				m_Program_data.at(entry_index).auto_manual = json["value"].asInt();
+			}
+
+			Write_Private_Data_Blocking(WRITEPROGRAM_T3000, entry_index, entry_index, g_bac_instance);
+			::PostMessage(m_pragram_dlg_hwnd, WM_REFRESH_BAC_PROGRAM_LIST, entry_index, REFRESH_ON_ITEM);
+			break;
+		}
+		case WEBVIEW_ENTRY_TYPE::SCHEDULE:
+		{
+
+			if ((entry_index >= 0) && entry_index + 1 > BAC_SCHEDULE_COUNT)
+			{
+				break;
+			}
+			if (field.compare("output") == 0) {
+				m_Weekly_data.at(entry_index).value = json["value"].asInt() * 1000;
+			}
+			else if (field.compare("auto_manual") == 0) {
+				m_Weekly_data.at(entry_index).auto_manual = json["value"].asInt();
+			}
+
+			Write_Private_Data_Blocking(WRITESCHEDULE_T3000, entry_index, entry_index, g_bac_instance);
+			::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, entry_index, REFRESH_ON_ITEM);
+			break;
+		}
+		case WEBVIEW_ENTRY_TYPE::HOLIDAY:
+		{
+
+			if ((entry_index >= 0) && entry_index + 1 > BAC_HOLIDAY_COUNT)
+			{
+				break;
+			}
+			if (field.compare("value") == 0) {
+				m_Annual_data.at(entry_index).value = json["value"].asInt() * 1000;
+			}
+			else if (field.compare("auto_manual") == 0) {
+				m_Annual_data.at(entry_index).auto_manual = json["value"].asInt();
+			}
+
+			Write_Private_Data_Blocking(WRITEHOLIDAY_T3000, entry_index, entry_index, g_bac_instance);
+			::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, entry_index, REFRESH_ON_ITEM);
+			break;
+		}
+
+		}
+		tempjson["action"] = "UPDATE_ENTRY_RES";
 		tempjson["data"]["status"] = true;
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 
 		m_webView->PostWebMessageAsJson(temp_cs);
 
-		break;
 	}
-	break;
 	}
 }
 
