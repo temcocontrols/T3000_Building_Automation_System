@@ -886,7 +886,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				break;
 			}
 			if (field.compare("output") == 0) {
-				m_Weekly_data.at(entry_index).value = json["value"].asInt() * 1000;
+				m_Weekly_data.at(entry_index).value = json["value"].asInt();
 			}
 			else if (field.compare("auto_manual") == 0) {
 				m_Weekly_data.at(entry_index).auto_manual = json["value"].asInt();
@@ -904,7 +904,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				break;
 			}
 			if (field.compare("value") == 0) {
-				m_Annual_data.at(entry_index).value = json["value"].asInt() * 1000;
+				m_Annual_data.at(entry_index).value = json["value"].asInt();
 			}
 			else if (field.compare("auto_manual") == 0) {
 				m_Annual_data.at(entry_index).auto_manual = json["value"].asInt();
