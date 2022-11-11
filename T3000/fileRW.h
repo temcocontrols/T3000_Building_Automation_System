@@ -42,7 +42,7 @@ void Save2File(const char* fn);
 //void Save2File_ForTwoFiles(const char* fn);
 void Save2File_ForTwoFiles(TCHAR* fn);
 void Save2File_ForCO2Node(TCHAR* fn);
-
+int SaveGeneralReg(CString nPath, int pidtype);
 void Save2File_ForTwoFilesTSTAT67(TCHAR* fn);//((LPTSTR)(LPCTSTR)strFilename);
 void change_showing_text_variable(CString str);
 bool before_load_file_inspect(CString path_name,CString name,int i_tstat_id,bool show_message=true);
