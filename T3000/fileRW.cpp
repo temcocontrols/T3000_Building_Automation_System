@@ -2393,6 +2393,171 @@ void Save2File(CString fn)
 	//write_one(tstat_id,16,159);//////
 	//close_com();//close the com port 
 }
+
+int SaveGeneralReg(CString nPath,int pidtype)
+{
+	WritePrivateProfileStringW(_T("Version"), _T("iniVersion"), _T("1"), nPath);
+	int itemp = 0;
+	itemp = Read_Multi(g_tstat_id, product_register_value, 0, 100, 4);
+	if (itemp < 0)
+	{
+		return -1;
+	}
+	CString cs_type;
+	cs_type.Format(_T("%d"), product_register_value[7]);
+	WritePrivateProfileStringW(_T("Version"), _T("pidtype"), cs_type, nPath);
+
+	if (product_register_value[7] != pidtype)
+		return -2;
+	CString cs_part;
+	CString WriteString;
+	if ((product_register_value[7] == STM32_CO2_NET) ||
+		(product_register_value[7] == STM32_CO2_RS485))
+	{
+		cs_part = _T("200-220,1230-1270,3000-3080,3141-3141");
+		WritePrivateProfileStringW(_T("Version"), _T("Part"), cs_part, nPath);
+
+		itemp = Read_Multi(g_tstat_id, &product_register_value[200], 200, 21, 4);
+		if (itemp < 0)
+		{
+			return -1;
+		}
+		WriteString.Empty();
+		for (int i = 200; i <= 220; i++)
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("%u,"), product_register_value[i]);
+			WriteString = WriteString + temp_cs;
+		}
+		WritePrivateProfileStringW(_T("Data"), _T("200-220"), WriteString, nPath);
+
+		itemp = Read_Multi(g_tstat_id, &product_register_value[1230], 1230, 41, 4);
+		if (itemp < 0)
+		{
+			return -1;
+		}
+		WriteString.Empty();
+		for (int i = 1230; i <= 1270; i++)
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("%u,"), product_register_value[i]);
+			WriteString = WriteString + temp_cs;
+		}
+		WritePrivateProfileStringW(_T("Data"), _T("1230-1270"), WriteString, nPath);
+
+		itemp = Read_Multi(g_tstat_id, &product_register_value[3000], 3000, 81, 4);
+		if (itemp < 0)
+		{
+			return -1;
+		}
+		WriteString.Empty();
+		for (int i = 3000; i <= 3080; i++)
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("%u,"), product_register_value[i]);
+			WriteString = WriteString + temp_cs;
+		}
+		WritePrivateProfileStringW(_T("Data"), _T("3000-3080"), WriteString, nPath);
+
+		itemp = Read_Multi(g_tstat_id, &product_register_value[3141], 3141, 1, 4);
+		if (itemp < 0)
+		{
+			return -1;
+		}
+		for (int i = 3141; i <= 3141; i++)
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("%u,"), product_register_value[i]);
+			WriteString = WriteString + temp_cs;
+		}
+		WritePrivateProfileStringW(_T("Data"), _T("3141-3141"), WriteString, nPath);
+	}
+	else if ((product_register_value[7] == STM32_HUM_NET) ||
+		(product_register_value[7] == STM32_HUM_RS485))
+	{
+		cs_part = _T("100-101,285-288,450-453,482-490,600-610");
+		WritePrivateProfileStringW(_T("Version"), _T("Part"), cs_part, nPath);
+#pragma region section100-101
+		itemp = Read_Multi(g_tstat_id, &product_register_value[100], 100, 2, 4);
+		if (itemp < 0)
+		{
+			return -1;
+		}
+		WriteString.Empty();
+		for (int i = 100; i <= 101; i++)
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("%u,"), product_register_value[i]);
+			WriteString = WriteString + temp_cs;
+		}
+		WritePrivateProfileStringW(_T("Data"), _T("100-101"), WriteString, nPath);
+#pragma endregion
+#pragma region section285-288
+		itemp = Read_Multi(g_tstat_id, &product_register_value[285], 285, 4, 4);
+		if (itemp < 0)
+		{
+			return -1;
+		}
+		WriteString.Empty();
+		for (int i = 285; i <= 288; i++)
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("%u,"), product_register_value[i]);
+			WriteString = WriteString + temp_cs;
+		}
+		WritePrivateProfileStringW(_T("Data"), _T("285-288"), WriteString, nPath);
+#pragma endregion
+#pragma region section450-453
+		itemp = Read_Multi(g_tstat_id, &product_register_value[450], 450, 4, 4);
+		if (itemp < 0)
+		{
+			return -1;
+		}
+		WriteString.Empty();
+		for (int i = 450; i <= 453; i++)
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("%u,"), product_register_value[i]);
+			WriteString = WriteString + temp_cs;
+		}
+		WritePrivateProfileStringW(_T("Data"), _T("450-453"), WriteString, nPath);
+#pragma endregion
+#pragma region section482-490
+		itemp = Read_Multi(g_tstat_id, &product_register_value[482], 482, 9, 4);
+		if (itemp < 0)
+		{
+			return -1;
+		}
+		WriteString.Empty();
+		for (int i = 482; i <= 490; i++)
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("%u,"), product_register_value[i]);
+			WriteString = WriteString + temp_cs;
+		}
+		WritePrivateProfileStringW(_T("Data"), _T("482-490"), WriteString, nPath);
+#pragma endregion
+#pragma region section600-610
+		itemp = Read_Multi(g_tstat_id, &product_register_value[600], 600, 11, 4);
+		if (itemp < 0)
+		{
+			return -1;
+		}
+		WriteString.Empty();
+		for (int i = 600; i <= 610; i++)
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("%u,"), product_register_value[i]);
+			WriteString = WriteString + temp_cs;
+		}
+		WritePrivateProfileStringW(_T("Data"), _T("600-610"), WriteString, nPath);
+#pragma endregion
+	}
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The configuration file is saved successfully."));
+	Sleep(1);
+	return 1;
+}
+
 void Save2File_ForTwoFiles(TCHAR* fn)
 {
 	CString strTips;

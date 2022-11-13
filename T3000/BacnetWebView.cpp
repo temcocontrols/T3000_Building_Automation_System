@@ -636,7 +636,18 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	{
 	case WEBVIEW_MESSAGE_TYPE::GET_CURRENT_PANEL_DATA:
 	{
+		int ret_index = Post_Background_Read_Message_ByPanel(199, READINPUT_T3000, 3);  //send message to background ，read 199IN3
+		if (ret_index >= 0)
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("IN%d %.3f\r\n"), m_backbround_data.at(ret_index).str_info.npoint_number + 1, m_backbround_data.at(ret_index).ret_data.m_group_input_data.value / 1000.000);
+			AfxMessageBox(temp_cs);
+		}
+		//Alaa :please help me to Save the ret_index .  when we need update the data ,we need use
+		//modify the data of m_backbround_data.at(ret_index) when you need to modify the data later
+		//ret_index  This value is not going to change ( panel  command  , point )
 
+#if 0
 		tempjson["action"] = "GET_CURRENT_PANEL_DATA_RES";
 		int p_i = 0;
 		for (int i = 0; i < m_Input_data.size(); i++) {
@@ -730,7 +741,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			p_i++;
 		}
 
-
+#endif
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 
@@ -795,11 +806,34 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		int entry_type = json.get("entryType", Json::nullValue).asInt();
 		const std::string field = json.get("field", Json::nullValue).asString();
 
+		int ret_index = json.get("data_index", Json::nullValue).asInt(); //save ret_index ;
 		switch (entry_type)
 		{
 		case WEBVIEW_ENTRY_TYPE::INPUT_TYPE:
 		{
+			//get the ret_index first 
+			groupdata temp_write_data = {0};
+			memcpy(&temp_write_data, &m_backbround_data.at(ret_index).ret_data, sizeof(groupdata));
+			if (field.compare("control") == 0) {
+				temp_write_data.m_group_input_data.control = json["value"].asInt();
+			}
+			else if (field.compare("value") == 0) {
+				temp_write_data.m_group_input_data.value = json["value"].asInt() * 1000;
+			}
+			else if (field.compare("auto_manual") == 0) {
+				temp_write_data.m_group_input_data.auto_manual = json["value"].asInt();
+			}
 
+			int ret_results = WritePrivateData_Blocking(m_backbround_data.at(ret_index).str_info.ninstance,
+				WRITEINPUT_T3000, m_backbround_data.at(ret_index).str_info.npoint_number,
+				m_backbround_data.at(ret_index).str_info.npoint_number, 5, (char*)&temp_write_data.m_group_input_data);
+			if (ret_results >= 0)
+			{
+				//success
+			}
+
+
+#if 0
 			if ((entry_index >= 0) && entry_index + 1 > BAC_INPUT_ITEM_COUNT)
 			{
 				break;
@@ -816,6 +850,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 			Write_Private_Data_Blocking(WRITEINPUT_T3000, entry_index, entry_index, g_bac_instance);
 			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, entry_index, REFRESH_ON_ITEM);
+#endif
 			break;
 		}
 		case WEBVIEW_ENTRY_TYPE::OUTPUT:

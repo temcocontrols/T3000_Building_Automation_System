@@ -1043,7 +1043,6 @@ extern vector <Str_userlogin_point> m_user_login_data;
 extern vector <Str_table_point> m_analog_custmer_range;
 extern vector <Str_variable_uint_point> m_variable_analog_unite;
 extern vector <Str_Extio_point> m_extio_config_data;
-
 extern vector <Str_MSV> m_msv_data;
 extern vector <int>  m_Input_data_instance;
 extern vector <int>  m_Output_data_instance;
