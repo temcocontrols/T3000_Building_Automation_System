@@ -616,7 +616,7 @@ void CBacnetBuildingManagement::LoadDevice()
 				(temp_product_class_id == PM_CO2_RS485) ||
 				(temp_product_class_id == PM_PRESSURE_SENSOR) ||
 				(temp_product_class_id == STM32_PRESSURE_NET) ||
-				(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+				(temp_product_class_id == STM32_PRESSURE_RS485) ||
 				(temp_product_class_id == STM32_CO2_NET) ||
 				(temp_product_class_id == STM32_PM25) ||
 				(temp_product_class_id == STM32_CO2_RS485) ||
@@ -1001,7 +1001,7 @@ void CBacnetBuildingManagement::LoadDevice()
 				else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
 					(temp_product_class_id == PM_PRESSURE_SENSOR) ||
 					(temp_product_class_id == STM32_PRESSURE_NET) ||
-					(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+					(temp_product_class_id == STM32_PRESSURE_RS485) ||
 					(temp_product_class_id == STM32_CO2_NET) ||
 					(temp_product_class_id == STM32_PM25) ||
 					(temp_product_class_id == STM32_CO2_RS485) ||

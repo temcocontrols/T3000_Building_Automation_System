@@ -13,7 +13,7 @@ extern const int WRITE_ONE_SUCCESS_LIST;
 extern const int WRITE_ONE_FAIL_LIST ;
 extern const int WRITE_MULTI_SUCCESS_LIST  ;
 extern const int WRITE_MULTI_FAIL_LIST  ;
-
+extern HANDLE hwait_write_thread ;
 extern bool no_mouse_keyboard_event_enable_refresh ;
 extern CString USB_Serial;
 extern int g_invoke_id;
@@ -1010,6 +1010,8 @@ extern HWND		 analog_cus_range_dlg;
 extern HWND      m_tstat_schedule_dlg_hwnd ;
 extern HWND      m_t3000_log_window ;
 extern HWND      m_msv_dlg_hwnd;
+
+extern vector < vector<Str_in_point> >  g_Input_data; //全局所有panel input 的集合体;
 
 extern Str_in_point s_Input_data;
 extern Str_out_point s_Output_data;

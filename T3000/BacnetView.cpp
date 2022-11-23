@@ -2038,7 +2038,11 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 
 	//Fresh();//Fance
 	Initial_All_Point();
-	
+	//for (int i = 0; i < 256; i++)
+	//{
+	//	g_Input_data.push_back(m_Input_data);	
+	//}
+	//g_Input_data[3].at(1).value = 2;
 	//Tab_Initial();
 	//initial_once = false;
 	
@@ -3462,7 +3466,8 @@ void CDialogCM5_BacNet::Fresh()
 			(selected_product_Node.product_class_id == PM_T3_LC)  ||
         (selected_product_Node.product_class_id == STM32_CO2_NET)||
 		(selected_product_Node.product_class_id == STM32_CO2_RS485) ||
-		 (selected_product_Node.product_class_id == STM32_HUM_NET))
+		 (selected_product_Node.product_class_id == STM32_HUM_NET) ||
+		 (selected_product_Node.product_class_id == STM32_HUM_RS485))
 	{
 		BacNet_hwd = this->m_hWnd;
 		return;
@@ -6080,6 +6085,8 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 
 	switch(nIDEvent)
 	{
+		if (hwait_write_thread != NULL) //     在写入prog的时候，不要刷新value数据  
+			break;
 	case BAC_READ_PROPERTIES:
 	{
 		if (BACnet_read_thread == NULL)
@@ -7102,7 +7109,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         output_reg = 1;       //(1)*23 = 322
         input_reg = 6;       //23 * 12 = 506
     }
-    else if (n_read_product_type == STM32_HUM_NET)
+    else if ((n_read_product_type == STM32_HUM_NET) || (n_read_product_type == STM32_HUM_RS485))
     {
         output_reg = 1; // (3)*23 = 69/100 = 1
         input_reg = 1; //  23 * 3 = 69/100 = 1

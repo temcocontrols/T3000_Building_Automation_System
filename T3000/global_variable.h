@@ -38,6 +38,7 @@ bool g_HumChamberThread=FALSE;
 
 unsigned short cm5_register_value[512]; //CM5
 unsigned short m_buffer[512];//CM5
+HANDLE hwait_write_thread = NULL;
 bool no_mouse_keyboard_event_enable_refresh = true;
 bool g_fresh_T3000_background = false;
 CString CurrentT3000Version ;
@@ -1941,6 +1942,8 @@ HWND analog_cus_range_dlg=NULL;
 
 HWND	  m_statusbar_hwnd = NULL;
 HWND      m_t3000_log_window = NULL;
+
+vector < vector<Str_in_point> >  g_Input_data; //全局所有panel input 的集合体;
 
 Str_in_point s_Input_data;
 Str_out_point s_Output_data;

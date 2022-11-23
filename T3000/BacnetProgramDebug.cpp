@@ -1053,7 +1053,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						temp_des2.ReleaseBuffer();	
 
 						//如果是小叶的设备,因为没有input 就直接显示in2之类.
-						if(bacnet_device_type == STM32_HUM_NET)
+						if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 						{
 							temp_des2.Empty();
 						}
@@ -1082,7 +1082,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						}
 
 						//如果是小叶的设备,因为没有input 就直接显示rang 对应的值.
-						if(bacnet_device_type == STM32_HUM_NET)
+						if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 						{
 							if(m_controller_data.at(point_number).units < sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0]))
 							{
@@ -1308,7 +1308,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				}
 
 
-				if(bacnet_device_type == STM32_HUM_NET)
+				if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 				{
 					temp_des3.Format(_T("%.2f"),((float)m_controller_data.at(point_number).setpoint_value)/1000.0);
 				}

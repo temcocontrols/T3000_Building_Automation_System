@@ -49,6 +49,7 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_INITIAL_DATA = 1,
 	SAVE_GRAPHIC_DATA = 2,
 	UPDATE_ENTRY = 3,
+	GET_PANELS = 4
 };
 
 enum WEBVIEW_ENTRY_TYPE
@@ -959,6 +960,23 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		m_webView->PostWebMessageAsJson(temp_cs);
 
 	}
+	case WEBVIEW_MESSAGE_TYPE::GET_PANELS:
+	{
+		int p_i = 0;
+		for (int i = 0; i < g_bacnet_panel_info.size(); i++) 
+		{
+			tempjson["data"][p_i]["panel_number"] = g_bacnet_panel_info.at(i).panel_number;
+			tempjson["data"][p_i]["object_instance"] = g_bacnet_panel_info.at(i).object_instance;
+			tempjson["data"][p_i]["serial_number"] = g_bacnet_panel_info.at(i).nseiral_number;
+			tempjson["data"][p_i]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
+			tempjson["data"][p_i]["pid"] = g_bacnet_panel_info.at(i).npid; 
+			p_i++;
+		}
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+		m_webView->PostWebMessageAsJson(temp_cs);
+	}
+		break;
 	}
 }
 

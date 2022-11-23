@@ -2187,6 +2187,7 @@ typedef struct
 {
 	int panel_number;
 	int object_instance;
+	int nseiral_number;
 	int online_time;
 	int npid;
 }_panel_info;

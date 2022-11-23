@@ -126,7 +126,7 @@ unsigned long time_click = 0;
 tree_product selected_product_Node; // 选中的设备信息;
 bool enable_show_debug_window = false;
 BacnetWait *WaitWriteDlg=NULL;
-HANDLE hwait_write_thread = NULL;
+
 HANDLE hwait_read_thread = NULL;
 HANDLE hwait_read_modbus10000 = NULL;
 HANDLE hwait_write_modbus10000 = NULL;
@@ -1978,7 +1978,7 @@ void CMainFrame::LoadProductFromDB()
                 (temp_product_class_id == PM_CO2_RS485) ||
                 (temp_product_class_id == PM_PRESSURE_SENSOR) ||
                 (temp_product_class_id == STM32_PRESSURE_NET) ||
-                (temp_product_class_id == STM32_PRESSURE_RS3485) ||
+                (temp_product_class_id == STM32_PRESSURE_RS485) ||
                 (temp_product_class_id == STM32_CO2_NET) ||
                 (temp_product_class_id == STM32_PM25) ||
                 (temp_product_class_id == STM32_CO2_RS485) ||
@@ -2251,7 +2251,7 @@ void CMainFrame::LoadProductFromDB()
                 else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
                     (temp_product_class_id == PM_PRESSURE_SENSOR) ||
                     (temp_product_class_id == STM32_PRESSURE_NET) ||
-                    (temp_product_class_id == STM32_PRESSURE_RS3485) ||
+                    (temp_product_class_id == STM32_PRESSURE_RS485) ||
                     (temp_product_class_id == STM32_CO2_NET) ||
                     (temp_product_class_id == STM32_PM25) ||
                     (temp_product_class_id == STM32_CO2_RS485) ||
@@ -2922,7 +2922,7 @@ void CMainFrame::LoadProductFromDB()
                                 (temp_product_class_id == PM_CO2_RS485)||
 							    (temp_product_class_id == PM_PRESSURE_SENSOR)|| 
 							    (temp_product_class_id == STM32_PRESSURE_NET) ||
-							    (temp_product_class_id == STM32_PRESSURE_RS3485) ||
+							    (temp_product_class_id == STM32_PRESSURE_RS485) ||
 							    (temp_product_class_id == STM32_CO2_NET)||
                                 (temp_product_class_id == STM32_PM25) ||
 							    (temp_product_class_id == STM32_CO2_RS485) ||
@@ -3213,7 +3213,7 @@ void CMainFrame::LoadProductFromDB()
 							else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
 								(temp_product_class_id == PM_PRESSURE_SENSOR) ||
 								(temp_product_class_id == STM32_PRESSURE_NET) ||
-								(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+								(temp_product_class_id == STM32_PRESSURE_RS485) ||
 								(temp_product_class_id == STM32_CO2_NET) ||
                                 (temp_product_class_id == STM32_PM25) ||
 								(temp_product_class_id == STM32_CO2_RS485) ||
@@ -3497,7 +3497,7 @@ void CMainFrame::LoadProductFromDB()
 				else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
 					(temp_product_class_id == PM_PRESSURE_SENSOR) ||
 					(temp_product_class_id == STM32_PRESSURE_NET) ||
-					(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+					(temp_product_class_id == STM32_PRESSURE_RS485) ||
                     (temp_product_class_id == STM32_PM25) ||
 					(temp_product_class_id == STM32_CO2_NET) ||
 					(temp_product_class_id == STM32_CO2_RS485))
@@ -4055,7 +4055,7 @@ void CMainFrame::ScanTstatInDB(void)
 					else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
 						(temp_product_class_id == PM_PRESSURE_SENSOR) ||
 						(temp_product_class_id == STM32_PRESSURE_NET) ||
-						(temp_product_class_id == STM32_PRESSURE_RS3485) ||
+						(temp_product_class_id == STM32_PRESSURE_RS485) ||
 						(temp_product_class_id == STM32_CO2_NET) ||
                         (temp_product_class_id == STM32_PM25) ||
 						(temp_product_class_id == STM32_CO2_RS485))
@@ -9783,8 +9783,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 nFlag == PM_AirQuality || nFlag == PM_HUM_R ||
                 product_register_value[7] == PM_HUMTEMPSENSOR ||
                 product_register_value[7] == STM32_HUM_NET ||
-                product_register_value[7] == STM32_PRESSURE_NET ||
-                product_register_value[7] == STM32_HUM_RS485
+                product_register_value[7] == STM32_HUM_RS485 ||
+                product_register_value[7] == STM32_PRESSURE_NET 
+
                 )
             {
                 SwitchToPruductType(DLG_AIRQUALITY_VIEW);
@@ -12707,7 +12708,9 @@ void CMainFrame::OnControlInputs()
                   || (product_type == STM32_CO2_NET)
                   || (product_type == STM32_CO2_RS485)
                   || (product_type == STM32_HUM_NET)
+                  || (product_type == STM32_HUM_RS485)
                   || (product_type == STM32_PRESSURE_NET)
+                  || (product_type == STM32_PRESSURE_RS485)
 				/*&& new_device_support_mini_ui*/ ) ) ) ||
 		
 		   ((g_protocol == MODBUS_TCPIP ) && 
@@ -12722,7 +12725,9 @@ void CMainFrame::OnControlInputs()
             || (product_type == STM32_CO2_RS485)
             || (product_type == PWM_TRANSDUCER)
             || (product_type == STM32_HUM_NET)
+            || (product_type == STM32_HUM_RS485)
             || (product_type == STM32_PRESSURE_NET)
+            || (product_type == STM32_PRESSURE_RS485)
 			) /*&& new_device_support_mini_ui*/  )  ) || product_type== PM_THIRD_PARTY_DEVICE)
     {
 
@@ -13058,7 +13063,9 @@ void CMainFrame::OnControlOutputs()
                 || (product_type == STM32_CO2_NET)
                 || (product_type == STM32_CO2_RS485)
                 || (product_type == STM32_HUM_NET)
+                || (product_type == STM32_HUM_RS485)
                 || (product_type == STM32_PRESSURE_NET)
+                || (product_type == STM32_PRESSURE_RS485)
 				|| (bacnet_device_type == PID_T3PT12))) ) 
 		    ) 
 			 ||
@@ -13071,8 +13078,10 @@ void CMainFrame::OnControlOutputs()
             (product_type == STM32_CO2_NET) ||
               (product_type == STM32_CO2_RS485) ||
               (product_type == STM32_HUM_NET) ||
+              (product_type == STM32_HUM_RS485) ||
               (product_type == PWM_TRANSDUCER) ||
               (product_type == STM32_PRESSURE_NET) ||
+              (product_type == STM32_PRESSURE_RS485) ||
 			(bacnet_device_type == PID_T36CTA) 
 		  ) /*&& new_device_support_mini_ui */ ||   product_type == PM_THIRD_PARTY_DEVICE
 		  )
@@ -13521,7 +13530,7 @@ void CMainFrame::OnControlSettings()
         product_register_value[7] == STM32_PRESSURE_NET ||
         product_register_value[7] == STM32_CO2_RS485 ||
         product_register_value[7] == STM32_HUM_RS485 ||
-        product_register_value[7] == STM32_PRESSURE_RS3485 ||
+        product_register_value[7] == STM32_PRESSURE_RS485 ||
         product_register_value[7]==  STM32_HUM_NET ||
         product_register_value[7] == STM32_CO2_NODE
         )

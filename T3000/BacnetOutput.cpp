@@ -460,7 +460,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
     //}
     else if ((bacnet_device_type == STM32_CO2_NET) || 
 		    (bacnet_device_type == STM32_CO2_RS485) ||
-		     (bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_PRESSURE_NET))
+		     (bacnet_device_type == STM32_HUM_NET) || 
+			(bacnet_device_type == STM32_HUM_RS485) ||
+		     (bacnet_device_type == STM32_PRESSURE_NET)||
+		     (bacnet_device_type == STM32_PRESSURE_RS485))
     {
         OUTPUT_LIMITE_ITEM_COUNT = 3;
         Minipanel_device = 0;
@@ -1754,9 +1757,11 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 {
-	 
+	
 	switch(nIDEvent)
 	{
+		if (hwait_write_thread != NULL) //     在写入prog的时候，不要刷新value数据  
+			break; 
 	case 1:
 		{
             if(g_protocol == PROTOCOL_BIP_TO_MSTP)
@@ -1804,8 +1809,8 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 		break;
 	case 4:
 		if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_OUTPUT) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
-		{
-			Post_Refresh_Message(g_bac_instance, READOUTPUT_T3000, 0, BAC_OUTPUT_ITEM_COUNT - 1, sizeof(Str_out_point), 0); //只刷新Value
+		{			
+		    Post_Refresh_Message(g_bac_instance, READOUTPUT_T3000, 0, BAC_OUTPUT_ITEM_COUNT - 1, sizeof(Str_out_point), 0); //只刷新Value
 		}
 		break;
 	default:

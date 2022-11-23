@@ -1111,7 +1111,7 @@ int Post_Background_Read_Message_ByPanel(unsigned char panel_id,int command_type
     }
     else
     {
-        return SearchDataIndexByPanel(panel_id, command_type, npoint);
+        return SearchDataIndexByPanel(panel_id, command_type, npoint - 1);
     }
 }
 
@@ -6463,7 +6463,7 @@ void Inial_Product_Reglist_map()
     product_reglist_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("STM32-hum-w")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_HUM_RS485, _T("STM32-hum-w")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_PRESSURE_NET, _T("Pressure")));
-    product_reglist_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS3485, _T("Pressure")));
+    product_reglist_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS485, _T("Pressure")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_CO2_NODE, _T("CO2-W+Ethernet")));
 }
 
@@ -6688,7 +6688,7 @@ void Inial_Product_map()
 	product_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("Hum")));
 	product_map.insert(map<int, CString>::value_type(STM32_HUM_RS485, _T("Hum")));
 	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_NET, _T("Pressure")));
-	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS3485, _T("Pressure")));
+	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS485, _T("Pressure")));
 	product_map.insert(map<int, CString>::value_type(STM32_CO2_NODE, _T("CO2 Node")));
 
 }
@@ -8395,7 +8395,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         temp_panel.object_instance = temp.object_instance;
         temp_panel.panel_number = temp.panal_number;
         temp_panel.online_time = time(NULL);
-
+        temp_panel.nseiral_number = nSerial;
         int find_in_list = false;
         for (int j = 0; j < g_bacnet_panel_info.size(); j++)
         {
@@ -8407,6 +8407,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
                 g_bacnet_panel_info.at(j).npid = temp_panel.npid;
                 g_bacnet_panel_info.at(j).object_instance = temp_panel.object_instance;
                 g_bacnet_panel_info.at(j).online_time = temp_panel.online_time;
+                g_bacnet_panel_info.at(j).nseiral_number = temp_panel.nseiral_number;
                 break;
             }
         }
@@ -8417,7 +8418,19 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
             g_bacnet_panel_info.push_back(temp_panel);
         }
 
-            //
+        int temp_time_now = time(NULL);
+        vector<_panel_info>::iterator it = g_bacnet_panel_info.begin();
+        for (; it != g_bacnet_panel_info.end();) 
+        {
+            if (temp_time_now - it->online_time > 600) //删除10分钟以前的在线设备;
+            {
+                it = g_bacnet_panel_info.erase(it);
+            }
+            else
+                it++;
+        }
+
+
     }
     
 
@@ -15376,7 +15389,7 @@ void Initial_Instance_Reg_Map()
 void Inial_ProductName_map()
 {
     g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_NET, 901));
-    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_RS3485, 901));
+    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_RS485, 901));
 
 }
 
@@ -15874,7 +15887,7 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
     }
         break;
     case STM32_PRESSURE_NET:
-    case STM32_PRESSURE_RS3485:
+    case STM32_PRESSURE_RS485:
     {
         if (portindex <= 1)
             nret_type = OUTPUT_ANALOG_PORT;
@@ -16078,7 +16091,7 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
     }
     break;
     case STM32_PRESSURE_NET:
-    case STM32_PRESSURE_RS3485:
+    case STM32_PRESSURE_RS485:
     {
         if (portindex <= 1)
             nret_type = INPUT_INTERNAL;

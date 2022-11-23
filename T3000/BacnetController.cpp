@@ -240,7 +240,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
 
-	if(bacnet_device_type == STM32_HUM_NET)
+	if((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 	{
 		PID_CONTROLLER_LIMITE_ITEM_COUNT = 3;
 	}
@@ -302,7 +302,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 					temp_des2.ReleaseBuffer();	
 					temp_des2 = temp_des2.Left(STR_IN_LABEL).Trim();
 					//如果是小叶的设备,因为没有input 就直接显示in2之类.
-					if(bacnet_device_type == STM32_HUM_NET)
+					if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 					{
 						temp_des2.Empty();
 					}
@@ -331,7 +331,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 					}
 
 					//如果是小叶的设备,因为没有input 就直接显示rang 对应的值.
-					if(bacnet_device_type == STM32_HUM_NET)
+					if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 					{
 						if(m_controller_data.at(i).units < sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0]))
 						{
@@ -557,7 +557,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		}
 
 
-		if(bacnet_device_type == STM32_HUM_NET)
+		if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 		{
 			temp_des3.Format(_T("%.2f"),((float)m_controller_data.at(i).setpoint_value)/1000);
 		}
@@ -790,7 +790,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 
 	if(Changed_SubItem == CONTROLLER_INPUTVALUE)
 	{
-		if(bacnet_device_type == STM32_HUM_NET) //STM32_HUM_NET的设备不支持修改
+		if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485)) //STM32_HUM_NET的设备不支持修改
 		{
 			return 0;
 		}
@@ -812,7 +812,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 
 	if(Changed_SubItem == CONTROLLER_SETVALUE)
 	{
-		if(bacnet_device_type == STM32_HUM_NET) //STM32_HUM_NET的设备不支持修改
+		if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485)) //STM32_HUM_NET的设备不支持修改
 		{
 			int temp_proportional=0;
 			CString cs_temp = m_controller_list.GetItemText(Changed_Item,Changed_SubItem);

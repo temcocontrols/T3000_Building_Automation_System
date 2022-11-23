@@ -675,10 +675,52 @@ void CBacnetSettingTcpip::OnBnClickedRadioUsbHost()
 
 void CBacnetSettingTcpip::OnBnClickedButtonHealth()
 {
-    //#ifdef DEBUG
-    //    ShutDownMstpGlobal(5);
-    //    return;
-    //#endif // DEBUG
+#ifdef DEBUG
+    CString temp_cs1;
+
+	int ret_index1 = Post_Background_Read_Message_ByPanel(199, READINPUT_T3000, 8);  //send message to background £¬read 199IN3
+
+    CString temp_cs2;
+    int ret_index2 = Post_Background_Read_Message_ByPanel(199, READOUTPUT_T3000, 40);  //send message to background £¬read 199IN3
+
+	
+    CString temp_cs3;
+    int ret_index3 = Post_Background_Read_Message_ByPanel(11, READINPUT_T3000, 8);  //send message to background £¬read 199IN3
+
+    CString temp_cs4;
+    int ret_index4 = Post_Background_Read_Message_ByPanel(11, READOUTPUT_T3000, 40);  //send message to background £¬read 199IN3
+
+    if (ret_index1 >= 0)
+    {
+
+        temp_cs1.Format(_T("199IN%d %.3f\r\n"), m_backbround_data.at(ret_index1).str_info.npoint_number + 1, m_backbround_data.at(ret_index1).ret_data.m_group_input_data.value / 1000.000);
+        DFTrace(temp_cs1);
+        //AfxMessageBox(temp_cs1);
+    }
+
+    if (ret_index2 >= 0)
+    {
+        temp_cs2.Format(_T("199OUT%d %.3f\r\n"), m_backbround_data.at(ret_index2).str_info.npoint_number + 1, m_backbround_data.at(ret_index2).ret_data.m_group_output_data.value / 1000.000);
+        DFTrace(temp_cs2);
+        //AfxMessageBox(temp_cs2);
+    }
+
+    if (ret_index3 >= 0)
+    {
+        temp_cs3.Format(_T("11IN%d %.3f\r\n"), m_backbround_data.at(ret_index3).str_info.npoint_number + 1, m_backbround_data.at(ret_index3).ret_data.m_group_input_data.value / 1000.000);
+        DFTrace(temp_cs3);
+        //AfxMessageBox(temp_cs3);
+    }
+
+    if (ret_index4 >= 0)
+    {
+        
+        temp_cs4.Format(_T("11OUT%d %.3f\r\n"), m_backbround_data.at(ret_index4).str_info.npoint_number + 1, m_backbround_data.at(ret_index4).ret_data.m_group_output_data.value / 1000.000);
+        DFTrace(temp_cs4);
+        //AfxMessageBox(temp_cs4);
+    }
+    return;
+#endif // DEBUG
 
 
     GetPrivateData_Blocking(g_bac_instance, READ_MISC, 0, 0, sizeof(Str_MISC));
