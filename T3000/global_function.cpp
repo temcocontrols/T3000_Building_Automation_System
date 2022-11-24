@@ -1111,7 +1111,7 @@ int Post_Background_Read_Message_ByPanel(unsigned char panel_id,int command_type
     }
     else
     {
-        return SearchDataIndexByPanel(panel_id, command_type, npoint);
+        return SearchDataIndexByPanel(panel_id, command_type, npoint - 1);
     }
 }
 
