@@ -118,7 +118,7 @@ int main_webview(/*int argc, const char** argv*/) {
 
     auto port = 9103;
     //if (argc > 1) { port = atoi(argv[1]); }
-    auto base_dir = "WebView/www"; // The resources of this directory are used at publication time
+    auto base_dir = "ResourceFile/WebView/www"; // The resources of this directory are used at publication time
     //if (argc > 2) { base_dir = argv[2]; }
 
     if (!svr.set_mount_point("/", base_dir)) {

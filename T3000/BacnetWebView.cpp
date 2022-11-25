@@ -45,7 +45,7 @@ size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
 
 enum WEBVIEW_MESSAGE_TYPE
 {
-	GET_CURRENT_PANEL_DATA = 0,
+	GET_PANEL_DATA = 0,
 	GET_INITIAL_DATA = 1,
 	SAVE_GRAPHIC_DATA = 2,
 	UPDATE_ENTRY = 3,
@@ -623,6 +623,27 @@ HRESULT BacnetWebViewAppWindow::ExecuteScriptResponse(HRESULT errorCode, LPCWSTR
 	return S_OK;
 }
 
+/*void read_panel_entries(int panel_id, int command) {
+	str_point_info readinfo = { 0 };
+	for (int i = 0; i < 64; i++) {
+		readinfo.npanel_id = panel_id;
+		readinfo.npanel_commad = command;
+		readinfo.npoint_number = i;
+
+		str_point_info* pmy_refresh_info = new str_point_info;
+		memcpy(pmy_refresh_info, &readinfo, sizeof(str_point_info));
+		if (!PostThreadMessage(nThreadID, MY_BAC_READ_GRP, (WPARAM)pmy_refresh_info, NULL))//post thread msg
+		{
+
+		}
+		else
+		{
+
+
+		}
+	}
+}*/
+
 void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 {
 	Json::Value json;
@@ -635,8 +656,53 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	Json::Value tempjson;
 	switch (type)
 	{
-	case WEBVIEW_MESSAGE_TYPE::GET_CURRENT_PANEL_DATA:
+	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_DATA:
 	{
+		tempjson["action"] = "GET_PANEL_DATA_RES";
+		/*
+		read_panel_entries(199, READINPUT_T3000);
+		int p_i = 0;
+		for (int i = 0; i < 64; i++) {
+			if (!m_backbround_data.at(i).flag) break;
+			tempjson["data"][p_i]["type"] = "INPUT";
+			tempjson["data"][p_i]["panel"] = m_backbround_data.at(i).str_info.npanel_id;
+			tempjson["data"][p_i]["command"] = to_string(m_backbround_data.at(i).str_info.npanel_id) + "IN" + to_string(i+1);
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["description"] = (char*)m_backbround_data.at(i).ret_data.m_group_input_data.description;
+			tempjson["data"][p_i]["label"] = (char*)m_backbround_data.at(i).ret_data.m_group_input_data.label;
+			tempjson["data"][p_i]["unit"] = m_backbround_data.at(i).ret_data.m_group_input_data.range;
+			tempjson["data"][p_i]["auto_manual"] = m_backbround_data.at(i).ret_data.m_group_input_data.auto_manual;
+			tempjson["data"][p_i]["value"] = m_backbround_data.at(i).ret_data.m_group_input_data.value;
+			tempjson["data"][p_i]["filter"] = m_backbround_data.at(i).ret_data.m_group_input_data.filter;
+			tempjson["data"][p_i]["control"] = m_backbround_data.at(i).ret_data.m_group_input_data.control;
+			tempjson["data"][p_i]["digital_analog"] = m_backbround_data.at(i).ret_data.m_group_input_data.digital_analog;
+			tempjson["data"][p_i]["range"] = m_backbround_data.at(i).ret_data.m_group_input_data.range;
+			tempjson["data"][p_i]["calibration_sign"] = m_backbround_data.at(i).ret_data.m_group_input_data.calibration_sign;
+			tempjson["data"][p_i]["calibration_h"] = m_backbround_data.at(i).ret_data.m_group_input_data.calibration_h;
+			tempjson["data"][p_i]["calibration_l"] = m_backbround_data.at(i).ret_data.m_group_input_data.calibration_l;
+			p_i++;
+		}
+		read_panel_entries(199, READOUTPUT_T3000);
+		for (int i = 0; i < 64; i++) {
+			if (!m_backbround_data.at(i).flag) break;
+			tempjson["data"][p_i]["type"] = "OUTPUT";
+			tempjson["data"][p_i]["panel"] = m_backbround_data.at(i).str_info.npanel_id;
+			tempjson["data"][p_i]["command"] = to_string(m_backbround_data.at(i).str_info.npanel_id) + "OUT" + to_string(i+1);
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["description"] = (char*)m_backbround_data.at(i).ret_data.m_group_output_data.description;
+			tempjson["data"][p_i]["label"] = (char*)m_backbround_data.at(i).ret_data.m_group_output_data.label;
+			tempjson["data"][p_i]["auto_manual"] = m_backbround_data.at(i).ret_data.m_group_output_data.auto_manual;
+			tempjson["data"][p_i]["value"] = m_backbround_data.at(i).ret_data.m_group_output_data.value;
+			tempjson["data"][p_i]["low_voltage"] = m_backbround_data.at(i).ret_data.m_group_output_data.low_voltage;
+			tempjson["data"][p_i]["high_voltage"] = m_backbround_data.at(i).ret_data.m_group_output_data.high_voltage;
+			tempjson["data"][p_i]["range"] = m_backbround_data.at(i).ret_data.m_group_output_data.range;
+			tempjson["data"][p_i]["control"] = m_backbround_data.at(i).ret_data.m_group_output_data.control;
+			tempjson["data"][p_i]["digital_analog"] = m_backbround_data.at(i).ret_data.m_group_output_data.digital_analog;
+			tempjson["data"][p_i]["hw_switch_status"] = m_backbround_data.at(i).ret_data.m_group_output_data.hw_switch_status;
+			p_i++;
+		}
+		*/
+		/*
 		int ret_index = Post_Background_Read_Message_ByPanel(199, READINPUT_T3000, 3);  //send message to background ，read 199IN3
 		if (ret_index >= 0)
 		{
@@ -644,17 +710,17 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			temp_cs.Format(_T("IN%d %.3f\r\n"), m_backbround_data.at(ret_index).str_info.npoint_number + 1, m_backbround_data.at(ret_index).ret_data.m_group_input_data.value / 1000.000);
 			AfxMessageBox(temp_cs);
 		}
+			*/
 		//Alaa :please help me to Save the ret_index .  when we need update the data ,we need use
 		//modify the data of m_backbround_data.at(ret_index) when you need to modify the data later
 		//ret_index  This value is not going to change ( panel  command  , point )
 
-#if 0
-		tempjson["action"] = "GET_CURRENT_PANEL_DATA_RES";
 		int p_i = 0;
 		for (int i = 0; i < m_Input_data.size(); i++) {
 			tempjson["data"][p_i]["type"] = "INPUT";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "IN" + to_string(i +1);
+			tempjson["data"][p_i]["command"] = to_string(1) + "IN" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)m_Input_data.at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)m_Input_data.at(i).label;
 			tempjson["data"][p_i]["unit"] = m_Input_data.at(i).range;
@@ -676,6 +742,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["type"] = "OUTPUT";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "OUT" + to_string(i +1);
+			tempjson["data"][p_i]["command"] = to_string(1) + "OUT" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)m_Output_data.at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)m_Output_data.at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = m_Output_data.at(i).auto_manual;
@@ -694,6 +761,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["type"] = "VARIABLE";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "VAR" + to_string(i +1);
+			tempjson["data"][p_i]["command"] = to_string(1) + "VAR" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)m_Variable_data.at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)m_Variable_data.at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = m_Variable_data.at(i).auto_manual;
@@ -709,6 +777,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["type"] = "PROGRAM";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "PRG" + to_string(i +1);
+			tempjson["data"][p_i]["command"] = to_string(1) + "PRG" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)m_Program_data.at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)m_Program_data.at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = m_Program_data.at(i).auto_manual;
@@ -721,6 +790,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["type"] = "SCHEDULE";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "SCH" + to_string(i +1);
+			tempjson["data"][p_i]["command"] = to_string(1) + "SCH" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)m_Weekly_data.at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)m_Weekly_data.at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = m_Weekly_data.at(i).auto_manual;
@@ -735,6 +805,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["type"] = "HOLIDAY";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "CAL" + to_string(i +1);
+			tempjson["data"][p_i]["command"] = to_string(1) + "CAL" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)m_Annual_data.at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)m_Annual_data.at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = m_Annual_data.at(i).auto_manual;
@@ -742,7 +813,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			p_i++;
 		}
 
-#endif
+
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 
@@ -807,7 +878,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		int entry_type = json.get("entryType", Json::nullValue).asInt();
 		const std::string field = json.get("field", Json::nullValue).asString();
 
-		int ret_index = json.get("data_index", Json::nullValue).asInt(); //save ret_index ;
+		/*
+		// int ret_index = json.get("data_index", Json::nullValue).asInt(); //save ret_index ;
 		switch (entry_type)
 		{
 		case WEBVIEW_ENTRY_TYPE::INPUT_TYPE:
@@ -831,10 +903,14 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			if (ret_results >= 0)
 			{
 				//success
-			}
+			} 
+			*/
 
+		switch (entry_type)
+		{
+		case WEBVIEW_ENTRY_TYPE::INPUT_TYPE:
+		{
 
-#if 0
 			if ((entry_index >= 0) && entry_index + 1 > BAC_INPUT_ITEM_COUNT)
 			{
 				break;
@@ -851,7 +927,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 			Write_Private_Data_Blocking(WRITEINPUT_T3000, entry_index, entry_index, g_bac_instance);
 			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, entry_index, REFRESH_ON_ITEM);
-#endif
 			break;
 		}
 		case WEBVIEW_ENTRY_TYPE::OUTPUT:
@@ -922,7 +997,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				break;
 			}
 			if (field.compare("output") == 0) {
-				m_Weekly_data.at(entry_index).value = json["value"].asInt() * 1000;
+				m_Weekly_data.at(entry_index).value = json["value"].asInt();
 			}
 			else if (field.compare("auto_manual") == 0) {
 				m_Weekly_data.at(entry_index).auto_manual = json["value"].asInt();
@@ -940,7 +1015,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				break;
 			}
 			if (field.compare("value") == 0) {
-				m_Annual_data.at(entry_index).value = json["value"].asInt() * 1000;
+				m_Annual_data.at(entry_index).value = json["value"].asInt();
 			}
 			else if (field.compare("auto_manual") == 0) {
 				m_Annual_data.at(entry_index).auto_manual = json["value"].asInt();
