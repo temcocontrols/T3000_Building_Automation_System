@@ -659,6 +659,37 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_DATA:
 	{
 		tempjson["action"] = "GET_PANEL_DATA_RES";
+		int npanel_id = json.get("panelId", Json::nullValue).asInt(); // Ignored for now because we have only local panel data
+		int nret = LoadOnlinePanelData(npanel_id);
+		if (nret < 0)
+		{
+			CString temp_message;
+			temp_message.Format(_T("No cached data was found for this panel %d, do you want to read the device's data immediately"), npanel_id);
+			if (MessageBox(m_mainWindow, temp_message, L"Warning", MB_YESNO) == IDYES)
+			{
+				for (int j = 0; j < g_bacnet_panel_info.size(); j++)
+				{
+					int nseiral = 0;
+					if (g_bacnet_panel_info.at(j).panel_number != npanel_id)
+						continue;
+
+					nseiral = g_bacnet_panel_info.at(j).nseiral_number;
+					CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+					pFrame->LoadDeviceData(nseiral);
+					PostMessage(m_mainWindow, WM_CLOSE, NULL, NULL);
+				}
+			}
+			
+			break;
+		}
+		else if (nret == 0)
+		{
+			CString temp_message;
+			temp_message.Format(_T("Panel %d is offline!"), npanel_id);
+			MessageBox(m_mainWindow, temp_message ,L"Warning", MB_OK);
+			break;
+		}
+
 		/*
 		read_panel_entries(199, READINPUT_T3000);
 		int p_i = 0;
@@ -716,23 +747,23 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		//ret_index  This value is not going to change ( panel  command  , point )
 
 		int p_i = 0;
-		for (int i = 0; i < m_Input_data.size(); i++) {
+		for (int i = 0; i < g_Input_data[npanel_id].size(); i++) {
 			tempjson["data"][p_i]["type"] = "INPUT";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "IN" + to_string(i +1);
 			tempjson["data"][p_i]["command"] = to_string(1) + "IN" + to_string(i + 1);
-			tempjson["data"][p_i]["description"] = (char*)m_Input_data.at(i).description;
-			tempjson["data"][p_i]["label"] = (char*)m_Input_data.at(i).label;
-			tempjson["data"][p_i]["unit"] = m_Input_data.at(i).range;
-			tempjson["data"][p_i]["auto_manual"] = m_Input_data.at(i).auto_manual;
-			tempjson["data"][p_i]["value"] = m_Input_data.at(i).value;
-			tempjson["data"][p_i]["filter"] = m_Input_data.at(i).filter;
-			tempjson["data"][p_i]["control"] = m_Input_data.at(i).control;
-			tempjson["data"][p_i]["digital_analog"] = m_Input_data.at(i).digital_analog;
-			tempjson["data"][p_i]["range"] = m_Input_data.at(i).range;
-			tempjson["data"][p_i]["calibration_sign"] = m_Input_data.at(i).calibration_sign;
-			tempjson["data"][p_i]["calibration_h"] = m_Input_data.at(i).calibration_h;
-			tempjson["data"][p_i]["calibration_l"] = m_Input_data.at(i).calibration_l;
+			tempjson["data"][p_i]["description"] = (char*)g_Input_data[npanel_id].at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)g_Input_data[npanel_id].at(i).label;
+			tempjson["data"][p_i]["unit"] = g_Input_data[npanel_id].at(i).range;
+			tempjson["data"][p_i]["auto_manual"] = g_Input_data[npanel_id].at(i).auto_manual;
+			tempjson["data"][p_i]["value"] = g_Input_data[npanel_id].at(i).value;
+			tempjson["data"][p_i]["filter"] = g_Input_data[npanel_id].at(i).filter;
+			tempjson["data"][p_i]["control"] = g_Input_data[npanel_id].at(i).control;
+			tempjson["data"][p_i]["digital_analog"] = g_Input_data[npanel_id].at(i).digital_analog;
+			tempjson["data"][p_i]["range"] = g_Input_data[npanel_id].at(i).range;
+			tempjson["data"][p_i]["calibration_sign"] = g_Input_data[npanel_id].at(i).calibration_sign;
+			tempjson["data"][p_i]["calibration_h"] = g_Input_data[npanel_id].at(i).calibration_h;
+			tempjson["data"][p_i]["calibration_l"] = g_Input_data[npanel_id].at(i).calibration_l;
 			p_i++;
 		}
 
@@ -743,16 +774,16 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "OUT" + to_string(i +1);
 			tempjson["data"][p_i]["command"] = to_string(1) + "OUT" + to_string(i + 1);
-			tempjson["data"][p_i]["description"] = (char*)m_Output_data.at(i).description;
-			tempjson["data"][p_i]["label"] = (char*)m_Output_data.at(i).label;
-			tempjson["data"][p_i]["auto_manual"] = m_Output_data.at(i).auto_manual;
-			tempjson["data"][p_i]["value"] = m_Output_data.at(i).value;
-			tempjson["data"][p_i]["low_voltage"] = m_Output_data.at(i).low_voltage;
-			tempjson["data"][p_i]["high_voltage"] = m_Output_data.at(i).high_voltage;
-			tempjson["data"][p_i]["range"] = m_Output_data.at(i).range;
-			tempjson["data"][p_i]["control"] = m_Output_data.at(i).control;
-			tempjson["data"][p_i]["digital_analog"] = m_Output_data.at(i).digital_analog;
-			tempjson["data"][p_i]["hw_switch_status"] = m_Output_data.at(i).hw_switch_status;
+			tempjson["data"][p_i]["description"] = (char*)g_Output_data[npanel_id].at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)g_Output_data[npanel_id].at(i).label;
+			tempjson["data"][p_i]["auto_manual"] = g_Output_data[npanel_id].at(i).auto_manual;
+			tempjson["data"][p_i]["value"] = g_Output_data[npanel_id].at(i).value;
+			tempjson["data"][p_i]["low_voltage"] = g_Output_data[npanel_id].at(i).low_voltage;
+			tempjson["data"][p_i]["high_voltage"] = g_Output_data[npanel_id].at(i).high_voltage;
+			tempjson["data"][p_i]["range"] = g_Output_data[npanel_id].at(i).range;
+			tempjson["data"][p_i]["control"] = g_Output_data[npanel_id].at(i).control;
+			tempjson["data"][p_i]["digital_analog"] = g_Output_data[npanel_id].at(i).digital_analog;
+			tempjson["data"][p_i]["hw_switch_status"] = g_Output_data[npanel_id].at(i).hw_switch_status;
 			p_i++;
 		}
 
@@ -762,13 +793,13 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "VAR" + to_string(i +1);
 			tempjson["data"][p_i]["command"] = to_string(1) + "VAR" + to_string(i + 1);
-			tempjson["data"][p_i]["description"] = (char*)m_Variable_data.at(i).description;
-			tempjson["data"][p_i]["label"] = (char*)m_Variable_data.at(i).label;
-			tempjson["data"][p_i]["auto_manual"] = m_Variable_data.at(i).auto_manual;
-			tempjson["data"][p_i]["value"] = m_Variable_data.at(i).value;
-			tempjson["data"][p_i]["range"] = m_Variable_data.at(i).range;
-			tempjson["data"][p_i]["control"] = m_Variable_data.at(i).control;
-			tempjson["data"][p_i]["digital_analog"] = m_Variable_data.at(i).digital_analog;
+			tempjson["data"][p_i]["description"] = (char*)g_Variable_data[npanel_id].at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)g_Variable_data[npanel_id].at(i).label;
+			tempjson["data"][p_i]["auto_manual"] = g_Variable_data[npanel_id].at(i).auto_manual;
+			tempjson["data"][p_i]["value"] = g_Variable_data[npanel_id].at(i).value;
+			tempjson["data"][p_i]["range"] = g_Variable_data[npanel_id].at(i).range;
+			tempjson["data"][p_i]["control"] = g_Variable_data[npanel_id].at(i).control;
+			tempjson["data"][p_i]["digital_analog"] = g_Variable_data[npanel_id].at(i).digital_analog;
 			p_i++;
 		}
 
@@ -778,10 +809,10 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "PRG" + to_string(i +1);
 			tempjson["data"][p_i]["command"] = to_string(1) + "PRG" + to_string(i + 1);
-			tempjson["data"][p_i]["description"] = (char*)m_Program_data.at(i).description;
-			tempjson["data"][p_i]["label"] = (char*)m_Program_data.at(i).label;
-			tempjson["data"][p_i]["auto_manual"] = m_Program_data.at(i).auto_manual;
-			tempjson["data"][p_i]["status"] = m_Program_data.at(i).on_off;
+			tempjson["data"][p_i]["description"] = (char*)g_Program_data[npanel_id].at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)g_Program_data[npanel_id].at(i).label;
+			tempjson["data"][p_i]["auto_manual"] = g_Program_data[npanel_id].at(i).auto_manual;
+			tempjson["data"][p_i]["status"] = g_Program_data[npanel_id].at(i).on_off;
 			p_i++;
 		}
 
@@ -791,12 +822,12 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "SCH" + to_string(i +1);
 			tempjson["data"][p_i]["command"] = to_string(1) + "SCH" + to_string(i + 1);
-			tempjson["data"][p_i]["description"] = (char*)m_Weekly_data.at(i).description;
-			tempjson["data"][p_i]["label"] = (char*)m_Weekly_data.at(i).label;
-			tempjson["data"][p_i]["auto_manual"] = m_Weekly_data.at(i).auto_manual;
-			tempjson["data"][p_i]["output"] = m_Weekly_data.at(i).value;
-			tempjson["data"][p_i]["state1"] = m_Weekly_data.at(i).override_1_value;
-			tempjson["data"][p_i]["state2"] = m_Weekly_data.at(i).override_2_value;
+			tempjson["data"][p_i]["description"] = (char*)g_Weekly_data[npanel_id].at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)g_Weekly_data[npanel_id].at(i).label;
+			tempjson["data"][p_i]["auto_manual"] = g_Weekly_data[npanel_id].at(i).auto_manual;
+			tempjson["data"][p_i]["output"] = g_Weekly_data[npanel_id].at(i).value;
+			tempjson["data"][p_i]["state1"] = g_Weekly_data[npanel_id].at(i).override_1_value;
+			tempjson["data"][p_i]["state2"] = g_Weekly_data[npanel_id].at(i).override_2_value;
 			p_i++;
 		}
 
@@ -806,10 +837,10 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "CAL" + to_string(i +1);
 			tempjson["data"][p_i]["command"] = to_string(1) + "CAL" + to_string(i + 1);
-			tempjson["data"][p_i]["description"] = (char*)m_Annual_data.at(i).description;
-			tempjson["data"][p_i]["label"] = (char*)m_Annual_data.at(i).label;
-			tempjson["data"][p_i]["auto_manual"] = m_Annual_data.at(i).auto_manual;
-			tempjson["data"][p_i]["value"] = m_Annual_data.at(i).value;
+			tempjson["data"][p_i]["description"] = (char*)g_Annual_data[npanel_id].at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)g_Annual_data[npanel_id].at(i).label;
+			tempjson["data"][p_i]["auto_manual"] = g_Annual_data[npanel_id].at(i).auto_manual;
+			tempjson["data"][p_i]["value"] = g_Annual_data[npanel_id].at(i).value;
 			p_i++;
 		}
 

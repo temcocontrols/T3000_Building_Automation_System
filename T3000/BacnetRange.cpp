@@ -163,8 +163,8 @@ BOOL BacnetRange::OnInitDialog()
     {
         GetDlgItem(IDC_RADIO55)->SetWindowTextW(_T("3K YSI 44005 "));//除了PT12 其他的默认 用3K的传感器
         GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("3K YSI 44005 "));
-        GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("Allerton/Walker/ASI"));
-        GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("Allerton/Walker/ASI"));
+        GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("3K Allerton/ASI"));
+        GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("3K Allerton/ASI"));
     }
 	return FALSE;
 	//return TRUE;  // return TRUE unless you set the focus to a control

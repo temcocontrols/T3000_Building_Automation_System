@@ -2038,10 +2038,25 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 
 	//Fresh();//Fance
 	Initial_All_Point();
-	//for (int i = 0; i < 256; i++)
-	//{
-	//	g_Input_data.push_back(m_Input_data);	
-	//}
+	for (int i = 0; i < 256; i++)
+	{
+		g_Input_data.push_back(m_Input_data);	
+		g_Output_data.push_back(m_Output_data);
+		g_Variable_data.push_back(m_Variable_data);
+		g_Program_data.push_back(m_Program_data);
+		g_controller_data.push_back(m_controller_data);
+		g_screen_data.push_back(m_screen_data);
+		g_graphic_label_data.push_back(m_graphic_label_data);
+		g_user_login_data.push_back(m_user_login_data);
+		g_customer_unit_data.push_back(m_customer_unit_data);
+		g_analog_custmer_range.push_back(m_analog_custmer_range);
+		g_monitor_data.push_back(m_monitor_data);
+		g_Annual_data.push_back(m_Annual_data);
+		g_Weekly_data.push_back(m_Weekly_data);
+		g_variable_analog_unite.push_back(m_variable_analog_unite);
+		g_msv_data.push_back(m_msv_data);
+		g_Schedual_time_flag.push_back(m_Schedual_time_flag);
+	}
 	//g_Input_data[3].at(1).value = 2;
 	//Tab_Initial();
 	//initial_once = false;

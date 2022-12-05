@@ -411,4 +411,6 @@ int GetVariableValueEx(Str_variable_point temp_var, CString& ret_cstring, CStrin
 void InputDataToString(Str_in_point source_input, Input_CString* ret_string);
 void OutputDataToString(Str_out_point source_output, Output_CString* ret_string);
 void VariableDataToString(Str_variable_point source_variable, Variable_CString* ret_string);
+
+int LoadOnlinePanelData(unsigned char npanel = 0); //从缓存prog文件中加载所有在线设备的数据;
 #endif

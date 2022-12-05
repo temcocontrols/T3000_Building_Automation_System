@@ -4861,6 +4861,24 @@ void CMainFrame::OnScanDevice()
 	
 }
 
+void CMainFrame::ConnectNodeBySerialNumber(unsigned int nserialnumber)
+{
+	if (nserialnumber != 0)
+	{
+		bool find_product = false;
+		vector <tree_product>::iterator temp_it;
+		for (temp_it = m_product.begin(); temp_it != m_product.end(); ++temp_it)
+		{
+			if (temp_it->serial_number == nserialnumber)
+			{
+				DoConnectToANode(temp_it->product_item);
+				break;
+			}
+		}
+
+	}
+}
+
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
     if(SCAN_TIMER==nIDEvent)
@@ -4905,20 +4923,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		serial_number = (unsigned int)GetPrivateProfileInt(_T("LastView"),_T("ViewSerialNumber"),0,g_cstring_ini_path);
 		first_view_ui = GetPrivateProfileInt(_T("LastView"),_T("FistLevelViewUI"),0,g_cstring_ini_path);
 
-		if(serial_number != 0)
-		{
-			bool find_product = false;
-			vector <tree_product>::iterator temp_it;
-			for (temp_it = m_product.begin();temp_it!= m_product.end();++temp_it)
-			{
-				if(temp_it->serial_number == serial_number)
-				{
-					DoConnectToANode(temp_it->product_item);
-                    break;
-				}
-			}
-			
-		}
+        ConnectNodeBySerialNumber(serial_number);
 	}
 
     CString str;
@@ -5677,6 +5682,7 @@ DWORD WINAPI  CMainFrame::Read_Modbus_10000(LPVOID lpVoid)
 //点击菜单 Save file  也会 保存所有的配置信息;
 DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 {
+
 	 CMainFrame *pParent = (CMainFrame *)lpVoid;
      int  nspecial_mode = pParent->m_read_control;  // 0 默认全读   1 缓存的时候不读 program;
 	 int end_temp_instance = 0;
@@ -5709,7 +5715,10 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 	  int read_success_count = 0;
 	  int write_pos = 0;
 
-
+      if (offline_mode)
+      {
+          goto end_read_data_position;
+      }
 	 for (int i=0; i<BAC_INPUT_GROUP; i++)
 	 {
 		 end_temp_instance = BAC_READ_INPUT_REMAINDER + (BAC_READ_INPUT_GROUP_NUMBER)*i ;
@@ -6167,7 +6176,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
      }
 
 
-
+end_read_data_position:
 	 read_write_bacnet_config = false;
 	 hwait_read_thread = NULL;
 	 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data success!"));
@@ -16534,6 +16543,14 @@ void CMainFrame::OnFileNewproject()
 #endif
 
 
+}
+
+
+int CMainFrame::LoadDeviceData(int nserialnumber)
+{
+    ConnectNodeBySerialNumber(nserialnumber);
+    //SetTimer(FOR_LAST_VIEW_TIMER,4000,NULL);
+    return 0;
 }
 
 #ifndef LOCAL_DB_FUNCTION

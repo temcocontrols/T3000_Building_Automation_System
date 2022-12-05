@@ -1826,12 +1826,27 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         break;
     case WRITETIMESCHEDULE_T3000:
         temp_buffer = temp_buffer + HEADER_LENGTH;
-        for (int j=0; j<9; j++)
+ 
+        if (offline_mode)
         {
-            for (int i=0; i<8; i++)
+            for (int j = 0; j < 9; j++)
             {
-                *(temp_buffer++) = m_Schedual_Time_data.at(start_instance).Schedual_Day_Time[i][j].time_minutes;// = *(my_temp_point ++);
-                *(temp_buffer++) = m_Schedual_Time_data.at(start_instance).Schedual_Day_Time[i][j].time_hours;// = *(my_temp_point ++);
+                for (int i = 0; i < 8; i++)
+                {
+                    *(temp_buffer++) = weeklt_time_schedule[start_instance][8 * j + i];
+                    *(temp_buffer++) = weeklt_time_schedule[start_instance][8 * j + i + 1];
+                }
+            }
+        }
+        else
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    *(temp_buffer++) = m_Schedual_Time_data.at(start_instance).Schedual_Day_Time[i][j].time_minutes;// = *(my_temp_point ++);
+                    *(temp_buffer++) = m_Schedual_Time_data.at(start_instance).Schedual_Day_Time[i][j].time_hours;// = *(my_temp_point ++);
+                }
             }
         }
 
@@ -9472,13 +9487,13 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 			if(ntemp_version < 2)
 			{
 				DeleteFile(new_file);
-				SetPaneString(BAC_SHOW_MISSION_RESULTS ,_T("You config file is the old version."));
+				SetPaneString(BAC_SHOW_MISSION_RESULTS ,_T("Your config file is the old version."));
 				return -1;
 			}
 
 			if(ntemp_version < 4)
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS ,_T("You config file is the old version.Please save a new one."));
+				SetPaneString(BAC_SHOW_MISSION_RESULTS ,_T("Your config file is the old version.Please save a new one."));
 			}
 
 			//Version 3 加入了 BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT    BAC_GRPHIC_LABEL_COUNT    BAC_USER_LOGIN_COUNT    BAC_CUSTOMER_UNITS_COUNT
@@ -10307,6 +10322,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
                 {
                     //如果是离线模式 才把Setting的数据读出来，避免 Setting 那里 来回乱变.
                     memcpy(&Device_Basic_Setting, temp_point, sizeof(Str_Setting_Info));
+                    Device_Basic_Setting.reg.pro_info.firmware0_rev_main = 100; //使虚拟prog的版本最新，用来 适配很多判断版本号的界面;
                 }
                 else
                 {
@@ -10864,6 +10880,17 @@ void init_product_list()
     temp.sub_pid = MINIPANELARM_NB;
     m_product_iocount.push_back(temp);
 
+    temp.cs_name = _T("T3-FAN-MODULE");
+    temp.ai_count = 2;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 1;
+    temp.bo_count = 1;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 74;
+    temp.sub_pid = T3_FAN_MODULE;
+    m_product_iocount.push_back(temp);
+
     temp.cs_name = _T("Tstat10");
     temp.ai_count = 8;
     temp.bi_count = 0;
@@ -10871,11 +10898,36 @@ void init_product_list()
     temp.ao_count = 5;
     temp.bo_count = 2;
     temp.output_count = temp.ao_count + temp.bo_count;
-    temp.pid = 74;
+    temp.pid = 10;
     temp.sub_pid = T3_TSTAT10;
     m_product_iocount.push_back(temp);
 
+    temp.cs_name = _T("T3-OEM");
+    temp.ai_count = 12;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 5;
+    temp.bo_count = 4;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 10;
+    temp.sub_pid = T3_OEM;
+    m_product_iocount.push_back(temp);
 
+    temp.cs_name = _T("T3_OEM_12I");
+    temp.ai_count = 14;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 5;
+    temp.bo_count = 4;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 10;
+    temp.sub_pid = T3_OEM_12I;
+    m_product_iocount.push_back(temp);
+
+
+
+    
+    
 #if 0
     m_product_iocount.clear();
     CString AllData;
@@ -11540,9 +11592,25 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
 
     for (int i = 0; i<BAC_WEEKLYCODE_ROUTINES_COUNT; i++)
     {
-        memcpy(temp_point, weeklt_time_schedule[i], WEEKLY_SCHEDULE_SIZE);
-        temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
+        //memcpy(temp_point, weeklt_time_schedule[i], WEEKLY_SCHEDULE_SIZE);
+        //temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
+
+        for (int j = 0; j < 9; j++)
+        {
+            for (int x = 0; x < 8; x++)
+            {
+                *temp_point =  m_Schedual_Time_data.at(i).Schedual_Day_Time[x][j].time_minutes  ;
+                temp_point++;
+                *temp_point =  m_Schedual_Time_data.at(i).Schedual_Day_Time[x][j].time_hours  ;
+                temp_point++;
+            }
+        }
+
     }
+
+
+
+
 
     for (int i = 0; i<BAC_HOLIDAY_COUNT; i++)
     {
@@ -15820,7 +15888,16 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
                 nret_type = OUTPUT_VIRTUAL_PORT;
         }
         break;
-
+        case T3_FAN_MODULE:
+        {
+            if (portindex <= 1)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= 2)
+                nret_type = OUTPUT_ANALOG_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
         default:
             break;
         }
@@ -15986,6 +16063,18 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
                 nret_type = INPUT_VIRTUAL_PORT;
         }
         break;
+        case T3_FAN_MODULE:
+        {
+            if (portindex <= 2)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    nret_type = INPUT_DIGITAL_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+        }
+        break;
         default:
             break;
         }
@@ -16023,7 +16112,7 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
             break;
         case T3_OEM_12I:
         {
-            if (portindex <= 16)
+            if (portindex <= 14)
             {
                 nret_type = INPUT_ANALOG_PORT;
             }
@@ -16647,6 +16736,231 @@ void OutputDataToString(Str_out_point source_output, Output_CString* ret_string)
     temp_des2 = temp_des2.Left(STR_OUT_LABEL).Trim();
     ret_string->lable = temp_des2;
 
+}
+
+//Load all online prog into buffer 
+int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npanel)
+{
+        CString FilePath;
+        FilePath.Format(_T("%s"), tem_read_path);
+        CFileFind temp_find;
+        if (!temp_find.FindFile(FilePath))
+            return -1;
+
+        CFile myfile(FilePath, CFile::modeRead);
+        char* pBuf;
+        DWORD dwFileLen;
+        dwFileLen = myfile.GetLength();
+        pBuf = new char[dwFileLen + 1];
+        pBuf[dwFileLen] = 0;
+        myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
+        myfile.Close();
+        
+        char* temp_buffer = pBuf;
+        bool b_new_prg = false;
+        int ntemp_version = 0;
+        if (((unsigned char)temp_buffer[0] == 0x55) && ((unsigned char)temp_buffer[1] == 0xff))//新版本的prg
+        {
+            temp_buffer = temp_buffer + 2;
+            if (temp_buffer[0] >= 8)
+            {
+                ntemp_version = temp_buffer[0];
+                b_new_prg = true;
+            }
+            else
+            {
+                return -2;
+            }
+            temp_buffer++;
+        }
+
+            char* temp_point = temp_buffer;
+
+            int original_panel = 0;
+            int prg_panel = 0;
+            char* cacl_panel = temp_buffer;
+
+            cacl_panel = cacl_panel + BAC_INPUT_ITEM_COUNT * sizeof(Str_in_point)
+                + BAC_OUTPUT_ITEM_COUNT * sizeof(Str_out_point)
+                + BAC_VARIABLE_ITEM_COUNT * sizeof(Str_variable_point)
+                + BAC_PROGRAM_ITEM_COUNT * sizeof(Str_program_point)
+                + BAC_PID_COUNT * sizeof(Str_controller_point)
+                + BAC_SCREEN_COUNT * sizeof(Control_group_point)
+                + BAC_GRPHIC_LABEL_COUNT * sizeof(Str_label_point)
+                + BAC_USER_LOGIN_COUNT * sizeof(Str_userlogin_point)
+                + BAC_CUSTOMER_UNITS_COUNT * sizeof(Str_Units_element)
+                + BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT * sizeof(Str_table_point);
+
+
+                //memcpy(&GetPrgSetting, cacl_panel, sizeof(Str_Setting_Info));
+                //prg_panel = GetPrgSetting.reg.panel_number;
+
+
+            for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++)
+            {
+                memcpy(&g_Input_data[npanel].at(i), temp_point, sizeof(Str_in_point));
+                temp_point = temp_point + sizeof(Str_in_point);
+            }
+
+            for (int i = 0; i < BAC_OUTPUT_ITEM_COUNT; i++)
+            {
+                memcpy(&g_Output_data[npanel].at(i), temp_point, sizeof(Str_out_point));
+                temp_point = temp_point + sizeof(Str_out_point);
+            }
+#if 1
+
+
+            for (int i = 0; i < BAC_VARIABLE_ITEM_COUNT; i++)
+            {
+                memcpy(&g_Variable_data[npanel].at(i), temp_point, sizeof(Str_variable_point));
+                temp_point = temp_point + sizeof(Str_variable_point);
+            }
+
+            for (int i = 0; i < BAC_PROGRAM_ITEM_COUNT; i++)
+            {
+                memcpy(&g_Program_data[npanel].at(i), temp_point, sizeof(Str_program_point));
+                temp_point = temp_point + sizeof(Str_program_point);
+            }
+
+            for (int i = 0; i < BAC_PID_COUNT; i++)
+            {
+                memcpy(&g_controller_data[npanel].at(i), temp_point, sizeof(Str_controller_point));
+                temp_point = temp_point + sizeof(Str_controller_point);
+            }
+
+            for (int i = 0; i < BAC_SCREEN_COUNT; i++)
+            {
+                memcpy(&g_screen_data[npanel].at(i), temp_point, sizeof(Control_group_point));
+                temp_point = temp_point + sizeof(Control_group_point);
+            }
+
+            for (int i = 0; i < BAC_GRPHIC_LABEL_COUNT; i++)
+            {
+                memcpy(&g_graphic_label_data[npanel].at(i), temp_point, sizeof(Str_label_point));
+                temp_point = temp_point + sizeof(Str_label_point);
+            }
+
+            for (int i = 0; i < BAC_USER_LOGIN_COUNT; i++)
+            {
+                memcpy(&g_user_login_data[npanel].at(i), temp_point, sizeof(Str_userlogin_point));
+                temp_point = temp_point + sizeof(Str_userlogin_point);
+            }
+
+            for (int i = 0; i < BAC_CUSTOMER_UNITS_COUNT; i++)
+            {
+                memcpy(&g_customer_unit_data[npanel].at(i), temp_point, sizeof(Str_Units_element));
+                temp_point = temp_point + sizeof(Str_Units_element);
+            }
+
+            for (int i = 0; i < BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
+            {
+                memcpy(&g_analog_custmer_range[npanel].at(i), temp_point, sizeof(Str_table_point));
+                temp_point = temp_point + sizeof(Str_table_point);
+            }
+
+            memcpy(&g_Device_Basic_Setting[npanel], temp_point, sizeof(Str_Setting_Info));
+            temp_point = temp_point + sizeof(Str_Setting_Info);
+
+            for (int i = 0; i < BAC_SCHEDULE_COUNT; i++)
+            {
+                memcpy(&g_Weekly_data[npanel].at(i), temp_point, sizeof(Str_weekly_routine_point));
+                temp_point = temp_point + sizeof(Str_weekly_routine_point);
+            }
+
+            
+            for (int i = 0; i < BAC_HOLIDAY_COUNT; i++)
+            {
+                memcpy(&g_Annual_data[npanel].at(i), temp_point, sizeof(Str_annual_routine_point));
+                temp_point = temp_point + sizeof(Str_annual_routine_point);
+            }
+            
+            for (int i = 0; i < BAC_MONITOR_COUNT; i++)
+            {
+                memcpy(&g_monitor_data[npanel].at(i), temp_point, sizeof(Str_monitor_point));
+                temp_point = temp_point + sizeof(Str_monitor_point);
+            }
+
+            for (int i = 0; i < BAC_WEEKLYCODE_ROUTINES_COUNT; i++)
+            {
+                //char* temp_value = temp_point;
+                //memcpy(weeklt_time_schedule[i], temp_point, WEEKLY_SCHEDULE_SIZE);
+                temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
+
+            }
+
+            for (int i = 0; i < BAC_HOLIDAY_COUNT; i++)
+            {
+                //memcpy(g_DayState[i], temp_point, ANNUAL_CODE_SIZE);
+                temp_point = temp_point + ANNUAL_CODE_SIZE;
+            }
+
+            for (int i = 0; i < BAC_PROGRAMCODE_ITEM_COUNT; i++)
+            {
+                //memcpy(program_code[i], temp_point, 2000);
+                temp_point = temp_point + 2000;
+            }
+
+
+            for (int i = 0; i < BAC_VARIABLE_CUS_UNIT_COUNT; i++)
+            {
+                memcpy(&g_variable_analog_unite[npanel].at(i), temp_point, sizeof(Str_variable_uint_point));
+                temp_point = temp_point + sizeof(Str_variable_uint_point);
+            }
+
+            for (int i = 0; i < BAC_MSV_COUNT; i++)
+            {
+                memcpy(&g_msv_data[npanel].at(i), temp_point, sizeof(Str_MSV));
+                temp_point = temp_point + sizeof(Str_MSV);
+            }
+
+            for (int i = 0; i < BAC_SCHEDULE_COUNT; i++)
+            {
+                memcpy(&g_Schedual_time_flag[npanel].at(i), temp_point, sizeof(Str_schedual_time_flag));
+                temp_point = temp_point + sizeof(Str_schedual_time_flag);
+            }
+#endif
+        
+
+    return 1;
+}
+
+
+int LoadOnlinePanelData(unsigned char npanel)  //从缓存prog文件中加载所有在线设备的数据;
+{
+    int nret = -1;
+    for (int i = 0; i < g_bacnet_panel_info.size(); i++)
+    {
+        if (npanel != 0)
+        {
+            if (g_bacnet_panel_info.at(i).panel_number != npanel)
+                continue;
+        }
+        CString temp_prog_file;
+        int nseiral = 0;
+        CString prog_file_name;
+        nseiral = g_bacnet_panel_info.at(i).nseiral_number;
+        if (nseiral == 0)
+            continue;
+        prog_file_name.Format(_T("%d.prog"), nseiral);
+        temp_prog_file = g_achive_folder + _T("\\") + prog_file_name;
+        CFileFind temp_find;
+        if (temp_find.FindFile(temp_prog_file))
+        {
+            nret = LoadAllOnlinePanelBacnetBinaryFile(temp_prog_file, g_bacnet_panel_info.at(i).panel_number);
+            if (nret > 0)
+                return nret;
+            else
+                return -2;
+        }
+        else
+        {
+            if (npanel != 0)
+                return -1;
+            else
+                continue;
+        }
+    }
+    return 0;  // return 0 means device is offline;
 }
 
 void InputDataToString(Str_in_point source_input, Input_CString* ret_string)

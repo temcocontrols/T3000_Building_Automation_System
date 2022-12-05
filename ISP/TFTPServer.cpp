@@ -1207,7 +1207,7 @@ BOOL TFTPServer::StartServer()
 
 
 
-                    strTips.Format(_T("Communication with device.(Remain time:%d)"),20-mode_send_flash_try_time);
+                    strTips.Format(_T("Communication with device.(Time remaining:%d)"),20-mode_send_flash_try_time);
                     if(mode_send_flash_try_time == 1)
                         OutPutsStatusInfo(strTips, false);
                     else
@@ -1360,7 +1360,7 @@ BOOL TFTPServer::StartServer()
                     BOOL bBroadcast=false;
                     SendUDP_Flash_Socket.SetSockOpt(SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL),SOL_SOCKET);
                     SendUDP_Flash_Socket.SendTo(sendbuf,sizeof(sendbuf),FLASH_UDP_PORT,ISP_Device_IP,0);
-                    strTips.Format(_T("Send DHCP Package!!(Remain time:%d)"),16-mode_has_lanip_try_time);
+                    strTips.Format(_T("Send DHCP Package!!(Time remaining:%d)"),16-mode_has_lanip_try_time);
                     OutPutsStatusInfo(strTips, TRUE);
                 }
                 else

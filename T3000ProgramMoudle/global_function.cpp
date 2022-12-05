@@ -89,7 +89,7 @@ void Inial_Product_map()
 	product_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("Hum")));
 	product_map.insert(map<int, CString>::value_type(STM32_HUM_RS485, _T("Hum")));
 	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_NET, _T("Pressure")));
-	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS3485, _T("Pressure")));
+	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS485, _T("Pressure")));
 	product_map.insert(map<int, CString>::value_type(STM32_CO2_NODE, _T("CO2 Node")));
 
 }

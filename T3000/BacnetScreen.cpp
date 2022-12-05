@@ -1453,6 +1453,7 @@ void BacnetScreen::OnBnClickedWebViewShow()
 	{
 		h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
 	}
+	LoadOnlinePanelData();
 	Sleep(1000);
 	const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
 

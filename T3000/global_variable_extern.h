@@ -1010,15 +1010,35 @@ extern HWND		 analog_cus_range_dlg;
 extern HWND      m_tstat_schedule_dlg_hwnd ;
 extern HWND      m_t3000_log_window ;
 extern HWND      m_msv_dlg_hwnd;
-
-extern vector < vector<Str_in_point> >  g_Input_data; //全局所有panel input 的集合体;
+extern Str_Setting_Info g_Device_Basic_Setting[256];
+extern vector < vector<Str_out_point> >			        g_Output_data; //全局所有panel output 的集合体;
+extern vector < vector<Str_in_point> >				    g_Input_data; //全局所有panel input 的集合体;
+extern vector < vector<Str_program_point> >		        g_Program_data;
+extern vector < vector<Str_variable_point> >		    g_Variable_data;
+extern vector < vector<Str_weekly_routine_point> >      g_Weekly_data;
+extern vector < vector<Str_annual_routine_point> >      g_Annual_data;
+extern vector < vector<Str_schedual_time_point> >       g_Schedual_Time_data;
+extern vector < vector<Str_schedual_time_flag> >        g_Schedual_time_flag;
+extern vector < vector<Str_controller_point> >          g_controller_data;
+extern vector < vector<Control_group_point> >           g_screen_data;
+extern vector < vector<Str_tstat_schedule> >            g_tatat_schedule_data;
+extern vector < vector<Str_monitor_point> >             g_monitor_data;
+extern vector < vector<Str_TstatInfo_point> >           g_Tstat_data;
+extern vector < vector<Str_userlogin_point> >           g_user_login_data;
+extern vector < vector<Alarm_point> >				    g_alarmlog_data;
+extern vector < vector<Str_label_point> >			    g_graphic_label_data;//图片里面的Label的信息要存在设备里面;
+extern vector < vector<Str_Units_element> >		        g_customer_unit_data;
+extern vector < vector<Str_table_point> >		        g_analog_custmer_range;
+extern vector < vector<Str_variable_uint_point> >       g_variable_analog_unite;
+extern vector < vector<Str_Extio_point> >			    g_extio_config_data;
+extern vector < vector<Str_MSV> >					    g_msv_data;
 
 extern Str_in_point s_Input_data;
 extern Str_out_point s_Output_data;
 extern Str_variable_point s_Variable_data;
 extern vector <_panel_info> g_bacnet_panel_info; //全局的 object instance 与 panel number 对应的容器
 extern vector <Str_out_point> m_Output_data;
-extern vector <Str_in_point>  m_Input_data;
+extern vector <Str_in_point>  m_Input_data;                             
 extern vector <Str_program_point>  m_Program_data;
 extern vector <Str_variable_point>  m_Variable_data;
 extern vector <Str_weekly_routine_point> m_Weekly_data;

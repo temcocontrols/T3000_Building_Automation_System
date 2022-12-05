@@ -68,6 +68,30 @@ void CEreaseDlg::OnBnClickedMyOk()
             write_ret = write_one(g_tstat_id, 639, 0,5);
             Sleep(200);
         }
+		else if (product_register_value[7] == PM_TSTAT7_ARM)
+		{
+			int write_success = 0;
+			for (int j = 0; j < 7; j++)
+			{
+				ret = write_one(g_tstat_id, 6, ID);
+				if (ret < 0) // 小于0 两种可能 ，要么无应答，要么设备已经变更了ID
+				{
+					int new_id = read_one(ID, 6, 3);
+					if (new_id == ID)
+					{
+						write_success = 1;
+						break;
+					}
+				}
+			}
+			if (write_success == 0)
+			{
+				MessageBox(_T("Change ID timeout!"));
+				return ;
+			}
+			ret = 1;
+			goto handle_changeid_success;
+		}
 
             ret = write_one(g_tstat_id, 6, ID);
             while (times >= 0 && ret<0)
@@ -77,7 +101,7 @@ void CEreaseDlg::OnBnClickedMyOk()
                 --times;
             }
 
-
+handle_changeid_success:
 
         if (ret>0)
         {

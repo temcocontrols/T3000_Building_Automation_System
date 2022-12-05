@@ -378,7 +378,7 @@ public:
 	BOOL ConnectSubBuilding(Building_info build_info);
 	BOOL ConnectDevice(LPCTSTR ip_address,int nport);
 	BOOL ConnectDevice(tree_product tree_node);
-
+	void ConnectNodeBySerialNumber(unsigned int nserialnumber);
 	//scan funtion:
 
 
@@ -594,6 +594,7 @@ public:
 		void OnDatabaseBuildingManagement();
 		afx_msg void OnViewRefresh();
 		afx_msg void OnFileNewproject();
+		int LoadDeviceData(int nserialnumber);
 #ifndef LOCAL_DB_FUNCTION
 		afx_msg void OnUpdateFileNewproject(CCmdUI* pCmdUI);
 		
@@ -615,7 +616,7 @@ extern vector <bacnet_background_struct> m_backbround_data; // ÓÃÀ´È«³Ì´¢´æÐèÒª¶
 #define TVINSERV_LC				    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;} //Lightingcontroller
 #define TVINSERV_TSTAT6			    {tvInsert.item.iImage=16;tvInsert.item.iSelectedImage=16;}//tstat6
 #define TVINSERV_CO2			    {tvInsert.item.iImage=18;tvInsert.item.iSelectedImage=18;}//CO2
-#define TVINSERV_T3ARM			    {tvInsert.item.iImage=20;tvInsert.item.iSelectedImage=20;}//CO2
+#define TVINSERV_T3ARM			    {tvInsert.item.iImage=20;tvInsert.item.iSelectedImage=20;}
 #define TVINSERV_CS3000             {tvInsert.item.iImage=22;tvInsert.item.iSelectedImage=22;}//cs3000
 #define TVINSERV_TSTAT8			    {tvInsert.item.iImage=24;tvInsert.item.iSelectedImage=24;}//TSTAT8
 #define TVINSERV_T3LC			    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;}//LC
