@@ -6,8 +6,27 @@
 #include "Bacnet_Include.h"
 #include "T3000RegAddress.h"
 #include "msflexgrid1.h"
-
+#include "global_define.h"
 #pragma endregion For_Bacnet
+
+
+//typedef union
+//{
+//	Str_in_point  m_group_input_data;
+//	Str_out_point m_group_output_data;
+//	Str_variable_point m_group_variable_data;
+//	Str_program_point m_group_program_data;
+//	Str_weekly_routine_point m_group_schedual_data;
+//	Str_annual_routine_point m_group_annual_data;
+//	Str_controller_point  m_group_pid_data;
+//	Str_monitor_point     m_monitor_data;
+//}groupdata;
+
+//typedef struct grouppoint
+//{
+//	groupdata data;
+//}str_group_point;
+
 
 
 typedef union
@@ -26,6 +45,40 @@ typedef struct grouppoint
 {
 	groupdata data;
 }str_group_point;
+
+typedef struct
+{
+	unsigned char ndataindex;
+	int command_type;
+}str_command_info;
+
+typedef struct
+{
+	unsigned char npanel_id;
+	int ninstance;
+	int npanel_commad;
+	int nstandard_command;
+	int npoint_number;
+}str_point_info;
+
+enum Bacnet_Vector_Status
+{
+	STATUS_NOUSE = 0,
+	STATUS_USE   = 1
+};
+
+typedef struct
+{
+	int flag; // 0 - nouse 
+	int nindex;
+	int operation_type; // 0 by panel id			1 by instance
+	str_point_info str_info;
+	int nstatus;
+	int nreq_time; //last request time
+	int nrec_time; //last updated time
+	groupdata ret_data;
+}bacnet_background_struct;
+
 
 
 #include "global_variable_extern.h"
@@ -140,6 +193,8 @@ BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
 BOOL Post_Refresh_One_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize);
 BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size);
 BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd,CString Task_Info = _T(""),int nRow = 0,int nCol = 0);
+int Post_Background_Read_Message_ByPanel(unsigned char panel_id, int command_type, int npoint);
+int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata write_data);
 int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
 int GetProgramData_Blocking(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
 int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
@@ -150,8 +205,8 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
 int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_t writelength, unsigned short *data_in);
 
 int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint32_t ntotal_seg, uint32_t nseg_index,MonitorUpdateData* up_data);
-int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance);
-int WritePrivateData_Blocking(uint32_t deviceid, unsigned char n_command, unsigned char start_instance, unsigned char end_instance, uint8_t retrytime = 5);
+int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance, char* ext_data=NULL);
+int WritePrivateData_Blocking(uint32_t deviceid, unsigned char n_command, unsigned char start_instance, unsigned char end_instance, uint8_t retrytime = 5,  char* ext_data=NULL);
 int Write_Private_Data_Blocking(uint8_t ncommand, uint8_t nstart_index, uint8_t nstop_index, unsigned int write_object_list = 0);
 int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
 int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);

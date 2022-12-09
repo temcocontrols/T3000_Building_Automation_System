@@ -32,6 +32,8 @@
 class BacnetWebViewAppWindow
 {
 public:
+    CString des_file;
+public:
     BacnetWebViewAppWindow(
         UINT creationModeId,
         std::wstring initialUri = L"",
@@ -98,6 +100,7 @@ private:
                     }
                 }
         )~";
+    void InitialWebPoint();
     static PCWSTR GetWindowClass();    
     static LRESULT CALLBACK WndProcStatic(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     bool HandleWindowMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* result);

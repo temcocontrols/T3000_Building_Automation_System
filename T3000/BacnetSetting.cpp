@@ -1733,8 +1733,28 @@ BacnetDescription * m_pDescription;
 void CBacnetSetting::OnBnClickedButtonBacSettingOk()
 {
 #ifdef DEBUG
-    m_pDescription = new BacnetDescription;
-    m_pDescription->GetAllPanels();
+    static int n_point = 0;
+    n_point = (n_point % 10) + 1;
+    int ret_index = Post_Background_Read_Message_ByPanel(15, READINPUT_T3000, n_point);
+    if (ret_index >= 0)
+    {
+        CString temp_cs;
+        temp_cs.Format(_T("IN%d %.3f\r\n"), m_backbround_data.at(ret_index).str_info.npoint_number + 1, m_backbround_data.at(ret_index).ret_data.m_group_input_data.value / 1000.000);
+        MessageBox(temp_cs);
+    }
+
+    if (ret_index > 2)
+    {
+        str_command_info  ncommand_info = { 0 };
+        ncommand_info.command_type = WRITEINPUT_T3000;
+        ncommand_info.ndataindex = 0;
+        groupdata temp_write_data = { 0 };
+        memcpy(&temp_write_data.m_group_input_data, &m_backbround_data.at(ret_index).ret_data.m_group_input_data, sizeof(Str_in_point));
+        temp_write_data.m_group_input_data.value = 1234;
+        int nret = Post_Background_Write_Message_ByIndex(ncommand_info, temp_write_data);
+    }
+    //m_pDescription = new BacnetDescription;
+    //m_pDescription->GetAllPanels();
     return;
 #endif // DEBUG
 

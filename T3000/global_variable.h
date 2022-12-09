@@ -1971,6 +1971,7 @@ vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 
 vector <Str_table_point> m_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite;
 vector <Str_Extio_point> m_extio_config_data;
+vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
 
 vector <int>  m_Input_data_instance; // for input bacnet-thirdParty devices instance_is's
 vector <int>  m_Output_data_instance;// for output bacnet-thirdParty devices instance_is's

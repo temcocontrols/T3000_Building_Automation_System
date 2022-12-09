@@ -456,7 +456,7 @@ const int BAC_REMOTE_POINT_COUNT = 128;
 
 const int BAC_VARIABLE_CUS_UNIT_COUNT = 5;
 const int BAC_EXTIO_COUNT = 12;
-
+const int BAC_BACKGROUND_COUNT = 256;
 const int BAC_TSTAT_SCHEDULE = 240;
 
 
@@ -2862,7 +2862,6 @@ enum {
 	TREE_LP_VIRTUAL_DEVICE = 1000,
 	TREE_LP_MAX_DEFINE
 };
-
 
 
 enum

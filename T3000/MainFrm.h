@@ -341,6 +341,7 @@ public:
 	static DWORD WINAPI  Write_Modbus_10000(LPVOID lpVoid);
 	static DWORD WINAPI  DetectYabbeThread(LPVOID lpVoid);
     static DWORD WINAPI  Write_Modbus_tstat_cfg(LPVOID lpVoid);
+	static DWORD WINAPI  Write_Modbus_ConfigFile(LPVOID lpVoid);
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
     
@@ -600,9 +601,9 @@ public:
 		int    DoConnectDB_TreeNode(const HTREEITEM& hTreeItem);
 #endif
 };
-
+//DWORD WINAPI  Bacnet_ReadWrite_Message(LPVOID lpVoid);
 //tree0412  2017 05 11 fance change
-
+extern vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
 #define TVINSERV_BUILDING 		    {tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
 #define TVINSERV_FLOOR	 			{tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
 #define TVINSERV_ROOM				{tvInsert.item.iImage=2; tvInsert.item.iSelectedImage=2;}

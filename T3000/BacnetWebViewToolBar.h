@@ -26,7 +26,6 @@ public:
     void DisableAllItems();
     HWND GetItem(Item item) const;
     const std::vector<HWND>& GetItems() const;
-
 private:
     BacnetWebViewAppWindow* m_appWindow = nullptr;
     HFONT m_font = nullptr;

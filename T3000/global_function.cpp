@@ -72,6 +72,7 @@ extern CBacnetUserlogin* User_Login_Window ;
 extern CBacnetRemotePoint* Remote_Point_Window ;
 extern int pc_time_to_basic_delt; //用于时间转换 ，各个时区之间。
 extern CString program_string;
+extern vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
 int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length)
 {
     int retVal;
@@ -1046,6 +1047,74 @@ BOOL Post_Refresh_One_Message(uint32_t deviceid,int8_t command,int8_t start_inst
         return TRUE;
     }
 }
+
+//return -1 means  The corresponding data has not been read
+int SearchDataIndexByPanel(unsigned char panel_id, int command_type, int npoint)
+{
+    for (int j = 0; j < BAC_BACKGROUND_COUNT; j++)
+    {
+        //通过第一次循环找到第一个没有被使用的 vector;
+        if (m_backbround_data.at(j).flag == STATUS_NOUSE)
+        {
+            continue;
+        }
+
+        if ((m_backbround_data.at(j).str_info.npanel_id == panel_id) &&
+            (m_backbround_data.at(j).str_info.npanel_commad == command_type) &&
+            (m_backbround_data.at(j).str_info.npoint_number == npoint))
+        {
+            return j;
+        }
+    }
+    return -1;
+}
+
+int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata write_data)
+{
+    if (read_write_bacnet_config)	//在读写Bacnet config 的时候禁止刷新List;
+        return -1;
+
+    groupdata* pmy_refresh_info = new groupdata;
+    memcpy(pmy_refresh_info, &write_data, sizeof(groupdata));
+
+    str_command_info* pindex_info = new str_command_info;
+    memcpy(pindex_info, &ret_index, sizeof(str_command_info));
+
+    if (!PostThreadMessage(nThreadID, MY_BAC_WRITE_GRP, (WPARAM)pmy_refresh_info, (LPARAM)pindex_info))//post thread msg
+    {
+        return -1;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+//read  123IN4  ->  panel_id = 123     command_type = READINPUT_T3000     npoint = 3
+int Post_Background_Read_Message_ByPanel(unsigned char panel_id,int command_type,int npoint)
+{
+    if (read_write_bacnet_config)	//在读写Bacnet config 的时候禁止刷新List;
+        return -1;
+    if (npoint == 0)
+        return -2;
+    str_point_info readinfo = {0};
+    readinfo.npanel_id = panel_id;
+    readinfo.npanel_commad = command_type;
+    readinfo.npoint_number = npoint - 1;
+    if (readinfo.npanel_id == 0) 
+        return -1;
+    str_point_info* pmy_refresh_info = new str_point_info;
+    memcpy(pmy_refresh_info, &readinfo, sizeof(str_point_info));
+    if (!PostThreadMessage(nThreadID, MY_BAC_READ_GRP, (WPARAM)pmy_refresh_info, NULL))//post thread msg
+    {
+        return -1;
+    }
+    else
+    {
+        return SearchDataIndexByPanel(panel_id, command_type, npoint - 1);
+    }
+}
+
 BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size)
 {
 
@@ -1438,7 +1507,7 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 
 
 
-int WritePrivateData_Blocking(uint32_t deviceid, unsigned char n_command, unsigned char start_instance, unsigned char end_instance, uint8_t retrytime)
+int WritePrivateData_Blocking(uint32_t deviceid, unsigned char n_command, unsigned char start_instance, unsigned char end_instance, uint8_t retrytime,char * ext_data)
 {
 
     int send_status = true;
@@ -1457,9 +1526,17 @@ int WritePrivateData_Blocking(uint32_t deviceid, unsigned char n_command, unsign
                 break;
             }
             if (deviceid == 0)
-                temp_invoke_id = WritePrivateData(g_bac_instance, n_command, start_instance, end_instance);
+                if(ext_data == NULL)
+                    temp_invoke_id = WritePrivateData(g_bac_instance, n_command, start_instance, end_instance);
+                else
+                {
+                    temp_invoke_id = WritePrivateData(g_bac_instance, n_command, start_instance, end_instance,ext_data);
+                }
             else
-                temp_invoke_id = WritePrivateData(deviceid, n_command, start_instance, end_instance);
+                if (ext_data == NULL)
+                    temp_invoke_id = WritePrivateData(deviceid, n_command, start_instance, end_instance);
+                else
+                    temp_invoke_id = WritePrivateData(deviceid, n_command, start_instance, end_instance, ext_data);
             if (temp_invoke_id < 0)
                 Sleep(500);
             else
@@ -1499,7 +1576,7 @@ int WritePrivateData_Blocking(uint32_t deviceid, unsigned char n_command, unsign
 ** Write Bacnet private data to device
 ** Add by Fance
 ****************************************************/
-int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance)
+int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance,char *ext_data)
 {
  
 
@@ -1672,9 +1749,16 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         }
         break;
     case WRITEINPUT_T3000:
-        for (int i=0; i<(end_instance-start_instance + 1); i++)
+        if (ext_data == NULL)
         {
-            memcpy_s(SendBuffer + i*sizeof(Str_in_point) + HEADER_LENGTH,sizeof(Str_in_point),&m_Input_data.at(i + start_instance),sizeof(Str_in_point));
+            for (int i = 0; i < (end_instance - start_instance + 1); i++)
+            {
+                memcpy_s(SendBuffer + i * sizeof(Str_in_point) + HEADER_LENGTH, sizeof(Str_in_point), &m_Input_data.at(i + start_instance), sizeof(Str_in_point));
+            }
+        }
+        else
+        {
+            memcpy_s(SendBuffer  + HEADER_LENGTH, (end_instance - start_instance + 1)*sizeof(Str_in_point), ext_data, (end_instance - start_instance + 1) * sizeof(Str_in_point));
         }
         break;
     case WRITEPROGRAM_T3000:
@@ -1707,16 +1791,32 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     }
     break;
     case WRITEVARIABLE_T3000:
-        for (int i=0; i<(end_instance-start_instance + 1); i++)
+        if (ext_data == NULL)
         {
-            memcpy_s(SendBuffer + i*sizeof(Str_variable_point) + HEADER_LENGTH,sizeof(Str_variable_point),&m_Variable_data.at(i + start_instance),sizeof(Str_variable_point));
+            for (int i = 0; i < (end_instance - start_instance + 1); i++)
+            {
+                memcpy_s(SendBuffer + i * sizeof(Str_variable_point) + HEADER_LENGTH, sizeof(Str_variable_point), &m_Variable_data.at(i + start_instance), sizeof(Str_variable_point));
+            }
         }
+        else
+        {
+            memcpy_s(SendBuffer + HEADER_LENGTH, (end_instance - start_instance + 1) * sizeof(Str_variable_point), ext_data, (end_instance - start_instance + 1) * sizeof(Str_variable_point));
+        }
+
         break;
     case  WRITEOUTPUT_T3000:
-        for (int i=0; i<(end_instance-start_instance + 1); i++)
+        if (ext_data == NULL)
         {
-            memcpy_s(SendBuffer + i*sizeof(Str_out_point) + HEADER_LENGTH,sizeof(Str_out_point),&m_Output_data.at(i + start_instance),sizeof(Str_out_point));
+            for (int i = 0; i < (end_instance - start_instance + 1); i++)
+            {
+                memcpy_s(SendBuffer + i * sizeof(Str_out_point) + HEADER_LENGTH, sizeof(Str_out_point), &m_Output_data.at(i + start_instance), sizeof(Str_out_point));
+            }
         }
+        else
+        {
+            memcpy_s(SendBuffer + HEADER_LENGTH, (end_instance - start_instance + 1) * sizeof(Str_out_point), ext_data, (end_instance - start_instance + 1) * sizeof(Str_out_point));
+        }
+
         break;
     case WRITESCHEDULE_T3000:
         for (int i=0; i<(end_instance-start_instance + 1); i++)
@@ -3201,6 +3301,8 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     char *my_temp_point;
     command_type = *(bacnet_apud_point + 2);
     ///////////////////////////////
+    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+        invoke_id = 0;
     switch (command_type)
     {
     case READEXT_IO_T3000:
@@ -4465,7 +4567,8 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
                 T3_chip_name.Empty();
                 break;
             }
-
+            bacnet_device_type = s_Basic_Setting.reg.mini_type;
+#if 0
             if (s_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
                 bacnet_device_type = BIG_MINIPANEL;
             else if (s_Basic_Setting.reg.mini_type == SMALL_MINIPANEL)
@@ -4488,7 +4591,9 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
                 bacnet_device_type = T3_FAN_MODULE;
             else
                 bacnet_device_type = PM_CM5;
-            if (invoke_id == gsp_invoke)
+#endif
+            
+            if (invoke_id == gsp_invoke) 
             {
                 Sleep(1);
             }
@@ -16049,6 +16154,7 @@ void Initial_All_Point()
     m_msv_data.clear();
     m_Input_data_instance.clear();
     m_Output_data_instance.clear();
+    m_backbround_data.clear();
     //vector <Str_TstatInfo_point> m_Tstat_data;
     for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++)
     {
@@ -16196,6 +16302,13 @@ void Initial_All_Point()
         Str_tstat_schedule temp_tstat_schedule = { 0 };
         memset(&temp_tstat_schedule, 0, sizeof(Str_tstat_schedule));
         m_tatat_schedule_data.push_back(temp_tstat_schedule);
+    }
+
+    for (int i = 0; i < BAC_BACKGROUND_COUNT; i++)
+    {
+        bacnet_background_struct temp_point = { 0 };
+        memset(&temp_point, 0, sizeof(bacnet_background_struct));
+        m_backbround_data.push_back(temp_point);
     }
 
     for (int i = 0; i < BAC_MSV_COUNT + 1; i++)
