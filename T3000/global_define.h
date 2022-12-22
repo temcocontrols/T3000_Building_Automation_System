@@ -456,7 +456,7 @@ const int BAC_REMOTE_POINT_COUNT = 128;
 
 const int BAC_VARIABLE_CUS_UNIT_COUNT = 5;
 const int BAC_EXTIO_COUNT = 12;
-
+const int BAC_BACKGROUND_COUNT = 256;
 const int BAC_TSTAT_SCHEDULE = 240;
 
 
@@ -519,6 +519,7 @@ struct _Bac_Scan_Com_Info
     unsigned char ipaddress[6];   //前四位位IP地址  后两位位端口号
     int device_id;
     int macaddress;
+	uint16_t vendor_id;
 };
 struct _Bac_Scan_results_Info
 {
@@ -583,6 +584,13 @@ struct refresh_subnet_device
     UINT parent_sn;
     char reserved_data[15]; // 预留
     sub_net_status device_status[255];
+};
+
+struct bacnet_panel_object_info
+{
+	int panel_number;
+	unsigned int object_instance;
+	int last_update_time;
 };
 
 struct refresh_net_device
@@ -1808,18 +1816,18 @@ const int OUTPUT_FULL_LABLE = 2;
 const int OUTPUT_AUTO_MANUAL = 3;
 const int OUTPUT_HW_SWITCH = 4;
 const int OUTPUT_VALUE = 5;
-const int OUTPUT_RELINQUISH_VALUE = 6;
-const int OUTPUT_UNITE = 7;
-const int OUTPUT_RANGE = 8;
-const int OUTPUT_LOW_VOLTAGE = 9;
-const int OUTPUT_HIGH_VOLTAGE = 10;
-const int OUTPUT_PWM_PERIOD = 11;
-const int OUTPUT_DECOM = 12;
-const int OUTPUT_LABLE = 13;
-const int OUTPUT_EXTERNAL = 14;
-const int OUTPUT_PRODUCT = 15;
-const int OUTPUT_EXT_NUMBER = 16;
-const int OUTPUT_COL_NUMBER = 17;
+//const int OUTPUT_RELINQUISH_VALUE = 6;
+const int OUTPUT_UNITE = 6;
+const int OUTPUT_RANGE = 7;
+const int OUTPUT_LOW_VOLTAGE = 8;
+const int OUTPUT_HIGH_VOLTAGE = 9;
+const int OUTPUT_PWM_PERIOD = 10;
+const int OUTPUT_DECOM = 11;
+const int OUTPUT_LABLE = 12;
+const int OUTPUT_EXTERNAL = 13;
+const int OUTPUT_PRODUCT = 14;
+const int OUTPUT_EXT_NUMBER = 15;
+const int OUTPUT_COL_NUMBER = 16;
 
 const CString Output_Decom_Array[2] =
 {
@@ -2779,6 +2787,9 @@ typedef struct
 
 typedef  struct
 {
+	//Str_in_point  m_group_input_data;
+	//Str_out_point m_group_output_data;
+	//Str_variable_point m_group_variable_data;
 	int group_index;  //标识三维 属于哪一个节点;
 	int category_index;
 	int hw_index;
@@ -2803,6 +2814,7 @@ typedef  struct
 
 	Str_points nproperty;  //
 	CString cs_property_name; //例如  1234IN56
+	char  m_data[250];
 	Input_CString input_cstring;
 	Output_CString output_cstring;
 	Variable_CString variable_cstring;
@@ -2850,7 +2862,6 @@ enum {
 	TREE_LP_VIRTUAL_DEVICE = 1000,
 	TREE_LP_MAX_DEFINE
 };
-
 
 
 enum

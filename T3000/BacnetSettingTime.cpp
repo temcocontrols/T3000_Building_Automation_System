@@ -317,6 +317,9 @@ void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
     int nyear, nmonth, nday, nhour, nmin, nsec;
 
     unsigned long  temp_time_long = time(NULL);
+    //CString temp_cs;
+    //temp_cs.Format(_T("%u"), temp_time_long);
+    //MessageBox(temp_cs);
     time_t scale_time = temp_time_long;
 
     if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)

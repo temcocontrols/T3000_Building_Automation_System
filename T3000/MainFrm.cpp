@@ -110,6 +110,7 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "CBacnetBuildingManagement.h"
 #include "CBacnetBuildingMain.h"
 #include "CAirFlowSensor.h"
+#include "CTransducer.h"
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -130,6 +131,7 @@ HANDLE hwait_read_thread = NULL;
 HANDLE hwait_read_modbus10000 = NULL;
 HANDLE hwait_write_modbus10000 = NULL;
 HANDLE hwait_write_tstat_cfg = NULL;
+HANDLE hwait_write_ini_cfg = NULL;
 HANDLE hDetectYabeThread = NULL;
 HANDLE h_mul_ping_thread = NULL;
 int mul_ping_flag = 1;
@@ -139,7 +141,7 @@ extern int isp_product_id;
 vector <MSG> My_Receive_msg;
 #define WM_CREATE_STATUSBAR WM_USER + 638
 #define WM_TROUBLESHOOT_MSG  WM_USER + 639
-
+HANDLE hback_thread = 0;
 HANDLE hDeal_thread;
 DWORD nThreadID_Do;
 extern CBacnetScreenEdit * ScreenEdit_Window;
@@ -240,7 +242,6 @@ volatile HANDLE Read_Mutex=NULL;
 
 //BOOL g_bPauseMultiRead=FALSE;
 BOOL m_active_key_mouse = FALSE;
-
 
 
 
@@ -630,7 +631,7 @@ void CMainFrame::InitViews()
     m_pViews[DLG_DIALOG_THIRD_PARTY_BAC] = NULL /*(CView *)new CBacnetThirdPartyMain;*/;
     m_pViews[DLG_DIALOG_BUILDING_MANAGEMENT] = NULL;
     m_pViews[DLG_DIALOG_AIRFLOW] = NULL;
-    
+    m_pViews[DLG_DIALOG_TRANSDUCER] = NULL;
     CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
     newContext.m_pNewViewClass = NULL;
@@ -1093,6 +1094,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
 	hThread = CreateThread(NULL, NULL, Get_All_Dlg_Message, this, NULL, &nThreadID);
 	hDeal_thread = CreateThread(NULL, NULL, Translate_My_Message, this, NULL, &nThreadID_Do);
+
+    //hback_thread = CreateThread(NULL, NULL, Bacnet_ReadWrite_Message, this, NULL, NULL);
+
 	//m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 
@@ -5005,6 +5009,15 @@ void CMainFrame::SwitchToPruductType(int nIndex)
 
                 m_pViews[DLG_DIALOG_AIRFLOW]->OnInitialUpdate();//?
                 break;
+            case DLG_DIALOG_TRANSDUCER:
+                m_pViews[DLG_DIALOG_TRANSDUCER] = (CView*)new CTransducer();
+                m_pViews[DLG_DIALOG_TRANSDUCER]->Create(NULL, NULL,
+                    (AFX_WS_DEFAULT_VIEW & ~WS_VISIBLE),
+                    rect, this,
+                    AFX_IDW_PANE_FIRST + DLG_DIALOG_TRANSDUCER, &newContext);
+
+                m_pViews[DLG_DIALOG_TRANSDUCER]->OnInitialUpdate();//?
+                break;
             default:
                 return;
                     break;
@@ -5282,6 +5295,13 @@ here:
         PostMessage(WM_SIZE, 0, 0);
     }
         break;
+    case DLG_DIALOG_TRANSDUCER:
+    {
+        m_nCurView = DLG_DIALOG_TRANSDUCER;
+        ((CTransducer*)m_pViews[m_nCurView])->Fresh();
+        PostMessage(WM_SIZE, 0, 0);
+    }
+    break;
     default :
         break;
         //here
@@ -5516,6 +5536,81 @@ LRESULT CMainFrame::Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam)
     return 0;
 }
 
+
+DWORD WINAPI  CMainFrame::Write_Modbus_ConfigFile(LPVOID lpVoid)
+{
+    CMainFrame* pParent = (CMainFrame*)lpVoid;
+    g_bPauseMultiRead = TRUE;
+    int ini_type = GetPrivateProfileInt(_T("Version"), _T("pidtype"), 0, LoadConfigFilePath);
+    if (product_register_value[7] != ini_type)
+    {
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The configuration file does not match the product!"));
+        return -1;
+    }
+    if (product_register_value[7] == STM32_CO2_NET ||
+        product_register_value[7] == STM32_CO2_RS485 ||
+        product_register_value[7] == STM32_HUM_NET ||
+        product_register_value[7] == STM32_HUM_RS485)
+    {
+        int ini_version = GetPrivateProfileInt(_T("Version"), _T("iniVersion"), 0, LoadConfigFilePath);
+        if (ini_version < 1)
+        {
+            return -1;
+        }
+        CString TotalPart;
+        GetPrivateProfileStringW(_T("Version"), _T("Part"), _T(""), TotalPart.GetBuffer(MAX_PATH), MAX_PATH, LoadConfigFilePath);
+        TotalPart.ReleaseBuffer();
+
+        CStringArray temp_array;
+        SplitCStringA(temp_array, TotalPart, _T(","));
+        if (temp_array.GetSize() <= 0)
+        {
+            return -2;
+        }
+
+        for (int i = 0; i < temp_array.GetSize(); i++)
+        {
+            CString temp_section;
+            temp_section = temp_array.GetAt(i);
+            CString section_data;
+            GetPrivateProfileStringW(_T("Data"), temp_section, _T(""), section_data.GetBuffer(MAX_PATH), MAX_PATH, LoadConfigFilePath);
+            section_data.ReleaseBuffer();
+
+            CStringArray temp_sec_array;
+            SplitCStringA(temp_sec_array, temp_section, _T("-"));
+            if (temp_sec_array.GetSize() != 2)
+            {
+                return -2;
+            }
+            int strt_addr = _wtoi(temp_sec_array.GetAt(0));
+            int nlength = _wtoi(temp_sec_array.GetAt(1)) - _wtoi(temp_sec_array.GetAt(0)) + 1;
+
+
+
+            CStringArray temp_data_array;
+            SplitCStringA(temp_data_array, section_data, _T(","));
+            int test1 = temp_data_array.GetSize();
+            if (nlength != temp_data_array.GetSize())
+                return -3;
+            for (int a = 0; a < nlength; a++)
+            {
+                product_register_value[strt_addr + a] = _wtoi(temp_data_array.GetAt(a));
+                write_one(g_tstat_id, strt_addr + a, product_register_value[strt_addr + a],10);
+                Sleep(10);
+                g_progress_persent = (a+1)*100 / nlength;
+                CString temp_progress;
+                temp_progress.Format(_T("Loading register %d"), strt_addr + a);
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_progress);
+            }
+            g_progress_persent = 100;
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Load config file success!"));
+        }
+
+    }
+    hwait_write_ini_cfg = NULL;
+    g_bPauseMultiRead = FALSE;
+    return 0;
+}
 
 DWORD WINAPI  CMainFrame::Write_Modbus_tstat_cfg(LPVOID lpVoid)
 {
@@ -9751,8 +9846,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             else if ((nFlag == PWM_TEMPERATURE_TRANSDUCER) ||
                      (nFlag == STM32_PM25))
             {
-                //SwitchToPruductType(DLG_AIRQUALITY_VIEW);
-                SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
+                SwitchToPruductType(DLG_DIALOG_TRANSDUCER);
+                //SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
                 
                 //n_show_register_list = 1;
                 break; //直接显示寄存器列表;
@@ -11432,6 +11527,16 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
                 My_Receive_msg.push_back(msg);
                 MyCriticalSection.Unlock();
                 break;
+            case MY_BAC_READ_GRP:
+                MyCriticalSection.Lock();
+                My_Receive_msg.push_back(msg);
+                MyCriticalSection.Unlock();
+                break;
+            case MY_BAC_WRITE_GRP:
+                MyCriticalSection.Lock();
+                My_Receive_msg.push_back(msg);
+                MyCriticalSection.Unlock();
+                break;              
             case MY_CLOSE:
                 goto myend;
                 break;
@@ -11441,6 +11546,7 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
 myend:
     return 0;
 }
+
 
 
 //Code by Fance
@@ -11462,6 +11568,160 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
             MSG my_temp_msg = My_Receive_msg.at(0);
             switch(my_temp_msg.message)
             {
+            case MY_BAC_READ_GRP:
+            {
+                MyCriticalSection.Lock();
+                msg = My_Receive_msg.at(0);
+                str_point_info* My_read_Struct = (str_point_info*)msg.wParam;
+                My_Receive_msg.erase(My_Receive_msg.begin());
+                MyCriticalSection.Unlock();
+
+
+                //比对列表里面书否存在 
+
+                int n_index = -1;
+                int n_nouse_index = -1;
+                for (int j = 0; j < BAC_BACKGROUND_COUNT; j++)
+                {
+                    //通过第一次循环找到第一个没有被使用的 vector;
+                    if ((m_backbround_data.at(j).flag == STATUS_NOUSE) && (n_nouse_index == -1))
+                    {
+                        n_nouse_index = j;
+                    }
+                    if (m_backbround_data.at(j).flag == STATUS_USE)
+                    {
+                        if ((m_backbround_data.at(j).str_info.npanel_id == My_read_Struct->npanel_id) &&
+                            (m_backbround_data.at(j).str_info.npanel_commad == My_read_Struct->npanel_commad) &&
+                            (m_backbround_data.at(j).str_info.npoint_number == My_read_Struct->npoint_number))
+                        {
+                            n_index = j;
+                            break;
+                        }
+                    }
+                }
+                if (n_nouse_index == -1)
+                {
+                    n_nouse_index = 0; //如果所有的都使用完毕了，就使用第一个;
+                }
+                int n_handle_index = -1;
+                if (n_index == -1)
+                {
+                    //插入数据至最前面没有被使用的vector
+                    memcpy(&m_backbround_data.at(n_nouse_index).str_info, My_read_Struct, sizeof(str_point_info));
+                    m_backbround_data.at(n_nouse_index).flag = STATUS_USE;
+                    n_handle_index = n_nouse_index;
+                }
+                else
+                {
+                    n_handle_index = n_index;
+                }
+                if (m_backbround_data.at(n_handle_index).str_info.ninstance != 0)
+                {
+                    //直接通过instance 来获取需要的数据;
+                }
+                else
+                {
+                    unsigned long temptimenoew = time(NULL);
+                    //通过panel 获取对应的 instance
+                    if ((g_bac_panel[My_read_Struct->npanel_id].object_instance != 0) &&
+                        (g_bac_panel[My_read_Struct->npanel_id].panel_number == My_read_Struct->npanel_id) &&
+                        (temptimenoew  > g_bac_panel[My_read_Struct->npanel_id].last_update_time) &&
+                        (temptimenoew - g_bac_panel[My_read_Struct->npanel_id].last_update_time < 600))
+                    {
+                        m_backbround_data.at(n_handle_index).str_info.ninstance = g_bac_panel[My_read_Struct->npanel_id].object_instance;
+                    }
+                    else
+                    {
+                        break;
+                        //TRACE(_T("No panel info response\n"));
+                    }
+                }
+                int nret = 0;
+                switch (m_backbround_data.at(n_handle_index).str_info.npanel_commad)
+                {
+                case READINPUT_T3000:
+                {
+                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
+                                            m_backbround_data.at(n_handle_index).str_info.npanel_commad, 
+                                            m_backbround_data.at(n_handle_index).str_info.npoint_number, 
+                                            m_backbround_data.at(n_handle_index).str_info.npoint_number, 
+                                            sizeof(Str_in_point));
+                    if (nret > 0)
+                    {
+                         memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_input_data, &s_Input_data, sizeof(Str_in_point));
+                         CString temp_cs;
+                         temp_cs.Format(_T("IN%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1,m_backbround_data.at(n_handle_index).ret_data.m_group_input_data.value/1000.000);
+                         TRACE(temp_cs);
+                    }
+                }
+                    break;
+                case READOUTPUT_T3000:
+                {
+                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
+                        m_backbround_data.at(n_handle_index).str_info.npanel_commad,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        sizeof(Str_out_point));
+                    if (nret > 0)
+                    {
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_output_data, &s_Output_data, sizeof(Str_out_point));
+                        CString temp_cs;
+                        temp_cs.Format(_T("Out%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1, m_backbround_data.at(n_handle_index).ret_data.m_group_output_data.value / 1000.000);
+                        TRACE(temp_cs);
+                    }
+                }
+                    break;
+                case READVARIABLE_T3000:
+                {
+                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
+                        m_backbround_data.at(n_handle_index).str_info.npanel_commad,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        sizeof(Str_variable_point));
+                    if (nret > 0)
+                    {
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_variable_data, &s_Variable_data, sizeof(Str_variable_point));
+                        CString temp_cs;
+                        temp_cs.Format(_T("Var%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1, m_backbround_data.at(n_handle_index).ret_data.m_group_variable_data.value / 1000.000);
+                        TRACE(temp_cs);
+                    }
+                }
+                    break;
+                default:
+                    break;
+                }
+                delete My_read_Struct;
+
+            }
+                break;
+            case MY_BAC_WRITE_GRP:
+            {
+                MyCriticalSection.Lock();
+                msg = My_Receive_msg.at(0);
+                groupdata* groupdata_struct = (groupdata*)msg.wParam;
+                str_command_info *data_index_info = (str_command_info *)msg.lParam;
+                My_Receive_msg.erase(My_Receive_msg.begin());
+                MyCriticalSection.Unlock();
+                if (data_index_info->ndataindex >= BAC_BACKGROUND_COUNT)
+                {
+                    delete groupdata_struct;
+                    delete data_index_info;
+                    break;
+                }
+                if (data_index_info->command_type == WRITEINPUT_T3000)
+                {
+                    int ret_results = WritePrivateData_Blocking(m_backbround_data.at(data_index_info->ndataindex).str_info.ninstance,
+                        WRITEINPUT_T3000, m_backbround_data.at(data_index_info->ndataindex).str_info.npoint_number, 
+                                          m_backbround_data.at(data_index_info->ndataindex).str_info.npoint_number,5, (char *)&groupdata_struct->m_group_input_data);
+                    if (ret_results > 0)
+                    {
+                        Sleep(1);
+                        //m_backbround_data.at(data_index_info->ndataindex).
+                    }
+                }
+
+            }
+                break;
             case MY_WRITE_ONE:
             {
                 MyCriticalSection.Lock();
@@ -12351,8 +12611,11 @@ void CMainFrame::OnControlMain()
         {
             SwitchToPruductType(DLG_DIALOG_AIRFLOW);
         }
-        else if ((product_register_value[7] == PWM_TEMPERATURE_TRANSDUCER) ||
-            (product_register_value[7] == STM32_PM25))
+        else if (product_register_value[7] == PWM_TEMPERATURE_TRANSDUCER)
+        {
+            SwitchToPruductType(DLG_DIALOG_TRANSDUCER);
+        }
+        else if ((product_register_value[7] == STM32_PM25))
         {
             OnToolRegisterviewer();
         }
@@ -15929,6 +16192,24 @@ void CMainFrame::OnLoadConfigFile()
         SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Loading config file , Please wait!"));
         hwait_write_tstat_cfg = CreateThread(NULL, NULL, Write_Modbus_tstat_cfg, this, NULL, NULL);
     }
+    else if ( product_register_value[7] == STM32_CO2_NET ||
+             product_register_value[7] == STM32_CO2_RS485 ||
+            product_register_value[7] == STM32_HUM_NET ||
+            product_register_value[7] == STM32_HUM_RS485)
+    {
+        CFileDialog dlg(true, _T("*.ini"), _T(" "), OFN_HIDEREADONLY, _T("Ini files (*.ini)|*.ini||"), NULL, 0);
+        if (IDOK != dlg.DoModal())
+            return;
+        LoadConfigFilePath = dlg.GetPathName();
+
+        if (hwait_write_ini_cfg != NULL)
+        {
+            TerminateThread(hwait_write_ini_cfg, 0);
+            hwait_write_ini_cfg = NULL;
+        }
+        SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Loading config file , Please wait!"));
+        hwait_write_ini_cfg = CreateThread(NULL, NULL, Write_Modbus_ConfigFile, this, NULL, NULL);
+    }
 
     //AfxMessageBox(_T("Load configuration file."));
     if (g_LoadConfigLevel == 1)
@@ -16020,6 +16301,28 @@ void CMainFrame::SaveConfigFile()
     product_register_value[7] = IDFlag;
     if (IDFlag <= 0)
         return;
+    if ((product_register_value[7] == STM32_CO2_NET) ||
+        (product_register_value[7] == STM32_CO2_RS485) ||
+        (product_register_value[7] == STM32_HUM_NET) ||
+        (product_register_value[7] == STM32_HUM_RS485))
+    {
+        CString strFilter = _T("ini file|*.ini");
+        CFileDialog dlg(true, _T("bmp"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
+        if (IDOK == dlg.DoModal())
+        {
+            CString iniFilePath;
+            iniFilePath = dlg.GetPathName();
+
+            SaveGeneralReg(iniFilePath, product_register_value[7]);
+
+        }
+        else
+        {
+            return;
+        }
+        return;
+    }
+
     float version = get_curtstat_version();
     CString strFilter;
     CString strFilename;
@@ -16157,6 +16460,27 @@ void CMainFrame::OnViewRefresh()
     // TODO: 在此添加命令处理程序代码
     ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, bacnet_view_number);
 }
+////extern vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
+//DWORD WINAPI  Bacnet_ReadWrite_Message(LPVOID lpVoid)
+//{
+//    while (1)
+//    {
+//        if (1)
+//        {
+//            for (int i = 0; i < BAC_BACKGROUND_COUNT; i++)
+//            {
+//                if (m_backbround_data.at(i).flag == 1)
+//                {
+//                    Sleep(1);
+//                }
+//            }
+//            //m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
+//        }
+//        else
+//            break;
+//    }
+//    return 0;
+//}
 
 DWORD WINAPI  CMainFrame::DetectYabbeThread(LPVOID lpVoid)
 {
@@ -16283,3 +16607,4 @@ int CMainFrame::DoConnectDB_TreeNode(const HTREEITEM& hTreeItem)
     return 0;
 }
 #endif // LOCAL_DB_FUNCTION
+

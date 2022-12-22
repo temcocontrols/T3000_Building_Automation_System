@@ -42,12 +42,13 @@ const int TATAT_AQ_CONFIG_LINE3 = 1958;
 const int TATAT_AQ_CONFIG_LINE4 = 1959;
 const int TATAT_AQ_CONFIG_LINE5 = 1954;
 
-const int HIDE_IN_ARRAY = 4;
+const int HIDE_IN_ARRAY = 5;
 const CString AirLab_LCD[] =
 {
 	_T("Temperature"),
 	_T("Humidity"),
 	_T("CO2"),
 	_T("VOC"),
+	_T("Light"),
 	_T("Hide Item")
 };

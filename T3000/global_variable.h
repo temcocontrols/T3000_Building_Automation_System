@@ -46,7 +46,7 @@ int nCom;
 volatile int g_tstat_id=255;
 int g_protocol_support_ptp = PROTOCOL_UNKNOW;
 int g_output_support_relinquish = 0;
-unsigned short output_relinquish_value[128] ;
+//unsigned short output_relinquish_value[128] ;
 int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。 
 unsigned int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
@@ -1971,6 +1971,7 @@ vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 
 vector <Str_table_point> m_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite;
 vector <Str_Extio_point> m_extio_config_data;
+vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
 
 vector <int>  m_Input_data_instance; // for input bacnet-thirdParty devices instance_is's
 vector <int>  m_Output_data_instance;// for output bacnet-thirdParty devices instance_is's
@@ -1988,6 +1989,7 @@ Str_MISC Device_Misc_Data;
 Str_Special Device_Special_Data;
 char m_at_write_buf[100];
 char m_at_read_buf[450];
+bacnet_panel_object_info g_bac_panel[256]; //用于全局panel 与 object instance 对应查询;
 vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 新的setpoint表格; 以前的完全改不动了;
 vector <int> exsit_panel_number;
 vector <refresh_net_device> m_T3BB_device_data;
@@ -2320,7 +2322,7 @@ unsigned char daylight_start_day;
 unsigned char daylight_end_month;
 unsigned char daylight_end_day;
 
-unsigned char gsp_invoke;
+short gsp_invoke;
 bool Bacnet_debug_fileRead = false;
 device_io_status select_device_io_status;
 vector <Str_BM_IO> m_bm_io_data; //用来存储BM 系统  IO表数据

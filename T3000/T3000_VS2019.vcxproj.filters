@@ -837,6 +837,12 @@
     <ClCompile Include="Json-cpp\dist\jsoncpp.cpp">
       <Filter>Source Files\JsonCpp</Filter>
     </ClCompile>
+    <ClCompile Include="CTransducer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WebView\WebViewHvacDraw.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -2083,6 +2089,9 @@
       <Filter>Header Files\JsonCpp</Filter>
     </ClInclude>
     <ClInclude Include="dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTransducer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

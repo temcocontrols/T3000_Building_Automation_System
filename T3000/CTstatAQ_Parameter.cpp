@@ -93,7 +93,7 @@ void CTstatAQ_Parameter::InitialUI()
 
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->ResetContent();
     ((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->AddString(_T("PM2.5"));
-	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->AddString(AirLab_LCD[4]);
+	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->AddString(AirLab_LCD[HIDE_IN_ARRAY]);
 
 
 	if ((product_register_value[TATAT_AQ_CONFIG_LINE1] >= 0) && (product_register_value[TATAT_AQ_CONFIG_LINE1] <= 3))
@@ -102,39 +102,39 @@ void CTstatAQ_Parameter::InitialUI()
 	}
 	else if (product_register_value[TATAT_AQ_CONFIG_LINE1] == 20)
 	{
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE1))->SetWindowText(AirLab_LCD[4]);
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE1))->SetWindowText(AirLab_LCD[HIDE_IN_ARRAY]);
 	}
 
-	if ((product_register_value[TATAT_AQ_CONFIG_LINE2] >= 0) && (product_register_value[TATAT_AQ_CONFIG_LINE2] <= 3))
+	if ((product_register_value[TATAT_AQ_CONFIG_LINE2] >= 0) && (product_register_value[TATAT_AQ_CONFIG_LINE2] < HIDE_IN_ARRAY ))
 	{
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE2))->SetWindowText(AirLab_LCD[product_register_value[TATAT_AQ_CONFIG_LINE2]]);
 	}
 	else if (product_register_value[TATAT_AQ_CONFIG_LINE2] == 20)
 	{
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE2))->SetWindowText(AirLab_LCD[4]);
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE2))->SetWindowText(AirLab_LCD[HIDE_IN_ARRAY]);
 	}
 
-	if ((product_register_value[TATAT_AQ_CONFIG_LINE3] >= 0) && (product_register_value[TATAT_AQ_CONFIG_LINE3] <= 3))
+	if ((product_register_value[TATAT_AQ_CONFIG_LINE3] >= 0) && (product_register_value[TATAT_AQ_CONFIG_LINE3] < HIDE_IN_ARRAY))
 	{
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE3))->SetWindowText(AirLab_LCD[product_register_value[TATAT_AQ_CONFIG_LINE3]]);
 	}
 	else if (product_register_value[TATAT_AQ_CONFIG_LINE3] == 20)
 	{
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE3))->SetWindowText(AirLab_LCD[4]);
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE3))->SetWindowText(AirLab_LCD[HIDE_IN_ARRAY]);
 	}
 
-	if ((product_register_value[TATAT_AQ_CONFIG_LINE4] >= 0) && (product_register_value[TATAT_AQ_CONFIG_LINE4] <= 3))
+	if ((product_register_value[TATAT_AQ_CONFIG_LINE4] >= 0) && (product_register_value[TATAT_AQ_CONFIG_LINE4] < HIDE_IN_ARRAY))
 	{
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE4))->SetWindowText(AirLab_LCD[product_register_value[TATAT_AQ_CONFIG_LINE4]]);
 	}
 	else if (product_register_value[TATAT_AQ_CONFIG_LINE4] == 20)
 	{
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE4))->SetWindowText(AirLab_LCD[4]);
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE4))->SetWindowText(AirLab_LCD[HIDE_IN_ARRAY]);
 	}
 
 	if (product_register_value[TATAT_AQ_CONFIG_LINE5] == 20)
 	{
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->SetWindowText(AirLab_LCD[4]);
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->SetWindowText(AirLab_LCD[HIDE_IN_ARRAY]);
 	}
 	else
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->SetWindowText(_T("PM2.5"));
@@ -316,7 +316,7 @@ void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine5()
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->GetLBText(nSel, temp_string);
 	int nvalue = 0;
 
-	if (temp_string.CompareNoCase(AirLab_LCD[4]) == 0)
+	if (temp_string.CompareNoCase(AirLab_LCD[HIDE_IN_ARRAY]) == 0)
 	{
 		nvalue = 20;
 	}
