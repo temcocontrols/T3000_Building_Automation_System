@@ -738,9 +738,12 @@ set(T3000_SOURCE_FILES
   ${T3000_SOURCE_DIR}/CBacnetUnitsSelection.cpp
   ${T3000_SOURCE_DIR}/CAirFlowSensor.cpp
   ${T3000_SOURCE_DIR}/CTstatAQ_Parameter.cpp
+  ${T3000_SOURCE_DIR}/CBacnetBuildingProperty.cpp
+  ${T3000_SOURCE_DIR}/CTransducer.cpp
   ${T3000_SOURCE_DIR}/Json-cpp/dist/jsoncpp.cpp
   ${T3000_SOURCE_DIR}/BacnetWebViewToolBar.cpp
   ${T3000_SOURCE_DIR}/BacnetWebView.cpp
+  ${T3000_SOURCE_DIR}/webview/WebViewHvacDraw.cpp
 )
 
 set(LIGHTINGCONTROLLER_SRC_FILES
