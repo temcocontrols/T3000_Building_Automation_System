@@ -190,6 +190,82 @@ LRESULT  CBacnetScreenEdit::Delete_Label_Handle(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+int check_lable_type(char* temp_point, int *temp_panel,unsigned char * temp_point_type, int* temp_number)
+{
+	//寻找其他panel 对应的 label
+	CString cs_temp_point;
+	MultiByteToWideChar(CP_ACP, 0, (char*)temp_point, (int)strlen((char*)temp_point) + 1,
+		cs_temp_point.GetBuffer(MAX_PATH), MAX_PATH);
+	cs_temp_point.ReleaseBuffer();
+	cs_temp_point.Trim();
+	bool find_lable = false;
+	for (int i = 0; i < 254; i++)
+	{
+		if (find_lable)
+			break;
+		for (int j = 0; j < BAC_INPUT_ITEM_COUNT; j++)
+		{
+			if (strlen((char*)g_Input_data[i].at(j).label) == 0)
+				continue;
+			CString temp_label;
+			MultiByteToWideChar(CP_ACP, 0, (char*)g_Input_data[i].at(j).label, (int)strlen((char*)g_Input_data[i].at(j).label) + 1,
+				temp_label.GetBuffer(MAX_PATH), MAX_PATH);
+			temp_label.ReleaseBuffer();
+			temp_label.Trim();
+			if (temp_label.CompareNoCase(cs_temp_point) == 0)
+			{
+				*temp_panel = i;
+				*temp_point_type = BAC_IN;
+				*temp_number = j + 1;
+				find_lable = true;
+				break;
+			}
+
+		}
+		if (find_lable)
+			break;
+		for (int j = 0; j < BAC_OUTPUT_ITEM_COUNT; j++)
+		{
+			if (strlen((char*)g_Output_data[i].at(j).label) == 0)
+				continue;
+			CString temp_label;
+			MultiByteToWideChar(CP_ACP, 0, (char*)g_Output_data[i].at(j).label, (int)strlen((char*)g_Output_data[i].at(j).label) + 1,
+				temp_label.GetBuffer(MAX_PATH), MAX_PATH);
+			temp_label.ReleaseBuffer();
+			temp_label.Trim();
+			if (temp_label.CompareNoCase(cs_temp_point) == 0)
+			{
+				*temp_panel = i;
+				*temp_point_type = BAC_OUT;
+				*temp_number = j + 1;
+				find_lable = true;
+				break;
+			}
+		}
+		if (find_lable)
+			break;
+		for (int j = 0; j < BAC_VARIABLE_ITEM_COUNT; j++)
+		{
+			if (strlen((char*)g_Variable_data[i].at(j).label) == 0)
+				continue;
+			CString temp_label;
+			MultiByteToWideChar(CP_ACP, 0, (char*)g_Variable_data[i].at(j).label, (int)strlen((char*)g_Variable_data[i].at(j).label) + 1,
+				temp_label.GetBuffer(MAX_PATH), MAX_PATH);
+			temp_label.ReleaseBuffer();
+			temp_label.Trim();
+			if (temp_label.CompareNoCase(cs_temp_point) == 0)
+			{
+				*temp_panel = i;
+				*temp_point_type = BAC_VAR;
+				*temp_number = j + 1;
+				find_lable = true;
+				break;
+			}
+		}
+		Sleep(1);
+	}
+	return find_lable;
+}
 
 LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 {
@@ -220,8 +296,47 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	tempcs = ispoint_ex(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,sub_panel,Station_NUM,&k);
 	if(tempcs == NULL)
 	{
-		MessageBox(_T("Invalid Label , Please input a label such as 'IN8' , 'Mainpanel-Subpanel-OUT9', 'Mainpanel:Subpanel:OUT9' ,'VAR100'.\r\nFor more information , please reference the user manual."));
-		return 0;
+		//寻找其他panel 对应的 label
+		bool find_lable = false;
+		find_lable = check_lable_type(temp_point, &temp_panel, &temp_point_type, &temp_number);
+#if 0
+		CString cs_temp_point;
+		MultiByteToWideChar(CP_ACP, 0, (char*)temp_point, (int)strlen((char*)temp_point) + 1,
+			cs_temp_point.GetBuffer(MAX_PATH), MAX_PATH);
+		cs_temp_point.ReleaseBuffer();
+		cs_temp_point.Trim();
+		bool find_lable = false;
+		for (int i = 0; i < 254; i++)
+		{
+			if(find_lable)
+				break;
+			for (int j = 0; j < 64; j++)
+			{
+				if (strlen((char *)g_Input_data[i].at(j).label) == 0)
+					continue;
+				CString temp_label;
+				MultiByteToWideChar(CP_ACP, 0, (char*)g_Input_data[i].at(j).label, (int)strlen((char*)g_Input_data[i].at(j).label) + 1,
+					temp_label.GetBuffer(MAX_PATH), MAX_PATH);
+				temp_label.ReleaseBuffer();
+				temp_label.Trim();
+				if (temp_label.CompareNoCase(cs_temp_point) == 0)
+				{
+					temp_panel = i ;
+					temp_point_type = BAC_IN;
+					temp_number = j + 1;
+					find_lable = true;
+					break;
+				}
+
+			}
+			Sleep(1);
+		}
+#endif
+		if (!find_lable)
+		{
+			MessageBox(_T("Invalid Label , Please input a label such as 'IN8' , 'Mainpanel-Subpanel-OUT9', 'Mainpanel:Subpanel:OUT9' ,'VAR100'.\r\nFor more information , please reference the user manual."));
+			return 0;
+		}
 	}
 
 
@@ -1518,14 +1633,25 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
             else
             {
                 temp1.deviceid = 0; //非本地的如果在远程的点中 找不大 就先  标记为0.
-                for (int i = 0; i < m_remote_screen_data.size(); i++)
-                {
-                    if ((bac_label.nMain_Panel == m_remote_screen_data.at(i).npanelnum))
-                    {
-                        temp1.deviceid = m_remote_screen_data.at(i).ndeviceid;
-                        break;
-                    }
-                }
+
+				for (int i = 0; i < 255; i++)
+				{
+					if ((g_bac_panel[i].panel_number == bac_label.nMain_Panel) &&
+						(g_bac_panel[i].object_instance != 0))
+					{
+						temp1.deviceid = g_bac_panel[i].object_instance;
+						break;
+					}
+				}
+
+                //for (int i = 0; i < m_remote_screen_data.size(); i++)
+                //{
+                //    if ((bac_label.nMain_Panel == m_remote_screen_data.at(i).npanelnum))
+                //    {
+                //        temp1.deviceid = m_remote_screen_data.at(i).ndeviceid;
+                //        break;
+                //    }
+                //}
                 
                 
             }

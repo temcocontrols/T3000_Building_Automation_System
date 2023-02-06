@@ -16924,6 +16924,168 @@ int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npane
     return 1;
 }
 
+typedef struct
+{
+    int panel_id;
+    int object_type; //IN   OUT  VAR
+    CString range_type;
+    struct AllRanges
+    {
+        struct
+        {
+            CString range_name;
+            int range_min;
+            int range_max;
+            float fvalue;
+            CString unites;
+        }analog_range;
+
+        struct
+        {
+            CString range_name;
+            CString range_name0;
+            CString range_name1;
+            CString range_value;
+        }digital_range;
+
+        struct
+        {
+            CString range_name;
+            CString MSV[8];
+            CString range_value;
+        }multiple_range;
+
+    }Ranges;
+}panel_range_str;
+panel_range_str WebView_Input_range[BAC_INPUT_ITEM_COUNT];
+//typedef struct
+//{
+//    int panel_id;
+//    int object_type; //IN   OUT  VAR
+//    char range_type[20];
+//    union MyUnion
+//    {
+//        struct
+//        {
+//            char range_name[40];
+//            int range_min;
+//            int range_max;
+//            float fvalue;
+//        }analog_range;
+//
+//        struct
+//        {
+//            char range_name[40];
+//            char range_name0[30];
+//            char range_name1[30];
+//            char range_value[30];
+//        }digital_range;
+//
+//        struct
+//        {
+//            char range_name[40];
+//            char MSV[8][STR_MSV_NAME_LENGTH];
+//            char range_value[30];
+//        }multiple_range;
+//
+//    }Ranges;
+//}panel_range_str;
+
+
+
+int LoadPanelRange(unsigned char npanel)  //分离出每个panel的  range 标签
+{
+    if ((npanel < 0) || npanel >= 255)
+        return -1;
+    for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++)
+    {
+        if (g_Input_data[npanel].at(i).digital_analog == BAC_UNITS_DIGITAL)
+        {
+            if(g_Input_data[npanel].at(i).range)
+            WebView_Input_range[i].object_type = BAC_IN;
+            WebView_Input_range[i].panel_id = npanel;
+            WebView_Input_range[i].range_type = _T("Digital");
+            
+            if (g_Input_data[npanel].at(i).range == 0)
+            {
+                WebView_Input_range[i].Ranges.digital_range.range_name = Digital_Units_Array[0];
+                WebView_Input_range[i].Ranges.digital_range.range_name0 = _T("");
+                WebView_Input_range[i].Ranges.digital_range.range_name1 = _T("");
+                WebView_Input_range[i].Ranges.digital_range.range_value.Format(_T("%.3f"), g_Input_data[npanel].at(i).value / 1000.0);
+            }
+            else if (g_Input_data[npanel].at(i).range <= 22)
+            {
+                WebView_Input_range[i].Ranges.digital_range.range_name = Digital_Units_Array[g_Input_data[npanel].at(i).range];
+                CStringArray temparray;
+                SplitCStringA(temparray, WebView_Input_range[i].Ranges.digital_range.range_name, _T("/"));
+                if ((temparray.GetSize() == 2))
+                {
+                    WebView_Input_range[i].Ranges.digital_range.range_name0 = temparray.GetAt(0);
+                    WebView_Input_range[i].Ranges.digital_range.range_name1 = temparray.GetAt(1);
+                    if (g_Input_data[npanel].at(i).control == 0)
+                        WebView_Input_range[i].Ranges.digital_range.range_value = temparray.GetAt(0);
+                    else
+                        WebView_Input_range[i].Ranges.digital_range.range_value = temparray.GetAt(1);
+                }
+            }
+            else if ((g_Input_data[npanel].at(i).range >= 23) && (g_Input_data[npanel].at(i).range <= 30))
+            {
+                //如果是选中panel 就可以直接使用 Custom_Digital_Range[i] = cus_digital_off[i] + _T("/") + cus_digital_on[i];
+                //否则需要从panel中读取;
+                if (npanel == bac_gloab_panel)
+                {
+                    WebView_Input_range[i].Ranges.digital_range.range_name = Custom_Digital_Range[g_Input_data[npanel].at(i).range - 23];
+                    CStringArray temparray;
+                    SplitCStringA(temparray, WebView_Input_range[i].Ranges.digital_range.range_name, _T("/"));
+                    if ((temparray.GetSize() == 2))
+                    {
+                        WebView_Input_range[i].Ranges.digital_range.range_name0 = temparray.GetAt(0);
+                        WebView_Input_range[i].Ranges.digital_range.range_name1 = temparray.GetAt(1);
+                        if (g_Input_data[npanel].at(i).control == 0)
+                            WebView_Input_range[i].Ranges.digital_range.range_value = temparray.GetAt(0);
+                        else
+                            WebView_Input_range[i].Ranges.digital_range.range_value = temparray.GetAt(1);
+                    }
+                }
+                else
+                {
+                    //int ret_cusunits = GetPrivateData_Blocking(g_bac_instance, READUNIT_T3000, 0, BAC_CUSTOMER_UNITS_COUNT - 1, sizeof(Str_Units_element), 3);
+                    //if (ret_cusunits < 0)
+                    //{
+
+                    //}
+                }
+            }
+
+
+        }
+		else if (g_Input_data[npanel].at(i).digital_analog == BAC_UNITS_ANALOG)
+		{
+			WebView_Input_range[i].object_type = BAC_OUT;
+			WebView_Input_range[i].panel_id = npanel;
+			WebView_Input_range[i].range_type = _T("Analog");
+
+			if ((g_Input_data[npanel].at(i).range >= 20) && (g_Input_data[npanel].at(i).range <= 24))
+			{
+                if (npanel == bac_gloab_panel)
+                {
+                    WebView_Input_range[i].Ranges.analog_range.range_name = Analog_Customer_Units[g_Input_data[npanel].at(i).range - 20];
+                    WebView_Input_range[i].Ranges.analog_range.range_max = 9999; //待定
+                    WebView_Input_range[i].Ranges.analog_range.range_min = 0; //待定
+                    //WebView_Input_range[i].Ranges.analog_range.unites = m_analog_custmer_range.at(g_Input_data[npanel].at(i).range - 20).table_name;
+                }
+			}
+			else if (g_Input_data[npanel].at(i).range < (sizeof(Input_Analog_Units_Array) / sizeof(Input_Analog_Units_Array[0])))
+			{
+				WebView_Input_range[i].Ranges.analog_range.range_name = Input_Analog_Units_Array[g_Input_data[npanel].at(i).range];
+				WebView_Input_range[i].Ranges.analog_range.unites = Input_List_Analog_Units[g_Input_data[npanel].at(i).range];
+			}
+
+		}
+        
+    }
+
+}
 
 int LoadOnlinePanelData(unsigned char npanel)  //从缓存prog文件中加载所有在线设备的数据;
 {
@@ -16935,6 +17097,7 @@ int LoadOnlinePanelData(unsigned char npanel)  //从缓存prog文件中加载所
             if (g_bacnet_panel_info.at(i).panel_number != npanel)
                 continue;
         }
+
         CString temp_prog_file;
         int nseiral = 0;
         CString prog_file_name;
@@ -16947,17 +17110,21 @@ int LoadOnlinePanelData(unsigned char npanel)  //从缓存prog文件中加载所
         if (temp_find.FindFile(temp_prog_file))
         {
             nret = LoadAllOnlinePanelBacnetBinaryFile(temp_prog_file, g_bacnet_panel_info.at(i).panel_number);
-            if (nret > 0)
-                return nret;
-            else
-                return -2;
+            if (nret <= 0)
+                nret = -2;
+            if (npanel != 0)
+                return 1;
         }
         else
         {
             if (npanel != 0)
-                return -1;
+                nret = -1;
             else
                 continue;
+        }
+        if (npanel == 0)
+        {
+            continue;
         }
     }
     return 0;  // return 0 means device is offline;

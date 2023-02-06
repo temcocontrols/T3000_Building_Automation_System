@@ -48,6 +48,14 @@ public:
 	afx_msg void OnEnKillfocusEditAirflowRadius();
 	afx_msg void OnBnClickedRadioUnitM();
 	afx_msg void OnBnClickedRadioUnitIn();
+	afx_msg void OnBnClickedRadioDefault();
+	afx_msg void OnBnClickedRadioUserDefined();
+	afx_msg void OnEnKillfocusEditVolatgeMin();
+	afx_msg void OnEnKillfocusEditVolatgeMax();
+	afx_msg void OnEnKillfocusEditCurrentMin();
+	afx_msg void OnEnKillfocusEditCurrentMax();
+	afx_msg void OnEnKillfocusEditPascalMin();
+	afx_msg void OnEnKillfocusEditPascalMax();
 };
 static DWORD WINAPI Update_Airflow_Thread(LPVOID lPvoid);
 
@@ -61,6 +69,15 @@ static DWORD WINAPI Update_Airflow_Thread(LPVOID lPvoid);
 #define MODBUS_FLOW_HI					61
 #define MODBUS_FLOW_LO					62
 #define MODBUS_FLOW_RADIUS				63
+#define MODBUS_DEF_CUSTOMER				64
+#define MODBUS_CURRENT_MIN				65
+#define MODBUS_CURRENT_MAX				66
+#define MODBUS_VOLTAGE_MIN				67
+#define MODBUS_VOLTAGE_MAX				68
+#define MODBUS_PASCAL_MIN				69
+#define MODBUS_PASCAL_MAX				70
+#define MODBUS_OUTPUT_CUR				71
+#define MODBUS_OUTPUT_VOL				72
 #define MODBUS_FLOW_SHAPE				92
 #define MODBUS_FLOW_SHAPE_UNIT          93
 

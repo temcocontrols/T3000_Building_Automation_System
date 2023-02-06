@@ -94,7 +94,7 @@ DWORD WINAPI  BacnetScreen::ReadScreenThreadfun(LPVOID lpVoid)
 	//Write_Config_Info
 	BacnetScreen *pParent = (BacnetScreen *)lpVoid;
 
-
+	LoadOnlinePanelData();
 	if(pParent->read_screen_label())
 	{
 		bac_read_which_list = BAC_READ_GRAPHIC_LABEL_INFO;

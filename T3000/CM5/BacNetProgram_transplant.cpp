@@ -14,7 +14,6 @@
 #include "ROUTER.H"
 
 #include "..\global_define.h"
-
 #pragma warning(disable:4309)
 #pragma warning(disable:4305)
 #pragma warning(disable:4244)
@@ -4319,6 +4318,7 @@ char *islabel(char *token,int *num_point,byte *var_type,byte *point_type, int *n
 			#endif
 
 		}
+
 		return(p);
 }
 

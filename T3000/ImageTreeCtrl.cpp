@@ -2069,7 +2069,7 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 				subMenu.AppendMenu(MF_STRING, 100 + i, m_online_serial.at(i).online_name);
 			}
 
-			VERIFY(menu.AppendMenu(MF_POPUP, (UINT)subMenu.m_hMenu, _T("Sync to Controller")));
+			//VERIFY(menu.AppendMenu(MF_POPUP, (UINT)subMenu.m_hMenu, _T("Sync to Controller")));
 		}
 	}
 

@@ -9,6 +9,13 @@ MSFLXGRD.MSM
 COMCAT.MSM
 拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
 
+2022 12 05
+1.  Add data from other panels. (For Webview)
+2.  Fixed the Modbus ID cannot be modified on the interface in Tstat7.
+3.  Added virtual devices T3-OEM, Fan_Module, etc
+4.  Fixed an issue where virtual devices could not operate schedule.
+5. Fixed an issue where virtual devices are treated as online devices when they are saved to prog file.
+6.  Adjusting the range UI
 
 2021 06 01
 1.Optimized ISP tool

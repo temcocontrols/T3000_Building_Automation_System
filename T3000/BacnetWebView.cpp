@@ -49,7 +49,8 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_INITIAL_DATA = 1,
 	SAVE_GRAPHIC_DATA = 2,
 	UPDATE_ENTRY = 3,
-	GET_PANELS = 4
+	GET_PANELS = 4,
+	GET_PANEL_RANGE_INFO = 5
 };
 
 enum WEBVIEW_ENTRY_TYPE
@@ -660,6 +661,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	{
 		tempjson["action"] = "GET_PANEL_DATA_RES";
 		int npanel_id = json.get("panelId", Json::nullValue).asInt(); // Ignored for now because we have only local panel data
+		npanel_id = bac_gloab_panel;
 		int nret = LoadOnlinePanelData(npanel_id);
 		if (nret < 0)
 		{
@@ -687,6 +689,13 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			CString temp_message;
 			temp_message.Format(_T("Panel %d is offline!"), npanel_id);
 			MessageBox(m_mainWindow, temp_message ,L"Warning", MB_OK);
+			break;
+		}
+		else if (npanel_id == 0)
+		{
+			CString temp_message;
+			temp_message.Format(_T("Panel id can't be  0 !"), npanel_id);
+			MessageBox(m_mainWindow, temp_message, L"Warning", MB_OK);
 			break;
 		}
 
@@ -1081,6 +1090,15 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 		m_webView->PostWebMessageAsJson(temp_cs);
+	}
+		break;
+	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_RANGE_INFO:
+	{
+		tempjson["action"] = "GET_PANEL_RANGE_INFO";
+		int npanel_id = json.get("panelId", Json::nullValue).asInt(); // Ignored for now because we have only local panel data
+		npanel_id = bac_gloab_panel;
+		int nret = LoadOnlinePanelData(npanel_id);
+		//int nret = LoadPanelRange(npanel_id);
 	}
 		break;
 	}
