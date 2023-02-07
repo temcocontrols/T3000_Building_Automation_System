@@ -3281,6 +3281,8 @@
 #define IDC_STATIC_SUBNET_MASK          60046
 #define IDC_STATIC_IP_PORT              60047
 
+#define IDC_DASHBOARD_WEBVIEW_BUTTON    70001
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

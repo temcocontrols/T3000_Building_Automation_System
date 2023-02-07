@@ -52,6 +52,7 @@ BEGIN_MESSAGE_MAP(BacnetScreen, CDialogEx)
 	ON_MESSAGE(WM_SCREENEDIT_CLOSE,&BacnetScreen::Screeenedit_close_handle)//快捷键消息映射手动加入
 	ON_BN_CLICKED(IDC_BUTTON_GRAPHIC_INSERT, &BacnetScreen::OnBnClickedInsert)
 	ON_BN_CLICKED(IDC_WEBVIEW_BUTTON, &BacnetScreen::OnBnClickedWebViewShow)
+	ON_BN_CLICKED(IDC_DASHBOARD_WEBVIEW_BUTTON, &BacnetScreen::OnBnClickedDashboardWebViewShow)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_SCREEN, &BacnetScreen::OnNMDblclkListScreen)
@@ -1311,6 +1312,7 @@ void BacnetScreen::OnSize(UINT nType, int cx, int cy)
 
 		GetDlgItem(IDC_BUTTON_GRAPHIC_INSERT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
 		GetDlgItem(IDC_WEBVIEW_BUTTON)->MoveWindow(rc.left + 160, rc.bottom - 60, 120, 50);
+		GetDlgItem(IDC_DASHBOARD_WEBVIEW_BUTTON)->MoveWindow(rc.left + 300, rc.bottom - 60, 180, 50);
 	}
 }
 
@@ -1475,6 +1477,71 @@ void BacnetScreen::OnBnClickedWebViewShow()
 		//webviewFolder = Resource_folder + _T("\\webview\\webview.html");
 		webviewFolder = _T("http://localhost:9103/");
 	
+		//webviewFolder = SOLUTION_DIR  _T("T3000\\webview\\webview.html");
+		//CString sFilePath = dlg.GetPathName();
+		wstring fullpath = webviewFolder;
+		auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath));
+		auto result = BacnetWebViewAppWindow::RunMessagePump();
+		delete webviewwindow;
+	}
+}
+
+void BacnetScreen::OnBnClickedDashboardWebViewShow()
+{
+	/*
+	CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
+	PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
+	temp_now_building_name.ReleaseBuffer();
+	CString temp_image_folder = temp_now_building_name + _T("\\image\\");
+	CString PicFileTips;
+	MultiByteToWideChar(CP_ACP, 0, (char*)m_screen_data.at(screen_list_line).picture_file,
+		(int)strlen((char*)m_screen_data.at(screen_list_line).picture_file) + 1,
+		PicFileTips.GetBuffer(MAX_PATH), MAX_PATH);
+	PicFileTips.ReleaseBuffer();
+	CString fullpath = temp_image_folder + PicFileTips;
+	*/
+	int nversion = check_webview_runtime();
+	if (nversion == 0)
+	{
+
+		int Answer;
+
+		Answer = AfxMessageBox(L"To use this feature properly,Please download the latest WebView RumTime.\r\n https://developer.microsoft.com/en-us/microsoft-edge/webview2/", MB_YESNO | MB_ICONWARNING);
+
+
+		if (Answer == IDYES)
+		{
+			ShellExecute(this->m_hWnd, _T("open"), _T("https://developer.microsoft.com/en-us/microsoft-edge/webview2/"), NULL, NULL, SW_SHOWNORMAL);
+			ShellExecute(this->m_hWnd, _T("open"), _T("https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/f1ef4889-266b-41d8-9725-76f5b1e37f7f/Microsoft.WebView2.FixedVersionRuntime.100.0.1185.50.x64.cab"), NULL, NULL, SW_SHOWNORMAL);
+			return;
+		}
+
+	}
+	if (h_create_webview_server_thread == NULL)
+	{
+		h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
+	}
+	Sleep(1000);
+	const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
+
+	//CFileDialog dlg(TRUE, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+	//	szFilter, this->GetTopWindow());
+	//if (dlg.DoModal() == IDOK)
+	{
+		//CString ApplicationFolder;
+		CString webviewFolder;
+		/*GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+		ApplicationFolder.ReleaseBuffer();*/
+		CString Resource_folder;
+		CString ApplicationFolder;
+		GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+		ApplicationFolder.ReleaseBuffer();
+		Resource_folder = ApplicationFolder + _T("\\ResourceFile");
+		//webviewFolder = Resource_folder + _T("\\webview\\webview.html");
+		webviewFolder = _T("http://localhost:9103/#/dashboard");
+
 		//webviewFolder = SOLUTION_DIR  _T("T3000\\webview\\webview.html");
 		//CString sFilePath = dlg.GetPathName();
 		wstring fullpath = webviewFolder;
