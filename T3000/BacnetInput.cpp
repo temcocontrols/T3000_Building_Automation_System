@@ -723,6 +723,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
     else if ((bacnet_device_type == STM32_CO2_NET) || 
 		     (bacnet_device_type == STM32_CO2_RS485) ||
 		     (bacnet_device_type == STM32_HUM_NET) || 
+			 (bacnet_device_type == STM32_HUM_RS485) ||
 		     (bacnet_device_type == STM32_PRESSURE_NET))
     {
         INPUT_LIMITE_ITEM_COUNT = 3;
@@ -1877,6 +1878,8 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 
 	switch(nIDEvent)
 	{
+		if (hwait_write_thread != NULL) //     在写入prog的时候，不要刷新value数据  
+			break;
 	case INPUT_REFRESH_DATA_TIMER:
 		{
 			if(offline_mode)
@@ -1940,7 +1943,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 			{
 				break;
 			}
-			Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0); //只刷新Value
+				Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0); //只刷新Value
 		}
 		break;
 	case 5:

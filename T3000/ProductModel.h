@@ -90,7 +90,7 @@
 #define STM32_HUM_NET                 212      //HUMNET
 #define STM32_HUM_RS485               213      //HUMRS485
 #define STM32_PRESSURE_NET            214      //PSNET
-#define STM32_PRESSURE_RS3485         215      //PSRS485
+#define STM32_PRESSURE_RS485         215      //PSRS485
 #define STM32_CO2_NODE                216      //CO2NODE
 
 

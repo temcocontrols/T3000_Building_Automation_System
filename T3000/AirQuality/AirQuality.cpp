@@ -519,7 +519,7 @@ void CAirQuality::ShowAirqualityDialog()
 	strTemp.Format(_T("%d"), SN);
 	m_edit_sn.SetWindowTextW(strTemp);
 	strTemp = GetProductName(product_register_value[7]);
-	if (product_register_value[7] == STM32_PRESSURE_NET || product_register_value[7] == STM32_PRESSURE_RS3485)
+	if (product_register_value[7] == STM32_PRESSURE_NET || product_register_value[7] == STM32_PRESSURE_RS485)
 	{
 		if (product_register_value[700] == 0)
 		{

@@ -1171,7 +1171,7 @@ afx_msg LRESULT CISPDlg::OnFlashBoot_Update_boot(WPARAM wParam, LPARAM lParam)
             g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_T10.hex");
         else if (npid == PM_TSTAT8)
             g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_T8.hex");
-        else if(((npid >= STM32_CO2_NET) && (npid <= STM32_PRESSURE_RS3485)) || (npid == STM32_PM25))
+        else if(((npid >= STM32_CO2_NET) && (npid <= STM32_PRESSURE_RS485)) || (npid == STM32_PM25))
             g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_CO2.hex");
         else if (npid == PM_TSTAT9)
             return 1;
@@ -3647,7 +3647,10 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         }
 
         int n_mac_ret = 0;
-        if ((temp_read_reg[7] == PM_MINIPANEL_ARM) || temp_read_reg[7] == PM_MINIPANEL || temp_read_reg[7] == PM_CM5)
+        if ((temp_read_reg[7] == PM_MINIPANEL_ARM) || 
+            temp_read_reg[7] == PM_MINIPANEL || 
+            temp_read_reg[7] == PM_ESP32_T3_SERIES ||
+            temp_read_reg[7] == PM_CM5)
         {
             n_mac_ret = write_multi_Short(temp_read_reg[6], write_value,100, 6);
         }

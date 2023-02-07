@@ -85,6 +85,14 @@ SOCKADDR_IN h_siBind;
 
 int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
 {
+    WSADATA wsaData;
+    WORD sockVersion = MAKEWORD(2, 2);
+
+    if (::WSAStartup(sockVersion, &wsaData) != 0)
+    {
+        //AfxMessageBox(_T("Init Socket failed!"));
+        return FALSE;
+    }
     Inial_Product_map();
     m_refresh_net_device_data.clear();
 	GetIPMaskGetWayForScan();

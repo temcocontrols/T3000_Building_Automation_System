@@ -378,6 +378,7 @@
 #define IDC_EDIT_PARA_EXT_TIME_REMAINING 1027
 #define IDC_EDIT_MIN_VOLT_VALUE         1027
 #define IDC_EDIT_BN_OUTPUT_COUNT        1027
+#define IDC_EDIT_VOLATGE_MAX            1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
@@ -391,6 +392,7 @@
 #define IDC_EDIT_PARA_EXT_MIN_PWM       1028
 #define IDC_EDIT_MIN_VALUE_VALUE        1028
 #define IDC_EDIT_BN_VARIABLE_COUNT      1028
+#define IDC_EDIT_CURRENT_MIN            1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
@@ -403,6 +405,7 @@
 #define IDC_EDIT_MAX_VOLT_VALUE3        1029
 #define IDC_BUTTON_ABC_HELP             1029
 #define IDC_EDIT_BN_PROGRAM_COUNT       1029
+#define IDC_EDIT_CURRENT_MAX            1029
 #define IDC_OUTPUT4_DELAY_OFF_EDIT      1030
 #define IDC_HUM1                        1030
 #define IDC_EDIT43                      1030
@@ -414,6 +417,7 @@
 #define IDC_EDIT_MAX_VALUE_VALUE        1030
 #define IDC_EDIT_CO2_RE_CALIBRATION     1030
 #define IDC_EDIT_BN_SCHEDULE_COUNT      1030
+#define IDC_EDIT_PASCAL_MIN             1030
 #define IDC_OUTPUTBTN                   1031
 #define IDC_NUM_SENSOR                  1031
 #define IDC_EDIT44                      1031
@@ -423,6 +427,7 @@
 #define IDC_EDIT_VIRTUAL_FLOOR          1031
 #define IDC_EDIT_HOLIDAY_COUNT          1031
 #define IDC_EDIT_BN_HOLIDAY_COUNT       1031
+#define IDC_EDIT_PASCAL_MAX             1031
 #define IDC_PARAMETERBTN                1032
 #define IDC_EDIT45                      1032
 #define IDC_DTS4                        1032
@@ -2705,7 +2710,12 @@
 #define IDC_EDIT_HUM_OFFSET             2664
 #define IDC_STATIC_TRANSDUCER_TEMP_UNITS2 2665
 #define IDC_COMBO_TEMP_RANGE            2666
-#define IDC_BUTTON_WEBVIEW_SERVER       2667
+#define IDC_RADIO_DEFAULT               2668
+#define IDC_RADIO_USER_DEFINED          2669
+#define IDC_EDIT_VOLATGE_MIN            2670
+#define IDC_STATIC_OUT_CURRENT          2671
+#define IDC_STATIC_OUT_CURRENT2         2672
+#define IDC_STATIC_OUT_VOLTAGE          2672
 #define IDC_RADIO_SCROLL_ENABLE         2694
 #define IDC_RADIO_SCROLLBAR_DISABLE     2695
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
@@ -3279,7 +3289,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        796
 #define _APS_NEXT_COMMAND_VALUE         34080
-#define _APS_NEXT_CONTROL_VALUE         2668
+#define _APS_NEXT_CONTROL_VALUE         2672
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

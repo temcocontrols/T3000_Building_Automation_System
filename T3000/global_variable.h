@@ -38,6 +38,7 @@ bool g_HumChamberThread=FALSE;
 
 unsigned short cm5_register_value[512]; //CM5
 unsigned short m_buffer[512];//CM5
+HANDLE hwait_write_thread = NULL;
 bool no_mouse_keyboard_event_enable_refresh = true;
 bool g_fresh_T3000_background = false;
 CString CurrentT3000Version ;
@@ -1942,35 +1943,45 @@ HWND analog_cus_range_dlg=NULL;
 HWND	  m_statusbar_hwnd = NULL;
 HWND      m_t3000_log_window = NULL;
 
+
+Str_Setting_Info g_Device_Basic_Setting[256] = {0};
 Str_in_point s_Input_data;
 Str_out_point s_Output_data;
 Str_variable_point s_Variable_data;
 vector <_panel_info> g_bacnet_panel_info;  //全局的 object instance 与 panel number 对应的容器
-vector <Str_out_point> m_Output_data;
-vector <Str_in_point>  m_Input_data;
-vector <Str_program_point>  m_Program_data;
-vector <Str_variable_point>  m_Variable_data;
-vector <Str_weekly_routine_point> m_Weekly_data;
-vector <Str_annual_routine_point> m_Annual_data;
-vector <Str_schedual_time_point> m_Schedual_Time_data;
-vector <Str_schedual_time_flag> m_Schedual_time_flag;
-vector <Str_controller_point> m_controller_data;
-vector <Control_group_point> m_screen_data;
-vector <Str_tstat_schedule> m_tatat_schedule_data;
-vector <Str_monitor_point> m_monitor_data;
+vector <Str_out_point> m_Output_data;					vector < vector<Str_out_point> >			  g_Output_data; //全局所有panel output 的集合体;
+vector <Str_in_point>  m_Input_data;					vector < vector<Str_in_point> >				  g_Input_data; //全局所有panel input 的集合体;
+vector <Str_program_point>  m_Program_data;				vector < vector<Str_program_point> >		  g_Program_data;
+vector <Str_variable_point>  m_Variable_data;			vector < vector<Str_variable_point> >		  g_Variable_data;
+vector <Str_weekly_routine_point> m_Weekly_data;		vector < vector<Str_weekly_routine_point> >   g_Weekly_data;
+vector <Str_annual_routine_point> m_Annual_data;		vector < vector<Str_annual_routine_point> >   g_Annual_data;
+vector <Str_schedual_time_point> m_Schedual_Time_data;  vector < vector<Str_schedual_time_point> >    g_Schedual_Time_data;
+vector <Str_schedual_time_flag> m_Schedual_time_flag;	vector < vector<Str_schedual_time_flag> >     g_Schedual_time_flag;
+vector <Str_controller_point> m_controller_data;		vector < vector<Str_controller_point> >       g_controller_data;
+vector <Control_group_point> m_screen_data;				vector < vector<Control_group_point> >        g_screen_data;
+vector <Str_tstat_schedule> m_tatat_schedule_data;      vector < vector<Str_tstat_schedule> >         g_tatat_schedule_data;
+vector <Str_monitor_point> m_monitor_data;			    vector < vector<Str_monitor_point> >          g_monitor_data;
+vector <Str_TstatInfo_point> m_Tstat_data;				vector < vector<Str_TstatInfo_point> >        g_Tstat_data;
+vector <Str_userlogin_point> m_user_login_data;			vector < vector<Str_userlogin_point> >        g_user_login_data;
+vector <Alarm_point> m_alarmlog_data;					vector < vector<Alarm_point> >				  g_alarmlog_data;
+vector <Str_label_point> m_graphic_label_data;			vector < vector<Str_label_point> >			  g_graphic_label_data;//图片里面的Label的信息要存在设备里面;
+vector <Str_Units_element> m_customer_unit_data;        vector < vector<Str_Units_element> >		  g_customer_unit_data;
+vector <Str_table_point> m_analog_custmer_range;		vector < vector<Str_table_point> >		      g_analog_custmer_range;
+vector <Str_variable_uint_point> m_variable_analog_unite; vector < vector<Str_variable_uint_point> >  g_variable_analog_unite;
+vector <Str_Extio_point> m_extio_config_data;			vector < vector<Str_Extio_point> >			  g_extio_config_data;
+vector <Str_MSV> m_msv_data;                            vector < vector<Str_MSV> >					  g_msv_data;
 vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
-vector <Alarm_point> m_alarmlog_data;
-vector <Str_TstatInfo_point> m_Tstat_data;
+
 Str_Remote_TstDB m_remote_device_db;
-vector <Str_Units_element> m_customer_unit_data;
-vector <Str_userlogin_point> m_user_login_data;
+
+
 vector <Client_Info> m_tcp_connect_info;
-vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
+
 vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
-vector <Str_table_point> m_analog_custmer_range;
-vector <Str_variable_uint_point> m_variable_analog_unite;
-vector <Str_Extio_point> m_extio_config_data;
+
+
+
 vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
 
 vector <int>  m_Input_data_instance; // for input bacnet-thirdParty devices instance_is's
@@ -1979,7 +1990,7 @@ vector <int>  m_Variable_data_instance;
 vector <int>  m_Weekly_data_instance; 
 vector <int>  m_Annual_data_instance;
 
-vector <Str_MSV> m_msv_data;
+
 
 Time_block_mini Device_time;
 Str_Setting_Info s_Basic_Setting;

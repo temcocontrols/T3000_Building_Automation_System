@@ -1101,7 +1101,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 //void CImageTreeCtrl::Inial_ProductName_map()
 //{
 //    g_panelname_map.insert(map<int,int>::value_type(STM32_PRESSURE_NET,901));
-//    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_RS3485, 901));
+//    g_panelname_map.insert(map<int, int>::value_type(STM32_PRESSURE_RS485, 901));
 //
 //}
 //
@@ -2069,7 +2069,7 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 				subMenu.AppendMenu(MF_STRING, 100 + i, m_online_serial.at(i).online_name);
 			}
 
-			VERIFY(menu.AppendMenu(MF_POPUP, (UINT)subMenu.m_hMenu, _T("Sync to Controller")));
+			//VERIFY(menu.AppendMenu(MF_POPUP, (UINT)subMenu.m_hMenu, _T("Sync to Controller")));
 		}
 	}
 

@@ -526,7 +526,7 @@ CString GetFirmwareUpdateName(int ModelID) //TBD: Change this to an array
     case STM32_PRESSURE_NET:
         strProductName = "PSNET";
         break;
-    case STM32_PRESSURE_RS3485:
+    case STM32_PRESSURE_RS485:
         strProductName = "PSRS485";
         break;
     case STM32_CO2_NODE:
@@ -736,7 +736,7 @@ CString GetProductName(int ModelID) //TBD: Change this to an array
 	case STM32_PRESSURE_NET:
 		strProductName="PSNET";
 		break;
-	case STM32_PRESSURE_RS3485:
+	case STM32_PRESSURE_RS485:
 		strProductName="PSRS485";
 		break;
 	case STM32_CO2_NODE:
@@ -1044,7 +1044,7 @@ int check_bootloader_and_frimware(int npid ,int comport , unsigned short reg_11 
 	int c2_update_boot = false;
 	int device_version = 0;
 	int Ret_Result = 1;
-	if ((((npid >= STM32_CO2_NET) && (npid <= STM32_PRESSURE_RS3485)) ||
+	if ((((npid >= STM32_CO2_NET) && (npid <= STM32_PRESSURE_RS485)) ||
 		(npid == STM32_PM25)) &&
 		app_already_version >= 59) //不管读到没读到 boot version 都不用 再次更新boot
 	{
@@ -1066,7 +1066,7 @@ int check_bootloader_and_frimware(int npid ,int comport , unsigned short reg_11 
 			(Device_infor[7] == STM32_HUM_NET) ||
 			(Device_infor[7] == STM32_HUM_RS485) ||
 			(Device_infor[7] == STM32_PRESSURE_NET) ||
-			(Device_infor[7] == STM32_PRESSURE_RS3485))
+			(Device_infor[7] == STM32_PRESSURE_RS485))
         {
 
 
@@ -1107,7 +1107,7 @@ int check_bootloader_and_frimware(int npid ,int comport , unsigned short reg_11 
                     c2_update_boot = true;
                 }
 				else if ((((Device_infor[7] >= STM32_CO2_NET) && 
-					      (Device_infor[7] <= STM32_PRESSURE_RS3485)) || (Device_infor[7] == STM32_PM25))
+					      (Device_infor[7] <= STM32_PRESSURE_RS485)) || (Device_infor[7] == STM32_PM25))
 					&& (temp_bootloader_version < 56))
 				{
 					c2_update_boot = true;
