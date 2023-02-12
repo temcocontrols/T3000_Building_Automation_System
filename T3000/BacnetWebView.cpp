@@ -1086,16 +1086,14 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	}
 	case WEBVIEW_MESSAGE_TYPE::GET_PANELS_LIST:
 	{
-		int p_i = 0;
 		tempjson["action"] = "GET_PANELS_LIST_RES";
 		for (int i = 0; i < g_bacnet_panel_info.size(); i++) 
 		{
-			tempjson["data"][p_i]["panel_number"] = g_bacnet_panel_info.at(i).panel_number;
-			tempjson["data"][p_i]["object_instance"] = g_bacnet_panel_info.at(i).object_instance;
-			tempjson["data"][p_i]["serial_number"] = g_bacnet_panel_info.at(i).nseiral_number;
-			tempjson["data"][p_i]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
-			tempjson["data"][p_i]["pid"] = g_bacnet_panel_info.at(i).npid; 
-			p_i++;
+			tempjson["data"][i]["panel_number"] = g_bacnet_panel_info.at(i).panel_number;
+			tempjson["data"][i]["object_instance"] = g_bacnet_panel_info.at(i).object_instance;
+			tempjson["data"][i]["serial_number"] = g_bacnet_panel_info.at(i).nseiral_number;
+			tempjson["data"][i]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
+			tempjson["data"][i]["pid"] = g_bacnet_panel_info.at(i).npid; 
 		}
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
