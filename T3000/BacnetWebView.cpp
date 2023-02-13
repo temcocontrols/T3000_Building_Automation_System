@@ -1078,7 +1078,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		m_webView->PostWebMessageAsJson(temp_cs);
 
 	}
-	case WEBVIEW_MESSAGE_TYPE::GET_PANELS:
+	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_IDS:
 	{
 		int p_i = 0;
 		for (int i = 0; i < g_bacnet_panel_info.size(); i++) 
@@ -1095,15 +1095,15 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		m_webView->PostWebMessageAsJson(temp_cs);
 	}
 		break;
-	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_RANGE_INFO:
-	{
-		tempjson["action"] = "GET_PANEL_RANGE_INFO";
-		int npanel_id = json.get("panelId", Json::nullValue).asInt(); // Ignored for now because we have only local panel data
-		npanel_id = bac_gloab_panel;
-		int nret = LoadOnlinePanelData(npanel_id);
-		//int nret = LoadPanelRange(npanel_id);
-	}
-		break;
+	//case WEBVIEW_MESSAGE_TYPE::GET_PANEL_RANGE_INFO:
+	//{
+	//	tempjson["action"] = "GET_PANEL_RANGE_INFO";
+	//	int npanel_id = json.get("panelId", Json::nullValue).asInt(); // Ignored for now because we have only local panel data
+	//	npanel_id = bac_gloab_panel;
+	//	int nret = LoadOnlinePanelData(npanel_id);
+	//	//int nret = LoadPanelRange(npanel_id);
+	//}
+	//	break;
 	}
 }
 

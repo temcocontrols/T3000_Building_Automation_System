@@ -7870,6 +7870,7 @@ int	desexpr(void)
 							continue;
 	}
 	switch (*(code-1)) {
+		case POW:
 		case PLUS:
 		case MINUS:
 		case MUL:

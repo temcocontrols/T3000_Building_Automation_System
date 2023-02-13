@@ -3565,7 +3565,9 @@ void get_var_write_var(wifstream & inf,float tstat_version,CStdioFile *p_log_fil
 		if (wcsstr(buf,_T("//Input Name Config"))!=NULL)
 		 break;
 
-
+		g_progress_persent++;
+		if (g_progress_persent >= 100)
+			g_progress_persent = 0;
 		get_write_var_line(buf,tstat_version,p_log_file,p_log_file_one_time);//get a line ,one register value,
 	}
 }
@@ -3690,7 +3692,9 @@ void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_lo
 		 if (wcsstr(buf,_T("//Output Name Config"))!=NULL)
 			break; 
         
-
+		 g_progress_persent++;
+		 if (g_progress_persent >= 100)
+			 g_progress_persent = 0;
 		get_write_var_line_input_output(buf,tstat_version,inputno,p_log_file,p_log_file_one_time);//get a line ,one register value,
 	  inputno++;
 	}
@@ -3783,7 +3787,9 @@ void write_TStatAllLabel(wifstream & inf,float tstat_version,CStdioFile *p_log_f
         {
             if (Write_Multi(g_tstat_id, p, 737 + 4 * LabelNumber, 8)>0)
             {
-
+				g_progress_persent++;
+				if (g_progress_persent >= 100)
+					g_progress_persent = 0;
             }
             else
             {
@@ -7998,18 +8004,21 @@ SqliteDBBuilding.closedb();
          if (!support_mul_write)
          {
              int n_ret[9] = { 0 };
-             n_ret[0] = Write_Multi_org_short(g_tstat_id, &product_register_value[813], 813, 824 - 813 + 1, 5);
-             n_ret[1] = Write_Multi_org_short(g_tstat_id, &product_register_value[825], 825, 836 - 825 + 1, 5);
-             n_ret[2] = Write_Multi_org_short(g_tstat_id, &product_register_value[837], 837, 848 - 837 + 1, 5);
-             n_ret[3] = Write_Multi_org_short(g_tstat_id, &product_register_value[849], 849, 859 - 849 + 1, 5);
-             n_ret[4] = Write_Multi_org_short(g_tstat_id, &product_register_value[860], 860, 872 - 860 + 1, 5);
-             n_ret[5] = Write_Multi_org_short(g_tstat_id, &product_register_value[873], 873, 884 - 873 + 1, 5);
-             n_ret[6] = Write_Multi_org_short(g_tstat_id, &product_register_value[885], 885, 896 - 885 + 1, 5);
-             n_ret[7] = Write_Multi_org_short(g_tstat_id, &product_register_value[897], 897, 908 - 897 + 1, 5);
+             n_ret[0] = Write_Multi_org_short(g_tstat_id, &product_register_value[813], 813, 824 - 813 + 1, 5);	g_progress_persent++;		 
+             n_ret[1] = Write_Multi_org_short(g_tstat_id, &product_register_value[825], 825, 836 - 825 + 1, 5);	g_progress_persent++;
+             n_ret[2] = Write_Multi_org_short(g_tstat_id, &product_register_value[837], 837, 848 - 837 + 1, 5);	g_progress_persent++;
+             n_ret[3] = Write_Multi_org_short(g_tstat_id, &product_register_value[849], 849, 859 - 849 + 1, 5);	g_progress_persent++;
+             n_ret[4] = Write_Multi_org_short(g_tstat_id, &product_register_value[860], 860, 872 - 860 + 1, 5);	g_progress_persent++;
+             n_ret[5] = Write_Multi_org_short(g_tstat_id, &product_register_value[873], 873, 884 - 873 + 1, 5);	g_progress_persent++;
+             n_ret[6] = Write_Multi_org_short(g_tstat_id, &product_register_value[885], 885, 896 - 885 + 1, 5);	g_progress_persent++;
+             n_ret[7] = Write_Multi_org_short(g_tstat_id, &product_register_value[897], 897, 908 - 897 + 1, 5);	g_progress_persent++;
 
              for (int i = 909; i <= 971; i++)
              {
                  write_one(g_tstat_id, i, product_register_value[i]);
+				 g_progress_persent++;
+				 if(g_progress_persent>100)
+					 g_progress_persent = 100;
              }
          }
 

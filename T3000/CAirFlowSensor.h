@@ -56,9 +56,11 @@ public:
 	afx_msg void OnEnKillfocusEditCurrentMax();
 	afx_msg void OnEnKillfocusEditPascalMin();
 	afx_msg void OnEnKillfocusEditPascalMax();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 static DWORD WINAPI Update_Airflow_Thread(LPVOID lPvoid);
 
+#define MODBUS_FIRMWARE_VERSION         4
 #define MODBUS_SWITCH_OUTPUT_MODE       17
 #define MODBUS_SWITCH_DP_RANGE          18
 #define MODBUS_DIFF_PRESSURE_VALUE      34
