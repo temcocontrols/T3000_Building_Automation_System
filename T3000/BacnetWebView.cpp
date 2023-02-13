@@ -50,9 +50,9 @@ enum WEBVIEW_MESSAGE_TYPE
 	SAVE_GRAPHIC_DATA = 2,
 	UPDATE_ENTRY = 3,
 	//GET_PANELS = 4,
-	//GET_PANEL_RANGE_INFO = 5
-	GET_PANEL_IDS = 4,
-	GET_PANEL_ENTRY_BY_ID = 5,
+	GET_PANEL_RANGE_INFO = 5,
+	GET_PANELS_LIST = 4,
+	// GET_PANEL_ENTRY_BY_ID = 5,
 	GET_DASHBOARD_INITIAL_DATA = 6
 };
 
@@ -757,13 +757,14 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		//Alaa :please help me to Save the ret_index .  when we need update the data ,we need use
 		//modify the data of m_backbround_data.at(ret_index) when you need to modify the data later
 		//ret_index  This value is not going to change ( panel  command  , point )
-
+		tempjson["panel_id"] = npanel_id;
 		int p_i = 0;
 		for (int i = 0; i < g_Input_data[npanel_id].size(); i++) {
+			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "INPUT";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "IN" + to_string(i +1);
-			tempjson["data"][p_i]["command"] = to_string(1) + "IN" + to_string(i + 1);
+			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "IN" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)g_Input_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_Input_data[npanel_id].at(i).label;
 			tempjson["data"][p_i]["unit"] = g_Input_data[npanel_id].at(i).range;
@@ -782,10 +783,11 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 
 		for (int i = 0; i < m_Output_data.size(); i++) {
+			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "OUTPUT";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "OUT" + to_string(i +1);
-			tempjson["data"][p_i]["command"] = to_string(1) + "OUT" + to_string(i + 1);
+			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "OUT" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)g_Output_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_Output_data[npanel_id].at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = g_Output_data[npanel_id].at(i).auto_manual;
@@ -801,10 +803,11 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 
 		for (int i = 0; i < m_Variable_data.size(); i++) {
+			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "VARIABLE";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "VAR" + to_string(i +1);
-			tempjson["data"][p_i]["command"] = to_string(1) + "VAR" + to_string(i + 1);
+			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "VAR" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)g_Variable_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_Variable_data[npanel_id].at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = g_Variable_data[npanel_id].at(i).auto_manual;
@@ -817,10 +820,11 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 
 		for (int i = 0; i < m_Program_data.size(); i++) {
+			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "PROGRAM";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "PRG" + to_string(i +1);
-			tempjson["data"][p_i]["command"] = to_string(1) + "PRG" + to_string(i + 1);
+			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "PRG" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)g_Program_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_Program_data[npanel_id].at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = g_Program_data[npanel_id].at(i).auto_manual;
@@ -830,10 +834,11 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 
 		for (int i = 0; i < m_Weekly_data.size(); i++) {
+			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "SCHEDULE";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "SCH" + to_string(i +1);
-			tempjson["data"][p_i]["command"] = to_string(1) + "SCH" + to_string(i + 1);
+			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "SCH" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)g_Weekly_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_Weekly_data[npanel_id].at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = g_Weekly_data[npanel_id].at(i).auto_manual;
@@ -845,10 +850,11 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 
 		for (int i = 0; i < m_Annual_data.size(); i++) {
+			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "HOLIDAY";
 			tempjson["data"][p_i]["index"] = i;
 			tempjson["data"][p_i]["id"] = "CAL" + to_string(i +1);
-			tempjson["data"][p_i]["command"] = to_string(1) + "CAL" + to_string(i + 1);
+			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "CAL" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)g_Annual_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_Annual_data[npanel_id].at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = g_Annual_data[npanel_id].at(i).auto_manual;
@@ -1078,17 +1084,16 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		m_webView->PostWebMessageAsJson(temp_cs);
 
 	}
-	case WEBVIEW_MESSAGE_TYPE::GET_PANELS:
+	case WEBVIEW_MESSAGE_TYPE::GET_PANELS_LIST:
 	{
-		int p_i = 0;
+		tempjson["action"] = "GET_PANELS_LIST_RES";
 		for (int i = 0; i < g_bacnet_panel_info.size(); i++) 
 		{
-			tempjson["data"][p_i]["panel_number"] = g_bacnet_panel_info.at(i).panel_number;
-			tempjson["data"][p_i]["object_instance"] = g_bacnet_panel_info.at(i).object_instance;
-			tempjson["data"][p_i]["serial_number"] = g_bacnet_panel_info.at(i).nseiral_number;
-			tempjson["data"][p_i]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
-			tempjson["data"][p_i]["pid"] = g_bacnet_panel_info.at(i).npid; 
-			p_i++;
+			tempjson["data"][i]["panel_number"] = g_bacnet_panel_info.at(i).panel_number;
+			tempjson["data"][i]["object_instance"] = g_bacnet_panel_info.at(i).object_instance;
+			tempjson["data"][i]["serial_number"] = g_bacnet_panel_info.at(i).nseiral_number;
+			tempjson["data"][i]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
+			tempjson["data"][i]["pid"] = g_bacnet_panel_info.at(i).npid; 
 		}
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
