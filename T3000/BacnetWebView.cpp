@@ -53,7 +53,8 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_PANEL_RANGE_INFO = 5,
 	GET_PANELS_LIST = 4,
 	// GET_PANEL_ENTRY_BY_ID = 5,
-	GET_DASHBOARD_INITIAL_DATA = 6
+	GET_DASHBOARD_INITIAL_DATA = 6,
+	SAVE_DASHBOARD_DATA = 7
 };
 
 enum WEBVIEW_ENTRY_TYPE
@@ -1084,7 +1085,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		m_webView->PostWebMessageAsJson(temp_cs);
 
 	}
-	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_IDS:
+	case WEBVIEW_MESSAGE_TYPE::GET_PANELS_LIST:
 	{
 		tempjson["action"] = "GET_PANELS_LIST_RES";
 		for (int i = 0; i < g_bacnet_panel_info.size(); i++) 
