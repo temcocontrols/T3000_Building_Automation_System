@@ -51,9 +51,8 @@ public:
 	CString pic_filename;
 	void OnSize(UINT nType, int cx, int cy);
 	void OnSysCommand(UINT nID, LPARAM lParam);
-	bool window_max; // ±ê¼ÇÊÇ·ñÒÑ¾­×î´ó»¯;
+	bool window_max; // ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½;
 	void OnBnClickedWebViewShow();
-	void OnBnClickedDashboardWebViewShow();
 
 };
 

@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ Éú³ÉµÄ°üº¬ÎÄ¼þ¡£
-// ¹© T3000.rc Ê¹ÓÃ
+// Microsoft Visual C++ ï¿½ï¿½ï¿½ÉµÄ°ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
+// ï¿½ï¿½ T3000.rc Ê¹ï¿½ï¿½
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -3280,8 +3280,6 @@
 #define IDC_STATIC_GATEWAY_ADDRESS      60045
 #define IDC_STATIC_SUBNET_MASK          60046
 #define IDC_STATIC_IP_PORT              60047
-
-#define IDC_DASHBOARD_WEBVIEW_BUTTON    70001
 
 // Next default values for new objects
 // 
