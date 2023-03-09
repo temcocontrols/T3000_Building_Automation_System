@@ -53,8 +53,7 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_PANEL_RANGE_INFO = 5,
 	GET_PANELS_LIST = 4,
 	// GET_PANEL_ENTRY_BY_ID = 5,
-	GET_DASHBOARD_INITIAL_DATA = 6,
-	SAVE_DASHBOARD_DATA = 7
+	GET_ENTRIES = 6,
 };
 
 enum WEBVIEW_ENTRY_TYPE
@@ -655,16 +654,16 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	std::string message = CT2A(msg);
 	Json::Reader reader;
 	reader.parse(message, json, false);
-	int type = json.get("action", Json::nullValue).asInt();
+	int action = json.get("action", Json::nullValue).asInt();
 	Json::StreamWriterBuilder builder;
 	builder["indentation"] = ""; // If you want whitespace-less output
 	Json::Value tempjson;
-	switch (type)
+	switch (action)
 	{
 	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_DATA:
 	{
 		tempjson["action"] = "GET_PANEL_DATA_RES";
-		int npanel_id = json.get("panelId", Json::nullValue).asInt(); // Ignored for now because we have only local panel data
+		int npanel_id = json.get("panelId", Json::nullValue).asInt();
 		npanel_id = bac_gloab_panel;
 		int nret = LoadOnlinePanelData(npanel_id);
 		if (nret < 0)
@@ -703,61 +702,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			break;
 		}
 
-		/*
-		read_panel_entries(199, READINPUT_T3000);
-		int p_i = 0;
-		for (int i = 0; i < 64; i++) {
-			if (!m_backbround_data.at(i).flag) break;
-			tempjson["data"][p_i]["type"] = "INPUT";
-			tempjson["data"][p_i]["panel"] = m_backbround_data.at(i).str_info.npanel_id;
-			tempjson["data"][p_i]["command"] = to_string(m_backbround_data.at(i).str_info.npanel_id) + "IN" + to_string(i+1);
-			tempjson["data"][p_i]["index"] = i;
-			tempjson["data"][p_i]["description"] = (char*)m_backbround_data.at(i).ret_data.m_group_input_data.description;
-			tempjson["data"][p_i]["label"] = (char*)m_backbround_data.at(i).ret_data.m_group_input_data.label;
-			tempjson["data"][p_i]["unit"] = m_backbround_data.at(i).ret_data.m_group_input_data.range;
-			tempjson["data"][p_i]["auto_manual"] = m_backbround_data.at(i).ret_data.m_group_input_data.auto_manual;
-			tempjson["data"][p_i]["value"] = m_backbround_data.at(i).ret_data.m_group_input_data.value;
-			tempjson["data"][p_i]["filter"] = m_backbround_data.at(i).ret_data.m_group_input_data.filter;
-			tempjson["data"][p_i]["control"] = m_backbround_data.at(i).ret_data.m_group_input_data.control;
-			tempjson["data"][p_i]["digital_analog"] = m_backbround_data.at(i).ret_data.m_group_input_data.digital_analog;
-			tempjson["data"][p_i]["range"] = m_backbround_data.at(i).ret_data.m_group_input_data.range;
-			tempjson["data"][p_i]["calibration_sign"] = m_backbround_data.at(i).ret_data.m_group_input_data.calibration_sign;
-			tempjson["data"][p_i]["calibration_h"] = m_backbround_data.at(i).ret_data.m_group_input_data.calibration_h;
-			tempjson["data"][p_i]["calibration_l"] = m_backbround_data.at(i).ret_data.m_group_input_data.calibration_l;
-			p_i++;
-		}
-		read_panel_entries(199, READOUTPUT_T3000);
-		for (int i = 0; i < 64; i++) {
-			if (!m_backbround_data.at(i).flag) break;
-			tempjson["data"][p_i]["type"] = "OUTPUT";
-			tempjson["data"][p_i]["panel"] = m_backbround_data.at(i).str_info.npanel_id;
-			tempjson["data"][p_i]["command"] = to_string(m_backbround_data.at(i).str_info.npanel_id) + "OUT" + to_string(i+1);
-			tempjson["data"][p_i]["index"] = i;
-			tempjson["data"][p_i]["description"] = (char*)m_backbround_data.at(i).ret_data.m_group_output_data.description;
-			tempjson["data"][p_i]["label"] = (char*)m_backbround_data.at(i).ret_data.m_group_output_data.label;
-			tempjson["data"][p_i]["auto_manual"] = m_backbround_data.at(i).ret_data.m_group_output_data.auto_manual;
-			tempjson["data"][p_i]["value"] = m_backbround_data.at(i).ret_data.m_group_output_data.value;
-			tempjson["data"][p_i]["low_voltage"] = m_backbround_data.at(i).ret_data.m_group_output_data.low_voltage;
-			tempjson["data"][p_i]["high_voltage"] = m_backbround_data.at(i).ret_data.m_group_output_data.high_voltage;
-			tempjson["data"][p_i]["range"] = m_backbround_data.at(i).ret_data.m_group_output_data.range;
-			tempjson["data"][p_i]["control"] = m_backbround_data.at(i).ret_data.m_group_output_data.control;
-			tempjson["data"][p_i]["digital_analog"] = m_backbround_data.at(i).ret_data.m_group_output_data.digital_analog;
-			tempjson["data"][p_i]["hw_switch_status"] = m_backbround_data.at(i).ret_data.m_group_output_data.hw_switch_status;
-			p_i++;
-		}
-		*/
-		/*
-		int ret_index = Post_Background_Read_Message_ByPanel(199, READINPUT_T3000, 3);  //send message to background ，read 199IN3
-		if (ret_index >= 0)
-		{
-			CString temp_cs;
-			temp_cs.Format(_T("IN%d %.3f\r\n"), m_backbround_data.at(ret_index).str_info.npoint_number + 1, m_backbround_data.at(ret_index).ret_data.m_group_input_data.value / 1000.000);
-			AfxMessageBox(temp_cs);
-		}
-			*/
-		//Alaa :please help me to Save the ret_index .  when we need update the data ,we need use
-		//modify the data of m_backbround_data.at(ret_index) when you need to modify the data later
-		//ret_index  This value is not going to change ( panel  command  , point )
 		tempjson["panel_id"] = npanel_id;
 		int p_i = 0;
 		for (int i = 0; i < g_Input_data[npanel_id].size(); i++) {
@@ -923,7 +867,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	case WEBVIEW_MESSAGE_TYPE::UPDATE_ENTRY:
 	{
 		Json::Value tempjson;
-		int panel_id = json.get("panelId", Json::nullValue).asInt(); // Ignored for now because we have only local panel data
+		int panel_id = json.get("panelId", Json::nullValue).asInt();
 		int entry_index = json.get("entryIndex", Json::nullValue).asInt();
 		int entry_type = json.get("entryType", Json::nullValue).asInt();
 		const std::string field = json.get("field", Json::nullValue).asString();
@@ -1083,7 +1027,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		CString temp_cs(output.c_str());
 
 		m_webView->PostWebMessageAsJson(temp_cs);
-
+		break;
 	}
 	case WEBVIEW_MESSAGE_TYPE::GET_PANELS_LIST:
 	{
@@ -1099,596 +1043,31 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 		m_webView->PostWebMessageAsJson(temp_cs);
+		break;
+	}
+	case WEBVIEW_MESSAGE_TYPE::GET_ENTRIES:
+	{
+		tempjson["action"] = "GET_ENTRIES_RES";
+		Json::Value data = json["data"];
+		if (data.size()) {
+			for (int i = 0; i < data.size(); i++) {
+				Json::Value entry = data[i];
+				int panel_id = entry.get("panelId", Json::nullValue).asInt();
+				int entry_index = entry.get("index", Json::nullValue).asInt();
+				int entry_type = entry.get("type", Json::nullValue).asInt(); // entry_type is enum WEBVIEW_ENTRY_TYPE
+				tempjson["data"][i]["panel_id"] = panel_id;
+				tempjson["data"][i]["index"] = entry_index;
+				tempjson["data"][i]["type"] = entry_type;
+			}
+			const std::string output = Json::writeString(builder, tempjson);
+			CString temp_cs(output.c_str());
+			m_webView->PostWebMessageAsJson(temp_cs);
+		}
 	}
 		break;
-	//case WEBVIEW_MESSAGE_TYPE::GET_PANEL_RANGE_INFO:
-	//{
-	//	tempjson["action"] = "GET_PANEL_RANGE_INFO";
-	//	int npanel_id = json.get("panelId", Json::nullValue).asInt(); // Ignored for now because we have only local panel data
-	//	npanel_id = bac_gloab_panel;
-	//	int nret = LoadOnlinePanelData(npanel_id);
-	//	//int nret = LoadPanelRange(npanel_id);
-	//}
-	//	break;
 	}
 }
 
-//void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
-//{
-//   
-//    Json::Value json;
-//    std::string message = CT2A(msg);
-//    Json::Reader reader;
-//     /*Json::Value json;
-//     Json::wri writer;
-//     //writer.write()
-//   std::string str = R"~(
-//        {
-//            "id": 1,
-//            "parameters":
-//            {
-//                "var1": "bla",
-//                "var2": 7,
-//                "var3": "base64 encoded binary data"
-//            }
-//        }
-//        )~";//CT2A(receivedMessage);
-//    reader.parse(str, json, false);*/
-//    /*int  id = json.get("id", Json::nullValue).asInt();
-//    Json::Value param = json.get("parameters", Json::nullValue);
-//    int var2 = param.get("var2", Json::nullValue).asInt();*/
-//    
-//    reader.parse(message, json, false);
-//    int type = json.get("action", Json::nullValue).asInt();
-//    switch (type)
-//    {
-//         case WEBVIEW_MESSAGE_TYPE::READ_VARIABLES:
-//         {
-//             int sub_action = json.get("sub_action", Json::nullValue).asInt();
-//
-//                 if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//                 {
-//                     Json::Reader reader;
-//                     Json::Value tempjson;
-//                     reader.parse(app->JsonData, tempjson, false);
-//                     tempjson["action"] = sub_action;
-//                     if (sub_action == READ_INPUT_VARIABLE)
-//                     {
-//                         tempjson["size"] = m_Input_data.size() - 1;
-//                         for (int i = 0; i < m_Input_data.size(); i++)
-//                         {
-//                             tempjson["data"][i]["index"] = i;
-//                             tempjson["data"][i]["id"] = "IN"+ to_string(i);
-//                             tempjson["data"][i]["desc"] = (char*)m_Input_data.at(i).description;
-//                             tempjson["data"][i]["label"] = (char*)m_Input_data.at(i).label;
-//                             tempjson["data"][i]["unit"] = m_Input_data.at(i).range;
-//                             tempjson["data"][i]["auto_manual"] = m_Input_data.at(i).auto_manual;
-//                         }
-//                     }
-//                     else  if (sub_action == READ_OUTPUT_VARIABLE)
-//                     {
-//                         tempjson["size"] = m_Output_data.size() - 1;
-//                         for (int i = 0; i < m_Output_data.size(); i++)
-//                         {
-//                             tempjson["data"][i]["index"] = i;
-//                             tempjson["data"][i]["id"] = "OUT" + to_string(i);
-//                             tempjson["data"][i]["desc"] = (char*)m_Output_data.at(i).description;
-//                             tempjson["data"][i]["label"] = (char*)m_Output_data.at(i).label;
-//                             tempjson["data"][i]["unit"] = m_Output_data.at(i).range;
-//                             tempjson["data"][i]["auto_manual"] = m_Output_data.at(i).auto_manual;
-//                         }
-//                     }
-//                     else  if (sub_action == READ_VARIABLE)
-//                     {
-//                         tempjson["size"] = m_Variable_data.size() - 1;
-//                         for (int i = 0; i < m_Variable_data.size(); i++)
-//                         {
-//                             tempjson["data"][i]["index"] = i;
-//                             tempjson["data"][i]["id"] = "VAR" + to_string(i);
-//                             tempjson["data"][i]["desc"] = (char*)m_Variable_data.at(i).description;
-//                             tempjson["data"][i]["label"] = (char*)m_Variable_data.at(i).label;
-//                             tempjson["data"][i]["unit"] = m_Variable_data.at(i).range;
-//                             tempjson["data"][i]["auto_manual"] = m_Variable_data.at(i).auto_manual;
-//                         }
-//                     }
-//                     else  if (sub_action == READ_SCHEDULE)
-//                     {
-//                         tempjson["size"] = m_Weekly_data.size() - 1;
-//                         for (int i = 0; i < m_Weekly_data.size(); i++)
-//                         {
-//                             tempjson["data"][i]["index"] = i;
-//                             tempjson["data"][i]["id"] = "SCH" + to_string(i);
-//                             tempjson["data"][i]["desc"] = (char*)m_Weekly_data.at(i).description;
-//                             tempjson["data"][i]["label"] = (char*)m_Weekly_data.at(i).label;
-//                             tempjson["data"][i]["unit"] ="";
-//                             tempjson["data"][i]["auto_manual"] = m_Weekly_data.at(i).auto_manual;
-//                         }
-//                     }
-//                     else  if (sub_action == READ_CALENDER)
-//                     {
-//                         tempjson["size"] = m_Annual_data.size() - 1;
-//                         for (int i = 0; i < m_Annual_data.size(); i++)
-//                         {
-//                             tempjson["data"][i]["index"] = i;
-//                             tempjson["data"][i]["id"] = "CAL" + to_string(i);
-//                             tempjson["data"][i]["desc"] = (char*)m_Annual_data.at(i).description;
-//                             tempjson["data"][i]["label"] = (char*)m_Annual_data.at(i).label;
-//                             tempjson["data"][i]["unit"] = "";
-//                             tempjson["data"][i]["auto_manual"] = m_Annual_data.at(i).auto_manual;
-//                         }
-//                     }
-//                     else  if (sub_action == READ_PROGRAM)
-//                     {
-//                         tempjson["size"] = m_Program_data.size() - 1;
-//                         for (int i = 0; i < m_Program_data.size(); i++)
-//                         {
-//                             tempjson["data"][i]["index"] = i;
-//                             tempjson["data"][i]["id"] = "PRG" + to_string(i);
-//                             tempjson["data"][i]["desc"] = (char*)m_Program_data.at(i).description;
-//                             tempjson["data"][i]["label"] = (char*)m_Program_data.at(i).label;
-//                             tempjson["data"][i]["unit"] = "";
-//                             tempjson["data"][i]["Status"] = m_Program_data.at(i).on_off;
-//                             tempjson["data"][i]["auto_manual"] = m_Program_data.at(i).auto_manual;
-//                         }
-//                     }
-//                     Json::StyledWriter styleWriter;
-//                     Json::String writeStr = styleWriter.write(tempjson);
-//                     CString Response = writeStr.c_str();
-//                     app->m_webView->ExecuteScript(L"PopulateVariableList(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-//                 }
-//             break;
-//         }
-//        /* case WEBVIEW_MESSAGE_TYPE::READ_OUTPUT_VARIABLES:
-//         {
-//             if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//             {
-//                 Json::Reader reader;
-//                 Json::Value tempjson;
-//                 reader.parse(app->JsonData, tempjson, false);
-//                 tempjson["action"] = WEBVIEW_MESSAGE_TYPE::READ_OUTPUT_VARIABLES;
-//                 tempjson["size"] = m_Output_data.size() - 1;
-//                 for (int i = 0; i < m_Output_data.size(); i++)
-//                 {
-//                     tempjson["data"][i]["index"] = i;
-//                     tempjson["data"][i]["desc"] = (char*)m_Output_data.at(i).description;
-//                     tempjson["data"][i]["label"] = (char*)m_Output_data.at(i).label;
-//                     tempjson["data"][i]["unit"] = m_Output_data.at(i).range;
-//                 }
-//                 Json::StyledWriter styleWriter;
-//                 Json::String writeStr = styleWriter.write(tempjson);
-//                 CString Response = writeStr.c_str();
-//                 app->m_webView->ExecuteScript(L"PopulateVariableList(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-//             }
-//             break;
-//         }
-//         case WEBVIEW_MESSAGE_TYPE::READ_VARIABLE:
-//         {
-//             if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//             {
-//                 Json::Reader reader;
-//                 Json::Value tempjson;
-//                 reader.parse(app->JsonData, tempjson, false);
-//                 tempjson["action"] = WEBVIEW_MESSAGE_TYPE::READ_VARIABLES;
-//                 tempjson["size"] = m_Variable_data.size() - 1;
-//                 for (int i = 0; i < m_Variable_data.size(); i++)
-//                 {
-//                     tempjson["data"][i]["index"] = i;
-//                     tempjson["data"][i]["desc"] = (char*)m_Variable_data.at(i).description;
-//                     tempjson["data"][i]["label"] = (char*)m_Variable_data.at(i).label;
-//                     tempjson["data"][i]["unit"] = m_Variable_data.at(i).range;
-//                 }
-//                 Json::StyledWriter styleWriter;
-//                 Json::String writeStr = styleWriter.write(tempjson);
-//                 CString Response = writeStr.c_str();
-//                 app->m_webView->ExecuteScript(L"PopulateVariableList(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-//             }
-//             break;
-//         }*/
-//         case WEBVIEW_MESSAGE_TYPE::READ_DATA:
-//         {
-//            if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//            {
-//                Json::Reader reader;
-//                Json::Value tempjson;
-//                reader.parse(app->JsonData, tempjson, false);
-//                tempjson["action"] = WEBVIEW_MESSAGE_TYPE::READ_DATA;
-//                tempjson["element_id"] = json.get("element_id", Json::nullValue).asInt();
-//                int var_index = json.get("object_variable", Json::nullValue).asInt();
-//                tempjson["device_type"] = bacnet_device_type;
-//
-//                if (json.get("object_type", Json::nullValue).asInt() == 0)// input
-//                {
-//                    CString unit, value;
-//                    ((CBacnetInput*)pDialog[WINDOW_INPUT])->GetInputUnitandValue(var_index, unit, value);
-//                    CT2CA string(value);
-//                    std::string tempstr (string);
-//                    tempjson["value"] = tempstr.c_str();
-//                    CT2CA stringunit(unit);
-//                    std::string tempstrunit(stringunit);
-//                    tempjson["unit"] = tempstrunit.c_str();
-//                    tempjson["object_name"] = (char*)m_Input_data.at(var_index).description;
-//                    tempjson["object_label"] = (char*)m_Input_data.at(var_index).label;
-//                    tempjson["auto_manual"] = m_Input_data.at(var_index).auto_manual;
-//                }
-//                else if (json.get("object_type", Json::nullValue).asInt() == 1)// output
-//                {
-//                    tempjson["value"] = m_Output_data.at(var_index).value / 1000;
-//                    tempjson["unit"] = m_Output_data.at(var_index).range;
-//                    tempjson["object_name"] = (char*)m_Output_data.at(var_index).description;
-//                    tempjson["object_label"] = (char*)m_Output_data.at(var_index).label;
-//                    tempjson["auto_manual"] = m_Output_data.at(var_index).auto_manual;
-//                }
-//                else if (json.get("object_type", Json::nullValue).asInt() == 2)// variables
-//                {
-//                    tempjson["value"] = m_Variable_data.at(var_index).value / 1000;
-//
-//                    tempjson["unit"] = m_Variable_data.at(var_index).range;
-//                    tempjson["object_name"] = (char*)m_Variable_data.at(var_index).description;
-//                    tempjson["object_label"] = (char*)m_Variable_data.at(var_index).label;
-//                    tempjson["auto_manual"] = m_Variable_data.at(var_index).auto_manual;
-//                }
-//                else  if (json.get("object_type", Json::nullValue).asInt() == READ_SCHEDULE)
-//                {
-//                    tempjson["object_name"] = (char*)m_Weekly_data.at(var_index).description;
-//                    tempjson["object_label"] = (char*)m_Weekly_data.at(var_index).label;
-//                    tempjson["auto_manual"] = m_Weekly_data.at(var_index).auto_manual;
-//                }
-//                else  if (json.get("object_type", Json::nullValue).asInt() == READ_CALENDER)
-//                {
-//                    tempjson["object_name"] = (char*)m_Annual_data.at(var_index).description;
-//                    tempjson["object_label"] = (char*)m_Annual_data.at(var_index).label;
-//                    tempjson["auto_manual"] = m_Annual_data.at(var_index).auto_manual;
-//                }
-//                else  if (json.get("object_type", Json::nullValue).asInt() == READ_PROGRAM)
-//                {
-//                    tempjson["object_name"] = (char*)m_Program_data.at(var_index).description;
-//                    tempjson["object_label"] = (char*)m_Program_data.at(var_index).label;
-//                    tempjson["auto_manual"] = m_Program_data.at(var_index).auto_manual;
-//                    tempjson["status"] = m_Program_data.at(var_index).on_off;
-//                }
-//                Json::StyledWriter styleWriter;
-//                Json::String writeStr = styleWriter.write(tempjson);
-//                CString Response = writeStr.c_str();
-//                app->m_webView->ExecuteScript(L"UpdateElementsDataFromDevice(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-//                    
-//            }
-//             break;
-//         }
-//         case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC:
-//         {
-//             if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//             {
-//                 CString filename = json.get("graphic_name", Json::nullValue).asCString();
-//                 Json::String tmpString = json.get("data", Json::nullValue).asString();
-//                 CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
-//                 PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
-//                 temp_now_building_name.ReleaseBuffer();
-//                 CFile file;
-//                 CString tempfile;
-//                 if (CreateDirectory(temp_now_building_name + _T("\\Graphic"), NULL) ||
-//                     ERROR_ALREADY_EXISTS == GetLastError())
-//                 {
-//
-//                     tempfile = temp_now_building_name + _T("\\Graphic\\" + filename + ".grp");
-//                     if (file.Open(tempfile, CFile::modeCreate | CFile::modeWrite, NULL))
-//                     {
-//                         file.Write(tmpString.c_str(), tmpString.size());
-//                         file.Close();
-//                     }  // CopyFile(...)
-//                 }
-//                 else {
-//                     CString error = "Not Able to Create Directory at:  " + temp_now_building_name + _T("\\Graphic");
-//                     app->m_webView->ExecuteScript(L"DisplayError( " + error + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-//                 }
-//             }
-//             break;
-//         }
-//         case WEBVIEW_MESSAGE_TYPE::LIST_GRAPHICS:
-//         {
-//             if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//             {
-//                 CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
-//                 PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
-//                 temp_now_building_name.ReleaseBuffer();
-//                 CString path = temp_now_building_name + _T("\\Graphic");
-//                 //const TCHAR* x = path.GetBuffer();
-//                 vector<string> files = GetGraphicFiles(path);
-//
-//                 Json::Reader reader;
-//                 Json::Value tempjson;
-//                 reader.parse(app->JsonData, tempjson, false);
-//                 tempjson["action"] = WEBVIEW_MESSAGE_TYPE::LIST_GRAPHICS;
-//
-//                 for (int i = 0; i < files.size(); i++)
-//                 {
-//                    char* token = strtok(&files.at(i)[0], ".");
-//                    if (token) {
-//                        tempjson["files"][i] = token;
-//                    }
-//                 }
-//                 Json::StyledWriter styleWriter;
-//                 Json::String writeStr = styleWriter.write(tempjson);
-//                 CString Response = writeStr.c_str();
-//                 app->m_webView->ExecuteScript(L"GraphicFilesList(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-//             }
-//             break;
-//         }
-//         case WEBVIEW_MESSAGE_TYPE::LOAD_GRAPHICS:
-//         {
-//             if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//             {
-//
-//                 CString filename = json.get("graphic_name", Json::nullValue).asCString();
-//                 CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
-//                 PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
-//                 temp_now_building_name.ReleaseBuffer();
-//                 CString path = temp_now_building_name + _T("\\Graphic\\"+ filename+".grp");
-//                 
-//
-//                 Json::Reader reader;
-//                 Json::Value tempjson;
-//                 reader.parse(app->JsonData, tempjson, false);
-//                 tempjson["action"] = WEBVIEW_MESSAGE_TYPE::LIST_GRAPHICS;
-//                 CFile file;
-//                 CString tmpString;
-//                 if (file.Open(path, CFile::modeRead, NULL))
-//                 {
-//                     DWORD len = file.GetLength();
-//                     char* Buf = new char[len + 1];
-//                     Buf[len + 1] = 0;
-//                     file.Read(Buf, len);
-//                     file.Close();
-//                   
-//                     MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, tmpString.GetBuffer(len), len);
-//                     tmpString.ReleaseBuffer();
-//                     tempjson["data"] = Buf;
-//                 }
-//                 Json::StyledWriter styleWriter;
-//                 Json::String writeStr = styleWriter.write(tempjson);
-//                 CString Response = writeStr.c_str();
-//                 app->m_webView->ExecuteScript(L"LoadGraphicFile(" + tmpString + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-//             }
-//             break;
-//         }
-//         case WEBVIEW_MESSAGE_TYPE::TRIGGER_T3000_DLG:
-//         {
-//             if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//             {
-//                 if (json.get("object_type", Json::nullValue).asInt() == 3)// Schedule
-//                 {
-//                     int index = json.get("index", Json::nullValue).asInt();
-//                     weekly_list_line = index;
-//                     if ((n_read_item_index >= 0) && (n_read_item_index < BAC_SCHEDULE_COUNT))
-//                     {
-//                         n_read_item_index = weekly_list_line;
-//                         ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, product_type, READTIMESCHEDULE_T3000/*BAC_PRG*/);//
-//                     }
-//
-//                 }
-//                 else if (json.get("object_type", Json::nullValue).asInt() == 4)// Calender
-//                 {
-//                     int index = json.get("index", Json::nullValue).asInt();
-//                     annual_list_line = index;
-//                     ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_ANNUALCODE);
-//                 }
-//                 else if (json.get("object_type", Json::nullValue).asInt() == 5)// Program
-//                 {
-//                     int index = json.get("index", Json::nullValue).asInt();
-//                     program_list_line = index;
-//                      Program_Window->OnBnClickedButtonProgramEdit();
-//                 }
-//             }
-//             break;
-//         }
-//         case WEBVIEW_MESSAGE_TYPE::UPDATE_DATA:
-//         {
-//             if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//             {
-//
-//                 int var_index = json.get("index", Json::nullValue).asInt();
-//                 if (json.get("object_type", Json::nullValue).asInt() == 0)// input
-//                 {
-//                     m_Input_data.at(var_index).value = json.get("value", Json::nullValue).asFloat()*1000;
-//                     m_Input_data.at(var_index).auto_manual = json.get("auto_manual", Json::nullValue).asInt();
-//
-//                    // ::PostMessage(m_input_dlg_hwnd, WM_LIST_ITEM_CHANGED, var_index, INPUT_AUTO_MANUAL);
-//                    // ::PostMessage(m_input_dlg_hwnd, WM_LIST_ITEM_CHANGED, var_index, INPUT_VALUE);
-//
-//                     //::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, var_index, REFRESH_ON_ITEM);
-//
-//                      Write_Private_Data_Blocking(WRITEINPUT_T3000, var_index, var_index, g_bac_instance);
-//                      ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, var_index, REFRESH_ON_ITEM);
-//                 }
-//                 else if (json.get("object_type", Json::nullValue).asInt() == 1)// output
-//                 {
-//                     m_Output_data.at(var_index).value = json.get("value", Json::nullValue).asFloat() * 1000;
-//                     m_Output_data.at(var_index).auto_manual = json.get("auto_manual", Json::nullValue).asInt();
-//
-//                     /*::PostMessage(m_input_dlg_hwnd, WM_LIST_ITEM_CHANGED, var_index, INPUT_AUTO_MANUAL);
-//                     ::PostMessage(m_input_dlg_hwnd, WM_LIST_ITEM_CHANGED, var_index, OUTPUT_VALUE);
-//
-//                     ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, var_index, REFRESH_ON_ITEM);*/
-//
-//                     Write_Private_Data_Blocking(WRITEOUTPUT_T3000, var_index, var_index, g_bac_instance);
-//
-//                     ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, var_index, REFRESH_ON_ITEM);
-//
-//                 }
-//                 else if (json.get("object_type", Json::nullValue).asInt() == 2)// variables
-//                 {
-//                     m_Variable_data.at(var_index).value = json.get("value", Json::nullValue).asFloat() * 1000;
-//                     m_Variable_data.at(var_index).auto_manual = json.get("auto_manual", Json::nullValue).asInt();
-//                    // ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, var_index, REFRESH_ON_ITEM);
-//
-//                     Write_Private_Data_Blocking(WRITEVARIABLE_T3000, var_index, var_index, g_bac_instance);
-//                     ::PostMessage(m_variable_dlg_hwnd, WM_LIST_ITEM_CHANGED, var_index, VARIABLE_AUTO_MANUAL);
-//
-//                 }
-//                 else  if (json.get("object_type", Json::nullValue).asInt() == READ_SCHEDULE)
-//                 {
-//                     m_Weekly_data.at(var_index).auto_manual = json.get("auto_manual", Json::nullValue).asFloat();
-//
-//                     Write_Private_Data_Blocking(WRITESCHEDULE_T3000, var_index, var_index, g_bac_instance);
-//
-//                     ::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, var_index, REFRESH_ON_ITEM);
-//                    // ::PostMessage(m_weekly_dlg_hwnd, WM_LIST_ITEM_CHANGED, var_index, WEEKLY_ROUTINE_AUTO_MANUAL);
-//                 }
-//                 else  if (json.get("object_type", Json::nullValue).asInt() == READ_CALENDER)
-//                 {
-//                     m_Annual_data.at(var_index).auto_manual = json.get("auto_manual", Json::nullValue).asFloat();
-//
-//                     Write_Private_Data_Blocking(WRITEHOLIDAY_T3000, var_index, var_index, g_bac_instance);
-//                     ::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, var_index, REFRESH_ON_ITEM);
-//                     //::PostMessage(m_annual_dlg_hwnd, WM_LIST_ITEM_CHANGED, var_index, ANNUAL_ROUTINE_AUTO_MANUAL);
-//                 }
-//                 else  if (json.get("object_type", Json::nullValue).asInt() == READ_PROGRAM)
-//                 {
-//                     m_Program_data.at(var_index).auto_manual = json.get("auto_manual", Json::nullValue).asFloat();
-//                     m_Program_data.at(var_index).on_off = json.get("status", Json::nullValue).asInt();
-//
-//                     //::PostMessage(m_pragram_dlg_hwnd, WM_LIST_ITEM_CHANGED, var_index, PROGRAM_AUTO_MANUAL);
-//
-//                     Write_Private_Data_Blocking(WRITEPROGRAM_T3000, var_index, var_index, g_bac_instance);
-//                     ::PostMessage(m_pragram_dlg_hwnd, WM_REFRESH_BAC_PROGRAM_LIST, var_index, REFRESH_ON_ITEM);
-//                 }
-//             }
-//             break;
-//         }
-//         case WEBVIEW_MESSAGE_TYPE::ADD_VAR:
-//         {
-//             if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//             {
-//                 
-//                 CString value = json.get("Value", Json::nullValue).asCString();
-//                 float X_Pos = json.get("xpos", Json::nullValue).asFloat();
-//                 float Y_Pos = json.get("ypos", Json::nullValue).asInt();
-//                 POINT Insert_Point;
-//                 Insert_Point.x = X_Pos;
-//                 Insert_Point.y = Y_Pos;
-//
-//                 char* temp_char = new char[200];
-//
-//                 value.MakeUpper();// label only support upper case;
-//                 WideCharToMultiByte(CP_ACP, NULL, value.GetBuffer(), -1, temp_char, 200, NULL, NULL);
-//                // ::PostMessage(m_screenedit_dlg_hwnd, ADD_LABEL_MESSAGE, (WPARAM)temp_char, (LPARAM)(&Insert_Point));
-//                 int temp_number = -1;
-//                 byte temp_value_type = -1;
-//                 byte temp_point_type = -1;
-//                 int temp_panel = -1;
-//                 int temp_net = -1;
-//                 int k = 0;
-//                 unsigned char sub_panel = 0;
-//                 char* tempcs = NULL;
-//                 //int temp1;
-//                 //tempcs = ispoint(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,Station_NUM,&k);
-//                /* tempcs = ispoint_ex(temp_char, &temp_number, &temp_value_type, &temp_point_type, &temp_panel, &temp_net, 0, sub_panel, Station_NUM, &k);
-//                 if (tempcs == NULL)
-//                 {
-//                     AfxMessageBox(L"Invalid Label , Please input a label such as 'IN8' , 'Mainpanel-Subpanel-OUT9', 'Mainpanel:Subpanel:OUT9' ,'VAR100'.\r\nFor more information , please reference the user manual.");
-//                    
-//                 }*/
-//
-//
-//                 if (temp_number != 0)	//
-//                     temp_number = temp_number - 1;
-//             }
-//             break;
-//         case WEBVIEW_MESSAGE_TYPE::LOAD_BG_IMG:
-//         {
-//             if (auto app = (BacnetWebViewAppWindow*)GetWindowLongPtr(m_mainWindow, GWLP_USERDATA))
-//             {
-//                 const TCHAR szFilter[] = _T("Image files (*.jpg, *.png) | *.jpg; *.png");
-//                 CFileDialog dlg(1, _T("image"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-//                     szFilter, CWnd::FromHandle(m_mainWindow));
-//                 CString destination;
-//                 if (dlg.DoModal() == IDOK)
-//                 {
-//                     CString sFilePath = dlg.GetPathName();
-//                     CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
-//                     PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
-//                     temp_now_building_name.ReleaseBuffer();
-//                     if (CreateDirectory(temp_now_building_name + _T("\\image\\"), NULL) ||
-//                         ERROR_ALREADY_EXISTS == GetLastError())
-//                     {
-//                         destination = temp_now_building_name + _T("\\image\\" + dlg.GetFileName());
-//                         CopyFile(sFilePath, destination, 1);                        
-//                     }
-//                     else {
-//                         CString error = "Not Able to Create Directory at:  " + temp_now_building_name + _T("\\image");
-//                         app->m_webView->ExecuteScript(L"DisplayError( " + error + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-//                         return;
-//                     }
-//                   
-//                 }
-//                 if(destination!=""){
-//                     unsigned int width;
-//                     unsigned int height;
-//
-//                     get_png_image_dimensions(destination, width, height);
-//                     Json::Reader reader;
-//                     Json::Value tempjson;
-//                     reader.parse(app->JsonData, tempjson, false);
-//                     char cTemp1[255];
-//                     memset(cTemp1, 0, 255);
-//                     WideCharToMultiByte(CP_ACP, 0, destination.GetBuffer(), -1, cTemp1, destination.GetLength(), NULL, NULL);
-//
-//                     tempjson["file"] = cTemp1;
-//                         tempjson["width"] = width;
-//                         tempjson["height"] = height;
-//                     Json::StyledWriter styleWriter;
-//                     Json::String writeStr = styleWriter.write(tempjson);
-//                     CString Response = writeStr.c_str();
-//                     Sleep(100);
-//                    app->m_webView->ExecuteScript(L"UpdateBackgroundImage(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(app, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());
-//                 }
-//             }
-//             break;
-//         }
-//         }
-//        //case 2:// Update
-//        //{
-//
-//        //    Str_in_point m_temp_Input_data;
-//        //    CString type = json1.get("type", Json::nullValue).asCString();
-//        //    CString deviceId = json1.get("device_id", Json::nullValue).asCString();
-//        //    Json::Value variable = json1.get("variable", Json::nullValue);
-//        //    CString varName = variable.get("name", Json::nullValue).asCString();
-//        //    int  varIndex = variable.get("index", Json::nullValue).asInt();
-//        //    int  varValue = variable.get("value", Json::nullValue).asInt();
-//        //    int index =  Find_Index_Input_By_Label(varName);
-//        //    //json1["variable"]["name"] = "IN-DOOR";
-//        //    memcpy_s(&m_temp_Input_data, sizeof(Str_in_point), &m_Input_data.at(index), sizeof(Str_in_point));
-//
-//        //    if (varValue * 1000 != m_Input_data.at(index).value)
-//        //        m_Input_data.at(index).value = varValue * 1000;
-//
-//        //   int change = memcmp(&m_temp_Input_data, &m_Input_data.at(index), sizeof(Str_in_point));
-//        //    if (change != 0)
-//        //    {
-//        //        Post_Write_Message(g_bac_instance, WRITEINPUT_T3000, index, index, sizeof(Str_in_point), m_input_dlg_hwnd, "", index, 4);
-//        //        Sleep(50);
-//        //        //PostMessage(WM_REFRESH_BAC_INPUT_LIST, index, REFRESH_ON_ITEM);
-//        //        ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, index, REFRESH_ON_ITEM);
-//        //    }
-//
-//        //    /*json1["variable"]["value"] = m_Input_data.at(index).value / 1000;
-//        //    Json::StyledWriter styleWriter;
-//        //    Json::String writeStr = styleWriter.write(json1);
-//        //    CString Response = writeStr.c_str();
-//        //    m_webView->ExecuteScript(L"MessageReceived("+ Response +")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(this, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());*/
-//
-//        //    /*index = Find_Index_Input_By_Label("ODT");
-//        //    json1["variable"]["name"] = "OUT-DOOR";
-//        //    json1["variable"]["value"] = m_Input_data.at(index).value / 1000;
-//        //    writeStr = styleWriter.write(json1);
-//        //    Response = writeStr.c_str();
-//        //    m_webView->ExecuteScript(L"MessageReceived(" + Response + ")", Callback<ICoreWebView2ExecuteScriptCompletedHandler>(this, &BacnetWebViewAppWindow::ExecuteScriptResponse).Get());*/
-//        //    break;
-//        //}
-//       
-//    }
-//    
-//}
 VOID CALLBACK BacnetWebViewAppWindow::onTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
 
