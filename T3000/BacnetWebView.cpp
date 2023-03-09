@@ -1057,7 +1057,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				int entry_type = entry.get("type", Json::nullValue).asInt(); // entry_type is enum WEBVIEW_ENTRY_TYPE
 				tempjson["data"][i]["panel_id"] = panel_id;
 				tempjson["data"][i]["index"] = entry_index;
-				tempjson["data"][i]["type"] = entry_type;
 			}
 			const std::string output = Json::writeString(builder, tempjson);
 			CString temp_cs(output.c_str());
