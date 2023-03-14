@@ -1119,7 +1119,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 unsigned char temp_need_sync = 0;
                 if (Device_time.new_time.n_time >= temp_time_long)  //设备时间大于本地时间
                 {
-                    if (Device_time.new_time.n_time > (temp_time_long + 60))  //大于本地一分钟以上 需同步
+                    if (Device_time.new_time.n_time > (temp_time_long + 180))  //大于本地3分钟以上 需同步
                         temp_need_sync = 1;
                 }
                 else if(Device_time.new_time.n_time > temp_time_long - 180) // 比本地时间小3分钟以内 ， 不同步

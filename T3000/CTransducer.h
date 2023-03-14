@@ -41,19 +41,33 @@ public:
 	afx_msg void OnBnClickedRadioEnthalpy();
 	afx_msg void OnBnClickedRadioAbs();
 	afx_msg void OnBnClickedRadioReal();
+	int is_new_firmware = false;
+	afx_msg void OnCbnSelchangeComboTempRange();
+	void EnableNewUI(bool flag);
+	void InitialPaintParameter();
+	afx_msg void OnPaint();
+	afx_msg void OnBnClickedRadioDefaultT();
+	afx_msg void OnBnClickedRadioUserDefinedT();
+	afx_msg void OnBnClickedRadioDefaultH();
+	afx_msg void OnBnClickedRadioUserDefinedH();
+	afx_msg void OnEnKillfocusEditVolatgeMinT();
+	afx_msg void OnEnKillfocusEditVolatgeMaxT();
+	afx_msg void OnEnKillfocusEditCurrentMinT();
+	afx_msg void OnEnKillfocusEditCurrentMaxT();
+	afx_msg void OnEnKillfocusEditMinT();
+	afx_msg void OnEnKillfocusEditMaxT();
+	afx_msg void OnEnKillfocusEditVolatgeMinH();
+	afx_msg void OnEnKillfocusEditVolatgeMaxH();
+	afx_msg void OnEnKillfocusEditCurrentMinH();
+	afx_msg void OnEnKillfocusEditCurrentMaxH();
+	afx_msg void OnEnKillfocusEditMinH();
+	afx_msg void OnEnKillfocusEditMaxH();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
+static DWORD WINAPI Update_xducer_Thread(LPVOID lPvoid);
 
-#define MODBUS_SWITCH_OUTPUT_MODE    17
-#define MODBUS_SWITCH_TEMP_RANGE     18
-#define MODBUS_SWITCH_HUMI_RANGE	 19
-#define MODBUS_TEMPERATURE_TYPE			23
-#define MODBUS_TEMPERATURE			 34
-#define MODBUS_HUMIDITY				35
-#define MODBUS_TEMPERATURE_OFFSET   36
-#define MODBUS_HUMIDITY_OFFSET      37
-#define MODBUS_DEWPOINT				41
-#define MODBUS_ENTHALPY			    42
-#define MODBUS_ABSOLUTE_HUMI		44
+
+
 
 
 #define HUM_DEWPOINT   0  
@@ -64,7 +78,7 @@ public:
 const CString TransducerTempRange[] =
 {
 	_T("0.   0  - 100"),
-	_T("1.   20 - 80"),       //1
+	_T("1.  -20 - 80"),       //1
 	_T("2.   0  - 50"),
 	_T("3.  -50 - 50")
 };

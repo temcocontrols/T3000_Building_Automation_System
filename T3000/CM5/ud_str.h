@@ -197,17 +197,23 @@ typedef enum {
 typedef union
 {
     uint8_t all[400];
-    struct
-    {
-        unsigned char smtp_type;  //  0   ipaddress   // 1   domain
-        unsigned char smtp_ip[4];
-        char smtp_domain[40];
-        unsigned short smtp_port;
-        char email_address[60];
-        char user_name[60];
-        char password[20];
-        char secure_connection_type;  //0 -NULL   1-SSL   2-TLS
-    }reg;
+	struct
+	{
+		unsigned char smtp_type;  //  0   ipaddress   // 1   domain
+		unsigned char smtp_ip[4];
+		char smtp_domain[40];
+		unsigned short smtp_port;
+		char email_address[60];
+		char user_name[60];
+		char password[20];
+		char secure_connection_type;  //0 -NULL   1-SSL   2-TLS
+		char To1Addr[60];
+		char To2Addr[60];
+		//char To3Addr[60];
+		//char To4Addr[60];
+		uint8_t error_code;
+		// 2-> connect fail  3-> HELO_SENT fail  13->login fail  8-> send data fail
+	}reg;
 }Str_Email_point;
 
 

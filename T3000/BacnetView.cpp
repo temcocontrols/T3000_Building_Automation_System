@@ -3440,10 +3440,12 @@ void CDialogCM5_BacNet::Fresh()
 		set_datalink_protocol(2);
 		Initial_bac(g_gloab_bac_comport,_T(""), g_gloab_bac_baudrate);
 		if(g_bac_instance>0)
-			Send_WhoIs_Global(-1, -1);
+			Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 防止频繁的发送 全局WHOIS  干扰 一大批设备的应答;
+			//Send_WhoIs_Global(-1, -1);
+
 
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
-		SetTimer(BAC_TIMER_2_WHOIS,20000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
+		//SetTimer(BAC_TIMER_2_WHOIS,20000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 		return;
 	}
 	//else if((selected_product_Node.protocol == MODBUS_RS485) && (selected_product_Node.NetworkCard_Address.IsEmpty()))  // 2020 07 23 修改 在手动加入设备后，因为以前网络曾经扫描过，所以报错网络无法连接;
@@ -3536,7 +3538,7 @@ void CDialogCM5_BacNet::Fresh()
 
 	//
 	//SetTimer(1,500,NULL);
-	SetTimer(BAC_TIMER_2_WHOIS,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
+	//SetTimer(BAC_TIMER_2_WHOIS,180000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 	SetTimer(BAC_TIMER_3_CHECKALARM,1000,NULL); //Check whether need  show Alarm dialog.
 
 	BacNet_hwd = this->m_hWnd;
@@ -4275,11 +4277,12 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 	bool find_exsit = false;
 	for (int z=0;z<3;z++)
 	{
-		if(m_is_remote_device)
-			Send_WhoIs_remote_ip(remote_ip_address);
-		else
-			Send_WhoIs_Global(-1, -1);
-		Sleep(1000);
+		//if(m_is_remote_device)
+		//	Send_WhoIs_remote_ip(remote_ip_address);
+		//else
+		//	Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 防止频繁的发送 全局WHOIS  干扰 一大批设备的应答;
+		//	//Send_WhoIs_Global(-1, -1);
+		//Sleep(1000);
 		for (int i=0;i<(int)m_bac_handle_Iam_data.size();i++)
 		{
 			if(m_bac_handle_Iam_data.at(i).device_id == g_bac_instance)
@@ -4290,6 +4293,15 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 		}
 		if(find_exsit)
 			break;
+		else
+		{
+			if (m_is_remote_device)
+				Send_WhoIs_remote_ip(remote_ip_address);
+			else
+				Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 防止频繁的发送 全局WHOIS  干扰 一大批设备的应答;
+				//Send_WhoIs_Global(-1, -1);
+			Sleep(1000);
+		}
 	}
 
 	if(!find_exsit)
@@ -6119,7 +6131,8 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				{
 					Initial_bac(0, selected_product_Node.NetworkCard_Address);
 					Sleep(50);
-					Send_WhoIs_Global(-1, -1);
+					Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 防止频繁的发送 全局WHOIS  干扰 一大批设备的应答;
+					//Send_WhoIs_Global(-1, -1);
 					Sleep(50);
 				}
 				
@@ -8134,7 +8147,8 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 			connect_mstp_thread = NULL;
 			return 0;
 		}
-		Send_WhoIs_Global(-1, -1);
+		Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 防止频繁的发送 全局WHOIS  干扰 一大批设备的应答;
+		//Send_WhoIs_Global(-1, -1);
 		Sleep(1500);
 
 		for (int i=0;i<(int)m_bac_handle_Iam_data.size();i++)
@@ -8285,6 +8299,7 @@ DWORD WINAPI Handle_Bip_whois_Thread(LPVOID lpvoid)
 
 void intial_bip_socket()
 {
+	static CString last_bind_network_card;
     if (1/*initial_bip == false*/)
     {
 
@@ -8314,8 +8329,13 @@ Device IP : %s \r\n"), selected_product_Node.NetworkCard_Address, selected_produ
 
         if (g_bac_instance > 0)
         {
-            Send_WhoIs_Global(-1, -1);
-            Sleep(1000);
+			if (last_bind_network_card.CompareNoCase(selected_product_Node.NetworkCard_Address) != 0)
+			{
+				last_bind_network_card = selected_product_Node.NetworkCard_Address;
+				Send_WhoIs_Global(-1, -1);
+				Sleep(1000);
+			}
+
         }
     }
     else

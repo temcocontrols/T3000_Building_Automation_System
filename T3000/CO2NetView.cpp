@@ -1425,8 +1425,12 @@ void CCO2NetView::Check_DayTime()
     int cyear,cmonth,cday;
     m_co2_day_picker.GetTime(temp_time);
     cyear = temp_time.GetYear();
-    if(cyear>1800)
-        cyear = cyear%100;
+    if (product_register_value[4] < 106)
+    {
+        if (cyear > 1800)
+            cyear = cyear % 100;
+    }
+
     cmonth = temp_time.GetMonth();
     cday = temp_time.GetDay();
     if(cyear != product_register_value[CO2_NET_MODBUS_RTC_YEAR])

@@ -2491,7 +2491,7 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
     }
     else
     {
-        Send_WhoIs_Global(-1, -1);
+        Send_WhoIs_Global(deviceid, deviceid);
         return -2;
     }
 }
@@ -4641,6 +4641,12 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         memcpy_s(Device_Email_Point.reg.password, 20, my_temp_point, 20);
         my_temp_point = my_temp_point + 20;
         Device_Email_Point.reg.secure_connection_type = *(my_temp_point++);
+
+        memcpy_s(Device_Email_Point.reg.To1Addr, 60, my_temp_point, 60);
+        my_temp_point = my_temp_point + 60;
+        memcpy_s(Device_Email_Point.reg.To2Addr, 60, my_temp_point, 60);
+        my_temp_point = my_temp_point + 60;
+        Device_Email_Point.reg.error_code = *(my_temp_point++);
         return READ_EMAIL_ALARM;
     }
     break;
@@ -6354,17 +6360,26 @@ void local_handler_conf_private_trans_ack(
     if(((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG)) //||
         /*(bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND)*/) //Setting 要特殊存一下
     {
-        CString temp_file;
-        CString temp_serial;
-        temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
-        temp_file = g_achive_folder + _T("\\") + temp_serial;
-        SaveBacnetBinaryFile(temp_file);
+        SaveBacnetBinaryFile(g_selected_serialnumber);
+        //CString temp_file;
+        //CString temp_serial;
+        //temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
+        //temp_file = g_achive_folder + _T("\\") + temp_serial;
+        //SaveBacnetBinaryFile(temp_file);
         //TRACE(_T("Save config file cache\r\n"));
     }
 
     return;
 }
 
+void SaveBacnetBinaryFile(unsigned int serialnumber)
+{
+    CString temp_file;
+    CString temp_serial;
+    temp_serial.Format(_T("%u.prog"), serialnumber);//g_selected_serialnumber
+    temp_file = g_achive_folder + _T("\\") + temp_serial;
+    SaveBacnetBinaryFile(temp_file);
+}
 //This function coded by Fance,used to split the cstring to each part.
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
 {
@@ -8296,6 +8311,14 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         temp_label.serial_number = (unsigned int)nSerial;
         CString temp_serial_number;
         temp_serial_number.Format(_T("%u"), temp_label.serial_number);
+
+        if (cs_temp_label.CompareNoCase(_T("MSTP:")) == 0)
+        {
+            CString temp_id;
+            temp_id.Format(_T("ID %d"), temp.modbusID);
+            cs_temp_label = cs_temp_label + temp_id;
+        }
+
         temp.show_label_name = cs_temp_label;
     }
     if ((temp.panal_number <= 255) && temp.parent_serial_number == 0)
@@ -8313,7 +8336,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	}
 
 #ifdef DEBUG
-    if (nip_address.CompareNoCase(_T("192.168.0.132"))== 0)
+    if (nip_address.CompareNoCase(_T("192.168.0.144"))== 0)
     {
         //t2 = GetTickCount();
         //CString temp_time_print;
@@ -16755,7 +16778,10 @@ int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npane
         pBuf[dwFileLen] = 0;
         myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
         myfile.Close();
-        
+        if (dwFileLen == 2048) //正常的PROG文件大小都会比60000大,防止读取文件出错
+        {           
+            return -3;
+        }
         char* temp_buffer = pBuf;
         bool b_new_prg = false;
         int ntemp_version = 0;
@@ -16772,6 +16798,10 @@ int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npane
                 return -2;
             }
             temp_buffer++;
+        }
+        else
+        {
+            return -4;
         }
 
             char* temp_point = temp_buffer;

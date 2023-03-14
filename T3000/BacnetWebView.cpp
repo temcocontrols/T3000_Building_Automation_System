@@ -611,7 +611,7 @@ HRESULT BacnetWebViewAppWindow::WebMessageReceived(ICoreWebView2* sender, ICoreW
 	CString receivedMessage = pwStr;
 	if (!receivedMessage.IsEmpty())
 	{
-		TRACE(receivedMessage);
+		//TRACE(receivedMessage);
 		ProcessWebviewMsg(receivedMessage);
 
 		//AfxMessageBox(L"Message  from Javascript : " + receivedMessage);
@@ -664,7 +664,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	{
 		tempjson["action"] = "GET_PANEL_DATA_RES";
 		int npanel_id = json.get("panelId", Json::nullValue).asInt();
-		npanel_id = bac_gloab_panel;
+		if(npanel_id == 0)
+		   npanel_id = bac_gloab_panel;
 		int nret = LoadOnlinePanelData(npanel_id);
 		if (nret < 0)
 		{
@@ -690,8 +691,9 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		else if (nret == 0)
 		{
 			CString temp_message;
-			temp_message.Format(_T("Panel %d is offline!"), npanel_id);
-			MessageBox(m_mainWindow, temp_message ,L"Warning", MB_OK);
+			temp_message.Format(_T("Panel %d is offline!\r\n"), npanel_id);
+			TRACE(temp_message);
+			//MessageBox(m_mainWindow, temp_message ,L"Warning", MB_OK);
 			break;
 		}
 		else if (npanel_id == 0)
@@ -1052,11 +1054,55 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		if (data.size()) {
 			for (int i = 0; i < data.size(); i++) {
 				Json::Value entry = data[i];
-				int panel_id = entry.get("panelId", Json::nullValue).asInt();
+				int npanel_id = entry.get("panelId", Json::nullValue).asInt();
 				int entry_index = entry.get("index", Json::nullValue).asInt();
 				int entry_type = entry.get("type", Json::nullValue).asInt(); // entry_type is enum WEBVIEW_ENTRY_TYPE
-				tempjson["data"][i]["panel_id"] = panel_id;
+				//tempjson["data"][i]["panel_id"] = panel_id;
 				tempjson["data"][i]["index"] = entry_index;
+
+				if (entry_type == BAC_IN)
+				{
+					if (entry_index >= BAC_INPUT_ITEM_COUNT)
+						continue;
+					CString temp_cs4;
+					int ret_index4 = Post_Background_Read_Message_ByPanel(npanel_id, READINPUT_T3000, entry_index + 1);  //send message to background ，read 199IN3
+					if (ret_index4 >= 0)
+					{
+						memcpy(&g_Input_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index4).ret_data.m_group_input_data, sizeof(Str_in_point));
+						temp_cs4.Format(_T("%dIN%d %.3f\r\n"), npanel_id, m_backbround_data.at(ret_index4).str_info.npoint_number + 1, m_backbround_data.at(ret_index4).ret_data.m_group_input_data.value / 1000.000);
+						TRACE(temp_cs4);
+						//AfxMessageBox(temp_cs4);
+					}
+					tempjson["data"][i]["pid"] = npanel_id;
+					tempjson["data"][i]["type"] = "INPUT";
+					tempjson["data"][i]["index"] = entry_index;
+					tempjson["data"][i]["id"] = "IN" + to_string(entry_index + 1);
+					tempjson["data"][i]["command"] = to_string(npanel_id) + "IN" + to_string(entry_index + 1);
+					tempjson["data"][i]["description"] = (char*)g_Input_data[npanel_id].at(i).description;
+					tempjson["data"][i]["label"] = (char*)g_Input_data[npanel_id].at(i).label;
+					tempjson["data"][i]["unit"] = g_Input_data[npanel_id].at(i).range;
+					tempjson["data"][i]["auto_manual"] = g_Input_data[npanel_id].at(i).auto_manual;
+					tempjson["data"][i]["value"] = g_Input_data[npanel_id].at(i).value;
+					tempjson["data"][i]["filter"] = g_Input_data[npanel_id].at(i).filter;
+					tempjson["data"][i]["control"] = g_Input_data[npanel_id].at(i).control;
+					tempjson["data"][i]["digital_analog"] = g_Input_data[npanel_id].at(i).digital_analog;
+					tempjson["data"][i]["range"] = g_Input_data[npanel_id].at(i).range;
+					tempjson["data"][i]["calibration_sign"] = g_Input_data[npanel_id].at(i).calibration_sign;
+					tempjson["data"][i]["calibration_h"] = g_Input_data[npanel_id].at(i).calibration_h;
+					tempjson["data"][i]["calibration_l"] = g_Input_data[npanel_id].at(i).calibration_l;
+				}
+				else if (entry_type == BAC_OUT)
+				{
+					if (entry_index >= BAC_OUTPUT_ITEM_COUNT)
+						continue;
+					//Add more code here
+				}
+				else if (entry_type == BAC_VAR)
+				{
+					if (entry_index >= BAC_VARIABLE_ITEM_COUNT)
+						continue;
+					//Add more code here
+				}
 			}
 			const std::string output = Json::writeString(builder, tempjson);
 			CString temp_cs(output.c_str());

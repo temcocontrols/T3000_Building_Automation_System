@@ -675,7 +675,7 @@ void CBacnetSettingTcpip::OnBnClickedRadioUsbHost()
 
 void CBacnetSettingTcpip::OnBnClickedButtonHealth()
 {
-#ifdef DEBUG
+#if 0
     CString temp_cs1;
 
 	int ret_index1 = Post_Background_Read_Message_ByPanel(199, READINPUT_T3000, 8);  //send message to background £¬read 199IN3

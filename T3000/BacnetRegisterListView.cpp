@@ -716,7 +716,25 @@ LRESULT CBacnetRegisterListView::Fresh_Register_Item(WPARAM wParam, LPARAM lPara
         {
             unsigned short m_value = 0;
             int nret = 0;
-            if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_16_BIT_SIGNED_INTEGER_DIV_10]) == 0)
+            if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_16_BIT_SIGNED_INTEGER_DIV_100]) == 0)
+            {
+                m_value = ((float)_wtof(New_CString)) * 100;
+                if ((m_value < -32768) || (m_value > 32767))
+                {
+                    MessageBox(_T("Please enter the required data!"));
+                    return 1;
+                }
+            }
+            else  if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_100]) == 0)
+            {
+                m_value = ((float)_wtof(New_CString)) * 100;
+                if ((m_value < 0) || (m_value > 65535))
+                {
+                    MessageBox(_T("Please enter the required data!"));
+                    return 1;
+                }
+            }
+            else if (CStringDataFormat.CompareNoCase(RegisterView_Format[REGISTER_16_BIT_SIGNED_INTEGER_DIV_10]) == 0)
             {
                m_value = ((float)_wtof(New_CString)) * 10;
                if ((m_value < -32768) || (m_value > 32767))
@@ -1002,18 +1020,86 @@ LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lPara
         }
         case REGISTER_CHARACTER_STRING_HI_LO: 
         {  
-            break;
+                CString temp_string;
+                char temp_char[255];
+                int ntemplength = register_dbdata[i].m_register_length;
+                unsigned short temp_reg[255];
+                memset(temp_char, 0, 255);
+                memset(temp_reg, 0, 255);
+                for (int i = 0; i < ntemplength; i++)
+                {
+                    temp_reg[i] = htons(product_register_value[n_start_add + i]);
+                    //product_register_value[n_start_add] 
+                }
+                memcpy_s(temp_char, 255, temp_reg, ntemplength * 2);
+                MultiByteToWideChar(CP_ACP, 0, (char*)temp_char, (int)strlen(temp_char) + 1,temp_string.GetBuffer(ntemplength * 2 + 1), ntemplength * 2 + 1);
+                temp_string.ReleaseBuffer();
+                temp_string.Trim();
+                n_value = temp_string;                   
         }
+        break;
         case REGISTER_CHARACTER_STRING_LO_HI: 
         {  
+            CString temp_string;
+            char temp_char[255];
+            int ntemplength = register_dbdata[i].m_register_length;
+            unsigned short temp_reg[255];
+            memset(temp_char, 0, 255);
+            memset(temp_reg, 0, 255);
+            for (int i = 0; i < ntemplength; i++)
+            {
+                temp_reg[i] = product_register_value[n_start_add + i];
+                //product_register_value[n_start_add] 
+            }
+            memcpy_s(temp_char, 255, temp_reg, ntemplength * 2);
+            MultiByteToWideChar(CP_ACP, 0, (char*)temp_char, (int)strlen(temp_char) + 1, temp_string.GetBuffer(ntemplength * 2 + 1), ntemplength * 2 + 1);
+            temp_string.ReleaseBuffer();
+            temp_string.Trim();
+            n_value = temp_string;
             break;
         }
         case REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_10:
-        case REGISTER_16_BIT_SIGNED_INTEGER_DIV_10:
         {
             float n_temp_float = 0;
             n_temp_float = ((float)product_register_value[n_start_add])/10.0 ;
             n_value.Format(_T("%.1f"), n_temp_float);
+            break;
+        }
+        case REGISTER_16_BIT_SIGNED_INTEGER_DIV_10:
+        {
+            int n_temp_float = 0;
+            if (product_register_value[n_start_add] > 32767)
+            {
+                n_value.Format(_T("-%.1f"), (float)(65536 - product_register_value[n_start_add]) / 10.0);
+            }
+            else
+            {
+                n_value.Format(_T("%.1f"), (float)product_register_value[n_start_add] / 10.0 );
+            }
+
+            
+            break;
+        }
+        case REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_100:
+        {
+            float n_temp_float = 0;
+            n_temp_float = ((float)product_register_value[n_start_add]) / 100.0;
+            n_value.Format(_T("%.2f"), n_temp_float);
+            break;
+        }
+        case REGISTER_16_BIT_SIGNED_INTEGER_DIV_100:
+        {
+            int n_temp_float = 0;
+            if (product_register_value[n_start_add] > 32767)
+            {
+                n_value.Format(_T("-%.2f"), (float)(65536 - product_register_value[n_start_add]) / 100.0);
+            }
+            else
+            {
+                n_value.Format(_T("%.2f"), (float)product_register_value[n_start_add] / 100.0);
+            }
+
+
             break;
         }
         default :

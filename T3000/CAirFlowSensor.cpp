@@ -487,7 +487,6 @@ int CANVAS_TOP_X = 550;  //画布
 int CANVAS_TOP_Y = 0;
 int CANVAS_BOTTOM_X = 1210;
 int CANVAS_BOTTOM_Y = 420;
-
 int ORIGIN_X = 600; //原点
 int ORIGIN_Y = 400;
 

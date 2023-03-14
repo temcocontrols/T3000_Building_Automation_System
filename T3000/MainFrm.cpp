@@ -12264,6 +12264,7 @@ loop1:
                             memcpy(&m_Variable_data.at(z).value, temp_value, 4);
                             Sleep(1);
                         }
+                        SaveBacnetBinaryFile(g_selected_serialnumber);
                         ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
 
                     }
@@ -12284,6 +12285,7 @@ loop1:
                             memcpy(&m_Input_data.at(z).value, temp_value, 4);
                             Sleep(1);
                         }
+                        SaveBacnetBinaryFile(g_selected_serialnumber);
                         ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
                     }
                     else if ((unsigned char)My_WriteList_Struct->command == READOUTPUT_T3000)
@@ -12303,6 +12305,7 @@ loop1:
                             memcpy(&m_Output_data.at(z).value, temp_value, 4);
                             Sleep(1);
                         }
+                        SaveBacnetBinaryFile(g_selected_serialnumber);
                         ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
                     }
                 }

@@ -256,8 +256,17 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 	strlist.push_back(L"");
 	strlist.push_back(L"Home");
 	strlist.push_back(L"Work");
-	strlist.push_back(L"Sleep");
-	strlist.push_back(L"Away");
+	if ((product_register_value[7] == PM_TSTAT7) ||
+		(product_register_value[7] == PM_TSTAT7_ARM)) //TSTAT7  貌似不支持 AWAY  和 sleep这两种模式。Fandu 2023 03 08
+	{
+		;
+	}
+	else
+	{
+		strlist.push_back(L"Sleep");
+		strlist.push_back(L"Away");
+	}
+
 	list<Schedule_Node>::iterator it;
 	int index = 0;
 	for (it = m_ScheduleList.begin();it != m_ScheduleList.end();++it)
@@ -321,8 +330,16 @@ void CNewTstatSchedulesDlg::Fresh_List()
 	strlist.push_back(L"");
 	strlist.push_back(L"Home");
 	strlist.push_back(L"Work");
-	strlist.push_back(L"Sleep");
-	strlist.push_back(L"Away");
+	if ((product_register_value[7] == PM_TSTAT7) ||
+		(product_register_value[7] == PM_TSTAT7_ARM))  //TSTAT7  貌似不支持 AWAY  和 sleep这两种模式。Fandu 2023 03 08
+	{
+		;
+	}
+	else
+	{
+		strlist.push_back(L"Sleep");
+		strlist.push_back(L"Away");
+	}
 
 	list<Schedule_Node>::iterator it;
 	int index = 0;
@@ -1118,6 +1135,20 @@ void CNewTstatSchedulesDlg::OnBnClickedOk()
 	int EventNumber[2] = { 0,0 };
 	int i = 0;
 	memset(TimeBuffer, 0xff, sizeof(unsigned short) * 12);
+
+	if ((m_Monday.size() > 6) ||
+		(m_Tuesday.size() > 6) ||
+		(m_Wednesday.size() > 6) ||
+		(m_Thursday.size() > 6) ||
+		(m_Friday.size() > 6) ||
+		(m_Saturday.size() > 6) ||
+		(m_Sunday.size() > 6) ||
+		(m_Holiday.size() > 6) )
+	{
+		MessageBox(_T("Schedule only supports a maximum of 6 events per day"));
+		return;
+	}
+	
 	for (i = 0;i<(int)m_Monday.size();i++)
 	{
 

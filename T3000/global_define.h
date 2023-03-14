@@ -2286,7 +2286,9 @@ const CString RegisterView_Format[] =
     _T("Character String HI_LO"),
     _T("Character String LO_HI"),
     _T("16 Bit Signed Integer/10") ,  //17
-    _T("16 Bit Unsigned Integer/10")  // 18
+    _T("16 Bit Unsigned Integer/10"),  // 18
+	_T("16 Bit Signed Integer/100") ,  //19
+	_T("16 Bit Unsigned Integer/100")  // 20
 };
 const int REGISTER_UNKNOWN = 0;
 const int REGISTER_8_BIT_UNSIGNED_INTEGER = 1;
@@ -2307,6 +2309,8 @@ const int REGISTER_CHARACTER_STRING_HI_LO = 15;
 const int REGISTER_CHARACTER_STRING_LO_HI = 16;
 const int REGISTER_16_BIT_SIGNED_INTEGER_DIV_10 = 17;
 const int REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_10 = 18;
+const int REGISTER_16_BIT_SIGNED_INTEGER_DIV_100 = 19;
+const int REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_100 = 20;
 
 const CString Wifi_Module_Status[] =
 {

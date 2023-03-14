@@ -23,7 +23,7 @@ HANDLE h_create_webview_server_thread = NULL;
 HANDLE h_write_pic_thread = NULL;
 HANDLE h_get_pic_thread = NULL;
 CString Change_File_Path;
-extern tree_product selected_product_Node; // ѡ�е��豸��Ϣ;
+extern tree_product selected_product_Node; // 选中的设备信息;
 IMPLEMENT_DYNAMIC(BacnetScreen, CDialogEx)
 
 BacnetScreen::BacnetScreen(CWnd* pParent /*=NULL*/)
@@ -48,8 +48,8 @@ BEGIN_MESSAGE_MAP(BacnetScreen, CDialogEx)
 	ON_MESSAGE(WM_REFRESH_BAC_SCREEN_LIST,Fresh_Screen_List)	
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Screen_Item)	
 	ON_NOTIFY(NM_CLICK, IDC_LIST_SCREEN, &BacnetScreen::OnNMClickListScreen)
-	ON_MESSAGE(WM_HOTKEY,&BacnetScreen::OnHotKey)//��ݼ���Ϣӳ���ֶ�����
-	ON_MESSAGE(WM_SCREENEDIT_CLOSE,&BacnetScreen::Screeenedit_close_handle)//��ݼ���Ϣӳ���ֶ�����
+	ON_MESSAGE(WM_HOTKEY,&BacnetScreen::OnHotKey)//快捷键消息映射手动加入
+	ON_MESSAGE(WM_SCREENEDIT_CLOSE,&BacnetScreen::Screeenedit_close_handle)//快捷键消息映射手动加入
 	ON_BN_CLICKED(IDC_BUTTON_GRAPHIC_INSERT, &BacnetScreen::OnBnClickedInsert)
 	ON_BN_CLICKED(IDC_WEBVIEW_BUTTON, &BacnetScreen::OnBnClickedWebViewShow)
 	ON_WM_CLOSE()
@@ -109,7 +109,7 @@ DWORD WINAPI  BacnetScreen::ReadScreenThreadfun(LPVOID lpVoid)
 
 bool BacnetScreen::read_screen_label()
 {
-	//һֱ���� ��һ��ȫ��0 �� ��Чlabel;
+	//一直读到 下一个全是0 的 无效label;
 	for (int i=0;i<BAC_GRPHIC_LABEL_GROUP;i++)
 	{
 		int end_temp_instance = 0;
@@ -161,14 +161,14 @@ LRESULT  BacnetScreen::ScreenCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		memcpy_s(&m_screen_data.at(pInvoke->mRow),sizeof(Control_group_point),&m_temp_screen_data[pInvoke->mRow],sizeof(Control_group_point));//��ԭû�иĶԵ�ֵ
+		memcpy_s(&m_screen_data.at(pInvoke->mRow),sizeof(Control_group_point),&m_temp_screen_data[pInvoke->mRow],sizeof(Control_group_point));//还原没有改对的值
 		PostMessage(WM_REFRESH_BAC_SCREEN_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		//AfxMessageBox(Show_Results);
 		//MessageBox(_T("Bacnet operation fail!"));
 	}
-	if((pInvoke->mRow%2)==0)	//�ָ�ǰ���� ���� ��ɫ;
+	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 		m_screen_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
 		m_screen_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -223,20 +223,20 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//��ȡ view�Ĵ����С;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//��ȡ view�Ĵ����С;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 
 		return 1; 
 	}
-	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //��ëҪ��F2����ˢ��ֵ;
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
 	{
 		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_SCREENS);
 		return TRUE;
@@ -245,10 +245,10 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-//��ɾ������Ի���֮ǰ �ȳ��Ա��� �����е� label;
+//在删除这个对话框之前 先尝试保存 操作中的 label;
 LRESULT BacnetScreen::Screeenedit_close_handle(WPARAM wParam,LPARAM lParam)
 {
-    //���û��ر��������ʱ��������ԵĶ��У���������������Ϣ��Ҳ��գ�����100������Ϣ ȫ��������
+    //当用户关闭这个窗口时，清空所以的队列，即便有正常的消息，也清空，否则100多条消息 全堵在这里
     MyCriticalSection.Lock();
     My_Receive_msg.clear();
     MyCriticalSection.Unlock();
@@ -331,7 +331,7 @@ BOOL BacnetScreen::OnInitDialog()
 	PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 
 	ShowWindow(FALSE);
-//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2��
+//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2键
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -416,7 +416,7 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 	//{
 	//	if(m_screen_list.IsDataNewer((char *)&m_screen_data.at(0),sizeof(Control_group_point) * BAC_SCREEN_COUNT))
 	//	{
-	//		//����list ˢ��ʱ��˸;��û�����ݱ䶯������²�ˢ��List;
+	//		//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
 	//		m_screen_list.SetListData((char *)&m_screen_data.at(0),sizeof(Control_group_point) * BAC_SCREEN_COUNT);
 	//	}
 	//	else
@@ -489,7 +489,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 
 
 		CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_SCREEN_DESCRIPTION_LENGTH)	//���Ȳ��ܴ��ڽṹ�嶨��ĳ���;
+		if(cs_temp.GetLength()>= STR_SCREEN_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Warning"),_T("Length can not higher than 20"));
 			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
@@ -508,7 +508,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 	else if(Changed_SubItem == SCREEN_LABEL)
 	{
 		CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_SCREEN_LABLE_LENGTH)	//���Ȳ��ܴ��ڽṹ�嶨��ĳ���;
+		if(cs_temp.GetLength()>= STR_SCREEN_LABLE_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
 			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
@@ -608,7 +608,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 	lCol = lvinfo.iSubItem;
 
 
-	if(lRow>m_screen_list.GetItemCount()) //����������������кţ���������Ч��;
+	if(lRow>m_screen_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的;
 		return;
 	if(lRow<0)
 		return;
@@ -637,7 +637,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 		HANDLE hFind = FindFirstFile(image_fordor, &fd);
 		if ((hFind != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 		{
-			//Ŀ¼����
+			//目录存在
 			ret = TRUE;
 		}
 		else
@@ -653,7 +653,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 		SetCurrentDirectoryW(image_fordor);
-		//ѡ��ͼƬ,���ѡ�Ĳ���databaseĿ¼�¾�copyһ�ݹ���;����ڵĻ�������������Ϊ�ļ������Ȳ��ܳ���10���ֽ�;
+		//选择图片,如果选的不在database目录下就copy一份过来;如果在的话就重命名，因为文件名长度不能超过10个字节;
 		CString strFilter = _T("jpg file;bmp file;png file|*.jpg;*.bmp;*.png|all File|*.*||");
 		CFileDialog dlg(true,_T("bmp"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
 		if(IDOK==dlg.DoModal())
@@ -684,7 +684,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 			CString new_file_path;
 			new_file_path = image_fordor + _T("\\") + FileName;
 			Change_File_Path = new_file_path;
-			if(temp1.CompareNoCase(image_fordor) != 0)//������ڵ�ǰĿ¼�Ͳ���copy������;
+			if(temp1.CompareNoCase(image_fordor) != 0)//如果就在当前目录就不用copy过来了;
 			{
 				CopyFile(FilePath,new_file_path,false);
 			}
@@ -779,7 +779,7 @@ void BacnetScreen::OnTimer(UINT_PTR nIDEvent)
 	{
 		PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 	}
-	else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_SCREENS))  )	//GSM����ʱ��Ҫˢ��;
+	else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_SCREENS))  )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -790,7 +790,7 @@ void BacnetScreen::OnTimer(UINT_PTR nIDEvent)
 
 void BacnetScreen::Reg_Hotkey()
 {
-	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert��
+	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert键
 }
 
 void BacnetScreen::Unreg_Hotkey()
@@ -854,7 +854,7 @@ int BacnetScreen::WritePicFileFunction(CString ChooseFilePath,unsigned char scre
 	//if(IDOK!=dlg.DoModal())
 	//	return ;
 	//ChooseFilePath=dlg.GetPathName();
-	//MD5��һ��32bit��ֵ ���ַ����;
+	//MD5是一个32bit的值 按字符存的;
 
 
 
@@ -862,9 +862,9 @@ int BacnetScreen::WritePicFileFunction(CString ChooseFilePath,unsigned char scre
 #pragma region read file buffer
 	pic_sd_struct temp_pic;
 	memset(&temp_pic,0,sizeof(pic_sd_struct));
-	CFile Filetxt;//������ȡλͼ�ļ�
-	DWORD FileLen=0;//λͼ�ĳ���
-	char* FileBuff;//���ڴ��λͼ��Ϣ
+	CFile Filetxt;//用来读取位图文件
+	DWORD FileLen=0;//位图的长度
+	char* FileBuff;//用于存放位图信息
 
 	//unsigned int pic_file_size = 0;
 	string temp_md5 = MD5(ifstream( ChooseFilePath )).toString();
@@ -874,20 +874,20 @@ int BacnetScreen::WritePicFileFunction(CString ChooseFilePath,unsigned char scre
 	temp_show.Format(_T("The File MD5 is :"));
 
 
-	if(!Filetxt.Open(ChooseFilePath,CFile::modeRead))//���ļ�
+	if(!Filetxt.Open(ChooseFilePath,CFile::modeRead))//打开文件
 	{
-		//MessageBox(NULL,"���ı���Ϣʧ��!",NULL, MB_OK);
+		//MessageBox(NULL,"打开文本信息失败!",NULL, MB_OK);
 		return false;
 	}
-	FileLen=Filetxt.GetLength();//�õ�λͼ�ĳ���
-	FileBuff=new char[FileLen+1];//��λͼ�ļ��������ڿռ�
+	FileLen=Filetxt.GetLength();//得到位图的长度
+	FileBuff=new char[FileLen+1];//给位图文件申请内在空间
 	DWORD DwPic=Filetxt.GetLength();
-	memset(FileBuff,0,FileLen+1);//��ʼ��λͼ�ļ��Ŀռ�
-	if(!FileBuff)//�ж�λͼ�ռ��Ƿ�����ɹ�
+	memset(FileBuff,0,FileLen+1);//初始化位图文件的空间
+	if(!FileBuff)//判断位图空间是否申请成功
 	{
 		return false;
 	}
-	if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//��ȡ�ı���Ϣ�����뵽FileBuff��ȥ
+	if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//读取文本信息，存入到FileBuff中去
 	{
 		return false;
 	}
@@ -906,10 +906,10 @@ int BacnetScreen::WritePicFileFunction(CString ChooseFilePath,unsigned char scre
 		last_packet_data_size = FileLen % 400;
 	}
 
-	temp_pic.total_packet = temp_filepack + 1; //���� 1�� ��һ����ͷ �� MD5ֵ�� �ļ��ܰ���.;
+	temp_pic.total_packet = temp_filepack + 1; //其中 1是 第一包的头 传 MD5值和 文件总包数.;
 
 	//char crc_cal[4];
-	temp_pic.crc_cal[0] = 0x55 ; temp_pic.crc_cal[1] = 0xff ;temp_pic.crc_cal[2] = 0x55 ;temp_pic.crc_cal[3] = 0xff ; //��һ�������� ǰ4���ֽ� 0x55ff55ff�� ����ɰ汾 ���ظ�����Ϣ;
+	temp_pic.crc_cal[0] = 0x55 ; temp_pic.crc_cal[1] = 0xff ;temp_pic.crc_cal[2] = 0x55 ;temp_pic.crc_cal[3] = 0xff ; //第一包里面用 前4个字节 0x55ff55ff来 区别旧版本 不回复的信息;
 	//char md5_32byte[33];
 	memset(temp_pic.md5_32byte,0,33);
 	WideCharToMultiByte( CP_ACP, 0, MD5_value.GetBuffer(), -1, temp_pic.md5_32byte, 255, NULL, NULL );
@@ -973,7 +973,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 	//if(IDOK!=dlg.DoModal())
 	//	return ;
 	//ChooseFilePath=dlg.GetPathName();
-	//MD5��һ��32bit��ֵ ���ַ����;
+	//MD5是一个32bit的值 按字符存的;
 	pic_sd_struct temp_picture;
 	memset(&temp_picture,0,sizeof(pic_sd_struct));
 	//char md5_value[33];
@@ -1012,7 +1012,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 		return 0;
 	}
 
-	//�ȶ�MD5 ���豸���Ƿ�һ��;
+	//比对MD5 与设备的是否一致;
 	CString temp_pic_md5_cs;
 	MultiByteToWideChar( CP_ACP, 0, temp_picture.md5_32byte, (int)strlen((char *)temp_picture.md5_32byte)+1, 
 		temp_pic_md5_cs.GetBuffer(MAX_PATH), MAX_PATH );
@@ -1070,7 +1070,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 	}
 
 
-	char *ReadBuff=new char[temp_picture.pic_file_size+1];//��λͼ�ļ��������ڿռ�;
+	char *ReadBuff=new char[temp_picture.pic_file_size+1];//给位图文件申请内在空间;
 	if(ReadBuff == NULL)
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No enough memory!"));
@@ -1088,7 +1088,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 			if(i!= (temp_picture.total_packet-1))
 				memcpy(ReadBuff + (i-1)*400,picture_data_buffer,400);
 			else
-				memcpy(ReadBuff + (i-1)*400,picture_data_buffer,last_packet_size);	//���һ��ֻcopy ʣ��� �ֽ�;
+				memcpy(ReadBuff + (i-1)*400,picture_data_buffer,last_packet_size);	//最后一包只copy 剩余的 字节;
 
 			CString temp_cs_complet;
 			temp_cs_complet.Format(_T("Read picture file %d / %d"), i*400  ,temp_picture.pic_file_size);
@@ -1138,9 +1138,9 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 		return 1;
 #if 0
 #pragma region read file buffer
-	CFile Filetxt;//������ȡλͼ�ļ�
-	DWORD FileLen=0;//λͼ�ĳ���
-	char* FileBuff;//���ڴ��λͼ��Ϣ
+	CFile Filetxt;//用来读取位图文件
+	DWORD FileLen=0;//位图的长度
+	char* FileBuff;//用于存放位图信息
 
 
 	string temp_md5 = MD5(ifstream( ChooseFilePath )).toString();
@@ -1150,20 +1150,20 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 	temp_show.Format(_T("The File MD5 is :"));
 
 
-	if(!Filetxt.Open(ChooseFilePath,CFile::modeRead))//���ļ�
+	if(!Filetxt.Open(ChooseFilePath,CFile::modeRead))//打开文件
 	{
-		//MessageBox(NULL,"���ı���Ϣʧ��!",NULL, MB_OK);
+		//MessageBox(NULL,"打开文本信息失败!",NULL, MB_OK);
 		return false;
 	}
-	FileLen=Filetxt.GetLength();//�õ�λͼ�ĳ���
-	FileBuff=new char[FileLen+1];//��λͼ�ļ��������ڿռ�
+	FileLen=Filetxt.GetLength();//得到位图的长度
+	FileBuff=new char[FileLen+1];//给位图文件申请内在空间
 	DWORD DwPic=Filetxt.GetLength();
-	memset(FileBuff,0,FileLen+1);//��ʼ��λͼ�ļ��Ŀռ�
-	if(!FileBuff)//�ж�λͼ�ռ��Ƿ�����ɹ�
+	memset(FileBuff,0,FileLen+1);//初始化位图文件的空间
+	if(!FileBuff)//判断位图空间是否申请成功
 	{
 		return false;
 	}
-	if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//��ȡ�ı���Ϣ�����뵽FileBuff��ȥ
+	if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//读取文本信息，存入到FileBuff中去
 	{
 		return false;
 	}
@@ -1182,7 +1182,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 		last_packet_data_size = FileLen % 400;
 	}
 
-	total_packet = temp_filepack + 1; //���� 1�� ��һ����ͷ �� MD5ֵ�� �ļ��ܰ���.;
+	total_packet = temp_filepack + 1; //其中 1是 第一包的头 传 MD5值和 文件总包数.;
 
 
 	char md5_32byte[33];
@@ -1246,7 +1246,7 @@ void BacnetScreen::Reset_Screen_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//��ȡ view�Ĵ����С;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -1254,7 +1254,7 @@ void BacnetScreen::Reset_Screen_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//��ȡ view�Ĵ����С;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -1279,14 +1279,14 @@ void BacnetScreen::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//��ȡ view�Ĵ����С;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//��ȡ view�Ĵ����С;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return;
@@ -1349,7 +1349,7 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 	return;
-	if(lRow>m_screen_list.GetItemCount()) //����������������кţ���������Ч��;
+	if(lRow>m_screen_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的;
 		return;
 	if(lRow<0)
 		return;

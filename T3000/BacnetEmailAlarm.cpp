@@ -44,12 +44,15 @@ void CBacnetEmailAlarm::OnBnClickedButton1()
     CString cs_email_Address;
     CString cs_user_name;
     CString cs_password;
+    CString cs_recipient_1;
+    CString cs_recipient_2;
     GetDlgItem(IDC_EDIT_SMTP_SERVER)->GetWindowTextW(cs_smtp_server);
     GetDlgItem(IDC_EDIT_PORT_NUMBER)->GetWindowTextW(cs_smtp_port);
     GetDlgItem(IDC_EDIT_EMAIL)->GetWindowTextW(cs_email_Address);
     GetDlgItem(IDC_EDIT_USERNAME)->GetWindowTextW(cs_user_name);
     GetDlgItem(IDC_EDIT_PASSWORD)->GetWindowTextW(cs_password);
-
+    GetDlgItem(IDC_EDIT_RECIPIENT_1)->GetWindowTextW(cs_recipient_1);
+    GetDlgItem(IDC_EDIT_RECIPIENT_2)->GetWindowTextW(cs_recipient_2);
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_SECURE_TYPE))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_SECURE_TYPE))->GetLBText(nSel, temp_string);
@@ -66,6 +69,8 @@ void CBacnetEmailAlarm::OnBnClickedButton1()
     WideCharToMultiByte(CP_ACP, NULL, cs_user_name.GetBuffer(), -1, Device_Email_Point.reg.user_name, 60, NULL, NULL);
     WideCharToMultiByte(CP_ACP, NULL, cs_password.GetBuffer(), -1, Device_Email_Point.reg.password, 20, NULL, NULL);
 
+    WideCharToMultiByte(CP_ACP, NULL, cs_recipient_1.GetBuffer(), -1, Device_Email_Point.reg.To1Addr, 60, NULL, NULL);
+    WideCharToMultiByte(CP_ACP, NULL, cs_recipient_2.GetBuffer(), -1, Device_Email_Point.reg.To2Addr, 60, NULL, NULL);
     int temp_port = _wtoi(cs_smtp_port);
     Device_Email_Point.reg.smtp_port = temp_port;
 
@@ -150,6 +155,14 @@ void CBacnetEmailAlarm::Fresh_UI()
         cs_user_name.GetBuffer(MAX_PATH), MAX_PATH);
     cs_user_name.ReleaseBuffer();
 
+    CString cs_user_1;
+    MultiByteToWideChar(CP_ACP, 0, (char*)Device_Email_Point.reg.To1Addr, (int)strlen((char*)Device_Email_Point.reg.To1Addr) + 1,
+        cs_user_1.GetBuffer(MAX_PATH), MAX_PATH);
+    cs_user_1.ReleaseBuffer();
+    CString cs_user_2;
+    MultiByteToWideChar(CP_ACP, 0, (char*)Device_Email_Point.reg.To2Addr, (int)strlen((char*)Device_Email_Point.reg.To2Addr) + 1,
+        cs_user_2.GetBuffer(MAX_PATH), MAX_PATH);
+    cs_user_2.ReleaseBuffer();
 
     cs_email_Address.Trim();
     cs_user_name.Trim();
@@ -159,6 +172,8 @@ void CBacnetEmailAlarm::Fresh_UI()
     GetDlgItem(IDC_EDIT_EMAIL)->SetWindowTextW(cs_email_Address);
     GetDlgItem(IDC_EDIT_USERNAME)->SetWindowTextW(cs_user_name);
     GetDlgItem(IDC_EDIT_PASSWORD)->SetWindowTextW(cs_password);
+    GetDlgItem(IDC_EDIT_RECIPIENT_1)->SetWindowTextW(cs_user_1);
+    GetDlgItem(IDC_EDIT_RECIPIENT_2)->SetWindowTextW(cs_user_2);
 
     if (Device_Email_Point.reg.secure_connection_type == 0)
     {
@@ -174,6 +189,28 @@ void CBacnetEmailAlarm::Fresh_UI()
     }
     else
         ((CComboBox *)GetDlgItem(IDC_COMBO_SECURE_TYPE))->SetCurSel(0);
+    CString cs_email_status;
+    //3-> HELO_SENT fail  13->login fail  8-> send data fail
+    switch (Device_Email_Point.reg.error_code)
+    {
+    case 2:
+        cs_email_status = _T("Failed to establish the connection");
+        break;
+    case 3:
+        cs_email_status = _T("Handshake failed");
+        break;
+    case 8:
+        cs_email_status = _T("Send data failed");
+        break;
+    case 13:
+        cs_email_status = _T("Login failed");
+        break;
+    default:
+        cs_email_status = _T("Normal");
+        break;
+    }
+    GetDlgItem(IDC_EDIT_STATUS)->SetWindowTextW(cs_email_status);
+    //IDC_EDIT_STATUS
 }
 
 BOOL CBacnetEmailAlarm::PreTranslateMessage(MSG* pMsg)

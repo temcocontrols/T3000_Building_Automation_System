@@ -286,7 +286,7 @@ BOOL Ping(const CString& strIP, CWnd* pWndEcho);
 void Send_WhoIs_remote_ip(CString ipaddress);
 void ClearBacnetData(); //用来初始化bacnet 内存;
 void SaveBacnetBinaryFile(CString &SaveConfigFilePath);
-
+void SaveBacnetBinaryFile(unsigned int serialnumber);
 int SaveModbusConfigFile(CString &SaveConfigFilePath);
 void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigned int bufferlength);
 int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path);

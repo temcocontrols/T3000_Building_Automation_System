@@ -544,7 +544,8 @@ const CString CO2_Type[] =
     _T("OGM200"),
     _T("Temco"),
     _T("SCD30"),
-    _T("MH_Z19B")
+    _T("MH_Z19B"),
+    _T("SCD40")
 };
 
 

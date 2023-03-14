@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ ���ɵİ����ļ���
-// �� T3000.rc ʹ��
+// Microsoft Visual C++ Éú³ÉµÄ°üº¬ÎÄ¼þ¡£
+// ¹© T3000.rc Ê¹ÓÃ
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -436,25 +436,30 @@
 #define IDC_TEST_TEMP2                  1032
 #define IDC_EDIT_LAT                    1032
 #define IDC_EDIT_VIRTUAL_ROOM           1032
+#define IDC_EDIT_VOLATGE_MAX_H          1032
 #define IDC_LEDTABLEBTN                 1033
 #define IDC_EDIT46                      1033
 #define IDC_DTS5                        1033
 #define IDC_RADIO_100                   1033
 #define IDC_EDIT_LON                    1033
+#define IDC_EDIT_CURRENT_MIN_H          1033
 #define IDC_EDIT47                      1034
 #define IDC_DTS6                        1034
 #define IDC_RADIO_FIT_TO_QTY            1034
 #define IDC_EDIT_FAN_ON_NAME            1034
 #define IDC_EDIT_ELE                    1034
+#define IDC_EDIT_CURRENT_MAX_H          1034
 #define IDC_MODEL_EDIT                  1035
 #define IDC_EDIT48                      1035
 #define IDC_DTS7                        1035
 #define IDC_EDIT_FAN_LOW_NAME           1035
 #define IDC_EDIT_EUNITS                 1035
+#define IDC_EDIT_MIN_H                  1035
 #define IDC_FIRMWARV_EDIT               1036
 #define IDC_START_POINT                 1036
 #define IDC_EDIT49                      1036
 #define IDC_DTS8                        1036
+#define IDC_EDIT_MAX_H                  1036
 #define IDC_HARDWAREV_EDIT              1037
 #define IDC_TEMP_TOL                    1037
 #define IDC_EDIT50                      1037
@@ -2535,8 +2540,12 @@
 #define IDC_EDIT_USERNAME               2510
 #define IDC_COMBO_SECURE_TYPE           2511
 #define IDC_TAB_SETTING                 2512
+#define IDC_EDIT_RECIPIENT_1            2512
 #define IDC_BUTTON_WIFI_CONFIGURATION   2513
+#define IDC_EDIT_RECIPIENT_2            2513
 #define IDC_STATIC_NET_WORK_TYPE        2514
+#define IDC_EDIT_RECIPIENT_3            2514
+#define IDC_EDIT_STATUS                 2514
 #define IDC_EDIT_CO2_ON_TIME            2515
 #define IDC_EDIT_CO2_OFF_TIME           2516
 #define IDC_RADIO_IP_STATIC             2516
@@ -2710,12 +2719,30 @@
 #define IDC_EDIT_HUM_OFFSET             2664
 #define IDC_STATIC_TRANSDUCER_TEMP_UNITS2 2665
 #define IDC_COMBO_TEMP_RANGE            2666
+#define IDC_STATIC_TRANSDUCER_ABS_VALUE 2667
 #define IDC_RADIO_DEFAULT               2668
+#define IDC_STATIC_TRANSDUCER_ENTHALPY_VALUE2 2668
 #define IDC_RADIO_USER_DEFINED          2669
+#define IDC_STATIC_TRANSDUCER_DEW_VALUE 2669
 #define IDC_EDIT_VOLATGE_MIN            2670
 #define IDC_STATIC_OUT_CURRENT          2671
 #define IDC_STATIC_OUT_CURRENT2         2672
 #define IDC_STATIC_OUT_VOLTAGE          2672
+#define IDC_EDIT_VOLATGE_MIN_H          2673
+#define IDC_STATIC_OUT_CURRENT_H        2674
+#define IDC_STATIC_OUT_VOLTAGE_H        2675
+#define IDC_STATIC_OUT_CURRENT_T        2676
+#define IDC_STATIC_OUT_VOLTAGE_T        2677
+#define IDC_EDIT_VOLATGE_MIN_T          2678
+#define IDC_EDIT_VOLATGE_MAX_T          2679
+#define IDC_EDIT_CURRENT_MIN_T          2680
+#define IDC_EDIT_CURRENT_MAX_T          2681
+#define IDC_EDIT_MIN_T                  2682
+#define IDC_EDIT_MAX_T                  2683
+#define IDC_RADIO_DEFAULT_T             2684
+#define IDC_RADIO_USER_DEFINED_T        2685
+#define IDC_RADIO_DEFAULT_H             2686
+#define IDC_RADIO_USER_DEFINED_H        2687
 #define IDC_RADIO_SCROLL_ENABLE         2694
 #define IDC_RADIO_SCROLLBAR_DISABLE     2695
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
@@ -3287,7 +3314,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        796
 #define _APS_NEXT_COMMAND_VALUE         34080
-#define _APS_NEXT_CONTROL_VALUE         2672
+#define _APS_NEXT_CONTROL_VALUE         2686
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
