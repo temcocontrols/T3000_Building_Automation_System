@@ -56,16 +56,6 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_ENTRIES = 6,
 };
 
-enum WEBVIEW_ENTRY_TYPE
-{
-	INPUT_TYPE = 0,
-	OUTPUT = 1,
-	VARIABLE = 2,
-	PROGRAM = 3,
-	SCHEDULE = 4,
-	HOLIDAY = 5
-};
-
 #define READ_INPUT_VARIABLE  0
 #define READ_OUTPUT_VARIABLE 1
 #define READ_VARIABLE 2
@@ -878,7 +868,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		// int ret_index = json.get("data_index", Json::nullValue).asInt(); //save ret_index ;
 		switch (entry_type)
 		{
-		case WEBVIEW_ENTRY_TYPE::INPUT_TYPE:
+		case BAC_IN:
 		{
 			//get the ret_index first 
 			groupdata temp_write_data = {0};
@@ -904,7 +894,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 		switch (entry_type)
 		{
-		case WEBVIEW_ENTRY_TYPE::INPUT_TYPE:
+		case BAC_IN:
 		{
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_INPUT_ITEM_COUNT)
@@ -925,7 +915,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
-		case WEBVIEW_ENTRY_TYPE::OUTPUT:
+		case BAC_OUT:
 		{
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_OUTPUT_ITEM_COUNT)
@@ -946,7 +936,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
-		case WEBVIEW_ENTRY_TYPE::VARIABLE:
+		case BAC_VAR:
 		{
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_VARIABLE_ITEM_COUNT)
@@ -967,7 +957,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
-		case WEBVIEW_ENTRY_TYPE::PROGRAM:
+		case BAC_PRG:
 		{
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_PROGRAM_ITEM_COUNT)
@@ -985,7 +975,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			::PostMessage(m_pragram_dlg_hwnd, WM_REFRESH_BAC_PROGRAM_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
-		case WEBVIEW_ENTRY_TYPE::SCHEDULE:
+		case BAC_SCH:
 		{
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_SCHEDULE_COUNT)
@@ -1003,7 +993,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
-		case WEBVIEW_ENTRY_TYPE::HOLIDAY:
+		case BAC_HOL:
 		{
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_HOLIDAY_COUNT)
@@ -1056,7 +1046,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				Json::Value entry = data[i];
 				int npanel_id = entry.get("panelId", Json::nullValue).asInt();
 				int entry_index = entry.get("index", Json::nullValue).asInt();
-				int entry_type = entry.get("type", Json::nullValue).asInt(); // entry_type is enum WEBVIEW_ENTRY_TYPE
+				int entry_type = entry.get("type", Json::nullValue).asInt();
 				//tempjson["data"][i]["panel_id"] = panel_id;
 				tempjson["data"][i]["index"] = entry_index;
 
