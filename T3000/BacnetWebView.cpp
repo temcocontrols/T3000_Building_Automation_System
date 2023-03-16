@@ -1068,18 +1068,18 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 					tempjson["data"][i]["index"] = entry_index;
 					tempjson["data"][i]["id"] = "IN" + to_string(entry_index + 1);
 					tempjson["data"][i]["command"] = to_string(npanel_id) + "IN" + to_string(entry_index + 1);
-					tempjson["data"][i]["description"] = (char*)g_Input_data[npanel_id].at(i).description;
-					tempjson["data"][i]["label"] = (char*)g_Input_data[npanel_id].at(i).label;
-					tempjson["data"][i]["unit"] = g_Input_data[npanel_id].at(i).range;
-					tempjson["data"][i]["auto_manual"] = g_Input_data[npanel_id].at(i).auto_manual;
-					tempjson["data"][i]["value"] = g_Input_data[npanel_id].at(i).value;
-					tempjson["data"][i]["filter"] = g_Input_data[npanel_id].at(i).filter;
-					tempjson["data"][i]["control"] = g_Input_data[npanel_id].at(i).control;
-					tempjson["data"][i]["digital_analog"] = g_Input_data[npanel_id].at(i).digital_analog;
-					tempjson["data"][i]["range"] = g_Input_data[npanel_id].at(i).range;
-					tempjson["data"][i]["calibration_sign"] = g_Input_data[npanel_id].at(i).calibration_sign;
-					tempjson["data"][i]["calibration_h"] = g_Input_data[npanel_id].at(i).calibration_h;
-					tempjson["data"][i]["calibration_l"] = g_Input_data[npanel_id].at(i).calibration_l;
+					tempjson["data"][i]["description"] = (char*)g_Input_data[npanel_id].at(entry_index).description;
+					tempjson["data"][i]["label"] = (char*)g_Input_data[npanel_id].at(entry_index).label;
+					tempjson["data"][i]["unit"] = g_Input_data[npanel_id].at(entry_index).range;
+					tempjson["data"][i]["auto_manual"] = g_Input_data[npanel_id].at(entry_index).auto_manual;
+					tempjson["data"][i]["value"] = g_Input_data[npanel_id].at(entry_index).value;
+					tempjson["data"][i]["filter"] = g_Input_data[npanel_id].at(entry_index).filter;
+					tempjson["data"][i]["control"] = g_Input_data[npanel_id].at(entry_index).control;
+					tempjson["data"][i]["digital_analog"] = g_Input_data[npanel_id].at(entry_index).digital_analog;
+					tempjson["data"][i]["range"] = g_Input_data[npanel_id].at(entry_index).range;
+					tempjson["data"][i]["calibration_sign"] = g_Input_data[npanel_id].at(entry_index).calibration_sign;
+					tempjson["data"][i]["calibration_h"] = g_Input_data[npanel_id].at(entry_index).calibration_h;
+					tempjson["data"][i]["calibration_l"] = g_Input_data[npanel_id].at(entry_index).calibration_l;
 				}
 				else if (entry_type == BAC_OUT)
 				{
