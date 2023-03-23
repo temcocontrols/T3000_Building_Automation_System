@@ -1063,6 +1063,10 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 						TRACE(temp_cs4);
 						//AfxMessageBox(temp_cs4);
 					}
+					else
+					{
+						continue;
+					}
 					tempjson["data"][i]["pid"] = npanel_id;
 					tempjson["data"][i]["type"] = "INPUT";
 					tempjson["data"][i]["index"] = entry_index;
@@ -1085,13 +1089,133 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				{
 					if (entry_index >= BAC_OUTPUT_ITEM_COUNT)
 						continue;
-					//Add more code here
+					int ret_index_out = Post_Background_Read_Message_ByPanel(npanel_id, READOUTPUT_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					if (ret_index_out >= 0)
+					{
+						memcpy(&g_Output_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_output_data, sizeof(Str_out_point));
+					}
+					else
+					{
+						continue;
+					}
+					tempjson["data"][i]["pid"] = npanel_id;
+					tempjson["data"][i]["type"] = "OUTPUT";
+					tempjson["data"][i]["index"] = entry_index;
+					tempjson["data"][i]["id"] = "OUT" + to_string(entry_index + 1);
+					tempjson["data"][i]["command"] = to_string(npanel_id) + "OUT" + to_string(entry_index + 1);
+					tempjson["data"][i]["description"] = (char*)g_Output_data[npanel_id].at(entry_index).description;
+					tempjson["data"][i]["label"] = (char*)g_Output_data[npanel_id].at(entry_index).label;
+					tempjson["data"][i]["auto_manual"] = g_Output_data[npanel_id].at(entry_index).auto_manual;
+					tempjson["data"][i]["value"] = g_Output_data[npanel_id].at(entry_index).value;
+					tempjson["data"][i]["low_voltage"] = g_Output_data[npanel_id].at(entry_index).low_voltage;
+					tempjson["data"][i]["high_voltage"] = g_Output_data[npanel_id].at(entry_index).high_voltage;
+					tempjson["data"][i]["range"] = g_Output_data[npanel_id].at(entry_index).range;
+					tempjson["data"][i]["control"] = g_Output_data[npanel_id].at(entry_index).control;
+					tempjson["data"][i]["digital_analog"] = g_Output_data[npanel_id].at(entry_index).digital_analog;
+					tempjson["data"][i]["hw_switch_status"] = g_Output_data[npanel_id].at(entry_index).hw_switch_status;
+
 				}
 				else if (entry_type == BAC_VAR)
 				{
 					if (entry_index >= BAC_VARIABLE_ITEM_COUNT)
 						continue;
-					//Add more code here
+					int ret_index_var = Post_Background_Read_Message_ByPanel(npanel_id, READVARIABLE_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					if (ret_index_var >= 0)
+					{
+						memcpy(&g_Variable_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_var).ret_data.m_group_variable_data, sizeof(Str_variable_point));
+					}
+					else
+					{
+						continue;
+					}
+
+					tempjson["data"][i]["pid"] = npanel_id;
+					tempjson["data"][i]["type"] = "VARIABLE";
+					tempjson["data"][i]["index"] = entry_index;
+					tempjson["data"][i]["id"] = "VAR" + to_string(entry_index + 1);
+					tempjson["data"][i]["command"] = to_string(npanel_id) + "VAR" + to_string(i + 1);
+					tempjson["data"][i]["description"] = (char*)g_Variable_data[npanel_id].at(entry_index).description;
+					tempjson["data"][i]["label"] = (char*)g_Variable_data[npanel_id].at(entry_index).label;
+					tempjson["data"][i]["auto_manual"] = g_Variable_data[npanel_id].at(entry_index).auto_manual;
+					tempjson["data"][i]["value"] = g_Variable_data[npanel_id].at(entry_index).value;
+					tempjson["data"][i]["range"] = g_Variable_data[npanel_id].at(entry_index).range;
+					tempjson["data"][i]["control"] = g_Variable_data[npanel_id].at(entry_index).control;
+					tempjson["data"][i]["digital_analog"] = g_Variable_data[npanel_id].at(entry_index).digital_analog;
+
+				}
+				else if (entry_type == BAC_PRG)
+				{
+					if (entry_index >= BAC_PROGRAM_ITEM_COUNT)
+						continue;
+					int ret_index_prg = Post_Background_Read_Message_ByPanel(npanel_id, READPROGRAM_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					if (ret_index_prg >= 0)
+					{
+						memcpy(&g_Program_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_prg).ret_data.m_group_program_data, sizeof(Str_program_point));
+					}
+					else
+					{
+						continue;
+					}
+					tempjson["data"][i]["pid"] = npanel_id;
+					tempjson["data"][i]["type"] = "PROGRAM";
+					tempjson["data"][i]["index"] = entry_index;
+					tempjson["data"][i]["id"] = "PRG" + to_string(entry_index + 1);
+					tempjson["data"][i]["command"] = to_string(npanel_id) + "PRG" + to_string(entry_index + 1);
+					tempjson["data"][i]["description"] = (char*)g_Program_data[npanel_id].at(entry_index).description;
+					tempjson["data"][i]["label"] = (char*)g_Program_data[npanel_id].at(entry_index).label;
+					tempjson["data"][i]["auto_manual"] = g_Program_data[npanel_id].at(entry_index).auto_manual;
+					tempjson["data"][i]["status"] = g_Program_data[npanel_id].at(entry_index).on_off;
+				}
+				else if (entry_type == BAC_SCH)
+				{
+					if (entry_index >= BAC_SCHEDULE_COUNT)
+						continue;
+					int ret_index_sch = Post_Background_Read_Message_ByPanel(npanel_id, READWEEKLYROUTINE_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					if (ret_index_sch >= 0)
+					{
+						memcpy(&g_Weekly_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_sch).ret_data.m_group_schedual_data, sizeof(Str_weekly_routine_point));
+					}
+					else
+					{
+						continue;
+					}
+					tempjson["data"][i]["pid"] = npanel_id;
+					tempjson["data"][i]["type"] = "SCHEDULE";
+					tempjson["data"][i]["index"] = entry_index;
+					tempjson["data"][i]["id"] = "SCH" + to_string(entry_index + 1);
+					tempjson["data"][i]["command"] = to_string(npanel_id) + "SCH" + to_string(entry_index + 1);
+					tempjson["data"][i]["description"] = (char*)g_Weekly_data[npanel_id].at(entry_index).description;
+					tempjson["data"][i]["label"] = (char*)g_Weekly_data[npanel_id].at(entry_index).label;
+					tempjson["data"][i]["auto_manual"] = g_Weekly_data[npanel_id].at(entry_index).auto_manual;
+					tempjson["data"][i]["output"] = g_Weekly_data[npanel_id].at(entry_index).value;
+					tempjson["data"][i]["state1"] = g_Weekly_data[npanel_id].at(entry_index).override_1_value;
+					tempjson["data"][i]["state2"] = g_Weekly_data[npanel_id].at(entry_index).override_2_value;
+				}
+				else if (entry_type == BAC_HOL)
+				{
+					if (entry_index >= BAC_HOLIDAY_COUNT)
+						continue;
+					CString temp_cs4;
+					int ret_index_hol = Post_Background_Read_Message_ByPanel(npanel_id, READANNUALROUTINE_T3000, entry_index + 1);  //send message to background ，read 199IN3
+					if (ret_index_hol >= 0)
+					{
+						memcpy(&g_Annual_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_hol).ret_data.m_group_input_data, sizeof(Str_annual_routine_point));
+					}
+					else
+					{
+						continue;
+					}
+
+					tempjson["data"][i]["pid"] = npanel_id;
+					tempjson["data"][i]["type"] = "HOLIDAY";
+					tempjson["data"][i]["index"] = entry_index;
+					tempjson["data"][i]["id"] = "CAL" + to_string(entry_index + 1);
+					tempjson["data"][i]["command"] = to_string(npanel_id) + "CAL" + to_string(entry_index + 1);
+					tempjson["data"][i]["description"] = (char*)g_Annual_data[npanel_id].at(entry_index).description;
+					tempjson["data"][i]["label"] = (char*)g_Annual_data[npanel_id].at(entry_index).label;
+					tempjson["data"][i]["auto_manual"] = g_Annual_data[npanel_id].at(entry_index).auto_manual;
+					tempjson["data"][i]["value"] = g_Annual_data[npanel_id].at(entry_index).value;
+
 				}
 			}
 			const std::string output = Json::writeString(builder, tempjson);
