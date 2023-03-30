@@ -527,9 +527,13 @@ using namespace Microsoft::WRL;
 void BacnetWebViewAppWindow::InitializeWebView()
 {
 	LPCWSTR subFolder = nullptr;
+	PWSTR userDataPath;
+	HRESULT hrfolder = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &userDataPath);
+	std::wstring userDataFolder(userDataPath);
+	userDataFolder += L"\\T3000";
 	auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
 	HRESULT hr = CreateCoreWebView2EnvironmentWithOptions(
-		subFolder, nullptr, options.Get(),
+		subFolder, userDataFolder.c_str(), options.Get(),
 		Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
 			this, &BacnetWebViewAppWindow::OnCreateEnvironmentCompleted)
 		.Get());
