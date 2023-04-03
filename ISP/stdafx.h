@@ -47,7 +47,12 @@ using namespace std;
 #include "Bacnet_Include.h"
 #include "Global_Struct.h"
 #pragma comment(lib,"BACnet_Stack_Library" )
-
+struct baudrate_def
+{
+    int ncomport;
+    int baudrate;
+    int test_ret;
+};
 #define INPUT extern "C" __declspec(dllimport)
 INPUT int write_multi_Short(unsigned char device_var, unsigned short *to_write, unsigned short start_address, int length);
 
@@ -56,7 +61,7 @@ INPUT int Read_One(unsigned char device_var,unsigned short address);
 INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 INPUT int write_multi_by_tcp(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
-
+INPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudrate = 0);
 //INPUT bool open_com(unsigned char m_com);
 INPUT bool open_com(int m_com);
 

@@ -2325,6 +2325,17 @@ int get_token(void)
                     return (token_type = DELIMITER);
 
 			}
+			else if (strstr(prog, "MOD ") == prog)
+			{
+				
+				*temp = 0x25;
+					prog = prog + 4;
+					temp++;
+					*temp = '\0';
+					/*		print_vars();  /*		fprintf(pmes, "DELIMITER \n" ) ; */
+					return (token_type = DELIMITER);
+			}
+
 
 			if ( *prog == '"') 
 			{    /* quoted string */
@@ -3971,7 +3982,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
                              (k == BAC_FLOAT_CDAB) ||
                              (k == BAC_FLOAT_BADC) ||
                              (k == BAC_FLOAT_DCBA) ||
-                            (k == MB_REG)  )&& 
+                            (k == MB_REG) || (k == COIL_REG) || (k == DIS_INPUT_REG) || (k == INPUT_REG) )&&
                             (*num_point >=2000))
                         {
                             int temp_num_point = *num_point;
@@ -7330,6 +7341,9 @@ int pointtotext(char *buf,Point_Net *point)
     point_type = point_type | type_highest_2bytes;
 
     if (((point_type == MB_REG) || 
+		(point_type == COIL_REG) ||
+		(point_type == DIS_INPUT_REG) ||
+		(point_type == INPUT_REG) ||
          (point_type == BAC_FLOAT_ABCD) ||
          (point_type == BAC_FLOAT_CDAB) ||
          (point_type == BAC_FLOAT_BADC) ||
@@ -7407,6 +7421,9 @@ int pointtotext(char *buf,Point_Net *point)
 
     if ((point->network >= 128) && 
         (point_type != MB_REG) && 
+		(point_type != COIL_REG) &&
+		(point_type != DIS_INPUT_REG) &&
+		(point_type != INPUT_REG) &&
         (point_type != BAC_FLOAT_ABCD) &&
         (point_type != BAC_FLOAT_CDAB) &&
         (point_type != BAC_FLOAT_BADC) &&

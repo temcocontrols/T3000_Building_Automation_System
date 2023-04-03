@@ -54,6 +54,7 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_PANELS_LIST = 4,
 	// GET_PANEL_ENTRY_BY_ID = 5,
 	GET_ENTRIES = 6,
+	LOAD_GRAPHIC_ENTRY = 7,
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -105,11 +106,7 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 	if (shouldHaveToolbar)
 		m_toolbar.Initialize(this);
 
-	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
-	CString temp_item;
-	temp_item.Format(_T("%u_%d.txt"), g_selected_serialnumber, screen_list_line);
-	des_file = image_fordor + _T("\\") + temp_item;
+
 
 	SetWindowLongPtr(m_mainWindow, GWLP_USERDATA, (LONG_PTR)this);
 	ShowWindow(m_mainWindow, SW_SHOWDEFAULT);
@@ -652,6 +649,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	Json::StreamWriterBuilder builder;
 	builder["indentation"] = ""; // If you want whitespace-less output
 	Json::Value tempjson;
+	int grp_index = 0;
+	int grp_serial_number = 0;
 	switch (action)
 	{
 	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_DATA:
@@ -664,6 +663,10 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		if (nret < 0)
 		{
 			CString temp_message;
+			temp_message.Format(_T("No cached data was found for this panel %d"), npanel_id);
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_message);
+			break;
+#if 0
 			temp_message.Format(_T("No cached data was found for this panel %d, do you want to read the device's data immediately"), npanel_id);
 			if (MessageBox(m_mainWindow, temp_message, L"Warning", MB_YESNO) == IDYES)
 			{
@@ -679,7 +682,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 					PostMessage(m_mainWindow, WM_CLOSE, NULL, NULL);
 				}
 			}
-			
+#endif
 			break;
 		}
 		else if (nret == 0)
@@ -811,8 +814,45 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		//Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, entry_index, entry_index, sizeof(Str_in_point));
 		break;
 	}
+	case WEBVIEW_MESSAGE_TYPE::LOAD_GRAPHIC_ENTRY:
 	case WEBVIEW_MESSAGE_TYPE::GET_INITIAL_DATA:
 	{
+		if (action == LOAD_GRAPHIC_ENTRY)
+		{
+			int panel_id = json.get("panelId", Json::nullValue).asInt();
+			int entry_index = json.get("entryIndex", Json::nullValue).asInt();
+			grp_index = entry_index;
+			if (panel_id == bac_gloab_panel)
+				grp_serial_number = g_selected_serialnumber;
+			else
+			{
+				for (int z = 0; z < g_bacnet_panel_info.size(); z++)
+				{
+					if (panel_id == g_bacnet_panel_info.at(z).panel_number)
+					{
+						grp_serial_number = g_bacnet_panel_info.at(z).nseiral_number;
+						break;
+					}
+				}
+				if (grp_serial_number == 0)
+				{
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is offline."));
+					break;
+				}
+			}
+
+		}
+		else if(action == GET_INITIAL_DATA)
+		{
+			grp_index = screen_list_line;
+		}
+
+
+		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+		CString temp_item;
+		temp_item.Format(_T("%u_%d.txt"), g_selected_serialnumber, grp_index);
+		des_file = image_fordor + _T("\\") + temp_item;
 		CFile file;
 
 
@@ -841,6 +881,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		delete nbuff;
 		break;
 	}
+
+
 	case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
 	{
 		CFile file;

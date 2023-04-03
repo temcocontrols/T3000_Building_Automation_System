@@ -149,7 +149,7 @@ INPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned shor
 INPUT void close_T3000_log_file();//scan
 INPUT void write_T3000_log_file( CString StrTips);//scan
 INPUT void Create_T3000_log_file();//scan
-INPUT int Test_Comport(int comport, baudrate_def * ntest_ret);
+INPUT int Test_Comport(int comport, baudrate_def * ntest_ret, int default_baudrate = 0);
 INPUT int Set_Test_Comport_Status(int command);
 INPUT CString Get_NowTime();
 INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);

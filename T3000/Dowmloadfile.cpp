@@ -41,7 +41,7 @@ CString new_firmware_ip;
 int is_local_temco_net = false;
 extern bool update_t3000_only ;
 IMPLEMENT_DYNAMIC(Dowmloadfile, CDialogEx)
-
+int time_8_count = 0; // 记录mstp静默的时候 ，等待10秒; 
 map <int,CString> product_folder_map;
 
 Dowmloadfile::Dowmloadfile(CWnd* pParent /*=NULL*/)
@@ -190,17 +190,22 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
             return 0;
         }
         KillProcessFromName(_T("ISP.exe"));
-
-        if ((m_product_isp_auto_flash.protocol == PROTOCOL_BIP_TO_MSTP) ||
-            (m_product_isp_auto_flash.protocol == PROTOCOL_MSTP_TO_MODBUS) ||
-            (m_product_isp_auto_flash.protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+        if ((m_product_isp_auto_flash.protocol == MODBUS_RS485) ||
+            (m_product_isp_auto_flash.protocol == MODBUS_BACNET_MSTP))
         {
-            temp_isp_info.Format(_T("Don't support using bacnet protocol to update firmware ."));
-            m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
-            m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
-
-            return 0;
+            close_com();
+            close_bac_com();
         }
+        //if ((m_product_isp_auto_flash.protocol == PROTOCOL_BIP_TO_MSTP) ||
+        //    (m_product_isp_auto_flash.protocol == PROTOCOL_MSTP_TO_MODBUS) ||
+        //    (m_product_isp_auto_flash.protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
+        //{
+        //    temp_isp_info.Format(_T("Don't support using bacnet protocol to update firmware ."));
+        //    m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+        //    m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+
+        //    return 0;
+        //}
         bool is_sub_device = false;
         CString temp_deal_ip = m_product_isp_auto_flash.BuildingInfo.strIp;
         if (!temp_deal_ip.IsEmpty())
@@ -319,7 +324,12 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
         HANDLE Call_ISP_Application = NULL;
         Call_ISP_Application = CreateThread(NULL, NULL, isp_thread, this, NULL, NULL);
 
-
+        
+        if (m_product_isp_auto_flash.protocol == MODBUS_BACNET_MSTP)
+        {
+            time_8_count = 10;
+            SetTimer(8, 1300, NULL);
+        }
     }
     else if (ncommand == DOWNLOAD_PERSENT)
     {
@@ -1525,6 +1535,19 @@ void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 			OnBnClickedButtonUpdateT3000();
 		}
 		break;
+    case 8:
+        {
+            if (time_8_count > 0)
+            {
+                time_8_count--;
+                CString temp_isp_info;
+                temp_isp_info.Format(_T("Communicating with device, please wait (%d)"), time_8_count);
+                m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+            }
+             else
+                KillTimer(8);
+        }
+        break;
 	default:
 		{
 

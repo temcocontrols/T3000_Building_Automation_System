@@ -199,24 +199,26 @@ void Send_WhoIs(
 
 /** Send a global command request for shut down all device.
 */
-void ShutDownMstpGlobal(uint8_t n_time)
+int ShutDownMstpGlobal(uint8_t n_time)
 {
     BACNET_ADDRESS dest;
-
+    int nret = 0;
     if (!dcc_communication_enabled())
         return;
 
     /* Who-Is is a global broadcast */
     datalink_get_broadcast_address(&dest);
 
-    ShutDownMstp_To_Network(&dest , n_time);
+    nret = ShutDownMstp_To_Network(&dest , n_time);
+    return nret;
 }
 
 
-void ShutDownMstp_To_Network(
+int ShutDownMstp_To_Network(
     BACNET_ADDRESS * target_address,
     uint8_t n_time)
 {
+    int nret = 0;
     int32_t low_limit = -1;
     int32_t high_limit = -1;
     int len = 0;
@@ -240,4 +242,5 @@ void ShutDownMstp_To_Network(
     bytes_sent =
         datalink_send_pdu(target_address, &npdu_data,
             &Handler_Transmit_Buffer[0], pdu_len);
+    return bytes_sent;
 }

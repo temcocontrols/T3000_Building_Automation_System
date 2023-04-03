@@ -833,7 +833,7 @@ void CISPDlg::InitISPUI()
         WINDOWPLACEMENT wp;
 
         GetWindowPlacement(&wp);
-        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->ShowWindow(true);
+        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->ShowWindow(false); //暂时不显示 mstp的 update按钮，设备几乎还不支持;
 
 
         CRect rc;
@@ -2531,6 +2531,7 @@ void CISPDlg::FlashByCom()
             if (strBaudrate.CompareNoCase(c_strBaudate[i]) == 0)
             {
                 Baudrate_Index = i;
+                break;
             }
         }
         m_pComWriter->m_index_Baudrate = Baudrate_Index; //m_combox_baudrate.GetCurSel ();
@@ -4072,6 +4073,8 @@ BOOL CAboutDlg::OnInitDialog()
     // TODO:  在此添加额外的初始化
     CString release_note;
     CString temp;
+    temp.Format(_T("Rev6.3.8  (2023-03-31)\r\n  1.Support update Tstat10 when it is in Mstp Mode  .\r\n  Tstat10 firmware version should be larger than 63.5\r\n"));
+    release_note = release_note + temp;
     temp.Format(_T("Rev6.2.4  (2020-12-22)\r\n  1.Support update CO2 bootloader  .\r\n  2.If firmware version bigger than 59 \r\n    bootloader smaller than 67 \r\n    it will auto update bootloader\r\n"));
     release_note = release_note + temp;
     temp.Format(_T("Rev6.1.0  (2020-05-19)\r\n  1.Support update T3BB_LB_TB_NB bootloader  .\r\n  2.If firmware version bigger than 60.0 \r\n    bootloader smaller than 58 \r\n    it will auto update bootloader\r\n"));

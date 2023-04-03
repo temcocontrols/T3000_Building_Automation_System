@@ -239,7 +239,11 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
         temp_main_panel.Format(_T("%u"), m_remote_point_data.at(i).point.panel);
         temp_device_id.Format(_T("%u"), m_remote_point_data.at(i).point.sub_panel);
         unsigned char high_3bit;
-        if ((t_type == MB_REG + 1) && (m_remote_point_data.at(i).point.network >= 128))
+        if (((t_type == MB_REG + 1) ||
+			(t_type == COIL_REG + 1) ||
+			(t_type == DIS_INPUT_REG + 1) ||
+			(t_type == INPUT_REG + 1))
+			&& (m_remote_point_data.at(i).point.network >= 128))
         {
             high_3bit = (unsigned char)(((m_remote_point_data.at(i).point.point_type) & 0xE0) >> 5);
             dev_reg = m_remote_point_data.at(i).point.number + ((m_remote_point_data.at(i).point.network - 128) * 8 + high_3bit) * 256;
@@ -336,6 +340,13 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			
 		}
 		m_remote_point_list.SetItemText(i,REMOTE_DEVICE_STATUS,temp_status);
+
+		if ((t_type == COIL_REG + 1) ||
+			(t_type == DIS_INPUT_REG + 1) ||
+			(t_type == INPUT_REG + 1) )
+		{
+			continue;
+		}
 
 		if((dev_reg >= (sizeof(TSTAT_5ABCDFG_LED_ADDRESS)/sizeof(TSTAT_5ABCDFG_LED_ADDRESS[0]))) &&
             t_type != MB_REG + 1)

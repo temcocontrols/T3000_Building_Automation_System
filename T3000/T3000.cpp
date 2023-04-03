@@ -17,11 +17,13 @@
 #include <windows.h>  
  
 
-const unsigned int g_versionNO= 20230314;
+const unsigned int g_versionNO= 20230331;
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
 
 #include "global_variable.h"
 
@@ -955,6 +957,8 @@ void CAboutDlg::OnBnClickedOk()
 
 	update_t3000_only = true;
 	m_product_isp_auto_flash.product_class_id =  199;
+	close_com();
+	close_bac_com();
 	Dowmloadfile Dlg;
 	Dlg.DoModal();
 	update_t3000_only = false;

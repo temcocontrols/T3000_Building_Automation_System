@@ -74,19 +74,20 @@ int datalink_send_pdu (
     uint8_t * pdu,
     unsigned pdu_len)
 {
-	//m_protocol = 4;
+	int nret_send = 0;
 	if(m_protocol == 2)
 	{
-		dlmstp_send_pdu(dest,npdu_data,pdu,pdu_len);
+		nret_send = dlmstp_send_pdu(dest,npdu_data,pdu,pdu_len);
 	}
 	else if(m_protocol == 3)
 	{
-		bip_send_pdu(dest,npdu_data,pdu,pdu_len);
+		nret_send = bip_send_pdu(dest,npdu_data,pdu,pdu_len);
 	}
 	else if(m_protocol == 4)
 	{
 		//ptp_send_pdu(dest,npdu_data,pdu,pdu_len);
 	}
+	return nret_send;
 }
 
 __declspec(dllexport) uint16_t datalink_receive (BACNET_ADDRESS * src, uint8_t * pdu,
