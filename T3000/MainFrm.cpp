@@ -10670,7 +10670,8 @@ LRESULT  CMainFrame::HandleIspModedivice(WPARAM wParam, LPARAM lParam)
 
 		isp_mode_is_cancel = true;
 		isp_mode_firmware_auto = true;
-
+        close_com();
+        close_bac_com();
 		CISPModeSlove dlg;
 		dlg.DoModal();
 			Dowmloadfile Dlg;
@@ -13037,10 +13038,7 @@ void CMainFrame::OnControlPrograms()
 
 void CMainFrame::OnControlOutputs()
 {
-//#ifdef DEBUG
-//    ShutDownMstpGlobal(5);
-//    return;
-//#endif // DEBUG
+
 
 
     g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
@@ -14290,7 +14288,8 @@ void CMainFrame::OnHelpFeedbacktotemco()
     m_product_isp_auto_flash.product_class_id =  m_product.at(selected_product_index).product_class_id;
     m_product_isp_auto_flash.product_id =  m_product.at(selected_product_index).product_id;
 
-
+    close_com();
+    close_bac_com();
     Dowmloadfile Dlg;
     Dlg.DoModal();
 
@@ -15886,6 +15885,7 @@ void CMainFrame::OnHelpUsingUpdate()
 
 	SetCommunicationType(0);//关闭串口，供ISP 使用;
 	close_com();
+    close_bac_com();
 	Dowmloadfile Dlg;
 	Dlg.DoModal();
 
@@ -15920,6 +15920,9 @@ void CMainFrame::OnHelpUsingUpdate()
 	::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
 	b_pause_refresh_tree = false;
 	g_bPauseMultiRead = temp_status;
+
+    HideBacnetWindow();
+    SetTimer(FOR_LAST_VIEW_TIMER, 1000, NULL); //再次点击上次最后连接的设备;
 }
 
 

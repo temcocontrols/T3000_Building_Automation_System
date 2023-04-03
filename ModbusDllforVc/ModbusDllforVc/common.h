@@ -99,5 +99,5 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here,int 
 	unsigned char *put_revdata_into_here,
 	int* sendDataLength, int* recvDataLength);
 OUTPUT int SendData(TS_US *to_write,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here,int* sendDataLength, int* recvDataLength,BOOL CHECK_CRC) ;
-OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret);
+OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret , int default_baudrate = 0 );
 #endif

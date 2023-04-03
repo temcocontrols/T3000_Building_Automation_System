@@ -8426,7 +8426,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	}
 
     //通过64命令来更新panel number 与object instance 的对应表  .
-    if ((temp.object_instance != 0) && (temp.panal_number != 0) && (temp.panal_number < 255) && (temp.object_instance < 0x3fffff))
+    if ((temp.object_instance != 0) && (temp.panal_number != 0) && (temp.panal_number < 255) && (temp.object_instance < 0x3fffff) && temp.parent_serial_number == 0)
     {
         _panel_info temp_panel;
         temp_panel.npid = temp.product_id;
@@ -17148,7 +17148,7 @@ int LoadOnlinePanelData(unsigned char npanel)  //从缓存prog文件中加载所
         else
         {
             if (npanel != 0)
-                nret = -1;
+                return -1;
             else
                 continue;
         }

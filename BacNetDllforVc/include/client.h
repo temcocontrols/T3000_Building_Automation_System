@@ -68,7 +68,7 @@ __declspec(dllexport)    void Send_WhoIs_Global(
         int32_t low_limit,
         int32_t high_limit);
 
-__declspec(dllexport) void ShutDownMstpGlobal(uint8_t n_time);
+__declspec(dllexport) int ShutDownMstpGlobal(uint8_t n_time);
 
     void Send_WhoIs_Local(
         int32_t low_limit,
@@ -84,7 +84,7 @@ __declspec(dllexport) void ShutDownMstpGlobal(uint8_t n_time);
         int32_t low_limit,
         int32_t high_limit);
 
-    void ShutDownMstp_To_Network(
+    int ShutDownMstp_To_Network(
         BACNET_ADDRESS * target_address,
         uint8_t n_time);
 

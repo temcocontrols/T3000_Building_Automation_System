@@ -23,7 +23,7 @@ HANDLE h_create_webview_server_thread = NULL;
 HANDLE h_write_pic_thread = NULL;
 HANDLE h_get_pic_thread = NULL;
 CString Change_File_Path;
-extern tree_product selected_product_Node; // é€‰ä¸­çš„è®¾å¤‡ä¿¡æ¯;
+extern tree_product selected_product_Node; // Ñ¡ÖĞµÄÉè±¸ĞÅÏ¢;
 IMPLEMENT_DYNAMIC(BacnetScreen, CDialogEx)
 
 BacnetScreen::BacnetScreen(CWnd* pParent /*=NULL*/)
@@ -48,8 +48,8 @@ BEGIN_MESSAGE_MAP(BacnetScreen, CDialogEx)
 	ON_MESSAGE(WM_REFRESH_BAC_SCREEN_LIST,Fresh_Screen_List)	
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Screen_Item)	
 	ON_NOTIFY(NM_CLICK, IDC_LIST_SCREEN, &BacnetScreen::OnNMClickListScreen)
-	ON_MESSAGE(WM_HOTKEY,&BacnetScreen::OnHotKey)//å¿«æ·é”®æ¶ˆæ¯æ˜ å°„æ‰‹åŠ¨åŠ å…¥
-	ON_MESSAGE(WM_SCREENEDIT_CLOSE,&BacnetScreen::Screeenedit_close_handle)//å¿«æ·é”®æ¶ˆæ¯æ˜ å°„æ‰‹åŠ¨åŠ å…¥
+	ON_MESSAGE(WM_HOTKEY,&BacnetScreen::OnHotKey)//¿ì½İ¼üÏûÏ¢Ó³ÉäÊÖ¶¯¼ÓÈë
+	ON_MESSAGE(WM_SCREENEDIT_CLOSE,&BacnetScreen::Screeenedit_close_handle)//¿ì½İ¼üÏûÏ¢Ó³ÉäÊÖ¶¯¼ÓÈë
 	ON_BN_CLICKED(IDC_BUTTON_GRAPHIC_INSERT, &BacnetScreen::OnBnClickedInsert)
 	ON_BN_CLICKED(IDC_WEBVIEW_BUTTON, &BacnetScreen::OnBnClickedWebViewShow)
 	ON_WM_CLOSE()
@@ -109,7 +109,7 @@ DWORD WINAPI  BacnetScreen::ReadScreenThreadfun(LPVOID lpVoid)
 
 bool BacnetScreen::read_screen_label()
 {
-	//ä¸€ç›´è¯»åˆ° ä¸‹ä¸€ä¸ªå…¨æ˜¯0 çš„ æ— æ•ˆlabel;
+	//Ò»Ö±¶Áµ½ ÏÂÒ»¸öÈ«ÊÇ0 µÄ ÎŞĞ§label;
 	for (int i=0;i<BAC_GRPHIC_LABEL_GROUP;i++)
 	{
 		int end_temp_instance = 0;
@@ -161,14 +161,14 @@ LRESULT  BacnetScreen::ScreenCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		memcpy_s(&m_screen_data.at(pInvoke->mRow),sizeof(Control_group_point),&m_temp_screen_data[pInvoke->mRow],sizeof(Control_group_point));//è¿˜åŸæ²¡æœ‰æ”¹å¯¹çš„å€¼
+		memcpy_s(&m_screen_data.at(pInvoke->mRow),sizeof(Control_group_point),&m_temp_screen_data[pInvoke->mRow],sizeof(Control_group_point));//»¹Ô­Ã»ÓĞ¸Ä¶ÔµÄÖµ
 		PostMessage(WM_REFRESH_BAC_SCREEN_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		//AfxMessageBox(Show_Results);
 		//MessageBox(_T("Bacnet operation fail!"));
 	}
-	if((pInvoke->mRow%2)==0)	//æ¢å¤å‰æ™¯å’Œ èƒŒæ™¯ é¢œè‰²;
+	if((pInvoke->mRow%2)==0)	//»Ö¸´Ç°¾°ºÍ ±³¾° ÑÕÉ«;
 		m_screen_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
 		m_screen_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -223,20 +223,20 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//è·å– viewçš„çª—ä½“å¤§å°;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//»ñÈ¡ viewµÄ´°Ìå´óĞ¡;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//è·å– viewçš„çª—ä½“å¤§å°;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//»ñÈ¡ viewµÄ´°Ìå´óĞ¡;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 
 		return 1; 
 	}
-	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //è€æ¯›è¦æ±‚æŒ‰F2ç«‹åˆ»åˆ·æ–°å€¼;
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //ÀÏÃ«ÒªÇó°´F2Á¢¿ÌË¢ĞÂÖµ;
 	{
 		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_SCREENS);
 		return TRUE;
@@ -245,10 +245,10 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-//åœ¨åˆ é™¤è¿™ä¸ªå¯¹è¯æ¡†ä¹‹å‰ å…ˆå°è¯•ä¿å­˜ æ“ä½œä¸­çš„ label;
+//ÔÚÉ¾³ıÕâ¸ö¶Ô»°¿òÖ®Ç° ÏÈ³¢ÊÔ±£´æ ²Ù×÷ÖĞµÄ label;
 LRESULT BacnetScreen::Screeenedit_close_handle(WPARAM wParam,LPARAM lParam)
 {
-    //å½“ç”¨æˆ·å…³é—­è¿™ä¸ªçª—å£æ—¶ï¼Œæ¸…ç©ºæ‰€ä»¥çš„é˜Ÿåˆ—ï¼Œå³ä¾¿æœ‰æ­£å¸¸çš„æ¶ˆæ¯ï¼Œä¹Ÿæ¸…ç©ºï¼Œå¦åˆ™100å¤šæ¡æ¶ˆæ¯ å…¨å µåœ¨è¿™é‡Œ
+    //µ±ÓÃ»§¹Ø±ÕÕâ¸ö´°¿ÚÊ±£¬Çå¿ÕËùÒÔµÄ¶ÓÁĞ£¬¼´±ãÓĞÕı³£µÄÏûÏ¢£¬Ò²Çå¿Õ£¬·ñÔò100¶àÌõÏûÏ¢ È«¶ÂÔÚÕâÀï
     MyCriticalSection.Lock();
     My_Receive_msg.clear();
     MyCriticalSection.Unlock();
@@ -331,7 +331,7 @@ BOOL BacnetScreen::OnInitDialog()
 	PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 
 	ShowWindow(FALSE);
-//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2é”®
+//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2¼ü
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -416,7 +416,7 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 	//{
 	//	if(m_screen_list.IsDataNewer((char *)&m_screen_data.at(0),sizeof(Control_group_point) * BAC_SCREEN_COUNT))
 	//	{
-	//		//é¿å…list åˆ·æ–°æ—¶é—ªçƒ;åœ¨æ²¡æœ‰æ•°æ®å˜åŠ¨çš„æƒ…å†µä¸‹ä¸åˆ·æ–°List;
+	//		//±ÜÃâlist Ë¢ĞÂÊ±ÉÁË¸;ÔÚÃ»ÓĞÊı¾İ±ä¶¯µÄÇé¿öÏÂ²»Ë¢ĞÂList;
 	//		m_screen_list.SetListData((char *)&m_screen_data.at(0),sizeof(Control_group_point) * BAC_SCREEN_COUNT);
 	//	}
 	//	else
@@ -489,7 +489,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 
 
 		CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_SCREEN_DESCRIPTION_LENGTH)	//é•¿åº¦ä¸èƒ½å¤§äºç»“æ„ä½“å®šä¹‰çš„é•¿åº¦;
+		if(cs_temp.GetLength()>= STR_SCREEN_DESCRIPTION_LENGTH)	//³¤¶È²»ÄÜ´óÓÚ½á¹¹Ìå¶¨ÒåµÄ³¤¶È;
 		{
 			MessageBox(_T("Warning"),_T("Length can not higher than 20"));
 			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
@@ -508,7 +508,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 	else if(Changed_SubItem == SCREEN_LABEL)
 	{
 		CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_SCREEN_LABLE_LENGTH)	//é•¿åº¦ä¸èƒ½å¤§äºç»“æ„ä½“å®šä¹‰çš„é•¿åº¦;
+		if(cs_temp.GetLength()>= STR_SCREEN_LABLE_LENGTH)	//³¤¶È²»ÄÜ´óÓÚ½á¹¹Ìå¶¨ÒåµÄ³¤¶È;
 		{
 			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
 			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
@@ -608,7 +608,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 	lCol = lvinfo.iSubItem;
 
 
-	if(lRow>m_screen_list.GetItemCount()) //å¦‚æœç‚¹å‡»åŒºè¶…è¿‡æœ€å¤§è¡Œå·ï¼Œåˆ™ç‚¹å‡»æ˜¯æ— æ•ˆçš„;
+	if(lRow>m_screen_list.GetItemCount()) //Èç¹ûµã»÷Çø³¬¹ı×î´óĞĞºÅ£¬Ôòµã»÷ÊÇÎŞĞ§µÄ;
 		return;
 	if(lRow<0)
 		return;
@@ -637,7 +637,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 		HANDLE hFind = FindFirstFile(image_fordor, &fd);
 		if ((hFind != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 		{
-			//ç›®å½•å­˜åœ¨
+			//Ä¿Â¼´æÔÚ
 			ret = TRUE;
 		}
 		else
@@ -653,7 +653,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 		SetCurrentDirectoryW(image_fordor);
-		//é€‰æ‹©å›¾ç‰‡,å¦‚æœé€‰çš„ä¸åœ¨databaseç›®å½•ä¸‹å°±copyä¸€ä»½è¿‡æ¥;å¦‚æœåœ¨çš„è¯å°±é‡å‘½åï¼Œå› ä¸ºæ–‡ä»¶åé•¿åº¦ä¸èƒ½è¶…è¿‡10ä¸ªå­—èŠ‚;
+		//Ñ¡ÔñÍ¼Æ¬,Èç¹ûÑ¡µÄ²»ÔÚdatabaseÄ¿Â¼ÏÂ¾ÍcopyÒ»·İ¹ıÀ´;Èç¹ûÔÚµÄ»°¾ÍÖØÃüÃû£¬ÒòÎªÎÄ¼şÃû³¤¶È²»ÄÜ³¬¹ı10¸ö×Ö½Ú;
 		CString strFilter = _T("jpg file;bmp file;png file|*.jpg;*.bmp;*.png|all File|*.*||");
 		CFileDialog dlg(true,_T("bmp"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
 		if(IDOK==dlg.DoModal())
@@ -684,7 +684,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 			CString new_file_path;
 			new_file_path = image_fordor + _T("\\") + FileName;
 			Change_File_Path = new_file_path;
-			if(temp1.CompareNoCase(image_fordor) != 0)//å¦‚æœå°±åœ¨å½“å‰ç›®å½•å°±ä¸ç”¨copyè¿‡æ¥äº†;
+			if(temp1.CompareNoCase(image_fordor) != 0)//Èç¹û¾ÍÔÚµ±Ç°Ä¿Â¼¾Í²»ÓÃcopy¹ıÀ´ÁË;
 			{
 				CopyFile(FilePath,new_file_path,false);
 			}
@@ -779,7 +779,7 @@ void BacnetScreen::OnTimer(UINT_PTR nIDEvent)
 	{
 		PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 	}
-	else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_SCREENS))  )	//GSMè¿æ¥æ—¶ä¸è¦åˆ·æ–°;
+	else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_SCREENS))  )	//GSMÁ¬½ÓÊ±²»ÒªË¢ĞÂ;
 	{
 	PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -790,7 +790,7 @@ void BacnetScreen::OnTimer(UINT_PTR nIDEvent)
 
 void BacnetScreen::Reg_Hotkey()
 {
-	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Inserté”®
+	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert¼ü
 }
 
 void BacnetScreen::Unreg_Hotkey()
@@ -854,7 +854,7 @@ int BacnetScreen::WritePicFileFunction(CString ChooseFilePath,unsigned char scre
 	//if(IDOK!=dlg.DoModal())
 	//	return ;
 	//ChooseFilePath=dlg.GetPathName();
-	//MD5æ˜¯ä¸€ä¸ª32bitçš„å€¼ æŒ‰å­—ç¬¦å­˜çš„;
+	//MD5ÊÇÒ»¸ö32bitµÄÖµ °´×Ö·û´æµÄ;
 
 
 
@@ -862,9 +862,9 @@ int BacnetScreen::WritePicFileFunction(CString ChooseFilePath,unsigned char scre
 #pragma region read file buffer
 	pic_sd_struct temp_pic;
 	memset(&temp_pic,0,sizeof(pic_sd_struct));
-	CFile Filetxt;//ç”¨æ¥è¯»å–ä½å›¾æ–‡ä»¶
-	DWORD FileLen=0;//ä½å›¾çš„é•¿åº¦
-	char* FileBuff;//ç”¨äºå­˜æ”¾ä½å›¾ä¿¡æ¯
+	CFile Filetxt;//ÓÃÀ´¶ÁÈ¡Î»Í¼ÎÄ¼ş
+	DWORD FileLen=0;//Î»Í¼µÄ³¤¶È
+	char* FileBuff;//ÓÃÓÚ´æ·ÅÎ»Í¼ĞÅÏ¢
 
 	//unsigned int pic_file_size = 0;
 	string temp_md5 = MD5(ifstream( ChooseFilePath )).toString();
@@ -874,20 +874,20 @@ int BacnetScreen::WritePicFileFunction(CString ChooseFilePath,unsigned char scre
 	temp_show.Format(_T("The File MD5 is :"));
 
 
-	if(!Filetxt.Open(ChooseFilePath,CFile::modeRead))//æ‰“å¼€æ–‡ä»¶
+	if(!Filetxt.Open(ChooseFilePath,CFile::modeRead))//´ò¿ªÎÄ¼ş
 	{
-		//MessageBox(NULL,"æ‰“å¼€æ–‡æœ¬ä¿¡æ¯å¤±è´¥!",NULL, MB_OK);
+		//MessageBox(NULL,"´ò¿ªÎÄ±¾ĞÅÏ¢Ê§°Ü!",NULL, MB_OK);
 		return false;
 	}
-	FileLen=Filetxt.GetLength();//å¾—åˆ°ä½å›¾çš„é•¿åº¦
-	FileBuff=new char[FileLen+1];//ç»™ä½å›¾æ–‡ä»¶ç”³è¯·å†…åœ¨ç©ºé—´
+	FileLen=Filetxt.GetLength();//µÃµ½Î»Í¼µÄ³¤¶È
+	FileBuff=new char[FileLen+1];//¸øÎ»Í¼ÎÄ¼şÉêÇëÄÚÔÚ¿Õ¼ä
 	DWORD DwPic=Filetxt.GetLength();
-	memset(FileBuff,0,FileLen+1);//åˆå§‹åŒ–ä½å›¾æ–‡ä»¶çš„ç©ºé—´
-	if(!FileBuff)//åˆ¤æ–­ä½å›¾ç©ºé—´æ˜¯å¦ç”³è¯·æˆåŠŸ
+	memset(FileBuff,0,FileLen+1);//³õÊ¼»¯Î»Í¼ÎÄ¼şµÄ¿Õ¼ä
+	if(!FileBuff)//ÅĞ¶ÏÎ»Í¼¿Õ¼äÊÇ·ñÉêÇë³É¹¦
 	{
 		return false;
 	}
-	if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//è¯»å–æ–‡æœ¬ä¿¡æ¯ï¼Œå­˜å…¥åˆ°FileBuffä¸­å»
+	if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//¶ÁÈ¡ÎÄ±¾ĞÅÏ¢£¬´æÈëµ½FileBuffÖĞÈ¥
 	{
 		return false;
 	}
@@ -906,10 +906,10 @@ int BacnetScreen::WritePicFileFunction(CString ChooseFilePath,unsigned char scre
 		last_packet_data_size = FileLen % 400;
 	}
 
-	temp_pic.total_packet = temp_filepack + 1; //å…¶ä¸­ 1æ˜¯ ç¬¬ä¸€åŒ…çš„å¤´ ä¼  MD5å€¼å’Œ æ–‡ä»¶æ€»åŒ…æ•°.;
+	temp_pic.total_packet = temp_filepack + 1; //ÆäÖĞ 1ÊÇ µÚÒ»°üµÄÍ· ´« MD5ÖµºÍ ÎÄ¼ş×Ü°üÊı.;
 
 	//char crc_cal[4];
-	temp_pic.crc_cal[0] = 0x55 ; temp_pic.crc_cal[1] = 0xff ;temp_pic.crc_cal[2] = 0x55 ;temp_pic.crc_cal[3] = 0xff ; //ç¬¬ä¸€åŒ…é‡Œé¢ç”¨ å‰4ä¸ªå­—èŠ‚ 0x55ff55ffæ¥ åŒºåˆ«æ—§ç‰ˆæœ¬ ä¸å›å¤çš„ä¿¡æ¯;
+	temp_pic.crc_cal[0] = 0x55 ; temp_pic.crc_cal[1] = 0xff ;temp_pic.crc_cal[2] = 0x55 ;temp_pic.crc_cal[3] = 0xff ; //µÚÒ»°üÀïÃæÓÃ Ç°4¸ö×Ö½Ú 0x55ff55ffÀ´ Çø±ğ¾É°æ±¾ ²»»Ø¸´µÄĞÅÏ¢;
 	//char md5_32byte[33];
 	memset(temp_pic.md5_32byte,0,33);
 	WideCharToMultiByte( CP_ACP, 0, MD5_value.GetBuffer(), -1, temp_pic.md5_32byte, 255, NULL, NULL );
@@ -973,7 +973,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 	//if(IDOK!=dlg.DoModal())
 	//	return ;
 	//ChooseFilePath=dlg.GetPathName();
-	//MD5æ˜¯ä¸€ä¸ª32bitçš„å€¼ æŒ‰å­—ç¬¦å­˜çš„;
+	//MD5ÊÇÒ»¸ö32bitµÄÖµ °´×Ö·û´æµÄ;
 	pic_sd_struct temp_picture;
 	memset(&temp_picture,0,sizeof(pic_sd_struct));
 	//char md5_value[33];
@@ -1012,7 +1012,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 		return 0;
 	}
 
-	//æ¯”å¯¹MD5 ä¸è®¾å¤‡çš„æ˜¯å¦ä¸€è‡´;
+	//±È¶ÔMD5 ÓëÉè±¸µÄÊÇ·ñÒ»ÖÂ;
 	CString temp_pic_md5_cs;
 	MultiByteToWideChar( CP_ACP, 0, temp_picture.md5_32byte, (int)strlen((char *)temp_picture.md5_32byte)+1, 
 		temp_pic_md5_cs.GetBuffer(MAX_PATH), MAX_PATH );
@@ -1070,7 +1070,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 	}
 
 
-	char *ReadBuff=new char[temp_picture.pic_file_size+1];//ç»™ä½å›¾æ–‡ä»¶ç”³è¯·å†…åœ¨ç©ºé—´;
+	char *ReadBuff=new char[temp_picture.pic_file_size+1];//¸øÎ»Í¼ÎÄ¼şÉêÇëÄÚÔÚ¿Õ¼ä;
 	if(ReadBuff == NULL)
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No enough memory!"));
@@ -1088,7 +1088,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 			if(i!= (temp_picture.total_packet-1))
 				memcpy(ReadBuff + (i-1)*400,picture_data_buffer,400);
 			else
-				memcpy(ReadBuff + (i-1)*400,picture_data_buffer,last_packet_size);	//æœ€åä¸€åŒ…åªcopy å‰©ä½™çš„ å­—èŠ‚;
+				memcpy(ReadBuff + (i-1)*400,picture_data_buffer,last_packet_size);	//×îºóÒ»°üÖ»copy Ê£ÓàµÄ ×Ö½Ú;
 
 			CString temp_cs_complet;
 			temp_cs_complet.Format(_T("Read picture file %d / %d"), i*400  ,temp_picture.pic_file_size);
@@ -1138,9 +1138,9 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 		return 1;
 #if 0
 #pragma region read file buffer
-	CFile Filetxt;//ç”¨æ¥è¯»å–ä½å›¾æ–‡ä»¶
-	DWORD FileLen=0;//ä½å›¾çš„é•¿åº¦
-	char* FileBuff;//ç”¨äºå­˜æ”¾ä½å›¾ä¿¡æ¯
+	CFile Filetxt;//ÓÃÀ´¶ÁÈ¡Î»Í¼ÎÄ¼ş
+	DWORD FileLen=0;//Î»Í¼µÄ³¤¶È
+	char* FileBuff;//ÓÃÓÚ´æ·ÅÎ»Í¼ĞÅÏ¢
 
 
 	string temp_md5 = MD5(ifstream( ChooseFilePath )).toString();
@@ -1150,20 +1150,20 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 	temp_show.Format(_T("The File MD5 is :"));
 
 
-	if(!Filetxt.Open(ChooseFilePath,CFile::modeRead))//æ‰“å¼€æ–‡ä»¶
+	if(!Filetxt.Open(ChooseFilePath,CFile::modeRead))//´ò¿ªÎÄ¼ş
 	{
-		//MessageBox(NULL,"æ‰“å¼€æ–‡æœ¬ä¿¡æ¯å¤±è´¥!",NULL, MB_OK);
+		//MessageBox(NULL,"´ò¿ªÎÄ±¾ĞÅÏ¢Ê§°Ü!",NULL, MB_OK);
 		return false;
 	}
-	FileLen=Filetxt.GetLength();//å¾—åˆ°ä½å›¾çš„é•¿åº¦
-	FileBuff=new char[FileLen+1];//ç»™ä½å›¾æ–‡ä»¶ç”³è¯·å†…åœ¨ç©ºé—´
+	FileLen=Filetxt.GetLength();//µÃµ½Î»Í¼µÄ³¤¶È
+	FileBuff=new char[FileLen+1];//¸øÎ»Í¼ÎÄ¼şÉêÇëÄÚÔÚ¿Õ¼ä
 	DWORD DwPic=Filetxt.GetLength();
-	memset(FileBuff,0,FileLen+1);//åˆå§‹åŒ–ä½å›¾æ–‡ä»¶çš„ç©ºé—´
-	if(!FileBuff)//åˆ¤æ–­ä½å›¾ç©ºé—´æ˜¯å¦ç”³è¯·æˆåŠŸ
+	memset(FileBuff,0,FileLen+1);//³õÊ¼»¯Î»Í¼ÎÄ¼şµÄ¿Õ¼ä
+	if(!FileBuff)//ÅĞ¶ÏÎ»Í¼¿Õ¼äÊÇ·ñÉêÇë³É¹¦
 	{
 		return false;
 	}
-	if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//è¯»å–æ–‡æœ¬ä¿¡æ¯ï¼Œå­˜å…¥åˆ°FileBuffä¸­å»
+	if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//¶ÁÈ¡ÎÄ±¾ĞÅÏ¢£¬´æÈëµ½FileBuffÖĞÈ¥
 	{
 		return false;
 	}
@@ -1182,7 +1182,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 		last_packet_data_size = FileLen % 400;
 	}
 
-	total_packet = temp_filepack + 1; //å…¶ä¸­ 1æ˜¯ ç¬¬ä¸€åŒ…çš„å¤´ ä¼  MD5å€¼å’Œ æ–‡ä»¶æ€»åŒ…æ•°.;
+	total_packet = temp_filepack + 1; //ÆäÖĞ 1ÊÇ µÚÒ»°üµÄÍ· ´« MD5ÖµºÍ ÎÄ¼ş×Ü°üÊı.;
 
 
 	char md5_32byte[33];
@@ -1246,7 +1246,7 @@ void BacnetScreen::Reset_Screen_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//è·å– viewçš„çª—ä½“å¤§å°;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//»ñÈ¡ viewµÄ´°Ìå´óĞ¡;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -1254,7 +1254,7 @@ void BacnetScreen::Reset_Screen_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//è·å– viewçš„çª—ä½“å¤§å°;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//»ñÈ¡ viewµÄ´°Ìå´óĞ¡;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -1279,14 +1279,14 @@ void BacnetScreen::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//è·å– viewçš„çª—ä½“å¤§å°;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//»ñÈ¡ viewµÄ´°Ìå´óĞ¡;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//è·å– viewçš„çª—ä½“å¤§å°;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//»ñÈ¡ viewµÄ´°Ìå´óĞ¡;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return;
@@ -1349,7 +1349,7 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 	return;
-	if(lRow>m_screen_list.GetItemCount()) //å¦‚æœç‚¹å‡»åŒºè¶…è¿‡æœ€å¤§è¡Œå·ï¼Œåˆ™ç‚¹å‡»æ˜¯æ— æ•ˆçš„;
+	if(lRow>m_screen_list.GetItemCount()) //Èç¹ûµã»÷Çø³¬¹ı×î´óĞĞºÅ£¬Ôòµã»÷ÊÇÎŞĞ§µÄ;
 		return;
 	if(lRow<0)
 		return;
@@ -1392,29 +1392,56 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 int check_webview_runtime()
 {
-	LPCTSTR strRegEntry = _T("SOFTWARE\\WOW6432Node\\Microsoft\\EdgeUpdate\\Clients\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}\\");
-
-	HKEY   hKey;
-	LONG   lReturnCode = 0;
-	lReturnCode = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE, strRegEntry, 0, KEY_READ, &hKey);
-
-	if (lReturnCode != ERROR_SUCCESS)
-	{
-		return 0;
-	}
-
-
+	LPCTSTR strRegEntry1 = _T("SOFTWARE\\WOW6432Node\\Microsoft\\EdgeUpdate\\Clients\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}\\");
+	int nret_1 = 0;
+	int nret_2 = 0;
 	LPBYTE userversion_get = new BYTE[100];
 	DWORD type_1 = REG_SZ;
 	DWORD cbDate_1 = 80;
-	LONG return1 = ::RegQueryValueEx(hKey, _T("pv"), NULL, &type_1, userversion_get, &cbDate_1);
-	if (return1 != ERROR_SUCCESS)
+	HKEY   hKey;
+	LONG   lReturnCode = 0;
+
+	lReturnCode = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE, strRegEntry1, 0, KEY_READ, &hKey);
+
+	if (lReturnCode != ERROR_SUCCESS)
 	{
-		return 0;
+		nret_1 = 0;
+	}
+	else
+	{
+		LONG return1 = ::RegQueryValueEx(hKey, _T("pv"), NULL, &type_1, userversion_get, &cbDate_1);
+		if (return1 != ERROR_SUCCESS)
+		{
+			nret_1 = 0;
+		}
+		else
+			return 1;
 	}
 
-	
-	return 1;
+
+	LPCTSTR strRegEntry2 = _T("Software\\Microsoft\\EdgeUpdate\\Clients\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}\\");
+	lReturnCode = ::RegOpenKeyEx(HKEY_CURRENT_USER, strRegEntry2, 0, KEY_READ, &hKey);
+
+	if (lReturnCode != ERROR_SUCCESS)
+	{
+		nret_2 = 0;
+	}
+	else
+	{
+		LONG return2 = ::RegQueryValueEx(hKey, _T("pv"), NULL, &type_1, userversion_get, &cbDate_1);
+		if (return2 != ERROR_SUCCESS)
+		{
+			nret_2 = 0;
+		}
+		else
+			return 1;
+	}
+
+
+	if ((nret_1 == 0) && (nret_2 == 0))
+		return 0;
+	else
+		return 1;
 }
 
 #include "BacnetWebView.h"
@@ -1444,7 +1471,7 @@ void BacnetScreen::OnBnClickedWebViewShow()
 		if (Answer == IDYES)
 		{
 			ShellExecute(this->m_hWnd, _T("open"), _T("https://developer.microsoft.com/en-us/microsoft-edge/webview2/"), NULL, NULL, SW_SHOWNORMAL);
-			ShellExecute(this->m_hWnd, _T("open"), _T("https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/f1ef4889-266b-41d8-9725-76f5b1e37f7f/Microsoft.WebView2.FixedVersionRuntime.100.0.1185.50.x64.cab"), NULL, NULL, SW_SHOWNORMAL);
+			ShellExecute(this->m_hWnd, _T("open"), _T("https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/161df913-7a16-4b44-aa98-2a0239f227d7/MicrosoftEdgeWebView2RuntimeInstallerX86.exe"), NULL, NULL, SW_SHOWNORMAL);
 			return;
 		}
 

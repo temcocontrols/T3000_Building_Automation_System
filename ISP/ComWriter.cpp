@@ -16,6 +16,7 @@ extern unsigned int the_max_register_number_parameter_Finished;
 extern unsigned int com_error_delay_time ;
 extern unsigned int com_error_delay_count ;
 unsigned short Device_infor[18] = { 0 };
+void close_bac_com();
 #ifdef ISP_BURNING_MODE
 extern  unsigned short Check_sum ;
 extern int temco_burning_mode;
@@ -41,7 +42,7 @@ CComWriter::CComWriter(void)
     m_pWorkThread = NULL;
     continue_com_flash_count = 0;
     m_bStopWrite = FALSE;
-
+    m_subnet_flash = 0;
     m_nHexFileType = HEXFILE_DATA;
 }
 
@@ -137,27 +138,86 @@ int CComWriter::BeginWirteByCom()
 
     else if(m_nHexFileType == 2)
     {
-        if (open_com(m_nComPort) == false)
+#pragma region detect_mstp_shutdown
+
+        baudrate_def temp_baudrate_ret = { 0 }; //用于检测串口MSTP数据
+        int find_mstp_protocal = 0;
+        find_mstp_protocal = Test_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);
+        if ((find_mstp_protocal == -101) || (find_mstp_protocal == -100))
         {
             CString srtInfo = _T("|Error :The com port is occupied!");
-            //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
-            //AddStringToOutPuts(_T("Error :The com port is occupied!"));
-            OutPutsStatusInfo(srtInfo, FALSE);
-            srtInfo = _T("You need to shut down all other applications and ");
-            OutPutsStatusInfo(srtInfo, FALSE);
-            srtInfo = _T("background tasks that might be occupying this COM port!");
             OutPutsStatusInfo(srtInfo, FALSE);
             return 0;
         }
-        else
+        int temp_loop_count = 0;
+        while ( (find_mstp_protocal > 0) && (temp_loop_count < 3))
         {
-            CString strTemp;
-            strTemp.Format(_T("COM%d"), m_nComPort);
-            CString strTips = _T("|Open ") + strTemp + _T(" successful.");
-            OutPutsStatusInfo(strTips, FALSE);
-            Change_BaudRate(m_nBautrate);
+            CString srtInfo;
+            srtInfo.Format(_T("The current RS485 port uses Bacnet MSTP. (%d)"), temp_loop_count);
+            OutPutsStatusInfo(srtInfo, FALSE);
+            int ret = Initial_bac(m_nComPort, _T(""), m_nBautrate); //初始化bacnet mstp 协议
+            CString temp_cs;
+            if (ret <= 0)
+            {
+                temp_cs.Format(_T("Failed to open serial port :%d"), m_nComPort);
+                OutPutsStatusInfo(temp_cs, FALSE);
+                WriteFinish(0);
+                return 0;
+            }
+            srtInfo = _T("Disabling Bacnet MSTP and switching over to Modbus");
+            OutPutsStatusInfo(srtInfo, FALSE);
+            int nret = 0;
+            int loop1_count = 0;
+            do
+            {
+                nret = ShutDownMstpGlobal(4);  //让总线上 Temco的 bacnet 设备  闭嘴; 因为是广播 ， 所有循环发
+                Sleep(2000);
+                loop1_count++;
+            } while ((nret <= 0) && loop1_count < 5);
+            nret = ShutDownMstpGlobal(4);  //让总线上 Temco的 bacnet 设备  闭嘴; 因为是广播 ， 所有循环发
+            Sleep(1000);
 
+            close_bac_com();
+            find_mstp_protocal = Test_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  //再次确认总线上 都闭嘴了
+            temp_loop_count++; //最多循环3次
         }
+
+
+        if (find_mstp_protocal > 0)
+        {
+            CString temp_cs = _T("Some devices on the RS485 bus are running Bacnet MSTP");
+            OutPutsStatusInfo(temp_cs, FALSE);
+            temp_cs = _T("Remove these devices and try again.");
+            OutPutsStatusInfo(temp_cs, FALSE);
+            temp_cs = _T("Update the firmware failed.");
+            OutPutsStatusInfo(temp_cs, FALSE);
+            return 0;
+        }
+#pragma endregion
+
+
+        //if (open_com(m_nComPort) == false)
+        //{
+        //    CString srtInfo = _T("|Error :The com port is occupied!");
+        //    //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+        //    //AddStringToOutPuts(_T("Error :The com port is occupied!"));
+        //    OutPutsStatusInfo(srtInfo, FALSE);
+        //    srtInfo = _T("You need to shut down all other applications and ");
+        //    OutPutsStatusInfo(srtInfo, FALSE);
+        //    srtInfo = _T("background tasks that might be occupying this COM port!");
+        //    OutPutsStatusInfo(srtInfo, FALSE);
+        //    return 0;
+        //}
+        //else
+        //{
+        //    CString strTemp;
+        //    strTemp.Format(_T("COM%d"), m_nComPort);
+        //    CString strTips = _T("|Open ") + strTemp + _T(" successful.");
+        //    OutPutsStatusInfo(strTips, FALSE);
+        //    Change_BaudRate(m_nBautrate);
+        //    mudbus_write_one(255, 16, 0x0455, 3);
+        //    Sleep(100);
+        //}
 
         if (Is_Ram)
         {
@@ -1111,6 +1171,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
             if(mudbus_write_single_short(m_ID,&register_data[ii],ii,128)<0)//to write multiple 128 bytes
             {
                 long tempticktime = GetTickCount();
+                int temp_p = tempticktime - temp_last_time;
                 TRACE(_T("f(%d): %u  time:%u\r\n"),ii, tempticktime, tempticktime - temp_last_time);
                 temp_last_time = tempticktime;
                 if (itemp <= com_error_delay_count)
@@ -1248,7 +1309,7 @@ int CComWriter::WirteExtendHexFileByCom()
         strTemp.Format(_T("COM%d"), m_nComPort);
         CString strTips = _T("|Open ") +  strTemp + _T(" successful.");
         OutPutsStatusInfo(strTips, FALSE);
-
+        Change_BaudRate(m_nBautrate);
     }
 
 
@@ -1309,6 +1370,7 @@ int CComWriter::WirteExtendHexFileByCom_RAM()
             CString strTips = _T("|Open ") + strTemp + _T(" successful.");
             OutPutsStatusInfo(strTips, FALSE);
             Change_BaudRate(m_nBautrate);
+
         }
     }
 
@@ -2112,6 +2174,7 @@ int CComWriter::BeginWirteByTCP()
                 SetCommunicationType(1);
             }
         }
+        m_subnet_flash = 1; //设置标志位，是从 TCP 转 子口 的烧写;
         CString strTips = _T("|Programming device...");
         OutPutsStatusInfo(strTips);
         //AddStringToOutPuts(strTips);
@@ -2132,7 +2195,70 @@ int CComWriter::BeginWirteByTCP()
     return 1;
 }
 
+typedef enum
+{
+    F_INITIAL,
+    F_START_SHUTDOWN,
+    F_SUCCESS,
+    F_TIMEOUT,
+}E_FLAG_SHUTDOWN;
 
+
+int fun_shutdown(LPVOID pParam,int nretry_count)
+{
+    CComWriter* pWriter = (CComWriter*)(pParam);
+    int nret_value = 0;
+    for (int i = 0; i < nretry_count; i++)
+    {
+        int nflag = F_INITIAL;
+        unsigned short silent_command = 0; //高位时间  低位命令
+        silent_command = 0x0A00 | F_START_SHUTDOWN;
+        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // 静默初始化
+        if (nRet >= 0)
+        {
+            CString srtInfo = _T("Connecting the subdevice , Waiting.");
+            pWriter->OutPutsStatusInfo(srtInfo);
+            int retry_count = 0;
+            do
+            {
+                srtInfo = srtInfo + _T(".");
+                Sleep(3000);
+                pWriter->OutPutsStatusInfo(srtInfo, true);
+                nflag = mudbus_read_one(255, 99, 3);
+                retry_count++;
+            } while (((nflag <= 0) || (nflag == F_START_SHUTDOWN)) && (retry_count < 10));
+
+
+            if (nflag == F_TIMEOUT)
+            {
+                CString srtInfo = _T("MSTP cannot be disabled on a device in the bus.");
+                pWriter->OutPutsStatusInfo(srtInfo);
+                nret_value = -1;
+                continue;
+            }
+            else if (nflag == F_SUCCESS)
+            {
+                CString srtInfo = _T("Preparing firmware update via RS485port.");
+                pWriter->OutPutsStatusInfo(srtInfo);
+                nret_value = 1;
+                return 1;
+            }
+            else
+            {
+                CString srtInfo = _T("Send command timeout.");
+                pWriter->OutPutsStatusInfo(srtInfo);
+                nret_value = -2;
+                continue;
+            }
+        }
+        else
+        {
+            nret_value = -3;
+            continue;
+        }
+    }
+    return nret_value;
+}
 
 UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 {
@@ -2143,12 +2269,14 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
     UINT i=0;
     int nFailureNum = 0;
     UINT times=0;
+    const int  RETRY_TIMES = 10;
+    CString StrCurrentTime;
+
 
     g_mstp_deviceid = 0;
     m_bac_handle_Iam_data.clear();
 #if 1
-    const int  RETRY_TIMES = 10;
-    CString StrCurrentTime;
+
     StrCurrentTime.Format(_T("|>>>StartTime:%s"),GetSysTime());
     pWriter->OutPutsStatusInfo(StrCurrentTime);
     BOOL Flag_HEX_BIN = FALSE;
@@ -2211,6 +2339,86 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             }
         }
 
+#pragma region mstp_silent_part
+        if (pWriter->m_subnet_flash)  //如果是flash 子设备 才运行这一段;
+        {
+            int nret = 0;
+            unsigned short temp_register[100] = { 0 };
+            nret = mudbus_read_multi(255, &temp_register[0], 0, 100, 6);
+            if (nret>=0)
+            {
+                //只有 能够接子设备的 才搞 静默这一套;
+                if ((temp_register[7] == PM_MINIPANEL) ||
+                    (temp_register[7] == PM_TSTAT10) ||
+                    (temp_register[7] == PM_MINIPANEL_ARM) ||
+                    (temp_register[7] == PM_ESP32_T3_SERIES))
+                {
+                    int firmware_ver = temp_register[5] * 10 + temp_register[4];
+                    if (firmware_ver >= 636)
+                    {
+                        int nret1 = fun_shutdown(pWriter,2);
+                        if (nret1 < 0)
+                        {
+                            goto end_isp_flash;
+                        }
+#pragma region shutdown_function
+
+
+#if 0
+                        int nflag = F_INITIAL;
+                        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // 静默初始化
+                        if (nRet >= 0)
+                        {
+                            CString srtInfo = _T("Connecting the subdevice , Waiting.");
+                            pWriter->OutPutsStatusInfo(srtInfo);
+                            int retry_count = 0;
+                            do
+                            {
+                                srtInfo = srtInfo + _T(".");
+                                Sleep(3000);
+                                pWriter->OutPutsStatusInfo(srtInfo, true);
+                                nflag = mudbus_read_one(255, 99, 3);
+                                retry_count++;
+                            } while (((nflag <= 0) || (nflag == F_START_SHUTDOWN)) && (retry_count < 10));
+
+
+                            if (nflag == F_TIMEOUT)
+                            {
+                                CString srtInfo = _T("MSTP cannot be disabled on a device in the bus.");
+                                pWriter->OutPutsStatusInfo(srtInfo);
+                                goto end_isp_flash;
+                            }
+                            else if (nflag == F_SUCCESS)
+                            {
+                                CString srtInfo = _T("Preparing firmware update via RS485port.");
+                                pWriter->OutPutsStatusInfo(srtInfo);
+                            }
+                            else
+                            {
+                                CString srtInfo = _T("Send command timeout.");
+                                pWriter->OutPutsStatusInfo(srtInfo);
+                                goto end_isp_flash;
+                            }
+                        }
+                        else
+                        {
+
+                        }
+#endif
+#pragma endregion
+                    }
+
+                }
+            }
+            else
+            {
+                CString srtInfo = _T("Reading the device firmware version timed out.");
+                pWriter->OutPutsStatusInfo(srtInfo);
+                goto end_isp_flash;
+            }
+        }
+
+#pragma endregion
 
 
         while (0)
@@ -2231,8 +2439,9 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
            }
             Sleep(1);
         }
-
-
+        if (pWriter->m_subnet_flash == 0)
+             mudbus_write_one(255, 16, 0x0455, 3);
+        Sleep(100);
        //for (int Time =0; Time < pWriter->m_FlashTimes; Time++)
         {
             CString strID;
@@ -2627,9 +2836,11 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 continue;
             }
 
-
-
-
+            if (pWriter->m_subnet_flash == 0)
+            {
+                mudbus_write_one(255, 16, 0x0455, 3);  //全局广播  0x04 代表 4分钟   让所有 mstp的设备继续静默
+                Sleep(100);
+            }
 
             the_max_register_number_parameter_Count=pWriter->m_szHexFileFlags[pWriter->m_szHexFileFlags.size()-1];
             the_max_register_number_parameter_Finished = 0;

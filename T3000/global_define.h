@@ -6,7 +6,7 @@
 #endif // DEBUG
 
 
-//#define ENABLE_T3_EMAIL
+#define ENABLE_T3_EMAIL
 #include <map>
 //minipanel ¼Ä´æÆ÷±í
 //  9800	-	9999    200¸ö¼Ä´æÆ÷   setting

@@ -4306,7 +4306,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         if(nRecv<0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)    //10054  错误码   远程主机强迫关闭了一个现有的连接。 10060 有时候会超时;
             {
                 if (last_connected_port != 0)
                 {
@@ -10077,11 +10077,13 @@ OUTPUT int Set_Test_Comport_Status(int command)
     -1 有数据 但长度不足 8个字节
     -2 监视很50个token 以上 但没有发现 55 FF
     -3 检查完长度超过最后得 都没有发现 55 FF
+    -4 手动终止
     -100  代表串口号大于 100
     -101  同步打开串口失败
     -102  串口句柄为零，无效的串口
 */
-OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
+//OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret)
+OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudrate)
 {
     if (comport >= 100)
         return -100;
@@ -10098,11 +10100,22 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         if (shutdown_test_comport)
         {
             close_com_nocritical(comport);
-            return 1;
+            return -4;
         }
-        ntest_ret[i].ncomport = comport;
-        ntest_ret[i].baudrate = ArrayBaudate[i];
-        ntest_ret[i].test_ret = 0;
+
+        if (default_baudrate != 0) //默认不传 波特率的情况下 就检测所有的 波特率;
+        {
+            ntest_ret[i].ncomport = comport;
+            ntest_ret[i].test_ret = 0;
+            ntest_ret[i].baudrate = default_baudrate;
+        }
+        else
+        {
+            ntest_ret[i].ncomport = comport;
+            ntest_ret[i].test_ret = 0;
+            ntest_ret[i].baudrate = ArrayBaudate[i];
+        }
+
         if (found_bacnet_data)
         {
             ntest_ret[i].test_ret = -2;
@@ -10115,12 +10128,17 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         //    continue;
         //}
         bool change_baudrate_ret = false;
-        change_baudrate_ret = Change_BaudRate_NoCretical(ArrayBaudate[i], comport);
+        if (default_baudrate != 0)
+            change_baudrate_ret = Change_BaudRate_NoCretical(default_baudrate, comport);
+        else
+            change_baudrate_ret = Change_BaudRate_NoCretical(ArrayBaudate[i], comport);
         if (change_baudrate_ret == false)
         {
             DWORD nerrors;COMSTAT com_stats;
             ::ClearCommError(m_com_h_serial[comport],&nerrors, &com_stats);
             Sleep(1);
+            if (default_baudrate != 0)
+                break;
             continue;
         }
         unsigned char test_data[400];
@@ -10153,6 +10171,8 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         DWORD m_had_send_data_number;//已经发送的数据的字节数
         if (m_hSerial == NULL)
         {
+            if (default_baudrate != 0)
+                break;
             continue;
             return -102;
         }
@@ -10204,6 +10224,8 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         memset(&m_com_osRead[comport], 0, sizeof(OVERLAPPED));
         if ((m_com_osRead[comport].hEvent = CreateEvent(NULL, true, false, nReadSection)) == NULL)
         {
+            if (default_baudrate != 0)
+                break;
             continue;
             //return -2;
         }
@@ -10245,6 +10267,14 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         {
             n_no_data_online_count = 0;
             ntest_ret[i].test_ret = check_bacnet_data((unsigned char *)test_data, m_had_send_data_number);
+            if (default_baudrate != 0)
+            {
+                if (ntest_ret[i].test_ret == 1)
+                    found_bacnet_data = true;
+                else
+                    found_bacnet_data = false;
+                break;
+            }
             if (ntest_ret[i].test_ret != 1)
                 continue;
             found_bacnet_data = true;
@@ -10253,6 +10283,8 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
         {
             n_no_data_online_count++;
             ntest_ret[i].test_ret = 0;
+            if (default_baudrate != 0)
+                break;
             continue;
         }
 
@@ -10342,7 +10374,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret)
 
 
     close_com_nocritical(comport);
-    return 1;
+    return found_bacnet_data;
 
 }
 
