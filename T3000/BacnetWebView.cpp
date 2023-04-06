@@ -657,6 +657,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	{
 		tempjson["action"] = "GET_PANEL_DATA_RES";
 		int npanel_id = json.get("panelId", Json::nullValue).asInt();
+
 		if(npanel_id == 0)
 		   npanel_id = bac_gloab_panel;
 		int nret = LoadOnlinePanelData(npanel_id);
@@ -703,7 +704,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 		tempjson["panel_id"] = npanel_id;
 		int p_i = 0;
-		for (int i = 0; i < g_Input_data[npanel_id].size(); i++) {
+		for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++) {
 			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "INPUT";
 			tempjson["data"][p_i]["index"] = i;
@@ -726,7 +727,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 
 
-		for (int i = 0; i < m_Output_data.size(); i++) {
+		for (int i = 0; i < BAC_OUTPUT_ITEM_COUNT; i++) {
 			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "OUTPUT";
 			tempjson["data"][p_i]["index"] = i;
@@ -746,7 +747,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 
 
-		for (int i = 0; i < m_Variable_data.size(); i++) {
+		for (int i = 0; i < BAC_VARIABLE_ITEM_COUNT; i++) {
 			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "VARIABLE";
 			tempjson["data"][p_i]["index"] = i;
@@ -763,7 +764,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 
 
-		for (int i = 0; i < m_Program_data.size(); i++) {
+		for (int i = 0; i < BAC_PROGRAM_ITEM_COUNT; i++) {
 			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "PROGRAM";
 			tempjson["data"][p_i]["index"] = i;
@@ -777,7 +778,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 
 
-		for (int i = 0; i < m_Weekly_data.size(); i++) {
+		for (int i = 0; i < BAC_SCHEDULE_COUNT; i++) {
 			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "SCHEDULE";
 			tempjson["data"][p_i]["index"] = i;
@@ -793,7 +794,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 
 
-		for (int i = 0; i < m_Annual_data.size(); i++) {
+		for (int i = 0; i < BAC_HOLIDAY_COUNT; i++) {
 			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "HOLIDAY";
 			tempjson["data"][p_i]["index"] = i;
@@ -806,6 +807,57 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			p_i++;
 		}
 
+		for (int i = 0; i < BAC_PID_COUNT; i++)
+		{
+			tempjson["data"][p_i]["pid"] = npanel_id;
+			tempjson["data"][p_i]["type"] = "PID";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "PID" + to_string(i + 1);
+			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "PID" + to_string(i + 1);
+			tempjson["data"][p_i]["input_panel"] = g_controller_data[npanel_id].at(i).input.panel;
+			tempjson["data"][p_i]["input_type"] = g_controller_data[npanel_id].at(i).input.point_type;
+			tempjson["data"][p_i]["input_number"] = g_controller_data[npanel_id].at(i).input.number;
+			tempjson["data"][p_i]["input_value"] = g_controller_data[npanel_id].at(i).input_value;
+			tempjson["data"][p_i]["units"] = g_controller_data[npanel_id].at(i).units;
+			tempjson["data"][p_i]["auto_manual"] = g_controller_data[npanel_id].at(i).auto_manual;
+			tempjson["data"][p_i]["output_value"] = g_controller_data[npanel_id].at(i).value;
+			tempjson["data"][p_i]["setpoint_panel"] = g_controller_data[npanel_id].at(i).setpoint.panel;
+			tempjson["data"][p_i]["setpoint_type"] = g_controller_data[npanel_id].at(i).setpoint.point_type;
+			tempjson["data"][p_i]["setpoint_number"] = g_controller_data[npanel_id].at(i).setpoint.number;
+			tempjson["data"][p_i]["time_type"] = g_controller_data[npanel_id].at(i).repeats_per_min;
+			tempjson["data"][p_i]["action"] = g_controller_data[npanel_id].at(i).action;
+			tempjson["data"][p_i]["proportional"] = g_controller_data[npanel_id].at(i).proportional;
+			tempjson["data"][p_i]["Integral"] = g_controller_data[npanel_id].at(i).reset;	
+			tempjson["data"][p_i]["Differential"] = g_controller_data[npanel_id].at(i).rate;
+			tempjson["data"][p_i]["Bias"] = g_controller_data[npanel_id].at(i).bias;
+		}
+
+		for (int i = 0; i < BAC_SCREEN_COUNT; i++)
+		{
+			tempjson["data"][p_i]["pid"] = npanel_id;
+			tempjson["data"][p_i]["type"] = "GRP";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "GRP" + to_string(i + 1);
+			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "GRP" + to_string(i + 1);
+			tempjson["data"][p_i]["description"] = (char*)g_screen_data[npanel_id].at(i).description;
+			tempjson["data"][p_i]["label"] = (char*)g_screen_data[npanel_id].at(i).label;
+			//There is also additional data that does not need to be passed to the webview interface
+		}
+
+		for (int i = 0; i < BAC_MONITOR_COUNT; i++)
+		{
+			tempjson["data"][p_i]["pid"] = npanel_id;
+			tempjson["data"][p_i]["type"] = "MON";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "MON" + to_string(i + 1);
+			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "MON" + to_string(i + 1);
+			tempjson["data"][p_i]["label"] = (char*)g_monitor_data[npanel_id].at(i).label;
+			tempjson["data"][p_i]["hour_interval_time"] = g_monitor_data[npanel_id].at(i).hour_interval_time;
+			tempjson["data"][p_i]["minute_interval_time"] = g_monitor_data[npanel_id].at(i).minute_interval_time;
+			tempjson["data"][p_i]["second_interval_time"] = g_monitor_data[npanel_id].at(i).second_interval_time;
+			tempjson["data"][p_i]["status"] = g_monitor_data[npanel_id].at(i).status;
+			//There is also additional data that does not need to be passed to the webview interface
+		}
 
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
@@ -1070,13 +1122,20 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	case WEBVIEW_MESSAGE_TYPE::GET_PANELS_LIST:
 	{
 		tempjson["action"] = "GET_PANELS_LIST_RES";
+
+		int send_index = 0;
 		for (int i = 0; i < g_bacnet_panel_info.size(); i++) 
 		{
-			tempjson["data"][i]["panel_number"] = g_bacnet_panel_info.at(i).panel_number;
-			tempjson["data"][i]["object_instance"] = g_bacnet_panel_info.at(i).object_instance;
-			tempjson["data"][i]["serial_number"] = g_bacnet_panel_info.at(i).nseiral_number;
-			tempjson["data"][i]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
-			tempjson["data"][i]["pid"] = g_bacnet_panel_info.at(i).npid; 
+			int nret = LoadOnlinePanelData(g_bacnet_panel_info.at(i).panel_number);
+			if (nret > 0)
+			{
+				tempjson["data"][send_index]["panel_number"] = g_bacnet_panel_info.at(i).panel_number;
+				tempjson["data"][send_index]["object_instance"] = g_bacnet_panel_info.at(i).object_instance;
+				tempjson["data"][send_index]["serial_number"] = g_bacnet_panel_info.at(i).nseiral_number;
+				tempjson["data"][send_index]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
+				tempjson["data"][send_index]["pid"] = g_bacnet_panel_info.at(i).npid;
+				send_index++; //若缓存中没有 在线设备的数据，就不读取 。
+			}
 		}
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
@@ -1261,6 +1320,54 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 					tempjson["data"][i]["label"] = (char*)g_Annual_data[npanel_id].at(entry_index).label;
 					tempjson["data"][i]["auto_manual"] = g_Annual_data[npanel_id].at(entry_index).auto_manual;
 					tempjson["data"][i]["value"] = g_Annual_data[npanel_id].at(entry_index).value;
+
+				}
+				else if (entry_type == BAC_GRP)
+				{
+				if (entry_index >= BAC_SCREEN_COUNT)
+					continue;
+				int ret_index_out = Post_Background_Read_Message_ByPanel(npanel_id, READSCREEN_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+				if (ret_index_out >= 0)
+				{
+					memcpy(&g_screen_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_output_data, sizeof(Control_group_point));
+				}
+				else
+				{
+					continue;
+				}
+				tempjson["data"][i]["pid"] = npanel_id;
+				tempjson["data"][i]["type"] = "GRP";
+				tempjson["data"][i]["index"] = i;
+				tempjson["data"][i]["id"] = "GRP" + to_string(i + 1);
+				tempjson["data"][i]["command"] = to_string(npanel_id) + "GRP" + to_string(i + 1);
+				tempjson["data"][i]["description"] = (char*)g_screen_data[npanel_id].at(i).description;
+				tempjson["data"][i]["label"] = (char*)g_screen_data[npanel_id].at(i).label;
+				}
+				else if (entry_type == BAC_AMON)
+				{
+				if (entry_index >= BAC_MONITOR_COUNT)
+					continue;
+				int ret_index_monitor = Post_Background_Read_Message_ByPanel(npanel_id, READMONITOR_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+				if (ret_index_monitor >= 0)
+				{
+					memcpy(&g_monitor_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_monitor).ret_data.m_group_monitor_data, sizeof(Str_monitor_point));
+				}
+				else
+				{
+					continue;
+				}
+
+				tempjson["data"][i]["pid"] = npanel_id;
+				tempjson["data"][i]["type"] = "MON";
+				tempjson["data"][i]["index"] = i;
+				tempjson["data"][i]["id"] = "MON" + to_string(i + 1);
+				tempjson["data"][i]["command"] = to_string(npanel_id) + "MON" + to_string(i + 1);
+				tempjson["data"][i]["label"] = (char*)g_monitor_data[npanel_id].at(i).label;
+				tempjson["data"][i]["hour_interval_time"] = g_monitor_data[npanel_id].at(i).hour_interval_time;
+				tempjson["data"][i]["minute_interval_time"] = g_monitor_data[npanel_id].at(i).minute_interval_time;
+				tempjson["data"][i]["second_interval_time"] = g_monitor_data[npanel_id].at(i).second_interval_time;
+				tempjson["data"][i]["status"] = g_monitor_data[npanel_id].at(i).status;
+				//There is also additional data that does not need to be passed to the webview interface
 
 				}
 			}

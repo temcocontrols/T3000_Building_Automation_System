@@ -38,7 +38,9 @@ typedef union
 	Str_weekly_routine_point m_group_schedual_data;
 	Str_annual_routine_point m_group_annual_data;
 	Str_controller_point  m_group_pid_data;
-	Str_monitor_point     m_monitor_data;
+	//Str_monitor_point     m_monitor_data;
+	Control_group_point  m_group_screen_data;
+	Str_monitor_point  m_group_monitor_data;
 }groupdata;
 
 typedef struct grouppoint
