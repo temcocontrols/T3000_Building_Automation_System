@@ -827,9 +827,10 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["time_type"] = g_controller_data[npanel_id].at(i).repeats_per_min;
 			tempjson["data"][p_i]["action"] = g_controller_data[npanel_id].at(i).action;
 			tempjson["data"][p_i]["proportional"] = g_controller_data[npanel_id].at(i).proportional;
-			tempjson["data"][p_i]["Integral"] = g_controller_data[npanel_id].at(i).reset;	
-			tempjson["data"][p_i]["Differential"] = g_controller_data[npanel_id].at(i).rate;
-			tempjson["data"][p_i]["Bias"] = g_controller_data[npanel_id].at(i).bias;
+			tempjson["data"][p_i]["integral"] = g_controller_data[npanel_id].at(i).reset;	
+			tempjson["data"][p_i]["differential"] = g_controller_data[npanel_id].at(i).rate;
+			tempjson["data"][p_i]["bias"] = g_controller_data[npanel_id].at(i).bias;
+			p_i++;
 		}
 
 		for (int i = 0; i < BAC_SCREEN_COUNT; i++)
@@ -842,6 +843,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["description"] = (char*)g_screen_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_screen_data[npanel_id].at(i).label;
 			//There is also additional data that does not need to be passed to the webview interface
+			p_i++;
 		}
 
 		for (int i = 0; i < BAC_MONITOR_COUNT; i++)
@@ -857,6 +859,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["second_interval_time"] = g_monitor_data[npanel_id].at(i).second_interval_time;
 			tempjson["data"][p_i]["status"] = g_monitor_data[npanel_id].at(i).status;
 			//There is also additional data that does not need to be passed to the webview interface
+			p_i++;
 		}
 
 		const std::string output = Json::writeString(builder, tempjson);
