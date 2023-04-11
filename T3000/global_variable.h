@@ -1948,6 +1948,11 @@ Str_Setting_Info g_Device_Basic_Setting[256] = {0};
 Str_in_point s_Input_data;
 Str_out_point s_Output_data;
 Str_variable_point s_Variable_data;
+Str_controller_point s_controller_data;
+Str_program_point  s_Program_data;
+Str_weekly_routine_point s_Weekly_data;
+Str_annual_routine_point s_Annual_data;
+Control_group_point s_screen_data;
 vector <_panel_info> g_bacnet_panel_info;  //全局的 object instance 与 panel number 对应的容器
 vector <Str_out_point> m_Output_data;					vector < vector<Str_out_point> >			  g_Output_data; //全局所有panel output 的集合体;
 vector <Str_in_point>  m_Input_data;					vector < vector<Str_in_point> >				  g_Input_data; //全局所有panel input 的集合体;

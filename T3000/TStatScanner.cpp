@@ -2634,7 +2634,7 @@ void CTStatScanner::SendScanEndMsg()
             }
             if (find_exsit)
             {
-                AfxMessageBox(_T("T3000 will be occupying Bacnet Port 47808 in order to show 3rd party devices !"));
+                //AfxMessageBox(_T("T3000 will be occupying Bacnet Port 47808 in order to show 3rd party devices !"));
             }
         }
 #endif

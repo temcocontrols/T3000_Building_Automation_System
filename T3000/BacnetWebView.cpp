@@ -876,6 +876,11 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		{
 			int panel_id = json.get("panelId", Json::nullValue).asInt();
 			int entry_index = json.get("entryIndex", Json::nullValue).asInt();
+			if ((panel_id == 0) || entry_index >= BAC_SCREEN_COUNT)
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is invalid or Index is invalid."));
+				break;
+			}
 			grp_index = entry_index;
 			if (panel_id == bac_gloab_panel)
 				grp_serial_number = g_selected_serialnumber;
@@ -899,6 +904,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 		else if(action == GET_INITIAL_DATA)
 		{
+			grp_serial_number = g_selected_serialnumber;
 			grp_index = screen_list_line;
 		}
 
@@ -906,7 +912,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 		CString temp_item;
-		temp_item.Format(_T("%u_%d.txt"), g_selected_serialnumber, grp_index);
+		temp_item.Format(_T("%u_%d.txt"), grp_serial_number , grp_index);
 		des_file = image_fordor + _T("\\") + temp_item;
 		CFile file;
 
@@ -1307,7 +1313,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 					int ret_index_hol = Post_Background_Read_Message_ByPanel(npanel_id, READANNUALROUTINE_T3000, entry_index + 1);  //send message to background ，read 199IN3
 					if (ret_index_hol >= 0)
 					{
-						memcpy(&g_Annual_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_hol).ret_data.m_group_input_data, sizeof(Str_annual_routine_point));
+						memcpy(&g_Annual_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_hol).ret_data.m_group_annual_data, sizeof(Str_annual_routine_point));
 					}
 					else
 					{
@@ -1332,7 +1338,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				int ret_index_out = Post_Background_Read_Message_ByPanel(npanel_id, READSCREEN_T3000, entry_index + 1);  //send message to background ，read 199OUT3
 				if (ret_index_out >= 0)
 				{
-					memcpy(&g_screen_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_output_data, sizeof(Control_group_point));
+					memcpy(&g_screen_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_screen_data, sizeof(Control_group_point));
 				}
 				else
 				{

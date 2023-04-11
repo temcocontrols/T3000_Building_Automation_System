@@ -3257,6 +3257,156 @@ int fill_in_input(Str_in_point *temp_input, char* temp_point)
     return 0;
 }
 
+int fill_in_pids(Str_controller_point* temp_var, char* temp_point)
+{
+    int temp_struct_value;
+    char* my_temp_point = temp_point;
+    temp_var->input.number = *(my_temp_point++);
+    temp_var->input.point_type = *(my_temp_point++);
+    temp_var->input.panel = *(my_temp_point++);
+
+    //这里先加卡关条件，目前暂时不支持 其他panel的Input
+    //if(m_controller_data.at(i).input.number>=BAC_INPUT_ITEM_COUNT)
+    //	m_controller_data.at(i).input.number = 0;
+    //if(m_controller_data.at(i).input.panel != bac_gloab_panel )
+    //	m_controller_data.at(i).input.panel = bac_gloab_panel;
+
+    temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    temp_var->input_value = temp_struct_value;
+
+    my_temp_point = my_temp_point + 4;
+    temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    temp_var->value = temp_struct_value;
+    my_temp_point = my_temp_point + 4;
+
+    temp_var->setpoint.number = *(my_temp_point++);
+    temp_var->setpoint.point_type = *(my_temp_point++);
+    temp_var->setpoint.panel = *(my_temp_point++);
+
+    temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    temp_var->setpoint_value = temp_struct_value;
+    my_temp_point = my_temp_point + 4;
+
+    temp_var->units = *(my_temp_point++);
+    temp_var->auto_manual = *(my_temp_point++);
+    temp_var->action = *(my_temp_point++);
+    temp_var->repeats_per_min = *(my_temp_point++);
+    temp_var->sample_time = *(my_temp_point++);
+    temp_var->prop_high = *(my_temp_point++);
+    temp_var->proportional = *(my_temp_point++);
+    temp_var->reset = *(my_temp_point++);
+    temp_var->bias = *(my_temp_point++);
+    temp_var->rate = *(my_temp_point++);
+    return 0;
+}
+
+int fill_in_programs(Str_program_point* temp_program, char* temp_point)
+{
+    int temp_struct_value;
+    char* my_temp_point = temp_point;
+
+        if (strlen(my_temp_point) > STR_PROGRAM_DESCRIPTION_LENGTH)
+        memset(temp_program->description, 0, STR_PROGRAM_DESCRIPTION_LENGTH);
+    else
+        memcpy_s(temp_program->description, STR_PROGRAM_DESCRIPTION_LENGTH, my_temp_point, STR_PROGRAM_DESCRIPTION_LENGTH);
+    my_temp_point = my_temp_point + STR_PROGRAM_DESCRIPTION_LENGTH;
+    if (strlen(my_temp_point) > STR_PROGRAM_LABEL_LENGTH)
+        memset(temp_program->label, 0, STR_PROGRAM_LABEL_LENGTH);
+    else
+        memcpy_s(temp_program->label, STR_PROGRAM_LABEL_LENGTH, my_temp_point, STR_PROGRAM_LABEL_LENGTH);
+    my_temp_point = my_temp_point + STR_PROGRAM_LABEL_LENGTH;
+    temp_program->bytes = ((unsigned char)my_temp_point[1] << 8) | ((unsigned char)my_temp_point[0]);
+    my_temp_point = my_temp_point + 2;
+    temp_program->on_off = *(my_temp_point++);
+    temp_program->auto_manual = *(my_temp_point++);
+    temp_program->com_prg = *(my_temp_point++);
+    temp_program->errcode = *(my_temp_point++);
+    temp_program->unused = *(my_temp_point++);
+    return 0;
+}
+
+int fill_in_holiday(Str_annual_routine_point* temp_holiday, char* temp_point)
+{
+    int temp_struct_value;
+    char* my_temp_point = temp_point;
+
+    if (strlen(my_temp_point) > STR_ANNUAL_DESCRIPTION_LENGTH)
+        memset(temp_holiday->description, 0, STR_ANNUAL_DESCRIPTION_LENGTH);
+    else
+        memcpy_s(temp_holiday->description, STR_ANNUAL_DESCRIPTION_LENGTH, my_temp_point, STR_ANNUAL_DESCRIPTION_LENGTH);
+    my_temp_point = my_temp_point + STR_ANNUAL_DESCRIPTION_LENGTH;
+
+    if (strlen(my_temp_point) > STR_ANNUAL_DESCRIPTION_LENGTH)
+        memset(temp_holiday->label, 0, STR_ANNUAL_DESCRIPTION_LENGTH);
+    else
+        memcpy_s(temp_holiday->label, STR_ANNUAL_LABEL_LENGTH, my_temp_point, STR_ANNUAL_LABEL_LENGTH);
+    my_temp_point = my_temp_point + STR_ANNUAL_LABEL_LENGTH;
+
+
+    temp_holiday->value = (unsigned char)(*(my_temp_point++));
+    temp_holiday->auto_manual = (unsigned char)(*(my_temp_point++));
+    return 0;
+}
+
+int fill_in_screen(Control_group_point* temp_screen, char* temp_point)
+{
+    int temp_struct_value;
+    char* my_temp_point = temp_point;
+    if (strlen(my_temp_point) > STR_SCREEN_DESCRIPTION_LENGTH)
+        memset(temp_screen->description, 0, STR_SCREEN_DESCRIPTION_LENGTH);
+    else
+        memcpy_s(temp_screen->description, STR_SCREEN_DESCRIPTION_LENGTH, my_temp_point, STR_SCREEN_DESCRIPTION_LENGTH);
+    my_temp_point = my_temp_point + STR_SCREEN_DESCRIPTION_LENGTH;
+
+    if (strlen(my_temp_point) > STR_SCREEN_LABLE_LENGTH)
+        memset(temp_screen->label, 0, STR_SCREEN_LABLE_LENGTH);
+    else
+        memcpy_s(temp_screen->label, STR_SCREEN_LABLE_LENGTH, my_temp_point, STR_SCREEN_LABLE_LENGTH);
+    my_temp_point = my_temp_point + STR_SCREEN_LABLE_LENGTH;
+
+    if (strlen(my_temp_point) > STR_SCREEN_PIC_FILE_LENGTH)
+        memset(temp_screen->picture_file, 0, STR_SCREEN_PIC_FILE_LENGTH);
+    else
+        memcpy_s(temp_screen->picture_file, STR_SCREEN_PIC_FILE_LENGTH, my_temp_point, STR_SCREEN_PIC_FILE_LENGTH);
+    my_temp_point = my_temp_point + STR_SCREEN_PIC_FILE_LENGTH;
+
+    temp_screen->update = *(my_temp_point++);
+    temp_screen->mode = *(my_temp_point++);
+    temp_screen->xcur_grp = *(my_temp_point++);
+    unsigned short temp_ycur_grp;
+    temp_ycur_grp = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    temp_screen->ycur_grp = temp_ycur_grp;
+    my_temp_point = my_temp_point + 2;
+    return 0;
+}
+
+int fill_in_sch(Str_weekly_routine_point* temp_sch, char* temp_point)
+{
+    int temp_struct_value;
+    char* my_temp_point = temp_point;
+
+    if (strlen(my_temp_point) > STR_WEEKLY_DESCRIPTION_LENGTH)
+        memset(temp_sch->description, 0, STR_WEEKLY_DESCRIPTION_LENGTH);
+    else
+        memcpy_s(temp_sch->description, STR_WEEKLY_DESCRIPTION_LENGTH, my_temp_point, STR_WEEKLY_DESCRIPTION_LENGTH);
+    my_temp_point = my_temp_point + STR_WEEKLY_DESCRIPTION_LENGTH;
+
+    if (strlen(my_temp_point) > STR_WEEKLY_LABEL_LENGTH)
+        memset(temp_sch->label, 0, STR_WEEKLY_LABEL_LENGTH);
+    else
+        memcpy_s(temp_sch->label, STR_WEEKLY_LABEL_LENGTH, my_temp_point, STR_WEEKLY_LABEL_LENGTH);
+    my_temp_point = my_temp_point + STR_WEEKLY_LABEL_LENGTH;
+
+
+    temp_sch->value = (unsigned char)(*(my_temp_point++));
+    temp_sch->auto_manual = (unsigned char)(*(my_temp_point++));
+    temp_sch->override_1_value = (unsigned char)(*(my_temp_point++));
+    temp_sch->override_2_value = (unsigned char)(*(my_temp_point++));
+    temp_sch->off = (unsigned char)(*(my_temp_point++));
+    temp_sch->unused = (unsigned char)(*(my_temp_point++));
+    return 0;
+}
+
 int fill_in_variable(Str_variable_point* temp_var, char* temp_point)
 {
     int temp_struct_value;
@@ -3756,30 +3906,21 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (start_instance >= BAC_SCHEDULE_COUNT)
             return -1;//超过长度了;
 
-        for (i = start_instance; i <= end_instance; i++)
+        if (invoke_id == gsp_invoke)
         {
-            //Str_program_point temp_in;
-            if (strlen(my_temp_point) > STR_WEEKLY_DESCRIPTION_LENGTH)
-                memset(m_Weekly_data.at(i).description, 0, STR_WEEKLY_DESCRIPTION_LENGTH);
-            else
-                memcpy_s(m_Weekly_data.at(i).description, STR_WEEKLY_DESCRIPTION_LENGTH, my_temp_point, STR_WEEKLY_DESCRIPTION_LENGTH);
-            my_temp_point = my_temp_point + STR_WEEKLY_DESCRIPTION_LENGTH;
-
-            if (strlen(my_temp_point) > STR_WEEKLY_LABEL_LENGTH)
-                memset(m_Weekly_data.at(i).label, 0, STR_WEEKLY_LABEL_LENGTH);
-            else
-                memcpy_s(m_Weekly_data.at(i).label, STR_WEEKLY_LABEL_LENGTH, my_temp_point, STR_WEEKLY_LABEL_LENGTH);
-            my_temp_point = my_temp_point + STR_WEEKLY_LABEL_LENGTH;
-
-
-            m_Weekly_data.at(i).value = (unsigned char)(*(my_temp_point++));
-            m_Weekly_data.at(i).auto_manual = (unsigned char)(*(my_temp_point++));
-            m_Weekly_data.at(i).override_1_value = (unsigned char)(*(my_temp_point++));
-            m_Weekly_data.at(i).override_2_value = (unsigned char)(*(my_temp_point++));
-            m_Weekly_data.at(i).off = (unsigned char)(*(my_temp_point++));
-            m_Weekly_data.at(i).unused = (unsigned char)(*(my_temp_point++));
-
-            my_temp_point = my_temp_point + 2 * sizeof(Point_T3000);
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_sch(&s_Weekly_data, my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_weekly_routine_point);
+            }
+        }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_sch(&m_Weekly_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_weekly_routine_point);
+            }
         }
         return READWEEKLYROUTINE_T3000;
     }
@@ -3801,26 +3942,23 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (start_instance >= BAC_HOLIDAY_COUNT)
             return -1;//超过长度了;
 
-        for (i = start_instance; i <= end_instance; i++)
+        if (invoke_id == gsp_invoke)
         {
-            //Str_program_point temp_in;
-            if (strlen(my_temp_point) > STR_ANNUAL_DESCRIPTION_LENGTH)
-                memset(m_Annual_data.at(i).description, 0, STR_ANNUAL_DESCRIPTION_LENGTH);
-            else
-                memcpy_s(m_Annual_data.at(i).description, STR_ANNUAL_DESCRIPTION_LENGTH, my_temp_point, STR_ANNUAL_DESCRIPTION_LENGTH);
-            my_temp_point = my_temp_point + STR_ANNUAL_DESCRIPTION_LENGTH;
-
-            if (strlen(my_temp_point) > STR_ANNUAL_DESCRIPTION_LENGTH)
-                memset(m_Annual_data.at(i).label, 0, STR_ANNUAL_DESCRIPTION_LENGTH);
-            else
-                memcpy_s(m_Annual_data.at(i).label, STR_ANNUAL_LABEL_LENGTH, my_temp_point, STR_ANNUAL_LABEL_LENGTH);
-            my_temp_point = my_temp_point + STR_ANNUAL_LABEL_LENGTH;
-
-
-            m_Annual_data.at(i).value = (unsigned char)(*(my_temp_point++));
-            m_Annual_data.at(i).auto_manual = (unsigned char)(*(my_temp_point++));
-            my_temp_point++;
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_holiday(&s_Annual_data, my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_annual_routine_point);
+            }
         }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_holiday(&m_Annual_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_annual_routine_point);
+            }
+        }
+
         return READANNUALROUTINE_T3000;
     }
     break;
@@ -3842,27 +3980,21 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (BAC_PROGRAM_ITEM_COUNT - 1))
             end_flag = true;
 
-        for (i = start_instance; i <= end_instance; i++)
+        if (invoke_id == gsp_invoke)
         {
-            //Str_program_point temp_in;
-            if (strlen(my_temp_point) > STR_PROGRAM_DESCRIPTION_LENGTH)
-                memset(m_Program_data.at(i).description, 0, STR_PROGRAM_DESCRIPTION_LENGTH);
-            else
-                memcpy_s(m_Program_data.at(i).description, STR_PROGRAM_DESCRIPTION_LENGTH, my_temp_point, STR_PROGRAM_DESCRIPTION_LENGTH);
-            my_temp_point = my_temp_point + STR_PROGRAM_DESCRIPTION_LENGTH;
-            if (strlen(my_temp_point) > STR_PROGRAM_LABEL_LENGTH)
-                memset(m_Program_data.at(i).label, 0, STR_PROGRAM_LABEL_LENGTH);
-            else
-                memcpy_s(m_Program_data.at(i).label, STR_PROGRAM_LABEL_LENGTH, my_temp_point, STR_PROGRAM_LABEL_LENGTH);
-            my_temp_point = my_temp_point + STR_PROGRAM_LABEL_LENGTH;
-            m_Program_data.at(i).bytes = ((unsigned char)my_temp_point[1] << 8) | ((unsigned char)my_temp_point[0]);
-            my_temp_point = my_temp_point + 2;
-            m_Program_data.at(i).on_off = *(my_temp_point++);
-            m_Program_data.at(i).auto_manual = *(my_temp_point++);
-            m_Program_data.at(i).com_prg = *(my_temp_point++);
-            m_Program_data.at(i).errcode = *(my_temp_point++);
-            m_Program_data.at(i).unused = *(my_temp_point++);
-            //m_Program_data.push_back(temp_in);
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_programs(&s_Program_data, my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_program_point);
+            }
+        }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_programs(&m_Program_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_program_point);
+            }
         }
         return READPROGRAM_T3000;
     }
@@ -4152,46 +4284,22 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (BAC_PID_COUNT - 1))
             end_flag = true;
 
-        for (i = start_instance; i <= end_instance; i++)
+        if (invoke_id == gsp_invoke)
         {
-            m_controller_data.at(i).input.number = *(my_temp_point++);
-            m_controller_data.at(i).input.point_type = *(my_temp_point++);
-            m_controller_data.at(i).input.panel = *(my_temp_point++);
-
-            //这里先加卡关条件，目前暂时不支持 其他panel的Input
-            //if(m_controller_data.at(i).input.number>=BAC_INPUT_ITEM_COUNT)
-            //	m_controller_data.at(i).input.number = 0;
-            //if(m_controller_data.at(i).input.panel != bac_gloab_panel )
-            //	m_controller_data.at(i).input.panel = bac_gloab_panel;
-
-            temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
-            m_controller_data.at(i).input_value = temp_struct_value;
-
-            my_temp_point = my_temp_point + 4;
-            temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
-            m_controller_data.at(i).value = temp_struct_value;
-            my_temp_point = my_temp_point + 4;
-
-            m_controller_data.at(i).setpoint.number = *(my_temp_point++);
-            m_controller_data.at(i).setpoint.point_type = *(my_temp_point++);
-            m_controller_data.at(i).setpoint.panel = *(my_temp_point++);
-
-            temp_struct_value = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
-            m_controller_data.at(i).setpoint_value = temp_struct_value;
-            my_temp_point = my_temp_point + 4;
-
-            m_controller_data.at(i).units = *(my_temp_point++);
-            m_controller_data.at(i).auto_manual = *(my_temp_point++);
-            m_controller_data.at(i).action = *(my_temp_point++);
-            m_controller_data.at(i).repeats_per_min = *(my_temp_point++);
-            m_controller_data.at(i).sample_time = *(my_temp_point++);
-            m_controller_data.at(i).prop_high = *(my_temp_point++);
-            m_controller_data.at(i).proportional = *(my_temp_point++);
-            m_controller_data.at(i).reset = *(my_temp_point++);
-            m_controller_data.at(i).bias = *(my_temp_point++);
-            m_controller_data.at(i).rate = *(my_temp_point++);
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_pids(&s_controller_data, my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_controller_point);
+            }
         }
-
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_pids(&m_controller_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_controller_point);
+            }
+        }
 
 
         return READCONTROLLER_T3000;
@@ -4214,34 +4322,25 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             return -1;//超过长度了;
         if (end_instance == (BAC_SCREEN_COUNT - 1))
             end_flag = true;
-        for (i = start_instance; i <= end_instance; i++)
+
+        
+        if (invoke_id == gsp_invoke)
         {
-            if (strlen(my_temp_point) > STR_SCREEN_DESCRIPTION_LENGTH)
-                memset(m_screen_data.at(i).description, 0, STR_SCREEN_DESCRIPTION_LENGTH);
-            else
-                memcpy_s(m_screen_data.at(i).description, STR_SCREEN_DESCRIPTION_LENGTH, my_temp_point, STR_SCREEN_DESCRIPTION_LENGTH);
-            my_temp_point = my_temp_point + STR_SCREEN_DESCRIPTION_LENGTH;
-
-            if (strlen(my_temp_point) > STR_SCREEN_LABLE_LENGTH)
-                memset(m_screen_data.at(i).label, 0, STR_SCREEN_LABLE_LENGTH);
-            else
-                memcpy_s(m_screen_data.at(i).label, STR_SCREEN_LABLE_LENGTH, my_temp_point, STR_SCREEN_LABLE_LENGTH);
-            my_temp_point = my_temp_point + STR_SCREEN_LABLE_LENGTH;
-
-            if (strlen(my_temp_point) > STR_SCREEN_PIC_FILE_LENGTH)
-                memset(m_screen_data.at(i).picture_file, 0, STR_SCREEN_PIC_FILE_LENGTH);
-            else
-                memcpy_s(m_screen_data.at(i).picture_file, STR_SCREEN_PIC_FILE_LENGTH, my_temp_point, STR_SCREEN_PIC_FILE_LENGTH);
-            my_temp_point = my_temp_point + STR_SCREEN_PIC_FILE_LENGTH;
-
-            m_screen_data.at(i).update = *(my_temp_point++);
-            m_screen_data.at(i).mode = *(my_temp_point++);
-            m_screen_data.at(i).xcur_grp = *(my_temp_point++);
-            unsigned short temp_ycur_grp;
-            temp_ycur_grp = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
-            m_screen_data.at(i).ycur_grp = temp_ycur_grp;
-            my_temp_point = my_temp_point + 2;
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_screen(&s_screen_data, my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Control_group_point);
+            }
         }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_screen(&m_screen_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Control_group_point);
+            }
+        }
+       
         return READSCREEN_T3000;
     }
     break;

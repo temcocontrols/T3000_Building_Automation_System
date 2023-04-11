@@ -11698,6 +11698,71 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                     }
                 }
                     break;
+                case READCONTROLLER_T3000:
+                {
+                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
+                        m_backbround_data.at(n_handle_index).str_info.npanel_commad,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        sizeof(Str_variable_point));
+                    if (nret > 0)
+                    {
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_pid_data, &s_controller_data, sizeof(Str_controller_point));
+                    }
+                }
+                    break;
+                case READPROGRAM_T3000:
+                {
+                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
+                        m_backbround_data.at(n_handle_index).str_info.npanel_commad,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        sizeof(Str_program_point));
+                    if (nret > 0)
+                    {
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_program_data, &s_Program_data, sizeof(Str_program_point));
+                    }
+                }
+                break;
+                case READWEEKLYROUTINE_T3000:
+                {
+                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
+                        m_backbround_data.at(n_handle_index).str_info.npanel_commad,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        sizeof(Str_program_point));
+                    if (nret > 0)
+                    {
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_schedual_data, &s_Weekly_data, sizeof(Str_weekly_routine_point));
+                    }
+                }
+                break;
+                case READANNUALROUTINE_T3000:
+                {
+                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
+                        m_backbround_data.at(n_handle_index).str_info.npanel_commad,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        sizeof(Str_program_point));
+                    if (nret > 0)
+                    {
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_annual_data, &s_Annual_data, sizeof(Str_annual_routine_point));
+                    }
+                }
+                break;
+                case READSCREEN_T3000:
+                {
+                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
+                        m_backbround_data.at(n_handle_index).str_info.npanel_commad,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        sizeof(Str_program_point));
+                    if (nret > 0)
+                    {
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_screen_data, &s_screen_data, sizeof(Control_group_point));
+                    }
+                }
+                break;
                 default:
                     break;
                 }

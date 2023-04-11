@@ -1036,6 +1036,11 @@ extern vector < vector<Str_MSV> >					    g_msv_data;
 extern Str_in_point s_Input_data;
 extern Str_out_point s_Output_data;
 extern Str_variable_point s_Variable_data;
+extern Str_controller_point s_controller_data;
+extern Str_program_point  s_Program_data;
+extern Str_weekly_routine_point s_Weekly_data;
+extern Str_annual_routine_point s_Annual_data;
+extern Control_group_point s_screen_data;
 extern vector <_panel_info> g_bacnet_panel_info; //全局的 object instance 与 panel number 对应的容器
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;                             
