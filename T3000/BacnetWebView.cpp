@@ -872,9 +872,12 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	case WEBVIEW_MESSAGE_TYPE::LOAD_GRAPHIC_ENTRY:
 	case WEBVIEW_MESSAGE_TYPE::GET_INITIAL_DATA:
 	{
+		Json::Value tempjson;
+		int panel_id;
 		if (action == LOAD_GRAPHIC_ENTRY)
 		{
-			int panel_id = json.get("panelId", Json::nullValue).asInt();
+			tempjson["action"] = "LOAD_GRAPHIC_ENTRY_RES";
+			panel_id = json.get("panelId", Json::nullValue).asInt();
 			int entry_index = json.get("entryIndex", Json::nullValue).asInt();
 			if ((panel_id == 0) || entry_index >= BAC_SCREEN_COUNT)
 			{
@@ -904,10 +907,17 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 		else if(action == GET_INITIAL_DATA)
 		{
+			tempjson["action"] = "GET_INITIAL_DATA_RES";
+			panel_id = bac_gloab_panel;
 			grp_serial_number = g_selected_serialnumber;
 			grp_index = screen_list_line;
 		}
-
+		tempjson["entry"]["pid"] = bac_gloab_panel;
+		tempjson["entry"]["index"] = grp_index;
+		tempjson["entry"]["id"] = "GRP" + to_string(grp_index + 1);
+		tempjson["entry"]["command"] = to_string(panel_id) + "GRP" + to_string(grp_index + 1);
+		tempjson["entry"]["description"] = (char*)g_screen_data[panel_id].at(grp_index).description;
+		tempjson["entry"]["label"] = (char*)g_screen_data[panel_id].at(grp_index).label;
 
 		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
@@ -930,8 +940,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		WCHAR* nbuff = new WCHAR[len + 1];
 		memset(nbuff, 0, 2 * (len + 1));
 		file.Read(nbuff, len * 2 + 1);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
-		Json::Value tempjson;
-		tempjson["action"] = "GET_INITIAL_DATA_RES";
 		wstring nbuff_wstring(nbuff);
 		string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
 		tempjson["data"] = nbuff_str;
