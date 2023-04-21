@@ -55,6 +55,7 @@ enum WEBVIEW_MESSAGE_TYPE
 	// GET_PANEL_ENTRY_BY_ID = 5,
 	GET_ENTRIES = 6,
 	LOAD_GRAPHIC_ENTRY = 7,
+	OPEN_ENTRY_EDIT_WINDOW = 8,
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -639,6 +640,9 @@ HRESULT BacnetWebViewAppWindow::ExecuteScriptResponse(HRESULT errorCode, LPCWSTR
 	}
 }*/
 
+CString empty_grp_file = _T("{\"activeItemIndex\":null,\"customObjectsCount\":0,\"elementGuidelines\":[],\"groupCount\":0,\"items\":[],\"itemsCount\":0,\"selectedTargets\":[],\"version\":\"0.4.4\",\"viewportTransform\":{\"scale\":1,\"x\":0,\"y\":0}} ");
+
+
 void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 {
 	Json::Value json;
@@ -651,6 +655,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	Json::Value tempjson;
 	int grp_index = 0;
 	int grp_serial_number = 0;
+	int n_ret = -1;
 	switch (action)
 	{
 	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_DATA:
@@ -928,8 +933,14 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 
 		CFileFind temp_find;
-		if (temp_find.FindFile(des_file) == 0)
+		if (temp_find.FindFile(des_file) == 0) //当 没有发现缓存的 grp文件时，返回空的 grp给 webview 显示;
 		{
+			wstring nbuff_wstring(empty_grp_file.GetBuffer());
+			string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
+			tempjson["data"] = nbuff_str;
+			const std::string output = Json::writeString(builder, tempjson);
+			CString tempjson_str(output.c_str());
+			m_webView->PostWebMessageAsJson(tempjson_str);
 			break;
 		}
 
@@ -973,12 +984,18 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	}
 	case WEBVIEW_MESSAGE_TYPE::UPDATE_ENTRY:
 	{
+
 		Json::Value tempjson;
 		int panel_id = json.get("panelId", Json::nullValue).asInt();
 		int entry_index = json.get("entryIndex", Json::nullValue).asInt();
 		int entry_type = json.get("entryType", Json::nullValue).asInt();
 		const std::string field = json.get("field", Json::nullValue).asString();
 
+		if ((panel_id == 0) || (panel_id >= 255))
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is invalid ."));
+			break;
+		}
 		/*
 		// int ret_index = json.get("data_index", Json::nullValue).asInt(); //save ret_index ;
 		switch (entry_type)
@@ -1014,10 +1031,12 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_INPUT_ITEM_COUNT)
 			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("control") == 0) {
 				m_Input_data.at(entry_index).control = json["value"].asInt();
+				TRACE(_T("Change input Value to %d\r\n"), m_Input_data.at(entry_index).control);
 			}
 			else if (field.compare("value") == 0) {
 				m_Input_data.at(entry_index).value = json["value"].asInt() * 1000;
@@ -1026,7 +1045,22 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				m_Input_data.at(entry_index).auto_manual = json["value"].asInt();
 			}
 
-			Write_Private_Data_Blocking(WRITEINPUT_T3000, entry_index, entry_index, g_bac_instance);
+			n_ret = Write_Private_Data_Blocking(WRITEINPUT_T3000, entry_index, entry_index, g_bac_instance);
+			if (n_ret > 0)
+			{
+				memcpy(&g_Input_data.at(panel_id).at(entry_index), &m_Input_data.at(entry_index), sizeof(Str_in_point));	
+				int n_index = SearchDataIndexByPanel(panel_id, READINPUT_T3000, entry_index);
+				if ((n_index >= 0) && (n_index <= 255))
+				{
+					//第一时间更新全局数据，如果不这样，数据会来回变动
+					memcpy( &m_backbround_data.at(n_index).ret_data.m_group_input_data, &g_Input_data[panel_id].at(entry_index), sizeof(Str_in_point));
+				}
+			}
+			else
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				break;
+			}
 			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
@@ -1035,10 +1069,12 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_OUTPUT_ITEM_COUNT)
 			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("control") == 0) {
 				m_Output_data.at(entry_index).control = json["value"].asInt();
+				TRACE(_T("Change output Value to %d\r\n"), m_Output_data.at(entry_index).control);
 			}
 			else if (field.compare("value") == 0) {
 				m_Output_data.at(entry_index).value = json["value"].asInt() * 1000;
@@ -1047,7 +1083,22 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				m_Output_data.at(entry_index).auto_manual = json["value"].asInt();
 			}
 
-			Write_Private_Data_Blocking(WRITEOUTPUT_T3000, entry_index, entry_index, g_bac_instance);
+			n_ret = Write_Private_Data_Blocking(WRITEOUTPUT_T3000, entry_index, entry_index, g_bac_instance);
+			if (n_ret > 0)
+			{
+				memcpy(&g_Output_data.at(panel_id).at(entry_index), &m_Output_data.at(entry_index), sizeof(Str_out_point));
+				int n_index = SearchDataIndexByPanel(panel_id, READOUTPUT_T3000, entry_index);
+				if ((n_index >= 0) && (n_index <= 255))
+				{
+					//第一时间更新全局数据，如果不这样，数据会来回变动
+					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_output_data, &g_Output_data[panel_id].at(entry_index), sizeof(Str_out_point));
+				}
+			}
+			else
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				break;
+			}
 			::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
@@ -1056,6 +1107,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_VARIABLE_ITEM_COUNT)
 			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("control") == 0) {
@@ -1068,7 +1120,22 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				m_Variable_data.at(entry_index).auto_manual = json["value"].asInt();
 			}
 
-			Write_Private_Data_Blocking(WRITEVARIABLE_T3000, entry_index, entry_index, g_bac_instance);
+			n_ret = Write_Private_Data_Blocking(WRITEVARIABLE_T3000, entry_index, entry_index, g_bac_instance);
+			if (n_ret > 0)
+			{
+				memcpy(&g_Variable_data.at(panel_id).at(entry_index), &m_Variable_data.at(entry_index), sizeof(Str_variable_point));
+				int n_index = SearchDataIndexByPanel(panel_id, READVARIABLE_T3000, entry_index);
+				if ((n_index >= 0) && (n_index <= 255))
+				{
+					//第一时间更新全局数据，如果不这样，数据会来回变动
+					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_variable_data, &g_Variable_data[panel_id].at(entry_index), sizeof(Str_variable_point));
+				}
+			}
+			else
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				break;
+			}
 			::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
@@ -1077,6 +1144,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_PROGRAM_ITEM_COUNT)
 			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("status") == 0) {
@@ -1086,7 +1154,22 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				m_Program_data.at(entry_index).auto_manual = json["value"].asInt();
 			}
 
-			Write_Private_Data_Blocking(WRITEPROGRAM_T3000, entry_index, entry_index, g_bac_instance);
+			n_ret = Write_Private_Data_Blocking(WRITEPROGRAM_T3000, entry_index, entry_index, g_bac_instance);
+			if (n_ret > 0)
+			{
+				memcpy(&g_Program_data.at(panel_id).at(entry_index), &m_Program_data.at(entry_index), sizeof(Str_program_point));
+				int n_index = SearchDataIndexByPanel(panel_id, READPROGRAM_T3000, entry_index);
+				if ((n_index >= 0) && (n_index <= 255))
+				{
+					//第一时间更新全局数据，如果不这样，数据会来回变动
+					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_program_data, &g_Program_data[panel_id].at(entry_index), sizeof(Str_program_point));
+				}
+			}
+			else
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				break;
+			}
 			::PostMessage(m_pragram_dlg_hwnd, WM_REFRESH_BAC_PROGRAM_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
@@ -1095,6 +1178,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_SCHEDULE_COUNT)
 			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("output") == 0) {
@@ -1104,7 +1188,22 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				m_Weekly_data.at(entry_index).auto_manual = json["value"].asInt();
 			}
 
-			Write_Private_Data_Blocking(WRITESCHEDULE_T3000, entry_index, entry_index, g_bac_instance);
+			n_ret = Write_Private_Data_Blocking(WRITESCHEDULE_T3000, entry_index, entry_index, g_bac_instance);
+			if (n_ret > 0)
+			{
+				memcpy(&g_Weekly_data.at(panel_id).at(entry_index), &m_Weekly_data.at(entry_index), sizeof(Str_weekly_routine_point));
+				int n_index = SearchDataIndexByPanel(panel_id, READWEEKLYROUTINE_T3000, entry_index);
+				if ((n_index >= 0) && (n_index <= 255))
+				{
+					//第一时间更新全局数据，如果不这样，数据会来回变动
+					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_schedual_data, &g_Weekly_data[panel_id].at(entry_index), sizeof(Str_weekly_routine_point));
+				}
+			}
+			else
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				break;
+			}
 			::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
@@ -1113,6 +1212,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_HOLIDAY_COUNT)
 			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("value") == 0) {
@@ -1122,7 +1222,22 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				m_Annual_data.at(entry_index).auto_manual = json["value"].asInt();
 			}
 
-			Write_Private_Data_Blocking(WRITEHOLIDAY_T3000, entry_index, entry_index, g_bac_instance);
+			n_ret = Write_Private_Data_Blocking(WRITEHOLIDAY_T3000, entry_index, entry_index, g_bac_instance);
+			if (n_ret > 0)
+			{
+				memcpy(&g_Annual_data.at(panel_id).at(entry_index), &m_Annual_data.at(entry_index), sizeof(Str_annual_routine_point));
+				int n_index = SearchDataIndexByPanel(panel_id, READANNUALROUTINE_T3000, entry_index);
+				if ((n_index >= 0) && (n_index <= 255))
+				{
+					//第一时间更新全局数据，如果不这样，数据会来回变动
+					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_annual_data, &g_Annual_data[panel_id].at(entry_index), sizeof(Str_annual_routine_point));
+				}
+			}
+			else
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				break;
+			}
 			::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
@@ -1132,7 +1247,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		tempjson["data"]["status"] = true;
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
-
 		m_webView->PostWebMessageAsJson(temp_cs);
 		break;
 	}
@@ -1179,10 +1293,10 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 					CString temp_cs4;
 					int ret_index4 = Post_Background_Read_Message_ByPanel(npanel_id, READINPUT_T3000, entry_index + 1);  //send message to background ，read 199IN3
 					if (ret_index4 >= 0)
-					{
+					{						
 						memcpy(&g_Input_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index4).ret_data.m_group_input_data, sizeof(Str_in_point));
-						temp_cs4.Format(_T("%dIN%d %.3f\r\n"), npanel_id, m_backbround_data.at(ret_index4).str_info.npoint_number + 1, m_backbround_data.at(ret_index4).ret_data.m_group_input_data.value / 1000.000);
-						TRACE(temp_cs4);
+						//temp_cs4.Format(_T("%dIN%d %.3f  control %d\r\n"), npanel_id, m_backbround_data.at(ret_index4).str_info.npoint_number + 1, m_backbround_data.at(ret_index4).ret_data.m_group_input_data.value / 1000.000 , m_backbround_data.at(ret_index4).ret_data.m_group_input_data.control);
+						//TRACE(temp_cs4);
 						//AfxMessageBox(temp_cs4);
 					}
 					else
@@ -1215,6 +1329,9 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 					if (ret_index_out >= 0)
 					{
 						memcpy(&g_Output_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_output_data, sizeof(Str_out_point));
+						//CString temp_cs4;
+						//temp_cs4.Format(_T("%dOut%d value %.3f control %d\r\n"), npanel_id, m_backbround_data.at(ret_index_out).str_info.npoint_number + 1, m_backbround_data.at(ret_index_out).ret_data.m_group_output_data.value / 1000.000 , m_backbround_data.at(ret_index_out).ret_data.m_group_output_data.control);
+						//TRACE(temp_cs4);
 					}
 					else
 					{
@@ -1393,6 +1510,52 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			m_webView->PostWebMessageAsJson(temp_cs);
 		}
 	}
+		break;
+	case OPEN_ENTRY_EDIT_WINDOW:
+	{
+		tempjson["action"] = "OPEN_ENTRY_EDIT_WINDOW";
+		int npanel_id = json.get("panelId", Json::nullValue).asInt();
+		int entry_index = json.get("index", Json::nullValue).asInt();
+		int entry_type = json.get("type", Json::nullValue).asInt();
+		if (npanel_id == bac_gloab_panel) //暂时只处理本地 panel的 点击响应
+		{
+			switch (entry_type)
+			{
+			case BAC_SCH:
+			{
+				if (entry_index < BAC_SCHEDULE_COUNT)
+				{
+
+				}
+			}
+				break;
+			case BAC_HOL:
+			{
+				if (entry_index < BAC_HOLIDAY_COUNT)
+				{
+
+				}
+			}
+				break;
+			case BAC_PRG:
+			{
+				if (entry_index < BAC_PROGRAM_ITEM_COUNT)
+				{
+
+				}
+			}
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+
+		}
+	}
+		break;
+	default :
 		break;
 	}
 }

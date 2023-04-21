@@ -1093,6 +1093,7 @@ int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata 
 //read  123IN4  ->  panel_id = 123     command_type = READINPUT_T3000     npoint = 3
 int Post_Background_Read_Message_ByPanel(unsigned char panel_id,int command_type,int npoint)
 {
+    int n_index = 0;
     if (read_write_bacnet_config)	//在读写Bacnet config 的时候禁止刷新List;
         return -1;
     if (npoint == 0)
@@ -1111,7 +1112,10 @@ int Post_Background_Read_Message_ByPanel(unsigned char panel_id,int command_type
     }
     else
     {
-        return SearchDataIndexByPanel(panel_id, command_type, npoint - 1);
+        n_index = SearchDataIndexByPanel(panel_id, command_type, npoint - 1);
+        if((n_index >=0) && (n_index <= 255))
+            m_backbround_data.at(n_index).nreq_time = time(NULL);
+        return n_index;
     }
 }
 

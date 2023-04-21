@@ -7154,12 +7154,12 @@ DWORD WINAPI  CMainFrame::Mul_Ping_Thread(LPVOID lpVoid)
             CPingReply pr1;
             if (p1.Ping1((LPCTSTR)temp_3, pr1))
             {
-                TRACE(_T("%s online\r\n"), temp_3);
+                //TRACE(_T("%s online\r\n"), temp_3);
                 g_ipaddress_info.ip_status[j] = 1;
             }
             else
             {
-                TRACE(_T("%s offline\r\n"), temp_3);
+                //TRACE(_T("%s offline\r\n"), temp_3);
                 g_ipaddress_info.ip_status[j] = 0;
             }
             Sleep(10);
@@ -11648,6 +11648,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                     }
                 }
                 int nret = 0;
+                
                 switch (m_backbround_data.at(n_handle_index).str_info.npanel_commad)
                 {
                 case READINPUT_T3000:
@@ -11659,10 +11660,12 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                                             sizeof(Str_in_point));
                     if (nret > 0)
                     {
+                        m_backbround_data.at(n_handle_index).nrec_time = time(NULL);
                          memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_input_data, &s_Input_data, sizeof(Str_in_point));
-                         CString temp_cs;
-                         temp_cs.Format(_T("IN%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1,m_backbround_data.at(n_handle_index).ret_data.m_group_input_data.value/1000.000);
-                         TRACE(temp_cs);
+                         //CString temp_cs;
+                         //temp_cs.Format(_T("IN%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1,m_backbround_data.at(n_handle_index).ret_data.m_group_input_data.value/1000.000);
+                         //TRACE(_T("Start time: %d   End time : %d\r\n"), m_backbround_data.at(n_handle_index).nreq_time, m_backbround_data.at(n_handle_index).nrec_time);
+                         //TRACE(temp_cs);
                     }
                 }
                     break;
@@ -11678,7 +11681,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_output_data, &s_Output_data, sizeof(Str_out_point));
                         CString temp_cs;
                         temp_cs.Format(_T("Out%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1, m_backbround_data.at(n_handle_index).ret_data.m_group_output_data.value / 1000.000);
-                        TRACE(temp_cs);
+                        //TRACE(temp_cs);
                     }
                 }
                     break;
@@ -11692,9 +11695,9 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                     if (nret > 0)
                     {
                         memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_variable_data, &s_Variable_data, sizeof(Str_variable_point));
-                        CString temp_cs;
-                        temp_cs.Format(_T("Var%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1, m_backbround_data.at(n_handle_index).ret_data.m_group_variable_data.value / 1000.000);
-                        TRACE(temp_cs);
+                        //CString temp_cs;
+                        //temp_cs.Format(_T("Var%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1, m_backbround_data.at(n_handle_index).ret_data.m_group_variable_data.value / 1000.000);
+                        //TRACE(temp_cs);
                     }
                 }
                     break;
