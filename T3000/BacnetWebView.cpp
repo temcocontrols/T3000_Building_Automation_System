@@ -1515,8 +1515,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	{
 		tempjson["action"] = "OPEN_ENTRY_EDIT_WINDOW";
 		int npanel_id = json.get("panelId", Json::nullValue).asInt();
-		int entry_index = json.get("index", Json::nullValue).asInt();
-		int entry_type = json.get("type", Json::nullValue).asInt();
+		int entry_index = json.get("entryIndex", Json::nullValue).asInt();
+		int entry_type = json.get("entryType", Json::nullValue).asInt();
 		if (npanel_id == bac_gloab_panel) //暂时只处理本地 panel的 点击响应
 		{
 			switch (entry_type)
