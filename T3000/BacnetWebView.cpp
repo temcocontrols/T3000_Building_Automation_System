@@ -21,12 +21,13 @@
 #include "BacnetVariable.h"
 #include "dirent.h"
 #include "BacnetProgram.h"
-
+#include "BacnetWeeklyRoutine.h"
+#include "BacnetAnnualRoutine.h"
 #include "BacnetWebView.h"
 #include "MainFrm.h"
 using namespace Microsoft::WRL;
 size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
-
+char* base64_decode(char const* base64Str, char* debase64Str, int encodeStrLen);
 //enum WEBVIEW_MESSAGE_TYPE
 //{
 //    READ_VARIABLES = 0,
@@ -56,6 +57,8 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_ENTRIES = 6,
 	LOAD_GRAPHIC_ENTRY = 7,
 	OPEN_ENTRY_EDIT_WINDOW = 8,
+	SAVE_IMAGE_RES = 9,
+	SAVE_LIBRAY_DATA = 10,
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -69,7 +72,8 @@ enum WEBVIEW_MESSAGE_TYPE
 extern char* ispoint_ex(char* token, int* num_point, byte* var_type, byte* point_type, int* num_panel, int* num_net, int network, unsigned char& sub_panel, byte panel, int* netpresent);
 
 extern CBacnetProgram* Program_Window;
-
+extern BacnetWeeklyRoutine* WeeklyRoutine_Window ;
+extern BacnetAnnualRoutine* AnnualRoutine_Window ;
 BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 	UINT creationModeId,
 	std::wstring initialUri,
@@ -924,6 +928,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		tempjson["entry"]["description"] = (char*)g_screen_data[panel_id].at(grp_index).description;
 		tempjson["entry"]["label"] = (char*)g_screen_data[panel_id].at(grp_index).label;
 
+
 		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 		CString temp_item;
@@ -996,33 +1001,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is invalid ."));
 			break;
 		}
-		/*
-		// int ret_index = json.get("data_index", Json::nullValue).asInt(); //save ret_index ;
-		switch (entry_type)
-		{
-		case BAC_IN:
-		{
-			//get the ret_index first 
-			groupdata temp_write_data = {0};
-			memcpy(&temp_write_data, &m_backbround_data.at(ret_index).ret_data, sizeof(groupdata));
-			if (field.compare("control") == 0) {
-				temp_write_data.m_group_input_data.control = json["value"].asInt();
-			}
-			else if (field.compare("value") == 0) {
-				temp_write_data.m_group_input_data.value = json["value"].asInt() * 1000;
-			}
-			else if (field.compare("auto_manual") == 0) {
-				temp_write_data.m_group_input_data.auto_manual = json["value"].asInt();
-			}
-
-			int ret_results = WritePrivateData_Blocking(m_backbround_data.at(ret_index).str_info.ninstance,
-				WRITEINPUT_T3000, m_backbround_data.at(ret_index).str_info.npoint_number,
-				m_backbround_data.at(ret_index).str_info.npoint_number, 5, (char*)&temp_write_data.m_group_input_data);
-			if (ret_results >= 0)
-			{
-				//success
-			} 
-			*/
 
 		switch (entry_type)
 		{
@@ -1458,50 +1436,50 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				}
 				else if (entry_type == BAC_GRP)
 				{
-				if (entry_index >= BAC_SCREEN_COUNT)
-					continue;
-				int ret_index_out = Post_Background_Read_Message_ByPanel(npanel_id, READSCREEN_T3000, entry_index + 1);  //send message to background ，read 199OUT3
-				if (ret_index_out >= 0)
-				{
-					memcpy(&g_screen_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_screen_data, sizeof(Control_group_point));
-				}
-				else
-				{
-					continue;
-				}
-				tempjson["data"][i]["pid"] = npanel_id;
-				tempjson["data"][i]["type"] = "GRP";
-				tempjson["data"][i]["index"] = i;
-				tempjson["data"][i]["id"] = "GRP" + to_string(i + 1);
-				tempjson["data"][i]["command"] = to_string(npanel_id) + "GRP" + to_string(i + 1);
-				tempjson["data"][i]["description"] = (char*)g_screen_data[npanel_id].at(i).description;
-				tempjson["data"][i]["label"] = (char*)g_screen_data[npanel_id].at(i).label;
+					if (entry_index >= BAC_SCREEN_COUNT)
+						continue;
+					int ret_index_out = Post_Background_Read_Message_ByPanel(npanel_id, READSCREEN_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					if (ret_index_out >= 0)
+					{
+						memcpy(&g_screen_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_screen_data, sizeof(Control_group_point));
+					}
+					else
+					{
+						continue;
+					}
+					tempjson["data"][i]["pid"] = npanel_id;
+					tempjson["data"][i]["type"] = "GRP";
+					tempjson["data"][i]["index"] = entry_index;
+					tempjson["data"][i]["id"] = "GRP" + to_string(entry_index + 1);
+					tempjson["data"][i]["command"] = to_string(npanel_id) + "GRP" + to_string(entry_index + 1);
+					tempjson["data"][i]["description"] = (char*)g_screen_data[npanel_id].at(entry_index).description;
+					tempjson["data"][i]["label"] = (char*)g_screen_data[npanel_id].at(entry_index).label;
 				}
 				else if (entry_type == BAC_AMON)
 				{
-				if (entry_index >= BAC_MONITOR_COUNT)
-					continue;
-				int ret_index_monitor = Post_Background_Read_Message_ByPanel(npanel_id, READMONITOR_T3000, entry_index + 1);  //send message to background ，read 199OUT3
-				if (ret_index_monitor >= 0)
-				{
-					memcpy(&g_monitor_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_monitor).ret_data.m_group_monitor_data, sizeof(Str_monitor_point));
-				}
-				else
-				{
-					continue;
-				}
+					if (entry_index >= BAC_MONITOR_COUNT)
+						continue;
+					int ret_index_monitor = Post_Background_Read_Message_ByPanel(npanel_id, READMONITOR_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					if (ret_index_monitor >= 0)
+					{
+						memcpy(&g_monitor_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_monitor).ret_data.m_group_monitor_data, sizeof(Str_monitor_point));
+					}
+					else
+					{
+						continue;
+					}
 
-				tempjson["data"][i]["pid"] = npanel_id;
-				tempjson["data"][i]["type"] = "MON";
-				tempjson["data"][i]["index"] = i;
-				tempjson["data"][i]["id"] = "MON" + to_string(i + 1);
-				tempjson["data"][i]["command"] = to_string(npanel_id) + "MON" + to_string(i + 1);
-				tempjson["data"][i]["label"] = (char*)g_monitor_data[npanel_id].at(i).label;
-				tempjson["data"][i]["hour_interval_time"] = g_monitor_data[npanel_id].at(i).hour_interval_time;
-				tempjson["data"][i]["minute_interval_time"] = g_monitor_data[npanel_id].at(i).minute_interval_time;
-				tempjson["data"][i]["second_interval_time"] = g_monitor_data[npanel_id].at(i).second_interval_time;
-				tempjson["data"][i]["status"] = g_monitor_data[npanel_id].at(i).status;
-				//There is also additional data that does not need to be passed to the webview interface
+					tempjson["data"][i]["pid"] = npanel_id;
+					tempjson["data"][i]["type"] = "MON";
+					tempjson["data"][i]["index"] = entry_index;
+					tempjson["data"][i]["id"] = "MON" + to_string(entry_index + 1);
+					tempjson["data"][i]["command"] = to_string(npanel_id) + "MON" + to_string(entry_index + 1);
+					tempjson["data"][i]["label"] = (char*)g_monitor_data[npanel_id].at(entry_index).label;
+					tempjson["data"][i]["hour_interval_time"] = g_monitor_data[npanel_id].at(entry_index).hour_interval_time;
+					tempjson["data"][i]["minute_interval_time"] = g_monitor_data[npanel_id].at(entry_index).minute_interval_time;
+					tempjson["data"][i]["second_interval_time"] = g_monitor_data[npanel_id].at(entry_index).second_interval_time;
+					tempjson["data"][i]["status"] = g_monitor_data[npanel_id].at(entry_index).status;
+					//There is also additional data that does not need to be passed to the webview interface
 
 				}
 			}
@@ -1525,7 +1503,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			{
 				if (entry_index < BAC_SCHEDULE_COUNT)
 				{
-
+					weekly_list_line = entry_index;
+					WeeklyRoutine_Window->OnBnClickedButtonWeeklyScheduleEdit();
 				}
 			}
 				break;
@@ -1533,7 +1512,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			{
 				if (entry_index < BAC_HOLIDAY_COUNT)
 				{
-
+					annual_list_line = entry_index;
+					AnnualRoutine_Window->OnBnClickedButtonAnnualEdit();
 				}
 			}
 				break;
@@ -1541,6 +1521,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			{
 				if (entry_index < BAC_PROGRAM_ITEM_COUNT)
 				{
+					program_list_line = entry_index;
+					Program_Window->OnBnClickedButtonProgramEdit();
 
 				}
 			}
@@ -1555,10 +1537,110 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 	}
 		break;
+	case SAVE_IMAGE_RES:
+	{
+		const std::string filename = json.get("filename", Json::nullValue).asString();
+		int file_length = json.get("fileLength", Json::nullValue).asInt();
+		const std::string file_data = Json::writeString(builder, json["fileData"]);
+		char des_folder[512];
+		memset(des_folder, 0, 512);
+		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		CString temp_sel_building =  g_strBuildingFolder + pFrame->m_strCurMainBuildingName + _T("\\image\\") + filename.c_str();
+		WideCharToMultiByte(CP_ACP, 0, temp_sel_building.GetBuffer(), -1, des_folder, 512, NULL, NULL);
+		std::ofstream file(des_folder, std::ios::binary);
+
+		char* ret_result = (char*)malloc(sizeof(char) * file_length);	//申请返回字符串空间
+		memset(ret_result, 0, sizeof(char) * file_length);		//初始化字符串空间
+		const char * temp_ret = strstr((char const*)file_data.c_str(), "base64,"); //去除前面不用的部分;
+		if (temp_ret == NULL)
+			break;
+		const std::string temp_image_data = strstr((char const*)file_data.c_str(), "base64,") + 7; //去除前面不用的部分;
+		base64_decode((char const*)temp_image_data.c_str(), ret_result, (int)strlen(temp_image_data.c_str()));
+		file.write(ret_result, file_length);
+		free(ret_result);
+
+		CString cs_temp_path;
+		cs_temp_path.Format(_T("Database\\Buildings\\%s\\image\\"), pFrame->m_strCurMainBuildingName);
+
+		char temp_folder[256];
+		memset(temp_folder, 0, 256);
+		WideCharToMultiByte(CP_ACP, 0, cs_temp_path.GetBuffer(), -1, temp_folder, 256, NULL, NULL);
+		strcat(temp_folder, filename.c_str());
+		tempjson["action"] = "SAVE_IMAGE_RES";
+		tempjson["data"]["name"] = filename;
+		tempjson["data"]["path"] = temp_folder;
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+		m_webView->PostWebMessageAsJson(temp_cs);
+	}
+		break;
+	case SAVE_LIBRAY_DATA:
+	{
+		const std::string file_output = Json::writeString(builder, json["library"]);
+		//保存至building 目录
+	}
+		break;
 	default :
 		break;
 	}
 }
+
+char base64char[] = {
+		'A','B','C','D','E','F','G','H','I','J',
+		'K','L','M','N','O','P','Q','R','S','T',
+		'U','V','W','X','Y','Z','a','b','c','d',
+		'e','f','g','h','i','j','k','l','m','n',
+		'o','p','q','r','s','t','u','v','w','x',
+		'y','z','0','1','2','3','4','5','6','7',
+		'8','9','+', '/', '\0'
+};
+
+
+char* base64_decode(char const* base64Str, char* debase64Str, int encodeStrLen)
+{
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	char temp[4] = "";
+
+	for (i = 0; i < encodeStrLen; i += 4) {
+		for (j = 0; j < 64; j++) {
+			if (*(base64Str + i) == base64char[j]) {
+				temp[0] = j;
+			}
+		}
+
+		for (j = 0; j < 64; j++) {
+			if (*(base64Str + i + 1) == base64char[j]) {
+				temp[1] = j;
+			}
+		}
+
+		for (j = 0; j < 64; j++) {
+			if (*(base64Str + i + 2) == base64char[j]) {
+				temp[2] = j;
+			}
+		}
+
+		for (j = 0; j < 64; j++) {
+			if (*(base64Str + i + 3) == base64char[j]) {
+				temp[3] = j;
+			}
+		}
+
+		*(debase64Str + k++) = ((temp[0] << 2) & 0xFC) | ((temp[1] >> 4) & 0x03);
+		if (*(base64Str + i + 2) == '=')
+			break;
+
+		*(debase64Str + k++) = ((temp[1] << 4) & 0xF0) | ((temp[2] >> 2) & 0x0F);
+		if (*(base64Str + i + 3) == '=')
+			break;
+
+		*(debase64Str + k++) = ((temp[2] << 6) & 0xF0) | (temp[3] & 0x3F);
+	}
+	return debase64Str;
+}
+
 
 VOID CALLBACK BacnetWebViewAppWindow::onTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {

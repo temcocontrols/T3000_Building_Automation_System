@@ -1372,9 +1372,12 @@ if(error!=-1)
 					 if(line_table[j].line==go_to[k].go_to)
 							break;
 				if (j==lline)
-				{
-						sntx_err(NOT_LINE) ;
-						break;
+				{			
+						//sntx_err(NOT_LINE) ;
+						error = 1;
+						sprintf(pmes, "Wrong or missing line number %d in Line %d", go_to[k].go_to, line_table[i].line);
+						return 1;
+						
 				}
 			 }
 		 }

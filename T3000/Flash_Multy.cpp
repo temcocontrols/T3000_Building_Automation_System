@@ -709,7 +709,7 @@ void CFlash_Multy::SetAutoConfig(Str_flash_device ndevice_info)
 
 
         WritePrivateProfileStringW(_T("Data"),_T("COMPORT"),cs_comport,AutoFlashConfigPath);
-        WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),ndevice_info.nipport,AutoFlashConfigPath);
+        WritePrivateProfileStringW(_T("Data"),_T("Baudrate"),ndevice_info.nBaudrate,AutoFlashConfigPath);
 
         CString nflash_id;
         nflash_id = ndevice_info.nID;
@@ -848,14 +848,14 @@ void CFlash_Multy::OnBnClickedButtonStatrt()
 
         if (m_bool_flash_different_version)
         {
-            if (_wtof(temp.file_rev)-temp.software_rev>0.1)
-            {
+            //if (_wtof(temp.file_rev)-temp.software_rev>0.1)
+            //{
                 temp.need_flash = true;
-            }
-            else
-            {
-                temp.need_flash = false;
-            }
+            //}
+            //else
+            //{
+            //    temp.need_flash = false;
+            //}
         }
         else
         {
@@ -990,12 +990,12 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
                     temp_time.Format(_T("%u"), temp_int_time);
                     unsigned int last_oper_time = 0;
                     last_oper_time = GetPrivateProfileInt(temp_serial, _T("Time"), 0, g_ext_mass_flash_path);
-                    if (temp_int_time - last_oper_time < 3600 * 2)
-                    {
-                        pParent->PostMessage(WM_MULTY_FLASH_MESSAGE, MASS_FLASH_MESSAGE, flash_device.at(i).nitem);
-                        WritePrivateProfileStringW(_T("FlashResult"), temp_serial, _T("3"), g_ext_mass_flash_path); //Up to date
-                        continue;
-                    }
+                    //if (temp_int_time - last_oper_time < 3600 * 2)
+                    //{
+                    //    pParent->PostMessage(WM_MULTY_FLASH_MESSAGE, MASS_FLASH_MESSAGE, flash_device.at(i).nitem);
+                    //    WritePrivateProfileStringW(_T("FlashResult"), temp_serial, _T("3"), g_ext_mass_flash_path); //Up to date
+                    //    continue;
+                    //}
 
                     CString temp_ProductPath = ApplicationFolder + _T("\\Database\\Firmware\\ProductPath.ini");
                     CString temp_pid;
@@ -1004,7 +1004,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
                     GetPrivateProfileString(_T("Version"), temp_pid, _T("0"), temp_newest_rev.GetBuffer(MAX_PATH),MAX_PATH, temp_ProductPath);
                     temp_newest_rev.ReleaseBuffer();
                     flash_device.at(i).newest_rev = _wtof(temp_newest_rev);
-                    if (fabs(flash_device.at(i).newest_rev - flash_device.at(i).software_rev*10) <= 0.00001)
+                    if ((fabs(flash_device.at(i).newest_rev - flash_device.at(i).software_rev*10) <= 0.00001) && (flash_device.at(i).newest_rev > 0) && flash_device.at(i).software_rev > 0)
                     {
                         pParent->PostMessage(WM_MULTY_FLASH_MESSAGE, MASS_FLASH_MESSAGE, flash_device.at(i).nitem);
                         WritePrivateProfileStringW(_T("FlashResult"), temp_serial, _T("3"), g_ext_mass_flash_path); //Up to date
@@ -1503,7 +1503,7 @@ void CFlash_Multy::OnTimer(UINT_PTR nIDEvent)
             //GetDlgItem(IDC_BUTTON_STATRT)->ShowWindow(TRUE);
 
             KillTimer(1);
-            m_multy_flash_listbox.InsertString(m_multy_flash_listbox.GetCount(), _T("The selected device has been updated, please check it!"));
+            m_multy_flash_listbox.InsertString(m_multy_flash_listbox.GetCount(), _T("The selected device has been updated!"));
             m_multy_flash_listbox.SetTopIndex(m_multy_flash_listbox.GetCount() - 1);
         }
 
