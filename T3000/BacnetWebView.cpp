@@ -1544,9 +1544,30 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		const std::string file_data = Json::writeString(builder, json["fileData"]);
 		char des_folder[512];
 		memset(des_folder, 0, 512);
+
+		CString web_image_folder = g_strExePth + _T("ResourceFile\\webview\\www\\image");
+		int ret = FALSE;
+		WIN32_FIND_DATA fd;
+		HANDLE hFind_folder;
+		hFind_folder = FindFirstFile(web_image_folder, &fd);
+		if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+		{			
+			ret = TRUE; //目录存在
+		}
+		FindClose(hFind_folder);
+		if (ret == false)
+		{
+			SECURITY_ATTRIBUTES attrib;
+			attrib.bInheritHandle = FALSE;
+			attrib.lpSecurityDescriptor = NULL;
+			attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
+			CreateDirectory(web_image_folder, &attrib);
+		}
+
+
 		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-		CString temp_sel_building =  g_strBuildingFolder + pFrame->m_strCurMainBuildingName + _T("\\image\\") + filename.c_str();
-		WideCharToMultiByte(CP_ACP, 0, temp_sel_building.GetBuffer(), -1, des_folder, 512, NULL, NULL);
+		CString temp_image_path = web_image_folder + _T("\\") + filename.c_str();
+		WideCharToMultiByte(CP_ACP, 0, temp_image_path.GetBuffer(), -1, des_folder, 512, NULL, NULL);
 		std::ofstream file(des_folder, std::ios::binary);
 
 		char* ret_result = (char*)malloc(sizeof(char) * file_length);	//申请返回字符串空间
@@ -1558,10 +1579,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		base64_decode((char const*)temp_image_data.c_str(), ret_result, (int)strlen(temp_image_data.c_str()));
 		file.write(ret_result, file_length);
 		free(ret_result);
-
-		CString cs_temp_path;
-		cs_temp_path.Format(_T("Database\\Buildings\\%s\\image\\"), pFrame->m_strCurMainBuildingName);
-
+		CString cs_temp_path; 
+	    cs_temp_path.Format(_T("ResourceFile\\webview\\www\\image\\"), pFrame->m_strCurMainBuildingName);
 		char temp_folder[256];
 		memset(temp_folder, 0, 256);
 		WideCharToMultiByte(CP_ACP, 0, cs_temp_path.GetBuffer(), -1, temp_folder, 256, NULL, NULL);
