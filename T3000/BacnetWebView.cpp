@@ -57,7 +57,7 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_ENTRIES = 6,
 	LOAD_GRAPHIC_ENTRY = 7,
 	OPEN_ENTRY_EDIT_WINDOW = 8,
-	SAVE_IMAGE_RES = 9,
+	SAVE_IMAGE = 9,
 	SAVE_LIBRAY_DATA = 10,
 };
 
@@ -1537,7 +1537,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 	}
 		break;
-	case SAVE_IMAGE_RES:
+	case SAVE_IMAGE:
 	{
 		const std::string filename = json.get("filename", Json::nullValue).asString();
 		int file_length = json.get("fileLength", Json::nullValue).asInt();
@@ -1545,7 +1545,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		char des_folder[512];
 		memset(des_folder, 0, 512);
 
-		CString web_image_folder = g_strExePth + _T("ResourceFile\\webview\\www\\image");
+		CString web_image_folder = g_strExePth + _T("ResourceFile\\webview\\www\\uploads");
 		int ret = FALSE;
 		WIN32_FIND_DATA fd;
 		HANDLE hFind_folder;
@@ -1580,14 +1580,14 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		file.write(ret_result, file_length);
 		free(ret_result);
 		CString cs_temp_path; 
-	    cs_temp_path.Format(_T("ResourceFile\\webview\\www\\image\\"), pFrame->m_strCurMainBuildingName);
+	    cs_temp_path.Format(_T("ResourceFile\\webview\\www\\uploads\\"), pFrame->m_strCurMainBuildingName);
 		char temp_folder[256];
 		memset(temp_folder, 0, 256);
 		WideCharToMultiByte(CP_ACP, 0, cs_temp_path.GetBuffer(), -1, temp_folder, 256, NULL, NULL);
 		strcat(temp_folder, filename.c_str());
 		tempjson["action"] = "SAVE_IMAGE_RES";
 		tempjson["data"]["name"] = filename;
-		tempjson["data"]["path"] = temp_folder;
+		tempjson["data"]["path"] = "/uploads/"+filename;
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 		m_webView->PostWebMessageAsJson(temp_cs);
