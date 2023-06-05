@@ -1673,7 +1673,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		break;
 	case SAVE_LIBRAY_DATA:
 	{
-		const std::string file_output = Json::writeString(builder, json["library"]);
+		const std::string file_output = Json::writeString(builder, json["data"]);
 		
 		CFile file;
 
@@ -1683,7 +1683,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		file.Close();
 		Json::Value tempjson;
 		tempjson["action"] = "SAVE_LIBRAY_DATA_RES";
-		tempjson["library"]["status"] = true;
+		tempjson["status"] = true;
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 
