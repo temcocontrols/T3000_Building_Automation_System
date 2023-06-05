@@ -364,17 +364,17 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
 				char temp_char[50];
 				CString temp_11;
-				if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
-				{			
+				//if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
+				//{			
 					int time_seconds = m_Variable_data.at(i).value / 1000;
 					intervaltotextfull(temp_char, time_seconds, 0, 0);
 
-				}
-				else
-				{
-					int time_seconds = m_Variable_data.at(i).value;
-					intervaltotext_2022_full(temp_char, time_seconds, 0);
-				}
+				//}
+				//else
+				//{
+				//	int time_seconds = m_Variable_data.at(i).value;
+				//	intervaltotext_2022_full(temp_char, time_seconds, 0);
+				//}
 				MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1,
 					temp_11.GetBuffer(MAX_PATH), MAX_PATH);
 				temp_11.ReleaseBuffer();
@@ -1051,17 +1051,17 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 				if(m_Variable_data.at(lRow).range == 20)	//如果是时间;
 				{
 					char temp_char[50];
-					if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
-					{
+					//if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
+					//{
 						int time_seconds = m_Variable_data.at(lRow).value / 1000;
 						intervaltotextfull(temp_char, time_seconds, 0, 0);
 
-					}
-					else
-					{
-						int time_seconds = m_Variable_data.at(lRow).value;
-						intervaltotext_2022_full(temp_char, time_seconds, 0);
-					}
+					//}
+					//else
+					//{
+					//	int time_seconds = m_Variable_data.at(lRow).value;
+					//	intervaltotext_2022_full(temp_char, time_seconds, 0);
+					//}
 					CString temp_11;
 					MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1,
 						temp_11.GetBuffer(MAX_PATH), MAX_PATH);

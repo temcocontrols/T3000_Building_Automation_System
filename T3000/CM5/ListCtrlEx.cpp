@@ -830,6 +830,15 @@ BOOL CListCtrlEx::IsDataNewer(char *datapoint,int data_length)
 		return false;
 }
 
+BOOL CListCtrlEx::IsDataItemNewer(char* datapoint, int data_length , int nitem)
+{
+	int ret = memcmp(m_data + nitem * data_length, datapoint, data_length);
+	if (ret != 0)
+		return true;
+	else
+		return false;
+}
+
 
 int CListCtrlEx::InsertItem(int nIndex, LPCTSTR lpText)
 {	

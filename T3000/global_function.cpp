@@ -7023,6 +7023,7 @@ char* intervaltotext_2022_full(char* textbuf, unsigned long var_value, char* c)
     if (var_value >= 2400000)
     {
         strcpy(textbuffer++, "-");
+        *textbuf = 0;
         return(buf);
     }
 
@@ -7878,32 +7879,48 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
 
     for (int i = 0; i < g_Vector_Subnet.size(); i++)
     {
-       
-        CStringArray temp_strip;
-        SplitCStringA(temp_strip, strIPAdress, _T("."));
-        CString temp_ip;
-
-        temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
-
-
-
-
         CString PC_IP;
         PC_IP = g_Vector_Subnet.at(i).StrIP;
-        CStringArray temp_pc_strip;
-        SplitCStringA(temp_pc_strip, PC_IP, _T("."));
-        CString temp_pc_ip;
-        temp_pc_ip.Format(_T("%s.%s.%s"), temp_pc_strip.GetAt(0), temp_pc_strip.GetAt(1), temp_pc_strip.GetAt(2));
-
-        if (temp_pc_ip.CompareNoCase(_T("0.0.0")) == 0)
-            continue;
-
-
-        if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
+        if (PC_IP.CompareNoCase(_T("0.0.0.0")) == 0)
         {
-            find_network = true;
-            strIPAdress = g_Vector_Subnet.at(i).StrIP;
+            continue;
+        }
+        if (PC_IP.CompareNoCase(strIPAdress) == 0)
+        {
+            strIPAdress = PC_IP;
+            find_network = true; //找到了完全匹配的本地网卡IP ，直接使用 这个IP进行连接;
             break;
+        }
+    }
+
+    if (find_network == false) //没有完全找到匹配的 本地网卡IP的情况下，尝试匹配相同网段，尝试连接
+    {
+        for (int i = 0; i < g_Vector_Subnet.size(); i++)
+        {
+
+            CStringArray temp_strip;
+            SplitCStringA(temp_strip, strIPAdress, _T("."));
+            CString temp_ip;
+
+            temp_ip.Format(_T("%s.%s.%s"), temp_strip.GetAt(0), temp_strip.GetAt(1), temp_strip.GetAt(2));
+
+            CString PC_IP;
+            PC_IP = g_Vector_Subnet.at(i).StrIP;
+            CStringArray temp_pc_strip;
+            SplitCStringA(temp_pc_strip, PC_IP, _T("."));
+            CString temp_pc_ip;
+            temp_pc_ip.Format(_T("%s.%s.%s"), temp_pc_strip.GetAt(0), temp_pc_strip.GetAt(1), temp_pc_strip.GetAt(2));
+
+            if (temp_pc_ip.CompareNoCase(_T("0.0.0")) == 0)
+                continue;
+
+
+            if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
+            {
+                find_network = true;
+                strIPAdress = g_Vector_Subnet.at(i).StrIP;
+                break;
+            }
         }
     }
 
@@ -16657,17 +16674,17 @@ void VariableDataToString(Str_variable_point source_variable, Variable_CString* 
             ret_string->units = Variable_Analog_Units_Array[source_variable.range];
             char temp_char[50];
             CString temp_11;
-            if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
-            {
+            //if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
+            //{
                 int time_seconds = source_variable.value / 1000;
                 intervaltotextfull(temp_char, time_seconds, 0, 0);
 
-            }
-            else
-            {
-                int time_seconds = source_variable.value;
-                intervaltotext_2022_full(temp_char, time_seconds, 0);
-            }
+            //}
+            //else
+            //{
+            //    int time_seconds = source_variable.value;
+            //    intervaltotext_2022_full(temp_char, time_seconds, 0);
+            //}
             MultiByteToWideChar(CP_ACP, 0, temp_char, strlen(temp_char) + 1,
                 temp_11.GetBuffer(MAX_PATH), MAX_PATH);
             temp_11.ReleaseBuffer();

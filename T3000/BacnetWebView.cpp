@@ -734,6 +734,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			p_i++;
 		}
 
+		
+
 
 
 		for (int i = 0; i < BAC_OUTPUT_ITEM_COUNT; i++) {
@@ -871,6 +873,57 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			p_i++;
 		}
 
+
+#pragma region digital_custom_range
+		for (int i = 0; i < BAC_CUSTOMER_UNITS_COUNT; i++)
+		{
+			tempjson["data"][p_i]["pid"] = npanel_id;
+			tempjson["data"][p_i]["type"] = "DRange";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "DRange" + to_string(i + 1); 
+			tempjson["data"][p_i]["direct"] = g_customer_unit_data[npanel_id].at(i).direct;
+			tempjson["data"][p_i]["units_off"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_off;
+			tempjson["data"][p_i]["units_on"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_on;
+			p_i++;
+		}
+		
+#pragma endregion
+
+#pragma region analog_custom_range
+		for (int i = 0; i < BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
+		{
+			tempjson["data"][p_i]["pid"] = npanel_id;
+			tempjson["data"][p_i]["type"] = "ARange";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "ARange" + to_string(i + 1);
+			tempjson["data"][p_i]["table_name"] = (char*)g_analog_custmer_range[npanel_id].at(i).table_name;
+			p_i++;
+			//The other values of this structure don't need to be passed to json for now
+		}
+
+#pragma endregion
+
+		for (int i = 0; i < BAC_MSV_COUNT; i++)
+		{
+			tempjson["data"][p_i]["pid"] = npanel_id;
+			tempjson["data"][p_i]["type"] = "MSV";
+			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["id"] = "MSV" + to_string(i + 1);
+			for (int j = 0; j < STR_MSV_MULTIPLE_COUNT; j++)
+			{
+				char temp_status[20];	memset(temp_status, 0, 20); sprintf(temp_status, "Status%d", j);
+				char temp_name[20];	memset(temp_name, 0, 20); sprintf(temp_name, "Name%d", j);
+				char temp_value[20];	memset(temp_value, 0, 20); sprintf(temp_value, "Value%d", j);
+				tempjson["data"][p_i][temp_status] = g_msv_data[npanel_id].at(i).msv_data[j].status;
+				tempjson["data"][p_i][temp_name] = (char*)g_msv_data[npanel_id].at(i).msv_data[j].msv_name;
+				tempjson["data"][p_i][temp_value] = g_msv_data[npanel_id].at(i).msv_data[j].msv_value;
+			}
+			p_i++;
+		}
+		
+
+
+
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 
@@ -927,13 +980,16 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		tempjson["entry"]["command"] = to_string(panel_id) + "GRP" + to_string(grp_index + 1);
 		tempjson["entry"]["description"] = (char*)g_screen_data[panel_id].at(grp_index).description;
 		tempjson["entry"]["label"] = (char*)g_screen_data[panel_id].at(grp_index).label;
-
+		
 
 		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 		CString temp_item;
 		temp_item.Format(_T("%u_%d.txt"), grp_serial_number , grp_index);
 		des_file = image_fordor + _T("\\") + temp_item;
+		CString temp_lib_file;
+		temp_lib_file.Format(_T("lib_%u_%d.txt"), grp_serial_number, grp_index);
+		des_lib_file = image_fordor + _T("\\") + temp_lib_file;
 		CFile file;
 
 
@@ -948,6 +1004,26 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			m_webView->PostWebMessageAsJson(tempjson_str);
 			break;
 		}
+		if (temp_find.FindFile(des_lib_file) == 0) //当 没有发现缓存的 lib文件时，返回空的 grp给 webview 显示;
+		{
+
+		}
+		else
+		{
+			CFile filelib;
+			filelib.Open(des_lib_file, CFile::modeRead, NULL);
+			DWORD len = filelib.GetLength();
+			if (len == 0)
+				break;
+			WCHAR* nlibbuff = new WCHAR[len + 1];
+			memset(nlibbuff, 0, 2 * (len + 1));
+			filelib.Read(nlibbuff , len * 2 + 1);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
+			wstring nbuff_wstring(nlibbuff);
+			string file_content(nbuff_wstring.begin(), nbuff_wstring.end());
+			tempjson["library"] = file_content;
+			filelib.Close();
+			delete nlibbuff;
+		}
 
 		file.Open(des_file, CFile::modeRead, NULL);
 		DWORD len = file.GetLength();
@@ -959,11 +1035,13 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		wstring nbuff_wstring(nbuff);
 		string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
 		tempjson["data"] = nbuff_str;
+
 		const std::string output = Json::writeString(builder, tempjson);
 		CString tempjson_str(output.c_str());
 		TRACE(nbuff);
 		m_webView->PostWebMessageAsJson(tempjson_str);
 		delete nbuff;
+
 		break;
 	}
 
@@ -1596,7 +1674,20 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 	case SAVE_LIBRAY_DATA:
 	{
 		const std::string file_output = Json::writeString(builder, json["library"]);
-		//保存至building 目录
+		
+		CFile file;
+
+		CString file_temp_cs(file_output.c_str());
+		file.Open(des_lib_file, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
+		file.Write(file_temp_cs, file_temp_cs.GetLength() * 2);
+		file.Close();
+		Json::Value tempjson;
+		tempjson["action"] = "SAVE_LIBRAY_DATA_RES";
+		tempjson["library"]["status"] = true;
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+
+		m_webView->PostWebMessageAsJson(temp_cs);
 	}
 		break;
 	default :

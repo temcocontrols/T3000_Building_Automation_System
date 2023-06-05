@@ -28,3 +28,9 @@
 240 1.2.MB_REG4 = VAR1 * 1000 % 65536 / 1000      
 250  REM How to read slave unsigned INT by Modbus  ， reg3 is high  ,reg4 is low
 251   VAR3 = 1.2.MB_REG3 * 65536 + 1.2.MB_REG4
+255  REM THE FOLLOWING ARE EXAMPLES OF READING A REMOTE DEVICE MODBUS ID=4 WITH LAST IP NUMBER 199 
+256 REM 199 is the last number of the IP address of the device to be read （ex:The IP address of the device to be read is 192.168.0.199）
+259 VAR98 = 199.4.MB_REG55
+260 VAR99 = 199.4.MB_DISINPUT56
+
+

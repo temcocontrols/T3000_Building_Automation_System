@@ -33,6 +33,7 @@ class BacnetWebViewAppWindow
 {
 public:
     CString des_file;
+    CString des_lib_file;
 public:
     BacnetWebViewAppWindow(
         UINT creationModeId,

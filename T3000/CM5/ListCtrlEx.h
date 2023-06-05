@@ -158,6 +158,7 @@ namespace ListCtrlEx
 		void				InitListData();
 		void				SetListData(char *mydata,int data_length);
 		BOOL				IsDataNewer(char *datapoint,int data_length);
+		BOOL                IsDataItemNewer(char* datapoint, int data_length, int nitem);
 		void				Set_Selected_Item(int nRAW,int nCol);
 		void				Get_Selected_Item(int &my_select_raw,int &my_select_col);
 		void				SetWhetherShowBkCol(bool nshow=true);

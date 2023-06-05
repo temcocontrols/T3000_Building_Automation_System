@@ -546,7 +546,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			if(m_output_list.IsDataNewer((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT))
 			{
 				//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-				m_output_list.SetListData((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT);
+				//m_output_list.SetListData((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT);
 			}
 			else
 			{
@@ -605,6 +605,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 		if(i>=output_item_limit_count)
 			break;
+
+		if (isFreshOne != 1) //当要立即刷新单个条目时  不用顾及 数据是否是最新的;
+		{
+			if (m_output_list.IsDataItemNewer((char*)&m_Output_data.at(i), sizeof(Str_out_point), i) == false)
+			{
+				continue; //单个条目数据  无变化 ，立即更新;
+			}
+		}
 
 		if(i>= OUTPUT_LIMITE_ITEM_COUNT)
 		{
@@ -1053,6 +1061,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		{
 			break;
 		}
+	}
+	if (m_output_list.IsDataNewer((char*)&m_Output_data.at(0), sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT))
+	{
+		//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+		m_output_list.SetListData((char*)&m_Output_data.at(0), sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT);
 	}
 	copy_data_to_ptrpanel(TYPE_OUTPUT);
 #ifdef LOCAL_DB_FUNCTION
