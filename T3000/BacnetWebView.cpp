@@ -873,18 +873,18 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			p_i++;
 		}
 
-
+		int r_i = 0;
 #pragma region digital_custom_range
 		for (int i = 0; i < BAC_CUSTOMER_UNITS_COUNT; i++)
 		{
-			tempjson["data"][p_i]["pid"] = npanel_id;
-			tempjson["data"][p_i]["type"] = "DRange";
-			tempjson["data"][p_i]["index"] = i;
-			tempjson["data"][p_i]["id"] = "DRange" + to_string(i + 1); 
-			tempjson["data"][p_i]["direct"] = g_customer_unit_data[npanel_id].at(i).direct;
-			tempjson["data"][p_i]["units_off"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_off;
-			tempjson["data"][p_i]["units_on"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_on;
-			p_i++;
+			tempjson["ranges"][r_i]["pid"] = npanel_id;
+			tempjson["ranges"][r_i]["type"] = "DRange";
+			tempjson["ranges"][r_i]["index"] = i;
+			tempjson["ranges"][r_i]["id"] = "DRange" + to_string(i + 1);
+			tempjson["ranges"][r_i]["direct"] = g_customer_unit_data[npanel_id].at(i).direct;
+			tempjson["ranges"][r_i]["units_off"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_off;
+			tempjson["ranges"][r_i]["units_on"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_on;
+			r_i++;
 		}
 		
 #pragma endregion
@@ -892,12 +892,12 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 #pragma region analog_custom_range
 		for (int i = 0; i < BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
 		{
-			tempjson["data"][p_i]["pid"] = npanel_id;
-			tempjson["data"][p_i]["type"] = "ARange";
-			tempjson["data"][p_i]["index"] = i;
-			tempjson["data"][p_i]["id"] = "ARange" + to_string(i + 1);
-			tempjson["data"][p_i]["table_name"] = (char*)g_analog_custmer_range[npanel_id].at(i).table_name;
-			p_i++;
+			tempjson["ranges"][r_i]["pid"] = npanel_id;
+			tempjson["ranges"][r_i]["type"] = "ARange";
+			tempjson["ranges"][r_i]["index"] = i;
+			tempjson["ranges"][r_i]["id"] = "ARange" + to_string(i + 1);
+			tempjson["ranges"][r_i]["table_name"] = (char*)g_analog_custmer_range[npanel_id].at(i).table_name;
+			r_i++;
 			//The other values of this structure don't need to be passed to json for now
 		}
 
