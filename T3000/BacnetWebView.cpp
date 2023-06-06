@@ -988,7 +988,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		temp_item.Format(_T("%u_%d.txt"), grp_serial_number , grp_index);
 		des_file = image_fordor + _T("\\") + temp_item;
 		CString temp_lib_file;
-		temp_lib_file.Format(_T("lib_%u_%d.txt"), grp_serial_number, grp_index);
+		temp_lib_file = _T("hvac_library.json");
 		des_lib_file = image_fordor + _T("\\") + temp_lib_file;
 		CFile file;
 
