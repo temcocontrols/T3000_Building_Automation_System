@@ -879,7 +879,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		{
 			tempjson["ranges"][r_i]["pid"] = npanel_id;
 			tempjson["ranges"][r_i]["type"] = "DRange";
-			tempjson["ranges"][r_i]["index"] = i;
+			tempjson["ranges"][r_i]["index"] = i + 23;    // 8 custom digital ranges, corresponding to ranges 23 to 30 (Condition .digital_analog = 0)
 			tempjson["ranges"][r_i]["id"] = "DRange" + to_string(i + 1);
 			tempjson["ranges"][r_i]["direct"] = g_customer_unit_data[npanel_id].at(i).direct;
 			tempjson["ranges"][r_i]["units_off"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_off;
@@ -894,7 +894,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		{
 			tempjson["ranges"][r_i]["pid"] = npanel_id;
 			tempjson["ranges"][r_i]["type"] = "ARange";
-			tempjson["ranges"][r_i]["index"] = i;
+			tempjson["ranges"][r_i]["index"] = i + 20;  // 5 analog custom range, corresponding to ranges 23 to 30  (Condition .digital_analog = 1)
 			tempjson["ranges"][r_i]["id"] = "ARange" + to_string(i + 1);
 			tempjson["ranges"][r_i]["table_name"] = (char*)g_analog_custmer_range[npanel_id].at(i).table_name;
 			r_i++;
@@ -907,7 +907,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		{
 			tempjson["data"][p_i]["pid"] = npanel_id;
 			tempjson["data"][p_i]["type"] = "MSV";
-			tempjson["data"][p_i]["index"] = i;
+			tempjson["data"][p_i]["index"] = i + 101;  //8 custom digital MSV ranges, corresponding to ranges 101 to 104 (MSV is special, do not care about  digital_analog value, has nothing to do with  digital_analog)
 			tempjson["data"][p_i]["id"] = "MSV" + to_string(i + 1);
 			for (int j = 0; j < STR_MSV_MULTIPLE_COUNT; j++)
 			{
