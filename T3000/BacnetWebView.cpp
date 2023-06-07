@@ -905,20 +905,20 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 		for (int i = 0; i < BAC_MSV_COUNT; i++)
 		{
-			tempjson["data"][p_i]["pid"] = npanel_id;
-			tempjson["data"][p_i]["type"] = "MSV";
-			tempjson["data"][p_i]["index"] = i + 101;  //8 custom digital MSV ranges, corresponding to ranges 101 to 104 (MSV is special, do not care about  digital_analog value, has nothing to do with  digital_analog)
-			tempjson["data"][p_i]["id"] = "MSV" + to_string(i + 1);
+			tempjson["ranges"][r_i]["pid"] = npanel_id;
+			tempjson["ranges"][r_i]["type"] = "MSV";
+			tempjson["ranges"][r_i]["index"] = i + 101;  //8 custom digital MSV ranges, corresponding to ranges 101 to 104 (MSV is special, do not care about  digital_analog value, has nothing to do with  digital_analog)
+			tempjson["ranges"][r_i]["id"] = "MSV" + to_string(i + 1);
 			for (int j = 0; j < STR_MSV_MULTIPLE_COUNT; j++)
 			{
 				char temp_status[20];	memset(temp_status, 0, 20); sprintf(temp_status, "Status%d", j);
 				char temp_name[20];	memset(temp_name, 0, 20); sprintf(temp_name, "Name%d", j);
 				char temp_value[20];	memset(temp_value, 0, 20); sprintf(temp_value, "Value%d", j);
-				tempjson["data"][p_i][temp_status] = g_msv_data[npanel_id].at(i).msv_data[j].status;
-				tempjson["data"][p_i][temp_name] = (char*)g_msv_data[npanel_id].at(i).msv_data[j].msv_name;
-				tempjson["data"][p_i][temp_value] = g_msv_data[npanel_id].at(i).msv_data[j].msv_value;
+				tempjson["ranges"][r_i][temp_status] = g_msv_data[npanel_id].at(i).msv_data[j].status;
+				tempjson["ranges"][r_i][temp_name] = (char*)g_msv_data[npanel_id].at(i).msv_data[j].msv_name;
+				tempjson["ranges"][r_i][temp_value] = g_msv_data[npanel_id].at(i).msv_data[j].msv_value;
 			}
-			p_i++;
+			r_i++;
 		}
 		
 
