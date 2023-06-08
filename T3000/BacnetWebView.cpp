@@ -878,12 +878,12 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		for (int i = 0; i < BAC_CUSTOMER_UNITS_COUNT; i++)
 		{
 			tempjson["ranges"][r_i]["pid"] = npanel_id;
-			tempjson["ranges"][r_i]["type"] = "DRange";
+			tempjson["ranges"][r_i]["type"] = "digital";
 			tempjson["ranges"][r_i]["index"] = i + 23;    // 8 custom digital ranges, corresponding to ranges 23 to 30 (Condition .digital_analog = 0)
 			tempjson["ranges"][r_i]["id"] = "DRange" + to_string(i + 1);
 			tempjson["ranges"][r_i]["direct"] = g_customer_unit_data[npanel_id].at(i).direct;
-			tempjson["ranges"][r_i]["units_off"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_off;
-			tempjson["ranges"][r_i]["units_on"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_on;
+			tempjson["ranges"][r_i]["off"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_off;
+			tempjson["ranges"][r_i]["on"] = (char*)g_customer_unit_data[npanel_id].at(i).digital_units_on;
 			r_i++;
 		}
 		
@@ -893,10 +893,10 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		for (int i = 0; i < BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
 		{
 			tempjson["ranges"][r_i]["pid"] = npanel_id;
-			tempjson["ranges"][r_i]["type"] = "ARange";
+			tempjson["ranges"][r_i]["type"] = "analog";
 			tempjson["ranges"][r_i]["index"] = i + 20;  // 5 analog custom range, corresponding to ranges 23 to 30  (Condition .digital_analog = 1)
 			tempjson["ranges"][r_i]["id"] = "ARange" + to_string(i + 1);
-			tempjson["ranges"][r_i]["table_name"] = (char*)g_analog_custmer_range[npanel_id].at(i).table_name;
+			tempjson["ranges"][r_i]["unit"] = (char*)g_analog_custmer_range[npanel_id].at(i).table_name;
 			r_i++;
 			//The other values of this structure don't need to be passed to json for now
 		}
