@@ -914,9 +914,9 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				char temp_status[20];	memset(temp_status, 0, 20); sprintf(temp_status, "Status%d", j);
 				char temp_name[20];	memset(temp_name, 0, 20); sprintf(temp_name, "Name%d", j);
 				char temp_value[20];	memset(temp_value, 0, 20); sprintf(temp_value, "Value%d", j);
-				tempjson["ranges"][r_i][temp_status] = g_msv_data[npanel_id].at(i).msv_data[j].status;
-				tempjson["ranges"][r_i][temp_name] = (char*)g_msv_data[npanel_id].at(i).msv_data[j].msv_name;
-				tempjson["ranges"][r_i][temp_value] = g_msv_data[npanel_id].at(i).msv_data[j].msv_value;
+				tempjson["ranges"][r_i]["options"][j]["status"] = g_msv_data[npanel_id].at(i).msv_data[j].status;
+				tempjson["ranges"][r_i]["options"][j]["name"] = (char*)g_msv_data[npanel_id].at(i).msv_data[j].msv_name;
+				tempjson["ranges"][r_i]["options"][j]["value"] = g_msv_data[npanel_id].at(i).msv_data[j].msv_value;
 			}
 			r_i++;
 		}
