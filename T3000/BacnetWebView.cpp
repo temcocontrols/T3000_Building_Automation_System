@@ -1642,9 +1642,65 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			CreateDirectory(web_image_folder, &attrib);
 		}
 
-
 		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-		CString temp_image_path = web_image_folder + _T("\\") + filename.c_str();
+		CString cs_filename = filename.c_str();
+
+		CStringArray temp_array;
+		CString temp_file_name_without_suffix;
+		CString temp_suffix;
+		SplitCStringA(temp_array, cs_filename,_T("."));
+		if (temp_array.GetSize() >= 2)
+		{
+			CString temp_last;
+			temp_last = temp_array.GetAt(temp_array.GetSize() - 1);
+			int temp_length = temp_last.GetLength();
+			int total_length = cs_filename.GetLength();
+			temp_file_name_without_suffix = cs_filename.Left(total_length - temp_length - 1);
+			temp_suffix = temp_last;
+		}
+		else
+		{
+			break; //  suffix error
+		}
+		int temp_name_index = 0;
+		CString temp_image_path;
+		do
+		{
+			if (temp_name_index > 0)
+			{
+				temp_image_path.Format(_T("%s\\%s-%d.%s"), web_image_folder, temp_file_name_without_suffix, temp_name_index, temp_suffix);
+				cs_filename.Format(_T("%s-%d.%s"), temp_file_name_without_suffix, temp_name_index, temp_suffix);
+			}
+			else
+			{
+				temp_image_path = web_image_folder + _T("\\") + filename.c_str();
+				cs_filename = filename.c_str();
+			}
+			hFind_folder = FindFirstFile(temp_image_path, &fd);
+			if (hFind_folder != INVALID_HANDLE_VALUE)
+			{
+				//发现同名文件存在，变更同名文件文件名;
+				temp_name_index++;
+			}
+			else
+			{
+				temp_name_index = 0;
+				break;
+			}
+			FindClose(hFind_folder);
+
+		} while ((temp_name_index > 0) && (temp_name_index <= 100));
+
+		if (temp_name_index > 100)
+		{
+			break; // After 100 loops, no available file name can be found
+		}
+
+		char des_file_name[MAX_PATH];
+		memset(des_file_name, 0, MAX_PATH);
+		WideCharToMultiByte(CP_ACP, 0, cs_filename.GetBuffer(), -1, des_file_name, MAX_PATH, NULL, NULL);
+		string newfilename = des_file_name;
+
 		WideCharToMultiByte(CP_ACP, 0, temp_image_path.GetBuffer(), -1, des_folder, 512, NULL, NULL);
 		std::ofstream file(des_folder, std::ios::binary);
 
@@ -1665,7 +1721,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		strcat(temp_folder, filename.c_str());
 		tempjson["action"] = "SAVE_IMAGE_RES";
 		tempjson["data"]["name"] = filename;
-		tempjson["data"]["path"] = "/uploads/"+filename;
+		tempjson["data"]["path"] = "/uploads/"+ newfilename;
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 		m_webView->PostWebMessageAsJson(temp_cs);
