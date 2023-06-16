@@ -936,4 +936,6 @@ BacnetExplore/CodeExamples/Xamarin/YabeStack/bin/Release/YabeStack.dll
 /.vs/T3000 - VS2019/v16/*.db-wal
 /.vs/T3000 - VS2019/v16/*.opendb
 /enc_temp_folder
-T3000ProgramMoudle/.vs/T3000ProgramMoudle/v16/Browse.VC.db
+/T3000ProgramMoudle/.vs/T3000ProgramMoudle/v16/*.db
+/T3000/T3000_config.ini
+/packages

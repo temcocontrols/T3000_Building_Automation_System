@@ -67,6 +67,7 @@ public:
     int m_col;
     afx_msg void OnBnClickedButtonAirlabParameter();
     afx_msg void OnPaint();
+    afx_msg void OnBnClickedButtonHelpWbgt();
 };
 #define AIRLAB_TYPE    0
 #define AIRLAB_VALUE   1
@@ -149,6 +150,7 @@ const int TSTAT_AQ_CO2_ALARM_ON = 623;
 const int TSTAT_AQ_CO2_COUNT_DOWN = 624;
 
 const int TSTAT_AQ_SOUND = 640;
+const int TSTAT_AQ_WBGT = 994;
 const int TATAT_AQ_CO2_ON = 1009;
 const int TATAT_AQ_CO2_OFF = 1010;
 const int TATAT_AQ_PM_ON = 1011;

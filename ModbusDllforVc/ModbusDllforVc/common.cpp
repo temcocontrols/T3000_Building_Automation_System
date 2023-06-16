@@ -40,7 +40,9 @@ int successful_baudrate = 19200;
 int successful_com_port = 0;
 //CMutex scan_mutex;
 
-
+unsigned short trans_id = 0;
+unsigned short trans_high_id = 0;
+unsigned short trans_low_id = 0;
 
 CStdioFile* g_fileScanLog = NULL;
 CStdioFile* g_fileScanNetLog=NULL;
@@ -1124,12 +1126,14 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         HCURSOR hc;//load mouse cursor
         TS_UC data_to_write[600]= {'\0'};
         TS_UC data_back_write[600]= {'\0'};
-
-        data_to_write[0]=1;
-        data_to_write[1]=2;
-        data_to_write[2]=3;
-        data_to_write[3]=4;
-        data_to_write[4]=5;
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
+        data_to_write[0]= trans_high_id;
+        data_to_write[1]= trans_low_id;
+        data_to_write[2]=0;
+        data_to_write[3]=0;
+        data_to_write[4]=0;
         data_to_write[5]=6;
 
         data_to_write[6]=device_var;
@@ -1325,12 +1329,14 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         HCURSOR hc;//load mouse cursor
         TS_UC data_to_write[600]= {'\0'};
         TS_UC data_back_write[600]= {'\0'};
-
-        data_to_write[0]=1;
-        data_to_write[1]=2;
-        data_to_write[2]=3;
-        data_to_write[3]=4;
-        data_to_write[4]=5;
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
+        data_to_write[0]= trans_high_id;
+        data_to_write[1]= trans_low_id;
+        data_to_write[2]=0;
+        data_to_write[3]=0;
+        data_to_write[4]=0;
         data_to_write[5]=6;
 
         data_to_write[6]=device_var;
@@ -1571,12 +1577,14 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		HCURSOR hc;//load mouse cursor
 		TS_UC data_to_write[600] = { '\0' };
 		TS_UC data_back_write[600] = { '\0' };
-
-		data_to_write[0] = 1;
-		data_to_write[1] = 2;
-		data_to_write[2] = 3;
-		data_to_write[3] = 4;
-		data_to_write[4] = 5;
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
+		data_to_write[0] = trans_high_id;
+		data_to_write[1] = trans_low_id;
+		data_to_write[2] = 0;
+		data_to_write[3] = 0;
+		data_to_write[4] = 0;
 		data_to_write[5] = 6;
 
 		data_to_write[6] = device_var;
@@ -1802,14 +1810,16 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
 
         };
         */
-
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
         TS_UC data[12];
 
-        data[0]=1;
-        data[1]=2;
-        data[2]=3;
-        data[3]=4;
-        data[4]=5;
+        data[0]= trans_high_id;
+        data[1]= trans_low_id;
+        data[2]=0;
+        data[3]=0;
+        data[4]=0;
         data[5]=6;
         data[6]=device_var;
         data[7]=3;
@@ -2121,14 +2131,16 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
 
         };
         */
-
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
         TS_UC data[12];
 
-        data[0]=1;
-        data[1]=2;
-        data[2]=3;
-        data[3]=4;
-        data[4]=5;
+        data[0]= trans_high_id;
+        data[1]= trans_low_id;
+        data[2]=0;
+        data[3]=0;
+        data[4]=0;
         data[5]=6;
 
 
@@ -2502,12 +2514,14 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
             nSendNum = 12;
         }
         ZeroMemory(data, nSendNum);
-
-        data[0] = 1;
-        data[1] = 2;
-        data[2] = 3;
-        data[3] = 4;
-        data[4] = 5;
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
+        data[0] = trans_high_id;
+        data[1] = trans_low_id;
+        data[2] = 0;
+        data[3] = 0;
+        data[4] = 0;
         data[5] = 6;
         //		DWORD m_had_send_data_number;//已经发送的数据的字节数
         data[6] = device_var;
@@ -2842,12 +2856,14 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
             nSendNum = 12;
         }
         ZeroMemory(data, nSendNum);
-
-        data[0]=1;
-        data[1]=2;
-        data[2]=3;
-        data[3]=4;
-        data[4]=5;
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
+        data[0]= trans_high_id;
+        data[1]= trans_low_id;
+        data[2]=0;
+        data[3]=0;
+        data[4]=0;
         data[5]=6;
 //		DWORD m_had_send_data_number;//已经发送的数据的字节数
         data[6] = device_var;
@@ -3252,10 +3268,12 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
             g_data_to_send[1]=0;
         }
 
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
 
-
-        data[0]=g_data_to_send[0];
-        data[1]=g_data_to_send[1];
+        data[0]= trans_high_id;
+        data[1]= trans_low_id;
         data[2]=g_data_to_send[2];
         data[3]=g_data_to_send[3];
         data[4]=g_data_to_send[4];
@@ -3820,12 +3838,15 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         //to_send_data is the array that you want to put data into
         //length is the number of register,that you want to read
         //start_address is the start register
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
         TS_UC data_to_send[12]= {'\0'}; //the array to used in writefile()
-        data_to_send[0]=1;
-        data_to_send[1]=2;
-        data_to_send[2]=3;
-        data_to_send[3]=4;
-        data_to_send[4]=5;
+        data_to_send[0]= trans_high_id;
+        data_to_send[1]= trans_low_id;
+        data_to_send[2]=0;
+        data_to_send[3]=0;
+        data_to_send[4]=0;
         data_to_send[5]=6;
 
 
@@ -4077,10 +4098,12 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
             g_data_to_send[1]=0;
         }
 
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
 
-
-        data_to_send[0]=g_data_to_send[0];
-        data_to_send[1]=g_data_to_send[1];
+        data_to_send[0]= trans_high_id;
+        data_to_send[1]= trans_low_id;
 
         data_to_send[2]=g_data_to_send[2];
         data_to_send[3]=g_data_to_send[3];
@@ -4269,12 +4292,14 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         HCURSOR hc;//load mouse cursor
         TS_UC data_to_write[600]= {'\0'};
         TS_UC data_back_write[600]= {'\0'};
-
-        data_to_write[0]=1;
-        data_to_write[1]=2;
-        data_to_write[2]=3;
-        data_to_write[3]=4;
-        data_to_write[4]=5;
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
+        data_to_write[0]= trans_high_id;
+        data_to_write[1]= trans_low_id;
+        data_to_write[2]=0;
+        data_to_write[3]=0;
+        data_to_write[4]=0;
         data_to_write[5]=6;
 
         data_to_write[6]=device_var;
@@ -4453,10 +4478,12 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
             g_data_to_send[1]=0;
         }
 
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
 
-
-        data_to_write[0]=g_data_to_send[0];
-        data_to_write[1]=g_data_to_send[1];
+        data_to_write[0]= trans_high_id;
+        data_to_write[1]= trans_low_id;
         data_to_write[2]=g_data_to_send[2];
         data_to_write[3]=g_data_to_send[3];
         data_to_write[4]=g_data_to_send[4];
@@ -5323,14 +5350,16 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
 
         };
         */
-
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
         TS_UC data[12];
 
-        data[0]=1;
-        data[1]=2;
-        data[2]=3;
-        data[3]=4;
-        data[4]=5;
+        data[0]= trans_high_id;
+        data[1]= trans_low_id;
+        data[2]=0;
+        data[3]=0;
+        data[4]=0;
         data[5]=6;
         data[6]=device_var;
         data[7]=3;
@@ -5683,12 +5712,14 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
             nSendNum = 12;
         }
         ZeroMemory(data, nSendNum);
-
-        data[0]=1;
-        data[1]=2;
-        data[2]=3;
-        data[3]=4;
-        data[4]=5;
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
+        data[0]= trans_high_id;
+        data[1]= trans_low_id;
+        data[2]=0;
+        data[3]=0;
+        data[4]=0;
         data[5]=6;
 //		DWORD m_had_send_data_number;//已经发送的数据的字节数
         data[6] = device_var;
@@ -6468,12 +6499,15 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         //to_send_data is the array that you want to put data into
         //length is the number of register,that you want to read
         //start_address is the start register
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
         TS_UC data_to_send[12] = { '\0' }; //the array to used in writefile()
-        data_to_send[0] = 1;
-        data_to_send[1] = 2;
-        data_to_send[2] = 3;
-        data_to_send[3] = 4;
-        data_to_send[4] = 5;
+        data_to_send[0] = trans_high_id;
+        data_to_send[1] = trans_low_id;
+        data_to_send[2] = 0;
+        data_to_send[3] = 0;
+        data_to_send[4] = 0;
         data_to_send[5] = 6;
 
 
@@ -6749,9 +6783,9 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
 
         data[0] = 1;
         data[1] = 2;
-        data[2] = 3;
-        data[3] = 4;
-        data[4] = 5;
+        data[2] = 0;
+        data[3] = 0;
+        data[4] = 0;
         data[5] = 6;
         //		DWORD m_had_send_data_number;//已经发送的数据的字节数
         data[6] = device_var;
@@ -7070,12 +7104,15 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         //to_send_data is the array that you want to put data into
         //length is the number of register,that you want to read
         //start_address is the start register
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
         TS_UC data_to_send[12]= {'\0'}; //the array to used in writefile()
-        data_to_send[0]=1;
-        data_to_send[1]=2;
-        data_to_send[2]=3;
-        data_to_send[3]=4;
-        data_to_send[4]=5;
+        data_to_send[0]= trans_high_id;
+        data_to_send[1]= trans_low_id;
+        data_to_send[2]=0;
+        data_to_send[3]=0;
+        data_to_send[4]=0;
         data_to_send[5]=6;
 
 
@@ -8565,14 +8602,16 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
 
         };
         */
-
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
         TS_UC data[12];
 
-        data[0]=1;
-        data[1]=2;
-        data[2]=3;
-        data[3]=4;
-        data[4]=5;
+        data[0]= trans_high_id;
+        data[1]= trans_low_id;
+        data[2]=0;
+        data[3]=0;
+        data[4]=0;
         data[5]=6;
         data[6]=device_var;
         data[7]=3;
@@ -8912,12 +8951,14 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
             nSendNum = 12;
         }
         ZeroMemory(data, nSendNum);
-
-        data[0]=1;
-        data[1]=2;
-        data[2]=3;
-        data[3]=4;
-        data[4]=5;
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
+        data[0]= trans_high_id;
+        data[1]= trans_low_id;
+        data[2]=0;
+        data[3]=0;
+        data[4]=0;
         data[5]=6;
 //		DWORD m_had_send_data_number;//已经发送的数据的字节数
         data[6] = device_var;
@@ -9219,12 +9260,15 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         //to_send_data is the array that you want to put data into
         //length is the number of register,that you want to read
         //start_address is the start register
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
         TS_UC data_to_send[12]= {'\0'}; //the array to used in writefile()
-        data_to_send[0]=1;
-        data_to_send[1]=2;
-        data_to_send[2]=3;
-        data_to_send[3]=4;
-        data_to_send[4]=5;
+        data_to_send[0]= trans_high_id;
+        data_to_send[1]= trans_low_id;
+        data_to_send[2]=0;
+        data_to_send[3]=0;
+        data_to_send[4]=0;
         data_to_send[5]=6;
 
 
@@ -9406,12 +9450,14 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         HCURSOR hc;//load mouse cursor
         TS_UC data_to_write[600]= {'\0'};
         TS_UC data_back_write[600]= {'\0'};
-
-        data_to_write[0]=1;
-        data_to_write[1]=2;
-        data_to_write[2]=3;
-        data_to_write[3]=4;
-        data_to_write[4]=5;
+        trans_id++;
+        trans_high_id = (trans_id >> 8) & 0xff;
+        trans_low_id = trans_id & 0xff;
+        data_to_write[0]= trans_high_id;
+        data_to_write[1]= trans_low_id;
+        data_to_write[2]=0;
+        data_to_write[3]=0;
+        data_to_write[4]=0;
         data_to_write[5]=6;
 
         data_to_write[6]=device_var;

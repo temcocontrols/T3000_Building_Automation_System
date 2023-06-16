@@ -22,6 +22,11 @@ CShowMessageDlg::CShowMessageDlg(CWnd* pParent /*=NULL*/)
     b_set_backcolor = false;
     b_show_progress = false;
     auto_close_time = 0;
+    int_x = 10;
+    int_y = 10;
+    int_cx = 500;
+    int_cy = 250;
+    resize_message_window = false;
 }
 
 CShowMessageDlg::~CShowMessageDlg()
@@ -51,6 +56,16 @@ void CShowMessageDlg::SetStaticText(LPCTSTR lpszTitleText)
 {
     static_text = lpszTitleText;
     m_exit_by_hands = 0;
+}
+
+
+void CShowMessageDlg::SetMessageWindowSize(int xx, int yy, int c_xx, int c_yy)
+{
+    resize_message_window = true;
+    int_x = xx;
+    int_y = yy;
+    int_cx = c_xx;
+    int_cy = c_yy;
 }
 
 //设置需要显示的背景色
@@ -163,7 +178,13 @@ BOOL CShowMessageDlg::OnInitDialog()
     }
     else if (mevent == EVENT_MESSAGE_ONLY)
     {
-        m_static_title.SetWindowPos(NULL, 10, 10, 500, 250, SWP_NOZORDER );
+        m_static_title.SetWindowPos(NULL, 10, 10, 500, 250, SWP_NOZORDER);
+        if (resize_message_window)
+        {
+            ::SetWindowPos(this->m_hWnd, HWND_TOPMOST, int_x, int_y, int_cx, int_cy, SWP_NOMOVE);
+            m_static_title.SetWindowPos(NULL, 10, 10, int_cx - 20, 250, SWP_NOZORDER);
+        }
+
     }
     else
     {

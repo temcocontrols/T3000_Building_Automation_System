@@ -1053,8 +1053,12 @@ struct func_table {
  "TIME_ON",TIME_ON,
  "TIME-OFF",TIME_OFF,
  "TIME_OFF",TIME_OFF,
+ "SCH-ON",WR_ON,
+ "SCH_ON",WR_ON,
  "WR-ON",WR_ON,
  "WR_ON",WR_ON,
+ "SCH-OFF",WR_OFF,
+ "SCH_OFF",WR_OFF,
  "WR-OFF",WR_OFF,
  "WR_OFF",WR_OFF,
  "SENSOR-ON",	SENSOR_ON,
@@ -3965,19 +3969,19 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 							error = 1; return 0;
 						}
 						unsigned char high_3bit =  0;
-						if(*num_point % 0x100 == 0)
-						{
-							if(*num_point == 0x100)
-								high_3bit = 0;
-							else if(*num_point == 0x200)
-								high_3bit = 0x20;
-							else if(*num_point == 0x300)
-								high_3bit = 0x40;
-							else if(*num_point == 0x400)
-								high_3bit = 0x80;
-						}
+						//if(*num_point % 0x100 == 0)
+						//{
+						//	if(*num_point == 0x100)
+						//		high_3bit = 0;
+						//	else if(*num_point == 0x200)
+						//		high_3bit = 0x20;
+						//	else if(*num_point == 0x300)
+						//		high_3bit = 0x40;
+						//	else if(*num_point == 0x400)
+						//		high_3bit = 0x80;
+						//}
 							
-						else
+						//else
 							high_3bit = ((*num_point) & 0xff00) >> 3;
 
                         if (

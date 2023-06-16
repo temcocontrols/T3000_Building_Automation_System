@@ -2537,6 +2537,7 @@
 #define IDC_EDIT_PORT_NUMBER            2508
 #define IDC_STATIC_FIR_REMOTE_TEMP2     2508
 #define IDC_EDIT_EMAIL                  2509
+#define IDC_STATIC_WBGT_TEMPERATURE     2509
 #define IDC_EDIT_USERNAME               2510
 #define IDC_COMBO_SECURE_TYPE           2511
 #define IDC_TAB_SETTING                 2512
@@ -2583,6 +2584,7 @@
 #define IDC_EDIT_LEVEL_4                2543
 #define IDC_EDIT_LEVEL_5                2544
 #define IDC_BUTTON_DONE                 2545
+#define IDC_STATIC_WBGT_UNITS           2546
 #define IDC_BUTTON_CUS_AQI              2549
 #define IDC_STATIC_AQI_INFO             2550
 #define IDC_STATIC_AQI                  2551
@@ -2742,6 +2744,7 @@
 #define IDC_RADIO_DEFAULT_T             2684
 #define IDC_RADIO_USER_DEFINED_T        2685
 #define IDC_RADIO_DEFAULT_H             2686
+#define IDC_BUTTON_HELP_WBGT            2686
 #define IDC_RADIO_USER_DEFINED_H        2687
 #define IDC_RADIO_SCROLL_ENABLE         2694
 #define IDC_RADIO_SCROLLBAR_DISABLE     2695
@@ -3314,7 +3317,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        796
 #define _APS_NEXT_COMMAND_VALUE         34080
-#define _APS_NEXT_CONTROL_VALUE         2686
+#define _APS_NEXT_CONTROL_VALUE         2687
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

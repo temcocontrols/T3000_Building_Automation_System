@@ -45,6 +45,12 @@ public:
     bool b_show_progress;
     int auto_close_time; // 自动关闭时间;
     
+    bool resize_message_window;
+    int int_x;  //窗体的大小 以及 static 的大小
+    int int_y;
+    int int_cx;
+    int int_cy;
+
     int auto_close_time_count; // 几次后自动关闭;
     int auto_close_time_count_old; // 用于计算百分比;
     int mevent;
@@ -53,7 +59,7 @@ public:
     int m_message ;
 
     _Bac_Scan_Com_Info m_mstp_device_info;  // MSTP 用于确认 whois 是否有回复;
-
+    void SetMessageWindowSize(int xx, int yy, int c_xx, int c_yy);
     void SetStaticText(LPCTSTR lpszTitleText);
     void SetStaticTextBackgroundColor(COLORREF TitleTextBackColor);
     void SetStaticTextSize(int size_length, int size_width);

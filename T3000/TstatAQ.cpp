@@ -55,6 +55,7 @@ BEGIN_MESSAGE_MAP(CTstatAQ, CFormView)
     ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER_TIME_REMAIN, &CTstatAQ::OnNMKillfocusDatetimepickerTimeRemain)
     ON_BN_CLICKED(IDC_BUTTON_AIRLAB_PARAMETER, &CTstatAQ::OnBnClickedButtonAirlabParameter)
     ON_WM_PAINT()
+    ON_BN_CLICKED(IDC_BUTTON_HELP_WBGT, &CTstatAQ::OnBnClickedButtonHelpWbgt)
 END_MESSAGE_MAP()
 
 
@@ -247,6 +248,20 @@ void CTstatAQ::UpdateUI()
     GetDlgItem(IDC_STATIC_CO2_VALUE)->SetWindowTextW(cs_ppm);
     GetDlgItem(IDC_STATIC_VOC_VALUE)->SetWindowTextW(cs_VOC);
 
+    if (product_register_value[4] >= 140)
+    {
+        GetDlgItem(IDC_STATIC_WBGT_TEMPERATURE)->EnableWindow(1);
+        GetDlgItem(IDC_BUTTON_HELP_WBGT)->EnableWindow(1);     
+        CString temp_wbgt;
+        temp_wbgt.Format(_T("%.1f"), (float)product_register_value[TSTAT_AQ_WBGT] / 10.0);
+        GetDlgItem(IDC_STATIC_WBGT_TEMPERATURE)->SetWindowTextW(temp_wbgt);
+    }
+    else
+    {
+        GetDlgItem(IDC_STATIC_WBGT_TEMPERATURE)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_HELP_WBGT)->EnableWindow(0);
+        GetDlgItem(IDC_STATIC_WBGT_TEMPERATURE)->SetWindowTextW(_T(""));
+    }
 
     CString cs_api_value;
     CString cs_api_level;
@@ -359,13 +374,14 @@ void CTstatAQ::UpdateUI()
         ((CButton *)GetDlgItem(IDC_RADIO_DEG_C))->SetCheck(1);
         ((CButton *)GetDlgItem(IDC_RADIO_DEG_F))->SetCheck(0);
         GetDlgItem(IDC_STATIC_TEMP_UNITS)->SetWindowTextW(_T("Deg.C"));
-        
+        GetDlgItem(IDC_STATIC_WBGT_UNITS)->SetWindowTextW(_T("Deg.C"));
     }
     else if (product_register_value[TSTAT_AQ_TEMP_UNIT] == 1)
     {
         ((CButton *)GetDlgItem(IDC_RADIO_DEG_C))->SetCheck(0);
         ((CButton *)GetDlgItem(IDC_RADIO_DEG_F))->SetCheck(1);
         GetDlgItem(IDC_STATIC_TEMP_UNITS)->SetWindowTextW(_T("Deg.F"));
+        GetDlgItem(IDC_STATIC_WBGT_UNITS)->SetWindowTextW(_T("Deg.F"));
     }
 
     CString cs_weight_pm1;
@@ -1349,4 +1365,27 @@ void CTstatAQ::OnPaint()
 #endif
 
 
+}
+
+#include "ShowMessageDlg.h"
+void CTstatAQ::OnBnClickedButtonHelpWbgt()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CShowMessageDlg dlg;
+    CString TotalMessage;
+    TotalMessage = _T("What is WBGT?\r\nWBGT is an experimental forecast tool indicating expected heat stress on the human body when in direct sunlight. It estimates the effect of temperature, relative humidity, wind speed, and solar radiation on humans using a combination of temperatures from three thermometers:\r\n\
+A Wet bulb measures the temperature read by a thermometer covered in a wet cloth.As water evaporates from the cloth, evaporation cools the thermometer.This mirrors how the human body cools itself with sweat.\r\n\
+A black globe is used to measure solar radiation. Solar radiation heats the globe and wind blowing across it cools the globe.\r\n\
+A Dry bulb calculates the air temperature measured in the shade. It is the temperature you would see on your thermometer outside.\r\n\
+With WBGT forecasts available by region up to 7 days in advance, it is a useful tool for planning ahead.\r\n\r\n\
+Who should use WBGT?\r\n\
+This experimental tool is most useful for active, acclimatized people such as outdoor workers, athletes, and anyone else performing strenuous outdoor activities — and has been used for decades by military agencies, OSHA, and marathon organizers.");
+
+    dlg.SetStaticText(TotalMessage);
+    //dlg.SetStaticTextBackgroundColor(RGB(222, 222, 222));
+    dlg.SetStaticTextColor(RGB(0, 0, 0));
+    dlg.SetStaticTextSize(20, 14);
+    dlg.SetEvent(EVENT_MESSAGE_ONLY);
+    dlg.SetMessageWindowSize(10, 10, 1000, 450);
+    dlg.DoModal();
 }
