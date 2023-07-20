@@ -12,7 +12,7 @@
         width="17.868"
         x="7.066"
         y="2.3772"
-        fill="#1976D2"
+        fill="currentColor"
       />
       <g transform="translate(24.9334,29.6232) rotate(180)">
         <rect
@@ -22,7 +22,7 @@
           width="17.875"
           x="0"
           y="0"
-          fill="#1976D2"
+          fill="currentColor"
           stroke="none"
         />
       </g>
@@ -51,7 +51,7 @@
   <symbol id="cursor" viewBox="0 0 320 512">
     <path
       d="M302.189 329.126H196.105l55.831 135.993c3.889 9.428-.555 19.999-9.444 23.999l-49.165 21.427c-9.165 4-19.443-.571-23.332-9.714l-53.053-129.136-86.664 89.138C18.729 472.71 0 463.554 0 447.977V18.299C0 1.899 19.921-6.096 30.277 5.443l284.412 292.542c11.472 11.179 3.007 31.141-12.5 31.141z"
-      fill="#1976D2"
+      fill="currentColor"
     />
   </symbol>
   <symbol id="damper" viewBox="0 0 13.431694 28.950886" version="1.1">
@@ -66,7 +66,7 @@
       y="0.67645228"
       stroke-dasharray="none"
       stroke-width="1"
-      fill="#1976d2"
+      fill="currentColor"
     />
     <g
       stroke="#000000"
@@ -147,7 +147,7 @@
     >
       <path
         d="M 225.903 35.245 L 250 71.643 L 452.108 71.643 L 435.361 35.245 L 452.108 -3.408 L 250 -1.153 L 225.903 35.245 Z"
-        fill="#1976D2"
+        fill="currentColor"
       />
     </g>
   </symbol>
@@ -165,7 +165,7 @@
     <g>
       <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)">
         <path
-          fill="#1976D2"
+          fill="currentColor"
           d="M4512.5,5012.2c-955.8-78.7-1591.1-449.1-1950-1132.4l-99.8-193.8l21.1-201.5c71-623.8,393.5-1307,930.8-1969.2c90.2-113.2,165.1-209.2,165.1-215c0-5.8-38.4-61.4-84.4-124.8c-46.1-63.3-88.3-124.8-92.1-136.3c-3.8-13.4-587.3,301.3-1389.5,750.4C1255.5,2213.9,627.9,2565.1,622.1,2569c-21.1,11.5-295.6-543.2-372.3-748.5c-117.1-318.6-151.6-499-149.7-817.6c0-220.7,9.6-309,40.3-426.1c61.4-226.5,147.8-416.5,278.3-614.2c109.4-163.1,128.6-184.2,243.7-239.9C1255.5-572.9,2171-647.7,3170.9-484.6l78.7,13.4l69.1-147.8c38.4-82.5,69.1-155.4,69.1-161.2c0-7.7-621.8-366.6-1381.9-798.4C1245.9-2010.4,624-2369.3,624-2377c0-28.8,330.1-506.7,451-648.7c499-598.8,1101.7-880.9,1794.5-838.7l201.5,11.5l163.1,109.4c209.2,143.9,512.4,443.3,692.9,687.1c247.6,333.9,497.1,794.6,652.5,1205.3c55.7,149.7,67.2,168.9,103.6,159.3c23-5.8,103.6-17.3,178.5-23l138.2-13.4v-1531.6v-1533.5h92.1c205.4,0,621.8,42.2,842.6,86.4c712,143.9,1199.5,489.4,1500.9,1067.1l101.7,191.9l-21.1,195.8c-23,213.1-88.3,479.8-168.9,694.8c-138.2,372.3-443.3,882.9-765.8,1284c-117.1,145.8-163.1,214.9-149.7,232.2c9.6,15.4,51.8,76.8,92.1,138.2c42.2,61.4,76.8,113.2,80.6,117.1c1.9,3.8,621.9-339.7,1380-763.9c756.2-424.2,1387.6-765.8,1401.1-760c44.1,17.3,326.3,610.3,399.2,836.8c101.7,322.4,117.1,422.2,115.2,719.7c0,209.2-9.6,301.3-40.3,416.5c-61.4,224.6-147.8,416.5-278.3,614.2c-109.4,165-128.6,182.3-243.8,239.9c-274.5,134.3-658.3,234.1-1074.8,276.4c-276.4,28.8-846.4,13.4-1170.8-32.6c-370.4-51.8-337.8-61.4-416.5,113.2c-38.4,80.6-65.2,151.6-61.4,155.5c3.8,5.8,625.7,358.9,1380,788.8c754.3,429.9,1376.1,785,1380,788.8c11.5,11.5-168.9,289.8-316.7,489.4c-537.4,719.7-1151.6,1046-1907.8,1007.6l-220.7-11.5l-157.4-107.5c-524-355.1-1015.3-1034.5-1332-1846.3c-72.9-188.1-90.2-215-122.8-207.3c-21.1,5.8-101.7,15.4-176.6,23l-140.1,13.4v1531.6v1533.5l-147.8-1.9C4769.7,5029.5,4616.1,5021.8,4512.5,5012.2z M5224.5,1014.4c155.4-42.2,272.5-107.5,399.2-226.5c305.1-284,381.9-706.3,199.6-1084.4c-24.9-49.9-105.6-153.6-180.4-228.4c-203.5-205.4-418.4-289.8-696.7-272.5c-656.4,42.2-1055.6,719.7-775.4,1318.5c63.3,136.3,286,360.8,416.5,424.2C4786.9,1039.3,5032.6,1066.2,5224.5,1014.4z"
         />
       </g>
@@ -183,7 +183,7 @@
         width="11.26"
         y="2.3252"
         x="10.37"
-        fill="#1976D2"
+        fill="currentColor"
       />
       <path
         id="path3756"
@@ -211,7 +211,7 @@
     <g stroke="#000000" id="g15" transform="translate(-6.129206,-1.5327875)">
       <use
         xlink:href="#heating-coil-rect"
-        fill="#1976d2"
+        fill="currentColor"
         stroke="none"
         x="7.066"
         y="2.3771999"
@@ -223,7 +223,7 @@
           class="heating-coil"
           x="0"
           y="0"
-          fill="#1976d2"
+          fill="currentColor"
           stroke="none"
           id="use8"
         />
@@ -252,7 +252,6 @@
     viewBox="0 0 18 25"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
-    xmlns:bx="https://boxy-svg.com"
   >
     <g
       class="duct-humidifier"
@@ -264,7 +263,7 @@
           stroke="#000"
           stroke-width=".5"
           class="water-drops"
-          fill="#1976D2"
+          fill="currentColor"
         >
           <path
             id="path4150"
@@ -287,7 +286,7 @@
             stroke="#000"
             stroke-width=".5"
             class="water-drops water-drops-2"
-            fill="#1976D2"
+            fill="currentColor"
           >
             <path
               id="path23"
@@ -311,7 +310,7 @@
         class="humidifier-body"
         d="m4.3242 8.877v22.586h4.0059v-9.883h4.3789v-2.617h-4.3789v-5.721h4.3789v-2.617h-4.3789v-1.748h-4.0059z"
         stroke="#000"
-        fill="#1976D2"
+        fill="currentColor"
       />
     </g>
   </symbol>
@@ -347,7 +346,7 @@
         id="path3010"
         stroke-width="1.2px"
         transform="matrix(0.74098,0,0,0.74098,7.3047,15.679)"
-        fill="#1976d2"
+        fill="currentColor"
         d="m 17.949,15.898 -3.1021,5.373 H 8.6427 L 5.5406,15.898 8.6427,10.525 h 6.2042 z"
       />
     </g>
@@ -557,7 +556,7 @@
     <path
       d="m14.173 13.001v-5.9126c0-3.9132-3.168-7.0884-7.0855-7.0884-3.9125 0-7.0877 3.1694-7.0877 7.0884v13.649c1.4738 1.651 4.0968 2.7526 7.0877 2.7526 4.6195 0 8.3686-2.6179 8.3686-5.8594v-1.5235c-7.4e-4 -1.1426-0.47444-2.2039-1.283-3.1061z"
       opacity=".65"
-      fill="#1976d2"
+      fill="currentColor"
     ></path>
     <g fill="#ffffff">
       <path
@@ -573,5 +572,204 @@
         opacity=".5"
       ></path>
     </g>
+  </symbol>
+  <symbol
+    id="boiler"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 32 32"
+    version="1.1"
+  >
+    <path
+      style="
+        fill: currentColor;
+        fill-opacity: 1;
+        fill-rule: nonzero;
+        stroke: #000000;
+        stroke-width: 1;
+        stroke-linecap: butt;
+        stroke-linejoin: miter;
+        stroke-miterlimit: 4;
+        stroke-dasharray: none;
+        stroke-opacity: 1;
+      "
+      d="m 2,15 8,-7 0,-7 12,0 0,7 8,7 0,16 -28,0 z"
+    ></path>
+  </symbol>
+  <symbol viewBox="0 0 10 22" xmlns="http://www.w3.org/2000/svg" id="enthalpy">
+    <defs>
+      <linearGradient id="linearGradient4194">
+        <stop
+          style="stop-color: #ffff00; stop-opacity: 1"
+          offset="0"
+          id="stop4196"
+        />
+        <stop
+          id="stop4148"
+          offset="0.3598454"
+          style="stop-color: #ffff00; stop-opacity: 1"
+        />
+        <stop
+          id="stop4144"
+          offset="0.59441435"
+          style="stop-color: #00ffff; stop-opacity: 1"
+        />
+        <stop
+          style="stop-color: #00ffff; stop-opacity: 1"
+          offset="1"
+          id="stop4198"
+        />
+      </linearGradient>
+      <linearGradient
+        xlink:href="#linearGradient4194"
+        id="linearGradient4219"
+        x1="15.955305"
+        y1="9.504283"
+        x2="16.127491"
+        y2="24.826317"
+        gradientUnits="userSpaceOnUse"
+        gradientTransform="translate(-10.896808,-9.4127998)"
+      />
+    </defs>
+    <rect
+      style="
+        fill: url(#linearGradient4219);
+        fill-opacity: 1;
+        fill-rule: nonzero;
+        stroke: #000000;
+        stroke-width: 1px;
+      "
+      x="3.660192"
+      y="0.5"
+      width="2.901"
+      height="14.505"
+    />
+    <path
+      style="fill: #659dc5; stroke: #000000; stroke-width: 0.889176px"
+      d="m 9.7077419,18.0463 -2.298594,3.981286 H 2.8119599 L 0.51336587,18.0463 2.8119599,14.065014 h 4.597188 z"
+    />
+    <g transform="translate(-10.733726,-9.4127998)">
+      <g transform="translate(8.1630559,0.95878887)">
+        <circle
+          style="
+            fill: none;
+            fill-opacity: 1;
+            stroke: #000000;
+            stroke-width: 0.5;
+            stroke-miterlimit: 4;
+            stroke-dasharray: none;
+            stroke-opacity: 1;
+          "
+          id="path4137"
+          cx="6.4061227"
+          cy="28.129852"
+          r="0.77312505"
+        />
+        <path
+          style="
+            fill: none;
+            fill-rule: evenodd;
+            stroke: #000000;
+            stroke-width: 0.5;
+            stroke-linecap: butt;
+            stroke-linejoin: miter;
+            stroke-miterlimit: 4;
+            stroke-dasharray: none;
+            stroke-opacity: 1;
+          "
+          d="M 6.4061205,27.157211 V 23.65349"
+        />
+      </g>
+      <path
+        style="
+          fill: none;
+          stroke: #000000;
+          stroke-width: 0.5;
+          stroke-miterlimit: 4;
+          stroke-dasharray: none;
+          stroke-opacity: 1;
+        "
+        d="m 17.270488,24.668533 c 0.0958,0.465416 0.27099,0.690186 0.496151,0.991638 0.07789,0.10429 0.125868,0.230683 0.125868,0.370878 0,0.342813 -0.279183,0.620776 -0.621988,0.620776 -0.342814,0 -0.619564,-0.277963 -0.619564,-0.620776 0,-0.138342 0.0428,-0.269876 0.1222,-0.370878 0.234976,-0.29895 0.406955,-0.524932 0.497324,-0.991677 z"
+      />
+      <path
+        style="
+          fill: none;
+          stroke: #000000;
+          stroke-width: 0.5;
+          stroke-miterlimit: 4;
+          stroke-dasharray: none;
+          stroke-opacity: 1;
+        "
+        d="m 17.270488,27.878474 c 0.0958,0.465416 0.27099,0.690186 0.496151,0.991638 0.07789,0.10429 0.125868,0.230683 0.125868,0.370878 0,0.342813 -0.279183,0.620776 -0.621988,0.620776 -0.342814,0 -0.619564,-0.277963 -0.619564,-0.620776 0,-0.138342 0.0428,-0.269876 0.1222,-0.370878 0.234976,-0.29895 0.406955,-0.524932 0.497324,-0.991677 z"
+      />
+    </g>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" id="flow" viewBox="0 0 32 32">
+    <path
+      style="fill: #659dc5; stroke: #000000; stroke-width: 0.88917601px"
+      inkscape:connector-curvature="0"
+      d="m 20.60455,27.4591 -2.298594,3.981286 -4.597188,0 -2.298594,-3.981286 2.298594,-3.981286 4.597188,0 z"
+      id="path3010"
+    ></path>
+    <g
+      id="g4150"
+      transform="matrix(0.83920236,0,0,0.83920236,2.5837137,4.2139363)"
+    >
+      <path
+        inkscape:connector-curvature="0"
+        id="path4146"
+        d="m 14.917284,30.513877 0,-5.217284 2.569115,0"
+        style="
+          fill: none;
+          fill-rule: evenodd;
+          stroke: #000000;
+          stroke-width: 0.82447493px;
+          stroke-linecap: butt;
+          stroke-linejoin: miter;
+          stroke-opacity: 1;
+        "
+      ></path>
+      <path
+        inkscape:connector-curvature="0"
+        id="path4148"
+        d="m 14.956808,27.549512 2.529591,0"
+        style="
+          fill: none;
+          fill-rule: evenodd;
+          stroke: #000000;
+          stroke-width: 0.82447493px;
+          stroke-linecap: butt;
+          stroke-linejoin: miter;
+          stroke-opacity: 1;
+        "
+      ></path>
+    </g>
+    <path
+      style="
+        fill: none;
+        fill-rule: evenodd;
+        stroke: #000000;
+        stroke-width: 1px;
+        stroke-linecap: butt;
+        stroke-linejoin: miter;
+        stroke-opacity: 1;
+      "
+      d="m 16.059713,23.514719 0,-12.464256 -4.602186,0"
+      id="path4156"
+      inkscape:connector-curvature="0"
+    ></path>
+    <path
+      style="
+        fill: none;
+        fill-rule: evenodd;
+        stroke: #000000;
+        stroke-width: 1px;
+        stroke-linecap: butt;
+        stroke-linejoin: miter;
+        stroke-opacity: 1;
+      "
+      d="m 15.915895,19.439866 2.205215,0 0,4.122792"
+      id="path4158"
+      inkscape:connector-curvature="0"
+    ></path>
   </symbol>
 </svg>
