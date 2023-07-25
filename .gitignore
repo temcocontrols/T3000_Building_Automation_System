@@ -939,3 +939,6 @@ BacnetExplore/CodeExamples/Xamarin/YabeStack/bin/Release/YabeStack.dll
 /T3000ProgramMoudle/.vs/T3000ProgramMoudle/v16/*.db
 /T3000/T3000_config.ini
 /packages
+
+/build/bin
+/.vs

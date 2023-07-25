@@ -1,0 +1,48 @@
+# This workflow now builds T3000Controls and BACnetStackLibrary components
+
+name: CI
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: cmake
+        run: |
+          cd ${{ github.workspace }}
+          cd build
+          cmake -A Win32 .. -DCMAKE_TOOLCHAIN_FILE="..\vcpkg-export-openssl\scripts\buildsystems\vcpkg.cmake"
+
+      - name: cmake-build
+        run: |
+          echo CMake configuration successful. Going for build...
+          cd build
+          cmake --build . --config Release
+
+      - name: Build AIP
+        uses: caphyon/advinst-github-action@v1.0
+        with:
+          advinst-version: "19.0"
+          advinst-enable-automation: "true"
+          aip-path: ${{ github.workspace }}\T3000.aip
+          aip-build-name: DefaultBuild
+          aip-package-name: setup.msi
+          aip-output-dir: ${{ github.workspace }}\setup
+          aip-commands: |
+            SetVersion ${{ steps.vars.outputs.tag }}
+      - name: Publish setup artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: setup
+          path: ${{ github.workspace }}\setup\T3000-installer.msi

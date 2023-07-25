@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT Type="Advanced Installer" CreateVersion="20.8" version="20.8" Modules="simple" RootPath="." Language="en" Id="{8D24B8DB-10B0-4480-B1BF-055A2BC65478}">
+  <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
+    <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent;FixupComponent;MsiXDiffComponent;MsixManifestEditorComponent"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
+    <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
+    <ROW Property="ALLUSERS" Value="1"/>
+    <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
+    <ROW Property="Manufacturer" Value="Temco Controls"/>
+    <ROW Property="ProductCode" Value="1033:{6EFBCC2B-BEB9-46D5-9DF9-BF5CE1DEB7F2} " Type="16"/>
+    <ROW Property="ProductLanguage" Value="1033"/>
+    <ROW Property="ProductName" Value="T3000"/>
+    <ROW Property="ProductVersion" Value="1.0.0" Options="32"/>
+    <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
+    <ROW Property="UpgradeCode" Value="{63F7651F-1072-4D01-8C9F-22996CB6412D}"/>
+    <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsType9XDisplay" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40Display" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50Display" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5X" MultiBuildValue="DefaultBuild:Windows XP/2003" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5XDisplay" MultiBuildValue="DefaultBuild:Windows XP/2003" ValueLocId="-"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
+    <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="HexFile_Dir" Directory_Parent="ResourceFile_Dir" DefaultDir="HexFile"/>
+    <ROW Directory="Icon_Dir" Directory_Parent="ResourceFile_Dir" DefaultDir="Icon"/>
+    <ROW Directory="ResourceFile_Dir" Directory_Parent="APPDIR" DefaultDir="RESOUR~1|ResourceFile"/>
+    <ROW Directory="System64Folder" Directory_Parent="TARGETDIR" DefaultDir="SYSTEM~1|System64Folder" IsPseudoRoot="1"/>
+    <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="assets_Dir" Directory_Parent="www_Dir" DefaultDir="assets"/>
+    <ROW Directory="uploads_Dir" Directory_Parent="www_Dir" DefaultDir="uploads"/>
+    <ROW Directory="webview_Dir" Directory_Parent="ResourceFile_Dir" DefaultDir="webview"/>
+    <ROW Directory="www_Dir" Directory_Parent="webview_Dir" DefaultDir="www"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="APPDIR" ComponentId="{9DC76C83-660A-4B16-A727-7B2AF6B44EA0}" Directory_="APPDIR" Attributes="0"/>
+    <ROW Component="Airlab.jpg" ComponentId="{DA35FA7D-F996-4CAE-85EA-19A058F4A48E}" Directory_="ResourceFile_Dir" Attributes="0" KeyPath="Airlab.jpg" Type="0"/>
+    <ROW Component="BACnet_Stack_Library.dll" ComponentId="{E7EA0BB7-788E-4493-9D90-60C963E9E3FE}" Directory_="APPDIR" Attributes="0" KeyPath="BACnet_Stack_Library.dll"/>
+    <ROW Component="BacnetExplore.exe" ComponentId="{814BD2F0-6D69-4A8C-A584-DD0DBC67C30B}" Directory_="APPDIR" Attributes="0" KeyPath="BacnetExplore.exe"/>
+    <ROW Component="BacnetExplore.exe.config" ComponentId="{B07389B0-B4EB-4150-82BB-2C37E297DDA5}" Directory_="APPDIR" Attributes="0" KeyPath="BacnetExplore.exe.config" Type="0"/>
+    <ROW Component="CalendarView.dll" ComponentId="{1A371E8B-6605-48A6-8D9C-8C8DE3FBC0F8}" Directory_="APPDIR" Attributes="0" KeyPath="CalendarView.dll"/>
+    <ROW Component="ErrorNotFound.cc7b3457.js" ComponentId="{22995A25-C24B-4E26-9E00-2E85E5003DBF}" Directory_="assets_Dir" Attributes="0" KeyPath="ErrorNotFound.cc7b3457.js" Type="0"/>
+    <ROW Component="FlexSlideBar.dll" ComponentId="{23A54896-9447-4761-B3D4-657A7CE02C39}" Directory_="APPDIR" Attributes="0" KeyPath="FlexSlideBar.dll"/>
+    <ROW Component="HttpAPI.dll" ComponentId="{64FB123C-3DB7-422B-B5A2-2DB9C5AA33E5}" Directory_="APPDIR" Attributes="0" KeyPath="HttpAPI.dll"/>
+    <ROW Component="ISP.exe" ComponentId="{00347ED5-235F-4EBD-9CFD-8B43911F42E0}" Directory_="APPDIR" Attributes="0" KeyPath="ISP.exe"/>
+    <ROW Component="MFC16API.dll" ComponentId="{608BB0EE-F1AE-4949-8249-831C052F1A95}" Directory_="APPDIR" Attributes="0" KeyPath="MFC16API.dll"/>
+    <ROW Component="ModbusDllforVc.dll" ComponentId="{49C64DCE-0691-4A48-A0C2-46882B093766}" Directory_="APPDIR" Attributes="0" KeyPath="ModbusDllforVc.dll"/>
+    <ROW Component="ModbusPoll.exe" ComponentId="{926247B6-A944-4000-848D-A4644B23D8C6}" Directory_="APPDIR" Attributes="0" KeyPath="ModbusPoll.exe"/>
+    <ROW Component="PacketDotNet.dll" ComponentId="{C35DE9A2-C8E5-48CB-947A-F5CE17962EE7}" Directory_="APPDIR" Attributes="0" KeyPath="PacketDotNet.dll"/>
+    <ROW Component="ProductInformation" ComponentId="{6A90A415-991D-43D6-B993-58FDBAA8CA00}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
+    <ROW Component="SharpPcap.dll" ComponentId="{0B9924BF-A011-4506-BF50-2E0250D6BA82}" Directory_="APPDIR" Attributes="0" KeyPath="SharpPcap.dll"/>
+    <ROW Component="T3000.exe" ComponentId="{DDFBDDFC-4B18-4D43-ABAD-ED27DB6C008B}" Directory_="APPDIR" Attributes="0" KeyPath="T3000.exe"/>
+    <ROW Component="T3000Controls.dll" ComponentId="{27453811-3379-4BCD-AF0E-3D6E0B55E3EE}" Directory_="APPDIR" Attributes="0" KeyPath="T3000Controls.dll"/>
+    <ROW Component="Update.exe" ComponentId="{A04771B4-873E-49EE-83CC-C1E6200CBF40}" Directory_="APPDIR" Attributes="0" KeyPath="Update.exe"/>
+    <ROW Component="ZedGraph.dll" ComponentId="{C1705E00-854B-4253-883D-9247C8B20867}" Directory_="APPDIR" Attributes="0" KeyPath="ZedGraph.dll"/>
+    <ROW Component="favicon.ico" ComponentId="{847F9F23-5571-492F-85B0-9324A40611F3}" Directory_="www_Dir" Attributes="0" KeyPath="favicon.ico" Type="0"/>
+    <ROW Component="gitignore" ComponentId="{D827F057-C30D-47EF-810B-251E93C74B1E}" Directory_="uploads_Dir" Attributes="0" KeyPath="gitignore" Type="0"/>
+    <ROW Component="libcrypto1_1.dll" ComponentId="{A024336B-D25B-4B18-96B5-9D7C48B5F922}" Directory_="APPDIR" Attributes="0" KeyPath="libcrypto1_1.dll"/>
+    <ROW Component="libssl1_1.dll" ComponentId="{73DFC6A6-56A2-4A98-BC51-6879D95514C7}" Directory_="APPDIR" Attributes="0" KeyPath="libssl1_1.dll"/>
+    <ROW Component="msflxgrd.ocx" ComponentId="{B21EF7B0-6915-45AE-BC01-5EAA207757C2}" Directory_="System64Folder" Attributes="0" KeyPath="msflxgrd.ocx"/>
+    <ROW Component="repair_bootloader.hex" ComponentId="{935EA326-A3FC-496B-BADD-7851EEE52E38}" Directory_="HexFile_Dir" Attributes="0" KeyPath="repair_bootloader.hex" Type="0"/>
+    <ROW Component="sound_0.ico" ComponentId="{E2169738-13FD-4912-858F-24B6AE7D544B}" Directory_="Icon_Dir" Attributes="0" KeyPath="sound_0.ico" Type="0"/>
+    <ROW Component="sqlite3.dll" ComponentId="{CBF98026-A67F-41AA-B24C-8C7C9C218214}" Directory_="APPDIR" Attributes="0" KeyPath="sqlite3.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
+    <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="Airlab.jpg" Component_="Airlab.jpg" FileName="Airlab.jpg" Attributes="0" SourcePath="build\bin\Release\ResourceFile\Airlab.jpg" SelfReg="false"/>
+    <ROW File="AQI.jpg" Component_="Airlab.jpg" FileName="AQI.jpg" Attributes="0" SourcePath="build\bin\Release\ResourceFile\AQI.jpg" SelfReg="false"/>
+    <ROW File="BTU.jpg" Component_="Airlab.jpg" FileName="BTU.jpg" Attributes="0" SourcePath="build\bin\Release\ResourceFile\BTU.jpg" SelfReg="false"/>
+    <ROW File="cylinder.png" Component_="Airlab.jpg" FileName="cylinder.png" Attributes="0" SourcePath="build\bin\Release\ResourceFile\cylinder.png" SelfReg="false"/>
+    <ROW File="DemoPrg.txt" Component_="Airlab.jpg" FileName="DemoPrg.txt" Attributes="0" SourcePath="build\bin\Release\ResourceFile\DemoPrg.txt" SelfReg="false"/>
+    <ROW File="DeviceDatabase.mdb_1" Component_="Airlab.jpg" FileName="DEVICE~1.MDB|DeviceDatabase.mdb" Attributes="0" SourcePath="build\bin\Release\ResourceFile\DeviceDatabase.mdb" SelfReg="false"/>
+    <ROW File="repair_bootloader.hex" Component_="repair_bootloader.hex" FileName="REPAIR~1.HEX|repair_bootloader.hex" Attributes="0" SourcePath="build\bin\Release\ResourceFile\HexFile\repair_bootloader.hex" SelfReg="false"/>
+    <ROW File="repair_bootloader_AQ.hex" Component_="repair_bootloader.hex" FileName="REPAIR~2.HEX|repair_bootloader_AQ.hex" Attributes="0" SourcePath="build\bin\Release\ResourceFile\HexFile\repair_bootloader_AQ.hex" SelfReg="false"/>
+    <ROW File="repair_bootloader_CO2.hex" Component_="repair_bootloader.hex" FileName="REPAIR~3.HEX|repair_bootloader_CO2.hex" Attributes="0" SourcePath="build\bin\Release\ResourceFile\HexFile\repair_bootloader_CO2.hex" SelfReg="false"/>
+    <ROW File="repair_bootloader_T10.hex" Component_="repair_bootloader.hex" FileName="REPAIR~4.HEX|repair_bootloader_T10.hex" Attributes="0" SourcePath="build\bin\Release\ResourceFile\HexFile\repair_bootloader_T10.hex" SelfReg="false"/>
+    <ROW File="repair_bootloader_T8.hex" Component_="repair_bootloader.hex" FileName="REPAIR~5.HEX|repair_bootloader_T8.hex" Attributes="0" SourcePath="build\bin\Release\ResourceFile\HexFile\repair_bootloader_T8.hex" SelfReg="false"/>
+    <ROW File="repair_bootloader_T9.hex" Component_="repair_bootloader.hex" FileName="REPAIR~6.HEX|repair_bootloader_T9.hex" Attributes="0" SourcePath="build\bin\Release\ResourceFile\HexFile\repair_bootloader_T9.hex" SelfReg="false"/>
+    <ROW File="sound_0.ico" Component_="sound_0.ico" FileName="sound_0.ico" Attributes="0" SourcePath="build\bin\Release\ResourceFile\Icon\sound_0.ico" SelfReg="false"/>
+    <ROW File="sound_1.ico" Component_="sound_0.ico" FileName="sound_1.ico" Attributes="0" SourcePath="build\bin\Release\ResourceFile\Icon\sound_1.ico" SelfReg="false"/>
+    <ROW File="sound_2.ico" Component_="sound_0.ico" FileName="sound_2.ico" Attributes="0" SourcePath="build\bin\Release\ResourceFile\Icon\sound_2.ico" SelfReg="false"/>
+    <ROW File="sound_3.ico" Component_="sound_0.ico" FileName="sound_3.ico" Attributes="0" SourcePath="build\bin\Release\ResourceFile\Icon\sound_3.ico" SelfReg="false"/>
+    <ROW File="ISPLogo.jpg" Component_="Airlab.jpg" FileName="ISPLogo.jpg" Attributes="0" SourcePath="build\bin\Release\ResourceFile\ISPLogo.jpg" SelfReg="false"/>
+    <ROW File="ProductMode.ini" Component_="Airlab.jpg" FileName="PRODUC~1.INI|ProductMode.ini" Attributes="0" SourcePath="build\bin\Release\ResourceFile\ProductMode.ini" SelfReg="false"/>
+    <ROW File="rectangular_tube.png" Component_="Airlab.jpg" FileName="RECTAN~1.PNG|rectangular_tube.png" Attributes="0" SourcePath="build\bin\Release\ResourceFile\rectangular_tube.png" SelfReg="false"/>
+    <ROW File="RegistersListDB.mdb" Component_="Airlab.jpg" FileName="REGIST~1.MDB|RegistersListDB.mdb" Attributes="0" SourcePath="build\bin\Release\ResourceFile\RegistersListDB.mdb" SelfReg="false"/>
+    <ROW File="temperature.bmp" Component_="Airlab.jpg" FileName="TEMPER~1.BMP|temperature.bmp" Attributes="0" SourcePath="build\bin\Release\ResourceFile\temperature.bmp" SelfReg="false"/>
+    <ROW File="ErrorNotFound.cc7b3457.js" Component_="ErrorNotFound.cc7b3457.js" FileName="ERRORN~1.JS|ErrorNotFound.cc7b3457.js" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\ErrorNotFound.cc7b3457.js" SelfReg="false"/>
+    <ROW File="fabrands400.20c4a58b.ttf" Component_="ErrorNotFound.cc7b3457.js" FileName="FA-BRA~1.TTF|fa-brands-400.20c4a58b.ttf" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\fa-brands-400.20c4a58b.ttf" SelfReg="false"/>
+    <ROW File="fabrands400.74833209.woff2" Component_="ErrorNotFound.cc7b3457.js" FileName="FA-BRA~1.WOF|fa-brands-400.74833209.woff2" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\fa-brands-400.74833209.woff2" SelfReg="false"/>
+    <ROW File="faregular400.528d022d.ttf" Component_="ErrorNotFound.cc7b3457.js" FileName="FA-REG~1.TTF|fa-regular-400.528d022d.ttf" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\fa-regular-400.528d022d.ttf" SelfReg="false"/>
+    <ROW File="faregular400.8e7e5ea1.woff2" Component_="ErrorNotFound.cc7b3457.js" FileName="FA-REG~1.WOF|fa-regular-400.8e7e5ea1.woff2" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\fa-regular-400.8e7e5ea1.woff2" SelfReg="false"/>
+    <ROW File="fasolid900.67a65763.ttf" Component_="ErrorNotFound.cc7b3457.js" FileName="FA-SOL~1.TTF|fa-solid-900.67a65763.ttf" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\fa-solid-900.67a65763.ttf" SelfReg="false"/>
+    <ROW File="fasolid900.7152a693.woff2" Component_="ErrorNotFound.cc7b3457.js" FileName="FA-SOL~1.WOF|fa-solid-900.7152a693.woff2" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\fa-solid-900.7152a693.woff2" SelfReg="false"/>
+    <ROW File="fav4compatibility.0515a423.ttf" Component_="ErrorNotFound.cc7b3457.js" FileName="FA-V4C~1.TTF|fa-v4compatibility.0515a423.ttf" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\fa-v4compatibility.0515a423.ttf" SelfReg="false"/>
+    <ROW File="fav4compatibility.694a17c3.woff2" Component_="ErrorNotFound.cc7b3457.js" FileName="FA-V4C~1.WOF|fa-v4compatibility.694a17c3.woff2" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\fa-v4compatibility.694a17c3.woff2" SelfReg="false"/>
+    <ROW File="flUhRq6tzZclQEJVdgIuiaDsNa.fd84f88b.woff" Component_="ErrorNotFound.cc7b3457.js" FileName="FLUHRQ~1.WOF|flUhRq6tzZclQEJ-Vdg-IuiaDsNa.fd84f88b.woff" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\flUhRq6tzZclQEJ-Vdg-IuiaDsNa.fd84f88b.woff" SelfReg="false"/>
+    <ROW File="flUhRq6tzZclQEJVdgIuiaDsNcIhQ8tQ.4a4dbc62.woff2" Component_="ErrorNotFound.cc7b3457.js" FileName="FLUHRQ~2.WOF|flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.4a4dbc62.woff2" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.4a4dbc62.woff2" SelfReg="false"/>
+    <ROW File="index.17e32911.js" Component_="ErrorNotFound.cc7b3457.js" FileName="INDEX1~1.JS|index.17e32911.js" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\index.17e32911.js" SelfReg="false"/>
+    <ROW File="index.df7862c3.css" Component_="ErrorNotFound.cc7b3457.js" FileName="INDEXD~1.CSS|index.df7862c3.css" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\index.df7862c3.css" SelfReg="false"/>
+    <ROW File="IndexPage.64b50715.css" Component_="ErrorNotFound.cc7b3457.js" FileName="INDEXP~1.CSS|IndexPage.64b50715.css" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\IndexPage.64b50715.css" SelfReg="false"/>
+    <ROW File="IndexPage.e5c5ae0b.js" Component_="ErrorNotFound.cc7b3457.js" FileName="INDEXP~1.JS|IndexPage.e5c5ae0b.js" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\IndexPage.e5c5ae0b.js" SelfReg="false"/>
+    <ROW File="KFOkCnqEu92Fr1MmgVxIIzQ.34e9582c.woff" Component_="ErrorNotFound.cc7b3457.js" FileName="KFOKCN~1.WOF|KFOkCnqEu92Fr1MmgVxIIzQ.34e9582c.woff" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\KFOkCnqEu92Fr1MmgVxIIzQ.34e9582c.woff" SelfReg="false"/>
+    <ROW File="KFOlCnqEu92Fr1MmEU9fBBc.9ce7f3ac.woff" Component_="ErrorNotFound.cc7b3457.js" FileName="KFOLCN~1.WOF|KFOlCnqEu92Fr1MmEU9fBBc-.9ce7f3ac.woff" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\KFOlCnqEu92Fr1MmEU9fBBc-.9ce7f3ac.woff" SelfReg="false"/>
+    <ROW File="KFOlCnqEu92Fr1MmSU5fBBc.bf14c7d7.woff" Component_="ErrorNotFound.cc7b3457.js" FileName="KFOLCN~2.WOF|KFOlCnqEu92Fr1MmSU5fBBc-.bf14c7d7.woff" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\KFOlCnqEu92Fr1MmSU5fBBc-.bf14c7d7.woff" SelfReg="false"/>
+    <ROW File="KFOlCnqEu92Fr1MmWUlfBBc.e0fd57c0.woff" Component_="ErrorNotFound.cc7b3457.js" FileName="KFOLCN~3.WOF|KFOlCnqEu92Fr1MmWUlfBBc-.e0fd57c0.woff" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\KFOlCnqEu92Fr1MmWUlfBBc-.e0fd57c0.woff" SelfReg="false"/>
+    <ROW File="KFOlCnqEu92Fr1MmYUtfBBc.f6537e32.woff" Component_="ErrorNotFound.cc7b3457.js" FileName="KFOLCN~4.WOF|KFOlCnqEu92Fr1MmYUtfBBc-.f6537e32.woff" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\KFOlCnqEu92Fr1MmYUtfBBc-.f6537e32.woff" SelfReg="false"/>
+    <ROW File="KFOmCnqEu92Fr1Mu4mxM.f2abf7fb.woff" Component_="ErrorNotFound.cc7b3457.js" FileName="KFOMCN~1.WOF|KFOmCnqEu92Fr1Mu4mxM.f2abf7fb.woff" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\KFOmCnqEu92Fr1Mu4mxM.f2abf7fb.woff" SelfReg="false"/>
+    <ROW File="MainLayout.0700d2bc.js" Component_="ErrorNotFound.cc7b3457.js" FileName="MAINLA~1.JS|MainLayout.0700d2bc.js" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\MainLayout.0700d2bc.js" SelfReg="false"/>
+    <ROW File="QResizeObserver.17b1c121.js" Component_="ErrorNotFound.cc7b3457.js" FileName="QRESIZ~1.JS|QResizeObserver.17b1c121.js" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\assets\QResizeObserver.17b1c121.js" SelfReg="false"/>
+    <ROW File="favicon.ico" Component_="favicon.ico" FileName="favicon.ico" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\favicon.ico" SelfReg="false"/>
+    <ROW File="icons.svg" Component_="favicon.ico" FileName="icons.svg" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\icons.svg" SelfReg="false"/>
+    <ROW File="index.html" Component_="favicon.ico" FileName="INDEX~1.HTM|index.html" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\index.html" SelfReg="false"/>
+    <ROW File="gitignore" Component_="gitignore" FileName="GITIGN~1|.gitignore" Attributes="0" SourcePath="build\bin\Release\ResourceFile\webview\www\uploads\.gitignore" SelfReg="false"/>
+    <ROW File="BACnet_Stack_Library.dll" Component_="BACnet_Stack_Library.dll" FileName="BACNET~1.DLL|BACnet_Stack_Library.dll" Attributes="0" SourcePath="build\bin\Release\BACnet_Stack_Library.dll" SelfReg="false"/>
+    <ROW File="BacnetExplore.exe" Component_="BacnetExplore.exe" FileName="BACNET~1.EXE|BacnetExplore.exe" Attributes="0" SourcePath="build\bin\Release\BacnetExplore.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="BacnetExplore.exe.config" Component_="BacnetExplore.exe.config" FileName="BACNET~1.CON|BacnetExplore.exe.config" Attributes="0" SourcePath="build\bin\Release\BacnetExplore.exe.config" SelfReg="false"/>
+    <ROW File="CalendarView.dll" Component_="CalendarView.dll" FileName="CALEND~1.DLL|CalendarView.dll" Attributes="0" SourcePath="build\bin\Release\CalendarView.dll" SelfReg="false"/>
+    <ROW File="FlexSlideBar.dll" Component_="FlexSlideBar.dll" FileName="FLEXSL~1.DLL|FlexSlideBar.dll" Attributes="0" SourcePath="build\bin\Release\FlexSlideBar.dll" SelfReg="false"/>
+    <ROW File="HttpAPI.dll" Component_="HttpAPI.dll" FileName="HttpAPI.dll" Attributes="0" SourcePath="build\bin\Release\HttpAPI.dll" SelfReg="false"/>
+    <ROW File="ISP.exe" Component_="ISP.exe" FileName="ISP.exe" Attributes="0" SourcePath="build\bin\Release\ISP.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="libcrypto1_1.dll" Component_="libcrypto1_1.dll" FileName="LIBCRY~1.DLL|libcrypto-1_1.dll" Attributes="0" SourcePath="build\bin\Release\libcrypto-1_1.dll" SelfReg="false"/>
+    <ROW File="libssl1_1.dll" Component_="libssl1_1.dll" FileName="LIBSSL~1.DLL|libssl-1_1.dll" Attributes="0" SourcePath="build\bin\Release\libssl-1_1.dll" SelfReg="false"/>
+    <ROW File="MFC16API.dll" Component_="MFC16API.dll" FileName="MFC16API.dll" Attributes="0" SourcePath="build\bin\Release\MFC16API.dll" SelfReg="false"/>
+    <ROW File="ModbusDllforVc.dll" Component_="ModbusDllforVc.dll" FileName="MODBUS~1.DLL|ModbusDllforVc.dll" Attributes="0" SourcePath="build\bin\Release\ModbusDllforVc.dll" SelfReg="false"/>
+    <ROW File="ModbusPoll.exe" Component_="ModbusPoll.exe" FileName="MODBUS~1.EXE|ModbusPoll.exe" Attributes="0" SourcePath="build\bin\Release\ModbusPoll.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="PacketDotNet.dll" Component_="PacketDotNet.dll" FileName="PACKET~1.DLL|PacketDotNet.dll" Attributes="0" SourcePath="build\bin\Release\PacketDotNet.dll" SelfReg="false"/>
+    <ROW File="SharpPcap.dll" Component_="SharpPcap.dll" FileName="SHARPP~1.DLL|SharpPcap.dll" Attributes="0" SourcePath="build\bin\Release\SharpPcap.dll" SelfReg="false"/>
+    <ROW File="sqlite3.dll" Component_="sqlite3.dll" FileName="sqlite3.dll" Attributes="0" SourcePath="build\bin\Release\sqlite3.dll" SelfReg="false"/>
+    <ROW File="T3000.exe" Component_="T3000.exe" FileName="T3000.exe" Attributes="0" SourcePath="build\bin\Release\T3000.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="T3000.log" Component_="BacnetExplore.exe.config" FileName="T3000.log" Attributes="0" SourcePath="build\bin\Release\T3000.log" SelfReg="false"/>
+    <ROW File="T3000_config.ini" Component_="BacnetExplore.exe.config" FileName="T3000_~1.INI|T3000_config.ini" Attributes="0" SourcePath="build\bin\Release\T3000_config.ini" SelfReg="false"/>
+    <ROW File="T3000Controls.dll" Component_="T3000Controls.dll" FileName="T3000C~1.DLL|T3000Controls.dll" Attributes="0" SourcePath="build\bin\Release\T3000Controls.dll" SelfReg="false"/>
+    <ROW File="Update.exe" Component_="Update.exe" FileName="Update.exe" Attributes="0" SourcePath="build\bin\Release\Update.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="ZedGraph.dll" Component_="ZedGraph.dll" FileName="ZedGraph.dll" Attributes="0" SourcePath="build\bin\Release\ZedGraph.dll" SelfReg="false"/>
+    <ROW File="msflxgrd.ocx" Component_="msflxgrd.ocx" FileName="msflxgrd.ocx" Attributes="0" SourcePath="DLLs\msflxgrd.ocx" SelfReg="false"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
+    <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" Languages="en" InstallationType="4" UseLargeSchema="true"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
+    <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
+    <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
+    <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
+    <ROW Fragment="FolderDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\FolderDlg.aip"/>
+    <ROW Fragment="MaintenanceTypeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceTypeDlg.aip"/>
+    <ROW Fragment="MaintenanceWelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceWelcomeDlg.aip"/>
+    <ROW Fragment="SequenceDialogs.aip" Path="&lt;AI_THEMES&gt;classic\fragments\SequenceDialogs.aip"/>
+    <ROW Fragment="Sequences.aip" Path="&lt;AI_FRAGS&gt;Sequences.aip"/>
+    <ROW Fragment="StaticUIStrings.aip" Path="&lt;AI_FRAGS&gt;StaticUIStrings.aip"/>
+    <ROW Fragment="Themes.aip" Path="&lt;AI_FRAGS&gt;Themes.aip"/>
+    <ROW Fragment="UI.aip" Path="&lt;AI_THEMES&gt;classic\fragments\UI.aip"/>
+    <ROW Fragment="Validation.aip" Path="&lt;AI_FRAGS&gt;Validation.aip"/>
+    <ROW Fragment="VerifyRemoveDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRemoveDlg.aip"/>
+    <ROW Fragment="VerifyRepairDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRepairDlg.aip"/>
+    <ROW Fragment="WelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomeDlg.aip"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
+    <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
+    <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="99"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_MAINT" Ordering="198"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="202"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_INSTALL" Ordering="197"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_MAINT" Ordering="101"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="ChangeButton" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="501"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceWelcomeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RemoveButton" Event="NewDialog" Argument="VerifyRemoveDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RepairButton" Event="NewDialog" Argument="VerifyRepairDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="1"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Repair" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="399" Options="1"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Remove" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="299" Options="1"/>
+    <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="201"/>
+    <ROW Dialog_="ResumeDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_RESUME" Ordering="299"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_PATCH" Ordering="199"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="203"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
+    <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
+    <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
+    <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
+    <ROW Action="AI_EnableDebugLog" Type="321" Source="aicustact.dll" Target="EnableDebugLog"/>
+    <ROW Action="AI_InstallModeCheck" Type="1" Source="aicustact.dll" Target="UpdateInstallMode" WithoutSeq="true"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
+    <ROW Action="AI_PRESERVE_INSTALL_TYPE" Type="65" Source="aicustact.dll" Target="PreserveInstallType"/>
+    <ROW Action="AI_RESTORE_LOCATION" Type="65" Source="aicustact.dll" Target="RestoreLocation"/>
+    <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
+    <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
+    <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
+    <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatCompsComponent">
+    <ROW Feature_="MainFeature" Component_="APPDIR"/>
+    <ROW Feature_="MainFeature" Component_="ProductInformation"/>
+    <ROW Feature_="MainFeature" Component_="BACnet_Stack_Library.dll"/>
+    <ROW Feature_="MainFeature" Component_="BacnetExplore.exe"/>
+    <ROW Feature_="MainFeature" Component_="BacnetExplore.exe.config"/>
+    <ROW Feature_="MainFeature" Component_="CalendarView.dll"/>
+    <ROW Feature_="MainFeature" Component_="FlexSlideBar.dll"/>
+    <ROW Feature_="MainFeature" Component_="HttpAPI.dll"/>
+    <ROW Feature_="MainFeature" Component_="ISP.exe"/>
+    <ROW Feature_="MainFeature" Component_="libcrypto1_1.dll"/>
+    <ROW Feature_="MainFeature" Component_="libssl1_1.dll"/>
+    <ROW Feature_="MainFeature" Component_="Airlab.jpg"/>
+    <ROW Feature_="MainFeature" Component_="repair_bootloader.hex"/>
+    <ROW Feature_="MainFeature" Component_="sound_0.ico"/>
+    <ROW Feature_="MainFeature" Component_="ErrorNotFound.cc7b3457.js"/>
+    <ROW Feature_="MainFeature" Component_="favicon.ico"/>
+    <ROW Feature_="MainFeature" Component_="gitignore"/>
+    <ROW Feature_="MainFeature" Component_="MFC16API.dll"/>
+    <ROW Feature_="MainFeature" Component_="ModbusDllforVc.dll"/>
+    <ROW Feature_="MainFeature" Component_="msflxgrd.ocx"/>
+    <ROW Feature_="MainFeature" Component_="ModbusPoll.exe"/>
+    <ROW Feature_="MainFeature" Component_="PacketDotNet.dll"/>
+    <ROW Feature_="MainFeature" Component_="SharpPcap.dll"/>
+    <ROW Feature_="MainFeature" Component_="sqlite3.dll"/>
+    <ROW Feature_="MainFeature" Component_="T3000.exe"/>
+    <ROW Feature_="MainFeature" Component_="T3000Controls.dll"/>
+    <ROW Feature_="MainFeature" Component_="Update.exe"/>
+    <ROW Feature_="MainFeature" Component_="ZedGraph.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
+    <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_STORE_LOCATION" Condition="(Not Installed) OR REINSTALL" Sequence="1501"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1399"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
+    <ROW Action="AI_PRESERVE_INSTALL_TYPE" Sequence="199"/>
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="53"/>
+    <ROW Action="AI_DpiContentScale" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
+    <ROW Condition="((VersionNT &lt;&gt; 501) AND (VersionNT &lt;&gt; 502))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
+    <ROW Registry="Manufacturer" Root="-1" Key="Software\[Manufacturer]" Name="\"/>
+    <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="ProductName" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
+    <ROW Registry="Software" Root="-1" Key="Software" Name="\"/>
+    <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
+    <ATTRIBUTE name="UsedTheme" value="classic"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="[|ProductVersion]" Attributes="257" ActionProperty="OLDPRODUCTS"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
+  </COMPONENT>
+</DOCUMENT>
