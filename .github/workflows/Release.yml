@@ -17,6 +17,13 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Build webview assets
+        run: |
+          cd t3-webview-ui
+          npm install
+          npm run build
+          xcopy "dist\spa\" "..\T3000\ResourceFile\webview\www\" /E /H /C /I /y
+
       - name: cmake
         run: |
           cd ${{ github.workspace }}
@@ -28,13 +35,6 @@ jobs:
           echo CMake configuration successful. Going for build...
           cd build
           cmake --build . --config Release
-
-      - name: Build webview assets
-        run: |
-          cd t3-webview-ui
-          npm install
-          npm run build
-          xcopy "dist\spa\" "..\T3000\ResourceFile\webview\www\" /E /H /C /I
 
       - name: Build AIP
         uses: caphyon/advinst-github-action@v1.0
