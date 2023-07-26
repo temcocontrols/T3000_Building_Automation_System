@@ -62,5 +62,5 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ${{ github.workspace }}\setup\T3000-installer.msi
-          asset_name: ${{ github.event.repository.name }}.msi
+          asset_name: T3000-installer.msi
           asset_content_type: application/x-ms-installer
