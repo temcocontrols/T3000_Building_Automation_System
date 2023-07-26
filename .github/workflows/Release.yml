@@ -1,6 +1,6 @@
 # This workflow now builds T3000Controls and BACnetStackLibrary components
 
-name: CI
+name: Release
 
 on:
   push:
@@ -10,11 +10,11 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
@@ -33,16 +33,18 @@ jobs:
       - name: Build AIP
         uses: caphyon/advinst-github-action@v1.0
         with:
-          advinst-version: "19.0"
+          advinst-version: "20.8"
           advinst-enable-automation: "true"
           aip-path: ${{ github.workspace }}\T3000.aip
           aip-build-name: DefaultBuild
-          aip-package-name: setup.msi
+          aip-package-name: T3000-installer.msi
           aip-output-dir: ${{ github.workspace }}\setup
           aip-commands: |
-            SetVersion ${{ steps.vars.outputs.tag }}
+            AddFolder "APPDIR" ".\T3000\ResourceFile"
+            AddFolder "APPDIR" ".\build\bin\Release" -install_in_parent_folder
+            SetVersion -increment
       - name: Publish setup artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: setup
           path: ${{ github.workspace }}\setup\T3000-installer.msi
