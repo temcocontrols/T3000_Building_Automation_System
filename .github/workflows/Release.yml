@@ -3,9 +3,8 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  release:
+    types: [published]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -30,6 +29,13 @@ jobs:
           cd build
           cmake --build . --config Release
 
+      - name: Build webview assets
+        run: |
+          cd t3-webview-ui
+          npm install
+          npm run build
+          xcopy "dist\spa\" "..\T3000\ResourceFile\webview\www\" /E /H /C /I
+
       - name: Build AIP
         uses: caphyon/advinst-github-action@v1.0
         with:
@@ -48,3 +54,13 @@ jobs:
         with:
           name: setup
           path: ${{ github.workspace }}\setup\T3000-installer.msi
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ github.workspace }}\setup\T3000-installer.msi
+          asset_name: ${{ github.event.repository.name }}.msi
+          asset_content_type: application/x-ms-installer
