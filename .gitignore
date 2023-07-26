@@ -940,5 +940,14 @@ BacnetExplore/CodeExamples/Xamarin/YabeStack/bin/Release/YabeStack.dll
 /T3000/T3000_config.ini
 /packages
 
-/build/bin
+T3000Controls/obj/Release/*.resources
+build/T3000_Building_Automation_System.sln
+build/ZERO_CHECK.vcxproj.filters
+build/CMakeCache.txt
+build/ZERO_CHECK.vcxproj
+build/cmake_install.cmake
+build/ALL_BUILD.vcxproj.filters
+build/ALL_BUILD.vcxproj
+
+/build/*/*
 /.vs
