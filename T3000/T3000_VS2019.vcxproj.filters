@@ -1189,6 +1189,8 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ResourceFile\DeviceDatabase.mdb" />
+    <None Include="config.props" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">

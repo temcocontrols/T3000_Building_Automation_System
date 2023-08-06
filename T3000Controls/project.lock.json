@@ -1,28 +1,28 @@
 {
   "version": 3,
   "targets": {
-    ".NETFramework,Version=v4.0": {},
-    ".NETFramework,Version=v4.0/win": {}
+    ".NETFramework,Version=v4.5.2": {},
+    ".NETFramework,Version=v4.5.2/win": {}
   },
   "libraries": {},
   "projectFileDependencyGroups": {
     "": [],
-    ".NETFramework,Version=v4.0": []
+    ".NETFramework,Version=v4.5.2": []
   },
   "packageFolders": {
-    "C:\\Users\\Administrator\\.nuget\\packages\\": {}
+    "C:\\Users\\alaar\\.nuget\\packages\\": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\Work\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
+      "projectUniqueName": "D:\\Temco\\T3000_Building_Automation_System-alaa\\T3000Controls\\T3000Controls.csproj",
       "projectName": "T3000Controls",
-      "projectPath": "C:\\Work\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
-      "projectJsonPath": "C:\\Work\\T3000_Building_Automation_System\\T3000Controls\\project.json",
-      "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-      "outputPath": "C:\\Work\\T3000_Building_Automation_System\\T3000Controls\\obj\\",
+      "projectPath": "D:\\Temco\\T3000_Building_Automation_System-alaa\\T3000Controls\\T3000Controls.csproj",
+      "projectJsonPath": "D:\\Temco\\T3000_Building_Automation_System-alaa\\T3000Controls\\project.json",
+      "packagesPath": "C:\\Users\\alaar\\.nuget\\packages\\",
+      "outputPath": "D:\\Temco\\T3000_Building_Automation_System-alaa\\T3000Controls\\obj\\",
       "projectStyle": "ProjectJson",
       "configFilePaths": [
-        "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\alaar\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "sources": {
@@ -31,7 +31,7 @@
       }
     },
     "frameworks": {
-      "net40": {}
+      "net452": {}
     },
     "runtimes": {
       "win": {

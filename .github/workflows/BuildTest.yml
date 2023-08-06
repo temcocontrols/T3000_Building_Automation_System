@@ -1,6 +1,6 @@
 # This workflow now builds T3000Controls and BACnetStackLibrary components
 
-name: CI
+name: Testing the MSBuild
 
 # On master make sure both push and a pull request builds this action
 on:
@@ -12,22 +12,17 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
-      - name: cmake
-        run: |
-          cd ${{ github.workspace }}
-          cd build
-          cmake -A Win32 .. -DCMAKE_TOOLCHAIN_FILE="..\vcpkg-export-openssl\scripts\buildsystems\vcpkg.cmake"  
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
 
-      - name: cmake-build
+      - name: Build Solution
         run: |
-          echo CMake configuration successful. Going for build...
-          cd build
-          cmake --build .
+          msbuild "T3000 - VS2019.sln" /p:Platform=x86 /p:Configuration=Release /p:ProjectVersion=20230804

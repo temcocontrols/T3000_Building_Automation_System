@@ -8,7 +8,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build:
+  release:
     runs-on: windows-latest
 
     steps:
@@ -22,45 +22,78 @@ jobs:
           cd t3-webview-ui
           npm install
           npm run build
-          xcopy "dist\spa\" "..\T3000\ResourceFile\webview\www\" /E /H /C /I /y
 
-      - name: cmake
+      - name: Get T3000 version number
+        id: version
         run: |
-          cd ${{ github.workspace }}
-          cd build
-          cmake -A Win32 .. -DCMAKE_TOOLCHAIN_FILE="..\vcpkg-export-openssl\scripts\buildsystems\vcpkg.cmake"
+          $version = '${{ github.event.release.tag_name }}'
+          $version = $version -replace "[^0-9]"
+          Write-Output version=$version >> $Env:GITHUB_OUTPUT
 
-      - name: cmake-build
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build Solution
         run: |
-          echo CMake configuration successful. Going for build...
-          cd build
-          cmake --build . --config Release
+          msbuild "T3000 - VS2019.sln" /p:Platform=x86 /p:Configuration=Release /p:ProjectVersion=${{ steps.version.outputs.version }}
+
+      - name: Clean & Orgenize Files
+        run: |
+          del "T3000 Output\release\*.pdb"
+          xcopy "t3-webview-ui\dist\spa\" "T3000\ResourceFile\webview\www\" /E /H /C /I /y
+          xcopy "T3000\ResourceFile\" "T3000 Output\release\ResourceFile\" /E /H /C /I /y
+
+      - name: Zip the update files
+        run: Compress-Archive -Path ".\T3000 Output\release\*" -CompressionLevel Optimal -DestinationPath .\20T3000Update1.zip
+
+      - name: Upload Update file to FTP
+        uses: Creepios/sftp-action@v1.0.3
+        with:
+          port: 22
+          host: ${{ vars.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          localPath: './20T3000Update1.zip'
+          remotePath: '/software/'
+
+      - name: Set Installer version
+        id: iversion
+        run: |
+          $iversion = '${{ steps.version.outputs.version }}'
+          $iversion = $iversion.Insert(4,'.')
+          Write-Output iversion=$iversion >> $Env:GITHUB_OUTPUT
 
       - name: Build AIP
         uses: caphyon/advinst-github-action@v1.0
         with:
-          advinst-version: "20.8"
+          advinst-version: "20.9"
           advinst-enable-automation: "true"
           aip-path: ${{ github.workspace }}\T3000.aip
           aip-build-name: DefaultBuild
-          aip-package-name: T3000-installer.msi
+          aip-package-name: T3000-setup.msi
           aip-output-dir: ${{ github.workspace }}\setup
           aip-commands: |
-            AddFolder "APPDIR" ".\T3000\ResourceFile"
-            AddFolder "APPDIR" ".\build\bin\Release" -install_in_parent_folder
-            SetVersion -increment
-      - name: Publish setup artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: setup
-          path: ${{ github.workspace }}\setup\T3000-installer.msi
+            AddFolder "APPDIR" ".\T3000 Output\release" -install_in_parent_folder
+            AddFolder "APPDIR" ".\T3000InstallShield\PH_Application"
+            AddFolder "APPDIR" ".\T3000InstallShield\Psychrometry"
+            SetProductCode -langid 1033
+            SetVersion ${{ steps.iversion.outputs.iversion }}
 
       - name: Upload release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: releaseFile
+        uses: shogo82148/actions-upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}\setup\T3000-installer.msi
-          asset_name: T3000-installer.msi
+          asset_path: ${{ github.workspace }}\setup\T3000-setup.msi
+          asset_name: T3000-setup.msi
           asset_content_type: application/x-ms-installer
+
+      - name: Update T3000 version in the INI file
+        id: webhookRequest
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: '${{ vars.T3_VERSION_UPDATER_WEBHOOK_URL }}'
+          method: 'POST'
+          customHeaders: '{"Content-Type": "application/json", "X-Secret-Key": "${{ secrets.T3_VERSION_UPDATER_WEBHOOK_SECRET }}"}'
+          data: '{"version": "${{ steps.version.outputs.version }}", "url": "${{ steps.releaseFile.outputs.browser_download_url }}"}'
+

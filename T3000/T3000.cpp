@@ -17,7 +17,7 @@
 #include <windows.h>  
  
 
-const unsigned int g_versionNO= 20230616;
+const unsigned int g_versionNO = PROJECT_VERSION;
 
 
 #ifdef _DEBUG
@@ -47,14 +47,14 @@ CT3000App::CT3000App()
     CurrentT3000Version.ReleaseBuffer();
 
     //******************************************************
-    // Release °æ±¾·¢²¼Ê±ÆÁ±Î´Ë¶Î£¬´Ë¶Î Ö÷ÒªÓÃÓÚµ÷ÊÔÊ± ÏÔÊ¾ ¾ßÌåÊÇ ¼¸µãÖÓµÄ°æ±¾.
+    // Release ï¿½æ±¾ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Î´Ë¶Î£ï¿½ï¿½Ë¶ï¿½ ï¿½ï¿½Òªï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½Ê± ï¿½ï¿½Ê¾ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ÓµÄ°æ±¾.
 //#ifdef _DEBUG
-    char strTime[128] = { 0 }; // È¡Ð¡Ê±µ± Ð¡°æ±¾ºÅ;
-    CString Test_Version;  //   TIME ºÍDATE    
+    char strTime[128] = { 0 }; // È¡Ð¡Ê±ï¿½ï¿½ Ð¡ï¿½æ±¾ï¿½ï¿½;
+    CString Test_Version;  //   TIME ï¿½ï¿½DATE    
     memcpy(strTime, __TIME__, 2);
     MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
     Test_Version.ReleaseBuffer();
-	CurrentT3000Version= CurrentT3000Version  + Test_Version; //¶Å·« : Release °æ·¢²¼µÄÊ±ºò Õâ¾äÆÁ±Îµô¾ÍºÃÁË £¬»á×Ô¶¯»ñÈ¡±àÒëµÄÈÕÆÚ.
+	CurrentT3000Version= CurrentT3000Version  + Test_Version; //ï¿½Å·ï¿½ : Release ï¿½æ·¢ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îµï¿½ï¿½Íºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
 //#endif 
     //*******************************************************
     
@@ -121,13 +121,13 @@ void CT3000App::UpdateDB()
 		q.finalize();
 		SqliteDBT3000.closedb();
 
-        remove((UTF8MBSTR)g_strDatabasefilepath);//É¾µôÔ­ÓÐµÄÊý¾Ý¿â
+        remove((UTF8MBSTR)g_strDatabasefilepath);//É¾ï¿½ï¿½Ô­ï¿½Ðµï¿½ï¿½ï¿½ï¿½Ý¿ï¿½
 
         CString FilePath;
         HANDLE hFind;
         WIN32_FIND_DATA wfd;
         hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-        if (hFind==INVALID_HANDLE_VALUE)//²»´æÔÚ¸ÃÎÄ¼þ
+        if (hFind==INVALID_HANDLE_VALUE)//ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½Ä¼ï¿½
         {
            
             FilePath=g_strExePth+_T("Database\\T3000.db");
@@ -197,8 +197,8 @@ BOOL CT3000App::InitInstance()
 	 
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
-    //2018 04 23 ÐÞ¸´bug Ä¬Ð´²Ù×÷ÏµÍ³²»ÊÇCÅÌµÄÇé¿ö°²×°¿Ø¼þÊ§°Ü
-    //½â¾ö°ì·¨  »ñÈ¡ÏµÍ³ËùÔÚÅÌ·û £¬È»ºó²ÉÈ¡¶ÔÓ¦²Ù×÷.
+    //2018 04 23 ï¿½Þ¸ï¿½bug Ä¬Ð´ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½Cï¿½Ìµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×°ï¿½Ø¼ï¿½Ê§ï¿½ï¿½
+    //ï¿½ï¿½ï¿½ï¿½ì·¨  ï¿½ï¿½È¡ÏµÍ³ï¿½ï¿½ï¿½ï¿½ï¿½Ì·ï¿½ ï¿½ï¿½È»ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½.
     CString Local_System_Path;
     TCHAR szPath[MAX_PATH];
     DWORD ret;
@@ -211,7 +211,7 @@ BOOL CT3000App::InitInstance()
 	{
 		//if (ReadDLLRegAsm()<1)
 		{
-#if 1 // ¶Å·«ÆÁ±Î  £¬ Ðí¶àÉ±¶¾Èí¼þ ¼ì²âµ½  RegAsm.exe µÄ·ÃÎÊ²»ºÏ·¨£¬ ±¨²¡¶¾;
+#if 1 // ï¿½Å·ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½É±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½âµ½  RegAsm.exe ï¿½Ä·ï¿½ï¿½Ê²ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½;
             CString temp_dotnet_path;
             CString temp_t3000controlldll_path;
             CString temp_bacnetdll;
@@ -357,7 +357,7 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_folder = FindFirstFile(g_achive_folder, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//Ä¿Â¼´æÔÚ
+				//Ä¿Â¼ï¿½ï¿½ï¿½ï¿½
 				ret = TRUE;
 
 			}
@@ -376,7 +376,7 @@ BOOL CT3000App::InitInstance()
 			hFind_folder = FindFirstFile(g_achive_folder_temp_txt, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//Ä¿Â¼´æÔÚ
+				//Ä¿Â¼ï¿½ï¿½ï¿½ï¿½
 				ret = TRUE;
 
 			}
@@ -396,7 +396,7 @@ BOOL CT3000App::InitInstance()
 			hFind_folder = FindFirstFile(g_achive_folder_temp_db, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//Ä¿Â¼´æÔÚ
+				//Ä¿Â¼ï¿½ï¿½ï¿½ï¿½
 				ret = TRUE;
 
 			}
@@ -432,15 +432,15 @@ BOOL CT3000App::InitInstance()
 		 
 			g_strDatabasefilepath+=_T("Database\\T3000.db");//
 
-#if 1//Èç¹û›]ÓÐT3000 µÄÇé›rÏÂ
+#if 1//ï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½T3000 ï¿½ï¿½ï¿½ï¿½rï¿½ï¿½
 
 			CString FilePath;
  
 			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-			if (hFind==INVALID_HANDLE_VALUE)//ËµÃ÷µ±Ç°Ä¿Â¼ÏÂÎÞt3000.mdb
+			if (hFind==INVALID_HANDLE_VALUE)//Ëµï¿½ï¿½ï¿½ï¿½Ç°Ä¿Â¼ï¿½ï¿½ï¿½ï¿½t3000.mdb
 			{
 				
-				//Ã»ÓÐÕÒµ½¾Í´´½¨Ò»¸öÄ¬ÈÏµÄÊý¾Ý¿â
+				//Ã»ï¿½ï¿½ï¿½Òµï¿½ï¿½Í´ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ä¬ï¿½Ïµï¿½ï¿½ï¿½ï¿½Ý¿ï¿½
 				FilePath=g_strExePth+_T("Database\\T3000.db");
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -465,9 +465,9 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_Monitor;//
 			WIN32_FIND_DATA wfd_monitor;//
 			hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
-			if (hFind_Monitor==INVALID_HANDLE_VALUE)//ËµÃ÷µ±Ç°Ä¿Â¼ÏÂÎÞMonitorData.db
+			if (hFind_Monitor==INVALID_HANDLE_VALUE)//Ëµï¿½ï¿½ï¿½ï¿½Ç°Ä¿Â¼ï¿½ï¿½ï¿½ï¿½MonitorData.db
 			{
-				//Ã»ÓÐÕÒµ½¾Í´´½¨Ò»¸öÄ¬ÈÏµÄÊý¾Ý¿â
+				//Ã»ï¿½ï¿½ï¿½Òµï¿½ï¿½Í´ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ä¬ï¿½Ïµï¿½ï¿½ï¿½ï¿½Ý¿ï¿½
 				FilePath_Monitor= g_achive_monitor_datatbase_path;
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB2), _T("MONITOR_DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -493,7 +493,7 @@ BOOL CT3000App::InitInstance()
 
 			if (First_Start)
 			{
-				//´´½¨Default_Building
+				//ï¿½ï¿½ï¿½ï¿½Default_Building
 				CString filebuildingPath;//=g_strBuildingFolder+m_Building.at(i).Main_BuildingName+_T("\\"); 
 				filebuildingPath.Format(_T("%sDefault_Building\\"),g_strBuildingFolder);
 				CreateDirectory(g_strBuildingFolder,NULL);
@@ -509,7 +509,7 @@ BOOL CT3000App::InitInstance()
 				//create building db file
 
 				hFind = FindFirstFile(filebuildingPath, &wfd);//
-				if (hFind==INVALID_HANDLE_VALUE)//ËµÃ÷µ±Ç°Ä¿Â¼ÏÂÎÞt3000.mdb
+				if (hFind==INVALID_HANDLE_VALUE)//Ëµï¿½ï¿½ï¿½ï¿½Ç°Ä¿Â¼ï¿½ï¿½ï¿½ï¿½t3000.mdb
 				{
 
 					HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDINGDB1), _T("BUILDINGDB"));   
@@ -649,7 +649,7 @@ BOOL CT3000App::InitInstance()
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
        m_szAppPath  = g_strExePth;
-       if(m_special_customer == 1) //Èç¹ûÊÇµÚÒ»¸ö¿Í»§ ¾Í¶¨ÒåÎªCPR-1000-Help.chm
+       if(m_special_customer == 1) //ï¿½ï¿½ï¿½ï¿½Çµï¿½Ò»ï¿½ï¿½ï¿½Í»ï¿½ ï¿½Í¶ï¿½ï¿½ï¿½ÎªCPR-1000-Help.chm
            m_szHelpFile = theApp.m_szAppPath + L"CPR-1000-Help.chm";
        else
             m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";

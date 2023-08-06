@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="20.8" version="20.8" Modules="simple" RootPath="." Language="en" Id="{8D24B8DB-10B0-4480-B1BF-055A2BC65478}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="20.8" version="20.9" Modules="simple" RootPath="." Language="en" Id="{8D24B8DB-10B0-4480-B1BF-055A2BC65478}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
     <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent;FixupComponent;MsiXDiffComponent;MsixManifestEditorComponent"/>
   </COMPONENT>
@@ -10,10 +10,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPURLINFOABOUT" Value="https://temcocontrols.com"/>
     <ROW Property="CTRLS" Value="2"/>
-    <ROW Property="Manufacturer" Value="Temco Controls"/>
+    <ROW Property="Manufacturer" Value="Temcocontrols"/>
     <ROW Property="ProductCode" Value="1033:{6EFBCC2B-BEB9-46D5-9DF9-BF5CE1DEB7F2} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
-    <ROW Property="ProductName" Value="T3000"/>
+    <ROW Property="ProductName" Value="T3000_Building_Automation_System"/>
     <ROW Property="ProductVersion" Value="1.0.0" Options="32"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
@@ -37,6 +37,7 @@
     <ROW Component="APPDIR" ComponentId="{9DC76C83-660A-4B16-A727-7B2AF6B44EA0}" Directory_="APPDIR" Attributes="0"/>
     <ROW Component="ProductInformation" ComponentId="{6A90A415-991D-43D6-B993-58FDBAA8CA00}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
     <ROW Component="T3000.exe" ComponentId="{0226BD9A-809B-419C-B6F4-93A986C86B9C}" Directory_="APPDIR" Attributes="0" KeyPath="T3000.exe"/>
+    <ROW Component="T3000_Help.chm" ComponentId="{40310900-121F-4C6B-8F12-B0B9C01E00A4}" Directory_="APPDIR" Attributes="0" KeyPath="T3000_Help.chm" Type="1"/>
     <ROW Component="msflxgrd.ocx" ComponentId="{B21EF7B0-6915-45AE-BC01-5EAA207757C2}" Directory_="System64Folder" Attributes="0" KeyPath="msflxgrd.ocx"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
@@ -45,7 +46,8 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
     <ROW File="msflxgrd.ocx" Component_="msflxgrd.ocx" FileName="msflxgrd.ocx" Attributes="0" SourcePath="DLLs\msflxgrd.ocx" SelfReg="false"/>
-    <ROW File="T3000.exe" Component_="T3000.exe" FileName="T3000.exe" Attributes="0" SourcePath="build\bin\Release\T3000.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="T3000.exe" Component_="T3000.exe" FileName="T3000.exe" Attributes="0" SourcePath="T3000 Output\release\T3000.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="T3000_Help.chm" Component_="T3000_Help.chm" FileName="T3000_~1.CHM|T3000_Help.chm" Attributes="0" SourcePath="HelpDocs\T3000_Help.chm" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
@@ -117,8 +119,8 @@
     <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
     <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
     <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
-    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]"/>
-    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFilesFolder]\T3000"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]" MultiBuildTarget="DefaultBuild:[ProgramMenuFolder]T3000"/>
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatCompsComponent">
@@ -126,6 +128,7 @@
     <ROW Feature_="MainFeature" Component_="ProductInformation"/>
     <ROW Feature_="MainFeature" Component_="msflxgrd.ocx"/>
     <ROW Feature_="MainFeature" Component_="T3000.exe"/>
+    <ROW Feature_="MainFeature" Component_="T3000_Help.chm"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>

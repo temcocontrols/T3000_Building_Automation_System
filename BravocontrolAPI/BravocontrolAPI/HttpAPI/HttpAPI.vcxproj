@@ -22,7 +22,7 @@
     <ProjectGuid>{45AA955A-259F-434A-988D-77D1889C5DBD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>BravocontrolAPI</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>HttpAPI</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
