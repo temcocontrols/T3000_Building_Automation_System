@@ -79,7 +79,7 @@ jobs:
       - name: Zip the update files
         run: Compress-Archive -Path ".\T3000 Output\release\*" -CompressionLevel Optimal -DestinationPath .\20T3000Update.zip
 
-         - name: Zip the installer file
+      - name: Zip the installer file
         run: Compress-Archive -Path ".\setup\T3000-setup.msi" -CompressionLevel Optimal -DestinationPath .\09T3000Software.zip
 
       - name: Upload the update file to FTP
