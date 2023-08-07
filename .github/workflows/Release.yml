@@ -43,27 +43,15 @@ jobs:
           xcopy "t3-webview-ui\dist\spa\" "T3000\ResourceFile\webview\www\" /E /H /C /I /y
           xcopy "T3000\ResourceFile\" "T3000 Output\release\ResourceFile\" /E /H /C /I /y
 
-      - name: Zip the update files
-        run: Compress-Archive -Path ".\T3000 Output\release\*" -CompressionLevel Optimal -DestinationPath .\20T3000Update1.zip
 
-      - name: Upload Update file to FTP
-        uses: Creepios/sftp-action@v1.0.3
-        with:
-          port: 22
-          host: ${{ vars.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          localPath: './20T3000Update1.zip'
-          remotePath: '/software/'
-
-      - name: Set Installer version
+      - name: Set the installer version ( doesn't accept big numbers so we add a point )
         id: iversion
         run: |
           $iversion = '${{ steps.version.outputs.version }}'
           $iversion = $iversion.Insert(4,'.')
           Write-Output iversion=$iversion >> $Env:GITHUB_OUTPUT
 
-      - name: Build AIP
+      - name: Build the installer
         uses: caphyon/advinst-github-action@v1.0
         with:
           advinst-version: "20.9"
@@ -79,7 +67,7 @@ jobs:
             SetProductCode -langid 1033
             SetVersion ${{ steps.iversion.outputs.iversion }}
 
-      - name: Upload release asset
+      - name: Upload the installer file to the release assets
         id: releaseFile
         uses: shogo82148/actions-upload-release-asset@v1
         with:
@@ -87,6 +75,32 @@ jobs:
           asset_path: ${{ github.workspace }}\setup\T3000-setup.msi
           asset_name: T3000-setup.msi
           asset_content_type: application/x-ms-installer
+
+      - name: Zip the update files
+        run: Compress-Archive -Path ".\T3000 Output\release\*" -CompressionLevel Optimal -DestinationPath .\20T3000Update.zip
+
+         - name: Zip the installer file
+        run: Compress-Archive -Path ".\setup\T3000-setup.msi" -CompressionLevel Optimal -DestinationPath .\09T3000Software.zip
+
+      - name: Upload the update file to FTP
+        uses: Creepios/sftp-action@v1.0.3
+        with:
+          port: 22
+          host: ${{ vars.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          localPath: './20T3000Update.zip'
+          remotePath: '/software/'
+
+      - name: Upload the software installer file to FTP
+        uses: Creepios/sftp-action@v1.0.3
+        with:
+          port: 22
+          host: ${{ vars.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          localPath: './09T3000Software.zip'
+          remotePath: '/software/'
 
       - name: Update T3000 version in the INI file
         id: webhookRequest
