@@ -1457,7 +1457,7 @@ if(error!=-1)
 		else
 			Byte=0xff;
 
-		if( ncod+2+1 >= PROGRAM_SIZE - 100)
+		if( ncod+2+1 >= PROGRAM_SIZE - 40)
 		{
 		  
 		 if( local_table )
@@ -1473,7 +1473,7 @@ if(error!=-1)
 
 		if (DORU_SYSTEM)
 		{
-		 if( (ncod+2)+2+2+ind_local_table+2+ind_time_table >= PROGRAM_SIZE - 100 )
+		 if( (ncod+2)+2+2+ind_local_table+2+ind_time_table >= PROGRAM_SIZE - 40 )
 		 {
 		   
 			if( local_table )
@@ -2884,7 +2884,7 @@ void sntx_err(int err, int err_true )
 	 "Output number is too large",
 	 "Input number is too large",
 	 "Variable number is too large",
-	 "Program code larger than 2000",
+	 "Program code size is over the 2000 bytes maximum",
      "Use instance only support AV AI AO DO",      // 29 
 	 "Object identifier instance cannot be greater than 2048" //30
 	} ;
@@ -6508,7 +6508,7 @@ unsigned char cod;//,xtemp[15];
   int code_length = ((unsigned char)code[1])*256 + (unsigned char)code[0];
  if((code_length == 0) || (code_length > 2000)) //如果传过来的是无效的 大于500的编码 就说明是错的 直接清空;
 	 return my_display;
- bac_program_size = code_length;
+ bac_program_size = m_Program_data.at(program_list_line).bytes;
  bac_free_memory = 2000 - bac_program_size;
  pcode=code+2;
  memcpy(&bytes,code,2);
@@ -6640,14 +6640,14 @@ unsigned char cod;//,xtemp[15];
 			case STRING_TYPE:
 			case LONG_TYPE:
 			case FLOAT_TYPE:
-									len = *code++;
+									len = (unsigned char)*code++;
 									memcpy(buf,code,len);
 									buf += len;
 									code += len;
 									break;
 			case PRINT:
 								  {
-									nitem = *code++;
+									nitem = (unsigned char)*code++;
 									i=0;
 									for(int j=0;j<nitem;j++)
 									 {
@@ -6673,7 +6673,7 @@ unsigned char cod;//,xtemp[15];
 																buf += strlen("USER_B;");
 																break;
 											case STRING:
-																len = *code++;
+																len = (unsigned char)*code++;
 																if ((unsigned char)*code=='\r')
 																{
 																 buf--;
@@ -6705,7 +6705,7 @@ unsigned char cod;//,xtemp[15];
 			case HANGUP:
 									break;
 			case SET_PRINTER:
-									*buf++ = *code;
+									*buf++ = (unsigned char)*code;
 									code++;
 									break;
 			case RUN_MACRO:
@@ -6729,7 +6729,7 @@ unsigned char cod;//,xtemp[15];
 											buf += 4;
 									}
 									*buf++ = ' ';
-									nitem = *code++;
+									nitem = (unsigned char)*code++;
 									for(i=0; i<nitem;i++)
 										{
 										 memcpy(&n,code,2);
@@ -6799,7 +6799,7 @@ unsigned char cod;//,xtemp[15];
 									buf += strlen(buf);
 									strcpy(buf," , ");
 									buf += strlen(buf);
-									len = *code++;
+									len = (unsigned char)*code++;
 									memcpy(buf,code,len);
 									buf += len;
 									code += len;
@@ -6827,7 +6827,7 @@ unsigned char cod;//,xtemp[15];
 									buf += strlen(buf);
 									strcpy(buf," , ");
 									buf += strlen(buf);
-									len = *code++;
+									len = (unsigned char)*code++;
 									memcpy(buf,code,len);
 									buf += len;
 									code += len;
@@ -6845,7 +6845,7 @@ unsigned char cod;//,xtemp[15];
 												i=1;
 												while(((unsigned char)*code) && i++<=3)
 													{
-													 itoa(*code,buf,10);
+													 itoa((unsigned char)*code,buf,10);
 													 buf += strlen(buf);
 													 *buf++=' ';
 													 code++;
@@ -7787,7 +7787,7 @@ int	desexpr(void)
 									((unsigned char)*(code - 1)) == MB_BR || ((unsigned char)*(code - 1)) == MB_BW || ((unsigned char)*(code - 1)) == MB_BW_COIL)
 								{
 										 i = *(code-1);
-										 n = *code++;
+										 n = (unsigned char)*code++;
 								}
 								else
 								{

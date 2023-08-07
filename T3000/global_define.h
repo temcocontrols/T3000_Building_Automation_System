@@ -613,6 +613,7 @@ struct refresh_net_device
     UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
     UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
     UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
+	UCHAR  minitype; //用来确认到底是哪个设备，ESP 设备用了一个主设备;
 };
 
 struct refresh_net_label_info
@@ -1044,12 +1045,27 @@ const CString AirFlowMode[] =
 	_T("0-10V")
 };
 
-const CString AirFlowRange[] =
+const CString AirFlowSensorType[] =
+{
+	_T("SPD31"),  //value 60
+	_T("SPD33")   //value 20
+};
+
+const CString AirFlowRange_SPD31[] =
 {
 	_T("0-50 Pascal"),
 	_T("0-100 Pascal"),
 	_T("0-250 Pascal"),
 	_T("0-500 Pascal")
+};
+
+
+const CString AirFlowRange_SPD33[] =
+{
+	_T("0-750 Pascal"),
+	_T("0-1000 Pascal"),
+	_T("0-1250 Pascal"),
+	_T("0-1500 Pascal")
 };
 
 const CString AirFlowUnit[] =
@@ -1230,12 +1246,13 @@ typedef enum
 	MINIPANELARM = 5,
 	MINIPANELARM_LB = 6,
 	MINIPANELARM_TB = 7,
-    MINIPANELARM_NB = 8,
-    T3_TSTAT10    = 9,
-    T3_OEM        = 11,
-    T3_TB_11I = 12,
+	MINIPANELARM_NB = 8,
+	T3_TSTAT10 = 9,
+	T3_OEM = 11,
+	T3_TB_11I = 12,
 	T3_FAN_MODULE = 13,
-	T3_OEM_12I   = 14,
+	T3_OEM_12I = 14,
+	T3_AIRLAB = 15,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -2239,6 +2256,7 @@ typedef union
         UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
         UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
         UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
+		UCHAR  minitype;     //用来确认到底是哪个设备，ESP 设备用了一个主设备;
 	}reg;
 }Str_UPD_SCAN;
 
@@ -2875,6 +2893,9 @@ enum
 	TREE_IO_ONLINE,
 	TREE_IO_UNKNOWN,
 };
+
+
+
 
 
 

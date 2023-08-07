@@ -47,14 +47,14 @@ CT3000App::CT3000App()
     CurrentT3000Version.ReleaseBuffer();
 
     //******************************************************
-    // Release �汾����ʱ���δ˶Σ��˶� ��Ҫ���ڵ���ʱ ��ʾ ������ �����ӵİ汾.
+    // Release 版本发布时屏蔽此段，此段 主要用于调试时 显示 具体是 几点钟的版本.
 //#ifdef _DEBUG
-    char strTime[128] = { 0 }; // ȡСʱ�� С�汾��;
-    CString Test_Version;  //   TIME ��DATE    
+    char strTime[128] = { 0 }; // 取小时当 小版本号;
+    CString Test_Version;  //   TIME 和DATE    
     memcpy(strTime, __TIME__, 2);
     MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
     Test_Version.ReleaseBuffer();
-	CurrentT3000Version= CurrentT3000Version  + Test_Version; //�ŷ� : Release �淢����ʱ�� ������ε��ͺ��� �����Զ���ȡ���������.
+	CurrentT3000Version= CurrentT3000Version  + Test_Version; //杜帆 : Release 版发布的时候 这句屏蔽掉就好了 ，会自动获取编译的日期.
 //#endif 
     //*******************************************************
     
@@ -121,13 +121,13 @@ void CT3000App::UpdateDB()
 		q.finalize();
 		SqliteDBT3000.closedb();
 
-        remove((UTF8MBSTR)g_strDatabasefilepath);//ɾ��ԭ�е����ݿ�
+        remove((UTF8MBSTR)g_strDatabasefilepath);//删掉原有的数据库
 
         CString FilePath;
         HANDLE hFind;
         WIN32_FIND_DATA wfd;
         hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-        if (hFind==INVALID_HANDLE_VALUE)//�����ڸ��ļ�
+        if (hFind==INVALID_HANDLE_VALUE)//不存在该文件
         {
            
             FilePath=g_strExePth+_T("Database\\T3000.db");
@@ -197,8 +197,8 @@ BOOL CT3000App::InitInstance()
 	 
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
-    //2018 04 23 �޸�bug Ĭд����ϵͳ����C�̵������װ�ؼ�ʧ��
-    //����취  ��ȡϵͳ�����̷� ��Ȼ���ȡ��Ӧ����.
+    //2018 04 23 修复bug 默写操作系统不是C盘的情况安装控件失败
+    //解决办法  获取系统所在盘符 ，然后采取对应操作.
     CString Local_System_Path;
     TCHAR szPath[MAX_PATH];
     DWORD ret;
@@ -211,7 +211,7 @@ BOOL CT3000App::InitInstance()
 	{
 		//if (ReadDLLRegAsm()<1)
 		{
-#if 1 // �ŷ�����  �� ����ɱ������ ��⵽  RegAsm.exe �ķ��ʲ��Ϸ��� ������;
+#if 1 // 杜帆屏蔽  ， 许多杀毒软件 检测到  RegAsm.exe 的访问不合法， 报病毒;
             CString temp_dotnet_path;
             CString temp_t3000controlldll_path;
             CString temp_bacnetdll;
@@ -357,7 +357,7 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_folder = FindFirstFile(g_achive_folder, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//Ŀ¼����
+				//目录存在
 				ret = TRUE;
 
 			}
@@ -376,7 +376,7 @@ BOOL CT3000App::InitInstance()
 			hFind_folder = FindFirstFile(g_achive_folder_temp_txt, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//Ŀ¼����
+				//目录存在
 				ret = TRUE;
 
 			}
@@ -396,7 +396,7 @@ BOOL CT3000App::InitInstance()
 			hFind_folder = FindFirstFile(g_achive_folder_temp_db, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//Ŀ¼����
+				//目录存在
 				ret = TRUE;
 
 			}
@@ -432,15 +432,15 @@ BOOL CT3000App::InitInstance()
 		 
 			g_strDatabasefilepath+=_T("Database\\T3000.db");//
 
-#if 1//����]��T3000 ����r��
+#if 1//如果沒有T3000 的情況下
 
 			CString FilePath;
  
 			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-			if (hFind==INVALID_HANDLE_VALUE)//˵����ǰĿ¼����t3000.mdb
+			if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
 			{
 				
-				//û���ҵ��ʹ���һ��Ĭ�ϵ����ݿ�
+				//没有找到就创建一个默认的数据库
 				FilePath=g_strExePth+_T("Database\\T3000.db");
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -465,9 +465,9 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_Monitor;//
 			WIN32_FIND_DATA wfd_monitor;//
 			hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
-			if (hFind_Monitor==INVALID_HANDLE_VALUE)//˵����ǰĿ¼����MonitorData.db
+			if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.db
 			{
-				//û���ҵ��ʹ���һ��Ĭ�ϵ����ݿ�
+				//没有找到就创建一个默认的数据库
 				FilePath_Monitor= g_achive_monitor_datatbase_path;
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB2), _T("MONITOR_DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -493,7 +493,7 @@ BOOL CT3000App::InitInstance()
 
 			if (First_Start)
 			{
-				//����Default_Building
+				//创建Default_Building
 				CString filebuildingPath;//=g_strBuildingFolder+m_Building.at(i).Main_BuildingName+_T("\\"); 
 				filebuildingPath.Format(_T("%sDefault_Building\\"),g_strBuildingFolder);
 				CreateDirectory(g_strBuildingFolder,NULL);
@@ -509,7 +509,7 @@ BOOL CT3000App::InitInstance()
 				//create building db file
 
 				hFind = FindFirstFile(filebuildingPath, &wfd);//
-				if (hFind==INVALID_HANDLE_VALUE)//˵����ǰĿ¼����t3000.mdb
+				if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
 				{
 
 					HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDINGDB1), _T("BUILDINGDB"));   
@@ -649,7 +649,7 @@ BOOL CT3000App::InitInstance()
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
        m_szAppPath  = g_strExePth;
-       if(m_special_customer == 1) //����ǵ�һ���ͻ� �Ͷ���ΪCPR-1000-Help.chm
+       if(m_special_customer == 1) //如果是第一个客户 就定义为CPR-1000-Help.chm
            m_szHelpFile = theApp.m_szAppPath + L"CPR-1000-Help.chm";
        else
             m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";

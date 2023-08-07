@@ -15,6 +15,10 @@
 #include "Class/md5.h"
 
 #include "BacnetWebView.h"
+
+#include "JsonHead.h"
+
+
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
 extern vector <MSG> My_Receive_msg;
 extern CCriticalSection MyCriticalSection;
@@ -800,6 +804,211 @@ void BacnetScreen::Unreg_Hotkey()
 
 void BacnetScreen::OnBnClickedInsert()
 {
+#if _DEBUG
+	using json = nlohmann::json;
+	char text[] = R"(
+    {
+     "activeItemIndex":14,
+    "customObjectsCount":0,
+    "elementGuidelines":[
+
+    ],
+    "groupCount":9,
+    "itemsCount":24,
+    "selectedTargets":[
+
+    ],
+"items":[
+        {
+            "active":true,
+            "group":9,
+            "height":53,
+            "id":1,
+            "rotate":0,
+            "scaleX":1,
+            "scaleY":1,
+            "settings":{
+                "active":true,
+                "bgColor":"inherit",
+                "fontSize":16,
+                "inAlarm":false,
+                "t3EntryDisplayField":"control",
+                "textColor":"inherit",
+                "titleColor":"inherit"
+            },
+            "t3Entry":{
+                "auto_manual":0,
+                "calibration_h":0,
+                "calibration_l":0,
+                "calibration_sign":1,
+                "command":"144IN7",
+                "control":1,
+                "description":"IN7",
+                "digital_analog":1,
+                "filter":5,
+                "id":"IN7",
+                "index":6,
+                "label":"IN7",
+                "pid":144,
+                "range":3,
+                "type":"INPUT",
+                "unit":3,
+                "value":-40000
+            },
+            "title":null,
+            "translate":[
+                22,
+                167,
+                0,
+                0
+            ],
+            "width":65
+        },
+        {
+            "active":false,
+            "group":3,
+            "height":77,
+            "id":2,
+            "rotate":2,
+            "scaleX":111,
+            "scaleY":11,
+            "settings":{
+                "active":false,
+                "bgColor":"inherit",
+                "fontSize":16,
+                "inAlarm":false,
+                "t3EntryDisplayField":"control",
+                "textColor":"inherit",
+                "titleColor":"inherit"
+            },
+            "t3Entry":{
+                "auto_manual":1,
+                "command":"144OUT3",
+                "control":0,
+                "description":"OUT2",
+                "digital_analog":1,
+                "high_voltage":0,
+                "hw_switch_status":1,
+                "id":"OUT1",
+                "index":8,
+                "label":"OUT9",
+                "low_voltage":0,
+                "pid":144,
+                "range":0,
+                "type":"OUTPUT",
+                "value":0
+            },
+            "title":null,
+            "translate":[
+                117,
+                114,
+                0,
+                0
+            ],
+            "type":"Fan",
+            "width":15,
+            "zindex":1
+        },
+        {
+            "active":false,
+            "group":2,
+            "height":77,
+            "id":2,
+            "rotate":0,
+            "scaleX":1,
+            "scaleY":1,
+            "settings":{
+                "active":false,
+                "bgColor":"inherit",
+                "fontSize":16,
+                "inAlarm":false,
+                "t3EntryDisplayField":"control",
+                "textColor":"inherit",
+                "titleColor":"inherit"
+            },
+            "t3Entry":{
+                "auto_manual":0,
+                "command":"144OUT9",
+                "control":0,
+                "description":"OUT9",
+                "digital_analog":1,
+                "high_voltage":0,
+                "hw_switch_status":1,
+                "id":"OUT9",
+                "index":8,
+                "label":"OUT9",
+                "low_voltage":0,
+                "pid":144,
+                "range":0,
+                "type":"OUTPUT",
+                "value":0
+            },
+            "title":null,
+            "translate":[
+                167,
+                154,
+                0,
+                0
+            ],
+            "type":"Fan",
+            "width":65,
+            "zindex":1
+        }
+      ],   
+    "version":"0.4.4",
+    "viewportTransform":{
+        "scale":1,
+        "x":0,
+        "y":0
+    } 
+}
+    )";
+
+	// parse and serialize JSON
+	//json j_complete = json::parse(text);
+
+
+
+#if 0
+	json j;
+	j["name"] = "Ned Flanders";
+	j["address"] = "744 Evergreen Terrace";
+	j["age"] = 60;
+
+	auto p = j.template get<ns::person>();
+
+	std::cout << p.name << " (" << p.age << ") lives in " << p.address << std::endl;
+#endif
+	// JSON string representing the data
+#if 1
+	//Test use this json file
+	CString fn = _T("C:\\Work\\T3000_Building_Automation_System\\T3000 Output\\debug\\Database\\Buildings\\Default_Building\\image\\178157_0.txt");//这里如果用VS可能要来个强制转换(char*)"a.txt"
+
+	CFile filelib;
+	filelib.Open(fn, CFile::modeRead, NULL);
+	DWORD len = filelib.GetLength();
+
+	WCHAR* nlibbuff = new WCHAR[len + 1];
+	memset(nlibbuff, 0, 2 * (len + 1));
+	filelib.Read(nlibbuff, len * 2 + 1);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
+	wstring nbuff_wstring(nlibbuff);
+	string file_content(nbuff_wstring.begin(), nbuff_wstring.end());
+	//tempjson["library"] = file_content;
+	filelib.Close();
+	delete nlibbuff;
+
+	json jsonData = json::parse(nbuff_wstring);
+#endif
+	//json jsonData = json::parse(text);
+
+	// Convert JSON data to the struct using the constructor
+	Str_Json Str_MyJson(jsonData);
+
+	// Access and print the struct members
+	//std::cout << "Name: " << person.name << std::endl;
+	//std::cout << "Age: " << person.age << std::endl;
+	//std::cout << "Occupation: " << person.occupation << std::endl;
+#endif
 	PostMessage(WM_HOTKEY,KEY_INSERT,NULL);
 }
 

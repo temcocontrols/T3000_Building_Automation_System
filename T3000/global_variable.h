@@ -1857,6 +1857,8 @@ int bacnet_device_type;
 int g_bac_instance;
 unsigned int g_sub_instace;
 unsigned int g_selected_serialnumber;
+unsigned char refresh_input;
+unsigned char refresh_output;
 unsigned int g_selected_product_id;
 unsigned short g_mac;
 HWND MainFram_hwd;

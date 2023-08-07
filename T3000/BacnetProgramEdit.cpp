@@ -14,6 +14,7 @@
 #include "BacnetProgramSetting.h"
 #include "BacnetProgramDebug.h"
 #include "MainFrm.h"
+bool need_syntax = false;
 extern tree_product selected_product_Node; // 选中的设备信息;
 extern CBacnetProgramEdit *ProgramEdit_Window;
 #define  WM_RICHEDIT_RIGHT_CLICK  WM_USER + 1001
@@ -46,6 +47,7 @@ CString high_light_string;
 HWND mParent_Hwnd;
 
 bool show_upper;
+bool program_re_line_number;
 DWORD prg_text_color;
 DWORD prg_label_color;
 DWORD prg_command_color;
@@ -97,6 +99,7 @@ BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
 //	ON_WM_RBUTTONDOWN()
 	ON_COMMAND(ID_PROPERTIES_GOTODEFINITION, &CBacnetProgramEdit::OnPropertiesGotodefinition)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_EDIT_HELP, &CBacnetProgramEdit::OnBnClickedButtonProgramEditHelp)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -198,7 +201,7 @@ void CBacnetProgramEdit::GetColor()
 	prg_command_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Command Color"),DEFAULT_PRG_COMMAND_COLOR,g_cstring_ini_path);
 	prg_function_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Function Color"),DEFAULT_PRG_FUNCTION_COLOR,g_cstring_ini_path);
     prg_local_var_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"), _T("LOVAL_VAR Color"), DEFAULT_PRG_LOCAL_VAR_COLOR, g_cstring_ini_path);
-
+	program_re_line_number = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"), _T("Redefine_LineNumber"), 1, g_cstring_ini_path);
 
 	show_upper = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Upper Case"),1,g_cstring_ini_path);
 	GetPrivateProfileString(_T("Program_IDE_Color"),_T("Text Font"),_T("Arial"),prg_character_font.GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
@@ -321,7 +324,15 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	
 	//	CString temp2;
 	char * temp_point;
- 	temp_point = desassembler_program();
+	try
+	{
+		temp_point = desassembler_program();
+	}
+	catch (...)
+	{
+		temp_point = NULL;
+	}
+ 	
 	if(temp_point == NULL)
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Decode Error!"));
@@ -418,7 +429,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetReadOnly(TRUE);
 	memset(program_code[program_list_line],0,2000);
 
-	renumvar = 1;
+	renumvar = program_re_line_number;
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
@@ -515,9 +526,9 @@ void CBacnetProgramEdit::Syntax_analysis()
 
 		value_test = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetScrollPos (SB_VERT,value_test,1);
 
+		((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SendMessage(WM_VSCROLL, 0, 0);
 
-
-
+		program_code_length[program_list_line] = my_lengthcode;
 	//Invalidate(0);
 	//not a variable
 }
@@ -527,7 +538,7 @@ void CBacnetProgramEdit::OnSend()
 	//reset the program buffer
 	memset(program_code[program_list_line],0,2000);
 
-	renumvar = 1;
+	renumvar = program_re_line_number;
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
@@ -552,7 +563,7 @@ void CBacnetProgramEdit::OnSend()
 	
 		TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"),program_code_length[program_list_line],my_lengthcode );
 
-		if(my_lengthcode > 1920)
+		if(my_lengthcode > 1960)
 		{
 			MessageBox(_T("Encode Program Code Length is too large"));
 			return;
@@ -588,6 +599,11 @@ void CBacnetProgramEdit::OnSend()
 		memset(program_code[program_list_line],0,2000);
 		memcpy_s(program_code[program_list_line],my_lengthcode,mycode,my_lengthcode);
 		program_code_length[program_list_line] = program_code[program_list_line][1] *256 + (unsigned char)program_code[program_list_line][0];
+		if ((my_lengthcode > program_code_length[program_list_line]) &&
+			my_lengthcode < 2000)
+		{
+			program_code_length[program_list_line] = my_lengthcode;
+		}
 		bac_program_size = program_code_length[program_list_line];// my_lengthcode;
 		bac_free_memory = 2000 - bac_program_size;
 
@@ -978,7 +994,10 @@ void CBacnetProgramEdit::OnProgramIdeSettings()
 		tempcs.MakeLower();
 	}
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(tempcs);
+	refresh_program_text_color = true;
+	need_syntax = true; //刷新颜色
 	Syntax_analysis();
+
 }
 
 int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
@@ -1135,7 +1154,7 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 	return true;
 }
 
-bool need_syntax = false;
+
 
 void CBacnetProgramEdit::OnTimer(UINT_PTR nIDEvent)
 {
@@ -1352,4 +1371,54 @@ void CBacnetProgramEdit::OnBnClickedButtonProgramEditHelp()
 	temp_demo_prog = g_strExePth + _T("T3000_Help.chm");
 	ShellExecute(this->m_hWnd, _T("open"), temp_demo_prog, NULL, NULL, SW_SHOWNORMAL);
 
+}
+
+
+void CBacnetProgramEdit::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	CRect rc;
+	GetClientRect(rc);
+	//GetDlgItem(IDC_BUTTON_PROGRAM_EDIT)->MoveWindow(rc.left + 20, rc.bottom - 60, 120, 50);
+	TRACE(_T("cx = %d , cy = %d\r\n"), cx, cy);
+	if (m_information_window.m_hWnd != NULL)
+	{
+		((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->MoveWindow(rc.left, rc.top, rc.Width(), rc.Height() - 120);
+		if (cy > 120)
+			m_information_window.MoveWindow(rc.left, cy - 120, rc.Width() - 360, 120);
+		CRect rcCtrl;
+		GetDlgItem(IDC_BUTTON_PROGRAM_EDIT_HELP)->GetWindowRect(rcCtrl);
+		ScreenToClient(rcCtrl);
+
+		GetDlgItem(IDC_BUTTON_PROGRAM_EDIT_HELP)->SetWindowPos(NULL,cx - 350, cy - 100,	0, 0,  SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_PRG_GROUP)->SetWindowPos(NULL, cx - 250, cy - 120, 0, 0, SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_POOL_1)->SetWindowPos(NULL, cx - 245, cy - 100, 0, 0, SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_SIZE_1)->SetWindowPos(NULL, cx - 245, cy - 75, 0, 0, SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_FREE_1)->SetWindowPos(NULL, cx - 245, cy - 50, 0, 0, SWP_NOSIZE);
+		m_pool_size.SetWindowPos(NULL, cx - 140, cy - 100, 0, 0, SWP_NOSIZE);
+		m_program_size.SetWindowPos(NULL, cx - 140, cy - 75, 0, 0, SWP_NOSIZE);
+		m_free_memory.SetWindowPos(NULL, cx - 140, cy - 50, 0, 0, SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_POOL_2)->SetWindowPos(NULL, cx - 85, cy - 100, 0, 0, SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_SIZE_2)->SetWindowPos(NULL, cx - 85, cy - 75, 0, 0, SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_FREE_2)->SetWindowPos(NULL, cx - 85, cy - 50, 0, 0, SWP_NOSIZE);
+		if (cx < 1100)
+		{
+			//GetDlgItem(IDC_STATIC_PRG_GROUP)->ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_STATIC_POOL_1)->ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_STATIC_SIZE_1)->ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_STATIC_FREE_1)->ShowWindow(SW_HIDE);
+			//m_pool_size.ShowWindow(SW_HIDE);
+			//m_program_size.ShowWindow(SW_HIDE);
+			//m_free_memory.ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_STATIC_POOL_2)->ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_STATIC_SIZE_2)->ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_STATIC_FREE_2)->ShowWindow(SW_HIDE);
+		}
+
+
+		
+	}
+	Invalidate(1);
+	// TODO: 在此处添加消息处理程序代码
 }

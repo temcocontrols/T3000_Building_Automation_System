@@ -51,4 +51,5 @@ public:
     CEdit m_edit_zone_name;
     //afx_msg void OnEnKillfocusEditSettingAliasName();
     afx_msg void OnEnKillfocusEditSettingBipNetwork2();
+    afx_msg void OnEnKillfocusEditSettingMstpNetwork();
 };

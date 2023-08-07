@@ -50,6 +50,7 @@ BEGIN_MESSAGE_MAP(CAirFlowSensor, CFormView)
 	ON_EN_KILLFOCUS(IDC_EDIT_CURRENT_MAX, &CAirFlowSensor::OnEnKillfocusEditCurrentMax)
 	ON_EN_KILLFOCUS(IDC_EDIT_PASCAL_MIN, &CAirFlowSensor::OnEnKillfocusEditPascalMin)
 	ON_EN_KILLFOCUS(IDC_EDIT_PASCAL_MAX, &CAirFlowSensor::OnEnKillfocusEditPascalMax)
+	ON_CBN_SELCHANGE(IDC_COMBO_AIRFLOW_SENSOR_TYPE, &CAirFlowSensor::OnCbnSelchangeComboAirflowSensorType)
 END_MESSAGE_MAP()
 
 
@@ -86,11 +87,30 @@ void CAirFlowSensor::InitialUI()
     ((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->AddString(AirFlowMode[0]);
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->AddString(AirFlowMode[1]);
 
-	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->ResetContent();
-	for (int z = 0; z < sizeof(AirFlowRange) / sizeof(AirFlowRange[0]); z++)
+	
+	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->ResetContent();
+	for (int z = 0; z < sizeof(AirFlowSensorType) / sizeof(AirFlowSensorType[0]); z++)
 	{
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->AddString(AirFlowRange[z]);
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->AddString(AirFlowSensorType[z]);
 	}
+
+
+	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->ResetContent();
+	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
+	{
+		for (int z = 0; z < sizeof(AirFlowRange_SPD33) / sizeof(AirFlowRange_SPD33[0]); z++)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->AddString(AirFlowRange_SPD33[z]);
+		}
+	}
+	else
+	{
+		for (int z = 0; z < sizeof(AirFlowRange_SPD31) / sizeof(AirFlowRange_SPD31[0]); z++)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->AddString(AirFlowRange_SPD31[z]);
+		}
+	}
+
 	
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->ResetContent();
 	for (int z = 0; z < sizeof(AirFlowUnit) / sizeof(AirFlowUnit[0]); z++)
@@ -118,12 +138,31 @@ void CAirFlowSensor::UpdateUserInterface()
 	else
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(_T(""));
 
-	if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
+	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[1]);
+	else
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[0]);
+
+
+	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
 	{
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
+		if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange_SPD33[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
+		}
+		else
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
 	}
 	else
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
+	{
+		if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange_SPD31[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
+		}
+		else
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
+	}
+
 	
 	if (product_register_value[MODBUS_FLOW_UNIT] < 3)
 	{
@@ -371,22 +410,45 @@ void CAirFlowSensor::OnCbnSelchangeComboAirflowRange()
 	CString temp_string;
 	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->GetCurSel();
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->GetLBText(nSel, temp_string);
-	if (temp_string.CompareNoCase(AirFlowRange[0]) == 0)
+	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
 	{
-		n_value = 0;
+		if (temp_string.CompareNoCase(AirFlowRange_SPD33[0]) == 0)
+		{
+			n_value = 0;
+		}
+		else if (temp_string.CompareNoCase(AirFlowRange_SPD33[1]) == 0)
+		{
+			n_value = 1;
+		}
+		else if (temp_string.CompareNoCase(AirFlowRange_SPD33[2]) == 0)
+		{
+			n_value = 2;
+		}
+		else if (temp_string.CompareNoCase(AirFlowRange_SPD33[3]) == 0)
+		{
+			n_value = 3;
+		}
 	}
-	else if (temp_string.CompareNoCase(AirFlowRange[1]) == 0)
+	else
 	{
-		n_value = 1;
+		if (temp_string.CompareNoCase(AirFlowRange_SPD31[0]) == 0)
+		{
+			n_value = 0;
+		}
+		else if (temp_string.CompareNoCase(AirFlowRange_SPD31[1]) == 0)
+		{
+			n_value = 1;
+		}
+		else if (temp_string.CompareNoCase(AirFlowRange_SPD31[2]) == 0)
+		{
+			n_value = 2;
+		}
+		else if (temp_string.CompareNoCase(AirFlowRange_SPD31[3]) == 0)
+		{
+			n_value = 3;
+		}
 	}
-	else if (temp_string.CompareNoCase(AirFlowRange[2]) == 0)
-	{
-		n_value = 2;
-	}
-	else if (temp_string.CompareNoCase(AirFlowRange[3]) == 0)
-	{
-		n_value = 3;
-	}
+
 
 	if (write_one(g_tstat_id, MODBUS_SWITCH_DP_RANGE, n_value) > 0)
 	{
@@ -535,7 +597,7 @@ void CAirFlowSensor::OnPaint()
 	//将客户区选中到控件表示的矩形区域内  
 	ScreenToClient(&rect);
 	//窗口移动到控件表示的区域  
-	GetDlgItem(IDC_STATIC_SHAPE)->MoveWindow(rect.left, rect.top, cx, cy, TRUE);
+	GetDlgItem(IDC_STATIC_SHAPE)->MoveWindow(rect.left, rect.top, cx/3, cy/3, TRUE);
 	CWnd* pWnd = NULL;
 	pWnd = GetDlgItem(IDC_STATIC_SHAPE);
 	pWnd->GetClientRect(&rect);
@@ -605,27 +667,53 @@ void CAirFlowSensor::OnPaint()
 			pointF.X = ORIGIN_X;
 			pointF.Y = ORIGIN_Y + 5;
 
-
-			if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 0)
+			if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
 			{
-				cs_show_info4 = _T("50 Pascal");
-				default_max_pascal = 50;
+				if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 0)
+				{
+					cs_show_info4 = _T("750 Pascal");
+					default_max_pascal = 750;
+				}
+				else if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 1)
+				{
+					cs_show_info4 = _T("1000 Pascal");
+					default_max_pascal = 1000;
+				}
+				else if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 2)
+				{
+					cs_show_info4 = _T("1250 Pascal");
+					default_max_pascal = 1250;
+				}
+				else if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 3)
+				{
+					cs_show_info4 = _T("1500 Pascal");
+					default_max_pascal = 1500;
+				}
 			}
-			else if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 1)
+			else
 			{
-				cs_show_info4 = _T("100 Pascal");
-				default_max_pascal = 100;
+				if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 0)
+				{
+					cs_show_info4 = _T("50 Pascal");
+					default_max_pascal = 50;
+				}
+				else if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 1)
+				{
+					cs_show_info4 = _T("100 Pascal");
+					default_max_pascal = 100;
+				}
+				else if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 2)
+				{
+					cs_show_info4 = _T("250 Pascal");
+					default_max_pascal = 250;
+				}
+				else if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 3)
+				{
+					cs_show_info4 = _T("500 Pascal");
+					default_max_pascal = 500;
+				}
 			}
-			else if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 2)
-			{
-				cs_show_info4 = _T("250 Pascal");
-				default_max_pascal = 250;
-			}
-			else if (product_register_value[MODBUS_SWITCH_DP_RANGE] == 3)
-			{
-				cs_show_info4 = _T("500 Pascal");
-				default_max_pascal = 500;
-			}
+			
 		}
 		else
 		{
@@ -1084,4 +1172,35 @@ BOOL CAirFlowSensor::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 	return CFormView::PreTranslateMessage(pMsg);
+}
+
+
+void CAirFlowSensor::OnCbnSelchangeComboAirflowSensorType()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int n_value = 0;
+	CString temp_string;
+	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->GetCurSel();
+	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->GetLBText(nSel, temp_string);
+
+	if (temp_string.CompareNoCase(AirFlowSensorType[0]) == 0)
+	{
+		n_value = 60;
+	}
+	else if (temp_string.CompareNoCase(AirFlowSensorType[1]) == 0)
+	{
+		n_value = 20;
+	}
+
+	if (write_one(g_tstat_id, MODBUS_SENSOR_TYPE, n_value) > 0)
+	{
+		product_register_value[MODBUS_SENSOR_TYPE] = n_value;
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Select Airflow Sensor Success"));
+		InitialUI();
+	}
+	else
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Select Airflow Sensor Timeout"));
+	}
+
 }

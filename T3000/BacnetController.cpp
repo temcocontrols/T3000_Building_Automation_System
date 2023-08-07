@@ -227,6 +227,9 @@ void BacnetController::Initial_List()
 				m_controller_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
 		}
 	}
+	m_controller_list.Special_ToolTips(CONTROLLER_ACTION, _T(" Set this to กฎ+กฏ for systems like cooling where the action increases when the temperature is above the setpoint.\r\n\r\n\
+Set this to กฎ-กฎ for systems like heating where the action increases when the temperature is below setpoint.\r\n\r\n\
+For more info  on PIDs check out the help documents. "), 1);
 	m_controller_list.InitListData();
 		m_controller_list.ShowWindow(SW_SHOW);
 }
@@ -770,7 +773,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 			else
 			{
 				CString temp_message;
-				temp_message.Format(_T("%s character not allowed in labels!"),cs_temp.GetString());
+				temp_message.Format(_T("%s not found in the system database.Please check spelling!"),cs_temp.GetString());
 				
 				MessageBox(temp_message,_T("Information"),MB_OK |MB_ICONINFORMATION);
 				m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
@@ -1084,7 +1087,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
         
             if (m_controller_data.at(lRow).action == 0)
             {
-                if (IDYES == MessageBox(_T("Change to '+'?It is for a system that will react when the sensor is ABOVE the setpoint such as cooling."), _T("Warning"), MB_YESNOCANCEL | MB_ICONINFORMATION))
+                if (IDYES == MessageBox(_T("Set this to กฎ+กฏ for systems like cooling where the action increases when the temperature is above the setpoint."), _T(" "), MB_YESNOCANCEL | MB_ICONINFORMATION))
                 {
                     m_controller_data.at(lRow).action = 1;
                     m_controller_list.SetItemText(lRow, lCol, _T("+"));
@@ -1097,7 +1100,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
             }
             else
             {
-                if (IDYES == MessageBox(_T("Change to '-'? It is used on a system that will react when the sensor is BELOW the setpoint such as heating."), _T("Note"), MB_YESNOCANCEL | MB_ICONINFORMATION))
+                if (IDYES == MessageBox(_T("Set this to กฎ-กฎ for systems like heating where the action increases when the temperature is below setpoint."), _T(" "), MB_YESNOCANCEL | MB_ICONINFORMATION))
                 {
                     m_controller_data.at(lRow).action = 0;
                     m_controller_list.SetItemText(lRow, lCol, _T("-"));

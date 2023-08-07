@@ -146,10 +146,14 @@ namespace ListCtrlEx
         int m_nSubItem;                //存放行号
         int m_nItem;                //存放列号
         BOOL m_bEnableTips;
+		bool m_bUser_tips; //使能自定义提示信息
+		int  n_tip_colomn; //需要显示自定义tip的列
+		CString n_tip_message; //自定义tip的消息
 		int InsertItem(int nIndex, LPCTSTR lpText);
 
 // operations
 	public:
+		void                Special_ToolTips(int ncolomn, CString ntemp, int b_special_tool = 0);
 		void                Dont_DT_Left();
 		void				Support_Col_0_Edit(bool b_support);
 		void				Support_Keyboard(bool b_support);

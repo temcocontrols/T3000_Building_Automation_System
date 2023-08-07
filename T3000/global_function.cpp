@@ -8345,11 +8345,23 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         }
     }
 
+    if (nBufLen >= 68)
+    {
+        temp_data.reg.minitype = *(my_temp_point++);
+    }
+
 
 	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
 	CString nip_address;
 	nip_address.Format(_T("%u.%u.%u.%u"),temp_data.reg.ip_address_1,temp_data.reg.ip_address_2,temp_data.reg.ip_address_3,temp_data.reg.ip_address_4);
 	CString nproduct_name = GetProductName(temp_data.reg.product_id);
+    if (temp_data.reg.product_id == PM_ESP32_T3_SERIES) // esp32 系列 需要具体查看子产品 
+    {
+        if (temp_data.reg.minitype == T3_AIRLAB)
+        {
+            nproduct_name = _T("Airlab");
+        }
+    }
 	if(nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
 	{
         if (temp_data.reg.product_id == 0)
@@ -8411,7 +8423,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
     temp.command_version = temp_data.reg.command_version;
     temp.subnet_baudrate = temp_data.reg.subnet_baudrate;
     temp.subnet_port = temp_data.reg.subnet_port;
-
+    temp.minitype = temp_data.reg.minitype;
     if (temp.nprotocol == MODBUS_RS485)   //通过64 命令回的 都属于网络的modbus tcp ，除非直接回 12 
         temp.nprotocol = MODBUS_TCPIP;
     char * temp_point = NULL;
@@ -8456,7 +8468,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	}
 
 #ifdef DEBUG
-    if (nip_address.CompareNoCase(_T("192.168.0.144"))== 0)
+    if (nip_address.CompareNoCase(_T("192.168.0.114"))== 0)
     {
         //t2 = GetTickCount();
         //CString temp_time_print;

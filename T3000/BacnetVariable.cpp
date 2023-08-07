@@ -1272,14 +1272,14 @@ void CBacnetVariable::OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESUL
 	m_variable_time_picker.ShowWindow(SW_HIDE);
 
 	int write_value;
-	if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
-	{
+	//if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
+	//{
 		write_value = (chour * 3600 + cmin * 60 + csend) * 1000;
-	}
-	else
-	{
-		write_value = (chour * 100 * 1000 + cmin * 1000 + csend * 10);
-	}
+	//}
+	//else
+	//{
+	//	write_value = (chour * 100 * 1000 + cmin * 1000 + csend * 10);
+	//}
 
 	m_Variable_data.at(m_row).value = write_value;
 	CString temp_task_info;

@@ -393,7 +393,7 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 
 
         CString temp_exe_time;
-		if (m_Program_data.at(i).com_prg >= 10)
+		if (m_Program_data.at(i).com_prg >= 50)
 			temp_exe_time = _T("Endless Loop");
 		else
 			temp_exe_time.Format(_T("%u ms"), m_Program_data.at(i).com_prg);

@@ -2723,7 +2723,7 @@ void CAirQuality::Initial_OutputList()
 
 	if (m_product_model == PM_HUMTEMPSENSOR)
 	{
-		AddressValue = 187;
+		AddressValue = 186;
 	}
 	else
 	{
@@ -2887,7 +2887,7 @@ void CAirQuality::Initial_OutputList()
 			{
 				m_output_list.SetItemText(1, 6,Global_String_AUTO);
 				HUM = ((float)((short)product_register_value[373])) / 10;
-				if (product_register_value[187] == 1)
+				if (product_register_value[186] == 1)  //187 改186 修改原因是187 固件没有处理，所以退一步改186
 				{
 					Vhum = HUM / 10;
 					if (Vhum > 10)
@@ -2900,7 +2900,7 @@ void CAirQuality::Initial_OutputList()
 					}
 					humsignal.Format(_T("%.2fv"), Vhum);
 				}
-				else if (product_register_value[187] == 2)
+				else if (product_register_value[186] == 2) //187 改186 修改原因是187 固件没有处理，所以退一步改186
 				{
 					Vhum = HUM / 20;
 					if (Vhum > 5)
@@ -2913,7 +2913,7 @@ void CAirQuality::Initial_OutputList()
 					}
 					humsignal.Format(_T("%.2fv"), Vhum);
 				}
-				else if (product_register_value[187] == 3)
+				else if (product_register_value[186] == 3) //187 改186 修改原因是187 固件没有处理，所以退一步改186
 				{
 					Vhum = (HUM / 100) * 16 + 4;
 					if (Vhum > 20)
@@ -2935,7 +2935,7 @@ void CAirQuality::Initial_OutputList()
 			{
 				m_output_list.SetItemText(1, 6,Global_String_MANUAL);
 				HUM = ((float)((short)product_register_value[372])) / 10;
-				if (product_register_value[187] == 1)
+				if (product_register_value[186] == 1)
 				{
 					Vhum = HUM / 10;
 					if (Vhum > 10)
@@ -2948,7 +2948,7 @@ void CAirQuality::Initial_OutputList()
 					}
 					humsignal.Format(_T("%.2fv"), Vhum);
 				}
-				else if (product_register_value[187] == 2)
+				else if (product_register_value[186] == 2)
 				{
 					Vhum = HUM / 20;
 					if (Vhum > 5)
@@ -2961,7 +2961,7 @@ void CAirQuality::Initial_OutputList()
 					}
 					humsignal.Format(_T("%.2fv"), Vhum);
 				}
-				else if (product_register_value[187] == 3)
+				else if (product_register_value[186] == 3)
 				{
 					Vhum = (HUM / 100) * 16 + 4;
 					if (Vhum > 20)
@@ -3115,7 +3115,7 @@ void CAirQuality::Initial_OutputList()
 
 			m_output_list.SetItemText(1, 6,NO_APPLICATION);
 			HUM = ((float)((short)product_register_value[482])) / 10;
-			if (product_register_value[187] == 1)
+			if (product_register_value[186] == 1)
 			{
 				Vhum = HUM / 10;
 				if (Vhum > 10)
@@ -3128,7 +3128,7 @@ void CAirQuality::Initial_OutputList()
 				}
 				humsignal.Format(_T("%.2fv"), Vhum);
 			}
-			else if (product_register_value[187] == 2)
+			else if (product_register_value[186] == 2)
 			{
 				Vhum = HUM / 20;
 				if (Vhum > 5)
@@ -3141,7 +3141,7 @@ void CAirQuality::Initial_OutputList()
 				}
 				humsignal.Format(_T("%.2fv"), Vhum);
 			}
-			else if (product_register_value[187] == 3)
+			else if (product_register_value[186] == 3)
 			{
 				Vhum = (HUM / 100) * 16 + 4;
 				if (Vhum > 20)

@@ -2096,6 +2096,9 @@
     <ClInclude Include="CTransducer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="JsonHead.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc">
