@@ -57,12 +57,17 @@ public:
 	afx_msg void OnEnKillfocusEditPascalMin();
 	afx_msg void OnEnKillfocusEditPascalMax();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnCbnSelchangeComboAirflowSensorType();
 };
 static DWORD WINAPI Update_Airflow_Thread(LPVOID lPvoid);
+
+#define SENSOR_SPD31   60
+#define SENSOR_SPD33   20
 
 #define MODBUS_FIRMWARE_VERSION         4
 #define MODBUS_SWITCH_OUTPUT_MODE       17
 #define MODBUS_SWITCH_DP_RANGE          18
+#define MODBUS_SENSOR_TYPE				29
 #define MODBUS_DIFF_PRESSURE_VALUE      34
 #define MODBUS_FLOW_LENGTH				57
 #define MODBUS_FLOW_WIDTH				58

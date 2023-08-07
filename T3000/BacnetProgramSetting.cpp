@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "BacnetProgramSetting.h"
 #include "afxdialogex.h"
-
+extern bool program_re_line_number;
 extern bool show_upper;
 extern DWORD prg_text_color;
 extern DWORD prg_label_color;
@@ -67,6 +67,8 @@ void CBacnetProgramSetting::OnBnClickedOk()
 	((CComboBox *)GetDlgItem(IDC_COMBO_PRG_SETTING_FONT))->GetWindowText(temp_string);
 
 	int check_ret = ((CButton *)GetDlgItem(IDC_CHECK_PRG_SETTING_UPPER))->GetCheck();
+	int check_re_line = ((CButton*)GetDlgItem(IDC_CHECK_PRG_LINE_NUMBER_RENAME))->GetCheck();
+	
 
 	if( (color_text != prg_text_color)   || 
         (color_label != prg_label_color) || 
@@ -74,8 +76,10 @@ void CBacnetProgramSetting::OnBnClickedOk()
         (color_command != prg_command_color ) ||
         (color_local_var != prg_local_var_color) ||
         (temp_string.CompareNoCase(prg_character_font) != 0) || 
-        (check_ret != show_upper) )
+        (check_ret != show_upper) ||
+		(check_re_line != program_re_line_number))
 	{
+		program_re_line_number = check_re_line;
 		show_upper = check_ret;
 		prg_color_change = true;
 		prg_character_font = temp_string;
@@ -90,12 +94,14 @@ void CBacnetProgramSetting::OnBnClickedOk()
 		CString temp_color_command;
         CString temp_color_local_var;
 		CString temp_upper;
+		CString temp_relinenumber;
 		temp_color_text.Format(_T("%u"),prg_text_color);
 		temp_color_label.Format(_T("%u"),prg_label_color);
 		temp_color_function.Format(_T("%u"),prg_function_color);
 		temp_color_command.Format(_T("%u"),prg_command_color);
         temp_color_local_var.Format(_T("%u"), prg_local_var_color);
 		temp_upper.Format(_T("%d"),show_upper);
+		temp_relinenumber.Format(_T("%d"), program_re_line_number);
 		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Text Color"),temp_color_text,g_cstring_ini_path);
 		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Label Color"),temp_color_label,g_cstring_ini_path);
 		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Function Color"),temp_color_function,g_cstring_ini_path);
@@ -103,6 +109,7 @@ void CBacnetProgramSetting::OnBnClickedOk()
         WritePrivateProfileString(_T("Program_IDE_Color"), _T("LOVAL_VAR Color"), temp_color_local_var, g_cstring_ini_path);
 		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Text Font"),prg_character_font,g_cstring_ini_path);
 		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Upper Case"),temp_upper,g_cstring_ini_path);
+		WritePrivateProfileString(_T("Program_IDE_Color"), _T("Redefine_LineNumber"), temp_relinenumber, g_cstring_ini_path);
 	}
 
 	CDialogEx::OnOK();
@@ -148,6 +155,15 @@ BOOL CBacnetProgramSetting::OnInitDialog()
 	else
 	{
 		((CButton *)GetDlgItem(IDC_CHECK_PRG_SETTING_UPPER))->SetCheck(0);
+	}
+
+	if (program_re_line_number)
+	{
+		((CButton*)GetDlgItem(IDC_CHECK_PRG_LINE_NUMBER_RENAME))->SetCheck(1);
+	}
+	else
+	{
+		((CButton*)GetDlgItem(IDC_CHECK_PRG_LINE_NUMBER_RENAME))->SetCheck(0);
 	}
 
 	for(int j=0;j<sizeof(Program_Fonts)/sizeof(Program_Fonts[0]);j++)

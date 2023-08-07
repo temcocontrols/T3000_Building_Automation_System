@@ -1861,6 +1861,8 @@ try
 			memDC.FillSolidRect(&rect,GetSysColor( COLOR_WINDOW ));//clr);
 
 			memDC.SetBkColor( GetSysColor( COLOR_WINDOW ) );
+
+
 			//向内存中的图片写入内容,为该节点的内容
 			memDC.TextOut( rect.left+2, rect.top+1, sItem );
 			if(tree_offline_mode)
@@ -2565,8 +2567,8 @@ void CImageTreeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 			{
 				if (plvoid->nmcd.lItemlParam == TREE_LP_VIRTUAL_DEVICE) //在添加节点时设置了节点的lParam属性，在这里就利用来判定具体是哪个节点
 				{
-					crText = RGB(200, 200, 200);
-					crBkgnd = RGB(66, 66, 66);
+					crText = RGB(40, 40, 40);
+					crBkgnd = RGB(222, 222, 222);
 
 					plvoid->clrText = crText;  //设置文字颜色
 					plvoid->clrTextBk = crBkgnd;  //设置背景颜色
@@ -2584,8 +2586,10 @@ void CImageTreeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 			{
 				if (plvoid->nmcd.lItemlParam == TREE_LP_VIRTUAL_DEVICE) //在添加节点时设置了节点的lParam属性，在这里就利用来判定具体是哪个节点
 				{
-					crText = RGB(200, 200, 200);
-					crBkgnd = RGB(66, 66, 66);
+					crText = RGB(40, 40, 40);
+					crBkgnd = RGB(222, 222, 222);
+					//crText = RGB(200, 200, 200);
+					//crBkgnd = RGB(66, 66, 66);
 
 					plvoid->clrText = crText;  //设置文字颜色
 					plvoid->clrTextBk = crBkgnd;  //设置背景颜色

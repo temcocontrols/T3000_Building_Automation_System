@@ -25,6 +25,7 @@
 #include "BacnetAnnualRoutine.h"
 #include "BacnetWebView.h"
 #include "MainFrm.h"
+#include "JsonHead.h"
 using namespace Microsoft::WRL;
 size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
 char* base64_decode(char const* base64Str, char* debase64Str, int encodeStrLen);
@@ -59,6 +60,7 @@ enum WEBVIEW_MESSAGE_TYPE
 	OPEN_ENTRY_EDIT_WINDOW = 8,
 	SAVE_IMAGE = 9,
 	SAVE_LIBRAY_DATA = 10,
+	DELETE_IMAGE = 11,
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -400,6 +402,13 @@ void BacnetWebViewAppWindow::Release()
 
 void BacnetWebViewAppWindow::NotifyClosed()
 {
+	//对话框窗体大小及其屏幕坐标
+	//CRect rectDlg;
+	////GetClientRect(rectDlg);//获得窗体的大小 //法1：
+	//::GetWindowRect(this,;//获得窗体在屏幕上的位置 //法2：
+	//ScreenToClient(rectDlg);
+
+	//printf(“窗口位置大小:底: % d, 右 : % d, 宽 : % d, 高 : % d\r\n”, rectDlg.bottom, rectDlg.right, rectDlg.Width(), rectDlg.Height());
 	m_isClosed = true;
 }
 
@@ -1062,7 +1071,11 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		CString temp_cs(output.c_str());
 
 		m_webView->PostWebMessageAsJson(temp_cs);
-
+#if 0
+		nlohmann::json jsonData = nlohmann::json::parse(file_output);
+		Str_Json Str_MyJson(jsonData);
+		Sleep(1);
+#endif
 		break;
 	}
 	case WEBVIEW_MESSAGE_TYPE::UPDATE_ENTRY:
@@ -1744,6 +1757,22 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		CString temp_cs(output.c_str());
 
 		m_webView->PostWebMessageAsJson(temp_cs);
+	}
+		break;
+	case DELETE_IMAGE:
+	{
+		const std::string file_path = Json::writeString(builder, json["data"]);
+		CString web_image_folder = g_strExePth + _T("ResourceFile\\webview\\www");
+		CString temp_delete_file_path;
+		CString temp_file_name = file_path.c_str();
+		temp_file_name = temp_file_name.TrimLeft(_T("\""));
+		temp_file_name = temp_file_name.TrimRight(_T("\""));
+		temp_delete_file_path = web_image_folder + temp_file_name;
+		CFileFind temp_find;
+		if (temp_find.FindFile(temp_delete_file_path)) //当 发现需要删除的的 IMAGE文件时 删除
+		{
+			DeleteFile(temp_delete_file_path);
+		}
 	}
 		break;
 	default :

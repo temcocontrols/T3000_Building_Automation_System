@@ -825,7 +825,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	else
 	{
 		//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-		if(m_input_list.IsDataNewer((char *)&m_Input_data.at(0),sizeof(Str_in_point) * BAC_INPUT_ITEM_COUNT) == false)
+		if((m_input_list.IsDataNewer((char *)&m_Input_data.at(0),sizeof(Str_in_point) * BAC_INPUT_ITEM_COUNT) == false) && refresh_input == 0)
 		{
 			return 0;
 		}
@@ -922,11 +922,14 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		else
 			temp_item.Format(_T("IN%d"), i + 1);
 
-		if (isFreshOne != 1) //当要立即刷新单个条目时  不用顾及 数据是否是最新的;
+		if (refresh_input == 0)
 		{
-			if (m_input_list.IsDataItemNewer((char*)&m_Input_data.at(i), sizeof(Str_in_point), i) == false)
-			{				
-				continue; //单个条目数据  无变化 ，立即更新;
+			if (isFreshOne != 1) //当要立即刷新单个条目时  不用顾及 数据是否是最新的;
+			{
+				if (m_input_list.IsDataItemNewer((char*)&m_Input_data.at(i), sizeof(Str_in_point), i) == false)  //变更选中设备时 必须刷新
+				{
+					continue; //单个条目数据  无变化 ，立即更新;
+				}
 			}
 		}
 
@@ -1350,6 +1353,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	if(selected_product_Node.serial_number != 0)
 		WriteDeviceDataIntoAccessDB(BAC_IN, input_item_limit_count, selected_product_Node.serial_number);
 #endif
+	if (isFreshOne != 1)
+	{
+		if (refresh_input > 0)
+			refresh_input--;  //清空标志位，代表刷新过一次了;
+	}
 	return 0;
 }
 

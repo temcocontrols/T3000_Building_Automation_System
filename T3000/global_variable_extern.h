@@ -927,6 +927,9 @@ extern int bacnet_device_type;
 extern int g_bac_instance;
 extern unsigned int g_sub_instace;
 extern unsigned int g_selected_serialnumber;
+extern unsigned char refresh_input;
+extern unsigned char refresh_output;
+
 extern unsigned int g_selected_product_id;
 extern unsigned short g_mac;
 extern HWND MainFram_hwd;

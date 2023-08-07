@@ -82,6 +82,9 @@ CListCtrlEx::CListCtrlEx()
 	m_window_hwnd = NULL;
 
     m_bEnableTips = TRUE;
+	m_bUser_tips = 0;
+	n_tip_colomn = 0;
+	n_tip_message.Empty();
     m_toolTip.Create(this);
     m_toolTip.SetMaxTipWidth(300);
     m_toolTip.SetDelayTime(1000);
@@ -1172,6 +1175,15 @@ void CListCtrlEx::DrawNormal(CDC *pDC, CString &strText, CRect &rcCell, BOOL bSe
 	pDC->DrawText(strText, &rcText, nFormat);
 	pDC->SetTextColor(crOldText);
 }
+
+
+void CListCtrlEx::Special_ToolTips(int ncolomn, CString ntemp, int b_special_tool )
+{
+	m_bUser_tips = b_special_tool;
+	n_tip_colomn = ncolomn;
+	n_tip_message = ntemp;
+}
+
 void CListCtrlEx::Dont_DT_Left()
 {
 	m_dt_left = false;
@@ -2062,7 +2074,15 @@ void ListCtrlEx::CListCtrlEx::OnMouseMove(UINT nFlags, CPoint point)
             {
                 // @@@@@@@@ 在这里修改要显示的提示信息
                 // 这里仅仅是一个例子---获得当前单元格的文字信息, 并设置为新的提示信息
-                str = GetItemText(m_nItem, m_nSubItem);
+				if ((m_bUser_tips) && (m_nSubItem == n_tip_colomn)) //如果对应的list 有特殊设置 需要显示的文字 这里做特殊处理;
+				{
+					str = n_tip_message;
+					TRACE(str);
+				}
+				else
+				{
+					str = GetItemText(m_nItem, m_nSubItem);
+				}
                 m_toolTip.AddTool(this, str);
                 // 显示提示框
                 m_toolTip.Pop();

@@ -724,10 +724,41 @@ void CMainFrame::ShowSplashWnd(int nMillisecond)
     }
 }
 
+#if 0
+#include <iostream>
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
+
+namespace ns
+{
+    // a simple struct to model a person
+    struct person
+    {
+        std::string name;
+        std::string address;
+        int age;
+    };
+} // namespace ns
+
+namespace ns
+{
+    void from_json(const json& j, person& p)
+    {
+        j.at("name").get_to(p.name);
+        j.at("address").get_to(p.address);
+        j.at("age").get_to(p.age);
+    }
+} // namespace ns
+#endif
+
+
 
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+    
+
 
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
         return -1;
@@ -1118,6 +1149,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     {
         h_mul_ping_thread = CreateThread(NULL, NULL, Mul_Ping_Thread, this, NULL, NULL);
     }
+
+    
 
     return 0;
 }
@@ -8040,6 +8073,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             temp_csa = temp_csa.Right(temp_csa.GetLength() - 3);
             g_bac_instance = m_product.at(i).object_instance;
             g_selected_serialnumber = m_product.at(i).serial_number;
+            refresh_input = 3; refresh_output = 3;  //要求刷新input 和output
+
             g_mac = m_product.at(i).panel_number;
             bac_gloab_panel = g_mac;
             g_gloab_bac_comport = m_product.at(i).ncomport;

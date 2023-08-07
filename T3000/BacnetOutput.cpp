@@ -543,13 +543,9 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			if(m_output_list.IsDataNewer((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT))
+			if((m_output_list.IsDataNewer((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT)  == 0) && refresh_output == 0)
 			{
 				//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-				//m_output_list.SetListData((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT);
-			}
-			else
-			{
 				return 0;
 			}
 		}
@@ -606,11 +602,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		if(i>=output_item_limit_count)
 			break;
 
-		if (isFreshOne != 1) //当要立即刷新单个条目时  不用顾及 数据是否是最新的;
+		if (refresh_output == 0)
 		{
-			if (m_output_list.IsDataItemNewer((char*)&m_Output_data.at(i), sizeof(Str_out_point), i) == false)
+			if (isFreshOne != 1) //当要立即刷新单个条目时  不用顾及 数据是否是最新的;
 			{
-				continue; //单个条目数据  无变化 ，立即更新;
+				if (m_output_list.IsDataItemNewer((char*)&m_Output_data.at(i), sizeof(Str_out_point), i) == false)
+				{
+					continue; //单个条目数据  无变化 ，立即更新;
+				}
 			}
 		}
 
@@ -1072,6 +1071,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	if(selected_product_Node.serial_number != 0)
 	   WriteDeviceDataIntoAccessDB(BAC_OUT, output_item_limit_count, selected_product_Node.serial_number);
 #endif
+	if (isFreshOne != 1)
+	{
+		if(refresh_output > 0)
+			refresh_output --; //清空标志位，代表刷新过一次了;
+	}
 	//Invalidate();
 	return 0;
 }

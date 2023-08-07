@@ -1088,6 +1088,17 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
         ((CEdit *)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->SetWindowTextW(temp_bip_network);
         ((CEdit *)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_MODBUS_ID))->SetWindowTextW(temp_modbus_id);
 
+        if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 640)
+        {
+            //((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_MSTP_NETWORK))->EnableWindow(TRUE);
+            ((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_MSTP_NETWORK))->SetReadOnly(FALSE);
+        }
+        else
+        {
+            //((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_MSTP_NETWORK))->EnableWindow(FALSE);
+            ((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_MSTP_NETWORK))->SetReadOnly(TRUE);
+        }
+
         CString cszigbeeanid;
         cszigbeeanid.Format(_T("%d"), Device_Basic_Setting.reg.zigbee_panid);
         ((CEdit *)m_page_tcpip.GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->SetWindowTextW(cszigbeeanid);
