@@ -18,7 +18,7 @@
 
 #include "JsonHead.h"
 
-
+int main_webview();
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
 extern vector <MSG> My_Receive_msg;
 extern CCriticalSection MyCriticalSection;
@@ -61,6 +61,7 @@ BEGIN_MESSAGE_MAP(BacnetScreen, CDialogEx)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_SCREEN, &BacnetScreen::OnNMDblclkListScreen)
 	ON_WM_SIZE()
 	ON_WM_SYSCOMMAND()
+	ON_MESSAGE(HANDLE_JSON_DATA, Handle_Json_Data)
 //	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
@@ -148,6 +149,166 @@ bool BacnetScreen::read_screen_label()
 
 
 	return true;
+}
+
+LRESULT  BacnetScreen::Handle_Json_Data(WPARAM wParam, LPARAM lParam)
+{
+
+
+	int total_write_json_item_count = 0;
+	CString Mession_ret;
+	CString des_file;
+	int end_temp_instance = 0;
+	//m_json_item_data
+	FILE * fp;
+	unsigned int element = 0;
+
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+	CString temp_item;
+
+	temp_item.Format(_T("%u_%d.zip"), g_selected_serialnumber, screen_list_line);
+	des_file = image_fordor + _T("\\") + temp_item;
+	
+
+
+	char temp_des_file[MAX_PATH] = { 0 };
+	WideCharToMultiByte(CP_ACP, 0, des_file.GetBuffer(), -1, temp_des_file, MAX_PATH, NULL, NULL);
+
+	fp = fopen(temp_des_file, "rb");
+	while (!feof(fp))
+	{
+		element++;
+		char c;
+		c = getc(fp);
+
+	}
+
+	char* temp_buffer = new char[element];
+	unsigned int data_point = 0;
+	fseek(fp, 0L, SEEK_SET);
+	while (!feof(fp))
+	{
+		temp_buffer[data_point] = getc(fp);
+		data_point++;
+	}
+	if (element != data_point)
+		return 0;
+	fclose(fp);
+
+	m_json_screen_data.at(screen_list_line).file_data.version_high = 1;
+	m_json_screen_data.at(screen_list_line).file_data.version_low = 1;
+	m_json_screen_data.at(screen_list_line).file_data.zip_size = element;
+	int write_screen_results = Write_Private_Data_Blocking(WRITE_JSON_SCREEN, screen_list_line, screen_list_line);
+	if (write_screen_results < 0)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout!"));
+		return -2;
+	}
+	//写入的时候 需要获取目前所有的 size 已经存储的 位置;
+	total_write_json_item_count = element / 200 + 1;
+	for (int i = 0; i < total_write_json_item_count; i++)
+	{
+		if(i !=  (total_write_json_item_count-1))
+			memcpy(&m_json_item_data.at(i).all, temp_buffer + i*200, 200);
+		else
+		{
+			int last_size = element % 200;
+			memcpy(&m_json_item_data.at(i).all, temp_buffer + i * 200, last_size);
+		}
+	}
+
+	int temp_json_item_group = (total_write_json_item_count + BAC_READ_JSON_ITEM_GROUP_NUMBER - 1) / BAC_READ_JSON_ITEM_GROUP_NUMBER;
+	if (total_write_json_item_count != 0)
+	{
+		for (int i = 0; i < temp_json_item_group; i++)
+		{
+			end_temp_instance = BAC_READ_JSON_ITEM_REMAINDER + (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i;
+			if (end_temp_instance >= total_write_json_item_count)
+				end_temp_instance = total_write_json_item_count;
+			if (Write_Private_Data_Blocking(WRITE_JSON_ITEM, (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance) > 0)
+			{
+				Mession_ret.Format(_T("Write webview data from %d to %d success."), (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+				//write_success_count++;
+				if (!offline_mode)
+					Sleep(SEND_COMMAND_DELAY_TIME);
+			}
+			else
+			{
+				Mession_ret.Format(_T("Write webview data from %d to %d timeout."), (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+			}
+		}
+		//g_progress_persent = write_success_count * 100 / write_total_count;
+	}
+
+	return 1;
+#ifndef  DISABLE_HANDLE_JSON_DATA
+
+
+
+	int write_results = Write_Private_Data_Blocking(WRITE_JSON_SCREEN, screen_list_line, screen_list_line);
+
+	//计算 到底要写到多少个为止，通过 那个item_belong_screen 为 255来判断
+
+	for (int i = 0; i < BAC_JSON_ITEM_GROUP; i++)
+	{
+		if (m_json_item_data.at(i).reg.json_items.item_belong_screen == 255)
+		{
+			total_write_json_item_count = i;
+			break;
+		}
+	}
+	temp_json_item_group = (total_write_json_item_count + BAC_READ_JSON_ITEM_GROUP_NUMBER - 1) / BAC_READ_JSON_ITEM_GROUP_NUMBER;
+	if (total_write_json_item_count != 0)
+	{
+		for (int i = 0; i < temp_json_item_group; i++)
+		{
+			end_temp_instance = BAC_READ_JSON_ITEM_REMAINDER + (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i;
+			if (end_temp_instance >= total_write_json_item_count)
+				end_temp_instance = total_write_json_item_count ;
+			if (Write_Private_Data_Blocking(WRITE_JSON_ITEM, (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance) > 0)
+			{
+				Mession_ret.Format(_T("Write webview data from %d to %d success."), (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+				//write_success_count++;
+				if (!offline_mode)
+					Sleep(SEND_COMMAND_DELAY_TIME);
+			}
+			else
+			{
+				Mession_ret.Format(_T("Write webview data from %d to %d timeout."), (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+			}
+		}
+		//g_progress_persent = write_success_count * 100 / write_total_count;
+	}
+	Device_Basic_Setting.reg.webview_json_flash = 2; //value 1 old way     value 2  new way for jsaon
+	if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+	{
+		CString temp_task_info;
+		temp_task_info.Format(_T("Write webview timeout!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
+	}
+#if 0
+	m_json_item_data.at(4).reg.json_items.item_belong_screen = 0x11;
+	m_json_item_data.at(4).reg.json_items.active = 0x22;
+	m_json_item_data.at(4).reg.json_items.width = 0x33;
+	m_json_item_data.at(4).reg.json_items.zindex = 0x44;
+	strcpy(m_json_item_data.at(4).reg.json_items.title, "Dufan");
+
+	int write_results2 = Write_Private_Data_Blocking(WRITE_JSON_ITEM, 4, 4);
+	Sleep(2);
+	return;
+	m_json_screen_data.at(3).reg.activeItemIndex = 0x55;
+	m_json_screen_data.at(3).reg.customObjectsCount = 0x66;
+	m_json_screen_data.at(3).reg.groupCount = 0x77;
+	m_json_screen_data.at(3).reg.viewportTransform.y = 0x88;
+#endif
+
+	return 0;
+#endif 
 }
 
 LRESULT  BacnetScreen::ScreenCallBack(WPARAM wParam, LPARAM lParam)
@@ -804,7 +965,15 @@ void BacnetScreen::Unreg_Hotkey()
 
 void BacnetScreen::OnBnClickedInsert()
 {
-#if _DEBUG
+#if 0
+
+	int test_count2 = GetPrivateData_Blocking(g_bac_instance, READ_JSON_ITEM, 4, 4, sizeof(Str_item_Json));
+	Sleep(1);
+	return;
+	int test_count = GetPrivateData_Blocking(g_bac_instance, READ_JSON_SCREEN,3, 3, sizeof(Str_t3_screen_Json));
+	Sleep(1);
+
+	return;
 	using json = nlohmann::json;
 	char text[] = R"(
     {
@@ -1076,7 +1245,7 @@ int BacnetScreen::WritePicFileFunction(CString ChooseFilePath,unsigned char scre
 	char* FileBuff;//用于存放位图信息
 
 	//unsigned int pic_file_size = 0;
-	string temp_md5 = MD5(ifstream( ChooseFilePath )).toString();
+	string temp_md5;// = MD5(ifstream(ChooseFilePath)).toString();
 	CString MD5_value;
 	MD5_value = temp_md5.c_str();
 	CString temp_show;
@@ -1251,7 +1420,7 @@ int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_im
 	CFileFind temp_find;
 	if(temp_find.FindFile(Picture_path))
 	{
-		string temp_md5 = MD5(ifstream( Picture_path )).toString();
+		string temp_md5;// = MD5(ifstream(Picture_path)).toString();
 		CString MD5_value;
 		MD5_value = temp_md5.c_str();
 		if(MD5_value.CompareNoCase(temp_pic_md5_cs) == 0)
@@ -1656,6 +1825,25 @@ int check_webview_runtime()
 #include "BacnetWebView.h"
 void BacnetScreen::OnBnClickedWebViewShow()
 {
+#if 0
+	m_json_item_data.at(4).reg.json_items.item_belong_screen = 0x11;
+	m_json_item_data.at(4).reg.json_items.active = 0x22;
+	m_json_item_data.at(4).reg.json_items.width = 0x33;
+	m_json_item_data.at(4).reg.json_items.zindex = 0x44;
+	strcpy(m_json_item_data.at(4).reg.json_items.title, "Dufan");
+	
+	int write_results2 = Write_Private_Data_Blocking(WRITE_JSON_ITEM, 4, 4);
+	Sleep(2);
+	return;
+	m_json_screen_data.at(3).reg.activeItemIndex = 0x55;
+	m_json_screen_data.at(3).reg.customObjectsCount = 0x66;
+	m_json_screen_data.at(3).reg.groupCount = 0x77;
+	m_json_screen_data.at(3).reg.viewportTransform.y = 0x88;
+	int write_results = Write_Private_Data_Blocking(WRITE_JSON_SCREEN, 3, 3);
+	Sleep(2);
+	return;
+#endif // DEBUG
+
 	/*
 	CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
 	PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
@@ -1720,13 +1908,195 @@ void BacnetScreen::OnBnClickedWebViewShow()
 	}
 }
 
-int main_webview();
 
+#ifndef  DISABLE_HANDLE_JSON_DATA
+	#include "Json-cpp/include/json/json.h"
+	#include <iostream>
+	#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+using std::to_string;
+#endif
+
+int BacnetScreen::StructToJsonData()
+{
+	return 1;
+#ifndef  DISABLE_HANDLE_JSON_DATA
+	CFile file;
+	StrJson temp;
+
+	nlohmann::json ret_json;
+	temp.jsonBuild(ret_json, m_json_screen_data.at(screen_list_line));
+	string file_output = ret_json.dump();
+
+	CString des_file;
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+	CString temp_item;
+	temp_item.Format(_T("%u_%d_json.txt"), g_selected_serialnumber, screen_list_line);
+	des_file = image_fordor + _T("\\") + temp_item;
+
+	CString file_temp_cs(file_output.c_str());
+	file.Open(des_file, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
+	file.Write(file_temp_cs, file_temp_cs.GetLength() * 2);
+	file.Close();
+
+
+
+	//string temp1 = ret_json.dump(-1, ' ', false, nlohmann::detail::error_handler_t::strict);
+	//auto j_str = to_string(ret_json);  // calling nlohmann::to_string
+	//auto i_str = to_string(ret_json);  // calling std::to_string
+	
+	return 1;
+#endif
+}
+
+
+int  BacnetScreen::Read_Struct_Data()
+{
+	if (Device_Basic_Setting.reg.webview_json_flash == 0)//这里要判断是2
+	{
+		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+		CString temp_item_out;
+		CString  des_file_out;
+		temp_item_out.Format(_T("%u_%d_out.zip"), g_selected_serialnumber, screen_list_line);
+		des_file_out = image_fordor + _T("\\") + temp_item_out;
+		char temp_des_file_out[MAX_PATH] = { 0 };
+		WideCharToMultiByte(CP_ACP, 0, des_file_out.GetBuffer(), -1, temp_des_file_out, MAX_PATH, NULL, NULL);
+
+		int test_count2 = GetPrivateData_Blocking(g_bac_instance, READ_JSON_SCREEN, screen_list_line, screen_list_line, sizeof(Str_t3_screen_Json));
+		if (test_count2 < 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
+			return -1;
+		}
+		int data_point_length = m_json_screen_data.at(screen_list_line).file_data.zip_size;
+		if (data_point_length == 0)
+			return -2;
+		char* temp_buffer = new char[data_point_length];
+		memset(temp_buffer, 0, data_point_length);
+		int read_counts = data_point_length / 200 + 1; //暂时只考虑第0个开始;
+		int temp_json_item_group = (read_counts + BAC_READ_JSON_ITEM_GROUP_NUMBER - 1) / BAC_READ_JSON_ITEM_GROUP_NUMBER;
+		CString Mession_ret;
+		int end_temp_instance = 0;
+		for (int i = 0; i < temp_json_item_group; i++) //这里暂时是从0 index 开始读取的
+		{
+			end_temp_instance = BAC_READ_JSON_ITEM_REMAINDER + (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i;
+			if (end_temp_instance >= read_counts)
+				end_temp_instance = read_counts;
+			if (GetPrivateData_Blocking(g_bac_instance, READ_JSON_ITEM, (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_item_Json)) > 0)
+			{
+				Mession_ret.Format(_T("Read webview data from %d to %d success."), (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+				//write_success_count++;
+				if (!offline_mode)
+					Sleep(SEND_COMMAND_DELAY_TIME);
+			}
+			else
+			{
+				Mession_ret.Format(_T("Read webview data from %d to %d timeout."), (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+				return -2;
+			}
+		}
+		char* temp_char = temp_buffer;
+		for (int j = 0; j < read_counts; j++) //暂时只考虑第0个开始;
+		{
+			if (data_point_length <= 200)
+			{
+				memcpy(temp_char, m_json_item_data.at(j).all, data_point_length);
+				break;
+			}
+			else
+			{
+				int last_length = data_point_length % 200;
+				if (j != read_counts - 1)
+				{
+					memcpy(temp_char, m_json_item_data.at(j).all, 200);
+					temp_char = temp_char + 200;
+				}
+				else
+				{
+					memcpy(temp_char, m_json_item_data.at(j).all, last_length);
+					temp_char = temp_char + last_length;
+					break;
+				}
+			}
+
+		}
+
+
+
+		FILE* fpw;
+		fpw = fopen(temp_des_file_out, "wb+");
+
+
+
+		fwrite(temp_buffer, sizeof(char), data_point_length, fpw);
+		fflush(fpw);
+		fclose(fpw);
+		free(temp_buffer);
+		bool ret_unzip = UnzipItem(des_file_out, image_fordor);
+		if (!ret_unzip)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Unzip file failed!"));
+		}
+
+#ifndef  DISABLE_HANDLE_JSON_DATA
+		test_count2 = GetPrivateData_Blocking(g_bac_instance, READ_JSON_SCREEN, screen_list_line, screen_list_line, sizeof(Str_t3_screen_Json));
+		if (test_count2 > 0)
+		{
+			CString Mession_ret;
+			int end_temp_instance = 0;
+			for (int i = 0; i < BAC_JSON_ITEM_GROUP; i++)
+			{
+				end_temp_instance = BAC_READ_JSON_ITEM_REMAINDER + (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i;
+				if (end_temp_instance >= BAC_GRPHIC_JSON_ITEM_COUNT)
+					end_temp_instance = BAC_GRPHIC_JSON_ITEM_COUNT;
+				if (GetPrivateData_Blocking(g_bac_instance, READ_JSON_ITEM, (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_item_Json)) > 0)
+				{
+					Mession_ret.Format(_T("Read webview data from %d to %d success."), (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance);
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+					//write_success_count++;
+					if (!offline_mode)
+						Sleep(SEND_COMMAND_DELAY_TIME);
+				}
+				else
+				{
+					Mession_ret.Format(_T("Read webview data from %d to %d timeout."), (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i, end_temp_instance);
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+					return -2;
+				}
+
+				if (m_json_item_data.at(end_temp_instance).reg.json_items.item_belong_screen == 255)
+				{
+					break;
+				}
+
+			}
+
+		}
+#endif
+	}
+	return 1;
+}
 
 DWORD WINAPI  BacnetScreen::CreateWebServerThreadfun(LPVOID lpVoid)
 {
 	BacnetScreen* pParent = (BacnetScreen*)lpVoid;
-
+#if 1
+	int read_ret = pParent->Read_Struct_Data();
+	if (read_ret <= 0)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
+	}
+	else
+	{
+#ifndef  DISABLE_HANDLE_JSON_DATA
+		pParent->StructToJsonData();
+#endif
+	}
+#endif
 	main_webview();
 	h_create_webview_server_thread = NULL;
 	return 0;

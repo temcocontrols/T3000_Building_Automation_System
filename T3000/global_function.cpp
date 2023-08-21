@@ -46,6 +46,9 @@
 #include "HttpApiDefine.h"
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "BADO/BADO.h"
+#include "JsonHead.h"
+#include "ForZip/unzip.h"
+#include "ForZip/zip.h"
 extern tree_product selected_product_Node; // 选中的设备信息;
 //#include "CM5\PTP\ptp.h"
 #pragma region For_Bacnet_program_Use
@@ -1629,6 +1632,12 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     case WRITE_EMAIL_ALARM:
         entitysize = sizeof(Str_Email_point);
         break;
+    case WRITE_JSON_SCREEN:
+        entitysize = sizeof(Str_t3_screen_Json);
+        break;
+    case WRITE_JSON_ITEM:
+        entitysize = sizeof(Str_item_Json);
+        break;
 	case WRITE_TSTATE_SCHEDULE_T3000:
 		entitysize = sizeof(Str_tstat_schedule);
 		break;
@@ -1740,6 +1749,22 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 			}
 		}
 		break;
+    case WRITE_JSON_SCREEN:
+        {
+            for (int i = 0; i < (end_instance - start_instance + 1); i++)
+            {
+                memcpy_s(SendBuffer + i * sizeof(Str_t3_screen_Json) + HEADER_LENGTH, sizeof(Str_t3_screen_Json), &m_json_screen_data.at(i + start_instance), sizeof(Str_t3_screen_Json));
+            }
+        }
+        break;
+    case WRITE_JSON_ITEM:
+        {
+            for (int i = 0; i < (end_instance - start_instance + 1); i++)
+            {
+                memcpy_s(SendBuffer + i * sizeof(Str_item_Json) + HEADER_LENGTH, sizeof(Str_item_Json), &m_json_item_data.at(i + start_instance), sizeof(Str_item_Json));
+            }
+        }
+        break;
     case  WRITE_GRPHIC_LABEL_COMMAND:
         for (int i=0; i<(end_instance - start_instance + 1); i++)
         {
@@ -3505,6 +3530,48 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         }
     }
     break;
+    case READ_JSON_SCREEN:
+    {
+        if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_t3_screen_Json)) != 0)
+            return -1;	//得到的结构长度错误;
+        block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_t3_screen_Json);
+        my_temp_point = bacnet_apud_point + 3;
+        start_instance = *my_temp_point;
+        my_temp_point++;
+        end_instance = *my_temp_point;
+        my_temp_point++;
+        my_temp_point = my_temp_point + 2;
+        if (end_instance == (BAC_SCREEN_COUNT - 1))
+            end_flag = true;
+
+        for (i = start_instance; i <= end_instance; i++)
+        {
+            memcpy(&m_json_screen_data.at(i), my_temp_point, sizeof(Str_t3_screen_Json));     
+            my_temp_point = my_temp_point + sizeof(Str_t3_screen_Json);
+        }
+    }
+    break;
+    case READ_JSON_ITEM:
+    {
+        if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_item_Json)) != 0)
+            return -1;	//得到的结构长度错误;
+        block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_item_Json);
+        my_temp_point = bacnet_apud_point + 3;
+        start_instance = *my_temp_point;
+        my_temp_point++;
+        end_instance = *my_temp_point;
+        my_temp_point++;
+        my_temp_point = my_temp_point + 2;
+        if (end_instance == (BAC_GRPHIC_JSON_ITEM_COUNT - 1))
+            end_flag = true;
+
+        for (i = start_instance; i <= end_instance; i++)
+        {
+            memcpy(&m_json_item_data.at(i), my_temp_point, sizeof(Str_item_Json));
+            my_temp_point = my_temp_point + sizeof(Str_item_Json);
+        }
+    }
+        break;
     case READ_TSTATE_SCHEDULE_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_tstat_schedule)) != 0)
@@ -7990,7 +8057,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
     USES_CONVERSION;
 
 
-    int bind_ret =	bind(mysocket, (struct sockaddr*)&servAddr, sizeof(servAddr));
+    int bind_ret = ::bind(mysocket, (struct sockaddr*)&servAddr, sizeof(servAddr));
     if(bind_ret != 0)
     {
         int  nError = WSAGetLastError();
@@ -8919,7 +8986,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
         {
             h_siBind.sin_port = htons(57619+i);
             int ret_bind = 0;
-            ret_bind = bind(h_Broad, (SOCKADDR*)&h_siBind, sizeof(h_siBind));//把网卡地址强行绑定到Socket
+            ret_bind = ::bind(h_Broad, (SOCKADDR*)&h_siBind, sizeof(h_siBind));//把网卡地址强行绑定到Socket
             if (ret_bind != 0)
             {
                 TRACE(_T("scan bind port failed.\r\n"));
@@ -16528,6 +16595,19 @@ void Initial_All_Point()
         memset(&temp_label_point, 0, sizeof(Str_label_point));
         m_graphic_label_data.push_back(temp_label_point);
     }
+    for (int  i = 0; i < BAC_SCREEN_COUNT; i++)
+    {
+        Str_t3_screen_Json temp_screen_json_point = { 0 };
+        memset(&temp_screen_json_point, 0, sizeof(Str_t3_screen_Json));
+        m_json_screen_data.push_back(temp_screen_json_point);
+    }
+    for (int i = 0; i < BAC_GRPHIC_JSON_ITEM_COUNT; i++)
+    {
+        Str_item_Json temp_item_json_point = { 0 };
+        memset(&temp_item_json_point, 0, sizeof(Str_item_Json));
+        temp_item_json_point.reg.json_items.item_belong_screen = 255;
+        m_json_item_data.push_back(temp_item_json_point);
+    }
     for (int i = 0; i < BAC_REMOTE_POINT_COUNT; i++)
     {
         Str_remote_point temp_remote_point = { 0 };
@@ -17454,5 +17534,59 @@ void InputDataToString(Str_in_point source_input, Input_CString* ret_string)
     ret_string->units = temp_units;
     ret_string->value = cstemp_value;
     ret_string->lable = temp_lable;;
+}
+
+
+bool UnzipItem(CString SourceFilePath, CString DesFolder)
+{
+    CreateDirectory(DesFolder, NULL);
+    HZIP hz = OpenZip(SourceFilePath, 0);
+    ZIPENTRY ze; GetZipItem(hz, -1, &ze); int numitems = ze.index;
+    // -1 gives overall information about the zipfile
+    for (int zi = 0; zi < numitems; zi++)
+    {
+        ZIPENTRY ze; GetZipItem(hz, zi, &ze); // fetch individual details
+        TCHAR temp_123[255];
+        memset(temp_123, 0, 255);
+        wcscpy(temp_123, DesFolder);
+        wcscat(temp_123, _T("\\"));
+        wcscat(temp_123, ze.name);
+        //UnzipItem(hz, zi, ze.name);         // e.g. the item's name.
+        UnzipItem(hz, zi, temp_123);         // e.g. the item's name.
+    }
+    CloseZip(hz);
+
+    return TRUE;
+}
+
+bool ZipSingleItem(CString strUserDesZipFile, CString strsingleFilepath)
+{
+    CFileFind temp_find;
+    if (temp_find.FindFile(strUserDesZipFile))
+    {
+        DeleteFile(strUserDesZipFile);
+    }
+    HZIP hz = CreateZip(strUserDesZipFile, 0);
+    if (hz == NULL)
+    {
+        return 0;
+    }
+
+    CString filename = strsingleFilepath.Right(strsingleFilepath.GetLength() - strsingleFilepath.ReverseFind('\\') - 1);
+
+    if (PathFileExists(strsingleFilepath))
+    {
+        ZipAdd(hz, filename, strsingleFilepath);
+    }
+    else
+    {
+        return 0;
+    }
+
+    DWORD Z_RESULT = CloseZipZ(hz);
+    if (Z_RESULT == ZR_OK)
+        return 1;
+    else
+        return 0;
 }
 

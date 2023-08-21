@@ -125,7 +125,7 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 	{
 		InitializeWebView();
 	}
-
+	json_to_struct_results = 0;
 }
 
 
@@ -244,6 +244,12 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
 	break;
 	case WM_NCDESTROY:
 	{
+		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 640) //643 版本会有这个功能
+		{
+			if (json_to_struct_results > 0)
+				::PostMessage(m_screen_dlg_hwnd, HANDLE_JSON_DATA, NULL, NULL);
+		}
+
 		int retValue = 0;
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
 		NotifyClosed();
@@ -655,6 +661,81 @@ HRESULT BacnetWebViewAppWindow::ExecuteScriptResponse(HRESULT errorCode, LPCWSTR
 
 CString empty_grp_file = _T("{\"activeItemIndex\":null,\"customObjectsCount\":0,\"elementGuidelines\":[],\"groupCount\":0,\"items\":[],\"itemsCount\":0,\"selectedTargets\":[],\"version\":\"0.4.4\",\"viewportTransform\":{\"scale\":1,\"x\":0,\"y\":0}} ");
 
+int BacnetWebViewAppWindow::JsonDataToStruct(std::string file_output)
+{
+	return 1;
+#ifndef  DISABLE_HANDLE_JSON_DATA
+	nlohmann::json jsonData = nlohmann::json::parse(file_output);
+	Str_Json Str_MyJson(jsonData);
+	int n_screen_index = screen_list_line;
+	if (n_screen_index >= BAC_SCREEN_COUNT)
+		return -2;
+	m_json_screen_data.at(screen_list_line).reg.activeItemIndex = Str_MyJson.activeItemIndex;
+	m_json_screen_data.at(screen_list_line).reg.customObjectsCount = Str_MyJson.customObjectsCount;
+	m_json_screen_data.at(screen_list_line).reg.groupCount = Str_MyJson.groupCount;
+	m_json_screen_data.at(screen_list_line).reg.itemsCount = Str_MyJson.itemsCount;
+	m_json_screen_data.at(screen_list_line).reg.ncount = Str_MyJson.ncount;
+	//m_json_screen_data.at(screen_list_line).reg.ntranslate_count = Str_MyJson.ntranslate_count;
+	strcpy_s(m_json_screen_data.at(screen_list_line).reg.version, JSON_STRING_LENGTH, Str_MyJson.version);
+	memcpy(&m_json_screen_data.at(screen_list_line).reg.viewportTransform, &Str_MyJson.viewportTransform, 3);
+
+	bool find_avaiable_index = 0; 
+	int look_for_index = 0; //第二层遍历的位置；
+	for (int i = 0; i < m_json_screen_data.at(screen_list_line).reg.ncount; i++)
+	{
+
+
+		for (int j = look_for_index ; j < BAC_GRPHIC_JSON_ITEM_COUNT; j++)
+		{
+			//遍历每个item 将他们依次填充到80个item中 ,255未使用可以填充，本screen 的也可以，其他跳过寻找下一个
+			if ((m_json_item_data.at(j).reg.json_items.item_belong_screen == 255) ||
+				(m_json_item_data.at(j).reg.json_items.item_belong_screen == screen_list_line))
+			{
+				//找到可用的就存在序号J 的位置
+				find_avaiable_index = true;
+				look_for_index = j + 1; //下一个循环 从下一个位置开始寻找 能塞得进去的点;
+				m_json_item_data.at(j).reg.json_items.item_belong_screen = screen_list_line;
+				m_json_item_data.at(j).reg.json_items.active = Str_MyJson.m_data_item[i].active;
+				m_json_item_data.at(j).reg.json_items.group = Str_MyJson.m_data_item[i].group;
+				m_json_item_data.at(j).reg.json_items.height = Str_MyJson.m_data_item[i].height;
+				m_json_item_data.at(j).reg.json_items.id = Str_MyJson.m_data_item[i].id;
+				m_json_item_data.at(j).reg.json_items.ntranslate_count = Str_MyJson.m_data_item[i].ntranslate_count;
+				m_json_item_data.at(j).reg.json_items.rotate = Str_MyJson.m_data_item[i].rotate;
+				m_json_item_data.at(j).reg.json_items.scaleX = Str_MyJson.m_data_item[i].scaleX;
+				m_json_item_data.at(j).reg.json_items.scaleY = Str_MyJson.m_data_item[i].scaleY;
+				memcpy(&m_json_item_data.at(j).reg.json_items.settings, &Str_MyJson.m_data_item[i].settings,sizeof(str_settings));
+				strcpy_s(m_json_item_data.at(j).reg.json_items.strtype, 20, Str_MyJson.m_data_item[i].strtype);
+				strcpy_s(m_json_item_data.at(j).reg.json_items.title, JSON_STRING_LENGTH, ""); //Str_MyJson.m_data_item[i].title
+				if(m_json_item_data.at(j).reg.json_items.ntranslate_count > 0)
+					memcpy(m_json_item_data.at(j).reg.json_items.translate,  Str_MyJson.m_data_item[i].translate, 4 * m_json_item_data.at(j).reg.json_items.ntranslate_count);
+				m_json_item_data.at(j).reg.json_items.width = Str_MyJson.m_data_item[i].width;
+				m_json_item_data.at(j).reg.json_items.zindex = Str_MyJson.m_data_item[i].zindex;
+				m_json_item_data.at(j).reg.json_items.t3_Entrys.index = Str_MyJson.m_data_item[i].t3_Entrys.index;
+				m_json_item_data.at(j).reg.json_items.t3_Entrys.ntype = Str_MyJson.m_data_item[i].t3_Entrys.ntype;
+				m_json_item_data.at(j).reg.json_items.t3_Entrys.pid = Str_MyJson.m_data_item[i].t3_Entrys.pid;
+				break;
+			}
+			else
+			{
+				continue;
+			}
+
+
+		}
+		if (!find_avaiable_index)
+		{
+			return -1; //没有多余可用的
+			break;
+		}
+	}
+
+	
+	//m_json_item_data
+	return 1;
+#endif
+}
+
+
 
 void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 {
@@ -740,6 +821,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["calibration_sign"] = g_Input_data[npanel_id].at(i).calibration_sign;
 			tempjson["data"][p_i]["calibration_h"] = g_Input_data[npanel_id].at(i).calibration_h;
 			tempjson["data"][p_i]["calibration_l"] = g_Input_data[npanel_id].at(i).calibration_l;
+			tempjson["data"][p_i]["decom"] = g_Input_data[npanel_id].at(i).decom; //for input   0 "Normal"    1"Open"   2  "Shorted"
 			p_i++;
 		}
 
@@ -763,6 +845,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["control"] = g_Output_data[npanel_id].at(i).control;
 			tempjson["data"][p_i]["digital_analog"] = g_Output_data[npanel_id].at(i).digital_analog;
 			tempjson["data"][p_i]["hw_switch_status"] = g_Output_data[npanel_id].at(i).hw_switch_status;
+			tempjson["data"][p_i]["decom"] = g_Output_data[npanel_id].at(i).decom; //for output   0 "Normal"    1"Alarm"  
 			p_i++;
 		}
 
@@ -994,8 +1077,20 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 		CString temp_item;
-		temp_item.Format(_T("%u_%d.txt"), grp_serial_number , grp_index);
+		CString temp_item_zip;
+		if (0)
+		{
+			temp_item.Format(_T("%u_%d_json.txt"), grp_serial_number, grp_index);
+			temp_item_zip.Format(_T("%u_%d_json.zip"), grp_serial_number, grp_index);
+		}
+		else
+		{
+			temp_item.Format(_T("%u_%d.txt"), grp_serial_number, grp_index);
+			temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, grp_index);
+
+		}
 		des_file = image_fordor + _T("\\") + temp_item;
+		des_file_zip = image_fordor + _T("\\") + temp_item_zip;
 		CString temp_lib_file;
 		temp_lib_file = _T("hvac_library.json");
 		des_lib_file = image_fordor + _T("\\") + temp_lib_file;
@@ -1071,6 +1166,18 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		CString temp_cs(output.c_str());
 
 		m_webView->PostWebMessageAsJson(temp_cs);
+
+		json_to_struct_results = JsonDataToStruct(file_output);
+		bool zip_ret = ZipSingleItem(des_file_zip,des_file);
+		if (!zip_ret)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to store data!"));
+		}
+		else
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data from flash success!"));
+		}
+		Sleep(1);
 #if 0
 		nlohmann::json jsonData = nlohmann::json::parse(file_output);
 		Str_Json Str_MyJson(jsonData);
@@ -1389,6 +1496,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 					tempjson["data"][i]["calibration_sign"] = g_Input_data[npanel_id].at(entry_index).calibration_sign;
 					tempjson["data"][i]["calibration_h"] = g_Input_data[npanel_id].at(entry_index).calibration_h;
 					tempjson["data"][i]["calibration_l"] = g_Input_data[npanel_id].at(entry_index).calibration_l;
+					tempjson["data"][i]["decom"] = g_Input_data[npanel_id].at(entry_index).decom; //for input   0 "Normal"    1"Open"   2  "Shorted"
 				}
 				else if (entry_type == BAC_OUT)
 				{
@@ -1421,6 +1529,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 					tempjson["data"][i]["control"] = g_Output_data[npanel_id].at(entry_index).control;
 					tempjson["data"][i]["digital_analog"] = g_Output_data[npanel_id].at(entry_index).digital_analog;
 					tempjson["data"][i]["hw_switch_status"] = g_Output_data[npanel_id].at(entry_index).hw_switch_status;
+					tempjson["data"][i]["decom"] = g_Output_data[npanel_id].at(entry_index).decom; //for output   0 "Normal"    1"Alarm"  
 
 				}
 				else if (entry_type == BAC_VAR)

@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
 	<PropertyGroup>
-		<ProjectVersion>20230721</ProjectVersion>
+		<ProjectVersion>20230815</ProjectVersion>
 	</PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

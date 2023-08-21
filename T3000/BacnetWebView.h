@@ -33,6 +33,7 @@ class BacnetWebViewAppWindow
 {
 public:
     CString des_file;
+    CString des_file_zip;
     CString des_lib_file;
 public:
     BacnetWebViewAppWindow(
@@ -147,6 +148,9 @@ private:
     HBITMAP m_appBackgroundImageHandle;
     BITMAP m_appBackgroundImage;
     HDC m_memHdc;
+    public:
+        int JsonDataToStruct(std::string file_output);
+        int json_to_struct_results;
 };
 
 

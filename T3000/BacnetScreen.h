@@ -32,6 +32,7 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg LRESULT  ScreenCallBack(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT  Handle_Json_Data(WPARAM wParam, LPARAM lParam);
 	LRESULT Screeenedit_close_handle(WPARAM wParam,LPARAM lParam);
 	virtual void OnCancel();
 	void Reg_Hotkey();
@@ -51,9 +52,10 @@ public:
 	CString pic_filename;
 	void OnSize(UINT nType, int cx, int cy);
 	void OnSysCommand(UINT nID, LPARAM lParam);
-	bool window_max; // 卤锚录脟脢脟路帽脪脩戮颅脳卯麓贸禄炉;
+	bool window_max; // 标记是否已经最大化;
 	void OnBnClickedWebViewShow();
-
+	int  Read_Struct_Data();
+	int StructToJsonData();
 };
 
 

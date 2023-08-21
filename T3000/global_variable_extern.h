@@ -6,6 +6,7 @@
 #include "Global_Struct.h"
 #include "ProductModel.h"
 #include <map>
+
 #define MY_MBPOLL_REG_DIALOG_MSG (WM_USER + 557)
 #define MY_MBPOLL_WRITE_REG_MSG (WM_USER + 558)
 
@@ -1084,6 +1085,8 @@ extern vector <Scan_Info> m_scan_info;
 extern vector <Scan_Info> m_scan_info_buffer;
 extern vector <Client_Info> m_tcp_connect_info;
 extern vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
+extern vector <Str_t3_screen_Json> m_json_screen_data;		extern	vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen的信息要存在设备里面;
+extern vector <Str_item_Json> m_json_item_data;			extern    vector < vector<Str_item_Json> >			  g_graphic_item_data;//item的信息要存在设备里面;
 extern vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
 extern vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 新的setpoint表格; 以前的完全改不动了;
 extern Str_Setting_Info s_Basic_Setting;

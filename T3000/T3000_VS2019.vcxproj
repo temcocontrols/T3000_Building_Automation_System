@@ -294,6 +294,8 @@
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="Flash_Multy.cpp" />
+    <ClCompile Include="ForZip\unzip.cpp" />
+    <ClCompile Include="ForZip\zip.cpp" />
     <ClCompile Include="global_function.cpp" />
     <ClCompile Include="GraphicMode.cpp" />
     <ClCompile Include="GroupScheduleDlg.cpp" />

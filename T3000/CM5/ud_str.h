@@ -78,7 +78,8 @@ typedef enum {
          READ_SCHEDUAL_TIME_FLAG   = 41,
          READ_MSV_COMMAND          = 42,
          READ_EMAIL_ALARM          = 43,
-
+		 READ_JSON_SCREEN          = 86,
+		 READ_JSON_ITEM            = 87, 
          READ_NEW_TIME_COMMAND = 88,           /* read new time            */  //2018 04 17 新的读时间命令
          READMONITORPACKAGE_T3000 = 89,           /* read monitor belong to which package   */
          READ_AT_COMMAND = 90,	//450 length
@@ -136,6 +137,8 @@ typedef enum {
          WRITE_SCHEDUAL_TIME_FLAG   = 141,
          WRITE_MSV_COMMAND          = 142,
          WRITE_EMAIL_ALARM           = 143,
+		 WRITE_JSON_SCREEN			= 186,
+		 WRITE_JSON_ITEM			= 187,
          WRITE_NEW_TIME_COMMAND     = 188,  //2018 04 17 新的写时间命令
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
@@ -893,6 +896,7 @@ typedef union
 		 unsigned char end_month;
 		 unsigned char end_day;
 		 unsigned char network_number_hi;
+		 unsigned char webview_json_flash; //value 1 old way     value 2  new way for jsaon
 	}reg;
 }Str_Setting_Info;
 
@@ -1205,6 +1209,100 @@ typedef struct
 
 #pragma pack(pop)//恢复对齐状态 
 
+#define JSON_COLOR_LENGTH 10
+#define JSON_STRING_LENGTH  10
+
+#pragma pack(push) //保存对齐状态 
+#pragma pack(1)
+
+typedef struct str_viewportTransform
+{
+	unsigned short scale;
+	unsigned short x;
+	unsigned short y;
+};
+typedef struct str_t3Entry
+{
+	unsigned char pid;
+	unsigned char ntype;
+	unsigned char index;
+};
+
+typedef struct str_settings
+{
+	unsigned char active;
+	char bgColor[JSON_COLOR_LENGTH];
+	char fillColor[JSON_COLOR_LENGTH];
+	unsigned char fontSize;
+	unsigned char inAlarm;
+	char icon[JSON_STRING_LENGTH];
+	char offColor[JSON_COLOR_LENGTH];
+	char onColor[JSON_COLOR_LENGTH];
+	char t3EntryDisplayField[JSON_STRING_LENGTH];
+	char textAlign[JSON_STRING_LENGTH];
+	char textColor[JSON_COLOR_LENGTH];
+	char titleColor[JSON_COLOR_LENGTH];
+	unsigned char blink;
+	unsigned short blinkInterval;
+
+};
+
+
+typedef struct myitems
+{
+	unsigned char ntranslate_count;// 控制结构体 translate 数量
+	unsigned char item_belong_screen;
+	unsigned char active;
+	unsigned char group;
+	unsigned short height;
+	unsigned char id;
+	unsigned short rotate;
+	unsigned short scaleX;
+	unsigned short scaleY;
+	int translate[4];
+	unsigned short width;
+	unsigned short zindex;
+	str_settings settings;
+	str_t3Entry t3_Entrys;
+	char title[JSON_STRING_LENGTH];
+	char strtype[JSON_STRING_LENGTH + 10];
+};
+
+typedef union
+{
+	uint8_t all[50];//50x16
+	struct
+	{
+		unsigned short ncount; //控制结构体 myitems 的数量的，不存入设备
+		unsigned char activeItemIndex;
+		unsigned char customObjectsCount;
+		unsigned char groupCount;
+		unsigned short itemsCount;
+		char version[JSON_STRING_LENGTH];
+		str_viewportTransform viewportTransform;
+	}reg;
+	struct
+	{
+		unsigned char version_high;
+		unsigned char version_low;
+		unsigned short zip_size;
+
+	}file_data;
+}Str_t3_screen_Json;
+
+
+typedef union
+{
+	uint8_t all[200];//80X200
+	struct
+	{
+		myitems json_items;  //size约185
+	}reg;
+}Str_item_Json;
+
+
+
+#pragma pack(pop)//恢复对齐状态 
 
 
 #endif

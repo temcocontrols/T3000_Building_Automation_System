@@ -415,4 +415,7 @@ void VariableDataToString(Str_variable_point source_variable, Variable_CString* 
 
 int LoadOnlinePanelData(unsigned char npanel = 0); //从缓存prog文件中加载所有在线设备的数据;
 int SearchDataIndexByPanel(unsigned char panel_id, int command_type, int npoint);//通过 panel type point number 寻找 对应的index
+
+bool UnzipItem(CString SourceFilePath, CString DesFolder);
+bool ZipSingleItem(CString strUserDesZipFile, CString strsingleFilepath);
 #endif

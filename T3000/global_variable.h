@@ -5,7 +5,7 @@
 #include "CM5\ud_str.h"
 #include "global_define.h"
 #include "Global_Struct.h"
- 
+#include "JsonHead.h"
 CString USB_Serial;
 vector <int> Change_Color_ID;
 const bool WRITE_SUCCESS = true;
@@ -1972,6 +1972,8 @@ vector <Str_TstatInfo_point> m_Tstat_data;				vector < vector<Str_TstatInfo_poin
 vector <Str_userlogin_point> m_user_login_data;			vector < vector<Str_userlogin_point> >        g_user_login_data;
 vector <Alarm_point> m_alarmlog_data;					vector < vector<Alarm_point> >				  g_alarmlog_data;
 vector <Str_label_point> m_graphic_label_data;			vector < vector<Str_label_point> >			  g_graphic_label_data;//图片里面的Label的信息要存在设备里面;
+vector <Str_t3_screen_Json> m_json_screen_data;			vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen的信息要存在设备里面;
+vector <Str_item_Json> m_json_item_data;			    vector < vector<Str_item_Json> >			  g_graphic_item_data;//item的信息要存在设备里面;
 vector <Str_Units_element> m_customer_unit_data;        vector < vector<Str_Units_element> >		  g_customer_unit_data;
 vector <Str_table_point> m_analog_custmer_range;		vector < vector<Str_table_point> >		      g_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite; vector < vector<Str_variable_uint_point> >  g_variable_analog_unite;
