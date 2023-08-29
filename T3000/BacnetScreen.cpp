@@ -153,7 +153,7 @@ bool BacnetScreen::read_screen_label()
 
 LRESULT  BacnetScreen::Handle_Json_Data(WPARAM wParam, LPARAM lParam)
 {
-
+	screen_list_line = 0;
 
 	int total_write_json_item_count = 0;
 	CString Mession_ret;
@@ -195,6 +195,13 @@ LRESULT  BacnetScreen::Handle_Json_Data(WPARAM wParam, LPARAM lParam)
 	if (element != data_point)
 		return 0;
 	fclose(fp);
+	Device_Basic_Setting.reg.webview_json_flash = 2;
+	if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+	{
+		CString temp_task_info;
+		temp_task_info.Format(_T("Write into device timeout!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
+	}
 
 	m_json_screen_data.at(screen_list_line).file_data.version_high = 1;
 	m_json_screen_data.at(screen_list_line).file_data.version_low = 1;
@@ -1856,6 +1863,7 @@ void BacnetScreen::OnBnClickedWebViewShow()
 	PicFileTips.ReleaseBuffer();
 	CString fullpath = temp_image_folder + PicFileTips;
 	*/
+	screen_list_line = 0;
 	int nversion = check_webview_runtime();
 	if (nversion == 0)
 	{
@@ -1873,6 +1881,19 @@ void BacnetScreen::OnBnClickedWebViewShow()
 		}
 
 	}
+
+	int read_ret = Read_Struct_Data();
+	if (read_ret <= 0)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
+	}
+	else
+	{
+#ifndef  DISABLE_HANDLE_JSON_DATA
+		pParent->StructToJsonData();
+#endif
+	}
+
 	if (h_create_webview_server_thread == NULL)
 	{
 		h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
@@ -1953,7 +1974,7 @@ int BacnetScreen::StructToJsonData()
 
 int  BacnetScreen::Read_Struct_Data()
 {
-	if (Device_Basic_Setting.reg.webview_json_flash == 0)//这里要判断是2
+	if (Device_Basic_Setting.reg.webview_json_flash == 2)//这里要判断是2
 	{
 		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
@@ -2084,7 +2105,7 @@ int  BacnetScreen::Read_Struct_Data()
 DWORD WINAPI  BacnetScreen::CreateWebServerThreadfun(LPVOID lpVoid)
 {
 	BacnetScreen* pParent = (BacnetScreen*)lpVoid;
-#if 1
+#if 0
 	int read_ret = pParent->Read_Struct_Data();
 	if (read_ret <= 0)
 	{

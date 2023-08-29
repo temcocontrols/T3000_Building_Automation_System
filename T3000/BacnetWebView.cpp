@@ -246,7 +246,6 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
 	{
 		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 640) //643 版本会有这个功能
 		{
-			if (json_to_struct_results > 0)
 				::PostMessage(m_screen_dlg_hwnd, HANDLE_JSON_DATA, NULL, NULL);
 		}
 
