@@ -150,7 +150,7 @@ private:
     HDC m_memHdc;
     public:
         int JsonDataToStruct(std::string file_output);
-        int json_to_struct_results;
+
 };
 
 

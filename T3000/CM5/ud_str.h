@@ -896,7 +896,7 @@ typedef union
 		 unsigned char end_month;
 		 unsigned char end_day;
 		 unsigned char network_number_hi;
-		 unsigned char webview_json_flash; //value 1 old way     value 2  new way for jsaon
+		 unsigned char webview_json_flash; //value 0 old way     value 2  new way for jsaon
 	}reg;
 }Str_Setting_Info;
 

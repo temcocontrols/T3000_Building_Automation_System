@@ -3255,6 +3255,17 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 		}
 
 	}
+
+	if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 640)
+	{
+	Device_Basic_Setting.reg.webview_json_flash = 0;
+		if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+		{
+			CString temp_task_info;
+			temp_task_info.Format(_T("Write into device timeout!"));
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
+		}
+	}
 	
 	return true;
 

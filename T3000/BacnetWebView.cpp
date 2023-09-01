@@ -70,7 +70,7 @@ enum WEBVIEW_MESSAGE_TYPE
 #define READ_CALENDER 4
 #define READ_PROGRAM 5
 
-
+int save_button_click = 0;
 extern char* ispoint_ex(char* token, int* num_point, byte* var_type, byte* point_type, int* num_panel, int* num_net, int network, unsigned char& sub_panel, byte panel, int* netpresent);
 
 extern CBacnetProgram* Program_Window;
@@ -125,7 +125,7 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 	{
 		InitializeWebView();
 	}
-	json_to_struct_results = 0;
+	save_button_click = 0;
 }
 
 
@@ -1166,7 +1166,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 		m_webView->PostWebMessageAsJson(temp_cs);
 
-		json_to_struct_results = JsonDataToStruct(file_output);
+
+		JsonDataToStruct(file_output);
 		bool zip_ret = ZipSingleItem(des_file_zip,des_file);
 		if (!zip_ret)
 		{
@@ -1177,6 +1178,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data from flash success!"));
 		}
 		Sleep(1);
+		save_button_click = 1;
 #if 0
 		nlohmann::json jsonData = nlohmann::json::parse(file_output);
 		Str_Json Str_MyJson(jsonData);

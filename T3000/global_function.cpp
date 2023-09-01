@@ -4726,7 +4726,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             s_Basic_Setting.reg.network_number_hi = *(my_temp_point++);
             //memcpy_s(&s_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
             //my_temp_point = my_temp_point + 10; //算上这个  长度是 270
-
+            s_Basic_Setting.reg.webview_json_flash = *(my_temp_point++);
 
             //额外处理不同CPU的 minitype
                //最高位 次高位   10   主芯片 APM
