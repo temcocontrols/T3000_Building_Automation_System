@@ -1,0 +1,82 @@
+name: Release
+
+on: workflow_dispatch
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Build webview assets
+        run: |
+          cd t3-webview-ui
+          npm install
+          npm run build
+
+      - name: Get T3000 version number
+        id: version
+        run: |
+          $version = '${{ github.event.release.tag_name }}'
+          $version = $version -replace "[^0-9]"
+          Write-Output version=$version >> $Env:GITHUB_OUTPUT
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build Solution
+        run: |
+          msbuild "T3000 - VS2019.sln" /p:Platform=x86 /p:Configuration=Release /p:ProjectVersion=${{ steps.version.outputs.version }}
+
+      - name: Clean & Orgenize Files
+        run: |
+          del "T3000 Output\release\*.pdb"
+          del "T3000 Output\release\*.lib"
+          del "T3000 Output\release\*.exp"
+          del "T3000 Output\release\*.ilk"
+          del "T3000 Output\release\ReadSinglePropDescr.xml"
+          xcopy "t3-webview-ui\dist\spa\" "T3000\ResourceFile\webview\www\" /E /H /C /I /y
+          xcopy "T3000\ResourceFile\" "T3000 Output\release\ResourceFile\" /E /H /C /I /y
+
+      - name: Set the installer version ( doesn't accept big numbers so we add a point )
+        id: iversion
+        run: |
+          $iversion = Get-Date -Format “yyyyMMdd”
+          Write-Output iversion=$iversion >> $Env:GITHUB_OUTPUT
+
+      - name: Build the installer
+        uses: caphyon/advinst-github-action@v1.0
+        with:
+          advinst-version: "20.9"
+          advinst-enable-automation: "true"
+          aip-path: ${{ github.workspace }}\T3000.aip
+          aip-build-name: DefaultBuild
+          aip-package-name: T3000-setup.msi
+          aip-output-dir: ${{ github.workspace }}\setup
+          aip-commands: |
+            AddFolder "APPDIR" ".\T3000 Output\release" -install_in_parent_folder
+            AddFolder "APPDIR" ".\T3000InstallShield\PH_Application"
+            AddFolder "APPDIR" ".\T3000InstallShield\Psychrometry"
+            SetProductCode -langid 1033
+            SetVersion ${{ steps.iversion.outputs.iversion }}
+
+      - name: Upload the installer to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: T3000-setup.msi
+          path: setup/T3000-setup.msi
+
+      - name: Prepare & zip the update files
+        run: |
+          Rename-Item -Path ".\T3000 Output\release\Update.exe" -NewName "UpdateEng.exe"
+          Compress-Archive -Path ".\T3000 Output\release\*" -CompressionLevel Optimal -DestinationPath .\20T3000Update.zip
+
+      - name: Upload the update files to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: 20T3000Update.zip
+          path: 20T3000Update.zip
