@@ -1,4 +1,4 @@
-name: Release
+name: Build
 
 on: workflow_dispatch
 
@@ -21,8 +21,7 @@ jobs:
       - name: Get T3000 version number
         id: version
         run: |
-          $version = '${{ github.event.release.tag_name }}'
-          $version = $version -replace "[^0-9]"
+          $version = Get-Date -Format “yyyyMMdd”
           Write-Output version=$version >> $Env:GITHUB_OUTPUT
 
       - name: Setup MSBuild
@@ -45,7 +44,8 @@ jobs:
       - name: Set the installer version ( doesn't accept big numbers so we add a point )
         id: iversion
         run: |
-          $iversion = Get-Date -Format “yyyyMMdd”
+          $iversion = '${{ steps.version.outputs.version }}'
+          $iversion = $iversion.Insert(4,'.')
           Write-Output iversion=$iversion >> $Env:GITHUB_OUTPUT
 
       - name: Build the installer
