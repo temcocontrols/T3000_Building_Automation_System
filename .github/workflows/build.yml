@@ -32,12 +32,14 @@ jobs:
           msbuild "T3000 - VS2019.sln" /p:Platform=x86 /p:Configuration=Release /p:ProjectVersion=${{ steps.version.outputs.version }}
 
       - name: Clean & Orgenize Files
+        continue-on-error: true
         run: |
           del "T3000 Output\release\*.pdb"
           del "T3000 Output\release\*.lib"
           del "T3000 Output\release\*.exp"
           del "T3000 Output\release\*.ilk"
           del "T3000 Output\release\ReadSinglePropDescr.xml"
+          del "T3000 Output\release\BacnetExplore.exe.config"
           xcopy "t3-webview-ui\dist\spa\" "T3000\ResourceFile\webview\www\" /E /H /C /I /y
           xcopy "T3000\ResourceFile\" "T3000 Output\release\ResourceFile\" /E /H /C /I /y
 
@@ -67,7 +69,7 @@ jobs:
       - name: Upload the installer to artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: T3000-setup.msi
+          name: T3000-setup
           path: setup/T3000-setup.msi
 
       - name: Prepare & zip the update files
@@ -78,5 +80,5 @@ jobs:
       - name: Upload the update files to artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: 20T3000Update.zip
-          path: 20T3000Update.zip
+          name: 20T3000Update
+          path: T3000 Output/release/*
