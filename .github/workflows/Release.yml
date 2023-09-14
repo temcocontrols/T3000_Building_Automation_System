@@ -17,6 +17,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Update submodules
+        run: |
+          git submodule update --recursive --remote
+
       - name: Build webview assets
         run: |
           cd t3-webview-ui
