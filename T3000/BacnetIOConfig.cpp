@@ -180,7 +180,7 @@ LRESULT CBacnetIOConfig::Fresh_Extio_List(WPARAM wParam, LPARAM lParam)
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
 
-	if (/*(g_selected_product_id == PM_ESP32_T3_SERIES) &&*/
+	if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
 		(
 			(int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
 	{

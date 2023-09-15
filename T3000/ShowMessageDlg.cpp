@@ -287,7 +287,7 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
 
                 Get_MSTP_Nodes(mstp_add, &mstp_count);
                 //SetStaticText(_T("Establishing Bacnet MSTP connection , please wait!"));
-                mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Des node %d\r\n"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
+                mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Panel Bacnet MAC ID %d\r\n"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
                 for (int i = 0; i < mstp_count; i++)
                 {
                     CString temp_nodes;
@@ -301,7 +301,7 @@ DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
                 {
                     Get_MSTP_STRUCT(&Temp_MSTP_Port);
                     Sleep(200);
-                    mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Des node %d\r\nNo response from device\r\nPlease check the communication protocol and check the RS485 hardware connection\r\nScanning"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
+                    mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Panel Bacnet MAC ID %d\r\nNo response from device\r\nPlease check the communication protocol and check the RS485 hardware connection\r\nScanning"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
                     CString temp_net;
                     for (int i = 0; i < temp_wait_count; i++)
                     {

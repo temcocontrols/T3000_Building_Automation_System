@@ -1705,7 +1705,7 @@ void BacnetScreen::OnSize(UINT nType, int cx, int cy)
 		m_screen_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
 
 		GetDlgItem(IDC_BUTTON_GRAPHIC_INSERT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
-		GetDlgItem(IDC_WEBVIEW_BUTTON)->MoveWindow(rc.left + 160, rc.bottom - 60, 120, 50);
+		GetDlgItem(IDC_WEBVIEW_BUTTON)->MoveWindow(rc.left + 20, rc.bottom - 60, 120, 50);
 	}
 }
 
