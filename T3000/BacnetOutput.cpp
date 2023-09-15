@@ -479,6 +479,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
     else
     {
         OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+		if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
+			((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
+		{
+			OUTPUT_LIMITE_ITEM_COUNT = DYNAMIC_OUTPUT_ITEM_COUNT;
+		}
     }
 
 	int temp_need_show_external = 0;

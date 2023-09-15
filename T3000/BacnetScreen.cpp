@@ -17,7 +17,7 @@
 #include "BacnetWebView.h"
 
 #include "JsonHead.h"
-
+#include "BacnetWebView.h"
 int main_webview();
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
 extern vector <MSG> My_Receive_msg;
@@ -481,7 +481,7 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 
 
 		if ((Device_Basic_Setting.reg.webview_json_flash == 2) &&//这里要判断是2
-			(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 640)) //643 版本会有这个功能
+			(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= WEBVIEW_JSON_FEATURE)) //643 版本会有这个功能
 		{
 			if (IDNO == MessageBox(_T("Continuing to use Graphic will erase the data stored by the Webview, which shares this part of flash. Are you sure you want to use Graphic?"), _T(""), MB_YESNO | MB_ICONINFORMATION))
 			{
@@ -1839,40 +1839,60 @@ int check_webview_runtime()
 		return 1;
 }
 
-#include "BacnetWebView.h"
+//系统版本太低 使用旧版本
+//检查旧版本的是否有数据，如果有数据就使用旧版本的
+//否则直接使用新版
+/*
+*	OS 		data in device	firmware	    use webview
+	old		no				old				no
+	new		no				old				no
+	old		yes				old				no
+	new		yes				old				no
+	old		no				new				no
+	old		yes				new				no
+	new		no				new				yes
+	new		yes				new				no
+
+*/
+int BacnetScreen::CheckOldGraphic()
+{
+	int os_pass = 0;
+	int firmware_pass = 0;
+	int nversion = check_webview_runtime();
+	if (nversion == 0)
+	{
+		os_pass = 0;
+		return 0;
+	}
+
+	if ((Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < WEBVIEW_JSON_FEATURE))
+	{
+		firmware_pass = 0;
+		return 0;
+	}
+	int ret_n = 0;
+     //判断每个里面有没有元素，没有元素就可以使用;
+	for (int i = 0; i < (int)m_screen_data.size(); i++)
+	{
+		if (m_screen_data.at(i).update != 0)
+			return 0;
+	}
+
+	return 1;
+ 
+
+}
+
 void BacnetScreen::OnBnClickedWebViewShow()
 {
-#if 0
-	m_json_item_data.at(4).reg.json_items.item_belong_screen = 0x11;
-	m_json_item_data.at(4).reg.json_items.active = 0x22;
-	m_json_item_data.at(4).reg.json_items.width = 0x33;
-	m_json_item_data.at(4).reg.json_items.zindex = 0x44;
-	strcpy(m_json_item_data.at(4).reg.json_items.title, "Dufan");
-	
-	int write_results2 = Write_Private_Data_Blocking(WRITE_JSON_ITEM, 4, 4);
-	Sleep(2);
-	return;
-	m_json_screen_data.at(3).reg.activeItemIndex = 0x55;
-	m_json_screen_data.at(3).reg.customObjectsCount = 0x66;
-	m_json_screen_data.at(3).reg.groupCount = 0x77;
-	m_json_screen_data.at(3).reg.viewportTransform.y = 0x88;
-	int write_results = Write_Private_Data_Blocking(WRITE_JSON_SCREEN, 3, 3);
-	Sleep(2);
-	return;
-#endif // DEBUG
+	int nret = CheckOldGraphic();
+	if (nret == 0)
+	{
+		PostMessage(WM_HOTKEY, KEY_INSERT, NULL);
+		return;
+	}
 
-	/*
-	CString temp_now_building_name = g_strCurBuildingDatabasefilePath;
-	PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
-	temp_now_building_name.ReleaseBuffer();
-	CString temp_image_folder = temp_now_building_name + _T("\\image\\");
-	CString PicFileTips;
-	MultiByteToWideChar(CP_ACP, 0, (char*)m_screen_data.at(screen_list_line).picture_file,
-		(int)strlen((char*)m_screen_data.at(screen_list_line).picture_file) + 1,
-		PicFileTips.GetBuffer(MAX_PATH), MAX_PATH);
-	PicFileTips.ReleaseBuffer();
-	CString fullpath = temp_image_folder + PicFileTips;
-	*/
+
 	if (screen_list_line > 7)
 	{
 		CString temp_cs;
@@ -1992,7 +2012,7 @@ int BacnetScreen::StructToJsonData()
 int  BacnetScreen::Read_Struct_Data()
 {
 	if ((Device_Basic_Setting.reg.webview_json_flash == 2) &&//这里要判断是2
-		(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 640)) //643 版本会有这个功能
+		(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= WEBVIEW_JSON_FEATURE)) //643 版本会有这个功能
 	{
 		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");

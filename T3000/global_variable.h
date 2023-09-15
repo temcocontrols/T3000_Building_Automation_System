@@ -2350,4 +2350,8 @@ vector <Str_BM_IO> m_bm_io_data; //用来存储BM 系统  IO表数据
 vector <Str_product_io_count> m_product_iocount;  // 用来存储不同设备包含的IO数量;
 vector <Str_online_serialnumber> m_online_serial; //在线的设备，用于动态菜单
 
+unsigned int DYNAMIC_INPUT_ITEM_COUNT = 64;
+unsigned int DYNAMIC_OUTPUT_ITEM_COUNT = 64;
+unsigned int DYNAMIC_VARIABLE_ITEM_COUNT = 128;
+
 

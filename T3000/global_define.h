@@ -6,7 +6,7 @@
 #endif // DEBUG
 
 
-#define ENABLE_T3_EMAIL
+//#define ENABLE_T3_EMAIL
 #define DISABLE_HANDLE_JSON_DATA
 #include <map>
 //minipanel ¼Ä´æÆ÷±í
@@ -2309,7 +2309,11 @@ const CString RegisterView_Format[] =
     _T("16 Bit Signed Integer/10") ,  //17
     _T("16 Bit Unsigned Integer/10"),  // 18
 	_T("16 Bit Signed Integer/100") ,  //19
-	_T("16 Bit Unsigned Integer/100")  // 20
+	_T("16 Bit Unsigned Integer/100"),  // 20
+	_T("32 Bit Float_ABCD"),
+	_T("32 Bit Float_CDAB"),
+	_T("32 Bit Float_BADC"),
+	_T("32 Bit Float_DCBA")
 };
 const int REGISTER_UNKNOWN = 0;
 const int REGISTER_8_BIT_UNSIGNED_INTEGER = 1;
@@ -2332,6 +2336,10 @@ const int REGISTER_16_BIT_SIGNED_INTEGER_DIV_10 = 17;
 const int REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_10 = 18;
 const int REGISTER_16_BIT_SIGNED_INTEGER_DIV_100 = 19;
 const int REGISTER_16_BIT_UNSIGNED_INTEGER_DIV_100 = 20;
+const int REGISTER_2REG_FLOAT_ABCD = 21;
+const int REGISTER_2REG_FLOAT_CDAB = 22;
+const int REGISTER_2REG_FLOAT_BADC = 23;
+const int REGISTER_2REG_FLOAT_DCBA = 24;
 
 const CString Wifi_Module_Status[] =
 {
@@ -2896,6 +2904,9 @@ enum
 	TREE_IO_ONLINE,
 	TREE_IO_UNKNOWN,
 };
+
+#define ESP32_IO_COUNT_REDEFINE_VERSION  637
+#define WEBVIEW_JSON_FEATURE             643
 
 
 

@@ -3268,7 +3268,7 @@ void CDialogCM5_BacNet::Fresh()
 	if ((g_protocol!=PROTOCOL_BACNET_IP) && 
         (g_protocol != MODBUS_BACNET_MSTP)  && 
         (g_protocol != PROTOCOL_BIP_TO_MSTP) && 
-        (g_protocol != MODBUS_RS485) && 
+        (g_protocol != MODBUS_RS485) &&  
         (g_protocol != MODBUS_TCPIP) &&
         (g_protocol != PROTOCOL_BIP_T0_MSTP_TO_MODBUS) &&
         (g_protocol != PROTOCOL_MB_TCPIP_TO_MB_RS485) &&
@@ -3290,7 +3290,7 @@ void CDialogCM5_BacNet::Fresh()
 
 //	g_NEED_MULTI_READ = FALSE;
 	already_retry = false;
-	read_write_bacnet_config = false;
+ 	read_write_bacnet_config = false;
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	if(last_serial_number != selected_product_Node.serial_number) //如果上次的设备不是一样的就需要重读 Graphic label;
 	{
@@ -3585,7 +3585,7 @@ void CDialogCM5_BacNet::Fresh()
 	}
 	if(!offline_mode)
 	{
-        if(selected_product_Node.software_version >= 52.8)
+         if(selected_product_Node.software_version >= 52.8)
             MODE_SUPPORT_PTRANSFER = 1;
         else
             MODE_SUPPORT_PTRANSFER = 0;
@@ -3699,7 +3699,7 @@ void CDialogCM5_BacNet::Fresh()
 
             temp_instance = temp_buffer[0] * 65536 + temp_buffer[3];
             temp_mac = temp_buffer[4];
-        }
+        } 
 
 
 
@@ -6137,7 +6137,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				}
 				
 
-				g_mstp_deviceid = selected_product_Node.object_instance;
+				 g_mstp_deviceid = selected_product_Node.object_instance;
 				g_protocol = PROTOCOL_THIRD_PARTY_BAC_BIP;
 				product_type = selected_product_Node.product_class_id;
 				BACnet_read_thread = CreateThread(NULL, NULL, Bacnet_read_properties_thread, this, NULL, NULL);
@@ -6521,10 +6521,31 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 				//PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,BAC_READ_ALL_LIST);
 			}
 		}
-
+		static int last_inital_point = 0;
 		Set_Tab_Loaded_Parameter(WINDOW_INPUT);
 		Set_Tab_Loaded_Parameter(WINDOW_OUTPUT);
 		Set_Tab_Loaded_Parameter(WINDOW_VARIABLE);
+		if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
+			((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
+		{
+			//重新加载 input output  variable  esp32 的3个是动态设置变化的;
+			ReInital_Someof_Point();
+			last_inital_point = 2; // 最后一次是esp 的count
+		}
+		else
+		{
+			if (last_inital_point == 2)
+			{
+				last_inital_point = 1;
+				Initial_All_Point();
+				//input_item_limit_count = DYNAMIC_INPUT_ITEM_COUNT;
+				((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
+				//output_item_limit_count = DYNAMIC_OUTPUT_ITEM_COUNT;
+				((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->Initial_List();
+				//variable_item_limit_count = DYNAMIC_VARIABLE_ITEM_COUNT;
+				((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->Initial_List();
+			}
+		}
 	}
 
 	if(m_bac_main_tab.IsWindowVisible() == false)
@@ -6542,7 +6563,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		g_hwnd_now = m_input_dlg_hwnd;
 		Input_Window->m_input_list.SetFocus();  
 		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-		break;
+ 		break;
 	case TYPE_OUTPUT:
         if (Output_Window->IsWindowVisible() == false)
         {
@@ -8308,7 +8329,7 @@ void intial_bip_socket()
 
         Re_Initial_Bac_Socket_IP = selected_product_Node.NetworkCard_Address;
 
-        if ((!offline_mode) && (Initial_bac(g_gloab_bac_comport, selected_product_Node.NetworkCard_Address)))
+         if ((!offline_mode) && (Initial_bac(g_gloab_bac_comport, selected_product_Node.NetworkCard_Address)))
         {
             initial_bip = true;
         }

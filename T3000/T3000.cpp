@@ -66,6 +66,7 @@ CT3000App::CT3000App()
 // The one and only CT3000App object
 CT3000App theApp;
 
+
 void CT3000App::UpdateDB()
 {
     CppSQLite3DB SqliteDBT3000;

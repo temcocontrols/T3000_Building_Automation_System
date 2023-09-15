@@ -244,7 +244,7 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
 	break;
 	case WM_NCDESTROY:
 	{
-		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 640) //643 版本会有这个功能
+		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= WEBVIEW_JSON_FEATURE) //643 版本会有这个功能
 		{
 				::PostMessage(m_screen_dlg_hwnd, HANDLE_JSON_DATA, NULL, NULL);
 		}

@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ Ã‰ÃºÂ³Ã‰ÂµÃ„Â°Ã¼ÂºÂ¬ÃŽÃ„Â¼Ã¾Â¡Â£
-// Â¹Â© T3000.rc ÃŠÂ¹Ã“Ãƒ
+// Microsoft Visual C++ Éú³ÉµÄ°üº¬ÎÄ¼þ¡£
+// ¹© T3000.rc Ê¹ÓÃ
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -344,6 +344,7 @@
 #define IDD_DIALOG_BACNET_UNITS         788
 #define IDD_DIALOG_BACNET_BUILDING_PROPERTY 790
 #define IDR_DEVICEDATABASE_DB           793
+#define IDD_DIALOG_REDEFINE_IO_COUNT    796
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -393,6 +394,7 @@
 #define IDC_EDIT_MIN_VALUE_VALUE        1028
 #define IDC_EDIT_BN_VARIABLE_COUNT      1028
 #define IDC_EDIT_CURRENT_MIN            1028
+#define IDC_EDIT_VARIABLE_COUNT         1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
@@ -1136,6 +1138,7 @@
 #define IDC_COMMAND1                    1347
 #define IDC_EDIT_OUTPUT                 1348
 #define IDC_CHECK10                     1348
+#define IDC_EDIT_OUTPUT_COUNT           1348
 #define IDC_EDIT_T3MODEL                1349
 #define IDC_CHECK11                     1349
 #define IDC_EDIT_T3PICVERSION           1350
@@ -2756,7 +2759,9 @@
 #define IDC_STATIC_FREE_1               2692
 #define IDC_STATIC_FREE_2               2693
 #define IDC_RADIO_SCROLL_ENABLE         2694
+#define IDC_EDIT_INPUT_COUNT            2694
 #define IDC_RADIO_SCROLLBAR_DISABLE     2695
+#define IDC_BUTTON_REDEFINE_IO          2695
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3325,9 +3330,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        796
+#define _APS_NEXT_RESOURCE_VALUE        798
 #define _APS_NEXT_COMMAND_VALUE         34080
-#define _APS_NEXT_CONTROL_VALUE         2694
+#define _APS_NEXT_CONTROL_VALUE         2696
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

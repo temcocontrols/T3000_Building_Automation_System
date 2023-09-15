@@ -102,7 +102,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingObjInstance()
     {
         CString temp_warning;
         temp_warning.Format(_T("Do you really want to change the bacnet object instance to %u ?"), temp_obj_instance);
-        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
             unsigned int old_object_instance = Device_Basic_Setting.reg.object_instance;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.object_instance = (unsigned int)temp_obj_instance;
@@ -141,7 +141,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingModbusId()
     {
         CString temp_warning;
         temp_warning.Format(_T("Do you really want to change the modbus ID to %u ?"), temp_modbusid);
-        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
             unsigned char old_modbusid = Device_Basic_Setting.reg.modbus_id;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.modbus_id = (unsigned char)temp_modbusid;
@@ -182,7 +182,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMaxMaster()
     {
         CString temp_warning;
         temp_warning.Format(_T("Do you really want to change the max master to %u ?"), temp_max_master);
-        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
             unsigned char old_max_master = Device_Basic_Setting.reg.max_master;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.max_master = (unsigned char)temp_max_master;
@@ -270,7 +270,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingPanel()
     {
         CString temp_warning;
         temp_warning.Format(_T("Do you really want to change the panel number to %u ?"), temp_panel);
-        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
             unsigned char old_panel = Device_Basic_Setting.reg.panel_number;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.panel_number = (unsigned char)temp_panel;
@@ -444,7 +444,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingBipNetwork2()
     {
         CString temp_warning;
         temp_warning.Format(_T("Do you really want to change the bacnet network to %u ?"), temp_bip_network);
-        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
             unsigned int old_network = Device_Basic_Setting.reg.network_number_hi * 256 + Device_Basic_Setting.reg.network_number;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.network_number = (unsigned int)temp_bip_network%256;
@@ -479,7 +479,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMstpNetwork()
     {
         CString temp_warning;
         temp_warning.Format(_T("Do you really want to change the bacnet MSTP network number to %u ?"), temp_mstp_network);
-        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
             unsigned int old_mstp_network = Device_Basic_Setting.reg.mstp_network_number;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.mstp_network_number = temp_mstp_network;

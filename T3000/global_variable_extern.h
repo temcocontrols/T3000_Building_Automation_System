@@ -1356,3 +1356,9 @@ extern vector <Str_product_io_count> m_product_iocount;  // 用来存储不同设备包含
 extern vector <Str_online_serialnumber> m_online_serial; //在线的设备，用于动态菜单
 extern bool Bacnet_debug_fileRead;
 extern bool bacnetIpDataRead;
+
+extern unsigned int DYNAMIC_INPUT_ITEM_COUNT ;
+extern unsigned int DYNAMIC_OUTPUT_ITEM_COUNT ;
+extern unsigned int DYNAMIC_VARIABLE_ITEM_COUNT ;
+
+

@@ -80,6 +80,29 @@ void CBacnetSettingParamter::InitialUI()
         temp_cs.Format(_T("%u"), temp_number);
         ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->SetWindowTextW(temp_cs);
 
+  
+
+        if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
+            (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
+            (Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
+        {
+            if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 539)
+            {
+                ((CComboBox*)GetDlgItem(IDC_COMBO_TYPE))->EnableWindow(1);
+                ((CComboBox*)GetDlgItem(IDC_COMBO_NUMBER))->EnableWindow(1);
+            }
+            else
+            {
+                ((CComboBox*)GetDlgItem(IDC_COMBO_TYPE))->EnableWindow(0);
+                ((CComboBox*)GetDlgItem(IDC_COMBO_NUMBER))->EnableWindow(0);
+            }
+        }
+        else
+        {
+            ((CComboBox*)GetDlgItem(IDC_COMBO_TYPE))->EnableWindow(0);
+            ((CComboBox*)GetDlgItem(IDC_COMBO_NUMBER))->EnableWindow(0);
+        }
+
 }
 
 
@@ -132,21 +155,30 @@ void CBacnetSettingParamter::InitialUI()
 void CBacnetSettingParamter::OnBnClickedButtonLcdOk()
 {
     // TODO: 在此添加控件通知处理程序代码
-    CString temp_type; CString temp_number;
-    GetDlgItemText(IDC_COMBO_TYPE, temp_type);
-    GetDlgItemText(IDC_COMBO_NUMBER, temp_number);
-
-    for (int i = 0; i < sizeof(DisplayType) / sizeof(DisplayType[0]); i++)
+    if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
+        (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
+        (Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
     {
-        if (temp_type.CompareNoCase(DisplayType[i]) == 0)
+        if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 539)
         {
-            Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.npoint.point_type = i;
-            break;
+
+            CString temp_type; CString temp_number;
+            GetDlgItemText(IDC_COMBO_TYPE, temp_type);
+            GetDlgItemText(IDC_COMBO_NUMBER, temp_number);
+
+            for (int i = 0; i < sizeof(DisplayType) / sizeof(DisplayType[0]); i++)
+            {
+                if (temp_type.CompareNoCase(DisplayType[i]) == 0)
+                {
+                    Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.npoint.point_type = i;
+                    break;
+                }
+            }
+            int temp_value;
+            temp_value = (unsigned char)_wtoi(temp_number);
+            Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.npoint.number = temp_value;
         }
     }
-    int temp_value;
-    temp_value = (unsigned char)_wtoi(temp_number);
-    Device_Basic_Setting.reg.display_lcd.lcd_mod_reg.npoint.number = temp_value;
 
     if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
     {
@@ -155,4 +187,10 @@ void CBacnetSettingParamter::OnBnClickedButtonLcdOk()
         SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
         return;
     }
+    else
+    {
+        MessageBox(_T("success!"));
+        PostMessage(WM_CLOSE, NULL, NULL);
+    }
+
 }

@@ -63,7 +63,7 @@
     </Filter>
     <Filter Include="Source Files\JsonCpp">
       <UniqueIdentifier>{aed7621d-d450-4ef1-b09a-558136c0b07f}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="ClassInfo\Zip">
       <UniqueIdentifier>{36cd581d-75f9-4594-9503-f6ae70f1ebd1}</UniqueIdentifier>
     </Filter>
@@ -851,6 +851,9 @@
     </ClCompile>
     <ClCompile Include="ForZip\zip.cpp">
       <Filter>ClassInfo\Zip</Filter>
+    </ClCompile>
+    <ClCompile Include="CBacnetIODefine.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2106,6 +2109,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="JsonHead.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBacnetIODefine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -639,7 +639,7 @@ void CBacnetSettingTcpip::OnEnKillfocusEditSettingZeigbeePanid()
     {
         CString temp_warning;
         temp_warning.Format(_T("Do you really want to change the zigbee pan ID to %u ?"), temp_panid);
-        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
             unsigned short old_panid = Device_Basic_Setting.reg.zigbee_panid;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.zigbee_panid = (unsigned short)temp_panid;
@@ -755,7 +755,7 @@ void CBacnetSettingTcpip::OnEnKillfocusEditSettingPort()
     {
         CString temp_warning;
         temp_warning.Format(_T("Do you really want to change the modbus port to %u ?"), temp_port);
-        if (IDYES == MessageBox(temp_warning, _T("Notoce"), MB_YESNO))
+        if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
             unsigned short old_port = Device_Basic_Setting.reg.modbus_port;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.modbus_port = (unsigned short)temp_port;

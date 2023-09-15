@@ -33,4 +33,5 @@ public:
 	afx_msg void OnNMClickListIoconfig(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedButtonExtOk();
 	afx_msg void OnBnClickedButtonExtCancel();
+	afx_msg void OnBnClickedButtonRedefineIo();
 };

@@ -747,6 +747,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	else
 	{
 		INPUT_LIMITE_ITEM_COUNT =  BAC_INPUT_ITEM_COUNT;
+		if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
+			((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
+		{
+			INPUT_LIMITE_ITEM_COUNT = DYNAMIC_INPUT_ITEM_COUNT;
+		}
 	}
 
 
@@ -1963,7 +1968,9 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 			{
 				break;
 			}
-				Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0); //只刷新Value
+
+
+//				Post_Refresh_Message(g_bac_instance, READINPUT_T3000, 0, BAC_INPUT_ITEM_COUNT - 1, sizeof(Str_in_point), 0); //只刷新Value
 		}
 		break;
 	case 5:

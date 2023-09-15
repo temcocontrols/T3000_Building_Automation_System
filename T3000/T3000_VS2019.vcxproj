@@ -56,7 +56,7 @@
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\T3000 Output\debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\T3000 Output\T3000 object\debug\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</EmbedManifest>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\T3000 object\Release\</IntDir>
@@ -234,6 +234,7 @@
     <ClCompile Include="CBacnetBuildingProperty.cpp" />
     <ClCompile Include="CBacnetBuildingRoomEditor.cpp" />
     <ClCompile Include="CBacnetBuilidngAddNode.cpp" />
+    <ClCompile Include="CBacnetIODefine.cpp" />
     <ClCompile Include="CBacnetUnitsSelection.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxis.cpp" />
@@ -622,6 +623,7 @@
     <ClInclude Include="CBacnetBuildingRoomEditor.h" />
     <ClInclude Include="CBacnetBuilidngAddNode.h" />
     <ClInclude Include="CBacnetDescription.h" />
+    <ClInclude Include="CBacnetIODefine.h" />
     <ClInclude Include="CBacnetUnitsSelection.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />
     <ClInclude Include="ChartCtrl\ChartAxisLabel.h" />

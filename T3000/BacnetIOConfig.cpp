@@ -6,7 +6,7 @@
 #include "BacnetIOConfig.h"
 #include "afxdialogex.h"
 #include "global_function.h"
-
+#include "CBacnetIODefine.h"
 // CBacnetIOConfig dialog
 
 IMPLEMENT_DYNAMIC(CBacnetIOConfig, CDialogEx)
@@ -35,6 +35,7 @@ BEGIN_MESSAGE_MAP(CBacnetIOConfig, CDialogEx)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_IOCONFIG, &CBacnetIOConfig::OnNMClickListIoconfig)
 	ON_BN_CLICKED(IDC_BUTTON_EXT_OK, &CBacnetIOConfig::OnBnClickedButtonExtOk)
 	ON_BN_CLICKED(IDC_BUTTON_EXT_CANCEL, &CBacnetIOConfig::OnBnClickedButtonExtCancel)
+	ON_BN_CLICKED(IDC_BUTTON_REDEFINE_IO, &CBacnetIOConfig::OnBnClickedButtonRedefineIo)
 END_MESSAGE_MAP()
 
 
@@ -179,6 +180,16 @@ LRESULT CBacnetIOConfig::Fresh_Extio_List(WPARAM wParam, LPARAM lParam)
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
 
+	if (/*(g_selected_product_id == PM_ESP32_T3_SERIES) &&*/
+		(
+			(int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
+	{
+		((CButton*)GetDlgItem(IDC_BUTTON_REDEFINE_IO))->EnableWindow(true);
+	}
+	else
+	{
+		((CButton*)GetDlgItem(IDC_BUTTON_REDEFINE_IO))->EnableWindow(false);
+	}
 
 	for (int i = 0; i < (int)m_extio_config_data.size(); i++)
 	{
@@ -268,6 +279,8 @@ LRESULT CBacnetIOConfig::Fresh_Extio_List(WPARAM wParam, LPARAM lParam)
 		m_ext_io_config_list.SetItemText(i, EXTIO_INPUTS_IO, temp_in);
 		m_ext_io_config_list.SetItemText(i, EXTIO_OUTPUTS_IO, temp_out);
 	}
+
+
 	return 0;
 }
 
@@ -519,4 +532,12 @@ void CBacnetIOConfig::OnBnClickedButtonExtCancel()
 {
 	
 	PostMessage(WM_CLOSE,NULL,NULL);
+}
+
+
+void CBacnetIOConfig::OnBnClickedButtonRedefineIo()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CBacnetIODefine IOdlg;
+	IOdlg.DoModal();
 }

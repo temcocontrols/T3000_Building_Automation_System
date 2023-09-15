@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// √ñ√ê√é√Ñ(¬º√≤√å√•¬£¬¨√ñ√ê¬π√∫) resources
+// ÷–Œƒ(ºÚÃÂ£¨÷–π˙) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -781,7 +781,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "OK",IDOK,701,461,50,14,NOT WS_VISIBLE
     PUSHBUTTON      "Cancel",IDCANCEL,701,461,50,14,NOT WS_VISIBLE
-    CONTROL         "",IDC_RICHEDIT2_PROGRAM,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN | ES_NUMBER | WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,7,14,744,386
+    CONTROL         "",IDC_RICHEDIT2_PROGRAM,"RichEdit20W",WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP | 0x3084,7,14,744,386
     LISTBOX         IDC_LIST_INFORMATION_WINDOW,7,411,508,64,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Programs pool size :",IDC_STATIC_POOL_1,606,418,64,8
     LTEXT           "Programs size        :",IDC_STATIC_SIZE_1,607,437,64,8
@@ -1131,9 +1131,9 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,363,338,50,14,NOT WS_VISIBLE | NOT WS_TABSTOP
     PUSHBUTTON      "Cancel",IDCANCEL,418,338,50,14,NOT WS_VISIBLE | NOT WS_TABSTOP
     CONTROL         "",IDC_LIST_SCREEN,"SysListView32",LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,15,461,304
-    PUSHBUTTON      "Show Graphic",IDC_BUTTON_GRAPHIC_INSERT,7,321,84,31
+    PUSHBUTTON      "Show Graphic",IDC_BUTTON_GRAPHIC_INSERT,245,321,84,31,NOT WS_VISIBLE
     EDITTEXT        IDC_EDIT_BACNET_SCREEN_PIC_FILE,335,322,62,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
-    PUSHBUTTON      "WEBVIEW (Beta)",IDC_WEBVIEW_BUTTON,97,323,77,29
+    PUSHBUTTON      "Webview",IDC_WEBVIEW_BUTTON,12,323,77,29
 END
 
 IDD_GRID_LAB DIALOGEX 0, 0, 93, 21
@@ -2741,6 +2741,7 @@ BEGIN
     PUSHBUTTON      "Delete Select\r Expansion I/O",IDC_BUTTON_EXTIO_DELETE_SEL,134,189,73,27,BS_MULTILINE
     PUSHBUTTON      "Done",IDC_BUTTON_EXT_OK,234,189,73,27
     PUSHBUTTON      "Cancel",IDC_BUTTON_EXT_CANCEL,334,189,73,27
+    PUSHBUTTON      "Redefine IO ",IDC_BUTTON_REDEFINE_IO,423,190,48,26
 END
 
 IDD_DIALOG_BACNET_ADD_VIRTUAL_DEVICE DIALOGEX 0, 0, 397, 298
@@ -3228,6 +3229,22 @@ BEGIN
     CTEXT           "",IDC_STATIC_TRANSDUCER_ENTHALPY_VALUE2,286,54,34,14,WS_BORDER
     CTEXT           "",IDC_STATIC_TRANSDUCER_DEW_VALUE,287,30,34,14,WS_BORDER
     LTEXT           "Kg/m3",IDC_STATIC,324,79,21,8
+END
+
+IDD_DIALOG_REDEFINE_IO_COUNT DIALOGEX 0, 0, 185, 153
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "IO Define"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "»∑∂®",IDOK,92,103,50,14
+    PUSHBUTTON      "»°œ˚",IDCANCEL,24,103,50,14
+    GROUPBOX        "IO",IDC_STATIC,13,15,150,79
+    LTEXT           "Input Count :",IDC_STATIC,22,28,58,12
+    LTEXT           "Output Count :",IDC_STATIC,22,47,58,12
+    LTEXT           "Variable Count :",IDC_STATIC,22,65,58,12
+    EDITTEXT        IDC_EDIT_INPUT_COUNT,82,27,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_OUTPUT_COUNT,82,45,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_VARIABLE_COUNT,82,63,40,14,ES_AUTOHSCROLL
 END
 
 
@@ -4218,6 +4235,14 @@ BEGIN
         RIGHTMARGIN, 694
         TOPMARGIN, 7
         BOTTOMMARGIN, 386
+    END
+
+    IDD_DIALOG_REDEFINE_IO_COUNT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 178
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 146
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -7226,6 +7251,11 @@ BEGIN
     0
 END
 
+IDD_DIALOG_REDEFINE_IO_COUNT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -7306,12 +7336,12 @@ BEGIN
     ID_TOOLS_MODBUSTOBACNETROUTER "Subnet Devices"
 END
 
-#endif    // √ñ√ê√é√Ñ(¬º√≤√å√•¬£¬¨√ñ√ê¬π√∫) resources
+#endif    // ÷–Œƒ(ºÚÃÂ£¨÷–π˙) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// √ì¬¢√ì√Ø(√É√Ä¬π√∫) resources
+// ”¢”Ô(√¿π˙) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -8928,7 +8958,7 @@ BEGIN
     EDITTEXT        IDC_EDIT_SETTING_NODES_LABEL_SETTING,307,197,119,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_LCD_DELAY_OFF_TIME,76,226,40,14,ES_CENTER | ES_AUTOHSCROLL
     LTEXT           "( s )",IDC_STATIC,121,228,14,8
-    PUSHBUTTON      "LCD \r\nParameter",IDC_BUTTON_LCD_SETTING,84,197,50,22,BS_MULTILINE
+    PUSHBUTTON      "Parameter",IDC_BUTTON_LCD_SETTING,84,197,50,22,BS_MULTILINE
     LTEXT           "Zone Name  :",IDC_STATIC_SETTING_NODES_LABEL_TITLE2,243,221,50,10,NOT WS_VISIBLE
     EDITTEXT        IDC_EDIT_SETTING_ALIAS_NAME,307,218,119,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
     LTEXT           "MCU type :",IDC_STATIC,19,148,37,8
@@ -9109,7 +9139,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
 END
 
-IDD_DIALOG_BACNET_SETTING_LCD_PARAMETER DIALOGEX 0, 0, 291, 215
+IDD_DIALOG_BACNET_SETTING_LCD_PARAMETER DIALOGEX 0, 0, 189, 160
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Parameter"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -9118,7 +9148,7 @@ BEGIN
     COMBOBOX        IDC_COMBO_NUMBER,94,42,57,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "LCD",IDC_STATIC,15,11,151,75
     LTEXT           "What to display on the top of the LCD",IDC_STATIC,23,27,148,8
-    PUSHBUTTON      "OK",IDC_BUTTON_LCD_OK,102,65,50,14
+    PUSHBUTTON      "OK",IDC_BUTTON_LCD_OK,109,110,50,14
 END
 
 IDD_DIALOG_BACNET_UNITS DIALOGEX 0, 0, 265, 125
@@ -9644,9 +9674,9 @@ BEGIN
     IDD_DIALOG_BACNET_SETTING_LCD_PARAMETER, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 284
+        RIGHTMARGIN, 182
         TOPMARGIN, 7
-        BOTTOMMARGIN, 208
+        BOTTOMMARGIN, 153
     END
 
     IDD_DIALOG_BACNET_UNITS, DIALOG
@@ -11838,12 +11868,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // √ì¬¢√ì√Ø(√É√Ä¬π√∫) resources
+#endif    // ”¢”Ô(√¿π˙) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// √ì¬¢√ì√Ø(√ì¬¢¬π√∫) resources
+// ”¢”Ô(”¢π˙) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -11949,7 +11979,7 @@ BEGIN
     0
 END
 
-#endif    // √ì¬¢√ì√Ø(√ì¬¢¬π√∫) resources
+#endif    // ”¢”Ô(”¢π˙) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

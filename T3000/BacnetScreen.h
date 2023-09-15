@@ -56,6 +56,7 @@ public:
 	void OnBnClickedWebViewShow();
 	int  Read_Struct_Data();
 	int StructToJsonData();
+	int CheckOldGraphic();
 };
 
 

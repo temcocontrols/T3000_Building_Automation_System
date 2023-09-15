@@ -4727,6 +4727,11 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             //memcpy_s(&s_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
             //my_temp_point = my_temp_point + 10; //算上这个  长度是 270
             s_Basic_Setting.reg.webview_json_flash = *(my_temp_point++);
+            
+            s_Basic_Setting.reg.max_var = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0]; my_temp_point = my_temp_point + 2;
+            s_Basic_Setting.reg.max_in = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0]; my_temp_point = my_temp_point + 2;
+            s_Basic_Setting.reg.max_out = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0]; my_temp_point = my_temp_point + 2;
+
 
             //额外处理不同CPU的 minitype
                //最高位 次高位   10   主芯片 APM
@@ -7239,7 +7244,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 
     int len = 0;
     uint32_t device_id = 0;
-    unsigned max_apdu = 0;
+    unsigned max_apdu = 0; 
     int segmentation = 0;
     uint16_t vendor_id = 0;
 
@@ -7295,7 +7300,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
     temp_1.macaddress = _wtoi(bac_cs_mac);
     temp_1.vendor_id = vendor_id;
     int find_exsit = false;
-    for (int i=0; i<(int)m_bac_handle_Iam_data.size(); i++)
+     for (int i=0; i<(int)m_bac_handle_Iam_data.size(); i++)
     {
         if((m_bac_handle_Iam_data.at(i).device_id == temp_1.device_id)
                 && (m_bac_handle_Iam_data.at(i).macaddress == temp_1.macaddress))
@@ -7303,7 +7308,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
             find_exsit = true;
         }
     }
-
+     
     if(!find_exsit)
     {
         m_bac_handle_Iam_data.push_back(temp_1);
@@ -16455,6 +16460,67 @@ void Initial_Virtual_Device_Setting()
     Device_Basic_Setting.reg.ip_addr[2] = 0;
     Device_Basic_Setting.reg.ip_addr[3] = 3;
     Device_Basic_Setting.reg.modbus_port = 502;
+}
+
+void ReInital_Someof_Point()
+{
+    if (Device_Basic_Setting.reg.max_in > BAC_INPUT_ITEM_COUNT)
+    {
+        DYNAMIC_INPUT_ITEM_COUNT = Device_Basic_Setting.reg.max_in;
+        m_Input_data.clear();    
+        m_Input_data_instance.clear();
+        for (int i = 0; i < DYNAMIC_INPUT_ITEM_COUNT; i++)
+        {
+            Str_in_point temp_in = { 0 };
+            memset(temp_in.description, 0, 21);
+            memset(temp_in.label, 0, 9);
+            temp_in.filter = 5;
+            sprintf((char*)temp_in.description, "IN%d", i + 1);
+            m_Input_data.push_back(temp_in);
+            m_Input_data_instance.push_back(i);
+        }
+
+        input_item_limit_count = DYNAMIC_INPUT_ITEM_COUNT;
+        ((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
+
+    }
+
+    if (Device_Basic_Setting.reg.max_out > BAC_OUTPUT_ITEM_COUNT)
+    {
+        DYNAMIC_OUTPUT_ITEM_COUNT = Device_Basic_Setting.reg.max_out;
+        m_Output_data.clear();
+        m_Output_data_instance.clear();
+        for (int i = 0; i < DYNAMIC_OUTPUT_ITEM_COUNT; i++)
+        {
+            Str_out_point temp_out = { 0 };
+            memset(&temp_out, 0, sizeof(temp_out));
+            sprintf((char*)temp_out.description, "OUT%d", i + 1);
+            temp_out.hw_switch_status = 1;
+            m_Output_data.push_back(temp_out);
+            m_Output_data_instance.push_back(i);
+        }
+        output_item_limit_count = DYNAMIC_OUTPUT_ITEM_COUNT;
+        ((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->Initial_List();
+    }
+
+    if (Device_Basic_Setting.reg.max_var > BAC_VARIABLE_ITEM_COUNT)
+    {
+        DYNAMIC_VARIABLE_ITEM_COUNT = Device_Basic_Setting.reg.max_var;
+        m_Variable_data.clear();
+        m_Variable_data_instance.clear();
+        for (int i = 0; i < DYNAMIC_VARIABLE_ITEM_COUNT; i++)
+        {
+            Str_variable_point temp_variable = { 0 };
+            memset(&temp_variable, 0, sizeof(temp_variable));
+            sprintf((char*)temp_variable.description, "VAR%d", i + 1);
+            m_Variable_data.push_back(temp_variable);
+            m_Variable_data_instance.push_back(i);
+        }
+        variable_item_limit_count = DYNAMIC_VARIABLE_ITEM_COUNT;
+        ((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->Initial_List();
+    }
+
+
 }
 
 void Initial_All_Point()

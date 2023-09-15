@@ -40,7 +40,11 @@ BEGIN_MESSAGE_MAP(CBacnetRegisterListView, CDialogEx)
 END_MESSAGE_MAP()
 
 HANDLE h_read_reg_date_thread = NULL;
-
+typedef union
+{
+    float floatvalue;
+    char chardata[4];
+}Float_Char_Data;
 
 DWORD WINAPI  CBacnetRegisterListView::ReadRegDataThreadfun(LPVOID lpVoid)
 {
@@ -1102,6 +1106,70 @@ LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lPara
 
             break;
         }
+        case REGISTER_2REG_FLOAT_ABCD:
+        {
+            int ntemplength = register_dbdata[i].m_register_length;
+            if (ntemplength != 2)
+            {
+                break;
+            }
+            Float_Char_Data temp_data_abcd;
+            temp_data_abcd.chardata[0] = product_register_value[n_start_add + 1] % 256;
+            temp_data_abcd.chardata[1] = product_register_value[n_start_add + 1] / 256;
+            temp_data_abcd.chardata[2] = product_register_value[n_start_add] % 256;  
+            temp_data_abcd.chardata[3] = product_register_value[n_start_add] / 256;  
+            n_value.Format(_T("%.2f"), (float)temp_data_abcd.floatvalue);
+
+        }
+            break;
+        case REGISTER_2REG_FLOAT_CDAB :
+        {
+            int ntemplength = register_dbdata[i].m_register_length;
+            if (ntemplength != 2)
+            {
+                break;
+            }
+            Float_Char_Data temp_data_abcd;
+            temp_data_abcd.chardata[2] = product_register_value[n_start_add + 1] % 256;
+            temp_data_abcd.chardata[3] = product_register_value[n_start_add + 1] / 256;
+            temp_data_abcd.chardata[0] = product_register_value[n_start_add] % 256;
+            temp_data_abcd.chardata[1] = product_register_value[n_start_add] / 256;
+            n_value.Format(_T("%.2f"), (float)temp_data_abcd.floatvalue);
+
+        }
+            break;
+        case REGISTER_2REG_FLOAT_BADC:
+        {
+            int ntemplength = register_dbdata[i].m_register_length;
+            if (ntemplength != 2)
+            {
+                break;
+            }
+            Float_Char_Data temp_data_abcd;
+            temp_data_abcd.chardata[0] = product_register_value[n_start_add + 1] / 256;
+            temp_data_abcd.chardata[1] = product_register_value[n_start_add + 1] % 256;
+            temp_data_abcd.chardata[2] = product_register_value[n_start_add] / 256;
+            temp_data_abcd.chardata[3] = product_register_value[n_start_add] % 256;
+            n_value.Format(_T("%.2f"), (float)temp_data_abcd.floatvalue);
+
+        }
+            break;
+        case REGISTER_2REG_FLOAT_DCBA:
+        {
+            int ntemplength = register_dbdata[i].m_register_length;
+            if (ntemplength != 2)
+            {
+                break;
+            }
+            Float_Char_Data temp_data_abcd;
+            temp_data_abcd.chardata[3] = product_register_value[n_start_add + 1] % 256;
+            temp_data_abcd.chardata[2] = product_register_value[n_start_add + 1] / 256;
+            temp_data_abcd.chardata[1] = product_register_value[n_start_add] % 256;
+            temp_data_abcd.chardata[0] = product_register_value[n_start_add] / 256;
+            n_value.Format(_T("%.2f"), (float)temp_data_abcd.floatvalue);
+
+        }
+            break;
         default :
             break;
         }

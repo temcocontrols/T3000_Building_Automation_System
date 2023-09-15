@@ -395,6 +395,7 @@ void Time32toCString(unsigned long ntime, CString &outputtime, int nproduct_id =
 int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex); //获取输出状态
 int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n_digital_analog); //获取输出状态
 char* decode_point(char* token, Str_points& temp);
+void ReInital_Someof_Point(); //部分 产品的input output variable 的size 是产品自定义的;
 void Initial_All_Point();
 void Initial_Virtual_Device_Setting();
 int bacnet_set_read_result(int nret);
