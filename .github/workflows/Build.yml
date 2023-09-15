@@ -1,14 +1,9 @@
-# This workflow now builds T3000Controls and BACnetStackLibrary components
+name: Build
 
-name: Release
+on: workflow_dispatch
 
-on:
-  release:
-    types: [published]
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  release:
+  build:
     runs-on: windows-latest
 
     steps:
@@ -16,7 +11,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
-
+          
       - name: Update submodules
         run: |
           git submodule update --recursive --remote
@@ -30,8 +25,7 @@ jobs:
       - name: Get T3000 version number
         id: version
         run: |
-          $version = '${{ github.event.release.tag_name }}'
-          $version = $version -replace "[^0-9]"
+          $version = Get-Date -Format “yyyyMMdd”
           Write-Output version=$version >> $Env:GITHUB_OUTPUT
 
       - name: Setup MSBuild
@@ -52,7 +46,6 @@ jobs:
           del "T3000 Output\release\BacnetExplore.exe.config"
           xcopy "t3-webview-ui\dist\spa\" "T3000\ResourceFile\webview\www\" /E /H /C /I /y
           xcopy "T3000\ResourceFile\" "T3000 Output\release\ResourceFile\" /E /H /C /I /y
-
 
       - name: Set the installer version ( doesn't accept big numbers so we add a point )
         id: iversion
@@ -77,49 +70,19 @@ jobs:
             SetProductCode -langid 1033
             SetVersion ${{ steps.iversion.outputs.iversion }}
 
-      - name: Upload the installer file to the release assets
-        id: releaseFile
-        uses: shogo82148/actions-upload-release-asset@v1
+      - name: Upload the installer to artifacts
+        uses: actions/upload-artifact@v3
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}\setup\T3000-setup.msi
-          asset_name: T3000-setup.msi
-          asset_content_type: application/x-ms-installer
+          name: T3000-setup
+          path: setup/T3000-setup.msi
 
       - name: Prepare & zip the update files
         run: |
           Rename-Item -Path ".\T3000 Output\release\Update.exe" -NewName "UpdateEng.exe"
           Compress-Archive -Path ".\T3000 Output\release\*" -CompressionLevel Optimal -DestinationPath .\20T3000Update.zip
 
-      - name: Zip the installer file
-        run: Compress-Archive -Path ".\setup\T3000-setup.msi" -CompressionLevel Optimal -DestinationPath .\09T3000Software.zip
-
-      - name: Upload the update file to FTP
-        uses: Creepios/sftp-action@v1.0.3
+      - name: Upload the update files to artifacts
+        uses: actions/upload-artifact@v3
         with:
-          port: 22
-          host: ${{ vars.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          localPath: './20T3000Update.zip'
-          remotePath: '/software/'
-
-      - name: Upload the software installer file to FTP
-        uses: Creepios/sftp-action@v1.0.3
-        with:
-          port: 22
-          host: ${{ vars.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          localPath: './09T3000Software.zip'
-          remotePath: '/software/'
-
-      - name: Update T3000 version in the INI file
-        id: webhookRequest
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: '${{ vars.T3_VERSION_UPDATER_WEBHOOK_URL }}'
-          method: 'POST'
-          customHeaders: '{"Content-Type": "application/json", "X-Secret-Key": "${{ secrets.T3_VERSION_UPDATER_WEBHOOK_SECRET }}"}'
-          data: '{"version": "${{ steps.version.outputs.version }}", "url": "${{ steps.releaseFile.outputs.browser_download_url }}"}'
-
+          name: 20T3000Update
+          path: T3000 Output/release/*
