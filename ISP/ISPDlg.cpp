@@ -3428,6 +3428,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     int n_ret_low = 0;
     int n_ret_high = 0;
     n_ret_low = Write_One_Retry(temp_read_reg[6], 0, low_serial,6);
+    Sleep(1000);
     n_ret_high = Write_One_Retry(temp_read_reg[6], 2, high_serial,6);
 
     if ((n_ret_low < 0) || (n_ret_high < 0))

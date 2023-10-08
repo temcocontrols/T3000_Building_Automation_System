@@ -563,7 +563,7 @@ void CBacnetProgramEdit::OnSend()
 	
 		TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"),program_code_length[program_list_line],my_lengthcode );
 
-		if(my_lengthcode > 1960)
+		if(my_lengthcode > 1990)
 		{
 			MessageBox(_T("Encode Program Code Length is too large"));
 			return;
@@ -604,9 +604,16 @@ void CBacnetProgramEdit::OnSend()
 		{
 			program_code_length[program_list_line] = my_lengthcode;
 		}
-		bac_program_size = program_code_length[program_list_line];// my_lengthcode;
-		bac_free_memory = 2000 - bac_program_size;
-
+		if (program_code_length[program_list_line] >= 9)
+		{
+			bac_program_size = program_code_length[program_list_line] - 9;// my_lengthcode;
+			bac_free_memory = 2000 - bac_program_size ;
+		}
+		else
+		{
+			bac_program_size = program_code_length[program_list_line];// my_lengthcode;
+			bac_free_memory = 2000 - bac_program_size;
+		}
 
 		int npart = (my_lengthcode / 401) + 1;
 

@@ -897,9 +897,9 @@ typedef union
 		 unsigned char end_day;
 		 unsigned char network_number_hi;
 		 unsigned char webview_json_flash; //value 0 old way     value 2  new way for jsaon
-		 unsigned short max_var;  //ESP32 Only   ST 固定 128
-		 unsigned short max_in;	  //ESP32 Only	 ST 固定 64
-		 unsigned short max_out;  //ESP32 Only   ST 固定 64
+		 unsigned char max_var;  //ESP32 Only   ST 固定 128
+		 unsigned char max_in;	  //ESP32 Only	 ST 固定 64
+		 unsigned char max_out;  //ESP32 Only   ST 固定 64
 	}reg;
 }Str_Setting_Info;
 

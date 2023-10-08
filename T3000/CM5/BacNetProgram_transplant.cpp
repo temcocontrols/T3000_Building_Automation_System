@@ -1457,7 +1457,7 @@ if(error!=-1)
 		else
 			Byte=0xff;
 
-		if( ncod+2+1 >= PROGRAM_SIZE - 40)
+		if( ncod+2+1 >= PROGRAM_SIZE - 10)
 		{
 		  
 		 if( local_table )
@@ -1473,7 +1473,7 @@ if(error!=-1)
 
 		if (DORU_SYSTEM)
 		{
-		 if( (ncod+2)+2+2+ind_local_table+2+ind_time_table >= PROGRAM_SIZE - 40 )
+		 if( (ncod+2)+2+2+ind_local_table+2+ind_time_table >= PROGRAM_SIZE - 10)
 		 {
 		   
 			if( local_table )
@@ -1502,8 +1502,9 @@ if(error!=-1)
 
 
 
-		my_lengthcode = code - mycode;
-		if(my_lengthcode >= 2000)
+		my_lengthcode = code - mycode; // 2023 09 19 delete
+		//if(my_lengthcode >= 2000)      // 2023 09 19 delete
+		if ((code - mycode) >= 2000)
 		{
 			sntx_err(TOTAL_2000_BREAK);   // 2017 - 01 17  ¶Å·« fix 
 			error = 1;

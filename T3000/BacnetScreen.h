@@ -54,6 +54,7 @@ public:
 	void OnSysCommand(UINT nID, LPARAM lParam);
 	bool window_max; // 标记是否已经最大化;
 	void OnBnClickedWebViewShow();
+	void OnBnClickedClearScreenData();
 	int  Read_Struct_Data();
 	int StructToJsonData();
 	int CheckOldGraphic();

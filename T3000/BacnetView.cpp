@@ -4925,6 +4925,32 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 
 	}
 
+	int redef_bac_input_group = BAC_INPUT_GROUP;
+	int redef_bac_output_group = BAC_OUTPUT_GROUP;
+	int redef_bac_variable_group = BAC_VARIABLE_GROUP;
+	int redef_bac_input_item_count = BAC_INPUT_ITEM_COUNT;
+	int redef_bac_output_item_count = BAC_OUTPUT_ITEM_COUNT;
+	int redef_bac_variable_item_count = BAC_VARIABLE_ITEM_COUNT;
+	if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
+		((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
+	{
+		redef_bac_input_item_count = DYNAMIC_INPUT_ITEM_COUNT;
+		redef_bac_input_group = (DYNAMIC_INPUT_ITEM_COUNT + BAC_READ_INPUT_GROUP_NUMBER - 1) / BAC_READ_INPUT_GROUP_NUMBER;
+		redef_bac_output_item_count = DYNAMIC_OUTPUT_ITEM_COUNT;
+		redef_bac_output_group = (DYNAMIC_OUTPUT_ITEM_COUNT + BAC_READ_OUTPUT_GROUP_NUMBER - 1) / BAC_READ_OUTPUT_GROUP_NUMBER;
+		redef_bac_variable_item_count = DYNAMIC_VARIABLE_ITEM_COUNT;
+		redef_bac_variable_group = (DYNAMIC_VARIABLE_ITEM_COUNT + BAC_READ_VARIABLE_GROUP_NUMBER - 1) / BAC_READ_VARIABLE_GROUP_NUMBER;
+	}
+	else
+	{
+		redef_bac_input_group = BAC_INPUT_GROUP;
+		redef_bac_output_group = BAC_OUTPUT_GROUP;
+		redef_bac_variable_group = BAC_VARIABLE_GROUP;
+		redef_bac_input_item_count = BAC_INPUT_ITEM_COUNT;
+		redef_bac_output_item_count = BAC_OUTPUT_ITEM_COUNT;
+		redef_bac_variable_item_count = BAC_VARIABLE_ITEM_COUNT;
+	}
+
 	for (int i=0;i<BAC_GRPHIC_LABEL_GROUP;i++)
 	{
 		if(bac_read_which_list == BAC_READ_GRAPHIC_LABEL_INFO)
@@ -5499,14 +5525,15 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 
 
 
-	for (int i=0;i<BAC_INPUT_GROUP;i++)
+	//for (int i=0;i<BAC_INPUT_GROUP;i++)
+	for (int i = 0; i < redef_bac_input_group; i++)
 	{
 		if((bac_read_which_list == BAC_READ_INPUT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_IN_OUT_VAR_LIST))
 		{
 
             end_temp_instance = BAC_READ_INPUT_REMAINDER + (BAC_READ_INPUT_GROUP_NUMBER)*i;
-            if (end_temp_instance >= BAC_INPUT_ITEM_COUNT)
-                end_temp_instance = BAC_INPUT_ITEM_COUNT - 1;
+            if (end_temp_instance >= redef_bac_input_item_count)
+                end_temp_instance = redef_bac_input_item_count - 1;
             CString temp_cs;
             temp_cs.Format(_T("Read Input List Item From %d to %d "),
                 BAC_READ_INPUT_GROUP_NUMBER*i,
@@ -5553,14 +5580,15 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		}
 	}
 
-	for (int i=0;i<BAC_OUTPUT_GROUP;i++)
+
+	for (int i=0;i< redef_bac_output_group;i++)
 	{
 
 		if((bac_read_which_list == BAC_READ_OUTPUT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_IN_OUT_VAR_LIST))
 		{
             end_temp_instance = BAC_READ_OUTPUT_REMAINDER + (BAC_READ_OUTPUT_GROUP_NUMBER)*i;
-            if (end_temp_instance >= BAC_OUTPUT_ITEM_COUNT)
-                end_temp_instance = BAC_OUTPUT_ITEM_COUNT - 1;
+            if (end_temp_instance >= redef_bac_output_item_count)
+                end_temp_instance = redef_bac_output_item_count - 1;
             CString temp_cs;
             temp_cs.Format(_T("Read Output List Item From %d to %d "), BAC_READ_OUTPUT_GROUP_NUMBER*i,   end_temp_instance);
             if (GetPrivateData_Blocking(g_bac_instance, READOUTPUT_T3000, BAC_READ_OUTPUT_GROUP_NUMBER*i,end_temp_instance,sizeof(Str_out_point))> 0)
@@ -5597,15 +5625,14 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	}
 
 
-
-	for (int i=0;i<BAC_VARIABLE_GROUP;i++)
+	for (int i=0;i< redef_bac_variable_group;i++)
 	{
 		if((bac_read_which_list == BAC_READ_VARIABLE_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_IN_OUT_VAR_LIST))
 		{
 
             end_temp_instance = BAC_READ_VARIABLE_REMAINDER + (BAC_READ_VARIABLE_GROUP_NUMBER)*i;
-            if (end_temp_instance >= BAC_VARIABLE_ITEM_COUNT)
-                end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
+            if (end_temp_instance >= redef_bac_variable_item_count)
+                end_temp_instance = redef_bac_variable_item_count - 1;
             CString temp_cs;
             temp_cs.Format(_T("Read Variable List Item From %d to %d "), BAC_READ_VARIABLE_GROUP_NUMBER*i, end_temp_instance);
             if (GetPrivateData_Blocking(g_bac_instance, READVARIABLE_T3000, BAC_READ_VARIABLE_GROUP_NUMBER*i, end_temp_instance, sizeof(Str_variable_point)) > 0)

@@ -3029,7 +3029,7 @@ bool Check_Label_Exsit(LPCTSTR m_new_label)
     memset(cTemp1,0,255);
     WideCharToMultiByte( CP_ACP, 0, new_string.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 
-    for (int i=0; i<BAC_INPUT_ITEM_COUNT; i++)
+    for (int i=0; i< m_Input_data.size(); i++)
     {
         if(strcmp(cTemp1,(char *)m_Input_data.at(i).label) == 0)
         {
@@ -3038,7 +3038,7 @@ bool Check_Label_Exsit(LPCTSTR m_new_label)
         }
     }
 
-    for (int i=0; i<BAC_OUTPUT_ITEM_COUNT; i++)
+    for (int i=0; i< m_Output_data.size(); i++)
     {
         if(strcmp(cTemp1,(char *)m_Output_data.at(i).label) == 0)
         {
@@ -3047,7 +3047,7 @@ bool Check_Label_Exsit(LPCTSTR m_new_label)
         }
     }
 
-    for (int i=0; i<BAC_VARIABLE_ITEM_COUNT; i++)
+    for (int i=0; i< m_Variable_data.size(); i++)
     {
         if(strcmp(cTemp1,(char *)m_Variable_data.at(i).label) == 0)
         {
@@ -3778,12 +3778,24 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         start_instance = *my_temp_point;
         my_temp_point++;
         end_instance = *my_temp_point;
-        if (end_instance == (BAC_OUTPUT_ITEM_COUNT - 1))
+
+        int temp_bac_output_item_count = 0;
+        if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
+            ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
+        {
+            temp_bac_output_item_count = DYNAMIC_OUTPUT_ITEM_COUNT;
+        }
+        else
+        {
+            temp_bac_output_item_count = BAC_OUTPUT_ITEM_COUNT;
+        }
+
+        if (end_instance == (temp_bac_output_item_count - 1))
             end_flag = true;
         my_temp_point++;
         my_temp_point = my_temp_point + 2;
 
-        if (start_instance >= BAC_OUTPUT_ITEM_COUNT)
+        if (start_instance >= temp_bac_output_item_count)
             return -1;//超过长度了;
 
         if (invoke_id == gsp_invoke)
@@ -3798,6 +3810,11 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         {
             for (i = start_instance; i <= end_instance; i++)
             {
+                if (i >= m_Output_data.size())
+                {
+                    TRACE(_T("receive output out of range!"));
+                    break;
+                }
                 fill_in_output(&m_Output_data.at(i), my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_out_point);
 
@@ -3821,10 +3838,22 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         end_instance = *my_temp_point;
         my_temp_point++;
         my_temp_point = my_temp_point + 2;
-        if (end_instance == (BAC_INPUT_ITEM_COUNT - 1))
+
+        int temp_bac_input_item_count = 0;
+        if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
+            ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
+        {
+            temp_bac_input_item_count = DYNAMIC_INPUT_ITEM_COUNT;
+        }
+        else
+        {
+            temp_bac_input_item_count = BAC_INPUT_ITEM_COUNT;
+        }
+
+        if (end_instance == (temp_bac_input_item_count - 1))
             end_flag = true;
 
-        if (start_instance >= BAC_INPUT_ITEM_COUNT)
+        if (start_instance >= temp_bac_input_item_count)
             return -1;//超过长度了;
         if (invoke_id == gsp_invoke)
         {
@@ -3838,6 +3867,11 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         {
             for (i = start_instance; i <= end_instance; i++)
             {
+                if (i >= m_Input_data.size())
+                {
+                    TRACE(_T("receive input out of range!"));
+                    break;
+                }
                 fill_in_input(&m_Input_data.at(i), my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_in_point);
             }
@@ -3857,9 +3891,21 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         end_instance = *my_temp_point;
         my_temp_point++;
         my_temp_point = my_temp_point + 2;
-        if (end_instance == (BAC_VARIABLE_ITEM_COUNT - 1))
+
+        int temp_bac_variable_item_count = 0;
+        if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
+            ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
+        {
+            temp_bac_variable_item_count = DYNAMIC_VARIABLE_ITEM_COUNT;
+        }
+        else
+        {
+            temp_bac_variable_item_count = BAC_VARIABLE_ITEM_COUNT;
+        }
+
+        if (end_instance == (temp_bac_variable_item_count - 1))
             end_flag = true;
-        if (start_instance >= BAC_VARIABLE_ITEM_COUNT)
+        if (start_instance >= temp_bac_variable_item_count)
             return -1;//超过长度了;
 
         if (invoke_id == gsp_invoke)
@@ -3874,6 +3920,11 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         {
             for (i = start_instance; i <= end_instance; i++)
             {
+                if (i >= m_Variable_data.size())
+                {
+                    TRACE(_T("receive variable out of range!"));
+                    break;
+                }
                 fill_in_variable(&m_Variable_data.at(i), my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_variable_point);
             }
@@ -4728,9 +4779,9 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             //my_temp_point = my_temp_point + 10; //算上这个  长度是 270
             s_Basic_Setting.reg.webview_json_flash = *(my_temp_point++);
             
-            s_Basic_Setting.reg.max_var = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0]; my_temp_point = my_temp_point + 2;
-            s_Basic_Setting.reg.max_in = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0]; my_temp_point = my_temp_point + 2;
-            s_Basic_Setting.reg.max_out = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0]; my_temp_point = my_temp_point + 2;
+            s_Basic_Setting.reg.max_var = *(my_temp_point++); 
+            s_Basic_Setting.reg.max_in =  *(my_temp_point++);
+            s_Basic_Setting.reg.max_out = *(my_temp_point++);
 
 
             //额外处理不同CPU的 minitype

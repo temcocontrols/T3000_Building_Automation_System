@@ -56,6 +56,8 @@ BEGIN_MESSAGE_MAP(BacnetScreen, CDialogEx)
 	ON_MESSAGE(WM_SCREENEDIT_CLOSE,&BacnetScreen::Screeenedit_close_handle)//快捷键消息映射手动加入
 	ON_BN_CLICKED(IDC_BUTTON_GRAPHIC_INSERT, &BacnetScreen::OnBnClickedInsert)
 	ON_BN_CLICKED(IDC_WEBVIEW_BUTTON, &BacnetScreen::OnBnClickedWebViewShow)
+	ON_BN_CLICKED(IDC_BUTTON_CLEAR_SCREEN_DATA, &BacnetScreen::OnBnClickedClearScreenData)
+
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_SCREEN, &BacnetScreen::OnNMDblclkListScreen)
@@ -1706,6 +1708,8 @@ void BacnetScreen::OnSize(UINT nType, int cx, int cy)
 
 		GetDlgItem(IDC_BUTTON_GRAPHIC_INSERT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
 		GetDlgItem(IDC_WEBVIEW_BUTTON)->MoveWindow(rc.left + 20, rc.bottom - 60, 120, 50);
+		GetDlgItem(IDC_BUTTON_CLEAR_SCREEN_DATA)->MoveWindow(rc.left + 150, rc.bottom - 60, 120, 50);
+		
 	}
 }
 
@@ -1865,7 +1869,7 @@ int BacnetScreen::CheckOldGraphic()
 		return 0;
 	}
 
-	if ((Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < WEBVIEW_JSON_FEATURE))
+	if((Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < WEBVIEW_JSON_FEATURE))
 	{
 		firmware_pass = 0;
 		return 0;
@@ -1881,6 +1885,39 @@ int BacnetScreen::CheckOldGraphic()
 	return 1;
  
 
+}
+
+
+void BacnetScreen::OnBnClickedClearScreenData()
+{
+	if (IDYES != MessageBox(_T("Clicking the yes button will clear graphic data. Are you sure to delete it?"), _T("Warning"), MB_YESNOCANCEL))
+	{
+		return;
+	}
+	int nret = CheckOldGraphic();
+	if (nret == 0)
+	{
+		for (int i = 0; i < (int)m_screen_data.size(); i++)
+		{
+			m_screen_data.at(i).update = 0;
+		}
+		m_graphic_label_data.clear();
+		for (int i = 0; i < BAC_GRPHIC_LABEL_COUNT; i++)
+		{
+			Str_label_point temp_label_point = { 0 };
+			memset(&temp_label_point, 0, sizeof(Str_label_point));
+			m_graphic_label_data.push_back(temp_label_point);
+		}
+
+		for (int i = 0; i < BAC_GRPHIC_LABEL_GROUP - 1; i++)
+		{
+			int ret_return = 0;
+			ret_return = Write_Private_Data_Blocking(WRITE_GRPHIC_LABEL_COMMAND, i * BAC_READ_GRPHIC_LABEL_GROUP_NUMBER, BAC_READ_GRPHIC_LABEL_GROUP_NUMBER * (i + 1) - 1);
+			if (ret_return < 0)
+				return;
+			Sleep(50);
+		}
+	}
 }
 
 void BacnetScreen::OnBnClickedWebViewShow()

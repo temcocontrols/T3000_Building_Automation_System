@@ -670,15 +670,12 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 
 LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 {
-    //static int test_count1234 = 0;
-    //TRACE(_T("Fresh_Input_List = %d\r\n"), test_count1234++);
 	int Fresh_Item;
 	int isFreshOne = (bool)lParam;
 	int  Minipanel_device = 1;
 	int listCount = m_input_list.GetItemCount();
 	if (listCount != input_item_limit_count ) // for bacnet devices hiding columns
 	{
-		//Initial_List();
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
 		{
 			isFreshOne = false;
@@ -711,7 +708,6 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	}
 	else if (bacnet_device_type == PID_T36CTA)
 	{
-		/*INPUT_LIMITE_ITEM_COUNT = 19;*/
         INPUT_LIMITE_ITEM_COUNT = 24;
 		Minipanel_device = 0;
 	}

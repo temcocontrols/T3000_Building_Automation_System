@@ -79,6 +79,21 @@ void CBacnetIODefine::OnBnClickedOk()
     unsigned short temp_int_input = unsigned short(_wtoi(temp_input_count));
     unsigned short temp_int_output = unsigned short(_wtoi(temp_output_count));
     unsigned short temp_int_variable = unsigned short(_wtoi(temp_var_count));
+    if ((temp_int_input > 256) && (temp_int_input == 0))
+    {
+        MessageBox(_T("The number of input cannot be greater than 256"));
+        return;
+    }
+    if ((temp_int_output > 256) && (temp_int_output == 0))
+    {
+        MessageBox(_T("The number of output cannot be greater than 256"));
+        return;
+    }
+    if ((temp_int_variable > 256) && (temp_int_variable == 0))
+    {
+        MessageBox(_T("The number of variable cannot be greater than 256"));
+        return;
+    }
     if (g_selected_product_id == PM_ESP32_T3_SERIES)
     {
         Device_Basic_Setting.reg.max_in = temp_int_input;
