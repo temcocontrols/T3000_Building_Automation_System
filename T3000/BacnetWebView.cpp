@@ -862,6 +862,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["range"] = g_Variable_data[npanel_id].at(i).range;
 			tempjson["data"][p_i]["control"] = g_Variable_data[npanel_id].at(i).control;
 			tempjson["data"][p_i]["digital_analog"] = g_Variable_data[npanel_id].at(i).digital_analog;
+			tempjson["data"][p_i]["unused"] = g_Variable_data[npanel_id].at(i).unused;
 			p_i++;
 		}
 
@@ -876,6 +877,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["label"] = (char*)g_Program_data[npanel_id].at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = g_Program_data[npanel_id].at(i).auto_manual;
 			tempjson["data"][p_i]["status"] = g_Program_data[npanel_id].at(i).on_off;
+			tempjson["data"][p_i]["unused"] = g_Program_data[npanel_id].at(i).unused;
 			p_i++;
 		}
 
@@ -892,6 +894,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["output"] = g_Weekly_data[npanel_id].at(i).value;
 			tempjson["data"][p_i]["state1"] = g_Weekly_data[npanel_id].at(i).override_1_value;
 			tempjson["data"][p_i]["state2"] = g_Weekly_data[npanel_id].at(i).override_2_value;
+			tempjson["data"][p_i]["unused"] = g_Weekly_data[npanel_id].at(i).unused;
 			p_i++;
 		}
 
@@ -906,6 +909,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["label"] = (char*)g_Annual_data[npanel_id].at(i).label;
 			tempjson["data"][p_i]["auto_manual"] = g_Annual_data[npanel_id].at(i).auto_manual;
 			tempjson["data"][p_i]["value"] = g_Annual_data[npanel_id].at(i).value;
+			tempjson["data"][p_i]["unused"] = g_Annual_data[npanel_id].at(i).unused;
 			p_i++;
 		}
 
@@ -944,6 +948,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "GRP" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)g_screen_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_screen_data[npanel_id].at(i).label;
+			tempjson["data"][p_i]["mode"] = (char*)g_screen_data[npanel_id].at(i).mode;
 			//There is also additional data that does not need to be passed to the webview interface
 			p_i++;
 		}
