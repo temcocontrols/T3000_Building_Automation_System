@@ -51,16 +51,15 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_INITIAL_DATA = 1,
 	SAVE_GRAPHIC_DATA = 2,
 	UPDATE_ENTRY = 3,
-	//GET_PANELS = 4,
-	GET_PANEL_RANGE_INFO = 5,
 	GET_PANELS_LIST = 4,
-	// GET_PANEL_ENTRY_BY_ID = 5,
+	GET_PANEL_RANGE_INFO = 5,
 	GET_ENTRIES = 6,
 	LOAD_GRAPHIC_ENTRY = 7,
 	OPEN_ENTRY_EDIT_WINDOW = 8,
 	SAVE_IMAGE = 9,
 	SAVE_LIBRAY_DATA = 10,
 	DELETE_IMAGE = 11,
+	SAVE_USER_TOKEN = 12,
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -1883,6 +1882,19 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		{
 			DeleteFile(temp_delete_file_path);
 		}
+	}
+		break;
+	case SAVE_USER_TOKEN:
+	{
+		CFile file;
+		const std::string file_output = Json::writeString(builder, json["data"]);
+		CString file_temp_cs(file_output.c_str());
+		CString temp_token;
+		temp_token =  _T("C:\\123.txt");
+		file.Open(temp_token, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
+		file.Write(file_temp_cs, file_temp_cs.GetLength() * 2);
+		file.Close();
+
 	}
 		break;
 	default :

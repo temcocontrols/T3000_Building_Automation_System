@@ -40,6 +40,7 @@ public:
     afx_msg void OnBnClickedApplybutton();
     afx_msg void OnCbnSelchangeIpmodelCombo();
 	CComboBox m_brandrate_combox;
+	CComboBox m_parity_bit;
 	CEdit m_Editor_macmstp;
 	CComboBox m_mstpmodbus_combox;
 	CEdit m_BipPort_Edit;
@@ -65,6 +66,7 @@ public:
     afx_msg void OnEnKillfocusEditBacnetDeviceId();
     afx_msg void OnCbnSelchangeBaudratecombo();
     afx_msg void OnEnKillfocusEditDeadMaster();
+	afx_msg void OnCbnSelchangeParity_bitcombo();
 };
 
 

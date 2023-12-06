@@ -806,6 +806,7 @@
 #define IDC_COMBO_TYPE_INOUTPUT         1131
 #define IDC_DISPLAYCOMBO                1132
 #define IDC_CHECK66                     1132
+#define IDC_RS485_PARITY_BIT            1132
 #define IDC_KEYPADLOCKCOMBO             1133
 #define IDC_CHECK67                     1133
 #define IDC_COMBO6                      1134
@@ -2569,7 +2570,10 @@
 #define IDC_COMBO_PARITY_BIT3           2523
 #define IDC_STATIC_IP                   2523
 #define IDC_STATIC_MASK                 2524
+#define IDC_COMBO_DATA_BIT0             2524
 #define IDC_STATIC_GATEWAY              2525
+#define IDC_COMBO_DATA_BIT1             2525
+#define IDC_COMBO_DATA_BIT2             2526
 #define IDC_LIST_TSTAT_SETPOINT         2527
 #define IDC_CHECK_DONT_POP              2529
 #define IDC_RADIO_WIFI_ENABLE           2531

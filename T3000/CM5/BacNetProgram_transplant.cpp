@@ -6993,7 +6993,7 @@ char *look_instr( char cod )
 /* convert to lower case */
 /* see if token is in table */
 for( i = 0 ; *table[i].command ; i++ )
-	if (table[i].tok==cod ) return table[i].command;
+	if (table[i].tok==(unsigned char )cod ) return table[i].command;
 return "" ; /* unkown command */
 }
 

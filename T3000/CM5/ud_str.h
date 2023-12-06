@@ -844,7 +844,7 @@ typedef union
 
 		uint8_t usb_mode; //0 device   1:host.
 		uint8_t network_number;
-		uint8_t panel_type;
+		uint8_t panel_type;//count 52
 
 		char panel_name[20];
 
@@ -863,7 +863,7 @@ typedef union
 		//0xd248912d			210.72.145.45  NTSC					4
         //自动要求跟PC同步                                          200 
 		signed short time_zone; 
-		unsigned int n_serial_number; 
+		unsigned int n_serial_number;  //count 181
 
 		 UN_Time update_dyndns; 
 
@@ -899,7 +899,8 @@ typedef union
 		 unsigned char webview_json_flash; //value 0 old way     value 2  new way for jsaon
 		 unsigned char max_var;  //ESP32 Only   ST 固定 128
 		 unsigned char max_in;	  //ESP32 Only	 ST 固定 64
-		 unsigned char max_out;  //ESP32 Only   ST 固定 64
+		 unsigned char max_out;  //ESP32 Only   ST 固定 64   //count 269
+
 	}reg;
 }Str_Setting_Info;
 

@@ -3741,6 +3741,8 @@ void CDialogCM5_BacNet::Fresh()
                     bacnet_device_type = MINIPANELARM_NB;
 				else if (ret == T3_FAN_MODULE)
 					bacnet_device_type = T3_FAN_MODULE;
+				else if (ret == T3_ESP_NG2)
+					bacnet_device_type = T3_ESP_NG2;
 				else
 					bacnet_device_type = PRODUCT_CM5;
 			}
@@ -7919,7 +7921,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
     {
         close_com();
         m_nbaudrat = selected_product_Node.baudrate;
-        if ((n_comport == 0) || (n_comport >50))
+        if ((n_comport == 0) || (n_comport >200))
         {
             AfxMessageBox(_T("Serial Port error!"));
             read_rs485_thread = NULL;
@@ -7950,20 +7952,6 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
             read_rs485_thread = NULL;
             return 4;
         }
-        //ret = Open_Socket2(nconnectionip, nport);
-
-
-//#ifdef DEBUG
-//        g_protocol_support_ptp = PROTOCOL_MB_PTP_TRANSFER;
-//        if (GetPrivateData_Blocking(g_bac_instance, TIME_COMMAND, 0, 0, sizeof(Time_block_mini)) > 0)
-//        {
-//            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read system time success!"));
-//        }
-//        else
-//        {
-//            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read system time timeout!"));
-//        }
-//#endif // DEBUG
     }
 
 

@@ -10,6 +10,7 @@
 #pragma endregion For_Bacnet
 
 
+
 //typedef union
 //{
 //	Str_in_point  m_group_input_data;

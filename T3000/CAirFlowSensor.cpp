@@ -180,7 +180,7 @@ void CAirFlowSensor::UpdateUserInterface()
 		cs_pressure_value.Format(_T("%d"), (short)product_register_value[MODBUS_DIFF_PRESSURE_VALUE]);
 		cs_length.Format(_T("%u"), product_register_value[MODBUS_FLOW_LENGTH]);
 		cs_width.Format(_T("%u"), product_register_value[MODBUS_FLOW_WIDTH]);
-		cs_speed.Format(_T("%u"), product_register_value[MODBUS_FLOW_SPEED]);
+		cs_speed.Format(_T("%.1f"), (float)product_register_value[MODBUS_FLOW_SPEED]/10.0);
 
 		unsigned int temp_flow_value;
 		temp_flow_value = product_register_value[MODBUS_FLOW_HI] * 65536 + product_register_value[MODBUS_FLOW_LO];

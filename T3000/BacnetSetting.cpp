@@ -177,6 +177,9 @@ void Getminitypename(unsigned char nmini_type, CString &ret_name)
     case T3_OEM_12I:
         ret_name = _T("T3-OEM-12I");
         break;
+    case T3_ESP_NG2:
+        ret_name = _T("T3-NG2");
+        break;
     case T3_FAN_MODULE:
         ret_name = _T("T3-FAN-MODULE");
         break;
@@ -361,6 +364,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_PARITY_BIT3))->AddString(Com_Parity_bit[i]);
         }
 
+
 #pragma region stop_bit
         ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_STOP_BIT))->ResetContent();
         ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_STOP_BIT2))->ResetContent();
@@ -385,6 +389,12 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_STOP_BIT2))->SetCurSel(Device_Basic_Setting.reg.uart_stopbit[1]);
         if (Device_Basic_Setting.reg.uart_stopbit[2] <= sizeof(Com_Stop_bit) / sizeof(Com_Stop_bit[0]))
             ((CComboBox *)m_page_tcpip.GetDlgItem(IDC_COMBO_STOP_BIT3))->SetCurSel(Device_Basic_Setting.reg.uart_stopbit[2]);
+
+
+            ((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_DATA_BIT0))->EnableWindow(0);
+            ((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_DATA_BIT1))->EnableWindow(0);
+            ((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_DATA_BIT2))->EnableWindow(0);
+
 
         if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 497)//497
         {
@@ -866,6 +876,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             bacnet_device_type == TINY_EX_MINIPANEL ||
             bacnet_device_type == MINIPANELARM_NB ||
             bacnet_device_type == T3_FAN_MODULE ||
+            bacnet_device_type == T3_ESP_NG2 ||
             bacnet_device_type == T3_TSTAT10 ||
             bacnet_device_type == T3_OEM ||
             bacnet_device_type == T3_OEM_12I ||
@@ -913,6 +924,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
                 (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
+                (Device_Basic_Setting.reg.mini_type == T3_ESP_NG2) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
                 (Device_Basic_Setting.reg.mini_type == T3_TSTAT10) )
@@ -945,6 +957,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
                 (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
+                (Device_Basic_Setting.reg.mini_type == T3_ESP_NG2) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
                 (Device_Basic_Setting.reg.mini_type == T3_TSTAT10))
@@ -1010,6 +1023,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL) ||
             (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
             (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
+            (Device_Basic_Setting.reg.mini_type == T3_ESP_NG2) ||
             (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
             (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
             (Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||

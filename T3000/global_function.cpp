@@ -4784,6 +4784,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             s_Basic_Setting.reg.max_out = *(my_temp_point++);
 
 
+
             //额外处理不同CPU的 minitype
                //最高位 次高位   10   主芯片 APM
         //最高位 次高位   01   主芯片 GD
@@ -4809,30 +4810,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
                 break;
             }
             bacnet_device_type = s_Basic_Setting.reg.mini_type;
-#if 0
-            if (s_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
-                bacnet_device_type = BIG_MINIPANEL;
-            else if (s_Basic_Setting.reg.mini_type == SMALL_MINIPANEL)
-                bacnet_device_type = SMALL_MINIPANEL;
-            else if (s_Basic_Setting.reg.mini_type == TINY_MINIPANEL)
-                bacnet_device_type = TINY_MINIPANEL;
-            else if (s_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL)
-                bacnet_device_type = TINY_EX_MINIPANEL;
-            else if (s_Basic_Setting.reg.mini_type == MINIPANELARM)
-                bacnet_device_type = MINIPANELARM;
-            else if (s_Basic_Setting.reg.mini_type == MINIPANELARM_LB)
-                bacnet_device_type = MINIPANELARM_LB;
-            else if (s_Basic_Setting.reg.mini_type == MINIPANELARM_TB)
-                bacnet_device_type = MINIPANELARM_TB;
-            else if (s_Basic_Setting.reg.mini_type == T3_TB_11I)
-                bacnet_device_type = T3_TB_11I;
-            else if (s_Basic_Setting.reg.mini_type == MINIPANELARM_NB)
-                bacnet_device_type = MINIPANELARM_NB;
-            else if (s_Basic_Setting.reg.mini_type == T3_FAN_MODULE)
-                bacnet_device_type = T3_FAN_MODULE;
-            else
-                bacnet_device_type = PM_CM5;
-#endif
+
             
             if (invoke_id == gsp_invoke) 
             {
@@ -11114,6 +11092,17 @@ void init_product_list()
 {
     m_product_iocount.clear();
     Str_product_io_count temp = { 0 };
+    temp.cs_name = _T("Custom Device");
+    temp.ai_count = 0;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 0;
+    temp.bo_count = 0;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 254;
+    temp.sub_pid = 0;
+    m_product_iocount.push_back(temp);
+
     temp.cs_name = _T("T3-BB");
     temp.ai_count = 32;
     temp.bi_count = 0;
@@ -11167,6 +11156,17 @@ void init_product_list()
     temp.output_count = temp.ao_count + temp.bo_count;
     temp.pid = 74;
     temp.sub_pid = T3_FAN_MODULE;
+    m_product_iocount.push_back(temp);
+
+    temp.cs_name = _T("T3-NG2");
+    temp.ai_count = 18;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 0;
+    temp.bo_count = 7;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 88;
+    temp.sub_pid = T3_ESP_NG2;
     m_product_iocount.push_back(temp);
 
     temp.cs_name = _T("Tstat10");
@@ -16176,6 +16176,14 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
                 nret_type = OUTPUT_VIRTUAL_PORT;
         }
         break;
+        case T3_ESP_NG2:
+        {
+            if (portindex <= 7)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
         default:
             break;
         }
@@ -16348,6 +16356,20 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
                 nret_type = INPUT_ANALOG_PORT;
                 if (n_digital_analog == BAC_UNITS_DIGITAL)
                     nret_type = INPUT_DIGITAL_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+        }
+        break;
+        case T3_ESP_NG2:
+        {
+            if (portindex <= 18)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    nret_type = INPUT_DIGITAL_PORT;
+                else
+                    nret_type = INPUT_ANALOG_PORT;
             }
             else
                 nret_type = INPUT_VIRTUAL_PORT;
