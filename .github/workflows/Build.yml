@@ -63,8 +63,7 @@ jobs:
           xcopy "T3000Webview\dist\spa\" "T3000 Output\release\ResourceFile\webview\www\" /E /H /C /I /y
           xcopy "T3000Webview\api\target\i686-pc-windows-msvc\release\t3_webview_api.dll" "T3000 Output\release\" /Y
           xcopy "T3000Webview\api\target\i686-pc-windows-msvc\release\t3_webview_api.dll.lib" "T3000 Output\release\" /Y
-          Set-Content -Path "T3000 Output\release\.env" -Value "DATABASE_URL=${{ vars.DATABASE_URL }}"
-          Set-Content -Path "T3000 Output\release\.env" -Value "API_SECRET_KEY=${{ vars.LOCAL_API_SECRET_KEY }}" -Append
+          Set-Content -Path "T3000 Output\release\.env" -Value "API_SECRET_KEY=${{ vars.LOCAL_API_SECRET_KEY }}"
 
       - name: Set the installer version ( doesn't accept big numbers so we add a point )
         id: iversion
