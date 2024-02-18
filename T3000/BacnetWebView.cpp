@@ -26,6 +26,9 @@
 #include "BacnetWebView.h"
 #include "MainFrm.h"
 #include "JsonHead.h"
+extern "C" {
+	void run_server();
+}
 using namespace Microsoft::WRL;
 size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
 char* base64_decode(char const* base64Str, char* debase64Str, int encodeStrLen);
@@ -2015,3 +2018,9 @@ void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsign
 	height = (buf[4] << 24) + (buf[5] << 16) + (buf[6] << 8) + (buf[7] << 0);
 }
 #pragma endregion WebviewRelatedMethods
+
+
+int webview_run_server() {
+	run_server();
+	return 0;
+}

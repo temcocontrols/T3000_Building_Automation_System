@@ -18,7 +18,7 @@
 
 #include "JsonHead.h"
 #include "BacnetWebView.h"
-int main_webview();
+int webview_run_server();
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
 extern vector <MSG> My_Receive_msg;
 extern CCriticalSection MyCriticalSection;
@@ -1974,30 +1974,10 @@ void BacnetScreen::OnBnClickedWebViewShow()
 	}
 	LoadOnlinePanelData();
 	Sleep(1000);
-	const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
-
-	//CFileDialog dlg(TRUE, _T("html"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-	//	szFilter, this->GetTopWindow());
-	//if (dlg.DoModal() == IDOK)
 	{
-		//CString ApplicationFolder;
-		CString webviewFolder;
-		/*GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
-		ApplicationFolder.ReleaseBuffer();*/
-		CString Resource_folder;
-		CString ApplicationFolder;
-		GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
-		ApplicationFolder.ReleaseBuffer();
-		Resource_folder = ApplicationFolder + _T("\\ResourceFile");
-		//webviewFolder = Resource_folder + _T("\\webview\\webview.html");
-		webviewFolder = _T("http://localhost:9103/");
+		CString webviewUrl = _T("http://localhost:9103/");
 	
-		//webviewFolder = SOLUTION_DIR  _T("T3000\\webview\\webview.html");
-		//CString sFilePath = dlg.GetPathName();
-		wstring fullpath = webviewFolder;
-		auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath));
+		auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(webviewUrl));
 		auto result = BacnetWebViewAppWindow::RunMessagePump();
 		delete webviewwindow;
 	}
@@ -2254,7 +2234,7 @@ DWORD WINAPI  BacnetScreen::CreateWebServerThreadfun(LPVOID lpVoid)
 #endif
 	}
 #endif
-	main_webview();
+	webview_run_server();
 	h_create_webview_server_thread = NULL;
 	return 0;
 }
