@@ -103,7 +103,8 @@
 XCOPY "$(SolutionDir)"\DLLs\T3WebviewApi\* "$(TargetDir)" /D /K /Y</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY "$(ProjectDir)"\ResourceFile "$(TargetDir)"\ResourceFile /E /C /I /D</Command>
+      <Command>XCOPY "$(ProjectDir)"\ResourceFile "$(TargetDir)"\ResourceFile /E /C /I /D
+echo API_SECRET_KEY=secret &gt; "$(TargetDir).env"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -148,7 +149,8 @@ XCOPY "$(SolutionDir)"\DLLs\T3WebviewApi\* "$(TargetDir)" /D /K /Y</Command>
 XCOPY "$(SolutionDir)"\DLLs\T3WebviewApi\* "$(TargetDir)" /D /K /Y</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY "$(ProjectDir)"\ResourceFile "$(TargetDir)"\ResourceFile /E /C /I /D</Command>
+      <Command>XCOPY "$(ProjectDir)"\ResourceFile "$(TargetDir)"\ResourceFile /E /C /I /D
+echo API_SECRET_KEY=secret &gt; "$(TargetDir).env"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
