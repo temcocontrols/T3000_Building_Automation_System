@@ -32,9 +32,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: i686-pc-windows-msvc
-      - run: |
-        cd T3000Webview/api
-        cargo build --target=i686-pc-windows-msvc --release
+        run: |
+          cd T3000Webview/api
+          cargo build --target=i686-pc-windows-msvc --release
 
       - name: Get T3000 version number
         id: version
