@@ -16,6 +16,10 @@ jobs:
       API_WS_URL: ${{ vars.API_WS_URL }}
       LOCAL_API_URL: ${{ vars.LOCAL_API_URL }}
       LOCAL_API_SECRET_KEY: ${{ vars.LOCAL_API_SECRET_KEY }}
+      DATABASE_URL: ${{ vars.DATABASE_URL }}
+      PORT: ${{ vars.PORT }}
+      API_SECRET_KEY: ${{ vars.LOCAL_API_SECRET_KEY }}
+      SPA_DIR: ${{ vars.SPA_DIR }}
 
     steps:
       - name: checkout
