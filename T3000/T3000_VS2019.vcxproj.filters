@@ -843,9 +843,6 @@
     <ClCompile Include="CTransducer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WebView\WebViewHvacDraw.cpp">
-      <Filter>Bacnet</Filter>
-    </ClCompile>
     <ClCompile Include="ForZip\unzip.cpp">
       <Filter>ClassInfo\Zip</Filter>
     </ClCompile>

@@ -5,22 +5,39 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: windows-latest
+    environment: webview_build
+    env:
+      API_URL: ${{ vars.API_URL }}
+      API_WS_URL: ${{ vars.API_WS_URL }}
+      LOCAL_API_URL: ${{ vars.LOCAL_API_URL }}
+      LOCAL_API_SECRET_KEY: ${{ vars.LOCAL_API_SECRET_KEY }}
+      API_SECRET_KEY: ${{ vars.LOCAL_API_SECRET_KEY }}
 
     steps:
       - name: checkout
         uses: actions/checkout@v3
         with:
           submodules: recursive
-          
+
       - name: Update submodules
         run: |
           git submodule update --recursive --remote
 
-      - name: Build webview assets
+      - name: Build webview ui
         run: |
-          cd t3-webview-ui
+          cd T3000Webview
           npm install
           npm run build
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: i686-pc-windows-msvc
+
+      - name: Build webview api
+        run: |
+          cd T3000Webview/api
+          cargo build --target=i686-pc-windows-msvc --release
 
       - name: Get T3000 version number
         id: version
@@ -44,8 +61,9 @@ jobs:
           del "T3000 Output\release\*.ilk"
           del "T3000 Output\release\ReadSinglePropDescr.xml"
           del "T3000 Output\release\BacnetExplore.exe.config"
-          xcopy "t3-webview-ui\dist\spa\" "T3000\ResourceFile\webview\www\" /E /H /C /I /y
-          xcopy "T3000\ResourceFile\" "T3000 Output\release\ResourceFile\" /E /H /C /I /y
+          xcopy "T3000Webview\dist\spa\" "T3000 Output\release\ResourceFile\webview\www\" /E /H /C /I /y
+          xcopy "T3000Webview\api\target\i686-pc-windows-msvc\release\t3_webview_api.dll" "T3000 Output\release\" /Y
+          xcopy "T3000Webview\api\target\i686-pc-windows-msvc\release\t3_webview_api.dll.lib" "T3000 Output\release\" /Y
 
       - name: Set the installer version ( doesn't accept big numbers so we add a point )
         id: iversion

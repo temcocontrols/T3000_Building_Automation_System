@@ -10,6 +10,13 @@ on:
 jobs:
   release:
     runs-on: windows-latest
+    environment: webview_build
+    env:
+      API_URL: ${{ vars.API_URL }}
+      API_WS_URL: ${{ vars.API_WS_URL }}
+      LOCAL_API_URL: ${{ vars.LOCAL_API_URL }}
+      LOCAL_API_SECRET_KEY: ${{ vars.LOCAL_API_SECRET_KEY }}
+      API_SECRET_KEY: ${{ vars.LOCAL_API_SECRET_KEY }}
 
     steps:
       - name: checkout
@@ -21,11 +28,21 @@ jobs:
         run: |
           git submodule update --recursive --remote
 
-      - name: Build webview assets
+      - name: Build webview ui
         run: |
-          cd t3-webview-ui
+          cd T3000Webview
           npm install
           npm run build
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: i686-pc-windows-msvc
+
+      - name: Build webview api
+        run: |
+          cd T3000Webview/api
+          cargo build --target=i686-pc-windows-msvc --release
 
       - name: Get T3000 version number
         id: version
@@ -50,9 +67,9 @@ jobs:
           del "T3000 Output\release\*.ilk"
           del "T3000 Output\release\ReadSinglePropDescr.xml"
           del "T3000 Output\release\BacnetExplore.exe.config"
-          xcopy "t3-webview-ui\dist\spa\" "T3000\ResourceFile\webview\www\" /E /H /C /I /y
-          xcopy "T3000\ResourceFile\" "T3000 Output\release\ResourceFile\" /E /H /C /I /y
-
+          xcopy "T3000Webview\dist\spa\" "T3000 Output\release\ResourceFile\webview\www\" /E /H /C /I /y
+          xcopy "T3000Webview\api\target\i686-pc-windows-msvc\release\t3_webview_api.dll" "T3000 Output\release\" /Y
+          xcopy "T3000Webview\api\target\i686-pc-windows-msvc\release\t3_webview_api.dll.lib" "T3000 Output\release\" /Y
 
       - name: Set the installer version ( doesn't accept big numbers so we add a point )
         id: iversion
@@ -101,8 +118,8 @@ jobs:
           host: ${{ vars.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          localPath: './20T3000Update.zip'
-          remotePath: '/software/'
+          localPath: "./20T3000Update.zip"
+          remotePath: "/software/"
 
       - name: Upload the software installer file to FTP
         uses: Creepios/sftp-action@v1.0.3
@@ -111,15 +128,14 @@ jobs:
           host: ${{ vars.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          localPath: './09T3000Software.zip'
-          remotePath: '/software/'
+          localPath: "./09T3000Software.zip"
+          remotePath: "/software/"
 
       - name: Update T3000 version in the INI file
         id: webhookRequest
         uses: fjogeleit/http-request-action@v1
         with:
-          url: '${{ vars.T3_VERSION_UPDATER_WEBHOOK_URL }}'
-          method: 'POST'
+          url: "${{ vars.T3_VERSION_UPDATER_WEBHOOK_URL }}"
+          method: "POST"
           customHeaders: '{"Content-Type": "application/json", "X-Secret-Key": "${{ secrets.T3_VERSION_UPDATER_WEBHOOK_SECRET }}"}'
           data: '{"version": "${{ steps.version.outputs.version }}", "url": "${{ steps.releaseFile.outputs.browser_download_url }}"}'
-

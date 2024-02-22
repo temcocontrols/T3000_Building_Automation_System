@@ -89,7 +89,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;MultipleMonthCal32.lib;HttpAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;MultipleMonthCal32.lib;$(SolutionDir)T3000 Output\release\t3_webview_api.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -99,8 +99,12 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreBuildEvent>
-      <Command>XCOPY "$(SolutionDir)"\SQLiteDriver\*.DLL "$(TargetDir)" /D /K /Y</Command>
+      <Command>XCOPY "$(SolutionDir)"\SQLiteDriver\*.DLL "$(TargetDir)" /D /K /Y
+XCOPY "$(SolutionDir)"\DLLs\T3WebviewApi\* "$(TargetDir)" /D /K /Y</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>XCOPY "$(ProjectDir)"\ResourceFile "$(TargetDir)"\ResourceFile /E /C /I /D</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -128,7 +132,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;$(SolutionDir)T3000 Output\release\MultipleMonthCal32.lib;$(SolutionDir)T3000 Output\release\HttpAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;$(SolutionDir)T3000 Output\release\MultipleMonthCal32.lib;$(SolutionDir)T3000 Output\release\t3_webview_api.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -140,8 +144,12 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PreBuildEvent>
-      <Command>XCOPY "$(SolutionDir)"\SQLiteDriver\*.DLL "$(TargetDir)" /D /K /Y</Command>
+      <Command>XCOPY "$(SolutionDir)"\SQLiteDriver\*.DLL "$(TargetDir)" /D /K /Y
+XCOPY "$(SolutionDir)"\DLLs\T3WebviewApi\* "$(TargetDir)" /D /K /Y</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>XCOPY "$(ProjectDir)"\ResourceFile "$(TargetDir)"\ResourceFile /E /C /I /D</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\ISP\MyPing.cpp" />
@@ -406,7 +414,6 @@
     <ClCompile Include="TStatScanner.cpp" />
     <ClCompile Include="TStatScheduleDlg.cpp" />
     <ClCompile Include="UserAcessSetDlg.cpp" />
-    <ClCompile Include="WebView\WebViewHvacDraw.cpp" />
     <ClCompile Include="Weekly_Routines.cpp" />
     <ClCompile Include="WeeklyRout_InsertDia.cpp" />
     <ClCompile Include="WifiConfigDlg.cpp" />
