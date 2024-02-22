@@ -28,17 +28,17 @@
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -226,6 +226,7 @@
     <ClCompile Include="BuildingConfigration.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="CAirFlowSensor.cpp" />
+    <ClCompile Include="CBacnetArray.cpp" />
     <ClCompile Include="CBacnetBMD.cpp" />
     <ClCompile Include="CBacnetBuildingCommunicate.cpp" />
     <ClCompile Include="CBacnetBuildingIOPoints.cpp" />
@@ -614,6 +615,7 @@
     <ClInclude Include="CAirFlowSensor.h" />
     <ClInclude Include="CalibartionHT.h" />
     <ClInclude Include="CApplication0.h" />
+    <ClInclude Include="CBacnetArray.h" />
     <ClInclude Include="CBacnetBMD.h" />
     <ClInclude Include="CBacnetBuildingCommunicate.h" />
     <ClInclude Include="CBacnetBuildingIOPoints.h" />
@@ -856,6 +858,9 @@
     <ResourceCompile Include="T3000.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\default_icon\Array.ico" />
+    <Image Include="res\icon5.ico" />
+    <Image Include="res\icon_def.ico" />
     <Image Include="res\treenode_ext.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

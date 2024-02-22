@@ -51,7 +51,7 @@ int MODBUS_ABSOLUTE_HUMI	=44	  ;
 int NEW_MODBUS_SWITCH_OUTPUT_MODE = 17;
 int NEW_MODBUS_SWITCH_TEMP_RANGE = 18;
 int NEW_MODBUS_SWITCH_HUMI_RANGE = 20;
-int NEW_MODBUS_TEMPERATURE_UNIT = 23;
+int NEW_MODBUS_TEMPERATURE_UNIT = 21;
 int NEW_MODBUS_TEMPERATURE_OFFSET = 35;
 int NEW_MODBUS_HUMIDITY_OFFSET = 36;
 int NEW_MODBUS_TEMPERATURE_C = 37;
@@ -315,9 +315,10 @@ LRESULT CTransducer::UpdateUI(WPARAM wParam, LPARAM lParam)
 			((CButton*)GetDlgItem(IDC_RADIO_TRANSDUCER_DEG_F))->SetCheck(0);
 			GetDlgItem(IDC_STATIC_TRANSDUCER_TEMP_UNITS)->SetWindowText(_T("Deg.C"));
 			GetDlgItem(IDC_STATIC_TRANSDUCER_TEMP_UNITS2)->SetWindowText(_T("Deg.C"));
-
+			GetDlgItem(IDC_STATIC_T_UNIT)->SetWindowText(_T("Temperature\r\n       Deg.C"));
+			
 			CString temp_value;
-			temp_value.Format(_T("%.1f"), product_register_value[NEW_MODBUS_TEMPERATURE_C] / 10.0);
+			temp_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_TEMPERATURE_C] / 10.0);
 			GetDlgItem(IDC_STATIC_TEMPERATURE)->SetWindowText(temp_value);
 		}
 		else
@@ -326,9 +327,9 @@ LRESULT CTransducer::UpdateUI(WPARAM wParam, LPARAM lParam)
 			((CButton*)GetDlgItem(IDC_RADIO_TRANSDUCER_DEG_F))->SetCheck(1);
 			GetDlgItem(IDC_STATIC_TRANSDUCER_TEMP_UNITS)->SetWindowText(_T("Deg.F"));
 			GetDlgItem(IDC_STATIC_TRANSDUCER_TEMP_UNITS2)->SetWindowText(_T("Deg.F"));
-
+			GetDlgItem(IDC_STATIC_T_UNIT)->SetWindowText(_T("Temperature\r\n       Deg.F"));
 			CString temp_value;
-			temp_value.Format(_T("%.1f"), product_register_value[NEW_MODBUS_TEMPERATURE_F] / 10.0);
+			temp_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_TEMPERATURE_F] / 10.0);
 			GetDlgItem(IDC_STATIC_TEMPERATURE)->SetWindowText(temp_value);
 		}
 
@@ -405,14 +406,20 @@ LRESULT CTransducer::UpdateUI(WPARAM wParam, LPARAM lParam)
 		CString temp_t_max_value;
 		CString temp_output_c_value;
 		CString temp_output_v_value;
-		temp_v_min_value.Format(_T("%.1f"), product_register_value[NEW_MODBUS_VOLTAGE_MIN_TEMP]/10.0);
-		temp_v_max_value.Format(_T("%.1f"), product_register_value[NEW_MODBUS_VOLTAGE_MAX_TEMP] / 10.0);
-		temp_c_min_value.Format(_T("%.1f"), product_register_value[NEW_MODBUS_CURRENT_MIN_TEMP] / 10.0);
-		temp_c_max_value.Format(_T("%.1f"), product_register_value[NEW_MODBUS_CURRENT_MAX_TEMP] / 10.0);
-		temp_t_min_value.Format(_T("%.1f"), product_register_value[NEW_MODBUS_TEMP_MIN] / 10.0);
-		temp_t_max_value.Format(_T("%.1f"), product_register_value[NEW_MODBUS_TEMP_MAX] / 10.0);
-		temp_output_c_value.Format(_T("%.1f"), product_register_value[NEW_MODBUS_OUTPUT_CUR_TEMP] / 10.0);
-		temp_output_v_value.Format(_T("%.1f"), product_register_value[NEW_MODBUS_OUTPUT_VOL_TEMP] / 10.0);
+		temp_v_min_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_VOLTAGE_MIN_TEMP]/10.0);
+		temp_v_max_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_VOLTAGE_MAX_TEMP] / 10.0);
+		temp_c_min_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_CURRENT_MIN_TEMP] / 10.0);
+		temp_c_max_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_CURRENT_MAX_TEMP] / 10.0);
+		//if (product_register_value[NEW_MODBUS_TEMP_MIN] > 0x7fff)
+		//{
+		//	temp_t_min_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_TEMP_MIN] / 10.0);
+		//	Sleep(1);
+		//}
+		//else
+		temp_t_min_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_TEMP_MIN] / 10.0);
+		temp_t_max_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_TEMP_MAX] / 10.0);
+		temp_output_c_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_OUTPUT_CUR_TEMP] / 10.0);
+		temp_output_v_value.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_OUTPUT_VOL_TEMP] / 10.0);
 
 		GetDlgItem(IDC_EDIT_VOLATGE_MIN_T)->SetWindowTextW(temp_v_min_value);
 		GetDlgItem(IDC_EDIT_VOLATGE_MAX_T)->SetWindowTextW(temp_v_max_value);
@@ -926,7 +933,22 @@ void CTransducer::OnCbnSelchangeComboTempRange()
 	{
 		n_value = 3;
 	}
-
+	else if (temp_string.CompareNoCase(TransducerTempRange[4]) == 0)
+	{
+		n_value = 4;
+	}
+	else if (temp_string.CompareNoCase(TransducerTempRange[5]) == 0)
+	{
+		n_value = 5;
+	}
+	else if (temp_string.CompareNoCase(TransducerTempRange[6]) == 0)
+	{
+		n_value = 6;
+	}
+	else if (temp_string.CompareNoCase(TransducerTempRange[7]) == 0)
+	{
+		n_value = 7;
+	}
 	if (write_one(g_tstat_id, NEW_MODBUS_SWITCH_TEMP_RANGE, n_value) > 0)
 	{
 		product_register_value[NEW_MODBUS_SWITCH_TEMP_RANGE] = n_value;
@@ -946,7 +968,11 @@ void CTransducer::OnPaint()
 	CPaintDC dc(this); // device context for painting
 					   // TODO: 在此处添加消息处理程序代码
 					   // 不为绘图消息调用 CFormView::OnPaint()
-
+	unsigned short temp_temperature = 0;
+	if (product_register_value[NEW_MODBUS_TEMPERATURE_UNIT] == 0)
+		temp_temperature  = product_register_value[NEW_MODBUS_TEMPERATURE_C];
+	else
+		temp_temperature = product_register_value[NEW_MODBUS_TEMPERATURE_F];
 	if (is_new_firmware)
 	{
 		Pen* myRectangle_pen;
@@ -1032,19 +1058,50 @@ void CTransducer::OnPaint()
 			{
 				cs_show_info3 = _T("-50 ");
 				cs_show_info4 = _T("50 Deg.C");
-				default_min_pascal = -500;//???????????????????
+				default_min_pascal = -500;
 				default_max_pascal = 500;
+			}
+			else if (product_register_value[NEW_MODBUS_SWITCH_TEMP_RANGE] == 4)
+			{
+				cs_show_info3 = _T("-20 ");
+				cs_show_info4 = _T("140 Deg.F");
+				default_min_pascal = -200;
+				default_max_pascal = 1400;
+			}
+			else if (product_register_value[NEW_MODBUS_SWITCH_TEMP_RANGE] == 5)
+			{
+				cs_show_info3 = _T("0 ");
+				cs_show_info4 = _T("100 Deg.F");
+				default_min_pascal = 0;
+				default_max_pascal = 1000;
+			}
+			else if (product_register_value[NEW_MODBUS_SWITCH_TEMP_RANGE] == 6)
+			{
+				cs_show_info3 = _T("40 ");
+				cs_show_info4 = _T("90 Deg.F");
+				default_min_pascal = 400;
+				default_max_pascal = 900;
+			}
+			else if (product_register_value[NEW_MODBUS_SWITCH_TEMP_RANGE] == 7)
+			{
+				cs_show_info3 = _T("-40 ");
+				cs_show_info4 = _T("140 Deg.F");
+				default_min_pascal = -400;
+				default_max_pascal = 1400;
 			}
 		}
 		else
 		{
-			cs_show_info3.Format(_T("%d"), product_register_value[NEW_MODBUS_TEMP_MIN]);
+			cs_show_info3.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_TEMP_MIN] / 10.0);
 			pointF.X = ORIGIN_X;
-			pointF.Y = ORIGIN_Y + 5;
+			pointF.Y = ORIGIN_Y + 10;
 
 			CString temp;
-			temp.Format(_T("%.1f"), product_register_value[NEW_MODBUS_TEMP_MAX] / 10.0);
-			cs_show_info4 = temp + _T(" Deg.c");
+			temp.Format(_T("%.1f"), (short)product_register_value[NEW_MODBUS_TEMP_MAX] / 10.0);
+			if (product_register_value[NEW_MODBUS_TEMPERATURE_UNIT] == 0)
+				cs_show_info4 = temp + _T(" Deg.C");
+			else
+				cs_show_info4 = temp + _T(" Deg.F");
 			default_min_pascal = product_register_value[NEW_MODBUS_TEMP_MIN];
 			default_max_pascal = product_register_value[NEW_MODBUS_TEMP_MAX];
 
@@ -1117,10 +1174,10 @@ void CTransducer::OnPaint()
 		PointF value_position;
 		if (product_register_value[NEW_MODBUS_DEF_CUSTOMER_TEMP] == 0)
 		{
-			if (product_register_value[NEW_MODBUS_TEMPERATURE_C] > default_max_pascal)
+			if (temp_temperature > default_max_pascal)
 				value_position.X = X_AXIS_MAX_VALUE_X;
 			else
-				value_position.X = ORIGIN_X + (X_AXIS_MAX_VALUE_X - ORIGIN_X) * (product_register_value[NEW_MODBUS_TEMPERATURE_C] - default_min_pascal) / (default_max_pascal - default_min_pascal);
+				value_position.X = ORIGIN_X + (X_AXIS_MAX_VALUE_X - ORIGIN_X) * (temp_temperature - default_min_pascal) / (default_max_pascal - default_min_pascal);
 			//value_position.X = ORIGIN_X + (default_max_pascal) * product_register_value[MODBUS_DIFF_PRESSURE_VALUE] / (X_AXIS_MAX_VALUE_X - ORIGIN_X);
 			if (product_register_value[NEW_MODBUS_SWITCH_OUTPUT_MODE] == 0) //4- 20 ma
 			{
@@ -1140,12 +1197,12 @@ void CTransducer::OnPaint()
 			}
 			else
 			{
-				if (product_register_value[NEW_MODBUS_TEMPERATURE_C] < product_register_value[NEW_MODBUS_TEMP_MIN])
+				if ((short)temp_temperature < (short)product_register_value[NEW_MODBUS_TEMP_MIN])
 					value_position.X = ORIGIN_X;
-				else if (product_register_value[NEW_MODBUS_TEMPERATURE_C] > product_register_value[NEW_MODBUS_TEMP_MAX])
+				else if ((short)temp_temperature > (short)product_register_value[NEW_MODBUS_TEMP_MAX])
 					value_position.X = X_AXIS_MAX_VALUE_X;
 				else
-					value_position.X = ORIGIN_X + (X_AXIS_MAX_VALUE_X - ORIGIN_X) * (product_register_value[NEW_MODBUS_TEMPERATURE_C] - product_register_value[NEW_MODBUS_TEMP_MIN]) / (product_register_value[NEW_MODBUS_TEMP_MAX] - product_register_value[NEW_MODBUS_TEMP_MIN]);
+					value_position.X = ORIGIN_X + (X_AXIS_MAX_VALUE_X - ORIGIN_X) * ((short)temp_temperature - (short)product_register_value[NEW_MODBUS_TEMP_MIN]) / ((short)product_register_value[NEW_MODBUS_TEMP_MAX] - (short)product_register_value[NEW_MODBUS_TEMP_MIN]);
 				if (product_register_value[NEW_MODBUS_SWITCH_OUTPUT_MODE] == 0) //4- 20 ma
 				{
 					value_position.Y = ORIGIN_Y - (ORIGIN_Y - Y_AXIS_MAX_VALUE_Y) * product_register_value[NEW_MODBUS_OUTPUT_CUR_TEMP] / 200;
@@ -1167,11 +1224,17 @@ void CTransducer::OnPaint()
 		CString temp_value;
 		if (product_register_value[NEW_MODBUS_SWITCH_OUTPUT_MODE] == 0) //4- 20 ma
 		{
-			temp_value.Format(_T("(%.1f Deg.C, %.1f ma)"), product_register_value[NEW_MODBUS_TEMPERATURE_C]/10.0, product_register_value[NEW_MODBUS_OUTPUT_CUR_TEMP] / 10.0);
+			if (product_register_value[NEW_MODBUS_TEMPERATURE_UNIT] == 0)
+				temp_value.Format(_T("(%.1f Deg.C, %.1f ma)"), (short)temp_temperature /10.0, product_register_value[NEW_MODBUS_OUTPUT_CUR_TEMP] / 10.0);
+			else
+				temp_value.Format(_T("(%.1f Deg.F, %.1f ma)"), (short)temp_temperature / 10.0, product_register_value[NEW_MODBUS_OUTPUT_CUR_TEMP] / 10.0);
 		}
 		else
 		{
-			temp_value.Format(_T("(%.1f Deg.C, %.1f V)"), product_register_value[NEW_MODBUS_TEMPERATURE_C]/10.0, product_register_value[NEW_MODBUS_OUTPUT_VOL_TEMP] / 10.0);
+			if (product_register_value[NEW_MODBUS_TEMPERATURE_UNIT] == 0)
+				temp_value.Format(_T("(%.1f Deg.C, %.1f V)"), (short)temp_temperature /10.0, product_register_value[NEW_MODBUS_OUTPUT_VOL_TEMP] / 10.0);
+			else
+				temp_value.Format(_T("(%.1f Deg.F, %.1f V)"), (short)temp_temperature / 10.0, product_register_value[NEW_MODBUS_OUTPUT_VOL_TEMP] / 10.0);
 		}
 		PointF temppoint_value;
 		SolidBrush  value_color_brush(Color(255, 255, 0, 0));
@@ -1578,17 +1641,25 @@ void CTransducer::OnEnKillfocusEditMinT()
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_MIN_T, temp_cstring_min);
-	int temp_temperature_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
-
+	//unsigned short temp_temperature_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
+	unsigned short temp_temperature_value_min = _wtof(temp_cstring_min) * 10;
 	CString temp_cstring_max;
 	GetDlgItemTextW(IDC_EDIT_MAX_T, temp_cstring_max);
 	int temp_value_max = unsigned int(_wtof(temp_cstring_max) * 10);
 
-	if ((temp_temperature_value_min < - 500) || (temp_temperature_value_min > 1000) || (temp_temperature_value_min >= temp_value_max))
+	if ((temp_temperature_value_min < 0xfe0b) && (temp_temperature_value_min > 1000))
 	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Minimum and maximum values must be between -50 and 100 "));
+		MessageBox(_T("Minimum and maximum values must be between -50 Deg.C and 100 Deg.C"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Minimum and maximum values must be between -50 Deg.C and 100 Deg.C"));
 		return;
 	}
+
+	//if (((temp_temperature_value_min <= 0xffff) && ((temp_temperature_value_min > 0xfe0b))) ||
+	//	((temp_temperature_value_min > 1000) && (temp_temperature_value_min < 0x7fff)) || (temp_temperature_value_min >= temp_value_max))
+	//{
+	//	SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Minimum and maximum values must be between -50 and 100 "));
+	//	return;
+	//}
 
 	if (write_one(g_tstat_id, NEW_MODBUS_TEMP_MIN, temp_temperature_value_min) > 0)
 	{
@@ -1599,6 +1670,7 @@ void CTransducer::OnEnKillfocusEditMinT()
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data Timeout"));
 	}
+	GetDlgItem(IDC_BUTTON_DONE)->SetFocus();
 }
 
 
@@ -1607,17 +1679,25 @@ void CTransducer::OnEnKillfocusEditMaxT()
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_MIN_T, temp_cstring_min);
-	int temp_temperature_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
+	unsigned short temp_temperature_value_min = _wtof(temp_cstring_min) * 10;
 
 	CString temp_cstring_max;
 	GetDlgItemTextW(IDC_EDIT_MAX_T, temp_cstring_max);
-	int temp_value_max = unsigned int(_wtof(temp_cstring_max) * 10);
+	unsigned short temp_value_max = unsigned short(_wtof(temp_cstring_max) * 10);
 
-	if ((temp_value_max < -500) || (temp_value_max > 1000) || (temp_temperature_value_min >= temp_value_max))
+	if ((temp_temperature_value_min < 0xfe0b) && (temp_temperature_value_min > 1000) ||
+		 ((short)temp_temperature_value_min >= (short)temp_value_max))
 	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Minimum and maximum values must be between -50 and 100 "));
+		MessageBox(_T("Minimum and maximum values must be between -50 Deg.C and 100 Deg.C"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Minimum and maximum values must be between -50 Deg.C and 100 Deg.C"));
 		return;
 	}
+
+	//if ((temp_value_max < -500) || (temp_value_max > 1000) || (temp_temperature_value_min >= temp_value_max))
+	//{
+	//	SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Minimum and maximum values must be between -50 and 100 "));
+	//	return;
+	//}
 
 	if (write_one(g_tstat_id, NEW_MODBUS_TEMP_MAX, temp_value_max) > 0)
 	{
@@ -1628,6 +1708,7 @@ void CTransducer::OnEnKillfocusEditMaxT()
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data Timeout"));
 	}
+	GetDlgItem(IDC_BUTTON_DONE)->SetFocus();
 }
 
 

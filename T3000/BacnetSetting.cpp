@@ -394,7 +394,9 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             ((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_DATA_BIT0))->EnableWindow(0);
             ((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_DATA_BIT1))->EnableWindow(0);
             ((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_DATA_BIT2))->EnableWindow(0);
-
+            ((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_DATA_BIT0))->SetWindowTextW(_T("8"));
+            ((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_DATA_BIT1))->SetWindowTextW(_T("8"));
+            ((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_DATA_BIT2))->SetWindowTextW(_T("8"));
 
         if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 497)//497
         {
@@ -1431,6 +1433,8 @@ BOOL CBacnetSetting::OnInitDialog()
 	SetWindowTextW(_T("Setting"));
 	m_setting_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_setting_dlg_hwnd;
+    HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_SETTING);
+    SetIcon(m_hIcon, TRUE);
 #if 0
     m_page_time.m_cm5_date_picker.EnableWindow(0);
 	m_cm5_time_picker.EnableWindow(0);

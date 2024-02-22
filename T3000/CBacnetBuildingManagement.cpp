@@ -567,6 +567,7 @@ void CBacnetBuildingManagement::LoadDevice()
 				TVINSERV_NET_WORK
 			else if (
 				temp_product_class_id == PM_T322AI ||
+				temp_product_class_id == PM_T332AI_ARM ||
 				temp_product_class_id == PM_T3PT12 ||
 				temp_product_class_id == PM_T36CTA ||
 				temp_product_class_id == PM_T3_LC ||
@@ -970,6 +971,7 @@ void CBacnetBuildingManagement::LoadDevice()
 					TVINSERV_NET_WORK
 				else if (
 					temp_product_class_id == PM_T322AI ||
+					temp_product_class_id == PM_T332AI_ARM ||
 					temp_product_class_id == PM_T3PT12 ||
 					temp_product_class_id == PM_T36CTA ||
 

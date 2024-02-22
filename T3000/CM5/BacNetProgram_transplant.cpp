@@ -6589,16 +6589,16 @@ unsigned char cod;//,xtemp[15];
 									i = *(code-1);
 									n=desvar();
 									buf += strlen(buf);
-/*
-									if(i == ASSIGNAR)
-									{
-									 *buf++ = '[';
-									 desexpr();
-									 buf += strlen(buf);
-									 *buf++ = ']';
-									}
-									else
-*/
+//20231219
+									//if(i == ASSIGNAR)
+									//{
+									// *buf++ = '[';
+									// desexpr();
+									// buf += strlen(buf);
+									// *buf++ = ']';
+									//}
+									//else
+
 									{
 									 if(i == ASSIGNARRAY_1 || i == ASSIGNARRAY_2)
 									 {

@@ -295,6 +295,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path);
 int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path);
 int GetDeviceCountTable(int device_serialnumber, int ntype, device_io_status &temp_device_io_status);
 void Create_DeviceDatabase();
+int Create_DeviceDatabase(CString des_path, CString source_path);
 int UpdateDeviceCountTable(int device_serialnumber, int ntype, device_io_status temp_device_io_status);
 int CheckDeviceCountTable(int device_serialnumber, int objectinstance = 0);
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path);

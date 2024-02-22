@@ -1460,6 +1460,7 @@ BOOL Dowmloadfile::IsNetDevice(int DevType)
         || DevType == PM_ESP32_T3_SERIES
 		|| DevType == PM_CM5
 		|| DevType == PM_T322AI
+        || DevType == PM_T332AI_ARM
 		|| DevType == PM_T38AI8AO6DO)
 	{
 		return TRUE;
@@ -1594,10 +1595,18 @@ void Dowmloadfile::OnBnClickedButtonStartDownload()
 
 void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()
 {
-	
-	download_and_update = DOWNLOAD_ONLY;
-	//Start_Download();
-    Start_Download_Ftp();
+    if (m_product_isp_auto_flash.product_class_id == 199)
+    {
+        CString CS_Info;
+        CS_Info.Format(_T("Select the device you want to download from the tree on the left."));
+        m_download_info.InsertString(m_download_info.GetCount(), CS_Info);
+        m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+    }
+    else
+    {
+		download_and_update = DOWNLOAD_ONLY;
+		Start_Download_Ftp();
+	}
 }
 
 void Dowmloadfile::AutoFlashFirmware()

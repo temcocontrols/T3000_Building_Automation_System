@@ -697,6 +697,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		INPUT_LIMITE_ITEM_COUNT = 22;
 			Minipanel_device = 0;
 	}
+	else if (bacnet_device_type == PID_T332AI)
+	{
+		INPUT_LIMITE_ITEM_COUNT = 32;
+		Minipanel_device = 0;
+	}
 	else if (bacnet_device_type == PWM_TRANSDUCER)
 	{
 		INPUT_LIMITE_ITEM_COUNT = 6;
@@ -1205,6 +1210,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 				(temp_pid == PM_T38I13O) ||
 				(temp_pid == PM_T34AO) ||
 				(temp_pid == PM_T322AI) ||
+				(temp_pid == PM_T332AI_ARM) ||
 				(temp_pid == PM_T38AI8AO6DO) ||
 				(temp_pid == PM_T36CT) ||
 				(temp_pid == PM_T36CTA)||
@@ -1401,6 +1407,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				(temp_pid == PM_T38I13O) ||
 				(temp_pid == PM_T34AO) ||
 				(temp_pid == PM_T322AI) ||
+				(temp_pid == PM_T332AI_ARM) ||
 				(temp_pid == PM_T38AI8AO6DO) ||
 				(temp_pid == PM_T36CT) ||
 				(temp_pid == PM_T36CTA) ||

@@ -882,6 +882,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 							(temp_pid == PM_T38I13O) ||
 							(temp_pid == PM_T34AO) ||
 							(temp_pid == PM_T322AI) ||
+							(temp_pid == PM_T332AI_ARM) ||
 							(temp_pid == PM_T38AI8AO6DO) ||
 							(temp_pid == PM_T36CT)||
 							(temp_pid == PM_T36CTA)||

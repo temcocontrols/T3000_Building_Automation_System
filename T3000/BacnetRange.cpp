@@ -2630,7 +2630,8 @@ void BacnetRange::ShowAnalogCusRange()
             GetPrivateData_Blocking(g_bac_instance, READANALOG_CUS_TABLE_T3000, temp_value, temp_value, sizeof(Str_table_point));
         }
 		else if ((g_selected_product_id == PM_T38AI8AO6DO) ||
-			(g_selected_product_id == PM_T322AI))
+			(g_selected_product_id == PM_T322AI)||
+			(g_selected_product_id == PM_T332AI_ARM))
 		{
 			unsigned short read_data_buffer[600];
 			memset(read_data_buffer, 0, sizeof(unsigned short) * 600);

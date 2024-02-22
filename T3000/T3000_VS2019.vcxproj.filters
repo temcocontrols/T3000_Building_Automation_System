@@ -855,6 +855,9 @@
     <ClCompile Include="CBacnetIODefine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CBacnetArray.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -2114,6 +2117,9 @@
     <ClInclude Include="CBacnetIODefine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CBacnetArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc">
@@ -2122,6 +2128,15 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\treenode_ext.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\icon_def.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\icon5.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\default_icon\Array.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

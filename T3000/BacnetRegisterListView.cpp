@@ -8,24 +8,40 @@
 #include "BADO/BADO.h"
 #include "global_function.h"
 // CBacnetRegisterListView
-
+#include "MainFrm.h"
 
 IMPLEMENT_DYNAMIC(CBacnetRegisterListView, CDialogEx)
 
+//CBacnetRegisterListView::CBacnetRegisterListView(int nmode = 0,CWnd* pParent )
+//    : CDialogEx(IDD_DIALOG_REGISTER_LIST, pParent)
+//{
+//    m_max_reg = 200;
+//}
+
+CString m_third_db_path;
 CBacnetRegisterListView::CBacnetRegisterListView(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_DIALOG_REGISTER_LIST, pParent)
 {
+    m_third_party_db = 0;
     m_max_reg = 100;
+    m_record_count = 0;
+    m_device_mode = 0;
 }
 
 CBacnetRegisterListView::~CBacnetRegisterListView()
 {
+}
+void CBacnetRegisterListView::SetDeviceMode(int n_device_mode)
+{
+    m_device_mode = n_device_mode;
 }
 
 void CBacnetRegisterListView::DoDataExchange(CDataExchange* pDX)
 {
     CDialogEx::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_LIST_REGISTER_VIEW, m_register_view);
+    //DDX_Control(pDX, ID_THIRD_LIST_DELETE, m_DeleteListButton);
+    //DDX_Control(pDX, ID_THIRD_LIST_AND,    m_DeleteListAdd);
 }
 
 #define  WM_REFRESH_REGISTER_LIST WM_USER + 203
@@ -37,7 +53,30 @@ BEGIN_MESSAGE_MAP(CBacnetRegisterListView, CDialogEx)
     ON_WM_CLOSE()
     ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_REGISTER_VIEW, &CBacnetRegisterListView::OnLvnItemchangedListRegisterView)
     ON_NOTIFY(NM_CLICK, IDC_LIST_REGISTER_VIEW, &CBacnetRegisterListView::OnNMClickListRegisterView)
+    ON_BN_CLICKED(IDC_BUTTON_CREATE_DB, &CBacnetRegisterListView::OnBnClickedButtonCreateDb)
+    ON_BN_CLICKED(IDC_BUTTON_THIRD_SAVE, &CBacnetRegisterListView::OnBnClickedButtonThirdSave)
+    ON_NOTIFY(NM_RCLICK, IDC_LIST_REGISTER_VIEW, &CBacnetRegisterListView::OnNMRClickListRegisterView)
+    ON_COMMAND(ID_THIRD_LIST_DELETE, &CBacnetRegisterListView::OnBnClickedListDelete)
+    ON_COMMAND(ID_THIRD_LIST_AND, &CBacnetRegisterListView::OnBnClickedListAdd)
+    ON_CBN_SELCHANGE(IDC_COMBO_REGISTER_DB, &CBacnetRegisterListView::OnCbnSelchangeComboRegisterDb)
+    ON_BN_CLICKED(IDC_BUTTON_DELETE_SELECTED_DB, &CBacnetRegisterListView::OnBnClickedButtonDeleteSelectedDb)
 END_MESSAGE_MAP()
+
+void CBacnetRegisterListView::OnBnClickedListDelete()
+{
+    //添加代码弹出消息框
+    //删除 m_register_view 鼠标点击的这一行
+
+    MessageBox(_T("Delete"));
+
+}
+
+void CBacnetRegisterListView::OnBnClickedListAdd()
+{
+    //新增m_register_view 一行
+    m_register_view.InsertItem(m_register_view.GetItemCount(), _T(" "));
+    //MessageBox(_T("Add"));
+}
 
 HANDLE h_read_reg_date_thread = NULL;
 typedef union
@@ -91,13 +130,17 @@ DWORD WINAPI  CBacnetRegisterListView::ReadRegDataThreadfun(LPVOID lpVoid)
 BOOL CBacnetRegisterListView::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
-
+    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    m_third_db_path = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\ThirdPartyRegistersListDB.mdb");
     InitialListData();
-    
-    if (h_read_reg_date_thread == NULL)
+    if (m_device_mode == 0)
     {
-        h_read_reg_date_thread = CreateThread(NULL, NULL, ReadRegDataThreadfun, this, NULL, NULL);
+        if (h_read_reg_date_thread == NULL)
+        {
+            h_read_reg_date_thread = CreateThread(NULL, NULL, ReadRegDataThreadfun, this, NULL, NULL);
+        }
     }
+
 
     //Test_Read_Excel();
     return TRUE;  // return TRUE unless you set the focus to a control
@@ -325,21 +368,28 @@ void CBacnetRegisterListView::OnSize(UINT nType, int cx, int cy)
     this->GetClientRect(&rect);
     CPoint pot = rect.TopLeft();
     m_register_view.SetWindowPos(NULL, pot.x + 10, pot.y + 10,
-        rect.Width() - 30, rect.Height() - 20, NULL);
+        rect.Width() - 30, rect.Height() - 65, NULL);
 }
 
 
 void CBacnetRegisterListView::InitialListData()
 {
     Initial_List();
-    m_record_count = Read_Data_From_DB(&m_max_reg);
-    if (m_record_count <= 0)
+    if (m_device_mode)
     {
-        MessageBox(_T("The register list for the corresponding product was not found !"));
-        
+
     }
-    AddDataIntoList();
-    PostMessage(WM_REFRESH_REGISTER_LIST, NULL, NULL);
+    else
+    {
+        m_record_count = Read_Data_From_DB(&m_max_reg);
+        if (m_record_count <= 0)
+        {
+			MessageBox(_T("The register list for the corresponding product was not found !"));
+			return;
+		}
+		AddDataIntoList();
+		PostMessage(WM_REFRESH_REGISTER_LIST, NULL, NULL);
+    }
 }
 
 typedef struct _str_data_format
@@ -650,7 +700,176 @@ int Read_Data_From_DB(int* m_max_retreg)
     return temp_record_count;
 }
 
+void CBacnetRegisterListView::ShowThirdPartyWindow(int nCmdShow)
+{
+    GetDlgItem(IDC_STATIC_THIRD1)->ShowWindow(nCmdShow);
+    GetDlgItem(IDC_EDIT_REGISTER_DB_NAME)->ShowWindow(nCmdShow);
+    GetDlgItem(IDC_STATIC_REGISTER_SELECT)->ShowWindow(nCmdShow);
+    GetDlgItem(IDC_COMBO_REGISTER_DB)->ShowWindow(nCmdShow);
+    GetDlgItem(IDC_BUTTON_CREATE_DB)->ShowWindow(nCmdShow);
+    GetDlgItem(IDC_BUTTON_DELETE_SELECTED_DB)->ShowWindow(nCmdShow);
+    GetDlgItem(IDC_BUTTON_THIRD_SAVE)->ShowWindow(nCmdShow);
+}
 
+struct str_third_db_str
+{
+    int reg_address;
+    CString reg_operation;
+    int reg_length;
+    CString reg_name;
+    CString reg_data_formate;
+    CString reg_description;
+    CString reg_unit;
+};
+
+vector <str_third_db_str> m_thir_db_data;
+
+void CBacnetRegisterListView::QueryTable(CString n_device_db_name)
+{
+    m_thir_db_data.clear();
+    CBADO third_db_bado;
+    third_db_bado.SetDBPath(m_third_db_path);	//暂时不创建新数据库
+    third_db_bado.OnInitADOConn();
+    int temp_record_count = 0;
+    CString strSql;
+    strSql.Format(_T("select * from ThirdPartyRegister where Device_DB_Name = '%s' ORDER BY Register_Address ASC"), n_device_db_name);
+    third_db_bado.m_pRecordset = third_db_bado.OpenRecordset(strSql);
+    temp_record_count = third_db_bado.GetRecordCount(third_db_bado.m_pRecordset);
+    if (temp_record_count <= 0)
+    {
+        third_db_bado.CloseConn();
+        return;
+    }
+    _variant_t temp_variant;
+    while (VARIANT_FALSE == third_db_bado.m_pRecordset->EndOfFile)
+    {
+        str_third_db_str temp_str;
+        temp_variant = third_db_bado.m_pRecordset->GetCollect("Register_Address");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            temp_str.reg_address = temp_variant;
+        }
+        else
+        {
+            third_db_bado.m_pRecordset->MoveNext();
+            continue;
+        }
+
+        temp_variant = third_db_bado.m_pRecordset->GetCollect("Operation");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            temp_str.reg_operation = temp_variant;
+        }
+        else
+        {
+            third_db_bado.m_pRecordset->MoveNext();
+            continue;
+        }
+
+        temp_variant = third_db_bado.m_pRecordset->GetCollect("Register_Length");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            temp_str.reg_length = temp_variant;
+        }
+        else
+        {
+            third_db_bado.m_pRecordset->MoveNext();
+            continue;
+        }
+
+        temp_variant = third_db_bado.m_pRecordset->GetCollect("Register_Name");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            temp_str.reg_name = temp_variant;
+        }
+        else
+        {
+            third_db_bado.m_pRecordset->MoveNext();
+            continue;
+        }
+
+        temp_variant = third_db_bado.m_pRecordset->GetCollect("Data_Format");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            temp_str.reg_data_formate = temp_variant;
+        }
+        else
+        {
+            third_db_bado.m_pRecordset->MoveNext();
+            continue;
+        }
+
+        temp_variant = third_db_bado.m_pRecordset->GetCollect("Description");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            temp_str.reg_description = temp_variant;
+        }
+        else
+        {
+            third_db_bado.m_pRecordset->MoveNext();
+            continue;
+        }
+
+        temp_variant = third_db_bado.m_pRecordset->GetCollect("Unit");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            temp_str.reg_unit = temp_variant;
+        }
+        else
+        {
+            third_db_bado.m_pRecordset->MoveNext();
+            continue;
+        }
+        m_thir_db_data.push_back(temp_str);
+        third_db_bado.m_pRecordset->MoveNext();
+    }
+    third_db_bado.CloseRecordset();//Ffff add
+    third_db_bado.CloseConn();
+
+    PostMessage(WM_REFRESH_REGISTER_LIST, NULL, NULL);
+    GetDlgItem(IDC_EDIT_REGISTER_DB_NAME)->SetWindowTextW(n_device_db_name);
+}
+void CBacnetRegisterListView::QueryAllDbDeviceName()
+{
+    vector_third_db_name.clear();
+    CBADO monitor_bado;
+    monitor_bado.SetDBPath(m_third_db_path);	//暂时不创建新数据库
+    monitor_bado.OnInitADOConn();
+    CString strSql;
+    strSql.Format(_T("select DISTINCT Device_DB_Name from ThirdPartyRegister "));
+    unsigned int temp_record_count = 0;
+    monitor_bado.m_pRecordset = monitor_bado.OpenRecordset(strSql);
+    temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
+    if (temp_record_count <= 0)
+    {
+        monitor_bado.CloseConn();
+        return;
+    }
+    int temp_count = 0;
+    _variant_t temp_variant;
+    CString temp_device_db_name;
+    int monitor_value = 0;
+    while (VARIANT_FALSE == monitor_bado.m_pRecordset->EndOfFile)
+    {
+        temp_variant = monitor_bado.m_pRecordset->GetCollect("Device_DB_Name");//
+        if (temp_variant.vt != VT_NULL)
+        {
+            temp_device_db_name = temp_variant;
+            vector_third_db_name.push_back(temp_device_db_name);
+        }
+        else
+        {
+            temp_device_db_name.Empty();
+            monitor_bado.m_pRecordset->MoveNext();
+            continue;
+        }
+
+        temp_count++;
+        monitor_bado.m_pRecordset->MoveNext();
+    }
+    monitor_bado.CloseRecordset();//Ffff add
+    monitor_bado.CloseConn();
+}
 
 void CBacnetRegisterListView::Initial_List()
 {
@@ -659,16 +878,37 @@ void CBacnetRegisterListView::Initial_List()
     while (m_register_view.DeleteColumn(0));
 
     m_register_view.ModifyStyle(0, LVS_SINGLESEL | LVS_REPORT | LVS_SHOWSELALWAYS);
-    //m_register_view.SetExtendedStyle(m_register_view.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
-    m_register_view.SetExtendedStyle(m_register_view.GetExtendedStyle() | LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-    m_register_view.InsertColumn(REGISTER_LIST_ID, _T("ID"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
-    m_register_view.InsertColumn(REGISTER_LIST_ADDRESS, _T("Reg_Address"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-    m_register_view.InsertColumn(REGUSTER_LIST_OPERATION, _T("Operation"), 130, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-    m_register_view.InsertColumn(REGISTER_LIST_REG_LENGTH, _T("Reg_Length"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_register_view.InsertColumn(REGISTER_LIST_REG_NAME, _T("Register_Name"), 140, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-    m_register_view.InsertColumn(REGISTER_LIST_VALUE, _T("Value"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_register_view.InsertColumn(REGISTER_LIST_DATA_FORMAT, _T("Data_Format"), 140, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-    m_register_view.InsertColumn(REGISTER_LIST_DESCRIPTION, _T("Description"), 350, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+
+
+    if (m_device_mode)
+    {
+        vector_third_db_name.clear();
+        m_register_view.SetExtendedStyle(m_register_view.GetExtendedStyle() | LVS_EX_GRIDLINES & (~LVS_EX_FULLROWSELECT));//Not allow full row select.
+        m_register_view.InsertColumn(REGISTER_LIST_ID, _T("ID"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+        m_register_view.InsertColumn(REGISTER_LIST_ADDRESS, _T("Address"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGUSTER_LIST_OPERATION, _T("Operation"), 130, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_REG_LENGTH, _T("Length"), 50, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_REG_NAME, _T("Register Name"), 140, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_VALUE, _T("Value"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_DATA_FORMAT, _T("Data Format"), 140, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_DESCRIPTION, _T("Description"), 350, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_UNIT, _T("Unit"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        ShowThirdPartyWindow(1);
+    }
+    else
+    {
+        m_register_view.SetExtendedStyle(m_register_view.GetExtendedStyle() | LVS_EX_GRIDLINES & (~LVS_EX_FULLROWSELECT));//Not allow full row select.
+        m_register_view.InsertColumn(REGISTER_LIST_ID, _T("ID"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+        m_register_view.InsertColumn(REGISTER_LIST_ADDRESS, _T("Address"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGUSTER_LIST_OPERATION, _T("Operation"), 130, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_REG_LENGTH, _T("Length"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_REG_NAME, _T("Register Name"), 140, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_VALUE, _T("Value"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_DATA_FORMAT, _T("Data Format"), 140, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_DESCRIPTION, _T("Description"), 350, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        m_register_view.InsertColumn(REGISTER_LIST_UNIT, _T("Unit"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+        ShowThirdPartyWindow(0);
+    }
     m_pragram_dlg_hwnd = this->m_hWnd;
     m_register_view.SetListHwnd(this->m_hWnd);
     CRect list_rect, win_rect;
@@ -682,6 +922,32 @@ void CBacnetRegisterListView::Initial_List()
     m_register_view.DeleteAllItems();
 
     m_register_view.ShowWindow(SW_SHOW);
+
+    
+	if (m_device_mode)
+	{
+		//判断文件是否存在
+		if (PathFileExists(m_third_db_path))
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The register list for the corresponding product was not found !"));
+			
+            QueryAllDbDeviceName();
+			//清空下面的combobox
+			((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->ResetContent();
+			//循环将vector_third_db_name 的内容添加到combobox中
+            if (vector_third_db_name.size() > 0)
+            {
+                for (size_t i = 0; i < vector_third_db_name.size(); i++)
+                {
+                    ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->AddString(vector_third_db_name.at(i));
+                }
+                ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->SetCurSel(0);
+            }
+		}
+        if (vector_third_db_name.size() > 0)
+            QueryTable(vector_third_db_name.at(0));
+
+	}
 }
 
 void CBacnetRegisterListView::AddDataIntoList()
@@ -818,6 +1084,37 @@ LRESULT CBacnetRegisterListView::Fresh_Register_Item(WPARAM wParam, LPARAM lPara
 
 LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lParam)
 {
+    if (m_device_mode)
+    {
+        m_register_view.DeleteAllItems();
+
+        for (int i = 0; i < m_thir_db_data.size(); i++)
+        {
+            CString temp_id;
+			temp_id.Format(_T("%d"), i + 1);
+            m_register_view.InsertItem(i, temp_id);
+			CString temp_register_address;
+			temp_register_address.Format(_T("%d"), m_thir_db_data.at(i).reg_address);
+
+			CString temp_register_length;
+			temp_register_length.Format(_T("%d"), m_thir_db_data.at(i).reg_length);
+
+            CString temp_register_operation = m_thir_db_data.at(i).reg_operation;
+            CString temp_register_name = m_thir_db_data.at(i).reg_name;
+            CString temp_register_data_format = m_thir_db_data.at(i).reg_data_formate;
+            CString temp_register_description = m_thir_db_data.at(i).reg_description;
+            CString temp_register_unit = m_thir_db_data.at(i).reg_unit;
+            m_register_view.SetItemText(i, REGISTER_LIST_ID, temp_id);
+            m_register_view.SetItemText(i, REGISTER_LIST_ADDRESS, temp_register_address);
+            m_register_view.SetItemText(i, REGUSTER_LIST_OPERATION, temp_register_operation);
+            m_register_view.SetItemText(i, REGISTER_LIST_REG_LENGTH, temp_register_length);
+            m_register_view.SetItemText(i, REGISTER_LIST_REG_NAME, temp_register_name);
+            m_register_view.SetItemText(i, REGISTER_LIST_DATA_FORMAT, temp_register_data_format);
+            m_register_view.SetItemText(i, REGISTER_LIST_DESCRIPTION, temp_register_description);
+            m_register_view.SetItemText(i, REGISTER_LIST_UNIT, temp_register_unit);
+        }
+        return 1;
+	}
     int l_param = (int)lParam;
     for (int i = 0;i < m_record_count;i++)
     {
@@ -1267,7 +1564,7 @@ void CBacnetRegisterListView::OnNMClickListRegisterView(NMHDR *pNMHDR, LRESULT *
     // TODO: 在此添加控件通知处理程序代码
     *pResult = 0;
     long lRow, lCol;
-    m_register_view.Set_Edit(false);
+    m_register_view.Set_Edit(true);
     DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
     CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
     m_register_view.ScreenToClient(&point);
@@ -1284,7 +1581,8 @@ void CBacnetRegisterListView::OnNMClickListRegisterView(NMHDR *pNMHDR, LRESULT *
         return;
     if (lRow<0)
         return;
-
+    if (m_device_mode == 1)
+        return;
     if(lCol != REGISTER_LIST_VALUE)
         return;
 
@@ -1299,4 +1597,131 @@ void CBacnetRegisterListView::OnNMClickListRegisterView(NMHDR *pNMHDR, LRESULT *
     }
     else
         return;
+}
+
+
+void CBacnetRegisterListView::OnBnClickedButtonCreateDb()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    int n_ret = 0;
+    CString FilePath;
+
+    FilePath = g_strExePth + _T("ResourceFile\\ThirdPartyRegistersListDB.mdb");
+    n_ret = Create_DeviceDatabase(m_third_db_path, FilePath);
+    if(n_ret)
+		MessageBox(_T("Create Database Success!"));
+
+
+
+        CString temp_item;
+        temp_item.Format(_T("%d"),  1);
+        m_register_view.InsertItem(0, temp_item);
+
+}
+
+
+void CBacnetRegisterListView::OnBnClickedButtonThirdSave()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CBADO monitor_bado;
+    monitor_bado.SetDBPath(m_third_db_path);	//暂时不创建新数据库
+    monitor_bado.OnInitADOConn();
+    CString temp_db_name; CString temp_operation; CString temp_reg_name; CString temp_data_formate; CString temp_description; CString temp_unit;
+    GetDlgItemText(IDC_EDIT_REGISTER_DB_NAME, temp_db_name);
+    int temp_address = _wtoi( m_register_view.GetItemText(0, REGISTER_LIST_ADDRESS));
+    temp_operation = m_register_view.GetItemText(0, REGUSTER_LIST_OPERATION);
+    int temp_length = _wtoi(m_register_view.GetItemText(0, REGISTER_LIST_REG_LENGTH));
+
+
+    temp_reg_name = m_register_view.GetItemText(0, REGISTER_LIST_REG_NAME);
+    temp_data_formate = m_register_view.GetItemText(0, REGISTER_LIST_DATA_FORMAT);
+    temp_description = m_register_view.GetItemText(0, REGISTER_LIST_DESCRIPTION);
+    temp_unit = m_register_view.GetItemText(0, REGISTER_LIST_UNIT);
+
+    CString strSql;
+    strSql.Format(_T("insert into ThirdPartyRegister (Device_DB_Name,Register_Address,Operation,Register_Length,Register_Name,Data_Format,Description,Unit) values('%s',%u,'%s',%u,'%s','%s','%s','%s')"),temp_db_name, temp_address,temp_operation,temp_length,temp_reg_name, temp_data_formate,temp_description,temp_unit);
+    monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+    monitor_bado.CloseConn();
+}
+
+void CBacnetRegisterListView::UpdateThirdUI()
+{
+
+}
+
+
+void CBacnetRegisterListView::OnNMRClickListRegisterView(NMHDR* pNMHDR, LRESULT* pResult)
+{
+    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+    // TODO: 在此添加控件通知处理程序代码
+
+    CString temp_cstring;
+    long lRow, lCol;
+    m_register_view.Set_Edit(true);
+    DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+    CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
+    m_register_view.ScreenToClient(&point);
+    LVHITTESTINFO lvinfo;
+    lvinfo.pt = point;
+    lvinfo.flags = LVHT_ABOVE;
+    int nItem = m_register_view.SubItemHitTest(&lvinfo);
+
+    lRow = lvinfo.iItem;
+    lCol = lvinfo.iSubItem;
+
+    if (lRow > m_register_view.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+        return;
+    if (lRow < 0)
+        return;
+
+
+    CMenu menu;
+    menu.LoadMenu(IDR_THIRD_REG_MENU_POP);
+    CMenu* pmenu = menu.GetSubMenu(0);
+    //CPoint point;
+    GetCursorPos(&point);
+    pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN, point.x, point.y, this);
+
+    *pResult = 0;
+}
+
+
+
+void CBacnetRegisterListView::OnCbnSelchangeComboRegisterDb()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_string;
+    int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->GetCurSel();
+    ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->GetLBText(nSel, temp_string);
+    QueryTable(temp_string);
+}
+
+
+void CBacnetRegisterListView::OnBnClickedButtonDeleteSelectedDb()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CBADO monitor_bado;
+    monitor_bado.SetDBPath(m_third_db_path);	//暂时不创建新数据库
+    monitor_bado.OnInitADOConn();
+    CString temp_db_name; 
+    GetDlgItemText(IDC_EDIT_REGISTER_DB_NAME, temp_db_name);
+
+    CString strSql;
+    strSql.Format(_T("delete * from ThirdPartyRegister where Device_DB_Name = '%s'") , temp_db_name);
+    monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
+    monitor_bado.CloseConn();
+    QueryAllDbDeviceName();
+    
+    //清空下面的combobox
+    ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->ResetContent();
+    //循环将vector_third_db_name 的内容添加到combobox中
+    for (size_t i = 0; i < vector_third_db_name.size(); i++)
+    {
+        ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->AddString(vector_third_db_name.at(i));
+    }
+    if (vector_third_db_name.size() > 0)
+    {
+        ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->SetCurSel(0);
+        QueryTable(vector_third_db_name.at(0));
+    }
 }

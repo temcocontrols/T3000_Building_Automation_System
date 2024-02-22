@@ -10,19 +10,24 @@
     ".NETFramework,Version=v4.5.2": []
   },
   "packageFolders": {
-    "C:\\Users\\Administrator\\.nuget\\packages\\": {}
+    "C:\\Users\\Administrator\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\Work\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
+      "projectUniqueName": "M:\\Work\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
       "projectName": "T3000Controls",
-      "projectPath": "C:\\Work\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
-      "projectJsonPath": "C:\\Work\\T3000_Building_Automation_System\\T3000Controls\\project.json",
+      "projectPath": "M:\\Work\\T3000_Building_Automation_System\\T3000Controls\\T3000Controls.csproj",
+      "projectJsonPath": "M:\\Work\\T3000_Building_Automation_System\\T3000Controls\\project.json",
       "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-      "outputPath": "C:\\Work\\T3000_Building_Automation_System\\T3000Controls\\obj\\",
+      "outputPath": "M:\\Work\\T3000_Building_Automation_System\\T3000Controls\\obj\\",
       "projectStyle": "ProjectJson",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
         "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "sources": {

@@ -1187,5 +1187,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader8;
         private System.Windows.Forms.ToolStripMenuItem searchToolStripMenuItem1;
     }
+     
 }
 

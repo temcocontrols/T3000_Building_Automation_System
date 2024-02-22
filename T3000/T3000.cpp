@@ -17,7 +17,7 @@
 #include <windows.h>  
  
 
-const unsigned int g_versionNO = PROJECT_VERSION;
+const unsigned int g_versionNO = 20240219;  // PROJECT_VERSION;
 
 
 #ifdef _DEBUG
@@ -61,6 +61,7 @@ CT3000App::CT3000App()
 	T3000_Version = g_versionNO; //
 
 	m_lastinterface=19;
+	
 }
 
 // The one and only CT3000App object

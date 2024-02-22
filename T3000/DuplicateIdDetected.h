@@ -63,7 +63,7 @@ public:
 
 	int duplicate_mode;
     BOOL ChangeNetDeviceIP(CString soldIP, CString newstrIP, unsigned int nSerialNum);
-
+	unsigned int m_changed_instance;
     CString original_ip1;
     CString original_ip2;
     CString cschaned_ip1;

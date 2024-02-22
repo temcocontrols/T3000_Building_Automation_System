@@ -444,6 +444,13 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
         OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
 		Minipanel_device = 0;
 	}
+	else if (bacnet_device_type == PM_T332AI_ARM)
+	{
+		digital_special_output_count = T332AI_OUT_D;
+		analog_special_output_count = T332AI_OUT_A;
+		OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+		Minipanel_device = 0;
+	}
 	else if (bacnet_device_type == PWM_TRANSDUCER)
 	{
 		digital_special_output_count = PWM_TRANSDUCER_OUT_D;
@@ -941,6 +948,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				(temp_pid == PM_T38I13O) ||
 				(temp_pid == PM_T34AO) ||
 				(temp_pid == PM_T322AI) ||
+				(temp_pid == PM_T332AI_ARM) ||
 				(temp_pid == PM_T38AI8AO6DO) ||
 				(temp_pid == PM_T36CT) ||
 				(temp_pid == PM_T36CTA)||
@@ -1389,6 +1397,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 				(temp_pid == PM_T34AO) ||
 				(temp_pid == PM_T36CT) ||
 				(temp_pid == PM_T322AI) ||
+				(temp_pid == PM_T332AI_ARM) ||
 				(temp_pid == PM_T38AI8AO6DO)||
 				(temp_pid == PM_T36CTA)||
 				(temp_pid == PM_T3_LC)

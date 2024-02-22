@@ -181,6 +181,8 @@ typedef enum {
 #define STR_PROGRAM_DESCRIPTION_LENGTH 21
 #define  STR_PROGRAM_LABEL_LENGTH 9
 
+#define STR_ARRAY_NAME_LENGTH 9
+
 #define STR_WEEKLY_DESCRIPTION_LENGTH 21
 #define  STR_WEEKLY_LABEL_LENGTH 9
 
@@ -511,7 +513,11 @@ typedef struct
 
 } Str_program_point;	  /*37 bytes  fandu*/
 
-
+typedef struct 		// (size = 11 byte s)
+{
+	int8_t label[STR_ARRAY_NAME_LENGTH];		     // (9 byte s; string)
+	uint16_t  array_size;  	 // (2 byte ; 0-65535)
+} Str_array_point;
 
 typedef struct
 {

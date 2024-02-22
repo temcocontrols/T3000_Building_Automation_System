@@ -331,6 +331,7 @@ public:
 	BOOL  CheckDeviceStatus(int refresh_com);
 	void  CheckDuplicate();
     void  CheckIPDuplicate();
+	void  CheckDeviceParameter();
 	void  Show_Wait_Dialog_And_SendConfigMessage();
     void  Show_Wait_Dialog_And_ReadBacnet(int ncontrol);
 	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
@@ -342,6 +343,7 @@ public:
 	static DWORD WINAPI  DetectYabbeThread(LPVOID lpVoid);
     static DWORD WINAPI  Write_Modbus_tstat_cfg(LPVOID lpVoid);
 	static DWORD WINAPI  Write_Modbus_ConfigFile(LPVOID lpVoid);
+	static DWORD WINAPI  CreateWebServerThreadfun(LPVOID lpVoid);
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
     
@@ -476,13 +478,14 @@ public:
 	afx_msg void OnControlOutputs();
 	afx_msg void OnControlVariables();
 	afx_msg void OnControlWeekly();
+	afx_msg void OnControlRefresh();
 	afx_msg void OnControlAnnualroutines();
 	afx_msg void OnMiscellaneousLoaddescriptors();
 	afx_msg void OnMiscellaneousUpdatemini();
 	afx_msg void OnControlControllers();
 	afx_msg void OnControlScreens();
 	afx_msg void OnControlMonitors();
-    afx_msg void OnControlPanel();
+    afx_msg void OnControlArray();
 	afx_msg void OnHelpGetlanguageconfigfile();
 	afx_msg void OnLanguageEnglish();
 	afx_msg void OnLanguage34010();
@@ -601,6 +604,8 @@ public:
 #else
 		int    DoConnectDB_TreeNode(const HTREEITEM& hTreeItem);
 #endif
+		afx_msg void OnWebviewModbusregister();
+		afx_msg void OnWebviewThirdpartymodbusdatabase();
 };
 //DWORD WINAPI  Bacnet_ReadWrite_Message(LPVOID lpVoid);
 //tree0412  2017 05 11 fance change

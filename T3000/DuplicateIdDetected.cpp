@@ -193,39 +193,76 @@ DWORD WINAPI ChangeDuplicateIPthread(LPVOID lpvoid)
 DWORD WINAPI HanlePanelNumber(LPVOID lpvoid)
 {
 	CDuplicateIdDetected *mparent = (CDuplicateIdDetected *)lpvoid;
-
-	if(first_need_changed)
+	if (mparent->duplicate_mode == CONFILIC_DEVICE_BACNET_INSTANCE)
 	{
-		 bool bret=Open_Socket2(device_id_data_1.ip_address,device_id_data_1.nport);
-		 SetCommunicationType(1);
-		 if(bret)
-		 {
-			 //first_propose_id
-			 int write_ret = 0 ;
-			write_ret =  write_one(255,36,first_propose_id);
-			if(write_ret <0)
-			{
-				cs_show_info.Format(_T("try to change the first panel id failed..."));
+        bool bret = Open_Socket2(device_id_data_1.ip_address, device_id_data_1.nport);
+        SetCommunicationType(1);
+        if (bret)
+        {
+            unsigned short temp_low = 0;
+            unsigned short temp_high = 0;
+            Get_Instance_Reg_Map(device_id_data_1.product_id, temp_high, temp_low);
+            unsigned short temp_write_high = 0;
+            unsigned short temp_write_low = 0;
+            temp_write_high = (unsigned short)(mparent->m_changed_instance >> 16);
+            temp_write_low = (unsigned short)(mparent->m_changed_instance & 0x0000ffff);
+            int write_ret1 = 0;
+            write_ret1 = write_one(device_id_data_1.modbusID, temp_high, temp_write_high);
+            if (write_ret1 < 0)
+            {
+				cs_show_info.Format(_T("try to change object instance failed..."));
 				Sleep(1000);
 				goto ret_label_panel_ret;
 			}
-		 }
+          
+            int write_ret2 = 0;
+            write_ret2 = write_one(device_id_data_1.modbusID, temp_low, temp_write_low);
+            if (write_ret2 < 0)
+            {
+                cs_show_info.Format(_T("try to change object instance failed..."));
+                Sleep(1000);
+                goto ret_label_panel_ret;
+            }
+            
+        }
 	}
-
-	if(second_need_changed)
+	else
 	{
-		bool bret=Open_Socket2(device_id_data_2.ip_address,device_id_data_2.nport);
-		SetCommunicationType(1);
-		if(bret)
+
+
+		if (first_need_changed)
 		{
-			//first_propose_id
-			int write_ret = 0 ;
-			write_ret =  write_one(255,36,second_propose_id);
-			if(write_ret <0)
+			bool bret = Open_Socket2(device_id_data_1.ip_address, device_id_data_1.nport);
+			SetCommunicationType(1);
+			if (bret)
 			{
-				cs_show_info.Format(_T("try to change %s panel id failed..."),device_id_data_2.ip_address);
-				Sleep(1000);
-				goto ret_label_panel_ret;
+				//first_propose_id
+				int write_ret = 0;
+				write_ret = write_one(255, 36, first_propose_id);
+				if (write_ret < 0)
+				{
+					cs_show_info.Format(_T("try to change the first panel id failed..."));
+					Sleep(1000);
+					goto ret_label_panel_ret;
+				}
+			}
+		}
+
+		if (second_need_changed)
+		{
+			bool bret = Open_Socket2(device_id_data_2.ip_address, device_id_data_2.nport);
+			SetCommunicationType(1);
+			if (bret)
+			{
+				//first_propose_id
+				int write_ret = 0;
+				write_ret = write_one(255, 36, second_propose_id);
+				if (write_ret < 0)
+				{
+					cs_show_info.Format(_T("try to change %s panel id failed..."), device_id_data_2.ip_address);
+					Sleep(1000);
+					goto ret_label_panel_ret;
+				}
 			}
 		}
 	}
@@ -356,6 +393,8 @@ void CDuplicateIdDetected::Initial_static()
 		m_static_title.SetWindowTextW(_T("Each device on the same network needs a unique panel number or communications will fail.\r\nWould you like to change the panel number to the new value?"));
     else if(duplicate_mode == CONFILIC_IPADDRESS)
         m_static_title.SetWindowTextW(_T("Each device on the ethernet network needs a unique IP address or communications will fail.\r\nWould you like to change the IP address to a new IP?"));
+    else if(duplicate_mode == CONFILIC_DEVICE_BACNET_INSTANCE)
+        m_static_title.SetWindowTextW(_T("Each device bacnet instance should be less than 0xfffff.\r\nIf the bacnet instance is greater than this value, the device cannot communicate."));
 	m_static_title.textColor(RGB(0,0,0));
 	//m_static.bkColor(RGB(0,255,255));
 	m_static_title.setFont(28,16,NULL,_T("Arial"));
@@ -370,9 +409,10 @@ void CDuplicateIdDetected::Initial_static()
         temp_subnet.Format(_T("%s - %s panel number conflict"), device_id_data_1.ip_address, device_id_data_2.ip_address);
     else if(duplicate_mode == CONFILIC_IPADDRESS)
         temp_subnet.Format(_T("%s - %s IP address conflict"), device_id_data_1.ip_address, device_id_data_1.ip_address);
-
+    else if (duplicate_mode == CONFILIC_DEVICE_BACNET_INSTANCE)
+        temp_subnet.Format(_T("%d bacnet instance is invalid"), device_id_data_1.object_instance);
 	CString temp_serial_1;CString temp_serial_2;
-	CString temp_current_id_1;CString temp_current_id_2;
+    CString temp_current_id_1; CString temp_current_id_2; CString temp_propsed_id;
 	CString temp_user_text_1;CString temp_user_text_2;
 	CString temp_product_id_1;CString temp_product_id_2;
     CString temp_ip_address_1; CString temp_ip_address_2;
@@ -414,6 +454,16 @@ void CDuplicateIdDetected::Initial_static()
         temp_ip_address_1 = device_id_data_1.ip_address;
         temp_ip_address_2 = device_id_data_2.ip_address;
     }
+    else if (duplicate_mode == CONFILIC_DEVICE_BACNET_INSTANCE)
+    {
+		temp_current_id_1.Format(_T("%d"), device_id_data_1.object_instance);
+        unsigned short temp_instance = device_id_data_1.nSerial;
+        temp_propsed_id.Format(_T("%d"), temp_instance);
+        temp_user_text_2 = temp_user_text_1 = device_id_data_1.show_label_name;
+        temp_product_id_2 = temp_product_id_1 = GetProductName(device_id_data_1.product_id);
+        temp_ip_address_2 = temp_ip_address_1 = device_id_data_1.ip_address;
+	}
+
 
 
 
@@ -451,6 +501,11 @@ void CDuplicateIdDetected::Initial_static()
         m_dup_current_id.SetWindowTextW(_T("Current IP:"));
         m_dup_propsed_id.SetWindowTextW(_T("Proposed IP:"));
     }
+    else if (duplicate_mode == CONFILIC_DEVICE_BACNET_INSTANCE)
+    {
+		m_dup_current_id.SetWindowTextW(_T("Current Instance:"));
+		m_dup_propsed_id.SetWindowTextW(_T("Proposed Instance:"));
+	}
 
 	m_dup_current_id.textColor(RGB(0,0,0));
 	m_dup_current_id.setFont(24,16,NULL,_T("Arial"));
@@ -494,12 +549,19 @@ void CDuplicateIdDetected::Initial_static()
 	//m_current_id_1.bkColor(RGB(0,255,255));
 	m_current_id_1.setFont(24,16,NULL,_T("Arial"));
 
-	m_current_id_2.SetWindowTextW(temp_current_id_2);
+    m_current_id_2.SetWindowTextW(temp_current_id_2);
 	m_current_id_2.textColor(RGB(0,0,0));
 	//m_current_id_2.bkColor(RGB(0,255,255));
 	m_current_id_2.setFont(24,16,NULL,_T("Arial"));
 
-	m_edit_propsed_id_1.SetWindowTextW(temp_current_id_1);
+    if (duplicate_mode == CONFILIC_DEVICE_BACNET_INSTANCE)
+    {
+        m_edit_propsed_id_1.SetWindowTextW(temp_propsed_id);
+    }
+    else
+    {
+        m_edit_propsed_id_1.SetWindowTextW(temp_current_id_1);
+    }
 	m_edit_propsed_id_1.textColor(RGB(0,0,0));
 	m_edit_propsed_id_1.bkColor(RGB(255,255,255));
 	m_edit_propsed_id_1.setFont(24,16,NULL,_T("Arial"));
@@ -687,6 +749,18 @@ void CDuplicateIdDetected::Initial_static()
         m_device_model_1.SetWindowTextW(temp_product_id_1);
         m_device_model_2.SetWindowTextW(temp_product_id_2);
     }
+    else if (duplicate_mode == CONFILIC_DEVICE_BACNET_INSTANCE)
+    {
+        m_current_id_2.ShowWindow(false);
+        m_edit_propsed_id_2.ShowWindow(false);
+        m_static_serial_2.ShowWindow(false);
+        m_device_model_2.ShowWindow(false);
+        m_user_text_2.ShowWindow(false);
+        m_device_yes_no_2.ShowWindow(false);
+        m_id_from_db_2.ShowWindow(false);
+        m_device2_title.ShowWindow(false);
+        m_edit_ipaddress_2.ShowWindow(false);
+    }
 }
 
 
@@ -769,7 +843,17 @@ void CDuplicateIdDetected::OnBnClickedButtonDuplicateDone()
         else
             ip2_need_change = true;
     }
-	
+    else if (duplicate_mode == CONFILIC_DEVICE_BACNET_INSTANCE)
+    {
+        CString temp_changed_instance;
+        GetDlgItem(IDC_EDIT_DEVICE_1)->GetWindowTextW(temp_changed_instance);
+        m_changed_instance = _wtoi(temp_changed_instance);
+        if (PanelNumberThread == NULL)
+        {
+            PanelNumberThread = CreateThread(NULL, NULL, HanlePanelNumber, this, NULL, NULL);
+            ::CloseHandle(PanelNumberThread);
+        }
+    }
 
     if (duplicate_mode == CONFILIC_SUBID)
     {

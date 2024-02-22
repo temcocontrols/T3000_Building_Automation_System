@@ -326,7 +326,19 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 	mygraphics->DrawRectangle(myRectangle_pen, progress_start_pos, 0, progress_width - STATUS_ALARM_ICON_WIDTH, window_height);
 
 	CString temp_value;
-
+	//外部清零的情况下，需要其他参数也初始化
+	if (clear_status_bar)
+	{
+		m_health_persent = 100;
+		g_llerrCount = 0;
+		old_tx_count = 0;
+		for (int i = 0; i < 100; i++)
+		{
+			Tx_array[i] = 0;
+			Rx_array[i] = 0;
+		}
+		clear_status_bar = false;
+	}
 
 	staticpointF.X = 1;
 	staticpointF.Y = 1;

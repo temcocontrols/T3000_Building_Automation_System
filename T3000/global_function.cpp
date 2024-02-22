@@ -268,6 +268,8 @@ void SetPaneString(int nIndext,CString str)
         pStatusBar->SetPaneBackgroundColor(nIndext,RGB(42,58,87));
     }
 }
+
+
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
     //2018 0606 在底层公共读写函数增加对不同协议的处理
@@ -1626,6 +1628,9 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 	case WRITEPROGRAM_T3000:
 		entitysize = sizeof(Str_program_point);
 		break;
+    case WRITEARRAY_T3000:
+        entitysize = sizeof(Str_array_point);
+        break;
 	case WRITEUNIT_T3000:
 		entitysize = sizeof(Str_Units_element);
 		break;
@@ -1788,6 +1793,12 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         else
         {
             memcpy_s(SendBuffer  + HEADER_LENGTH, (end_instance - start_instance + 1)*sizeof(Str_in_point), ext_data, (end_instance - start_instance + 1) * sizeof(Str_in_point));
+        }
+        break;
+    case WRITEARRAY_T3000:
+        for (int i = 0; i < (end_instance - start_instance + 1); i++)
+        {
+            memcpy_s(SendBuffer + i * sizeof(Str_array_point) + HEADER_LENGTH, sizeof(Str_array_point), &m_Array_data.at(i + start_instance), sizeof(Str_array_point));
         }
         break;
     case WRITEPROGRAM_T3000:
@@ -3329,6 +3340,22 @@ int fill_in_pids(Str_controller_point* temp_var, char* temp_point)
     return 0;
 }
 
+int fill_in_arrays(Str_array_point* temp_array, char* temp_point)
+{
+    int temp_struct_value;
+    char* my_temp_point = temp_point;
+
+    if (strlen(my_temp_point) > STR_ARRAY_NAME_LENGTH)
+        memset(temp_array->label, 0, STR_ARRAY_NAME_LENGTH);
+    else
+        memcpy_s(temp_array->label, STR_ARRAY_NAME_LENGTH, my_temp_point, STR_ARRAY_NAME_LENGTH);
+    my_temp_point = my_temp_point + STR_ARRAY_NAME_LENGTH;
+
+    temp_array->array_size = ((unsigned char)my_temp_point[1] << 8) | ((unsigned char)my_temp_point[0]);
+    my_temp_point = my_temp_point + 2;
+    return 0;
+}
+
 int fill_in_programs(Str_program_point* temp_program, char* temp_point)
 {
     int temp_struct_value;
@@ -4084,6 +4111,42 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         return READANNUALROUTINE_T3000;
     }
     break;
+    case READARRAY_T3000:
+    {
+        if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_array_point)) != 0)
+            return -1;	//得到的结构长度错误;
+        block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_array_point);
+        my_temp_point = bacnet_apud_point + 3;
+        start_instance = *my_temp_point;
+        my_temp_point++;
+        end_instance = *my_temp_point;
+        my_temp_point++;
+        my_temp_point = my_temp_point + 2;
+        if (start_instance >= BAC_ARRAY_ITEM_COUNT)
+            return -1;//超过长度了;
+        if (end_instance == (BAC_ARRAY_ITEM_COUNT - 1))
+            end_flag = true;
+
+        if (invoke_id == gsp_invoke)
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_arrays(&s_Array_data, my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_array_point);
+            }
+        }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_arrays(&m_Array_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_array_point);
+            }
+        }
+        return READARRAY_T3000;
+
+    }
+        break;
     case READPROGRAM_T3000:
     {
 
@@ -5683,8 +5746,10 @@ int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_t
 }
 
 
+
 int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_APPLICATION_DATA_VALUE &value, uint8_t retrytime, uint32_t index)
 {
+
     int send_status = true;
 
     str_bacnet_rp_info temp_standard_bacnet_data = { 0 };
@@ -5739,9 +5804,17 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
                     itrflag->invoke_id = temp_invoke_id;
                 }
                 else
-                {
-                    itrflag = standard_bacnet_data.end() - 1;
-                    itrflag->invoke_id = temp_invoke_id;
+                {              
+                    if (standard_bacnet_data.size() > 0)
+                    {
+						itrflag = standard_bacnet_data.end() - 1;
+						itrflag->invoke_id = temp_invoke_id;
+                    }
+                    else
+                    {
+                        return -2;
+                    }
+
                 }
                 send_status = true;
             }
@@ -5751,7 +5824,7 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
         {
             for (int i = 0; i<100; i++)
             {
-                Sleep(20);
+                Sleep(30);
                 if (tsm_invoke_id_free(temp_invoke_id))
                 {
                    // Sleep(10);
@@ -5790,6 +5863,8 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
 
 
 }
+   
+
 
 void localhandler_read_property_ack(
     uint8_t * service_request,
@@ -6388,6 +6463,11 @@ void local_handler_update_bacnet_ui(int receive_data_type, bool each_end_flag)
         }
     }
     break;
+    case READARRAY_T3000:
+    {
+        ::PostMessage(m_array_dlg_hwnd, WM_REFRESH_BAC_ARRAY_LIST, NULL, NULL);
+    }
+        break;
     default:
         break;
     }
@@ -6673,6 +6753,7 @@ void Inial_Product_Reglist_map()
     product_reglist_map.insert(map<int, CString>::value_type(PM_PRESSURE, _T("Pressure")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_HUM_R, _T("CO2-R")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_T322AI, _T("T3 Modules")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_T332AI_ARM, _T("T3 Modules")));
     //product_map.insert(map<int, CString>::value_type(PWM_TRANSDUCER, _T("PWM_Tranducer")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_BTU_METER, _T("BTU Meter")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_T3PT12, _T("T3 Modules")));
@@ -6744,6 +6825,7 @@ void Inial_Product_Menu_map()
         case PM_CS_RSM_AC:
         case PM_CS_RSM_DC:
         case PM_T322AI:
+        case PM_T332AI_ARM:
         {
             unsigned char  temp[20] = { 1,1,0,0,  0,0,0,0,  0,0,0,0,   0,1,1,1  ,0,0,0,0 };
             memcpy(product_menu[i], temp, 20);
@@ -6894,6 +6976,7 @@ void Inial_Product_map()
 	product_map.insert(map<int,CString>::value_type(PM_PRESSURE,_T("Pressure Sensor")));
 	product_map.insert(map<int,CString>::value_type(PM_HUM_R,_T("HUM-R")));
 	product_map.insert(map<int,CString>::value_type(PM_T322AI,_T("T3-22I")));
+    product_map.insert(map<int, CString>::value_type(PM_T332AI_ARM, _T("T3-32I")));
 	product_map.insert(map<int,CString>::value_type(PWM_TRANSDUCER,_T("PWM_Tranducer")));
 	product_map.insert(map<int,CString>::value_type(PM_BTU_METER,_T("BTU_Meter")));
     product_map.insert(map<int, CString>::value_type(PM_T38AI8AO6DO, _T("T3-8AI8AO6DO")));
@@ -9535,6 +9618,21 @@ end_getcount_function:
     return ret_value;
 
 }
+
+int Create_DeviceDatabase(CString des_path,CString source_path)
+{
+    HANDLE hFind;
+    WIN32_FIND_DATA wfd;
+    hFind = FindFirstFile(des_path, &wfd);//
+    if (hFind == INVALID_HANDLE_VALUE)//不存在该文件
+    {
+        //复制文件
+        CopyFile(source_path, des_path, FALSE);
+        return 1;
+    }
+    return 0; // 已经存在此文件，不需要再创建;
+}
+
 
 void Create_DeviceDatabase()
 {
@@ -12645,6 +12743,8 @@ bool IP_is_Local(LPCTSTR ip_address)
     return false;
 }
 
+
+
 // 执行程序的路径 // 参数  // 执行环境目录   // 最大等待时间, 超过这个时间强行终止;
 DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirectory, 	DWORD dwMilliseconds)
 {
@@ -12797,6 +12897,7 @@ BOOL DirectoryExist(CString Path)
     FindClose(hFind);
     return ret;
 }
+
 
 
 BOOL Ping(const CString& strIP, CWnd* pWndEcho)
@@ -15724,6 +15825,7 @@ void Initial_Instance_Reg_Map()
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_ESP32_T3_SERIES, _T("35,32")));
 
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T322AI, _T("23,22")));
+    g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T332AI_ARM, _T("23,22")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T38AI8AO6DO, _T("23,22")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T3PT12, _T("23,22")));
     g_bacnet_reg_ins_map.insert(map<int, CString>::value_type(PM_T322AIVG, _T("23,22")));
@@ -16258,6 +16360,7 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
             nret_type = OUTPUT_VIRTUAL_PORT;
     }
         break;
+    case PM_T332AI_ARM:
     case PM_T322AI:
     {
 
@@ -16272,7 +16375,8 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
         break;
     case PM_T36CTA:
     {
-
+        if (portindex <= 2)
+            nret_type = OUTPUT_DIGITAL_PORT;
     }
     break;
     default:
@@ -16444,6 +16548,20 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
     case PM_T322AI:
     {
         if (portindex <= 22)
+        {
+            nret_type = INPUT_ANALOG_PORT;
+            if (n_digital_analog == BAC_UNITS_DIGITAL)
+            {
+                nret_type = INPUT_DIGITAL_PORT;
+            }
+        }
+        else
+            nret_type = INPUT_VIRTUAL_PORT;
+    }
+    break;
+    case PM_T332AI_ARM:
+    {
+        if (portindex <= 32)
         {
             nret_type = INPUT_ANALOG_PORT;
             if (n_digital_analog == BAC_UNITS_DIGITAL)
@@ -16655,6 +16773,15 @@ void Initial_All_Point()
         temp_program.bytes = 0;//初始化时默认为400的长度，避免读不到数据;
         m_Program_data.push_back(temp_program);
     }
+
+    for (int i = 0; i < BAC_ARRAY_ITEM_COUNT; i++)
+    {
+        Str_array_point temp_array = { 0 };
+        int test_length = sizeof(temp_array);
+        memset(&temp_array, 0, sizeof(Str_array_point));
+        m_Array_data.push_back(temp_array);
+    }
+    
     for (int i = 0; i < BAC_SCHEDULE_COUNT; i++)
     {
         Str_weekly_routine_point temp_weekly = { 0 };
@@ -17728,4 +17855,5 @@ bool ZipSingleItem(CString strUserDesZipFile, CString strsingleFilepath)
     else
         return 0;
 }
+
 

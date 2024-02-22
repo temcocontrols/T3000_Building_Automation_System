@@ -77,9 +77,13 @@ static DWORD WINAPI Update_xducer_Thread(LPVOID lPvoid);
 
 const CString TransducerTempRange[] =
 {
-	_T("0.   0  - 100"),
-	_T("1.  -20 - 80"),       //1
-	_T("2.   0  - 50"),
-	_T("3.  -50 - 50")
+	_T("0.   0  - 100  Deg.C"),
+	_T("1.  -20 - 80  Deg.C"),       
+	_T("2.   0  - 50  Deg.C"),
+	_T("3.  -50 - 50  Deg.C"),
+	_T("4.  -20 - 140 Deg.F"),
+	_T("5.   0  - 100 Deg.F"),
+	_T("6.   40 - 90  Deg.F"),
+	_T("7.  -40 - 140 Deg.F")
 };
 

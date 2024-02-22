@@ -1165,6 +1165,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
                  nFlag==PM_T34AO||
                  nFlag==PM_T36CT||
                  nFlag==PM_T322AI||
+                 nFlag == PM_T332AI_ARM ||
                  nFlag==PM_T38AI8AO6DO
                 )
         {
