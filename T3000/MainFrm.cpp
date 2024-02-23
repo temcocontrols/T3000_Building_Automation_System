@@ -15589,13 +15589,14 @@ int CMainFrame::LoadDeviceData(int nserialnumber)
     //SetTimer(FOR_LAST_VIEW_TIMER,4000,NULL);
     return 0;
 }
-
+int webview_run_server();
 DWORD WINAPI  CMainFrame::CreateWebServerThreadfun(LPVOID lpVoid)
 {
     BacnetScreen* pParent = (BacnetScreen*)lpVoid;
-    main_webview();
+    webview_run_server();
     h_create_webview_server_thread = NULL;
     return 0;
+
 }
 
 #ifndef LOCAL_DB_FUNCTION

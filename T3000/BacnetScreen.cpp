@@ -22,12 +22,11 @@
 //int main_webview();
 
 int webview_run_server();
-
+extern HANDLE h_create_webview_server_thread;
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
 extern vector <MSG> My_Receive_msg;
 extern CCriticalSection MyCriticalSection;
 HANDLE h_read_screenlabel_thread = NULL;
-//HANDLE h_create_webview_server_thread = NULL;
 HANDLE h_write_pic_thread = NULL;
 HANDLE h_get_pic_thread = NULL;
 CString Change_File_Path;
@@ -2226,25 +2225,25 @@ int  BacnetScreen::Read_Struct_Data()
 }
 
 
-DWORD WINAPI  BacnetScreen::CreateWebServerThreadfun(LPVOID lpVoid)
-{
-	BacnetScreen* pParent = (BacnetScreen*)lpVoid;
-#if 0
-	int read_ret = pParent->Read_Struct_Data();
-	if (read_ret <= 0)
-	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
-	}
-	else
-	{
-#ifndef  DISABLE_HANDLE_JSON_DATA
-		pParent->StructToJsonData();
-#endif
-	}
-#endif
-	webview_run_server();
-	h_create_webview_server_thread = NULL;
-	return 0;
-}
+//DWORD WINAPI  BacnetScreen::CreateWebServerThreadfun(LPVOID lpVoid)
+//{
+//	BacnetScreen* pParent = (BacnetScreen*)lpVoid;
+//#if 0
+//	int read_ret = pParent->Read_Struct_Data();
+//	if (read_ret <= 0)
+//	{
+//		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
+//	}
+//	else
+//	{
+//#ifndef  DISABLE_HANDLE_JSON_DATA
+//		pParent->StructToJsonData();
+//#endif
+//	}
+//#endif
+//	webview_run_server();
+//	h_create_webview_server_thread = NULL;
+//	return 0;
+//}
 
 

@@ -94,8 +94,8 @@ typedef struct
 //#define USE_MOD_SHIFT_DF
 
 #ifdef ENABLE_HTTP_FUCTION
-#include "HttpApiDefine.h"
-#include "..\BravocontrolAPI\BravocontrolAPI\HttpAPI\HttpAPI.h"
+//#include "HttpApiDefine.h"
+//#include "..\BravocontrolAPI\BravocontrolAPI\HttpAPI\HttpAPI.h"
 #endif
 
 

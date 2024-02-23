@@ -2,7 +2,7 @@
 
 #include "RelayLabel.h"
 #ifdef DEBUG
- #define ENABLE_HTTP_FUCTION  //定义是否使用http api
+ //#define ENABLE_HTTP_FUCTION  //定义是否使用http api
 #endif // DEBUG
 
 
