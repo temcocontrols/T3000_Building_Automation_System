@@ -89,7 +89,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;MultipleMonthCal32.lib;$(SolutionDir)T3000 Output\release\t3_webview_api.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;MultipleMonthCal32.lib;$(TargetDir)t3_webview_api.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -99,11 +99,11 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreBuildEvent>
-      <Command>XCOPY "$(SolutionDir)"\SQLiteDriver\*.DLL "$(TargetDir)" /D /K /Y
-XCOPY "$(SolutionDir)"\DLLs\T3WebviewApi\* "$(TargetDir)" /D /K /Y</Command>
+      <Command>XCOPY "$(SolutionDir)SQLiteDriver\*.DLL" "$(TargetDir)" /D /K /Y
+XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY "$(ProjectDir)"\ResourceFile "$(TargetDir)"\ResourceFile /E /C /I /D</Command>
+      <Command>XCOPY "$(ProjectDir)ResourceFile" "$(TargetDir)ResourceFile" /E /C /I /D /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,7 +132,7 @@ XCOPY "$(SolutionDir)"\DLLs\T3WebviewApi\* "$(TargetDir)" /D /K /Y</Command>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;$(SolutionDir)T3000 Output\release\MultipleMonthCal32.lib;$(SolutionDir)T3000 Output\release\t3_webview_api.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib;$(SolutionDir)SQLiteDriver\sqlite3.lib;$(TargetDir)MultipleMonthCal32.lib;$(TargetDir)t3_webview_api.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -144,11 +144,11 @@ XCOPY "$(SolutionDir)"\DLLs\T3WebviewApi\* "$(TargetDir)" /D /K /Y</Command>
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PreBuildEvent>
-      <Command>XCOPY "$(SolutionDir)"\SQLiteDriver\*.DLL "$(TargetDir)" /D /K /Y
-XCOPY "$(SolutionDir)"\DLLs\T3WebviewApi\* "$(TargetDir)" /D /K /Y</Command>
+      <Command>XCOPY "$(SolutionDir)SQLiteDriver\*.DLL" "$(TargetDir)" /D /K /Y
+XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY "$(ProjectDir)"\ResourceFile "$(TargetDir)"\ResourceFile /E /C /I /D</Command>
+      <Command>XCOPY "$(ProjectDir)ResourceFile" "$(TargetDir)ResourceFile" /E /C /I /D /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
