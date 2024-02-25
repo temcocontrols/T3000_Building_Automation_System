@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -46,7 +46,7 @@ jobs:
           Write-Output version=$version >> $Env:GITHUB_OUTPUT
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build Solution
         run: |
@@ -73,7 +73,7 @@ jobs:
           Write-Output iversion=$iversion >> $Env:GITHUB_OUTPUT
 
       - name: Build the installer
-        uses: caphyon/advinst-github-action@v1.0
+        uses: caphyon/advinst-github-action@main
         with:
           advinst-version: "20.9"
           advinst-enable-automation: "true"
@@ -89,7 +89,7 @@ jobs:
             SetVersion ${{ steps.iversion.outputs.iversion }}
 
       - name: Upload the installer to artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: T3000-setup
           path: setup/T3000-setup.msi
@@ -100,7 +100,7 @@ jobs:
           Compress-Archive -Path ".\T3000 Output\release\*" -CompressionLevel Optimal -DestinationPath .\20T3000Update.zip
 
       - name: Upload the update files to artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 20T3000Update
           path: T3000 Output/release/*

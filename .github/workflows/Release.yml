@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -52,7 +52,7 @@ jobs:
           Write-Output version=$version >> $Env:GITHUB_OUTPUT
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build Solution
         run: |
@@ -79,7 +79,7 @@ jobs:
           Write-Output iversion=$iversion >> $Env:GITHUB_OUTPUT
 
       - name: Build the installer
-        uses: caphyon/advinst-github-action@v1.0
+        uses: caphyon/advinst-github-action@main
         with:
           advinst-version: "20.9"
           advinst-enable-automation: "true"
