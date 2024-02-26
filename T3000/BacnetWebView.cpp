@@ -950,7 +950,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "GRP" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)g_screen_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_screen_data[npanel_id].at(i).label;
-			tempjson["data"][p_i]["mode"] = (char*)g_screen_data[npanel_id].at(i).mode;
+			// tempjson["data"][p_i]["mode"] = (char*)g_screen_data[npanel_id].at(i).mode;
 			//There is also additional data that does not need to be passed to the webview interface
 			p_i++;
 		}
