@@ -164,7 +164,7 @@ extern void Init_table_bank();
 #include "BacnetRemotePoint.h"
 #include "BacnetSetting.h"
 #include "BacnetWebView.h"
-int main_webview();
+
 HANDLE h_create_webview_server_thread = NULL;
 extern BacnetScreen *Screen_Window;
 extern CBacnetProgram *Program_Window;
@@ -15685,17 +15685,18 @@ int CMainFrame::DoConnectDB_TreeNode(const HTREEITEM& hTreeItem)
 void CMainFrame::OnWebviewModbusregister()
 {
     // TODO: 在此添加命令处理程序代码
-    CString webviewFolder;
+   /* 
     CString Resource_folder;
     CString ApplicationFolder;
     GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
     PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
     ApplicationFolder.ReleaseBuffer();
     Resource_folder = ApplicationFolder + _T("\\ResourceFile");
-    webviewFolder = _T("http://localhost:9103/#/modbus-register");
+   */
+    CString webviewUrl = _T("http://localhost:9103/#/modbus-register");
+    CString webviewTitle = _T("Modbus Register");
 
-    wstring fullpath = webviewFolder;
-    auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath));
+    auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(webviewUrl), wstring(webviewTitle));
     auto result = BacnetWebViewAppWindow::RunMessagePump();
     delete webviewwindow;
 }
