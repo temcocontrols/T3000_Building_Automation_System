@@ -528,6 +528,7 @@ void BacnetWebViewAppWindow::CloseWebView(bool cleanupUserDataFolder)
 		HRESULT hrfolder = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &userDataPath);
 		std::wstring userDataFolder(userDataPath);
 		userDataFolder += L"\\T3000";
+		Sleep(2000);
 		DeleteDirectoryRecursive(userDataFolder);
 	}
 }
