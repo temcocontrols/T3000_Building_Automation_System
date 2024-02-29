@@ -1,4 +1,3 @@
-
 #include <afxwin.h>
 #include "resource.h"
 #include <Shellapi.h>
@@ -27,7 +26,12 @@
 #include "MainFrm.h"
 #include "JsonHead.h"
 extern "C" {
-	void run_server();
+	enum RustError {
+		Ok = 0,
+		Error = 1,
+	};
+
+	RustError run_server();
 }
 using namespace Microsoft::WRL;
 size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
@@ -2053,6 +2057,11 @@ void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsign
 
 
 int webview_run_server() {
-	run_server();
+	RustError result = run_server();
+	if (result != RustError::Ok) {
+		AfxMessageBox(L"Couldn't run the webview API server");
+		return 1;
+	}
+
 	return 0;
 }
