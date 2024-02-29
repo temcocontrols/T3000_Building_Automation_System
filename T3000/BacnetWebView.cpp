@@ -524,12 +524,14 @@ void BacnetWebViewAppWindow::CloseWebView(bool cleanupUserDataFolder)
 		// creation, they would need to pass in that explicit value here.
 		// For more information about userDataFolder:
 		// https://docs.microsoft.com/microsoft-edge/webview2/reference/win32/webview2-idl#createcorewebview2environmentwithoptions
+		/* 
 		PWSTR userDataPath;
 		HRESULT hrfolder = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &userDataPath);
 		std::wstring userDataFolder(userDataPath);
 		userDataFolder += L"\\T3000";
 		Sleep(2000);
 		DeleteDirectoryRecursive(userDataFolder);
+		*/
 	}
 }
 
