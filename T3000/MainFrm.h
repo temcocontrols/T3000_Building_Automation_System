@@ -606,6 +606,7 @@ public:
 #endif
 		afx_msg void OnWebviewModbusregister();
 		afx_msg void OnWebviewThirdpartymodbusdatabase();
+		afx_msg void OnToolsLoginmyaccount();
 };
 //DWORD WINAPI  Bacnet_ReadWrite_Message(LPVOID lpVoid);
 //tree0412  2017 05 11 fance change

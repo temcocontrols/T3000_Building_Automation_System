@@ -64,7 +64,7 @@ public:
 	void SetConnected_IP(LPCTSTR myip);
 	void Set_Device_Type(bool is_remote_device);
 	void Set_remote_device_IP(LPCTSTR ipaddress);
-
+	void Read_Setting_Info_Progress(int retry_count);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CTabCtrl m_bac_main_tab;
 	void Tab_Initial();

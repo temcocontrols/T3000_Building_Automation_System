@@ -3282,6 +3282,7 @@
 #define ID_LIST_ADD                     34086
 #define ID_THIRD_LIST_DELETE            34087
 #define ID_THIRD_LIST_AND               34088
+#define ID_TOOLS_LOGINMYACCOUNT         34089
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -3357,7 +3358,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        802
-#define _APS_NEXT_COMMAND_VALUE         34089
+#define _APS_NEXT_COMMAND_VALUE         34090
 #define _APS_NEXT_CONTROL_VALUE         2706
 #define _APS_NEXT_SYMED_VALUE           320
 #endif

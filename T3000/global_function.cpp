@@ -8514,7 +8514,13 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	my_temp_point= my_temp_point + 2;
 	temp_data.reg.hardware_info =  *(my_temp_point++); // 1 代表存在，其他任何代表不存在;
     temp_data.reg.subnet_protocol = *(my_temp_point++);   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
-
+    if (temp_data.reg.subnet_protocol == 12)
+    {
+        bool is_bacnet_device = false;
+        is_bacnet_device = ShowBacnetView(temp_data.reg.product_id);
+        if(is_bacnet_device)
+            temp_data.reg.subnet_protocol = 10;
+    }
     if (nBufLen >= 67) //新增3个
     {
         temp_data.reg.command_version = *(my_temp_point++);
@@ -10895,7 +10901,9 @@ int CheckDeviceDatabase()
     CFileFind fFind;
     if (fFind.FindFile(g_building_devicedatabase))
     {
+        #ifdef LOCAL_DB_FUNCTION
         CheckDeviceDataDBAndUpdateDB();
+        #endif
         return 1;
     }
     else

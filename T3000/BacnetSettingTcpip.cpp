@@ -335,11 +335,11 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
     {
         if (temp_string.CompareNoCase(Device_Serial_Port_Status[i]) == 0)
         {
-            if (i == MAIN_MSTP)   //原由： 1 为 MSTP Slave     9为 MSTP Master   现在统统改为MSTP
-                i = MSTP_MASTER;
+            //if (i == MAIN_MSTP)   //原由： 1 为 MSTP Slave     9为 MSTP Master   现在统统改为MSTP
+            //    i = MSTP_MASTER;
             if (g_selected_product_id != PM_TSTAT10)
             {
-                if (i == MSTP_MASTER)
+                if ((i == MSTP_MASTER) || (i == MAIN_MSTP))
                 {
                     if ((Device_Basic_Setting.reg.com2_config == MAIN_MSTP) ||
                         (Device_Basic_Setting.reg.com2_config == MSTP_MASTER))
@@ -450,9 +450,9 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
     {
         if (temp_string.CompareNoCase(Device_Serial_Port_Status[i]) == 0)
         {
-            if (i == MAIN_MSTP)   //原由： 1 为 MSTP Slave     9为 MSTP Master   现在统统改为MSTP
-                i = MSTP_MASTER;
-            if (i == MSTP_MASTER)
+            //if (i == MAIN_MSTP)   //原由： 1 为 MSTP Slave     9为 MSTP Master   现在统统改为MSTP
+            //   i = MSTP_MASTER;
+            if ((i == MSTP_MASTER) || (i == MAIN_MSTP))
             {
                 if ((Device_Basic_Setting.reg.com0_config == MSTP_MASTER) || (Device_Basic_Setting.reg.com0_config == MAIN_MSTP))
                 {

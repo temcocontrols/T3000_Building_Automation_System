@@ -11311,6 +11311,7 @@ BEGIN
         MENUITEM "PH Chart",                    ID_TOOLS_PHCHART
         MENUITEM "Option",                      ID_TOOLS_OPTION
         MENUITEM "&Disconnect the serial port \tCtrl+D", ID_DISCONNECT_COM
+        MENUITEM "Login my account",            ID_TOOLS_LOGINMYACCOUNT
     END
     POPUP "&View"
     BEGIN

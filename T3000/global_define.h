@@ -1154,7 +1154,7 @@ const CString Sys_Tstat_Mode_Name[] =
 const CString Device_Serial_Port_Status[] =
 {
 	_T("Unused"),
-	_T("Bacnet MSTP"),       //1
+	_T("Bacnet Slave"),       //1
 	_T("Modbus Slave"),
 	_T("Bacnet PTP"),
 	_T("GSM"),
@@ -1162,7 +1162,7 @@ const CString Device_Serial_Port_Status[] =
 	_T("Sub Zigbee"),
 	_T("Modbus Master"),
 	_T("RS232 Meter"),
-	_T("Bacnet MSTP")       // 9
+	_T("Bacnet Master")       // 9
 };
 
 

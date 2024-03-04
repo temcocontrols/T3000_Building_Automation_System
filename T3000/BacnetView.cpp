@@ -1715,6 +1715,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 		break;
 	case START_BACNET_TIMER:
 		{
+#if 0
 			DFTrace(_T("Connect to the device use the modbus ip and port success!"));
 			//m_bac_handle_Iam_data.clear();
 			if(m_is_remote_device)
@@ -1726,9 +1727,11 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				Send_WhoIs_Global(g_bac_instance, g_bac_instance);
 			}
 			//MessageBox(_T("Test2"));
-
-			SetTimer(BAC_READ_SETTING_TIMER,500,NULL);
-			click_resend_time = 10;
+#endif
+			//click_resend_time = 3;
+			Read_Setting_Info_Progress(3);
+			//SetTimer(BAC_READ_SETTING_TIMER,2500,NULL);
+			
 		}
 		break;
 	case CONNECT_TO_MODBUS_FAILED:
@@ -3571,7 +3574,7 @@ void CDialogCM5_BacNet::Fresh()
 	g_CommunicationType = 1;
 	SetCommunicationType(1);
 
-
+#if 0  //20240301
     if (selected_product_Node.protocol == PROTOCOL_BIP_TO_MSTP)
     {
         ::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, START_BACNET_TIMER, 0);
@@ -3583,7 +3586,7 @@ void CDialogCM5_BacNet::Fresh()
         BacNet_hwd = this->m_hWnd;
         //return;
     }
-
+#endif
 	int ret = 0;
 	if (ValidAddress(nconnectionip)==FALSE)  // 验证NC的IP
 	{
@@ -3640,7 +3643,7 @@ void CDialogCM5_BacNet::Fresh()
 		int temp_mac;
 		int multy_ret = 0;
 		unsigned short temp_buffer[72];
-        if (selected_product_Node.protocol != PROTOCOL_BIP_TO_MSTP)  //这玩意的话 不用 校准 obj instance
+        //if (selected_product_Node.protocol != PROTOCOL_BIP_TO_MSTP)  //这玩意的话 不用 校准 obj instance
         {
             ::PostMessage(MainFram_hwd, MY_RX_TX_COUNT, 1, 0);
             memset(temp_buffer, 0, 5);
@@ -3786,6 +3789,7 @@ void CDialogCM5_BacNet::Fresh()
 		program_item_limit_count = BAC_PROGRAM_ITEM_COUNT;
 		controller_item_limit_count = BAC_PID_COUNT;
 		screen_item_limit_count = BAC_SCREEN_COUNT;
+#if 0
 		if(selected_product_Node.protocol == PROTOCOL_BIP_TO_MSTP)
 		{
 			//g_sub_instace = g_bac_instance;
@@ -3874,6 +3878,7 @@ void CDialogCM5_BacNet::Fresh()
 			//::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
 		}
 		else
+#endif 
 		{
 
 
@@ -5828,6 +5833,147 @@ void CDialogCM5_BacNet::Set_remote_device_IP(LPCTSTR ipaddress)
 	remote_ip_address.Format(_T("%s"),ipaddress);
 }
 
+void CDialogCM5_BacNet::Read_Setting_Info_Progress(int retry_count)
+{
+	click_resend_time = retry_count;
+	for (int i = 0; i < retry_count; i++)
+	{
+
+		bool is_connected = false;
+		if (offline_mode)
+		{
+			Initial_Some_UI(LOGIN_SUCCESS_FULL_ACCESS);
+			KillTimer(BAC_READ_SETTING_TIMER);
+			return;
+		}
+
+		bool find_exsit = false;
+		for (int i = 0; i < (int)m_bac_handle_Iam_data.size(); i++)
+		{
+			if (m_bac_handle_Iam_data.at(i).device_id == g_bac_instance)
+			{
+				find_exsit = true;
+				KillTimer(BAC_READ_SETTING_TIMER);
+				break;
+			}
+		}
+
+		//在没有找到的情况下在发送whois
+		if (find_exsit == false)
+		{
+			click_resend_time--;
+			if (m_is_remote_device)
+				Send_WhoIs_remote_ip(remote_ip_address);
+			else
+				Send_WhoIs_Global(g_bac_instance, g_bac_instance);
+		}
+
+
+		if (click_resend_time == click_resend_time -1)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Connecting! Please wait ...."));
+		}
+
+		if (find_exsit)
+		{
+			//if (hbip_whois_thread == NULL)
+			//	hbip_whois_thread = CreateThread(NULL, NULL, Handle_Bip_whois_Thread, this, NULL, NULL);
+
+			int temp_invoke_id = -1;
+			int send_status = true;
+			int	resend_count = 0;
+			for (int z = 0; z < 3; z++)
+			{
+				if (GetPrivateData_Blocking(g_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 3) >= 0)
+				{
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data success!"));
+
+					g_llRxCount++;
+					g_llTxCount++;
+					is_connected = true;
+					//Device_Basic_Setting.reg.user_name = 2;
+					if (Device_Basic_Setting.reg.user_name == 2) //Enable user name
+					{
+						m_bac_main_tab.ShowWindow(false);
+						PostMessage(WM_FRESH_CM_LIST, MENU_CLICK, BAC_READ_USER_LOGIN_INFO);
+						User_Login_Window->ShowWindow(SW_NORMAL);
+
+						::PostMessage(m_user_login_hwnd, MY_REDRAW_WINDOW, NULL, NULL);
+						return;
+					}
+					else
+					{
+						m_user_level = LOGIN_SUCCESS_FULL_ACCESS;
+					}
+					break;
+				}
+				else
+				{
+					CString temp_cs;
+					temp_cs.Format(_T("Read data Timeout ,retry (%d)  "), z + 1);
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs);
+				}
+				Sleep(SEND_COMMAND_DELAY_TIME);
+			}
+			if (is_connected)
+			{
+				Initial_Some_UI(LOGIN_SUCCESS_FULL_ACCESS);
+				KillTimer(BAC_READ_SETTING_TIMER);
+				return;
+			}
+			else
+			{
+				bac_select_device_online = false;
+				KillTimer(BAC_READ_SETTING_TIMER);
+				CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+				pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item, false);
+
+				for (int x = 0; x < 5; x++)
+				{
+					selected_product_Node.status_last_time[x] = false;
+				}
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout. "));
+				return;
+			}
+		}
+
+		if (!find_exsit)
+		{
+			if (click_resend_time == 0)
+			{
+				if (already_retry == false)
+				{
+					//如果 TCP能连接上， 而没有回复UDP的包，就用TCP 发送软复位命令给板子;
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("No bacnet command response!"));
+					//if(IDYES == MessageBox(_T("No bacnet command reply from panel .Do you want reset the network of this panel"),_T("Warning"),MB_YESNO))
+					//{
+					//	write_one(g_tstat_id,33,151,1);
+
+					//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reset the network , please wait!"));
+
+					//}
+					//click_resend_time = 3;
+					already_retry = true;
+
+
+				}
+
+			}
+			else
+			{
+				//TRACE(_T("Resend Who is count = %d\r\n"),3 - click_resend_time);
+			}
+
+		}
+
+		if (click_resend_time <= 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("No Bacnet 'Who is?' Command response"));
+			KillTimer(BAC_READ_SETTING_TIMER);
+		}
+		Sleep(2000);
+	}
+}
 
 void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 {
@@ -5921,17 +6067,14 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 		break;
 	case BAC_READ_SETTING_TIMER:
 		{
+#if 0
 			if(offline_mode)
 			{
 				Initial_Some_UI(LOGIN_SUCCESS_FULL_ACCESS);
 				KillTimer(BAC_READ_SETTING_TIMER);
 				break;
 			}
-			click_resend_time --;
-			if(m_is_remote_device)
-				Send_WhoIs_remote_ip(remote_ip_address);
-			else
-				Send_WhoIs_Global(g_bac_instance, g_bac_instance);
+
 			bool find_exsit = false;
 			for (int i=0;i<(int)m_bac_handle_Iam_data.size();i++)
 			{
@@ -5943,7 +6086,13 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				}
 			}
 
-			if(click_resend_time == 9)
+			click_resend_time--;
+			if (m_is_remote_device)
+				Send_WhoIs_remote_ip(remote_ip_address);
+			else
+				Send_WhoIs_Global(g_bac_instance, g_bac_instance);
+
+			if(click_resend_time == 2)
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Connecting! Please wait ...."));
 			}
@@ -6063,7 +6212,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 						//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reset the network , please wait!"));
 
 						//}
-						click_resend_time = 10;
+						click_resend_time = 3;
 						already_retry = true;
 
 
@@ -6072,7 +6221,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				}
 				else
 				{
-					//TRACE(_T("Resend Who is count = %d\r\n"),10 - click_resend_time);
+					//TRACE(_T("Resend Who is count = %d\r\n"),3 - click_resend_time);
 				}
 
 			}
@@ -6082,7 +6231,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No Bacnet 'Who is?' Command response"));
 				KillTimer(BAC_READ_SETTING_TIMER);
 			}
-			
+#endif	
 		}
 		break;
 	case BAC_RESET_WINDOW_TIMER:
