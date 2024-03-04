@@ -39,6 +39,7 @@ public:
     BacnetWebViewAppWindow(
         UINT creationModeId,
         std::wstring initialUri = L"",
+        std::wstring title = L"",
         bool isMainWindow = false,
         std::function<void()> webviewCreatedCallback = nullptr,
         bool customWindowRect = false,

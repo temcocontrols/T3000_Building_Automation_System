@@ -19,8 +19,6 @@
 #include "JsonHead.h"
 #include "BacnetWebView.h"
 
-//int main_webview();
-
 int webview_run_server();
 extern HANDLE h_create_webview_server_thread;
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
@@ -1982,8 +1980,10 @@ void BacnetScreen::OnBnClickedWebViewShow()
 
 	{
 		CString webviewUrl = _T("http://localhost:9103/");
-	
-		auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(webviewUrl));
+		CString webviewTitle = _T("HVAC Drawer");
+		
+
+		auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(webviewUrl), wstring(webviewTitle));
 		auto result = BacnetWebViewAppWindow::RunMessagePump();
 		delete webviewwindow;
 	}

@@ -1,4 +1,3 @@
-
 #include <afxwin.h>
 #include "resource.h"
 #include <Shellapi.h>
@@ -27,7 +26,12 @@
 #include "MainFrm.h"
 #include "JsonHead.h"
 extern "C" {
-	void run_server();
+	enum RustError {
+		Ok = 0,
+		Error = 1,
+	};
+
+	RustError run_server();
 }
 using namespace Microsoft::WRL;
 size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
@@ -75,12 +79,40 @@ enum WEBVIEW_MESSAGE_TYPE
 int save_button_click = 0;
 extern char* ispoint_ex(char* token, int* num_point, byte* var_type, byte* point_type, int* num_panel, int* num_net, int network, unsigned char& sub_panel, byte panel, int* netpresent);
 
+
+void DeleteDirectoryRecursive(const std::wstring& dir_path) {
+	std::wstring file_search_path = dir_path + L"\\*";
+	WIN32_FIND_DATAW find_data;
+	HANDLE hFind = FindFirstFileW(file_search_path.c_str(), &find_data);
+
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			if (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				if (wcscmp(find_data.cFileName, L".") != 0 && wcscmp(find_data.cFileName, L"..") != 0) {
+					// This is a directory, so we need to recurse into it
+					DeleteDirectoryRecursive(dir_path + L"\\" + find_data.cFileName);
+				}
+			}
+			else {
+				// This is a file, so delete it
+				DeleteFileW((dir_path + L"\\" + find_data.cFileName).c_str());
+			}
+		} while (FindNextFileW(hFind, &find_data) != 0);
+
+		FindClose(hFind);
+
+		// Now that all the files in the directory are deleted, delete the directory itself
+		RemoveDirectoryW(dir_path.c_str());
+	}
+}
+
 extern CBacnetProgram* Program_Window;
 extern BacnetWeeklyRoutine* WeeklyRoutine_Window ;
 extern BacnetAnnualRoutine* AnnualRoutine_Window ;
 BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 	UINT creationModeId,
 	std::wstring initialUri,
+	std::wstring title,
 	bool isMainWindow,
 	std::function<void()> webviewCreatedCallback,
 	bool customWindowRect,
@@ -96,7 +128,6 @@ BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 
 	++s_appInstances;
-	std::wstring title = L"HVAC Drawer 0.2";
 	m_mainWindow = CreateWindowExW(0, GetWindowClass(), title.c_str(),
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, BacNet_hwd, nullptr,
 		GetModuleHandle(nullptr), nullptr);
@@ -416,6 +447,7 @@ void BacnetWebViewAppWindow::NotifyClosed()
 	//ScreenToClient(rectDlg);
 
 	//printf(“窗口位置大小:底: % d, 右 : % d, 宽 : % d, 高 : % d\r\n”, rectDlg.bottom, rectDlg.right, rectDlg.Width(), rectDlg.Height());
+	CloseWebView(true);
 	m_isClosed = true;
 }
 
@@ -496,28 +528,20 @@ void BacnetWebViewAppWindow::CloseWebView(bool cleanupUserDataFolder)
 		// creation, they would need to pass in that explicit value here.
 		// For more information about userDataFolder:
 		// https://docs.microsoft.com/microsoft-edge/webview2/reference/win32/webview2-idl#createcorewebview2environmentwithoptions
-		WCHAR userDataFolder[MAX_PATH] = L"";
-		// Obtain the absolute path for relative paths that include "./" or "../"
-		_wfullpath(
-			userDataFolder, GetLocalPath(L".WebView2", true).c_str(), MAX_PATH);
-		std::wstring userDataFolderPath(userDataFolder);
-
-		std::wstring message = L"Are you sure you want to clean up the user data folder at\n";
-		message += userDataFolderPath;
-		message += L"\n?\nWarning: This action is not reversible.\n\n";
-		message += L"Click No if there are other open WebView instances.\n";
-
-		if (MessageBox(m_mainWindow, message.c_str(), L"Cleanup User Data Folder", MB_YESNO) ==
-			IDYES)
-		{
-			//CHECK_FAILURE(DeleteFileRecursive(userDataFolderPath));
-		}
+		/* 
+		PWSTR userDataPath;
+		HRESULT hrfolder = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &userDataPath);
+		std::wstring userDataFolder(userDataPath);
+		userDataFolder += L"\\T3000";
+		Sleep(2000);
+		DeleteDirectoryRecursive(userDataFolder);
+		*/
 	}
 }
 
 void BacnetWebViewAppWindow::CloseAppWindow()
 {
-	CloseWebView();
+	CloseWebView(true);
 	DestroyWindow(m_mainWindow);
 }
 
@@ -2033,6 +2057,11 @@ void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsign
 
 
 int webview_run_server() {
-	run_server();
+	RustError result = run_server();
+	if (result != RustError::Ok) {
+		AfxMessageBox(L"Couldn't run the webview API server");
+		return 1;
+	}
+
 	return 0;
 }
