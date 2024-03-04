@@ -2059,7 +2059,9 @@ void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsign
 int webview_run_server() {
 	RustError result = run_server();
 	if (result != RustError::Ok) {
-		AfxMessageBox(L"Couldn't run the webview API server");
+		//暂时屏蔽下面的消息，避免不需要使用webview的客户 在一些情况下看到这个失败的消息。
+		//Temporarily mask the following message to prevent customers who do not need to use webview from seeing the failed message in some cases.
+		//AfxMessageBox(L"Couldn't run the webview API server");
 		return 1;
 	}
 
