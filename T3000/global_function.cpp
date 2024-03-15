@@ -10506,7 +10506,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
             }
             else
             {
-
+                Device_Basic_Setting.reg.reset_default = 0; 
                 memcpy(&GetPrgSetting, cacl_panel, sizeof(Str_Setting_Info));
                 prg_panel = GetPrgSetting.reg.panel_number;
             }

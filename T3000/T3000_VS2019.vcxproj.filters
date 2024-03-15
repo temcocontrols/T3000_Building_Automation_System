@@ -855,6 +855,9 @@
     <ClCompile Include="CBacnetArray.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
+    <ClCompile Include="CTstatAQ_PM25_Parameter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -2115,6 +2118,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CBacnetArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTstatAQ_PM25_Parameter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

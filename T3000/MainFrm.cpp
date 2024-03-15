@@ -8657,7 +8657,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             }
             else if ((nFlag == PM_TSTAT_AQ) ||
                      (nFlag == PM_FAN_MODULE) ||
-                     (nFlag == PM_AIRLAB_ESP32) ||
+                     (nFlag == PM_AIRLAB_ESP32) ||                  
                 (nFlag == PM_MULTI_SENSOR))
             {
                 SwitchToPruductType(DLG_DIALOG_TSTAT_AQ);
@@ -8670,12 +8670,17 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             {
                 SwitchToPruductType(DLG_DIALOG_BOATMONITOR);
             }
-            else if ((nFlag == PWM_TEMPERATURE_TRANSDUCER) ||
-                     (nFlag == STM32_PM25))
+            else if ((nFlag == PWM_TEMPERATURE_TRANSDUCER) )
             {
                 SwitchToPruductType(DLG_DIALOG_TRANSDUCER);
                 //SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
                 
+                //n_show_register_list = 1;
+                break; //直接显示寄存器列表;
+            }
+            else if (nFlag == STM32_PM25)
+            {
+                SwitchToPruductType(DLG_DIALOG_TSTAT_AQ);
                 //n_show_register_list = 1;
                 break; //直接显示寄存器列表;
             }
@@ -9510,8 +9515,18 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                 }
 
             }
-            strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 1 where Product_ID in (%s) and (Parent_SerialNum = %d)"), subnet_composite_serial, m_refresh_subnet_status.at(z).parent_sn);
-            SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
+            if (n_item_count > 0)
+            {
+                if ((debug_item_show == DEBUG_SHOW_SCAN_ONLY) || (debug_item_show == DEBUG_SHOW_ALL))
+                {
+                    CString temp_subnet_scan_results;
+                    temp_subnet_scan_results.Format(_T("Main Controllor : %d  sub id : %s"), m_refresh_subnet_status.at(z).parent_sn, subnet_composite_serial);
+                    DFTrace(temp_subnet_scan_results);
+                }
+                strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 1 where Product_ID in (%s) and (Parent_SerialNum = %d)"), subnet_composite_serial, m_refresh_subnet_status.at(z).parent_sn);
+                SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
+            }
+
         }
 
 	}

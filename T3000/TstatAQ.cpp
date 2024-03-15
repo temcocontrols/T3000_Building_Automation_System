@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "TstatAQ.h"
 #include "MainFrm.h"
-
+#include "CTstatAQ_PM25_Parameter.h"
 // CTstatAQ
 //CString  show_fan_picture = _T("C:\\temp\\fan\\fan_0.png");; //
 #define     WM_TSTAT_AQ_THREAD_READ                     WM_USER + 502
@@ -100,7 +100,35 @@ LRESULT  CTstatAQ::AirlabMessageCallBack(WPARAM wParam, LPARAM lParam)
         delete Write_Struct_feedback;
     return 0;
 }
+void CTstatAQ::PM2_5_Window(int nflag)
+{
+    if (nflag == 0)
+    {
+        m_airlab_list.ShowWindow(0);
+        GetDlgItem(IDC_RADIO_DEG_C)->EnableWindow(0);
+        GetDlgItem(IDC_RADIO_DEG_F)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_HELP_WBGT)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_AUTO_CAL)->EnableWindow(0);
 
+        GetDlgItem(IDC_STATIC_CO2_VALUE)->SetWindowTextW(_T("-"));
+        GetDlgItem(IDC_STATIC_LIGHT_VALUE)->SetWindowTextW(_T("-"));
+        GetDlgItem(IDC_STATIC_OCC_STATUS)->SetWindowTextW(_T("-"));
+        GetDlgItem(IDC_STATIC_SOUND_VALUE)->SetWindowTextW(_T("-"));
+        GetDlgItem(IDC_STATIC_HUM_VALUE)->SetWindowTextW(_T("-"));
+        GetDlgItem(IDC_STATIC_VOC_VALUE)->SetWindowTextW(_T("-"));
+        GetDlgItem(IDC_STATIC_FIR_AMBIENT_TEMP)->SetWindowTextW(_T("-"));
+        GetDlgItem(IDC_STATIC_FIR_REMOTE_TEMP2)->SetWindowTextW(_T("-"));
+    }
+    else
+    {
+        m_airlab_list.ShowWindow(0);
+        GetDlgItem(IDC_RADIO_DEG_C)->EnableWindow(0);
+        GetDlgItem(IDC_RADIO_DEG_F)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_HELP_WBGT)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_AIRLAB_PARAMETER)->EnableWindow(0);
+        GetDlgItem(IDC_BUTTON_AUTO_CAL)->EnableWindow(0);
+    }
+}
 
 CString AQ_image_fordor;
 CString bmp_AQI;
@@ -151,7 +179,16 @@ void CTstatAQ::Fresh()
         CloseHandle(h_tstat_aq_thread);
     }
     Initial_List();
-    UpdateUI();
+    if (product_register_value[7] == STM32_PM25)
+    {
+        UpdatePM25UI();
+        PM2_5_Window(0);
+    }
+    else
+    {
+        UpdateUI();
+        PM2_5_Window(1);
+    }
 
 
     CString sound_full_path;
@@ -194,6 +231,122 @@ void CTstatAQ::EnableCus(bool flag)
     GetDlgItem(IDC_EDIT_LEVEL_3)->EnableWindow(flag);
     GetDlgItem(IDC_EDIT_LEVEL_4)->EnableWindow(flag);
     GetDlgItem(IDC_EDIT_LEVEL_5)->EnableWindow(flag);
+}
+
+void CTstatAQ::UpdatePM25UI()
+{
+    CString temp_cus_api[5];
+    temp_cus_api[0].Format(_T("%u"), product_register_value[PM25_MODBUS_AQI_FIRST_LINE]);
+    temp_cus_api[1].Format(_T("%u"), product_register_value[PM25_MODBUS_AQI_SECOND_LINE]);
+    temp_cus_api[2].Format(_T("%u"), product_register_value[PM25_MODBUS_AQI_THIRD_LINE]);
+    temp_cus_api[3].Format(_T("%u"), product_register_value[PM25_MODBUS_AQI_FOURTH_LINE]);
+    temp_cus_api[4].Format(_T("%u"), product_register_value[PM25_MODBUS_AQI_FIFTH_LINE]);
+    GetDlgItem(IDC_EDIT_LEVEL_1)->SetWindowTextW(temp_cus_api[0]);
+    GetDlgItem(IDC_EDIT_LEVEL_2)->SetWindowTextW(temp_cus_api[1]);
+    GetDlgItem(IDC_EDIT_LEVEL_3)->SetWindowTextW(temp_cus_api[2]);
+    GetDlgItem(IDC_EDIT_LEVEL_4)->SetWindowTextW(temp_cus_api[3]);
+    GetDlgItem(IDC_EDIT_LEVEL_5)->SetWindowTextW(temp_cus_api[4]);
+
+    CString cs_weight_pm1;
+    if (product_register_value[PM25_MODBUS_PM25_WEIGHT_1_0] != 0)
+        cs_weight_pm1.Format(_T("%u"), product_register_value[PM25_MODBUS_PM25_WEIGHT_1_0]);
+    else
+        cs_weight_pm1 = _T("-");
+    CString cs_weight_pm2_5;
+    if (product_register_value[PM25_MODBUS_PM25_WEIGHT_2_5] != 0)
+        cs_weight_pm2_5.Format(_T("%u"), product_register_value[PM25_MODBUS_PM25_WEIGHT_2_5]);
+    else
+        cs_weight_pm2_5 = _T("-");
+    CString cs_weight_pm4;
+    if (product_register_value[PM25_MODBUS_PM25_WEIGHT_4_0] != 0)
+        cs_weight_pm4.Format(_T("%u"), product_register_value[PM25_MODBUS_PM25_WEIGHT_4_0]);
+    else
+        cs_weight_pm4 = _T("-");
+    CString cs_weight_pm10;
+    if (product_register_value[PM25_MODBUS_PM25_WEIGHT_10] != 0)
+        cs_weight_pm10.Format(_T("%u"), product_register_value[PM25_MODBUS_PM25_WEIGHT_10]);
+    else
+        cs_weight_pm10 = _T("-");
+
+    CString cs_weight_total;
+    cs_weight_total.Format(_T("%u"), product_register_value[PM25_MODBUS_PM25_WEIGHT_1_0] +
+        product_register_value[PM25_MODBUS_PM25_WEIGHT_2_5] +
+        product_register_value[PM25_MODBUS_PM25_WEIGHT_4_0] +
+        product_register_value[PM25_MODBUS_PM25_WEIGHT_10]);
+
+    GetDlgItem(IDC_STATIC_WEIGHT_PM1_0)->SetWindowTextW(cs_weight_pm1);
+    GetDlgItem(IDC_STATIC_WEIGHT_PM2_5)->SetWindowTextW(cs_weight_pm2_5);
+    GetDlgItem(IDC_STATIC_WEIGHT_PM4_0)->SetWindowTextW(cs_weight_pm4);
+    GetDlgItem(IDC_STATIC_WEIGHT_PM10)->SetWindowTextW(cs_weight_pm10);
+    GetDlgItem(IDC_STATIC_WEIGHT_TOTAL)->SetWindowTextW(cs_weight_total);
+
+    CString cs_index_pm1;
+    if (product_register_value[PM25_MODBUS_PM25_NUMBER_1_0] != 0)
+        cs_index_pm1.Format(_T("%u"), product_register_value[PM25_MODBUS_PM25_NUMBER_1_0]);
+    else
+        cs_index_pm1 = _T("-");
+    CString cs_index_pm2_5;
+    if (product_register_value[PM25_MODBUS_PM25_NUMBER_2_5] != 0)
+        cs_index_pm2_5.Format(_T("%u"), product_register_value[PM25_MODBUS_PM25_NUMBER_2_5]);
+    else
+        cs_index_pm2_5 = _T("-");
+    CString cs_index_pm4;
+    if (product_register_value[PM25_MODBUS_PM25_NUMBER_4_0] != 0)
+        cs_index_pm4.Format(_T("%u"), product_register_value[PM25_MODBUS_PM25_NUMBER_4_0]);
+    else
+        cs_index_pm4 = _T("-");
+    CString cs_index_pm10;
+    if (product_register_value[PM25_MODBUS_PM25_NUMBER_10] != 0)
+        cs_index_pm10.Format(_T("%u"), product_register_value[PM25_MODBUS_PM25_NUMBER_10]);
+    else
+        cs_index_pm10 = _T("-");
+
+    CString cs_index_total;
+    cs_index_total.Format(_T("%u"), product_register_value[PM25_MODBUS_PM25_NUMBER_1_0] +
+        product_register_value[PM25_MODBUS_PM25_NUMBER_2_5] +
+        product_register_value[PM25_MODBUS_PM25_NUMBER_4_0] +
+        product_register_value[PM25_MODBUS_PM25_NUMBER_10]);
+
+    GetDlgItem(IDC_STATIC_INDEX_PM1_0)->SetWindowTextW(cs_index_pm1);
+    GetDlgItem(IDC_STATIC_INDEX_PM2_5)->SetWindowTextW(cs_index_pm2_5);
+    GetDlgItem(IDC_STATIC_INDEX_PM4_0)->SetWindowTextW(cs_index_pm4);
+    GetDlgItem(IDC_STATIC_INDEX_PM10)->SetWindowTextW(cs_index_pm10);
+    GetDlgItem(IDC_STATIC_INDEX_TOTAL)->SetWindowTextW(cs_index_total);
+
+    CString cs_api_value;
+    CString cs_api_level;
+    cs_api_value.Format(_T("%u"), product_register_value[PM25_MODBUS_AQI]);
+    cs_api_level.Format(_T("%u"), product_register_value[PM25_MODBUS_AQI_LEVEL] + 1);
+    GetDlgItem(IDC_EDIT_AQI_VALUE)->SetWindowTextW(cs_api_value);
+    GetDlgItem(IDC_EDIT_AQI_LEVEL)->SetWindowTextW(cs_api_level);
+
+    if ((aqi_level != product_register_value[PM25_MODBUS_AQI_LEVEL]) && product_register_value[PM25_MODBUS_AQI_LEVEL] <= 5)
+    {
+        aqi_level = product_register_value[PM25_MODBUS_AQI_LEVEL];
+        m_aqi_title.SetWindowTextW(AQI_Info_Status[aqi_level]);
+        m_aqi_title.textColor(AQI_Info_Status_Color[aqi_level]);
+        m_aqi_title.bkColor(AQI_Info_Status_Back_Color[aqi_level]);
+    }
+
+    CString cs_api_region;
+    if (product_register_value[PM25_MODBUS_PM25_AREA] == 0)
+    {
+        ((CComboBox*)GetDlgItem(IDC_COMBO_AQI_REGION))->SetCurSel(0);
+        EnableCus(0);
+    }
+    else if (product_register_value[PM25_MODBUS_PM25_AREA] == 1)
+    {
+        ((CComboBox*)GetDlgItem(IDC_COMBO_AQI_REGION))->SetCurSel(1);
+        EnableCus(0);
+    }
+    else
+    {
+        ((CComboBox*)GetDlgItem(IDC_COMBO_AQI_REGION))->SetCurSel(2);
+        EnableCus(1);
+    }
+
+
+    return;
 }
 
 void CTstatAQ::UpdateUI()
@@ -897,7 +1050,12 @@ void CTstatAQ::OnCbnSelchangeComboAqiRegion()
     {
         n_value = 2;
     }
-
+    if (product_register_value[7] == STM32_PM25)
+    {
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, PM25_MODBUS_PM25_AREA, n_value,
+            product_register_value[TATAT_AQ_MODBUS_AQI_AREA], this->m_hWnd, IDC_EDIT_DTERM, _T(" AQI Region "));
+    }
+    else
     Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_AREA, n_value,
         product_register_value[TATAT_AQ_MODBUS_AQI_AREA], this->m_hWnd, IDC_EDIT_DTERM, _T(" AQI Region "));
 }
@@ -911,7 +1069,10 @@ void CTstatAQ::OnEnKillfocusEditLevel1()
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_LEVEL_1, temp_cstring);
     unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
-
+    if (product_register_value[7] == STM32_PM25)
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, PM25_MODBUS_AQI_FIRST_LINE, temp_value,
+            product_register_value[PM25_MODBUS_AQI_FIRST_LINE], this->m_hWnd, IDC_EDIT_LEVEL_1, _T(" Custom Value 1 "));
+    else
     Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_FIRST_LINE, temp_value,
         product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FIRST_LINE], this->m_hWnd, IDC_EDIT_LEVEL_1, _T(" Custom Value 1 "));
 }
@@ -923,8 +1084,11 @@ void CTstatAQ::OnEnKillfocusEditLevel2()
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_LEVEL_2, temp_cstring);
     unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
-
-    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_SECOND_LINE, temp_value,
+    if (product_register_value[7] == STM32_PM25)
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, PM25_MODBUS_AQI_SECOND_LINE, temp_value,
+            product_register_value[PM25_MODBUS_AQI_SECOND_LINE], this->m_hWnd, IDC_EDIT_LEVEL_2, _T(" Custom Value 2 "));
+    else
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_SECOND_LINE, temp_value,
         product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_SECOND_LINE], this->m_hWnd, IDC_EDIT_LEVEL_2, _T(" Custom Value 2 "));
 }
 
@@ -935,8 +1099,11 @@ void CTstatAQ::OnEnKillfocusEditLevel3()
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_LEVEL_3, temp_cstring);
     unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
-
-    Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_THIRD_LINE, temp_value,
+    if (product_register_value[7] == STM32_PM25)
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, PM25_MODBUS_AQI_THIRD_LINE, temp_value,
+            product_register_value[PM25_MODBUS_AQI_THIRD_LINE], this->m_hWnd, IDC_EDIT_LEVEL_3, _T(" Custom Value 3 "));
+    else
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_THIRD_LINE, temp_value,
         product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_THIRD_LINE], this->m_hWnd, IDC_EDIT_LEVEL_3, _T(" Custom Value 3 "));
 }
 
@@ -947,7 +1114,10 @@ void CTstatAQ::OnEnKillfocusEditLevel4()
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_LEVEL_4, temp_cstring);
     unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
-
+    if (product_register_value[7] == STM32_PM25)
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, PM25_MODBUS_AQI_FOURTH_LINE, temp_value,
+            product_register_value[PM25_MODBUS_AQI_FOURTH_LINE], this->m_hWnd, IDC_EDIT_LEVEL_4, _T(" Custom Value 4 "));
+    else
     Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_FOURTH_LINE, temp_value,
         product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FOURTH_LINE], this->m_hWnd, IDC_EDIT_LEVEL_4, _T(" Custom Value 4 "));
 }
@@ -959,7 +1129,10 @@ void CTstatAQ::OnEnKillfocusEditLevel5()
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_LEVEL_5, temp_cstring);
     unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
-
+    if (product_register_value[7] == STM32_PM25)
+        Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, PM25_MODBUS_AQI_FIFTH_LINE, temp_value,
+            product_register_value[PM25_MODBUS_AQI_FIFTH_LINE], this->m_hWnd, IDC_EDIT_LEVEL_5, _T(" Custom Value 5 "));
+    else
     Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_MODBUS_AQI_CUSTOMER_FIFTH_LINE, temp_value,
         product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FIFTH_LINE], this->m_hWnd, IDC_EDIT_LEVEL_5, _T(" Custom Value 5 "));
 }
@@ -1311,15 +1484,30 @@ void CTstatAQ::OnNMKillfocusDatetimepickerTimeRemain(NMHDR* pNMHDR, LRESULT* pRe
 void CTstatAQ::OnBnClickedButtonAirlabParameter()
 {
     // TODO: 在此添加控件通知处理程序代码
-    int read_ret = 0;
-    read_ret = Read_Multi(g_tstat_id, &product_register_value[1900], 1900,100, 5);
-    if (read_ret < 0)
-    {
-        MessageBox(_T("Read data timeout!"));
-        return ;
-    }
-    CTstatAQ_Parameter dlg;
-    dlg.DoModal();
+	int read_ret = 0;
+	if (product_register_value[7] == STM32_PM25)
+	{
+        read_ret = Read_Multi(g_tstat_id, &product_register_value[100], 100, 100, 5);
+        if (read_ret < 0)
+        {
+            MessageBox(_T("Read data timeout!"));
+            return;
+        }
+        CTstatAQ_PM25_Parameter  mDlg;
+        mDlg.DoModal();
+	}
+	else
+	{
+
+        read_ret = Read_Multi(g_tstat_id, &product_register_value[1900], 1900, 100, 5);
+        if (read_ret < 0)
+        {
+            MessageBox(_T("Read data timeout!"));
+            return;
+        }
+        CTstatAQ_Parameter dlg;
+        dlg.DoModal();
+	}
 }
 
 //String show_fan_picture_old;

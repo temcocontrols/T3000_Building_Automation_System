@@ -2887,7 +2887,8 @@ void sntx_err(int err, int err_true )
 	 "Variable number is too large",
 	 "Program code size is over the 2000 bytes maximum",
      "Use instance only support AV AI AO DO",      // 29 
-	 "Object identifier instance cannot be greater than 2048" //30
+	 "Object identifier instance cannot be greater than 2048",//30
+	 "Bacnet instance is too large ,Maximum support in programming 0x1fffff"
 	} ;
 	if(!pmes) return;
 	if(pmes < mesbuf + ( 1024 - 100 ) )
@@ -3742,7 +3743,7 @@ char* decode_point(char* token, Str_points &temp)
 char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent)
 {
 
-	int /*i,j*/k,l;
+	int /*i,j*/k = 0;int l = 0;
 	char pc[30],*p,*q,buf[30],*tok;
 	char fance_sub_pc[30];
 	char *fance_tok;
@@ -4021,6 +4022,11 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 						//	strcat(buf,"-");
                         if ((*num_panel >= 256) || (b_is_instance == true))
                         {
+							if (*num_panel > 0x1fffff) //2097151
+							{
+								sntx_err(TOO_LARGE_BACNET_INSTANCE);
+								error = 1; return 0;
+							}
                             unsigned int temp_value = 0;
                             temp_value = *num_panel;
                             *netpresent = temp_value >> 16;

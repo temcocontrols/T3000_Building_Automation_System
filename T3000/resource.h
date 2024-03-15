@@ -347,6 +347,7 @@
 #define IDR_DEVICEDATABASE_DB           793
 #define IDD_DIALOG_REDEFINE_IO_COUNT    796
 #define IDI_ICON_DEFAULT_ARRAY          801
+#define IDD_DIALOG_TSTAT_AQ_PM25_PARAMETER 802
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -2778,6 +2779,17 @@
 #define IDC_BUTTON_CREATE_DB            2703
 #define IDC_BUTTON_DELETE_SELECTED_DB   2704
 #define IDC_BUTTON_THIRD_SAVE           2705
+#define IDC_EDIT_P_PM25_VALUE           2706
+#define IDC_EDIT_P_PM10_VALUE2          2707
+#define IDC_EDIT_P_PM25_OFFSET          2708
+#define IDC_EDIT_P_PM25_FILTER          2710
+#define IDC_EDIT_P_PM10_FILTER          2711
+#define IDC_EDIT_P_PM25_MIN             2712
+#define IDC_EDIT_P_PM25_MAX             2713
+#define IDC_EDIT_P_PM10_MIN             2714
+#define IDC_EDIT_P_PM10_MAX             2715
+#define IDC_RADIO_PM_AUTO               2716
+#define IDC_RADIO_PM_MANUAL             2717
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3357,9 +3369,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        802
+#define _APS_NEXT_RESOURCE_VALUE        804
 #define _APS_NEXT_COMMAND_VALUE         34090
-#define _APS_NEXT_CONTROL_VALUE         2706
+#define _APS_NEXT_CONTROL_VALUE         2718
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
