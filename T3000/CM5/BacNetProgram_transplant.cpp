@@ -17,8 +17,8 @@
 #pragma warning(disable:4309)
 #pragma warning(disable:4305)
 #pragma warning(disable:4244)
-
-
+const int support_large_instance_version = 99999; //待固件确定版本号
+int t3_panel_version = 0;
 extern DWORD prg_text_color;
 extern DWORD prg_label_color;
 extern DWORD prg_command_color;
@@ -310,6 +310,23 @@ typedef struct
 	byte  network;
 }Point_Net ;
 
+#if 0
+typedef struct
+{
+	byte identification_code1; //0x55
+	byte identification_code2;  //0xff
+	byte identification_code3; //0x55
+	byte identification_code4;  //0xff
+	byte instance_high_byte;
+	byte instance_mid_byte;
+	byte instance_low_byte;
+	byte point_type;
+	byte obj_number_high;
+	byte obj_number_mid;
+	byte obj_number_low;
+	byte reserve[3];
+}Point_Bacnet;
+#endif
 
 typedef struct
 {
@@ -883,6 +900,7 @@ extern int GetPrgFileNames(void) ;    	/* get the prg names */
 
 //void cod_putint(char *ptr, int j, int type);
 int find_var_def(char *var_name);
+char* isbacnet_point(char* token, Point_Bacnet* temp_point);
 char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network=0, byte panel=0, int *netpresent=0);
 char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char &sub_panel , byte panel=0, int *netpresent=0);
 char *ltrim(char *text);
@@ -1195,6 +1213,7 @@ extern int get_token(void) ;
 
 char *look_instr( char cod );
 int desvar(void);
+int pointtobacnettext(char* buf, Point_Bacnet* point);
 int pointtotext(char *buf,Point_Net *point);
 int pointtotext(char *buf,Point_T3000 *point);
 int	desexpr(void);
@@ -2689,6 +2708,19 @@ int define_var(char *tok, int t,int l,int c, int lstr)
 
 	if (var_type==POINT_VAR || var_type==LABEL_VAR)
 	{
+
+		if (t3_panel_version > support_large_instance_version)
+		{
+			Point_Bacnet temp_point = { 0 };
+			isbacnet_point(tok, &temp_point);
+			if ((temp_point.identification_code1 == 0x55) && (temp_point.identification_code2 == 0xff)
+				&& (temp_point.identification_code3 == 0x55) && (temp_point.identification_code4 == 0xff))
+			{
+				memcpy(&vars_table[i].b_point, &temp_point, sizeof(Point_Bacnet));
+				Sleep(1);
+			}
+		}
+
 					vars_table[i].point_type= point_type;// & 0x1F;
 					vars_table[i].num_point = num_point;
 					vars_table[i].panel = num_panel;
@@ -3740,6 +3772,178 @@ char* decode_point(char* token, Str_points &temp)
 	return NULL;
 }
 
+char* isbacnet_point(char* token, Point_Bacnet *temp_point)
+{
+	unsigned char point_type = 0;
+	int num_point = 0;
+	int  num_panel = 0;
+	int l = 0;
+	int k = 0;
+	char pc[30] = {0};
+	char buf[30] = { 0 };
+	char * q = NULL;
+	char* p = NULL;
+	char* tok = NULL;
+	tok = token;
+	int b_is_instance = false;
+	char* temp_next = token + 3;
+	int token_length = strlen(token);
+	char* temp_last = token + token_length - 1;
+	if (((q = strstr(token, "INS")) != NULL) && ((*(temp_next) >= '0') && (*(temp_next) <= '9')) && ((*(temp_last) >= '0') && (*(temp_last) <= '9')))
+	{
+		b_is_instance = true;
+		Sleep(1);
+	}
+
+	if (((q = strchr(token, '-')) != NULL) || ((q = strchr(token, '.')) != NULL))
+	{
+	
+	}
+	else	//如果是直接var1 就代表 使用的是自己的 main和sub都是一个;Fance
+	{
+		//因为要支持instance 所以数比较大，不局限于以前的 255那么大
+		//for(l=0;l<3 && token[l]!=0;l++)
+		//	if (token[l]<'0' || token[l]>'9')
+		//		break;
+
+		if (b_is_instance)
+			token = token + 3; //因为前面加了M
+
+		for (l = 0; l < 10 && token[l] != 0; l++)
+			if (token[l] < '0' || token[l]>'9')
+				break;
+
+
+		q = token + l;
+		memcpy(pc, token, l);
+		pc[l] = 0;
+		num_panel = atoi(pc);
+	}
+
+	if ((p = strpbrk(q, "0123456789")) != NULL)
+	{
+		memcpy(pc, q, p - q);
+		pc[p - q] = 0;
+		for (k = OUT; k <= MAX_FUNCTION_COUNT; k++)
+		{
+			if (k != DMON)
+			{
+				if (!strcmp(pc, ptr_panel.info[k].name))
+					break;
+				else if (strcmp(pc, "REG") == 0)
+				{
+					k = VAR;
+					break;
+				}
+			}
+		}
+
+
+		if (k <= MAX_FUNCTION_COUNT)
+		{
+			if ((k == BAC_BI) || (k == BAC_BV) ||
+				(k == BAC_AV) || (k == BAC_AI) ||
+				(k == BAC_AO) || (k == BAC_BO))
+			{
+				b_is_instance = true;
+			}
+			if (p == NULL)
+			{
+				memcpy(pmes, "error line : ", 13);
+				pmes += 13;
+				itoa(lline, pmes, 10);
+				pmes += strlen(pmes);
+				*pmes++ = 0x0d;
+				//												fprintf(pmes,"error line %d\n",line);
+				error = 1; return 0;
+			}
+			else  if
+				(
+					((strlen(p) == 1) && (*p == '0')) &&
+					(
+						(k != BAC_AV) &&
+						(k != BAC_AI) &&
+						(k != BAC_AO) &&
+						(k != BAC_BO) &&
+						(k != BAC_BV) &&
+						(k != BAC_BI)
+						)
+					)
+			{
+				memcpy(pmes, "error line : ", 13);
+				pmes += 13;
+				itoa(lline, pmes, 10);
+				pmes += strlen(pmes);
+				*pmes++ = 0x0d;
+				//								fprintf(pmes,"error line %d\n",line);
+				error = 1; return 0;
+			}
+			else
+			{
+				for (l = 0; l < (int)strlen(p); l++)//括号 Fance 加
+				{
+					if (p[l] < '0' || p[l]>'9')
+						break;
+				}
+				if (l < (int)strlen(p))
+					return 0;
+					//return(islabel(token, num_point, var_type, point_type, num_panel));
+				else
+				{
+					//														itoa(panel,buf,10);
+					buf[0] = 0;
+
+#if 1
+					itoa(num_panel, &buf[strlen(buf)], 10);
+					num_point = atoi(p);
+
+					point_type = k;
+					if ((num_panel >= 256) || (b_is_instance == true))
+					{
+						if (num_panel > 0x3fffff) //2097151
+						{
+							sntx_err(TOO_LARGE_BACNET_INSTANCE);
+							error = 1; return 0;
+						}
+						unsigned int temp_value = 0;
+						temp_value = num_panel;
+
+					}
+					else
+					{
+						return tok;
+					}
+
+#endif
+						//		return tok;
+					//if ((p = look_label_ex(*num_panel, sub_panel, k, *num_point, *num_net)) != NULL)
+					//{
+					//	*var_type = LABEL_VAR;
+					//	return p;
+					//}
+					//else
+					//{
+					temp_point->identification_code1 = 0x55;
+					temp_point->identification_code2 = 0xff;
+					temp_point->identification_code3 = 0x55;
+					temp_point->identification_code4 = 0xff;
+					temp_point->instance_high_byte = num_panel >> 16;
+					temp_point->instance_mid_byte = num_panel >> 8;
+					temp_point->instance_low_byte = num_panel ;
+					temp_point->obj_number_high = num_point >> 16;
+					temp_point->obj_number_mid = num_point >> 8;
+					temp_point->obj_number_low = num_point ;
+					temp_point->point_type = point_type;
+
+						return tok;
+					//}
+				}
+			}
+		}
+	}
+
+}
+
 char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent)
 {
 
@@ -3965,11 +4169,11 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 #if 1
 						itoa(*num_panel,&buf[strlen(buf)],10);
 						*num_point=atoi(p);
-						if ((*num_point > 2048) && (b_is_instance))
-						{
-							sntx_err(TOO_LARGE_IDENTIFIER_INSTANCE);
-							error = 1; return 0;
-						}
+						//if ((*num_point > 2048) && (b_is_instance))
+						//{
+						//	sntx_err(TOO_LARGE_IDENTIFIER_INSTANCE);
+						//	error = 1; return 0;
+						//}
 						unsigned char high_3bit =  0;
 						//if(*num_point % 0x100 == 0)
 						//{
@@ -6048,6 +6252,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
  long lvar;
  int i,ind;
  Point_Net point;
+ Point_Bacnet bac_point = {0};
 		 ind = Byte;
 		 if (v>0)
 		 {
@@ -6130,7 +6335,18 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 
 				}
 				else
-					if ((vars_table[cur_index].type == POINT_VAR) || (vars_table[cur_index].type == LABEL_VAR))
+					if ((vars_table[cur_index].b_point.identification_code1 == 0x55) && 
+						(vars_table[cur_index].b_point.identification_code2 == 0xff) &&
+						(vars_table[cur_index].b_point.identification_code3 == 0x55) &&
+						(vars_table[cur_index].b_point.identification_code4 == 0xff) &&
+						(vars_table[cur_index].type == POINT_VAR) &&
+						t3_panel_version > support_large_instance_version)
+					{
+						cod_line[Byte++] = REMOTE_POINT_PRG;
+						memcpy(&cod_line[Byte], &vars_table[cur_index].b_point, sizeof(Point_Bacnet));
+						Byte += sizeof(Point_Bacnet);
+					}
+					else if ((vars_table[cur_index].type == POINT_VAR) || (vars_table[cur_index].type == LABEL_VAR))
 					{
                         //if (((unsigned char)vars_table[cur_index].network >= 128) && (( ((unsigned char)vars_table[cur_index].point_type) & 0x1F) != MB_REG)) //network 的最高位用来标识  是否是新的数据格式
                         if ((unsigned char)vars_table[cur_index].network >= 128)  //network 的最高位用来标识  是否是新的数据格式
@@ -6176,6 +6392,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                             point.panel = vars_table[cur_index].panel;
                             point.sub_panel = vars_table[cur_index].sub_panel;
                             point.network = vars_table[cur_index].network;
+							
+
                             memcpy(&cod_line[Byte], &point, sizeof(Point_Net));
                             Byte += sizeof(Point_Net);
                         }
@@ -7190,39 +7408,56 @@ int desvar(void)
 else
   if (((unsigned char)*code) == (byte)REMOTE_POINT_PRG)
 	 {
-				++code;
-				Point_Net temp_point;
-				memcpy(&temp_point,code,sizeof(Point_Net));
-				b = code;
-				memset(q,0,17);
-				if(temp_point.point_type>0)
-					temp_point.point_type = temp_point.point_type - 1;
-				pointtotext(q,&temp_point);
-				code += sizeof(Point_Net);
-				k=0;
-			//	strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, network, panel, &k));//Fance
-			
-				char *temp_p =NULL;
-				temp_p = ispoint_ex(q,&num_point,&var_type, &point_type, &num_panel, &num_net, my_network,sub_panel, temp_point.panel, &k);	
-				if(temp_p == NULL)	//没有获取到，就算失败
-				{
-					return 0;
-				}
-			//	char *temp_p = ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, my_network, my_panel, &k);
-				//if(temp_p == NULL)	//没有获取到，就算失败
-				//{
-				//	return 0;
-				//}
-				strcpy(buf,temp_p);
-				if( (((Point_Net *)b)->point_type-1) == AY )
-				{
-					b = buf;
-				  strcat(buf, "[");
-				  buf += strlen(buf);
-				  desexpr();
-				  strcat(buf, "]");
-				  buf = b;
-				}
+	  ++code;
+	  if (((unsigned char)*code == 0x55) &&
+		  ((unsigned char)*(code + 1) == 0xff) &&
+		  ((unsigned char)*(code + 2) == 0x55) &&
+		  ((unsigned char)*(code + 3) == 0xff))
+	  {
+		  Point_Bacnet temp_bacnet_point = { 0 };
+		  memcpy(&temp_bacnet_point, code, sizeof(Point_Bacnet));
+		  b = code;
+		  pointtobacnettext(q, &temp_bacnet_point);
+		  code += sizeof(Point_Bacnet);
+		  strcpy(p, q);
+		  k = 0;
+	  }
+	  else
+	  {
+
+		  Point_Net temp_point;
+		  memcpy(&temp_point, code, sizeof(Point_Net));
+		  b = code;
+		  memset(q, 0, 17);
+		  if (temp_point.point_type > 0)
+			  temp_point.point_type = temp_point.point_type - 1;
+		  pointtotext(q, &temp_point);
+		  code += sizeof(Point_Net);
+		  k = 0;
+		  //	strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, network, panel, &k));//Fance
+
+		  char* temp_p = NULL;
+		  temp_p = ispoint_ex(q, &num_point, &var_type, &point_type, &num_panel, &num_net, my_network, sub_panel, temp_point.panel, &k);
+		  if (temp_p == NULL)	//没有获取到，就算失败
+		  {
+			  return 0;
+		  }
+		  //	char *temp_p = ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, my_network, my_panel, &k);
+			  //if(temp_p == NULL)	//没有获取到，就算失败
+			  //{
+			  //	return 0;
+			  //}
+		  strcpy(buf, temp_p);
+		  if ((((Point_Net*)b)->point_type - 1) == AY)
+		  {
+			  b = buf;
+			  strcat(buf, "[");
+			  buf += strlen(buf);
+			  desexpr();
+			  strcat(buf, "]");
+			  buf = b;
+		  }
+	  }
 	 }
 	 else 
 		 if (((unsigned char)*code) == CONST_VALUE_PRG)
@@ -7332,7 +7567,19 @@ int pointtotext(char *buf,Point_T3000 *point)
 	return 0;
 }
 
+int pointtobacnettext(char* buf, Point_Bacnet* point)
+{
+	//char temp_type[20] = { 0 };
+	char temp_number[20] = { 0 };
 
+
+	sprintf(buf, "%u", point->instance_high_byte * 65536 + point->instance_mid_byte * 256 + point->instance_low_byte);
+	strcat(buf, ptr_panel.info[point->point_type].name);
+	sprintf(temp_number,"%u", point->obj_number_high * 65536 + point->obj_number_mid * 256 + point->obj_number_low);
+	strcat(buf, temp_number);
+	//strcpy(buf, "123456AV20000");
+	return 1;
+}
 
 int pointtotext(char *buf,Point_Net *point)
 {

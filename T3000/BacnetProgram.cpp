@@ -438,8 +438,10 @@ void CBacnetProgram::OnBnClickedButton1()
 	dlg.DoModal();
 }
 
+extern int t3_panel_version ;
 void CBacnetProgram::OnBnClickedButtonProgramEdit()
 {
+	t3_panel_version = Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub;
 	g_new_old_IDE = 0;
 	//2018 05 23 解决在切换panel时 ， 选中的 program_list_line 的值需要重新获取.
     for (int i = 0;i<m_program_list.GetItemCount();++i)

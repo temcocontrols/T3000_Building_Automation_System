@@ -11341,11 +11341,7 @@ BEGIN
         MENUITEM "Bacnet Tool",                 ID_DATABASE_BACNETTOOL
         MENUITEM "Modbus Poll",                 ID_DATABASE_MBPOLL
         MENUITEM "Register Viewer",             ID_TOOL_REGISTERVIEWER
-        POPUP "Webview"
-        BEGIN
-            MENUITEM "Web Register",                ID_WEBVIEW_MODBUSREGISTER
-            MENUITEM "Third Party Modbus Database", ID_WEBVIEW_THIRDPARTYMODBUSDATABASE
-        END
+        MENUITEM "Modbus Register v2 ( beta )", ID_WEBVIEW_MODBUSREGISTER
         MENUITEM "RegisterList Database Folder", ID_FILE_EXPORTREGISETERSLIST1
         MENUITEM "Load firmware for a single device    [Ctrl+F2]", ID_TOOL_ISPTOOLFORONE
         MENUITEM "Load firmware for many devices [Ctrl+M]", ID_FILE_BATCHBURNHEX, INACTIVE

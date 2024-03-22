@@ -13,11 +13,12 @@
 
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
- 
 #include <windows.h>  
  
+const unsigned int g_versionNO = 20240322;  // PROJECT_VERSION;
 
-const unsigned int g_versionNO = 20240315;  // PROJECT_VERSION;
+
+
 
 
 #ifdef _DEBUG

@@ -9139,8 +9139,9 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
             if (nRet == SOCKET_ERROR)
             {
                 int  nError = WSAGetLastError();
-                goto END_REFRESH_SCAN;
-                return 0;
+                continue;
+                //goto END_REFRESH_SCAN;
+                //return 0;
             }
             int nLen = sizeof(h_siBind);
             fd_set fdRead = fdSocket;
@@ -9148,8 +9149,9 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
             if (nSelRet == SOCKET_ERROR)
             {
                 int nError = WSAGetLastError();
-                goto END_REFRESH_SCAN;
-                return 0;
+                continue;
+                //goto END_REFRESH_SCAN;
+                //return 0;
             }
             unsigned int t1 = GetTickCount();//程序段开始前取得系统运行时间(ms);
             unsigned int t2;//程序段开始前取得系统运行时间(ms);
@@ -10506,7 +10508,32 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
             }
             else
             {
+                unsigned int temp_device_serial = Device_Basic_Setting.reg.n_serial_number;  //原始设备的序列号不变才能写入setting结构;
+                unsigned int temp_object_instance = Device_Basic_Setting.reg.object_instance;
+                unsigned char temp_panel_number = Device_Basic_Setting.reg.panel_number;
+                unsigned char temp_modbus_id = Device_Basic_Setting.reg.modbus_id;
+                unsigned char temp_ip_addr[4] = {0};
+                unsigned char temp_subnet[4] = { 0 };
+                unsigned char temp_gate_addr[4] = { 0 };
+                memcpy(temp_ip_addr, Device_Basic_Setting.reg.ip_addr, 4);
+                memcpy(temp_subnet, Device_Basic_Setting.reg.subnet, 4);
+                memcpy(temp_gate_addr, Device_Basic_Setting.reg.gate_addr, 4);
+
+                char temp_panel_name[20] = {0};
+                memcpy(temp_panel_name, Device_Basic_Setting.reg.panel_name, 20);
+
+                memcpy(&Device_Basic_Setting, cacl_panel, sizeof(Str_Setting_Info));
+                Device_Basic_Setting.reg.n_serial_number = temp_device_serial;
                 Device_Basic_Setting.reg.reset_default = 0; 
+                //保持如下变量不写入Setting
+                memcpy(Device_Basic_Setting.reg.panel_name,temp_panel_name , 20);
+                Device_Basic_Setting.reg.object_instance = temp_object_instance;
+                Device_Basic_Setting.reg.panel_number = temp_panel_number;
+                Device_Basic_Setting.reg.modbus_id = temp_modbus_id;
+                memcpy(Device_Basic_Setting.reg.ip_addr, temp_ip_addr, 4);
+                memcpy(Device_Basic_Setting.reg.subnet, temp_subnet, 4);
+                memcpy(Device_Basic_Setting.reg.gate_addr, temp_gate_addr, 4);
+
                 memcpy(&GetPrgSetting, cacl_panel, sizeof(Str_Setting_Info));
                 prg_panel = GetPrgSetting.reg.panel_number;
             }
@@ -11193,7 +11220,7 @@ end_SaveDeviceDataIntoAccessDB_function:
     return ret_value;
 }
 
-#ifdef LOCAL_DB_FUNCTION
+#if 1//def LOCAL_DB_FUNCTION
 void init_product_list()
 {
     m_product_iocount.clear();

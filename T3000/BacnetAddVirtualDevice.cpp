@@ -42,7 +42,7 @@ BOOL CBacnetAddVirtualDevice::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 //#ifdef LOCAL_DB_FUNCTION
-//	init_product_list();
+	init_product_list();
 //#endif
 
 	HICON temp_icon_ok = AfxGetApp()->LoadIconW(IDI_ICON_OK);

@@ -605,7 +605,7 @@ public:
 		int    DoConnectDB_TreeNode(const HTREEITEM& hTreeItem);
 #endif
 		afx_msg void OnWebviewModbusregister();
-		afx_msg void OnWebviewThirdpartymodbusdatabase();
+		//afx_msg void OnWebviewThirdpartymodbusdatabase();
 		afx_msg void OnToolsLoginmyaccount();
 };
 //DWORD WINAPI  Bacnet_ReadWrite_Message(LPVOID lpVoid);

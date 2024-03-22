@@ -2781,7 +2781,6 @@
 #define IDC_BUTTON_THIRD_SAVE           2705
 #define IDC_EDIT_P_PM25_VALUE           2706
 #define IDC_EDIT_P_PM10_VALUE2          2707
-#define IDC_EDIT_P_PM25_OFFSET          2708
 #define IDC_EDIT_P_PM25_FILTER          2710
 #define IDC_EDIT_P_PM10_FILTER          2711
 #define IDC_EDIT_P_PM25_MIN             2712
@@ -3295,6 +3294,7 @@
 #define ID_THIRD_LIST_DELETE            34087
 #define ID_THIRD_LIST_AND               34088
 #define ID_TOOLS_LOGINMYACCOUNT         34089
+#define ID_TOOLS_WEBVIEW34090           34090
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -3370,7 +3370,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        804
-#define _APS_NEXT_COMMAND_VALUE         34090
+#define _APS_NEXT_COMMAND_VALUE         34091
 #define _APS_NEXT_CONTROL_VALUE         2718
 #define _APS_NEXT_SYMED_VALUE           320
 #endif

@@ -301,8 +301,9 @@ int CheckDeviceCountTable(int device_serialnumber, int objectinstance = 0);
 int LoadMiniModbusConfigFile(LPCTSTR tem_read_path);
 //For MINIPanel ARM
 int WriteDeviceDataIntoAccessDB(int nTableType, int ncount, int device_serialnumber);
-#ifdef LOCAL_DB_FUNCTION
 void init_product_list();
+#ifdef LOCAL_DB_FUNCTION
+
 int CheckDeviceDataDBAndUpdateDB();
 #endif
 void Copy_Data_From_485_to_Bacnet(unsigned short *start_point);

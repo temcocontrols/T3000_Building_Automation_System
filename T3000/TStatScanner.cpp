@@ -1960,15 +1960,14 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                 }
 
                 //############################
-
                 //############################
                 nRet = ::sendto(h_scan_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_scan_bcast,sizeof(h_scan_bcast));
                 if (nRet == SOCKET_ERROR)
                 {
                     int  nError = WSAGetLastError();
-
-                    goto END_SCAN;
-                    return 0;
+                    continue;
+                    //goto END_SCAN;
+                    //return 0;
                 }
 				g_llTxCount ++ ;
                 memset(m_scan_info.at(scan_udp_item).scan_notes,0,250);
@@ -1985,9 +1984,9 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                 if (nSelRet == SOCKET_ERROR)
                 {
                     int nError = WSAGetLastError();
-
-                    goto END_SCAN;
-                    return 0;
+                    continue;
+                    //goto END_SCAN;
+                    //return 0;
                 }
 
                 if(nSelRet > 0)
@@ -2014,6 +2013,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                                 szIPAddr[1]= buffer[18];//(BYTE)dataPackage[8];
                                 szIPAddr[2]= buffer[20];//(BYTE)dataPackage[9];
                                 szIPAddr[3]= buffer[22];//(BYTE)dataPackage[10];
+#if 0
                                 CString StrIp;
                                 StrIp.Format(_T("%d.%d.%d.%d"),szIPAddr[0],szIPAddr[1],szIPAddr[2],szIPAddr[3]);
                                 if (StrIp.GetLength()<=16)
@@ -2024,7 +2024,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                                     // 								pScanner->m_bCheckSubnetFinish=pScanner->m_thesamesubnet;
                                     // 							}
                                 }
-
+#endif
                                 memset(m_scan_info.at(scan_udp_item).scan_notes,0,250);
                                 temp_str.Format(_T("Receive reply :%u"),reply_count);
                                 char temp_char[250];
@@ -2078,7 +2078,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                             }
                             else
                             {
-                                break;
+                                continue; //2024 03 20 修复当收到0x2f 时 导致的扫描终止的问题;
                             }
                             SHOW_TX_RX
 
@@ -2210,7 +2210,7 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
     if (temp_data.reg.subnet_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
     {
         //点击扫描，暂时忽略掉回复的BIP 转MSTP 时的加入数据库的操作;
-        return	 0;
+        //return	 0;
     }
 
 	if(temp_data.reg.isp_mode != 0)
@@ -2249,8 +2249,9 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 	if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
 	{
-		g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name,temp.object_instance,temp.panal_number);
+		g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u\n"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name,temp.object_instance,temp.panal_number);
 		DFTrace(g_Print);
+        TRACE(g_Print);
 	}
 
 
@@ -3801,7 +3802,8 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 {
     m_T3BB_device_data.clear();
 	m_tstat_net_device_data.clear();
-
+    if (m_refresh_net_device_data.size() > 2) //如果T3 控制器的个数超过2个就不适合 扫描下面的子设备
+        return 0;
 	for (int i=0;i<m_refresh_net_device_data.size();i++)
 	{
 		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL)&& 

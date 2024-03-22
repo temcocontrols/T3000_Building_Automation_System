@@ -111,7 +111,24 @@ enum error_msg { SYNTAX ,
     TOO_LARGE_IDENTIFIER_INSTANCE,
 	TOO_LARGE_BACNET_INSTANCE} ;
 
-
+#pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
+#pragma pack(1)
+typedef struct
+{
+	byte identification_code1; //0x55
+	byte identification_code2;  //0xff
+	byte identification_code3; //0x55
+	byte identification_code4;  //0xff
+	byte instance_high_byte;
+	byte instance_mid_byte;
+	byte instance_low_byte;
+	byte point_type;
+	byte obj_number_high;
+	byte obj_number_mid;
+	byte obj_number_low;
+	byte reserve[3];
+}Point_Bacnet;
+#pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
 //struct variable_table {
 //				char name[12];
 //				char label[9];
@@ -138,6 +155,7 @@ struct variable_table {
     unsigned char point_type;
 	//char num_point;
 	unsigned short num_point;
+	Point_Bacnet b_point;
 };
 
 //struct buf_str {

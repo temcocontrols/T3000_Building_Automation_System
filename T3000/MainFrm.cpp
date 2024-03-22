@@ -382,7 +382,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 #endif
         ON_MESSAGE(WM_WRITE_INTO_NEW_DEVICE, HandleWriteNewDevice)
         ON_COMMAND(ID_WEBVIEW_MODBUSREGISTER, &CMainFrame::OnWebviewModbusregister)
-        ON_COMMAND(ID_WEBVIEW_THIRDPARTYMODBUSDATABASE, &CMainFrame::OnWebviewThirdpartymodbusdatabase)
+        //ON_COMMAND(ID_WEBVIEW_THIRDPARTYMODBUSDATABASE, &CMainFrame::OnWebviewThirdpartymodbusdatabase)
         ON_COMMAND(ID_TOOLS_LOGINMYACCOUNT, &CMainFrame::OnToolsLoginmyaccount)
         END_MESSAGE_MAP()
 
@@ -5574,25 +5574,6 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 			g_progress_persent = write_success_count * 100 /write_total_count;
 		}
 
-		if(temp_prg_version >= 4)
-		{
-			if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) > 0)
-			{
-				Mession_ret.Format(_T("Write device information success."));
-				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
-				write_success_count ++ ;
-                if (!offline_mode)
-				    Sleep(SEND_COMMAND_DELAY_TIME);
-			}
-			else
-			{
-				Mession_ret.Format(_T("Write device information timeout."));
-				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
-				goto write_end_thread;
-			}
-			g_progress_persent = write_success_count * 100 /write_total_count;
-		}
-
 	}
 
 
@@ -5621,6 +5602,25 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             g_progress_persent = write_success_count * 100 / write_total_count;
         }
 
+    }
+
+    if (temp_prg_version >= 4)
+    {
+        if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) > 0)
+        {
+            Mession_ret.Format(_T("Write device information success."));
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+            write_success_count++;
+            if (!offline_mode)
+                Sleep(SEND_COMMAND_DELAY_TIME);
+        }
+        else
+        {
+            Mession_ret.Format(_T("Write device information timeout."));
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+            goto write_end_thread;
+        }
+        g_progress_persent = write_success_count * 100 / write_total_count;
     }
 
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,WRITEPRGFLASH_COMMAND);
@@ -15781,18 +15781,18 @@ void CMainFrame::OnWebviewModbusregister()
 }
 
 
-void CMainFrame::OnWebviewThirdpartymodbusdatabase()
-{
-    // TODO: 在此添加命令处理程序代码
-    //提示客户这部分功能还在开发中
-    MessageBox(_T("This feature is in development!"));
-
-    return;
-    HideBacnetWindow();
-    CBacnetRegisterListView ReglistViewDlg;
-    ReglistViewDlg.SetDeviceMode(1);
-    ReglistViewDlg.DoModal();
-}
+//void CMainFrame::OnWebviewThirdpartymodbusdatabase()
+//{
+//    // TODO: 在此添加命令处理程序代码
+//    //提示客户这部分功能还在开发中
+//    MessageBox(_T("This feature is in development!"));
+//
+//    return;
+//    HideBacnetWindow();
+//    CBacnetRegisterListView ReglistViewDlg;
+//    ReglistViewDlg.SetDeviceMode(1);
+//    ReglistViewDlg.DoModal();
+//}
 
 
 void CMainFrame::OnToolsLoginmyaccount()
