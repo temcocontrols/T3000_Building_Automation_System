@@ -12,11 +12,11 @@ jobs:
     runs-on: windows-latest
     environment: webview_build
     env:
-      API_URL: ${{ vars.API_URL }}
-      API_WS_URL: ${{ vars.API_WS_URL }}
+      API_URL: ${{ secrets.API_URL }}
+      API_WS_URL: ${{ secrets.API_WS_URL }}
       LOCAL_API_URL: ${{ vars.LOCAL_API_URL }}
-      LOCAL_API_SECRET_KEY: ${{ vars.LOCAL_API_SECRET_KEY }}
-      API_SECRET_KEY: ${{ vars.LOCAL_API_SECRET_KEY }}
+      LOCAL_API_SECRET_KEY: ${{ secrets.LOCAL_API_SECRET_KEY }}
+      API_SECRET_KEY: ${{ secrets.LOCAL_API_SECRET_KEY }}
 
     steps:
       - name: checkout
