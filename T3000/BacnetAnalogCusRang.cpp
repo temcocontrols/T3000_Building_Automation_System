@@ -21,6 +21,8 @@ int voltage_down = -1;
 int value_up = -1;
 int value_down = -1;
 
+int firmware_support_high_precision = 0; // 0xef   0.01.  firmwware need Rev 64.8
+int enable_high_precision = 0; // 0xef   0.01.  firmwware need Rev 64.8
 // CBacnetAnalogCusRang dialog
 HWND temp_gloab_hwnd =NULL;
 IMPLEMENT_DYNAMIC(CBacnetAnalogCusRang, CDialogEx)
@@ -83,6 +85,7 @@ BEGIN_MESSAGE_MAP(CBacnetAnalogCusRang, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_APPLY, &CBacnetAnalogCusRang::OnBnClickedButtonApply)
     ON_CBN_KILLFOCUS(IDC_COMBO_CUSRANGE_STIGNALTYPE, &CBacnetAnalogCusRang::OnCbnKillfocusComboCusrangeStignaltype)
     ON_NOTIFY(NM_CLICK, IDD_DIALOG_BACNET_RANGE_LIST, &CBacnetAnalogCusRang::OnNMClickDialogBacnetRangeList)
+    ON_CBN_SELCHANGE(IDC_COMBO_PRECISION, &CBacnetAnalogCusRang::OnCbnSelchangeComboPrecision)
 END_MESSAGE_MAP()
 
 
@@ -135,6 +138,16 @@ BOOL CBacnetAnalogCusRang::OnInitDialog()
 
 	m_tooltips.Activate(TRUE);
 
+    if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 648)
+    {
+		firmware_support_high_precision = 1;
+	}
+    else
+    {
+		firmware_support_high_precision = 0;
+	}
+
+
 	Initial_List();
     InitialPointCount();
 	Fresh_AnalogCusRange_List(analog_range_tbl_line, analog_range_tbl_line);
@@ -173,7 +186,31 @@ void CBacnetAnalogCusRang::Initial_List()
             ((CComboBox *)GetDlgItem(IDC_COMBO_CUSRANGE_STIGNALTYPE))->AddString(JumperStatus[j]);
         }
 #pragma endregion
-
+        ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->ResetContent();
+        ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->AddString(_T("0.1"));
+        ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->AddString(_T("0.01"));
+        if (firmware_support_high_precision)
+        {
+            ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->ShowWindow(1);
+            ((CComboBox*)GetDlgItem(IDC_STATIC_PRECISION))->ShowWindow(1);
+            if ((unsigned char)m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] == 0xef)
+            {
+                enable_high_precision = 1;
+                ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->SetWindowText(_T("0.01"));
+            }
+            else
+            {
+                enable_high_precision = 0;
+                ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->SetWindowText(_T("0.1"));
+			}
+        }
+        else
+        {
+            ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->ShowWindow(0);
+            ((CComboBox*)GetDlgItem(IDC_STATIC_PRECISION))->ShowWindow(0);
+            enable_high_precision = 0;  //固件不支持的话 就算load 新的prog 的0.01精度进来 固件都会按0.1的去执行
+        }
+     
 
 	int temp_jumper = 0;
 	CString Unit_temp;
@@ -298,35 +335,71 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
         m_analog_cus_range_list.SetCellEnabled(Changed_Item, 1, true);
 
         float temp_value = _wtof(cs_temp);
-        if ((temp_value >6553.5) || (temp_value <0))
+        if (enable_high_precision == 1)
         {
-            m_analog_cus_range_list.SetItemText(Changed_Item, 0, _T(""));
-            SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Value Out of range"));
-            return 0;
+            m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] = 0xef; //table 名字的最后一个字节需要标识为高精度 0.01
+            if ((temp_value > 655.35) || (temp_value < 0))
+            {
+                m_analog_cus_range_list.SetItemText(Changed_Item, 0, _T(""));
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Value Out of range"));
+                return 0;
+            }
+            m_analog_custmer_range.at(analog_range_tbl_line).dat[Changed_Item].m_volts = (unsigned short)(temp_value * 100);
         }
-        m_analog_custmer_range.at(analog_range_tbl_line).dat[Changed_Item].m_volts = (unsigned short)(temp_value * 10);
-        //判断用户输入的值逻辑是否异常.
-        if (Changed_Item > 1)
+        else 
         {
-           
+            if ((temp_value > 6553.5) || (temp_value < 0))
+            {
+                m_analog_cus_range_list.SetItemText(Changed_Item, 0, _T(""));
+                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Value Out of range"));
+                return 0;
+            }
+            m_analog_custmer_range.at(analog_range_tbl_line).dat[Changed_Item].m_volts = (unsigned short)(temp_value * 10);
         }
+
+ 
+
     }
 
 	for (int i=0;i<11;i++)//只要有修改1个，就重新将界面上所有的值 读到 内存 并写入 设备;
 	{
 			CString cs_temp = m_analog_cus_range_list.GetItemText(i,ANALOG_CUS_RANGE_RBL_VALUE);
 			float temp_value =_wtof(cs_temp);
-			if((temp_value >6553.5) || (temp_value <0))
-			{
-				m_analog_cus_range_list.SetItemText(Changed_Item,0,_T(""));
-				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Value Out of range"));
-				continue;
-			}
-			m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_volts = (unsigned short)(temp_value * 10);
+            if (enable_high_precision == 1)
+            {
+                if ((temp_value > 655.35) || (temp_value < 0))
+                {
+					m_analog_cus_range_list.SetItemText(Changed_Item, 0, _T(""));
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Value Out of range"));
+					continue;
+				}
+                m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_volts = (unsigned short)(temp_value * 100);
+            }
+            else
+            {
+                if ((temp_value > 6553.5) || (temp_value < 0))
+                {
+                    m_analog_cus_range_list.SetItemText(Changed_Item, 0, _T(""));
+                    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Value Out of range"));
+                    continue;
+                }
+                m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_volts = (unsigned short)(temp_value * 10);
+            }
+
 
 			CString cs_temp1 = m_analog_cus_range_list.GetItemText(i,ANALOG_CUS_RANGE_RBL_UNIT);
-			int temp_value1 =_wtoi(cs_temp1);
-			m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_value = temp_value1;
+			
+            if (enable_high_precision == 1)
+            {
+                float temp_value1 = _wtof(cs_temp1);
+                m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_value = (unsigned int)(temp_value1 * 100); ;
+            }
+            else
+            {
+                int temp_value1 = _wtoi(cs_temp1);
+                m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_value = temp_value1;
+            }
+			
 			if(i==0)
 			{
 				GetDlgItem(IDC_STATIC_VC_1)->SetWindowText(cs_temp);
@@ -338,7 +411,7 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
 	ret_check = CheckAllDataValid();
 	if(!ret_check)
 	{
-		MessageBox(_T("Make sure table values are of steadily increasing or decreasing values, reversing inflection will cause the lookup function to fail."));
+		//MessageBox(_T("Make sure table values are of steadily increasing or decreasing values, reversing inflection will cause the lookup function to fail."));
         m_static_data_status.ShowWindow(SW_SHOW);
         m_static_data_status.SetWindowTextW(_T("Inflection point\r\n detected"));
 		return 0;
@@ -365,7 +438,6 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
 
 BOOL CBacnetAnalogCusRang::CheckAllDataValid()
 {
-    //return 1;
 	int slop_value[11];
 
 	int voltage[11];
@@ -383,22 +455,13 @@ BOOL CBacnetAnalogCusRang::CheckAllDataValid()
 	max_voltage = 0xffffffff;
 	min_voltage = 0x7fffffff;
 
-	//int valid_data_count = 0;
 	for (int i=0;i<11;i++)
 	{
         if (i >= n_point_count)
             break;
-		//if(m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].m_volts == 0)
-		//{
-		//	valid_data_count = i;
-		//	break;
-		//}
+	
 		voltage[i] = m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].m_volts - m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_volts;
-		//if(m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].m_value == 0)
-		//{
-		//	valid_data_count = i;
-		//	break;
-		//}	
+	
 		mvalue[i] = m_analog_custmer_range.at(analog_range_tbl_line).dat[i+1].m_value - m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_value;
 	}
 	for (int i=0;i<11;i++)
@@ -406,8 +469,6 @@ BOOL CBacnetAnalogCusRang::CheckAllDataValid()
         if (i >= n_point_count - 1)
             break;
 
-		//if(i>=valid_data_count)
-		//	break;
 		if(mvalue[i] > 0)
 		{
 			value_up = 1;
@@ -423,8 +484,6 @@ BOOL CBacnetAnalogCusRang::CheckAllDataValid()
         if (i >= n_point_count - 1)
             break;
 
-		//if(i>=valid_data_count)
-		//	break;
 		if(voltage[i] > 0)
 		{
 			voltage_up = 1;
@@ -434,14 +493,7 @@ BOOL CBacnetAnalogCusRang::CheckAllDataValid()
 			voltage_down = 1;
 		}
 	}
-
-	//if((voltage_up == 1) && (value_down == 1))
-	//if((voltage_up == 1) && (voltage_down == voltage_up))
-/*	if(voltage_down == 1)
-	{
-		return 0;
-	}
-	else */if((value_up == 1) && (value_up == value_down))
+    if((value_up == 1) && (value_up == value_down))
 	{
 		return 0;
 	}
@@ -450,19 +502,6 @@ BOOL CBacnetAnalogCusRang::CheckAllDataValid()
     {
         return 0;
     }
-
-	//min_voltage = m_analog_custmer_range.at(analog_range_tbl_line).dat[0].m_volts;
-	//max_voltage = m_analog_custmer_range.at(analog_range_tbl_line).dat[valid_data_count].m_volts;
-	//if(value_up == 1)
-	//{
-	//	min_unit = m_analog_custmer_range.at(analog_range_tbl_line).dat[0].m_value;
-	//	max_unit = m_analog_custmer_range.at(analog_range_tbl_line).dat[valid_data_count].m_value;
-	//}
-	//else if(value_down)
-	//{
-	//	min_unit = m_analog_custmer_range.at(analog_range_tbl_line).dat[valid_data_count].m_value;
-	//	max_unit = m_analog_custmer_range.at(analog_range_tbl_line).dat[0].m_value;
-	//}
 
 
 	return 1;
@@ -474,10 +513,22 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lPa
     max_unit = 0xffffffff;
     min_unit = 0x7fffffff;
 
+    char temp_char[10] = { 0 };
+    if ((unsigned char)m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] != 0xef) //最后一位用来标识 精度 ，与旧版本的0.1 区别开
+    {
+        memcpy_s(temp_char, 9, (char*)m_analog_custmer_range.at(analog_range_tbl_line).table_name, 9);
+    }
+    else
+    {
+        memcpy_s(temp_char, 9, (char*)m_analog_custmer_range.at(analog_range_tbl_line).table_name, 8);
+    }
+
 	CString temp_show_unit;
-	MultiByteToWideChar( CP_ACP, 0, (char *)m_analog_custmer_range.at(analog_range_tbl_line).table_name, (int)strlen(m_analog_custmer_range.at(analog_range_tbl_line).table_name)+1, 
+	MultiByteToWideChar( CP_ACP, 0, (char *)temp_char, (int)strlen(temp_char)+1,
 		temp_show_unit.GetBuffer(MAX_PATH), MAX_PATH );
 	temp_show_unit.ReleaseBuffer();
+
+
 	if(temp_show_unit.GetLength() > 9)
 		temp_show_unit = temp_show_unit.Left(9);
 	Analog_Customer_Units[analog_range_tbl_line] = temp_show_unit;
@@ -503,8 +554,16 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lPa
 		//}
 		//else
 		//{
-			n_value_2byte.Format(_T("%.1f"),((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_volts)/10);
-			n_unite_4byte.Format(_T("%d"),m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_value);
+        if (enable_high_precision == 1)
+        {
+            n_value_2byte.Format(_T("%.2f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_volts) / 100);
+            n_unite_4byte.Format(_T("%.2f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_value) / 100);
+        }
+        else
+        {
+            n_value_2byte.Format(_T("%.1f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_volts) / 10);
+            n_unite_4byte.Format(_T("%d"), m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_value);
+        }
 		//}
 
             if (max_unit < m_analog_custmer_range.at(analog_range_tbl_line).dat[i].m_value)
@@ -805,14 +864,23 @@ void CBacnetAnalogCusRang::UpdateCusAnalogUnit()
 	char cTemp1[255];
 	memset(cTemp1,0,255);
 	WideCharToMultiByte( CP_ACP, 0, temp_cs.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+    if (enable_high_precision == 1)
+    {
+        memcpy_s(m_analog_custmer_range.at(analog_range_tbl_line).table_name, 9, cTemp1, 8);
+        m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] = 0xef; //table 名字的最后一个字节需要标识为高精度 0.01
+    }
+    else
+    {
+        memcpy_s(m_analog_custmer_range.at(analog_range_tbl_line).table_name, 9, cTemp1, 9);
+    }
 
-	memcpy_s(m_analog_custmer_range.at(analog_range_tbl_line).table_name,9,cTemp1,9);
+
 	//m_analog_custmer_range.at(analog_range_tbl_line).table_name
 	bool ret_check = false;
 	ret_check = CheckAllDataValid();
 	if(!ret_check)
 	{
-		MessageBox(_T("Make sure table values are of steadily increasing or decreasing values, reversing inflection will cause the lookup function to fail. "));
+		//MessageBox(_T("Make sure table values are of steadily increasing or decreasing values, reversing inflection will cause the lookup function to fail. "));
         m_static_data_status.ShowWindow(SW_SHOW);
         m_static_data_status.SetWindowTextW(_T("Inflection point\r\n detected"));
 		return ;
@@ -997,11 +1065,22 @@ void CBacnetAnalogCusRang::InitialPointCount()
     CString first_value;
     CString last_volts;
     CString last_value;
+    if (enable_high_precision)
+    {
+        first_volts.Format(_T("%.2f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[0].m_volts) / 100);
+        last_volts.Format(_T("%.2f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[n_point_count - 1].m_volts) / 100);
+        first_value.Format(_T("%.2f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[0].m_value) / 100);
+        last_value.Format(_T("%.2f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[n_point_count - 1].m_value) / 100);
+    }
+    else
+    {
+        first_volts.Format(_T("%.1f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[0].m_volts) / 10);
+        last_volts.Format(_T("%.1f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[n_point_count - 1].m_volts) / 10);
+        first_value.Format(_T("%d"), m_analog_custmer_range.at(analog_range_tbl_line).dat[0].m_value);
+        last_value.Format(_T("%d"), m_analog_custmer_range.at(analog_range_tbl_line).dat[n_point_count - 1].m_value);
+    }
+        
 
-    first_volts.Format(_T("%.1f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[0].m_volts)/10);
-    first_value.Format(_T("%d"), m_analog_custmer_range.at(analog_range_tbl_line).dat[0].m_value);
-    last_volts.Format(_T("%.1f"), ((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[n_point_count - 1].m_volts)/10);
-    last_value.Format(_T("%d"), m_analog_custmer_range.at(analog_range_tbl_line).dat[n_point_count - 1].m_value);
 
     GetDlgItem(IDC_EDIT_MIN_VOLT_VALUE)->SetWindowTextW(first_volts);
     GetDlgItem(IDC_EDIT_MIN_VALUE_VALUE)->SetWindowTextW(first_value);
@@ -1178,11 +1257,21 @@ void CBacnetAnalogCusRang::ReSetSlideAndList()
     n_point_count = _wtoi(temp_point_value);
     if (n_point_count > 11)
         n_point_count = 11;
+    if (enable_high_precision)
+    {
+        n_min_volts = _wtof(temp_min_volts) * 100;
+        n_min_value = _wtof(temp_min_value) * 100;;
+        n_max_volts = _wtof(temp_max_volts) * 100;
+        n_max_value = _wtof(temp_max_value) * 100;
+    }
+    else
+    {
+        n_min_volts = _wtof(temp_min_volts) * 10;
+        n_min_value = _wtof(temp_min_value);
+        n_max_volts = _wtof(temp_max_volts) * 10;
+        n_max_value = _wtof(temp_max_value);
+    }
 
-    n_min_volts = _wtof(temp_min_volts)*10;
-    n_min_value = _wtof(temp_min_value);
-    n_max_volts = _wtof(temp_max_volts)*10;
-    n_max_value = _wtof(temp_max_value);
 
 
     m_analog_custmer_range.at(analog_range_tbl_line).dat[0].m_volts = n_min_volts;
@@ -1258,7 +1347,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_0()
 
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if(n_point_count>=1)
         m_analog_cus_range_list.SetItemText(0, 1, strtext);
@@ -1284,7 +1378,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_1()
     CurPos = m_cus_analog_range_ctrl_1.GetPos();
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if (n_point_count >= 2)
         m_analog_cus_range_list.SetItemText(1, 1, strtext);
@@ -1310,7 +1409,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_2()
     CurPos = m_cus_analog_range_ctrl_2.GetPos();
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if (n_point_count >= 3)
     m_analog_cus_range_list.SetItemText(2, 1, strtext);
@@ -1336,7 +1440,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_3()
     CurPos = m_cus_analog_range_ctrl_3.GetPos();
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if (n_point_count >= 4)
     m_analog_cus_range_list.SetItemText(3, 1, strtext);
@@ -1362,7 +1471,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_4()
     CurPos = m_cus_analog_range_ctrl_4.GetPos();
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if (n_point_count >= 5)
     m_analog_cus_range_list.SetItemText(4, 1, strtext);
@@ -1388,7 +1502,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_5()
     CurPos = m_cus_analog_range_ctrl_5.GetPos();
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if (n_point_count >= 6)
     m_analog_cus_range_list.SetItemText(5, 1, strtext);
@@ -1414,7 +1533,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_6()
     CurPos = m_cus_analog_range_ctrl_6.GetPos();
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if (n_point_count >= 7)
     m_analog_cus_range_list.SetItemText(6, 1, strtext);
@@ -1440,7 +1564,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_7()
     CurPos = m_cus_analog_range_ctrl_7.GetPos();
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if (n_point_count >= 8)
     m_analog_cus_range_list.SetItemText(7, 1, strtext);
@@ -1466,7 +1595,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_8()
     CurPos = m_cus_analog_range_ctrl_8.GetPos();
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if (n_point_count >= 9)
     m_analog_cus_range_list.SetItemText(8, 1, strtext);
@@ -1492,7 +1626,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_9()
     CurPos = m_cus_analog_range_ctrl_9.GetPos();
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if (n_point_count >= 10)
     m_analog_cus_range_list.SetItemText(9, 1, strtext);
@@ -1518,7 +1657,12 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_10()
     CurPos = m_cus_analog_range_ctrl_10.GetPos();
     temp_value = max_unit + min_unit - CurPos;
     CString strtext;
-    strtext.Format(_T("%d"), temp_value);
+    if (enable_high_precision == 1)
+    {
+        strtext.Format(_T("%.2f"), (float)temp_value / 100);
+    }
+    else
+        strtext.Format(_T("%d"), temp_value);
     m_tipvalue = temp_value;
     if (n_point_count >= 11)
     m_analog_cus_range_list.SetItemText(10, 1, strtext);
@@ -1596,4 +1740,28 @@ void CBacnetAnalogCusRang::OnNMClickDialogBacnetRangeList(NMHDR *pNMHDR, LRESULT
         return;
 
     m_analog_cus_range_list.Set_Edit(true);
+}
+
+
+void CBacnetAnalogCusRang::OnCbnSelchangeComboPrecision()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString temp_string;
+    int n_value = 0;
+    int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->GetCurSel();
+    ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->GetLBText(nSel, temp_string);
+    for (int i = 0; i < sizeof(JumperStatus) / sizeof(JumperStatus[0]); i++)
+    {
+        if (temp_string.CompareNoCase(_T("0.01")) == 0)
+        {
+            enable_high_precision = 1;
+            n_value = 0xef;
+            break;
+        }
+    }
+    if (n_value != 0xef)
+        enable_high_precision = 0;
+    m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] = n_value;
+    UpdateCusAnalogUnit();
+    PostMessage(WM_REFRESH_BAC_ANALOGCUSRANGE_LIST, NULL, NULL);
 }

@@ -11848,8 +11848,17 @@ void CMainFrame::OnControlInputs()
                         }
                         memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//因为Str_table_point 只有106个字节，两个byte放到1个 modbus的寄存器里面;
 
-                        MultiByteToWideChar(CP_ACP, 0, (char*)m_analog_custmer_range.at(i).table_name,
-                            (int)strlen((char*)m_analog_custmer_range.at(i).table_name) + 1,
+                        char temp_char[10] = { 0 };
+                        if ((unsigned char)m_analog_custmer_range.at(i).table_name[8] != 0xef) //最后一位用来标识 精度 ，与旧版本的0.1 区别开
+                        {
+                            memcpy_s(temp_char, 9, (char*)m_analog_custmer_range.at(i).table_name, 9);
+                        }
+                        else
+                        {
+                            memcpy_s(temp_char, 9, (char*)m_analog_custmer_range.at(i).table_name, 8);
+                        }
+                        MultiByteToWideChar(CP_ACP, 0, (char*)temp_char,
+                            (int)strlen((char*)temp_char) + 1,
                             Analog_Customer_Units[i].GetBuffer(MAX_PATH), MAX_PATH);
                         Analog_Customer_Units[i].ReleaseBuffer();
                     }

@@ -1160,7 +1160,7 @@ typedef struct
 
 typedef struct
 {
-	char table_name[9];
+	char table_name[9];  //最后一个字节用来判断精度，如果是 0xEF 就用0.01  64.8
 	Tbl_point  dat[16];
 
 } Str_table_point;

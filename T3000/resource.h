@@ -2789,6 +2789,8 @@
 #define IDC_EDIT_P_PM10_MAX             2715
 #define IDC_RADIO_PM_AUTO               2716
 #define IDC_RADIO_PM_MANUAL             2717
+#define IDC_COMBO_PRECISION             2718
+#define IDC_STATIC_PRECISION            2719
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3371,7 +3373,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        804
 #define _APS_NEXT_COMMAND_VALUE         34091
-#define _APS_NEXT_CONTROL_VALUE         2718
+#define _APS_NEXT_CONTROL_VALUE         2720
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

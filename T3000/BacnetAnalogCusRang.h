@@ -78,6 +78,7 @@ public:
       
       CStaticEx m_static_data_status;
       afx_msg void OnNMClickDialogBacnetRangeList(NMHDR *pNMHDR, LRESULT *pResult);
+	  afx_msg void OnCbnSelchangeComboPrecision();
 };
 
 const int ANALOG_CUS_RANGE_RBL_VALUE = 0;

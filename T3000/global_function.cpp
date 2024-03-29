@@ -3985,8 +3985,20 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             else
                 memcpy_s(m_analog_custmer_range.at(i).table_name, 9, my_temp_point, 9);
 
-            MultiByteToWideChar(CP_ACP, 0, (char *)m_analog_custmer_range.at(i).table_name,
-                (int)strlen((char *)m_analog_custmer_range.at(i).table_name) + 1,
+            char temp_char[10] = { 0 };
+            if ((unsigned char)m_analog_custmer_range.at(i).table_name[8] != 0xef) //最后一位用来标识 精度 ，与旧版本的0.1 区别开
+            {
+                memcpy_s(temp_char, 9, my_temp_point, 9);
+            }
+			else
+			{
+				memcpy_s(temp_char, 9, my_temp_point, 8);
+			}
+
+            
+
+            MultiByteToWideChar(CP_ACP, 0, (char *)temp_char,
+                (int)strlen((char *)temp_char) + 1,
                 Analog_Customer_Units[i].GetBuffer(MAX_PATH), MAX_PATH);
             Analog_Customer_Units[i].ReleaseBuffer();
 
