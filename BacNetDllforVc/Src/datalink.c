@@ -77,7 +77,15 @@ int datalink_send_pdu (
 	int nret_send = 0;
 	if(m_protocol == 2)
 	{
-		nret_send = dlmstp_send_pdu(dest,npdu_data,pdu,pdu_len);
+		int retry_count = 0;
+		do
+		{
+			nret_send = dlmstp_send_pdu(dest, npdu_data, pdu, pdu_len);
+			if(nret_send <= 0)
+				Sleep(150);
+			retry_count++;
+		} while ((nret_send<=0)&& (retry_count < 10));
+		
 	}
 	else if(m_protocol == 3)
 	{
@@ -93,49 +101,51 @@ int datalink_send_pdu (
 __declspec(dllexport) uint16_t datalink_receive (BACNET_ADDRESS * src, uint8_t * pdu,
     uint16_t max_pdu, unsigned timeout)
 {
-	if(m_protocol == 3)
+	if (m_protocol == 3)
 	{
-		return	bip_receive(src,pdu,max_pdu,timeout);
+		return	bip_receive(src, pdu, max_pdu, timeout);
 	}
-	else if(m_protocol == 2)
+	else if (m_protocol == 2)
 	{
 		return dlmstp_receive(src, pdu, max_pdu, 3000);
 
 #if 0
-        uint16_t temp_value;
-        temp_value =  dlmstp_receive(src, pdu, max_pdu, 3000);
+		uint16_t temp_value;
+		temp_value = dlmstp_receive(src, pdu, max_pdu, 3000);
 
 
-        if (temp_value == 0)
-            return temp_value;
+		if (temp_value == 0)
+			return temp_value;
 
-        BACNET_ADDRESS temp1;
-        memcpy(&temp1, src, sizeof(BACNET_ADDRESS));
+		BACNET_ADDRESS temp1;
+		memcpy(&temp1, src, sizeof(BACNET_ADDRESS));
 
-        static int n_count = 0;
-        n_count++;
-        //remove("C:\\log1.txt");
-        FILE *st_dout;
-        st_dout = fopen("C:\\log1.txt", "a+");
-        //fprintf(st_dout, "Count = %d Start\r\n", n_count);
+		static int n_count = 0;
+		n_count++;
+		//remove("C:\\log1.txt");
+		FILE* st_dout;
+		st_dout = fopen("C:\\log1.txt", "a+");
+		//fprintf(st_dout, "Count = %d Start\r\n", n_count);
 
-        char tempbuff[200] = { 0 };
-//        sprintf(tempbuff, "%u ", n_count);
-        char * temp_print_test = NULL;
-        temp_print_test = (char *)&temp1;
-        for (int i = 0; i< sizeof(BACNET_ADDRESS); i++)
-        {
-            char temp_char[10] = {0};
-            sprintf(temp_char, "%02x ", (unsigned char)*(temp_print_test+i));
-            strcat(tempbuff, temp_char);
-        }
-        fprintf(st_dout, "%s\r\n", tempbuff);
-        fflush(st_dout);
-        fclose(st_dout);
+		char tempbuff[200] = { 0 };
+		//        sprintf(tempbuff, "%u ", n_count);
+		char* temp_print_test = NULL;
+		temp_print_test = (char*)&temp1;
+		for (int i = 0; i < sizeof(BACNET_ADDRESS); i++)
+		{
+			char temp_char[10] = { 0 };
+			sprintf(temp_char, "%02x ", (unsigned char)*(temp_print_test + i));
+			strcat(tempbuff, temp_char);
+}
+		fprintf(st_dout, "%s\r\n", tempbuff);
+		fflush(st_dout);
+		fclose(st_dout);
 
-        return temp_value;
+		return temp_value;
 #endif
 	}
+	else
+		return 0;
 	
 }
 #endif

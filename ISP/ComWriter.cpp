@@ -149,12 +149,23 @@ int CComWriter::BeginWirteByCom()
             OutPutsStatusInfo(srtInfo, FALSE);
             return 0;
         }
+        if (SPECIAL_BAC_TO_MODBUS)
+        {
+            if (find_mstp_protocal != 1)
+            {
+                CString srtInfo = _T("|Error :No MSTP data was found on the RS485 serial bus!");
+                OutPutsStatusInfo(srtInfo, FALSE);
+                return 0;
+            }
+        }
+#if 0
         int temp_loop_count = 0;
         while ( (find_mstp_protocal > 0) && (temp_loop_count < 3))
         {
             CString srtInfo;
             srtInfo.Format(_T("The current RS485 port uses Bacnet MSTP. (%d)"), temp_loop_count);
             OutPutsStatusInfo(srtInfo, FALSE);
+
             int ret = Initial_bac(m_nComPort, _T(""), m_nBautrate); //初始化bacnet mstp 协议
             CString temp_cs;
             if (ret <= 0)
@@ -164,6 +175,12 @@ int CComWriter::BeginWirteByCom()
                 WriteFinish(0);
                 return 0;
             }
+            else
+            {
+                break;
+            }
+            //Send_WhoIs_Global(-1, -1);
+#if 0  //先不采用闭嘴
             srtInfo = _T("Disabling Bacnet MSTP and switching over to Modbus");
             OutPutsStatusInfo(srtInfo, FALSE);
             int nret = 0;
@@ -180,6 +197,7 @@ int CComWriter::BeginWirteByCom()
             close_bac_com();
             find_mstp_protocal = Test_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  //再次确认总线上 都闭嘴了
             temp_loop_count++; //最多循环3次
+#endif
         }
 
 
@@ -193,31 +211,10 @@ int CComWriter::BeginWirteByCom()
             OutPutsStatusInfo(temp_cs, FALSE);
             return 0;
         }
+#endif
 #pragma endregion
 
 
-        //if (open_com(m_nComPort) == false)
-        //{
-        //    CString srtInfo = _T("|Error :The com port is occupied!");
-        //    //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
-        //    //AddStringToOutPuts(_T("Error :The com port is occupied!"));
-        //    OutPutsStatusInfo(srtInfo, FALSE);
-        //    srtInfo = _T("You need to shut down all other applications and ");
-        //    OutPutsStatusInfo(srtInfo, FALSE);
-        //    srtInfo = _T("background tasks that might be occupying this COM port!");
-        //    OutPutsStatusInfo(srtInfo, FALSE);
-        //    return 0;
-        //}
-        //else
-        //{
-        //    CString strTemp;
-        //    strTemp.Format(_T("COM%d"), m_nComPort);
-        //    CString strTips = _T("|Open ") + strTemp + _T(" successful.");
-        //    OutPutsStatusInfo(strTips, FALSE);
-        //    Change_BaudRate(m_nBautrate);
-        //    mudbus_write_one(255, 16, 0x0455, 3);
-        //    Sleep(100);
-        //}
 
         if (Is_Ram)
         {
@@ -825,12 +822,12 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
     unsigned int ii=0;
 
     //*************inspect the flash at the last flash position ***********************
-    int x = Read_One(m_ID,0xee10);
+    int x = mudbus_read_one(m_ID,0xee10);
 
 
     //************* begin to flash ***********************
     ii=0;
-    if(Read_One(m_ID,0xee10)==0x40 || Read_One(m_ID,0xee10)==0x1f) // 读ee10， why？
+    if(mudbus_read_one(m_ID,0xee10)==0x40 || mudbus_read_one(m_ID,0xee10)==0x1f) // 读ee10， why？
     {
         if(IDOK==AfxMessageBox(_T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),MB_OKCANCEL))
         {
@@ -839,8 +836,8 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             int l=0;//temp;<200
             do
             {
-                int uc_temp1=Read_One(m_ID,ii);
-                int uc_temp2=Read_One(m_ID,ii+1);
+                int uc_temp1= mudbus_read_one(m_ID,ii);
+                int uc_temp2= mudbus_read_one(m_ID,ii+1);
                 if(uc_temp1==0x00 && uc_temp2==0x00 )
                     ii+=2;
                 else if(l==0)
@@ -871,7 +868,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             do
             {
                 if(ii<RETRY_TIMES)
-                    if(-2==Write_One(m_ID,16,0x7f))
+                    if(-2== mudbus_write_one(m_ID,16,0x7f))
                     {
                         ii++;
                         Sleep(6000);
@@ -893,7 +890,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             {
                 if(ii<RETRY_TIMES)
                 {
-                    if(-2==Write_One(m_ID,16,0x3f))
+                    if(-2== mudbus_write_one(m_ID,16,0x3f))
                     {
                         ii++;
                     }
@@ -915,7 +912,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             do
             {
                 if(ii<RETRY_TIMES)
-                    if(-2==Write_One(m_ID,16,0x1f))
+                    if(-2== mudbus_write_one(m_ID,16,0x1f))
                         ii++;
                     else
                         ii=0;
@@ -942,7 +939,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
         //x=Write_One(m_ID,16,0x7f);
         do
         {
-            if(Write_One(m_ID,16,0x7f)<0)
+            if(mudbus_write_one(m_ID,16,0x7f)<0)
             {
                 ii++;
                 Sleep(1000);
@@ -963,7 +960,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 
         do
         {
-            if(Write_One(m_ID,16,0x3f)<0)
+            if(mudbus_write_one(m_ID,16,0x3f)<0)
             {
                 ii++;
                 Sleep(1000);
@@ -983,7 +980,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 
         do
         {
-            if(Write_One(m_ID,16,0x1f)<0)
+            if(mudbus_write_one(m_ID,16,0x1f)<0)
             {
                 ii++;
                 Sleep(1000);
@@ -1013,6 +1010,11 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
         the_max_register_number_parameter = the_max_register_number_parameter + ii;
         Sleep(4000);
     }
+    int one_flash_package = 128;
+    if (SPECIAL_BAC_TO_MODBUS)
+    {
+        one_flash_package = 256;
+    }
     while(ii<the_max_register_number_parameter)
     {
         if (pWriter->m_bStopWrite)
@@ -1023,18 +1025,18 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
         TS_UC data_to_send[160]= {0}; // buffer that writefile() will to use
         int itemp=0;
         
-        persentfinished = ((ii+128)*100)/the_max_register_number_parameter;
+        persentfinished = ((ii+ one_flash_package)*100)/the_max_register_number_parameter;
         if(persentfinished>100)
             persentfinished=100;
         CString srtInfo;
-        srtInfo.Format(_T("|ID %d: Programming lines %d to %d.(%d%%)"),m_ID,ii,ii+128,persentfinished);
+        srtInfo.Format(_T("|ID %d: Programming lines %d to %d.(%d%%)"),m_ID,ii,ii+ one_flash_package,persentfinished);
         pWriter->OutPutsStatusInfo(srtInfo, TRUE);
         do
         {
             if(itemp<RETRY_TIMES)
             {
-
-                if (-2 == write_multi(m_ID, &register_data[ii], ii, 128))//to write multiple 128 bytes
+                
+                if (-2 == mudbus_write_single_short(m_ID, &register_data[ii], ii, 128))//to write multiple 128 bytes  //这里 如果是SPECIAL_BAC_TO_MODBUS 就是 128x2
                 {
                     itemp++;
                     Sleep(300);
@@ -1051,8 +1053,8 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 
                 if(itemp<RETRY_TIMES+3)
                 {
-                    Read_One(255,1);//If the connection is disconnected automatically open the last port;
-                    if(-2==write_multi(m_ID,&register_data[ii],ii,128))//to write multiple 128 bytes
+                    mudbus_read_one(255,1);//If the connection is disconnected automatically open the last port;
+                    if(-2== mudbus_write_single_short(m_ID,&register_data[ii],ii,128))//to write multiple 128 bytes
                         itemp++;
                     else
                         itemp=0;
@@ -1065,7 +1067,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             }
         }
         while(itemp);
-        ii+=128;
+        ii+= one_flash_package;
     }
 
     //********************write register 16 value 0x01 **************
@@ -1074,7 +1076,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
     {
         if(ii<RETRY_TIMES)
         {
-            if(-2==Write_One(m_ID,16,1))
+            if(-2== mudbus_write_one(m_ID,16,1))
                 ii++;
             else
                 ii=0;
@@ -1291,27 +1293,46 @@ int CComWriter::WirteExtendHexFileByCom()
     HCURSOR hc;//load mouse cursor
     hc = LoadCursor(NULL,IDC_WAIT);
     hc = SetCursor(hc);
-
-    if(open_com(m_nComPort)==false)
+    if (SPECIAL_BAC_TO_MODBUS)
     {
-        CString srtInfo = _T("|Error :The com port is occupied!");
-        OutPutsStatusInfo(srtInfo, FALSE);
-        srtInfo = _T("You need to shut down all other applications and");
-        OutPutsStatusInfo(srtInfo, FALSE);
-        srtInfo = _T("background tasks that might be occupying this COM port!");
-        OutPutsStatusInfo(srtInfo, FALSE);
-		WriteFinish(0);
-        return 0;
+        int ret = Initial_bac(m_nComPort, _T(""), m_nBautrate);
+        CString temp_cs;
+        if (ret <= 0)
+        {
+            temp_cs.Format(_T("Failed to open serial port :%d"), m_nComPort);
+            OutPutsStatusInfo(temp_cs, FALSE);
+            WriteFinish(0);
+            return 0;
+        }
+        else
+        {
+            temp_cs.Format(_T("Initial Bacnet MSTP port :%d baudrate:%d success!"), m_nComPort, m_nBautrate);
+            OutPutsStatusInfo(temp_cs, FALSE);
+        }
+        Sleep(1);
     }
     else
     {
-        CString strTemp;
-        strTemp.Format(_T("COM%d"), m_nComPort);
-        CString strTips = _T("|Open ") +  strTemp + _T(" successful.");
-        OutPutsStatusInfo(strTips, FALSE);
-        Change_BaudRate(m_nBautrate);
+        if (open_com(m_nComPort) == false)
+        {
+            CString srtInfo = _T("|Error :The com port is occupied!");
+            OutPutsStatusInfo(srtInfo, FALSE);
+            srtInfo = _T("You need to shut down all other applications and");
+            OutPutsStatusInfo(srtInfo, FALSE);
+            srtInfo = _T("background tasks that might be occupying this COM port!");
+            OutPutsStatusInfo(srtInfo, FALSE);
+            WriteFinish(0);
+            return 0;
+        }
+        else
+        {
+            CString strTemp;
+            strTemp.Format(_T("COM%d"), m_nComPort);
+            CString strTips = _T("|Open ") + strTemp + _T(" successful.");
+            OutPutsStatusInfo(strTips, FALSE);
+            Change_BaudRate(m_nBautrate);
+        }
     }
-
 
     CString strTips = _T("|Programming device...");
     OutPutsStatusInfo(strTips);
@@ -1402,6 +1423,57 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
     for(i = 0; i < pWriter->m_szMdbIDs.size(); i++)
     {
+        if (SPECIAL_BAC_TO_MODBUS)
+        {
+            g_mstp_deviceid = 0;
+            //根据ID得到对应的 device id.
+            CString strtemp;
+            strtemp.Format(_T("|Reading Device Object Instance"));
+            pWriter->OutPutsStatusInfo(strtemp);
+            strtemp.Format(_T(" "));
+            pWriter->OutPutsStatusInfo(strtemp);
+            int temp_found_device_id = 0;
+            for (int x = 0; x < 30; x++)
+            {
+                CString temp_found_id = _T("Found MAC ID:");
+                Send_WhoIs_Global(-1, -1);
+                Sleep(2000);
+                if (m_bac_handle_Iam_data.size() > 0)
+                {
+                    for (int j = 0; j < m_bac_handle_Iam_data.size(); j++)
+                    {
+                        if (j != 0)
+                            temp_found_id = temp_found_id + _T(",");
+                        CString temp_id;
+                        temp_id.Format(_T("%d"), m_bac_handle_Iam_data.at(j).macaddress);
+                        temp_found_id = temp_found_id + temp_id;
+                        if (m_bac_handle_Iam_data.at(j).macaddress == pWriter->m_szMdbIDs[i])
+                        {
+                            temp_found_device_id = m_bac_handle_Iam_data.at(j).device_id;
+                            break;
+                        }
+                    }
+                }
+
+                if (temp_found_device_id > 0)
+                {
+                    g_mstp_deviceid = temp_found_device_id;
+                    CString strtemp;
+                    strtemp.Format(_T("|ID %d is online.Device instance : %u!"), pWriter->m_szMdbIDs[i], g_mstp_deviceid);
+                    pWriter->OutPutsStatusInfo(strtemp);
+                    break;
+                }
+                pWriter->OutPutsStatusInfo(temp_found_id, true);
+            }
+            if (g_mstp_deviceid == 0)
+            {
+                CString strtemp;
+                strtemp.Format(_T("|ID %d is offline.Update failed!"), pWriter->m_szMdbIDs[i]);
+                pWriter->OutPutsStatusInfo(strtemp);
+                goto end_isp_flash;
+            }
+        }
+
      //   for (int Time =0; Time < pWriter->m_FlashTimes; Time++)
         {
             CString strID;
@@ -1419,7 +1491,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
 
                     //如果88esp的设备在bootloader 里面
-                    int n_ret = mudbus_read_multi(pWriter->m_szMdbIDs[i], &pWriter->update_firmware_info[0], 1994, 6);
+                    int n_ret = modbus_read_multi(pWriter->m_szMdbIDs[i], &pWriter->update_firmware_info[0], 1994, 6);
                     if (n_ret > 0)
                     {
                         //比对MD5
@@ -1466,9 +1538,9 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     }
                     //continue_com_flash_count =
                 }
-                int nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
+                int nRet = mudbus_write_one(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
                 if(nRet < 0)
-                    Write_One(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
+                    mudbus_write_one(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
 
                 //TBD: explain this comment better
  /*  If you jump from the application code to the ISP 16 write 127, you need to read 11th register 11th number greater than 1 description of the jump success, otherwise continue to wait; */
@@ -1479,7 +1551,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                 int nnn_ret = 0;
                 do
                 {
-                    nnn_ret  = read_one(pWriter->m_szMdbIDs[i],11);
+                    nnn_ret  = mudbus_read_one(pWriter->m_szMdbIDs[i],11);
                     if(nnn_ret > 1)
                         break;
                     Sleep(1000);
@@ -1490,12 +1562,12 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                 while (nnn_ret > 1);
 
                 // Sleep(2000);
-                int ModelID= read_one(pWriter->m_szMdbIDs[i],7,5);
+                int ModelID= mudbus_read_one(pWriter->m_szMdbIDs[i],7,5);
                 if (ModelID>0)
                 {
                     if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7,8 Detect CPU flash size.                     {
                     {
-                        int Chipsize=read_one(pWriter->m_szMdbIDs[i],11,5);
+                        int Chipsize= mudbus_read_one(pWriter->m_szMdbIDs[i],11,5);
                         if(Chipsize < 0)
                         {
                             nFlashRet = false;
@@ -1516,7 +1588,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                                 int ii=0;
                                 while(ii<=5)
                                 {
-                                    int ret=Write_One(pWriter->m_szMdbIDs[i],16,1);
+                                    int ret= mudbus_write_one(pWriter->m_szMdbIDs[i],16,1);
                                     if (ret>0)
                                     {
                                         break;
@@ -1536,7 +1608,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                                 int ii=0;
                                 while(ii<=5)
                                 {
-                                    int ret=Write_One(pWriter->m_szMdbIDs[i],33,0);
+                                    int ret= mudbus_write_one(pWriter->m_szMdbIDs[i],33,0);
                                     if (ret>0)
                                     {
                                         break;
@@ -1564,7 +1636,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
                 // pWriter->OutPutsStatusInfo(_T("The device doesn’t match with the hex file"));
 #if 1		//复位
-                int Chipsize=read_one(pWriter->m_szMdbIDs[i],11,5);
+                int Chipsize= mudbus_read_one(pWriter->m_szMdbIDs[i],11,5);
                 if (Chipsize<37)	//64K
                 {
 
@@ -1574,7 +1646,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     {
                         if (Device_infor[7] == 88)
                             break;
-                        int ret=Write_One(pWriter->m_szMdbIDs[i],16,1);
+                        int ret= mudbus_write_one(pWriter->m_szMdbIDs[i],16,1);
                         if (ret>0)
                         {
                             break;
@@ -1590,7 +1662,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     int ii=0;
                     while(ii<=5)
                     {
-                        int ret=Write_One(pWriter->m_szMdbIDs[i],33,0);
+                        int ret= mudbus_write_one(pWriter->m_szMdbIDs[i],33,0);
                         if (ret>0)
                         {
                             break;
@@ -1688,7 +1760,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     int ii=0;
                     while(ii<=5)
                     {
-                        int ret=Write_One(pWriter->m_szMdbIDs[i], 16, 8);
+                        int ret= mudbus_write_one(pWriter->m_szMdbIDs[i], 16, 8);
                         if (ret>0)
                         {
                             break;
@@ -1698,7 +1770,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     ii=0;
                     while(ii<=5)
                     {
-                        int ret=Write_One(pWriter->m_szMdbIDs[i], 33, 1);
+                        int ret= mudbus_write_one(pWriter->m_szMdbIDs[i], 33, 1);
                         if (ret>0)
                         {
                             break;
@@ -1719,7 +1791,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
             if ((Device_infor[7] == 88) && (nFlashRet > 0))
             {
                 int temp_flag = 0;
-                temp_flag = read_one(pWriter->m_szMdbIDs[i], 23, 5);
+                temp_flag = mudbus_read_one(pWriter->m_szMdbIDs[i], 23, 5);
                 CString strText;
                 if (temp_flag == 0x51)
                 {
@@ -1776,6 +1848,8 @@ end_isp_flash:
     Sleep(500);
 
     close_com();
+    if (SPECIAL_BAC_TO_MODBUS)
+        close_bac_com();
     return 1;//close thread
 //	}while(1);
 
@@ -1919,7 +1993,7 @@ int CComWriter::UpdataDeviceInformation(int& ID)
     int resend_count = 0;
     do
     {
-        ret = mudbus_read_multi(ID,&Device_infor[0],0,18);
+        ret = modbus_read_multi(ID,&Device_infor[0],0,18);
         if(ret >= 0)
             break;
         resend_count ++ ;
@@ -2344,7 +2418,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
         {
             int nret = 0;
             unsigned short temp_register[100] = { 0 };
-            nret = mudbus_read_multi(255, &temp_register[0], 0, 100, 6);
+            nret = modbus_read_multi(255, &temp_register[0], 0, 100, 6);
             if (nret>=0)
             {
                 //只有 能够接子设备的 才搞 静默这一套;
@@ -2934,7 +3008,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             while(ii<RETRY_TIMES);
 #ifdef ISP_BURNING_MODE
             unsigned short temp_check_sum[4] ;
-            int nret = mudbus_read_multi(pWriter->m_szMdbIDs[i], &temp_check_sum[0], 28, 4,5);
+            int nret = modbus_read_multi(pWriter->m_szMdbIDs[i], &temp_check_sum[0], 28, 4,5);
             if (nret >= 0)
             {
                 CString srtInfoSum;

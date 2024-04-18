@@ -1224,13 +1224,14 @@ int mudbus_write_one(unsigned char device_var, unsigned short address, short val
 
 
 
-int mudbus_read_multi(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length, int retry_times)
+int modbus_read_multi(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length, int retry_times)
 {
     CString data;
     CString g_strT3000LogString;
     //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     if (SPECIAL_BAC_TO_MODBUS)
     {
+		retry_times = 10;
         int n_ret = 0;
         for (int i = 0; i < retry_times; i++)
         {
@@ -1280,6 +1281,7 @@ int mudbus_write_single_short(unsigned char device_var, unsigned char *to_write,
     //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     if (SPECIAL_BAC_TO_MODBUS)
     {
+		retry_times = 10;
         int n_ret = 0;
         for (int i = 0; i < retry_times; i++)
         {

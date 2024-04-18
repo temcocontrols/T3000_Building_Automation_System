@@ -81,6 +81,26 @@ void CAirFlowSensor::OnInitialUpdate()
 	// TODO: 在此添加专用代码和/或调用基类
 }
 
+void CAirFlowSensor::ShowTempHumUI(bool show_window)
+{
+	GetDlgItem(IDC_STATIC_AFS_DEW)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_ENTHALPY)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_ABS)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_REAL)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_RANGE)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_DEW_VALUE2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_ENTHALPY_VALUE3)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_ABS_VALUE)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_HUM_VALUE)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_KGM3)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_PERSENT)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_GROUP_TEMP)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_TEMP_DEGC)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_TEMP_DEGF)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_DEGC)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_DEGF)->ShowWindow(show_window);
+}
+
 void CAirFlowSensor::InitialUI()
 {
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->ResetContent();
@@ -94,7 +114,7 @@ void CAirFlowSensor::InitialUI()
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->AddString(AirFlowSensorType[z]);
 	}
 
-
+	
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->ResetContent();
 	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
 	{
@@ -131,6 +151,36 @@ LRESULT CAirFlowSensor::UpdateUI(WPARAM wParam, LPARAM lParam)
 
 void CAirFlowSensor::UpdateUserInterface()
 {
+	//如果硬件版本号小于6 就说明只有 AFS的传感器 否则的话需要显示温湿度的信息
+	if (product_register_value[8] < 6)
+	{
+		ShowTempHumUI(false);
+	}
+	else
+	{
+		ShowTempHumUI(true);
+
+		CString temp_dew;
+		temp_dew.Format(_T("%.1f"), product_register_value[MODBUS_DEWPOINT] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_DEW_VALUE2)->SetWindowText(temp_dew);
+		CString temp_enthalpy;
+		temp_enthalpy.Format(_T("%.1f"), product_register_value[MODBUS_ENTHALPY] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_ENTHALPY_VALUE3)->SetWindowText(temp_enthalpy);
+		CString temp_hum;
+		temp_hum.Format(_T("%.1f"), product_register_value[MODBUS_HUMIDITY] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_HUM_VALUE)->SetWindowText(temp_hum);
+		CString temp_abs;
+		temp_abs.Format(_T("%.1f"), product_register_value[MODBUS_ABSOLUTE_HUMI] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_ABS_VALUE)->SetWindowText(temp_abs);
+
+		CString temp_temp_c;
+		temp_temp_c.Format(_T("%.1f"), product_register_value[MODBUS_TEMPERATURE_C] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_TEMP_DEGC)->SetWindowText(temp_temp_c);
+		CString temp_temp_f;
+		temp_temp_f.Format(_T("%.1f"), product_register_value[MODBUS_TEMPERATURE_F] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_TEMP_DEGF)->SetWindowText(temp_temp_f);
+	}
+
 	if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 0)
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(AirFlowMode[0]);
 	else if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 1)
@@ -143,7 +193,7 @@ void CAirFlowSensor::UpdateUserInterface()
 	else
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[0]);
 
-
+	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->EnableWindow(false);
 	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
 	{
 		if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)

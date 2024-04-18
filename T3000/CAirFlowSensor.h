@@ -28,6 +28,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
+	void ShowTempHumUI(bool show_window);
 	virtual void OnInitialUpdate();
 	void Fresh();
 	void InitialUI();
@@ -69,6 +70,12 @@ static DWORD WINAPI Update_Airflow_Thread(LPVOID lPvoid);
 #define MODBUS_SWITCH_DP_RANGE          18
 #define MODBUS_SENSOR_TYPE				29
 #define MODBUS_DIFF_PRESSURE_VALUE      34
+#define MODBUS_TEMPERATURE_C			37
+#define MODBUS_TEMPERATURE_F			38
+#define MODBUS_HUMIDITY					39
+#define MODBUS_DEWPOINT					41
+#define MODBUS_ENTHALPY					42
+#define MODBUS_ABSOLUTE_HUMI			44
 #define MODBUS_FLOW_LENGTH				57
 #define MODBUS_FLOW_WIDTH				58
 #define MODBUS_FLOW_UNIT				59

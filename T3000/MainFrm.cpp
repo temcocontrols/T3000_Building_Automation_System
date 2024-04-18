@@ -1670,6 +1670,43 @@ void CMainFrame::DeleteConflictInDB()
 
 void CMainFrame::GetExtProductInfo(tree_product &m_product_temp,CString temp_ext)
 {
+    //获取 temp_ext 补全代码
+    CStringArray temp_array_2;
+    temp_ext.Trim();
+    SplitCStringA(temp_array_2, temp_ext, _T("^"));
+    if ((temp_array_2.GetSize() == 0) || (temp_ext.IsEmpty()))
+	{
+		m_product_temp.m_ext_info.virtual_device = 0;
+        return;
+	}
+	else
+	{
+        //如果GetSize 为2 就赋值两个 为3 就赋值3个 以此类推
+
+		if (temp_array_2.GetSize() >= 2)
+		{
+			m_product_temp.m_ext_info.virtual_device = _wtoi(temp_array_2.GetAt(0).GetString());
+			m_product_temp.m_ext_info.mini_type = _wtoi(temp_array_2.GetAt(1).GetString());
+		}
+        if (temp_array_2.GetSize() >= 3)
+		{
+			m_product_temp.m_ext_info.special_com_communicate = _wtoi(temp_array_2.GetAt(2).GetString());
+		}
+        if(temp_array_2.GetSize() >= 4)
+		{
+			m_product_temp.m_ext_info.com_data_bit = _wtoi(temp_array_2.GetAt(3).GetString());
+		}
+        if (temp_array_2.GetSize() >= 5)
+        {
+            m_product_temp.m_ext_info.com_stop_bit = _wtoi(temp_array_2.GetAt(4).GetString());
+        }
+        if (temp_array_2.GetSize() >= 6)
+        {
+            m_product_temp.m_ext_info.com_parity_bit = _wtoi(temp_array_2.GetAt(5).GetString());
+        }
+	}
+
+#if 0
     CStringArray temp_array_2;
     temp_ext.Trim();
     SplitCStringA(temp_array_2, temp_ext, _T("^"));
@@ -1685,6 +1722,7 @@ void CMainFrame::GetExtProductInfo(tree_product &m_product_temp,CString temp_ext
             m_product_temp.m_ext_info.mini_type = _wtoi(temp_array_2.GetAt(1).GetString());
         }
     }
+#endif
 }
 
 
@@ -9231,11 +9269,8 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                     }
 
                     bool is_bacnet_device = false;
-                    if((m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL) || 
-                        (m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL_ARM) || 
-                        (m_refresh_net_device_data.at(y).product_id == PM_ESP32_T3_SERIES) ||
-                        (m_refresh_net_device_data.at(y).product_id == PM_CM5))
-                        is_bacnet_device = true;
+                    is_bacnet_device = ShowBacnetView(m_refresh_net_device_data.at(y).product_id);
+
 
                     if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device && (m_refresh_net_device_data.at(y).parent_serial_number != 0))
                     {
@@ -9678,6 +9713,45 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
             return 0;
 
         tree_product tp = m_product.at(i);
+
+        //先找父节点在不在 如果有父节点 就多加一条判断 ，判断父节点 有没有回复0X27命令，刷新界面;
+        if (m_product.at(i).note_parent_serial_number != 0)
+        {
+            //找到对应的是哪一个subnet
+            for (int z = 0; z < m_refresh_subnet_status.size(); z++)
+            {
+                int find_subnet = 0;
+                if (m_refresh_subnet_status.at(z).parent_sn == m_product.at(i).note_parent_serial_number)
+                {
+                    for (int y = 0; y < m_refresh_subnet_status.at(z).device_count; y++)
+					{
+						if (m_refresh_subnet_status.at(z).device_status[y].modbusid == m_product.at(i).product_id)
+						{
+							if (m_refresh_subnet_status.at(z).device_status[y].nstatus == 1)
+							{
+								m_product.at(i).status = 1;
+                                m_product.at(i).status_last_time[0] = 1;
+                                m_product.at(i).status_last_time[1] = 1;
+                                m_product.at(i).status_last_time[2] = 1;
+                                m_product.at(i).status_last_time[3] = 1;
+                                m_product.at(i).status_last_time[4] = 1;							
+							}
+                            else
+                            {
+                                m_product.at(i).status_last_time[0] = 0;
+                            }
+                            find_subnet = true;
+                            break;
+						}
+					}
+
+                }
+                if (find_subnet)
+                    break;
+            }
+        }
+
+
         if (tp.protocol == P_MODBUS_485 )
             continue;
 

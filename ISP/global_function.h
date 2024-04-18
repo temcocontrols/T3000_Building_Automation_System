@@ -54,7 +54,7 @@ bool Open_Socket_Retry(CString strIPAdress, short nPort, int retry_time = 3);
 int check_bootloader_and_frimware(int npid, int comport, unsigned short reg_11, unsigned short reg_14,int &update_value,  unsigned char app_already_version = 0);
 int mudbus_read_one(unsigned char device_var, unsigned short address, int retry_times = 3);
 int mudbus_write_one(unsigned char device_var, unsigned short address, short value, int retry_times = 1);
-int mudbus_read_multi(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length, int retry_times = 3);
+int modbus_read_multi(unsigned char device_var, unsigned short *put_data_into_here, unsigned short start_address, int length, int retry_times = 3);
 int mudbus_write_multi_short(unsigned char device_var, unsigned short *to_write, unsigned short start_address, int length, int retry_times = 3);
 int mudbus_write_single_short(unsigned char device_var, unsigned char *to_write, unsigned short start_address, int length, int retry_times = 3);
 bool Initial_bac(int comport, CString bind_local_ip, int n_baudrate);

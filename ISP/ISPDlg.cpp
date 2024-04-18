@@ -833,7 +833,7 @@ void CISPDlg::InitISPUI()
         WINDOWPLACEMENT wp;
 
         GetWindowPlacement(&wp);
-        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->ShowWindow(false); //暂时不显示 mstp的 update按钮，设备几乎还不支持;
+        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->ShowWindow(1); //暂时不显示 mstp的 update按钮，设备几乎还不支持;
 
 
         CRect rc;

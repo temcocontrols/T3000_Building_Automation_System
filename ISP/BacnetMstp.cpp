@@ -627,7 +627,7 @@ int WritePrivateBacnetToModbusCharData(uint32_t deviceid, int16_t start_reg, uin
     BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
 
 
-    if ((writelength == 0) || (writelength > 128))
+    if ((writelength == 0) || (writelength > 256))
         return -4; //≥§∂»”–ŒÛ;
 
     bool status = false;
@@ -672,7 +672,21 @@ int WritePrivateBacnetToModbusCharData(uint32_t deviceid, int16_t start_reg, uin
     if (status)
     {
         n_ret = Send_ConfirmedPrivateTransfer(&dest, &private_data);
-
+#if 0
+        for (int j = 0; j < 5; j++)
+        {
+            n_ret = Send_ConfirmedPrivateTransfer(&dest, &private_data);
+            if (n_ret >= 0)
+            {
+                break;
+            }
+            else
+            {
+                Sleep(300);
+                TRACE(_T("Send_ConfirmedPrivateTransfer = - 2 \n"));
+            }
+        }
+#endif
         if (n_ret >= 0)
         {
             for (int i = 0; i<300; i++)
@@ -686,6 +700,11 @@ int WritePrivateBacnetToModbusCharData(uint32_t deviceid, int16_t start_reg, uin
                 else
                     continue;
             }
+        }
+
+        else
+        {
+            return -2;
         }
     }
     else

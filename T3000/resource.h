@@ -2743,7 +2743,9 @@
 #define IDC_STATIC_OUT_CURRENT2         2672
 #define IDC_STATIC_OUT_VOLTAGE          2672
 #define IDC_EDIT_VOLATGE_MIN_H          2673
+#define IDC_STATIC_AFS_ENTHALPY_VALUE3  2673
 #define IDC_STATIC_OUT_CURRENT_H        2674
+#define IDC_STATIC_AFS_DEW_VALUE2       2674
 #define IDC_STATIC_OUT_VOLTAGE_H        2675
 #define IDC_STATIC_OUT_CURRENT_T        2676
 #define IDC_STATIC_OUT_VOLTAGE_T        2677
@@ -2791,6 +2793,20 @@
 #define IDC_RADIO_PM_MANUAL             2717
 #define IDC_COMBO_PRECISION             2718
 #define IDC_STATIC_PRECISION            2719
+#define IDC_RADIO_AFS_REAL              2723
+#define IDC_STATIC_AFS_ABS_VALUE        2724
+#define IDC_STATIC_AFS_HUM_VALUE        2725
+#define IDC_STATIC_AFS_KGM3             2726
+#define IDC_STATIC_AFS_RANGE            2727
+#define IDC_STATIC_AFS_GROUP_TEMP       2728
+#define IDC_STATIC_AFS_TEMP_DEGC        2729
+#define IDC_STATIC_AFS_DEGC             2730
+#define IDC_STATIC_AFS_TEMP_DEGF        2731
+#define IDC_STATIC_AFS_DEGF             2732
+#define IDC_STATIC_AFS_DEW              2733
+#define IDC_STATIC_AFS_ENTHALPY         2734
+#define IDC_STATIC_AFS_ABS              2735
+#define IDC_STATIC_AFS_REAL             2736
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3373,7 +3389,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        804
 #define _APS_NEXT_COMMAND_VALUE         34091
-#define _APS_NEXT_CONTROL_VALUE         2720
+#define _APS_NEXT_CONTROL_VALUE         2734
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

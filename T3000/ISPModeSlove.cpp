@@ -165,7 +165,7 @@ void CISPModeSlove::OnTimer(UINT_PTR nIDEvent)
 	case 1:
 		{
 			timer_count --;
-			if (timer_count == 0)
+			if (timer_count <= 0)
 			{
 				KillTimer(1);
 				isp_mode_is_cancel = true;
