@@ -66,7 +66,7 @@ enum WEBVIEW_MESSAGE_TYPE
 	SAVE_IMAGE = 9,
 	SAVE_LIBRAY_DATA = 10,
 	DELETE_IMAGE = 11,
-	SAVE_USER_TOKEN = 12,
+	GET_SELECTED_DEVICE_INFO = 12,
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -1197,7 +1197,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 		m_webView->PostWebMessageAsJson(temp_cs);
 
-
+		// Temporary disabled until we fix it
+		/*
 		JsonDataToStruct(file_output);
 		bool zip_ret = ZipSingleItem(des_file_zip,des_file);
 		if (!zip_ret)
@@ -1210,6 +1211,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 		Sleep(1);
 		save_button_click = 1;
+		*/
 #if 0
 		nlohmann::json jsonData = nlohmann::json::parse(file_output);
 		Str_Json Str_MyJson(jsonData);
@@ -1916,17 +1918,16 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 	}
 		break;
-	case SAVE_USER_TOKEN:
+	case GET_SELECTED_DEVICE_INFO:
 	{
-		CFile file;
-		const std::string file_output = Json::writeString(builder, json["data"]);
-		CString file_temp_cs(file_output.c_str());
-		CString temp_token;
-		temp_token =  _T("C:\\123.txt");
-		file.Open(temp_token, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
-		file.Write(file_temp_cs, file_temp_cs.GetLength() * 2);
-		file.Close();
-
+		Json::Value tempjson;
+		tempjson["action"] = "GET_SELECTED_DEVICE_INFO_RES";
+		tempjson["data"]["product_id"] = g_selected_product_id;
+		tempjson["data"]["panel_id"] = bac_gloab_panel;
+		tempjson["data"]["serial_number"] = g_selected_serialnumber;
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+		m_webView->PostWebMessageAsJson(temp_cs);
 	}
 		break;
 	default :
