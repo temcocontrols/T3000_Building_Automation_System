@@ -953,3 +953,4 @@ build/ALL_BUILD.vcxproj
 /.vs
 /T3000/ResourceFile/webview
 /T3000/Database
+T3000Controls/project.lock.json
