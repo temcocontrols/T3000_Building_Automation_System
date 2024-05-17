@@ -15839,23 +15839,36 @@ int CMainFrame::DoConnectDB_TreeNode(const HTREEITEM& hTreeItem)
 #endif // LOCAL_DB_FUNCTION
 
 
+CString GetUserAppDataPath(LPCTSTR lpFolderName = NULL)
+{
+    TCHAR szPath[MAX_PATH];
+    if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szPath)))
+    {
+        CString strPath = szPath;
+        if (lpFolderName != NULL)
+        {
+            strPath += _T("\\");
+            strPath += lpFolderName;
+        }
+        return strPath;
+    }
+    return _T("");
+}
 
 void CMainFrame::OnWebviewModbusregister()
 {
     // TODO: 在此添加命令处理程序代码
     // This thread will not exit when it is running properly, and will exit if run_server executes abnormally, terminating the thread.
+
+    CString appDataMyAppPath = GetUserAppDataPath(_T("T3000"));
+    appDataMyAppPath = appDataMyAppPath + _T("\\EBWebView");
+    DeleteDirectory(appDataMyAppPath);
+    
     if (h_create_webview_server_thread == NULL)
     {
         h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
     }
-   /* 
-    CString Resource_folder;
-    CString ApplicationFolder;
-    GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-    PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
-    ApplicationFolder.ReleaseBuffer();
-    Resource_folder = ApplicationFolder + _T("\\ResourceFile");
-   */
+
     CString webviewUrl = _T("http://localhost:9103/#/modbus-register");
     CString webviewTitle = _T("Modbus Register");
 
@@ -15865,18 +15878,6 @@ void CMainFrame::OnWebviewModbusregister()
 }
 
 
-//void CMainFrame::OnWebviewThirdpartymodbusdatabase()
-//{
-//    // TODO: 在此添加命令处理程序代码
-//    //提示客户这部分功能还在开发中
-//    MessageBox(_T("This feature is in development!"));
-//
-//    return;
-//    HideBacnetWindow();
-//    CBacnetRegisterListView ReglistViewDlg;
-//    ReglistViewDlg.SetDeviceMode(1);
-//    ReglistViewDlg.DoModal();
-//}
 
 
 void CMainFrame::OnToolsLoginmyaccount()
