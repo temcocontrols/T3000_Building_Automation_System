@@ -1125,32 +1125,16 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
     Sleep(1000);
 
 
-
+	int send_whois_loop_count = 0;
     while (1)
     {
-		//////归纳出所有需要读取的 主panel的  deviceid
-		//for (int i = 0; i < m_read_group_data.size(); i++)
-		//{
-
-		//	bool find_panel_in_vector = false;
-		//	for (int j = 0; j < temp_panel_deviceid.size(); j++)
-		//	{
-		//		if (m_read_group_data.at(i).point.panel == temp_panel_deviceid.at(j).npanelnum)
-		//		{
-		//			find_panel_in_vector = true;
-		//			break;
-		//		}
-		//	}
-		//	if (!find_panel_in_vector)
-		//	{
-		//		Bacnet_RemotePoint_Info temp;
-		//		temp.npanelnum = m_read_group_data.at(i).point.panel;
-		//		temp.ndeviceid = 0;
-		//		temp_panel_deviceid.push_back(temp);
-		//	}
-		//}
-
-		Send_WhoIs_Global(-1, -1);
+		if (send_whois_loop_count == 0)
+		{
+			Send_WhoIs_Global(-1, -1);
+		}
+		send_whois_loop_count++;
+		if (send_whois_loop_count >= 10)
+			send_whois_loop_count = 0;
 		Sleep(2000);
 
 

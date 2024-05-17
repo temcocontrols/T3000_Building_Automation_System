@@ -852,7 +852,7 @@ const CString OutPut_List_Analog_Range[] =
 	_T("0.0 -> 100"),
 	_T("4   -> 20"),
 	_T("0.0 -> 100"),
-    _T("2   -> 10"),
+    _T("0.0 -> 100"),
 };
 
 const CString OutPut_List_Analog_Units[] =
@@ -2033,6 +2033,7 @@ enum sub_io_type
 
 #define BAC_BI        20
 #define BAC_BV        21
+#define BAC_MSV       22
 #define COIL_REG      23
 #define DIS_INPUT_REG 24
 #define INPUT_REG     25

@@ -285,6 +285,8 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			temp_type = _T("AO");
 		else if (t_type == BAC_BO + 1)
 			temp_type = _T("BO");
+		else if (t_type == BAC_MSV + 1)
+			temp_type = _T("MSV");
         else if (t_type == BAC_BV + 1)
             temp_type = _T("BV");
         else if (t_type == BAC_BI + 1)

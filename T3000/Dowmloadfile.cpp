@@ -1211,8 +1211,14 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     local_version_date = GetPrivateProfileInt(_T("LastUpdateTime"), str_product_section, 0, CheckVersionIniFilePath);
 
 
-
-    if (temp_download_path.IsEmpty())  //此产品没有找到对应的下载目录;
+    if ((pParent->m_download_product_type == 199)&& (temp_download_path.IsEmpty()))
+    {
+        CS_Info.Format(_T("Please select a product from the list on the left."));
+        pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
+        pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
+        goto ftp_download_end;
+    }
+    else if (temp_download_path.IsEmpty())  //此产品没有找到对应的下载目录;
     {
         CS_Info.Format(_T("Can't find the firmware file on the website."));
         pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);

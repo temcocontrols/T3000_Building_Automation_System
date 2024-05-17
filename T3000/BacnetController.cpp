@@ -1087,7 +1087,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
         
             if (m_controller_data.at(lRow).action == 0)
             {
-                if (IDYES == MessageBox(_T("Set this to กฎ+กฏ for systems like cooling where the action increases when the temperature is above the setpoint."), _T(" "), MB_YESNOCANCEL | MB_ICONINFORMATION))
+                if (IDYES == MessageBox(_T("Set this to '+'for systems like cooling where the action increases when the temperature is above the setpoint."), _T(" "), MB_YESNOCANCEL | MB_ICONINFORMATION))
                 {
                     m_controller_data.at(lRow).action = 1;
                     m_controller_list.SetItemText(lRow, lCol, _T("+"));
@@ -1100,7 +1100,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
             }
             else
             {
-                if (IDYES == MessageBox(_T("Set this to กฎ-กฎ for systems like heating where the action increases when the temperature is below setpoint."), _T(" "), MB_YESNOCANCEL | MB_ICONINFORMATION))
+                if (IDYES == MessageBox(_T("Set this to '-' for systems like heating where the action increases when the temperature is below setpoint."), _T(" "), MB_YESNOCANCEL | MB_ICONINFORMATION))
                 {
                     m_controller_data.at(lRow).action = 0;
                     m_controller_list.SetItemText(lRow, lCol, _T("-"));

@@ -612,6 +612,7 @@ int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_
 
 
 
+
 int WritePrivateBacnetToModbusCharData(uint32_t deviceid, int16_t start_reg, uint16_t writelength, unsigned char *data_in)
 {
     unsigned short temp_data[400];
@@ -652,12 +653,12 @@ int WritePrivateBacnetToModbusCharData(uint32_t deviceid, int16_t start_reg, uin
     Set_transfer_length(private_data_chunk.total_length);
     memcpy_s(SendBuffer, PRIVATE_HEAD_LENGTH, &private_data_chunk, PRIVATE_HEAD_LENGTH);
 
-    memcpy(temp_data, data_in, writelength );
-    //电脑和设备大小端不一致，这里以设备为准.
-    for (int i = 0; i < writelength; i++)
-    {
-        temp_data[i] = htons(temp_data[i]);
-    }
+    memcpy(temp_data, data_in, writelength * 2 );
+    //电脑和设备大小端不一致，这里以设备为准. 但是这里给ESP32 烧写 不需要反转
+    //for (int i = 0; i < writelength; i++)
+    //{
+    //    temp_data[i] = htons(temp_data[i]);
+    //}
 
     memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH, writelength * 2, temp_data, writelength * 2);
     status = bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING, (char *)&SendBuffer, &data_value);

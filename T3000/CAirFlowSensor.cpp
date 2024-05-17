@@ -152,7 +152,8 @@ LRESULT CAirFlowSensor::UpdateUI(WPARAM wParam, LPARAM lParam)
 void CAirFlowSensor::UpdateUserInterface()
 {
 	//如果硬件版本号小于6 就说明只有 AFS的传感器 否则的话需要显示温湿度的信息
-	if (product_register_value[8] < 6)
+	//如果99 寄存器  为 0  就说明 没有温湿度传感器 就隐藏界面
+	if ((product_register_value[8] < 6) ||  (product_register_value[99] == 0))
 	{
 		ShowTempHumUI(false);
 	}
@@ -1183,7 +1184,7 @@ void CAirFlowSensor::OnEnKillfocusEditPascalMax()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring_min;
-	GetDlgItemTextW(IDC_EDIT_PASCAL_MAX, temp_cstring_min);
+	GetDlgItemTextW(IDC_EDIT_PASCAL_MIN, temp_cstring_min);
 	unsigned int temp_value_min = unsigned int(_wtoi(temp_cstring_min));
 
 	CString temp_cstring_max;

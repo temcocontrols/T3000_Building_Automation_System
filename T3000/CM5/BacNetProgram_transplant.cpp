@@ -3657,7 +3657,7 @@ char* decode_point(char* token, Str_points &temp)
 
 		if (k <= MAX_FUNCTION_COUNT)
 		{
-			if ((k == BAC_BI) || (k == BAC_BV) ||
+			if ((k == BAC_BI) || (k == BAC_BV) || (k == BAC_MSV) ||
 				(k == BAC_AV) || (k == BAC_AI) ||
 				(k == BAC_AO) || (k == BAC_BO))
 			{
@@ -3690,6 +3690,7 @@ char* decode_point(char* token, Str_points &temp)
 						(k != BAC_AO) &&
 						(k != BAC_BO) &&
 						(k != BAC_BV) &&
+						(k != BAC_MSV) &&
 						(k != BAC_BI)
 						)
 					)
@@ -3841,7 +3842,7 @@ char* isbacnet_point(char* token, Point_Bacnet *temp_point)
 
 		if (k <= MAX_FUNCTION_COUNT)
 		{
-			if ((k == BAC_BI) || (k == BAC_BV) ||
+			if ((k == BAC_BI) || (k == BAC_BV) || (k == BAC_MSV) ||
 				(k == BAC_AV) || (k == BAC_AI) ||
 				(k == BAC_AO) || (k == BAC_BO))
 			{
@@ -3866,6 +3867,7 @@ char* isbacnet_point(char* token, Point_Bacnet *temp_point)
 						(k != BAC_AO) &&
 						(k != BAC_BO) &&
 						(k != BAC_BV) &&
+						(k != BAC_MSV) &&
 						(k != BAC_BI)
 						)
 					)
@@ -4089,7 +4091,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 
 		if (k<= MAX_FUNCTION_COUNT)
 		{
-            if ((k == BAC_BI) || (k == BAC_BV) ||
+            if ((k == BAC_BI) || (k == BAC_BV) || (k == BAC_MSV) ||
                 (k == BAC_AV) || (k == BAC_AI) ||
                 (k == BAC_AO) || (k == BAC_BO))
             {
@@ -4122,6 +4124,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
                       (k != BAC_AO) && 
                       (k != BAC_BO) && 
                       (k != BAC_BV) && 
+					  (k != BAC_MSV) &&
                       (k != BAC_BI)
                       )
                 )
@@ -4291,7 +4294,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
     //// 例如 编程   123456IN4   会报错 ，因为这种利用object instance 去编程 只支持 AV AI AO DO
     if ((*num_panel >= 256) || b_is_instance)
     {
-        if ((k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_BO) && (k != BAC_BI) && (k != BAC_BV))
+        if ((k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_BO) && (k != BAC_BI) && (k != BAC_BV) && (k != BAC_MSV))
         {
             sntx_err(INSTANCE_NOT_SUPPORT); //instance 不支持 此 type. 
             error = INSTANCE_NOT_SUPPORT;
@@ -6367,6 +6370,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                                 (temp_point_type == INPUT_REG) ||
                                 (temp_point_type == MB_REG) ||
                                 (temp_point_type == BAC_VAR) ||
+								(temp_point_type == BAC_MSV) ||
                                 (temp_point_type == BAC_BV) ||
                                 (temp_point_type == BAC_BI) ||
                                 (temp_point_type == BAC_AV) ||
@@ -6457,6 +6461,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 								(temp_point_type == DIS_INPUT_REG) ||
 								(temp_point_type == INPUT_REG) ||
 								(temp_point_type == MB_REG) ||
+								(temp_point_type == BAC_MSV) ||
                                 (temp_point_type == BAC_BV) ||
                                 (temp_point_type == BAC_BI) ||
 								(temp_point_type == BAC_AV) ||
@@ -6502,6 +6507,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                                 (temp_point_type == DIS_INPUT_REG) ||
 								(temp_point_type == INPUT_REG) ||
 								(temp_point_type == MB_REG) ||
+								(temp_point_type == BAC_MSV) ||
                                 (temp_point_type == BAC_BV) ||
                                 (temp_point_type == BAC_BI) ||
 								(temp_point_type == BAC_AV) ||
@@ -7668,6 +7674,7 @@ int pointtotext(char *buf,Point_Net *point)
             (point_type == BAC_BO) ||
             (point_type == BAC_BV) ||
             (point_type == BAC_BI) ||
+			(point_type == BAC_MSV) ||
             (point_type == COIL_REG) ||
             (point_type == DIS_INPUT_REG) ||
             (point_type == INPUT_REG) ||
@@ -7691,7 +7698,7 @@ int pointtotext(char *buf,Point_Net *point)
         (point_type != BAC_FLOAT_DCBA) &&
         (point_type != BAC_VAR)) // 说明是新的格式，最高位用来标识.
     {
-        if ((point_type == BAC_BI) || (point_type == BAC_BV) ||
+        if ((point_type == BAC_BI) || (point_type == BAC_BV) || (point_type == BAC_MSV) ||
             (point_type == BAC_AV) || (point_type == BAC_AI) ||
             (point_type == BAC_AO) || (point_type == BAC_BO))
         {
@@ -7733,6 +7740,7 @@ int pointtotext(char *buf,Point_Net *point)
             (point->point_type == DIS_INPUT_REG) ||
             (point->point_type == INPUT_REG) ||
             (point->point_type == MB_REG) ||
+			(point->point_type == BAC_MSV) ||
             (point->point_type == BAC_BV) ||
             (point->point_type == BAC_BI) ||
             (point->point_type == BAC_AV) ||
@@ -7776,6 +7784,7 @@ int pointtotext(char *buf,Point_Net *point)
 		(point->point_type == DIS_INPUT_REG) ||
 		(point->point_type == INPUT_REG) ||
 		(point->point_type == MB_REG) ||
+		(point->point_type == BAC_MSV) ||
         (point->point_type == BAC_BV) ||
         (point->point_type == BAC_BI) ||
 		(point->point_type == BAC_AV) ||
@@ -8429,6 +8438,9 @@ void init_info_table( void )
             case BAC_BV:
                 ptr_panel.info[i].name = "BV";
                 break;
+			case BAC_MSV:
+				ptr_panel.info[i].name = "MSV";
+				break;
             case BAC_FLOAT_ABCD:
                 ptr_panel.info[i].name = "MB_REG_FLOAT_ABCD";
                 break;

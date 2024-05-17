@@ -1158,10 +1158,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         h_mul_ping_thread = CreateThread(NULL, NULL, Mul_Ping_Thread, this, NULL, NULL);
     }
 
-    if (h_create_webview_server_thread == NULL)
-    {
-        h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
-    }
+
 
     return 0;
 }
@@ -11693,7 +11690,6 @@ void CMainFrame::OnControlMain()
 
 void CMainFrame::OnControlInputs()
 {
-
 #if 0
 //    m_testtoolbar.RemoveAllButtons();
    // CMFCToolBar::ResetAllImages();
@@ -15847,6 +15843,11 @@ int CMainFrame::DoConnectDB_TreeNode(const HTREEITEM& hTreeItem)
 void CMainFrame::OnWebviewModbusregister()
 {
     // TODO: 在此添加命令处理程序代码
+    // This thread will not exit when it is running properly, and will exit if run_server executes abnormally, terminating the thread.
+    if (h_create_webview_server_thread == NULL)
+    {
+        h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
+    }
    /* 
     CString Resource_folder;
     CString ApplicationFolder;
@@ -15881,6 +15882,12 @@ void CMainFrame::OnWebviewModbusregister()
 void CMainFrame::OnToolsLoginmyaccount()
 {
     // TODO: 在此添加命令处理程序代码
+    // This thread will not exit when it is running properly, and will exit if run_server executes abnormally, terminating the thread.
+    if (h_create_webview_server_thread == NULL)
+    {
+        h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
+    }
+
     CString webviewFolder;
     CString Resource_folder;
     CString ApplicationFolder;

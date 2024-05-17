@@ -58,6 +58,7 @@ public:
 	int  Read_Struct_Data();
 	int StructToJsonData();
 	int CheckOldGraphic();
+	bool run_old_graphic_screen();
 };
 
 

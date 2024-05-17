@@ -460,6 +460,22 @@ LRESULT BacnetScreen::Screeenedit_close_handle(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
+bool BacnetScreen::run_old_graphic_screen()
+{
+
+	if ((Device_Basic_Setting.reg.webview_json_flash == 2) &&//这里要判断是2
+		(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= WEBVIEW_JSON_FEATURE)) //643 版本会有这个功能
+	{
+		if (IDNO == MessageBox(_T("Continuing to use Graphic will erase the data stored by the Webview, which shares this part of flash. Are you sure you want to use Graphic?"), _T(""), MB_YESNO | MB_ICONINFORMATION))
+		{
+			return 0;
+		}
+	}
+	if (h_read_screenlabel_thread == NULL)
+	{
+		h_read_screenlabel_thread = CreateThread(NULL, NULL, ReadScreenThreadfun, this, NULL, NULL);
+	}
+}
 
 LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 {
@@ -482,20 +498,11 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 		//		h_get_pic_thread =CreateThread(NULL,NULL,GetPictureThread,this,NULL, NULL);
 		//}
 
-
-		if ((Device_Basic_Setting.reg.webview_json_flash == 2) &&//这里要判断是2
-			(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= WEBVIEW_JSON_FEATURE)) //643 版本会有这个功能
-		{
-			if (IDNO == MessageBox(_T("Continuing to use Graphic will erase the data stored by the Webview, which shares this part of flash. Are you sure you want to use Graphic?"), _T(""), MB_YESNO | MB_ICONINFORMATION))
-			{
-				return 0;
-			}
-		}
-		if(h_read_screenlabel_thread==NULL)
-		{
-			h_read_screenlabel_thread =CreateThread(NULL,NULL,ReadScreenThreadfun,this,NULL, NULL);
-		}
-
+		int nret = CheckOldGraphic();
+		if(nret == 0)
+			run_old_graphic_screen();
+		else
+			PostMessage(WM_COMMAND, MAKEWPARAM(IDC_WEBVIEW_BUTTON, BN_CLICKED), NULL);
 
 		return 0;
 		
@@ -907,16 +914,13 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 		}
 
-		//if(h_get_pic_thread==NULL)
-		//{
-		//	if(Device_Basic_Setting.reg.sd_exist)
-		//		h_get_pic_thread =CreateThread(NULL,NULL,GetPictureThread,this,NULL, NULL);
-		//}
-
+		PostMessage(WM_COMMAND, MAKEWPARAM(IDC_WEBVIEW_BUTTON, BN_CLICKED), NULL);
+#if 0
 		if(h_read_screenlabel_thread==NULL)
 		{
 			h_read_screenlabel_thread =CreateThread(NULL,NULL,ReadScreenThreadfun,this,NULL, NULL);
 		}
+#endif
 		*pResult = 0;
 		return;
 	}
@@ -1921,8 +1925,23 @@ void BacnetScreen::OnBnClickedClearScreenData()
 	}
 }
 
+DWORD WINAPI  BacnetScreen::CreateWebServerThreadfun(LPVOID lpVoid)
+{
+	BacnetScreen* pParent = (BacnetScreen*)lpVoid;
+	webview_run_server();
+	h_create_webview_server_thread = NULL;
+	return 0;
+
+}
+
 void BacnetScreen::OnBnClickedWebViewShow()
 {
+	// This thread will not exit when it is running properly, and will exit if run_server executes abnormally, terminating the thread.
+	if (h_create_webview_server_thread == NULL)
+	{
+		h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
+	}
+
 	int nret = CheckOldGraphic();
 	if (nret == 0)
 	{
@@ -1960,7 +1979,12 @@ void BacnetScreen::OnBnClickedWebViewShow()
 	int read_ret = Read_Struct_Data();
 	if (read_ret <= 0)
 	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
+		if (read_ret == -2)
+		{
+		    SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data success! The data length is 0 ."));
+		}
+		else 
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
 	}
 	else
 	{
@@ -1969,16 +1993,14 @@ void BacnetScreen::OnBnClickedWebViewShow()
 #endif
 	}
 
-	//if (h_create_webview_server_thread == NULL)
-	//{
-	//	h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
-	//}
+	Unreg_Hotkey();
 	LoadOnlinePanelData();
-	Sleep(1000);
+	Sleep(200);
 
 	const TCHAR szFilter[] = _T("HTML File (*.html)|*.html");
 
 	{
+
 		CString webviewUrl = _T("http://localhost:9103/");
 		CString webviewTitle = _T("HVAC Drawer");
 		
@@ -2081,7 +2103,7 @@ int  BacnetScreen::Read_Struct_Data()
 			{
 				Mession_ret.Format(_T("Read webview data from %d to %d timeout."), start_index, end_temp_instance);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
-				return -2;
+				return -3;
 			}
 
 		}
