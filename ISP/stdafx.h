@@ -63,8 +63,8 @@ INPUT int write_multi_by_tcp(unsigned char device_var,unsigned char *to_write,un
 INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 INPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudrate = 0);
 //INPUT bool open_com(unsigned char m_com);
-INPUT bool open_com(int m_com);
-
+//INPUT bool open_com(int m_com);
+INPUT bool open_com(int m_com, unsigned char com_data_bit = 8, unsigned char com_stop_bit = ONESTOPBIT, unsigned char com_parity_bit = NOPARITY);
 INPUT void close_com();
 INPUT bool is_connect();
 //INPUT bool open_com_for_Command(unsigned char m_com);

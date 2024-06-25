@@ -1,7 +1,7 @@
 #pragma once
 #include "afxwin.h"
 
-
+#include "MainFrm.h"
 
 // T3000_Default_MainView form view
 
@@ -67,6 +67,7 @@ public:
     afx_msg void OnCbnSelchangeBaudratecombo();
     afx_msg void OnEnKillfocusEditDeadMaster();
 	afx_msg void OnCbnSelchangeParity_bitcombo();
+	void UpdateDeviceDB(tree_product temp_tree_product);
 };
 
 

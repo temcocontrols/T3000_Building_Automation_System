@@ -1543,6 +1543,7 @@
 #define IDC_STATIC_INPUT_ANALOG_UNITS   1665
 #define IDC_STATIC_PERSENT              1667
 #define IDC_LIST_BAC_WEEKLY             1668
+#define IDC_STATIC_PERSENT2             1668
 #define IDC_LIST_BAC_ANNULE_LIST        1669
 #define IDC_LIST_SCHEDULE_TIME          1670
 #define IDC_DATETIMEPICKER1_SCHEDUAL    1671
@@ -2747,10 +2748,15 @@
 #define IDC_STATIC_OUT_CURRENT_H        2674
 #define IDC_STATIC_AFS_DEW_VALUE2       2674
 #define IDC_STATIC_OUT_VOLTAGE_H        2675
+#define IDC_STATIC_AFS_ENTHALPY_VALUE4  2675
 #define IDC_STATIC_OUT_CURRENT_T        2676
+#define IDC_STATIC_AFS_DEW_VALUE3       2676
 #define IDC_STATIC_OUT_VOLTAGE_T        2677
+#define IDC_STATIC_PLC_C1_VALUE1        2677
 #define IDC_EDIT_VOLATGE_MIN_T          2678
+#define IDC_STATIC_PLC_C2_VALUE2        2678
 #define IDC_EDIT_VOLATGE_MAX_T          2679
+#define IDC_STATIC_PLC_C3_VALUE3        2679
 #define IDC_EDIT_CURRENT_MIN_T          2680
 #define IDC_EDIT_CURRENT_MAX_T          2681
 #define IDC_EDIT_MIN_T                  2682
@@ -2807,6 +2813,24 @@
 #define IDC_STATIC_AFS_ENTHALPY         2734
 #define IDC_STATIC_AFS_ABS              2735
 #define IDC_STATIC_AFS_REAL             2736
+#define IDC_STATIC_AFS_HUM_VALUE2       2737
+#define IDC_STATIC_AFS_RANGE2           2738
+#define IDC_STATIC_AFS_ABS_VALUE2       2739
+#define IDC_STATIC_AFS_KGM4             2740
+#define IDC_STATIC_AFS_GROUP_TEMP2      2741
+#define IDC_STATIC_AFS_TEMP_DEGC2       2742
+#define IDC_STATIC_AFS_DEGC2            2743
+#define IDC_STATIC_AFS_TEMP_DEGF2       2744
+#define IDC_STATIC_AFS_DEGF2            2745
+#define IDC_STATIC_AFS_DEW2             2746
+#define IDC_STATIC_AFS_ENTHALPY2        2747
+#define IDC_STATIC_AFS_ABS2             2748
+#define IDC_STATIC_AFS_REAL2            2749
+#define IDC_STATIC_C1                   2750
+#define IDC_STATIC_C2                   2751
+#define IDC_STATIC_C3                   2752
+#define IDC_STATIC_PLC_T                2753
+#define IDC_STATIC_PLC_GROUP_T          2753
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3389,7 +3413,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        804
 #define _APS_NEXT_COMMAND_VALUE         34091
-#define _APS_NEXT_CONTROL_VALUE         2734
+#define _APS_NEXT_CONTROL_VALUE         2751
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

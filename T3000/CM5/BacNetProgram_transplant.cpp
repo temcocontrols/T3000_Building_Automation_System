@@ -1111,6 +1111,7 @@ struct func_table {
  "MB_BLOCKREAD",MB_BR,
  "MB_BLOCKWRITE",MB_BW,
  "MB_BWCOIL",MB_BW_COIL,
+ "PVAR",PVAR,
  "",ENDPRG
  };
 
@@ -3200,6 +3201,7 @@ void parse_atom( float  *value )
 				 case MB_BR:
 				 case MB_BW:
 				 case MB_BW_COIL:
+				 case PVAR:
 				 case COM_1:
 							  {
 								 char eoiold = eoi;
@@ -6688,6 +6690,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				 case MB_BR:
 				 case MB_BW:
 				 case MB_BW_COIL:
+				 case PVAR:
 								cod_line[Byte++]=op[i++];
 								cod_line[Byte++]=op[i];
 								break;
@@ -8035,6 +8038,7 @@ int	desexpr(void)
 				 case MB_BR:
 				 case MB_BW:
 				 case MB_BW_COIL:
+				 case PVAR:
 				 case INKEYD:
 				 case	OUTPUTD:
 				 case PIDPROP:
@@ -8046,8 +8050,11 @@ int	desexpr(void)
 				         {
 								par=0;
 								//if (*(code-1)==AVG || *(code-1)==MIN || *(code-1)==MAX  || *(code-1)==COM_1)
-								if (*(code - 1) == AVG || *(code - 1) == MIN || *(code - 1) == MAX || *(code - 1) == COM_1 || 
-									((unsigned char)*(code - 1)) == MB_BR || ((unsigned char)*(code - 1)) == MB_BW || ((unsigned char)*(code - 1)) == MB_BW_COIL)
+								if ( *(code - 1) == AVG || *(code - 1) == MIN || *(code - 1) == MAX || *(code - 1) == COM_1 ||
+									((unsigned char)*(code - 1)) == MB_BR || 
+									((unsigned char)*(code - 1)) == MB_BW || 
+									((unsigned char)*(code - 1)) == MB_BW_COIL ||
+									((unsigned char)*(code - 1)) == PVAR)
 								{
 										 i = *(code-1);
 										 n = (unsigned char)*code++;

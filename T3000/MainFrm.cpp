@@ -3531,7 +3531,20 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
     g_CommunicationType = 0;
     SetCommunicationType(g_CommunicationType);
     int nCom = tree_node.ncomport;
-    open_com(nCom);//open*************************************
+    if (tree_node.m_ext_info.special_com_communicate == 1)
+    {
+        if (tree_node.m_ext_info.com_data_bit == 0)
+            tree_node.m_ext_info.com_data_bit = 8;
+        if (tree_node.m_ext_info.com_stop_bit == 0)
+            tree_node.m_ext_info.com_stop_bit = ONESTOPBIT;
+        if (tree_node.m_ext_info.com_parity_bit == 0)
+            tree_node.m_ext_info.com_parity_bit = NOPARITY;
+		open_com(nCom,tree_node.m_ext_info.com_data_bit, tree_node.m_ext_info.com_stop_bit, tree_node.m_ext_info.com_parity_bit);//open special type com port
+    }
+    else
+    {
+        open_com(nCom);//open*************************************
+    }
     if(!is_connect())
     {
         strInfo.Format(_T("COM %d : Not available "), nCom);
@@ -6791,7 +6804,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
         subID
 		);
 
-
+    KillTimer(FOR_LAST_VIEW_TIMER); //如果已经点击了设备，就尊重客户的新操作，不用在去连接上次的连接;
 
     CString g_strT3000LogString;
     no_mouse_keyboard_event_enable_refresh = false;
@@ -11692,7 +11705,6 @@ void CMainFrame::OnControlInputs()
 {
 #if 0
 //    m_testtoolbar.RemoveAllButtons();
-   // CMFCToolBar::ResetAllImages();
 
     CMFCPopupMenu::SetForceMenuFocus(FALSE);
     CMFCToolBar::SetSizes(CSize(32, 32), CSize(32, 32));
@@ -11764,6 +11776,7 @@ void CMainFrame::OnControlInputs()
                   || (bacnet_device_type == PM_TSTAT_AQ)
                   || (bacnet_device_type == PM_AIRLAB_ESP32)
                   || (bacnet_device_type == PM_T36CTA)
+                  || (bacnet_device_type == PM_T332AI_ARM)
 				  || (bacnet_device_type == PWM_TRANSDUCER)) 
                   || (product_type == PM_MULTI_SENSOR)
                   || (product_type == PM_TSTAT_AQ)
@@ -14670,6 +14683,7 @@ BOOL CMainFrame::OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult)
             {
                 pTTT->lpszText = _T("Refresh Data");
             }
+            
             pTTT->hinst = AfxGetResourceHandle();
         }
     }

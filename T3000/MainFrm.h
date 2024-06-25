@@ -128,7 +128,7 @@ typedef struct ext_info
 	int special_com_communicate;  //取值  1  客户自定义的串口 停止位 校验位之类的;
 	unsigned char com_data_bit;   //取值  -1 为不可用    5  6 7 8
 	unsigned char com_stop_bit;   //取值  -1 为不可用    1   1.5   2
-	unsigned char com_parity_bit;  //取值  -1 为不可用  0:None  1:odd    2:Even    3: Mark     4:Space
+	unsigned char com_parity_bit;  //取值  -1 为不可用  0:None  1:odd    2:Even   
 
 };
 

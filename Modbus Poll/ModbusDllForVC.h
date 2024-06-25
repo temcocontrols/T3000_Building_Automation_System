@@ -10,8 +10,8 @@ INPUT int Write_One_tap(unsigned char device_var,unsigned short address,unsigned
 INPUT int Read_One_tap(unsigned char device_var,unsigned short address);
 INPUT int write_multi_tap(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
-
-INPUT bool open_com(int m_com);
+INPUT bool open_com(int m_com, unsigned char com_data_bit = 8, unsigned char com_stop_bit = ONESTOPBIT, unsigned char com_parity_bit = NOPARITY);
+//INPUT bool open_com(int m_com);
 INPUT bool open_com_nocretical(int m_com);
 INPUT void close_com();
 INPUT bool is_connect();

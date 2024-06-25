@@ -26,6 +26,9 @@ extern TS_UC  serinumber_in_dll[4];//only read_one function ,when read 10,
 extern TS_UC  pval[13];//the data that send from com
 extern TS_UC  multi_read_val[256];//the register value is put into here,by multi_read function//the number must less 256
 static int baudrate_in_dll=0;
+static unsigned char com_data_bit_in_dll = 8;
+static unsigned char com_stop_bit_in_dll = ONESTOPBIT;
+static unsigned char com_parity_bit_in_dll = NOPARITY;
 static int open_com_port_number_in_dll=65535;
 static int old_or_new_scan_protocal_in_dll=1;//1==new protocal;2==old protocal
 extern 	SOCKET m_hSocket;
@@ -676,10 +679,11 @@ OUTPUT bool Change_BaudRate(int new_baudrate)
         if(successful==false)
             return false;
         //not to change the baudate
+
         PortDCB.BaudRate = new_baudrate; // baud//attention ,if it is wrong,can't write the com
-        PortDCB.ByteSize = 8;     // Number of bits/byte, 4-8 
-        PortDCB.Parity = NOPARITY; 
-        PortDCB.StopBits = ONESTOPBIT;  
+        PortDCB.ByteSize = com_data_bit_in_dll;// 8;     // Number of bits/byte, 4-8 
+        PortDCB.Parity = com_parity_bit_in_dll;// NOPARITY;
+        PortDCB.StopBits = com_stop_bit_in_dll;// ONESTOPBIT;
         successful=false;
         for(i=0;i<10;i++)
             if(SetCommState(m_hSerial, &PortDCB))
@@ -4977,14 +4981,16 @@ OUTPUT void SetComnicationHandle(int nType,HANDLE hCommunication)
 }
 
 
-OUTPUT bool open_com(int m_com)
+OUTPUT bool open_com(int m_com ,unsigned char com_data_bit,unsigned char com_stop_bit ,unsigned char com_parity_bit)
 {
     //open com ,if you want to open "com1",the m_com equal 0;if you want to open "com2",the m_com equal 1
     //you will get the handle to com,m_hSerial,is a extern variable
     //the return value ,true is ok,false is failure
-    if (open_com_port_number_in_dll == m_com)
+    if ((open_com_port_number_in_dll == m_com) && 
+        (com_data_bit_in_dll == com_data_bit ) &&
+        (com_stop_bit_in_dll == com_stop_bit) &&
+        (com_parity_bit_in_dll == com_parity_bit))
     {
-        //Change_BaudRate(19200);
         return true;///////////////////////////same com port ,opened by multi times,it's badly.
     }
     if (m_hSerial != NULL)
@@ -5044,9 +5050,9 @@ OUTPUT bool open_com(int m_com)
     }
     //not to change the baudate
     PortDCB.BaudRate = 19200; // baud//attention ,if it is wrong,can't write the com
-    PortDCB.ByteSize = 8;     // Number of bits/byte, 4-8
-    PortDCB.Parity = NOPARITY;
-    PortDCB.StopBits = ONESTOPBIT;
+    PortDCB.ByteSize = com_data_bit;// 8;     // Number of bits/byte, 4-8
+    PortDCB.Parity = com_parity_bit;// NOPARITY;
+    PortDCB.StopBits = com_stop_bit;// ONESTOPBIT;
     if (!SetCommState(m_hSerial, &PortDCB))
     {
         return false;
@@ -5074,8 +5080,10 @@ OUTPUT bool open_com(int m_com)
     }
     open_com_port_number_in_dll = m_com;
     baudrate_in_dll = 19200;
+    com_data_bit_in_dll = com_data_bit;
+    com_stop_bit_in_dll = com_stop_bit;
+    com_parity_bit_in_dll = com_parity_bit;
 
-    
     g_cs_com_section_mulwrite.Format(_T("MulWrite%u"), m_com);
     g_cs_com_section_read.Format(_T("Read%u"), m_com);
     return true;

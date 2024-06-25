@@ -31,8 +31,10 @@ public:
 	void ShowTempHumUI(bool show_window);
 	virtual void OnInitialUpdate();
 	void Fresh();
+	void EnablePLCUI(bool nflag);
 	void InitialUI();
 	void UpdateUserInterface();
+	void ShowTempHumUI_Part2(bool show_window);
     afx_msg	LRESULT UpdateUI(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnCbnSelchangeComboAirflowMode();
 	afx_msg void OnCbnSelchangeComboAirflowRange();
@@ -94,4 +96,15 @@ static DWORD WINAPI Update_Airflow_Thread(LPVOID lPvoid);
 #define MODBUS_OUTPUT_VOL				72
 #define MODBUS_FLOW_SHAPE				92
 #define MODBUS_FLOW_SHAPE_UNIT          93
+
+#define MODBUS_DEW_POINT2					48
+#define MODBUS_ENTHALPY2					49
+#define MODBUS_HUMI2					    79
+#define MODBUS_ABSOLUTE_HUMI2			43
+#define MODBUS_TEMPERATURE_C2           77
+#define MODBUS_TEMPERATURE_F2           78
+
+#define MODBUS_CHANNEL1_TEMP 45
+#define MODBUS_CHANNEL2_TEMP 46
+#define MODBUS_CHANNEL3_TEMP 47
 

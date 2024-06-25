@@ -149,18 +149,105 @@ LRESULT CAirFlowSensor::UpdateUI(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void CAirFlowSensor::ShowTempHumUI_Part2(bool show_window)
+{
+	GetDlgItem(IDC_STATIC_AFS_RANGE2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_DEW2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_DEW_VALUE3)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_ENTHALPY2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_ENTHALPY_VALUE4)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_ABS2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_ABS_VALUE2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_KGM4)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_REAL2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_HUM_VALUE2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_PERSENT2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_GROUP_TEMP2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_TEMP_DEGC2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_DEGC2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_TEMP_DEGF2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_DEGF2)->ShowWindow(show_window);
+
+	GetDlgItem(IDC_STATIC_PLC_GROUP_T)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_C1)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_PLC_C1_VALUE1)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_C2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_PLC_C2_VALUE2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_C3)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_PLC_C3_VALUE3)->ShowWindow(show_window);
+
+}
+
 void CAirFlowSensor::UpdateUserInterface()
 {
 	//如果硬件版本号小于6 就说明只有 AFS的传感器 否则的话需要显示温湿度的信息
 	//如果99 寄存器  为 0  就说明 没有温湿度传感器 就隐藏界面
-	if ((product_register_value[8] < 6) ||  (product_register_value[99] == 0))
+	if (product_register_value[95] == 1)
+	{
+		ShowTempHumUI(true);
+		ShowTempHumUI_Part2(TRUE);
+		CString temp_dew;
+		temp_dew.Format(_T("%.1f"), product_register_value[MODBUS_DEWPOINT] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_DEW_VALUE2)->SetWindowText(temp_dew);
+		CString temp_enthalpy;
+		temp_enthalpy.Format(_T("%.1f"), product_register_value[MODBUS_ENTHALPY] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_ENTHALPY_VALUE3)->SetWindowText(temp_enthalpy);
+		CString temp_hum;
+		temp_hum.Format(_T("%.1f"), product_register_value[MODBUS_HUMIDITY] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_HUM_VALUE)->SetWindowText(temp_hum);
+		CString temp_abs;
+		temp_abs.Format(_T("%.1f"), product_register_value[MODBUS_ABSOLUTE_HUMI] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_ABS_VALUE)->SetWindowText(temp_abs);
+
+		CString temp_temp_c;
+		temp_temp_c.Format(_T("%.1f"), product_register_value[MODBUS_TEMPERATURE_C] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_TEMP_DEGC)->SetWindowText(temp_temp_c);
+		CString temp_temp_f;
+		temp_temp_f.Format(_T("%.1f"), product_register_value[MODBUS_TEMPERATURE_F] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_TEMP_DEGF)->SetWindowText(temp_temp_f);
+
+
+
+		temp_dew.Format(_T("%.1f"), product_register_value[MODBUS_DEW_POINT2] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_DEW_VALUE3)->SetWindowText(temp_dew);
+
+		temp_enthalpy.Format(_T("%.1f"), product_register_value[MODBUS_ENTHALPY2] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_ENTHALPY_VALUE4)->SetWindowText(temp_enthalpy);
+
+		temp_hum.Format(_T("%.1f"), product_register_value[MODBUS_HUMI2] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_HUM_VALUE2)->SetWindowText(temp_hum);
+
+		temp_abs.Format(_T("%.1f"), product_register_value[MODBUS_ABSOLUTE_HUMI2] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_ABS_VALUE2)->SetWindowText(temp_abs);
+
+
+		temp_temp_c.Format(_T("%.1f"), product_register_value[MODBUS_TEMPERATURE_C2] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_TEMP_DEGC2)->SetWindowText(temp_temp_c);
+
+		temp_temp_f.Format(_T("%.1f"), product_register_value[MODBUS_TEMPERATURE_F2] / 10.0);
+		GetDlgItem(IDC_STATIC_AFS_TEMP_DEGF2)->SetWindowText(temp_temp_f);
+
+		CString temp_c1;
+		temp_c1.Format(_T("%.1f"), product_register_value[MODBUS_CHANNEL1_TEMP] / 10.0);
+		GetDlgItem(IDC_STATIC_PLC_C1_VALUE1)->SetWindowText(temp_c1);
+
+		CString temp_c2;
+		temp_c2.Format(_T("%.1f"), product_register_value[MODBUS_CHANNEL2_TEMP] / 10.0);
+		GetDlgItem(IDC_STATIC_PLC_C2_VALUE2)->SetWindowText(temp_c2);
+
+		CString temp_c3;
+		temp_c3.Format(_T("%.1f"), product_register_value[MODBUS_CHANNEL3_TEMP] / 10.0);
+		GetDlgItem(IDC_STATIC_PLC_C3_VALUE3)->SetWindowText(temp_c3);
+	}
+	else if ((product_register_value[8] < 6) ||  (product_register_value[99] == 0))
 	{
 		ShowTempHumUI(false);
+		ShowTempHumUI_Part2(false);
 	}
 	else
 	{
 		ShowTempHumUI(true);
-
+		ShowTempHumUI_Part2(false);
 		CString temp_dew;
 		temp_dew.Format(_T("%.1f"), product_register_value[MODBUS_DEWPOINT] / 10.0);
 		GetDlgItem(IDC_STATIC_AFS_DEW_VALUE2)->SetWindowText(temp_dew);
@@ -182,45 +269,52 @@ void CAirFlowSensor::UpdateUserInterface()
 		GetDlgItem(IDC_STATIC_AFS_TEMP_DEGF)->SetWindowText(temp_temp_f);
 	}
 
-	if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 0)
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(AirFlowMode[0]);
-	else if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 1)
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(AirFlowMode[1]);
-	else
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(_T(""));
-
-	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[1]);
-	else
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[0]);
-
-	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->EnableWindow(false);
-	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
+	//PLC 只有2个湿度传感器 和3 和温度传感器，没有任何输出;
+	if (product_register_value[95] == 1)
 	{
-		if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
+		EnablePLCUI(0); //如果是PLC的话，就Disable这些界面
+	}
+
+
+		if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 0)
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(AirFlowMode[0]);
+		else if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 1)
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(AirFlowMode[1]);
+		else
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(_T(""));
+
+		if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[1]);
+		else
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[0]);
+
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->EnableWindow(false);
+		if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
 		{
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange_SPD33[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
+			if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
+			{
+				((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange_SPD33[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
+			}
+			else
+				((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
 		}
 		else
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
-	}
-	else
-	{
-		if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
 		{
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange_SPD31[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
+			if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
+			{
+				((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange_SPD31[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
+			}
+			else
+				((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
+		}
+
+
+		if (product_register_value[MODBUS_FLOW_UNIT] < 3)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->SetWindowText(AirFlowUnit[product_register_value[MODBUS_FLOW_UNIT]]);
 		}
 		else
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
-	}
-
-	
-	if (product_register_value[MODBUS_FLOW_UNIT] < 3)
-	{
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->SetWindowText(AirFlowUnit[product_register_value[MODBUS_FLOW_UNIT]]);
-	}
-	else
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->SetWindowText(_T(""));
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->SetWindowText(_T(""));
 
 
 		CString cs_pressure_value;
@@ -231,7 +325,7 @@ void CAirFlowSensor::UpdateUserInterface()
 		cs_pressure_value.Format(_T("%d"), (short)product_register_value[MODBUS_DIFF_PRESSURE_VALUE]);
 		cs_length.Format(_T("%u"), product_register_value[MODBUS_FLOW_LENGTH]);
 		cs_width.Format(_T("%u"), product_register_value[MODBUS_FLOW_WIDTH]);
-		cs_speed.Format(_T("%.1f"), (float)product_register_value[MODBUS_FLOW_SPEED]/10.0);
+		cs_speed.Format(_T("%.1f"), (float)product_register_value[MODBUS_FLOW_SPEED] / 10.0);
 
 		unsigned int temp_flow_value;
 		temp_flow_value = product_register_value[MODBUS_FLOW_HI] * 65536 + product_register_value[MODBUS_FLOW_LO];
@@ -368,11 +462,41 @@ void CAirFlowSensor::UpdateUserInterface()
 			}
 		}
 
+
+	
+}
+
+void CAirFlowSensor::EnablePLCUI(bool nflag)
+{
+	GetDlgItem(IDC_COMBO_AIRFLOW_MODE)->EnableWindow(nflag);
+	GetDlgItem(IDC_COMBO_AIRFLOW_RANGE)->EnableWindow(nflag);
+		//GetDlgItem(IDC_COMBO_AIRFLOW_UNIT)->EnableWindow(nflag);
+		//GetDlgItem(IDC_EDIT_AIRFLOW_DIF_PRESSURE_VALUE)->EnableWindow(nflag);
+		//GetDlgItem(IDC_EDIT_AIRFLOW_DIF_LENGTH)->EnableWindow(nflag);
+		//GetDlgItem(IDC_EDIT_AIRFLOW_DIF_WIDTH)->EnableWindow(nflag);
+		//GetDlgItem(IDC_EDIT_AIRFLOW_SPEED)->EnableWindow(nflag);
+		//GetDlgItem(IDC_EDIT_AIRFLOW_VALUE)->EnableWindow(nflag);
+		//GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->EnableWindow(nflag);
+		//GetDlgItem(IDC_RADIO_CIRCULAR)->EnableWindow(nflag);
+		//GetDlgItem(IDC_RADIO_RECTANGULAR)->EnableWindow(nflag);
+		//GetDlgItem(IDC_RADIO_UNIT_M)->EnableWindow(nflag);
+		//GetDlgItem(IDC_RADIO_UNIT_IN)->EnableWindow(nflag);
+	GetDlgItem(IDC_RADIO_DEFAULT)->EnableWindow(nflag);
+	GetDlgItem(IDC_RADIO_USER_DEFINED)->EnableWindow(nflag);
+	GetDlgItem(IDC_EDIT_VOLATGE_MIN)->EnableWindow(nflag);
+	GetDlgItem(IDC_EDIT_VOLATGE_MAX)->EnableWindow(nflag);
+	GetDlgItem(IDC_EDIT_CURRENT_MIN)->EnableWindow(nflag);
+	GetDlgItem(IDC_EDIT_CURRENT_MAX)->EnableWindow(nflag);
+	GetDlgItem(IDC_EDIT_PASCAL_MIN)->EnableWindow(nflag);
+	GetDlgItem(IDC_EDIT_PASCAL_MAX)->EnableWindow(nflag);
+	GetDlgItem(IDC_STATIC_OUT_CURRENT)->SetWindowText(_T(""));
+	GetDlgItem(IDC_STATIC_OUT_VOLTAGE)->SetWindowText(_T(""));
 }
 
 void CAirFlowSensor::Fresh()
 {
 	// TODO: 在此处添加实现代码.
+	EnablePLCUI(1);
 	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	pFrame->SetWindowTextW(cs_special_name + CurrentT3000Version);
 	InitialUI();
@@ -642,13 +766,12 @@ void CAirFlowSensor::OnPaint()
 	image.Load(show_duct_picture);
 	cx = image.GetWidth();
 	cy = image.GetHeight();
-
 	//获取Picture Control控件的大小  
 	GetDlgItem(IDC_STATIC_SHAPE)->GetWindowRect(&rect);
 	//将客户区选中到控件表示的矩形区域内  
 	ScreenToClient(&rect);
 	//窗口移动到控件表示的区域  
-	GetDlgItem(IDC_STATIC_SHAPE)->MoveWindow(rect.left, rect.top, cx/3, cy/3, TRUE);
+	GetDlgItem(IDC_STATIC_SHAPE)->MoveWindow(rect.left, rect.top, cx / 3, cy / 3, TRUE);
 	CWnd* pWnd = NULL;
 	pWnd = GetDlgItem(IDC_STATIC_SHAPE);
 	pWnd->GetClientRect(&rect);
@@ -657,8 +780,12 @@ void CAirFlowSensor::OnPaint()
 	image.Draw(pDc->m_hDC, rect);
 
 
-	if (product_register_value[MODBUS_FIRMWARE_VERSION] >= 25)
+
+
+	if ((product_register_value[MODBUS_FIRMWARE_VERSION] >= 25) && (product_register_value[95] != 1))
 	{
+
+
 		Pen* myRectangle_pen;
 		Graphics* mygraphics;
 		Pen* myRectangle_pen3;
@@ -918,9 +1045,10 @@ void CAirFlowSensor::OnPaint()
 		delete myRectangle_pen3;
 		delete myRectangle_pen4;
 		delete myRectangle_pen5;
+		
 	}
-
 	ReleaseDC(pDc);
+
 }
 
 

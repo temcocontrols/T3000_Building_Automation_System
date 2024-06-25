@@ -104,7 +104,7 @@ void CTstatAQ::PM2_5_Window(int nflag)
 {
     if (nflag == 0)
     {
-        m_airlab_list.ShowWindow(0);
+        //m_airlab_list.ShowWindow(0);  暂时所有产品都不显示，这个表格是鸡肋;
         GetDlgItem(IDC_RADIO_DEG_C)->EnableWindow(0);
         GetDlgItem(IDC_RADIO_DEG_F)->EnableWindow(0);
         GetDlgItem(IDC_BUTTON_HELP_WBGT)->EnableWindow(0);
@@ -121,12 +121,12 @@ void CTstatAQ::PM2_5_Window(int nflag)
     }
     else
     {
-        m_airlab_list.ShowWindow(0);
-        GetDlgItem(IDC_RADIO_DEG_C)->EnableWindow(0);
-        GetDlgItem(IDC_RADIO_DEG_F)->EnableWindow(0);
-        GetDlgItem(IDC_BUTTON_HELP_WBGT)->EnableWindow(0);
-        GetDlgItem(IDC_BUTTON_AIRLAB_PARAMETER)->EnableWindow(0);
-        GetDlgItem(IDC_BUTTON_AUTO_CAL)->EnableWindow(0);
+        //m_airlab_list.ShowWindow(0);
+        GetDlgItem(IDC_RADIO_DEG_C)->EnableWindow(1);
+        GetDlgItem(IDC_RADIO_DEG_F)->EnableWindow(1);
+        GetDlgItem(IDC_BUTTON_HELP_WBGT)->EnableWindow(1);
+        GetDlgItem(IDC_BUTTON_AIRLAB_PARAMETER)->EnableWindow(1);
+        GetDlgItem(IDC_BUTTON_AUTO_CAL)->EnableWindow(1);
     }
 }
 
@@ -205,7 +205,7 @@ void CTstatAQ::Fresh()
     HICON m_hIcon = ExtractIcon(AfxGetInstanceHandle(), sound_full_path,0);
     pWnd_sound_pic->ModifyStyle(0, SS_ICON | SS_CENTERIMAGE);
     pWnd_sound_pic->SetIcon(m_hIcon);
-
+    m_airlab_list.ShowWindow(0);
    
 
     if ((product_register_value[7] == PM_TSTAT_AQ) ||
