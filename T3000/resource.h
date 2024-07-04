@@ -2829,8 +2829,10 @@
 #define IDC_STATIC_C1                   2750
 #define IDC_STATIC_C2                   2751
 #define IDC_STATIC_C3                   2752
-#define IDC_STATIC_PLC_T                2753
 #define IDC_STATIC_PLC_GROUP_T          2753
+#define IDC_STATIC_AFS_DEGC_C1          2754
+#define IDC_STATIC_AFS_DEGC_C2          2755
+#define IDC_STATIC_AFS_DEGC_C3          2756
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998

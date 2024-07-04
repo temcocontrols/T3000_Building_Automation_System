@@ -2199,6 +2199,7 @@ bool b_stop_read_tstat_schedule = false;	//Èç¹û¶Áµ½¿ÕµÄtstat ¾Í²»Òª¼ÌĞø¶ÁÏÂÒ»¸öÁ
 CString Statuspanel;   //ÔÚ×´Ì¬À¸ÏÔÊ¾panel 2-3;
 
 CString g_cstring_ini_path;
+CString g_trendlog_ini_path; //Ã¿¸öĞòÁĞºÅµ¥¶ÀÒ»¸öÅäÖÃµµ£¬±ÜÃâÅäÖÃÎÄ¼ş¹ı´ó;
 unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
 int input_item_limit_count = BAC_INPUT_ITEM_COUNT;	//input list ÒªÏÔÊ¾¶àÉÙ¸öinput µÄ¸öÊı£¬ ²»ÊÇ¸ù¾İvector µÄsize À´ÅĞ¶Ï´óĞ¡;
 int output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;	//output list ÒªÏÔÊ¾¶àÉÙ¸öoutput µÄ¸öÊı£¬ ²»ÊÇ¸ù¾İvector µÄsize À´ÅĞ¶Ï´óĞ¡;

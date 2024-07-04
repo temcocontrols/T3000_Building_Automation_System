@@ -1370,8 +1370,8 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 				temp_monitor_digital_index.Format(_T("Digital_Index_%d"),monitor_list_line);
 				temp_operation_time.Format(_T("%u"),Device_Misc_Data.reg.operation_time[monitor_list_line]);
 				WritePrivateProfileString(temp_serial,temp_cs_modify_index,temp_operation_time,temp_db_ini_folder);
-				WritePrivateProfileString(temp_serial,temp_monitor_index,NULL,g_cstring_ini_path);
-				WritePrivateProfileString(temp_serial,temp_monitor_digital_index,NULL,g_cstring_ini_path);
+				WritePrivateProfileString(temp_serial,temp_monitor_index,NULL, g_trendlog_ini_path);
+				WritePrivateProfileString(temp_serial,temp_monitor_digital_index,NULL, g_trendlog_ini_path);
 			//}
 		}
 
@@ -1391,6 +1391,8 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 
 void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 {
+
+
 	memset(monitor_database_flag ,1,24);
 	if(IDYES != MessageBox(_T("Do you want to delete all device monitor data which saved in SD card?"),_T("Warning"),MB_YESNO))
 		return;
@@ -1402,6 +1404,8 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 		CString temp_monitor_digital_index;
 		temp_serial.Format(_T("%u"),g_selected_serialnumber);
 		WritePrivateProfileString(temp_serial,NULL,NULL,g_cstring_ini_path);
+		WritePrivateProfileString(temp_serial, NULL, NULL, g_trendlog_ini_path); //以后都存在单独的文件里面; 之前的配置文件只删除 不写入;
+		
 		//for (int i=0;i<12;i++)
 		//{
 		//	temp_monitor_index.Format(_T("Index_%d"),i);
@@ -1447,8 +1451,8 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteLocal()
 	CString temp_serial;
 	temp_serial.Format(_T("%u"),g_selected_serialnumber);
 	WritePrivateProfileString(temp_serial,NULL,NULL,g_cstring_ini_path);
-
-
+	WritePrivateProfileString(temp_serial, NULL, NULL, g_trendlog_ini_path); //以后都存在单独的文件里面; 之前的配置文件只删除 不写入;
+	
 
 	CString strSql;
 	CBADO monitor_bado;
@@ -1494,7 +1498,9 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 
 			WritePrivateProfileString(temp_serial,temp_monitor_index,NULL,g_cstring_ini_path);
 			WritePrivateProfileString(temp_serial,temp_monitor_digital_index,NULL,g_cstring_ini_path);
-
+			WritePrivateProfileString(temp_serial, temp_monitor_index, NULL, g_trendlog_ini_path);//以后都存在单独的文件里面; 之前的配置文件只删除 不写入;
+			WritePrivateProfileString(temp_serial, temp_monitor_digital_index, NULL, g_trendlog_ini_path);//以后都存在单独的文件里面; 之前的配置文件只删除 不写入;
+			
 
 
 			CString temp_cs_modify_index;
@@ -2329,7 +2335,7 @@ BOOL CBacnetMonitor::GetMonitorReadPackage(int digtal_or_analog,int nIndex)
         temp_monitor_index.Format(_T("Digital_Index_%d"), monitor_list_line);
 
     temp_serial.Format(_T("%u"), g_selected_serialnumber);
-    GetPrivateProfileString(temp_serial, temp_monitor_index, _T(""), ReadPackage.GetBuffer(GRAPHIC_MAX_PACKAGE * 2 + 100), GRAPHIC_MAX_PACKAGE *2 + 100, g_cstring_ini_path);
+    GetPrivateProfileString(temp_serial, temp_monitor_index, _T(""), ReadPackage.GetBuffer(GRAPHIC_MAX_PACKAGE * 2 + 100), GRAPHIC_MAX_PACKAGE *2 + 100, g_trendlog_ini_path);
     ReadPackage.ReleaseBuffer();
     if (ReadPackage.GetLength() != GRAPHIC_MAX_PACKAGE * 2)
         ReadPackage.Empty();
@@ -2341,7 +2347,7 @@ BOOL CBacnetMonitor::GetMonitorReadPackage(int digtal_or_analog,int nIndex)
         {
             ReadPackage = ReadPackage + temp1;
         }
-        WritePrivateProfileString(temp_serial, temp_monitor_index, ReadPackage, g_cstring_ini_path);
+        WritePrivateProfileString(temp_serial, temp_monitor_index, ReadPackage, g_trendlog_ini_path);
 
     }
 
@@ -2399,7 +2405,7 @@ void BitToString(int digtal_or_analog, int nIndex)
             WriteValue = WriteValue + TempChar;
         }
     }
-    WritePrivateProfileString(temp_serial, temp_monitor_index, WriteValue, g_cstring_ini_path);
+    WritePrivateProfileString(temp_serial, temp_monitor_index, WriteValue, g_trendlog_ini_path);
 
 }
 

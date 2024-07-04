@@ -3277,6 +3277,7 @@ void CDialogCM5_BacNet::Fresh()
 {
     //SEND_COMMAND_DELAY_TIME = 1000; //测试
 
+
     str_bacnet_rp_info temp_test2;
 	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 
@@ -3302,6 +3303,10 @@ void CDialogCM5_BacNet::Fresh()
 	CheckDeviceCountTable(g_selected_serialnumber, selected_product_Node.object_instance);
     load_prg_cache_ret = LoadBacnetBinaryFile(false, achive_file_path);
 
+	g_trendlog_ini_path = g_achive_folder_temp_db;
+	CString cs_serial_number;
+	cs_serial_number.Format(_T("\\%u"), g_selected_serialnumber);
+	g_trendlog_ini_path = g_trendlog_ini_path + cs_serial_number +_T(".ini");
 
 //	g_NEED_MULTI_READ = FALSE;
 	already_retry = false;

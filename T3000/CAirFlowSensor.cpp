@@ -149,6 +149,19 @@ LRESULT CAirFlowSensor::UpdateUI(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void CAirFlowSensor::EnablePressureUI(bool enable_window)
+{
+	GetDlgItem(IDC_RADIO_CIRCULAR)->EnableWindow(enable_window);
+	GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->EnableWindow(enable_window);
+	GetDlgItem(IDC_RADIO_RECTANGULAR)->EnableWindow(enable_window);
+	GetDlgItem(IDC_EDIT_AIRFLOW_DIF_LENGTH)->EnableWindow(enable_window);
+	GetDlgItem(IDC_EDIT_AIRFLOW_DIF_WIDTH)->EnableWindow(enable_window);
+	GetDlgItem(IDC_RADIO_UNIT_M)->EnableWindow(enable_window);
+	GetDlgItem(IDC_RADIO_UNIT_IN)->EnableWindow(enable_window);
+
+	GetDlgItem(IDC_COMBO_AIRFLOW_UNIT)->EnableWindow(enable_window);
+}
+
 void CAirFlowSensor::ShowTempHumUI_Part2(bool show_window)
 {
 	GetDlgItem(IDC_STATIC_AFS_RANGE2)->ShowWindow(show_window);
@@ -175,11 +188,15 @@ void CAirFlowSensor::ShowTempHumUI_Part2(bool show_window)
 	GetDlgItem(IDC_STATIC_PLC_C2_VALUE2)->ShowWindow(show_window);
 	GetDlgItem(IDC_STATIC_C3)->ShowWindow(show_window);
 	GetDlgItem(IDC_STATIC_PLC_C3_VALUE3)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_DEGC_C1)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_DEGC_C2)->ShowWindow(show_window);
+	GetDlgItem(IDC_STATIC_AFS_DEGC_C3)->ShowWindow(show_window);
 
 }
 
 void CAirFlowSensor::UpdateUserInterface()
 {
+	EnablePressureUI(true);
 	//如果硬件版本号小于6 就说明只有 AFS的传感器 否则的话需要显示温湿度的信息
 	//如果99 寄存器  为 0  就说明 没有温湿度传感器 就隐藏界面
 	if (product_register_value[95] == 1)
@@ -276,6 +293,45 @@ void CAirFlowSensor::UpdateUserInterface()
 	}
 
 
+	if (product_register_value[MODBUS_FLOW_SHAPE] == 1) //The shape of the channel, 0: square; 1: round
+	{
+		((CButton*)GetDlgItem(IDC_RADIO_CIRCULAR))->SetCheck(1);
+		((CButton*)GetDlgItem(IDC_RADIO_RECTANGULAR))->SetCheck(0);
+		m_shape_type = 1;
+		show_duct_picture = png_airflow_shape_cylinder;
+		GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->EnableWindow(true);
+		GetDlgItem(IDC_EDIT_AIRFLOW_DIF_LENGTH)->EnableWindow(false);
+		GetDlgItem(IDC_EDIT_AIRFLOW_DIF_WIDTH)->EnableWindow(false);
+	}
+	else
+	{
+		((CButton*)GetDlgItem(IDC_RADIO_CIRCULAR))->SetCheck(0);
+		((CButton*)GetDlgItem(IDC_RADIO_RECTANGULAR))->SetCheck(1);
+		m_shape_type = 0;
+		show_duct_picture = png_airflow_shape_rectangular;
+
+		GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->EnableWindow(false);
+		GetDlgItem(IDC_EDIT_AIRFLOW_DIF_LENGTH)->EnableWindow(true);
+		GetDlgItem(IDC_EDIT_AIRFLOW_DIF_WIDTH)->EnableWindow(true);
+	}
+
+	if (product_register_value[MODBUS_FLOW_SHAPE_UNIT] == 1)
+	{
+		((CButton*)GetDlgItem(IDC_RADIO_UNIT_M))->SetCheck(0);
+		((CButton*)GetDlgItem(IDC_RADIO_UNIT_IN))->SetCheck(1);
+		GetDlgItem(IDC_STATIC_CIRCULAR_UNIT)->SetWindowText(_T("inch"));
+		GetDlgItem(IDC_STATIC_RECTANGULAR_UNIT_LENGTH)->SetWindowText(_T("inch"));
+		GetDlgItem(IDC_STATIC_RECTANGULAR_UNIT_WIDTH)->SetWindowText(_T("inch"));
+	}
+	else
+	{
+		((CButton*)GetDlgItem(IDC_RADIO_UNIT_M))->SetCheck(1);
+		((CButton*)GetDlgItem(IDC_RADIO_UNIT_IN))->SetCheck(0);
+		GetDlgItem(IDC_STATIC_CIRCULAR_UNIT)->SetWindowText(_T("cm"));
+		GetDlgItem(IDC_STATIC_RECTANGULAR_UNIT_LENGTH)->SetWindowText(_T("cm"));
+		GetDlgItem(IDC_STATIC_RECTANGULAR_UNIT_WIDTH)->SetWindowText(_T("cm"));
+	}
+
 		if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 0)
 			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(AirFlowMode[0]);
 		else if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 1)
@@ -285,6 +341,27 @@ void CAirFlowSensor::UpdateUserInterface()
 
 		if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
 			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[1]);
+		else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP0)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[2]);
+		}
+		else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP1)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[3]);
+		}
+		else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP2)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[4]);
+		}
+		else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP3)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[5]);
+		}
+		else if (product_register_value[MODBUS_SENSOR_TYPE] == NO_PRESSURE_SENSOR)
+		{
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[6]);
+			EnablePressureUI(false);
+		}
 		else
 			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[0]);
 
@@ -341,44 +418,6 @@ void CAirFlowSensor::UpdateUserInterface()
 		temp_radius.Format(_T("%u"), product_register_value[MODBUS_FLOW_RADIUS]);
 		GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->SetWindowText(temp_radius);
 
-		if (product_register_value[MODBUS_FLOW_SHAPE] == 1) //The shape of the channel, 0: square; 1: round
-		{
-			((CButton*)GetDlgItem(IDC_RADIO_CIRCULAR))->SetCheck(1);
-			((CButton*)GetDlgItem(IDC_RADIO_RECTANGULAR))->SetCheck(0);
-			m_shape_type = 1;
-			show_duct_picture = png_airflow_shape_cylinder;
-			GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->EnableWindow(true);
-			GetDlgItem(IDC_EDIT_AIRFLOW_DIF_LENGTH)->EnableWindow(false);
-			GetDlgItem(IDC_EDIT_AIRFLOW_DIF_WIDTH)->EnableWindow(false);
-		}
-		else
-		{
-			((CButton*)GetDlgItem(IDC_RADIO_CIRCULAR))->SetCheck(0);
-			((CButton*)GetDlgItem(IDC_RADIO_RECTANGULAR))->SetCheck(1);
-			m_shape_type = 0;
-			show_duct_picture = png_airflow_shape_rectangular;
-
-			GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->EnableWindow(false);
-			GetDlgItem(IDC_EDIT_AIRFLOW_DIF_LENGTH)->EnableWindow(true);
-			GetDlgItem(IDC_EDIT_AIRFLOW_DIF_WIDTH)->EnableWindow(true);
-		}
-
-		if (product_register_value[MODBUS_FLOW_SHAPE_UNIT] == 1)
-		{
-			((CButton*)GetDlgItem(IDC_RADIO_UNIT_M))->SetCheck(0);
-			((CButton*)GetDlgItem(IDC_RADIO_UNIT_IN))->SetCheck(1);
-			GetDlgItem(IDC_STATIC_CIRCULAR_UNIT)->SetWindowText(_T("inch"));
-			GetDlgItem(IDC_STATIC_RECTANGULAR_UNIT_LENGTH)->SetWindowText(_T("inch"));
-			GetDlgItem(IDC_STATIC_RECTANGULAR_UNIT_WIDTH)->SetWindowText(_T("inch"));
-		}
-		else
-		{
-			((CButton*)GetDlgItem(IDC_RADIO_UNIT_M))->SetCheck(1);
-			((CButton*)GetDlgItem(IDC_RADIO_UNIT_IN))->SetCheck(0);
-			GetDlgItem(IDC_STATIC_CIRCULAR_UNIT)->SetWindowText(_T("cm"));
-			GetDlgItem(IDC_STATIC_RECTANGULAR_UNIT_LENGTH)->SetWindowText(_T("cm"));
-			GetDlgItem(IDC_STATIC_RECTANGULAR_UNIT_WIDTH)->SetWindowText(_T("cm"));
-		}
 
 
 		if (product_register_value[MODBUS_FIRMWARE_VERSION] < 25)
@@ -1364,11 +1403,31 @@ void CAirFlowSensor::OnCbnSelchangeComboAirflowSensorType()
 
 	if (temp_string.CompareNoCase(AirFlowSensorType[0]) == 0)
 	{
-		n_value = 60;
+		n_value = SENSOR_SPD31;
 	}
 	else if (temp_string.CompareNoCase(AirFlowSensorType[1]) == 0)
 	{
-		n_value = 20;
+		n_value = SENSOR_SPD33;
+	}
+	else if (temp_string.CompareNoCase(AirFlowSensorType[2]) == 0)
+	{
+		n_value = XGZP0;
+	}
+	else if (temp_string.CompareNoCase(AirFlowSensorType[3]) == 0)
+	{
+		n_value = XGZP1;
+	}
+	else if (temp_string.CompareNoCase(AirFlowSensorType[4]) == 0)
+	{
+		n_value = XGZP2;
+	}
+	else if (temp_string.CompareNoCase(AirFlowSensorType[5]) == 0)
+	{
+		n_value = XGZP3;
+	}
+	else if (temp_string.CompareNoCase(AirFlowSensorType[6]) == 0)
+	{
+		n_value = NO_PRESSURE_SENSOR;
 	}
 
 	if (write_one(g_tstat_id, MODBUS_SENSOR_TYPE, n_value) > 0)

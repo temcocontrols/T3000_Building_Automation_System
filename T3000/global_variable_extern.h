@@ -1225,6 +1225,7 @@ extern vector <IspModeInfo> g_isp_device_info;
 extern IspModeInfo need_isp_device;
 extern vector<Registers_Infor> g_vectRegisters;
 extern CString g_cstring_ini_path;
+extern CString g_trendlog_ini_path; //每个序列号单独一个配置档，避免配置文件过大;
 extern unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
 extern BOOL g_fresh_Graphic;
 extern bool b_stop_read_grp_label;		//如果读到空的grp label 就不要继续读下一个了;

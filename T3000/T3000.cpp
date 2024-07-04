@@ -15,7 +15,7 @@
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
 #include <windows.h>  
  
-const unsigned int g_versionNO = 20240624;  // PROJECT_VERSION;
+const unsigned int g_versionNO = 20240704;  // PROJECT_VERSION;
 
 
 #ifdef _DEBUG
@@ -313,6 +313,7 @@ BOOL CT3000App::InitInstance()
 			g_achive_folder_temp_txt = g_achive_folder + _T("\\") + _T("prg_txt_file");
 			g_achive_folder_temp_db = g_achive_folder + _T("\\") + _T("MonitorDatabaseFolder");
 			g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
+			g_trendlog_ini_path = g_achive_folder_temp_db;
 			
 			// Use CIniFile to read and write .ini files
 			CIniFile monitorindexfile(g_cstring_ini_path);

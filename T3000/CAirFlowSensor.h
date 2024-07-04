@@ -35,6 +35,7 @@ public:
 	void InitialUI();
 	void UpdateUserInterface();
 	void ShowTempHumUI_Part2(bool show_window);
+	void EnablePressureUI(bool enable_window);
     afx_msg	LRESULT UpdateUI(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnCbnSelchangeComboAirflowMode();
 	afx_msg void OnCbnSelchangeComboAirflowRange();
@@ -66,6 +67,12 @@ static DWORD WINAPI Update_Airflow_Thread(LPVOID lPvoid);
 
 #define SENSOR_SPD31   60
 #define SENSOR_SPD33   20
+#define XGZP0  10
+#define XGZP1  11
+#define XGZP2  12
+#define XGZP3  13
+#define NO_PRESSURE_SENSOR 0
+
 
 #define MODBUS_FIRMWARE_VERSION         4
 #define MODBUS_SWITCH_OUTPUT_MODE       17

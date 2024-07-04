@@ -1056,7 +1056,12 @@ const CString AirFlowMode[] =
 const CString AirFlowSensorType[] =
 {
 	_T("SPD31"),  //value 60
-	_T("SPD33")   //value 20
+	_T("SPD33"),   //value 20
+	_T("XGZP0"), // 10
+	_T("XGZP1"), // 11
+	_T("XGZP2"), // 12
+	_T("XGZP3"), // 13
+	_T("No Pressure Sensor")  //  0
 };
 
 const CString AirFlowRange_SPD31[] =
