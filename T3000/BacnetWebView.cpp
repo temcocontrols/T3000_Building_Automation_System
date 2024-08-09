@@ -1197,8 +1197,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 		m_webView->PostWebMessageAsJson(temp_cs);
 
-		// Temporary disabled until we fix it
-		/*
+
 		JsonDataToStruct(file_output);
 		bool zip_ret = ZipSingleItem(des_file_zip,des_file);
 		if (!zip_ret)
@@ -1211,7 +1210,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 		}
 		Sleep(1);
 		save_button_click = 1;
-		*/
 #if 0
 		nlohmann::json jsonData = nlohmann::json::parse(file_output);
 		Str_Json Str_MyJson(jsonData);
@@ -2059,6 +2057,7 @@ void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsign
 
 int webview_run_server() {
 	
+
 	RustError result = run_server();
 	if (result != RustError::Ok) {
 		//暂时屏蔽下面的消息，避免不需要使用webview的客户 在一些情况下看到这个失败的消息。

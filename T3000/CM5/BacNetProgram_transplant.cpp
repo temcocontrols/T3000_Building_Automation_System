@@ -1112,6 +1112,8 @@ struct func_table {
  "MB_BLOCKWRITE",MB_BW,
  "MB_BWCOIL",MB_BW_COIL,
  "PVAR",PVAR,
+ "SIN",SIN,
+ "COS",COS,
  "",ENDPRG
  };
 
@@ -3163,6 +3165,8 @@ void parse_atom( float  *value )
 			 switch (ftok) 
 			 {
 				 case ABS:
+				 case SIN:
+				 case COS:
 				 case _INT:
 				 case LN:
 				 case LN_1:
@@ -6595,6 +6599,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				 case NOT:
 				 case MINUSUNAR:
 				 case ABS:
+				 case SIN:
+				 case COS:
 				 case INKEYD:
 				 case OUTPUTD:
 				 case _INT:
@@ -7961,6 +7967,8 @@ int	desexpr(void)
 							 par=0;
 							 break;
 				 case ABS:
+				 case SIN:
+				 case COS:
 				 case SENSOR_ON:
 				 case SENSOR_OFF:
 				 case _INT:
