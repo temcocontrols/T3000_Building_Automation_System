@@ -129,21 +129,18 @@ DWORD WINAPI  CBacnetRegisterListView::ReadRegDataThreadfun(LPVOID lpVoid)
 
 BOOL CBacnetRegisterListView::OnInitDialog()
 {
-    CDialogEx::OnInitDialog();
-    CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    m_third_db_path = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\ThirdPartyRegistersListDB.mdb");
-    InitialListData();
-    if (m_device_mode == 0)
-    {
-        if (h_read_reg_date_thread == NULL)
-        {
-            h_read_reg_date_thread = CreateThread(NULL, NULL, ReadRegDataThreadfun, this, NULL, NULL);
-        }
-    }
-
-
-    //Test_Read_Excel();
-    return TRUE;  // return TRUE unless you set the focus to a control
+	CDialogEx::OnInitDialog();
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	m_third_db_path = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\ThirdPartyRegistersListDB.mdb");
+	InitialListData();
+	if (m_device_mode == 0)
+	{
+		if (h_read_reg_date_thread == NULL)
+		{
+			h_read_reg_date_thread = CreateThread(NULL, NULL, ReadRegDataThreadfun, this, NULL, NULL);
+		}
+	}
+	return TRUE;  // return TRUE unless you set the focus to a control
 }
 
 

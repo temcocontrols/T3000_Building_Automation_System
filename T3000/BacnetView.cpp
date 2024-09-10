@@ -3477,8 +3477,6 @@ void CDialogCM5_BacNet::Fresh()
         if (read_rs485_thread != NULL)
         {
             return;
-            //TerminateThread(read_rs485_thread, 0);
-            //read_rs485_thread = NULL;
         }
         connect_way = 1;
 		if(read_rs485_thread == NULL)
@@ -3491,8 +3489,6 @@ void CDialogCM5_BacNet::Fresh()
         if (read_rs485_thread != NULL)
         {
             return;
-            //TerminateThread(read_rs485_thread, 0);
-            //read_rs485_thread = NULL;
         }
         connect_way = 2;
         if (read_rs485_thread == NULL)
@@ -3517,11 +3513,6 @@ void CDialogCM5_BacNet::Fresh()
 		BacNet_hwd = this->m_hWnd;
 		return;
 	}
-    //else if (selected_product_Node.protocol == PROTOCOL_BIP_TO_MSTP)
-    //{
-    //    BacNet_hwd = this->m_hWnd;
-    //    return;
-    //}
     else if (selected_product_Node.protocol == PROTOCOL_MSTP_TO_MODBUS)
     {
         BacNet_hwd = this->m_hWnd;
@@ -3962,43 +3953,13 @@ void CDialogCM5_BacNet::Fresh()
         {
             selected_product_Node.status_last_time[x] = false;//没有读到的话就将左边的list和状态都设置为false;
         }
-		//selected_product_Node.status_last_time[0] = false;//没有读到的话就将左边的list和状态都设置为false;
-		//selected_product_Node.status_last_time[1] = false;
-		//selected_product_Node.status_last_time[2] = false;
+
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,CONNECT_TO_MODBUS_FAILED,0);
 	}
 
 }
 
 
-
-
-
-
-
-
-
-//typedef struct BACnet_Object_Property_Value_Own {
-//	BACNET_OBJECT_TYPE object_type;
-//	uint32_t object_instance;
-//	BACNET_PROPERTY_ID object_property;
-//	uint32_t array_index;
-//	BACNET_APPLICATION_DATA_VALUE value;
-//	HTREEITEM t_PropertyChild;
-//} BACNET_OBJECT_PROPERTY_VALUE_Own;
-
-//typedef struct _DEVICE_INFO
-//{
-//	uint32_t i_device_id;
-//	uint32_t i_vendor_id;
-//	uint32_t i_mac;
-//	HTREEITEM t_DeviceChild;
-//	vector	<BACnet_Object_Property_Value_Own> my_Property_value;
-//
-//}DEVICE_INFO;
-
-
-//volatile struct mstp_port_struct_t MSTP_Port;
 static void Read_Properties(
     void)
 {
@@ -4134,15 +4095,6 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 	}
 	switch(command_type)
 	{
-	//case WM_COMMAND_WHO_IS:
-		//temp_cs.Format(_T("%d"),g_bac_instance);
-		//GetDlgItem(IDC_STATIC_CM_DEVICE_ID)->SetWindowTextW(temp_cs);
-		//temp_cs.Format(_T("%d"),g_mac);
-		//GetDlgItem(IDC_STATIC_CM5_MAC)->SetWindowTextW(temp_cs);
-		//Station_NUM = g_mac;
-
-		//break;
-
 	case MENU_CLICK:
         if ((User_Login_Window->IsWindowVisible()) && (lParam != BAC_READ_USER_LOGIN_INFO))
         {
@@ -4183,28 +4135,7 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 {
 	bac_read_which_list = read_list_type;
-#if 0
-	if(WaitDlg==NULL)
-	{
-			if(bac_read_which_list == BAC_READ_SVAE_CONFIG)
-			{
-				WaitDlg = new BacnetWait((int)BAC_WAIT_READ_DATA_WRITE_CONFIG);//如果是保存为ini文件 就要读取全部的data;
-			}
-			else
-			{
-				WaitDlg = new BacnetWait((int)BAC_WAIT_NORMAL_READ);
-			}
-			WaitDlg->Create(IDD_DIALOG_BACNET_WAIT,this);
-			WaitDlg->ShowWindow(SW_HIDE);
 
-            //2018 02 26 dufan 屏蔽  异常报错，这段应该没有用到.
-			//RECT RECT_SET1;
-			//GetClientRect(&RECT_SET1);
-			//ClientToScreen(&RECT_SET1);
-			//WaitDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20);		
-	}
-#endif
-	//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
     if (hwait_thread != NULL)
         TerminateThread(hwait_thread, 0);
 	hwait_thread =CreateThread(NULL,NULL,Send_read_Command_Thread,this,NULL, NULL);

@@ -412,140 +412,126 @@ void CT3000View::OnFileOpen()
 /// </summary>
 void CT3000View::Fresh()
 {
-    Tstat_Setpoint_data.clear();
+	Tstat_Setpoint_data.clear();
 
-    CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+	CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 
-    g_ifanStatus = product_register_value[MODBUS_FAN_SPEED];
-    g_NEED_MULTI_READ=TRUE;
-    int  Fresh_Min=(short)product_register_value[MODBUS_MIN_SETPOINT];
-    int Fresh_Max=(short)product_register_value[MODBUS_MAX_SETPOINT];
+	g_ifanStatus = product_register_value[MODBUS_FAN_SPEED];
+	g_NEED_MULTI_READ = TRUE;
+	int  Fresh_Min = (short)product_register_value[MODBUS_MIN_SETPOINT];
+	int Fresh_Max = (short)product_register_value[MODBUS_MAX_SETPOINT];
 	m_StartFirst = TRUE;
-    Initial_Max_Min();
-    /*
-    1>>input 1.....8
-    2>>output 11...88
-    */
-    int index;
+	Initial_Max_Min();
+	/*
+	1>>input 1.....8
+	2>>output 11...88
+	*/
+	int index;
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3Query q;
 	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-    if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
-    {
-        CString sql;
-        sql.Format(_T("Select * from Value_Range where SN=%d"),get_serialnumber());
-         q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+	if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
+	{
+		CString sql;
+		sql.Format(_T("Select * from Value_Range where SN=%d"), get_serialnumber());
+		q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-        if (!q.eof())//有表但是没有对应序列号的值
-        {
-             
-            while (!q.eof())
-            {
-                index=q.getIntField("CInputNo");
-                if (index>10)//说明是output
-                {
-                    index%=10;
-                    m_OutRanges[index]=q.getIntField("CRange");
-                }
-                else
-                {
-                    m_InRanges[index]=q.getIntField("CRange");
-                }
-                q.nextRow();
-            }
-        }
-       
-    }
+		if (!q.eof())//有表但是没有对应序列号的值
+		{
 
-   SqliteDBT3000.closedb();
+			while (!q.eof())
+			{
+				index = q.getIntField("CInputNo");
+				if (index > 10)//说明是output
+				{
+					index %= 10;
+					m_OutRanges[index] = q.getIntField("CRange");
+				}
+				else
+				{
+					m_InRanges[index] = q.getIntField("CRange");
+				}
+				q.nextRow();
+			}
+		}
 
+	}
 
-
-    if (is_connect())
-    {
-        GetDlgItem(IDC_FANSPEEDCOMBO)->EnableWindow(TRUE);
-        GetDlgItem(IDC_INPUT_MSFLEXGRID)->EnableWindow(TRUE);
-        GetDlgItem(IDC_OUTPUT_MSFLEXGRID)->EnableWindow(TRUE);
-    }
-    else
-    {
-        GetDlgItem(IDC_FANSPEEDCOMBO)->EnableWindow(FALSE);
-        GetDlgItem(IDC_INPUT_MSFLEXGRID)->EnableWindow(FALSE);
-        GetDlgItem(IDC_OUTPUT_MSFLEXGRID)->EnableWindow(FALSE);
-    }
-
-    CString strTemp;
-    strTemp.Format(_T("%d"),product_register_value[MODBUS_COOLING_PID]);		//104 384
-    strTemp+=_T("%");
-    GetDlgItem(IDC_OUTPUT1)->SetWindowText(strTemp);
-    strTemp.Format(_T("%d"),product_register_value[MODBUS_PID_UNIVERSAL]);		//270  389
-    strTemp+=_T("%");
-    GetDlgItem(IDC_OUTPUT2)->SetWindowText(strTemp);
-
-    strTemp.Format(_T("Max=%d"),Fresh_Max);
+	SqliteDBT3000.closedb();
 
 
- 
-    strTemp.Format(_T("Min=%d"),(short)Fresh_Min);
 
- 
-    strTemp.Format(_T("%d"),product_register_value[MODBUS_PIC_VERSION]);
-    GetDlgItem(IDC_PIC_EDIT)->SetWindowText(strTemp);
-    FreshCtrl();
-    FreshIOGridTable();
-    InitFanSpeed();
-    m_nID=product_register_value[6];
+	if (is_connect())
+	{
+		GetDlgItem(IDC_FANSPEEDCOMBO)->EnableWindow(TRUE);
+		GetDlgItem(IDC_INPUT_MSFLEXGRID)->EnableWindow(TRUE);
+		GetDlgItem(IDC_OUTPUT_MSFLEXGRID)->EnableWindow(TRUE);
+	}
+	else
+	{
+		GetDlgItem(IDC_FANSPEEDCOMBO)->EnableWindow(FALSE);
+		GetDlgItem(IDC_INPUT_MSFLEXGRID)->EnableWindow(FALSE);
+		GetDlgItem(IDC_OUTPUT_MSFLEXGRID)->EnableWindow(FALSE);
+	}
 
-	if (product_register_value[7] == PM_TSTAT5i || (  product_register_value[7] == PM_TSTAT8
-        || product_register_value[7] == PM_TSTAT9
+	CString strTemp;
+	strTemp.Format(_T("%d"), product_register_value[MODBUS_COOLING_PID]);		//104 384
+	strTemp += _T("%");
+	GetDlgItem(IDC_OUTPUT1)->SetWindowText(strTemp);
+	strTemp.Format(_T("%d"), product_register_value[MODBUS_PID_UNIVERSAL]);		//270  389
+	strTemp += _T("%");
+	GetDlgItem(IDC_OUTPUT2)->SetWindowText(strTemp);
+
+	strTemp.Format(_T("Max=%d"), Fresh_Max);
+
+
+
+	strTemp.Format(_T("Min=%d"), (short)Fresh_Min);
+
+
+	strTemp.Format(_T("%d"), product_register_value[MODBUS_PIC_VERSION]);
+	GetDlgItem(IDC_PIC_EDIT)->SetWindowText(strTemp);
+	FreshCtrl();
+	FreshIOGridTable();
+	InitFanSpeed();
+	m_nID = product_register_value[6];
+
+	if (product_register_value[7] == PM_TSTAT5i || (product_register_value[7] == PM_TSTAT8
+		|| product_register_value[7] == PM_TSTAT9
 		|| product_register_value[7] == PM_TSTAT8_WIFI
 		|| product_register_value[7] == PM_TSTAT8_OCC
 		|| product_register_value[7] == PM_TSTAT7_ARM
 		|| product_register_value[7] == PM_TSTAT8_220V) || product_register_value[7] == PM_TSTAT6 || product_register_value[7] == PM_TSTAT7)
-    {
-          GetDlgItem(IDC_GRAPGICBUTTON)->ShowWindow(SW_HIDE);
-//       //  GetDlgItem(IDC_PARAMETERBTN)->ShowWindow(SW_HIDE);
-//         GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_HIDE);
+	{
+		GetDlgItem(IDC_GRAPGICBUTTON)->ShowWindow(SW_HIDE);
+		//       //  GetDlgItem(IDC_PARAMETERBTN)->ShowWindow(SW_HIDE);
+		//         GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_HIDE);
 
-    }
-    else
-    {
-        GetDlgItem(IDC_GRAPGICBUTTON)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_PARAMETERBTN)->ShowWindow(SW_SHOW);
-        //GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_HIDE);  //杜帆添加 不懂为什么要用这玩意
-    } 
-    if (m_pFreshBackground==NULL)
-    {
-        m_pFreshBackground = AfxBeginThread(BackMainUIFresh,this);
-    }
+	}
+	else
+	{
+		GetDlgItem(IDC_GRAPGICBUTTON)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_PARAMETERBTN)->ShowWindow(SW_SHOW);
+		//GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_HIDE);  //杜帆添加 不懂为什么要用这玩意
+	}
+	if (m_pFreshBackground == NULL)
+	{
+		m_pFreshBackground = AfxBeginThread(BackMainUIFresh, this);
+	}
 
-    //if (product_register_value[11]!=0)
-    //{
-    //    m_isp.ShowWindow(TRUE);
-    //    CString StrTemp;
-    //    StrTemp = _T("Your device may be in ISP Model,Please check your device");
-    //    m_isp.SetWindowTextW(StrTemp);
-    //    m_isp.textColor(RGB(255,0,0));
-    //    //m_current_product.bkColor(RGB(255,255,255));
-    //    m_isp.setFont(30,10,NULL,_T("Arial"));
-    //}
-    //else
-    //{
-    //    m_isp.ShowWindow(FALSE);
-    //}
-    if (product_register_value[714]==0x56)
-    {
-        GetDlgItem(IDC_STATIC_NAME_TSTAT)->ShowWindow(TRUE);
-        GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(TRUE);
-        CString TstatName;
-        TstatName.Format(_T("%s%s"),GetTextFromReg(715),GetTextFromReg(719));
-        GetDlgItem(IDC_EDIT_TSTAT_NAME)->SetWindowText(TstatName);
-    }
-    else
-    {
-        GetDlgItem(IDC_STATIC_NAME_TSTAT)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(SW_HIDE);
-    }
+	if (product_register_value[714] == 0x56)
+	{
+		GetDlgItem(IDC_STATIC_NAME_TSTAT)->ShowWindow(TRUE);
+		GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(TRUE);
+		CString TstatName;
+		TstatName.Format(_T("%s%s"), GetTextFromReg(715), GetTextFromReg(719));
+		GetDlgItem(IDC_EDIT_TSTAT_NAME)->SetWindowText(TstatName);
+	}
+	else
+	{
+		GetDlgItem(IDC_STATIC_NAME_TSTAT)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(SW_HIDE);
+	}
 	CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
 	m_offline = GetPrivateProfileInt(_T("SliderUI"), _T("Online"), 0, g_configfile_path);
 	if (!m_offline)
@@ -554,16 +540,9 @@ void CT3000View::Fresh()
 	}
 
 
-    switch_product_last_view();
+	switch_product_last_view();
 }
 
-
-/// <summary>
-/// Fresh_T3000View
-/// <summary>
-/// Fresh the window
-/// </summary>
-/// </summary>
 void CT3000View::Fresh_T3000View()
 {
     int  Fresh_Min=(short)product_register_value[MODBUS_MIN_SETPOINT];

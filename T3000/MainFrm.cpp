@@ -2562,7 +2562,6 @@ void CMainFrame::ScanTstatInDB(void)
 		CString strSql;
  
         strSql.Format(_T("select * from Building where Default_SubBuilding=1"));
-        //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
         table = SqliteDB.getTable("select * from Building where Default_SubBuilding=1");
         int count =table.numRows(); //ado.m_pRecordset->GetRecordCount();
         _variant_t temp_variant;
@@ -7568,10 +7567,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Comport is 0,Error"));
                             m_pDialogInfo->ShowWindow(SW_SHOW);
                         }
-                        //                          while(m_pDialogInfo->IsWindowVisible()){
-                        //                              Sleep(50);
-                        //                              continue;
-                        //                          }
+
                         if (pDlg != NULL)
                         {
                             pDlg->ShowWindow(SW_HIDE);
@@ -7602,10 +7598,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(strTemp);
                             m_pDialogInfo->ShowWindow(SW_SHOW);
                         }
-                        //                         while(m_pDialogInfo->IsWindowVisible()){
-                        //                             Sleep(50);
-                        //                             continue;
-                        //                         }
+
                         if (pDlg != NULL)
                         {
                             pDlg->ShowWindow(SW_HIDE);
@@ -9882,43 +9875,6 @@ UINT _FreshTreeView(LPVOID pParam )
     refresh_tree_status_immediately = true;
     while(1)
     {
-#if 0
-		Sleep(10000);
-		HWND temp1_hwmd ;//= 0x000211F0;
-		HWND temp2_hwmd;
-		temp1_hwmd = FindWindowA(NULL,"十步一杀人，千里不留行 - 群(32984537)");
-		::EnumChildWindows(temp1_hwmd,(WNDENUMPROC)enum3Dinstall_two,1);
-		int aaaaaaaaaa = 0;
-		while(1)
-		{		
-			unsigned long	my_time = time(NULL);
-			aaaaaaaaaa = 1516267800 - my_time;
-			if(aaaaaaaaaa < 0)
-				return 1;
-			//aaaaaaaaaa++;
-			CString temp_cs;
-			temp_cs.Format(_T("Time %u s"),aaaaaaaaaa);
-			char temp_1[20];
-			WideCharToMultiByte(CP_ACP,0,temp_cs.GetBuffer(),-1,temp_1,255,NULL,NULL);
-			Send_Key_Value(my_window_hwnd,temp_1);
-			CRect temp_rect;
-			GetWindowRect(my_window_hwnd,temp_rect);
-			SetCursorPos(temp_rect.right - 40,temp_rect.bottom + 5);
-			mouse_event(MOUSEEVENTF_LEFTDOWN,0,0,0,0);
-			mouse_event(MOUSEEVENTF_LEFTUP,0,0,0,0);
-
-			//Sleep(1);
-			//SendMessage(my_window_hwnd,WM_KEYDOWN,VK_RETURN,NULL); 
-			//Sleep(1);
-			//SendMessage(my_window_hwnd,WM_KEYUP,VK_RETURN,NULL);
-			Sleep(1000);
-			continue;
-
-		}
-#endif
-
-
-
 		if(scaning_mode)
 		{
 			Sleep(1000);

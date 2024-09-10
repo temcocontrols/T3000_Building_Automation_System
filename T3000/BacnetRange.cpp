@@ -2411,32 +2411,20 @@ void BacnetRange::OnBnClickedCancel()
 void BacnetRange::UpdateCustomerRangeText()
 {
 
-    for (int i = 0;i < BAC_CUSTOMER_UNITS_COUNT; i++)
-    {
-        //MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_off) + 1,
-        //    cus_digital_off[i].GetBuffer(MAX_PATH), MAX_PATH);
-        //cus_digital_off[i].ReleaseBuffer();
-        //if (cus_digital_off[i].GetLength() >= 12)
-        //    cus_digital_off[i].Empty();
+	for (int i = 0; i < BAC_CUSTOMER_UNITS_COUNT; i++)
+	{
+		CString unit_index;
+		unit_index.Format(_T("%d.     "), i + 23);
 
-        //MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_on) + 1,
-        //    cus_digital_on[i].GetBuffer(MAX_PATH), MAX_PATH);
-        //cus_digital_on[i].ReleaseBuffer();
-        //if (cus_digital_on[i].GetLength() >= 12)
-        //    cus_digital_on[i].Empty();
+		temp_unit[i] = unit_index + cus_digital_off[i] + _T("/") + cus_digital_on[i];
+		Custom_Digital_Range[i] = cus_digital_off[i] + _T("/") + cus_digital_on[i];
 
-        CString unit_index;
-        unit_index.Format(_T("%d.     "), i + 23);
+	}
 
-        temp_unit[i] = unit_index + cus_digital_off[i] + _T("/") + cus_digital_on[i];
-        Custom_Digital_Range[i] = cus_digital_off[i] + _T("/") + cus_digital_on[i];
-
-    }
-
-    for (int j = 0;j <= 7; j++)
-    {
-        GetDlgItem(IDC_RADIO73 + j)->SetWindowTextW(temp_unit[j]);
-    }
+	for (int j = 0; j <= 7; j++)
+	{
+		GetDlgItem(IDC_RADIO73 + j)->SetWindowTextW(temp_unit[j]);
+	}
 }
 
 void BacnetRange::OnBnClickedBtnEditCustomerRange()
@@ -2445,43 +2433,43 @@ void BacnetRange::OnBnClickedBtnEditCustomerRange()
 	CBacnetCustomerDigitalRange dlg;
 	dlg.DoModal();
 
-	for(int i=0 ;i < BAC_CUSTOMER_UNITS_COUNT ; i++)
+	for (int i = 0; i < BAC_CUSTOMER_UNITS_COUNT; i++)
 	{
-        CString temp_dig_off;
-        CString temp_dig_on;
-        MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_off) + 1,
-            temp_dig_off.GetBuffer(MAX_PATH), MAX_PATH);
-        temp_dig_off.ReleaseBuffer();
-        if (temp_dig_off.GetLength() >= 12)
-            temp_dig_off.Empty();
+		CString temp_dig_off;
+		CString temp_dig_on;
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char*)m_customer_unit_data.at(i).digital_units_off) + 1,
+			temp_dig_off.GetBuffer(MAX_PATH), MAX_PATH);
+		temp_dig_off.ReleaseBuffer();
+		if (temp_dig_off.GetLength() >= 12)
+			temp_dig_off.Empty();
 
-        MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_on) + 1,
-            temp_dig_on.GetBuffer(MAX_PATH), MAX_PATH);
-        temp_dig_on.ReleaseBuffer();
-        if (temp_dig_on.GetLength() >= 12)
-            temp_dig_on.Empty();
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char*)m_customer_unit_data.at(i).digital_units_on) + 1,
+			temp_dig_on.GetBuffer(MAX_PATH), MAX_PATH);
+		temp_dig_on.ReleaseBuffer();
+		if (temp_dig_on.GetLength() >= 12)
+			temp_dig_on.Empty();
 
-        //判断正反向逻辑 ，正逻辑处理方式如同  Range 1    负逻辑如同 12;
-        if (m_customer_unit_data.at(i).direct == DIGITAL_DIRECT)
-        {
-            cus_digital_off[i] = temp_dig_off;
-            cus_digital_on[i] = temp_dig_on;
-        }
-        else
-        {
-            cus_digital_off[i] = temp_dig_on;
-            cus_digital_on[i] = temp_dig_off;
-        }
+		//判断正反向逻辑 ，正逻辑处理方式如同  Range 1    负逻辑如同 12;
+		if (m_customer_unit_data.at(i).direct == DIGITAL_DIRECT)
+		{
+			cus_digital_off[i] = temp_dig_off;
+			cus_digital_on[i] = temp_dig_on;
+		}
+		else
+		{
+			cus_digital_off[i] = temp_dig_on;
+			cus_digital_on[i] = temp_dig_off;
+		}
 
 		CString unit_index;
-		unit_index.Format(_T("%d.     "),i+23);
+		unit_index.Format(_T("%d.     "), i + 23);
 
-		temp_unit[i] =unit_index + cus_digital_off[i] + _T("/") + cus_digital_on[i];
+		temp_unit[i] = unit_index + cus_digital_off[i] + _T("/") + cus_digital_on[i];
 		Custom_Digital_Range[i] = cus_digital_off[i] + _T("/") + cus_digital_on[i];
 
 	}
 
-	for(int j=0;j<=7 ; j++)
+	for (int j = 0; j <= 7; j++)
 	{
 		GetDlgItem(IDC_RADIO73 + j)->SetWindowTextW(temp_unit[j]);
 	}

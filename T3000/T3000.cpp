@@ -15,7 +15,7 @@
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
 #include <windows.h>  
  
-const unsigned int g_versionNO = 20240809;  // PROJECT_VERSION;
+const unsigned int g_versionNO = 20240910;  // PROJECT_VERSION;
 
 
 #ifdef _DEBUG
@@ -221,11 +221,9 @@ BOOL CT3000App::InitInstance()
             temp_bacnetdll = temp_dotnet_path + _T("\\TemcoStandardBacnetTool.dll");
             temp_Regasm_path = temp_dotnet_path + _T("\\RegAsm.exe");
 			CopyFile(strSource, temp_t3000controlldll_path, FALSE);
-			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
 			ShellExecute(NULL, _T("open"), temp_Regasm_path, temp_t3000controlldll_path, NULL, SW_HIDE);
 			strSource = g_strExePth + L"TemcoStandardBacnetTool.dll";
 			CopyFile(strSource, temp_bacnetdll, FALSE);
-			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
 			ShellExecute(NULL, _T("open"), temp_Regasm_path, temp_bacnetdll, NULL, SW_HIDE);
 
 			strSource = g_strExePth+L"ControlBasicEditor.dll";
@@ -235,7 +233,6 @@ BOOL CT3000App::InitInstance()
 			temp_bacnetdll = temp_dotnet_path + L"\\ControlBasicEditor.tlb";
 			CopyFile(strSource, temp_bacnetdll, FALSE);
 			strSource=_T("ControlBasicEditor.dll tlb:/ControlBasicEditor.tlb  /codebase");
-			// ::ShellExecute(NULL, _T("open"), _T("C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\RegAsm.exe T3000Controls.dll"), _T(""), _T(""), SW_SHOW); 
 			ShellExecute(NULL, _T("open"), temp_Regasm_path, strSource, NULL, SW_HIDE);
 
 #endif

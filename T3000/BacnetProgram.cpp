@@ -165,7 +165,6 @@ void CBacnetProgram::Initial_List()
 	while ( m_program_list.DeleteColumn (0)) ;
 
 	m_program_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-	//m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_program_list.InsertColumn(PROGRAM_NUM, _T("Program"), 80, ListCtrlEx::CheckBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	m_program_list.InsertColumn(PROGRAM_FULL_LABLE, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
@@ -323,21 +322,21 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
+LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam, LPARAM lParam)
 {
 	// Str_in_point Get_Str_in_Point(int index);
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
-	if(isFreshOne == REFRESH_ON_ITEM)
+	if (isFreshOne == REFRESH_ON_ITEM)
 	{
 		Fresh_Item = (int)wParam;
 	}
 	else
 	{
-		if(m_program_list.IsDataNewer((char *)&m_Program_data.at(0),sizeof(Str_program_point) * BAC_PROGRAM_ITEM_COUNT))
+		if (m_program_list.IsDataNewer((char*)&m_Program_data.at(0), sizeof(Str_program_point) * BAC_PROGRAM_ITEM_COUNT))
 		{
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-			m_program_list.SetListData((char *)&m_Program_data.at(0),sizeof(Str_program_point) * BAC_PROGRAM_ITEM_COUNT);
+			m_program_list.SetListData((char*)&m_Program_data.at(0), sizeof(Str_program_point) * BAC_PROGRAM_ITEM_COUNT);
 		}
 		else
 		{
@@ -345,74 +344,67 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		}
 	}
 
-
-
 	bac_program_pool_size = 2000;
 	bac_program_size = 0;
 	bac_free_memory = 2000;
-	for (int i=0;i<(int)m_Program_data.size();i++)
+	for (int i = 0; i < (int)m_Program_data.size(); i++)
 	{
-		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
+		CString temp_item, temp_value, temp_cal, temp_filter, temp_status, temp_lable;
 		CString temp_des;
 		CString temp_units;
-		
-		if(i>=program_item_limit_count)
+
+		if (i >= program_item_limit_count)
 			break;
 
-		if(isFreshOne)
+		if (isFreshOne)
 		{
 			i = Fresh_Item;
 		}
 
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).description, (int)strlen((char *)m_Program_data.at(i).description)+1, 
-			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_Program_data.at(i).description, (int)strlen((char*)m_Program_data.at(i).description) + 1,
+			temp_des.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_des.ReleaseBuffer();
 		temp_des = temp_des.Left(STR_PROGRAM_DESCRIPTION_LENGTH).Trim();
-		
-		m_program_list.SetItemText(i,PROGRAM_FULL_LABLE,temp_des);
+
+		m_program_list.SetItemText(i, PROGRAM_FULL_LABLE, temp_des);
 
 
-		if(m_Program_data.at(i).auto_manual==0)
-			m_program_list.SetItemText(i,PROGRAM_AUTO_MANUAL,_T("Auto"));
+		if (m_Program_data.at(i).auto_manual == 0)
+			m_program_list.SetItemText(i, PROGRAM_AUTO_MANUAL, _T("Auto"));
 		else
-			m_program_list.SetItemText(i,PROGRAM_AUTO_MANUAL,_T("Manual"));
+			m_program_list.SetItemText(i, PROGRAM_AUTO_MANUAL, _T("Manual"));
 
-		if(m_Program_data.at(i).on_off==0)
+		if (m_Program_data.at(i).on_off == 0)
 		{
-			m_program_list.SetItemTextColor(i,PROGRAM_STATUS,RGB(255,0,0),false);
-			m_program_list.SetItemText(i,PROGRAM_STATUS,ProgramStatus[1]);
+			m_program_list.SetItemTextColor(i, PROGRAM_STATUS, RGB(255, 0, 0), false);
+			m_program_list.SetItemText(i, PROGRAM_STATUS, ProgramStatus[1]);
 		}
 		else
 		{
-			m_program_list.SetItemTextColor(i,PROGRAM_STATUS,RGB(0,0,255),false);
-			m_program_list.SetItemText(i,PROGRAM_STATUS,ProgramStatus[0]);
+			m_program_list.SetItemTextColor(i, PROGRAM_STATUS, RGB(0, 0, 255), false);
+			m_program_list.SetItemText(i, PROGRAM_STATUS, ProgramStatus[0]);
 		}
 
-		temp_value.Format(_T("%d"),m_Program_data.at(i).bytes);
-		m_program_list.SetItemText(i,PROGRAM_SIZE_LIST,temp_value);
+		temp_value.Format(_T("%d"), m_Program_data.at(i).bytes);
+		m_program_list.SetItemText(i, PROGRAM_SIZE_LIST, temp_value);
 
 
-        CString temp_exe_time;
+		CString temp_exe_time;
 		if (m_Program_data.at(i).com_prg >= 50)
 			temp_exe_time = _T("Endless Loop");
 		else
 			temp_exe_time.Format(_T("%u ms"), m_Program_data.at(i).com_prg);
-		
-        m_program_list.SetItemText(i, PROGRAM_RUN_STATUS, temp_exe_time);
-		//if(m_Program_data.at(i).com_prg==0)
-		//	m_program_list.SetItemText(i,PROGRAM_RUN_STATUS,_T("Normal"));
-		//else
-		//	m_program_list.SetItemText(i,PROGRAM_RUN_STATUS,_T("Abnormal"));
 
+		m_program_list.SetItemText(i, PROGRAM_RUN_STATUS, temp_exe_time);
 
 		CString temp_des2;
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).label, (int)strlen((char *)m_Program_data.at(i).label)+1, 
-			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_Program_data.at(i).label, (int)strlen((char*)m_Program_data.at(i).label) + 1,
+			temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_des2.ReleaseBuffer();
 		temp_des2 = temp_des2.Left(STR_PROGRAM_LABEL_LENGTH).Trim();
-		m_program_list.SetItemText(i,PROGRAM_LABEL,temp_des2);
+		m_program_list.SetItemText(i, PROGRAM_LABEL, temp_des2);
 
-		if(isFreshOne)
+		if (isFreshOne)
 		{
 			break;
 		}

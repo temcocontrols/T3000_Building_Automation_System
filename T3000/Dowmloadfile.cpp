@@ -889,36 +889,7 @@ BOOL Dowmloadfile::OnInitDialog()
 
 	if(is_local_temco_net == false)
 	{
-#if 0
-		hostent* host = gethostbyname("newfirmware.com");
-		if(host == NULL)
-		{
-			if(!flash_multi_auto)
-			{
-				MessageBox(_T("Connect firmware server failed.  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-				if(MessageBox(_T("Do you want download firmware manually from website?"),_T("Download"),MB_YESNO) == IDYES)
-				{
-					CString excute_path;
-					if(!productfolder.IsEmpty())
-					{ 
-						excute_path = _T("http://www.temcocontrols.com/ftp/firmware/") + productfolder;
-						ShellExecute(NULL, L"open", excute_path, NULL, NULL, SW_SHOWNORMAL);
-					}
 
-				}
-			}
-
-			PostMessage(WM_CLOSE,NULL,NULL);
-			return TRUE;
-		}
-		char* pszIP  = (char *)inet_ntoa(*(struct in_addr *)(host->h_addr)); 
-		memcpy_s((char *)IP_ADDRESS_SERVER,20,pszIP,20);
-
-		CString temp_message;
-		temp_message.Format(_T("Internet access!"));
-		m_download_info.InsertString(m_download_info.GetCount(),temp_message);
-		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
-#endif
 	}
 	else
 	{
@@ -931,9 +902,7 @@ BOOL Dowmloadfile::OnInitDialog()
 		WideCharToMultiByte( CP_ACP, 0, temp_ip.GetBuffer(), -1, temp_char_ip, 255, NULL, NULL );
 		memcpy_s((char *)IP_ADDRESS_SERVER,20,temp_char_ip,20);
 	}
-//#ifdef _DEBUG
-//	memcpy_s((char *)IP_ADDRESS_SERVER,20,"127.0.0.1",20);
-//#endif
+
 	if(flash_multi_auto)
 		SetTimer(2,200,NULL);
 
@@ -975,43 +944,6 @@ void Dowmloadfile::Update_File()
         CopyFile(update_exe_file_path, NewUpdateFilePath, false);
         DeleteFile(update_exe_file_path); //在更新完后删除Eng文件;
     }
-
-#if 0
-    //删除exe目录下无用的动态库文件 ，只做一次;
-    CString temp_db_ini_folder;
-    temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
-    int n_already_check_old_file = 0;
-    n_already_check_old_file = GetPrivateProfileInt(_T("Setting"), _T("AlreadyCheckOldFile"), 0, temp_db_ini_folder);
-    if (n_already_check_old_file == 0)
-    {
-        CString temp_delete_old_file_path1 = ApplicationFolder + _T("\\FastColoredTextBox.dll");
-        CString temp_delete_old_file_path2 = ApplicationFolder + _T("\\FastColoredTextBoxNS.dll");
-        CString temp_delete_old_file_path3 = ApplicationFolder + _T("\\Irony.dll");
-        CString temp_delete_old_file_path4 = ApplicationFolder + _T("\\Irony.Interpreter.dll");
-        CString temp_delete_old_file_path5 = ApplicationFolder + _T("\\NGenerics.dll");
-        CString temp_delete_old_file_path6 = ApplicationFolder + _T("\\T3000Grammar.dll");
-        CString temp_delete_old_file_path7 = ApplicationFolder + _T("\\PRGReaderLibrary.dll");
-        CString temp_delete_old_file_path8 = ApplicationFolder + _T("\\ProgramEditor.dll");
-
-        if (cs_temp_find.FindFile(temp_delete_old_file_path1))
-            DeleteFile(temp_delete_old_file_path1);
-        if (cs_temp_find.FindFile(temp_delete_old_file_path2))
-            DeleteFile(temp_delete_old_file_path2);
-        if (cs_temp_find.FindFile(temp_delete_old_file_path3))
-            DeleteFile(temp_delete_old_file_path3);
-        if (cs_temp_find.FindFile(temp_delete_old_file_path4))
-            DeleteFile(temp_delete_old_file_path4);
-        if (cs_temp_find.FindFile(temp_delete_old_file_path5))
-            DeleteFile(temp_delete_old_file_path5);
-        if (cs_temp_find.FindFile(temp_delete_old_file_path6))
-            DeleteFile(temp_delete_old_file_path6);
-        if (cs_temp_find.FindFile(temp_delete_old_file_path7))
-            DeleteFile(temp_delete_old_file_path7);
-        if (cs_temp_find.FindFile(temp_delete_old_file_path8))
-            DeleteFile(temp_delete_old_file_path8);
-        WritePrivateProfileStringW(_T("Setting"), _T("AlreadyCheckOldFile"), _T("1"), temp_db_ini_folder);
-    }
-#endif
 }
 
 HANDLE hDownloadWebThread = NULL;
@@ -1033,11 +965,6 @@ void Dowmloadfile::Start_Download_Ftp()
 //#endif // !DEBUG
 
 
-
-//#ifdef DEBUG
-//    if (hDownloadWebThread == NULL)
-//        hDownloadWebThread = CreateThread(NULL, NULL, WebDownloadThread, this, NULL, NULL);
-//#endif // DEBUG
 
 }
 
@@ -1344,64 +1271,51 @@ ftp_download_end:
 void Dowmloadfile::Start_Download()
 {
 	KillProcessFromName(_T("ISP.exe"));
-	SetTimer(1,200,NULL);
+	SetTimer(1, 200, NULL);
 	wait_download_and_isp_finished = false;
 	Add_log_count = 1;
 	replace_count = 1;
 	m_download_info.ResetContent();
 	download_step = SEND_DOWNLOAD_COMMAND;
-	int resualt=TCP_File_Socket.Create(0,SOCK_STREAM);//SOCK_STREAM
+	int resualt = TCP_File_Socket.Create(0, SOCK_STREAM);//SOCK_STREAM
 	TCP_File_Socket.SetParentWindow(downloadfile_hwnd);
-
-	//int nRecvBufLen = 32 * 1024; //设置为32K
-	//TCP_File_Socket.SetSockOpt(  SO_RCVBUF, ( const char* )&nRecvBufLen, sizeof( int ) ,SOL_SOCKET);
-
-	////发送缓冲区
-	//int nSendBufLen = 32*1024; //设置为32K
-	//setsockopt( s, SOL_SOCKET, SO_SNDBUF, ( const char* )&nSendBufLen, sizeof( int ) );
-
 
 
 	CString temp_db_ini_folder;
 	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
 	int is_local_temco_net = false;
-	is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,temp_db_ini_folder);
-	if(is_local_temco_net == false)
+	is_local_temco_net = GetPrivateProfileInt(_T("Setting"), _T("LocalTemcoNet"), 0, temp_db_ini_folder);
+	if (is_local_temco_net == false)
 	{
-		WritePrivateProfileStringW(_T("Setting"),_T("LocalTemcoNet"),_T("0"),temp_db_ini_folder);
-		WritePrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.4"),temp_db_ini_folder);
+		WritePrivateProfileStringW(_T("Setting"), _T("LocalTemcoNet"), _T("0"), temp_db_ini_folder);
+		WritePrivateProfileStringW(_T("Setting"), _T("TemcoServerIP"), _T("192.168.0.4"), temp_db_ini_folder);
 	}
-	//TCP_File_Socket.Connect(_T("114.93.6.170"),31234);
 
-	//hostent* host = gethostbyname("14i5f38013.iok.la");
 
-	if(is_local_temco_net == false)
+	if (is_local_temco_net == false)
 	{
 		hostent* host = gethostbyname("newfirmware.com");
-		if(host == NULL)
+		if (host == NULL)
 		{
-			MessageBox(_T("Can't access Firmware server.  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			PostMessage(WM_CLOSE,NULL,NULL);
-			return ;
+			MessageBox(_T("Can't access Firmware server.  \r\nPlease check your internet connection!"), _T("Warning"), MB_OK | MB_ICONINFORMATION);
+			PostMessage(WM_CLOSE, NULL, NULL);
+			return;
 		}
-		char* pszIP  = (char *)inet_ntoa(*(struct in_addr *)(host->h_addr)); 
-		memcpy_s((char *)IP_ADDRESS_SERVER,20,pszIP,20);
+		char* pszIP = (char*)inet_ntoa(*(struct in_addr*)(host->h_addr));
+		memcpy_s((char*)IP_ADDRESS_SERVER, 20, pszIP, 20);
 	}
 	else
 	{
 		CString temp_ip;
-		GetPrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.4"),temp_ip.GetBuffer(MAX_PATH),MAX_PATH,temp_db_ini_folder);
+		GetPrivateProfileStringW(_T("Setting"), _T("TemcoServerIP"), _T("192.168.0.4"), temp_ip.GetBuffer(MAX_PATH), MAX_PATH, temp_db_ini_folder);
 		temp_ip.ReleaseBuffer();
 
 		char temp_char_ip[40];
-		memset(temp_char_ip,0,40);
-		WideCharToMultiByte( CP_ACP, 0, temp_ip.GetBuffer(), -1, temp_char_ip, 255, NULL, NULL );
-		memcpy_s((char *)IP_ADDRESS_SERVER,20,temp_char_ip,20);
+		memset(temp_char_ip, 0, 40);
+		WideCharToMultiByte(CP_ACP, 0, temp_ip.GetBuffer(), -1, temp_char_ip, 255, NULL, NULL);
+		memcpy_s((char*)IP_ADDRESS_SERVER, 20, temp_char_ip, 20);
 	}
 
-	//#ifdef _DEBUG
-	//	memcpy_s((char *)IP_ADDRESS_SERVER,20,"127.0.0.1",20);
-	//#endif
 
 
 
@@ -1413,21 +1327,21 @@ void Dowmloadfile::Start_Download()
 	show_message.Format(_T("Wait connection to newfirmware.com , IP : "));
 	show_message = show_message + Connect_ip;
 	//m_download_info.AddString(complete_message);
-	m_download_info.InsertString(m_download_info.GetCount(),show_message);
-	m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+	m_download_info.InsertString(m_download_info.GetCount(), show_message);
+	m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
 
 
 
-	TCP_File_Socket.Connect(Connect_ip,TEMCO_SERVER_PORT);
+	TCP_File_Socket.Connect(Connect_ip, TEMCO_SERVER_PORT);
 
-	const BOOL bReuseaddr=TRUE;
-	const BOOL bDontLinger = FALSE; 
-	TCP_File_Socket.SetSockOpt(SO_DONTLINGER,&bDontLinger,sizeof(BOOL),SOL_SOCKET);
-	TCP_File_Socket.SetSockOpt(SO_REUSEADDR,&bReuseaddr,sizeof(BOOL),SOL_SOCKET);
+	const BOOL bReuseaddr = TRUE;
+	const BOOL bDontLinger = FALSE;
+	TCP_File_Socket.SetSockOpt(SO_DONTLINGER, &bDontLinger, sizeof(BOOL), SOL_SOCKET);
+	TCP_File_Socket.SetSockOpt(SO_REUSEADDR, &bReuseaddr, sizeof(BOOL), SOL_SOCKET);
 	TCP_File_Socket.GetLastError();
-	TCP_File_Socket.AsyncSelect(FD_READ |FD_CONNECT |FD_CLOSE);
+	TCP_File_Socket.AsyncSelect(FD_READ | FD_CONNECT | FD_CLOSE);
 
-	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->EnableWindow(false);
+	((CComboBox*)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->EnableWindow(false);
 	GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(false);
 	GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(false);
 }

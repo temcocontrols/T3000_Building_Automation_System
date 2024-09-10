@@ -116,7 +116,6 @@ BOOL CBacnetVariable::OnInitDialog()
 
 	SetTimer(1, BAC_LIST_REFRESH_TIME,NULL);
 	SetTimer(4, 15000, NULL);
-	//SetTimer(6,250,NULL);
 	ShowWindow(FALSE);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -135,64 +134,63 @@ void CBacnetVariable::Initial_List()
 {
 	m_variable_list.ShowWindow(SW_HIDE);
 	m_variable_list.DeleteAllItems();
-	while ( m_variable_list.DeleteColumn (0)) ;
+	while (m_variable_list.DeleteColumn(0));
 
-	m_variable_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-	m_variable_list.SetExtendedStyle(m_variable_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
+	m_variable_list.ModifyStyle(0, LVS_SINGLESEL | LVS_REPORT | LVS_SHOWSELALWAYS);
+	m_variable_list.SetExtendedStyle(m_variable_list.GetExtendedStyle() | LVS_EX_GRIDLINES & (~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_variable_list.InsertColumn(VARIABLE_NUM, _T("Variable"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	m_variable_list.InsertColumn(VARIABLE_FULL_LABLE, _T("Full Label"), 200, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_AUTO_MANUAL, _T("Auto/Manual"), 150, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_VALUE, _T("Value"), 120, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_UNITE, _T("Units"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_LABLE, _T("Label"), 130, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_variable_list.Setlistcolcharlimit(VARIABLE_FULL_LABLE,STR_VARIABLE_DESCRIPTION_LENGTH -1);
-	m_variable_list.Setlistcolcharlimit(VARIABLE_LABLE,STR_VARIABLE_LABEL-1);
+	m_variable_list.Setlistcolcharlimit(VARIABLE_FULL_LABLE, STR_VARIABLE_DESCRIPTION_LENGTH - 1);
+	m_variable_list.Setlistcolcharlimit(VARIABLE_LABLE, STR_VARIABLE_LABEL - 1);
 
 	m_variable_dlg_hwnd = this->m_hWnd;
-	//g_hwnd_now = m_variable_dlg_hwnd;
 	m_variable_list.SetListHwnd(this->m_hWnd);
-	CRect list_rect,win_rect;
+	CRect list_rect, win_rect;
 	m_variable_list.GetWindowRect(list_rect);
 	ScreenToClient(&list_rect);
-	::GetWindowRect(m_input_dlg_hwnd,win_rect);
+	::GetWindowRect(m_input_dlg_hwnd, win_rect);
 	m_variable_list.Set_My_WindowRect(win_rect);
 	m_variable_list.Set_My_ListRect(list_rect);
 
-	CTime TimeTemp(2017,1,1,0,0,0);
+	CTime TimeTemp(2017, 1, 1, 0, 0, 0);
 	m_variable_time_picker.SetFormat(_T("HH:mm"));
 	m_variable_time_picker.SetTime(&TimeTemp);
 	m_variable_time_picker.ShowWindow(SW_HIDE);
 
 	m_variable_list.DeleteAllItems();
-	for (int i=0;i<(int)m_Variable_data.size();i++)
+	for (int i = 0; i < (int)m_Variable_data.size(); i++)
 	{
-		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
+		CString temp_item, temp_value, temp_cal, temp_filter, temp_status, temp_lable;
 		CString temp_des;
 		CString temp_units;
 
-		if(i>=variable_item_limit_count)
+		if (i >= variable_item_limit_count)
 			break;
 
-		temp_item.Format(_T("VAR%d"),i+1);
-		m_variable_list.InsertItem(i,temp_item);
+		temp_item.Format(_T("VAR%d"), i + 1);
+		m_variable_list.InsertItem(i, temp_item);
 
-		if(ListCtrlEx::ComboBox == m_variable_list.GetColumnType(VARIABLE_UNITE))
+		if (ListCtrlEx::ComboBox == m_variable_list.GetColumnType(VARIABLE_UNITE))
 		{
 			ListCtrlEx::CStrList strlist;
 
-			for (int i=0;i<(int)sizeof(Units_Type)/sizeof(Units_Type[0]);i++)
+			for (int i = 0; i < (int)sizeof(Units_Type) / sizeof(Units_Type[0]); i++)
 			{
 				strlist.push_back(Units_Type[i]);
 			}
-			m_variable_list.SetCellStringList(i, VARIABLE_UNITE, strlist);		
+			m_variable_list.SetCellStringList(i, VARIABLE_UNITE, strlist);
 		}
 
-		for (int x=0;x<VARIABLE_COL_NUMBER;x++)
+		for (int x = 0; x < VARIABLE_COL_NUMBER; x++)
 		{
-			if((i%2)==0)
-				m_variable_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
+			if ((i % 2) == 0)
+				m_variable_list.SetItemBkColor(i, x, LIST_ITEM_DEFAULT_BKCOLOR);
 			else
-				m_variable_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+				m_variable_list.SetItemBkColor(i, x, LIST_ITEM_DEFAULT_BKCOLOR_GRAY);
 		}
 
 	}
@@ -201,84 +199,76 @@ void CBacnetVariable::Initial_List()
 }
 
 
-LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
+LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 {
 
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
-	//bool need_refresh_all = false;
-	//int Fresh_List_Now = (int)wParam;
-	//if( Fresh_List_Now == REFRESH_LIST_NOW)
-	//{
-	//	need_refresh_all = true;
-	//}
 
-	//if(need_refresh_all == false)
-	//{
-		if(isFreshOne == REFRESH_ON_ITEM)
+	if (isFreshOne == REFRESH_ON_ITEM)
+	{
+		Fresh_Item = (int)wParam;
+	}
+	else
+	{
+		if (m_variable_list.IsDataNewer((char*)&m_Variable_data.at(0), sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT))
 		{
-			Fresh_Item = (int)wParam;
+			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			m_variable_list.SetListData((char*)&m_Variable_data.at(0), sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT);
 		}
 		else
 		{
-			if(m_variable_list.IsDataNewer((char *)&m_Variable_data.at(0),sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT))
-			{
-				//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-				m_variable_list.SetListData((char *)&m_Variable_data.at(0),sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT);
-			}
-			else
-			{
-				return 0;
-			}
+			return 0;
 		}
-	//}
-		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
-		{
-			TCHAR szBuffer[80];
-			LVCOLUMN col;
-			col.mask = LVCF_TEXT;
-			col.pszText = szBuffer;
-			col.cchTextMax = 80;
-			m_variable_list.GetColumn(VARIABLE_AUTO_MANUAL, &col);
-			col.pszText = _T("Out of Service");
-			m_variable_list.SetColumn(VARIABLE_AUTO_MANUAL, &col);
-		
+	}
 
-		}
-		else { // to show the column for non-bacnet devices
-			TCHAR szBuffer[80];
-			LVCOLUMN col;
-			col.mask = LVCF_TEXT;
-			col.pszText = szBuffer;
-			col.cchTextMax = 80;
-			m_variable_list.GetColumn(VARIABLE_AUTO_MANUAL, &col);
-			col.pszText = _T("Auto/Manual");
-			m_variable_list.SetColumn(VARIABLE_AUTO_MANUAL, &col);
-			
-		}
-
-
-	for (int i=0;i<(int)m_Variable_data.size();i++)
+	if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
 	{
-		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
+		TCHAR szBuffer[80];
+		LVCOLUMN col;
+		col.mask = LVCF_TEXT;
+		col.pszText = szBuffer;
+		col.cchTextMax = 80;
+		m_variable_list.GetColumn(VARIABLE_AUTO_MANUAL, &col);
+		col.pszText = _T("Out of Service");
+		m_variable_list.SetColumn(VARIABLE_AUTO_MANUAL, &col);
+
+
+	}
+	else { // to show the column for non-bacnet devices
+		TCHAR szBuffer[80];
+		LVCOLUMN col;
+		col.mask = LVCF_TEXT;
+		col.pszText = szBuffer;
+		col.cchTextMax = 80;
+		m_variable_list.GetColumn(VARIABLE_AUTO_MANUAL, &col);
+		col.pszText = _T("Auto/Manual");
+		m_variable_list.SetColumn(VARIABLE_AUTO_MANUAL, &col);
+
+	}
+
+
+	for (int i = 0; i < (int)m_Variable_data.size(); i++)
+	{
+		CString temp_item, temp_value, temp_cal, temp_filter, temp_status, temp_lable;
 		CString temp_des;
 		CString temp_units;
 
-		if(isFreshOne)
+		if (isFreshOne)
 		{
 			i = Fresh_Item;
 		}
 
-		if(i>=variable_item_limit_count)
+		if (i >= variable_item_limit_count)
 		{
 			return 0;
 		}
 
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description)+1, 
-			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_Variable_data.at(i).description, (int)strlen((char*)m_Variable_data.at(i).description) + 1,
+			temp_des.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_des.ReleaseBuffer();
 		temp_des = temp_des.Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
-		m_variable_list.SetItemText(i,VARIABLE_FULL_LABLE,temp_des);
+		m_variable_list.SetItemText(i, VARIABLE_FULL_LABLE, temp_des);
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 		{
 			if (m_Variable_data.at(i).auto_manual == 0)
@@ -302,72 +292,72 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		}
 
 
-		if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+		if (m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
-			
-			if((m_Variable_data.at(i).range == 0) || ((m_Variable_data.at(i).range>30) && (m_Variable_data.at(i).range<100)) )
+
+			if ((m_Variable_data.at(i).range == 0) || ((m_Variable_data.at(i).range > 30) && (m_Variable_data.at(i).range < 100)))
 			{
 				CString cstemp_value2;
 				float temp_float_value1;
 				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
-				cstemp_value2.Format(_T("%.3f"),temp_float_value1);
-				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value2);
-				m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
+				cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
+				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[0]);
 			}
-            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))
-            {
-                if (read_msv_table)
-                    m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
-                int get_name_ret = 0;
-                CString cstemp_value2;
-                float temp_float_value1;
-                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
-                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
-                if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
-                    cstemp_value2.Format(_T("%.3f"), temp_float_value1);
-                m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
-            }
+			else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))
+			{
+				if (read_msv_table)
+					m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
+				int get_name_ret = 0;
+				CString cstemp_value2;
+				float temp_float_value1;
+				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+				get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
+				if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+					cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
+			}
 			else
 			{
 				CString temp1;
 				CStringArray temparray;
 
-				if((m_Variable_data.at(i).range < 23) &&(m_Variable_data.at(i).range !=0))
+				if ((m_Variable_data.at(i).range < 23) && (m_Variable_data.at(i).range != 0))
 					temp1 = Digital_Units_Array[m_Variable_data.at(i).range];
-				else if((m_Variable_data.at(i).range >=23) && (m_Variable_data.at(i).range <= 30))
+				else if ((m_Variable_data.at(i).range >= 23) && (m_Variable_data.at(i).range <= 30))
 				{
-					if(receive_customer_unit)
+					if (receive_customer_unit)
 						temp1 = Custom_Digital_Range[m_Variable_data.at(i).range - 23];
 				}
 				else
 				{
 					temp1 = Digital_Units_Array[0];
-					m_variable_list.SetItemText(i,VARIABLE_UNITE,temp1);
+					m_variable_list.SetItemText(i, VARIABLE_UNITE, temp1);
 				}
 
-				SplitCStringA(temparray,temp1,_T("/"));
-				if((temparray.GetSize()==2))
+				SplitCStringA(temparray, temp1, _T("/"));
+				if ((temparray.GetSize() == 2))
 				{
-					if(m_Variable_data.at(i).control == 0)
-						m_variable_list.SetItemText(i,VARIABLE_VALUE,temparray.GetAt(0));
+					if (m_Variable_data.at(i).control == 0)
+						m_variable_list.SetItemText(i, VARIABLE_VALUE, temparray.GetAt(0));
 					else
-						m_variable_list.SetItemText(i,VARIABLE_VALUE,temparray.GetAt(1));
-					m_variable_list.SetItemText(i,VARIABLE_UNITE,temp1);
+						m_variable_list.SetItemText(i, VARIABLE_VALUE, temparray.GetAt(1));
+					m_variable_list.SetItemText(i, VARIABLE_UNITE, temp1);
 				}
-				
+
 			}
 		}
 		else
 		{
-			if(m_Variable_data.at(i).range == 20)	//如果是时间;
+			if (m_Variable_data.at(i).range == 20)	//如果是时间;
 			{
 				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
 				char temp_char[50];
 				CString temp_11;
 				//if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
 				//{			
-					int time_seconds = m_Variable_data.at(i).value / 1000;
-					intervaltotextfull(temp_char, time_seconds, 0, 0);
+				int time_seconds = m_Variable_data.at(i).value / 1000;
+				intervaltotextfull(temp_char, time_seconds, 0, 0);
 
 				//}
 				//else
@@ -380,87 +370,87 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				temp_11.ReleaseBuffer();
 				temp_11 = temp_11.Left(STR_VARIABLE_DESCRIPTION_LENGTH).Trim();
 
-				m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_11);
+				m_variable_list.SetItemText(i, VARIABLE_VALUE, temp_11);
 
 			}
 
-			else if(m_Variable_data.at(i).range<sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))
+			else if (m_Variable_data.at(i).range < sizeof(Variable_Analog_Units_Array) / sizeof(Variable_Analog_Units_Array[0]))
 			{
-			m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
-
-			CString cstemp_value;
-			float temp_float_value;
-			temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
-			cstemp_value.Format(_T("%.3f"),temp_float_value);
-			m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value);
-			}
-			else if((m_Variable_data.at(i).range >= 34 ) && (m_Variable_data.at(i).range <= 38))
-			{
-				m_variable_list.SetItemText(i,VARIABLE_UNITE,Analog_Variable_Units[m_Variable_data.at(i).range - 34]);
+				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
 
 				CString cstemp_value;
 				float temp_float_value;
 				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
-				cstemp_value.Format(_T("%.3f"),temp_float_value);
-				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value);
+				cstemp_value.Format(_T("%.3f"), temp_float_value);
+				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value);
 			}
-            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))
-            {
-                if (read_msv_table)
-                    m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
-                int get_name_ret = 0;
-                CString cstemp_value2;
-                float temp_float_value1;
-                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
-                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
-                if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
-                    cstemp_value2.Format(_T("%.3f"), temp_float_value1);
-                m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
-            }
-            else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))
-            {
-                if (read_msv_table)
-                    m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
-                int get_name_ret = 0;
-                CString cstemp_value2;
-                float temp_float_value1;
-                temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
-                get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
-                if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
-                    cstemp_value2.Format(_T("%.3f"), temp_float_value1);
-                m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
-            }
+			else if ((m_Variable_data.at(i).range >= 34) && (m_Variable_data.at(i).range <= 38))
+			{
+				m_variable_list.SetItemText(i, VARIABLE_UNITE, Analog_Variable_Units[m_Variable_data.at(i).range - 34]);
+
+				CString cstemp_value;
+				float temp_float_value;
+				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+				cstemp_value.Format(_T("%.3f"), temp_float_value);
+				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value);
+			}
+			else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))
+			{
+				if (read_msv_table)
+					m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
+				int get_name_ret = 0;
+				CString cstemp_value2;
+				float temp_float_value1;
+				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+				get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
+				if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+					cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
+			}
+			else if ((m_Variable_data.at(i).range >= 101) && (m_Variable_data.at(i).range <= 104))
+			{
+				if (read_msv_table)
+					m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
+				int get_name_ret = 0;
+				CString cstemp_value2;
+				float temp_float_value1;
+				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+				get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
+				if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+					cstemp_value2.Format(_T("%.3f"), temp_float_value1);
+				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
+			}
 			else
 			{
-				m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
+				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[0]);
 
 				CString cstemp_value;
 				float temp_float_value;
 				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
-				cstemp_value.Format(_T("%.3f"),temp_float_value);
-				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value);
+				cstemp_value.Format(_T("%.3f"), temp_float_value);
+				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value);
 			}
 
 		}
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
-			{
-				CString varunit;
-				MultiByteToWideChar(CP_ACP, 0, (char*)bacnet_engineering_unit_names[m_Variable_data.at(i).range].pString,
-					(int)strlen((char*)bacnet_engineering_unit_names[m_Variable_data.at(i).range].pString) + 1,
-					varunit.GetBuffer(MAX_PATH), MAX_PATH);
-				varunit.ReleaseBuffer();
-				m_variable_list.SetItemText(i, VARIABLE_UNITE, varunit);
-			}
-		
+		{
+			CString varunit;
+			MultiByteToWideChar(CP_ACP, 0, (char*)bacnet_engineering_unit_names[m_Variable_data.at(i).range].pString,
+				(int)strlen((char*)bacnet_engineering_unit_names[m_Variable_data.at(i).range].pString) + 1,
+				varunit.GetBuffer(MAX_PATH), MAX_PATH);
+			varunit.ReleaseBuffer();
+			m_variable_list.SetItemText(i, VARIABLE_UNITE, varunit);
+		}
+
 		CString temp_des2;
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).label, (int)strlen((char *)m_Variable_data.at(i).label)+1, 
-			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_Variable_data.at(i).label, (int)strlen((char*)m_Variable_data.at(i).label) + 1,
+			temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_des2.ReleaseBuffer();
 		temp_des2 = temp_des2.Left(STR_VARIABLE_LABEL).Trim();
-		m_variable_list.SetItemText(i,VARIABLE_LABLE,temp_des2);
+		m_variable_list.SetItemText(i, VARIABLE_LABLE, temp_des2);
 
 
-		if(isFreshOne)
+		if (isFreshOne)
 		{
 			break;
 		}

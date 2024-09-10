@@ -1245,10 +1245,6 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-
-
-			//main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
-			//m_input_list.SetItemText(i,INPUT_PANEL,main_sub_panel);
 			if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 			{
 				CString panelID;
@@ -1261,7 +1257,6 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 				m_input_list.SetItemText(i, INPUT_PANEL, Statuspanel);
 				int InputType = 0;
-				//if (selected_product_Node.product_class_id == PM_TSTAT10)
 				  if(Bacnet_Private_Device(selected_product_Node.product_class_id))
 					bacnet_device_type = Device_Basic_Setting.reg.mini_type;
 				InputType = GetInputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1, m_Input_data.at(i).digital_analog);
@@ -1682,8 +1677,6 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 		
 
-		//if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_ANALOG])==0)
-		//{
 
         if (m_Input_data.at(lRow).sub_product == PM_T3PT12)
         {
@@ -1861,16 +1854,6 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	if(cmp_ret!=0)
 	{
 		
-		//if(Write_Private_Data_Blocking(WRITEINPUT_T3000,lRow,lRow) > 0)
-		//{
-		//	temp_task_info.Format(_T("Write Input List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
-		//	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
-		//}
-		//else
-		//{
-		//	temp_task_info.Format(_T("Write Input List Item%d .Changed to \"%s\" Failed"),lRow + 1,New_CString);
-		//	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_task_info);
-		//}
 
 		changed_input_item = lRow;
 		m_input_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);

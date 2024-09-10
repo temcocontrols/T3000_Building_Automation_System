@@ -51,10 +51,6 @@ void CBacnetThirdPartyMain::Dump(CDumpContext& dc) const
 
 void CBacnetThirdPartyMain::Initial_combo()
 {
-    //m_combo_service_choice.AddString(_T("Read Property (12)"));
-    //m_combo_service_choice.SetCurSel(0);
-    //GetDlgItem(IDC_TOOL_NETWORK_EDIT)->SetWindowTextW(_T("0"));
-
     const char * temp = NULL;
 
     CString Add_CString;
@@ -110,7 +106,6 @@ void CBacnetThirdPartyMain::Fresh()
     Sleep(3000);
     return;
     BACNET_APPLICATION_DATA_VALUE temp_value;
-    //int nret = Bacnet_Read_Properties_Blocking(3000, OBJECT_DEVICE, 3000, 76, temp_value, 4);
     int nret = Bacnet_Read_Property_Multiple(137445,(BACNET_OBJECT_TYPE)0,2,8);
     if (nret >= 0)
     {
@@ -133,52 +128,7 @@ void CBacnetThirdPartyMain::Fresh()
 
         MessageBox(temp_cs);
     }
-    //CStatic* pWnd = (CStatic*)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE); // 得到 Picture Control 句柄 ;
-    //CString icon_temperature;
-
-
-    //CString ApplicationFolder;
-    //GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-    //PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
-    //ApplicationFolder.ReleaseBuffer();
-    //AQ_image_fordor = ApplicationFolder + _T("\\ResourceFile");
-    //icon_temperature = AQ_image_fordor + _T("\\temperature.bmp");
-    //HBITMAP bitmap;
-    //bitmap = (HBITMAP)LoadImage(AfxGetInstanceHandle(), icon_temperature, IMAGE_BITMAP, 40, 120, LR_LOADFROMFILE);
-
-    //CStatic *p = (CStatic *)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE);
-    ////设置静态控件窗口风格为位图居中显示  
-    //p->ModifyStyle(0xf, SS_BITMAP | SS_CENTERIMAGE);
-    ////将图片设置到Picture控件上  
-    //p->SetBitmap(bitmap);
-
-
-
-
-
-    //CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    //pFrame->SetWindowTextW(_T("T3000 Building Automation System") + CurrentT3000Version);
-    //if (h_tstat_aq_thread == NULL)
-    //    h_tstat_aq_thread = CreateThread(NULL, NULL, Update_TstatAQ_Thread, this, NULL, NULL);
-    //UpdateUI();
-
-
-    //CString sound_full_path;
-    //CStatic* pWnd_sound_pic = (CStatic*)GetDlgItem(IDC_STATIC_SOUND); // 得到 Picture Control 句柄 ;
-    //if (product_register_value[TSTAT_AQ_SOUND] <= 10)
-    //    sound_full_path = ApplicationFolder + _T("\\ResourceFile\\Icon\\sound_0.ico");
-    //else if (product_register_value[TSTAT_AQ_SOUND] <= 30)
-    //    sound_full_path = ApplicationFolder + _T("\\ResourceFile\\Icon\\sound_1.ico");
-    //else if (product_register_value[TSTAT_AQ_SOUND] <= 50)
-    //    sound_full_path = ApplicationFolder + _T("\\ResourceFile\\Icon\\sound_2.ico");
-    //else
-    //    sound_full_path = ApplicationFolder + _T("\\ResourceFile\\Icon\\sound_3.ico");
-    //Bitmap icon_bitmap(sound_full_path);
-    //HICON m_hIcon = ExtractIcon(AfxGetInstanceHandle(), sound_full_path, 0);
-    //pWnd_sound_pic->ModifyStyle(0, SS_ICON | SS_CENTERIMAGE);
-    //pWnd_sound_pic->SetIcon(m_hIcon);
-
-
+   
 
 }
 
@@ -216,20 +166,5 @@ void CBacnetThirdPartyMain::OnBnClickedButtonThirdOk()
             MessageBox(bacnet_string);
         }
     }
-    //int nret = Bacnet_Read_Properties(device_id, (BACNET_OBJECT_TYPE)object_identifier, object_instance, property_identifier);
-   /* if (nret >= 0)
-    {
-        CFile file;
-        CString temp_bacnet_logfile;
-        temp_bacnet_logfile = g_achive_folder + _T("\\bacnetlog.txt");
-        file.Open(temp_bacnet_logfile, CFile::modeRead, NULL);
-        DWORD len = file.GetLength();
-        char *Buf = new char[len + 1];
-        Buf[len + 1] = 0;  //0终止字符串，用于输出。
-        file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
-        CString temp_cs;
-        MultiByteToWideChar(CP_ACP, 0, (char *)Buf, (int)strlen((char *)Buf) + 1, temp_cs.GetBuffer(len), len);
-        temp_cs.ReleaseBuffer();
-        MessageBox(temp_cs);
-    }*/
+   
 }

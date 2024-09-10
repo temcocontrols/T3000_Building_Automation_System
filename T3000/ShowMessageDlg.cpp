@@ -203,330 +203,324 @@ BOOL CShowMessageDlg::OnInitDialog()
 //此线程用于每隔5秒读取数据
 DWORD WINAPI CShowMessageDlg::ShowMessageThread(LPVOID lPvoid)
 {
-    CShowMessageDlg * mparent = (CShowMessageDlg *)lPvoid;
-    CMainFrame* pFrame = NULL;
-        if (mparent->mevent == EVENT_IP_STATIC_CHANGE)
-        {
-            for (int i = 0; i < 50; i++)
-            {
-                mparent->m_pos = (mparent->auto_close_time_count_old - mparent->auto_close_time_count) * 100 / mparent->auto_close_time_count_old;
-                mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
-                Sleep(mparent->auto_close_time);
-                mparent->auto_close_time_count--;
-            }
-
-            bool ping_ret = false;
-            int try_time = 0;
-            do
-            {
-                CPing p1;
-                CPingReply pr1;
-                ping_ret = p1.Ping1((LPCTSTR)mparent->m_string_event_2_static_ip, pr1);
-                if(ping_ret == false)
-                {
-                    //如果ping 的不通
-                    Sleep(2000);
-                    try_time++;
-                    mparent->m_pos = (mparent->auto_close_time_count_old - mparent->auto_close_time_count) * 100 / mparent->auto_close_time_count_old;
-                    mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
-                    mparent->auto_close_time_count--;
-                }
-
-            } while ((ping_ret == false) && (try_time < 7));
-
-            do
-            {
-                mparent->m_pos = (mparent->auto_close_time_count_old - mparent->auto_close_time_count) * 100 / mparent->auto_close_time_count_old;
-                mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
-                Sleep(mparent->auto_close_time);
-                mparent->auto_close_time_count--;
-            } while (mparent->auto_close_time_count > 0);
-
-            if (mparent->auto_close_time_count <= 0)
-            {
-                ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
-                hShowMessageHandle = NULL;
-                return true;
-            }
-        }
-        else if (mparent->mevent == EVENT_IP_AUTO)
-        {
-            for (int i = 0; i < 60; i++)
-            {
-                mparent->m_pos = (mparent->auto_close_time_count_old - mparent->auto_close_time_count) * 100 / mparent->auto_close_time_count_old;
-                mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
-                Sleep(mparent->auto_close_time);
-                mparent->auto_close_time_count--;
-            }
-            refresh_tree_status_immediately = true;
-            do
-            {
-                mparent->m_pos = (mparent->auto_close_time_count_old - mparent->auto_close_time_count) * 100 / mparent->auto_close_time_count_old;
-                mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
-                Sleep(mparent->auto_close_time);
-                mparent->auto_close_time_count--;
-            } while (mparent->auto_close_time_count > 0);
-
-            if (mparent->auto_close_time_count <= 0)
-            {
-                ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
-                hShowMessageHandle = NULL;
-                return true;
-            }
-        }
-        else if (mparent->mevent == EVENT_MSTP_CONNECTION_ESTABLISH)
-        {
-            for (int i = 0; i<90; i++)
-            {
-                if (mparent->m_exit_by_hands)
-                    break;
-                mstp_port_struct_t Temp_MSTP_Port;
-                Get_MSTP_STRUCT(&Temp_MSTP_Port);
-                unsigned char mstp_add[255] = {0};
-                unsigned char mstp_count = 0;
-
-                Get_MSTP_Nodes(mstp_add, &mstp_count);
-                //SetStaticText(_T("Establishing Bacnet MSTP connection , please wait!"));
-                mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Panel Bacnet MAC ID %d\r\n"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
-                for (int i = 0; i < mstp_count; i++)
-                {
-                    CString temp_nodes;
-                    temp_nodes.Format(_T("MSTP MAC ID : %d\r\n"), mstp_add[i]);
-                    mparent->static_text = mparent->static_text + temp_nodes;
-                }
-
-
-                int temp_wait_count = 0;
-                while ((Temp_MSTP_Port.SoleMaster == 1) && ( temp_wait_count < 10))
-                {
-                    Get_MSTP_STRUCT(&Temp_MSTP_Port);
-                    Sleep(200);
-                    mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Panel Bacnet MAC ID %d\r\nNo response from device\r\nPlease check the communication protocol and check the RS485 hardware connection\r\nScanning"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
-                    CString temp_net;
-                    for (int i = 0; i < temp_wait_count; i++)
-                    {
-                        temp_net = temp_net + _T(".");
-                    }
-                    mparent->static_text = mparent->static_text + temp_net;
-                    temp_wait_count++;
-                }
-
-
-                if(i%10 == 0)
-                    Send_WhoIs_Global(-1, -1);
-                mparent->m_pos = i;
-                Sleep(1000);
-
-                for (int j = 0; j < m_bac_handle_Iam_data.size(); j++)
-                {
-                    if ((mparent->m_mstp_device_info.device_id == m_bac_handle_Iam_data.at(j).device_id) /*&&
-                        (mparent->m_mstp_device_info.macaddress == m_bac_handle_Iam_data.at(j).macaddress)*/)   //暂时拿掉 pannal number的 核对，茶洗说不是一一对应了
-                    {
-                        g_progress_persent = 33;
-                        Sleep(200);
-                        g_progress_persent = 66;
-                        Sleep(200);
-                        g_progress_persent = 100;
-                        Sleep(200);
-                        mstp_read_result = true;  // 读值成功;收到返回I am 设备;
-                        ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
-                        hShowMessageHandle = NULL;
-                        return true;
-                    }
-                }
-
-            }
-            mparent->static_text = mparent->static_text + _T("\r\nDevice not responding.\r\nPlease Check the baudrate and protocol\r\nPlease check the RS485 cable.\r\n");
-            Sleep(1000);
-            system_connect_info.mstp_status = 0; //没有扫描到对应的 下次点击需要重新初始化;
-            ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
-        }
-        else if (mparent->mevent == EVENT_FIRST_LOAD_PROG)
-        {
-            Sleep(500);
-            while(hwait_read_thread != NULL)
-            {
-                if (g_progress_persent != 0)
-                {
-                    mparent->m_pos = g_progress_persent;
-                    mparent->static_percent.Format(_T("%d%%"), g_progress_persent);
-                }
-                Sleep(100);
-            }
-            mparent->KillTimer(1);
-            ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
-        }
-        else if (mparent->mevent == EVENT_CHANGE_PROTOCOL)
-        {
-            g_mstp_deviceid = selected_product_Node.object_instance;
-            CppSQLite3DB SqliteDBBuilding;
-            CppSQLite3Table table;
-            CppSQLite3Query q;
-            CString SqlText;
-            mparent->m_pos = 5;
-            mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
-
-            mparent->static_text.Format(_T("Reading device Bacnet device id!"));
-            unsigned int temp_instance = GetDeviceInstance(product_register_value[7]);
-            Sleep(1000);
-            mparent->m_pos = 25;
-            mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
-
-            if (temp_instance <= 0)
-            {
-                mparent->static_text.Format(_T("Read Bacnet device id failed!"));
-                Sleep(2000);
-                goto failed_path;
-            }
-            int n_ret = 0;
-
-            mparent->static_text.Format(_T("Writing command, please wait!"));
-            n_ret = write_one(mparent->cprotocol_modbus_id, mparent->cprotocol_nreg_address, mparent->cprotocol_nreg_value, 6);
-            mparent->m_pos = 50;
-            mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
-            Sleep(1000);
-
-
-            if (n_ret < 0)
-            {
-                mparent->static_text.Format(_T("Writing command failed!!"));
-                goto failed_path;
-            }
-
-            if (mparent->cprotocol_modbus_to_bacnet == 0)  // 0 modbus          1  bacnet 
-            {
-                if (mparent->cprotocol_sub_device)
-                {
-                    Sleep(1);
-                    //这里要做很多特殊情况处理 ，例如母设备下的   总线上还有没有其他mstp设备在运行;
-                    //先把这个子节点的信息更改
-                    if (Bacnet_Private_Device(selected_product_Node.product_class_id))
-                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), PROTOCOL_MB_TCPIP_TO_MB_RS485, g_selected_serialnumber);
-                    else
-                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_TCPIP, g_selected_serialnumber);
-                }
-                else //
-                {
-                    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), MODBUS_RS485, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
-
-                    //if (Bacnet_Private_Device(selected_product_Node.product_class_id)) //如果是BB类似的
-                    //{
-                    //    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
-                    //}
-                    //else
-                    //    SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), PROTOCOL_MSTP_TO_MODBUS, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
-                }
-
-            }
-            else //  转换为 MSTP协议                 0 modbus          1  bacnet 
-            {
-                if (mparent->cprotocol_sub_device) //BIP下的mstp
-                {
-                    Sleep(1);
-                    //这里要做很多特殊情况处理 ，例如母设备下的   总线上还有没有其他mstp设备在运行;
-                    if (selected_product_Node.note_parent_serial_number != 0)
-                    {
-                        //挂在父节点下面的,更改协议成MSTP ，如果自己本身是T3控制器 就直接用MSTP的协议
-                        if(Bacnet_Private_Device(selected_product_Node.product_class_id))
-                            SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, selected_product_Node.serial_number);
-                        else
-                            SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS, selected_product_Node.serial_number);
-                    }
-                    
-                }
-                else //单纯的 mstp 协议 
-                {
-                    //SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_RS485, g_selected_serialnumber);
-                    if (Bacnet_Private_Device(product_register_value[7])) //如果是BB类似的 全支持的 就改为 全MSTP
-                    {
-                        //这里还要判断是不是通过网络在改 串口的协议？？？？？？？？？？？？？？？？？？？？？？
-                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d',Object_Instance = '%d',Panal_Number = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, temp_instance, selected_product_Node.product_id, g_selected_serialnumber);
-                    }
-                    else//否则就要改为鸡肋版本的 MSTP-Modbus寄存器
-                    {
-                        SqlText.Format(_T("update ALL_NODE set Protocol = '%d',Object_Instance = '%d',Panal_Number = '%d' where Serial_ID='%d'"), PROTOCOL_MSTP_TO_MODBUS, temp_instance, selected_product_Node.product_id, g_selected_serialnumber);
-                    }
-                }
-               
-            }
-
-            mparent->static_text.Format(_T("Changing the local configuration file!"));
-
-            SqliteDBBuilding.open((UTF8MBSTR)mparent->cprotocol_Dbpath);
-
-            SqliteDBBuilding.execDML((UTF8MBSTR)SqlText);
-            SqliteDBBuilding.closedb();
-
-            mparent->m_pos = 75;
-            mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
-
-            Sleep(1000);
-            mparent->static_text.Format(_T("The operation has completed successfully"));
-
-            mparent->m_pos = 100;
-            mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
-            Sleep(1000);
-
-            if (selected_product_Node.note_parent_serial_number != 0)
-            {
-                CString temp_product;
-                temp_product = GetProductName(selected_product_Node.product_class_id);
-                mparent->static_text.Format(_T("%s protocal and baudrate changed success"), temp_product);
-                Sleep(1000);
-                mparent->static_text.Format(_T("The controller's protocol and baud rate also need to be changed to communicate properly"));
-                Sleep(2000);
-            }
-
-
-failed_path:
-            pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
-            pFrame->PostMessage(WM_MYMSG_REFRESHBUILDING, 0, 0);
-            mparent->PostMessage(WM_CLOSE, NULL, NULL);
-            if (selected_product_Node.note_parent_serial_number == 0)
-            {
-                pFrame->SetTimer(5, 2000, NULL);
-            }
-        }
-        else if (mparent->mevent == EVENT_WARNING_CHANGE_PROTOCOL_BAUDRATE)
-        {
-            Sleep(mparent->auto_close_time);
-            ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
-        }
-        else if (EVENT_SYNC_TIME == mparent->mevent)
-        {
-            for (int i = 0; i < 20; i++)
-            {
-                if ((ok_button_press != 0) && (ok_button_press != 1))
-                {
-                    Sleep(1000);
-                }
-                else
-                {
-                    ::PostMessage(mparent->m_hWnd,WM_CLOSE, NULL, NULL);
-                    break;
-                }
-
-            }
-
-                
-        }
-		else if (EVENT_MESSAGE_ONLY == mparent->mevent)
+	CShowMessageDlg* mparent = (CShowMessageDlg*)lPvoid;
+	CMainFrame* pFrame = NULL;
+	if (mparent->mevent == EVENT_IP_STATIC_CHANGE)
+	{
+		for (int i = 0; i < 50; i++)
 		{
-		    for (int i = 0; i < 20; i++)
-		    {
-			    if ((ok_button_press != 0) && (ok_button_press != 1))
-			    {
-				    Sleep(1000);
-			    }
-			    else
-			    {
-				    ::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
-				    break;
-			    }
-		    }
+			mparent->m_pos = (mparent->auto_close_time_count_old - mparent->auto_close_time_count) * 100 / mparent->auto_close_time_count_old;
+			mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+			Sleep(mparent->auto_close_time);
+			mparent->auto_close_time_count--;
 		}
-    hShowMessageHandle = NULL;
-    return true;
+
+		bool ping_ret = false;
+		int try_time = 0;
+		do
+		{
+			CPing p1;
+			CPingReply pr1;
+			ping_ret = p1.Ping1((LPCTSTR)mparent->m_string_event_2_static_ip, pr1);
+			if (ping_ret == false)
+			{
+				//如果ping 的不通
+				Sleep(2000);
+				try_time++;
+				mparent->m_pos = (mparent->auto_close_time_count_old - mparent->auto_close_time_count) * 100 / mparent->auto_close_time_count_old;
+				mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+				mparent->auto_close_time_count--;
+			}
+
+		} while ((ping_ret == false) && (try_time < 7));
+
+		do
+		{
+			mparent->m_pos = (mparent->auto_close_time_count_old - mparent->auto_close_time_count) * 100 / mparent->auto_close_time_count_old;
+			mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+			Sleep(mparent->auto_close_time);
+			mparent->auto_close_time_count--;
+		} while (mparent->auto_close_time_count > 0);
+
+		if (mparent->auto_close_time_count <= 0)
+		{
+			::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+			hShowMessageHandle = NULL;
+			return true;
+		}
+	}
+	else if (mparent->mevent == EVENT_IP_AUTO)
+	{
+		for (int i = 0; i < 60; i++)
+		{
+			mparent->m_pos = (mparent->auto_close_time_count_old - mparent->auto_close_time_count) * 100 / mparent->auto_close_time_count_old;
+			mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+			Sleep(mparent->auto_close_time);
+			mparent->auto_close_time_count--;
+		}
+		refresh_tree_status_immediately = true;
+		do
+		{
+			mparent->m_pos = (mparent->auto_close_time_count_old - mparent->auto_close_time_count) * 100 / mparent->auto_close_time_count_old;
+			mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+			Sleep(mparent->auto_close_time);
+			mparent->auto_close_time_count--;
+		} while (mparent->auto_close_time_count > 0);
+
+		if (mparent->auto_close_time_count <= 0)
+		{
+			::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+			hShowMessageHandle = NULL;
+			return true;
+		}
+	}
+	else if (mparent->mevent == EVENT_MSTP_CONNECTION_ESTABLISH)
+	{
+		for (int i = 0; i < 90; i++)
+		{
+			if (mparent->m_exit_by_hands)
+				break;
+			mstp_port_struct_t Temp_MSTP_Port;
+			Get_MSTP_STRUCT(&Temp_MSTP_Port);
+			unsigned char mstp_add[255] = { 0 };
+			unsigned char mstp_count = 0;
+
+			Get_MSTP_Nodes(mstp_add, &mstp_count);
+			//SetStaticText(_T("Establishing Bacnet MSTP connection , please wait!"));
+			mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Panel Bacnet MAC ID %d\r\n"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
+			for (int i = 0; i < mstp_count; i++)
+			{
+				CString temp_nodes;
+				temp_nodes.Format(_T("MSTP MAC ID : %d\r\n"), mstp_add[i]);
+				mparent->static_text = mparent->static_text + temp_nodes;
+			}
+
+
+			int temp_wait_count = 0;
+			while ((Temp_MSTP_Port.SoleMaster == 1) && (temp_wait_count < 10))
+			{
+				Get_MSTP_STRUCT(&Temp_MSTP_Port);
+				Sleep(200);
+				mparent->static_text.Format(_T("Establishing Bacnet MSTP connection , please wait!\r\nPolling node %d ,Panel Bacnet MAC ID %d\r\nNo response from device\r\nPlease check the communication protocol and check the RS485 hardware connection\r\nScanning"), Temp_MSTP_Port.Poll_Station, bac_gloab_panel);
+				CString temp_net;
+				for (int i = 0; i < temp_wait_count; i++)
+				{
+					temp_net = temp_net + _T(".");
+				}
+				mparent->static_text = mparent->static_text + temp_net;
+				temp_wait_count++;
+			}
+
+
+			if (i % 10 == 0)
+				Send_WhoIs_Global(-1, -1);
+			mparent->m_pos = i;
+			Sleep(1000);
+
+			for (int j = 0; j < m_bac_handle_Iam_data.size(); j++)
+			{
+				if ((mparent->m_mstp_device_info.device_id == m_bac_handle_Iam_data.at(j).device_id) /*&&
+					(mparent->m_mstp_device_info.macaddress == m_bac_handle_Iam_data.at(j).macaddress)*/)   //暂时拿掉 pannal number的 核对，茶洗说不是一一对应了
+				{
+					g_progress_persent = 33;
+					Sleep(200);
+					g_progress_persent = 66;
+					Sleep(200);
+					g_progress_persent = 100;
+					Sleep(200);
+					mstp_read_result = true;  // 读值成功;收到返回I am 设备;
+					::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+					hShowMessageHandle = NULL;
+					return true;
+				}
+			}
+
+		}
+		mparent->static_text = mparent->static_text + _T("\r\nDevice not responding.\r\nPlease Check the baudrate and protocol\r\nPlease check the RS485 cable.\r\n");
+		Sleep(1000);
+		system_connect_info.mstp_status = 0; //没有扫描到对应的 下次点击需要重新初始化;
+		::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+	}
+	else if (mparent->mevent == EVENT_FIRST_LOAD_PROG)
+	{
+		Sleep(500);
+		while (hwait_read_thread != NULL)
+		{
+			if (g_progress_persent != 0)
+			{
+				mparent->m_pos = g_progress_persent;
+				mparent->static_percent.Format(_T("%d%%"), g_progress_persent);
+			}
+			Sleep(100);
+		}
+		mparent->KillTimer(1);
+		::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+	}
+	else if (mparent->mevent == EVENT_CHANGE_PROTOCOL)
+	{
+		g_mstp_deviceid = selected_product_Node.object_instance;
+		CppSQLite3DB SqliteDBBuilding;
+		CppSQLite3Table table;
+		CppSQLite3Query q;
+		CString SqlText;
+		mparent->m_pos = 5;
+		mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+
+		mparent->static_text.Format(_T("Reading device Bacnet device id!"));
+		unsigned int temp_instance = GetDeviceInstance(product_register_value[7]);
+		Sleep(1000);
+		mparent->m_pos = 25;
+		mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+
+		if (temp_instance <= 0)
+		{
+			mparent->static_text.Format(_T("Read Bacnet device id failed!"));
+			Sleep(2000);
+			goto failed_path;
+		}
+		int n_ret = 0;
+
+		mparent->static_text.Format(_T("Writing command, please wait!"));
+		n_ret = write_one(mparent->cprotocol_modbus_id, mparent->cprotocol_nreg_address, mparent->cprotocol_nreg_value, 6);
+		mparent->m_pos = 50;
+		mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+		Sleep(1000);
+
+
+		if (n_ret < 0)
+		{
+			mparent->static_text.Format(_T("Writing command failed!!"));
+			goto failed_path;
+		}
+
+		if (mparent->cprotocol_modbus_to_bacnet == 0)  // 0 modbus          1  bacnet 
+		{
+			if (mparent->cprotocol_sub_device)
+			{
+				Sleep(1);
+				//这里要做很多特殊情况处理 ，例如母设备下的   总线上还有没有其他mstp设备在运行;
+				//先把这个子节点的信息更改
+				if (Bacnet_Private_Device(selected_product_Node.product_class_id))
+					SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), PROTOCOL_MB_TCPIP_TO_MB_RS485, g_selected_serialnumber);
+				else
+					SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_TCPIP, g_selected_serialnumber);
+			}
+			else //
+			{
+				SqlText.Format(_T("update ALL_NODE set Protocol = '%d' , Object_Instance = '%d' where Serial_ID='%d'"), MODBUS_RS485, temp_instance, g_selected_serialnumber /*get_serialnumber()*/);
+
+			}
+
+		}
+		else //  转换为 MSTP协议                 0 modbus          1  bacnet 
+		{
+			if (mparent->cprotocol_sub_device) //BIP下的mstp
+			{
+				Sleep(1);
+				//这里要做很多特殊情况处理 ，例如母设备下的   总线上还有没有其他mstp设备在运行;
+				if (selected_product_Node.note_parent_serial_number != 0)
+				{
+					//挂在父节点下面的,更改协议成MSTP ，如果自己本身是T3控制器 就直接用MSTP的协议
+					if (Bacnet_Private_Device(selected_product_Node.product_class_id))
+						SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, selected_product_Node.serial_number);
+					else
+						SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS, selected_product_Node.serial_number);
+				}
+
+			}
+			else //单纯的 mstp 协议 
+			{
+				//SqlText.Format(_T("update ALL_NODE set Protocol = '%d' where Serial_ID='%d'"), MODBUS_RS485, g_selected_serialnumber);
+				if (Bacnet_Private_Device(product_register_value[7])) //如果是BB类似的 全支持的 就改为 全MSTP
+				{
+					//这里还要判断是不是通过网络在改 串口的协议？？？？？？？？？？？？？？？？？？？？？？
+					SqlText.Format(_T("update ALL_NODE set Protocol = '%d',Object_Instance = '%d',Panal_Number = '%d' where Serial_ID='%d'"), MODBUS_BACNET_MSTP, temp_instance, selected_product_Node.product_id, g_selected_serialnumber);
+				}
+				else//否则就要改为鸡肋版本的 MSTP-Modbus寄存器
+				{
+					SqlText.Format(_T("update ALL_NODE set Protocol = '%d',Object_Instance = '%d',Panal_Number = '%d' where Serial_ID='%d'"), PROTOCOL_MSTP_TO_MODBUS, temp_instance, selected_product_Node.product_id, g_selected_serialnumber);
+				}
+			}
+
+		}
+
+		mparent->static_text.Format(_T("Changing the local configuration file!"));
+
+		SqliteDBBuilding.open((UTF8MBSTR)mparent->cprotocol_Dbpath);
+
+		SqliteDBBuilding.execDML((UTF8MBSTR)SqlText);
+		SqliteDBBuilding.closedb();
+
+		mparent->m_pos = 75;
+		mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+
+		Sleep(1000);
+		mparent->static_text.Format(_T("The operation has completed successfully"));
+
+		mparent->m_pos = 100;
+		mparent->static_percent.Format(_T("%d%%"), mparent->m_pos);
+		Sleep(1000);
+
+		if (selected_product_Node.note_parent_serial_number != 0)
+		{
+			CString temp_product;
+			temp_product = GetProductName(selected_product_Node.product_class_id);
+			mparent->static_text.Format(_T("%s protocal and baudrate changed success"), temp_product);
+			Sleep(1000);
+			mparent->static_text.Format(_T("The controller's protocol and baud rate also need to be changed to communicate properly"));
+			Sleep(2000);
+		}
+
+
+	failed_path:
+		pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		pFrame->PostMessage(WM_MYMSG_REFRESHBUILDING, 0, 0);
+		mparent->PostMessage(WM_CLOSE, NULL, NULL);
+		if (selected_product_Node.note_parent_serial_number == 0)
+		{
+			pFrame->SetTimer(5, 2000, NULL);
+		}
+	}
+	else if (mparent->mevent == EVENT_WARNING_CHANGE_PROTOCOL_BAUDRATE)
+	{
+		Sleep(mparent->auto_close_time);
+		::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+	}
+	else if (EVENT_SYNC_TIME == mparent->mevent)
+	{
+		for (int i = 0; i < 20; i++)
+		{
+			if ((ok_button_press != 0) && (ok_button_press != 1))
+			{
+				Sleep(1000);
+			}
+			else
+			{
+				::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+				break;
+			}
+
+		}
+
+
+	}
+	else if (EVENT_MESSAGE_ONLY == mparent->mevent)
+	{
+		for (int i = 0; i < 20; i++)
+		{
+			if ((ok_button_press != 0) && (ok_button_press != 1))
+			{
+				Sleep(1000);
+			}
+			else
+			{
+				::PostMessage(mparent->m_hWnd, WM_CLOSE, NULL, NULL);
+				break;
+			}
+		}
+	}
+	hShowMessageHandle = NULL;
+	return true;
 }
 
 BOOL CShowMessageDlg::PreTranslateMessage(MSG* pMsg)

@@ -338,17 +338,6 @@ BOOL CBacnetGraphic::OnInitDialog()
 		CloseHandle(mythread);
 	}
 
-	//if(read_monitor_sd_ret == MONITOR_READ_TIMEOUT)
-	//{
-	//	//MessageBox(_T("Read Monitor Data Timeout!"));
-	//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read monitor data timeout!"));
-	//}
-	//else if(read_monitor_sd_ret == MONITOR_READ_NO_DATA)
-	//{
-	//	//MessageBox(_T("No data in this period of time!"));
-	//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No data in this period of time!"));
-	//}
-
 
 	if(updatedatathread == NULL)
 	{
@@ -652,23 +641,11 @@ void CBacnetGraphic::Create_Line_Point()
                     continue;
 				}
 
-				//CString strTime;
-				//time_t scale_time ;
-				//CTime time_scaletime;
-				//scale_time = analog_data_point[x][i].loggingtime ;
-				//time_scaletime = scale_time;
-				//strTime = time_scaletime.Format("  %m/%d %H:%M:%S");
-
-				//TRACE(_T("X = %d , Y = %d Time = %s\r\n"),(int)mytemppoint.X,(int)mytemppoint.Y,strTime);
-
 				MyPoint Mypoint={0,0};
 				Mypoint.x = mytemppoint.X;
 				Mypoint.y = mytemppoint.Y;
 				pTempItem->SetPoint(Mypoint);
-				//if(i == (analog_data_count[x]-1))
-				//{
-				//	pTempItem->m_link_to_next = false;
-				//}
+				
 				if(pPrevItem != NULL)
 				{
 					pPrevItem->SetNext(pTempItem);
@@ -868,11 +845,6 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
         n_update_shou_1_once = false;
 
 
-        //if (!refresh_ret)
-        //{
-        //    Sleep(5000);
-        //    continue;
-        //}
 
         draw_graphic_finished = false;
         b_has_create_point = false;
@@ -962,8 +934,7 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 			//TRACE(str_temp);
 
 			mparent->Create_Line_Point();	//新建需要绘制的点;一直到下次开始刷新 或者定时器刷新时在去获取点;
-			//b_has_create_point = true;
-			//draw_graphic_finished = true;
+			
 		}
 		WaitForSingleObject(Point_Mutex,INFINITE); 
 		mparent->Draw_Graphic(hMemDC);
@@ -982,7 +953,7 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
             if(no_space_auto_close == 0)
                 ::PostMessage(myhWnd, WM_CLOSE, NULL, NULL);
         }
-		//flag_continue_thread = false;
+		
 	}
 	mythread = NULL;
 	return 0;
@@ -998,58 +969,56 @@ LRESULT CBacnetGraphic::Fresh_Static_Function(WPARAM wParam,LPARAM lParam)
 
 void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 {
-	Graphics *mygraphics;
+	Graphics* mygraphics;
 
 	mygraphics = new Graphics(my_hdc);
 	mygraphics->SetSmoothingMode(SmoothingModeAntiAlias);
-	Pen *myRectangle_pen;
-	Pen * my_inline_pen;
-	Pen * m_value_move_pen;
-	Pen * static_write_bord;
-	Pen * static_black_bord;
-	Pen * static_auto_scroll_pen;
+	Pen* myRectangle_pen;
+	Pen* my_inline_pen;
+	Pen* m_value_move_pen;
+	Pen* static_write_bord;
+	Pen* static_black_bord;
+	Pen* static_auto_scroll_pen;
 
-	Pen * CurePen;
+	Pen* CurePen;
 
-	Pen * persent_pen1;Pen * persent_pen2;Pen * persent_pen3;
-	persent_pen1 = new Pen(Color(255,255,0,0),2.0);	persent_pen2 = new Pen(Color(255,0,255,0),2.0);	persent_pen3 = new Pen(Color(255,0,0,255),2.0);
+	Pen* persent_pen1; Pen* persent_pen2; Pen* persent_pen3;
+	persent_pen1 = new Pen(Color(255, 255, 0, 0), 2.0);	persent_pen2 = new Pen(Color(255, 0, 255, 0), 2.0);	persent_pen3 = new Pen(Color(255, 0, 0, 255), 2.0);
 
-	SolidBrush *BlackBrush;
-	
-	
+	SolidBrush* BlackBrush;
+
+
 	myRectangle_pen = new Pen(MY_COLOR_PEN_RECTANGLE_BORD);
 	my_inline_pen = new Pen(MY_COLOR_PEN_INLINE_PEN);
 	m_value_move_pen = new Pen(MY_COLOR_PEN_VALUE_PEN);
-	static_write_bord = new  Pen(MY_COLOR_14_WRITE_BORD,2.0f);
-	static_black_bord = new  Pen(MY_COLOR_14_BLACK_BORD,2.0f);
-	static_auto_scroll_pen = new  Pen(Color(255,255,255,255),4.0f);
+	static_write_bord = new  Pen(MY_COLOR_14_WRITE_BORD, 2.0f);
+	static_black_bord = new  Pen(MY_COLOR_14_BLACK_BORD, 2.0f);
+	static_auto_scroll_pen = new  Pen(Color(255, 255, 255, 255), 4.0f);
 
-	REAL dashValues[2] = {3, 7};
+	REAL dashValues[2] = { 3, 7 };
 	//Pen blackPen(Color(255, 0, 0, 0), 5);
 	my_inline_pen->SetDashPattern(dashValues, 2);
-	REAL valuedashValues[2] = {4, 6};
+	REAL valuedashValues[2] = { 4, 6 };
 	m_value_move_pen->SetDashPattern(valuedashValues, 2);
 
-	CurePen = new Pen(Graphic_Color[1],2.0f);
+	CurePen = new Pen(Graphic_Color[1], 2.0f);
 	PointF      pointF(0, 0);
 
 	//BlackBrush =new SolidBrush(Color(255,0,0,0));老毛希望背景色改为灰色.
-	BlackBrush =new  SolidBrush(MY_COLOR_BACKGRAND) ;
+	BlackBrush = new  SolidBrush(MY_COLOR_BACKGRAND);
 
-	
-	mygraphics->FillRectangle(BlackBrush,0,0,window_width,window_hight);
-	mygraphics->DrawRectangle(myRectangle_pen,(int)m_analogorignpoint.X,(int)m_analogorignpoint.Y,m_X_ASIX_WIDTH,m_Y_ASIX_HIGHT);
-	mygraphics->DrawRectangle(myRectangle_pen,(int)m_digitalorignpoint.X,(int)m_digitalorignpoint.Y,m_Digital_X_WIDTH,m_Digital_Y_HIGHT  );
 
-	SolidBrush *Static_blackground_Brush;
-	Pen *mystaticRectangle_pen;
-	mystaticRectangle_pen = new Pen(MY_COLOR_PEN,2.0f);
-	Static_blackground_Brush =new SolidBrush(MY_COLOR_14BGD);	//This part is draw the 14 label and it's background;
+	mygraphics->FillRectangle(BlackBrush, 0, 0, window_width, window_hight);
+	mygraphics->DrawRectangle(myRectangle_pen, (int)m_analogorignpoint.X, (int)m_analogorignpoint.Y, m_X_ASIX_WIDTH, m_Y_ASIX_HIGHT);
+	mygraphics->DrawRectangle(myRectangle_pen, (int)m_digitalorignpoint.X, (int)m_digitalorignpoint.Y, m_Digital_X_WIDTH, m_Digital_Y_HIGHT);
 
-	//mygraphics->FillRectangle(Static_blackground_Brush,0,window_hight - 200,window_width,200);
-	//mygraphics->DrawRectangle(mystaticRectangle_pen,2,window_hight - 200,window_width-15,200 -55);
-	mygraphics->FillRectangle(Static_blackground_Brush,4,4,9 + STATIC_LABLE_WIDTH + 40,663);
-	mygraphics->DrawRectangle(mystaticRectangle_pen,6,4,9 + STATIC_LABLE_WIDTH + 40,663);
+	SolidBrush* Static_blackground_Brush;
+	Pen* mystaticRectangle_pen;
+	mystaticRectangle_pen = new Pen(MY_COLOR_PEN, 2.0f);
+	Static_blackground_Brush = new SolidBrush(MY_COLOR_14BGD);	//This part is draw the 14 label and it's background;
+
+	mygraphics->FillRectangle(Static_blackground_Brush, 4, 4, 9 + STATIC_LABLE_WIDTH + 40, 663);
+	mygraphics->DrawRectangle(mystaticRectangle_pen, 6, 4, 9 + STATIC_LABLE_WIDTH + 40, 663);
 
 
 	FontFamily  ScrollfontFamily(_T("Arial"));
@@ -1065,67 +1034,66 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	scrollpointF.X = 122;
 	scrollpointF.Y = 15 + 13 * (STATIC_LABLE_HIGHT + 9) + STATIC_LABLE_HIGHT + 8; //714;
 
-	SolidBrush *Static_scroll_blackground_Brush;
-	Static_scroll_blackground_Brush =new SolidBrush(MY_COLOR_14LABLE_BGD);	//This part is draw the 14 label and it's background;
-	mygraphics->FillRectangle(Static_scroll_blackground_Brush,120,(int)scrollpointF.Y,50,20);
+	SolidBrush* Static_scroll_blackground_Brush;
+	Static_scroll_blackground_Brush = new SolidBrush(MY_COLOR_14LABLE_BGD);	//This part is draw the 14 label and it's background;
+	mygraphics->FillRectangle(Static_scroll_blackground_Brush, 120, (int)scrollpointF.Y, 50, 20);
 
 
 
-	if(flag_auto_scroll)
-		mygraphics->DrawString(_T("ON"), -1, &Scroll_font, scrollpointF,&Font_brush_on_off);
+	if (flag_auto_scroll)
+		mygraphics->DrawString(_T("ON"), -1, &Scroll_font, scrollpointF, &Font_brush_on_off);
 	else
-		mygraphics->DrawString(_T("OFF"), -1, &Scroll_font, scrollpointF,&Font_brush_on_off);
+		mygraphics->DrawString(_T("OFF"), -1, &Scroll_font, scrollpointF, &Font_brush_on_off);
 
-    if (no_space_auto_close)
-    {
-        scrollpointF.X = 500;
-        scrollpointF.Y = 200;
-        mygraphics->DrawString(_T("There is not enough space to store new data (selected trend log)."), -1, &Scroll_font, scrollpointF, &Font_brush_on_off);
+	if (no_space_auto_close)
+	{
+		scrollpointF.X = 500;
+		scrollpointF.Y = 200;
+		mygraphics->DrawString(_T("There is not enough space to store new data (selected trend log)."), -1, &Scroll_font, scrollpointF, &Font_brush_on_off);
 
-    }
+	}
 
 
 
 	delete Static_scroll_blackground_Brush;
 
 #pragma region Show_Three_View
-//#define  MY_COLOR_VIEW_SELECT			Color(255,255,255,255)
-//#define  MY_COLOR_VIEW_UNSELECT			Color(255,192,192,192)
+
 
 	SolidBrush  View_Font_brush_temp(MY_COLOR_VIEW123);
-	SolidBrush *Static_view_Brush;
-	SolidBrush *Static_view_unselect_Brush;
-	Static_view_Brush =new SolidBrush(MY_COLOR_VIEW_SELECT);	
-	Static_view_unselect_Brush =new SolidBrush(MY_COLOR_VIEW_UNSELECT);
+	SolidBrush* Static_view_Brush;
+	SolidBrush* Static_view_unselect_Brush;
+	Static_view_Brush = new SolidBrush(MY_COLOR_VIEW_SELECT);
+	Static_view_unselect_Brush = new SolidBrush(MY_COLOR_VIEW_UNSELECT);
 
 	//绘制 屏幕上方的 三个View.
-	if(graphic_view_index == 0)
-		mygraphics->FillRectangle(Static_view_Brush,850,6,120,20);
+	if (graphic_view_index == 0)
+		mygraphics->FillRectangle(Static_view_Brush, 850, 6, 120, 20);
 	else
-		mygraphics->FillRectangle(Static_view_unselect_Brush,850,6,120,20);
+		mygraphics->FillRectangle(Static_view_unselect_Brush, 850, 6, 120, 20);
 
-	mygraphics->DrawRectangle(mystaticRectangle_pen,850,6,120,20);
+	mygraphics->DrawRectangle(mystaticRectangle_pen, 850, 6, 120, 20);
 	scrollpointF.X = 850;
 	scrollpointF.Y = 6;
-	mygraphics->DrawString(grapgic_view_name[0], -1, &Scroll_font, scrollpointF,&View_Font_brush_temp);
+	mygraphics->DrawString(grapgic_view_name[0], -1, &Scroll_font, scrollpointF, &View_Font_brush_temp);
 
-	if(graphic_view_index == 1)
-		mygraphics->FillRectangle(Static_view_Brush,1000,6,120,20);
+	if (graphic_view_index == 1)
+		mygraphics->FillRectangle(Static_view_Brush, 1000, 6, 120, 20);
 	else
-		mygraphics->FillRectangle(Static_view_unselect_Brush,1000,6,120,20);
-	mygraphics->DrawRectangle(mystaticRectangle_pen,1000,6,120,20);
+		mygraphics->FillRectangle(Static_view_unselect_Brush, 1000, 6, 120, 20);
+	mygraphics->DrawRectangle(mystaticRectangle_pen, 1000, 6, 120, 20);
 	scrollpointF.X = 1000;
 	scrollpointF.Y = 6;
-	mygraphics->DrawString(grapgic_view_name[1], -1, &Scroll_font, scrollpointF,&View_Font_brush_temp);
+	mygraphics->DrawString(grapgic_view_name[1], -1, &Scroll_font, scrollpointF, &View_Font_brush_temp);
 
-	if(graphic_view_index == 2)
-		mygraphics->FillRectangle(Static_view_Brush,1150,6,120,20);
+	if (graphic_view_index == 2)
+		mygraphics->FillRectangle(Static_view_Brush, 1150, 6, 120, 20);
 	else
-		mygraphics->FillRectangle(Static_view_unselect_Brush,1150,6,120,20);
-	mygraphics->DrawRectangle(mystaticRectangle_pen,1150,6,120,20);
+		mygraphics->FillRectangle(Static_view_unselect_Brush, 1150, 6, 120, 20);
+	mygraphics->DrawRectangle(mystaticRectangle_pen, 1150, 6, 120, 20);
 	scrollpointF.X = 1150;
 	scrollpointF.Y = 6;
-	mygraphics->DrawString(grapgic_view_name[2], -1, &Scroll_font, scrollpointF,&View_Font_brush_temp);
+	mygraphics->DrawString(grapgic_view_name[2], -1, &Scroll_font, scrollpointF, &View_Font_brush_temp);
 
 	delete Static_view_unselect_Brush;
 	delete Static_view_Brush;
@@ -1137,14 +1105,14 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	scrollpointF.X = 700;
 	scrollpointF.Y = 2;
 	CString top_string;
-	switch(m_time_selected)
+	switch (m_time_selected)
 	{
 	case TIME_FIVE_MINUTE:
-			top_string.Format(_T("5 Minutes"));
-	
+		top_string.Format(_T("5 Minutes"));
+
 		break;
-	case TIME_TEN_MINUTE :
-			top_string.Format(_T("10 Minutes"));
+	case TIME_TEN_MINUTE:
+		top_string.Format(_T("10 Minutes"));
 		break;
 	case TIME_ONE_HOUR:
 		top_string.Format(_T("1 Hour"));
@@ -1167,51 +1135,51 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	default:
 		break;
 	}
-	
-	mygraphics->DrawString(top_string, -1, &TimeTopShow_font, scrollpointF,&Font_brush_on_off);
+
+	mygraphics->DrawString(top_string, -1, &TimeTopShow_font, scrollpointF, &Font_brush_on_off);
 
 	//右键点击 在绘图区域显示当前的值;
-	if((RclickValueTime.X != 0) && (RclickValueTime.Y != 0))
+	if ((RclickValueTime.X != 0) && (RclickValueTime.Y != 0))
 	{
-		CString cs_value ;
+		CString cs_value;
 		float temp_nvalue;
-		temp_nvalue =	 ( m_analogorignpoint.Y + m_Y_ASIX_HIGHT - RclickValueTime.Y ) * m_onepiexlvalue  + m_lowvalue ;
-		cs_value.Format(_T("%.1f"),temp_nvalue);
+		temp_nvalue = (m_analogorignpoint.Y + m_Y_ASIX_HIGHT - RclickValueTime.Y) * m_onepiexlvalue + m_lowvalue;
+		cs_value.Format(_T("%.1f"), temp_nvalue);
 		SolidBrush  RClickBrush(MY_COLOR_RIGHTCLICK_VALUE_COLOR);
-		mygraphics->DrawString(cs_value, -1, &TimeTopShow_font, RclickValueTime,&RClickBrush);
-		mygraphics->DrawLine(m_value_move_pen,(INT)250, (INT) RclickValueTime.Y   ,(INT)  1250, (INT) RclickValueTime.Y);
-		if(contain_digital )
-		mygraphics->DrawLine(m_value_move_pen,(INT)RclickValueTime.X, (INT) (30)   ,(INT)RclickValueTime.X, (INT) (30 + 500));
+		mygraphics->DrawString(cs_value, -1, &TimeTopShow_font, RclickValueTime, &RClickBrush);
+		mygraphics->DrawLine(m_value_move_pen, (INT)250, (INT)RclickValueTime.Y, (INT)1250, (INT)RclickValueTime.Y);
+		if (contain_digital)
+			mygraphics->DrawLine(m_value_move_pen, (INT)RclickValueTime.X, (INT)(30), (INT)RclickValueTime.X, (INT)(30 + 500));
 		else
 		{
-			mygraphics->DrawLine(m_value_move_pen,(INT)RclickValueTime.X, (INT) (30)   ,(INT)RclickValueTime.X, (INT) (30 + 650));
+			mygraphics->DrawLine(m_value_move_pen, (INT)RclickValueTime.X, (INT)(30), (INT)RclickValueTime.X, (INT)(30 + 650));
 		}
 	}
 
-			//****************************************************************************************************
-	//画下面的 1 到 E 的lable	;
-	//mystaticRectangle_pen = new Pen(Graphic_Color[0],2.0f);
-	for (int i=0;i<INPUT_NUMBER;i++)
+	//****************************************************************************************************
+//画下面的 1 到 E 的lable	;
+//mystaticRectangle_pen = new Pen(Graphic_Color[0],2.0f);
+	for (int i = 0; i < INPUT_NUMBER; i++)
 	{
 		CString temp_cs;
 		temp_cs = InputLable[i];// _T("AAAAAA");
-		if((temp_cs.IsEmpty()) || (StaticShow[i] == false))
+		if ((temp_cs.IsEmpty()) || (StaticShow[i] == false))
 		{
-			Static_blackground_Brush =new SolidBrush(UNUSE_COLOR);	//This part is draw the 14 label and it's background;
+			Static_blackground_Brush = new SolidBrush(UNUSE_COLOR);	//This part is draw the 14 label and it's background;
 			StaticShow[i] = false;	//如果是由 temp_cs.IsEmpty() 进来的 就顺便把 StaticShow 也设置为false;
 		}
 		else
-			Static_blackground_Brush =new SolidBrush(Graphic_Color[i+1]);	//This part is draw the 14 label and it's background;
+			Static_blackground_Brush = new SolidBrush(Graphic_Color[i + 1]);	//This part is draw the 14 label and it's background;
 
-		RectPosition[i].left = 15 ;
-		RectPosition[i].top = 15 + i* (STATIC_LABLE_HIGHT + 9);
-		RectPosition[i].right = 15   + STATIC_LABLE_WIDTH;
-		RectPosition[i].bottom = 15 + i* (STATIC_LABLE_HIGHT + 9) + STATIC_LABLE_HIGHT;
-		mygraphics->FillRectangle(Static_blackground_Brush,RectPosition[i].left,RectPosition[i].top,STATIC_LABLE_WIDTH,STATIC_LABLE_HIGHT);
-		mygraphics->DrawLine(static_write_bord,RectPosition[i].left - 2,  RectPosition[i].top -2   ,RectPosition[i].right     ,RectPosition[i].top -2);
-		mygraphics->DrawLine(static_write_bord,RectPosition[i].left - 2,  RectPosition[i].top -2   ,RectPosition[i].left - 2  ,RectPosition[i].bottom);
-		mygraphics->DrawLine(static_black_bord,RectPosition[i].left ,     RectPosition[i].bottom   ,RectPosition[i].right     ,RectPosition[i].bottom);
-		mygraphics->DrawLine(static_black_bord,RectPosition[i].right ,    RectPosition[i].top      ,RectPosition[i].right     ,RectPosition[i].bottom);
+		RectPosition[i].left = 15;
+		RectPosition[i].top = 15 + i * (STATIC_LABLE_HIGHT + 9);
+		RectPosition[i].right = 15 + STATIC_LABLE_WIDTH;
+		RectPosition[i].bottom = 15 + i * (STATIC_LABLE_HIGHT + 9) + STATIC_LABLE_HIGHT;
+		mygraphics->FillRectangle(Static_blackground_Brush, RectPosition[i].left, RectPosition[i].top, STATIC_LABLE_WIDTH, STATIC_LABLE_HIGHT);
+		mygraphics->DrawLine(static_write_bord, RectPosition[i].left - 2, RectPosition[i].top - 2, RectPosition[i].right, RectPosition[i].top - 2);
+		mygraphics->DrawLine(static_write_bord, RectPosition[i].left - 2, RectPosition[i].top - 2, RectPosition[i].left - 2, RectPosition[i].bottom);
+		mygraphics->DrawLine(static_black_bord, RectPosition[i].left, RectPosition[i].bottom, RectPosition[i].right, RectPosition[i].bottom);
+		mygraphics->DrawLine(static_black_bord, RectPosition[i].right, RectPosition[i].top, RectPosition[i].right, RectPosition[i].bottom);
 
 
 
@@ -1219,45 +1187,42 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		FontFamily  UnitfontFamily(_T("Arial"));
 		//FontFamily  StaticfontFamily(_T("Times New Roman"));
 		FontFamily  StaticfontFamily(_T("Arial"));
-		
+
 		Gdiplus::Font        Input_font(&StaticfontFamily, 12, FontStyleRegular, UnitPixel);
-		
+
 		PointF      staticpointF(0, 0);
-		SolidBrush *   pen_unit_brush = new SolidBrush(Graphic_Color[i+1]);
+		SolidBrush* pen_unit_brush = new SolidBrush(Graphic_Color[i + 1]);
 		PointF      UnitpointF(0, 0);
 
 		staticpointF.X = RectPosition[i].left + 4;
-		staticpointF.Y = RectPosition[i].top + 4 ;
+		staticpointF.Y = RectPosition[i].top + 4;
 		UnitpointF.X = RectPosition[i].left + 4;
-		UnitpointF.Y =  RectPosition[i].top + 0  + 18;
+		UnitpointF.Y = RectPosition[i].top + 0 + 18;
 
-		mygraphics->DrawString(temp_cs, -1, &Input_font, staticpointF,&Font_brush);
+		mygraphics->DrawString(temp_cs, -1, &Input_font, staticpointF, &Font_brush);
 
 		CString temp_cs_label_unit;
-		temp_cs_label_unit =  InputUnit[i];// _T("AAAAAA");
-		if(i<get_data_count)
+		temp_cs_label_unit = InputUnit[i];// _T("AAAAAA");
+		if (i < get_data_count)
 			mygraphics->DrawString(temp_cs_label_unit, -1, &Input_font, UnitpointF, &Font_brush);
 		delete pen_unit_brush;
 		pen_unit_brush = NULL;
 
-
-
-
 		//************************************************************************************
 		//这些是画 Static 后面的 数字;
 		CString temp_item;
-		temp_item.Format(_T("%x"),i+1);
+		temp_item.Format(_T("%x"), i + 1);
 		temp_item = temp_item.MakeUpper();
 
-		SolidBrush  static_item_brush(Graphic_Color[i+1]);
-		
+		SolidBrush  static_item_brush(Graphic_Color[i + 1]);
+
 		Gdiplus::Font        unitfont(&UnitfontFamily, 22, FontStyleRegular, UnitPixel);
 		pointF.X = RectPosition[i].left + STATIC_LABLE_WIDTH + 5;
 		pointF.Y = RectPosition[i].top + 4;
 
 		mygraphics->DrawString(temp_item, -1, &unitfont, pointF, &static_item_brush);
 		//************************************************************************************
-		if(Static_blackground_Brush)
+		if (Static_blackground_Brush)
 			delete Static_blackground_Brush;
 		Static_blackground_Brush = NULL;
 	}
@@ -1267,44 +1232,34 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	SolidBrush  time_brush(MY_COLOR_TIME_PEN);
 	//FontFamily  fontFamily(_T("Times New Roman"));
 	FontFamily  fontFamily(_T("Arial"));
-	
+
 	Gdiplus::Font        time_font(&fontFamily, 12, FontStyleRegular, UnitPixel);
 
-	for(int i=0;i<m_xscale + 1;i++)				//画网格线
+	for (int i = 0; i < m_xscale + 1; i++)				//画网格线
 	{
-		//mygraphics->DrawLine(my_inline_pen,(int)m_analogorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
-		//									(int)m_analogorignpoint.Y,
-		//									 (int)m_analogorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
-		//									 (int)m_analogorignpoint.Y + m_Y_ASIX_HIGHT);
-
-		//mygraphics->DrawLine(my_inline_pen,(int)m_digitalorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
-		//	(int)m_digitalorignpoint.Y,
-		//	(int)m_digitalorignpoint.X+(m_X_ASIX_WIDTH/m_xscale)*(i+1),
-		//	(int)m_digitalorignpoint.Y + m_Digital_Y_HIGHT);
-
-		mygraphics->DrawLine(my_inline_pen,(int)m_analogorignpoint.X+(m_X_ASIX_WIDTH*i)/m_xscale,
+		mygraphics->DrawLine(my_inline_pen, (int)m_analogorignpoint.X + (m_X_ASIX_WIDTH * i) / m_xscale,
 			(int)m_analogorignpoint.Y,
-			(int)m_analogorignpoint.X+(m_X_ASIX_WIDTH*i)/m_xscale,
+			(int)m_analogorignpoint.X + (m_X_ASIX_WIDTH * i) / m_xscale,
 			(int)m_analogorignpoint.Y + m_Y_ASIX_HIGHT);
 
-		mygraphics->DrawLine(my_inline_pen,(int)m_digitalorignpoint.X+(m_X_ASIX_WIDTH*i)/m_xscale,
+		mygraphics->DrawLine(my_inline_pen, (int)m_digitalorignpoint.X + (m_X_ASIX_WIDTH * i) / m_xscale,
 			(int)m_digitalorignpoint.Y,
-			(int)m_digitalorignpoint.X+(m_X_ASIX_WIDTH*i)/m_xscale,
+			(int)m_digitalorignpoint.X + (m_X_ASIX_WIDTH * i) / m_xscale,
 			(int)m_digitalorignpoint.Y + m_Digital_Y_HIGHT);
 
 
-		CString strTime ;
+		CString strTime;
 		wchar_t temp_char[200];
-		time_t scale_time ;
+		time_t scale_time;
 		CTime time_scaletime;
-		scale_time = m_starttime +  i*(x_axis_total_time / m_xscale);
+		scale_time = m_starttime + i * (x_axis_total_time / m_xscale);
 		time_scaletime = scale_time;
-		if((m_time_selected <= TIME_ONE_HOUR) && (m_time_selected >= TIME_FIVE_MINUTE))
+		if ((m_time_selected <= TIME_ONE_HOUR) && (m_time_selected >= TIME_FIVE_MINUTE))
 			strTime = time_scaletime.Format("  %m/%d \r\n%H:%M:%S");
 		else
 			strTime = time_scaletime.Format("%m/%d %H:%M");
 
-		pointF.X = (int)m_analogorignpoint.X - 30 + i*(m_X_ASIX_WIDTH/m_xscale);
+		pointF.X = (int)m_analogorignpoint.X - 30 + i * (m_X_ASIX_WIDTH / m_xscale);
 		pointF.Y = (int)m_analogorignpoint.Y + m_Y_ASIX_HIGHT + 5;
 		mygraphics->DrawString(strTime, -1, &time_font, pointF, &time_brush);
 	}
@@ -1313,179 +1268,149 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	//FontFamily  UnitfontFamily(_T("Times New Roman"));
 	FontFamily  UnitfontFamily(_T("Arial"));
 	Gdiplus::Font        unitfont(&UnitfontFamily, 18, FontStyleRegular, UnitPixel);
-	for(int i=0;i<=m_yscale;i++)				//画网格线
+	for (int i = 0; i <= m_yscale; i++)				//画网格线
 	{
 		CString Unit_value;
-		if(i!=m_yscale)
+		if (i != m_yscale)
 		{
-			mygraphics->DrawLine(my_inline_pen,(int)m_analogorignpoint.X,
-								(int)m_analogorignpoint.Y+(m_Y_ASIX_HIGHT/m_yscale)*(1+i),
-								 (int)m_analogorignpoint.X + m_X_ASIX_WIDTH ,
-								 (int)m_analogorignpoint.Y + (m_Y_ASIX_HIGHT/m_yscale)*(1+i));
+			mygraphics->DrawLine(my_inline_pen, (int)m_analogorignpoint.X,
+				(int)m_analogorignpoint.Y + (m_Y_ASIX_HIGHT / m_yscale) * (1 + i),
+				(int)m_analogorignpoint.X + m_X_ASIX_WIDTH,
+				(int)m_analogorignpoint.Y + (m_Y_ASIX_HIGHT / m_yscale) * (1 + i));
 		}
 
-		if(i!=m_yscale)
+		if (i != m_yscale)
 		{
-			Unit_value.Format(_T("%.0f"),((float)y_axis_total_value/m_yscale)*(m_yscale-i) + m_lowvalue);
+			Unit_value.Format(_T("%.0f"), ((float)y_axis_total_value / m_yscale) * (m_yscale - i) + m_lowvalue);
 		}
 		else
 		{
-			Unit_value.Format(_T("%.0f"),m_lowvalue);
+			Unit_value.Format(_T("%.0f"), m_lowvalue);
 		}
 
 		int value_temp_length = Unit_value.GetLength();
-		pointF.X = (int)m_analogorignpoint.X - 38  - (value_temp_length-3)*4;	//动态调整 Y轴 显示的值 根据所带小数点的位数不同 调整位置;
-		
-		if(i == m_yscale)	//如果是显示靠近原点的 Y值 因为与X轴的时间显示 有轻微重叠，所以特殊处理，稍微向上一点;
+		pointF.X = (int)m_analogorignpoint.X - 38 - (value_temp_length - 3) * 4;	//动态调整 Y轴 显示的值 根据所带小数点的位数不同 调整位置;
+
+		if (i == m_yscale)	//如果是显示靠近原点的 Y值 因为与X轴的时间显示 有轻微重叠，所以特殊处理，稍微向上一点;
 		{
-			pointF.Y =  (int)m_analogorignpoint.Y+ i*(m_Y_ASIX_HIGHT/m_yscale) - 16;
+			pointF.Y = (int)m_analogorignpoint.Y + i * (m_Y_ASIX_HIGHT / m_yscale) - 16;
 			mygraphics->DrawString(Unit_value, -1, &unitfont, pointF, &unit_brush);
 		}
 		else
 		{
-			pointF.Y =  (int)m_analogorignpoint.Y+ i*(m_Y_ASIX_HIGHT/m_yscale) - 8;
+			pointF.Y = (int)m_analogorignpoint.Y + i * (m_Y_ASIX_HIGHT / m_yscale) - 8;
 			mygraphics->DrawString(Unit_value, -1, &unitfont, pointF, &unit_brush);
 		}
 	}
 
-
-#if 0
-	//****************************************************************
-	//画 Digital  的 横着的 两条线内 网格;
-	mygraphics->DrawLine(my_inline_pen,(int)m_digitalorignpoint.X,
-		(int)m_digitalorignpoint.Y+ 30,
-		(int)m_digitalorignpoint.X + m_Digital_X_WIDTH ,
-		(int)m_digitalorignpoint.Y + 30);
-
-	mygraphics->DrawLine(my_inline_pen,(int)m_digitalorignpoint.X,
-		(int)m_digitalorignpoint.Y+ 110,
-		(int)m_digitalorignpoint.X + m_Digital_X_WIDTH ,
-		(int)m_digitalorignpoint.Y + 110);
-	//****************************************************************
-#endif
-	CPointItem *first_item[INPUT_NUMBER];
-	CPointItem *second_item[INPUT_NUMBER];
-	Pen * DrawLinePen[INPUT_NUMBER];
-	for (int i=0;i<INPUT_NUMBER;i++)	//Initial all the PointItems;
+	CPointItem* first_item[INPUT_NUMBER];
+	CPointItem* second_item[INPUT_NUMBER];
+	Pen* DrawLinePen[INPUT_NUMBER];
+	for (int i = 0; i < INPUT_NUMBER; i++)	//Initial all the PointItems;
 	{
 		first_item[i] = NULL;
 		second_item[i] = NULL;
 		DrawLinePen[i] = NULL;
 	}
 
-	for (int i=0;i<get_data_count;i++)
+	for (int i = 0; i < get_data_count; i++)
 	{
-		if(!StaticShow[i])
+		if (!StaticShow[i])
 			continue;
 		first_item[i] = m_pFirstItem[i];
-		DrawLinePen[i] = new Pen(Graphic_Color[i + 1],3.0f);
-		if(i<monitor_analog_count)
+		DrawLinePen[i] = new Pen(Graphic_Color[i + 1], 3.0f);
+		if (i < monitor_analog_count)
 		{
-			if(first_item[i] != NULL)
+			if (first_item[i] != NULL)
 			{
-				do 
+				do
 				{
-					second_item[i]=first_item[i]->GetNext();
-					if(second_item[i]==NULL)
+					second_item[i] = first_item[i]->GetNext();
+					if (second_item[i] == NULL)
 						break;
-					if(first_item[i]->m_link_to_next)
-						mygraphics->DrawLine(DrawLinePen[i],first_item[i]->GetPoint().x,first_item[i]->GetPoint().y,second_item[i]->GetPoint().x,second_item[i]->GetPoint().y);
+					if (first_item[i]->m_link_to_next)
+						mygraphics->DrawLine(DrawLinePen[i], first_item[i]->GetPoint().x, first_item[i]->GetPoint().y, second_item[i]->GetPoint().x, second_item[i]->GetPoint().y);
 
 					first_item[i] = second_item[i];
-				} while ((second_item[i]->GetNext())!=NULL);
+				} while ((second_item[i]->GetNext()) != NULL);
 			}
 		}
-		else if(monitor_digital_count > 0)
+		else if (monitor_digital_count > 0)
 		{
 			CString temp_cs_label;
 			temp_cs_label = InputLable[i];
 
-			SolidBrush  static_item_brush(Graphic_Color[i+1]);
-			//SolidBrush  Font_brush(STATIC_FONT_COLOR);
-			//FontFamily  UnitfontFamily(_T("Arial"));
-			//FontFamily  StaticfontFamily(_T("Times New Roman"));
+			SolidBrush  static_item_brush(Graphic_Color[i + 1]);
 			FontFamily  StaticfontFamily(_T("Arial"));
 
 			Gdiplus::Font        DiInputFont(&StaticfontFamily, 10, FontStyleRegular, UnitPixel);
 
 			PointF      staticpointF(0, 0);
-			//SolidBrush *   pen_unit_brush = new SolidBrush(Graphic_Color[i+1]);//
-			//PointF      UnitpointF(0, 0);
+			staticpointF = (PointF)GetDigitalYLabelPos(i - monitor_analog_count);// m_digitalorignpoint.Y + 30*(i-monitor_analog_count)  ;
 
-			//staticpointF.X = m_digitalorignpoint.X - 30;
-			staticpointF = (PointF)GetDigitalYLabelPos(i-monitor_analog_count);// m_digitalorignpoint.Y + 30*(i-monitor_analog_count)  ;
-
-
-			
-			if(first_item[i] != NULL)
+			if (first_item[i] != NULL)
 			{
-				staticpointF.Y =  first_item[i]->GetPoint().y;
-				mygraphics->DrawString(temp_cs_label, -1, &DiInputFont, staticpointF,&static_item_brush);
+				staticpointF.Y = first_item[i]->GetPoint().y;
+				mygraphics->DrawString(temp_cs_label, -1, &DiInputFont, staticpointF, &static_item_brush);
 			}
 
-			if(first_item[i] != NULL)
+			if (first_item[i] != NULL)
 			{
-				if((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//有可能确实出现前面所有一个点都没有，这种情况就不要从前面拉线了;
+				if ((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//有可能确实出现前面所有一个点都没有，这种情况就不要从前面拉线了;
 				{
-					if(digital_last_data[i].data_point.X < first_item[i]->GetPoint().x)
+					if (digital_last_data[i].data_point.X < first_item[i]->GetPoint().x)
 					{
 						//下面一部分是处理 digital  前半段没有数据，需要参考 xtime 之前的最近的状态来划线的做法;
 
-						if(digital_last_data[i].analogdata == first_item[i]->GetPointValue())
-							mygraphics->DrawLine( DrawLinePen[i],
-							(int)digital_last_data[i].data_point.X,
-							(int)digital_last_data[i].data_point.Y,
-							first_item[i]->GetPoint().x,
-							first_item[i]->GetPoint().y);
+						if (digital_last_data[i].analogdata == first_item[i]->GetPointValue())
+							mygraphics->DrawLine(DrawLinePen[i],
+								(int)digital_last_data[i].data_point.X,
+								(int)digital_last_data[i].data_point.Y,
+								first_item[i]->GetPoint().x,
+								first_item[i]->GetPoint().y);
 						else
 						{
 							mygraphics->DrawLine(DrawLinePen[i],
 								(int)digital_last_data[i].data_point.X, (int)digital_last_data[i].data_point.Y,
-								first_item[i]->GetPoint().x,  (int)digital_last_data[i].data_point.Y);
+								first_item[i]->GetPoint().x, (int)digital_last_data[i].data_point.Y);
 							mygraphics->DrawLine(DrawLinePen[i],
-								first_item[i]->GetPoint().x,(int)digital_last_data[i].data_point.Y,
-								first_item[i]->GetPoint().x,first_item[i]->GetPoint().y);
+								first_item[i]->GetPoint().x, (int)digital_last_data[i].data_point.Y,
+								first_item[i]->GetPoint().x, first_item[i]->GetPoint().y);
 						}
-					}
-				}
+		}
+	}
 
-
-
-
-
-
-
-				do 
+				do
 				{
-					second_item[i]=first_item[i]->GetNext();
-					if(second_item[i]==NULL)
+					second_item[i] = first_item[i]->GetNext();
+					if (second_item[i] == NULL)
 					{
-						int temp_x = 0 ;
-						
+						int temp_x = 0;
+
 						//if(first_item[i]->GetPoint().x + 20 < m_digitalorignpoint.X + m_Digital_X_WIDTH)
 						//	temp_x = first_item[i]->GetPoint().x + 20;
 						//else
-							temp_x = m_digitalorignpoint.X + m_Digital_X_WIDTH;
-						mygraphics->DrawLine(DrawLinePen[i],first_item[i]->GetPoint().x,first_item[i]->GetPoint().y,temp_x,first_item[i]->GetPoint().y);
+						temp_x = m_digitalorignpoint.X + m_Digital_X_WIDTH;
+						mygraphics->DrawLine(DrawLinePen[i], first_item[i]->GetPoint().x, first_item[i]->GetPoint().y, temp_x, first_item[i]->GetPoint().y);
 						break;
 					}
 					//如果前面一个数字点和后面一个数字点的 值不一样 就要画  延变化;
-					if(second_item[i]->GetPointValue() == first_item[i]->GetPointValue())
-						mygraphics->DrawLine(DrawLinePen[i],first_item[i]->GetPoint().x,first_item[i]->GetPoint().y,second_item[i]->GetPoint().x,second_item[i]->GetPoint().y);
+					if (second_item[i]->GetPointValue() == first_item[i]->GetPointValue())
+						mygraphics->DrawLine(DrawLinePen[i], first_item[i]->GetPoint().x, first_item[i]->GetPoint().y, second_item[i]->GetPoint().x, second_item[i]->GetPoint().y);
 					else
 					{
-						mygraphics->DrawLine(DrawLinePen[i],first_item[i]->GetPoint().x,first_item[i]->GetPoint().y,second_item[i]->GetPoint().x,first_item[i]->GetPoint().y);
-						mygraphics->DrawLine(DrawLinePen[i],second_item[i]->GetPoint().x,first_item[i]->GetPoint().y,second_item[i]->GetPoint().x,second_item[i]->GetPoint().y);
+						mygraphics->DrawLine(DrawLinePen[i], first_item[i]->GetPoint().x, first_item[i]->GetPoint().y, second_item[i]->GetPoint().x, first_item[i]->GetPoint().y);
+						mygraphics->DrawLine(DrawLinePen[i], second_item[i]->GetPoint().x, first_item[i]->GetPoint().y, second_item[i]->GetPoint().x, second_item[i]->GetPoint().y);
 					}
-					
+
 
 					first_item[i] = second_item[i];
-				} while (first_item[i]!=NULL);
-			}
+				} while (first_item[i] != NULL);
+}
 			else	//目标区域一个点都没有，需要参考很久以前的值;
 			{
-				if((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//有可能确实出现前面所有一个点都没有，这种情况就不要从前面拉线了;
-					mygraphics->DrawLine(DrawLinePen[i],digital_last_data[i].data_point.X,digital_last_data[i].data_point.Y,digital_last_data[i].data_point.X + m_Digital_X_WIDTH,digital_last_data[i].data_point.Y);
+				if ((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//有可能确实出现前面所有一个点都没有，这种情况就不要从前面拉线了;
+					mygraphics->DrawLine(DrawLinePen[i], digital_last_data[i].data_point.X, digital_last_data[i].data_point.Y, digital_last_data[i].data_point.X + m_Digital_X_WIDTH, digital_last_data[i].data_point.Y);
 			}
 		}
 
@@ -1496,78 +1421,68 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	int reg_y;
 	reg_x = 710;
 	reg_y = 310;
-	if((g_progress_persent != 0 )  && (g_progress_persent != 100))
+	if ((g_progress_persent != 0) && (g_progress_persent != 100))
 	{
 
 		static int temp_cycle = 0;
-		temp_cycle  = (++temp_cycle) % 6;
+		temp_cycle = (++temp_cycle) % 6;
 
-		if(temp_cycle==0)
+		if (temp_cycle == 0)
 		{
-			Bitmap icon_bitmap(Loading_Icon1);		
-			
-			mygraphics->DrawImage(&icon_bitmap,(int)reg_x ,(int)reg_y,(int)90,(int)90);
-		}
-		else if(temp_cycle==1)
-		{
-			Bitmap icon_bitmap(Loading_Icon2);		
-			mygraphics->DrawImage(&icon_bitmap,(int)reg_x ,(int)reg_y,(int)90,(int)90);
-		}
-		else if(temp_cycle==2)
-		{
-			Bitmap icon_bitmap(Loading_Icon3);		
-			mygraphics->DrawImage(&icon_bitmap,(int)reg_x ,(int)reg_y,(int)90,(int)90);
-		}
-		else if(temp_cycle==3)
-		{
-			Bitmap icon_bitmap(Loading_Icon4);		
-			mygraphics->DrawImage(&icon_bitmap,(int)reg_x ,(int)reg_y,(int)90,(int)90);
-		}
-		else if(temp_cycle==4)
-		{
-			Bitmap icon_bitmap(Loading_Icon5);		
-			mygraphics->DrawImage(&icon_bitmap,(int)reg_x ,(int)reg_y,(int)90,(int)90);
-		}
-		else if(temp_cycle==5)
-		{
-			Bitmap icon_bitmap(Loading_Icon6);		
-			mygraphics->DrawImage(&icon_bitmap,(int)reg_x ,(int)reg_y,(int)90,(int)90);
-		}
+			Bitmap icon_bitmap(Loading_Icon1);
 
-
+			mygraphics->DrawImage(&icon_bitmap, (int)reg_x, (int)reg_y, (int)90, (int)90);
+		}
+		else if (temp_cycle == 1)
+		{
+			Bitmap icon_bitmap(Loading_Icon2);
+			mygraphics->DrawImage(&icon_bitmap, (int)reg_x, (int)reg_y, (int)90, (int)90);
+		}
+		else if (temp_cycle == 2)
+		{
+			Bitmap icon_bitmap(Loading_Icon3);
+			mygraphics->DrawImage(&icon_bitmap, (int)reg_x, (int)reg_y, (int)90, (int)90);
+		}
+		else if (temp_cycle == 3)
+		{
+			Bitmap icon_bitmap(Loading_Icon4);
+			mygraphics->DrawImage(&icon_bitmap, (int)reg_x, (int)reg_y, (int)90, (int)90);
+		}
+		else if (temp_cycle == 4)
+		{
+			Bitmap icon_bitmap(Loading_Icon5);
+			mygraphics->DrawImage(&icon_bitmap, (int)reg_x, (int)reg_y, (int)90, (int)90);
+		}
+		else if (temp_cycle == 5)
+		{
+			Bitmap icon_bitmap(Loading_Icon6);
+			mygraphics->DrawImage(&icon_bitmap, (int)reg_x, (int)reg_y, (int)90, (int)90);
+		}
 
 
-		//if((temp_cycle >= 0) && (temp_cycle<3))
-		//	mygraphics->DrawEllipse(persent_pen3,(INT)reg_x,(INT)reg_y,(INT)80,(INT)80);
-		//else if((temp_cycle >= 3) && (temp_cycle<6)) 
-		//	mygraphics->DrawEllipse(persent_pen2,(INT)reg_x,(INT)reg_y,(INT)80,(INT)80);
-		//else if((temp_cycle >= 6) && (temp_cycle <9))
-		//	mygraphics->DrawEllipse(persent_pen3,(INT)reg_x,(INT)reg_y,(INT)80,(INT)80);
 		CString temp_cs_draw_persent;
-		temp_cs_draw_persent.Format(_T("%u%%"),g_progress_persent);
+		temp_cs_draw_persent.Format(_T("%u%%"), g_progress_persent);
 		PointF      ReadingpointF(0, 0);
 		Gdiplus::Font  PersentShow_font(&ScrollfontFamily, 18, FontStyleRegular, UnitPixel);
-		SolidBrush  Persentbrush( Color(255,255,255,255));
+		SolidBrush  Persentbrush(Color(255, 255, 255, 255));
 		ReadingpointF.X = reg_x + 8;
 		ReadingpointF.Y = reg_y + 25;;
-		mygraphics->DrawString(_T("Reading"), -1, &PersentShow_font, ReadingpointF,&Font_brush_on_off);
+		mygraphics->DrawString(_T("Reading"), -1, &PersentShow_font, ReadingpointF, &Font_brush_on_off);
 
 		ReadingpointF.X = reg_x + 23;
 		ReadingpointF.Y = reg_y + 45;
-		mygraphics->DrawString(temp_cs_draw_persent, -1, &PersentShow_font, ReadingpointF,&Font_brush_on_off);
-
-
+		mygraphics->DrawString(temp_cs_draw_persent, -1, &PersentShow_font, ReadingpointF, &Font_brush_on_off);
 
 	}
 
 #endif
 
 
-	
 
-	for (int i=0;i<INPUT_NUMBER;i++)
+
+	for (int i = 0; i < INPUT_NUMBER; i++)
 	{
-		if(DrawLinePen[i] != NULL)
+		if (DrawLinePen[i] != NULL)
 		{
 			delete DrawLinePen[i];
 			DrawLinePen[i] = NULL;
@@ -1575,7 +1490,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	}
 
 
-	delete persent_pen1;delete persent_pen2;delete persent_pen3;
+	delete persent_pen1; delete persent_pen2; delete persent_pen3;
 	delete m_value_move_pen;
 	delete CurePen;
 	delete mygraphics;

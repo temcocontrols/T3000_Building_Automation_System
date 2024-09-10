@@ -1704,7 +1704,6 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 
 					if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
 					{
-						//temp1.Format(_T("%s"), Custom_Digital_Range[bac_range_number_choose - 23]);
 						temp1 = Custom_Digital_Range[bac_range_number_choose - 23];
 					}
 					else
