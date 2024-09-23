@@ -20,6 +20,7 @@
 #include "BacnetWebView.h"
 
 int webview_run_server();
+extern CString GetUserAppDataPath(LPCTSTR lpFolderName = NULL);
 extern HANDLE h_create_webview_server_thread;
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
 extern vector <MSG> My_Receive_msg;
@@ -1937,6 +1938,9 @@ DWORD WINAPI  BacnetScreen::CreateWebServerThreadfun(LPVOID lpVoid)
 void BacnetScreen::OnBnClickedWebViewShow()
 {
 	// This thread will not exit when it is running properly, and will exit if run_server executes abnormally, terminating the thread.
+	//CString appDataMyAppPath = GetUserAppDataPath(_T("T3000"));
+	//appDataMyAppPath = appDataMyAppPath + _T("\\EBWebView");
+	//DeleteDirectory(appDataMyAppPath);
 	if (h_create_webview_server_thread == NULL)
 	{
 		h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
