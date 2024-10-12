@@ -43,7 +43,8 @@ CString InputUnit[15];
 bool StaticShow[15];
 int total_y_max_value = 0x80000001;
 int total_y_min_value = 0x7fffffff;
-
+int Bitmap_width = 0;
+int Bitmap_height = 0;
 #define  INPUT_NUMBER  14
 
 CPointItem * pTempItem = NULL;
@@ -313,11 +314,19 @@ BOOL CBacnetGraphic::OnInitDialog()
 	GdiplusStartup(&gdiplustoken,&gdistartupInput,NULL);
 
 	myhWnd = this->m_hWnd;
-	::GetWindowRect(myhWnd,&myRect);
-	myRect.left=0;
-	myRect.top=0;
-	myRect.right=myRect.right-myRect.left;
-	myRect.bottom=myRect.bottom-myRect.top;
+	::GetWindowRect(myhWnd, &myRect);
+	//myRect.left = 0;
+	//myRect.top = 0;
+	//myRect.right = myRect.right - myRect.left;
+	//myRect.bottom = myRect.bottom - myRect.top;
+
+	// 获取窗口的宽度和高度
+	 Bitmap_width = myRect.right - myRect.left;
+	 Bitmap_height = myRect.bottom - myRect.top;
+
+	// 将窗口移动到第一个屏幕区间的左上角
+	::MoveWindow(myhWnd, 0, 0, Bitmap_width, Bitmap_height, TRUE);
+
 
 	time_interval_point = m_monitor_data.at(monitor_list_line).hour_interval_time *3600 + m_monitor_data.at(monitor_list_line).minute_interval_time * 60 + m_monitor_data.at(monitor_list_line).second_interval_time;
 	if(monitor_list_line != 11)
@@ -382,8 +391,9 @@ BOOL CBacnetGraphic::InitDC()
 	hMemDC=::CreateCompatibleDC(NULL);
 	if(hMemDC==NULL)
 		return FALSE;
-
-	hBmp=::CreateCompatibleBitmap(gloab_hdc, myRect.right, myRect.bottom);
+	
+	hBmp = ::CreateCompatibleBitmap(gloab_hdc, Bitmap_width, Bitmap_height);
+	//hBmp=::CreateCompatibleBitmap(gloab_hdc, myRect.right, myRect.bottom);
 	if(hBmp==NULL)
 		return FALSE;
 
@@ -940,7 +950,8 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 		mparent->Draw_Graphic(hMemDC);
 		ReleaseMutex(Point_Mutex);
 
-		BitBlt(gloab_hdc,0,0, myRect.right, myRect.bottom, hMemDC, 0, 0, SRCCOPY);//将绘制完成的内存位图贴到的Picture空间对象中;
+		BitBlt(gloab_hdc, 0, 0, Bitmap_width, Bitmap_height, hMemDC, 0, 0, SRCCOPY);//将绘制完成的内存位图贴到的Picture空间对象中;
+		//BitBlt(gloab_hdc,0,0, myRect.right, myRect.bottom, hMemDC, 0, 0, SRCCOPY);//将绘制完成的内存位图贴到的Picture空间对象中;
 		//PostMessage(test_hwnd, WM_FRESH_STATIC,0,0);	//当重绘了之后，控件会被重绘的画布遮盖住，所以发送消息让控件再次刷新;
 		if(start_wait_init < 4)
 			Sleep(10);

@@ -291,6 +291,7 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
 		}
 		DeleteObject(m_appBackgroundImageHandle);
 		DeleteDC(m_memHdc);
+		FreeConsole(); //关闭控制台
 	}
 	break;
 	//! [RestartManager]
@@ -2053,10 +2054,42 @@ void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsign
 	height = (buf[4] << 24) + (buf[5] << 16) + (buf[6] << 8) + (buf[7] << 0);
 }
 #pragma endregion WebviewRelatedMethods
+//#include <cstdio>
+//#include <iostream>
 
+
+//void redirect_stdout_stderr() {
+//	std::freopen("output.log", "w", stdout); // Redirect stdout to output.log
+//	std::freopen("error.log", "w", stderr);  // Redirect stderr to error.log
+//}
+
+//BOOL WINAPI ConsoleHandler(DWORD dwCtrlType)
+//{
+//	switch (dwCtrlType)
+//	{
+//	case CTRL_CLOSE_EVENT:
+//		// 处理控制台关闭事件，防止程序终止
+//		//std::cout << "控制台窗口关闭事件被捕获，程序继续运行。" << std::endl;
+//		Sleep(1);
+//		return TRUE;
+//	default:
+//		return FALSE;
+//	}
+//}
+
+void setup_console() 
+{
+	AllocConsole();
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
+
+	// 设置控制台关闭事件处理程序
+	//SetConsoleCtrlHandler(ConsoleHandler, TRUE);
+}
 
 int webview_run_server() {
-	
+	setup_console();
+	//redirect_stdout_stderr();
 
 	RustError result = run_server();
 	if (result != RustError::Ok) {

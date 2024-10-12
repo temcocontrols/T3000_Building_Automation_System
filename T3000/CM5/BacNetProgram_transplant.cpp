@@ -4652,6 +4652,9 @@ int localnetwork(int net)
 char *look_label_ex(int panel,int sub_panel, int point_type, int num, int network)
 {
 	char *p=NULL;
+	if ((sub_panel != 0) && (sub_panel != panel)) //2024 09 29 解决 133.1.REG2 会自动变为 133.0.REG2 对应的Lable的问题
+		return NULL;
+
 	// if(local_panel)
 	if( local_request_ex(panel,sub_panel, network) )
 		//if((panel == Station_NUM) && (sub_panel == Station_NUM))

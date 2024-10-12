@@ -493,17 +493,12 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 
 
 
-		//if(h_get_pic_thread==NULL)
-		//{
-		//	if(Device_Basic_Setting.reg.sd_exist)
-		//		h_get_pic_thread =CreateThread(NULL,NULL,GetPictureThread,this,NULL, NULL);
-		//}
-
-		int nret = CheckOldGraphic();
-		if(nret == 0)
+		//按下快捷键或者原始grpahic按键 显示旧的UI
+		//int nret = CheckOldGraphic();
+		//if(nret == 0)
 			run_old_graphic_screen();
-		else
-			PostMessage(WM_COMMAND, MAKEWPARAM(IDC_WEBVIEW_BUTTON, BN_CLICKED), NULL);
+		//else
+		//	PostMessage(WM_COMMAND, MAKEWPARAM(IDC_WEBVIEW_BUTTON, BN_CLICKED), NULL);
 
 		return 0;
 		
@@ -1713,8 +1708,8 @@ void BacnetScreen::OnSize(UINT nType, int cx, int cy)
 		m_screen_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
 
 		GetDlgItem(IDC_BUTTON_GRAPHIC_INSERT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
-		GetDlgItem(IDC_WEBVIEW_BUTTON)->MoveWindow(rc.left + 20, rc.bottom - 60, 120, 50);
-		GetDlgItem(IDC_BUTTON_CLEAR_SCREEN_DATA)->MoveWindow(rc.left + 150, rc.bottom - 60, 120, 50);
+		GetDlgItem(IDC_WEBVIEW_BUTTON)->MoveWindow(rc.left + 150, rc.bottom - 60, 120, 50);
+		GetDlgItem(IDC_BUTTON_CLEAR_SCREEN_DATA)->MoveWindow(rc.left + 280, rc.bottom - 60, 120, 50);
 		
 	}
 }
