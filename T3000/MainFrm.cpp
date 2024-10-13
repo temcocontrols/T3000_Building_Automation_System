@@ -111,6 +111,10 @@ HTREEITEM  hLastTreeItem =NULL;
 #include "CAirFlowSensor.h"
 #include "CTransducer.h"
 #include "CBacnetArray.h"
+
+extern "C" {
+    void shutdown_server();
+}
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -6090,6 +6094,7 @@ LRESULT CMainFrame::OnFreshStatusBar(WPARAM wParam, LPARAM lParam)
 
 void CMainFrame::OnDestroy()
 {
+    shutdown_server();
     mul_ping_flag = false; //关闭 ping 的命令;
     g_mstp_flag = false;
     b_statusbarthreadflag = FALSE; //close the status bar thread;
