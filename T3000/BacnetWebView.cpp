@@ -2077,19 +2077,19 @@ void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsign
 //	}
 //}
 
-void setup_console() 
-{
-	AllocConsole();
-	freopen("CONOUT$", "w", stdout);
-	freopen("CONOUT$", "w", stderr);
-
-	// 设置控制台关闭事件处理程序
-	//SetConsoleCtrlHandler(ConsoleHandler, TRUE);
-}
+//void setup_console() 
+//{
+//	AllocConsole();
+//	freopen("CONOUT$", "w", stdout);
+//	freopen("CONOUT$", "w", stderr);
+//
+//	// 设置控制台关闭事件处理程序
+//	//SetConsoleCtrlHandler(ConsoleHandler, TRUE);
+//}
 
 int webview_run_server() {
-	setup_console();
-	//redirect_stdout_stderr();
+	// setup_console();
+	// redirect_stdout_stderr();
 
 	RustError result = run_server();
 	if (result != RustError::Ok) {
