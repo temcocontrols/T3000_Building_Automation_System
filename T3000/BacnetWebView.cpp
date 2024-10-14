@@ -2087,15 +2087,37 @@ void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsign
 //	//SetConsoleCtrlHandler(ConsoleHandler, TRUE);
 //}
 
+// Function to convert wide string (wchar_t) to a regular string (std::string)
+std::string wide_string_to_string(const std::wstring& wide_str) {
+	std::string result(wide_str.begin(), wide_str.end());
+	return result;
+}
+
+// Function to get the directory of the executable
+std::string get_executable_directory() {
+	wchar_t path[MAX_PATH];
+	GetModuleFileNameW(NULL, path, MAX_PATH);  // Use wide-character version
+	std::wstring full_path(path);
+
+	// Find the last backslash to separate the directory from the executable name
+	size_t pos = full_path.find_last_of(L"\\/");  // Note the L for wide-string literal
+	if (pos != std::wstring::npos) {
+		std::wstring exe_dir_w = full_path.substr(0, pos);  // Extract wide-string directory part
+		return wide_string_to_string(exe_dir_w);  // Convert to std::string and return
+	}
+	return "";
+}
+
 int webview_run_server() {
+	std::string exe_dir = get_executable_directory();
+
+	SetCurrentDirectoryA(exe_dir.c_str());
 	// setup_console();
 	// redirect_stdout_stderr();
 
 	RustError result = run_server();
 	if (result != RustError::Ok) {
-		//暂时屏蔽下面的消息，避免不需要使用webview的客户 在一些情况下看到这个失败的消息。
-		//Temporarily mask the following message to prevent customers who do not need to use webview from seeing the failed message in some cases.
-		//AfxMessageBox(L"Couldn't run the webview API server");
+		
 		SetPaneString(BAC_SHOW_MISSION_RESULTS, L"Couldn't run the webview API server");
 		return 1;
 	}
