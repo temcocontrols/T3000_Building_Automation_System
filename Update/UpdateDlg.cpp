@@ -335,6 +335,18 @@ bool CopyDirW(CString strSrcPath, CString strDstPath, bool bFailIfExists)
 DWORD WINAPI InstallFileThread(LPVOID lPvoid)
 {
     CUpdateDlg * mparent = (CUpdateDlg *)lPvoid;
+    // Check if the assets folder exists in the new files (UnzipFileFolder)
+    CString assetsFolder = _T("\\ResourceFile\\webview\\www\\assets");
+    CString newAssetsFolder = UnzipFileFolder + assetsFolder;
+
+    if (PathIsDirectory(newAssetsFolder))
+    {
+        // If the folder exists in the new files, delete the old assets folder
+        CString oldAssetsFolder = APP_RUN_FOLDER + assetsFolder;
+        mparent->DeleteDirectory(oldAssetsFolder);
+        // Optionally, recreate the directory after deletion
+        CreateDirectory(oldAssetsFolder, NULL);
+    }
 
     bool copy_ret = false;
     SetCurrentDirectoryW(APP_RUN_FOLDER);
