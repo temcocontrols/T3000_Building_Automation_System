@@ -113,14 +113,16 @@ jobs:
         run: Compress-Archive -Path ".\setup\T3000-setup.msi" -CompressionLevel Optimal -DestinationPath .\09T3000Software.zip
 
       - name: Upload the update file to FTP
-        uses: Creepios/sftp-action@v1.0.3
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          port: 22
-          host: ${{ vars.FTP_HOST }}
+          server: sftp://${{ vars.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          localPath: "./20T3000Update.zip"
-          remotePath: "/software/"
+          protocol: 'sftp'  # Ensure SFTP protocol is used
+          local-dir: "./09T3000Software.zip"
+          server-dir: "/software/"
+          dry-run: false  # Set to false to enable actual file upload
+          dangerous-clean-slate: false  # Prevent deletion of other files
 
       - name: Upload the software installer file to FTP
         uses: appleboy/scp-action@v0.1.7
