@@ -336,16 +336,16 @@ DWORD WINAPI InstallFileThread(LPVOID lPvoid)
 {
     CUpdateDlg * mparent = (CUpdateDlg *)lPvoid;
     // Check if the assets folder exists in the new files (UnzipFileFolder)
-    CString assetsFolder = _T("\\ResourceFile\\webview\\www\\assets");
-    CString newAssetsFolder = UnzipFileFolder + assetsFolder;
+    //CString assetsFolder = _T("\\ResourceFile\\webview\\www\\assets");
+    //CString newAssetsFolder = UnzipFileFolder + assetsFolder;
+    CString oldwebviewFolder = APP_RUN_FOLDER + _T("\\ResourceFile\\webview");
 
-    if (PathIsDirectory(newAssetsFolder))
+
+
+    if (PathIsDirectory(oldwebviewFolder))
     {
         // If the folder exists in the new files, delete the old assets folder
-        CString oldAssetsFolder = APP_RUN_FOLDER + assetsFolder;
-        mparent->DeleteDirectory(oldAssetsFolder);
-        // Optionally, recreate the directory after deletion
-        CreateDirectory(oldAssetsFolder, NULL);
+        mparent->DeleteDirectory(oldwebviewFolder);
     }
 
     bool copy_ret = false;
