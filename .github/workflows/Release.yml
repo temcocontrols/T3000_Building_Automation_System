@@ -119,22 +119,17 @@ jobs:
         run: |
           mkdir %USERPROFILE%\.ssh
           echo "%SSH_PRIVATE_KEY%" > %USERPROFILE%\.ssh\id_rsa
-          chmod 600 %USERPROFILE%\.ssh\id_rsa
+          icacls %USERPROFILE%\.ssh\id_rsa /inheritance:r /grant:r "%USERNAME%:R"
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Add SSH key to agent
-        run: |
-          Start-Service ssh-agent
-          ssh-add %USERPROFILE%\.ssh\id_rsa
-
       - name: Upload the update file via SCP
         run: |
-          scp -o StrictHostKeyChecking=no -P 22 ./20T3000Update.zip ${{ secrets.FTP_USER }}@${{ vars.FTP_HOST }}:/home/bravoftp/software/
+          scp -i %USERPROFILE%\.ssh\id_rsa -o StrictHostKeyChecking=no -P 22 ./20T3000Update.zip ${{ secrets.FTP_USER }}@${{ vars.FTP_HOST }}:/home/bravoftp/software/
 
       - name: Upload the software installer file via SCP
         run: |
-          scp -o StrictHostKeyChecking=no -P 22 ./09T3000Software.zip ${{ secrets.FTP_USER }}@${{ vars.FTP_HOST }}:/home/bravoftp/software/
+          scp -i %USERPROFILE%\.ssh\id_rsa -o StrictHostKeyChecking=no -P 22 ./09T3000Software.zip ${{ secrets.FTP_USER }}@${{ vars.FTP_HOST }}:/home/bravoftp/software/
 
       - name: Update T3000 version in the INI file
         id: webhookRequest
