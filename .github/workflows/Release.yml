@@ -3,6 +3,7 @@
 name: Release
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
@@ -122,14 +123,15 @@ jobs:
           remotePath: "/software/"
 
       - name: Upload the software installer file to FTP
-        uses: Creepios/sftp-action@v1.0.3
+        uses: appleboy/scp-action@v0.1.7
         with:
-          port: 22
           host: ${{ vars.FTP_HOST }}
+          port: 22
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          localPath: "./09T3000Software.zip"
-          remotePath: "/software/"
+          overwrite: true
+          source: "./20T3000Update.zip"
+          target: "/software/"
 
       - name: Update T3000 version in the INI file
         id: webhookRequest
