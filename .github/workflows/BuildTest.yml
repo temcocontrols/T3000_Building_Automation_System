@@ -6,8 +6,12 @@ name: Testing the MSBuild
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+      - '.github/**'
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '.github/**'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
