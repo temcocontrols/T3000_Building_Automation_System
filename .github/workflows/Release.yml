@@ -47,10 +47,14 @@ jobs:
 
       - name: Get T3000 version number
         id: version
+        shell: pwsh
         run: |
           $version = '${{ github.event.release.tag_name }}'
           $version = $version -replace "[^0-9]"
-          Write-Output version=$version >> $Env:GITHUB_OUTPUT
+          if (-not $version) {
+            $version = (Get-Date).ToString('yyyyMMdd')
+          }
+          Write-Output "version=$version" >> $Env:GITHUB_OUTPUT
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
