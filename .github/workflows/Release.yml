@@ -116,27 +116,24 @@ jobs:
       - name: Zip the installer file
         run: Compress-Archive -Path ".\setup\T3000-setup.msi" -CompressionLevel Optimal -DestinationPath .\09T3000Software.zip
 
-      - name: Upload the update file to FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: sftp://${{ vars.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: 'sftp'  # Ensure SFTP protocol is used
-          local-dir: "./09T3000Software.zip"
-          server-dir: "/software/"
-          dry-run: false  # Set to false to enable actual file upload
-          dangerous-clean-slate: false  # Prevent deletion of other files
-
-      - name: Upload the software installer file to FTP
+      - name: Upload the update file via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ vars.FTP_HOST }}
-          port: 22
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          overwrite: true
+          port: 22
           source: "./20T3000Update.zip"
+          target: "/software/"
+      
+      - name: Upload the software installer file via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ vars.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 22
+          source: "./09T3000Software.zip"
           target: "/software/"
 
       - name: Update T3000 version in the INI file
