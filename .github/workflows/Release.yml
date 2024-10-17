@@ -115,22 +115,23 @@ jobs:
       - name: Zip the installer file
         run: Compress-Archive -Path ".\setup\T3000-setup.msi" -CompressionLevel Optimal -DestinationPath .\09T3000Software.zip
 
-      - name: Set up SSH key
+      - name: Set up SSH Key with Correct Permissions
         run: |
-          mkdir %USERPROFILE%\.ssh
-          echo "%SSH_PRIVATE_KEY%" > %USERPROFILE%\.ssh\id_rsa
-          icacls %USERPROFILE%\.ssh\id_rsa /inheritance:r /grant:r "%USERNAME%:R"
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          mkdir -p $HOME\.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME\.ssh\id_rsa
+          chmod 600 $HOME\.ssh\id_rsa  # Correct permissions for SSH key
+        shell: bash
 
       - name: Upload the update file via SCP
         run: |
-          scp -i %USERPROFILE%\.ssh\id_rsa -o StrictHostKeyChecking=no -P 22 ./20T3000Update.zip ${{ secrets.FTP_USER }}@${{ vars.FTP_HOST }}:/home/bravoftp/software/
-
+          scp -i $HOME\.ssh\id_rsa -o StrictHostKeyChecking=no -P 22 ./20T3000Update.zip ${{ secrets.FTP_USER }}@${{ vars.FTP_HOST }}:/home/bravoftp/software/
+        shell: bash
+        
       - name: Upload the software installer file via SCP
         run: |
-          scp -i %USERPROFILE%\.ssh\id_rsa -o StrictHostKeyChecking=no -P 22 ./09T3000Software.zip ${{ secrets.FTP_USER }}@${{ vars.FTP_HOST }}:/home/bravoftp/software/
-
+          scp -i $HOME\.ssh\id_rsa -o StrictHostKeyChecking=no -P 22 ./09T3000Software.zip ${{ secrets.FTP_USER }}@${{ vars.FTP_HOST }}:/home/bravoftp/software/
+        shell: bash
+        
       - name: Update T3000 version in the INI file
         id: webhookRequest
         uses: fjogeleit/http-request-action@v1
