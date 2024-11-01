@@ -8339,6 +8339,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
                                 WritePrivateProfileStringW(temp_serial_number, _T("WriteFlag"), L"0", g_achive_device_name_path);
                                 PostMessage(WM_MYMSG_REFRESHBUILDING, 0, 0);
+
+                                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Succeeded in changing the device name."));                               
+                            }
+                            else
+                            {
+                                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to change the device. Click the device list and try again"));
                             }
                         }
 
@@ -15044,6 +15050,15 @@ void CMainFrame::OnHelpUsingUpdate()
 	if((temp_product_count > 0) && (selected_product_index!=-1) && (selected_product_index < temp_product_count))
 	{
         m_product_isp_auto_flash = m_product.at(selected_product_index);
+        if ((Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) || (Device_Basic_Setting.reg.mini_type == T3_NG2_TYPE2))
+        {
+            //如果是PLC的 RMC和NG2的第二种类型，那么在后面判断类型  不能直接使用T3000 去更新固件;
+            m_product_isp_auto_flash.m_ext_info.mini_type = Device_Basic_Setting.reg.mini_type;
+        }
+	}
+	else
+	{
+		m_product_isp_auto_flash.product_class_id =  199;
 	}
 
 	SetCommunicationType(0);//关闭串口，供ISP 使用;

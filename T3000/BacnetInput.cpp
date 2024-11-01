@@ -276,14 +276,20 @@ void CBacnetInput::Reload_Unit_Type()
 	else
 		initial_count = FAN_MODULE_IN_A;
 	}
-	else if (bacnet_device_type == T3_ESP_NG2)
+	else if (bacnet_device_type == T3_ESP_RMC)
 	{
-	if (NG2_IN_A > (int)m_Input_data.size())
-		initial_count = (int)m_Input_data.size();
-	else
-		initial_count = NG2_IN_A;
+		if (NG2_IN_A > (int)m_Input_data.size())
+			initial_count = (int)m_Input_data.size();
+		else
+			initial_count = NG2_IN_A;
 	}
-
+	else if (bacnet_device_type == T3_NG2_TYPE2)
+	{
+		if (NG2_TYPE2_IN_A > (int)m_Input_data.size())
+			initial_count = (int)m_Input_data.size();
+		else
+			initial_count = NG2_TYPE2_IN_A;
+	}
 
 }
 
@@ -1631,10 +1637,17 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
         }
 		if (PM_ESP32_T3_SERIES == g_selected_product_id)
 		{
-			if (Device_Basic_Setting.reg.mini_type == T3_ESP_NG2)
+			if (Device_Basic_Setting.reg.mini_type == T3_ESP_RMC)
 			{
 				if ((lRow >= 16) && (lRow <= 17))  //IN17  IN18 is sensor
 					return;
+			}
+			else if (Device_Basic_Setting.reg.mini_type == T3_NG2_TYPE2)
+			{
+				if ((lRow >= 16) && (lRow <= 17))  //IN17  IN18  和其他LB 一样了
+				{
+					;;
+				}
 			}
 		}
         m_dialog_signal_type = 0xff;

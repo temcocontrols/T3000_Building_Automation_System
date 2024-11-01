@@ -1270,7 +1270,8 @@ typedef enum
 	T3_ESP_TRANSDUCER = 16,  //T3000 TBD
 	T3_ESP_TSTAT9 = 17,//T3000 TBD
 	T3_ESP_SAUTER = 18,//T3000 TBD
-	T3_ESP_NG2 = 19,  //1-16 input 17-18 sensor    Output1-7DO
+	T3_ESP_RMC = 19,  //1-16 input 17-18 sensor    Output1-7DO
+	T3_NG2_TYPE2 = 22,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1339,6 +1340,11 @@ const int NG2_IN_A = 18;
 const int NG2_IN_D = 0;
 const int NG2_OUT_A = 0;
 const int NG2_OUT_D = 7;
+
+const int NG2_TYPE2_IN_A = 16;
+const int NG2_TYPE2_IN_D = 0;
+const int NG2_TYPE2_OUT_A = 4;
+const int NG2_TYPE2_OUT_D = 6;
 enum
 {
 	UART_1200 = 0,

@@ -381,7 +381,7 @@ BOOL CScanDlg::TestPing(const CString& strIP)
 {	
  #ifdef CPING_USE_ICMP
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 1; i++) //改为1次 ，这一次都要大约4秒钟，只是用这个来判断IP是否在线
     {
         CPing p1;
         CPingReply pr1;
@@ -391,7 +391,7 @@ BOOL CScanDlg::TestPing(const CString& strIP)
         }
         else
         {
-            Sleep(500);
+            Sleep(10);
             continue;
         }
     }

@@ -493,10 +493,15 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						digital_special_output_count = FAN_MOUDLE_OUT_D;
 						analog_special_output_count = FAN_MOUDLE_OUT_A;
 					}
-					else if (bacnet_device_type == T3_ESP_NG2)
+					else if (bacnet_device_type == T3_ESP_RMC)
 					{
 						digital_special_output_count = NG2_OUT_D;
 						analog_special_output_count = NG2_OUT_A;
+					}
+					else if (bacnet_device_type == T3_NG2_TYPE2)
+					{
+						digital_special_output_count = NG2_TYPE2_OUT_D;
+						analog_special_output_count = NG2_TYPE2_OUT_A;
 					}
 
 					if(point_number < (digital_special_output_count +analog_special_output_count) )

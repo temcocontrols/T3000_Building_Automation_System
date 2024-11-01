@@ -177,7 +177,10 @@ void Getminitypename(unsigned char nmini_type, CString &ret_name)
     case T3_OEM_12I:
         ret_name = _T("T3-OEM-12I");
         break;
-    case T3_ESP_NG2:
+    case T3_ESP_RMC:
+        ret_name = _T("T3-RMC");
+        break;
+    case T3_NG2_TYPE2:
         ret_name = _T("T3-NG2");
         break;
     case T3_FAN_MODULE:
@@ -878,7 +881,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             bacnet_device_type == TINY_EX_MINIPANEL ||
             bacnet_device_type == MINIPANELARM_NB ||
             bacnet_device_type == T3_FAN_MODULE ||
-            bacnet_device_type == T3_ESP_NG2 ||
+            bacnet_device_type == T3_ESP_RMC ||
+            bacnet_device_type == T3_NG2_TYPE2 ||
             bacnet_device_type == T3_TSTAT10 ||
             bacnet_device_type == T3_OEM ||
             bacnet_device_type == T3_OEM_12I ||
@@ -928,7 +932,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
                 (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
-                (Device_Basic_Setting.reg.mini_type == T3_ESP_NG2) ||
+                (Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) ||
+                (Device_Basic_Setting.reg.mini_type == T3_NG2_TYPE2) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
                 (Device_Basic_Setting.reg.mini_type == T3_TSTAT10) )
@@ -961,7 +966,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
                 (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
                 (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
                 (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
-                (Device_Basic_Setting.reg.mini_type == T3_ESP_NG2) ||
+                (Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) ||
+                (Device_Basic_Setting.reg.mini_type == T3_NG2_TYPE2) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
                 (Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
                 (Device_Basic_Setting.reg.mini_type == T3_TSTAT10))
@@ -1027,7 +1033,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
             (Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL) ||
             (Device_Basic_Setting.reg.mini_type == MINIPANELARM_NB) ||
             (Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
-            (Device_Basic_Setting.reg.mini_type == T3_ESP_NG2) ||
+            (Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) ||
+            (Device_Basic_Setting.reg.mini_type == T3_NG2_TYPE2) ||
             (Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
             (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
             (Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||

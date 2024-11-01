@@ -52,88 +52,102 @@ enum ERightDragHandler {
 };
 extern BM_dlg_ret dlg_ret;
 BM_nodeinfo operation_nodeinfo;
- DWORD WINAPI _Background_Write_Name(LPVOID pParam){
-  CImageTreeCtrl* dlg=(CImageTreeCtrl*)(pParam);
-     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-     for (int i=0;i< pFrame->m_product.size();i++){
-         if (dlg->m_hSelItem == pFrame->m_product.at(i).product_item)
-         {  
-              CString strIPAddress;
-              int IPPort=0;
-              int ComPort=0;
-              int brandrate = 0;
-              int ModbusID=0;
-             CString strSql,temp_serial;
-            unsigned int sn=pFrame->m_product.at(i).serial_number;
-            temp_serial.Format(_T("%u"),sn);
-            int  int_product_type = pFrame->m_product.at(i).product_class_id;
-            
-            //if (product_register_value[714] == 0x56)
-            //{
-                int communicationType = pFrame->m_product.at(i).protocol;  
-                ModbusID = pFrame->m_product.at(i).product_id;
-                SetCommunicationType(communicationType);
-                if (communicationType==0)
-                {
-                    
-                    ComPort =  pFrame->m_product.at(i).ncomport;
-                    brandrate = pFrame->m_product.at(i).baudrate;
-                   
-                    if (open_com(ComPort))
-                    {
-                        Change_BaudRate(brandrate);
-                        
-                        char cTemp1[16];
-                        memset(cTemp1,0,16);
-                        WideCharToMultiByte( CP_ACP, 0, dlg->m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
-                        unsigned char Databuffer[16];
-                        memcpy_s(Databuffer,16,cTemp1,16);
-                        if (Write_Multi(ModbusID,Databuffer,715,16,10)>0)
-                        {
-                             WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("0"),g_achive_device_name_path);
-                        }
-                        
-                        
-                        close_com();
+tree_product selected_device;
+DWORD WINAPI _Background_Write_Name(LPVOID pParam) 
+{
+	CImageTreeCtrl* dlg = (CImageTreeCtrl*)(pParam);
 
-                    }
-                } 
-                else
-                {
-                    strIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
-                    IPPort = pFrame->m_product.at(i).ncomport;
-                    if (Open_Socket2(strIPAddress,IPPort))
-                    {
-                        if(dlg->m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度;
-                        {
-                            dlg->m_name_new.Delete(16,dlg->m_name_new.GetLength()-16);
-                        }
+	tree_product  temp_tree_product = selected_device;
 
-                        char cTemp1[16];
-                        memset(cTemp1,0,16);
-                        WideCharToMultiByte( CP_ACP, 0, dlg->m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
-                        unsigned char Databuffer[16];
-                        memcpy_s(Databuffer,16,cTemp1,16);
-                        if (Write_Multi(ModbusID,Databuffer,715,16,10)>0)
-                        {
-                             
-                                 
-                                WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("0"),g_achive_device_name_path);
-                           
-                        }
-                    }
-                      
-                }
+	//CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	//for (int i = 0; i < pFrame->m_product.size(); i++) {
+		//if (dlg->m_hSelItem == pFrame->m_product.at(i).product_item)
+		//{
+			CString strIPAddress;
+			int IPPort = 0;
+			int ComPort = 0;
+			int brandrate = 0;
+			int ModbusID = 0;
+			CString strSql, temp_serial;
+			unsigned int sn = temp_tree_product.serial_number;
+			temp_serial.Format(_T("%u"), sn);
+			int  int_product_type = temp_tree_product.product_class_id;
 
-                
-            //} 
+			//if (product_register_value[714] == 0x56)
+			//{
+			int communicationType = temp_tree_product.protocol;
+			ModbusID = temp_tree_product.product_id;
+			SetCommunicationType(communicationType);
+			if (communicationType == 0)
+			{
 
-            break;
-         }
-         }
+				ComPort = temp_tree_product.ncomport;
+				brandrate = temp_tree_product.baudrate;
 
-         return 1;
- }
+				if (open_com(ComPort))
+				{
+					Change_BaudRate(brandrate);
+
+					char cTemp1[16];
+					memset(cTemp1, 0, 16);
+					WideCharToMultiByte(CP_ACP, 0, dlg->m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL);
+					unsigned char Databuffer[16];
+					memcpy_s(Databuffer, 16, cTemp1, 16);
+					if (Write_Multi(ModbusID, Databuffer, 715, 16, 10) > 0)
+					{
+						WritePrivateProfileStringW(temp_serial, _T("WriteFlag"), _T("0"), g_achive_device_name_path);
+						SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Succeeded in changing the device name."));
+					}
+					else
+					{
+						SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to change the device. Click the device list and try again"));
+					}
+
+
+					close_com();
+
+				}
+			}
+			else
+			{
+				strIPAddress = temp_tree_product.BuildingInfo.strIp;
+				IPPort = temp_tree_product.ncomport;
+				if (Open_Socket_Retry(strIPAddress, IPPort))
+				{
+					if (dlg->m_name_new.GetLength() > 17)	//长度不能大于结构体定义的长度;
+					{
+						dlg->m_name_new.Delete(16, dlg->m_name_new.GetLength() - 16);
+					}
+
+					char cTemp1[16];
+					memset(cTemp1, 0, 16);
+					WideCharToMultiByte(CP_ACP, 0, dlg->m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL);
+					unsigned char Databuffer[16];
+					memcpy_s(Databuffer, 16, cTemp1, 16);
+					if (Write_Multi(ModbusID, Databuffer, 715, 16, 10) > 0)
+					{
+
+
+						WritePrivateProfileStringW(temp_serial, _T("WriteFlag"), _T("0"), g_achive_device_name_path);
+						SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Succeeded in changing the device name"));
+					}
+				}
+				else
+				{
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to change the device. Click the device list and try again"));
+				}
+
+			}
+
+
+			//} 
+
+		//	break;
+		//}
+	//}
+
+	return 1;
+}
 IMPLEMENT_DYNAMIC(CImageTreeCtrl, CTreeCtrl)
 CImageTreeCtrl::CImageTreeCtrl()
 {
@@ -1051,7 +1065,12 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                                             WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
                                             WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
                                         }
+										SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to change the device. Click the device list and try again"));
                                     }
+									else
+									{
+										SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Succeeded in changing the device name"));
+									}
                                 }                              
 
                             }
@@ -1129,107 +1148,118 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
           return FALSE;
        }
 
-
-       int ccc = PanelName_Map(22);
-
-       ccc = PanelName_Map(99);
+	int write_results = 0;
 
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
     for (int i=0;i< pFrame->m_product.size();i++){
-      if (m_hSelItem == pFrame->m_product.at(i).product_item)
-      {     
-          
-              CString strIPAddress;
-              int IPPort=0;
-              int ComPort=0;
-              int brandrate = 0;
-              int ModbusID=0;
-             CString strSql,temp_serial;
-            int sn=pFrame->m_product.at(i).serial_number;
-            temp_serial.Format(_T("%d"),sn);
-            int  int_product_type = pFrame->m_product.at(i).product_class_id;
-            int panel_name_start_reg = 0;  //获取对应产品号
-            panel_name_start_reg = PanelName_Map(int_product_type);
+		if (m_hSelItem == pFrame->m_product.at(i).product_item)
+		{
+			selected_device = pFrame->m_product.at(i);
+			CString strIPAddress;
+			int IPPort = 0;
+			int ComPort = 0;
+			int brandrate = 0;
+			int ModbusID = 0;
+			CString strSql, temp_serial;
+			int sn = pFrame->m_product.at(i).serial_number;
+			temp_serial.Format(_T("%d"), sn);
+			int  int_product_type = pFrame->m_product.at(i).product_class_id;
+			int panel_name_start_reg = 0;  //获取对应产品号
+			panel_name_start_reg = PanelName_Map(int_product_type);
 
 
-             WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
-             WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+			WritePrivateProfileStringW(temp_serial, _T("NewName"), m_name_new, g_achive_device_name_path);
+			WritePrivateProfileStringW(temp_serial, _T("WriteFlag"), _T("1"), g_achive_device_name_path);
 
-            
 
-                int communicationType = pFrame->m_product.at(i).protocol;  
-                ModbusID = pFrame->m_product.at(i).product_id;
-                SetCommunicationType(communicationType);
-                if (communicationType==0)
-                {
-                    
-                    ComPort =  pFrame->m_product.at(i).ncomport;
-                    brandrate = pFrame->m_product.at(i).baudrate;
-                   
-                    if (open_com(ComPort))
-                    {
-                        Change_BaudRate(brandrate);
-                        
-                        char cTemp1[16];
-                        memset(cTemp1,0,16);
-                        WideCharToMultiByte( CP_ACP, 0, m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
-                        unsigned char Databuffer[16];
-                        memcpy_s(Databuffer,16,cTemp1,16);
-                        if (Write_Multi(ModbusID,Databuffer, panel_name_start_reg,16,10)<0)
-                        {
-                            
-                        }
-                        
-                        
-                        close_com();
 
-                    }
-                } 
-                else
-                {
-                    strIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
-                    IPPort = pFrame->m_product.at(i).ncomport;
-                    if (Open_Socket2(strIPAddress,IPPort))
-                    {
-                        if(m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度;
-                        {
-                            m_name_new.Delete(16,m_name_new.GetLength()-16);
-                        }
+			int communicationType = pFrame->m_product.at(i).protocol;
+			ModbusID = pFrame->m_product.at(i).product_id;
+			SetCommunicationType(communicationType);
+			if (communicationType == 0)
+			{
 
-                        char cTemp1[16];
-                        memset(cTemp1,0,16);
-                        WideCharToMultiByte( CP_ACP, 0, m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
-                        unsigned char Databuffer[16];
-                        memcpy_s(Databuffer,16,cTemp1,16);
-                        if (Write_Multi(ModbusID,Databuffer, panel_name_start_reg,16,10)<0)
-                        {
-                                WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
-                                WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
-                          
-                        }
-                    }
-                      
-                }
+				ComPort = pFrame->m_product.at(i).ncomport;
+				brandrate = pFrame->m_product.at(i).baudrate;
+
+				if (open_com(ComPort))
+				{
+					Change_BaudRate(brandrate);
+
+					char cTemp1[16];
+					memset(cTemp1, 0, 16);
+					WideCharToMultiByte(CP_ACP, 0, m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL);
+					unsigned char Databuffer[16];
+					memcpy_s(Databuffer, 16, cTemp1, 16);
+					if (Write_Multi(ModbusID, Databuffer, panel_name_start_reg, 16, 10) < 0)
+					{
+						SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to change the device. Click the device list and try again"));	
+						write_results = 0;
+					}
+					else
+					{
+						WritePrivateProfileStringW(temp_serial, _T("WriteFlag"), _T("0"), g_achive_device_name_path);
+						SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Succeeded in changing the device name"));
+						write_results = 1;
+					}
+
+					close_com();
+
+				}
+			}
+			else
+			{
+				strIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
+				IPPort = pFrame->m_product.at(i).ncomport;
+				if (Open_Socket_Retry(strIPAddress, IPPort))
+				{
+					if (m_name_new.GetLength() > 17)	//长度不能大于结构体定义的长度;
+					{
+						m_name_new.Delete(16, m_name_new.GetLength() - 16);
+					}
+
+					char cTemp1[16];
+					memset(cTemp1, 0, 16);
+					WideCharToMultiByte(CP_ACP, 0, m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL);
+					unsigned char Databuffer[16];
+					memcpy_s(Databuffer, 16, cTemp1, 16);
+					if (Write_Multi(ModbusID, Databuffer, panel_name_start_reg, 16, 10) < 0)
+					{
+						WritePrivateProfileStringW(temp_serial, _T("NewName"), m_name_new, g_achive_device_name_path);
+						WritePrivateProfileStringW(temp_serial, _T("WriteFlag"), _T("1"), g_achive_device_name_path);
+						SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to change the device. Click the device list and try again")); 
+						write_results = 0;
+					}
+					else
+					{
+						WritePrivateProfileStringW(temp_serial, _T("WriteFlag"), _T("0"), g_achive_device_name_path);
+						SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Succeeded in changing the device name"));
+						write_results = 1;
+					}
+				}
+
+			}
 
 			CppSQLite3DB SqliteDBBuilding;
 			CppSQLite3Table table;
 			CppSQLite3Query q;
 			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
-            strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s' and Serial_ID='%s'"),m_name_new,m_name_old,temp_serial);
-            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
-            SqliteDBBuilding.closedb();
+			strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s' and Serial_ID='%s'"), m_name_new, m_name_old, temp_serial);
+			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
+			SqliteDBBuilding.closedb();
 
-            if (m_name_new.GetLength() > 16)	//长度不能大于结构体定义的长度;
-            {
-                m_name_new.Delete(16, m_name_new.GetLength() - 16);
-            }
-            WritePrivateProfileStringW(temp_serial, _T("NewName"), m_name_new, g_achive_device_name_path);
-            WritePrivateProfileStringW(temp_serial, _T("WriteFlag"), _T("1"), g_achive_device_name_path);
-            CreateThread(NULL, NULL, _Background_Write_Name, this, NULL, 0);
+			if (m_name_new.GetLength() > 16)	//长度不能大于结构体定义的长度;
+			{
+				m_name_new.Delete(16, m_name_new.GetLength() - 16);
+			}
+			//WritePrivateProfileStringW(temp_serial, _T("NewName"), m_name_new, g_achive_device_name_path);
+			//WritePrivateProfileStringW(temp_serial, _T("WriteFlag"), _T("1"), g_achive_device_name_path);
+			if(write_results == 0)
+				CreateThread(NULL, NULL, _Background_Write_Name, this,NULL, 0);
 
-            return TRUE;
-      }
+			return TRUE;
+		}
     }
     
     return FALSE; 

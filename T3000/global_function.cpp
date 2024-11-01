@@ -11311,7 +11311,18 @@ void init_product_list()
     temp.bo_count = 7;
     temp.output_count = temp.ao_count + temp.bo_count;
     temp.pid = 88;
-    temp.sub_pid = T3_ESP_NG2;
+    temp.sub_pid = T3_ESP_RMC;
+    m_product_iocount.push_back(temp);
+
+    temp.cs_name = _T("T3-NG2-TYPE2");
+    temp.ai_count = NG2_TYPE2_IN_A;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = NG2_TYPE2_IN_A;
+    temp.bo_count = NG2_TYPE2_OUT_D;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 88;
+    temp.sub_pid = T3_NG2_TYPE2;
     m_product_iocount.push_back(temp);
 
     temp.cs_name = _T("Tstat10");
@@ -16325,10 +16336,20 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //èŽ·å
                 nret_type = OUTPUT_VIRTUAL_PORT;
         }
         break;
-        case T3_ESP_NG2:
+        case T3_ESP_RMC:
         {
             if (portindex <= 7)
                 nret_type = OUTPUT_DIGITAL_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
+        case T3_NG2_TYPE2:
+        {
+            if (portindex <= NG2_TYPE2_OUT_D)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= NG2_TYPE2_OUT_D + NG2_TYPE2_OUT_A)
+                nret_type = OUTPUT_ANALOG_PORT;
             else
                 nret_type = OUTPUT_VIRTUAL_PORT;
         }
@@ -16512,7 +16533,7 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
                 nret_type = INPUT_VIRTUAL_PORT;
         }
         break;
-        case T3_ESP_NG2:
+        case T3_ESP_RMC:
         {
             if (portindex <= 18)
             {
@@ -16526,6 +16547,19 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
                 nret_type = INPUT_VIRTUAL_PORT;
         }
         break;
+        case T3_NG2_TYPE2:
+        {
+            if (portindex <= NG2_TYPE2_IN_A)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    nret_type = INPUT_DIGITAL_PORT;
+                else
+                    nret_type = INPUT_ANALOG_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+        }
         default:
             break;
         }
