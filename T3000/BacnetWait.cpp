@@ -720,6 +720,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 							goto endthis;
 						}
 
+
 						g_invoke_id = GetPrivateData(
 							Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].device_id,
 							Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].command,

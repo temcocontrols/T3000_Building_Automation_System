@@ -1341,10 +1341,10 @@ const int NG2_IN_D = 0;
 const int NG2_OUT_A = 0;
 const int NG2_OUT_D = 7;
 
-const int NG2_TYPE2_IN_A = 16;
+const int NG2_TYPE2_IN_A = 30;
 const int NG2_TYPE2_IN_D = 0;
 const int NG2_TYPE2_OUT_A = 4;
-const int NG2_TYPE2_OUT_D = 6;
+const int NG2_TYPE2_OUT_D = 8;
 enum
 {
 	UART_1200 = 0,

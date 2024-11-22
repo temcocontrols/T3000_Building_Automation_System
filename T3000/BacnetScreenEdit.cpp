@@ -1194,7 +1194,7 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
 			}
 #endif
 
-
+#if 1  //Fandu 
         for (int i = 0;i < m_read_group_data.size();i++)
         {
             if (m_read_group_data.at(i).read_info.deviceid == 0)  //如果deviceid 是0 跳过刷新;并尝试根据panel获取device id;
@@ -1278,11 +1278,11 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
             }
 			else
 			{
-				memset(&m_read_group_data.at(i).detail_data, 0, sizeof(groupdata));
+				//memset(&m_read_group_data.at(i).detail_data, 0, sizeof(groupdata));
 			}
 			Sleep(50);
         }
-
+#endif
 
 
 		for (int i = 0; i < m_standard_graphic_refresh_data.size(); i++)
@@ -1677,58 +1677,56 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 					temp1.entitysize = sizeof(Str_controller_point);
 					m_graphic_refresh_data.push_back(temp1);
 				}
-                else if ((bac_label.nPoint_type == BAC_BI) || (bac_label.nPoint_type == BAC_BV) ||
-                    (bac_label.nPoint_type == BAC_AV) || (bac_label.nPoint_type == BAC_AI) ||
-                    (bac_label.nPoint_type == BAC_AO) || (bac_label.nPoint_type == BAC_BO))
-                {
-                    temp2.standard_command = true;
-                    if (bac_label.nPoint_type == BAC_BI)
-                        temp2.object_type = OBJECT_BINARY_INPUT;
-                    else if (bac_label.nPoint_type == BAC_BV)
-                        temp2.object_type = OBJECT_BINARY_VALUE;
-                    else if (bac_label.nPoint_type == BAC_AV)
-                        temp2.object_type = OBJECT_ANALOG_VALUE;
-                    else if (bac_label.nPoint_type == BAC_AI)
-                        temp2.object_type = OBJECT_ANALOG_INPUT;
-                    else if (bac_label.nPoint_type == BAC_AO)
-                        temp2.object_type = OBJECT_ANALOG_OUTPUT;
-                    else if (bac_label.nPoint_type == BAC_BO)
-                        temp2.object_type = OBJECT_BINARY_OUTPUT;
-                    
-                    temp2.deviceid = ((bac_label.network_point & 0x7F) << 16) + (bac_label.nMain_Panel << 8) + (bac_label.nSub_Panel);
-                    temp2.object_instance = bac_label.nPoint_number;
-                    temp2.property_id = PROP_PRESENT_VALUE;
-                    temp2.lable_index = bac_label.nLabel_index;
-                    Sleep(1);
+				else if ((bac_label.nPoint_type == BAC_BI) || (bac_label.nPoint_type == BAC_BV) ||
+					(bac_label.nPoint_type == BAC_AV) || (bac_label.nPoint_type == BAC_AI) ||
+					(bac_label.nPoint_type == BAC_AO) || (bac_label.nPoint_type == BAC_BO))
+				{
+					temp2.standard_command = true;
+					if (bac_label.nPoint_type == BAC_BI)
+						temp2.object_type = OBJECT_BINARY_INPUT;
+					else if (bac_label.nPoint_type == BAC_BV)
+						temp2.object_type = OBJECT_BINARY_VALUE;
+					else if (bac_label.nPoint_type == BAC_AV)
+						temp2.object_type = OBJECT_ANALOG_VALUE;
+					else if (bac_label.nPoint_type == BAC_AI)
+						temp2.object_type = OBJECT_ANALOG_INPUT;
+					else if (bac_label.nPoint_type == BAC_AO)
+						temp2.object_type = OBJECT_ANALOG_OUTPUT;
+					else if (bac_label.nPoint_type == BAC_BO)
+						temp2.object_type = OBJECT_BINARY_OUTPUT;
 
-                    
+					temp2.deviceid = ((bac_label.network_point & 0x7F) << 16) + (bac_label.nMain_Panel << 8) + (bac_label.nSub_Panel);
+					temp2.object_instance = bac_label.nPoint_number;
+					temp2.property_id = PROP_PRESENT_VALUE;
+					temp2.lable_index = bac_label.nLabel_index;
+					Sleep(1);
+					m_standard_graphic_refresh_data.push_back(temp2);
 
-                    m_standard_graphic_refresh_data.push_back(temp2);
-                }
+				}
 
-			//}
-                bool temp_exsit = false;
-                for (int i = 0; i < m_read_group_data.size(); i++)
-                {
-                    if (memcmp(&m_read_group_data.at(i).read_info, &temp1, sizeof(_Graphic_Value_Info)) == 0)
-                    {
-                        temp_exsit = true;
-                        break;
-                    }
-                }
-                if (!temp_exsit)
-                {
-                    _Group_Data temp_group_data;
-                    memset(&temp_group_data, 0, sizeof(_Group_Data));
-                    memcpy(&temp_group_data.read_info, &temp1, sizeof(_Graphic_Value_Info));
-                    temp_group_data.point.panel = bac_label.nMain_Panel;
-                    temp_group_data.point.sub_panel = bac_label.nSub_Panel;
-                    temp_group_data.point.point_type = bac_label.nPoint_type;
-                    temp_group_data.point.number = bac_label.nPoint_number;
-                    temp_group_data.point.network = bac_label.network_point;
-                    m_read_group_data.push_back(temp_group_data);
 
-                }
+				bool temp_exsit = false;
+				for (int i = 0; i < m_read_group_data.size(); i++)
+				{
+					if (memcmp(&m_read_group_data.at(i).read_info, &temp1, sizeof(_Graphic_Value_Info)) == 0)
+					{
+						temp_exsit = true;
+						break;
+					}
+				}
+				if (!temp_exsit)
+				{
+					_Group_Data temp_group_data;
+					memset(&temp_group_data, 0, sizeof(_Group_Data));
+					memcpy(&temp_group_data.read_info, &temp1, sizeof(_Graphic_Value_Info));
+					temp_group_data.point.panel = bac_label.nMain_Panel;
+					temp_group_data.point.sub_panel = bac_label.nSub_Panel;
+					temp_group_data.point.point_type = bac_label.nPoint_type;
+					temp_group_data.point.number = bac_label.nPoint_number;
+					temp_group_data.point.network = bac_label.network_point;
+					m_read_group_data.push_back(temp_group_data);
+
+				}
 
             if((bac_label.nMain_Panel == Station_NUM) && (bac_label.nSub_Panel != 0))
 			{

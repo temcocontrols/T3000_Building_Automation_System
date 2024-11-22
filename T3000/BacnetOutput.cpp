@@ -371,9 +371,9 @@ void CBacnetOutput::OnBnClickedButtonOutputRead()
 
 
 
-LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
+LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 {
-    //bool need_refresh_all = false; 
+	//bool need_refresh_all = false; 
 	int Fresh_Item;
 	int isFreshOne = (bool)lParam;
 	int  Minipanel_device = 1;
@@ -399,49 +399,49 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		digital_special_output_count = BIG_MINIPANEL_OUT_D;
 		analog_special_output_count = BIG_MINIPANEL_OUT_A;
-        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
-	else if(bacnet_device_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB)
+	else if (bacnet_device_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB)
 	{
 		digital_special_output_count = SMALL_MINIPANEL_OUT_D;
 		analog_special_output_count = SMALL_MINIPANEL_OUT_A;
-        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
-	else if(bacnet_device_type == TINY_MINIPANEL)
+	else if (bacnet_device_type == TINY_MINIPANEL)
 	{
 		digital_special_output_count = TINY_MINIPANEL_OUT_D;
 		analog_special_output_count = TINY_MINIPANEL_OUT_A;
-        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
 	else if (bacnet_device_type == TINY_EX_MINIPANEL || bacnet_device_type == MINIPANELARM_TB)
 	{
 		digital_special_output_count = TINYEX_MINIPANEL_OUT_D;
 		analog_special_output_count = TINYEX_MINIPANEL_OUT_A;
-        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
-    else if (bacnet_device_type == T3_TB_11I)
-    {
-        digital_special_output_count = T3_TB_11I_OUT_D;
-        analog_special_output_count = T3_TB_11I_OUT_A;
-        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
-        Minipanel_device = 1;
-    }
-	else if(bacnet_device_type == PM_T38AI8AO6DO)
+	else if (bacnet_device_type == T3_TB_11I)
+	{
+		digital_special_output_count = T3_TB_11I_OUT_D;
+		analog_special_output_count = T3_TB_11I_OUT_A;
+		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+		Minipanel_device = 1;
+	}
+	else if (bacnet_device_type == PM_T38AI8AO6DO)
 	{
 		digital_special_output_count = T38AI8AO6DO_OUT_D;
 		analog_special_output_count = T38AI8AO6DO_OUT_A;
-        OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+		OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
 		Minipanel_device = 0;
 	}
 	else if (bacnet_device_type == PM_T322AI)
 	{
 		digital_special_output_count = T322AI_OUT_D;
 		analog_special_output_count = T322AI_OUT_A;
-        OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+		OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
 		Minipanel_device = 0;
 	}
 	else if (bacnet_device_type == PM_T332AI_ARM)
@@ -455,54 +455,54 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	{
 		digital_special_output_count = PWM_TRANSDUCER_OUT_D;
 		analog_special_output_count = PWM_TRANSDUCER_OUT_A;
-        OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count  + analog_special_output_count;
+		OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
 		Minipanel_device = 0;
 	}
-    //else if (bacnet_device_type == BACNET_ROUTER)
-    //{
-    //    digital_special_output_count = BACNET_ROUTER_OUT_D;
-    //    analog_special_output_count = BACNET_ROUTER_OUT_A;
-    //    OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
-    //    Minipanel_device = 1;
-    //}
-    else if ((bacnet_device_type == STM32_CO2_NET) || 
-		    (bacnet_device_type == STM32_CO2_RS485) ||
-		     (bacnet_device_type == STM32_HUM_NET) || 
-			(bacnet_device_type == STM32_HUM_RS485) ||
-		     (bacnet_device_type == STM32_PRESSURE_NET)||
-		     (bacnet_device_type == STM32_PRESSURE_RS485))
-    {
-        OUTPUT_LIMITE_ITEM_COUNT = 3;
-        Minipanel_device = 0;
-    }
-    else if (bacnet_device_type == PM_T3_LC)
-    {
-        OUTPUT_LIMITE_ITEM_COUNT = 8;
-    }
-    else if ((bacnet_device_type == PID_T36CTA))
-    {
-        OUTPUT_LIMITE_ITEM_COUNT = 2;
-    }
-    else
-    {
-        OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+	//else if (bacnet_device_type == BACNET_ROUTER)
+	//{
+	//    digital_special_output_count = BACNET_ROUTER_OUT_D;
+	//    analog_special_output_count = BACNET_ROUTER_OUT_A;
+	//    OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+	//    Minipanel_device = 1;
+	//}
+	else if ((bacnet_device_type == STM32_CO2_NET) ||
+		(bacnet_device_type == STM32_CO2_RS485) ||
+		(bacnet_device_type == STM32_HUM_NET) ||
+		(bacnet_device_type == STM32_HUM_RS485) ||
+		(bacnet_device_type == STM32_PRESSURE_NET) ||
+		(bacnet_device_type == STM32_PRESSURE_RS485))
+	{
+		OUTPUT_LIMITE_ITEM_COUNT = 3;
+		Minipanel_device = 0;
+	}
+	else if (bacnet_device_type == PM_T3_LC)
+	{
+		OUTPUT_LIMITE_ITEM_COUNT = 8;
+	}
+	else if ((bacnet_device_type == PID_T36CTA))
+	{
+		OUTPUT_LIMITE_ITEM_COUNT = 2;
+	}
+	else
+	{
+		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
 			((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
 		{
 			OUTPUT_LIMITE_ITEM_COUNT = DYNAMIC_OUTPUT_ITEM_COUNT;
 		}
-    }
+	}
 
 	int temp_need_show_external = 0;
-	for (int z= 0 ;z < (int)m_Output_data.size();z++)
+	for (int z = 0; z < (int)m_Output_data.size(); z++)
 	{
-		if(z>= OUTPUT_LIMITE_ITEM_COUNT)
+		if (z >= OUTPUT_LIMITE_ITEM_COUNT)
 		{
-			m_output_list.SetItemText(z,0,_T(""));
+			m_output_list.SetItemText(z, 0, _T(""));
 			continue;
 		}
-		if((m_Output_data.at(z).sub_id !=0) &&
-			(m_Output_data.at(z).sub_product !=0))
+		if ((m_Output_data.at(z).sub_id != 0) &&
+			(m_Output_data.at(z).sub_product != 0))
 		{
 			temp_need_show_external = 1;
 			break;
@@ -510,108 +510,108 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 	}
 
-    //if (g_output_support_relinquish != 0)
-    //{
-    //    m_output_list.SetColumnWidth(OUTPUT_RELINQUISH_VALUE, 80);
-    //}
-    //else
-    //{
-    //    m_output_list.SetColumnWidth(OUTPUT_RELINQUISH_VALUE, 0);
-    //}
-	if(show_output_external != temp_need_show_external)
+	//if (g_output_support_relinquish != 0)
+	//{
+	//    m_output_list.SetColumnWidth(OUTPUT_RELINQUISH_VALUE, 80);
+	//}
+	//else
+	//{
+	//    m_output_list.SetColumnWidth(OUTPUT_RELINQUISH_VALUE, 0);
+	//}
+	if (show_output_external != temp_need_show_external)
 	{
 		show_output_external = temp_need_show_external;
-		if(temp_need_show_external)
+		if (temp_need_show_external)
 		{
 			//m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,60);
-			m_output_list.SetColumnWidth(OUTPUT_PRODUCT,80);
-			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,80);
+			m_output_list.SetColumnWidth(OUTPUT_PRODUCT, 80);
+			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 80);
 		}
 		else
 		{
-            for (int i = 0;i < (int)m_Output_data.size();i++)
-            {
-                m_output_list.SetItemTextColor(i, OUTPUT_EXTERNAL, RGB(0, 0, 0), FALSE);
-                m_output_list.SetItemTextColor(i, -1, RGB(0, 0, 0), 0);
-            }
+			for (int i = 0; i < (int)m_Output_data.size(); i++)
+			{
+				m_output_list.SetItemTextColor(i, OUTPUT_EXTERNAL, RGB(0, 0, 0), FALSE);
+				m_output_list.SetItemTextColor(i, -1, RGB(0, 0, 0), 0);
+			}
 			//m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
-			m_output_list.SetColumnWidth(OUTPUT_PRODUCT,0);
-			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,0);
+			m_output_list.SetColumnWidth(OUTPUT_PRODUCT, 0);
+			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
 		}
 	}
-	if(Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
+	if (Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
 	{
 		//m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
-		m_output_list.SetColumnWidth(OUTPUT_PRODUCT,0);
-		m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,0);
+		m_output_list.SetColumnWidth(OUTPUT_PRODUCT, 0);
+		m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
 	}
 
 
 	//if(need_refresh_all == false)
 	//{
-		if(isFreshOne == REFRESH_ON_ITEM)
+	if (isFreshOne == REFRESH_ON_ITEM)
+	{
+		Fresh_Item = (int)wParam;
+	}
+	else
+	{
+		if ((m_output_list.IsDataNewer((char*)&m_Output_data.at(0), sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT) == 0) && refresh_output == 0)
 		{
-			Fresh_Item = (int)wParam;
+			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			return 0;
 		}
-		else
-		{
-			if((m_output_list.IsDataNewer((char *)&m_Output_data.at(0),sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT)  == 0) && refresh_output == 0)
-			{
-				//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-				return 0;
-			}
-		}
+	}
 	//}
 #ifdef USE_THIRD_PARTY_FUNC
-		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
-		{
-			TCHAR szBuffer[80];
-			LVCOLUMN col;
-			col.mask = LVCF_TEXT;
-			col.pszText = szBuffer;
-			col.cchTextMax = 80;
-			m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
-			col.pszText = _T("Out of Service");
-			m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
+	if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
+	{
+		TCHAR szBuffer[80];
+		LVCOLUMN col;
+		col.mask = LVCF_TEXT;
+		col.pszText = szBuffer;
+		col.cchTextMax = 80;
+		m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
+		col.pszText = _T("Out of Service");
+		m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
 
-			m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH, 0);
-			m_output_list.SetColumnWidth(OUTPUT_RANGE, 0);
-			m_output_list.SetColumnWidth(OUTPUT_LOW_VOLTAGE, 0);
-			m_output_list.SetColumnWidth(OUTPUT_HIGH_VOLTAGE, 0);
-			m_output_list.SetColumnWidth(OUTPUT_PWM_PERIOD, 0);
-			m_output_list.SetColumnWidth(OUTPUT_DECOM, 0);
-			m_output_list.SetColumnWidth(OUTPUT_PRODUCT, 0);
-			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
-		}
-		else { // to show the column for non-bacnet devices
-			TCHAR szBuffer[80];
-			LVCOLUMN col;
-			col.mask = LVCF_TEXT;
-			col.pszText = szBuffer;
-			col.cchTextMax = 65;
-			m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
-			col.pszText = _T("Auto/Man");
-			m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
-			m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH, 80);
-			m_output_list.SetColumnWidth(OUTPUT_RANGE, 100);
-			m_output_list.SetColumnWidth(OUTPUT_LOW_VOLTAGE, 50);
-			m_output_list.SetColumnWidth(OUTPUT_HIGH_VOLTAGE, 50);
-			m_output_list.SetColumnWidth(OUTPUT_PWM_PERIOD, 80);
-			m_output_list.SetColumnWidth(OUTPUT_DECOM, 70);
-		}
+		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH, 0);
+		m_output_list.SetColumnWidth(OUTPUT_RANGE, 0);
+		m_output_list.SetColumnWidth(OUTPUT_LOW_VOLTAGE, 0);
+		m_output_list.SetColumnWidth(OUTPUT_HIGH_VOLTAGE, 0);
+		m_output_list.SetColumnWidth(OUTPUT_PWM_PERIOD, 0);
+		m_output_list.SetColumnWidth(OUTPUT_DECOM, 0);
+		m_output_list.SetColumnWidth(OUTPUT_PRODUCT, 0);
+		m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
+	}
+	else { // to show the column for non-bacnet devices
+		TCHAR szBuffer[80];
+		LVCOLUMN col;
+		col.mask = LVCF_TEXT;
+		col.pszText = szBuffer;
+		col.cchTextMax = 65;
+		m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
+		col.pszText = _T("Auto/Man");
+		m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
+		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH, 80);
+		m_output_list.SetColumnWidth(OUTPUT_RANGE, 100);
+		m_output_list.SetColumnWidth(OUTPUT_LOW_VOLTAGE, 50);
+		m_output_list.SetColumnWidth(OUTPUT_HIGH_VOLTAGE, 50);
+		m_output_list.SetColumnWidth(OUTPUT_PWM_PERIOD, 80);
+		m_output_list.SetColumnWidth(OUTPUT_DECOM, 70);
+	}
 #endif
 
 	CString temp1;
-	for (int i=0;i<(int)m_Output_data.size();i++)
+	for (int i = 0; i < (int)m_Output_data.size(); i++)
 	{
-		if(isFreshOne)
+		if (isFreshOne)
 		{
 			i = Fresh_Item;
-            if (i >= m_Output_data.size())
-                return 1;
+			if (i >= m_Output_data.size())
+				return 1;
 		}
 
-		if(i>=output_item_limit_count)
+		if (i >= output_item_limit_count)
 			break;
 
 		if (refresh_output == 0)
@@ -625,25 +625,25 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			}
 		}
 
-		if(i>= OUTPUT_LIMITE_ITEM_COUNT)
+		if (i >= OUTPUT_LIMITE_ITEM_COUNT)
 		{
-			for (int a=0;a<OUTPUT_COL_NUMBER; a++)
+			for (int a = 0; a < OUTPUT_COL_NUMBER; a++)
 			{
-				m_output_list.SetItemText(i,a,_T(""));
+				m_output_list.SetItemText(i, a, _T(""));
 			}
 			continue;
 		}
-		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
+		CString temp_item, temp_value, temp_cal, temp_filter, temp_status, temp_lable;
 		CString temp_des;
 		CString temp_units;
-		CString low_voltage,high_voltage;
-        CString temp_relinquish_value;
-        
+		CString low_voltage, high_voltage;
+		CString temp_relinquish_value;
 
 
 
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).description, (int)strlen((char *)m_Output_data.at(i).description)+1, 
-			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_Output_data.at(i).description, (int)strlen((char*)m_Output_data.at(i).description) + 1,
+			temp_des.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_des.ReleaseBuffer();
 		temp_des = temp_des.Left(STR_OUT_DESCRIPTION_LENGTH).Trim();
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
@@ -657,82 +657,82 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 		else
 			temp_item.Format(_T("OUT%d"), i + 1);
-		m_output_list.SetItemText(i,OUTPUT_NUM,temp_item);
-		m_output_list.SetItemText(i,OUTPUT_FULL_LABLE,temp_des);
-		m_output_list.SetCellEnabled(i,OUTPUT_HW_SWITCH,0);
-		m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T(""));
+		m_output_list.SetItemText(i, OUTPUT_NUM, temp_item);
+		m_output_list.SetItemText(i, OUTPUT_FULL_LABLE, temp_des);
+		m_output_list.SetCellEnabled(i, OUTPUT_HW_SWITCH, 0);
+		m_output_list.SetItemText(i, OUTPUT_HW_SWITCH, _T(""));
 
-		if(m_Output_data.at(i).low_voltage == 0)
+		if (m_Output_data.at(i).low_voltage == 0)
 			low_voltage.Empty();
 		else
-			low_voltage.Format(_T("%.1f"),m_Output_data.at(i).low_voltage/10.0);
+			low_voltage.Format(_T("%.1f"), m_Output_data.at(i).low_voltage / 10.0);
 
-		if(m_Output_data.at(i).high_voltage == 0)
+		if (m_Output_data.at(i).high_voltage == 0)
 			high_voltage.Empty();
 		else
-			high_voltage.Format(_T("%.1f"),m_Output_data.at(i).high_voltage/10.0);
-		
-		m_output_list.SetItemText(i,OUTPUT_LOW_VOLTAGE,low_voltage);	
-		m_output_list.SetItemText(i,OUTPUT_HIGH_VOLTAGE,high_voltage);	
-		if(
-			    bacnet_device_type == T3_TSTAT10 ||
-				bacnet_device_type == T3_OEM ||
-				bacnet_device_type == T3_OEM_12I ||
-			    bacnet_device_type == T3_ESP_RMC ||
-				bacnet_device_type == T3_NG2_TYPE2 ||
-			    bacnet_device_type == BIG_MINIPANEL || 
-                bacnet_device_type == MINIPANELARM || 
-                bacnet_device_type == MINIPANELARM_LB || 
-                bacnet_device_type == T3_TB_11I ||
-                bacnet_device_type == MINIPANELARM_TB || 
-			    bacnet_device_type == SMALL_MINIPANEL || 
-			    bacnet_device_type == TINY_MINIPANEL || 
-			    bacnet_device_type == TINY_EX_MINIPANEL ||
-			    bacnet_device_type == T38AI8AO6DO || 
-			    bacnet_device_type == PID_T322AI || 
-			    bacnet_device_type == PWM_TRANSDUCER
-            )
+			high_voltage.Format(_T("%.1f"), m_Output_data.at(i).high_voltage / 10.0);
+
+		m_output_list.SetItemText(i, OUTPUT_LOW_VOLTAGE, low_voltage);
+		m_output_list.SetItemText(i, OUTPUT_HIGH_VOLTAGE, high_voltage);
+		if (
+			bacnet_device_type == T3_TSTAT10 ||
+			bacnet_device_type == T3_OEM ||
+			bacnet_device_type == T3_OEM_12I ||
+			bacnet_device_type == T3_ESP_RMC ||
+			bacnet_device_type == T3_NG2_TYPE2 ||
+			bacnet_device_type == BIG_MINIPANEL ||
+			bacnet_device_type == MINIPANELARM ||
+			bacnet_device_type == MINIPANELARM_LB ||
+			bacnet_device_type == T3_TB_11I ||
+			bacnet_device_type == MINIPANELARM_TB ||
+			bacnet_device_type == SMALL_MINIPANEL ||
+			bacnet_device_type == TINY_MINIPANEL ||
+			bacnet_device_type == TINY_EX_MINIPANEL ||
+			bacnet_device_type == T38AI8AO6DO ||
+			bacnet_device_type == PID_T322AI ||
+			bacnet_device_type == PWM_TRANSDUCER
+			)
 		{
-			if(i < (digital_special_output_count +analog_special_output_count) )
+			if (i < (digital_special_output_count + analog_special_output_count))
 			{
-				if(m_Output_data.at(i).hw_switch_status == HW_SW_OFF)
+				if (m_Output_data.at(i).hw_switch_status == HW_SW_OFF)
 				{
-					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-OFF"));		
-					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
+					m_output_list.SetItemText(i, OUTPUT_HW_SWITCH, _T("MAN-OFF"));
+					m_output_list.SetCellEnabled(i, OUTPUT_AUTO_MANUAL, 0);
 
-					m_output_list.SetItemTextColor(i,-1,RGB(255,0,0),0);
+					m_output_list.SetItemTextColor(i, -1, RGB(255, 0, 0), 0);
 				}
-				else if(m_Output_data.at(i).hw_switch_status == HW_SW_HAND)
+				else if (m_Output_data.at(i).hw_switch_status == HW_SW_HAND)
 				{
-					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-ON"));
-					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
+					m_output_list.SetItemText(i, OUTPUT_HW_SWITCH, _T("MAN-ON"));
+					m_output_list.SetCellEnabled(i, OUTPUT_AUTO_MANUAL, 0);
 
-					m_output_list.SetItemTextColor(i,-1,RGB(255,0,0),0);
+					m_output_list.SetItemTextColor(i, -1, RGB(255, 0, 0), 0);
 				}
 				else
 				{
-					m_output_list.SetItemTextColor(i,-1,RGB(0,0,0),0);
+					m_output_list.SetItemTextColor(i, -1, RGB(0, 0, 0), 0);
 
-					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("AUTO"));
-					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
-					
-						if (m_Output_data.at(i).auto_manual == 0)	//In output table if it is auto ,the value can't be edit by user
-						{
-							m_output_list.SetItemText(i, OUTPUT_AUTO_MANUAL, _T("Auto"));
-							//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
-						}
-						else
-						{
-							m_output_list.SetItemText(i, OUTPUT_AUTO_MANUAL, _T("Manual"));
-							//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
-						}
+					m_output_list.SetItemText(i, OUTPUT_HW_SWITCH, _T("AUTO"));
+					m_output_list.SetCellEnabled(i, OUTPUT_AUTO_MANUAL, 1);
+
+					if (m_Output_data.at(i).auto_manual == 0)	//In output table if it is auto ,the value can't be edit by user
+					{
+						m_output_list.SetItemText(i, OUTPUT_AUTO_MANUAL, _T("Auto"));
+						//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+					}
+					else
+					{
+						m_output_list.SetItemText(i, OUTPUT_AUTO_MANUAL, _T("Manual"));
+						//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
+					}
 				}
 			}
 			else
 			{
-				m_output_list.SetItemTextColor(i,-1,RGB(0,0,0),0);
-				m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("AUTO"));
-				m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
+				m_output_list.SetItemTextColor(i, -1, RGB(0, 0, 0), 0);
+				m_output_list.SetItemText(i, OUTPUT_HW_SWITCH, _T("AUTO"));
+				m_output_list.SetCellEnabled(i, OUTPUT_AUTO_MANUAL, 1);
 
 				if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 				{
@@ -767,7 +767,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
+			m_output_list.SetCellEnabled(i, OUTPUT_AUTO_MANUAL, 1);
 			if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 			{
 				if (m_Output_data.at(i).auto_manual == 0)
@@ -778,7 +778,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				{
 					m_output_list.SetItemText(i, OUTPUT_AUTO_MANUAL, _T("True"));
 				}
-				
+
 			}
 			else
 			{
@@ -799,14 +799,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 
 
-			m_output_list.SetCellEnabled(i,OUTPUT_UNITE,0);
-            CString temp_digital_value2;
-            CStringArray temparray;
-		if(m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG)
+		m_output_list.SetCellEnabled(i, OUTPUT_UNITE, 0);
+		CString temp_digital_value2;
+		CStringArray temparray;
+		if (m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG)
 		{
-			m_output_list.SetCellEnabled(i,OUTPUT_LOW_VOLTAGE,1);
-			m_output_list.SetCellEnabled(i,OUTPUT_HIGH_VOLTAGE,1);
-			m_output_list.SetCellEnabled(i,OUTPUT_PWM_PERIOD,1);
+			m_output_list.SetCellEnabled(i, OUTPUT_LOW_VOLTAGE, 1);
+			m_output_list.SetCellEnabled(i, OUTPUT_HIGH_VOLTAGE, 1);
+			m_output_list.SetCellEnabled(i, OUTPUT_PWM_PERIOD, 1);
 			if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
 			{
 				CString outputunit;
@@ -832,117 +832,117 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				else
 					m_output_list.SetItemText(i, OUTPUT_UNITE, _T("Unused"));
 			}
-			CString temp_low,temp_high;
-			temp_low.Format(_T("%d"),0);
-			temp_high.Format(_T("%d"),0);
+			CString temp_low, temp_high;
+			temp_low.Format(_T("%d"), 0);
+			temp_high.Format(_T("%d"), 0);
 
 
 			CString temp_value;
-			temp_value.Format(_T("%.2f"),((float)m_Output_data.at(i).value) / 1000);
-			m_output_list.SetItemText(i,OUTPUT_VALUE,temp_value);
+			temp_value.Format(_T("%.2f"), ((float)m_Output_data.at(i).value) / 1000);
+			m_output_list.SetItemText(i, OUTPUT_VALUE, temp_value);
 
 		}
-		else if(m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+		else if (m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
-			m_output_list.SetCellEnabled(i,OUTPUT_LOW_VOLTAGE,0);
-			m_output_list.SetCellEnabled(i,OUTPUT_HIGH_VOLTAGE,0);
-			m_output_list.SetCellEnabled(i,OUTPUT_PWM_PERIOD,0);
-			m_output_list.SetItemText(i,OUTPUT_UNITE,_T(""));
+			m_output_list.SetCellEnabled(i, OUTPUT_LOW_VOLTAGE, 0);
+			m_output_list.SetCellEnabled(i, OUTPUT_HIGH_VOLTAGE, 0);
+			m_output_list.SetCellEnabled(i, OUTPUT_PWM_PERIOD, 0);
+			m_output_list.SetItemText(i, OUTPUT_UNITE, _T(""));
 
-			if(m_Output_data.at(i).range == 0)
+			if (m_Output_data.at(i).range == 0)
 			{
-				
-                temp_digital_value2.Format(_T("%.2f"),((float)m_Output_data.at(i).value) / 1000);
-				m_output_list.SetItemText(i,OUTPUT_VALUE, temp_digital_value2);
 
-				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[0]);
+				temp_digital_value2.Format(_T("%.2f"), ((float)m_Output_data.at(i).value) / 1000);
+				m_output_list.SetItemText(i, OUTPUT_VALUE, temp_digital_value2);
+
+				m_output_list.SetItemText(i, OUTPUT_RANGE, Digital_Units_Array[0]);
 			}
-			else if(m_Output_data.at(i).range<=22)
-				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[m_Output_data.at(i).range]);
-			else if((m_Output_data.at(i).range >= 23) && (m_Output_data.at(i).range <= 30))
+			else if (m_Output_data.at(i).range <= 22)
+				m_output_list.SetItemText(i, OUTPUT_RANGE, Digital_Units_Array[m_Output_data.at(i).range]);
+			else if ((m_Output_data.at(i).range >= 23) && (m_Output_data.at(i).range <= 30))
 			{
-				if(receive_customer_unit)
-					m_output_list.SetItemText(i,OUTPUT_RANGE,Custom_Digital_Range[m_Output_data.at(i).range - 23]);
+				if (receive_customer_unit)
+					m_output_list.SetItemText(i, OUTPUT_RANGE, Custom_Digital_Range[m_Output_data.at(i).range - 23]);
 				else
-					m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[0]);
+					m_output_list.SetItemText(i, OUTPUT_RANGE, Digital_Units_Array[0]);
 			}
 			else
-				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[0]);
+				m_output_list.SetItemText(i, OUTPUT_RANGE, Digital_Units_Array[0]);
 #if 0
-			if(m_Output_data.at(i).range>=12)
-				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[m_Output_data.at(i).range -11]);
+			if (m_Output_data.at(i).range >= 12)
+				m_output_list.SetItemText(i, OUTPUT_RANGE, Digital_Units_Array[m_Output_data.at(i).range - 11]);
 			else
-				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[m_Output_data.at(i).range]);
+				m_output_list.SetItemText(i, OUTPUT_RANGE, Digital_Units_Array[m_Output_data.at(i).range]);
 #endif
-			if((m_Output_data.at(i).range>30) || (m_Output_data.at(i).range == 0))
+			if ((m_Output_data.at(i).range > 30) || (m_Output_data.at(i).range == 0))
 			{
 				//m_output_list.SetItemText(i,OUTPUT_UNITE,Digital_Units_Array[0]);
 			}
 			else
 			{
-				
-				
 
-				if((m_Output_data.at(i).range < 23) &&(m_Output_data.at(i).range !=0))
+
+
+				if ((m_Output_data.at(i).range < 23) && (m_Output_data.at(i).range != 0))
 					temp1 = Digital_Units_Array[m_Output_data.at(i).range];
-				else if((m_Output_data.at(i).range >=23) && (m_Output_data.at(i).range <= 30))
+				else if ((m_Output_data.at(i).range >= 23) && (m_Output_data.at(i).range <= 30))
 				{
-					if(receive_customer_unit)
+					if (receive_customer_unit)
 						temp1 = Custom_Digital_Range[m_Output_data.at(i).range - 23];
 				}
 				else
 				{
 					temp1.Empty();
-					m_output_list.SetItemText(i,OUTPUT_VALUE,_T(""));
+					m_output_list.SetItemText(i, OUTPUT_VALUE, _T(""));
 				}
 
-				SplitCStringA(temparray,temp1,_T("/"));
-				if((temparray.GetSize()==2))
+				SplitCStringA(temparray, temp1, _T("/"));
+				if ((temparray.GetSize() == 2))
 				{
-					if(m_Output_data.at(i).control == 0)
-						m_output_list.SetItemText(i,OUTPUT_VALUE,temparray.GetAt(0));
+					if (m_Output_data.at(i).control == 0)
+						m_output_list.SetItemText(i, OUTPUT_VALUE, temparray.GetAt(0));
 					else
-						m_output_list.SetItemText(i,OUTPUT_VALUE,temparray.GetAt(1));
+						m_output_list.SetItemText(i, OUTPUT_VALUE, temparray.GetAt(1));
 				}
 			}
 		}
 #if 0
-        if (g_output_support_relinquish != 0)
-        {
-            int relinquish_value = 0;
-            relinquish_value = output_relinquish_value[2 * i] * 65536 + output_relinquish_value[i * 2 + 1];
-            if ((m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG) ||
-                ((m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL) && (m_Output_data.at(i).range == 0)))
-            {
-                temp_relinquish_value.Format(_T("%.3f"), (output_relinquish_value[2 * i] * 65536 + output_relinquish_value[i * 2 + 1]) / 1000.0);
-            }
-            else if (m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
-            {
-                if ((temparray.GetSize() == 2))
-                {
-                    if (relinquish_value == 0)
-                        temp_relinquish_value = temparray.GetAt(0);
-                    else if (relinquish_value == 1000)
-                        temp_relinquish_value = temparray.GetAt(1);
-                    else
-                        temp_relinquish_value = _T("");
-                }
-            }
+		if (g_output_support_relinquish != 0)
+		{
+			int relinquish_value = 0;
+			relinquish_value = output_relinquish_value[2 * i] * 65536 + output_relinquish_value[i * 2 + 1];
+			if ((m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG) ||
+				((m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL) && (m_Output_data.at(i).range == 0)))
+			{
+				temp_relinquish_value.Format(_T("%.3f"), (output_relinquish_value[2 * i] * 65536 + output_relinquish_value[i * 2 + 1]) / 1000.0);
+			}
+			else if (m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+			{
+				if ((temparray.GetSize() == 2))
+				{
+					if (relinquish_value == 0)
+						temp_relinquish_value = temparray.GetAt(0);
+					else if (relinquish_value == 1000)
+						temp_relinquish_value = temparray.GetAt(1);
+					else
+						temp_relinquish_value = _T("");
+				}
+			}
 
 
-            m_output_list.SetItemText(i, OUTPUT_RELINQUISH_VALUE, temp_relinquish_value);
-        }
+			m_output_list.SetItemText(i, OUTPUT_RELINQUISH_VALUE, temp_relinquish_value);
+		}
 #endif
-			CString main_sub_panel;
+		CString main_sub_panel;
 
 #pragma region External info
-		if((m_Output_data.at(i).sub_id !=0) &&
+		if ((m_Output_data.at(i).sub_id != 0) &&
 			//(m_Input_data.at(input_list_line).sub_number !=0) &&
-			(m_Output_data.at(i).sub_product !=0) &&
+			(m_Output_data.at(i).sub_product != 0) &&
 			Minipanel_device == 1)
 		{
 			unsigned char temp_pid = m_Output_data.at(i).sub_product;
-			if((temp_pid == PM_T3PT10) ||
+			if ((temp_pid == PM_T3PT10) ||
 				(temp_pid == PM_T3IOA) ||
 				(temp_pid == PM_T332AI) ||
 				(temp_pid == PM_T38AI16O) ||
@@ -952,7 +952,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				(temp_pid == PM_T332AI_ARM) ||
 				(temp_pid == PM_T38AI8AO6DO) ||
 				(temp_pid == PM_T36CT) ||
-				(temp_pid == PM_T36CTA)||
+				(temp_pid == PM_T36CTA) ||
 				(temp_pid == PM_T3_LC)
 				)
 			{
@@ -967,60 +967,60 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				highest_bit = mytest.test(7);
 
 				unsigned char temp_sub_number = 0;
-				mytest = mytest.set(7,0);
+				mytest = mytest.set(7, 0);
 				temp_sub_number = (unsigned char)mytest.to_ulong();
 
 
-				if(highest_bit)
-					temp_number.Format(_T("AO%d"),temp_sub_number + 1);
+				if (highest_bit)
+					temp_number.Format(_T("AO%d"), temp_sub_number + 1);
 				else
-					temp_number.Format(_T("DO%d"),temp_sub_number + 1);
+					temp_number.Format(_T("DO%d"), temp_sub_number + 1);
 
 
-				if(m_Output_data.at(i).hw_switch_status == HW_SW_OFF)
+				if (m_Output_data.at(i).hw_switch_status == HW_SW_OFF)
 				{
-					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-OFF"));		
+					m_output_list.SetItemText(i, OUTPUT_HW_SWITCH, _T("MAN-OFF"));
 					//m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
 
-					m_output_list.SetItemTextColor(i,-1,RGB(255,0,0),0);
+					m_output_list.SetItemTextColor(i, -1, RGB(255, 0, 0), 0);
 				}
-				else if(m_Output_data.at(i).hw_switch_status == HW_SW_HAND)
+				else if (m_Output_data.at(i).hw_switch_status == HW_SW_HAND)
 				{
-					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-ON"));
+					m_output_list.SetItemText(i, OUTPUT_HW_SWITCH, _T("MAN-ON"));
 					//m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
 
-					m_output_list.SetItemTextColor(i,-1,RGB(255,0,0),0);
+					m_output_list.SetItemTextColor(i, -1, RGB(255, 0, 0), 0);
 				}
 				else
 				{
-					m_output_list.SetItemTextColor(i,-1,RGB(0,0,0),0);
+					m_output_list.SetItemTextColor(i, -1, RGB(0, 0, 0), 0);
 
-					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("AUTO"));
+					m_output_list.SetItemText(i, OUTPUT_HW_SWITCH, _T("AUTO"));
 					//m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
 				}
 
-				
-				m_output_list.SetItemText(i,OUTPUT_EXTERNAL,_T("External"));
 
-				m_output_list.SetItemTextColor(i,OUTPUT_EXTERNAL,RGB(0,0,255),FALSE);
-				m_output_list.SetItemText(i,OUTPUT_PRODUCT,temp_name);
-				m_output_list.SetItemText(i,OUTPUT_EXT_NUMBER,temp_number);
+				m_output_list.SetItemText(i, OUTPUT_EXTERNAL, _T("External"));
 
-				main_sub_panel.Format(_T("%d-%d"),(unsigned char)Station_NUM,(unsigned char)m_Output_data.at(i).sub_id);
-				m_output_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
+				m_output_list.SetItemTextColor(i, OUTPUT_EXTERNAL, RGB(0, 0, 255), FALSE);
+				m_output_list.SetItemText(i, OUTPUT_PRODUCT, temp_name);
+				m_output_list.SetItemText(i, OUTPUT_EXT_NUMBER, temp_number);
+
+				main_sub_panel.Format(_T("%d-%d"), (unsigned char)Station_NUM, (unsigned char)m_Output_data.at(i).sub_id);
+				m_output_list.SetItemText(i, OUTPUT_PANEL, main_sub_panel);
 
 
-			}	
+			}
 			else
 			{
-				main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
-				m_output_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
+				main_sub_panel.Format(_T("%d"), (unsigned char)Station_NUM);
+				m_output_list.SetItemText(i, OUTPUT_PANEL, main_sub_panel);
 			}
 
 		}
 		else
 		{
-			
+
 			//main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
 			//m_output_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
 			if (bacnet_device_type == PM_THIRD_PARTY_DEVICE)
@@ -1043,9 +1043,9 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 				m_output_list.SetItemText(i, OUTPUT_EXTERNAL, Output_Type_String[OutputType]);
 			}
-			
-			m_output_list.SetItemText(i,OUTPUT_PRODUCT,_T(""));
-			m_output_list.SetItemText(i,OUTPUT_EXT_NUMBER,_T(""));
+
+			m_output_list.SetItemText(i, OUTPUT_PRODUCT, _T(""));
+			m_output_list.SetItemText(i, OUTPUT_EXT_NUMBER, _T(""));
 		}
 
 #pragma endregion External info
@@ -1053,25 +1053,25 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 
 
-		if(m_Output_data.at(i).decom==0)
+		if (m_Output_data.at(i).decom == 0)
 			temp_status.Format(Output_Decom_Array[0]);
-		else if(m_Output_data.at(i).decom==1)
+		else if (m_Output_data.at(i).decom == 1)
 			temp_status.Format(Output_Decom_Array[1]);
 		else
 			temp_status.Empty();
-		m_output_list.SetItemText(i,OUTPUT_DECOM,temp_status);
+		m_output_list.SetItemText(i, OUTPUT_DECOM, temp_status);
 
 		CString temp_pwm_period;
-		temp_pwm_period.Format(_T("%u"),(unsigned char)m_Output_data.at(i).pwm_period);
-		m_output_list.SetItemText(i,OUTPUT_PWM_PERIOD,temp_pwm_period);
+		temp_pwm_period.Format(_T("%u"), (unsigned char)m_Output_data.at(i).pwm_period);
+		m_output_list.SetItemText(i, OUTPUT_PWM_PERIOD, temp_pwm_period);
 
 		CString temp_des2;
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).label, (int)strlen((char *)m_Output_data.at(i).label)+1, 
-			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_Output_data.at(i).label, (int)strlen((char*)m_Output_data.at(i).label) + 1,
+			temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_des2.ReleaseBuffer();
 		temp_des2 = temp_des2.Left(STR_OUT_LABEL).Trim();
-		m_output_list.SetItemText(i,OUTPUT_LABLE,temp_des2);
-		if(isFreshOne)
+		m_output_list.SetItemText(i, OUTPUT_LABLE, temp_des2);
+		if (isFreshOne)
 		{
 			break;
 		}
@@ -1083,13 +1083,13 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	}
 	copy_data_to_ptrpanel(TYPE_OUTPUT);
 #ifdef LOCAL_DB_FUNCTION
-	if(selected_product_Node.serial_number != 0)
-	   WriteDeviceDataIntoAccessDB(BAC_OUT, output_item_limit_count, selected_product_Node.serial_number);
+	if (selected_product_Node.serial_number != 0)
+		WriteDeviceDataIntoAccessDB(BAC_OUT, output_item_limit_count, selected_product_Node.serial_number);
 #endif
 	if (isFreshOne != 1)
 	{
-		if(refresh_output > 0)
-			refresh_output --; //清空标志位，代表刷新过一次了;
+		if (refresh_output > 0)
+			refresh_output--; //清空标志位，代表刷新过一次了;
 	}
 	//Invalidate();
 	return 0;

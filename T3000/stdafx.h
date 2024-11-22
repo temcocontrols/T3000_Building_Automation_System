@@ -78,7 +78,7 @@ using namespace Gdiplus;
 
 #pragma  comment(lib,"HtmlHelp.lib")
 #pragma  comment(lib,"Iphlpapi.lib")
-
+#pragma comment(lib, "ws2_32.lib")
  
 #include "HtmlHelp.h"
 

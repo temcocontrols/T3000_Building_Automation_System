@@ -591,12 +591,12 @@ void BacnetScreen::Initial_List()
 	m_screen_list.ShowWindow(SW_SHOW);
 }
 
-LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
+LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam, LPARAM lParam)
 {
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
 
-	if(isFreshOne == REFRESH_ON_ITEM)
+	if (isFreshOne == REFRESH_ON_ITEM)
 	{
 		Fresh_Item = (int)wParam;
 	}
@@ -613,42 +613,42 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 	//	}
 	//}
 
-	for (int i=0;i<(int)m_screen_data.size();i++)
+	for (int i = 0; i < (int)m_screen_data.size(); i++)
 	{
-		CString temp_des,temp_label,temp_pic_file;
+		CString temp_des, temp_label, temp_pic_file;
 
-		if(i>=screen_item_limit_count)
+		if (i >= screen_item_limit_count)
 			break;
 
-		if(isFreshOne)
+		if (isFreshOne)
 		{
 			i = Fresh_Item;
 		}
 
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).description, (int)strlen((char *)m_screen_data.at(i).description)+1, 
-			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_screen_data.at(i).description, (int)strlen((char*)m_screen_data.at(i).description) + 1,
+			temp_des.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_des.ReleaseBuffer();
 		temp_des = temp_des.Left(STR_SCREEN_DESCRIPTION_LENGTH).Trim();
-		m_screen_list.SetItemText(i,SCREEN_DESCRIPTION,temp_des);
+		m_screen_list.SetItemText(i, SCREEN_DESCRIPTION, temp_des);
 
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).label, (int)strlen((char *)m_screen_data.at(i).label)+1, 
-			temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_screen_data.at(i).label, (int)strlen((char*)m_screen_data.at(i).label) + 1,
+			temp_label.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_label.ReleaseBuffer();
 		temp_label = temp_label.Left(STR_SCREEN_LABLE_LENGTH).Trim();
-		m_screen_list.SetItemText(i,SCREEN_LABEL,temp_label);
+		m_screen_list.SetItemText(i, SCREEN_LABEL, temp_label);
 
 
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).picture_file, (int)strlen((char *)m_screen_data.at(i).picture_file)+1, 
-			temp_pic_file.GetBuffer(MAX_PATH), MAX_PATH );
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_screen_data.at(i).picture_file, (int)strlen((char*)m_screen_data.at(i).picture_file) + 1,
+			temp_pic_file.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_pic_file.ReleaseBuffer();
 
-		m_screen_list.SetItemText(i,SCREEN_PIC_FILE,temp_pic_file);
+		m_screen_list.SetItemText(i, SCREEN_PIC_FILE, temp_pic_file);
 
 		//m_screen_list.SetItemText(i,SCREEN_MODE,_T("Graphic"));
 		CString cs_refresh_time;
-		cs_refresh_time.Format(_T("%d"),m_screen_data.at(i).update);
-		m_screen_list.SetItemText(i,SCREEN_ELEMENT_COUNT,cs_refresh_time);
-		if(isFreshOne)
+		cs_refresh_time.Format(_T("%d"), m_screen_data.at(i).update);
+		m_screen_list.SetItemText(i, SCREEN_ELEMENT_COUNT, cs_refresh_time);
+		if (isFreshOne)
 		{
 			break;
 		}
@@ -661,106 +661,82 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
+LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam, LPARAM lParam)
 {
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
 
 	CString temp_task_info;
-	CString New_CString =  m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
+	CString New_CString = m_screen_list.GetItemText(Changed_Item, Changed_SubItem);
 	CString cstemp_value;
 
-	memcpy_s(&m_temp_screen_data[Changed_Item],sizeof(Control_group_point),&m_screen_data.at(Changed_Item),sizeof(Control_group_point));
+	memcpy_s(&m_temp_screen_data[Changed_Item], sizeof(Control_group_point), &m_screen_data.at(Changed_Item), sizeof(Control_group_point));
 
-	if(Changed_SubItem == SCREEN_DESCRIPTION)
+	if (Changed_SubItem == SCREEN_DESCRIPTION)
 	{
 
 
-		CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_SCREEN_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+		CString cs_temp = m_screen_list.GetItemText(Changed_Item, Changed_SubItem);
+		if (cs_temp.GetLength() >= STR_SCREEN_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
 		{
-			MessageBox(_T("Warning"),_T("Length can not higher than 20"));
-			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
+			MessageBox(_T("Warning"), _T("Length can not higher than 20"));
+			PostMessage(WM_REFRESH_BAC_SCREEN_LIST, NULL, NULL);
 			return 0;
 		}
-		if(Check_FullLabel_Exsit(cs_temp))
+		if (Check_FullLabel_Exsit(cs_temp))
 		{
-			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,Changed_Item,REFRESH_ON_ITEM);
+			PostMessage(WM_REFRESH_BAC_SCREEN_LIST, Changed_Item, REFRESH_ON_ITEM);
 			return 0;
 		}
 		char cTemp1[255];
-		memset(cTemp1,0,255);
-		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-		memcpy_s(m_screen_data.at(Changed_Item).description,STR_SCREEN_DESCRIPTION_LENGTH,cTemp1,STR_SCREEN_DESCRIPTION_LENGTH);
+		memset(cTemp1, 0, 255);
+		WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+		memcpy_s(m_screen_data.at(Changed_Item).description, STR_SCREEN_DESCRIPTION_LENGTH, cTemp1, STR_SCREEN_DESCRIPTION_LENGTH);
 	}
-	else if(Changed_SubItem == SCREEN_LABEL)
+	else if (Changed_SubItem == SCREEN_LABEL)
 	{
-		CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_SCREEN_LABLE_LENGTH)	//长度不能大于结构体定义的长度;
+		CString cs_temp = m_screen_list.GetItemText(Changed_Item, Changed_SubItem);
+		if (cs_temp.GetLength() >= STR_SCREEN_LABLE_LENGTH)	//长度不能大于结构体定义的长度;
 		{
-			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
-			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
+			MessageBox(_T("Length can not higher than 8"), _T("Warning"));
+			PostMessage(WM_REFRESH_BAC_SCREEN_LIST, NULL, NULL);
 			return 0;
 		}
 		cs_temp.MakeUpper();
-		if(Check_Label_Exsit(cs_temp))
+		if (Check_Label_Exsit(cs_temp))
 		{
-			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,Changed_Item,REFRESH_ON_ITEM);
+			PostMessage(WM_REFRESH_BAC_SCREEN_LIST, Changed_Item, REFRESH_ON_ITEM);
 			return 0;
 		}
 		char cTemp1[255];
-		memset(cTemp1,0,255);
-		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-		memcpy_s(m_screen_data.at(Changed_Item).label,STR_SCREEN_LABLE_LENGTH,cTemp1,STR_SCREEN_LABLE_LENGTH);
+		memset(cTemp1, 0, 255);
+		WideCharToMultiByte(CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL);
+		memcpy_s(m_screen_data.at(Changed_Item).label, STR_SCREEN_LABLE_LENGTH, cTemp1, STR_SCREEN_LABLE_LENGTH);
 	}
-	else if(Changed_SubItem == SCREEN_PIC_FILE)
+	else if (Changed_SubItem == SCREEN_PIC_FILE)
 	{
-		//CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
-		//CFileFind temp_find;
-		//bool find_full_name = false;
-		//bool find_relatice_path = false;
-		//find_full_name = temp_find.FindFile(cs_temp);
-		//if(find_full_name)
-		//{
 
-		//}
-		//else
-		//{
-		//	CString folder_temp_file;
-		//	folder_temp_file = g_strBuildingFolder + _T("\\image\\") + cs_temp;
-		//	CFileFind find_relatice_file;
-		//	find_relatice_path = find_relatice_file.FindFile(folder_temp_file);
-		//	if(find_relatice_path == false)
-		//	{
-		//		MessageBox(_T("Please input an valid path or double click to select file."));
-		//		m_screen_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
-		//		return 0;
-		//	}
-		//}
 	}
 	else if (Changed_SubItem == SCREEN_ELEMENT_COUNT)
 	{
 		int temp_value;
-		if((New_CString.GetLength()>=4) || (_wtoi(New_CString)>255))
+		if ((New_CString.GetLength() >= 4) || (_wtoi(New_CString) > 255))
 		{
-			MessageBox(_T("Please input a value between 0 - 255"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);//restore the list.
+			MessageBox(_T("Please input a value between 0 - 255"), _T("Warning"), MB_OK | MB_ICONINFORMATION);
+			PostMessage(WM_REFRESH_BAC_SCREEN_LIST, NULL, NULL);//restore the list.
 			return 0;
 		}
 		temp_value = _wtoi(New_CString);
 		m_screen_data.at(Changed_Item).update = temp_value;
 	}
-	int cmp_ret = memcmp(&m_temp_screen_data[Changed_Item],&m_screen_data.at(Changed_Item),sizeof(Control_group_point));
-	if(cmp_ret!=0)
+	int cmp_ret = memcmp(&m_temp_screen_data[Changed_Item], &m_screen_data.at(Changed_Item), sizeof(Control_group_point));
+	if (cmp_ret != 0)
 	{
-		m_screen_list.SetItemBkColor(Changed_Item,Changed_SubItem,LIST_ITEM_CHANGED_BKCOLOR);
-		temp_task_info.Format(_T("Write Screen List Item%d .Changed to \"%s\" "),Changed_Item + 1,New_CString);
-		Post_Write_Message(g_bac_instance,WRITESCREEN_T3000,Changed_Item,Changed_Item,sizeof(Control_group_point),m_screen_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
+		m_screen_list.SetItemBkColor(Changed_Item, Changed_SubItem, LIST_ITEM_CHANGED_BKCOLOR);
+		temp_task_info.Format(_T("Write Screen List Item%d .Changed to \"%s\" "), Changed_Item + 1, New_CString);
+		Post_Write_Message(g_bac_instance, WRITESCREEN_T3000, Changed_Item, Changed_Item, sizeof(Control_group_point), m_screen_dlg_hwnd, temp_task_info, Changed_Item, Changed_SubItem);
 
 	}
-
-
-	
 	return 0;
 }
 

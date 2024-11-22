@@ -111,15 +111,6 @@ BOOL CBacnetEmailAlarm::OnInitDialog()
 
 void CBacnetEmailAlarm::Fresh_UI()
 {
-    //Device_Email_Point
-    //unsigned char smtp_type;  //  0   ipaddress   // 1   domain
-    //unsigned char smtp_ip[4];
-    //char smtp_domain[40];
-    //unsigned short smtp_port;
-    //char email_address[60];
-    //char user_name[60];
-    //char password[20];
-    //char secure_connection_type;  //0 -NULL   1-SSL   2-TLS
 
     ((CComboBox *)GetDlgItem(IDC_COMBO_SECURE_TYPE))->ResetContent();
     ((CComboBox *)GetDlgItem(IDC_COMBO_SECURE_TYPE))->AddString(_T("NULL"));

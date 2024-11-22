@@ -15,7 +15,7 @@
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
 #include <windows.h>  
  
-const unsigned int g_versionNO = 20241101;  // PROJECT_VERSION
+const unsigned int g_versionNO = 20241122;  // PROJECT_VERSION
 
 
 
@@ -540,21 +540,6 @@ BOOL CT3000App::InitInstance()
 
 #endif
 
-
-			//HKEY hkey;
-			//char sz[256];
-			//DWORD dwtype, sl = 256;
-
-			//RegOpenKeyEx(HKEY_LOCAL_MACHINE,	_T("SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile"),	NULL, KEY_READ, &hkey);
-			//RegQueryValueEx(hkey, _T("EnableFirewall"), NULL, &dwtype, (LPBYTE)sz, &sl);
-			//DWORD dw_firewall;
-			//dw_firewall = sz[0] + sz[1] * 256 + sz[2] * 256*256 + sz[3] * 256*256*256;
-			//if(dw_firewall != 0 )
-			//{
-			//	AfxMessageBox(_T("Please turn off your firewall .If not , some broadcast communication may fail."));
-			//}
-			//
-			//RegCloseKey(hkey);
 
               UpdateDB();
 

@@ -1507,21 +1507,21 @@ void Dowmloadfile::OnBnClickedButton1()
 
 void Dowmloadfile::OnBnClickedButtonStartDownload()
 {
-    if (m_product_isp_auto_flash.product_class_id == PM_ESP32_T3_SERIES)
-    {
-        if ((m_product_isp_auto_flash.m_ext_info.mini_type == T3_ESP_RMC) || ((m_product_isp_auto_flash.m_ext_info.mini_type == T3_NG2_TYPE2)))
-        {
-            CString temp_isp_info;
-            temp_isp_info.Format(_T("This type of product cannot update the firmware at will, please contact the sales staff."));
-            m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
-            m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
-            return;
-        }
-    }
+	if (m_product_isp_auto_flash.product_class_id == PM_ESP32_T3_SERIES)
+	{
+		if ((m_product_isp_auto_flash.m_ext_info.mini_type == T3_ESP_RMC) || ((m_product_isp_auto_flash.m_ext_info.mini_type == T3_NG2_TYPE2)))
+		{
+			CString temp_isp_info;
+			temp_isp_info.Format(_T("This type of product cannot update the firmware at will, please contact the sales staff."));
+			m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
+			m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+			return;
+		}
+	}
 
 	download_and_update = DOWNLOAD_AND_UPDATE;
 	//Start_Download();
-    Start_Download_Ftp();
+	Start_Download_Ftp();
 }
 
 void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()

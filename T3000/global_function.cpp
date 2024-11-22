@@ -2181,9 +2181,9 @@ int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t sta
                 break;
             }
             if (deviceid == 0)
-                temp_invoke_id = GetPrivateData(g_bac_instance, command, start_instance, end_instance, entitysize);
+                temp_invoke_id = GetSpecialPrivateData(g_bac_instance, command, start_instance, end_instance, entitysize);
             else
-                temp_invoke_id = GetPrivateData(deviceid, command, start_instance, end_instance, entitysize);
+                temp_invoke_id = GetSpecialPrivateData(deviceid, command, start_instance, end_instance, entitysize);
             if (temp_invoke_id < 0)
                 Sleep(500);
             else if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
@@ -2442,7 +2442,96 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
 
 
 
+/************************************************************************/
+/*
+Author: Fance
+Get Bacnet Special Private Data  这一段是读取其他panel的数据，不是本panel的数据
+<param name="deviceid">Bacnet Device ID
+<param name="command">Bacnet command
+<param name="start_instance">start point
+<param name="end_instance">end point
+<param name="entitysize">Block size of read
+*/
+/************************************************************************/
+int GetSpecialPrivateData(uint32_t deviceid, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize)
+{
+    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+    {
+        int ret_results = 0;
+        unsigned char test_data[600] = { 0 };
 
+        bool end_flag = false;
+        int ret_length = 0;
+        g_llTxCount++;
+        ret_length = read_ptp_data(g_tstat_id, test_data, command, start_instance, end_instance, entitysize);
+        if (ret_length < 0)
+        {
+            return ret_length;
+        }
+        ret_results = Bacnet_PrivateData_Deal((char*)test_data, ret_length, end_flag,-1);
+        if (ret_results > 0)
+        {
+            local_handler_update_bacnet_ui(ret_results, end_flag);
+            g_llRxCount++;
+        }
+
+        return ret_results;
+    }
+
+    uint8_t apdu[480] = { 0 };
+    uint8_t test_value[480] = { 0 };
+    int apdu_len = 0;
+    int private_data_len = 0;
+    unsigned max_apdu = 0;
+    BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
+    //	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
+    BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
+    //	BACNET_PRIVATE_TRANSFER_DATA test_data = { 0 };
+    bool status = false;
+
+    private_data.vendorID = BACNET_VENDOR_ID;
+    private_data.serviceNumber = 1;
+
+
+    char SendBuffer[1000];
+    memset(SendBuffer, 0, 1000);
+    char* temp_buffer = SendBuffer;
+
+    Str_user_data_header private_data_chunk;
+    int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
+
+    HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
+    private_data_chunk.total_length = PRIVATE_HEAD_LENGTH;
+    private_data_chunk.command = command;
+    private_data_chunk.point_start_instance = start_instance;
+    private_data_chunk.point_end_instance = end_instance;
+    private_data_chunk.entitysize = entitysize;
+    Set_transfer_length(PRIVATE_HEAD_LENGTH);
+    status = bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING, (char*)&private_data_chunk, &data_value);
+
+    private_data_len = bacapp_encode_application_data(&test_value[0], &data_value);
+    private_data.serviceParameters = &test_value[0];
+    private_data.serviceParametersLen = private_data_len;
+
+    BACNET_ADDRESS dest = { 0 };
+    if (offline_mode)
+    {
+        LoadBacnetBinaryFile(false, offline_prg_path);
+        return 1;
+    }
+
+    status = address_get_by_device(deviceid, &max_apdu, &dest);
+    if (status)
+    {
+        g_llTxCount++;
+        return Send_ConfirmedPrivateTransfer(&dest, &private_data);
+    }
+    else
+    {
+        Send_WhoIs_Global(deviceid, deviceid);
+        return -2;
+    }
+}
 
 
 /************************************************************************/
@@ -2471,7 +2560,7 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
         {
             return ret_length;
         }
-        ret_results = Bacnet_PrivateData_Deal((char *)test_data, ret_length, end_flag);
+        ret_results = Bacnet_PrivateData_Deal((char*)test_data, ret_length, end_flag);
         if (ret_results > 0)
         {
             local_handler_update_bacnet_ui(ret_results, end_flag);
@@ -3521,9 +3610,20 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     unsigned char end_instance = 0;
     char *my_temp_point;
     command_type = *(bacnet_apud_point + 2);
-    ///////////////////////////////
-    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
-        invoke_id = 0;
+        ///////////////////////////////
+    if (invoke_id == -1)
+    {
+
+    }
+    else
+    {
+        if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+            invoke_id = 0;
+    }
+
+
+
+
     switch (command_type)
     {
     case READEXT_IO_T3000:
@@ -8899,6 +8999,135 @@ int GetHostAdaptersInfo(CString &IP_address_local)
 }
 
 
+void PrintAdapterInfo() 
+{
+    ULONG flags = GAA_FLAG_INCLUDE_PREFIX;
+    ULONG family = AF_UNSPEC; // AF_INET for IPv4, AF_INET6 for IPv6, AF_UNSPEC for both
+    PIP_ADAPTER_ADDRESSES pAddresses = NULL;
+    ULONG outBufLen = 0;
+    DWORD dwRetVal = 0;
+
+    // Allocate a buffer for the adapter addresses
+    outBufLen = sizeof(IP_ADAPTER_ADDRESSES);
+    pAddresses = (IP_ADAPTER_ADDRESSES*)malloc(outBufLen);
+    ALL_LOCAL_SUBNET_NODE  Temp_Node;
+    // Make an initial call to GetAdaptersAddresses to get the necessary size into the outBufLen variable
+    if (GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen) == ERROR_BUFFER_OVERFLOW) {
+        free(pAddresses);
+        pAddresses = (IP_ADAPTER_ADDRESSES*)malloc(outBufLen);
+    }
+
+    // Make a second call to GetAdaptersAddresses to get the actual data
+    if ((dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen)) == NO_ERROR) 
+    {
+        PIP_ADAPTER_ADDRESSES pCurrAddresses = pAddresses;
+        while (pCurrAddresses) 
+        {
+            // 判断网卡是否被禁用
+            if (pCurrAddresses->OperStatus == IfOperStatusDown) 
+            {
+                pCurrAddresses = pCurrAddresses->Next;
+                continue;
+                //printf("Status: Disabled\n");
+            }
+
+            // 判断网卡是否正常连接
+            if (pCurrAddresses->OperStatus == IfOperStatusUp) 
+            {
+                printf("Connection: Connected\n");
+            }
+            else 
+            {
+                pCurrAddresses = pCurrAddresses->Next;
+                continue;
+                //printf("Connection: Not Connected\n");
+            }
+
+
+            // 获取 IP 地址和子网掩码
+            PIP_ADAPTER_UNICAST_ADDRESS pUnicast = pCurrAddresses->FirstUnicastAddress;
+            while (pUnicast) 
+            {
+                char ipAddress[INET6_ADDRSTRLEN] = { 0 };
+                void* addrPtr = NULL;
+
+                if (pUnicast->Address.lpSockaddr->sa_family == AF_INET) 
+                { // IPv4
+                    struct sockaddr_in* sa_in = (struct sockaddr_in*)pUnicast->Address.lpSockaddr;
+                    addrPtr = &(sa_in->sin_addr);
+                }
+                else if (pUnicast->Address.lpSockaddr->sa_family == AF_INET6) 
+                { // IPv6
+                    struct sockaddr_in6* sa_in6 = (struct sockaddr_in6*)pUnicast->Address.lpSockaddr;
+                    addrPtr = &(sa_in6->sin6_addr);
+                }
+
+                if (addrPtr) 
+                {
+                    inet_ntop(pUnicast->Address.lpSockaddr->sa_family, addrPtr, ipAddress, sizeof(ipAddress));
+                    //TRACE("IP Address: %s\n", ipAddress);
+
+
+
+                    // 计算并输出子网掩码
+                    ULONG maskLength = pUnicast->OnLinkPrefixLength;
+                    ULONG mask = 0xFFFFFFFF << (32 - maskLength);
+                    struct in_addr subnetMask;
+                    subnetMask.s_addr = htonl(mask);
+                    char subnetMaskStr[INET_ADDRSTRLEN + 10] = { 0 };
+                    inet_ntop(AF_INET, &subnetMask, subnetMaskStr, INET_ADDRSTRLEN);
+                    //TRACE("Subnet Mask: %s\n", subnetMaskStr);
+                    MultiByteToWideChar(CP_ACP, 0, ipAddress, (int)strlen((char*)ipAddress) + 1, Temp_Node.StrIP.GetBuffer(MAX_PATH), MAX_PATH);
+                    Temp_Node.StrIP.ReleaseBuffer();
+                    MultiByteToWideChar(CP_ACP, 0, subnetMaskStr, (int)strlen((char*)subnetMaskStr) + 1, Temp_Node.StrMask.GetBuffer(MAX_PATH), MAX_PATH);
+                    Temp_Node.StrMask.ReleaseBuffer();
+                    if (Temp_Node.StrIP.Find(_T("0.0.0")) != -1)
+                    {
+                        pUnicast = pUnicast->Next;
+                    }
+                    else if (Temp_Node.StrIP.GetLength() > 16) //过滤ip6
+                    {
+                        pUnicast = pUnicast->Next;
+                    }
+                    else if (Temp_Node.StrIP.GetLength() < 7)  //过滤不合理的IP
+                    {
+                        pUnicast = pUnicast->Next;
+                    }
+                    else
+					{
+                        int find_exsit = false;
+                        for (int x = 0; x < g_Vector_Subnet.size(); x++)
+                        {
+							if (g_Vector_Subnet.at(x).StrIP.CompareNoCase(Temp_Node.StrIP) == 0)
+							{
+                                find_exsit = true;
+								break;
+							}
+                        }
+                        if(find_exsit == false)
+						{
+							g_Vector_Subnet.push_back(Temp_Node);
+						}
+						break;
+					}
+                }
+
+
+                pUnicast = pUnicast->Next;
+            }
+
+            pCurrAddresses = pCurrAddresses->Next;
+        }
+    }
+    else {
+        TRACE("Call to GetAdaptersAddresses failed with error: %d\n", dwRetVal);
+    }
+
+    if (pAddresses) {
+        free(pAddresses);
+    }
+}
+
 
 void GetIPMaskGetWay()
 {
@@ -8960,6 +9189,9 @@ void GetIPMaskGetWay()
     }
     if(pAdapterInfo !=NULL)	//Add by Fance . 如果不释放，会内存泄露 ，引起程序崩溃; 2015-10-22
         free(pAdapterInfo);
+
+    PrintAdapterInfo();
+    
 }
 
 
