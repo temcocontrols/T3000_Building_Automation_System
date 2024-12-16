@@ -894,17 +894,16 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->ResetContent();
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[NOUSE]);
-			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[MAIN_MSTP]);
+			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[BACNET_MSTP]);
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[MAIN_MODBUS]);
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[SUB_MODBUS]);
-			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[MSTP_MASTER]);
+
 
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->ResetContent();
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[NOUSE]);
-			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[MAIN_MSTP]);
+			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[BACNET_MSTP]);
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[MAIN_MODBUS]);
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[SUB_MODBUS]);
-			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[MSTP_MASTER]);
 
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->EnableWindow(TRUE);
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(TRUE);
@@ -977,10 +976,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->ResetContent();
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[NOUSE]);
-				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[MAIN_MSTP]);
+				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[BACNET_MSTP]);
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[MAIN_MODBUS]);
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[SUB_MODBUS]);
-				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[MSTP_MASTER]);
+
 				if (Device_Basic_Setting.reg.com0_config < MAX_COM_TYPE)
 					((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->SetWindowTextW(Device_Serial_Port_Status[Device_Basic_Setting.reg.com0_config]);
 			}

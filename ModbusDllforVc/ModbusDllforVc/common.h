@@ -13,7 +13,7 @@ struct baudrate_def
 OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length);
 OUTPUT int Read_One(TS_UC device_var,TS_US address);
 OUTPUT bool open_com(int m_com, unsigned char com_data_bit = 8, unsigned char com_stop_bit = ONESTOPBIT, unsigned char com_parity_bit = NOPARITY);
-OUTPUT bool open_com_nocretical(int m_com);
+OUTPUT bool open_com_nocretical(int m_com, int default_baudrate = 19200);
 OUTPUT void close_com();
 OUTPUT void close_com_nocritical(int ncomport);
 OUTPUT bool is_connect();
@@ -100,4 +100,5 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here,int 
 	int* sendDataLength, int* recvDataLength);
 OUTPUT int SendData(TS_US *to_write,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here,int* sendDataLength, int* recvDataLength,BOOL CHECK_CRC) ;
 OUTPUT int Test_Comport(int comport, baudrate_def * ntest_ret , int default_baudrate = 0 );
+OUTPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_baudrate);
 #endif

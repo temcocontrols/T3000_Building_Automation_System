@@ -339,9 +339,9 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
             //    i = MSTP_MASTER;
             if (g_selected_product_id != PM_TSTAT10)
             {
-                if ((i == MSTP_MASTER) || (i == MAIN_MSTP))
+                if ((i == MSTP_MASTER) || (i == BACNET_MSTP))
                 {
-                    if ((Device_Basic_Setting.reg.com2_config == MAIN_MSTP) ||
+                    if ((Device_Basic_Setting.reg.com2_config == BACNET_MSTP) ||
                         (Device_Basic_Setting.reg.com2_config == MSTP_MASTER))
                     {
                         //想配置为mstp 必须其他的口设置为 空;
@@ -376,7 +376,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
     {
 
         bool modbus_0_bacnet_1 = 0;
-        if ((Device_Basic_Setting.reg.com0_config == MAIN_MSTP) ||
+        if ((Device_Basic_Setting.reg.com0_config == BACNET_MSTP) ||
             (Device_Basic_Setting.reg.com0_config == MSTP_MASTER))
         {
             modbus_0_bacnet_1 = 1;
@@ -452,9 +452,9 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
         {
             //if (i == MAIN_MSTP)   //原由： 1 为 MSTP Slave     9为 MSTP Master   现在统统改为MSTP
             //   i = MSTP_MASTER;
-            if ((i == MSTP_MASTER) || (i == MAIN_MSTP))
+            if ((i == MSTP_MASTER) || (i == BACNET_MSTP))
             {
-                if ((Device_Basic_Setting.reg.com0_config == MSTP_MASTER) || (Device_Basic_Setting.reg.com0_config == MAIN_MSTP))
+                if ((Device_Basic_Setting.reg.com0_config == MSTP_MASTER) || (Device_Basic_Setting.reg.com0_config == BACNET_MSTP))
                 {
                     //想配置为mstp 必须其他的口设置为 空;
                     MessageBox(_T("With the current version of firmware , only one Bacnet MSTP subnet is supported, please select MSTP on only ONE of the RS485 ports"), _T("Message"));
@@ -486,7 +486,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
     {
 
         bool modbus_0_bacnet_1 = 0;
-        if ((Device_Basic_Setting.reg.com2_config == MAIN_MSTP) ||
+        if ((Device_Basic_Setting.reg.com2_config == BACNET_MSTP) ||
             (Device_Basic_Setting.reg.com2_config == MSTP_MASTER))
         {
             modbus_0_bacnet_1 = 1;

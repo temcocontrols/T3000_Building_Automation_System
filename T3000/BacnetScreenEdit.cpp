@@ -1945,6 +1945,9 @@ void CBacnetScreenEdit::OnPaint()
 	CMemDC memDC(dc,this);
 	CRect rcClient;
 	GetClientRect(&rcClient);
+
+
+
 	//memDC.GetDC().FillSolidRect(&rcClient,::GetSysColor (COLOR_3DLIGHT));
 	//	if(g_strImagePathName.IsEmpty())
 

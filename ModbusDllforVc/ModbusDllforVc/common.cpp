@@ -5090,7 +5090,7 @@ OUTPUT bool open_com(int m_com ,unsigned char com_data_bit,unsigned char com_sto
 }
 
 
-OUTPUT bool open_com_nocretical(int m_com)
+OUTPUT bool open_com_nocretical(int m_com, int default_baudrate)
 {
     //open com ,if you want to open "com1",the m_com equal 0;if you want to open "com2",the m_com equal 1
     //you will get the handle to com,m_hSerial,is a extern variable
@@ -5159,7 +5159,7 @@ OUTPUT bool open_com_nocretical(int m_com)
         return false;
     }
     //not to change the baudate
-    PortDCB.BaudRate = 19200; // baud//attention ,if it is wrong,can't write the com
+    PortDCB.BaudRate = default_baudrate; // baud//attention ,if it is wrong,can't write the com
     PortDCB.ByteSize = 8;     // Number of bits/byte, 4-8
     PortDCB.Parity = NOPARITY;
     PortDCB.StopBits = ONESTOPBIT;
@@ -10446,6 +10446,202 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
     return found_bacnet_data;
 
 }
+
+
+
+OUTPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_baudrate)
+{
+    if (comport >= 100)
+        return -100;
+    if (open_com_nocretical(comport, default_baudrate) == false)
+    {
+        Sleep(1000);
+
+        return -101;
+    }
+    // 清空串口缓冲区
+    PurgeComm(m_com_h_serial[comport], PURGE_RXCLEAR | PURGE_TXCLEAR);
+    DWORD nerrors1; COMSTAT com_stats1;
+    ::ClearCommError(m_com_h_serial[comport], &nerrors1, &com_stats1);
+
+    bool found_bacnet_data = false;
+    int n_no_data_online_count = 0;
+    int found_mstp_data = false;
+    for (int i = 0; i < 10; i++)
+    {
+        if (found_mstp_data)
+            break;
+        for (int i = 0; i < sizeof(ArrayBaudate) / sizeof(ArrayBaudate[0]); i++)
+        {
+            if (shutdown_test_comport)
+            {
+                close_com_nocritical(comport);
+                return -4;
+            }
+
+            if (default_baudrate != 0) //默认不传 波特率的情况下 就检测所有的 波特率;
+            {
+                ntest_ret[i].ncomport = comport;
+                ntest_ret[i].test_ret = 0;
+                ntest_ret[i].baudrate = default_baudrate;
+            }
+            else
+            {
+                ntest_ret[i].ncomport = comport;
+                ntest_ret[i].test_ret = 0;
+                ntest_ret[i].baudrate = ArrayBaudate[i];
+            }
+
+            if (found_bacnet_data)
+            {
+                found_mstp_data = 1;
+                ntest_ret[i].test_ret = 1;
+                break;
+            }
+            //Speed up scan , if no data online ,check 2 times ,then stop.
+            //if (n_no_data_online_count >= 10)
+            //{
+            //    ntest_ret[i].test_ret = 0;
+            //    continue;
+            //}
+#if 0
+            bool change_baudrate_ret = false;
+            if (default_baudrate != 0)
+                change_baudrate_ret = Change_BaudRate_NoCretical(default_baudrate, comport);
+            else
+                change_baudrate_ret = Change_BaudRate_NoCretical(ArrayBaudate[i], comport);
+            if (change_baudrate_ret == false)
+            {
+                DWORD nerrors; COMSTAT com_stats;
+                ::ClearCommError(m_com_h_serial[comport], &nerrors, &com_stats);
+                Sleep(1);
+                if (default_baudrate != 0)
+                    break;
+                continue;
+            }
+#endif
+            unsigned char test_data[400];
+            memset(test_data, 0, 400);
+            //read_multi2_nocretical(255, test_data, 2000, 100, 0, comport);
+
+            HANDLE m_hSerial = NULL;
+            m_hSerial = m_com_h_serial[comport];
+            //device_var is the Tstat ID
+            //the return value == -1 ,no connecting
+
+            TS_C to_send_data[600] = { '\0' };
+            HCURSOR hc;//load mouse cursor
+            hc = LoadCursor(NULL, IDC_WAIT);
+            hc = SetCursor(hc);
+            //to_send_data is the array that you want to put data into
+            //length is the number of register,that you want to read
+            //start_address is the start register
+            TS_UC data_to_send[8] = { '\0' }; //the array to used in writefile()
+            data_to_send[0] = 255;//slave address
+            data_to_send[1] = 255;//function multiple
+            data_to_send[2] = 0xffff >> 8 & 0xff;//starting address hi
+            data_to_send[3] = 0xffff & 0xff;//starting address lo
+            data_to_send[4] = 0xffff >> 8 & 0xff;//quantity of registers hi
+            data_to_send[5] = 0xffff & 0xff;//quantity of registers lo
+            TS_US crc = CRC16(data_to_send, 6);
+            data_to_send[6] = (crc >> 8) & 0xff + 20;
+            data_to_send[7] = crc & 0xff + 20;
+
+            DWORD m_had_send_data_number;//已经发送的数据的字节数
+            if (m_hSerial == NULL)
+            {
+                if (default_baudrate != 0)
+                    break;
+                continue;
+                return -102;
+            }
+
+            ////////////////////////////////////////////////clear com error
+            COMSTAT ComStat;
+            DWORD dwErrorFlags;
+            int fState;
+
+            memset(&m_com_osRead[comport], 0, sizeof(OVERLAPPED));
+#if 0
+            CString nReadSection;
+            nReadSection.Format(_T("MulTestBacnetRead_%d_%d"), comport, ntest_ret[i].baudrate);
+            ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
+            memset(&m_com_osRead[comport], 0, sizeof(OVERLAPPED));
+            if ((m_com_osRead[comport].hEvent = CreateEvent(NULL, true, false, nReadSection)) == NULL)
+            {
+                if (default_baudrate != 0)
+                    break;
+                continue;
+                //return -2;
+            }
+#endif
+            m_com_osRead[comport].Offset = 0;
+            m_com_osRead[comport].OffsetHigh = 0;
+
+            Sleep(LATENCY_TIME_COM * 5);
+            ////////////////////////////////////////////////clear com error
+            fState = ReadFile(m_hSerial,// 句柄
+                to_send_data,// 数据缓冲区地址
+                100 * 2 + 5,// 数据大小
+                &m_had_send_data_number,// 返回发送出去的字节数
+                &m_com_osRead[comport]);
+            if (!fState)// 不支持重叠
+            {
+                if (GetLastError() == ERROR_IO_PENDING)
+                {
+                    //WaitForSingleObject(m_osRead.hEvent,INFINITE);
+                    BOOL result = GetOverlappedResult(m_hSerial, &m_com_osRead[comport], &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                    if (result)
+                    {
+                        // 操作成功，处理传输的字节数
+                        TRACE("Bytes transferred: %lu\n", m_had_send_data_number);
+                    }
+                    else
+                    {
+                        // 操作失败，获取错误信息
+                        DWORD error = GetLastError();
+                        TRACE("GetOverlappedResult failed with error: %lu\n", error);
+                    }
+                }
+                else
+                    m_had_send_data_number = 0;
+            }
+            memcpy(test_data, to_send_data, 200);
+            if (m_had_send_data_number > 0)
+            {
+                n_no_data_online_count = 0;
+                ntest_ret[i].test_ret = check_bacnet_data((unsigned char*)test_data, m_had_send_data_number);
+                if (default_baudrate != 0)
+                {
+                    if (ntest_ret[i].test_ret == 1)
+                        found_bacnet_data = true;
+                    else
+                        found_bacnet_data = false;
+                    break;
+                }
+                if (ntest_ret[i].test_ret != 1)
+                    continue;
+                found_bacnet_data = true;
+                found_mstp_data = true;
+            }
+            else
+            {
+                n_no_data_online_count++;
+                ntest_ret[i].test_ret = 0;
+                if (default_baudrate != 0)
+                    break;
+                continue;
+            }
+
+        }
+        Sleep(150);
+    }
+    close_com_nocritical(comport);
+    return found_bacnet_data;
+
+}
+
+
 
 
 #if 1

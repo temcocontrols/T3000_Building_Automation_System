@@ -109,7 +109,8 @@ INPUT int Modbus_Standard_Read(unsigned char device_var, unsigned short *put_dat
 );
 //INPUT bool open_com(int m_com);
 INPUT bool open_com(int m_com, unsigned char com_data_bit = 8, unsigned char com_stop_bit = ONESTOPBIT, unsigned char com_parity_bit = NOPARITY);
-INPUT bool open_com_nocretical(int m_com);
+//INPUT bool open_com_nocretical(int m_com);
+INPUT bool open_com_nocretical(int m_com, int default_baudrate = 19200);
 INPUT void close_com();
 INPUT void close_com_nocritical(int ncomport);
 INPUT bool is_connect();

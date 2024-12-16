@@ -15,7 +15,7 @@
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
 #include <windows.h>  
  
-const unsigned int g_versionNO = 20241122;  // PROJECT_VERSION
+const unsigned int g_versionNO = 20241216;  // PROJECT_VERSION
 
 
 
@@ -633,7 +633,7 @@ BOOL CT3000App::InitInstance()
         strTile = cs_special_name;
 		strTile+=CurrentT3000Version;
 		m_pMainWnd->SetWindowText(strTile);//
-		m_pMainWnd->ShowWindow(SW_SHOWMAXIMIZED);
+		m_pMainWnd->ShowWindow(SW_SHOWNORMAL);
 		m_pMainWnd->ShowWindow(SW_SHOW);
 		m_pMainWnd->UpdateWindow();
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 

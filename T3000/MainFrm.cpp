@@ -9632,8 +9632,8 @@ LRESULT  CMainFrame::HandleIspModedivice(WPARAM wParam, LPARAM lParam)
 
 		isp_mode_is_cancel = true;
 		isp_mode_firmware_auto = true;
-        close_com();
-        close_bac_com();
+        //close_com();
+        //close_bac_com();
 		CISPModeSlove dlg;
 		dlg.DoModal();
 			Dowmloadfile Dlg;

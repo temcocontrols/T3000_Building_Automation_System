@@ -106,7 +106,8 @@ int CComWriter::BeginWirteByCom()
 
         if(open_com(m_nComPort)==false)
         {
-            CString srtInfo = _T("|Error :The com port is occupied!");
+            CString srtInfo;
+            srtInfo = _T("|Error :The com port is occupied!");
             //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
             //AddStringToOutPuts(_T("Error :The com port is occupied!"));
             OutPutsStatusInfo(srtInfo, FALSE);
@@ -120,14 +121,16 @@ int CComWriter::BeginWirteByCom()
         {
             CString strTemp;
             strTemp.Format(_T("COM%d"), m_nComPort);
-            CString strTips = _T("|Open ") +  strTemp + _T(" successful.");
+            CString strTips;
+            strTips.Format(_T("|Open %s successful."), strTemp);
             OutPutsStatusInfo(strTips, FALSE);
             Change_BaudRate(m_nBautrate);
 
         }
 
 
-        CString strTips = _T("|Programming device...");
+        CString strTips;
+        strTips = _T("|Programming device...");
         OutPutsStatusInfo(strTips);
         //AddStringToOutPuts(strTips);
         //m_pWorkThread=AfxBeginThread(run_back_ground_flash_thread, this); //create thread,read information
@@ -140,9 +143,9 @@ int CComWriter::BeginWirteByCom()
     {
 #pragma region detect_mstp_shutdown
 
-        baudrate_def temp_baudrate_ret = { 0 }; //用于检测串口MSTP数据
+        baudrate_def temp_baudrate_ret[100] = {0}; //用于检测串口MSTP数据
         int find_mstp_protocal = 0;
-        find_mstp_protocal = Test_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);
+        find_mstp_protocal = Check_Mstp_Comport(m_nComPort, temp_baudrate_ret, m_nBautrate);
         if ((find_mstp_protocal == -101) || (find_mstp_protocal == -100))
         {
             CString srtInfo = _T("|Error :The com port is occupied!");
@@ -195,7 +198,7 @@ int CComWriter::BeginWirteByCom()
             Sleep(1000);
 
             close_bac_com();
-            find_mstp_protocal = Test_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  //再次确认总线上 都闭嘴了
+            find_mstp_protocal = Check_Mstp_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  //再次确认总线上 都闭嘴了
             temp_loop_count++; //最多循环3次
 #endif
         }

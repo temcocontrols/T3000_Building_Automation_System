@@ -3802,8 +3802,8 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 {
     m_T3BB_device_data.clear();
 	m_tstat_net_device_data.clear();
-    if (m_refresh_net_device_data.size() > 2) //如果T3 控制器的个数超过2个就不适合 扫描下面的子设备
-        return 0;
+    //if (m_refresh_net_device_data.size() > 2) //如果T3 控制器的个数超过2个就不适合 扫描下面的子设备
+    return 0;  //不在扫描下面的设备，依靠主控器自己在main和sub RS485上扫描;
 	for (int i=0;i<m_refresh_net_device_data.size();i++)
 	{
 		if((m_refresh_net_device_data.at(i).product_id != PM_MINIPANEL)&& 

@@ -61,7 +61,7 @@ INPUT int Read_One(unsigned char device_var,unsigned short address);
 INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 INPUT int write_multi_by_tcp(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
-INPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudrate = 0);
+INPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_baudrate);
 //INPUT bool open_com(unsigned char m_com);
 //INPUT bool open_com(int m_com);
 INPUT bool open_com(int m_com, unsigned char com_data_bit = 8, unsigned char com_stop_bit = ONESTOPBIT, unsigned char com_parity_bit = NOPARITY);

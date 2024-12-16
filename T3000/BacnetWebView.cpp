@@ -1248,7 +1248,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				TRACE(_T("Change input Value to %d\r\n"), m_Input_data.at(entry_index).control);
 			}
 			else if (field.compare("value") == 0) {
-				m_Input_data.at(entry_index).value = json["value"].asInt() * 1000;
+				//m_Input_data.at(entry_index).value = json["value"].asInt() * 1000;
+				m_Input_data.at(entry_index).value = json["value"].asFloat() * 1000;
 			}
 			else if (field.compare("auto_manual") == 0) {
 				m_Input_data.at(entry_index).auto_manual = json["value"].asInt();
@@ -1286,7 +1287,9 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				TRACE(_T("Change output Value to %d\r\n"), m_Output_data.at(entry_index).control);
 			}
 			else if (field.compare("value") == 0) {
-				m_Output_data.at(entry_index).value = json["value"].asInt() * 1000;
+				//m_Output_data.at(entry_index).value = json["value"].asInt() * 1000;
+				m_Output_data.at(entry_index).value = json["value"].asFloat() * 1000;
+				
 			}
 			else if (field.compare("auto_manual") == 0) {
 				m_Output_data.at(entry_index).auto_manual = json["value"].asInt();
@@ -1323,7 +1326,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				m_Variable_data.at(entry_index).control = json["value"].asInt();
 			}
 			else if (field.compare("value") == 0) {
-				m_Variable_data.at(entry_index).value = json["value"].asInt() * 1000;
+				//m_Variable_data.at(entry_index).value = json["value"].asInt() * 1000;
+				m_Variable_data.at(entry_index).value = json["value"].asFloat() * 1000;
 			}
 			else if (field.compare("auto_manual") == 0) {
 				m_Variable_data.at(entry_index).auto_manual = json["value"].asInt();
