@@ -1114,6 +1114,7 @@ struct func_table {
  "PVAR",PVAR,
  "SIN",SIN,
  "COS",COS,
+ "RGB",RGB,
  "",ENDPRG
  };
 
@@ -3206,6 +3207,7 @@ void parse_atom( float  *value )
 				 case MB_BW:
 				 case MB_BW_COIL:
 				 case PVAR:
+				 case RGB:
 				 case COM_1:
 							  {
 								 char eoiold = eoi;
@@ -6700,6 +6702,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				 case MB_BW:
 				 case MB_BW_COIL:
 				 case PVAR:
+				 case RGB:
 								cod_line[Byte++]=op[i++];
 								cod_line[Byte++]=op[i];
 								break;
@@ -8050,6 +8053,7 @@ int	desexpr(void)
 				 case MB_BW:
 				 case MB_BW_COIL:
 				 case PVAR:
+				 case RGB:
 				 case INKEYD:
 				 case	OUTPUTD:
 				 case PIDPROP:
@@ -8065,6 +8069,7 @@ int	desexpr(void)
 									((unsigned char)*(code - 1)) == MB_BR || 
 									((unsigned char)*(code - 1)) == MB_BW || 
 									((unsigned char)*(code - 1)) == MB_BW_COIL ||
+									((unsigned char)*(code - 1)) == RGB ||
 									((unsigned char)*(code - 1)) == PVAR)
 								{
 										 i = *(code-1);

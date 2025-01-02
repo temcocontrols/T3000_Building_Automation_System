@@ -3751,6 +3751,8 @@ void CDialogCM5_BacNet::Fresh()
                     bacnet_device_type = T3_TB_11I;
                 else if (ret == MINIPANELARM_NB)
                     bacnet_device_type = MINIPANELARM_NB;
+				else if (ret == T3_ESP_LW)
+					bacnet_device_type = T3_ESP_LW;
 				else if (ret == T3_FAN_MODULE)
 					bacnet_device_type = T3_FAN_MODULE;
 				else if (ret == T3_ESP_RMC)

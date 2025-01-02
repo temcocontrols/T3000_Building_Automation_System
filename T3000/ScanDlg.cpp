@@ -381,16 +381,18 @@ BOOL CScanDlg::TestPing(const CString& strIP)
 {	
  #ifdef CPING_USE_ICMP
 
-    for (int i = 0; i < 1; i++) //改为1次 ，这一次都要大约4秒钟，只是用这个来判断IP是否在线
+    for (int i = 0; i < 2; i++) //改为2次 ，这一次都要大约4秒钟，只是用这个来判断IP是否在线
     {
         CPing p1;
         CPingReply pr1;
         if (p1.Ping1((LPCTSTR)strIP, pr1))
         {
+			//TRACE(_T("TestPing %s success .count i= %d\r\n"), strIP.GetString(), i);
             return TRUE;
         }
         else
         {
+			//TRACE(_T("TestPing %s failed .count i= %d\r\n"), strIP.GetString(), i);
             Sleep(10);
             continue;
         }

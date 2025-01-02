@@ -198,15 +198,23 @@ LRESULT  BacnetScreen::Handle_Json_Data(WPARAM wParam, LPARAM lParam)
 		data_point++;
 	}
 	if (element != data_point)
-		return 0;
-	fclose(fp);
-	Device_Basic_Setting.reg.webview_json_flash = 2;
-	if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
 	{
-		CString temp_task_info;
-		temp_task_info.Format(_T("Write into device timeout!"));
-		SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
+		delete temp_buffer;
+		return 0;
 	}
+	fclose(fp);
+	if (Device_Basic_Setting.reg.webview_json_flash != 2)
+	{
+		//如果之前是用旧的格式存储的，才改标志位为2.标志位已经为2的 就不用多此一举了
+		Device_Basic_Setting.reg.webview_json_flash = 2;
+		if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+		{
+			CString temp_task_info;
+			temp_task_info.Format(_T("Write into device timeout!"));
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_task_info);
+		}
+	}
+	
 
 	m_json_screen_data.at(screen_list_line).file_data.version_high = 1;
 	m_json_screen_data.at(screen_list_line).file_data.version_low = 1;
@@ -215,6 +223,8 @@ LRESULT  BacnetScreen::Handle_Json_Data(WPARAM wParam, LPARAM lParam)
 	if (write_screen_results < 0)
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout!"));
+		//这里要加回滚机制，写入失败，要把之前的数据还原回去;
+		delete temp_buffer;
 		return -2;
 	}
 	//写入的时候 需要获取目前所有的 size 已经存储的 位置;
@@ -256,7 +266,7 @@ LRESULT  BacnetScreen::Handle_Json_Data(WPARAM wParam, LPARAM lParam)
 		}
 		//g_progress_persent = write_success_count * 100 / write_total_count;
 	}
-
+	delete temp_buffer;
 	return 1;
 #ifndef  DISABLE_HANDLE_JSON_DATA
 
@@ -467,10 +477,14 @@ bool BacnetScreen::run_old_graphic_screen()
 	if ((Device_Basic_Setting.reg.webview_json_flash == 2) &&//这里要判断是2
 		(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= WEBVIEW_JSON_FEATURE)) //643 版本会有这个功能
 	{
-		if (IDNO == MessageBox(_T("Continuing to use Graphic will erase the data stored by the Webview, which shares this part of flash. Are you sure you want to use Graphic?"), _T(""), MB_YESNO | MB_ICONINFORMATION))
+		if (IDNO == MessageBox(_T("Switching to 'Graphic Classical View' will erase all data from 'Webview Graphic'. Are you sure you want to erase and switch to 'Classical View'"), _T(""), MB_YESNO | MB_ICONINFORMATION))
 		{
 			return 0;
 		}
+	}
+	else
+	{
+		MessageBox(_T("'Graphic Classical View' have some data in it, If you want use 'Webview Graphic' ,you should click 'Clear All Graphic Data' button!"));
 	}
 	if (h_read_screenlabel_thread == NULL)
 	{
@@ -646,7 +660,10 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam, LPARAM lParam)
 
 		//m_screen_list.SetItemText(i,SCREEN_MODE,_T("Graphic"));
 		CString cs_refresh_time;
-		cs_refresh_time.Format(_T("%d"), m_screen_data.at(i).update);
+		if(Device_Basic_Setting.reg.webview_json_flash == 2)
+			cs_refresh_time.Format(_T("%d"), m_screen_data.at(i).webview_element_count);
+		else
+			cs_refresh_time.Format(_T("%d"), m_screen_data.at(i).old_type_element_count);
 		m_screen_list.SetItemText(i, SCREEN_ELEMENT_COUNT, cs_refresh_time);
 		if (isFreshOne)
 		{
@@ -727,7 +744,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 		temp_value = _wtoi(New_CString);
-		m_screen_data.at(Changed_Item).update = temp_value;
+		m_screen_data.at(Changed_Item).old_type_element_count = temp_value;
 	}
 	int cmp_ret = memcmp(&m_temp_screen_data[Changed_Item], &m_screen_data.at(Changed_Item), sizeof(Control_group_point));
 	if (cmp_ret != 0)
@@ -1855,7 +1872,7 @@ int BacnetScreen::CheckOldGraphic()
      //判断每个里面有没有元素，没有元素就可以使用;
 	for (int i = 0; i < (int)m_screen_data.size(); i++)
 	{
-		if (m_screen_data.at(i).update != 0)
+		if (m_screen_data.at(i).old_type_element_count != 0)
 			return 0;
 	}
 
@@ -1867,17 +1884,33 @@ int BacnetScreen::CheckOldGraphic()
 
 void BacnetScreen::OnBnClickedClearScreenData()
 {
-	if (IDYES != MessageBox(_T("Clicking the yes button will clear graphic data. Are you sure to delete it?"), _T("Warning"), MB_YESNOCANCEL))
+	if (IDYES != MessageBox(_T("Clicking the yes button will clear all graphic data. Are you sure to clear it?"), _T("Warning"), MB_YESNOCANCEL))
 	{
 		return;
 	}
 	int nret = CheckOldGraphic();
-	if (nret == 0)
+	//if (nret == 0)
 	{
 		for (int i = 0; i < (int)m_screen_data.size(); i++)
 		{
-			m_screen_data.at(i).update = 0;
+			m_screen_data.at(i).old_type_element_count = 0;
+			m_screen_data.at(i).webview_element_count = 0;
 		}
+
+		int end_temp_instance = 0;
+		for (int i = 0; i < BAC_SCREEN_GROUP; i++)
+		{
+			end_temp_instance = BAC_READ_SCREEN_REMAINDER + (BAC_READ_SCREEN_GROUP_NUMBER)*i;
+			if (end_temp_instance >= BAC_SCREEN_COUNT)
+				end_temp_instance = BAC_SCREEN_COUNT - 1;
+			if (Write_Private_Data_Blocking(WRITESCREEN_T3000, (BAC_READ_SCREEN_GROUP_NUMBER)*i, end_temp_instance) > 0)
+			{
+				CString Mession_ret;
+				Mession_ret.Format(_T("Write screen from %d to %d success."), (BAC_READ_SCREEN_GROUP_NUMBER)*i, end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+			}
+		}
+
 		m_graphic_label_data.clear();
 		for (int i = 0; i < BAC_GRPHIC_LABEL_COUNT; i++)
 		{

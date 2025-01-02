@@ -486,6 +486,11 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				digital_special_output_count = BACNET_ROUTER_OUT_D;
 				analog_special_output_count = BACNET_ROUTER_OUT_A;
 			}
+			else if (bacnet_device_type == T3_ESP_LW)
+			{
+				digital_special_output_count = T3_ESP_LW_OUT_D;
+				analog_special_output_count = T3_ESP_LW_OUT_A;
+			}
 			else if (bacnet_device_type == T3_FAN_MODULE)
 			{
 				digital_special_output_count = FAN_MOUDLE_OUT_D;

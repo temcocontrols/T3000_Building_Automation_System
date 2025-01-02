@@ -2406,6 +2406,12 @@ BOOL CImageTreeCtrl::OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 
 	AFX_MODULE_THREAD_STATE* pThreadState = AfxGetModuleThreadState();
 	CToolTipCtrl* pToolTip = pThreadState->m_pToolTip;
+	if(pToolTip == NULL)
+	{
+		pToolTip = new CToolTipCtrl;
+		pThreadState->m_pToolTip = pToolTip;
+		pToolTip->Create(this);
+	}
 	pToolTip->SetMaxTipWidth(350);
 	//pToolTip->SetDelayTime(5000);
     TOOLTIPTEXTA* pTTTA = (TOOLTIPTEXTA*)pNMHDR;

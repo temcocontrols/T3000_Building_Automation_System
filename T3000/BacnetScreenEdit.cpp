@@ -3214,7 +3214,7 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
     {
         for (int i = 0; i < BAC_SCREEN_COUNT; i++)
         {
-            m_screen_data.at(m_graphic_label_data.at(i).reg.nScreen_index).update = 0;
+            m_screen_data.at(m_graphic_label_data.at(i).reg.nScreen_index).old_type_element_count = 0;
         }
         for (int i = 0;i < BAC_GRPHIC_LABEL_COUNT;i++)
         {
@@ -3222,7 +3222,7 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
                 (m_graphic_label_data.at(i).reg.label_status == 1) &&
                 (m_graphic_label_data.at(i).reg.nScreen_index < BAC_SCREEN_COUNT))
             {
-                m_screen_data.at(m_graphic_label_data.at(i).reg.nScreen_index).update++;
+                m_screen_data.at(m_graphic_label_data.at(i).reg.nScreen_index).old_type_element_count++;
             }
         }
     }

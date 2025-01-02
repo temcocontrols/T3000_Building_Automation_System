@@ -586,6 +586,8 @@ void CBacnetBuildingManagement::LoadDevice()
 						TVINSERV_T3ARM
 					else if (m_product_temp.m_ext_info.mini_type == MINIPANELARM_NB)
 						TVINSERV_T3_NANO
+					else if (m_product_temp.m_ext_info.mini_type == T3_ESP_LW)
+						TVINSERV_T3_NANO
 					else if(m_product_temp.m_ext_info.mini_type == T3_TSTAT10)
 						TVINSERV_TSTAT8
 				}

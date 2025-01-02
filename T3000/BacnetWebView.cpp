@@ -827,7 +827,17 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			break;
 		}
 
+		g_Device_Basic_Setting[npanel_id].reg.ip_addr;
+		char ipStr[16]; // 用于存储转换后的IP字符串
+		unsigned char* ipAddr = g_Device_Basic_Setting[npanel_id].reg.ip_addr;
+		// 使用 sprintf 将 IP 地址转换为字符串
+		sprintf(ipStr, "%d.%d.%d.%d", ipAddr[0], ipAddr[1], ipAddr[2], ipAddr[3]);
+
 		tempjson["panel_id"] = npanel_id;
+		tempjson["panel_name"] = (char*)g_Device_Basic_Setting[npanel_id].reg.panel_name;
+		tempjson["panel_serial_number"] = g_Device_Basic_Setting[npanel_id].reg.n_serial_number;
+		tempjson["panel_ipaddress"] = ipStr;
+		
 		int p_i = 0;
 		for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++) {
 			tempjson["data"][p_i]["pid"] = npanel_id;
@@ -1043,6 +1053,8 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 			}
 			r_i++;
 		}
+
+
 		
 
 
@@ -1183,8 +1195,27 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 
 	case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
 	{
-		CFile file;
+		int temp_elementcount =  json["data"].get("itemsCount", Json::nullValue).asInt();
+		if (temp_elementcount == 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("No data to save."));
+			break;
+		}
+		m_screen_data.at(screen_list_line).webview_element_count = temp_elementcount;
+		n_ret = Write_Private_Data_Blocking(WRITESCREEN_T3000, screen_list_line, screen_list_line, g_bac_instance);
+		if (n_ret > 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write element count success."));
+		}
+		else
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write element count timeout."));
+			break;
 
+		}
+
+		
+		CFile file;
 		const std::string file_output = Json::writeString(builder, json["data"]);
 		CString file_temp_cs(file_output.c_str());
 		file.Open(des_file, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
@@ -1248,7 +1279,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				TRACE(_T("Change input Value to %d\r\n"), m_Input_data.at(entry_index).control);
 			}
 			else if (field.compare("value") == 0) {
-				//m_Input_data.at(entry_index).value = json["value"].asInt() * 1000;
 				m_Input_data.at(entry_index).value = json["value"].asFloat() * 1000;
 			}
 			else if (field.compare("auto_manual") == 0) {
@@ -1287,7 +1317,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				TRACE(_T("Change output Value to %d\r\n"), m_Output_data.at(entry_index).control);
 			}
 			else if (field.compare("value") == 0) {
-				//m_Output_data.at(entry_index).value = json["value"].asInt() * 1000;
 				m_Output_data.at(entry_index).value = json["value"].asFloat() * 1000;
 				
 			}
@@ -1326,7 +1355,6 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 				m_Variable_data.at(entry_index).control = json["value"].asInt();
 			}
 			else if (field.compare("value") == 0) {
-				//m_Variable_data.at(entry_index).value = json["value"].asInt() * 1000;
 				m_Variable_data.at(entry_index).value = json["value"].asFloat() * 1000;
 			}
 			else if (field.compare("auto_manual") == 0) {

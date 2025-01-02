@@ -1162,7 +1162,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         h_mul_ping_thread = CreateThread(NULL, NULL, Mul_Ping_Thread, this, NULL, NULL);
     }
 
-
+    if (h_create_webview_server_thread == NULL)
+    {
+        h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
+    }
 
     return 0;
 }
@@ -2041,6 +2044,8 @@ void CMainFrame::LoadProductFromDB()
                     else if (m_product_temp.m_ext_info.mini_type == MINIPANELARM_TB)
                         TVINSERV_T3ARM
                     else if (m_product_temp.m_ext_info.mini_type == MINIPANELARM_NB)
+                        TVINSERV_T3_NANO
+                    else if (m_product_temp.m_ext_info.mini_type == T3_ESP_LW)
                         TVINSERV_T3_NANO
                 }
                 else

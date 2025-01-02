@@ -3515,8 +3515,8 @@ int fill_in_screen(Control_group_point* temp_screen, char* temp_point)
         memcpy_s(temp_screen->picture_file, STR_SCREEN_PIC_FILE_LENGTH, my_temp_point, STR_SCREEN_PIC_FILE_LENGTH);
     my_temp_point = my_temp_point + STR_SCREEN_PIC_FILE_LENGTH;
 
-    temp_screen->update = *(my_temp_point++);
-    temp_screen->mode = *(my_temp_point++);
+    temp_screen->old_type_element_count = *(my_temp_point++);
+    temp_screen->webview_element_count = *(my_temp_point++);
     temp_screen->xcur_grp = *(my_temp_point++);
     unsigned short temp_ycur_grp;
     temp_ycur_grp = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
@@ -10400,8 +10400,8 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 					WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 					memcpy_s(m_screen_data.at(i).picture_file,STR_SCREEN_PIC_FILE_LENGTH,cTemp1,STR_SCREEN_PIC_FILE_LENGTH);
 
-					m_screen_data.at(i).update = GetPrivateProfileInt(temp_section,_T("Update"),0,FilePath);
-					m_screen_data.at(i).mode = GetPrivateProfileInt(temp_section,_T("Mode"),0,FilePath);
+					m_screen_data.at(i).old_type_element_count = GetPrivateProfileInt(temp_section,_T("Update"),0,FilePath);
+					m_screen_data.at(i).webview_element_count = GetPrivateProfileInt(temp_section,_T("Mode"),0,FilePath);
 					m_screen_data.at(i).xcur_grp = GetPrivateProfileInt(temp_section,_T("Xcur_grp"),0,FilePath);
 					m_screen_data.at(i).ycur_grp = GetPrivateProfileInt(temp_section,_T("Ycur_grp"),0,FilePath);
 				}
@@ -11522,6 +11522,17 @@ void init_product_list()
     temp.output_count = temp.ao_count + temp.bo_count;
     temp.pid = 74;
     temp.sub_pid = MINIPANELARM_NB;
+    m_product_iocount.push_back(temp);
+
+    temp.cs_name = _T("T3-ESP-LW");
+    temp.ai_count = 0;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 0;
+    temp.bo_count = 0;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 88;
+    temp.sub_pid = T3_ESP_LW;
     m_product_iocount.push_back(temp);
 
     temp.cs_name = _T("T3-FAN-MODULE");
@@ -16581,6 +16592,16 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //èŽ·å
             if (portindex <= NG2_TYPE2_OUT_D)
                 nret_type = OUTPUT_DIGITAL_PORT;
             else if (portindex <= NG2_TYPE2_OUT_D + NG2_TYPE2_OUT_A)
+                nret_type = OUTPUT_ANALOG_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
+        case T3_ESP_LW:
+        {
+            if (portindex <= T3_ESP_LW_OUT_D)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= T3_ESP_LW_OUT_D + T3_ESP_LW_OUT_A)
                 nret_type = OUTPUT_ANALOG_PORT;
             else
                 nret_type = OUTPUT_VIRTUAL_PORT;

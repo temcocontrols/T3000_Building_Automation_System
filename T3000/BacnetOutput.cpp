@@ -423,6 +423,13 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 		Minipanel_device = 1;
 	}
+	else if (bacnet_device_type == T3_ESP_LW)
+	{
+		digital_special_output_count = T3_ESP_LW_OUT_D;
+		analog_special_output_count = T3_ESP_LW_OUT_A;
+		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+		Minipanel_device = 1;
+	}
 	else if (bacnet_device_type == T3_TB_11I)
 	{
 		digital_special_output_count = T3_TB_11I_OUT_D;
@@ -683,6 +690,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 			bacnet_device_type == BIG_MINIPANEL ||
 			bacnet_device_type == MINIPANELARM ||
 			bacnet_device_type == MINIPANELARM_LB ||
+			bacnet_device_type == T3_ESP_LW ||
 			bacnet_device_type == T3_TB_11I ||
 			bacnet_device_type == MINIPANELARM_TB ||
 			bacnet_device_type == SMALL_MINIPANEL ||

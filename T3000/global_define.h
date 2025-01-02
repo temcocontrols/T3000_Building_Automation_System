@@ -1271,6 +1271,7 @@ typedef enum
 	T3_ESP_TSTAT9 = 17,//T3000 TBD
 	T3_ESP_SAUTER = 18,//T3000 TBD
 	T3_ESP_RMC = 19,  //1-16 input 17-18 sensor    Output1-7DO
+	T3_ESP_LW = 21,  //0 input   ,   6  output
 	T3_NG2_TYPE2 = 22,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
@@ -1345,6 +1346,12 @@ const int NG2_TYPE2_IN_A = 30;
 const int NG2_TYPE2_IN_D = 0;
 const int NG2_TYPE2_OUT_A = 4;
 const int NG2_TYPE2_OUT_D = 8;
+
+const int T3_ESP_LW_IN_A = 0;
+const int T3_ESP_LW_IN_D = 0;
+const int T3_ESP_LW_OUT_A = 6;  //Lighting sw  6 个灯 可以输出各种颜色;
+const int T3_ESP_LW_OUT_D = 0;
+
 enum
 {
 	UART_1200 = 0,

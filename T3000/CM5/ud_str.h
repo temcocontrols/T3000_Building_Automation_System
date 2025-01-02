@@ -585,8 +585,8 @@ typedef struct
 	int8_t label[9];							/* (9 bytes; string)	*/
 	int8_t picture_file[11];			/* (11 bytes; string)	*/
 
-	uint8_t update;                /* refresh time */
-	uint8_t  mode     ;// :1;     /* text / graphic */
+	uint8_t old_type_element_count;                /* refresh time */
+	uint8_t  webview_element_count; ;// :1;     /* text / graphic */
 	uint8_t  xcur_grp	;//:15;
 
 	uint16_t  ycur_grp;
