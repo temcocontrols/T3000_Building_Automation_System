@@ -45,6 +45,7 @@ public:
 	afx_msg void OnCbnSelchangeComboDebugChoose();
     afx_msg void OnBnClickedButtonDebug();
     afx_msg void OnBnClickedButtonWebTest();
+	afx_msg void OnBnClickedButtonBacnettool();
 };
 
 

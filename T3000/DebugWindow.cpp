@@ -6,7 +6,7 @@
 #include "DebugWindow.h"
 #include "afxdialogex.h"
 #include "global_function.h"
-
+#include "BacnetTool.h"
 // CDebugWindow dialog
 
 IMPLEMENT_DYNAMIC(CDebugWindow, CDialogEx)
@@ -45,6 +45,7 @@ ON_BN_CLICKED(IDC_BUTTON_DEBUG_TIME_TO_NUM, &CDebugWindow::OnBnClickedButtonDebu
 ON_CBN_SELCHANGE(IDC_COMBO_DEBUG_CHOOSE, &CDebugWindow::OnCbnSelchangeComboDebugChoose)
 ON_BN_CLICKED(IDC_BUTTON_DEBUG, &CDebugWindow::OnBnClickedButtonDebug)
 ON_BN_CLICKED(IDC_BUTTON_WEB_TEST, &CDebugWindow::OnBnClickedButtonWebTest)
+ON_BN_CLICKED(IDC_BUTTON_BACNETTOOL, &CDebugWindow::OnBnClickedButtonBacnettool)
 END_MESSAGE_MAP()
 
 
@@ -314,6 +315,8 @@ void CDebugWindow::OnCbnSelchangeComboDebugChoose()
 void CDebugWindow::OnBnClickedButtonDebug()
 {
     // TODO: 在此添加控件通知处理程序代码
+	//BACNET_READ_ACCESS_DATA value;
+	//Bacnet_Read_Properties_Multiple_Blocking(47085, (BACNET_OBJECT_TYPE)8, 1, 77, value, 3);
 
 
 
@@ -391,4 +394,13 @@ void CDebugWindow::OnBnClickedButtonWebTest()
     testweb.DoModal();
     return;
 #endif // DEBUG
+}
+
+
+void CDebugWindow::OnBnClickedButtonBacnettool()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	close_bac_com();
+    CBacnetTool dlg;
+    dlg.DoModal();
 }

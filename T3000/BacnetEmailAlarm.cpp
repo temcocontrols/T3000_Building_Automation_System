@@ -122,17 +122,17 @@ void CBacnetEmailAlarm::Fresh_UI()
     CString cs_email_Address;
     CString cs_user_name;
     CString cs_password;
-    if (Device_Email_Point.reg.smtp_type == 0)
-    {
-        cs_smtp_server.Format(_T("%u.%u.%u.%u"), Device_Email_Point.reg.smtp_ip[0],
-            Device_Email_Point.reg.smtp_ip[1], Device_Email_Point.reg.smtp_ip[2], Device_Email_Point.reg.smtp_ip[3]);
-    }
-    else
-    {
+    //if (Device_Email_Point.reg.smtp_type == 0)
+    //{
+    //    cs_smtp_server.Format(_T("%u.%u.%u.%u"), Device_Email_Point.reg.smtp_ip[0],
+    //        Device_Email_Point.reg.smtp_ip[1], Device_Email_Point.reg.smtp_ip[2], Device_Email_Point.reg.smtp_ip[3]);
+    //}
+    //else
+    //{
         MultiByteToWideChar(CP_ACP, 0, (char *)Device_Email_Point.reg.smtp_domain, (int)strlen((char *)Device_Email_Point.reg.smtp_domain) + 1,
             cs_smtp_server.GetBuffer(MAX_PATH), MAX_PATH);
         cs_smtp_server.ReleaseBuffer();
-    }
+    //}
 
     cs_smtp_port.Format(_T("%u"), Device_Email_Point.reg.smtp_port);
 

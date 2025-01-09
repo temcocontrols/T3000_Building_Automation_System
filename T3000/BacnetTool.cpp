@@ -568,6 +568,7 @@ void CBacnetTool::OnBnClickedButtonBacToolTest2()
 	
 	CBacnetToolReadProperty Dlg;
 	Dlg.DoModal();
+
 	if(!read_property_cancel)
 	{
         //Write_Properties(object_instance, (BACNET_OBJECT_TYPE)object_identifier, property_identifier);

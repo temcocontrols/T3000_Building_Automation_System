@@ -170,6 +170,8 @@ extern void Init_table_bank();
 #include "BacnetWebView.h"
 
 HANDLE h_create_webview_server_thread = NULL;
+HANDLE h_create_webview_client_thread = NULL;
+
 extern BacnetScreen *Screen_Window;
 extern CBacnetProgram *Program_Window;
 extern CBacnetInput *Input_Window ;
@@ -1165,6 +1167,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     if (h_create_webview_server_thread == NULL)
     {
         h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
+
+        h_create_webview_client_thread = CreateThread(NULL, NULL, CreateWebServerClientThreadfun, this, NULL, NULL);
     }
 
     return 0;
@@ -15751,6 +15755,144 @@ DWORD WINAPI  CMainFrame::CreateWebServerThreadfun(LPVOID lpVoid)
     return 0;
 
 }
+extern void HandleWebViewMsg(CString msg, CString &outmsg);
+DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
+{
+    //BacnetScreen* pParent = (BacnetScreen*)lpVoid;
+    // 初始化 Winsock
+   // 初始化 Winsock
+    Sleep(5000);
+    WSADATA wsaData;
+    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (iResult != 0) {
+        TRACE("WSAStartup failed: %d\n", iResult);
+        return 1;
+    }
+
+    // 创建套接字
+    SOCKET ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (ConnectSocket == INVALID_SOCKET) {
+        TRACE("Error at socket(): %d\n", WSAGetLastError());
+        WSACleanup();
+        return 1;
+    }
+
+    // 设置服务器地址和端口
+    sockaddr_in clientService;
+    clientService.sin_family = AF_INET;
+    clientService.sin_addr.s_addr = inet_addr("127.0.0.1");
+    clientService.sin_port = htons(9104);
+
+    // 连接到服务器
+    iResult = connect(ConnectSocket, (SOCKADDR*)&clientService, sizeof(clientService));
+    if (iResult == SOCKET_ERROR) {
+        TRACE("Unable to connect to server: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    CString handshakeRequest;
+    handshakeRequest.Format(
+        _T("GET / HTTP/1.1\r\n")
+        _T("Host: %s\r\n")
+        _T("Upgrade: websocket\r\n")
+        _T("Connection: Upgrade\r\n")
+        _T("Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==\r\n")
+        _T("Sec-WebSocket-Version: 13\r\n")
+        _T("Sec-WebSocket-Protocol: chat\r\n\r\n"),
+        _T("127.0.0.1")
+    );
+
+    char sendbuf[2048] = {0};
+    // 发送和接收数据的缓冲区
+    WideCharToMultiByte(CP_ACP, 0, handshakeRequest.GetBuffer(), -1, sendbuf, 2048, NULL, NULL);
+
+    //const char* sendbuf = "This is a test message from client";
+    char recvbuf[2048] = {0};
+    int recvbuflen = 2048;
+
+    // 发送初始数据
+    iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+    if (iResult == SOCKET_ERROR) {
+        TRACE("send failed: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    TRACE("Bytes Sent: %d\r\n%s\r\n", iResult, sendbuf);
+
+    // 循环接收和处理数据
+    while (true) {
+        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+        if (iResult > 0) 
+        {
+            recvbuf[iResult] = '\0'; // Null-terminate the received data
+            TRACE("Bytes received: %d\r\n%s\r\n", iResult, recvbuf);
+
+            // 检查接收到的数据并做出应答
+            std::string receivedData(recvbuf);
+            if (receivedData.find("Switching Protocols") != std::string::npos) 
+            {
+                Sleep(2000);
+                CString handshakeConfirm;
+                handshakeConfirm = _T("{\"header\":{\"clientId\":\" - \",\"from\":\"T3\"},\"message\":{\"action\":-1,\"clientId\":\"11111111 - 1111 - 1111 - 1111 - 111111111111\"}}");
+                WideCharToMultiByte(CP_ACP, 0, handshakeConfirm.GetBuffer(), -1, sendbuf, 2048, NULL, NULL);
+                iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+                if (iResult == SOCKET_ERROR) 
+                {
+                    TRACE("send failed: %d\n", WSAGetLastError());
+                    closesocket(ConnectSocket);
+                    WSACleanup();
+                    return 1;
+                }
+                TRACE("%s\r\n", sendbuf);
+            }
+            else if (receivedData.length() > 2)
+            {
+                std::string filteredData = receivedData.substr(2);
+                // 检查从第三个字节开始的数据是否与 {" 一模一样
+                if (filteredData.find("{\"") == 0)
+                {
+                    //调用别的函数处理数据
+                    CString msg = CString(filteredData.c_str());
+                    CString outmsg;
+                    HandleWebViewMsg(msg, outmsg);
+                    WideCharToMultiByte(CP_ACP, 0, outmsg.GetBuffer(), -1, sendbuf, 2048, NULL, NULL);
+                    Sleep(1);
+                       iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+                       if (iResult == SOCKET_ERROR) 
+                       {
+                           TRACE("send failed: %d\n", WSAGetLastError());
+                           closesocket(ConnectSocket);
+                           WSACleanup();
+                           return 1;
+                       }
+                       TRACE("%d\r\n", sendbuf);
+				}
+            }
+           
+        }
+        else if (iResult == 0) {
+            TRACE("Connection closed\n");
+            break;
+        }
+        else {
+            TRACE("recv failed: %d\n", WSAGetLastError());
+            break;
+        }
+    }
+
+    // 关闭套接字
+    closesocket(ConnectSocket);
+    WSACleanup();
+
+    h_create_webview_client_thread = NULL;
+    return 0;
+
+}
+
 
 #ifndef LOCAL_DB_FUNCTION
 

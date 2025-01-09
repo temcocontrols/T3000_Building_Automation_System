@@ -32,9 +32,9 @@
 class BacnetWebViewAppWindow
 {
 public:
-    CString des_file;
-    CString des_file_zip;
-    CString des_lib_file;
+    //CString des_file;
+    //CString des_file_zip;
+    //CString des_lib_file;
 public:
     BacnetWebViewAppWindow(
         UINT creationModeId,

@@ -6,7 +6,7 @@
 #endif // DEBUG
 
 
-//#define ENABLE_T3_EMAIL
+#define ENABLE_T3_EMAIL
 #define DISABLE_HANDLE_JSON_DATA
 #include <map>
 //minipanel ¼Ä´æÆ÷±í

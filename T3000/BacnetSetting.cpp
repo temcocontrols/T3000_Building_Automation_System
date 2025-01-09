@@ -451,7 +451,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			DFTrace(temp123);
 		}
 
-		if ((Device_Basic_Setting.reg.time_update_since_1970 < 1420041600) || (Device_Basic_Setting.reg.time_update_since_1970 > 1735660800))
+		if ((Device_Basic_Setting.reg.time_update_since_1970 < 1420041600) || (Device_Basic_Setting.reg.time_update_since_1970 > 2235660800))
 		{
 			((CEdit*)m_page_time.GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(_T("No Reply"));
 		}

@@ -1967,7 +1967,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		if(temp_data.point.panel != Station_NUM)	//如果数据point 不是本panel 估计就是传错了值;
 			continue;
 #endif
-		if((temp_data.time < 1420041600)  || (temp_data.time > 1735660800))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
+		if((temp_data.time < 1420041600)  || (temp_data.time > 2235660800))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
 		{
 			continue;
 		}

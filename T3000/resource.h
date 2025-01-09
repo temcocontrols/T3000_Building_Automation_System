@@ -2828,6 +2828,7 @@
 #define IDC_STATIC_AFS_REAL2            2749
 #define IDC_STATIC_C1                   2750
 #define IDC_STATIC_C2                   2751
+#define IDC_BUTTON_BACNETTOOL           2751
 #define IDC_STATIC_C3                   2752
 #define IDC_STATIC_PLC_GROUP_T          2753
 #define IDC_STATIC_AFS_DEGC_C1          2754
@@ -3415,7 +3416,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        804
 #define _APS_NEXT_COMMAND_VALUE         34091
-#define _APS_NEXT_CONTROL_VALUE         2751
+#define _APS_NEXT_CONTROL_VALUE         2752
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

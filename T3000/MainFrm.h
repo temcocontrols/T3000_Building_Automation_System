@@ -349,6 +349,7 @@ public:
     static DWORD WINAPI  Write_Modbus_tstat_cfg(LPVOID lpVoid);
 	static DWORD WINAPI  Write_Modbus_ConfigFile(LPVOID lpVoid);
 	static DWORD WINAPI  CreateWebServerThreadfun(LPVOID lpVoid);
+	static DWORD WINAPI  CreateWebServerClientThreadfun(LPVOID lpVoid);
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
     
