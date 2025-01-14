@@ -15853,13 +15853,13 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
         _T("127.0.0.1")
     );
 
-    char sendbuf[2048] = {0};
+    char sendbuf[10240] = {0};
     // 发送和接收数据的缓冲区
-    WideCharToMultiByte(CP_ACP, 0, handshakeRequest.GetBuffer(), -1, sendbuf, 2048, NULL, NULL);
+    WideCharToMultiByte(CP_ACP, 0, handshakeRequest.GetBuffer(), -1, sendbuf, 10240, NULL, NULL);
 
     //const char* sendbuf = "This is a test message from client";
-    char recvbuf[2048] = {0};
-    int recvbuflen = 2048;
+    char recvbuf[10240] = {0};
+    int recvbuflen = 10240;
 
     // 发送初始数据
     iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
@@ -15874,7 +15874,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
 
     // 循环接收和处理数据
     while (true) {
-        memset(recvbuf, 0, 2048);
+        memset(recvbuf, 0, 10240);
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
         if (iResult > 0) 
         {
@@ -15903,29 +15903,42 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
                 }
                 TRACE("%s\r\n", sendbuf);
             }
-            else if (receivedData.length() > 2)
+            else if (receivedData.length() > 6)
             {
-                std::string filteredData = receivedData.substr(2);
-                // 检查从第三个字节开始的数据是否与 {" 一模一样
-				if (filteredData.find("{\"") == 0)
-				{
-					//调用别的函数处理数据
-					CString msg = CString(filteredData.c_str());
-					CString outmsg;
-					HandleWebViewMsg(msg, outmsg,1); //msg_source = 1 代表来自外部浏览器的消息， 需要根据panel 还有index 来加载对应的 data
+                std::string filteredData = receivedData;
+                int loop_count = 0; //有时候前面多4个字节 从第三个字节开始是长度，有时候又只有两个字节。这里循环判断 大括号加冒号为起点.
+                do
+                {
+                    
+                    //std::string filteredData = receivedData.substr(2);
+                    if (filteredData.find("{\"") == 0)
+                    {
+                        //调用别的函数处理数据
+                        CString msg = CString(filteredData.c_str());
+                        CString outmsg;
+                        HandleWebViewMsg(msg, outmsg, 1); //msg_source = 1 代表来自外部浏览器的消息， 需要根据panel 还有index 来加载对应的 data
 
-					vector<unsigned char> wsFrame = CreateWebSocketFrame(outmsg);
-					iResult = send(ConnectSocket, reinterpret_cast<const char*>(wsFrame.data()), wsFrame.size(), 0);
+                        vector<unsigned char> wsFrame = CreateWebSocketFrame(outmsg);
+                        iResult = send(ConnectSocket, reinterpret_cast<const char*>(wsFrame.data()), wsFrame.size(), 0);
 
-					if (iResult == SOCKET_ERROR)
-					{
-						TRACE("send failed: %d\n", WSAGetLastError());
-						closesocket(ConnectSocket);
-						WSACleanup();
-						return 1;
-					}
-					TRACE("%d\r\n", sendbuf);
-				}
+                        if (iResult == SOCKET_ERROR)
+                        {
+                            TRACE("send failed: %d\n", WSAGetLastError());
+                            closesocket(ConnectSocket);
+                            WSACleanup();
+                            return 1;
+                        }
+                        TRACE("%d\r\n", sendbuf);
+                        break;
+                    }
+                    else
+                    {
+                        loop_count++;
+                        if (loop_count > 6)
+                            break; // 没搜到起始 信号;
+                        filteredData = receivedData.substr(loop_count); // 检查从第loop_count个字节开始的数据是否与 {" 一模一样
+                    }                                       
+                } while (loop_count < 7);
             }
            
         }

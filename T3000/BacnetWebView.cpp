@@ -856,7 +856,6 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			CString temp_message;
 			temp_message.Format(_T("Panel %d is offline!\r\n"), npanel_id);
 			TRACE(temp_message);
-			//MessageBox(m_mainWindow, temp_message ,L"Warning", MB_OK);  
             WrapErrorMessage(builder, tempjson, outmsg, temp_message);
 			break;
 		}
@@ -864,7 +863,6 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		{
 			CString temp_message;
 			temp_message.Format(_T("Panel id can't be  0 !"), npanel_id);
-			//MessageBox(m_mainWindow, temp_message, L"Warning", MB_OK);
 			WrapErrorMessage(builder, tempjson, outmsg, temp_message);
 			break;
 		}
@@ -902,10 +900,6 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			tempjson["data"][p_i]["decom"] = g_Input_data[npanel_id].at(i).decom; //for input   0 "Normal"    1"Open"   2  "Shorted"
 			p_i++;
 		}
-
-
-
-
 
 		for (int i = 0; i < BAC_OUTPUT_ITEM_COUNT; i++) {
 			tempjson["data"][p_i]["pid"] = npanel_id;
@@ -1028,7 +1022,6 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			tempjson["data"][p_i]["description"] = (char*)g_screen_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_screen_data[npanel_id].at(i).label;
 			tempjson["data"][p_i]["count"] = g_screen_data[npanel_id].at(i).webview_element_count;
-			// tempjson["data"][p_i]["mode"] = (char*)g_screen_data[npanel_id].at(i).mode;
 			//There is also additional data that does not need to be passed to the webview interface
 			p_i++;
 		}
@@ -1097,16 +1090,10 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			r_i++;
 		}
 
-
-
-
-
-
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 		outmsg = temp_cs;
-		//m_webView->PostWebMessageAsJson(temp_cs);
-		//Post_Refresh_One_Message(g_bac_instance, READINPUT_T3000, entry_index, entry_index, sizeof(Str_in_point));
+
 		break;
 	}
 	case WEBVIEW_MESSAGE_TYPE::LOAD_GRAPHIC_ENTRY:
@@ -1131,28 +1118,14 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			break;
 		}
 
-
-
-
-
-		if (0)
-		{
-			temp_item.Format(_T("%u_%d_json.txt"), grp_serial_number, grp_index);
-			temp_item_zip.Format(_T("%u_%d_json.zip"), grp_serial_number, grp_index);
-		}
-		else
-		{
-			temp_item.Format(_T("%u_%d.txt"), grp_serial_number, grp_index);
-			temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, grp_index);
-
-		}
+		temp_item.Format(_T("%u_%d.txt"), grp_serial_number, grp_index);
+		temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, grp_index);
 
 		des_file = image_fordor + _T("\\") + temp_item;
 		des_file_zip = image_fordor + _T("\\") + temp_item_zip;
 		CString temp_lib_file;
 		temp_lib_file = _T("hvac_library.json");
 		des_lib_file = image_fordor + _T("\\") + temp_lib_file;
-
 
 		if (action == LOAD_GRAPHIC_ENTRY)
 		{
@@ -1290,26 +1263,15 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 		grp_serial_number = g_selected_serialnumber; //暂时用这个代替
 		grp_index = screen_list_line;
-		if (0)
-		{
-			temp_item.Format(_T("%u_%d_json.txt"), grp_serial_number, grp_index);
-			temp_item_zip.Format(_T("%u_%d_json.zip"), grp_serial_number, grp_index);
-		}
-		else
-		{
-			temp_item.Format(_T("%u_%d.txt"), grp_serial_number, grp_index);
-			temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, grp_index);
 
-		}
+		temp_item.Format(_T("%u_%d.txt"), grp_serial_number, grp_index);
+		temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, grp_index);
 
 		des_file = image_fordor + _T("\\") + temp_item;
 		des_file_zip = image_fordor + _T("\\") + temp_item_zip;
 		CString temp_lib_file;
 		temp_lib_file = _T("hvac_library.json");
 		des_lib_file = image_fordor + _T("\\") + temp_lib_file;
-
-
-
 
 		int temp_elementcount = json["data"].get("itemsCount", Json::nullValue).asInt();
 		if (temp_elementcount == 0)
@@ -1361,11 +1323,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		}
 		Sleep(1);
 		save_button_click = 1;
-#if 0
-		nlohmann::json jsonData = nlohmann::json::parse(file_output);
-		Str_Json Str_MyJson(jsonData);
-		Sleep(1);
-#endif
+
 		break;
 	}
 	case WEBVIEW_MESSAGE_TYPE::UPDATE_ENTRY:
@@ -1991,8 +1949,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		{
 			if (temp_name_index > 0)
 			{
-				temp_image_path.Format(_T("%s\\%s-%d.%s"), web_image_folder, temp_file_name_without_suffix, temp_name_index, temp_suffix);
-				cs_filename.Format(_T("%s-%d.%s"), temp_file_name_without_suffix, temp_name_index, temp_suffix);
+				temp_image_path.Format(_T("%s\\%s-%d.%s"), web_image_folder.GetBuffer(), temp_file_name_without_suffix.GetBuffer(), temp_name_index, temp_suffix.GetBuffer());
+				cs_filename.Format(_T("%s-%d.%s"), temp_file_name_without_suffix.GetBuffer(), temp_name_index, temp_suffix.GetBuffer());
 			}
 			else
 			{
