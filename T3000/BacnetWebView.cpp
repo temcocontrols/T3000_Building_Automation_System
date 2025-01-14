@@ -761,9 +761,20 @@ int BacnetWebViewAppWindow::JsonDataToStruct(std::string file_output)
 	return 1;
 #endif
 }
+
+
+void WrapErrorMessage(Json::StreamWriterBuilder& builder, const Json::Value& tempjson, CString& outmsg, const CString& error_message) {
+	if (!error_message.IsEmpty()) {
+		Json::Value tempjsonCopy = tempjson;
+		tempjsonCopy["error"] = std::string(CT2A(error_message));
+		const std::string output = Json::writeString(builder, tempjsonCopy);
+		outmsg = CString(output.c_str());
+	}
+}
+
 #include <mutex>
 std::mutex handleWebViewMsgMutex;
-void HandleWebViewMsg(CString msg ,CString &outmsg)
+void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 {
 	// 使用 std::lock_guard 来锁定互斥锁
 	std::lock_guard<std::mutex> lock(handleWebViewMsgMutex);
@@ -773,50 +784,44 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 	Json::Reader reader;
 	reader.parse(message, json, false);
 	int action = json.get("action", Json::nullValue).asInt();
+
+
 	Json::StreamWriterBuilder builder;
 	builder["indentation"] = ""; // If you want whitespace-less output
 	Json::Value tempjson;
-	int grp_index = 0;
-	int grp_serial_number = 0;
+	int grp_index = 0;  //选中的第几幅图;
+	int grp_serial_number = 0; //选中设备的序列号 ，靠这个序列号来找到对应的设备 zip文件;
 	int n_ret = -1;
 	CString des_file;
 	CString des_file_zip;
 	CString des_lib_file;
 
-
+	TRACE(msg + _T("\r\n"));
 #if 1
 	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 	CString temp_item;
 	CString temp_item_zip;
-	grp_serial_number = g_selected_serialnumber; //暂时用这个代替
-	grp_index = 0;
-	if (0)
-	{
-		temp_item.Format(_T("%u_%d_json.txt"), grp_serial_number, grp_index);
-		temp_item_zip.Format(_T("%u_%d_json.zip"), grp_serial_number, grp_index);
-	}
-	else
-	{
-		temp_item.Format(_T("%u_%d.txt"), grp_serial_number, grp_index);
-		temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, grp_index);
-
-	}
-
-	des_file = image_fordor + _T("\\") + temp_item;
-	des_file_zip = image_fordor + _T("\\") + temp_item_zip;
-	CString temp_lib_file;
-	temp_lib_file = _T("hvac_library.json");
-	des_lib_file = image_fordor + _T("\\") + temp_lib_file;
+	
 #endif
 
+	// append msgId
+	if (json.isMember("msgId")) {
+		std::string msgId = json["msgId"].asString();
+		tempjson["msgId"] = msgId;
+	}
+	
+	//CString temp_action;
+	//temp_action.Format(_T("action value = %d\r\n"), action);
+	//DFTrace(temp_action);
 	switch (action)
 	{
 	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_DATA:
 	{
 		tempjson["action"] = "GET_PANEL_DATA_RES";
 		int npanel_id = json.get("panelId", Json::nullValue).asInt();
-
+		//temp_action.Format(_T("npanel_idididididididididididid = %d\r\n"), npanel_id);
+		//DFTrace(temp_action);
 		if (npanel_id == 0)
 			npanel_id = bac_gloab_panel;
 		int nret = LoadOnlinePanelData(npanel_id);
@@ -825,6 +830,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			CString temp_message;
 			temp_message.Format(_T("No cached data was found for this panel %d"), npanel_id);
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_message);
+			WrapErrorMessage(builder, tempjson, outmsg, temp_message);
 			break;
 #if 0
 			temp_message.Format(_T("No cached data was found for this panel %d, do you want to read the device's data immediately"), npanel_id);
@@ -850,7 +856,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			CString temp_message;
 			temp_message.Format(_T("Panel %d is offline!\r\n"), npanel_id);
 			TRACE(temp_message);
-			//MessageBox(m_mainWindow, temp_message ,L"Warning", MB_OK);
+			//MessageBox(m_mainWindow, temp_message ,L"Warning", MB_OK);  
+            WrapErrorMessage(builder, tempjson, outmsg, temp_message);
 			break;
 		}
 		else if (npanel_id == 0)
@@ -858,6 +865,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			CString temp_message;
 			temp_message.Format(_T("Panel id can't be  0 !"), npanel_id);
 			//MessageBox(m_mainWindow, temp_message, L"Warning", MB_OK);
+			WrapErrorMessage(builder, tempjson, outmsg, temp_message);
 			break;
 		}
 
@@ -1019,6 +1027,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			tempjson["data"][p_i]["command"] = to_string(npanel_id) + "GRP" + to_string(i + 1);
 			tempjson["data"][p_i]["description"] = (char*)g_screen_data[npanel_id].at(i).description;
 			tempjson["data"][p_i]["label"] = (char*)g_screen_data[npanel_id].at(i).label;
+			tempjson["data"][p_i]["count"] = g_screen_data[npanel_id].at(i).webview_element_count;
 			// tempjson["data"][p_i]["mode"] = (char*)g_screen_data[npanel_id].at(i).mode;
 			//There is also additional data that does not need to be passed to the webview interface
 			p_i++;
@@ -1105,6 +1114,46 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 	{
 		Json::Value tempjson;
 		int panel_id;
+		if (msg_source == 0)//来自T3000按键点击
+		{
+			grp_serial_number = g_selected_serialnumber; 
+			grp_index = screen_list_line;
+		}
+		else if(msg_source == 1)//来自浏览器
+		{
+			panel_id = json.get("panelId", Json::nullValue).asInt(); //这里要根据panelId来判断是那个序列号的设备，进而确定保存的文件名
+			grp_index = json.get("viewitem", Json::nullValue).asInt(); //这里如果是按键点进来的，要用T3000的index ，如果是 浏览器的 要浏览器的index
+		}
+		else
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Message Source Error."));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
+			break;
+		}
+
+
+
+
+
+		if (0)
+		{
+			temp_item.Format(_T("%u_%d_json.txt"), grp_serial_number, grp_index);
+			temp_item_zip.Format(_T("%u_%d_json.zip"), grp_serial_number, grp_index);
+		}
+		else
+		{
+			temp_item.Format(_T("%u_%d.txt"), grp_serial_number, grp_index);
+			temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, grp_index);
+
+		}
+
+		des_file = image_fordor + _T("\\") + temp_item;
+		des_file_zip = image_fordor + _T("\\") + temp_item_zip;
+		CString temp_lib_file;
+		temp_lib_file = _T("hvac_library.json");
+		des_lib_file = image_fordor + _T("\\") + temp_lib_file;
+
+
 		if (action == LOAD_GRAPHIC_ENTRY)
 		{
 			tempjson["action"] = "LOAD_GRAPHIC_ENTRY_RES";
@@ -1113,6 +1162,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			if ((panel_id == 0) || entry_index >= BAC_SCREEN_COUNT)
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is invalid or Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Panel is invalid or Index is invalid."));
 				break;
 			}
 			grp_index = entry_index;
@@ -1131,6 +1181,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 				if (grp_serial_number == 0)
 				{
 					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is offline."));
+					WrapErrorMessage(builder, tempjson, outmsg, _T("Panel is offline."));
 					break;
 				}
 			}
@@ -1222,7 +1273,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 
 		const std::string output = Json::writeString(builder, tempjson);
 		CString tempjson_str(output.c_str());
-		TRACE(nbuff);
+		//TRACE(nbuff);
 		//m_webView->PostWebMessageAsJson(tempjson_str);
 		outmsg = tempjson_str;
 		delete nbuff;
@@ -1233,10 +1284,38 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 
 	case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
 	{
+		int panelId = json.get("panelId", Json::nullValue).asInt(); //这里要根据panelId来判断是那个序列号的设备，进而确定保存的文件名
+		int save_grp_index = json.get("viewitem", Json::nullValue).asInt();
+
+
+		grp_serial_number = g_selected_serialnumber; //暂时用这个代替
+		grp_index = screen_list_line;
+		if (0)
+		{
+			temp_item.Format(_T("%u_%d_json.txt"), grp_serial_number, grp_index);
+			temp_item_zip.Format(_T("%u_%d_json.zip"), grp_serial_number, grp_index);
+		}
+		else
+		{
+			temp_item.Format(_T("%u_%d.txt"), grp_serial_number, grp_index);
+			temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, grp_index);
+
+		}
+
+		des_file = image_fordor + _T("\\") + temp_item;
+		des_file_zip = image_fordor + _T("\\") + temp_item_zip;
+		CString temp_lib_file;
+		temp_lib_file = _T("hvac_library.json");
+		des_lib_file = image_fordor + _T("\\") + temp_lib_file;
+
+
+
+
 		int temp_elementcount = json["data"].get("itemsCount", Json::nullValue).asInt();
 		if (temp_elementcount == 0)
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("No data to save."));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("No data to save."));
 			break;
 		}
 		m_screen_data.at(screen_list_line).webview_element_count = temp_elementcount;
@@ -1248,6 +1327,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 		else
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write element count timeout."));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Write element count timeout."));
 			break;
 
 		}
@@ -1273,6 +1353,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 		if (!zip_ret)
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to store data!"));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Failed to store data!"));
 		}
 		else
 		{
@@ -1299,6 +1380,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 		if ((panel_id == 0) || (panel_id >= 255))
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is invalid ."));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Panel is invalid ."));
 			break;
 		}
 
@@ -1310,6 +1392,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			if ((entry_index >= 0) && entry_index + 1 > BAC_INPUT_ITEM_COUNT)
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("control") == 0) {
@@ -1337,6 +1420,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			else
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
 			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, entry_index, REFRESH_ON_ITEM);
@@ -1348,6 +1432,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			if ((entry_index >= 0) && entry_index + 1 > BAC_OUTPUT_ITEM_COUNT)
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("control") == 0) {
@@ -1376,6 +1461,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			else
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
 			::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, entry_index, REFRESH_ON_ITEM);
@@ -1387,6 +1473,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			if ((entry_index >= 0) && entry_index + 1 > BAC_VARIABLE_ITEM_COUNT)
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("control") == 0) {
@@ -1413,6 +1500,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			else
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
 			::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, entry_index, REFRESH_ON_ITEM);
@@ -1424,6 +1512,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			if ((entry_index >= 0) && entry_index + 1 > BAC_PROGRAM_ITEM_COUNT)
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("status") == 0) {
@@ -1447,6 +1536,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			else
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
 			::PostMessage(m_pragram_dlg_hwnd, WM_REFRESH_BAC_PROGRAM_LIST, entry_index, REFRESH_ON_ITEM);
@@ -1458,6 +1548,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			if ((entry_index >= 0) && entry_index + 1 > BAC_SCHEDULE_COUNT)
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("output") == 0) {
@@ -1481,6 +1572,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			else
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
 			::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST, entry_index, REFRESH_ON_ITEM);
@@ -1492,6 +1584,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			if ((entry_index >= 0) && entry_index + 1 > BAC_HOLIDAY_COUNT)
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
 			if (field.compare("value") == 0) {
@@ -1515,6 +1608,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg)
 			else
 			{
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
 			::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, entry_index, REFRESH_ON_ITEM);

@@ -2015,7 +2015,15 @@ void BacnetScreen::OnBnClickedWebViewShow()
 
 		auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(webviewUrl), wstring(webviewTitle));
 		auto result = BacnetWebViewAppWindow::RunMessagePump();
-		delete webviewwindow;
+		try
+		{
+			delete webviewwindow;
+		}
+		catch (const std::exception&)
+		{
+
+		}
+		
 	}
 }
 

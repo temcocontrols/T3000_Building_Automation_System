@@ -10759,9 +10759,13 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
                 unsigned char temp_ip_addr[4] = {0};
                 unsigned char temp_subnet[4] = { 0 };
                 unsigned char temp_gate_addr[4] = { 0 };
+                unsigned char temp_mac_addr[6] = { 0 };
                 memcpy(temp_ip_addr, Device_Basic_Setting.reg.ip_addr, 4);
                 memcpy(temp_subnet, Device_Basic_Setting.reg.subnet, 4);
                 memcpy(temp_gate_addr, Device_Basic_Setting.reg.gate_addr, 4);
+                memcpy(temp_mac_addr, Device_Basic_Setting.reg.mac_addr, 6);
+
+
 
                 char temp_panel_name[20] = {0};
                 memcpy(temp_panel_name, Device_Basic_Setting.reg.panel_name, 20);
@@ -10777,6 +10781,8 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
                 memcpy(Device_Basic_Setting.reg.ip_addr, temp_ip_addr, 4);
                 memcpy(Device_Basic_Setting.reg.subnet, temp_subnet, 4);
                 memcpy(Device_Basic_Setting.reg.gate_addr, temp_gate_addr, 4);
+                memcpy(Device_Basic_Setting.reg.mac_addr, temp_mac_addr, 6);  //20250113修复 固件mac地址被覆盖的问题
+
 
                 memcpy(&GetPrgSetting, cacl_panel, sizeof(Str_Setting_Info));
                 prg_panel = GetPrgSetting.reg.panel_number;

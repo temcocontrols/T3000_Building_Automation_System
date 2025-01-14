@@ -951,47 +951,47 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     //Register热键
 #ifdef _DEBUG //debug版本   
     int nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'I');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + I failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + I failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'O');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + O failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + O failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'V');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + V failure"));
+    //if(!nRet)
+    //   AfxMessageBox(_T("RegisterHotKey ALT + V failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[3],MOD_ALT,'P');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + P failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + P failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[5],MOD_ALT,'L');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + L failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + L failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[6],MOD_ALT,'G');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + G failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + G failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'S');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + S failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + S failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'H');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + H failure"));
+    //if(!nRet)
+     //   AfxMessageBox(_T("RegisterHotKey ALT + H failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[9],MOD_ALT,'T');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + T failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + T failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[10],MOD_ALT,'A');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + A failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + A failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[11],MOD_ALT,'C');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + C failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + C failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[4],MOD_ALT,'R');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + R failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + R failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[12],MOD_ALT,'B');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + R failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + R failure"));
     nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[13],MOD_ALT,'D');
-    if(!nRet)
-        AfxMessageBox(_T("RegisterHotKey ALT + R failure"));
+    //if(!nRet)
+    //    AfxMessageBox(_T("RegisterHotKey ALT + R failure"));
 #ifdef USE_MOD_SHIFT_DF
     nRet = RegisterHotKey(GetSafeHwnd(),1111,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'D'); //热键 ctrl + alt + shift + D
     if(!nRet)
@@ -15715,6 +15715,7 @@ DWORD WINAPI  CMainFrame::DetectYabbeThread(LPVOID lpVoid)
 
 
 #include "BacnetMessageInput.h"
+#include <random>
 void CMainFrame::OnFileNewproject()
 {
 #ifdef LOCAL_DB_FUNCTION
@@ -15739,6 +15740,56 @@ void CMainFrame::OnFileNewproject()
 
 }
 
+std::vector<unsigned char> CreateWebSocketFrame(const CString& message) {
+
+    // Convert the CString to a UTF-8 encoded string
+    int bufferSize = WideCharToMultiByte(CP_UTF8, 0, message, -1, nullptr, 0, nullptr, nullptr);
+    if (bufferSize <= 0) {
+        throw std::runtime_error("Failed to convert CString to UTF-8");
+    }
+
+    std::vector<char> utf8Message(bufferSize);
+    WideCharToMultiByte(CP_UTF8, 0, message, -1, utf8Message.data(), bufferSize, nullptr, nullptr);
+
+    // Create WebSocket frame
+    std::vector<unsigned char> frame;
+
+    // FIN and opcode (0x81 for text frame)
+    frame.push_back(0x81);
+
+    // Mask and payload length, should use uint64_t instead of size_t for 32-bit application
+    uint64_t msgLen = utf8Message.size() - 1; // Exclude null terminator
+    if (msgLen <= 125) {
+        frame.push_back(0x80 | static_cast<unsigned char>(msgLen));
+    }
+    else if (msgLen <= 65535) {
+        frame.push_back(0x80 | 126);
+        frame.push_back((msgLen >> 8) & 0xFF);
+        frame.push_back(msgLen & 0xFF);
+    }
+    else {
+        frame.push_back(0x80 | 127);
+        for (int i = 7; i >= 0; --i) {
+            frame.push_back((msgLen >> (8 * i)) & 0xFF);
+        }
+    }
+
+    // Masking key (securely generated)
+    std::random_device rd;
+    std::uniform_int_distribution<unsigned int> dist(0, 255);
+    unsigned char maskingKey[4];
+    for (int i = 0; i < 4; ++i) {
+        maskingKey[i] = dist(rd);
+    }
+    frame.insert(frame.end(), maskingKey, maskingKey + 4);
+
+    // Mask the payload data
+    for (size_t i = 0; i < msgLen; ++i) {
+        frame.push_back(utf8Message[i] ^ maskingKey[i % 4]);
+    }
+
+    return frame;
+}
 
 int CMainFrame::LoadDeviceData(int nserialnumber)
 {
@@ -15755,12 +15806,10 @@ DWORD WINAPI  CMainFrame::CreateWebServerThreadfun(LPVOID lpVoid)
     return 0;
 
 }
-extern void HandleWebViewMsg(CString msg, CString &outmsg);
+extern void HandleWebViewMsg(CString msg, CString &outmsg , int msg_source = 0);
 DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
 {
-    //BacnetScreen* pParent = (BacnetScreen*)lpVoid;
     // 初始化 Winsock
-   // 初始化 Winsock
     Sleep(5000);
     WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -15825,10 +15874,10 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
 
     // 循环接收和处理数据
     while (true) {
+        memset(recvbuf, 0, 2048);
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
         if (iResult > 0) 
         {
-            recvbuf[iResult] = '\0'; // Null-terminate the received data
             TRACE("Bytes received: %d\r\n%s\r\n", iResult, recvbuf);
 
             // 检查接收到的数据并做出应答
@@ -15837,9 +15886,14 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
             {
                 Sleep(2000);
                 CString handshakeConfirm;
-                handshakeConfirm = _T("{\"header\":{\"clientId\":\" - \",\"from\":\"T3\"},\"message\":{\"action\":-1,\"clientId\":\"11111111 - 1111 - 1111 - 1111 - 111111111111\"}}");
-                WideCharToMultiByte(CP_ACP, 0, handshakeConfirm.GetBuffer(), -1, sendbuf, 2048, NULL, NULL);
-                iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+                handshakeConfirm = _T("{\"header\":{\"from\":\"T3\"},\"message\":{\"action\":13,\"clientId\":\"11111111-1111-1111-1111-111111111111\"}}");
+                
+                /*WideCharToMultiByte(CP_UTF8, 0, handshakeConfirm.GetBuffer(), -1, sendbuf, 2048, NULL, NULL);
+                iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);*/
+
+                vector<unsigned char> wsFrame= CreateWebSocketFrame(handshakeConfirm);
+                iResult = send(ConnectSocket, reinterpret_cast<const char*>(wsFrame.data()), wsFrame.size(), 0);
+
                 if (iResult == SOCKET_ERROR) 
                 {
                     TRACE("send failed: %d\n", WSAGetLastError());
@@ -15853,23 +15907,24 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
             {
                 std::string filteredData = receivedData.substr(2);
                 // 检查从第三个字节开始的数据是否与 {" 一模一样
-                if (filteredData.find("{\"") == 0)
-                {
-                    //调用别的函数处理数据
-                    CString msg = CString(filteredData.c_str());
-                    CString outmsg;
-                    HandleWebViewMsg(msg, outmsg);
-                    WideCharToMultiByte(CP_ACP, 0, outmsg.GetBuffer(), -1, sendbuf, 2048, NULL, NULL);
-                    Sleep(1);
-                       iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
-                       if (iResult == SOCKET_ERROR) 
-                       {
-                           TRACE("send failed: %d\n", WSAGetLastError());
-                           closesocket(ConnectSocket);
-                           WSACleanup();
-                           return 1;
-                       }
-                       TRACE("%d\r\n", sendbuf);
+				if (filteredData.find("{\"") == 0)
+				{
+					//调用别的函数处理数据
+					CString msg = CString(filteredData.c_str());
+					CString outmsg;
+					HandleWebViewMsg(msg, outmsg,1); //msg_source = 1 代表来自外部浏览器的消息， 需要根据panel 还有index 来加载对应的 data
+
+					vector<unsigned char> wsFrame = CreateWebSocketFrame(outmsg);
+					iResult = send(ConnectSocket, reinterpret_cast<const char*>(wsFrame.data()), wsFrame.size(), 0);
+
+					if (iResult == SOCKET_ERROR)
+					{
+						TRACE("send failed: %d\n", WSAGetLastError());
+						closesocket(ConnectSocket);
+						WSACleanup();
+						return 1;
+					}
+					TRACE("%d\r\n", sendbuf);
 				}
             }
            

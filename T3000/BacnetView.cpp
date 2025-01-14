@@ -9,6 +9,9 @@ MSFLXGRD.MSM
 COMCAT.MSM
 拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
 
+2025 01 13 
+1. Load prog时 避免改变T3 ARM设备的Mac地址
+
 2024 02 22
 1. Fixed an issue where the transducer  could not change the temperature range
 2. Fixed the ESP32 device cannot be accessed through the network normally when the object instance is abnormal.
