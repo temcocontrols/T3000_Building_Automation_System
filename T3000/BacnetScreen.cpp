@@ -1984,7 +1984,7 @@ void BacnetScreen::OnBnClickedWebViewShow()
 
 	}
 
-	int read_ret = Read_Struct_Data();
+	int read_ret = Read_Webview_Data();
 	if (read_ret <= 0)
 	{
 		if (read_ret == -2)
@@ -2069,8 +2069,127 @@ int BacnetScreen::StructToJsonData()
 #endif
 }
 
+int Read_Webview_Data_Special(int panelid,UINT nserialnumber,int nscreenindex)
+{
+	//g_Device_Basic_Setting
+	int handle_device_instance = 0;
+	for (int i = 0; i < g_bacnet_panel_info.size(); i++)
+	{
+		if ((nserialnumber == g_bacnet_panel_info.at(i).nseiral_number) && (panelid == g_bacnet_panel_info.at(i).panel_number))
+		{
+			handle_device_instance = g_bacnet_panel_info.at(i).object_instance;
+			break;
+		}
+	}
 
-int  BacnetScreen::Read_Struct_Data()
+	if(handle_device_instance == 0)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Can't find the device instance!"));
+		return -1;
+	}
+
+
+	if (GetPrivateDataSaveSPBlocking(handle_device_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
+	{
+		memcpy(&g_Device_Basic_Setting[panelid], &s_Basic_Setting, sizeof(Str_Setting_Info));
+	}
+	else
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
+		return -1;
+	}
+
+	if(g_Device_Basic_Setting[panelid].reg.pro_info.firmware0_rev_main * 10 + g_Device_Basic_Setting[panelid].reg.pro_info.firmware0_rev_sub < WEBVIEW_JSON_FEATURE)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The device doesn't support this feature . need update firmware!"));
+		return -1;
+	}
+
+
+	//
+	CString temp_item_out;
+	CString  des_file_out;
+	temp_item_out.Format(_T("%u_%d_out.zip"), nserialnumber, nscreenindex);
+	des_file_out = selected_image_fordor + _T("\\") + temp_item_out;
+	char temp_des_file_out[MAX_PATH] = { 0 };
+	WideCharToMultiByte(CP_ACP, 0, des_file_out.GetBuffer(), -1, temp_des_file_out, MAX_PATH, NULL, NULL);
+
+	int test_count2 = GetPrivateDataSaveSPBlocking(handle_device_instance, READ_JSON_SCREEN, nscreenindex, nscreenindex, sizeof(Str_t3_screen_Json));
+	if (test_count2 < 0)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
+		return -1;
+	}
+	memcpy(&g_json_screen_data[panelid].at(screen_list_line), &s_json_screen_data, sizeof(Str_t3_screen_Json));
+
+	int data_point_length = g_json_screen_data[panelid].at(screen_list_line).file_data.zip_size;
+	if (data_point_length == 0)
+		return -2;
+#if 0
+	char* temp_buffer = new char[data_point_length];
+	memset(temp_buffer, 0, data_point_length);
+	int read_counts = 10;
+	int temp_json_item_group = (read_counts + BAC_READ_JSON_ITEM_GROUP_NUMBER - 1) / BAC_READ_JSON_ITEM_GROUP_NUMBER;
+	CString Mession_ret;
+	int end_temp_instance = 0;
+	for (int i = 0; i < temp_json_item_group; i++) //这里暂时是从0 index 开始读取的
+	{
+		end_temp_instance = BAC_READ_JSON_ITEM_REMAINDER + (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i + screen_list_line * 10;
+		if (end_temp_instance >= screen_list_line * 10 + 9)
+			end_temp_instance = screen_list_line * 10 + 9;
+
+		int start_index = screen_list_line * 10 + (BAC_READ_JSON_ITEM_GROUP_NUMBER)*i;
+		if (GetPrivateData_Blocking(g_bac_instance, READ_JSON_ITEM, start_index, end_temp_instance, sizeof(Str_item_Json)) > 0)
+		{
+			Mession_ret.Format(_T("Read webview data from %d to %d success."), start_index, end_temp_instance);
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+			//write_success_count++;
+			if (!offline_mode)
+				Sleep(SEND_COMMAND_DELAY_TIME);
+		}
+		else
+		{
+			Mession_ret.Format(_T("Read webview data from %d to %d timeout."), start_index, end_temp_instance);
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+			return -3;
+		}
+
+	}
+
+	char* temp_char = temp_buffer;
+	int already_copy = 0;
+	for (int j = screen_list_line * 10; j < screen_list_line * 10 + 10; j++) //暂时只考虑第0个开始;
+	{
+		if (data_point_length <= 200)
+		{
+			memcpy(temp_char, m_json_item_data.at(j).all, data_point_length);
+			already_copy = already_copy + data_point_length;
+			break;
+		}
+		else
+		{
+			int last_length = data_point_length % 200;
+			if (already_copy != (data_point_length - last_length))
+			{
+				memcpy(temp_char, m_json_item_data.at(j).all, 200);
+				temp_char = temp_char + 200;
+				already_copy = already_copy + 200;
+			}
+			else
+			{
+				memcpy(temp_char, m_json_item_data.at(j).all, last_length);
+				temp_char = temp_char + last_length;
+				already_copy = already_copy + last_length;
+				break;
+			}
+		}
+
+	}
+#endif
+	return 1;
+}
+
+int  BacnetScreen::Read_Webview_Data()
 {
 	if ((Device_Basic_Setting.reg.webview_json_flash == 2) &&//这里要判断是2
 		(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= WEBVIEW_JSON_FEATURE)) //643 版本会有这个功能

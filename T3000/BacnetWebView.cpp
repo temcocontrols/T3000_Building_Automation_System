@@ -1105,11 +1105,26 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		{
 			grp_serial_number = g_selected_serialnumber; 
 			grp_index = screen_list_line;
+			panel_id = bac_gloab_panel;
 		}
 		else if(msg_source == 1)//来自浏览器
 		{
 			panel_id = json.get("panelId", Json::nullValue).asInt(); //这里要根据panelId来判断是那个序列号的设备，进而确定保存的文件名
 			grp_index = json.get("viewitem", Json::nullValue).asInt(); //这里如果是按键点进来的，要用T3000的index ，如果是 浏览器的 要浏览器的index
+			grp_serial_number = json.get("serialNumber", Json::nullValue).asInt();
+			//浏览器这里要调用一个函数，根据panel_id 和 grp_index 以及序列号 读取对应的panel的 绘图数据的zip文件并解压;
+			
+			if ((panel_id <= 0) || (panel_id > 254))
+			{
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
+				break;
+			}
+
+			if (grp_index < 0)
+			{
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
+				break;
+			}
 		}
 		else
 		{
@@ -1163,9 +1178,9 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		else if (action == GET_INITIAL_DATA)
 		{
 			tempjson["action"] = "GET_INITIAL_DATA_RES";
-			panel_id = bac_gloab_panel;
-			grp_serial_number = g_selected_serialnumber;
-			grp_index = screen_list_line;
+			//panel_id = bac_gloab_panel;
+			//grp_serial_number = g_selected_serialnumber;
+			//grp_index = screen_list_line;
 		}
 		tempjson["entry"]["pid"] = bac_gloab_panel;
 		tempjson["entry"]["index"] = grp_index;

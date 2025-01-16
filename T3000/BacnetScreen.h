@@ -55,7 +55,7 @@ public:
 	bool window_max; // 标记是否已经最大化;
 	void OnBnClickedWebViewShow();
 	void OnBnClickedClearScreenData();
-	int  Read_Struct_Data();
+	int  Read_Webview_Data();
 	int StructToJsonData();
 	int CheckOldGraphic();
 	bool run_old_graphic_screen();

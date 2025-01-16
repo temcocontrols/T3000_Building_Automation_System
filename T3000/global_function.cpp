@@ -3671,11 +3671,31 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (BAC_SCREEN_COUNT - 1))
             end_flag = true;
 
-        for (i = start_instance; i <= end_instance; i++)
+
+        if (invoke_id == gsp_invoke)
         {
-            memcpy(&m_json_screen_data.at(i), my_temp_point, sizeof(Str_t3_screen_Json));     
-            my_temp_point = my_temp_point + sizeof(Str_t3_screen_Json);
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                memcpy(&s_json_screen_data, my_temp_point, sizeof(Str_t3_screen_Json));
+                my_temp_point = my_temp_point + sizeof(Str_t3_screen_Json);
+            }
         }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                if (i >= m_json_screen_data.size())
+                {
+                    TRACE(_T("receive json screen out of range!"));
+                    break;
+                }
+                memcpy(&m_json_screen_data.at(i), my_temp_point, sizeof(Str_t3_screen_Json));
+                my_temp_point = my_temp_point + sizeof(Str_t3_screen_Json);
+            }
+        }
+
+
+
     }
     break;
     case READ_JSON_ITEM:

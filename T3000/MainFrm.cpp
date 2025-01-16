@@ -1130,12 +1130,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 
     PostMessage(WM_CREATE_STATUSBAR,0,0);
-    CString image_fordor;
-    image_fordor = temp_ApplicationFolder + _T("\\Database\\Buildings\\") + m_strCurMainBuildingName + _T("\\image");
+
+    selected_image_fordor = temp_ApplicationFolder + _T("\\Database\\Buildings\\") + m_strCurMainBuildingName + _T("\\image");
     CFileFind temp_find;
-    if(temp_find.FindFile(image_fordor) == 0)
+    if(temp_find.FindFile(selected_image_fordor) == 0)
     {
-        CreateDirectory(image_fordor,NULL);
+        CreateDirectory(selected_image_fordor,NULL);
     }
 	hThread = CreateThread(NULL, NULL, Get_All_Dlg_Message, this, NULL, &nThreadID);
 	hDeal_thread = CreateThread(NULL, NULL, Translate_My_Message, this, NULL, &nThreadID_Do);
@@ -15740,6 +15740,66 @@ void CMainFrame::OnFileNewproject()
 
 }
 
+
+std::string ProcessWebSocketFrame(const std::vector<uint8_t>& recvbuf) {
+    std::string message;
+
+    if (recvbuf.size() < 2) {
+        return message; // Invalid frame
+    }
+
+    bool fin = recvbuf[0] & 0x80;
+    uint8_t opcode = recvbuf[0] & 0x0F;
+    bool mask = recvbuf[1] & 0x80;
+    uint64_t payloadLength = recvbuf[1] & 0x7F;
+
+    size_t pos = 2;
+
+    if (payloadLength == 126) {
+        if (recvbuf.size() < 4) {
+            return message; // Invalid frame
+        }
+        payloadLength = (recvbuf[2] << 8) | recvbuf[3];
+        pos += 2;
+    }
+    else if (payloadLength == 127) {
+        if (recvbuf.size() < 10) {
+            return message; // Invalid frame
+        }
+        payloadLength = 0;
+        for (int i = 0; i < 8; ++i) {
+            payloadLength = (payloadLength << 8) | recvbuf[2 + i];
+        }
+        pos += 8;
+    }
+
+    if (mask) {
+        if (recvbuf.size() < pos + 4) {
+            return message; // Invalid frame
+        }
+        std::vector<uint8_t> maskingKey(recvbuf.begin() + pos, recvbuf.begin() + pos + 4);
+        pos += 4;
+
+        if (recvbuf.size() < pos + payloadLength) {
+            return message; // Invalid frame
+        }
+
+        message.resize(payloadLength);
+        for (size_t i = 0; i < payloadLength; ++i) {
+            message[i] = recvbuf[pos + i] ^ maskingKey[i % 4];
+        }
+    }
+    else {
+        if (recvbuf.size() < pos + payloadLength) {
+            return message; // Invalid frame
+        }
+        message.insert(message.end(), recvbuf.begin() + pos, recvbuf.begin() + pos + payloadLength);
+    }
+
+    return message;
+}
+
+
 std::vector<unsigned char> CreateWebSocketFrame(const CString& message) {
 
     // Convert the CString to a UTF-8 encoded string
@@ -15881,7 +15941,8 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
             TRACE("Bytes received: %d\r\n%s\r\n", iResult, recvbuf);
 
             // 检查接收到的数据并做出应答
-            std::string receivedData(recvbuf);
+            std::string receivedData = ProcessWebSocketFrame(std::vector<uint8_t>(recvbuf, recvbuf + iResult));
+            //std::string receivedData(recvbuf);
             if (receivedData.find("Switching Protocols") != std::string::npos) 
             {
                 Sleep(2000);
@@ -15901,7 +15962,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
                     WSACleanup();
                     return 1;
                 }
-                TRACE("%s\r\n", sendbuf);
+                TRACE(handshakeConfirm + _T("\r\n"));
             }
             else if (receivedData.length() > 6)
             {
@@ -15928,7 +15989,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
                             WSACleanup();
                             return 1;
                         }
-                        TRACE("%d\r\n", sendbuf);
+                        TRACE(outmsg + _T("\r\n"));
                         break;
                     }
                     else

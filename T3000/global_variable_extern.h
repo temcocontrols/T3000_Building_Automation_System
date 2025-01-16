@@ -69,6 +69,7 @@ extern unsigned int g_serialNum;
 extern	BOOL g_tstat_id_changed;
 extern  BOOL g_bPauseMultiRead;     // for background read register
 extern  int now_tstat_id;//for batch load/flash read/write
+extern  CString selected_image_fordor; //选中building的目录;
 extern  CString g_strImagePathName;
 extern	CString	g_strDatabasefilepath;
 extern	CString g_strExePth;
@@ -1048,6 +1049,7 @@ extern Str_array_point s_Array_data;
 extern Str_weekly_routine_point s_Weekly_data;
 extern Str_annual_routine_point s_Annual_data;
 extern Control_group_point s_screen_data;
+extern Str_t3_screen_Json s_json_screen_data;
 extern vector <_panel_info> g_bacnet_panel_info; //全局的 object instance 与 panel number 对应的容器
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;                             
