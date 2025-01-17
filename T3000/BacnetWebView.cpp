@@ -36,6 +36,8 @@ extern "C" {
 using namespace Microsoft::WRL;
 size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
 char* base64_decode(char const* base64Str, char* debase64Str, int encodeStrLen);
+extern int Read_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex);
+extern int Write_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex,int element_count);
 //enum WEBVIEW_MESSAGE_TYPE
 //{
 //    READ_VARIABLES = 0,
@@ -688,79 +690,6 @@ HRESULT BacnetWebViewAppWindow::ExecuteScriptResponse(HRESULT errorCode, LPCWSTR
 
 CString empty_grp_file = _T("{\"activeItemIndex\":null,\"customObjectsCount\":0,\"elementGuidelines\":[],\"groupCount\":0,\"items\":[],\"itemsCount\":0,\"selectedTargets\":[],\"version\":\"0.4.4\",\"viewportTransform\":{\"scale\":1,\"x\":0,\"y\":0}} ");
 
-int BacnetWebViewAppWindow::JsonDataToStruct(std::string file_output)
-{
-	return 1;
-#ifndef  DISABLE_HANDLE_JSON_DATA
-	nlohmann::json jsonData = nlohmann::json::parse(file_output);
-	Str_Json Str_MyJson(jsonData);
-	int n_screen_index = screen_list_line;
-	if (n_screen_index >= BAC_SCREEN_COUNT)
-		return -2;
-	m_json_screen_data.at(screen_list_line).reg.activeItemIndex = Str_MyJson.activeItemIndex;
-	m_json_screen_data.at(screen_list_line).reg.customObjectsCount = Str_MyJson.customObjectsCount;
-	m_json_screen_data.at(screen_list_line).reg.groupCount = Str_MyJson.groupCount;
-	m_json_screen_data.at(screen_list_line).reg.itemsCount = Str_MyJson.itemsCount;
-	m_json_screen_data.at(screen_list_line).reg.ncount = Str_MyJson.ncount;
-	//m_json_screen_data.at(screen_list_line).reg.ntranslate_count = Str_MyJson.ntranslate_count;
-	strcpy_s(m_json_screen_data.at(screen_list_line).reg.version, JSON_STRING_LENGTH, Str_MyJson.version);
-	memcpy(&m_json_screen_data.at(screen_list_line).reg.viewportTransform, &Str_MyJson.viewportTransform, 3);
-
-	bool find_avaiable_index = 0; 
-	int look_for_index = 0; //第二层遍历的位置；
-	for (int i = 0; i < m_json_screen_data.at(screen_list_line).reg.ncount; i++)
-	{
-
-
-		for (int j = look_for_index ; j < BAC_GRPHIC_JSON_ITEM_COUNT; j++)
-		{
-			//遍历每个item 将他们依次填充到80个item中 ,255未使用可以填充，本screen 的也可以，其他跳过寻找下一个
-			if ((m_json_item_data.at(j).reg.json_items.item_belong_screen == 255) ||
-				(m_json_item_data.at(j).reg.json_items.item_belong_screen == screen_list_line))
-			{
-				//找到可用的就存在序号J 的位置
-				find_avaiable_index = true;
-				look_for_index = j + 1; //下一个循环 从下一个位置开始寻找 能塞得进去的点;
-				m_json_item_data.at(j).reg.json_items.item_belong_screen = screen_list_line;
-				m_json_item_data.at(j).reg.json_items.active = Str_MyJson.m_data_item[i].active;
-				m_json_item_data.at(j).reg.json_items.group = Str_MyJson.m_data_item[i].group;
-				m_json_item_data.at(j).reg.json_items.height = Str_MyJson.m_data_item[i].height;
-				m_json_item_data.at(j).reg.json_items.id = Str_MyJson.m_data_item[i].id;
-				m_json_item_data.at(j).reg.json_items.ntranslate_count = Str_MyJson.m_data_item[i].ntranslate_count;
-				m_json_item_data.at(j).reg.json_items.rotate = Str_MyJson.m_data_item[i].rotate;
-				m_json_item_data.at(j).reg.json_items.scaleX = Str_MyJson.m_data_item[i].scaleX;
-				m_json_item_data.at(j).reg.json_items.scaleY = Str_MyJson.m_data_item[i].scaleY;
-				memcpy(&m_json_item_data.at(j).reg.json_items.settings, &Str_MyJson.m_data_item[i].settings,sizeof(str_settings));
-				strcpy_s(m_json_item_data.at(j).reg.json_items.strtype, 20, Str_MyJson.m_data_item[i].strtype);
-				strcpy_s(m_json_item_data.at(j).reg.json_items.title, JSON_STRING_LENGTH, ""); //Str_MyJson.m_data_item[i].title
-				if(m_json_item_data.at(j).reg.json_items.ntranslate_count > 0)
-					memcpy(m_json_item_data.at(j).reg.json_items.translate,  Str_MyJson.m_data_item[i].translate, 4 * m_json_item_data.at(j).reg.json_items.ntranslate_count);
-				m_json_item_data.at(j).reg.json_items.width = Str_MyJson.m_data_item[i].width;
-				m_json_item_data.at(j).reg.json_items.zindex = Str_MyJson.m_data_item[i].zindex;
-				m_json_item_data.at(j).reg.json_items.t3_Entrys.index = Str_MyJson.m_data_item[i].t3_Entrys.index;
-				m_json_item_data.at(j).reg.json_items.t3_Entrys.ntype = Str_MyJson.m_data_item[i].t3_Entrys.ntype;
-				m_json_item_data.at(j).reg.json_items.t3_Entrys.pid = Str_MyJson.m_data_item[i].t3_Entrys.pid;
-				break;
-			}
-			else
-			{
-				continue;
-			}
-
-
-		}
-		if (!find_avaiable_index)
-		{
-			return -1; //没有多余可用的
-			break;
-		}
-	}
-
-	
-	//m_json_item_data
-	return 1;
-#endif
-}
 
 
 void WrapErrorMessage(Json::StreamWriterBuilder& builder, const Json::Value& tempjson, CString& outmsg, const CString& error_message) {
@@ -1125,6 +1054,12 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
 				break;
 			}
+			int n_read_result = Read_Webview_Data_Special(panel_id, grp_serial_number, grp_index );
+			if (n_read_result < 0)
+			{
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Read panel data timeout."));
+				break;
+			}
 		}
 		else
 		{
@@ -1273,14 +1208,37 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
 	{
 		int panelId = json.get("panelId", Json::nullValue).asInt(); //这里要根据panelId来判断是那个序列号的设备，进而确定保存的文件名
-		int save_grp_index = json.get("viewitem", Json::nullValue).asInt();
+		int save_grp_index = -1;
 
+		
+		if (msg_source == 0)//来自T3000按键点击
+		{
+			grp_serial_number = g_selected_serialnumber; //暂时用这个代替
+			save_grp_index = screen_list_line;
+			save_button_click = 1;
+		}
+		else if (msg_source == 1)//来自浏览器
+		{
+			grp_serial_number = json.get("serialNumber", Json::nullValue).asInt();
+			save_grp_index = json.get("viewitem", Json::nullValue).asInt();
+		}
+		else
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Message Source Error."));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
+			break;
+		}
+		
+		if ((save_grp_index < 0) || (save_grp_index > 7))
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Viewitem out of range."));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Viewitem out of range."));
+			break;
+		}
+		
 
-		grp_serial_number = g_selected_serialnumber; //暂时用这个代替
-		grp_index = screen_list_line;
-
-		temp_item.Format(_T("%u_%d.txt"), grp_serial_number, grp_index);
-		temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, grp_index);
+		temp_item.Format(_T("%u_%d.txt"), grp_serial_number, save_grp_index);
+		temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, save_grp_index);
 
 		des_file = image_fordor + _T("\\") + temp_item;
 		des_file_zip = image_fordor + _T("\\") + temp_item_zip;
@@ -1295,19 +1253,22 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			WrapErrorMessage(builder, tempjson, outmsg, _T("No data to save."));
 			break;
 		}
-		m_screen_data.at(screen_list_line).webview_element_count = temp_elementcount;
-		n_ret = Write_Private_Data_Blocking(WRITESCREEN_T3000, screen_list_line, screen_list_line, g_bac_instance);
-		if (n_ret > 0)
-		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write element count success."));
-		}
-		else
-		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write element count timeout."));
-			WrapErrorMessage(builder, tempjson, outmsg, _T("Write element count timeout."));
-			break;
 
-		}
+
+
+		//m_screen_data.at(screen_list_line).webview_element_count = temp_elementcount;
+		//n_ret = Write_Private_Data_Blocking(WRITESCREEN_T3000, screen_list_line, screen_list_line, g_bac_instance);
+		//if (n_ret > 0)
+		//{
+		//	SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write element count success."));
+		//}
+		//else
+		//{
+		//	SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write element count timeout."));
+		//	WrapErrorMessage(builder, tempjson, outmsg, _T("Write element count timeout."));
+		//	break;
+
+		//}
 
 
 		CFile file;
@@ -1331,13 +1292,25 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to store data!"));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Failed to store data!"));
+			break;
 		}
 		else
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data from flash success!"));
 		}
 		Sleep(1);
-		save_button_click = 1;
+
+		//这里涉及到写设备的动作 发消息放到线程中去做。避免界面卡死，以及影响其他消息收发;
+		//这里要根据不同的panel 对不同设备进行保存 .
+		int n_write_result =  Write_Webview_Data_Special(panelId, grp_serial_number, save_grp_index, temp_elementcount);
+		if (n_write_result < 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to store data!"));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Failed to store data!"));
+			break;
+		}
+
+		
 
 		break;
 	}

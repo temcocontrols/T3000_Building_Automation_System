@@ -10773,6 +10773,8 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         //m_backbround_data.at(data_index_info->ndataindex).
                     }
                 }
+                delete groupdata_struct;
+                delete data_index_info;
 
             }
                 break;
@@ -14723,7 +14725,8 @@ void CMainFrame::Reset_Window_Pos()
 	{
 		CRect temprec;
 		m_wndStatusBar.GetWindowRect(&temprec);
-		if((temprec.top >0) && (temprec.bottom >0) && (temprec.left >0) && (temprec.right > 0))
+
+		//if((temprec.top >0) && (temprec.bottom >0) && (temprec.left >0) && (temprec.right > 0))
 			statusbar->SetWindowPos(&wndNoTopMost,temprec.left,temprec.top,temprec.Width(),temprec.Height(),SWP_NOACTIVATE | SWP_SHOWWINDOW );
 		if(((CBacnetInput *)pDialog[WINDOW_INPUT]) != NULL)
 		{

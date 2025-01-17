@@ -149,8 +149,7 @@ private:
     HBITMAP m_appBackgroundImageHandle;
     BITMAP m_appBackgroundImage;
     HDC m_memHdc;
-    public:
-        int JsonDataToStruct(std::string file_output);
+ 
 
 };
 

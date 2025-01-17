@@ -1050,6 +1050,7 @@ extern Str_weekly_routine_point s_Weekly_data;
 extern Str_annual_routine_point s_Annual_data;
 extern Control_group_point s_screen_data;
 extern Str_t3_screen_Json s_json_screen_data;
+extern Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //缓存其他panel json item 值的 全局变量;
 extern vector <_panel_info> g_bacnet_panel_info; //全局的 object instance 与 panel number 对应的容器
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;                             
@@ -1092,7 +1093,7 @@ extern vector <Scan_Info> m_scan_info_buffer;
 extern vector <Client_Info> m_tcp_connect_info;
 extern vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
 extern vector <Str_t3_screen_Json> m_json_screen_data;		extern	vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen的信息要存在设备里面;
-extern vector <Str_item_Json> m_json_item_data;			extern    vector < vector<Str_item_Json> >			  g_graphic_item_data;//item的信息要存在设备里面;
+extern vector <Str_item_Json> m_json_item_data;			extern    vector < vector<Str_item_Json> >			  g_json_item_data;//item的信息要存在设备里面;
 extern vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
 extern vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 新的setpoint表格; 以前的完全改不动了;
 extern Str_Setting_Info s_Basic_Setting;

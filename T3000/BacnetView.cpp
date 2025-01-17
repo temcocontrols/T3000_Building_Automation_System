@@ -2079,6 +2079,8 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 		g_variable_analog_unite.push_back(m_variable_analog_unite);
 		g_msv_data.push_back(m_msv_data);
 		g_Schedual_time_flag.push_back(m_Schedual_time_flag);
+		g_json_screen_data.push_back(m_json_screen_data);
+		g_json_item_data.push_back(m_json_item_data);
 	}
 	//g_Input_data[3].at(1).value = 2;
 	//Tab_Initial();

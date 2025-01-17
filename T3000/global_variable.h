@@ -1959,6 +1959,9 @@ Str_weekly_routine_point s_Weekly_data;
 Str_annual_routine_point s_Annual_data;
 Control_group_point s_screen_data;
 Str_t3_screen_Json s_json_screen_data;
+Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //缓存其他panel json item 值的 全局变量;
+
+
 vector <_panel_info> g_bacnet_panel_info;  //全局的 object instance 与 panel number 对应的容器
 vector <Str_out_point> m_Output_data;					vector < vector<Str_out_point> >			  g_Output_data; //全局所有panel output 的集合体;
 vector <Str_in_point>  m_Input_data;					vector < vector<Str_in_point> >				  g_Input_data; //全局所有panel input 的集合体;
@@ -1978,7 +1981,7 @@ vector <Str_userlogin_point> m_user_login_data;			vector < vector<Str_userlogin_
 vector <Alarm_point> m_alarmlog_data;					vector < vector<Alarm_point> >				  g_alarmlog_data;
 vector <Str_label_point> m_graphic_label_data;			vector < vector<Str_label_point> >			  g_graphic_label_data;//图片里面的Label的信息要存在设备里面;
 vector <Str_t3_screen_Json> m_json_screen_data;			vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen的信息要存在设备里面;
-vector <Str_item_Json> m_json_item_data;			    vector < vector<Str_item_Json> >			  g_graphic_item_data;//item的信息要存在设备里面;
+vector <Str_item_Json> m_json_item_data;			    vector < vector<Str_item_Json> >			  g_json_item_data;//item的信息要存在设备里面;
 vector <Str_Units_element> m_customer_unit_data;        vector < vector<Str_Units_element> >		  g_customer_unit_data;
 vector <Str_table_point> m_analog_custmer_range;		vector < vector<Str_table_point> >		      g_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite; vector < vector<Str_variable_uint_point> >  g_variable_analog_unite;

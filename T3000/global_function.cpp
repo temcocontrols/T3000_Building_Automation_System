@@ -1074,6 +1074,7 @@ int SearchDataIndexByPanel(unsigned char panel_id, int command_type, int npoint)
     return -1;
 }
 
+
 int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata write_data)
 {
     if (read_write_bacnet_config)	//在读写Bacnet config 的时候禁止刷新List;
@@ -1754,13 +1755,22 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 			}
 		}
 		break;
-    case WRITE_JSON_SCREEN:
-        {
-            for (int i = 0; i < (end_instance - start_instance + 1); i++)
-            {
-                memcpy_s(SendBuffer + i * sizeof(Str_t3_screen_Json) + HEADER_LENGTH, sizeof(Str_t3_screen_Json), &m_json_screen_data.at(i + start_instance), sizeof(Str_t3_screen_Json));
-            }
-        }
+	case WRITE_JSON_SCREEN:
+	{
+		if (ext_data == NULL)
+		{
+			for (int i = 0; i < (end_instance - start_instance + 1); i++)
+			{
+				memcpy_s(SendBuffer + i * sizeof(Str_t3_screen_Json) + HEADER_LENGTH, sizeof(Str_t3_screen_Json), &m_json_screen_data.at(i + start_instance), sizeof(Str_t3_screen_Json));
+			}
+		}
+		else
+		{
+			memcpy_s(SendBuffer + HEADER_LENGTH, (end_instance - start_instance + 1) * sizeof(Str_t3_screen_Json), ext_data, (end_instance - start_instance + 1) * sizeof(Str_t3_screen_Json));
+		}
+
+
+	}
         break;
     case WRITE_JSON_ITEM:
         {
@@ -1938,7 +1948,14 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     break;
     case WRITE_SETTING_COMMAND:
     {
-        memcpy_s(SendBuffer + HEADER_LENGTH,sizeof(Str_Setting_Info),&Device_Basic_Setting,sizeof(Str_Setting_Info));
+        if (ext_data == NULL)
+        {
+            memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_Setting_Info), &Device_Basic_Setting, sizeof(Str_Setting_Info));
+        }
+        else
+        {
+            memcpy_s(SendBuffer + HEADER_LENGTH, (end_instance - start_instance + 1) * sizeof(Str_Setting_Info), ext_data, (end_instance - start_instance + 1) * sizeof(Str_Setting_Info));
+        }     
     }
     break;
     case WRITEPID_T3000:
@@ -3712,10 +3729,33 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (BAC_GRPHIC_JSON_ITEM_COUNT - 1))
             end_flag = true;
 
-        for (i = start_instance; i <= end_instance; i++)
+
+
+        if (invoke_id == gsp_invoke)
         {
-            memcpy(&m_json_item_data.at(i), my_temp_point, sizeof(Str_item_Json));
-            my_temp_point = my_temp_point + sizeof(Str_item_Json);
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                if (i >= BAC_GRPHIC_JSON_ITEM_COUNT)
+                {
+                    TRACE(_T("receive json webview item out of range!"));
+                    break;
+                }
+                memcpy(&s_json_item_data[i], my_temp_point, sizeof(Str_item_Json));
+                my_temp_point = my_temp_point + sizeof(Str_item_Json);
+            }
+        }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                if(i>= BAC_GRPHIC_JSON_ITEM_COUNT)
+                {
+                    TRACE(_T("receive json webview item out of range!"));
+                    break;
+                }
+                memcpy(&m_json_item_data.at(i), my_temp_point, sizeof(Str_item_Json));
+                my_temp_point = my_temp_point + sizeof(Str_item_Json);
+            }
         }
     }
         break;
