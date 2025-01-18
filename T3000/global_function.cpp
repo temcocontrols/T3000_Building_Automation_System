@@ -1773,13 +1773,21 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 	}
         break;
     case WRITE_JSON_ITEM:
-        {
-            for (int i = 0; i < (end_instance - start_instance + 1); i++)
-            {
-                memcpy_s(SendBuffer + i * sizeof(Str_item_Json) + HEADER_LENGTH, sizeof(Str_item_Json), &m_json_item_data.at(i + start_instance), sizeof(Str_item_Json));
-            }
-        }
-        break;
+	{
+		if (ext_data == NULL)
+		{
+			for (int i = 0; i < (end_instance - start_instance + 1); i++)
+			{
+				memcpy_s(SendBuffer + i * sizeof(Str_item_Json) + HEADER_LENGTH, sizeof(Str_item_Json), &m_json_item_data.at(i + start_instance), sizeof(Str_item_Json));
+			}
+		}
+		else
+		{
+            memcpy_s(SendBuffer + HEADER_LENGTH, (end_instance - start_instance + 1) * sizeof(Str_item_Json), ext_data, (end_instance - start_instance + 1) * sizeof(Str_item_Json));
+		}
+
+	}
+	break;
     case  WRITE_GRPHIC_LABEL_COMMAND:
         for (int i=0; i<(end_instance - start_instance + 1); i++)
         {
@@ -1965,9 +1973,16 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         }
         break;
     case WRITESCREEN_T3000:
-        for (int i=0; i<(end_instance-start_instance + 1); i++)
+        if (ext_data == NULL)
         {
-            memcpy_s(SendBuffer + i*sizeof(Control_group_point) + HEADER_LENGTH,sizeof(Control_group_point),&m_screen_data.at(i + start_instance),sizeof(Control_group_point));
+            for (int i = 0; i < (end_instance - start_instance + 1); i++)
+            {
+                memcpy_s(SendBuffer + i * sizeof(Control_group_point) + HEADER_LENGTH, sizeof(Control_group_point), &m_screen_data.at(i + start_instance), sizeof(Control_group_point));
+            }
+        }
+        else
+        {
+            memcpy_s(SendBuffer + HEADER_LENGTH, (end_instance - start_instance + 1) * sizeof(Control_group_point), ext_data, (end_instance - start_instance + 1) * sizeof(Control_group_point));
         }
         break;
     case WRITEMONITOR_T3000:

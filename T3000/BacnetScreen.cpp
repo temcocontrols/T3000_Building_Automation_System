@@ -2209,7 +2209,7 @@ int Write_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex
 		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Can't find the device instance!"));
 		return -1;
 	}
-	g_screen_data[panelid].at(nscreenindex).webview_element_count = 1;
+	g_screen_data[panelid].at(nscreenindex).webview_element_count = element_count;
 	int n_ret = WritePrivateData_Blocking(handle_device_instance, WRITESCREEN_T3000, nscreenindex, nscreenindex, 5, (char*)&g_screen_data.at(panelid).at(nscreenindex));
 
 	if (n_ret > 0)

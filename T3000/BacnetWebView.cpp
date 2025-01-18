@@ -2006,6 +2006,9 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	break;
 	case SAVE_LIBRAY_DATA:
 	{
+		CString temp_lib_file;
+		temp_lib_file = _T("hvac_library.json");
+		des_lib_file = image_fordor + _T("\\") + temp_lib_file;
 		const std::string file_output = Json::writeString(builder, json["data"]);
 
 		CFile file;
