@@ -3758,6 +3758,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             }
         }
     }
+    return READ_JSON_ITEM;
         break;
     case READ_TSTATE_SCHEDULE_T3000:
     {
@@ -5342,6 +5343,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     default:
         break;
     }
+    return command_type;
 }
 
 int handle_read_pic_data_ex(char *npoint,int nlength)

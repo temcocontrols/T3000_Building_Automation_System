@@ -725,7 +725,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	CString des_file_zip;
 	CString des_lib_file;
 
-	//TRACE(msg + _T("\r\n"));
+	TRACE(msg + _T("\r\n"));
 #if 1
 	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
@@ -1215,6 +1215,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		{
 			grp_serial_number = g_selected_serialnumber; //暂时用这个代替
 			save_grp_index = screen_list_line;
+			panelId = bac_gloab_panel; //有时候浏览器这里传过来的panelID是0 ，不正常，这里强行赋值;
 			save_button_click = 1;
 		}
 		else if (msg_source == 1)//来自浏览器
@@ -1303,7 +1304,13 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		//这里涉及到写设备的动作 发消息放到线程中去做。避免界面卡死，以及影响其他消息收发;
 		//这里要根据不同的panel 对不同设备进行保存 .
 		int n_write_result =  Write_Webview_Data_Special(panelId, grp_serial_number, save_grp_index, temp_elementcount);
-		if (n_write_result < 0)
+		if (n_write_result == -3)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write too often. Ignore this request!"));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Write too often. Ignore this request!"));
+			break;
+		}
+		else if(n_write_result < 0)
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to store data!"));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Failed to store data!"));

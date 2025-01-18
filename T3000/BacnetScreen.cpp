@@ -2185,10 +2185,10 @@ int Write_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex
 	if (last_write_call_times.find(current_params) != last_write_call_times.end()) {
 		auto last_call_time = last_write_call_times[current_params];
 		auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - last_call_time).count();
-		if (duration < 20)
+		if (duration < 10)
 		{
 			TRACE(_T("在十秒内调用，直接返回\r\n"));
-			return 1; // 在十秒内调用，直接返回
+			return -3; // 在十秒内调用，直接返回
 		}
 	}
 	// 更新上次调用时间
