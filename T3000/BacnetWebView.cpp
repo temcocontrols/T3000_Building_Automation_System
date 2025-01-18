@@ -725,7 +725,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	CString des_file_zip;
 	CString des_lib_file;
 
-	TRACE(msg + _T("\r\n"));
+	//TRACE(msg + _T("\r\n"));
 #if 1
 	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
@@ -740,9 +740,9 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		tempjson["msgId"] = msgId;
 	}
 	
-	//CString temp_action;
-	//temp_action.Format(_T("action value = %d\r\n"), action);
-	//DFTrace(temp_action);
+	CString temp_action;
+	temp_action.Format(_T("action value = %d\r\n"), action);
+	DFTrace(temp_action);
 	switch (action)
 	{
 	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_DATA:

@@ -15941,7 +15941,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
         if (iResult > 0) 
         {
-            TRACE("Bytes received: %d\r\n%s\r\n", iResult, recvbuf);
+            //TRACE("Bytes received: %d\r\n%s\r\n", iResult, recvbuf);
 
             // 检查接收到的数据并做出应答
             std::string receivedData = ProcessWebSocketFrame(std::vector<uint8_t>(recvbuf, recvbuf + iResult));
@@ -15992,7 +15992,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
                             WSACleanup();
                             return 1;
                         }
-                        TRACE(outmsg + _T("\r\n"));
+                        //TRACE(outmsg + _T("\r\n"));
                         break;
                     }
                     else

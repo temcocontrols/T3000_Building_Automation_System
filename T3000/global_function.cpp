@@ -6680,149 +6680,18 @@ void local_handler_conf_private_trans_ack(
         g_llerrCount ++;
         return;
     }
+    if (service_data->invoke_id == gsp_invoke)
+    {
+        return; //对于一些 不是读取选中panel的 命令回复，不要将对应命令转换为刷新前端界面;
+    }
 	bac_select_device_online = true;
     local_handler_update_bacnet_ui(receive_data_type, each_end_flag);
     if (each_end_flag)
         copy_data_to_ptrpanel(TYPE_ALL);
-#if 0
-    switch(receive_data_type)
-    {
-	case READEXT_IO_T3000:
-		{
-			 if(each_end_flag)
-			 {
-				 ::PostMessage(m_ext_io_dlg_hwmd,WM_REFRESH_BAC_EXTIO_LIST,NULL,NULL);
-			 }
-		}
-		break;
-    case READ_REMOTE_POINT:
-    {
-        if(each_end_flag)
-        {
-            if(pDialog[WINDOW_REMOTE_POINT]->IsWindowEnabled())
-                ::PostMessage(m_remote_point_hwnd,WM_REFRESH_BAC_REMOTE_POINT_LIST,NULL,NULL);
-        }
-    }
-    break;
-    case READANALOG_CUS_TABLE_T3000:
-    {
-        if(analog_cus_range_dlg!=NULL)
-            ::PostMessage(analog_cus_range_dlg,WM_REFRESH_BAC_ANALOGCUSRANGE_LIST,NULL,NULL);
-    }
-    break;
-    case READ_TSTATE_SCHEDULE_T3000:
-        if (m_tstat_schedule_dlg_hwnd != NULL)
-            ::PostMessage(m_tstat_schedule_dlg_hwnd, WM_REFRESH_BAC_TSTAT_SCHEDULE_LIST, NULL, NULL);
-        break;
-    case READ_AT_COMMAND:
-    {
-        ::PostMessage(m_at_command_hwnd,WM_REFRESH_BAC_AT_COMMAND,NULL,NULL);
-    }
-    break;
-    case READINPUT_T3000:
-        if(each_end_flag)
-        {
-            if(pDialog[WINDOW_INPUT]->IsWindowVisible())
-                ::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-            else
-                TRACE(_T("Input window not visiable ,don't refresh\r\n"));
-        }
-        copy_data_to_ptrpanel(TYPE_INPUT);
-        break;
-    case READPROGRAM_T3000:
-        if(each_end_flag)
-        {
-            if(pDialog[WINDOW_PROGRAM]->IsWindowVisible())
-                ::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-        }
-        copy_data_to_ptrpanel(TYPE_ALL);
-        break;
-    case READPROGRAMCODE_T3000:
-        break;
-    case READVARIABLE_T3000:
-        if(each_end_flag)
-        {
-            if(pDialog[WINDOW_VARIABLE]->IsWindowVisible())
-                ::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
-        }
-        copy_data_to_ptrpanel(TYPE_VARIABLE);
-        break;
-    case READOUTPUT_T3000:
-        if(each_end_flag)
-        {
-            if(pDialog[WINDOW_OUTPUT]->IsWindowVisible())
-                ::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-        }
-        copy_data_to_ptrpanel(TYPE_OUTPUT);
-        break;
-    case READWEEKLYROUTINE_T3000:
-        if(each_end_flag)
-            ::PostMessage(m_weekly_dlg_hwnd,WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
-        copy_data_to_ptrpanel(TYPE_WEEKLY);
-        break;
-    case READANNUALROUTINE_T3000:
-        ::PostMessage(m_annual_dlg_hwnd,WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
-        copy_data_to_ptrpanel(TYPE_ANNUAL);
-        break;
-    case READTIMESCHEDULE_T3000:
-        ::PostMessage(m_schedule_time_dlg_hwnd,WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
-        break;
-    case TIME_COMMAND:
-        ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,TIME_COMMAND,NULL);
-        break;
-    case READANNUALSCHEDULE_T3000:
-        ::PostMessage(m_schedule_day_dlg_hwnd,WM_REFRESH_BAC_DAY_CAL,NULL,NULL);
-        break;
-    case READCONTROLLER_T3000:
-        if(each_end_flag)
-            ::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-        copy_data_to_ptrpanel(TYPE_ALL);
-        break;
-    case READSCREEN_T3000:
-        if(each_end_flag)
-            ::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
-        copy_data_to_ptrpanel(TYPE_ALL);
-        break;
-    case READ_EMAIL_ALARM:
-            ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_EMAIL_ALARM, NULL);
-        break;
-    case READALARM_T3000:
-        if(each_end_flag)
-            ::PostMessage(m_alarmlog_dlg_hwnd,WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
-        break;
-    case READ_SETTING_COMMAND:
-            ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
-        break;
-    case READTSTAT_T3000:
-        //if(each_end_flag)
-        //	::PostMessage(m_tstat_dlg_hwnd,WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
-        break;
-    case READ_MSV_COMMAND:
-        ::PostMessage(m_msv_dlg_hwnd, WM_REFRESH_BAC_MSV_LIST, NULL, NULL);
-        break;
-    case READMONITOR_T3000:
-    {
-        if(each_end_flag)
-        {
-            ::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
-            ::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
-        }
-    }
-    break;
-    default:
-        break;
-    }
-#endif
-    if(((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG)) //||
-        /*(bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND)*/) //Setting 要特殊存一下
+
+    if((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG)) 
     {
         SaveBacnetBinaryFile(g_selected_serialnumber);
-        //CString temp_file;
-        //CString temp_serial;
-        //temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
-        //temp_file = g_achive_folder + _T("\\") + temp_serial;
-        //SaveBacnetBinaryFile(temp_file);
-        //TRACE(_T("Save config file cache\r\n"));
     }
 
     return;

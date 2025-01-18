@@ -212,7 +212,7 @@ int write_webview_data(int device_instance,int panel_id,int nsel_serialnumber,in
 	if (element != data_point)
 	{
 		delete temp_buffer;
-		return 0;
+		return -3;
 	}
 	fclose(fp);
 
@@ -2227,6 +2227,7 @@ int Write_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex
 	{
 		return -2;
 	}
+	TRACE(_T("write_webview_data success\r\n"));
 	//if (GetPrivateDataSaveSPBlocking(handle_device_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
 	//{
 	//	memcpy(&g_Device_Basic_Setting[panelid], &s_Basic_Setting, sizeof(Str_Setting_Info));
