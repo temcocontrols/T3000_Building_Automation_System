@@ -533,6 +533,7 @@ const int SENSOR_TYPE_OGM200 = 3;
 const int SENSOR_TYPE_TEMCO = 4;
 const int SENSOR_TYPE_SCD30 = 5;
 const int SENSOR_TYPE_MH_Z19B = 6;
+const int SENSOR_TYPE_SCD40 = 7;
 
 const int SCROLL_BAR_REG = 3138;
 

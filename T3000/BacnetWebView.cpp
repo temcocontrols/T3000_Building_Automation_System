@@ -1045,24 +1045,59 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			
 			if ((panel_id <= 0) || (panel_id > 254))
 			{
+				if (action == GET_INITIAL_DATA) 
+				{
+					tempjson["action"] = "GET_INITIAL_DATA_RES";
+				}
+				else if (action == LOAD_GRAPHIC_ENTRY)
+				{
+					tempjson["action"] = "LOAD_GRAPHIC_ENTRY_RES";
+				}
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
 				break;
 			}
 
 			if (grp_index < 0)
 			{
+
+				if (action == GET_INITIAL_DATA)
+				{
+					tempjson["action"] = "GET_INITIAL_DATA_RES";
+				}
+				else if (action == LOAD_GRAPHIC_ENTRY)
+				{
+					tempjson["action"] = "LOAD_GRAPHIC_ENTRY_RES";
+				}
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
 				break;
 			}
 			int n_read_result = Read_Webview_Data_Special(panel_id, grp_serial_number, grp_index );
 			if (n_read_result < 0)
 			{
+				if (action == GET_INITIAL_DATA)
+				{
+					tempjson["action"] = "GET_INITIAL_DATA_RES";
+				}
+				else if (action == LOAD_GRAPHIC_ENTRY)
+				{
+					tempjson["action"] = "LOAD_GRAPHIC_ENTRY_RES";
+				}
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Read panel data timeout."));
+				DFTrace(_T("Read panel data timeout."));
 				break;
 			}
 		}
 		else
 		{
+
+			if (action == GET_INITIAL_DATA)
+			{
+				tempjson["action"] = "GET_INITIAL_DATA_RES";
+			}
+			else if (action == LOAD_GRAPHIC_ENTRY)
+			{
+				tempjson["action"] = "LOAD_GRAPHIC_ENTRY_RES";
+			}
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Message Source Error."));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
 			break;
@@ -1193,7 +1228,6 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		wstring nbuff_wstring(nbuff);
 		string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
 		tempjson["data"] = nbuff_str;
-
 		const std::string output = Json::writeString(builder, tempjson);
 		CString tempjson_str(output.c_str());
 		//TRACE(nbuff);
@@ -1225,14 +1259,16 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		}
 		else
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Message Source Error."));
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Message Source Error."));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
 			break;
 		}
 		
 		if ((save_grp_index < 0) || (save_grp_index > 7))
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Viewitem out of range."));
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Viewitem out of range."));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Viewitem out of range."));
 			break;
 		}
@@ -1250,7 +1286,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		int temp_elementcount = json["data"].get("itemsCount", Json::nullValue).asInt();
 		if (temp_elementcount == 0)
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("No data to save."));
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("No data to save."));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("No data to save."));
 			break;
 		}
@@ -1291,28 +1328,31 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		bool zip_ret = ZipSingleItem(des_file_zip, des_file);
 		if (!zip_ret)
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to store data!"));
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to store data!"));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Failed to store data!"));
 			break;
 		}
 		else
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data from flash success!"));
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data into file success!"));
 		}
-		Sleep(1);
 
 		//这里涉及到写设备的动作 发消息放到线程中去做。避免界面卡死，以及影响其他消息收发;
 		//这里要根据不同的panel 对不同设备进行保存 .
 		int n_write_result =  Write_Webview_Data_Special(panelId, grp_serial_number, save_grp_index, temp_elementcount);
 		if (n_write_result == -3)
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write too often. Ignore this request!"));
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write too often. Ignore this request!"));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Write too often. Ignore this request!"));
 			break;
 		}
 		else if(n_write_result < 0)
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to store data!"));
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to store data!"));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Failed to store data!"));
 			break;
 		}
@@ -1332,7 +1372,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 		if ((panel_id == 0) || (panel_id >= 255))
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is invalid ."));
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is invalid ."));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Panel is invalid ."));
 			break;
 		}
@@ -1344,7 +1385,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_INPUT_ITEM_COUNT)
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
@@ -1372,7 +1414,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			}
 			else
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
@@ -1384,7 +1427,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_OUTPUT_ITEM_COUNT)
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
@@ -1413,7 +1457,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			}
 			else
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
@@ -1425,7 +1470,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_VARIABLE_ITEM_COUNT)
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
@@ -1452,7 +1498,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			}
 			else
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
@@ -1464,7 +1511,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_PROGRAM_ITEM_COUNT)
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
@@ -1488,7 +1536,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			}
 			else
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
@@ -1500,7 +1549,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_SCHEDULE_COUNT)
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
@@ -1524,7 +1574,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			}
 			else
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}
@@ -1536,7 +1587,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 			if ((entry_index >= 0) && entry_index + 1 > BAC_HOLIDAY_COUNT)
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
 				break;
 			}
@@ -1560,7 +1612,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			}
 			else
 			{
-				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
 				break;
 			}

@@ -611,7 +611,8 @@ void CCO2NetView::Initial_Window()
         GetDlgItem(IDC_BUTTON_CO2_HELP)->EnableWindow(0);
         GetDlgItem(IDC_BUTTON_RE_CALIBRATION_DONE)->EnableWindow(0);
     }
-    else if(product_register_value[210] == SENSOR_TYPE_SCD30)
+    else if((product_register_value[210] == SENSOR_TYPE_SCD30) ||
+        (product_register_value[210] == SENSOR_TYPE_SCD40))
     {
         CString temp_recal_value;
         temp_recal_value.Format(_T("%u"), product_register_value[MODBUS_CO2_FORCED_RE_CALIBRATION]);

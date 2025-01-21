@@ -15,7 +15,7 @@
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
 #include <windows.h>  
  
-const unsigned int g_versionNO = 20250113;    // PROJECT_VERSION
+const unsigned int g_versionNO = 20250121;    // PROJECT_VERSION
 
 
 
@@ -313,12 +313,35 @@ BOOL CT3000App::InitInstance()
 			g_achive_folder_temp_db = g_achive_folder + _T("\\") + _T("MonitorDatabaseFolder");
 			g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
 			g_trendlog_ini_path = g_achive_folder_temp_db;
-
+			CString webview_www_folder;
+			CString www_zip_file; //制作安装文件的时候将安装文件的zip文件解压到www文件夹下
 			CString WebDBFilePath;
 			CString WebDBDesFilePath;
+			webview_www_folder = g_strExePth + _T("ResourceFile\\webview\\www");
 			WebDBFilePath = g_strExePth + _T("ResourceFile\\webview_database.db");
 			WebDBDesFilePath = g_strExePth + _T("Database\\webview_database.db");
 			CopyFile(WebDBFilePath, WebDBDesFilePath, FALSE);
+
+			//这一段是方便 installshield 制作安装文件的时候第一次运行将安装文件的zip文件解压到ResourceFile下面的www文件夹下
+			www_zip_file = g_strExePth + _T("ResourceFile\\webview.zip");
+			//判断www_zip_file文件是否存在，存在就解压到webview_www_folder下
+			CFileFind temp_findzip;
+			BOOL	nret = temp_findzip.FindFile(www_zip_file);
+			if (nret)
+			{
+				bool ret_unzip = UnzipItem(www_zip_file, webview_www_folder);
+				if (!ret_unzip)
+				{
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Unzip file failed!"));
+				}
+				else
+				{
+					DeleteFile(www_zip_file);
+				}
+			}
+
+
+
 			// Use CIniFile to read and write .ini files
 			CIniFile monitorindexfile(g_cstring_ini_path);
 			product_sort_way = monitorindexfile.GetProfileIntW(_T("Setting"), _T("ProductSort"), 0);

@@ -2285,7 +2285,7 @@ int Read_Webview_Data_Special(int panelid,UINT nserialnumber,int nscreenindex)
 	}
 
 
-	if (GetPrivateDataSaveSPBlocking(handle_device_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
+	if (GetPrivateDataSaveSPBlocking(handle_device_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info)) > 0)
 	{
 		memcpy(&g_Device_Basic_Setting[panelid], &s_Basic_Setting, sizeof(Str_Setting_Info));
 	}
@@ -2320,7 +2320,7 @@ int Read_Webview_Data_Special(int panelid,UINT nserialnumber,int nscreenindex)
 
 	int data_point_length = g_json_screen_data[panelid].at(nscreenindex).file_data.zip_size;
 	if (data_point_length == 0)
-		return -2;
+		return 1;
 #if 1
 	char* temp_buffer = new char[data_point_length];
 	memset(temp_buffer, 0, data_point_length);
