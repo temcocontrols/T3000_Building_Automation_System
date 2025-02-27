@@ -104,17 +104,17 @@ void CAirFlowSensor::ShowTempHumUI(bool show_window)
 void CAirFlowSensor::InitialUI()
 {
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->ResetContent();
-    ((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->AddString(AirFlowMode[0]);
+	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->AddString(AirFlowMode[0]);
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->AddString(AirFlowMode[1]);
 
-	
+
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->ResetContent();
 	for (int z = 0; z < sizeof(AirFlowSensorType) / sizeof(AirFlowSensorType[0]); z++)
 	{
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->AddString(AirFlowSensorType[z]);
 	}
 
-	
+
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->ResetContent();
 	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
 	{
@@ -131,13 +131,13 @@ void CAirFlowSensor::InitialUI()
 		}
 	}
 
-	
+
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->ResetContent();
 	for (int z = 0; z < sizeof(AirFlowUnit) / sizeof(AirFlowUnit[0]); z++)
 	{
 		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->AddString(AirFlowUnit[z]);
 	}
-	
+
 
 }
 
@@ -256,7 +256,7 @@ void CAirFlowSensor::UpdateUserInterface()
 		temp_c3.Format(_T("%.1f"), product_register_value[MODBUS_CHANNEL3_TEMP] / 10.0);
 		GetDlgItem(IDC_STATIC_PLC_C3_VALUE3)->SetWindowText(temp_c3);
 	}
-	else if ((product_register_value[8] < 6) ||  (product_register_value[99] == 0))
+	else if ((product_register_value[8] < 6) || (product_register_value[99] == 0))
 	{
 		ShowTempHumUI(false);
 		ShowTempHumUI_Part2(false);
@@ -332,95 +332,110 @@ void CAirFlowSensor::UpdateUserInterface()
 		GetDlgItem(IDC_STATIC_RECTANGULAR_UNIT_WIDTH)->SetWindowText(_T("cm"));
 	}
 
-		if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 0)
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(AirFlowMode[0]);
-		else if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 1)
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(AirFlowMode[1]);
-		else
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(_T(""));
+	if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 0)
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(AirFlowMode[0]);
+	else if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 1)
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(AirFlowMode[1]);
+	else
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_MODE))->SetWindowText(_T(""));
 
-		if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[1]);
-		else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP0)
-		{
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[2]);
-		}
-		else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP1)
-		{
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[3]);
-		}
-		else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP2)
-		{
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[4]);
-		}
-		else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP3)
-		{
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[5]);
-		}
-		else if (product_register_value[MODBUS_SENSOR_TYPE] == NO_PRESSURE_SENSOR)
-		{
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[6]);
-			EnablePressureUI(false);
-		}
-		else
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[0]);
+	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[1]);
+	else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP0)
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[2]);
+	}
+	else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP1)
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[3]);
+	}
+	else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP2)
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[4]);
+	}
+	else if (product_register_value[MODBUS_SENSOR_TYPE] == XGZP3)
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[5]);
+	}
+	else if (product_register_value[MODBUS_SENSOR_TYPE] == NO_PRESSURE_SENSOR)
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[6]);
+		EnablePressureUI(false);
+	}
+	else
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->SetWindowText(AirFlowSensorType[0]);
 
-		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->EnableWindow(false);
-		if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
+	((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_SENSOR_TYPE))->EnableWindow(false);
+	if (product_register_value[MODBUS_SENSOR_TYPE] == SENSOR_SPD33)
+	{
+		if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
 		{
-			if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
-			{
-				((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange_SPD33[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
-			}
-			else
-				((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange_SPD33[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
 		}
 		else
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
+	}
+	else
+	{
+		if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
 		{
-			if (product_register_value[MODBUS_SWITCH_DP_RANGE] < 4)
-			{
-				((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange_SPD31[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
-			}
-			else
-				((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
-		}
-
-
-		if (product_register_value[MODBUS_FLOW_UNIT] < 3)
-		{
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->SetWindowText(AirFlowUnit[product_register_value[MODBUS_FLOW_UNIT]]);
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(AirFlowRange_SPD31[product_register_value[MODBUS_SWITCH_DP_RANGE]]);
 		}
 		else
-			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->SetWindowText(_T(""));
+			((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_RANGE))->SetWindowText(_T(""));
+	}
 
 
-		CString cs_pressure_value;
-		CString cs_length;
-		CString cs_width;
-		CString cs_speed;
-		CString cs_flow_value;
-		cs_pressure_value.Format(_T("%d"), (short)product_register_value[MODBUS_DIFF_PRESSURE_VALUE]);
-		cs_length.Format(_T("%u"), product_register_value[MODBUS_FLOW_LENGTH]);
-		cs_width.Format(_T("%u"), product_register_value[MODBUS_FLOW_WIDTH]);
-		cs_speed.Format(_T("%.1f"), (float)product_register_value[MODBUS_FLOW_SPEED] / 10.0);
-
-		unsigned int temp_flow_value;
-		temp_flow_value = product_register_value[MODBUS_FLOW_HI] * 65536 + product_register_value[MODBUS_FLOW_LO];
-		cs_flow_value.Format(_T("%u"), temp_flow_value);
-
-		GetDlgItem(IDC_EDIT_AIRFLOW_DIF_PRESSURE_VALUE)->SetWindowText(cs_pressure_value);
-		GetDlgItem(IDC_EDIT_AIRFLOW_DIF_LENGTH)->SetWindowText(cs_length);
-		GetDlgItem(IDC_EDIT_AIRFLOW_DIF_WIDTH)->SetWindowText(cs_width);
-		GetDlgItem(IDC_EDIT_AIRFLOW_SPEED)->SetWindowText(cs_speed);
-		GetDlgItem(IDC_EDIT_AIRFLOW_VALUE)->SetWindowText(cs_flow_value);
-
-		CString temp_radius;
-		temp_radius.Format(_T("%u"), product_register_value[MODBUS_FLOW_RADIUS]);
-		GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->SetWindowText(temp_radius);
+	if (product_register_value[MODBUS_FLOW_UNIT] < 3)
+	{
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->SetWindowText(AirFlowUnit[product_register_value[MODBUS_FLOW_UNIT]]);
+	}
+	else
+		((CComboBox*)GetDlgItem(IDC_COMBO_AIRFLOW_UNIT))->SetWindowText(_T(""));
 
 
+	CString cs_pressure_value;
+	CString cs_length;
+	CString cs_width;
+	CString cs_speed;
+	CString cs_flow_value;
+	cs_pressure_value.Format(_T("%d"), (short)product_register_value[MODBUS_DIFF_PRESSURE_VALUE]);
+	cs_length.Format(_T("%u"), product_register_value[MODBUS_FLOW_LENGTH]);
+	cs_width.Format(_T("%u"), product_register_value[MODBUS_FLOW_WIDTH]);
+	cs_speed.Format(_T("%.1f"), (float)product_register_value[MODBUS_FLOW_SPEED] / 10.0);
 
-		if (product_register_value[MODBUS_FIRMWARE_VERSION] < 25)
+	unsigned int temp_flow_value;
+	temp_flow_value = product_register_value[MODBUS_FLOW_HI] * 65536 + product_register_value[MODBUS_FLOW_LO];
+	cs_flow_value.Format(_T("%u"), temp_flow_value);
+
+	GetDlgItem(IDC_EDIT_AIRFLOW_DIF_PRESSURE_VALUE)->SetWindowText(cs_pressure_value);
+	GetDlgItem(IDC_EDIT_AIRFLOW_DIF_LENGTH)->SetWindowText(cs_length);
+	GetDlgItem(IDC_EDIT_AIRFLOW_DIF_WIDTH)->SetWindowText(cs_width);
+	GetDlgItem(IDC_EDIT_AIRFLOW_SPEED)->SetWindowText(cs_speed);
+	GetDlgItem(IDC_EDIT_AIRFLOW_VALUE)->SetWindowText(cs_flow_value);
+
+	CString temp_radius;
+	temp_radius.Format(_T("%u"), product_register_value[MODBUS_FLOW_RADIUS]);
+	GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->SetWindowText(temp_radius);
+
+
+
+	if (product_register_value[MODBUS_FIRMWARE_VERSION] < 25)
+	{
+		GetDlgItem(IDC_EDIT_VOLATGE_MIN)->EnableWindow(false);
+		GetDlgItem(IDC_EDIT_VOLATGE_MAX)->EnableWindow(false);
+		GetDlgItem(IDC_EDIT_CURRENT_MIN)->EnableWindow(false);
+		GetDlgItem(IDC_EDIT_CURRENT_MAX)->EnableWindow(false);
+		GetDlgItem(IDC_EDIT_PASCAL_MIN)->EnableWindow(false);
+		GetDlgItem(IDC_EDIT_PASCAL_MAX)->EnableWindow(false);
+		GetDlgItem(IDC_RADIO_DEFAULT)->EnableWindow(false);
+		GetDlgItem(IDC_RADIO_USER_DEFINED)->EnableWindow(false);
+		((CButton*)GetDlgItem(IDC_RADIO_DEFAULT))->SetCheck(0);
+		((CButton*)GetDlgItem(IDC_RADIO_USER_DEFINED))->SetCheck(0);
+	}
+	else
+	{
+		if (product_register_value[MODBUS_DEF_CUSTOMER] == 0)
 		{
 			GetDlgItem(IDC_EDIT_VOLATGE_MIN)->EnableWindow(false);
 			GetDlgItem(IDC_EDIT_VOLATGE_MAX)->EnableWindow(false);
@@ -428,98 +443,83 @@ void CAirFlowSensor::UpdateUserInterface()
 			GetDlgItem(IDC_EDIT_CURRENT_MAX)->EnableWindow(false);
 			GetDlgItem(IDC_EDIT_PASCAL_MIN)->EnableWindow(false);
 			GetDlgItem(IDC_EDIT_PASCAL_MAX)->EnableWindow(false);
-			GetDlgItem(IDC_RADIO_DEFAULT)->EnableWindow(false);
-			GetDlgItem(IDC_RADIO_USER_DEFINED)->EnableWindow(false);
-			((CButton*)GetDlgItem(IDC_RADIO_DEFAULT))->SetCheck(0);
+			((CButton*)GetDlgItem(IDC_RADIO_DEFAULT))->SetCheck(1);
 			((CButton*)GetDlgItem(IDC_RADIO_USER_DEFINED))->SetCheck(0);
 		}
 		else
 		{
-			if (product_register_value[MODBUS_DEF_CUSTOMER] == 0)
-			{
-				GetDlgItem(IDC_EDIT_VOLATGE_MIN)->EnableWindow(false);
-				GetDlgItem(IDC_EDIT_VOLATGE_MAX)->EnableWindow(false);
-				GetDlgItem(IDC_EDIT_CURRENT_MIN)->EnableWindow(false);
-				GetDlgItem(IDC_EDIT_CURRENT_MAX)->EnableWindow(false);
-				GetDlgItem(IDC_EDIT_PASCAL_MIN)->EnableWindow(false);
-				GetDlgItem(IDC_EDIT_PASCAL_MAX)->EnableWindow(false);
-				((CButton*)GetDlgItem(IDC_RADIO_DEFAULT))->SetCheck(1);
-				((CButton*)GetDlgItem(IDC_RADIO_USER_DEFINED))->SetCheck(0);
-			}
-			else
-			{
-				if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 0)
-				{
-					GetDlgItem(IDC_EDIT_CURRENT_MIN)->EnableWindow(1);
-					GetDlgItem(IDC_EDIT_CURRENT_MAX)->EnableWindow(1);
-					GetDlgItem(IDC_EDIT_VOLATGE_MIN)->EnableWindow(0);
-					GetDlgItem(IDC_EDIT_VOLATGE_MAX)->EnableWindow(0);
-				}
-				else if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 1)
-				{
-					GetDlgItem(IDC_EDIT_CURRENT_MIN)->EnableWindow(0);
-					GetDlgItem(IDC_EDIT_CURRENT_MAX)->EnableWindow(0);
-					GetDlgItem(IDC_EDIT_VOLATGE_MIN)->EnableWindow(1);
-					GetDlgItem(IDC_EDIT_VOLATGE_MAX)->EnableWindow(1);
-				}
-
-				GetDlgItem(IDC_EDIT_PASCAL_MIN)->EnableWindow(1);
-				GetDlgItem(IDC_EDIT_PASCAL_MAX)->EnableWindow(1);
-				((CButton*)GetDlgItem(IDC_RADIO_DEFAULT))->SetCheck(0);
-				((CButton*)GetDlgItem(IDC_RADIO_USER_DEFINED))->SetCheck(1);
-
-				CString current_min; CString current_max;
-				CString voltage_min; CString voltage_max;
-				CString pascal_min;  CString pascal_max;
-				current_min.Format(_T("%.1f"), product_register_value[MODBUS_CURRENT_MIN] / 10.0);
-				current_max.Format(_T("%.1f"), product_register_value[MODBUS_CURRENT_MAX] / 10.0);
-				voltage_min.Format(_T("%.1f"), product_register_value[MODBUS_VOLTAGE_MIN] / 10.0);
-				voltage_max.Format(_T("%.1f"), product_register_value[MODBUS_VOLTAGE_MAX] / 10.0);
-				pascal_min.Format(_T("%u"), product_register_value[MODBUS_PASCAL_MIN]);
-				pascal_max.Format(_T("%u"), product_register_value[MODBUS_PASCAL_MAX]);
-				GetDlgItem(IDC_EDIT_CURRENT_MIN)->SetWindowText(current_min);
-				GetDlgItem(IDC_EDIT_CURRENT_MAX)->SetWindowText(current_max);
-				GetDlgItem(IDC_EDIT_VOLATGE_MIN)->SetWindowText(voltage_min);
-				GetDlgItem(IDC_EDIT_VOLATGE_MAX)->SetWindowText(voltage_max);
-				GetDlgItem(IDC_EDIT_PASCAL_MIN)->SetWindowText(pascal_min);
-				GetDlgItem(IDC_EDIT_PASCAL_MAX)->SetWindowText(pascal_max);
-			}
-
 			if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 0)
 			{
-				CString current_output;
-				current_output.Format(_T("%.1f"), product_register_value[MODBUS_OUTPUT_CUR] / 10.0);
-				((CStatic*)GetDlgItem(IDC_STATIC_OUT_CURRENT))->SetWindowText(current_output);
-				((CStatic*)GetDlgItem(IDC_STATIC_OUT_VOLTAGE))->SetWindowText(_T(""));
+				GetDlgItem(IDC_EDIT_CURRENT_MIN)->EnableWindow(1);
+				GetDlgItem(IDC_EDIT_CURRENT_MAX)->EnableWindow(1);
+				GetDlgItem(IDC_EDIT_VOLATGE_MIN)->EnableWindow(0);
+				GetDlgItem(IDC_EDIT_VOLATGE_MAX)->EnableWindow(0);
 			}
 			else if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 1)
 			{
-				CString voltage_output;
-				voltage_output.Format(_T("%.1f"), product_register_value[MODBUS_OUTPUT_VOL] / 10.0);
-				((CStatic*)GetDlgItem(IDC_STATIC_OUT_VOLTAGE))->SetWindowText(voltage_output);
-				((CStatic*)GetDlgItem(IDC_STATIC_OUT_CURRENT))->SetWindowText(_T(""));
+				GetDlgItem(IDC_EDIT_CURRENT_MIN)->EnableWindow(0);
+				GetDlgItem(IDC_EDIT_CURRENT_MAX)->EnableWindow(0);
+				GetDlgItem(IDC_EDIT_VOLATGE_MIN)->EnableWindow(1);
+				GetDlgItem(IDC_EDIT_VOLATGE_MAX)->EnableWindow(1);
 			}
+
+			GetDlgItem(IDC_EDIT_PASCAL_MIN)->EnableWindow(1);
+			GetDlgItem(IDC_EDIT_PASCAL_MAX)->EnableWindow(1);
+			((CButton*)GetDlgItem(IDC_RADIO_DEFAULT))->SetCheck(0);
+			((CButton*)GetDlgItem(IDC_RADIO_USER_DEFINED))->SetCheck(1);
+
+			CString current_min; CString current_max;
+			CString voltage_min; CString voltage_max;
+			CString pascal_min;  CString pascal_max;
+			current_min.Format(_T("%.1f"), product_register_value[MODBUS_CURRENT_MIN] / 10.0);
+			current_max.Format(_T("%.1f"), product_register_value[MODBUS_CURRENT_MAX] / 10.0);
+			voltage_min.Format(_T("%.1f"), product_register_value[MODBUS_VOLTAGE_MIN] / 10.0);
+			voltage_max.Format(_T("%.1f"), product_register_value[MODBUS_VOLTAGE_MAX] / 10.0);
+			pascal_min.Format(_T("%u"), product_register_value[MODBUS_PASCAL_MIN]);
+			pascal_max.Format(_T("%u"), product_register_value[MODBUS_PASCAL_MAX]);
+			GetDlgItem(IDC_EDIT_CURRENT_MIN)->SetWindowText(current_min);
+			GetDlgItem(IDC_EDIT_CURRENT_MAX)->SetWindowText(current_max);
+			GetDlgItem(IDC_EDIT_VOLATGE_MIN)->SetWindowText(voltage_min);
+			GetDlgItem(IDC_EDIT_VOLATGE_MAX)->SetWindowText(voltage_max);
+			GetDlgItem(IDC_EDIT_PASCAL_MIN)->SetWindowText(pascal_min);
+			GetDlgItem(IDC_EDIT_PASCAL_MAX)->SetWindowText(pascal_max);
 		}
 
+		if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 0)
+		{
+			CString current_output;
+			current_output.Format(_T("%.1f"), product_register_value[MODBUS_OUTPUT_CUR] / 10.0);
+			((CStatic*)GetDlgItem(IDC_STATIC_OUT_CURRENT))->SetWindowText(current_output);
+			((CStatic*)GetDlgItem(IDC_STATIC_OUT_VOLTAGE))->SetWindowText(_T(""));
+		}
+		else if (product_register_value[MODBUS_SWITCH_OUTPUT_MODE] == 1)
+		{
+			CString voltage_output;
+			voltage_output.Format(_T("%.1f"), product_register_value[MODBUS_OUTPUT_VOL] / 10.0);
+			((CStatic*)GetDlgItem(IDC_STATIC_OUT_VOLTAGE))->SetWindowText(voltage_output);
+			((CStatic*)GetDlgItem(IDC_STATIC_OUT_CURRENT))->SetWindowText(_T(""));
+		}
+	}
 
-	
+
+
 }
 
 void CAirFlowSensor::EnablePLCUI(bool nflag)
 {
 	GetDlgItem(IDC_COMBO_AIRFLOW_MODE)->EnableWindow(nflag);
 	GetDlgItem(IDC_COMBO_AIRFLOW_RANGE)->EnableWindow(nflag);
-		//GetDlgItem(IDC_COMBO_AIRFLOW_UNIT)->EnableWindow(nflag);
-		//GetDlgItem(IDC_EDIT_AIRFLOW_DIF_PRESSURE_VALUE)->EnableWindow(nflag);
-		//GetDlgItem(IDC_EDIT_AIRFLOW_DIF_LENGTH)->EnableWindow(nflag);
-		//GetDlgItem(IDC_EDIT_AIRFLOW_DIF_WIDTH)->EnableWindow(nflag);
-		//GetDlgItem(IDC_EDIT_AIRFLOW_SPEED)->EnableWindow(nflag);
-		//GetDlgItem(IDC_EDIT_AIRFLOW_VALUE)->EnableWindow(nflag);
-		//GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->EnableWindow(nflag);
-		//GetDlgItem(IDC_RADIO_CIRCULAR)->EnableWindow(nflag);
-		//GetDlgItem(IDC_RADIO_RECTANGULAR)->EnableWindow(nflag);
-		//GetDlgItem(IDC_RADIO_UNIT_M)->EnableWindow(nflag);
-		//GetDlgItem(IDC_RADIO_UNIT_IN)->EnableWindow(nflag);
+	//GetDlgItem(IDC_COMBO_AIRFLOW_UNIT)->EnableWindow(nflag);
+	//GetDlgItem(IDC_EDIT_AIRFLOW_DIF_PRESSURE_VALUE)->EnableWindow(nflag);
+	//GetDlgItem(IDC_EDIT_AIRFLOW_DIF_LENGTH)->EnableWindow(nflag);
+	//GetDlgItem(IDC_EDIT_AIRFLOW_DIF_WIDTH)->EnableWindow(nflag);
+	//GetDlgItem(IDC_EDIT_AIRFLOW_SPEED)->EnableWindow(nflag);
+	//GetDlgItem(IDC_EDIT_AIRFLOW_VALUE)->EnableWindow(nflag);
+	//GetDlgItem(IDC_EDIT_AIRFLOW_RADIUS)->EnableWindow(nflag);
+	//GetDlgItem(IDC_RADIO_CIRCULAR)->EnableWindow(nflag);
+	//GetDlgItem(IDC_RADIO_RECTANGULAR)->EnableWindow(nflag);
+	//GetDlgItem(IDC_RADIO_UNIT_M)->EnableWindow(nflag);
+	//GetDlgItem(IDC_RADIO_UNIT_IN)->EnableWindow(nflag);
 	GetDlgItem(IDC_RADIO_DEFAULT)->EnableWindow(nflag);
 	GetDlgItem(IDC_RADIO_USER_DEFINED)->EnableWindow(nflag);
 	GetDlgItem(IDC_EDIT_VOLATGE_MIN)->EnableWindow(nflag);
@@ -556,7 +556,7 @@ void CAirFlowSensor::Fresh()
 	}
 
 	UpdateUserInterface();
-	return ;
+	return;
 }
 
 
@@ -754,7 +754,7 @@ void CAirFlowSensor::OnEnKillfocusEditAirflowDifWidth()
 void CAirFlowSensor::OnBnClickedButtonAirflowDone()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	
+
 }
 
 
@@ -778,7 +778,7 @@ int X_AXIS_RIGHT_X = CANVAS_BOTTOM_X - 10;  //X轴最右边  X坐标
 int X_AXIS_RIGHT_Y = ORIGIN_Y;				//X轴最右边  Y坐标
 
 int X_AXIS_MAX_VALUE_X = X_AXIS_RIGHT_X - 100; //X轴最大点  X坐标
-int X_AXIS_MAX_VALUE_Y = X_AXIS_RIGHT_Y ; //X轴最大点  Y坐标
+int X_AXIS_MAX_VALUE_Y = X_AXIS_RIGHT_Y; //X轴最大点  Y坐标
 
 int Y_AXIS_MAX_VALUE_X = Y_AXIS_TOP_X;
 int Y_AXIS_MAX_VALUE_Y = Y_AXIS_TOP_Y + 50;
@@ -794,10 +794,10 @@ int X_AXIS_ARROW_BOTTOM_Y = X_AXIS_RIGHT_Y + 5;
 void CAirFlowSensor::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-					   // TODO: 在此处添加消息处理程序代码
-					   // 不为绘图消息调用 CFormView::OnPaint()
-	//CString png_airflow_shape_cylinder;
-	//CString png_airflow_shape_rectangular;
+	// TODO: 在此处添加消息处理程序代码
+	// 不为绘图消息调用 CFormView::OnPaint()
+//CString png_airflow_shape_cylinder;
+//CString png_airflow_shape_rectangular;
 	int cx = 0;
 	int cy = 0;
 	CImage image;
@@ -930,7 +930,7 @@ void CAirFlowSensor::OnPaint()
 					default_max_pascal = 500;
 				}
 			}
-			
+
 		}
 		else
 		{
@@ -1084,7 +1084,7 @@ void CAirFlowSensor::OnPaint()
 		delete myRectangle_pen3;
 		delete myRectangle_pen4;
 		delete myRectangle_pen5;
-		
+
 	}
 	ReleaseDC(pDc);
 
@@ -1102,7 +1102,7 @@ void CAirFlowSensor::OnBnClickedRadioCircular()
 	{
 		MessageBox(_T("Write data timeout!"));
 	}
-	PostMessage( WM_TSTAT_AIRFLOW_THREAD_READ, NULL, NULL);
+	PostMessage(WM_TSTAT_AIRFLOW_THREAD_READ, NULL, NULL);
 	Invalidate();
 }
 
@@ -1301,7 +1301,7 @@ void CAirFlowSensor::OnEnKillfocusEditCurrentMax()
 	GetDlgItemTextW(IDC_EDIT_CURRENT_MAX, temp_cstring_max);
 	unsigned int temp_value_max = unsigned int(_wtof(temp_cstring_max) * 10);
 
-	if ((temp_value_max < 40) || (temp_value_max > 200) || (temp_value_max <= temp_value_min ))
+	if ((temp_value_max < 40) || (temp_value_max > 200) || (temp_value_max <= temp_value_min))
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Minimum and maximum values must be between 4 and 20 "));
 		return;

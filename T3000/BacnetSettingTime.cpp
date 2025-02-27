@@ -574,7 +574,7 @@ void CBacnetSettingTime::OnBnClickedRadioSettingSyncPc()
     GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(true);
     GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->EnableWindow(false);
     GetDlgItem(IDC_BUTTON_SYNC_TIME)->EnableWindow(false);
-
+ 
     Device_Basic_Setting.reg.time_sync_auto_manual = 1;
 
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
@@ -586,7 +586,7 @@ void CBacnetSettingTime::OnBnClickedRadioSettingSyncPc()
 
 void CBacnetSettingTime::OnCbnSelchangeComboBacnetSettingTimeServer()
 {
-
+    Device_Basic_Setting.reg.time_sync_auto_manual = 0;
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->GetLBText(nSel, temp_string);

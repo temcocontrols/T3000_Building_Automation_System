@@ -706,7 +706,16 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 
 
-
+		//不管是啥设备 time zone 都要能修改
+		m_page_time.GetDlgItem(IDC_STATIC_SETTING_TIME_ZONE)->ShowWindow(TRUE);
+		m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE)->ShowWindow(TRUE);
+		((CComboBox*)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->ResetContent();
+		for (int z = 0; z < sizeof(Time_Zone_Name) / sizeof(Time_Zone_Name[0]); z++)
+		{
+			((CComboBox*)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->AddString(Time_Zone_Name[z]);
+			if (Device_Basic_Setting.reg.time_zone == Time_Zone_Value[z])
+				((CComboBox*)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->SetWindowTextW(Time_Zone_Name[z]);
+		}
 
 		if (Device_Basic_Setting.reg.en_sntp == 0)
 		{
@@ -714,29 +723,22 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			m_page_time.GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME)->ShowWindow(FALSE);
 			m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->ShowWindow(FALSE);
 
-			m_page_time.GetDlgItem(IDC_STATIC_SETTING_TIME_ZONE)->ShowWindow(FALSE);
-			m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE)->ShowWindow(FALSE);
+			//m_page_time.GetDlgItem(IDC_STATIC_SETTING_TIME_ZONE)->ShowWindow(FALSE);
+			//m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE)->ShowWindow(FALSE);
 		}
 		else
 		{
 			m_page_time.GetDlgItem(IDC_STATIC_SETTING_TIMER_SERVER)->ShowWindow(TRUE);
 			m_page_time.GetDlgItem(IDC_RADIO_SETTING_SYNC_TIME)->ShowWindow(TRUE);
 			m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER)->ShowWindow(TRUE);
-			m_page_time.GetDlgItem(IDC_STATIC_SETTING_TIME_ZONE)->ShowWindow(TRUE);
-			m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE)->ShowWindow(TRUE);
+
 
 			((CComboBox*)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->ResetContent();
 			for (int j = 0; j < sizeof(Time_Server_Name) / sizeof(Time_Server_Name[0]); j++)
 			{
 				((CComboBox*)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_SERVER))->AddString(Time_Server_Name[j]);
 			}
-			((CComboBox*)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->ResetContent();
-			for (int z = 0; z < sizeof(Time_Zone_Name) / sizeof(Time_Zone_Name[0]); z++)
-			{
-				((CComboBox*)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->AddString(Time_Zone_Name[z]);
-				if (Device_Basic_Setting.reg.time_zone == Time_Zone_Value[z])
-					((CComboBox*)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->SetWindowTextW(Time_Zone_Name[z]);
-			}
+
 
 			if (Device_Basic_Setting.reg.time_sync_auto_manual == 0)
 			{

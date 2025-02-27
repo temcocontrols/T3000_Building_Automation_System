@@ -1677,9 +1677,6 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 					if (ret_index4 >= 0)
 					{
 						memcpy(&g_Input_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index4).ret_data.m_group_input_data, sizeof(Str_in_point));
-						//temp_cs4.Format(_T("%dIN%d %.3f  control %d\r\n"), npanel_id, m_backbround_data.at(ret_index4).str_info.npoint_number + 1, m_backbround_data.at(ret_index4).ret_data.m_group_input_data.value / 1000.000 , m_backbround_data.at(ret_index4).ret_data.m_group_input_data.control);
-						//TRACE(temp_cs4);
-						//AfxMessageBox(temp_cs4);
 					}
 					else
 					{
@@ -1712,9 +1709,6 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 					if (ret_index_out >= 0)
 					{
 						memcpy(&g_Output_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_output_data, sizeof(Str_out_point));
-						//CString temp_cs4;
-						//temp_cs4.Format(_T("%dOut%d value %.3f control %d\r\n"), npanel_id, m_backbround_data.at(ret_index_out).str_info.npoint_number + 1, m_backbround_data.at(ret_index_out).ret_data.m_group_output_data.value / 1000.000 , m_backbround_data.at(ret_index_out).ret_data.m_group_output_data.control);
-						//TRACE(temp_cs4);
 					}
 					else
 					{

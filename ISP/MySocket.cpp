@@ -42,6 +42,7 @@ typedef struct _Product_IP_ID
 // CAkingSocket
 
 extern CString ShowTFTPMessage; //用于显示一些结果;
+extern CString ShowTFTPMessage2; //用于显示一些结果;
 extern int ISP_STEP;
 extern BYTE Byte_ISP_Device_IP[4];
 extern bool device_has_replay_lan_IP;
@@ -81,6 +82,7 @@ void MySocket::OnReceive(int nErrorCode)
 	{
 		if(Receive_data_length == 40)//接收EE 10 的 40 byte 回复
 		{
+			TRACE("ISP_SEND_FLASH_COMMAND Receive 40 byte\n");
 			char temp_data[100];
 			memset(temp_data,0,sizeof(temp_data));
 			memcpy_s(temp_data,sizeof(temp_data),receive_buf,Receive_data_length);
@@ -98,7 +100,7 @@ void MySocket::OnReceive(int nErrorCode)
 		}
 		else if(Receive_data_length == 31)
 		{
-      
+			TRACE("ISP_SEND_FLASH_COMMAND Receive 31 byte\n");
 			char temp_data[100];
 			memset(temp_data,0,sizeof(temp_data));
 			memcpy_s(temp_data,sizeof(temp_data),receive_buf,11);//copy the first 11 byte and check
@@ -112,11 +114,12 @@ void MySocket::OnReceive(int nErrorCode)
 				//先检查是不是目标IP地址回复的，优先处理目标IP地址回复的
 				CString temp_reply_ip;
 				temp_reply_ip.Format(_T("%u.%u.%u.%u"), Byte_ISP_Device_IP[0], Byte_ISP_Device_IP[1], Byte_ISP_Device_IP[2], Byte_ISP_Device_IP[3]);
-				if ((temp_reply_ip.CompareNoCase(ISP_Device_IP) != 0) && (receive_not_want_ip_times <10))
+				if ((temp_reply_ip.CompareNoCase(ISP_Device_IP) != 0) && (receive_not_want_ip_times <3))
 				{
+					ShowTFTPMessage2.Format(_T("IP:%s responds to the update request (%d)"), temp_reply_ip.GetString(), receive_not_want_ip_times);
 					receive_not_want_ip_times++;
-					CAsyncSocket::OnReceive(nErrorCode);
-					return;
+					//CAsyncSocket::OnReceive(nErrorCode); //暂时屏蔽，设备经常回复 05 错误命令导致握手失败
+					//return;
 				}
 				
 
@@ -183,11 +186,16 @@ void MySocket::OnReceive(int nErrorCode)
 
 			}
 		}
+		else if (Receive_data_length == 5)
+		{
+			ShowTFTPMessage = _T("Failed.Reboot or One minute later try again.");
+		}
 	}
 	else if((ISP_STEP ==ISP_SEND_DHCP_COMMAND_HAS_LANIP)&&(has_enter_dhcp_has_lanip_block==true))
 	{
 		if(Receive_data_length == 31)
 		{
+			TRACE("ISP_SEND_DHCP_COMMAND_HAS_LANIP Receive 31 byte\n");
 			char temp_data[100];
 			memset(temp_data,0,sizeof(temp_data));
 			memcpy_s(temp_data,sizeof(temp_data),receive_buf,11);//copy the first 11 byte and check
@@ -264,6 +272,10 @@ void MySocket::OnReceive(int nErrorCode)
 				
 			}
 		}
+		else if (Receive_data_length == 5)
+		{
+			ShowTFTPMessage = _T("Failed.Reboot or One minute later try again.");
+		}
 	}
 	else if(ISP_STEP ==ISP_Send_TFTP_PAKAGE)
 	{
@@ -278,6 +290,10 @@ void MySocket::OnReceive(int nErrorCode)
 				next_package_number = package_number +1;
 			}
 		}
+		else if (Receive_data_length == 5)
+		{
+			ShowTFTPMessage = _T("Failed.Reboot or One minute later try again.");
+		}
 	}
 	else if(ISP_STEP==ISP_Send_TFTP_OVER)
 	{
@@ -290,6 +306,10 @@ void MySocket::OnReceive(int nErrorCode)
 			{
 				ISP_STEP = ISP_Flash_Done;
 			}
+		}
+		else if (Receive_data_length == 5)
+		{
+			ShowTFTPMessage = _T("Failed.Reboot or One minute later try again.");
 		}
 	}
 

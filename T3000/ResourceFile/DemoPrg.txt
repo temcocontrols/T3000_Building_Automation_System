@@ -21,7 +21,6 @@
 190 VAR110 = 123456BI6 
 200 VAR110 = 123456BV7
 210 VAR1 = MB_BLOCKWRITE ( 1 , 2 , 3 , 111 , 5 , 6 ) 
-220 VAR10 = MB_BLOCKREAD ( 1 , 2 , 3 , 2 , VAR1 , VAR2 ) 
 228 REM Line 230 writes the high level of VAR1 to register 3
 229 REM Line 240 writes the low level of VAR1 to register 4
 230 1.2.MB_REG3 = VAR1 / 65536        

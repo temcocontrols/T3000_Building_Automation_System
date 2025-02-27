@@ -1231,9 +1231,12 @@ afx_msg LRESULT CISPDlg::OnFlashNewBootFinish(WPARAM wParam, LPARAM lParam)
 }
 
 
+
 static int total_test_count = 0;
 static int total_success_count = 0;
 #ifdef ISP_BURNING_MODE
+static int total_udp_count = 0;
+static int total_udp_success_count = 0;
 extern int temco_burning_mode;
 #endif
 void close_bac_com();
@@ -1241,6 +1244,7 @@ void close_bac_com();
 afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 {
 #ifdef ISP_BURNING_MODE
+    total_udp_count++;
     if (temco_burning_mode == 1)
     {
         auto_flash_mode = false;
@@ -1313,6 +1317,10 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
             {
                 WritePrivateProfileStringW(_T("Data"), _T("Command"), _T("4"), AutoFlashConfigPath);	//FAILED_UNKNOW_ERROR
             }
+            #ifdef ISP_BURNING_MODE
+            burning_test_finished = 1; //如果是循环模式就不关闭;
+            return 1;
+            #endif
             PostMessage(WM_CLOSE, NULL, NULL);
         }
 
@@ -1332,6 +1340,15 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
     if (com_port_flash_status == 2)
         com_port_flash_status = 0;
 #ifdef ISP_BURNING_MODE
+
+
+    if(nRet)
+	{
+		total_udp_success_count++;
+	}
+    CString strTips;
+    strTips.Format(_T("Total Test : %u ,Success : %u"),total_udp_count,total_udp_success_count);
+    UpdateStatusInfo(strTips, FALSE);
     burning_test_finished = 1;
 #endif
     return 1;
@@ -4136,10 +4153,11 @@ DWORD WINAPI  CISPDlg::Thread_BurningTest_fun(LPVOID lpVoid)
     {
         if (burning_test_finished == 1)
         {
+            burning_test_finished = 0;
+            Sleep(30000);
             auto_flash_mode = 1;
             ::PostMessage(m_parent->GetDlgItem(IDC_BUTTON_FLASH)->m_hWnd, WM_LBUTTONDOWN, NULL, NULL);
             ::PostMessage(m_parent->GetDlgItem(IDC_BUTTON_FLASH)->m_hWnd, WM_LBUTTONUP, NULL, NULL);
-            Sleep(5000);
         }
     }
     h_BurningTest_thread = NULL;

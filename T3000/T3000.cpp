@@ -14,8 +14,8 @@
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
 #include <windows.h>  
- 
-const unsigned int g_versionNO = 20250121;    // PROJECT_VERSION
+
+const unsigned int g_versionNO = 20250227;    // PROJECT_VERSION
 
 
 

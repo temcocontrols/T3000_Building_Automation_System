@@ -3525,6 +3525,39 @@ int fill_in_holiday(Str_annual_routine_point* temp_holiday, char* temp_point)
     return 0;
 }
 
+int fill_in_trendlog(Str_monitor_point* temp_mon, char* temp_point)
+{
+    char* my_temp_point = temp_point;
+    if (strlen(my_temp_point) > STR_MONITOR_LABEL_LENGTH)
+        memset(temp_mon->label, 0, STR_MONITOR_LABEL_LENGTH);
+    else
+        memcpy_s(temp_mon->label, STR_MONITOR_LABEL_LENGTH, my_temp_point, STR_MONITOR_LABEL_LENGTH);
+    my_temp_point = my_temp_point + STR_MONITOR_LABEL_LENGTH;
+
+    for (int j = 0; j < MAX_POINTS_IN_MONITOR; j++)
+    {
+        temp_mon->inputs[j].number = *(my_temp_point++);
+        temp_mon->inputs[j].point_type = *(my_temp_point++);
+        temp_mon->inputs[j].panel = *(my_temp_point++);
+        temp_mon->inputs[j].sub_panel = *(my_temp_point++);
+        temp_mon->inputs[j].network = *(my_temp_point++);
+    }
+    for (int k = 0; k < MAX_POINTS_IN_MONITOR; k++)
+    {
+        temp_mon->range[k] = *(my_temp_point++);
+    }
+    temp_mon->second_interval_time = *(my_temp_point++);
+    temp_mon->minute_interval_time = *(my_temp_point++);
+    temp_mon->hour_interval_time = *(my_temp_point++);
+    temp_mon->max_time_length = *(my_temp_point++);
+    temp_mon->num_inputs = *(my_temp_point++);
+    temp_mon->an_inputs = *(my_temp_point++);
+    temp_mon->status = *(my_temp_point++);
+    temp_mon->next_sample_time = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+    my_temp_point = my_temp_point + 4;
+    return 0;
+}
+
 int fill_in_screen(Control_group_point* temp_screen, char* temp_point)
 {
     int temp_struct_value;
@@ -4734,6 +4767,25 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (BAC_MONITOR_COUNT - 1))
             end_flag = true;
 
+
+        if (invoke_id == gsp_invoke)
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_trendlog(&s_monitor_data, my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_monitor_point);
+            }
+        }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                fill_in_trendlog(&m_monitor_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_monitor_point);
+            }
+        }
+
+#if 0
         for (i = start_instance; i <= end_instance; i++)
         {
             if (strlen(my_temp_point) > STR_MONITOR_LABEL_LENGTH)
@@ -4764,6 +4816,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             m_monitor_data.at(i).next_sample_time = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
         }
+#endif
     }
     return READMONITOR_T3000;
     break;

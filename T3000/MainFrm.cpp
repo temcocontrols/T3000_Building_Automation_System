@@ -390,6 +390,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
         ON_COMMAND(ID_WEBVIEW_MODBUSREGISTER, &CMainFrame::OnWebviewModbusregister)
         //ON_COMMAND(ID_WEBVIEW_THIRDPARTYMODBUSDATABASE, &CMainFrame::OnWebviewThirdpartymodbusdatabase)
         ON_COMMAND(ID_TOOLS_LOGINMYACCOUNT, &CMainFrame::OnToolsLoginmyaccount)
+        ON_WM_SYSCOMMAND()
         END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -1180,7 +1181,8 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
         return FALSE;
     //  Modify the Window class or styles here by modifying
     //  the CREATESTRUCT cs
-
+    // 禁用最小化按钮
+    cs.style &= ~WS_MINIMIZEBOX;
 
     return TRUE;
 }
@@ -6313,9 +6315,36 @@ void CMainFrame::OnDestroy()
     
 }
 
+void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
+{
+    TRACE("OnSysCommand: nID = 0x%04X\n", nID);  // 注意用十六进制打印
+    if ((nID & 0xFFF0) == SC_MINIMIZE)
+    {
+        // 处理最小化
+        ShowWindow(SW_MINIMIZE);
+        //SetFocus();
+    }
+    else if (((nID & 0xFFF0) == SC_RESTORE) || (nID == SC_DEFAULT && IsIconic()))
+    {
+        //PostMessage(WM_KEYDOWN, VK_ESCAPE, 0);
+        // 模拟 ESC 键释放
+        //PostMessage(WM_KEYUP, VK_ESCAPE, 0);
+        // 处理恢复
+        //TRACE("Restoring window...\n");
+        ShowWindow(SW_RESTORE);
+        //SetForegroundWindow();   // 将窗口置于前台
+        //SetActiveWindow();        // 激活窗口
+        //SetFocus();
+    }
+    else
+    {
+        DefWindowProc(WM_SYSCOMMAND, nID, lParam);  // 调用默认窗口过程处理其他系统命令
+        //CFrameWnd::OnSysCommand(nID, lParam);
+    }
+}
+
 LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-    
     if(message==WM_MYMSG_REFRESHBUILDING)
     {
         if (b_building_management_flag != SYS_NORMAL_MODE) //处于Building 管理模式 不要刷新Tree
@@ -10637,10 +10666,6 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                     {
                         m_backbround_data.at(n_handle_index).nrec_time = time(NULL);
                          memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_input_data, &s_Input_data, sizeof(Str_in_point));
-                         //CString temp_cs;
-                         //temp_cs.Format(_T("IN%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1,m_backbround_data.at(n_handle_index).ret_data.m_group_input_data.value/1000.000);
-                         //TRACE(_T("Start time: %d   End time : %d\r\n"), m_backbround_data.at(n_handle_index).nreq_time, m_backbround_data.at(n_handle_index).nrec_time);
-                         //TRACE(temp_cs);
                     }
                 }
                     break;
@@ -10670,9 +10695,6 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                     if (nret > 0)
                     {
                         memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_variable_data, &s_Variable_data, sizeof(Str_variable_point));
-                        //CString temp_cs;
-                        //temp_cs.Format(_T("Var%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1, m_backbround_data.at(n_handle_index).ret_data.m_group_variable_data.value / 1000.000);
-                        //TRACE(temp_cs);
                     }
                 }
                     break;
@@ -10708,7 +10730,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         m_backbround_data.at(n_handle_index).str_info.npanel_commad,
                         m_backbround_data.at(n_handle_index).str_info.npoint_number,
                         m_backbround_data.at(n_handle_index).str_info.npoint_number,
-                        sizeof(Str_program_point));
+                        sizeof(Str_weekly_routine_point));
                     if (nret > 0)
                     {
                         memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_schedual_data, &s_Weekly_data, sizeof(Str_weekly_routine_point));
@@ -10721,7 +10743,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         m_backbround_data.at(n_handle_index).str_info.npanel_commad,
                         m_backbround_data.at(n_handle_index).str_info.npoint_number,
                         m_backbround_data.at(n_handle_index).str_info.npoint_number,
-                        sizeof(Str_program_point));
+                        sizeof(Str_annual_routine_point));
                     if (nret > 0)
                     {
                         memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_annual_data, &s_Annual_data, sizeof(Str_annual_routine_point));
@@ -10734,10 +10756,23 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         m_backbround_data.at(n_handle_index).str_info.npanel_commad,
                         m_backbround_data.at(n_handle_index).str_info.npoint_number,
                         m_backbround_data.at(n_handle_index).str_info.npoint_number,
-                        sizeof(Str_program_point));
+                        sizeof(Control_group_point));
                     if (nret > 0)
                     {
                         memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_screen_data, &s_screen_data, sizeof(Control_group_point));
+                    }
+                }
+                break;
+                case READMONITOR_T3000:
+                {
+                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
+                        m_backbround_data.at(n_handle_index).str_info.npanel_commad,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
+                        sizeof(Str_monitor_point));
+                    if (nret > 0)
+                    {
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_monitor_data, &s_monitor_data, sizeof(Str_monitor_point));
                     }
                 }
                 break;

@@ -613,6 +613,7 @@ public:
 		afx_msg void OnWebviewModbusregister();
 		//afx_msg void OnWebviewThirdpartymodbusdatabase();
 		afx_msg void OnToolsLoginmyaccount();
+		afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 };
 //DWORD WINAPI  Bacnet_ReadWrite_Message(LPVOID lpVoid);
 //tree0412  2017 05 11 fance change

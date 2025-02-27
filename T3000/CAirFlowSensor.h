@@ -36,7 +36,7 @@ public:
 	void UpdateUserInterface();
 	void ShowTempHumUI_Part2(bool show_window);
 	void EnablePressureUI(bool enable_window);
-    afx_msg	LRESULT UpdateUI(WPARAM wParam, LPARAM lParam);
+	afx_msg	LRESULT UpdateUI(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnCbnSelchangeComboAirflowMode();
 	afx_msg void OnCbnSelchangeComboAirflowRange();
 	afx_msg void OnEnKillfocusEditAirflowDifLength();

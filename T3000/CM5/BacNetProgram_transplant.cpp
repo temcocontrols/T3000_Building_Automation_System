@@ -1593,42 +1593,42 @@ if(error!=-1)
 }	/* end of main */
 
 
-char * intervaltotext_old(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c)
+char* intervaltotext_old(char* textbuf, long seconds, unsigned minutes, unsigned hours, char* c)
 {
-	char buf[12], *textbuffer;
-	char *separator = c ;
+	char buf[12], * textbuffer;
+	char* separator = c;
 	textbuffer = buf;
-	if( seconds < 0 )
+	if (seconds < 0)
 	{
 		seconds = -seconds;
-		strcpy(textbuffer++, "-" ) ;        /* add the '-' */
+		strcpy(textbuffer++, "-");        /* add the '-' */
 	}
-	if(*c!='-')
+	if (*c != '-')
 	{
-		hours += seconds/3600;
-		minutes += (unsigned)(seconds%3600)/60;
-		seconds = (unsigned)(seconds%3600)%60;
+		hours += seconds / 3600;
+		minutes += (unsigned)(seconds % 3600) / 60;
+		seconds = (unsigned)(seconds % 3600) % 60;
 	}
-	if( hours < 10 ) {
-		strcpy(textbuffer++, "0" ) ;        /* add the leading zero 0#:##:## */
+	if (hours < 10) {
+		strcpy(textbuffer++, "0");        /* add the leading zero 0#:##:## */
 	}
-	itoa(hours,textbuffer,10) ;
+	itoa(hours, textbuffer, 10);
 	textbuffer += strlen(textbuffer);
-	strcpy(textbuffer++, separator ) ;        /* add the ":" separator*/
+	strcpy(textbuffer++, separator);        /* add the ":" separator*/
 
-	if( minutes < 10 ) {
-		strcpy(textbuffer++, "0" ) ;        /* add the leading zero ##:0#:## */
+	if (minutes < 10) {
+		strcpy(textbuffer++, "0");        /* add the leading zero ##:0#:## */
 	}
-	itoa(minutes,textbuffer,10) ;
+	itoa(minutes, textbuffer, 10);
 	textbuffer += strlen(textbuffer);
-	strcpy(textbuffer++, separator ) ;        /* add the ":" separator*/
-	if( seconds < 10 ) {
-		strcpy(textbuffer++, "0" ) ;        /* add the leading zero ##:##:0# */
+	strcpy(textbuffer++, separator);        /* add the ":" separator*/
+	if (seconds < 10) {
+		strcpy(textbuffer++, "0");        /* add the leading zero ##:##:0# */
 	}
-	itoa(seconds,textbuffer,10)  ;
+	itoa(seconds, textbuffer, 10);
 
-	if(textbuf) strcpy(textbuf, buf);
-	return( buf ) ;
+	if (textbuf) strcpy(textbuf, buf);
+	return(buf);
 }
 /*******************intervaltotext ********************/
 
@@ -2175,20 +2175,20 @@ int prescan1 (void)
 
 void get_nl()
 {
-	while( (*prog!=13) && *prog)
-		++prog ;
-	token[0]='\0';
-/*	if (*prog)
-		{
+	while ((*prog != 13) && *prog)
 		++prog;
-		token_type = NL;
-		}
-	else
-		{
-		 token_type = DELIMITER;
-		 tok = FINISHED;
-		}
-*/
+	token[0] = '\0';
+	/*	if (*prog)
+			{
+			++prog;
+			token_type = NL;
+			}
+		else
+			{
+			 token_type = DELIMITER;
+			 tok = FINISHED;
+			}
+	*/
 }
 
 int get_token(void)
@@ -4723,54 +4723,54 @@ char *look_label_ex(int panel,int sub_panel, int point_type, int num, int networ
 		return p;
 }
 
-char *look_label(int panel, int point_type, int num, int network)
+char* look_label(int panel, int point_type, int num, int network)
 {
-	char *p=NULL;
+	char* p = NULL;
 	// if(local_panel)
-	if( local_request(panel, network) )
-		if(panel == Station_NUM)
+	if (local_request(panel, network))
+		if (panel == Station_NUM)
 		{
 			switch (point_type) {
 			case OUT:
 				//strcpy(ptr_panel.outputs[num-1].label,"OUT");
-				p = ptr_panel.outputs[num-1].label;
+				p = ptr_panel.outputs[num - 1].label;
 				break;
 			case IN:
 				//strcpy(ptr_panel.inputs[num-1].label,"IN");
-				p = ptr_panel.inputs[num-1].label;
+				p = ptr_panel.inputs[num - 1].label;
 				break;
 			case VAR:
 				//strcpy(ptr_panel.vars[num-1].label,"VAR");
-				p = ptr_panel.vars[num-1].label;
+				p = ptr_panel.vars[num - 1].label;
 				break;
 			case CON:
 				return 0;
 				//									p = ptr_panel->controllers[num].label;
 				break;
 			case WR:
-				p = ptr_panel.weekly_routines[num-1].label;
+				p = ptr_panel.weekly_routines[num - 1].label;
 				break;
 			case AR:
-				p = ptr_panel.annual_routines[num-1].label;
+				p = ptr_panel.annual_routines[num - 1].label;
 				break;
 			case PRG:
-				p = ptr_panel.programs[num-1].label;
+				p = ptr_panel.programs[num - 1].label;
 				break;
 			case AMON:
-				p = ptr_panel.analog_mon[num-1].label;
+				p = ptr_panel.analog_mon[num - 1].label;
 				break;
 			case AY:
-				p = ptr_panel.arrays[num-1].label;
+				p = ptr_panel.arrays[num - 1].label;
 				break;
 			case GRP:
-				p = ptr_panel.control_groups[num-1].label;
+				p = ptr_panel.control_groups[num - 1].label;
 				break;
 			default:
 				break;
 			}
-			if(p)
+			if (p)
 			{
-				p=rtrim(p);
+				p = rtrim(p);
 				if (strlen(p) == 0)
 					return 0;
 				else
@@ -4780,14 +4780,14 @@ char *look_label(int panel, int point_type, int num, int network)
 				return 0;
 
 		}
-		p=0;
-		if(point_type!=CON && point_type!=TBL)
-		{
-			//fance if(Des)
-			//fance 	p = Des->look_label(panel,point_type,num);
-			//fance     look_label(panel,point_type,num,0);
-		}
-		return p;
+	p = 0;
+	if (point_type != CON && point_type != TBL)
+	{
+		//fance if(Des)
+		//fance 	p = Des->look_label(panel,point_type,num);
+		//fance     look_label(panel,point_type,num,0);
+	}
+	return p;
 }
 
 
@@ -4809,49 +4809,50 @@ int checklocalvar(char *tok)
 
 
 
-int look_up_func( char *s )
-{ register int i ;
-char *p ;
-/* convert to lower case */
-p = s ;
-//	 while (*p) { * p = toupper(*p) ; p++ ; }
+int look_up_func(char* s)
+{
+	register int i;
+	char* p;
+	/* convert to lower case */
+	p = s;
+	//	 while (*p) { * p = toupper(*p) ; p++ ; }
 
-/* see if token is in table */
-for( i = 0 ; *func_table[i].func_name ; i++ )
-	if (!strcmp(func_table[i].func_name , s)) 
-		return func_table[i].tok;
-return 0 ; /* unkown command */
+	/* see if token is in table */
+	for (i = 0; *func_table[i].func_name; i++)
+		if (!strcmp(func_table[i].func_name, s))
+			return func_table[i].tok;
+	return 0; /* unkown command */
 }
 
 
-int isarray(char *tok)
+int isarray(char* tok)
 {
-//	float value;
+	//	float value;
 	int i;
-	i=checklocalvar(tok);
-	if( !i ) return 0;
+	i = checklocalvar(tok);
+	if (!i) return 0;
 	get_token();
-	if (*token=='(')
+	if (*token == '(')
 	{
 		parse_exp(&res);
-		if(!res)
+		if (!res)
 			return 0;
 		get_token();
-		if (*token!=')')
+		if (*token != ')')
 		{
-			if( !vars_table[i-1].l ) 
+			if (!vars_table[i - 1].l)
 				return 0;
-			if (*token!=',')
+			if (*token != ',')
 				return 0;
 			parse_exp(&res);
-			if(!res)
+			if (!res)
 				return 0;
 			get_token();
-			if (*token!=')')
+			if (*token != ')')
 				return 0;
 			return 1;
 		}
-		if( vars_table[i-1].l && vars_table[i-1].c ) 
+		if (vars_table[i - 1].l && vars_table[i - 1].c)
 			return 0;
 		return 1;
 	}

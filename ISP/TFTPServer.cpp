@@ -76,11 +76,7 @@ TFTPServer::TFTPServer(void)
     WORD wVersionRequested;
     wVersionRequested = MAKEWORD( 1,1 );
     err = WSAStartup( wVersionRequested, &wsaData );
-    //if ( err != 0 )
-    //{
-    //	return TRUE;
-    //}
-    //some_device_reply_the_broadcast=false;
+
     device_jump_from_runtime = false;
     dhcp_package_is_broadcast=false;
     ISP_Device_IP.Empty();
@@ -378,47 +374,6 @@ int TFTPServer::SendDataNew(BYTE* szBuf, int nLen)
 
 
 
-// Send data
-//int TFTPServer::SendData(BYTE* szBuf, int nLen)
-//{
-//	TFTP_DATA_PACK tdp;
-//	int nCount = m_nDataBufLen;
-//
-//	ASSERT(nLen <= 512)	;
-//	tdp.m_wOPCode = 3;
-//	tdp.m_wOPCode <<= 8;
-//	tdp.m_wBlkNum = htons(m_nBlkNum);
-//	memcpy(tdp.m_szData, szBuf, nLen);
-//
-//// 	int nSendPort =3763;
-//// 	m_siSend.sin_family = AF_INET;
-//// 	m_siSend.sin_port = m_siClient.sin_port;
-//// 	m_siSend.sin_addr = m_siClient.sin_addr;
-//	int nAddrLen = sizeof(m_siClient);
-//	int nRet = 0;
-//	if (nLen == 512)
-//	{
-//		nRet = sendto(m_soSend,(char*)(&tdp), sizeof(tdp),0, (sockaddr*)&m_siClient, nAddrLen);
-//	}
-//	else  // Last package, do not send useless data
-//	{
-//		nRet = sendto(m_soSend,(char*)(&tdp), nLen+4, 0, (sockaddr*)&m_siClient, nAddrLen);
-//	}
-//
-//
-//	if (nRet == SOCKET_ERROR)
-//	{
-//		return 0;
-//	}
-//
-//	CString strInfo;
-//	//strInfo.Format(_T("Send Data Byte Num = %d ********"), nRet);
-//	//strInfo.Format(_T("Send Block Num = %d\n"), tdp.m_wBlkNum);
-//
-//
-//	return nRet;
-//}
-
 const BYTE c_byEndFlag[2] = {0xee, 0x10};
 int TFTPServer::SendEndDataPack()
 {
@@ -635,11 +590,6 @@ void TFTPServer::GetIPMaskGetWay()
 		pAdapter = pAdapterInfo;
 		while (pAdapter)
 		{
-			//             CString Name;//=pAdapter->AdapterName;
-			// 			MultiByteToWideChar( CP_ACP, 0, pAdapter->AdapterName, (int)strlen((char *)pAdapter->AdapterName)+1,
-			// 				Name.GetBuffer(MAX_PATH), MAX_PATH );
-			// 			Name.ReleaseBuffer();
-
 			MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1,
 				Temp_Node.StrIP.GetBuffer(MAX_PATH), MAX_PATH );
 			Temp_Node.StrIP.ReleaseBuffer();
@@ -1104,8 +1054,10 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 }
 
 CString ShowTFTPMessage;
+CString ShowTFTPMessage2;
 BOOL TFTPServer::StartServer()
 {
+
 #ifdef ISP_BURNING_MODE
     Check_sum = 0;
        CString strTips_checksum;
@@ -1170,6 +1122,13 @@ BOOL TFTPServer::StartServer()
                 strTips.Format(_T(" "));
                 OutPutsStatusInfo(strTips, FALSE);
             }
+            if (!ShowTFTPMessage2.IsEmpty())
+            {
+                OutPutsStatusInfo(ShowTFTPMessage2, FALSE);
+                ShowTFTPMessage2.Empty();
+                strTips.Format(_T(" "));
+                OutPutsStatusInfo(strTips, FALSE);
+            }
             switch(ISP_STEP)
             {
             case ISP_SEND_FLASH_COMMAND:
@@ -1185,6 +1144,7 @@ BOOL TFTPServer::StartServer()
 						//TRACE(_T("Send EEprom data failed!"));
                         //TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
                     }
+
 
                     SetDHCP_Data();
 
@@ -1224,21 +1184,7 @@ BOOL TFTPServer::StartServer()
 
 
                     goto StopServer;
-                    //if(some_device_reply_the_broadcast == true)	//This is used to support multiple broadcasts in bootload mode, and if so print the responses
-                    //{
-                    //	CString temp_pro_cs;
-                    //	temp_pro_cs.Format(_T("Find %d device in ISP mode"),Product_Info.size());
-                    //	OutPutsStatusInfo(temp_pro_cs, FALSE);
-                    //	for (int i=0;i<((int)Product_Info.size());i++)
-                    //	{
-                    //		temp_pro_cs.Format(_T("No.%d -----> IP ="),i+1);
-                    //		temp_pro_cs = temp_pro_cs + Product_Info.at(i).ISP_Device_IP;
-                    //		OutPutsStatusInfo(temp_pro_cs, FALSE);
-                    //	}
-                    //	ISP_STEP =ISP_SEND_DHCP_COMMAND_HAS_LANIP;
-                    //	broadcast_flash_count = Product_Info.size();
-                    //	continue;
-                    //}
+
 
                 }
                 break;
@@ -1285,7 +1231,6 @@ BOOL TFTPServer::StartServer()
 
                 if((device_jump_from_runtime == true)&&(has_wait_device_into_bootloader == false))
                 {
-                    has_wait_device_into_bootloader = true;
                     OutPutsStatusInfo(_T(""), FALSE);
                     for (int i=0; i<7; i++)
                     {
@@ -1294,6 +1239,7 @@ BOOL TFTPServer::StartServer()
                         Sleep(1000);
                     }
                     OutPutsStatusInfo(_T(""), FALSE);
+                    has_wait_device_into_bootloader = true;
                 }
 #if 1
 				if(dhcp_package_is_broadcast == true)//If it's a broadcast, change the device IP TBD: explain this better 
@@ -1310,9 +1256,7 @@ BOOL TFTPServer::StartServer()
 					if(m_StrProductName.GetLength() > 11)
 						m_StrProductName = m_StrProductName.Left(10);
 
-					//m_StrProductName.Format(_T("%C%C%C%C%C%C%C%C%C%C"),Product_Name[0],Product_Name[1],Product_Name[2],Product_Name[3],Product_Name[4]
-					//,Product_Name[5],Product_Name[6],Product_Name[7],Product_Name[8],Product_Name[9]
-					//);
+
 					m_StrProductName.Trim();
 					if(!m_StrProductName.IsEmpty())
 					{
@@ -1355,12 +1299,30 @@ BOOL TFTPServer::StartServer()
 				}
 #endif
                 SetDHCP_Data();
-                if(mode_has_lanip_try_time++<15)
+                if(mode_has_lanip_try_time++<20)
                 {
                     BOOL bBroadcast=false;
-                    SendUDP_Flash_Socket.SetSockOpt(SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL),SOL_SOCKET);
-                    SendUDP_Flash_Socket.SendTo(sendbuf,sizeof(sendbuf),FLASH_UDP_PORT,ISP_Device_IP,0);
-                    strTips.Format(_T("Send DHCP Package!!(Time remaining:%d)"),16-mode_has_lanip_try_time);
+                    if (ISP_Device_IP.IsEmpty())
+                    {
+                        SendUDP_Flash_Socket.SetSockOpt(SO_BROADCAST, (char*)&bBroadcast, sizeof(BOOL), SOL_SOCKET);
+                        strTips.Format(_T("Send DHCP Package!!(Time remaining:%d)"), 21 - mode_has_lanip_try_time);
+                    }
+                    else
+                    {
+                        if (Byte_ISP_Device_IP[0] != 0)
+                        {
+                            CString temp_ip;
+                            temp_ip.Format(_T("%u.%u.%u.%u"), Byte_ISP_Device_IP[0], Byte_ISP_Device_IP[1], Byte_ISP_Device_IP[2], Byte_ISP_Device_IP[3]);
+                            SendUDP_Flash_Socket.SendTo(sendbuf, sizeof(sendbuf), FLASH_UDP_PORT, ISP_Device_IP, 0);
+                            strTips.Format(_T("Send DHCP Package to %s!(%d)"), temp_ip.GetString(), 21 - mode_has_lanip_try_time);
+                        }
+                        else
+                        {
+                            SendUDP_Flash_Socket.SendTo(sendbuf, sizeof(sendbuf), FLASH_UDP_PORT, ISP_Device_IP, 0);
+
+                            strTips.Format(_T("Send DHCP Package to %s!(%d)"), ISP_Device_IP.GetString(), 21 - mode_has_lanip_try_time);
+                        }
+                    }
                     OutPutsStatusInfo(strTips, TRUE);
                 }
                 else
@@ -1404,7 +1366,14 @@ BOOL TFTPServer::StartServer()
                                 temp_ver_boot = read_reg[11];
                             else
                                 temp_ver_boot = read_reg[14];
+                            #ifdef ISP_BURNING_MODE
+                            strTips_Ethernet.Format(_T("Bootloader version :%u ,panel :%u"), temp_ver_boot, read_reg[36]);
+                            #endif
+                            #ifndef ISP_BURNING_MODE
                             strTips_Ethernet.Format(_T("Bootloader version :%u"), temp_ver_boot);
+                            #endif 
+
+
                             OutPutsStatusInfo(strTips_Ethernet, FALSE);
 
 #pragma region check_boot_version
@@ -1422,34 +1391,6 @@ BOOL TFTPServer::StartServer()
                             }
 #pragma endregion
 
-#if 0
-                            if ((temp_read_reg[11] >= 62) || (temp_read_reg[14] >= 62))
-                            {
-
-                                strTips_Ethernet = _T("Check bootloader version success.");
-                                OutPutsStatusInfo(strTips_Ethernet, FALSE);
-                            }
-                            else
-                            {
-                                if (temp_mu_ret >= 0)
-                                {
-                                    strTips_Ethernet.Format(_T("Serial Number: %u"), temp_read_reg[3] * 65536 * 256 + temp_read_reg[2] * 65536 + temp_read_reg[1] * 256 + temp_read_reg[0]);
-                                    OutPutsStatusInfo(strTips_Ethernet, FALSE);
-
-                                }
-
-                                if (firmware_must_use_new_bootloader)
-                                {
-                                    strTips_Ethernet = _T("Bootloader version is too old,need update now.");
-                                    OutPutsStatusInfo(strTips_Ethernet, FALSE);
-                                    //这里设置标志 需要自动引到ISP来更新 repaire boot 
-                                    //HexFileValidation(g_repair_bootloader_file_path);
-                                    ISP_STEP = ISP_SEND_FLASH_COMMAND;
-                                    PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, temp_read_reg[7], 0);
-                                    return 0;
-                                }
-                            }
-#endif
                         }
 
 
@@ -1460,58 +1401,7 @@ BOOL TFTPServer::StartServer()
                 strTips.Format(_T("Updating firmware. Device IP : %d.%d.%d.%d"),Byte_ISP_Device_IP[0],Byte_ISP_Device_IP[1],Byte_ISP_Device_IP[2],Byte_ISP_Device_IP[3]);
                 OutPutsStatusInfo(strTips, FALSE);
 
-#if 0
-                if (m_tcp_connect_results)
-                {
-                    unsigned short temp_reg[100];
-                    unsigned short temp_reg2[5];
-                    int nret_read = read_multi_retry(255, temp_reg, 0, 100, 3);
-                    if (nret_read > 0)
-                    {
-                        unsigned short wirte_md5[4];
-                        unsigned short temp_md5[5];
-                        int compare_ret = 1;
-                        int nret = read_multi_retry(255, temp_reg2, 1995, 5, 3);
-                        for (int x = 0; x < 4; x++)
-                        {
-                            wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
-                            if (temp_reg2[x] != wirte_md5[x])
-                            {
-                                compare_ret = -1;
-                                break;
-                            }
-                        }
 
-                        if (read_reg[7] == 88)
-                        {
-                            //获取上次烧写的 MD5值 ，需要同时满足MD5以及 没有烧写完毕 才开启  断点续传;
-
-                            if ((temp_reg2[4] != 0) && (compare_ret == 1))
-                            {
-                                continue_flash_count = temp_reg2[4];
-                                strTips.Format(_T("Resume at breakpoint, starting from package %u"), continue_flash_count);
-                                OutPutsStatusInfo(strTips, FALSE);
-                            }
-                            else
-                            {
-                                int md5_write_ret[4];
-                                int total_ret = 1;
-                                for (int x = 0; x < 4; x++)
-                                {
-                                    wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
-                                    md5_write_ret[x] = mudbus_write_one(read_reg[6], 1995 + x, wirte_md5[x], 3);
-                                    if (md5_write_ret[x] < 0)
-                                        break;
-                                }
-
-                            }
-
-                            Sleep(1);
-                        }
-                    }
- 
-                }
-#endif
                 OutPutsStatusInfo(_T(""), FALSE);
                 nRet =Send_Tftp_File();
                 if(nRet==0) //break;
@@ -1524,7 +1414,7 @@ BOOL TFTPServer::StartServer()
                 OutPutsStatusInfo(strTips_checksum, FALSE);
 #endif
 
-                if(mode_flash_over_try_time++<5)
+                if(mode_flash_over_try_time++<10)
                     SendUDP_Flash_Socket.SendTo(Flash_Done,sizeof(Flash_Done),FLASH_UDP_PORT,ISP_Device_IP,0);
                 else
                 {
@@ -2104,189 +1994,152 @@ void TFTPServer::NewBootWriteFinish(int nFlashFlag)
 
 void TFTPServer::FlashByEthernet()
 {
-    GetIPMaskGetWay();
-    GetDeviceIP_String();
-    //确认绑定哪一个本地IP地址来建立UDP通讯
-    CString bind_local_pc_ip;
-    CString temp_device_ip = ISP_Device_IP;
-    CString temp_compare_ip;
-    CStringArray temparray;
-    SplitCStringA(temparray, temp_device_ip, _T("."));
-    CString strTips_ip;
+	GetIPMaskGetWay();
+	GetDeviceIP_String();
+	//确认绑定哪一个本地IP地址来建立UDP通讯
+	CString bind_local_pc_ip;
+	CString temp_device_ip = ISP_Device_IP;
+	CString temp_compare_ip;
+	CStringArray temparray;
+	SplitCStringA(temparray, temp_device_ip, _T("."));
+	CString strTips_ip;
 	if (temparray.GetSize() == 4)
 	{
-		temp_compare_ip = temparray.GetAt(0) + _T(".")  + temparray.GetAt(1) + _T(".")  + temparray.GetAt(2);
+		temp_compare_ip = temparray.GetAt(0) + _T(".") + temparray.GetAt(1) + _T(".") + temparray.GetAt(2);
 		for (int index = 0; index < g_Vector_Subnet.size(); index++)
 		{
-            if (g_Vector_Subnet[index].StrIP.Find(_T("0.0.")) != -1)
-            {
-                continue;
-            }
-            strTips_ip = _T("Local computer IP :");
-            strTips_ip = strTips_ip + g_Vector_Subnet[index].StrIP;
-            OutPutsStatusInfo(strTips_ip, FALSE);
+			if (g_Vector_Subnet[index].StrIP.Find(_T("0.0.")) != -1)
+			{
+				continue;
+			}
+			strTips_ip = _T("Local computer IP :");
+			strTips_ip = strTips_ip + g_Vector_Subnet[index].StrIP;
+			OutPutsStatusInfo(strTips_ip, FALSE);
 			if (g_Vector_Subnet[index].StrIP.Find(temp_compare_ip) != -1)
 			{
-                bind_local_pc_ip = g_Vector_Subnet[index].StrIP;
-                //break;
+				bind_local_pc_ip = g_Vector_Subnet[index].StrIP;
+				//break;
 			}
 
 		}
 	}
-    strTips_ip = _T("Use local network card's IP  ")  ;
-    strTips_ip = strTips_ip + bind_local_pc_ip;
-    strTips_ip = strTips_ip + _T(" to communicate");
-    OutPutsStatusInfo(strTips_ip, FALSE);
+	strTips_ip = _T("Use local network card's IP  ");
+	strTips_ip = strTips_ip + bind_local_pc_ip;
+	strTips_ip = strTips_ip + _T(" to communicate");
+	OutPutsStatusInfo(strTips_ip, FALSE);
 
-    int Udp_resualt;
-    device_has_replay_lan_IP =false;
-    if(bind_local_pc_ip.IsEmpty())
-        Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT,SOCK_DGRAM);
-    else
-        Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT, SOCK_DGRAM,63L, bind_local_pc_ip); //测试
-    if(Udp_resualt == 0)
-    {
-        DWORD error_msg=GetLastError();
-        TCHAR szBuf[250];
-        LPVOID lpMsgBuf;
-        FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER | 	FORMAT_MESSAGE_FROM_SYSTEM,	NULL,	error_msg,
-                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),	(LPTSTR) &lpMsgBuf,	0, NULL );
-        wsprintf(szBuf,_T("failed with error %d: %s"), 	 error_msg, lpMsgBuf);
-        if(!auto_flash_mode)
-            AfxMessageBox(szBuf);
-        LocalFree(lpMsgBuf);
+	int Udp_resualt;
+	device_has_replay_lan_IP = false;
+	if (bind_local_pc_ip.IsEmpty())
+		Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT, SOCK_DGRAM);
+	else
+		Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT, SOCK_DGRAM, 63L, bind_local_pc_ip); //测试
+	if (Udp_resualt == 0)
+	{
+		DWORD error_msg = GetLastError();
+		TCHAR szBuf[250];
+		LPVOID lpMsgBuf;
+		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, error_msg,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+		wsprintf(szBuf, _T("failed with error %d: %s"), error_msg, lpMsgBuf);
+		if (!auto_flash_mode)
+			AfxMessageBox(szBuf);
+		LocalFree(lpMsgBuf);
 
-        PostMessage(m_pDlg->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(0));
-        return;
-    }
+		PostMessage(m_pDlg->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(0));
+		return;
+	}
 
-    ISP_STEP = 0;
-    //int add_port=0;
-    //if(m_nClientPort<60000)
-    //	add_port= rand() % 30000+ 8000;
-    //else
-    //	add_port= rand() % 100+ 1;
+	ISP_STEP = 0;
 
 
-    int resualt=TCP_Flash_CMD_Socket.Create(0,SOCK_STREAM);//SOCK_STREAM
+	int resualt = TCP_Flash_CMD_Socket.Create(0, SOCK_STREAM);//SOCK_STREAM
 
-    if(resualt == 0)
-    {
-        DWORD error_msg=GetLastError();
-        TCHAR szBuf[250];
-        LPVOID lpMsgBuf;
-        FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER | 	FORMAT_MESSAGE_FROM_SYSTEM,	NULL,	error_msg,
-                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),	(LPTSTR) &lpMsgBuf,	0, NULL );
-        wsprintf(szBuf,_T("failed with error %d: %s"), 	 error_msg, lpMsgBuf);
-        if(!auto_flash_mode)
-            AfxMessageBox(szBuf);
-        LocalFree(lpMsgBuf);
+	if (resualt == 0)
+	{
+		DWORD error_msg = GetLastError();
+		TCHAR szBuf[250];
+		LPVOID lpMsgBuf;
+		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, error_msg,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+		wsprintf(szBuf, _T("failed with error %d: %s"), error_msg, lpMsgBuf);
+		if (!auto_flash_mode)
+			AfxMessageBox(szBuf);
+		LocalFree(lpMsgBuf);
 
-        PostMessage(m_pDlg->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(0));
-        return;
-    }
-  //   TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
-	 //Sleep(3000);
-   // TCP_Flash_CMD_Socket.m_hex_bin_filepath=m_strFileName;
-    if (new_bootload == 0)
-    {
-        CString strTips_Ethernet;
-        strTips_Ethernet = _T("Connecting device.");
-        OutPutsStatusInfo(strTips_Ethernet, FALSE);
+		PostMessage(m_pDlg->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(0));
+		return;
+	}
 
-        int connect_ret = Open_Socket_Retry(ISP_Device_IP, m_nClientPort, 2);
-        if (connect_ret)
-        {
-            m_tcp_connect_results = 1;
-            strTips_Ethernet = _T("Reading bootloader version.");
-            OutPutsStatusInfo(strTips_Ethernet, FALSE);
-            int temp_mu_ret = 0;
+	if (new_bootload == 0)
+	{
+		CString strTips_Ethernet;
+		strTips_Ethernet = _T("Connecting device.");
+		OutPutsStatusInfo(strTips_Ethernet, FALSE);
 
-            temp_mu_ret = read_multi_retry(255, read_reg, 0, 100,3);
-            if (temp_mu_ret < 0)
-            {
-                strTips_Ethernet = _T("Read bootloader version failed.");
-                OutPutsStatusInfo(strTips_Ethernet, FALSE);
-            }
-            else
-            {
+		int connect_ret = Open_Socket_Retry(ISP_Device_IP, m_nClientPort, 2);
+		if (connect_ret)
+		{
+			m_tcp_connect_results = 1;
+			strTips_Ethernet = _T("Reading bootloader version.");
+			OutPutsStatusInfo(strTips_Ethernet, FALSE);
+			int temp_mu_ret = 0;
 
-
-
-                unsigned short temp_ver_boot = 0;
-                if(read_reg[11] >= read_reg[14])
-                    temp_ver_boot = read_reg[11];
-                else
-                    temp_ver_boot = read_reg[14];
-                strTips_Ethernet.Format(_T("Bootloader version :%u"), temp_ver_boot);
-                OutPutsStatusInfo(strTips_Ethernet, FALSE);
-
-                int c2_update_boot = 0;
-                int Ret_Result = 0;
-
-                Ret_Result = check_bootloader_and_frimware(read_reg[7], 1 , read_reg[11], read_reg[14], c2_update_boot, read_reg[4]);
-
-                if (c2_update_boot == 1)
-                {
-                    CString strtips;
-                    strtips.Format(_T("New bootloader available ,need update!"));
-                    OutPutsStatusInfo(strtips, false);
-                    PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, read_reg[7], 0);
-                    Ret_Result = 2;
-                    return;
-                }
-
-
-#if 0
-                if ((temp_read_reg[11] >= 62) || (temp_read_reg[14] >= 62))
-                {
-
-                    strTips_Ethernet = _T("Check bootloader version success.");
-                    OutPutsStatusInfo(strTips_Ethernet, FALSE);
-                }
-                else
-                {
-                    if (temp_mu_ret >= 0)
-                    {
-                        strTips_Ethernet.Format(_T("Serial Number: %u"), temp_read_reg[3] * 65536 * 256 + temp_read_reg[2] * 65536 + temp_read_reg[1] * 256 + temp_read_reg[0]);
-                        OutPutsStatusInfo(strTips_Ethernet, FALSE);
-
-                    }
-
-                    if (firmware_must_use_new_bootloader)
-                    {
-
-                        strTips_Ethernet = _T("Bootloader version is too old,need update now.");
-                        OutPutsStatusInfo(strTips_Ethernet, FALSE);
-                        //这里设置标志 需要自动引到ISP来更新 repaire boot 
-                        //HexFileValidation(g_repair_bootloader_file_path);
-                        PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, temp_read_reg[7], 0);
-                        return;
-                    }
-                }
+			temp_mu_ret = read_multi_retry(255, read_reg, 0, 100, 3);
+			if (temp_mu_ret < 0)
+			{
+				strTips_Ethernet = _T("Read bootloader version failed.");
+				OutPutsStatusInfo(strTips_Ethernet, FALSE);
+			}
+			else
+			{
+				unsigned short temp_ver_boot = 0;
+				if (read_reg[11] >= read_reg[14])
+					temp_ver_boot = read_reg[11];
+				else
+					temp_ver_boot = read_reg[14];
+#ifdef ISP_BURNING_MODE
+				strTips_Ethernet.Format(_T("Bootloader version :%u ,panel :%u"), temp_ver_boot, read_reg[36]);
 #endif
-            }
+#ifndef ISP_BURNING_MODE
+				strTips_Ethernet.Format(_T("Bootloader version :%u"), temp_ver_boot);
+#endif 
 
-            
+				OutPutsStatusInfo(strTips_Ethernet, FALSE);
 
-        }
-        else
-        {
-            m_tcp_connect_results = 0;
-            strTips_Ethernet.Format(_T("Can't connect to IP:%s port:%d."), ISP_Device_IP, m_nClientPort);
-            OutPutsStatusInfo(strTips_Ethernet, FALSE);
-            strTips_Ethernet.Format(_T(" "));
-            OutPutsStatusInfo(strTips_Ethernet, FALSE);
-        }
-    }
-    //else
-    //{
-    //    new_bootload = 0;
-    //}
+				int c2_update_boot = 0;
+				int Ret_Result = 0;
 
-    m_pThread = AfxBeginThread(_StartSeverFunc, this);
+				Ret_Result = check_bootloader_and_frimware(read_reg[7], 1, read_reg[11], read_reg[14], c2_update_boot, read_reg[4]);
 
-    ASSERT(m_pThread);
+				if (c2_update_boot == 1)
+				{
+					CString strtips;
+					strtips.Format(_T("New bootloader available ,need update!"));
+					OutPutsStatusInfo(strtips, false);
+					PostMessage(m_pDlg->m_hWnd, WM_FLASH_RESTATR_BOOT, read_reg[7], 0);
+					Ret_Result = 2;
+					return;
+				}
+			}
+
+
+
+		}
+		else
+		{
+			m_tcp_connect_results = 0;
+			strTips_Ethernet.Format(_T("Can't connect to IP:%s port:%d."), ISP_Device_IP, m_nClientPort);
+			OutPutsStatusInfo(strTips_Ethernet, FALSE);
+			strTips_Ethernet.Format(_T(" "));
+			OutPutsStatusInfo(strTips_Ethernet, FALSE);
+		}
+	}
+
+
+	m_pThread = AfxBeginThread(_StartSeverFunc, this);
+
+	ASSERT(m_pThread);
 }
 
 
@@ -2308,74 +2161,55 @@ UINT _StartSeverFunc(LPVOID pParam)
 //so we change the protocol,but we also need the old protocol to update the old bootload to new bootload
 BOOL TFTPServer::StartServer_Old_Protocol()
 {
-    m_nBlkNum = 0;
-    int nRet  =0;
+	m_nBlkNum = 0;
+	int nRet = 0;
 
 
-    //else
-    //{
-    //	CString strTips = _T("Initializing network setting...");
-    //	OutPutsStatusInfo(strTips, FALSE);
-    //}
-    //CString strTips = _T("Use old protocol send flash command");
-    //OutPutsStatusInfo(strTips, FALSE);
+	//else
+	//{
+	//	CString strTips = _T("Initializing network setting...");
+	//	OutPutsStatusInfo(strTips, FALSE);
+	//}
+	//CString strTips = _T("Use old protocol send flash command");
+	//OutPutsStatusInfo(strTips, FALSE);
 
-    if(!SendDHCPPack())
-        //if(!SendAnyTFTPData())
-    {
-        CString strTips = _T("Send dhcp pack broadcast failed.");
-        OutPutsStatusInfo(strTips, FALSE);
-        //AfxMessageBox(strTips, MB_OK);
-        ReleaseAll();
-        //goto StopServer;
-        return 0;
-    }
-    else
-    {
-        CString strTips = _T("ISP has Send a dhcp pack.");
-    }
+	if (!SendDHCPPack())
+		//if(!SendAnyTFTPData())
+	{
+		CString strTips = _T("Send dhcp pack broadcast failed.");
+		OutPutsStatusInfo(strTips, FALSE);
+		//AfxMessageBox(strTips, MB_OK);
+		ReleaseAll();
+		//goto StopServer;
+		return 0;
+	}
+	else
+	{
+		CString strTips = _T("ISP has Send a dhcp pack.");
+	}
 
-    //BroadCastToClient();
-
-
-    //阻塞接受
-    if(!RecvRequest())
-    {
-        CString strTips = _T("Recv TFTP read request pack failed.");
-        OutPutsStatusInfo(strTips, FALSE);
-        //AfxMessageBox(strTips, MB_OK);
-        ReleaseAll();
-        //goto StopServer;
-        return 0;
-    }
-    else
-    {
-        CString strTips = _T("Recv TFTP read request pack.");
-        //OutPutInfo(strTips);
-        OutPutsStatusInfo(strTips, FALSE);
-        // fornew m_pDlg->m_sendmul_button.EnableWindow(TRUE);
-    }
-
-    nRet = SendProcess();
-
-    //if (nRet == 1)
-    //{
-    //	CString strTips=_T("Programming successful. ");
-    //	OutPutsStatusInfo(strTips, FALSE);
-    //	//AfxMessageBox(strTips);
-    //}
-    //else
-    //{
-    //	CString strTips=_T("Programming failure.");
-    //	OutPutsStatusInfo(strTips, FALSE);
-    //	//AfxMessageBox(strTips);
-    //}
+	//BroadCastToClient();
 
 
-//StopServer:
-//
-//	WriteFinish(nRet);
-//	//Sleep(3000);
-//	((CISPDlg*)m_pDlg)->Show_Flash_DeviceInfor_NET();
-    return nRet;
+	//阻塞接受
+	if (!RecvRequest())
+	{
+		CString strTips = _T("Recv TFTP read request pack failed.");
+		OutPutsStatusInfo(strTips, FALSE);
+		//AfxMessageBox(strTips, MB_OK);
+		ReleaseAll();
+		//goto StopServer;
+		return 0;
+	}
+	else
+	{
+		CString strTips = _T("Recv TFTP read request pack.");
+		//OutPutInfo(strTips);
+		OutPutsStatusInfo(strTips, FALSE);
+		// fornew m_pDlg->m_sendmul_button.EnableWindow(TRUE);
+	}
+
+	nRet = SendProcess();
+
+	return nRet;
 }
