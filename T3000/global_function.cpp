@@ -16564,6 +16564,16 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //èŽ·å
                 nret_type = OUTPUT_VIRTUAL_PORT;
         }
         break;
+        case T3_TSTAT10:
+        {
+            if (portindex <= 5)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= 5 + 2)
+                nret_type = OUTPUT_ANALOG_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
         case T3_TB_11I:  //6DO   5AO
         {
             if (portindex <= 6)
@@ -16767,6 +16777,22 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
                 nret_type = INPUT_VIRTUAL_PORT;
         }
         break;
+        case T3_TSTAT10:   //12DO  ,12AO
+            if (portindex <= 10)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (portindex <= 8)
+                {
+                    if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    {
+                        nret_type = INPUT_DIGITAL_PORT;
+                    }
+                }
+
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+            break;
         case T3_TB_11I:  //11AI
         {
             if (portindex <= TB_11I_IN_A)

@@ -35,7 +35,7 @@ public:
     afx_msg void OnEnKillfocusEditSettingMaxMaster();
     virtual BOOL PreTranslateMessage(MSG* pMsg);
     afx_msg void OnEnKillfocusEditSettingPanel();
-
+    afx_msg void OnEnKillfocusEditSettingLcdDelayOff();
     afx_msg void OnEnKillfocusEditSettingNodesLabelSetting();
 
     CStatic m_static_panel_title;

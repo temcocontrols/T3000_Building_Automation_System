@@ -142,25 +142,25 @@ int CComWriter::BeginWirteByCom()
     else if(m_nHexFileType == 2)
     {
 #pragma region detect_mstp_shutdown
+		if (SPECIAL_BAC_TO_MODBUS)  //暂时不要在店flash的时候 判断串口的协议，不然烧modbus的时候很慢 。
+		{
+			baudrate_def temp_baudrate_ret[100] = { 0 }; //用于检测串口MSTP数据
+			int find_mstp_protocal = 0;
+			find_mstp_protocal = Check_Mstp_Comport(m_nComPort, temp_baudrate_ret, m_nBautrate);
+			if ((find_mstp_protocal == -101) || (find_mstp_protocal == -100))
+			{
+				CString srtInfo = _T("|Error :The com port is occupied!");
+				OutPutsStatusInfo(srtInfo, FALSE);
+				return 0;
+			}
 
-        baudrate_def temp_baudrate_ret[100] = {0}; //用于检测串口MSTP数据
-        int find_mstp_protocal = 0;
-        find_mstp_protocal = Check_Mstp_Comport(m_nComPort, temp_baudrate_ret, m_nBautrate);
-        if ((find_mstp_protocal == -101) || (find_mstp_protocal == -100))
-        {
-            CString srtInfo = _T("|Error :The com port is occupied!");
-            OutPutsStatusInfo(srtInfo, FALSE);
-            return 0;
-        }
-        if (SPECIAL_BAC_TO_MODBUS)
-        {
-            if (find_mstp_protocal != 1)
-            {
-                CString srtInfo = _T("|Error :No MSTP data was found on the RS485 serial bus!");
-                OutPutsStatusInfo(srtInfo, FALSE);
-                return 0;
-            }
-        }
+			if (find_mstp_protocal != 1)
+			{
+				CString srtInfo = _T("|Error :No MSTP data was found on the RS485 serial bus!");
+				OutPutsStatusInfo(srtInfo, FALSE);
+				return 0;
+			}
+		}
 #if 0
         int temp_loop_count = 0;
         while ( (find_mstp_protocal > 0) && (temp_loop_count < 3))

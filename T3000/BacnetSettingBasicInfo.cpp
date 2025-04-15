@@ -79,6 +79,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingBasicInfo, CDialogEx)
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_MAX_MASTER, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMaxMaster)
     ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
 
+    ON_EN_KILLFOCUS(IDC_EDIT_LCD_DELAY_OFF_TIME, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingLcdDelayOff)
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_PANEL, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingPanel)
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_NODES_LABEL_SETTING, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingNodesLabelSetting)
 
@@ -258,7 +259,10 @@ void CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdDelayOff()
 }
 
 
-
+void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingLcdDelayOff()
+{
+    OnBnClickedRadioSettingLcdDelayOff();
+}
 
 void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingPanel()
 {
