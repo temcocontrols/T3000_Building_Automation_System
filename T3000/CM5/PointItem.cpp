@@ -18,13 +18,13 @@ CPointItem::~CPointItem(void)
 	m_pNextItem =NULL;
 }
 
-void CPointItem::SetPoint(MyPoint point)  //设置此ItemPoint的坐标
+void CPointItem::SetPoint(MyPoint point)  //ItemPoint
 {
 	m_point.x = point.x;
 	m_point.y = point.y;
 }
 
-MyPoint CPointItem::GetPoint() const		//获取 坐标;
+MyPoint CPointItem::GetPoint() const		// ;
 {
 	MyPoint tempPoint;
 	tempPoint.x=m_point.x;
@@ -34,7 +34,7 @@ MyPoint CPointItem::GetPoint() const		//获取 坐标;
 
 
 
-void CPointItem::SetIndex(int nIndex)	//设置此ItemPoint的序号;
+void CPointItem::SetIndex(int nIndex)	//ItemPoint;
 {
 	m_index = nIndex;
 }

@@ -115,7 +115,7 @@ CModbusPollView::CModbusPollView()
 CModbusPollView::~CModbusPollView()
 {
 	 
-    //2018 04 17 dufan  如果是成功的连接过 打开MB POLL 通过配置文件读取 modbus id ， 关闭时 恢复默认255.
+    //2018 04 17 dufan   MB POLL  modbus id   255.
     WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), _T("255"), g_configfile_path);
 // 	if(m_MultiRead_handle != NULL)
 // 		TerminateThread(m_MultiRead_handle, 0);
@@ -534,11 +534,11 @@ void CModbusPollView::Fresh_Data(){
 	  
 	*/
     /*
-	如果 m_Hide_Alias=0;
+	 m_Hide_Alias=0;
 	m_grid_cols=2*m_data_cols+1;
 	m_grid_rows=m_data_rows+1;
 
-	如果 m_Hide_Alias=1;
+	 m_Hide_Alias=1;
 	m_grid_cols=m_data_cols+1;
 	m_grid_rows=m_data_rows+1;
 	*/
@@ -572,7 +572,7 @@ void CModbusPollView::Fresh_Data(){
 	CString DataTemp;
 	int Index;
 	int Index_start,Index_end,row;
-	//写下标
+	//
 	if (m_PLC_Addresses==1)
 	{
 		Index_start=1;
@@ -592,14 +592,14 @@ void CModbusPollView::Fresh_Data(){
 		m_MsDataGrid.SetItemText(row, 0, index);
 		row++;
 	}
-	//把索引隐藏掉
+	//
  
 	//m_MsDataGrid.SetColumnWidth(0, 0);
-	//这里主要是不要显示index行，如果要显示的话，就要把这行屏蔽掉，就可以了
-	//Modbus Poll的
+	//index
+	//Modbus Poll
 	if (m_Hide_Alias_Columns!=0)
 	{
-		 //初始化第0行
+		 //0
 		for (int i=1;i<m_MsDataGrid.GetColumnCount();i++)
 		{
 			index.Format(_T("%d"),m_address+(i-1)*(m_MsDataGrid.GetRowCount()-1));
@@ -614,7 +614,7 @@ void CModbusPollView::Fresh_Data(){
  
  					if (j==0)
  					{
- 						//初始化第0行
+ 						//0
  						if (i%2==1)
  						{
  							index=L"Address";
@@ -664,7 +664,7 @@ void CModbusPollView::Fresh_Data(){
  			}
 	}
 	else{
-		//初始化行
+		//
 		for (int i=1;i<m_MsDataGrid.GetColumnCount();i++)
 		{
 
@@ -674,7 +674,7 @@ void CModbusPollView::Fresh_Data(){
 			{
                  if (j==0)
                  {
-					 //初始化第0行
+					 //0
 					 if((i%3)==1)
 					 {
 						 index=L"Description";
@@ -751,7 +751,7 @@ void CModbusPollView::Fresh_Data(){
          if (g_Time_Offset%10==0)
          {
             ::SendMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
-            Sleep(200);   //响应绘图
+            Sleep(200);   //
          } 
        
      }
@@ -760,7 +760,7 @@ void CModbusPollView::Fresh_Data(){
         
      }
     
-/////////////////记录数据 Txt 
+///////////////// Txt 
 	if (!m_logText)
 	{
 		if (!m_logTextPath.IsEmpty())
@@ -800,29 +800,29 @@ void CModbusPollView::Fresh_Data(){
 
 	}
 	// 	CString str;
-// 	str = _T("医疗机构许可证信息查询结果");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)1),_variant_t((long)2),_variant_t(str)); 
-// 	str = _T("许可证编号");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)1),_variant_t(str)); 
-// 	str = _T("机构名称");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)2),_variant_t(str)); 
-// 	str = _T("经营性质");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)3),_variant_t(str));
-// 	str = _T("经济性质");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)4),_variant_t(str));
-// 	str = _T("负责人");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)5),_variant_t(str));
-// 	str = _T("法人代表");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)6),_variant_t(str));
-// 	str = _T("诊疗科目");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)7),_variant_t(str));
-// 	str =_T( "地址");
+// 	str =_T( "");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)8),_variant_t(str));
-// 	str = _T("电话");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)8),_variant_t(str));
-// 	str = _T("发证日期");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)9),_variant_t(str));
-// 	str = _T("有效期截止");
+// 	str = _T("");
 // 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)10),_variant_t(str));
 // 	
 // 	
@@ -857,7 +857,7 @@ void CModbusPollView::Fresh_Data(){
 	//}
 	
 	//wbMyBook.PrintPreview(_variant_t(false)); 
-	//释放对象 
+	// 
 	
 	 
 }
@@ -1158,7 +1158,7 @@ void CModbusPollView::OnSize(UINT nType, int cx, int cy)
 //			Traffic_Data(m_Rx);
 //
 //
-//			if (ret>0)//读的正确之后，我们才把值传给view显示
+//			if (ret>0)//view
 //			{
 //				memcpy_s(pMBPollView->m_DataBuffer,sizeof(pMBPollView->m_DataBuffer),DataBuffer,sizeof(DataBuffer));
 //				++pMBPollView->m_Tx;
@@ -1283,7 +1283,7 @@ LRESULT CModbusPollView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	/*}*/
 
-	if (ret>0)//读的正确之后，我们才把值传给view显示
+	if (ret>0)//view
 	{
 		memcpy_s(pMBPollView->m_DataBuffer,sizeof(pMBPollView->m_DataBuffer),DataBuffer,sizeof(DataBuffer));
 		++pMBPollView->m_Tx;
@@ -1316,7 +1316,7 @@ BOOL CModbusPollView::DestroyWindow()
 void CModbusPollView::OnEditAdd()
 {
 	int Index;
-	if(m_Hide_Alias_Columns!=0)//都是数值的
+	if(m_Hide_Alias_Columns!=0)//
 	{
 		 
         if (m_Current_Col%2!=0)
@@ -1329,7 +1329,7 @@ void CModbusPollView::OnEditAdd()
             Index=(m_Current_Col/2-1)*(m_MsDataGrid.GetRowCount()-1)+(m_Current_Row-1);
         }
 	}
-	else//含义名字的
+	else//
 	{
 		if (m_Current_Col%3!=0)
 		{
@@ -1480,7 +1480,7 @@ void CModbusPollView::OnSetupExcelloging()
    COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
 	
 	 
-	//创建Excel 2000服务器(启动Excel) 
+	//Excel 2000(Excel) 
 	if (!m_ExcelApp.CreateDispatch(_T("Excel.Application"),NULL)) 
 	{ 
 		AfxMessageBox(_T("Create Excel Fail!")); 
@@ -1491,11 +1491,11 @@ void CModbusPollView::OnSetupExcelloging()
 	m_wbsMyBooks.AttachDispatch(m_ExcelApp.GetWorkbooks(),true); 
 	
 	m_wbMyBook.AttachDispatch(m_wbsMyBooks.Add(covOptional));
-	//得到Worksheets 
+	//Worksheets 
 	m_wssMysheets.AttachDispatch(m_wbMyBook.GetWorksheets(),true);
-	//得到sheet1 
+	//sheet1 
 	m_wsMysheet.AttachDispatch(m_wssMysheets.GetItem(_variant_t("Sheet1")),true);
-	//得到全部Cells，此时,rgMyRge是cells的集合 
+	//Cells,rgMyRgecells 
 	m_rgMyRge.AttachDispatch(m_wsMysheet.GetCells(),true); 
 	m_rgMyRge.SetValue(_variant_t(""));
 	m_curexcelrow=1;
@@ -1666,26 +1666,26 @@ void CModbusPollView::OnFunctionsTestcenter()
 // void CModbusPollView::MouseMoveMsflexgrid1(short Button, short Shift, long x, long y)
 // {
 // 	long lRow,lCol;
-// 	lRow = m_MsDataGrid.get_RowSel();//获取点击的行号	
-// 	lCol = m_MsDataGrid.get_ColSel(); //获取点击的列号
+// 	lRow = m_MsDataGrid.get_RowSel();//	
+// 	lCol = m_MsDataGrid.get_ColSel(); //
 // 	TRACE(_T("lRow=%d,lCol=%d\n"),lRow,lCol);
 // 
 // 	CRect rect;
-// 	m_MsDataGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-// 	ScreenToClient(rect); //转换为客户区矩形	
+// 	m_MsDataGrid.GetWindowRect(rect); //
+// 	ScreenToClient(rect); //	
 // 	CDC* pDC =GetDC();
 // 
 // 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 // 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-// 	//计算选中格的左上角的坐标(象素为单位)
+// 	//()
 // //	long y = m_MsDataGrid.get_RowPos(lRow)/nTwipsPerDotY;
 // 	//long x = m_MsDataGrid.get_ColPos(lCol)/nTwipsPerDotX;
-// 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+// 	//()11
 // 	//long width = m_MsDataGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 // //	long height = m_MsDataGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-// 	//形成选中个所在的矩形区域
+// 	//
 // //	CRect rcCell(x,y,x+width,y+height);
-// 	//转换成相对对话框的坐标
+// 	//
 // //	rcCell.OffsetRect(rect.left+1,rect.top+1);
 // //	ReleaseDC(pDC);
 // 
@@ -1758,7 +1758,7 @@ void CModbusPollView::OnGridDblClick(NMHDR *pNotifyStruct, LRESULT* /*pResult*/)
 
 	int Index;
 	UINT Address;
-	if (m_Hide_Alias_Columns != 0)//都是数值的
+	if (m_Hide_Alias_Columns != 0)//
 	{
 		//	Index=(lCol/3)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
 		if (lCol % 2 == 0)
@@ -1772,7 +1772,7 @@ void CModbusPollView::OnGridDblClick(NMHDR *pNotifyStruct, LRESULT* /*pResult*/)
 
 		Show_Name = FALSE;
 	}
-	else//含义名字的
+	else//
 	{
 		if (lCol % 3 == 1)
 		{
@@ -1802,9 +1802,9 @@ void CModbusPollView::OnGridDblClick(NMHDR *pNotifyStruct, LRESULT* /*pResult*/)
 	{
 // 		m_edit_name.ShowWindow(SW_SHOW);
 // 		m_edit_name.SetWindowText(strValue);
-// 		m_edit_name.MoveWindow(rcCell); //移动到选中格的位置，覆盖
+// 		m_edit_name.MoveWindow(rcCell); //
 // 		m_edit_name.BringWindowToTop();
-// 		m_edit_name.SetFocus(); //获取焦点
+// 		m_edit_name.SetFocus(); //
 	}
 	else
 	{

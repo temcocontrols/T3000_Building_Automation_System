@@ -452,7 +452,7 @@ public:
 	/*afx_msg*/  void OnEnKillfocusEditSensorMax();
 //	virtual BOOL PreTranslateMessage(MSG* pMsg);
 //	afx_msg void OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2);
-   // afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);//手动加入.
+   // afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);//.
 	afx_msg void OnEnSetfocusPressureSensor();
 	afx_msg void OnEnSetfocusEditFilter();
 	afx_msg void OnSetfocusEditSensorMin();

@@ -2,7 +2,7 @@
  *
  *	ChartXYSerie.cpp
  *
- *	Written by Cédric Moonen (cedric_moonen@hotmail.com)
+ *	Written by Cric Moonen (cedric_moonen@hotmail.com)
  *
  *
  *

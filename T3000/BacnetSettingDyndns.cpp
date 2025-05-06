@@ -1,4 +1,4 @@
-// BacnetSettingDyndns.cpp : 实现文件
+// BacnetSettingDyndns.cpp : 
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
-// CBacnetSettingDyndns 对话框
+// CBacnetSettingDyndns 
 
 IMPLEMENT_DYNAMIC(CBacnetSettingDyndns, CDialogEx)
 
@@ -41,7 +41,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingDyndns, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetSettingDyndns 消息处理程序
+// CBacnetSettingDyndns 
 
 
 
@@ -217,7 +217,7 @@ void CBacnetSettingDyndns::OnEnKillfocusEditTimeUpdate()
 
 BOOL CBacnetSettingDyndns::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: 在此添加专用代码和/或调用基类
+    // TODO: /
     if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
     {
         int temp_focus_id = GetFocus()->GetDlgCtrlID();

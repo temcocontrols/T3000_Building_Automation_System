@@ -2,16 +2,16 @@
 #include "TStatBase.h"
 
 CTStatBase::CTStatBase(void)
-:m_dwSerialID(0),						// 每个产品的序列号ID，出厂时设定
-m_nDevID(-1),						// 设备ID，当设备联网工作时的ID，这个内容必须与寄存器同步
-m_bOnLine(FALSE),					// 连接状态，TRUE＝在线，FALSE＝掉线
-m_nProductType(-1),				//	产品型号，由此判断5A，5B。。。等等，或者是否是NC
-m_fHardware_version(0.0),		//  硬件版本号
-m_fSoftware_version(0.0),			//  软件版本号
+:m_dwSerialID(0),						// ID
+m_nDevID(-1),						// IDID
+m_bOnLine(FALSE),					// TRUEFALSE
+m_nProductType(-1),				//	5A5BNC
+m_fHardware_version(0.0),		//  
+m_fSoftware_version(0.0),			//  
 
-m_strBuildingName(_T("")),		// 所属建筑
-m_strFloorName(_T("")),			// 所属楼层
-m_strRoomName(_T(""))		// 所属房间
+m_strBuildingName(_T("")),		// 
+m_strFloorName(_T("")),			// 
+m_strRoomName(_T(""))		// 
 {
 }
 

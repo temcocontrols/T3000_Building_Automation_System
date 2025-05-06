@@ -37,7 +37,7 @@ public:
 	friend class CTripleLinkageOpt;
 	friend class CMultiThumbOpt;
 protected:
-// 	int					m_nPosX;		// 应该为channel中心点位置
+// 	int					m_nPosX;		// channel
 // 	int					m_nPosY;
 
 	CRect				m_rc;

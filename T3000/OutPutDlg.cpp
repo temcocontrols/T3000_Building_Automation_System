@@ -306,7 +306,7 @@ BOOL COutPutDlg::OnInitDialog()
 
 
         GetDlgItem(IDC_STATIC_FAN_MODE_NAME)->ShowWindow(FALSE);
-        //GetDlgItem(IDC_STATIC_FAN_OFF)->ShowWindow(FALSE);   //Fan 2018 01 17 即便没有fan名字也要现实默认名字，否则光秃秃的 show 一个button  太不合情理
+        //GetDlgItem(IDC_STATIC_FAN_OFF)->ShowWindow(FALSE);   //Fan 2018 01 17 non  
         //GetDlgItem(IDC_STATIC_FAN_ON)->ShowWindow(FALSE);
         //GetDlgItem(IDC_STATIC_FAN_LOW)->ShowWindow(FALSE);
         //GetDlgItem(IDC_STATIC_MID)->ShowWindow(FALSE);
@@ -477,7 +477,7 @@ BOOL COutPutDlg::OnInitDialog()
 		int currentrow=0;
 		for (int i=0;i<5;i++)
 		{
-			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==3)//找到了第一个pwm
+			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==3)//
 			{
 				m_pwm_row1=i+1;
 				currentrow=m_pwm_row1;
@@ -486,7 +486,7 @@ BOOL COutPutDlg::OnInitDialog()
 		}
 		for (int i=currentrow;i<5;i++)
 		{
-			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==3)//找到了第一个pwm
+			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==3)//
 			{
 				m_pwm_row2=i+1;
 				break;
@@ -498,7 +498,7 @@ BOOL COutPutDlg::OnInitDialog()
 		int currentrow=0;
 		for (int i=0;i<5;i++)
 		{
-			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==2)//找到了第一个pwm
+			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==2)//
 			{
 				m_pwm_row1=i+1;
 				currentrow=m_pwm_row1;
@@ -507,7 +507,7 @@ BOOL COutPutDlg::OnInitDialog()
 		}
 		for (int i=currentrow;i<5;i++)
 		{
-			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==2)//找到了第一个pwm
+			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==2)//
 			{
 				m_pwm_row2=i+1;
 				break;
@@ -526,7 +526,7 @@ BOOL COutPutDlg::OnInitDialog()
 
 		GetWindowPlacement(&wp);
 
-        if(wp.rcNormalPosition.bottom<1038)      //重新调用 OnInitDialog时 会反复增加;
+        if(wp.rcNormalPosition.bottom<1038)      //nInitDialog
 		    wp.rcNormalPosition.bottom += 120;
 
 		SetWindowPlacement(&wp);
@@ -708,7 +708,7 @@ void COutPutDlg::put_fan_variable()
 		 
 		m_fan.ResetContent();
 		//if(read_one(g_tstat_id,107)==1)////here can't use  function
-		if(product_register_value[107] == 1)////here can't use  function  如果去读，常会死在这里。
+		if(product_register_value[107] == 1)////here can't use  function  
 		{
 			strdemo = _T("1-4-1,");
 			SetPaneString(2,strdemo);
@@ -799,7 +799,7 @@ void COutPutDlg::put_fan_variable()
 	else
 	{
 
-// 		strdemo = _T("read_one(g_tstat_id,129)==1开始");
+// 		strdemo = _T("read_one(g_tstat_id,129)==1;
 // 		SetPaneString(2,strdemo);
 		//if(read_one(g_tstat_id,129)==1)////here can't use  function//0912
 		if (product_register_value[129] == 1)
@@ -818,7 +818,7 @@ void COutPutDlg::put_fan_variable()
 		   default:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
 			}
 		}
-// 		strdemo = _T("read_one(g_tstat_id,129)==1完成");
+// 		strdemo = _T("read_one(g_tstat_id,129)==1);
 // 		SetPaneString(2,strdemo);
 		m_fan.SetCurSel(product_register_value[137]);
 	}
@@ -1273,7 +1273,7 @@ if(product_register_value[129]==1)
 	m_FlexGrid1.put_TextMatrix(0,1,_T("Description"));
 	m_FlexGrid1.put_TextMatrix(0,2,_T("Function"));
 	m_FlexGrid1.put_TextMatrix(0,3,_T("Rotation"));
-	m_FlexGrid1.put_ColWidth(3,0);//隐藏Rotation
+	m_FlexGrid1.put_ColWidth(3,0);//otation
 	m_FlexGrid1.put_TextMatrix(0,4,_T("Control"));
 	m_FlexGrid1.put_TextMatrix(0,5,_T("InterLock"));
 	int i=0;
@@ -1354,7 +1354,7 @@ if(product_register_value[129]==1)
 		totalrows = 5;
 		
 	if(m_nmoduleType == 3)//2.5.0.99
-		totalrows = 7;//只要是Tstat都是7个输出
+		totalrows = 7;//tat
 
 	int pid_select2[7]={0};
 	 
@@ -1362,7 +1362,7 @@ if(product_register_value[129]==1)
 			pid_select2[i]=product_register_value[MODBUS_PID_OUTPUT1+i];/////////////////////////////get pid select ;col one 1
 			
  
-	m_pids = pid_select2[0];//lsc add 默认为pid1
+	m_pids = pid_select2[0];//lsc add d1
 	//new feature:
 	short nRotation;
 	short nFunction=product_register_value[328];
@@ -1428,11 +1428,11 @@ if(product_register_value[129]==1)
 			else
 				tstatval = product_register_value[138+nFan * 7 + pos];
 			CString str;
-			{    //被选中Pid2，Pid1变灰
+			{    //d21
 				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
 					if(pid_select2[row-1]==1||pid_select2[row-1]==2)
 						FLEX_GRID1_PUT_COLOR_STR(row,col,str);
-						//col +1//变灰不显示
+						//col +1//
 					else
 						FLEX_GRID1_PUT_STR(row,col,str);
 						//col +1
@@ -1440,7 +1440,7 @@ if(product_register_value[129]==1)
 
 		}
 	}
-//以前只显示了前三排的数据
+//
 #if 1 //test
 	if(m_nmoduleType == 1 || m_nmoduleType == 3)
 	{
@@ -1455,7 +1455,7 @@ if(product_register_value[129]==1)
 			else
 				pos = col - (m_PID1_heat_stages+1);
 			 
-			if(product_register_value[MODBUS_FAN_SPEED]==0)//a,d,g 3就是tstat5g//2.5.0.99
+			if(product_register_value[MODBUS_FAN_SPEED]==0)//a,d,g 3stat5g//2.5.0.99
 			{
 					tstatval = product_register_value[351+ pos];
 			
@@ -1499,7 +1499,7 @@ if(product_register_value[129]==1)
 				//if(/*tstatval>63*/TRUE)//
 				//{
 			
-					if(row==(totalrows-1))//倒数第二行
+					if(row==(totalrows-1))//
 					{
 					if (product_register_value[186]!=0)
 						{
@@ -1549,7 +1549,7 @@ if(product_register_value[129]==1)
 				 
 					}
 					}
-					if(row==totalrows)//倒数第一个
+					if(row==totalrows)//
 					{
 					if (product_register_value[187]!=0)
 						{
@@ -1618,7 +1618,7 @@ if(product_register_value[129]==1)
 		}
 	}
 
-// 	output4_value =product_register_value[283]; // 1 表示floating
+// 	output4_value =product_register_value[283]; // 1 loating
 // 	output5_value =product_register_value[284];
 	if (product_register_value[7] == 18) // 2.5.0.98
 	{
@@ -1799,7 +1799,7 @@ if(product_register_value[129]==1)
 		}
 
 	}
-	if(m_bOut4PWM) // 2表示PWM
+	if(m_bOut4PWM) // 2WM
 	{
 
 			for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
@@ -1834,7 +1834,7 @@ if(product_register_value[129]==1)
 				default:
 					strTemp=_T("");
 				}
-			if(pid_select2[4-1]==1||pid_select2[4-1]==2)//2.5.0.98  1表示pid2
+			if(pid_select2[4-1]==1||pid_select2[4-1]==2)//2.5.0.98  1id2
 				FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp);
 				else
 				FLEX_GRID1_PUT_STR(4,col,strTemp);//col +1
@@ -1882,7 +1882,7 @@ if(product_register_value[129]==1)
 				FLEX_GRID1_PUT_STR(5,col,strTemp);//col +1
 
 
-				if(pid_select2[5-1]==2)//2.5.0.98  2表示pid3
+				if(pid_select2[5-1]==2)//2.5.0.98  2id3
 					FLEX_GRID3_PUT_STR(4,col,strTemp);//col +1	
 				else
 					FLEX_GRID3_PUT_COLOR_STR(4,col,strTemp);
@@ -2001,7 +2001,7 @@ void COutPutDlg::FreshGrid_PID2()
 	m_FlexGrid2.put_TextMatrix(0,1,_T("Description"));
 	m_FlexGrid2.put_TextMatrix(0,2,_T("Function"));
 	m_FlexGrid2.put_TextMatrix(0,3,_T("Rotation"));
-	m_FlexGrid2.put_ColWidth(3,0);//隐藏Rotation
+	m_FlexGrid2.put_ColWidth(3,0);//otation
 	m_FlexGrid2.put_TextMatrix(0,4,_T("Control"));
 	m_FlexGrid2.put_TextMatrix(0,5,_T("Interlock"));
 	int i=0;
@@ -2030,7 +2030,7 @@ void COutPutDlg::FreshGrid_PID2()
 
 	m_FlexGrid2.put_ColAlignment(0,4);
 	m_FlexGrid2.put_ColAlignment(1,4);
-	//*****************************888、
+	//*****************************888
 	int totalrows,row;
 	unsigned short tstatval,pos;
 
@@ -2089,7 +2089,7 @@ void COutPutDlg::FreshGrid_PID2()
 			}
 		}
 	}//end if
-	if(m_nmoduleType == 1 || m_nmoduleType == 3) //3就是TSTAT5G
+	if(m_nmoduleType == 1 || m_nmoduleType == 3) //3STAT5G
 	{
 		if(m_nmoduleType == 1)
 			totalrows = 5 ;//********************************************
@@ -2103,9 +2103,9 @@ void COutPutDlg::FreshGrid_PID2()
 				pos = col - (m_PID2_heat_stages+1);			//cool handles position
 
 //2.5.0.95
-			if(product_register_value[MODBUS_FAN_SPEED]==0&&(m_nmoduleType==1||m_nmoduleType==3))//a,d,g 3就是tstat5g
+			if(product_register_value[MODBUS_FAN_SPEED]==0&&(m_nmoduleType==1||m_nmoduleType==3))//a,d,g 3stat5g
 			{
-				// 				if (pid_select2[0] == 1)//只有第一行选择pid2，下面都是以PID2来计算  //PID1 = 0 PID2 =1
+				// 				if (pid_select2[0] == 1)////= 0 PID2 =1
 				// 					tstatval = product_register_value[385+ pos];
 				// 				else
 				tstatval = product_register_value[533+ pos];
@@ -2321,7 +2321,7 @@ if(row==(totalrows-1))
 #endif
 
 
-		//2.5.0.98以下
+		//2.5.0.98
 		if(m_bOut4PWM)
 		{
 
@@ -2359,7 +2359,7 @@ if(row==(totalrows-1))
 				}
 				 
 
-				if(pid_select2[4-1]==1)//2.5.0.98  2表示pid3
+				if(pid_select2[4-1]==1)//2.5.0.98  2id3
 					FLEX_GRID2_PUT_STR(4,col,strTemp);//col +1	
 				else
 					FLEX_GRID2_PUT_COLOR_STR(4,col,strTemp);
@@ -2405,7 +2405,7 @@ if(row==(totalrows-1))
 				 
 
 
-				if(pid_select2[5-1]==1)//2.5.0.98  2表示pid3
+				if(pid_select2[5-1]==1)//2.5.0.98  2id3
 					FLEX_GRID2_PUT_STR(4,col,strTemp);//col +1	
 				else
 					FLEX_GRID2_PUT_COLOR_STR(4,col,strTemp);
@@ -2445,9 +2445,9 @@ void COutPutDlg::FreshGrid_PID3()
 	//*****************************************
 	m_FlexGrid3.put_TextMatrix(0,1,_T("Description"));
 	m_FlexGrid3.put_TextMatrix(0,2,_T("Function"));
-	m_FlexGrid3.put_ColWidth(2,0);//隐藏Rotation
+	m_FlexGrid3.put_ColWidth(2,0);//otation
 	m_FlexGrid3.put_TextMatrix(0,3,_T("Rotation"));
-	m_FlexGrid3.put_ColWidth(3,0);//隐藏Rotation
+	m_FlexGrid3.put_ColWidth(3,0);//otation
 	m_FlexGrid3.put_TextMatrix(0,4,_T("Control"));
 	m_FlexGrid3.put_TextMatrix(0,5,_T("Interlock"));
 	int i=0;
@@ -2476,7 +2476,7 @@ void COutPutDlg::FreshGrid_PID3()
 
 	m_FlexGrid3.put_ColAlignment(0,4);
 	m_FlexGrid3.put_ColAlignment(1,4);
-	//*****************************888、
+	//*****************************888
 	int totalrows,row;
 	unsigned short tstatval,pos;
 
@@ -2524,7 +2524,7 @@ void COutPutDlg::FreshGrid_PID3()
 		else
 			pos = col - (m_PID3_heat_stages+1);
 
-        if(product_register_value[MODBUS_FAN_SPEED]==4||product_register_value[MODBUS_FAN_SPEED]==5||product_register_value[MODBUS_FAN_SPEED]==6)//a,d,g 3就是tstat5g
+        if(product_register_value[MODBUS_FAN_SPEED]==4||product_register_value[MODBUS_FAN_SPEED]==5||product_register_value[MODBUS_FAN_SPEED]==6)//a,d,g 3stat5g
 			tstatval = product_register_value[MODBUS_PID3_OUTPUT_BEGIN+pos];/////////////////////fan auto
 		else if(product_register_value[MODBUS_FAN_SPEED]==0)//Off
 			tstatval = product_register_value[MODBUS_PID3_OFF_OUTPUT_BEGIN+pos];
@@ -2541,7 +2541,7 @@ void COutPutDlg::FreshGrid_PID3()
 			}
 		}
 	}//end if
-	 //3就是TSTAT5G
+	 //3STAT5G
 	{
 		if(m_nmoduleType == 1)
 			totalrows = 5 ;//********************************************
@@ -2555,7 +2555,7 @@ void COutPutDlg::FreshGrid_PID3()
 				pos = col - (m_PID3_heat_stages+1);			//cool handles position
 
 //2.5.0.95
-			if(product_register_value[MODBUS_FAN_SPEED]==4||product_register_value[MODBUS_FAN_SPEED]==5||product_register_value[MODBUS_FAN_SPEED]==6)//a,d,g 3就是tstat5g
+			if(product_register_value[MODBUS_FAN_SPEED]==4||product_register_value[MODBUS_FAN_SPEED]==5||product_register_value[MODBUS_FAN_SPEED]==6)//a,d,g 3stat5g
 			{
 				tstatval = product_register_value[MODBUS_PID3_VALVE_OPERATION_TABLE_BEGIN+ pos];
 			}
@@ -2828,7 +2828,7 @@ if(row==(totalrows-1))
 #endif
 
 
-		//2.5.0.98以下
+		//2.5.0.98
 		if(m_bOut4PWM)
 		{
 
@@ -2864,7 +2864,7 @@ if(row==(totalrows-1))
 				default:
 					strTemp=_T("");
 				}
-				if(pid_select2[4-1]==2)//2.5.0.98  2表示pid3
+				if(pid_select2[4-1]==2)//2.5.0.98  2id3
 				FLEX_GRID3_PUT_STR(4,col,strTemp);//col +1	
 				else
 				FLEX_GRID3_PUT_COLOR_STR(4,col,strTemp);
@@ -3024,37 +3024,37 @@ void COutPutDlg::ClickMsflexgrid1()
 	//click grid 1 to select item.
 	m_bflexgrid1_or_2=0;
 	long lRow,lCol;
-	lRow = m_FlexGrid1.get_RowSel();//获取点击的行号	
+	lRow = m_FlexGrid1.get_RowSel();//
 	pid1lrow = lRow;//2.5.0.96 
-	lCol = m_FlexGrid1.get_ColSel(); //获取点击的列号
+	lCol = m_FlexGrid1.get_ColSel(); //
 	if((lCol==1 || lCol==2) && get_curtstat_version()<26)
 		return;
-	if(lRow>m_FlexGrid1.get_Rows()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_FlexGrid1.get_Rows()) //
 		return;
-	if(lRow == 0) //如果点击标题行，也无效
+	if(lRow == 0) //
 		return;
 	if(FLEXGRID_CELL_COLOR==m_FlexGrid1.get_CellBackColor())
 		return;
 	CRect rect;
-	m_FlexGrid1.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-	//需要将其转化为像素，1440缇= 1英寸
+	m_FlexGrid1.GetWindowRect(rect); //
+	ScreenToClient(rect); //
+	// MSFlexGridp"
+	// 1
 	CDC* pDC =GetDC();
-	//计算象素点和缇的转换比例
+	//
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//)
 	long y = m_FlexGrid1.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid1.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//
 	long width = m_FlexGrid1.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid1.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//
 	CRect rc(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	//
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//获取选中格的文本信息
+	//
 	CString strValue = m_FlexGrid1.get_TextMatrix(lRow,lCol);
 	m_nCurRow=lRow;
 	m_nCurCol=lCol;
@@ -3076,24 +3076,24 @@ void COutPutDlg::ClickMsflexgrid1()
 // 		m_ItemValueCombx.AddString(_T("PID2"));
 // 		m_ItemValueCombx.AddString(_T("MAX(PID1,PID2)"));
 // 		m_ItemValueCombx.AddString(_T("MIN(PID1,PID2)"));
-// 		m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-// 		m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+// 		m_ItemValueCombx.ShowWindow(SW_SHOW);//
+// 		m_ItemValueCombx.MoveWindow(rc); //
 // 		m_ItemValueCombx.BringWindowToTop();
-// 		m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-// 		m_ItemValueCombx.SetFocus(); //获取焦点
+// 		m_ItemValueCombx.SelectString(-1,strValue); //
+// 		m_ItemValueCombx.SetFocus(); //
 
-//0911这样做
+//0911
 		m_ItemValueCombx.ResetContent();
 		m_ItemValueCombx.AddString(_T("PID1"));
 		m_ItemValueCombx.AddString(_T("PID2"));
 		m_ItemValueCombx.AddString(_T("PID3"));
 		m_ItemValueCombx.AddString(_T("MAX(PID1,PID2)"));
 		m_ItemValueCombx.AddString(_T("MIN(PID1,PID2)"));
-		m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-		m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_ItemValueCombx.ShowWindow(SW_SHOW);//
+		m_ItemValueCombx.MoveWindow(rc); //
 		m_ItemValueCombx.BringWindowToTop();
-		m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-		m_ItemValueCombx.SetFocus(); //获取焦点
+		m_ItemValueCombx.SelectString(-1,strValue); //
+		m_ItemValueCombx.SetFocus(); //
 	}
 	 if(lCol==5)
 	{
@@ -3106,7 +3106,7 @@ void COutPutDlg::ClickMsflexgrid1()
                 product_register_value[7]== PM_TSTAT7|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
 				)
 			{
-				if(product_register_value[MODBUS_ANALOG_IN1]==3)//on/off mode  //找不到对应的tstat6
+				if(product_register_value[MODBUS_ANALOG_IN1]==3)//on/off mode  //at6
 					m_ItemValueCombx.AddString(_T("AI1"));
 				else
 					m_ItemValueCombx.AddString(_T("//AI1"));
@@ -3130,11 +3130,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("Timer And"));
 			m_ItemValueCombx.AddString(_T("InterLock Timer"));
 			m_ItemValueCombx.AddString(_T("FreeCool"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 	}
 
 
@@ -3181,11 +3181,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("MIN->100%"));
 			m_ItemValueCombx.AddString(_T("MIN|100%"));
 			m_ItemValueCombx.AddString(_T("MIN"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 		}
 	//	else if((lRow<4)||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM))
 		else if((lRow<4) ||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM))//20121008
@@ -3201,11 +3201,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
 			*/
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 		}
 		else if((lRow>5))//20121008
 		{		
@@ -3229,11 +3229,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));*/
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				} 
 				else
 				{
@@ -3245,11 +3245,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				}
 			    } 
 			    else if (lRow==7)//lRow==7
@@ -3260,11 +3260,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On")); 
 			 
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				  } 
 				  else
 				  {
@@ -3275,11 +3275,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				  }
 			    }
 			 } 
@@ -3298,11 +3298,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));*/
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				} 
 				else
 				{
@@ -3314,11 +3314,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				}
 			    } 
 			    else if (lRow==7)//lRow==7
@@ -3329,11 +3329,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On")); 
 			 
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				  } 
 				  else
 				  {
@@ -3344,11 +3344,11 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				  }
 			    }
 			 }
@@ -3356,7 +3356,7 @@ void COutPutDlg::ClickMsflexgrid1()
 		 
 #endif
 	}
-	//后来修改了，不在限制在四和第五行了。现在都支持PWM模式了
+	//
 	if(lCol>5)
 	{   
 	    if (lRow<=5)
@@ -3374,11 +3374,11 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
 				m_ItemValueCombx.AddString(_T("0-50"));
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//
+				m_ItemValueCombx.MoveWindow(rc); //
 				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				m_ItemValueCombx.SelectString(-1,strValue); //
+				m_ItemValueCombx.SetFocus(); //
 			}
 			else
 			{
@@ -3386,11 +3386,11 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.AddString(_T("Off"));
 				m_ItemValueCombx.AddString(_T("On"));
 
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//
+				m_ItemValueCombx.MoveWindow(rc); //
 				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				m_ItemValueCombx.SelectString(-1,strValue); //
+				m_ItemValueCombx.SetFocus(); //
 			}
 		} 
 		else
@@ -3403,11 +3403,11 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
 				m_ItemValueCombx.AddString(_T("0-50"));
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//
+				m_ItemValueCombx.MoveWindow(rc); //
 				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				m_ItemValueCombx.SelectString(-1,strValue); //
+				m_ItemValueCombx.SetFocus(); //
 			}
 			else
 			{
@@ -3415,11 +3415,11 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.AddString(_T("Off"));
 				m_ItemValueCombx.AddString(_T("On"));
 
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//
+				m_ItemValueCombx.MoveWindow(rc); //
 				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				m_ItemValueCombx.SelectString(-1,strValue); //
+				m_ItemValueCombx.SetFocus(); //
 			}
 
 				if (product_register_value[7]==PM_TSTAT5A)
@@ -3432,11 +3432,11 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.AddString(_T("Off"));
 				m_ItemValueCombx.AddString(_T("On")); 
 			 
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//
+				m_ItemValueCombx.MoveWindow(rc); //
 				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				m_ItemValueCombx.SelectString(-1,strValue); //
+				m_ItemValueCombx.SetFocus(); //
 					} 
 					else
 					{
@@ -3447,11 +3447,11 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
 				m_ItemValueCombx.AddString(_T("0-50"));
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//
+				m_ItemValueCombx.MoveWindow(rc); //
 				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				m_ItemValueCombx.SelectString(-1,strValue); //
+				m_ItemValueCombx.SetFocus(); //
 					}
 					} 
 					else if (lRow==5)//lRow==7
@@ -3462,11 +3462,11 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.AddString(_T("Off"));
 				m_ItemValueCombx.AddString(_T("On")); 
 			 
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//
+				m_ItemValueCombx.MoveWindow(rc); //
 				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				m_ItemValueCombx.SelectString(-1,strValue); //
+				m_ItemValueCombx.SetFocus(); //
 					  } 
 					  else
 					  {
@@ -3477,11 +3477,11 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
 				m_ItemValueCombx.AddString(_T("0-50"));
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//
+				m_ItemValueCombx.MoveWindow(rc); //
 				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				m_ItemValueCombx.SelectString(-1,strValue); //
+				m_ItemValueCombx.SetFocus(); //
 					  }
 					}
 				}
@@ -3659,7 +3659,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 			int output4_value;//=product_register_value[284];//out 5;
 
 
-			//这里可能是变量定义的问题，让人难以理解 为什么 会错位;Fance
+			//a
 			output3_value = product_register_value[MODBUS_MODE_OUTPUT4]; // 283  205
 			output4_value = product_register_value[MODBUS_MODE_OUTPUT5]; //284 206
 	 
@@ -3705,7 +3705,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                             {
                                 if(string2digital(strItem,cellval,ty) )
                                 {
-                                    tstatval = tstatval &0x0f; //保留低位 ,高位清空
+                                    tstatval = tstatval &0x0f; //
                                     nValue= cellval << 4 ;
                                     tstatval|=nValue;
                                 } 
@@ -3718,7 +3718,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                             {
                                 if(string2digital(strItem,cellval,ty) )
                                 {
-                                    tstatval=tstatval&0xf0;//保留高位，低位清空
+                                    tstatval=tstatval&0xf0;//
                                     nValue= cellval  ;
                                     tstatval|=nValue;
                                 } 
@@ -3733,7 +3733,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                             {
                                 if(string2digital(strItem,cellval,ty) )
                                 {
-                                    tstatval = tstatval &0x0f; //保留低位 ,高位清空
+                                    tstatval = tstatval &0x0f; //
                                     nValue= cellval << 4 ;
                                     tstatval|=nValue;
                                 } 
@@ -3746,7 +3746,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                             {
                                 if(string2digital(strItem,cellval,ty) )
                                 {
-                                    tstatval=tstatval&0xf0;//保留高位，低位清空
+                                    tstatval=tstatval&0xf0;//
                                     nValue= cellval  ;
                                     tstatval|=nValue;
                                 } 
@@ -3763,7 +3763,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                         {
                             if(string2digital(strItem,cellval,ty) )
                             {
-                                tstatval = tstatval &0x0f; //保留低位 ,高位清空
+                                tstatval = tstatval &0x0f; //
                                 nValue= cellval << 4 ;
                                 tstatval|=nValue;
                             } 
@@ -3776,7 +3776,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                         {
                             if(string2digital(strItem,cellval,ty) )
                             {
-                                tstatval=tstatval&0xf0;//保留高位，低位清空
+                                tstatval=tstatval&0xf0;//
                                 nValue= cellval  ;
                                 tstatval|=nValue;
                             } 
@@ -3903,9 +3903,9 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                         if(cellval==4)
                         {//for 0-50
                             if(row_temp==totalrows)
-                                tstatval |=64;//第6位
+                                tstatval |=64;//
                             else if(row_temp==(totalrows+1))//0-50
-                                tstatval |=128;//第7位
+                                tstatval |=128;//
                         }
                         else
                         {
@@ -3960,7 +3960,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                     {
                         if(string2digital(strItem,cellval,ty) )
                         {
-                            tstatval = tstatval &0x0f; //保留低位 ,高位清空
+                            tstatval = tstatval &0x0f; //
                             nValue= cellval << 4 ;
                             tstatval|=nValue;
                         } 
@@ -3973,7 +3973,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                     {
                         if(string2digital(strItem,cellval,ty) )
                         {
-                            tstatval=tstatval&0xf0;//保留高位，低位清空
+                            tstatval=tstatval&0xf0;//
                             nValue= cellval  ;
                             tstatval|=nValue;
                         } 
@@ -4058,7 +4058,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                             }
                             //
 
-                            if(write_one(g_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+                            if(write_one(g_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+pos,tstatval)<0)//
                             {MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
                             product_register_value[MODBUS_UNIVERSAL_VALVE_BEGIN+pos]=tstatval;
 					 
@@ -4145,7 +4145,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                                 }
                                 //
 
-                                if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+                                if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+pos,tstatval)<0)//
                                 {MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
                                 product_register_value[MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+pos]=tstatval;
                                 }
@@ -4174,7 +4174,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                     {
                         if(string2digital(strItem,cellval,ty) )
                         {
-                            tstatval = tstatval &0x0f; //保留低位 ,高位清空
+                            tstatval = tstatval &0x0f; //
                             nValue= cellval << 4 ;
                             tstatval|=nValue;
                         } 
@@ -4187,7 +4187,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                     {
                         if(string2digital(strItem,cellval,ty) )
                         {
-                            tstatval=tstatval&0xf0;//保留高位，低位清空
+                            tstatval=tstatval&0xf0;//
                             nValue= cellval  ;
                             tstatval|=nValue;
                         } 
@@ -4271,7 +4271,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                         }
                         //
 
-                        if(write_one(g_tstat_id,MODBUS_PID3_VALVE_OPERATION_TABLE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+                        if(write_one(g_tstat_id,MODBUS_PID3_VALVE_OPERATION_TABLE_BEGIN+pos,tstatval)<0)//
                         {MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
                         product_register_value[MODBUS_PID3_VALVE_OPERATION_TABLE_BEGIN+pos]=tstatval;
 
@@ -4352,7 +4352,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
                         }
                         //
 
-                        if(write_one(g_tstat_id,MODBUS_PID3_VALVE_OFF_TABLE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+                        if(write_one(g_tstat_id,MODBUS_PID3_VALVE_OFF_TABLE_BEGIN+pos,tstatval)<0)//
                         {MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
                         product_register_value[MODBUS_PID3_VALVE_OFF_TABLE_BEGIN+pos]=tstatval;
                         }
@@ -4518,11 +4518,11 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 			int output4_value;//=product_register_value[284];//out 5;
 
 
-			//这里可能是变量定义的问题，让人难以理解 为什么 会错位;Fance
+			//a
 			output3_value = product_register_value[MODBUS_MODE_OUTPUT4]; // 283  205
 			output4_value = product_register_value[MODBUS_MODE_OUTPUT5]; //284 206
 			//------------------------------------------------------------------------
-			//Annul by Fance 2013 04 10		//??有问题  205 对应的是output4 为什么要叫 output3_value
+			//Annul by Fance 2013 04 10		//??205 t4 lue
 			//if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
 			//{
 			//	output3_value=newtstat6[205];//2 rows plug in one row//out 4
@@ -4655,9 +4655,9 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 						if(cellval==4)
 						{//for 0-50
 							if(row_temp==totalrows)
-								tstatval |=64;//第6位
+								tstatval |=64;//
 							else if(row_temp==(totalrows+1))//0-50
-								tstatval |=128;//第7位
+								tstatval |=128;//
 						}
 						else
 						{
@@ -4770,7 +4770,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 						 }
 						 //
 
-						 if(write_one(g_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+						 if(write_one(g_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+pos,tstatval)<0)//
 						 {MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
 						 product_register_value[MODBUS_UNIVERSAL_VALVE_BEGIN+pos]=tstatval;
 					 
@@ -4849,7 +4849,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 							}
 							//
 
-							if(write_one(g_tstat_id,392+pos,tstatval)<0)//没找到对应的值。
+							if(write_one(g_tstat_id,392+pos,tstatval)<0)//
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 							return;
 							}
@@ -4940,7 +4940,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 						 }
 						 //
 
-						 if(write_one(g_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+						 if(write_one(g_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+pos,tstatval)<0)//
 						 {MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
 						 product_register_value[MODBUS_UNIVERSAL_VALVE_BEGIN+pos]=tstatval;
 					 
@@ -5019,7 +5019,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 							}
 							//
 
-							if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+							if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+pos,tstatval)<0)//
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
 							product_register_value[MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+pos]=tstatval;
 						  }
@@ -5109,7 +5109,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 						 }
 						 //
 
-						 if(write_one(g_tstat_id,MODBUS_PID3_VALVE_OPERATION_TABLE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+						 if(write_one(g_tstat_id,MODBUS_PID3_VALVE_OPERATION_TABLE_BEGIN+pos,tstatval)<0)//
 						 {MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
 						 product_register_value[MODBUS_PID3_VALVE_OPERATION_TABLE_BEGIN+pos]=tstatval;
 					 
@@ -5337,9 +5337,9 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 						if(cellval==4 )
 						{//for 0-50
 							if(row_temp==totalrows)
-								tstatval |=64;//第6位
+								tstatval |=64;//
 							else if(row_temp==(totalrows+1))//0-50
-								tstatval |=128;//第7位
+								tstatval |=128;//
 						}
 						else
 						{
@@ -5572,8 +5572,8 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 	CString strNewText;
 	if(m_bflexgrid1_or_2==0)
 	{
-		lRow = m_FlexGrid1.get_RowSel();//获取点击的行号	
-		lCol = m_FlexGrid1.get_ColSel(); //获取点击的列号
+		lRow = m_FlexGrid1.get_RowSel();//
+		lCol = m_FlexGrid1.get_ColSel(); //
 		nCounts=m_FlexGrid1.get_Rows();
 
 		strOldText=m_FlexGrid1.get_TextMatrix(lRow,lCol);
@@ -5593,8 +5593,8 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 	}
 	else if(m_bflexgrid1_or_2==1)//grid 2
 	{
-		lRow = m_FlexGrid2.get_RowSel();//获取点击的行号	
-		lCol = m_FlexGrid2.get_ColSel(); //获取点击的列号
+		lRow = m_FlexGrid2.get_RowSel();//
+		lCol = m_FlexGrid2.get_ColSel(); //
 		nCounts=m_FlexGrid2.get_Rows();
 
 		strOldText=m_FlexGrid2.get_TextMatrix(lRow,lCol);
@@ -5613,8 +5613,8 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 	}
 	else//
 	{
-		lRow = m_FlexGrid3.get_RowSel();//获取点击的行号	
-		lCol = m_FlexGrid3.get_ColSel(); //获取点击的列号
+		lRow = m_FlexGrid3.get_RowSel();//
+		lCol = m_FlexGrid3.get_ColSel(); //
 		nCounts=m_FlexGrid3.get_Rows();
 		m_bflexgrid1_or_2=2;
 		strOldText=m_FlexGrid3.get_TextMatrix(lRow,lCol);
@@ -5654,7 +5654,7 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 		//		nPos = nCol - (m_PID1_heat_stages+1);
 
 		//	//nreg=read_one(tstat_id,341+nPos);
-		//	nreg=(BYTE)product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+nPos];//341TSTAT6找不到对应
+		//	nreg=(BYTE)product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+nPos];//341TSTAT6
 		//	nreg=nreg&0x0f;
 		//	nValue=nValue<<4;
 		//	nValue=nreg|nValue;
@@ -5750,7 +5750,7 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 				ndata=product_register_value[125+nPos];
 				if(ndata>=0)
 				{
-					ndata=ndata&0x0F;//清掉4-7位
+					ndata=ndata&0x0F;//-7
 					nValue=nValue|ndata;
 					 
 					int ret1 = write_one(g_tstat_id,125+nPos,nValue);
@@ -5795,7 +5795,7 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			ndata=product_register_value[362+nPos];
 			if(ndata>=0)
 			{
-				ndata=ndata&0x0F;//清掉4-7位
+				ndata=ndata&0x0F;//-7
 				nValue=nValue|ndata;
 				 
 
@@ -5846,38 +5846,38 @@ void COutPutDlg::ClickMsflexgrid2()
 		return;
 	m_bflexgrid1_or_2=1;//flexgrid2 is selected
 	long lRow,lCol;
-	lRow = m_FlexGrid2.get_RowSel();//获取点击的行号	
+	lRow = m_FlexGrid2.get_RowSel();//
 	pid2lrow = lRow;
-	lCol = m_FlexGrid2.get_ColSel(); //获取点击的列号
+	lCol = m_FlexGrid2.get_ColSel(); //
 	
 	if((lCol==1 || lCol==2) && get_curtstat_version()<26)
 		return;
-	if(lRow>m_FlexGrid2.get_Rows()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_FlexGrid2.get_Rows()) //
 		return;
-	if(lRow == 0) //如果点击标题行，也无效
+	if(lRow == 0) //
 		return;
 	if(FLEXGRID_CELL_COLOR==m_FlexGrid2.get_CellBackColor())
 		return;
 	CRect rect;
-	m_FlexGrid2.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-	//需要将其转化为像素，1440缇= 1英寸
+	m_FlexGrid2.GetWindowRect(rect); //
+	ScreenToClient(rect); //
+	// MSFlexGridp"
+	// 1
 	CDC* pDC =GetDC();
-	//计算象素点和缇的转换比例
+	//
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//)
 	long y = m_FlexGrid2.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid2.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//
 	long width = m_FlexGrid2.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid2.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//
 	CRect rc(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	//
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//获取选中格的文本信息
+	//
 	CString strValue = m_FlexGrid2.get_TextMatrix(lRow,lCol);
 	m_nCurRow=lRow;
 	m_nCurCol=lCol;
@@ -5898,11 +5898,11 @@ void COutPutDlg::ClickMsflexgrid2()
 // 		m_ItemValueCombx.AddString(_T("PID2"));
 // 		m_ItemValueCombx.AddString(_T("MAX(PID1,PID2)"));
 // 		m_ItemValueCombx.AddString(_T("MIN(PID1,PID2)"));
-// 		m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+// 		m_ItemValueCombx.ShowWindow(SW_SHOW);//
 // 		m_ItemValueCombx.BringWindowToTop();
-// 		m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 		m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-// 		m_ItemValueCombx.SetFocus(); //获取焦点
+// 		m_ItemValueCombx.MoveWindow(rc); //
+// 		m_ItemValueCombx.SelectString(-1,strValue); //
+// 		m_ItemValueCombx.SetFocus(); //
 
 
 		m_ItemValueCombx.ResetContent();
@@ -5911,11 +5911,11 @@ void COutPutDlg::ClickMsflexgrid2()
 		m_ItemValueCombx.AddString(_T("PID3"));
 		m_ItemValueCombx.AddString(_T("MAX(PID1,PID2)"));
 		m_ItemValueCombx.AddString(_T("MIN(PID1,PID2)"));
-		m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+		m_ItemValueCombx.ShowWindow(SW_SHOW);//
 		m_ItemValueCombx.BringWindowToTop();
-		m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-		m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-		m_ItemValueCombx.SetFocus(); //获取焦点
+		m_ItemValueCombx.MoveWindow(rc); //
+		m_ItemValueCombx.SelectString(-1,strValue); //
+		m_ItemValueCombx.SetFocus(); //
 	}
 	 if(lCol==5)
 	{
@@ -5934,11 +5934,11 @@ void COutPutDlg::ClickMsflexgrid2()
 		m_ItemValueCombx.AddString(_T("Timer And"));
 		m_ItemValueCombx.AddString(_T("InterLock Timer"));
 
-		m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+		m_ItemValueCombx.ShowWindow(SW_SHOW);//
 		m_ItemValueCombx.BringWindowToTop();
-		m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-		m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-		m_ItemValueCombx.SetFocus(); //获取焦点
+		m_ItemValueCombx.MoveWindow(rc); //
+		m_ItemValueCombx.SelectString(-1,strValue); //
+		m_ItemValueCombx.SetFocus(); //
 	}
 	if (lCol>5)
 	{
@@ -5950,11 +5950,11 @@ void COutPutDlg::ClickMsflexgrid2()
 		//m_ItemValueCombx.AddString(_T("0-100"));
 		//m_ItemValueCombx.AddString(_T("50-100"));
 		//m_ItemValueCombx.AddString(_T("0-50"));
-		//m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+		//m_ItemValueCombx.ShowWindow(SW_SHOW);//
 		//m_ItemValueCombx.BringWindowToTop();
-		//m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-		//m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-		//m_ItemValueCombx.SetFocus(); //获取焦点
+		//m_ItemValueCombx.MoveWindow(rc); //
+		//m_ItemValueCombx.SelectString(-1,strValue); //
+		//m_ItemValueCombx.SetFocus(); //
 		#if 1
 		//if(nValue==7&&(!m_bOut4PWM)&&(!m_bOut5PWM))
 		//if((nValue==7&&lRow<4)||(lRow==4 && !m_bOut4PWM&&nValue==7)||(lRow==5 && !m_bOut5PWM&&nValue==7))
@@ -5972,11 +5972,11 @@ void COutPutDlg::ClickMsflexgrid2()
         m_ItemValueCombx.AddString(_T("MIN->100%"));
         m_ItemValueCombx.AddString(_T("MIN|100%"));
         m_ItemValueCombx.AddString(_T("MIN"));
-        m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-        m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+        m_ItemValueCombx.ShowWindow(SW_SHOW);//
+        m_ItemValueCombx.MoveWindow(rc); //
         m_ItemValueCombx.BringWindowToTop();
-        m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-        m_ItemValueCombx.SetFocus(); //获取焦点
+        m_ItemValueCombx.SelectString(-1,strValue); //
+        m_ItemValueCombx.SetFocus(); //
     }
 
     else if((lRow<4)||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM)) 
@@ -5991,22 +5991,22 @@ void COutPutDlg::ClickMsflexgrid2()
             m_ItemValueCombx.AddString(_T("0-100"));
             m_ItemValueCombx.AddString(_T("50-100"));
             m_ItemValueCombx.AddString(_T("0-50")); 
-            m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-            m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+            m_ItemValueCombx.ShowWindow(SW_SHOW);//
+            m_ItemValueCombx.MoveWindow(rc); //
             m_ItemValueCombx.BringWindowToTop();
-            m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-            m_ItemValueCombx.SetFocus(); //获取焦点
+            m_ItemValueCombx.SelectString(-1,strValue); //
+            m_ItemValueCombx.SetFocus(); //
         } 
         else
         {
             m_ItemValueCombx.ResetContent();
             m_ItemValueCombx.AddString(_T("Off"));
             m_ItemValueCombx.AddString(_T("On"));
-            m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-            m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+            m_ItemValueCombx.ShowWindow(SW_SHOW);//
+            m_ItemValueCombx.MoveWindow(rc); //
             m_ItemValueCombx.BringWindowToTop();
-            m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-            m_ItemValueCombx.SetFocus(); //获取焦点
+            m_ItemValueCombx.SelectString(-1,strValue); //
+            m_ItemValueCombx.SetFocus(); //
         }
 
     }
@@ -6021,11 +6021,11 @@ void COutPutDlg::ClickMsflexgrid2()
                 m_ItemValueCombx.AddString(_T("Off"));
                 m_ItemValueCombx.AddString(_T("On")); 
 
-                m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-                m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+                m_ItemValueCombx.ShowWindow(SW_SHOW);//
+                m_ItemValueCombx.MoveWindow(rc); //
                 m_ItemValueCombx.BringWindowToTop();
-                m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-                m_ItemValueCombx.SetFocus(); //获取焦点
+                m_ItemValueCombx.SelectString(-1,strValue); //
+                m_ItemValueCombx.SetFocus(); //
             } 
             else
             {
@@ -6035,11 +6035,11 @@ void COutPutDlg::ClickMsflexgrid2()
                 m_ItemValueCombx.AddString(_T("0-100"));
                 m_ItemValueCombx.AddString(_T("50-100"));
                 m_ItemValueCombx.AddString(_T("0-50"));
-                m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-                m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+                m_ItemValueCombx.ShowWindow(SW_SHOW);//
+                m_ItemValueCombx.MoveWindow(rc); //
                 m_ItemValueCombx.BringWindowToTop();
-                m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-                m_ItemValueCombx.SetFocus(); //获取焦点
+                m_ItemValueCombx.SelectString(-1,strValue); //
+                m_ItemValueCombx.SetFocus(); //
             }
         } 
         if (lRow==7)//lRow==7
@@ -6050,11 +6050,11 @@ void COutPutDlg::ClickMsflexgrid2()
                 m_ItemValueCombx.AddString(_T("Off"));
                 m_ItemValueCombx.AddString(_T("On")); 
 
-                m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-                m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+                m_ItemValueCombx.ShowWindow(SW_SHOW);//
+                m_ItemValueCombx.MoveWindow(rc); //
                 m_ItemValueCombx.BringWindowToTop();
-                m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-                m_ItemValueCombx.SetFocus(); //获取焦点
+                m_ItemValueCombx.SelectString(-1,strValue); //
+                m_ItemValueCombx.SetFocus(); //
             } 
             else
             {
@@ -6065,11 +6065,11 @@ void COutPutDlg::ClickMsflexgrid2()
                 m_ItemValueCombx.AddString(_T("0-100"));
                 m_ItemValueCombx.AddString(_T("50-100"));
                 m_ItemValueCombx.AddString(_T("0-50"));
-                m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-                m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+                m_ItemValueCombx.ShowWindow(SW_SHOW);//
+                m_ItemValueCombx.MoveWindow(rc); //
                 m_ItemValueCombx.BringWindowToTop();
-                m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-                m_ItemValueCombx.SetFocus(); //获取焦点
+                m_ItemValueCombx.SelectString(-1,strValue); //
+                m_ItemValueCombx.SetFocus(); //
             }
         }	
     }
@@ -6089,11 +6089,11 @@ void COutPutDlg::ClickMsflexgrid2()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 			}
 		if(lRow==m_pwm_row2)
 			{
@@ -6103,11 +6103,11 @@ void COutPutDlg::ClickMsflexgrid2()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 			}
 		}
 }
@@ -6212,8 +6212,8 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 	CString strText;
 	m_DescriptEdt.GetWindowText(strText);
 	m_DescriptEdt.ShowWindow(SW_HIDE);
-	//int lRow = m_Output_Grid.get_RowSel();//获取点击的行号	
-//	int lCol = m_Output_Grid.get_ColSel(); //获取点击的列号
+	//int lRow = m_Output_Grid.get_RowSel();//
+//	int lCol = m_Output_Grid.get_ColSel(); //
 
 	CString strInName;
 	switch (m_nCurRow)
@@ -6503,7 +6503,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 
  
 #if 1
-	CString strTemp;//332 333 这两个寄存器 决定 有几个 阶段。;comments by Fance
+	CString strTemp;//332 333   os by Fance
 	m_PID1_heat_stages=product_register_value[MODBUS_HEAT_ORIGINAL_TABLE];//332 register ,heat stages
 	m_PID1_cool_stages=product_register_value[MODBUS_COOL_ORIGINAL_TABLE];//333 register ,cool stages
 	if(m_PID1_heat_stages==0&&m_PID1_cool_stages==0)
@@ -6763,7 +6763,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
                 tstatval = product_register_value[323+ pos];
                 int indext=-1;
                 //nValue=read_one(tstat_id,341+pos);
-                //nValue=multi_register_value[341+pos];//这项没找到对应项   //Annul by Fance
+                //nValue=multi_register_value[341+pos];///Annul by Fance
 
                 nValue=product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+pos];//modify by Fance  341  591
 
@@ -6807,7 +6807,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
                 tstatval = product_register_value[323+ pos];
                 int indext=-1;
 
-                //nValue=multi_register_value[341+pos];//这项没找到对应项		 //Annul by Fance
+                //nValue=multi_register_value[341+pos];///Annul by Fance
                 nValue=product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+pos];//modify by Fance  341  591
 
                 nValue=nValue&0x0f;
@@ -6845,7 +6845,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 		//for( row = totalrows-1;row<=totalrows;row++)//****************************
 	{
 		int nOutReg;
-		nOutReg=MODBUS_INTERLOCK_OUTPUT1+row-1;//Modify by fance; 这里应该是 MODBUS_INTERLOCK_OUTPUT1 对应 245  而  286 是TSTAT 5的值
+		nOutReg=MODBUS_INTERLOCK_OUTPUT1+row-1;//Modify by fance; DBUS_INTERLOCK_OUTPUT1    
 		//nOutReg=286+row-1;
 		//			int nValue=read_one(tstat_id,nOutReg);
 		int nValue=product_register_value[nOutReg];
@@ -6999,7 +6999,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 
 	m_FlexGrid2.put_ColAlignment(0,4);
 	m_FlexGrid2.put_ColAlignment(1,4);
-	//*****************************888、
+	//*****************************888
 
 
 	int totalrows,row;
@@ -7409,7 +7409,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			//tstatval = product_register_value[323+ pos];
 			int indext=-1;
 			//nValue=read_one(tstat_id,341+pos);
-			//nValue=multi_register_value[341+pos];//这项没找到对应项   //Annul by Fance
+			//nValue=multi_register_value[341+pos];///Annul by Fance
 
 			nValue=product_register_value[725+pos];//modify by Fance  341  591
 
@@ -7456,7 +7456,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			 
 			int indext=-1;
 
-			//nValue=multi_register_value[341+pos];//这项没找到对应项		 //Annul by Fance
+			//nValue=multi_register_value[341+pos];///Annul by Fance
 			nValue=product_register_value[725+pos];//modify by Fance  341  591
 
 			nValue=nValue&0x0f;
@@ -7503,7 +7503,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
                 //tstatval = product_register_value[323+ pos];
                 int indext=-1;
                 //nValue=read_one(tstat_id,341+pos);
-                //nValue=multi_register_value[341+pos];//这项没找到对应项   //Annul by Fance
+                //nValue=multi_register_value[341+pos];///Annul by Fance
 
                 nValue=product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+pos];//modify by Fance  341  591
 
@@ -7550,7 +7550,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 
                 int indext=-1;
 
-                //nValue=multi_register_value[341+pos];//这项没找到对应项		 //Annul by Fance
+                //nValue=multi_register_value[341+pos];///Annul by Fance
                 nValue=product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+pos];//modify by Fance  341  591
 
                 nValue=nValue&0x0f;
@@ -7656,7 +7656,7 @@ void COutPutDlg::FreshGrid_PID2tstat5GLessthan368()
 
 	m_FlexGrid2.put_ColAlignment(0,4);
 	m_FlexGrid2.put_ColAlignment(1,4);
-	//*****************************888、
+	//*****************************888
 
 
 	int totalrows,row;
@@ -8073,7 +8073,7 @@ void COutPutDlg::FreshGrid_PID2tstat5GLessthan368()
 			//tstatval = product_register_value[323+ pos];
 			int indext=-1;
 			//nValue=read_one(tstat_id,341+pos);
-			//nValue=multi_register_value[341+pos];//这项没找到对应项   //Annul by Fance
+			//nValue=multi_register_value[341+pos];///Annul by Fance
 
 			nValue=product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+pos];//modify by Fance  341  591
 
@@ -8120,7 +8120,7 @@ void COutPutDlg::FreshGrid_PID2tstat5GLessthan368()
 			 
 			int indext=-1;
 
-			//nValue=multi_register_value[341+pos];//这项没找到对应项		 //Annul by Fance
+			//nValue=multi_register_value[341+pos];///Annul by Fance
 			nValue=product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+pos];//modify by Fance  341  591
 
 			nValue=nValue&0x0f;
@@ -8173,38 +8173,38 @@ void COutPutDlg::ClickMsflexgrid3()
 	m_bflexgrid1_or_2=2;//flexgrid2 is selected
 
 	long lRow,lCol;
-	lRow = m_FlexGrid3.get_RowSel();//获取点击的行号	
+	lRow = m_FlexGrid3.get_RowSel();//
 	pid2lrow = lRow;
-	lCol = m_FlexGrid3.get_ColSel(); //获取点击的列号
+	lCol = m_FlexGrid3.get_ColSel(); //
 	
 	if((lCol==1 || lCol==2) && get_curtstat_version()<26)
 		return;
-	if(lRow>m_FlexGrid3.get_Rows()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_FlexGrid3.get_Rows()) //
 		return;
-	if(lRow == 0) //如果点击标题行，也无效
+	if(lRow == 0) //
 		return;
 	if(FLEXGRID_CELL_COLOR==m_FlexGrid3.get_CellBackColor())
 		return;
 	CRect rect;
-	m_FlexGrid3.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-	//需要将其转化为像素，1440缇= 1英寸
+	m_FlexGrid3.GetWindowRect(rect); //
+	ScreenToClient(rect); //
+	// MSFlexGridp"
+	// 1
 	CDC* pDC =GetDC();
-	//计算象素点和缇的转换比例
+	//
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//)
 	long y = m_FlexGrid3.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid3.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//
 	long width = m_FlexGrid3.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid3.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//
 	CRect rc(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	//
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//获取选中格的文本信息
+	//
 	CString strValue = m_FlexGrid3.get_TextMatrix(lRow,lCol);
 	m_nCurRow=lRow;
 	m_nCurCol=lCol;
@@ -8225,11 +8225,11 @@ void COutPutDlg::ClickMsflexgrid3()
 // 		m_ItemValueCombx.AddString(_T("PID2"));
 // 		m_ItemValueCombx.AddString(_T("MAX(PID1,PID2)"));
 // 		m_ItemValueCombx.AddString(_T("MIN(PID1,PID2)"));
-// 		m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+// 		m_ItemValueCombx.ShowWindow(SW_SHOW);//
 // 		m_ItemValueCombx.BringWindowToTop();
-// 		m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 		m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-// 		m_ItemValueCombx.SetFocus(); //获取焦点
+// 		m_ItemValueCombx.MoveWindow(rc); //
+// 		m_ItemValueCombx.SelectString(-1,strValue); //
+// 		m_ItemValueCombx.SetFocus(); //
 
 
 		m_ItemValueCombx.ResetContent();
@@ -8238,11 +8238,11 @@ void COutPutDlg::ClickMsflexgrid3()
 		m_ItemValueCombx.AddString(_T("PID3"));
 		m_ItemValueCombx.AddString(_T("MAX(PID1,PID2)"));
 		m_ItemValueCombx.AddString(_T("MIN(PID1,PID2)"));
-		m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+		m_ItemValueCombx.ShowWindow(SW_SHOW);//
 		m_ItemValueCombx.BringWindowToTop();
-		m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-		m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-		m_ItemValueCombx.SetFocus(); //获取焦点
+		m_ItemValueCombx.MoveWindow(rc); //
+		m_ItemValueCombx.SelectString(-1,strValue); //
+		m_ItemValueCombx.SetFocus(); //
 	}
 	 if(lCol==5)
 	{
@@ -8261,11 +8261,11 @@ void COutPutDlg::ClickMsflexgrid3()
 		m_ItemValueCombx.AddString(_T("Timer And"));
 		m_ItemValueCombx.AddString(_T("InterLock Timer"));
 
-		m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+		m_ItemValueCombx.ShowWindow(SW_SHOW);//
 		m_ItemValueCombx.BringWindowToTop();
-		m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-		m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-		m_ItemValueCombx.SetFocus(); //获取焦点
+		m_ItemValueCombx.MoveWindow(rc); //
+		m_ItemValueCombx.SelectString(-1,strValue); //
+		m_ItemValueCombx.SetFocus(); //
 	}
 	if (lCol>5)
 	{
@@ -8277,11 +8277,11 @@ void COutPutDlg::ClickMsflexgrid3()
 		//m_ItemValueCombx.AddString(_T("0-100"));
 		//m_ItemValueCombx.AddString(_T("50-100"));
 		//m_ItemValueCombx.AddString(_T("0-50"));
-		//m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+		//m_ItemValueCombx.ShowWindow(SW_SHOW);//
 		//m_ItemValueCombx.BringWindowToTop();
-		//m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-		//m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-		//m_ItemValueCombx.SetFocus(); //获取焦点
+		//m_ItemValueCombx.MoveWindow(rc); //
+		//m_ItemValueCombx.SelectString(-1,strValue); //
+		//m_ItemValueCombx.SetFocus(); //
 		#if 1
 		//if(nValue==7&&(!m_bOut4PWM)&&(!m_bOut5PWM))
 		//if((nValue==7&&lRow<4)||(lRow==4 && !m_bOut4PWM&&nValue==7)||(lRow==5 && !m_bOut5PWM&&nValue==7))
@@ -8307,11 +8307,11 @@ void COutPutDlg::ClickMsflexgrid3()
 			m_ItemValueCombx.AddString(_T("MIN->100%"));
 			m_ItemValueCombx.AddString(_T("MIN|100%"));
 			m_ItemValueCombx.AddString(_T("MIN"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 		}
 	//	else if((lRow<4)||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM))
 		else if((lRow<4)||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM)/*||(lRow>5)*/)//20121008
@@ -8326,11 +8326,11 @@ void COutPutDlg::ClickMsflexgrid3()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50")); 
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 		    } 
 		    else
 		    {m_ItemValueCombx.ResetContent();
@@ -8341,11 +8341,11 @@ void COutPutDlg::ClickMsflexgrid3()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));*/
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 		    }
 			
 		}
@@ -8367,11 +8367,11 @@ void COutPutDlg::ClickMsflexgrid3()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));*/
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				} 
 				else
 				{
@@ -8383,11 +8383,11 @@ void COutPutDlg::ClickMsflexgrid3()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				}
 			    } 
 			    else if (lRow==7)//lRow==7
@@ -8398,11 +8398,11 @@ void COutPutDlg::ClickMsflexgrid3()
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On")); 
 			 
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				  } 
 				  else
 				  {
@@ -8413,11 +8413,11 @@ void COutPutDlg::ClickMsflexgrid3()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 				  }
 			    }
 			 } 
@@ -8434,11 +8434,11 @@ void COutPutDlg::ClickMsflexgrid3()
 					 m_ItemValueCombx.AddString(_T("0-100"));
 					 m_ItemValueCombx.AddString(_T("50-100"));
 					 m_ItemValueCombx.AddString(_T("0-50"));
-					 m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-					 m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+					 m_ItemValueCombx.ShowWindow(SW_SHOW);//
+					 m_ItemValueCombx.MoveWindow(rc); //
 					 m_ItemValueCombx.BringWindowToTop();
-					 m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-					 m_ItemValueCombx.SetFocus(); //获取焦点
+					 m_ItemValueCombx.SelectString(-1,strValue); //
+					 m_ItemValueCombx.SetFocus(); //
 					 } 
 				 else
 					 {
@@ -8448,11 +8448,11 @@ void COutPutDlg::ClickMsflexgrid3()
 					 //m_ItemValueCombx.AddString(_T("0-100"));
 					 //m_ItemValueCombx.AddString(_T("50-100"));
 					 //m_ItemValueCombx.AddString(_T("0-50"));
-					 m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-					 m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+					 m_ItemValueCombx.ShowWindow(SW_SHOW);//
+					 m_ItemValueCombx.MoveWindow(rc); //
 					 m_ItemValueCombx.BringWindowToTop();
-					 m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-					 m_ItemValueCombx.SetFocus(); //获取焦点
+					 m_ItemValueCombx.SelectString(-1,strValue); //
+					 m_ItemValueCombx.SetFocus(); //
 					 }
 				 }
 			else if (lRow==7)
@@ -8465,11 +8465,11 @@ void COutPutDlg::ClickMsflexgrid3()
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
 				m_ItemValueCombx.AddString(_T("0-50"));
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//
+				m_ItemValueCombx.MoveWindow(rc); //
 				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				m_ItemValueCombx.SelectString(-1,strValue); //
+				m_ItemValueCombx.SetFocus(); //
 				} 
 			else
 				{
@@ -8479,11 +8479,11 @@ void COutPutDlg::ClickMsflexgrid3()
 				//m_ItemValueCombx.AddString(_T("0-100"));
 				//m_ItemValueCombx.AddString(_T("50-100"));
 				//m_ItemValueCombx.AddString(_T("0-50"));
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//
+				m_ItemValueCombx.MoveWindow(rc); //
 				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				m_ItemValueCombx.SelectString(-1,strValue); //
+				m_ItemValueCombx.SetFocus(); //
 				}
 			} 
 			
@@ -8510,11 +8510,11 @@ void COutPutDlg::ClickMsflexgrid3()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 			}
 		if(lRow==5 &&m_bOut5PWM)
 			{
@@ -8524,11 +8524,11 @@ void COutPutDlg::ClickMsflexgrid3()
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
 			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//
+			m_ItemValueCombx.MoveWindow(rc); //
 			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.SelectString(-1,strValue); //
+			m_ItemValueCombx.SetFocus(); //
 			}
 
 		}
@@ -8660,7 +8660,7 @@ void COutPutDlg::OnEnKillfocusEditFanOffName()
      CString strText;
  
      m_edit_off.GetWindowText(strText);
-     strText.Trim();  //去掉前后空格;
+     strText.Trim();  //
      if (!Write_Model_Name(strText,737))
      {
          strText = GetTextFromReg(737);

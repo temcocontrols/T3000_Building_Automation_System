@@ -280,7 +280,7 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
 	break;
 	case WM_NCDESTROY:
 	{
-		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= WEBVIEW_JSON_FEATURE) //643 版本会有这个功能
+		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= WEBVIEW_JSON_FEATURE) //643 
 		{
 				::PostMessage(m_screen_dlg_hwnd, HANDLE_JSON_DATA, NULL, NULL);
 		}
@@ -294,7 +294,7 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
 		}
 		//DeleteObject(m_appBackgroundImageHandle);
 		DeleteDC(m_memHdc);
-		//FreeConsole(); //关闭控制台
+		//FreeConsole(); //
 	}
 	break;
 	//! [RestartManager]
@@ -444,13 +444,13 @@ void BacnetWebViewAppWindow::Release()
 
 void BacnetWebViewAppWindow::NotifyClosed()
 {
-	//对话框窗体大小及其屏幕坐标
+	//
 	//CRect rectDlg;
-	////GetClientRect(rectDlg);//获得窗体的大小 //法1：
-	//::GetWindowRect(this,;//获得窗体在屏幕上的位置 //法2：
+	////GetClientRect(rectDlg);// //1
+	//::GetWindowRect(this,;// //2
 	//ScreenToClient(rectDlg);
 
-	//printf(“窗口位置大小:底: % d, 右 : % d, 宽 : % d, 高 : % d\r\n”, rectDlg.bottom, rectDlg.right, rectDlg.Width(), rectDlg.Height());
+	//printf(:: % d,  : % d,  : % d,  : % d\r\n, rectDlg.bottom, rectDlg.right, rectDlg.Width(), rectDlg.Height());
 	CloseWebView(true);
 	m_isClosed = true;
 }
@@ -705,7 +705,7 @@ void WrapErrorMessage(Json::StreamWriterBuilder& builder, const Json::Value& tem
 std::mutex handleWebViewMsgMutex;
 void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 {
-	// 使用 std::lock_guard 来锁定互斥锁
+	//  std::lock_guard 
 	std::lock_guard<std::mutex> lock(handleWebViewMsgMutex);
 
 	Json::Value json;
@@ -718,8 +718,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	Json::StreamWriterBuilder builder;
 	builder["indentation"] = ""; // If you want whitespace-less output
 	Json::Value tempjson;
-	int grp_index = 0;  //选中的第几幅图;
-	int grp_serial_number = 0; //选中设备的序列号 ，靠这个序列号来找到对应的设备 zip文件;
+	int grp_index = 0;  //;
+	int grp_serial_number = 0; //  zip;
 	int n_ret = -1;
 	CString des_file;
 	CString des_file_zip;
@@ -797,9 +797,9 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		}
 
 		g_Device_Basic_Setting[npanel_id].reg.ip_addr;
-		char ipStr[16]; // 用于存储转换后的IP字符串
+		char ipStr[16]; // IP
 		unsigned char* ipAddr = g_Device_Basic_Setting[npanel_id].reg.ip_addr;
-		// 使用 sprintf 将 IP 地址转换为字符串
+		//  sprintf  IP 
 		sprintf(ipStr, "%d.%d.%d.%d", ipAddr[0], ipAddr[1], ipAddr[2], ipAddr[3]);
 
 		tempjson["panel_id"] = npanel_id;
@@ -1030,18 +1030,18 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	{
 		Json::Value tempjson;
 		int panel_id;
-		if (msg_source == 0)//来自T3000按键点击
+		if (msg_source == 0)//T3000
 		{
 			grp_serial_number = g_selected_serialnumber; 
 			grp_index = screen_list_line;
 			panel_id = bac_gloab_panel;
 		}
-		else if(msg_source == 1)//来自浏览器
+		else if(msg_source == 1)//
 		{
-			panel_id = json.get("panelId", Json::nullValue).asInt(); //这里要根据panelId来判断是那个序列号的设备，进而确定保存的文件名
-			grp_index = json.get("viewitem", Json::nullValue).asInt(); //这里如果是按键点进来的，要用T3000的index ，如果是 浏览器的 要浏览器的index
+			panel_id = json.get("panelId", Json::nullValue).asInt(); //anelId
+			grp_index = json.get("viewitem", Json::nullValue).asInt(); //T3000ndex   ndex
 			grp_serial_number = json.get("serialNumber", Json::nullValue).asInt();
-			//浏览器这里要调用一个函数，根据panel_id 和 grp_index 以及序列号 读取对应的panel的 绘图数据的zip文件并解压;
+			//panel_id  grp_index  anel ip;
 			
 			if ((panel_id <= 0) || (panel_id > 254))
 			{
@@ -1186,7 +1186,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 
 		CFileFind temp_find;
-		if (temp_find.FindFile(des_file) == 0) //当 没有发现缓存的 grp文件时，返回空的 grp给 webview 显示;
+		if (temp_find.FindFile(des_file) == 0) //  grp grp webview ;
 		{
 			wstring nbuff_wstring(empty_grp_file.GetBuffer());
 			string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
@@ -1197,7 +1197,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			//m_webView->PostWebMessageAsJson(tempjson_str);
 			break;
 		}
-		if (temp_find.FindFile(des_lib_file) == 0) //当 没有发现缓存的 lib文件时，返回空的 grp给 webview 显示;
+		if (temp_find.FindFile(des_lib_file) == 0) //  lib grp webview ;
 		{
 
 		}
@@ -1210,7 +1210,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				break;
 			WCHAR* nlibbuff = new WCHAR[len + 1];
 			memset(nlibbuff, 0, 2 * (len + 1));
-			filelib.Read(nlibbuff, len * 2 + 1);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
+			filelib.Read(nlibbuff, len * 2 + 1);   //Read( void* lpBuf, UINT nCount ) lpBufBufnCount
 			wstring nbuff_wstring(nlibbuff);
 			string file_content(nbuff_wstring.begin(), nbuff_wstring.end());
 			tempjson["library"] = file_content;
@@ -1224,7 +1224,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			break;
 		WCHAR* nbuff = new WCHAR[len + 1];
 		memset(nbuff, 0, 2 * (len + 1));
-		file.Read(nbuff, len * 2 + 1);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
+		file.Read(nbuff, len * 2 + 1);   //Read( void* lpBuf, UINT nCount ) lpBufBufnCount
 		wstring nbuff_wstring(nbuff);
 		string nbuff_str(nbuff_wstring.begin(), nbuff_wstring.end());
 		tempjson["data"] = nbuff_str;
@@ -1241,18 +1241,18 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 	case WEBVIEW_MESSAGE_TYPE::SAVE_GRAPHIC_DATA:
 	{
-		int panelId = json.get("panelId", Json::nullValue).asInt(); //这里要根据panelId来判断是那个序列号的设备，进而确定保存的文件名
+		int panelId = json.get("panelId", Json::nullValue).asInt(); //anelId
 		int save_grp_index = -1;
 
 		
-		if (msg_source == 0)//来自T3000按键点击
+		if (msg_source == 0)//T3000
 		{
-			grp_serial_number = g_selected_serialnumber; //暂时用这个代替
+			grp_serial_number = g_selected_serialnumber; //
 			save_grp_index = screen_list_line;
-			panelId = bac_gloab_panel; //有时候浏览器这里传过来的panelID是0 ，不正常，这里强行赋值;
+			panelId = bac_gloab_panel; //panelID0 ;
 			save_button_click = 1;
 		}
-		else if (msg_source == 1)//来自浏览器
+		else if (msg_source == 1)//
 		{
 			grp_serial_number = json.get("serialNumber", Json::nullValue).asInt();
 			save_grp_index = json.get("viewitem", Json::nullValue).asInt();
@@ -1339,8 +1339,8 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data into file success!"));
 		}
 
-		//这里涉及到写设备的动作 发消息放到线程中去做。避免界面卡死，以及影响其他消息收发;
-		//这里要根据不同的panel 对不同设备进行保存 .
+		// ;
+		//panel  .
 		int n_write_result =  Write_Webview_Data_Special(panelId, grp_serial_number, save_grp_index, temp_elementcount);
 		if (n_write_result == -3)
 		{
@@ -1408,7 +1408,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				int n_index = SearchDataIndexByPanel(panel_id, READINPUT_T3000, entry_index);
 				if ((n_index >= 0) && (n_index <= 255))
 				{
-					//第一时间更新全局数据，如果不这样，数据会来回变动
+					//
 					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_input_data, &g_Input_data[panel_id].at(entry_index), sizeof(Str_in_point));
 				}
 			}
@@ -1451,7 +1451,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				int n_index = SearchDataIndexByPanel(panel_id, READOUTPUT_T3000, entry_index);
 				if ((n_index >= 0) && (n_index <= 255))
 				{
-					//第一时间更新全局数据，如果不这样，数据会来回变动
+					//
 					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_output_data, &g_Output_data[panel_id].at(entry_index), sizeof(Str_out_point));
 				}
 			}
@@ -1492,7 +1492,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				int n_index = SearchDataIndexByPanel(panel_id, READVARIABLE_T3000, entry_index);
 				if ((n_index >= 0) && (n_index <= 255))
 				{
-					//第一时间更新全局数据，如果不这样，数据会来回变动
+					//
 					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_variable_data, &g_Variable_data[panel_id].at(entry_index), sizeof(Str_variable_point));
 				}
 			}
@@ -1530,7 +1530,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				int n_index = SearchDataIndexByPanel(panel_id, READPROGRAM_T3000, entry_index);
 				if ((n_index >= 0) && (n_index <= 255))
 				{
-					//第一时间更新全局数据，如果不这样，数据会来回变动
+					//
 					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_program_data, &g_Program_data[panel_id].at(entry_index), sizeof(Str_program_point));
 				}
 			}
@@ -1568,7 +1568,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				int n_index = SearchDataIndexByPanel(panel_id, READWEEKLYROUTINE_T3000, entry_index);
 				if ((n_index >= 0) && (n_index <= 255))
 				{
-					//第一时间更新全局数据，如果不这样，数据会来回变动
+					//
 					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_schedual_data, &g_Weekly_data[panel_id].at(entry_index), sizeof(Str_weekly_routine_point));
 				}
 			}
@@ -1606,7 +1606,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				int n_index = SearchDataIndexByPanel(panel_id, READANNUALROUTINE_T3000, entry_index);
 				if ((n_index >= 0) && (n_index <= 255))
 				{
-					//第一时间更新全局数据，如果不这样，数据会来回变动
+					//
 					memcpy(&m_backbround_data.at(n_index).ret_data.m_group_annual_data, &g_Annual_data[panel_id].at(entry_index), sizeof(Str_annual_routine_point));
 				}
 			}
@@ -1646,7 +1646,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				tempjson["data"][send_index]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
 				tempjson["data"][send_index]["pid"] = g_bacnet_panel_info.at(i).npid;
 				tempjson["data"][send_index]["panel_name"] = (char*)g_Device_Basic_Setting[g_bacnet_panel_info.at(i).panel_number].reg.panel_name;
-				send_index++; //若缓存中没有 在线设备的数据，就不读取 。
+				send_index++; //  
 			}
 		}
 		const std::string output = Json::writeString(builder, tempjson);
@@ -1673,7 +1673,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 					if (entry_index >= BAC_INPUT_ITEM_COUNT)
 						continue;
 					CString temp_cs4;
-					int ret_index4 = Post_Background_Read_Message_ByPanel(npanel_id, READINPUT_T3000, entry_index + 1);  //send message to background ，read 199IN3
+					int ret_index4 = Post_Background_Read_Message_ByPanel(npanel_id, READINPUT_T3000, entry_index + 1);  //send message to background ead 199IN3
 					if (ret_index4 >= 0)
 					{
 						memcpy(&g_Input_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index4).ret_data.m_group_input_data, sizeof(Str_in_point));
@@ -1705,7 +1705,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				{
 					if (entry_index >= BAC_OUTPUT_ITEM_COUNT)
 						continue;
-					int ret_index_out = Post_Background_Read_Message_ByPanel(npanel_id, READOUTPUT_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					int ret_index_out = Post_Background_Read_Message_ByPanel(npanel_id, READOUTPUT_T3000, entry_index + 1);  //send message to background ead 199OUT3
 					if (ret_index_out >= 0)
 					{
 						memcpy(&g_Output_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_output_data, sizeof(Str_out_point));
@@ -1736,7 +1736,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				{
 					if (entry_index >= BAC_VARIABLE_ITEM_COUNT)
 						continue;
-					int ret_index_var = Post_Background_Read_Message_ByPanel(npanel_id, READVARIABLE_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					int ret_index_var = Post_Background_Read_Message_ByPanel(npanel_id, READVARIABLE_T3000, entry_index + 1);  //send message to background ead 199OUT3
 					if (ret_index_var >= 0)
 					{
 						memcpy(&g_Variable_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_var).ret_data.m_group_variable_data, sizeof(Str_variable_point));
@@ -1764,7 +1764,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				{
 					if (entry_index >= BAC_PROGRAM_ITEM_COUNT)
 						continue;
-					int ret_index_prg = Post_Background_Read_Message_ByPanel(npanel_id, READPROGRAM_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					int ret_index_prg = Post_Background_Read_Message_ByPanel(npanel_id, READPROGRAM_T3000, entry_index + 1);  //send message to background ead 199OUT3
 					if (ret_index_prg >= 0)
 					{
 						memcpy(&g_Program_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_prg).ret_data.m_group_program_data, sizeof(Str_program_point));
@@ -1787,7 +1787,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				{
 					if (entry_index >= BAC_SCHEDULE_COUNT)
 						continue;
-					int ret_index_sch = Post_Background_Read_Message_ByPanel(npanel_id, READWEEKLYROUTINE_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					int ret_index_sch = Post_Background_Read_Message_ByPanel(npanel_id, READWEEKLYROUTINE_T3000, entry_index + 1);  //send message to background ead 199OUT3
 					if (ret_index_sch >= 0)
 					{
 						memcpy(&g_Weekly_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_sch).ret_data.m_group_schedual_data, sizeof(Str_weekly_routine_point));
@@ -1813,7 +1813,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 					if (entry_index >= BAC_HOLIDAY_COUNT)
 						continue;
 					CString temp_cs4;
-					int ret_index_hol = Post_Background_Read_Message_ByPanel(npanel_id, READANNUALROUTINE_T3000, entry_index + 1);  //send message to background ，read 199IN3
+					int ret_index_hol = Post_Background_Read_Message_ByPanel(npanel_id, READANNUALROUTINE_T3000, entry_index + 1);  //send message to background ead 199IN3
 					if (ret_index_hol >= 0)
 					{
 						memcpy(&g_Annual_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_hol).ret_data.m_group_annual_data, sizeof(Str_annual_routine_point));
@@ -1838,7 +1838,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				{
 					if (entry_index >= BAC_SCREEN_COUNT)
 						continue;
-					int ret_index_out = Post_Background_Read_Message_ByPanel(npanel_id, READSCREEN_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					int ret_index_out = Post_Background_Read_Message_ByPanel(npanel_id, READSCREEN_T3000, entry_index + 1);  //send message to background ead 199OUT3
 					if (ret_index_out >= 0)
 					{
 						memcpy(&g_screen_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_screen_data, sizeof(Control_group_point));
@@ -1859,7 +1859,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				{
 					if (entry_index >= BAC_MONITOR_COUNT)
 						continue;
-					int ret_index_monitor = Post_Background_Read_Message_ByPanel(npanel_id, READMONITOR_T3000, entry_index + 1);  //send message to background ，read 199OUT3
+					int ret_index_monitor = Post_Background_Read_Message_ByPanel(npanel_id, READMONITOR_T3000, entry_index + 1);  //send message to background ead 199OUT3
 					if (ret_index_monitor >= 0)
 					{
 						memcpy(&g_monitor_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_monitor).ret_data.m_group_monitor_data, sizeof(Str_monitor_point));
@@ -1896,7 +1896,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		int npanel_id = json.get("panelId", Json::nullValue).asInt();
 		int entry_index = json.get("entryIndex", Json::nullValue).asInt();
 		int entry_type = json.get("entryType", Json::nullValue).asInt();
-		if (npanel_id == bac_gloab_panel) //暂时只处理本地 panel的 点击响应
+		if (npanel_id == bac_gloab_panel) // panel 
 		{
 			switch (entry_type)
 			{
@@ -1953,7 +1953,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		hFind_folder = FindFirstFile(web_image_folder, &fd);
 		if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 		{
-			ret = TRUE; //目录存在
+			ret = TRUE; //
 		}
 		FindClose(hFind_folder);
 		if (ret == false)
@@ -2002,7 +2002,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			hFind_folder = FindFirstFile(temp_image_path, &fd);
 			if (hFind_folder != INVALID_HANDLE_VALUE)
 			{
-				//发现同名文件存在，变更同名文件文件名;
+				//;
 				temp_name_index++;
 			}
 			else
@@ -2027,12 +2027,12 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		WideCharToMultiByte(CP_ACP, 0, temp_image_path.GetBuffer(), -1, des_folder, 512, NULL, NULL);
 		std::ofstream file(des_folder, std::ios::binary);
 
-		char* ret_result = (char*)malloc(sizeof(char) * file_length);	//申请返回字符串空间
-		memset(ret_result, 0, sizeof(char) * file_length);		//初始化字符串空间
-		const char* temp_ret = strstr((char const*)file_data.c_str(), "base64,"); //去除前面不用的部分;
+		char* ret_result = (char*)malloc(sizeof(char) * file_length);	//
+		memset(ret_result, 0, sizeof(char) * file_length);		//
+		const char* temp_ret = strstr((char const*)file_data.c_str(), "base64,"); //;
 		if (temp_ret == NULL)
 			break;
-		const std::string temp_image_data = strstr((char const*)file_data.c_str(), "base64,") + 7; //去除前面不用的部分;
+		const std::string temp_image_data = strstr((char const*)file_data.c_str(), "base64,") + 7; //;
 		base64_decode((char const*)temp_image_data.c_str(), ret_result, (int)strlen(temp_image_data.c_str()));
 		file.write(ret_result, file_length);
 		free(ret_result);
@@ -2083,7 +2083,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		temp_file_name = temp_file_name.TrimRight(_T("\""));
 		temp_delete_file_path = web_image_folder + temp_file_name;
 		CFileFind temp_find;
-		if (temp_find.FindFile(temp_delete_file_path)) //当 发现需要删除的的 IMAGE文件时 删除
+		if (temp_find.FindFile(temp_delete_file_path)) //  IMAGE 
 		{
 			DeleteFile(temp_delete_file_path);
 		}
@@ -2251,8 +2251,8 @@ void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsign
 //	switch (dwCtrlType)
 //	{
 //	case CTRL_CLOSE_EVENT:
-//		// 处理控制台关闭事件，防止程序终止
-//		//std::cout << "控制台窗口关闭事件被捕获，程序继续运行。" << std::endl;
+//		// 
+//		//std::cout << "" << std::endl;
 //		Sleep(1);
 //		return TRUE;
 //	default:
@@ -2266,7 +2266,7 @@ void BacnetWebViewAppWindow::get_png_image_dimensions(CString& file_path, unsign
 //	freopen("CONOUT$", "w", stdout);
 //	freopen("CONOUT$", "w", stderr);
 //
-//	// 设置控制台关闭事件处理程序
+//	// 
 //	//SetConsoleCtrlHandler(ConsoleHandler, TRUE);
 //}
 

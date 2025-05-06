@@ -1,4 +1,4 @@
-// C:\Documents and Settings\software\My Documents\Visual Studio Projects\NWT3000_first\Tstat Manager\LedsDialog.cpp : 实现文件
+// C:\Documents and Settings\software\My Documents\Visual Studio Projects\NWT3000_first\Tstat Manager\LedsDialog.cpp : 
 //
 
 #include "stdafx.h"
@@ -11,7 +11,7 @@
 // CLedsDialog dialog
 
 
-	char *m_led_value[32]={//to 对应the mobus.h中的表示led内容的enum
+	char *m_led_value[32]={//to the mobus.hledenum
 		    "NONE",
 			"RELAY1",
 			"RELAY2",
@@ -45,7 +45,7 @@
 			"HOLD",
 			"MODE_BUTTON",
 			};
-// CLedsDialog 对话框
+// CLedsDialog 
 
 IMPLEMENT_DYNAMIC(CLedsDialog, CDialog)
 CLedsDialog::CLedsDialog(CWnd* pParent /*=NULL*/)

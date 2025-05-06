@@ -15,7 +15,7 @@
 #include "CBacnetUnitsSelection.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
-extern tree_product selected_product_Node; // 选中的设备信息;
+extern tree_product selected_product_Node; // ;
 
 
 
@@ -70,7 +70,7 @@ LRESULT  CBacnetVariable::VariableMessageCallBack(WPARAM wParam, LPARAM lParam)
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		if((pInvoke->mRow < BAC_VARIABLE_ITEM_COUNT) && (pInvoke->mRow >= 0))
 		{
-            if ((!SPECIAL_BAC_TO_MODBUS) && (Bacnet_Private_Device(selected_product_Node.product_class_id))) //不是转Modbus的协议的 就调用下面的刷新单条.)
+            if ((!SPECIAL_BAC_TO_MODBUS) && (Bacnet_Private_Device(selected_product_Node.product_class_id))) //Modbus .)
             {
                 Post_Refresh_One_Message(g_bac_instance, READVARIABLE_T3000,
                     pInvoke->mRow, pInvoke->mRow, sizeof(Str_variable_point));
@@ -81,12 +81,12 @@ LRESULT  CBacnetVariable::VariableMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		memcpy_s(&m_Variable_data.at(pInvoke->mRow),sizeof(Str_variable_point),&m_temp_variable_data[pInvoke->mRow],sizeof(Str_variable_point));//还原没有改对的值
+		memcpy_s(&m_Variable_data.at(pInvoke->mRow),sizeof(Str_variable_point),&m_temp_variable_data[pInvoke->mRow],sizeof(Str_variable_point));//
 		PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 	}
-	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
+	if((pInvoke->mRow%2)==0)	//  ;
 		m_variable_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
 		m_variable_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -213,7 +213,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 	{
 		if (m_variable_list.IsDataNewer((char*)&m_Variable_data.at(0), sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT))
 		{
-			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			//list ;List;
 			m_variable_list.SetListData((char*)&m_Variable_data.at(0), sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT);
 		}
 		else
@@ -313,7 +313,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 				float temp_float_value1;
 				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
 				get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
-				if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+				if (get_name_ret < 0)  //  ;
 					cstemp_value2.Format(_T("%.3f"), temp_float_value1);
 				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
 			}
@@ -349,7 +349,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			if (m_Variable_data.at(i).range == 20)	//如果是时间;
+			if (m_Variable_data.at(i).range == 20)	//;
 			{
 				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
 				char temp_char[50];
@@ -403,7 +403,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 				float temp_float_value1;
 				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
 				get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
-				if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+				if (get_name_ret < 0)  //  ;
 					cstemp_value2.Format(_T("%.3f"), temp_float_value1);
 				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
 			}
@@ -416,7 +416,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 				float temp_float_value1;
 				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
 				get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
-				if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+				if (get_name_ret < 0)  //  ;
 					cstemp_value2.Format(_T("%.3f"), temp_float_value1);
 				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
 			}
@@ -478,12 +478,12 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == VARIABLE_LABLE)
 	{
 		CString cs_temp = m_variable_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_VARIABLE_LABEL)	//长度不能大于结构体定义的长度;
+		if(cs_temp.GetLength()>= STR_VARIABLE_LABEL)	//;
 		{
 			MessageBox(_T("Length can not higher than 9"),_T("Warning"));
 
 #pragma region note_what_do	
-			//如下所做的事 达到 ,在弹窗后 继续选中客户输入的部分 ，毛总的要求;
+			//  ,  ;
 			CRect list_rect,win_rect;
 			m_variable_list.GetWindowRect(list_rect);
 			ScreenToClient(&list_rect);
@@ -527,11 +527,11 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == VARIABLE_FULL_LABLE)
 	{
 		CString cs_temp = m_variable_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_VARIABLE_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+		if(cs_temp.GetLength()>= STR_VARIABLE_DESCRIPTION_LENGTH)	//;
 		{
 			MessageBox(_T("Length can not higher than 20"),_T("Warning"));
 #pragma region note_what_do	
-			//如下所做的事 达到 ,在弹窗后 继续选中客户输入的部分 ，毛总的要求;
+			//  ,  ;
 			CRect list_rect,win_rect;
 			m_variable_list.GetWindowRect(list_rect);
 			ScreenToClient(&list_rect);
@@ -593,7 +593,7 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Variable_data_instance.at(Changed_Item), PROP_OUT_OF_SERVICE, temp_value);
 		}
 	}
-	if(Changed_SubItem == VARIABLE_VALUE)//这里只用处理 ANALOG 的值就看要了， DIGITAL 的值在Click 事件中处理过了;
+	if(Changed_SubItem == VARIABLE_VALUE)// ANALOG  DIGITAL Click ;
 	{
 		CString temp_cs = m_variable_list.GetItemText(Changed_Item,Changed_SubItem);
 
@@ -688,7 +688,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 	lCol = lvinfo.iSubItem;
 
 
-	if(lRow>m_variable_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_variable_list.GetItemCount()) //
 		return;
 	if(lRow<0)
 		return;
@@ -907,7 +907,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
         CString temp_info;
 		BacnetRange dlg;
 
-		//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+		// custom unitsfirmware  ;
 		if(!read_customer_unit)
 		{
 
@@ -1016,10 +1016,10 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			dlg.DoModal();
 			if(range_cancel)
 			{
-				PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,lRow,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+				PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,lRow,REFRESH_ON_ITEM);// ;
 				return ;
 			}
-			if(bac_range_number_choose == 0)	//如果选择的是 unused 就认为是analog 的unused;这样 能显示对应的value;
+			if(bac_range_number_choose == 0)	// unused analog unused; value;
 			{
 				m_Variable_data.at(lRow).digital_analog =  BAC_UNITS_ANALOG;
 				bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
@@ -1038,7 +1038,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 
-				if(m_Variable_data.at(lRow).range == 20)	//如果是时间;
+				if(m_Variable_data.at(lRow).range == 20)	//;
 				{
 					char temp_char[50];
 					//if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 620)
@@ -1201,7 +1201,7 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 			{
 				PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 			}
-			else if((bacnet_view_number == TYPE_VARIABLE) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_VARIABLE))  )	//GSM连接时不要刷新;
+			else if((bacnet_view_number == TYPE_VARIABLE) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_VARIABLE))  )	//GSM;
 			{
 			::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 			if(bac_select_device_online)
@@ -1217,7 +1217,7 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 		break;
 	case 3:
 		{
-			//在更改某一列之后要在读取此列的值，并刷新此列;
+			//;
 
 			if(this->IsWindowVisible())
 				PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
@@ -1307,21 +1307,21 @@ BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 60 ,temp_mynew_rect.top + 60,500,700,SWP_SHOWWINDOW);
 		}
 
 
 		return 1; 
 	}
-	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //F2;
 	{
 		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_VARIABLE);
 		return TRUE;
@@ -1429,7 +1429,7 @@ int GetVariableValueEx(Str_variable_point temp_var, CString& ret_cstring, CStrin
 		Auto_M.Empty();
 	}
 
-    if ((temp_var.range >= 101) && (temp_var.range <= 104))  //判断是MSV range
+    if ((temp_var.range >= 101) && (temp_var.range <= 104))  //MSV range
     {
         for (int z = 0; z < 3; z++)
         {
@@ -1488,9 +1488,9 @@ int GetVariableValueEx(Str_variable_point temp_var, CString& ret_cstring, CStrin
 	}
 	else
 	{
-		if(temp_var.range == 20)	//如果是时间;
+		if(temp_var.range == 20)	//;
 		{
-            ret_unit.Empty(); //不显示 time 
+            ret_unit.Empty(); // time 
 			//ret_unit = Variable_Analog_Units_Array[temp_var.range];
 			char temp_char[50];
 			int time_seconds = temp_var.value / 1000;
@@ -1565,7 +1565,7 @@ void CBacnetVariable::Reset_Variable_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -1573,7 +1573,7 @@ void CBacnetVariable::Reset_Variable_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -1614,14 +1614,14 @@ void CBacnetVariable::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 60 ,temp_mynew_rect.top + 60,500,700,SWP_SHOWWINDOW);
 		}
 		return;

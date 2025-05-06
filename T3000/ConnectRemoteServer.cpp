@@ -103,8 +103,8 @@ end_connect_paint:
 	return;
 }
 
-HANDLE tcp_client_thread = NULL; // 连接server 的 TCP状态 线程;
-HANDLE udp_ptp_client_thread = NULL; // UDP 打洞 线程;
+HANDLE tcp_client_thread = NULL; // server  TCP ;
+HANDLE udp_ptp_client_thread = NULL; // UDP  ;
 BOOL CConnectRemoteServer::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -188,40 +188,40 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 
 	if (ret_rec <= 0)
 	{
-		Sleep(1000); //接收出错 延时等待;
+		Sleep(1000); // ;
 		ConnectMessage[static_step].Format(_T("Recvfrom server error!"));
 		static_step ++;
 		pParent->Invalidate(1);
 		goto end_udp_hole_thread;
 		//continue;
 	}
-	//接收到服务器发来的 minipanel 的 信息; 209 个字节
+	// minipanel  ; 209 
 	if (((unsigned char)receive_buffer[0] == 0x55) && ((unsigned char)receive_buffer[1] == 0xff))
 	{
 		if ((unsigned char)receive_buffer[2] == COMMAND_COMMAND_UNKNOWN)
 		{
-			//收到的命令格式不正确;
+			//;
 			ConnectMessage[static_step].Format(_T("Command type error!"));
 			static_step ++;
 			goto end_udp_hole_thread;
 		}
 		else if ((unsigned char)receive_buffer[2] == COMMAND_PASSWORD_ERROR)
 		{
-			//账号密码错误;
+			//;
 			ConnectMessage[static_step].Format(_T("Username and password error!"));
 			static_step ++;
 			goto end_udp_hole_thread;
 		}
 		else if ((unsigned char)receive_buffer[2] == COMMAND_DEVICE_NOT_CONNECT_ERROR)
 		{
-			//账号密码错误;
+			//;
 			ConnectMessage[static_step].Format(_T("Device not connect to the server yet!"));
 			static_step ++;
 			goto end_udp_hole_thread;
 		}
 		else if ((unsigned char)receive_buffer[2] == COMMAND_DEVICE_NO_HEARTBEAT_ERROR)
 		{
-			//账号密码错误;
+			//;
 			ConnectMessage[static_step].Format(_T("No heartbeat package from device!"));
 			static_step ++;
 			goto end_udp_hole_thread;
@@ -230,7 +230,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 
 	if (ret_rec != T3000_MINI_HEARTBEAT_LENGTH_WITH_MINI_PORT)
 	{
-		//不是收到的minipanel 的端口信息 + minipanel 的 所有信息 ;
+		//minipanel  + minipanel   ;
 		ConnectMessage[static_step].Format(_T("Error comand receive!"));
 		static_step ++;
 		goto end_udp_hole_thread;
@@ -261,14 +261,14 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 	send_buffer[1] = 0xff;
 	send_buffer[2] = COMMAND_T3000_SEND_TO_DEVICE_MAKEHOLE;
 
-	//int nNetTimeout = 5000; //1秒
+	//int nNetTimeout = 5000; //1
 	//setsockopt( sockClient, SOL_SOCKET, SO_RCVTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
 
 	memset(receive_buffer, 0, 1000);
 	ret_rec = recvfrom(sockClient, receive_buffer, 1000, 0, (sockaddr *)&addrServer, &temp_len);
 	if (ret_rec <= 0)
 	{
-		Sleep(1000); //接收出错 延时等待;
+		Sleep(1000); // ;
 		ConnectMessage[static_step].Format(_T("Recvfrom server error , No suuccess COMMAND_MINI_SEDN_T3000_DONE 10  receive!"));
 		static_step ++;
 		pParent->Invalidate(1);
@@ -277,7 +277,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 
 	if (((unsigned char)receive_buffer[0] != 0x55) || ((unsigned char)receive_buffer[1] != 0xff) || ((unsigned char)receive_buffer[2] != COMMAND_T3000_KEYI_FA_MESSAGE))
 	{
-		Sleep(1000); //接收出错 延时等待;
+		Sleep(1000); // ;
 		ConnectMessage[static_step].Format(_T("Not 0x10  received!"));
 		static_step ++;
 		pParent->Invalidate(1);
@@ -294,7 +294,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 	sendto(sockClient, send_buffer, 3, 0, (sockaddr*)&addr_device_address, sizeof(sockaddr));
 
 
-	int nNetTimeout = 5000; //1秒
+	int nNetTimeout = 5000; //1
 	setsockopt(sockClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof( int));
 
 	memset(receive_buffer, 0, 1000);
@@ -304,7 +304,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 		ConnectMessage[static_step].Format(_T("No device reply . Make UDP Hole failed!"));
 		static_step ++;
 		pParent->Invalidate(1);
-		////取消接收时限
+		////
 		nNetTimeout = 0;
 		setsockopt(sockClient, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof( int));
 		ret_rec = recvfrom(sockClient, receive_buffer, 1000, 0, (sockaddr *)&addr_device_address, &temp_len);
@@ -370,7 +370,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 	}
 
 
-	////取消接收时限
+	////
 	//nNetTimeout = 0;
 	//setsockopt( sockClient, SOL_SOCKET, SO_RCVTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
 	//ret_rec = recvfrom(sockClient,receive_buffer,1000,0,(sockaddr *)&addr_device_address,&temp_len);
@@ -466,25 +466,25 @@ DWORD WINAPI TcpClient_Connect_Thread(LPVOID lpVoid)
 	servAddr.sin_port = htons(TEMCO_SERVER_PORT);
 	USES_CONVERSION;
 	servAddr.sin_addr.S_un.S_addr = (inet_addr(dyndns_ipaddress));
-	//发送时限
+	//
 	setsockopt(tcp_client_socket,SOL_SOCKET,SO_SNDTIMEO, (char *)&nNetTimeout, sizeof(int));
-	//接收时限
+	//
 	setsockopt(tcp_client_socket,SOL_SOCKET,SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int));
 
 	//****************************************************************************
-	// Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 。
-	//改为非阻塞的 2.5秒后还没连接上就 算连接失败;
+	// Fance added ,  10 
+	// 2.5 ;
 	int error = -1;
 	int len;
 	len = sizeof(int);
 	timeval tm;
 	fd_set set;
 	unsigned long ul = 1;
-	ioctlsocket(tcp_client_socket, FIONBIO, &ul); //设置为非阻塞模式
+	ioctlsocket(tcp_client_socket, FIONBIO, &ul); //
 	bool ret = false;
 	if (connect(tcp_client_socket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
 	{
-		tm.tv_sec = 3;//4.5s 如果连接不上就 算失败 ，不要重新retry了;
+		tm.tv_sec = 3;//4.5s   retry;
 		tm.tv_usec = 500;
 		FD_ZERO(&set);
 		FD_SET(sockfd, &set);
@@ -505,7 +505,7 @@ DWORD WINAPI TcpClient_Connect_Thread(LPVOID lpVoid)
 	}
 	else ret = true;
 	ul = 0;
-	ioctlsocket(sockfd, FIONBIO, &ul); //设置为阻塞模式
+	ioctlsocket(sockfd, FIONBIO, &ul); //
 	//****************************************************************************
 
 	if (ret)

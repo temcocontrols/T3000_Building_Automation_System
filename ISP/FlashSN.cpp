@@ -118,7 +118,7 @@ unsigned long CFlashSN::Get_SerialNumber_From_Server(CString nipaddress,
 
 	send_buffer[index] = (char)(nfirwareversion & 0x00ff); index ++;
 	send_buffer[index] = (char)(nfirwareversion >> 8); index ++;
-	index = index + 4; //序列号等服务器传过来;
+	index = index + 4; //;
 
 	send_buffer[index] = (char)(nhardwareversion & 0x00ff); index ++;
 	send_buffer[index] = (char)(nhardwareversion >> 8); index ++;
@@ -286,24 +286,24 @@ bool CFlashSN::Connect_To_Server(CString strIPAdress,short nPort)
 		servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
 	//	u_long ul=1;
 	//	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-	//发送时限
+	//
 	setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
-	//接收时限
+	//
 	setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
 	//****************************************************************************
-	// Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒
-	//改为非阻塞的 2.5秒后还没连接上就 算连接失败;
+	// Fance added ,  10
+	// 2.5 ;
 	int error = -1;int len;
 	len = sizeof(int);
 	timeval tm;
 	fd_set set;
 	unsigned long ul = 1;
-	ioctlsocket(m_hSocket, FIONBIO, &ul); //设置为非阻塞模式
+	ioctlsocket(m_hSocket, FIONBIO, &ul); //
 	bool ret = false;
 	if( connect(m_hSocket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
 	{
-		tm.tv_sec = 3;//4.5s 如果连接不上就 算失败 ，不要重新retry了;
+		tm.tv_sec = 3;//4.5s   retry;
 		tm.tv_usec = 500;
 		FD_ZERO(&set);
 		FD_SET(sockfd, &set);
@@ -324,7 +324,7 @@ bool CFlashSN::Connect_To_Server(CString strIPAdress,short nPort)
 	}
 	else ret = true;
 	ul = 0;
-	ioctlsocket(sockfd, FIONBIO, &ul); //设置为阻塞模式
+	ioctlsocket(sockfd, FIONBIO, &ul); //
 	//****************************************************************************
 
 	if(ret)

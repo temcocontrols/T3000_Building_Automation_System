@@ -28,8 +28,8 @@ typedef struct _Product_IP_ID
 	unsigned char ID;
 }Product_IP_ID;
 
-////#include <vector>			//矢量模板
-////using  std::vector;			//命名空间
+////#include <vector>			//
+////using  std::vector;			//
 ////
 ////
 ////extern vector <Product_IP_ID> Product_Info;
@@ -76,7 +76,7 @@ void MySocket::OnReceive(int nErrorCode)
 	Receive_data_length=Receive(receive_buf,4096);
 	if(ISP_STEP == ISP_SEND_FLASH_COMMAND)
 	{
-		if(Receive_data_length == 40)//接收EE 10 的 40 byte 回复
+		if(Receive_data_length == 40)//EE 10  40 byte 
 		{
 			char temp_data[100];
 			memset(temp_data,0,sizeof(temp_data));

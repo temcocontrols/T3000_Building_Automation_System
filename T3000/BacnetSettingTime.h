@@ -1,23 +1,23 @@
 #pragma once
 //#include "BacnetSetting.h"
 
-// CBacnetSettingTime 对话框
+// CBacnetSettingTime 
 
 class CBacnetSettingTime : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnetSettingTime)
 
 public:
-	CBacnetSettingTime(CWnd* pParent = NULL);   // 标准构造函数
+	CBacnetSettingTime(CWnd* pParent = NULL);   // 
 	virtual ~CBacnetSettingTime();
 
-// 对话框数据
+// 
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_SETTING_TIME };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 
 	DECLARE_MESSAGE_MAP()
 

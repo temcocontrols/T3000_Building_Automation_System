@@ -84,7 +84,7 @@ void CCDialogISPTOOL::OnBnClickedButtonFlash()
 			}
 
 		}
-		catch (...)//这个无效，当pDialogInfo->Create(IDC_STATIC_INFO,this);中的ID写错时，这个函数没有throw抛出错误，所以捕获不到
+		catch (...)//pDialogInfo->Create(IDC_STATIC_INFO,this);IDthrow
 		{
 
 		}

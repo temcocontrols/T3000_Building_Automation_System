@@ -144,7 +144,7 @@ struct variable_table {
 //		 char var[12];
 //		 float fvar;
 //		 char op[10];
-//};//Fance 把字节改大
+//};//Fance 
 
 struct buf_str {
 	int v;

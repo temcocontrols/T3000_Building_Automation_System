@@ -86,7 +86,7 @@ int tstat29_register_var[TSTAT29_VAR_NUM]={	118,121,185,128,111,	112,114,115,119
 											329,330,331,332,333,     334,335,};
 */
 
-_TCHAR * NET_WORK_CONTROLLER[] = {                  //attention:该数组中的值，不要有完全包含的出现
+_TCHAR * NET_WORK_CONTROLLER[] = {                  //attention:
 						_T("ip Mode:"),		//0
 						_T("Ip Address:"),		//1
 						_T("Subnet Address:"),	//2	
@@ -100,7 +100,7 @@ _TCHAR * NET_WORK_CONTROLLER[] = {                  //attention:该数组中的值，不
 						_T("Inter Character Timeout:"),		//10
 						_T("Factory Default:")		//11
 						};
-_TCHAR * LC_VARIABLE_LIST[] = {                  //attention:该数组中的值，不要有完全包含的出现
+_TCHAR * LC_VARIABLE_LIST[] = {                  //attention:
 	_T("Input Filter Time:"),		//0
 	_T("Relay Pulse Duration:"),		//1
 	_T("Delay Between Relay Pulses:")	//2	
@@ -160,7 +160,7 @@ _TCHAR * STATE_DELAY_TIMES_CONST[] = {
 	_T("COOL_DELAY_TIMES  : "),
 	_T("HEAT_DELAY_TIMES  : "),
 };
-_TCHAR * TSTATVAR_CONST_24[] = {                  //attention:该数组中的值，不要有完全包含的出现
+_TCHAR * TSTATVAR_CONST_24[] = {                  //attention:
 						_T("SEQUENCE"),		
 						_T("DEGC_OR_F"),                   
 						_T("KEYPAD_SELECT"),               
@@ -198,7 +198,7 @@ _TCHAR * TSTATVAR_CONST_24[] = {                  //attention:该数组中的值，不要
 						_T("NIGHT_COOLING_SETPOINT")
 						};
 
-_TCHAR * TSTATVAR_CONST_25[] = {                  //attention:该数组中的值，不要有完全包含的出现
+_TCHAR * TSTATVAR_CONST_25[] = {                  //attention:
 	_T("SEQUENCE"),		
 	_T("DEGC_OR_F"),                   
 	_T("baudrate"),                    
@@ -298,7 +298,7 @@ _TCHAR * TSTATVAR_CONST_25[] = {                  //attention:该数组中的值，不要
 	_T("VAV_PID3_OFF_OUTPUT_HEAT2"),
 	_T("VAV_PID3_OFF_OUTPUT_HEAT3"),
 };	
-_TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要有完全包含的出现
+_TCHAR * TSTATVAR_CONST_26[] = {                  //attention:
 	_T("SEQUENCE"),		
 	_T("DEGC_OR_F"),                   
 	_T("baudrate"),                    
@@ -478,7 +478,7 @@ _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要
 	_T("VAV_PID3_OFF_OUTPUT_HEAT3"),
 
 };
-_TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要有完全包含的出现
+_TCHAR * TSTATVAR_CONST_67[] = {                  //attention:
 	_T("COOL HEAT MODE"),																																																																																						
 	//_T("MODE OPERATION"),																																																																																						
 	_T("SEQUENCE"),																																																																																						
@@ -876,7 +876,7 @@ _TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要
     _T("     MODBUS_PID_D_TERM  "),
     _T("     MODBUS_PID_SAMPLE_TIME  ")
 };
-_TCHAR * CO2NODEVAR_CONST_25[] = {                  //attention:该数组中的值，不要有完全包含的出现
+_TCHAR * CO2NODEVAR_CONST_25[] = {                  //attention:
     _T("CO2 Calibration Offset"),		
     _T("Delta Value"),                   
     _T("Filter Times"),                    
@@ -3010,7 +3010,7 @@ bool Check_Config_File(wifstream & inf){
 		inf.getline(buf,1024);
 		if (find_sub_chars(buf,_T("Config File")))
 		{
-			inf.getline(buf,1024);//T3000 版本号
+			inf.getline(buf,1024);//T3000 
             if (find_sub_chars(buf,GetProductName(product_register_value[7])))
             {
                 ret=true; 
@@ -3200,7 +3200,7 @@ void turn_order_for_fan(int source[],int order[],int m_heat_stages,int m_cool_st
 			order[i - m_heat_stages]=source[i];						
 }
 bool find_sub_chars(CString m_array_char,CString sub_array_char)
-{//find sub chars is exist?no up or lower?查找子串是否存在，不分大小写
+{//find sub chars is exist?no up or lower?
 	CString mother,son;
 	mother=m_array_char;
 	son=sub_array_char;
@@ -3730,7 +3730,7 @@ void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_lo
 		CString sql;
 		sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),inputno,m_sn);
 		q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
-		if (!q.eof())//有表但是没有对应序列号的值
+		if (!q.eof())//
 		{
 
 			sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),rangeno,inputno,m_sn);
@@ -3831,7 +3831,7 @@ Reg_Infor Reg_Infor_Temp;
 	int register_id=_wtoi(buf);
     if (register_id == 101)
     {
-        return;  //2018 08 22  TSTAT 现在的版本 COOL HEAT MODE ,这个寄存器 不让写.
+        return;  //2018 08 22  TSTAT  COOL HEAT MODE , .
     }
 	int register_value=_wtoi(temp);
 	int j = 1;
@@ -3862,7 +3862,7 @@ Reg_Infor Reg_Infor_Temp;
         else
             product_register_value[register_id] = register_value;
     }
-#if 0   //20180911 杜帆屏蔽 T5需要，但现在不维护;
+#if 0   //20180911  T5;
 	if(register_id==185)
 	{
 		Sleep(14000);	
@@ -3872,7 +3872,7 @@ Reg_Infor Reg_Infor_Temp;
 #endif 
 	if(j==-2 && tstat_version<25 && tstat_version >0)  ////////////////////////if the version is 24.4 ,write_one some register will restart,for example 118,121
 	{
-		//Sleep(14000);	//20180911 杜帆屏蔽 T5需要，但现在不维护;
+		//Sleep(14000);	//20180911  T5;
         if (!support_mul_write)
 		   j=write_one(now_tstat_id,register_id,register_value);	
         else
@@ -4430,7 +4430,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 		multy_ret = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100,10);
 		//register_critical_section.Unlock();
 		Sleep(100);
-		if(multy_ret<0)		//Fance : 如果出现读失败 就跳出循环体,因为如果是由断开连接 造成的 读失败 会使其他需要用到读的地方一直无法获得资源;
+		if(multy_ret<0)		//Fance :  ,   ;
 			break;
         g_progress_persent = (i * 100) / 11;
 	}
@@ -4561,7 +4561,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 	//if(version>=25)
 		delay_time_write_Tstat67(out);//delay time write
 	//if(version>=26)
-	//{   //Lookup table 取消了这个功能
+	//{   //Lookup table 
 		//_Twrite_to_file_a_line(out,_T(" "));//space
 		//lookup_table_write(out);//lookup table 26 only
 		_Twrite_to_file_a_line(out,_T(" "));//space
@@ -5073,7 +5073,7 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file)
 {
     support_mul_write = false;
-    if ((product_register_value[4] > 90) && product_register_value[7] == PM_TSTAT8) //94 版本以后支持随意多写命令;
+    if ((product_register_value[4] > 90) && product_register_value[7] == PM_TSTAT8) //94 ;
     {
         support_mul_write = true;
     }
@@ -5504,10 +5504,10 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
             g_progress_persent = (i * 100) / 10;
             Sleep(2000);
         }
-        //单独在处理一下499-502这个跨界的 output6的名字问题;
+        //499-502 output6;
         Write_Multi_org_short(g_tstat_id, &product_register_value[499], 499, 4, 5);
         Sleep(1000);
-        //单独在处理一下499-502这个跨界的 output6的名字问题;
+        //499-502 output6;
         Write_Multi_org_short(g_tstat_id, &product_register_value[897], 897, 12, 5);
         Sleep(1000);
         g_progress_persent = 100;
@@ -5717,9 +5717,9 @@ void weekly_routines_insert_write_LC(CStdioFile &default_file,int schedule_id,in
 	//	for(i=0;i<MAX_WR;i++)
 	//	{
 	Read_Multi(schedule_id,on,6216 + WR_TIME_SIZE*weekly_row_number,0x48);
-	//由上到下，由左到右，from up to lower ,from left to right
+	//from up to lower ,from left to right
 	Read_Multi(schedule_id,off,7656 + WR_TIME_SIZE*weekly_row_number,0x48);
-	//由上到下，由左到右，from up to lower ,from left to right
+	//from up to lower ,from left to right
 	for(int i=0;i<0x48;i++)
 	{
 		if(on[i]==255)
@@ -5810,7 +5810,7 @@ void OutCardName_Insert_Description_LC(CStdioFile &default_file,int schedule_id,
 		default_file.WriteString(a_line.GetString());
  
 }
-//多写到Buffer
+//Buffer
 void Switch_Config_LC(CStdioFile &default_file,int schedule_id){
 	CString a_line,temp,temp1;	
 	int i=0;
@@ -5894,7 +5894,7 @@ void Switch_Config_LC(CStdioFile &default_file,int schedule_id){
 	}
 
 }
-//多写到buffer
+//buffer
 void Enable_Disable_Manual_Control_LC(CStdioFile &default_file,int schedule_id){
 	CString a_line,temp;	
 	int i=0;
@@ -5950,7 +5950,7 @@ void Enable_Disable_Manual_Control_LC(CStdioFile &default_file,int schedule_id){
 
 	}
 }
-//多写到buffer
+//buffer
 void Group_Config_LC(CStdioFile &default_file,int schedule_id){
 	CString a_line,temp;	
 	int i=0;
@@ -5967,7 +5967,7 @@ void Group_Config_LC(CStdioFile &default_file,int schedule_id){
 	for (i=0;i<GROUP_NUM;i++)
 	{   
 	a_line=_T("");
-	temp.Format(_T("Group%02d:"),i+1);/////???为什么要两个\t才能对齐呢？？
+	temp.Format(_T("Group%02d:"),i+1);/////???\t
 	temp+=_T("\t");
 	a_line+=temp;
 
@@ -5997,7 +5997,7 @@ void Group_Config_LC(CStdioFile &default_file,int schedule_id){
 	}
 
 }
-//多写到buffer
+//buffer
 void Input_Output_Mapping_LC(CStdioFile &default_file,int schedule_id){
 	CString a_line,temp;	
 	int i=0;
@@ -6033,7 +6033,7 @@ void Input_Output_Mapping_LC(CStdioFile &default_file,int schedule_id){
 	}
 
 }
-//多写到buffer
+//buffer
 void Group_Output_Mapping_LC(CStdioFile &default_file,int schedule_id){
 	CString a_line,temp;	
 	int i=0;
@@ -6276,9 +6276,9 @@ void weekly_routines_insert_write(CStdioFile &default_file,int schedule_id,int w
 	//	for(i=0;i<MAX_WR;i++)
 	//	{
 	Read_Multi(schedule_id,on,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*weekly_row_number,0x48);
-	//由上到下，由左到右，from up to lower ,from left to right
+	//from up to lower ,from left to right
 	Read_Multi(schedule_id,off,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*weekly_row_number,0x48);
-	//由上到下，由左到右，from up to lower ,from left to right
+	//from up to lower ,from left to right
 	for(int i=0;i<0x48;i++)
 	{
 		if(on[i]==255)
@@ -7298,7 +7298,7 @@ void Input_Output_Mapping_read_LC(CStdioFile &default_file,int schedule_id, CStd
 			int address=0;   
 			unsigned short high,low=0;
 			CString outputvalue=get_left_first_array(a_line);
-			             get_left_first_array(a_line);//ID不要了
+			             get_left_first_array(a_line);//ID
 			 output_value=_wtoi(outputvalue);
 			 high=output_value/256;
 			 low=output_value%256;
@@ -7344,7 +7344,7 @@ void Group_Output_Mappings_read_LC(CStdioFile &default_file,int schedule_id, CSt
 				int address=0;   
 				unsigned short high,low=0;
 				CString outputvalue=get_left_first_array(a_line);
-				get_left_first_array(a_line);//ID不要了
+				get_left_first_array(a_line);//ID
 				output_value=_wtoi(outputvalue);
 				high=output_value/256;
 				low=output_value%256;
@@ -7663,7 +7663,7 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
 	CString str1;
 	int m_outRows,m_inRows;
 	
-	//判断Input output 行数
+	//Input output 
 	#if 1
 	int nModel=product_register_value[MODBUS_PRODUCT_MODEL];
 	switch (nModel)
@@ -7685,7 +7685,7 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
 		}
 		break;	
 	case PM_TSTAT7:
-	case PM_TSTAT5D:  // 5D 同 TStat7
+	case PM_TSTAT5D:  // 5D  TStat7
 		{
 			m_outRows=8;
 			m_inRows=5;
@@ -7864,13 +7864,13 @@ CppSQLite3DB SqliteDBBuilding;
 CppSQLite3Table table;
 CppSQLite3Query q;
 SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
- if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
+ if (SqliteDBBuilding.tableExists("Value_Range"))//Version
  {
 	 CString sql;
 	 sql.Format(_T("Select * from Value_Range where SN=%d"),m_sn);
 	 q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-	 if (!q.eof())//有表但是没有对应序列号的值
+	 if (!q.eof())//
 	 {    
 		 
 		 while (!q.eof())
@@ -7929,7 +7929,7 @@ SqliteDBBuilding.closedb();
  //    885 - 896
  //    897 - 908
  //    CHARLY 15:13 : 06
- //    909 - 971单写
+ //    909 - 971
  void save_write_TStatSchedual(wofstream & out)
  {
      CString cs_write_string;
@@ -7953,7 +7953,7 @@ SqliteDBBuilding.closedb();
      int inputno = 0;
      int LabelNumber = 0;
      CString strText;
-     int confirm_flag = 0; // 用于判断  Schedual Config 是否存在的 标志位;
+     int confirm_flag = 0; //   Schedual Config  ;
      while (!inf.eof())
      {
          inf.getline(buf, 1024);
@@ -8000,7 +8000,7 @@ SqliteDBBuilding.closedb();
          //    885 - 896
          //    897 - 908
          //    CHARLY 15:13 : 06
-         //    909 - 971单写
+         //    909 - 971
          if (!support_mul_write)
          {
              int n_ret[9] = { 0 };

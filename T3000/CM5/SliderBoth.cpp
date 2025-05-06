@@ -18,7 +18,7 @@ SliderBoth::SliderBoth()
 {
 	b_Initialized=0;
 
-//	pos.Init(0,200,10); //原代码执行此句
+//	pos.Init(0,200,10); //
 //	pos.Init(0,24,1);
 }
 
@@ -44,7 +44,7 @@ BOOL SliderBoth::Create(CWnd*pMum,CRect rcBd,BOOL bHorz,int iID)
 	i_ID	=iID;
 	b_Horz	=bHorz;
 	
-//	i_SliderY=5+6+8;	//top+tic+gap;//原代码执行此句
+//	i_SliderY=5+6+8;	//top+tic+gap;//
 
 	i_SliderY = 5+6+8;
 	int iH=i_SliderY+3+5;	//sliderH+bottom; 
@@ -60,7 +60,7 @@ BOOL SliderBoth::Create(CWnd*pMum,CRect rcBd,BOOL bHorz,int iID)
 	BOOL b=CWnd::Create(0,0,u,rc,pMum,iID);
 	if(b==0)	return 0;
 
-	tic0.Create(this,bHorz,1);//第三个参数1，是BOOL类型以区别左右两边滑块形状
+	tic0.Create(this,bHorz,1);//1BOOL
 	tic1.Create(this,bHorz,0);
 // 	tic2.Create(this,bHorz,TRUE);//LSC
 // 	tic3.Create(this,bHorz,TRUE);//LSC
@@ -159,7 +159,7 @@ void SliderBoth::P_SetPosition_Horz(int iL,int iR,BOOL bFst,BOOL bSnd)
 		rc.right=rc.left+iW;
 		tic1.MoveWindow(&rc);
 	}
-	//LSC 以下新增加的
+	//LSC 
 
 // 	if(bFst)
 // 	{
@@ -236,7 +236,7 @@ void SliderBoth::OnPaint()
 {
 	if(b_Initialized==0)
 	{
-		PostMessage(WM_USER+100); //确定滑块初始位置状态
+		PostMessage(WM_USER+100); //
 	}
 
 	CPaintDC dc(this);
@@ -244,14 +244,14 @@ void SliderBoth::OnPaint()
 	CRect rc;
 	GetClientRect(&rc);
 
-	rc.bottom = rc.bottom-5;//LSC 增加 Slider控件底部减小
-//	COLORREF clrBk=::GetSysColor(COLOR_BTNFACE);//LSC 原执行此句
+	rc.bottom = rc.bottom-5;//LSC  Slider
+//	COLORREF clrBk=::GetSysColor(COLOR_BTNFACE);//LSC 
 	int iV=209;
-//	COLORREF clrBk=RGB(iV,iV,iV);//LSC 原屏蔽此句
-	COLORREF clrBk=RGB(17,74,126); //LSC  修改整个slider控件的背景色
-	dc.FillRect(&rc,&CBrush(clrBk));//LSC原代码执行此句
+//	COLORREF clrBk=RGB(iV,iV,iV);//LSC 
+	COLORREF clrBk=RGB(17,74,126); //LSC  slider
+	dc.FillRect(&rc,&CBrush(clrBk));//LSC
 
-	P_PaintHorz(&dc,rc); //LSC 绘制刻度线
+	P_PaintHorz(&dc,rc); //LSC 
 	SetBlockColor();
 }
 
@@ -268,13 +268,13 @@ void SliderBoth::P_PaintHorz(CDC*pDC,const CRect &rcMe)
 
 	if(b_Horz)
 	{
-// 		const int iL=MARGIN_ME;//LSC 原代码执行此句 画刻度的
+// 		const int iL=MARGIN_ME;//LSC  
 // 		const int iR=rcMe.right-MARGIN_ME;
 // 		const double dbStep=(iR-iL)*1.0/iNumTic;
 
 
-		const int iL=1;//LSC 修改 原代码执行此句 画刻度的 表示刻度线在左边向右移动多少，即起止点离滑块左边多远。
-		const int iR=rcMe.right; //LSC 修改 表示刻度在滑块的右边向左移动多少。
+		const int iL=1;//LSC    
+		const int iR=rcMe.right; //LSC  
 		const double dbStep=(iR-iL)*1.0/iNumTic;
  		double db=iL;
 		int iX;
@@ -289,10 +289,10 @@ void SliderBoth::P_PaintHorz(CDC*pDC,const CRect &rcMe)
 		}
 
 		int iLineT=iTicB+8;
-//		CRect rc(iL-5,iLineT,iR+5,iLineT+3);//LSC 原句执行此句 画滑块底下的白色线条
-		CRect rc(iL-15,iLineT,iR+15,iLineT+3);//LSC 增加
+//		CRect rc(iL-5,iLineT,iR+5,iLineT+3);//LSC  
+		CRect rc(iL-15,iLineT,iR+15,iLineT+3);//LSC 
 
-		pDC->Draw3dRect(&rc,clr000,clr255);//LSC 屏蔽，原代码执行此句
+		pDC->Draw3dRect(&rc,clr000,clr255);//LSC 
 	}
 	else
 	{
@@ -313,7 +313,7 @@ void SliderBoth::P_PaintHorz(CDC*pDC,const CRect &rcMe)
 
 		int iLineT=iTicB+8;
 		CRect rc(iLineT,iR-5,iLineT+3,iL+5);
-//		pDC->Draw3dRect(&rc,clr000,clr255);//LSC 屏蔽，原代码执行此句
+//		pDC->Draw3dRect(&rc,clr000,clr255);//LSC 
 	}
 
 }
@@ -343,9 +343,9 @@ LRESULT SliderBoth::WindowProc(UINT m,WPARAM w,LPARAM l)
 // 				CClientDC dc(this);
 // 				
 // 				int iV=209;
-// 				//	COLORREF clrBk=RGB(iV,iV,iV);//LSC 原屏蔽此句
-// 				COLORREF clrBk=RGB(0,0,255); //LSC  修改整个slider控件的背景色
-// 				dc.FillRect(&rcMe,&CBrush(clrBk));//LSC原代码执行此句
+// 				//	COLORREF clrBk=RGB(iV,iV,iV);//LSC 
+// 				COLORREF clrBk=RGB(0,0,255); //LSC  slider
+// 				dc.FillRect(&rcMe,&CBrush(clrBk));//LSC
 			}
 			else
 			if(m==WM_USER+1)
@@ -394,7 +394,7 @@ LRESULT SliderBoth::WindowProc(UINT m,WPARAM w,LPARAM l)
 			{
 				b_Initialized=1;
 				//P_SetPosition(pos.iMin,pos.iMax,1,1);
-				P_SetPosition(m_min,m_max,1,1);//注意，后两个参数是1,2,3...的1,不是l,j,k的l
+				P_SetPosition(m_min,m_max,1,1);//1,2,3...1,l,j,kl
 				RedrawWindow();
 			}
 		}
@@ -495,8 +495,8 @@ void SliderBoth::SetBlockColor()
 	CBrush * pOldBrush= dc.SelectObject (&brush);//LSC
 
 
-	double lval = pos.iL*dbStep;//左边滑块
-	double rval = pos.iR*dbStep;//右边滑块
+	double lval = pos.iL*dbStep;//
+	double rval = pos.iR*dbStep;//
 
 	int iM=iNumTic/2;
 	int RectaParam1,RectaParam2 = rc.top+1,RectaParam3,RectaParam4 = rc.bottom-MARGIN_SLIDE*2;

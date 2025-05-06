@@ -19,24 +19,24 @@ public:
 
 	void SetFSBThumbShape(FSB_THUMBSHAPE fsbTbShape);
 
-	// 设置控件的位置
+	// 
 	void SetFlexSlideBarRect(CRect& rc);	
 //	CRect& GetFlexSlideBarRect();
 
-	// 设置channel的宽度，不得大于控件宽度，不小于1个象素
-	// channel 长度应该依据控件长度来计算获得
+	// channel1
+	// channel 
 	void SetChannelWidth(int nChannelWidth);
 	int GetChannelWidth();
 
-	// 设置Channel的颜色
+	// Channel
 	COLORREF GetChannelColor();					
 	void SetChannelColor(COLORREF clrChannel);
 
-	// 设置Thumb的长度，不小于channel的宽度，不大于控件的宽度，thumb的宽度为固定值
+	// Thumbchannelthumb
 	int GetThumbWidth();					
 	void SetThumbWidth(int nThumbLen);
 
-	// 设置Thumb的颜色
+	// Thumb
 	COLORREF GetThumbColor()const;					
 	void SetThumbColor(COLORREF clrThumb);
 
@@ -44,7 +44,7 @@ public:
 	void	SetRangeMax(int nMax);
 	void	SetRangeMin(int nMin);
 
-	// 控件是否水平放置
+	// 
 	void SetHorizontal(BOOL bHorizontal);
 	BOOL IsHorizontal();
 
@@ -67,7 +67,7 @@ public:
 	void GetRange(int& nMin, int& nMax)const;
 
 	// Sets the current position of the slider. 
-	// nMinPos 是最小的值，MidPos是中等值，Max是最大的值
+	// nMinPos MidPosMax
 	BOOL SetPos(int nMinPos, int nMidPos, int nMaxPos); 	
 	BOOL SetPos_tstat6_2pos(int nMinPos, int nMidPos, int nMaxPos); 
 	BOOL SetPos_tstat6_3pos(int nMinPos, int nMidPos, int nMaxPos); 

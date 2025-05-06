@@ -33,7 +33,7 @@ DWORD WINAPI  BacnetDescription::Read_BacnetPanelLable_Thread(LPVOID lpVoid)
     Sleep(1000);
     int ncount = address_count();
     Str_Setting_Info temp_setting_info;
-    temp_setting_info = Device_Basic_Setting; //入栈保存起来;
+    temp_setting_info = Device_Basic_Setting; //;
     for (int i = 0; i < ncount; i++)
     {
         unsigned int ndevice_id = 0;
@@ -53,8 +53,8 @@ DWORD WINAPI  BacnetDescription::Read_BacnetPanelLable_Thread(LPVOID lpVoid)
             continue;
         Str_Setting_Info temp_setting_buffer;
 
-        unsigned int t1 = GetTickCount();//程序段开始前取得系统运行时间(ms);
-        //判断是不是他妈口的产品 
+        unsigned int t1 = GetTickCount();//(ms);
+        // 
         Device_Basic_Setting.reg.object_instance = 0;
         if (GetPrivateData_Blocking(ndevice_id, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
         {
@@ -66,7 +66,7 @@ DWORD WINAPI  BacnetDescription::Read_BacnetPanelLable_Thread(LPVOID lpVoid)
             Sleep(10);
             continue;
         }
-        unsigned int t2 = GetTickCount();//程序段开始前取得系统运行时间(ms);
+        unsigned int t2 = GetTickCount();//(ms);
 
 
         CString temp_cs;
@@ -82,11 +82,11 @@ DWORD WINAPI  BacnetDescription::Read_BacnetPanelLable_Thread(LPVOID lpVoid)
         {
             TRACE(_T("%d not exsit,time %d\n"), ndevice_id, t2 - t1);
         }
-        //是他妈口的产品就加入vector里 ，方便查询;
+        //vector ;
         Sleep(1);
     }
-    temp_setting_info = Device_Basic_Setting; //出栈还原;
-    //确定这些object instance 对应的panel 号
+    temp_setting_info = Device_Basic_Setting; //;
+    //object instance panel 
     //for (int i = 0; i < pParent->m_bacnet_panel.size(); i++)
     //{
     //    if (pParent->m_bacnet_panel.at(i).npanelnum != 0)
@@ -103,7 +103,7 @@ DWORD WINAPI  BacnetDescription::Read_BacnetPanelLable_Thread(LPVOID lpVoid)
     sort(pParent->m_bacnet_panel.begin(), pParent->m_bacnet_panel.end(), sort_by_panelnumber);
     pParent->hwait_readdes_thread = NULL;
     //Sleep(15000);
-    //读取所有在线panel的label和description;
+    //panellabeldescription;
 
 
 	return 1;
@@ -139,14 +139,14 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
                 continue;
 
 
-            unsigned int t1 = GetTickCount();//程序段开始前取得系统运行时间(ms);
-            //判断是不是他妈口的产品 
+            unsigned int t1 = GetTickCount();//(ms);
+            // 
             Device_Basic_Setting.reg.object_instance = 0;
             if (GetPrivateData_Blocking(ndevice_id, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
             {
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data success!"));
             }
-            unsigned int t2 = GetTickCount();//程序段开始前取得系统运行时间(ms);
+            unsigned int t2 = GetTickCount();//(ms);
             Sleep(1);
             //Device_Basic_Setting.reg
 
@@ -163,11 +163,11 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
             {
                 TRACE(_T("%d not exsit,time %d\n"), ndevice_id, t2 - t1);
             }
-            //是他妈口的产品就加入vector里 ，方便查询;
+            //vector ;
             Sleep(1);
         }
 
-        //确定这些object instance 对应的panel 号
+        //object instance panel 
         for (int i = 0; i < m_remote_screen_data.size(); i++)
         {
             if (m_remote_screen_data.at(i).npanelnum != 0)
@@ -183,7 +183,7 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
         }
         sort(m_remote_screen_data.begin(), m_remote_screen_data.end(), sort_by_panelnumber);
         Sleep(15000);
-        //读取所有在线panel的label和description;
+        //panellabeldescription;
 
         if (ScreenEdit_Window == NULL)
         {

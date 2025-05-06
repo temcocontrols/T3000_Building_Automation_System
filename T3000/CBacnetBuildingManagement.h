@@ -3,14 +3,14 @@
 #include "CM5/ListCtrlEx.h"
 //#include "MainFrm.h"
 #include "CBacnetBMD.h"
-// CBacnetBuildingManagement 窗体视图
+// CBacnetBuildingManagement 
 
 class CBacnetBuildingManagement : public CDialogEx
 {
 	DECLARE_DYNCREATE(CBacnetBuildingManagement)
 
 public:
-	CBacnetBuildingManagement();           // 动态创建所使用的受保护的构造函数
+	CBacnetBuildingManagement();           // 
 	virtual ~CBacnetBuildingManagement();
 
 public:
@@ -25,7 +25,7 @@ public:
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -40,7 +40,7 @@ public:
 	void TreeInital();
 	//CMainFrame* pFrame;
 	void LoadDevice();
-	int nGroupCount ; // 有多少个Group 
+	int nGroupCount ; // oup 
 	CString groupname[255];
 	int n_group_kids_count[255];
 	void SaveAllIntoIniFile();

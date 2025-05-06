@@ -259,7 +259,7 @@ namespace T3000Controls
             set
             {
                 _ShowBorder = value;
-                // 画Frame
+                // rame
                  Invalidate();
             }
         }
@@ -300,23 +300,23 @@ namespace T3000Controls
               Font font = new Font(new FontFamily(TFontName),
                            float.Parse(TFontSize.ToString()),
                            FontStyle.Bold | FontStyle.Italic | FontStyle.Strikeout | FontStyle.Underline);
-            if (!_IsItalic)//没有斜体
-            {//删除字体中的斜体样式
+            if (!_IsItalic)//
+            {//
                 font = new Font(font, font.Style & ~FontStyle.Italic);
             }
-            if (!_IsBold)//没有粗体
-            {//删除字体中的粗体
+            if (!_IsBold)//
+            {//
                 font = new Font(font, font.Style & ~FontStyle.Bold);
             }
-            if (!_IsStrikeout)//没有删除线
-            {//删除字体中的删除线
+            if (!_IsStrikeout)//
+            {//
                 font = new Font(font, font.Style & ~FontStyle.Strikeout);
             }
-            if (!_IsUnderline)//没有下划线
-            {//删除字体中的下划线
+            if (!_IsUnderline)//
+            {//
                 font = new Font(font, font.Style & ~FontStyle.Underline);
             }
-            //这样就得到原来保存的字体样式了，有点麻烦……
+            //
             this.Font = font;
 
             base.OnFontChanged(e);

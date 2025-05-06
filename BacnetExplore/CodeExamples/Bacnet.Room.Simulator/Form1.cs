@@ -114,9 +114,9 @@ namespace Bacnet.Room.Simulator
         {
 
             if (Application.CurrentCulture.ToString() == "en-US")
-                return Truncate(C).ToString()+"°F";
+                return Truncate(C).ToString()+"F";
             else
-                return Truncate(C).ToString()+"°C";
+                return Truncate(C).ToString()+"C";
         }
 
         private float TempDegre2Value(double C)
@@ -153,11 +153,11 @@ namespace Bacnet.Room.Simulator
 
             RollingCounter += 2 * random.NextDouble();
 
-            // Récupération de la consigne de temperature
+            // Rcupration de la consigne de temperature
             bv1 = BacnetActivity.GetBacObjectPresentValue(Bac_ConsigneTemp);
             TempCons = Temp2Degree((float)bv1.Value);
 
-            // Récupération du mode choisi
+            // Rcupration du mode choisi
             bv2 = BacnetActivity.GetBacObjectPresentValue(Bac_Mode);
             uint mode = (uint)bv2.Value;
             if (mode > 3)
@@ -257,7 +257,7 @@ namespace Bacnet.Room.Simulator
             BacnetValue bv;
             float f;
 
-            // Les labels associés aux Bp pour choisir la temperature
+            // Les labels associs aux Bp pour choisir la temperature
             b = new BacnetObjectId(BacnetObjectTypes.OBJECT_CHARACTERSTRING_VALUE, 1);
             bv=BacnetActivity.GetBacObjectPresentValue(b);
             Set1Label.Text = (string)bv.Value;
@@ -276,18 +276,18 @@ namespace Bacnet.Room.Simulator
 
             bv = BacnetActivity.GetBacObjectPresentValue(Bac_ConsigneTemp);
             f = (float)bv.Value;
-            TempSet.Text = "T Set : " + f.ToString()+"°";
+            TempSet.Text = "T Set : " + f.ToString()+"";
 
             bv = BacnetActivity.GetBacObjectPresentValue(Bac_TempExterieure);
             f = (float)bv.Value;
-            TempExt.Text = "T Ext : " + f.ToString() + "°";          
+            TempExt.Text = "T Ext : " + f.ToString() + "";          
         }
 
         private void TmrUpdate_Tick(object sender, EventArgs e)
         {
 
-            // Si consigne_Effective OutofService alors l'écriture de Present_Value à lieu via Bacnet
-            // sinon on remet à jour ici la valeur choisie 'au clavier' par l'utilisateur
+            // Si consigne_Effective OutofService alors l'criture de Present_Value  lieu via Bacnet
+            // sinon on remet  jour ici la valeur choisie 'au clavier' par l'utilisateur
             IList<BacnetValue> val = null;
             BacnetActivity.m_storage.ReadProperty(Bac_ConsigneTemp, BacnetPropertyIds.PROP_OUT_OF_SERVICE, 1, out val);
             Remoteconsigne = (bool)val[0].Value;

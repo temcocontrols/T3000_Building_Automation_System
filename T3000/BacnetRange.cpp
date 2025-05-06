@@ -17,7 +17,7 @@ static int temp_static_value = 0;
 int old_bac_range_number_choose = 0;
 int initial_dialog = 0;
 bool move_window_to_right = true; 
-extern tree_product selected_product_Node; // 选中的设备信息;
+extern tree_product selected_product_Node; // 
 // BacnetRange dialog
 IMPLEMENT_DYNAMIC(BacnetRange, CDialogEx)
 
@@ -117,7 +117,7 @@ BOOL BacnetRange::OnInitDialog()
 		GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("32.  PT100 -40 to 1800"));
 		GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("35.  PT1000 -200 to 600"));
 		GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("36.  PT1000 -328 to 1112"));
-		//ÏÈ½ûÓÃËùÓÐµÄÑ¡Ïî;
+		//;
 		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
 		{
 			((CButton *)GetDlgItem(i))->EnableWindow(FALSE);
@@ -147,7 +147,7 @@ BOOL BacnetRange::OnInitDialog()
 		}
 		((CButton *)GetDlgItem(IDC_BTN_EDIT_CUSTOMER_RANGE))->EnableWindow(FALSE);
 		
-		//Ê¹ÄÜPT12ÓÐµÄÑ¡Ïî
+		//PT12
 		((CButton *)GetDlgItem(IDC_RADIO35))->EnableWindow(1);
 		((CButton *)GetDlgItem(IDC_RADIO55))->EnableWindow(1);
 		((CButton *)GetDlgItem(IDC_RADIO56))->EnableWindow(1);
@@ -161,7 +161,7 @@ BOOL BacnetRange::OnInitDialog()
 	}
     else
     {
-        GetDlgItem(IDC_RADIO55)->SetWindowTextW(_T("3K YSI 44005 "));//除了PT12 其他的默认 用3K的传感器
+        GetDlgItem(IDC_RADIO55)->SetWindowTextW(_T("3K YSI 44005 "));//T12 
         GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("3K YSI 44005 "));
         GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("3K Allerton/ASI"));
         GetDlgItem(IDC_RADIO60)->SetWindowTextW(_T("3K Allerton/ASI"));
@@ -174,7 +174,7 @@ BOOL BacnetRange::OnInitDialog()
 
 void BacnetRange::SetAllRadioButton(int button_index ) // 0  keep     1 enable all  2 disable all
 {
-    //先DisableAll
+    //isableAll
     GetDlgItem(IDC_EDIT_RANGE_SELECT)->EnableWindow(1);
     for (int i = IDC_RADIO47;i <= IDC_RADIO53;i++)
     {
@@ -445,7 +445,7 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left - 830,c1.top + 320,0,0,SWP_NOZORDER|SWP_NOSIZE);
 
@@ -454,7 +454,7 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO_VAR_CUS_1;i<=IDC_RADIO_VAR_CUS_5;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left - 830,c1.top + 320,0,0,SWP_NOZORDER|SWP_NOSIZE);
 
@@ -464,13 +464,13 @@ void BacnetRange::Initial_static()
 			GetDlgItem(i)->SetWindowTextW(temp_info);
 		}
 		CRect cREC1; 
-		GetDlgItem(IDC_BTN_EDIT_CUSTOMER_VAR_RANGE)->GetWindowRect(cREC1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+		GetDlgItem(IDC_BTN_EDIT_CUSTOMER_VAR_RANGE)->GetWindowRect(cREC1);   // ;
 		ScreenToClient(cREC1);  
 		GetDlgItem(IDC_BTN_EDIT_CUSTOMER_VAR_RANGE)->SetWindowPos(NULL,cREC1.left - 830,cREC1.top + 320,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		GetDlgItem(IDC_BTN_EDIT_CUSTOMER_VAR_RANGE)->ShowWindow(true);
 		
 		CRect cREC2; 
-		GetDlgItem(IDC_STATIC_CUSTOMER_VAR_ANALOG_UNITS)->GetWindowRect(cREC2);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+		GetDlgItem(IDC_STATIC_CUSTOMER_VAR_ANALOG_UNITS)->GetWindowRect(cREC2);   // ;
 		ScreenToClient(cREC2);  
 		GetDlgItem(IDC_STATIC_CUSTOMER_VAR_ANALOG_UNITS)->SetWindowPos(NULL,cREC2.left - 830,cREC2.top + 320,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		GetDlgItem(IDC_STATIC_CUSTOMER_VAR_ANALOG_UNITS)->ShowWindow(true);
@@ -481,7 +481,7 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 25,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
@@ -490,7 +490,7 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO89;i<=IDC_RADIO99;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 25,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
@@ -499,14 +499,14 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 25,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
 		}
 
 		CRect c1; 
-		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   // ;
 		ScreenToClient(c1);  
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->SetWindowPos(NULL,c1.left + 27,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(true);
@@ -642,7 +642,7 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO89;i<=IDC_RADIO99;i++)	//Digital
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top ,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
@@ -650,13 +650,13 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)	//Digital Custom
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top ,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
 		}
 		CRect c1; 
-		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   // ;
 		ScreenToClient(c1);  
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->SetWindowPos(NULL,c1.left + 50,c1.top ,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(true);
@@ -709,7 +709,7 @@ void BacnetRange::Initial_static()
 		GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(false);//input
 		MoveWindow(Temp_Rect.left,Temp_Rect.top, 950,630);
 
-		GetDlgItem(IDC_RADIO53)->EnableWindow(false); //Fandu 2021 09 06 所有的T3系列 以及扩展系列都不支持 4-20ma 电流输出;
+		GetDlgItem(IDC_RADIO53)->EnableWindow(false); //Fandu 2021 09 06 
 	}
 	else if((bac_ranges_type == INPUT_RANGE_ANALOG_TYPE) || (initial_dialog == 2))
 	{
@@ -753,7 +753,7 @@ void BacnetRange::Initial_static()
 		{
 			GetDlgItem(i)->ShowWindow(0);
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			((CButton *)GetDlgItem(i))->ShowWindow(1);
@@ -763,7 +763,7 @@ void BacnetRange::Initial_static()
 		{
 			GetDlgItem(i)->ShowWindow(0);
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			((CButton *)GetDlgItem(i))->ShowWindow(1);
@@ -773,14 +773,14 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
 		}
 
 		CRect c1; 
-		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   // ;
 		ScreenToClient(c1);  
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(true);
@@ -799,14 +799,14 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 
 			((CButton *)GetDlgItem(i))->ShowWindow(1);
 		}
         CRect c1_range_groupbox;
-        GetDlgItem(IDC_STATIC_CUSTOM_RANGE_GROUPBOX)->GetWindowRect(c1_range_groupbox);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+        GetDlgItem(IDC_STATIC_CUSTOM_RANGE_GROUPBOX)->GetWindowRect(c1_range_groupbox);   // ;
         ScreenToClient(c1_range_groupbox);
         GetDlgItem(IDC_STATIC_CUSTOM_RANGE_GROUPBOX)->SetWindowPos(NULL, c1_range_groupbox.left + 50, c1_range_groupbox.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
         ((CButton *)GetDlgItem(IDC_STATIC_CUSTOM_RANGE_GROUPBOX))->ShowWindow(1);
@@ -815,7 +815,7 @@ void BacnetRange::Initial_static()
 		for (int i = IDC_RADIO101;i <= IDC_RADIO113;i++)
 		{
 			CRect c1;
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);
 			GetDlgItem(i)->SetWindowPos(NULL, c1.left + 50, c1.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
@@ -825,7 +825,7 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO81;i<=IDC_RADIO88;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(i)->GetWindowRect(c1);   // ;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 
@@ -859,55 +859,55 @@ void BacnetRange::Initial_static()
 		//	GetDlgItem(IDC_RADIO86)->SetWindowTextW(temp_cs_analog);
 		//}
 
-		// Big  input27 - 32  small 11 - 16  tiny 6 - 11 range  T3-22 1-11 ÀïÃæÓÐ¸ßËÙÂö³å.  ÆäËûµÄ ÉèÖÃ´Ërange ¶¼ÊÇµÍËÙÂö³å;
+		// Big  input27 - 32  small 11 - 16  tiny 6 - 11 range  T3-22 1-11 .   range ;
 		if((Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM) && (input_list_line >=26) && (input_list_line <=31))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
-            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE); //使能RPM选项
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE); //PM
 		}
 		else if((Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL || bacnet_device_type == MINIPANELARM_LB) && (input_list_line >=10) && (input_list_line <=16))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
-            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//PM
 		}
 		else if((Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL) && (input_list_line >=5) && (input_list_line <=11))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
-            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//PM
 		}
 		else if ((Device_Basic_Setting.reg.mini_type == TINY_EX_MINIPANEL ) && (input_list_line >= 0) && (input_list_line <= 7))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
-            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//PM
 		}
         else if ((Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB) && (input_list_line >= 0) && (input_list_line <= 7))
         {
             GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
             GetDlgItem(IDC_RADIO69)->EnableWindow(TRUE);
             GetDlgItem(IDC_RADIO87)->EnableWindow(FALSE);
-            GetDlgItem(IDC_RADIO103)->EnableWindow(FALSE);//禁用RPM选项
+            GetDlgItem(IDC_RADIO103)->EnableWindow(FALSE);//PM
         }
         else if ((Device_Basic_Setting.reg.mini_type == T3_TB_11I) && (input_list_line >= 0) && (input_list_line <= 10))
         {
             GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
             GetDlgItem(IDC_RADIO69)->EnableWindow(TRUE);
             GetDlgItem(IDC_RADIO87)->EnableWindow(FALSE);
-            GetDlgItem(IDC_RADIO103)->EnableWindow(FALSE);//禁用RPM选项
+            GetDlgItem(IDC_RADIO103)->EnableWindow(FALSE);//PM
         }
 		else if((bacnet_device_type == PID_T322AI) && (input_list_line >= 0) && (input_list_line <=10))
 		{
 			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. Pulse Count (Fast 100Hz)"));
 			GetDlgItem(IDC_RADIO69)->EnableWindow(FALSE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(TRUE);
-            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
+            GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//PM
 		}
         else if ((Device_Basic_Setting.reg.mini_type == T3_OEM))
         {
@@ -951,34 +951,34 @@ void BacnetRange::Initial_static()
 		}
 		else if ((Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) && (input_list_line == 4))
 		{
-			GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//使能RPM选项
+			GetDlgItem(IDC_RADIO103)->EnableWindow(TRUE);//PM
 		}
 		else
 		{
 			GetDlgItem(IDC_RADIO69)->EnableWindow(TRUE);	
 			GetDlgItem(IDC_RADIO87)->EnableWindow(FALSE);
-            GetDlgItem(IDC_RADIO103)->EnableWindow(FALSE);//禁用RPM选项
+            GetDlgItem(IDC_RADIO103)->EnableWindow(FALSE);//PM
 		}
         
         if ((Device_Basic_Setting.reg.special_flag & 0x01) == 0x01)
         {
-            GetDlgItem(IDC_RADIO63)->EnableWindow(true);   //使能PT1K Sensor 的 按钮
+            GetDlgItem(IDC_RADIO63)->EnableWindow(true);   //T1K Sensor 
             GetDlgItem(IDC_RADIO64)->EnableWindow(true);
         }
         else
         {
-            GetDlgItem(IDC_RADIO63)->EnableWindow(FALSE);  //禁用PT1K Sensor 的 按钮
+            GetDlgItem(IDC_RADIO63)->EnableWindow(FALSE);  //T1K Sensor 
             GetDlgItem(IDC_RADIO64)->EnableWindow(FALSE);
         }
 
-        if ((Device_Basic_Setting.reg.special_flag & 0x02) == 0x02) //目前T3 系列 不支持PT100，待支持时 在启用此位;
+        if ((Device_Basic_Setting.reg.special_flag & 0x02) == 0x02) //3 
         {
-            //GetDlgItem(IDC_RADIO55)->EnableWindow(true);  //使能PT100 Sensor 的 按钮
+            //GetDlgItem(IDC_RADIO55)->EnableWindow(true);  //T100 Sensor 
             //GetDlgItem(IDC_RADIO56)->EnableWindow(true);
         }
         else
         {
-            //GetDlgItem(IDC_RADIO55)->EnableWindow(FALSE);  //禁用PT100 Sensor 的 按钮
+            //GetDlgItem(IDC_RADIO55)->EnableWindow(FALSE);  //T100 Sensor 
             //GetDlgItem(IDC_RADIO56)->EnableWindow(FALSE);
         }
 
@@ -1447,7 +1447,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						{
 							m_show_unit.SetWindowTextW(	Analog_Variable_Units[m_analog_select-34]);
 							CRect c4;
-							GetDlgItem(IDC_RADIO_VAR_CUS_1 + m_analog_select - 34)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+							GetDlgItem(IDC_RADIO_VAR_CUS_1 + m_analog_select - 34)->GetWindowRect(c4);   // ;
 							ScreenToClient(c4);  
 							m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -1456,7 +1456,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						{
 							m_show_unit.SetWindowTextW(Variable_Analog_Units_Array[bac_range_number_choose]);
 							CRect c4;
-							GetDlgItem(IDC_RADIO1 + m_analog_select)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+							GetDlgItem(IDC_RADIO1 + m_analog_select)->GetWindowRect(c4);   // ;
 							ScreenToClient(c4);  
 							m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -1554,7 +1554,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							int temp_value;
 							temp_value = m_input_Analog_select - 19;
 							CRect c4;
-							GetDlgItem(IDC_RADIO81 + temp_value)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+							GetDlgItem(IDC_RADIO81 + temp_value)->GetWindowRect(c4);   // ;
 							ScreenToClient(c4);  
 							m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -1564,7 +1564,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							int temp_value;
 							temp_value = m_input_Analog_select - 27;
 							CRect c4;
-							GetDlgItem(IDC_RADIO101 + temp_value)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+							GetDlgItem(IDC_RADIO101 + temp_value)->GetWindowRect(c4);   // ;
 							ScreenToClient(c4);
 							m_rang_pic.SetWindowPos(NULL, c4.left - 40, c4.top - 4, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -1573,7 +1573,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						else
 						{
 							CRect c4;
-							GetDlgItem(IDC_RADIO54 + m_input_Analog_select)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+							GetDlgItem(IDC_RADIO54 + m_input_Analog_select)->GetWindowRect(c4);   // ;
 							ScreenToClient(c4);  
 							m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -1662,7 +1662,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							bac_range_number_choose = m_digital_select ;
 
 							CRect c6;
-							GetDlgItem(IDC_RADIO73 + bac_range_number_choose - 23)->GetWindowRect(c6);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+							GetDlgItem(IDC_RADIO73 + bac_range_number_choose - 23)->GetWindowRect(c6);   // ;
 							ScreenToClient(c6);  
 							m_rang_pic.SetWindowPos(NULL,c6.left - 40,c6.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -1672,7 +1672,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						{
 							bac_range_number_choose = m_digital_select ;
 							CRect c6;
-							GetDlgItem(IDC_RADIO89 + bac_range_number_choose - 12)->GetWindowRect(c6);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+							GetDlgItem(IDC_RADIO89 + bac_range_number_choose - 12)->GetWindowRect(c6);   // ;
 							ScreenToClient(c6);  
 							m_rang_pic.SetWindowPos(NULL,c6.left - 40,c6.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -1681,7 +1681,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
                         {
                             bac_range_number_choose = m_digital_select;
                             CRect c6;
-                            GetDlgItem(IDC_RADIO_MSV_1 + m_digital_select - 101)->GetWindowRect(c6);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+                            GetDlgItem(IDC_RADIO_MSV_1 + m_digital_select - 101)->GetWindowRect(c6);   // ;
                             ScreenToClient(c6);
                             m_rang_pic.SetWindowPos(NULL, c6.left - 40, c6.top - 4, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
                             m_rang_pic.Invalidate(TRUE);
@@ -1691,7 +1691,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							bac_range_number_choose = m_digital_select;
 
 							CRect c6;
-							GetDlgItem(IDC_RADIO35 + bac_range_number_choose)->GetWindowRect(c6);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+							GetDlgItem(IDC_RADIO35 + bac_range_number_choose)->GetWindowRect(c6);   // ;
 							ScreenToClient(c6);  
 							m_rang_pic.SetWindowPos(NULL,c6.left - 40,c6.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -1812,7 +1812,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   // ;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1834,7 +1834,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value - 11;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   // ;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1857,7 +1857,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value - 11;
 				CRect c4;
-				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4);   // ;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1893,7 +1893,7 @@ void BacnetRange::Timer2_handle()
 			}
 			m_analog_select = sel_value - 30 ;
 			CRect c4;
-			GetDlgItem(IDC_RADIO1 + m_analog_select )->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(IDC_RADIO1 + m_analog_select )->GetWindowRect(c4);   // ;
 			ScreenToClient(c4);  
 			m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			m_rang_pic.Invalidate(TRUE);
@@ -1926,7 +1926,7 @@ void BacnetRange::Timer2_handle()
 			m_analog_select = sel_value - 30 ;
 
 			CRect c4;
-			GetDlgItem(IDC_RADIO_VAR_CUS_1 + m_analog_select - 34 )->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+			GetDlgItem(IDC_RADIO_VAR_CUS_1 + m_analog_select - 34 )->GetWindowRect(c4);   // ;
 			ScreenToClient(c4);  
 			m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			m_rang_pic.Invalidate(TRUE);
@@ -1957,7 +1957,7 @@ void BacnetRange::Timer2_handle()
             ((CButton *)GetDlgItem(IDC_RADIO_MSV_1 - 101 + sel_value))->SetCheck(true);
 
             CRect c4;
-            GetDlgItem(IDC_RADIO_MSV_1 - 101 + sel_value)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+            GetDlgItem(IDC_RADIO_MSV_1 - 101 + sel_value)->GetWindowRect(c4);   // ;
             ScreenToClient(c4);
             m_rang_pic.SetWindowPos(NULL, c4.left - 40, c4.top - 4, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
             m_rang_pic.Invalidate(TRUE);
@@ -2112,7 +2112,7 @@ void BacnetRange::Timer2_handle()
             ((CButton *)GetDlgItem(IDC_RADIO_MSV_1 - 101 + sel_value))->SetCheck(true);
 
             CRect c4;
-            GetDlgItem(IDC_RADIO_MSV_1 - 101 + sel_value)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+            GetDlgItem(IDC_RADIO_MSV_1 - 101 + sel_value)->GetWindowRect(c4);   // ;
             ScreenToClient(c4);
             m_rang_pic.SetWindowPos(NULL, c4.left - 40, c4.top - 4, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
             m_rang_pic.Invalidate(TRUE);
@@ -2280,7 +2280,7 @@ void BacnetRange::Timer2_handle()
 			else if(sel_value == 56)
 			{
 				CRect c4;
-				GetDlgItem(IDC_RADIO88)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO88)->GetWindowRect(c4);   // ;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -2290,7 +2290,7 @@ void BacnetRange::Timer2_handle()
 				int temp_delt = 0;
 				temp_delt = sel_value - 57;
 				CRect c4;
-				GetDlgItem(IDC_RADIO101 + temp_delt)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO101 + temp_delt)->GetWindowRect(c4);   // ;
 				ScreenToClient(c4);
 				m_rang_pic.SetWindowPos(NULL, c4.left - 40, c4.top - 4, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -2300,7 +2300,7 @@ void BacnetRange::Timer2_handle()
 				int temp_delt = 0;
 				temp_delt = sel_value - 50;
 				CRect c4;
-				GetDlgItem(IDC_RADIO82 + temp_delt)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO82 + temp_delt)->GetWindowRect(c4);   // ;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -2308,7 +2308,7 @@ void BacnetRange::Timer2_handle()
 			else
 			{
 				CRect c4;
-				GetDlgItem(IDC_RADIO54 + m_input_Analog_select )->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				GetDlgItem(IDC_RADIO54 + m_input_Analog_select )->GetWindowRect(c4);   // ;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -2371,7 +2371,7 @@ void BacnetRange::Timer2_handle()
                     ((CButton *)GetDlgItem(IDC_RADIO_MSV_1 - 101 + sel_value))->SetCheck(true);
 
                     CRect c4;
-                    GetDlgItem(IDC_RADIO_MSV_1 - 101 + sel_value)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+                    GetDlgItem(IDC_RADIO_MSV_1 - 101 + sel_value)->GetWindowRect(c4);   // ;
                     ScreenToClient(c4);
                     m_rang_pic.SetWindowPos(NULL, c4.left - 40, c4.top - 4, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
                     m_rang_pic.Invalidate(TRUE);
@@ -2449,7 +2449,7 @@ void BacnetRange::OnBnClickedBtnEditCustomerRange()
 		if (temp_dig_on.GetLength() >= 12)
 			temp_dig_on.Empty();
 
-		//判断正反向逻辑 ，正逻辑处理方式如同  Range 1    负逻辑如同 12;
+		//   
 		if (m_customer_unit_data.at(i).direct == DIGITAL_DIRECT)
 		{
 			cus_digital_off[i] = temp_dig_off;
@@ -2551,7 +2551,7 @@ void BacnetRange::OnBnClickedRadio80()
 
 void BacnetRange::OnBnClickedRadio82()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
 
     m_input_Analog_select = 20;
     ShowAnalogCusRange();
@@ -2561,7 +2561,7 @@ void BacnetRange::OnBnClickedRadio82()
 
 void BacnetRange::OnBnClickedRadio83()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
 
     m_input_Analog_select = 21;
     ShowAnalogCusRange();
@@ -2570,7 +2570,7 @@ void BacnetRange::OnBnClickedRadio83()
 
 void BacnetRange::OnBnClickedRadio84()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     m_input_Analog_select = 22;
     ShowAnalogCusRange();
 
@@ -2579,7 +2579,7 @@ void BacnetRange::OnBnClickedRadio84()
 
 void BacnetRange::OnBnClickedRadio85()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     m_input_Analog_select = 23;
     ShowAnalogCusRange();
 }
@@ -2587,7 +2587,7 @@ void BacnetRange::OnBnClickedRadio85()
 
 void BacnetRange::OnBnClickedRadio86()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     m_input_Analog_select = 24;
     ShowAnalogCusRange();
 }
@@ -2613,7 +2613,7 @@ void BacnetRange::ShowAnalogCusRange()
         analog_range_tbl_line = temp_value;
         if ((g_protocol == MODBUS_BACNET_MSTP) ||
             (g_protocol == PROTOCOL_BACNET_IP) 
-			)// MSTP_转MUDBUS 协议，因为10000以后没有自定义的CUSTOM 表;
+			)// MSTP_UDBUS 00
         {
             GetPrivateData_Blocking(g_bac_instance, READANALOG_CUS_TABLE_T3000, temp_value, temp_value, sizeof(Str_table_point));
         }
@@ -2624,7 +2624,7 @@ void BacnetRange::ShowAnalogCusRange()
 			unsigned short read_data_buffer[600];
 			memset(read_data_buffer, 0, sizeof(unsigned short) * 600);
 			int read_result = 1;
-			//cus table  106 按106算  *5    106x5  需要读530   需要读取6包;
+			//cus table  106 065    106x5  
 			for (int i = 0; i < 6; i++)
 			{
 				int itemp = 0;
@@ -2657,7 +2657,7 @@ void BacnetRange::ShowAnalogCusRange()
 							read_data_buffer[i * 53 + j] = htons(read_data_buffer[i * 53 + j]);
 						}
 					}
-					memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//因为Str_table_point 只有106个字节，两个byte放到1个 modbus的寄存器里面;
+					memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//tr_table_point 
 				}
 
 			}
@@ -2691,7 +2691,7 @@ void BacnetRange::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
         break;
     case SB_LINEDOWN:           //Scroll one line down
         scrollinfo.nPos += 1;
-        if (scrollinfo.nPos + scrollinfo.nPage>scrollinfo.nMax)  //此处一定要注意加上滑块的长度，再作判断
+        if (scrollinfo.nPos + scrollinfo.nPage>scrollinfo.nMax)  //
         {
             scrollinfo.nPos = scrollinfo.nMax;
             break;
@@ -2711,7 +2711,7 @@ void BacnetRange::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
         break;
     case SB_PAGEDOWN:        //Scroll one page down        
         scrollinfo.nPos += 5;
-        if (scrollinfo.nPos + scrollinfo.nPage >= scrollinfo.nMax)  //此处一定要注意加上滑块的长度，再作判断
+        if (scrollinfo.nPos + scrollinfo.nPage >= scrollinfo.nMax)  //
         {
             scrollinfo.nPos = scrollinfo.nMax;
             break;
@@ -2735,7 +2735,7 @@ void BacnetRange::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 void BacnetRange::OnBnClickedBtnEditMsvRange()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     if (((CButton *)GetDlgItem(IDC_RADIO_MSV_1))->GetCheck())
         msv_range_tbl_line = 0;
     else if (((CButton *)GetDlgItem(IDC_RADIO_MSV_2))->GetCheck())
@@ -2787,7 +2787,7 @@ void BacnetRange::DisableAnalogVarRadio()
 
 void BacnetRange::OnBnClickedRadioMsv1()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
     DisableAnalogVarRadio();
     GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("101"));
@@ -2796,7 +2796,7 @@ void BacnetRange::OnBnClickedRadioMsv1()
 
 void BacnetRange::OnBnClickedRadioMsv2()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
     DisableAnalogVarRadio();
     GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("102"));
@@ -2805,7 +2805,7 @@ void BacnetRange::OnBnClickedRadioMsv2()
 
 void BacnetRange::OnBnClickedRadioMsv3()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
     DisableAnalogVarRadio();
     GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("103"));
@@ -2814,7 +2814,7 @@ void BacnetRange::OnBnClickedRadioMsv3()
 
 void BacnetRange::OnBnClickedRadio57()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     SetAllRadioButton(RANGE_RADIO_KEEP);
     GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("33"));
     ((CButton *)GetDlgItem(IDC_RADIO57))->SetCheck(1);
@@ -2825,7 +2825,7 @@ void BacnetRange::OnBnClickedRadio57()
 
 void BacnetRange::OnBnClickedRadio58()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     SetAllRadioButton(RANGE_RADIO_KEEP);
     GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("34"));
     ((CButton *)GetDlgItem(IDC_RADIO58))->SetCheck(1);
@@ -2834,7 +2834,7 @@ void BacnetRange::OnBnClickedRadio58()
 
 void BacnetRange::OnBnClickedRadio87()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     SetAllRadioButton(RANGE_RADIO_KEEP);
     ((CButton *)GetDlgItem(IDC_RADIO87))->SetCheck(1);
     GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("55"));
@@ -2843,7 +2843,7 @@ void BacnetRange::OnBnClickedRadio87()
 
 void BacnetRange::OnBnClickedRadio103()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     SetAllRadioButton(RANGE_RADIO_KEEP);
     ((CButton *)GetDlgItem(IDC_RADIO103))->SetCheck(1);
     GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("59"));
@@ -2892,7 +2892,7 @@ void BacnetRange::RadioDegC_DegF(bool n_enable ,bool n_deg_c)
 
 void BacnetRange::OnBnClickedRadioMsv4()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
 	DisableAnalogVarRadio();
 	GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowText(_T("104"));

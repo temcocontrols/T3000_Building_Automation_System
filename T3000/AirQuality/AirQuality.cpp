@@ -214,7 +214,7 @@ void CAirQuality::Fresh()
 	m_Combox_baudrate.AddString(_T("38400"));
 	m_Combox_baudrate.AddString(_T("57600"));
 	m_Combox_baudrate.AddString(_T("115200"));
-	m_Combox_baudrate.AddString(L"76800");  //新增76800的处理;
+	m_Combox_baudrate.AddString(L"76800");  //76800;
 	g_NEED_MULTI_READ = FALSE;
 	int AddressValue = -1;
 	m_current_TstatID = g_tstat_id;
@@ -260,7 +260,7 @@ void CAirQuality::Fresh()
 	//InitChartData();
 	CString strTemp;
 	strTemp.Format(_T("%d"), product_register_value[9]);
-    if (product_register_value[9] >= 30)   //hum version 大于等于30的 传感器不用校准;  老的传感器用的 27 以前的版本 ，旧的有校准表格;
+    if (product_register_value[9] >= 30)   //hum version 30 ;   27  ;
     {
         GetDlgItem(IDC_GRAPIC)->EnableWindow(false);
     }
@@ -2887,7 +2887,7 @@ void CAirQuality::Initial_OutputList()
 			{
 				m_output_list.SetItemText(1, 6,Global_String_AUTO);
 				HUM = ((float)((short)product_register_value[373])) / 10;
-				if (product_register_value[186] == 1)  //187 改186 修改原因是187 固件没有处理，所以退一步改186
+				if (product_register_value[186] == 1)  //187 186 187 186
 				{
 					Vhum = HUM / 10;
 					if (Vhum > 10)
@@ -2900,7 +2900,7 @@ void CAirQuality::Initial_OutputList()
 					}
 					humsignal.Format(_T("%.2fv"), Vhum);
 				}
-				else if (product_register_value[186] == 2) //187 改186 修改原因是187 固件没有处理，所以退一步改186
+				else if (product_register_value[186] == 2) //187 186 187 186
 				{
 					Vhum = HUM / 20;
 					if (Vhum > 5)
@@ -2913,7 +2913,7 @@ void CAirQuality::Initial_OutputList()
 					}
 					humsignal.Format(_T("%.2fv"), Vhum);
 				}
-				else if (product_register_value[186] == 3) //187 改186 修改原因是187 固件没有处理，所以退一步改186
+				else if (product_register_value[186] == 3) //187 186 187 186
 				{
 					Vhum = (HUM / 100) * 16 + 4;
 					if (Vhum > 20)
@@ -4352,7 +4352,7 @@ void CAirQuality::Fresh_Input_Output()
 
 void CAirQuality::OnCbnSelchangeCo2Baudratecombo()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (product_register_value[MODBUS_BAUDRATE] == m_Combox_baudrate.GetCurSel()) //Add this to judge weather this value need to change.
 		return;
 

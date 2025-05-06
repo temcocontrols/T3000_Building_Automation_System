@@ -33,7 +33,7 @@ struct _Bac_Scan_results_Info
 struct _Bac_Scan_Com_Info
 {
     int nprotocol;  // 0 MSTP     1 BIP
-    unsigned char ipaddress[6];   //前四位位IP地址  后两位位端口号
+    unsigned char ipaddress[6];   //IP  
     int device_id;
     int macaddress;
 };

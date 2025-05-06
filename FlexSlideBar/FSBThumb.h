@@ -47,7 +47,7 @@ public:
     void SetMixValue(int min);
 protected:
 	BOOL							m_bHorizontal;
-	int								m_nPosX;				// 象素的位置
+	int								m_nPosX;				// 
 	int								m_nPosY;
 
 	int								m_nHeight;
@@ -58,7 +58,7 @@ protected:
 	BOOL							m_bIsDragging;
 	FSB_THUMBSHAPE		m_shape;
 		
-	int								m_nPosition;			// 刻度的位置
+	int								m_nPosition;			// 
     
     int m_min;
 

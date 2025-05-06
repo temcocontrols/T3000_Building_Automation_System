@@ -42,9 +42,9 @@ afx_msg void OnSize(UINT nType, int cx, int cy);
  virtual BOOL PreTranslateMessage(MSG* pMsg);
  afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 
- bool b_hum_sensor;   //用于判断TSTAT 输入 有无 Hum
- bool b_co2_sensor;   //输入 有无 CO2 用此标志 来判断是否显示在输入想里;
- bool b_lux_sensor;   // 光强
+ bool b_hum_sensor;   //TSTAT   Hum
+ bool b_co2_sensor;   //  CO2  ;
+ bool b_lux_sensor;   // 
 };
 
 

@@ -20,7 +20,7 @@ using json = nlohmann::json;
 
 typedef struct StrJson
 {
-	unsigned short ncount; //控制结构体 myitems 的数量的，不存入设备
+	unsigned short ncount; // myitems 
 
 
 	unsigned char activeItemIndex;
@@ -46,7 +46,7 @@ typedef struct StrJson
 		for (int i = 0; i < json_screen.reg.ncount; i++)
 		{
 			bool find_next = false;
-			for (int j = z; j < BAC_GRPHIC_JSON_ITEM_COUNT; j++) //把所有80个里面，从头开始是这幅图的组件拉出来;
+			for (int j = z; j < BAC_GRPHIC_JSON_ITEM_COUNT; j++) //80;
 			{
 				if (m_json_item_data.at(j).reg.json_items.item_belong_screen == screen_list_line)
 				{
@@ -121,7 +121,7 @@ typedef struct StrJson
 		viewportTransform.x = jsonData["viewportTransform"].value("x", 0);
 		viewportTransform.y = jsonData["viewportTransform"].value("y", 0);
 
-		ncount = 0; // 获取动态item的个数
+		ncount = 0; // item
 		for (const auto& item : jsonData["items"])
 		{
 			ncount++;

@@ -1274,7 +1274,7 @@ for (int i=0;i<m_allnodes.size();i++)
 
 		   strSql.Format(_T("Select * from ALL_NODE where Product_name='%s'"),strProName);
 		     q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
-		   if (!q.eof())//有表但是没有对应序列号的值
+		   if (!q.eof())//
 		   {
 			   strSql.Format(_T("update ALL_NODE set Software_Ver ='%s' where Serial_ID = '%s' "),m_allnodes.at(i).Firmware,m_allnodes.at(i).SerialNO);
 			   SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
@@ -1526,32 +1526,32 @@ void CDetectOnlineDlg::ClickMsflexgridResult()
 {
 	long lRow,lCol;
 
-	lRow = m_detect_grid.get_RowSel();//获取点击的行号	
-	lCol = m_detect_grid.get_ColSel(); //获取点击的列号
-	if(lRow>m_detect_grid.get_Rows()) //如果点击区超过最大行号，则点击是无效的
+	lRow = m_detect_grid.get_RowSel();//	
+	lCol = m_detect_grid.get_ColSel(); //
+	if(lRow>m_detect_grid.get_Rows()) //
 		return;
-	if(lRow == 0) //如果点击标题行，也无效
+	if(lRow == 0) //
 		return;
 	CRect rect;
-	m_detect_grid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-	//需要将其转化为像素，1440缇= 1英寸
+	m_detect_grid.GetWindowRect(rect); //
+	ScreenToClient(rect); //	
+	// MSFlexGrid"(twips)"
+	//1440= 1
 	CDC* pDC =GetDC();
-	//计算象素点和缇的转换比例
+	//
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//()
 	long y = m_detect_grid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_detect_grid.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//()11
 	long width = m_detect_grid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_detect_grid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//
 	CRect rc(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	//
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//获取选中格的文本信息
+	//
 	CString strValue = m_detect_grid.get_TextMatrix(lRow,lCol);
 	CString strStatus= m_detect_grid.get_TextMatrix(lRow,5);
 	m_nCurRow=lRow;
@@ -1562,23 +1562,23 @@ void CDetectOnlineDlg::ClickMsflexgridResult()
 	}
 	if (lCol==7)
 	{
-		m_writesnBtn.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_writesnBtn.MoveWindow(rc); //
 		m_writesnBtn.ShowWindow(SW_SHOW);
 
 		m_writesnBtn.BringWindowToTop();
 		//m_RangCombox.SelectString(-1,strValue);
 		m_writesnBtn.SetWindowText(strValue);
-		m_writesnBtn.SetFocus(); //获取焦点
+		m_writesnBtn.SetFocus(); //
 	}
 	else
 	{
-		m_editor.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_editor.MoveWindow(rc); //
 		m_editor.ShowWindow(SW_SHOW);
 
 		m_editor.BringWindowToTop();
 		//m_RangCombox.SelectString(-1,strValue);
 		m_editor.SetWindowText(strValue);
-		m_editor.SetFocus(); //获取焦点
+		m_editor.SetFocus(); //
 	}
 // 	if (strStatus.CompareNoCase(_T("Online"))==0)
 // 	{
@@ -1852,32 +1852,32 @@ void CDetectOnlineDlg::ClickMsflexgridResult2()
 {
 	long lRow,lCol;
 	 
-	lRow = m_allcomportTable.get_RowSel();//获取点击的行号	
-	lCol = m_allcomportTable.get_ColSel(); //获取点击的列号
-	if(lRow>m_allcomportTable.get_Rows()) //如果点击区超过最大行号，则点击是无效的
+	lRow = m_allcomportTable.get_RowSel();//	
+	lCol = m_allcomportTable.get_ColSel(); //
+	if(lRow>m_allcomportTable.get_Rows()) //
 		return;
-	if(lRow == 0) //如果点击标题行，也无效
+	if(lRow == 0) //
 		return;
 	CRect rect;
-	m_allcomportTable.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-	//需要将其转化为像素，1440缇= 1英寸
+	m_allcomportTable.GetWindowRect(rect); //
+	ScreenToClient(rect); //	
+	// MSFlexGrid"(twips)"
+	//1440= 1
 	CDC* pDC =GetDC();
-	//计算象素点和缇的转换比例
+	//
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//()
 	long y = m_allcomportTable.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_allcomportTable.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//()11
 	long width = m_allcomportTable.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_allcomportTable.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//
 	CRect rc(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	//
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//获取选中格的文本信息
+	//
 	CString strValue = m_allcomportTable.get_TextMatrix(lRow,lCol);
 	//CString strStatus= m_allcomportTable.get_TextMatrix(lRow,5);
 	m_nCurRow=lRow;
@@ -1891,13 +1891,13 @@ void CDetectOnlineDlg::ClickMsflexgridResult2()
 	m_edit_name.ShowWindow(FALSE);
 	if (lCol==2||lCol==3||lCol==4)
 	{
-		m_edit_name.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_edit_name.MoveWindow(rc); //
 		m_edit_name.ShowWindow(SW_SHOW);
 
 		m_edit_name.BringWindowToTop();
 		//m_RangCombox.SelectString(-1,strValue);
 		m_edit_name.SetWindowText(strValue);
-		m_edit_name.SetFocus(); //获取焦点
+		m_edit_name.SetFocus(); //
 
 
 	}
@@ -1906,11 +1906,11 @@ void CDetectOnlineDlg::ClickMsflexgridResult2()
 
 		m_combox_tf.ShowWindow(SW_SHOW);
 
-		m_combox_tf.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_combox_tf.MoveWindow(rc); //
 		m_combox_tf.ShowWindow(SW_SHOW);
 		m_combox_tf.BringWindowToTop();
 		m_combox_tf.SetWindowText(strValue);
-		m_combox_tf.SetFocus(); //获取焦点
+		m_combox_tf.SetFocus(); //
 
 
 	}
@@ -2395,9 +2395,9 @@ void CDetectOnlineDlg::OnBnClickedButtonClear()
 		return;
 	}
 	SqliteDBT3000.closedb();
-	//清buffer
+	//buffer
 	m_allnodes.clear();
-	//清grid
+	//grid
 	m_detect_grid.put_Rows(1);
 	m_detect_grid.put_Cols(9);
 	m_detect_grid.put_TextMatrix(0,0,_T("COM Port"));

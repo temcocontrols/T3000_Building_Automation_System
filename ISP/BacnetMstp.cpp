@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "BacnetMstp.h"
-Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
+Str_modbus_reg bacnet_to_modbus_struct;  //bacnet modbus 
 vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 
 HANDLE CM5_hThread = NULL;
@@ -114,7 +114,7 @@ void LocalIAmHandler(uint8_t * service_request, uint16_t service_len, BACNET_ADD
     {
         m_bac_handle_Iam_data.push_back(temp_1);
 #ifdef USE_THIRD_PARTY_FUNC
-        if (vendor_id != 148) //如果不是Temco的ID 才当作第三方设备
+        if (vendor_id != 148) //TemcoID 
         {
             _Bac_Scan_Com_Info *temp = new _Bac_Scan_Com_Info;
             memcpy(temp, &temp_1, sizeof(_Bac_Scan_Com_Info));
@@ -135,7 +135,7 @@ void Init_Service_Handlers(void)
     Device_Init(NULL);
 #if 1
     /* we need to handle who-is to support dynamic device binding */
-    //2017 12 07  由杜帆屏蔽 客户不希望T3000 回Who is 的信息。
+    //2017 12 07   T3000 Who is 
     //apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_WHO_IS, handler_who_is);
     apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_I_AM, LocalIAmHandler);
 
@@ -398,7 +398,7 @@ int handle_bacnet_to_modbus_data(char *npoint, int nlength)
     if (bacnet_to_modbus_struct.nlength <= 200)
     {
         memcpy(bacnet_to_modbus_struct.ndata, my_temp_point, 2 * bacnet_to_modbus_struct.nlength);
-        //因为下位机回传的大小端与电脑相反,需要转换为以下位机的为准
+        //,
         for (int i = 0; i < nlength; i++)
         {
             bacnet_to_modbus_struct.ndata[i] = htons(bacnet_to_modbus_struct.ndata[i]);
@@ -439,7 +439,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
 /*
 Author: Fance
 Get  Private  Bacnet  To  ModbusData
-//这个函数用来通过bacnet命令读取modbus 的相关寄存器
+//bacnetmodbus 
 */
 /************************************************************************/
 int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t readlength, unsigned short *data_out)
@@ -472,7 +472,7 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
     HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
     private_data_chunk.total_length = PRIVATE_HEAD_LENGTH;
     private_data_chunk.command = READ_BACNET_TO_MODBUS_COMMAND;
-    private_data_chunk.start_reg = start_reg; // 测试
+    private_data_chunk.start_reg = start_reg; // 
     private_data_chunk.nlength = readlength;
     Set_transfer_length(PRIVATE_HEAD_LENGTH);
     status = bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING, (char *)&private_data_chunk, &data_value);
@@ -546,7 +546,7 @@ int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_
 
 
     if ((writelength == 0) || (writelength > 128))
-        return -4; //长度有误;
+        return -4; //;
 
     bool status = false;
 
@@ -564,14 +564,14 @@ int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_
     HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
     private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + writelength * 2;
     private_data_chunk.command = WRITE_BACNET_TO_MODBUS_COMMAND;
-    private_data_chunk.start_reg = start_reg; // 测试
+    private_data_chunk.start_reg = start_reg; // 
     private_data_chunk.nlength = writelength;
 
     Set_transfer_length(private_data_chunk.total_length);
     memcpy_s(SendBuffer, PRIVATE_HEAD_LENGTH, &private_data_chunk, PRIVATE_HEAD_LENGTH);
 
     memcpy(temp_data, data_in, writelength * 2);
-    //电脑和设备大小端不一致，这里以设备为准.
+    //.
     for (int i = 0; i < writelength; i++)
     {
         temp_data[i] = htons(temp_data[i]);
@@ -629,7 +629,7 @@ int WritePrivateBacnetToModbusCharData(uint32_t deviceid, int16_t start_reg, uin
 
 
     if ((writelength == 0) || (writelength > 256))
-        return -4; //长度有误;
+        return -4; //;
 
     bool status = false;
 
@@ -647,14 +647,14 @@ int WritePrivateBacnetToModbusCharData(uint32_t deviceid, int16_t start_reg, uin
     HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
     private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + writelength * 2;
     private_data_chunk.command = WRITE_BACNET_TO_MODBUS_COMMAND;
-    private_data_chunk.start_reg = start_reg; // 测试
+    private_data_chunk.start_reg = start_reg; // 
     private_data_chunk.nlength = writelength;
 
     Set_transfer_length(private_data_chunk.total_length);
     memcpy_s(SendBuffer, PRIVATE_HEAD_LENGTH, &private_data_chunk, PRIVATE_HEAD_LENGTH);
 
     memcpy(temp_data, data_in, writelength * 2 );
-    //电脑和设备大小端不一致，这里以设备为准. 但是这里给ESP32 烧写 不需要反转
+    //. ESP32  
     //for (int i = 0; i < writelength; i++)
     //{
     //    temp_data[i] = htons(temp_data[i]);

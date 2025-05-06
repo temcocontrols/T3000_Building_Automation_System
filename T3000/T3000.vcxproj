@@ -452,7 +452,7 @@
     <None Include="res\MonitorData.mdb" />
     <None Include="res\monitor_.bin" />
     <None Include="res\MUp.bmp" />
-    <None Include="C:\Documents and Settings\lee\桌面\NWT3000.ico" />
+    <None Include="C:\Documents and Settings\lee\NWT3000.ico" />
     <None Include="res\OK.ico" />
     <None Include="res\PIDBUTTON.bmp" />
     <None Include="res\Refresh.ico" />
@@ -463,7 +463,7 @@
     <None Include="res\Schedule0607.bmp" />
     <None Include="res\Select.ico" />
     <None Include="res\serialnum.ico" />
-    <None Include="C:\Documents and Settings\lee\桌面\serialnum.ico" />
+    <None Include="C:\Documents and Settings\lee\serialnum.ico" />
     <None Include="res\switch_off.ico" />
     <None Include="res\switch_on.ico" />
     <None Include="res\T3000.db" />

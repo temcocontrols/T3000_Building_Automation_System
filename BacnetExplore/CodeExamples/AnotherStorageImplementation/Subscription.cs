@@ -82,7 +82,7 @@ namespace AnotherStorageImplementation
             {
                 for (int i = 0; i < entry.Value.Count; i++)
                 {
-                    // Modif F. Chaxel <0 modifié == 0
+                    // Modif F. Chaxel <0 modifi == 0
                     if (entry.Value[i].GetTimeRemaining() < 0)
                     {
                         entry.Value.RemoveAt(i);

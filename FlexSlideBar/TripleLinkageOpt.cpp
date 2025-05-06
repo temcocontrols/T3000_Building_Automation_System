@@ -187,7 +187,7 @@ void CTripleLinkageOpt::MovePage(const CPoint& pt)
 
 }
 
-// 专门为两个从属thumb movepage使用
+// thumb movepage
 void CTripleLinkageOpt::MovePageForOtherThumb(const CPoint& pt)
 {
 
@@ -272,7 +272,7 @@ void CTripleLinkageOpt::MovePageForOtherThumb(const CPoint& pt)
 }
 
 
-// 专门为主Thumb使用
+// Thumb
 void CTripleLinkageOpt::MovePageForMainThumb(const CPoint& pt)
 {
 	CFSBThumb* pThumb = m_szThumb[m_nFocusThumb];
@@ -364,7 +364,7 @@ void CTripleLinkageOpt::MovePageForMainThumb(const CPoint& pt)
 	}
 	else
 	{
-		// 交换
+		// 
 		int nTemp = nltPos;
 		nltPos = nbrPos;
 		nbrPos = nTemp;
@@ -374,7 +374,7 @@ void CTripleLinkageOpt::MovePageForMainThumb(const CPoint& pt)
 		//
 		if (pt.y > ptPos.y)  // move down
 		{
-			nNewbrPos = nbrPos-m_nLengthOfPage;// 向下是减 
+			nNewbrPos = nbrPos-m_nLengthOfPage;//  
 
 			if(nNewbrPos <= nMin)
 			{				
@@ -455,7 +455,7 @@ void CTripleLinkageOpt::OnLButtonDown(const CPoint& point)
 	{	
 		m_nFocusThumb = nRet;
 
- 		if( m_nFocusThumb == FOCUS_ON_TOPLEFT || m_nFocusThumb == FOCUS_ON_RIGHTBTM) //single button模式 两个从属的不能拖动
+ 		if( m_nFocusThumb == FOCUS_ON_TOPLEFT || m_nFocusThumb == FOCUS_ON_RIGHTBTM) //single button 
  		{
  			return;
  		}		
@@ -465,7 +465,7 @@ void CTripleLinkageOpt::OnLButtonDown(const CPoint& point)
 	else
 	{
 	   
-		//if( m_nFocusThumb == FOCUS_ON_TOPLEFT || m_nFocusThumb == FOCUS_ON_RIGHTBTM) //single button模式 两个从属的不能拖动
+		//if( m_nFocusThumb == FOCUS_ON_TOPLEFT || m_nFocusThumb == FOCUS_ON_RIGHTBTM) //single button 
 		//{
 		//	return;
 		//}
@@ -476,7 +476,7 @@ void CTripleLinkageOpt::OnLButtonDown(const CPoint& point)
 }
 
 
-// 下一步，大的数值
+// 
 void CTripleLinkageOpt::MoveNextStep()
 {
 	/*
@@ -505,7 +505,7 @@ void CTripleLinkageOpt::MoveNextStep()
 }
 
 
-// 上一步，小的数值
+// 
 void CTripleLinkageOpt::MovePreStep()
 {
 	/*
@@ -580,7 +580,7 @@ void CTripleLinkageOpt::OnMouseMove(const CPoint& point)
 	
 }
 
-// 专门为两个从属thumb movepage使用
+// thumb movepage
 void CTripleLinkageOpt::MouseMoveForMainThumb(const CPoint& point)
 {
 
@@ -640,7 +640,7 @@ void CTripleLinkageOpt::MouseMoveForMainThumb(const CPoint& point)
 		{	
 			nPixMin = m_szTicMarks->at(nMax);
 			nPixMax = m_szTicMarks->at(nMin);
-			// 交换
+			// 
 			CPoint ptTemp = ptltPos;
 			ptltPos = ptrbPos;
 			ptrbPos = ptTemp;
@@ -655,7 +655,7 @@ void CTripleLinkageOpt::MouseMoveForMainThumb(const CPoint& point)
 			ptrbNewPS.y = ptrbPos.y + point.y-ptPos.y; 
 			ptNewPS.y = point.y;
 
-			if(ptrbNewPS.y >= nPixMax)   // 超过极大值
+			if(ptrbNewPS.y >= nPixMax)   // 
 			{
 				ptrbNewPS.y = nPixMax;
 				int nDist = abs(ptrbNewPS.y-ptrbPos.y);
@@ -682,7 +682,7 @@ void CTripleLinkageOpt::MouseMoveForMainThumb(const CPoint& point)
 
 
 
-// 专门为主Thumb使用
+// Thumb
 void CTripleLinkageOpt::MouseMoveForOtherThumb(const CPoint& point)
 {
 	CFSBThumb* pThumb = m_szThumb[m_nFocusThumb];
@@ -842,7 +842,7 @@ void CTripleLinkageOpt::OnLButtonUp(const CPoint& point)
 
 
 
-// 专门为两个从属thumb movepage使用
+// thumb movepage
 void CTripleLinkageOpt::LBtnUpForOtherThumb(const CPoint& point)
 {
 	if(m_bStartDraging)// begin to drag?
@@ -871,7 +871,7 @@ void CTripleLinkageOpt::LBtnUpForOtherThumb(const CPoint& point)
 	}	
 }
 
-// 专门为主Thumb使用
+// Thumb
 void CTripleLinkageOpt::LBtnUpForMainThumb(const CPoint& point)
 {
 	if(m_bStartDraging)// begin to drag?
@@ -1018,7 +1018,7 @@ int CTripleLinkageOpt::GetFocusThumb(const CPoint& point)
 }
 
 
-// 返回的都是可以到达的位置，而不是不能到达的位置（即重合位置）。
+// 
 void CTripleLinkageOpt::GetThumbRange(int nIndex, int& nMin, int& nMax)
 {			
 	if (m_nFocusThumb == 0)

@@ -219,10 +219,10 @@ void CTempHumSensorForm::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
 #if 1	
-	//设置排/行数量
+	///
 	m_sensor_table.put_Cols(3);
-	m_sensor_table.put_Rows(11);//包括标题栏
-	//显示横标题
+	m_sensor_table.put_Rows(11);//
+	//
 	m_sensor_table.put_TextMatrix(0,0,_T(""));
 	m_sensor_table.put_TextMatrix(0,1,_T("Frequency"));
 	m_sensor_table.put_TextMatrix(0,2,_T("RH"));
@@ -236,7 +236,7 @@ void CTempHumSensorForm::OnInitialUpdate()
 
 
 
-	//显示纵标题
+	//
 	CString str;
 	for(int i=1;i<11;i++)
 	{
@@ -1118,7 +1118,7 @@ void CTempHumSensorForm::OnBnClickedUserTableDel()
 		int RegAddress;
 		//int row =m_sensor_calibrate_table.get_Rows();
 		int row =m_user_list.GetItemCount();
-		row -= 1;//末尾行
+		row -= 1;//
 		RegAddress=456+2*row;
 		int ret=write_one(g_tstat_id,RegAddress,0);
 
@@ -1215,7 +1215,7 @@ LRESULT CTempHumSensorForm::Fresh_User_Item(WPARAM wParam,LPARAM lParam){
 
 void CTempHumSensorForm::OnBnClickedCheckDefault()
 {
-	if (product_register_value[454] == 0)//说明是选中状态
+	if (product_register_value[454] == 0)//
 	{
 
 		ShowChecks();
@@ -1240,7 +1240,7 @@ void CTempHumSensorForm::OnBnClickedCheckDefault()
 
 void CTempHumSensorForm::OnBnClickedCheckUser()
 {
-	if (product_register_value[454] == 1)//说明是选中状态
+	if (product_register_value[454] == 1)//
 	{
 
 		ShowChecks();

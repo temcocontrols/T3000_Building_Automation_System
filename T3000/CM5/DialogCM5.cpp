@@ -208,7 +208,7 @@ void CDialogCM5::Fresh()
 Comment by:Alex
 Date:2013/04/10
 Purpose:
-重写 if 0 掉
+ if 0 
 */
 SetTimer(DATATIME_TIMER,1000,NULL);
 
@@ -443,27 +443,27 @@ else if (m_type==3)//rows==10
 }
 return ID;
 }
-//获取一个第八位数据，s:system:进制，n;num:这个数是几位的，第N位是1还是0
+//s:system:n;num:N10
 //n>=N
 BOOL CDialogCM5::Get_Data_Bit(UINT Data,int n,int N)
 {
-  //Data=Data&0FFx;//去掉高八位数据
-  //下面是算幂 2的N
-  //最大的num位数的数是？ 2~num-1
+  //Data=Data&0FFx;//
+  // 2N
+  //num 2~num-1
  // AfxMessageBox(_T("OK"));
   UINT num=1;
   for (int i=1;i<=n;i++)
   {
     num=num*2;
   }
-  num=num-1;//最大的num位数
-  Data=Data&num;//取得这个n位数是什么？
+  num=num-1;//num
+  Data=Data&num;//n
   num=1;
   for (int i=1;i<N;i++)
   {
 	  num=num*2;
   }
-  if (num==(Data&num))//说明是1 
+  if (num==(Data&num))//1 
   {
    return TRUE;
   } 
@@ -521,10 +521,10 @@ void CDialogCM5::OnEnKillfocusEditInput()
 	/*CommentBy Alex
 	2013/04/12
 	Purpose:
-	写入寄存器中
-	步骤：
-	1.判断输入的字符数是不是大于14个 有七个寄存器
-	2.使用多写写入对应的寄存器中
+	
+	
+	1.14 
+	2.
 	*/
 	
 	CString strText;
@@ -592,7 +592,7 @@ void CDialogCM5::OnEnKillfocusEditInput()
 	 int lRow = m_DIGrid.get_RowSel();	
 	 int lCol = m_DIGrid.get_ColSel(); 
 
- 		//一般的空的或者和输入之前相等的返回
+ 		//
 	if ((strText.GetLength()<=0)||strText.CompareNoCase(m_tempGridString)==0)
 	{
 		return;
@@ -1251,8 +1251,8 @@ void CDialogCM5::OnInitialUpdate()
     m_progressctrl.ShowWindow(FALSE);
 	CString index;
 
-	//============================================================================================列表框设置（界面中间部份列表框）
-	m_Output_GridCM5_.put_Rows(9); //行
+	//============================================================================================
+	m_Output_GridCM5_.put_Rows(9); //
 	m_Output_GridCM5_.put_Cols(16);
 	//set row high
 	m_Output_GridCM5_.put_WordWrap(TRUE);
@@ -1262,7 +1262,7 @@ void CDialogCM5::OnInitialUpdate()
 	{
 		m_Output_GridCM5_.put_ColAlignment(n,4);
 	}
-	//设置列宽
+	//
 	m_Output_GridCM5_.put_ColWidth(0,400);
 	m_Output_GridCM5_.put_ColWidth(1,800);
 	m_Output_GridCM5_.put_ColWidth(2,1200);
@@ -1295,7 +1295,7 @@ void CDialogCM5::OnInitialUpdate()
 	m_Output_GridCM5_.put_TextMatrix(0,13,_T("Night Heating\n DB"));
 	m_Output_GridCM5_.put_TextMatrix(0,14,_T("Night Cooling\n DB"));
 	m_Output_GridCM5_.put_TextMatrix(0,15,_T("Override Value"));
-	//彩色显示
+	//
 	for(int i=1;i<9;i++)
 	{
 
@@ -1321,17 +1321,17 @@ void CDialogCM5::OnInitialUpdate()
 		}
 	}
 
-	//============================================================================================================界面Output部份列表框
+	//============================================================================================================Output
 
-	//设置行/列数量
+	///
 	m_msflexgridoutput.put_Rows(11);
 	m_msflexgridoutput.put_Cols(5);
-	//设置列宽	
+	//	
 	m_msflexgridoutput.put_ColWidth(0,400);
 	m_msflexgridoutput.put_ColWidth(1,1500);
 	m_msflexgridoutput.put_ColWidth(4,700);
 
-	//显示横标题
+	//
 	m_msflexgridoutput.put_TextMatrix(0,1,_T("Name"));
 	m_msflexgridoutput.put_TextMatrix(0,2,_T("Value"));
 	m_msflexgridoutput.put_TextMatrix(0,3,_T("Auto/Man"));
@@ -1340,18 +1340,18 @@ void CDialogCM5::OnInitialUpdate()
 
 
 
-	//居中显示
+	//
 	for (int col=0;col<5;col++)
 	{ 
 		m_msflexgridoutput.put_ColAlignment(col,4);
 	}
 
-	//彩色显示
-	for(int i=1;i<11;i++)		//排数量
+	//
+	for(int i=1;i<11;i++)		//
 	{
 		index.Format(_T("%d"),i);
 		m_msflexgridoutput.put_TextMatrix(i,0,index);
-		for(int k=0;k<5;k++)	//列数量
+		for(int k=0;k<5;k++)	//
 		{
 			if (i%2==1)
 			{
@@ -1369,13 +1369,13 @@ void CDialogCM5::OnInitialUpdate()
 	}
 
 	//------------------sub tstat--------------------------------
-	//设置排/行数量
+	///
 	m_subtstatgrid.put_Cols(4);
 	m_subtstatgrid.put_Rows(9);
 	m_subtstatgrid.put_ColWidth(0,400);
 	m_subtstatgrid.put_ColWidth(1,1500);
 	 
-	//显示横标题
+	//
 	m_subtstatgrid.put_TextMatrix(0,1,_T("Name"));
 	m_subtstatgrid.put_TextMatrix(0,2,_T("Type"));
 	m_subtstatgrid.put_TextMatrix(0,3,_T("Value"));
@@ -1383,7 +1383,7 @@ void CDialogCM5::OnInitialUpdate()
 	{
 		index.Format(_T("%d"),i);
 		m_subtstatgrid.put_TextMatrix(i,0,index);
-		for(int k=0;k<4;k++)	//列数量
+		for(int k=0;k<4;k++)	//
 		{
 			if (i%2==1)
 			{
@@ -1399,35 +1399,35 @@ void CDialogCM5::OnInitialUpdate()
 			}
 		}
 	}
-	//======================================>>DI<<===============界面Input部份列表框
+	//======================================>>DI<<===============Input
 
-	//设置排/行数量
+	///
 	m_msflexgrid_input.put_Cols(4);
 	m_msflexgrid_input.put_Rows(9);
-	//显示横标题
+	//
 	m_msflexgrid_input.put_TextMatrix(0,1,_T("Name"));
 	m_msflexgrid_input.put_TextMatrix(0,2,_T("Value"));
 	m_msflexgrid_input.put_TextMatrix(0,3,_T("Auto/Man"));
 	//m_msflexgrid_input.put_TextMatrix(0,4,_T("Range"));
 	//m_msflexgrid_input.put_TextMatrix(0,4,_T("Enable"));
-	//设置列宽	
+	//	
 	m_msflexgrid_input.put_ColWidth(0,400);
 	m_msflexgrid_input.put_ColWidth(1,1500);
 	//m_msflexgrid_input.put_ColWidth(4,700);
 
-	//居中显示
+	//
 	for (int col=0;col<4;col++)
 	{ 
 		m_msflexgrid_input.put_ColAlignment(col,4);
 	}
 
-	//彩色显示
+	//
 	//CString index;
-	for(int i=1;i<9;i++)		//排数量
+	for(int i=1;i<9;i++)		//
 	{
 		index.Format(_T("%d"),i);
 		m_msflexgrid_input.put_TextMatrix(i,0,index);
-		for(int k=0;k<4;k++)	//列数量
+		for(int k=0;k<4;k++)	//
 		{
 			if (i%2==1)
 			{
@@ -1451,7 +1451,7 @@ void CDialogCM5::OnInitialUpdate()
 	m_DIGrid.put_ColWidth(0,400);
 	m_DIGrid.put_ColWidth(1,1500);
 	m_DIGrid.put_ColWidth(7,700);
-	//显示横标题
+	//
 	m_DIGrid.put_TextMatrix(0,1,_T("Name"));
 	m_DIGrid.put_TextMatrix(0,2,_T("Value"));
 	m_DIGrid.put_TextMatrix(0,3,_T("Auto/Man"));
@@ -1460,11 +1460,11 @@ void CDialogCM5::OnInitialUpdate()
 	m_DIGrid.put_TextMatrix(0,6,_T("Calibration"));
 	m_DIGrid.put_TextMatrix(0,7,_T("Enable"));
 
-	for(int i=1;i<11;i++)		//排数量
+	for(int i=1;i<11;i++)		//
 	{
 		index.Format(_T("%d"),i);
 		m_DIGrid.put_TextMatrix(i,0,index);
-		for(int k=0;k<8;k++)	//列数量
+		for(int k=0;k<8;k++)	//
 		{
 			if (i%2==1)
 			{
@@ -1499,8 +1499,8 @@ BOOL CDialogCM5::PreTranslateMessage(MSG* pMsg)
 void CDialogCM5::UpdateGrid(){
 	CString index;
 
-	//============================================================================================列表框设置（界面中间部份列表框）
-	m_Output_GridCM5_.put_Rows(9); //行
+	//============================================================================================
+	m_Output_GridCM5_.put_Rows(9); //
 	m_Output_GridCM5_.put_Cols(16);
 	//set row high
 	m_Output_GridCM5_.put_WordWrap(TRUE);
@@ -1510,7 +1510,7 @@ void CDialogCM5::UpdateGrid(){
 	{
 		m_Output_GridCM5_.put_ColAlignment(n,4);
 	}
-	//设置列宽
+	//
 	m_Output_GridCM5_.put_ColWidth(0,400);
 	m_Output_GridCM5_.put_ColWidth(1,800);
 	m_Output_GridCM5_.put_ColWidth(2,1200);
@@ -1543,7 +1543,7 @@ void CDialogCM5::UpdateGrid(){
 	m_Output_GridCM5_.put_TextMatrix(0,13,_T("Night Heating\n DB"));
 	m_Output_GridCM5_.put_TextMatrix(0,14,_T("Night Cooling\n DB"));
 	m_Output_GridCM5_.put_TextMatrix(0,15,_T("Override Value"));
-	//彩色显示
+	//
 	for(int i=1;i<9;i++)
 	{
 
@@ -1599,7 +1599,7 @@ void CDialogCM5::ShowDialogData()
 		Purpose:
 
 		*/
-		//m_strDateCM5.Format(_T("%02d%02d-%02d-%02d"),20,multi_register_value_tcp[201],multi_register_value_tcp[202],multi_register_value_tcp[204]);//临时演示
+		//m_strDateCM5.Format(_T("%02d%02d-%02d-%02d"),20,multi_register_value_tcp[201],multi_register_value_tcp[202],multi_register_value_tcp[204]);//
 		//m_strTime.Format(_T("%02d:%02d:%02d"),multi_register_value_tcp[205],multi_register_value_tcp[206],multi_register_value_tcp[207]);
 		m_IDaddressCM5=multi_register_value_tcp[6];	
 
@@ -1645,7 +1645,7 @@ void CDialogCM5::ShowDialogData()
 	Comment by:Alex
 	Date:2013/04/10
 	Purpose:
-	显示Tstat的状态统计
+	Tstat
 	*/
 	m_result.Format(_T("%d"),multi_register_value_tcp[29]);
 	m_coating.Format(_T("%d"),multi_register_value_tcp[26]);
@@ -1681,7 +1681,7 @@ void CDialogCM5::ShowDialogData()
 	UpdateData(FALSE);
 	Show_DisplayEdit(multi_register_value_tcp[7302]);
 
-	//==========================================显示界面中间列表框中的数据==============================================
+	//========================================================================================
 
 	//	    5671 to 5678	8	cooling setpoint value of Sub Tstats(register380)
 	//		5679 to 5686	8	heating setpoint value of Sub Tstats(register136)
@@ -1699,16 +1699,16 @@ void CDialogCM5::ShowDialogData()
 	{
 
 	    m_subetwork.m_Occupied=(multi_register_value_tcp[5670]&(unsigned short)pow((double)2,i));//1,2,4,8,16,32,64,128
-		m_subetwork.m_coolingSet.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i]/10);
-		m_subetwork.m_heatingSet.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+8]);
-		m_subetwork.m_setpoint.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+16]); 
-		m_subetwork.m_roomTemper.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+24]/10); 
+		m_subetwork.m_coolingSet.Format(_T("%.1fC"),(float)multi_register_value_tcp[5671+i]/10);
+		m_subetwork.m_heatingSet.Format(_T("%.1fC"),(float)multi_register_value_tcp[5671+i+8]);
+		m_subetwork.m_setpoint.Format(_T("%.1fC"),(float)multi_register_value_tcp[5671+i+16]); 
+		m_subetwork.m_roomTemper.Format(_T("%.1fC"),(float)multi_register_value_tcp[5671+i+24]/10); 
 		m_subetwork.m_mode = multi_register_value_tcp[5671+i+32];     
 		m_subetwork.m_outputState.Format(_T("%.1f"),(float)multi_register_value_tcp[5671+i+40]/10); 
-		m_subetwork.m_nightHeatingDB.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+48]);
-		m_subetwork.m_nightCoolingDB.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+56]); 
-		m_subetwork.m_nightHeating.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+64]);
-		m_subetwork.m_nightCooling.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+72]); 
+		m_subetwork.m_nightHeatingDB.Format(_T("%.1fC"),(float)multi_register_value_tcp[5671+i+48]);
+		m_subetwork.m_nightCoolingDB.Format(_T("%.1fC"),(float)multi_register_value_tcp[5671+i+56]); 
+		m_subetwork.m_nightHeating.Format(_T("%.1fC"),(float)multi_register_value_tcp[5671+i+64]);
+		m_subetwork.m_nightCooling.Format(_T("%.1fC"),(float)multi_register_value_tcp[5671+i+72]); 
 		m_subetwork.m_tstatProduct = multi_register_value_tcp[5671+i+80]; 
 		m_subetwork.m_overridevalue.Format(_T("%d"),multi_register_value_tcp[5671+i+88]);
 		m_subetwork.m_SerialNumber.Format(_T("%d"),multi_register_value_tcp[5671+i+96]+multi_register_value_tcp[5671+i+96+1]*256+multi_register_value_tcp[5671+i+96+2]*256*256+multi_register_value_tcp[5671+i+96+3]*256*256*256);
@@ -1739,7 +1739,7 @@ void CDialogCM5::ShowDialogData()
 		if(ret == 0)
 			continue;
 		m_num.Format(_T("%d"),i);
-		m_Output_GridCM5_.put_TextMatrix(i,0,m_num);//第一列：序号
+		m_Output_GridCM5_.put_TextMatrix(i,0,m_num);//
 
 		switch(_subnetwork.at(i-1).m_tstatProduct)
 		{
@@ -1843,7 +1843,7 @@ void CDialogCM5::ShowDialogData()
 	UINT reg184=multi_register_value_tcp[184];
 	UINT reg188=multi_register_value_tcp[188];
 	UINT reg191=multi_register_value_tcp[191];
-	for(int i=1;i<11;i++)		//排数量 output 
+	for(int i=1;i<11;i++)		// output 
 	{
 		//index.Format(_T("%d"),i);_T("12345671234567")
 		m_msflexgridoutput.put_TextMatrix(i,1,GetTextReg(Get_RegID(i),FALSE));
@@ -1883,7 +1883,7 @@ void CDialogCM5::ShowDialogData()
 	m_type=1;
 //	int type;
 
-	for(int i=1;i<9;i++)		//排数量 Sub Tstat
+	for(int i=1;i<9;i++)		// Sub Tstat
 	{
 		//index.Format(_T("%d"),i);_T("12345671234567")
 		m_subtstatgrid.put_TextMatrix(i,1,GetTextReg(Get_RegID(i),FALSE));
@@ -1925,10 +1925,10 @@ void CDialogCM5::ShowDialogData()
 	UINT reg183=multi_register_value_tcp[183];
 	UINT reg190=multi_register_value_tcp[190];
 	
-	for(int i=1;i<9;i++)		//排数量,input_DI
+	for(int i=1;i<9;i++)		//,input_DI
 	{
 		m_msflexgrid_input.put_TextMatrix(i,1,GetTextReg(Get_RegID(i),FALSE));
-		//m_msflexgrid_input.put_TextMatrix(i,1,_T("12345671234567"));//FALSE-不需要读取对应寄存器中的值，使用内存数组中的数据
+		//m_msflexgrid_input.put_TextMatrix(i,1,_T("12345671234567"));//FALSE-
 		//183 Value
 		//190	1	digital input auto or manual feature  DI-A/M
 		bit=Get_Data_Bit(reg183,8,i);
@@ -1956,7 +1956,7 @@ void CDialogCM5::ShowDialogData()
 	UINT reg189=multi_register_value_tcp[189];
 	UINT reg192=multi_register_value_tcp[192];
 	
-	for(int i=1;i<11;i++)		//排数量,input AI
+	for(int i=1;i<11;i++)		//,input AI
 	{
 	/*
 	
@@ -1971,11 +1971,11 @@ void CDialogCM5::ShowDialogData()
 
 	*/
 		m_DIGrid.put_TextMatrix(i,1,GetTextReg(Get_RegID(i),FALSE));
-		//m_msflexgrid_input.put_TextMatrix(i,1,_T("12345671234567"));//FALSE-不需要读取对应寄存器中的值，使用内存数组中的数据
+		//m_msflexgrid_input.put_TextMatrix(i,1,_T("12345671234567"));//FALSE-
 	    strTemp.Format(_T("%d"),multi_register_value_tcp[134+i-1]);//Value
 		m_DIGrid.put_TextMatrix(i,2,strTemp);
 
-		 //strTemp.Format(_T("%0.1f°C"),multi_register_value_tcp[144+i-1]/10);//Range
+		 //strTemp.Format(_T("%0.1fC"),multi_register_value_tcp[144+i-1]/10);//Range
 		 strTemp=AI_Range[multi_register_value_tcp[143+i]];
 		 m_DIGrid.put_TextMatrix(i,4,strTemp);
  		  
@@ -2033,19 +2033,19 @@ void CDialogCM5::ClickInputMsflexgrid()
 	/*m_switch = 1;
 	m_Input_Output=TRUE;
 	// TODO: Add your message handler code here
-	//get_RowSel();这是获取总的行数
+	//get_RowSel();
 	long row = m_msflexgrid_input.get_RowSel();
 	long col = m_msflexgrid_input.get_ColSel();
 	if ((col==2&&row>10)||col==3)
 	{
-		if ((m_cellcol == 2&&m_cellrow>10)||m_cellcol == 3)//原来是否有标志背景单元格
+		if ((m_cellcol == 2&&m_cellrow>10)||m_cellcol == 3)//
 		{
 			if (m_cellrow%2 == 1)
 			{
-				m_msflexgrid_input.put_Row(m_cellrow);m_msflexgrid_input.put_Col(m_cellcol);m_msflexgrid_input.put_CellBackColor(RGB(255,255,255));//单数行
+				m_msflexgrid_input.put_Row(m_cellrow);m_msflexgrid_input.put_Col(m_cellcol);m_msflexgrid_input.put_CellBackColor(RGB(255,255,255));//
 			}else
 			{
-				m_msflexgrid_input.put_Row(m_cellrow);m_msflexgrid_input.put_Col(m_cellcol);m_msflexgrid_input.put_CellBackColor(COLOR_CELL);//双数行
+				m_msflexgrid_input.put_Row(m_cellrow);m_msflexgrid_input.put_Col(m_cellcol);m_msflexgrid_input.put_CellBackColor(COLOR_CELL);//
 			}
 		}
 
@@ -2068,7 +2068,7 @@ void CDialogCM5::ClickInputMsflexgrid()
 		}
 		if (col == 4)
 		{
-			m_msflexgrid_input.put_Row(row);m_msflexgrid_input.put_Col(col);m_msflexgrid_input.put_CellBackColor(FLEXGRID_CELL_GRAY_COLOR);//第5列灰色显示
+			m_msflexgrid_input.put_Row(row);m_msflexgrid_input.put_Col(col);m_msflexgrid_input.put_CellBackColor(FLEXGRID_CELL_GRAY_COLOR);//5
 
 		}else if (row%2 == 1)
 		{
@@ -2083,7 +2083,7 @@ void CDialogCM5::ClickInputMsflexgrid()
 	m_cellrow = row;
 	m_cellcol = col;		*/															 
 
-	//使用edition控件形式显示
+	//edition
 
 	long lRow,lCol;
 	lRow = m_msflexgrid_input.get_RowSel();
@@ -2118,7 +2118,7 @@ void CDialogCM5::ClickInputMsflexgrid()
 				m_edit_input.ShowWindow(SW_SHOW);	
 				m_edit_input.SetWindowText(strValue);	
 				m_edit_input.SetFocus();
-				m_edit_input.SetCapture();//使随后的鼠标输入都被发送到这个CWnd 
+				m_edit_input.SetCapture();//CWnd 
 				int nLenth=strValue.GetLength();	
 				m_edit_input.SetSel(nLenth,nLenth); 
 
@@ -2174,7 +2174,7 @@ void CDialogCM5::ClickInputMsflexgrid2()
 				m_edit_input.ShowWindow(SW_SHOW);	
 				m_edit_input.SetWindowText(strValue);	
 				m_edit_input.SetFocus();
-				m_edit_input.SetCapture();//使随后的鼠标输入都被发送到这个CWnd 
+				m_edit_input.SetCapture();//CWnd 
 				int nLenth=strValue.GetLength();	
 				m_edit_input.SetSel(nLenth,nLenth); 
 
@@ -2188,11 +2188,11 @@ void CDialogCM5::ClickInputMsflexgrid2()
 					m_combobox2_input.AddString(AI_Range[i]);
 				}
 
-				m_combobox2_input.MoveWindow(rcCell); //移动到选中格的位置，覆盖
+				m_combobox2_input.MoveWindow(rcCell); //
 				m_combobox2_input.ShowWindow(SW_SHOW);
 				m_combobox2_input.BringWindowToTop();
 				//m_valueCombx.SelectString(-1,strValue);
-				m_combobox2_input.SetFocus(); //获取焦点
+				m_combobox2_input.SetFocus(); //
 				m_combobox2_input.SetWindowText(strValue);
 			}
 				
@@ -2217,8 +2217,8 @@ void CDialogCM5::DblClickInputMsflexgrid()
 	m_combobox2_input.ShowWindow(SW_HIDE);
 	UpdateData(FALSE);
 
-	long lRow = m_msflexgrid_input.get_RowSel();//获取点击的行号	
-	long lCol = m_msflexgrid_input.get_ColSel(); //获取点击的列号
+	long lRow = m_msflexgrid_input.get_RowSel();//	
+	long lCol = m_msflexgrid_input.get_ColSel(); //
 
 	if (lCol == 2)
 	{
@@ -2239,9 +2239,9 @@ void CDialogCM5::DblClickInputMsflexgrid()
 
 			
 
-				//参数写入设备
-				//1-代表ON            0-代表OFF
-				//1-代表手动Manual    0-代表自动Auto
+				//
+				//1-ON            0-OFF
+				//1-Manual    0-Auto
 
 			//183 Value
 			//190	1	digital input auto or manual feature  DI-A/M
@@ -2347,7 +2347,7 @@ void CDialogCM5::DblClickInputMsflexgrid()
 	/*
 	Date:2013/04/24
 	Purpose:
-	  单击output
+	  output
 	*/
 void CDialogCM5::ClickOutputMsflexgrid()
 {
@@ -2368,12 +2368,12 @@ void CDialogCM5::ClickOutputMsflexgrid()
 	//		{
 	//			m_msflexgridoutput.put_Row(m_cellrowout);
 	//			m_msflexgridoutput.put_Col(m_cellcolout);
-	//			m_msflexgridoutput.put_CellBackColor(RGB(255,255,255));//单数行
+	//			m_msflexgridoutput.put_CellBackColor(RGB(255,255,255));//
 	//		}else
 	//		{
 	//			m_msflexgridoutput.put_Row(m_cellrowout);
 	//			m_msflexgridoutput.put_Col(m_cellcolout);
-	//			m_msflexgridoutput.put_CellBackColor(COLOR_CELL);//双数行
+	//			m_msflexgridoutput.put_CellBackColor(COLOR_CELL);//
 	//		}
 
 
@@ -2398,7 +2398,7 @@ void CDialogCM5::ClickOutputMsflexgrid()
 	//	}
 	//	if (col == 4)
 	//	{
-	//		m_msflexgridoutput.put_Row(row);m_msflexgridoutput.put_Col(col);m_msflexgridoutput.put_CellBackColor(FLEXGRID_CELL_GRAY_COLOR);//第5列灰色显示
+	//		m_msflexgridoutput.put_Row(row);m_msflexgridoutput.put_Col(col);m_msflexgridoutput.put_CellBackColor(FLEXGRID_CELL_GRAY_COLOR);//5
 	//	}else if (row%2 == 1)
 	//	{
 	//		m_msflexgridoutput.put_Row(row);m_msflexgridoutput.put_Col(col);m_msflexgridoutput.put_CellBackColor(RGB(255,255,255));
@@ -2414,7 +2414,7 @@ void CDialogCM5::ClickOutputMsflexgrid()
 
 
 
-	//使用edition控件形式显示
+	//edition
 
 	long lRow,lCol;
 	lRow = m_msflexgridoutput.get_RowSel();
@@ -2464,7 +2464,7 @@ void CDialogCM5::ClickOutputMsflexgrid()
 	/*
 	Date:2013/04/24
 	Purpose:
-	单击sub Tstat
+	sub Tstat
 	*/
 void CDialogCM5::ClickSubTstatgrid()
 {
@@ -2473,7 +2473,7 @@ void CDialogCM5::ClickSubTstatgrid()
 	UpdateData(FALSE);
 
 	m_type=1;
-	//使用edition控件形式显示
+	//edition
 
 	long lRow,lCol;
 	lRow = m_subtstatgrid.get_RowSel();
@@ -2531,7 +2531,7 @@ void CDialogCM5::ClickSubTstatgrid()
 	/*
 	Date:2013/04/24
 	Purpose:
-	  双击output
+	  output
 	*/
 void CDialogCM5::DblClickOutputMsflexgrid()
 {
@@ -2543,8 +2543,8 @@ void CDialogCM5::DblClickOutputMsflexgrid()
 	m_combobox2_input.ShowWindow(SW_HIDE);
 	UpdateData(FALSE);
 
-	long lRow = m_msflexgridoutput.get_RowSel();//获取点击的行号	
-	long lCol = m_msflexgridoutput.get_ColSel(); //获取点击的列号
+	long lRow = m_msflexgridoutput.get_RowSel();//	
+	long lCol = m_msflexgridoutput.get_ColSel(); //
 
 	if (lCol == 2)
 	{
@@ -2561,9 +2561,9 @@ void CDialogCM5::DblClickOutputMsflexgrid()
 			CString m_stron = _T("OFF");
 			int ret = m_stron.Collate(strValue);
 
-				//参数写入设备
-				//1-代表ON            0-代表OFF
-				//1-代表手动Manual    0-代表自动Auto
+				//
+				//1-ON            0-OFF
+				//1-Manual    0-Auto
 				//174	1	Digital output1 - 8, valves/pumps
 
 				int m_lRow= lRow;
@@ -2578,7 +2578,7 @@ void CDialogCM5::DblClickOutputMsflexgrid()
 				{
 
 					temp=multi_register_value_tcp[184];
-					temp=temp+num;//对应的位0->1
+					temp=temp+num;//0->1
 
 					int ww = write_one(g_tstat_id,184,temp);
 					//TRACE(_T("No:%d = write_one(on/off) is %d\n"),lRow,ww);
@@ -2596,7 +2596,7 @@ void CDialogCM5::DblClickOutputMsflexgrid()
 				{
 
 					temp=multi_register_value_tcp[184];
-					temp=temp-num;//对应的位1->0
+					temp=temp-num;//1->0
 
 					int ww = write_one(g_tstat_id,184,temp,1);
 					//TRACE(_T("No:%d = write_one(on/off) is %d\n"),lRow,temp);
@@ -2676,9 +2676,9 @@ void CDialogCM5::DblClickOutputMsflexgrid()
 		CString m_stron = _T("OFF");
 		int ret = m_stron.Collate(strValue);
 
-		//参数写入设备
-		//1-代表ON            0-代表OFF
-		//1-代表手动Manual    0-代表自动Auto
+		//
+		//1-ON            0-OFF
+		//1-Manual    0-Auto
 		//174	1	Digital output1 - 8, valves/pumps
 
 		int m_lRow= lRow;
@@ -2693,7 +2693,7 @@ void CDialogCM5::DblClickOutputMsflexgrid()
 		{
 
 			temp=multi_register_value_tcp[188];
-			temp=temp+num;//对应的位0->1
+			temp=temp+num;//0->1
 
 			int ww = write_one(g_tstat_id,188,temp);
 			//TRACE(_T("No:%d = write_one(on/off) is %d\n"),lRow,ww);
@@ -2711,7 +2711,7 @@ void CDialogCM5::DblClickOutputMsflexgrid()
 		{
 
 			temp=multi_register_value_tcp[188];
-			temp=temp-num;//对应的位1->0
+			temp=temp-num;//1->0
 
 			int ww = write_one(g_tstat_id,188,temp,1);
 			//TRACE(_T("No:%d = write_one(on/off) is %d\n"),lRow,temp);
@@ -2731,16 +2731,16 @@ void CDialogCM5::DblClickOutputMsflexgrid()
 	/*
 	Date:2013/04/24
 	Purpose:
-	  双击AI
+	  AI
 	*/
-void CDialogCM5::DblClickInputMsflexgrid2()	  //	   双击AI
+void CDialogCM5::DblClickInputMsflexgrid2()	  //	   AI
 {
 	KillTimer(DATATIME_TIMER);
 	m_combobox2_input.ShowWindow(SW_HIDE);
 	UpdateData(FALSE);
 
-	long lRow = m_DIGrid.get_RowSel();//获取点击的行号	
-	long lCol = m_DIGrid.get_ColSel(); //获取点击的列号
+	long lRow = m_DIGrid.get_RowSel();//	
+	long lCol = m_DIGrid.get_ColSel(); //
 
    if (lCol == 3)
 	{
@@ -2799,9 +2799,9 @@ void CDialogCM5::DblClickInputMsflexgrid2()	  //	   双击AI
 	   CString m_stron = _T("OFF");
 	   int ret = m_stron.Collate(strValue);
 
-	   //参数写入设备
-	   //1-代表ON            0-代表OFF
-	   //1-代表手动Manual    0-代表自动Auto
+	   //
+	   //1-ON            0-OFF
+	   //1-Manual    0-Auto
 	   //174	1	Digital output1 - 8, valves/pumps
 
 	   int m_lRow= lRow;
@@ -2816,7 +2816,7 @@ void CDialogCM5::DblClickInputMsflexgrid2()	  //	   双击AI
 	   {
 
 		   temp=multi_register_value_tcp[189];
-		   temp=temp+num;//对应的位0->1
+		   temp=temp+num;//0->1
 
 		   int ww = write_one(g_tstat_id,189,temp);
 		   //TRACE(_T("No:%d = write_one(on/off) is %d\n"),lRow,ww);
@@ -2834,7 +2834,7 @@ void CDialogCM5::DblClickInputMsflexgrid2()	  //	   双击AI
 	   {
 
 		   temp=multi_register_value_tcp[189];
-		   temp=temp-num;//对应的位1->0
+		   temp=temp-num;//1->0
 
 		   int ww = write_one(g_tstat_id,189,temp,1);
 		   //TRACE(_T("No:%d = write_one(on/off) is %d\n"),lRow,temp);

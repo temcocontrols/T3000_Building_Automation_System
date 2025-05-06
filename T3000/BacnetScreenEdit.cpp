@@ -16,7 +16,7 @@ extern int pointtotext(char *buf,Point_Net *point);
 extern vector <MSG> My_Receive_msg;
 extern CCriticalSection MyCriticalSection;
 Str_label_point m_temp_graphic_label_data[BAC_GRPHIC_LABEL_COUNT];
-int loading_labels;   //用来判断是否正在加载label;
+int loading_labels;   //label;
 static int m_bac_select_label_old = -1;
 static bool click_ret_old = false;
 CBacnetEditLabel * Edit_Label_Window = NULL;
@@ -64,7 +64,7 @@ volatile HANDLE GraphicLable_Mutex = NULL;
 #define XStart 0
 //#define YStart 30
 #define YStart 0
-CRect mynew_rect;	//用来存储 窗体应该有多大;
+CRect mynew_rect;	// ;
 HANDLE h_read_standard_thread = NULL;
 HANDLE h_refresh_group_thread = NULL;
 HANDLE h_read_all_panel_des_thread = NULL;
@@ -83,7 +83,7 @@ extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_t
 
 
 
-//用于刷新 group的结构;
+// group;
 struct _Group_Data
 {
     _Graphic_Value_Info read_info;
@@ -91,7 +91,7 @@ struct _Group_Data
     groupdata           detail_data;
 }Group_Data;
 
-vector <_Group_Data> m_read_group_data; //用于刷新group screen 的结构;
+vector <_Group_Data> m_read_group_data; //group screen ;
 
 
 
@@ -114,7 +114,7 @@ void CBacnetScreenEdit::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetScreenEdit, CDialogEx)
-	ON_MESSAGE(WM_HOTKEY,&CBacnetScreenEdit::OnHotKey)//快捷键消息映射手动加入
+	ON_MESSAGE(WM_HOTKEY,&CBacnetScreenEdit::OnHotKey)//
 	ON_BN_CLICKED(IDC_BUTTON_SCREEN_EDIT_TEST, &CBacnetScreenEdit::OnBnClickedButtonScreenEditTest)
 	ON_WM_PAINT()
 	ON_WM_LBUTTONDOWN()
@@ -192,7 +192,7 @@ LRESULT  CBacnetScreenEdit::Delete_Label_Handle(WPARAM wParam, LPARAM lParam)
 
 int check_lable_type(char* temp_point, int *temp_panel,unsigned char * temp_point_type, int* temp_number)
 {
-	//寻找其他panel 对应的 label
+	//panel  label
 	CString cs_temp_point;
 	MultiByteToWideChar(CP_ACP, 0, (char*)temp_point, (int)strlen((char*)temp_point) + 1,
 		cs_temp_point.GetBuffer(MAX_PATH), MAX_PATH);
@@ -296,7 +296,7 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	tempcs = ispoint_ex(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,sub_panel,Station_NUM,&k);
 	if(tempcs == NULL)
 	{
-		//寻找其他panel 对应的 label
+		//panel  label
 		bool find_lable = false;
 		find_lable = check_lable_type(temp_point, &temp_panel, &temp_point_type, &temp_number);
 #if 0
@@ -340,11 +340,11 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	}
 
 
-	if(temp_number != 0)	//Vector 里面是 0开始 , 这里如果是INPUT1  那值为1  直接减一 存起来 用;
+	if(temp_number != 0)	//Vector  0 , INPUT1  1    ;
 		temp_number = temp_number - 1;
 
     unsigned char temp_1 = temp_point_type & 0x1F;
-    unsigned char type_highest_2bytes = k & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+    unsigned char type_highest_2bytes = k & 0x60;    //   0x60    01100000 2-3bit 
     temp_1 = temp_1 | type_highest_2bytes;
 
 		if(
@@ -366,25 +366,25 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
             temp_number = temp_number + 1;
         }
 
-	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&mynew_rect);	// view;
 
 	int nLeft,nTop;
-	//nLeft = (insert_point.x * 1000)/mynew_rect.Width();	//保存的是相对X和Y
+	//nLeft = (insert_point.x * 1000)/mynew_rect.Width();	//XY
 	//nTop = (insert_point.y * 1000)/(mynew_rect.Height());
 	if(m_full_screen_mode)
 	{
-		nLeft = (insert_point.x * 1000)/m_cxScreen;	//保存的是相对X和Y
+		nLeft = (insert_point.x * 1000)/m_cxScreen;	//XY
 		nTop = (insert_point.y * 1000)/m_cyScreen;
 	}
 	else
 	{
-		nLeft = (insert_point.x * 1000)/m_paint_right_limit;	//保存的是相对X和Y
+		nLeft = (insert_point.x * 1000)/m_paint_right_limit;	//XY
 		nTop = (insert_point.y * 1000)/m_paint_botton_limit;
 	}
 
 
-    //2018 01 10  自己的panel 如果是2  允许出现  1.1.IN1  这样的 点. 
-	//if(temp_panel != Station_NUM)	//目前不支持读其他Minipanel的东西;
+    //2018 01 10  panel 2    1.1.IN1   . 
+	//if(temp_panel != Station_NUM)	//Minipanel;
 	//	return 0;
 	/*if((sub_panel ==0) && (sub_panel >254))
 		return 0;*/
@@ -461,7 +461,7 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 LRESULT  CBacnetScreenEdit::RedrawScreeneditWindow(WPARAM wParam, LPARAM lParam)
 {
 	static CRect temp_rect;	
-	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&mynew_rect);	// view;
 	if(temp_rect!= mynew_rect)
 	{
 		MoveWindow(mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
@@ -500,7 +500,7 @@ BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 
 	if((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN) && (m_bac_select_label>=0))
 	{
-		if(m_bac_label_vector.at(m_bac_select_label).nPoint_type == BAC_GRP)//10 就是GRP
+		if(m_bac_label_vector.at(m_bac_select_label).nPoint_type == BAC_GRP)//10 GRP
 		{
 			screen_list_line = m_bac_label_vector.at(m_bac_select_label).nPoint_number;
 			if(screen_list_line<= BAC_SCREEN_COUNT - 1)
@@ -564,7 +564,7 @@ BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 		else if(m_full_screen_mode)
 		{
 			m_full_screen_mode = false;
-			::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&mynew_rect);	// view;
 			MoveWindow(mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
 			InitGraphic(g_serialNum,g_bac_instance,screen_list_line);
 			return 0;
@@ -577,7 +577,7 @@ BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 		GetCursorPos(&mypoint);
 		if(pMsg->wParam == VK_NEXT)
 		{
-			::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&mynew_rect);	// view;
 
 			MoveWindow(mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
 			//MoveWindow(0,0,m_cxScreen,m_cyScreen,1);
@@ -592,7 +592,7 @@ BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 		}
 		else if(pMsg->wParam == VK_PRIOR)
 		{
-			::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&mynew_rect);	// view;
 
 			MoveWindow(mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
 			//MoveWindow(0,0,m_cxScreen,m_cyScreen,1);
@@ -845,14 +845,14 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 	}
 	return 0;
 }
-//杜帆：很奇葩的事情是  IDI_ICON_DEFAULT_GRAPHIC  利用LoadIcon 加载出来显示的 会很清楚  其他的 用LoadImage 比较清楚;
+//  IDI_ICON_DEFAULT_GRAPHIC  LoadIcon     LoadImage ;
 BOOL CBacnetScreenEdit::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
     loading_labels = false;
 	screen_lock_label  =(bool)GetPrivateProfileInt(_T("Setting"),_T("LockScreenLabel"),0,g_cstring_ini_path);
 
-	//show no pic 如果是0的话就不在显示没有图片.
+	//show no pic 0.
 	screen_show_nopic  =  0;// (bool)GetPrivateProfileInt(_T("Setting"),_T("ScreenLabelShowNoPic"),1,g_cstring_ini_path);
 	
 
@@ -881,14 +881,14 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 //	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 	m_bac_select_label = -1;
 	m_bac_lbuttondown = false;
-	//暂时加入，到时候要删掉的，不在这加，debug;
-	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert键
+	//debug;
+	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert
 	
 	
 	m_cxScreen=GetSystemMetrics(SM_CXSCREEN);
 	m_cyScreen=GetSystemMetrics(SM_CYSCREEN);
 	
-	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&mynew_rect);	// view;
 	
 	MoveWindow(mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
 	//MoveWindow(0,0,m_cxScreen,m_cyScreen,1);
@@ -953,7 +953,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 
 	//LoadBitmap()
 
-#ifdef _DEBUG //debug版本   
+#ifdef _DEBUG //debug   
 	int nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[0],MOD_SHIFT,VK_UP); 
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey SHIFT + UP failure"));  
@@ -973,7 +973,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey SHIFT + M failure"));  
 #endif
-#else //release版本   
+#else //release   
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[0],MOD_SHIFT,VK_UP); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[1],MOD_SHIFT,VK_DOWN); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[2],MOD_SHIFT,VK_LEFT); 
@@ -996,7 +996,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	if(!m_bImgExist)
 	{
 		SetTimer(3,5000,NULL);
-		show_not_exsit_dlg = true; //如果图片不存在，就在开始前几秒显示 不存在的 信息;
+		show_not_exsit_dlg = true; //  ;
 	}
 	control_object_instance = g_bac_instance;
 	Invalidate(1);
@@ -1011,7 +1011,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
     //if(h_read_standard_thread == NULL)
     //    h_read_standard_thread = CreateThread(NULL, NULL, ReadStandardThreadfun, this, NULL, NULL);
 
-    if (My_Receive_msg.size() < 100) //如果队列太长就不要在往队列里面加了 ，防止出现客户各种点进点出;
+    if (My_Receive_msg.size() < 100) // ;
     {
         for (int i = 0;i < (int)m_graphic_refresh_data.size();i++)
         {
@@ -1161,8 +1161,8 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
 					continue;
 
 
-				unsigned int t1 = GetTickCount();//程序段开始前取得系统运行时间(ms);
-				//判断是不是他妈口的产品 
+				unsigned int t1 = GetTickCount();//(ms);
+				// 
 				s_Basic_Setting.reg.object_instance = 0;
 				if (GetPrivateDataSaveSPBlocking(ndevice_id, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
 				{
@@ -1173,7 +1173,7 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
 					Sleep(10);
 					continue;
 				}
-				unsigned int t2 = GetTickCount();//程序段开始前取得系统运行时间(ms);
+				unsigned int t2 = GetTickCount();//(ms);
 				Sleep(1);
 
 				CString temp_cs;
@@ -1189,7 +1189,7 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
 				{
 					TRACE(_T("%d not exsit,time %d\n"), ndevice_id, t2 - t1);
 				}
-				//是他妈口的产品就加入vector里 ，方便查询;
+				//vector ;
 				Sleep(1);
 			}
 #endif
@@ -1197,7 +1197,7 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
 #if 1  //Fandu 
         for (int i = 0;i < m_read_group_data.size();i++)
         {
-            if (m_read_group_data.at(i).read_info.deviceid == 0)  //如果deviceid 是0 跳过刷新;并尝试根据panel获取device id;
+            if (m_read_group_data.at(i).read_info.deviceid == 0)  //deviceid 0 ;paneldevice id;
             {
                 bool find_in_other_thread = false;
 				int temp_current_time = time(NULL);
@@ -1349,7 +1349,7 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
 		}
         Sleep(5000);
 
-        //至少让先运行一次，以便下次打开的时候显示非常快速
+        //
         if (ScreenEdit_Window == NULL)
         {
             h_refresh_group_thread = NULL;
@@ -1389,8 +1389,8 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
                 continue;
 
 
-            unsigned int t1 = GetTickCount();//程序段开始前取得系统运行时间(ms);
-            //判断是不是他妈口的产品 
+            unsigned int t1 = GetTickCount();//(ms);
+            // 
             s_Basic_Setting.reg.object_instance = 0;
             if (GetPrivateDataSaveSPBlocking(ndevice_id, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 2) > 0)
             {
@@ -1401,7 +1401,7 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
 				Sleep(10);
 				continue;
 			}
-            unsigned int t2 = GetTickCount();//程序段开始前取得系统运行时间(ms);
+            unsigned int t2 = GetTickCount();//(ms);
             Sleep(1);
             //Device_Basic_Setting.reg
 
@@ -1418,11 +1418,11 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
             {
                 TRACE(_T("%d not exsit,time %d\n"), ndevice_id, t2 - t1);
             }
-            //是他妈口的产品就加入vector里 ，方便查询;
+            //vector ;
             Sleep(1);
         }
 #if 0
-        //确定这些object instance 对应的panel 号
+        //object instance panel 
         for (int i = 0;i < m_remote_screen_data.size();i++)
         {
             if (m_remote_screen_data.at(i).npanelnum != 0)
@@ -1439,7 +1439,7 @@ DWORD WINAPI  CBacnetScreenEdit::ReadAllPanelThreadfun(LPVOID lpVoid)
         sort(m_remote_screen_data.begin(), m_remote_screen_data.end(), sort_by_panelnumber);
 #endif
         Sleep(15000);
-        //读取所有在线panel的label和description;
+        //panellabeldescription;
 
         if (ScreenEdit_Window == NULL)
         {
@@ -1503,7 +1503,7 @@ void CBacnetScreenEdit::InitGraphic(int nSerialNum,int nInstanceID,unsigned char
 		m_paint_right_limit = mynew_rect.Width();
 		m_bImgExist=FALSE;
 		FindClose(hFile);
-		//自动删除相关记录，因为图象不存在，Label没有任何意思;
+		//Label;
 
 	}
 	if(m_full_screen_mode)
@@ -1538,8 +1538,8 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 	strtemp.Empty();
 	int nTemp;
 	CString strTemp;
-	int nItem = 0;//用于记录有多少个需要刷新;
-	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+	int nItem = 0;//;
+	::GetWindowRect(BacNet_hwd,&mynew_rect);	// view;
 
 	for (int i=0;i<m_graphic_label_data.size();i++)
 	{
@@ -1549,7 +1549,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 			break;
 		}
 
-        //dufan 如果是删掉过的label 就继续取下一个.
+        //dufan label .
         if (m_graphic_label_data.at(i).reg.label_status == EMPTY_LABEL)
         {
             continue;
@@ -1613,10 +1613,10 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 			_Graphic_Value_Info temp1;
             bacnet_standard_Info temp2;
             if (bac_label.nMain_Panel == Station_NUM)
-			    temp1.deviceid = g_bac_instance;//暂时只支持 读本地的 instance;
+			    temp1.deviceid = g_bac_instance;//  instance;
             else
             {
-                temp1.deviceid = 0; //非本地的如果在远程的点中 找不大 就先  标记为0.
+                temp1.deviceid = 0; //    0.
 
 				for (int i = 0; i < 255; i++)
 				{
@@ -1642,8 +1642,8 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
                 
 			temp1.value_type = bac_label.nPoint_type;
 			temp1.value_item = bac_label.nPoint_number;
-            //dufan 改为能够支持远程的panel.
-			//if((bac_label.nMain_Panel == Station_NUM) && (bac_label.nSub_Panel == Station_NUM))  //如果是这个设备下面的 才加到自动刷新 的里面;
+            //dufan panel.
+			//if((bac_label.nMain_Panel == Station_NUM) && (bac_label.nSub_Panel == Station_NUM))  //  ;
 			//{
 				if(bac_label.nPoint_type == BAC_IN)
 				{
@@ -1936,7 +1936,7 @@ void CBacnetScreenEdit::OnPaint()
 	CString cs_full_label;
 	CPaintDC dc(this); // device context for painting
 	//TRACE(_T("Screen Edit Paint\r\n"));
-	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&mynew_rect);	// view;
 
 	
 	
@@ -2052,7 +2052,7 @@ void CBacnetScreenEdit::OnPaint()
             (m_bac_label_vector.at(i).nPoint_type == BAC_BI) || (m_bac_label_vector.at(i).nPoint_type == BAC_BV) ||
             (m_bac_label_vector.at(i).nPoint_type == BAC_AO) || (m_bac_label_vector.at(i).nPoint_type == BAC_BO))
         {
-            // 2019 04 03 新增支持 123456AI5的功能
+            // 2019 04 03  123456AI5
             Point_Net temp_point;
             temp_point.panel = m_bac_label_vector.at(i).nMain_Panel;
             temp_point.sub_panel = m_bac_label_vector.at(i).nSub_Panel;
@@ -2073,7 +2073,7 @@ void CBacnetScreenEdit::OnPaint()
             //int find_label_value = false;
             for (int j = 0; j < m_standard_graphic_refresh_data.size(); j++)
             {
-                if (m_standard_graphic_refresh_data.at(j).lable_index == m_bac_label_vector.at(i).nLabel_index) //找到对应的label存储的值了
+                if (m_standard_graphic_refresh_data.at(j).lable_index == m_bac_label_vector.at(i).nLabel_index) //label
                 {
                     cs_value = m_standard_graphic_refresh_data.at(j).cs_value_show;
                     break;
@@ -2170,7 +2170,7 @@ void CBacnetScreenEdit::OnPaint()
 		(m_bac_label_vector.at(i).nSub_Panel == 0)) &&
 		(m_bac_label_vector.at(i).nMain_Panel != Station_NUM))*/
 		{
-		//访问不同的 主panel 远程的点的情况;
+		// panel ;
 		Point_Net temp_point;
 		temp_point.panel = m_bac_label_vector.at(i).nMain_Panel;
 		temp_point.sub_panel = m_bac_label_vector.at(i).nSub_Panel;
@@ -2219,14 +2219,14 @@ void CBacnetScreenEdit::OnPaint()
 		{
 		case BAC_IN://INPUT
 		{
-			//dufan 先将原input0 的值存起来，然后 将其他panel 的input 放入 ，方便调用 GetInputValue等函数取 解析值.
-			//随后解析完在还原.
+			//dufan input0  panel input   GetInputValue .
+			//.
 			//Str_in_point temp_data_in;
 			//memcpy(&temp_data_in, &m_Input_data.at(0), sizeof(Str_in_point));
 			if (m_read_group_data.at(read_group_index).point.panel != Device_Basic_Setting.reg.panel_number)
 			{
 				memcpy(&s_Input_data, &m_read_group_data.at(read_group_index).detail_data.m_group_input_data, sizeof(Str_in_point));
-				if (memcmp(&s_Input_data, &temp_in, sizeof(Str_in_point)) == 0) //如果暂时没有读取到 就显示空
+				if (memcmp(&s_Input_data, &temp_in, sizeof(Str_in_point)) == 0) // 
 				{
 					get_ret = 1;
 					cs_value = _T("N/A");
@@ -2259,7 +2259,7 @@ void CBacnetScreenEdit::OnPaint()
 			if (m_read_group_data.at(read_group_index).point.panel != Device_Basic_Setting.reg.panel_number)
 			{
 				memcpy(&s_Output_data, &m_read_group_data.at(read_group_index).detail_data.m_group_output_data, sizeof(Str_out_point));
-				if (memcmp(&s_Output_data, &temp_out, sizeof(Str_out_point)) == 0) //如果暂时没有读取到 就显示空
+				if (memcmp(&s_Output_data, &temp_out, sizeof(Str_out_point)) == 0) // 
 				{
 					get_ret = 1;
 					cs_value = _T("N/A");
@@ -2291,7 +2291,7 @@ void CBacnetScreenEdit::OnPaint()
 			{
 				memcpy(&s_Variable_data, &m_read_group_data.at(read_group_index).detail_data.m_group_variable_data, sizeof(Str_variable_point));
 
-				if (memcmp(&s_Variable_data, &temp_var, sizeof(Str_variable_point)) == 0) //如果暂时没有读取到 就显示空
+				if (memcmp(&s_Variable_data, &temp_var, sizeof(Str_variable_point)) == 0) // 
 				{
 					get_ret = 1;
 					cs_value = _T("N/A");
@@ -2328,7 +2328,7 @@ void CBacnetScreenEdit::OnPaint()
 		else
 		{
 			//**********************************************************************
-			// 得到 Value; 
+			//  Value; 
 			read_bac_index = m_bac_label_vector.at(i).nPoint_number;
 			dig_unit_ret = -1;
 			unsigned char temp_type = m_bac_label_vector.at(i).nPoint_type ;
@@ -3108,7 +3108,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 				m_bac_select_label = i;
 				PostMessage(WM_KEYDOWN, VK_RETURN,1); 
 				Sleep(1);
-				PostMessage(WM_KEYUP, VK_RETURN, 1);    //释放
+				PostMessage(WM_KEYUP, VK_RETURN, 1);    //
 				break;
 
 			}
@@ -3117,7 +3117,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 				(m_bac_label_vector.at(i).nPoint_type == BAC_VAR) ||
 				(m_bac_label_vector.at(i).nPoint_type == BAC_PID))
 			{
-				//如果是点击的是锁定状态下的 IN OUT VAR  要求能改变值;但是不能改变range.
+				// IN OUT VAR  ;range.
 				click_ret = true;
 				m_bac_select_label = i;
 
@@ -3130,7 +3130,7 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 	if(!click_ret)
 	{
-		m_bac_select_label = -1;	//没有点击上任何label,就取消选中;
+		m_bac_select_label = -1;	//label,;
 	}
 	m_bac_lbuttondown = true;
 
@@ -3209,7 +3209,7 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 {
 	int ret_return = 0;
 
-    //离线模式下 重新计算 各个标签 的个数.因为此前 在线模式下是由 T3BB 计算的。
+    //   .  T3BB 
     if (offline_mode)
     {
         for (int i = 0; i < BAC_SCREEN_COUNT; i++)
@@ -3263,7 +3263,7 @@ void CBacnetScreenEdit::OnCancel()
 	int nsize = screnn_sequence.size();
 	if(nsize > 1)
 	{
-        //当用户关闭这个窗口时，清空所以的队列，即便有正常的消息，也清空，否则100多条消息 全堵在这里
+        //100 
         MyCriticalSection.Lock();
         My_Receive_msg.clear();
         MyCriticalSection.Unlock();
@@ -3304,7 +3304,7 @@ void CBacnetScreenEdit::OnCancel()
 
 	KillTimer(1);
 
-    //当用户关闭这个窗口时，清空所以的队列，即便有正常的消息，也清空，否则100多条消息 全堵在这里
+    //100 
     MyCriticalSection.Lock();
     My_Receive_msg.clear();
     MyCriticalSection.Unlock();
@@ -3353,7 +3353,7 @@ void CBacnetScreenEdit::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 		break;
-	case 3:	//5秒后 设置flag  不要显示没有图片的对话框;
+	case 3:	//5 flag  ;
 		{
 			show_not_exsit_dlg = false;
 			KillTimer(3);
@@ -3429,7 +3429,7 @@ void CBacnetScreenEdit::SaveBacLabel(int nItem)
 		return;
 	if(nItem>=(int)m_bac_label_vector.size())
 		return;
-	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&mynew_rect);	// view;
     unsigned short temp_x_value;
     unsigned short temp_y_value;
 
@@ -3470,7 +3470,7 @@ void CBacnetScreenEdit::OnLButtonDblClk(UINT nFlags, CPoint point)
 	else
 	{
 		m_full_screen_mode = false;
-		::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
+		::GetWindowRect(BacNet_hwd,&mynew_rect);	// view;
 		MoveWindow(mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
 		InitGraphic(g_serialNum,g_bac_instance,screen_list_line);
 	}
@@ -3482,7 +3482,7 @@ void CBacnetScreenEdit::OnLButtonDblClk(UINT nFlags, CPoint point)
 
 void CBacnetScreenEdit::OnClose()
 {
-    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    // TODO: /
 
 
     CDialogEx::OnClose();

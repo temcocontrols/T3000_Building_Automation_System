@@ -8,7 +8,7 @@
 
 // CScanDbWaitDlg dialog
 CRect Scan_rect;
-extern HANDLE * hScanTCPData ; //用于网络多网络同时扫描
+extern HANDLE * hScanTCPData ; //
 IMPLEMENT_DYNAMIC(CScanDbWaitDlg, CDialog)
 
 CScanDbWaitDlg::CScanDbWaitDlg(CWnd* pParent /*=NULL*/)
@@ -62,7 +62,7 @@ void CScanDbWaitDlg::OnBnClickedCancel()
     ;
 }
 
-extern HANDLE * hScanComData ; //用于串口多线程同时扫描
+extern HANDLE * hScanComData ; //
 void CScanDbWaitDlg::OnBnClickedExitbutton()
 {
     m_pScaner->m_bStopScan = TRUE;
@@ -73,7 +73,7 @@ void CScanDbWaitDlg::OnBnClickedExitbutton()
 	//pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
 	TerminateThread(hwait_scan_thread, 0);
     TerminateThread(m_pScaner->m_pScanTCP_to_485Thread, 0);
-    for (int j = 0; j < m_pScaner->m_szComs.size(); j++)  //20200327 这里不能随便结束扫描现场，否则会引起串口挂掉，dabuk
+    for (int j = 0; j < m_pScaner->m_szComs.size(); j++)  //20200327 dabuk
     {
         Sleep(3000);
         //if (hScanComData[j] != NULL)
@@ -460,9 +460,9 @@ void CScanDbWaitDlg::OnSize(UINT nType, int cx, int cy)
 {
     CDialog::OnSize(nType, cx, cy);
 
-    // TODO: 在此处添加消息处理程序代码
+    // TODO: 
     CRect temp_mynew_rect;
-    ::GetWindowRect(this->m_hWnd, &temp_mynew_rect);	//获取 view的窗体大小;
+    ::GetWindowRect(this->m_hWnd, &temp_mynew_rect);	// view;
 
     ::SetWindowPos(m_scan_com_list.m_hWnd, NULL, temp_mynew_rect.left, temp_mynew_rect.top, temp_mynew_rect.Width() -30, temp_mynew_rect.Height(), SWP_NOMOVE);
 }

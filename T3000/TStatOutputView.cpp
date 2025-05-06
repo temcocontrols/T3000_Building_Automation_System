@@ -69,7 +69,7 @@ LRESULT  CTStatOutputView::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
     CString Show_Results;
    
     LoadTstat_OutputData();
-    if (msg_result==1||msg_result==2)//单写
+    if (msg_result==1||msg_result==2)//
     {
         _MessageWriteOneInfo_List *pInvoke =(_MessageWriteOneInfo_List *)lParam;
         //pInvoke->list_type=LIST_TYPE_OUTPUT_TSTAT; 
@@ -86,7 +86,7 @@ LRESULT  CTStatOutputView::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
         }
         Fresh_One_Item(pInvoke->mRow);
 
-        if((pInvoke->mRow%2)==0)//恢复前景和 背景 颜色;
+        if((pInvoke->mRow%2)==0)//  ;
             m_output_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
         else
             m_output_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -97,7 +97,7 @@ LRESULT  CTStatOutputView::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
         if(pInvoke)
             delete pInvoke;
     }
-    if (msg_result==3||msg_result==4)//多写
+    if (msg_result==3||msg_result==4)//
     { 
 
         _MessageWriteMultiInfo_List *pInvoke =(_MessageWriteMultiInfo_List *)lParam;
@@ -120,7 +120,7 @@ LRESULT  CTStatOutputView::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
         //  PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
 
 
-        if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
+        if((pInvoke->mRow%2)==0)	//  ;
             m_output_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
         else
             m_output_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -352,7 +352,7 @@ LRESULT CTStatOutputView::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
         }
 
         CString cs_temp = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
-        if(cs_temp.GetLength()> STR_IN_LABEL)	//长度不能大于结构体定义的长度;
+        if(cs_temp.GetLength()> STR_IN_LABEL)	//;
         {
             cs_temp.Delete(8,cs_temp.GetLength()-8);
         }
@@ -421,7 +421,7 @@ LRESULT CTStatOutputView::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
     }
 
     if (lCol == TStat_Value){
-        //if (m_tstat_output_data.at(lRow).Value.StrValue.CompareNoCase(New_CString)==0)//选的字符和内存的值相同的话，就返回
+        //if (m_tstat_output_data.at(lRow).Value.StrValue.CompareNoCase(New_CString)==0)//
         //{
         //	m_output_list.Set_Edit(false);
         //	IS_SEND=FALSE;
@@ -452,15 +452,15 @@ LRESULT CTStatOutputView::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 
     if (lCol == TStat_Range)
     {	
-        if (m_tstat_output_data.at(lRow).Range.StrValue.CompareNoCase(New_CString)==0)//选的字符和内存的值相同的话，就返回
+        if (m_tstat_output_data.at(lRow).Range.StrValue.CompareNoCase(New_CString)==0)//
         {
             m_output_list.Set_Edit(false);
             IS_SEND=FALSE;
             return 0;
         }
-        if (New_CString.CompareNoCase(_T("PWM(0-100%)"))==0)//是PWM
+        if (New_CString.CompareNoCase(_T("PWM(0-100%)"))==0)//PWM
         {
-            //检测当前的PWM状态的个数
+            //PWM
             int PWMNUMBER =0;
             for (int i=0;i<7;i++)
             {
@@ -548,7 +548,7 @@ LRESULT CTStatOutputView::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 
     if (lCol == TStat_Funcation)
     {
-        if (m_tstat_output_data.at(lRow).Function.StrValue.CompareNoCase(New_CString)==0)//选的字符和内存的值相同的话，就返回
+        if (m_tstat_output_data.at(lRow).Function.StrValue.CompareNoCase(New_CString)==0)//
         {
             m_output_list.Set_Edit(false);
             IS_SEND=FALSE;
@@ -576,7 +576,7 @@ LRESULT CTStatOutputView::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
     }
     if (lCol == TStat_Interlock)
     {
-        if (m_tstat_output_data.at(lRow).Interlock.StrValue.CompareNoCase(New_CString)==0)//选的字符和内存的值相同的话，就返回
+        if (m_tstat_output_data.at(lRow).Interlock.StrValue.CompareNoCase(New_CString)==0)//
         {
             m_output_list.Set_Edit(false);
             IS_SEND=FALSE;
@@ -633,7 +633,7 @@ LRESULT CTStatOutputView::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
     }
     if (lCol == TStat_Signal_Type)
     {
-        if (m_tstat_output_data.at(lRow).Signal_Type.StrValue.CompareNoCase(New_CString)==0)//选的字符和内存的值相同的话，就返回
+        if (m_tstat_output_data.at(lRow).Signal_Type.StrValue.CompareNoCase(New_CString)==0)//
         {
             m_output_list.Set_Edit(false);
             IS_SEND=FALSE;
@@ -706,7 +706,7 @@ void CTStatOutputView::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
     lCol = lvinfo.iSubItem;
 
 
-    if(lRow>m_output_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+    if(lRow>m_output_list.GetItemCount()) //
         return;
     if(lRow<0)
         return;
@@ -764,7 +764,7 @@ void CTStatOutputView::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 			if (lRow>4)
 			{
 				  
-				if (m_tstat_output_data.at(lRow).Value.StrValue.CompareNoCase(Global_String_NO) == 0)//如果当前的值是 ON
+				if (m_tstat_output_data.at(lRow).Value.StrValue.CompareNoCase(Global_String_NO) == 0)// ON
 				{
 					pwrite_info->Changed_Name.Format(_T("%s,From %s to %s"), m_tstat_output_data.at(lRow).OutputName.StrValue, m_tstat_output_data.at(lRow).Value.StrValue, Global_String_OFF);
 					pwrite_info->address = m_tstat_output_data.at(lRow).Value.regAddress;
@@ -783,7 +783,7 @@ void CTStatOutputView::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 			else
 			{
 				bitset<16> RegValue(m_tstat_output_data.at(lRow).Value.RegValue);
-				if (m_tstat_output_data.at(lRow).Value.StrValue.CompareNoCase(Global_String_NO) == 0)//如果当前的值是 ON
+				if (m_tstat_output_data.at(lRow).Value.StrValue.CompareNoCase(Global_String_NO) == 0)// ON
 				{
 					pwrite_info->Changed_Name.Format(_T("%s,From %s to %s"), m_tstat_output_data.at(lRow).OutputName.StrValue, m_tstat_output_data.at(lRow).Value.StrValue, Global_String_OFF);
 					pwrite_info->address = m_tstat_output_data.at(lRow).Value.regAddress;

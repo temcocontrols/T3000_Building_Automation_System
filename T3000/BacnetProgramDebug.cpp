@@ -224,7 +224,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 					ListCtrlEx::CStrList strlist;
 					for (int i=0;i<(int)sizeof(JumperStatus)/sizeof(JumperStatus[0]);i++)
 					{
-                        if (i == 4)   //以前出于某些原因  0  和 4 都代表 Thermistor Dry Contact; 这里下拉框不希望显示两个 一样的，所以过滤掉
+                        if (i == 4)   //  0   4  Thermistor Dry Contact;  
                             continue;
 						strlist.push_back(JumperStatus[i]);
 					}
@@ -820,7 +820,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 		temp_decom = m_Input_data.at(point_number).decom & 0x0f;
 		temp_jumper = (m_Input_data.at(point_number).decom & 0xf0) >> 4;
 
-		//如果range 是0 或者 不在正常范围内，就不要显示 open short 的报警 状态;
+		//range 0   open short  ;
 		if ((temp_decom == 0) || (m_Input_data.at(point_number).range == 0) || (bac_Invalid_range(m_Input_data.at(point_number).range)))
 		{
 			temp_status.Format(Decom_Array[0]);
@@ -863,7 +863,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 		else
 		{
 			temp_status.Format(JumperStatus[0]);
-			m_Input_data.at(point_number).decom = m_Input_data.at(point_number).decom & 0x0f;	 //如果最高位不是 有效值，清零;
+			m_Input_data.at(point_number).decom = m_Input_data.at(point_number).decom & 0x0f;	 // ;
 		}
 		m_program_debug_list.SetItemText(0, INPUT_JUMPER, temp_status);
 
@@ -986,7 +986,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 		}
 		else
 		{
-			if (m_Variable_data.at(point_number).range == 20)	//如果是时间;
+			if (m_Variable_data.at(point_number).range == 20)	//;
 			{
 				m_program_debug_list.SetItemText(0, VARIABLE_UNITE, Variable_Analog_Units_Array[m_Variable_data.at(point_number).range]);
 				char temp_char[50];
@@ -1027,7 +1027,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				float temp_float_value1;
 				temp_float_value1 = ((float)m_Variable_data.at(point_number).value) / 1000;
 				get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(point_number).range - 101, (int)temp_float_value1, cstemp_value2);
-				if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
+				if (get_name_ret < 0)  //  ;
 					cstemp_value2.Format(_T("%.3f"), temp_float_value1);
 				m_program_debug_list.SetItemText(0, VARIABLE_VALUE, cstemp_value2);
 			}
@@ -1067,7 +1067,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 					temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
 				temp_des2.ReleaseBuffer();
 
-				//如果是小叶的设备,因为没有input 就直接显示in2之类.
+				//,input in2.
 				if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 				{
 					temp_des2.Empty();
@@ -1096,7 +1096,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 					m_program_debug_list.SetItemText(0, CONTROLLER_INPUTUNITS, Input_List_Analog_Units[m_Input_data.at(x).range]);
 				}
 
-				//如果是小叶的设备,因为没有input 就直接显示rang 对应的值.
+				//,input rang .
 				if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 				{
 					if (m_controller_data.at(point_number).units < sizeof(Input_List_Analog_Units) / sizeof(Input_List_Analog_Units[0]))
@@ -1174,9 +1174,9 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				int num_point, num_panel, num_net, k;
 				Point_T3000 point;
 				point.number = m_controller_data.at(point_number).setpoint.number;
-				point.number = point.number + 1;	//input setpoint 是从 0 开始计数的 ，但是要去找point label 要从1开始;
+				point.number = point.number + 1;	//input setpoint  0  point label 1;
 				point.panel = m_controller_data.at(point_number).setpoint.panel;
-				point.point_type = m_controller_data.at(point_number).setpoint.point_type - 1;	//调用 ispoint的时候要减一;
+				point.point_type = m_controller_data.at(point_number).setpoint.point_type - 1;	// ispoint;
 				byte point_type, var_type;
 
 				int temp_network = 0;
@@ -1221,9 +1221,9 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				int num_point, num_panel, num_net, k;
 				Point_T3000 point;
 				point.number = m_controller_data.at(point_number).setpoint.number;
-				point.number = point.number + 1;	//input setpoint 是从 0 开始计数的 ，但是要去找point label 要从1开始;
+				point.number = point.number + 1;	//input setpoint  0  point label 1;
 				point.panel = m_controller_data.at(point_number).setpoint.panel;
-				point.point_type = m_controller_data.at(point_number).setpoint.point_type - 1;	//调用 ispoint的时候要减一;
+				point.point_type = m_controller_data.at(point_number).setpoint.point_type - 1;	// ispoint;
 				byte point_type, var_type;
 
 				int temp_network = 0;
@@ -1283,7 +1283,7 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 						}
 						else
 						{
-							if (m_Variable_data.at(x).range == 20)	//如果是时间;
+							if (m_Variable_data.at(x).range == 20)	//;
 							{
 								temp_set_unit = Variable_Analog_Units_Array[m_Variable_data.at(x).range];
 								char temp_char[50];
@@ -1524,7 +1524,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 			CString temp_task_info;
 			CString New_CString =  m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
 			CString cstemp_value;
-			//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
+			// ;
 			memcpy_s(&m_temp_output_data[point_number],sizeof(Str_out_point),&m_Output_data.at(point_number),sizeof(Str_out_point));
 
 			if(Changed_SubItem == OUTPUT_PWM_PERIOD)
@@ -1543,7 +1543,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 			if(Changed_SubItem == OUTPUT_LABLE)
 			{
 				CString cs_temp = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
-				if(cs_temp.GetLength()>= STR_OUT_LABEL)	//长度不能大于结构体定义的长度;
+				if(cs_temp.GetLength()>= STR_OUT_LABEL)	//;
 				{
 					MessageBox(_T("Length can not higher than 8"),_T("Warning"));
 					PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
@@ -1565,7 +1565,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 			if(Changed_SubItem == OUTPUT_FULL_LABLE)
 			{
 				CString cs_temp = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
-				if(cs_temp.GetLength()>= STR_OUT_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+				if(cs_temp.GetLength()>= STR_OUT_DESCRIPTION_LENGTH)	//;
 				{
 					MessageBox(_T("Length can not higher than 18"),_T("Warning"));
 					//PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
@@ -1642,7 +1642,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 			if(Changed_SubItem == INPUT_LABLE)
 			{
 				CString cs_temp = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
-				if(cs_temp.GetLength()>= STR_IN_LABEL)	//长度不能大于结构体定义的长度;
+				if(cs_temp.GetLength()>= STR_IN_LABEL)	//;
 				{
 					MessageBox(_T("Length can not greater than 8"),_T("Warning"));
 					PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
@@ -1664,7 +1664,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 			if(Changed_SubItem == INPUT_FULL_LABLE)
 			{
 				CString cs_temp = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
-				if(cs_temp.GetLength()>= STR_IN_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+				if(cs_temp.GetLength()>= STR_IN_DESCRIPTION_LENGTH)	//;
 				{
 					MessageBox(_T("Length can not higher than 20"),_T("Warning"));
 					PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
@@ -1719,7 +1719,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 				if((cal_value<0) || (cal_value >65535))
 				{
 					MessageBox(_T("Please Input an value between 0.0 - 6553.6"),_T("Warning"),MB_OK);
-					PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+					PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);// ;
 					return 0;
 				}
 
@@ -1735,7 +1735,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 				if((temp2<0) || (temp2 >255))
 				{
 					MessageBox(_T("Please Input an value between 0 - 255"),_T("Warning"),MB_OK);
-					PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+					PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);// ;
 					return 0;
 				}
 				m_Input_data.at(point_number).filter = (unsigned char)temp2;//(int8_t)(log((double)temp2)/log((double)2));
@@ -1785,7 +1785,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 			if(Changed_SubItem == VARIABLE_LABLE)
 			{
 				CString cs_temp = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
-				if(cs_temp.GetLength()>= STR_VARIABLE_LABEL)	//长度不能大于结构体定义的长度;
+				if(cs_temp.GetLength()>= STR_VARIABLE_LABEL)	//;
 				{
 					MessageBox(_T("Length can not higher than 9"),_T("Warning"));
 					PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
@@ -1807,7 +1807,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 			if(Changed_SubItem == VARIABLE_FULL_LABLE)
 			{
 				CString cs_temp = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
-				if(cs_temp.GetLength()>= STR_VARIABLE_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+				if(cs_temp.GetLength()>= STR_VARIABLE_DESCRIPTION_LENGTH)	//;
 				{
 					MessageBox(_T("Length can not higher than 20"),_T("Warning"));
 					PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
@@ -1837,7 +1837,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
 					m_Variable_data.at(point_number).auto_manual = BAC_MANUAL;
 				}
 			}
-			if(Changed_SubItem == VARIABLE_VALUE)//这里只用处理 ANALOG 的值就看要了， DIGITAL 的值在Click 事件中处理过了;
+			if(Changed_SubItem == VARIABLE_VALUE)// ANALOG  DIGITAL Click ;
 			{
 				CString temp_cs = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
 
@@ -1865,7 +1865,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
         if (Changed_SubItem == WEEKLY_ROUTINE_LABEL)
         {
             CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
-            if (cs_temp.GetLength() >= STR_WEEKLY_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
+            if (cs_temp.GetLength() >= STR_WEEKLY_LABEL_LENGTH)	//;
             {
                 MessageBox(_T("Length can not higher than 8"), _T("Warning"));
                 PostMessage(WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
@@ -1886,7 +1886,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
         if (Changed_SubItem == WEEKLY_ROUTINE_FULL_LABLE)
         {
             CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
-            if (cs_temp.GetLength() >= STR_WEEKLY_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+            if (cs_temp.GetLength() >= STR_WEEKLY_DESCRIPTION_LENGTH)	//;
             {
                 MessageBox(_T("Length can not higher than 20"), _T("Warning"));
                 PostMessage(WM_REFRESH_BAC_WEEKLY_LIST, NULL, NULL);
@@ -2003,13 +2003,13 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
         CString temp_task_info;
         CString New_CString = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
 
-        //先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
+        // ;
         memcpy_s(&m_temp_annual_data[point_number], sizeof(Str_annual_routine_point), &m_Annual_data.at(point_number), sizeof(Str_annual_routine_point));
 
         if (Changed_SubItem == ANNUAL_ROUTINE_LABLE)
         {
             CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
-            if (cs_temp.GetLength() >= STR_ANNUAL_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
+            if (cs_temp.GetLength() >= STR_ANNUAL_LABEL_LENGTH)	//;
             {
                 MessageBox(_T("Length can not higher than 8"), _T("Warning"));
                 PostMessage(WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
@@ -2030,7 +2030,7 @@ LRESULT CBacnetProgramDebug::Fresh_Program_Debug_Item(WPARAM wParam,LPARAM lPara
         if (Changed_SubItem == ANNUAL_ROUTINE_FULL_LABEL)
         {
             CString cs_temp = m_program_debug_list.GetItemText(Changed_Item, Changed_SubItem);
-            if (cs_temp.GetLength() >= STR_ANNUAL_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+            if (cs_temp.GetLength() >= STR_ANNUAL_DESCRIPTION_LENGTH)	//;
             {
                 MessageBox(_T("Length can not higher than 20"), _T("Warning"));
                 PostMessage(WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
@@ -2122,7 +2122,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 	lCol = lvinfo.iSubItem;
 
 
-	if(lRow>m_program_debug_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_program_debug_list.GetItemCount()) //
 		return;
 	if(lRow<0)
 		return;
@@ -2215,7 +2215,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 				//CString temp_cs = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
 				BacnetRange dlg;
-				//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+				// custom unitsfirmware  ;
 				if(!read_customer_unit)
 				{
 
@@ -2291,10 +2291,10 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				dlg.DoModal();
 				if(range_cancel)
 				{
-					PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,lRow,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+					PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,lRow,REFRESH_ON_ITEM);// ;
 					return ;
 				}
-				if(bac_range_number_choose == 0)	//如果选择的是 unused 就认为是analog 的unused;这样 能显示对应的value;
+				if(bac_range_number_choose == 0)	// unused analog unused; value;
 				{
 					m_Output_data.at(point_number).digital_analog =  BAC_UNITS_ANALOG;
 					bac_ranges_type = OUTPUT_RANGE_ANALOG_TYPE;
@@ -2347,7 +2347,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 						}	
 					}
 					m_program_debug_list.SetItemText(0,OUTPUT_RANGE,temp1);
-					m_program_debug_list.SetItemText(0,OUTPUT_UNITE,_T(""));//如果是数字单位 Unit 要清空;
+					m_program_debug_list.SetItemText(0,OUTPUT_UNITE,_T(""));// Unit ;
 				}
 
 			}
@@ -2508,7 +2508,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				//CString temp_cs = m_program_debug_list.GetItemText(Changed_Item,Changed_SubItem);
 				BacnetRange dlg;
 
-				//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+				// custom unitsfirmware  ;
 				if(!read_customer_unit)
 				{
 
@@ -2582,10 +2582,10 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				dlg.DoModal();
 				if(range_cancel)
 				{
-					PostMessage(WM_REFRESH_BAC_INPUT_LIST,lRow,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+					PostMessage(WM_REFRESH_BAC_INPUT_LIST,lRow,REFRESH_ON_ITEM);// ;
 					return ;
 				}
-				if(bac_range_number_choose == 0)	//如果选择的是 unused 就认为是analog 的unused;这样 能显示对应的value;
+				if(bac_range_number_choose == 0)	// unused analog unused; value;
 				{
 					m_Input_data.at(point_number).digital_analog =  BAC_UNITS_ANALOG;
 					bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
@@ -2821,7 +2821,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 				BacnetRange dlg;
 
-				//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+				// custom unitsfirmware  ;
 				if(!read_customer_unit)
 				{
 
@@ -2895,10 +2895,10 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 				if(range_cancel)
 				{
 					Fresh_Program_List(2);
-					//PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);//这里调用 刷新线程重新刷新会方便一点;
+					//PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);// ;
 					return ;
 				}
-				if(bac_range_number_choose == 0)	//如果选择的是 unused 就认为是analog 的unused;这样 能显示对应的value;
+				if(bac_range_number_choose == 0)	// unused analog unused; value;
 				{
 					m_Variable_data.at(point_number).digital_analog =  BAC_UNITS_ANALOG;
 					bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
@@ -2912,7 +2912,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
 
 
-					if(m_Variable_data.at(point_number).range == 20)	//如果是时间;
+					if(m_Variable_data.at(point_number).range == 20)	//;
 					{
 						char temp_char[50];
 						int time_seconds = m_Variable_data.at(point_number).value / 1000;
@@ -3003,7 +3003,7 @@ void CBacnetProgramDebug::OnNMClickListProgramDebug(NMHDR *pNMHDR, LRESULT *pRes
 
         if (lCol == ANNUAL_ROUTINE_AUTO_MANUAL)
         {
-            //先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
+            // ;
             memcpy_s(&m_temp_annual_data[point_number], sizeof(Str_annual_routine_point), &m_Annual_data.at(point_number), sizeof(Str_annual_routine_point));
 
             if (m_Annual_data.at(point_number).auto_manual == 0)

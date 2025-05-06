@@ -20,8 +20,8 @@ CRect Output_rect;
 static int show_output_external =  -1;
 int OUTPUT_LIMITE_ITEM_COUNT = 0;
 #define UPDATE_OUTPUT_ONE_ITEM_TIMER 3
-int changed_output_item = -1; //// 用于改变某一列后 ，立即刷新 当前列的其他变化;
-extern tree_product selected_product_Node; // 选中的设备信息;
+int changed_output_item = -1; ////   ;
+extern tree_product selected_product_Node; // ;
 
 
 
@@ -77,8 +77,8 @@ LRESULT  CBacnetOutput::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
 		if((pInvoke->mRow < BAC_OUTPUT_ITEM_COUNT) && (pInvoke->mRow >= 0))
 		{
             
-            //if (!SPECIAL_BAC_TO_MODBUS) //不是转Modbus的协议的 就调用下面的刷新单条.
-            if ((!SPECIAL_BAC_TO_MODBUS) && (Bacnet_Private_Device(selected_product_Node.product_class_id))) //不是转Modbus的协议的 就调用下面的刷新单条.)
+            //if (!SPECIAL_BAC_TO_MODBUS) //Modbus .
+            if ((!SPECIAL_BAC_TO_MODBUS) && (Bacnet_Private_Device(selected_product_Node.product_class_id))) //Modbus .)
             {
                 Post_Refresh_One_Message(g_bac_instance, READOUTPUT_T3000,
                     pInvoke->mRow, pInvoke->mRow, sizeof(Str_out_point));
@@ -89,13 +89,13 @@ LRESULT  CBacnetOutput::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		memcpy_s(&m_Output_data.at(pInvoke->mRow),sizeof(Str_out_point),&m_temp_output_data[pInvoke->mRow],sizeof(Str_out_point));//还原没有改对的值
+		memcpy_s(&m_Output_data.at(pInvoke->mRow),sizeof(Str_out_point),&m_temp_output_data[pInvoke->mRow],sizeof(Str_out_point));//
 		PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 	}
 
-	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
+	if((pInvoke->mRow%2)==0)	//  ;
 		m_output_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
 		m_output_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -546,7 +546,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
 		}
 	}
-	if (Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
+	if (Minipanel_device == 0)	//minipanel;
 	{
 		//m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
 		m_output_list.SetColumnWidth(OUTPUT_PRODUCT, 0);
@@ -564,7 +564,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 	{
 		if ((m_output_list.IsDataNewer((char*)&m_Output_data.at(0), sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT) == 0) && refresh_output == 0)
 		{
-			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			//list ;List;
 			return 0;
 		}
 	}
@@ -623,11 +623,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 
 		if (refresh_output == 0)
 		{
-			if (isFreshOne != 1) //当要立即刷新单个条目时  不用顾及 数据是否是最新的;
+			if (isFreshOne != 1) //   ;
 			{
 				if (m_output_list.IsDataItemNewer((char*)&m_Output_data.at(i), sizeof(Str_out_point), i) == false)
 				{
-					continue; //单个条目数据  无变化 ，立即更新;
+					continue; //   ;
 				}
 			}
 		}
@@ -1086,7 +1086,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 	}
 	if (m_output_list.IsDataNewer((char*)&m_Output_data.at(0), sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT))
 	{
-		//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+		//list ;List;
 		m_output_list.SetListData((char*)&m_Output_data.at(0), sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT);
 	}
 	copy_data_to_ptrpanel(TYPE_OUTPUT);
@@ -1097,7 +1097,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 	if (isFreshOne != 1)
 	{
 		if (refresh_output > 0)
-			refresh_output--; //清空标志位，代表刷新过一次了;
+			refresh_output--; //;
 	}
 	//Invalidate();
 	return 0;
@@ -1123,7 +1123,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		return 0;
 	}
 
-	//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
+	// ;
 	memcpy_s(&m_temp_output_data[Changed_Item],sizeof(Str_out_point),&m_Output_data.at(Changed_Item),sizeof(Str_out_point));
 
 	if(Changed_SubItem == OUTPUT_PWM_PERIOD)
@@ -1142,11 +1142,11 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == OUTPUT_LABLE)
 	{
 		CString cs_temp = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_OUT_LABEL)	//长度不能大于结构体定义的长度;
+		if(cs_temp.GetLength()>= STR_OUT_LABEL)	//;
 		{
 			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
 #pragma region note_what_do	
-			//如下所做的事 达到 ,在弹窗后 继续选中客户输入的部分 ，毛总的要求;
+			//  ,  ;
 			CRect list_rect,win_rect;
 			m_output_list.GetWindowRect(list_rect);
 			ScreenToClient(&list_rect);
@@ -1192,11 +1192,11 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == OUTPUT_FULL_LABLE)
 	{
 		CString cs_temp = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_OUT_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+		if(cs_temp.GetLength()>= STR_OUT_DESCRIPTION_LENGTH)	//;
 		{
 			MessageBox(_T("Length can not higher than 18"),_T("Warning"));
 #pragma region note_what_do	
-			//如下所做的事 达到 ,在弹窗后 继续选中客户输入的部分 ，毛总的要求;
+			//  ,  ;
 			CRect list_rect,win_rect;
 			m_output_list.GetWindowRect(list_rect);
 			ScreenToClient(&list_rect);
@@ -1294,7 +1294,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
         {
             CString temp_cs = m_output_list.GetItemText(Changed_Item, Changed_SubItem);
             int temp_int = (int)(_wtof(temp_cs) * 1000);
-            unsigned short temp_high_byte = 0;  //高字节在前 低字节在后
+            unsigned short temp_high_byte = 0;  // 
             unsigned short temp_low_byte = 0;
             temp_high_byte = (temp_int&0xffff0000) >> 16;
             temp_low_byte = temp_int & 0x0000ffff;
@@ -1412,7 +1412,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 				(temp_pid == PM_T3_LC)
 				)
 			{
-				//m_output_item_info.ShowWindow(true); //由于改成全屏的 支持resize 的显示，所以先屏蔽;
+				//m_output_item_info.ShowWindow(true); // resize ;
 				CString temp_name;
 				temp_name = GetProductName(m_Output_data.at(output_list_line).sub_product);
 				CString show_info;
@@ -1441,7 +1441,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	if(lRow>= OUTPUT_LIMITE_ITEM_COUNT)
 		return;
 
-	if(lRow>m_output_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_output_list.GetItemCount()) //
 		return;
 	if(lRow<0)
 		return;
@@ -1602,7 +1602,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 
 			//CString temp_cs = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
 			BacnetRange dlg;
-			//点击产品的时候 需要读custom units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
+			// custom unitsfirmware  ;
 			if(!read_customer_unit)
 			{
 
@@ -1678,10 +1678,10 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 				dlg.DoModal();
 				if(range_cancel)
 				{
-					PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,lRow,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+					PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,lRow,REFRESH_ON_ITEM);// ;
 					return ;
 				}
-				if(bac_range_number_choose == 0)	//如果选择的是 unused 就认为是analog 的unused;这样 能显示对应的value;
+				if(bac_range_number_choose == 0)	// unused analog unused; value;
 				{
 					m_Output_data.at(lRow).digital_analog =  BAC_UNITS_ANALOG;
 					bac_ranges_type = OUTPUT_RANGE_ANALOG_TYPE;
@@ -1737,7 +1737,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 						}	
 					}
 					m_output_list.SetItemText(lRow,OUTPUT_RANGE,temp1);
-					m_output_list.SetItemText(lRow,OUTPUT_UNITE,_T(""));//如果是数字单位 Unit 要清空;
+					m_output_list.SetItemText(lRow,OUTPUT_UNITE,_T(""));// Unit ;
 					m_output_list.SetCellEnabled(lRow,OUTPUT_PWM_PERIOD,0);
 					m_output_list.SetCellEnabled(lRow,OUTPUT_LOW_VOLTAGE,0);
 					m_output_list.SetCellEnabled(lRow,OUTPUT_HIGH_VOLTAGE,0);
@@ -1800,7 +1800,7 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 	
 	switch(nIDEvent)
 	{
-		if (hwait_write_thread != NULL) //     在写入prog的时候，不要刷新value数据  
+		if (hwait_write_thread != NULL) //     progvalue  
 			break; 
 	case 1:
 		{
@@ -1808,7 +1808,7 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 			{
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			}
-			else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_OUTPUT))  )	//GSM连接时不要刷新;
+			else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_OUTPUT))  )	//GSM;
 			{
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 				if((bac_select_device_online) && (g_protocol == PROTOCOL_BACNET_IP))
@@ -1816,21 +1816,21 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 				else if((bac_select_device_online) && 
                     ((g_protocol == MODBUS_RS485) || 
                      (g_protocol == MODBUS_TCPIP) || 
-                     (g_protocol == PROTOCOL_MSTP_TO_MODBUS) ||   //MSTP协议 接 T322 或者 T3-8 这些设备不支持BB的结构，需要用MSTP转Modbus的协议;
+                     (g_protocol == PROTOCOL_MSTP_TO_MODBUS) ||   //MSTP  T322  T3-8 BBMSTPModbus;
                      (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)))
 				{
 					if(read_each_485_fun_thread == NULL)
 					{
 						hide_485_progress = true;
-                        //经常性的在load file 的时候锁死 ，待解决 2019 06 19
-						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type, READOUTPUT_T3000/*BAC_OUT*/);//第二个参数 OUT
+                        //load file   2019 06 19
+						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type, READOUTPUT_T3000/*BAC_OUT*/);// OUT
 					}
 				}
 			}
 
 		}
 		break;
-	case 2:	//在更改某一列之后要在读取此列的值，并刷新此列;
+	case 2:	//;
 		{
 			if(this->IsWindowVisible())
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
@@ -1850,7 +1850,7 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 	case 4:
 		if ((SPECIAL_BAC_TO_MODBUS) && (bacnet_view_number == TYPE_OUTPUT) && (Bacnet_Private_Device(selected_product_Node.product_class_id)))
 		{			
-		    Post_Refresh_Message(g_bac_instance, READOUTPUT_T3000, 0, BAC_OUTPUT_ITEM_COUNT - 1, sizeof(Str_out_point), 0); //只刷新Value
+		    Post_Refresh_Message(g_bac_instance, READOUTPUT_T3000, 0, BAC_OUTPUT_ITEM_COUNT - 1, sizeof(Str_out_point), 0); //Value
 		}
 		break;
 	default:
@@ -1884,20 +1884,20 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 30 ,temp_mynew_rect.top + 30,500,700,SWP_SHOWWINDOW);
 		}
 
 		return 1; 
 	}
-	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //F2;
 	{
 		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_OUTPUT);
 		return TRUE;
@@ -2143,14 +2143,14 @@ void CBacnetOutput::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 30 ,temp_mynew_rect.top + 30,500,700,SWP_SHOWWINDOW);
 		}
 		return;
@@ -2162,14 +2162,14 @@ void CBacnetOutput::Reset_Output_Rect()
 {
 
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 
 		CRect temp_window;
 		GetWindowRect(&temp_window);
 		if(window_max)
 		{
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 		}
 		else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -2188,7 +2188,7 @@ void CBacnetOutput::Reset_Output_Rect()
 void CBacnetOutput::OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     *pResult = 0;
 
 
@@ -2207,7 +2207,7 @@ void CBacnetOutput::OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
     if (lRow >= OUTPUT_LIMITE_ITEM_COUNT)
         return;
 
-    if (lRow>m_output_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+    if (lRow>m_output_list.GetItemCount()) //
         return;
     if (lRow<0)
         return;

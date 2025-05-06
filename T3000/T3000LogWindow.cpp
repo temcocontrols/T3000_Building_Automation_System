@@ -1,4 +1,4 @@
-// T3000LogWindow.cpp : 实现文件
+// T3000LogWindow.cpp : 
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// CT3000LogWindow 对话框
+// CT3000LogWindow 
 
 IMPLEMENT_DYNAMIC(CT3000LogWindow, CDialogEx)
 
@@ -33,7 +33,7 @@ BEGIN_MESSAGE_MAP(CT3000LogWindow, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CT3000LogWindow 消息处理程序
+// CT3000LogWindow 
 
 extern CString temp_statusbar_log_path;
 
@@ -41,7 +41,7 @@ BOOL CT3000LogWindow::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
     ::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    // TODO:  在此添加额外的初始化
+    // TODO:  
     m_t3000_log_window = this->m_hWnd;
 
     int n_logcount = 0;
@@ -65,13 +65,13 @@ BOOL CT3000LogWindow::OnInitDialog()
     }
 
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // 异常: OCX 属性页应返回 FALSE
+                  // : OCX  FALSE
 }
 
 
 BOOL CT3000LogWindow::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: 在此添加专用代码和/或调用基类
+    // TODO: /
     if (pMsg->message == WM_KEYDOWN)
     {
         if ((pMsg->wParam == VK_RETURN))

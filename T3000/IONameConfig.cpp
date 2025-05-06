@@ -57,30 +57,30 @@ void CIONameConfig::ClickMsflexgridIotable()
 {
     m_Clicked=TRUE;
 	long lRow,lCol;
-	lRow = m_IONametable.get_RowSel();//获取点击的行号	
-	lCol = m_IONametable.get_ColSel(); //获取点击的列号
+	lRow = m_IONametable.get_RowSel();//	
+	lCol = m_IONametable.get_ColSel(); //
 	if(lRow==0)
 		return;
 	CRect rect;
-	m_IONametable.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-	//需要将其转化为像素，1440缇= 1英寸
+	m_IONametable.GetWindowRect(rect); //
+	ScreenToClient(rect); //	
+	// MSFlexGrid"(twips)"
+	//1440= 1
 	CDC* pDC =GetDC();
-	//计算象素点和缇的转换比例
+	//
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//()
 	long y = m_IONametable.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_IONametable.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//()11
 	long width = m_IONametable.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_IONametable.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//
 	CRect rc(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	//
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//获取选中格的文本信息	
+	//	
 	CString strValue = m_IONametable.get_TextMatrix(lRow,lCol);
 	m_oldname=strValue;
 	m_nCurRow=lRow;
@@ -94,13 +94,13 @@ void CIONameConfig::ClickMsflexgridIotable()
 	else
 	{
 		 m_nameEditor.ShowWindow(SW_SHOW);
-		 m_nameEditor.SetWindowText(strValue); //显示文本
+		 m_nameEditor.SetWindowText(strValue); //
 		  		 
 		 m_nameEditor.SetFocus();
 		 int nLenth=strValue.GetLength();
 		 
-		 m_nameEditor.SetFocus(); //获取焦点
-		 m_nameEditor.MoveWindow(rc); //移动到选中格的位置，覆盖
+		 m_nameEditor.SetFocus(); //
+		 m_nameEditor.MoveWindow(rc); //
 	}
 	
 }
@@ -268,7 +268,7 @@ void CIONameConfig::OnEnKillfocusNameedit()
 	m_IONametable.put_TextMatrix(m_nCurRow,m_nCurCol,m_newname);
 	if (m_oldname.CompareNoCase(m_newname)==0)
 	{
-	 return;//只要是相同的，都不进行改变
+	 return;//
 	} 
 	else
 	{
@@ -511,6 +511,6 @@ void CIONameConfig::OnBnClickedCancel()
 	{
 	GetIOName();
 	}
-	//更新全局变量IOName的值
+	//IOName
 	CDialog::OnCancel();
 }

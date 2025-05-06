@@ -381,7 +381,7 @@ void CMacSliderCtrl::DrawHorizontalThumb(CDC* pDC, const CRect& rect)
 
 //-------------------------------------------------------------------
 //
-void CMacSliderCtrl::DrawVerticalThumb(CDC* pDC, const CRect& rect)//绘制滑动控件
+void CMacSliderCtrl::DrawVerticalThumb(CDC* pDC, const CRect& rect)//
 //
 // Return Value:	None.
 //
@@ -566,7 +566,7 @@ void CMacSliderCtrl::DrawChannel(CDC* pDC, const CRect& rect, BOOL bHorz)
 	CBrush br(m_crChannel);
 	CBrush* pOldBrush = pDC->SelectObject(&br);
 
-#if 0//2.5.0.95 删除滑块中的坚条
+#if 0//2.5.0.95 
 	// If the height or width is > 3, draw the inner round rect.
 	if ((bHorz && rc.Height() > 3) || (!bHorz && rc.Width() > 3))
 		pDC->RoundRect(rc, CPoint(2, 2));

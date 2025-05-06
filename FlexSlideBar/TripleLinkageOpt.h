@@ -6,10 +6,10 @@
 	file base:	TripleLinkageOpt
 	file ext:	h
 	author:			
-	purpose:	 此种样式Slide有3个Thumb，其中中间的Thumb为主Thumb（main Thumb），
-	其余两个为从属Thumb（或者称为联动Thumb，LinkageThumb）。
-	在操作时，当移动主Thumb时，从属Thumb也会同时联动，移动相等的距离，直到边缘。
-	而移动任何一个从属Thumb，则不影响其他Thumb，但是不得越过其他Thumb和边界。
+	purpose:	 Slide3ThumbThumbThumbmain Thumb
+	ThumbThumbLinkageThumb
+	ThumbThumb
+	ThumbThumbThumb
 *********************************************************************/
 
 #pragma once
@@ -45,7 +45,7 @@ public:
 	virtual void OnMouseMove(const CPoint& point);
 	virtual void OnLButtonUp(const CPoint& point);
 	virtual void SetTicsArray(vector<int>& szTics);
-	// 将会返回当前活跃
+	// 
 	virtual int GetThumbNum();
 	virtual int GetThumbPosition();	
 	virtual int GetAllThumbPosition(vector<int>& szThumbPos);	
@@ -53,44 +53,44 @@ public:
 
 	void SetParentWnd(CWnd* pParent);
 	//////////////////////////////////////////////////////////////////////////
-	// 设置thumb的位置
+	// thumb
 	void SetThumbPosition(int nFirstPos, int nMidPos, int nLastPos);
 	void GetThumbPosition(int& nFirstPos, int& nMidPos, int& nLastPos);
 
 	virtual void  CalcThumbPosition();
 	//////////////////////////////////////////////////////////////////////////
 	// non virtual function
-	// 设置Thumb的个数
+	// Thumb
 	// void SetThumbNum(int nThumbNum);
 
 protected:
 
-	// 获得一个Thumb可以移动到的边界值(刻度单位)，即它的相邻的两个Thumb的刻度位置（Position）。（不能重合）
-	// param1: nInded , thumb 的索引，即在thumb数组中的位置，根据规定，所有的thumb都不能越过其他相邻的thumb。
-	// param2: nMin, 下边界，thumb可以移动到的最小的刻度位置
-	// param3: nMax,上边界，thumb可以移动到的最大的刻度位置
+	// Thumb()ThumbPosition
+	// param1: nInded , thumb thumbthumbthumb
+	// param2: nMin, thumb
+	// param3: nMax,thumb
 	//
 	void GetThumbRange(int nIndex, int& nMin, int& nMax);
 	int GetFocusThumb(const CPoint& point);
 	void MoveToPosition(int nIndex, int nPosition);
 	int SearchThumbPosition(const CPoint& pt);
 
-	// 专门为两个从属thumb movepage使用
+	// thumb movepage
 	void MovePageForOtherThumb(const CPoint& pt);
-	// 专门为主Thumb使用
+	// Thumb
 	void MovePageForMainThumb(const CPoint& pt);	
 
-	// 专门为两个从属thumb movepage使用
+	// thumb movepage
 	void MouseMoveForOtherThumb(const CPoint& point);
-	// 专门为主Thumb使用
+	// Thumb
 	void MouseMoveForMainThumb(const CPoint& point);	
 
-	// 专门为两个从属thumb movepage使用
+	// thumb movepage
 	void LBtnUpForOtherThumb(const CPoint& point);
-	// 专门为主Thumb使用
+	// Thumb
 	void LBtnUpForMainThumb(const CPoint& point);	
 	
-	// 计算Channel 各个部分rect。
+	// Channel rect
 	void ReCalcChannelRect();
 
 
@@ -98,7 +98,7 @@ protected:
 
 	vector<CFSBThumb*>				m_szThumb;
 
-	vector<int>*					m_szTicMarks;  // 位置与象素对应的数组
+	vector<int>*					m_szTicMarks;  // 
 	int								m_nFocusThumb;
 
 	

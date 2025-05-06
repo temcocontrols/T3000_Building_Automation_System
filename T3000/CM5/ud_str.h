@@ -80,7 +80,7 @@ typedef enum {
          READ_EMAIL_ALARM          = 43,
 		 READ_JSON_SCREEN          = 86,
 		 READ_JSON_ITEM            = 87, 
-         READ_NEW_TIME_COMMAND = 88,           /* read new time            */  //2018 04 17 新的读时间命令
+         READ_NEW_TIME_COMMAND = 88,           /* read new time            */  //2018 04 17 
          READMONITORPACKAGE_T3000 = 89,           /* read monitor belong to which package   */
          READ_AT_COMMAND = 90,	//450 length
          READ_GRPHIC_LABEL_COMMAND = 91,
@@ -139,7 +139,7 @@ typedef enum {
          WRITE_EMAIL_ALARM           = 143,
 		 WRITE_JSON_SCREEN			= 186,
 		 WRITE_JSON_ITEM			= 187,
-         WRITE_NEW_TIME_COMMAND     = 188,  //2018 04 17 新的写时间命令
+         WRITE_NEW_TIME_COMMAND     = 188,  //2018 04 17 
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
          WRITE_BACNET_TO_MODBUS_COMMAND = 194,
@@ -195,7 +195,7 @@ typedef enum {
 
 #define STR_MONITOR_LABEL_LENGTH 9
 
-#pragma pack(push) //保存对齐状态 
+#pragma pack(push) // 
 #pragma pack(1)
 
 
@@ -284,7 +284,7 @@ typedef  struct
 	uint8_t digital_analog ; /* (1 bit; 1=analog, 0=digital)*/
 	uint8_t calibration_sign; /* (1 bit; sign 0=positiv 1=negative )*/
 	uint8_t sub_number; /* (1 bit;  0=0.1, 1=1.0)*/
-	uint8_t calibration_h; /* (5 bits - spare )*/  //去掉了 unused 把 calibration改为了双字节
+	uint8_t calibration_h; /* (5 bits - spare )*/  // unused  calibration
 	uint8_t calibration_l;  /* (8 bits; -25.6 to 25.6 / -256 to 256 )*/
 	uint8_t range;	      			/* (1 uint8_t ; input_range_equate)*/
 } Str_in_point; 
@@ -310,8 +310,8 @@ typedef struct
 {
     uint16_t  		total_length;        /*	total length to be received or sent	*/
     uint8_t		command;
-    uint16_t    start_reg;            //开始的寄存器
-    uint16_t		nlength;          //读写的长度
+    uint16_t    start_reg;            //
+    uint16_t		nlength;          //
 
 }Str_bacnet_to_modbus_header;
 
@@ -332,8 +332,8 @@ typedef struct
 {
     uint16_t start_add;
     uint16_t nlength;
-    uint16_t org_start_add; // 用于校验数据的正确性
-    uint16_t org_nlength;   // 用于校验数据的正确性
+    uint16_t org_start_add; // 
+    uint16_t org_nlength;   // 
     unsigned short ndata[400];
 }Str_modbus_reg;
 
@@ -565,17 +565,17 @@ typedef union
 	}tstat;
 }Str_tstat_schedule; /*config roution */
 
-//暂时不做成灵活性这么强的
+//
 //typedef struct
 //{
 //	int8_t all[40];
 //	struct
 //	{
-//		char flag;                         //是否有用到 use or not ，  0 ：无用     1：有用
-//		unsigned short register_pos;       //Modbus 寄存器 0-65535
-//		char opertion;                     // 0:readwrite  1 :read only    2 :write only  对此寄存器的操作方式  
-//		char headline[30];                 //显示在TSTAT SCHEDUAL 里面的抬头.
-//		char reserved[6];                  //保留项.
+//		char flag;                         // use or not   0      1
+//		unsigned short register_pos;       //Modbus  0-65535
+//		char opertion;                     // 0:readwrite  1 :read only    2 :write only    
+//		char headline[30];                 //TSTAT SCHEDUAL .
+//		char reserved[6];                  //.
 //	}tstat;
 //}Str_reg_customer_def;
 
@@ -613,7 +613,7 @@ typedef struct
 typedef struct
 {
 	byte number		;
-	byte point_type;	//高三位借给 number ，低5位是自己的;
+	byte point_type;	// number 5;
 	byte panel		;
 	byte sub_panel  ;
 	byte  network;
@@ -807,13 +807,13 @@ typedef union
     uint8_t lcddisplay[7];
     struct
     {
-        uint8_t display_type; // 0:使用原来显示的温度    1：modbus 方式自定义显示的格式
-        Point_Net npoint;     //用来描述是input output var 的结构
+        uint8_t display_type; // 0:    1modbus 
+        Point_Net npoint;     //input output var 
     }lcd_mod_reg;
 
     struct
     {
-        uint8_t display_type; // 0:使用原来显示的温度    2：Bacnet 自定义的显示的格式
+        uint8_t display_type; // 0:    2Bacnet 
         unsigned int obj_instance;
         uint8_t point_type;
         uint8_t point_number;
@@ -840,7 +840,7 @@ typedef union
 
 		uint8_t refresh_flash_timer;
 		uint8_t en_plug_n_play;   
-		uint8_t reset_default;   // write 88  //第 37 个     写77 就是启用 闪灯识别设备;
+		uint8_t reset_default;   // write 88  // 37      77  ;
 		uint8_t com_baudrate0; 
 		uint8_t com_baudrate1; 
 		uint8_t com_baudrate2; 
@@ -867,7 +867,7 @@ typedef union
 		//0xca780265			202.120.2.101 ntp.sjtu.edu.cn      2
 		//0x1838b28c            24.56.178.140 time.nist.gov			3
 		//0xd248912d			210.72.145.45  NTSC					4
-        //自动要求跟PC同步                                          200 
+        //PC                                          200 
 		signed short time_zone; 
 		unsigned int n_serial_number;  //count 181
 
@@ -875,7 +875,7 @@ typedef union
 
 		 uint16_t mstp_network_number;
 		 uint8_t BBMD_EN;
-		 uint8_t sd_exist;  // 1 -no    2- yes         3 文件格式不对.
+		 uint8_t sd_exist;  // 1 -no    2- yes         3 .
 		 unsigned short modbus_port;
 		 unsigned char modbus_id; //198
 		 unsigned int object_instance ;
@@ -884,18 +884,18 @@ typedef union
 
 		 char sntp_server[30];
 		 unsigned char zegbee_exsit;//238
-         unsigned char LCD_Display; //1: 常亮  0：常闭;
-         unsigned char flag_time_sync_pc;  // 0: 不需要   1:同步.
-         unsigned char time_sync_auto_manual;  // 0 和时间服务器同步   1：和PC 时间同步
-         unsigned char sync_time_results;      //与时间服务器同步的结果 0 失败         1成功   注：只有在 reset_default 写99 要求同步后才去读次位用以判断同步结果;
-         //unsigned char network_ID[3];   //三个口 用于编程的ID；
+         unsigned char LCD_Display; //1:   0;
+         unsigned char flag_time_sync_pc;  // 0:    1:.
+         unsigned char time_sync_auto_manual;  // 0    1PC 
+         unsigned char sync_time_results;      // 0          1    reset_default 99 ;
+         //unsigned char network_ID[3];   // ID
          unsigned char mstp_id;         //MSTP_ID
          unsigned short zigbee_panid;
-         unsigned char max_master; //可设置的最大matser值  245 个
-         unsigned char special_flag; // bit 0  代表是否支持 PT1K snesor 0 不支持 1支持;
+         unsigned char max_master; //matser  245 
+         unsigned char special_flag; // bit 0   PT1K snesor 0  1;
                                      // bit 1 PT100
          unsigned char uart_parity[3];
-         unsigned char uart_stopbit[3];   //总共253
+         unsigned char uart_stopbit[3];   //253
          lcdconfig display_lcd;
 		 unsigned char start_month;
 		 unsigned char start_day;
@@ -903,9 +903,9 @@ typedef union
 		 unsigned char end_day;
 		 unsigned char network_number_hi;
 		 unsigned char webview_json_flash; //value 0 old way     value 2  new way for jsaon
-		 unsigned char max_var;  //ESP32 Only   ST 固定 128
-		 unsigned char max_in;	  //ESP32 Only	 ST 固定 64
-		 unsigned char max_out;  //ESP32 Only   ST 固定 64   //count 269
+		 unsigned char max_var;  //ESP32 Only   ST  128
+		 unsigned char max_in;	  //ESP32 Only	 ST  64
+		 unsigned char max_out;  //ESP32 Only   ST  64   //count 269
 
 	}reg;
 }Str_Setting_Info;
@@ -917,10 +917,10 @@ typedef enum
 
  
 //**************************************************
-//2019 05 20 Fandu 用于远程访问时，读取 T3 下面子设备信息;
+//2019 05 20 Fandu  T3 ;
 typedef	struct
 {
-    uint8_t protocal;  // 0  是modbus设备   1 是bacnet 设备;
+    uint8_t protocal;  // 0  modbus   1 bacnet ;
     uint8_t modbus_id;
     uint32_t instance;
 }Str_Remote_Info;
@@ -1106,12 +1106,12 @@ typedef struct
 	uint8_t product_id  ;//            : 8;
 	uint8_t count;//              : 8;
 	uint8_t read_write;//         : 2;    0 - read only 1- written
-	uint8_t time_remaining ;//          : 2; //远程点 剩余生命周期
+	uint8_t time_remaining ;//          : 2; // 
     uint32_t object_instance;
 } Str_remote_point; /* 1+5+4+2+2=14 bytes */
 
 
-typedef struct	//用来存储data log 的结构;
+typedef struct	//data log ;
 {
 	uint8_t index;   // monitor
 	unsigned int time;
@@ -1160,7 +1160,7 @@ typedef struct
 
 typedef struct
 {
-	char table_name[9];  //最后一个字节用来判断精度，如果是 0xEF 就用0.01  64.8
+	char table_name[9];  // 0xEF 0.01  64.8
 	Tbl_point  dat[16];
 
 } Str_table_point;
@@ -1181,20 +1181,20 @@ typedef union
     uint8_t all[160];
     struct
     {
-        uint8_t Wifi_Enable;   // 写1 应该 这些IP 变更   Modbus 起始位置 2000
+        uint8_t Wifi_Enable;   // 1  IP    Modbus  2000
         uint8_t IP_Auto_Manual; //  0 Auto DHCP   1 static IP
-        uint8_t IP_Wifi_Status;  // 0 Wifi模块未知  
+        uint8_t IP_Wifi_Status;  // 0 Wifi  
         uint8_t LoadDefault; //1
         uint8_t modbus_port;
         uint8_t bacnet_port;
         uint8_t software_version;
         uint8_t	reserved[7];
-        char username[64];  //多写
-        char password[32];  //多写
-        uint8_t ip_addr[4];   //IP地址 12个寄存器 多写
+        char username[64];  //
+        char password[32];  //
+        uint8_t ip_addr[4];   //IP 12 
         uint8_t net_mask[4];
         uint8_t getway[4];
-        uint8_t wifi_mac[6];  //只读
+        uint8_t wifi_mac[6];  //
     }reg;
 }str_wifi_point;
 
@@ -1217,12 +1217,12 @@ typedef struct
     register_point heat_db;
 }Str_tstat_setpoint;
 
-#pragma pack(pop)//恢复对齐状态 
+#pragma pack(pop)// 
 
 #define JSON_COLOR_LENGTH 10
 #define JSON_STRING_LENGTH  10
 
-#pragma pack(push) //保存对齐状态 
+#pragma pack(push) // 
 #pragma pack(1)
 
 typedef struct str_viewportTransform
@@ -1260,7 +1260,7 @@ typedef struct str_settings
 
 typedef struct myitems
 {
-	unsigned char ntranslate_count;// 控制结构体 translate 数量
+	unsigned char ntranslate_count;//  translate 
 	unsigned char item_belong_screen;
 	unsigned char active;
 	unsigned char group;
@@ -1283,7 +1283,7 @@ typedef union
 	uint8_t all[50];//50x16
 	struct
 	{
-		unsigned short ncount; //控制结构体 myitems 的数量的，不存入设备
+		unsigned short ncount; // myitems 
 		unsigned char activeItemIndex;
 		unsigned char customObjectsCount;
 		unsigned char groupCount;
@@ -1306,13 +1306,13 @@ typedef union
 	uint8_t all[200];//80X200
 	struct
 	{
-		myitems json_items;  //size约185
+		myitems json_items;  //size185
 	}reg;
 }Str_item_Json;
 
 
 
-#pragma pack(pop)//恢复对齐状态 
+#pragma pack(pop)// 
 
 
 #endif

@@ -8,7 +8,7 @@
 #include "global_function.h"
 #include "global_define.h"
 // CBacnetUserlogin dialog
-CRect userlogin_rect;	//用来存储 窗体应该有多大;
+CRect userlogin_rect;	// ;
 CString bmp_login_path;
 HBITMAP 	hBitmap_login;
 IMPLEMENT_DYNAMIC(CBacnetUserlogin, CDialogEx)
@@ -51,7 +51,7 @@ BOOL CBacnetUserlogin::OnInitDialog()
 	m_cxScreen=GetSystemMetrics(SM_CXSCREEN);
 	m_cyScreen=GetSystemMetrics(SM_CYSCREEN);
 	m_user_login_hwnd = this->m_hWnd;
-	::GetWindowRect(BacNet_hwd,&userlogin_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&userlogin_rect);	// view;
 	MoveWindow(userlogin_rect.left,userlogin_rect.top,userlogin_rect.Width(),userlogin_rect.Height(),1);
 	Invalidate();
 	GetDlgItem(IDC_EDIT_LOGIN_USERNAME)->SetFocus();
@@ -80,7 +80,7 @@ BOOL CBacnetUserlogin::OnInitDialog()
 // CBacnetScreenEdit message handlers
 LRESULT  CBacnetUserlogin::RedrawLoginWindow(WPARAM wParam, LPARAM lParam)
 {
-	::GetWindowRect(BacNet_hwd,&userlogin_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&userlogin_rect);	// view;
 	MoveWindow(userlogin_rect.left,userlogin_rect.top,userlogin_rect.Width(),userlogin_rect.Height(),1);
 	Invalidate();
 	GetDlgItem(IDC_EDIT_LOGIN_USERNAME)->SetFocus();
@@ -126,7 +126,7 @@ void CBacnetUserlogin::OnBnClickedButtonLogin()
 {
 	
 	bool any_user_valid = false;
-	//检测是否里面存在有效的账号密码;
+	//;
 	for (int i=0;i<(int)m_user_login_data.size();i++)
 	{
 		CString temp_user_name;
@@ -142,7 +142,7 @@ void CBacnetUserlogin::OnBnClickedButtonLogin()
 		{
 			if(!temp_password.IsEmpty())
 			{
-				any_user_valid = true;	//User表里面 存在可用的 账号密码;
+				any_user_valid = true;	//User  ;
 				break;
 			}
 		}		
@@ -265,7 +265,7 @@ void CBacnetUserlogin::OnPaint()
 	// Do not call CDialogEx::OnPaint() for painting messages
 
 	CRect test_rect;
-	::GetWindowRect(BacNet_hwd,&test_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&test_rect);	// view;
 
 
 	

@@ -1,4 +1,4 @@
-﻿// CBacnetBuilidngAddNode.cpp: 实现文件
+﻿// CBacnetBuilidngAddNode.cpp: 
 //
 #include "stdafx.h"
 
@@ -8,7 +8,7 @@
 #include "CBacnetBuildingRoomEditor.h"
 #include "CBacnetBMD.h"
 BM_dlg_ret dlg_ret;
-// CBacnetBuilidngAddNode 对话框
+// CBacnetBuilidngAddNode 
 
 CString BM_Cstring_Type[]
 {
@@ -62,7 +62,7 @@ BEGIN_MESSAGE_MAP(CBacnetBuilidngAddNode, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetBuilidngAddNode 消息处理程序
+// CBacnetBuilidngAddNode 
 
 void CBacnetBuilidngAddNode::SetParameter(int nfunction,int ntype)
 {
@@ -154,16 +154,16 @@ BOOL CBacnetBuilidngAddNode::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  在此添加额外的初始化
+	// TODO:  
 	InitalUI();
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // 异常: OCX 属性页应返回 FALSE
+				  //  OCX 
 }
 
 
 void CBacnetBuilidngAddNode::OnBnClickedButtonBmNodeOk()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_csfunction;
 	GetDlgItem(IDC_COMBO_BM_FUNCTION)->GetWindowTextW(temp_csfunction);
 	CString temp_cstype;
@@ -232,7 +232,7 @@ void CBacnetBuilidngAddNode::OnBnClickedButtonBmNodeOk()
 
 void CBacnetBuilidngAddNode::OnBnClickedButtonManageBuild()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CBacnetBuildingRoomEditor dlg;
 	dlg.DoModal();
 }
@@ -240,7 +240,7 @@ void CBacnetBuilidngAddNode::OnBnClickedButtonManageBuild()
 
 void CBacnetBuilidngAddNode::OnCbnSelchangeComboBmMoudle()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	int example_index = 0;
 	CString temp_string;
 	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_BM_MOUDLE))->GetCurSel();

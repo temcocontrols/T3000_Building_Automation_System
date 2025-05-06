@@ -56,7 +56,7 @@ protected:
 	DWORD GetIPAddress();
 	int Judge_BinHexFile(CString filepath);
 public:
-	//选择flash文件
+	//flash
 	afx_msg void OnBnClickedButtonSelfile();
 	//flash button click
 	afx_msg void OnBnClickedButtonFlash();
@@ -80,7 +80,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// public method
 	////////////////////////////////////////////////////////////////////////////
-	// 参数 BOOL, =TRUE replace the current line, =FALSE add a new line
+	//  BOOL, =TRUE replace the current line, =FALSE add a new line
 
 	void UpdateStatusInfo(const CString& strInfo, BOOL bReplace);
 	 
@@ -109,7 +109,7 @@ BOOL	GetFlashSNParam(int& nHWVerison, CString& strProductModel,int &nProductID);
 public: 
 	// public member
 	//CIPAddressCtrl m_IPAddr;
-	/*提示信息控件*/
+	/**/
 	CToolTipCtrl *m_ToolTip;
  
 public:	// private method
@@ -147,27 +147,27 @@ public:	// private method
 protected:	// private member
 
 	//int					m_nFlashTypeFlag;			// =0 flash by com;  =1 flash by ethernet;
-	//CString			m_strInstallPath;				// 老毛要的，其实没用
-	CString			m_strFlashMethod;			// flash的方式
-	CString			m_strLogoFileName;			// logo文件名，包含路径
+	//CString			m_strInstallPath;				// 
+	CString			m_strFlashMethod;			// flash
+	CString			m_strLogoFileName;			// logo
 	CString 		m_strLogFileName;           //log file name
-	vector<int>		m_szMdbIDs;					// 记录所有输入的Modbus ID
+	vector<int>		m_szMdbIDs;					// Modbus ID
 	CListBox			m_lbStatusInfo;
 	NC_FLASH_TYPE		m_ftFlashType;
-	CComWriter*	m_pComWriter;				// 用串口flash的类的指针，在使用时才实例化，用完后立即释放
+	CComWriter*	m_pComWriter;				// flash
 	
-	TFTPServer*	m_pTFTPServer;				// 使用网络，TFTP协议flash，使用时实例化
-	CComWriter*		m_pTCPFlasher;//使用网络接口来flash subid
+	TFTPServer*	m_pTFTPServer;				// TFTPflash
+	CComWriter*		m_pTCPFlasher;//flash subid
 	
 public:
 	//CTabCtrl					m_tab;
-	CString					m_strHexFileName;			// hex文件名，包含路径，要烧录的文件，实际上也可能是bin文件
+	CString					m_strHexFileName;			// hexbin
 	CConfigFileHandler		m_cfgFileHandler;	
-	CString					m_strCfgFilePath;				// cfg配置文件名，包含路径
+	CString					m_strCfgFilePath;				// cfg
 
 	int							m_nTabSel;
 	
-	BOOL						m_bShowSN;					// 是否显示隐藏的界面。
+	BOOL						m_bShowSN;					// 
     BOOL                         m_enable_sn_mac;
     
 	map<int, CString>	m_mapModel;
@@ -178,7 +178,7 @@ public:
 	afx_msg void OnBnClickedCom();
 	afx_msg void OnBnClickedNet();
 	void COM_NET_Set_ReadOnly();
-	//是否点击了刷新子ID的按钮，点击了，标志位TRUE
+	//IDTRUE
 	void set_SUBID();
 	//void Set_Device_FHInfor();	//FirmVersion,HardVersion
     CString m_strASIX;
@@ -190,13 +190,13 @@ private:
 	CEdit m_ipPort;
 	CButton m_Check_SubID;
 	CEdit m_SubID;
-	// 文件缓冲区，用来存放读取的文件的内容，flash完后应当delete，使用时再new
+	// flashdeletenew
 	char*					m_pFileBuf;	//FOR SUBID					
-	    //这个变量来控制控件是否可用的判断条件 
-	    //COM_INPUT=TRUE 那就是选择COM的状态
+	    // 
+	    //COM_INPUT=TRUE COM
 		BOOL 						COM_INPUT;
-		//这个变量是控制 通过IP刷新连到NC或者LC下面的设备的
-		//TRUE的话，用户需要输入
+		// IPNCLC
+		//TRUE
 		BOOL						FLASH_SUBID;
 	   	/*	 Flash_Type
 		1:TStat-by com 
@@ -208,9 +208,9 @@ private:
 		*/
 		unsigned int  Flash_Type;	 
 
-	 	//为写入日志文件  系统文件类
+	 	//  
 		CStdioFile*		 m_plogFile;
-		//这个变量是数据库的路径
+		//
 		CString	m_strDatabasefilepath;
 
 
@@ -221,12 +221,12 @@ private:
 		UINT m_ChipSize;
 
 public:
-	//点击click-box 的空间的触发事件
+	//click-box 
 	afx_msg void OnBnClickedCheckFlashSubid();
-	//初始化Combox控件
+	//Combox
 	void InitCombox(void);
-	//这个函数为COM_TStat的总函数
-	//当用户点击COM_FLASH的时候，
+	//COM_TStat
+	//COM_FLASH
 	BOOL FlashByComport(void);
 	BOOL FlashByNetwork(void);
 	BOOL FlashSubID(void);

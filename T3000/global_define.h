@@ -2,15 +2,15 @@
 
 #include "RelayLabel.h"
 #ifdef DEBUG
- //#define ENABLE_HTTP_FUCTION  //定义是否使用http api
+ //#define ENABLE_HTTP_FUCTION  //http api
 #endif // DEBUG
 
 
 #define ENABLE_T3_EMAIL
 #define DISABLE_HANDLE_JSON_DATA
 #include <map>
-//minipanel 寄存器表
-//  9800	-	9999    200个寄存器   setting
+//minipanel 
+//  9800	-	9999    200   setting
 //  10000	-   11471   1472		  OUT
 //  11472   -   12943   1472		  IN
 //	12944   -   15503	2560		  VAR					sizeof(Str_variable_point)= 39
@@ -84,7 +84,7 @@ const int THREAD_IDLE = 255;
 //const int TFTP_SEND_LENGTH = 3 * 1024 + 512;
 const int TFTP_SEND_LENGTH = 512;
 //const int TFTP_SEND_LENGTH = 1024;
-#pragma pack(push) //保存对齐状态 
+#pragma pack(push) // 
 #pragma pack(1)
 typedef struct
 {
@@ -159,7 +159,7 @@ typedef struct
 
 
 
-#pragma pack(pop)//恢复对齐状态 
+#pragma pack(pop)// 
 
 
 typedef enum
@@ -167,7 +167,7 @@ typedef enum
 	GET_SERIAL_NUMBER = 1,
 	DOWNLOAD_FILE = 2,
 	UPLOAD_FILE = 3,
-	DOWNLOAD_NEW_FILE = 4,	//用于区别  DOWNLOAD_FILE ， 代表新的下载利用3K下载;
+	DOWNLOAD_NEW_FILE = 4,	//  DOWNLOAD_FILE  3K;
 	GET_MD5_VALUE = 99,
 
 	RETURN_SERIAL_NUMBER = 101,
@@ -251,9 +251,9 @@ const int PROTOCOL_GSM = 4;
 const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
 const int PROTOCOL_MSTP_TO_MODBUS = 11;
-const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;    //网络下面的设备，子口跑MSTP设备 ，只能通过Ptransfer 转10000以后寄存器读取
-const int PROTOCOL_MB_TCPIP_TO_MB_RS485 = 13;     //20200306 TSTAT10或者T3BB  使用MODBUS MODBUS485 接到  T3BB下面 
-const int PROTOCOL_MB_PTP_TRANSFER = 14;          //MODBUS485采用ptp 的方式获取 T3私有数据;
+const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;    //MSTP Ptransfer 10000
+const int PROTOCOL_MB_TCPIP_TO_MB_RS485 = 13;     //20200306 TSTAT10T3BB  MODBUS MODBUS485   T3BB 
+const int PROTOCOL_MB_PTP_TRANSFER = 14;          //MODBUS485ptp  T3;
 const int PROTOCOL_THIRD_PARTY_BAC_BIP = 253;
 const int PROTOCOL_VIRTUAL = 254;
 const int PROTOCOL_UNKNOW = 255;
@@ -500,7 +500,7 @@ const int BAC_SHOW_MISSION_RESULTS = 3;
 const int BAC_LIST_REFRESH_INPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_OUTPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_TIME = 45000;//ms
-const int BAC_LIST_REFRESH_ETHERNET_TIME = 45000;  //判断是接的网络就用20秒的刷新;
+const int BAC_LIST_REFRESH_ETHERNET_TIME = 45000;  //20;
 
 const int SCHEDULE_TIME_NUM = 0;
 const int SCHEDULE_TIME_MONDAY = 1;
@@ -523,7 +523,7 @@ const int HANDLE_I_AM_BIP = 1;
 struct _Bac_Scan_Com_Info
 {
     int nprotocol;  // 0 MSTP     1 BIP
-    unsigned char ipaddress[6];   //前四位位IP地址  后两位位端口号
+    unsigned char ipaddress[6];   //IP  
     int device_id;
     int macaddress;
 	uint16_t vendor_id;
@@ -565,7 +565,7 @@ struct _Resend_Read_Info
 	int task_result;
 	int invoke_id;
 	int has_resend_yes_or_no;
-	int timeout_count;//多少次还没收到回复，就算 失败;
+	int timeout_count;// ;
 };
 
 struct _Com_Scan_Read_Info
@@ -589,7 +589,7 @@ struct refresh_subnet_device
 {
     UCHAR device_count;
     UINT parent_sn;
-    char reserved_data[15]; // 预留
+    char reserved_data[15]; // 
     sub_net_status device_status[255];
 };
 
@@ -617,10 +617,10 @@ struct refresh_net_device
 	unsigned short bacnetip_port;
     int hardware_info;     //bit  0x74 zigbee   bit1 wifi
     int nprotocol;
-    UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
-    UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
-    UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
-	UCHAR  minitype; //用来确认到底是哪个设备，ESP 设备用了一个主设备;
+    UCHAR  command_version; //6565 +1 
+    UCHAR  subnet_port;  // 1- MainPort      2-ZigbeePort      3-SubPort
+    UCHAR  subnet_baudrate;   //; 
+	UCHAR  minitype; //ESP ;
 };
 
 struct refresh_net_label_info
@@ -676,9 +676,9 @@ struct Monitor_Input_Info
 {
 	int Max_Value;
 	int Min_Value;
-	bool be_record;//是否记录了这条;
-	bool use_own_scale;//是否单独用自己的刻度;
-	bool show_graphic; //是否显示图像;
+	bool be_record;//;
+	bool use_own_scale;//;
+	bool show_graphic; //;
 };
 
 struct Changed_Item_Info
@@ -1110,7 +1110,7 @@ const CString Time_Zone_Name[] =
 	_T("(UTC - 11:00) , X-ray Time Zone"),
 	_T("(UTC - 10:00) , Cook Island , Hawaii-Aleutian Standard Time"),
 	_T("(UTC - 09:00) , Alaska Standard Time , Gambier Time"),
-	_T("(UTC - 08:00) , Pacific Standard Time , Tiempo del Pacífico"),
+	_T("(UTC - 08:00) , Pacific Standard Time , Tiempo del Pacfico"),
 	_T("(UTC - 07:00) , Mountain Standard Time , Pacific Daylight Time"),
 	_T("(UTC - 06:00) , Central Standard Time , Galapagos Time"),
 	_T("(UTC - 05:00) , Eastern Standard Time"),
@@ -1219,7 +1219,7 @@ struct _Graphic_Value_Info
 	unsigned short entitysize;
 	CRelayLabel* control_pt;
 	HWND hWnd;
-    //int8_t standard_command;  //0  非标      1 标准;
+    //int8_t standard_command;  //0        1 ;
     //int object_type;
     //uint32_t object_instance;
     //int property_id;
@@ -1227,7 +1227,7 @@ struct _Graphic_Value_Info
 
 
 
-const int WINDOW_TAB_COUNT = 15; //多少个Window 嵌入在TAB里面;
+const int WINDOW_TAB_COUNT = 15; //Window TAB;
 const int WINDOW_INPUT = 0;
 const int WINDOW_OUTPUT = 1;
 const int WINDOW_VARIABLE = 2;
@@ -1332,7 +1332,7 @@ const int T332AI_OUT_A = 0;
 const int PWM_TRANSDUCER_OUT_D = 0;
 const int PWM_TRANSDUCER_OUT_A = 6;
 
-const int FAN_MODULE_IN_A = 12; // ESP32 版本 子设备  Fan module 输入;
+const int FAN_MODULE_IN_A = 12; // ESP32    Fan module ;
 const int FAN_MODULE_IN_D = 0;
 const int FAN_MOUDLE_OUT_A = 1; 
 const int FAN_MOUDLE_OUT_D = 0;
@@ -1349,7 +1349,7 @@ const int NG2_TYPE2_OUT_D = 8;
 
 const int T3_ESP_LW_IN_A = 0;
 const int T3_ESP_LW_IN_D = 0;
-const int T3_ESP_LW_OUT_A = 6;  //Lighting sw  6 个灯 可以输出各种颜色;
+const int T3_ESP_LW_OUT_A = 6;  //Lighting sw  6  ;
 const int T3_ESP_LW_OUT_D = 0;
 
 enum
@@ -1427,7 +1427,7 @@ typedef struct
 	int scan_status;
 	char scan_notes[250];
 	int scan_found;
-}Scan_Info;	// 扫描的时候 用于显示给list 的结构;
+}Scan_Info;	//  list ;
 
 
 typedef struct
@@ -1449,7 +1449,7 @@ typedef struct
     uint8_t network_point;
 	uint8_t ntext_place;
 	uint8_t n_iconsize;
-    int x_length; // 用来确定标签是否点击，以及点击的宽度.
+    int x_length; // .
 }Bacnet_Label_Info;
 
 
@@ -1783,8 +1783,8 @@ const CString Input_Filter_Array[8] =
 const CString Input_Unit[42] =
 {
 	_T("Not Used"),
-	_T("℃"),
-	_T("℉"),
+	_T(""),
+	_T(""),
 	_T("FPM"),
 	_T("Pa"),
 	_T("KPa"),
@@ -1982,7 +1982,7 @@ const int LENGTH_MODBUS_SCHEDULE_CODE = WEEKLY_SCHEDULE_SIZE / 2 * BAC_WEEKLYCOD
 const int LENGTH_MODBUS_HOLIDAY_CODE = ANNUAL_CODE_SIZE / 2;
 
 
-//以下是 bacnet 寄存器 映射到modbus的位置;
+// bacnet  modbus;
 const int REG_SETTING_START_ADDRESS = BAC_SETTING_START_REG;
 const int REG_OUTPUT_START_ADDRESS = REG_SETTING_START_ADDRESS + LENGTH_MODBUS_SETTING; //10000
 const int REG_INPUT_START_ADDRESS = REG_OUTPUT_START_ADDRESS + LENGTH_MODBUS_OUTPUT;	//11472
@@ -2062,7 +2062,7 @@ enum sub_io_type
 #define BAC_AO        29
 #define BAC_BO        30
 
-//31弃用 
+//31 
 #define BAC_FLOAT_ABCD  32
 #define BAC_FLOAT_CDAB  33
 #define BAC_FLOAT_BADC  34
@@ -2094,7 +2094,7 @@ enum sub_io_type
 #define BLACK_PC_GROUND_HEIGHT     BLACK_GROUND_HEIGHT
 
 
-																						//从机 发起的 FF 55 后面的 请求位;
+																						//  FF 55  ;
 typedef enum
 {
 	SEND_MINIPANEL_INFO = 1,
@@ -2102,7 +2102,7 @@ typedef enum
 };
 
 
-//主机应答的FF 55 后面的命令位;
+//FF 55 ;
 typedef enum
 {
 	RECEIVE_DATA_LEBGTH_ERROR = 1,
@@ -2112,7 +2112,7 @@ typedef enum
 	RETURN_MINI_DATA = 5
 };
 
-#pragma pack(push) //保存对齐状态 
+#pragma pack(push) // 
 #pragma pack(1)
 typedef struct
 {
@@ -2133,7 +2133,7 @@ typedef struct
 
 }STR_For_T3000;
 
-#pragma pack(pop)//恢复对齐状态 
+#pragma pack(pop)// 
 
 
 
@@ -2181,7 +2181,7 @@ const int day_in_this_year[] =
 #define HEARTBEAT_LENGTH	200
 #define  T3000_MINI_HEARTBEAT_LENGTH_WITH_MINI_PORT  (9 + HEARTBEAT_LENGTH)
 
-#pragma pack(push) //保存对齐状态 
+#pragma pack(push) // 
 #pragma pack(1)
 struct stLoginMessage
 {
@@ -2197,7 +2197,7 @@ typedef union
 	unsigned char all_data[T3000_CONNECT_LENGTH];
 	struct
 	{
-		unsigned int m_serial_number; //T3000想要连接的 序列号;
+		unsigned int m_serial_number; //T3000 ;
 		stLoginMessage login_message;
 		unsigned char reserved_reg[46];
 	}reg_date;
@@ -2208,7 +2208,7 @@ typedef union
 #define COMMAND_FROM_MINI		2
 #define COMMAND_FROM_T3000		3
 
-#pragma pack(pop)//恢复对齐状态 
+#pragma pack(pop)// 
 
 enum PTP_COMMAND_TYPE {
 	COMMAND_RECEIVE_HEART_BEAT = 0x01,
@@ -2288,15 +2288,15 @@ typedef union
 		char panel_name[20];
 		UCHAR object_instance_4;
 		UCHAR object_instance_3;
-		UCHAR isp_mode;  //非0 在isp mode   , 0 在应用代码;    第60个字节
-		USHORT bacnetip_port;	//bacnet 的端口号;
+		UCHAR isp_mode;  //0 isp mode   , 0 ;    60
+		USHORT bacnetip_port;	//bacnet ;
 		UCHAR  hardware_info;	//  //bit0 zigbee   bit1 wifi
-        UCHAR  subnet_protocol;   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
+        UCHAR  subnet_protocol;   //0  modbus   12  PROTOCOL_BIP_T0_MSTP_TO_MODBUS
 
-        UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
-        UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
-        UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
-		UCHAR  minitype;     //用来确认到底是哪个设备，ESP 设备用了一个主设备;
+        UCHAR  command_version; //6565 +1 
+        UCHAR  subnet_port;  // 1- MainPort      2-ZigbeePort      3-SubPort
+        UCHAR  subnet_baudrate;   //; 
+		UCHAR  minitype;     //ESP ;
 	}reg;
 }Str_UPD_SCAN;
 
@@ -2401,10 +2401,10 @@ typedef enum
 };
 
 
-const int DIGITAL_DIRECT = 0; //自定义 数字量Range
+const int DIGITAL_DIRECT = 0; // Range
 const int DIGITAL_INVERS = 1;
 
-const int DELTA_HEIGHT = 10; // 用于窗口最大化之后 显示的差值，以免挡住下面的状态栏
+const int DELTA_HEIGHT = 10; //  
 
 const int MENU_HOME = 0;
 const int MENU_INPUT = 1;
@@ -2426,7 +2426,7 @@ const int MENU_BUILDING = 15;
 const int READ_MODE_NORMAL = 0;
 const int READ_MODE_SIMPLIFICATION = 1;
 
-#pragma region define_bacnet_data_type  //定义标准的bacnet 数据结构类型;
+#pragma region define_bacnet_data_type  //bacnet ;
 
 const int TPYE_BACAPP_BOOLEAN = 1;
 const int TPYE_BACAPP_UNSIGNED = 2;
@@ -2457,7 +2457,7 @@ struct str_register_db_data
 };
 
 #pragma region connect_region
-//用于标识目前整个系统的协议状态；
+//
 typedef struct 
 {
     unsigned char mstp_status;  // 0 stop    1 running
@@ -2473,7 +2473,7 @@ typedef struct
 
 typedef enum
 {
-    F_EXPANSION_IO, //Minipanel 的扩展IO界面
+    F_EXPANSION_IO, //Minipanel IO
     F_SETTING_USER_LOGIN,
     FUNCTION_C
 }FunctionNumber;
@@ -2806,7 +2806,7 @@ typedef struct
 		unsigned char sub_panel;
 		unsigned char ntype;
 		unsigned int object_number;
-		unsigned char network; //原有结构;
+		unsigned char network; //;
 	}pan_str;
 	struct
 	{
@@ -2862,15 +2862,15 @@ typedef  struct
 	//Str_in_point  m_group_input_data;
 	//Str_out_point m_group_output_data;
 	//Str_variable_point m_group_variable_data;
-	int group_index;  //标识三维 属于哪一个节点;
+	int group_index;  // ;
 	int category_index;
 	int hw_index;
 	CString Group_Name;
 	CString Category_Name;
 	CString HW_Point_Name;
 	CString type_string;
-	int type; //标识是input output 还是var
-	int nstatus; // 0  offline    1  online      2 在线不可用
+	int type; //input output var
+	int nstatus; // 0  offline    1  online      2 
 
 	int n_index;
 	int n_panel;
@@ -2885,7 +2885,7 @@ typedef  struct
 	CString iotype; // digital   ananlog  virtual
 
 	Str_points nproperty;  //
-	CString cs_property_name; //例如  1234IN56
+	CString cs_property_name; //  1234IN56
 	char  m_data[250];
 	Input_CString input_cstring;
 	Output_CString output_cstring;

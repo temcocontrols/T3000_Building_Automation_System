@@ -53,7 +53,7 @@ public:
 	CString m_strSubNetName;
 	CString m_strID;
 
-	CString	m_strHexFileName;			// hex文件名，包含路径，要烧录的文件，实际上也可能是bin文件
+	CString	m_strHexFileName;			// hexbin
 	CDialogInfo* pDialogInfo;
 	DECLARE_EVENTSINK_MAP()
 	void ClickMsflexgridAllnode();

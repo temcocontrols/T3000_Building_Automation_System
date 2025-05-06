@@ -100,7 +100,7 @@ void CFSBChannel::Draw(CDC* pDC)
 	// put back the old objects
 	//pDC->SelectObject(pOldBrush);
 	//pDC->SelectObject(pOldPen);
-//if (m_szRC.size()!=1)//lsc加的，当增加一人滑块后在这里出错m_szRC.size()没有数据
+//if (m_szRC.size()!=1)//lscm_szRC.size()
 //{
 	//////////////////////////////////////////////////////////////////////////
  	for (UINT i = 0; i < m_szRC.size(); i++)

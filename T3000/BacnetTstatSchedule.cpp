@@ -1,4 +1,4 @@
-// BacnetTstatSchedule.cpp : 实现文件
+// BacnetTstatSchedule.cpp : 
 //
 
 #include "stdafx.h"
@@ -9,8 +9,8 @@
 
 HANDLE h_write_group_thread = NULL;
 HANDLE h_read_group_thread = NULL;
-CString ScheduleName[BAC_WEEKLYCODE_ROUTINES_COUNT + 1]; //用来存放Schedule的lable
-// CBacnetTstatSchedule 对话框
+CString ScheduleName[BAC_WEEKLYCODE_ROUTINES_COUNT + 1]; //Schedulelable
+// CBacnetTstatSchedule 
 
 IMPLEMENT_DYNAMIC(CBacnetTstatSchedule, CDialogEx)
 
@@ -41,19 +41,19 @@ BEGIN_MESSAGE_MAP(CBacnetTstatSchedule, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetTstatSchedule 消息处理程序
+// CBacnetTstatSchedule 
 
 
 BOOL CBacnetTstatSchedule::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  在此添加额外的初始化
+	// TODO:  
 	Initial_List();
 	Fresh_TSTAT_Schedule_List(NULL, NULL);
     SetWindowText(_T("Group Schedule Setting"));
 
-    //使list的长宽 和对话框一样大;
+    //list ;
     CRect windowrect;
     GetWindowRect(windowrect);
     ::SetWindowPos(m_bac_tstat_sch_list.m_hWnd, NULL, windowrect.left, windowrect.top, windowrect.Width() - 20, windowrect.Height(), SWP_NOMOVE);
@@ -61,13 +61,13 @@ BOOL CBacnetTstatSchedule::OnInitDialog()
     SetTimer(1, 7000, NULL);
     ::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // 异常: OCX 属性页应返回 FALSE
+				  // : OCX  FALSE
 }
 
 
 BOOL CBacnetTstatSchedule::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	// TODO: /
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -191,7 +191,7 @@ LRESULT CBacnetTstatSchedule::Fresh_TSTAT_Schedule_Item(WPARAM wParam, LPARAM lP
     CString temp_cs = m_bac_tstat_sch_list.GetItemText(Changed_Item, Changed_SubItem);
     if (Changed_SubItem == TSTAT_SCHEDULE_SCHEDULES)
     {
-        for (int i = 0;i < 9;i++) //改变后判断是变化为哪一个
+        for (int i = 0;i < 9;i++) //
         {
             if (temp_cs.CompareNoCase(ScheduleName[i]) == 0)
             {
@@ -202,7 +202,7 @@ LRESULT CBacnetTstatSchedule::Fresh_TSTAT_Schedule_Item(WPARAM wParam, LPARAM lP
     }
 
     
-    //Fandu 2013-12-13  在变更 setpoint 时 ，需要优先校验值的取值范围。
+    //Fandu 2013-12-13   setpoint  
     if (Changed_SubItem == TSTAT_SCHEDULE_DSP_VALUE)
     {
         int temp_int = (int)(_wtof(temp_cs) * 10);
@@ -272,7 +272,7 @@ LRESULT CBacnetTstatSchedule::Fresh_TSTAT_Schedule_Item(WPARAM wParam, LPARAM lP
                 m_group_value = write_sp_value;
                 m_group_index = Changed_SubItem;
 
-                m_group_id = m_tatat_schedule_data.at(Changed_Item).tstat.schedule; //保存需要改的group id.
+                m_group_id = m_tatat_schedule_data.at(Changed_Item).tstat.schedule; //group id.
                 h_write_group_thread = CreateThread(NULL, NULL, WriteGroupRegThreadfun, this, NULL, NULL);
                 return true;
             }
@@ -384,7 +384,7 @@ void CBacnetTstatSchedule::Initial_List()
 void CBacnetTstatSchedule::OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 
 	long lRow, lCol;
 	m_bac_tstat_sch_list.Set_Edit(true);
@@ -400,7 +400,7 @@ void CBacnetTstatSchedule::OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT 
 	lCol = lvinfo.iSubItem;
 
 
-	if (lRow>m_bac_tstat_sch_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if (lRow>m_bac_tstat_sch_list.GetItemCount()) //
 		return;
 	if (lRow<0)
 		return;
@@ -421,7 +421,7 @@ void CBacnetTstatSchedule::OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT 
 			m_tatat_schedule_data.at(lRow).tstat.flag &= 0x7F;
 			m_bac_tstat_sch_list.SetItemText(lRow, TSTAT_SCHEDULE_SCHEDULES_AM, _T("Auto"));
 		}
-		else //是Manual 就改auto
+		else //Manual auto
 		{
 			m_tatat_schedule_data.at(lRow).tstat.flag |= 0x80;
 			m_bac_tstat_sch_list.SetItemText(lRow, TSTAT_SCHEDULE_SCHEDULES_AM, _T("Manual"));
@@ -430,7 +430,7 @@ void CBacnetTstatSchedule::OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT 
 	else if (lCol == TSTAT_SCHEDULE_SCHEDULES_VALUE)
 	{
 		CString temp_am = m_bac_tstat_sch_list.GetItemText(lRow, TSTAT_SCHEDULE_SCHEDULES_AM);
-		if (temp_am.CompareNoCase(_T("Auto")) == 0)  //Auto 的时候是不允许手动改 value 值.
+		if (temp_am.CompareNoCase(_T("Auto")) == 0)  //Auto  value .
 		{
 			return;
 		}
@@ -463,7 +463,7 @@ void CBacnetTstatSchedule::OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT 
 
 void CBacnetTstatSchedule::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    // TODO: /
     switch (nIDEvent)
     {
     case 1:
@@ -483,7 +483,7 @@ DWORD WINAPI  CBacnetTstatSchedule::ReadGroupRegThreadfun(LPVOID lpVoid)
     //Write_Config_Info 
     CBacnetTstatSchedule *pParent = (CBacnetTstatSchedule *)lpVoid;
 
-    b_stop_read_tstat_schedule = false;  //是否继续读取标志，若后面数据为空则退出循环体.
+    b_stop_read_tstat_schedule = false;  //.
     for (int i = 0;i<BAC_TSTAT_SCHEDULE_GROUP;i++)
     {
         int end_temp_instance = 0;
@@ -523,7 +523,7 @@ DWORD WINAPI  CBacnetTstatSchedule::ReadGroupRegThreadfun(LPVOID lpVoid)
 //void CBacnetTstatSchedule::OnNMDblclkListBacTstatSchedule(NMHDR *pNMHDR, LRESULT *pResult)
 //{
 //    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-//    // TODO: 在此添加控件通知处理程序代码
+//    // TODO: 
 //
 //
 //    //for (int i = 0;i<m_weeklyr_list.GetItemCount();++i)
@@ -549,7 +549,7 @@ DWORD WINAPI  CBacnetTstatSchedule::ReadGroupRegThreadfun(LPVOID lpVoid)
 void CBacnetTstatSchedule::OnNMRClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     long lRow, lCol;
     m_bac_tstat_sch_list.Set_Edit(true);
     DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
@@ -564,7 +564,7 @@ void CBacnetTstatSchedule::OnNMRClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT
     lCol = lvinfo.iSubItem;
 
 
-    if (lRow>m_bac_tstat_sch_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+    if (lRow>m_bac_tstat_sch_list.GetItemCount()) //
         return;
     if (lRow<0)
         return;

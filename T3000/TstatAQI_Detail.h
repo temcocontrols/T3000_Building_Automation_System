@@ -1,23 +1,23 @@
 #pragma once
 
 
-// CTstatAQI_Detail 对话框
+// CTstatAQI_Detail 
 
 class CTstatAQI_Detail : public CDialogEx
 {
 	DECLARE_DYNAMIC(CTstatAQI_Detail)
 
 public:
-	CTstatAQI_Detail(CWnd* pParent = NULL);   // 标准构造函数
+	CTstatAQI_Detail(CWnd* pParent = NULL);   // 
 	virtual ~CTstatAQI_Detail();
 
-// 对话框数据
+// 
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_AQI };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 
 	DECLARE_MESSAGE_MAP()
 public:

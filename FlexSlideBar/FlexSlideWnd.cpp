@@ -72,8 +72,8 @@ void CFlexSlideWnd::SetFSBStyle(FSB_STYLE fsbStyle)
 		switch(fsbStyle)
 		{
 		case FSB_STYLE_SINGLETHUMB:
- 		//	m_pThumbOpter = new CSingleThumbOpt;//因ThumbOperator是抽象类，但在CSingleThumbOpt有一个函数还没实现，	virtual int GetThumbNum()=0;
-			//所以CSingleThumbOpt也不能实例化
+ 		//	m_pThumbOpter = new CSingleThumbOpt;//ThumbOperatorCSingleThumbOpt	virtual int GetThumbNum()=0;
+			//CSingleThumbOpt
  		//	m_pThumbOpter->SetParentWnd(this);
 			break;
 		case FSB_STYLE_DOUBLETHUMB:
@@ -114,7 +114,7 @@ void CFlexSlideWnd::SetFSBThumbShape(FSB_THUMBSHAPE fsbTbShape)
 	m_pThumbOpter->SetThumbShape(fsbTbShape);
 }
 
-// 设置控件的位置
+// 
 void CFlexSlideWnd::SetFlexSlideBarRect(CRect& rc)
 {
 //	Create(_T(""), SS_SUNKEN, rc, NULL, 0);
@@ -122,9 +122,9 @@ void CFlexSlideWnd::SetFlexSlideBarRect(CRect& rc)
 	m_rc = rc;
 }
 
-// 设置channel的宽度，不得大于控件宽度，不小于1个象素
-// channel 长度应该依据控件长度来计算获得
-// 这里的宽度是指的较短的边长，相对于垂直来说，是width，对于水平来说，是height
+// channel1
+// channel 
+// widthheight
 void CFlexSlideWnd::SetChannelWidth(int nChannelWidth)
 {
 	m_fsbChannel.SetWidth(nChannelWidth);
@@ -150,7 +150,7 @@ int CFlexSlideWnd::GetChannelWidth()
 	return m_fsbChannel.GetWidth();
 }
 
-// 设置Channel的颜色
+// Channel
 COLORREF CFlexSlideWnd::GetChannelColor()
 {
 	return m_fsbChannel.GetColor();	
@@ -174,7 +174,7 @@ void CFlexSlideWnd::SetThumbWidth(int nThumbWidth)
 }
 
 
-// 设置Thumb的颜色
+// Thumb
 COLORREF CFlexSlideWnd::GetThumbColor()const		
 {
 	return m_pThumbOpter->GetThumbColor();
@@ -280,7 +280,7 @@ void CFlexSlideWnd::CalcTicMarks(CRect& rcChannel)
 }
 
 
-// 创建flex slidebar
+// flex slidebar
 BOOL CFlexSlideWnd::CreateFlexSlideBar(
 									   BOOL bHorizontal, 
 									   FSB_STYLE style,
@@ -440,7 +440,7 @@ void CFlexSlideWnd::Draw(CDC* pDC)
 	m_fsbChannel.Draw(pMemDC);
 	m_pThumbOpter->Draw(pMemDC);
 
-	::BitBlt(pDC->m_hDC, 0,0, rc.Width(), rc.Height(), pMemDC->m_hDC, 0,0, SRCCOPY);//没这，就不会有新的控件显示出来
+	::BitBlt(pDC->m_hDC, 0,0, rc.Width(), rc.Height(), pMemDC->m_hDC, 0,0, SRCCOPY);//
 
 	
 
@@ -563,7 +563,7 @@ void CFlexSlideWnd::DrawTics(CDC* pDC)
 				int nY = ptStart.y + m_szTics[i];
 
 
-				pDC->MoveTo(ptStart.x, nY);//2.5.0.95显示在滑块两边的刻度条
+				pDC->MoveTo(ptStart.x, nY);//2.5.0.95
 				pDC->LineTo(ptEnd.x, nY);//2.5.0.95
 
 
@@ -579,7 +579,7 @@ void CFlexSlideWnd::DrawTics(CDC* pDC)
  				int nY = ptStart_mid.y + m_szTics[i];
  
  
- 				pDC->MoveTo(ptStart_mid.x, nY);//2.5.0.95显示在滑块两边的刻度条
+ 				pDC->MoveTo(ptStart_mid.x, nY);//2.5.0.95
  				pDC->LineTo(ptEnd_mid.x, nY);//2.5.0.95
  
  

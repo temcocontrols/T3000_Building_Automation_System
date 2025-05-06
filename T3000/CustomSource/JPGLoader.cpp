@@ -60,16 +60,16 @@ int JPGLoader::LoadPic()
 	}
 
 
-	// HRESULT Render( HDC hdc, //渲染图像用的设备环境句柄
-	// long x, //在hdc上的水平坐标
-	// long y, //在hdc上的垂直坐标
-	// long cx, //图像宽度
-	// long cy, //图像高度
-	// OLE_XPOS_HIMETRIC xSrc, //在源图像上的水平偏移
-	// OLE_YPOS_HIMETRIC ySrc, //在源图像上的垂直偏移
-	// OLE_XSIZE_HIMETRIC cxSrc,//在源图像上水平拷贝的数量
-	// OLE_YSIZE_HIMETRIC cySrc,//在源图像上垂直拷贝的数量
-	// LPCRECT prcWBounds //指向目标图元设备环境句柄的指针);
+	// HRESULT Render( HDC hdc, //
+	// long x, //hdc
+	// long y, //hdc
+	// long cx, //
+	// long cy, //
+	// OLE_XPOS_HIMETRIC xSrc, //
+	// OLE_YPOS_HIMETRIC ySrc, //
+	// OLE_XSIZE_HIMETRIC cxSrc,//
+	// OLE_YSIZE_HIMETRIC cySrc,//
+	// LPCRECT prcWBounds //);
 	//CComQIPtr<IPicture> m_picture;
 	HRESULT hr = OleLoadPicture(pStm,0,false,IID_IPicture,(void**)&m_picture);
 	long a,b; 

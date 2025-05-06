@@ -25,21 +25,21 @@ protected:
 #include "afxwin.h"
 
 
-// COutsidDailog 对话框
+// COutsidDailog 
 
 class COutsidDailog : public CDialog
 {
 	DECLARE_DYNAMIC(COutsidDailog)
 
 public:
-	COutsidDailog(CWnd* pParent = NULL);   // 标准构造函数
+	COutsidDailog(CWnd* pParent = NULL);   // 
 	virtual ~COutsidDailog();
 
-// 对话框数据
+// 
 	enum { IDD = IDD_OUTSIDEDOORDLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

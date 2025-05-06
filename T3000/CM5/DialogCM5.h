@@ -125,7 +125,7 @@ public://messages override
 	virtual void OnInitialUpdate();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	CString GetTextReg(unsigned short reg,BOOL IsRead);
-	 BOOL  Get_Data_Bit(UINT Data, int n,int N);//获取一个第八位数据，s:system:进制，n;num:这个数是几位的，第N位是1还是0
+	 BOOL  Get_Data_Bit(UINT Data, int n,int N);//s:system:n;num:N10
 
 public:
 	void Fresh();

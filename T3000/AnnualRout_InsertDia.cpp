@@ -11,7 +11,7 @@
 #include "Schedule_grid.h"
 #include "../MultipleMonthCal32/multiplemonthcal.h"
 
-// AnnualRout_InsertDia 对话框
+// AnnualRout_InsertDia 
 #define TO_CLEAR_MONTH_CTRL _T("clear")
 IMPLEMENT_DYNAMIC(AnnualRout_InsertDia, CDialog)
 
@@ -74,7 +74,7 @@ BEGIN_MESSAGE_MAP(AnnualRout_InsertDia, CDialog)
 
 END_MESSAGE_MAP()
 
-// AnnualRout_InsertDia 消息处理程序
+// AnnualRout_InsertDia 
 void AnnualRout_InsertDia::leap_year()//if the year is leap year,get the holiday by this function
 {
 	CString str;
@@ -356,7 +356,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 		int nFlag = product_register_value[7];
         if (Bacnet_Private_Device(nFlag) ||	(g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP))
 		//if (g_protocol == PROTOCOL_BACNET_IP)
-		{								//器件。产品本来不同 界面就会有差异 都还要用一个界面。木有办法，只能 加在一起了。;
+		{								//   ;
 			GetDlgItem(IDC_LIST1)->ShowWindow(0);
 			GetDlgItem(IDC_YEARSTATIC)->ShowWindow(0);
 			GetDlgItem(IDC_COMBO1)->ShowWindow(0);
@@ -555,7 +555,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 	
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// 异常: OCX 属性页应返回 FALSE
+	// : OCX  FALSE
 }
 void AnnualRout_InsertDia::set_day_state(CString month_day)///////////////attention ,the control must be 12 month
 {
@@ -943,7 +943,7 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 		m = day_number % 8;//bit day
 		for (int j = 0; j < m; j++)
 			l *= 2;
-		the_days[day_number / 8] = the_days[day_number / 8] ^ l;//异或。
+		the_days[day_number / 8] = the_days[day_number / 8] ^ l;//
 
 
 		CString strKeyName,strValue;
@@ -966,7 +966,7 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 			//m = day_number % 8;//bit day
 			//for (int j = 0; j < m; j++)
 			//	l *= 2;
-			//the_days[day_number / 8] = the_days[day_number / 8] ^ l;//异或。
+			//the_days[day_number / 8] = the_days[day_number / 8] ^ l;//
 
 #if 1
             int day_in_year = day_in_this_year[Clicked_month - 1] + Clicked_day;

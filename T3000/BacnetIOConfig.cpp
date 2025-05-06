@@ -294,7 +294,7 @@ void CBacnetIOConfig::CaculateIOCount(int nitem)
 		//CString temp_pidtype =  m_ext_io_config_list.GetItemText(i,EXTIO_HARDWARE);
 		int pid_sequence = 0;
 
-        //遍历ext产品，判断选中的是哪一个扩展设备;
+        //ext;
         for (int j = 0; j < sizeof(ExtIO_ProductId)/sizeof(ExtIO_ProductId[0]); j++)
         {
             if (m_extio_config_data.at(i).reg.product_id == ExtIO_ProductId[j])
@@ -315,7 +315,7 @@ void CBacnetIOConfig::CaculateIOCount(int nitem)
 
 
 		CString temp_output;
-		if (ExtIO_OUTPUT_COUNT[pid_sequence] == 0) // 没有输出output的情况
+		if (ExtIO_OUTPUT_COUNT[pid_sequence] == 0) // output
 		{
 			m_extio_config_data.at(i).reg.output_end = m_extio_config_data.at(i - 1).reg.output_end;
 			temp_output.Format(_T("N/A"));
@@ -538,7 +538,7 @@ void CBacnetIOConfig::OnBnClickedButtonExtCancel()
 
 void CBacnetIOConfig::OnBnClickedButtonRedefineIo()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CBacnetIODefine IOdlg;
 	IOdlg.DoModal();
 }

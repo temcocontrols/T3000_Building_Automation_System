@@ -31,8 +31,8 @@ typedef struct _Product_IP_ID
 	unsigned char ID;
 }Product_IP_ID;
 
-////#include <vector>			//矢量模板
-////using  std::vector;			//命名空间
+////#include <vector>			//
+////using  std::vector;			//
 ////
 ////
 ////extern vector <Product_IP_ID> Product_Info;
@@ -41,8 +41,8 @@ typedef struct _Product_IP_ID
 /////////////////////////////////////////////////////////////////////////////
 // CAkingSocket
 
-extern CString ShowTFTPMessage; //用于显示一些结果;
-extern CString ShowTFTPMessage2; //用于显示一些结果;
+extern CString ShowTFTPMessage; //;
+extern CString ShowTFTPMessage2; //;
 extern int ISP_STEP;
 extern BYTE Byte_ISP_Device_IP[4];
 extern bool device_has_replay_lan_IP;
@@ -80,7 +80,7 @@ void MySocket::OnReceive(int nErrorCode)
 	Receive_data_length=Receive(receive_buf,4096);
 	if(ISP_STEP == ISP_SEND_FLASH_COMMAND)
 	{
-		if(Receive_data_length == 40)//接收EE 10 的 40 byte 回复
+		if(Receive_data_length == 40)//EE 10  40 byte 
 		{
 			TRACE("ISP_SEND_FLASH_COMMAND Receive 40 byte\n");
 			char temp_data[100];
@@ -111,14 +111,14 @@ void MySocket::OnReceive(int nErrorCode)
 				memcpy_s(Byte_ISP_Device_IP,sizeof(Byte_ISP_Device_IP),receive_buf+11,4);//copy the first 11 byte and check
                 memcpy_s(Product_Name,sizeof(Product_Name),receive_buf+15,11);//copy the first 11 byte and check
 
-				//先检查是不是目标IP地址回复的，优先处理目标IP地址回复的
+				//IPIP
 				CString temp_reply_ip;
 				temp_reply_ip.Format(_T("%u.%u.%u.%u"), Byte_ISP_Device_IP[0], Byte_ISP_Device_IP[1], Byte_ISP_Device_IP[2], Byte_ISP_Device_IP[3]);
 				if ((temp_reply_ip.CompareNoCase(ISP_Device_IP) != 0) && (receive_not_want_ip_times <3))
 				{
 					ShowTFTPMessage2.Format(_T("IP:%s responds to the update request (%d)"), temp_reply_ip.GetString(), receive_not_want_ip_times);
 					receive_not_want_ip_times++;
-					//CAsyncSocket::OnReceive(nErrorCode); //暂时屏蔽，设备经常回复 05 错误命令导致握手失败
+					//CAsyncSocket::OnReceive(nErrorCode); // 05 
 					//return;
 				}
 				
@@ -160,7 +160,7 @@ void MySocket::OnReceive(int nErrorCode)
 					}
 					else if(((DeviceProductName.CompareNoCase(_T("MINI")) == 0) && (FileProductName.CompareNoCase(_T("Minipanel")) == 0)) ||
 						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0 ))  ||
-                        ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  // 2018 0307 有人把 CO2NET 改为CO2ALL了，导致匹配不到，无法烧写.为了兼容，加特例.
+                        ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  // 2018 0307  CO2NET CO2ALL..
                         ((DeviceProductName.CompareNoCase(_T("UMNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||
                         ((DeviceProductName.CompareNoCase(_T("CO2")) == 0) && (FileProductName.CompareNoCase(_T("CO2 NET")) == 0)) ||
                         ((DeviceProductName.CompareNoCase(_T("PSNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)))
@@ -249,7 +249,7 @@ void MySocket::OnReceive(int nErrorCode)
 					}
 					else if(((DeviceProductName.CompareNoCase(_T("MINI")) == 0) && (FileProductName.CompareNoCase(_T("Minipanel")) == 0)) ||
 						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0))  ||
-                        ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  //特殊情况加入的.
+                        ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  //.
                         ((DeviceProductName.CompareNoCase(_T("UMNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0))  ||
                         ((DeviceProductName.CompareNoCase(_T("CO2")) == 0) && (FileProductName.CompareNoCase(_T("CO2 NET")) == 0)) ||
                         ((DeviceProductName.CompareNoCase(_T("PSNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)))

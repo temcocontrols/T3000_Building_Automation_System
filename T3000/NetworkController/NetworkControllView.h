@@ -26,7 +26,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	float GetFirmwareVersion();
 	BOOL CheckSettingChanged();
-	void AddNewTimeServer(const CString& strTimeServer);  // 把新增的时间服务器加到列表里，并写入寄存器
+	void AddNewTimeServer(const CString& strTimeServer);  // 
 	BOOL SaveTimeServerToRegister(const CString& strVal, const CString& strKey);
 	BOOL LoadTimeServerFromRegister(const CString& strKey ,CString& strVal);
 	void initTimeServerList();

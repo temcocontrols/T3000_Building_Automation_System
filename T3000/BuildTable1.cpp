@@ -1,4 +1,4 @@
-// BuildTable1.cpp : 实现文件
+// BuildTable1.cpp : 
 //
 
 #include "stdafx.h"
@@ -130,7 +130,7 @@ BEGIN_MESSAGE_MAP(CBuildTable1, CDialog)
 END_MESSAGE_MAP()
 
 
-// CBuildTable1 消息处理程序
+// CBuildTable1 
 
 void CBuildTable1::OnBnClickedOk()
 {
@@ -146,7 +146,7 @@ BOOL CBuildTable1::OnInitDialog()
  
 	to_fresh();
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// 异常: OCX 属性页应返回 FALSE
+	// : OCX  FALSE
 }
 
 void CBuildTable1::to_fresh()
@@ -392,132 +392,132 @@ void CBuildTable1::OnDestroy()
 void CBuildTable1::OnEnChangeEdit1()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 	
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit8()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit9()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit13()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit14()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit15()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit16()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit17()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit18()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit19()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit20()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnChangeEdit12()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
@@ -912,11 +912,11 @@ void CBuildTable1::OnEnKillfocusEdit12()
 void CBuildTable1::OnEnChangeEdit10()
 {
     
-    // 发送该通知，除非重写 CDialog::OnInitDialog()
-    // 函数并调用 CRichEditCtrl().SetEventMask()，
-    // 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+    //  CDialog::OnInitDialog()
+    //  CRichEditCtrl().SetEventMask()
+    //  ENM_CHANGE 
     IsModfied=true;
-    //   在此添加控件通知处理程序代码
+    //   
 }
 
 void CBuildTable1::OnEnSetfocusEdit10()
@@ -975,7 +975,7 @@ CString CBuildTable1::GetValueFromRegister(short nValue)
 {
 	CString strTxt;
 	int nNum=0;
-	if((nValue & 0x1000)>>15==1)//为负数;
+	if((nValue & 0x1000)>>15==1)//;
 	{
 		nNum= (0x7fff & nValue);
 		CString strNum;

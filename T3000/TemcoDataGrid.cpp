@@ -151,22 +151,22 @@ BOOL CTemcoDataGrid::OnMouseMove(short Button, short Shift, long x, long y)
 	{
 	    int col = get_MouseCol();
 		CRect rect;
-		GetWindowRect(&rect);                 //获取FlexGrid控件的窗口矩形
-		m_pParent->ScreenToClient(&rect);                 //转换为客户区矩形
+		GetWindowRect(&rect);                 //FlexGrid
+		m_pParent->ScreenToClient(&rect);                 //
 		CDC* pDC=GetDC();
-		//MSFlexGrid 控件的函数的长度单位是“缇(twips)”，需要将其转化为像素，1440 缇 = 1 英寸
-		//计算象素点和缇的转换比例
+		//MSFlexGrid (twips)1440  = 1 
+		//
 		int nTwipsPerDotX=1440/pDC->GetDeviceCaps(LOGPIXELSX);
 		int nTwipsPerDotY=1440/pDC->GetDeviceCaps(LOGPIXELSY);
 
 		long y = get_RowPos(0)/nTwipsPerDotY;
 		long x = get_ColPos(col)/nTwipsPerDotX;
-		//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+		//()11
 		long width = get_ColWidth(m_SelCurCol)/nTwipsPerDotX+1;
 		long height = get_RowHeight(m_SelCurRow)/nTwipsPerDotY+1;
-		//形成选中个所在的矩形区域
+		//
 		CRect rcCell(x,y,x+width,y+height);
-		//转换成相对对话框的坐标
+		//
 		rcCell.OffsetRect(rect.left+1,rect.top+1);
 		m_ColName->MoveWindow(rcCell);
 		m_ColName->ShowWindow(SW_SHOW);

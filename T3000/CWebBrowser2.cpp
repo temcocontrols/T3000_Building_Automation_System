@@ -1,4 +1,4 @@
-// CWebBrowser2.cpp : 由 Microsoft Visual C++ 创建的 ActiveX 控件包装器类的定义
+// CWebBrowser2.cpp :  Microsoft Visual C++  ActiveX 
 
 
 #include "stdafx.h"
@@ -9,6 +9,6 @@
 
 IMPLEMENT_DYNCREATE(CWebBrowser2, CWnd)
 
-// CWebBrowser2 属性
+// CWebBrowser2 
 
-// CWebBrowser2 操作
+// CWebBrowser2 

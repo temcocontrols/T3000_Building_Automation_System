@@ -244,7 +244,7 @@ namespace TemcoStandardBacnetTool
 
             if (((o is BacnetDate)&&(((BacnetDate)o).IsPeriodic))||( o is BacnetweekNDay))
             {
-                // Cannot do that with perodic element : what has to be changed : day n°, wday, month ????
+                // Cannot do that with perodic element : what has to be changed : day n, wday, month ????
                 modifyToolStripMenuItem_Click(null, null);
             }
             else

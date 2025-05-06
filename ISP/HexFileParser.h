@@ -15,35 +15,35 @@ public:
 	CHexFileParser(void);
 	virtual ~CHexFileParser(void);
     CString Get_HexInfor();
-	// 设置文件名，包含绝对路径
+	// 
 	void SetFileName(const CString& strFileName);
-	// 获得读取的Hex文件的有效数据，参数是缓冲区和缓冲区长度。
-	// 返回的是数据缓冲区中实际使用的字节数。即：return int < nLen
+	// Hex
+	// return int < nLen
 	int GetHexFileBuffer(IN char* pBuf, IN int nLen);
     int GetFileType();
-	//Hex文件类型，00 ----数据记录01 ----扩展段地址记录02 ----扩展线性地址记录
+	//Hex00 ----01 ----02 ----
 	HEXFILE_FORMAT GetHexFileFormatType();
 
-	// 获得扩展hex 文件的段长度集合。
+	// hex 
 	int	GetExtendHexFileSectionFlag(vector<int>& szFlags);
 	void Get_DeviceInfor(UINT &ProductModel,float &SoftwareVersion,CString &ProductName,CString &ChipName,UINT &Chipsize);
-	HEXFILE_FORMAT	m_nHexFileType;		//Hex文件类型，00 ----数据记录01 ----扩展段地址记录02 ----扩展线性地址记录
+	HEXFILE_FORMAT	m_nHexFileType;		//Hex00 ----01 ----02 ----
 protected:
-	// 获得hex文件的类型
+	// hex
 	HEXFILE_FORMAT	GetHexFileType(CFile& hexFile);
-	// CRC 校验
+	// CRC 
 	BOOL DoCRC( TS_UC* szBuf, int nLen);
-	// 辅助函数，获得高位地址
+	// 
 	WORD GetHighAddrFromFile(const CString& strLine);
     int GetFileTypeFromLine(const CString& strLine);
-	// 从文件中读取一行，放到缓冲区
+	// 
 	BOOL ReadLineFromFile(CFile& file, char* pBuffer);
 
-	// 读取normal模式的hex文件
+	// normalhex
 	int ReadNormalHexFile(CFile& hexFile, char* pBuf, int nBufLen);	
-	// extend模式
+	// extend
 	int ReadExtendHexFile(CFile& hexFile, char* pBuf, int nBufLen);	
-	// 扩展线性模式的
+	// 
 	int ReadExtLinearHexFile(CFile& hexFile, char* pBuf, int nBufLen);	
     
 

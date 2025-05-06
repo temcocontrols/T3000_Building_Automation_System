@@ -82,7 +82,7 @@ void CDoubleThumbOpt::OnLButtonDown(const CPoint& point)
 
 }
 
-// 下一步，大的数值
+// 
 void CDoubleThumbOpt::MoveNextStep()
 {/*
 	int nPosition = m_thumb.GetPosition();
@@ -110,7 +110,7 @@ void CDoubleThumbOpt::MoveNextStep()
 }
 
 
-// 上一步，小的数值
+// 
 void CDoubleThumbOpt::MovePreStep()
 {
 	/*

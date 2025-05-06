@@ -9,7 +9,7 @@
 
 #include "AnnualRout_InsertDia.h"
 #include "global_function.h"
-// Annual_Routines 对话框
+// Annual_Routines 
 #define GRID_ROW_NUMBER 16
 #define GRID_COL_NUMBER 3
 #define FULL_LABEL_NUMBER 20
@@ -54,7 +54,7 @@ BEGIN_MESSAGE_MAP(Annual_Routines, CDialog)
 END_MESSAGE_MAP()
 
 
-// Annual_Routines 消息处理程序
+// Annual_Routines 
 description2 Annual_Routines::read_addr(unsigned char addr2)
 {
 	description2 temp_description;
@@ -220,31 +220,31 @@ void Annual_Routines::load_grid()
 void Annual_Routines::on_select()
 {
 	long lRow,lCol;
-	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	lRow = m_FlexGrid.get_RowSel();//	
+	lCol = m_FlexGrid.get_ColSel(); //
 	UpdateData(false);
 	if(lRow==0 || lCol==0)
 		return;
 	CRect rect;
-	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-	//需要将其转化为像素，1440缇= 1英寸
+	m_FlexGrid.GetWindowRect(rect); //
+	ScreenToClient(rect); //	
+	// MSFlexGrid"(twips)"
+	//1440= 1
 	CDC* pDC =GetDC();
-	//计算象素点和缇的转换比例
+	//
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//()
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//()11
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//
 	CRect rc(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	//
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//获取选中格的文本信息
+	//
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
 	row_row=lRow;
 	row_col=lCol;
@@ -267,10 +267,10 @@ void Annual_Routines::on_select()
 	
 		m_combo_col_row.BringWindowToTop();
 
-		m_combo_col_row.ShowWindow(SW_SHOW);//显示控件
-		m_combo_col_row.MoveWindow(rc); //移动到选中格的位置，覆盖
-		m_combo_col_row.SelectString(-1,strValue); //内容全选。方便直接修改		
-		m_combo_col_row.SetFocus(); //获取焦点
+		m_combo_col_row.ShowWindow(SW_SHOW);//
+		m_combo_col_row.MoveWindow(rc); //
+		m_combo_col_row.SelectString(-1,strValue); //		
+		m_combo_col_row.SetFocus(); //
 	}
 	else if(row_col==3 )
 	{
@@ -279,20 +279,20 @@ void Annual_Routines::on_select()
 		m_combo_col_row.AddString(_T("ON"));
 
 		m_combo_col_row.BringWindowToTop();
-		m_combo_col_row.ShowWindow(SW_SHOW);//显示控件
-		m_combo_col_row.MoveWindow(rc); //移动到选中格的位置，覆盖
-		m_combo_col_row.SelectString(-1,strValue); //内容全选。方便直接修改		
-		m_combo_col_row.SetFocus(); //获取焦点
+		m_combo_col_row.ShowWindow(SW_SHOW);//
+		m_combo_col_row.MoveWindow(rc); //
+		m_combo_col_row.SelectString(-1,strValue); //		
+		m_combo_col_row.SetFocus(); //
 
 	}
 	else
 	{
 		m_Change.BringWindowToTop();
-		m_Change.ShowWindow(SW_SHOW); //显示控件
-		m_Change.SetWindowText(strValue); //显示文本
-		m_Change.SetFocus(); //获取焦点
-		m_Change.SetSel(0,-1); //全选
-		m_Change.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_Change.ShowWindow(SW_SHOW); //
+		m_Change.SetWindowText(strValue); //
+		m_Change.SetFocus(); //
+		m_Change.SetSel(0,-1); //
+		m_Change.MoveWindow(rc); //
 	}	
 }
 
@@ -304,7 +304,7 @@ BOOL Annual_Routines::OnInitDialog()
 	load_grid();
 	NET_WORK_SET_TIMER
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// 异常: OCX 属性页应返回 FALSE
+	// : OCX  FALSE
 }
 BEGIN_EVENTSINK_MAP(Annual_Routines, CDialog)
 	ON_EVENT(Annual_Routines, IDC_MSFLEXGRID1, DISPID_CLICK, ClickMsflexgrid1, VTS_NONE)
@@ -330,8 +330,8 @@ void Annual_Routines::OnEnKillfocusEdit1()
 	
 	NET_WORK_SET_TIMER
 	UpdateData(true);
-	m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//设置文本信息
-	m_Change.ShowWindow(SW_HIDE); //隐藏文本控件
+	m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//
+	m_Change.ShowWindow(SW_HIDE); //
 	UpdateData(false);
 	if(m_before_focus_string!=m_sChange)
 		write_addr(row_row);
@@ -377,8 +377,8 @@ void Annual_Routines::OnCbnKillfocusCombo1()
 
 void Annual_Routines::tab_move()
 {
-	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
+	long lRow = m_FlexGrid.get_RowSel();//	
+	long lCol = m_FlexGrid.get_ColSel(); //	
 	if(lRow==m_FlexGrid.get_Rows()-1 && lCol==m_FlexGrid.get_Cols()-1)
 	{
 	}
@@ -400,8 +400,8 @@ void Annual_Routines::tab_move()
 
 void Annual_Routines::shift_tab_move()
 {
-	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
+	long lRow = m_FlexGrid.get_RowSel();//	
+	long lCol = m_FlexGrid.get_ColSel(); //	
 	if(lRow==1 && lCol==1)
 	{
 	}
@@ -431,8 +431,8 @@ void Annual_Routines::right_move()
 
 void Annual_Routines::up_move()
 {
-	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号
-	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
+	long lRow = m_FlexGrid.get_RowSel();//
+	long lCol = m_FlexGrid.get_ColSel(); //	
 	if (lRow!=1)
 		m_FlexGrid.put_Row(--lRow);
 	GRID_UP_MOVE
@@ -441,8 +441,8 @@ void Annual_Routines::up_move()
 
 void Annual_Routines::down_move()
 {
-	long lRow =m_FlexGrid.get_RowSel();//获取点击的行号	
-	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
+	long lRow =m_FlexGrid.get_RowSel();//	
+	long lCol = m_FlexGrid.get_ColSel(); //	
 	if (lRow!=m_FlexGrid.get_Rows()-1)
 		m_FlexGrid.put_Row(++lRow);
 	GRID_DOWN_MOVE
@@ -518,8 +518,8 @@ void Annual_Routines::OnTimer(UINT nIDEvent)
 
 void Annual_Routines::DblClickMsflexgrid1()
 {
-	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	long lRow = m_FlexGrid.get_RowSel();//	
+	long lCol = m_FlexGrid.get_ColSel(); //
 	if(lRow==0 || lCol==0)
 		return ;
 	row_row=lRow;

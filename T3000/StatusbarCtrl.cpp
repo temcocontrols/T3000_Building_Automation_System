@@ -9,7 +9,7 @@
 
 HDC status_gloab_hdc;
 HDC status_hMemDC;
-HBITMAP status_hBmp; //用于双缓冲;
+HBITMAP status_hBmp; //;
 CRect status_myRect;
 CString cs_show_status_info;
 
@@ -260,7 +260,7 @@ DWORD WINAPI MyStatusBarThread(LPVOID lPvoid)
 
 		SelectObject(status_hMemDC, status_hBmp);
 		mparent->DrawStatusBar(status_hMemDC);
-		BitBlt(status_gloab_hdc, 0, 0, status_myRect.right, status_myRect.bottom, status_hMemDC, 0, 0, SRCCOPY);//将绘制完成的内存位图贴到的Picture空间对象中;
+		BitBlt(status_gloab_hdc, 0, 0, status_myRect.right, status_myRect.bottom, status_hMemDC, 0, 0, SRCCOPY);//Picture;
 		for (int z = 0; z < 100; z++)
 		{
 			if (b_statusbarthreadflag)
@@ -276,7 +276,7 @@ DWORD WINAPI MyStatusBarThread(LPVOID lPvoid)
 	return 0;
 }
 
-//重绘状态栏 ， 状态栏的大小会根据窗体的大小变动;
+//  ;
 void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 {
 	Graphics* mygraphics;
@@ -326,7 +326,7 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 	mygraphics->DrawRectangle(myRectangle_pen, progress_start_pos, 0, progress_width - STATUS_ALARM_ICON_WIDTH, window_height);
 
 	CString temp_value;
-	//外部清零的情况下，需要其他参数也初始化
+	//
 	if (clear_status_bar)
 	{
 		m_health_persent = 100;
@@ -375,7 +375,7 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 
 	staticpointF.X = err_start_pos + STATUS_CHARACTER_VALUE_OFFSET;
 
-	//这一段主要是处理有些命令是设备多余回复出来的，例如 发一条，设备回复两条，这样就不太好计算 error 的个数;
+	//  error ;
 	static int n_err_show_count = 0;
 	if (++n_err_show_count == 50)
 	{
@@ -394,7 +394,7 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 			g_llerrCount = g_llTxCount - g_llRxCount;
 		}
 	}
-	if (g_llTxCount > old_tx_count) //每发送一次才进来一次;
+	if (g_llTxCount > old_tx_count) //;
 	{
 		old_tx_count = g_llTxCount;
 		if (persent_array_count < 100)
@@ -522,8 +522,8 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 	delete BlackBrush;
 	delete CharacterblkBrush;
 	delete ProgressblkBrush;
-    delete HealthGreenBrush;  //2018 03 02 fandu添加  
-    delete HealthRedBrush;    //2018 03 02 fandu添加  
+    delete HealthGreenBrush;  //2018 03 02 fandu  
+    delete HealthRedBrush;    //2018 03 02 fandu  
 }
 
 void CMyStatusbarCtrl::OnPaint()
@@ -558,7 +558,7 @@ LRESULT CMyStatusbarCtrl::ShowProgressText(WPARAM wParam, LPARAM lParam)
 
 void CMyStatusbarCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    // TODO: /
     if (T3000LogWindow == NULL)
     {
         T3000LogWindow = new CT3000LogWindow;

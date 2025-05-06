@@ -12,7 +12,7 @@ HBITMAP 	hBitmap_brown_bmp;
 HBITMAP 	hBitmap_green_bmp;
 // CBacnetAlarmWindow dialog
 CBacnetAlarmWindow * AlarmWindow_Window = NULL;
-CRect my_view_rect;	//用来存储 窗体位置;
+CRect my_view_rect;	// ;
 CRect warning_window_rect;
 IMPLEMENT_DYNAMIC(CBacnetAlarmWindow, CDialogEx)
 
@@ -84,7 +84,7 @@ BOOL CBacnetAlarmWindow::OnInitDialog()
 	m_static_bac_alarm.ShowWindow(SW_HIDE);
 	SetTimer(1,500,NULL);
 	m_alarmwindow_dlg_hwnd = this->m_hWnd;
-	::GetWindowRect(BacNet_hwd,&my_view_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&my_view_rect);	// view;
 	GetWindowRect(&warning_window_rect);
 	//warning_window_rect.Height();
 	MoveWindow(my_view_rect.right - warning_window_rect.Width() ,my_view_rect.top/* - warning_window_rect.Height()*/,
@@ -101,7 +101,7 @@ LRESULT  CBacnetAlarmWindow::RedrawScreeneditWindow(WPARAM wParam, LPARAM lParam
 
 
 
-	::GetWindowRect(MainFram_hwd,&my_view_rect);	//获取 view的窗体大小;
+	::GetWindowRect(MainFram_hwd,&my_view_rect);	// view;
 	GetWindowRect(&warning_window_rect);
 	//warning_window_rect.Height();
 	//MoveWindow(my_view_rect.right - warning_window_rect.Width() ,my_view_rect.top,
@@ -181,7 +181,7 @@ void CBacnetAlarmWindow::OnPaint()
 
 	CRect test_rect;
 	HWND temp_hwnd = this->m_hWnd;
-	::GetWindowRect(temp_hwnd,&test_rect);	//获取 view的窗体大小;
+	::GetWindowRect(temp_hwnd,&test_rect);	// view;
 	Bitmap bitmap(show_bitmap,NULL);
 	mygraphics->DrawImage(&bitmap,0 ,0,test_rect.Width(),test_rect.Height());
 

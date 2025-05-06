@@ -24,14 +24,14 @@ static TCHAR gBufferString[BUFF_SIZE];
 class CLanguageLocale  
 {
 public:
-	void AddCatalogLookupPath(LPCTSTR szPath);//设置文件查找路径
+	void AddCatalogLookupPath(LPCTSTR szPath);//
 	bool SetLanguage(int nID);
 	CLanguageLocale();
 	virtual ~CLanguageLocale();
 	enum
 	{
-		LANGUAGE_ENGLISH= 0,//简体中文
-		LANGUAGE_PERSONAL  //英文
+		LANGUAGE_ENGLISH= 0,//
+		LANGUAGE_PERSONAL  //
 	};
 private:
 	CString  m_strPath;

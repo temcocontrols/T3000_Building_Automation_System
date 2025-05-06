@@ -335,7 +335,7 @@ void CGraphicMode::ShowChecks(){
 void CGraphicMode::OnBnClickedUser(){
 
 	 
-		if (product_register_value[g_calibration_module_data.User_Table_Selection.regAddress] == 1)//说明是选中状态
+		if (product_register_value[g_calibration_module_data.User_Table_Selection.regAddress] == 1)//
 		{
 
 			ShowChecks();
@@ -434,7 +434,7 @@ void CGraphicMode::DrawerPoint(){
 
 
 				/*
-				实心;下划线;点;下划线-点;下划线-点-点;
+				;;;-;--;
 				*/
 				pLineSeries->SetWidth(3);
 
@@ -582,7 +582,7 @@ void CGraphicMode::DrawerPoint(){
 
 
 				/*
-				实心;下划线;点;下划线-点;下划线-点-点;
+				;;;-;--;
 				*/
 				pLineSeries->SetWidth(3);
 
@@ -739,7 +739,7 @@ void CGraphicMode::Fresh_Graphic(){
 
 
 				/*
-				实心;下划线;点;下划线-点;下划线-点-点;
+				;;;-;--;
 				*/
 				pLineSeries->SetWidth(3);
 
@@ -880,7 +880,7 @@ void CGraphicMode::Fresh_Graphic(){
 
 
 				/*
-				实心;下划线;点;下划线-点;下划线-点-点;
+				;;;-;--;
 				*/
 				pLineSeries->SetWidth(3);
 
@@ -1169,7 +1169,7 @@ void CGraphicMode::OnBnClickedUserTableDel()
         int RegAddress;
         //int row =m_sensor_calibrate_table.get_Rows();
         int row =m_user_list.GetItemCount();
-        row -= 1;//末尾行
+        row -= 1;//
          
         RegAddress=g_calibration_module_data.User_Hum.regAddress+2*row;
         int ret=write_one(g_tstat_id,RegAddress,0);

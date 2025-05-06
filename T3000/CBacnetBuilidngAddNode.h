@@ -1,30 +1,30 @@
 ﻿#pragma once
 
 
-// CBacnetBuilidngAddNode 对话框
+// CBacnetBuilidngAddNode 
 
 class CBacnetBuilidngAddNode : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnetBuilidngAddNode)
 
 public:
-	CBacnetBuilidngAddNode(CWnd* pParent = nullptr);   // 标准构造函数
+	CBacnetBuilidngAddNode(CWnd* pParent = nullptr);   // 
 	virtual ~CBacnetBuilidngAddNode();
 
-// 对话框数据
+// 
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_BUILDING_HANDLE_NODES };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
 	void SetParameter(int nfunction, int ntype);
 	void InitalUI();
-	void ResetMoudleCount(int nmoudle_type); //通过例子 展示不同的输入输出个数;
+	void ResetMoudleCount(int nmoudle_type); //
 	int m_function;
 	int m_type;
 	afx_msg void OnBnClickedButtonBmNodeOk();

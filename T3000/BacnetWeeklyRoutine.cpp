@@ -20,7 +20,7 @@ extern CBacnetScheduleTime* ScheduleEdit_Window;
 extern CBacnetTstatSchedule *BacnetTstatSchedule_Window ;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern vector <int>  m_Weekly_data_instance;
-extern tree_product selected_product_Node; // 选中的设备信息;
+extern tree_product selected_product_Node; // ;
 
 CString Hol_Old_Lable[BAC_HOLIDAY_COUNT] =
 {
@@ -53,7 +53,7 @@ void BacnetWeeklyRoutine::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(BacnetWeeklyRoutine, CDialogEx)
 	ON_MESSAGE(MY_RESUME_DATA, WeeklyMessageCallBack)
-	ON_MESSAGE(WM_HOTKEY,&BacnetWeeklyRoutine::OnHotKey)//快捷键消息映射手动加入
+	ON_MESSAGE(WM_HOTKEY,&BacnetWeeklyRoutine::OnHotKey)//
 	ON_MESSAGE(WM_REFRESH_BAC_WEEKLY_LIST,Fresh_Weekly_List)
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Weekly_Routine_Item)
 
@@ -86,14 +86,14 @@ LRESULT  BacnetWeeklyRoutine::WeeklyMessageCallBack(WPARAM wParam, LPARAM lParam
 	}
 	else
 	{
-		memcpy_s(&m_Weekly_data.at(pInvoke->mRow),sizeof(Str_weekly_routine_point),&m_temp_weekly_data[pInvoke->mRow],sizeof(Str_weekly_routine_point));//还原没有改对的值
+		memcpy_s(&m_Weekly_data.at(pInvoke->mRow),sizeof(Str_weekly_routine_point),&m_temp_weekly_data[pInvoke->mRow],sizeof(Str_weekly_routine_point));//
 		PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 
 	}
 
-	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
+	if((pInvoke->mRow%2)==0)	//  ;
 		m_weeklyr_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
 		m_weeklyr_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -126,20 +126,20 @@ BOOL BacnetWeeklyRoutine::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 60 ,temp_mynew_rect.top + 60,500,700,SWP_SHOWWINDOW);
 		}
 
 		return 1; 
 	}
-	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //F2;
 	{
 		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_WEEKLY);
 		return TRUE;
@@ -149,7 +149,7 @@ BOOL BacnetWeeklyRoutine::PreTranslateMessage(MSG* pMsg)
 
 void BacnetWeeklyRoutine::Reg_Hotkey()
 {
-	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert键
+	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert
 }
 
 void BacnetWeeklyRoutine::Unreg_Hotkey()
@@ -298,7 +298,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 	if(Changed_SubItem == WEEKLY_ROUTINE_LABEL)
 	{
 		CString cs_temp = m_weeklyr_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_WEEKLY_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
+		if(cs_temp.GetLength()>= STR_WEEKLY_LABEL_LENGTH)	//;
 		{
 			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
 			PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
@@ -329,7 +329,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 	if(Changed_SubItem == WEEKLY_ROUTINE_FULL_LABLE)
 	{
 		CString cs_temp = m_weeklyr_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_WEEKLY_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+		if(cs_temp.GetLength()>= STR_WEEKLY_DESCRIPTION_LENGTH)	//;
 		{
 			MessageBox(_T("Length can not higher than 20"),_T("Warning"));
 			PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
@@ -493,7 +493,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 	{
 		if(m_weeklyr_list.IsDataNewer((char *)&m_Weekly_data.at(0),sizeof(Str_weekly_routine_point) * BAC_SCHEDULE_COUNT))
 		{
-			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			//list ;List;
 			m_weeklyr_list.SetListData((char *)&m_Weekly_data.at(0),sizeof(Str_weekly_routine_point) * BAC_SCHEDULE_COUNT);
 		}
 		else
@@ -666,7 +666,7 @@ void BacnetWeeklyRoutine::OnCancel()
 void BacnetWeeklyRoutine::OnTimer(UINT_PTR nIDEvent)
 {
 	 
-	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_WEEKLY))  )	//GSM连接时不要刷新;
+	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_WEEKLY))  )	//GSM;
 	{
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 	Post_Refresh_Message(g_bac_instance,READWEEKLYROUTINE_T3000,0,BAC_SCHEDULE_COUNT - 1,sizeof(Str_weekly_routine_point), BAC_SCHEDULE_GROUP);
@@ -686,9 +686,9 @@ void BacnetWeeklyRoutine::OnNMDblclkListWeeklySchedule(NMHDR *pNMHDR, LRESULT *p
 void BacnetWeeklyRoutine::OnBnClickedButtonWeeklysubPanelScheduleEdit()
 {
 
-    b_stop_read_tstat_schedule = false;  //是否继续读取标志，若后面数据为空则退出循环体.
+    b_stop_read_tstat_schedule = false;  //.
 
-                                         //在获取前清空缓存值.
+                                         //.
     for (int i = 0;i < BAC_TSTAT_SCHEDULE;i++)
     {
         Str_tstat_schedule temp_tstat_schedule;
@@ -727,7 +727,7 @@ void BacnetWeeklyRoutine::OnBnClickedButtonWeeklysubPanelScheduleEdit()
 
     b_stop_read_tstat_schedule = false;
 
-    //显示非模态对话框;
+    //;
     if (BacnetTstatSchedule_Window != NULL)
     {
         delete BacnetTstatSchedule_Window;
@@ -750,8 +750,8 @@ void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
 		}
 	}
 
-    if ((g_protocol == MODBUS_RS485) || //RS485 下面挂T3 MINIPANEL
-        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) || (g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP))   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
+    if ((g_protocol == MODBUS_RS485) || //RS485 T3 MINIPANEL
+        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) || (g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP))   //BB MODBUS485     TSTAT10 BB
     {
         if ((product_type == PM_MINIPANEL) ||
             (product_type == PM_TSTAT10) ||
@@ -761,7 +761,7 @@ void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
             if ((n_read_item_index >= 0) && (n_read_item_index < BAC_SCHEDULE_COUNT))
             {
                 n_read_item_index = weekly_list_line;
-                ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, product_type, READTIMESCHEDULE_T3000/*BAC_PRG*/);//第二个参数 In
+                ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, product_type, READTIMESCHEDULE_T3000/*BAC_PRG*/);// In
             }
 
         }
@@ -781,14 +781,14 @@ void BacnetWeeklyRoutine::Reset_Weekly_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -815,7 +815,7 @@ void BacnetWeeklyRoutine::OnSize(UINT nType, int cx, int cy)
 		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
 		m_weeklyr_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
 		GetDlgItem(IDC_BUTTON_WEEKLY_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
-        GetDlgItem(IDC_BUTTON_SCHEDULE_SUBNET)->MoveWindow(rc.left + 200, rc.bottom - 60, 160, 50);  //随着窗体的移动  移动 按键 和表格的位置;
+        GetDlgItem(IDC_BUTTON_SCHEDULE_SUBNET)->MoveWindow(rc.left + 200, rc.bottom - 60, 160, 50);  //    ;
 	}
 
 }
@@ -831,14 +831,14 @@ void BacnetWeeklyRoutine::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 60 ,temp_mynew_rect.top + 60,500,700,SWP_SHOWWINDOW);
 		}
 		return;

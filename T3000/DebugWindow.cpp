@@ -68,7 +68,7 @@ BOOL CDebugWindow::OnInitDialog()
 	if(hInst)  
 	{      
 		typedef    BOOL    (WINAPI    *MYFUNC)(HWND,COLORREF,BYTE,DWORD);      
-		MYFUNC    fun    =    NULL;      //取¨?得Ì?SetLayeredWindowAttributes函¡¥数ºy指?针?     
+		MYFUNC    fun    =    NULL;      //tLayeredWindowAttributes 
 		fun=(MYFUNC)GetProcAddress(hInst,    "SetLayeredWindowAttributes");      
 		if(fun)
 			fun(this->GetSafeHwnd(),0,255,LWA_ALPHA);   //0,1,2,3,4,   
@@ -110,7 +110,7 @@ BOOL CDebugWindow::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-//隐藏调试窗口;
+//
 void CDebugWindow::OnClose()
 {
 	 
@@ -128,7 +128,7 @@ void CDebugWindow::Change_Transparency(int persent)
 	if(hInst)  
 	{      
 		typedef    BOOL    (WINAPI    *MYFUNC)(HWND,COLORREF,BYTE,DWORD);      
-		MYFUNC    fun    =    NULL;      //取¨?得Ì?SetLayeredWindowAttributes函¡¥数ºy指?针?     
+		MYFUNC    fun    =    NULL;      //tLayeredWindowAttributes 
 		fun=(MYFUNC)GetProcAddress(hInst,    "SetLayeredWindowAttributes");    
 		if(fun)
 			fun(this->GetSafeHwnd(),0,persent,LWA_ALPHA);   //0,1,2,3,4,   
@@ -314,7 +314,7 @@ void CDebugWindow::OnCbnSelchangeComboDebugChoose()
 
 void CDebugWindow::OnBnClickedButtonDebug()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
 	//BACNET_READ_ACCESS_DATA value;
 	//Bacnet_Read_Properties_Multiple_Blocking(47085, (BACNET_OBJECT_TYPE)8, 1, 77, value, 3);
 
@@ -341,7 +341,7 @@ void CDebugWindow::OnBnClickedButtonDebug()
 	return;
 
 
-	//获取对应产品的 固件信息
+	//
 #if 0
 	StrGetFileInfo test1 = { 0 };
 	int test_pid2 = 74;
@@ -349,7 +349,7 @@ void CDebugWindow::OnBnClickedButtonDebug()
 	Sleep(1);
 #endif
 
-	//获取对应产品的 固件信息
+	//
 #if 0
 #ifdef ENABLE_HTTP_FUCTION
     StrGetProductID test1 = { 0 };
@@ -380,9 +380,9 @@ test1.key[GETP_UPDATED].KeyName, test1.key[GETP_UPDATED].tValue.cs_value);
 #include "BacnetWeb.h"
 void CDebugWindow::OnBnClickedButtonWebTest()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
 #if 0
-    mul_ping_flag = false; //关闭 ping 的命令;
+    mul_ping_flag = false; //ping 
     for (int j = 1; j < 254; j++)
     {
         g_ipaddress_info.ip_status[j] = 0;
@@ -399,7 +399,7 @@ void CDebugWindow::OnBnClickedButtonWebTest()
 
 void CDebugWindow::OnBnClickedButtonBacnettool()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	close_bac_com();
     CBacnetTool dlg;
     dlg.DoModal();

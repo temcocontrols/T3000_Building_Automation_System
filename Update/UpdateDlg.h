@@ -49,8 +49,8 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	void InitialTemcoLogo();
 	bool DeleteDirectory( CString DirName);
-	BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //待下载文件的URL
-		const CString & strFileLocalFullPath);//存放到本地的路径
+	BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //URL
+		const CString & strFileLocalFullPath);//
 	afx_msg void OnBnClickedCheckOpenT3000();
 };
 

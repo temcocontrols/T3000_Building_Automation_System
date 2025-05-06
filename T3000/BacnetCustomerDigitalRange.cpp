@@ -180,7 +180,7 @@ LRESULT CBacnetCustomerDigitalRange::Fresh_Customer_Digital_Range_Item(WPARAM wP
 	if(Changed_SubItem == CUSTOMER_DIGITAL_RANGE_OFF)
 	{
 		CString cs_temp = m_customer_dig_range_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= 12)	//长度不能大于结构体定义的长度;
+		if(cs_temp.GetLength()>= 12)	//;
 		{
 			MessageBox(_T("String length can not greater than 11"),_T("Warning"));
 			PostMessage(WM_REFRESH_BAC_CUSTOMER_DIGITAL_RANGE_LIST,NULL,NULL);
@@ -195,7 +195,7 @@ LRESULT CBacnetCustomerDigitalRange::Fresh_Customer_Digital_Range_Item(WPARAM wP
 	if(Changed_SubItem == CUSTOMER_DIGITAL_RANGE_ON)
 	{
 		CString cs_temp = m_customer_dig_range_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= 12)	//长度不能大于结构体定义的长度;
+		if(cs_temp.GetLength()>= 12)	//;
 		{
 			MessageBox(_T("String length can not greater than 11"),_T("Warning"));
 			PostMessage(WM_REFRESH_BAC_CUSTOMER_DIGITAL_RANGE_LIST,NULL,NULL);
@@ -241,7 +241,7 @@ void CBacnetCustomerDigitalRange::OnNMClickListCustomerDigitalRange(NMHDR *pNMHD
 	lCol = lvinfo.iSubItem;
 
 
-	if(lRow>m_customer_dig_range_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_customer_dig_range_list.GetItemCount()) //
 		return;
 	if(lRow<0)
 		return;

@@ -128,7 +128,7 @@ void CT3RangeDlg::Initial_window()
 
 
     CRect c13;
-    GetDlgItem(IDC_RADIO_T_0 + m_input_Analog_select)->GetWindowRect(c13);   //获取控件的位置 ，饼调整位置;
+    GetDlgItem(IDC_RADIO_T_0 + m_input_Analog_select)->GetWindowRect(c13);   // ;
     ScreenToClient(c13);
     m_rang_pic.SetWindowPos(NULL,c13.left - 40,c13.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
     m_rang_pic.Invalidate(TRUE);

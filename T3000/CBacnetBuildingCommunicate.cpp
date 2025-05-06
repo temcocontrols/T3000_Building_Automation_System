@@ -1,4 +1,4 @@
-﻿// CBacnetBuildingCommunicate.cpp: 实现文件
+﻿// CBacnetBuildingCommunicate.cpp: 
 //
 #include "stdafx.h"
 #include "T3000.h"
@@ -6,7 +6,7 @@
 #include "afxdialogex.h"
 
 
-// CBacnetBuildingCommunicate 对话框
+// CBacnetBuildingCommunicate 
 
 IMPLEMENT_DYNAMIC(CBacnetBuildingCommunicate, CDialogEx)
 
@@ -30,17 +30,17 @@ BEGIN_MESSAGE_MAP(CBacnetBuildingCommunicate, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetBuildingCommunicate 消息处理程序
+// CBacnetBuildingCommunicate 
 
 
 BOOL CBacnetBuildingCommunicate::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	m_szComm.clear();
-	// TODO:  在此添加额外的初始化
+	// TODO:  
 	Initialize();
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // 异常: OCX 属性页应返回 FALSE
+				  //  OCX E
 }
 
 void CBacnetBuildingCommunicate::Initialize()
@@ -52,7 +52,7 @@ void CBacnetBuildingCommunicate::Initialize()
 	{
 		((CComboBox*)GetDlgItem(IDC_COMBO_PROTOCOL))->AddString(BM_Protocol[i]);
 	}
-	//设置默认值
+	//
 	((CComboBox*)GetDlgItem(IDC_COMBO_PROTOCOL))->SetWindowText(BM_Protocol[0]);
 
 

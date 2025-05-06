@@ -16,7 +16,7 @@ typedef struct
 typedef struct
 {
     CString KeyName;
-    int nStatus;  //×´Ì¬ -1 ÎÞ    
+    int nStatus;  // -1     
     ValueType tValue;
 }Http_key;
 

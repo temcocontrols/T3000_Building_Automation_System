@@ -63,7 +63,7 @@ void bip_set_socket(
     BIP_Socket = sock_fd;
 }
 
-//如果是GSM 的连接 将不会判断47808 之类的端口，采用特殊情况 通讯;
+//GSM  47808  ;
 void bip_setgsm(bool isconnect)
 {
 	b_gsm_connected = isconnect;

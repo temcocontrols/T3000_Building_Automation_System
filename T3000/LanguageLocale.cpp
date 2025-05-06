@@ -94,7 +94,7 @@ bool gSetDialogStrings(HWND hWnd,UINT uDlgID)
 	CString szDefault = _T("");
 
 	
-	//读对话框标题
+	//
 	szKey.Format(_T("IDD%d_Title"),uDlgID);
 	if(GetPrivateProfileString(SECTION_NAME,szKey,szDefault,
 		gBufferString,BUFF_SIZE,gStrFileName) != 0)
@@ -102,7 +102,7 @@ bool gSetDialogStrings(HWND hWnd,UINT uDlgID)
 		::SetWindowText(hWnd,gBufferString);
 	}
 	
-	//写入各个子控件的标题文字
+	//
 	HWND hSubWnd = GetWindow(hWnd,GW_CHILD);
 	while(::IsWindow(hSubWnd))
 	{
@@ -126,7 +126,7 @@ bool gSetFormViewStrings(HWND hWnd,UINT uDlgID)
 
 	 
 	szseactionname.Format(_T("%s_%d"),T3000_VIEW,uDlgID);
-	//读对话框标题
+	//
 	/*szKey.Format(_T("IDD%d_Title"),uDlgID);
 	if(GetPrivateProfileString(szseactionname,szKey,szDefault,
 		gBufferString,BUFF_SIZE,gStrFileName) != 0)
@@ -134,7 +134,7 @@ bool gSetFormViewStrings(HWND hWnd,UINT uDlgID)
 		::SetWindowText(hWnd,gBufferString);
 	}*/
 
-	//写入各个子控件的标题文字
+	//
 	HWND hSubWnd = GetWindow(hWnd,GW_CHILD);
 	while(::IsWindow(hSubWnd))
 	{
@@ -154,13 +154,13 @@ bool gGetDialogStrings(HWND hWnd,UINT uDlgID)
 {
 	CString szseactionname ,szKey,szText;
 	 int ID;
-	//写入对话框标题
+	//
 	szseactionname.Format(_T("%s_%d"),T3000_DLG,uDlgID);
 	szKey.Format(_T("IDD%d_Title"),uDlgID);
 	GetWindowText(hWnd,gBufferString,BUFF_SIZE);
 	WritePrivateProfileString(szseactionname,szKey,gBufferString,gStrFileName);
 	
-	//写入各个子控件的标题文字
+	//
 	HWND hSubWnd = GetWindow(hWnd,GW_CHILD);
 	 
 	while(hSubWnd != NULL)
@@ -185,12 +185,12 @@ bool gGetFormViewStrings(HWND hWnd,UINT uDlgID)
 {
 	CString szseactionname ,szKey,szText;
 	 int ID;
-	//写入对话框标题
+	//
 	/*szKey.Format(_T("IDD%d_Title"),uDlgID);
 	GetWindowText(hWnd,gBufferString,BUFF_SIZE);
 	WritePrivateProfileString(SECTION_NAME,szKey,gBufferString,gStrFileName);*/
 	szseactionname.Format(_T("%s_%d"),T3000_VIEW,uDlgID);
-	//写入各个子控件的标题文字
+	//
 	HWND hSubWnd = GetWindow(hWnd,GW_CHILD);
 	 
 	while(hSubWnd != NULL)
@@ -221,10 +221,10 @@ void InitMenu(HMENU menu,CString KeyName)
     CString szText; 
     int nCount,subCount, id; 
  
-    nCount =GetMenuItemCount(menu);// menu->GetMenuItemCount();   //获取该层菜单数 
-    for(int i=0;i<nCount;i++)                //遍历所有菜单项 
+    nCount =GetMenuItemCount(menu);// menu->GetMenuItemCount();   // 
+    for(int i=0;i<nCount;i++)                // 
     { 
-        //查看子菜单   如果有子菜单，返回0，否则返回子菜单项数目，如果是子菜单项，返回资源中的菜单COMMAND ID 
+        //   0COMMAND ID 
 		 KeyName=_T("");
 		 KeyName=tempname;
         id= GetMenuItemID(menu,i); 
@@ -323,16 +323,16 @@ void ExportMenu(CMenu*menu,CString KeyName)
 	int nCount,subCount; 
 
 	 
-	nCount= menu->GetMenuItemCount();    //获取该层菜单数 
+	nCount= menu->GetMenuItemCount();    // 
 
-	for(int i=0;i<nCount;i++ )               //遍历所有菜单项 
+	for(int i=0;i<nCount;i++ )               // 
 	{ 
-		menu->GetMenuString (i, szText, MF_BYPOSITION);//获取菜单文字 
+		menu->GetMenuString (i, szText, MF_BYPOSITION);// 
 		int nMenuID = GetMenuItemID(menu->GetSubMenu(i)->m_hMenu,i);
 
 		if ( szText!=_T("")) 
 		{ 
-			//导出到配置文件中 
+			// 
 			if (nMenuID!=-1)
 			{
 			szKeyName.Format(_T("_%d"),nMenuID); 
@@ -349,7 +349,7 @@ void ExportMenu(CMenu*menu,CString KeyName)
 
 		} 
 
-		//查看是否有子菜单项 
+		// 
 		
 		if ( nMenuID==-1 ) 
 		{ 

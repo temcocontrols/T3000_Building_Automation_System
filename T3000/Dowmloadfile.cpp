@@ -18,7 +18,7 @@ extern vector <Str_download_firmware_info> download_info_type;
 
 BYTE IP_ADDRESS_SERVER[20];
 int total_file_length = 0;	
-int Add_log_count = 1;	//用于读取改读多少count了;
+int Add_log_count = 1;	//count;
 int replace_count = 1;
 CString AutoFlashConfigPath;
 CString ISPtool_path;
@@ -41,7 +41,7 @@ CString new_firmware_ip;
 int is_local_temco_net = false;
 extern bool update_t3000_only ;
 IMPLEMENT_DYNAMIC(Dowmloadfile, CDialogEx)
-int time_8_count = 0; // 记录mstp静默的时候 ，等待10秒; 
+int time_8_count = 0; // mstp 10; 
 map <int,CString> product_folder_map;
 
 Dowmloadfile::Dowmloadfile(CWnd* pParent /*=NULL*/)
@@ -163,15 +163,15 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
         temp_isp_info = temp_isp_info + mypath;
         m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
         m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
-        //if (m_download_product_type == 199) //如果下载的是T3000;
+        //if (m_download_product_type == 199) //T3000;
         //{
-        //    //调用解压;
+        //    //;
         //}
         if (download_and_update == DOWNLOAD_ONLY)
         {
             if (flash_multi_auto)
             {
-                //保存下载的位置,产品号 等信息;
+                //, ;
 
                 for (int z = 0;z<download_info_type.size();z++)
                 {
@@ -232,7 +232,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
             (m_product_isp_auto_flash.baudrate == 38400) ||
             (m_product_isp_auto_flash.baudrate == 57600) ||
             (m_product_isp_auto_flash.baudrate == 76800) ||
-            (m_product_isp_auto_flash.baudrate == 115200))//串口
+            (m_product_isp_auto_flash.baudrate == 115200))//
         {
             CString temp_baudrate;
             temp_baudrate.Format(_T("%d"), m_product_isp_auto_flash.baudrate);
@@ -652,24 +652,24 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				file_name.ReleaseBuffer();
 				temp_file_path = temp_file_path + _T("\\") + file_name; 
 				CFileFind findfirmwarefile;
-				if(!findfirmwarefile.FindFile(temp_file_path))	//没有发现文件 就要服务器传过来;
+				if(!findfirmwarefile.FindFile(temp_file_path))	// ;
 				{
 					::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_NOT_FIND_LOCAL,NULL);
 					download_step = START_SEND_WANT_PACKAGE;
 				}
-				else	//发现有一样的了就要比对MD5是否一致;
+				else	//MD5;
 				{
 
 
 					char locoal_char_md5[20];
 					memcpy_s(locoal_char_md5,20, MD5(ifstream( temp_file_path )).digest(),20);
 					int ret_value = memcmp(locoal_char_md5,receive_md5,16);
-					if(ret_value == 0)	//MD5值一样就不用下载 直接结束;
+					if(ret_value == 0)	//MD5 ;
 					{
 						::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_LOCAL_EXSIT,NULL);
 						download_step = THREAD_IDLE;
 					}
-					else	// 不一致就要再次下载;
+					else	// ;
 					{
 						::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_NOT_FIND_LOCAL,NULL);
 						download_step = START_SEND_WANT_PACKAGE;
@@ -743,7 +743,7 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				{
 					delete receivefile_buffer;
 					receivefile_buffer = NULL;
-					total_file_length = 0;	//开辟的内存空间大小;
+					total_file_length = 0;	//;
 				}
 				download_step = THREAD_IDLE;
 
@@ -924,9 +924,9 @@ BOOL Dowmloadfile::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-//更新包打补丁的时候，在zip文件中放置 UpdateEng.exe 
-//在打开T3000的时候，更新时，替换 原有的Update.exe 达到自动更新引擎的目的
-//T3000 更新  Update.exe 更新 自己 .
+//zip UpdateEng.exe 
+//T3000 Update.exe 
+//T3000   Update.exe   .
 HANDLE h_updatefile = NULL;
 void Dowmloadfile::Update_File()
 {
@@ -942,7 +942,7 @@ void Dowmloadfile::Update_File()
     {
         CString NewUpdateFilePath = ApplicationFolder + _T("\\Update.exe");
         CopyFile(update_exe_file_path, NewUpdateFilePath, false);
-        DeleteFile(update_exe_file_path); //在更新完后删除Eng文件;
+        DeleteFile(update_exe_file_path); //Eng;
     }
 }
 
@@ -1024,12 +1024,12 @@ DWORD WINAPI  Dowmloadfile::WebDownloadThread(LPVOID lpVoid)
         HRESULT download_ret = NULL;
         CBindCallback cbc;
         cbc.m_pdlg = pParent;
-        DeleteUrlCacheEntry(T3000FtpPath); // 清理缓存
+        DeleteUrlCacheEntry(T3000FtpPath); // 
         Sleep(2000);
         int retry_count_hex = 0;
         while (retry_count_hex<10)
         {
-            download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.下载到指定目录，并记录目录位置;
+            download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // .;
             if (download_ret != S_OK)
             {
                 retry_count_hex++;
@@ -1089,17 +1089,17 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     CString DesDownloadFilePath;
     CString DownloadIniFilePath;
     CString CheckVersionIniFilePath;
-    CString T3000FtpPath;//测试用;
+    CString T3000FtpPath;//;
     CString temp_download_path;
 
-    CString revisionFtpPath;//保存revision 的本地路径
+    CString revisionFtpPath;//revision 
     CString temp_revision_path;
     CString DesDownloadRevisionPath;
     CFileFind tempfind;
     CString strFileName;
     CString str_product_section;
 
-    DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/firmware/ProductPath.ini")); // 清理缓存
+    DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/firmware/ProductPath.ini")); // 
     Sleep(1000);
     DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/software/20T3000Update.zip "));
     Sleep(1000);
@@ -1145,7 +1145,7 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
         pParent->m_download_info.SetTopIndex(pParent->m_download_info.GetCount() - 1);
         goto ftp_download_end;
     }
-    else if (temp_download_path.IsEmpty())  //此产品没有找到对应的下载目录;
+    else if (temp_download_path.IsEmpty())  //;
     {
         CS_Info.Format(_T("Can't find the firmware file on the website."));
         pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
@@ -1156,19 +1156,19 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     T3000FtpPath = _T("https://temcocontrols.com/ftp/firmware/") + temp_download_path;
 
 
-    strFileName  = PathFindFileName(T3000FtpPath);  //根据组合的下载路径，获取最后得文件名
+    strFileName  = PathFindFileName(T3000FtpPath);  //
 
 
     DesDownloadFilePath = Folder_Path + _T("\\") + strFileName;     
 
-    //若存在 版本信息文件路径 就去下载并显示出来;
+    //  ;
     if (temp_revision_path.IsEmpty() == false)
     {
         revisionFtpPath = _T("https://temcocontrols.com/ftp/firmware/") + temp_revision_path;
-        strFileName = PathFindFileName(revisionFtpPath);  //根据组合的下载路径，获取最后得文件名
+        strFileName = PathFindFileName(revisionFtpPath);  //
         DesDownloadRevisionPath = Folder_Path + _T("\\") + strFileName;
 
-        DeleteUrlCacheEntry(revisionFtpPath); // 清理缓存
+        DeleteUrlCacheEntry(revisionFtpPath); // 
         Sleep(10);
 
         download_ret = URLDownloadToFile(NULL, revisionFtpPath, DesDownloadRevisionPath, 0, &cbc);
@@ -1180,7 +1180,7 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
             dwFileLen = myfile.GetLength();
             pBuf = new char[dwFileLen + 1];
             pBuf[dwFileLen] = 0;
-            myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
+            myfile.Read(pBuf, dwFileLen);     //MFC   CFile  
             myfile.Close();
 
             CString temp_revision_notes;
@@ -1191,7 +1191,7 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
 
             for (int j = 0; j < temparray.GetSize(); j++)
             {
-                if (j > 20) //只展示前20行.
+                if (j > 20) //20.
                     break;
                 CS_Info.Format(_T("%s"), temparray.GetAt(j));
                 pParent->m_download_info.InsertString(pParent->m_download_info.GetCount(), CS_Info);
@@ -1210,7 +1210,7 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
         }
     }
 
-    if ((local_version_date == ftp_version_date) && (ftp_version_date != 0) && tempfind.FindFile(DesDownloadFilePath))  //与FTP上相等 并且存在;
+    if ((local_version_date == ftp_version_date) && (ftp_version_date != 0) && tempfind.FindFile(DesDownloadFilePath))  //FTP ;
     {
         pParent->download_file_name = DesDownloadFilePath;
         CS_Info.Format(_T("The file has been downloaded."));
@@ -1219,12 +1219,12 @@ DWORD WINAPI  Dowmloadfile::FtpDownloadThread(LPVOID lpVoid)
     }
     else
     {
-        DeleteUrlCacheEntry(T3000FtpPath); // 清理缓存
+        DeleteUrlCacheEntry(T3000FtpPath); // 
         Sleep(2000);
         int retry_count_hex = 0;
         while (retry_count_hex<10)
         {
-            download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.下载到指定目录，并记录目录位置;
+            download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // .;
             if (download_ret != S_OK)
             {
                 retry_count_hex++;
@@ -1635,12 +1635,12 @@ void Dowmloadfile::OnBnClickedButtonUpdateT3000()
     bool download_ret = false;
     DownloadIniFilePath = Folder_Path + _T("//ProductPath.ini");
     CheckVersionIniFilePath = Folder_Path + _T("//CheckVersionPath.ini");
-    DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/firmware/ProductPath.ini")); // 清理缓存
+    DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/firmware/ProductPath.ini")); // 
     Sleep(800);
 
     download_ret = URLDownloadToFile(NULL, _T("https://temcocontrols.com/ftp/firmware/ProductPath.ini"), DownloadIniFilePath, 0, NULL);
     //T3000_FTP_Version = GetPrivateProfileIntW(_T("Version"), _T("T3000Version"), 0, DownloadIniFilePath);
-    if ((download_ret != S_OK) && is_local_temco_net == false)  //如果不是本地的temco
+    if ((download_ret != S_OK) && is_local_temco_net == false)  //temco
     {
         CString CS_Info;
         CS_Info.Format(_T("The network connection is not available,please check the network connection"));

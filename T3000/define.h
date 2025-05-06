@@ -33,8 +33,8 @@
 #define Global_String_NO     _T("On")
 #define Global_String_OFF   _T("Off")
 
-#define Global_String_C _T("°„C")
-#define Glocal_String_F _T("°„F")
+#define Global_String_C _T("C")
+#define Glocal_String_F _T("F")
 
 #define Modbus_Serial	0
 #define Modbus_TCP		1
@@ -98,7 +98,7 @@
 
 
 
-// CBuildTable1 ∂‘ª∞øÚ
+// CBuildTable1 
     // Address 219
 	/*
 #define MODBUS_TABLE1_ZERO  219

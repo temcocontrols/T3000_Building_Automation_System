@@ -179,30 +179,30 @@ END_EVENTSINK_MAP()
 void CAllNodesDiaolg::ClickMsflexgrid1()
 {
 	long lRow, lCol;
-	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	lRow = m_FlexGrid.get_RowSel();//	
+	lCol = m_FlexGrid.get_ColSel(); //
 	if (lRow == 0)
 		return;
 	CRect rect;
-	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-						  // MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-						  //需要将其转化为像素，1440缇= 1英寸
+	m_FlexGrid.GetWindowRect(rect); //
+	ScreenToClient(rect); //	
+						  // MSFlexGrid"(twips)"
+						  //1440= 1
 	CDC* pDC = GetDC();
-	//计算象素点和缇的转换比例
+	//
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX);
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY);
-	//计算选中格的左上角的坐标(象素为单位)
+	//()
 	long y = m_FlexGrid.get_RowPos(lRow) / nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol) / nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//()11
 	long width = m_FlexGrid.get_ColWidth(lCol) / nTwipsPerDotX + 1;
 	long height = m_FlexGrid.get_RowHeight(lRow) / nTwipsPerDotY + 1;
-	//形成选中个所在的矩形区域
+	//
 	CRect rc(x, y, x + width, y + height);
-	//转换成相对对话框的坐标
+	//
 	rc.OffsetRect(rect.left + 1, rect.top + 1);
-	//获取选中格的文本信息	
+	//	
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow, lCol);
 	m_nCurRow = lRow;
 	m_nCurCol = lCol;
@@ -219,25 +219,25 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 	// 		m_productCombox.ResetContent();
 	// 		m_productCombox.AddString(_T("Tstat"));
 	// 		m_productCombox.AddString(_T("NC"));
-	// 		m_productCombox.ShowWindow(SW_SHOW);//显示控件		
-	// 		m_productCombox.SetWindowText(strValue); //显示文本
-	// 		m_productCombox.SelectString(-1,strValue); //内容全选。方便直接修改		this line must before setfocus
-	// 		m_productCombox.SetFocus(); //获取焦点
-	// 		m_productCombox.MoveWindow(rc); //移动到选中格的位置，覆盖		
+	// 		m_productCombox.ShowWindow(SW_SHOW);//		
+	// 		m_productCombox.SetWindowText(strValue); //
+	// 		m_productCombox.SelectString(-1,strValue); //		this line must before setfocus
+	// 		m_productCombox.SetFocus(); //
+	// 		m_productCombox.MoveWindow(rc); //		
 	// 	}
 	//	if(m_nCurCol==AN_PRUDUCTNAME||m_nCurCol==AN_ROOMNAME||m_nCurCol==AN_FLOORNAME)
 	if (m_nCurCol > 0 && /*m_nCurCol != AN_GRAPHICID  &&*/ m_nCurCol != AN_MAINNAME)
 	{
 		m_InputTextEdt.ShowWindow(SW_SHOW);
 
-		m_InputTextEdt.SetWindowText(strValue); //显示文本
-												//	m_InputTextEdt(-1,strValue); //内容全选。方便直接修改		this line must before setfocus
+		m_InputTextEdt.SetWindowText(strValue); //
+												//	m_InputTextEdt(-1,strValue); //		this line must before setfocus
 
 		m_InputTextEdt.SetFocus();
 		int nLenth = strValue.GetLength();
 		m_InputTextEdt.SetSel(0, nLenth);
-		m_InputTextEdt.SetFocus(); //获取焦点
-		m_InputTextEdt.MoveWindow(rc); //移动到选中格的位置，覆盖	
+		m_InputTextEdt.SetFocus(); //
+		m_InputTextEdt.MoveWindow(rc); //	
 
 	}
 #if 0
@@ -401,7 +401,7 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 			ReloadAddBuildingDB();
 		}
 	}
-	else // 最后一行，用来增加
+	else // 
 	{
 		//if(m_nCurCol==AN_PRODUCTTYPE)
 		{
@@ -749,7 +749,7 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
             m_FlexGrid.put_TextMatrix(temp_row, AN_IP_ADDRESS, _T(""));
         }
 
-		m_strID = q.getValuebyName(L"Background_imgID");// 这一列更改为 协议
+		m_strID = q.getValuebyName(L"Background_imgID");//  
 
 		m_FlexGrid.put_TextMatrix(temp_row, AN_PROTOCOL, m_strID);
 

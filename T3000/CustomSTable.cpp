@@ -53,7 +53,7 @@ BOOL CCustomSTable::OnInitDialog()
 
 	to_fresh();
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// 异常: OCX 属性页应返回 FALSE
+	// : OCX  FALSE
 }
 // CCustomSTable message handlers
 void CCustomSTable::to_fresh()
@@ -436,7 +436,7 @@ void CCustomSTable::OnEnKillfocusEdit12()
  
 		to_fresh();
 	 
-//	SetTimer(1,ONTIMER_TIME,NULL);//设定每五秒更新一次开始
+//	SetTimer(1,ONTIMER_TIME,NULL);//
 }
 
 void CCustomSTable::OnBnClickedOk()

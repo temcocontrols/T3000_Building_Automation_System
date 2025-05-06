@@ -105,12 +105,12 @@ LRESULT  CBacnetAnalogCusRang::AnalogRangeTblMessageCallBack(WPARAM wParam, LPAR
 	}
 	else
 	{
-		memcpy_s(&m_Program_data.at(pInvoke->mRow),sizeof(Str_program_point),&m_temp_program_data[pInvoke->mRow],sizeof(Str_program_point));//还原没有改对的值
+		memcpy_s(&m_Program_data.at(pInvoke->mRow),sizeof(Str_program_point),&m_temp_program_data[pInvoke->mRow],sizeof(Str_program_point));//
 		PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 	}
-	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
+	if((pInvoke->mRow%2)==0)	//  ;
 		m_analog_cus_range_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
 		m_analog_cus_range_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -181,7 +181,7 @@ void CBacnetAnalogCusRang::Initial_List()
 
         for (int j = 0;j<(int)sizeof(JumperStatus) / sizeof(JumperStatus[0]);j++)
         {
-            if (j == 4)   //以前出于某些原因  0  和 4 都代表 Thermistor Dry Contact; 这里下拉框不希望显示两个 一样的，所以过滤掉
+            if (j == 4)   //  0   4  Thermistor Dry Contact;  
                 continue;
             ((CComboBox *)GetDlgItem(IDC_COMBO_CUSRANGE_STIGNALTYPE))->AddString(JumperStatus[j]);
         }
@@ -208,7 +208,7 @@ void CBacnetAnalogCusRang::Initial_List()
         {
             ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->ShowWindow(0);
             ((CComboBox*)GetDlgItem(IDC_STATIC_PRECISION))->ShowWindow(0);
-            enable_high_precision = 0;  //固件不支持的话 就算load 新的prog 的0.01精度进来 固件都会按0.1的去执行
+            enable_high_precision = 0;  // load prog 0.01 0.1
         }
      
 
@@ -287,7 +287,7 @@ void CBacnetAnalogCusRang::Initial_List()
 		CString temp_des;
 		CString temp_units;
 
-		if(i>=input_item_limit_count)	//vector的大小始终不变 ,用次变量来 约束 要显示的 item 数量;
+		if(i>=input_item_limit_count)	//vector ,   item ;
 			break;
 
 		temp_item.Format(_T("%.1f"),i*0.5);
@@ -319,7 +319,7 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
 
     if (Changed_Item >= n_point_count) 
     {
-        //判断用户是不是想新增点
+        //
         if(cs_temp.IsEmpty())
             return 0;
         for (int j = Changed_Item; j < 11; j++)
@@ -337,7 +337,7 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
         float temp_value = _wtof(cs_temp);
         if (enable_high_precision == 1)
         {
-            m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] = 0xef; //table 名字的最后一个字节需要标识为高精度 0.01
+            m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] = 0xef; //table  0.01
             if ((temp_value > 655.35) || (temp_value < 0))
             {
                 m_analog_cus_range_list.SetItemText(Changed_Item, 0, _T(""));
@@ -361,7 +361,7 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_Item(WPARAM wParam,LPARAM lPa
 
     }
 
-	for (int i=0;i<11;i++)//只要有修改1个，就重新将界面上所有的值 读到 内存 并写入 设备;
+	for (int i=0;i<11;i++)//1    ;
 	{
 			CString cs_temp = m_analog_cus_range_list.GetItemText(i,ANALOG_CUS_RANGE_RBL_VALUE);
 			float temp_value =_wtof(cs_temp);
@@ -514,7 +514,7 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lPa
     min_unit = 0x7fffffff;
 
     char temp_char[10] = { 0 };
-    if ((unsigned char)m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] != 0xef) //最后一位用来标识 精度 ，与旧版本的0.1 区别开
+    if ((unsigned char)m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] != 0xef) //  0.1 
     {
         memcpy_s(temp_char, 9, (char*)m_analog_custmer_range.at(analog_range_tbl_line).table_name, 9);
     }
@@ -829,7 +829,7 @@ BOOL CBacnetAnalogCusRang::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pR
 		nID = ::GetDlgCtrlID((HWND)nID);
 		if(nID)
 		{
-			//  这里就是你要显示的Tooltips，可以根据需要来定制
+			//  Tooltips
 			CString strToolTips;
 			strToolTips.Format(_T("%d"), m_tipvalue);
 			pTTT->lpszText=strToolTips.AllocSysString();
@@ -867,7 +867,7 @@ void CBacnetAnalogCusRang::UpdateCusAnalogUnit()
     if (enable_high_precision == 1)
     {
         memcpy_s(m_analog_custmer_range.at(analog_range_tbl_line).table_name, 9, cTemp1, 8);
-        m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] = 0xef; //table 名字的最后一个字节需要标识为高精度 0.01
+        m_analog_custmer_range.at(analog_range_tbl_line).table_name[8] = 0xef; //table  0.01
     }
     else
     {
@@ -978,7 +978,7 @@ void CBacnetAnalogCusRang::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetAnalogCusRang::OnEnKillfocusEditcusPointValue()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     ReSetSlideAndList();
     PostMessage(WM_LIST_ITEM_CHANGED, NULL, NULL);
 }
@@ -986,7 +986,7 @@ void CBacnetAnalogCusRang::OnEnKillfocusEditcusPointValue()
 
 void CBacnetAnalogCusRang::OnEnKillfocusEditMinVoltValue()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     ReSetSlideAndList();
     ReAllocationVolts();
     PostMessage(WM_LIST_ITEM_CHANGED, NULL, NULL);
@@ -995,7 +995,7 @@ void CBacnetAnalogCusRang::OnEnKillfocusEditMinVoltValue()
 
 void CBacnetAnalogCusRang::OnEnKillfocusEditMinValueValue()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     ReSetSlideAndList();
     ReAllocationValue();
     PostMessage(WM_LIST_ITEM_CHANGED, NULL, NULL);
@@ -1004,7 +1004,7 @@ void CBacnetAnalogCusRang::OnEnKillfocusEditMinValueValue()
 
 void CBacnetAnalogCusRang::OnEnKillfocusEditMaxVoltValue3()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     ReSetSlideAndList();
     ReAllocationVolts();
     PostMessage(WM_LIST_ITEM_CHANGED, NULL, NULL);
@@ -1013,7 +1013,7 @@ void CBacnetAnalogCusRang::OnEnKillfocusEditMaxVoltValue3()
 
 void CBacnetAnalogCusRang::OnEnKillfocusEditMaxValueValue()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     ReSetSlideAndList();
     ReAllocationValue();
     PostMessage(WM_LIST_ITEM_CHANGED, NULL, NULL);
@@ -1681,13 +1681,13 @@ void CBacnetAnalogCusRang::Handle_Static_ctrl_10()
 
 void CBacnetAnalogCusRang::OnBnClickedButtonApply()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
 }
 
 
 void CBacnetAnalogCusRang::OnCbnKillfocusComboCusrangeStignaltype()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     CString temp_string;
     int n_value = 0xff;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_CUSRANGE_STIGNALTYPE))->GetCurSel();
@@ -1720,7 +1720,7 @@ void CBacnetAnalogCusRang::OnCbnKillfocusComboCusrangeStignaltype()
 void CBacnetAnalogCusRang::OnNMClickDialogBacnetRangeList(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     *pResult = 0;
 
     long lRow, lCol;
@@ -1736,7 +1736,7 @@ void CBacnetAnalogCusRang::OnNMClickDialogBacnetRangeList(NMHDR *pNMHDR, LRESULT
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
 
-    if (lRow>=n_point_count) //如果点击区超过最大行号，则点击是无效的
+    if (lRow>=n_point_count) //
         return;
 
     m_analog_cus_range_list.Set_Edit(true);
@@ -1745,7 +1745,7 @@ void CBacnetAnalogCusRang::OnNMClickDialogBacnetRangeList(NMHDR *pNMHDR, LRESULT
 
 void CBacnetAnalogCusRang::OnCbnSelchangeComboPrecision()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     CString temp_string;
     int n_value = 0;
     int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_PRECISION))->GetCurSel();

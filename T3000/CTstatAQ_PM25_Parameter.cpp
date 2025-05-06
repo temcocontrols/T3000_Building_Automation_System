@@ -1,4 +1,4 @@
-﻿// CTstatAQ_PM25_Parameter.cpp: 实现文件
+﻿// CTstatAQ_PM25_Parameter.cpp: 
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "CTstatAQ_PM25_Parameter.h"
 #include "TstatAQ.h"
 #include "global_function.h"
-// CTstatAQ_PM25_Parameter 对话框
+// CTstatAQ_PM25_Parameter 
 
 IMPLEMENT_DYNAMIC(CTstatAQ_PM25_Parameter, CDialogEx)
 
@@ -42,7 +42,7 @@ BEGIN_MESSAGE_MAP(CTstatAQ_PM25_Parameter, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CTstatAQ_PM25_Parameter 消息处理程序
+// CTstatAQ_PM25_Parameter 
 
 
 LRESULT  CTstatAQ_PM25_Parameter::PM25MessageCallBack(WPARAM wParam, LPARAM lParam)
@@ -75,7 +75,7 @@ BOOL CTstatAQ_PM25_Parameter::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  在此添加额外的初始化
+	// TODO:  
 	CString temp_manual_value1;
 	temp_manual_value1.Format(_T("%u"), product_register_value[100]);
 	GetDlgItem(IDC_EDIT_P_PM25_VALUE)->SetWindowTextW(temp_manual_value1);
@@ -117,13 +117,13 @@ BOOL CTstatAQ_PM25_Parameter::OnInitDialog()
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// 异常: OCX 属性页应返回 FALSE
+	//  OCX 
 }
 
 
 void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm25Value()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	unsigned short temp_value;
 	CString temp_manual_value1;
 	GetDlgItem(IDC_EDIT_P_PM25_VALUE)->GetWindowTextW(temp_manual_value1);
@@ -136,7 +136,7 @@ void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm25Value()
 
 void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm10Value2()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	unsigned short temp_value;
 	CString temp_manual_value2;
 	GetDlgItem(IDC_EDIT_P_PM10_VALUE2)->GetWindowTextW(temp_manual_value2);
@@ -149,7 +149,7 @@ void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm10Value2()
 
 void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm25Min()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	unsigned short temp_value;
 	CString temp_25min;
 	GetDlgItem(IDC_EDIT_P_PM25_MIN)->GetWindowTextW(temp_25min);
@@ -161,7 +161,7 @@ void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm25Min()
 
 void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm25Max()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	unsigned short temp_value;
 	CString temp_25max;
 	GetDlgItem(IDC_EDIT_P_PM25_MAX)->GetWindowTextW(temp_25max);
@@ -173,7 +173,7 @@ void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm25Max()
 
 void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm10Min()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	unsigned short temp_value;
 	CString temp_10min;
 	GetDlgItem(IDC_EDIT_P_PM10_MIN)->GetWindowTextW(temp_10min);
@@ -185,7 +185,7 @@ void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm10Min()
 
 void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm10Max()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	unsigned short temp_value;
 	CString temp_10max;
 	GetDlgItem(IDC_EDIT_P_PM10_MAX)->GetWindowTextW(temp_10max);
@@ -200,7 +200,7 @@ void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm10Max()
 
 void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm25Filter()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	unsigned short temp_value;
 	CString temp_25_filter;
 	GetDlgItem(IDC_EDIT_P_PM25_FILTER)->GetWindowTextW(temp_25_filter);
@@ -213,7 +213,7 @@ void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm25Filter()
 
 void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm10Filter()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	unsigned short temp_value;
 	CString temp_10_filter;
 	GetDlgItem(IDC_EDIT_P_PM10_FILTER)->GetWindowTextW(temp_10_filter);
@@ -225,7 +225,7 @@ void CTstatAQ_PM25_Parameter::OnEnKillfocusEditPPm10Filter()
 
 void CTstatAQ_PM25_Parameter::OnBnClickedRadioPmAuto()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	int nValue = 0;
 	if (product_register_value[PM25_MODBUS_PM_OUTPUT_AUTO_MANUAL] == nValue)	//Add this to judge weather this value need to change.
 		return;
@@ -238,7 +238,7 @@ void CTstatAQ_PM25_Parameter::OnBnClickedRadioPmAuto()
 
 void CTstatAQ_PM25_Parameter::OnBnClickedRadioPmManual()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	int nValue = 3;
 	if (product_register_value[PM25_MODBUS_PM_OUTPUT_AUTO_MANUAL] == nValue)	//Add this to judge weather this value need to change.
 		return;
@@ -249,7 +249,7 @@ void CTstatAQ_PM25_Parameter::OnBnClickedRadioPmManual()
 
 BOOL CTstatAQ_PM25_Parameter::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	// TODO: 
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if ((pMsg->wParam == VK_RETURN) || (pMsg->wParam == VK_ESCAPE))

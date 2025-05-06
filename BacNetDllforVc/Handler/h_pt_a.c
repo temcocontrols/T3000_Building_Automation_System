@@ -159,7 +159,7 @@ static void DecodeBlock(
 //    //    &uiErrorCode);
 //	 decode_octet_string(&data->serviceParameters[iLen], len_value_type,&Temp_CS);
 //	 if((len_value_type - 6)%44!=0)
-//		 return 0;	//得到的结构长度错误;
+//		 return 0;	//;
 //
 //	 block_length=(len_value_type - 6)/44;
 //	 Private_data_length = block_length;
@@ -295,7 +295,7 @@ static void DecodeBlock(
 	 decode_octet_string(&data->serviceParameters[iLen], len_value_type,&Temp_CS);
 
 	 if((len_value_type - 6)%44!=0)
-		 return;	//得到的结构长度错误;
+		 return;	//;
 
 	 block_length=(len_value_type - 6)/44;
 	 Private_data_length = block_length;

@@ -199,7 +199,7 @@ struct _Resend_Read_Info
 	int task_result;
 	int invoke_id;
 	int has_resend_yes_or_no;
-	int timeout_count;//多少次还没收到回复，就算 失败;
+	int timeout_count;// ;
 };
 
 struct _Com_Scan_Read_Info
@@ -262,9 +262,9 @@ struct Monitor_Input_Info
 {
 	int Max_Value;
 	int Min_Value;
-	bool be_record;//是否记录了这条;
-	bool use_own_scale;//是否单独用自己的刻度;
-	bool show_graphic; //是否显示图像;
+	bool be_record;//;
+	bool use_own_scale;//;
+	bool show_graphic; //;
 };
 
 struct Changed_Item_Info
@@ -462,7 +462,7 @@ const CString Variable_Analog_Units_Array[] =
 
 
 
-const int WINDOW_TAB_COUNT = 11; //多少个Window 嵌入在TAB里面;
+const int WINDOW_TAB_COUNT = 11; //Window TAB;
 const int WINDOW_INPUT = 0;
 const int WINDOW_OUTPUT = 1;
 const int WINDOW_VARIABLE = 2;

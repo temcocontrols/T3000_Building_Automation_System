@@ -56,7 +56,7 @@ BOOL CBacnetScheduleTime::OnInitDialog()
 	
 	PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
 
-    //2017 12 28 优化显示 ，在弹出 的schedule 界面 优先显示 label 的值，如果label为空值就默认显示Schedule加序号. 
+    //2017 12 28   schedule   label labelSchedule. 
     CString temp_des2;
     MultiByteToWideChar(CP_ACP, 0, (char *)m_Weekly_data.at(weekly_list_line).label, (int)strlen((char *)m_Weekly_data.at(weekly_list_line).label) + 1,
         temp_des2.GetBuffer(MAX_PATH), MAX_PATH);
@@ -215,7 +215,7 @@ LRESULT CBacnetScheduleTime::Fresh_Schedual_List(WPARAM wParam,LPARAM lParam)
     {
         for (int j = 0;j < 9;j++)
         {
-            //过滤不合理的时间，不合理的显示空;
+            //;
                 //if((m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes >59) ||
                 //	(m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_hours >23)	||
                 //	((m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes == 0)
@@ -234,7 +234,7 @@ LRESULT CBacnetScheduleTime::Fresh_Schedual_List(WPARAM wParam,LPARAM lParam)
                     m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes);
             }
 #if 0
-            //2018 05 31 切尔西要求 如果 第二行有值 ，第一行又是 00:00 的时候 默认情况是隐藏的，这时候要显示出来;
+            //2018 05 31     00:00  ;
             if ((i == 0) && temp_show.IsEmpty() &&
                 ((m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[1][j].time_minutes != 0)
                     || (m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[1][j].time_hours != 0)))
@@ -283,7 +283,7 @@ void CBacnetScheduleTime::OnNMClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pRes
 	lCol = lvinfo.iSubItem;
 
 
-	if(lRow>m_schedule_time_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_schedule_time_list.GetItemCount()) //
 		return;
 	if(lRow<0)
 		return;

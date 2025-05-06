@@ -7,8 +7,8 @@
 	file ext:	h
 	author:		zgq
 	
-	purpose:	 flash功能的基类，提供一般常用的接口。各个设备不同的flash方式
-				 使用不同的类，但都从这里继承。
+	purpose:	 flashflash
+				 
 *********************************************************************/
 
 
@@ -20,7 +20,7 @@ public:
 	CFlashBase(void);
 	virtual ~CFlashBase(void);
 
-	// 获得flash file的绝对路径和文件名。
+	// flash file
 	CString		GetFlashFileName();											
 	void			SetFlashFileName(const CString& strFlieName);		// 
 
@@ -42,9 +42,9 @@ public:
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// 需要重载的函数
+	// 
 	//////////////////////////////////////////////////////////////////////////
-	// 检查文件格式
+	// 
 	virtual BOOL FileValidation(const CString& strFileName);
 	virtual BOOL Flash();
 
@@ -56,7 +56,7 @@ public:
 protected:
 	CString		m_strFlashFileName;		// flash file name
 
-	char*			m_pFileBuffer;				// 文件内容缓冲区，保存要刷新的文件
+	char*			m_pFileBuffer;				// 
 	int				m_nBufferSize;			// size
 
 };

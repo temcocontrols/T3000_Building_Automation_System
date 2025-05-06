@@ -38,7 +38,7 @@
 //			  node becomes selected.
 //			- If in the BeforeSelect event, e.Cancel is set to true, then node 
 //			  will not be selected
-//			- SHIFT selection sometimes didn’t behave correctly. Fixed.
+//			- SHIFT selection sometimes didn behave correctly. Fixed.
 //		04/09/2004	
 //			- SelectedNodes is no longer an array of tree nodes, but a 
 //			  SelectedNodesCollection

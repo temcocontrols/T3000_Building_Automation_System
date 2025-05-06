@@ -9,7 +9,7 @@
 // CAfxMessageDialog dialog
 
 
-// CAfxMessageDialog 对话框
+// CAfxMessageDialog 
 
 IMPLEMENT_DYNAMIC(CAfxMessageDialog, CDialog)
 CAfxMessageDialog::CAfxMessageDialog(CWnd* pParent /*=NULL*/)
@@ -39,7 +39,7 @@ BEGIN_MESSAGE_MAP(CAfxMessageDialog, CDialog)
 END_MESSAGE_MAP()
 
 
-// CAfxMessageDialog 消息处理程序
+// CAfxMessageDialog 
 
 void CAfxMessageDialog::SetPromtionTxt(CString strText)
 {

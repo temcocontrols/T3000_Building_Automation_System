@@ -155,7 +155,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 
 
-	if(m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG)	//这里是 读取config 所要的 资料;
+	if(m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG)	// config  ;
 	{
 		int read_config_total_count = BAC_INPUT_GROUP +
 									  BAC_OUTPUT_GROUP +
@@ -168,7 +168,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 									  BAC_HOLIDAY_GROUP +
 									  BAC_MONITOR_GROUP +
 									  BAC_SCHEDULECODE_GOUP +
-									  BAC_HOLIDAYCODE_GROUP;//这里还有很多要加;
+									  BAC_HOLIDAYCODE_GROUP;//;
 									  BAC_BASIC_SETTING_GROUP;
 		int read_config_all_step = 1000 / read_config_total_count;
 		int read_config_success_count =0;
@@ -338,7 +338,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		g_progress_persent = read_config_pos;
 
 	}
-	else if(m_wait_type == BAC_WAIT_NORMAL_READ)//这里是点击的时候读，只要INput output var program 和time;
+	else if(m_wait_type == BAC_WAIT_NORMAL_READ)//INput output var program time;
 	{
 		int total_count = BAC_INPUT_GROUP + 
 			BAC_OUTPUT_GROUP +	
@@ -668,7 +668,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			g_progress_persent = 0;
 			this->ShowWindow(SW_HIDE);
 		}
-		if(bac_read_which_list == BAC_READ_GRAPHIC_LABEL_INFO)	// 如果是第一次 读 图片里面的label,就慢慢读,并且显示 进度条.
+		if(bac_read_which_list == BAC_READ_GRAPHIC_LABEL_INFO)	//   label,, .
 		{
 			g_progress_persent = pos;
 			//this->ShowWindow(SW_SHOW);
@@ -709,7 +709,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					{
 						cotinue_waite = true;
 						Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].resend_count ++ ;
-						//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+						//10 ;
 						if((Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].resend_count>RESEND_COUNT) 
 							|| (Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 						{
@@ -727,14 +727,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 							Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].start_instance,
 							Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].end_instance,
 							sizeof(Str_Units_element));
-						if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+						if(g_invoke_id<0)	// ;
 						{
 							Sleep(50);
 							continue;
 						}
 						Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].has_resend_yes_or_no ++;
-						Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-						Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+						Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+						Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].invoke_id = g_invoke_id;	// ID ;
 
 						CString temp_cs_show;
 						temp_cs_show.Format(_T("Read graphic label "));
@@ -769,7 +769,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					{
 						cotinue_waite = true;
 						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].resend_count ++ ;
-						//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+						//10 ;
 						if((Bacnet_Refresh_Info.Read_Customer_unit_Info[i].resend_count>RESEND_COUNT) 
 							|| (Bacnet_Refresh_Info.Read_Customer_unit_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 						{
@@ -786,14 +786,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 							Bacnet_Refresh_Info.Read_Customer_unit_Info[i].start_instance,
 							Bacnet_Refresh_Info.Read_Customer_unit_Info[i].end_instance,
 							sizeof(Str_Units_element));
-						if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+						if(g_invoke_id<0)	// ;
 						{
 							Sleep(50);
 							continue;
 						}
 						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].has_resend_yes_or_no ++;
-						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id = g_invoke_id;	// ID ;
 
 						CString temp_cs_show;
 						temp_cs_show.Format(_T("Read Custom units "));
@@ -827,7 +827,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					{
 						cotinue_waite = true;
 						Bacnet_Refresh_Info.Read_UserLogin[i].resend_count ++ ;
-						//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+						//10 ;
 						if((Bacnet_Refresh_Info.Read_UserLogin[i].resend_count>RESEND_COUNT) 
 							|| (Bacnet_Refresh_Info.Read_UserLogin[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 						{
@@ -844,14 +844,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 							Bacnet_Refresh_Info.Read_UserLogin[i].start_instance,
 							Bacnet_Refresh_Info.Read_UserLogin[i].end_instance,
 							sizeof(Str_userlogin_point));
-						if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+						if(g_invoke_id<0)	// ;
 						{
 							Sleep(50);
 							continue;
 						}
 						Bacnet_Refresh_Info.Read_UserLogin[i].has_resend_yes_or_no ++;
-						Bacnet_Refresh_Info.Read_UserLogin[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-						Bacnet_Refresh_Info.Read_UserLogin[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+						Bacnet_Refresh_Info.Read_UserLogin[i].task_result = BAC_RESULTS_UNKONW;//  ;
+						Bacnet_Refresh_Info.Read_UserLogin[i].invoke_id = g_invoke_id;	// ID ;
 
 						CString temp_cs_show;
 						temp_cs_show.Format(_T("Read Tstats list "));
@@ -885,7 +885,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					cotinue_waite = true;
 					Bacnet_Refresh_Info.Read_Monitor_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_Monitor_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Monitor_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -902,14 +902,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Monitor_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Monitor_Info[i].end_instance,
 						sizeof(Str_monitor_point));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Monitor_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Monitor_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Monitor_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Monitor_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Monitor_Info[i].invoke_id = g_invoke_id;	// ID ;
 
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read Monitor list "));
@@ -952,7 +952,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					cotinue_waite = true;
 					Bacnet_Refresh_Info.Read_Screen_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_Screen_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Screen_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -969,14 +969,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Screen_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Screen_Info[i].end_instance,
 						sizeof(Control_group_point));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Screen_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Screen_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Screen_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Screen_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Screen_Info[i].invoke_id = g_invoke_id;	// ID ;
 
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read Screen list "));
@@ -1019,7 +1019,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					cotinue_waite = true;
 					Bacnet_Refresh_Info.Read_Controller_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 						if((Bacnet_Refresh_Info.Read_Controller_Info[i].resend_count>RESEND_COUNT) 
 							|| (Bacnet_Refresh_Info.Read_Controller_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1036,14 +1036,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Controller_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Controller_Info[i].end_instance,
 						sizeof(Str_controller_point));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Controller_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Controller_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Controller_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Controller_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Controller_Info[i].invoke_id = g_invoke_id;	// ID ;
 
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read Controller list "),g_invoke_id);
@@ -1086,7 +1086,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					Bacnet_Refresh_Info.Read_Time_Command[i].resend_count ++ ;
 					cotinue_waite = true;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_Time_Command[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Time_Command[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1102,14 +1102,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Time_Command[i].start_instance,
 						Bacnet_Refresh_Info.Read_Time_Command[i].end_instance,
 						sizeof(Time_block_mini));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Time_Command[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Time_Command[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Time_Command[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Time_Command[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Time_Command[i].invoke_id = g_invoke_id;	// ID ;
 
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read device time "),g_invoke_id);
@@ -1154,7 +1154,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].resend_count ++ ;
 					cotinue_waite = true;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_BasicSetting_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_BasicSetting_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1171,14 +1171,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].end_instance,
 						sizeof(Str_Setting_Info));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].invoke_id = g_invoke_id;	// ID ;
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read basic setting "),g_invoke_id);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
@@ -1223,7 +1223,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					cotinue_waite = true;
 					Bacnet_Refresh_Info.Read_Annual_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_Annual_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Annual_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1240,14 +1240,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Annual_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Annual_Info[i].end_instance,
 						sizeof(Str_annual_routine_point));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Annual_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Annual_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Annual_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Annual_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Annual_Info[i].invoke_id = g_invoke_id;	// ID ;
 
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read annual routine from item %d to %d "),g_invoke_id,
@@ -1294,7 +1294,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					Bacnet_Refresh_Info.Read_Weekly_Info[i].resend_count ++ ;
 					cotinue_waite = true;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_Weekly_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Weekly_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1310,14 +1310,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Weekly_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Weekly_Info[i].end_instance,
 						sizeof(Str_weekly_routine_point));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Weekly_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Weekly_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Weekly_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Weekly_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Weekly_Info[i].invoke_id = g_invoke_id;	// ID ;
 
 
 					CString temp_cs_show;
@@ -1362,7 +1362,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					Bacnet_Refresh_Info.Read_Program_Info[i].resend_count ++ ;
 					cotinue_waite = true;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_Program_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Program_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1378,14 +1378,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Program_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Program_Info[i].end_instance,
 						sizeof(Str_program_point));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Program_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Program_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Program_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Program_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Program_Info[i].invoke_id = g_invoke_id;	// ID ;
 					
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read program list from item %d to %d "),
@@ -1430,7 +1430,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].resend_count ++ ;
 					cotinue_waite = true;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_AlarmLog_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_AlarmLog_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1446,14 +1446,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].end_instance,
 						sizeof(Alarm_point));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].invoke_id = g_invoke_id;	// ID ;
 
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read Alarm Log %d "),
@@ -1508,7 +1508,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			{
 				Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].resend_count ++ ;
 				cotinue_waite = true;
-				//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+				//10 ;
 				if((Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].resend_count>RESEND_COUNT) 
 					|| (Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 				{
@@ -1524,13 +1524,13 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].start_instance,
 					Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].end_instance,
 					WEEKLY_SCHEDULE_SIZE);
-				if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+				if(g_invoke_id<0)	// ;
 				{
 					goto endthis;
 				}
 				Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].has_resend_yes_or_no ++;
-				Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-				Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+				Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].task_result = BAC_RESULTS_UNKONW;//  ;
+				Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].invoke_id = g_invoke_id;	// ID ;
 
 				CString temp_cs_show;
 				temp_cs_show.Format(_T("Read schedule time list from item %d to %d "),
@@ -1573,7 +1573,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					Bacnet_Refresh_Info.Read_Weeklycode_Info[i].resend_count ++ ;
 					cotinue_waite = true;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_Weeklycode_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Weeklycode_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1589,14 +1589,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Weeklycode_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Weeklycode_Info[i].end_instance,
 						WEEKLY_SCHEDULE_SIZE);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Weeklycode_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Weeklycode_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Weeklycode_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Weeklycode_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Weeklycode_Info[i].invoke_id = g_invoke_id;	// ID ;
 
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read Schedule time list from item %d to %d "),
@@ -1636,7 +1636,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			{
 				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].resend_count ++ ;
 				cotinue_waite = true;
-				//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+				//10 ;
 				if((Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].resend_count>RESEND_COUNT) 
 					|| (Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 				{
@@ -1652,13 +1652,13 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].start_instance,
 					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].end_instance,
 					WEEKLY_SCHEDULE_SIZE);
-				if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+				if(g_invoke_id<0)	// ;
 				{
 					goto endthis;
 				}
 				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].has_resend_yes_or_no ++;
-				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].task_result = BAC_RESULTS_UNKONW;//  ;
+				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].invoke_id = g_invoke_id;	// ID ;
 
 				CString temp_cs_show;
 				temp_cs_show.Format(_T("Read Holiday list from item %d to %d "),
@@ -1701,7 +1701,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					Bacnet_Refresh_Info.Read_Annualcode_Info[i].resend_count ++ ;
 					cotinue_waite = true;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_Annualcode_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Annualcode_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1717,14 +1717,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Annualcode_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Annualcode_Info[i].end_instance,
 						WEEKLY_SCHEDULE_SIZE);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Annualcode_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Annualcode_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Annualcode_Info[i].invoke_id = g_invoke_id;	// ID ;
 
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read Holiday list from item %d to %d "),
@@ -1770,7 +1770,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					Bacnet_Refresh_Info.Read_Input_Info[i].resend_count ++ ;
 					cotinue_waite = true;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_Input_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Input_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1786,14 +1786,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Input_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Input_Info[i].end_instance,
 						sizeof(Str_in_point));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Input_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Input_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Input_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Input_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Input_Info[i].invoke_id = g_invoke_id;	// ID ;
 					
 					CString temp_cs_show;
 					temp_cs_show.Format(_T("Read input list from item %d to %d "),
@@ -1839,7 +1839,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					Bacnet_Refresh_Info.Read_Output_Info[i].resend_count ++ ;
 					cotinue_waite = true;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 					if((Bacnet_Refresh_Info.Read_Output_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Output_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
@@ -1855,14 +1855,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Output_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Output_Info[i].end_instance,
 						sizeof(Str_out_point));
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					if(g_invoke_id<0)	// ;
 					{
 						Sleep(50);
 						continue;
 					}
 					Bacnet_Refresh_Info.Read_Output_Info[i].has_resend_yes_or_no ++;
-					Bacnet_Refresh_Info.Read_Output_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Bacnet_Refresh_Info.Read_Output_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+					Bacnet_Refresh_Info.Read_Output_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+					Bacnet_Refresh_Info.Read_Output_Info[i].invoke_id = g_invoke_id;	// ID ;
 					
 					
 					CString temp_cs_show;
@@ -1907,7 +1907,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					Bacnet_Refresh_Info.Read_Variable_Info[i].resend_count ++ ;
 					cotinue_waite = true;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					//10 ;
 						if((Bacnet_Refresh_Info.Read_Variable_Info[i].resend_count>10) 
 							|| (Bacnet_Refresh_Info.Read_Variable_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 						{
@@ -1923,14 +1923,14 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 							Bacnet_Refresh_Info.Read_Variable_Info[i].start_instance,
 							Bacnet_Refresh_Info.Read_Variable_Info[i].end_instance,
 							sizeof(Str_variable_point));
-						if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+						if(g_invoke_id<0)	// ;
 						{
 							Sleep(50);
 							continue;
 						}
 						Bacnet_Refresh_Info.Read_Variable_Info[i].has_resend_yes_or_no ++;
-						Bacnet_Refresh_Info.Read_Variable_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-						Bacnet_Refresh_Info.Read_Variable_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+						Bacnet_Refresh_Info.Read_Variable_Info[i].task_result = BAC_RESULTS_UNKONW;//  ;
+						Bacnet_Refresh_Info.Read_Variable_Info[i].invoke_id = g_invoke_id;	// ID ;
 						CString temp_cs_show;
 						temp_cs_show.Format(_T("Read variable list from item %d to %d "),
 							Bacnet_Refresh_Info.Read_Variable_Info[i].start_instance,

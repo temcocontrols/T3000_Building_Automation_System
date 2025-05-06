@@ -618,7 +618,7 @@ void CT3ModulesView::Fresh()
                 }
                 else if (2==product_register_value[228+i-1])
                 {
-                    strresult=_T("Ω");
+                    strresult=_T("");
                 }
                 m_T3_Input_List.SetItemText(i-1,3,strresult);
 
@@ -701,7 +701,7 @@ void CT3ModulesView::Fresh()
                 }
                 else if (2==product_register_value[228+i-1])
                 {
-                    strresult=_T("Ω");
+                    strresult=_T("");
                 }
 
                 m_T3_Input_List.SetItemText(i-1,3,strresult);
@@ -1690,7 +1690,7 @@ LRESULT CT3ModulesView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
                 }
                 else if (2==product_register_value[228+i-1])
                 {
-                    strresult=_T("Ω");
+                    strresult=_T("");
                 }
                 m_T3_Input_List.SetItemText(i-1,3,strresult);
 
@@ -1773,7 +1773,7 @@ LRESULT CT3ModulesView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
                 }
                 else if (2==product_register_value[228+i-1])
                 {
-                    strresult=_T("Ω");
+                    strresult=_T("");
                 }
 
                 m_T3_Input_List.SetItemText(i-1,3,strresult);
@@ -2241,7 +2241,7 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult)
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
     
-    if(lRow>m_T3_Input_List.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+    if(lRow>m_T3_Input_List.GetItemCount()) //
         return;
     if(lRow<0)
         return;

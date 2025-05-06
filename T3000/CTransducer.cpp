@@ -1,4 +1,4 @@
-﻿// CTransducer.cpp: 实现文件
+﻿// CTransducer.cpp: 
 //
 
 #include "stdafx.h"
@@ -10,28 +10,28 @@
 #define WM_TRANDUCER_UPDATEUI  WM_USER + 509
 IMPLEMENT_DYNCREATE(CTransducer, CFormView)
 
-extern int CANVAS_TOP_X ;  //画布
+extern int CANVAS_TOP_X ;  //
 extern int CANVAS_TOP_Y;
 extern int CANVAS_BOTTOM_X ;
 extern int CANVAS_BOTTOM_Y ;
-extern int ORIGIN_X ; //原点
+extern int ORIGIN_X ; //
 extern int ORIGIN_Y ;
 
-extern int Y_AXIS_TOP_X ;  //Y轴最上面点
+extern int Y_AXIS_TOP_X ;  //Y
 extern int Y_AXIS_TOP_Y ;
-extern int Y_AXIS_ARROW_LEFT_X ;  //Y轴的箭头左边
+extern int Y_AXIS_ARROW_LEFT_X ;  //Y
 extern int Y_AXIS_ARROW_LEFT_Y ;
-extern int Y_AXIS_ARROW_RIGHT_X ; // Y轴的箭头右边
+extern int Y_AXIS_ARROW_RIGHT_X ; // Y
 extern int Y_AXIS_ARROW_RIGHT_Y ;
-extern int X_AXIS_RIGHT_X ;  //X轴最右边  X坐标
-extern int X_AXIS_RIGHT_Y ;				//X轴最右边  Y坐标
-extern int X_AXIS_MAX_VALUE_X ; //X轴最大点  X坐标
-extern int X_AXIS_MAX_VALUE_Y ; //X轴最大点  Y坐标
+extern int X_AXIS_RIGHT_X ;  //XX
+extern int X_AXIS_RIGHT_Y ;				//XY
+extern int X_AXIS_MAX_VALUE_X ; //XX
+extern int X_AXIS_MAX_VALUE_Y ; //XY
 extern int Y_AXIS_MAX_VALUE_X ;
 extern int Y_AXIS_MAX_VALUE_Y ;
-extern int X_AXIS_ARROW_TOP_X ; //X轴的箭头上边
+extern int X_AXIS_ARROW_TOP_X ; //X
 extern int X_AXIS_ARROW_TOP_Y ;
-extern int X_AXIS_ARROW_BOTTOM_X ; //X轴的箭头下边
+extern int X_AXIS_ARROW_BOTTOM_X ; //X
 extern int X_AXIS_ARROW_BOTTOM_Y ;
 
 int MODBUS_SWITCH_OUTPUT_MODE=   17;
@@ -47,7 +47,7 @@ int MODBUS_ENTHALPY			=  42 ;
 int MODBUS_ABSOLUTE_HUMI	=44	  ;
 
 
-//版本号大于25时启用新寄存器
+//
 int NEW_MODBUS_SWITCH_OUTPUT_MODE = 17;
 int NEW_MODBUS_SWITCH_TEMP_RANGE = 18;
 int NEW_MODBUS_SWITCH_HUMI_RANGE = 20;
@@ -140,7 +140,7 @@ END_MESSAGE_MAP()
 
 
 
-// CTransducer 诊断
+// CTransducer 
 
 #ifdef _DEBUG
 void CTransducer::AssertValid() const
@@ -157,44 +157,44 @@ void CTransducer::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 
-// CTransducer 消息处理程序
+// CTransducer 
 HANDLE h_xducer_thread = NULL;
 
 void CTransducer::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
 
-	// TODO: 在此添加专用代码和/或调用基类
+	// TODO: 
 }
 
 
 void CTransducer::InitialPaintParameter()
 {
-     CANVAS_TOP_X = 550 + 50;  //画布
+     CANVAS_TOP_X = 550 + 50;  //
 	 CANVAS_TOP_Y = 0 + 50;
 	 CANVAS_BOTTOM_X = 1210 + 50;
 	 CANVAS_BOTTOM_Y = 420 + 100;
-	 ORIGIN_X = 600 + 50; //原点
+	 ORIGIN_X = 600 + 50; //
 	 ORIGIN_Y = 400 + 50;
-	 Y_AXIS_TOP_X = ORIGIN_X;  //Y轴最上面点
+	 Y_AXIS_TOP_X = ORIGIN_X;  //Y
 	 Y_AXIS_TOP_Y = CANVAS_TOP_Y + 10;
-	 Y_AXIS_ARROW_LEFT_X = Y_AXIS_TOP_X - 5;  //Y轴的箭头左边
+	 Y_AXIS_ARROW_LEFT_X = Y_AXIS_TOP_X - 5;  //Y
 	 Y_AXIS_ARROW_LEFT_Y = Y_AXIS_TOP_Y + 10;
-	 Y_AXIS_ARROW_RIGHT_X = Y_AXIS_TOP_X + 5; // Y轴的箭头右边
+	 Y_AXIS_ARROW_RIGHT_X = Y_AXIS_TOP_X + 5; // Y
 	 Y_AXIS_ARROW_RIGHT_Y = Y_AXIS_TOP_Y + 10;
 
-	 X_AXIS_RIGHT_X = CANVAS_BOTTOM_X - 10;  //X轴最右边  X坐标
-	 X_AXIS_RIGHT_Y = ORIGIN_Y;				//X轴最右边  Y坐标
+	 X_AXIS_RIGHT_X = CANVAS_BOTTOM_X - 10;  //XX
+	 X_AXIS_RIGHT_Y = ORIGIN_Y;				//XY
 
-	 X_AXIS_MAX_VALUE_X = X_AXIS_RIGHT_X - 100; //X轴最大点  X坐标
-	 X_AXIS_MAX_VALUE_Y = X_AXIS_RIGHT_Y; //X轴最大点  Y坐标
+	 X_AXIS_MAX_VALUE_X = X_AXIS_RIGHT_X - 100; //XX
+	 X_AXIS_MAX_VALUE_Y = X_AXIS_RIGHT_Y; //XY
 
 	 Y_AXIS_MAX_VALUE_X = Y_AXIS_TOP_X;
 	 Y_AXIS_MAX_VALUE_Y = Y_AXIS_TOP_Y + 50;
 
-	 X_AXIS_ARROW_TOP_X = X_AXIS_RIGHT_X - 10; //X轴的箭头上边
+	 X_AXIS_ARROW_TOP_X = X_AXIS_RIGHT_X - 10; //X
 	 X_AXIS_ARROW_TOP_Y = X_AXIS_RIGHT_Y - 5;
-	 X_AXIS_ARROW_BOTTOM_X = X_AXIS_RIGHT_X - 10; //X轴的箭头下边
+	 X_AXIS_ARROW_BOTTOM_X = X_AXIS_RIGHT_X - 10; //X
 	 X_AXIS_ARROW_BOTTOM_Y = X_AXIS_RIGHT_Y + 5;
 }
 
@@ -203,7 +203,7 @@ void CTransducer::Fresh()
 	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	pFrame->SetWindowTextW(cs_special_name + CurrentT3000Version);
 
-	CStatic* pWnd = (CStatic*)GetDlgItem(IDC_STATIC_TRANSDUCER_TEMPERATURE); // 得到 Picture Control 句柄 ;
+	CStatic* pWnd = (CStatic*)GetDlgItem(IDC_STATIC_TRANSDUCER_TEMPERATURE); // Picture Control 
 	CString icon_temperature;
 	CString ApplicationFolder;
 	CString AQ_image_fordor;
@@ -215,9 +215,9 @@ void CTransducer::Fresh()
 	HBITMAP bitmap;
 	bitmap = (HBITMAP)LoadImage(AfxGetInstanceHandle(), icon_temperature, IMAGE_BITMAP, 40, 120, LR_LOADFROMFILE);
 	CStatic* p = (CStatic*)GetDlgItem(IDC_STATIC_TRANSDUCER_TEMPERATURE);
-	//设置静态控件窗口风格为位图居中显示  
+	//
 	p->ModifyStyle(0xf, SS_BITMAP | SS_CENTERIMAGE);
-	//将图片设置到Picture控件上  
+	//ture
 	p->SetBitmap(bitmap);
 
 	((CComboBox*)GetDlgItem(IDC_COMBO_TEMP_RANGE))->ResetContent();
@@ -227,10 +227,10 @@ void CTransducer::Fresh()
 	}
 	if (product_register_value[4] >= 25)
 	{
-		is_new_firmware = true; //大于等于25版本的 Xducer  寄存器都变位置了 ;
+		is_new_firmware = true; //er  
 	}
 	else
-		is_new_firmware = false; //大于等于25版本的 Xducer  寄存器都变位置了 ;
+		is_new_firmware = false; //er  
 
 	if (h_xducer_thread == NULL)
 	{
@@ -616,7 +616,7 @@ LRESULT CTransducer::UpdateUI(WPARAM wParam, LPARAM lParam)
 
 void CTransducer::OnBnClickedRadioTransducerDegC()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (is_new_firmware)
 	{
 		if (product_register_value[NEW_MODBUS_TEMPERATURE_UNIT] == 0)
@@ -645,7 +645,7 @@ void CTransducer::OnBnClickedRadioTransducerDegC()
 
 void CTransducer::OnBnClickedRadioTransducerDegF()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (is_new_firmware)
 	{
 		if (product_register_value[NEW_MODBUS_TEMPERATURE_UNIT] == 1)
@@ -675,7 +675,7 @@ void CTransducer::OnBnClickedRadioTransducerDegF()
 
 void CTransducer::OnEnKillfocusEditTempOffset()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (is_new_firmware)
 	{
 		CString strText;
@@ -707,7 +707,7 @@ void CTransducer::OnEnKillfocusEditTempOffset()
 
 void CTransducer::OnEnKillfocusEditHumOffset()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (is_new_firmware)
 	{
 		CString strText;
@@ -740,7 +740,7 @@ void CTransducer::OnEnKillfocusEditHumOffset()
 
 void CTransducer::OnBnClickedRadioTransducer420Ma()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (is_new_firmware)
 	{
 		if (product_register_value[NEW_MODBUS_SWITCH_OUTPUT_MODE] == 0)
@@ -768,7 +768,7 @@ void CTransducer::OnBnClickedRadioTransducer420Ma()
 
 void CTransducer::OnBnClickedRadioTransducer010v()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (is_new_firmware)
 	{
 		if (product_register_value[NEW_MODBUS_SWITCH_OUTPUT_MODE] == 1)
@@ -796,7 +796,7 @@ void CTransducer::OnBnClickedRadioTransducer010v()
 
 void CTransducer::OnBnClickedRadioDew()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (is_new_firmware)
 	{
 		if (product_register_value[NEW_MODBUS_SWITCH_HUMI_RANGE] == HUM_DEWPOINT)
@@ -825,7 +825,7 @@ void CTransducer::OnBnClickedRadioDew()
 
 void CTransducer::OnBnClickedRadioEnthalpy()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (is_new_firmware)
 	{
 		if (product_register_value[NEW_MODBUS_SWITCH_HUMI_RANGE] == HUM_ENTHALPY)
@@ -854,7 +854,7 @@ void CTransducer::OnBnClickedRadioEnthalpy()
 
 void CTransducer::OnBnClickedRadioAbs()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (is_new_firmware)
 	{
 		if (product_register_value[NEW_MODBUS_SWITCH_HUMI_RANGE] == HUM_ABSOLUTE)
@@ -882,7 +882,7 @@ void CTransducer::OnBnClickedRadioAbs()
 
 void CTransducer::OnBnClickedRadioReal()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (is_new_firmware)
 	{
 		if (product_register_value[NEW_MODBUS_SWITCH_HUMI_RANGE] == HUM_REAL)
@@ -911,7 +911,7 @@ void CTransducer::OnBnClickedRadioReal()
 
 void CTransducer::OnCbnSelchangeComboTempRange()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 
 	int n_value = 0;
 	CString temp_string;
@@ -966,8 +966,8 @@ void CTransducer::OnCbnSelchangeComboTempRange()
 void CTransducer::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-					   // TODO: 在此处添加消息处理程序代码
-					   // 不为绘图消息调用 CFormView::OnPaint()
+					   // TODO: 
+					   // rmView::OnPaint()
 	unsigned short temp_temperature = 0;
 	if (product_register_value[NEW_MODBUS_TEMPERATURE_UNIT] == 0)
 		temp_temperature  = product_register_value[NEW_MODBUS_TEMPERATURE_C];
@@ -992,10 +992,10 @@ void CTransducer::OnPaint()
 		mygraphics->DrawLine(myRectangle_pen, ORIGIN_X, ORIGIN_Y, Y_AXIS_TOP_X, Y_AXIS_TOP_Y);
 		mygraphics->DrawLine(myRectangle_pen, ORIGIN_X, ORIGIN_Y, X_AXIS_RIGHT_X, X_AXIS_RIGHT_Y);
 
-		mygraphics->DrawLine(myRectangle_pen, Y_AXIS_TOP_X, Y_AXIS_TOP_Y, Y_AXIS_ARROW_LEFT_X, Y_AXIS_ARROW_LEFT_Y); //画 Y轴 箭头
+		mygraphics->DrawLine(myRectangle_pen, Y_AXIS_TOP_X, Y_AXIS_TOP_Y, Y_AXIS_ARROW_LEFT_X, Y_AXIS_ARROW_LEFT_Y); //Y
 		mygraphics->DrawLine(myRectangle_pen, Y_AXIS_TOP_X, Y_AXIS_TOP_Y, Y_AXIS_ARROW_RIGHT_X, Y_AXIS_ARROW_RIGHT_Y);
 
-		mygraphics->DrawLine(myRectangle_pen, X_AXIS_RIGHT_X, X_AXIS_RIGHT_Y, X_AXIS_ARROW_TOP_X, X_AXIS_ARROW_TOP_Y); //画 X轴 箭头
+		mygraphics->DrawLine(myRectangle_pen, X_AXIS_RIGHT_X, X_AXIS_RIGHT_Y, X_AXIS_ARROW_TOP_X, X_AXIS_ARROW_TOP_Y); //X
 		mygraphics->DrawLine(myRectangle_pen, X_AXIS_RIGHT_X, X_AXIS_RIGHT_Y, X_AXIS_ARROW_BOTTOM_X, X_AXIS_ARROW_BOTTOM_Y);
 
 		CString cs_show_info;
@@ -1434,7 +1434,7 @@ void CTransducer::OnPaint()
 		mygraphics->DrawString(temp_value, -1, &Valueunitfont, temppoint_value, &hun_txt_color_brush);
 
 		PointF      point_line1;
-		point_line1.X = ORIGIN_X + 100; //画图下面的标识线 ，标识温度还是湿度
+		point_line1.X = ORIGIN_X + 100; //
 		point_line1.Y = CANVAS_BOTTOM_Y - 20;
 		PointF      point_line2;
 		point_line2.X = ORIGIN_X + 150;
@@ -1445,7 +1445,7 @@ void CTransducer::OnPaint()
 		temppoint_value.Y = point_line2.Y - 10;
 		mygraphics->DrawString(temp_value, -1, &Valueunitfont, temppoint_value, &txt_color_brush);
 
-		point_line1.X = ORIGIN_X + 300;//画图下面的标识线 ，标识温度还是湿度
+		point_line1.X = ORIGIN_X + 300;//
 		point_line1.Y = CANVAS_BOTTOM_Y - 20;
 		point_line2.X = ORIGIN_X + 350;
 		point_line2.Y = CANVAS_BOTTOM_Y - 20;
@@ -1470,7 +1470,7 @@ void CTransducer::OnPaint()
 
 void CTransducer::OnBnClickedRadioDefaultT()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (product_register_value[NEW_MODBUS_DEF_CUSTOMER_TEMP] == 0)
 		return;
 	product_register_value[NEW_MODBUS_DEF_CUSTOMER_TEMP] = 0;
@@ -1483,7 +1483,7 @@ void CTransducer::OnBnClickedRadioDefaultT()
 
 void CTransducer::OnBnClickedRadioUserDefinedT()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (product_register_value[NEW_MODBUS_DEF_CUSTOMER_TEMP] == 1)
 		return;
 	product_register_value[NEW_MODBUS_DEF_CUSTOMER_TEMP] = 1;
@@ -1496,7 +1496,7 @@ void CTransducer::OnBnClickedRadioUserDefinedT()
 
 void CTransducer::OnBnClickedRadioDefaultH()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (product_register_value[NEW_MODBUS_DEF_CUSTOMER_HUM] == 0)
 		return;
 	product_register_value[NEW_MODBUS_DEF_CUSTOMER_HUM] = 0;
@@ -1509,7 +1509,7 @@ void CTransducer::OnBnClickedRadioDefaultH()
 
 void CTransducer::OnBnClickedRadioUserDefinedH()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	if (product_register_value[NEW_MODBUS_DEF_CUSTOMER_HUM] == 1)
 		return;
 	product_register_value[NEW_MODBUS_DEF_CUSTOMER_HUM] = 1;
@@ -1522,7 +1522,7 @@ void CTransducer::OnBnClickedRadioUserDefinedH()
 
 void CTransducer::OnEnKillfocusEditVolatgeMinT()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_VOLATGE_MIN_T, temp_cstring_min);
 	unsigned int temp_voltage_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1551,7 +1551,7 @@ void CTransducer::OnEnKillfocusEditVolatgeMinT()
 
 void CTransducer::OnEnKillfocusEditVolatgeMaxT()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_VOLATGE_MIN_T, temp_cstring_min);
 	unsigned int temp_voltage_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1580,7 +1580,7 @@ void CTransducer::OnEnKillfocusEditVolatgeMaxT()
 
 void CTransducer::OnEnKillfocusEditCurrentMinT()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_CURRENT_MIN_T, temp_cstring_min);
 	unsigned int temp_current_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1609,7 +1609,7 @@ void CTransducer::OnEnKillfocusEditCurrentMinT()
 
 void CTransducer::OnEnKillfocusEditCurrentMaxT()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_CURRENT_MIN_T, temp_cstring_min);
 	unsigned int temp_current_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1638,7 +1638,7 @@ void CTransducer::OnEnKillfocusEditCurrentMaxT()
 
 void CTransducer::OnEnKillfocusEditMinT()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_MIN_T, temp_cstring_min);
 	//unsigned short temp_temperature_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1676,7 +1676,7 @@ void CTransducer::OnEnKillfocusEditMinT()
 
 void CTransducer::OnEnKillfocusEditMaxT()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_MIN_T, temp_cstring_min);
 	unsigned short temp_temperature_value_min = _wtof(temp_cstring_min) * 10;
@@ -1714,7 +1714,7 @@ void CTransducer::OnEnKillfocusEditMaxT()
 
 void CTransducer::OnEnKillfocusEditVolatgeMinH()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_VOLATGE_MIN_H, temp_cstring_min);
 	int hum_voltage_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1743,7 +1743,7 @@ void CTransducer::OnEnKillfocusEditVolatgeMinH()
 
 void CTransducer::OnEnKillfocusEditVolatgeMaxH()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_VOLATGE_MIN_H, temp_cstring_min);
 	int hum_voltage_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1772,7 +1772,7 @@ void CTransducer::OnEnKillfocusEditVolatgeMaxH()
 
 void CTransducer::OnEnKillfocusEditCurrentMinH()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_CURRENT_MIN_H, temp_cstring_min);
 	int hum_c_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1801,7 +1801,7 @@ void CTransducer::OnEnKillfocusEditCurrentMinH()
 
 void CTransducer::OnEnKillfocusEditCurrentMaxH()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_CURRENT_MIN_H, temp_cstring_min);
 	int hum_c_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1830,7 +1830,7 @@ void CTransducer::OnEnKillfocusEditCurrentMaxH()
 
 void CTransducer::OnEnKillfocusEditMinH()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_MIN_H, temp_cstring_min);
 	int hum_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1859,7 +1859,7 @@ void CTransducer::OnEnKillfocusEditMinH()
 
 void CTransducer::OnEnKillfocusEditMaxH()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_MIN_H, temp_cstring_min);
 	int hum_value_min = unsigned int(_wtof(temp_cstring_min) * 10);
@@ -1888,7 +1888,7 @@ void CTransducer::OnEnKillfocusEditMaxH()
 
 BOOL CTransducer::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	// TODO: 
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if (pMsg->wParam == VK_RETURN)

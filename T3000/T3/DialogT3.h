@@ -66,7 +66,7 @@ public:
 	afx_msg void OnBnClickedBtnReset();
 	vector<t3model> vect3model;
 	t3model m_t3model;
-	int comnum;//¶ÁÈ¡´®¿ÚºÅ
+	int comnum;//
 
 
 	CEdit m_inNameEdt;

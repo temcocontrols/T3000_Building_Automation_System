@@ -3,14 +3,14 @@
     partial class BacForm
     {
         /// <summary>
-        /// Variable nécessaire au concepteur.
+        /// Variable ncessaire au concepteur.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
         /// <summary>
-        /// Nettoyage des ressources utilisées.
+        /// Nettoyage des ressources utilises.
         /// </summary>
-        /// <param name="disposing">true si les ressources managées doivent être supprimées ; sinon, false.</param>
+        /// <param name="disposing">true si les ressources manages doivent tre supprimes; sinon, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -20,11 +20,11 @@
             base.Dispose(disposing);
         }
 
-        #region Code généré par le Concepteur Windows Form
+        #region Code gnr par le Concepteur Windows Form
 
         /// <summary>
-        /// Méthode requise pour la prise en charge du concepteur - ne modifiez pas
-        /// le contenu de cette méthode avec l'éditeur de code.
+        /// Mthode requise pour la prise en charge du concepteur - ne modifiez pas
+        /// le contenu de cette mthode avec l'diteur de code.
         /// </summary>
         private void InitializeComponent()
         {
@@ -153,7 +153,7 @@
             this.TempInt.Name = "TempInt";
             this.TempInt.Size = new System.Drawing.Size(192, 54);
             this.TempInt.TabIndex = 9;
-            this.TempInt.Text = "20°C";
+            this.TempInt.Text = "20C";
             this.TempInt.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // TempSet
@@ -165,7 +165,7 @@
             this.TempSet.Name = "TempSet";
             this.TempSet.Size = new System.Drawing.Size(80, 17);
             this.TempSet.TabIndex = 11;
-            this.TempSet.Text = "T Set : 21°C";
+            this.TempSet.Text = "T Set : 21C";
             // 
             // TmrUpdate
             // 
@@ -237,7 +237,7 @@
             this.TempExt.Name = "TempExt";
             this.TempExt.Size = new System.Drawing.Size(93, 17);
             this.TempExt.TabIndex = 20;
-            this.TempExt.Text = "T Ext : 20°C";
+            this.TempExt.Text = "T Ext : 20C";
             this.TempExt.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // Chauf3

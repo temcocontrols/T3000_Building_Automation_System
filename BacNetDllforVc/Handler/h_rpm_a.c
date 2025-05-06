@@ -346,7 +346,7 @@ void handler_read_property_multiple_ack(
 #endif
     if (len > 0) {
         while (rpm_data) {
-            //rpm_ack_print_data(rpm_data);¶Å·«ÆÁ±Î²âÊÔ
+            //rpm_ack_print_data(rpm_data);
             rpm_property = rpm_data->listOfProperties;
             while (rpm_property) {
                 value = rpm_property->value;

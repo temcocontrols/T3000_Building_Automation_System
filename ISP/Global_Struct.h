@@ -7,13 +7,13 @@
 	file ext:	h
 	author:		ZGQ
 	
-	purpose:	 全局常量，以及结构体的声明
+	purpose:	 
 *********************************************************************/
 #pragma once
 #include "..\t3000\ProductModel.h"
 
-const	 int c_nSplashTime = 2000;	// splash window的显示时间
-const TCHAR c_strCfgFileName[] = _T("config.txt");				//	配置文件名称，用于保存用户设置
+const	 int c_nSplashTime = 2000;	// splash window
+const TCHAR c_strCfgFileName[] = _T("config.txt");				//	
 const TCHAR c_strLogoFileName[] = _T("ISPLogo.jpg");			// logo picture file name
 
  
@@ -51,9 +51,9 @@ const TCHAR c_strFlashMethodCom[] = _T("COM");
 
 
 
-//const DWORD c_nHexFileBufLen = 0x7FFFF;   // hex 最大64k
-const DWORD c_nHexFileBufLen = 0x1FFFFF;   // hex 最大64k
-const DWORD c_nBinFileBufLen = 0x1FFFFF;  // bin 文件最大512k
+//const DWORD c_nHexFileBufLen = 0x7FFFF;   // hex 64k
+const DWORD c_nHexFileBufLen = 0x1FFFFF;   // hex 64k
+const DWORD c_nBinFileBufLen = 0x1FFFFF;  // bin 512k
 
 
 
@@ -540,7 +540,7 @@ enum{
 //int const PM_BTU_METER=121;
 //
 //int const PM_PRESSURE_SENSOR=45;
-const TCHAR c_strProductModelFileName[] = _T("ProductModel.cfg");				//	Product Model 配置文件名称
+const TCHAR c_strProductModelFileName[] = _T("ProductModel.cfg");				//	Product Model 
 
 
 const int c_nModelNum = 27;
@@ -586,7 +586,7 @@ const int FAILED_UNKNOW_ERROR = 4;
 ///////////////////////////////////////////////////////////////////////////
 // for flash sn settings file
 
-const TCHAR c_strFlashSNCfgFileName[] = _T("Flash_SN.cfg");				//	保存FLASH SN 的用户设定
+const TCHAR c_strFlashSNCfgFileName[] = _T("Flash_SN.cfg");				//	FLASH SN 
 
 const TCHAR c_strFlashHWVersion[] = _T("Hardware Verson : ");
 const TCHAR c_strFlashSNModel[] = _T("Product Model : ");

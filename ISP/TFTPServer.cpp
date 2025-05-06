@@ -22,14 +22,14 @@ char sendbuf[45];
 extern CString g_strFlashInfo;
 extern unsigned int Remote_timeout;
 extern unsigned int nflash_receive_to_send_delay_time;
-extern int c2_need_update_boot;  //0 不用更新boot   1 需要更新bootload;   C2为bootload  同时要更新就必须更新;
+extern int c2_need_update_boot;  //0 boot   1 bootload;   C2bootload  ;
 extern CString g_repair_bootloader_file_path;
-extern int new_bootload ; //如果等于1 就说明现在烧写的是新的BootLoader;
+extern int new_bootload ; //1 BootLoader;
 extern unsigned char firmware_md5[32];
 /*extern*/ CRITICAL_SECTION g_cs;
 /*extern*/ CString showing_text;
 /*extern*/ int writing_row;
-extern int firmware_must_use_new_bootloader ;  //0 不用更新boot   1 需要更新bootload;   C1为hex
+extern int firmware_must_use_new_bootloader ;  //0 boot   1 bootload;   C1hex
 const int TFTP_PORT = 69;
 
 const int nLocalDhcp_Port = 67;			// Server Local 67
@@ -197,7 +197,7 @@ int TFTPServer::RecvRequest()
     BYTE szBuf[512];
     ZeroMemory(szBuf, 512);
 
-    SOCKADDR_IN  siRecvRead; // Receive read request，Used to bind
+    SOCKADDR_IN  siRecvRead; // Receive read requestUsed to bind
     siRecvRead.sin_family = AF_INET;
     siRecvRead.sin_port = htons(TFTP_PORT);
     siRecvRead.sin_addr.s_addr = htonl(INADDR_ANY);// inet_addr(_T("192.168.0.3"))
@@ -424,12 +424,12 @@ void TFTPServer::ReleaseAll()
     }
     if (m_soSend)
     {
-        closesocket(m_soSend);				//  Send socket，Send tftp data
+        closesocket(m_soSend);				//  Send socketSend tftp data
     }
 
     if (m_soRecv)
     {
-        closesocket(m_soRecv);				// Receive socket，Receive tftp ack
+        closesocket(m_soRecv);				// Receive socketReceive tftp ack
     }
     SendUDP_Flash_Socket.ShutDown();
     SendUDP_Flash_Socket.Close();
@@ -578,7 +578,7 @@ void TFTPServer::GetIPMaskGetWay()
 	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO));
 	ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 	ALL_LOCAL_SUBNET_NODE  Temp_Node;
-	// 第一次调用GetAdapterInfo获取ulOutBufLen大小
+	// GetAdapterInfoulOutBufLen
 	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
 	{
 		free(pAdapterInfo);
@@ -768,7 +768,7 @@ UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
 							int n = 1;
 							BOOL bFlag=FALSE;
 							//////////////////////////////////////////////////////////////////////////
-							// Detect duplicate IP’s 
+							// Detect duplicate IPs 
 							DWORD dwValidIP = 0;
 							memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
 							while(dwValidIP != END_FLAG)
@@ -993,7 +993,7 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 
 	if(temp_data.reg.isp_mode != 0)
 	{
-		//记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
+		//, bootload.
              // Record this information, if a short time several times to determine under the Bootload, only occasionally appear only once to the boot received. TBD: Clarify this comment
 
 #if 0
@@ -1136,7 +1136,7 @@ BOOL TFTPServer::StartServer()
                 if((mode_send_flash_try_time++)<20)
                 {
 					int send_ret=TCP_Flash_CMD_Socket.Send(byCommand,sizeof(byCommand),0);
-                    Sleep(50);   //WIFI 的 bootloader 需要此延时 ， 设备的响应时间太慢了.不延时他们的设备  会忽略其他的网络包;
+                    Sleep(50);   //WIFI  bootloader   .  ;
                    // int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
                     TRACE(_T("send_ret = %d\r\n"),send_ret);
                     if(send_ret<0)	//Try TCP connection again if send fails
@@ -1339,7 +1339,7 @@ BOOL TFTPServer::StartServer()
 
                 if (m_tcp_connect_results == 0)
                 {
-                    //说明在此之前没有检查过bootloader 版本信息,不确定要不要先升级Bootloader;
+                    //bootloader ,Bootloader;
                     CString temp_real_ip;
                     temp_real_ip.Format(_T("%d.%d.%d.%d"), Byte_ISP_Device_IP[0], Byte_ISP_Device_IP[1], Byte_ISP_Device_IP[2], Byte_ISP_Device_IP[3]);
                     ISP_Device_IP = temp_real_ip;
@@ -1479,7 +1479,7 @@ StopServer:
                 //AfxMessageBox(strTips);
             }
         }
-        if (new_bootload == 1) //目前更新的是新的bootloader 还需要更新客户之前选中的固件;
+        if (new_bootload == 1) //bootloader ;
         {
             if (nRet)
             {
@@ -1557,7 +1557,7 @@ bool TFTPServer::Send_Tftp_File()
             //}
             nRet = SendDataNew(pBuf, nSendNum);
             if (package_number == 1)
-                Sleep(2000);   //发送第一包的时候 设备接收到会做擦除flash的动作，需要等待.
+                Sleep(2000);   // flash.
             for (int i=0; i<Remote_timeout; i++)
             {
                 //if(IP_is_Local())
@@ -1574,7 +1574,7 @@ bool TFTPServer::Send_Tftp_File()
 					if (nflash_receive_to_send_delay_time)
 						Sleep(nflash_receive_to_send_delay_time);
 #ifdef ISP_BURNING_MODE
-					if (next_package_number > 64)  //前32K是bootloader 不用算校验和;
+					if (next_package_number > 64)  //32Kbootloader ;
 					{
 						for (int x = 0; x < nSendNum; x++)
 						{
@@ -1646,7 +1646,7 @@ void TFTPServer::HandleWRRequest(BYTE* szBuf,  int nLen)
         TFTP_ItemPair* pTip = new TFTP_ItemPair;
         ZeroMemory(pTip, sizeof(TFTP_ItemPair));
         m_twr.m_szItems.push_back(pTip);
-        // 选项
+        // 
         nIdxTemp = ++nIndex;
         while (szBuf[nIndex] != 0)
         {
@@ -1657,7 +1657,7 @@ void TFTPServer::HandleWRRequest(BYTE* szBuf,  int nLen)
         int nItemLen = nIndex -nIdxTemp;
         memcpy(pTip->m_strItem, szBuf+nIdxTemp, nItemLen+1);
 
-        // 值
+        // 
         nIdxTemp = ++nIndex;
         while (szBuf[nIndex] != 0)
         {
@@ -1693,9 +1693,9 @@ void TFTPServer::OutPutsStatusInfo(const CString& strInfo, BOOL bReplace)
 }
 
 
-// 返回 -1， 那么socket error
-// 返回 0，  no response
-// 1，       ok
+//  -1 socket error
+//  0  no response
+// 1       ok
 int TFTPServer::RecvBOOTP()
 {
     BYTE szBuf[512];
@@ -1800,7 +1800,7 @@ BOOL TFTPServer::SendDHCPPack()
 }
 
 
-// 返回的是网络字节顺序
+// 
 DWORD TFTPServer::GetLocalIP()
 {
     IP_ADAPTER_INFO pAdapterInfo;
@@ -1996,7 +1996,7 @@ void TFTPServer::FlashByEthernet()
 {
 	GetIPMaskGetWay();
 	GetDeviceIP_String();
-	//确认绑定哪一个本地IP地址来建立UDP通讯
+	//IPUDP
 	CString bind_local_pc_ip;
 	CString temp_device_ip = ISP_Device_IP;
 	CString temp_compare_ip;
@@ -2033,7 +2033,7 @@ void TFTPServer::FlashByEthernet()
 	if (bind_local_pc_ip.IsEmpty())
 		Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT, SOCK_DGRAM);
 	else
-		Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT, SOCK_DGRAM, 63L, bind_local_pc_ip); //测试
+		Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT, SOCK_DGRAM, 63L, bind_local_pc_ip); //
 	if (Udp_resualt == 0)
 	{
 		DWORD error_msg = GetLastError();
@@ -2191,7 +2191,7 @@ BOOL TFTPServer::StartServer_Old_Protocol()
 	//BroadCastToClient();
 
 
-	//阻塞接受
+	//
 	if (!RecvRequest())
 	{
 		CString strTips = _T("Recv TFTP read request pack failed.");

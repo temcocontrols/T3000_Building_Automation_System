@@ -15,7 +15,7 @@
 #include "BacnetProgramDebug.h"
 #include "MainFrm.h"
 bool need_syntax = false;
-extern tree_product selected_product_Node; // 选中的设备信息;
+extern tree_product selected_product_Node; // ;
 extern CBacnetProgramEdit *ProgramEdit_Window;
 #define  WM_RICHEDIT_RIGHT_CLICK  WM_USER + 1001
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
@@ -23,10 +23,10 @@ extern void clear_local_var();
 CBacnetProgramDebug * Program_Debug_Window = NULL;
 extern int error;
 extern char *pmes;
-int refresh_program_text_color = false;  //控制点击刷新按钮后，更新所有的数据颜色;
-vector <Str_char_pos_color> m_prg_label_error_color;	//用于highlight 关键字用;
-vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
-vector <Str_char_pos_color> buffer_prg_char_color; //用于防止频繁更新界面引起的闪烁问题;
+int refresh_program_text_color = false;  //;
+vector <Str_char_pos_color> m_prg_label_error_color;	//highlight ;
+vector <Str_char_pos_color> m_prg_char_color;	//highlight ;
+vector <Str_char_pos_color> buffer_prg_char_color; //;
 
 CString program_string;
 CString AnalysisString;
@@ -83,7 +83,7 @@ void CBacnetProgramEdit::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
-	ON_MESSAGE(WM_HOTKEY,&CBacnetProgramEdit::OnHotKey)//快捷键消息映射手动加入
+	ON_MESSAGE(WM_HOTKEY,&CBacnetProgramEdit::OnHotKey)//
 	ON_MESSAGE(WM_REFRESH_BAC_PROGRAM_RICHEDIT,Fresh_Program_RichEdit)
 	ON_MESSAGE(MY_RESUME_DATA, ProgramResumeMessageCallBack)
 	ON_COMMAND(ID_SEND, &CBacnetProgramEdit::OnSend)
@@ -174,17 +174,17 @@ void CBacnetProgramEdit::SetRicheditFont(long nStartchar,long nEndchar,DWORD nCo
 	cf.dwMask|=CFM_BOLD;
 
 	cf.dwEffects&=~CFE_BOLD;
-	//cf.dwEffects|=~CFE_BOLD; //粗体，取消用cf.dwEffects&=~CFE_BOLD;
+	//cf.dwEffects|=~CFE_BOLD; //cf.dwEffects&=~CFE_BOLD;
 	cf.dwMask|=CFM_ITALIC;
 	cf.dwEffects&=~CFE_ITALIC;
-	//cf.dwEffects|=~CFE_ITALIC; //斜体，取消用cf.dwEffects&=~CFE_ITALIC;
+	//cf.dwEffects|=~CFE_ITALIC; //cf.dwEffects&=~CFE_ITALIC;
 	cf.dwMask|=CFM_UNDERLINE;
 	cf.dwEffects&=~CFE_UNDERLINE;
-	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE;
+	//cf.dwEffects|=~CFE_UNDERLINE; //cf.dwEffects&=~CFE_UNDERLINE;
 	cf.dwMask|=CFM_COLOR;
-	cf.crTextColor = nColor;//RGB(0,0,255); //设置颜色
+	cf.crTextColor = nColor;//RGB(0,0,255); //
 	cf.dwMask|=CFM_SIZE;
-	cf.yHeight =250; //设置高度
+	cf.yHeight =250; //
 	cf.dwMask|=CFM_FACE;
 	_tcscpy(cf.szFaceName , prg_character_font);
 
@@ -259,21 +259,21 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	cf.dwMask|=CFM_BOLD;
 
 	cf.dwEffects&=~CFE_BOLD;
-	//cf.dwEffects|=~CFE_BOLD; //粗体，取消用cf.dwEffects&=~CFE_BOLD;
+	//cf.dwEffects|=~CFE_BOLD; //cf.dwEffects&=~CFE_BOLD;
 	cf.dwMask|=CFM_ITALIC;
 	cf.dwEffects&=~CFE_ITALIC;
-	//cf.dwEffects|=~CFE_ITALIC; //斜体，取消用cf.dwEffects&=~CFE_ITALIC;
+	//cf.dwEffects|=~CFE_ITALIC; //cf.dwEffects&=~CFE_ITALIC;
 	cf.dwMask|=CFM_UNDERLINE;
 	cf.dwEffects&=~CFE_UNDERLINE;
-	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE;
+	//cf.dwEffects|=~CFE_UNDERLINE; //cf.dwEffects&=~CFE_UNDERLINE;
 	cf.dwMask|=CFM_COLOR;
-	cf.crTextColor = prg_text_color;//RGB(0,0,255); //设置颜色
+	cf.crTextColor = prg_text_color;//RGB(0,0,255); //
 	cf.dwMask|=CFM_SIZE;
-	cf.yHeight =250; //设置高度
+	cf.yHeight =250; //
 	cf.dwMask|=CFM_FACE;
 	//_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
 	//_tcscpy(cf.szFaceName ,_T("Times New Roman"));
-	//	strcpy(cf.szFaceName ,_T("隶书")); //设置字体
+	//	strcpy(cf.szFaceName ,_T("")); //
 	_tcscpy(cf.szFaceName , prg_character_font);
 	//_tcscpy(cf.szFaceName ,_T("NSimSun"));
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSelectionCharFormat(cf);
@@ -284,7 +284,7 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->PostMessage(WM_VSCROLL, SB_BOTTOM,0);
 
 
-	RegisterHotKey(GetSafeHwnd(),KEY_F2,NULL,VK_F2);//F2键
+	RegisterHotKey(GetSafeHwnd(),KEY_F2,NULL,VK_F2);//F2
 	RegisterHotKey(GetSafeHwnd(),KEY_F3,NULL,VK_F3);
 	RegisterHotKey(GetSafeHwnd(),KEY_F7,NULL,VK_F7);
 	RegisterHotKey(GetSafeHwnd(),KEY_F6,NULL,VK_F6);
@@ -445,7 +445,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 
 	long temp_sel_str = 0;
 	long temp_sel_end = 0;
-	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //记住刷新前用户选择的部分;
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //;
 	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ShowScrollBar(SB_VERT,FALSE);
 	UpdateDataProgramText();
 	
@@ -516,7 +516,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 	}
 	SetRicheditFont(0,0,prg_text_color);
 	//if(temp_sel_str!= temp_sel_end)
-	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //操作完成后还原现场;
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //;
 
 
 
@@ -550,7 +550,7 @@ void CBacnetProgramEdit::OnSend()
 	memset( ( void* )editbuf, 0, sizeof( char ) * ( iTextLen + 1 ) );
 	::WideCharToMultiByte( CP_ACP,0,tempcs,-1,editbuf,iTextLen,NULL,NULL );
 
-	//2017/ 12 / 04   dufan 不允许使用 在THEN 中嵌套使用IF ，否则 解码时会出错。暂时找不出更好的解决办法。
+	//2017/ 12 / 04   dufan  THEN IF  
 	if (tempcs.Find(_T("THEN IF")) != -1)
 	{
 		MessageBox(_T("Don't allowed use nested 'IF'."));
@@ -781,7 +781,7 @@ program_part_success:
 void CBacnetProgramEdit::OnClose()
 {
 	 
-	UnregisterHotKey(GetSafeHwnd(),KEY_F2);//注销F2键
+	UnregisterHotKey(GetSafeHwnd(),KEY_F2);//F2
 	UnregisterHotKey(GetSafeHwnd(),KEY_F3);
 	UnregisterHotKey(GetSafeHwnd(),KEY_F7);
 	UnregisterHotKey(GetSafeHwnd(),KEY_F6);
@@ -1002,7 +1002,7 @@ void CBacnetProgramEdit::OnProgramIdeSettings()
 	}
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(tempcs);
 	refresh_program_text_color = true;
-	need_syntax = true; //刷新颜色
+	need_syntax = true; //
 	Syntax_analysis();
 
 }
@@ -1033,7 +1033,7 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 			{
 				int sel_number_charactor;
 				sel_number_charactor = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetTextRange(temp_start,temp_end,temp_txt);
-				if((temp_txt.CompareNoCase(_T(" ")) == 0) || (sel_number_charactor == 0)) //说明继续往前 没意义了，都是空格和前面的;
+				if((temp_txt.CompareNoCase(_T(" ")) == 0) || (sel_number_charactor == 0)) // ;
 				{
 					caculate_start = temp_start + 1;
 					break;
@@ -1053,7 +1053,7 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 			{
 				int sel_number_charactor;
 				sel_number_charactor = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetTextRange(temp_start,temp_end,temp_txt);
-				if((temp_txt.CompareNoCase(_T(" ")) == 0) || (sel_number_charactor == 0)) //说明继续往前 没意义了，都是空格和前面的;
+				if((temp_txt.CompareNoCase(_T(" ")) == 0) || (sel_number_charactor == 0)) // ;
 				{
 					caculate_end = temp_end - 1;
 					break;
@@ -1112,7 +1112,7 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString &retselstring)
 	point_number = temp_number - 1;
 	point_type = temp_point_type;
 
-    //fandu 修复 部分 input output debug 模式无法正常弹出的问题
+    //fandu   input output debug 
 	switch(point_type)
 	{
 	case BAC_OUT:
@@ -1207,7 +1207,7 @@ void CBacnetProgramEdit::UpdateDataProgramText()
 
 		long temp_sel_str = 0;
 		long temp_sel_end = 0;
-		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //记住刷新前用户选择的部分;
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //;
 
 		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(TRUE,FALSE);
 		SetRicheditFont(0,-1,prg_text_color);
@@ -1222,7 +1222,7 @@ void CBacnetProgramEdit::UpdateDataProgramText()
 
 		//SetRicheditFont(0,0,prg_text_color);111111111
 
-			((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //操作完成后还原现场;
+			((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //;
 
 		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(FALSE,FALSE);
 	}
@@ -1244,21 +1244,21 @@ void CBacnetProgramEdit::SetBackFont()
 	cf.dwMask|=CFM_BOLD;
 
 	cf.dwEffects&=~CFE_BOLD;
-	//cf.dwEffects|=~CFE_BOLD; //粗体，取消用cf.dwEffects&=~CFE_BOLD;
+	//cf.dwEffects|=~CFE_BOLD; //cf.dwEffects&=~CFE_BOLD;
 	cf.dwMask|=CFM_ITALIC;
 	cf.dwEffects&=~CFE_ITALIC;
-	//cf.dwEffects|=~CFE_ITALIC; //斜体，取消用cf.dwEffects&=~CFE_ITALIC;
+	//cf.dwEffects|=~CFE_ITALIC; //cf.dwEffects&=~CFE_ITALIC;
 	cf.dwMask|=CFM_UNDERLINE;
 	cf.dwEffects&=~CFE_UNDERLINE;
-	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE;
+	//cf.dwEffects|=~CFE_UNDERLINE; //cf.dwEffects&=~CFE_UNDERLINE;
 	cf.dwMask|=CFM_COLOR;
-	cf.crTextColor = prg_text_color;//RGB(0,0,255); //设置颜色
+	cf.crTextColor = prg_text_color;//RGB(0,0,255); //
 	cf.dwMask|=CFM_SIZE;
-	cf.yHeight =250; //设置高度
+	cf.yHeight =250; //
 	cf.dwMask|=CFM_FACE;
 	//_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
 	//_tcscpy(cf.szFaceName ,_T("Times New Roman"));
-	//	strcpy(cf.szFaceName ,_T("隶书")); //设置字体
+	//	strcpy(cf.szFaceName ,_T("")); //
 	_tcscpy(cf.szFaceName , prg_character_font);
 	//_tcscpy(cf.szFaceName ,_T("NSimSun"));
 	//((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSelectionCharFormat(cf);
@@ -1370,7 +1370,7 @@ void CBacnetProgramEdit::OnPropertiesGotodefinition()
 
 void CBacnetProgramEdit::OnBnClickedButtonProgramEditHelp()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_demo_prog;
 	temp_demo_prog = g_strExePth + _T("ResourceFile\\DemoPrg.txt");
 	ShellExecute(this->m_hWnd, _T("open"), temp_demo_prog, NULL, NULL, SW_SHOWNORMAL);
@@ -1427,5 +1427,5 @@ void CBacnetProgramEdit::OnSize(UINT nType, int cx, int cy)
 		
 	}
 	Invalidate(1);
-	// TODO: 在此处添加消息处理程序代码
+	// TODO: 
 }

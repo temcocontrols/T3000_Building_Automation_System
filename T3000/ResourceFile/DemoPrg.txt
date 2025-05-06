@@ -1,6 +1,6 @@
 1 REM For more keywords and how to use them, see t3000_help.chm in the installation directory
 10 REM THE FOLLOWING ARE EXAMPLES OF READING A SUBNET DEVICE MODBUS ID=2
-20 REM WHICH CONNECTED TO A MASTER CONTROLLER ON THE ETHERNET NETWORK WITH ‘PANEL ID?
+20 REM WHICH CONNECTED TO A MASTER CONTROLLER ON THE ETHERNET NETWORK WITH ANEL ID?
 30 REM READ THE REGISTER UNDER MODBUS RS485 IN MODBUS FLOATING POINT MODE AND SAVE IT 
 40 VAR100 = 1.2.MB_REG_FLOAT_ABCD33 
 50 VAR101 = 1.2.MB_REG_FLOAT_CDAB44 
@@ -25,10 +25,10 @@
 229 REM Line 240 writes the low level of VAR1 to register 4
 230 1.2.MB_REG3 = VAR1 / 65536        
 240 1.2.MB_REG4 = VAR1 * 1000 % 65536 / 1000      
-250  REM How to read slave unsigned INT by Modbus  ， reg3 is high  ,reg4 is low
+250  REM How to read slave unsigned INT by Modbus   reg3 is high  ,reg4 is low
 251   VAR3 = 1.2.MB_REG3 * 65536 + 1.2.MB_REG4
 255  REM THE FOLLOWING ARE EXAMPLES OF READING A REMOTE DEVICE MODBUS ID=4 WITH LAST IP NUMBER 199 
-256 REM 199 is the last number of the IP address of the device to be read （ex:The IP address of the device to be read is 192.168.0.199）
+256 REM 199 is the last number of the IP address of the device to be read x:The IP address of the device to be read is 192.168.0.199
 259 VAR98 = 199.4.MB_REG55
 260 VAR99 = 199.4.MB_DISINPUT56
 270 REM PVAR RETURN THE NUMBER OF MINUTES SINCE LAST TRANSMISSION.

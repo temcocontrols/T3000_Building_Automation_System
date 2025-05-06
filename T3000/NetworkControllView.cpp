@@ -179,7 +179,7 @@ void CNetworkControllView::Fresh()
 	CEdit* pEdit = (CEdit*)GetDlgItem(IDC_EDIT_BLDVERSION);
 	CString strBldVer; strBldVer.Format(_T("%d"), m_nbldVersion);
 	pEdit->SetWindowText(strBldVer);
-	if (m_nbldVersion < _OLD_NC_VERSION && !m_bWarningBldVersion && m_nSerialNum != 0 && m_hardware_version < 4) // 序列号不等于0防止掉线时版本寄存器为0弹这个消息
+	if (m_nbldVersion < _OLD_NC_VERSION && !m_bWarningBldVersion && m_nSerialNum != 0 && m_hardware_version < 4) // 00
 	{	
 		m_bWarningBldVersion = TRUE;
 		CString strBldVer;
@@ -504,11 +504,11 @@ return;
 				 
 			 
 
-			// 改node
+			// node
 			CString strSID;
 			CString strSql;
 			strSID.Format(_T("%d"), m_nSerialNum);
-			strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID='%s'"),strIP, strSID); //bautrate 放IP
+			strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID='%s'"),strIP, strSID); //bautrate IP
 			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
 
@@ -729,9 +729,9 @@ void CNetworkControllView::OnBnClickedButtonUpdatetimeserver()
 	n=write_one(g_tstat_id,180,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b3 ));
 	n=write_one(g_tstat_id,181,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b4 ));
 
-	n=write_one(g_tstat_id,177,6); // 命令寄存器，同步命令
+	n=write_one(g_tstat_id,177,6); // 
 
-	Sleep(5000);  // 等待NC 同步
+	Sleep(5000);  // NC 
 	AddNewTimeServer(strTimeServer);
 
 	int nCount = 0;
@@ -795,10 +795,10 @@ CString CNetworkControllView::GetIPFromHostName(CString& strHostName)
 { 
 	//char	szhostname[128]; 
 	CString	str; 
-	//获得主机名 
+	// 
 //	if(   gethostname(szhostname,   128)   ==   0   ) 
 	{
-		//   获得主机ip地址 
+		//   ip 
 		struct hostent* phost;
 		int i;
 		USES_CONVERSION;
@@ -835,7 +835,7 @@ CString CNetworkControllView::GetIPFromHostName(CString& strHostName)
 // }
 
 
-// 读取NC信息，并加入到数据库
+// NC
 void CNetworkControllView::GetTstatInfo(int nID)
 {
 
@@ -972,7 +972,7 @@ BOOL CNetworkControllView::SaveTimeServerToRegister(const CString& strVal, const
 			ASSERT(0);
 		}
 	}	
-	else // 没有这个表项
+	else // 
 	{
 		ASSERT(0);		
 		return FALSE;
@@ -1003,7 +1003,7 @@ BOOL CNetworkControllView::LoadTimeServerFromRegister(const CString& strKey ,CSt
 			return FALSE;
 		}	
 	}	
-	else // 没有这个表项
+	else // 
 	{
 		delete []szRet;
 		return FALSE;
@@ -1085,27 +1085,27 @@ void CNetworkControllView::InitGrid()
 // 	m_gridSub.put_TextMatrix(0,5,_T("Time Since"));
 
 /*For Heng
-5670 NC连接了多少设备 ，本身也计算
-5671 NC的ID
-5672 NC的序列号
+5670 NC 
+5671 NCID
+5672 NC
 
-5673 任何连接到NC上的设备ID
-5674 任何连接到NC上的设备序列号
+5673 NCID
+5674 NC
 */
-//设置排/行数量
+///
 	int rows=read_one(g_tstat_id,5670);
 	if (rows>=254)
 	{
 		rows=254;
 	}
-	m_gridSub.put_Cols(3);//这句一定要有，如果下面再增加显示一外，而这里不变还是5，则会出错
-	m_gridSub.put_Rows(rows+1);//包括标题栏
+	m_gridSub.put_Cols(3);//5
+	m_gridSub.put_Rows(rows+1);//
 
 	//set row high
 	m_gridSub.put_WordWrap(TRUE);
 	m_gridSub.put_RowHeight(0,500);
 
-	//设置列宽
+	//
 	m_gridSub.put_ColWidth(0,400);
 	m_gridSub.put_ColWidth(1,800);
 	m_gridSub.put_ColWidth(2,800);
@@ -1164,7 +1164,7 @@ void CNetworkControllView::InitGrid()
 	{
  
 		m_num.Format(_T("%d"),i);
-		m_gridSub.put_TextMatrix(i,0,m_num);//第一列：序号
+		m_gridSub.put_TextMatrix(i,0,m_num);//
 		
 		m_gridSub.put_TextMatrix(i,1,_subnetwork.at(i-1).ID);
 		m_gridSub.put_TextMatrix(i,2,_subnetwork.at(i-1).SN);
@@ -1177,7 +1177,7 @@ void CNetworkControllView::InitGrid()
 
 
 const int TABLE_NODE_NUM_REG = 7000;
-const int TABLE_NODE_SIZE = 20;				// 一个node占用20寄存器
+const int TABLE_NODE_SIZE = 20;				// node20
 void  CNetworkControllView::ReadNCTable()
 {
 	WORD wNumLow = Read_One(m_IDaddress, TABLE_NODE_NUM_REG);

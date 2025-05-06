@@ -1,7 +1,7 @@
 #pragma once
 #include "tstatbase.h"
 
-// TStat5 系列设备的基类
+// TStat5 
 class CTStat_Dev :
 	public CTStatBase
 {
@@ -15,7 +15,7 @@ public:
 
 	virtual int ReadMultiReg(int nRegAddrStart, int nRegAddrEnd, OUT int* nVal);
 	virtual int WriteMultiReg(int nRegAddrStart, int nRegAddrEnd, OUT int* nVal);
-	// 也必须通过读写寄存器来实现
+	// 
 	virtual BOOL IsOnLine();	
 
 	virtual int WriteDevID(int nID)const;	
@@ -44,9 +44,9 @@ public:
 
 
 public:
-	int				m_nprotocol;				//协议
-	int				m_nBaudRate;				// 波特率
-	int				m_nComPort;				// 串口	
+	int				m_nprotocol;				//
+	int				m_nBaudRate;				// 
+	int				m_nComPort;				// 	
 	int				m_nEPSize;					// ??
-	//int				m_nAddrID;				// 地址ID，表示在ModBus中的地址==不需要，就是devID
+	//int				m_nAddrID;				// IDModBus==devID
 };

@@ -47,13 +47,13 @@ using namespace std;  // Ensure that the namespace is set to std
 
 #define WM_TRAFFIC_DATA_WINDOW  WM_USER + 111
 
-// 除要将 bMultiInstance 参数的 TRUE 
-// 传递给 COleObjectFactory 构造函数之外，此宏与 IMPLEMENT_OLECREATE 相同。
-// 对于自动化控制器所请求的每一个自动化代理对象,
-// 需要分别启动一个该应用程序的实例。
+//  bMultiInstance  TRUE 
+//  COleObjectFactory  IMPLEMENT_OLECREATE 
+// ,
+// 
 // TBD: Clarify this machine trnaslation 
 // In addition to the bMultiInstance Parameters of TRUE 
-// Passed to COleObjectFactory Constructor，This macro and IMPLEMENT_OLECREATE are the same
+// Passed to COleObjectFactory ConstructorThis macro and IMPLEMENT_OLECREATE are the same
 // For each Automation agent object requested by the automation controller,
 // You need to start an instance of the application separately.
 

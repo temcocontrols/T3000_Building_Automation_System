@@ -64,7 +64,7 @@ BOOL CBacnetRemotePoint::OnInitDialog()
 	Initial_List();
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_NETWORKPOINT);
 	SetIcon(m_hIcon,TRUE);
-	//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2键
+	//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	ShowWindow(FALSE);
 	
@@ -135,14 +135,14 @@ BOOL CBacnetRemotePoint::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 			return 1; 
@@ -181,7 +181,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 	{
 		if(m_remote_point_list.IsDataNewer((char *)&m_remote_point_data.at(0),sizeof(Str_remote_point) * BAC_REMOTE_POINT_COUNT))
 		{
-			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			//list ;List;
 			m_remote_point_list.SetListData((char *)&m_remote_point_data.at(0),sizeof(Str_remote_point) * BAC_REMOTE_POINT_COUNT);
 		}
 		else
@@ -210,7 +210,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			i = Fresh_Item;
 		}
 
-        //因为subpanel 老毛要求 也能够为0  所以
+        //subpanel  0  
         if ((m_remote_point_data.at(i).point.sub_panel == 0) && (m_remote_point_data.at(i).point.panel == 0))
 		{
 			m_remote_point_list.SetItemText(i, REMOTE_MAIN_ID, _T(""));
@@ -220,7 +220,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 			m_remote_point_list.SetItemText(i, REMOTE_TPYE, _T(""));
 			m_remote_point_list.SetItemText(i,REMOTE_DEVICE_STATUS,_T(""));
 			m_remote_point_list.SetItemText(i,REMOTE_DESCRIPTION,_T(""));
-            m_remote_point_list.SetItemText(i, REMOTE_TIME_REMAINING, _T(""));  //修复当远程的点不在的时候  时间还在显示的问题;
+            m_remote_point_list.SetItemText(i, REMOTE_TIME_REMAINING, _T(""));  //  ;
             m_remote_point_list.SetItemText(i, REMOTE_INSTANCE, _T(""));
 			continue;
 		}
@@ -232,7 +232,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 		unsigned char t_type;
 		t_type = m_remote_point_data.at(i).point.point_type & 0x1F;
 
-        unsigned char type_highest_2bytes = m_remote_point_data.at(i).point.network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
+        unsigned char type_highest_2bytes = m_remote_point_data.at(i).point.network & 0x60;    //   0x60    01100000 2-3bit 
         t_type = t_type | type_highest_2bytes;
 
 
@@ -463,7 +463,7 @@ void CBacnetRemotePoint::Reset_RemotePoint_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -471,7 +471,7 @@ void CBacnetRemotePoint::Reset_RemotePoint_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -514,14 +514,14 @@ void CBacnetRemotePoint::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return;
@@ -537,7 +537,7 @@ void CBacnetRemotePoint::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
-			if((this->IsWindowVisible()) && (Gsm_communication == false) &&  (this->m_hWnd  == ::GetActiveWindow())  )	//GSM连接时不要刷新;
+			if((this->IsWindowVisible()) && (Gsm_communication == false) &&  (this->m_hWnd  == ::GetActiveWindow())  )	//GSM;
 			{
 				PostMessage(WM_REFRESH_BAC_REMOTE_POINT_LIST,NULL,NULL);
 				if(bac_select_device_online)
@@ -545,7 +545,7 @@ void CBacnetRemotePoint::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 		break;
-	case 2:	//在更改某一列之后要在读取此列的值，并刷新此列;
+	case 2:	//;
 		{
 			if(this->IsWindowVisible())
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);

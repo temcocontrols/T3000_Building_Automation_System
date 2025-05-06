@@ -1,4 +1,4 @@
-﻿// CTstatAQ_Parameter.cpp: 实现文件
+﻿// CTstatAQ_Parameter.cpp: 
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 extern CString jpg_airlab;
-// CTstatAQ_Parameter 对话框
+// CTstatAQ_Parameter 
 
 IMPLEMENT_DYNAMIC(CTstatAQ_Parameter, CDialogEx)
 
@@ -41,16 +41,16 @@ BEGIN_MESSAGE_MAP(CTstatAQ_Parameter, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CTstatAQ_Parameter 消息处理程序
+// CTstatAQ_Parameter 
 
 
 BOOL CTstatAQ_Parameter::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	InitialUI();
-	// TODO:  在此添加额外的初始化
+	// TODO:  
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // 异常: OCX 属性页应返回 FALSE
+				  //  OCX 
 }
 
 void CTstatAQ_Parameter::InitialUI()
@@ -144,8 +144,8 @@ void CTstatAQ_Parameter::InitialUI()
 void CTstatAQ_Parameter::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-					   // TODO: 在此处添加消息处理程序代码
-					   // 不为绘图消息调用 CDialogEx::OnPaint()
+					   // TODO: 
+					   // alogEx::OnPaint()
 	int cx = 0;
 	int cy = 0;
 	CImage image;
@@ -154,11 +154,11 @@ void CTstatAQ_Parameter::OnPaint()
 	cx = image.GetWidth();
 	cy = image.GetHeight();
 
-	//获取Picture Control控件的大小  
+	//ictureontrol
 	GetDlgItem(IDC_STATIC_AIRLAB)->GetWindowRect(&rect);
-	//将客户区选中到控件表示的矩形区域内  
+	//
 	ScreenToClient(&rect);
-	//窗口移动到控件表示的区域  
+	//
 	GetDlgItem(IDC_STATIC_AIRLAB)->MoveWindow(rect.left, rect.top, cx, cy, TRUE);
 	CWnd* pWnd = NULL;
 	pWnd = GetDlgItem(IDC_STATIC_AIRLAB);
@@ -172,7 +172,7 @@ void CTstatAQ_Parameter::OnPaint()
 
 void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_string;
 	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE1))->GetCurSel();
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE1))->GetLBText(nSel, temp_string);
@@ -197,7 +197,7 @@ void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine1()
 
 void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine2()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_string;
 	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE2))->GetCurSel();
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE2))->GetLBText(nSel, temp_string);
@@ -221,7 +221,7 @@ void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine2()
 
 void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine3()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_string;
 	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE3))->GetCurSel();
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE3))->GetLBText(nSel, temp_string);
@@ -245,7 +245,7 @@ void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine3()
 
 void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine4()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_string;
 	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE4))->GetCurSel();
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE4))->GetLBText(nSel, temp_string);
@@ -270,7 +270,7 @@ void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine4()
 
 void CTstatAQ_Parameter::OnBnClickedRadio1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	product_register_value[TSTAT_AQ_BLANK_SCREEN] = 0;
 	Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TSTAT_AQ_BLANK_SCREEN, 0,
 		product_register_value[TSTAT_AQ_BLANK_SCREEN], this->m_hWnd, IDC_RADIO1, _T(" default normal display "));
@@ -279,7 +279,7 @@ void CTstatAQ_Parameter::OnBnClickedRadio1()
 
 void CTstatAQ_Parameter::OnBnClickedRadio2()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	product_register_value[TSTAT_AQ_BLANK_SCREEN] = 1;
 	Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TSTAT_AQ_BLANK_SCREEN, 1,
 		product_register_value[TSTAT_AQ_BLANK_SCREEN], this->m_hWnd, IDC_RADIO1, _T(" blank screen "));
@@ -288,13 +288,13 @@ void CTstatAQ_Parameter::OnBnClickedRadio2()
 
 void CTstatAQ_Parameter::OnBnClickedButtonDone()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 }
 
 
 void CTstatAQ_Parameter::OnBnClickedButtonDefault()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, TATAT_AQ_CONFIG_LINE1, 0,
 		product_register_value[TATAT_AQ_CONFIG_LINE1], this->m_hWnd, NULL, _T(" Line 1 "));
 
@@ -310,7 +310,7 @@ void CTstatAQ_Parameter::OnBnClickedButtonDefault()
 
 void CTstatAQ_Parameter::OnCbnSelchangeComboAirlabLine5()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_string;
 	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->GetCurSel();
 	((CComboBox*)GetDlgItem(IDC_COMBO_AIRLAB_LINE5))->GetLBText(nSel, temp_string);

@@ -278,13 +278,13 @@ LRESULT CBTUMeterDlg::UpdateBTUUI(WPARAM wParam, LPARAM lParam)
 
 //void CBTUMeterDlg::OnBnClickedButtonClearUpOffset()
 //{
-//    // TODO: 在此添加控件通知处理程序代码
+//    // TODO: 
 //}
 
 
 //void CBTUMeterDlg::OnBnClickedButtonClearUpOffset2()
 //{
-//    // TODO: 在此添加控件通知处理程序代码
+//    // TODO: 
 //}
 
 const PointF FLOW_RATE(167, 31);
@@ -297,8 +297,8 @@ const PointF TEMPERATURE_OUT(333, 237);
 void CBTUMeterDlg::OnPaint()
 {
     CPaintDC dc(this); // device context for painting
-                       // TODO: 在此处添加消息处理程序代码
-                       // 不为绘图消息调用 CFormView::OnPaint()+
+                       // TODO: 
+                       //  CFormView::OnPaint()+
     CFileFind temp_find;
     PointF icon_point;
     CMemDC memDC(dc, this);

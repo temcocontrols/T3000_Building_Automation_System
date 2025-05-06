@@ -34,7 +34,7 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CDateTimeCtrl m_variable_time_picker;
 	afx_msg void OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESULT *pResult);
-	bool window_max; // 标记是否已经最大化;
+	bool window_max; // ;
 	int m_row;
 	int m_col;
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

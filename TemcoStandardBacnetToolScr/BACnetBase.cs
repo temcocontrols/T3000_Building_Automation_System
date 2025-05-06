@@ -6355,7 +6355,7 @@ namespace System.IO.BACnet.Serialize
         }
 
         //**********************************************************************************
-        // by Christopher Günter
+        // by Christopher Gnter
         public static void EncodeCreateProperty(EncodeBuffer buffer, BacnetObjectId object_id, ICollection<BacnetPropertyValue> value_list)
         {
 
@@ -7042,7 +7042,7 @@ namespace System.IO.BACnet.Serialize
         {
             int len = 0;;
 
-            if (GetEvent) len++;  // peut être tag 0
+            if (GetEvent) len++;  // peut tre tag 0
 
             while ((apdu_len - 3 - len) > 0)
             {

@@ -8,7 +8,7 @@ extern char download_filename[20];
 extern unsigned short download_fw_version;
 extern char receive_md5[20];
 extern int download_step ;
-extern unsigned int T3000_Version ; //T3000的版本号.
+extern unsigned int T3000_Version ; //T3000.
 int Receive_data_length = 0;
 
 extern int total_file_length;	
@@ -106,7 +106,7 @@ void DownloadSocket::OnReceive(int nErrorCode)
 			}
 			else
 			{
-				temp_point = temp_point - 3 - 4;	//需要回过头去得到 此包的长度;
+				temp_point = temp_point - 3 - 4;	// ;
 				
 				int nlength;
 				nlength = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
@@ -177,7 +177,7 @@ void DownloadSocket::OnConnect(int nErrorCode)
 	if(!nErrorCode)
 	{
 		SetDownloadResults(DOWNLOAD_RESULTS_UNKNOW);
-		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CONNECT_SUCCESS,NULL);	//建立套接字,连接成功时就开始请求传输的文件;
+		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CONNECT_SUCCESS,NULL);	//,;
 		is_connect = true;
 	}
 	else

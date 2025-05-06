@@ -83,8 +83,8 @@ UINT _Background_Read(LPVOID pParam) {
 				if (ret>0)
 				{
 					/*
-					说明：这里是把读到的值转化成字符串，值与值之间用逗号隔开
-					然后把值赋值给结构体中的Value，在发出消息，把值显示出来
+					
+					Value
 					*/
 					/* 16 Bit Unsigned Integer
 					16 Bit Signed Integer
@@ -285,7 +285,7 @@ CProductRegisterListView::CProductRegisterListView()
 
 	m_short_counts = 1;
 	m_string_paratypes = _T("");
-	m_sort_type = 0;//默认排序
+	m_sort_type = 0;//
 	m_value_format = 0;
 
 	m_vecDataRW.clear();
@@ -1035,7 +1035,7 @@ void CProductRegisterListView::OnBnClickedReadDevice()
 
 void CProductRegisterListView::OnBnClickedButton4()
 {
-	if (m_sort_type != 0)    //防止已经是默认排序了，还狂点默认排序
+	if (m_sort_type != 0)    //
 	{
 		m_sort_type = 0;
 		SendMessage(WM_REFRESH_BAC_INPUT_LIST, 0, 0);
@@ -2003,7 +2003,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
-	if (lRow>m_register_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if (lRow>m_register_list.GetItemCount()) //
 		return;
 	if (lRow<0)
 		return;
@@ -2065,7 +2065,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 		}
 
 
-		//5=数据格式
+		//5=
 		if (lCol == _NUM_DATAFORMAT)
 		{
 			m_vecDataFormat = GetDataFormatByVariable(GetFunctionName(m_register_data_sheet[lRow].function_code));
@@ -2080,7 +2080,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 				m_register_list.SetCellStringList(lRow, _NUM_DATAFORMAT, strlist);
 			}
 		}
-		//11=读写属性的判断
+		//11=
 		if (lCol == _NUM_RW)
 		{
 			m_vecDataRW = GetRWByVariableDataFormat(GetFunctionName(m_register_data_sheet[lRow].function_code), m_register_data_sheet[lRow].DataFormat);
@@ -2094,7 +2094,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 				m_register_list.SetCellStringList(lRow, _NUM_RW, strlist);
 			}
 		}
-		//12=Bacnet Type 判断
+		//12=Bacnet Type 
 		if (lCol == _NUM_Bacnet_Type)
 		{
 			m_vecBacnetType = GetBacnetType(GetFunctionName(m_register_data_sheet[lRow].function_code), m_register_data_sheet[lRow].DataFormat, m_register_data_sheet[lRow].Read_Only_Or_RW);
@@ -2227,7 +2227,7 @@ void CProductRegisterListView::OnNMDblclkListCustomList(NMHDR *pNMHDR, LRESULT *
 void CProductRegisterListView::FreshOneRowInGrid(int Row, CustomProductTable_T tp, int operator_Grid)
 {
 	CString strTemp;
-	if (operator_Grid == 0)//插入到最后一行
+	if (operator_Grid == 0)//
 	{
 		strTemp.Format(_T("%d"), Row + 1);
 		m_register_list.InsertItem(Row, strTemp);
@@ -2284,11 +2284,11 @@ void CProductRegisterListView::FreshOneRowInGrid(int Row, CustomProductTable_T t
 		strTemp.Format(_T("%s"), tp.Reg_Description);
 		m_register_list.SetItemText(Row, _NUM_Modbus_DESCRIPTION, strTemp);
 	}
-	else if (operator_Grid == 1)//更新改行的数据
+	else if (operator_Grid == 1)//
 	{
 
 	}
-	else if (operator_Grid == 2)//删除改行的数据
+	else if (operator_Grid == 2)//
 	{
 
 	}
@@ -2343,7 +2343,7 @@ void CProductRegisterListView::OnBnClickedButtonExportexcelfile()
 		AfxMessageBox(_T("Create Excel false!"));
 		return;
 	}
-	//遍历所有行  
+	//  
 	strFilename = g_strExePth + _T("RegisterListTemplate.xls");
 
 	books.AttachDispatch(app.GetWorkbooks());

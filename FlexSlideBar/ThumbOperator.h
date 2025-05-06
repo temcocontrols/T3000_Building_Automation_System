@@ -58,8 +58,8 @@ protected:
 	CRect					m_rcChannel;
 
 	CRect					m_rcParent;
-	int						m_nLengthOfTic;			// 刻度，通常是指每个刻度单位的象素数。
-	int						m_nLengthOfPage;		// 步长，通常是指每个步长单位的刻度数。
+	int						m_nLengthOfTic;			// 
+	int						m_nLengthOfPage;		// 
 
 	BOOL					m_bStartDraging;
 

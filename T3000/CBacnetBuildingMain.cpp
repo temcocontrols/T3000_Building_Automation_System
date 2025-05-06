@@ -1,4 +1,4 @@
-﻿// CBacnetBuildingMain.cpp: 实现文件
+﻿// CBacnetBuildingMain.cpp: 
 //
 
 #include "stdafx.h"
@@ -32,7 +32,7 @@ BEGIN_MESSAGE_MAP(CBacnetBuildingMain, CFormView)
 END_MESSAGE_MAP()
 
 
-// CBacnetBuildingMain 诊断
+// CBacnetBuildingMain 
 
 #ifdef _DEBUG
 void CBacnetBuildingMain::AssertValid() const
@@ -83,7 +83,7 @@ void CBacnetBuildingMain::Fresh()
     pFrame_BM = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
     cs_bm_ini = g_strExePth + _T("Database\\Buildings\\") + pFrame_BM->m_strCurMainBuildingName + _T("\\BuildingManagement.ini");
     InitBuildingFloor();
-    //添加代码 加载楼层房间的 名字 
+    //
     static int inital_once = false;
     if (inital_once == false)
     {
@@ -110,7 +110,7 @@ void CBacnetBuildingMain::InitialTab()
     //m_main_building_tab.InsertItem(BUILDING_COMMUNICATION, _T("Communication          "));
 
     //m_main_building_tab.InsertItem(SETTING_WIFI, _T("Wifi           "));
-    //创建两个对话框
+    //
     m_page_building_info.Create(IDD_DIALOG_BACNET_BUILDING_MANAGEMENT, &m_main_building_tab);
     m_page_building_io.Create(IDD_DIALOG_BACNET_BUILDING_IO_POINT, &m_main_building_tab);
    
@@ -118,7 +118,7 @@ void CBacnetBuildingMain::InitialTab()
 
 
 
-    //设定在Tab内显示的范围
+    //b
     CRect rc;
     m_main_building_tab.GetClientRect(rc);
     rc.top += 21;
@@ -129,19 +129,19 @@ void CBacnetBuildingMain::InitialTab()
     m_page_building_io.MoveWindow(&rc);
 #if 1
     //m_page_wifi.MoveWindow(&rc);
-    //把对话框对象指针保存起来
+    //
     building_tab_dialog[BUILDING_IO] = &m_page_building_io;
     building_tab_dialog[BUILDING_BASIC] = &m_page_building_info;
 
 
     //tab_dialog[SETTING_WIFI] = &m_page_wifi;
-    //显示初始页面
+    //
     building_tab_dialog[BUILDING_IO]->ShowWindow(SW_SHOW);
     building_tab_dialog[BUILDING_BASIC]->ShowWindow(SW_HIDE);
 
 
     //tab_dialog[SETTING_WIFI]->ShowWindow(SW_HIDE);
-    //保存当前选择
+    //
     m_CurSelTab = 0;
 #endif
 }
@@ -150,8 +150,8 @@ void CBacnetBuildingMain::InitScrollbar()
 {
     SCROLLINFO scrollinfo;
     GetScrollInfo(SB_VERT, &scrollinfo, SIF_ALL);
-    scrollinfo.nPage = 20;    //设置滑块大小
-    scrollinfo.nMax = 75;     //设置滚动条的最大位置0--75
+    scrollinfo.nPage = 20;    //
+    scrollinfo.nMax = 75;     //
     SetScrollInfo(SB_VERT, &scrollinfo, SIF_ALL);
 }
 
@@ -160,17 +160,17 @@ void CBacnetBuildingMain::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
 
-    // TODO: 在此添加专用代码和/或调用基类
+    // TODO: 
 }
 
 
 void CBacnetBuildingMain::OnTcnSelchangeTabBuildingMain(NMHDR* pNMHDR, LRESULT* pResult)
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     *pResult = 0;
 
     building_tab_dialog[m_CurSelTab]->ShowWindow(SW_HIDE);
-    //得到新的页面索引
+    //
     m_CurSelTab = m_main_building_tab.GetCurSel();
     building_tab_dialog[m_CurSelTab]->ShowWindow(SW_SHOW);
 }

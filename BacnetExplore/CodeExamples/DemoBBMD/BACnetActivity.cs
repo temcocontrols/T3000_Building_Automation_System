@@ -128,8 +128,8 @@ namespace DemoBBMD
 
         public static BacnetValue GetBacObjectPresentValue(BacnetObjectId id)
         {
-            // L'index 0 c'est le nombre de valeurs associées à la propriété
-            // L'index 1 pour la première valeur
+            // L'index 0 c'est le nombre de valeurs associes  la proprit
+            // L'index 1 pour la premire valeur
             // L'index System.IO.BACnet.Serialize.ASN1.BACNET_ARRAY_ALL pour tout le tableau
             IList<BacnetValue> val=null;
             m_storage.ReadProperty(id, BacnetPropertyIds.PROP_PRESENT_VALUE, 1, out val);
@@ -138,12 +138,12 @@ namespace DemoBBMD
 
         public static void SetBacObjectPresentValue(BacnetObjectId id, BacnetValue bv)
         {
-            // On est sur des valeurs simples, la comparaison est possible ici sans problème
+            // On est sur des valeurs simples, la comparaison est possible ici sans problme
             if (GetBacObjectPresentValue(id).Value.ToString() == bv.Value.ToString())
                 return;
 
-            // L'index 0 c'est le nombre de valeurs associées à la propriété
-            // L'index 1 pour la première valeur
+            // L'index 0 c'est le nombre de valeurs associes  la proprit
+            // L'index 1 pour la premire valeur
             // L'index System.IO.BACnet.Serialize.ASN1.BACNET_ARRAY_ALL pour tout le tableau
             IList<BacnetValue> val = new BacnetValue[1] {bv};
             m_storage.WriteProperty(id, BacnetPropertyIds.PROP_PRESENT_VALUE, 1, val, true);
@@ -352,7 +352,7 @@ namespace DemoBBMD
             {
                 for (int i = 0; i < entry.Value.Count; i++)
                 {
-                    // Modif F. Chaxel <0 modifié == 0
+                    // Modif F. Chaxel <0 modifi == 0
                     if (entry.Value[i].GetTimeRemaining() <0)
                     {
                         entry.Value.RemoveAt(i);

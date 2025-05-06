@@ -7,21 +7,21 @@
 
 #include "schedule.h"
 
-// Annual_Routines 对话框
+// Annual_Routines 
 
 class Annual_Routines : public CDialog
 {
 	DECLARE_DYNAMIC(Annual_Routines)
 
 public:
-	Annual_Routines(CWnd* pParent = NULL,CString strtype = _T(""));   // 标准构造函数
+	Annual_Routines(CWnd* pParent = NULL,CString strtype = _T(""));   // 
 	virtual ~Annual_Routines();
 
-// 对话框数据
+// 
 	enum { IDD = IDD_ANNUAL_ROUTINES };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 public:
 	//add function by manual
 	int row_row,row_col;//for first row is clicked,setfocus is last row and first line,killfocus is first line and first row

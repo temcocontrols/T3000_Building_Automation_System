@@ -10,7 +10,7 @@
 #define PM_TSTAT7                     7
 #define PM_TSTAT5i                    8
 #define PM_TSTAT8                     9
-#define PM_TSTAT10                    10    //带Wifi 的TSTAT 拥有T3 program 的功能
+#define PM_TSTAT10                    10    //Wifi TSTAT T3 program 
 #define PM_TSTAT5D                    12
 #define PM_AirQuality                 13
 #define PM_HUMTEMPSENSOR              14
@@ -50,15 +50,15 @@
 #define PM_T38IOVG                    48
 #define PM_T3PTVG                     49
 #define PM_CM5                        50
-#define PM_PM5E_ARM                   51   //2019 03 18 由老款5964芯片移植过来
+#define PM_PM5E_ARM                   51   //2019 03 18 5964
 #define STM32_PM25                    52
 #define PM_T332AI_ARM                 53   //20240115 STM32   32 AI
 #define PM_TSTAT9                     59   //2019 06 20 
-#define PM_MULTI_SENSOR               60   //等同于 62 ，手持式的 多功能传感器;
-#define PM_TSTAT_AQ                   62   //TSTAT AQ 没有各种控制 输入输出的版本; 
-#define PM_ZIGBEE_REPEATER            63   //zigbee的中继器
+#define PM_MULTI_SENSOR               60   // 62  ;
+#define PM_TSTAT_AQ                   62   //TSTAT AQ  ; 
+#define PM_ZIGBEE_REPEATER            63   //zigbee
 #define PM_TSTAT6_HUM_Chamber         64
-#define PM_AIRLAB_ESP32               65   //和Airlab 功能一模一样  带wifi的芯片
+#define PM_AIRLAB_ESP32               65   //Airlab   wifi
 #define PM_BEENY                      70
 #define PM_WATER_SENSOR               71
 #define PM_T3_LC                      72
@@ -66,19 +66,19 @@
 #define PM_MINIPANEL_ARM              74
 #define PM_WEATHER_STATION            75
 #define PM_ESP32_T38AI8AO6DO          87
-//产品号是 88   用于最新的 ESP32版本的 T3 BB LB TB Nano
+// 88    ESP32 T3 BB LB TB Nano
 #define PM_ESP32_T3_SERIES            88
 #define PM_ESP32_T322AI               89
-#define PWM_TEMPERATURE_TRANSDUCER    90  //Lijun transudcer 新板子;
+#define PWM_TEMPERATURE_TRANSDUCER    90  //Lijun transudcer ;
 #define PM_TSTAT8_WIFI                91
 #define PM_TSTAT8_OCC                 92
 #define PM_TSTAT7_ARM                 93
 #define PM_TSTAT8_220V                94
 #define PM_T36CTA                     95
 #define PM_AFS                        96  //Air Floor Sensor
-#define PM_FAN_MODULE                 97  //Lijun  ESP32 new board fan  暂时没界面
+#define PM_FAN_MODULE                 97  //Lijun  ESP32 new board fan  
 #define PM_NC                         100
-#define PM_TSTAT8_PROGRAM             101  //TSTAT8 的可编程版本;
+#define PM_TSTAT8_PROGRAM             101  //TSTAT8 ;
 #define PWM_TRANSDUCER                104
 #define PM_LightingController         120
 #define PM_BTU_METER                  121
@@ -95,5 +95,5 @@
 #define STM32_CO2_NODE                216      //CO2NODE
 
 
-#define PM_THIRD_PARTY_DEVICE         254      //第三方设备
+#define PM_THIRD_PARTY_DEVICE         254      //
 #endif

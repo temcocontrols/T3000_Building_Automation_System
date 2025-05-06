@@ -95,7 +95,7 @@ void CT3000Option::OnCbnSelchangeComboLanguage()
 
 void CT3000Option::OnBnClickedOk()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     CString temp_string_com;
     m_combox_language.GetWindowTextW(temp_string_com);
     temp_string_com = temp_string_com.Mid(3);
@@ -111,7 +111,7 @@ void CT3000Option::OnBnClickedOk()
 
 void CT3000Option::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    // TODO: /
     show_time_left--;
     CString cs_value;
     cs_value.Format(_T("%d"), show_time_left);

@@ -36,41 +36,41 @@ public:
 	void SetDataSource(BYTE* pBuf, int nLen);
     
 	//////////////////////////////////////////////////////////////////////////
-	// 外部接口
+	// 
 	 void FlashByEthernet();
 	//////////////////////////////////////////////////////////////////////////
-	// tftp 功能流程函数
+	// tftp 
 	BOOL StartServer();
 	//////////////////////////////////////////////////////////////////////////
-	// 获得本地IP
+	// IP
 	DWORD GetLocalIP();
 	//void ParseFile(const CString& strFileName);	
 	
 	int InitSocket();
-	// 广播通知NC
+	// NC
 	void BroadCastToClient();
 
 	BOOL RecvBOOTP();
-	// 接受Request
+	// Request
 	int RecvRequest();	
-	// 发送数据
+	// 
 	int SendData(BYTE* szBuf, int nLen);
 
 	int SendDataNew(BYTE* szBuf, int nLen);
-	// 接受ACK
+	// ACK
 	int RecvACK();
-	// 发送结束标识
+	// 
 
-	// 处理请求
+	// 
 	void HandleWRRequest(BYTE* szBuf,  int nLen);
 	
-	// 打印信息
+	// 
 	void OutPutsStatusInfo(const CString& strInfo, BOOL bReplace);
 
-	// flash 完成。
+	// flash 
 	void WriteFinish(int nFlashFlag);
     void NewBootWriteFinish(int nFlashFlag);
-	// 发送数据流程
+	// 
 	int SendProcess();
 
 	int SendEndDataPack();
@@ -98,20 +98,20 @@ public:
 	unsigned short AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind);
 	int					m_nClientPort;
 protected:
-	BYTE*			m_szDataBuf;			// 要发送到数据
+	BYTE*			m_szDataBuf;			// 
 	int					m_nDataBufLen;
 	DWORD			m_dwClientIP;
 	
-	int					m_nBlkNum;			// 块号
+	int					m_nBlkNum;			// 
 	
 	CString			m_strFileName;
    
 
-	SOCKET			m_sock;					// 接收tftp request socket, 绑定了69端口
-	SOCKET			m_soSend;				// 发送socket，发送tftp数据的
-	SOCKET			m_soRecv;				// 接收socket，接收tftp ack的
-	sockaddr_in		m_siSend;				// 发送si，不绑定端口
-	sockaddr_in		m_siClient;				// 接收tftp ack
+	SOCKET			m_sock;					// tftp request socket, 69
+	SOCKET			m_soSend;				// sockettftp
+	SOCKET			m_soRecv;				// sockettftp ack
+	sockaddr_in		m_siSend;				// si
+	sockaddr_in		m_siClient;				// tftp ack
 	sockaddr_in		m_siServer;				// client info
 
 	MySocket TCP_Flash_CMD_Socket;
@@ -129,8 +129,8 @@ public:
     CString m_StrFileProductName;
     void Set_FileProductName(CString Name);
 	int total_retry;
-    int m_tcp_connect_results; // 点击Flash之后  标识TCP 套接字是否连上
+    int m_tcp_connect_results; // Flash  TCP 
 	int m_FlashTimes;
 	unsigned short read_reg[100] ;
-	int continue_flash_count; // 继续从多少包开始烧入; 目前只支持产品为88 的 ESP32 芯片的板子;
+	int continue_flash_count; // ; 88  ESP32 ;
 };

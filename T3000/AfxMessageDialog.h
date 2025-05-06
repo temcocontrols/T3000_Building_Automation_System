@@ -11,14 +11,14 @@ private:
 	CString m_strPromtionText;
 	DWORD m_dwTimeStart;
 public:
-	CAfxMessageDialog(CWnd* pParent = NULL);   // 标准构造函数
+	CAfxMessageDialog(CWnd* pParent = NULL);   // 
 	virtual ~CAfxMessageDialog();
 
-// 对话框数据
+// 
 	enum { IDD = IDD_AFXDIALOG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 
 	DECLARE_MESSAGE_MAP()
 public:

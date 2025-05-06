@@ -190,7 +190,7 @@ void CTstatRangeDlg::Initial_window(){
 
 	  m_show_unit.SetWindowTextW(analog_range_TSTAT6[m_input_Analog_select]);
 	  CRect c13;
-	  GetDlgItem(IDC_RADIO_T_0 + m_input_Analog_select)->GetWindowRect(c13);   //获取控件的位置 ，饼调整位置;
+	  GetDlgItem(IDC_RADIO_T_0 + m_input_Analog_select)->GetWindowRect(c13);   // ;
 	  ScreenToClient(c13);  
 	  m_rang_pic.SetWindowPos(NULL,c13.left - 40,c13.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 	  m_rang_pic.Invalidate(TRUE);
@@ -294,7 +294,7 @@ void CTstatRangeDlg::OnTimer(UINT_PTR nIDEvent)
 	if(nfocusid == IDC_EDIT_RANGE_SELECT)
 	{
 		CRect c2;
-		GetDlgItem(IDC_RADIO_T_0 + m_current_range)->GetWindowRect(c2);   //获取控件的位置 ，饼调整位置;
+		GetDlgItem(IDC_RADIO_T_0 + m_current_range)->GetWindowRect(c2);   // ;
 		ScreenToClient(c2);  
 		m_rang_pic.SetWindowPos(NULL,c2.left - 40,c2.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		m_rang_pic.Invalidate(TRUE);
@@ -308,7 +308,7 @@ void CTstatRangeDlg::OnTimer(UINT_PTR nIDEvent)
 	if(nfocusid != IDC_EDIT_RANGE_SELECT)
 	{
 		CRect c1;
-		GetFocus()->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+		GetFocus()->GetWindowRect(c1);   // ;
 		ScreenToClient(c1);  
 		m_rang_pic.SetWindowPos(NULL,c1.left - 40,c1.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		m_rang_pic.Invalidate(TRUE);
@@ -331,7 +331,7 @@ void CTstatRangeDlg::OnTimer(UINT_PTR nIDEvent)
 			m_input_Analog_select = sel_value;
 			//m_show_unit.SetWindowTextW(Input_Analog_Units_Array[bac_range_number_choose]);
 			////CRect c13;
-			////GetDlgItem(IDC_RADIO_T_0 + m_input_Analog_select)->GetWindowRect(c13);   //获取控件的位置 ，饼调整位置;
+			////GetDlgItem(IDC_RADIO_T_0 + m_input_Analog_select)->GetWindowRect(c13);   // ;
 			////ScreenToClient(c13);  
 			////m_rang_pic.SetWindowPos(NULL,c13.left - 40,c13.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			////m_rang_pic.Invalidate(TRUE);
@@ -340,7 +340,7 @@ void CTstatRangeDlg::OnTimer(UINT_PTR nIDEvent)
 
 			m_show_unit.SetWindowTextW(analog_range_TSTAT6[m_current_range]);
 			CRect c13;
-			GetDlgItem(IDC_RADIO_T_0 + m_input_Analog_select)->GetWindowRect(c13);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(IDC_RADIO_T_0 + m_input_Analog_select)->GetWindowRect(c13);   // ;
 			ScreenToClient(c13);  
 			m_rang_pic.SetWindowPos(NULL,c13.left - 40,c13.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			m_rang_pic.Invalidate(TRUE);
@@ -555,9 +555,9 @@ void CTstatRangeDlg::OnBnClickedOk()
      }
      else if (m_input_Analog_select == 12)
      {
-         //fandu 2018 01 05  TSTAT 4-20ma 对应2个点的table;
-         //979 4ma 对应的最小值
-         //980 20ma 对应的最大值
+         //fandu 2018 01 05  TSTAT 4-20ma 2table;
+         //979 4ma 
+         //980 20ma 
          CString temp_units;
          CString temp_4_value;
          CString temp_20_value;
@@ -971,132 +971,132 @@ short CTstatRangeDlg::Get_Max(short *short_Array,int length){
 void CTstatRangeDlg::OnEnChangeEdit1()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 	
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit8()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit9()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit13()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit14()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit15()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit16()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit17()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit18()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit19()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit20()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
 void CTstatRangeDlg::OnEnChangeEdit12()
 {
 	
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	//  CDialog::OnInitDialog()
+	//  CRichEditCtrl().SetEventMask()
+	//  ENM_CHANGE 
 
-	//   在此添加控件通知处理程序代码
+	//   
 	IsModfied=true;
 }
 
@@ -1532,11 +1532,11 @@ void CTstatRangeDlg::OnEnKillfocusEdit12()
 void CTstatRangeDlg::OnEnChangeEdit10()
 {
     
-    // 发送该通知，除非重写 CDialog::OnInitDialog()
-    // 函数并调用 CRichEditCtrl().SetEventMask()，
-    // 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+    //  CDialog::OnInitDialog()
+    //  CRichEditCtrl().SetEventMask()
+    //  ENM_CHANGE 
     IsModfied=true;
-    //   在此添加控件通知处理程序代码
+    //   
 }
 
 void CTstatRangeDlg::OnEnSetfocusEdit10()
@@ -1836,7 +1836,7 @@ BOOL CTstatRangeDlg::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
         nID = ::GetDlgCtrlID((HWND)nID);
         if(nID)
         {
-            //  这里就是你要显示的Tooltips，可以根据需要来定制
+            //  Tooltips
             CString strToolTips;
             strToolTips.Format(_T("%d"), m_tipvalue);
             

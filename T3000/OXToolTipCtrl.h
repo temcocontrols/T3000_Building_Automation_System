@@ -296,7 +296,7 @@ public:
 // Attributes
 public:
 	// --- In:		ToolInfo	-	Reference to a TOOLINFO object that receives the 
-	//								tool’s text.
+	//								tool text.
 	//				pWnd		-	Pointer to the window that contains the tool.
 	//				nIDTool		-	ID of the tool.
 	// --- Out :
@@ -329,7 +329,7 @@ public:
 	// --- In:		pWnd	-	Pointer to the window that contains the tool.
 	//				nIDTool	-	ID of the tool.
 	// --- Out:		str		-	Reference to a CString object that receives the 
-	//							tool’s text
+	//							tool text
 	// --- Returns : 
 	// --- Effect : Retrieves the text that a tooltip control maintains for a tool.
 	//              If pWnd and nIDTool specify a valid tool that has been previously
@@ -539,7 +539,7 @@ public:
 	//								information about the tool.
 	// --- Out :
 	// --- Returns:	TRUE if the point specified by the hit-test information is 
-	//				within the tool’s bounding rectangle; otherwise FALSE.
+	//				within the tool bounding rectangle; otherwise FALSE.
 	// --- Effect:	Returns TRUE if the given pt is in the windows toolinfo bounding 
 	//				rectangle (pt is in client coords relative to the parent window). 
 	//				If this function returns a TRUE, the structure pointed to by 

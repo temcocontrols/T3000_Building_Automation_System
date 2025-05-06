@@ -52,7 +52,7 @@ BOOL CARDDlg::OnInitDialog()
 	strIP.Format(_T("%d"), IPPort);
 	m_porteditor.SetWindowText(strIP);
     m_minipanel_comport.SetCurSel(0);
-	((CButton *)GetDlgItem(IDC_RADIO_NET_DEVICE))->SetCheck(TRUE);//选上
+	((CButton *)GetDlgItem(IDC_RADIO_NET_DEVICE))->SetCheck(TRUE);//
 	
     OnCbnDropdownComboProductName();
 	((CEdit*)GetDlgItem(IDC_EDIT_TYPE_ID))->SetReadOnly(TRUE);
@@ -243,7 +243,7 @@ void CARDDlg::OnBnClickedOk()
 	   temp_baud = L"19200";
 	   StrProtocol = _T("0");
    }
-   MODE_SUPPORT_PTRANSFER = 0; //暂时关闭;
+   MODE_SUPPORT_PTRANSFER = 0; //;
    if (is_open && (offline_mode == false))
    {
 
@@ -262,7 +262,7 @@ void CARDDlg::OnBnClickedOk()
            temp_info.serialnumber = test_array[0] + test_array[1] * 256 + test_array[2] * 256 * 256 + test_array[3] * 256 * 256 * 256;
            temp_info.product_type = test_array[7];
            temp_info.modbus_addr = test_array[6];
-           temp_info.panel_number = 0; //这里暂定0  
+           temp_info.panel_number = 0; //0  
            temp_info.software_version = 0;
            temp_info.hardware_version = 0;
            temp_info.device_id = 0;
@@ -638,7 +638,7 @@ int CARDDlg::GetNewSerialNumber()
 void CARDDlg::OnCbnSelchangeComboProductName()
 {
      	int sel = m_combox_productname.GetCurSel();
-	    if (sel == m_combox_productname.GetCount() -1)//最后一个New
+	    if (sel == m_combox_productname.GetCount() -1)//New
 	    {
 			GetDlgItem(IDC_PRODUCTNAME_EDITOR)->ShowWindow(TRUE);
 			 CString TypeID;

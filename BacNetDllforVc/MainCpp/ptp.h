@@ -41,7 +41,7 @@
 #define MAX_SEND_FRAMES             5
 
 
-#pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
+#pragma pack(push) // 
 #pragma pack(1)
 
 typedef struct {
@@ -239,7 +239,7 @@ typedef struct {
 
 
 
-#pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
+#pragma pack(push) // 
 #pragma pack(1)
 
 
@@ -257,7 +257,7 @@ typedef struct
 
 } UNITDATA_PARAMETERS;
 
-#pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
+#pragma pack(pop)// 
 
 //typedef struct {
 //	char 		status;

@@ -8,7 +8,7 @@
 #include "global_function.h"
 #include "MainFrm.h"
 
-extern tree_product selected_product_Node; // 选中的设备信息;
+extern tree_product selected_product_Node; // ;
 // CBacnetAlarmLog dialog
 
 IMPLEMENT_DYNAMIC(CBacnetAlarmLog, CDialogEx)
@@ -87,7 +87,7 @@ LRESULT  CBacnetAlarmLog::AlarmLogMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		memcpy_s(&m_alarmlog_data.at(pInvoke->mRow),sizeof(Alarm_point),&m_temp_alarmlog_data[pInvoke->mRow],sizeof(Alarm_point));//还原没有改对的值;
+		memcpy_s(&m_alarmlog_data.at(pInvoke->mRow),sizeof(Alarm_point),&m_temp_alarmlog_data[pInvoke->mRow],sizeof(Alarm_point));//;
 		PostMessage(WM_REFRESH_BAC_ALARMLOG_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
@@ -95,7 +95,7 @@ LRESULT  CBacnetAlarmLog::AlarmLogMessageCallBack(WPARAM wParam, LPARAM lParam)
 		//MessageBox(_T("Bacnet operation fail!"));
 	}
 
-	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
+	if((pInvoke->mRow%2)==0)	//  ;
 		m_alarmlog_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
 		m_alarmlog_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -127,14 +127,14 @@ BOOL CBacnetAlarmLog::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return 1; 
@@ -171,7 +171,7 @@ void CBacnetAlarmLog::Initial_List()
 		m_alarmlog_list.InsertItem(i,temp_item);
 
 
-		for (int x=0;x<ALARMLOG_COL_NUMBER;x++)//设置背景色，白灰间隔，看起来不那么累;
+		for (int x=0;x<ALARMLOG_COL_NUMBER;x++)//;
 		{
 			if((i%2)==0)
 				m_alarmlog_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
@@ -199,7 +199,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 	{
 		if(m_alarmlog_list.IsDataNewer((char *)&m_alarmlog_data.at(0),sizeof(Alarm_point) * BAC_ALARMLOG_COUNT))
 		{
-			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			//list ;List;
 			m_alarmlog_list.SetListData((char *)&m_alarmlog_data.at(0),sizeof(Alarm_point) * BAC_ALARMLOG_COUNT);
 		}
 		//else
@@ -232,7 +232,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 
 			time_t tempalarm_time ;
 			tempalarm_time = (unsigned int)m_alarmlog_data.at(i).alarm_time;
-			if((tempalarm_time < 1420041600)  || (tempalarm_time > 1735660800))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
+			if((tempalarm_time < 1420041600)  || (tempalarm_time > 1735660800))	// 2015-1-1  ->2049-12-30  ;
 			{
 				temp_time.Empty();
 			}
@@ -314,7 +314,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 void CBacnetAlarmLog::OnTimer(UINT_PTR nIDEvent)
 {
 	 
-	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  (this->m_hWnd  == ::GetActiveWindow())  )	//GSM连接时不要刷新;
+	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  (this->m_hWnd  == ::GetActiveWindow())  )	//GSM;
 	{
 		PostMessage(WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
 		if(bac_select_device_online)
@@ -351,7 +351,7 @@ void CBacnetAlarmLog::OnClickListAlarmlog(NMHDR *pNMHDR, LRESULT *pResult)
 	lCol = lvinfo.iSubItem;
 
 
-	if(lRow>m_alarmlog_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_alarmlog_list.GetItemCount()) //
 		return;
 	if(lRow<0)
 		return;
@@ -363,7 +363,7 @@ void CBacnetAlarmLog::OnClickListAlarmlog(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if(lCol == ALARMLOG_DEL)
 	{
-		if(m_alarmlog_data.at(lRow).ddelete == 1)	//如果已经是delete 了就不在变了;
+		if(m_alarmlog_data.at(lRow).ddelete == 1)	//delete ;
 			return;
 		CString temp_task_info;
 		CString New_CString;
@@ -468,7 +468,7 @@ void CBacnetAlarmLog::Reset_Alarm_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -476,7 +476,7 @@ void CBacnetAlarmLog::Reset_Alarm_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -518,14 +518,14 @@ void CBacnetAlarmLog::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return;
@@ -536,7 +536,7 @@ void CBacnetAlarmLog::OnSysCommand(UINT nID, LPARAM lParam)
 #include "BacnetEmailAlarm.h"
 void CBacnetAlarmLog::OnBnClickedButtonEmailAlarm()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
 #ifdef ENABLE_T3_EMAIL
     if (GetPrivateData_Blocking(g_bac_instance, READ_EMAIL_ALARM, 0, 0, sizeof(Str_Email_point)) < 0)
     {

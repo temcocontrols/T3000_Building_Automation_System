@@ -70,7 +70,7 @@ void CMulitithreadSocket::CloseServer()
 
 CMulitithreadSocket::CMulitithreadSocket()
 {
-    WSADATA wsaData;//存储SOCKET初始信息
+    WSADATA wsaData;//SOCKET
 
 	m_sSocket = NULL;
 	m_bConnected = FALSE;
@@ -118,7 +118,7 @@ BOOL CMulitithreadSocket::CreateServer(int port, int backlog)
 
 	struct	sockaddr_in local;
 
-	//创建监听socket
+	//socket
     m_sServer = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if(m_sServer == SOCKET_ERROR)
     {
@@ -126,7 +126,7 @@ BOOL CMulitithreadSocket::CreateServer(int port, int backlog)
         return FALSE;
     }
 
-	//添参数	
+	//	
 	local.sin_addr.s_addr = htonl(INADDR_ANY);
     local.sin_family = AF_INET;
     local.sin_port = htons(port);
@@ -138,7 +138,7 @@ BOOL CMulitithreadSocket::CreateServer(int port, int backlog)
         return FALSE;
     }
 
-	//开始侦听
+	//
     if(listen(m_sServer, backlog) != 0)
 	{
 		err = WSAGetLastError();
@@ -339,7 +339,7 @@ DWORD CALLBACK CMulitithreadSocket::ServerProc(LPVOID lpParm)
 		parac->lpDealFunc = lpDealFunc;
 		memcpy(parac->IP, IP, strlen(IP));	
 		parac->SourcePort =  ntohs(addr.sin_port);
-		//侦听到连接，开一个线程		
+		//		
         hThread = CreateThread(NULL, 0, DealProc, (LPVOID)(parac), 0, &dwThreadId);
 
 		if(hThread == NULL) delete parac;

@@ -69,7 +69,7 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	void Reset_Setting_Rect();
-	bool window_max; // 标记是否已经最大化;
+	bool window_max; // ;
 
 
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
@@ -77,8 +77,8 @@ public:
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	void InitScrollbar();
 	afx_msg void OnBnClickedButtonZoneSchedule();
-    int m_reboot_time_left; //用来记录reboot 的时间;
-    char m_tcp_type; //用于记录 IP地址是否是动态的，来判别是否有改变;
+    int m_reboot_time_left; //reboot ;
+    char m_tcp_type; // IP;
 
     void InitialTab();
     CTabCtrl m_setting_tab;

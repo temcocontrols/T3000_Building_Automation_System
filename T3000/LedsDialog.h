@@ -2,17 +2,17 @@
 
 #include "stdafx.h"
 #include "afxwin.h"
-// CLedsDialog 对话框
+// CLedsDialog 
 
 class CLedsDialog : public CDialog
 {
 	DECLARE_DYNAMIC(CLedsDialog)
 
 public:
-	CLedsDialog(CWnd* pParent = NULL);   // 标准构造函数
+	CLedsDialog(CWnd* pParent = NULL);   // 
 	virtual ~CLedsDialog();
 
-// 对话框数据
+// 
 	enum { IDD = IDD_LEDS_DIALOG };
 	int		m_address;
 	CString	m_led1_value;
@@ -23,7 +23,7 @@ public:
 	CString	m_led6_value;
 	CString	m_led7_value;
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持	
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 	
 
 	DECLARE_MESSAGE_MAP()
 public:

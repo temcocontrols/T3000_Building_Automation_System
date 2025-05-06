@@ -186,7 +186,7 @@ void CTstatFlashDlg::InitFromConfigFile()
 
 
 ////////////////////////////////////////////////////////////////////////////
-// 参数 BOOL, =TRUE replace the current line, =FALSE add a new line
+//  BOOL, =TRUE replace the current line, =FALSE add a new line
 void CTstatFlashDlg::UpdateStatusInfo(const CString& strInfo, BOOL bReplace)
 {
 	((CISPDlg*)GetParent())->UpdateStatusInfo(strInfo, bReplace);	
@@ -232,11 +232,11 @@ int CTstatFlashDlg::GetModbusID(vector<int>& szMdbIDs)
 			}
 			szMdbIDs.push_back(nID);
 		}
-		// 		else if(nPos == 0) // 在第一位
+		// 		else if(nPos == 0) // 
 		// 		{
 		// 		}
 
-		if (nPos < 0 || (nPos == strSrc.GetLength())) // 找不到或者位于最后一位
+		if (nPos < 0 || (nPos == strSrc.GetLength())) // 
 		{
 			return TRUE;
 		}
@@ -396,7 +396,7 @@ BOOL CTstatFlashDlg::FileValidation(const CString& strFileName)
 }
 
 
-// 验证输入的Modbus ID是有效的
+// Modbus ID
 BOOL CTstatFlashDlg::ValidMdbIDString()
 {
 	CString strModbusID;
@@ -473,7 +473,7 @@ void CTstatFlashDlg::FlashByCom()
 		int nRet = m_pComWriter->BeginWirteByCom();
 
 		// disable flash button
-		if (nRet != 0) // 表示开始写了
+		if (nRet != 0) // 
 		{
 			((CISPDlg*)GetParent())->EnableFlash(FALSE);
 		}
@@ -519,9 +519,9 @@ afx_msg LRESULT CTstatFlashDlg::OnReplaceStatusInfo(WPARAM wParam, LPARAM lParam
 
 LRESULT CTstatFlashDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 {
-	int nRet = lParam; // 线程中有消息弹出，这里就不弹了
+	int nRet = lParam; // 
 
-	// flash完了，释放资源
+	// flash
 	if (m_pComWriter)
 	{
 		delete m_pComWriter;

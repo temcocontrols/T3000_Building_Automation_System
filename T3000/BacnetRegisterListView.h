@@ -7,27 +7,27 @@
 #include "Excel\CWorksheet0.h" 
 #include "Excel\CWorksheets0.h"
 #include "afxcmn.h"
-// CBacnetRegisterListView 对话框
+// CBacnetRegisterListView 
 
 class CBacnetRegisterListView : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnetRegisterListView)
 
 public:
-	CBacnetRegisterListView(CWnd* pParent = NULL);   // 标准构造函数
+	CBacnetRegisterListView(CWnd* pParent = NULL);   // 
 	virtual ~CBacnetRegisterListView();
 
-// 对话框数据
+// 
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_REGISTER_LIST };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 
 	DECLARE_MESSAGE_MAP()
 public:
-    CString cs_clicked_cstring; //要修改的数据原始值;
+    CString cs_clicked_cstring; //;
     virtual BOOL OnInitDialog();
     virtual BOOL PreTranslateMessage(MSG* pMsg);
     void Test_Read_Excel();
@@ -45,7 +45,7 @@ public:
     int m_record_count;
     int m_max_reg;
     int m_third_party_db;
-    int m_device_mode; //如果是 第三方设备 则为1    
+    int m_device_mode; //  1    
     static DWORD WINAPI  ReadRegDataThreadfun(LPVOID lpVoid);
     void SetDeviceMode(int n_device_mode);
     afx_msg void OnClose();

@@ -133,7 +133,7 @@ Defs::SymStat ModbusViewWin8::Run()
 //void ModbusViewWin8::ExitSym()
 //{
 //	//ASSERT(running == false);
-//	//ResetPointer();               // schowanie strza³ki
+//	//ResetPointer();               // schowanie strzai
 //	//CMainFrame* main = (CMainFrame*) AfxGetApp()->main_wnd_;
 //	//  main->ShowRegisterBar(false);
 //}
@@ -211,16 +211,16 @@ CString ModbusViewWin8::GetLastStatMsg()
 //	//{
 //	//	CDebugLine dl;
 //	//	debug->GetLine(dl,org);
-//	//	//    ASSERT(dl.flags != Defs::DBG_EMPTY);      // brak wiersza odp. pocz¹tkowi programu
-//	//	SetPointer(dl.line,org);    // ustawienie strza³ki (->) przed aktualnym wierszem
+//	//	//    ASSERT(dl.flags != Defs::DBG_EMPTY);      // brak wiersza odp. poczkowi programu
+//	//	SetPointer(dl.line,org);    // ustawienie strzai (->) przed aktualnym wierszem
 //	//}
 //}
 
 
-//void ModbusViewWin8::SetPointer(const CLine &line, UINT16 addr) // ustawienie strza³ki (->) przed aktualnym wierszem
+//void ModbusViewWin8::SetPointer(const CLine &line, UINT16 addr) // ustawienie strzai (->) przed aktualnym wierszem
 //{
 	//POSITION posDoc= theApp.doc_deasm_template_->GetFirstDocPosition();
-	//while (posDoc != NULL)        // s¹ okna z deasemblera?
+	//while (posDoc != NULL)        // s okna z deasemblera?
 	//{
 	//	CDocument *doc= theApp.doc_deasm_template_->GetNextDoc(posDoc);
 	//	ASSERT(doc->IsKindOf(RUNTIME_CLASS(CDeasm6502Doc)));
@@ -231,13 +231,13 @@ CString ModbusViewWin8::GetLastStatMsg()
 	//if (fuid_last_view_ != line.file && ::IsWindow(last_view_))        // zmiana okna?
 	//{
 	//	if (LuaSrcView* view= dynamic_cast<LuaSrcView*>(CWnd::FromHandlePermanent(last_view_)))
-	//		SetPointer(view, -1, false);              // ukrycie strza³ki
+	//		SetPointer(view, -1, false);              // ukrycie strzai
 	//	last_view_ = 0;
 	//}
 	//if (!view && debug)
 	//{
 	//	if (const TCHAR* path= debug->GetFilePath(line.file))
-	//	{                                           // próba otwarcia dokumentu...
+	//	{                                           // pra otwarcia dokumentu...
 	//		StudioApp* app= static_cast<StudioApp*>( AfxGetApp() );
 	//		app->do_not_add_to_recent_file_list_ = true;
 	//		CDocument* doc= app->OpenDocumentFile(path);
@@ -252,11 +252,11 @@ CString ModbusViewWin8::GetLastStatMsg()
 	//}
 	//if (!view)
 	//{
-	//	//    ResetPointer();   // schowanie strza³ki, jeœli by³a
-	//	return;             // nie ma okna dokumentu zawieraj¹cego aktualny wiersz
+	//	//    ResetPointer();   // schowanie strzai, jei by
+	//	return;             // nie ma okna dokumentu zawierajego aktualny wiersz
 	//}
 
-	//SetPointer(view, line.ln, true);  // wymuszenie przesuniêcia zawartoœci okna, jeœli potrzeba
+	//SetPointer(view, line.ln, true);  // wymuszenie przesuniia zawartoi okna, jei potrzeba
 	//fuid_last_view_ = line.file;
 	//last_view_ = view->m_hWnd;
 //}
@@ -276,10 +276,10 @@ CString ModbusViewWin8::GetLastStatMsg()
 //}
 
 
-//void ModbusViewWin8::ResetPointer()   // schowanie strza³ki
+//void ModbusViewWin8::ResetPointer()   // schowanie strzai
 //{
 	//POSITION posDoc= theApp.doc_deasm_template_->GetFirstDocPosition();
-	//while (posDoc != NULL)        // s¹ okna z deasemblera?
+	//while (posDoc != NULL)        // s okna z deasemblera?
 	//{
 	//	if (CDeasm6502Doc* doc= dynamic_cast<CDeasm6502Doc*>( theApp.doc_deasm_template_->GetNextDoc(posDoc) ))
 	//		doc->SetPointer(-1,true);
@@ -288,7 +288,7 @@ CString ModbusViewWin8::GetLastStatMsg()
 	//if (fuid_last_view_)
 	//{
 	//	if (LuaSrcView* view= FindDocView(fuid_last_view_))
-	//		SetPointer(view, -1, false);    // zmazanie strza³ki
+	//		SetPointer(view, -1, false);    // zmazanie strzai
 	//}
 	//fuid_last_view_ = 0;
 //}

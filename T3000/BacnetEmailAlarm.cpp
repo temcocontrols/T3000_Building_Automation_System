@@ -1,4 +1,4 @@
-// BacnetEmailAlarm.cpp : 实现文件
+// BacnetEmailAlarm.cpp : 
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
-// CBacnetEmailAlarm 对话框
+// CBacnetEmailAlarm 
 
 IMPLEMENT_DYNAMIC(CBacnetEmailAlarm, CDialogEx)
 
@@ -32,13 +32,13 @@ BEGIN_MESSAGE_MAP(CBacnetEmailAlarm, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetEmailAlarm 消息处理程序
+// CBacnetEmailAlarm 
 
 
 void CBacnetEmailAlarm::OnBnClickedButton1()
 {
 #ifdef ENABLE_T3_EMAIL
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     CString cs_smtp_server;
     CString cs_smtp_port;
     CString cs_email_Address;
@@ -103,10 +103,10 @@ BOOL CBacnetEmailAlarm::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  在此添加额外的初始化
+    // TODO:  
     Fresh_UI();
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // 异常: OCX 属性页应返回 FALSE
+                  // : OCX  FALSE
 }
 
 void CBacnetEmailAlarm::Fresh_UI()
@@ -206,7 +206,7 @@ void CBacnetEmailAlarm::Fresh_UI()
 
 BOOL CBacnetEmailAlarm::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: 在此添加专用代码和/或调用基类
+    // TODO: /
 
     return CDialogEx::PreTranslateMessage(pMsg);
 }

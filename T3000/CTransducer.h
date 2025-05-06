@@ -2,14 +2,14 @@
 
 
 
-// CTransducer 窗体视图
+// CTransducer 
 
 class CTransducer : public CFormView
 {
 	DECLARE_DYNCREATE(CTransducer)
 
 public:
-	CTransducer();           // 动态创建所使用的受保护的构造函数
+	CTransducer();           // 
 	virtual ~CTransducer();
 
 public:
@@ -24,7 +24,7 @@ public:
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 
 	DECLARE_MESSAGE_MAP()
 public:

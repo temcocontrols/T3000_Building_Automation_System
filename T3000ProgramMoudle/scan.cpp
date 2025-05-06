@@ -38,7 +38,7 @@ void GetIPMaskGetWayForScan()
     pAdapterInfo = (PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO));
     ulOutBufLen = sizeof(IP_ADAPTER_INFO);
     ALL_LOCAL_SUBNET_NODE  Temp_Node;
-    // 第一次调用GetAdapterInfo获取ulOutBufLen大小
+    // GetAdapterInfoulOutBufLen
     if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
     {
         free(pAdapterInfo);
@@ -139,7 +139,7 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
         h_siBind.sin_addr.s_addr = inet_addr(local_network_ip);
         //	h_siBind.sin_port=
         h_siBind.sin_port = htons(57629);
-        if (-1 == bind(h_scan_Broad, (SOCKADDR*)&h_siBind, sizeof(h_siBind)))//把网卡地址强行绑定到Socket
+        if (-1 == bind(h_scan_Broad, (SOCKADDR*)&h_siBind, sizeof(h_siBind)))//Socket
         {
             continue;
         }
@@ -169,7 +169,7 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
 
         int time_out = 0;
         BOOL bTimeOut = FALSE;
-        while (!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
+        while (!bTimeOut)//!pScanner->m_bNetScanFinish)  // 
         {
             time_out++;
             if (time_out > 3)
@@ -230,7 +230,7 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
                             int n = 1;
                             BOOL bFlag = FALSE;
                             //////////////////////////////////////////////////////////////////////////
-                            // 检测IP重复
+                            // IP
                             DWORD dwValidIP = 0;
                             memcpy((BYTE*)&dwValidIP, pSendBuf + n, 4);
                             while (dwValidIP != END_FLAG)
@@ -249,7 +249,7 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
                             }
                             //////////////////////////////////////////////////////////////////////////
                             bFlag = FALSE;
-                            if (!bFlag)	//不判断 Ip是否重复，因为 Minipanel能挂载TSTAT的设备 会将底下的设备也回复过来;
+                            if (!bFlag)	// Ip MinipanelTSTAT ;
                             {
 
                                 AddNCToList(buffer, nRet, h_scan_siBind);
@@ -355,7 +355,7 @@ int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind)
         (my_temp_point[0] == my_temp_point[3]) &&
         (my_temp_point[0] != 0))
     {
-        //如果谁回复的父节点信息 4个字节都相同就认为是和Airlab一样 有Bug ,将回复的父节点清零确保能够在Tree中显示出来;
+        // 4Airlab Bug ,Tree;
         my_temp_point[0] = 0; my_temp_point[1] = 0; my_temp_point[2] = 0; my_temp_point[3] = 0;
     }
 
@@ -369,7 +369,7 @@ int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind)
     my_temp_point = my_temp_point + 20;
     temp_data.reg.object_instance_4 = *(my_temp_point++);
     temp_data.reg.object_instance_3 = *(my_temp_point++);
-    temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
+    temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0  0 bootload.
     temp_data.reg.bacnetip_port = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
     my_temp_point = my_temp_point + 2;
     temp_data.reg.hardware_info = *(my_temp_point++);
@@ -377,20 +377,20 @@ int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind)
 
     if (temp_data.reg.subnet_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
     {
-        //点击扫描，暂时忽略掉回复的BIP 转MSTP 时的加入数据库的操作;
+        //BIP MSTP ;
         return	 0;
     }
 
     if (temp_data.reg.isp_mode != 0)
     {
-        //记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
+        //, bootload.
         return	 0;
     }
     DWORD nSerial = temp_data.reg.serial_low + temp_data.reg.serial_low_2 * 256 + temp_data.reg.serial_low_3 * 256 * 256 + temp_data.reg.serial_low_4 * 256 * 256 * 256;
     CString nip_address;
     nip_address.Format(_T("%u.%u.%u.%u"), temp_data.reg.ip_address_1, temp_data.reg.ip_address_2, temp_data.reg.ip_address_3, temp_data.reg.ip_address_4);
     CString nproduct_name = GetProductName(temp_data.reg.product_id);
-    if (nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
+    if (nproduct_name.IsEmpty())	//  exit;
     {
         if (temp_data.reg.product_id < 220)
         {

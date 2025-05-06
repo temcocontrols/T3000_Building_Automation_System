@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Yabe")]
 [assembly: AssemblyProduct("LibBacnet")]
-[assembly: AssemblyCopyright("Copyright © Morten Kvistgaard 2015, MIT License")]
+[assembly: AssemblyCopyright("Copyright  Morten Kvistgaard 2015, MIT License")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

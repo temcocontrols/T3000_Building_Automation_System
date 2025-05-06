@@ -180,12 +180,12 @@ void CWriteSingle_BinaryDlg::OnBnClickedOk()
 	CString temp;
 	unsigned char rev_back_rawData[300],send_data[100];
 
-	if (m_base_0!=0)//”√
+	if (m_base_0!=0)//
 	{
 		--m_address;
 	} 
 	
-	if (m_function)//∂‡–¥
+	if (m_function)//
 	{
 	 
 		 
@@ -231,7 +231,7 @@ void CWriteSingle_BinaryDlg::OnBnClickedOk()
 		} 
 
 	} 
-	else//µ•–¥
+	else//
 	{
 
 		

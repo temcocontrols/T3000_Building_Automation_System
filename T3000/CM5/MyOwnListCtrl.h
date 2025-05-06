@@ -44,18 +44,18 @@ style|=LVS_REPORT;
 style|=LVS_EX_CHECKBOXES;
 
 m_list_control.SetExtendedStyle(style);
-SetWindowLong(m_list_control.m_hWnd,GWL_STYLE,style);//list_infomation.m_hWnd´°¿ÚµÄ¾ä±ú    GWL_STYLEÉèÖÃÒ»¸öÐÂµÄ´°ÌåÀàÐÍ
+SetWindowLong(m_list_control.m_hWnd,GWL_STYLE,style);//list_infomation.m_hWnd    GWL_STYLE
 DWORD dwstyle=m_list_control.GetExtendedStyle();
-dwstyle|=LVS_EX_FULLROWSELECT; //µ±ItemÖÐµÄÒ»¸ö±»Ñ¡ÖÐµÄÊ±ºò£¬Õû¸öItem¶¼»á±»Ñ¡ÖÐ
-dwstyle|=LVS_EX_GRIDLINES;     //ÔÚItem ºÍ subitemsÖÐ ÏÔÊ¾Íø¸ñ
+dwstyle|=LVS_EX_FULLROWSELECT; //ItemItem
+dwstyle|=LVS_EX_GRIDLINES;     //Item  subitems 
 m_list_control.SetExtendedStyle(dwstyle);
-m_list_control.InsertColumn(ML_CHOOSE,_T("選擇"),LVCFMT_CENTER,50);  
-//m_list_control.InsertColumn(1,_T("序列"),LVCFMT_CENTER,50);                //ÐÂÔöcolumn  ¾ÓÖÐÏÔÊ¾   ¿í¶È50
-m_list_control.InsertColumn(ML_NAME,_T("名稱"),LVCFMT_CENTER,200);
-m_list_control.InsertColumn(ML_SERVERPATH,_T("服務器路徑"),LVCFMT_CENTER,200);
-m_list_control.InsertColumn(ML_EXECUTE_RESALT,_T("執行結果"),LVCFMT_CENTER,100);
+m_list_control.InsertColumn(ML_CHOOSE,_T("),LVCFMT_CENTER,50);  
+//m_list_control.InsertColumn(1,_T("),LVCFMT_CENTER,50);                //olumn    0
+m_list_control.InsertColumn(ML_NAME,_T("),LVCFMT_CENTER,200);
+m_list_control.InsertColumn(ML_SERVERPATH,_T("LVCFMT_CENTER,200);
+m_list_control.InsertColumn(ML_EXECUTE_RESALT,_T(",LVCFMT_CENTER,100);
 
-m_list_control.InsertColumn(ML_SURPPORT_AUTOINSTALL,_T("支持自動安裝"),LVCFMT_CENTER,120);
+m_list_control.InsertColumn(ML_SURPPORT_AUTOINSTALL,_T("LVCFMT_CENTER,120);
 //SurpportAutoInstall
 //m_list_control.InsertColumn(5,_T("444"),LVCFMT_CENTER,100);
 m_list_control.SetTextColor(RGB(0,0,255));

@@ -18,7 +18,7 @@ CMultiThumbOpt::~CMultiThumbOpt(void)
 }
 
 
-// 设置Thumb的个数
+// Thumb
 void CMultiThumbOpt::SetThumbNum(int nThumbNum)
 {
 	ASSERT( nThumbNum > 1);
@@ -114,7 +114,7 @@ void CMultiThumbOpt::SetThumbColor(COLORREF clr)
 		m_szThumb[i]->SetColor(clr);
 	}
 
-	//m_szThumb[0]->SetColor(RGB(0,0,128));  //改变下面那个滑块的颜色
+	//m_szThumb[0]->SetColor(RGB(0,0,128));  //
 	m_szThumb[0]->SetColor(RGB(255,0,0)); 
 }
 
@@ -173,9 +173,9 @@ void CMultiThumbOpt::MovePage(const CPoint& pt)
 	}
 	else
 	{
-		if (pt.y > ptPos.y)  // move down, 向下
+		if (pt.y > ptPos.y)  // move down, 
 		{
-			nNewPosition = nPosition-m_nLengthOfPage; // 向下是减 
+			nNewPosition = nPosition-m_nLengthOfPage; //  
 
 			if(nNewPosition <= nMin)
 			{				
@@ -231,7 +231,7 @@ void CMultiThumbOpt::OnLButtonDown(const CPoint& point)
 }
 
 
-// 下一步，大的数值
+// 
 void CMultiThumbOpt::MoveNextStep()
 {
 	/*
@@ -260,7 +260,7 @@ void CMultiThumbOpt::MoveNextStep()
 }
 
 
-// 上一步，小的数值
+// 
 void CMultiThumbOpt::MovePreStep()
 {
 	/*
@@ -356,7 +356,7 @@ void CMultiThumbOpt::OnMouseMove(const CPoint& point)
 
 			int nTemp = nPixMin;
 			nPixMin = nPixMax;
-			nPixMax = nTemp;     // 交换一下，
+			nPixMax = nTemp;     // 
 
 			ptNewPS.y = point.y;
 
@@ -524,7 +524,7 @@ int CMultiThumbOpt::GetThumbPosition()
 
 void CMultiThumbOpt::SetThumbPosition(int nIndex, int nPosition)
 {	
-	if (nPosition >= (int)m_szTicMarks->size())   // 超过刻度那么裁减掉
+	if (nPosition >= (int)m_szTicMarks->size())   // 
 	{
 		nPosition = m_szTicMarks->size()-1;
 	}
@@ -549,7 +549,7 @@ int CMultiThumbOpt::GetFocusThumb(const CPoint& point)
 }
 
 
-// 返回的都是可以到达的位置，而不是不能到达的位置（即重合位置）。
+// 
 void CMultiThumbOpt::GetThumbRange(int nIndex, int& nMin, int& nMax)
 {			
 	if (m_nFocusThumb == 0)

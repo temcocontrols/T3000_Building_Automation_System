@@ -6,20 +6,20 @@
 #include "afxwin.h"
 #include "schedule.h"
 
-// CConfig_Routines 对话框
+// CConfig_Routines 
 
 class CConfig_Routines : public CDialog
 {
 	DECLARE_DYNAMIC(CConfig_Routines)
 public:
-	CConfig_Routines(CWnd* pParent = NULL,CString strtype = _T(""));   // 标准构造函数
+	CConfig_Routines(CWnd* pParent = NULL,CString strtype = _T(""));   // 
 	virtual ~CConfig_Routines();
 
-// 对话框数据
+// 
 	enum { IDD = IDD_CONFIG_ROUTINES };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 public:
 	//add function by manual
 	int m_sn;

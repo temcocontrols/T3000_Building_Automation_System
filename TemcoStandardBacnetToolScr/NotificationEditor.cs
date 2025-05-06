@@ -310,7 +310,7 @@ namespace TemcoStandardBacnetTool
             base.Dispose(disposing);
         }
 
-        #region Code généré par le Concepteur de composants
+        #region Code gnr par le Concepteur de composants
 
         private void InitializeComponent()
         {

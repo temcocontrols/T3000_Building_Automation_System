@@ -425,7 +425,7 @@ void CAutoRichEditCtrl::SetNumberDefaultTex(COLORREF crf)
  		cf.yHeight = nPointSize;
  		cf.dwMask = CFM_SIZE;
 		 
-		//strcpy(cf.szFaceName ,_T("Arial"));//ÉèÖÃ×ÖÌå
+		//strcpy(cf.szFaceName ,_T("Arial"));//
 		memcpy(&cf.szFaceName,"Arial",sizeof(cf.szFaceName));
  		SetSelectionCharFormat(cf);
 

@@ -7,7 +7,7 @@ using namespace std;
 
 #define TRUE_OR_FALSE	true
 #define SLEEP_TIME		50
-//#define  LATENCY_TIME_COM	60      // 串口延迟，必须600，设为500或更小时，通过NC scan TStat容易失败
+//#define  LATENCY_TIME_COM	60      // 600500NC scan TStat
 //#define  LATENCY_TIME_NET	100
 
 extern TS_US LATENCY_TIME_COM ;
@@ -17,10 +17,10 @@ extern  TS_US LATENCY_TIME_NET ;
 CString g_cs_com_section_mulwrite = _T("Write");
 CString g_cs_com_section_read = _T("Read");
  
-extern HANDLE m_hSerial;//串口句柄
+extern HANDLE m_hSerial;//
 extern HANDLE m_com_h_serial[100];
-extern OVERLAPPED m_com_osRead[100], m_com_osWrite[100], m_com_osMulWrite[100]; // 用于多线程同时重叠读/写
-extern OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // 用于重叠读/写
+extern OVERLAPPED m_com_osRead[100], m_com_osWrite[100], m_com_osMulWrite[100]; // /
+extern OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // /
 extern TS_UC  gval[13];//the data that get from com
 extern TS_UC  serinumber_in_dll[4];//only read_one function ,when read 10,
 extern TS_UC  pval[13];//the data that send from com
@@ -34,7 +34,7 @@ static int old_or_new_scan_protocal_in_dll=1;//1==new protocal;2==old protocal
 extern 	SOCKET m_hSocket;
 extern SOCKET m_bip_socket;
 extern  SOCKET m_hSocket_for_list;
-extern 	SOCKET m_tcp_hSocket[256];  //用于多线程扫描
+extern 	SOCKET m_tcp_hSocket[256];  //
 int g_Commu_type=0;//0:serial modus//
 CString last_connected_ip;
 int last_connected_port = 0;
@@ -108,7 +108,7 @@ OUTPUT void close_com_nocritical(int ncomport)
     {
         if (m_com_h_serial[ncomport] != NULL)
         {
-            //关闭串口
+            //
             CloseHandle(m_com_h_serial[ncomport]);
             m_com_h_serial[ncomport] = NULL;
         }
@@ -133,7 +133,7 @@ OUTPUT void close_com()
     {
         if(m_hSerial != NULL)
         {
-            //关闭串口
+            //
             CloseHandle(m_hSerial);
             m_hSerial = NULL;
         }
@@ -163,7 +163,7 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         if(devLo<1 || devHi>254)
             return -5;
@@ -172,7 +172,7 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[6];
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = 255;
         pval[1] = 25;  //put comments here,
         pval[2] = devHi;
@@ -196,17 +196,17 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-        int fState=WriteFile(m_hSerial,// 句柄
-                             pval,// 数据缓冲区地址
-                             6,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             pval,// 
+                             6,// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -226,17 +226,17 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,// 数据缓冲区地址
-                        13,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        gval,// 
+                        13,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -337,7 +337,7 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
 
         if(devLo<1 || devHi>254)
@@ -348,7 +348,7 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 
         TS_UC  pval[10];
         //	TS_US crc;
-        //	DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //	DWORD m_had_send_data_number;//
         pval[0]=1;
         pval[1]=2;
         pval[2]=3;
@@ -464,7 +464,7 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -523,7 +523,7 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -584,7 +584,7 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 OUTPUT bool Change_BaudRate_NoCretical(int new_baudrate,int ncomport)
 {
 
-    ///配置串口
+    ///
     //if(new_baudrate!=9600 && new_baudrate!=19200)
     //	return false;
     BOOL iscorrect = FALSE;
@@ -606,7 +606,7 @@ OUTPUT bool Change_BaudRate_NoCretical(int new_baudrate,int ncomport)
     //    baudrate_in_dll = new_baudrate;
     DCB  PortDCB;
     PortDCB.DCBlength = sizeof(DCB);
-    // 默认串口参数
+    // 
     int i = 0;
     bool successful = false;//true==do it success;false==do it failure
     for (i = 0;i < 10;i++)
@@ -634,7 +634,7 @@ OUTPUT bool Change_BaudRate_NoCretical(int new_baudrate,int ncomport)
     for (i = 0;i<10;i++)
         if (SetCommState(m_com_h_serial[ncomport], &PortDCB))
         {
-            ///L"配置串口失败";
+            ///L"";
             successful = true;
             break;
         }
@@ -645,7 +645,7 @@ OUTPUT bool Change_BaudRate_NoCretical(int new_baudrate,int ncomport)
 OUTPUT bool Change_BaudRate(int new_baudrate)
 {
 
-    ///配置串口
+    ///
     //if(new_baudrate!=9600 && new_baudrate!=19200)
     //	return false;
     BOOL iscorrect= FALSE;
@@ -667,7 +667,7 @@ OUTPUT bool Change_BaudRate(int new_baudrate)
         baudrate_in_dll=new_baudrate;
     DCB  PortDCB;    
     PortDCB.DCBlength = sizeof(DCB); 
-    // 默认串口参数
+    // 
     int i=0;
     bool successful=false;//true==do it success;false==do it failure
     for(i=0;i<10;i++)
@@ -688,7 +688,7 @@ OUTPUT bool Change_BaudRate(int new_baudrate)
         for(i=0;i<10;i++)
             if(SetCommState(m_hSerial, &PortDCB))
             {
-                ///L"配置串口失败";
+                ///L"";
                 successful=true;
                 break;
             }
@@ -732,14 +732,14 @@ OUTPUT bool Open_Socket(CString strIPAdress)
     sockaddr_in servAddr;
     servAddr.sin_family = AF_INET;
     servAddr.sin_port = htons(6001);
-    // 注意，这里要填写服务器程序（TCPServer程序）所在机器的IP地址
+    // TCPServerIP
     //servAddr.sin_addr.S_un.S_addr =inet_addr("192.168.0.28");
     servAddr.sin_addr.S_un.S_addr =inet_addr((LPSTR)(LPCTSTR)strIPAdress);
     //	u_long ul=1;
     //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-    //发送时限
+    //
     setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
-    //接收时限
+    //
     setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
     if(::connect(m_hSocket,(sockaddr*)&servAddr, sizeof(servAddr)) == -1)
     {
@@ -796,27 +796,27 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
     servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
     //	u_long ul=1;
     //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-    //发送时限
+    //
     setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
-    //接收时限
+    //
     setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
     BOOL bDontLinger = FALSE;
-    setsockopt(m_hSocket, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));  //20200214 新增直接关闭套接字
+    setsockopt(m_hSocket, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));  //20200214 
     //****************************************************************************
-    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 
-    //改为非阻塞的 2.5秒后还没连接上就 算连接失败;
+    // Fance added ,  10 
+    // 2.5 ;
     int error = -1;
     int len;
     len = sizeof(int);
     timeval tm;
     fd_set set;
     unsigned long ul = 1;
-    ioctlsocket(m_hSocket, FIONBIO, &ul); //设置为非阻塞模式
+    ioctlsocket(m_hSocket, FIONBIO, &ul); //
     bool ret = false;
     if( connect(m_hSocket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
     {
-        tm.tv_sec = 4;//4s 如果连接不上就 算失败 ，不要重新retry了;
+        tm.tv_sec = 4;//4s   retry;
         tm.tv_usec = 0;
         FD_ZERO(&set);
         FD_SET(sockfd, &set);
@@ -837,7 +837,7 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
     }
     else ret = true;
     ul = 0;
-    ioctlsocket(sockfd, FIONBIO, &ul); //设置为阻塞模式
+    ioctlsocket(sockfd, FIONBIO, &ul); //
     //****************************************************************************
 
     if(ret)
@@ -910,25 +910,25 @@ OUTPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort,int ninde
     servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
     //	u_long ul=1;
     //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-    //发送时限
+    //
     setsockopt(m_hSocket, SOL_SOCKET, SO_SNDTIMEO, (char *)&nNetTimeout, sizeof(int));
-    //接收时限
+    //
     setsockopt(m_hSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int));
 
     //****************************************************************************
-    // Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒
-    //改为非阻塞的 2.5秒后还没连接上就 算连接失败;
+    // Fance added ,  10
+    // 2.5 ;
     int error = -1;
     int len;
     len = sizeof(int);
     timeval tm;
     fd_set set;
     unsigned long ul = 1;
-    ioctlsocket(m_hSocket, FIONBIO, &ul); //设置为非阻塞模式
+    ioctlsocket(m_hSocket, FIONBIO, &ul); //
     bool ret = false;
     if (connect(m_hSocket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
     {
-        tm.tv_sec = 4;//4.5s 如果连接不上就 算失败 ，不要重新retry了;
+        tm.tv_sec = 4;//4.5s   retry;
         tm.tv_usec = 0;
         FD_ZERO(&set);
         FD_SET(sockfd, &set);
@@ -949,7 +949,7 @@ OUTPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort,int ninde
     }
     else ret = true;
     ul = 0;
-    ioctlsocket(sockfd, FIONBIO, &ul); //设置为阻塞模式
+    ioctlsocket(sockfd, FIONBIO, &ul); //
                                        //****************************************************************************
 
     if (ret)
@@ -978,11 +978,11 @@ OUTPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort,int ninde
 
 
 ////////////////////////////////////////////////////////////////////////////
-// Connect 分为两种情况：
-// 1，串口打开工作正常，但是设备通信失败（断电，掉线等等）。
-// 表现为对串口操作正常，但是没有通信数据。
-// 2，串口打开失败或工作不正常（USB串口拔出，占用等等）。
-// 表现为无法操作串口。
+// Connect 
+// 1
+// 
+// 2USB
+// 
 
 OUTPUT bool is_connect()
 {
@@ -1045,7 +1045,7 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSerial==NULL)
         {
             return -1;
@@ -1065,17 +1065,17 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// 句柄
-                             data_to_write,// 数据缓冲区地址
-                             length*2+9,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             data_to_write,// 
+                             length*2+9,// 
+                             &m_had_send_data_number,// 
                              &m_osMulWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -1090,17 +1090,17 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,// 数据缓冲区地址
-                        8,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        gval,// 
+                        8,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -1161,7 +1161,7 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
 //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -1172,7 +1172,7 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                     Open_Socket2(last_connected_ip, last_connected_port);
@@ -1188,9 +1188,9 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
     }
     return -1;
 }
-OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_address,TS_US length,//参数命令部分
-                                 unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, //发送和接受的原始数据
-                                 int* sendDataLength, int* recvDataLength) //发送和接受数据长度
+OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_address,TS_US length,//
+                                 unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, //
+                                 int* sendDataLength, int* recvDataLength) //
 {
     if(g_Commu_type==0)//
     {
@@ -1243,7 +1243,7 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSerial==NULL)
         {
             return -1;
@@ -1261,17 +1261,17 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// 句柄
-                             data_to_write,// 数据缓冲区地址
-                             length*2+9,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             data_to_write,// 
+                             length*2+9,// 
+                             &m_had_send_data_number,// 
                              &m_osMulWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -1286,17 +1286,17 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,// 数据缓冲区地址
-                        8,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        gval,// 
+                        8,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -1368,7 +1368,7 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
 //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -1379,7 +1379,7 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                 {
@@ -1407,9 +1407,9 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
     }
     return -1;
 }
-OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start_address, TS_US length,//参数命令部分
-	unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here, //发送和接受的原始数据
-	int* sendDataLength, int* recvDataLength) //发送和接受数据长度
+OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start_address, TS_US length,//
+	unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here, //
+	int* sendDataLength, int* recvDataLength) //
 {
 	unsigned short ToSendData[16];
 	int DataLength = 0;
@@ -1425,7 +1425,7 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 	bitset<8> BitReg;
 	for (int index = 0;index< DataLength;index++)
 	{
-		//初始化BitReg
+		//BitReg
 		for (int i=0;i<8;i++)
 		{
 			BitReg[i] = false;
@@ -1491,7 +1491,7 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		hc = LoadCursor(NULL, IDC_WAIT);
 		hc = SetCursor(hc);
 		//length is the data length,if you want to write 128 bite,the length == 128
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//
 		if (m_hSerial == NULL)
 		{
 			return -1;
@@ -1509,17 +1509,17 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		m_osMulWrite.Offset = 0;
 		m_osMulWrite.OffsetHigh = 0;
 		///////////////////////////////////////////////////////send the to read message
-		int fState = WriteFile(m_hSerial,// 句柄
-			data_to_write,// 数据缓冲区地址
-			length * 2 + 9,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		int fState = WriteFile(m_hSerial,// 
+			data_to_write,// 
+			length * 2 + 9,// 
+			&m_had_send_data_number,// 
 			&m_osMulWrite);
-		if (!fState)// 不支持重叠
+		if (!fState)// 
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 
 			}
 			else
 				m_had_send_data_number = 0;
@@ -1534,17 +1534,17 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		m_osRead.OffsetHigh = 0;
 		Sleep(LATENCY_TIME_COM);
 		////////////////////////////////////////////////clear com error
-		fState = ReadFile(m_hSerial,// 句柄
-			gval,// 数据缓冲区地址
-			8,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		fState = ReadFile(m_hSerial,// 
+			gval,// 
+			8,// 
+			&m_had_send_data_number,// 
 			&m_osRead);
-		if (!fState)// 不支持重叠
+		if (!fState)// 
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 
 			}
 			else
 				m_had_send_data_number = 0;
@@ -1616,7 +1616,7 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		hc = LoadCursor(NULL, IDC_WAIT);
 		hc = SetCursor(hc);
 		//length is the data length,if you want to write 128 bite,the length == 128
-		//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		//		DWORD m_had_send_data_number;//
 		if (m_hSocket == INVALID_SOCKET)
 		{
 			return -1;
@@ -1658,13 +1658,13 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //清空串口缓冲区
+        //
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 3;
         pval[2] = address>>8 & 0xFF ;
@@ -1693,17 +1693,17 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         m_osWrite.Offset = 0;
         m_osWrite.OffsetHigh = 0;
 
-        int fState=WriteFile(m_hSerial,// 句柄
-                             pval,	// 数据缓冲区地址
-                             8,		// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             pval,	// 
+                             8,		// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_PENDING)
                 //				AfxMessageBox("wrong1");
             }
@@ -1723,26 +1723,26 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         if(address==10)
         {
             serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            11,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            11,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
         else
         {
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            7,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            7,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -1802,7 +1802,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //清空串口缓冲区
+        //
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
 
@@ -1836,7 +1836,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //TS_US crc;
-        //DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //DWORD m_had_send_data_number;//
 
         pval[0] = device_var;
         pval[1] = 3;
@@ -1881,7 +1881,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                 {
@@ -1945,7 +1945,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
             }
         }
         nTemp = gval[3];
-        //2018 09 26 Fandu  屏蔽
+        //2018 09 26 Fandu  
         //if(nTemp==255)
         //    nTemp=-1;
         return (gval[3] * 256 + gval[4]);
@@ -1966,13 +1966,13 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //清空串口缓冲区
+        //
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 3;
         pval[2] = address>>8 & 0xFF ;
@@ -2007,17 +2007,17 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
             *((char*)put_senddate_into_here + i) = pval[i];
         }
 
-        int fState=WriteFile(m_hSerial,// 句柄
-                             pval,	// 数据缓冲区地址
-                             8,		// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             pval,	// 
+                             8,		// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_PENDING)
                 //				AfxMessageBox("wrong1");
             }
@@ -2037,26 +2037,26 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
         if(address==10)
         {
             serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            11,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            11,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
         else
         {
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            7,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            7,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -2123,7 +2123,7 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //清空串口缓冲区
+        //
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
 
@@ -2177,7 +2177,7 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //TS_US crc;
-        //DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //DWORD m_had_send_data_number;//
 
         pval[0] = device_var;
         pval[1] = 3;
@@ -2303,14 +2303,14 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for (int i = 0; i <= 11; i++)
             gval[i] = 0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address >> 8 & 0xFF;
@@ -2366,10 +2366,10 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         Sleep(50);
         if (address != 10)
         {
-            fState = WriteFile(m_hSerial,// 句柄
-                pval,// 数据缓冲区地址
-                8,// 数据大小
-                &m_had_send_data_number,// 返回发送出去的字节数
+            fState = WriteFile(m_hSerial,// 
+                pval,// 
+                8,// 
+                &m_had_send_data_number,// 
                 &m_osWrite);
         }
         else
@@ -2378,28 +2378,28 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
             if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
             {
                 //old protocal
-                fState = WriteFile(m_hSerial,// 句柄
-                    pval,// 数据缓冲区地址
-                    8,// 数据大小
-                    &m_had_send_data_number,// 返回发送出去的字节数
+                fState = WriteFile(m_hSerial,// 
+                    pval,// 
+                    8,// 
+                    &m_had_send_data_number,// 
                     &m_osWrite);
             }
             else
             {
                 //new protocal
-                fState = WriteFile(m_hSerial,// 句柄
-                    pval,// 数据缓冲区地址
-                    12,// 数据大小
-                    &m_had_send_data_number,// 返回发送出去的字节数
+                fState = WriteFile(m_hSerial,// 
+                    pval,// 
+                    12,// 
+                    &m_had_send_data_number,// 
                     &m_osWrite);
             }
         }
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 
                                                                                                    //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                                                                                                    //				AfxMessageBox("wrong1");
             }
@@ -2418,10 +2418,10 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         Sleep(LATENCY_TIME_COM);
         if (address != 10)
         {
-            fState = ReadFile(m_hSerial,// 句柄
-                gval,// 数据缓冲区地址
-                8,// 数据大小
-                &m_had_send_data_number,// 返回发送出去的字节数
+            fState = ReadFile(m_hSerial,// 
+                gval,// 
+                8,// 
+                &m_had_send_data_number,// 
                 &m_osRead);
         }
         else
@@ -2429,28 +2429,28 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
             if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
             {
                 //old protocal
-                fState = ReadFile(m_hSerial,// 句柄
-                    gval,// 数据缓冲区地址
-                    8,// 数据大小
-                    &m_had_send_data_number,// 返回发送出去的字节数
+                fState = ReadFile(m_hSerial,// 
+                    gval,// 
+                    8,// 
+                    &m_had_send_data_number,// 
                     &m_osRead);
             }
             else
             {
                 //new protocal
-                fState = ReadFile(m_hSerial,// 句柄
-                    gval,// 数据缓冲区地址
-                    12,// 数据大小
-                    &m_had_send_data_number,// 返回发送出去的字节数
+                fState = ReadFile(m_hSerial,// 
+                    gval,// 
+                    12,// 
+                    &m_had_send_data_number,// 
                     &m_osRead);
             }
         }
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -2501,7 +2501,7 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -2527,7 +2527,7 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         data[3] = 0;
         data[4] = 0;
         data[5] = 6;
-        //		DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //		DWORD m_had_send_data_number;//
         data[6] = device_var;
         data[7] = 6;
         data[8] = address >> 8 & 0xFF;
@@ -2559,7 +2559,7 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         for (int i = 0; i <= 11; i++)
             gval[i] = 0;/////////////////////////////////////////clear buffer
                         //	TS_US crc;
-                        //	DWORD m_had_send_data_number;//已经发送的数据的字节数
+                        //	DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address >> 8 & 0xFF;
@@ -2581,7 +2581,7 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         if (nRet < 0)	//Add by Fance ,if device is dosconnected , we need to connect the device again;
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                     Open_Socket2_multy_thread(last_connected_ip, last_connected_port, nindex);
@@ -2647,14 +2647,14 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -2710,10 +2710,10 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         Sleep(50);
         if(address!=10)
         {
-            fState=WriteFile(m_hSerial,// 句柄
-                             pval,// 数据缓冲区地址
-                             8,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+            fState=WriteFile(m_hSerial,// 
+                             pval,// 
+                             8,// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
         }
         else
@@ -2722,28 +2722,28 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=WriteFile(m_hSerial,// 句柄
-                                 pval,// 数据缓冲区地址
-                                 8,// 数据大小
-                                 &m_had_send_data_number,// 返回发送出去的字节数
+                fState=WriteFile(m_hSerial,// 
+                                 pval,// 
+                                 8,// 
+                                 &m_had_send_data_number,// 
                                  &m_osWrite);
             }
             else
             {
                 //new protocal
-                fState=WriteFile(m_hSerial,// 句柄
-                                 pval,// 数据缓冲区地址
-                                 12,// 数据大小
-                                 &m_had_send_data_number,// 返回发送出去的字节数
+                fState=WriteFile(m_hSerial,// 
+                                 pval,// 
+                                 12,// 
+                                 &m_had_send_data_number,// 
                                  &m_osWrite);
             }
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -2762,10 +2762,10 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         Sleep(LATENCY_TIME_COM);
         if(address!=10)
         {
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            8,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            8,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
         else
@@ -2773,28 +2773,28 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=ReadFile(m_hSerial,// 句柄
-                                gval,// 数据缓冲区地址
-                                8,// 数据大小
-                                &m_had_send_data_number,// 返回发送出去的字节数
+                fState=ReadFile(m_hSerial,// 
+                                gval,// 
+                                8,// 
+                                &m_had_send_data_number,// 
                                 &m_osRead);
             }
             else
             {
                 //new protocal
-                fState=ReadFile(m_hSerial,// 句柄
-                                gval,// 数据缓冲区地址
-                                12,// 数据大小
-                                &m_had_send_data_number,// 返回发送出去的字节数
+                fState=ReadFile(m_hSerial,// 
+                                gval,// 
+                                12,// 
+                                &m_had_send_data_number,// 
                                 &m_osRead);
             }
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -2843,7 +2843,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -2869,7 +2869,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         data[3]=0;
         data[4]=0;
         data[5]=6;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         data[6] = device_var;
         data[7] = 6;
         data[8] = address>>8 & 0xFF ;
@@ -2901,7 +2901,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //	TS_US crc;
-        //	DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //	DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -2916,7 +2916,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         for(int i=0;i<=11;i++)
         	gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -3025,14 +3025,14 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -3094,10 +3094,10 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
                 *((char*)put_senddate_into_here + i) = pval[i];
             }
 
-            fState=WriteFile(m_hSerial,// 句柄
-                             pval,// 数据缓冲区地址
-                             8,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+            fState=WriteFile(m_hSerial,// 
+                             pval,// 
+                             8,// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
         }
         else
@@ -3111,10 +3111,10 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
                 {
                     *((char*)put_senddate_into_here + i) = pval[i];
                 }
-                fState=WriteFile(m_hSerial,// 句柄
-                                 pval,// 数据缓冲区地址
-                                 8,// 数据大小
-                                 &m_had_send_data_number,// 返回发送出去的字节数
+                fState=WriteFile(m_hSerial,// 
+                                 pval,// 
+                                 8,// 
+                                 &m_had_send_data_number,// 
                                  &m_osWrite);
             }
             else
@@ -3126,19 +3126,19 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
                     *((char*)put_senddate_into_here + i) = pval[i];
                 }
 
-                fState=WriteFile(m_hSerial,// 句柄
-                                 pval,// 数据缓冲区地址
-                                 12,// 数据大小
-                                 &m_had_send_data_number,// 返回发送出去的字节数
+                fState=WriteFile(m_hSerial,// 
+                                 pval,// 
+                                 12,// 
+                                 &m_had_send_data_number,// 
                                  &m_osWrite);
             }
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -3158,10 +3158,10 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         Sleep(LATENCY_TIME_COM);
         if(address!=10)
         {
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            8,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            8,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
         else
@@ -3169,28 +3169,28 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=ReadFile(m_hSerial,// 句柄
-                                gval,// 数据缓冲区地址
-                                8,// 数据大小
-                                &m_had_send_data_number,// 返回发送出去的字节数
+                fState=ReadFile(m_hSerial,// 
+                                gval,// 
+                                8,// 
+                                &m_had_send_data_number,// 
                                 &m_osRead);
             }
             else
             {
                 //new protocal
-                fState=ReadFile(m_hSerial,// 句柄
-                                gval,// 数据缓冲区地址
-                                12,// 数据大小
-                                &m_had_send_data_number,// 返回发送出去的字节数
+                fState=ReadFile(m_hSerial,// 
+                                gval,// 
+                                12,// 
+                                &m_had_send_data_number,// 
                                 &m_osRead);
             }
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -3246,7 +3246,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -3282,7 +3282,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         data[3]=g_data_to_send[3];
         data[4]=g_data_to_send[4];
         data[5]=g_data_to_send[5];
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         data[6] = device_var;
         data[7] = 6;
         data[8] = address>>8 & 0xFF ;
@@ -3314,7 +3314,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //	TS_US crc;
-        //	DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //	DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -3329,7 +3329,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         for(int i=0;i<=11;i++)
         	gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -3446,14 +3446,14 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 		//val         the value that you want to write to the register
 		//the return value == -1 ,no connecting
 		//the return value == -3 , no response
-		//清空串口缓冲区
+		//
 
 		//		gval[8]={'\0'};//the data that get
 		//      TS_UC  pval[9];
 		for (int i = 0; i <= 11; i++)
 			gval[i] = 0;/////////////////////////////////////////clear buffer
 		TS_US crc;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//
 		pval[0] = device_var;
 		pval[1] = 5;
 		pval[2] = address >> 8 & 0xFF;
@@ -3498,19 +3498,19 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 				*((char*)put_senddate_into_here + i) = pval[i];
 			}
 
-			fState = WriteFile(m_hSerial,// 句柄
-				pval,// 数据缓冲区地址
-				8,// 数据大小
-				&m_had_send_data_number,// 返回发送出去的字节数
+			fState = WriteFile(m_hSerial,// 
+				pval,// 
+				8,// 
+				&m_had_send_data_number,// 
 				&m_osWrite);
 		 
 		 
-		if (!fState)// 不支持重叠
+		if (!fState)// 
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 
 																								   //			if(GetLastError()==ERROR_IO_INCOMPLETE)
 																								   //				AfxMessageBox("wrong1");
 			}
@@ -3529,19 +3529,19 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 		////////////////////////////////////////////////clear com error
 		Sleep(LATENCY_TIME_COM);
 		 
-			fState = ReadFile(m_hSerial,// 句柄
-				gval,// 数据缓冲区地址
-				8,// 数据大小
-				&m_had_send_data_number,// 返回发送出去的字节数
+			fState = ReadFile(m_hSerial,// 
+				gval,// 
+				8,// 
+				&m_had_send_data_number,// 
 				&m_osRead);
 		 
 		 
-		if (!fState)// 不支持重叠
+		if (!fState)// 
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 
 			}
 			else
 				m_had_send_data_number = 0;
@@ -3570,7 +3570,7 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 		//val         the value that you want to write to the register
 		//the return value == -1 ,no connecting
 		//the return value == -3 , no response
-		//清空串口缓冲区
+		//
 
 		//TS_UC data[12];
 		TS_UC data[16];
@@ -3606,7 +3606,7 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
         data[4] = 0;
         data[5] = 6;
 
-		//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		//		DWORD m_had_send_data_number;//
 		data[6] = device_var;
 		data[7] = 5;
 		data[8] = address >> 8 & 0xFF;
@@ -3627,7 +3627,7 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 			gval[i] = 0;
 		/////////////////////////////////////////clear buffer
 						//	TS_US crc;
-						//	DWORD m_had_send_data_number;//已经发送的数据的字节数
+						//	DWORD m_had_send_data_number;//
 		pval[0] = device_var;
 		pval[1] = 5;
 		pval[2] = address >> 8 & 0xFF;
@@ -3714,7 +3714,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSerial==NULL)
         {
             return -1;
@@ -3735,17 +3735,17 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 
 
 
-        int fState=WriteFile(m_hSerial,// 句柄
-                             data_to_send,// 数据缓冲区地址
-                             8,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             data_to_send,// 
+                             8,// 
+                             &m_had_send_data_number,// 
                              &m_osMulWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -3761,17 +3761,17 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        to_send_data,// 数据缓冲区地址
-                        length*2+5,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        to_send_data,// 
+                        length*2+5,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -3811,7 +3811,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
         	return -1;
@@ -3868,7 +3868,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         //data_to_send[6]=(crc>>8) & 0xff;
         //data_to_send[7]=crc & 0xff;/
 
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -3887,7 +3887,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                 {
@@ -3945,7 +3945,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSerial==NULL)
         {
             return -1;
@@ -3970,17 +3970,17 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         }
 
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// 句柄
-                             data_to_send,// 数据缓冲区地址
-                             8,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             data_to_send,// 
+                             8,// 
+                             &m_had_send_data_number,// 
                              &m_osMulWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -3996,17 +3996,17 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        to_send_data,// 数据缓冲区地址
-                        length*2+5,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        to_send_data,// 
+                        length*2+5,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -4063,7 +4063,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
         	return -1;
@@ -4130,7 +4130,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         //data_to_send[6]=(crc>>8) & 0xff;
         //data_to_send[7]=crc & 0xff;/
 
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -4151,7 +4151,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                 {
@@ -4222,7 +4222,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSerial==NULL)
         {
             return -1;
@@ -4240,17 +4240,17 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// 句柄
-                             data_to_write,// 数据缓冲区地址
-                             length+9,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             data_to_write,// 
+                             length+9,// 
+                             &m_had_send_data_number,// 
                              &m_osMulWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -4265,17 +4265,17 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,// 数据缓冲区地址
-                        8,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        gval,// 
+                        8,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -4326,7 +4326,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -4337,7 +4337,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         if(nRecv<0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)    //10054  错误码   远程主机强迫关闭了一个现有的连接。 10060 有时候会超时;
+            if (nErr == 10054)    //10054      10060 ;
             {
                 if (last_connected_port != 0)
                 {
@@ -4385,7 +4385,7 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSerial==NULL)
         {
             return -1;
@@ -4410,17 +4410,17 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         }
 
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// 句柄
-                             data_to_write,// 数据缓冲区地址
-                             length+9,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             data_to_write,// 
+                             length+9,// 
+                             &m_had_send_data_number,// 
                              &m_osMulWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -4435,17 +4435,17 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,// 数据缓冲区地址
-                        8,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        gval,// 
+                        8,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -4515,7 +4515,7 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -4561,7 +4561,7 @@ OUTPUT int NetController_CheckTstatOnline(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
 
         //Sleep(150);       //must use this function to slow computer
@@ -4622,7 +4622,7 @@ OUTPUT int NetController_CheckTstatOnline(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -4688,7 +4688,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
 
         if(devLo<1 || devHi>254)
@@ -4698,7 +4698,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[6];
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = 255;
         pval[1] = 26;  //put comments here,
         pval[2] = devHi;
@@ -4724,17 +4724,17 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-        int fState=WriteFile(m_hSerial,// 句柄
-                             pval,// 数据缓冲区地址
-                             6,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             pval,// 
+                             6,// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
-        if(!fState)//不支持重叠
+        if(!fState)//
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -4754,17 +4754,17 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,// 数据缓冲区地址
-                        13,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        gval,// 
+                        13,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -4852,7 +4852,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         if(devLo<1 || devHi>254)
             return -5;
@@ -4862,7 +4862,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[10];
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
 
 
         pval[0]=1;
@@ -4893,7 +4893,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         int nRecv = ::recv(m_hSocket, (char*)rvdata, sizeof(rvdata), 0);
         if (nRecv>0)
         {
-            //异常:
+            //:
             memcpy(gval,(void*)&rvdata[6],sizeof(rvdata)-6);
         }
         if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
@@ -4997,11 +4997,11 @@ OUTPUT bool open_com(int m_com ,unsigned char com_data_bit,unsigned char com_sto
     {
         if (m_com_h_serial[m_com] != NULL)
             m_com_h_serial[m_com] = NULL;
-        //关闭串口
+        //
         CloseHandle(m_hSerial);
         m_hSerial = NULL;
     }
-    /////////////////////////////////////////////////////////////////////加入的串口通信部分
+    /////////////////////////////////////////////////////////////////////
     // 	LPCSTR lpComNum[6];
     // 	ZeroMemory(lpComNum, )
 
@@ -5017,12 +5017,12 @@ OUTPUT bool open_com(int m_com ,unsigned char com_data_bit,unsigned char com_sto
         strCom = _T("\\\\.\\COM") + strCom;
     }
 
-    m_hSerial = CreateFile(strCom, //strCom,//串口句柄，打开串口
+    m_hSerial = CreateFile(strCom, //strCom,//
         GENERIC_READ | GENERIC_WRITE,
         0,
         NULL,
         OPEN_EXISTING,
-        FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
+        FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,;0
         NULL);
 
 
@@ -5041,7 +5041,7 @@ OUTPUT bool open_com(int m_com ,unsigned char com_data_bit,unsigned char com_sto
     }
     DCB  PortDCB;
     PortDCB.DCBlength = sizeof(DCB);
-    // 默认串口参数
+    // 
     if (!GetCommState(m_hSerial, &PortDCB))
     {
         CloseHandle(m_hSerial);
@@ -5102,11 +5102,11 @@ OUTPUT bool open_com_nocretical(int m_com, int default_baudrate)
     //}
     if(m_com_h_serial[m_com] != NULL)
     {
-        //关闭串口
+        //
         CloseHandle(m_com_h_serial[m_com]);
         m_com_h_serial[m_com] = NULL;
     }
-    /////////////////////////////////////////////////////////////////////加入的串口通信部分
+    /////////////////////////////////////////////////////////////////////
 // 	LPCSTR lpComNum[6];
 // 	ZeroMemory(lpComNum, )
 
@@ -5122,12 +5122,12 @@ OUTPUT bool open_com_nocretical(int m_com, int default_baudrate)
         strCom = _T("\\\\.\\COM")+strCom;
     }
 
-     m_hSerial = CreateFile(strCom, //strCom,//串口句柄，打开串口
+     m_hSerial = CreateFile(strCom, //strCom,//
          GENERIC_READ | GENERIC_WRITE,
          0,
          NULL,
          OPEN_EXISTING,
-         FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,是另外的形式，表示的是异步通信，能同时读写;0为同步读写
+         FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,;0
          NULL);
 
 
@@ -5150,7 +5150,7 @@ OUTPUT bool open_com_nocretical(int m_com, int default_baudrate)
     }
     DCB  PortDCB;
     PortDCB.DCBlength = sizeof(DCB);
-    // 默认串口参数
+    // 
     if(!GetCommState(m_hSerial, &PortDCB))
     {
         CloseHandle(m_hSerial);
@@ -5175,7 +5175,7 @@ OUTPUT bool open_com_nocretical(int m_com, int default_baudrate)
     CommTimeouts.WriteTotalTimeoutMultiplier = 20;
     CommTimeouts.WriteTotalTimeoutConstant = 200;
 
-//测试
+//
     //CommTimeouts.ReadIntervalTimeout = 0;
     //CommTimeouts.ReadTotalTimeoutMultiplier = 0;
     //CommTimeouts.ReadTotalTimeoutConstant = 0;
@@ -5205,13 +5205,13 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //清空串口缓冲区
+        //
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 3;
         pval[2] = address>>8 & 0xFF ;
@@ -5240,17 +5240,17 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         m_osWrite.Offset = 0;
         m_osWrite.OffsetHigh = 0 ;
 
-        int fState=WriteFile(m_hSerial,// 句柄
-                             pval,// 数据缓冲区地址
-                             8,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             pval,// 
+                             8,// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
-        if(!fState)// I/O未完成或失败
+        if(!fState)// I/O
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_PENDING)
                 //				AfxMessageBox("wrong1");
             }
@@ -5270,26 +5270,26 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         if(address==10)
         {
             serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            11,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            11,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
         else
         {
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            7,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            7,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -5348,7 +5348,7 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //清空串口缓冲区
+        //
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
 
@@ -5382,7 +5382,7 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
 
         pval[0] = device_var;
         pval[1] = 3;
@@ -5423,7 +5423,7 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                 {
@@ -5509,14 +5509,14 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -5572,10 +5572,10 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         Sleep(50);
         if(address!=10)
         {
-            fState=WriteFile(m_hSerial,// 句柄
-                             pval,// 数据缓冲区地址
-                             8,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+            fState=WriteFile(m_hSerial,// 
+                             pval,// 
+                             8,// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
         }
         else
@@ -5584,28 +5584,28 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=WriteFile(m_hSerial,// 句柄
-                                 pval,// 数据缓冲区地址
-                                 8,// 数据大小
-                                 &m_had_send_data_number,// 返回发送出去的字节数
+                fState=WriteFile(m_hSerial,// 
+                                 pval,// 
+                                 8,// 
+                                 &m_had_send_data_number,// 
                                  &m_osWrite);
             }
             else
             {
                 //new protocal
-                fState=WriteFile(m_hSerial,// 句柄
-                                 pval,// 数据缓冲区地址
-                                 12,// 数据大小
-                                 &m_had_send_data_number,// 返回发送出去的字节数
+                fState=WriteFile(m_hSerial,// 
+                                 pval,// 
+                                 12,// 
+                                 &m_had_send_data_number,// 
                                  &m_osWrite);
             }
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -5624,10 +5624,10 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         Sleep(LATENCY_TIME_COM);
         if(address!=10)
         {
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            8,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            8,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
         else
@@ -5635,28 +5635,28 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=ReadFile(m_hSerial,// 句柄
-                                gval,// 数据缓冲区地址
-                                8,// 数据大小
-                                &m_had_send_data_number,// 返回发送出去的字节数
+                fState=ReadFile(m_hSerial,// 
+                                gval,// 
+                                8,// 
+                                &m_had_send_data_number,// 
                                 &m_osRead);
             }
             else
             {
                 //new protocal
-                fState=ReadFile(m_hSerial,// 句柄
-                                gval,// 数据缓冲区地址
-                                12,// 数据大小
-                                &m_had_send_data_number,// 返回发送出去的字节数
+                fState=ReadFile(m_hSerial,// 
+                                gval,// 
+                                12,// 
+                                &m_had_send_data_number,// 
                                 &m_osRead);
             }
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -5705,7 +5705,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -5731,7 +5731,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         data[3]=0;
         data[4]=0;
         data[5]=6;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         data[6] = device_var;
         data[7] = 6;
         data[8] = address>>8 & 0xFF ;
@@ -5763,7 +5763,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
 //		TS_US crc;
-        //	DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //	DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -5778,7 +5778,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         for(int i=0;i<=11;i++)
         	gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -5831,7 +5831,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                 {
@@ -5897,7 +5897,7 @@ OUTPUT int NetController_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
 
         //Sleep(150);       //must use this function to slow computer
@@ -5958,7 +5958,7 @@ OUTPUT int NetController_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -6025,7 +6025,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         strlog.Format(_T("Scan From ID=%d To ID=%d"),devLo,devHi);
         //WriteLogFile(strlog);
@@ -6036,7 +6036,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[6];
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = 255;
         pval[1] = 26;  //put comments here,
         pval[2] = devHi;
@@ -6062,17 +6062,17 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-        int fState=WriteFile(m_hSerial,// 句柄
-                             pval,// 数据缓冲区地址
-                             6,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             pval,// 
+                             6,// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
-        if(!fState)//不支持重叠
+        if(!fState)//
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -6092,17 +6092,17 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,// 数据缓冲区地址
-                        13,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        gval,// 
+                        13,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -6224,7 +6224,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         strlog.Format(_T("Scan From ID=%d To ID=%d"),devLo,devHi);
         //NET_WriteLogFile(strlog);
@@ -6236,7 +6236,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[10];
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
 
 
         pval[0]=1;
@@ -6267,7 +6267,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
         int nRecv = ::recv(m_hSocket, (char*)rvdata, sizeof(rvdata), 0);
         if (nRecv>0)
         {
-            //异常:
+            //:
             memcpy(gval,(void*)&rvdata[6],sizeof(rvdata)-6);
         }
 
@@ -6382,7 +6382,7 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         data_to_send[6] = (crc >> 8) & 0xff;
         data_to_send[7] = crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if (m_hSerial == NULL)
         {
             return -1;
@@ -6400,17 +6400,17 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0;
         ///////////////////////////////////////////////////////send the to read message
-        int fState = WriteFile(m_hSerial,// 句柄
-            data_to_send,// 数据缓冲区地址
-            8,// 数据大小
-            &m_had_send_data_number,// 返回发送出去的字节数
+        int fState = WriteFile(m_hSerial,// 
+            data_to_send,// 
+            8,// 
+            &m_had_send_data_number,// 
             &m_osMulWrite);
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -6426,17 +6426,17 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState = ReadFile(m_hSerial,// 句柄
-            to_send_data,// 数据缓冲区地址
-            length * 2 + 5,// 数据大小
-            &m_had_send_data_number,// 返回发送出去的字节数
+        fState = ReadFile(m_hSerial,// 
+            to_send_data,// 
+            length * 2 + 5,// 
+            &m_had_send_data_number,// 
             &m_osRead);
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -6476,7 +6476,7 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
         return -1;
@@ -6533,7 +6533,7 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
                                          //data_to_send[6]=(crc>>8) & 0xff;
                                          //data_to_send[7]=crc & 0xff;/
 
-                                         //		DWORD m_had_send_data_number;//已经发送的数据的字节数
+                                         //		DWORD m_had_send_data_number;//
         if (m_hSocket == INVALID_SOCKET)
         {
             return -1;
@@ -6575,14 +6575,14 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for (int i = 0; i <= 11; i++)
             gval[i] = 0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address >> 8 & 0xFF;
@@ -6640,10 +6640,10 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         Sleep(50);
         if (address != 10)
         {
-            fState = WriteFile(m_hSerial,// 句柄
-                pval,// 数据缓冲区地址
-                8,// 数据大小
-                &m_had_send_data_number,// 返回发送出去的字节数
+            fState = WriteFile(m_hSerial,// 
+                pval,// 
+                8,// 
+                &m_had_send_data_number,// 
                 &m_com_osWrite[ncomport]);
         }
         else
@@ -6652,28 +6652,28 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
             if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
             {
                 //old protocal
-                fState = WriteFile(m_hSerial,// 句柄
-                    pval,// 数据缓冲区地址
-                    8,// 数据大小
-                    &m_had_send_data_number,// 返回发送出去的字节数
+                fState = WriteFile(m_hSerial,// 
+                    pval,// 
+                    8,// 
+                    &m_had_send_data_number,// 
                     &m_com_osWrite[ncomport]);
             }
             else
             {
                 //new protocal
-                fState = WriteFile(m_hSerial,// 句柄
-                    pval,// 数据缓冲区地址
-                    12,// 数据大小
-                    &m_had_send_data_number,// 返回发送出去的字节数
+                fState = WriteFile(m_hSerial,// 
+                    pval,// 
+                    12,// 
+                    &m_had_send_data_number,// 
                     &m_com_osWrite[ncomport]);
             }
         }
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_com_osWrite[ncomport], &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_com_osWrite[ncomport], &m_had_send_data_number, TRUE_OR_FALSE);// 
                                                                                                    //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                                                                                                    //				AfxMessageBox("wrong1");
             }
@@ -6692,10 +6692,10 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         Sleep(LATENCY_TIME_COM);
         if (address != 10)
         {
-            fState = ReadFile(m_hSerial,// 句柄
-                gval,// 数据缓冲区地址
-                8,// 数据大小
-                &m_had_send_data_number,// 返回发送出去的字节数
+            fState = ReadFile(m_hSerial,// 
+                gval,// 
+                8,// 
+                &m_had_send_data_number,// 
                 &m_com_osWrite[ncomport]);
         }
         else
@@ -6703,28 +6703,28 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
             if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
             {
                 //old protocal
-                fState = ReadFile(m_hSerial,// 句柄
-                    gval,// 数据缓冲区地址
-                    8,// 数据大小
-                    &m_had_send_data_number,// 返回发送出去的字节数
+                fState = ReadFile(m_hSerial,// 
+                    gval,// 
+                    8,// 
+                    &m_had_send_data_number,// 
                     &m_com_osWrite[ncomport]);
             }
             else
             {
                 //new protocal
-                fState = ReadFile(m_hSerial,// 句柄
-                    gval,// 数据缓冲区地址
-                    12,// 数据大小
-                    &m_had_send_data_number,// 返回发送出去的字节数
+                fState = ReadFile(m_hSerial,// 
+                    gval,// 
+                    12,// 
+                    &m_had_send_data_number,// 
                     &m_com_osWrite[ncomport]);
             }
         }
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_com_osWrite[ncomport], &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_com_osWrite[ncomport], &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -6773,7 +6773,7 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -6801,7 +6801,7 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         data[4] = 0;
         data[5] = 6;
 
-        //		DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //		DWORD m_had_send_data_number;//
         data[6] = device_var;
         data[7] = 6;
         data[8] = address >> 8 & 0xFF;
@@ -6833,7 +6833,7 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         for (int i = 0; i <= 11; i++)
             gval[i] = 0;/////////////////////////////////////////clear buffer
                         //		TS_US crc;
-                        //	DWORD m_had_send_data_number;//已经发送的数据的字节数
+                        //	DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address >> 8 & 0xFF;
@@ -6848,7 +6848,7 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
                              for(int i=0;i<=11;i++)
                              gval[i]=0;/////////////////////////////////////////clear buffer
                              TS_US crc;
-                             DWORD m_had_send_data_number;//已经发送的数据的字节数
+                             DWORD m_had_send_data_number;//
                              pval[0] = device_var;
                              pval[1] = 6;
                              pval[2] = address>>8 & 0xFF ;
@@ -6901,7 +6901,7 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                 {
@@ -6985,7 +6985,7 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSerial==NULL)
         {
             return -1;
@@ -7006,17 +7006,17 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// 句柄
-                             data_to_send,// 数据缓冲区地址
-                             8,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             data_to_send,// 
+                             8,// 
+                             &m_had_send_data_number,// 
                              &m_osMulWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -7034,17 +7034,17 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        to_send_data,// 数据缓冲区地址
-                        length*2+5,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        to_send_data,// 
+                        length*2+5,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -7084,7 +7084,7 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
         	return -1;
@@ -7142,7 +7142,7 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         //data_to_send[6]=(crc>>8) & 0xff;
         //data_to_send[7]=crc & 0xff;/
 
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -7192,7 +7192,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
         //the return value == -5 ,the input have some trouble
         //the return value == -6 , the bus has bannet protocol,scan stop;
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         strlog.Format(_T("Com Scan:  From ID=%d To ID=%d"), devLo, devHi);
         //WriteLogFile(strlog);
@@ -7204,7 +7204,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
             gval[i] = 0;/////////////////////////////////////////clear buffer
         TS_UC  pval[6];
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = 255;
         pval[1] = 25;  //put comments here,
         pval[2] = devHi;
@@ -7235,17 +7235,17 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
 
         ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear buffer
-        int fState = WriteFile(m_hSerial,// 句柄
-            pval,// 数据缓冲区地址
-            6,// 数据大小
-            &m_had_send_data_number,// 返回发送出去的字节数
+        int fState = WriteFile(m_hSerial,// 
+            pval,// 
+            6,// 
+            &m_had_send_data_number,// 
             &m_osWrite);
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 
                                                                                                    //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                                                                                                    //				AfxMessageBox("wrong1");
             }
@@ -7267,17 +7267,17 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState = ReadFile(m_hSerial,// 句柄
-            gval,// 数据缓冲区地址
-            13,// 数据大小
-            &m_had_send_data_number,// 返回发送出去的字节数
+        fState = ReadFile(m_hSerial,// 
+            gval,// 
+            13,// 
+            &m_had_send_data_number,// 
             &m_osRead);
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -7310,14 +7310,14 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
             strValue.Format(_T("%0X, "), nValue);
             //g_fileScanLog->WriteString(strValue);
             filelog += strValue;
-            if ((nValue == 0x55) && ((i + 1)<13))	//为了防止误判，检测2个周期的 55 ff  。。。。55 ff;
+            if ((nValue == 0x55) && ((i + 1)<13))	//2 55 ff  55 ff;
             {
                 if ((gval[i + 1] == 0xff) && (i + 8)<13)
                 {
                     if ((gval[i + 8] == 0x55) && (i + 9)<13)
                     {
                         if (gval[i + 9] == 0xff)
-                            return -6;//总线上有bacnet协议，结束扫描;
+                            return -6;//bacnet;
                     }
 
                 }
@@ -7335,7 +7335,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
             //WriteLogFile(_T(">>No one device answer......"));
         }
 
-        if (gval[7] == 0 && gval[8] == 0 && gval[9] == 0 && gval[10] == 0 && gval[11] == 0 && gval[12] == 0)  //modify by fance .解决扫描校验刚好为0而扫不到的 bug;
+        if (gval[7] == 0 && gval[8] == 0 && gval[9] == 0 && gval[10] == 0 && gval[11] == 0 && gval[12] == 0)  //modify by fance .0 bug;
                                                                                                               //if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
         {
             //old scan protocal
@@ -7382,7 +7382,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
             // new scan protocal,if many old tstat ,get into here ,scan result is oK too.
             old_or_new_scan_protocal_in_dll = 1;
             Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-            if ((devLo == devHi) && ((gval[9] != 0 || gval[10] != 0 || gval[11] != 0 || gval[12] != 0)))  //如果2分法 起始ID 一样 还收到垃圾数据，说明总线数据有错误;
+            if ((devLo == devHi) && ((gval[9] != 0 || gval[10] != 0 || gval[11] != 0 || gval[12] != 0)))  //2 ID  ;
                 return -6;
             if (gval[9] != 0 || gval[10] != 0 || gval[11] != 0 || gval[12] != 0)//to inspect
                 return -3;
@@ -7422,7 +7422,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         SOCKET m_hSocket = NULL;
         m_hSocket = m_tcp_hSocket[ncomport];
@@ -7436,7 +7436,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
 
         TS_UC  pval[10];
         //		TS_US crc;
-        //		DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //		DWORD m_had_send_data_number;//
         pval[0] = 1;
         pval[1] = 2;
         pval[2] = 3;
@@ -7459,7 +7459,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
         {
             return -1;
         }
-        int nRet = ::send(m_hSocket, (char*)pval, sizeof(pval), 0);//scan 扫NC中的TSTAT
+        int nRet = ::send(m_hSocket, (char*)pval, sizeof(pval), 0);//scan NCTSTAT
 
                                                                    //Sleep(SLEEP_TIME+8);
         Sleep(LATENCY_TIME_NET + 100);
@@ -7553,7 +7553,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
         //				}
         //
         //				g_fileScanLog->WriteString(_T("\n"));
-        //				g_fileScanLog->WriteString(strreceive+_T("\n"));//↑
+        //				g_fileScanLog->WriteString(strreceive+_T("\n"));//
         //				for (int i =0;i<sizeof(rvData);i++)
         //				{
         //					idate =(int)rvData[i];
@@ -7668,7 +7668,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         //the return value == -5 ,the input have some trouble
         //the return value == -6 , the bus has bannet protocol,scan stop;
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         strlog.Format(_T("Com Scan:  From ID=%d To ID=%d"),devLo,devHi);
         //WriteLogFile(strlog);
@@ -7680,7 +7680,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[6];
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = 255;
         pval[1] = 25;  //put comments here,
         pval[2] = devHi;
@@ -7704,17 +7704,17 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-        int fState=WriteFile(m_hSerial,// 句柄
-                             pval,// 数据缓冲区地址
-                             6,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             pval,// 
+                             6,// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -7734,17 +7734,17 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,// 数据缓冲区地址
-                        13,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        gval,// 
+                        13,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -7777,14 +7777,14 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
             strValue.Format(_T("%0X, "), nValue);
             //g_fileScanLog->WriteString(strValue);
             filelog+=strValue;
-            if((nValue == 0x55) &&((i+1)<13))	//为了防止误判，检测2个周期的 55 ff  。。。。55 ff;
+            if((nValue == 0x55) &&((i+1)<13))	//2 55 ff  55 ff;
             {
                 if((gval[i+1] == 0xff) && (i+8)<13)
                 {
                     if((gval[i+8] == 0x55) && (i+9)<13)
                     {
                         if(gval[i+9] == 0xff)
-                            return -6;//总线上有bacnet协议，结束扫描;
+                            return -6;//bacnet;
                     }
 
                 }
@@ -7802,7 +7802,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
             //WriteLogFile(_T(">>No one device answer......"));
         }
 
-		if(gval[7]==0 && gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)  //modify by fance .解决扫描校验刚好为0而扫不到的 bug;
+		if(gval[7]==0 && gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)  //modify by fance .0 bug;
         //if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
         {
             //old scan protocal
@@ -7887,7 +7887,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         strlog.Format(_T("NET Scan:  From ID=%d To ID=%d"),devLo,devHi);
         //NET_WriteLogFile(strlog);
@@ -7899,7 +7899,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 
         TS_UC  pval[10];
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         pval[0]=1;
         pval[1]=2;
         pval[2]=3;
@@ -7922,7 +7922,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         {
             return -1;
         }
-        int nRet =::send(m_hSocket,(char*)pval,sizeof(pval),0);//scan 扫NC中的TSTAT
+        int nRet =::send(m_hSocket,(char*)pval,sizeof(pval),0);//scan NCTSTAT
 
         //Sleep(SLEEP_TIME+8);
         Sleep(LATENCY_TIME_NET+100);
@@ -8016,7 +8016,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 //				}
 //
 //				g_fileScanLog->WriteString(_T("\n"));
-//				g_fileScanLog->WriteString(strreceive+_T("\n"));//↑
+//				g_fileScanLog->WriteString(strreceive+_T("\n"));//
 //				for (int i =0;i<sizeof(rvData);i++)
 //				{
 //					idate =(int)rvData[i];
@@ -8127,7 +8127,7 @@ OUTPUT int CheckTstatOnline_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_Type
         //the return value == -5 ,the input have some trouble
         //the return value == -6 , the bus has bannet protocol,scan stop;
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if (devLo<1 || devHi>254)
@@ -8139,7 +8139,7 @@ OUTPUT int CheckTstatOnline_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_Type
 
         int the_return_value;
         int the_return_value2 = 0;
-        //CheckTstatOnline2_a 可以记录收发的数据
+        //CheckTstatOnline2_a 
         the_return_value = CheckTstatOnline2_a_nocretical(devLo, devHi, bComm_Type,ncomport);
         if (the_return_value == -6)
             return -6;
@@ -8190,7 +8190,7 @@ OUTPUT int CheckTstatOnline_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_Type
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         SOCKET m_hSocket = NULL;
@@ -8261,7 +8261,7 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         //the return value == -5 ,the input have some trouble
         //the return value == -6 , the bus has bannet protocol,scan stop;
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -8272,7 +8272,7 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         }
         int the_return_value;
         int the_return_value2=0;
-        //CheckTstatOnline2_a 可以记录收发的数据
+        //CheckTstatOnline2_a 
         the_return_value=CheckTstatOnline2_a(devLo,devHi, bComm_Type);
         if(the_return_value == -6)
             return -6;
@@ -8324,7 +8324,7 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //清空串口缓冲区
+        //
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -8461,13 +8461,13 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //清空串口缓冲区
+        //
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 3;
         pval[2] = address>>8 & 0xFF ;
@@ -8496,17 +8496,17 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         m_osWrite.Offset = 0;
         m_osWrite.OffsetHigh = 0;
 
-        int fState=WriteFile(m_hSerial,// 句柄
-                             pval,	// 数据缓冲区地址
-                             8,		// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             pval,	// 
+                             8,		// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_PENDING)
                 //				AfxMessageBox("wrong1");
             }
@@ -8526,26 +8526,26 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         if(address==10)
         {
             serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            11,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            11,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
         else
         {
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            7,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            7,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -8604,7 +8604,7 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //清空串口缓冲区
+        //
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
 
@@ -8638,7 +8638,7 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //TS_US crc;
-        //DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //DWORD m_had_send_data_number;//
 
         pval[0] = device_var;
         pval[1] = 3;
@@ -8752,14 +8752,14 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -8815,10 +8815,10 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         Sleep(50);
         if(address!=10)
         {
-            fState=WriteFile(m_hSerial,// 句柄
-                             pval,// 数据缓冲区地址
-                             8,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+            fState=WriteFile(m_hSerial,// 
+                             pval,// 
+                             8,// 
+                             &m_had_send_data_number,// 
                              &m_osWrite);
         }
         else
@@ -8827,28 +8827,28 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=WriteFile(m_hSerial,// 句柄
-                                 pval,// 数据缓冲区地址
-                                 8,// 数据大小
-                                 &m_had_send_data_number,// 返回发送出去的字节数
+                fState=WriteFile(m_hSerial,// 
+                                 pval,// 
+                                 8,// 
+                                 &m_had_send_data_number,// 
                                  &m_osWrite);
             }
             else
             {
                 //new protocal
-                fState=WriteFile(m_hSerial,// 句柄
-                                 pval,// 数据缓冲区地址
-                                 12,// 数据大小
-                                 &m_had_send_data_number,// 返回发送出去的字节数
+                fState=WriteFile(m_hSerial,// 
+                                 pval,// 
+                                 12,// 
+                                 &m_had_send_data_number,// 
                                  &m_osWrite);
             }
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -8867,10 +8867,10 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         Sleep(LATENCY_TIME_COM);
         if(address!=10)
         {
-            fState=ReadFile(m_hSerial,// 句柄
-                            gval,// 数据缓冲区地址
-                            8,// 数据大小
-                            &m_had_send_data_number,// 返回发送出去的字节数
+            fState=ReadFile(m_hSerial,// 
+                            gval,// 
+                            8,// 
+                            &m_had_send_data_number,// 
                             &m_osRead);
         }
         else
@@ -8878,28 +8878,28 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=ReadFile(m_hSerial,// 句柄
-                                gval,// 数据缓冲区地址
-                                8,// 数据大小
-                                &m_had_send_data_number,// 返回发送出去的字节数
+                fState=ReadFile(m_hSerial,// 
+                                gval,// 
+                                8,// 
+                                &m_had_send_data_number,// 
                                 &m_osRead);
             }
             else
             {
                 //new protocal
-                fState=ReadFile(m_hSerial,// 句柄
-                                gval,// 数据缓冲区地址
-                                12,// 数据大小
-                                &m_had_send_data_number,// 返回发送出去的字节数
+                fState=ReadFile(m_hSerial,// 
+                                gval,// 
+                                12,// 
+                                &m_had_send_data_number,// 
                                 &m_osRead);
             }
         }
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -8948,7 +8948,7 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //清空串口缓冲区
+        //
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -8974,7 +8974,7 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         data[3]=0;
         data[4]=0;
         data[5]=6;
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         data[6] = device_var;
         data[7] = 6;
         data[8] = address>>8 & 0xFF ;
@@ -9006,7 +9006,7 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //	TS_US crc;
-        //	DWORD m_had_send_data_number;//已经发送的数据的字节数
+        //	DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -9021,7 +9021,7 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         for(int i=0;i<=11;i++)
         	gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -9143,7 +9143,7 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSerial==NULL)
         {
             return -1;
@@ -9164,17 +9164,17 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 
 
 
-        int fState=WriteFile(m_hSerial,// 句柄
-                             data_to_send,// 数据缓冲区地址
-                             8,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             data_to_send,// 
+                             8,// 
+                             &m_had_send_data_number,// 
                              &m_osMulWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -9191,17 +9191,17 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         m_osRead.OffsetHigh = 0 ;
         ////////////////////////////////////////////////clear com error
 
-        fState=ReadFile(m_hSerial,// 句柄
-                        to_send_data,// 数据缓冲区地址
-                        length*2+5,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        to_send_data,// 
+                        length*2+5,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -9241,7 +9241,7 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
         	return -1;
@@ -9298,7 +9298,7 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         //data_to_send[6]=(crc>>8) & 0xff;
         //data_to_send[7]=crc & 0xff;/
 
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -9321,14 +9321,14 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 
         if (nRecv < 0)
         {
-            unsigned int t1 = GetTickCount();//程序段开始前取得系统运行时间(ms);
+            unsigned int t1 = GetTickCount();//(ms);
             nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length * 2 + 12, 0);
-            unsigned int t2 = GetTickCount();//程序段开始前取得系统运行时间(ms);
+            unsigned int t2 = GetTickCount();//(ms);
             if (nRecv < 0)
             {
-                TRACE(_T("\r\n%u-%u , time  %u - %u = %u\r\n"), start_address, start_address+ length - 1,t2,t1,t2 - t1); //Timeout 的时间;
+                TRACE(_T("\r\n%u-%u , time  %u - %u = %u\r\n"), start_address, start_address+ length - 1,t2,t1,t2 - t1); //Timeout ;
                 int nErr = WSAGetLastError();
-                if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+                if (nErr == 10054)   //10054     
                 {
                     if (last_connected_port != 0)
                         Open_Socket2(last_connected_ip, last_connected_port);
@@ -9388,7 +9388,7 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSerial==NULL)
         {
             return -1;
@@ -9406,17 +9406,17 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// 句柄
-                             data_to_write,// 数据缓冲区地址
-                             length+9,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             data_to_write,// 
+                             length+9,// 
+                             &m_had_send_data_number,// 
                              &m_osMulWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -9431,17 +9431,17 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,// 数据缓冲区地址
-                        8,// 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        gval,// 
+                        8,// 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -9492,7 +9492,7 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -9548,7 +9548,7 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if(m_hSerial==NULL)
         {
             return -1;
@@ -9581,17 +9581,17 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
         }
 
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// 句柄
-                             data_to_write,// 数据缓冲区地址
-                             length,// 数据大小
-                             &m_had_send_data_number,// 返回发送出去的字节数
+        int fState=WriteFile(m_hSerial,// 
+                             data_to_write,// 
+                             length,// 
+                             &m_had_send_data_number,// 
                              &m_osMulWrite);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -9606,17 +9606,17 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// 句柄
-                        gval,    // 数据缓冲区地址
-                        128,      // 数据大小
-                        &m_had_send_data_number,// 返回发送出去的字节数
+        fState=ReadFile(m_hSerial,// 
+                        gval,    // 
+                        128,      // 
+                        &m_had_send_data_number,// 
                         &m_osRead);
-        if(!fState)// 不支持重叠
+        if(!fState)// 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number=0;
@@ -9665,7 +9665,7 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -9741,7 +9741,7 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		data_to_send[6] = (crc >> 8) & 0xff;
 		data_to_send[7] = crc & 0xff;
 
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		DWORD m_had_send_data_number;//
 		if (m_hSerial == NULL)
 		{
 			return -1;
@@ -9766,17 +9766,17 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		}
 
 
-		int fState = WriteFile(m_hSerial,// 句柄
-			data_to_send,// 数据缓冲区地址
-			8,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		int fState = WriteFile(m_hSerial,// 
+			data_to_send,// 
+			8,// 
+			&m_had_send_data_number,// 
 			&m_osMulWrite);
-		if (!fState)// 不支持重叠
+		if (!fState)// 
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 
 			}
 			else
 				m_had_send_data_number = 0;
@@ -9793,17 +9793,17 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		m_osRead.OffsetHigh = 0;
 		////////////////////////////////////////////////clear com error
 
-		fState = ReadFile(m_hSerial,// 句柄
-			to_send_data,// 数据缓冲区地址
-			length * 2 + 5,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
+		fState = ReadFile(m_hSerial,// 
+			to_send_data,// 
+			length * 2 + 5,// 
+			&m_had_send_data_number,// 
 			&m_osRead);
-		if (!fState)// 不支持重叠
+		if (!fState)// 
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 
 			}
 			else
 				m_had_send_data_number = 0;
@@ -9936,7 +9936,7 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 										 //data_to_send[6]=(crc>>8) & 0xff;
 										 //data_to_send[7]=crc & 0xff;/
 
-										 //		DWORD m_had_send_data_number;//已经发送的数据的字节数
+										 //		DWORD m_had_send_data_number;//
 		if (m_hSocket == INVALID_SOCKET)
 		{
 			return -1;
@@ -9955,7 +9955,7 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                     Open_Socket2(last_connected_ip, last_connected_port);
@@ -10071,9 +10071,9 @@ OUTPUT bool Open_Socket_For_All(CString strIPAdress, short nPort)
     servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
     //	u_long ul=1;
     //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-    //发送时限
+    //
     setsockopt(m_hSocket, SOL_SOCKET, SO_SNDTIMEO, (char *)&nNetTimeout, sizeof(int));
-    //接收时限
+    //
     setsockopt(m_hSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int));
     if (::connect(m_hSocket, (sockaddr*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
     {
@@ -10089,20 +10089,20 @@ OUTPUT bool Open_Socket_For_All(CString strIPAdress, short nPort)
 }
 
 
-//校验总线上的数据,是否有bacnet 的55  FF 的 数据
+//,bacnet 55  FF  
 int check_bacnet_data(unsigned char * buffer, int nlength)
 {
     if (nlength <= 2)
         return -1;
     unsigned char * nlast_point = buffer + nlength - 1;
     unsigned char * npoint = buffer;
-    int no_token_count = 0; //连续多个字节没有搜到0x55的个数 
+    int no_token_count = 0; //0x55 
     int token_count = 0;
     while ((npoint - buffer) < (nlength - 1))
     {
         if (no_token_count > 100)
         {
-            return -2; //总线无bacnet 55  ff 数据
+            return -2; //bacnet 55  ff 
         }
         if (*npoint != 0x55)
         {
@@ -10119,7 +10119,7 @@ int check_bacnet_data(unsigned char * buffer, int nlength)
         }
         npoint++;
         token_count++;
-        if(token_count >= 3)  //一帧数据出现 55 FF 的个数达到3个就判定为有 bacnet mstp存在
+        if(token_count >= 3)  // 55 FF 3 bacnet mstp
            return 1;
     }
 }
@@ -10141,15 +10141,15 @@ OUTPUT int Set_Test_Comport_Status(int command)
 }
 
 /* Test_Comport return
-    1  发现两个周期的 55 FF 存在
-    0  代表总线无数据
-    -1 有数据 但长度不足 8个字节
-    -2 监视很50个token 以上 但没有发现 55 FF
-    -3 检查完长度超过最后得 都没有发现 55 FF
-    -4 手动终止
-    -100  代表串口号大于 100
-    -101  同步打开串口失败
-    -102  串口句柄为零，无效的串口
+    1   55 FF 
+    0  
+    -1   8
+    -2 50token   55 FF
+    -3   55 FF
+    -4 
+    -100   100
+    -101  
+    -102  
 */
 //OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret)
 OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudrate)
@@ -10172,7 +10172,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
             return -4;
         }
 
-        if (default_baudrate != 0) //默认不传 波特率的情况下 就检测所有的 波特率;
+        if (default_baudrate != 0) //   ;
         {
             ntest_ret[i].ncomport = comport;
             ntest_ret[i].test_ret = 0;
@@ -10237,7 +10237,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
         data_to_send[6] = (crc >> 8) & 0xff +20;
         data_to_send[7] = crc & 0xff + 20;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if (m_hSerial == NULL)
         {
             if (default_baudrate != 0)
@@ -10267,17 +10267,17 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
         m_com_osMulWrite[comport].Offset = 0;
         m_com_osMulWrite[comport].OffsetHigh = 0;
         ///////////////////////////////////////////////////////send the to read message
-        fState = WriteFile(m_hSerial,// 句柄
-            data_to_send,// 数据缓冲区地址
-            8,// 数据大小
-            &m_had_send_data_number,// 返回发送出去的字节数
+        fState = WriteFile(m_hSerial,// 
+            data_to_send,// 
+            8,// 
+            &m_had_send_data_number,// 
             &m_com_osMulWrite[comport]);
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_com_osMulWrite[comport], &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_com_osMulWrite[comport], &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -10303,17 +10303,17 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
 
         Sleep(LATENCY_TIME_COM * 3);
         ////////////////////////////////////////////////clear com error
-        fState = ReadFile(m_hSerial,// 句柄
-            to_send_data,// 数据缓冲区地址
-            100 * 2 + 5,// 数据大小
-            &m_had_send_data_number,// 返回发送出去的字节数
+        fState = ReadFile(m_hSerial,// 
+            to_send_data,// 
+            100 * 2 + 5,// 
+            &m_had_send_data_number,// 
             &m_com_osRead[comport]);
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_com_osRead[comport], &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_com_osRead[comport], &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -10388,13 +10388,13 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
         for (int j = 0;j < 30;j++)
         {
             Sleep(100);
-            if (ClearCommError(m_hSerial, &error, &stat) && error > 0)    //清除错误
+            if (ClearCommError(m_hSerial, &error, &stat) && error > 0)    //
             {
-                PurgeComm(m_hSerial, PURGE_RXABORT | PURGE_RXCLEAR); /*清除输入缓冲区*/
+                PurgeComm(m_hSerial, PURGE_RXABORT | PURGE_RXCLEAR); /**/
                 continue;
             }
 
-            if (!stat.cbInQue)// 缓冲区无数据
+            if (!stat.cbInQue)// 
                 continue;
 
             buf_len = min((int)(buf_len - 1), (int)stat.cbInQue);
@@ -10409,13 +10409,13 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
             m_osRead.OffsetHigh = 0;
 
 
-            if (!ReadFile(m_hSerial, buf, buf_len, &r_len, &m_osRead)) //2000 下 ReadFile 始终返回 True
+            if (!ReadFile(m_hSerial, buf, buf_len, &r_len, &m_osRead)) //2000  ReadFile  True
             {
-                if (GetLastError() == ERROR_IO_PENDING) // 结束异步I/O
+                if (GetLastError() == ERROR_IO_PENDING) // I/O
                 {
                     if (!GetOverlappedResult(m_hSerial, &m_osRead, &r_len, false))
                     {
-                        if (GetLastError() != ERROR_IO_INCOMPLETE)//其他错误
+                        if (GetLastError() != ERROR_IO_INCOMPLETE)//
                             r_len = 0;
                     }
                 }
@@ -10459,7 +10459,7 @@ OUTPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_
 
         return -101;
     }
-    // 清空串口缓冲区
+    // 
     PurgeComm(m_com_h_serial[comport], PURGE_RXCLEAR | PURGE_TXCLEAR);
     DWORD nerrors1; COMSTAT com_stats1;
     ::ClearCommError(m_com_h_serial[comport], &nerrors1, &com_stats1);
@@ -10479,7 +10479,7 @@ OUTPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_
                 return -4;
             }
 
-            if (default_baudrate != 0) //默认不传 波特率的情况下 就检测所有的 波特率;
+            if (default_baudrate != 0) //   ;
             {
                 ntest_ret[i].ncomport = comport;
                 ntest_ret[i].test_ret = 0;
@@ -10547,7 +10547,7 @@ OUTPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_
             data_to_send[6] = (crc >> 8) & 0xff + 20;
             data_to_send[7] = crc & 0xff + 20;
 
-            DWORD m_had_send_data_number;//已经发送的数据的字节数
+            DWORD m_had_send_data_number;//
             if (m_hSerial == NULL)
             {
                 if (default_baudrate != 0)
@@ -10580,25 +10580,25 @@ OUTPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_
 
             Sleep(LATENCY_TIME_COM * 5);
             ////////////////////////////////////////////////clear com error
-            fState = ReadFile(m_hSerial,// 句柄
-                to_send_data,// 数据缓冲区地址
-                100 * 2 + 5,// 数据大小
-                &m_had_send_data_number,// 返回发送出去的字节数
+            fState = ReadFile(m_hSerial,// 
+                to_send_data,// 
+                100 * 2 + 5,// 
+                &m_had_send_data_number,// 
                 &m_com_osRead[comport]);
-            if (!fState)// 不支持重叠
+            if (!fState)// 
             {
                 if (GetLastError() == ERROR_IO_PENDING)
                 {
                     //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                    BOOL result = GetOverlappedResult(m_hSerial, &m_com_osRead[comport], &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                    BOOL result = GetOverlappedResult(m_hSerial, &m_com_osRead[comport], &m_had_send_data_number, TRUE_OR_FALSE);// 
                     if (result)
                     {
-                        // 操作成功，处理传输的字节数
+                        // 
                         TRACE("Bytes transferred: %lu\n", m_had_send_data_number);
                     }
                     else
                     {
-                        // 操作失败，获取错误信息
+                        // 
                         DWORD error = GetLastError();
                         TRACE("GetOverlappedResult failed with error: %lu\n", error);
                     }
@@ -10670,7 +10670,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
         data_to_send[6] = 0x4F; //O
 
         data_to_send[7] = 0x07;  
-        data_to_send[8] = 0x00;  // 这前面两个只给prg和monitor使用
+        data_to_send[8] = 0x00;  // prgmonitor
         data_to_send[9] = command;
         data_to_send[10] = start_instance;
         data_to_send[11] = end_instance;
@@ -10680,7 +10680,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
         data_to_send[14] = (crc >> 8) & 0xff;
         data_to_send[15] = crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if (m_hSerial == NULL)
         {
             return -1;
@@ -10701,17 +10701,17 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
 
 
 
-        int fState = WriteFile(m_hSerial,// 句柄
-            data_to_send,// 数据缓冲区地址
-            16,// 数据大小
-            &m_had_send_data_number,// 返回发送出去的字节数
+        int fState = WriteFile(m_hSerial,// 
+            data_to_send,// 
+            16,// 
+            &m_had_send_data_number,// 
             &m_osMulWrite);
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -10736,17 +10736,17 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
             data_length = (end_instance - start_instance + 1)*entitysize;
         }
         
-        fState = ReadFile(m_hSerial,// 句柄
-            read_buffer_data,// 数据缓冲区地址
-            data_length + 14 + 2,// 数据大小
-            &m_had_send_data_number,// 返回发送出去的字节数
+        fState = ReadFile(m_hSerial,// 
+            read_buffer_data,// 
+            data_length + 14 + 2,// 
+            &m_had_send_data_number,// 
             &m_osRead);
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -10791,7 +10791,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
         data_to_send[6+6] = 0x4F; //O
 
         data_to_send[7+6] = 0x07;
-        data_to_send[8+6] = 0x00;  // 这前面两个只给prg和monitor使用
+        data_to_send[8+6] = 0x00;  // prgmonitor
         data_to_send[9+6] = command;
         data_to_send[10+6] = start_instance;
         data_to_send[11+6] = end_instance;
@@ -10827,7 +10827,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                 {
@@ -10846,7 +10846,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
             data_length = (end_instance - start_instance + 1)*entitysize;
         }
 
-        memcpy((void*)read_buffer_data, rvData + 6, data_length + 14 + 2);// 数据大小
+        memcpy((void*)read_buffer_data, rvData + 6, data_length + 14 + 2);// 
 
         for (int x = 0; x < 14; x++)
         {
@@ -10889,7 +10889,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         data_to_send[nlength + 7] = (crc >> 8) & 0xff;
         data_to_send[nlength + 8] = crc & 0xff;
 
-        DWORD m_had_send_data_number;//已经发送的数据的字节数
+        DWORD m_had_send_data_number;//
         if (m_hSerial == NULL)
         {
             return -1;
@@ -10907,17 +10907,17 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0;
         ///////////////////////////////////////////////////////send the to read message
-        int fState = WriteFile(m_hSerial,// 句柄
-            data_to_send,// 数据缓冲区地址
-            nlength + 9,// 数据大小
-            &m_had_send_data_number,// 返回发送出去的字节数
+        int fState = WriteFile(m_hSerial,// 
+            data_to_send,// 
+            nlength + 9,// 
+            &m_had_send_data_number,// 
             &m_osMulWrite);
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -10931,17 +10931,17 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         Sleep(LATENCY_TIME_COM);
-        fState = ReadFile(m_hSerial,// 句柄
-            read_buffer_data,// 数据缓冲区地址
-            7 + 7 + 2,// 数据大小
-            &m_had_send_data_number,// 返回发送出去的字节数
+        fState = ReadFile(m_hSerial,// 
+            read_buffer_data,// 
+            7 + 7 + 2,// 
+            &m_had_send_data_number,// 
             &m_osRead);
-        if (!fState)// 不支持重叠
+        if (!fState)// 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 等待
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// 
             }
             else
                 m_had_send_data_number = 0;
@@ -11015,7 +11015,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  错误码   远程主机强迫关闭了一个现有的连接。
+            if (nErr == 10054)   //10054     
             {
                 if (last_connected_port != 0)
                 {
@@ -11027,7 +11027,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         }
 
 
-        memcpy((void*)read_buffer_data, rvData + 6, nlength + 8  + 1);// 数据大小
+        memcpy((void*)read_buffer_data, rvData + 6, nlength + 8  + 1);// 
 
 
         for (int x = 0; x < 14; x++)

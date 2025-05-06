@@ -67,7 +67,7 @@ void CTCP_Server::OnBnClickedButtonStartServer()
 	if (!m_bServer)
 	{
 		CString info;
-		info.Format(_T("Start Server Failed：%d"), m_wskServer.err);
+		info.Format(_T("Start Server Failed%d"), m_wskServer.err);
 		TCP_Server_Running = false;
 		AfxMessageBox(info);
 	}
@@ -165,7 +165,7 @@ void CTCP_Server::OnCancel()
 }
 
 extern SOCKET my_sokect;
-//TCP Server 的 回调函数 ，当客户端连接上 之后就可以用这个socket去发送数据了;//This function add by Fance.
+//TCP Server    socket;//This function add by Fance.
 void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 {
 	CppSQLite3DB SqliteDBBuilding;
@@ -198,7 +198,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 	m_bac_handle_Iam_data.clear();
 
 
-	while (!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
+	while (!bTimeOut)//!pScanner->m_bNetScanFinish)  // 
 	{
 		time_out++;
 		if (time_out > 5)
@@ -244,7 +244,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 		//DFTrace(strInfo);
 		//pScan->ShowBacnetComScanInfo(strInfo);
 
-		if ((int)m_bac_scan_result_data.size() >= ready_to_read_count) //达到返回的个数后就break;
+		if ((int)m_bac_scan_result_data.size() >= ready_to_read_count) //break;
 			break;
 		TRACE(_T("gloab scan = %d\r\n"), ready_to_read_count);
 		for (int i = 0; i < ready_to_read_count; i++)
@@ -333,7 +333,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 	if (is_found_in_db) //Found in DB  
 	{
 		CString strSql;
-		//pFrame->m_pCon.CreateInstance(_T("ADODB.Connection"));	//这里要用互斥变量保护起来;
+		//pFrame->m_pCon.CreateInstance(_T("ADODB.Connection"));	//;
 		//pFrame->m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 		CString str_serialid;
 		CString str_screen_name;
@@ -345,13 +345,13 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 		str_screen_name = _T("GSM - ") + str_product_name + _T(":") + str_serialid;
 		str_hinstance.Format(_T("%u"), m_bac_scan_result_data.at(0).device_id);
 		str_panelnumber.Format(_T("%u"), m_bac_scan_result_data.at(0).panel_number);
-		strSql.Format(_T("update ALL_NODE set Protocol ='5' , Product_name ='%s',Hardware_Ver ='%s',Software_Ver ='%s' where Serial_ID = '%s'"), str_screen_name, str_hinstance, str_panelnumber, str_serialid); //5对应的是GSM协议;
+		strSql.Format(_T("update ALL_NODE set Protocol ='5' , Product_name ='%s',Hardware_Ver ='%s',Software_Ver ='%s' where Serial_ID = '%s'"), str_screen_name, str_hinstance, str_panelnumber, str_serialid); //5GSM;
 		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
 
 		//	 ::PostMessage(MainFram_hwd,WM_MYMSG_REFRESHBUILDING,0,0);
 	}
-	else //插入;
+	else //;
 	{
 		CString strSql;
 

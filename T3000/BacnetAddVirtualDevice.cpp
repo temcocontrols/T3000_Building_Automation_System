@@ -240,7 +240,7 @@ void CBacnetAddVirtualDevice::OnBnClickedButtonVirtualCancel()
 
 void CBacnetAddVirtualDevice::OnCbnSelchangeComboVirtualPidName()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 	CString temp_string;
 	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_VIRTUAL_PID_NAME))->GetCurSel();
 	((CComboBox*)GetDlgItem(IDC_COMBO_VIRTUAL_PID_NAME))->GetLBText(nSel, temp_string);

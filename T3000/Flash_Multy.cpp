@@ -24,15 +24,15 @@ CString Edit_File_Path;
 extern tree_product	m_product_isp_auto_flash;
 int Get_File_Version(LPCTSTR filepath,unsigned char &HighVersion,unsigned char &LowVersion);
 
-const int CHANGE_THE_ITEM_COLOR_BLUE = 1;//烧写开始，表示正在进行的1>正在进行的项目：就是蓝色
-const int CHANGE_THE_ITEM_COLOR_RED = 2;//烧写失败2>烧写没有成功,就是红色
-const int CHANGE_THE_ITEM_COLOR_GREEN = 3;//烧写成功3>烧写成功，是绿色
-const int  CHANGE_THE_ITEM_COLOR_DEFAULT = 4;//默认
-const int CHANGE_THE_ITEM_COLOR_MORE_GREEN = 5; //4>烧写成功&&配置文件，成功,
-const int CHANGE_THE_ITEM_COLOR_LESS_RED = 6;//5>配置文件，失败
+const int CHANGE_THE_ITEM_COLOR_BLUE = 1;//1>
+const int CHANGE_THE_ITEM_COLOR_RED = 2;//2>,
+const int CHANGE_THE_ITEM_COLOR_GREEN = 3;//3>
+const int  CHANGE_THE_ITEM_COLOR_DEFAULT = 4;//
+const int CHANGE_THE_ITEM_COLOR_MORE_GREEN = 5; //4>&&,
+const int CHANGE_THE_ITEM_COLOR_LESS_RED = 6;//5>
 
-const int MASS_FLASH_MESSAGE = 200; //线程传递给界面List 的显示消息;
-const int OPERATION_SUCCESS = 3; //成功;
+const int MASS_FLASH_MESSAGE = 200; //List ;
+const int OPERATION_SUCCESS = 3; //;
 
 const int  CHANGE_ONE_ITEM = 10;
 
@@ -321,7 +321,7 @@ void CFlash_Multy::Initial_List()
             nComport.Empty();
             nIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
             nIP_Port.Format(_T("%d"),pFrame->m_product.at(i).ncomport);
-            //if(IsOurNetDevice(pFrame->m_product.at(i).product_class_id) == false)//如果不是网络设备就说明是TSTAT类的串口设备;
+            //if(IsOurNetDevice(pFrame->m_product.at(i).product_class_id) == false)//TSTAT;
            // {
                 n_is_sub = _T("YES");
            // }
@@ -366,11 +366,11 @@ void CFlash_Multy::Initial_List()
         temp_firmware_path.ReleaseBuffer();
         m_flash_multy_list.SetItemText(i, FLASH_FILE_POSITION, temp_firmware_path);
         int temp_results = GetPrivateProfileInt(_T("FlashResult"), nSerialNum, 0, g_ext_mass_flash_path);
-        if (temp_results == 1)//失败
+        if (temp_results == 1)//
         {
             m_flash_multy_list.SetItemText(i, FLASH_RESULTS, _T("Fail"));
         }
-        else if (temp_results == 2) //成功
+        else if (temp_results == 2) //
         {
             m_flash_multy_list.SetItemText(i, FLASH_RESULTS, _T("Success"));
         }
@@ -506,7 +506,7 @@ void CFlash_Multy::OnBnClickedButtonApplyWoAllSelect()
             m_flash_multy_list.SetItemText(i,FLASH_FILE_POSITION,Edit_File_Path);
 
 
-#if 0    //杜帆屏蔽  下面的 各种有误，获取不到固件信息，还会导致崩溃;
+#if 0    //   ;
             BOOL is_good = FALSE;
             Bin_Info file_infor;
             if (HexFileValidation(Edit_File_Path))
@@ -554,7 +554,7 @@ void CFlash_Multy::OnBnClickedButtonApplyWoAllSelect()
 
 BOOL CFlash_Multy::Product_Firmware_Check(CString ProductName,CString FirmwareFilePath)
 {
-    return 1;   //不要在这里做重复的事情 ，校验固件的事情交给ISP tool 去完成;
+    return 1;   // ISP tool ;
 
 
 
@@ -701,7 +701,7 @@ void CFlash_Multy::SetAutoConfig(Str_flash_device ndevice_info)
         DeleteFile(AutoFlashConfigPath);
     }
     WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("1"),AutoFlashConfigPath);
-    if(ndevice_info.nIPaddress.IsEmpty())//串口
+    if(ndevice_info.nIPaddress.IsEmpty())//
     {
         WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),AutoFlashConfigPath);
         CString cs_comport;
@@ -927,12 +927,12 @@ void CFlash_Multy::ParameterSaveToDB()
 }
 
 /*
-const int CHANGE_THE_ITEM_COLOR_BLUE = 1;//烧写开始，表示正在进行的1>正在进行的项目：就是蓝色
-const int CHANGE_THE_ITEM_COLOR_RED = 2;//烧写失败2>烧写没有成功,就是红色
-const int CHANGE_THE_ITEM_COLOR_GREEN = 3;//烧写成功3>烧写成功，是绿色
-const int  CHANGE_THE_ITEM_COLOR_DEFAULT = 4;//默认
-const int CHANGE_THE_ITEM_COLOR_MORE_GREEN = 5; //4>烧写成功&&配置文件，成功,
-const int CHANGE_THE_ITEM_COLOR_LESS_RED = 6;//5>配置文件，失败
+const int CHANGE_THE_ITEM_COLOR_BLUE = 1;//1>
+const int CHANGE_THE_ITEM_COLOR_RED = 2;//2>,
+const int CHANGE_THE_ITEM_COLOR_GREEN = 3;//3>
+const int  CHANGE_THE_ITEM_COLOR_DEFAULT = 4;//
+const int CHANGE_THE_ITEM_COLOR_MORE_GREEN = 5; //4>&&,
+const int CHANGE_THE_ITEM_COLOR_LESS_RED = 6;//5>
 
 #define FLASH_COLOR_BLUE RGB(50,50,180)
 #define FLASH_COLOR_RED  RGB(255,0,0)
@@ -947,7 +947,7 @@ const int CHANGE_THE_ITEM_COLOR_LESS_RED = 6;//5>配置文件，失败
 //    
 //}
 
-int multy_log_count = 1;	//用于读取改读多少count了;
+int multy_log_count = 1;	//count;
 DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
 {
     //Write_Config_Info
@@ -982,7 +982,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
                     {
                         Sleep(100);
                         continue;
-                    }//检查现在是否为开始状态
+                    }//
                     CString temp_serial;
                     temp_serial = flash_device.at(i).strSN;
                     CString temp_time;
@@ -1011,7 +1011,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
                         continue;
                     }
 
-                    WritePrivateProfileStringW(temp_serial, _T("Time"), temp_time, g_ext_mass_flash_path);  //记录此设备操作时间
+                    WritePrivateProfileStringW(temp_serial, _T("Time"), temp_time, g_ext_mass_flash_path);  //
                     log_file_opened=false;
                     pParent->SetAutoConfig(flash_device.at(i));
                     pParent->PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_BLUE,flash_device.at(i).nitem);
@@ -1024,7 +1024,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
                         flash_device.at(i).nresult=CHANGE_THE_ITEM_COLOR_GREEN;
                         pParent->PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_GREEN,flash_device.at(i).nitem);
 
-                        WritePrivateProfileStringW(_T("FlashResult"), temp_serial, _T("2"), g_ext_mass_flash_path); //成功
+                        WritePrivateProfileStringW(_T("FlashResult"), temp_serial, _T("2"), g_ext_mass_flash_path); //
                     }
                     else
                     {
@@ -1032,7 +1032,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
                         pParent->PostMessage(WM_MULTY_FLASH_MESSAGE,CHANGE_THE_ITEM_COLOR_RED,flash_device.at(i).nitem);
                         CString temp_serial;
                         temp_serial = flash_device.at(i).strSN;
-                        WritePrivateProfileStringW(_T("FlashResult"), temp_serial, _T("1"), g_ext_mass_flash_path); //失败
+                        WritePrivateProfileStringW(_T("FlashResult"), temp_serial, _T("1"), g_ext_mass_flash_path); //
                     }
                     if (nresult!=FLASH_SUCCESS)
                     {
@@ -1044,7 +1044,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
         }
 
 
-        //检查现在是否为开始状态
+        //
 
         if (flash_device.at(i).cofnigresult==3||flash_device.at(i).config_file_position.IsEmpty())
         {
@@ -1070,7 +1070,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
         {
             continue;
         }
-        if (!flash_device.at(i).ncomport.IsEmpty())//说明是非串口设备
+        if (!flash_device.at(i).ncomport.IsEmpty())//
         {
             comport=_wtoi(flash_device.at(i).ncomport);
 			baudrate = _wtoi(flash_device.at(i).nBaudrate);
@@ -1291,7 +1291,7 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
             close_com();
         }
         Sleep(100);
-        if (!flash_device.at(i).ncomport.IsEmpty())//说明是非串口设备
+        if (!flash_device.at(i).ncomport.IsEmpty())//
         {
             comport=_wtoi(flash_device.at(i).ncomport);
 			baudrate = _wtoi(flash_device.at(i).nBaudrate);
@@ -1321,7 +1321,7 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
         {
             is_connect_device=FALSE;
         }
-        else  if (IS_COM)  //建立连接
+        else  if (IS_COM)  //
         {
             if (open_com(comport))
             {
@@ -1544,12 +1544,12 @@ void CFlash_Multy::OnTimer(UINT_PTR nIDEvent)
     CDialogEx::OnTimer(nIDEvent);
 }
 /*
-const int CHANGE_THE_ITEM_COLOR_BLUE = 1;//烧写开始，表示正在进行的1>正在进行的项目：就是蓝色
-const int CHANGE_THE_ITEM_COLOR_RED = 2;//烧写失败2>烧写没有成功,就是红色
-const int CHANGE_THE_ITEM_COLOR_GREEN = 3;//烧写成功3>烧写成功，是绿色
-const int  CHANGE_THE_ITEM_COLOR_DEFAULT = 4;//默认
-const int CHANGE_THE_ITEM_COLOR_MORE_GREEN = 5; //4>烧写成功&&配置文件，成功,
-const int CHANGE_THE_ITEM_COLOR_LESS_RED = 6;//5>配置文件，失败
+const int CHANGE_THE_ITEM_COLOR_BLUE = 1;//1>
+const int CHANGE_THE_ITEM_COLOR_RED = 2;//2>,
+const int CHANGE_THE_ITEM_COLOR_GREEN = 3;//3>
+const int  CHANGE_THE_ITEM_COLOR_DEFAULT = 4;//
+const int CHANGE_THE_ITEM_COLOR_MORE_GREEN = 5; //4>&&,
+const int CHANGE_THE_ITEM_COLOR_LESS_RED = 6;//5>
 
 #define FLASH_COLOR_BLUE RGB(50,50,180)
 #define FLASH_COLOR_RED  RGB(255,0,0)
@@ -1671,14 +1671,14 @@ void CFlash_Multy::OnNMClickListFlashMulty(NMHDR *pNMHDR, LRESULT *pResult)
     lCol = lvinfo.iSubItem;
     CString Product_Name = m_flash_multy_list.GetItemText(lRow,FLASH_PRODUCT_NAME);
     int total_count = m_flash_multy_list.GetItemCount();
-    if(lRow> total_count) //如果点击区超过最大行号，则点击是无效的
+    if(lRow> total_count) //
         return;
     if(lRow<0)
         return;
     if (lCol == FLASH_ITEM)
     {
         
-        for (int z = 0; z < total_count; z++) //将目前选中的存储起来;下次直接显示这些已经选中的;
+        for (int z = 0; z < total_count; z++) //;;
         {
             CString temp_serial = m_flash_multy_list.GetItemText(z, FLASH_SERIAL_NUMBER);
             bool temp_check = m_flash_multy_list.GetCellChecked(z, FLASH_ITEM);
@@ -1858,7 +1858,7 @@ BOOL CFlash_Multy::Configuration_File_Check(CString ProductName,CString Configur
     inf.getline(buf,1024);
     if (find_sub_chars(buf,_T("Config File")))
     {
-        inf.getline(buf,1024);//T3000 版本号
+        inf.getline(buf,1024);//T3000 
         if (find_sub_chars(buf, ProductName))
         {
             ret=true;
@@ -1914,7 +1914,7 @@ void CFlash_Multy::OnDestroy()
     
 }
 
-//获取数据库中有多少 产品类型;
+// ;
 void CFlash_Multy::GetProductType()
 {
     download_info_type.clear();
@@ -1994,7 +1994,7 @@ void CFlash_Multy::Get_Device_Firmware()
 
         if (flash_device.at(i).ncomport.IsEmpty() && flash_device.at(i).nBaudrate.IsEmpty())
         {
-            //带网络连接的设备;
+            //;
             unsigned short temp_port = 0;
             temp_port = _wtoi(flash_device.at(i).nipport);
             if (Open_Socket_Retry(flash_device.at(i).nIPaddress, temp_port,1))
@@ -2081,7 +2081,7 @@ void CFlash_Multy::OnBnClickedButtonUpdateFirmware()
     }
 
 
-    //判断所获取的文件都是否存在，不存在就清空;
+    //;
     for (int m=0; m<download_info_type.size(); m++)
     {
         CString temp_file_path;
@@ -2100,7 +2100,7 @@ void CFlash_Multy::OnBnClickedButtonUpdateFirmware()
         }
     }
 
-    //将获取到的 最新版本的 填充至 表格;
+    //   ;
     for (int i=0; i<flash_device.size(); i++)
     {
         if (!m_flash_multy_list.GetCellChecked(i, FLASH_ITEM))
@@ -2149,7 +2149,7 @@ void CFlash_Multy::OnBnClickedButtonUpdateFirmware()
     OnBnClickedButtonStatrt();
 }
 
-//与 TemcoProductFirmware   里面的一致;
+// TemcoProductFirmware   ;
 int Get_File_Version(LPCTSTR filepath,unsigned char &HighVersion,unsigned char &LowVersion)
 {
     CFileFind fFind;

@@ -312,23 +312,23 @@ namespace T3000Controls
             Font font = new Font(new FontFamily(_FontName),
                          float.Parse(_FontSize.ToString()),
                          FontStyle.Bold | FontStyle.Italic | FontStyle.Strikeout | FontStyle.Underline);
-            if (!_Italic)//没有斜体
-            {//删除字体中的斜体样式
+            if (!_Italic)//
+            {//
                 font = new Font(font, font.Style & ~FontStyle.Italic);
             }
-            if (!_Bold)//没有粗体
-            {//删除字体中的粗体
+            if (!_Bold)//
+            {//
                 font = new Font(font, font.Style & ~FontStyle.Bold);
             }
-            if (!_Strikeout)//没有删除线
-            {//删除字体中的删除线
+            if (!_Strikeout)//
+            {//
                 font = new Font(font, font.Style & ~FontStyle.Strikeout);
             }
-            if (!_Underline)//没有下划线
-            {//删除字体中的下划线
+            if (!_Underline)//
+            {//
                 font = new Font(font, font.Style & ~FontStyle.Underline);
             }
-            //这样就得到原来保存的字体样式了，有点麻烦……
+            //
             this.Font = font;
 
             base.OnFontChanged(e);

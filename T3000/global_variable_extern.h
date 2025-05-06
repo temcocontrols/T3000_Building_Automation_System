@@ -64,12 +64,12 @@ extern	volatile int g_tstat_id;
 extern int g_protocol_support_ptp ;
 extern int g_output_support_relinquish ;
 //extern unsigned short output_relinquish_value[128];
-extern  int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。
+extern  int g_mstp_deviceid; //Device id  MSTP 
 extern unsigned int g_serialNum;
 extern	BOOL g_tstat_id_changed;
 extern  BOOL g_bPauseMultiRead;     // for background read register
 extern  int now_tstat_id;//for batch load/flash read/write
-extern  CString selected_image_fordor; //选中building的目录;
+extern  CString selected_image_fordor; //building;
 extern  CString g_strImagePathName;
 extern	CString	g_strDatabasefilepath;
 extern	CString g_strExePth;
@@ -79,10 +79,10 @@ extern  CString g_achive_folder_temp_db;
 extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
-extern CString g_ext_database_path ; //额外的配置档数据库路径;
-extern CString g_ext_mass_flash_path ; //保存多烧写  选中设备的 配置文件路径
+extern CString g_ext_database_path ; //;
+extern CString g_ext_mass_flash_path ; //   
 extern  CString g_achive_monitor_datatbase_path ;
-extern CString g_building_devicedatabase; //DeviceDatabase.mdb 全路径
+extern CString g_building_devicedatabase; //DeviceDatabase.mdb 
 extern BOOL g_mstp_flag;
 extern	BOOL g_Scanfully;
 extern	BOOL g_ScanSecurity;
@@ -913,16 +913,16 @@ extern int selected_product_index;
 extern HTREEITEM selected_tree_item;
 #pragma region For_bacnet
 
-extern CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
+extern CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//   ;
 extern CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
-//extern int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //自定义的  正向逻辑还是反向逻辑;
+//extern int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //  ;
 extern CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 extern CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
-extern bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
-extern bool receive_customer_unit; //收到回复，flag就置 true;
-extern bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
+extern bool read_customer_unit;	// customer unit,;
+extern bool receive_customer_unit; //flag true;
+extern bool read_analog_customer_unit;  // cus tabel ;
 extern bool read_msv_table; //MSV table 
-extern CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// 存储客户多态  例如显示  AAA/BBB/CCC
+extern CString Custom_Msv_Range[BAC_MSV_COUNT + 1];//     AAA/BBB/CCC
 extern CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 extern CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
 extern unsigned char bacnet_add_id[254];
@@ -968,7 +968,7 @@ extern bool bac_remote_point_read_results;
 extern bool bac_cm5_graphic;
 
 extern unsigned char  bac_gloab_panel;
-extern unsigned char g_thread_max_mac_id ; //客户上次点击的mstp mac ID
+extern unsigned char g_thread_max_mac_id ; //mstp mac ID
 extern int input_list_line;
 extern int output_list_line;
 extern int program_list_line ;
@@ -1018,8 +1018,8 @@ extern HWND      m_tstat_schedule_dlg_hwnd ;
 extern HWND      m_t3000_log_window ;
 extern HWND      m_msv_dlg_hwnd;
 extern Str_Setting_Info g_Device_Basic_Setting[256];
-extern vector < vector<Str_out_point> >			        g_Output_data; //全局所有panel output 的集合体;
-extern vector < vector<Str_in_point> >				    g_Input_data; //全局所有panel input 的集合体;
+extern vector < vector<Str_out_point> >			        g_Output_data; //panel output ;
+extern vector < vector<Str_in_point> >				    g_Input_data; //panel input ;
 extern vector < vector<Str_program_point> >		        g_Program_data;
 extern vector < vector<Str_variable_point> >		    g_Variable_data;
 extern vector < vector<Str_weekly_routine_point> >      g_Weekly_data;
@@ -1033,7 +1033,7 @@ extern vector < vector<Str_monitor_point> >             g_monitor_data;
 extern vector < vector<Str_TstatInfo_point> >           g_Tstat_data;
 extern vector < vector<Str_userlogin_point> >           g_user_login_data;
 extern vector < vector<Alarm_point> >				    g_alarmlog_data;
-extern vector < vector<Str_label_point> >			    g_graphic_label_data;//图片里面的Label的信息要存在设备里面;
+extern vector < vector<Str_label_point> >			    g_graphic_label_data;//Label;
 extern vector < vector<Str_Units_element> >		        g_customer_unit_data;
 extern vector < vector<Str_table_point> >		        g_analog_custmer_range;
 extern vector < vector<Str_variable_uint_point> >       g_variable_analog_unite;
@@ -1051,8 +1051,8 @@ extern Str_annual_routine_point s_Annual_data;
 extern Control_group_point s_screen_data;
 extern Str_monitor_point s_monitor_data;
 extern Str_t3_screen_Json s_json_screen_data;
-extern Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //缓存其他panel json item 值的 全局变量;
-extern vector <_panel_info> g_bacnet_panel_info; //全局的 object instance 与 panel number 对应的容器
+extern Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //panel json item  ;
+extern vector <_panel_info> g_bacnet_panel_info; // object instance  panel number 
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;                             
 extern vector <Str_program_point>  m_Program_data;
@@ -1071,7 +1071,7 @@ extern vector <_Graphic_Value_Info> m_graphic_refresh_data;
 extern vector <bacnet_standard_Info> m_standard_graphic_refresh_data;
 extern vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 extern vector <Alarm_point> m_alarmlog_data;
-extern bacnet_panel_object_info g_bac_panel[256]; //用于全局panel 与 object instance 对应查询;
+extern bacnet_panel_object_info g_bac_panel[256]; //panel  object instance ;
 extern vector <refresh_net_device> m_refresh_net_device_data;
 extern vector <refresh_subnet_device> m_refresh_subnet_status;
 extern vector <refresh_net_device> m_T3BB_device_data;
@@ -1092,11 +1092,11 @@ extern vector <GSM_connection_info> m_gsm_connect_info;
 extern vector <Scan_Info> m_scan_info;
 extern vector <Scan_Info> m_scan_info_buffer;
 extern vector <Client_Info> m_tcp_connect_info;
-extern vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
-extern vector <Str_t3_screen_Json> m_json_screen_data;		extern	vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen的信息要存在设备里面;
-extern vector <Str_item_Json> m_json_item_data;			extern    vector < vector<Str_item_Json> >			  g_json_item_data;//item的信息要存在设备里面;
-extern vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
-extern vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 新的setpoint表格; 以前的完全改不动了;
+extern vector <Str_label_point> m_graphic_label_data;	//Label;
+extern vector <Str_t3_screen_Json> m_json_screen_data;		extern	vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen;
+extern vector <Str_item_Json> m_json_item_data;			extern    vector < vector<Str_item_Json> >			  g_json_item_data;//item;
+extern vector <Str_remote_point> m_remote_point_data;  //Mini panel Tstat  ;
+extern vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 setpoint; ;
 extern Str_Setting_Info s_Basic_Setting;
 extern Str_Setting_Info Device_Basic_Setting;
 extern Str_Email_point  Device_Email_Point;
@@ -1107,14 +1107,14 @@ extern char m_at_read_buf[450];
 
 extern Monitor_Block m_monitor_block;
 extern Str_Monitor_data_header m_monitor_head;
-extern char picture_data_buffer[400]; //用来存每包 pic 的数据.
-extern Str_picture_header m_picture_head; //传图片的 头，结构其实是和 monitor same.
+extern char picture_data_buffer[400]; // pic .
+extern Str_picture_header m_picture_head; //  monitor same.
 extern int Monitor_Input__Data[14][1000];
 extern unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
-extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
+extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//2000;
 extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 
-extern int controller_counter ; //记录扫描的子节点
+extern int controller_counter ; //
 extern CString bac_cs_mac;
 extern CString bac_cs_device_id;
 //extern CString bac_cs_vendor_id;
@@ -1126,7 +1126,7 @@ extern int g_protocol;
 //to flag ,call new ,old IDE
 extern int g_new_old_IDE;
 extern int g_bac_read_type;
-extern bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
+extern bool g_bac_need_read_setting;  // Setting ;Label;
 extern HANDLE click_read_thread; 
 extern HANDLE BACnet_read_thread;
 extern HANDLE BACnet_abort_read_thread;
@@ -1142,12 +1142,12 @@ extern CString g_Print;
 extern HWND h_debug_window;
 extern unsigned long timesec1970; 
 extern unsigned long timestart;   
-extern bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
+extern bool range_cancel;//Range 01;
 extern int connect_invoke_id ;
 //extern bool connect_replay ;
 extern BACNET_OBJECT_PROPERTY_VALUE receive_object_value;  /* for bacapp printing */
 extern bool bac_show_alarm_window ;	//used for judge whether need to show the alarm window.
-extern bool bac_select_device_online ; //判断选中的bacnet device 是否在线;
+extern bool bac_select_device_online ; //bacnet device ;
 extern SOCKET h_Broad;
 extern SOCKADDR_IN h_siBind;
 extern SOCKADDR_IN h_bcast;
@@ -1159,15 +1159,15 @@ extern Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
 extern Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];
 extern int analog_data_max_value[MAX_POINTS_IN_MONITOR];
 extern int analog_data_min_value[MAX_POINTS_IN_MONITOR];
-extern int digital_data_count[MAX_POINTS_IN_MONITOR];	//用于记录digital data 这个指针到底存了多少数据;
+extern int digital_data_count[MAX_POINTS_IN_MONITOR];	//digital data ;
 extern int analog_data_count[MAX_POINTS_IN_MONITOR];
 extern int get_data_count ;
-extern int monitor_analog_count ;	//暂存monitor 的模拟和数字的个数;
+extern int monitor_analog_count ;	//monitor ;
 extern int monitor_digital_count ;
 extern Data_Time_Match * temp_analog_data[MAX_POINTS_IN_MONITOR];
 extern int SEND_COMMAND_DELAY_TIME ;
 extern bool TCP_Server_Running ;
-extern bool Gsm_communication ;	//如果是通过GSM 读远程设备 许多地方要特殊处理;不能刷新太频繁;
+extern bool Gsm_communication ;	//GSM  ;;
 extern CString SaveConfigFilePath;
 extern CString LoadConfigFilePath;
 extern vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
@@ -1179,7 +1179,7 @@ extern vector<Reg_Infor> g_Vector_Write_Error;
 extern CString g_strStartInterface_config;
 extern CString	g_configfile_path;
 extern bool need_read_bacnet_graphic_label_flag;
-extern bool read_write_bacnet_config ;	//读写Bacnet config 的时候禁止刷新 List;
+extern bool read_write_bacnet_config ;	//Bacnet config  List;
 
 extern int g_SleepTimeForConfig;
 extern vector <Tstat_Input_Struct> m_tstat_input_data;
@@ -1219,7 +1219,7 @@ extern int current_building_ipport;
 
 extern int m_user_level;
 
-extern CString Statuspanel;   //在状态栏显示panel 2-3;
+extern CString Statuspanel;   //panel 2-3;
 
 extern CString CS3000_INPUT_RANGE[4];
 extern BOOL g_NEED_MULTI_READ;
@@ -1229,18 +1229,18 @@ extern vector <IspModeInfo> g_isp_device_info;
 extern IspModeInfo need_isp_device;
 extern vector<Registers_Infor> g_vectRegisters;
 extern CString g_cstring_ini_path;
-extern CString g_trendlog_ini_path; //每个序列号单独一个配置档，避免配置文件过大;
+extern CString g_trendlog_ini_path; //;
 extern unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
 extern BOOL g_fresh_Graphic;
-extern bool b_stop_read_grp_label;		//如果读到空的grp label 就不要继续读下一个了;
-extern bool b_stop_read_tstat_schedule;	    //如果读到空的tstat 就不要继续读下一个了;
+extern bool b_stop_read_grp_label;		//grp label ;
+extern bool b_stop_read_tstat_schedule;	    //tstat ;
 
 extern Global_Calibration_Module   g_calibration_module_data;
  extern CDialog *g_Draw_dlg;
-extern unsigned int g_progress_persent ;	//用来记录全局状态栏该显示的 进度 百分比;
-extern int input_item_limit_count;	//input list 要显示多少个input 的个数， 不是根据vector 的size 来判断大小;
-extern int output_item_limit_count;	//output list 要显示多少个output 的个数， 不是根据vector 的size 来判断大小;
-extern int variable_item_limit_count;	//variable list 要显示多少个variable 的个数， 不是根据vector 的size 来判断大小;
+extern unsigned int g_progress_persent ;	//  ;
+extern int input_item_limit_count;	//input list input  vector size ;
+extern int output_item_limit_count;	//output list output  vector size ;
+extern int variable_item_limit_count;	//variable list variable  vector size ;
 extern int program_item_limit_count ;
 extern int controller_item_limit_count ;
 extern int screen_item_limit_count ;
@@ -1256,34 +1256,34 @@ extern Str_weekly_routine_point m_temp_weekly_data[BAC_SCHEDULE_COUNT];
 extern Str_annual_routine_point m_temp_annual_data[BAC_HOLIDAY_COUNT];
 extern Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
 extern Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
-extern int b_pause_refresh_tree; // 全局变量，控制主线程里面的 是否刷新网络数据;
-extern int b_building_management_flag ;//另一种 虚拟控制模式，yes就停止后台扫描以及刷新;
+extern int b_pause_refresh_tree; //  ;
+extern int b_building_management_flag ;// yes;
 extern int debug_item_show;
 
-extern char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
+extern char monitor_database_flag[24];   //Database 1 ;
 extern int Station_NUM;
 extern bool monitor_ignore_enable ;
 extern int monitor_ignore_max_value ;
 extern int monitor_ignore_min_value ;
 extern int persent_array_count;
 extern	unsigned int old_tx_count;
-extern int flash_multi_auto ; //用于控制 多烧的  自动控制;
-extern unsigned int T3000_Version ; //T3000的版本号.
+extern int flash_multi_auto ; //   ;
+extern unsigned int T3000_Version ; //T3000.
 extern HANDLE read_each_485_fun_thread ;
 extern bool hide_485_progress ;
 extern bool new_device_support_mini_ui;
 
-extern int flag_auto_scroll ; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
-extern int graphic_last_scale_type ; //用于存储上次 有效的 X轴的 刻度;
-extern unsigned int graphic_last_time_value; //x轴上次查看的时间;
+extern int flag_auto_scroll ; // X   1;;
+extern int graphic_last_scale_type ; //  X ;
+extern unsigned int graphic_last_time_value; //x;
 extern const CString c_strBaudate[NUMBER_BAUDRATE];
 #pragma endregion For_bacnet
 
-extern int global_interface; //用来标识全局的界面在哪？主要是 Input 和 output;
-extern bool b_remote_connection;  //全局的 用来判断 对远程设备的 特殊处理;
-extern bool refresh_tree_status_immediately ;	//如果置为true了，就会立即调用 刷新 ，不用等待一个周期，用于 某些IP或状态变了，立即刷新;
-extern unsigned int remote_connect_serial_number; // 远程连接的序列号;
-extern char ptpLoginName[30];	//远程连接的账号和密码;
+extern int global_interface; // Input  output;
+extern bool b_remote_connection;  //   ;
+extern bool refresh_tree_status_immediately ;	//true   IP;
+extern unsigned int remote_connect_serial_number; // ;
+extern char ptpLoginName[30];	//;
 extern char ptpLoginPassword[20];
 
 extern refresh_net_device device_same_panel_1;
@@ -1315,40 +1315,40 @@ extern COLORREF	  nDefaultclrTxt;
 extern int bacnet_view_number;
 extern int input_item_select_for_range;
 
-extern bitset<65536*3> read_analog_package;  //用于记录trendlog 已经记录了哪些模拟包
-extern bitset<65536*3> read_dig_package;     //用于记录trendlog 已经记录了哪些数字包
+extern bitset<65536*3> read_analog_package;  //trendlog 
+extern bitset<65536*3> read_dig_package;     //trendlog 
 extern unsigned char m_dialog_signal_type;
 extern int graphic_view_index ;
 extern CString grapgic_view_name[3];
 extern bool graphic_view_visible[14];
 extern CString bacnet_message_input_title;
-extern CString bacnet_message_return_string;  //得到的输入字符串
+extern CString bacnet_message_return_string;  //
 extern pidname_map product_map;
 extern pid_reglist_map product_reglist_map;
-extern bool offline_mode ; //全局离线模式判断;
-extern CString offline_prg_path;   //离线模式得prg 保存路径;
-extern bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
+extern bool offline_mode ; //;
+extern CString offline_prg_path;   //prg ;
+extern bac_mstp_com g_mstp_com; // mstp com  
 extern bool custom_bacnet_register_listview;
-extern bool n_wifi_connection;  //后台列表 刷新开关
-extern int MODE_SUPPORT_PTRANSFER; // 1 支持bip ptransfer 
+extern bool n_wifi_connection;  // 
+extern int MODE_SUPPORT_PTRANSFER; // 1 bip ptransfer 
 extern bool initial_bip ;
-extern Str_modbus_reg bacnet_to_modbus_struct; //用于bacnet 协议转换为modbus 协议的结构
-extern vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
+extern Str_modbus_reg bacnet_to_modbus_struct; //bacnet modbus 
+extern vector <str_bacnet_rp_info> standard_bacnet_data; // bacnet   ;
 extern vector <str_segmented_bacnet_rp_info> segmented_bacnet_data;
 extern panelname_map g_panelname_map;
-extern bacnet_instance_reg_map g_bacnet_reg_ins_map;  //用来区分每个instance 存放在那两个字节，不同产品，不同处理;
+extern bacnet_instance_reg_map g_bacnet_reg_ins_map;  //instance ;
 extern connect_Info system_connect_info;
-extern CString HolLable[BAC_HOLIDAY_COUNT]; //用于动态加载List中的下拉框
-extern int m_special_customer ;      //客户自定义T3000的名字;  // 1为CPR_Bestek
-extern CString cs_special_name;         //对应该改的名字;
-extern unsigned char n_ignore_sync_time;  //是否忽略同步时间;
-extern unsigned int last_ignore_sync_time;  //上次点击忽略同步时间的 时间节点;  比如用于3天后继续提醒;
-extern unsigned char check_revert_daxiaoduan; //大小端是否需要反转，正常旧版本不要反转;
-extern int n_read_product_type ; //这三个变量 确定 modbus协议 去读取 bacnet东西的时候 ，读哪些寄存器;
-extern int n_read_list_flag ; // 读取那一个，例如读Input 还是Output
-extern int n_read_item_index ; // 读哪一个 例如Schedule3 的时间 ，不能用weekly_list 因为界面上的容易变。
-extern unsigned int DEBUG_DELAY_TIME ; //测试用调试Wifi 延迟时间;
-extern CString bacnet_string; // 待解析的字串
+extern CString HolLable[BAC_HOLIDAY_COUNT]; //List
+extern int m_special_customer ;      //T3000;  // 1CPR_Bestek
+extern CString cs_special_name;         //;
+extern unsigned char n_ignore_sync_time;  //;
+extern unsigned int last_ignore_sync_time;  // ;  3;
+extern unsigned char check_revert_daxiaoduan; //;
+extern int n_read_product_type ; //  modbus  bacnet ;
+extern int n_read_list_flag ; // Input Output
+extern int n_read_item_index ; //  Schedule3  weekly_list 
+extern unsigned int DEBUG_DELAY_TIME ; //Wifi ;
+extern CString bacnet_string; // 
 
 extern vector < FloorInfo> bm_floor;
 extern vector < RoomInfo> bm_room;
@@ -1362,8 +1362,8 @@ extern short gsp_invoke;
 extern int gsp_invoke_instance[256];
 extern device_io_status select_device_io_status;
 extern vector <Str_BM_IO> m_bm_io_data;
-extern vector <Str_product_io_count> m_product_iocount;  // 用来存储不同设备包含的IO数量;
-extern vector <Str_online_serialnumber> m_online_serial; //在线的设备，用于动态菜单
+extern vector <Str_product_io_count> m_product_iocount;  // IO;
+extern vector <Str_online_serialnumber> m_online_serial; //
 extern bool Bacnet_debug_fileRead;
 extern bool bacnetIpDataRead;
 

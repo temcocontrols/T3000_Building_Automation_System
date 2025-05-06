@@ -2388,7 +2388,7 @@ namespace System.IO.BACnet
         FAILED = 3
     }
 
-    public struct BACnetPropertyState : ASN1.IASN1encode //C. Günther
+    public struct BACnetPropertyState : ASN1.IASN1encode //C. Gnther
     {
         public enum BACnetPropertyStates
         {
@@ -2853,7 +2853,7 @@ namespace System.IO.BACnet
 
 
 
-    public struct BACnetPrescale : ASN1.IASN1encode //C. Günther
+    public struct BACnetPrescale : ASN1.IASN1encode //C. Gnther
     {
         private uint multiplier;
         private uint moduloDivide;
@@ -3023,7 +3023,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetFaultParameter : ASN1.IASN1encode //C. Günther
+    public struct BACnetFaultParameter : ASN1.IASN1encode //C. Gnther
     {
         public BACnetFaultType type;
         public object Value;
@@ -3632,7 +3632,7 @@ namespace System.IO.BACnet
         }
     }
 
-    public struct BACnetAccessRule : ASN1.IASN1encode //C. Günther
+    public struct BACnetAccessRule : ASN1.IASN1encode //C. Gnther
     {
         private timerangerspecifier time_range_specifier;
         private BacnetDeviceObjectPropertyReference time_range;
@@ -3762,7 +3762,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetLightingCommand : ASN1.IASN1encode //C. Günther
+    public struct BACnetLightingCommand : ASN1.IASN1encode //C. Gnther
     {
         private BACnetLightingOperation operation;
         private float target_level;
@@ -3925,7 +3925,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetChannelValue : ASN1.IASN1encode //C. Günther
+    public struct BACnetChannelValue : ASN1.IASN1encode //C. Gnther
     {
 
         private ApplicationTag tag;
@@ -4259,7 +4259,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetGroupChannelValue : ASN1.IASN1encode //C. Günther
+    public struct BACnetGroupChannelValue : ASN1.IASN1encode //C. Gnther
     {
         public ushort channel;
         public uint overriding_priority;
@@ -4320,7 +4320,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetActionCommand : ASN1.IASN1encode //christopher Günther
+    public struct BACnetActionCommand : ASN1.IASN1encode //christopher Gnther
     {
         private bool opt_device_identifier;
         private BacnetObjectId device_identifier;
@@ -4546,7 +4546,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetActionList : ASN1.IASN1encode //christopher Günther
+    public struct BACnetActionList : ASN1.IASN1encode //christopher Gnther
     {
         public List<BACnetActionCommand> actions { get; set; }
 
@@ -4597,7 +4597,7 @@ namespace System.IO.BACnet
         }
     }
 
-    public struct BACnetBDTEntry //C. Günther
+    public struct BACnetBDTEntry //C. Gnther
     {
         public BACnetHostNPort bbmd_address;
         public bool opt_broadcast_mask;
@@ -4664,7 +4664,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetHostAddress //C. Günther
+    public struct BACnetHostAddress //C. Gnther
     {
         public BACnetHostAddressType type_tag;
         public object value;
@@ -4756,7 +4756,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetHostNPort //C. Günther
+    public struct BACnetHostNPort //C. Gnther
     {
         private BACnetHostAddress host;
         private ushort port;
@@ -4813,7 +4813,7 @@ namespace System.IO.BACnet
         }
     }
 
-    public struct BACnetFDTEntry //C. Günther
+    public struct BACnetFDTEntry //C. Gnther
     {
         public byte[] bacnetip_address;
         public ushort time_to_live;
@@ -4880,7 +4880,7 @@ namespace System.IO.BACnet
         }
     }
 
-    public struct BACnetAddressBinding //C. Günther
+    public struct BACnetAddressBinding //C. Gnther
     {
         private BacnetObjectId device_identifier;
         private BacnetAddress device_address;
@@ -4957,7 +4957,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetVMACEntry : ASN1.IASN1encode  //C. Günther
+    public struct BACnetVMACEntry : ASN1.IASN1encode  //C. Gnther
     {
         public byte[] virtual_mac_address;
         public byte[] native_mac_address;
@@ -5007,7 +5007,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetAccumulatorRecord : ASN1.IASN1encode //C. Günther
+    public struct BACnetAccumulatorRecord : ASN1.IASN1encode //C. Gnther
     {
         private DateTime timestamp;
         private uint present_value;
@@ -5119,7 +5119,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetRouterEntry : ASN1.IASN1encode //christopher Günther
+    public struct BACnetRouterEntry : ASN1.IASN1encode //christopher Gnther
     {
         public ushort network_number;
         public byte[] mac_address;
@@ -5211,7 +5211,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetWriteGroupRequest : ASN1.IASN1encode //C. Günther
+    public struct BACnetWriteGroupRequest : ASN1.IASN1encode //C. Gnther
     {
         public uint group_number;
         public uint write_priority;
@@ -5308,7 +5308,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetSubscribeCOVPropertyMultiple : ASN1.IASN1encode //C. Günther
+    public struct BACnetSubscribeCOVPropertyMultiple : ASN1.IASN1encode //C. Gnther
     {
         //could also be used for BACnetCOVMultipleSubscription but than has
         //BACnetRecipientProcess recipient instead of uint subscriber_process_identifier
@@ -5548,7 +5548,7 @@ namespace System.IO.BACnet
         }
     }
 
-    public struct BACnetCOVNotificationMultiple : ASN1.IASN1encode //C. Günther for UnconfirmedCOVNotificationMultiple and ConfirmedCOVNotificationMultiple
+    public struct BACnetCOVNotificationMultiple : ASN1.IASN1encode //C. Gnther for UnconfirmedCOVNotificationMultiple and ConfirmedCOVNotificationMultiple
     {
         //cg
         public uint subscriber_process_identifier;
@@ -5924,7 +5924,7 @@ namespace System.IO.BACnet
         }
     }
 
-    public struct BACnetObjectPropertyReference : ASN1.IASN1encode //C. Günther
+    public struct BACnetObjectPropertyReference : ASN1.IASN1encode //C. Gnther
     {
         private BacnetObjectId object_identifier;
         private BacnetPropertyIds property_identifier;
@@ -6019,7 +6019,7 @@ namespace System.IO.BACnet
         }
     }
 
-    public struct BACnetSetpointReference : ASN1.IASN1encode //C. Günther
+    public struct BACnetSetpointReference : ASN1.IASN1encode //C. Gnther
     {
         public BACnetObjectPropertyReference setpoint_reference;
 
@@ -6061,7 +6061,7 @@ namespace System.IO.BACnet
         }
     }
 
-    public struct BACnetShedLevel : ASN1.IASN1encode //C. Günther
+    public struct BACnetShedLevel : ASN1.IASN1encode //C. Gnther
     {
         private object value;
         private ShedLevelType type;
@@ -6187,7 +6187,7 @@ namespace System.IO.BACnet
 
     }
 
-    public struct BACnetEventParameter : ASN1.IASN1encode //C. Günther
+    public struct BACnetEventParameter : ASN1.IASN1encode //C. Gnther
     {
         /*BACnetNotificationParameters
           -- These choices have a one-to-one correspondence with the Event_Type enumeration with the exception of the
@@ -11293,7 +11293,7 @@ namespace System.IO.BACnet.Serialize
             uint len_value_type = 0;
 
             value = new BacnetValue();
-            /*C. Günther*/
+            /*C. Gnther*/
             //put before because has otherwise would decode as not context specific!
             if (property_id == BacnetPropertyIds.PROP_REQUESTED_SHED_LEVEL || property_id == BacnetPropertyIds.PROP_EXPECTED_SHED_LEVEL || property_id == BacnetPropertyIds.PROP_ACTUAL_SHED_LEVEL)
             {
@@ -12474,7 +12474,7 @@ namespace System.IO.BACnet.Serialize
         }
 
         //**********************************************************************************
-        // by Christopher Günter
+        // by Christopher Gnter
         public static void EncodeCreateProperty(EncodeBuffer buffer, BacnetObjectId object_id, ICollection<BacnetPropertyValue> value_list)
         {
 
@@ -13156,7 +13156,7 @@ namespace System.IO.BACnet.Serialize
         {
             int len = 0;;
 
-            if (GetEvent) len++;  // peut être tag 0
+            if (GetEvent) len++;  // peut tre tag 0
 
             while ((apdu_len - 3 - len) > 0)
             {

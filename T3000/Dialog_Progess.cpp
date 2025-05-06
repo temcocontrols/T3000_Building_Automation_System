@@ -44,11 +44,11 @@ BOOL CDialog_Progess::OnInitDialog()
 	CDialog::OnInitDialog();
 
 			
-	//设置进度条的范围
+	//
 		m_progress.SetRange(m_lower,m_upper);
-	//设置进度条的每一步的增量
+	//
 	//	m_progress.SetStep(m_setsetup);
-	//设置进度条的当前位置
+	//
 //	SetTimer(1, 1000, NULL);
 
 
@@ -69,7 +69,7 @@ BOOL CDialog_Progess::PreTranslateMessage(MSG* pMsg)
 // 	for (int i = 1;i<101;i++)
 // 	{
 // 		CString CStemp;
-// 		CStemp.Format(_T("%d％"),i);
+// 		CStemp.Format(_T("%d"),i);
 // 		SetDlgItemText(IDC_STATIC1,CStemp);
 // 
 // 		m_progress.SetPos(i);
@@ -110,7 +110,7 @@ void CDialog_Progess::ShowProgress( int setpos,int percent )
 {
 
 	CString CStemp;
-	CStemp.Format(_T("%d％"),percent);
+	CStemp.Format(_T("%d"),percent);
 	SetDlgItemText(IDC_STATIC1,CStemp);
 	m_progress.SetPos(setpos);
 

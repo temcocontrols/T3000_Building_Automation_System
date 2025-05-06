@@ -66,7 +66,7 @@ void CConfigFileHandler::SetConfigFilePath(const CString& strFilePath)
 
 
 // Create config file
-// If already exists don¡¯t create a new one
+// If already exists dont create a new one
 BOOL CConfigFileHandler::CreateConfigFile(const CString& strFilePath)
 {
 	ASSERT(strFilePath.GetLength() > 0);

@@ -160,7 +160,7 @@ void CSingleThumbOpt::OnLButtonDown(const CPoint& point)
 }
 
 
-// 下一步，大的数值
+// 
 void CSingleThumbOpt::MoveNextStep()
 {
 	int nPosition = m_thumb.GetPosition();
@@ -187,7 +187,7 @@ void CSingleThumbOpt::MoveNextStep()
 }
 
 
-// 上一步，小的数值
+// 
 void CSingleThumbOpt::MovePreStep()
 {
 	int nPosition = m_thumb.GetPosition();

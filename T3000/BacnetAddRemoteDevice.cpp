@@ -1,4 +1,4 @@
-// BacnetAddRemoteDevice.cpp : 实现文件
+// BacnetAddRemoteDevice.cpp : 
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include "global_function.h"
 #include "MainFrm.h"
 #include "ScanDlg.h"
-// CBacnetAddRemoteDevice 对话框
+// CBacnetAddRemoteDevice 
 
 vector <CString> local_ip_address;
 
@@ -48,12 +48,12 @@ BEGIN_MESSAGE_MAP(CBacnetAddRemoteDevice, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetAddRemoteDevice 消息处理程序
+// CBacnetAddRemoteDevice 
 
 HANDLE h_add_remote_thread = NULL;
 void CBacnetAddRemoteDevice::OnBnClickedButtonRemotedlgScan()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     BYTE address1, address2, address3, address4;
     //GetDlgItemText(IDC_COMBO_REMOTEDLG_LOCAL_IP, cs_local_ip);
     ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_REMOTEDLG_REMOTE_IP))->GetAddress(address1, address2, address3, address4);
@@ -285,7 +285,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 if (!query_serial.eof())
                 {
                     strSql.Format(_T("Delete  From  ALL_NODE Where Serial_ID = '%d' "), temp_struct.serialnumber);
-                    SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   //如果查询到有重复的就删除后在插入
+                    SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   //
                 }
 
                 if (IS_Temco_Product(read_data[7]))
@@ -333,7 +333,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
                 static_info.Format(_T("Add device %d into database success!"), i + 1);
                 Sleep(1000);
-                if (Bacnet_Private_Device(temp_struct.product_type)) //如果是T3 还要读下面是否挂有设备;
+                if (Bacnet_Private_Device(temp_struct.product_type)) //T3 ;
                 {
                     int ret_cusunits = GetPrivateData_Blocking(g_mstp_deviceid, READ_REMOTE_DEVICE_DB, 0, 0, sizeof(Str_Remote_TstDB), 3);
                     if (ret_cusunits > 0)
@@ -389,7 +389,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                                         if (!query_sub_serial.eof())
                                         {
                                             strSql.Format(_T("Delete  From  ALL_NODE Where Serial_ID = '%d' "), sub_serial);
-                                            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   //如果查询到有重复的就删除后在插入
+                                            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   //
                                         }
 
                                         CString cs_temp_name;
@@ -452,12 +452,12 @@ BOOL CBacnetAddRemoteDevice::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  在此添加额外的初始化
+    // TODO:  
     InitialStatic();
     InitialUI();
     SetTimer(1, 200, NULL);
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // 异常: OCX 属性页应返回 FALSE
+                  // : OCX  FALSE
 }
 
 void CBacnetAddRemoteDevice::InitialStatic()
@@ -514,7 +514,7 @@ void CBacnetAddRemoteDevice::InitialUI()
 
 BOOL CBacnetAddRemoteDevice::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: 在此添加专用代码和/或调用基类
+    // TODO: /
 
     return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -523,7 +523,7 @@ BOOL CBacnetAddRemoteDevice::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetAddRemoteDevice::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    // TODO: /
     static int addinfo_count = 1;
     if (Compare_CS.CompareNoCase(static_info) == 0)
     {

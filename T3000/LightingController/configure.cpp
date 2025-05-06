@@ -53,7 +53,7 @@ BOOL Cconfigure::OnInitDialog()
 	unsigned short Data[4];
 	Read_Multi(g_tstat_id,Data,0,4);
 	m_sn=Data[0]+Data[1]*256+Data[2]*256*256+Data[3]*256*256*256;
-	m_msflexgrid.put_Rows(25); //行
+	m_msflexgrid.put_Rows(25); //
 	//set row high
 	m_msflexgrid.put_WordWrap(TRUE);
 	m_msflexgrid.put_RowHeight(0,500);
@@ -62,7 +62,7 @@ BOOL Cconfigure::OnInitDialog()
 	{
 		m_msflexgrid.put_ColAlignment(n,4);
 	}
-//设置行的高度
+//
     
 	CString str;
 	for(int i=1;i<25;i++)
@@ -73,7 +73,7 @@ BOOL Cconfigure::OnInitDialog()
 		m_msflexgrid.put_TextMatrix(i,1,_T("ON/OFF"));
 	}
 	m_msflexgrid.put_Cols(7);
-	//设置列宽
+	//
 	m_msflexgrid.put_ColWidth(0,1200);
 	m_msflexgrid.put_ColWidth(1,1500);
 	m_msflexgrid.put_ColWidth(2,1500);
@@ -88,10 +88,10 @@ BOOL Cconfigure::OnInitDialog()
 	m_msflexgrid.put_TextMatrix(0,4,_T("Auto/Manual"));
 	m_msflexgrid.put_TextMatrix(0,5,_T("Delay Time(s)"));
     m_msflexgrid.put_TextMatrix(0,6,_T("Time Left(s)"));
-	//读取硬件数据
+	//
 
-	//201…224	1 * 24	switch (1..24) types: 0 --- low active,  1--- high active,   2 --- falling edge active,    3 --- rising edge active
-	//252…275	2 * 24	override time for each switch. Uint is second. 2bytes = 65536s =~18hours max.
+	//201224	1 * 24	switch (1..24) types: 0 --- low active,  1--- high active,   2 --- falling edge active,    3 --- rising edge active
+	//252275	2 * 24	override time for each switch. Uint is second. 2bytes = 65536s =~18hours max.
 	memset(m_switch,0,sizeof(m_switch));
     memset(m_overridetime,0,sizeof(m_overridetime));
     memset(m_MB,0,sizeof(m_MB));
@@ -264,36 +264,36 @@ DWORD WINAPI _UpdateThread_LC(LPVOID pParam)
 void Cconfigure::ClickMsflexgridConfigure()
 {
     KILLTIMER
-	long lRow = m_msflexgrid.get_RowSel();//获取点击的行号	
-	long lCol = m_msflexgrid.get_ColSel(); //获取点击的列号	
+	long lRow = m_msflexgrid.get_RowSel();//	
+	long lCol = m_msflexgrid.get_ColSel(); //	
 
 	CRect rect;	
-	m_msflexgrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形
-	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-	//需要将其转化为像素，1440缇= 1英寸
+	m_msflexgrid.GetWindowRect(rect); //
+	ScreenToClient(rect); //
+	// MSFlexGrid"(twips)"
+	//1440= 1
 	CDC* pDC =GetDC();
-	//计算象素点和缇的转换比例
+	//
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//()
 	long y = m_msflexgrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_msflexgrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//()11
 	long width = m_msflexgrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_msflexgrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//
 	CRect rc(x,y,x+width,y+height);
-	//转换成相对对话框的坐标	
+	//	
 	rc.OffsetRect(rect.left+1,rect.top+1);	
-	//获取选中格的文本信息	
+	//	
 	m_CurRow=lRow;
 	m_CurCol=lCol;
 	CString strValue = m_msflexgrid.get_TextMatrix(lRow,lCol);
 	m_oldname=strValue;
 	if (lCol == 1||lCol ==2||lCol==4)
 	{
-		//使用combobox控件形式显示
+		//combobox
 		m_edit.ShowWindow(SW_HIDE);
 		m_controlcombo.ShowWindow(SW_SHOW);
 
@@ -320,10 +320,10 @@ void Cconfigure::ClickMsflexgridConfigure()
 			m_controlcombo.AddString(_T("OFF"));
 			 
 		}
-		m_controlcombo.MoveWindow(&rc,1); //移动到选中格的位置
+		m_controlcombo.MoveWindow(&rc,1); //
 		m_controlcombo.BringWindowToTop();	
 		m_controlcombo.SelectString(-1,strValue);
-		m_controlcombo.ShowWindow(SW_SHOW);//显示控件
+		m_controlcombo.ShowWindow(SW_SHOW);//
 	}
 	else if (lCol ==3||lCol ==5)
 	{  
@@ -339,13 +339,13 @@ void Cconfigure::ClickMsflexgridConfigure()
         
          
        
-		//使用edition控件形式显示
+		//edition
 		m_controlcombo.ShowWindow(SW_HIDE);
 		m_edit.MoveWindow(&rc,1);
 		m_edit.ShowWindow(SW_SHOW);	
 		m_edit.SetWindowText(strValue);	
 		m_edit.SetFocus();
-		m_edit.SetCapture();//使随后的鼠标输入都被发送到这个CWnd 
+		m_edit.SetCapture();//CWnd 
 		int nLenth=strValue.GetLength();	
 		m_edit.SetSel(nLenth,nLenth); 	
 
@@ -360,8 +360,8 @@ void Cconfigure::ClickMsflexgridConfigure()
 
 void Cconfigure::OnCbnKillfocusComboSelect()
 {KILLTIMER
-	long lRow = m_msflexgrid.get_RowSel();//获取点击的行号	
-	long lCol = m_msflexgrid.get_ColSel(); //获取点击的列号	
+	long lRow = m_msflexgrid.get_RowSel();//	
+	long lCol = m_msflexgrid.get_ColSel(); //	
 
 
 
@@ -461,8 +461,8 @@ void Cconfigure::OnBnClickedButtonSend()
 //	}
 //
 //
-//	//201…224	1 * 24	switch (1..24) types: 0 --- low active,  1--- high active,   2 --- falling edge active,    3 --- rising edge active
-//	//252…275	2 * 24	override time for each switch. Uint is second. 2bytes = 65536s =~18hours max.
+//	//201224	1 * 24	switch (1..24) types: 0 --- low active,  1--- high active,   2 --- falling edge active,    3 --- rising edge active
+//	//252275	2 * 24	override time for each switch. Uint is second. 2bytes = 65536s =~18hours max.
 //	int ret1=0,ret=0;
 //	ret = Write_Multi(g_tstat_id,Sendswitch,201,24);
 //	//int ret1 = Write_Multi(g_tstat_id,SendTimebye,252,48);
@@ -527,8 +527,8 @@ KILLTIMER
 	{
 		Value=16;
 	}
-	RegValue&=0x0F;//留底位，去高位
-	RegValue+=Value;//置高位
+	RegValue&=0x0F;//
+	RegValue+=Value;//
 	ret=write_one(g_tstat_id,200+m_CurRow,RegValue);
 
 
@@ -598,7 +598,7 @@ void Cconfigure::OnTimer(UINT_PTR nIDEvent)
     //if (pNewView != pActiveView)
     //{
     //    KillTimer(1);
-    //    //恢复T3000主线程
+    //    //T3000
     //   /* pMain->m_pFreshMultiRegisters->ResumeThread();
     //    pMain->m_pRefreshThread->ResumeThread();*/
 

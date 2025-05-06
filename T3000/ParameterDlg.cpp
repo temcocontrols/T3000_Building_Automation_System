@@ -327,7 +327,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_BN_CLICKED(IDC_BUTTON_ICON_SETTING, &CParameterDlg::OnBnClickedButtonIconSetting)
     ON_CBN_SELCHANGE(IDC_DELTA_SELECT_1, &CParameterDlg::OnCbnSelchangeDeltaSelect1)
     ON_CBN_SELCHANGE(IDC_DELTA_SELECT_2, &CParameterDlg::OnCbnSelchangeDeltaSelect2)
-    ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)  //添加 高级选项界面对话框的提示语;
+    ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)  //
 END_MESSAGE_MAP()
 
 	/// <summary>
@@ -359,13 +359,13 @@ BOOL CParameterDlg::OnInitDialog()
 {
 	//20120420
 	//pProgess = new CDialog_Progess(this,1,10);
-	//创建对话框窗口
+	//
 
 
-	//居中显示
+	//
 	//	pProgess->CenterWindow();//2.5.0.98
 
-	//显示对话框窗口
+	//
 
 	//20120420
 
@@ -422,11 +422,11 @@ BOOL CParameterDlg::OnInitDialog()
 		m_baudRateCombox.AddString(L"19200");
 	}
 
-	m_gUnit.AddString(_T("°C"));
-	m_gUnit.AddString(_T("°F"));
+	m_gUnit.AddString(_T("C"));
+	m_gUnit.AddString(_T("F"));
 
 
-    //Fandu 20180127  TSTAT8 才显示 额外新增的 TSTAT 参数对话框的 按钮;
+    //Fandu 20180127  TSTAT8  
     if ((product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9))
     {
         GetDlgItem(IDC_BUTTON_PARAMETER_EXT)->ShowWindow(SW_SHOW);
@@ -875,7 +875,7 @@ void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 //        strSerial.Trim();
 //        g_tstat_id=nID;
 //
-//        // 修改product name
+//        // roduct name
 //        int nProductClassID = 0;
 //        for(UINT i = 0; i < pPraent->m_product.size(); i++)
 //        {
@@ -1659,7 +1659,7 @@ void CParameterDlg::OnCbnSelchangeEapplication()
         BOOL bOccupied = nOccupied & 0x0001;
         if (bOccupied)  // day  - Occupied
         {
-            //nRet = write_one(g_tstat_id, 454 ,m_application_ctrl.GetCurSel()); // 5E 以及以前的型号  //tstat6 在TSTAT6会死在这里
+            //nRet = write_one(g_tstat_id, 454 ,m_application_ctrl.GetCurSel()); // 5E tstat6 ST6
         }
         else
         {
@@ -1724,19 +1724,19 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
             {
                 if (g_unint)
                 {
-                    strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
+                    strText.Format(_T("%0.1fC"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
                     m_nightheating.SetWindowText(strText);
 
                     //m_nightheating.Format("%d%c",product_register_value[123],176);//night heating deadband
-                    strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);		//124
+                    strText.Format(_T("%0.1fC"),(float)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);		//124
                     m_nightcooling.SetWindowText(strText);
 
                 }
                 else
                 {
-                    strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//182   354
+                    strText.Format(_T("%0.1fF"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//182   354
                     m_nightheating.SetWindowText(strText);
-                    strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//183
+                    strText.Format(_T("%0.1fF"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//183
                     m_nightcooling.SetWindowText(strText);
 
                 }
@@ -1749,18 +1749,18 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
             {
                 if (g_unint)
                 {
-                    strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10);
+                    strText.Format(_T("%dC"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10);
                     m_nightheating.SetWindowText(strText);
 
-                    strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10);//183
+                    strText.Format(_T("%dC"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10);//183
                     m_nightcooling.SetWindowText(strText);
                 }
                 else
                 {
-                    strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10);
+                    strText.Format(_T("%dF"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10);
                     m_nightheating.SetWindowText(strText);
 
-                    strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10);//183
+                    strText.Format(_T("%dF"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10);//183
                     m_nightcooling.SetWindowText(strText);
                 }
 
@@ -1769,18 +1769,18 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
             {
                 if (g_unint)
                 {
-                    strText.Format(_T("%0.1f°C"),(float)(product_register_value[123]/10.0));
+                    strText.Format(_T("%0.1fC"),(float)(product_register_value[123]/10.0));
                     m_nightheating.SetWindowText(strText);
 
-                    strText.Format(_T("%0.1f°C"),(float)(product_register_value[124]/10.0));
+                    strText.Format(_T("%0.1fC"),(float)(product_register_value[124]/10.0));
                     m_nightcooling.SetWindowText(strText);
                 }
                 else
                 {
-                    strText.Format(_T("%0.1f°F"),(float)product_register_value[123]/10.0);
+                    strText.Format(_T("%0.1fF"),(float)product_register_value[123]/10.0);
                     m_nightheating.SetWindowText(strText);
 
-                    strText.Format(_T("%0.1f°F"),(float)product_register_value[124]/10.0);
+                    strText.Format(_T("%0.1fF"),(float)product_register_value[124]/10.0);
                     m_nightcooling.SetWindowText(strText);
 
                 }
@@ -1819,19 +1819,19 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
             {
                 if (g_unint)
                 {
-                    strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
+                    strText.Format(_T("%0.1fC"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
                     m_nightheating.SetWindowText(strText);
 
                     //m_nightheating.Format("%d%c",product_register_value[123],176);//night heating deadband
-                    strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);		//124
+                    strText.Format(_T("%0.1fC"),(float)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);		//124
                     m_nightcooling.SetWindowText(strText);
 
                 }
                 else
                 {
-                    strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//182   354
+                    strText.Format(_T("%0.1fF"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//182   354
                     m_nightheating.SetWindowText(strText);
-                    strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//183
+                    strText.Format(_T("%0.1fF"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//183
                     m_nightcooling.SetWindowText(strText);
 
                 }
@@ -1844,18 +1844,18 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
             {
                 if (g_unint)
                 {
-                    strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
+                    strText.Format(_T("%dC"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
                     m_nightheating.SetWindowText(strText);
 
-                    strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+                    strText.Format(_T("%dC"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
                     m_nightcooling.SetWindowText(strText);
                 }
                 else
                 {
-                    strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
+                    strText.Format(_T("%dF"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
                     m_nightheating.SetWindowText(strText);
 
-                    strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+                    strText.Format(_T("%dF"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
                     m_nightcooling.SetWindowText(strText);
                 }
 
@@ -1864,18 +1864,18 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
             {
                 if (g_unint)
                 {
-                    strText.Format(_T("%0.1f°C"),(float)(product_register_value[123]/10.0));
+                    strText.Format(_T("%0.1fC"),(float)(product_register_value[123]/10.0));
                     m_nightheating.SetWindowText(strText);
 
-                    strText.Format(_T("%0.1f°C"),(float)(product_register_value[124]/10.0));
+                    strText.Format(_T("%0.1fC"),(float)(product_register_value[124]/10.0));
                     m_nightcooling.SetWindowText(strText);
                 }
                 else
                 {
-                    strText.Format(_T("%0.1f°F"),(float)product_register_value[123]/10.0);
+                    strText.Format(_T("%0.1fF"),(float)product_register_value[123]/10.0);
                     m_nightheating.SetWindowText(strText);
 
-                    strText.Format(_T("%0.1f°F"),(float)product_register_value[124]/10.0);
+                    strText.Format(_T("%0.1fF"),(float)product_register_value[124]/10.0);
                     m_nightcooling.SetWindowText(strText);
 
                 }
@@ -2297,7 +2297,7 @@ void CParameterDlg::OnBnClickedInputsbutton()
     CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;//tstat6
     //	pMain->m_pFreshMultiRegisters->SuspendThread(); //Annul by Fance
     pMain->m_pRefreshThread->SuspendThread();
-    g_bPauseMultiRead = TRUE;	//暂停主线程读取 寄存器;	//Add by Fance
+    g_bPauseMultiRead = TRUE;	//;d by Fance
     CInputSetDlg dlg;
     dlg.DoModal();
     InitPID2ComboBox();
@@ -2311,7 +2311,7 @@ void CParameterDlg::OnBnClickedInputsbutton()
 
 void CParameterDlg::OnBnClickedOutputsbutton()
 {
-    g_bPauseMultiRead = TRUE;	//暂停主线程读取 寄存器;	//Add by Fance
+    g_bPauseMultiRead = TRUE;	//;d by Fance
     COutputSetDlg dlg;
     dlg.DoModal();
     g_bPauseMultiRead =FALSE;		//Add by Fance
@@ -2323,7 +2323,7 @@ void CParameterDlg::OnBnClickedOutputstablebutton()
     CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 
 
-    g_bPauseMultiRead = TRUE;	//暂停主线程读取 寄存器;	//Add by Fance
+    g_bPauseMultiRead = TRUE;	//;d by Fance
     COutPutDlg Dlg;
     Dlg.DoModal();
     g_bPauseMultiRead =FALSE;	//Add by Fance
@@ -2438,7 +2438,7 @@ BOOL CParameterDlg::PreTranslateMessage(MSG* pMsg)
 
 void CParameterDlg::OnEnKillfocusSetvalue1()
 {
-//修改这个因为 用消息 一直在消息队列中，故而改成这种方式
+//
     if(g_ParamLevel==1)
         return;
     CString strText;
@@ -2474,7 +2474,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 
 
     }
-    else if(product_register_value[7] == PM_TSTAT5G || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR))  // 只有5E使用135
+    else if(product_register_value[7] == PM_TSTAT5G || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E || product_register_value[7] == PM_PM5E_ARM ||(product_register_value[7]==PM_TSTATRUNAR))  // E
     {
         //short nVal = short(fValue);
         /*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,short(fValue),
@@ -2533,7 +2533,7 @@ void CParameterDlg::OnCbnSelchangeOccupiedmodecombo()
 }
 
 
-//Modify by Fance 这里原来的代码400只支持 5E 不支持T6 所以 改为如下
+//Modify by Fance 
 void CParameterDlg::OnCbnSelchangeComboLcdscrn1()
 {
     CComboBox* pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_LCDSCRN1);
@@ -2606,9 +2606,9 @@ void CParameterDlg::OnCbnKillfocusCombo4()
 
 
 
-CString CParameterDlg::GetInputValue(int InputNo) //这个是行号，如果是Input的话，要在这个基础上加1
+CString CParameterDlg::GetInputValue(int InputNo) //
 {
-//所以InputNO=InputNo+1;
+//putNO=InputNo+1;
     InputNo+=1;
     float fValue;
     short nValue;
@@ -2678,12 +2678,12 @@ void CParameterDlg::Reflesh_ParameterDlg()
     if(product_register_value[MODBUS_DEGC_OR_F] == 1)	//t5= 121;t6=104
     {
         g_unint = FALSE;
-        GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("°F"));
+        GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("F"));
     }
     else
     {
         g_unint = TRUE;
-        GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("°C"));
+        GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("C"));
     }
 
 #if 1
@@ -2767,7 +2767,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 
-    // 	203	397	1	Low byte	W/R	"dIS ¨C Display.  This sets the display to either room temperature or setpoint.  0 = room temp,
+    // 	203	397	1	Low byte	W/R	"dIS C Display.  This sets the display to either room temperature or setpoint.  0 = room temp,
     // 		1 = setpoint, 2 = Blank Display,3 = PID2 value,4 = PID2 setpoint,
     // 		5 = set segment code by manually, 6 = Display sleep"
 
@@ -2830,7 +2830,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
     m_inputFilterEdit.SetWindowText(strTemp);
 
 
-    //201	241	1	Low byte	W/R	"MODBUS_CYCLING_DELAY ¨C delay time (in minutes) for switching out of heating or cooling
+    //201	241	1	Low byte	W/R	"MODBUS_CYCLING_DELAY C delay time (in minutes) for switching out of heating or cooling
     //strTemp.Format(_T("%d"),product_register_value[201]);
     strTemp.Format(_T("%d"),product_register_value[MODBUS_CYCLING_DELAY]);	//201  T6=241
     m_cycledlayEdit.SetWindowText(strTemp);
@@ -2856,7 +2856,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
     if(product_type!=3)	//TSTAT6 7 does not have this parameter
     {
-        strTemp.Format(_T("%d"),product_register_value[MODBUS_ROTATION_TIME_LEFT]);//tstat6,7Ã»ÕÒµ½¡£	333
+        strTemp.Format(_T("%d"),product_register_value[MODBUS_ROTATION_TIME_LEFT]);//tstat6,7	333
         m_timerLeft.SetWindowText(strTemp);
 
     }
@@ -2916,7 +2916,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
     {
         --sel;
     }
-    m_timerSelectCombox.SetCurSel(sel);	//327  408->409才对
+    m_timerSelectCombox.SetCurSel(sel);	//327  408->409
 
 
     //211	111	1	Low byte	W/R	Unoccupied Override Timer, Ort. 0=disabled, >0=number of minutes manual override is allowed
@@ -2981,11 +2981,11 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
         if(product_register_value[382]>=5&&product_register_value[382]<=14) // input1
         {
-            if (product_register_value[382] == 13) //说明是选择的CO2 ，而CO2对应的是 index 是10
+            if (product_register_value[382] == 13) //1
             {
                 strTemp = m_tstat_input_data.at(10).Value.StrValue + m_tstat_input_data.at(10).Unit.StrValue;
             }
-            else if (product_register_value[382] == 14) //说明是选择的HUM ，而HUM对应的是 index 是9
+            else if (product_register_value[382] == 14) //9
             {
                 strTemp = m_tstat_input_data.at(9).Value.StrValue + m_tstat_input_data.at(9).Unit.StrValue;
             }
@@ -3023,22 +3023,22 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			)
 		{
 			bitset<16>  value109(product_register_value[109]);
-			int sel = value109[4];//第五位
+			int sel = value109[4];//
 			m_combox_mrd.SetCurSel(sel);
 		}
 		else
 		{
 			bitset<16>  value184(product_register_value[184]);
-			int sel = value184[4];//第五位
+			int sel = value184[4];//
 			m_combox_mrd.SetCurSel(sel);
 		}
         if(product_register_value[383]>=5&&product_register_value[383]<=14) // input1
         {
-            if (product_register_value[383] == 13) //说明是选择的CO2 ，而CO2对应的是 index 是10
+            if (product_register_value[383] == 13) //1
             {
                 strTemp = m_tstat_input_data.at(10).Value.StrValue + m_tstat_input_data.at(10).Unit.StrValue;
             }
-            else if (product_register_value[383] == 14) //说明是选择的HUM ，而HUM对应的是 index 是9
+            else if (product_register_value[383] == 14) //9
             {
                 strTemp = m_tstat_input_data.at(9).Value.StrValue + m_tstat_input_data.at(9).Unit.StrValue;
             }
@@ -3296,7 +3296,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
             else
             {
                 m_application_ctrl.SetCurSel(product_register_value[454]);
-                // 5E 以及以后的型号
+                // 5E 
             }
 
         }
@@ -3381,7 +3381,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
     m_dayOccEdt2.SetWindowText(strTemp);
 
 
-    //下面有问题;
+    //
     //if (product_register_value[MODBUS_INPUT1_SELECT]==3) // humidity		//241
     //{
     //	strTemp.Format(_T("%0.1f%%"),product_register_value[422]/10.0);	//422 Don't know why???
@@ -3389,7 +3389,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
     //}
 
     strTemp.Empty();
-    //上面可能有问题;
+    //
 
     if(product_type!=T3000_6_ADDRESS)
     {
@@ -4054,11 +4054,11 @@ HBRUSH CParameterDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
     
     for (int i=0; i<(int)Change_Color_ID.size(); i++)
     {
-        if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
+        if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//d->
         {
             pDC->SetTextColor(RGB(0,0,0));
-            pDC->SetBkColor(RGB(255,0,0));//设置文本背景色
-            pDC->SetBkMode(TRANSPARENT);//设置背景透明
+            pDC->SetBkColor(RGB(255,0,0));//
+            pDC->SetBkMode(TRANSPARENT);//
             hbr = (HBRUSH)m_brush;
         }
 
@@ -4108,12 +4108,12 @@ void CParameterDlg::OnCbnSelchangeStaticunint2()
         if(product_register_value[MODBUS_DEGC_OR_F] == 1)	//t5= 121;t6=104
         {
             g_unint = FALSE;
-            GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°F"));
+            GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("F"));
         }
         else
         {
             g_unint = TRUE;
-            GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°C"));
+            GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("C"));
         }
 
     }
@@ -4212,27 +4212,27 @@ void CParameterDlg::OnCbnSelchangeInputselect3Pid3()
 
     Reflesh_ParameterDlg();
 }
-//获取一个第八位数据，s:system:进制，n;num:这个数是几位的，第N位是1还是0
+//em:
 //n>=N
 BOOL CParameterDlg::Get_Data_Bit(UINT Data,int n,int N)
 {
-    //Data=Data&0FFx;//去掉高八位数据
-    //下面是算幂 2的N
-    //最大的num位数的数是？ 2~num-1
+    //Data=Data&0FFx;//
+    //N
+    //m-1
     // AfxMessageBox(_T("OK"));
     UINT num=1;
     for (int i=1; i<=n; i++)
     {
         num=num*2;
     }
-    num=num-1;//最大的num位数
-    Data=Data&num;//取得这个n位数是什么 ？
+    num=num-1;//m
+    Data=Data&num;//
     num=1;
     for (int i=1; i<N; i++)
     {
         num=num*2;
     }
-    if (num==(Data&num))//说明是1
+    if (num==(Data&num))//
     {
         return TRUE;
     }
@@ -5305,7 +5305,7 @@ void CParameterDlg::OnEnKillfocusEditTstatName()
     {
         return;
     }
-    if(newname.GetLength()> 17)	//长度不能大于结构体定义的长度;
+    if(newname.GetLength()> 17)	//
     {
         newname.Delete(16,newname.GetLength()-16);
     }
@@ -5330,7 +5330,7 @@ void CParameterDlg::OnEnKillfocusEditTstatName()
         SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
         SqliteDBBuilding.closedb();
         CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-        // 这里就是用来刷新产品树结构,刷新树的产品的名字，以及名字产品的装填
+        // 
         ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
     }
     /* else
@@ -5468,7 +5468,7 @@ BOOL CParameterDlg::OnHelpInfo(HELPINFO* pHelpInfo)
 
 void CParameterDlg::OnEnKillfocusEditDterm()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     if (g_ParamLevel == 1)
         return;
 
@@ -5488,7 +5488,7 @@ void CParameterDlg::OnEnKillfocusEditDterm()
 
 void CParameterDlg::OnEnKillfocusEditSamplingInterval()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     if (g_ParamLevel == 1)
         return;
 
@@ -5508,7 +5508,7 @@ void CParameterDlg::OnEnKillfocusEditSamplingInterval()
 
 void CParameterDlg::OnBnClickedButtonParameterExt()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     CParameterExtDlg dlg;
     dlg.DoModal();
 }
@@ -5684,7 +5684,7 @@ void CParameterDlg::OnEnKillfocusEdit35()
 #include "TstatIconSetting.h"
 void CParameterDlg::OnBnClickedButtonIconSetting()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
     CTstatIconSetting dlg;
     dlg.DoModal();
 }
@@ -5692,7 +5692,7 @@ void CParameterDlg::OnBnClickedButtonIconSetting()
 
 void CParameterDlg::OnCbnSelchangeDeltaSelect1()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
 
     CString temp_string;
     unsigned short TempValue;
@@ -5719,7 +5719,7 @@ void CParameterDlg::OnCbnSelchangeDeltaSelect1()
 
 void CParameterDlg::OnCbnSelchangeDeltaSelect2()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 
 
 
     CString temp_string;

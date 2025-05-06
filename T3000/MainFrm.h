@@ -124,21 +124,21 @@ typedef struct _BUILDING_TAG
 typedef struct ext_info
 {
 	int virtual_device;  // 0  default    1  verture device
-	int mini_type;       //¶ÔÓ¦ Setting ½çÃæµÄ  mini_type
-	int special_com_communicate;  //È¡Öµ  1  ¿Í»§×Ô¶¨ÒåµÄ´®¿Ú Í£Ö¹Î» Ð£ÑéÎ»Ö®ÀàµÄ;
-	unsigned char com_data_bit;   //È¡Öµ  -1 Îª²»¿ÉÓÃ    5  6 7 8
-	unsigned char com_stop_bit;   //È¡Öµ  -1 Îª²»¿ÉÓÃ    1   1.5   2
-	unsigned char com_parity_bit;  //È¡Öµ  -1 Îª²»¿ÉÓÃ  0:None  1:odd    2:Even   
+	int mini_type;       // Setting   mini_type
+	int special_com_communicate;  //  1    ;
+	unsigned char com_data_bit;   //  -1     5  6 7 8
+	unsigned char com_stop_bit;   //  -1     1   1.5   2
+	unsigned char com_parity_bit;  //  -1   0:None  1:odd    2:Even   
 
 };
 
 typedef struct tree_io_info
 {
-	HTREEITEM h_tree_item; //×Ó½ÚµãÊ÷¾ä±ú
-	HTREEITEM h_parent_item; // ¸¸½ÚµãµÄ¾ä±ú
+	HTREEITEM h_tree_item; //
+	HTREEITEM h_parent_item; // 
 	int h_item_type; // input or output or ......
-	int capacity;   //×î´ó¸öÊý
-	int already_use; //ÒÑ¾­Ê¹ÓÃ;
+	int capacity;   //
+	int already_use; //;
 }tree_sub_io;
 
 typedef struct _tree_product//////////////////////
@@ -164,9 +164,9 @@ typedef struct _tree_product//////////////////////
     unsigned int note_parent_serial_number;
     unsigned char panel_number;
     unsigned int object_instance;
-    UCHAR  subnet_port;  //Éè±¸ÊôÓÚÄÄÒ»¸ö¶Ë¿Ú»Ø¸´³öÀ´µÄ¡£ 1- MainPort      2-ZigbeePort      3-SubPort
-    UCHAR  subnet_baudrate;   //×ÓÉè±¸ËùÓÃµÄ²¨ÌØÂÊ; ºÍÖ®Ç°¶¨ÒåµÄ²¨ÌØÂÊÐòºÅ¶ÔÓ¦
-    UCHAR  expand; //ÊÇ·ñÊ÷ÐÎ½á¹¹Õ¹¿ª; 1ÎªÄ¬ÈÏÕ¹¿ª »òÕß ·Ç2 ÎªÕ¹¿ª       2 ÎªÕÛµþ
+    UCHAR  subnet_port;  // 1- MainPort      2-ZigbeePort      3-SubPort
+    UCHAR  subnet_baudrate;   //; 
+    UCHAR  expand; //; 1  2        2 
 	ext_info m_ext_info;
 	tree_sub_io sub_io_info[TREE_MAX_TYPE];
 	
@@ -341,7 +341,7 @@ public:
     void  Show_Wait_Dialog_And_ReadBacnet(int ncontrol);
 	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
     static DWORD WINAPI  Mul_Ping_Thread(LPVOID lpVoid);
-    int m_read_control;   // 0 Ä¬ÈÏÈ«²¿¶ÁÈ¡     1  ¶Á»º´æµÄÊ±ºòÊ¹ÓÃ ;
+    int m_read_control;   // 0      1   ;
 	static DWORD WINAPI  Read_Bacnet_Thread(LPVOID lpVoid);
 	static DWORD WINAPI  Read_Modbus_10000(LPVOID lpVoid);
 	static DWORD WINAPI  Write_Modbus_10000(LPVOID lpVoid);
@@ -381,7 +381,7 @@ public:
 			//BOOL ValidAddress(CString sAddress);
 	BOOL ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT& n4);
 	 
-	void CheckConnectFailure(const CString& strIP);// ¼ì²éÊ§°ÜµÄÔ­Òò£¬²¢¸ø³öÏêÏ¸µÄÌáÊ¾ÐÅÏ¢
+	void CheckConnectFailure(const CString& strIP);// 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	BOOL ConnectSubBuilding(Building_info build_info);
 	BOOL ConnectDevice(LPCTSTR ip_address,int nport);
@@ -436,16 +436,16 @@ protected:
 	BOOL ImportDataBaseForFirstRun();
 	CString GetCurrentFileVersion();
 	CString ReadFileVersionFromRegister(CRegKey& reg);
-//protected://lsc20111213ÐÞ¸Ä
+//protected://lsc20111213
 public:
 	BOOL m_bEnableRefreshTreeView;
 	CRefreshTreeThread*	m_pRefreshThread;
 
-	CString						m_strCurSelNodeName;  // ¼ÇÂ¼µ±Ç°µã»÷Ê÷½ÚµãµÄname
+	CString						m_strCurSelNodeName;  // name
 	BOOL m_isCM5;
 	BOOL m_isMiniPanel;
 
-	//HTREEITEM				m_htiCurSel;  // ¼ÇÂ¼µ±Ç°µã»÷Ê÷½Úµã
+	//HTREEITEM				m_htiCurSel;  // 
 	CString						m_strFileVersion;
 
 public:
@@ -617,11 +617,11 @@ public:
 };
 //DWORD WINAPI  Bacnet_ReadWrite_Message(LPVOID lpVoid);
 //tree0412  2017 05 11 fance change
-extern vector <bacnet_background_struct> m_backbround_data; // ÓÃÀ´È«³Ì´¢´æÐèÒª¶îÍâ¶ÁÈ¡µÄÒ»Ð©ºóÌ¨bacnet panelÊý¾Ý
+extern vector <bacnet_background_struct> m_backbround_data; // bacnet panel
 #define TVINSERV_BUILDING 		    {tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
 #define TVINSERV_FLOOR	 			{tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
 #define TVINSERV_ROOM				{tvInsert.item.iImage=2; tvInsert.item.iSelectedImage=2;}
-#define TVINSERV_TSTAT_DEFAULT 	    {tvInsert.item.iImage=6; tvInsert.item.iSelectedImage=6;}     //Ä¬ÈÏµÄ²úÆ·Í¼±ê
+#define TVINSERV_TSTAT_DEFAULT 	    {tvInsert.item.iImage=6; tvInsert.item.iSelectedImage=6;}     //
 #define TVINSERV_LED_TSTAT7 		{tvInsert.item.iImage=8; tvInsert.item.iSelectedImage=8;}   //TSTAT7
 #define TVINSERV_CMFIVE			    {tvInsert.item.iImage=10;tvInsert.item.iSelectedImage=10;}   //TSTAT7
 #define TVINSERV_NET_WORK		    {tvInsert.item.iImage=12;tvInsert.item.iSelectedImage=12;}
@@ -635,6 +635,6 @@ extern vector <bacnet_background_struct> m_backbround_data; // ÓÃÀ´È«³Ì´¢´æÐèÒª¶
 #define TVINSERV_T3LC			    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;}//LC
 #define TVINSERV_T3_NANO    {tvInsert.item.iImage=28;tvInsert.item.iSelectedImage=28;}//zigbeerepeater
 #define TVINSERV_PM5E               {tvInsert.item.iImage=30;tvInsert.item.iSelectedImage=30;}//PM5E
-#define TVINSERV_THIRD_PARTY        {tvInsert.item.iImage=32;tvInsert.item.iSelectedImage=32;}//µÚÈý·½Éè±¸
+#define TVINSERV_THIRD_PARTY        {tvInsert.item.iImage=32;tvInsert.item.iSelectedImage=32;}//
 #define ITEM_MASK				TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_TEXT
 

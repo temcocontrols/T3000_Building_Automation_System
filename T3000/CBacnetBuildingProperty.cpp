@@ -1,4 +1,4 @@
-﻿// CBacnetBuildingProperty.cpp: 实现文件
+﻿// CBacnetBuildingProperty.cpp: 
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "MainFrm.h"
 
-// CBacnetBuildingProperty 对话框
+// CBacnetBuildingProperty 
 extern BM_nodeinfo operation_nodeinfo;
 IMPLEMENT_DYNAMIC(CBacnetBuildingProperty, CDialogEx)
 
@@ -33,14 +33,14 @@ BEGIN_MESSAGE_MAP(CBacnetBuildingProperty, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetBuildingProperty 消息处理程序
+// CBacnetBuildingProperty 
 
 
 BOOL CBacnetBuildingProperty::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  在此添加额外的初始化
+	// TODO:  
 	Initial_List();
 
 	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -58,13 +58,13 @@ BOOL CBacnetBuildingProperty::OnInitDialog()
 	GetDlgItem(IDC_EDIT_CATEGORY_NAME)->SetWindowTextW(cs_category_name);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // 异常: OCX 属性页应返回 FALSE
+				  //  OCX 
 }
 
 
 void CBacnetBuildingProperty::OnBnClickedButtonDbPropertyOk()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 
 }
 
 const int PROPERTY_NUM = 0;

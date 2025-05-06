@@ -62,7 +62,7 @@ void CBacnetaddintodb::OnBnClickedBacnetSettingAddBtn()
 
 	for (int x=0;x<254;x++)
 	{
-		if(bacnet_add_id[x] == 0)	//为0 就说明后面没有了;
+		if(bacnet_add_id[x] == 0)	//0 ;
 		{
 			bacnet_add_id[x] = nidvalue;
 			CString showvalue;

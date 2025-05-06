@@ -12,7 +12,7 @@ using namespace std;
 
 //#define NTDDI_LONGHORN  0x051
 
-// AnnualRout_InsertDia 对话框
+// AnnualRout_InsertDia 
 #define ONE_YEAR_BETYS 46
 class AnnualRout_InsertDia : public CDialog
 {
@@ -20,14 +20,14 @@ class AnnualRout_InsertDia : public CDialog
 
 public:
 	AnnualRout_InsertDia(CWnd* pParent = NULL);   // standard constructor
-	AnnualRout_InsertDia(unsigned char row,CString strtype = _T(""),CWnd* pParent = NULL);   // 标准构造函数
+	AnnualRout_InsertDia(unsigned char row,CString strtype = _T(""),CWnd* pParent = NULL);   // 
 	virtual ~AnnualRout_InsertDia();
 
-// 对话框数据
+// 
 	enum { IDD = IDD_ANNUAL_ROUTINES_INSERT_DIA };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
 public:
 	//mannual insert
 	void load();

@@ -1506,7 +1506,7 @@ namespace System.IO.BACnet
             res.Dispose();
         }
 
-        // By Chritopher Günter : Write multiple properties on multiple objects
+        // By Chritopher Gnter : Write multiple properties on multiple objects
         public bool WritePropertyMultipleRequest(BacnetAddress adr, ICollection<BacnetReadAccessResult> value_list, byte invoke_id = 0)
         {
             using (BacnetAsyncResult result = (BacnetAsyncResult)BeginWritePropertyMultipleRequest(adr, value_list, true, invoke_id))
@@ -1646,7 +1646,7 @@ namespace System.IO.BACnet
         }
 
         //*********************************************************************************
-        // By Christopher Günter
+        // By Christopher Gnter
         public bool CreateObjectRequest(BacnetAddress adr, BacnetObjectId object_id, ICollection<BacnetPropertyValue> value_list = null, byte invoke_id = 0)
         {
             using (BacnetAsyncResult result = (BacnetAsyncResult)BeginCreateObjectRequest(adr, object_id, value_list, true, invoke_id))

@@ -556,7 +556,7 @@ void CRegisterValueAnalyzerDlg::DrawerPoint(){
 
 				 
 				/*
-				实心;下划线;点;下划线-点;下划线-点-点;
+				;;;-;--;
 				*/
 				pLineSeries->SetWidth(3);
 				
@@ -704,7 +704,7 @@ void CRegisterValueAnalyzerDlg::Fresh(){
 				pSeries[i] = pLineSeries;
 
 				/*
-				实心;下划线;点;下划线-点;下划线-点-点;
+				;;;-;--;
 				*/
 				pLineSeries->SetWidth(3);
 				
