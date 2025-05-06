@@ -875,11 +875,11 @@ CString GetTempUnit(int nRange, int nPIDNO)
             //Chinese.
             if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
             {
-                strTemp=_T(");
+                strTemp=_T("");
             }
             else
             {
-                strTemp=_T(");
+                strTemp=_T("");
             }
         }
         return strTemp;
@@ -907,11 +907,11 @@ CString GetTempUnit(int nRange, int nPIDNO)
             //chinese.
             if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
             {
-                strTemp=_T(");
+                strTemp=_T("");
             }
             else
             {
-                strTemp=_T(");
+                strTemp=_T("");
             }
         }
         return strTemp;
