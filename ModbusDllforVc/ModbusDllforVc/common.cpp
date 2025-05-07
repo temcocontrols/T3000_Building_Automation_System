@@ -8426,7 +8426,7 @@ OUTPUT void Create_T3000_log_file()
     (_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
     CString g_strDatabasefilepath=exeFullPath;
     CString g_strExePth=g_strDatabasefilepath;
-    m_strFileINI = g_strExePth + _T("T3000.log");
+    m_strFileINI = g_strExePth + _T("") MY_LOG_NAME;
     m_pFile->Open(m_strFileINI.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
 
 }

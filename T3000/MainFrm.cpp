@@ -6648,7 +6648,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
         m_wndStatusBar.ClientToScreen(&rect);
         if(PtInRect(&rect,pt))
         {
-            CString strHelp=g_strExePth+_T("T3000.log");
+            CString strHelp=g_strExePth+_T("") MY_LOG_NAME;
             ShellExecute(NULL, _T("open"), strHelp, NULL, NULL, SW_SHOWNORMAL);
         }
         m_wndStatusBar.GetItemRect(2,&rect);
