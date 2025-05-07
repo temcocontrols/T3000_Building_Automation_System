@@ -774,7 +774,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     
 
-
+    SetWindowText(_T("") MY_APP_TITLE);
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
         return -1;
     CString temp_bacnet_logfile;
@@ -1183,7 +1183,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
     //  the CREATESTRUCT cs
     // 
     cs.style &= ~WS_MINIMIZEBOX;
-
+    cs.style &= ~FWS_ADDTOTITLE; 
     return TRUE;
 }
 
