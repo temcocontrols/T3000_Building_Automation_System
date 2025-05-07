@@ -725,11 +725,11 @@ void CMainFrame::ShowSplashWnd(int nMillisecond)
         //g_configfile_path
         GetPrivateProfileString(_T("Parameter"), _T("SoftwareName"), _T(""), cs_special_name.GetBuffer(MAX_PATH), MAX_PATH, g_configfile_path);
         cs_special_name.ReleaseBuffer();
-        if ((cs_special_name.IsEmpty()   ||  (cs_special_name.CompareNoCase(_T("T3000 Building Automation System")) == 0) ))
+        if ((cs_special_name.IsEmpty()   ||  (cs_special_name.CompareNoCase(_T("") MY_APP_TITLE) == 0) ))
         {
-            WritePrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("T3000.exe"), temp_db_ini_folder);
-            WritePrivateProfileString(_T("Parameter"), _T("SoftwareName"), _T("T3000 Building Automation System"), g_configfile_path);
-            cs_special_name = _T("T3000 Building Automation System");
+            WritePrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("") MY_EXE_NAME, temp_db_ini_folder);
+            WritePrivateProfileString(_T("Parameter"), _T("SoftwareName"), _T("") MY_APP_TITLE, g_configfile_path);
+            cs_special_name = _T("") MY_APP_TITLE;
                 m_special_customer= 0;
         }
         else

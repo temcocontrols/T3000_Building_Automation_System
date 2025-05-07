@@ -3,8 +3,10 @@
   <PropertyGroup Label="UserMacros" />
 	<PropertyGroup>
         <AppOutputName>OptiMax</AppOutputName>
+        <AppExeOutputName>"$(AppOutputName).exe"</AppExeOutputName>
         <AppControlOutputName>$(AppOutputName)Controls</AppControlOutputName>
         <AppControlDllNameString>"$(AppControlOutputName).dll"</AppControlDllNameString>
         <AppLogNameString>"$(AppOutputName).log"</AppLogNameString>
+        <AppTitleString>"$(AppOutputName) Building Automation System"</AppTitleString>
 	</PropertyGroup>
 </Project>
