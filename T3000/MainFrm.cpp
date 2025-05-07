@@ -15665,12 +15665,7 @@ void CMainFrame::OnUpdateAppAbout(CCmdUI *pCmdUI)
     if (pCmdUI->m_pMenu != NULL)
     {
         CString show_cs;
-        if(m_special_customer == 0)
-            pCmdUI->SetText(_T("Update T3000"));
-        else
-        {
-            pCmdUI->SetText(_T("Update  ") + cs_special_name);
-        }
+        pCmdUI->SetText(_T("Update ") MY_NAME);
     }
 }
 

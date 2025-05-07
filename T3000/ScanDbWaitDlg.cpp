@@ -197,7 +197,7 @@ void CScanDbWaitDlg::OnTimer(UINT_PTR nIDEvent)
                 }
                 CString strTemp;
                 CString strTip;
-                strTip.Format(_T("T3000 is scanning, please wait%s"), m_strDot);
+                strTip.Format(MY_NAME _T(" is scanning, please wait%s"), m_strDot);
                 if (m_pScaner->m_saving_data == false)
                     m_strInfopromp = strTip;
                 else
