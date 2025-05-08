@@ -42,7 +42,7 @@ BOOL CARDDlg::OnInitDialog()
 	m_add_device_baudrate.SetCurSel(1);
 	m_add_device_modbus_id.SetWindowText(_T("255"));
 
-	CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
+	CString	g_configfile_path = g_strExePth + _T("") MY_CONFIG;
 	CString strIP;
 	int IPPort;
 	GetPrivateProfileString(_T("MBPOLL_Setting"), _T("IP Address"), _T("127.0.0.1"), strIP.GetBuffer(MAX_PATH), MAX_PATH, g_configfile_path);

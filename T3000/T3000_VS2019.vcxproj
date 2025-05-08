@@ -79,7 +79,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SOLUTION_DIR=R"($(SolutionDir))";PROJECT_VERSION=$(ProjectVersion);%(PreprocessorDefinitions);MY_NAME=$(AppOutputString);MY_CONTROL_DLL_NAME=$(AppControlDllNameString);MY_LOG_NAME=$(AppLogNameString);MY_APP_TITLE=$(AppTitleString);MY_EXE_NAME=$(AppExeOutputName);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SOLUTION_DIR=R"($(SolutionDir))";PROJECT_VERSION=$(ProjectVersion);%(PreprocessorDefinitions);MY_NAME=$(AppOutputString);MY_CONTROL_DLL_NAME=$(AppControlDllNameString);MY_LOG_NAME=$(AppLogNameString);MY_APP_TITLE=$(AppTitleString);MY_EXE_NAME=$(AppExeOutputName);MY_CONFIG=$(AppConfigNameString);</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -120,7 +120,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClCompile>
       <Optimization>MinSpace</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SOLUTION_DIR=R"($(SolutionDir))";PROJECT_VERSION=$(ProjectVersion);%(PreprocessorDefinitions);MY_NAME=$(AppOutputString);MY_CONTROL_DLL_NAME=$(AppControlDllNameString);MY_LOG_NAME=$(AppLogNameString);MY_APP_TITLE=$(AppTitleString);MY_EXE_NAME=$(AppExeOutputName);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SOLUTION_DIR=R"($(SolutionDir))";PROJECT_VERSION=$(ProjectVersion);%(PreprocessorDefinitions);MY_NAME=$(AppOutputString);MY_CONTROL_DLL_NAME=$(AppControlDllNameString);MY_LOG_NAME=$(AppLogNameString);MY_APP_TITLE=$(AppTitleString);MY_EXE_NAME=$(AppExeOutputName);MY_CONFIG=$(AppConfigNameString);</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

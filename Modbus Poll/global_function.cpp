@@ -111,7 +111,7 @@ CString get_ExePath(){
 	GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
 	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
 	g_strExEPath=exeFullPath;//
-	g_configfile_path=g_strExEPath+_T("T3000_config.ini");
+	g_configfile_path=g_strExEPath+_T("") MY_CONFIG;
 	return g_strExEPath;
 }
 

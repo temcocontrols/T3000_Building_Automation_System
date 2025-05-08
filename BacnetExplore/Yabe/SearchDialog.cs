@@ -182,7 +182,7 @@ namespace Yabe
             m_localUdpEndpointsCombo.Items.AddRange(local_endpoints);
 
             string str3 = System.IO.Directory.GetCurrentDirectory();// System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-            str3 = str3 + "\\T3000_config.ini";
+            str3 = str3 + "\\" + AppConfigConstants.AppConfigName;
             StringBuilder AutoLocalIP = new StringBuilder();
             GetPrivateProfileString("Yabe", "LocalPCIPaddress", "", AutoLocalIP, 255, str3);
             //WritePrivateProfileString("Yabe", "LocalPCIPaddress", "", str3);

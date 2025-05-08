@@ -9,5 +9,7 @@
         <AppControlDllNameString>"$(AppControlOutputName).dll"</AppControlDllNameString>
         <AppLogNameString>"$(AppOutputName).log"</AppLogNameString>
         <AppTitleString>"$(AppOutputName) Building Automation System"</AppTitleString>
+        <AppConfigName>$(AppOutputName)_config.ini</AppConfigName>
+        <AppConfigNameString>"$(AppOutputName)_config.ini"</AppConfigNameString>
 	</PropertyGroup>
 </Project>
