@@ -352,13 +352,13 @@ DWORD WINAPI InstallFileThread(LPVOID lPvoid)
     SetCurrentDirectoryW(APP_RUN_FOLDER);
     copy_ret = CopyDirW(UnzipFileFolder, APP_RUN_FOLDER, FALSE);
 
-    GetPrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("T3000.exe"), cs_new_name.GetBuffer(MAX_PATH), MAX_PATH, T3000_ini_file_path);
+    GetPrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("") MY_EXE_NAME, cs_new_name.GetBuffer(MAX_PATH), MAX_PATH, T3000_ini_file_path);
     cs_new_name.ReleaseBuffer();
-    if (cs_new_name.CompareNoCase(_T("T3000.exe")) != 0)
+    if (cs_new_name.CompareNoCase(_T("") MY_EXE_NAME) != 0)
     {
         CString CS_Old_File;
         CString CS_New_File;
-        CS_Old_File = APP_RUN_FOLDER + _T("\\T3000.exe");
+        CS_Old_File = APP_RUN_FOLDER + _T("\\") + _T("") MY_EXE_NAME;
         CS_New_File = APP_RUN_FOLDER + _T("\\") + cs_new_name;
         char oldfile[1000] = { 0 };
         char newfile[1000] = { 0 };
@@ -552,7 +552,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
         }
         else
         {
-            CS_Info.Format(_T("Your T3000.exe is up-to-date"));
+            CS_Info.Format(_T("Your ") MY_EXE_NAME _T(" is up-to-date"));
             Sleep(5000);
             m_static_step = UPDATE_STEP_READY_TO_CLOASE;
             getftpthread = NULL;
@@ -643,7 +643,7 @@ download_pass:
 
     if (unzipthread == NULL)
     {
-        GetPrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("T3000.exe"), cs_new_name.GetBuffer(MAX_PATH), MAX_PATH, T3000_ini_file_path);
+        GetPrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("") MY_EXE_NAME, cs_new_name.GetBuffer(MAX_PATH), MAX_PATH, T3000_ini_file_path);
         cs_new_name.ReleaseBuffer();
         KillProcessFromName(cs_new_name);
         KillProcessFromName(_T("ISP.exe"));
@@ -835,7 +835,7 @@ void CUpdateDlg::OnTimer(UINT_PTR nIDEvent)
             tempApplicationFolder.ReleaseBuffer();
 
             if (run_t3000)
-                ShellExecute(NULL, _T("open"), _T("T3000.exe"), NULL, tempApplicationFolder, SW_SHOWNORMAL);
+                ShellExecute(NULL, _T("open"), _T("") MY_EXE_NAME, NULL, tempApplicationFolder, SW_SHOWNORMAL);
 
             PostMessage(WM_CLOSE, NULL, NULL);
         }
