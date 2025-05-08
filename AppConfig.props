@@ -3,7 +3,7 @@
   <PropertyGroup Label="UserMacros" />
 	<PropertyGroup>
         <AppOutputName>OptiMax</AppOutputName>
-        <AppOutputString>"OptiMax"</AppOutputString>
+        <AppOutputString>"$(AppOutputName)"</AppOutputString>
         <AppExeOutputName>"$(AppOutputName).exe"</AppExeOutputName>
         <AppControlOutputName>$(AppOutputName)Controls</AppControlOutputName>
         <AppControlDllNameString>"$(AppControlOutputName).dll"</AppControlDllNameString>
@@ -11,5 +11,6 @@
         <AppTitleString>"$(AppOutputName) Building Automation System"</AppTitleString>
         <AppConfigName>$(AppOutputName)_config.ini</AppConfigName>
         <AppConfigNameString>"$(AppOutputName)_config.ini"</AppConfigNameString>
+        <AppLegalCopyright>$(AppOutputName). All rights reserved.</AppLegalCopyright>
 	</PropertyGroup>
 </Project>
