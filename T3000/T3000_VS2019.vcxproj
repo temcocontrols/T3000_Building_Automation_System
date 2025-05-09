@@ -89,7 +89,7 @@
       <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;Json-cpp\nlohmann\;Json-cpp\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions);MY_NAME=$(AppOutputName);MY_COPYRIGHT=$(AppLegalCopyright);MY_EXE=$(AppExeOutputRaw);MY_UPDATE=$(AppUpdateRaw);MY_SCAN=$(AppScanRaw);MY_TITLE=$(AppTitleRaw);MY_LOG=$(AppLogDetailRaw);MY_HELP=$(AppHelpRaw);MY_IMPORT_LOWER=$(AppImportLowerRaw);MY_IMPORT_UPPER=$(AppImportUpperRaw);MY_BACNET=$(AppBacnetRaw);</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
@@ -132,7 +132,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions);MY_NAME=$(AppOutputName);MY_COPYRIGHT=$(AppLegalCopyright);MY_EXE=$(AppExeOutputRaw);MY_UPDATE=$(AppUpdateRaw);MY_SCAN=$(AppScanRaw);MY_TITLE=$(AppTitleRaw);MY_LOG=$(AppLogDetailRaw);MY_HELP=$(AppHelpRaw);MY_IMPORT_LOWER=$(AppImportLowerRaw);MY_IMPORT_UPPER=$(AppImportUpperRaw);MY_BACNET=$(AppBacnetRaw);</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
