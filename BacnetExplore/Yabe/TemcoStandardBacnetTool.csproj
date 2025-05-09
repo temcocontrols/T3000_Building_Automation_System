@@ -334,6 +334,7 @@
           <_LinesToWrite Include="    public static class AppConfigConstants" />
           <_LinesToWrite Include="    {" />
           <_LinesToWrite Include='        public const string AppConfigName = "$(AppConfigName)"%3b' />
+          <_LinesToWrite Include='        public const string AppBacnetName = "$(AppBacnetRaw)"%3b' />
           <_LinesToWrite Include="    }" />
           <_LinesToWrite Include="}" />
         </ItemGroup>

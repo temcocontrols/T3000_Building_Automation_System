@@ -1050,7 +1050,7 @@
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "YabeMainDialog";
-            this.Text = "Temco Standard Bacnet Tool";
+            this.Text = AppConfigConstants.AppBacnetName;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainDialog_FormClosing);
             this.Load += new System.EventHandler(this.MainDialog_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainDialog_KeyDown);

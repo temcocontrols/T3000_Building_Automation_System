@@ -20,6 +20,6 @@
         <AppHelpRaw>$(AppOutputName) Help</AppHelpRaw>
         <AppImportLowerRaw>Import data from database of $(AppOutputName) version LOWER than ver2.5.0.0.</AppImportLowerRaw>
         <AppImportUpperRaw>Import data from database of $(AppOutputName) version UPPER than ver2.5.0.0.</AppImportUpperRaw>
-        <AppBacnetRaw>$(AppOutputName) Standard BacNET Tool</AppBacnetRaw>
+        <AppBacnetRaw>$(AppOutputName) Standard BACNet Tool</AppBacnetRaw>
 	</PropertyGroup>
 </Project>
