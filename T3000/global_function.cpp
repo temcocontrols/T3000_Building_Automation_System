@@ -908,6 +908,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
             if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 strTemp=_T("");
             }
             else
@@ -920,6 +921,13 @@ CString GetTempUnit(int nRange, int nPIDNO)
             {
                 strTemp=_T("℉");
 >>>>>>> parent of db9e9d9d (Ignore this commit - remove all non-ascii characters as vscode automatically change all chinese characters)
+=======
+                strTemp=_T(");
+            }
+            else
+            {
+                strTemp=_T(");
+>>>>>>> parent of 2c137ce6 (Ignore this commit)
             }
         }
         return strTemp;
