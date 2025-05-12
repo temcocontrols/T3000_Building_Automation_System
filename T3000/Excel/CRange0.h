@@ -1,23 +1,23 @@
-//  IDispatch 
+// 从类型库向导中用“添加类”创建的计算机生成的 IDispatch 包装器类
 
 //#import "C:\\Program Files\\Microsoft Office\\Office14\\EXCEL.EXE" no_namespace
-// CRange0 
+// CRange0 包装器类
 
 class CRange0 : public COleDispatchDriver
 {
 public:
-    CRange0() {} //  COleDispatchDriver 
+    CRange0() {} // 调用 COleDispatchDriver 默认构造函数
     CRange0(LPDISPATCH pDispatch) : COleDispatchDriver(pDispatch) {}
     CRange0(const CRange0& dispatchSrc) : COleDispatchDriver(dispatchSrc) {}
 
-    // 
+    // 特性
 public:
 
-    // 
+    // 操作
 public:
 
 
-    // Range 
+    // Range 方法
 public:
     LPDISPATCH get_Application()
     {
@@ -1333,7 +1333,7 @@ public:
         InvokeHelper(0xb28, DISPATCH_METHOD, VT_EMPTY, NULL, NULL);
     }
 
-    // Range 
+    // Range 属性
 public:
 
 };

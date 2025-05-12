@@ -1,4 +1,4 @@
-// ZigbeeRepeater.cpp : 
+// ZigbeeRepeater.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "global_function.h"
 #include "MainFrm.h"
 // CZigbeeRepeater
-extern tree_product selected_product_Node; // ;
+extern tree_product selected_product_Node; // 选中的设备信息;
 IMPLEMENT_DYNCREATE(CZigbeeRepeater, CFormView)
 
 CZigbeeRepeater::CZigbeeRepeater()
@@ -37,7 +37,7 @@ BEGIN_MESSAGE_MAP(CZigbeeRepeater, CFormView)
 END_MESSAGE_MAP()
 
 
-// CZigbeeRepeater 
+// CZigbeeRepeater 诊断
 
 #ifdef _DEBUG
 void CZigbeeRepeater::AssertValid() const
@@ -54,7 +54,7 @@ void CZigbeeRepeater::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 
-// CZigbeeRepeater 
+// CZigbeeRepeater 消息处理程序
 
 void CZigbeeRepeater::Fresh()
 {
@@ -109,7 +109,7 @@ void CZigbeeRepeater::Fresh()
 
     for (int i = 301; i < 301 + loop_count; i++)
     {
-        //Zigbee repeater ID   ;
+        //Zigbee repeater 先读到ID 然后 在判断 数据库中是否存在，不存在就加入;
         if (product_register_value[i] != 0)
         {
             int temp_count = m_zigbee_repeater_list.GetItemCount();
@@ -231,7 +231,7 @@ void CZigbeeRepeater::Fresh()
             CS_STATUS = Repeater_STATUS_Array[2];
         }
 
-        //  65136   -40
+        //  65136  为 -40度
         if ((product_register_value[53 + loop_count * 3 + i] <= 65136) &&
             product_register_value[53 + loop_count * 3 + i] >= 1200)
         {
@@ -287,7 +287,7 @@ void CZigbeeRepeater::OnInitialUpdate()
     hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_REFRESH), IMAGE_ICON, 32, 32, 0);
     ((CButton *)GetDlgItem(IDC_BUTTON_ZIGBEE_REFRESH))->SetIcon(hIcon);
 
-    // TODO: /
+    // TODO: 在此添加专用代码和/或调用基类
 }
 
 
@@ -343,7 +343,7 @@ void CZigbeeRepeater::Initial_Moudle_List()
 
 void CZigbeeRepeater::OnCbnSelchangeComboRepeaterBaudrate()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_REPEATER_BAUDRATE))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_REPEATER_BAUDRATE))->GetLBText(nSel, temp_string);
@@ -373,7 +373,7 @@ void CZigbeeRepeater::OnCbnSelchangeComboRepeaterBaudrate()
 
 void CZigbeeRepeater::OnCbnSelchangeComboRepeaterMode()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_REPEATER_MODE))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_REPEATER_MODE))->GetLBText(nSel, temp_string);
@@ -402,7 +402,7 @@ void CZigbeeRepeater::OnCbnSelchangeComboRepeaterMode()
 
 void CZigbeeRepeater::OnEnKillfocusEditModbusid()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_MODBUSID)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -423,7 +423,7 @@ void CZigbeeRepeater::OnEnKillfocusEditModbusid()
 
 void CZigbeeRepeater::OnEnKillfocusEditChannel()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_CHANNEL)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -448,7 +448,7 @@ void CZigbeeRepeater::OnEnKillfocusEditChannel()
 
 void CZigbeeRepeater::OnEnKillfocusEditPanid()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_PANID)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -504,7 +504,7 @@ void CZigbeeRepeater::UpdateDeviceDB(int nmodbusid , CString cs_baudrate)
 
 void CZigbeeRepeater::OnBnClickedButtonZigbeeRefresh()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
 
     int i;
     int item_read = 0;

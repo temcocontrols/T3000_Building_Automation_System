@@ -568,6 +568,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="xt" />
+    <Text Include="版本信息.txt" />
   </ItemGroup>
 </Project>

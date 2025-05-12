@@ -1,4 +1,4 @@
-﻿// CBacnetIODefine.cpp: 
+﻿// CBacnetIODefine.cpp: 实现文件
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include "global_function.h"
 
 
-// CBacnetIODefine 
+// CBacnetIODefine 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetIODefine, CDialogEx)
 
@@ -33,14 +33,14 @@ BEGIN_MESSAGE_MAP(CBacnetIODefine, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetIODefine 
+// CBacnetIODefine 消息处理程序
 
 
 BOOL CBacnetIODefine::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  
+	// TODO:  在此添加额外的初始化
     if ((Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 636) &&
         (g_selected_product_id == PM_ESP32_T3_SERIES))
     {
@@ -62,13 +62,13 @@ BOOL CBacnetIODefine::OnInitDialog()
     }
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  //  OCX 
+				  // 异常: OCX 属性页应返回 FALSE
 }
 
 
 void CBacnetIODefine::OnBnClickedOk()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_input_count;
     CString temp_output_count;
     CString temp_var_count;

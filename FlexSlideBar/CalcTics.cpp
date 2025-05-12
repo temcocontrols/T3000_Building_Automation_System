@@ -54,21 +54,21 @@ int CCalcTics::CalcTicArray(vector<int>& szTics)
 	nLowNum = m_nTicNum - nHighNum;
 
 	//////////////////////////////////////////////////////////////////////////
-	// 
+	// 获得分布情况模型，两种刻度尺寸插入间隔，多余的刻度分布在两端
 	ASSERT(nHighNum + nLowNum == m_nTicNum);
 	
 	int nGap=0;
 	int nStartNum, nEndNum;
-	int nEndValue = 0; // 
+	int nEndValue = 0; // 端值，即两端应该用小值还是大值
 	int nBigNum, nSmallNum;
-	int nBigVal, nSmallVal; // bignum
+	int nBigVal, nSmallVal; // 与bignum对应，数量多的刻度对应的刻度值
 
 
-	if (nHighNum == 0) // 
+	if (nHighNum == 0) // 只需要一种刻度值
 	{
 		nStartNum = 0;
 		nEndNum = 0;
-		nBigNum = nLowNum;nBigVal = nLow;	// 
+		nBigNum = nLowNum;nBigVal = nLow;	// 只有一种
 		nSmallNum = nLowNum;nSmallVal = nLow;
 	}
 	else if (nLowNum > nHighNum) 
@@ -77,8 +77,8 @@ int CCalcTics::CalcTicArray(vector<int>& szTics)
 		int nTempNum = nLowNum - (nGap * nHighNum);
 		nStartNum = nTempNum /2;
 		nEndNum = nTempNum/2 + nTempNum%2;
-		nEndValue = nLow; // 
-		nBigNum = nLowNum;nBigVal = nLow; // 
+		nEndValue = nLow; // 谁多用谁
+		nBigNum = nLowNum;nBigVal = nLow; // 谁大谁用来主循环
 		nSmallNum = nHighNum;nSmallVal = nHigh;
 	}
 	else
@@ -87,15 +87,15 @@ int CCalcTics::CalcTicArray(vector<int>& szTics)
 		int nTempNum = nHighNum - (nGap * nLowNum);
 		nStartNum = nTempNum /2;
 		nEndNum = nTempNum/2 + nTempNum%2;
-		nEndValue = nHigh;// 
-		nBigNum = nHighNum;nBigVal = nHigh;// 
+		nEndValue = nHigh;// 谁多用谁
+		nBigNum = nHighNum;nBigVal = nHigh;// 谁大谁用来主循环
 		nSmallNum = nLowNum;nSmallVal = nLow;
 	}
 		
 	//////////////////////////////////////////////////////////////////////////
-	// , 
+	// 生成刻度数组, 注意，算的时候是间隔，数组里是刻度，所以会多一
 
-	// 
+	// 头部
 	
 	int nSumTic = 0;	
 	m_szTics.push_back(nSumTic);
@@ -105,7 +105,7 @@ int CCalcTics::CalcTicArray(vector<int>& szTics)
 		m_szTics.push_back(nSumTic);
 	}
 
-	// 
+	// 中间
 	
 	int nGapCount = 0;
 	for (int i = 0; i < (nBigNum-nStartNum-nEndNum); i++)
@@ -120,7 +120,7 @@ int CCalcTics::CalcTicArray(vector<int>& szTics)
 		}
 	}
 
-	// 
+	// 结尾
 	for (int i = 0; i < nEndNum; i++)
 	{	
 		nSumTic  += nEndValue;

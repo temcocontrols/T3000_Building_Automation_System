@@ -1,4 +1,4 @@
-﻿// CBacnetArray.cpp: 
+﻿// CBacnetArray.cpp: 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
-// CBacnetArray 
+// CBacnetArray 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetArray, CDialogEx)
 
@@ -36,7 +36,7 @@ BEGIN_MESSAGE_MAP(CBacnetArray, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetArray 
+// CBacnetArray 消息处理程序
 
 
 BOOL CBacnetArray::OnInitDialog()
@@ -45,10 +45,10 @@ BOOL CBacnetArray::OnInitDialog()
 	SetWindowTextW(_T("Array"));
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_ARRAY);
 	SetIcon(m_hIcon, TRUE);
-	// TODO:  
+	// TODO:  在此添加额外的初始化
 	Initial_List();
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  //  OCX 
+				  // 异常: OCX 属性页应返回 FALSE
 }
 
 
@@ -119,7 +119,7 @@ LRESULT CBacnetArray::Fresh_Array_List(WPARAM wParam, LPARAM lParam)
 	{
 		if (m_array_list.IsDataNewer((char*)&m_Array_data.at(0), sizeof(Str_array_point) * BAC_ARRAY_ITEM_COUNT))
 		{
-			//ist 
+			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
 			m_array_list.SetListData((char*)&m_Array_data.at(0), sizeof(Str_array_point) * BAC_ARRAY_ITEM_COUNT);
 		}
 		else
@@ -185,7 +185,7 @@ LRESULT CBacnetArray::Fresh_Array_Item(WPARAM wParam, LPARAM lParam)
 	if (Changed_SubItem == ARRAY_LABLE)
 	{
 		CString cs_temp = m_array_list.GetItemText(Changed_Item, Changed_SubItem);
-		if (cs_temp.GetLength() > STR_ARRAY_NAME_LENGTH)	//
+		if (cs_temp.GetLength() > STR_ARRAY_NAME_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 9"), _T("Warning"), MB_OK | MB_ICONINFORMATION);
 			PostMessage(WM_REFRESH_BAC_ARRAY_LIST, NULL, NULL);
@@ -210,7 +210,7 @@ LRESULT CBacnetArray::Fresh_Array_Item(WPARAM wParam, LPARAM lParam)
 		if ((temp2 < 0) || (temp2 > 65535))
 		{
 			MessageBox(_T("Please Input an value between 0 - 65535"), _T("Warning"), MB_OK);
-			PostMessage(WM_REFRESH_BAC_ARRAY_LIST, NULL, NULL);//
+			PostMessage(WM_REFRESH_BAC_ARRAY_LIST, NULL, NULL);//这里调用 刷新线程重新刷新会方便一点;
 			return 0;
 		}
 		m_Array_data.at(Changed_Item).array_size = (unsigned short)temp2;
@@ -230,7 +230,7 @@ void CBacnetArray::Reset_Array_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//view
+	::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//获取 view的窗体大小;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -238,7 +238,7 @@ void CBacnetArray::Reset_Array_Rect()
 	if (window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//view
+		::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//获取 view的窗体大小;
 		::SetWindowPos(this->m_hWnd, NULL, temp_mynew_rect.left, temp_mynew_rect.top, temp_mynew_rect.Width(), temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if ((temp_window.Width() <= temp_mynew_rect.Width()) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -256,7 +256,7 @@ void CBacnetArray::Reset_Array_Rect()
 
 BOOL CBacnetArray::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: 
+	// TODO: 在此添加专用代码和/或调用基类
 	if ((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN))
 	{
 		CRect list_rect, win_rect;
@@ -279,14 +279,14 @@ BOOL CBacnetArray::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//view
+			::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd, NULL, temp_mynew_rect.left, temp_mynew_rect.top, temp_mynew_rect.Width(), temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//view
+			::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd, NULL, temp_mynew_rect.left + 60, temp_mynew_rect.top + 60, 500, 700, SWP_SHOWWINDOW);
 		}
 
@@ -301,7 +301,7 @@ void CBacnetArray::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// TODO: 
+	// TODO: 在此处添加消息处理程序代码
 	CRect rc;
 	GetClientRect(rc);
 	if (m_array_list.m_hWnd != NULL)
@@ -326,12 +326,12 @@ LRESULT  CBacnetArray::ArrayMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		memcpy_s(&m_Array_data.at(pInvoke->mRow), sizeof(Str_array_point), &m_temp_array_data[pInvoke->mRow], sizeof(Str_array_point));//
+		memcpy_s(&m_Array_data.at(pInvoke->mRow), sizeof(Str_array_point), &m_temp_array_data[pInvoke->mRow], sizeof(Str_array_point));//还原没有改对的值
 		PostMessage(WM_REFRESH_BAC_ARRAY_LIST, pInvoke->mRow, REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
 	}
-	if ((pInvoke->mRow % 2) == 0)	// 
+	if ((pInvoke->mRow % 2) == 0)	//恢复前景和 背景 颜色;
 		m_array_list.SetItemBkColor(pInvoke->mRow, pInvoke->mCol, LIST_ITEM_DEFAULT_BKCOLOR, 0);
 	else
 		m_array_list.SetItemBkColor(pInvoke->mRow, pInvoke->mCol, LIST_ITEM_DEFAULT_BKCOLOR_GRAY, 0);

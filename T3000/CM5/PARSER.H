@@ -111,7 +111,7 @@ enum error_msg { SYNTAX ,
     TOO_LARGE_IDENTIFIER_INSTANCE,
 	TOO_LARGE_BACNET_INSTANCE} ;
 
-#pragma pack(push) // 
+#pragma pack(push) //保存对齐状态 
 #pragma pack(1)
 typedef struct
 {
@@ -128,7 +128,7 @@ typedef struct
 	byte obj_number_low;
 	byte reserve[3];
 }Point_Bacnet;
-#pragma pack(pop)// 
+#pragma pack(pop)//恢复对齐状态 
 //struct variable_table {
 //				char name[12];
 //				char label[9];
@@ -163,7 +163,7 @@ struct variable_table {
 //		 char var[12];
 //		 float fvar;
 //		 char op[10];
-//};//Fance 
+//};//Fance 把字节改大
 
 struct buf_str {
 	int v;

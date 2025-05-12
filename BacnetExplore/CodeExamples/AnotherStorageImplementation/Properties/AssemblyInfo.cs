@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("F. Chaxel")]
 [assembly: AssemblyProduct("AnotherStorageImplementation")]
-[assembly: AssemblyCopyright("Copyright  F. Chaxel 2015")]
+[assembly: AssemblyCopyright("Copyright © F. Chaxel 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

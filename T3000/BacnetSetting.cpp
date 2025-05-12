@@ -26,14 +26,14 @@ bool show_user_list_window = false;
 CBacnetTstatSchedule *BacnetTstatSchedule_Window = NULL;
 LONG n_tempBias;
 LONG DaylightBias = 0;
-int pc_time_to_basic_delt = 0; //
+int pc_time_to_basic_delt = 0; //用于时间转换 ，各个时区之间。
 int panel_time_to_basic_delt = 0; 
-extern tree_product selected_product_Node; // 
+extern tree_product selected_product_Node; // 选中的设备信息;
 #define TIMER_SYNC_TIMER    1
 #define TIMER_REFRESH_READ    2
 #define TIMER_IP_CHANGED_RECONNECT 3
 #define TIMER_REFRESH_READ_DELAY    15000
-extern int ok_button_press ; //
+extern int ok_button_press ; //确定按钮
 IMPLEMENT_DYNAMIC(CBacnetSetting, CDialogEx)
 
 CBacnetSetting::CBacnetSetting(CWnd* pParent /*=NULL*/)
@@ -337,7 +337,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 		else
 			((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->EnableWindow(1);
 
-		// 
+		//硬件版本大于 26 代表是arm的版本.
 		if (Device_Basic_Setting.reg.pro_info.harware_rev >= 26)
 		{
 			m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(FALSE);
@@ -347,7 +347,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(TRUE);
 		}
 
-		//.6 ng 
+		//版本大于38.6 的才有在setting 里面改port 的功能
 		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 476)
 		{
 			CString temp_port;
@@ -407,7 +407,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 497)//497
 		{
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_PARITY_BIT))->EnableWindow(TRUE);
-			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_PARITY_BIT2))->EnableWindow(false);  //zigbee 
+			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_PARITY_BIT2))->EnableWindow(false);  //zigbee 口始终固定;
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_PARITY_BIT3))->EnableWindow(TRUE);
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_STOP_BIT))->EnableWindow(TRUE);
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_STOP_BIT2))->EnableWindow(false);
@@ -428,8 +428,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 
 
-		//20180201 fandu  ARM e schedual 
-		//.1 ng 
+		//20180201 fandu  ARM 的 板子才有 zone schedual 这个功能
+		//版本大于46.1 的才有在setting 里面改port 的功能
 
 
 		if (Device_Basic_Setting.reg.en_plug_n_play == 1)
@@ -585,7 +585,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			m_page_time.GetDlgItem(IDC_COMBO_END_MONTH)->EnableWindow(0);
 			m_page_time.GetDlgItem(IDC_COMBO_START_DAY)->EnableWindow(0);
 			m_page_time.GetDlgItem(IDC_COMBO_END_DAY)->EnableWindow(0);
-			daylight_start_month = 3;  //2021-11    11-7
+			daylight_start_month = 3;  //2021年默认 3-11    11-7
 			daylight_start_day = 14;
 			daylight_end_month = 11;
 			daylight_end_day = 7;
@@ -649,14 +649,14 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->EnableWindow(false);
 				if (Device_Basic_Setting.reg.LCD_Display == 0)
 				{
-					//1 
+					//1 常灭
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(true);
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
 				}
 				else if (Device_Basic_Setting.reg.LCD_Display == 1)
 				{
-					//1 
+					//1 常亮
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
@@ -668,7 +668,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 				if (Device_Basic_Setting.reg.LCD_Display == 0)
 				{
-					//1 
+					//1 常灭
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(true);
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
@@ -676,7 +676,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				}
 				else if (Device_Basic_Setting.reg.LCD_Display == 255)
 				{
-					//255 
+					//255 常亮
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(true);
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(false);
@@ -685,7 +685,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				else
 				{
 					CString temp_lcd_delay_time;
-					//1 
+					//1 常亮
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_ON))->SetCheck(false);
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_OFF))->SetCheck(false);
 					((CButton*)m_page_basic_info.GetDlgItem(IDC_RADIO_SETTING_LCD_DELAY_OFF))->SetCheck(true);
@@ -706,7 +706,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 
 
-		//me zone 
+		//不管是啥设备 time zone 都要能修改
 		m_page_time.GetDlgItem(IDC_STATIC_SETTING_TIME_ZONE)->ShowWindow(TRUE);
 		m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE)->ShowWindow(TRUE);
 		((CComboBox*)m_page_time.GetDlgItem(IDC_COMBO_BACNET_SETTING_TIME_ZONE))->ResetContent();
@@ -929,7 +929,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->ResetContent();
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->ResetContent();
 
-			//Fandu 2017-12-07  rm 
+			//Fandu 2017-12-07  新的arm板子的com0 支持所有的波特率.
 			if ((Device_Basic_Setting.reg.mini_type == MINIPANELARM) ||
 				(Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB) ||
 				(Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB) ||
@@ -964,7 +964,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->AddString(Baudrate_Array[x]);
 			}
 
-			//Fandu 2017-12-07  rm 
+			//Fandu 2017-12-07  新的arm板子的com0 支持所有的波特率.
 			if ((Device_Basic_Setting.reg.mini_type == MINIPANELARM) ||
 				(Device_Basic_Setting.reg.mini_type == MINIPANELARM_LB) ||
 				(Device_Basic_Setting.reg.mini_type == MINIPANELARM_TB) ||
@@ -1153,7 +1153,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 	case TIME_COMMAND:
 	{
 
-		//20180108 Fanminipanel 
+		//20180108 Fan判断 minipanel 的大体时间是否一致，不一致自动更改;
 		if (Device_Basic_Setting.reg.time_sync_auto_manual == 1)
 		{
 			if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)
@@ -1161,23 +1161,23 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				unsigned long  temp_time_long = time(NULL);
 
 				unsigned char temp_need_sync = 0;
-				if (Device_time.new_time.n_time >= temp_time_long)  //
+				if (Device_time.new_time.n_time >= temp_time_long)  //设备时间大于本地时间
 				{
-					if (Device_time.new_time.n_time > (temp_time_long + 180))  //
+					if (Device_time.new_time.n_time > (temp_time_long + 180))  //大于本地3分钟以上 需同步
 						temp_need_sync = 1;
 				}
-				else if (Device_time.new_time.n_time > temp_time_long - 180) // 
+				else if (Device_time.new_time.n_time > temp_time_long - 180) // 比本地时间小3分钟以内 ， 不同步
 				{
 					temp_need_sync = 0;
 				}
 				else
-					temp_need_sync = 1; //
+					temp_need_sync = 1; //小3分钟以上，需要同步;
 
 				n_ignore_sync_time = GetPrivateProfileInt(_T("SYNC_Time"), _T("ignore_pop"), 0, g_cstring_ini_path);
 				last_ignore_sync_time = GetPrivateProfileInt(_T("SYNC_Time"), _T("ignore_pop_time"), 0, g_cstring_ini_path);
 				int delta_time = 0;
 				delta_time = temp_time_long - last_ignore_sync_time;
-				if ((n_ignore_sync_time == 1) && (delta_time < 3600 * 24 * 3) && (delta_time >= 0))  //3
+				if ((n_ignore_sync_time == 1) && (delta_time < 3600 * 24 * 3) && (delta_time >= 0))  //3天内 客户点了忽略，才不提醒;
 				{
 					temp_need_sync = 0;
 				}
@@ -1247,13 +1247,13 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 
 			//**********************************************************
-			//2019 05 20 Fance 
+			//2019 05 20 Fance 用于处理 电脑勾选了夏令时 引起的 T3 显示时间 与实际时间总是相差一小时的问题;
 			TIME_ZONE_INFORMATION tzi;
 			GetTimeZoneInformation(&tzi);
 			//short computer_DaylightBias = tzi.DaylightBias * 60;
 #pragma region MyRegion
 			short computer_DaylightBias;
-			int temp_ret = GetTimeZoneInformation(&tzi); // ghtBias 
+			int temp_ret = GetTimeZoneInformation(&tzi); // 茶洗的电脑 没有开 夏令时 获取tzi.DaylightBias 居然等于-60 导致 显示少一个小时;
 			//if (temp_ret == TIME_ZONE_ID_INVALID)
 			computer_DaylightBias = 0;
 			// else
@@ -1265,7 +1265,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 			temp_debug4.Format(_T("panel_time_to_basic_delt = %d\r\n"), panel_time_to_basic_delt);
 
-			//ateTimeCtrl 
+			//因为本地CDateTimeCtrl 在设置时间的时候 会默认 加上 电脑的时区，但是显示的时候要显示 设备所选时区，所以 要 变换.
 			time_t scale_time;
 			if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
 				scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
@@ -1303,13 +1303,13 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 				if (check_daylight)
 				{
-					scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //
+					scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
 				}
 				else
-					scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; //
+					scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; //如果选中夏令时 需要显示的时候加一个小时
 			}
 			else
-				scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 
+				scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
 			TimeTemp = scale_time + computer_DaylightBias;
 			CString temp_debug5;
 			temp_debug5.Format(_T("computer_DaylightBias = %d\r\n"), computer_DaylightBias);
@@ -1321,7 +1321,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 		}
 
-		//l
+		//减去系统现在的时区 ，然后在加上 minipanel自己的时区.
 		m_page_time.m_cm5_time_picker.SetFormat(_T("HH:mm"));
 		unsigned short read_data[10];
 		int nmultyRet = Read_Multi(g_tstat_id, &read_data[0], 200, 10, 3);
@@ -1384,7 +1384,7 @@ void CBacnetSetting::InitialTab()
     m_setting_tab.InsertItem(SETTING_USER_LOGIN, _T("User Login             "));
     m_setting_tab.InsertItem(SETTING_EXPANSION_IO, _T("Expansion IO           "));
     //m_setting_tab.InsertItem(SETTING_WIFI, _T("Wifi           "));
-    //
+    //创建两个对话框
     m_page_basic_info.Create(IDD_DIALOG_BACNET_SETTING_BASIC, &m_setting_tab);
     m_page_tcpip.Create(IDD_DIALOG_BACNET_SETTING_TCPIP, &m_setting_tab);
     m_page_time.Create(IDD_DIALOG_BACNET_SETTING_TIME, &m_setting_tab);
@@ -1400,7 +1400,7 @@ void CBacnetSetting::InitialTab()
 
     //m_page_wifi.ModifyStyleEx(WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE, NULL, NULL);
     //IDD_DIALOG_BACNET_USER_CONFIG
-    //b
+    //设定在Tab内显示的范围
     CRect rc;
     m_setting_tab.GetClientRect(rc);
     rc.top += 21;
@@ -1416,7 +1416,7 @@ void CBacnetSetting::InitialTab()
     m_page_user.MoveWindow(&rc);
     m_page_expansion_io.MoveWindow(&rc);
     //m_page_wifi.MoveWindow(&rc);
-    //
+    //把对话框对象指针保存起来
     tab_dialog[SETTING_BASIC] = &m_page_basic_info;
     tab_dialog[SETTING_TCP] = &m_page_tcpip;
     tab_dialog[SETTING_TIME] = &m_page_time;
@@ -1426,7 +1426,7 @@ void CBacnetSetting::InitialTab()
     tab_dialog[SETTING_EXPANSION_IO] = &m_page_expansion_io;
 
     //tab_dialog[SETTING_WIFI] = &m_page_wifi;
-    //
+    //显示初始页面
     tab_dialog[SETTING_BASIC]->ShowWindow(SW_SHOW);
     tab_dialog[SETTING_TCP]->ShowWindow(SW_HIDE);
     tab_dialog[SETTING_TIME]->ShowWindow(SW_HIDE);
@@ -1435,7 +1435,7 @@ void CBacnetSetting::InitialTab()
     tab_dialog[SETTING_USER_LOGIN]->ShowWindow(SW_HIDE);
     tab_dialog[SETTING_EXPANSION_IO]->ShowWindow(SW_HIDE);
     //tab_dialog[SETTING_WIFI]->ShowWindow(SW_HIDE);
-    //
+    //保存当前选择
     m_CurSelTab = 0;
 
 }
@@ -1503,14 +1503,14 @@ BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//view
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//view
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 100,500,700,SWP_SHOWWINDOW);
 		}
 
@@ -1530,7 +1530,7 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
                KillTimer(TIMER_SYNC_TIMER);
                if (GetPrivateData_Blocking(g_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
                {
-                   //
+                   //判断同步结果是否成功
                    if (Device_Basic_Setting.reg.sync_time_results != 1)
                    {
                        MessageBox(_T("SYNC time failed , No Reply from server"));
@@ -1560,7 +1560,7 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 
 			if (g_protocol == MODBUS_RS485)
 			{
-				::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, 0, READ_SETTING_COMMAND);//
+				::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, 0, READ_SETTING_COMMAND);//第二个参数 In
 			}
 			else
 			{
@@ -1613,8 +1613,8 @@ LRESULT  CBacnetSetting::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		//memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//
-		PostMessage(WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);//
+		//memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//还原没有改对的值
+		PostMessage(WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);//这里调用 刷新线程重新刷新会方便一点;
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 
@@ -1641,7 +1641,7 @@ void CBacnetSetting::OnCancel()
 
 void DeleteSubnetDatabase()
 {
-    //
+    //删除数据库中 这个设备下的所以子设备,完全依靠下一次扫描;
     CppSQLite3DB SqliteDBBuilding;
     SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
@@ -1850,7 +1850,7 @@ void CBacnetSetting::Reset_Setting_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//view
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -1858,7 +1858,7 @@ void CBacnetSetting::Reset_Setting_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//view
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -1898,14 +1898,14 @@ void CBacnetSetting::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//view
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//view
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 100,500,700,SWP_SHOWWINDOW);
 		}
 		return;
@@ -1929,7 +1929,7 @@ void CBacnetSetting::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 void CBacnetSetting::OnBnClickedButtonRebootDevice()
 {
 	
-	//.6 ng 
+	//版本大于38.6 的才有在setting 里面改port 的功能
 	if(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 +Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 441)
 	{
 		if(IDYES == MessageBox(_T("Are you sure you want reboot device"),_T("Warning"),MB_YESNOCANCEL | MB_ICONINFORMATION))
@@ -1951,8 +1951,8 @@ void CBacnetSetting::InitScrollbar()
 {
 	SCROLLINFO scrollinfo;
 	GetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);    
-	scrollinfo.nPage=20;    //
-	scrollinfo.nMax=75;     //
+	scrollinfo.nPage=20;    //设置滑块大小
+	scrollinfo.nMax=75;     //设置滚动条的最大位置0--75
 	SetScrollInfo(SB_VERT,&scrollinfo,SIF_ALL);  
 }
 
@@ -1977,7 +1977,7 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		break;  
 	case SB_LINEDOWN:           //Scroll one line down
 		scrollinfo.nPos += 1;  
-		if (scrollinfo.nPos+scrollinfo.nPage>scrollinfo.nMax)  //
+		if (scrollinfo.nPos+scrollinfo.nPage>scrollinfo.nMax)  //此处一定要注意加上滑块的长度，再作判断
 		{  
 			scrollinfo.nPos = scrollinfo.nMax;  
 			break;  
@@ -1997,7 +1997,7 @@ void CBacnetSetting::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		break;  
 	case SB_PAGEDOWN:        //Scroll one page down        
 		scrollinfo.nPos += 5;  
-		if (scrollinfo.nPos+scrollinfo.nPage>=scrollinfo.nMax)  //
+		if (scrollinfo.nPos+scrollinfo.nPage>=scrollinfo.nMax)  //此处一定要注意加上滑块的长度，再作判断
 		{  
 			scrollinfo.nPos = scrollinfo.nMax;  
 			break;  
@@ -2027,9 +2027,9 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 {
 
 
-	b_stop_read_tstat_schedule = false;  //
+	b_stop_read_tstat_schedule = false;  //是否继续读取标志，若后面数据为空则退出循环体.
 
-    //
+    //在获取前清空缓存值.
     for (int i = 0;i < BAC_TSTAT_SCHEDULE;i++)
     {
         Str_tstat_schedule temp_tstat_schedule;
@@ -2068,7 +2068,7 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 
 	b_stop_read_tstat_schedule = false;
 
-    //
+    //显示非模态对话框;
     if (BacnetTstatSchedule_Window != NULL)
     {
         delete BacnetTstatSchedule_Window;
@@ -2093,9 +2093,9 @@ void CBacnetSetting::OnBnClickedButtonZoneSchedule()
 
 void CBacnetSetting::OnTcnSelchangeTabSetting(NMHDR *pNMHDR, LRESULT *pResult)
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     tab_dialog[m_CurSelTab]->ShowWindow(SW_HIDE);
-    //
+    //得到新的页面索引
     m_CurSelTab = m_setting_tab.GetCurSel();
     if (SETTING_USER_LOGIN == m_CurSelTab)
     {
@@ -2151,7 +2151,7 @@ void CBacnetSetting::OnTcnSelchangeTabSetting(NMHDR *pNMHDR, LRESULT *pResult)
     //{
     //    //m_page_wifi.OnInitDialog();
     //}
-    //
+    //把新的页面显示出来
     tab_dialog[m_CurSelTab]->ShowWindow(SW_SHOW);
     *pResult = 0;
 }

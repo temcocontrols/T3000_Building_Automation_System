@@ -106,10 +106,10 @@ int Send_ConfirmedPrivateTransfer(
 	/* encode the APDU portion of the packet */
 
 	 invoke_id = tsm_next_free_invokeID();
-	 if(invoke_id==0)//IDID;;
+	 if(invoke_id==0)//这里是当没有可用的调用ID的时候将所有ID都清零;变为可用;
 		 tsm_free_all_invoke_id();
 	len =
-		ptransfer_encode_apdu(&Handler_Transmit_Buffer[pdu_len],invoke_id,private_data);	// Invoke ID
+		ptransfer_encode_apdu(&Handler_Transmit_Buffer[pdu_len],invoke_id,private_data);	//这里的还需要完善 Invoke ID
 	// uptransfer_encode_apdu(&Handler_Transmit_Buffer[pdu_len],		//Fance
 	// private_data);
 	pdu_len += len;

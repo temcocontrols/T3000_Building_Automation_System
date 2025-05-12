@@ -78,7 +78,7 @@ CListCtrlEx::CListCtrlEx()
 	m_select_raw = 0;
 	m_select_col = 1;
 	m_dt_left = true;
-	m_support_col0_edit = false; //0 ;
+	m_support_col0_edit = false; //默认第0列 不允许编辑;
 	m_window_hwnd = NULL;
 
     m_bEnableTips = TRUE;
@@ -124,19 +124,19 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	//Get_clicked_mouse_position(select_raw,select_col);
 	if(m_support_key)
 	{
-		int old_select_raw = m_select_raw;//;
+		int old_select_raw = m_select_raw;//记录下原来的行和列;
 		int old_select_col = m_select_col;
 
 		if(nChar == VK_LEFT)
 		{
-			if((m_select_col >1) || ((m_support_col0_edit) && (m_select_col == 1)))//left;
+			if((m_select_col >1) || ((m_support_col0_edit) && (m_select_col == 1)))//left第一列无效;
 			{
 				m_select_col = m_select_col - 1;
 
 				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
 				if (m_show_bk_color)
 				{
-					if ((old_select_raw % 2) == 0)	//  ;
+					if ((old_select_raw % 2) == 0)	//恢复前景和 背景 颜色;
 						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
 					else
 						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR_GRAY, 0);
@@ -165,7 +165,7 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 				if (m_show_bk_color)
 				{
-					if ((old_select_raw % 2) == 0)	//  ;
+					if ((old_select_raw % 2) == 0)	//恢复前景和 背景 颜色;
 						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
 					else
 						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR_GRAY, 0);
@@ -205,7 +205,7 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 				if (m_show_bk_color)
 				{
-					if ((old_select_raw % 2) == 0)	//  ;
+					if ((old_select_raw % 2) == 0)	//恢复前景和 背景 颜色;
 						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
 					else
 						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR_GRAY, 0);
@@ -234,7 +234,7 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 				if (m_show_bk_color)
 				{
-					if ((old_select_raw % 2) == 0)	//  ;
+					if ((old_select_raw % 2) == 0)	//恢复前景和 背景 颜色;
 						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
 					else
 						SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR_GRAY, 0);
@@ -352,19 +352,19 @@ CListCtrlEx::CellIndex CListCtrlEx::Point2Cell(const CPoint &point)
 			nCol = 0;
 		int nColCnt=GetColumnCount();
 
-		int old_select_col = m_select_col;	//;
+		int old_select_col = m_select_col;	//把旧的的存起来;
 		int old_select_raw = m_select_raw;
-		m_select_raw = nRow;				//select
+		m_select_raw = nRow;				//新的赋值给当前select
 		m_select_col = nCol;
 
-			if((old_select_raw != m_select_raw) || (old_select_col != m_select_col ))	//;
+			if((old_select_raw != m_select_raw) || (old_select_col != m_select_col ))	//判断是否为选中的同一个;
 			{
 				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
 
-                //2017/12/14 Fandu Modify    .
+                //2017/12/14 Fandu Modify  在需选择需要间隔背景色的表格，选中的恢复默认色时 恢复为 系统默认颜色.
                 if (m_show_bk_color)
                 {
-                    if ((old_select_raw % 2) == 0)	//  ;
+                    if ((old_select_raw % 2) == 0)	//恢复前景和 背景 颜色;
                         SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
                     else
                     {
@@ -374,12 +374,12 @@ CListCtrlEx::CellIndex CListCtrlEx::Point2Cell(const CPoint &point)
                 else
                     SetItemBkColor(old_select_raw, old_select_col, LIST_ITEM_DEFAULT_BKCOLOR, 0);
 
-				if(m_select_raw != old_select_raw)	//;
+				if(m_select_raw != old_select_raw)	//如果是换行了，就两行都要刷新;
 				{
 					RedrawItems(m_select_raw,m_select_raw);
 					RedrawItems(old_select_raw,old_select_raw);
 				}
-				else//
+				else//没有换行就只刷新当前行
 				{
 					RedrawItems(m_select_raw,m_select_raw);
 				}
@@ -780,7 +780,7 @@ POINT	CListCtrlEx::Get_clicked_mouse_position()
 	{
 		int nRow = lvHitTestInfo.iItem;
 		int nCol =  lvHitTestInfo.iSubItem;
-		if(GetColumnType(nCol)==ListCtrlEx::ComboBox)// Combobox ;
+		if(GetColumnType(nCol)==ListCtrlEx::ComboBox)//判断如果是 Combobox的话就下拉出全部的 选项;
 		{
 			SetCursorPos(temp_point.x, temp_point.y);
 			mouse_event(MOUSEEVENTF_LEFTDOWN,0,0,0,0);
@@ -1168,7 +1168,7 @@ void CListCtrlEx::DrawNormal(CDC *pDC, CString &strText, CRect &rcCell, BOOL bSe
 		nFormat=DT_RIGHT;
 	}
 	if(m_dt_left)
-		nFormat = DT_LEFT;// ;
+		nFormat = DT_LEFT;//老毛要求的 靠左显示;
 
 	COLORREF crOldText=pDC->SetTextColor(crText);
 	rcText.left=rcIcon.right+3;
@@ -1447,7 +1447,7 @@ void CListCtrlEx::DrawEditBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL b
 	case LVCFMT_LEFT: nFormat=DT_LEFT; break;
 	case LVCFMT_RIGHT: nFormat=DT_RIGHT; break;
 	}
-	nFormat = DT_LEFT;// ;
+	nFormat = DT_LEFT;//老毛要求的 靠左显示;
 
 	COLORREF crOldText=pDC->SetTextColor(crText);
 	if (!cellData.GetEnable())
@@ -2050,31 +2050,31 @@ void ListCtrlEx::CListCtrlEx::OnDestroy()
 
 void ListCtrlEx::CListCtrlEx::OnMouseMove(UINT nFlags, CPoint point)
 {
-    // TODO: /
-    //
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    //如果开启文本提示
     if (m_bEnableTips)
     {
         CString str;
         LVHITTESTINFO lvhti;
 
-        // (, )
+        // 判断鼠标当前所在的位置(行, 列)
         lvhti.pt = point;
         SubItemHitTest(&lvhti);
 
-        //, ; , 
+        //如果鼠标移动到另一个单元格内, 则进行处理; 否则, 不做处理
         if ((lvhti.iItem != m_nItem) || (lvhti.iSubItem != m_nSubItem))
         {
-            // (,)
+            // 保存当前鼠标所在的(行,列)
             m_nItem = lvhti.iItem;
             m_nSubItem = lvhti.iSubItem;
 
-            // ,
-            // , 
+            // 如果鼠标移动到一个合法的单元格内,则显示新的提示信息
+            // 否则, 不显示提示
             if ((m_nItem != -1) && (m_nSubItem != -1))
             {
-                // @@@@@@@@ 
-                // ---, 
-				if ((m_bUser_tips) && (m_nSubItem == n_tip_colomn)) //list   ;
+                // @@@@@@@@ 在这里修改要显示的提示信息
+                // 这里仅仅是一个例子---获得当前单元格的文字信息, 并设置为新的提示信息
+				if ((m_bUser_tips) && (m_nSubItem == n_tip_colomn)) //如果对应的list 有特殊设置 需要显示的文字 这里做特殊处理;
 				{
 					str = n_tip_message;
 					TRACE(str);
@@ -2084,7 +2084,7 @@ void ListCtrlEx::CListCtrlEx::OnMouseMove(UINT nFlags, CPoint point)
 					str = GetItemText(m_nItem, m_nSubItem);
 				}
                 m_toolTip.AddTool(this, str);
-                // 
+                // 显示提示框
                 m_toolTip.Pop();
             }
             else
@@ -2102,7 +2102,7 @@ void ListCtrlEx::CListCtrlEx::OnMouseMove(UINT nFlags, CPoint point)
 
 BOOL ListCtrlEx::CListCtrlEx::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: /
+    // TODO: 在此添加专用代码和/或调用基类
 
     if (m_toolTip.GetSafeHwnd())
     {

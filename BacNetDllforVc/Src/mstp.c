@@ -573,7 +573,7 @@ void MSTP_Receive_Frame_FSM(
     return;
 }
 
-#if 0  //log;
+#if 0  //打印调试信息至log文档的;
 void MSTP_Receive_Frame_FSM(
     volatile struct mstp_port_struct_t *mstp_port)
 {

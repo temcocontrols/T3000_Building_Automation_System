@@ -42,7 +42,7 @@ public:
 	void OnSize(UINT nType, int cx, int cy);
 	void OnSysCommand(UINT nID, LPARAM lParam);
 
-	bool window_max; // ;
+	bool window_max; // 标记是否已经最大化;
 	//afx_msg LRESULT AnnualResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 };
 

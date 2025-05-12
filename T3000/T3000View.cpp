@@ -28,17 +28,17 @@
 
 
 //2013 03 10
-//   product_register_value[101] 101
-// Get   mdb product_register_value[MODBUS_TEMPRATURE_CHIP].
-//  t3000.mdb
+//老毛要求代码里面所有的数字 例如  product_register_value[101] 其中101要变为可变的，由数据库中读到。
+//所以写了一个函数 Get 在程序运行前 加载 mdb，在程序运行中动态的查找 对应的值。product_register_value[MODBUS_TEMPRATURE_CHIP].；
+//这样既保证了程序的可读性，又方便维护，日后 寄存器列表变化后只需修改 t3000.mdb的寄存器表即可。
 #include "T3000RegAddress.h"
 extern T3000RegAddress GloabeAddress;
 extern int Mdb_Adress_Map;
 extern BOOL m_active_key_mouse;
-unsigned char already_check_tstat_timesync = 0; //TSTAT ;
+unsigned char already_check_tstat_timesync = 0; //每个TSTAT设备 只有点击的时候在确认时间;
 // CT3000View
 //extern BOOL g_bPauseMultiRead;
-extern int ok_button_press; //
+extern int ok_button_press; //确定按钮
 IMPLEMENT_DYNCREATE(CT3000View, CFormView)
 BEGIN_MESSAGE_MAP(CT3000View, CFormView)
     ON_BN_CLICKED(IDC_COOL_RADIO, &CT3000View::OnBnClickedCoolRadio)
@@ -129,7 +129,7 @@ UINT BackMainUIFresh(LPVOID pParam)
                 if (itemp < 0)
                 {
                     //continue;
-                    break; // NCT3000  ;
+                    break; //读不到就退出，很多时候 NC在读的过程中断开连接T3000 还一直去读剩余的 就会引起无响应;
                 }
                 else
                 {
@@ -197,7 +197,7 @@ CT3000View::CT3000View()
 CT3000View::~CT3000View()
 {
      
-    //Fandu 2017 /12/20  Debug  .
+    //Fandu 2017 /12/20  解决Debug 模式下 此处抛出异常.
 	//m_daySlider.Dispose();
 	//m_nightSlider.Dispose();
 }
@@ -430,19 +430,19 @@ void CT3000View::Fresh()
 	CppSQLite3DB SqliteDBT3000;
 	CppSQLite3Query q;
 	SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-	if (SqliteDBT3000.tableExists("Value_Range"))//Version
+	if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
 	{
 		CString sql;
 		sql.Format(_T("Select * from Value_Range where SN=%d"), get_serialnumber());
 		q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-		if (!q.eof())//
+		if (!q.eof())//有表但是没有对应序列号的值
 		{
 
 			while (!q.eof())
 			{
 				index = q.getIntField("CInputNo");
-				if (index > 10)//output
+				if (index > 10)//说明是output
 				{
 					index %= 10;
 					m_OutRanges[index] = q.getIntField("CRange");
@@ -512,7 +512,7 @@ void CT3000View::Fresh()
 	{
 		GetDlgItem(IDC_GRAPGICBUTTON)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_PARAMETERBTN)->ShowWindow(SW_SHOW);
-		//GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_HIDE);  // 
+		//GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_HIDE);  //杜帆添加 不懂为什么要用这玩意
 	}
 	if (m_pFreshBackground == NULL)
 	{
@@ -609,14 +609,14 @@ HBRUSH CT3000View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
     }
 
 }
-// 3ThumbSlider3Slider
-// A,B,C,D,F,G,HTStat5E
+// 使用一个3Thumb的Slider，代替之前的3个Slider
+// （A,B,C,D,F,G,H）专门给TStat5E之前的型号
 #if 1
 void CT3000View::InitSliderBars2()
 {
-    //0907
-    // TSTAT5E Runar ver34.1
-    // TSTAT5E ver35.5
+    //0907以下
+    // 以TSTAT5E Runar ver34.1为样本
+    // 以TSTAT5E ver35.5为样本
     Initial_Max_Min();
     int nSP = 0;
     int dSP = 0;
@@ -678,7 +678,7 @@ void CT3000View::InitSliderBars2()
 
        nSP =(int)itemp;
 
-    	dSP=nSP;// day setpoint =night setpoint
+    	dSP=nSP;//默认 day setpoint =night setpoint
          nOccupied = product_register_value[184];  // Day setpoint option
          bOccupied = nOccupied & 0x0001;
 
@@ -1093,7 +1093,7 @@ void CT3000View::Fresh_In()
 
 
 
-        if (m_InRanges[1]!=-1)//
+        if (m_InRanges[1]!=-1)//有表但是没有对应序列号的值
         {
             strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
             if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)//188
@@ -1192,7 +1192,7 @@ void CT3000View::Fresh_In()
 
 
 
-        if (m_InRanges[2]!=-1)//
+        if (m_InRanges[2]!=-1)//有表但是没有对应序列号的值
         {
 
 
@@ -1296,7 +1296,7 @@ void CT3000View::Fresh_In()
 
 
 
-        if (m_InRanges[3]!=-1)//
+        if (m_InRanges[3]!=-1)//有表但是没有对应序列号的值
         {
 
 
@@ -1415,7 +1415,7 @@ void CT3000View::Fresh_In()
 		|| product_register_value[7] == PM_TSTAT8_220V) || nModel == PM_TSTAT5i)// Tstat 6
     {
         int m_crange=0;
-        //Mdb_Adress_Map = T3000_6_ADDRESS; // T3000_6_ADDRESS   Maping;
+        //Mdb_Adress_Map = T3000_6_ADDRESS; //让其在 T3000_6_ADDRESS 中 进行地址 Maping;
         /*
         for(int i=1;i++;i<=8)
         {
@@ -1623,7 +1623,7 @@ void CT3000View::Fresh_In()
         else
         {
 
-            //Mdb_Adress_Map = 1; // T3000_5ABCDFG_LED_ADDRESS   Maping;
+            //Mdb_Adress_Map = 1; //让其在 T3000_5ABCDFG_LED_ADDRESS 中 进行地址 Maping;
             float nValue;
             for(int i=0; i<8; i++)
             {
@@ -1683,7 +1683,7 @@ void CT3000View::Fresh_In()
                     CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+i-1], 1);//359
                     if(product_register_value[MODBUS_ANALOG1_RANGE+i-1]==1)//359
                     {
-                        nValue= (float)(product_register_value[MODBUS_ANALOG_INPUT1+i-1]/10.0);//stat6 UNUSE  //367
+                        nValue= (float)(product_register_value[MODBUS_ANALOG_INPUT1+i-1]/10.0);//stat6 如是这个则显示UNUSE，未使用  //367
                         strTemp.Format(_T("%.1f"),nValue);//
                         //strTemp=_T("UNUSED");
                     }
@@ -1830,7 +1830,7 @@ void CT3000View::Fresh_Out()
                 }
                 else
                 {
-                    //comments by Fance , 348 - t6598  ;
+                    //comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
                     int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
                     strTemp.Format(_T("%d%%"), nValueTemp);
                 }
@@ -1868,7 +1868,7 @@ void CT3000View::Fresh_Out()
                 }
                 else
                 {
-                    //comments by Fance , 348 - t6598  ;
+                    //comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
                     int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
                     strTemp.Format(_T("%d%%"), nValueTemp);
                 }
@@ -1897,7 +1897,7 @@ void CT3000View::Fresh_Out()
 
         if (m_OutRanges[3]!=-1)
         {
-            if(m_OutRanges[3] == 0||m_OutRanges[3]==4||m_OutRanges[3]==5||m_OutRanges[3]==6 ) // AMAutoRange On/OffvalueON/Off
+            if(m_OutRanges[3] == 0||m_OutRanges[3]==4||m_OutRanges[3]==5||m_OutRanges[3]==6 ) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
             {
                 // output is on/off
 
@@ -1930,7 +1930,7 @@ void CT3000View::Fresh_Out()
             }
             else // output is value
             {
-                //comments by Fance , 348 - t6598  ;
+                //comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
                 int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
                 strTemp.Format(_T("%d%%"), nValueTemp);
             }
@@ -1938,7 +1938,7 @@ void CT3000View::Fresh_Out()
         }
         else
         {
-            if(nRange == 0||nRange==4||nRange==5||nRange==6 ) // AMAutoRange On/OffvalueON/Off
+            if(nRange == 0||nRange==4||nRange==5||nRange==6 ) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
             {
                 // output is on/off
 
@@ -1971,7 +1971,7 @@ void CT3000View::Fresh_Out()
             }
             else // output is value
             {
-                //comments by Fance , 348 - t6598  ;
+                //comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
                 int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
                 strTemp.Format(_T("%d%%"), nValueTemp);
             }
@@ -1995,7 +1995,7 @@ void CT3000View::Fresh_Out()
 
         if (m_OutRanges[4]!=-1)
         {
-            if(m_OutRanges[4] == 0||m_OutRanges[4]==4||m_OutRanges[4]==5||m_OutRanges[4]==6 ) // AMAutoRange On/OffvalueON/Off
+            if(m_OutRanges[4] == 0||m_OutRanges[4]==4||m_OutRanges[4]==5||m_OutRanges[4]==6 ) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
             {
                 // output is on/off
 
@@ -2028,14 +2028,14 @@ void CT3000View::Fresh_Out()
             }
             else // output is value
             {
-                //comments by Fance , 348 - t6598  ;
+                //comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
                 int nValueTemp = product_register_value[MODBUS_PWM_OUT5]; //348 //598
                 strTemp.Format(_T("%d%%"), nValueTemp);
             }
         }
         else
         {
-            if(nRange == 0||nRange==4||nRange==5||nRange==6 ) // AMAutoRange On/OffvalueON/Off
+            if(nRange == 0||nRange==4||nRange==5||nRange==6 ) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
             {
                 // output is on/off
 
@@ -2068,7 +2068,7 @@ void CT3000View::Fresh_Out()
             }
             else // output is value
             {
-                //comments by Fance , 348 - t6598  ;
+                //comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
                 int nValueTemp = product_register_value[MODBUS_PWM_OUT5]; //348 //598
                 strTemp.Format(_T("%d%%"), nValueTemp);
             }
@@ -2299,7 +2299,7 @@ void CT3000View::FreshIOGridTable()
         return;
     if(::GetFocus()==m_inNameEdt.m_hWnd)
         return;
-	// dufan 2017/12/05  PANEL TSTAT8 22I input   TSTAT8input bug
+	// dufan 2017/12/05  解决在挂在PANEL下的 TSTAT8 与网络22I 在input界面切换时  始终无法切换至 TSTAT8的input 界面的bug
 	bacnet_device_type = -1;
 
     if (product_type==T3000_6_ADDRESS)
@@ -2331,7 +2331,7 @@ void CT3000View::FreshIOGridTable()
     }
     break;
 
-    case PM_TSTAT5D:  // 5D  TStat7
+    case PM_TSTAT5D:  // 5D 同 TStat7
     {
         m_outRows=8;
         m_inRows=5;
@@ -2509,9 +2509,9 @@ void CT3000View::FreshIOGridTable_Tstat6()
     CString strTemp;
     m_Input_Grid.put_TextMatrix(0,1,_T("Name"));
     m_Input_Grid.put_TextMatrix(0,2,_T("Value"));
-    bool b_hum_sensor = false;   //TSTAT   Hum
-    bool b_co2_sensor = false;   //  CO2  ;
-    bool b_lux_sensor = false;   // 
+    bool b_hum_sensor = false;   //用于判断TSTAT 输入 有无 Hum
+    bool b_co2_sensor = false;   //输入 有无 CO2 用此标志 来判断是否显示在输入想里;
+    bool b_lux_sensor = false;   // 光强
     for (int i=0; i<(int)m_tstat_input_data.size(); i++)
     {
         if (i > 8)
@@ -2659,25 +2659,25 @@ void CT3000View::ClickInputMsflexgrid()
 {
 
     long lRow,lCol;
-    lRow = m_Input_Grid.get_RowSel();//
-    lCol = m_Input_Grid.get_ColSel(); //
+    lRow = m_Input_Grid.get_RowSel();//获取点击的行号
+    lCol = m_Input_Grid.get_ColSel(); //获取点击的列号
 
     CRect rect;
-    m_Input_Grid.GetWindowRect(rect); //
-    ScreenToClient(rect); //
+    m_Input_Grid.GetWindowRect(rect); //获取表格控件的窗口矩形
+    ScreenToClient(rect); //转换为客户区矩形
     CDC* pDC =GetDC();
 
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //()
+    //计算选中格的左上角的坐标(象素为单位)
     long y = m_Input_Grid.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_Input_Grid.get_ColPos(lCol)/nTwipsPerDotX;
-    //()11
+    //计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
     long width = m_Input_Grid.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_Input_Grid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //
+    //形成选中个所在的矩形区域
     CRect rcCell(x,y,x+width,y+height);
-    //
+    //转换成相对对话框的坐标
     rcCell.OffsetRect(rect.left+1,rect.top+1);
     ReleaseDC(pDC);
     CString strValue = m_Input_Grid.get_TextMatrix(lRow,lCol);
@@ -2685,14 +2685,14 @@ void CT3000View::ClickInputMsflexgrid()
 
     if(1==lCol && lRow <=8)
     {
-       // return; // 2012.2.7
+       // return; // 2012.2.7老毛说不允许修改
         m_inNameEdt.MoveWindow(&rcCell,1);
         m_inNameEdt.ShowWindow(SW_SHOW);
         m_inNameEdt.SetWindowText(strValue);
         m_inNameEdt.SetFocus();
         m_inNameEdt.SetCapture();//LSC
         int nLenth=strValue.GetLength();
-        m_inNameEdt.SetSel(nLenth,nLenth); ////
+        m_inNameEdt.SetSel(nLenth,nLenth); //全选//
 
     }
 
@@ -2701,27 +2701,27 @@ void CT3000View::ClickInputMsflexgrid()
 void CT3000View::ClickOutputMsflexgrid()
 {
     long lRow,lCol;
-    lRow = m_Output_Grid.get_RowSel();//
-    lCol = m_Output_Grid.get_ColSel(); //
+    lRow = m_Output_Grid.get_RowSel();//获取点击的行号
+    lCol = m_Output_Grid.get_ColSel(); //获取点击的列号
 
     TRACE(_T("Click output grid!\n"));
 
     CRect rect;
-    m_Output_Grid.GetWindowRect(rect); //
-    ScreenToClient(rect); //
+    m_Output_Grid.GetWindowRect(rect); //获取表格控件的窗口矩形
+    ScreenToClient(rect); //转换为客户区矩形
     CDC* pDC =GetDC();
 
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //()
+    //计算选中格的左上角的坐标(象素为单位)
     long y = m_Output_Grid.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_Output_Grid.get_ColPos(lCol)/nTwipsPerDotX;
-    //()11
+    //计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
     long width = m_Output_Grid.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_Output_Grid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //
+    //形成选中个所在的矩形区域
     CRect rcCell(x,y,x+width,y+height);
-    //
+    //转换成相对对话框的坐标
     rcCell.OffsetRect(rect.left+1,rect.top+1);
     ReleaseDC(pDC);
     CString strValue = m_Output_Grid.get_TextMatrix(lRow,lCol);
@@ -2735,7 +2735,7 @@ void CT3000View::ClickOutputMsflexgrid()
         m_outNameEdt.SetWindowText(strValue);
         m_outNameEdt.SetFocus();
         int nLenth=strValue.GetLength();
-        m_outNameEdt.SetSel(nLenth,nLenth); ////
+        m_outNameEdt.SetSel(nLenth,nLenth); //全选//
     }
 }
 
@@ -2744,8 +2744,8 @@ void CT3000View::OnEnKillfocusInputnameedit()
     CString strText;
     m_inNameEdt.GetWindowText(strText);
     m_inNameEdt.ShowWindow(SW_HIDE);
-    int lRow = m_Input_Grid.get_RowSel();//
-    int lCol = m_Input_Grid.get_ColSel(); //
+    int lRow = m_Input_Grid.get_RowSel();//获取点击的行号
+    int lCol = m_Input_Grid.get_ColSel(); //获取点击的列号
 
     CString strInName;
     if(lCol!=1||lRow==0)
@@ -3011,8 +3011,8 @@ void CT3000View::OnEnKillfocusOutputnameedit()
     CString strText;
     m_outNameEdt.GetWindowText(strText);
     m_outNameEdt.ShowWindow(SW_HIDE);
-    int lRow = m_Output_Grid.get_RowSel();//
-    int lCol = m_Output_Grid.get_ColSel(); //
+    int lRow = m_Output_Grid.get_RowSel();//获取点击的行号
+    int lCol = m_Output_Grid.get_ColSel(); //获取点击的列号
 
     CString strInName;
     if(lCol!=1||lRow==0)
@@ -3270,7 +3270,7 @@ BOOL CT3000View::PreTranslateMessage(MSG* pMsg)
 
     return CFormView::PreTranslateMessage(pMsg);
 }
-//.....
+//时间更新.....
 void CT3000View::OnTimer(UINT_PTR nIDEvent)
 {
      
@@ -3278,7 +3278,7 @@ void CT3000View::OnTimer(UINT_PTR nIDEvent)
         return;
 
 
-    // 
+    // 更新时间。
     CTime time = CTime::GetCurrentTime();
     if (product_register_value[7] == PM_TSTAT8)
     {
@@ -3529,7 +3529,7 @@ void CT3000View::OnBnClickedUnoccupiedMark()
         int ret=write_one(g_tstat_id,MODBUS_INFO_BYTE,0);	//184  109
         if (ret>0)
         {
-            //product_register_value[MODBUS_CALIBRATION]=0;  2020 03 09  TSTAT8  UNOCC   MODBUS_CALIBRATION -1 
+            //product_register_value[MODBUS_CALIBRATION]=0;  2020 03 09 杜帆屏蔽 TSTAT8 勾选 UNOCC 的时候  MODBUS_CALIBRATION 为-1 导致崩溃
         }
         product_register_value[MODBUS_INFO_BYTE] = 0;//184
         //if ((m_strModelName.CompareNoCase(_T("Tstat6")) == 0)||(m_strModelName.CompareNoCase(_T("Tstat7")) == 0))
@@ -3802,7 +3802,7 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
 {
     CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 
-    //T3000
+    //恢复T3000主线程
     //pMain->m_pFreshMultiRegisters->SuspendThread();
     //pMain->m_pRefreshThread->SuspendThread();
 
@@ -3855,7 +3855,7 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
     //	AfxMessageBox(_T("setting invalid!"));
     //}
 
-    //T3000
+    //恢复T3000主线程
 
 
 	if (product_register_value[7] == PM_TSTAT8
@@ -3913,8 +3913,8 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				|| product_register_value[7] == PM_TSTAT8_220V) || (product_register_value[7] == PM_TSTAT5i))
             {
 
-                //product_register_value[]
-                //TXT
+                //product_register_value[]列表交换。
+                //读取TXT
                 //	memset(newtstat6,0,sizeof(newtstat6));
                 memcpy(newtstat6,product_register_value,sizeof(newtstat6));
 
@@ -4053,7 +4053,7 @@ void CT3000View::OnBnClickedBtnSynctime()
     }
     product_register_value[MODBUS_YEAR] = szTime[0];
     g_progress_persent = 15;
-    Sleep(1000); // 2020 0309  1 TSTAT;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[1] = (BYTE)(time.GetMonth());
     nRet[1] = write_one(g_tstat_id, MODBUS_MONTH, szTime[1],6);
     if (nRet[1] < 0)
@@ -4063,7 +4063,7 @@ void CT3000View::OnBnClickedBtnSynctime()
     }
     product_register_value[MODBUS_MONTH] = szTime[1];
     g_progress_persent = 25;
-    Sleep(1000); // 2020 0309  1 TSTAT;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[2] = (BYTE)(time.GetDayOfWeek()-1);
     nRet[2] = write_one(g_tstat_id, MODBUS_WEEK, szTime[2], 6);
     if (nRet[2] < 0)
@@ -4073,7 +4073,7 @@ void CT3000View::OnBnClickedBtnSynctime()
     }
     product_register_value[MODBUS_WEEK] = szTime[2];
     g_progress_persent = 40;
-    Sleep(1000); // 2020 0309  1 TSTAT;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[3] = (BYTE)(time.GetDay());
     nRet[3] = write_one(g_tstat_id, MODBUS_DAY, szTime[3], 6);
     if (nRet[3] < 0)
@@ -4083,7 +4083,7 @@ void CT3000View::OnBnClickedBtnSynctime()
     }
     product_register_value[MODBUS_DAY] = szTime[3];
     g_progress_persent = 60;
-    Sleep(1000); // 2020 0309  1 TSTAT;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[4] = (BYTE)(time.GetHour());
     nRet[4] = write_one(g_tstat_id, MODBUS_HOUR, szTime[4], 6);
     if (nRet[4] < 0)
@@ -4093,7 +4093,7 @@ void CT3000View::OnBnClickedBtnSynctime()
     }
     product_register_value[MODBUS_HOUR] = szTime[4];
     g_progress_persent = 70;
-    Sleep(1000); // 2020 0309  1 TSTAT;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[5] = (BYTE)(time.GetMinute());
     nRet[5] = write_one(g_tstat_id, MODBUS_MINUTE, szTime[5], 6);
     if (nRet[5] < 0)
@@ -4103,7 +4103,7 @@ void CT3000View::OnBnClickedBtnSynctime()
     }
     product_register_value[MODBUS_MINUTE] = szTime[5];
     g_progress_persent = 80;
-    Sleep(1000); // 2020 0309  1 TSTAT;
+    Sleep(1000); // 2020 0309 杜帆改为 1秒， TSTAT写的太快，容易出现只应答不处理的现象;
     szTime[6] = (BYTE)(time.GetSecond());
     nRet[6] = write_one(g_tstat_id, MODBUS_SECOND, szTime[6], 6);
     if (nRet[6] < 0)
@@ -4120,7 +4120,7 @@ endsynctime:
     EndWaitCursor();
 #endif
 
-    //int nRet = Write_Multi(g_tstat_id, szTime, 450, 8, 3);  // 
+    //int nRet = Write_Multi(g_tstat_id, szTime, 450, 8, 3);  // 这个写入有问题，所以变成单个字节写多次
 }
 
 void CT3000View::OnBnClickedButtonSchedule()
@@ -4141,13 +4141,13 @@ void CT3000View::OnBnClickedButtonSchedule()
 
 
 
-// ModelTStat6TStat7
-// 
+// 这个函数是给新的Model，TStat6，TStat7使用
+// 使用了新的寄存器和新的寄存器逻辑
 void CT3000View::InitFlexSliderBars()
 {
 
 
-//E:\Tstat67\T3000\T3000
+//以下是E:\Tstat67\T3000\T3000
 #if 1
     // init 3 thumb slider
     //CStatic *s = (CStatic*)GetDlgItem(IDC_FSB_OFFICE);
@@ -4612,7 +4612,7 @@ void CT3000View::HandleSliderSetPos( BOOL bRight )
         m_bSliderSetPosWarning = TRUE;
     }
 }
-//Tstat
+//这个是Tstat
 void CT3000View::InitFlexSliderBars_tstat6()
 {
 
@@ -4745,7 +4745,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
 #if 1
     if (FlexSP == 1)
     {
-        //2 SP
+        //以下是2 SP
         //	MDAY=1;
         // MDAY=0;
 
@@ -4890,7 +4890,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
         }
     }
 
-    if(FlexSPN == 1)//   NIGHT
+    if(FlexSPN == 1)//以下是右侧的  右侧 NIGHT
     {
 
         if (MNIGHT == 1) // office
@@ -5099,7 +5099,7 @@ void CT3000View::SetFlexSliderBars_tstat6()
 #if 1
     if (FlexSP == 1)
     {
-        //2 SP
+        //以下是2 SP
         //	MDAY=1;
         // MDAY=0;
 
@@ -5224,7 +5224,7 @@ void CT3000View::SetFlexSliderBars_tstat6()
         }
     }
 
-    if(FlexSPN == 1)//   NIGHT
+    if(FlexSPN == 1)//以下是右侧的  右侧 NIGHT
     {
 
         if (MNIGHT == 1) // office
@@ -5641,7 +5641,7 @@ int CT3000View::GetRoundMM(BOOL is_max,int num1,int num2,float rate)
 //          {
 //              retvalue = small_regvalue;
 //          }
-//          else   //
+//          else   //相等的情况下
 //          {
     if (is_max)
     {
@@ -5993,23 +5993,23 @@ void CT3000View::FreshCtrl()
         unsigned long  temp_time_long = time(NULL);
 
 
-        if (time_current >= temp_time_long)  //
+        if (time_current >= temp_time_long)  //设备时间大于本地时间
         {
-            if (time_current > (temp_time_long + 600))  // 
+            if (time_current > (temp_time_long + 600))  //大于本地一分钟以上 需同步
                 temp_need_sync = 1;
         }
-        else if (time_current > temp_time_long - 600) // 10  
+        else if (time_current > temp_time_long - 600) // 比本地时间小10分钟以内 ， 不用不同步
         {
             temp_need_sync = 0;
         }
         else
-            temp_need_sync = 1; //10;
+            temp_need_sync = 1; //小10分钟以上，需要同步;
 
         n_ignore_sync_time = GetPrivateProfileInt(_T("SYNC_Time"), _T("ignore_pop"), 0, g_cstring_ini_path);
         last_ignore_sync_time = GetPrivateProfileInt(_T("SYNC_Time"), _T("ignore_pop_time"), 0, g_cstring_ini_path);
         int delta_time = 0;
         delta_time = temp_time_long - last_ignore_sync_time;
-        if ((n_ignore_sync_time == 1) && (delta_time  < 3600 * 24 * 3) && (delta_time >= 0))  //3 ;
+        if ((n_ignore_sync_time == 1) && (delta_time  < 3600 * 24 * 3) && (delta_time >= 0))  //3天内 客户点了忽略，才不提醒;
         {
             temp_need_sync = 0;
         }
@@ -6043,7 +6043,7 @@ void CT3000View::FreshCtrl()
                 OnBnClickedBtnSynctime();
             }
         }
-        already_check_tstat_timesync = 1; //;
+        already_check_tstat_timesync = 1; //此设备不点击的话，不在弹出;
 
     }
     else
@@ -6071,7 +6071,7 @@ void CT3000View::FreshCtrl()
     {
         Flexflash=1;
 
-        if (Flexflash)//
+        if (Flexflash)//只有点击树型列表时才执行下面的。
         {
 
             //GetDlgItem(IDC_DAYSTATIC)->ShowWindow(SW_HIDE);
@@ -6488,7 +6488,7 @@ BOOL CT3000View::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
         nID = ::GetDlgCtrlID((HWND)nID);
         if(nID)
         {
-            //  Tooltips
+            //  这里就是你要显示的Tooltips，可以根据需要来定制
             CString strToolTips;
             // strToolTips.Format(_T("%d"), m_tipvalue);
 
@@ -6739,7 +6739,7 @@ void CT3000View::NightHandleMovedSlidercontrol1(const VARIANT& sender, float new
 			{
 				nSP = (nHeatSP + nCoolSP) / 2;
 			} 
-			//sp/*product_register_value[MODBUS_NIGHT_SETPOINT]*/
+			//自动调节sp/*product_register_value[MODBUS_NIGHT_SETPOINT]*/
 			nHeatSP = GetRoundNumber(nHeatSP);
 			nCoolSP = GetRoundNumber(nCoolSP);
 			nSP = GetRoundNumber(nSP);
@@ -6852,7 +6852,7 @@ void CT3000View::NightHandleMovedSlidercontrol1(const VARIANT& sender, float new
 			if (Tstat_nSP != nSP)
 			{
 
-                bool setpoint_flag = false; //  ,   
+                bool setpoint_flag = false; //若 被 最小或最大值限制, 就要判断 要不要 刷新界面。
 				if (NightSP < nRangeMin * 10)  //  ||
 				{
 					NightSP = nRangeMin * 10;
@@ -7359,7 +7359,7 @@ void CT3000View::NightFeedBackNewSliderFor5ABCD()
 
 void CT3000View::OnCbnSelchangeComboSysMode()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     int write_value = -1;
     UpdateData();
     CString temp_string;
@@ -7397,7 +7397,7 @@ void CT3000View::OnCbnSelchangeComboSysMode()
 
 void CT3000View::OnBnClickedButtonSetpointDetail()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CTstatSetpointDetail dlg;
     dlg.DoModal();
 }

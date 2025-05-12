@@ -60,7 +60,7 @@ typedef struct _GV_ITEM {
     UINT     mask;        // Mask for use in getting/setting cell data
     UINT     nState;      // cell state (focus/hilighted etc)
     DWORD    nFormat;     // Format of cell
-    int      iImage;      // index of the list view item icon
+    int      iImage;      // index of the list view item’s icon
     COLORREF crBkClr;     // Background colour (or CLR_DEFAULT)
     COLORREF crFgClr;     // Forground colour (or CLR_DEFAULT)
     LPARAM   lParam;      // 32-bit value to associate with item

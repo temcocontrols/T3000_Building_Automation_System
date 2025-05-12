@@ -62,7 +62,7 @@ extern CDialog_Progess *WaitRead_Data_Dlg;
 extern CBacnetAddLabel * Add_Label_Window;
 extern CBacnetUserlogin * User_Login_Window;
 extern CString Re_Initial_Bac_Socket_IP;
-extern unsigned char already_check_tstat_timesync; //TSTAT ;
+extern unsigned char already_check_tstat_timesync; //每个TSTAT设备 只有点击的时候在确认时间;
 HANDLE hretryThread = NULL;
 extern CString AutoFlashConfigPath;
 HTREEITEM  hTreeItem_retry =NULL;
@@ -117,17 +117,17 @@ extern "C" {
 }
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
-//	
+//	配置文件名称，用于保存用户设置
 extern bool b_statusbarthreadflag;
 extern tree_product	m_product_isp_auto_flash;
 extern void intial_bip_socket();
 #pragma region Fance Test
 //For Test
-//   treeview, ;
-bool mstp_read_result = false; //MSTP   ;
-bool start_record_time = true;	//;
+// 在没有鼠标和键盘消息的时候 就启用自动刷新 treeview,如果有就 不要刷新，因为如果正在刷新，客户肯能就无法第一时间读到自己想要的数据;
+bool mstp_read_result = false; //MSTP 设备 记录 建立连接时，是否为客户手动中断操作;
+bool start_record_time = true;	//开启计时，如果用户一段时间无键盘和鼠标左键操作就开启自动刷新;
 unsigned long time_click = 0;
-tree_product selected_product_Node; // ;
+tree_product selected_product_Node; // 选中的设备信息;
 bool enable_show_debug_window = false;
 BacnetWait *WaitWriteDlg=NULL;
 
@@ -520,7 +520,7 @@ UINT _ReadMultiRegisters(LPVOID pParam)
             multy_ret = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100);
             //register_critical_section.Unlock();
             Sleep(SEND_COMMAND_DELAY_TIME);
-            if(multy_ret<0)		//Fance :  ,   ;
+            if(multy_ret<0)		//Fance : 如果出现读失败 就跳出循环体,因为如果是由断开连接 造成的 读失败 会使其他需要用到读的地方一直无法获得资源;
                 break;
         }
 
@@ -661,7 +661,7 @@ void CMainFrame::InitViews()
     {
         if(nView == DLG_DIALOGCM5_VIEW||nView == DLG_DIALOGMINIPANEL_VIEW || nView == DLG_HUMCHAMBER)
             continue;
-        if (nView >= DLG_DIALOG_ZIGBEE_REPEATER)  //31iew ;;
+        if (nView >= DLG_DIALOG_ZIGBEE_REPEATER)  //从31以后得View 不在提前创建，否则浪费太多系统资源;改为何时需要何时创建;
         {
             continue;
         }
@@ -898,7 +898,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_pTreeViewCrl->SetExtendedStyle(TVS_EDITLABELS, TVS_EDITLABELS);
     MainFram_hwd = this->m_hWnd;
 
-    //  2011,7,4, 
+    //  2011,7,4, 先判断是否第一次运行，是否要导入数据库。
     //ImportDataBaseForFirstRun();
     g_configfile_path =g_strExePth + g_strStartInterface_config;
     g_selected_serialnumber=0;//GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
@@ -919,7 +919,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
     ScanTstatInDB();
 
-   // DeleteConflictInDB();//;
+   // DeleteConflictInDB();//用于处理数据库中重复的数据，这些数据有相同的序列号;
     PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);
 
     SetTimer(MONITOR_MOUSE_KEYBOARD_TIMER,1000,NULL);
@@ -932,10 +932,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 
    
-    BuildingComportConfig();//  Config Comport;
+    BuildingComportConfig();//用于 更改 Config里面的 Comport项;
 
 
-//
+//展开所有的项
 //	Treestatus();
     HTREEITEM htiRoot = m_pTreeViewCrl->GetRootItem();//GetRootItem();
     m_pTreeViewCrl->Expand(htiRoot,TVE_EXPAND);
@@ -949,8 +949,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     HTREEITEM hChilder1 = m_pTreeViewCrl->GetChildItem(hChilder);
     m_pTreeViewCrl->Expand(hChilder1,TVE_EXPAND);
 
-    //Register
-#ifdef _DEBUG //debug   
+    //Register热键
+#ifdef _DEBUG //debug版本   
     int nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'I');
     //if(!nRet)
     //    AfxMessageBox(_T("RegisterHotKey ALT + I failure"));
@@ -994,14 +994,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     //if(!nRet)
     //    AfxMessageBox(_T("RegisterHotKey ALT + R failure"));
 #ifdef USE_MOD_SHIFT_DF
-    nRet = RegisterHotKey(GetSafeHwnd(),1111,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'D'); // ctrl + alt + shift + D
+    nRet = RegisterHotKey(GetSafeHwnd(),1111,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'D'); //热键 ctrl + alt + shift + D
     if(!nRet)
         AfxMessageBox(_T("RegisterHotKey MOD_SHIFT + D failure"));
-    nRet = RegisterHotKey(GetSafeHwnd(),1112,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'F'); // ctrl + alt + shift + F
+    nRet = RegisterHotKey(GetSafeHwnd(),1112,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'F'); //热键 ctrl + alt + shift + F
     if(!nRet)
         AfxMessageBox(_T("RegisterHotKey MOD_SHIFT + F failure"));
 #endif // USE_MOD_SHIFT_DF
-#else //release   
+#else //release版本   
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'I');
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'O');
     RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'V');
@@ -1070,8 +1070,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 #endif
 
-    // 
-#if 0      //2018 0409 fandu 
+    // 需要执行线程中的操作时
+#if 0      //2018 0409 fandu 屏蔽
     if (m_lasttime_tree_node.protocol == Modbus_Serial)
     {
         open_com(m_lasttime_tree_node.ncomport);
@@ -1106,7 +1106,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
     else
     {
-       // m_pTreeViewCrl->turn_item_image(m_lasttime_tree_node.product_item ,false); //2016 03 17 .  m_lasttime_tree_node.product_item 0xcdcdcdcd. ;
+       // m_pTreeViewCrl->turn_item_image(m_lasttime_tree_node.product_item ,false); //2016 03 17 由杜帆屏蔽. 初始化 m_lasttime_tree_node.product_item 的值可能为0xcdcdcdcd. 导致运行错误;
         for (int i = 0; i<(int)m_product.size(); i++)
         {
             if (m_product.at(i).product_item == m_lasttime_tree_node.product_item)
@@ -1181,7 +1181,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
         return FALSE;
     //  Modify the Window class or styles here by modifying
     //  the CREATESTRUCT cs
-    // 
+    // 禁用最小化按钮
     cs.style &= ~WS_MINIMIZEBOX;
     cs.style &= ~FWS_ADDTOTITLE; 
     return TRUE;
@@ -1360,7 +1360,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
     //}
 
     RECT r;
-    if (pt.x <= 104)  //;
+    if (pt.x <= 104)  //点击展开或者折叠时，不会像以前一样还拼命加载界面;
     {
 
         unsigned char expand_status = 0;
@@ -1373,7 +1373,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
             {
                 temp_serialnumber.Format(_T("%u"), m_product.at(i).serial_number);
 
-                expand_status = (unsigned char)GetPrivateProfileInt(temp_serialnumber, _T("Expand"), 1, g_ext_database_path); //;
+                expand_status = (unsigned char)GetPrivateProfileInt(temp_serialnumber, _T("Expand"), 1, g_ext_database_path); //默认是都展开的;
                 if (expand_status == 2)
                 {
                     WritePrivateProfileString(temp_serialnumber, _T("Expand"), _T("1"), g_ext_database_path);
@@ -1635,7 +1635,7 @@ BOOL CMainFrame::ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT& 
     return true;
 }
 
-// evice.;
+//删除数据库中 重叠的device.;
 void CMainFrame::DeleteConflictInDB()
 {
     bool find_conflict = false;
@@ -1680,7 +1680,7 @@ void CMainFrame::DeleteConflictInDB()
 
 void CMainFrame::GetExtProductInfo(tree_product &m_product_temp,CString temp_ext)
 {
-    // temp_ext 
+    //获取 temp_ext 补全代码
     CStringArray temp_array_2;
     temp_ext.Trim();
     SplitCStringA(temp_array_2, temp_ext, _T("^"));
@@ -1691,7 +1691,7 @@ void CMainFrame::GetExtProductInfo(tree_product &m_product_temp,CString temp_ext
 	}
 	else
 	{
-        //GetSize 2  3 3 
+        //如果GetSize 为2 就赋值两个 为3 就赋值3个 以此类推
 
 		if (temp_array_2.GetSize() >= 2)
 		{
@@ -1927,13 +1927,13 @@ void CMainFrame::LoadProductFromDB()
 
     CString strBuilding = m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
 
-    tvInsert.hParent = TVI_ROOT; // 
-    tvInsert.item.mask = ITEM_MASK; // TV_ITEM
+    tvInsert.hParent = TVI_ROOT; // 指定父句柄
+    tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
     tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strBuilding;
-    tvInsert.hInsertAfter = TVI_LAST; // 
+    tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
     TVINSERV_BUILDING
         HTREEITEM hTreeSubbuilding = NULL;
-    hTreeSubbuilding = m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//subbuilding
+    hTreeSubbuilding = m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入subbuilding。
     // Expand the parent, if possible.
 
 
@@ -1941,8 +1941,8 @@ void CMainFrame::LoadProductFromDB()
 
 
     HTREEITEM hlocalnetwork = NULL;
-    //  .
-    //remote   .  .
+    //要求选择远程连接的时候 不显示 本地的设备.
+    //潜在问题是客户一不小心选中remote 后 ，这样改会出现 扫描不到的情况.即使扫描到了 ，要求不显示本地的设备，客户会抱怨 扫不到.
     if (b_remote_connection == false)
     {
         if ((current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_AUTO))
@@ -1950,15 +1950,15 @@ void CMainFrame::LoadProductFromDB()
             CString strNetWrokName;
             strNetWrokName = _T("Local View");
             ///*********tree***********************************
-            tvInsert.hParent = hTreeSubbuilding; // 
-            tvInsert.item.mask = ITEM_MASK; // TV_ITEM
+            tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
+            tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 
             tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strNetWrokName;
-            tvInsert.hInsertAfter = TVI_LAST; // 
+            tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
             TVINSERV_FLOOR
 
 
-                hlocalnetwork = m_pTreeViewCrl->InsertItem(&tvInsert);//
+                hlocalnetwork = m_pTreeViewCrl->InsertItem(&tvInsert);//返回楼层的句柄
             HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hlocalnetwork);
             if (hParent != NULL)
                 m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
@@ -1970,7 +1970,7 @@ void CMainFrame::LoadProductFromDB()
     CString temp_parent_serialnum;
     if (!q.eof())
     {
-        while (!q.eof())// ;
+        while (!q.eof())//所有 设备;
         {
 
             tree_product m_product_temp = { 0 };
@@ -1983,11 +1983,11 @@ void CMainFrame::LoadProductFromDB()
                 tvInsert.item.lParam = TREE_LP_VIRTUAL_DEVICE  ;
             }
             else
-                tvInsert.item.mask = ITEM_MASK; // TV_ITEM
+                tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
             temp_parent_serialnum = q.getValuebyName(L"Parent_SerialNum");
             unsigned int temp_int_serial;
             temp_int_serial = (unsigned int)_wtoi(temp_parent_serialnum);
-            if ((!temp_parent_serialnum.IsEmpty()) && (temp_int_serial != 0))	//;
+            if ((!temp_parent_serialnum.IsEmpty()) && (temp_int_serial != 0))	//说明有父节点;先插入父节点
             {
                 q.nextRow();
                 continue;
@@ -1999,22 +1999,22 @@ void CMainFrame::LoadProductFromDB()
 #if 0
             if (z == COM_SERIAL_PORT)
             {
-                tvInsert.hParent = m_comportlist.at(j).each_port_item; // 
+                tvInsert.hParent = m_comportlist.at(j).each_port_item; // 指定父句柄
             }
             else if (z == LOCAL_NETWORK_PORT)
             {
-                tvInsert.hParent = hlocalnetwork;//  ;
+                tvInsert.hParent = hlocalnetwork;// 指定父句柄 为本地网络;
             }
             else if (z == REMOTE_CONNECTION)
             {
-                tvInsert.hParent = hrootremote;//  ;
+                tvInsert.hParent = hrootremote;// 指定父句柄 为本地网络;
             }
 #endif
            
-           // tvInsert.item.mask = ITEM_MASK; // TV_ITEM
+           // tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
             tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strProdcut;
             //TRACE(strProdcut);
-            tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 
+            tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
             int temp_product_class_id = q.getIntField("Product_class_ID");
             if (temp_product_class_id == PM_NC || temp_product_class_id == PM_SOLAR)
                 TVINSERV_NET_WORK
@@ -2075,7 +2075,7 @@ void CMainFrame::LoadProductFromDB()
                 temp_product_class_id == PM_TSTAT8_220V)
                 TVINSERV_TSTAT8
             else if (temp_product_class_id == PM_MULTI_SENSOR)
-                TVINSERV_TSTAT8   //STAT8 
+                TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
             else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
                 TVINSERV_T3_NANO
             else if ((temp_product_class_id == PM_CO2_NET) ||
@@ -2086,7 +2086,7 @@ void CMainFrame::LoadProductFromDB()
                 (temp_product_class_id == STM32_CO2_NET) ||
                 (temp_product_class_id == STM32_PM25) ||
                 (temp_product_class_id == STM32_CO2_RS485) ||
-                (temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28  HUM TSTATug
+                (temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28 修复 HUM 使用默认TSTAT图标的bug
                 (temp_product_class_id == STM32_HUM_RS485))
                 TVINSERV_CO2
             else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
@@ -2126,12 +2126,12 @@ void CMainFrame::LoadProductFromDB()
             {
                 CString temp_cs_serial;
                 temp_cs_serial.Format(_T("%u"), m_product_temp.serial_number);
-                //  ;
-                m_product_temp.expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //;
+                //如果父节点 是要求折叠的 就不要展开;
+                m_product_temp.expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //默认是都展开的;
                 if (m_product_temp.expand != 2)
                     m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
                 else
-                    m_pTreeViewCrl->Expand(hParent, TVE_COLLAPSE); //2
+                    m_pTreeViewCrl->Expand(hParent, TVE_COLLAPSE); //2就折叠
             }
 
 
@@ -2261,7 +2261,7 @@ void CMainFrame::LoadProductFromDB()
     strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s'  and  Parent_SerialNum <> '0' and Parent_SerialNum <> '' "), strBuilding);
     q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
 
-    if (!q.eof())// ;
+    if (!q.eof())//就说明这个节点下面有 挂在父节点下面的;
     {
         while (!q.eof())
         {
@@ -2298,11 +2298,11 @@ void CMainFrame::LoadProductFromDB()
             if (find_parents)
             {
                 CString strProdcut = q.getValuebyName(L"Product_name");
-                tvInsert.hParent = parents_item; // 
-                tvInsert.item.mask = ITEM_MASK; // TV_ITEM
+                tvInsert.hParent = parents_item; // 指定父句柄
+                tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
                 tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strProdcut;
                 //TRACE(strProdcut);
-                tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 
+                tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
 
 
                 int temp_product_class_id = q.getIntField("Product_class_ID");
@@ -2350,7 +2350,7 @@ void CMainFrame::LoadProductFromDB()
                     temp_product_class_id == PM_TSTAT8_220V)
                     TVINSERV_TSTAT8
                 else if (temp_product_class_id == PM_MULTI_SENSOR)
-                    TVINSERV_TSTAT8   //STAT8 
+                    TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
                 else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
                     TVINSERV_T3_NANO
                 else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
@@ -2360,7 +2360,7 @@ void CMainFrame::LoadProductFromDB()
                     (temp_product_class_id == STM32_CO2_NET) ||
                     (temp_product_class_id == STM32_PM25) ||
                     (temp_product_class_id == STM32_CO2_RS485) ||
-                    (temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28  HUM TSTATug
+                    (temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28 修复 HUM 使用默认TSTAT图标的bug
                     (temp_product_class_id == STM32_HUM_RS485))
                     TVINSERV_CO2
                 else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
@@ -2393,20 +2393,20 @@ void CMainFrame::LoadProductFromDB()
                 {
                     CString temp_cs_serial;
                     temp_cs_serial.Format(_T("%u"), uint_p_serial_number);
-                    //  ;
+                    //如果父节点 是要求折叠的 就不要展开;
                     unsigned char temp_expand = 0;
-                    temp_expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //;
+                    temp_expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //默认是都展开的;
                     if (temp_expand != 2)
                         m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
                     else
-                        m_pTreeViewCrl->Expand(hParent, TVE_COLLAPSE); //2
+                        m_pTreeViewCrl->Expand(hParent, TVE_COLLAPSE); //2就折叠
                 }
 
                 strSql = q.getValuebyName(L"Serial_ID");
 
                 long temp_serial_id = (long)(_wtoi64(strSql));
                 unsigned int correct_id = (DWORD)(_wtoi64(strSql));
-                //  ;Add by Fance
+                //用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
                 //if(temp_serial_id < 0)
                 //{
                 //	CString wrong_serial_id;
@@ -2546,7 +2546,7 @@ void CMainFrame::LoadProductFromDB()
 
             m_product.at(i).subnet_baudrate = GetPrivateProfileInt(ntemp_serial_number, _T("Subnet_baudrate"), 0, g_ext_database_path);
 
-            //m_product.at(i).expand = (unsigned char)GetPrivateProfileInt(ntemp_serial_number, _T("Expand"), 1, g_ext_database_path); //;
+            //m_product.at(i).expand = (unsigned char)GetPrivateProfileInt(ntemp_serial_number, _T("Expand"), 1, g_ext_database_path); //默认是都展开的;
         }
     }
     SqliteDBT3000.closedb();
@@ -2684,14 +2684,14 @@ void CMainFrame::ScanTstatInDB(void)
         {
             CString strBuilding=m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
 
-            tvInsert.hParent = TVI_ROOT; // 
-            tvInsert.item.mask = ITEM_MASK; // TV_ITEM
+            tvInsert.hParent = TVI_ROOT; // 指定父句柄
+            tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
             tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strBuilding;
-            tvInsert.hInsertAfter = TVI_LAST; // 
+            tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
             TVINSERV_BUILDING
             HTREEITEM hTreeSubbuilding=NULL;
-            //hTreeSubbuilding=m_pTreeViewCrl->InsertItem(&tvInsert);//subbuilding
-            hTreeSubbuilding=m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//subbuilding
+            //hTreeSubbuilding=m_pTreeViewCrl->InsertItem(&tvInsert);//插入subbuilding。
+            hTreeSubbuilding=m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入subbuilding。
             // m_pTreeViewCrl->Expand(hTreeSubbuilding,TVE_EXPAND);//Add
 
             // Expand the parent, if possible.
@@ -2729,20 +2729,20 @@ void CMainFrame::ScanTstatInDB(void)
              
             vector <tree_floor> tmpfloorLst;//
             tmpfloorLst.empty();
-            while(!q.eof())//
+            while(!q.eof())//所有楼层。
             {
                 CString strFloorName=q.getValuebyName(L"Floor_name");
                 ///*********tree***********************************
-                tvInsert.hParent = hTreeSubbuilding; // 
-                tvInsert.item.mask = ITEM_MASK; // TV_ITEM
+                tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
+                tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 
                 tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strFloorName;
-                tvInsert.hInsertAfter = TVI_LAST; // 
+                tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
                 TVINSERV_FLOOR
 
                 HTREEITEM hTreeFloor=NULL;
-                //hTreeFloor=m_pTreeViewCrl->InsertItem(&tvInsert);//
-                hTreeFloor=m_pTreeViewCrl->InsertFloorItem(&tvInsert);//
+                //hTreeFloor=m_pTreeViewCrl->InsertItem(&tvInsert);//返回楼层的句柄
+                hTreeFloor=m_pTreeViewCrl->InsertFloorItem(&tvInsert);//返回楼层的句柄
 
                 HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hTreeFloor);
                 if (hParent != NULL)
@@ -2783,15 +2783,15 @@ void CMainFrame::ScanTstatInDB(void)
                 }
 
                 q = SqliteDB.execQuery((UTF8MBSTR)temp_str);
-                //
+                //插入每个房间到相关的楼层。
                 while(!q.eof())
                 {
                     CString strRoomName;
                     strRoomName=q.getValuebyName(L"Room_name");
-                    tvInsert.hParent = tmpfloorLst.at(i).floor_item ; // 
-                    tvInsert.item.mask = ITEM_MASK; // TV_ITEM
+                    tvInsert.hParent = tmpfloorLst.at(i).floor_item ; // 指定父句柄
+                    tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
                     tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strRoomName;
-                    tvInsert.hInsertAfter = TVI_LAST; // 
+                    tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
                     TVINSERV_ROOM
                     HTREEITEM hTreeRoom=NULL;
                     //hTreeRoom=m_pTreeViewCrl->InsertItem(&tvInsert);
@@ -2815,7 +2815,7 @@ void CMainFrame::ScanTstatInDB(void)
             }
             ///////end room nodes//////////////////////////////////////////////////////////////////////
             //////Begin product node/////////////////////////////////////////////////////////////////
-            ///
+            ///每个房间；
             for(UINT i=0; i<tmproomLst.size(); i++)
             {
                 //loop for product Name
@@ -2848,11 +2848,11 @@ void CMainFrame::ScanTstatInDB(void)
                 while(!q.eof())
                 {
                     CString strProdcut=q.getValuebyName(L"Product_name");
-                    tvInsert.hParent = tmproomLst.at(i).room_item ; // 
-                    tvInsert.item.mask = ITEM_MASK; // TV_ITEM
+                    tvInsert.hParent = tmproomLst.at(i).room_item ; // 指定父句柄
+                    tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
                     tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;
                     //TRACE(strProdcut);
-                    tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 
+                    tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式
                     int temp_product_class_id=q.getIntField("Product_class_ID");
                     CString temp_ext;
                     tree_product m_product_temp = {0};
@@ -2909,7 +2909,7 @@ void CMainFrame::ScanTstatInDB(void)
                              temp_product_class_id == PM_TSTAT8_220V)
 						TVINSERV_TSTAT8
                     else if (temp_product_class_id == PM_MULTI_SENSOR)
-                        TVINSERV_TSTAT8   //STAT8 
+                        TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
                     else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
                         TVINSERV_T3_NANO
 					else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
@@ -2949,7 +2949,7 @@ void CMainFrame::ScanTstatInDB(void)
 
                     //long temp_serial_id = _wtol(strSql);
                     //unsigned int correct_id = (DWORD)(_wtol(strSql));
-                    //  ;Add by Fance
+                    //用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
                     if(temp_serial_id < 0)
                     {
                         CString wrong_serial_id;
@@ -3046,7 +3046,7 @@ void CMainFrame::ScanTstatInDB(void)
                     if (g_selected_serialnumber == m_product_temp.serial_number)
                     {
                         m_lasttime_tree_node  =  m_product_temp;
-                        m_pTreeViewCrl->SetSelectItem(m_product_temp.product_item);//;
+                        m_pTreeViewCrl->SetSelectItem(m_product_temp.product_item);//在线的时候才将颜色变红;
                         m_pTreeViewCrl->SetSelectSerialNumber(m_product_temp.serial_number);
                         m_current_tree_node =   m_product_temp;
                         /*g_selected_serialnumber = m_product.at(i).serial_number;*/
@@ -3098,7 +3098,7 @@ void CMainFrame::OnBatchFlashHex()
     setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
     closesocket(h_Broad);
 
-    SetCommunicationType(0);//ISP ;
+    SetCommunicationType(0);//关闭串口，供ISP 使用;
     close_com();
 
 
@@ -3117,7 +3117,7 @@ void CMainFrame::OnBatchFlashHex()
     }
     SetCommunicationType(temp_type);
 
-    //Fance Add. SP 1234 4321 T3000 istview ;
+    //Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
     h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
     BOOL bBroadcast=TRUE;
     ::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -3324,7 +3324,7 @@ BOOL CMainFrame::ConnectSubBuilding(Building_info build_info)
         CString* pstrInfo = new CString(g_strT3000LogString);
         ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
         UINT n1,n2,n3,n4;
-        if (ValidAddress(build_info.strIp,n1,n2,n3,n4)==FALSE)  // NCP
+        if (ValidAddress(build_info.strIp,n1,n2,n3,n4)==FALSE)  // 验证NC的IP
         {
             CString StringIP;
             if(!GetIPbyHostName(build_info.strIp,StringIP))
@@ -3417,7 +3417,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
 		||(tree_node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
     {
         UINT n1,n2,n3,n4;
-        if (ValidAddress(tree_node.BuildingInfo.strIp,n1,n2,n3,n4)==FALSE)  // NCP
+        if (ValidAddress(tree_node.BuildingInfo.strIp,n1,n2,n3,n4)==FALSE)  // 验证NC的IP
         {
 
             CString StringIP;
@@ -3623,14 +3623,14 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
         m_CurSubBuldingInfo=tree_node.BuildingInfo;
         m_pTreeViewCrl->turn_item_image(tree_node.product_item ,true);
 
-        m_pTreeViewCrl->SetSelectItem(tree_node.product_item );//;
+        m_pTreeViewCrl->SetSelectItem(tree_node.product_item );//在线的时候才将颜色变红;
         m_pTreeViewCrl->SetSelectSerialNumber(tree_node.serial_number);
         g_selected_serialnumber = tree_node.serial_number;
 
     }
     return bRet;
 }
-void CMainFrame::CheckConnectFailure(const CString& strIP) // 
+void CMainFrame::CheckConnectFailure(const CString& strIP) // 检查失败的原因，并给出详细的提示信息
 {
     USES_CONVERSION;
     LPCSTR szIP = W2A(strIP);
@@ -3656,13 +3656,13 @@ void CMainFrame::CheckConnectFailure(const CString& strIP) //
     CString strHostIP;
     strHostIP.Format(_T("%d.%d.%d.%d"), sa.sin_addr.S_un.S_un_b.s_b1,sa.sin_addr.S_un.S_un_b.s_b2,sa.sin_addr.S_un.S_un_b.s_b3,sa.sin_addr.S_un.S_un_b.s_b4);
 
-    // 
+    // 是否是同一子网
     if ( ia.S_un.S_un_b.s_b1 == sa.sin_addr.S_un.S_un_b.s_b1 &&
             ia.S_un.S_un_b.s_b2 == sa.sin_addr.S_un.S_un_b.s_b2 &&
             ia.S_un.S_un_b.s_b3 == sa.sin_addr.S_un.S_un_b.s_b3
        )
     {
-        // 
+        // 是同一子网，但是连接不上，那么提示检查设备连接
         CString strTip;
         strTip.Format(_T("Can not set up the connection with %s, please check its IP address and net cable. "), strIP);
         AfxMessageBox(strTip);
@@ -3690,7 +3690,7 @@ void CMainFrame::OnAddBuildingConfig()
     }
  
 
-    bool temp_value = 	b_pause_refresh_tree;	//onfigbuildingTree.
+    bool temp_value = 	b_pause_refresh_tree;	//如果在Config界面选择building的时候就不要刷新Tree了.
     b_pause_refresh_tree = ADD_BUILDING_CONFIG;
     m_nStyle=4;
     Invalidate();
@@ -3941,7 +3941,7 @@ void CMainFrame::SwitchToPruductType(int nIndex)
     //pNewView->Invalidate();
 
 here:
-    g_bPauseMultiRead = FALSE;//
+    g_bPauseMultiRead = FALSE;//恢复主线程的刷新
 
     switch(nIndex)
     {
@@ -4217,7 +4217,7 @@ void CMainFrame::Scan_Product()
 {
     CString strTime;
     strTime=Get_NowTime();
-    //
+    //开始时间
 
     CString g_strT3000LogString=_T("--------------------------------Scan Begin--------------------------------\n");
     CString* pstrInfo = new CString(g_strT3000LogString);
@@ -4231,7 +4231,7 @@ void CMainFrame::Scan_Product()
     ClearBuilding();
 
 
-    HANDLE temphandle;//Scan bacnet;
+    HANDLE temphandle;//如果用户点击Scan，而 bacnet的线程还在继续工作，需要先结束这两个线程;
     if(bac_net_initial_once)
     {
         close_bac_com();
@@ -4301,7 +4301,7 @@ void CMainFrame::Scan_Product()
 	dlg.DoModal();
 
     m_bScanALL = TRUE;
-	refresh_tree_status_immediately = true; // ;
+	refresh_tree_status_immediately = true; //立即刷新 树形结构;
     delete m_pWaitScanDlg;
     m_pWaitScanDlg = NULL;
 	scaning_mode = false;
@@ -4494,7 +4494,7 @@ DWORD WINAPI  CMainFrame::Write_Modbus_tstat_cfg(LPVOID lpVoid)
 {
     CMainFrame *pParent = (CMainFrame *)lpVoid;
     g_bPauseMultiRead = TRUE;
-    now_tstat_id = g_tstat_id; //   now_tstat_id  0;
+    now_tstat_id = g_tstat_id; //必须要赋值 否则  now_tstat_id 后面全是 0;
     load_file_every_step temppp;
     CString log_file_path = _T("C:\\1.txt");
     //added the header marker.
@@ -4551,13 +4551,13 @@ DWORD WINAPI  CMainFrame::Read_Modbus_10000(LPVOID lpVoid)
 	 return true;
 }
 
-// T3TBLBBB TSTAT10  CM5  ;
-// Save file   ;
+//点击 T3TBLBBB TSTAT10  CM5 的时候会通过此函数保存缓存数据至 本地文件;
+//点击菜单 Save file  也会 保存所有的配置信息;
 DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 {
 
 	 CMainFrame *pParent = (CMainFrame *)lpVoid;
-     int  nspecial_mode = pParent->m_read_control;  // 0    1  program;
+     int  nspecial_mode = pParent->m_read_control;  // 0 默认全读   1 缓存的时候不读 program;
 	 int end_temp_instance = 0;
 	  CString Mession_ret;
 	   read_write_bacnet_config = true;
@@ -4578,10 +4578,10 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 		  BAC_USER_LOGIN_GROUP +
           BAC_MSV_GROUP +
 		  BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT +
-		  BAC_PROGRAM_ITEM_COUNT*5 +   //5 rogram52000;
-		  1 +		//1etting
+		  BAC_PROGRAM_ITEM_COUNT*5 +   //乘以5 是因为每个program都有5包，共2000个字节要读;
+		  1 +		//这个1是Setting
 		  1 +
-          BAC_SCHEDULE_FLAG_GROUP;		//1ariable Custmer Units.	
+          BAC_SCHEDULE_FLAG_GROUP;		//这个1是Variable Custmer Units.	
 
 
 	  int read_all_step = 1000 / read_total_count;
@@ -4915,7 +4915,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
 	 }
 
 
-	 //Setting ;
+	 //下面是读Setting 结构的部分;
 	 if(GetPrivateData_Blocking(g_bac_instance,READ_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info)) > 0)
 	 {
 		 Mession_ret.Format(_T("Read device information success."));
@@ -4934,7 +4934,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
       for (int z = 0;z<BAC_PROGRAM_ITEM_COUNT;z++)
       {
 
-          memset(program_code[z], 0, 2000);		 //;
+          memset(program_code[z], 0, 2000);		 //清零;
 
           for (int i = 0;i < 5;i++)
           {
@@ -4949,7 +4949,7 @@ DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
               ret_variable = GetProgramData_Blocking(g_bac_instance, z, z, i);
               if (ret_variable < 0)
               {
-                  Mession_ret.Format(_T("Read program code %d part %d timeout."), z, i); //3 ;
+                  Mession_ret.Format(_T("Read program code %d part %d timeout."), z, i); //如果重试3次都失败就跳转至 失败;
                   SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
                   goto read_end_thread;
               }
@@ -5116,7 +5116,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 			BAC_CUSTOMER_UNIT_GROUP +
 			BAC_USER_LOGIN_GROUP +
 			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT ;//+
-			//BAC_PROGRAM_ITEM_COUNT*5;//5 rogram52000;
+			//BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
 	}
 	else if((temp_prg_version >= 4) && (temp_prg_version <= 5))
 	{
@@ -5135,7 +5135,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 			BAC_GRPHIC_LABEL_GROUP + 
 			BAC_CUSTOMER_UNIT_GROUP +
 			BAC_USER_LOGIN_GROUP +
-			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//5 rogram52000;
+			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
 			+ 1 ;   //Setting
 	}
 	else if(temp_prg_version == 6)
@@ -5155,7 +5155,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 			BAC_GRPHIC_LABEL_GROUP + 
 			BAC_CUSTOMER_UNIT_GROUP +
 			BAC_USER_LOGIN_GROUP +
-			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//5 rogram52000;
+			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
 			+ 1		//Setting
 			+ 1;    //Variable_Cus_Units
 	}
@@ -5177,7 +5177,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             BAC_CUSTOMER_UNIT_GROUP +
             BAC_USER_LOGIN_GROUP +
             BAC_MSV_GROUP +
-            BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//5 rogram52000;
+            BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
             + 1		//Setting
             + 1;    //Variable_Cus_Units
     }
@@ -5199,10 +5199,10 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
             BAC_CUSTOMER_UNIT_GROUP +
             BAC_USER_LOGIN_GROUP +
             BAC_MSV_GROUP +
-            BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//5 rogram52000;
+            BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT //BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
             + 1		//Setting
             + 1     //Variable_Cus_Units
-            + BAC_SCHEDULE_FLAG_GROUP;    // Schedule time flag ;
+            + BAC_SCHEDULE_FLAG_GROUP;    // Schedule time flag 需要两包能读取完成;
     }
 	else
 	{
@@ -5219,7 +5219,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
     int write_all_step = 1000 / write_total_count;
     int write_success_count = 0;
     int write_pos = 0;
-	if(temp_prg_version >= 6)	 // version 6 ;
+	if(temp_prg_version >= 6)	 // version 6 中才加的这玩意;
 	{
 
 			if(Write_Private_Data_Blocking(WRITEVARUNIT_T3000,0,4) > 0)
@@ -5240,7 +5240,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 
 	}
 
-    if (temp_prg_version >= 7)	 // version 7  MSV ;
+    if (temp_prg_version >= 7)	 // version 7  MSV 中才加的这玩意;
     {
         for (int i = 0; i<BAC_MSV_COUNT; i++)
         {
@@ -5640,7 +5640,7 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 
 
 
-    if (temp_prg_version >= 8)	 // version 8  schedule flag time ;
+    if (temp_prg_version >= 8)	 // version 8  schedule flag time 中才加的这玩意;
     {
         for (int i = 0; i < BAC_SCHEDULE_FLAG_GROUP; i++)
         {
@@ -5757,7 +5757,7 @@ LRESULT CMainFrame::Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam)
     int ret = (int)wParam;
     if(ret == 1)
     {
-        Set_Communication_Count(1,g_bac_instance);//+1
+        Set_Communication_Count(1,g_bac_instance);//成功，计数+1
 
         //m_pTreeViewCrl->turn_item_image(selected_tree_item ,true); //2016 02 24 MARK Fance
         //SetPaneConnectionPrompt(_T("Online"));
@@ -6106,7 +6106,7 @@ LRESULT CMainFrame::OnFreshStatusBar(WPARAM wParam, LPARAM lParam)
 void CMainFrame::OnDestroy()
 {
     shutdown_server();
-    mul_ping_flag = false; // ping ;
+    mul_ping_flag = false; //关闭 ping 的命令;
     g_mstp_flag = false;
     b_statusbarthreadflag = FALSE; //close the status bar thread;
     OnDisconnect();
@@ -6117,7 +6117,7 @@ void CMainFrame::OnDestroy()
 	SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
 
-    for(int i=0; i<m_product.size(); i++) // ;
+    for(int i=0; i<m_product.size(); i++) //用于更新 产品的状态，以便下次打开的时候直接显示上次关闭的时候的状态;
     {
         CString serial_number_temp;
         serial_number_temp.Format(_T("%u"),m_product.at(i).serial_number);
@@ -6160,7 +6160,7 @@ void CMainFrame::OnDestroy()
     {
         int temp =1;
 
-       // UpdataSlider(temp); // ; 2016 - 03 - 17  ;
+       // UpdataSlider(temp); //每次结束都会溢出 报错; 2016 - 03 - 17 杜帆 屏蔽;
         
         g_bEnableRefreshTreeView = FALSE;
         for(int i=0; i<WINDOW_TAB_COUNT ; i++)
@@ -6254,7 +6254,7 @@ void CMainFrame::OnDestroy()
             TerminateThread(hThread,0);
         if(m_pFreshTree!=NULL)
             TerminateThread(m_pFreshTree,0);
-        // 
+        // 结束线程
         if(h_create_webview_server_thread != NULL)
             TerminateThread(h_create_webview_server_thread, 0);
         if (m_pRefreshThread)
@@ -6302,7 +6302,7 @@ void CMainFrame::OnDestroy()
         
 
     }
-    catch (...)//pDialogInfo->Create(IDC_STATIC_INFO,this);IDthrow
+    catch (...)//这个无效，当pDialogInfo->Create(IDC_STATIC_INFO,this);中的ID写错时，这个函数没有throw抛出错误，所以捕获不到
     {
         Sleep(1);
     }
@@ -6317,28 +6317,28 @@ void CMainFrame::OnDestroy()
 
 void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 {
-    TRACE("OnSysCommand: nID = 0x%04X\n", nID);  // 
+    TRACE("OnSysCommand: nID = 0x%04X\n", nID);  // 注意用十六进制打印
     if ((nID & 0xFFF0) == SC_MINIMIZE)
     {
-        // 
+        // 处理最小化
         ShowWindow(SW_MINIMIZE);
         //SetFocus();
     }
     else if (((nID & 0xFFF0) == SC_RESTORE) || (nID == SC_DEFAULT && IsIconic()))
     {
         //PostMessage(WM_KEYDOWN, VK_ESCAPE, 0);
-        //  ESC 
+        // 模拟 ESC 键释放
         //PostMessage(WM_KEYUP, VK_ESCAPE, 0);
-        // 
+        // 处理恢复
         //TRACE("Restoring window...\n");
         ShowWindow(SW_RESTORE);
-        //SetForegroundWindow();   // 
-        //SetActiveWindow();        // 
+        //SetForegroundWindow();   // 将窗口置于前台
+        //SetActiveWindow();        // 激活窗口
         //SetFocus();
     }
     else
     {
-        DefWindowProc(WM_SYSCOMMAND, nID, lParam);  // 
+        DefWindowProc(WM_SYSCOMMAND, nID, lParam);  // 调用默认窗口过程处理其他系统命令
         //CFrameWnd::OnSysCommand(nID, lParam);
     }
 }
@@ -6347,7 +6347,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(message==WM_MYMSG_REFRESHBUILDING)
     {
-        if (b_building_management_flag != SYS_NORMAL_MODE) //Building  Tree
+        if (b_building_management_flag != SYS_NORMAL_MODE) //处于Building 管理模式 不要刷新Tree
             return 0;
         //Sleep(1000);
         //AfxMessageBox(_T("There is no default building,please select a building First."));
@@ -6358,7 +6358,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         ScanTstatInDB();
 
         int temp_select_serial = m_pTreeViewCrl->GetSelectSerialNumber();
-        bool find_serial_number_device = false;	// ; ;
+        bool find_serial_number_device = false;	//如果重新加载数据库，没有发现选中的那个设备 序列号，就说明可能被删掉了;需要退出当前界面 切换至初始界面;
         HTREEITEM temp_htree;
         for (int i=0; i<m_product.size(); i++)
         {
@@ -6367,7 +6367,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
                 temp_htree = m_product.at(i).product_item;
                 m_pTreeViewCrl->SetSelectItem(temp_htree);
                 find_serial_number_device = true;
-                selected_product_index = i;//  ;
+                selected_product_index = i;//重新加载 产品列表的时候 选中上次选中的设备;
                 break;
             }
         }
@@ -6825,15 +6825,15 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 	UINT nSerialNumber = 0;
 	int Device_Type = 0;
 	MODE_SUPPORT_PTRANSFER = 0;
-	check_revert_daxiaoduan = 0; //
-	g_protocol_support_ptp = PROTOCOL_UNKNOW; //    ;
+	check_revert_daxiaoduan = 0; //换设备情况大小端反转为默认不反转
+	g_protocol_support_ptp = PROTOCOL_UNKNOW; //默认点击任何设备  ，初始化  为不知道是否支持;
 	g_output_support_relinquish = 0;
 	int Scan_Product_ID;
 	unsigned short read_data[10];
 	CString strTemp;
 	CString subnote;
 	CString subID;
-	unsigned char n_show_register_list = 0; //;
+	unsigned char n_show_register_list = 0; //对于没有界面的设备，直接显示寄存器列表;
 	m_cfgFileHandler.ReadFromCfgFileForAll(
 		filename,
 		flashmethod,
@@ -6846,14 +6846,14 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 		subID
 	);
 
-	KillTimer(FOR_LAST_VIEW_TIMER); //;
+	KillTimer(FOR_LAST_VIEW_TIMER); //如果已经点击了设备，就尊重客户的新操作，不用在去连接上次的连接;
 
 	CString g_strT3000LogString;
 	no_mouse_keyboard_event_enable_refresh = false;
 
 	if (User_Login_Window != NULL)
 	{
-		if (User_Login_Window->IsWindowVisible())	//  ;
+		if (User_Login_Window->IsWindowVisible())	//如果客户点击其他的 设备，之前还停留在 登入界面就先关掉登入界面，后面再判断要不要登入;
 			User_Login_Window->ShowWindow(SW_HIDE);
 	}
 	if (ScreenEdit_Window != NULL)
@@ -6875,7 +6875,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 	MainFram_hwd = this->m_hWnd;
 	//20120420
 	CDialog_Progess* pDlg = new CDialog_Progess(this, 1, 100);
-	//
+	//创建对话框窗口
 	pDlg->Create(IDD_DIALOG10_Progress, this);
 
 	pDlg->ShowProgress(0, 0);
@@ -6928,7 +6928,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 			//g_tstat_id=m_product.at(i).product_id;
 			selected_product_Node = m_product.at(i);
 
-			m_pTreeViewCrl->SetSelectItem(hTreeItem);//;
+			m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
 			m_pTreeViewCrl->SetSelectSerialNumber(selected_product_Node.serial_number);
 			g_selected_serialnumber = selected_product_Node.serial_number;
 			g_bac_instance = NULL;
@@ -6942,15 +6942,15 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 			temp_csa = temp_csa.Right(temp_csa.GetLength() - 3);
 			g_bac_instance = m_product.at(i).object_instance;
 			g_selected_serialnumber = m_product.at(i).serial_number;
-			refresh_input = 3; refresh_output = 3;  //input utput
+			refresh_input = 3; refresh_output = 3;  //要求刷新input 和output
 
 			g_mac = m_product.at(i).panel_number;
 			bac_gloab_panel = g_mac;
 			g_gloab_bac_comport = m_product.at(i).ncomport;
 			g_gloab_bac_baudrate = m_product.at(i).baudrate;
-			//if ((selected_product_Node.nhardware_info & 0x02) == 2) //ifi  ;
+			//if ((selected_product_Node.nhardware_info & 0x02) == 2) //说明是wifi 连接 ，延时要加长，并关闭后台刷新;
 			//{
-			//    n_wifi_connection = true; //;
+			//    n_wifi_connection = true; //关闭后台刷新;
 			//    SEND_COMMAND_DELAY_TIME = 300;
 			//    SetCommunicationType(1);
 			//    SetResponseTime(SEND_COMMAND_DELAY_TIME);
@@ -6960,7 +6960,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 			//    SEND_COMMAND_DELAY_TIME = 100;
 			//    n_wifi_connection = false;
 			//}
-			selected_product_index = i;// ;firmware;
+			selected_product_index = i;//记录目前选中的是哪一个 产品;用于后面自动更新firmware;
 			selected_tree_item = hTreeItem;
 			Statuspanel.Empty();
 			if (selected_product_Node.note_parent_serial_number == 0)
@@ -7006,7 +7006,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 				offline_mode = false;
 				set_offline_mode(offline_mode);
 			}
-			//if(1)//GSM  
+			//if(1)//GSM  模块
 
 #ifdef USE_THIRD_PARTY_FUNC
 			if (m_product.at(i).protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
@@ -7050,7 +7050,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 						CScanDlg scandlg;
 						if (!offline_mode && (!scandlg.TestPing(m_product.at(i).BuildingInfo.strIp)))
 						{
-							//PingP      
+							//尝试Ping数据库中保存的IP地址失败 做如下动作     去掉进度条
 							pDlg->ShowWindow(SW_HIDE);
 							if (pDlg)
 								delete pDlg;//20120220
@@ -7066,7 +7066,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 									if (dlg.DoModal() == IDOK)
 									{
 										is_OK = dlg.b_changeip_ok;
-										refresh_tree_status_immediately = true;//P;
+										refresh_tree_status_immediately = true;//在改完IP后立刻在去扫描，更新数据库;
 									}
 									return;
 								}
@@ -7083,12 +7083,12 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 									m_product.at(i).status_last_time[4] = false;
 									m_product.at(i).status = false;
 
-									//MessageBox(_T("Device is offline!"));	//Ping     ; ;
+									//MessageBox(_T("Device is offline!"));	//Ping 不通 ， 还在一个网段 ， 还显示在线; 其实不在线;
 
-									//ing.
+									//连不上时，发送ping命令，显示出来.
 									::PostMessage(MainFram_hwd, WM_PING_MESSAGE, (WPARAM)hTreeItem, NULL);
 
-#if 0      //T3   
+#if 0      //T3 无法连接  需要额外处理函数诊断问题
 									PostMessage(WM_TROUBLESHOOT_MSG, 0, 0);
 									if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
 									{
@@ -7121,7 +7121,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 								m_product.at(i).status = false;
 
 								::PostMessage(MainFram_hwd, WM_PING_MESSAGE, (WPARAM)hTreeItem, NULL);
-#if 0      //T3  
+#if 0      //T3 无法连接 需要额外处理函数诊断问题
 								//MessageBox(_T("Device is offline!"));
 								if (m_pDialogInfo != NULL && !m_pDialogInfo->IsWindowVisible())
 								{
@@ -7188,7 +7188,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 							CString IP = m_product.at(i).BuildingInfo.strIp;
 							int Port = m_product.at(i).ncomport;
 							SetCommunicationType(1);
-							if ((selected_product_Node.nhardware_info & 0x02) == 2) //ifi  ;
+							if ((selected_product_Node.nhardware_info & 0x02) == 2) //说明是wifi 连接 ，延时要加长，并关闭后台刷新;
 							{
 								if (((selected_product_Node.product_class_id == PM_TSTAT10) && (selected_product_Node.software_version >= 52.3)) ||
 									((selected_product_Node.product_class_id == PM_MINIPANEL_ARM) && (selected_product_Node.software_version >= 52.3)) ||
@@ -7197,21 +7197,21 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 									((selected_product_Node.product_class_id == PM_TSTAT9) && (selected_product_Node.software_version >= 10.0))
 									)
 								{
-									n_wifi_connection = false; // 
-									MODE_SUPPORT_PTRANSFER = 1;//bip ptransfer
+									n_wifi_connection = false; //新改的 
+									MODE_SUPPORT_PTRANSFER = 1;//支持bip ptransfer
 									SEND_COMMAND_DELAY_TIME = 100;
 									SetResponseTime(SEND_COMMAND_DELAY_TIME);
 								}
 								//else if (
 								//    )
 								//{
-								//    n_wifi_connection = true; // 
+								//    n_wifi_connection = true; //新改的 
 								//    SEND_COMMAND_DELAY_TIME = 350;
 								//    SetResponseTime(SEND_COMMAND_DELAY_TIME);
 								//}
 								else
 								{
-									n_wifi_connection = true; //;
+									n_wifi_connection = true; //关闭后台刷新;
 									SEND_COMMAND_DELAY_TIME = 350;// DEBUG_DELAY_TIME;
 									SetResponseTime(SEND_COMMAND_DELAY_TIME);
 								}
@@ -7268,7 +7268,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 				(selected_product_Node.product_class_id == PM_TSTAT10) ||
 				(selected_product_Node.product_class_id == PM_MINIPANEL_ARM) ||
 				(selected_product_Node.product_class_id == PM_ESP32_T3_SERIES)
-				)	//M5INIPANEL  bacnet;
+				)	//如果是CM5或者MINIPANEL 才有 bacnet协议;
 			{
 
 				product_type = selected_product_Node.product_class_id;
@@ -7357,7 +7357,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 									break;
 								}
 							}
-							if (found_device >= 0)	// ;
+							if (found_device >= 0)	//发现 已经连接的设备;
 							{
 								bip_set_socket(m_tcp_connect_info.at(found_device).client_socket);
 								SEND_COMMAND_DELAY_TIME = 1000;
@@ -7387,17 +7387,17 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 					if (pDlg)
 						delete pDlg;//20120220
 					pDlg = NULL;
-					m_pTreeViewCrl->SetSelectItem(hTreeItem);//;
+					m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
 					m_pTreeViewCrl->SetSelectSerialNumber(selected_product_Node.serial_number);
 					g_selected_serialnumber = m_product.at(i).serial_number;
 					goto do_connect_success;
 					return;
 
 				}
-				else if (m_product.at(i).protocol == MODBUS_RS485) //Minipanel C;
+				else if (m_product.at(i).protocol == MODBUS_RS485) //如果客户是将Minipanel的 串口连接至PC;
 				{
 					g_protocol = MODBUS_RS485;
-					close_bac_com(); // bacnet mstp
+					close_bac_com(); //关闭 bacnet mstp
 					SetCommunicationType(0);
 					g_tstat_id = selected_product_Node.product_id;
 					SEND_COMMAND_DELAY_TIME = 200;
@@ -7407,7 +7407,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 					if (pDlg)
 						delete pDlg;//20120220
 					pDlg = NULL;
-					m_pTreeViewCrl->SetSelectItem(hTreeItem);//;
+					m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
 					m_pTreeViewCrl->SetSelectSerialNumber(selected_product_Node.serial_number);
 					g_selected_serialnumber = m_product.at(i).serial_number;
 					goto do_connect_success;
@@ -7419,7 +7419,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 					if (selected_product_Node.protocol == PROTOCOL_REMOTE_IP)
 						is_local = false;
 					//BOOL is_local = IP_is_Local(product_Node.BuildingInfo.strIp);
-					if (is_local == false)	//P Who  is  ;
+					if (is_local == false)	//判断是否是本地IP，不是本地的就要连接到远端的，远端的 Who  is  广播发布过去的;
 					{
 						m_is_remote_device = true;
 						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Set_remote_device_IP(selected_product_Node.BuildingInfo.strIp);
@@ -7447,7 +7447,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 				HANDLE hFind;//
 				WIN32_FIND_DATA wfd;//
 				hFind = FindFirstFile(StrBinHexPath, &wfd);//
-				if ((hFind != INVALID_HANDLE_VALUE) && (!StrULRPath.IsEmpty()))//t3000.mdb
+				if ((hFind != INVALID_HANDLE_VALUE) && (!StrULRPath.IsEmpty()))//说明当前目录下无t3000.mdb
 				{
 					filename = StrBinHexPath;
 				}
@@ -7468,7 +7468,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 				if (selected_product_Node.protocol == PROTOCOL_BIP_TO_MSTP)
 					g_protocol = PROTOCOL_BIP_TO_MSTP;
 				else if ((selected_product_Node.protocol == MODBUS_TCPIP) &&
-					(selected_product_Node.note_parent_serial_number != 0) &&   // TSTAT10 485T3BB
+					(selected_product_Node.note_parent_serial_number != 0) &&   //如 TSTAT10 用485协议挂在T3BB下
 					((selected_product_Node.product_class_id == PM_TSTAT10) ||
 						(selected_product_Node.product_class_id == PM_MINIPANEL) ||
 						(selected_product_Node.product_class_id == PM_ESP32_T3_SERIES) ||
@@ -7499,7 +7499,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 				if (pDlg)
 					delete pDlg;//20120220
 				pDlg = NULL;
-				m_pTreeViewCrl->SetSelectItem(hTreeItem);//;
+				m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
 				m_pTreeViewCrl->SetSelectSerialNumber(selected_product_Node.serial_number);
 				g_selected_serialnumber = m_product.at(i).serial_number;
 				g_bPauseMultiRead = true;
@@ -7569,7 +7569,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 					//    ConnectDevice(selected_product_Node);
 					//else
 					//    g_CommunicationType = 0;
-					// SetLastCommunicationType(1); // by  06 03 31;
+					// SetLastCommunicationType(1); //不可理解为什么要这么做，屏蔽 by 杜帆 06 03 31;
 					ip = selected_product_Node.BuildingInfo.strIp;
 					ipport.Format(_T("%d"), selected_product_Node.ncomport);
 
@@ -7591,13 +7591,13 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 #endif
 				}
 			}
-			//
+			//串口设置
 			else
 			{
 				g_protocol = MODBUS_RS485;
 
 				{
-					//close_com();//
+					//close_com();//关闭所有端口
 					//int nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
 
 					int nComPort = selected_product_Node.ncomport;
@@ -7835,7 +7835,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 					SetLastSuccessBaudrate(m_nbaudrat);
 					bac_select_device_online = true;
 					m_product.at(i).status = true;
-					m_pTreeViewCrl->SetSelectItem(hTreeItem);//;
+					m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
 					m_pTreeViewCrl->SetSelectSerialNumber(selected_product_Node.serial_number);
 					g_selected_serialnumber = m_product.at(i).serial_number;
 
@@ -7978,7 +7978,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 			{
 				//SetPaneConnectionPrompt(_T("Online!"));
 				pDlg->ShowWindow(SW_HIDE);
-				m_pTreeViewCrl->SetSelectItem(hTreeItem);//;
+				m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
 				m_pTreeViewCrl->SetSelectSerialNumber(selected_product_Node.serial_number);
 				g_selected_serialnumber = m_product.at(i).serial_number;
 				m_pTreeViewCrl->turn_item_image(hSelItem, true);
@@ -8059,7 +8059,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 						if (itemp < 0)
 						{
 							//continue;
-							break; // NCT3000  ;
+							break; //读不到就退出，很多时候 NC在读的过程中断开连接T3000 还一直去读剩余的 就会引起无响应;
 						}
 						else
 						{
@@ -8161,7 +8161,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 						float progress;
 						SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Reading data!"));
 
-						for (i = 0; i < (length); i++)	//0 STAT6 600
+						for (i = 0; i < (length); i++)	//暂定为0 ，因为TSTAT6 目前为600多
 						{
 							int itemp = 0;
 							itemp = Read_Multi(g_tstat_id, &multi_register_value[i * 100], i * 100, 100, 5);
@@ -8198,7 +8198,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 						int i;
 						it = 0;
 						float progress;
-						for (i = 0; i < length; i++)	//0 STAT6 600
+						for (i = 0; i < length; i++)	//暂定为0 ，因为TSTAT6 目前为600多
 						{
 							int itemp = 0;
 							itemp = Read_Multi(g_tstat_id, &multi_register_value[i * 100], i * 100, 100, 5);
@@ -8284,7 +8284,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 								}
 							}
 							it++;
-							if ((i == 0) || (i == 1) || (i == 6) || (i == 7) || (i == 9) || (i == 10)) //Airlab
+							if ((i == 0) || (i == 1) || (i == 6) || (i == 7) || (i == 9) || (i == 10)) //Airlab不需要读这些寄存器
 								Sleep(SEND_COMMAND_DELAY_TIME);
 						}
 						g_tstat_id_changed = FALSE;
@@ -8340,7 +8340,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 						CString strSerial;
 						strSerial.Format(_T("%d"), get_serialnumber());
 
-#if 1 // Tstat6stat6
+#if 1 // 点击的时候把新的Tstat6的名字写到Tstat6的寄存器中
 
 						CString newname;
 						CString strSql;
@@ -8353,7 +8353,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 						if (temp_write_flag == 1)
 						{
 							GetPrivateProfileStringW(temp_serial_number, _T("NewName"), _T(""), newname.GetBuffer(MAX_PATH), MAX_PATH, g_achive_device_name_path);
-							if (newname.GetLength() > 16)	//;
+							if (newname.GetLength() > 16)	//长度不能大于结构体定义的长度;
 							{
 								newname.Delete(16, newname.GetLength() - 16);
 							}
@@ -8529,7 +8529,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 
 							if (!q.eof())
 							{
-								//
+								//获取权限：
 								g_AllscreensetLevel = q.getIntField("allscreen_level");
 								if (g_AllscreensetLevel != 1)
 								{
@@ -8564,7 +8564,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 							q = SqliteDBT3000.execQuery((UTF8MBSTR)strsql);
 							if (!q.eof())
 							{
-								//
+								//获取权限：
 								g_NetWorkLevel = q.getIntField("networkcontroller");//
 								g_BuildingsetLevel = q.getIntField("database_limition");
 							}
@@ -8730,7 +8730,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 			}
 			else if (nFlag == PM_T322AI || nFlag == PM_T332AI_ARM || nFlag == CS3000 || nFlag == PWM_TRANSDUCER || nFlag == PM_T38AI8AO6DO || nFlag == PM_T3PT12 || nFlag == PM_T36CTA || nFlag == PM_T3_LC)
 			{
-				//minipanel 10000; ;
+				//就说明是加了minipanel 10000以后寄存器的; 否则的话就跳转至以前的界面;
 				new_device_support_mini_ui = true;
 
 				bacnet_view_number = TYPE_TSTAT;
@@ -8766,13 +8766,13 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 				//SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
 
 				//n_show_register_list = 1;
-				break; //;
+				break; //直接显示寄存器列表;
 			}
 			else if (nFlag == STM32_PM25)
 			{
 				SwitchToPruductType(DLG_DIALOG_TSTAT_AQ);
 				//n_show_register_list = 1;
-				break; //;
+				break; //直接显示寄存器列表;
 			}
 			else if (nFlag < PM_NC)
 			{
@@ -8839,7 +8839,7 @@ do_connect_success:
 	//hTreeItem_retry = NULL;
 	g_llRxCount = g_llRxCount + 4;
 
-	if (n_show_register_list)  //;
+	if (n_show_register_list)  //对于没有界面的设备，直接显示寄存器列表;
 	{
 		OnToolRegisterviewer();
 	}
@@ -8847,7 +8847,7 @@ do_connect_success:
 	return;
 do_conncet_failed:
 
-	//Fandu 2017/12/13     .
+	//Fandu 2017/12/13 设备离线时 更新 数据库设备状态字段。因为有太多地方调用  重新加载数据库的函数，导致如果不更新状态显示不正常.
 	CString strUpdateSql;
 	strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID = %u"), g_selected_serialnumber);
 	SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
@@ -8889,7 +8889,7 @@ void CMainFrame::GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItem
 void CMainFrame::CheckIPDuplicate()
 {
     bool find_ip_conflict = false;
-    //IP;  m_refresh_net_device_data
+    //探索重复IP;  m_refresh_net_device_data
     for (int i = 0; i < m_refresh_net_device_data.size(); i++)
     {
         if (m_refresh_net_device_data.size() <= 1)
@@ -8917,7 +8917,7 @@ void CMainFrame::CheckIPDuplicate()
 void CMainFrame::CheckDeviceParameter()
 {
     bool find_ip_conflict = false;
-    //IP;  m_refresh_net_device_data
+    //探索重复IP;  m_refresh_net_device_data
     for (int i = 0; i < m_refresh_net_device_data.size(); i++)
     {
         if (m_refresh_net_device_data.size() <= 0)
@@ -9026,7 +9026,7 @@ void CMainFrame::CheckDuplicate()
 
 	}
 }
-// refresh_com 0, ;;
+// refresh_com 只有当这个值为0的时候才刷新串口那部分的状态,因为网络广播的 很快;可以频繁扫描，串口太慢了;
 BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 {
     bool find_new_device = false;
@@ -9048,10 +9048,10 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
             nSerialNumber=tp.serial_number;
 
             //int newnID=read_one(nID,6,2);
-            /*;
+            /*需要先保存之前的通信协议;
             Get the protocol ,if it is bacnet ip,we compare the device id.
             */
-            //stripNCCODBUS  RS485
+            //如果strip不是空的就说明这个设备室挂在NC或LC等等下面的MODBUS  RS485设备
             //if((m_product.at(i).protocol == MODBUS_RS485) && (m_product.at(i).BuildingInfo.strIp.IsEmpty()))
 
             int temp_port = 0;
@@ -9116,7 +9116,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
             }
             else if (tp.protocol == 254 || tp.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
             {
-                temp_online = true; //;
+                temp_online = true; //虚拟设备显示在线;
                 m_product.at(i).status = true;
             }
             else
@@ -9195,9 +9195,9 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
         str_object_instance.Format(_T("%u"),m_refresh_net_device_data.at(y).object_instance);
         str_panel_number.Format(_T("%u"),m_refresh_net_device_data.at(y).panal_number);
         str_hardware_info.Format(_T("%u"), m_refresh_net_device_data.at(y).hardware_info);
-        if(db_exsit)	//;
+        if(db_exsit)	//数据库存在，就查看是否要更新;
         {
-            //IP STP  ;  //   
+            //如果是BIP 转MSTP 对已经存在的 不作刷新动作;  //需解决的问题是 已经存在的 子设备 如何刷新？
             //if (m_refresh_net_device_data.at(y).nprotocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
             //{
             //    continue;
@@ -9370,7 +9370,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
             }
 
         }
-        else			// ;
+        else			//不存在 就插入;
         {
             CString strSql;
             CString str_ip_address;
@@ -9393,7 +9393,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 
 			CppSQLite3Query query_serial;
 
-            // 
+            //删掉 存在的序列号
             try
             {
 
@@ -9415,7 +9415,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 
 			if (!query_serial.eof())
 			{
-				continue; //
+				continue; //如果查询到有重复的就不插入
 			}
 
 
@@ -9486,7 +9486,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                 //    if (nret_read_bac == 100)
                 //    {
                 //        product_class_id.Format(_T("%d"), mstp_array[7]);
-                        // instance ;
+                        //序列号这里肯定还有问题 ，因为客户的instance 可能会认为更改;
                         //str_serialid.Format(_T("%u"), mstp_array[0] + mstp_array[1] * 256 + mstp_array[2] * 256 * 256 + mstp_array[3] * 256 * 256 * 256);
                         CString temp_pro4;
                         temp_pro4.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
@@ -9523,7 +9523,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                 AfxMessageBox(e->ErrorMessage());
             }
 
-            //;
+            //子设备才存储这些额外的信息;
             if (m_refresh_net_device_data.at(y).parent_serial_number != 0)
             {
                 CString nsubnet_port;
@@ -9538,7 +9538,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 
     }
 
-	//Fandu 2017/12/13 .
+	//Fandu 2017/12/13 新增批量处理在线状态，修改数据库状态字段.
 	CString strUpdateSql;
 	if (m_refresh_net_device_data.size() == 0)
 	{
@@ -9556,7 +9556,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 			temp1.Format(_T("%u"), m_refresh_net_device_data.at(i).nSerial);
             online_composite_serial = online_composite_serial + temp1;
 
-            if (m_refresh_net_device_data.at(i).parent_serial_number != 0) // ;;
+            if (m_refresh_net_device_data.at(i).parent_serial_number != 0) //确保 所有的父节点都在线;即使没有回复;
             {
                 temp1.Format(_T(",%u"), m_refresh_net_device_data.at(i).parent_serial_number);
                 online_composite_serial = online_composite_serial + temp1;
@@ -9576,7 +9576,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
                 offline_count++;
             }
         }
-        // 1     offline. 
+        //将回复 协议不是1 的 网络设备  状态设置为 offline. 
 		strUpdateSql.Format(_T("update ALL_NODE set Online_Status = 0 where Serial_ID in (%s) and (protocol = 1  or protocol = %d )"), offline_composite_serial, PROTOCOL_BIP_T0_MSTP_TO_MODBUS);
 		SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
 
@@ -9584,11 +9584,11 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
         SqliteDBBuilding.execDML((UTF8MBSTR)strUpdateSql);
 
         CString subnet_composite_serial;
-        // 0x2f 
+        //特殊回复处理 0x2f 回复子网设备的命令
         for (int z = 0; z < m_refresh_subnet_status.size(); z++)
         {
             subnet_composite_serial.Empty();
-            int n_item_count = 0; // ;
+            int n_item_count = 0; // 在线子设备计数;
             for (int y = 0; y < m_refresh_subnet_status.at(z).device_count; y++)
             {
                 if (m_refresh_subnet_status.at(z).device_status[y].nstatus == 1)
@@ -9681,7 +9681,7 @@ LRESULT  CMainFrame::HandleIspModedivice(WPARAM wParam, LPARAM lParam)
 			goto finished_detect;
 		}
         run_isp = 1;
-	SetCommunicationType(0);//ISP ;
+	SetCommunicationType(0);//关闭串口，供ISP 使用;
 	close_com();
 
 	Dlg.DoModal();
@@ -9704,7 +9704,7 @@ finished_detect:
     }
 
 
-	//Fance Add. SP 1234 4321 T3000 istview ;
+	//Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
 	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	BOOL bBroadcast=TRUE;
 	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -9761,15 +9761,15 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 {
     for (UINT i = 0; i < m_product.size(); i++)
     {
-        if (b_building_management_flag != SYS_NORMAL_MODE) //Building 
+        if (b_building_management_flag != SYS_NORMAL_MODE) //处于Building编辑模式 ，就退出
             return 0;
 
         tree_product tp = m_product.at(i);
 
-        //    0X27;
+        //先找父节点在不在 如果有父节点 就多加一条判断 ，判断父节点 有没有回复0X27命令，刷新界面;
         if (m_product.at(i).note_parent_serial_number != 0)
         {
-            //ubnet
+            //找到对应的是哪一个subnet
             for (int z = 0; z < m_refresh_subnet_status.size(); z++)
             {
                 int find_subnet = 0;
@@ -9819,7 +9819,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
                 CString temp_last_ip;
                 temp_last_ip = temp_array.GetAt(3);
                 unsigned char nlastip = (unsigned char)(_wtoi(temp_last_ip));
-                if (tp.note_parent_serial_number == 0) // 0;
+                if (tp.note_parent_serial_number == 0) //处理 父节点为0的情况;
                 {
                     if (tp.status == 0)
                     {
@@ -9836,13 +9836,13 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 #pragma endregion
 
 
-        if (tp.status > 0)    // online
+        if (tp.status > 0)    // 如果online，更新显示图片
         {
             m_pTreeViewCrl->turn_item_image(tp.product_item, true);
         }
-        else  // offline
+        else  // 替换offline的图片
         {
-            //Ping;
+            //如果设备不在线了，毛总的意思是Ping一次，确认是否在线;再次确认
             m_pTreeViewCrl->turn_item_image(tp.product_item, false);
         }
         if (g_selected_serialnumber == m_product.at(i).serial_number)
@@ -9852,7 +9852,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
             else
             {
                 //if(tp.product_class_id	!= PM_MINIPANEL)
-                bac_select_device_online = false; //inipanel,  64 ;
+                bac_select_device_online = false; //对minipanel特殊处理, 被选中的设备不回 64 ，而其他通信又正常，头疼;
             }
         }
     }
@@ -9934,7 +9934,7 @@ UINT _FreshTreeView(LPVOID pParam )
         {
 			for (int x=0;x<60;x++)
 			{
-				if(refresh_tree_status_immediately)  //IP  flagrue ;
+				if(refresh_tree_status_immediately)  //在设备的IP 或端口改变后 ，其他文件会将此flag设置为true 要求重新刷新;
 				{
 					refresh_tree_status_immediately = false;
 					break;
@@ -9954,7 +9954,7 @@ UINT _FreshTreeView(LPVOID pParam )
             
         }
 		pMain->m_frist_start = false;
-		if(b_remote_connection)	//  ,  0x64 .  Fance;
+		if(b_remote_connection)	//如果是远程连接的设备 就不扫描 , 也无法通过 0x64 判断远程的设备是否在线.  Fance;
 		{
 			if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
 			{
@@ -10050,7 +10050,7 @@ LRESULT CMainFrame::OnAddTreeNode(WPARAM wParam, LPARAM lParam)
         KillTimer(SCAN_TIMER);
         m_wndWorkSpace.m_TreeCtrl.Invalidate();
 
-        //SelectTreeNodeFromRecord();//scan scanom
+        //SelectTreeNodeFromRecord();//scan 解决scan完后，点击所扫到的项，显示com不对问题。
 
         //////////////////////////////////////////////////////////////////////////
         delete m_pScanner;
@@ -10058,7 +10058,7 @@ LRESULT CMainFrame::OnAddTreeNode(WPARAM wParam, LPARAM lParam)
     }
     g_bEnableRefreshTreeView =TRUE;
     b_pause_refresh_tree = FALSE;
-    PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);//reeview;
+    PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);//扫描完了之后关闭扫描窗口，还要刷新Treeview;
     return 1;
 }
 
@@ -10088,11 +10088,11 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam,LPARAM lParam)
         AnnualRoutine_Window->Unreg_Hotkey();
         Monitor_Window->Unreg_Hotkey();
     }
-    //
+    //判断响应了什么热键
     if( MOD_ALT == fuModifiers && 'G' == uVirtKey )  //Screen
     {
         OnControlScreens();
-        //AfxMessageBox(_T(" alt + m"));
+        //AfxMessageBox(_T("你按下了组合键 alt + m"));
     }
     else if(MOD_ALT == fuModifiers && 'P' == uVirtKey)//Program
     {
@@ -10185,7 +10185,7 @@ HTREEITEM CMainFrame::GetLastSelNodeFromRecord(CRegKey& reg, HTREEITEM& htiRoot)
     ZeroMemory(szRet, 64);
 
     //////////////////////////////////////////////////////////////////////////
-    //   name
+    // 先获得所有的标志位 和 name
     // subnet
     if(reg.QueryDWORDValue(strSubnetRegEntryValid, nSubnet) == ERROR_SUCCESS)
     {
@@ -10261,7 +10261,7 @@ HTREEITEM CMainFrame::GetLastSelNodeFromRecord(CRegKey& reg, HTREEITEM& htiRoot)
     }
 
     /////////////////////////////////////////////////////////////////////////
-    // 
+    // 查找节点
     if(nSubnet == 1)
     {
         htiSel = SearchItemByName(htiRoot, strSubnetName);
@@ -10312,8 +10312,8 @@ HTREEITEM CMainFrame::GetLastSelNodeFromRecord(CRegKey& reg, HTREEITEM& htiRoot)
 
 
 //////////////////////////////////////////////////////////////////////////
-// name
-// 
+// 根据树节点的name搜索一个节点并返回
+// 如果有多个节点同名，那么返回第一个找到的
 //
 HTREEITEM CMainFrame::SearchItemByName(HTREEITEM& htiRoot, const CString& strItemName)
 {
@@ -10366,9 +10366,9 @@ HTREEITEM CMainFrame::SearchItemByName(HTREEITEM& htiRoot, const CString& strIte
 }
 
 
-// 
-// 
-// 
+// 为第一次运行导入数据库，如果不是第一次运行则不用提示
+// 判断当前版本与注册表中版本是否一致，如一致则不用提示
+// 如不一致，那么要提示，并把当前版本写入注册表
 BOOL CMainFrame::ImportDataBaseForFirstRun()
 {
     CString strFileVer = GetCurrentFileVersion();
@@ -10392,7 +10392,7 @@ BOOL CMainFrame::ImportDataBaseForFirstRun()
 const CString c_strFileVersionPath = _T("Software\\Temco T3000 Application\\T3000\\FileVersion\\");
 
 
-// ileversion
+// 从注册表读fileversion
 CString CMainFrame::ReadFileVersionFromRegister(CRegKey& reg)
 {
     WCHAR szBuf[64] = {0};
@@ -10405,7 +10405,7 @@ CString CMainFrame::ReadFileVersionFromRegister(CRegKey& reg)
             m_strFileVersion = CString(szBuf);
         }
     }
-    else // 
+    else // 没有这个表项
     {
         ASSERT(0);
     }
@@ -10421,12 +10421,12 @@ CString CMainFrame::GetCurrentFileVersion()
     WCHAR cPath[200];
     DWORD dwHandle,InfoSize;
     CString strVersion;
-    ::GetModuleFileName(NULL,cPath,sizeof(cPath)); //+
+    ::GetModuleFileName(NULL,cPath,sizeof(cPath)); //首先获得版本信息资源的长度+
 
-    InfoSize = GetFileVersionInfoSize(cPath,&dwHandle); //
+    InfoSize = GetFileVersionInfoSize(cPath,&dwHandle); //将版本信息资源读入缓冲区
     if(InfoSize==0) return _T("None Version Supprot");
     char *InfoBuf = new char[InfoSize];
-    GetFileVersionInfo(cPath,0,InfoSize,InfoBuf); //
+    GetFileVersionInfo(cPath,0,InfoSize,InfoBuf); //获得生成文件使用的代码页及文件版本
     unsigned int  cbTranslate = 0;
     struct LANGANDCODEPAGE
     {
@@ -10498,7 +10498,7 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
                 MyCriticalSection.Unlock();
 
                 My_Write_Struct= (_MessageWriteOneInfo *)msg.wParam;
-                product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;// 
+                product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;//先变过来，免得后台更新的时候 乱变。
                 break;
             case MY_WRITE_ONE_LIST:
                 MyCriticalSection.Lock();
@@ -10509,7 +10509,7 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
                 My_Receive_msg.push_back(msg);
                 MyCriticalSection.Unlock();
 // 				My_Write_Struct= (_MessageWriteOneInfo_List *)msg.wParam;
-// 				product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;// 
+// 				product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;//先变过来，免得后台更新的时候 乱变。
                 break;
             case  MY_READ_ONE:
                 MyCriticalSection.Lock();
@@ -10592,13 +10592,13 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                 MyCriticalSection.Unlock();
 
 
-                // 
+                //比对列表里面书否存在 
 
                 int n_index = -1;
                 int n_nouse_index = -1;
                 for (int j = 0; j < BAC_BACKGROUND_COUNT; j++)
                 {
-                    // vector;
+                    //通过第一次循环找到第一个没有被使用的 vector;
                     if ((m_backbround_data.at(j).flag == STATUS_NOUSE) && (n_nouse_index == -1))
                     {
                         n_nouse_index = j;
@@ -10616,12 +10616,12 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                 }
                 if (n_nouse_index == -1)
                 {
-                    n_nouse_index = 0; //;
+                    n_nouse_index = 0; //如果所有的都使用完毕了，就使用第一个;
                 }
                 int n_handle_index = -1;
                 if (n_index == -1)
                 {
-                    //vector
+                    //插入数据至最前面没有被使用的vector
                     memcpy(&m_backbround_data.at(n_nouse_index).str_info, My_read_Struct, sizeof(str_point_info));
                     m_backbround_data.at(n_nouse_index).flag = STATUS_USE;
                     n_handle_index = n_nouse_index;
@@ -10632,12 +10632,12 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                 }
                 if (m_backbround_data.at(n_handle_index).str_info.ninstance != 0)
                 {
-                    //instance ;
+                    //直接通过instance 来获取需要的数据;
                 }
                 else
                 {
                     unsigned long temptimenoew = time(NULL);
-                    //panel  instance
+                    //通过panel 获取对应的 instance
                     if ((g_bac_panel[My_read_Struct->npanel_id].object_instance != 0) &&
                         (g_bac_panel[My_read_Struct->npanel_id].panel_number == My_read_Struct->npanel_id) &&
                         (temptimenoew  > g_bac_panel[My_read_Struct->npanel_id].last_update_time) &&
@@ -10989,7 +10989,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                 My_Invoke_Struct = (_MessageInvokeIDInfo *)msg.wParam;
                 My_Receive_msg.erase(My_Receive_msg.begin());
                 MyCriticalSection.Unlock();
-                for (int i = 0; i < 2000; i++) //10.
+                for (int i = 0; i < 2000; i++) //10秒钟判断任务是否超时.
                 {
                     if (tsm_invoke_id_free(My_Invoke_Struct->Invoke_ID))
                     {
@@ -11025,7 +11025,7 @@ loop1:
 					{
 					case WRITEANALOG_CUS_TABLE_T3000:
 					{
-						memcpy(write_buffer, &m_analog_custmer_range.at(My_WriteList_Struct->start_instance), sizeof(Str_table_point));//Output 45byte1 modbus;
+						memcpy(write_buffer, &m_analog_custmer_range.at(My_WriteList_Struct->start_instance), sizeof(Str_table_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
                             for (int j = 0;j < 200;j++)
                             {
                                 write_buffer[j] = htons(write_buffer[j]);
@@ -11051,7 +11051,7 @@ loop1:
 					break;
 					case WRITEOUTPUT_T3000:
 						{
-							memcpy( write_buffer,&m_Output_data.at(My_WriteList_Struct->start_instance),sizeof(Str_out_point));//Output 45byte1 modbus;
+							memcpy( write_buffer,&m_Output_data.at(My_WriteList_Struct->start_instance),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 							for (int j=0;j<200;j++)
 							{
 								write_buffer[j] = htons(write_buffer[j]);
@@ -11076,7 +11076,7 @@ loop1:
 						break;
 					case WRITEINPUT_T3000:
 						{
-							memcpy( write_buffer,&m_Input_data.at(My_WriteList_Struct->start_instance),sizeof(Str_in_point));//IN46byte1 modbus;
+							memcpy( write_buffer,&m_Input_data.at(My_WriteList_Struct->start_instance),sizeof(Str_in_point));//因为IN只有46个字节，两个byte放到1个 modbus的寄存器里面;
 							for (int j=0;j<200;j++)
 							{
 								write_buffer[j] = htons(write_buffer[j]);
@@ -11106,7 +11106,7 @@ loop1:
                         {
                             write_buffer[j] = htons(write_buffer[j]);
                         }
-                        test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_VAR_START_REG + 20 * My_WriteList_Struct->start_instance, 20, 4); //Variable 3920;
+                        test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_VAR_START_REG + 20 * My_WriteList_Struct->start_instance, 20, 4); //Variable 是39个字节，占用20个寄存器;
 
                         _MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
                         pMy_Invoke_id->hwnd = My_WriteList_Struct->hWnd;
@@ -11126,7 +11126,7 @@ loop1:
 
 					case WRITEPID_T3000:
 						{
-							memcpy( write_buffer,&m_controller_data.at(My_WriteList_Struct->start_instance),sizeof(Str_controller_point));//IN46byte1 modbus;
+							memcpy( write_buffer,&m_controller_data.at(My_WriteList_Struct->start_instance),sizeof(Str_controller_point));//因为IN只有46个字节，两个byte放到1个 modbus的寄存器里面;
 							for (int j=0;j<200;j++)
 							{
 								write_buffer[j] = htons(write_buffer[j]);
@@ -11155,7 +11155,7 @@ loop1:
                         {
                             write_buffer[j] = htons(write_buffer[j]);
                         }
-                        test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_SCH_START_REG + 21 * My_WriteList_Struct->start_instance, 21, 4); //Variable 3920;
+                        test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_SCH_START_REG + 21 * My_WriteList_Struct->start_instance, 21, 4); //Variable 是39个字节，占用20个寄存器;
 
                         _MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
                         pMy_Invoke_id->hwnd = My_WriteList_Struct->hWnd;
@@ -11212,7 +11212,7 @@ loop1:
                         {
                             write_buffer[j] = htons(write_buffer[j]);
                         }
-                        test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_WR_TIME_FIRST + 72 * My_WriteList_Struct->start_instance, 72, 4); //Variable 3920;
+                        test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_WR_TIME_FIRST + 72 * My_WriteList_Struct->start_instance, 72, 4); //Variable 是39个字节，占用20个寄存器;
 
                         _MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
                         pMy_Invoke_id->hwnd = My_WriteList_Struct->hWnd;
@@ -11323,7 +11323,7 @@ loop1:
                 MyCriticalSection.Unlock();
                 if (n_wifi_connection)
                     break;
-                if (My_WriteList_Struct->block_size == 0) // ;
+                if (My_WriteList_Struct->block_size == 0) // 用寄存器来更新列表;
                 {
                     if ((unsigned char)My_WriteList_Struct->command == READVARIABLE_T3000)
                     {
@@ -11538,7 +11538,7 @@ void CMainFrame::OnToolIsptoolforone()
     BOOL bDontLinger = FALSE;
     setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
     closesocket(h_Broad);
-    SetCommunicationType(0);//ISP ;
+    SetCommunicationType(0);//关闭串口，供ISP 使用;
     close_com();
 
     CString ApplicationFolder;
@@ -11563,7 +11563,7 @@ void CMainFrame::OnToolIsptoolforone()
     }
     SetCommunicationType(temp_type);
 
-    //Fance Add. SP 1234 4321 T3000 istview ;
+    //Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
     h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
     BOOL bBroadcast=TRUE;
     ::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -11746,7 +11746,7 @@ void CMainFrame::OnControlInputs()
 
     return;
 #endif
-    g_llTxCount++; //  X ++ ;
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
 
 
     if (product_type == CS3000 || 
@@ -11890,12 +11890,12 @@ void CMainFrame::OnControlInputs()
         if(g_protocol == PROTOCOL_BIP_TO_MSTP)
         {
             Input_Window->KillTimer(INPUT_REFRESH_DATA_TIMER);
-            Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_TIME, NULL); //;
+            Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_TIME, NULL); //点击按钮手动刷新后，开启计时避免频繁刷新;
             Create_Thread_Read_Item(TYPE_INPUT);
         }
 		else if((g_protocol == MODBUS_RS485) || 
                 (g_protocol == MODBUS_TCPIP) || 
-                (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) ||  //20200306 TSTAT103BB  MODBUS MODBUS485   T3BB 
+                (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) ||  //20200306 TSTAT10或者T3BB  使用MODBUS MODBUS485 接到  T3BB下面 
                 (g_protocol == PROTOCOL_MSTP_TO_MODBUS) ||
                 (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
 		{
@@ -11909,7 +11909,7 @@ void CMainFrame::OnControlInputs()
                 unsigned short read_data_buffer[600];
                 memset(read_data_buffer, 0, sizeof(unsigned short) * 600);
                 int read_result = 1;
-                //cus table  106 106  *5    106x5  530   6;
+                //cus table  106 按106算  *5    106x5  需要读530   需要读取6包;
                 for (int i = 0; i < 6; i++)
                 {
                     int itemp = 0;
@@ -11942,10 +11942,10 @@ void CMainFrame::OnControlInputs()
                                 read_data_buffer[i * 53 + j] = htons(read_data_buffer[i * 53 + j]);
                             }
                         }
-                        memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//Str_table_point 106byte1 modbus;
+                        memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//因为Str_table_point 只有106个字节，两个byte放到1个 modbus的寄存器里面;
 
                         char temp_char[10] = { 0 };
-                        if ((unsigned char)m_analog_custmer_range.at(i).table_name[8] != 0xef) //  0.1 
+                        if ((unsigned char)m_analog_custmer_range.at(i).table_name[8] != 0xef) //最后一位用来标识 精度 ，与旧版本的0.1 区别开
                         {
                             memcpy_s(temp_char, 9, (char*)m_analog_custmer_range.at(i).table_name, 9);
                         }
@@ -11965,10 +11965,10 @@ void CMainFrame::OnControlInputs()
 
             }
 			hide_485_progress = false;
-			::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, READINPUT_T3000 /*BAC_IN*/);// In
+			::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, bacnet_device_type, READINPUT_T3000 /*BAC_IN*/);//第二个参数 In
 			::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
             Input_Window->KillTimer(INPUT_REFRESH_DATA_TIMER);
-            Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_TIME, NULL); //;
+            Input_Window->SetTimer(INPUT_REFRESH_DATA_TIMER, BAC_LIST_REFRESH_TIME, NULL); //点击按钮手动刷新后，开启计时避免频繁刷新;
 		}
         else
         {
@@ -12015,7 +12015,7 @@ void CMainFrame::OnControlInputs()
 void CMainFrame::OnControlArray()
 {
 
-    g_llTxCount++; //  X ++ ;
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if ((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
         if ((m_user_level == LOGIN_SUCCESS_GRAPHIC_MODE) ||
@@ -12062,8 +12062,8 @@ void CMainFrame::OnControlArray()
                 ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_ARRAY);
         }
     }
-    else if ((g_protocol == MODBUS_RS485) || //RS485 3 MINIPANEL
-        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))   //BB MODBUS485     TSTAT10 BB
+    else if ((g_protocol == MODBUS_RS485) || //RS485 下面挂T3 MINIPANEL
+        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
     {
         if ((product_type == PM_MINIPANEL) ||
             (product_type == PM_TSTAT10) ||
@@ -12074,7 +12074,7 @@ void CMainFrame::OnControlArray()
             {
                 SwitchToPruductType(DLG_BACNET_VIEW);
             }
-            //::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, PM_MINIPANEL_ARM, READVARIABLE_T3000);// In
+            //::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, PM_MINIPANEL_ARM, READVARIABLE_T3000);//第二个参数 In
             bacnet_view_number = TYPE_ARRAY;
             global_interface = BAC_AY;
 
@@ -12117,7 +12117,7 @@ void CMainFrame::OnControlPrograms()
 #endif // DEBUG
 
 
-    g_llTxCount++; //  X ++ ;
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
     {
         if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) ||
@@ -12165,8 +12165,8 @@ void CMainFrame::OnControlPrograms()
                 ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAM);
         }
     }
-    else if ((g_protocol == MODBUS_RS485) || //RS485 3 MINIPANEL
-            (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))   //BB MODBUS485     TSTAT10 BB
+    else if ((g_protocol == MODBUS_RS485) || //RS485 下面挂T3 MINIPANEL
+            (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
     {
         if ((product_type == PM_MINIPANEL) ||
             (product_type == PM_TSTAT10) ||
@@ -12177,7 +12177,7 @@ void CMainFrame::OnControlPrograms()
             {
                 SwitchToPruductType(DLG_BACNET_VIEW);
             }
-            ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, PM_MINIPANEL_ARM, READPROGRAM_T3000/*BAC_PRG*/);// In
+            ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, PM_MINIPANEL_ARM, READPROGRAM_T3000/*BAC_PRG*/);//第二个参数 In
             bacnet_view_number = TYPE_PROGRAM;
             global_interface = BAC_PRG;
 
@@ -12206,7 +12206,7 @@ void CMainFrame::OnControlOutputs()
 
 
 
-    g_llTxCount++; //  X ++ ;
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
 
     if (product_type == T3000_6_ADDRESS || 
         product_register_value[7] == PM_PM5E_ARM ||
@@ -12219,7 +12219,7 @@ void CMainFrame::OnControlOutputs()
         return;
     }
 
-	// new_device_support_mini_ui   T3;
+	// new_device_support_mini_ui  主要是为了支持 旧版本的T3进入以前的界面;
     if ((g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) ||
         (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) ||
           (g_protocol == PROTOCOL_MSTP_TO_MODBUS) ||
@@ -12336,7 +12336,7 @@ void CMainFrame::OnControlOutputs()
                 (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
 		{
 			::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type, READOUTPUT_T3000/*BAC_OUT*/);// OUT
+			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type, READOUTPUT_T3000/*BAC_OUT*/);//第二个参数 OUT
 		}
         else
         {
@@ -12363,7 +12363,7 @@ void CMainFrame::OnControlOutputs()
 
 void CMainFrame::OnControlVariables()
 {
-    g_llTxCount++; //  X ++ ;
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
     {
         if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) ||
@@ -12411,8 +12411,8 @@ void CMainFrame::OnControlVariables()
                 ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_VARIABLE);
         }
     }
-    else if ((g_protocol == MODBUS_RS485) ||  //RS485 3 MINIPANEL
-             (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))   //BB MODBUS485     TSTAT10 BB
+    else if ((g_protocol == MODBUS_RS485) ||  //RS485 下面挂T3 MINIPANEL
+             (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
     {
         if ((product_type == PM_MINIPANEL) ||
             (product_type == PM_TSTAT10) ||
@@ -12423,7 +12423,7 @@ void CMainFrame::OnControlVariables()
             {
                 SwitchToPruductType(DLG_BACNET_VIEW);
             }
-            ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, PM_MINIPANEL_ARM, READVARIABLE_T3000/*BAC_VAR*/);// In
+            ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, PM_MINIPANEL_ARM, READVARIABLE_T3000/*BAC_VAR*/);//第二个参数 In
             bacnet_view_number = TYPE_VARIABLE;
             global_interface = BAC_VAR;
 
@@ -12474,7 +12474,7 @@ void CMainFrame::OnControlRefresh()
 
 void CMainFrame::OnControlWeekly()
 {
-    g_llTxCount++; //  X ++ ;
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP))
     {
         if((m_user_level !=	LOGIN_SUCCESS_ROUTINE_MODE) &&
@@ -12522,8 +12522,8 @@ void CMainFrame::OnControlWeekly()
 
 
     }
-    else if (((g_protocol == MODBUS_RS485) ||  //RS485 3 MINIPANEL
-        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485)) &&   //BB MODBUS485     TSTAT10 BB
+    else if (((g_protocol == MODBUS_RS485) ||  //RS485 下面挂T3 MINIPANEL
+        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485)) &&   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
         Bacnet_Private_Device(product_type))
     {
 
@@ -12531,7 +12531,7 @@ void CMainFrame::OnControlWeekly()
             {
                 SwitchToPruductType(DLG_BACNET_VIEW);
             }
-            ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, PM_MINIPANEL_ARM, READWEEKLYROUTINE_T3000/*BAC_SCH*/);// In
+            ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, PM_MINIPANEL_ARM, READWEEKLYROUTINE_T3000/*BAC_SCH*/);//第二个参数 In
             bacnet_view_number = TYPE_WEEKLY;
             global_interface = BAC_SCH;
 
@@ -12574,7 +12574,7 @@ void CMainFrame::OnControlWeekly()
 
 void CMainFrame::OnControlAnnualroutines()
 { 
-    g_llTxCount++; //  X ++ ;
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || 
         (g_protocol == MODBUS_BACNET_MSTP) || 
         (g_protocol == PROTOCOL_BIP_TO_MSTP) ||
@@ -12647,7 +12647,7 @@ void CMainFrame::OnControlSettings()
     temp_ui.Format(_T("%u"), TYPE_MAIN);
     WritePrivateProfileString(_T("LastView"), _T("FistLevelViewUI"), temp_ui, g_cstring_ini_path);
 
-    g_llTxCount++; //  X ++ ;
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
     if((g_protocol == PROTOCOL_BACNET_IP) || 
 		(g_protocol == PROTOCOL_BIP_TO_MSTP) || 
 		(g_protocol == MODBUS_BACNET_MSTP) ||
@@ -12703,7 +12703,7 @@ void CMainFrame::OnControlSettings()
                 ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_SETTING);
             }
             else
-			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,0,READ_SETTING_COMMAND);// In
+			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,0,READ_SETTING_COMMAND);//第二个参数 In
 		}
         else
         {
@@ -12751,7 +12751,7 @@ void CMainFrame::OnControlSettings()
         }
         else if (product_register_value[7] == PM_PWMETER)
         {
-            //power meter ;
+            //新增power meter 的弹出界面;
             CPowerMeterList dlg;
             dlg.DoModal();
         }
@@ -12880,7 +12880,7 @@ void CMainFrame::OnControlControllers()
 		{
 			hide_485_progress = false;
 			::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type, READCONTROLLER_T3000/*BAC_PID*/);// In
+			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type, READCONTROLLER_T3000/*BAC_PID*/);//第二个参数 In
 		}
         else
         {
@@ -13107,7 +13107,7 @@ void CMainFrame::OnDatabaseBacnettool()
     //dlg.DoModal();
     //return;
 //#endif // DEBUG
-    close_bac_com(); //acnet  Yabe bind;
+    close_bac_com(); //这里需要bacnet 任务占用的端口，如果不释放会倒是 Yabe 无法bind端口;
     CString CS_BacnetExplore_Path;
     CString ApplicationFolder;
     GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
@@ -13275,7 +13275,7 @@ void CMainFrame::OnControlRemotePoint()
 				Remote_Point_Window->Reset_RemotePoint_Rect();
                 pDialog[WINDOW_REMOTE_POINT]->ShowWindow(SW_SHOW);
             }
-            ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(12);	//12;
+            ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(12);	//第12个插入的是远端的点;
             Remote_Point_Window->m_remote_point_list.SetFocus();  
             bacnet_view_number = TYPE_READ_REMOTE_POINT_INFO;
 			CString temp_ui;
@@ -13330,7 +13330,7 @@ void CMainFrame::OnUpdateConnect2(CCmdUI *pCmdUI)
 }
 
 
-//TCP , GSM ;
+//建立TCP 服务器, GSM 会连接上来;
 void CMainFrame::OnMiscellaneousGsmconnection()
 {
     if(Tcp_Server_Window == NULL)
@@ -13410,7 +13410,7 @@ void CMainFrame::BuildingComportConfig()
                         SetLastOpenedComport(m_building_com_port);
                         open_com(m_building_com_port);
                     }
-                    else	// ;;
+                    else	//如果在枚举的 串口里面没有找到就默认第一个;还要改数据库;
                     {
                         CString temp_port;
                         temp_port = m_vector_comport.at(0);
@@ -13499,7 +13499,7 @@ CString CMainFrame::GetFWVersionFromFTP(CString ProductName)
     char sRecived[1024];
     if(pHttpFile)
     {
-        while(pHttpFile->ReadString((LPTSTR)sRecived, 1024)) //Cstring
+        while(pHttpFile->ReadString((LPTSTR)sRecived, 1024)) //解决Cstring乱码
         {
             CString temp(sRecived);
             /*	strHtml += temp;* /*/
@@ -13531,7 +13531,7 @@ LRESULT CMainFrame::OnThreadFinished(WPARAM wParam, LPARAM /*lParam*/)
         m_bSafeToClose=TRUE;
         return 0L;
     }
-    //
+    //下载完成之后，打开文件
     else
     {
         //EndDialog(IDOK);
@@ -14518,7 +14518,7 @@ void CMainFrame::Create_Thread_Read_Item(int n_item)
         WaitRead_Data_Dlg = 0;
     }
     WaitRead_Data_Dlg = new CDialog_Progess(this,1,100);
-    //
+    //创建对话框窗口
     WaitRead_Data_Dlg->Create(IDD_DIALOG10_Progress, this);
     WaitRead_Data_Dlg->ShowProgress(0,0);
     RECT RECT_SET1;
@@ -14588,22 +14588,22 @@ void CMainFrame::OnFileExportregiseterslist()
 /// </summary>
 void CMainFrame::OnToolRegistersmaintenancesystem()
 {
-    // 
-    //
-    // 
+    //维护寄存器列表管理的 一个应用程序
+    //它能够维护所以产品的寄存器
+    // 它的所有的功能列表
     /*
-    1>
-    2>
-    3>
-    4>
-    5>
+    1>用户管理
+    2>密码修改
+    3>项目管理
+    4>寄存器信息修改
+    5>产品的添加
     */
   /*  CString strHistotyFile=g_strExePth+_T("RegisterListManager.exe");
     ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);*/
 }
 
 /// <summary>
-///  
+/// 消息提示 ，根据不同的控件，提示不一样的信息
 /// </summary>
 /// <param name="id"></param>
 /// <param name="Pnmhdr"></param>
@@ -14720,7 +14720,7 @@ INT_PTR CMainFrame::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 
     CString adoStr;
     static CString strText;
-    INT_PTR hInt = CFrameWndEx::OnToolHitTest(point,pTI);//,.   ;
+    INT_PTR hInt = CFrameWndEx::OnToolHitTest(point,pTI);//先调用基类函数,再修改串.   ;
     strText = pTI->lpszText;
 
     //if(pTI->uId == ID_CONTROL_INPUTS )
@@ -14728,10 +14728,10 @@ INT_PTR CMainFrame::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
     //	adoStr = _T("test111");
 
     //}
-    strText = adoStr + strText; //: New(Ctrl+N).
+    strText = adoStr + strText; //重新组合成: New(Ctrl+N)形式.
 
-    //pTI->lpszText,,
-    //,,,
+    //基类中会释放这个指针pTI->lpszText,但是由于我们要修改这个串,
+    //所以原来的空间不一定够,所以要释放掉原来的,并重新申请,
     int len = strText.GetLength()*sizeof(TCHAR);
     TCHAR *pBuf =(TCHAR*)malloc(len+10);
     memset(pBuf,0,len+10);
@@ -15099,7 +15099,7 @@ void CMainFrame::OnHelpUsingUpdate()
         m_product_isp_auto_flash = m_product.at(selected_product_index);
         if ((Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) || (Device_Basic_Setting.reg.mini_type == T3_NG2_TYPE2))
         {
-            //LC RMCG2  T3000 ;
+            //如果是PLC的 RMC和NG2的第二种类型，那么在后面判断类型  不能直接使用T3000 去更新固件;
             m_product_isp_auto_flash.m_ext_info.mini_type = Device_Basic_Setting.reg.mini_type;
         }
 	}
@@ -15108,7 +15108,7 @@ void CMainFrame::OnHelpUsingUpdate()
 		m_product_isp_auto_flash.product_class_id =  199;
 	}
 
-	SetCommunicationType(0);//ISP ;
+	SetCommunicationType(0);//关闭串口，供ISP 使用;
 	close_com();
     close_bac_com();
 	Dowmloadfile Dlg;
@@ -15125,7 +15125,7 @@ void CMainFrame::OnHelpUsingUpdate()
 	}
 	SetCommunicationType(temp_type);
 
-	//Fance Add. SP 1234 4321 T3000 istview ;
+	//Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
 	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	BOOL bBroadcast=TRUE;
 	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -15147,7 +15147,7 @@ void CMainFrame::OnHelpUsingUpdate()
 	g_bPauseMultiRead = temp_status;
 
     HideBacnetWindow();
-    SetTimer(FOR_LAST_VIEW_TIMER, 1000, NULL); //;
+    SetTimer(FOR_LAST_VIEW_TIMER, 1000, NULL); //再次点击上次最后连接的设备;
 }
 
 
@@ -15385,7 +15385,7 @@ void CMainFrame::OnControlIoNetConfig()
 
 void CMainFrame::OnDatabaseLogdetail()
 {
-    // TODO: 
+    // TODO: 在此添加命令处理程序代码
     ShowDebugWindow();
 }
 
@@ -15490,7 +15490,7 @@ void CMainFrame::SaveConfigFile()
             //    DeleteFile(SaveConfigFilePath);
             //}
 
-            //acnet  File save  Save
+            //协议时bacnet ，用户点击 File save时 先调用线程读取所有需要存的资料；在发送消息回来 调用Save
             //::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
 
             if ((g_protocol == PROTOCOL_BACNET_IP) || 
@@ -15521,7 +15521,7 @@ void CMainFrame::SaveConfigFile()
             (bacnet_device_type == PID_T36CTA) ||
             (bacnet_device_type == PWM_TRANSDUCER)))
     {
-        //T3inipanel input output 10000;
+        //T3的设备支持minipanel的 input output 就读10000以后的寄存器;
         MainFram_hwd = this->m_hWnd;
 
         CFileDialog dlg(false, _T("*.prog"), _T(" "), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, _T("prog files (*.prog)|*.prog|All Files (*.*)|*.*||"), NULL, 0);
@@ -15661,7 +15661,7 @@ void CMainFrame::SaveConfigFile()
 
 void CMainFrame::OnUpdateAppAbout(CCmdUI *pCmdUI)
 {
-    // TODO: 
+    // TODO: 在此添加命令更新用户界面处理程序代码
     if (pCmdUI->m_pMenu != NULL)
     {
         CString show_cs;
@@ -15680,7 +15680,7 @@ void CMainFrame::OnDatabaseBuildingManagement()
 #endif // !1
 
 
-    // TODO: 
+    // TODO: 在此添加命令处理程序代码
 
     b_building_management_flag = SYS_DB_BUILDING_MODE;
 
@@ -15702,10 +15702,10 @@ void CMainFrame::VirtualDeviceMode()
 
 void CMainFrame::OnViewRefresh()
 {
-    // TODO: 
+    // TODO: 在此添加命令处理程序代码
     ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, bacnet_view_number);
 }
-////extern vector <bacnet_background_struct> m_backbround_data; // acnet panel
+////extern vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
 //DWORD WINAPI  Bacnet_ReadWrite_Message(LPVOID lpVoid)
 //{
 //    while (1)
@@ -15719,7 +15719,7 @@ void CMainFrame::OnViewRefresh()
 //                    Sleep(1);
 //                }
 //            }
-//            //m_backbround_data; // acnet panel
+//            //m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
 //        }
 //        else
 //            break;
@@ -15754,7 +15754,7 @@ void CMainFrame::OnFileNewproject()
 #ifdef LOCAL_DB_FUNCTION
 
     CString temp_device_db;
-    // TODO: 
+    // TODO: 在此添加命令处理程序代码
     bacnet_message_input_title.Format(_T("Please input a project name "));
     CBacnetMessageInput temp_dlg;
     temp_dlg.DoModal();
@@ -15765,7 +15765,7 @@ void CMainFrame::OnFileNewproject()
         return;
     }
     
-    //1. uilding DeviceDatabase.mdb   Building.
+    //1. 检查当前building下是否存在 DeviceDatabase.mdb ， 如果没有 就拷贝资源文件的数据库至Building文件夹下.
     //2. PathFileExists
     //CString 
 #endif
@@ -15902,7 +15902,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerThreadfun(LPVOID lpVoid)
 extern void HandleWebViewMsg(CString msg, CString &outmsg , int msg_source = 0);
 DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
 {
-    //  Winsock
+    // 初始化 Winsock
     Sleep(5000);
     WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -15911,7 +15911,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
         return 1;
     }
 
-    // 
+    // 创建套接字
     SOCKET ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (ConnectSocket == INVALID_SOCKET) {
         TRACE("Error at socket(): %d\n", WSAGetLastError());
@@ -15919,13 +15919,13 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
         return 1;
     }
 
-    // 
+    // 设置服务器地址和端口
     sockaddr_in clientService;
     clientService.sin_family = AF_INET;
     clientService.sin_addr.s_addr = inet_addr("127.0.0.1");
     clientService.sin_port = htons(9104);
 
-    // 
+    // 连接到服务器
     iResult = connect(ConnectSocket, (SOCKADDR*)&clientService, sizeof(clientService));
     if (iResult == SOCKET_ERROR) {
         TRACE("Unable to connect to server: %d\n", WSAGetLastError());
@@ -15947,14 +15947,14 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
     );
 
     char sendbuf[10240] = {0};
-    // 
+    // 发送和接收数据的缓冲区
     WideCharToMultiByte(CP_ACP, 0, handshakeRequest.GetBuffer(), -1, sendbuf, 10240, NULL, NULL);
 
     //const char* sendbuf = "This is a test message from client";
     char recvbuf[10240] = {0};
     int recvbuflen = 10240;
 
-    // 
+    // 发送初始数据
     iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
     if (iResult == SOCKET_ERROR) {
         TRACE("send failed: %d\n", WSAGetLastError());
@@ -15965,7 +15965,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
 
     TRACE("Bytes Sent: %d\r\n%s\r\n", iResult, sendbuf);
 
-    // 
+    // 循环接收和处理数据
     while (true) {
         memset(recvbuf, 0, 10240);
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
@@ -15973,7 +15973,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
         {
             //TRACE("Bytes received: %d\r\n%s\r\n", iResult, recvbuf);
 
-            // 
+            // 检查接收到的数据并做出应答
             std::string receivedData = ProcessWebSocketFrame(std::vector<uint8_t>(recvbuf, recvbuf + iResult));
             //std::string receivedData(recvbuf);
             if (receivedData.find("Switching Protocols") != std::string::npos) 
@@ -16000,17 +16000,17 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
             else if (receivedData.length() > 6)
             {
                 std::string filteredData = receivedData;
-                int loop_count = 0; //4  .
+                int loop_count = 0; //有时候前面多4个字节 从第三个字节开始是长度，有时候又只有两个字节。这里循环判断 大括号加冒号为起点.
                 do
                 {
                     
                     //std::string filteredData = receivedData.substr(2);
                     if (filteredData.find("{\"") == 0)
                     {
-                        //
+                        //调用别的函数处理数据
                         CString msg = CString(filteredData.c_str());
                         CString outmsg;
-                        HandleWebViewMsg(msg, outmsg, 1); //msg_source = 1  anel index  data
+                        HandleWebViewMsg(msg, outmsg, 1); //msg_source = 1 代表来自外部浏览器的消息， 需要根据panel 还有index 来加载对应的 data
 
                         vector<unsigned char> wsFrame = CreateWebSocketFrame(outmsg);
                         iResult = send(ConnectSocket, reinterpret_cast<const char*>(wsFrame.data()), wsFrame.size(), 0);
@@ -16029,8 +16029,8 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
                     {
                         loop_count++;
                         if (loop_count > 6)
-                            break; //  ;
-                        filteredData = receivedData.substr(loop_count); // oop_count {" 
+                            break; // 没搜到起始 信号;
+                        filteredData = receivedData.substr(loop_count); // 检查从第loop_count个字节开始的数据是否与 {" 一模一样
                     }                                       
                 } while (loop_count < 7);
             }
@@ -16046,7 +16046,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
         }
     }
 
-    // 
+    // 关闭套接字
     closesocket(ConnectSocket);
     WSACleanup();
 
@@ -16061,7 +16061,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
 
 void CMainFrame::OnUpdateFileNewproject(CCmdUI* pCmdUI)
 {
-    // TODO: 
+    // TODO: 在此添加命令更新用户界面处理程序代码
     pCmdUI->SetCheck(0);
     pCmdUI->Enable(0);
 }
@@ -16156,7 +16156,7 @@ CString GetUserAppDataPath(LPCTSTR lpFolderName = NULL)
 
 void CMainFrame::OnWebviewModbusregister()
 {
-    // TODO: 
+    // TODO: 在此添加命令处理程序代码
     // This thread will not exit when it is running properly, and will exit if run_server executes abnormally, terminating the thread.
 
     CString appDataMyAppPath = GetUserAppDataPath(_T("T3000"));
@@ -16181,7 +16181,7 @@ void CMainFrame::OnWebviewModbusregister()
 
 void CMainFrame::OnToolsLoginmyaccount()
 {
-    // TODO: 
+    // TODO: 在此添加命令处理程序代码
     // This thread will not exit when it is running properly, and will exit if run_server executes abnormally, terminating the thread.
     if (h_create_webview_server_thread == NULL)
     {

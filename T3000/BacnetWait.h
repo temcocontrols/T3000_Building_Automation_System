@@ -34,7 +34,7 @@ public:
 	//static DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
 	
 	CStaticEx m_wait_persent;
-	int m_wait_type;//0   1 config  2  config;
+	int m_wait_type;//0 µã»÷£»  1 Ð´config  £»2  ¶Áconfig;
 	CString PosString;
 	int m_pos;
 public:

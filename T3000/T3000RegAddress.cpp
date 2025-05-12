@@ -13,7 +13,7 @@ int temp_Mdb_Adress_Map=0;
 
 
 
-//3;
+//目前数据库支持这3张表的查询，在切换器件时，一次性载入新的数据库，并不影响效率。;
 
 
 
@@ -32,9 +32,9 @@ T3000RegAddress::~T3000RegAddress(void)
 //Code by Fance
 //The search the character from array which read from t3000.mdb
 //Default search from TSTAT5 ABCD register list .
-//T3000.MDB    ;
-//  Frimware  T3000.mdb ;
-//    ;
+//在运行程序之前加载T3000.MDB 的数据至 数组，在动态运行中，判断 数组的值 后，在取值;
+//这样 如果 Frimware 的寄存器列表更改，则只需更改 T3000.mdb的 寄存器表即可;
+//但是由于需要修改的 地方实在太多，并且 太多特例情况，目前只能将 看的懂的部分 修改。旧版本的特例情况不做修改。;
 int _P(char *str,int mMdb_Adress_Map)
 {
 	if(product_type==T3000_5ABCDFG_LED_ADDRESS)

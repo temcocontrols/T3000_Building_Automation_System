@@ -98,7 +98,7 @@ public:
 	void Set_IsScan(BOOL Is_Scan);
 	void Release();
 protected:
-	// 
+	// 读出所有存在数据库中的设备节点。准备与搜索到的设备比较
 	int GetAllNodeFromDataBase();
 	void SetGridCellColor(int nRow, int nCol, COLORREF clr);
  
@@ -115,18 +115,18 @@ protected:
 	// destroy
 	void DestroyFlexEdit();
 
-	// edit
+	// 显示edit
 	void ShowInputEditBox(int iRow, int iCol);
 	
-	// gridcell rect, 
+	// 计算gridcell rect, 根据行列号
 	CRect CalcGridCellRect(int iRow, int iCol );	
 
-	// tstatDB
+	// 把一个tstat写成一条DB记录
 	void WriteOneDevInfoToDB( CTStat_Dev* pDev);
 	void WriteOneNetInfoToDB( CTStat_Net* pNet);
 
-	//  buildingnamefloornameroomnameaddress
-	// address
+	// 只允许写 buildingname，floorname，roomname，address
+	// 因此，需要向寄存器写的只有address
 	void GetDataFromGrid();
 	void SaveAllNodeToDB();
 	void AutoFixComConflict();
@@ -145,7 +145,7 @@ protected:
 	}IcmpHeader; 
 protected:
 	void		CalcClickPos(CSize& size);
-	void		GetGridEditString(); // edit
+	void		GetGridEditString(); // 记录edit的数据
 	int			IsValidClick(CSize szTemp);	
 	void		CombineDBandScanRet();
 

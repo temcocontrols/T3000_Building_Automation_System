@@ -59,7 +59,7 @@ BOOL CLCOutNameConfig::OnInitDialog()
    // AfxBeginThread(_Read_LightingOutputName,this);
 	return TRUE; 
 	 // return TRUE unless you set the focus to a control
-	// : OCX  FALSE
+	// 异常: OCX 属性页应返回 FALSE
 }
 
 void CLCOutNameConfig::to_fresh(){
@@ -119,22 +119,22 @@ BEGIN_EVENTSINK_MAP(CLCOutNameConfig, CDialogEx)
 void CLCOutNameConfig::ClickInputMsflexgrid()
 {
     m_editName.ShowWindow(SW_HIDE);  
-	long lCol=m_outputname.get_ColSel();         //
-	long lRow=m_outputname.get_RowSel();      //
+	long lCol=m_outputname.get_ColSel();         //获取点击的行号
+	long lRow=m_outputname.get_RowSel();      //获取点击的列号
 	m_curcol=lCol;
 	m_currow=lRow;
-	if(lRow>m_outputname.get_Rows() || lRow==0)              //
+	if(lRow>m_outputname.get_Rows() || lRow==0)              //判断点击是否有效
 		return;
 
 	CRect rect;
-	m_outputname.GetWindowRect(&rect);                 //FlexGrid
-	ScreenToClient(&rect);                                    //
+	m_outputname.GetWindowRect(&rect);                 //获取FlexGrid控件的窗口矩形
+	ScreenToClient(&rect);                                    //转换为客户区矩形
 	CDC* pDC=GetDC();
-	//MSFlexGrid (twips)1440  = 1 
-	//
+	//MSFlexGrid 控件的函数的长度单位是“缇(twips)”，需要将其转化为像素，1440 缇 = 1 英寸
+	//计算象素点和缇的转换比例
 	int nTwipsPerDotX=1440/pDC->GetDeviceCaps(LOGPIXELSX);
 	int nTwipsPerDotY=1440/pDC->GetDeviceCaps(LOGPIXELSY);
-	//
+	//计算选中格的左上角的坐标（象素为单位）
 	long y = m_outputname.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_outputname.get_ColPos(lCol)/nTwipsPerDotX;
 
@@ -143,19 +143,19 @@ void CLCOutNameConfig::ClickInputMsflexgrid()
 	//long w= m_msflexgrid1to96.get_ColWidth(lCol);
 	//long h= m_msflexgrid1to96.get_RowHeight(lRow);
 	/*m_msflexgrid1to96.get_CellWidth()*/
-	//11
+	//计算选中格的尺寸（象素为单位）。加1是实际调试中，发现加1后效果更好
 	long width = m_outputname.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_outputname.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//
+	//形成选中个所在的矩形区域
 	CRect rc(x,y,x+width,y+height);
-	//
+	//转换成相对对话框的坐标
 	rc.OffsetRect(rect.left,rect.top);
 
-	CString strValue=m_outputname.get_TextMatrix(lRow,lCol);       //
+	CString strValue=m_outputname.get_TextMatrix(lRow,lCol);       //获取单元格内容
 	m_stroldername=strValue;
-	m_editName.ShowWindow(SW_SHOW);                  //
-	m_editName.MoveWindow(rc);                            //
-	m_editName.SetWindowText(strValue);                   //
+	m_editName.ShowWindow(SW_SHOW);                  //显示控件
+	m_editName.MoveWindow(rc);                            //改变大小并移到选中格位置
+	m_editName.SetWindowText(strValue);                   //显示文本
 	m_editName.SetFocus();   
 }
 
@@ -196,7 +196,7 @@ if (SqliteDBBuilding.tableExists("LCNameConfigure"))
 	sql.Format(_T("Select * from LCNameConfigure where SN=%d"),m_sn);
 	q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
  
-	while (!q.eof())//
+	while (!q.eof())//有表但是没有对应序列号的值
 	{
 	  tempstruct.name=q.getValuebyName(_T("OutputName"));
 	  temp=q.getValuebyName(_T("Card"));
@@ -249,7 +249,7 @@ void CLCOutNameConfig::Insert_Update_OutputName(int sn,int card,int output ,CStr
 	sql.Format(_T("Select * from LCNameConfigure where SN=%d and  Card=%d and Output=%d"),sn,card,output);
 	q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-	if (!q.eof())//
+	if (!q.eof())//有表但是没有对应序列号的值
 	{
 		sql.Format(_T("update LCNameConfigure set OutputName = '%s' where SN=%d and  Card=%d and Output=%d "),outputname.GetBuffer(),sn,card,output);
 		 SqliteDBBuilding.execDML((UTF8MBSTR)sql);

@@ -42,23 +42,23 @@ END_MESSAGE_MAP()
 // CAirflowSettingDlg message handlers
 BOOL CAirflowSettingDlg::Get_Data_Bit(UINT Data,int n,int N)
 {
-	//Data=Data&0FFx;//
-	// 2N
-	//num 2~num-1
+	//Data=Data&0FFx;//去掉高八位数据
+	//下面是算幂 2的N
+	//最大的num位数的数是？ 2~num-1
 	// AfxMessageBox(_T("OK"));
 	UINT num=1;
 	for (int i=1;i<=n;i++)
 	{
 		num=num*2;
 	}
-	num=num-1;//num
-	Data=Data&num;//n 
+	num=num-1;//最大的num位数
+	Data=Data&num;//取得这个n位数是什么 ？
 	num=1;
 	for (int i=1;i<N;i++)
 	{
 		num=num*2;
 	}
-	if (num==(Data&num))//1 
+	if (num==(Data&num))//说明是1 
 	{
 		return TRUE;
 	} 
@@ -78,12 +78,12 @@ void CAirflowSettingDlg::Fresh(){
 	if(!g_unint)	//t5= 121;t6=104
 	{
 
-		m_strUnit=_T("F");
+		m_strUnit=_T("°F");
 	}
 	else 
 	{
 
-		m_strUnit=_T("C");
+		m_strUnit=_T("°C");
 	}
 	CString strUnit;CString temp,strTemp;
 	

@@ -1013,7 +1013,7 @@ void CMyOwnListCtrl::_MouseClkMonitor(UINT nMsg, UINT nFlags, CPoint point, BOOL
 		//m_valueCombx.InsertString(0,_T("Off"));
 		//m_valueCombx.InsertString(1,_T("On"));
 
-		//m_valueCombx.MoveWindow(rc); //
+		//m_valueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 
 		return;
 	}*/

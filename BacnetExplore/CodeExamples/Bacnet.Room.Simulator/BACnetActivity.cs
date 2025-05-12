@@ -108,8 +108,8 @@ namespace DemoServer
 
         public static BacnetValue GetBacObjectPresentValue(BacnetObjectId id)
         {
-            // L'index 0 c'est le nombre de valeurs associes  la proprit
-            // L'index 1 pour la premire valeur
+            // L'index 0 c'est le nombre de valeurs associées à la propriété
+            // L'index 1 pour la première valeur
             // L'index System.IO.BACnet.Serialize.ASN1.BACNET_ARRAY_ALL pour tout le tableau
             lock (m_lockObject)
             {
@@ -121,12 +121,12 @@ namespace DemoServer
 
         public static void SetBacObjectPresentValue(BacnetObjectId id, BacnetValue bv)
         {
-            // On est sur des valeurs simples, la comparaison est possible ici sans problme
+            // On est sur des valeurs simples, la comparaison est possible ici sans problème
             if (GetBacObjectPresentValue(id).Value.ToString() == bv.Value.ToString())
                 return;
 
-            // L'index 0 c'est le nombre de valeurs associes  la proprit
-            // L'index 1 pour la premire valeur
+            // L'index 0 c'est le nombre de valeurs associées à la propriété
+            // L'index 1 pour la première valeur
             // L'index System.IO.BACnet.Serialize.ASN1.BACNET_ARRAY_ALL pour tout le tableau
             lock (m_lockObject)
             {
@@ -135,7 +135,7 @@ namespace DemoServer
             }
         }
 
-        // Ici les remplacement de la lecture de quelques lements
+        // Ici les remplacement de la lecture de quelques élements
         private static void m_storage_ReadOverride(BacnetObjectId object_id, BacnetPropertyIds property_id, uint array_index, out IList<BacnetValue> value, out DeviceStorage.ErrorCodes status, out bool handled)
         {
             handled = true;
@@ -346,7 +346,7 @@ namespace DemoServer
             {
                 for (int i = 0; i < entry.Value.Count; i++)
                 {
-                    // Modif F. Chaxel <0 modifi == 0
+                    // Modif F. Chaxel <0 modifié == 0
                     if (entry.Value[i].GetTimeRemaining() <0)
                     {
                         entry.Value.RemoveAt(i);
@@ -360,8 +360,8 @@ namespace DemoServer
                 m_subscriptions.Remove(obj_id);
         }
 
-        // C'est que la souscription est ajoute  la liste
-        // ou retrouve est remise en tat
+        // C'est que la souscription est ajoutée à la liste
+        // ou retrouvée est remise en état
         private static Subscription HandleSubscriptionRequest(BacnetClient sender, BacnetAddress adr, byte invoke_id, uint subscriberProcessIdentifier, BacnetObjectId monitoredObjectIdentifier, uint property_id, bool cancellationRequest, bool issueConfirmedNotifications, uint lifetime, float covIncrement)
         {
             //remove old leftovers

@@ -1,16 +1,16 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
-//S2010 rogram Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 
+//使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
 81 0B 00 0C 01 20 FF FF 00 FF 10 08
-//wifi 
+//wifi 版本，大于等于4  使用低延时300ms
 
 MSFLXGRD.MSM
 COMCAT.MSM
- 
+拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
 
 2025 01 13 
-1. Load progRM
+1. Load prog时 避免改变T3 ARM设备的Mac地址
 
 2024 02 22
 1. Fixed an issue where the transducer  could not change the temperature range
@@ -36,7 +36,7 @@ COMCAT.MSM
 2. T3000
 	2.1 Supports ESP32 version of XDucer (TBD, poor communication 50% loss)
 	2.2 Fixed the following situation: if DHCP is used to obtain Device IP, the next time T3000 connects to this device, when Setting is selected in the interface, it may trigger the wrong command to write IP address.
-	2.3 About CO2 dd new UI for Sensirion CO2 sensor RE-CALIBRATION.
+	2.3 About CO2 ，add new UI for Sensirion CO2 sensor RE-CALIBRATION.
 	2.4 Fixed an issue where the CO2 interface subnet mask and gateway action controls were opposite
 	2.5 Mass flash .Supports one button to automatically download the firmware of the selected device and update it one by one.Need to continue after closing T3000 software)
 
@@ -48,29 +48,29 @@ COMCAT.MSM
 5. ISP tool support load esp8266 bootloader
 
 2020 08 17
-1.putput8AI 
+1.修复在input和output界面 ，写入值时，会造成T3-22I以及T38AI8AO 重启的问题.
 
 2019 11 25
-1. abe
-2. creenEdit le 
-3. e
+1. 加入Yabe
+2. 修改ScreenEdit 当lable 很多时 ，根据数量动态 调整读取时间，并在退出时清空队列;
+3. 支持显示自定义的range
 
 2019 08 19
-1. Setting 
-2. ISP tool ifi 
-3. T3000 TSTAT10 WIFI  s P 
-4. odbus 485net 
-5. Schedule y Monday to Friday 
-6. TSTATAQ  multiple sensor 2 sensor ensor 
-7. 3000 s 
+1. Setting 界面分类显示
+2. ISP tool 支持wifi 设备烧写
+3. T3000 支持 TSTAT10 WIFI 连接 以及  通过RS485 使用 Modbus 和MSTP连接 ， 并处理好 协议之间的切换
+4. 通过Modbus 485能够访问 Bacnet 的大多数界面，部分没有对应寄存器的界面需切换协议才能访问
+5. 修复 Schedule 无法使用 Copy Monday to Friday 的功能， 对应操作 由双击 变更为单击.
+6. TSTATAQ  multiple sensor 支持 修改 CO2 sensor 以及PM sensor 的 开关时间 。
+7. 修改T3000 底层 接口函数，使得 T3000 能更顺畅的 和 两种协议 Bacnet 和Modbus 的设备通讯。
 
 
 2019 07 11
 1.Fixed program failure caused by lack of .net frame dynamic library files
-2.Fixing remote connection nnecessary prompts about IP addresses are not in the same network segment
-3.Remote connections can now be scanned to subdevices properly
+2.Fixing remote connection ，unnecessary prompts about IP addresses are not in the same network segment。
+3.Remote connections can now be scanned to subdevices properly。
 4.Devices connected via RS485 can also configure addresses normally.
-5.Unselectable when the device does not support certain ranges
+5.Unselectable when the device does not support certain ranges。
 6.Add email alarm user interface .(partly completed)
 7.All T3 modules can change bacnet device id.
 8.Fix the value display anomalies caused by coding and decoding errors in programming
@@ -99,65 +99,65 @@ T3000 Revisions for the software release of Apr 4, 2019
 
 
 2019 03 15
-1.odbus 
-2.O2 Node 
-3.O2 Net "Min Out Scale" "Max Out Scale" o manual TBD)
+1.修改modbus 底层库， 若服务器端强制断开连接 ，则主动去连接上次的ip和端口;
+2.修复CO2 Node 温度显示异常的问题，只从传感器上读取温度，不在从 内部板上读取;
+3.修复CO2 Net "Min Out Scale" "Max Out Scale" 无法写入值的问题; (Auto manual TBD)
 
 2019 03 13
-1.oad prg schedule 
-2.ustom Unit 
+1.修复Load prg schedule 不起作用的bug.
+2.修复Custom Unit 正反向 无法正常工作的问题.
 
 2019 03 08
-1.WMTRANDUCER output 
-2.Asix  am   
+1.修复PWMTRANDUCER output 个数显示有错误的问题;
+2.修复 Asix 的T3  整个program   大于10000 时， 提示客户 删除之前 无法继续编程;
 
 
 1. Fix the program bug "10 28AO5 = 3" when open again it show "10  = 3"
 
 2019 03 04
-1. program 
+1. 解决 program 读出来 存入prg文件 只存了1600个字节的问题;
 
 2019 03 01
-1. program ave  load  gram decode error
-2. ProgramEditDebug L.
-3. pdate 
+1. 解决 program 中  save  load  某些 program decode error的问题;
+2. ProgramEditDebug 中可以 显示 并更改 SCH ，HOL.
+3. 更新Update 引擎， 并自动在T3000中替换原有Update.exe 文件.
 
 
 2018 12 21
-1. ScreenEdit Sch  FF 
-2. AR1 AR2 CHcbo 
-3. BTU urcefile 
+1. ScreenEdit 中 Sch 以及Hol 可以显示 ON OFF 值
+2. AR1 AR2 动态加载至  SCH的 combo 中
+3. 新增 BTU 界面  创建 resourcefile 的文件夹 以后资源文件都放在这个文件夹下更新
 4. Zigbee Pan ID   for TSTAT8 
 
 2018 12 11
-1. O2 NET BUS_DEW_PT  
-2. O2  Output2  value
-3. Graphic view ,
+1. 修复CO2 NET 无法显示 MODBUS_DEW_PT  的值
+2. 修复CO2  Output2  value为负值的
+3. Graphic view 下面的时间刻度 整数化, 左右移动改25%.
 
 2018 11 27
-1. Setting Done 
-2. Setting Show LCD B 
-3. Monitor D
+1. Setting 界面 Done 不在修改IP
+2. Setting Show LCD 只有BB 有，其他的需要隐藏;
+3. Monitor 处新增 SD卡状态显示;
 
 2018 09 03
-1.TSTAT8  
+1.TSTAT8 输入根据 寄存器来判断 是否显示HUM CO2 和光强;
 
 2018 08 27
-1.TAT8
-2.
+1.加载或保存 TSTAT8的配置时 新增更多寄存器
+2.不在显示 初次加载TB 之类的对话框.
 
 
 1. Fix the program bug "10 28AO5 = 3" when open again it show "10  = 3"
 
 2018 05 29 
-1.T3T12 
-2.UM CO2 PRESSURE .
-3.mstp 
-4.Bacnet Tool 
-5.el
-6.etwork point bpanel  
-7.e 
-8.creen tput iable  to 
+1.T3系列 扩展IO支持 T3-PT12 
+2.支持更改名字  HUM CO2 PRESSURE .
+3.mstp 通讯参数修改.
+4.Bacnet Tool 改为非模态窗口, 支持多个窗口同时工作;
+5.解决在切换panel时 ， 哪一个program是选中状态需要重新获取.否则会读到其他不相关的 program
+6.修复network point 中 subpanel 为0 时 的显示问题.
+7.优化扫描，若设备没有Zigbee ，不再会进行此项扫描
+8.修复Screen 中 output 和variable  由 Auto 改为manual时  点击无法更改 digital 值的问题.
 
 1. Support using Temco Bacnet tool and T3000 at the same time
 2. Modify the Bacnet MSTP parameter to improve the communication.
@@ -167,13 +167,13 @@ T3000 Revisions for the software release of Apr 4, 2019
 
 
 2018 04 27
-1. igbee1 
+1. 没有Zigbee的设备 Com1 不允许修改 ，以免误导客户.
 
 
 2018 04 24 
-1.
-2.
-3. 
+1.修复 若保存Prg失败 却将以前的文件删除的问题.
+2.从时间服务器更新时间返回信息提醒.
+3.修复时间同步问题，包括改时区，夏令时 从470版本以后 用新的命令读写更新时间;
 
 
 1. ISP tool (Prompt message optimization)
@@ -184,14 +184,14 @@ T3000 Revisions for the software release of Apr 4, 2019
 6. optimize the custom experience when changing T3 controller's IP address.
 
 2018-0409 Update by Fance
-1.
-2.000 
-3.tom  rangeditalrange 
-4.3BB
+1.支持同时扫描
+2.开启T3000 默认进入的设备 由上次成功的连接决定.
+3.修复 在设置 custom  range是 digitalrange 意外弹出 的问题;
+4.在T3BB点击和电脑同步的时候 时区也一并同步 .
 
 2018-04-02  Update by Fance
-1. T3-6CTA BUS 485 
-2.  
+1. 支持 T3-6CTA 通过MODBUS 485 正常访问
+2. 串口  多线程同时扫描  ， 修改底层 动态库 。（改动较大）
 
 
 1.  The subpanel can be zero , ex:  1.0.VAR3
@@ -205,247 +205,247 @@ T3000 Revisions for the software release of Apr 4, 2019
 
 
 2018-0312 Update by Fance
-1.put output debug 
-2.TSTAT8  setpoint 
-3. T3000t 
-4. T3controller D 
+1.修复 部分 input output debug 模式无法正常弹出的问题
+2.修复 TSTAT8  setpoint ，现在修改值能够正常反应实际状态了.
+3. T3000的把车net 端口不在占用 标准的 47808端口了
+4. T3controller 增加 修改 LCD 显示 模式
 
 2018-0130 Update by Fance
-1.g 
-2.ubpanel 
-3.toorbarenu work el 
-4.minipanel P
-5. 
+1.在加载prg文件的时候，变更 修改 panel 的方式.
+2.支持subpanel 为0 ，以前跟main 一样.
+3.toorbar和menu 菜单 新增network 和panel 的图标.
+4.minipanel 优化修改 IP地址 ，优化等候方式及界面;有冲突的IP 不允许设置;
+5.当广播发送 收到 两个设备的IP地址冲突时，回弹出更改视窗，修改IP地址;
 
 2017-12-13 Update by Fance
-1.TP_MASTER.
-2.ist 
-3.
-4.Tstat Schedual ySetpoint NightSetpoint SleepSetpoint AwakeSetpoint
+1.串口二  支持  MSTP_MASTER.
+2.修复list 在利用鼠标移动时 有些list 显示的背景色杂乱无章的问题
+3.修复设备状态显示不正常的问题。
+4.Tstat Schedual 控制增加DaySetpoint NightSetpoint SleepSetpoint AwakeSetpoint
 
 2017-12-08 Update by Fance
-1. inipanelatcdule
-2. 
-3.T3000acnetois
-4.ut8
-5.inipanel ARM 0
+1. 新增Minipanel界面下 tstat的schedule界面
+2. 修复扫描时 对重复数据的处理
+3.T3000的bacnet不在应答whois
+4.解决 在22I的input界面往TSTAT8的input界面切换时始终无法切的问题。
+5.新增Minipanel ARM 版本的 com0口支持全波特率。
 
 2017 - 03 - 13 Update by Fance
-1. lete 
-2. rt by floor .
+1. 优化了在delete 树 产品时，重新加载 数据库  的问题.
+2. 解决掉sort by floor 代码bug.
 
 2017 - 02 - 23 Update by Fance
-1. inipanel 
-2. inipanel el
+1. 针对minipanel 菜单上的保存上次浏览的记录.
+2. 针对minipanel 重复panel的问题也修复了.
 
 2017 - 02 - 20 Update by Fance
-1. onitor input 
-2. custom table 
+1. 在monitor input 中 改变一项时，颜色闪烁
+2. custom table 限制不规则 表格
 
 2017 - 02 - 10Update by Fance
-1. do list 
+1. 毛列了接近40条的 to do list ， 吐槽下 登山包。
 
 2017 - 02 - 07 Update by Fance
 1. Add feature  extension I/O .
 
 2017 - 01 - 18 Update by Fance
 1. Merge code finished . 
-2. range edit
+2. 修复 range edit填入数字引起的问题.
 
 2017 - 01 - 16 Update by Fance
-1. Fix 0
-2. nd log ital 
+1. Fix 编程代码超过2000的时候会出问题...
+2. 进一步优化Trend log 里面 digital 个数 显示的位置.
 
 2017 - 01 - 16 Update by Fance
-1. Var custmer units 
-2. PRG 
-3. creen edit 
+1. 增加 Var custmer units 客户自定义的 单位.
+2. PRG 存成第六版 。存入这个单位.
+3. 修复screen edit 中 操作数据库崩溃的问题.
 
 2017 - 01 - 12 Update by Fance
-1. put 
+1. 修复在input 界面跳转至其他设备住界面时  界面覆盖的问题;
 
 2017 - 01 - 10 Update by Fance
-1. bacview is 
-2. bac setting 
-3. ac 
-4. PID 
+1. 修复 bacview 中whois 反复发送的问题
+2. 修复 bac setting 时间控件焦点问题
+3. 改善Bac 操作UI ，支持所有窗口 双击标题栏 放大 缩小.
+4. PID 增加时间 积分参数.
 
 2017 - 01 - 7 Update by Fance
-2. rendlog ading 
-3. PT12 RangeDI 
+2. 在trendlog 界面加入Loading 图标.
+3. PT12 Range支持 DI 输入.
 
 2016 - 12 - 19 Update by Fance
-1. gram
+1. 修复一个program里面 变量超过100个 就编译无法通过的问题;
 
 2016 - 12 - 15 Update by Fance
-1. ogram ME-ON OFF  ) 
+1. 解决在program 时 TIME-ON 或者 TIME-OFF  个数超过30个以上后 TIME-ON( ) 里面的的值显示异常的问题;
 
 2016 - 12 - 14 Update by Fance
-1. rogram 0 ;
+1. 修改program 里面的时间  12：30  传值为1250.000;
 
 2016 - 12 - 12 Update by Fance
-1. ug Setting
+1. 修复bug Setting将 
 
 2016 - 12 - 02 Update by Fance
-1. ISP slove 
+1. ISP slove 界面恢复初始.
 
 2016 - 12 - 01 Update by Fance
-1. SP tool 
-2. rendlog ital 
-3. rm 
-4. P_SLOVE D
+1. 解决ISP tool 通过网络可能将A 的固件烧入B 的问题;
+2. 在Trendlog 里面 的digital 不在叠加在一起，错开显示,并在最前面显示Label.
+3. 修复 在Alarm 界面 由于接收到的时间错误引起的  弹窗  参数错误的问题.
+4. 加入自动关闭 ISP_SLOVE 窗口 和 ID重复窗口.
 
 2016 - 11 - 22 Update by Fance
-2.  nput 
-3. Download file 
-4. STAT Scan , el 
-5. Update.exe 
+2.  修改input 的扩展属性的显示
+3. Download file 中修改  自动烧写 解决设备一直在isp中的问题.
+4. 修改TSTAT Scan , 需要选择是否扫描Minipanel 下面的所有口的 各个波特率;
+5. Update.exe 中加入 默认更新完成后打开T3000.
 
 2016 - 11 - 04 Update by Fance
-1. Settingdate 3ng 
-2. 
+1. Setting界面点击update 3秒后自动刷新 setting 界面
+2. 新增解决id冲突的显示界面.
 
 2016 - 10 - 10 Update by Fance
-1.anelt.
+1.修复针对T3的，如果minipanel界面在output 切换到T3时界面也要在output ，同理input.
 2016 - 09 - 09 Update by Fance
-1. Bacnet view Setting UI , 
-2. Downloadfile 5
+1. Bacnet view Setting UI , 哪些下拉菜单  只有下拉功能，去掉编辑功能;
+2. Downloadfile 里面 传文件的 包大小  改为3.5K ，大大加快传输效率;
 
 
 2016 - 09 - 07 Update by Fance
-1. ut 
-2. reen re.
-3. 3  output.
-4. Trend Log Y
+1. 在其他设备的input 界面时,如果点击TSTAT的设备，需要跳转至TSTAT的input 界面.
+2. 允许删除screen 里面的picture.
+3. 支持T3 在多个设备之间切换INPUT , output.
+4. Trend Log Y轴 取整.
 
 2016 - 07 - 05 Update by Fance
-1. inipanel  
-2.   F 55 ni
-3. nge
+1. 修复minipanel 时区与电脑时区不一致 引起的 trendlog 无法正常显示的问题;
+2. 在点击扫描的时候 ， 发送 FF 55 FF 55 命令，让Minipanel 立刻去扫描下面的 设备;
+3. 在选择range的时候 打开界面默认要选中字符串，以供客户修改;
 
 2016 - 06 -23 Update by Fance
-1. 
-2. 
+1. 树形结构里面支持鼠标移动，修复以前那种选中的设备无法正常选中的问题;
+2. 修复扫描到的设备如果设备名称包含 "'" 这种数据库关键字  就崩溃的问题;
 
 2016 - 06 -14 Update by Fance
-1. Settinging 
-2. IP
-3. BB 
-4. Building 
-5. ScreenEdit  icon.
-6. Analog custom tabel nput 
-7. c
+1. Setting里面也存入prg文件 ，Setting 界面微调 位置;
+2. IP冲突的界面微调位置和显示的label.
+3. 不回广播的T3-BB 在线状态 不受 广播的影响;
+4. Building 里面输入序列号后，保存起来;
+5. ScreenEdit 里面 客户满意手动选择icon的时候用 default icon.
+6. Analog custom tabel 在input 界面显示其单位.
+7. 修复一个线程里面删数据库 可能由于vector 引起的 崩溃问题;
 
 2016 - 06 - 03 Update by Fance
-1. rend log graphic 
+1. 修改Trend log graphic 宽度, 在绝大部分显示器上能显示完全;
 
 2016 - 06 - 01 Update by Fance
-1. program edit to definition ,
-2. edit debug ar;
-3. 
-4. 
-5. Graphic Zoom in /Zoom out 
-6. Graphic  rg1 
+1. program edit 界面增加右键 goto definition ,可以查看 当前的value
+2. edit 的 debug 界面查看当前值 加入自动刷新 仅限 out in var;
+3. 优化扫描网络设备时 数据库有的之前会先删掉, 不合适;
+4. 修复 数据库更新时引起的  产品列表丢失;
+5. 修复 Graphic Zoom in /Zoom out 不连续的问题;
+6. Graphic  加入prg1 后  在锁定的情况下，点击能进入编程界面;
 2016 - 05 - 31 Update by Fance
-1. Graphic 
+1. Graphic 右键在绘图区域点击 会显示当前的值;
 
 2016 - 05 - 30  Update by Fance
-1. Output PWM tal
-2. 
+1. Output PWM 周期 在选择digital的时候 禁止改动 wpm 周期这一列;
+2. 删除一些不用的屏蔽代码;
 
 2016 - 05 - 27 Update by Fance
-1. Variable range  time 00:00 -> 00:00:00
+1. Variable range  time 由 00:00 -> 00:00:00
 
 2016 - 05 -26 Update by Fance
-1.
-2.Settingp
-3.Building te device; remote 
-4.Graphic igital 
-5.Graphic 
+1.不同网段修改IP 成功后，立即更新数据库;
+2.Setting里面Ip修改完毕后夜立即修复数据库;
+3.Building 里面 区别处理remote device; remote 和本地的 不同时显示;
+4.Graphic 修复digital 部分如果在 选定时间内没有点就不划线，现在改为 划此前点的 值;
+5.Graphic 最上端增加显示 X轴的刻度; 修复X轴 时间 按10秒取整;
 
 2016 - 05 - 23 Update by Fance
-1. Cus Analog range 
+1. Cus Analog range 增加 单位显示和修改;
 
 2016 - 05 - 19 Update by Fance
-1. tatus bar 
-2. o 
+1. 修改Status bar 置顶的时候产生的 覆盖新窗口的问题;
+2. 增加 远程连接temco 服务器的功能 ，未完全测试通过;
 
 2016 - 05 - 11 Update by Fance
-1.T3 -22i 1-11nput high speed count 
+1.T3 -22i 1-11的input 增加 high speed count 功能.
 
 2016 - 05 - 10 Update by Fance
-1.Bacnet Setting  e update 
-2.input output u
+1.Bacnet Setting  中 加入time update 最后更新的时间.
+2.修复 input output 点击menu时 重新加载缓存文件 引起的 表格数据 异常.
 
 2016 - 05 - 04 Update by Fance
-1.bject instance;
-2.
-3.
+1.支持更改 object instance;改为4个字节
+2.重写 后台扫描函数;
+3.后台扫描自动删除重复序列号的 设备;
 
 2016 - 04 - 29 Update by Fance
-1. Output table 
-2. Range ON/OFF F/ON o button 
+1. 解决 Output table 宽度 显示 太长;
+2. Range 里面 ON/OFF 和 OFF/ON 用两个 radio button 来表示; 并且 修复 客户自定义的 在第一次的时候自动读取;
 
 2016 - 04 - 28 Update by Fance
-1. Program IT 
-2. SP  
+1. 修改 Program 中 WAIT 函数 ;
+2. 修复ISP  误烧写 .
 
 2016 - 04 - 25 Update by Fance
-1. SP ark 
+1. 修复ISP 烧写的时候提示 不匹配的bug . mark 住了 最早以前的  ISP 的 部分;
 
 2016 - 04 - 22 Update by Fance
-1.
-2.
+1.支持旧版的T3 ，判断版本号 ，旧版就进入旧版的界面.
+2.解决扫描的时候 会判断读multy的线程 引起 后台不扫描的bug
 
 2016 - 04 - 21 Update by Fance
-1. nipanel 
-2. raphic 4label 
+1. 支持在minipanel 界面显示
+2. 调整graphic 界面的 大小, 将14个 input label 位置调整至左边，支持更小分辨率的客户.
 
 2016 - 04 - 19 Update by Fance
-1. ogram debug rt
-2. abel 
-3. ebug acnet 
+1. 修复在program debug 界面下 按insert键后  新串口的 列错位的问题;
+2. 修复label 的第一个字符如果是数字 引起的 program里面 解析 认为是 远程的点的问题，导致 Var1 显示为1.0.var1
+3. 在debug 界面加入 bacnet 的 数据调试信息;
 
 
 2016 - 04 -14 Update by Fance
-1. larmlog 
+1. 修复alarmlog 私有的数据 赋值时 的bug.
 
 2016 - 04 -11 Update by Fance
-1. Controller 
+1. Controller 的刷新时间改为4s 一次.
 
 2016 - 04 - 07 Update by Fance
-1. Input utput anel 
-2. end log 
+1. Input 和Output 加入panel 两列 如果是扩展的就要写n-m.
+2. 小改动，trend log 右移后提示.
 
 2016 - 04 - 06 Update by Fance
-1. Graphic  
-2. unit 
-3. oad prg 
-4. Output O
-5. HAND_AM to output 
+1. Graphic 按照老毛的 要求  把下面14个改成双行的.
+2. 修复 unit 的问题，获取不到unit 的时候就从 其他data 那获取;
+3. 在load prg 之后 
+4. Output 扩展的最高位 区分是DO 还是AO
+5. HAND_AM 如果不是Auto output 就全部显示红色.
 
 2016 - 03 -30 Update by Fance
-1. Monitor  
-2. Range utput nge .
-3. Graphic abel 
-4. Setting 
-5.  
+1. Monitor 删掉  时间限制 ，只要On 就开始记录.
+2. Range 在output 里添加一个 模拟的PWM range .
+3. Graphic 显示label 和单位 在左边的 树那里.
+4. Setting 里面略微调整界面.
+5. 所有协议只有Auto ，不管客户选什么协议都能搜到除了远程的和MSTP的设备.
 
 2016 - 03 - 19 Update by Fance
-1. reeview 
+1. 修复treeview 产品 状态显示的问题;
 
 2016 - 03 - 18 Update by Fance
-1. acnet settingdbus ID.
+1. 在bacnet setting界面 加入 modbus ID.
 
 2016 - 03 - 17 Update by Fance
 //Fix the bugs which make the program crash when start up.
-//
+//原因是由 自动进入上一次的界面引起的;
 
 2016 - 03 - 16  Update by Fance
 //Merge Code.
 
-//minipanel 
-//  9800	-	9999    200 setting
+//minipanel 寄存器表
+//  9800	-	9999    200个寄存器   setting
 //  10000	-   11471   1472		  OUT
 //  11472   -   12943   1472		  IN
 //	12943   -   15502	2560		  VAR					sizeof(Str_variable_point)= 39
@@ -456,66 +456,66 @@ T3000 Revisions for the software release of Apr 4, 2019
 
 
 //  32712   - 32753		 14*16 =224								sizeof(Str_controller_point)	= 28						
-1.
+1.在下载界面加入 固件文件夹。
 2.Download hex or bin  file name change to 40 bytes.
 
 2016 - 03 - 04 Update by Fance
-1.ISP SP 
+1.ISP 修改显示 ISP 的 对话框 引起的 烧写网络 速度过快引起的 烧写中断的问题.
 
 
 2016 - 03 -01 Update by Fance
-1..
+1.自动连接服务器下载Hex代码.
 
 2016 - 02 - 24 Update by Fance
-1.
+1.修复当点击产品时，产品树 状态显示不正常的问题;
 
 2016 - 1 -11 Update by Fance
-1. T3dbus nel 
-2. 
+1. T3需要加Modbus 寄存器 还要和minipanel 界面一样,要求先 加Minipanel 的 寄存器 ，建立一个数据库和T3对应起来.
+2. 改改改 ，艹 ， 困的要死.
 
 2016 - 1 - 8 Update by Fance
-1. Setting ealth alu
-2. r 
+1. Setting 里面增加 health ，新的窗口显示各个TX RX的 value.
+2. 增加一个 结构，和monitor 一样 ，用于在grp 里面存储 图片;
 
 2016 - 1 - 5 Update by Fance
-1. Input external show T3 
+1. Input external show T3 加入两个新的T3 模块的产品号.
 
 2016 - 1 - 5 Update by Fance
-1.  Big  input27 - 32  small 11 - 16  tiny 6 - 11 range n
+1.  Big  input27 - 32  small 11 - 16  tiny 6 - 11 range 里面有高速脉冲.  其他的 设置此range 都是低速脉冲;
 	Add Analog input range -> Low speed count;
 
 2016 - 1 - 4 Update by Fance
-1. 
+1. 吐槽下一月份 每个周六都要上班 ，操蛋.
 
 2015 - 12 - 29 Update by Fance
-1. nput output 
+1. 修复Input output 中关于 T3 扩展 无法正常显示的Bug.
 
 2015 - 12 - 21 Update by Fance
-1. 
-2. 
-3. 
-4.  Fix Bacnet Setting P Auto 
+1. 修复不同网卡下面 无法正常访问的问题.
+2. 修复刷新树形产品时，先显示默认label，在显示真实label的问题;
+3. 开启时检测防火墙是否打开，若打开了，提示客户关闭防火墙.
+4.  Fix Bacnet Setting 中IP Auto 写入问题; 
 
 2015 - 12 - 10 Update by Fance
-1. Bacnet Screen  ,
-2. Screen 
+1. Bacnet Screen  ,上下左右移动.
+2. Screen 选择图片的时候 由单机改为双击.
 
 2015 - 12 - 08  Update by Fance
-1. Program IDE 
-2. Program IDE color fault value.
+1. Program IDE 大写小强制控制键盘输入
+2. 更改 Program IDE color 的 default value.
 3. Add new toolbar .Home.
-4. Program 2000
-5. Trend log 
-6. Trend log 
+4. Program 超过 2000个字节时不在溢出.给出超出提示;
+5. Trend log 在有大部分数据要读时，优先只读最近的数据。然后在后台读取剩余的;
+6. Trend log 在后台加范围 ， 用于过滤不合理的值;
 
 
 2015 - 11 - 17 Update by Fance
-1. program IDE debug window , 
-2. raphic window raphic 
+1. 修复 program IDE debug window , 因 切换时间控件的焦点引起的 值不正确的BUG;
+2. 在graphic window 最小化时 再次点击show graphic 时 ，会自动最大化;
 
 
 2015 - 11 - 16 Update by Fance
-1. phic 
+1. 修复 在graphic 中 不选中部分input 的时候 ，在切换X轴的时间 不响应此动作的bug.
 
 2015 - 11 - 12
 1. Fix trend log analog value graphic line mess.
@@ -776,10 +776,10 @@ Update by Fance
 Update by Fance
 1. Improve the quality of communication. 
 2. Improve the network scan feature.
-3. T3000 will scan device via serial port with baud rate both 600d 00re we only use 19200.
+3. T3000 will scan device via serial port with baud rate both “9600” and “19200”.Before we only use 19200.
 4. Add feature user can add device not through the scan command.
 5. Bacnet programming feature support both lower-case and upper-case now.
-6. All the Bacnet list (input/output/, it will auto scroll, when user press up or down , the list item will automatically up and down.
+6. All the Bacnet list (input/output/…), it will auto scroll, when user press up or down , the list item will automatically up and down.
 7. Hide the graphic useless button. Add button feature to load factory default.(For Bacnet device)
 8. Improve code to support read TSTAT6 through Zigbee module. Now it read smoothly.
 
@@ -977,7 +977,7 @@ CDialog_Progess *WaitRead_Data_Dlg=NULL;
 extern CBacnetScreenEdit * ScreenEdit_Window;
 bool m_is_remote_device = false;
 HANDLE hconnect_modbus_thread = NULL;
-static int old_selected_item = WINDOW_PROGRAM; // 
+static int old_selected_item = WINDOW_PROGRAM; // 用于保存 上一个选中的 TAB; 用于 快捷键的操作;
 extern CBacnetAlarmWindow * AlarmWindow_Window;
 CBacnetProgramEdit *ProgramEdit_Window = NULL;
 CBacnetScheduleTime *ScheduleEdit_Window = NULL;
@@ -985,22 +985,22 @@ AnnualRout_InsertDia *HolidayEdit_Window = NULL;
 //define a dialg for new program ide 
 ControlBasicEditorView *ProgramNEWEdit_Window = NULL;
 extern char mycode[2000];
-int click_resend_time = 0;//
-int load_prg_cache_ret = 0; //
+int click_resend_time = 0;//当点击的时候，要切换device时 发送whois的次数;
+int load_prg_cache_ret = 0; //读取缓存文件的状态；
 // CDialogCM5_BacNet
 CString IP_ADDRESS;
 _Refresh_Info Bacnet_Refresh_Info;
 CString remote_ip_address;
-extern tree_product selected_product_Node; // 
-extern CString SaveConfigFilePath; //
+extern tree_product selected_product_Node; // 选中的设备信息;
+extern CString SaveConfigFilePath; //用来将资料存放至数据库，临时文件的存放目录;
 
 extern SOCKET my_sokect;
 extern bool show_user_list_window ;
-HANDLE connect_mstp_thread = NULL; // TP
-HANDLE read_rs485_thread = NULL; // RS485
-HANDLE write_indb_thread = NULL; //
-int connect_way = 0;  // 1 ODBUS RS485    2 MODBUS TCP
-HANDLE hbip_whois_thread = NULL; // am 
+HANDLE connect_mstp_thread = NULL; // 当点击MSTP的设备时开启 连接的线程;
+HANDLE read_rs485_thread = NULL; // RS485的设备 通用;
+HANDLE write_indb_thread = NULL; //将资料写入数据库的线程;
+int connect_way = 0;  // 1 为MODBUS RS485    2 为 MODBUS TCP
+HANDLE hbip_whois_thread = NULL; //处理回复 I am 线程
 
 extern vector <int>  m_Input_data_instance;
 extern vector <int>  m_Output_data_instance;
@@ -1090,7 +1090,7 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 	unsigned int next_lower_station_num = 0;
 	unsigned int next_higher_station_num = 255;
 	int next_index = -1;
-	//el  
+	//获取目前的panel  ， 如果是向上键就 返回 上一个 panel;
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 
 	if(temp_direction == LIST_UP)
@@ -1105,7 +1105,7 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 				continue;
 			}
 
-			if(pFrame->m_product.at(i).status == false)//nel 
+			if(pFrame->m_product.at(i).status == false)//下一个panel 不在线 就继续寻找下一个;
 			{
 				continue;
 			}
@@ -1132,7 +1132,7 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 				continue;
 			}
 
-			if(pFrame->m_product.at(i).status == false)//nel 
+			if(pFrame->m_product.at(i).status == false)//下一个panel 不在线 就继续寻找下一个;
 			{
 				continue;
 			}
@@ -1405,7 +1405,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			}
 			if(bac_read_which_list == BAC_READ_CUSTOMER_UNITS)
 			{
-				read_customer_unit = true;	//
+				read_customer_unit = true;	//标志已经读过 单位了 不必再读，旧版本的设备 可能读不到;
 				if(bac_customer_unit_read_results)
 				{
 					CBacnetCustomerDigitalRange Dlg;
@@ -1629,7 +1629,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			{
 				if(bac_weeklycode_read_results)
 				{
-					//
+					//显示非模态对话框;
 					if(ScheduleEdit_Window != NULL)
 					{
 						delete ScheduleEdit_Window;
@@ -1640,7 +1640,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
                     {
                         if(GetPrivateData_Blocking(g_bac_instance, READ_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line, sizeof(Str_schedual_time_flag))< 0)
                         {
-                             //odbusl 
+                             //对modbus下 没有读取到flag 情况 , 将 flag 默认为 1 ，如果00:00 则默认不显示;
                             for (int x = 0; x < 8; x++)
                             {
                                 for (int y = 0;y < 9; y++)
@@ -1768,7 +1768,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					bac_read_which_list = -1;
 					bac_programcode_read_results = false;
 
-					//
+					//显示非模态对话框;
 					if(ProgramEdit_Window != NULL)
 					{
 						delete ProgramEdit_Window;
@@ -1794,7 +1794,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				bac_read_which_list = -1;
 				bac_programcode_read_results = false;
 
-				//
+				//显示非模态对话框;
 				if (ProgramNEWEdit_Window != NULL)
 				{
 					delete ProgramNEWEdit_Window;
@@ -2037,7 +2037,7 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].invoke_id)
 				Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].task_result = false;
 		}
-		g_progress_persent = 0 ; // 
+		g_progress_persent = 0 ; // 只要有一个读写失败 任务就会中断 ， 进度条就清零;
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 
@@ -2093,7 +2093,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	GetParentFrame()->RecalcLayout();
 	ResizeParentToFit();
 
-	//ab Control
+	//为Tab Control增加两个页面;
 	m_bac_main_tab.InsertItem(WINDOW_INPUT, _T("&Input   "));
 	m_bac_main_tab.InsertItem(WINDOW_OUTPUT, _T("&Output   "));
 	m_bac_main_tab.InsertItem(WINDOW_VARIABLE, _T("&Variable   "));
@@ -2124,7 +2124,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_USER_LOGIN] =  User_Login_Window = new CBacnetUserlogin;
 	pDialog[WINDOW_REMOTE_POINT] =  Remote_Point_Window = new CBacnetRemotePoint;
 	pDialog[WINDOW_ARRAY] = Array_Window = new CBacnetArray;
-	//
+	//创建两个对话框;
 #if 0
 	Input_Window->Create(IDD_DIALOG_BACNET_INPUT, &m_bac_main_tab);
 	Output_Window->Create(IDD_DIALOG_BACNET_OUTPUT, &m_bac_main_tab);
@@ -2157,7 +2157,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	Setting_Window->Create(IDD_DIALOG_BACNET_SETTING,this);
 	Array_Window->Create(IDD_DIALOG_BACNET_ARRAY, this);
 #endif
-	//b
+	//设定在Tab内显示的范围;
 	CRect rc;
 	m_bac_main_tab.GetClientRect(rc);
 	rc.top -= 400;
@@ -2177,10 +2177,10 @@ void CDialogCM5_BacNet::Tab_Initial()
 	}
 
 	//CRect temp_mynew_rect
-	//::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//view
+	//::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 	//MoveWindow(temp_mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
 
-	//
+	//显示初始页面
 	pDialog[WINDOW_INPUT]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_OUTPUT]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_VARIABLE]->ShowWindow(SW_HIDE);
@@ -2197,10 +2197,10 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_REMOTE_POINT]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_ARRAY]->ShowWindow(SW_HIDE);
     g_hwnd_now = m_input_dlg_hwnd;
-	//Input_Window->m_input_list.SetFocus(); 
+	//Input_Window->m_input_list.SetFocus(); 暂时屏蔽 避免焦点切换导致无法F2变更名字;
 
 	SetTimer(BAC_RESET_WINDOW_TIMER,10,NULL);
-//
+//保存当前选择
 //	m_CurSelTab = WINDOW_INPUT;
 
 }
@@ -2243,8 +2243,8 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 		{
 			DWORD len = file.GetLength();
 			char* Buf = new char[len + 1];
-			Buf[len + 1] = 0;  //0
-			file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufBufnCount
+			Buf[len + 1] = 0;  //0ÖÕÖ¹×Ö·û´®£¬ÓÃÓÚÊä³ö¡£
+			file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufÊÇÓÃÓÚ½ÓÊÕ¶ÁÈ¡µ½µÄÊý¾ÝµÄBufÖ¸ÕënCountÊÇ´ÓÎÄ¼þ¶ÁÈ¡µÄ×Ö½ÚÊý
 			file.Close();
 			CString temp_cs;
 			MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, tmpString.GetBuffer(len), len);
@@ -3280,11 +3280,11 @@ Not able to read Property list of BACnet Device,\r\nThis may be due to a connect
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
-    //SEND_COMMAND_DELAY_TIME = 1000; //
+    //SEND_COMMAND_DELAY_TIME = 1000; //测试
 
 
     str_bacnet_rp_info temp_test2;
-	g_bPauseMultiRead = true; // nipanel
+	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 
 	if ((g_protocol!=PROTOCOL_BACNET_IP) && 
         (g_protocol != MODBUS_BACNET_MSTP)  && 
@@ -3317,7 +3317,7 @@ void CDialogCM5_BacNet::Fresh()
 	already_retry = false;
  	read_write_bacnet_config = false;
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	if(last_serial_number != selected_product_Node.serial_number) //label;
+	if(last_serial_number != selected_product_Node.serial_number) //如果上次的设备不是一样的就需要重读 Graphic label;
 	{
 		last_serial_number = selected_product_Node.serial_number;
 		need_read_bacnet_graphic_label_flag = true;
@@ -3386,7 +3386,7 @@ void CDialogCM5_BacNet::Fresh()
 		
 	}
 	else if(selected_product_Node.protocol == PROTOCOL_GSM)
-	//if(0)	//GSM
+	//if(0)	//GSM连接
 	{
 		Gsm_communication = true;
 		g_bac_instance = selected_product_Node.hardware_version;
@@ -3448,7 +3448,7 @@ void CDialogCM5_BacNet::Fresh()
 
             TempDlg.DoModal();
         }
-        Variable_Window->SetTimer(1, 10000, NULL);  //TP
+        Variable_Window->SetTimer(1, 10000, NULL);  //如果是MSTP协议不要刷新的那么频繁;
         Input_Window->SetTimer(1, 10000, NULL);
         Output_Window->SetTimer(1, 10000, NULL);
 
@@ -3465,15 +3465,15 @@ void CDialogCM5_BacNet::Fresh()
 		set_datalink_protocol(2);
 		Initial_bac(g_gloab_bac_comport,_T(""), g_gloab_bac_baudrate);
 		if(g_bac_instance>0)
-			Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 H  
+			Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 防止频繁的发送 全局WHOIS  干扰 一大批设备的应答;
 			//Send_WhoIs_Global(-1, -1);
 
 
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
-		//SetTimer(BAC_TIMER_2_WHOIS,20000,NULL);//
+		//SetTimer(BAC_TIMER_2_WHOIS,20000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 		return;
 	}
-	//else if((selected_product_Node.protocol == MODBUS_RS485) && (selected_product_Node.NetworkCard_Address.IsEmpty()))  // 2020 07 23 
+	//else if((selected_product_Node.protocol == MODBUS_RS485) && (selected_product_Node.NetworkCard_Address.IsEmpty()))  // 2020 07 23 修改 在手动加入设备后，因为以前网络曾经扫描过，所以报错网络无法连接;
     else if (selected_product_Node.protocol == MODBUS_RS485) 
 	{
 
@@ -3539,8 +3539,8 @@ void CDialogCM5_BacNet::Fresh()
     }
     else
     {
-        receive_customer_unit = true;  // an
-        //t 
+        receive_customer_unit = true;  // 虚拟设备很多地方判断是否有接收到了  客户的自定义range
+        //虚拟设备也需要初始化bacnet 的相关参数;
         if (!bac_net_initial_once)
         {
             bac_net_initial_once = true;
@@ -3555,7 +3555,7 @@ void CDialogCM5_BacNet::Fresh()
 
 	//
 	//SetTimer(1,500,NULL);
-	//SetTimer(BAC_TIMER_2_WHOIS,180000,NULL);//
+	//SetTimer(BAC_TIMER_2_WHOIS,180000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 	SetTimer(BAC_TIMER_3_CHECKALARM,1000,NULL); //Check whether need  show Alarm dialog.
 
 	BacNet_hwd = this->m_hWnd;
@@ -3589,7 +3589,7 @@ void CDialogCM5_BacNet::Fresh()
     }
 #endif
 	int ret = 0;
-	if (ValidAddress(nconnectionip)==FALSE)  // C
+	if (ValidAddress(nconnectionip)==FALSE)  // 验证NC的IP
 	{
 
 		CString StringIP;
@@ -3607,7 +3607,7 @@ void CDialogCM5_BacNet::Fresh()
         else
             MODE_SUPPORT_PTRANSFER = 0;
         ret = 1;
-        if (MODE_SUPPORT_PTRANSFER != 1)  //Ptransfer 08;
+        if (MODE_SUPPORT_PTRANSFER != 1)  //Ptransfer 模式下直接用47808端口访问 T3或者带Wifi的设备;
         {
             for (int i = 0;i<3;i++)
             {
@@ -3644,12 +3644,12 @@ void CDialogCM5_BacNet::Fresh()
 		int temp_mac;
 		int multy_ret = 0;
 		unsigned short temp_buffer[72];
-        //if (selected_product_Node.protocol != PROTOCOL_BIP_TO_MSTP)  // oinstance
+        //if (selected_product_Node.protocol != PROTOCOL_BIP_TO_MSTP)  //这玩意的话 不用 校准 obj instance
         {
             ::PostMessage(MainFram_hwd, MY_RX_TX_COUNT, 1, 0);
             memset(temp_buffer, 0, 5);
             multy_ret = Read_Multi(g_tstat_id, temp_buffer, 32, 72, 5);
-			if (multy_ret == -12)//is
+			if (multy_ret == -12)//因为没有回复whois，可能设备的bacnet任务挂掉了
 			{
 				int nret = Open_Socket_Retry(nconnectionip, nport);
 				if (nret <= 0)
@@ -3667,7 +3667,7 @@ void CDialogCM5_BacNet::Fresh()
 					temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
 
 					int is_local_temco_net = GetPrivateProfileInt(_T("Setting"), _T("LocalTemcoNet"), 0, temp_db_ini_folder);
-					if (is_local_temco_net) //Temco dg
+					if (is_local_temco_net) //Temco 本地局域网 显示debug窗口 用于工程师调试信息;
 					{
 						CShowMessageDlg dlg;
 						CString temp_message;
@@ -3768,10 +3768,10 @@ void CDialogCM5_BacNet::Fresh()
 					bacnet_device_type = PRODUCT_CM5;
 			}
 	
-            if ((selected_product_Node.nhardware_info & 0x02) == 2) //it1 
+            if ((selected_product_Node.nhardware_info & 0x02) == 2) //判断bit1 是否含有wifi模块;
             {
                 ;
-                //
+                //这里需要读取wifi部分的版本号  用来判断 延时采用多少合适;
             }
 
 		memset(&m_temp_output_data,0,BAC_OUTPUT_ITEM_COUNT * sizeof(Str_out_point));
@@ -3806,7 +3806,7 @@ void CDialogCM5_BacNet::Fresh()
 				WaitRead_Data_Dlg = 0;
 			}
 			WaitRead_Data_Dlg = new CDialog_Progess(this,1,100);
-			//
+			//创建对话框窗口
 			WaitRead_Data_Dlg->Create(IDD_DIALOG10_Progress, this);
 			WaitRead_Data_Dlg->ShowProgress(0,0);
 
@@ -3900,7 +3900,7 @@ void CDialogCM5_BacNet::Fresh()
 				g_llerrCount ++;
 				bac_select_device_online = false;
 			}
-			else//umber
+			else//更新数据库;如果是通过modbus扫描到得bacnet设备，因为不知道它的instance ID和panel number.所有读到后更新数据库;
 			{
 				bac_gloab_panel = g_mac;
 				if((g_bac_instance != temp_instance) || (g_mac != temp_mac))
@@ -3960,7 +3960,7 @@ void CDialogCM5_BacNet::Fresh()
 		bac_select_device_online = false;
         for (int x = 0; x < 5; x++)
         {
-            selected_product_Node.status_last_time[x] = false;//
+            selected_product_Node.status_last_time[x] = false;//没有读到的话就将左边的list和状态都设置为false;
         }
 
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,CONNECT_TO_MODBUS_FAILED,0);
@@ -4114,7 +4114,7 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
         }
             
 		button_click = lParam;
-		tsm_free_all_invoke_id();// ID 
+		tsm_free_all_invoke_id();//每次点击的时候都将所有INVOKE ID 清零;
 		if(button_click == WRITEPRGFLASH_COMMAND)
 		{
 			WriteFlash();
@@ -4127,7 +4127,7 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 		break;
 	case TYPE_SVAE_CONFIG:
 		read_write_bacnet_config = true;
-		tsm_free_all_invoke_id();// ID 
+		tsm_free_all_invoke_id();//每次点击的时候都将所有INVOKE ID 清零;
 		Show_Wait_Dialog_And_SendMessage(TYPE_SVAE_CONFIG);
 		break;
 	default: 
@@ -4228,7 +4228,7 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 
 
 
-//ve 
+//阻塞方式的读  还有保存prg save 公用此功能; 2019 03 22
 DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 {
 	
@@ -4245,7 +4245,7 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 		//if(m_is_remote_device)
 		//	Send_WhoIs_remote_ip(remote_ip_address);
 		//else
-		//	Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 H  
+		//	Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 防止频繁的发送 全局WHOIS  干扰 一大批设备的应答;
 		//	//Send_WhoIs_Global(-1, -1);
 		//Sleep(1000);
 		for (int i=0;i<(int)m_bac_handle_Iam_data.size();i++)
@@ -4263,7 +4263,7 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 			if (m_is_remote_device)
 				Send_WhoIs_remote_ip(remote_ip_address);
 			else
-				Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 H  
+				Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 防止频繁的发送 全局WHOIS  干扰 一大批设备的应答;
 				//Send_WhoIs_Global(-1, -1);
 			Sleep(1000);
 		}
@@ -4359,7 +4359,7 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 				PostMessage(BacNet_hwd,WM_SHOW_PANELSTRING,0,(LPARAM)(temp_cstring));
 				
 				//TRACE(_T("Read Setting %d ok!\r\n"),i);
-				g_bac_need_read_setting = false;	//npu
+				g_bac_need_read_setting = false;	//读过一次后 就不用在读了，下次点击Input 就直接读Input;
 			}
 		}
 
@@ -5093,7 +5093,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 
 	for (int i=0;i<BAC_TIME_COMMAND_GROUP;i++)
 	{
-		//ting meing
+		//如果是在读Setting 界面的时候也要同时读 Time，因为time在setting界面值;
 		if((bac_read_which_list == BAC_READ_TIME_COMMAND) ||(bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND)|| (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG))
 		{
             CString temp_cs_show;
@@ -5294,7 +5294,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             }
             Sleep(SEND_COMMAND_DELAY_TIME);
 
-			g_output_support_relinquish = 0; //elinquish 
+			g_output_support_relinquish = 0; //删除relinquish 
 		}
 		if (bac_read_which_list == BAC_READ_OUTPUT_LIST)
 		{
@@ -5641,7 +5641,7 @@ part_success:
 	{
 		for (int z=0;z<BAC_PROGRAM_ITEM_COUNT;z++)
 		{
-			memset(program_code[z],0,2000);		 //
+			memset(program_code[z],0,2000);		 //清零;
 
             for (int x = 0;x < 5;x++)
             {
@@ -5740,7 +5740,7 @@ void CDialogCM5_BacNet::WriteFlash()
     CString temp_cs_show;
     ret_n = GetPrivateData_Blocking(g_bac_instance, WRITEPRGFLASH_COMMAND, 0, 0, 0, 1);
     
-    temp_cs_show.Format(_T("Write into flash success")); //
+    temp_cs_show.Format(_T("Write into flash success")); //设备不响应这个命令，所以直接显示成功;
     SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs_show);
     
     return;
@@ -5803,7 +5803,7 @@ void CDialogCM5_BacNet::Read_Setting_Info_Progress(int retry_count)
 			}
 		}
 
-		//
+		//在没有找到的情况下在发送whois
 		if (find_exsit == false)
 		{
 			click_resend_time--;
@@ -5888,7 +5888,7 @@ void CDialogCM5_BacNet::Read_Setting_Info_Progress(int retry_count)
 			{
 				if (already_retry == false)
 				{
-					//TCP
+					//如果 TCP能连接上， 而没有回复UDP的包，就用TCP 发送软复位命令给板子;
 					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("No bacnet command response!"));
 					//if(IDYES == MessageBox(_T("No bacnet command reply from panel .Do you want reset the network of this panel"),_T("Warning"),MB_YESNO))
 					//{
@@ -5930,7 +5930,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 
 	switch(nIDEvent)
 	{
-		if (hwait_write_thread != NULL) //     og
+		if (hwait_write_thread != NULL) //     在写入prog的时候，不要刷新value数据  
 			break;
 	case BAC_READ_PROPERTIES:
 	{
@@ -5942,7 +5942,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				{
 					Initial_bac(0, selected_product_Node.NetworkCard_Address);
 					Sleep(50);
-					Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 H  
+					Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 防止频繁的发送 全局WHOIS  干扰 一大批设备的应答;
 					//Send_WhoIs_Global(-1, -1);
 					Sleep(50);
 				}
@@ -5962,7 +5962,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				break;
 			if(this->IsWindowVisible())
 			{
-				g_bPauseMultiRead = true; // nipanel
+				g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 				//if(!Gsm_communication)
 					//m_bac_handle_Iam_data.clear();
 
@@ -5993,7 +5993,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 		{
 			if((AlarmWindow_Window!=NULL) && ((CBacnetAlarmWindow *)AlarmWindow_Window->m_hWnd !=NULL))
 			{
-				if(bac_show_alarm_window)//
+				if(bac_show_alarm_window)//显示;
 				{
 					if(!(CBacnetAlarmWindow *)AlarmWindow_Window->IsWindowVisible())
 					{
@@ -6039,7 +6039,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
             switch_product_last_view();
 		}
 		break;
-    //case 10: //
+    //case 10: //测试用
     //    mstp_port_struct_t temp1234;
     //    Get_MSTP_STRUCT(&temp1234);
     //    //TRACE(_T("temp1234.DataAvailable = %d\r\n"), temp1234.DataAvailable);
@@ -6065,13 +6065,13 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 {
 
 
-	//
+	//先用宏定义标记起来;
 #ifdef NEED_ANALOG_DIGITAL_ONLY
 	Input_Window->Reload_Unit_Type();
 #endif
 	Output_Window->Reload_Unit_Type();
 	Inital_Tab_Loaded_Parameter();
-	//PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_READ_CUSTOMER_UNIT);//tomer unit ge
+	//PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_READ_CUSTOMER_UNIT);//先读下cutomer unit ，在range里面要显示出来;
 
 
 	CString temp_cstring;
@@ -6179,9 +6179,9 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
 			((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
 		{
-			//nput output  variable  esp32 
+			//重新加载 input output  variable  esp32 的3个是动态设置变化的;
 			ReInital_Someof_Point();
-			last_inital_point = 2; //  ot
+			last_inital_point = 2; // 最后一次是esp 的count
 		}
 		else
 		{
@@ -6300,7 +6300,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 
 	if(Device_Basic_Setting.reg.en_panel_name == 1)
 	{
-		if(temp_write_flag)	//ame 
+		if(temp_write_flag)	//本地的 name 比较新  更新至 设备; 
 		{
 			CString Write_String;
 			char temp_buffer[20];
@@ -6321,9 +6321,9 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 				WritePrivateProfileStringW(temp_serial_number,NULL,NULL,g_achive_device_name_path);
 			}
 		}
-		else	//
+		else	//设备的比较新
 		{
-            //20171219 //
+            //20171219 杜帆屏蔽  //不在去判断更新，有时候点击的时候会出现两个同名的设备，可能是Setting结构重名了。
 			//CString temp_device_panel_name;
 			//MultiByteToWideChar( CP_ACP, 0, Device_Basic_Setting.reg.panel_name, (int)strlen(Device_Basic_Setting.reg.panel_name)+1,temp_device_panel_name.GetBuffer(MAX_PATH), MAX_PATH );
 			//temp_device_panel_name.ReleaseBuffer();
@@ -6351,7 +6351,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			
 		}
 	}
-	//if((!read_customer_unit) && selected_product_Node.protocol != MODBUS_RS485    20200820 
+	//if((!read_customer_unit) && selected_product_Node.protocol != MODBUS_RS485    20200820 只要点击 就在读一遍 ，老毛一直叫 没刷新 MSV的 unit 以前是 只读第一遍
 	if (selected_product_Node.protocol != MODBUS_RS485
 		&& (
 			(selected_product_Node.product_class_id == PM_CM5)
@@ -6546,7 +6546,7 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 		break;
 	}
 
-	if(m_user_level == LOGIN_SUCCESS_GRAPHIC_MODE)	//
+	if(m_user_level == LOGIN_SUCCESS_GRAPHIC_MODE)	//如果是图片模式只让显示图片;
 	{
 		if(selected != WINDOW_SCREEN)
 		{
@@ -6717,7 +6717,7 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 				bacnet_view_number = TYPE_MONITOR;
 				break;
 			case WINDOW_ALARMLOG:
-				//st 
+				//增加刷新list和改变当前window 的hwnd;
 				if(!tab_loaded[WINDOW_ALARMLOG])
 				{
 					PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALARMLOG);
@@ -6840,12 +6840,12 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
     }
     else
     {
-        output_reg = 15; //nipanel 
+        output_reg = 15; //默认是读minipanel 的所有的寄存器 ;
         input_reg = 15;
         variable_reg = 26;
         pid_con_reg = 3;
         schedule_list_reg = 2;   //15808 - 15955+21
-        schedule_time_reg = 1;  //72
+        schedule_time_reg = 1;  //72个字节 一包搞定
     }
 
 
@@ -6855,7 +6855,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
     {
     case READOUTPUT_T3000/*BAC_OUT*/:   //OUT
     {
-        //output 45 664  + input 46  *64  
+        //output 45 按46算  *64  + input 46  *64  需要读2944;
         for (int i = 0; i < output_reg; i++)
         {
             int itemp = 0;
@@ -6888,7 +6888,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
                         read_data_buffer[i * 23 + j] = htons(read_data_buffer[i*23 +j]);
                     }
                 }
-                memcpy(&m_Output_data.at(i), &read_data_buffer[i * 23], sizeof(Str_out_point));//utput  
+                memcpy(&m_Output_data.at(i), &read_data_buffer[i * 23], sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
             }
 
 
@@ -6935,7 +6935,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
     break;
     case READINPUT_T3000/*BAC_IN*/:   //IN
     {
-        //output 45 664  + input 46  *64  
+        //output 45 按46算  *64  + input 46  *64  需要读2944;
         for (int i = 0; i < input_reg; i++)
         {
 
@@ -6971,7 +6971,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
                     }
                 }
 
-                memcpy(&m_Input_data.at(i), &read_data_buffer[i * 23], sizeof(Str_in_point));//nput  
+                memcpy(&m_Input_data.at(i), &read_data_buffer[i * 23], sizeof(Str_in_point));//因为Input 只有45个字节，两个byte放到1个 modbus的寄存器里面;
             }
             CString str_serialid;
             str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
@@ -6998,9 +6998,9 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         }
         g_progress_persent = 100;
 
-        if (Bacnet_Private_Device(n_read_product_type))  //20200522 ange
+        if (Bacnet_Private_Device(n_read_product_type))  //20200522 如果是茶洗的设备才读cus range
         {
-        for (int i = 0;i < 3;i++)  //ustom table
+        for (int i = 0;i < 3;i++)  //读Custom table
         {
             int itemp = 0;
             itemp = Read_Multi(read_device_id, &read_data_buffer[i * 100], BAC_CUSTOMER_TABLE_START + i * 100, 100, 4);
@@ -7032,7 +7032,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
                         read_data_buffer[i * 53 + j] = htons(read_data_buffer[i * 53 + j]);
                     }
                 }
-                memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//nput  
+                memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//因为Input 只有45个字节，两个byte放到1个 modbus的寄存器里面;
             }
 
         }
@@ -7105,7 +7105,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
     break;
     case READCONTROLLER_T3000/*BAC_PID*/:
     {
-        //output 45 664  + input 46  *64  
+        //output 45 按46算  *64  + input 46  *64  需要读2944;
         for (int i = 0; i < pid_con_reg; i++)
         {
 
@@ -7278,7 +7278,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         int itemp = 0;
         if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 513)
         {
-            //edule ag
+            //还需要读取schedule 的 flag
             itemp = Read_Multi(read_device_id, &read_data_buffer[0], BAC_WR_FLAG_FIRST + weekly_list_line * 36, 36, 6);
             if (itemp < 0)
             {
@@ -7337,7 +7337,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 
         read_result = true;
         //weekly_list_line
-        //for (int i = 0; i < schedule_time_reg; i++) //schedule_time_reg 1
+        //for (int i = 0; i < schedule_time_reg; i++) //schedule_time_reg 大概读多少包 少于100就读1包;
         //{
 
             itemp = Read_Multi(read_device_id, &read_data_buffer[0], BAC_WR_TIME_FIRST + weekly_list_line*72 , 100, 6);
@@ -7401,7 +7401,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         break;
     case   READ_SETTING_COMMAND:
     {
-        //Setting 400 
+        //Setting 400 个字节
         for (int i = 0; i < 2; i++)
         {
             int itemp = 0;
@@ -7432,7 +7432,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
             }
 
 
-            memcpy(&Device_Basic_Setting.reg, read_data_buffer, 400); //Setting 00
+            memcpy(&Device_Basic_Setting.reg, read_data_buffer, 400); //Setting 的400个字节;
 
 
             CString str_serialid;
@@ -7463,7 +7463,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
     break;
 	case READANALOG_CUS_TABLE_T3000/*BAC_OUT*/:   //OUT
 	{
-		//cus table  106 065    106x5  
+		//cus table  106 按106算  *5    106x5  需要读530   需要读取6包;
 		for (int i = 0; i < 6; i++)
 		{
 			int itemp = 0;
@@ -7496,7 +7496,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 						read_data_buffer[i * 53 + j] = htons(read_data_buffer[i * 53 + j]);
 					}
 				}
-				memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//tr_table_point 
+				memcpy(&m_analog_custmer_range.at(i), &read_data_buffer[i * 53], sizeof(Str_table_point));//因为Str_table_point 只有106个字节，两个byte放到1个 modbus的寄存器里面;
 			}
 
 
@@ -7584,14 +7584,14 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 	 {
 		 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read Register 0-100 timeout!"));
 		 read_rs485_thread = NULL;
-         //in 
+         //发送消息给 Main 更新 设备状态;
          ::PostMessage(pFrame->m_hWnd, WM_MAIN_MSG_UPDATE_PRODUCT_TREE, 0, 0);
 		 return 3;
 	 }
      else
      {
          bac_select_device_online = true;
-         //in 
+         //发送消息给 Main 更新 设备状态;
          ::PostMessage(pFrame->m_hWnd, WM_MAIN_MSG_UPDATE_PRODUCT_TREE, 0, 1);
      }
 	 g_llTxCount ++;
@@ -7603,7 +7603,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
          check_revert_daxiaoduan = Check_DaXiaoDuan(read_data[7], read_data[5], read_data[4]);
      }
 
-     //p
+     //检查设备以及版本，确定是否支持RS485 Ptp
      int software_version = 0;
      int check_device_type = 0;
      software_version = read_data[5] * 10 + read_data[4];
@@ -7666,7 +7666,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
          {
              SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read data timeout!"));
              read_rs485_thread = NULL;
-             //in 
+             //发送消息给 Main 更新 设备状态;
              ::PostMessage(pFrame->m_hWnd, WM_MAIN_MSG_UPDATE_PRODUCT_TREE, 0, 0);
              return 5;
          }
@@ -7682,7 +7682,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
      str_panel_number.Format(_T("%u"), temp_panel_number);
      str_serialid.Format(_T("%u"), selected_product_Node.serial_number);
 
-     // enumber 
+     // 同步 本地数据库 的资料 ， panel number 和 实例号需与设备匹配;
      if ((temp_panel_number != selected_product_Node.panel_number) || (temp_object_instance != selected_product_Node.object_instance))
      {
          CppSQLite3DB SqliteDBBuilding;
@@ -7702,7 +7702,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 
 
      /*
-     
+     从缓存中得到上次的数据，如果版本不对就重新读一遍.
      */
 
 	 CString achive_file_path;
@@ -7725,7 +7725,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
              unsigned int buffer_length = 3200;
              unsigned short read_data_buffer[3200];
              memset(read_data_buffer, 0, sizeof(unsigned short) * 3200);
-             //output 45 664  + input 46  *64  
+             //output 45 按46算  *64  + input 46  *64  需要读2944;
              for (int i = 0; i<32; i++)
              {
                  int itemp = 0;
@@ -7805,7 +7805,7 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 			connect_mstp_thread = NULL;
 			return 0;
 		}
-		Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 H  
+		Send_WhoIs_Global(g_bac_instance, g_bac_instance); //2023 03 13 防止频繁的发送 全局WHOIS  干扰 一大批设备的应答;
 		//Send_WhoIs_Global(-1, -1);
 		Sleep(1500);
 
@@ -7888,7 +7888,7 @@ BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 				User_Login_Window->SetFocus();
 			return 1;
 		}
-		if(m_user_level == LOGIN_SUCCESS_GRAPHIC_MODE)	//
+		if(m_user_level == LOGIN_SUCCESS_GRAPHIC_MODE)	//如果是图片模式只让显示图片;
 		{
 			return 1;
 		}
@@ -7922,7 +7922,7 @@ DWORD WINAPI Handle_Bip_whois_Thread(LPVOID lpvoid)
             m_bac_handle_Iam_data.at(i).ipaddress[3]);
         if ((IP_ADDRESS.CompareNoCase(temp_ip) == 0) && m_bac_handle_Iam_data.at(i).device_id != g_bac_instance)
         {
-            //P
+            //就说明下面挂载了 MSTP的设备;
             temp_vector.push_back(m_bac_handle_Iam_data.at(i));
         }
     }

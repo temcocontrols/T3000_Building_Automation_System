@@ -76,7 +76,7 @@ CT3RTDView::~CT3RTDView()
     //CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
     //pMain->m_pFreshMultiRegisters->ResumeThread();
     ////	pMain->m_pFreshTree->SuspendThread();
-    //pMain->m_pRefreshThread->ResumeThread();	// T3000 ; Fance comments
+    //pMain->m_pRefreshThread->ResumeThread();	//不能加这一段，否则 退出T3000的时候 报错; Fance comments
     if(hFirstThread != NULL)
         TerminateThread(hFirstThread, 0);
 }
@@ -129,7 +129,7 @@ void CT3RTDView::OnInitialUpdate()
     m_dataformat.AddString(_T("Float"));
     m_dataformat.AddString(_T("Int"));;
 //#if 1	
-    ///
+    //设置排/行数量
     m_msflexgrid_input.put_Cols(6);
     m_msflexgrid_input.put_Rows(10+1); 
     m_msflexgrid_input.put_TextMatrix(0,0,_T("Channel N0"));
@@ -138,7 +138,7 @@ void CT3RTDView::OnInitialUpdate()
     m_msflexgrid_input.put_TextMatrix(0,3,_T("Range"));
     m_msflexgrid_input.put_TextMatrix(0,4,_T("Filter"));
     m_msflexgrid_input.put_TextMatrix(0,5,_T("Status"));
-    //	
+    //设置列宽	
     m_msflexgrid_input.put_ColWidth(0,1000);
     m_msflexgrid_input.put_ColWidth(1,1500);
   
@@ -146,15 +146,15 @@ void CT3RTDView::OnInitialUpdate()
     m_msflexgrid_input.put_ColWidth(3,1000);
     m_msflexgrid_input.put_ColWidth(4,1000);
     m_msflexgrid_input.put_ColWidth(5,1000);
-    //
+    //居中显示
     for (int col=0;col<6;col++)
     { 
         m_msflexgrid_input.put_ColAlignment(col,4);
     }
-    //
-    for(int i=1;i<10+1;i++)		//
+    //彩色显示
+    for(int i=1;i<10+1;i++)		//排数量
     {
-        for(int k=0;k<6;k++)	//
+        for(int k=0;k<6;k++)	//列数量
         {
             if (i%2==1)
             {
@@ -166,7 +166,7 @@ void CT3RTDView::OnInitialUpdate()
             }
         }
     }
-    //
+    //显示纵标题
     CString str;
     for(int i=1;i<10+1;i++)
     {
@@ -387,7 +387,7 @@ void CT3RTDView::InitialDialog(){
             }
             else if (2==product_register_value[RANGE_CHANNEL1+i-1])
             {
-                strresult=_T("");
+                strresult=_T("Ω");
             }
             m_msflexgrid_input.put_TextMatrix(i,3,strresult);
 			DataFormat mydata;
@@ -466,7 +466,7 @@ void CT3RTDView::InitialDialog(){
             }
             else if (2==product_register_value[RANGE_CHANNEL1+i-1])
             {
-                strresult=_T("");
+                strresult=_T("Ω");
             }
             m_msflexgrid_input.put_TextMatrix(i,3,strresult);
             CString unit=strresult;
@@ -611,26 +611,26 @@ void CT3RTDView::ClickMsflexgridInput()
     UpdateData(FALSE);
 
     long lRow,lCol;
-    lRow = m_msflexgrid_input.get_RowSel();//	
-    lCol = m_msflexgrid_input.get_ColSel(); //
+    lRow = m_msflexgrid_input.get_RowSel();//获取点击的行号	
+    lCol = m_msflexgrid_input.get_ColSel(); //获取点击的列号
     TRACE(_T("Click input grid!\n"));
 
     CRect rect;
-    m_msflexgrid_input.GetWindowRect(rect); //
-    ScreenToClient(rect); //	
+    m_msflexgrid_input.GetWindowRect(rect); //获取表格控件的窗口矩形
+    ScreenToClient(rect); //转换为客户区矩形	
     CDC* pDC =GetDC();
 
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //()
+    //计算选中格的左上角的坐标(象素为单位)
     long y = m_msflexgrid_input.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_msflexgrid_input.get_ColPos(lCol)/nTwipsPerDotX;
-    //()11
+    //计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
     long width = m_msflexgrid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_msflexgrid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //
+    //形成选中个所在的矩形区域
     CRect rcCell(x,y,x+width,y+height);
-    //
+    //转换成相对对话框的坐标
     rcCell.OffsetRect(rect.left+1,rect.top+1);
     ReleaseDC(pDC);
     CString strValue = m_msflexgrid_input.get_TextMatrix(lRow,lCol);
@@ -650,10 +650,10 @@ void CT3RTDView::ClickMsflexgridInput()
         m_comboxRange.ResetContent();
         m_comboxRange.AddString(_T("C"));
         m_comboxRange.AddString(_T("F"));
-        m_comboxRange.AddString(_T(""));
+        m_comboxRange.AddString(_T("Ω"));
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
-        m_comboxRange.SetFocus(); //
+        m_comboxRange.SetFocus(); //获取焦点
         m_comboxRange.SetWindowText(strValue);
     }
     else  
@@ -665,7 +665,7 @@ void CT3RTDView::ClickMsflexgridInput()
         m_inNameEdt.SetFocus();
         m_inNameEdt.SetCapture();//LSC
         int nLenth=strValue.GetLength();
-        m_inNameEdt.SetSel(nLenth,nLenth); ////
+        m_inNameEdt.SetSel(nLenth,nLenth); //全选//
     }
 }
 

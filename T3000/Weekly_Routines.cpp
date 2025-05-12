@@ -9,7 +9,7 @@
 
 
 
-// Weekly_Routines 
+// Weekly_Routines 对话框
 #define GRID_ROW_NUMBER 20
 #define GRID_COL_NUMBER 7
 #define FULL_LABEL_NUMBER 20
@@ -64,7 +64,7 @@ BEGIN_MESSAGE_MAP(Weekly_Routines, CDialog)
 END_MESSAGE_MAP()
 
 
-// Weekly_Routines 
+// Weekly_Routines 消息处理程序
 description Weekly_Routines::read_addr(unsigned char addr2)
 {
 	description temp_description;
@@ -273,31 +273,31 @@ void Weekly_Routines::load_grid()
 void Weekly_Routines::on_select()
 {
 	long lRow,lCol;
-	lRow = m_FlexGrid.get_RowSel();//	
-	lCol = m_FlexGrid.get_ColSel(); //
+	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 	UpdateData(false);
 	if(lRow==0 || lCol==0)
 		return;
 	CRect rect;
-	m_FlexGrid.GetWindowRect(rect); //
-	ScreenToClient(rect); //	
-	// MSFlexGrid"(twips)"
-	//1440= 1
+	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
+	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	//需要将其转化为像素，1440缇= 1英寸
 	CDC* pDC =GetDC();
-	//
+	//计算象素点和缇的转换比例
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//()
+	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//()11
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//
+	//形成选中个所在的矩形区域
 	CRect rc(x,y,x+width,y+height);
-	//
+	//转换成相对对话框的坐标
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//
+	//获取选中格的文本信息
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
 	row_row=lRow;
 	row_col=lCol;
@@ -321,10 +321,10 @@ void Weekly_Routines::on_select()
 		m_combo_col_row.AddString(_T("AUTO"));
 		m_combo_col_row.AddString(_T("MAN"));
 		m_combo_col_row.BringWindowToTop();
-		m_combo_col_row.ShowWindow(SW_SHOW);//
-		m_combo_col_row.MoveWindow(rc); //
-		m_combo_col_row.SelectString(-1,strValue); //		
-		m_combo_col_row.SetFocus(); //
+		m_combo_col_row.ShowWindow(SW_SHOW);//显示控件
+		m_combo_col_row.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_combo_col_row.SelectString(-1,strValue); //内容全选。方便直接修改		
+		m_combo_col_row.SetFocus(); //获取焦点
 	}
 	else if(row_col==3)
 	{
@@ -333,28 +333,28 @@ void Weekly_Routines::on_select()
 		m_combo_col_row.AddString(_T("ON"));
 
 		m_combo_col_row.BringWindowToTop();
-		m_combo_col_row.ShowWindow(SW_SHOW);//
-		m_combo_col_row.MoveWindow(rc); //
-		m_combo_col_row.SelectString(-1,strValue); //		
-		m_combo_col_row.SetFocus(); //
+		m_combo_col_row.ShowWindow(SW_SHOW);//显示控件
+		m_combo_col_row.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_combo_col_row.SelectString(-1,strValue); //内容全选。方便直接修改		
+		m_combo_col_row.SetFocus(); //获取焦点
 	}
 	else if(row_col==4||row_col==6)
 	{
 		m_holidayCombx.BringWindowToTop();
 		m_holidayCombx.ShowWindow(SW_SHOW);
 			
-		m_holidayCombx.MoveWindow(rc); //
-		m_holidayCombx.SetFocus(); //
+		m_holidayCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_holidayCombx.SetFocus(); //获取焦点
 
 	}
 	else
 	{
 		m_Change.BringWindowToTop();
-		m_Change.ShowWindow(SW_SHOW); //
-		m_Change.SetWindowText(strValue); //
-		m_Change.SetFocus(); //
-		//m_Change.SetSel(0,-1); //
-		m_Change.MoveWindow(rc); //
+		m_Change.ShowWindow(SW_SHOW); //显示控件
+		m_Change.SetWindowText(strValue); //显示文本
+		m_Change.SetFocus(); //获取焦点
+		//m_Change.SetSel(0,-1); //全选
+		m_Change.MoveWindow(rc); //移动到选中格的位置，覆盖
 	}	
 }
 
@@ -374,7 +374,7 @@ BOOL Weekly_Routines::OnInitDialog()
 	load_grid();
 	NET_WORK_SET_TIMER
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// : OCX  FALSE
+	// 异常: OCX 属性页应返回 FALSE
 }
 BEGIN_EVENTSINK_MAP(Weekly_Routines, CDialog)
 	ON_EVENT(Weekly_Routines, IDC_MSFLEXGRID1, DISPID_CLICK, ClickMsflexgrid1, VTS_NONE)
@@ -419,8 +419,8 @@ void Weekly_Routines::OnEnKillfocusEdit1()
 	}
 	*/
 	m_Change.GetWindowText(m_sChange);
-	m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//
-	m_Change.ShowWindow(SW_HIDE); //
+	m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//设置文本信息
+	m_Change.ShowWindow(SW_HIDE); //隐藏文本控件
 	//UpdateData(false);
 	if(m_before_focus_string!=m_sChange)
 		write_addr(row_row);
@@ -466,8 +466,8 @@ void Weekly_Routines::OnCbnKillfocusCombo1()
 }
 void Weekly_Routines::tab_move()
 {
-	long lRow = m_FlexGrid.get_RowSel();//	
-	long lCol = m_FlexGrid.get_ColSel(); //	
+	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
 	if(lRow==m_FlexGrid.get_Rows()-1 && lCol==m_FlexGrid.get_Cols()-1)
 	{
 	}
@@ -489,8 +489,8 @@ void Weekly_Routines::tab_move()
 
 void Weekly_Routines::shift_tab_move()
 {
-	long lRow = m_FlexGrid.get_RowSel();//	
-	long lCol = m_FlexGrid.get_ColSel(); //	
+	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
 	if(lRow==1 && lCol==1)
 	{
 	}
@@ -520,8 +520,8 @@ void Weekly_Routines::right_move()
 
 void Weekly_Routines::up_move()
 {
-	long lRow = m_FlexGrid.get_RowSel();//
-	long lCol = m_FlexGrid.get_ColSel(); //	
+	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号
+	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
 	if (lRow!=1)
 		m_FlexGrid.put_Row(--lRow);
 	GRID_UP_MOVE
@@ -530,8 +530,8 @@ void Weekly_Routines::up_move()
 
 void Weekly_Routines::down_move()
 {
-	long lRow =m_FlexGrid.get_RowSel();//	
-	long lCol = m_FlexGrid.get_ColSel(); //	
+	long lRow =m_FlexGrid.get_RowSel();//获取点击的行号	
+	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
 	if (lRow!=m_FlexGrid.get_Rows()-1)
 		m_FlexGrid.put_Row(++lRow);
 	GRID_DOWN_MOVE
@@ -557,10 +557,10 @@ BOOL Weekly_Routines::PreTranslateMessage(MSG* pMsg)
 
 	if(pMsg->message == WM_KEYDOWN  )
 	{	
-//#if 1	//
+//#if 1	//改成双击
 		if(pMsg->wParam == VK_INSERT )
 		{				
-			EXIT_BUTTON_GET_FOCUS		//important,use this to settimer(1),so nextNET_WORK_KILL_TIMERwill be used
+			EXIT_BUTTON_GET_FOCUS		//important,use this to settimer(1),so next　NET_WORK_KILL_TIMER　will be used
 			Sleep(50);
 			NET_WORK_KILL_TIMER
 			CString strtmp= _T("LightingController");
@@ -580,8 +580,8 @@ BOOL Weekly_Routines::PreTranslateMessage(MSG* pMsg)
 //#endif
 		if(pMsg->wParam==VK_F1)
 		{
-			long lRow = m_FlexGrid.get_RowSel();//	
-			long lCol = m_FlexGrid.get_ColSel(); //
+			long lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+			long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 			if(lRow==0 || lCol==0)
 				return true;
 			row_row=lRow;
@@ -671,8 +671,8 @@ void Weekly_Routines::DblClickMsflexgrid1()
 {
 	
 #if 1
-	long lRow = m_FlexGrid.get_RowSel();//	
-	long lCol = m_FlexGrid.get_ColSel(); //
+	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 	if(lRow==0 || lCol==0)
 		return ;
 	row_row=lRow;
@@ -694,7 +694,7 @@ void Weekly_Routines::OnPaint()
 	dc.SetBkMode(TRANSPARENT);
 	dc.DrawText(m_strInfo,&outRc,DT_WORDBREAK|DT_VCENTER|DT_CENTER);
 	
-	//  CDialog::OnPaint()
+	// 不为绘图消息调用 CDialog::OnPaint()
 }
 
 void Weekly_Routines::OnCbnSelchangeHolidaycombx()
@@ -726,8 +726,8 @@ void Weekly_Routines::OnCbnKillfocusHolidaycombx()
 		return;
 
 	m_holidayCombx.GetWindowText(m_sChange);
-	m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//
-	m_holidayCombx.ShowWindow(SW_HIDE); //
+	m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//设置文本信息
+	m_holidayCombx.ShowWindow(SW_HIDE); //隐藏文本控件
 	write_addr(row_row);
 	NET_WORK_SET_TIMER
 }

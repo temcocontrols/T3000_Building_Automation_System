@@ -82,9 +82,9 @@ public:
 	CString		m_strInfoText;
 	BOOL			m_bTstatLoadFinished;
 	BOOL			m_bNCLoadFinished;
-	//BOOL			m_bExit;					// 
+	//BOOL			m_bExit;					// 是否退出程序
 	BOOL			m_bProductType;			// TRUE = TSTAT, FALSE = NC
-	CEvent		m_eTstatLoadFinish;		// Tstatload NC
+	CEvent		m_eTstatLoadFinish;		// 标记Tstatload 结束，NC可以开始
 public:
 	//void _change_showing_text_variable(CString str);
 

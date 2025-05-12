@@ -1059,7 +1059,7 @@ void CModbusToBacnetRouterDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
     m_datalist.SubItemHitTest(&lvinfo);
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
-	//5=
+	//5=数据格式
 	if (lRow<m_vecMd2BT.size()&&lCol==5)
 	{
 		m_vecDataFormat = GetDataFormatByVariable(m_vecMd2BT[lRow].Modbus_Variable_Type);
@@ -1074,7 +1074,7 @@ void CModbusToBacnetRouterDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_datalist.SetCellStringList(lRow, 5, strlist);
 		}
 	}
-	//11=
+	//11=读写属性的判断
 	if (lRow < m_vecMd2BT.size() && lCol == 11)
 	{
 		m_vecDataRW = GetRWByVariableDataFormat(m_vecMd2BT[lRow].Modbus_Variable_Type, m_vecMd2BT[lRow].Data_Format);
@@ -1088,7 +1088,7 @@ void CModbusToBacnetRouterDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_datalist.SetCellStringList(lRow, 11, strlist);
 		}
 	}
-	//12=Bacnet Type 
+	//12=Bacnet Type 判断
 	if (lRow < m_vecMd2BT.size() && lCol == 12)
 	{
 		m_vecBacnetType = GetBacnetType(m_vecMd2BT[lRow].Modbus_Variable_Type, m_vecMd2BT[lRow].Data_Format, m_vecMd2BT[lRow].Read_Only_Or_RW);

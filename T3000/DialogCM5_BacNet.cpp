@@ -704,7 +704,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	GetParentFrame()->RecalcLayout();
 	ResizeParentToFit();
 
-	//ab Control
+	//为Tab Control增加两个页面;
 	m_bac_main_tab.InsertItem(WINDOW_INPUT, _T("Input    "));
 	m_bac_main_tab.InsertItem(WINDOW_OUTPUT, _T("Output    "));
 	m_bac_main_tab.InsertItem(WINDOW_VARIABLE, _T("Variable    "));
@@ -727,7 +727,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_MONITOR] = Monitor_Window = new CBacnetMonitor;
 	pDialog[WINDOW_ALARMLOG] = AlarmLog_Window = new CBacnetAlarmLog;
 	
-	//
+	//创建两个对话框;
 	Input_Window->Create(IDD_DIALOG_BACNET_INPUT, &m_bac_main_tab);
 	Output_Window->Create(IDD_DIALOG_BACNET_OUTPUT, &m_bac_main_tab);
 	Variable_Window->Create(IDD_DIALOG_BACNET_VARIABLE, &m_bac_main_tab);
@@ -738,7 +738,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	AnnualRoutine_Window->Create(IDD_DIALOG_BACNET_ANNUAL_ROUTINES, &m_bac_main_tab);
 	Monitor_Window->Create(IDD_DIALOG_BACNET_MONITOR, &m_bac_main_tab);
 	AlarmLog_Window->Create(IDD_DIALOG_BACNET_ALARMLOG,&m_bac_main_tab);
-	//b
+	//设定在Tab内显示的范围;
 	CRect rc;
 	m_bac_main_tab.GetClientRect(rc);
 	rc.top += 20;
@@ -752,7 +752,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	}
 
 
-	//
+	//显示初始页面
 	pDialog[WINDOW_INPUT]->ShowWindow(SW_SHOW);
 	pDialog[WINDOW_OUTPUT]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_VARIABLE]->ShowWindow(SW_HIDE);
@@ -765,7 +765,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_ALARMLOG]->ShowWindow(SW_HIDE);
 
 	g_hwnd_now = m_input_dlg_hwnd;
-	//
+	//保存当前选择
 //	m_CurSelTab = WINDOW_INPUT;
 
 }
@@ -810,7 +810,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		Str_program_point temp_program;
 		memset(temp_program.description,0,21);
 		memset(temp_program.label,0,9);
-		temp_program.bytes = 400;//
+		temp_program.bytes = 400;//初始化时默认为400的长度，避免读不到数据;
 		m_Program_data.push_back(temp_program);
 	}
 	for(int i=0;i<BAC_WEEKLY_ROUTINES_COUNT;i++)
@@ -919,7 +919,7 @@ void CDialogCM5_BacNet::Fresh()
 			Set_RS485_Handle(NULL);
 		}
 
-		SetCommunicationType(0);	//
+		SetCommunicationType(0);	//这里要同时关闭网络的和串口的;
 		close_com();
 		//SetCommunicationType(1);
 		//close_com();
@@ -934,8 +934,8 @@ void CDialogCM5_BacNet::Fresh()
 
 		CString Program_Path,Program_ConfigFile_Path;
 		int g_com=0;
-		GetModuleFileName(NULL,Program_Path.GetBuffer(MAX_PATH),MAX_PATH);  //
-		PathRemoveFileSpec(Program_Path.GetBuffer(MAX_PATH) );            //
+		GetModuleFileName(NULL,Program_Path.GetBuffer(MAX_PATH),MAX_PATH);  //获取当前运行的绝对地址;
+		PathRemoveFileSpec(Program_Path.GetBuffer(MAX_PATH) );            //返回绝对地址的上层目录?;
 		Program_Path.ReleaseBuffer();
 		Program_ConfigFile_Path = Program_Path + _T("\\MyConfig.ini");
 
@@ -981,7 +981,7 @@ void CDialogCM5_BacNet::Fresh()
 
 		SetTimer(1,500,NULL);
 		BacNet_hwd = this->m_hWnd;
-		//m_bac_static_status.SetWindowTextW(_T("Disconnected"));	//
+		//m_bac_static_status.SetWindowTextW(_T("Disconnected"));	//放在这里，并且重发一次WHOIS
 		//m_bac_static_status.textColor(RGB(255,255,255));
 		//m_bac_static_status.bkColor(RGB(255,0,0));
 		//m_bac_static_status.setFont(26,18,NULL,_T("Cambria"));
@@ -1003,7 +1003,7 @@ void CDialogCM5_BacNet::Fresh()
 	m_cm5_time_picker.SetFormat(_T("HH:mm"));
 
 	SetTimer(1,500,NULL);
-	SetTimer(2,15000,NULL);//
+	SetTimer(2,15000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 	SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
 	BacNet_hwd = this->m_hWnd;
 
@@ -1317,12 +1317,12 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			tsm_free_all_invoke_id();// ID 
+			tsm_free_all_invoke_id();//每次点击的时候都将所有INVOKE ID 清零;
 			Show_Wait_Dialog_And_SendMessage(button_click);
 		}
 		break;
 	case TYPE_SVAE_CONFIG:
-		tsm_free_all_invoke_id();// ID 
+		tsm_free_all_invoke_id();//每次点击的时候都将所有INVOKE ID 清零;
 		Show_Wait_Dialog_And_SendMessage(TYPE_SVAE_CONFIG);
 		break;
 	default: 
@@ -1464,7 +1464,7 @@ static void Init_Service_Handlers(
 //	//	style|=RC_CHKBOX_SINGLE;
 //
 //	m_device_list_info.SetExtendedStyle(style);
-//	SetWindowLong(m_device_list_info.m_hWnd,GWL_STYLE,style);//list_infomation.m_hWnd
+//	SetWindowLong(m_device_list_info.m_hWnd,GWL_STYLE,style);//list_infomation.m_hWnd´
 //	DWORD dwstyle=m_device_list_info.GetExtendedStyle();
 //	dwstyle|=LVS_EX_FULLROWSELECT; //
 //	dwstyle|=LVS_EX_GRIDLINES;     //
@@ -1502,7 +1502,7 @@ void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 	{
 		if(bac_read_which_list == BAC_READ_SVAE_CONFIG)
 		{
-			WaitDlg = new BacnetWait((int)2);//
+			WaitDlg = new BacnetWait((int)2);//如果是保存为ini文件 就要读取全部的data;
 		}
 		else
 		{
@@ -2515,7 +2515,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 		{
 			if(AlarmWindow_Window!=NULL)
 			{
-				if(bac_show_alarm_window)//
+				if(bac_show_alarm_window)//显示;
 				{
 					if(!(CBacnetAlarmWindow *)AlarmWindow_Window->IsWindowVisible())
 					{
@@ -2620,7 +2620,7 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 				g_hwnd_now = m_monitor_dlg_hwnd;
 				break;
 			case WINDOW_ALARMLOG:
-				//st 
+				//增加刷新list和改变当前window 的hwnd;
 				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALARMLOG);
 				((CBacnetAlarmLog *)pDialog[i])->Fresh_Alarmlog_List(NULL,NULL);
 				g_hwnd_now = m_alarmlog_dlg_hwnd;

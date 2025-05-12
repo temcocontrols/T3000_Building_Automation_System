@@ -1,11 +1,11 @@
 
 //////////////////////////////////////////////////////////////////////////
 //  
-// 
-// 1
-// 2LButtonDown
-// 3
-// 4
+// 多个滑块的不同于一个滑块
+// 1，均可以随意滑动，但不能越过相邻的另两个滑块。
+// 2，当鼠标左键单击了滑块（LButtonDown），该滑块就成为焦点滑块。
+// 3，当鼠标左键单击标尺时，焦点滑块能够移动，非焦点滑块不动。
+// 4，
 //
 //
 //
@@ -46,8 +46,8 @@ protected:
 protected:
 
 	BOOL						m_bStartDraging;
-	vector<int>*			m_szTicMarks;  // 
+	vector<int>*			m_szTicMarks;  // 位置与象素对应的数组
 
-	CFSBThumb			m_ltThumb;		// 
-	CFSBThumb			m_rbThumb;		// 
+	CFSBThumb			m_ltThumb;		// 依次
+	CFSBThumb			m_rbThumb;		// 右下
 };

@@ -124,7 +124,7 @@ protected:
 protected:
     CString         m_strText;      // Cell text (or binary data if you wish...)
     LPARAM          m_lParam;       // 32-bit value to associate with item
-    int             m_nImage;       // Index of the list view item icon
+    int             m_nImage;       // Index of the list view item’s icon
 
 #ifdef GRIDCTRL_MINSIZE
     CGridCellAttr*  m_pAttr;        // Less commonly used attributes. NULL if defaults are used

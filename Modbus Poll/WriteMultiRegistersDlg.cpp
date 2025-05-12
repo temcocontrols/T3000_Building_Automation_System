@@ -343,7 +343,7 @@ void CWriteMultiRegistersDlg::OnLbnDblclkList3()
 }
 
 
-//
+//∂‡–¥
 void CWriteMultiRegistersDlg::OnBnClickedButton1()
 {	
 int Send_length;

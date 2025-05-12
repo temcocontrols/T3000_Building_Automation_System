@@ -1,4 +1,4 @@
-// BacnetSettingBasicInfo.cpp : 
+// BacnetSettingBasicInfo.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -9,7 +9,7 @@
 #include "BacnetSettingHealth.h"
 #include "BacnetSettingParamter.h"
 #include "MainFrm.h"
-// CBacnetSettingBasicInfo 
+// CBacnetSettingBasicInfo 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetSettingBasicInfo, CDialogEx)
 
@@ -39,8 +39,8 @@ LRESULT  CBacnetSettingBasicInfo::ResumeMessageCallBack(WPARAM wParam, LPARAM lP
     }
     else
     {
-        //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//
-        PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);// ;
+        //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//还原没有改对的值
+        PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
         Show_Results = temp_cs + _T("Fail!");
         SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
 
@@ -90,7 +90,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingBasicInfo, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetSettingBasicInfo 
+// CBacnetSettingBasicInfo 消息处理程序
 
 void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingObjInstance()
 {
@@ -104,7 +104,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingObjInstance()
         temp_warning.Format(_T("Do you really want to change the bacnet object instance to %u ?"), temp_obj_instance);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned int old_object_instance = Device_Basic_Setting.reg.object_instance;	// ;
+            unsigned int old_object_instance = Device_Basic_Setting.reg.object_instance;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.object_instance = (unsigned int)temp_obj_instance;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -120,7 +120,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingObjInstance()
         }
         else
         {
-            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);// ;
+            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
         }
     }
 }
@@ -143,7 +143,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingModbusId()
         temp_warning.Format(_T("Do you really want to change the modbus ID to %u ?"), temp_modbusid);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned char old_modbusid = Device_Basic_Setting.reg.modbus_id;	// ;
+            unsigned char old_modbusid = Device_Basic_Setting.reg.modbus_id;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.modbus_id = (unsigned char)temp_modbusid;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -159,7 +159,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingModbusId()
         }
         else
         {
-            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);// ;
+            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
         }
     }
 }
@@ -168,7 +168,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingModbusId()
 
 void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMaxMaster()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
 
     CString temp_cstring;
     GetDlgItemTextW(IDC_EDIT_SETTING_MAX_MASTER, temp_cstring);
@@ -184,7 +184,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMaxMaster()
         temp_warning.Format(_T("Do you really want to change the max master to %u ?"), temp_max_master);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned char old_max_master = Device_Basic_Setting.reg.max_master;	// ;
+            unsigned char old_max_master = Device_Basic_Setting.reg.max_master;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.max_master = (unsigned char)temp_max_master;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -199,7 +199,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMaxMaster()
         }
         else
         {
-            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);// ;
+            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
         }
     }
 }
@@ -207,7 +207,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMaxMaster()
 
 void CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdOn()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_task_info;
     temp_task_info.Format(_T(" Change LCD Background Light ON "));
     if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 519)//519
@@ -228,7 +228,7 @@ void CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdOn()
 
 void CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdOff()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_task_info;
     temp_task_info.Format(_T(" Change LCD Background Light OFF "));
     Device_Basic_Setting.reg.LCD_Display = 0;
@@ -238,7 +238,7 @@ void CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdOff()
 
 void CBacnetSettingBasicInfo::OnBnClickedRadioSettingLcdDelayOff()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_task_info;
     temp_task_info.Format(_T(" Change LCD Background Light ON "));
     CString temp_cstring;
@@ -272,7 +272,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingPanel()
         temp_warning.Format(_T("Do you really want to change the panel number to %u ?"), temp_panel);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned char old_panel = Device_Basic_Setting.reg.panel_number;	// ;
+            unsigned char old_panel = Device_Basic_Setting.reg.panel_number;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.panel_number = (unsigned char)temp_panel;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -362,7 +362,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingNodesLabelSetting()
 
 BOOL CBacnetSettingBasicInfo::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: /
+    // TODO: 在此添加专用代码和/或调用基类
     if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
     {
         int temp_focus_id = GetFocus()->GetDlgCtrlID();
@@ -382,17 +382,17 @@ BOOL CBacnetSettingBasicInfo::PreTranslateMessage(MSG* pMsg)
 BOOL CBacnetSettingBasicInfo::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
-    // TODO:  
+    // TODO:  在此添加额外的初始化
 
     return false;  // return TRUE unless you set the focus to a control
-                  // : OCX  FALSE
+                  // 异常: OCX 属性页应返回 FALSE
 }
 
 
 
 void CBacnetSettingBasicInfo::OnBnClickedButtonLcdSetting()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CBacnetSettingParamter Dlg;
     Dlg.DoModal();
 }
@@ -400,7 +400,7 @@ void CBacnetSettingBasicInfo::OnBnClickedButtonLcdSetting()
 #if 0
 void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     m_edit_zone_name.GetWindowTextW(temp_cstring);
     if (temp_cstring.GetLength() > 10)
@@ -436,7 +436,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName()
 
 void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingBipNetwork2()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     ((CEdit*)GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->GetWindowTextW(temp_cstring);
     unsigned int temp_bip_network = unsigned int(_wtoi(temp_cstring));
@@ -446,7 +446,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingBipNetwork2()
         temp_warning.Format(_T("Do you really want to change the bacnet network to %u ?"), temp_bip_network);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned int old_network = Device_Basic_Setting.reg.network_number_hi * 256 + Device_Basic_Setting.reg.network_number;	// ;
+            unsigned int old_network = Device_Basic_Setting.reg.network_number_hi * 256 + Device_Basic_Setting.reg.network_number;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.network_number = (unsigned int)temp_bip_network%256;
             Device_Basic_Setting.reg.network_number_hi = (unsigned int)temp_bip_network / 256;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
@@ -463,7 +463,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingBipNetwork2()
         }
         else
         {
-            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);// ;
+            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
         }
     }
 }
@@ -471,7 +471,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingBipNetwork2()
 
 void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMstpNetwork()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     ((CEdit*)GetDlgItem(IDC_EDIT_SETTING_MSTP_NETWORK))->GetWindowTextW(temp_cstring);
     unsigned int temp_mstp_network = unsigned int(_wtoi(temp_cstring));
@@ -481,7 +481,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMstpNetwork()
         temp_warning.Format(_T("Do you really want to change the bacnet MSTP network number to %u ?"), temp_mstp_network);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned int old_mstp_network = Device_Basic_Setting.reg.mstp_network_number;	// ;
+            unsigned int old_mstp_network = Device_Basic_Setting.reg.mstp_network_number;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.mstp_network_number = temp_mstp_network;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -496,7 +496,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMstpNetwork()
         }
         else
         {
-            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);// ;
+            PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
         }
     }
 }

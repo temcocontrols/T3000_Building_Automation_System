@@ -2,7 +2,7 @@
 
 
 
-// CBacnetThirdPartyMain 
+// CBacnetThirdPartyMain 窗体视图
 
 class CBacnetThirdPartyMain : public CFormView
 {
@@ -24,11 +24,11 @@ public:
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:
-    CBacnetThirdPartyMain();           // 
+    CBacnetThirdPartyMain();           // 动态创建所使用的受保护的构造函数
     virtual ~CBacnetThirdPartyMain();
     void Fresh();
     void Initial_combo();

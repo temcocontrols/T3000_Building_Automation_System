@@ -1,4 +1,4 @@
-// CO2_AUTO_CALIBRATION.cpp : 
+// CO2_AUTO_CALIBRATION.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 #include "ShowMessageDlg.h"
-// CCO2_AUTO_CALIBRATION 
+// CCO2_AUTO_CALIBRATION 对话框
 
 extern int CO2_MODBUS_CO2_BKCAL_ONOFF;
 extern int CO2_MODBUS_CO2_NATURE_LEVEL;
@@ -45,12 +45,12 @@ BEGIN_MESSAGE_MAP(CCO2_AUTO_CALIBRATION, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CCO2_AUTO_CALIBRATION 
+// CCO2_AUTO_CALIBRATION 消息处理程序
 
 
 void CCO2_AUTO_CALIBRATION::OnBnClickedButton1()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     int ret_value = 0;
     CString temp_cs;
     CString temp_cstring;
@@ -261,7 +261,7 @@ BOOL CCO2_AUTO_CALIBRATION::OnInitDialog()
     {
         return 1;
     }
-    // TODO:  
+    // TODO:  在此添加额外的初始化
     ((CComboBox *)GetDlgItem(IDC_COMBO_DLG_CO2_FIRMWARE_AUTO_CAL))->ResetContent();
     for (int i = 0; i < (sizeof(CO2_Node_Auto_Cal) / sizeof(CO2_Node_Auto_Cal[0])); i++)
     {
@@ -332,13 +332,13 @@ BOOL CCO2_AUTO_CALIBRATION::OnInitDialog()
     GetDlgItem(IDC_EDIT_FIGURE)->EnableWindow(false);
 
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // : OCX  FALSE
+                  // 异常: OCX 属性页应返回 FALSE
 }
 
 
 void CCO2_AUTO_CALIBRATION::OnCbnSelchangeComboDlgCo2FirmwareAutoCal()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_DLG_CO2_FIRMWARE_AUTO_CAL))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_DLG_CO2_FIRMWARE_AUTO_CAL))->GetLBText(nSel, temp_string);
@@ -361,23 +361,23 @@ void CCO2_AUTO_CALIBRATION::OnCbnSelchangeComboDlgCo2FirmwareAutoCal()
 
 void CCO2_AUTO_CALIBRATION::OnBnClickedButton2()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     PostMessage(WM_CLOSE, NULL, NULL);
 }
 
 
 void CCO2_AUTO_CALIBRATION::OnBnClickedButtonAbcHelp()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_ABC_Info;
-    temp_ABC_Info.Format(_T("The Co2 sensor will watch for the lowest concentration measured over the previous week, this is assumed to be the natural background C02 concentration on the earth of fresh air, currently this is 400ppm. If the sensor has been over or below 400 ppm a small nudge factor is added or subtracted from the actual reading to self compensate for variation over time of the sensing element and infrared light source. You can disable this feature if the building isnt hitting 400 ppm regularly during a given week. "));
+    temp_ABC_Info.Format(_T("The Co2 sensor will watch for the lowest concentration measured over the previous week, this is assumed to be the natural background C02 concentration on the earth of fresh air, currently this is 400ppm. If the sensor has been over or below 400 ppm a small nudge factor is added or subtracted from the actual reading to self compensate for variation over time of the sensing element and infrared light source. You can disable this feature if the building isn’t hitting 400 ppm regularly during a given week. "));
     MessageBox(temp_ABC_Info);
 }
 
 
 void CCO2_AUTO_CALIBRATION::OnBnClickedButtonCo2ScdHelp()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CShowMessageDlg dlg;
     CString temp_message;
     temp_message.Format(_T("Sensirion CO2 sensor RE-CALIBRATION \r\nLocate the device in an environment with air having a stable CO2 concentration in the range of 400 ppm to 2000 ppm. \r\n \
@@ -394,7 +394,7 @@ void CCO2_AUTO_CALIBRATION::OnBnClickedButtonCo2ScdHelp()
 
 void CCO2_AUTO_CALIBRATION::OnBnClickedButtonReCalibrationScdDone()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString strCalibration;
     GetDlgItem(IDC_EDIT_CO2_CALIBRATION_SCD)->GetWindowText(strCalibration);
 

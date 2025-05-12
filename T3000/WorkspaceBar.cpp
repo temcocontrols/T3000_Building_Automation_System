@@ -158,8 +158,8 @@ CWorkspaceBar::~CWorkspaceBar()
    	/*
 	Date:2013/05/29
 	Purpose:
-	parameters 1
-	2
+	parameters 1：根据层次
+	2：改变的名字，有新旧比较
    	*/
 BOOL CWorkspaceBar::UpdateDataToDB(){
  
@@ -193,9 +193,9 @@ BOOL CWorkspaceBar::UpdateDataToDB(){
 					 q.nextRow();
 				 }
 				 
-				 if (!is_exist)	 //
+				 if (!is_exist)	 //更新的名字在数据库中查找不到的
 				 {
-				 ////////////Building/////////////////////
+				 ////////////先更新Building表/////////////////////
 					 //CString strSql;
 					 strSql.Format(_T("delete   from Building_ALL where Building_Name = '%s' "),m_name_old);
 					 SqliteDBT3000.execDML((UTF8MBSTR)strSql);
@@ -404,7 +404,7 @@ int CWorkspaceBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	CBitmap a_ext;
 	a_ext.LoadBitmap(IDB_TREENODE_BMP_EXT);
-	m_image_list.Add(&a_ext, RGB(0, 0, 0)); //35
+	m_image_list.Add(&a_ext, RGB(0, 0, 0)); //此节点第一个元素序号为35
 
     m_TreeCtrl.SetImageList(&m_image_list,TVSIL_NORMAL);
 
@@ -474,7 +474,7 @@ void CWorkspaceBar::OnFolderBrowerBtn()
 LRESULT CWorkspaceBar::OnNcHitTest(CPoint point)
 {
 	 
-	//  dockable pane 
+	// 使得 dockable pane 无法拖动了。
 return 0;  
 	return CDockablePane::OnNcHitTest(point);
 }

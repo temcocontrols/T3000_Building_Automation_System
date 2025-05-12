@@ -21,7 +21,7 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);//.
+	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);//手动加入.
 	DECLARE_MESSAGE_MAP()
 	bool Run_once_mutex;
 public:

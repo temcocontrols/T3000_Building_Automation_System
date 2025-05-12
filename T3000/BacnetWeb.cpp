@@ -1,4 +1,4 @@
-// BacnetWeb.cpp : 
+// BacnetWeb.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// CBacnetWeb 
+// CBacnetWeb 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetWeb, CDialogEx)
 
@@ -32,14 +32,14 @@ BEGIN_MESSAGE_MAP(CBacnetWeb, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetWeb 
+// CBacnetWeb 消息处理程序
 
 
 BOOL CBacnetWeb::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  
+    // TODO:  在此添加额外的初始化
 
     CRect rectClient;
     GetClientRect(&rectClient);
@@ -60,13 +60,13 @@ BOOL CBacnetWeb::OnInitDialog()
 
 
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // : OCX  FALSE
+                  // 异常: OCX 属性页应返回 FALSE
 }
 
 
 void CBacnetWeb::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: /
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
 
     CDialogEx::OnTimer(nIDEvent);
 }

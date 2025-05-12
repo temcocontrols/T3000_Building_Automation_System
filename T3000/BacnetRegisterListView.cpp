@@ -64,8 +64,8 @@ END_MESSAGE_MAP()
 
 void CBacnetRegisterListView::OnBnClickedListDelete()
 {
-    //
-    //m_register_view 
+    //添加代码弹出消息框
+    //删除 m_register_view 鼠标点击的这一行
 
     MessageBox(_T("Delete"));
 
@@ -73,7 +73,7 @@ void CBacnetRegisterListView::OnBnClickedListDelete()
 
 void CBacnetRegisterListView::OnBnClickedListAdd()
 {
-    //_register_view 
+    //新增m_register_view 一行
     m_register_view.InsertItem(m_register_view.GetItemCount(), _T(" "));
     //MessageBox(_T("Add"));
 }
@@ -116,7 +116,7 @@ DWORD WINAPI  CBacnetRegisterListView::ReadRegDataThreadfun(LPVOID lpVoid)
         {
             if (i == 4)
                 i = 68; //
-            // 
+            //如果是T3 中间很多都不用读;
         }
     }
     ::PostMessage(pParent->m_hWnd,WM_REFRESH_REGISTER_LIST, NULL, 1);
@@ -358,7 +358,7 @@ void CBacnetRegisterListView::OnSize(UINT nType, int cx, int cy)
 {
     CDialogEx::OnSize(nType, cx, cy);
 
-    // TODO: 
+    // TODO: 在此处添加消息处理程序代码
 
     if (m_register_view.GetSafeHwnd() == NULL)   return;
     CRect rect;
@@ -421,7 +421,7 @@ int Read_Data_From_DB(int* m_max_retreg)
     ApplicationFolder.ReleaseBuffer();
     cs_register_db_path = ApplicationFolder + _T("\\ResourceFile\\RegistersListDB.mdb");
 
-    monitor_bado.SetDBPath(cs_register_db_path);	//
+    monitor_bado.SetDBPath(cs_register_db_path);	//暂时不创建新数据库
     monitor_bado.OnInitADOConn();
 
     int temp_count = 0;
@@ -683,7 +683,7 @@ int Read_Data_From_DB(int* m_max_retreg)
             continue;
         }
 
-        if (register_dbdata[temp_count].m_register_address < 10000) //
+        if (register_dbdata[temp_count].m_register_address < 10000) //不想读几万个，等那么久
         {
             if (m_max_reg <= register_dbdata[temp_count].m_register_address)
                 m_max_reg = register_dbdata[temp_count].m_register_address;
@@ -725,7 +725,7 @@ void CBacnetRegisterListView::QueryTable(CString n_device_db_name)
 {
     m_thir_db_data.clear();
     CBADO third_db_bado;
-    third_db_bado.SetDBPath(m_third_db_path);	//
+    third_db_bado.SetDBPath(m_third_db_path);	//暂时不创建新数据库
     third_db_bado.OnInitADOConn();
     int temp_record_count = 0;
     CString strSql;
@@ -830,7 +830,7 @@ void CBacnetRegisterListView::QueryAllDbDeviceName()
 {
     vector_third_db_name.clear();
     CBADO monitor_bado;
-    monitor_bado.SetDBPath(m_third_db_path);	//
+    monitor_bado.SetDBPath(m_third_db_path);	//暂时不创建新数据库
     monitor_bado.OnInitADOConn();
     CString strSql;
     strSql.Format(_T("select DISTINCT Device_DB_Name from ThirdPartyRegister "));
@@ -923,15 +923,15 @@ void CBacnetRegisterListView::Initial_List()
     
 	if (m_device_mode)
 	{
-		//
+		//判断文件是否存在
 		if (PathFileExists(m_third_db_path))
 		{
 			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The register list for the corresponding product was not found !"));
 			
             QueryAllDbDeviceName();
-			//bobox
+			//清空下面的combobox
 			((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->ResetContent();
-			//ctor_third_db_name box
+			//循环将vector_third_db_name 的内容添加到combobox中
             if (vector_third_db_name.size() > 0)
             {
                 for (size_t i = 0; i < vector_third_db_name.size(); i++)
@@ -1211,7 +1211,7 @@ LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lPara
                 n_temp_int = product_register_value[n_start_add] * 65536 + product_register_value[n_start_add + 1];
                 n_value.Format(_T("%d"), n_temp_int);
             }
-            else if (register_dbdata[i].m_register_length == 4) //
+            else if (register_dbdata[i].m_register_length == 4) //长度为4的是针对 序列号的，序列号是奇葩 占用8个字节 ;
             {
                 unsigned int n_temp_int = 0;
                 n_temp_int = product_register_value[n_start_add] + product_register_value[n_start_add + 1] * 256 + product_register_value[n_start_add + 2] * 256 * 256 + product_register_value[n_start_add + 3] * 256 * 256 * 256;
@@ -1541,7 +1541,7 @@ LRESULT CBacnetRegisterListView::Fresh_Register_List(WPARAM wParam, LPARAM lPara
 
 void CBacnetRegisterListView::OnClose()
 {
-    // TODO: 
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
 
     CDialogEx::OnClose();
 }
@@ -1550,7 +1550,7 @@ void CBacnetRegisterListView::OnClose()
 void CBacnetRegisterListView::OnLvnItemchangedListRegisterView(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     *pResult = 0;
 }
 
@@ -1558,7 +1558,7 @@ void CBacnetRegisterListView::OnLvnItemchangedListRegisterView(NMHDR *pNMHDR, LR
 void CBacnetRegisterListView::OnNMClickListRegisterView(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     *pResult = 0;
     long lRow, lCol;
     m_register_view.Set_Edit(true);
@@ -1574,7 +1574,7 @@ void CBacnetRegisterListView::OnNMClickListRegisterView(NMHDR *pNMHDR, LRESULT *
     lCol = lvinfo.iSubItem;
 
 
-    if (lRow>m_register_view.GetItemCount()) //
+    if (lRow>m_register_view.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
         return;
     if (lRow<0)
         return;
@@ -1599,7 +1599,7 @@ void CBacnetRegisterListView::OnNMClickListRegisterView(NMHDR *pNMHDR, LRESULT *
 
 void CBacnetRegisterListView::OnBnClickedButtonCreateDb()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     int n_ret = 0;
     CString FilePath;
 
@@ -1619,9 +1619,9 @@ void CBacnetRegisterListView::OnBnClickedButtonCreateDb()
 
 void CBacnetRegisterListView::OnBnClickedButtonThirdSave()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CBADO monitor_bado;
-    monitor_bado.SetDBPath(m_third_db_path);	//
+    monitor_bado.SetDBPath(m_third_db_path);	//暂时不创建新数据库
     monitor_bado.OnInitADOConn();
     CString temp_db_name; CString temp_operation; CString temp_reg_name; CString temp_data_formate; CString temp_description; CString temp_unit;
     GetDlgItemText(IDC_EDIT_REGISTER_DB_NAME, temp_db_name);
@@ -1650,7 +1650,7 @@ void CBacnetRegisterListView::UpdateThirdUI()
 void CBacnetRegisterListView::OnNMRClickListRegisterView(NMHDR* pNMHDR, LRESULT* pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
 
     CString temp_cstring;
     long lRow, lCol;
@@ -1666,7 +1666,7 @@ void CBacnetRegisterListView::OnNMRClickListRegisterView(NMHDR* pNMHDR, LRESULT*
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
 
-    if (lRow > m_register_view.GetItemCount()) //
+    if (lRow > m_register_view.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
         return;
     if (lRow < 0)
         return;
@@ -1686,7 +1686,7 @@ void CBacnetRegisterListView::OnNMRClickListRegisterView(NMHDR* pNMHDR, LRESULT*
 
 void CBacnetRegisterListView::OnCbnSelchangeComboRegisterDb()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_string;
     int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->GetCurSel();
     ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->GetLBText(nSel, temp_string);
@@ -1696,9 +1696,9 @@ void CBacnetRegisterListView::OnCbnSelchangeComboRegisterDb()
 
 void CBacnetRegisterListView::OnBnClickedButtonDeleteSelectedDb()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CBADO monitor_bado;
-    monitor_bado.SetDBPath(m_third_db_path);	//
+    monitor_bado.SetDBPath(m_third_db_path);	//暂时不创建新数据库
     monitor_bado.OnInitADOConn();
     CString temp_db_name; 
     GetDlgItemText(IDC_EDIT_REGISTER_DB_NAME, temp_db_name);
@@ -1709,9 +1709,9 @@ void CBacnetRegisterListView::OnBnClickedButtonDeleteSelectedDb()
     monitor_bado.CloseConn();
     QueryAllDbDeviceName();
     
-    //bobox
+    //清空下面的combobox
     ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->ResetContent();
-    //ctor_third_db_name box
+    //循环将vector_third_db_name 的内容添加到combobox中
     for (size_t i = 0; i < vector_third_db_name.size(); i++)
     {
         ((CComboBox*)GetDlgItem(IDC_COMBO_REGISTER_DB))->AddString(vector_third_db_name.at(i));

@@ -17,7 +17,7 @@
 // BacnetController dialog
 int PID_CONTROLLER_LIMITE_ITEM_COUNT = 0;
 
-extern tree_product selected_product_Node; // ;
+extern tree_product selected_product_Node; // 选中的设备信息;
 extern int pointtotext_for_controller(char *buf,Point_T3000 *point);
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
 
@@ -77,14 +77,14 @@ LRESULT  BacnetController::ControllerMessageCallBack(WPARAM wParam, LPARAM lPara
 	}
 	else
 	{
-		memcpy_s(&m_controller_data.at(pInvoke->mRow),sizeof(Str_controller_point),&m_temp_controller_data[pInvoke->mRow],sizeof(Str_controller_point));//
+		memcpy_s(&m_controller_data.at(pInvoke->mRow),sizeof(Str_controller_point),&m_temp_controller_data[pInvoke->mRow],sizeof(Str_controller_point));//还原没有改对的值
 		PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		//AfxMessageBox(Show_Results);
 		//MessageBox(_T("Bacnet operation fail!"));
 	}
-	if((pInvoke->mRow%2)==0)	//  ;
+	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 		m_controller_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
 		m_controller_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -132,21 +132,21 @@ BOOL BacnetController::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 
 
 		return 1; 
 	}
-	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //F2;
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
 	{
 		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_CONTROLLER);
 		return TRUE;
@@ -227,8 +227,8 @@ void BacnetController::Initial_List()
 				m_controller_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
 		}
 	}
-	m_controller_list.Special_ToolTips(CONTROLLER_ACTION, _T(" Set this to + for systems like cooling where the action increases when the temperature is above the setpoint.\r\n\r\n\
-Set this to - for systems like heating where the action increases when the temperature is below setpoint.\r\n\r\n\
+	m_controller_list.Special_ToolTips(CONTROLLER_ACTION, _T(" Set this to ‘+’ for systems like cooling where the action increases when the temperature is above the setpoint.\r\n\r\n\
+Set this to ‘-‘ for systems like heating where the action increases when the temperature is below setpoint.\r\n\r\n\
 For more info  on PIDs check out the help documents. "), 1);
 	m_controller_list.InitListData();
 		m_controller_list.ShowWindow(SW_SHOW);
@@ -260,7 +260,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 #if 1
 		if(m_controller_list.IsDataNewer((char *)&m_controller_data.at(0),sizeof(Str_controller_point) * BAC_PID_COUNT))
 		{
-			//list ;List;
+			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
 			m_controller_list.SetListData((char *)&m_controller_data.at(0),sizeof(Str_controller_point) * BAC_PID_COUNT);
 		}
 		else
@@ -304,7 +304,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 						temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 					temp_des2.ReleaseBuffer();	
 					temp_des2 = temp_des2.Left(STR_IN_LABEL).Trim();
-					//,input in2.
+					//如果是小叶的设备,因为没有input 就直接显示in2之类.
 					if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 					{
 						temp_des2.Empty();
@@ -333,7 +333,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 						m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,Input_List_Analog_Units[m_Input_data.at(x).range]);
 					}
 
-					//,input rang .
+					//如果是小叶的设备,因为没有input 就直接显示rang 对应的值.
 					if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 					{
 						if(m_controller_data.at(i).units < sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0]))
@@ -411,9 +411,9 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 					int num_point,num_panel,num_net,k;
 					Point_T3000 point;
 					point.number = m_controller_data.at(i).setpoint.number;
-					point.number = point.number + 1;	//input setpoint  0  point label 1;
+					point.number = point.number + 1;	//input setpoint 是从 0 开始计数的 ，但是要去找point label 要从1开始;
 					point.panel = m_controller_data.at(i).setpoint.panel;
-					point.point_type = m_controller_data.at(i).setpoint.point_type - 1;	// ispoint;
+					point.point_type = m_controller_data.at(i).setpoint.point_type - 1;	//调用 ispoint的时候要减一;
 					byte point_type,var_type;
 
 					int temp_network = 0;
@@ -458,9 +458,9 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 				int num_point,num_panel,num_net,k;
 				Point_T3000 point;
 				point.number = m_controller_data.at(i).setpoint.number;
-				point.number = point.number + 1;	//input setpoint  0  point label 1;
+				point.number = point.number + 1;	//input setpoint 是从 0 开始计数的 ，但是要去找point label 要从1开始;
 				point.panel = m_controller_data.at(i).setpoint.panel;
-				point.point_type = m_controller_data.at(i).setpoint.point_type - 1;	// ispoint;
+				point.point_type = m_controller_data.at(i).setpoint.point_type - 1;	//调用 ispoint的时候要减一;
 				byte point_type,var_type;
 
 				int temp_network = 0;
@@ -520,7 +520,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 						}
 						else
 						{
-							if(m_Variable_data.at(x).range == 20)	//;
+							if(m_Variable_data.at(x).range == 20)	//如果是时间;
 							{
 								temp_set_unit = Variable_Analog_Units_Array[m_Variable_data.at(x).range];
 								char temp_char[50];
@@ -667,13 +667,13 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 	CString New_CString =  m_controller_list.GetItemText(Changed_Item,Changed_SubItem);
 	CString cstemp_value;
 
-	// ;
+	//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
 	memcpy_s(&m_temp_controller_data[Changed_Item],sizeof(Str_controller_point),&m_controller_data.at(Changed_Item),sizeof(Str_controller_point));
 
 
 	if(Changed_SubItem == CONTROLLER_INPUT)
 	{
-		if(bacnet_device_type == STM32_HUM_NET) //
+		if(bacnet_device_type == STM32_HUM_NET) //小叶的设备不支持修改
 		{
 			return 0;
 		}
@@ -715,7 +715,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 					m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
 					return 0;
 				}
-				if(temp_number > 0);	//Input2  number 1;
+				if(temp_number > 0);	//因为Input2  的number 是1;
 					temp_number = temp_number - 1;
 				temp_point_type = temp_point_type + 1;
 				if(2 == temp_point_type)
@@ -793,7 +793,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 
 	if(Changed_SubItem == CONTROLLER_INPUTVALUE)
 	{
-		if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485)) //STM32_HUM_NET
+		if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485)) //STM32_HUM_NET的设备不支持修改
 		{
 			return 0;
 		}
@@ -815,7 +815,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 
 	if(Changed_SubItem == CONTROLLER_SETVALUE)
 	{
-		if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485)) //STM32_HUM_NET
+		if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485)) //STM32_HUM_NET的设备不支持修改
 		{
 			int temp_proportional=0;
 			CString cs_temp = m_controller_list.GetItemText(Changed_Item,Changed_SubItem);
@@ -910,9 +910,9 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
                     m_controller_list.SetItemText(Changed_Item, Changed_SubItem, _T(""));
                     return 0;
                 }
-                if (temp_number > 0)	//Setpoint ;0 ;
+                if (temp_number > 0)	//Setpoint 也是这样;从0 开始的;
                     temp_number = temp_number - 1;
-                temp_point_type = temp_point_type + 1; //OUTPUT=1, INPUT, VARIABLE ;
+                temp_point_type = temp_point_type + 1; //OUTPUT=1, INPUT, VARIABLE 要错位;
                 m_controller_data.at(Changed_Item).setpoint.number = temp_number;
                 m_controller_data.at(Changed_Item).setpoint.panel = temp_panel;//bac_gloab_panel;
                 m_controller_data.at(Changed_Item).setpoint.point_type = temp_point_type;//1 means input point
@@ -1075,7 +1075,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 	if(lRow>= PID_CONTROLLER_LIMITE_ITEM_COUNT)
 		return;
 
-	if(lRow>m_controller_list.GetItemCount()) //
+	if(lRow>m_controller_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if(lRow<0)
 		return;
@@ -1172,7 +1172,7 @@ void BacnetController::OnTimer(UINT_PTR nIDEvent)
 			{
 				PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
 			}
-			else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM;
+			else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 			{
 				if(bac_select_device_online)
 				{
@@ -1255,14 +1255,14 @@ void BacnetController::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return;
@@ -1276,7 +1276,7 @@ void BacnetController::Reset_Controller_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -1284,7 +1284,7 @@ void BacnetController::Reset_Controller_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))

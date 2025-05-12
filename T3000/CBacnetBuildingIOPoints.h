@@ -1,23 +1,23 @@
 ﻿#pragma once
 
 #include "CM5/ListCtrlEx.h"
-// CBacnetBuildingIOPoints 
+// CBacnetBuildingIOPoints 对话框
 
 class CBacnetBuildingIOPoints : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnetBuildingIOPoints)
 
 public:
-	CBacnetBuildingIOPoints(CWnd* pParent = nullptr);   // 
+	CBacnetBuildingIOPoints(CWnd* pParent = nullptr);   // 标准构造函数
 	virtual ~CBacnetBuildingIOPoints();
 
-// 
+// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_BUILDING_IO_POINT };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 
@@ -45,5 +45,5 @@ const int BM_IO_RANGE = 10;
 const int BM_IO_LABEL = 11;
 
 //const int BM_IO_TYPE = 5;
-//const int BM_ID_PRODUCT = 6;  //
-//const int BM_IO_STATUS = 7; // 0 offline   1  online   2 
+//const int BM_ID_PRODUCT = 6;  //产品类型
+//const int BM_IO_STATUS = 7; // 0 offline   1  online   2 在线未知

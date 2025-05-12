@@ -499,7 +499,7 @@ void RS485_Check_UART_Data(
         if (!ReadFile(RS485_Handle, lpBuf, sizeof(lpBuf), &dwRead, NULL)) {
             if (GetLastError() != ERROR_IO_PENDING) {
 				int temp_error = GetLastError();
-                if (temp_error == 995) // (995)-  I/O 
+                if (temp_error == 995) // (995)- 由于线程退出或应用程序请求，已放弃 I/O 操作。
                 {
                     DWORD lpErrors = 0;
                     COMSTAT lpStat = { 0 };
@@ -507,9 +507,9 @@ void RS485_Check_UART_Data(
                 }
 
                 mstp_port->ReceiveError = TRUE;
-				//PurgeComm(RS485_Handle, PURGE_TXABORT| PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//,
-			//	RS485_Cleanup();//Fance 
-			//	 RS485_Initialize();//Fance 
+				//PurgeComm(RS485_Handle, PURGE_TXABORT| PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//每次读都清空一次，多次调用后会触发错误,重叠模式
+			//	RS485_Cleanup();//Fance 添加，原来没有
+			//	 RS485_Initialize();//Fance 添加，原来没有
             }
         } else {
             if (dwRead) {
@@ -537,7 +537,7 @@ BOOL RS485_PTP_Check_UART_Data(
 			if (GetLastError() != ERROR_IO_PENDING) {
 				int tempa = GetLastError();
 				//mstp_port->ReceiveError = TRUE;
-				//	PurgeComm(RS485_Handle, PURGE_TXABORT| PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//,
+				//	PurgeComm(RS485_Handle, PURGE_TXABORT| PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//每次读都清空一次，多次调用后会触发错误,重叠模式
 				RS485_Cleanup();
 				RS485_Initialize();
 			}

@@ -154,9 +154,9 @@ void CBacnetTool::InitialTemcoLogo()
 		IMAGE_BITMAP,0,0,  
 		LR_LOADMAP3DCOLORS);  
 
-	CStatic *pStatic=(CStatic *)GetDlgItem(IDC_STATIC_BAC_LOGO); // 
-	pStatic->ModifyStyle(0xF,SS_BITMAP/*|SS_CENTERIMAGE*/);  //  ;
-	pStatic->SetBitmap(hBitmap);     // 
+	CStatic *pStatic=(CStatic *)GetDlgItem(IDC_STATIC_BAC_LOGO); //获得指向静态控件的指针 
+	pStatic->ModifyStyle(0xF,SS_BITMAP/*|SS_CENTERIMAGE*/);  //设置静态控件的样式，使其位图居中  ;
+	pStatic->SetBitmap(hBitmap);     //设置静态控件显示位图 
 }
 
 void CBacnetTool::InitialBacnetConnection()
@@ -542,7 +542,7 @@ void Localhandler_read_property_ack_tool(
 					temp_showvalue.GetBuffer(MAX_PATH), MAX_PATH );
 				temp_showvalue.ReleaseBuffer();
 				m_bacnet_tool_device.at(i).Htree_Prop_object_name.show_cstring = temp_showvalue;
-				//treeview item 1001  new;fresh tree ;
+				//如果treeview 对应的item 例如1001 没有此项 就在此设置为new;之后会在fresh tree 的函数里面将此项加进去，并设置为已经存在;
 				if(m_bacnet_tool_device.at(i).Htree_Prop_object_name.treestatus != TREE_ALREADY_EXSIT)
 					m_bacnet_tool_device.at(i).Htree_Prop_object_name.treestatus = TREE_NEED_NEW;
 				PostMessage(bac_tool_hwnd,WM_FRESH_BAC_TOOL_LISTVIEW,NULL,NULL);

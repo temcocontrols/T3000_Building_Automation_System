@@ -46,7 +46,7 @@ public:
 	void Reset_Program_Rect();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	bool window_max; // ;
+	bool window_max; // 标记是否已经最大化;
 	afx_msg void OnBnClickedButton1();
 };
 

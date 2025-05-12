@@ -76,7 +76,7 @@ void CT3000DefaultView::OnPaint()
 
 	CRect test_rect;
 	HWND temp_hwnd = this->m_hWnd;
-	::GetWindowRect(temp_hwnd,&test_rect);	// view;
+	::GetWindowRect(temp_hwnd,&test_rect);	//获取 view的窗体大小;
 	Bitmap bitmap(hBitmap_default_bmp,NULL);
 	graphics.DrawImage(&bitmap,0 ,0,test_rect.Width(),test_rect.Height());
 #endif

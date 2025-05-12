@@ -74,7 +74,7 @@ void CEreaseDlg::OnBnClickedMyOk()
 			for (int j = 0; j < 7; j++)
 			{
 				ret = write_one(g_tstat_id, 6, ID);
-				if (ret < 0) // 0  ID
+				if (ret < 0) // 小于0 两种可能 ，要么无应答，要么设备已经变更了ID
 				{
 					int new_id = read_one(ID, 6, 3);
 					if (new_id == ID)

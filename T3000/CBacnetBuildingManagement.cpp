@@ -1,4 +1,4 @@
-﻿// CBacnetBuildingManagement.cpp: 
+﻿// CBacnetBuildingManagement.cpp: 实现文件
 //
 
 #include "stdafx.h"
@@ -38,7 +38,7 @@ BEGIN_MESSAGE_MAP(CBacnetBuildingManagement, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetBuildingManagement 
+// CBacnetBuildingManagement 诊断
 
 #ifdef _DEBUG
 void CBacnetBuildingManagement::AssertValid() const
@@ -55,7 +55,7 @@ void CBacnetBuildingManagement::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 
-// CBacnetBuildingManagement 
+// CBacnetBuildingManagement 消息处理程序
 
 
 void CBacnetBuildingManagement::Fresh()
@@ -65,7 +65,7 @@ void CBacnetBuildingManagement::Fresh()
 	Initial_List();
 
 	LoadFileShowToList();
-	// TODO: 
+	// TODO: 在此处添加实现代码.
 }
 
 
@@ -104,14 +104,14 @@ void CBacnetBuildingManagement::Initial_List()
 
 void CBacnetBuildingManagement::OnBnClickedButtonBmAdd()
 {
-	// TODO: 
+	// TODO: 在此添加控件通知处理程序代码
 	return;
 }
 
 //int test_count = 35;
 void CBacnetBuildingManagement::OnBnClickedButtonBmDelete()
 {
-	// TODO: 
+	// TODO: 在此添加控件通知处理程序代码
 	if (MessageBox(_T("This operation will clear all the configuration. Are you sure?"), _T("Notic"), MB_OKCANCEL) == IDOK)
 	{
 		DeleteFile(cs_bm_ini);
@@ -126,14 +126,14 @@ void CBacnetBuildingManagement::OnBnClickedButtonBmDelete()
 	TV_INSERTSTRUCT tvInsert;////added
 	CString strBuilding = tempcs;//m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
 
-	tvInsert.hParent = TVI_ROOT; // 
-	tvInsert.item.mask = ITEM_MASK; // V_ITEM
+	tvInsert.hParent = TVI_ROOT; // 指定父句柄
+	tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 	tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strBuilding;
-	tvInsert.hInsertAfter = TVI_LAST; // 
+	tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 	//TVINSERV_BUILDING
 	tvInsert.item.iImage = test_count; tvInsert.item.iSelectedImage = test_count;
 	HTREEITEM hTreePointList = NULL;
-	hTreePointList = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//ointList
+	hTreePointList = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
 	test_count++;
 #endif
 }
@@ -187,7 +187,7 @@ void CBacnetBuildingManagement::SaveAllIntoIniFile()
 
 void CBacnetBuildingManagement::OnBnClickedButtonBmDone()
 {
-	// TODO: 
+	// TODO: 在此添加控件通知处理程序代码
 	//ShowListToTree();
 }
 
@@ -247,22 +247,22 @@ void CBacnetBuildingManagement::TreeInital()
 	TV_INSERTSTRUCT tvInsert;////added
 	CString strBuilding = _T("Point List");//m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
 
-	tvInsert.hParent = TVI_ROOT; // 
-	tvInsert.item.mask = ITEM_MASK; // V_ITEM
+	tvInsert.hParent = TVI_ROOT; // 指定父句柄
+	tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 	tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strBuilding;
-	tvInsert.hInsertAfter = TVI_LAST; // 
+	tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 	TVINSERV_BUILDING
 
 	HTREEITEM hTreePointList = NULL;
 
-	hTreePointList = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//ointList
+	hTreePointList = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
 
-#pragma region ntList
+#pragma region 根节点显示PointList
 	BuildingNode.hParent = TVI_ROOT;
 	BuildingNode.h_treeitem = hTreePointList;
 	BuildingNode.m_child_count = (unsigned char)nGroupCount;
 	BuildingNode.m_csName = _T("Point List");
-	BuildingNode.m_index = 0; //
+	BuildingNode.m_index = 0; //根节点 序号就是0
 #pragma endregion
 
 
@@ -270,12 +270,12 @@ void CBacnetBuildingManagement::TreeInital()
 	for (int i = 0; i < nGroupCount; i++)
 	{
 		HTREEITEM hTreeGroup = NULL;
-		tvInsert.hParent = hTreePointList; // 
-		tvInsert.item.mask = ITEM_MASK; // V_ITEM
+		tvInsert.hParent = hTreePointList; // 指定父句柄
+		tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 		tvInsert.item.pszText = (LPTSTR)(LPCTSTR)groupname[i];
-		tvInsert.hInsertAfter = TVI_LAST; // 
+		tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 		TVINSERV_ROOM
-			hTreeGroup = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//ointList
+			hTreeGroup = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
 
 		if (BuildingNode.pchild[i] == NULL)
 			BuildingNode.pchild[i] = new CBacnetBMD;
@@ -299,7 +299,7 @@ void CBacnetBuildingManagement::TreeInital()
 				BuildingNode.pchild[i]->pchild[j] = new CBacnetBMD;
 			int temp_io_count = 0;
 			HTREEITEM hTreeABC123 = NULL;
-			CString temp_abc1_name; //
+			CString temp_abc1_name; //这里要先从数据库读取名字，读取不到就用默认的名字;
 			CString section_device_name;
 			CString section_io_count;
 			section_device_name.Format(_T("DeviceName%d"), j);
@@ -310,19 +310,19 @@ void CBacnetBuildingManagement::TreeInital()
 			BuildingNode.pchild[i]->pchild[j]->m_csName.ReleaseBuffer();
 			temp_abc1_name = BuildingNode.pchild[i]->pchild[j]->m_csName;
 
-			tvInsert.hParent = hTreeGroup; // 
-			tvInsert.item.mask = ITEM_MASK; // V_ITEM
+			tvInsert.hParent = hTreeGroup; // 指定父句柄
+			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_abc1_name;
-			tvInsert.hInsertAfter = TVI_LAST; // 
+			tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 			if(i==0)
-				TVINSERV_MINIPANEL   //
+				TVINSERV_MINIPANEL   //这里到时候要判断到底是什么设备
 			else if (i == 1)
 				TVINSERV_TSTAT8
 			else if (i == 2)
 				TVINSERV_T3ARM
 			else
 				TVINSERV_MINIPANEL
-			hTreeABC123 = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//ointList
+			hTreeABC123 = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
 
 			CBacnetBMD* temp_bmd_point = NULL;
 
@@ -367,12 +367,12 @@ void CBacnetBuildingManagement::TreeInital()
 
 
 
-				tvInsert.hParent = hTreeABC123; // 
-				tvInsert.item.mask = ITEM_MASK; // V_ITEM
+				tvInsert.hParent = hTreeABC123; // 指定父句柄
+				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 				tvInsert.item.pszText = (LPTSTR)(LPCTSTR)io_name;
-				tvInsert.hInsertAfter = TVI_LAST; // 
+				tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 
-				//put
+				//暂时用input
 				if (io_type == TYPE_BM_INPUT)
 				{
 					temp_bmd_point->m_input_count++;
@@ -422,7 +422,7 @@ void CBacnetBuildingManagement::TreeInital()
 					}
 				}
 				HTREEITEM hTreeIO = NULL;
-				hTreeIO = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//ointList
+				hTreeIO = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
 
 				CBacnetBMD* temp_io_point = NULL;
 
@@ -473,7 +473,7 @@ void CBacnetBuildingManagement::TreeInital()
 	}
 	if (hTreePointList != NULL)
 		pFrame_BM->m_pTreeViewCrl->Expand(hTreePointList, TVE_EXPAND);
-	BuildingNode.UpdateCount(); //tuut
+	BuildingNode.UpdateCount(); //递归计算每一个input和output的数量
 
 	UpdateList();
 
@@ -481,15 +481,15 @@ void CBacnetBuildingManagement::TreeInital()
 
 
 	CString strvirtualdevice = _T("System List");//m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
-	tvInsert.hParent = TVI_ROOT; // 
-	tvInsert.item.mask = ITEM_MASK; // V_ITEM
+	tvInsert.hParent = TVI_ROOT; // 指定父句柄
+	tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 	tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strvirtualdevice;
-	tvInsert.hInsertAfter = TVI_LAST; // 
+	tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 	TVINSERV_BUILDING
 
 
 
-	hTreeDeviceList = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//ointList
+	hTreeDeviceList = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
 
 	LoadDevice();
 	pFrame_BM->m_pTreeViewCrl->Expand(hTreeDeviceList, TVE_EXPAND);
@@ -509,7 +509,7 @@ void CBacnetBuildingManagement::LoadDevice()
 	TV_INSERTSTRUCT tvInsert;
 	if (!q.eof())
 	{
-		while (!q.eof())//
+		while (!q.eof())//所有 设备;
 		{
 
 			tree_product m_product_temp = { 0 };
@@ -523,14 +523,14 @@ void CBacnetBuildingManagement::LoadDevice()
 			}
 			else
 			{
-				tvInsert.item.mask = ITEM_MASK; // V_ITEM
+				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 				//q.nextRow();
 				//continue;
 			}
 			temp_parent_serialnum = q.getValuebyName(L"Parent_SerialNum");
 			unsigned int temp_int_serial;
 			temp_int_serial = (unsigned int)_wtoi(temp_parent_serialnum);
-			if ((!temp_parent_serialnum.IsEmpty()) && (temp_int_serial != 0))	//
+			if ((!temp_parent_serialnum.IsEmpty()) && (temp_int_serial != 0))	//说明有父节点;先插入父节点
 			{
 				q.nextRow();
 				continue;
@@ -541,13 +541,13 @@ void CBacnetBuildingManagement::LoadDevice()
 			tvInsert.hParent = hTreeDeviceList;
 
 
-			// tvInsert.item.mask = ITEM_MASK; // V_ITEM
+			// tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strProdcut;
 			//TRACE(strProdcut);
-			tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 
+			tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
 			int temp_product_class_id = q.getIntField("Product_class_ID");
 			if ((temp_product_class_id != PM_MINIPANEL) && (temp_product_class_id != PM_MINIPANEL_ARM) && (temp_product_class_id != PM_ESP32_T3_SERIES))//Mini Panel)
-			{//3 minipanel 
+			{//不是T3 minipanel 系列
 				q.nextRow();
 				continue;
 			}
@@ -612,7 +612,7 @@ void CBacnetBuildingManagement::LoadDevice()
 				temp_product_class_id == PM_TSTAT8_220V)
 				TVINSERV_TSTAT8
 			else if (temp_product_class_id == PM_MULTI_SENSOR)
-				TVINSERV_TSTAT8   //TAT8 
+				TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
 			else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
 				TVINSERV_T3_NANO
 			else if ((temp_product_class_id == PM_CO2_NET) ||
@@ -623,7 +623,7 @@ void CBacnetBuildingManagement::LoadDevice()
 				(temp_product_class_id == STM32_CO2_NET) ||
 				(temp_product_class_id == STM32_PM25) ||
 				(temp_product_class_id == STM32_CO2_RS485) ||
-				(temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28 HUM T
+				(temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28 修复 HUM 使用默认TSTAT图标的bug
 				(temp_product_class_id == STM32_HUM_RS485))
 				TVINSERV_CO2
 			else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
@@ -662,12 +662,12 @@ void CBacnetBuildingManagement::LoadDevice()
 			{
 				CString temp_cs_serial;
 				temp_cs_serial.Format(_T("%u"), m_product_temp.serial_number);
-				//
-				m_product_temp.expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //
+				//如果父节点 是要求折叠的 就不要展开;
+				m_product_temp.expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //默认是都展开的;
 				if (m_product_temp.expand != 2)
 					pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
 				else
-					pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_COLLAPSE); //2
+					pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_COLLAPSE); //2就折叠
 			}
 
 
@@ -884,21 +884,21 @@ void CBacnetBuildingManagement::LoadDevice()
 					break;
 				}
 				tvInsert.hParent = hProductItem;
-				tvInsert.item.mask = ITEM_MASK; // V_ITEM
+				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 				tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_cs;
-				tvInsert.hInsertAfter = TVI_LAST;// TVI_LAST; // 
+				tvInsert.hInsertAfter = TVI_LAST;// TVI_LAST; // 项目插入方式
 				HTREEITEM hsubItem = pFrame_BM->m_pTreeViewCrl->InsertItem(&tvInsert);
 				m_product_temp.sub_io_info[x].h_tree_item = hsubItem;
 				m_product_temp.sub_io_info[x].h_parent_item = hProductItem;
 			}
 			CString temp_cs_serial;
 			temp_cs_serial.Format(_T("%u"), m_product_temp.serial_number);
-			//
-			m_product_temp.expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //
+			//如果父节点 是要求折叠的 就不要展开;
+			m_product_temp.expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //默认是都展开的;
 			if (m_product_temp.expand != 2)
 				pFrame_BM->m_pTreeViewCrl->Expand(hProductItem, TVE_EXPAND);
 			else
-				pFrame_BM->m_pTreeViewCrl->Expand(hProductItem, TVE_COLLAPSE); //2
+				pFrame_BM->m_pTreeViewCrl->Expand(hProductItem, TVE_COLLAPSE); //2就折叠
 
 			pFrame_BM->m_product.push_back(m_product_temp);
 			q.nextRow();
@@ -910,7 +910,7 @@ void CBacnetBuildingManagement::LoadDevice()
 	strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s'  and  Parent_SerialNum <> '0' and Parent_SerialNum <> '' "), strBuilding);
 	q = SqliteDBBuilding.execQuery((UTF8MBSTR)strSql);
 
-	if (!q.eof())//
+	if (!q.eof())//就说明这个节点下面有 挂在父节点下面的;
 	{
 		while (!q.eof())
 		{
@@ -947,11 +947,11 @@ void CBacnetBuildingManagement::LoadDevice()
 			if (find_parents)
 			{
 				CString strProdcut = q.getValuebyName(L"Product_name");
-				tvInsert.hParent = parents_item; // 
-				tvInsert.item.mask = ITEM_MASK; // V_ITEM
+				tvInsert.hParent = parents_item; // 指定父句柄
+				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 				tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strProdcut;
 				//TRACE(strProdcut);
-				tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 
+				tvInsert.hInsertAfter = TVI_SORT;// TVI_LAST; // 项目插入方式
 
 
 				int temp_product_class_id = q.getIntField("Product_class_ID");
@@ -999,7 +999,7 @@ void CBacnetBuildingManagement::LoadDevice()
 					temp_product_class_id == PM_TSTAT8_220V)
 					TVINSERV_TSTAT8
 				else if (temp_product_class_id == PM_MULTI_SENSOR)
-					TVINSERV_TSTAT8   //TAT8 
+					TVINSERV_TSTAT8   //暂且用TSTAT8 的图标
 				else if (temp_product_class_id == PM_ZIGBEE_REPEATER)
 					TVINSERV_T3_NANO
 				else if ((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485) ||
@@ -1009,7 +1009,7 @@ void CBacnetBuildingManagement::LoadDevice()
 					(temp_product_class_id == STM32_CO2_NET) ||
 					(temp_product_class_id == STM32_PM25) ||
 					(temp_product_class_id == STM32_CO2_RS485) ||
-					(temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28 HUM T
+					(temp_product_class_id == STM32_HUM_NET) ||    //2019 03 28 修复 HUM 使用默认TSTAT图标的bug
 					(temp_product_class_id == STM32_HUM_RS485))
 					TVINSERV_CO2
 				else if (temp_product_class_id == PM_CS_SM_AC || temp_product_class_id == PM_CS_SM_DC || temp_product_class_id == PM_CS_RSM_AC || temp_product_class_id == PM_CS_RSM_DC)
@@ -1042,20 +1042,20 @@ void CBacnetBuildingManagement::LoadDevice()
 				{
 					CString temp_cs_serial;
 					temp_cs_serial.Format(_T("%u"), uint_p_serial_number);
-					//
+					//如果父节点 是要求折叠的 就不要展开;
 					unsigned char temp_expand = 0;
-					temp_expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //
+					temp_expand = (unsigned char)GetPrivateProfileInt(temp_cs_serial, _T("Expand"), 1, g_ext_database_path); //默认是都展开的;
 					if (temp_expand != 2)
 						pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
 					else
-						pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_COLLAPSE); //2
+						pFrame_BM->m_pTreeViewCrl->Expand(hParent, TVE_COLLAPSE); //2就折叠
 				}
 
 				strSql = q.getValuebyName(L"Serial_ID");
 
 				long temp_serial_id = (long)(_wtoi64(strSql));
 				unsigned int correct_id = (DWORD)(_wtoi64(strSql));
-				//ce
+				//用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
 				//if(temp_serial_id < 0)
 				//{
 				//	CString wrong_serial_id;
@@ -1212,7 +1212,7 @@ void CBacnetBuildingManagement::UpdateList()
 
 void CBacnetBuildingManagement::OnBnClickedButtonBmSave()
 {
-	// TODO: 
+	// TODO: 在此添加控件通知处理程序代码
 	SaveAllIntoIniFile();
 }
 
@@ -1224,7 +1224,7 @@ void CBacnetBuildingManagement::SetDataTreeCtrl()
 
 void CBacnetBuildingManagement::OnBnClickedButtonDbDone()
 {
-	// TODO: 
+	// TODO: 在此添加控件通知处理程序代码
 	LoadFileShowToList();
 	::PostMessage(h_db_io_hwnd,WM_REFRESH_BAC_BUILDING_IO_LIST, NULL, NULL);
 }

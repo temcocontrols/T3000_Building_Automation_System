@@ -60,7 +60,7 @@ protected:
 	void			FlashByCom();
 
 	CString		GetCurSelPageStr();
-	//  
+	// 烧 序列号
 	void			FlashSN();
 
 	unsigned long get_file_last_serialnumber();
@@ -73,14 +73,14 @@ protected:
 
 	//CString				m_strHexFileName;
 
-	CComWriter*	m_pComWriter;				// flash
-//	TFTPServer*	m_pTFTPServer;				// TFTPflash
-	//char*				m_pFileBuf;						// flashdeletenew
+	CComWriter*	m_pComWriter;				// 用串口flash的类的指针，在使用时才实例化，用完后立即释放
+//	TFTPServer*	m_pTFTPServer;				// 使用网络，TFTP协议flash，使用时实例化
+	//char*				m_pFileBuf;						// 文件缓冲区，用来存放读取的文件的内容，flash完后应当delete，使用时再new
 
 	
 	// flash sn
-	BOOL				m_bFlashSN;					// serial number.
-//	BOOL				m_bFlashMacAddr;			// Mac address
+	BOOL				m_bFlashSN;					// 是否烧serial number.
+//	BOOL				m_bFlashMacAddr;			// 是否烧Mac address
 
 
 };

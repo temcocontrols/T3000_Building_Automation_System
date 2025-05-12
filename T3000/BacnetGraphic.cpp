@@ -52,18 +52,18 @@ CPointItem *pPrevItem = NULL;
 CPointItem	*m_pFirstItem[INPUT_NUMBER];
 
 unsigned int time_interval_point = 0;
-unsigned int customer_define_x_time = 3600;	//  x  ; 
+unsigned int customer_define_x_time = 3600;	// 客户定义的 x 的 长度; 
 unsigned long customer_start_time = 0;
 unsigned long customer_end_time = 3600;
 bool use_customer_time = false;
 int no_space_auto_close = 0;
-bool contain_digital = false; //;
+bool contain_digital = false; //用于判断是否包含数字量;
 bool draw_graphic_finished = false;
 //extern unsigned char read_monitor_sd_ret;
 
 RECT RectPosition[15];
 static bool b_has_create_point = false ;
-int start_wait_init = 0;	//;
+int start_wait_init = 0;	//用于控制显示刷新的变量;
 extern CBacnetGraphic * GraphicWindow;
 //CRect Static_Num_Rect[15];
 bool flag_continue_thread = true;
@@ -84,7 +84,7 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid);
 DWORD WINAPI RefreshThreadPro(LPVOID lPvoid);
 int point_error_2 = 0;
 PointF      RclickValueTime(0, 0);
-extern int ncontinue_read_data ; //,;
+extern int ncontinue_read_data ; //如果变更了刻度或进度条，就退出之前正在读的循环,需要读新的刻度;
 
 //#define  MY_COLOR_BACKGRAND SolidBrush(Color(255,192,192,192))
 //#define  MY_COLOR_AUTOSCROLL			Color(255,255,255,0)
@@ -171,7 +171,7 @@ END_MESSAGE_MAP()
 
 
 // CBacnetGraphic message handlers
-unsigned long m_time_monitor_now; //X;
+unsigned long m_time_monitor_now; //X轴最右边的时间;
 unsigned long m_time_left_time;
 
 
@@ -231,7 +231,7 @@ HICON Loading_Icon6;
 void CBacnetGraphic::Initial_Scale_Time()
 {
 
-    //;
+    //从配置文件中获得上次所选的刻度;
     graphic_last_scale_type = GetPrivateProfileInt(_T("Setting"), _T("GraphicScaleType"), -1, g_cstring_ini_path);
     if (graphic_last_scale_type == -1)
     {
@@ -242,7 +242,7 @@ void CBacnetGraphic::Initial_Scale_Time()
     }
     scale_type = graphic_last_scale_type;
 
-    if (flag_auto_scroll)	// ;
+    if (flag_auto_scroll)	//如果不是自动滚动，就要获取上次的 时间;
     {
         m_time_monitor_now = time(NULL);
     }
@@ -320,11 +320,11 @@ BOOL CBacnetGraphic::OnInitDialog()
 	//myRect.right = myRect.right - myRect.left;
 	//myRect.bottom = myRect.bottom - myRect.top;
 
-	// 
+	// 获取窗口的宽度和高度
 	 Bitmap_width = myRect.right - myRect.left;
 	 Bitmap_height = myRect.bottom - myRect.top;
 
-	// 
+	// 将窗口移动到第一个屏幕区间的左上角
 	::MoveWindow(myhWnd, 0, 0, Bitmap_width, Bitmap_height, TRUE);
 
 
@@ -338,7 +338,7 @@ BOOL CBacnetGraphic::OnInitDialog()
 	}
 #if 0
 	for(int i=0;i<14;i++)
-		StaticShow[i] = true;	//,;
+		StaticShow[i] = true;	//初始化时都让显示,显示第一次的时候这些值会被自动的修改;
 #endif
 	InitialParameter(scale_type);
 	if(mythread == NULL)
@@ -464,12 +464,12 @@ int CBacnetGraphic::Search_data_from_db()
 	}
 
 	CBADO monitor_bado;
-	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//
+	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 	monitor_bado.OnInitADOConn(); 
 
 	for (int i=0;i<temp_number_of_inputs;i++)
 	{
-		if(StaticShow[i] == false)	//;
+		if(StaticShow[i] == false)	//如果没有选中，就不要检索这部分的数据库;
 			continue;
 		CString cs_temp_input_index;
 		unsigned int temp_record_count = 0;
@@ -540,7 +540,7 @@ int CBacnetGraphic::Search_data_from_db()
 					}
 				}
 
-				if(analog_data_point[i][temp_count].analogdata > analog_data_max_value[i])	// ;
+				if(analog_data_point[i][temp_count].analogdata > analog_data_max_value[i])	//取 最大值和最小值;
 					analog_data_max_value[i] = analog_data_point[i][temp_count].analogdata;
 				if(analog_data_point[i][temp_count].analogdata < analog_data_min_value[i])
 					analog_data_min_value[i] = analog_data_point[i][temp_count].analogdata;
@@ -611,7 +611,7 @@ int CBacnetGraphic::Search_data_from_db()
 }
 
 
-//   ;
+//获取 或者 创建需要绘制的 点;
 void CBacnetGraphic::Create_Line_Point()
 {
 
@@ -659,7 +659,7 @@ void CBacnetGraphic::Create_Line_Point()
 				if(pPrevItem != NULL)
 				{
 					pPrevItem->SetNext(pTempItem);
-					//     ;  2016 02 25
+					//切尔西说 模拟量的 值 也要改为 有变化的时候记录， 所以所有的点都需要自动连接至下一个点;  2016 02 25
 					if(analog_data_point[x][i].loggingtime - analog_data_point[x][i - 1].loggingtime > 10*time_interval_point)
 					{
 						pPrevItem->m_link_to_next = false;
@@ -760,7 +760,7 @@ DWORD WINAPI RefreshThreadPro(LPVOID lPvoid)
             continue;
         }
 
-        if (draw_graphic_finished == false)	// ;
+        if (draw_graphic_finished == false)	//避免客户 频繁切换数据;
         {
             Sleep(5000);
             continue;
@@ -791,18 +791,18 @@ DWORD WINAPI RefreshThreadPro(LPVOID lPvoid)
     return 0;
 }
 
-//5
+//此线程用于每隔5秒读取数据
 DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
 {
     CBacnetGraphic * mparent = (CBacnetGraphic *)lPvoid;
 
     CString strSql;
     CBADO monitor_bado;
-    monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//
+    monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
     TRACE(g_achive_monitor_datatbase_path);
     monitor_bado.OnInitADOConn();
     CString temp_time;
-    temp_time.Format(_T(" and Time_Since1970 < %u "), m_time_left_time - 36000); //10 ;
+    temp_time.Format(_T(" and Time_Since1970 < %u "), m_time_left_time - 36000); //删除10个小时之前的 临时数据;
     
     strSql = _T("delete * from MonitorData where Flag <> 0") + temp_time;
     monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
@@ -815,7 +815,7 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
         ncontinue_read_data = true;
         int read_analog_ret = 0;
         int read_dig_ret = 0;
-        if (mparent->m_analog_count != 0)  //Fan;
+        if (mparent->m_analog_count != 0)  //Fan如果不包含模拟量，就没有必要刷新读的数据;
         {
             if(n_update_shou_1_once == true)
                 g_progress_persent = 1;
@@ -838,7 +838,7 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
             BitToString(BAC_UNITS_ANALOG, monitor_list_line);
         }
         
-        if (mparent->m_digital_count != 0)  //Fan ;
+        if (mparent->m_digital_count != 0)  //Fan 如果不包含数字量，就没有必要刷新读的数据;
         {
             if (n_update_shou_1_once == true)
                 g_progress_persent = 1;
@@ -865,7 +865,7 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
             Sleep(5);
             if (ncontinue_read_data == false)
             {
-                break;      // ;
+                break;      //如果有按键触发 ，更新线程要立刻启动区刷新数据;
             }
             if (!flag_continue_thread)
             {
@@ -936,23 +936,23 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 			}
 
 			mparent->Reset_X_Y_Parameter();
-			//long t1=GetTickCount();//(ms);
+			//long t1=GetTickCount();//程序段开始前取得系统运行时间(ms);
 			mparent->Search_data_from_db();
-			//long t2=GetTickCount();//(ms);
+			//long t2=GetTickCount();//程序段结束后取得系统运行时间(ms);
 			//CString str_temp;
-			//str_temp.Format(_T("time:%dms\r\n"),t2-t1);// ;
+			//str_temp.Format(_T("time:%dms\r\n"),t2-t1);//前后之差即 程序运行时间;
 			//TRACE(str_temp);
 
-			mparent->Create_Line_Point();	//; ;
+			mparent->Create_Line_Point();	//新建需要绘制的点;一直到下次开始刷新 或者定时器刷新时在去获取点;
 			
 		}
 		WaitForSingleObject(Point_Mutex,INFINITE); 
 		mparent->Draw_Graphic(hMemDC);
 		ReleaseMutex(Point_Mutex);
 
-		BitBlt(gloab_hdc, 0, 0, Bitmap_width, Bitmap_height, hMemDC, 0, 0, SRCCOPY);//Picture;
-		//BitBlt(gloab_hdc,0,0, myRect.right, myRect.bottom, hMemDC, 0, 0, SRCCOPY);//Picture;
-		//PostMessage(test_hwnd, WM_FRESH_STATIC,0,0);	//;
+		BitBlt(gloab_hdc, 0, 0, Bitmap_width, Bitmap_height, hMemDC, 0, 0, SRCCOPY);//将绘制完成的内存位图贴到的Picture空间对象中;
+		//BitBlt(gloab_hdc,0,0, myRect.right, myRect.bottom, hMemDC, 0, 0, SRCCOPY);//将绘制完成的内存位图贴到的Picture空间对象中;
+		//PostMessage(test_hwnd, WM_FRESH_STATIC,0,0);	//当重绘了之后，控件会被重绘的画布遮盖住，所以发送消息让控件再次刷新;
 		if(start_wait_init < 4)
 			Sleep(10);
 		else
@@ -1015,7 +1015,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	CurePen = new Pen(Graphic_Color[1], 2.0f);
 	PointF      pointF(0, 0);
 
-	//BlackBrush =new SolidBrush(Color(255,0,0,0));.
+	//BlackBrush =new SolidBrush(Color(255,0,0,0));老毛希望背景色改为灰色.
 	BlackBrush = new  SolidBrush(MY_COLOR_BACKGRAND);
 
 
@@ -1077,7 +1077,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	Static_view_Brush = new SolidBrush(MY_COLOR_VIEW_SELECT);
 	Static_view_unselect_Brush = new SolidBrush(MY_COLOR_VIEW_UNSELECT);
 
-	//  View.
+	//绘制 屏幕上方的 三个View.
 	if (graphic_view_index == 0)
 		mygraphics->FillRectangle(Static_view_Brush, 850, 6, 120, 20);
 	else
@@ -1149,7 +1149,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 	mygraphics->DrawString(top_string, -1, &TimeTopShow_font, scrollpointF, &Font_brush_on_off);
 
-	// ;
+	//右键点击 在绘图区域显示当前的值;
 	if ((RclickValueTime.X != 0) && (RclickValueTime.Y != 0))
 	{
 		CString cs_value;
@@ -1168,7 +1168,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	}
 
 	//****************************************************************************************************
-// 1  E lable	;
+//画下面的 1 到 E 的lable	;
 //mystaticRectangle_pen = new Pen(Graphic_Color[0],2.0f);
 	for (int i = 0; i < INPUT_NUMBER; i++)
 	{
@@ -1177,7 +1177,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		if ((temp_cs.IsEmpty()) || (StaticShow[i] == false))
 		{
 			Static_blackground_Brush = new SolidBrush(UNUSE_COLOR);	//This part is draw the 14 label and it's background;
-			StaticShow[i] = false;	// temp_cs.IsEmpty()   StaticShow false;
+			StaticShow[i] = false;	//如果是由 temp_cs.IsEmpty() 进来的 就顺便把 StaticShow 也设置为false;
 		}
 		else
 			Static_blackground_Brush = new SolidBrush(Graphic_Color[i + 1]);	//This part is draw the 14 label and it's background;
@@ -1220,7 +1220,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		pen_unit_brush = NULL;
 
 		//************************************************************************************
-		// Static  ;
+		//这些是画 Static 后面的 数字;
 		CString temp_item;
 		temp_item.Format(_T("%x"), i + 1);
 		temp_item = temp_item.MakeUpper();
@@ -1246,7 +1246,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 	Gdiplus::Font        time_font(&fontFamily, 12, FontStyleRegular, UnitPixel);
 
-	for (int i = 0; i < m_xscale + 1; i++)				//
+	for (int i = 0; i < m_xscale + 1; i++)				//画网格线
 	{
 		mygraphics->DrawLine(my_inline_pen, (int)m_analogorignpoint.X + (m_X_ASIX_WIDTH * i) / m_xscale,
 			(int)m_analogorignpoint.Y,
@@ -1279,7 +1279,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	//FontFamily  UnitfontFamily(_T("Times New Roman"));
 	FontFamily  UnitfontFamily(_T("Arial"));
 	Gdiplus::Font        unitfont(&UnitfontFamily, 18, FontStyleRegular, UnitPixel);
-	for (int i = 0; i <= m_yscale; i++)				//
+	for (int i = 0; i <= m_yscale; i++)				//画网格线
 	{
 		CString Unit_value;
 		if (i != m_yscale)
@@ -1300,9 +1300,9 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		}
 
 		int value_temp_length = Unit_value.GetLength();
-		pointF.X = (int)m_analogorignpoint.X - 38 - (value_temp_length - 3) * 4;	// Y   ;
+		pointF.X = (int)m_analogorignpoint.X - 38 - (value_temp_length - 3) * 4;	//动态调整 Y轴 显示的值 根据所带小数点的位数不同 调整位置;
 
-		if (i == m_yscale)	// Y X ;
+		if (i == m_yscale)	//如果是显示靠近原点的 Y值 因为与X轴的时间显示 有轻微重叠，所以特殊处理，稍微向上一点;
 		{
 			pointF.Y = (int)m_analogorignpoint.Y + i * (m_Y_ASIX_HIGHT / m_yscale) - 16;
 			mygraphics->DrawString(Unit_value, -1, &unitfont, pointF, &unit_brush);
@@ -1367,11 +1367,11 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 			if (first_item[i] != NULL)
 			{
-				if ((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//;
+				if ((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//有可能确实出现前面所有一个点都没有，这种情况就不要从前面拉线了;
 				{
 					if (digital_last_data[i].data_point.X < first_item[i]->GetPoint().x)
 					{
-						// digital   xtime ;
+						//下面一部分是处理 digital  前半段没有数据，需要参考 xtime 之前的最近的状态来划线的做法;
 
 						if (digital_last_data[i].analogdata == first_item[i]->GetPointValue())
 							mygraphics->DrawLine(DrawLinePen[i],
@@ -1405,7 +1405,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 						mygraphics->DrawLine(DrawLinePen[i], first_item[i]->GetPoint().x, first_item[i]->GetPoint().y, temp_x, first_item[i]->GetPoint().y);
 						break;
 					}
-					//    ;
+					//如果前面一个数字点和后面一个数字点的 值不一样 就要画  延变化;
 					if (second_item[i]->GetPointValue() == first_item[i]->GetPointValue())
 						mygraphics->DrawLine(DrawLinePen[i], first_item[i]->GetPoint().x, first_item[i]->GetPoint().y, second_item[i]->GetPoint().x, second_item[i]->GetPoint().y);
 					else
@@ -1418,16 +1418,16 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 					first_item[i] = second_item[i];
 				} while (first_item[i] != NULL);
 }
-			else	//;
+			else	//目标区域一个点都没有，需要参考很久以前的值;
 			{
-				if ((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//;
+				if ((digital_last_data[i].data_point.X != 0) && (digital_last_data[i].data_point.Y != 0))	//有可能确实出现前面所有一个点都没有，这种情况就不要从前面拉线了;
 					mygraphics->DrawLine(DrawLinePen[i], digital_last_data[i].data_point.X, digital_last_data[i].data_point.Y, digital_last_data[i].data_point.X + m_Digital_X_WIDTH, digital_last_data[i].data_point.Y);
 			}
 		}
 
 	}
 
-#if 1 //
+#if 1 //中间绘制提示进度条
 	int reg_x;
 	int reg_y;
 	reg_x = 710;
@@ -1560,17 +1560,17 @@ BOOL CBacnetGraphic::PreTranslateMessage(MSG* pMsg)
 			OnGraphicRight();
 			return 0;
 		}
-        else if ((pMsg->wParam == VK_OEM_MINUS) || (pMsg->wParam == VK_SUBTRACT))   //Add by Fandu 2018 0104  
+        else if ((pMsg->wParam == VK_OEM_MINUS) || (pMsg->wParam == VK_SUBTRACT))   //Add by Fandu 2018 0104  支持快捷键加减用来缩进
         {
             OnZoomout();
             return 0;
         }
-        else if (pMsg->wParam == VK_OEM_PLUS || (pMsg->wParam == VK_ADD))           //Add by Fandu 2018 0104  
+        else if (pMsg->wParam == VK_OEM_PLUS || (pMsg->wParam == VK_ADD))           //Add by Fandu 2018 0104  支持快捷键加减用来缩进
         {
             OnZoomin();
             return 0;
         }
-        else if ((pMsg->wParam >= 0x31) && (pMsg->wParam <= 0x39))                   //Add by Fandu 2018 0104   1-9  Label 
+        else if ((pMsg->wParam >= 0x31) && (pMsg->wParam <= 0x39))                   //Add by Fandu 2018 0104  按下数字键 1-9后  对应的Label 显示和不显示
         {
             unsigned char ntemp = pMsg->wParam - 0x31;
             if (StaticShow[ntemp] == true)
@@ -1592,7 +1592,7 @@ void CBacnetGraphic::OnCancel()
 	//GraphicWindow = NULL;
 	//::PostMessage(m_monitor_dlg_hwnd,WM_MONITOR_USER_MESSAGE,MONITOR_MESSAGE_DELETE,0);
 	//CDialogEx::OnCancel();
-	DestroyWindow();//        //CDialog::OnCancel();//OnCancel,OnCancelEndDialogDialog   
+	DestroyWindow();//窗口的销毁        //CDialog::OnCancel();//屏蔽基类的OnCancel,因为基类的OnCancel调用了EndDialog函数，这是模态Dialog的。   
 }
 
 
@@ -1603,7 +1603,7 @@ void CBacnetGraphic::OnOK()
 	CDialogEx::OnOK();
 }
 
-//  STATIC    ;
+//计算点击的坐标是否在某个  自己绘制的STATIC 里面 ，如果在里面就设置是否变色 以及 显示;
 void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	 
@@ -1631,7 +1631,7 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 	}
 
-	//   ;
+	//点击时间轴是否 自动 卷动的 自绘按钮;
 	if((point.x > 122) &&
 		(point.x <172) &&
 		(point.y > (15 + 13 * (STATIC_LABLE_HIGHT + 9) + STATIC_LABLE_HIGHT + 8)) &&
@@ -1657,7 +1657,7 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 		(point.y > 6) &&
 		(point.y < 26))
 	{
-		//View ;
+		//按下的是第一个View 的按钮;
 		CString temp_cs;
 		graphic_view_index = 0;
 		CString temp_serial;
@@ -1706,7 +1706,7 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 		(point.y > 6) &&
 		(point.y < 26))
 	{
-		//View ;
+		//按下的是第二个View 的按钮;
 		CString temp_cs;
 		graphic_view_index = 1;
 		CString temp_serial;
@@ -1755,7 +1755,7 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 		(point.y > 6) &&
 		(point.y < 26))
 	{
-		//View ;
+		//按下的是第三个View 的按钮;
 		CString temp_cs;
 		graphic_view_index = 2;
 		CString temp_serial;
@@ -1917,7 +1917,7 @@ void CBacnetGraphic::GetAnalogOrignPoint(PointF &returnpoint)
 	returnpoint.Y = m_analogorignpoint.Y;
 }
 
-// Y    ;
+//计算一个像素点 Y轴 所对应 的 值 是多少;
 void CBacnetGraphic::CalcOnePixelValue()
 {
 	m_onepiexlvalue = (float)y_axis_total_value / (float)m_Y_ASIX_HIGHT;
@@ -2262,7 +2262,7 @@ void CBacnetGraphic::PostNcDestroy()
 	updatedatathread = NULL;
 
 	CDialogEx::PostNcDestroy();
-	delete this;//   ;
+	delete this;//类对象的销毁   ;
 	GraphicWindow = NULL;
 
 	Delete_Ram_Data();
@@ -2271,7 +2271,7 @@ void CBacnetGraphic::PostNcDestroy()
 //void CBacnetGraphic::Delete_Ram_Data()
 void Delete_Ram_Data()
 {
-	WaitForSingleObject(Point_Mutex,INFINITE);	//  ;;
+	WaitForSingleObject(Point_Mutex,INFINITE);	//防止删除数据的时候  绘图的线程又调用此数据;加锁保护;
 
 	for (int i=0;i< INPUT_NUMBER ;i++)
 	{
@@ -2410,7 +2410,7 @@ void CBacnetGraphic::OnTimebase4hours()
 void CBacnetGraphic::OnTimebase4days()
 {
 	
-	//if(draw_graphic_finished == false)	// ;
+	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
 	//{
 	//	return;
 	//}
@@ -2429,7 +2429,7 @@ void CBacnetGraphic::OnTimebase4days()
 
 
 
-//
+//向大方向规整
 int CBacnetGraphic::MaxMinRound(int Data,bool UP)
 {
 	while (true)
@@ -2547,7 +2547,7 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 
 
 #if 0
-	// 0 - 100 Y ;
+	//针对 0 - 100 范围的Y轴 做出特殊处理;
 	unsigned int delta_value = 0;
 	delta_value = total_y_max_value - total_y_min_value;
 	 temp_max = total_y_max_value;
@@ -2560,7 +2560,7 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 	{
 		if(delta_value < 1000)
 		{
-			//1;
+			//差值小于1;
 			total_y_min_value = total_y_min_value / 1000;
 			total_y_min_value = total_y_min_value * 1000;
 
@@ -2572,7 +2572,7 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 		}
 		else if(delta_value < 10000)
 		{
-			//10;
+			//差值小于10;
 			total_y_min_value = total_y_min_value / 10000;
 			total_y_min_value = total_y_min_value * 10000;
 			total_y_max_value = total_y_min_value + 10000;
@@ -2583,7 +2583,7 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 		}
 		else if(delta_value < 20000)
 		{
-			//20;
+			//差值小于20;
 			total_y_min_value = total_y_min_value / 20000;
 			total_y_min_value = total_y_min_value * 20000;
 
@@ -2595,7 +2595,7 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 		}
 		else if(delta_value < 40000)
 		{
-			//40;
+			//差值小于40;
 			total_y_min_value = total_y_min_value / 40000;
 			total_y_min_value = total_y_min_value * 40000;
 
@@ -2612,7 +2612,7 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 		}
 
 	}
-	//
+	//暂时给郭少用
 	if((total_y_max_value > 100000) && (total_y_max_value < 150000))
 	{
 		if(total_y_min_value > 0)
@@ -2690,7 +2690,7 @@ void CBacnetGraphic::OnGraphicLeft()
 
 	if(m_time_selected == TIME_USER_DEFINE)
 	{
-		//  ;
+		//客户自定义的数据段时 ，左移 ;
 		customer_end_time = customer_end_time - x_axis_total_time;
 		customer_start_time = customer_start_time - x_axis_total_time;
 		m_time_monitor_now = customer_end_time;
@@ -2716,7 +2716,7 @@ void CBacnetGraphic::OnGraphicRight()
 
 	if(m_time_selected == TIME_USER_DEFINE)
 	{
-		//  ;
+		//客户自定义的数据段时 ，右移 ;
 		customer_end_time = customer_end_time + x_axis_total_time;
 		customer_start_time = customer_start_time + x_axis_total_time;
 		m_time_monitor_now = customer_end_time;
@@ -2759,7 +2759,7 @@ void CBacnetGraphic::OnZoomin()
         CString temp_cs1;
 		m_time_selected = m_time_selected - 1;
         temp_cs1.Format(_T("%d"), m_time_selected);
-        WritePrivateProfileString(_T("Setting"), _T("GraphicScaleType"), temp_cs1, g_cstring_ini_path); //,.
+        WritePrivateProfileString(_T("Setting"), _T("GraphicScaleType"), temp_cs1, g_cstring_ini_path); //在变更后记录时间刻度,下次打开还原为此刻度.
 		Delete_Ram_Data();
 		draw_graphic_finished = false;
 		b_has_create_point = false;
@@ -2791,7 +2791,7 @@ void CBacnetGraphic::OnZoomout()
         CString temp_cs1;
         m_time_selected = m_time_selected + 1;
         temp_cs1.Format(_T("%d"), m_time_selected);
-        WritePrivateProfileString(_T("Setting"), _T("GraphicScaleType"), temp_cs1, g_cstring_ini_path);//,.
+        WritePrivateProfileString(_T("Setting"), _T("GraphicScaleType"), temp_cs1, g_cstring_ini_path);//在变更后记录时间刻度,下次打开还原为此刻度.
 		draw_graphic_finished = false;
         ncontinue_read_data = false;
 		Delete_Ram_Data();
@@ -2813,7 +2813,7 @@ void CBacnetGraphic::OnZoomout()
 //} INDTEXT_DATA1;
 
 extern  INDTEXT_DATA  _declspec(dllimport) bacnet_engineering_unit_names[];
-//extern int _declspec(dllimport) dllGlobalVar; //_declspec(dllimport)
+//extern int _declspec(dllimport) dllGlobalVar; //用_declspec(dllimport)导入
 void CBacnetGraphic::Get_Input_Unit()
 {
 	int inputs_count = m_monitor_data.at(monitor_list_line).num_inputs;
@@ -3101,7 +3101,7 @@ void CBacnetGraphic::OnRButtonDown(UINT nFlags, CPoint point)
 		(point.y > 6) &&
 		(point.y < 26))
 	{
-		//View ;
+		//按下的是第一个View 的按钮;
 		bacnet_message_input_title.Format(_T("Please input a new name "));
 		CBacnetMessageInput temp_dlg;
 		temp_dlg.DoModal();
@@ -3116,7 +3116,7 @@ void CBacnetGraphic::OnRButtonDown(UINT nFlags, CPoint point)
 		(point.y > 6) &&
 		(point.y < 26))
 	{
-		//View ;
+		//按下的是第二个View 的按钮;
 		bacnet_message_input_title.Format(_T("Please input a new name "));
 		CBacnetMessageInput temp_dlg;
 		temp_dlg.DoModal();
@@ -3132,7 +3132,7 @@ void CBacnetGraphic::OnRButtonDown(UINT nFlags, CPoint point)
 		(point.y > 6) &&
 		(point.y < 26))
 	{
-		//View ;
+		//按下的是第三个View 的按钮;
 		bacnet_message_input_title.Format(_T("Please input a new name "));
 		CBacnetMessageInput temp_dlg;
 		temp_dlg.DoModal();

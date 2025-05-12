@@ -142,13 +142,13 @@ namespace ListCtrlEx
 		BOOL				DeleteAllItems( );
 		BOOL				DeleteItem( int nItem );
 
-        CToolTipCtrl m_toolTip;        //
-        int m_nSubItem;                //
-        int m_nItem;                //
+        CToolTipCtrl m_toolTip;        //文本提示类
+        int m_nSubItem;                //存放行号
+        int m_nItem;                //存放列号
         BOOL m_bEnableTips;
-		bool m_bUser_tips; //
-		int  n_tip_colomn; //tip
-		CString n_tip_message; //tip
+		bool m_bUser_tips; //使能自定义提示信息
+		int  n_tip_colomn; //需要显示自定义tip的列
+		CString n_tip_message; //自定义tip的消息
 		int InsertItem(int nIndex, LPCTSTR lpText);
 
 // operations
@@ -183,7 +183,7 @@ namespace ListCtrlEx
 
 		int CListCtrlEx::GetColumnLimitChar(int nColIndex);
 		void CListCtrlEx::SetColumnLimitChar(int nColIndex, int nlimitchar);
-		void CListCtrlEx::Setlistcolcharlimit(unsigned char ncol,unsigned char nlimitchar); // ;
+		void CListCtrlEx::Setlistcolcharlimit(unsigned char ncol,unsigned char nlimitchar); //限制单元格 输入的最大字符个数;
 
 		ColumnType	GetColumnType(int nColIndex);
 		void				SetColumnType(int nColIndex, ColumnType eColType);
@@ -281,12 +281,12 @@ namespace ListCtrlEx
 		CRect			m_list_rect;
 		int				m_select_raw;
 		int				m_select_col;
-		bool            m_dt_left; //;
-		bool			m_show_bk_color;//;
+		bool            m_dt_left; //是否要左对齐;
+		bool			m_show_bk_color;//记录是否显示选中背景颜色;
 		bool			m_support_key;
-		bool			m_support_col0_edit;  //0.;
+		bool			m_support_col0_edit;  //第0列是否允许编辑.默认是不许编辑;
 		int m_nItemHeight;
-		HWND			m_window_hwnd; //Hwnd;
+		HWND			m_window_hwnd; //用于记录每个表格自己要回传的Hwnd;
 	protected:
 		struct _ColumnSort_t
 		{

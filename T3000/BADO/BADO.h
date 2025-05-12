@@ -26,17 +26,17 @@ public:
 	/// initial ADO Connection
 	/// </summary>
 	BOOL OnInitADOConn();	
-	// 
+	// 连接数据库
 	/// <summary>
 	/// Open a Record set
 	/// </summary>
-	_RecordsetPtr& OpenRecordset(CString sql);  //
-	void CloseRecordset();						//
-	void CloseConn();							//
-	UINT GetRecordCount(_RecordsetPtr pRecordset);//
+	_RecordsetPtr& OpenRecordset(CString sql);  //打开记录集
+	void CloseRecordset();						//关闭记录集
+	void CloseConn();							//关闭数据库连接
+	UINT GetRecordCount(_RecordsetPtr pRecordset);//获得记录数
 
-	void Createtable(CString strSQL);//
-	bool IsHaveTable(CBADO ado, CString strTableName);//
+	void Createtable(CString strSQL);//自动创建表
+	bool IsHaveTable(CBADO ado, CString strTableName);//判断表是否存在
 	void DeleteDB();
     void RenameTable(CString TableName_Old,CString TableName_New);
 };

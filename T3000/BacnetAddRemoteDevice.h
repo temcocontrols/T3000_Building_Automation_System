@@ -2,23 +2,23 @@
 #include "afxwin.h"
 
 #include "CM5\CStatic\staticex.h"
-// CBacnetAddRemoteDevice 
+// CBacnetAddRemoteDevice 对话框
 
 class CBacnetAddRemoteDevice : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnetAddRemoteDevice)
 
 public:
-	CBacnetAddRemoteDevice(CWnd* pParent = NULL);   // 
+	CBacnetAddRemoteDevice(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBacnetAddRemoteDevice();
 
-// 
+// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_ADD_REMOTE_DEVICE };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:

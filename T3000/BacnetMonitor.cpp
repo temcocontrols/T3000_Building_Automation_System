@@ -15,7 +15,7 @@
 #include "BacnetWait.h"
 #include "BADO/BADO.h"
 #include "MainFrm.h"
-extern tree_product selected_product_Node; // ;
+extern tree_product selected_product_Node; // 选中的设备信息;
 void BitToString(int digtal_or_analog, int nIndex);
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
 #define  WM_FLASH_CHANGE         WM_USER + 903
@@ -32,10 +32,10 @@ extern BacnetWait *WaitDlg;
 HANDLE h_read_monitordata_thread = NULL;
 Str_MISC Device_Misc_Data_Old;
 //unsigned char read_monitor_sd_ret = false;
-bool read_temp_local_tem_package = true; //10;
+bool read_temp_local_tem_package = true; //开始点的时候只读最后10包并保存为临时数据;
 
 CString ReadPackage;
-int ncontinue_read_data = true; //,;
+int ncontinue_read_data = true; //如果变更了刻度或进度条，就退出之前正在读的循环,需要读新的刻度;
 
 IMPLEMENT_DYNAMIC(CBacnetMonitor, CDialogEx)
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
@@ -59,7 +59,7 @@ void CBacnetMonitor::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetMonitor, CDialogEx)
-	ON_MESSAGE(WM_HOTKEY,&CBacnetMonitor::OnHotKey)//
+	ON_MESSAGE(WM_HOTKEY,&CBacnetMonitor::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(MY_RESUME_DATA, MonitorMessageCallBack)
 	ON_MESSAGE(WM_REFRESH_BAC_MONITOR_LIST,Fresh_Monitor_List)
 	ON_MESSAGE(WM_REFRESH_BAC_MONITOR_INPUT_LIST,Fresh_Monitor_Input_List)
@@ -131,13 +131,13 @@ LRESULT  CBacnetMonitor::MonitorMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		memcpy_s(&m_monitor_data.at(pInvoke->mRow),sizeof(Str_monitor_point),&m_temp_monitor_data[pInvoke->mRow],sizeof(Str_monitor_point));//
+		memcpy_s(&m_monitor_data.at(pInvoke->mRow),sizeof(Str_monitor_point),&m_temp_monitor_data[pInvoke->mRow],sizeof(Str_monitor_point));//还原没有改对的值
 		PostMessage(WM_REFRESH_BAC_MONITOR_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 	}
-	if((pInvoke->mRow%2)==0)	//  ;
+	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 	{
 		if(pInvoke->mRow <= BAC_MONITOR_COUNT)
 		m_monitor_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
@@ -223,11 +223,11 @@ BOOL CBacnetMonitor::PreTranslateMessage(MSG* pMsg)
 	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		return 1; 
 	}
-	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //F2;
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
 	{
 		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_MONITOR);
 		return TRUE;
@@ -265,7 +265,7 @@ void CBacnetMonitor::Initial_List()
 		CString temp_units;
 		temp_item.Format(_T("%d"),i+1);
 		m_monitor_list.InsertItem(i,temp_item);
-		m_monitor_list.SetCellEnabled(i,0,0);//num;
+		m_monitor_list.SetCellEnabled(i,0,0);//禁用num，只是用来显示;
 
 		for (int x=0;x<MONITOR_COL_NUMBER;x++)
 		{
@@ -357,20 +357,20 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 		byte temp_panel = m_monitor_data.at(monitor_list_line).inputs[i].panel;
         byte temp_sub_panel = m_monitor_data.at(monitor_list_line).inputs[i].sub_panel;
 		byte temp_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type;
-		//point type 1  , out = 1in = 2 var = 3;  out = 0; in = 1, var = 2;
+		//point type 取的时候减1  ,设备里 out = 1，in = 2 ，var = 3; 取出来是 out = 0; in = 1, var = 2;
 		if(temp_point_type > 0)
 			temp_point_type = temp_point_type - 1;
 
 
 		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
-		byte lowbyte_point_type = temp_point_type & 0x1F;	//3 
-        unsigned char type_highest_2bytes = temp_network & 0x60;    //   0x60    01100000 2-3bit 
+		byte lowbyte_point_type = temp_point_type & 0x1F;	//高3位用于 存放
+        unsigned char type_highest_2bytes = temp_network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
         lowbyte_point_type = lowbyte_point_type | type_highest_2bytes;
-        //2018 01 26   sub panel 0 ;
+        //2018 01 26   sub panel 可以为0 代表访问本地;
         //if (((temp_panel == 0) || (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == 0)) || (lowbyte_point_type > BAC_AV + 10))
 		if(((temp_panel == 0) && (temp_sub_panel == 0)) || (lowbyte_point_type > BAC_BO + 1))
 		{
-			m_monitor_data.at(monitor_list_line).inputs[i].network = 0;	// panel 0  ,;
+			m_monitor_data.at(monitor_list_line).inputs[i].network = 0;	//发 现panel 是0  就说明这个数据是无效的,先设置为初始化值;
 			m_monitor_data.at(monitor_list_line).inputs[i].number = 0;
 			m_monitor_data.at(monitor_list_line).inputs[i].panel = 0;
 			m_monitor_data.at(monitor_list_line).inputs[i].point_type = 0;
@@ -478,14 +478,14 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
 
         char and_pointtype = temp_point_type & 0x1F;
-        unsigned char type_highest_2bytes = temp_network & 0x60;    //   0x60    01100000 2-3bit 
+        unsigned char type_highest_2bytes = temp_network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
         and_pointtype = and_pointtype | type_highest_2bytes;
-        //2018 01 26 fandu subpanel 0  0 . 
+        //2018 01 26 fandu subpanel 可以为0  为0 代表访问本身的. 
 		//if((temp_panel == 0) || (temp_sub_panel == 0))
         if ((temp_panel == 0) && (temp_sub_panel == 0))
 			continue;
 
-		//; //2018 01 26 monitor ;
+		//如果不是，就说明是远程的点; //2018 01 26 开始要支持monitor 加远程的点;
 		//if((temp_sub_panel!=Station_NUM) || (temp_panel != Station_NUM))
 		//{
 		//	temp_input_count ++;
@@ -581,7 +581,7 @@ void CBacnetMonitor::Set_Input_Range_And_count()
             temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
             temp_monitor_data_analog.inputs[temp_analog_count - 1].sub_panel = temp_sub_panel;
 
-            temp_monitor_data_analog.range[temp_analog_count - 1] = 0; //AV 
+            temp_monitor_data_analog.range[temp_analog_count - 1] = 0; //不知道AV 的单位
         }
         else if ((and_pointtype == BAC_BO + 1) ||
                  (and_pointtype == BAC_BV + 1) ||
@@ -599,7 +599,7 @@ void CBacnetMonitor::Set_Input_Range_And_count()
             (and_pointtype == DIS_INPUT_REG + 1) ||
             (and_pointtype == INPUT_REG + 1) ||
             (and_pointtype == MB_REG + 1) ||
-            (and_pointtype == BAC_FLOAT_ABCD + 1) || //2020 03 25 
+            (and_pointtype == BAC_FLOAT_ABCD + 1) || //2020 03 25 新增
             (and_pointtype == BAC_FLOAT_CDAB + 1) ||
             (and_pointtype == BAC_FLOAT_BADC + 1) ||
             (and_pointtype == BAC_FLOAT_DCBA + 1)
@@ -613,7 +613,7 @@ void CBacnetMonitor::Set_Input_Range_And_count()
             temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
             temp_monitor_data_analog.inputs[temp_analog_count - 1].sub_panel = temp_sub_panel;
 
-            temp_monitor_data_analog.range[temp_analog_count - 1] = 0; //AV 
+            temp_monitor_data_analog.range[temp_analog_count - 1] = 0; //不知道AV 的单位
         }
 
 	}
@@ -644,7 +644,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 	New_CString.Trim();
 	if(New_CString.IsEmpty())
 	{
-		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = 1;//network ;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = 1;//目前不知道network 怎么处理;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].number = 0;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].panel = 0;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].point_type = 0;
@@ -664,15 +664,15 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 	memset(cTemp1,0,255);
 	WideCharToMultiByte( CP_ACP, 0, New_CString, -1, cTemp1, 255, NULL, NULL );
 
-	//Panel Label ;
+	//目前只支持在本Panel下面寻找 各个Label 和值;
 	//label=ispoint(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0/*my_network*/,Station_NUM,&k);
 	unsigned char sub_panel_number = 0;
 	 label=ispoint_ex(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0,sub_panel_number,Station_NUM,&temp_net_work);
 	if(label!=NULL)
 	{
-		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = temp_net_work;//network ;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = temp_net_work;//目前不知道network 怎么处理;
         char temp_point = point_type & 0x1F;
-        unsigned char type_highest_2bytes = temp_net_work & 0x60;    //   0x60    01100000 2-3bit 
+        unsigned char type_highest_2bytes = temp_net_work & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
         temp_point = temp_point | type_highest_2bytes;
         if ((temp_point == COIL_REG) ||
             (temp_point == DIS_INPUT_REG) ||
@@ -698,7 +698,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
                 num_point = num_point - 1;
         }
 
-		//point type 1  , out = 0in = 1 var = 2;  out = 1; in = 2, var = 3;
+		//point type 存的时候加1  ,原始 out = 0，in = 1 ，var = 2; 存进去是 out = 1; in = 2, var = 3;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].number = num_point;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].panel = num_panel;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].sub_panel = sub_panel_number;
@@ -750,7 +750,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
             case BAC_AV + 1: //AV
                 {
                 if (m_monitor_data[monitor_list_line].inputs[i].number < BAC_VARIABLE_ITEM_COUNT)
-                    m_monitor_data[monitor_list_line].range[i] = 0; // range  0 ; 
+                    m_monitor_data[monitor_list_line].range[i] = 0; // range 不知道是啥 先赋值为0 ; 
                 }
             break;
 			default:
@@ -759,7 +759,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 			}
 		}
 
-		// monitor_list_line input label;
+		//这里应该是 monitor_list_line，就是要改变的多少项 而不是右边的input label的项目;
 		int cmp_ret = memcmp(&m_temp_monitor_data[monitor_list_line],&m_monitor_data.at(monitor_list_line),sizeof(Str_monitor_point));
 
 
@@ -793,14 +793,14 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Item(WPARAM wParam,LPARAM lParam)
 
 	CString temp_task_info;
 	CString New_CString =  m_monitor_list.GetItemText(Changed_Item,Changed_SubItem);
-	// ;
+	//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
 	memcpy_s(&m_temp_monitor_data[Changed_Item],sizeof(Str_monitor_point),&m_monitor_data.at(Changed_Item),sizeof(Str_monitor_point));
 
 
 
 	if(Changed_SubItem == MONITOR_LABEL)
 	{
-		if(New_CString.GetLength()>= STR_MONITOR_LABEL_LENGTH)	//;
+		if(New_CString.GetLength()>= STR_MONITOR_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not greater than 8"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
@@ -848,7 +848,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_List(WPARAM wParam,LPARAM lParam)
 		}
 		if(m_monitor_list.IsDataNewer((char *)&m_monitor_data.at(0),sizeof(Str_monitor_point) * BAC_MONITOR_COUNT))
 		{
-			//list ;List;
+			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
 			monitor_list_data_new = true;
 			m_monitor_list.SetListData((char *)&m_monitor_data.at(0),sizeof(Str_monitor_point) * BAC_MONITOR_COUNT);
 		}
@@ -936,7 +936,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_List(WPARAM wParam,LPARAM lParam)
 #endif
 	return 0;
 }
-//List  Changed ;
+//对于一个对话框里面有多个List 只能通过确认焦点 来发送Changed 消息;
 LRESULT CBacnetMonitor::Fresh_MCallBack_Item(WPARAM wParam,LPARAM lParam)
 {
 	//if (!::IsWindow(m_hWnd))
@@ -987,8 +987,8 @@ void CBacnetMonitor::OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 	if(nItem!=-1)
 	{
 		m_monitor_list.SetCellChecked(nItem,0,1); 
-		monitor_list_line = nItem;	//;
-		if(old_monitor_line != monitor_list_line) // INPUT list;
+		monitor_list_line = nItem;	//记录点击的是第几项;
+		if(old_monitor_line != monitor_list_line) //避免反复刷新右边的 INPUT list;
 		{
 			PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
 			old_monitor_line = monitor_list_line;
@@ -1004,7 +1004,7 @@ void CBacnetMonitor::OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 	long lRow,lCol;
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
-	if(lRow>m_monitor_list.GetItemCount()) //
+	if(lRow>m_monitor_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if(lRow<0)
 		return;
@@ -1122,7 +1122,7 @@ void CBacnetMonitor::OnTimer(UINT_PTR nIDEvent)
 	switch(nIDEvent)
 	{
 	case 1:
-		if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_MONITOR))  )	//GSM;
+		if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_MONITOR))  )	//GSM连接时不要刷新;
 		{
 		PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
 		PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
@@ -1229,7 +1229,7 @@ void CBacnetMonitor::OnNMKillfocusDatetimepickerMonitor(NMHDR *pNMHDR, LRESULT *
 void CBacnetMonitor::Check_New_DB()
 {
 	CTime tm;
-	tm=CTime::GetCurrentTime();//
+	tm=CTime::GetCurrentTime();//获取系统日期
 	int month_of_day = 0;
 	month_of_day = tm.GetDay();
 	//CString temp_cs_week;
@@ -1247,7 +1247,7 @@ void CBacnetMonitor::Check_New_DB()
 	hFind_folder = FindFirstFile(temp_folder, &fd);
 	if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 	{
-		//
+		//目录存在
 		ret = TRUE;
 
 	}
@@ -1273,9 +1273,9 @@ void CBacnetMonitor::Check_New_DB()
 	HANDLE hFind_Monitor;//
 	WIN32_FIND_DATA wfd_monitor;//
 	hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
-	if (hFind_Monitor==INVALID_HANDLE_VALUE)//MonitorData.mdb
+	if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.mdb
 	{
-		//
+		//没有找到就创建一个默认的数据库
 		FilePath_Monitor= g_achive_monitor_datatbase_path;
 		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB2), _T("MONITOR_DB"));   
 		HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -1360,7 +1360,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 
 		if(temp_time_num < Device_Misc_Data.reg.operation_time[monitor_list_line])
 		{
-			//;
+			//需要更新数据库;
 			//if(IDYES == MessageBox(_T("Trend log data saved in SD disk has changed , Do you want synchronization."),_T("Notice"),MB_YESNOCANCEL | MB_ICONINFORMATION))
 			//{
 				CString temp_operation_time;
@@ -1377,7 +1377,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 
 		CString strSql;
 		CBADO monitor_bado;
-		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//;
+		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//删除里面的临时数据;
 		monitor_bado.OnInitADOConn(); 
 		strSql.Format(_T("delete * from MonitorData where Flag=1"));
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
@@ -1404,7 +1404,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 		CString temp_monitor_digital_index;
 		temp_serial.Format(_T("%u"),g_selected_serialnumber);
 		WritePrivateProfileString(temp_serial,NULL,NULL,g_cstring_ini_path);
-		WritePrivateProfileString(temp_serial, NULL, NULL, g_trendlog_ini_path); //;  ;
+		WritePrivateProfileString(temp_serial, NULL, NULL, g_trendlog_ini_path); //以后都存在单独的文件里面; 之前的配置文件只删除 不写入;
 		
 		//for (int i=0;i<12;i++)
 		//{
@@ -1418,7 +1418,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 		//}
 		CString strSql;
 		CBADO monitor_bado;
-		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//
+		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 		monitor_bado.OnInitADOConn(); 
 		strSql=_T("delete * from MonitorData");
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
@@ -1451,12 +1451,12 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteLocal()
 	CString temp_serial;
 	temp_serial.Format(_T("%u"),g_selected_serialnumber);
 	WritePrivateProfileString(temp_serial,NULL,NULL,g_cstring_ini_path);
-	WritePrivateProfileString(temp_serial, NULL, NULL, g_trendlog_ini_path); //;  ;
+	WritePrivateProfileString(temp_serial, NULL, NULL, g_trendlog_ini_path); //以后都存在单独的文件里面; 之前的配置文件只删除 不写入;
 	
 
 	CString strSql;
 	CBADO monitor_bado;
-	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//
+	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 	monitor_bado.OnInitADOConn(); 
 	strSql=_T("delete * from MonitorData");
 	monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
@@ -1490,7 +1490,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 
 			CString strSql;
 			CBADO monitor_bado;
-			monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//
+			monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 			monitor_bado.OnInitADOConn(); 
 			strSql=_T("delete * from MonitorData");
 			monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
@@ -1498,15 +1498,15 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 
 			WritePrivateProfileString(temp_serial,temp_monitor_index,NULL,g_cstring_ini_path);
 			WritePrivateProfileString(temp_serial,temp_monitor_digital_index,NULL,g_cstring_ini_path);
-			WritePrivateProfileString(temp_serial, temp_monitor_index, NULL, g_trendlog_ini_path);//;  ;
-			WritePrivateProfileString(temp_serial, temp_monitor_digital_index, NULL, g_trendlog_ini_path);//;  ;
+			WritePrivateProfileString(temp_serial, temp_monitor_index, NULL, g_trendlog_ini_path);//以后都存在单独的文件里面; 之前的配置文件只删除 不写入;
+			WritePrivateProfileString(temp_serial, temp_monitor_digital_index, NULL, g_trendlog_ini_path);//以后都存在单独的文件里面; 之前的配置文件只删除 不写入;
 			
 
 
 			CString temp_cs_modify_index;
 			temp_cs_modify_index.Format(_T("Monitor_%d"),monitor_list_line);
 
-			//Monitor  ,Minipanel  ,minipanel 
+			//每次读完Monitor的 值 记录下读写的时间,和Minipanel 比对 ,若minipanel 有进行删减的动作
 			CString temp_db_ini_folder;
 			temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
 			CTime temp_start = CTime::GetCurrentTime();
@@ -1514,7 +1514,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 			CString temp_time_num;
 			temp_time_num.Format(_T("%u"),end_long_time);
 			WritePrivateProfileStringW(temp_serial,temp_cs_modify_index,temp_time_num,temp_db_ini_folder);
-			//;
+			//下面还要加写的动作;
 			Device_Misc_Data.reg.operation_time[monitor_list_line] = end_long_time;
 
 
@@ -1599,13 +1599,13 @@ int read_monitordata(int digtal_or_analog, unsigned int timeleft, unsigned int t
 	end_read_index = m_monitor_head.seg_index + m_monitor_head.total_seg;
 	if ((start_read_index == end_read_index) && (start_read_index == 0))
 	{
-		//0
+		//没有数据，开始结束都为0
 		return 0;
 	}
 	//for (int read_index = temp_value;read_index <= m_monitor_head.total_seg;read_index++)
 	for (unsigned int read_index = start_read_index; read_index <= end_read_index; read_index++)
 	{
-		if (ncontinue_read_data == false) //.
+		if (ncontinue_read_data == false) //如果有操作来了，退出线程更新循环.
 		{
 			g_progress_persent = 100;
 			return -1;
@@ -1616,7 +1616,7 @@ int read_monitordata(int digtal_or_analog, unsigned int timeleft, unsigned int t
 		{
 			if (read_index < read_analog_package.size())
 			{
-				if ((read_analog_package.test(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //;
+				if ((read_analog_package.test(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
 					continue;
 			}
 			else
@@ -1628,7 +1628,7 @@ int read_monitordata(int digtal_or_analog, unsigned int timeleft, unsigned int t
 		{
 			if (read_index < read_dig_package.size())
 			{
-				if ((read_dig_package.test(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //;
+				if ((read_dig_package.test(read_index) == true) && (read_index != m_monitor_head.seg_index + m_monitor_head.total_seg))  //已经读过的;
 					continue;
 			}
 			else
@@ -1741,7 +1741,7 @@ void CBacnetMonitor::OnNMSetfocusListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	
 	//Fance
-	//list  select ;
+	//两个list 要只有一个 的select 处于显示状态;
 	int my_raw=0;
 	int my_col=0;
 	m_monitor_input_list.Get_Selected_Item(my_raw,my_col);
@@ -1755,7 +1755,7 @@ void CBacnetMonitor::OnNMSetfocusListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 		m_monitor_input_list.SetItemBkColor(my_raw,my_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);	
 	m_monitor_input_list.RedrawItems(my_raw,my_raw);
 
-	m_monitor_list.Get_Selected_Item(my_raw,my_col);//select
+	m_monitor_list.Get_Selected_Item(my_raw,my_col);//重新在获取那个是select
 	m_monitor_list.SetItemBkColor(my_raw,my_col,LIST_ITEM_SELECTED,0);
 	m_monitor_list.RedrawItems(my_raw,my_raw);
 
@@ -1782,7 +1782,7 @@ void CBacnetMonitor::OnNMSetfocusListMonitorInput(NMHDR *pNMHDR, LRESULT *pResul
 
 	m_monitor_list.RedrawItems(my_raw,my_raw);
 
-	m_monitor_input_list.Get_Selected_Item(my_raw,my_col);//select
+	m_monitor_input_list.Get_Selected_Item(my_raw,my_col);//重新在获取那个是select
 	m_monitor_input_list.SetItemBkColor(my_raw,my_col,LIST_ITEM_SELECTED,0);
 	m_monitor_input_list.RedrawItems(my_raw,my_raw);
 
@@ -1812,7 +1812,7 @@ void CBacnetMonitor::OnCancel()
 
 void CBacnetMonitor::Reg_Hotkey()
 {
-	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert
+	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert键
 }
 
 void CBacnetMonitor::Unreg_Hotkey()
@@ -1840,13 +1840,13 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	int temp_flag = 0;
 	int temp_sd_exsit = 0;
 	
-	//SD ;;Access 5010;
+	//如果不存在SD卡 就认为接到的都是临时数据;麻痹后面临时数据也要存起来，当宝似的;导致Access 数据库超过50万笔数据检索都要10秒;
 	if(Device_Basic_Setting.reg.sd_exist == 2)
 		temp_sd_exsit = 1;
 	else
 		temp_sd_exsit = 0;
 
-	bool analog_data = true;//1Analog;
+	bool analog_data = true;//1为Analog;
 
 
 	//m_monitor_head.total_seg =  (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
@@ -1871,7 +1871,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
     my_temp_point = my_temp_point + 4;
     m_monitor_head.total_seg = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
     my_temp_point = my_temp_point + 4;
-	//;
+	//在调试界面中打印出接收到得字符;
 	if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)) /*&& (m_monitor_head.special == 0)*/)
 	{
 		for (int i = 0; i< nlength ; i++)
@@ -1886,13 +1886,13 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		DFTrace(n_temp_print);
         CString temp1;
         if(m_monitor_head.type == BAC_UNITS_DIGITAL)
-            temp1.Format(_T(":%u  -  : %u"), m_monitor_head.seg_index, m_monitor_head.total_seg);
+            temp1.Format(_T("数字开始包:%u  -  结束包: %u"), m_monitor_head.seg_index, m_monitor_head.total_seg);
         else if(m_monitor_head.type == BAC_UNITS_ANALOG)
-            temp1.Format(_T(":%u  -  : %u"), m_monitor_head.seg_index, m_monitor_head.total_seg);
+            temp1.Format(_T("模拟开始包:%u  -  结束包: %u"), m_monitor_head.seg_index, m_monitor_head.total_seg);
         DFTrace(temp1);
 	}
 
-	if(nlength!= 426)	//420;
+	if(nlength!= 426)	//每包必发420个字节;
 		return 0;
 	if(m_monitor_head.type == BAC_UNITS_ANALOG)
 		analog_data = true;
@@ -1903,7 +1903,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 
 
 	CBADO monitor_bado;
-	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//
+	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 	monitor_bado.OnInitADOConn(); 
 	int loop_count = 400/(sizeof(Str_mon_element));
 	for (int i=0;i<loop_count;i++)
@@ -1921,7 +1921,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 
 		temp_data.point.panel = *(my_temp_point++); 
 		temp_data.point.sub_panel = *(my_temp_point++); 
-		//temp_data.point.network = 1;my_temp_point ++; //*(my_temp_point++);   net  ;
+		//temp_data.point.network = 1;my_temp_point ++; //*(my_temp_point++);  目前不考虑 多个net 的情况 ;
         temp_data.point.network = *(my_temp_point++);
 		
 		temp_data.value = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
@@ -1938,7 +1938,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 
         if (temp_data.mark != 0x0A0D)	//0d0a
             break;
-		if((temp_data.time == 0) ) //;0
+		if((temp_data.time == 0) ) //说明后面是无用的数据;填充的是0
 		{
 			if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)))
 			{
@@ -1963,11 +1963,11 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 			break;
 		}
 
-#if 0   //instance
-		if(temp_data.point.panel != Station_NUM)	//point panel ;
+#if 0   //支持其他instance了
+		if(temp_data.point.panel != Station_NUM)	//如果数据point 不是本panel 估计就是传错了值;
 			continue;
 #endif
-		if((temp_data.time < 1420041600)  || (temp_data.time > 2235660800))	// 2015-1-1  ->2049-12-30  ;
+		if((temp_data.time < 1420041600)  || (temp_data.time > 2235660800))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
 		{
 			continue;
 		}
@@ -2113,7 +2113,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 				if(temp_sd_exsit)
 				{
 					if(m_monitor_head.seg_index == 65535)
-						WritePrivateProfileStringW(temp_serial,temp_monitor_index,_T("0"),temp_db_ini_folder);//panel ,;
+						WritePrivateProfileStringW(temp_serial,temp_monitor_index,_T("0"),temp_db_ini_folder);//如果panel 存了快两个字节的包,就要清零;
 					else
 						WritePrivateProfileStringW(temp_serial,temp_monitor_index,temp_write_index,temp_db_ini_folder);
 				}
@@ -2135,7 +2135,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	{
 		CString strSql;
 		CBADO monitor_bado;
-		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	// 
+		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库 
 		monitor_bado.OnInitADOConn(); 
 		if(analog_data)
 			strSql.Format(_T("delete * from MonitorData where Flag=1 and Analog_Digital=1"));
@@ -2172,7 +2172,7 @@ void CBacnetMonitor::Reset_Monitor_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -2180,7 +2180,7 @@ void CBacnetMonitor::Reset_Monitor_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -2226,14 +2226,14 @@ void CBacnetMonitor::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return;
@@ -2291,7 +2291,7 @@ BOOL CBacnetMonitor::GetMonitorReadPackage(int digtal_or_analog,int nIndex)
         ReadPackage.Empty();
     if (ReadPackage.IsEmpty())
     {
-        //
+        //赋值初始值
         CString temp1 = _T("0000000000000000");
         for (int i = 0; i < GRAPHIC_MAX_PACKAGE/8; i++)
         {
@@ -2306,7 +2306,7 @@ BOOL CBacnetMonitor::GetMonitorReadPackage(int digtal_or_analog,int nIndex)
     return 0;
 }
 
-//ini;
+//将二进制存值ini文件中;
 void BitToString(int digtal_or_analog, int nIndex)
 {
     CString temp_serial;
@@ -2361,7 +2361,7 @@ void BitToString(int digtal_or_analog, int nIndex)
 
 void CBacnetMonitor::StringToBit(int digtal_or_analog)
 {
-    //ReadPackage = _T("1122334455667788");//
+    //ReadPackage = _T("1122334455667788");//测试
     for (int i = 0;i < GRAPHIC_MAX_PACKAGE;i++)
     {
         CString temp1;

@@ -2,13 +2,13 @@
 
 #include "CM5/ListCtrlEx.h"
 
-// CCO2_NodeView 
+// CCO2_NodeView 窗体视图
 
 class CCO2_NodeView : public CFormView
 {
 	DECLARE_DYNCREATE(CCO2_NodeView)
 public:
-    CCO2_NodeView();           // 
+    CCO2_NodeView();           // 动态创建所使用的受保护的构造函数
     virtual ~CCO2_NodeView();
 protected:
 	
@@ -26,7 +26,7 @@ public:
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:

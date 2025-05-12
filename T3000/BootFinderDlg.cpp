@@ -66,13 +66,13 @@
      pdlg->m_StrRev.TrimRight();
      global_message.Format (_T("Bootloader Model Device IP and Name :%s  %s"),pdlg->ISP_Device_IP,pdlg->m_StrProductName);// =   +L""
      ::PostMessage(pdlg->m_hWnd,WM_BOOTMESSAGE,0,0);
-     Sleep(20000);//
+     Sleep(20000);//休息三秒钟
      RefreshNetWorkDeviceListByUDPFunc();
      Sleep (5000);
      BOOL FindDevice = FALSE;
      for (int i = 0 ;i < m_refresh_net_device_data.size ();i++)
      {
-          if (m_refresh_net_device_data.at (i).ip_address.CompareNoCase(pdlg->ISP_Device_IP) == 0)  // 
+          if (m_refresh_net_device_data.at (i).ip_address.CompareNoCase(pdlg->ISP_Device_IP) == 0)  //找到了 
           {
              FindDevice = TRUE;
              break;   
@@ -273,14 +273,14 @@ void CBootFinderDlg::OnBnClickedOk()
 
                 //int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
                 ////TRACE(_T("%d"),send_ret);
-                //if(send_ret<0)	//  TCP
+                //if(send_ret<0)	//如果发送失败 就尝试 再次进行TCP连接
                 //{
                 //	TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
                 //}
                 //SetDHCP_Data();
 
 
-                ////if(IP_is_Local())//    DHCP
+                ////if(IP_is_Local())//如果是本地的 就用广播的 方式 发送 DHCP
                 ////{
                 //dhcp_package_is_broadcast = true;
                 //BOOL bBroadcast=TRUE;
@@ -312,7 +312,7 @@ void CBootFinderDlg::OnBnClickedOk()
 
 
            //     goto StopServer;
-                //if(some_device_reply_the_broadcast == true)	//  bootload   
+                //if(some_device_reply_the_broadcast == true)	//这个是用来支持 多个 在bootload中回复的 广播，如果有 则 先打印其中有几个回复
                 //{
                 //	CString temp_pro_cs;
                 //	temp_pro_cs.Format(_T("Find %d device in ISP mode"),Product_Info.size());

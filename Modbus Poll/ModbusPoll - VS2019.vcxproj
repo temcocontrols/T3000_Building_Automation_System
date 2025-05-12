@@ -298,7 +298,7 @@
     <ResourceCompile Include="Modbus Poll.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="xt" />
+    <Text Include="版本信息.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

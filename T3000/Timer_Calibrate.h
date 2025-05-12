@@ -4,21 +4,21 @@
 #include "afxwin.h"
 
 
-// Timer_Calibrate 
+// Timer_Calibrate 对话框
 
 class Timer_Calibrate : public CDialog
 {
 	DECLARE_DYNAMIC(Timer_Calibrate)
 
 public:
-	Timer_Calibrate(CWnd* pParent = NULL);   // 
+	Timer_Calibrate(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~Timer_Calibrate();
 
-// 
+// 对话框数据
 	enum { IDD = IDD_DIA_Timer_Calibrate };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:

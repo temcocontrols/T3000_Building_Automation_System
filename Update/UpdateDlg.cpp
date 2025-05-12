@@ -14,7 +14,7 @@
 
 #include "..\\Update\\MFC16API.h"
 #pragma comment(lib,"..\\Update\\MFC16API.lib")
-CString cs_new_name; //;
+CString cs_new_name; //自定义软件的名字;
 bool run_t3000 = true;
 
 HANDLE getftpthread = NULL;
@@ -126,7 +126,7 @@ bool CUpdateDlg::DeleteDirectory(CString DirName)
             }
             else
             {
-                SetFileAttributes(strDirName, FILE_ATTRIBUTE_NORMAL); //
+                SetFileAttributes(strDirName, FILE_ATTRIBUTE_NORMAL); //去掉文件的系统和隐藏属性
                 DeleteFile(strDirName);
             }
         }
@@ -232,9 +232,9 @@ void CUpdateDlg::InitialTemcoLogo()
         IMAGE_BITMAP, 0, 0,
         LR_LOADMAP3DCOLORS);
 
-    CStatic *pStatic = (CStatic *)GetDlgItem(IDC_STATIC_T3000_UPDATE); // 
-    pStatic->ModifyStyle(0xF, SS_BITMAP/*|SS_CENTERIMAGE*/);  //  ;
-    pStatic->SetBitmap(hBitmap);     // 
+    CStatic *pStatic = (CStatic *)GetDlgItem(IDC_STATIC_T3000_UPDATE); //获得指向静态控件的指针 
+    pStatic->ModifyStyle(0xF, SS_BITMAP/*|SS_CENTERIMAGE*/);  //设置静态控件的样式，使其位图居中  ;
+    pStatic->SetBitmap(hBitmap);     //设置静态控件显示位图 
 }
 
 void CUpdateDlg::InitialStatic()
@@ -284,39 +284,39 @@ void CUpdateDlg::InitialStatic()
 
 bool CopyDirW(CString strSrcPath, CString strDstPath, bool bFailIfExists)
 {
-    CreateDirectory(strDstPath, NULL);// 
-    if (PathIsDirectory(strDstPath) && PathFileExists(strSrcPath))// strSrcPath 
+    CreateDirectory(strDstPath, NULL);// 创建目标文件夹，如果存在则不创建，如果不存在则创建。
+    if (PathIsDirectory(strDstPath) && PathFileExists(strSrcPath))//目标目录是否存在 而且strSrcPath 要么是文件夹要么是文件
     {
-        if (::PathIsDirectory(strSrcPath))//
+        if (::PathIsDirectory(strSrcPath))//如果是文件夹拷贝
         {
             CFileFind finder;
-            // 
+            // 打开指定的文件夹进行搜索
             BOOL bWorking = finder.FindFile(strSrcPath + _T("\\") + _T("*.*"));
             while (bWorking)
             {
-                // 
+                // 从当前目录搜索文件
                 bWorking = finder.FindNextFile();
                 CString strFileName = finder.GetFileName();
                 CString strSrc = strSrcPath + _T("\\") + strFileName;
                 CString strDst = strDstPath + _T("\\") + strFileName;
-                // "."".."
+                // 判断搜索到的是不是"."和".."目录
                 if (!finder.IsDots())
                 {
-                    // 
+                    // 判断搜索到的目录是否是文件夹
                     if (finder.IsDirectory())
-                    { // 
+                    { // 如果是文件夹的话，进行递归
                         if (!CopyDirW(strSrc, strDst, bFailIfExists))
                             return false;
                     }
                     else
-                    {// 
+                    {// 如果是文件，进行复制
                         if (!CopyFileW(strSrc, strDst, bFailIfExists))
                             return false;
                     }
                 }
             }
         }
-        else//
+        else//如果是文件拷贝
         {
             strDstPath += _T("\\");
             strDstPath += PathFindFileName(strSrcPath);
@@ -324,7 +324,7 @@ bool CopyDirW(CString strSrcPath, CString strDstPath, bool bFailIfExists)
                 return false;
         }
     }
-    else//
+    else//目的路径不存在
         return false;
     return true;
 
@@ -407,19 +407,19 @@ DWORD WINAPI UnzipFileThread(LPVOID lPvoid)
 
 BOOL KillProcessFromName(CString strProcessName)
 {
-    //(TH32CS_SNAPPROCESS)
+    //创建进程快照(TH32CS_SNAPPROCESS表示创建所有进程的快照)
 
     HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 
 
-    //PROCESSENTRY32
+    //PROCESSENTRY32进程快照的结构体
 
     PROCESSENTRY32 pe;
 
 
 
-    //Process32First
+    //实例化后使用Process32First获取第一个快照的进程前必做的初始化操作
 
     pe.dwSize = sizeof(PROCESSENTRY32);
 
@@ -427,9 +427,9 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-    //IF:
+    //下面的IF效果同:
 
-    //if(hProcessSnap == INVALID_HANDLE_VALUE)   
+    //if(hProcessSnap == INVALID_HANDLE_VALUE)   无效的句柄
 
     if (!Process32First(hSnapShot, &pe))
 
@@ -441,13 +441,13 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-    //
+    //将字符串转换为小写
 
     strProcessName.MakeLower();
 
 
 
-    //  
+    //如果句柄有效  则一直获取下一个句柄循环下去
 
     while (Process32Next(hSnapShot, &pe))
 
@@ -455,7 +455,7 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-        //pe.szExeFile
+        //pe.szExeFile获取当前进程的可执行文件名称
 
         CString scTmp = pe.szExeFile;
 
@@ -463,15 +463,15 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-        //
+        //将可执行文件名称所有英文字母修改为小写
 
         scTmp.MakeLower();
 
 
 
-        //
+        //比较当前进程的可执行文件名称和传递进来的文件名称是否相同
 
-        //Compare0
+        //相同的话Compare返回0
 
         if (!scTmp.Compare(strProcessName))
 
@@ -479,7 +479,7 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-            //PID(PID)
+            //从快照进程中获取该进程的PID(即任务管理器中的PID)
 
             DWORD dwProcessID = pe.th32ProcessID;
 
@@ -519,7 +519,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
         bool download_ret = false;
         DownloadIniFilePath = DownloadFileFolder + _T("//T3000Version.ini");
         int retry_count_ini = 0;
-        DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/firmware/ProductPath.ini")); // 
+        DeleteUrlCacheEntry(_T("https://temcocontrols.com/ftp/firmware/ProductPath.ini")); // 清理缓存
         Sleep(2000);
         while (1)
         {
@@ -572,11 +572,11 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 
         DesDownloadFilePath = DownloadFileFolder + _T("\\T3000Update.zip");
         int retry_count = 0;
-        DeleteUrlCacheEntry(T3000FtpPath); // 
+        DeleteUrlCacheEntry(T3000FtpPath); // 清理缓存
         Sleep(2000);
         while (1)
         {
-            download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // .
+            download_ret = URLDownloadToFile(NULL, T3000FtpPath, DesDownloadFilePath, 0, &cbc); // 根据配置文档配置好的路径去下载.
             if (download_ret == S_FALSE)
             {
                 retry_count++;
@@ -636,7 +636,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
     }
 
 
-    //;
+    //这里要检测是否下载完毕;
 
 
 download_pass:
@@ -886,8 +886,8 @@ BOOL CUpdateDlg::PreTranslateMessage(MSG* pMsg)
     return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //URL
-    const CString & strFileLocalFullPath)//
+BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //待下载文件的URL
+    const CString & strFileLocalFullPath)//存放到本地的路径
 {
     ASSERT(strFileURLInServer != "");
     ASSERT(strFileLocalFullPath != "");
@@ -899,8 +899,8 @@ BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //URL
 
     DWORD dwType;
     const int nTimeOut = 2000;
-    session.SetOption(INTERNET_OPTION_CONNECT_TIMEOUT, nTimeOut); //
-    session.SetOption(INTERNET_OPTION_CONNECT_RETRIES, 1);   //
+    session.SetOption(INTERNET_OPTION_CONNECT_TIMEOUT, nTimeOut); //重试之间的等待延时
+    session.SetOption(INTERNET_OPTION_CONNECT_RETRIES, 1);   //重试次数
     char* pszBuffer = NULL;
 
     try
@@ -917,7 +917,7 @@ BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //URL
         {
             HANDLE hFile = CreateFile(strFileLocalFullPath, GENERIC_WRITE,
                 FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,
-                NULL);  //
+                NULL);  //创建本地文件
             if (hFile == INVALID_HANDLE_VALUE)
             {
                 pHttpFile->Close();
@@ -926,8 +926,8 @@ BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //URL
                 return false;
             }
 
-            char szInfoBuffer[1000];  //
-            DWORD dwFileSize = 0;   //
+            char szInfoBuffer[1000];  //返回消息
+            DWORD dwFileSize = 0;   //文件长度
             DWORD dwInfoBufferSize = sizeof(szInfoBuffer);
             BOOL bResult = FALSE;
             bResult = pHttpFile->QueryInfo(HTTP_QUERY_CONTENT_LENGTH,
@@ -935,14 +935,14 @@ BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //URL
 
             dwFileSize = atoi(szInfoBuffer);
             const int BUFFER_LENGTH = 1024 * 10;
-            pszBuffer = new char[BUFFER_LENGTH];  //
+            pszBuffer = new char[BUFFER_LENGTH];  //读取文件的缓冲
             DWORD dwWrite, dwTotalWrite;
             dwWrite = dwTotalWrite = 0;
-            UINT nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH); //
+            UINT nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH); //读取服务器上数据
 
             while (nRead > 0)
             {
-                WriteFile(hFile, pszBuffer, nRead, &dwWrite, NULL);  //
+                WriteFile(hFile, pszBuffer, nRead, &dwWrite, NULL);  //写到本地文件
                 dwTotalWrite += dwWrite;
                 nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH);
             }

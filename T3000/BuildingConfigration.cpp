@@ -164,9 +164,9 @@ void CBuildingConfigration::Initial_Building_List()
         {
             continue;
         }
-        //1.Building 
-        //2.
-        //3.BuildingBuilding
+        //1.拷贝到当前目录下：新的Building 加入到数据库中
+        //2.把数据库的名字改掉了：把数据库的路径更改掉
+        //3.把Building的目录名字改掉了：当成一个新的Building
         CString sql;
         _variant_t temp_variant;
         CString Building_Name=L"";
@@ -178,7 +178,7 @@ void CBuildingConfigration::Initial_Building_List()
             {
                 continue;
             }
-#if 1 //BuildingDatabase
+#if 1 //校驗一下看看是否是Building的Database
             CString strpath = GetExePath(true)+m_vecdbfile.at(i);
             SqliteDBBuilding.open((UTF8MBSTR)strpath);
              
@@ -232,7 +232,7 @@ void CBuildingConfigration::Initial_Building_List()
             BCTemp.BuildingPath=m_vecdbfile.at(i);
             BCTemp.b_selected=FALSE;
 
-            //ALL_NODE 
+            //更新ALL_NODE 里面的数据
 
 			CppSQLite3DB SqliteDBT3000;
 			SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
@@ -240,7 +240,7 @@ void CBuildingConfigration::Initial_Building_List()
 
             sql.Format(_T("Select *  from  Building  where  Main_BuildingName='%s' "),BCTemp.MainBuildingName);
            q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
-            if (q.eof())//
+            if (q.eof())//有表但是没有对应序列号的值
             {
                  
                 for (int j=0; j<m_BuildNameLst.size(); j++)
@@ -287,13 +287,13 @@ void CBuildingConfigration::Initial_Building_List()
  
             }
             SqliteDBT3000.closedb();
-            //Vector
+            //更新到数据库之后，加入到Vector列表
             m_BuildNameLst.push_back(BCTemp);
 
         }
 
     }
-    //
+    //重新加载数据
     LoadBuildingConfigDB();
     m_building_config_list.DeleteAllItems();
     for (int i=0; i<(int)m_BuildNameLst.size(); i++)
@@ -305,7 +305,7 @@ void CBuildingConfigration::Initial_Building_List()
         m_building_config_list.SetItemText(i,BC_MAINNAME,m_BuildNameLst.at(i).MainBuildingName);
 
 
-        if(m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Auto")) == 0) // AUTO 
+        if(m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Auto")) == 0) // AUTO时 需要使能的表格
         {
             m_building_config_list.SetCellEnabled(i,BC_IPADDRESS,0);
             m_building_config_list.SetCellEnabled(i,BC_IPPORT,0);
@@ -313,7 +313,7 @@ void CBuildingConfigration::Initial_Building_List()
             m_building_config_list.SetCellEnabled(i,BC_BAUDRATE,0);
         }
 
-        if(m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Remote Device")) == 0)   // == REMOTE_DEVICE  
+        if(m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Remote Device")) == 0)   // == REMOTE_DEVICE  需要使能的表格
         {
             m_building_config_list.SetCellEnabled(i,BC_IPADDRESS,1);
             m_building_config_list.SetCellEnabled(i,BC_IPPORT,1);
@@ -472,7 +472,7 @@ void CBuildingConfigration::Fresh_List_Row()
 
         m_building_config_list.SetItemText(i,BC_MAINNAME,m_BuildNameLst.at(i).MainBuildingName);
   
-		if (m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Auto")) == 0) // AUTO 
+		if (m_BuildNameLst.at(i).Protocol.CompareNoCase(_T("Auto")) == 0) // AUTO时 需要使能的表格
 		{
 			m_building_config_list.SetCellEnabled(i, BC_IPADDRESS, 0);
 			m_building_config_list.SetCellEnabled(i, BC_IPPORT, 0);
@@ -793,7 +793,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 				CppSQLite3Query q;
                 sql.Format(_T("Select * from Building where Building_Path='%s'"),path);
                 q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
-                if (!q.eof())//
+                if (!q.eof())//有表但是没有对应序列号的值
                 {
                      
 
@@ -843,8 +843,8 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             _variant_t temp_variant;
 
            
-            //ALL_NODE BuilingName .
-#if 0    //BuildingDatabase
+            //修改ALL_NODE 里面的BuilingName .
+#if 0    //校驗一下看看是否是Building的Database
 
 			CString DB_Building_Name = L"";
 			CppSQLite3DB SqliteDBBuilding;
@@ -980,7 +980,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                 CString sql;
                 sql.Format(_T("Select * from Building where Building_Path='%s'"),BCTemp.BuildingPath);
                 q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
-                if (q.eof())//
+                if (q.eof())//有表但是没有对应序列号的值
                 {
                      
                     for (int j=0; j<m_BuildNameLst.size(); j++)
@@ -1104,7 +1104,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                 AfxMessageBox(_T("Operator Failed"));
             }
 
-            //Vector
+            //更新到数据库之后，加入到Vector列表
 
 
 #endif
@@ -1140,7 +1140,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 
 
 
-		if (cs_temp.CompareNoCase(_T("Auto")) == 0)    //IP;
+		if (cs_temp.CompareNoCase(_T("Auto")) == 0)    //只有填写远程的时候需要填写IP地址和端口;
         {
             m_building_config_list.SetCellEnabled(Changed_Item,BC_IPADDRESS,0);
             m_building_config_list.SetCellEnabled(Changed_Item,BC_IPPORT,0);
@@ -1238,7 +1238,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 
 			bool  serial_is_all_digital = AllCharactorIsDigital(temp_serial_number);
 			 WritePrivateProfileStringW(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),temp_serial_number,g_achive_device_name_path);
-			if((input_length <=8) && (serial_is_all_digital))	//.
+			if((input_length <=8) && (serial_is_all_digital))	//说明输入的全是数字，是序列号.
 			{
 				CString temp_message;
 				temp_message.Format(_T("Do you want to connect the remote device (serial number is %s)") ,temp_serial_number);
@@ -1326,7 +1326,7 @@ void CBuildingConfigration::LoadBuildingConfigDB()
     _variant_t temp_variant;
     while(!m_q.eof())
     {
-        Building_Config temp_building; //building ;
+        Building_Config temp_building; //先用临时building 接收新值;
         int temp_value=0;
         temp_value=m_q.getIntField("Default_SubBuilding");
         if(temp_value==1)//def building;
@@ -1492,7 +1492,7 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
         }
         CStringArray temparray;
         SplitCStringA(temparray,strIP,_T("."));
-        if((temparray.GetSize()==4))	//3  . 4
+        if((temparray.GetSize()==4))	//有3个  . 4段
         {
             if((IsNum(temparray.GetAt(0))) && (IsNum(temparray.GetAt(1))) && (IsNum(temparray.GetAt(2))))
             {
@@ -1503,12 +1503,12 @@ void CBuildingConfigration::OnBnClickedBuildingButtonAdd()
                 }
 
             }
-            else	// ;
+            else	//否则判断为 域名;
             {
                 is_domain = true;
             }
         }
-        else	// ;
+        else	//判断为 域名;
         {
             is_domain = true;
         }
@@ -1643,7 +1643,7 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
     CString Strprotcol=m_building_config_list.GetItemText(lRow,BC_PROTOCOL);
     BOOL Is_The_Same=TRUE;
     m_select_text=m_building_config_list.GetItemText(lRow,lCol);
-    if(lRow>m_building_config_list.GetItemCount()) //
+    if(lRow>m_building_config_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
         return;
     if(lRow<0)
         return;
@@ -1662,7 +1662,7 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
     CString DB_Building_Name=L"";
 
      
-     if (BC_BUILDINGPATH==lCol)//Building
+     if (BC_BUILDINGPATH==lCol)//当点击选择一个数据库的时候，把Building的名字已经数据库的信息都获取过来
     {
         m_building_config_list.Set_Edit(FALSE);
 
@@ -1687,7 +1687,7 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
 
                 return;
             }
-#if 1 //BuildingDatabase
+#if 1 //校驗一下看看是否是Building的Database
             
 			SqliteDBBuilding.open((UTF8MBSTR)strdatabasefile);
             if (!SqliteDBBuilding.tableExists("ALL_NODE"))
@@ -1777,7 +1777,7 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
 //			 m_building_config_list.SetItemText(lRow,BC_SUBNAME,BCTemp.MainBuildingName);
             m_building_config_list.SetItemText(lRow,BC_MAINNAME,BCTemp.MainBuildingName);
 
-            //
+            //更新数据库
 #if 1
             try
             {
@@ -1787,7 +1787,7 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
                 CString sql;
                 sql.Format(_T("Select * from Building where Building_Path='%s'"),BCTemp.BuildingPath);
                 q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
-                if (q.eof())//
+                if (q.eof())//有表但是没有对应序列号的值
                 {
                    
                     for (int j=0; j<m_BuildNameLst.size(); j++)
@@ -1834,7 +1834,7 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
             {
                 AfxMessageBox(_T("Operator Failed"));
             }
-            //Vector
+            //更新到数据库之后，加入到Vector列表
 #endif
 
 
@@ -1925,7 +1925,7 @@ void CBuildingConfigration::OnNMRClickListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 
     m_curRow=lRow;
     m_curCol=lCol;
-    if(lRow>m_building_config_list.GetItemCount()) //
+    if(lRow>m_building_config_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
         return;
     if(lRow<0)
         return;
@@ -2014,8 +2014,8 @@ void CBuildingConfigration::OnBuildingconfigSelect()
 
 
 
-	//ALL_NODE BuilingName .
-#if 1    //BuildingDatabase
+	//修改ALL_NODE 里面的BuilingName .
+#if 1    //校驗一下看看是否是Building的Database
 
 	CString DB_Building_Name = L"";
 	CppSQLite3DB SqliteDBBuilding;
@@ -2245,11 +2245,11 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 	CString Strprotcol=m_building_config_list.GetItemText(lRow,BC_PROTOCOL);
 	BOOL Is_The_Same=TRUE;
 	m_select_text=m_building_config_list.GetItemText(lRow,lCol);
-	if(lRow>m_building_config_list.GetItemCount()) //
+	if(lRow>m_building_config_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if(lRow<0)
 		return;
-	if (m_curRow>=m_BuildNameLst.size())//size
+	if (m_curRow>=m_BuildNameLst.size())//点的行超过了数据的size
 	{
 		return;
 	}

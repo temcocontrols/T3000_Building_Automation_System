@@ -172,7 +172,7 @@ DWORD WINAPI CInputSetDlg::StartRefresh(LPVOID lpVoid)
 	memcpy_s(product_register_value,sizeof(product_register_value),product_register_value,sizeof(product_register_value));//
 	//if ((product_register_value[7] == 6)||(product_register_value[7] == 7))//tstat6
 	//{
-	//	//product_register_value[]
+	//	//product_register_value[]列表交换。
 	//	memset(pParent->tempchange,0,sizeof(pParent->tempchange));
 	//	int index = 0;
 
@@ -282,7 +282,7 @@ BOOL CInputSetDlg::OnInitDialog()
 		case PM_TSTAT7:
 		m_inRows=12;break;
 		case PM_PRESSURE:
-		case 12:m_inRows=5;break; // 5D TStat7
+		case 12:m_inRows=5;break; // 5D 同 TStat7
 		case PM_TSTAT6:	m_inRows=12;break;
         case PM_TSTAT5i:	m_inRows=12;break;
         case PM_TSTAT8:	m_inRows=12;break;
@@ -364,9 +364,9 @@ BOOL CInputSetDlg::OnInitDialog()
 	else//chinese.
 	{
 		CString strTemp;
-		strTemp=_T("C");
+		strTemp=_T("°C");
 		m_strUnitList.push_back(strTemp);
-		strTemp=_T("F");
+		strTemp=_T("°F");
 		m_strUnitList.push_back(strTemp);
 	}
 
@@ -494,8 +494,8 @@ BOOL CInputSetDlg::PreTranslateMessage(MSG* pMsg)
  	{
 		 if(GetFocus()->GetDlgCtrlID() == IDC_MSFLEXGRID1){
 		 HideAllControls();
-		  			int lRow = m_FlexGrid.get_RowSel();//
- 			int lCol = m_FlexGrid.get_ColSel(); //
+		  			int lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+ 			int lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 			int lRow_Count = m_FlexGrid.get_Rows();
 			int lCol_Count = m_FlexGrid.get_Cols();
 
@@ -990,13 +990,13 @@ void CInputSetDlg::Fresh_Grid()
 	   CppSQLite3Query q;
 	   SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
-	   if (SqliteDBBuilding.tableExists("Value_Range"))//ersion
+	   if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 	   {
 		   CString sql;
 		   sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_FlexGrid.get_Row()-1,m_sn);
 		   q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-		   if (!q.eof())//
+		   if (!q.eof())//有表但是没有对应序列号的值
 		   {   
 		    
 		   while (!q.eof())
@@ -1653,13 +1653,13 @@ void CInputSetDlg::Fresh_GridForAll(){
 		CppSQLite3Query q;
 		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
 
-		if (SqliteDBT3000.tableExists("Value_Range"))//ersion
+		if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
 		{
 			CString sql;
 			sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_FlexGrid.get_Row()-1,m_sn);
 			q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-			if (!q.eof())//
+			if (!q.eof())//有表但是没有对应序列号的值
 			{   
 				while (!q.eof())
 				{
@@ -1970,32 +1970,32 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 {
 	long lRow,lCol;
 	
-	lRow = m_FlexGrid.get_RowSel();//
-	lCol = m_FlexGrid.get_ColSel(); //
-	if(lRow>m_FlexGrid.get_Rows()) //
+	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	if(lRow>m_FlexGrid.get_Rows()) //如果点击区超过最大行号，则点击是无效的
 		return;
-	if(lRow == 0) //
+	if(lRow == 0) //如果点击标题行，也无效
 		return;
 	CRect rect;
-	m_FlexGrid.GetWindowRect(rect); //
-	ScreenToClient(rect); //
-	// MSFlexGridp"
-	// 1
+	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
+	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	//需要将其转化为像素，1440缇= 1英寸
 	CDC* pDC =GetDC();
-	//
+	//计算象素点和缇的转换比例
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//)
+	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//
+	//形成选中个所在的矩形区域
 	CRect rc(x,y,x+width,y+height);
-	//
+	//转换成相对对话框的坐标
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//
+	//获取选中格的文本信息
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
 	m_nCurRow=lRow;
 	m_nCurCol=lCol;
@@ -2018,13 +2018,13 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 		unsigned short AM_lrow4=product_register_value[MODBUS_HUM_CAL_EREASE];
 		if(lRow==1)
 		{
-			m_inValueEdit.MoveWindow(rc); //
+			m_inValueEdit.MoveWindow(rc); //移动到选中格的位置，覆盖
 			m_inValueEdit.ShowWindow(SW_SHOW);
 			
 			m_inValueEdit.BringWindowToTop();
 			//m_RangCombox.SelectString(-1,strValue);
 			m_inValueEdit.SetWindowText(strValue);
-			m_inValueEdit.SetFocus(); //
+			m_inValueEdit.SetFocus(); //获取焦点
 		}
 		if(lRow==2 && (wAM & 0x01))
 		{
@@ -2034,14 +2034,14 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 			CppSQLite3Query q;
 			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
-			if (SqliteDBBuilding.tableExists("Value_Range"))//ersion
+			if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 			{
 				CString sql;
 				sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),1,get_serialnumber());
 				q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
 
-				if (!q.eof())//
+				if (!q.eof())//有表但是没有对应序列号的值
 				{    
 					 
 					while (!q.eof())
@@ -2072,23 +2072,23 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 							m_valueCombx.InsertString(0,_T("Occupied"));
 							m_valueCombx.InsertString(1,_T("UnOccupied"));
 						} 
-						m_valueCombx.MoveWindow(rc); //
+						m_valueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 						m_valueCombx.ShowWindow(SW_SHOW);
 						m_valueCombx.BringWindowToTop();
 						m_valueCombx.SelectString(-1,strValue);
-						m_valueCombx.SetFocus(); //
+						m_valueCombx.SetFocus(); //获取焦点
 
 
 					}
 					else
 					{
-						m_inValueEdit.MoveWindow(rc); //
+						m_inValueEdit.MoveWindow(rc); //移动到选中格的位置，覆盖
 						m_inValueEdit.ShowWindow(SW_SHOW);
 
 						m_inValueEdit.BringWindowToTop();
 						//m_RangCombox.SelectString(-1,strValue);
 						m_inValueEdit.SetWindowText(strValue);
-						m_inValueEdit.SetFocus(); //
+						m_inValueEdit.SetFocus(); //获取焦点
 					}
 				} 
 				else
@@ -2105,22 +2105,22 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 							m_valueCombx.InsertString(0,_T("Off"));
 							m_valueCombx.InsertString(1,_T("On"));
 						}
-						m_valueCombx.MoveWindow(rc); //
+						m_valueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 						m_valueCombx.ShowWindow(SW_SHOW);
 						m_valueCombx.BringWindowToTop();
 						m_valueCombx.SelectString(-1,strValue);
-						m_valueCombx.SetFocus(); //
+						m_valueCombx.SetFocus(); //获取焦点
 
 					}
 					else
 					{
-						m_inValueEdit.MoveWindow(rc); //
+						m_inValueEdit.MoveWindow(rc); //移动到选中格的位置，覆盖
 						m_inValueEdit.ShowWindow(SW_SHOW);
 
 						m_inValueEdit.BringWindowToTop();
 						//m_RangCombox.SelectString(-1,strValue);
 						m_inValueEdit.SetWindowText(strValue);
-						m_inValueEdit.SetFocus(); //
+						m_inValueEdit.SetFocus(); //获取焦点
 					}
 				}
 
@@ -2140,22 +2140,22 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 						m_valueCombx.InsertString(0,_T("Off"));
 						m_valueCombx.InsertString(1,_T("On"));
 					}
-					m_valueCombx.MoveWindow(rc); //
+					m_valueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 					m_valueCombx.ShowWindow(SW_SHOW);
 					m_valueCombx.BringWindowToTop();
 					m_valueCombx.SelectString(-1,strValue);
-					m_valueCombx.SetFocus(); //
+					m_valueCombx.SetFocus(); //获取焦点
 
 				}
 				else
 				{
-					m_inValueEdit.MoveWindow(rc); //
+					m_inValueEdit.MoveWindow(rc); //移动到选中格的位置，覆盖
 					m_inValueEdit.ShowWindow(SW_SHOW);
 
 					m_inValueEdit.BringWindowToTop();
 					//m_RangCombox.SelectString(-1,strValue);
 					m_inValueEdit.SetWindowText(strValue);
-					m_inValueEdit.SetFocus(); //
+					m_inValueEdit.SetFocus(); //获取焦点
 				}
 			}	
 
@@ -2172,14 +2172,14 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 			CppSQLite3Query q;
 			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
-			if (SqliteDBBuilding.tableExists("Value_Range"))//ersion
+			if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 			{
 				CString sql;
 				sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),2,get_serialnumber());
 				q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
 
-				if (!q.eof())//
+				if (!q.eof())//有表但是没有对应序列号的值
 				{    
 					 
 					while (!q.eof())
@@ -2222,21 +2222,21 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 								m_valueCombx.InsertString(1,_T("On"));
 							}
 						}
-						m_valueCombx.MoveWindow(rc); //
+						m_valueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 						m_valueCombx.ShowWindow(SW_SHOW);
 						m_valueCombx.BringWindowToTop();
 						m_valueCombx.SelectString(-1,strValue);
-						m_valueCombx.SetFocus(); //
+						m_valueCombx.SetFocus(); //获取焦点
 					} 
 					else
 					{
-						m_inValueEdit.MoveWindow(rc); //
+						m_inValueEdit.MoveWindow(rc); //移动到选中格的位置，覆盖
 						m_inValueEdit.ShowWindow(SW_SHOW);
 
 						m_inValueEdit.BringWindowToTop();
 						//m_RangCombox.SelectString(-1,strValue);
 						m_inValueEdit.SetWindowText(strValue);
-						m_inValueEdit.SetFocus(); //
+						m_inValueEdit.SetFocus(); //获取焦点
 					}
 				}
 				else
@@ -2257,21 +2257,21 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 								m_valueCombx.InsertString(1,_T("On"));
 							}
 						}
-						m_valueCombx.MoveWindow(rc); //
+						m_valueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 						m_valueCombx.ShowWindow(SW_SHOW);
 						m_valueCombx.BringWindowToTop();
 						m_valueCombx.SelectString(-1,strValue);
-						m_valueCombx.SetFocus(); //
+						m_valueCombx.SetFocus(); //获取焦点
 					} 
 					else
 					{
-						m_inValueEdit.MoveWindow(rc); //
+						m_inValueEdit.MoveWindow(rc); //移动到选中格的位置，覆盖
 						m_inValueEdit.ShowWindow(SW_SHOW);
 
 						m_inValueEdit.BringWindowToTop();
 						//m_RangCombox.SelectString(-1,strValue);
 						m_inValueEdit.SetWindowText(strValue);
-						m_inValueEdit.SetFocus(); //
+						m_inValueEdit.SetFocus(); //获取焦点
 					}
 				}
 
@@ -2294,14 +2294,14 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 			CppSQLite3Query q;
 			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
-			if (SqliteDBBuilding.tableExists("Value_Range"))//ersion
+			if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 			{
 				CString sql;
 				sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),3,get_serialnumber());
 				q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
 
-				if (!q.eof())//
+				if (!q.eof())//有表但是没有对应序列号的值
 				{    
 					 
 					while (!q.eof())
@@ -2370,11 +2370,11 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 
 			}
 			 SqliteDBBuilding.closedb();
-				m_valueCombx.MoveWindow(rc); //
+				m_valueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 				m_valueCombx.ShowWindow(SW_SHOW);
 				m_valueCombx.BringWindowToTop();
 				m_valueCombx.SelectString(-1,strValue);
-				m_valueCombx.SetFocus(); //
+				m_valueCombx.SetFocus(); //获取焦点
 		}
 		
 	}
@@ -2386,11 +2386,11 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 			{
 				m_RangCombox.AddString(m_strUnitList.at(i));
 			}
-			m_RangCombox.ShowWindow(SW_SHOW);//
-			m_RangCombox.MoveWindow(rc); //
+			m_RangCombox.ShowWindow(SW_SHOW);//显示控件
+			m_RangCombox.MoveWindow(rc); //移动到选中格的位置，覆盖
 			m_RangCombox.BringWindowToTop();
 			m_RangCombox.SelectString(-1,strValue);
-			m_RangCombox.SetFocus(); //
+			m_RangCombox.SetFocus(); //获取焦点
 		}
 
 		if(((lRow==2)&&(product_register_value[MODBUS_TEMP_SELECT]!=1))||(lRow==3))
@@ -2412,11 +2412,11 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 				}
 			}
 
-			m_RangCombox.ShowWindow(SW_SHOW);//
-			m_RangCombox.MoveWindow(rc); //
+			m_RangCombox.ShowWindow(SW_SHOW);//显示控件
+			m_RangCombox.MoveWindow(rc); //移动到选中格的位置，覆盖
 			m_RangCombox.BringWindowToTop();
 			m_RangCombox.SelectString(-1,strValue);
-			m_RangCombox.SetFocus(); //
+			m_RangCombox.SetFocus(); //获取焦点
 		}
 		if(lRow==4) 
 		{
@@ -2425,11 +2425,11 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 			m_RangCombox.AddString(_T("Off/On"));
 			m_RangCombox.AddString(_T("Occupied/UnOccupied"));
 			m_RangCombox.AddString(_T("UnOccupied/Occupied"));
-			m_RangCombox.ShowWindow(SW_SHOW);//
-			m_RangCombox.MoveWindow(rc); //
+			m_RangCombox.ShowWindow(SW_SHOW);//显示控件
+			m_RangCombox.MoveWindow(rc); //移动到选中格的位置，覆盖
 			m_RangCombox.BringWindowToTop();
 			m_RangCombox.SelectString(-1,strValue);
-			m_RangCombox.SetFocus(); //
+			m_RangCombox.SetFocus(); //获
 		}
 		ShowRangeCombox();
 	}
@@ -2483,11 +2483,11 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 	}
 	if(lCol==AM_FIELD&&lRow!=1)
 	{
-		m_AmCombox.ShowWindow(SW_SHOW);//
-		m_AmCombox.MoveWindow(rc); //
+		m_AmCombox.ShowWindow(SW_SHOW);//显示控件
+		m_AmCombox.MoveWindow(rc); //移动到选中格的位置，覆盖
 		m_AmCombox.BringWindowToTop();
 		m_AmCombox.SelectString(-1,strValue);
-		m_AmCombox.SetFocus(); //
+		m_AmCombox.SetFocus(); //获取焦点
 	}
 	if(FUN_FIELD==lCol&&lRow!=1)
 	{
@@ -2505,26 +2505,26 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 		}
 
 		
-		m_inputFinCombox.ShowWindow(SW_SHOW);//
-		m_inputFinCombox.MoveWindow(rc); //
+		m_inputFinCombox.ShowWindow(SW_SHOW);//显示控件
+		m_inputFinCombox.MoveWindow(rc); //移动到选中格的位置，覆盖
 		m_inputFinCombox.BringWindowToTop();
 		m_inputFinCombox.SelectString(-1,strValue);
-		m_inputFinCombox.SetFocus(); //
+		m_inputFinCombox.SetFocus(); //获取焦点
 		
 	}
 	if(lRow==2&&CUST_FIELD==lCol&&product_register_value[MODBUS_ANALOG_IN1]==4)
 	{
 		m_customBtn.ShowWindow(SW_SHOW);
-		m_customBtn.MoveWindow(rc); //
+		m_customBtn.MoveWindow(rc); //移动到选中格的位置，覆盖
 		m_customBtn.BringWindowToTop();
-		m_customBtn.SetFocus(); //
+		m_customBtn.SetFocus(); //获取焦点
 	}
 	if(lRow==3&&CUST_FIELD==lCol&&product_register_value[189]==4)
 	{
 		m_customBtn.ShowWindow(SW_SHOW);
-		m_customBtn.MoveWindow(rc); //
+		m_customBtn.MoveWindow(rc); //移动到选中格的位置，覆盖
 		m_customBtn.BringWindowToTop();
-		m_customBtn.SetFocus(); //
+		m_customBtn.SetFocus(); //获取焦点
 	}
 	if(lCol==NAME_FIELD)
 	{
@@ -2533,7 +2533,7 @@ void CInputSetDlg::ClickMsflexgrid_Click()
 		m_inputNameEdt.SetWindowText(strValue);
 		m_inputNameEdt.SetFocus();
 		int nLenth=strValue.GetLength();
-		m_inputNameEdt.SetSel(nLenth,nLenth); //
+		m_inputNameEdt.SetSel(nLenth,nLenth); //全选//
 
 	}
 
@@ -2633,7 +2633,7 @@ void CInputSetDlg::OnCbnSelchangeRangCombo()
 			sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_nCurRow-1,m_sn);
 			q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-			if (!q.eof())//
+			if (!q.eof())//有表但是没有对应序列号的值
 			{
 				sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),m_crange,m_nCurRow-1,m_sn);
 				SqliteDBBuilding.execDML((UTF8MBSTR)sql);
@@ -2690,7 +2690,7 @@ void CInputSetDlg::OnCbnSelchangeRangCombo()
 		q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
 		 
-		if (!q.eof())//
+		if (!q.eof())//有表但是没有对应序列号的值
 		{
 
 			sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),m_crange,m_nCurRow-1,m_sn);
@@ -2900,7 +2900,7 @@ void CInputSetDlg::OnEnKillfocusInvalueedit()
 	if(m_nModel == 16 || m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8 || m_nModel == PM_TSTAT9
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V))
 	{
-		OnEnKillfocusInvalueeditFor5E();	//5E 
+		OnEnKillfocusInvalueeditFor5E();	//5E 以及更高的版本 不让改这一项，点击不会弹出 Edit框。;
 		return;
 	}
 	int ret=0;
@@ -2947,7 +2947,7 @@ void CInputSetDlg::OnEnKillfocusInvalueedit()
 				{
 					AfxMessageBox(_T("Write Error"));
 				}
-			}//On/Off ombox
+			}//On/Off 通过combox选择。;
 	
 		}
 		if(m_nCurCol==VALUE_FIELD&&m_nCurRow==3)
@@ -2990,12 +2990,12 @@ void CInputSetDlg::OnCbnKillfocusValuecombo()
 	if (m_nModel == 16 || m_nModel == PM_TSTAT6||m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5i|| m_nModel == PM_TSTAT8 || m_nModel == PM_TSTAT9
 		|| (m_nModel == PM_TSTAT8_WIFI) || (m_nModel == PM_TSTAT8_OCC) || (m_nModel == PM_TSTAT7_ARM) || (m_nModel == PM_TSTAT8_220V))
 	{
-		//OnCbnKillfocusValuecombo;//
+		//OnCbnKillfocusValuecombo;//这里原来有错
 
 // 		m_valueCombx.ShowWindow(SW_HIDE);
 // 		int nItem=0;
 // 		nItem=m_valueCombx.GetCurSel();
-// 		if(m_nCurCol==VALUE_FIELD&&m_nCurRow==2)//at6
+// 		if(m_nCurCol==VALUE_FIELD&&m_nCurRow==2)//找不到对应的tstat6
 // 		{
 // 			if(nItem==0)//off
 // 				write_one(g_tstat_id,180,0);
@@ -3055,7 +3055,7 @@ void CInputSetDlg::OnBnClickedRefreshbutton()
 	memcpy_s(product_register_value,sizeof(product_register_value),product_register_value,sizeof(product_register_value));//
 	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))//tstat6
 	{
-			//product_register_value[]
+			//product_register_value[]列表交换。
 			memset(tempchange,0,sizeof(tempchange));
 			int index = 0;
 
@@ -3077,8 +3077,8 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 	CString strText;
 	m_inputNameEdt.GetWindowText(strText);
 	m_inputNameEdt.ShowWindow(SW_HIDE);
-	int lRow = m_FlexGrid.get_RowSel();//
-	int lCol = m_FlexGrid.get_ColSel(); //
+	int lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	int lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 	
 	CString strInName;
 	if(lCol!=NAME_FIELD||lRow==0)
@@ -3463,7 +3463,7 @@ void CInputSetDlg::InitGridtstat6()
 
 
 			   //309	141	2	Full	W/R	Input auto/ manual enable.
-			   // column 2  Auto/Manual // IN12,internal sensor 1 // 
+			   // column 2  Auto/Manual // Ö»ÓÐIN1£¬2²ÅÓÐ,internal sensor Ã»ÓÐ£¬´óÓÚ1 // 
 			   if(i>1)//( i== 2 || i == 3)
 			   {
 				   nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];//309    141
@@ -3825,7 +3825,7 @@ void CInputSetDlg::Fresh_GridForTstat6(){
 
 
 			   //309	141	2	Full	W/R	Input auto/ manual enable.
-			   // column 2  Auto/Manual // IN12,internal sensor 1 // 
+			   // column 2  Auto/Manual // Ö»ÓÐIN1£¬2²ÅÓÐ,internal sensor Ã»ÓÐ£¬´óÓÚ1 // 
 			   if(i>1)//( i== 2 || i == 3)
 			   {
 				   nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];//309    141
@@ -4169,7 +4169,7 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 				//strTemp.Format(_T("%.1f"),product_register_value[216]/10.0);
 				//216	130	2	Full	W/R	Internal Thermistor Sensor - Shows the filtered, calibrated value of the internal thermistor sensor
 				int nFlag = product_register_value[7];
-				if(product_register_value[MODBUS_PRODUCT_MODEL] ==  16)	//5E 
+				if(product_register_value[MODBUS_PRODUCT_MODEL] ==  16)	//5E 的这里和其他寄存器不一样，所以没办法合并;
 				{
 					strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);//216
 
@@ -4243,7 +4243,7 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 			}
 
 			//309	141	2	Full	W/R	Input auto/ manual enable.
-			// column 2  Auto/Manual // IN12,internal sensor 1 // 
+			// column 2  Auto/Manual // Ö»ÓÐIN1£¬2²ÅÓÐ,internal sensor Ã»ÓÐ£¬´óÓÚ1 // 
 			if(i>1)//( i== 2 || i == 3)
 			{
 				nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];//309    141
@@ -4282,7 +4282,7 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 			}
 
 			//298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-			// column 5 Function IN12
+			// column 5 Function Ö»ÓÐIN1£¬2²ÅÓÐ
 
 
 			// 				298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
@@ -4414,7 +4414,7 @@ void CInputSetDlg::Fresh_GridForTstat5E(){
 				//216	130	2	Full	W/R	Internal Thermistor Sensor - Shows the filtered, calibrated value of the internal thermistor sensor
 				int nFlag = product_register_value[7];
 				
-				if(product_register_value[MODBUS_PRODUCT_MODEL] ==  16)	//5E 
+				if(product_register_value[MODBUS_PRODUCT_MODEL] ==  16)	//5E 的这里和其他寄存器不一样，所以没办法合并;
 				{
 					strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);//216
 
@@ -4484,7 +4484,7 @@ void CInputSetDlg::Fresh_GridForTstat5E(){
 			}
 
 			//309	141	2	Full	W/R	Input auto/ manual enable.
-			// column 2  Auto/Manual // IN12,internal sensor 1 // 
+			// column 2  Auto/Manual // Ö»ÓÐIN1£¬2²ÅÓÐ,internal sensor Ã»ÓÐ£¬´óÓÚ1 // 
 			if(i>1)//( i== 2 || i == 3)
 			{
 				nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];//309    141
@@ -4523,7 +4523,7 @@ void CInputSetDlg::Fresh_GridForTstat5E(){
 			}
 
 			//298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-			// column 5 Function IN12
+			// column 5 Function Ö»ÓÐIN1£¬2²ÅÓÐ
 
 
 			// 				298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
@@ -4628,7 +4628,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
     CString txt=m_FlexGrid.get_TextMatrix(nRow,nCol);
  
     
- 	if (nCol == INDEX_FIELD)// && nRow == 1) // 
+ 	if (nCol == INDEX_FIELD)// && nRow == 1) // 序号都不能改
  	{
  		return;
  	}
@@ -4646,14 +4646,14 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			return;
 
 		CString strValue = m_FlexGrid.get_TextMatrix(nRow,nCol);
-		m_inputNameEdt.MoveWindow(rcCell); //
+		m_inputNameEdt.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 		m_inputNameEdt.ShowWindow(SW_SHOW);
 
 		m_inputNameEdt.BringWindowToTop();
 		//m_RangCombox.SelectString(-1,strValue);
 
 		m_inputNameEdt.SetWindowText(strValue);
-		m_inputNameEdt.SetFocus(); //
+		m_inputNameEdt.SetFocus(); //获取焦点
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//
@@ -4673,14 +4673,14 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 		{
 // 			if (product_register_value[695]!=0)
 // 			{
-				m_inValueEdit.MoveWindow(rcCell); //
+				m_inValueEdit.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 				m_inValueEdit.ShowWindow(SW_SHOW);
 
 				m_inValueEdit.BringWindowToTop();
 				//m_RangCombox.SelectString(-1,strValue);
 
 				m_inValueEdit.SetWindowText(strValue);
-				m_inValueEdit.SetFocus(); //
+				m_inValueEdit.SetFocus(); //获取焦点
 			/*}*/
 		}
 		else
@@ -4689,21 +4689,21 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			//int nRangeValue = product_register_value[359+m_nCurRow-2];
 			//MODBUS_ANALOG1_RANGE
 			int nRangeValue = product_register_value[MODBUS_ANALOG1_RANGE+m_nCurRow-2];
-			if (nRangeValue == 3||nRangeValue==5)  // /offbo
+			if (nRangeValue == 3||nRangeValue==5)  // 如果是on/off，用combo
 			{	
 			    DealValue_Digit();
 			    
 			}
-			else // 
+			else // 如果是值，用edit
 			{		
-				m_inValueEdit.MoveWindow(rcCell); //
+				m_inValueEdit.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 				m_inValueEdit.ShowWindow(SW_SHOW);
 
 				m_inValueEdit.BringWindowToTop();
 				//m_RangCombox.SelectString(-1,strValue);
 		
 				m_inValueEdit.SetWindowText(strValue);
-				m_inValueEdit.SetFocus(); //
+				m_inValueEdit.SetFocus(); //获取焦点
 
 			}		
 		}
@@ -4715,10 +4715,10 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 	if(nCol==AM_FIELD) // A/M
 	{
 	OnCbnSelchangeAmcombo();
-		//m_AmCombox.MoveWindow(&rcCell,1); //
+		//m_AmCombox.MoveWindow(&rcCell,1); //移动到选中格的位置
 		//m_AmCombox.BringWindowToTop();
-		//m_AmCombox.ShowWindow(SW_SHOW);//
-		//m_AmCombox.SetFocus(); //
+		//m_AmCombox.ShowWindow(SW_SHOW);//显示控件
+		//m_AmCombox.SetFocus(); //获取焦点
 		//CString strTemp;
 
 		////309	141	2	Full	W/R	Input auto/ manual enable.
@@ -4826,14 +4826,14 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			return;
 
 		CString strValue = m_FlexGrid.get_TextMatrix(nRow,nCol);
-		m_Filter.MoveWindow(rcCell); //
+		m_Filter.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 		m_Filter.ShowWindow(SW_SHOW);
 
 		m_Filter.BringWindowToTop();
 		//m_RangCombox.SelectString(-1,strValue);
 
 		m_Filter.SetWindowText(strValue);
-		m_Filter.SetFocus(); //
+		m_Filter.SetFocus(); //获取焦点
 	}
 	//////////////////////////////////////////////////////////////////////////
 	if(nCol==RANG_FIELD) 
@@ -4842,10 +4842,10 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 	{
 	return;
 	}
-		m_RangCombox.MoveWindow(&rcCell,1); //
+		m_RangCombox.MoveWindow(&rcCell,1); //移动到选中格的位置
 		m_RangCombox.BringWindowToTop();
-		m_RangCombox.ShowWindow(SW_SHOW);//
-		m_RangCombox.SetFocus(); //
+		m_RangCombox.ShowWindow(SW_SHOW);//显示控件
+		m_RangCombox.SetFocus(); //获取焦点
 	
 		CString strTemp;
 		if(nRow == 1) // use 121
@@ -4932,11 +4932,11 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 		for(int i=0;i<8;i++)
 			m_inputFinCombox.AddString(INPUT_FUNS[i]);
 		
-		m_inputFinCombox.ShowWindow(SW_SHOW);//
-		m_inputFinCombox.MoveWindow(rcCell); //
+		m_inputFinCombox.ShowWindow(SW_SHOW);//显示控件
+		m_inputFinCombox.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 		m_inputFinCombox.BringWindowToTop();
 		//m_inputFinCombox.SelectString(-1,strValue);
-		m_inputFinCombox.SetFocus(); //
+		m_inputFinCombox.SetFocus(); //获取焦点
 		//298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
 
 		int nValue;//=product_register_value[298+nRow-2];
@@ -5024,7 +5024,7 @@ void CInputSetDlg::OnCbnSelchangeRangComboFor5E()
 	
 
 
-	//OnBnClickedRefreshbutton();//stat6 TSTAT6
+	//OnBnClickedRefreshbutton();//stat6 TSTAT6点击这时，再去刷新则会出现错误，崩溃.
 	//Fresh_Grid();
 }
 
@@ -5213,7 +5213,7 @@ void CInputSetDlg::OnCbnSelchangeAmcombo()
 {
 	
 	//309	141	2	Full	W/R	Input auto/ manual enable.
-	//6950to
+	//第一行的时候   【695】=0为 auto 读内置传感器的，【695】=1 为manual模式 手动设置
 	
  
 	int sel;//=m_AmCombox.GetCurSel();
@@ -5369,11 +5369,11 @@ void CInputSetDlg::DealValue_Digit(){
 	//}
 
 
-	//m_valueCombx.MoveWindow(rcCell); //
+	//m_valueCombx.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 	//m_valueCombx.ShowWindow(SW_SHOW);
 	//m_valueCombx.BringWindowToTop();
 	////m_valueCombx.SelectString(-1,strValue);
-	//m_valueCombx.SetFocus(); //
+	//m_valueCombx.SetFocus(); //获取焦点
 	//m_valueCombx.SetWindowText(strValue);
 
 
@@ -5679,13 +5679,13 @@ void CInputSetDlg::OnCbnKillfocusValuecomboFor5E()
 void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 {
 	if (nCol == INDEX_FIELD)
-	// && nRow == 1) // 
+	// && nRow == 1) // 序号都不能改
 	{
 		return;
 	}
 
 	//lsc20120828
-// 	if (nCol == NAME_FIELD  && nRow > 3)  // 
+// 	if (nCol == NAME_FIELD  && nRow > 3)  // 只有2个输入
 // 	{
 // 		return;
 // 	}
@@ -5703,14 +5703,14 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 	if (nCol == NAME_FIELD)
 	{
 		CString strValue = m_FlexGrid.get_TextMatrix(nRow,nCol);
-		m_inputNameEdt.MoveWindow(rcCell); //
+		m_inputNameEdt.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 		m_inputNameEdt.ShowWindow(SW_SHOW);
 
 		m_inputNameEdt.BringWindowToTop();
 		//m_RangCombox.SelectString(-1,strValue);
 
 		m_inputNameEdt.SetWindowText(strValue);
-		m_inputNameEdt.SetFocus(); //
+		m_inputNameEdt.SetFocus(); //获取焦点
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//
@@ -5723,30 +5723,30 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 		if (nValue & nFilter)
 		{
 			int nRangeValue = product_register_value[359+m_nCurRow-2];
-			if (nRangeValue == 3)  // /offbo
+			if (nRangeValue == 3)  // 如果是on/off，用combo
 			{	
 				m_valueCombx.ResetContent();
 
 				m_valueCombx.InsertString(0,_T("On"));
 				m_valueCombx.InsertString(1,_T("Off"));
 
-				m_valueCombx.MoveWindow(rcCell); //
+				m_valueCombx.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 				m_valueCombx.ShowWindow(SW_SHOW);
 				m_valueCombx.BringWindowToTop();
 				//m_valueCombx.SelectString(-1,strValue);
-				m_valueCombx.SetFocus(); //
+				m_valueCombx.SetFocus(); //获取焦点
 				m_valueCombx.SetWindowText(strValue);
 			}
-			else // 
+			else // 如果是值，用edit
 			{		
-				m_inValueEdit.MoveWindow(rcCell); //
+				m_inValueEdit.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 				m_inValueEdit.ShowWindow(SW_SHOW);
 
 				m_inValueEdit.BringWindowToTop();
 				//m_RangCombox.SelectString(-1,strValue);
 
 				m_inValueEdit.SetWindowText(strValue);
-				m_inValueEdit.SetFocus(); //
+				m_inValueEdit.SetFocus(); //获取焦点
 
 			}		
 		}
@@ -5757,10 +5757,10 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 	CString strman=_T("Manual");
 	if(nCol==AM_FIELD) // A/M
 	{
-		m_AmCombox.MoveWindow(&rcCell,1); //
+		m_AmCombox.MoveWindow(&rcCell,1); //移动到选中格的位置
 		m_AmCombox.BringWindowToTop();
-		m_AmCombox.ShowWindow(SW_SHOW);//
-		m_AmCombox.SetFocus(); //
+		m_AmCombox.ShowWindow(SW_SHOW);//显示控件
+		m_AmCombox.SetFocus(); //获取焦点
 		CString strTemp;
 		BYTE nValue =BYTE(product_register_value[MODBUS_INPUT_MANU_ENABLE]);
 		BYTE nFilter = 0x01;
@@ -5838,10 +5838,10 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 	//////////////////////////////////////////////////////////////////////////
 	if(nCol==RANG_FIELD) 
 	{	
-		m_RangCombox.MoveWindow(&rcCell,1); //
+		m_RangCombox.MoveWindow(&rcCell,1); //移动到选中格的位置
 		m_RangCombox.BringWindowToTop();
-		m_RangCombox.ShowWindow(SW_SHOW);//
-		m_RangCombox.SetFocus(); //
+		m_RangCombox.ShowWindow(SW_SHOW);//显示控件
+		m_RangCombox.SetFocus(); //获取焦点
 
 		CString strTemp;
 		if(nRow == 1) // use 121
@@ -5887,11 +5887,11 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 		for(int i=0;i<8;i++)
 			m_inputFinCombox.AddString(INPUT_FUNS[i]);
 
-		m_inputFinCombox.ShowWindow(SW_SHOW);//
-		m_inputFinCombox.MoveWindow(rcCell); //
+		m_inputFinCombox.ShowWindow(SW_SHOW);//显示控件
+		m_inputFinCombox.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 		m_inputFinCombox.BringWindowToTop();
 		//m_inputFinCombox.SelectString(-1,strValue);
-		m_inputFinCombox.SetFocus(); //
+		m_inputFinCombox.SetFocus(); //获取焦点
 
 		int nValue=product_register_value[298+nRow-2];
 		CString strTemp(INPUT_FUNS[nValue]);
@@ -5905,16 +5905,16 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 		if(nRow==2&&product_register_value[MODBUS_ANALOG_IN1]==4)
 		{
 			m_customBtn.ShowWindow(SW_SHOW);
-			m_customBtn.MoveWindow(rcCell); //
+			m_customBtn.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 			m_customBtn.BringWindowToTop();
-			m_customBtn.SetFocus(); //
+			m_customBtn.SetFocus(); //获取焦点
 		}
 		if(nRow==3&&product_register_value[189]==4)
 		{
 			m_customBtn.ShowWindow(SW_SHOW);
-			m_customBtn.MoveWindow(rcCell); //
+			m_customBtn.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 			m_customBtn.BringWindowToTop();
-			m_customBtn.SetFocus(); //
+			m_customBtn.SetFocus(); //获取焦点
 		}
 	}
 	
@@ -6130,7 +6130,7 @@ void CInputSetDlg::OnCbnSelchangeValuecombo()
 
 void CInputSetDlg::OnBnClickedFresh()
 {
-	//for(int i=0;i<(9);i++)	//6 
+	//for(int i=0;i<(9);i++)	//暂定为0 ，因为TSTAT6 目前为600多
 	//{
 	//	int itemp = 0;
 	//	itemp = Read_Multi(g_tstat_id,&product_register_value[i*(100)],i*(100),100,5);
@@ -6152,11 +6152,11 @@ void CInputSetDlg::ClickMsflexgrid1()
 {
 	long lRow,lCol;
 
-	lRow = m_FlexGrid.get_RowSel();//
-	lCol = m_FlexGrid.get_ColSel(); //
-	if(lRow>m_FlexGrid.get_Rows()) //
+	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	if(lRow>m_FlexGrid.get_Rows()) //如果点击区超过最大行号，则点击是无效的
 		return;
-	if(lRow == 0||lCol==0) //
+	if(lRow == 0||lCol==0) //如果点击标题行，也无效
 		return;
  
 	 
@@ -6235,7 +6235,7 @@ void CInputSetDlg::OnCbnSelendokRangCombo()
 		 sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_nCurRow-1,m_sn);
 		 q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-		 if (!q.eof())//
+		 if (!q.eof())//有表但是没有对应序列号的值
 		 {
 
 			 sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),m_crange,m_nCurRow-1,m_sn);
@@ -6295,7 +6295,7 @@ void CInputSetDlg::OnCbnSelendokRangCombo()
 			sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_nCurRow-1,m_sn);
 			q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
 
-			if (!q.eof())//
+			if (!q.eof())//有表但是没有对应序列号的值
 			{
 				sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),m_crange,m_nCurRow-1,m_sn);
 				SqliteDBT3000.execDML((UTF8MBSTR)sql);

@@ -16,10 +16,10 @@ public:
 	~CPointItem(void);
 
 
-void SetPoint(MyPoint point);  //ItemPoint
-MyPoint GetPoint() const;		// ;
+void SetPoint(MyPoint point);  //设置此ItemPoint的坐标
+MyPoint GetPoint() const;		//获取 坐标;
 
-void SetIndex(int nIndex);	//ItemPoint;
+void SetIndex(int nIndex);	//设置此ItemPoint的序号;
 int GetIndex() const;
 
 void SetNext(CPointItem *pnext);
@@ -28,7 +28,7 @@ void SetPointValue(int nvalue);
 int GetPointValue();
 
 
-bool			m_link_to_next;//;
+bool			m_link_to_next;//连接至下一个点;
 
 protected:
 	MyPoint			m_point;

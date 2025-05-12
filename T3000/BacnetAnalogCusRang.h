@@ -57,7 +57,7 @@ public:
       afx_msg void OnEnKillfocusEditMaxVoltValue3();
       afx_msg void OnEnKillfocusEditMaxValueValue();
       void ReSetSlideAndList();
-      void InitialPointCount(); //  ;
+      void InitialPointCount(); //弹出对话框 初始化 个数以及最大最小值;
       void ShowWindowByCount(int n_count);
       int n_point_count ;
       void ReAllocationValue();

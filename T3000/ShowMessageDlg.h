@@ -3,7 +3,7 @@
 #include "afxwin.h"
 #include "afxcmn.h"
 
-// CShowMessageDlg 
+// CShowMessageDlg 对话框
 const int EVENT_AUTO_CLOSE = 0;
 const int EVENT_IP_AUTO = 1;
 const int EVENT_IP_STATIC_CHANGE = 2;
@@ -19,16 +19,16 @@ class CShowMessageDlg : public CDialogEx
 	DECLARE_DYNAMIC(CShowMessageDlg)
 
 public:
-	CShowMessageDlg(CWnd* pParent = NULL);   // 
+	CShowMessageDlg(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CShowMessageDlg();
 
-// 
+// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_AA_SHOWMESSAGE };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -37,28 +37,28 @@ public:
     CString static_text;
     CString static_percent;
     int     m_pos;
-    COLORREF static_backcolor; //
-    COLORREF static_textcolor; //
-    int static_text_length ; // 
-    int static_text_width ;  // 
+    COLORREF static_backcolor; //背景色
+    COLORREF static_textcolor; //字体色
+    int static_text_length ; // 字体长宽
+    int static_text_width ;  // 字体长宽
     bool b_set_backcolor ;
     bool b_show_progress;
-    int auto_close_time; // ;
+    int auto_close_time; // 自动关闭时间;
     
     bool resize_message_window;
-    int int_x;  //  static 
+    int int_x;  //窗体的大小 以及 static 的大小
     int int_y;
     int int_cx;
     int int_cy;
 
-    int auto_close_time_count; // ;
-    int auto_close_time_count_old; // ;
+    int auto_close_time_count; // 几次后自动关闭;
+    int auto_close_time_count_old; // 用于计算百分比;
     int mevent;
 
-    HWND m_message_hwnd ;  //;
+    HWND m_message_hwnd ;  //用于回传消息;
     int m_message ;
 
-    _Bac_Scan_Com_Info m_mstp_device_info;  // MSTP  whois ;
+    _Bac_Scan_Com_Info m_mstp_device_info;  // MSTP 用于确认 whois 是否有回复;
     void SetMessageWindowSize(int xx, int yy, int c_xx, int c_yy);
     void SetStaticText(LPCTSTR lpszTitleText);
     void SetStaticTextBackgroundColor(COLORREF TitleTextBackColor);
@@ -70,10 +70,10 @@ public:
         unsigned char modbus_id,
         unsigned short nreg_address,
         unsigned short nreg_value,
-        unsigned char sub_device,         //    ;
+        unsigned char sub_device,         // 如果是子设备  ，数据库中的协议 比较特殊;
         LPCTSTR Dbpath);
     void SetHwnd(HWND h_hwnd, int nMessage);
-    void SetMstpDeviceInfo(_Bac_Scan_Com_Info deviceinfo); // MSTP  whois ;
+    void SetMstpDeviceInfo(_Bac_Scan_Com_Info deviceinfo); // MSTP 用于确认 whois 是否有回复;
     CStaticEx m_static_title;
     CStaticEx m_static_persent;
     afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -81,18 +81,18 @@ public:
     static DWORD WINAPI ShowMessageThread(LPVOID lPvoid);
 
 
-    //2 IP
+    //事件2 静态IP修改
     CString m_string_event_2_static_ip;
     void SetChangedIPaddress(LPCTSTR lp_ipaddr);
     afx_msg void OnClose();
     virtual void OnCancel();
 
-    //
+    //更改协议所用参数
     bool cprotocol_modbus_to_bacnet;   // 0  modbus to bacnet          1  bacnet to modbus
     unsigned char cprotocol_modbus_id;
     unsigned short cprotocol_nreg_address;
     unsigned short cprotocol_nreg_value;
-    unsigned char cprotocol_sub_device;         //    ;
+    unsigned char cprotocol_sub_device;         // 如果是子设备  ，数据库中的协议 比较特殊;
     CString cprotocol_Dbpath;
     afx_msg void OnBnClickedOk();
     afx_msg void OnBnClickedCancel();

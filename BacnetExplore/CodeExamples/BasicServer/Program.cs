@@ -93,10 +93,10 @@ namespace BasicServer
 
             // Bacnet on UDP/IP/Ethernet
             bacnet_client = new BacnetClient(new BacnetIpUdpProtocolTransport(0xBAC0, false));
-            // or Bacnet Mstp on COM4  38400 bps, own master id 8
+            // or Bacnet Mstp on COM4 à 38400 bps, own master id 8
             // m_bacnet_client = new BacnetClient(new BacnetMstpProtocolTransport("COM4", 38400, 8);
             // Or Bacnet Ethernet
-            // bacnet_client = new BacnetClient(new BacnetEthernetProtocolTransport("Connexion au rseau local"));    
+            // bacnet_client = new BacnetClient(new BacnetEthernetProtocolTransport("Connexion au réseau local"));    
             // Or Bacnet on IPV6
             // bacnet_client = new BacnetClient(new BacnetIpV6UdpProtocolTransport(0xBAC0));
 

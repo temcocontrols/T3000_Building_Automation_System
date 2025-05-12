@@ -2,23 +2,23 @@
 #include "afxcmn.h"
 #include "CM5/ListCtrlEx.h"
 
-// CBacnetTstatSchedule 
+// CBacnetTstatSchedule 对话框
 
 class CBacnetTstatSchedule : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnetTstatSchedule)
 
 public:
-	CBacnetTstatSchedule(CWnd* pParent = NULL);   // 
+	CBacnetTstatSchedule(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBacnetTstatSchedule();
 
-// 
+// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_TSTAT_SCHEDULE };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -36,7 +36,7 @@ public:
     unsigned short m_group_value;
     int m_group_index;
 private:
-	int m_list_count;  // 
+	int m_list_count;  // 有效条数
 public:
     afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg void OnNMRClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT *pResult);

@@ -1,4 +1,4 @@
-// BacnetSettingParamter.cpp : 
+// BacnetSettingParamter.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
-// CBacnetSettingParamter 
+// CBacnetSettingParamter 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetSettingParamter, CDialogEx)
 
@@ -34,17 +34,17 @@ BEGIN_MESSAGE_MAP(CBacnetSettingParamter, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetSettingParamter 
+// CBacnetSettingParamter 消息处理程序
 
 
 BOOL CBacnetSettingParamter::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  
+    // TODO:  在此添加额外的初始化
     InitialUI();
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // : OCX  FALSE
+                  // 异常: OCX 属性页应返回 FALSE
 }
 
 void CBacnetSettingParamter::InitialUI()
@@ -111,7 +111,7 @@ void CBacnetSettingParamter::InitialUI()
 
 //void CBacnetSettingParamter::OnCbnSelchangeComboType()
 //{
-//    // TODO: 
+//    // TODO: 在此添加控件通知处理程序代码
 //    CString temp_string;
 //    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_TYPE))->GetCurSel();
 //    ((CComboBox *)GetDlgItem(IDC_COMBO_TYPE))->GetLBText(nSel, temp_string);
@@ -135,7 +135,7 @@ void CBacnetSettingParamter::InitialUI()
 
 //void CBacnetSettingParamter::OnCbnSelchangeComboNumber()
 //{
-//    // TODO: 
+//    // TODO: 在此添加控件通知处理程序代码
 //    CString temp_string;
 //    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->GetCurSel();
 //    ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->GetLBText(nSel, temp_string);
@@ -154,7 +154,7 @@ void CBacnetSettingParamter::InitialUI()
 
 void CBacnetSettingParamter::OnBnClickedButtonLcdOk()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
         (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
         (Device_Basic_Setting.reg.mini_type == T3_OEM_12I))

@@ -372,12 +372,12 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 		   CppSQLite3DB SqliteDBBuilding;
 		   SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
-		   if (SqliteDBBuilding.tableExists("Value_Range"))//Version
+		   if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 		   {
 			   CString sql;
 			   sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),nStatus,m_sn);
 			  q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
-			   if (!q.eof())//
+			   if (!q.eof())//有表但是没有对应序列号的值
 			   {    
 				    
 				   while (!q.eof())
@@ -891,7 +891,7 @@ void CRelayLabel::DispalyVariableValue_General(int nStatus,COLORREF textClr,COLO
 	}
 	else
 	{
-		if(m_Variable_data.at(i).range == 20)	//;
+		if(m_Variable_data.at(i).range == 20)	//如果是时间;
 		{
 			//m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
 			char temp_char[50];

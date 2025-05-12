@@ -151,7 +151,7 @@ BOOL CMyPing::TestPing(const CString& strIP)
 	int bread,datasize,times; 
 	int fromlen = sizeof(from); 
 	int timeout = 300;
-	int statistic = 0;  /*  */  
+	int statistic = 0;  /* 用于统计结果 */  
 	char *dest_ip; 
 	char *icmp_data; 
 	char *recvbuf; 
@@ -173,8 +173,8 @@ BOOL CMyPing::TestPing(const CString& strIP)
 
 	sockRaw = WSASocket(AF_INET,SOCK_RAW,IPPROTO_ICMP,NULL, 0,WSA_FLAG_OVERLAPPED);
 	//
-	//(SO_RCVTIMEO, SO_SNDTIMEO)
-	//    WSA_FLAG_OVERLAPPED !
+	//注：为了使用发送接收超时设置(即设置SO_RCVTIMEO, SO_SNDTIMEO)，
+	//    必须将标志位设为WSA_FLAG_OVERLAPPED !
 	// 
 	if (sockRaw == INVALID_SOCKET) 
 	{ 
@@ -234,7 +234,7 @@ BOOL CMyPing::TestPing(const CString& strIP)
 		dest.sin_family = AF_INET; 
 	dest_ip = inet_ntoa(dest.sin_addr); 
 	// 
-	//  atoi: int atoi( const char *string );
+	//  atoi函数原型是: int atoi( const char *string );
 	//  The return value is 0 if the input cannot be converted to an integer !
 	//
 // 	if(argc>2)
@@ -251,7 +251,7 @@ BOOL CMyPing::TestPing(const CString& strIP)
 // 		datasize = atoi(argv[3]); 
 // 		if (datasize == 0) 
 // 			datasize = DEF_PACKET_SIZE;
-// 		if (datasize >1024)   /*  */
+// 		if (datasize >1024)   /* 用户给出的数据包大小太大 */
 // 		{
 // 			fprintf(stderr,"WARNING : data_size is too large !\n");
 // 			datasize = DEF_PACKET_SIZE; 
@@ -278,7 +278,7 @@ BOOL CMyPing::TestPing(const CString& strIP)
 	//fill_icmp_data(icmp_data,datasize); 
 	FillIcmpData(icmp_data,datasize);
 	//
-	//
+	//显示提示信息
 	//
 	//fprintf(stdout,"\nPinging %s ....\n\n",dest_ip);
 	CString strTips;
@@ -340,7 +340,7 @@ BOOL CMyPing::TestPing(const CString& strIP)
 		} 
 
 		if(!DecodeResp(recvbuf,bread,&from))
-			statistic++; /* ++ */
+			statistic++; /* 成功接收的数目++ */
 		
 		Sleep(1000); 
 	}
@@ -371,7 +371,7 @@ Display the statistic result
 
 BOOL CMyPing::SendEchoMessage(const CString& strMsg)
 {
-	//WM_COPYDATA 
+	//使用WM_COPYDATA 
 	COPYDATASTRUCT cds = {0};
 	//int nSize = (strMsg.GetLength()+1)*sizeof(TCHAR);
 	//char* szMsg = new char[]

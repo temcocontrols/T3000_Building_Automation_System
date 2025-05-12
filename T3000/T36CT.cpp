@@ -212,28 +212,28 @@ void T36CT::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
 #if 1	
-    ///
+    //设置排/行数量
     m_msflexgrid_input.put_Cols(4);
     m_msflexgrid_input.put_Rows(6+1); 
     m_msflexgrid_input.put_TextMatrix(0,0,_T("Input Name"));
     m_msflexgrid_input.put_TextMatrix(0,1,_T("Register Value"));
     m_msflexgrid_input.put_TextMatrix(0,2,_T("Range"));
     m_msflexgrid_input.put_TextMatrix(0,3,_T("Filter"));
-    //	
+    //设置列宽	
     m_msflexgrid_input.put_ColWidth(0,1000);
     m_msflexgrid_input.put_ColWidth(1,1500);
     //m_msflexgrid_input.put_ColWidth(2,1500);
     m_msflexgrid_input.put_ColWidth(2,1500);
     m_msflexgrid_input.put_ColWidth(3,1000);
-    //
+    //居中显示
     for (int col=0;col<4;col++)
     { 
         m_msflexgrid_input.put_ColAlignment(col,4);
     }
-    //
-    for(int i=1;i<4+1;i++)		//
+    //彩色显示
+    for(int i=1;i<4+1;i++)		//排数量
     {
-        for(int k=0;k<4;k++)	//
+        for(int k=0;k<4;k++)	//列数量
         {
             if (i%2==1)
             {
@@ -245,7 +245,7 @@ void T36CT::OnInitialUpdate()
             }
         }
     }
-    //
+    //显示纵标题
     CString str;
     for(int i=1;i<6+1;i++)
     {
@@ -255,28 +255,28 @@ void T36CT::OnInitialUpdate()
         m_msflexgrid_input.put_TextMatrix(i,0,str);	 
     }
 
-    //============================================================================================================Output DO
+    //============================================================================================================界面Output DO部份列表框
     m_msflexgrid_Ainput.put_Cols(4);
     m_msflexgrid_Ainput.put_Rows(10+1); 
     m_msflexgrid_Ainput.put_TextMatrix(0,0,_T("Input Name"));
     m_msflexgrid_Ainput.put_TextMatrix(0,1,_T("Register Value"));
     m_msflexgrid_Ainput.put_TextMatrix(0,2,_T("Range"));
     m_msflexgrid_Ainput.put_TextMatrix(0,3,_T("Filter"));
-    //	
+    //设置列宽	
     m_msflexgrid_Ainput.put_ColWidth(0,1000);
     m_msflexgrid_Ainput.put_ColWidth(1,1500);
     //m_msflexgrid_input.put_ColWidth(2,1500);
     m_msflexgrid_Ainput.put_ColWidth(2,1500);
     m_msflexgrid_Ainput.put_ColWidth(3,1000);
-    //
+    //居中显示
     for (int col=0;col<4;col++)
     { 
         m_msflexgrid_Ainput.put_ColAlignment(col,4);
     }
-    //
-    for(int i=1;i<4+1;i++)		//
+    //彩色显示
+    for(int i=1;i<4+1;i++)		//排数量
     {
-        for(int k=0;k<4;k++)	//
+        for(int k=0;k<4;k++)	//列数量
         {
             if (i%2==1)
             {
@@ -288,7 +288,7 @@ void T36CT::OnInitialUpdate()
             }
         }
     }
-    //
+    //显示纵标题
 //    CString str;
     for(int i=1;i<10+1;i++)
     {
@@ -299,13 +299,13 @@ void T36CT::OnInitialUpdate()
     }
 
 
-    ///
+    //设置行/列数量
     m_msflexgrid_output.put_Rows(6);
     m_msflexgrid_output.put_Cols(3);
-    //	
+    //设置列宽	
 
 
-    //
+    //显示横标题
     m_msflexgrid_output.put_TextMatrix(0,0,_T("Output Name"));
     m_msflexgrid_output.put_TextMatrix(0,1,_T("Switch Status"));
     m_msflexgrid_output.put_TextMatrix(0,2,_T("Output Value"));
@@ -316,11 +316,11 @@ void T36CT::OnInitialUpdate()
         m_msflexgrid_output.put_ColAlignment(col,4);
     }
 
-    //
-    for(int i=1;i<6;i++)		//
+    //彩色显示
+    for(int i=1;i<6;i++)		//排数量
     {
 
-        for(int k=0;k<2;k++)	//
+        for(int k=0;k<2;k++)	//列数量
         {
             if (i%2==1)
             {
@@ -332,7 +332,7 @@ void T36CT::OnInitialUpdate()
             }
         }
     }
-    //
+    //显示纵标题
     CString str_output;
     for(int i=1;i<5+1;i++)
     {
@@ -766,26 +766,26 @@ void T36CT::ClickMsflexgridOutput()
 {
     grid_flag=3;
     long lRow,lCol;
-    lRow = m_msflexgrid_output.get_RowSel();//	
-    lCol = m_msflexgrid_output.get_ColSel(); //
+    lRow = m_msflexgrid_output.get_RowSel();//获取点击的行号	
+    lCol = m_msflexgrid_output.get_ColSel(); //获取点击的列号
     TRACE(_T("Click input grid!\n"));
 
     CRect rect;
-    m_msflexgrid_output.GetWindowRect(rect); //
-    ScreenToClient(rect); //	
+    m_msflexgrid_output.GetWindowRect(rect); //获取表格控件的窗口矩形
+    ScreenToClient(rect); //转换为客户区矩形	
     CDC* pDC =GetDC();
 
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //()
+    //计算选中格的左上角的坐标(象素为单位)
     long y = m_msflexgrid_output.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_msflexgrid_output.get_ColPos(lCol)/nTwipsPerDotX;
-    //()11
+    //计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
     long width = m_msflexgrid_output.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_msflexgrid_output.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //
+    //形成选中个所在的矩形区域
     CRect rcCell(x,y,x+width,y+height);
-    //
+    //转换成相对对话框的坐标
     rcCell.OffsetRect(rect.left+1,rect.top+1);
     ReleaseDC(pDC);
     CString strValue = m_msflexgrid_output.get_TextMatrix(lRow,lCol);
@@ -795,7 +795,7 @@ void T36CT::ClickMsflexgridOutput()
 
     if(lRow!=0)
     {
-        //return; // 2012.2.7
+        //return; // 2012.2.7老毛说不允许修改
         if (m_curcol==0||m_curcol==2)
         {
             m_inNameEdt.MoveWindow(&rcCell,1);
@@ -804,7 +804,7 @@ void T36CT::ClickMsflexgridOutput()
             m_inNameEdt.SetFocus();
             m_inNameEdt.SetCapture();//LSC
             int nLenth=strValue.GetLength();
-            m_inNameEdt.SetSel(nLenth,nLenth); ////
+            m_inNameEdt.SetSel(nLenth,nLenth); //全选//
         } 
         //else 
         //{
@@ -814,7 +814,7 @@ void T36CT::ClickMsflexgridOutput()
         //    m_comboxRange.AddString(_T("ON"));
         //    m_comboxRange.ShowWindow(SW_SHOW);
         //    m_comboxRange.BringWindowToTop();
-        //    m_comboxRange.SetFocus(); //
+        //    m_comboxRange.SetFocus(); //获取焦点
         //    m_comboxRange.SetWindowText(strValue);
         //}
         
@@ -830,26 +830,26 @@ void T36CT::ClickMsflexgridInput()
     UpdateData(FALSE);
 
     long lRow,lCol;
-    lRow = m_msflexgrid_input.get_RowSel();//	
-    lCol = m_msflexgrid_input.get_ColSel(); //
+    lRow = m_msflexgrid_input.get_RowSel();//获取点击的行号	
+    lCol = m_msflexgrid_input.get_ColSel(); //获取点击的列号
     TRACE(_T("Click input grid!\n"));
 
     CRect rect;
-    m_msflexgrid_input.GetWindowRect(rect); //
-    ScreenToClient(rect); //	
+    m_msflexgrid_input.GetWindowRect(rect); //获取表格控件的窗口矩形
+    ScreenToClient(rect); //转换为客户区矩形	
     CDC* pDC =GetDC();
 
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //()
+    //计算选中格的左上角的坐标(象素为单位)
     long y = m_msflexgrid_input.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_msflexgrid_input.get_ColPos(lCol)/nTwipsPerDotX;
-    //()11
+    //计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
     long width = m_msflexgrid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_msflexgrid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //
+    //形成选中个所在的矩形区域
     CRect rcCell(x,y,x+width,y+height);
-    //
+    //转换成相对对话框的坐标
     rcCell.OffsetRect(rect.left+1,rect.top+1);
     ReleaseDC(pDC);
     CString strValue = m_msflexgrid_input.get_TextMatrix(lRow,lCol);
@@ -885,7 +885,7 @@ void T36CT::ClickMsflexgridInput()
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
 
-        m_comboxRange.SetFocus(); //
+        m_comboxRange.SetFocus(); //获取焦点
         m_comboxRange.SetWindowText(strValue);
     }
     else  
@@ -897,7 +897,7 @@ void T36CT::ClickMsflexgridInput()
         m_inNameEdt.SetFocus();
         m_inNameEdt.SetCapture();//LSC
         int nLenth=strValue.GetLength();
-        m_inNameEdt.SetSel(nLenth,nLenth); ////
+        m_inNameEdt.SetSel(nLenth,nLenth); //全选//
     }
 }
 
@@ -909,26 +909,26 @@ void T36CT::ClickMsflexgridInput2()
     UpdateData(FALSE);
 
     long lRow,lCol;
-    lRow = m_msflexgrid_Ainput.get_RowSel();//	
-    lCol = m_msflexgrid_Ainput.get_ColSel(); //
+    lRow = m_msflexgrid_Ainput.get_RowSel();//获取点击的行号	
+    lCol = m_msflexgrid_Ainput.get_ColSel(); //获取点击的列号
     TRACE(_T("Click input grid!\n"));
 
     CRect rect;
-    m_msflexgrid_Ainput.GetWindowRect(rect); //
-    ScreenToClient(rect); //	
+    m_msflexgrid_Ainput.GetWindowRect(rect); //获取表格控件的窗口矩形
+    ScreenToClient(rect); //转换为客户区矩形	
     CDC* pDC =GetDC();
 
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //()
+    //计算选中格的左上角的坐标(象素为单位)
     long y = m_msflexgrid_Ainput.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_msflexgrid_Ainput.get_ColPos(lCol)/nTwipsPerDotX;
-    //()11
+    //计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
     long width = m_msflexgrid_Ainput.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_msflexgrid_Ainput.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //
+    //形成选中个所在的矩形区域
     CRect rcCell(x,y,x+width,y+height);
-    //
+    //转换成相对对话框的坐标
     rcCell.OffsetRect(rect.left+1,rect.top+1);
     ReleaseDC(pDC);
     CString strValue = m_msflexgrid_Ainput.get_TextMatrix(lRow,lCol);
@@ -959,7 +959,7 @@ void T36CT::ClickMsflexgridInput2()
         m_comboxRange.AddString(_T("4-20 ma"));
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
-        m_comboxRange.SetFocus(); //
+        m_comboxRange.SetFocus(); //获取焦点
         m_comboxRange.SetWindowText(strValue);
     }
     else  
@@ -970,7 +970,7 @@ void T36CT::ClickMsflexgridInput2()
         m_inNameEdt.SetFocus();
         m_inNameEdt.SetCapture();//LSC
         int nLenth=strValue.GetLength();
-        m_inNameEdt.SetSel(nLenth,nLenth); ////
+        m_inNameEdt.SetSel(nLenth,nLenth); //全选//
     }
 }
 
@@ -1187,7 +1187,7 @@ void T36CT::OnCbnSelchangeBaudratecombo()
 		CString sql;
 		sql.Format(_T("Select * from ALL_NODE where Serial_ID = '%d' "),m_sn);
 		q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
-		if (!q.eof())//
+		if (!q.eof())//有表但是没有对应序列号的值
 		{
 			sql.Format(_T("update ALL_NODE set Bautrate = '%d' where Serial_ID = '%d'"),bandrate,m_sn);
 			 SqliteDBT3000.execDML((UTF8MBSTR)sql);

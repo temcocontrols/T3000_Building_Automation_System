@@ -54,8 +54,8 @@ END_MESSAGE_MAP()
 
 int CNewTstatSchedulesDlg::GetEventNumber(int DayIndex)
 {
-	int RegNumber = DayIndex / 6;//2
-	int Position = DayIndex % 6;//
+	int RegNumber = DayIndex / 6;//2个事件占用一个寄存器
+	int Position = DayIndex % 6;//偶数位在后面，奇数高位
 	int int32value = m_SchduleBuffer[96 + 2 * RegNumber] + m_SchduleBuffer[96 + 2 * RegNumber + 1] * PowerFour(2, 16);
 	std::bitset<32> RegBits(int32value);
 	int eventNumber = 0;
@@ -257,7 +257,7 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 	strlist.push_back(L"Home");
 	strlist.push_back(L"Work");
 	if ((product_register_value[7] == PM_TSTAT7) ||
-		(product_register_value[7] == PM_TSTAT7_ARM)) //TSTAT7   AWAY   sleepFandu 2023 03 08
+		(product_register_value[7] == PM_TSTAT7_ARM)) //TSTAT7  貌似不支持 AWAY  和 sleep这两种模式。Fandu 2023 03 08
 	{
 		;
 	}
@@ -282,7 +282,7 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 		WeeklyList.SetItemText(index, 1, strTime);
 		WeeklyList.SetItemBkColor(index, 1, RGB(255, 255, 255), 0);
 		WeeklyList.SetWhetherShowBkCol(false);
-		//Combox
+		//设置Combox
 		for (int col = 2;col<10;col++)
 		{
 			WeeklyList.SetCellStringList(index, col, strlist);
@@ -331,7 +331,7 @@ void CNewTstatSchedulesDlg::Fresh_List()
 	strlist.push_back(L"Home");
 	strlist.push_back(L"Work");
 	if ((product_register_value[7] == PM_TSTAT7) ||
-		(product_register_value[7] == PM_TSTAT7_ARM))  //TSTAT7   AWAY   sleepFandu 2023 03 08
+		(product_register_value[7] == PM_TSTAT7_ARM))  //TSTAT7  貌似不支持 AWAY  和 sleep这两种模式。Fandu 2023 03 08
 	{
 		;
 	}
@@ -357,7 +357,7 @@ void CNewTstatSchedulesDlg::Fresh_List()
 		WeeklyList.SetItemText(index, 1, strTime);
 		WeeklyList.SetItemBkColor(index, 1, RGB(255, 255, 255), 0);
 		WeeklyList.SetWhetherShowBkCol(false);
-		//Combox
+		//设置Combox
 		for (int col = 2;col<10;col++)
 		{
 			WeeklyList.SetCellStringList(index, col, strlist);
@@ -715,7 +715,7 @@ BOOL CNewTstatSchedulesDlg::Insert_Schdule(Schedule_Node SR, int POS)
 	{
 		for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index != m_ScheduleList.end();++index)
 		{
-			if (position == POS)//
+			if (position == POS)//找到了要插入的位置
 			{
 				m_ScheduleList.insert(index, SR);
 				/*return TRUE;*/
@@ -724,7 +724,7 @@ BOOL CNewTstatSchedulesDlg::Insert_Schdule(Schedule_Node SR, int POS)
 		}
 
 	}
-	if (position != POS)//
+	if (position != POS)//没有找到要插入的位置，就直接添加到列表里面
 	{
 		m_ScheduleList.push_back(SR);
 	}
@@ -893,7 +893,7 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	lCol = lvinfo.iSubItem;
 
 
-	if (lRow>WeeklyList.GetItemCount()) //
+	if (lRow>WeeklyList.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if (lRow<0)
 		return;

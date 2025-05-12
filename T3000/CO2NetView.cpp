@@ -628,7 +628,7 @@ void CCO2NetView::Initial_Window()
         GetDlgItem(IDC_BUTTON_RE_CALIBRATION_DONE)->EnableWindow(0);
     }
 
-    m_grid_input.ShowWindow(false);  //CO2 input  
+    m_grid_input.ShowWindow(false);  //隐藏CO2界面的 input  表格
 }
 void CCO2NetView::Show_InputList()
 {
@@ -682,7 +682,7 @@ void CCO2NetView::Show_InputList()
     CString  TempValue,StrAM;
     m_grid_input.put_TextMatrix(1,2,strUnit);
 
-    if(product_register_value[CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//
+    if(product_register_value[CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//内部
     {
         TempValue.Format(_T("%0.1f"),f_internal_temp);
     }
@@ -935,11 +935,11 @@ void CCO2NetView::Get_CO2_Temperature_unit(CString &strTemp)
         //Chinese.
         if(product_register_value[CO2_NET_MODBUS_TEMPERATURE_DEGREE_C_OR_F]==0)//121
         {
-            strTemp=_T("");
+            strTemp=_T("℃");
         }
         else
         {
-            strTemp=_T("");
+            strTemp=_T("℉");
         }
     }
 }
@@ -1236,7 +1236,7 @@ void CCO2NetView::OnBnClickedButtonApply()
 
 
     n=write_one(g_tstat_id, 61, ip_mode_value);
-    n=write_one(g_tstat_id,CO2_NET_MODBUS_ENABLE_GHOST,1);//
+    n=write_one(g_tstat_id,CO2_NET_MODBUS_ENABLE_GHOST,1);//使能之后
     Sleep(5*1000);
 
 
@@ -1278,11 +1278,11 @@ void CCO2NetView::OnBnClickedButtonApply()
                 //strSql.Format(_T("update Building set Ip_Address='%s' where Ip_Address='%s'"),strIP,pPraent->m_strIP);
                 //t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
 
-                // node
+                // 改node
                 CString strSID;
 
                 strSID.Format(_T("%d"), get_serialnumber());
-                strSql.Format(_T("update ALL_NODE set Bautrate='%s',Com_Port='%s' where Serial_ID='%s'"),strIP,strPort,strSID); //bautrate IP
+                strSql.Format(_T("update ALL_NODE set Bautrate='%s',Com_Port='%s' where Serial_ID='%s'"),strIP,strPort,strSID); //bautrate 放IP
                 SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
                 SqliteDBBuilding.closedb();
@@ -1497,15 +1497,15 @@ void CCO2NetView::Check_HourTime()
 void CCO2NetView::OnBnClickedBtnCo2Refresh()
 {
     //CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
-    //
+    //创建对话框窗口
     //pDlg->Create(IDD_DIALOG10_Progress, this);
 
-    //
+    //居中显示
     //pDlg->CenterWindow();
     //void MoveWindow( LPCRECT lpRect, BOOL bRepaint = TRUE );
     //pDlg->MoveWindow(100,100,500,1000);
     //pDlg->ShowProgress(0,0);
-    //
+    //显示对话框窗口
     //pDlg->ShowWindow(SW_SHOW);
    // RECT RECT_SET1;
    // GetClientRect(&RECT_SET1);
@@ -1555,11 +1555,11 @@ HBRUSH CCO2NetView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
     
     for (int i=0; i<(int)Change_Color_ID.size(); i++)
     {
-        if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//pWnd->
+        if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
         {
             pDC->SetTextColor(RGB(0,0,0));
-            pDC->SetBkColor(RGB(255,0,0));//
-            pDC->SetBkMode(TRANSPARENT);//
+            pDC->SetBkColor(RGB(255,0,0));//设置文本背景色
+            pDC->SetBkMode(TRANSPARENT);//设置背景透明
             hbr = (HBRUSH)m_brush;
         }
 
@@ -2003,12 +2003,12 @@ LRESULT CCO2NetView::Fresh_Co2Output_Item(WPARAM wParam, LPARAM lParam)
     CString temp_task_info;
     CString New_CString = m_output_list.GetItemText(Changed_Item, Changed_SubItem);
 
-    //CO2 NET  Output     Min Max
+    //CO2 NET  Output 温湿度  允许 改变 Min 以及Max
     if (Changed_SubItem == CO2NET_MIN_OUT_SCALE)
     {
         int n_value = 0;
 
-        if (Changed_Item == 0) //;
+        if (Changed_Item == 0) //温度;
         {
             n_value = _wtof(New_CString) * 10;
             write_one(g_tstat_id, 1255, n_value);
@@ -2028,7 +2028,7 @@ LRESULT CCO2NetView::Fresh_Co2Output_Item(WPARAM wParam, LPARAM lParam)
     {
         int n_value = 0;
 
-        if (Changed_Item == 0) //;
+        if (Changed_Item == 0) //温度;
         {
             n_value = _wtof(New_CString) * 10;
             write_one(g_tstat_id, 1256, n_value);
@@ -2056,26 +2056,26 @@ void CCO2NetView::DblClickMsflexgridInput()
 	UpdateData(FALSE);
 
 	long lRow,lCol;
-	lRow = m_grid_input.get_RowSel();//	
-	lCol = m_grid_input.get_ColSel(); //
+	lRow = m_grid_input.get_RowSel();//获取点击的行号	
+	lCol = m_grid_input.get_ColSel(); //获取点击的列号
 	TRACE(_T("Click input grid!\n"));
 
 	CRect rect;
-	m_grid_input.GetWindowRect(rect); //
-	ScreenToClient(rect); //	
+	m_grid_input.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//()
+	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_grid_input.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_grid_input.get_ColPos(lCol)/nTwipsPerDotX;
-	//()11
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_grid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_grid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//
+	//形成选中个所在的矩形区域
 	CRect rcCell(x,y,x+width,y+height);
-	//
+	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
 	CString strValue = m_grid_input.get_TextMatrix(lRow,lCol);
@@ -2090,7 +2090,7 @@ void CCO2NetView::DblClickMsflexgridInput()
 		m_inNameEdt.SetFocus();
 		m_inNameEdt.SetCapture();//LSC
 		int nLenth=strValue.GetLength();
-		m_inNameEdt.SetSel(nLenth,nLenth); ////
+		m_inNameEdt.SetSel(nLenth,nLenth); //全选//
 	}
 }
 
@@ -2134,7 +2134,7 @@ void CCO2NetView::OnEnKillfocusEditName()
 
 				int RegAddress = 0;
 
-				if (product_register_value[CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//
+				if (product_register_value[CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//内部
 				{
 					RegAddress = Internal_Address;
 
@@ -2177,7 +2177,7 @@ void CCO2NetView::OnEnKillfocusEditName()
 
 void CCO2NetView::OnBnClickedRadioCo2CalEnable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     if (product_register_value[3131] != 0)
     {
         Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, 3131, 0,
@@ -2188,7 +2188,7 @@ void CCO2NetView::OnBnClickedRadioCo2CalEnable()
 
 void CCO2NetView::OnBnClickedRadioCo2CalDisable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     if (product_register_value[3131] != 1)
     {
         Post_Thread_Message(MY_WRITE_ONE, g_tstat_id, 3131, 1,
@@ -2199,13 +2199,13 @@ void CCO2NetView::OnBnClickedRadioCo2CalDisable()
 
 void CCO2NetView::OnBnClickedRadioHumidityHeatEnable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
 }
 
 
 void CCO2NetView::OnBnClickedButtonFirmwareAutoCal()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CCO2_AUTO_CALIBRATION Dlg;
     Dlg.DoModal();
 }
@@ -2213,7 +2213,7 @@ void CCO2NetView::OnBnClickedButtonFirmwareAutoCal()
 
 void CCO2NetView::OnBnClickedRadioCo2LcdOn()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_ON))->SetCheck(1);
     ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_OFF))->SetCheck(0);
     ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_DELAY_OFF))->SetCheck(0);
@@ -2227,7 +2227,7 @@ void CCO2NetView::OnBnClickedRadioCo2LcdOn()
 
 void CCO2NetView::OnBnClickedRadioCo2LcdOff()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_ON))->SetCheck(0);
     ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_OFF))->SetCheck(1);
     ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_DELAY_OFF))->SetCheck(0);
@@ -2241,7 +2241,7 @@ void CCO2NetView::OnBnClickedRadioCo2LcdOff()
 
 void CCO2NetView::OnBnClickedRadioCo2LcdDelayOff()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_ON))->SetCheck(0);
     ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_OFF))->SetCheck(0);
     ((CButton*)GetDlgItem(IDC_RADIO_CO2_LCD_DELAY_OFF))->SetCheck(1);
@@ -2253,7 +2253,7 @@ void CCO2NetView::OnBnClickedRadioCo2LcdDelayOff()
 
 void CCO2NetView::OnBnClickedButtonCo2Help()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CShowMessageDlg dlg;
     CString temp_message;
     temp_message.Format(_T("Sensirion CO2 sensor RE-CALIBRATION \r\nLocate the device in an environment with air having a stable CO2 concentration in the range of 400 ppm to 2000 ppm. \r\n \
@@ -2270,7 +2270,7 @@ void CCO2NetView::OnBnClickedButtonCo2Help()
 
 void CCO2NetView::OnBnClickedButtonReCalibrationDone()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString strCalibration;
     GetDlgItem(IDC_EDIT_CO2_RE_CALIBRATION)->GetWindowText(strCalibration);
     
@@ -2294,7 +2294,7 @@ void CCO2NetView::OnBnClickedButtonReCalibrationDone()
 
 void CCO2NetView::OnBnClickedRadioScrollEnable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     if (write_one(g_tstat_id, SCROLL_BAR_REG, 1, 3) < 0)
     {
         MessageBox(_T("Enable Scroll bar failed,Please try again"));
@@ -2310,7 +2310,7 @@ void CCO2NetView::OnBnClickedRadioScrollEnable()
 
 void CCO2NetView::OnBnClickedRadioScrollbarDisable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     if (write_one(g_tstat_id, SCROLL_BAR_REG, 0, 3) < 0)
     {
         MessageBox(_T("Disable Scroll bar failed,Please try again"));

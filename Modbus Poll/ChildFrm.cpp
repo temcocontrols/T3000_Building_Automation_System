@@ -399,12 +399,12 @@ void CChildFrame::OnFunctions06()
 	 UINT Address;
 	int lCol=pModbusView->m_Current_Col;
 	int lRow=pModbusView->m_Current_Row;
-	 if (m_Hide_Alias_Columns!=0)//
+	 if (m_Hide_Alias_Columns!=0)//都是数值的
 	 {
 		 Index=(lCol-1)*(pModbusView->m_data_rows)+(lRow-1);
 		 Show_Name=FALSE;
 	 }
-	 else//
+	 else//含义名字的
 	 {
 		 if (lCol%2!=0)
 		 {
@@ -521,12 +521,12 @@ void CChildFrame::OnFunctions05()
 	UINT Address;
 	int lCol = pModbusView->m_Current_Col;
 	int lRow = pModbusView->m_Current_Row;
-	if (m_Hide_Alias_Columns != 0)//
+	if (m_Hide_Alias_Columns != 0)//都是数值的
 	{
 		Index = (lCol - 1)*(pModbusView->m_data_rows) + (lRow - 1);
 		Show_Name = FALSE;
 	}
-	else//
+	else//含义名字的
 	{
 		if (lCol % 2 != 0)
 		{

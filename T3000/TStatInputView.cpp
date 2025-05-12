@@ -65,7 +65,7 @@ UINT BackMainUIFresh_TstatInput(LPVOID pParam)
                 if (itemp < 0)
                 {
                     //continue;
-                    break; // NCT3000  ;
+                    break; //读不到就退出，很多时候 NC在读的过程中断开连接T3000 还一直去读剩余的 就会引起无响应;
                 }
                 else
                 {
@@ -229,7 +229,7 @@ LRESULT  CTStatInputView::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
     LoadTstat_InputData();
     CString temp_task_info;
     CString Show_Results;
-    if (msg_result==1||msg_result==2)//
+    if (msg_result==1||msg_result==2)//单写
     {
         _MessageWriteOneInfo_List *pInvoke =(_MessageWriteOneInfo_List *)lParam;
         CString temp_cs = pInvoke->Changed_Name;
@@ -251,7 +251,7 @@ LRESULT  CTStatInputView::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 
         Fresh_One_Item(pInvoke->mRow);
 
-        if((pInvoke->mRow%2)==0)	//  ;
+        if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
             m_input_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
         else
             m_input_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -262,7 +262,7 @@ LRESULT  CTStatInputView::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
         if(pInvoke)
             delete pInvoke;
     }
-    if (msg_result==3||msg_result==4)//
+    if (msg_result==3||msg_result==4)//多写
     { 
         _MessageWriteMultiInfo_List *pInvoke =(_MessageWriteMultiInfo_List *)lParam;
 
@@ -284,7 +284,7 @@ LRESULT  CTStatInputView::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
         //  PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
 
 
-        if((pInvoke->mRow%2)==0)	//  ;
+        if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
             m_input_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
         else
             m_input_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -310,7 +310,7 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
         {
             b_hum_sensor = true;
             b_co2_sensor = true;
-            b_lux_sensor = true;// 20
+            b_lux_sensor = true;//先全部显示 ，知道20寄存器有值
 #if 0
             bitset<16> module_type(product_register_value[20]);
             if (module_type.test(1) == true)
@@ -432,7 +432,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
         }
         
 		CString cs_temp = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()> STR_IN_LABEL)	//;
+		if(cs_temp.GetLength()> STR_IN_LABEL)	//长度不能大于结构体定义的长度;
 		{
 			/* MessageBox(_T("Length can not greater than 8"),_T("Warning"));
             PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
@@ -469,7 +469,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	   }
 
 	}
-	if(Changed_SubItem== 3)//Manual + 
+	if(Changed_SubItem== 3)//Manual + 模拟量
 	{
 	   if (m_tstat_input_data.at(Changed_Item).Value.StrValue.CompareNoCase(New_CString)==0)
 	   {
@@ -494,7 +494,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	   else
 	   {
 
-           //2019 08 23    input  value  tstat 10   0-100%hum ;
+           //下面代码由杜帆2019 08 23 屏蔽  所有的 input 的 value  tstat 都要乘以10 ， 一起 0-100%和hum 是单独额外处理的;
 		   //if (m_tstat_input_data.at(Changed_Item).Range.StrValue.CompareNoCase(_T("0-100%"))==0)
 		   //{
 			  // SendValue=(int)new_fvalue;
@@ -691,13 +691,13 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
     lCol = lvinfo.iSubItem;
 
 
-    if(lRow>m_input_list.GetItemCount()) //
+    if(lRow>m_input_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
         return;
     if(lRow<0)
         return;
-    if (product_type == CS3000)  //Fandu 2021 12 16  ;
+    if (product_type == CS3000)  //Fandu 2021 12 16 不响应 点击;
         return;
-    //  .
+    //判断有无此传感器 没有 就不显示，并且不可操作.
     if ((lRow == 9) && (b_hum_sensor == false))
     {
         return ;
@@ -738,7 +738,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                 m_input_list.Set_Edit(false);
                 return;
             }
-            if (lRow == 12)    //LUX:
+            if (lRow == 12)    //LUX:不可以编辑
             {
                 m_input_list.Set_Edit(false);
                 return ;
@@ -762,7 +762,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                     m_input_list.Set_Edit(false);
                     return;
                 }
-                //Auto &&  --
+                //Auto && 开关量 --不可以写值
                 if (m_tstat_input_data.at(lRow).AM.StrValue.CompareNoCase(_T("Auto"))!=0&&
                     (
                     m_tstat_input_data.at(lRow).Value.StrValue.CompareNoCase(_T("On"))==0||
@@ -774,7 +774,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                     )
                     )
                 {
-                    //Manual 
+                    //Manual 的开关量
                     if (
                         m_tstat_input_data.at(lRow).Value.StrValue.CompareNoCase(_T("On"))==0||
 
@@ -837,7 +837,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
             {
                 CTstatRangeDlg   dlg;
                 int rangevalue=m_tstat_input_data.at(lRow).Range.RegValue;
-                if (rangevalue == 139)  //// 10V  128+ 14   139 ;
+                if (rangevalue == 139)  ////如果选择 10V电压  原本是128+ 14  板子却对应 139 的值;
                 {
                     dlg.m_current_range = 14;
                     dlg.m_10v = 1;
@@ -883,7 +883,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                         write_value = realRange;
                     
                     if (write_value == 142)
-                        write_value = 139;  // 10V  128+ 14   139 ;
+                        write_value = 139;  //如果选择 10V电压  原本是128+ 14  板子却对应 139 的值;
                     pwrite_info->Changed_Name.Format(_T("%s's Range,From %s to %s"),m_tstat_input_data.at(lRow).InputName.StrValue,
                         m_tstat_input_data.at(lRow).Range.StrValue,
                         analog_range_TSTAT6[range]);
@@ -905,7 +905,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
     {
 
         if (product_type != CS3000){
-            //
+            //开关量和不可用，无应用
             if((m_tstat_input_data.at(lRow).Range.StrValue.CompareNoCase(NO_APPLICATION)==0)||
                 (m_tstat_input_data.at(lRow).Range.StrValue.CompareNoCase(_T("UNUSED"))==0)||
                 (m_tstat_input_data.at(lRow).Range.StrValue.CompareNoCase(_T("On/Off"))==0)||
@@ -922,7 +922,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
             }
         }
         else{
-            //
+            //模拟量
             m_input_list.SetItemText(lRow,lCol,L"");
             m_input_list.Set_Edit(TRUE);
         }

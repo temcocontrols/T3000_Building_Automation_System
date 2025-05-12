@@ -42,7 +42,7 @@ jobs:
       - name: Get T3000 version number
         id: version
         run: |
-          $version = Get-Date -Format yyyMMdd
+          $version = Get-Date -Format “yyyyMMdd”
           Write-Output version=$version >> $Env:GITHUB_OUTPUT
 
       - name: Setup MSBuild

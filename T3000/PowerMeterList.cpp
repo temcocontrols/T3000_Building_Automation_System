@@ -1,4 +1,4 @@
-// PowerMeterList.cpp : 
+// PowerMeterList.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -18,7 +18,7 @@ const int POWERMETER_LAENERGY = 6;
 const int POWERMETER_FACTOR = 7;
 const int POWERMETER_MAX_COUNT = 8;
 
-// CPowerMeterList 
+// CPowerMeterList 对话框
 
 IMPLEMENT_DYNAMIC(CPowerMeterList, CDialogEx)
 
@@ -57,14 +57,14 @@ BEGIN_MESSAGE_MAP(CPowerMeterList, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CPowerMeterList 
+// CPowerMeterList 消息处理程序
 DWORD WINAPI UpdatePowerMeterThread(LPVOID lPvoid);
 
 BOOL CPowerMeterList::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  
+    // TODO:  在此添加额外的初始化
     Initial_List();
     int temp_value;
     temp_value = read_one(g_tstat_id, 1071);
@@ -81,7 +81,7 @@ BOOL CPowerMeterList::OnInitDialog()
     refreshthread = CreateThread(NULL, NULL, UpdatePowerMeterThread, this, NULL, NULL);
     CloseHandle(refreshthread);
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // : OCX  FALSE
+                  // 异常: OCX 属性页应返回 FALSE
 }
 
 DWORD WINAPI UpdatePowerMeterThread(LPVOID lPvoid)
@@ -110,7 +110,7 @@ DWORD WINAPI UpdatePowerMeterThread(LPVOID lPvoid)
 
 BOOL CPowerMeterList::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: /
+    // TODO: 在此添加专用代码和/或调用基类
 
     return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -317,7 +317,7 @@ LRESULT CPowerMeterList::Fresh_PowerMeter_List(WPARAM wParam, LPARAM lParam)
 
 void CPowerMeterList::OnBnClickedButtonClearPowerLaenergtU()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     m_powermeter_list.SetItemText(POWERMETER_LAENERGY, 1, _T("0"));
     int write_ret = 0;
     write_ret = write_one(g_tstat_id, 148, 0, 3);
@@ -330,7 +330,7 @@ void CPowerMeterList::OnBnClickedButtonClearPowerLaenergtU()
 
 void CPowerMeterList::OnBnClickedButtonClearPowerLaenergtV()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     m_powermeter_list.SetItemText(POWERMETER_LAENERGY, 2, _T("0"));
     int write_ret = 0;
     write_ret = write_one(g_tstat_id, 248, 0, 3);
@@ -343,7 +343,7 @@ void CPowerMeterList::OnBnClickedButtonClearPowerLaenergtV()
 
 void CPowerMeterList::OnBnClickedButtonClearPowerLaenergtW()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     m_powermeter_list.SetItemText(POWERMETER_LAENERGY, 3, _T("0"));
 
     int write_ret = 0;
@@ -357,13 +357,13 @@ void CPowerMeterList::OnBnClickedButtonClearPowerLaenergtW()
 
 void CPowerMeterList::OnBnClickedRadio3()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
 }
 
 
 void CPowerMeterList::OnBnClickedRadioExternalCt()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     int write_ret = 0;
     write_ret = write_one(g_tstat_id, 1070, 1, 3);
     if (write_ret <= 0)
@@ -375,7 +375,7 @@ void CPowerMeterList::OnBnClickedRadioExternalCt()
 
 void CPowerMeterList::OnBnClickedRadioPowerInternalCt()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     int write_ret = 0;
     write_ret = write_one(g_tstat_id, 1070, 0, 3);
     if (write_ret <= 0)
@@ -387,29 +387,29 @@ void CPowerMeterList::OnBnClickedRadioPowerInternalCt()
 
 void CPowerMeterList::OnEnChangeEdit2()
 {
-    // TODO:   RICHEDIT 
-    //  CDialogEx::OnInitDialog()
-    //  CRichEditCtrl().SetEventMask()
-    //  ENM_CHANGE 
+    // TODO:  如果该控件是 RICHEDIT 控件，它将不
+    // 发送此通知，除非重写 CDialogEx::OnInitDialog()
+    // 函数并调用 CRichEditCtrl().SetEventMask()，
+    // 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-    // TODO:  
+    // TODO:  在此添加控件通知处理程序代码
 }
 
 
 void CPowerMeterList::OnEnChangeEdit4()
 {
-    // TODO:   RICHEDIT 
-    //  CDialogEx::OnInitDialog()
-    //  CRichEditCtrl().SetEventMask()
-    //  ENM_CHANGE 
+    // TODO:  如果该控件是 RICHEDIT 控件，它将不
+    // 发送此通知，除非重写 CDialogEx::OnInitDialog()
+    // 函数并调用 CRichEditCtrl().SetEventMask()，
+    // 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-    // TODO:  
+    // TODO:  在此添加控件通知处理程序代码
 }
 
 
 void CPowerMeterList::OnEnKillfocusEditRatioValue()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     int write_ret = 0;
     CString tem_value;
     GetDlgItemText(IDC_EDIT_RATIO_VALUE, tem_value);
@@ -428,5 +428,5 @@ void CPowerMeterList::OnEnKillfocusEditRatioValue()
 
 void CPowerMeterList::OnStnClickedPowermeterTitle()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
 }

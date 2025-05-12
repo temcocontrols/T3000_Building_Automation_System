@@ -1,21 +1,21 @@
 #pragma once
 #include "afxcmn.h"
 #include "resource.h"
-// CBuildTable1 
+// CBuildTable1 对话框
 
 class CBuildTable1 : public CDialog
 {
 	DECLARE_DYNAMIC(CBuildTable1)
 
 public:
-	CBuildTable1(int Input_NO,CWnd* pParent = NULL);   // 
+	CBuildTable1(int Input_NO,CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBuildTable1();
 
-	// 
+	// 对话框数据
 	enum { IDD = IDD_BUILD_TABLE1 };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:

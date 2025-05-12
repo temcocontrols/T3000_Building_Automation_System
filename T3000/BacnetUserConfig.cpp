@@ -44,12 +44,12 @@ END_MESSAGE_MAP()
 BOOL CBacnetUserConfig::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	m_slected_item = -1;	// 0 	;
+	m_slected_item = -1;	//初始化时 没有选择，从0 开始选择	;
 	ok_button_stage = 0;
 	
 	Initial_List();
 	Enable_Window_Stage(HIDE_ALL);
-	show_user_list_window = false;	//list   userlist ;
+	show_user_list_window = false;	//避免点击左边list的时候 也弹出 配置对话框，只有在 点userlist 按键时弹出;
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -290,7 +290,7 @@ LRESULT CBacnetUserConfig::Fresh_User_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == USERLIST_NAME)
 	{
 		CString cs_temp = m_user_config_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_USER_NAME_LENGTH)	//;
+		if(cs_temp.GetLength()>= STR_USER_NAME_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not greater than 16"),_T("Warning"));
 			PostMessage(WM_REFRESH_BAC_USER_NAME_LIST,NULL,NULL);
@@ -330,7 +330,7 @@ void CBacnetUserConfig::OnNMClickUserList(NMHDR *pNMHDR, LRESULT *pResult)
 	lCol = lvinfo.iSubItem;
 
 
-	if(lRow>m_user_config_list.GetItemCount()) //
+	if(lRow>m_user_config_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if(lRow<0)
 		return;
@@ -435,7 +435,7 @@ void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 	{
 		bool any_user_valid = false;
 		bool any_user_administrator = false;
-		//;
+		//检测是否里面存在有效的账号密码;
 		for (int i=0;i<(int)m_user_login_data.size();i++)
 		{
 			CString temp_user_name;
@@ -456,7 +456,7 @@ void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 						any_user_administrator = true;
 						break;
 					}
-					any_user_valid = true;	//User  ;
+					any_user_valid = true;	//User表里面 存在可用的 账号密码;
 				}
 			}		
 		}
@@ -532,7 +532,7 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 	CString access_string;
 	switch(ok_button_stage)
 	{
-	case stage_enter_original_password://;
+	case stage_enter_original_password://检查原始密码是否正确;
 		{
 			//m_user_login_data.at(m_slected_item).password
 			GetDlgItemTextW(IDC_EDIT_USER_NAME,temp_user_name);

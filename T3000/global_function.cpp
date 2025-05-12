@@ -49,7 +49,7 @@
 #include "JsonHead.h"
 #include "ForZip/unzip.h"
 #include "ForZip/zip.h"
-extern tree_product selected_product_Node; // 
+extern tree_product selected_product_Node; // 选中的设备信息;
 //#include "CM5\PTP\ptp.h"
 #pragma region For_Bacnet_program_Use
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
@@ -73,9 +73,9 @@ extern CBacnetTstat *Tstat_Window ;
 extern CBacnetSetting * Setting_Window ;
 extern CBacnetUserlogin* User_Login_Window ;
 extern CBacnetRemotePoint* Remote_Point_Window ;
-extern int pc_time_to_basic_delt; //
+extern int pc_time_to_basic_delt; //用于时间转换 ，各个时区之间。
 extern CString program_string;
-extern vector <bacnet_background_struct> m_backbround_data; // el
+extern vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
 int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length)
 {
     int retVal;
@@ -157,7 +157,7 @@ int read_one(unsigned char device_var,unsigned short address,int retry_times)
 //the return value == -5 ,the input have some trouble
 //the return value == -6 , the bus has bannet protocol,scan stop;
 //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-//
+//清空串口缓冲区
 //the return value is the register address
 //Sleep(50);       //must use this function to slow computer
 int g_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Type)
@@ -272,7 +272,7 @@ void SetPaneString(int nIndext,CString str)
 
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
-    //2018 0606 
+    //2018 0606 在底层公共读写函数增加对不同协议的处理
     //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     if (SPECIAL_BAC_TO_MODBUS)
     {
@@ -329,7 +329,7 @@ int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short 
 int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
 {
 
-    //2018 0606 
+    //2018 0606 在底层公共读写函数增加对不同协议的处理
     //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     if (SPECIAL_BAC_TO_MODBUS)
     {
@@ -411,7 +411,7 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 
 int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
 {
-    //2018 0525 
+    //2018 0525 在底层公共读写函数增加对不同协议的处理
     //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     if (SPECIAL_BAC_TO_MODBUS)
     {
@@ -847,16 +847,16 @@ BOOL IS_Temco_Product(int product_model)
         return true;
     }
 }
-// Function : GridutpuGridutpuSet Grid
-// Param: int nRange: get
-//					
-//           int nPIDNO: ID1 2I
-// return 
+// Function : 获得单位名称，此单位用于Input Grid，Output Grid，Output Set Grid，主界面的Grid等等。
+// Param: int nRange: 指示当前的Range的选择值。函数应该根据Range的选择以及TStat的型号，
+//					获得单位名称，如摄氏度，华氏度，百分比，自定义的单位等。
+//           int nPIDNO: 区分PID1 还是PID2，1＝PID1，2＝PID2
+// return ： 单位名称
 CString GetTempUnit(int nRange, int nPIDNO)
 {
     CString strTemp=_T("");
 
-    if(nRange<0) // 
+    if(nRange<0) // 使用默认的温度单位
     {
         UINT uint_temp=GetOEMCP();//get system is for chinese or english
         if(uint_temp!=936 && uint_temp!=950)
@@ -875,11 +875,11 @@ CString GetTempUnit(int nRange, int nPIDNO)
             //Chinese.
             if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
             {
-                strTemp=_T("");
+                strTemp=_T("℃");
             }
             else
             {
-                strTemp=_T("");
+                strTemp=_T("℉");
             }
         }
         return strTemp;
@@ -907,11 +907,19 @@ CString GetTempUnit(int nRange, int nPIDNO)
             //chinese.
             if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
             {
+<<<<<<< HEAD
                 strTemp=_T("");
             }
             else
             {
                 strTemp=_T("");
+=======
+                strTemp=_T("℃");
+            }
+            else
+            {
+                strTemp=_T("℉");
+>>>>>>> parent of db9e9d9d (Ignore this commit - remove all non-ascii characters as vscode automatically change all chinese characters)
             }
         }
         return strTemp;
@@ -1058,7 +1066,7 @@ int SearchDataIndexByPanel(unsigned char panel_id, int command_type, int npoint)
 {
     for (int j = 0; j < BAC_BACKGROUND_COUNT; j++)
     {
-        //
+        //通过第一次循环找到第一个没有被使用的 vector;
         if (m_backbround_data.at(j).flag == STATUS_NOUSE)
         {
             continue;
@@ -1077,7 +1085,7 @@ int SearchDataIndexByPanel(unsigned char panel_id, int command_type, int npoint)
 
 int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata write_data)
 {
-    if (read_write_bacnet_config)	//cnet config 
+    if (read_write_bacnet_config)	//在读写Bacnet config 的时候禁止刷新List;
         return -1;
 
     groupdata* pmy_refresh_info = new groupdata;
@@ -1100,7 +1108,7 @@ int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata 
 int Post_Background_Read_Message_ByPanel(unsigned char panel_id,int command_type,int npoint)
 {
     int n_index = 0;
-    if (read_write_bacnet_config)	//cnet config 
+    if (read_write_bacnet_config)	//在读写Bacnet config 的时候禁止刷新List;
         return -1;
     if (npoint == 0)
         return -2;
@@ -1128,7 +1136,7 @@ int Post_Background_Read_Message_ByPanel(unsigned char panel_id,int command_type
 BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size)
 {
 
-    if(read_write_bacnet_config)	//cnet config 
+    if(read_write_bacnet_config)	//在读写Bacnet config 的时候禁止刷新List;
         return FALSE;
 
     _MessageRefreshListInfo *pmy_refresh_info = new _MessageRefreshListInfo;
@@ -1137,7 +1145,7 @@ BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance
     pmy_refresh_info->start_instance = start_instance;
     pmy_refresh_info->end_instance = end_instance;
     pmy_refresh_info->entitysize = entitysize;
-    pmy_refresh_info->block_size = block_size; //block_size 
+    pmy_refresh_info->block_size = block_size; //block_size 如果是0 表示 用寄存器去更新列表，只刷新value
     if ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS) || g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
     {
         //if (!PostThreadMessage(nThreadID, MY_RS485_WRITE_LIST, (WPARAM)pmy_write_info, NULL))//post thread msg
@@ -1413,7 +1421,7 @@ int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_
 }
 
 
-//gram code 
+//用于 读取program code 现在每个code 最大能有2000个字节;
 //
 int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage)
 {
@@ -1434,7 +1442,7 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 
 	unsigned max_apdu = 0;
 	entitysize = 400;
-	entitysize = entitysize | (npackage << 9);	//ntitysize am code 
+	entitysize = entitysize | (npackage << 9);	//将entitysize 的 高7位用来给program code ，用来记录是第几包;
 
 	char SendBuffer[1000];
 	memset(SendBuffer,0,1000);
@@ -1461,7 +1469,7 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 
         if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
         {
-            int nwrite_length = 0;//
+            int nwrite_length = 0;//包含7个私有字节的头
             int ret_results = 0;
 
             nwrite_length = 7 + 400;// (end_instance - start_instance + 1)*entitysize;
@@ -2038,7 +2046,7 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 
     if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
     {
-        int nwrite_length = 0;//
+        int nwrite_length = 0;//包含7个私有字节的头
         int ret_results = 0;
 
         nwrite_length = 7 + (end_instance - start_instance + 1)*entitysize;
@@ -2193,7 +2201,7 @@ int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t sta
     }
     gsp_invoke = -1;
     int send_status = true;
-    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) //
+    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) //如果支持 转接头协议 ，并且默认重试10次，就改默认3次，没必要那么久;
     {
         gsp_invoke = -1;
         if (retrytime == 10)
@@ -2266,7 +2274,7 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
 
 
     int send_status = true;
-    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) //
+    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) //如果支持 转接头协议 ，并且默认重试10次，就改默认3次，没必要那么久;
     {
         if (retrytime == 10)
             retrytime = 4;
@@ -2387,7 +2395,7 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
 
 
 
-                test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_WR_FLAG_FIRST + 36 * nstart_index, 36, 4); //Variable 9
+                test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_WR_FLAG_FIRST + 36 * nstart_index, 36, 4); //Variable 是39个字节，占用20个寄存器;
                 if ((test_value1 >= 0))
                 {
                     return 1;
@@ -2416,7 +2424,7 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
                 {
                     write_buffer[j] = htons(write_buffer[j]);
                 }
-                test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_WR_TIME_FIRST + 72 * nstart_index, 72, 4); //Variable 9
+                test_value1 = Write_Multi_org_short(g_tstat_id, write_buffer, BAC_WR_TIME_FIRST + 72 * nstart_index, 72, 4); //Variable 是39个字节，占用20个寄存器;
                 if ((test_value1 >= 0))
                 {
                     return 1;
@@ -2477,7 +2485,7 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
 /************************************************************************/
 /*
 Author: Fance
-Get Bacnet Special Private Data  l
+Get Bacnet Special Private Data  这一段是读取其他panel的数据，不是本panel的数据
 <param name="deviceid">Bacnet Device ID
 <param name="command">Bacnet command
 <param name="start_instance">start point
@@ -2663,7 +2671,7 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
 /*
 Author: Fance
 Get  Private  Bacnet  To  ModbusData
-//et
+//这个函数用来通过bacnet命令读取modbus 的相关寄存器
 */
 /************************************************************************/
 int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t readlength, unsigned short *data_out)
@@ -2696,7 +2704,7 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
     HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
     private_data_chunk.total_length = PRIVATE_HEAD_LENGTH;
     private_data_chunk.command = READ_BACNET_TO_MODBUS_COMMAND;
-    private_data_chunk.start_reg = start_reg; // 
+    private_data_chunk.start_reg = start_reg; // 测试
     private_data_chunk.nlength = readlength;
     Set_transfer_length(PRIVATE_HEAD_LENGTH);
     status = bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING, (char *)&private_data_chunk, &data_value);
@@ -2773,7 +2781,7 @@ int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_
 
 
     if ((writelength == 0) || (writelength > 128))
-        return -4; //
+        return -4; //长度有误;
 
     bool status = false;
 
@@ -2791,14 +2799,14 @@ int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_
     HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
     private_data_chunk.total_length = PRIVATE_HEAD_LENGTH +  writelength*2;
     private_data_chunk.command = WRITE_BACNET_TO_MODBUS_COMMAND;
-    private_data_chunk.start_reg = start_reg; // 
+    private_data_chunk.start_reg = start_reg; // 测试
     private_data_chunk.nlength = writelength;
 
     Set_transfer_length(private_data_chunk.total_length);
     memcpy_s(SendBuffer, PRIVATE_HEAD_LENGTH, &private_data_chunk, PRIVATE_HEAD_LENGTH);
 
     memcpy(temp_data, data_in, writelength*2);
-    //
+    //电脑和设备大小端不一致，这里以设备为准.
     for (int i = 0; i < writelength; i++)
     {
         temp_data[i] = htons(temp_data[i]);
@@ -2873,7 +2881,7 @@ Get Bacnet Private Data
 <param name="deviceid">Bacnet Device ID
 <param name="start_instance">start point
 <param name="end_instance">end point
-<param name="entitysize">Block size of read  
+<param name="entitysize">Block size of read  包含 第几包
 */
 /************************************************************************/
 int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae)
@@ -2881,7 +2889,7 @@ int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance
     if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
     {
         unsigned short	entitysize = 400;
-        entitysize = entitysize | (npackgae << 9);	//ntitysize am code 
+        entitysize = entitysize | (npackgae << 9);	//将entitysize 的 高7位用来给program code ，用来记录是第几包;
         int ret_results = 0;
         unsigned char test_data[600] = { 0 };
 
@@ -2891,7 +2899,7 @@ int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance
         if (ret_length >= 0)
             ret_results = Bacnet_PrivateData_Deal((char *)test_data, ret_length, end_flag);
         else
-            ret_results = -3; //
+            ret_results = -3; //读转接头命令超时;
         return ret_results;
     }
 
@@ -2910,7 +2918,7 @@ int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance
     private_data.serviceNumber = 1;
 
     unsigned short	entitysize = 400;
-    entitysize = entitysize | (npackgae << 9);	//ntitysize am code 
+    entitysize = entitysize | (npackgae << 9);	//将entitysize 的 高7位用来给program code ，用来记录是第几包;
 
     Str_user_data_header private_data_chunk;
     //Str_sub_user_data_header private_sub_data_chunk;
@@ -2969,7 +2977,7 @@ int GetProgramData_Blocking(uint32_t deviceid,uint8_t start_instance,uint8_t end
                                   npackgae);
 
             Sleep(SEND_COMMAND_DELAY_TIME);
-            if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) //RS485 ptp program  
+            if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER) //RS485 ptp 读取 program  返回值为 16 代表以及读取到了
             {
                 if (temp_invoke_id == READPROGRAMCODE_T3000)
                 {
@@ -3363,7 +3371,7 @@ int fill_in_output(Str_out_point* temp_output, char* temp_point)
     temp_output->sub_product = *(my_temp_point++);
     temp_output->sub_number = *(my_temp_point++);
 
-    //temp_out.delay_timer = *(my_temp_point++);  Output elay time
+    //temp_out.delay_timer = *(my_temp_point++);  Output 这个Delay time先不管 清0
     temp_output->pwm_period = *(my_temp_point++);
     return 0;
 }
@@ -3426,7 +3434,7 @@ int fill_in_pids(Str_controller_point* temp_var, char* temp_point)
     temp_var->input.point_type = *(my_temp_point++);
     temp_var->input.panel = *(my_temp_point++);
 
-    //t
+    //这里先加卡关条件，目前暂时不支持 其他panel的Input
     //if(m_controller_data.at(i).input.number>=BAC_INPUT_ITEM_COUNT)
     //	m_controller_data.at(i).input.number = 0;
     //if(m_controller_data.at(i).input.panel != bac_gloab_panel )
@@ -3694,7 +3702,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READEXT_IO_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_Extio_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_Extio_point);
         my_temp_point = bacnet_apud_point + 3;
         start_instance = *my_temp_point;
@@ -3725,7 +3733,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READ_JSON_SCREEN:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_t3_screen_Json)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_t3_screen_Json);
         my_temp_point = bacnet_apud_point + 3;
         start_instance = *my_temp_point;
@@ -3766,7 +3774,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READ_JSON_ITEM:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_item_Json)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_item_Json);
         my_temp_point = bacnet_apud_point + 3;
         start_instance = *my_temp_point;
@@ -3811,7 +3819,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READ_TSTATE_SCHEDULE_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_tstat_schedule)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_tstat_schedule);
         //m_Input_data_length = block_length;
         my_temp_point = bacnet_apud_point + 3;
@@ -3855,7 +3863,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READ_REMOTE_POINT:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_remote_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_remote_point);
         //m_Input_data_length = block_length;
         my_temp_point = bacnet_apud_point + 3;
@@ -3895,7 +3903,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READ_GRPHIC_LABEL_COMMAND:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_label_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_label_point);
         //m_Input_data_length = block_length;
         my_temp_point = bacnet_apud_point + 3;
@@ -3927,7 +3935,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             m_graphic_label_data.at(i).reg.nMain_Panel = *(my_temp_point++);
             m_graphic_label_data.at(i).reg.nSub_Panel = *(my_temp_point++);
 
-            //// l nenumb 
+            ////下面的做法不合理，懒得改了，留给后面维护的人;  从一个panel 的prg 导入另一个panel 的prg  他们的 panel number 不同 会出现很多问题;
             //if(m_graphic_label_data.at(i).reg.nMain_Panel == m_graphic_label_data.at(i).reg.nSub_Panel)
             //{
             //	if(m_graphic_label_data.at(i).reg.nMain_Panel != Station_NUM)
@@ -3968,7 +3976,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READ_AT_COMMAND:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (450) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
 
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / 450;
         //m_Input_data_length = block_length;
@@ -4006,7 +4014,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READOUTPUT_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_out_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
 
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_out_point);
         //m_Input_data_length = block_length;
@@ -4032,7 +4040,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 2;
 
         if (start_instance >= temp_bac_output_item_count)
-            return -1;//
+            return -1;//超过长度了;
 
         if (invoke_id == gsp_invoke)
         {
@@ -4065,7 +4073,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READINPUT_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_in_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_in_point);
         //m_Input_data_length = block_length;
         my_temp_point = bacnet_apud_point + 3;
@@ -4090,7 +4098,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             end_flag = true;
 
         if (start_instance >= temp_bac_input_item_count)
-            return -1;//
+            return -1;//超过长度了;
         if (invoke_id == gsp_invoke)
         {
             for (i = start_instance; i <= end_instance; i++)
@@ -4118,7 +4126,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READVARIABLE_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_variable_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
 
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_variable_point);
         my_temp_point = bacnet_apud_point + 3;
@@ -4142,7 +4150,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (temp_bac_variable_item_count - 1))
             end_flag = true;
         if (start_instance >= temp_bac_variable_item_count)
-            return -1;//
+            return -1;//超过长度了;
 
         if (invoke_id == gsp_invoke)
         {
@@ -4173,7 +4181,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     {
 
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_table_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
 
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_table_point);
         my_temp_point = bacnet_apud_point + 3;
@@ -4185,7 +4193,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT - 1))
             end_flag = true;
         if (start_instance >= BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT)
-            return -1;//
+            return -1;//超过长度了;
 
         for (int i = start_instance; i <= end_instance; i++)
         {
@@ -4195,7 +4203,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
                 memcpy_s(m_analog_custmer_range.at(i).table_name, 9, my_temp_point, 9);
 
             char temp_char[10] = { 0 };
-            if ((unsigned char)m_analog_custmer_range.at(i).table_name[8] != 0xef) //
+            if ((unsigned char)m_analog_custmer_range.at(i).table_name[8] != 0xef) //最后一位用来标识 精度 ，与旧版本的0.1 区别开
             {
                 memcpy_s(temp_char, 9, my_temp_point, 9);
             }
@@ -4227,7 +4235,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READVARUNIT_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_variable_uint_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
 
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_variable_uint_point);
         my_temp_point = bacnet_apud_point + 3;
@@ -4239,7 +4247,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (BAC_VARIABLE_CUS_UNIT_COUNT - 1))
             end_flag = true;
         if (start_instance >= BAC_VARIABLE_CUS_UNIT_COUNT)
-            return -1;//
+            return -1;//超过长度了;
 
         for (int i = start_instance; i <= end_instance; i++)
         {
@@ -4274,7 +4282,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (BAC_SCHEDULE_COUNT - 1))
             end_flag = true;
         if (start_instance >= BAC_SCHEDULE_COUNT)
-            return -1;//
+            return -1;//超过长度了;
 
         if (invoke_id == gsp_invoke)
         {
@@ -4298,7 +4306,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READANNUALROUTINE_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_annual_routine_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_annual_routine_point);
 
         my_temp_point = bacnet_apud_point + 3;
@@ -4310,7 +4318,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (BAC_HOLIDAY_COUNT - 1))
             end_flag = true;
         if (start_instance >= BAC_HOLIDAY_COUNT)
-            return -1;//
+            return -1;//超过长度了;
 
         if (invoke_id == gsp_invoke)
         {
@@ -4335,7 +4343,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READARRAY_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_array_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_array_point);
         my_temp_point = bacnet_apud_point + 3;
         start_instance = *my_temp_point;
@@ -4344,7 +4352,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point++;
         my_temp_point = my_temp_point + 2;
         if (start_instance >= BAC_ARRAY_ITEM_COUNT)
-            return -1;//
+            return -1;//超过长度了;
         if (end_instance == (BAC_ARRAY_ITEM_COUNT - 1))
             end_flag = true;
 
@@ -4372,7 +4380,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     {
 
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_program_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_program_point);
         my_temp_point = bacnet_apud_point + 3;
         start_instance = *my_temp_point;
@@ -4382,7 +4390,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 2;
 
         if (start_instance >= BAC_PROGRAM_ITEM_COUNT)
-            return -1;//
+            return -1;//超过长度了;
         if (end_instance == (BAC_PROGRAM_ITEM_COUNT - 1))
             end_flag = true;
 
@@ -4408,7 +4416,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READUSER_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_userlogin_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_userlogin_point);
         my_temp_point = bacnet_apud_point + 3;
         start_instance = *my_temp_point;
@@ -4418,7 +4426,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 2;
 
         if (start_instance >= BAC_CUSTOMER_UNITS_COUNT)
-            return -1;//
+            return -1;//超过长度了;
 
         for (i = start_instance; i <= end_instance; i++)
         {
@@ -4451,7 +4459,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
 
     }
     break;
-    case READPROGRAMCODE_T3000://Fance rogram code uf 
+    case READPROGRAMCODE_T3000://Fance 将program code 存至Buf 等待发送消息后使用解码函数
     {
         my_temp_point = bacnet_apud_point + 3;
         start_instance = *my_temp_point;
@@ -4463,7 +4471,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 2;
 
         if (start_instance >= BAC_PROGRAMCODE_ITEM_COUNT)
-            return -1;//
+            return -1;//超过长度了;
 
         block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
         if (block_length < 400)
@@ -4538,7 +4546,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READ_SCHEDUAL_TIME_FLAG:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_schedual_time_flag)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_schedual_time_flag);
         //m_Input_data_length = block_length;
         my_temp_point = bacnet_apud_point + 3;
@@ -4565,7 +4573,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READ_MSV_COMMAND:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_MSV)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_MSV);
         //m_Input_data_length = block_length;
         my_temp_point = bacnet_apud_point + 3;
@@ -4580,7 +4588,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             //copy the schedule day time to my own buffer.
             for (int j = 0; j < STR_MSV_MULTIPLE_COUNT; j++)
             {
-                m_msv_data.at(x).msv_data[j].status = *(my_temp_point++); //status 
+                m_msv_data.at(x).msv_data[j].status = *(my_temp_point++); //status 用来判断是否 这一组数据 使用与否;
                 memcpy_s(m_msv_data.at(x).msv_data[j].msv_name, STR_MSV_NAME_LENGTH, my_temp_point, STR_MSV_NAME_LENGTH);
                 my_temp_point = my_temp_point + STR_MSV_NAME_LENGTH;
                 m_msv_data.at(x).msv_data[j].msv_value = ((unsigned char)my_temp_point[1] << 8) | ((unsigned char)my_temp_point[0]);
@@ -4674,7 +4682,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READCONTROLLER_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_controller_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_controller_point);
 
         my_temp_point = bacnet_apud_point + 3;
@@ -4685,7 +4693,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 2;
 
         if (start_instance >= BAC_PID_COUNT)
-            return -1;//
+            return -1;//超过长度了;
 
         if (end_instance == (BAC_PID_COUNT - 1))
             end_flag = true;
@@ -4725,7 +4733,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 2;
 
         if (start_instance >= BAC_SCREEN_COUNT)
-            return -1;//
+            return -1;//超过长度了;
         if (end_instance == (BAC_SCREEN_COUNT - 1))
             end_flag = true;
 
@@ -4763,7 +4771,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point++;
         my_temp_point = my_temp_point + 2;
         if (start_instance >= BAC_MONITOR_COUNT)
-            return -1;//
+            return -1;//超过长度了;
         if (end_instance == (BAC_MONITOR_COUNT - 1))
             end_flag = true;
 
@@ -4823,7 +4831,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case  READALARM_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Alarm_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Alarm_point);
 
         my_temp_point = bacnet_apud_point + 3;
@@ -4837,7 +4845,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             end_flag = true;
 
         if (start_instance >= BAC_ALARMLOG_COUNT)
-            return -1;//
+            return -1;//超过长度了;
         for (int i = start_instance; i <= end_instance; i++)
         {
             m_alarmlog_data.at(i).point.number = *(my_temp_point++);
@@ -4985,7 +4993,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             s_Basic_Setting.reg.tcp_type = *(my_temp_point++);
             s_Basic_Setting.reg.mini_type = *(my_temp_point++);
 
-            my_temp_point = my_temp_point + 1;	//minitype  bug  
+            my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
             s_Basic_Setting.reg.pro_info.harware_rev = *(my_temp_point++);
             s_Basic_Setting.reg.pro_info.firmware0_rev_main = *(my_temp_point++);
             s_Basic_Setting.reg.pro_info.firmware0_rev_sub = *(my_temp_point++);
@@ -5080,7 +5088,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             s_Basic_Setting.reg.end_day = *(my_temp_point++);
             s_Basic_Setting.reg.network_number_hi = *(my_temp_point++);
             //memcpy_s(&s_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
-            //my_temp_point = my_temp_point + 10; //
+            //my_temp_point = my_temp_point + 10; //算上这个  长度是 270
             s_Basic_Setting.reg.webview_json_flash = *(my_temp_point++);
             
             s_Basic_Setting.reg.max_var = *(my_temp_point++); 
@@ -5089,9 +5097,9 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
 
 
 
-            //mitype
-               //   
-        //   
+            //额外处理不同CPU的 minitype
+               //最高位 次高位   10   主芯片 APM
+        //最高位 次高位   01   主芯片 GD
             unsigned char temp_chip = s_Basic_Setting.reg.mini_type;
             s_Basic_Setting.reg.mini_type = s_Basic_Setting.reg.mini_type & 0x3F;
 
@@ -5218,7 +5226,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             memcpy_s(temp.reserved, 10, my_temp_point, 10);
             my_temp_point = my_temp_point + 10;
 
-            if ((temp.product_type == 0) || (temp.modbus_id == 0) || (temp.port == 0) || (temp.sn == 0))  //
+            if ((temp.product_type == 0) || (temp.modbus_id == 0) || (temp.port == 0) || (temp.sn == 0))  //下面挂的不符合规则;
                 continue;
             //m_remote_device_db.at(x).sn = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
             //my_temp_point = my_temp_point + 4;
@@ -5298,7 +5306,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READTSTAT_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_TstatInfo_point)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_TstatInfo_point);
         my_temp_point = bacnet_apud_point + 3;
         start_instance = *my_temp_point;
@@ -5308,7 +5316,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 2;
 
         if (start_instance >= BAC_TSTAT_COUNT)
-            return -1;//
+            return -1;//超过长度了;
 
         if (end_instance == (BAC_TSTAT_COUNT - 1))
             end_flag = true;
@@ -5345,7 +5353,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     case READUNIT_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_Units_element)) != 0)
-            return -1;	//
+            return -1;	//得到的结构长度错误;
         block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_Units_element);
         my_temp_point = bacnet_apud_point + 3;
         start_instance = *my_temp_point;
@@ -5355,7 +5363,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 2;
 
         if (start_instance >= BAC_CUSTOMER_UNITS_COUNT)
-            return -1;//
+            return -1;//超过长度了;
         if (end_instance == (BAC_CUSTOMER_UNITS_COUNT - 1))
         {
             end_flag = true;
@@ -5383,7 +5391,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             if (temp_dig_on.GetLength() >= 12)
                 temp_dig_on.Empty();
 
-            //   
+            //判断正反向逻辑 ，正逻辑处理方式如同  Range 1    负逻辑如同 12;
             if (m_customer_unit_data.at(i).direct == DIGITAL_DIRECT)
             {
                 cus_digital_off[i] = temp_dig_off;
@@ -5799,7 +5807,7 @@ int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_t
     //strcpy(argv[1] , "444");
     //strcpy(argv[2] , "0");
     //strcpy(argv[3] , "2");
-    //strcpy(argv[4] , "8");  //8
+    //strcpy(argv[4] , "8");  //8是读取所有的属性;
 
     //argv[1] = "115909";
     //argv[2] = "8";
@@ -6010,7 +6018,7 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
             (itr->object_type == object_type) &&
             (itr->property_id == property_id))
         {
-            itrflag = itr;  //
+            itrflag = itr;  //找到曾经读过
             find_exsit = true;
         }
     }
@@ -6081,7 +6089,7 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
                             (itr->object_type == object_type) &&
                             (itr->property_id == property_id))
                         {
-                            itrflag = itr;  //
+                            itrflag = itr;  //找到曾经读过
                             value = itrflag->value;
                             find_exsit = true;
                             break;
@@ -6089,7 +6097,7 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
                     }
                     if (!find_exsit)
                     {
-                        continue;  //
+                        continue;  //没有找到对应的点，没有赋值 value成功;
                     }
                     standard_bacnet_data.erase(itrflag);
                     return 1;
@@ -6322,7 +6330,7 @@ void localhandler_read_property_ack(
             pBuf = new char[dwFileLen + 1];
             memset(pBuf, 0, dwFileLen);
             pBuf[dwFileLen] = 0;
-            myfile.Read(pBuf, dwFileLen);     //MFC   CFile 
+            myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
             myfile.Close();
             CString test_pop_up;
             MultiByteToWideChar(CP_ACP, 0, (char *)pBuf, (int)strlen((char *)pBuf) + 1,
@@ -6346,7 +6354,7 @@ void localhandler_read_property_ack(
                         (itr->object_type == data.object_type) &&
                         (itr->property_id == data.object_property))
                     {
-                        itrflag = itr;  //
+                        itrflag = itr;  //找到曾经读过
                         itrflag->value = value;
                         find_exsit = true;
                     }
@@ -6377,7 +6385,7 @@ int Bacnet_Read_Properties_Multiple_Blocking(uint32_t deviceid, BACNET_OBJECT_TY
             (itr->object_type == object_type) &&
             (itr->property_id == property_id))
         {
-            itrflag = itr;  //
+            itrflag = itr;  //找到曾经读过
             find_exsit = true;
         }
     }
@@ -6440,7 +6448,7 @@ int Bacnet_Read_Properties_Multiple_Blocking(uint32_t deviceid, BACNET_OBJECT_TY
                             (itr->object_type == object_type) &&
                             (itr->property_id == property_id))
                         {
-                            itrflag = itr;  //
+                            itrflag = itr;  //找到曾经读过
                             value = itrflag->rpm_data;
                            // memcpy_s(value, sizeof(BACNET_READ_ACCESS_DATA), itrflag->rpm_data, sizeof(BACNET_READ_ACCESS_DATA));
                             find_exsit = true;
@@ -6449,7 +6457,7 @@ int Bacnet_Read_Properties_Multiple_Blocking(uint32_t deviceid, BACNET_OBJECT_TY
                     }
                     if (!find_exsit)
                     {
-                        continue;  //
+                        continue;  //没有找到对应的点，没有赋值 value成功;
                     }
                     standard_bacnet_data.erase(itrflag);
                     return 1;
@@ -6550,7 +6558,7 @@ void local_handler_read_property_multiple_ack(
                 (itr->object_type == rpm_data.object_type) /*&&
                 (itr->property_id == rpm_data->object_property)*/)
             {
-                itrflag = itr;  //
+                itrflag = itr;  //找到曾经读过
                 itrflag->rpm_data = rpm_data;
                 find_exsit = true;
             }
@@ -6752,7 +6760,7 @@ void local_handler_conf_private_trans_ack(
     }
     if (service_data->invoke_id == gsp_invoke)
     {
-        return; //
+        return; //对于一些 不是读取选中panel的 命令回复，不要将对应命令转换为刷新前端界面;
     }
 	bac_select_device_online = true;
     local_handler_update_bacnet_ui(receive_data_type, each_end_flag);
@@ -6895,7 +6903,7 @@ void Inial_Product_Reglist_map()
 
 unsigned char product_menu[255][20] = { 0 };
 unsigned char product_input[255][20] = { 0 };
-//4 10
+//初始化 产品菜单状态 2019 04 10
 void Inial_Product_Menu_map()
 {
     
@@ -7138,12 +7146,12 @@ CString Get_Table_Name(int SerialNo,CString Type ,int Row)
     SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 	CppSQLite3Table table;
 	CppSQLite3Query q;
-    if (SqliteDBBuilding.tableExists("IONAME_CONFIG"))//ersion
+    if (SqliteDBBuilding.tableExists("IONAME_CONFIG"))//有Version表
     {
         CString sql;
         sql.Format(_T("Select * from IONAME_CONFIG where Type='%s' and  Row=%d and SerialNo=%d"),Type.GetBuffer(),Row,SerialNo);
         q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
-        if (!q.eof())//
+        if (!q.eof())//有表但是没有对应序列号的值
         {
             
             while (!q.eof())
@@ -7175,7 +7183,7 @@ SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
     sql.Format(_T("Select * from IONAME_CONFIG where Type='%s' and  Row=%d and SerialNo=%d"),Type.GetBuffer(),Row,SerialNo);
     q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
-    if (!q.eof())//
+    if (!q.eof())//有表但是没有对应序列号的值
     {
 
         sql.Format(_T("update IONAME_CONFIG set InOutName = '%s' where Type='%s' and  Row=%d and SerialNo=%d "),TableName.GetBuffer(),Type.GetBuffer(),Row,SerialNo);
@@ -7536,7 +7544,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
     {
         m_bac_handle_Iam_data.push_back(temp_1);
 #ifdef USE_THIRD_PARTY_FUNC
-        if (vendor_id != 148) //mco
+        if (vendor_id != 148) //如果不是Temco的ID 才当作第三方设备
         {
             _Bac_Scan_Com_Info *temp = new _Bac_Scan_Com_Info;
             memcpy(temp, &temp_1, sizeof(_Bac_Scan_Com_Info));
@@ -7559,11 +7567,11 @@ void close_bac_com()
     temphandle = Get_RS485_Handle();
     if (temphandle != NULL)
     {
-        g_mstp_flag = false;//
+        g_mstp_flag = false;//关闭
         int remp_socket = bip_socket();
         closesocket(remp_socket);
         remp_socket = NULL;
-        bip_set_socket(remp_socket); //nd
+        bip_set_socket(remp_socket); //关闭此前bind的套接字
 
         Set_Thread1_Status(0);
         Set_Thread2_Status(0);
@@ -7623,8 +7631,8 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
 
     if(comport == 0)	//
     {
-        //2017-12-20  09 
-        //T3000 808
+        //2017-12-20  杜帆修改  尝试绑定本地的通讯 UDP 47809 端口 ，若绑定失败就尝试其他端口;
+        //T3000 不在绑定47808端口了，改为绑定 47809以后得端口，为了 同时能使用其他bacnet软件.
         system_connect_info.mstp_status = 0;
         TRACE(_T("mstp_status = 0 \r\n"));
         close_bac_com();
@@ -7642,7 +7650,7 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
             {
                 port_bind_results = Open_bacnetSocket2(bind_local_ip, BACNETIP_PORT + temp_add_port, my_sokect);
             }
-            if (port_bind_results) { //808
+            if (port_bind_results) { //如果绑定47808端口失败 尝试绑定其他端口
                 //bip_set_socket(my_sokect);
                 //bip_set_port(htons(BACNETIP_PORT + temp_add_port));
                 break;
@@ -7826,7 +7834,7 @@ void Init_Service_Handlers(	void)
     Device_Init(NULL);
 
     /* we need to handle who-is to support dynamic device binding */
-	//2017 12 07  ho  
+	//2017 12 07  由杜帆屏蔽 客户不希望T3000 回Who is 的信息。
     //apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_WHO_IS, handler_who_is);
     apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_I_AM, LocalIAmHandler);
 
@@ -8163,13 +8171,13 @@ extern CString local_enthernet_ip;
 //socket dll.
 bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysocket)
 {
-    //2018 03 21 Fandu PCIP
+    //2018 03 21 Fandu 解决 PCIP地址频繁变化导致的 bind 数据库以前的错误IP ，以至于 无法正常通讯的问题.
     bool find_network =false;
     GetIPMaskGetWay();
 
     if (strIPAdress.IsEmpty())
     {
-        strIPAdress = selected_product_Node.BuildingInfo.strIp;  //b
+        strIPAdress = selected_product_Node.BuildingInfo.strIp;  //用设备的前三个 来确定bind哪一个 网卡;
     }
 
     for (int i = 0; i < g_Vector_Subnet.size(); i++)
@@ -8183,12 +8191,12 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
         if (PC_IP.CompareNoCase(strIPAdress) == 0)
         {
             strIPAdress = PC_IP;
-            find_network = true; //;
+            find_network = true; //找到了完全匹配的本地网卡IP ，直接使用 这个IP进行连接;
             break;
         }
     }
 
-    if (find_network == false) //I
+    if (find_network == false) //没有完全找到匹配的 本地网卡IP的情况下，尝试匹配相同网段，尝试连接
     {
         for (int i = 0; i < g_Vector_Subnet.size(); i++)
         {
@@ -8238,7 +8246,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
 
     if (mysocket > 0)
     {
-        ::closesocket(mysocket); //
+        ::closesocket(mysocket); //关闭之前可能存在的套接字;
         mysocket = NULL;
     }
 
@@ -8275,7 +8283,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
 
 
 
-    //
+    //这个地方不加限制后，及时是多网卡广播也没有什么问题.
 #if 0
     if(local_enthernet_ip.IsEmpty())
         servAddr.sin_addr.s_addr = INADDR_ANY;
@@ -8299,7 +8307,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
     setsockopt(mysocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
     BOOL bDontLinger = FALSE;
-    setsockopt(mysocket, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));  //20200214 
+    setsockopt(mysocket, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));  //20200214 新增直接关闭套接字
 
     BOOL bBroadcast=TRUE;
     setsockopt(mysocket,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
@@ -8501,11 +8509,11 @@ int AddSubNetInfoIntoRefreshList(BYTE* buffer)
 {
     refresh_subnet_device temp = {0};
     char * npoint = (char *)buffer;
-    npoint = npoint + 1; //
+    npoint = npoint + 1; //命令位
     temp.device_count = buffer[1];
     temp.parent_sn = buffer[2] + buffer[3] * 256 + buffer[4] * 256 * 256 + buffer[5] * 256 * 256 * 256;
     npoint = npoint + 5;
-    npoint = npoint + 15; //
+    npoint = npoint + 15; //预留
     for (int i = 0; i < temp.device_count; i++)
     {
         temp.device_status[i].nstatus = *(npoint++);
@@ -8606,7 +8614,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         (my_temp_point[0] == my_temp_point[3]) &&
         (my_temp_point[0] != 0))
     {
-        // ,
+        //如果谁回复的父节点信息 4个字节都相同就认为是和Airlab一样 有Bug ,清零;
         my_temp_point[0] = 0;my_temp_point[1] = 0;my_temp_point[2] = 0;my_temp_point[3] = 0;
     }
 
@@ -8620,11 +8628,11 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	my_temp_point = my_temp_point + 20;
 	temp_data.reg.object_instance_4 = *(my_temp_point++);
 	temp_data.reg.object_instance_3 = *(my_temp_point++);
-	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 od.  2TP
+	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，1 表示在bootload.  2表示坏掉了    3 表示是MSTP
 	temp_data.reg.bacnetip_port =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 	my_temp_point= my_temp_point + 2;
-	temp_data.reg.hardware_info =  *(my_temp_point++); // 1 
-    temp_data.reg.subnet_protocol = *(my_temp_point++);   //0 modbus   12 OTOCOL_BIP_T0_MSTP_TO_MODBUS
+	temp_data.reg.hardware_info =  *(my_temp_point++); // 1 代表存在，其他任何代表不存在;
+    temp_data.reg.subnet_protocol = *(my_temp_point++);   //0 旧的 modbus   12 ： PROTOCOL_BIP_T0_MSTP_TO_MODBUS
     if (temp_data.reg.subnet_protocol == 12)
     {
         bool is_bacnet_device = false;
@@ -8632,7 +8640,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         if(is_bacnet_device)
             temp_data.reg.subnet_protocol = 10;
     }
-    if (nBufLen >= 67) //
+    if (nBufLen >= 67) //新增3个
     {
         temp_data.reg.command_version = *(my_temp_point++);
         if (temp_data.reg.parent_serial_number != 0)
@@ -8656,18 +8664,18 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	CString nip_address;
 	nip_address.Format(_T("%u.%u.%u.%u"),temp_data.reg.ip_address_1,temp_data.reg.ip_address_2,temp_data.reg.ip_address_3,temp_data.reg.ip_address_4);
 	CString nproduct_name = GetProductName(temp_data.reg.product_id);
-    if (temp_data.reg.product_id == PM_ESP32_T3_SERIES) // esp32 
+    if (temp_data.reg.product_id == PM_ESP32_T3_SERIES) // esp32 系列 需要具体查看子产品 
     {
         if (temp_data.reg.minitype == T3_AIRLAB)
         {
             nproduct_name = _T("Airlab");
         }
     }
-	if(nproduct_name.IsEmpty())	//
+	if(nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
 	{
         if (temp_data.reg.product_id == 0)
         {
-            //
+            //是0的情况下特殊处理 有可能是T3 没有读到对应的产品号信息;
             if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
             {
                 g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  product id error ,ignore this package!"), nSerial, temp_data.reg.modbus_id, nip_address);
@@ -8701,7 +8709,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         (temp_data.reg.product_id == PM_MINIPANEL) ||
         (temp_data.reg.product_id == PM_MINIPANEL_ARM) ||
         (temp_data.reg.product_id == PM_ESP32_T3_SERIES) ||
-        (temp_data.reg.product_id == PM_TSTAT_AQ) ||    //
+        (temp_data.reg.product_id == PM_TSTAT_AQ) ||    //罗列出版本号需要除以10 的 设备
         (temp_data.reg.product_id == PM_CM5))
         temp.sw_version = (float)temp_data.reg.sw_version / 10.0;
     else
@@ -8725,7 +8733,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
     temp.subnet_baudrate = temp_data.reg.subnet_baudrate;
     temp.subnet_port = temp_data.reg.subnet_port;
     temp.minitype = temp_data.reg.minitype;
-    if (temp.nprotocol == MODBUS_RS485)   //4 tcp 
+    if (temp.nprotocol == MODBUS_RS485)   //通过64 命令回的 都属于网络的modbus tcp ，除非直接回 12 
         temp.nprotocol = MODBUS_TCPIP;
     char * temp_point = NULL;
     refresh_net_label_info temp_label;
@@ -8764,7 +8772,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 	if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
 	{
-		g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  , Product name : %s ,Name:%s, obj = %u ,panel = %u,isp_mode = %dserial = %u"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name, cs_temp_label,temp.object_instance,temp.panal_number,temp_data.reg.isp_mode, temp_data.reg.parent_serial_number);
+		g_Print.Format(_T("Serial = %12u     ID = %d ,ip = %s  , Product name : %s ,Name:%s, obj = %u ,panel = %u,isp_mode = %d，pserial = %u"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name, cs_temp_label,temp.object_instance,temp.panal_number,temp_data.reg.isp_mode, temp_data.reg.parent_serial_number);
 		DFTrace(g_Print);
 	}
 
@@ -8788,7 +8796,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 	if((temp_data.reg.isp_mode == 1) || (temp_data.reg.isp_mode == 2))
 	{
-		//
+		//记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
 		IspModeInfo temp_info;
 		temp_info.ipaddress[0] = temp_data.reg.ip_address_1;
 		temp_info.ipaddress[1] = temp_data.reg.ip_address_2;
@@ -8818,7 +8826,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 			{
 				g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
 				need_isp_device = g_isp_device_info.at(temp_index);
-				if(temp_data.reg.isp_mode == 2) //Minipanel otloader 
+				if(temp_data.reg.isp_mode == 2) //Minipanel 会回传特殊的 bootloader 坏掉的信息
 				{
 					isp_mode_error_code = 2;
 					::PostMessageW(MainFram_hwd,WM_HADNLE_ISP_MODE_DEVICE,2,NULL);
@@ -8858,7 +8866,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		m_refresh_net_device_data.push_back(temp);
 	}
 
-    //4 number bct instance 
+    //通过64命令来更新panel number 与object instance 的对应表  .
     if ((temp.object_instance != 0) && (temp.panal_number != 0) && (temp.panal_number < 255) && (temp.object_instance < 0x3fffff) && temp.parent_serial_number == 0)
     {
         _panel_info temp_panel;
@@ -8870,10 +8878,10 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         int find_in_list = false;
         for (int j = 0; j < g_bacnet_panel_info.size(); j++)
         {
-            //panel  
+            //判断主键  panel  以这个为依据更新 其他数据;
             if (temp_panel.panel_number == g_bacnet_panel_info.at(j).panel_number)
             {
-                //
+                //更新表格数据;
                 find_in_list = true;
                 g_bacnet_panel_info.at(j).npid = temp_panel.npid;
                 g_bacnet_panel_info.at(j).object_instance = temp_panel.object_instance;
@@ -8885,7 +8893,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
         if (find_in_list == false)
         {
-            //
+            //插入最新得到数据至表格;
             g_bacnet_panel_info.push_back(temp_panel);
         }
 
@@ -8893,7 +8901,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         vector<_panel_info>::iterator it = g_bacnet_panel_info.begin();
         for (; it != g_bacnet_panel_info.end();) 
         {
-            if (temp_time_now - it->online_time > 600) //0
+            if (temp_time_now - it->online_time > 600) //删除10分钟以前的在线设备;
             {
                 it = g_bacnet_panel_info.erase(it);
             }
@@ -9022,7 +9030,7 @@ void PrintAdapterInfo()
         PIP_ADAPTER_ADDRESSES pCurrAddresses = pAddresses;
         while (pCurrAddresses) 
         {
-            // 
+            // 判断网卡是否被禁用
             if (pCurrAddresses->OperStatus == IfOperStatusDown) 
             {
                 pCurrAddresses = pCurrAddresses->Next;
@@ -9030,7 +9038,7 @@ void PrintAdapterInfo()
                 //printf("Status: Disabled\n");
             }
 
-            // 
+            // 判断网卡是否正常连接
             if (pCurrAddresses->OperStatus == IfOperStatusUp) 
             {
                 printf("Connection: Connected\n");
@@ -9043,7 +9051,7 @@ void PrintAdapterInfo()
             }
 
 
-            // IP 
+            // 获取 IP 地址和子网掩码
             PIP_ADAPTER_UNICAST_ADDRESS pUnicast = pCurrAddresses->FirstUnicastAddress;
             while (pUnicast) 
             {
@@ -9068,7 +9076,7 @@ void PrintAdapterInfo()
 
 
 
-                    // 
+                    // 计算并输出子网掩码
                     ULONG maskLength = pUnicast->OnLinkPrefixLength;
                     ULONG mask = 0xFFFFFFFF << (32 - maskLength);
                     struct in_addr subnetMask;
@@ -9084,11 +9092,11 @@ void PrintAdapterInfo()
                     {
                         pUnicast = pUnicast->Next;
                     }
-                    else if (Temp_Node.StrIP.GetLength() > 16) //p6
+                    else if (Temp_Node.StrIP.GetLength() > 16) //过滤ip6
                     {
                         pUnicast = pUnicast->Next;
                     }
-                    else if (Temp_Node.StrIP.GetLength() < 7)  //
+                    else if (Temp_Node.StrIP.GetLength() < 7)  //过滤不合理的IP
                     {
                         pUnicast = pUnicast->Next;
                     }
@@ -9138,7 +9146,7 @@ void GetIPMaskGetWay()
     pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO));
     ulOutBufLen = sizeof(IP_ADAPTER_INFO);
     ALL_LOCAL_SUBNET_NODE  Temp_Node;
-    // AdapterInfotBufLen
+    // 第一次调用GetAdapterInfo获取ulOutBufLen大小
     if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
     {
         free(pAdapterInfo);
@@ -9186,7 +9194,7 @@ void GetIPMaskGetWay()
     {
 
     }
-    if(pAdapterInfo !=NULL)	//Add by Fance . 2
+    if(pAdapterInfo !=NULL)	//Add by Fance . 如果不释放，会内存泄露 ，引起程序崩溃; 2015-10-22
         free(pAdapterInfo);
 
     PrintAdapterInfo();
@@ -9260,7 +9268,7 @@ void GetIPMaskGetWayForScan()
     pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO));
     ulOutBufLen = sizeof(IP_ADAPTER_INFO);
     ALL_LOCAL_SUBNET_NODE  Temp_Node;
-    // AdapterInfotBufLen
+    // 第一次调用GetAdapterInfo获取ulOutBufLen大小
     if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
     {
         free(pAdapterInfo);
@@ -9352,7 +9360,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
         {
             h_siBind.sin_port = htons(57619+i);
             int ret_bind = 0;
-            ret_bind = ::bind(h_Broad, (SOCKADDR*)&h_siBind, sizeof(h_siBind));//
+            ret_bind = ::bind(h_Broad, (SOCKADDR*)&h_siBind, sizeof(h_siBind));//把网卡地址强行绑定到Socket
             if (ret_bind != 0)
             {
                 TRACE(_T("scan bind port failed.\r\n"));
@@ -9367,7 +9375,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
         test_count_special = 0;
         int time_out=0;
         BOOL bTimeOut = FALSE;
-        //while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 
+        //while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
         //{
             time_out++;
             if(time_out>1)
@@ -9396,8 +9404,8 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                 //goto END_REFRESH_SCAN;
                 //return 0;
             }
-            unsigned int t1 = GetTickCount();//
-            unsigned int t2;//
+            unsigned int t1 = GetTickCount();//程序段开始前取得系统运行时间(ms);
+            unsigned int t2;//程序段开始前取得系统运行时间(ms);
             
             if(nSelRet > 0)
             {
@@ -9452,7 +9460,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                             int n = 1;
                             BOOL bFlag=FALSE;
                             //////////////////////////////////////////////////////////////////////////
-                            // 
+                            // 检测IP重复
                             DWORD dwValidIP = 0;
                             memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
                             while(dwValidIP != END_FLAG)
@@ -9540,7 +9548,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 
                             }
                         }
-                        //g_llTxCount++;//
+                        //g_llTxCount++;//不合理
 #endif
                     }
                     else
@@ -9565,11 +9573,11 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
             {
                 g_ScnnedNum = 0;
                 bTimeOut = TRUE;
-                //g_llTxCount++;//
+                //g_llTxCount++;//不合理
             }
 
 #if 0
-            if (g_ipaddress_info[index].exist_device > 0) //
+            if (g_ipaddress_info[index].exist_device > 0) //这个网络适配器扫描到了一些设备  65 回复;
             {
                 CString temp_head_ip;
                 CString temp_ip = g_ipaddress_info[index].ip_head;
@@ -9638,7 +9646,7 @@ extern SOCKET my_sokect;
 void Send_WhoIs_remote_ip(CString ipaddress_temp)
 {
     CString ipaddress;
-    if (ValidAddress(ipaddress_temp)==FALSE)  // C
+    if (ValidAddress(ipaddress_temp)==FALSE)  // 验证NC的IP
     {
         if(!GetIPbyHostName(ipaddress_temp,ipaddress))
         {
@@ -9683,7 +9691,7 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
     int nRet = 0;
     Sleep(1);
   //  Initial_bac(0);
-    while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 
+    while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
     {
         time_out++;
         if(time_out>5)
@@ -9743,7 +9751,7 @@ int GetDeviceCountTable(int device_serialnumber, int ntype, device_io_status &te
     int ret_value = 0;
     CString strSql;
     CBADO count_bado;
-    count_bado.SetDBPath(g_building_devicedatabase);	//
+    count_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
     count_bado.OnInitADOConn();
     strSql.Format(_T("select * from CountTable  where nSerialNumber = %d"),  device_serialnumber);
     count_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
@@ -9875,13 +9883,13 @@ int Create_DeviceDatabase(CString des_path,CString source_path)
     HANDLE hFind;
     WIN32_FIND_DATA wfd;
     hFind = FindFirstFile(des_path, &wfd);//
-    if (hFind == INVALID_HANDLE_VALUE)//
+    if (hFind == INVALID_HANDLE_VALUE)//不存在该文件
     {
-        //
+        //复制文件
         CopyFile(source_path, des_path, FALSE);
         return 1;
     }
-    return 0; // 
+    return 0; // 已经存在此文件，不需要再创建;
 }
 
 
@@ -9891,7 +9899,7 @@ void Create_DeviceDatabase()
     HANDLE hFind;
     WIN32_FIND_DATA wfd;
     hFind = FindFirstFile(g_building_devicedatabase, &wfd);//
-    if (hFind == INVALID_HANDLE_VALUE)//
+    if (hFind == INVALID_HANDLE_VALUE)//不存在该文件
     {
         FilePath = g_strExePth + _T("ResourceFile\\DeviceDatabase.mdb");
         HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_DEVICEDATABASE_DB), _T("T3000DB"));
@@ -9918,7 +9926,7 @@ int UpdateDeviceCountTable(int device_serialnumber ,int ntype, device_io_status 
 
 		CString strSql;
 		CBADO count_bado;
-		count_bado.SetDBPath(g_building_devicedatabase);	//
+		count_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
 		count_bado.OnInitADOConn();
 		if ((ntype == BAC_READ_INPUT_LIST) || (ntype == BAC_READ_ALL_LIST))
 		{
@@ -9979,7 +9987,7 @@ int UpdateDeviceCountTable(int device_serialnumber ,int ntype, device_io_status 
 	return 1;
 }
 
-//untTable 
+//检查CountTable 如果存在序列号  就不要动，否则就插入一笔数据，后面就只用更新数据.
 int CheckDeviceCountTable(int device_serialnumber, int objectinstance)
 {
 	int ret_value = 0;
@@ -9992,7 +10000,7 @@ int CheckDeviceCountTable(int device_serialnumber, int objectinstance)
 		int temp_record_count = 0;
 		CString strSql;
 		CBADO count_bado;
-		count_bado.SetDBPath(g_building_devicedatabase);	//
+		count_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
 		count_bado.OnInitADOConn();
 		strSql.Format(_T("select * from CountTable where nSerialNumber = %d"), device_serialnumber);
 		count_bado.m_pRecordset = count_bado.OpenRecordset(strSql);
@@ -10013,7 +10021,7 @@ int CheckDeviceCountTable(int device_serialnumber, int objectinstance)
     return 1;
 }
 
-//oad 
+//杜帆Load 
 int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 {
 
@@ -10022,7 +10030,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
     if (1)
     {
         CString FilePath;
-        if(write_to_device == 1)	// 
+        if(write_to_device == 1)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
         {
             CFileDialog dlg(true,_T("*.prog"),_T(" "),OFN_HIDEREADONLY ,_T("Prg files (*.prog)|*.prog||"),NULL,0);
             if(IDOK!=dlg.DoModal())
@@ -10047,13 +10055,13 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
         dwFileLen=myfile.GetLength();
         pBuf= new char[dwFileLen+1];
         pBuf[dwFileLen]=0;
-        myfile.Read(pBuf,dwFileLen);     //MFC   CFile 
+        myfile.Read(pBuf,dwFileLen);     //MFC   CFile 类 很方便
         myfile.Close();
         //MessageBox(pBuf);
         char * temp_buffer = pBuf;
 		bool b_new_prg = false;
 		int ntemp_version = 0;
-		if(( (unsigned char)temp_buffer[0] == 0x55  ) && ((unsigned char)temp_buffer[1] == 0xff))//g
+		if(( (unsigned char)temp_buffer[0] == 0x55  ) && ((unsigned char)temp_buffer[1] == 0xff))//新版本的prg
 		{
 			temp_buffer = temp_buffer + 2;
 			if(temp_buffer[0] >= 5)
@@ -10101,8 +10109,8 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 				SetPaneString(BAC_SHOW_MISSION_RESULTS ,_T("Your config file is the old version.Please save a new one."));
 			}
 
-			//Version 3 AC_ALALOG_CUSTMER_RANGE_TABLE_COUNT    BAC_GRPHIC_LABEL_COUNT    BAC_USER_LOGIN_COUNT    BAC_CUSTOMER_UNITS_COUNT
-			//Version 4 etting 
+			//Version 3 加入了 BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT    BAC_GRPHIC_LABEL_COUNT    BAC_USER_LOGIN_COUNT    BAC_CUSTOMER_UNITS_COUNT
+			//Version 4 加入了 Setting 结构;
 			//			CString FilePath;
 			//		FilePath=dlg.GetPathName();
 			if(ntemp_version >= 2)
@@ -10245,14 +10253,14 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 
 					m_controller_data.at(i).input.number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Number"),0,FilePath);
 					m_controller_data.at(i).input.panel = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Panel"),0,FilePath);
-					if((m_controller_data.at(i).input.panel != Station_NUM) && (m_controller_data.at(i).input.panel != 0))	 //oad prg != 
+					if((m_controller_data.at(i).input.panel != Station_NUM) && (m_controller_data.at(i).input.panel != 0))	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
 						m_controller_data.at(i).input.panel = Station_NUM;
 					m_controller_data.at(i).input.point_type = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Point_Type"),0,FilePath);
 					m_controller_data.at(i).input_value = GetPrivateProfileInt(temp_section,_T("Input_Value"),0,FilePath);
 					m_controller_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
 					m_controller_data.at(i).setpoint.number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Number"),0,FilePath);
 					m_controller_data.at(i).setpoint.panel = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Panel"),0,FilePath);
-					if((m_controller_data.at(i).setpoint.panel != Station_NUM) &&  (m_controller_data.at(i).setpoint.panel != 0) )	 //oad prg != 
+					if((m_controller_data.at(i).setpoint.panel != Station_NUM) &&  (m_controller_data.at(i).setpoint.panel != 0) )	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
 						m_controller_data.at(i).setpoint.panel = Station_NUM;
 					m_controller_data.at(i).setpoint.point_type = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Point_Type"),0,FilePath);
 					m_controller_data.at(i).setpoint_value = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Value"),0,FilePath);
@@ -10340,7 +10348,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 					GetPrivateProfileStringW(temp_section,part_section,_T(""),temp_program_code.GetBuffer(4000),4000,FilePath);
 					temp_program_code.ReleaseBuffer();
 
-					if(ntemp_version < 2)	//c
+					if(ntemp_version < 2)	//如果是加载的旧版本的 配置档,code 就清零;
 					{
 						program_code_length[i] = 0;
 						memset(program_code[i],0,2000);
@@ -10504,7 +10512,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 					if(temp_input_test_value != struct_test_value )
 					{
 						if(IDYES == AfxMessageBox(_T("Prg is too old.Continue") ,MB_YESNO))
-							continue;	//
+							continue;	//如果这一个的长度不正确 就继续下一个;忽略这个;
 						else
 							return 0;
 					}
@@ -10520,7 +10528,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 
 					for (int x=0;x<MAX_POINTS_IN_MONITOR;x++)
 					{
-						if(m_monitor_data.at(i).inputs[x].panel != Station_NUM)	 //oad prg != 
+						if(m_monitor_data.at(i).inputs[x].panel != Station_NUM)	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
 						{
 							if((m_monitor_data.at(i).inputs[x].panel == m_monitor_data.at(i).inputs[x].sub_panel) && (m_monitor_data.at(i).inputs[x].panel != 0))
 							{
@@ -10552,7 +10560,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 
 				}
 			}
-			if(ntemp_version >= 3) // 
+			if(ntemp_version >= 3) // 第三版中新加入的;
 			{
 				for (int i=0; i<BAC_GRPHIC_LABEL_COUNT; i++)
 				{
@@ -10743,7 +10751,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 
             if (offline_mode)
             {
-                //eng
+                //如果是离线模式 才把Setting的数据读出来，避免 Setting 那里 来回乱变.
                 //memcpy(&Device_Basic_Setting, cacl_panel, sizeof(Str_Setting_Info));
                 //original_panel = Device_Basic_Setting.reg.panel_number;
                 memcpy(&GetPrgSetting, cacl_panel, sizeof(Str_Setting_Info));
@@ -10751,7 +10759,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
             }
             else
             {
-                unsigned int temp_device_serial = Device_Basic_Setting.reg.n_serial_number;  //
+                unsigned int temp_device_serial = Device_Basic_Setting.reg.n_serial_number;  //原始设备的序列号不变才能写入setting结构;
                 unsigned int temp_object_instance = Device_Basic_Setting.reg.object_instance;
                 unsigned char temp_panel_number = Device_Basic_Setting.reg.panel_number;
                 unsigned char temp_modbus_id = Device_Basic_Setting.reg.modbus_id;
@@ -10772,7 +10780,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
                 memcpy(&Device_Basic_Setting, cacl_panel, sizeof(Str_Setting_Info));
                 Device_Basic_Setting.reg.n_serial_number = temp_device_serial;
                 Device_Basic_Setting.reg.reset_default = 0; 
-                //ng
+                //保持如下变量不写入Setting
                 memcpy(Device_Basic_Setting.reg.panel_name,temp_panel_name , 20);
                 Device_Basic_Setting.reg.object_instance = temp_object_instance;
                 Device_Basic_Setting.reg.panel_number = temp_panel_number;
@@ -10780,7 +10788,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
                 memcpy(Device_Basic_Setting.reg.ip_addr, temp_ip_addr, 4);
                 memcpy(Device_Basic_Setting.reg.subnet, temp_subnet, 4);
                 memcpy(Device_Basic_Setting.reg.gate_addr, temp_gate_addr, 4);
-                memcpy(Device_Basic_Setting.reg.mac_addr, temp_mac_addr, 6);  //20250113
+                memcpy(Device_Basic_Setting.reg.mac_addr, temp_mac_addr, 6);  //20250113修复 固件mac地址被覆盖的问题
 
 
                 memcpy(&GetPrgSetting, cacl_panel, sizeof(Str_Setting_Info));
@@ -10870,7 +10878,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 				memcpy(&m_controller_data.at(i),temp_point,sizeof(Str_controller_point));
 				temp_point = temp_point + sizeof(Str_controller_point);
 
-                //fandu  20180130  anel 1 .2.var3    4  ,   
+                //fandu  20180130  原来panel 1 的  1.2.var3   加载至  panel 4  ,   要修改为4.2.var3.
                 if ((m_controller_data.at(i).input.panel == prg_panel) && (original_panel != 0) && (prg_panel != 0))
                 {
                     m_controller_data.at(i).input.panel = original_panel;
@@ -10880,9 +10888,9 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
                 {
                     m_controller_data.at(i).setpoint.panel = original_panel;
                 }
-				//if((m_controller_data.at(i).input.panel != Station_NUM) && (m_controller_data.at(i).input.panel != 0))	 //oad prg != 
+				//if((m_controller_data.at(i).input.panel != Station_NUM) && (m_controller_data.at(i).input.panel != 0))	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
 				//	m_controller_data.at(i).input.panel = Station_NUM;
-				//if((m_controller_data.at(i).setpoint.panel != Station_NUM) &&  (m_controller_data.at(i).setpoint.panel != 0) )	 //oad prg != 
+				//if((m_controller_data.at(i).setpoint.panel != Station_NUM) &&  (m_controller_data.at(i).setpoint.panel != 0) )	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
 				//	m_controller_data.at(i).setpoint.panel = Station_NUM;
                 if ((m_controller_data.at(i).input.number != 0) || (m_controller_data.at(i).input.point_type != 0))
                 {
@@ -10905,7 +10913,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 				temp_point = temp_point + sizeof(Str_label_point);
                 if (write_to_device == 1)
                     m_graphic_label_data.at(i).reg.nSerialNum = Device_Basic_Setting.reg.n_serial_number;
-                //fandu  20180130  anel 1 .2.var3    4  ,   
+                //fandu  20180130  原来panel 1 的  1.2.var3   加载至  panel 4  ,   要修改为4.2.var3.
                 if ((m_graphic_label_data.at(i).reg.nMain_Panel == prg_panel) && (original_panel != 0) && (prg_panel != 0))
                 {
                         m_graphic_label_data.at(i).reg.nMain_Panel = original_panel;
@@ -10929,7 +10937,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 				memcpy(&m_customer_unit_data.at(i),temp_point,sizeof(Str_Units_element));
 				temp_point = temp_point + sizeof(Str_Units_element);
 
-                //2018 07 23 
+                //2018 07 23 对于虚拟设备 在加载时 解析 客户自定义的 range
                 MultiByteToWideChar(CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_off) + 1,
                     cus_digital_off[i].GetBuffer(MAX_PATH), MAX_PATH);
                 cus_digital_off[i].ReleaseBuffer();
@@ -10956,13 +10964,13 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
             {
                 if (write_to_device == 0)
                 {
-                    //eng
+                    //如果是离线模式 才把Setting的数据读出来，避免 Setting 那里 来回乱变.
                     memcpy(&Device_Basic_Setting, temp_point, sizeof(Str_Setting_Info));
-                    Device_Basic_Setting.reg.pro_info.firmware0_rev_main = 100; //og
+                    Device_Basic_Setting.reg.pro_info.firmware0_rev_main = 100; //使虚拟prog的版本最新，用来 适配很多判断版本号的界面;
                 }
                 else
                 {
-                    //
+                    //写入虚拟设备时 保留一些最基本的参数不变;
                     int temp_serial = Device_Basic_Setting.reg.n_serial_number;
                     unsigned int temp_bacnet_obj = Device_Basic_Setting.reg.object_instance;
                     uint8_t temp_mini_type = Device_Basic_Setting.reg.mini_type;
@@ -11020,7 +11028,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 				temp_point = temp_point + sizeof(Str_monitor_point);
 				for (int x=0;x<MAX_POINTS_IN_MONITOR;x++)
 				{
-                    //fandu  20180130  anel 1 .2.var3    4  ,   
+                    //fandu  20180130  原来panel 1 的  1.2.var3   加载至  panel 4  ,   要修改为4.2.var3.
                     if ((m_monitor_data.at(i).inputs[x].panel == prg_panel) && (original_panel != 0) && (prg_panel != 0))
                     {
                             m_monitor_data.at(i).inputs[x].panel = original_panel;
@@ -11069,7 +11077,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 				program_code_length[i] = 2000;
 			}
 
-			if(ntemp_version >= 6)	// 
+			if(ntemp_version >= 6)	//第六版中新增的 prg 要读写 
 			{
 				for (int i=0; i<BAC_VARIABLE_CUS_UNIT_COUNT; i++)
 				{
@@ -11078,7 +11086,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 				}
 			}
 
-            if (ntemp_version >= 7)	//
+            if (ntemp_version >= 7)	//第7版中新增的 msv 要读写 
             {
                 for (int i = 0; i<BAC_MSV_COUNT; i++)
                 {
@@ -11087,7 +11095,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
                 }
             }
 
-            if (ntemp_version >= 8)	//dule flag 
+            if (ntemp_version >= 8)	//第8版中新增的 schedule flag 要读写 
             {
                 for (int i = 0; i<BAC_SCHEDULE_COUNT; i++)
                 {
@@ -11103,7 +11111,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
         copy_data_to_ptrpanel(TYPE_ALL);
 
 
-        if(write_to_device)	// 
+        if(write_to_device)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
         {
             //if(g_protocol == PROTOCOL_BIP_TO_MSTP)
             //{
@@ -11165,14 +11173,14 @@ vector <Str_trendlog_DB>    m_DB_Trendlog;
 vector <Str_alarm_DB>       m_DB_Alarm;
 
 
-//
+//如果没有数据库就复制一个过去;
 int CheckDeviceDatabase()
 {
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 
     g_building_devicedatabase = g_strExePth + _T("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\DeviceDatabase.mdb");
 
-    Create_DeviceDatabase(); //Database.mdb 
+    Create_DeviceDatabase(); //检查资源文件目录是否存在 DeviceDatabase.mdb ，不存在就解压一个出来.
 
     CFileFind fFind;
     if (fFind.FindFile(g_building_devicedatabase))
@@ -11205,7 +11213,7 @@ int CheckDeviceDataDBAndUpdateDB()
 		int nversion_number = 0;
 		CString strSql;
 		CBADO monitor_bado;
-		monitor_bado.SetDBPath(g_building_devicedatabase);	//
+		monitor_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
 		monitor_bado.OnInitADOConn();
 		strSql.Format(_T("select * from Version"));
 		monitor_bado.m_pRecordset = monitor_bado.OpenRecordset(strSql);
@@ -11268,7 +11276,7 @@ int UpdateDeviceDataIntoAccessDB()
     int temp_record_count = 0;
     CString strSql;
     CBADO monitor_bado;
-    monitor_bado.SetDBPath(g_building_devicedatabase);	//
+    monitor_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
     monitor_bado.OnInitADOConn();
     strSql.Format(_T("select * from Version"));
    
@@ -11296,8 +11304,8 @@ int UpdateDeviceDataIntoAccessDB()
 
         monitor_bado.m_pRecordset->MoveNext();
     }
-    //Step1 
-    if (nversion_number <= 1)  // put
+    //Step1 根据各个版本 ，分别读取各个版本的数据，加载至缓存;
+    if (nversion_number <= 1)  //版本1 只有 input表格;
     {
         strSql.Format(_T("select * from Inputs"));
         monitor_bado.m_pRecordset = monitor_bado.OpenRecordset(strSql);
@@ -11451,15 +11459,15 @@ int UpdateDeviceDataIntoAccessDB()
 
 
 
-    //Step2 
+    //Step2 删除原有的数据库
 
 
 
-    //Step3 ing
+    //Step3 复制新数据库至指定Building目录
 
 
 
-    //Step4 
+    //Step4 将缓存数据保存至新数据库.
 
 
 end_SaveDeviceDataIntoAccessDB_function:
@@ -11668,7 +11676,7 @@ int WriteDeviceDataIntoAccessDB(int nTableType,int ncount ,int device_serialnumb
     CBADO accessdb_bado;
 	try
 	{
-		accessdb_bado.SetDBPath(g_building_devicedatabase);	//
+		accessdb_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
 		accessdb_bado.OnInitADOConn();
 		switch (nTableType)
 		{
@@ -12171,7 +12179,7 @@ values(%d,%d,'%s')"), device_serialnumber, 	temp_programtext_db.Program_index,  
 			return 1;
 }
 char pBuf[200000];
-//ave
+//杜帆Save
 void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
 {
 #ifdef DEBUG
@@ -12312,14 +12320,14 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
         temp_point = temp_point + sizeof(Str_variable_uint_point);
     }
 
-    //version 7 
+    //version 7 新增
     for (int i = 0; i<BAC_MSV_COUNT; i++)
     {
         memcpy(temp_point, &m_msv_data.at(i), sizeof(Str_MSV));
         temp_point = temp_point + sizeof(Str_MSV);
     }
 
-    //version 8 schedule time flag
+    //version 8 新增 schedule time flag
     for (int i = 0; i < BAC_SCHEDULE_COUNT; i++)
     {
         memcpy(temp_point, &m_Schedual_time_flag.at(i), sizeof(Str_schedual_time_flag));
@@ -12366,7 +12374,7 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 	pBuf= new char[dwFileLen+1];
 	memset(pBuf,0,dwFileLen);
 	pBuf[dwFileLen]=0;
-	myfile.Read(pBuf,dwFileLen);     //MFC   CFile 
+	myfile.Read(pBuf,dwFileLen);     //MFC   CFile 类 很方便
 	myfile.Close();
 	//MessageBox(pBuf);
 	char * temp_point = pBuf;
@@ -12387,7 +12395,7 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 	CTime temp_time_now = CTime::GetCurrentTime();
 	unsigned long temp_cur_long_time = temp_time_now.GetTime();
 
-	//85 5
+	//如果485 的prg时间 是三天以前的  或者485文件的时间大于现在的时间，这个prg 文件 就不要了;
 	//if((temp_cur_long_time - temp_file_time > 259200) || (temp_file_time > temp_cur_long_time))
 	//{
 	//	return -1;
@@ -12401,17 +12409,17 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 
 	memcpy(temp_buffer,temp_point,dwFileLen-5);
 
-	memcpy(&Device_Basic_Setting.reg,temp_buffer,400); //Setting 00
+	memcpy(&Device_Basic_Setting.reg,temp_buffer,400); //Setting 的400个字节;
     temp_point = temp_buffer + 400;
 	//g_progress_persent = (i+1)*100 / 32;	
 	int total_count = BAC_OUTPUT_ITEM_COUNT + BAC_INPUT_ITEM_COUNT;
 	int resent_count = 0;
 	for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
 	{
-		memcpy( &m_Output_data.at(i), temp_point,sizeof(Str_out_point));//utput  
+		memcpy( &m_Output_data.at(i), temp_point,sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
         temp_point = temp_point + 23 * 2;
 		memset(write_buffer,0,sizeof(write_buffer));
-		memcpy( write_buffer,&m_Output_data.at(i),sizeof(Str_out_point));//utput  
+		memcpy( write_buffer,&m_Output_data.at(i),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 		for (int x=0;x<200;x++)
 		{
 			write_buffer[x] = htons(write_buffer[x]);
@@ -12434,11 +12442,11 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write  output OK!"));
 	for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
 	{
-		memcpy(&m_Input_data.at(j), temp_point,sizeof(Str_in_point)); //Input 46 
+		memcpy(&m_Input_data.at(j), temp_point,sizeof(Str_in_point)); //Input 46 个字节 ;
         temp_point = temp_point + 46;
         //temp_buffer + 200 + 23 * 64 + j * 23
 		memset(write_buffer,0,sizeof(write_buffer));
-		memcpy( write_buffer,&m_Input_data.at(j),sizeof(Str_in_point));//utput  
+		memcpy( write_buffer,&m_Input_data.at(j),sizeof(Str_in_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 		for (int Z=0;Z<200;Z++)
 		{
 			write_buffer[Z] = htons(write_buffer[Z]);
@@ -12513,7 +12521,7 @@ int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path)
 	pBuf= new char[dwFileLen+1];
 	memset(pBuf,0,dwFileLen);
 	pBuf[dwFileLen]=0;
-	myfile.Read(pBuf,dwFileLen);     //MFC   CFile 
+	myfile.Read(pBuf,dwFileLen);     //MFC   CFile 类 很方便
 	myfile.Close();
 	//MessageBox(pBuf);
 	char * temp_point = pBuf;
@@ -12527,7 +12535,7 @@ int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path)
 	CTime temp_time_now = CTime::GetCurrentTime();
 	unsigned long temp_cur_long_time = temp_time_now.GetTime();
 
-	//85 5
+	//如果485 的prg时间 是三天以前的  或者485文件的时间大于现在的时间，这个prg 文件 就不要了;
 	if((temp_cur_long_time - temp_file_time > 259200) || (temp_file_time > temp_cur_long_time))
 	{
 		return -1;
@@ -12540,23 +12548,23 @@ int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path)
 	memcpy(temp_buffer,temp_point,dwFileLen-5);
 
 
-	memcpy(&Device_Basic_Setting.reg,temp_buffer,400); //Setting 00
+	memcpy(&Device_Basic_Setting.reg,temp_buffer,400); //Setting 的400个字节;
     unsigned short * temp_short_point = temp_buffer + 200;
 	for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
 	{
-		memcpy( &m_Output_data.at(i), temp_short_point + i*23,sizeof(Str_out_point));//utput  
+		memcpy( &m_Output_data.at(i), temp_short_point + i*23,sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 	}
     temp_short_point = temp_short_point + BAC_OUTPUT_ITEM_COUNT * 23;
 
 	for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
 	{
-		memcpy(&m_Input_data.at(j), temp_short_point + j*23,sizeof(Str_in_point)); //Input 46 
+		memcpy(&m_Input_data.at(j), temp_short_point + j*23,sizeof(Str_in_point)); //Input 46 个字节 ;
 	}
     temp_short_point = temp_short_point + BAC_INPUT_ITEM_COUNT * 23;
 
     for (int j = 0;j<BAC_VARIABLE_ITEM_COUNT;j++)
     {
-        memcpy(&m_Variable_data.at(j), temp_short_point + j * 20, sizeof(Str_variable_point)); //Input 46 
+        memcpy(&m_Variable_data.at(j), temp_short_point + j * 20, sizeof(Str_variable_point)); //Input 46 个字节 ;
     }
     temp_short_point = temp_short_point + BAC_VARIABLE_ITEM_COUNT * 20;
 
@@ -12566,36 +12574,36 @@ int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path)
 
 void Copy_Data_From_485_to_Bacnet(unsigned short *start_point)
 {
-	memcpy(&Device_Basic_Setting.reg,start_point,400); //Setting 00
+	memcpy(&Device_Basic_Setting.reg,start_point,400); //Setting 的400个字节;
 
 	for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
 	{
-		memcpy( &m_Output_data.at(i),start_point + 200 + i*23,sizeof(Str_out_point));//utput  
+		memcpy( &m_Output_data.at(i),start_point + 200 + i*23,sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 	}
 
 	for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
 	{
-		memcpy(&m_Input_data.at(j),start_point + 200 + 23*64 + j*23,sizeof(Str_in_point)); //Input 46 
+		memcpy(&m_Input_data.at(j),start_point + 200 + 23*64 + j*23,sizeof(Str_in_point)); //Input 46 个字节 ;
 	}
 
-	//memcpy(&Device_Basic_Setting.reg,&read_data_buffer[0],400); //Setting 00
+	//memcpy(&Device_Basic_Setting.reg,&read_data_buffer[0],400); //Setting 的400个字节;
 
 	//for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
 	//{
-	//	memcpy( &m_Output_data.at(i),&read_data_buffer[200 + i*23],sizeof(Str_out_point));//utput  
+	//	memcpy( &m_Output_data.at(i),&read_data_buffer[200 + i*23],sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 	//}
 
 	//for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
 	//{
-	//	memcpy(&m_Input_data.at(j),&read_data_buffer[200 + 23*64 + j*23],sizeof(Str_in_point)); //Input 46 
+	//	memcpy(&m_Input_data.at(j),&read_data_buffer[200 + 23*64 + j*23],sizeof(Str_in_point)); //Input 46 个字节 ;
 	//}
 }
 
 
 char temp_save_modbus_buffer[64 * 1024 + 5];
 char temp_save_modbus_update_buffer[50000];
-//
-//
+//第一个字节 版本
+//然后是 4个字节的 时间 如果时间太久了 也需要重新获取;
 int SaveModbusConfigFile(CString &SaveConfigFilePath)
 {
 	CString FilePath;
@@ -12633,7 +12641,7 @@ int SaveModbusConfigFile(CString &SaveConfigFilePath)
 	unsigned int buffer_length = 3200;
 	unsigned short read_data_buffer[3200];
 	memset(read_data_buffer,0,sizeof(unsigned short)*3200);
-	//output 45 664  + input 46  *64  
+	//output 45 按46算  *64  + input 46  *64  需要读2944;
 	for(int i=0; i<32; i++)
 	{
 		//register_critical_section.Lock();
@@ -12720,28 +12728,28 @@ int SaveModbusConfigFile(CString &SaveConfigFilePath)
 		WriteFile(hFile, temp_save_modbus_buffer,dwFileLen,&dWrites,NULL);
 		CloseHandle(hFile);
 	}
-	else //e;
+	else //第二个参数 如果是Null 就是update;
 	{
 
 		memset(temp_save_modbus_update_buffer,0,50000);
 
-		memcpy(temp_save_modbus_update_buffer,&Device_Basic_Setting.reg,400); //Setting 00
+		memcpy(temp_save_modbus_update_buffer,&Device_Basic_Setting.reg,400); //Setting 的400个字节;
         char * temp_point = NULL;
         temp_point = temp_save_modbus_update_buffer + 400;
 		for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
 		{
             
-            memcpy(temp_point, &m_Output_data.at(i), sizeof(Str_out_point));//utput  
+            memcpy(temp_point, &m_Output_data.at(i), sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
             temp_point = temp_point + 23 * 2;
-			//memcpy(temp_update_buffer + 400 + i*(23*2), &m_Output_data.at(i),sizeof(Str_out_point));//utput  
+			//memcpy(temp_update_buffer + 400 + i*(23*2), &m_Output_data.at(i),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 		}
 
 		for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
 		{
 
-            memcpy(temp_point, &m_Input_data.at(j), sizeof(Str_in_point)); //Input 46 
+            memcpy(temp_point, &m_Input_data.at(j), sizeof(Str_in_point)); //Input 46 个字节 ;
             temp_point = temp_point +  23 * 2;
-			//memcpy(temp_update_buffer + 400 + 23*2*64 + j*23*2,&m_Input_data.at(j),sizeof(Str_in_point)); //Input 46 
+			//memcpy(temp_update_buffer + 400 + 23*2*64 + j*23*2,&m_Input_data.at(j),sizeof(Str_in_point)); //Input 46 个字节 ;
 		}
 
         memcpy(temp_point, temp_data_buffer, 200);
@@ -12752,7 +12760,7 @@ int SaveModbusConfigFile(CString &SaveConfigFilePath)
 
 		memcpy(temp_save_modbus_buffer + 5, temp_save_modbus_update_buffer, 50000/*bufferlength*/);
 		temp_point = temp_point + bufferlength;
-		dwFileLen = bufferlength + 5;//
+		dwFileLen = bufferlength + 5;//这5个字节是 版本和时间 ;
 		hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
 		WriteFile(hFile, temp_save_modbus_buffer,dwFileLen,&dWrites,NULL);
 		CloseHandle(hFile);
@@ -12765,8 +12773,8 @@ int SaveModbusConfigFile(CString &SaveConfigFilePath)
 
 
 
-//
-//
+//第一个字节 版本
+//然后是 4个字节的 时间 如果时间太久了 也需要重新获取;
 void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigned int bufferlength)
 {
 	CString FilePath;
@@ -12820,7 +12828,7 @@ void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigne
 		WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
 		CloseHandle(hFile);
 	}
-	else //e;
+	else //第二个参数 如果是Null 就是update;
 	{
 		char temp_update_buffer[50000];
 		memset(temp_update_buffer,0,50000);
@@ -12838,27 +12846,27 @@ void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigne
 #pragma endregion get_time_area
 
 
-		memcpy(temp_buffer,&Device_Basic_Setting.reg,400); //Setting 00
+		memcpy(temp_buffer,&Device_Basic_Setting.reg,400); //Setting 的400个字节;
 
 
         temp_buffer = temp_buffer + 400;
 		for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
 		{
-			memcpy(temp_buffer + i*(23*2), &m_Output_data.at(i),sizeof(Str_out_point));//utput  
+			memcpy(temp_buffer + i*(23*2), &m_Output_data.at(i),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 		}
         temp_buffer = temp_buffer + BAC_OUTPUT_ITEM_COUNT*(23 * 2);
 		for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
 		{
-			memcpy(temp_buffer + j*23*2,&m_Input_data.at(j),sizeof(Str_in_point)); //Input 46 
+			memcpy(temp_buffer + j*23*2,&m_Input_data.at(j),sizeof(Str_in_point)); //Input 46 个字节 ;
 		}
         temp_buffer = temp_buffer + BAC_INPUT_ITEM_COUNT * 23 * 2;
         for (int j = 0;j<BAC_VARIABLE_ITEM_COUNT;j++)
         {
-            memcpy(temp_buffer + BAC_VARIABLE_ITEM_COUNT*20*2, &m_Variable_data.at(j), sizeof(Str_variable_point)); //variable 39 
+            memcpy(temp_buffer + BAC_VARIABLE_ITEM_COUNT*20*2, &m_Variable_data.at(j), sizeof(Str_variable_point)); //variable 39 个字节 ;
         }
         temp_buffer = temp_buffer + BAC_VARIABLE_ITEM_COUNT * 20 * 2;
 
-		dwFileLen = temp_buffer - temp_update_buffer;//
+		dwFileLen = temp_buffer - temp_update_buffer;//这5个字节是 版本和时间 ;
 		hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
 		WriteFile(hFile, temp_update_buffer,dwFileLen,&dWrites,NULL);
 		CloseHandle(hFile);
@@ -12869,7 +12877,7 @@ void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigne
 }
 
 
-//net 
+//用来初始化bacnet 内存;
 void ClearBacnetData()
 {
     for (int i = 0; i<BAC_INPUT_ITEM_COUNT; i++)
@@ -13051,7 +13059,7 @@ bool IP_is_Local(LPCTSTR ip_address)
 
 
 
-//  
+// 执行程序的路径 // 参数  // 执行环境目录   // 最大等待时间, 超过这个时间强行终止;
 DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirectory, 	DWORD dwMilliseconds)
 {
     SHELLEXECUTEINFO ShExecInfo = {0};
@@ -13068,14 +13076,14 @@ DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirec
     ShellExecuteEx(&ShExecInfo);
     if(dwMilliseconds==0)
     {
-        WaitForSingleObject(ShExecInfo.hProcess,INFINITE);  //
+        WaitForSingleObject(ShExecInfo.hProcess,INFINITE);  //等待进程退出，才继续运行;
     }
-    else if (dwMilliseconds!=0 && WaitForSingleObject(ShExecInfo.hProcess, dwMilliseconds) == WAIT_TIMEOUT)  	// 
+    else if (dwMilliseconds!=0 && WaitForSingleObject(ShExecInfo.hProcess, dwMilliseconds) == WAIT_TIMEOUT)  	// 指定时间没结束;
     {
-        // 
+        // 强行杀死进程;
         TRACE(_T("TerminateProcess        %s"),lpszAppPath);
         TerminateProcess(ShExecInfo.hProcess, 0);
-        return 0;    //
+        return 0;    //强行终止;
     }
 
     DWORD dwExitCode;
@@ -13090,19 +13098,19 @@ DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirec
 
 BOOL KillProcessFromName(CString strProcessName)
 {
-    //32CS_SNAPPROCESS
+    //创建进程快照(TH32CS_SNAPPROCESS表示创建所有进程的快照)
 
     HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
 
 
 
-    //PROCESSENTRY32
+    //PROCESSENTRY32进程快照的结构体
 
     PROCESSENTRY32 pe;
 
 
 
-    //cess32First
+    //实例化后使用Process32First获取第一个快照的进程前必做的初始化操作
 
     pe.dwSize = sizeof(PROCESSENTRY32);
 
@@ -13110,9 +13118,9 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-    //
+    //下面的IF效果同:
 
-    //if(hProcessSnap == INVALID_HANDLE_VALUE)   
+    //if(hProcessSnap == INVALID_HANDLE_VALUE)   无效的句柄
 
     if(!Process32First(hSnapShot,&pe))
 
@@ -13124,13 +13132,13 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-    //
+    //将字符串转换为小写
 
     strProcessName.MakeLower();
 
 
 
-    //
+    //如果句柄有效  则一直获取下一个句柄循环下去
 
     while (Process32Next(hSnapShot,&pe))
 
@@ -13138,7 +13146,7 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-        //pe.szExeFile
+        //pe.szExeFile获取当前进程的可执行文件名称
 
         CString scTmp = pe.szExeFile;
 
@@ -13146,15 +13154,15 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-        //
+        //将可执行文件名称所有英文字母修改为小写
 
         scTmp.MakeLower();
 
 
 
-        //
+        //比较当前进程的可执行文件名称和传递进来的文件名称是否相同
 
-        //mpare
+        //相同的话Compare返回0
 
         if(!scTmp.Compare(strProcessName))
 
@@ -13162,7 +13170,7 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-            //
+            //从快照进程中获取该进程的PID(即任务管理器中的PID)
 
             DWORD dwProcessID = pe.th32ProcessID;
 
@@ -13196,7 +13204,7 @@ BOOL DirectoryExist(CString Path)
     HANDLE hFind = FindFirstFile(Path, &fd);
     if ((hFind != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
     {
-        //
+        //目录存在
         ret = TRUE;
 
     }
@@ -13247,12 +13255,12 @@ BOOL DeleteDirectory(CString path)
     {
         bWorking = finder.FindNextFile();
         //ret=bWorking;
-        if(finder.IsDirectory() && !finder.IsDots()) //
+        if(finder.IsDirectory() && !finder.IsDots()) //处理文件夹
         {
-            DeleteDirectory(finder.GetFilePath()); //
+            DeleteDirectory(finder.GetFilePath()); //递归删除文件夹
             RemoveDirectory(finder.GetFilePath());
         }
-        else //
+        else //处理文件
         {
             DeleteFile(finder.GetFilePath());
         }
@@ -13354,7 +13362,7 @@ CString GetContentFromURL(CString URL)
         char sRecived[1024];
         if(pHttpFile)
         {
-            while(pHttpFile->ReadString((LPTSTR)sRecived, 1024)) //string
+            while(pHttpFile->ReadString((LPTSTR)sRecived, 1024)) //解决Cstring乱码
             {
                 CString temp(sRecived);
                 strHtml += temp;
@@ -13494,13 +13502,13 @@ int Load_Product_Value_Cache(LPCTSTR tem_read_path)
 #endif
 }
 //////////////////////////////////////////////////////////////////////////
-//ipanel
-//LoadTstat_ata
-//
-//
+//这里改成用Minipanel的界面
+//LoadTstat_功能Data的函数都是把数据解析到一个Vector容器里面
+//在界面下面只要把这些数据填充到对于的表里面即可
+//结构中包含了对应的 寄存器地址，寄存器值，寄存器对应意义的字符串值
 // Author:Alex
-//
-//
+//这要这里解析的正确，后面界面操作，对应的也是正确的
+//只要不需要关心寄存器地址等
 //
 //
 //
@@ -13531,7 +13539,7 @@ void LoadTstat_InputData()
     }
     CString strUnit=GetTempUnit();
 
-#if 1//putName
+#if 1//初始化InputName
     strTemp=GetTextFromReg(MODBUS_AI1_CHAR1);
     strTemp.TrimLeft();
     strTemp.TrimRight();
@@ -13689,12 +13697,12 @@ void LoadTstat_InputData()
 #if 1//  g_strSensorName
     if (product_register_value[695] == 0)
     {
-        strTemp.Format(_T("%.1f"), product_register_value[MODBUS_INTERNAL_THERMISTOR] / 10.0);//130   Auto 304
+        strTemp.Format(_T("%.1f"), product_register_value[MODBUS_INTERNAL_THERMISTOR] / 10.0);//130   Auto 的时候用 130时 154校准
         temp_tstat_input.Calibration.regAddress = MODBUS_CALIBRATION_INTERNAL_THERMISTOR ;
     }
     else
     {
-        strTemp.Format(_T("%.1f"), product_register_value[MODBUS_TEMPRATURE_CHIP] / 10.0);//121    Manual 121   153
+        strTemp.Format(_T("%.1f"), product_register_value[MODBUS_TEMPRATURE_CHIP] / 10.0);//121    Manual 用 121   153校准
         temp_tstat_input.Calibration.regAddress = MODBUS_CALIBRATION_TERM;
     }
     if (g_strSensorName.Trim().IsEmpty())
@@ -13757,7 +13765,7 @@ void LoadTstat_InputData()
 
 #endif
 
-#if 1   //ut
+#if 1   //初始化其他的input的其他值
     int nValue=0;
 
     float fValue=0;
@@ -13793,12 +13801,12 @@ void LoadTstat_InputData()
         m_crange=0;
 		strTemp = L"0";
         nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-1];	//189
-        if (nValue == 139)  //0V  
+        if (nValue == 139)  //如果选择 10V电压  原本是128+ 14  板子却对应 139 的值;
             nValue = 14;
         else
-            nValue &= 0x7F;//
+            nValue &= 0x7F;//去掉最高位
 
-        //2018 04 02 Fandu 
+        //2018 04 02 Fandu 增加此异常处理 ，若不加，当值异常时，程序崩溃.
         int nsize = sizeof(analog_range_TSTAT6) / sizeof(analog_range_TSTAT6[0]);
         if (nValue >= nsize)
             nValue = 0;
@@ -13931,7 +13939,7 @@ void LoadTstat_InputData()
         }
         else if (m_crange == 0)
         {
-            m_tstat_input_data.at(i - 1).Unit.StrValue = _T("Volts");   //TSTAT input ange used it 
+            m_tstat_input_data.at(i - 1).Unit.StrValue = _T("Volts");   //TSTAT input 在range 选择为unused 的时候  unit 显示为电压;
         }
         else
         {
@@ -13945,7 +13953,7 @@ void LoadTstat_InputData()
         m_tstat_input_data.at(i-1).Value.RegValue=product_register_value[MODBUS_ANALOG_INPUT1+i-1];
         if (nUnitValue == 0)
         {
-            CString temp_value;   //2018 08 20 ange  
+            CString temp_value;   //2018 08 20 在range 为0 的时候 输入值 显示为电压 保留两位小数;
             temp_value.Format(_T("%.2f"), ((float)product_register_value[MODBUS_ANALOG_INPUT1 + i - 1])/100);
             m_tstat_input_data.at(i - 1).Value.StrValue = temp_value;
         }
@@ -14434,7 +14442,7 @@ void LoadTstat_OutputData()
     //	output6, bit 6 correspond to output7. 0, auto mode; 1, manual mode."
     int nAMVAlue=0;//=product_register_value[310];
     nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
-    //Row 1-3 aluege
+    //Row 1-3 初始化 Value，A/M，Range
     for(int i=1; i<=3; i++)
     {
         //int temp=1<<(i-1);
@@ -14463,12 +14471,12 @@ void LoadTstat_OutputData()
 			CppSQLite3Query q;
 			SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
             
-            if (SqliteDBT3000.tableExists("Value_Range"))//ersion
+            if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
             {
                 CString sql;
                 sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),i,i,m_sn);
                 q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
-                if (!q.eof())//
+                if (!q.eof())//有表但是没有对应序列号的值
                 {
                    
                     while (!q.eof())
@@ -14551,7 +14559,7 @@ void LoadTstat_OutputData()
         }
         else
         {
-            ////comments by Fance ,48 -98
+            ////comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
 			 
 				 
             int nValueTemp = 0;
@@ -14595,7 +14603,7 @@ void LoadTstat_OutputData()
 #if 1
     for(int i=0; i<OUTPUT_NUMBER; i++)
     {
-        int nFun=0;//=product_register_value[328];//tstat6
+        int nFun=0;//=product_register_value[328];//tstat6找不到对应的
         nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION+i]; //328   266
         strTemp=ONTPUT_FUNS[0];
         if(nFun>=0&&nFun<5)
@@ -14635,12 +14643,12 @@ void LoadTstat_OutputData()
 		CppSQLite3Table table;
 		CppSQLite3Query q;
 		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-        if (SqliteDBT3000.tableExists("Value_Range"))//ersion
+        if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
         {
             CString sql;
             sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),4,4,m_sn);
              q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
-            if (!q.eof())//
+            if (!q.eof())//有表但是没有对应序列号的值
             {
                  
                 while (!q.eof())
@@ -14689,7 +14697,7 @@ void LoadTstat_OutputData()
     m_tstat_output_data.at(3).Range.RegValue=product_register_value[MODBUS_MODE_OUTPUT4];
     m_tstat_output_data.at(3).Range.StrValue=strTemp;
 
-    if(nRange == 0||nRange==4||nRange==5||nRange==6) // || !(nAMVAlue & 8)AMo
+    if(nRange == 0||nRange==4||nRange==5||nRange==6) // || !(nAMVAlue & 8)AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
     {
         // output is on/off
 
@@ -14721,7 +14729,7 @@ void LoadTstat_OutputData()
     }
     else // output is value
     {
-        //comments by Fance ,48 -98
+        //comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
         int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
         strTemp.Format(_T("%d%%"), nValueTemp);
         m_tstat_output_data.at(3).Value.regAddress=MODBUS_PWM_OUT4;
@@ -14757,12 +14765,12 @@ void LoadTstat_OutputData()
 		CppSQLite3Table table;
 		CppSQLite3Query q;
 		SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-        if (SqliteDBT3000.tableExists("Value_Range"))//ersion
+        if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
         {
             CString sql;
             sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),5,5,m_sn);
             q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
-            if (!q.eof())//
+            if (!q.eof())//有表但是没有对应序列号的值
             {
 				 
 				while (!q.eof())
@@ -14849,7 +14857,7 @@ void LoadTstat_OutputData()
     }
     else
     {
-        int nValueTemp=product_register_value[MODBUS_PWM_OUT5];	//tstat649 ,599
+        int nValueTemp=product_register_value[MODBUS_PWM_OUT5];	//tstat6没有找到	349 ,599
         strTemp.Format(_T("%d%%"), nValueTemp);
 
         m_tstat_output_data.at(4).Value.regAddress=MODBUS_PWM_OUT5;
@@ -15000,7 +15008,7 @@ void LoadTstat_OutputData()
             nValue = product_register_value[MODBUS_COOLING_VALVE]; //102  210
             m_tstat_output_data.at(5).Value.regAddress=MODBUS_COOLING_VALVE;
             m_tstat_output_data.at(5).Value.RegValue=nValue;
-			if( m_tstat_output_data.at(5).Value.RegValue > 1000) //Add by Fance ,t6 
+			if( m_tstat_output_data.at(5).Value.RegValue > 1000) //Add by Fance ,查理说out6 和7 不可能大于100%;
 			{
 				m_tstat_output_data.at(5).Value.RegValue = 1000;
 			}
@@ -15068,7 +15076,7 @@ void LoadTstat_OutputData()
                 nValue = product_register_value[MODBUS_HEATING_VALVE]; //102  210
                 m_tstat_output_data.at(6).Value.regAddress=MODBUS_HEATING_VALVE;
                 m_tstat_output_data.at(6).Value.RegValue=nValue;
-				if( m_tstat_output_data.at(6).Value.RegValue > 1000) //Add by Fance ,t6 
+				if( m_tstat_output_data.at(6).Value.RegValue > 1000) //Add by Fance ,查理说out6 和7 不可能大于100%;
 				{
 					 m_tstat_output_data.at(6).Value.RegValue = 1000;
 				}
@@ -15411,7 +15419,7 @@ void LoadRegistersGraphicMode_AQ()
     g_calibration_module_data.Factory_Hum.regAddress  =	 2004  ;
     g_calibration_module_data.Factory_Hum.StrValue =_T("Humidity(%)");
 
-    //phic
+    //这个是AQ的Graphic的模块
 }
 void LoadRegistersGraphicMode_HUMTEMPSENSOR()
 {
@@ -15450,7 +15458,7 @@ void LoadRegistersGraphicMode_CO2485()
 }
 BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 {
-    //ex
+    //当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
     int linecharnum=0;
     char c;
     int nRet = file.Read(&c, 1);
@@ -15460,9 +15468,9 @@ BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
         ++linecharnum;
         *pBuffer++ = c;
         //TRACE(_T("\n%c"),c);
-        if (c == 0x0d) // 
+        if (c == 0x0d) // 回车
         {
-            file.Read(&c, 1);  // 
+            file.Read(&c, 1);  // 读一个换行
             *pBuffer++ = c;
             TRACE(_T("%s"),pBuffer);
             return TRUE;
@@ -15495,7 +15503,7 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 //*****************inspect the file*********************
 
 
-    DWORD dwHiAddr = 0; // 
+    DWORD dwHiAddr = 0; // 高位地址
     char readbuffer[256];
     ZeroMemory(readbuffer, 256);
     unsigned	char m_DeviceInfor[20];
@@ -15517,12 +15525,12 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
             //get hex data,it is get from the line char
             //the number is (i-1)
             //int nLen = strGetData.GetLength();
-            for(UINT i=0; i<strlen(readbuffer); i++) // 
+            for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
             {
                 readbuffer[i]=readbuffer[i+1];
             }
 
-            int nLen = strlen(readbuffer)-2; // 
+            int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
             if(strlen(readbuffer)%2==0)
                 turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int
             else
@@ -15819,7 +15827,7 @@ BOOL ShowBacnetView(unsigned char product_type)
 		return false;
 }
 
-//
+//检测字穿是否全是数字;
 BOOL AllCharactorIsDigital(LPCTSTR lpszSrc)
 {
 	CString Src = lpszSrc;
@@ -15871,7 +15879,7 @@ CString GetGUID()
 //the return value == -5 ,the input have some trouble
 //the return value == -6 , the bus has bannet protocol,scan stop;
 //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-//
+//清空串口缓冲区
 //the return value is the register address
 //Sleep(50);       //must use this function to slow computer
 int g_CheckTstatOnline_nocritical(unsigned char  devLo, unsigned char devHi, bool bComm_Type, int ncomport)
@@ -15944,7 +15952,7 @@ int handle_bacnet_to_modbus_data(char *npoint, int nlength)
     if (bacnet_to_modbus_struct.nlength <= 200)
     {
         memcpy(bacnet_to_modbus_struct.ndata, my_temp_point, 2 * bacnet_to_modbus_struct.nlength);
-        //
+        //因为下位机回传的大小端与电脑相反,需要转换为以下位机的为准
         for (int i = 0; i < nlength; i++)
         {
             bacnet_to_modbus_struct.ndata[i] = htons(bacnet_to_modbus_struct.ndata[i]);
@@ -15960,7 +15968,7 @@ int handle_bacnet_to_modbus_data(char *npoint, int nlength)
 
 bool Open_Socket_Retry(CString strIPAdress, short nPort,int retry_time)
 {
-    close_bac_com();//
+    close_bac_com();//只要建立 网络连接，就清空串口设置 以及串口的连接;
     for (int i = 0; i < retry_time; i++)
     {
         bool nreslts = false;
@@ -16051,7 +16059,7 @@ unsigned int GetDeviceInstance(unsigned char pid_type)
 
 }
 
-//us ID
+//修改数据库中的modbus ID
 int ChangeModbusDB(unsigned int nserialnumber, int nmodbusid, LPCTSTR Dbpath)
 {
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -16071,7 +16079,7 @@ int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bac
                          unsigned char modbus_id,
                          unsigned short nreg_address,
                          unsigned short nreg_value,
-                         unsigned char sub_device,         // 
+                         unsigned char sub_device,         // 如果是子设备  ，数据库中的协议 比较特殊;
                          LPCTSTR Dbpath)
 {
 
@@ -16088,7 +16096,7 @@ int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bac
     return 1;
 }
 
-//net object instance;
+//获取产品对应的 bacnet object instance;
 int Get_Instance_Reg_Map(int product_type , unsigned short &temp_high , unsigned short &temp_low)
 {
     CString temp_cs;
@@ -16102,7 +16110,7 @@ int Get_Instance_Reg_Map(int product_type , unsigned short &temp_high , unsigned
     }
     else
     {
-        temp_cs = _T("37,38");//  
+        temp_cs = _T("37,38");// 如果没有默认按照从37 38 寄存器
     }
 
     CStringArray temparray;
@@ -16190,7 +16198,7 @@ int Initial_Function()
     return 1;
 }
 
-//
+//检查某个产品 ，在某种协议下，是否支持某种功能
 int Check_Function(int product_id, unsigned char nprotocol, FunctionNumber function_number)
 {
     if ((product_id >= 255) || (nprotocol >= 10) || (function_number > 20))
@@ -16209,7 +16217,7 @@ int PanelName_Map(int product_type)
         return test1;
     }
 
-    return 715; // 8
+    return 715; // 如果没有默认按照从715 开始 8个寄存器.
 }
 
 
@@ -16221,7 +16229,7 @@ int Get_Msv_next_Name_and_Value_BySearchName(int ntable, CString nitemname, CStr
     int index = -1;
     for (int i = 0; i < STR_MSV_MULTIPLE_COUNT; i++)
     {
-        if (m_msv_data.at(ntable).msv_data[i].status == 1) //
+        if (m_msv_data.at(ntable).msv_data[i].status == 1) //首先要确保 这一行是使能的;
         {
             CString temp_name;
             MultiByteToWideChar(CP_ACP, 0, (char *)m_msv_data.at(ntable).msv_data[i].msv_name,
@@ -16234,7 +16242,7 @@ int Get_Msv_next_Name_and_Value_BySearchName(int ntable, CString nitemname, CStr
             if(nitemname.CompareNoCase(temp_name) == 0)
             //if (nitemvalue == m_msv_data.at(ntable).msv_data[i].msv_value)
             {
-                //
+                //顺着找一遍 ,找到对应的下一个;
                 for (int j = i + 1; j < STR_MSV_MULTIPLE_COUNT; j++)
                 {
                     if (m_msv_data.at(ntable).msv_data[j].status == 1)
@@ -16245,7 +16253,7 @@ int Get_Msv_next_Name_and_Value_BySearchName(int ntable, CString nitemname, CStr
                     }
                 }
 
-                //
+                //如果顺着找没有找到，就回到顺着的第一个;
                 for (int j = 0; j < i; j++)
                 {
                     if (m_msv_data.at(ntable).msv_data[j].status == 1)
@@ -16271,11 +16279,11 @@ int Get_Msv_next_Name_and_Value_BySearchValue(int ntable, int nitemvalue, CStrin
     int index = -1;
     for (int i = 0; i < STR_MSV_MULTIPLE_COUNT; i++)
     {
-        if (m_msv_data.at(ntable).msv_data[i].status == 1) //
+        if (m_msv_data.at(ntable).msv_data[i].status == 1) //首先要确保 这一行是使能的;
         {
             if (nitemvalue == m_msv_data.at(ntable).msv_data[i].msv_value)
             {
-                //
+                //顺着找一遍 ,找到对应的下一个;
                 for (int j = i+1; j < STR_MSV_MULTIPLE_COUNT; j++)
                 {
                     if (m_msv_data.at(ntable).msv_data[j].status == 1)
@@ -16286,7 +16294,7 @@ int Get_Msv_next_Name_and_Value_BySearchValue(int ntable, int nitemvalue, CStrin
                     }
                 }
 
-                //
+                //如果顺着找没有找到，就回到顺着的第一个;
                 for (int j = 0; j < i; j++)
                 {
                     if (m_msv_data.at(ntable).msv_data[j].status == 1)
@@ -16309,7 +16317,7 @@ int Get_Msv_Item_Name(int ntable, int nitemvalue,CString &csItemString)
         return  -1;
     for (int i = 0; i < STR_MSV_MULTIPLE_COUNT; i++)
     {
-        if (m_msv_data.at(ntable).msv_data[i].status == 1) //
+        if (m_msv_data.at(ntable).msv_data[i].status == 1) //首先要确保 这一行是使能的;
         {
             if (nitemvalue == m_msv_data.at(ntable).msv_data[i].msv_value)
             {
@@ -16336,14 +16344,14 @@ void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
         {
 #if 1
             //**********************************************************
-            //2019 05 20 Fance 
+            //2019 05 20 Fance 用于处理 电脑勾选了夏令时 引起的 T3 显示时间 与实际时间总是相差一小时的问题;
             
             GetTimeZoneInformation(&tzi);
             computer_DaylightBias = tzi.DaylightBias * 60;
             //**********************************************************
             panel_time_to_basic_delt = Device_Basic_Setting.reg.time_zone * 360 / 10;
 
-            //ateTimeCtrl 
+            //因为本地CDateTimeCtrl 在设置时间的时候 会默认 加上 电脑的时区，但是显示的时候要显示 设备所选时区，所以 要 变换.
             time_t scale_time;
             if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
                 scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;
@@ -16382,13 +16390,13 @@ void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
                 //if ((day_of_year > 73) && (day_of_year < 311))
                 if(check_daylight)
                 {
-                    scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //
+                    scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt + 3600; //如果选中夏令时 需要显示的时候加一个小时
                 }
                 else
-                    scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; //
+                    scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; //如果选中夏令时 需要显示的时候加一个小时
             }
             else
-                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 
+                scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt; // 其他值当作没有夏令时处理.
             TimeTemp = scale_time + computer_DaylightBias;
 #endif
         }
@@ -16439,7 +16447,7 @@ int Check_DaXiaoDuan(unsigned char npid, unsigned char Mainsw, unsigned char sub
 //        {
 //            if (m_msv_data.at(msv_count).msv_data[k].msv_value == nvalue_this)
 //            {
-//                int first_loop = 0; // 
+//                int first_loop = 0; // 向后的第一圈
 //                for (int i = k + 1; i < STR_MSV_MULTIPLE_COUNT; i++)
 //                {
 //                    if (m_msv_data.at(msv_count).msv_data[i].status == 1)
@@ -16477,7 +16485,7 @@ int Get_Msv_Table_Name(int x)
 {
     if (x >= BAC_MSV_COUNT + 1)
         return -1;
-    int index = 0; //AAB/CC
+    int index = 0; //最多显示三个  例如AAA/BB/CC
     Custom_Msv_Range[x].Empty();
     for (int k = 0; k < STR_MSV_MULTIPLE_COUNT; k++)
     {
@@ -16508,10 +16516,10 @@ int Get_Msv_Table_Name(int x)
 }
 
 
-// 
-int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //
+//返回值   判断输出类型  是数字的还是模拟的 还是扩展的  
+int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获取输出状态
 {
-    //portindex 
+    //portindex 采用1为基址 ;
     int nret_type = 0;
     switch (nproductid)
     {
@@ -16712,10 +16720,10 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //
     return nret_type;
 }
 
-//
-int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n_digital_analog) //
+//返回值 判断类型  是数字的还是模拟的 还是扩展的  
+int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n_digital_analog) //获取输出状态
 {
-    //portindex 
+    //portindex 采用1为基址 ;
     int nret_type = 0;
     switch (nproductid)
     {
@@ -17109,7 +17117,7 @@ void Initial_All_Point()
         Str_program_point temp_program = { 0 };
         memset(&temp_program, 0, sizeof(temp_program));
         sprintf((char*)temp_program.description, "PRG%d", i + 1);
-        temp_program.bytes = 0;//
+        temp_program.bytes = 0;//初始化时默认为400的长度，避免读不到数据;
         m_Program_data.push_back(temp_program);
     }
 
@@ -17330,7 +17338,7 @@ void VariableDataToString(Str_variable_point source_variable, Variable_CString* 
             float temp_float_value1;
             temp_float_value1 = ((float)source_variable.value) / 1000;
             get_name_ret = Get_Msv_Item_Name(source_variable.range - 101, (int)temp_float_value1, cstemp_value2);
-            if (get_name_ret < 0)  //
+            if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
                 cstemp_value2.Format(_T("%.3f"), temp_float_value1);
             ret_string->value = cstemp_value2;
         }
@@ -17366,7 +17374,7 @@ void VariableDataToString(Str_variable_point source_variable, Variable_CString* 
     }
     else
     {
-        if (source_variable.range == 20)	//
+        if (source_variable.range == 20)	//如果是时间;
         {
             ret_string->units = Variable_Analog_Units_Array[source_variable.range];
             char temp_char[50];
@@ -17419,7 +17427,7 @@ void VariableDataToString(Str_variable_point source_variable, Variable_CString* 
             float temp_float_value1;
             temp_float_value1 = ((float)source_variable.value) / 1000;
             get_name_ret = Get_Msv_Item_Name(source_variable.range - 101, (int)temp_float_value1, cstemp_value2);
-            if (get_name_ret < 0)  //
+            if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
                 cstemp_value2.Format(_T("%.3f"), temp_float_value1);
             ret_string->value = cstemp_value2;
         }
@@ -17593,16 +17601,16 @@ int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npane
         dwFileLen = myfile.GetLength();
         pBuf = new char[dwFileLen + 1];
         pBuf[dwFileLen] = 0;
-        myfile.Read(pBuf, dwFileLen);     //MFC   CFile 
+        myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
         myfile.Close();
-        if (dwFileLen == 2048) //OG
+        if (dwFileLen == 2048) //正常的PROG文件大小都会比60000大,防止读取文件出错
         {           
             return -3;
         }
         char* temp_buffer = pBuf;
         bool b_new_prg = false;
         int ntemp_version = 0;
-        if (((unsigned char)temp_buffer[0] == 0x55) && ((unsigned char)temp_buffer[1] == 0xff))//g
+        if (((unsigned char)temp_buffer[0] == 0x55) && ((unsigned char)temp_buffer[1] == 0xff))//新版本的prg
         {
             temp_buffer = temp_buffer + 2;
             if (temp_buffer[0] >= 8)
@@ -17840,7 +17848,7 @@ panel_range_str WebView_Input_range[BAC_INPUT_ITEM_COUNT];
 
 
 
-int LoadPanelRange(unsigned char npanel)  //elange 
+int LoadPanelRange(unsigned char npanel)  //分离出每个panel的  range 标签
 {
     if ((npanel < 0) || npanel >= 255)
         return -1;
@@ -17877,8 +17885,8 @@ int LoadPanelRange(unsigned char npanel)  //elange
             }
             else if ((g_Input_data[npanel].at(i).range >= 23) && (g_Input_data[npanel].at(i).range <= 30))
             {
-                //el igital_Range[i] = cus_digital_off[i] + _T("/") + cus_digital_on[i];
-                //el
+                //如果是选中panel 就可以直接使用 Custom_Digital_Range[i] = cus_digital_off[i] + _T("/") + cus_digital_on[i];
+                //否则需要从panel中读取;
                 if (npanel == bac_gloab_panel)
                 {
                     WebView_Input_range[i].Ranges.digital_range.range_name = Custom_Digital_Range[g_Input_data[npanel].at(i).range - 23];
@@ -17917,8 +17925,8 @@ int LoadPanelRange(unsigned char npanel)  //elange
                 if (npanel == bac_gloab_panel)
                 {
                     WebView_Input_range[i].Ranges.analog_range.range_name = Analog_Customer_Units[g_Input_data[npanel].at(i).range - 20];
-                    WebView_Input_range[i].Ranges.analog_range.range_max = 9999; //
-                    WebView_Input_range[i].Ranges.analog_range.range_min = 0; //
+                    WebView_Input_range[i].Ranges.analog_range.range_max = 9999; //待定
+                    WebView_Input_range[i].Ranges.analog_range.range_min = 0; //待定
                     //WebView_Input_range[i].Ranges.analog_range.unites = m_analog_custmer_range.at(g_Input_data[npanel].at(i).range - 20).table_name;
                 }
 			}
@@ -17934,7 +17942,7 @@ int LoadPanelRange(unsigned char npanel)  //elange
 
 }
 
-int LoadOnlinePanelData(unsigned char npanel)  //og
+int LoadOnlinePanelData(unsigned char npanel)  //从缓存prog文件中加载所有在线设备的数据;
 {
     int nret = -1;
     for (int i = 0; i < g_bacnet_panel_info.size(); i++)

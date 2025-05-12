@@ -138,7 +138,7 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg void OnRclick(NMHDR* pNMHDR, LRESULT* pResult);
-	void CheckClickNode(HTREEITEM hItem, BM_nodeinfo & nodeinfo); //
+	void CheckClickNode(HTREEITEM hItem, BM_nodeinfo & nodeinfo); //给管理模式使用的功能
 	void SetSelectSerialNumber(unsigned int nserial);
 	unsigned int GetSelectSerialNumber();
 	unsigned int m_serial_number;
@@ -161,16 +161,16 @@ public:
 	CString strmyTipText;
 
 	private:
-		CImageList	m_ImageList;		//
-		CImageList* m_pDragImage;		//
-		DWORD		m_dwDrawStart;		//
-		HTREEITEM	m_hDragSrc;			//
-		HTREEITEM	m_hDragDist;		//
-		bool		m_bDraged;			//
-		UINT		m_nMsMoveTimerID;	//
-		UINT		m_nScrollTimerID;	//
-		UINT		m_nTicks;			//
-		CPoint		m_ptMouseMove;		//
+		CImageList	m_ImageList;		//节点图标
+		CImageList* m_pDragImage;		//拖动是的图像列表
+		DWORD		m_dwDrawStart;		//开始拖动时刻
+		HTREEITEM	m_hDragSrc;			//被拖动节点
+		HTREEITEM	m_hDragDist;		//接收拖动的节点
+		bool		m_bDraged;			//拖动标识符
+		UINT		m_nMsMoveTimerID;	//检测鼠标移动的定时器
+		UINT		m_nScrollTimerID;	//滚动检测定时器
+		UINT		m_nTicks;			//计算滚动历时
+		CPoint		m_ptMouseMove;		//鼠标位置
 
 		afx_msg void OnBegindrag(NMHDR* pNMHDR, LRESULT* pResult);
 		afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
@@ -190,7 +190,7 @@ public:
 };
 
 #define TVINSERV_SMALL_CASE        {tvInsert.item.iImage=35;tvInsert.item.iSelectedImage=35;}//Air flow
-#define TVINSERV_CO2_NODE        {tvInsert.item.iImage=18;tvInsert.item.iSelectedImage=18;}// Co2Node  CO2 
+#define TVINSERV_CO2_NODE        {tvInsert.item.iImage=18;tvInsert.item.iSelectedImage=18;}// Co2Node 小方盒 使用CO2 的图标
 #define TREE_IMAGE_INPUT_ONLINE   37
 #define TREE_IMAGE_INPUT_OFFLINE  38
 #define TREE_IMAGE_INPUT_UNKNOWN  39

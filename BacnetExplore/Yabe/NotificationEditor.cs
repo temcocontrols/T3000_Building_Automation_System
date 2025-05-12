@@ -310,7 +310,7 @@ namespace Yabe
             base.Dispose(disposing);
         }
 
-        #region Code gnr par le Concepteur de composants
+        #region Code généré par le Concepteur de composants
 
         private void InitializeComponent()
         {

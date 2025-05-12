@@ -172,7 +172,7 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
          }
 
 		//GetNewIP(strnewipadress,allsubnets[i].StrIP);
-		if (strnewipadress.Find(_T("0.0.0"))!=-1)//0.0.0.0
+		if (strnewipadress.Find(_T("0.0.0"))!=-1)//对0.0.0.0的过滤掉
 		{
 			return FALSE;
 		}
@@ -210,7 +210,7 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 		WideCharToMultiByte( CP_ACP, 0, local_enthernet_ip.GetBuffer(), -1, local_network_ip, 255, NULL, NULL );
 		h_siBind.sin_family=AF_INET;
 		h_siBind.sin_addr.s_addr =  inet_addr(local_network_ip);
-		if( -1 == bind(h_scan_Broad,(SOCKADDR*)&h_siBind,sizeof(h_siBind)))//Socket  
+		if( -1 == bind(h_scan_Broad,(SOCKADDR*)&h_siBind,sizeof(h_siBind)))//把网卡地址强行绑定到Socket  
 		{
 			//MessageBox(_T("Network Initial Fail"));
 			ret= FALSE;
@@ -295,7 +295,7 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 			if(nRet > 0)
 			{		
 				FD_ZERO(&fdSocket);
-				if(buffer[0]==0x67)//
+				if(buffer[0]==0x67)//收到正确的回复了
 				{	
 				
 				SaveNewIPAddress(strnewipadress,stroldipaddress);
@@ -386,9 +386,9 @@ void CTroubleShootDlg::SaveNewIPAddress(CString newip,CString oldip){
 	{
 		CString strSql;
 		////////////////////////////////////////////////////////////////////////////////////////////
-		//
+		//获取数据库名称及路径
 		/////////////////////////////////////////////////////////////////////////////////////////////////
-		//
+		//连接数据库
 	    
 		strSql.Format(_T("select * from ALL_NODE where Bautrate='%s' "),oldip);
 		//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
@@ -530,7 +530,7 @@ void CTroubleShootDlg::OnPaint()
 
 void CTroubleShootDlg::OnBnClickedChangeIdOk()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     b_changeip_ok = false;
     SetTimer(1, 1000 ,NULL);
     GetDlgItem(ID_CHANGE_ID_OK)->EnableWindow(false);
@@ -540,7 +540,7 @@ void CTroubleShootDlg::OnBnClickedChangeIdOk()
 
 void CTroubleShootDlg::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: /
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
     switch (nIDEvent)
     {
     case 1:

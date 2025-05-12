@@ -40,7 +40,7 @@ public:
 	CTStatScanner*		m_pScaner;
 	ListCtrlEx::CListCtrlEx m_scan_com_list;
     CStaticEx m_waiting_title;
-    int n_time_count; //
+    int n_time_count; //用于计数。
     afx_msg void OnSize(UINT nType, int cx, int cy);
 };
 

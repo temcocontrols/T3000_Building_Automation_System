@@ -2,23 +2,23 @@
 #include "CM5/ListCtrlEx.h"
 #include "afxcmn.h"
 
-// CBacnet_Range_Msv 
+// CBacnet_Range_Msv 对话框
 
 class CBacnet_Range_Msv : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnet_Range_Msv)
 
 public:
-	CBacnet_Range_Msv(CWnd* pParent = NULL);   // 
+	CBacnet_Range_Msv(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBacnet_Range_Msv();
 
-// 
+// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_RANGE_MSV };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:

@@ -2,23 +2,23 @@
 #include "afxcmn.h"
 #include "CM5\CStatic\staticex.h"
 #include "CM5/ListCtrlEx.h"
-// CBacnetProperty 
+// CBacnetProperty 对话框
 
 class CBacnetProperty : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnetProperty)
 
 public:
-	CBacnetProperty(CWnd* pParent = NULL);   // 
+	CBacnetProperty(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBacnetProperty();
 
-// 
+// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_PROPERTY };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:

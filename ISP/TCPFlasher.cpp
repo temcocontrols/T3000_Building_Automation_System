@@ -113,16 +113,16 @@ UINT _TCPFlashFunc(PVOID pParam)
 	ZeroMemory(pRecBuf, 16);
 
 	int nNetTimeout = 3000;
-	//
+	//发送时限
 	setsockopt(sockSend,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
-	//
+	//接收时限
 	setsockopt(sockSend,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
 	int nRet = ::send(sockSend, (char*)(TCPFLASH_INPUT_START), 7, 0);
 
 	nRet = ::recv(sockSend, pRecBuf, 16, 0);
 	
-	if (nRet == SOCKET_ERROR)  // 
+	if (nRet == SOCKET_ERROR)  // 如果接受不对
 	{
 		pFlasher->ShowFlashInfo(_T("Send flash command failed. Please retry."), TRUE);
 		::closesocket(sockSend);
@@ -153,7 +153,7 @@ UINT _TCPFlashFunc(PVOID pParam)
 		}
 	}
 	//////////////////////////////////////////////////////////////////////////
-	// 
+	// 结束标记
 	nRet = ::send(sockSend, (char*)(TCPFLASH_INPUT_END), 7, 0);
 
 	//////////////////////////////////////////////////////////////////////////

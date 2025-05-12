@@ -205,20 +205,20 @@ static void dlmstp_receive_fsm_task(
 
 //
 ///**
-//* Description:
+//* Description:数组去重算法
 //*/
 //int arraydiff(unsigned char *A, unsigned char max, int len)
 //{
 //    unsigned char arrayflag[256];
 //    int i, j;
 //
-//    //
+//    //初始化标志数组
 //    for (i = 0; i <= max; i++)
 //    {
 //        arrayflag[i] = false;
 //    }
 //
-//    //
+//    //剔除算法
 //    for (i = 0; i < len; i++)
 //    {
 //        arrayflag[A[i]] = A[i];
@@ -229,7 +229,7 @@ static void dlmstp_receive_fsm_task(
 //        A[i] = 0;
 //    }
 //
-//    //
+//    //取出有效数
 //    for (i = 0, j = 0; i <= max; i++)
 //    {
 //        if (arrayflag[i] != false)

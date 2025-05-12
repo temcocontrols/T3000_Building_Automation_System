@@ -40,7 +40,7 @@ int CTStat_Dev::WriteMultiReg(int nRegAddrStart, int nRegAddrEnd, OUT int* nVal)
 
 
 
-// 
+// 也必须通过读写寄存器来实现
 BOOL CTStat_Dev::IsOnLine()
 {
 	return FALSE;

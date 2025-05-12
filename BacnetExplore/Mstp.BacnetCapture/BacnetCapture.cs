@@ -84,7 +84,7 @@ namespace Mstp.BacnetCapture
                 }
 
             System.Windows.Forms.ToolTip ToolTip1 = new System.Windows.Forms.ToolTip();
-            ToolTip1.SetToolTip(this, " Frederic Chaxel, Morten Kvistgaard 2015\r\n MIT License\r\n Thanks to http://icons8.com/");
+            ToolTip1.SetToolTip(this, "© Frederic Chaxel, Morten Kvistgaard 2015\r\n MIT License\r\n Thanks to http://icons8.com/");
 
             toFrench();
             treeView.TreeViewNodeSorter = new TreeNodeSorter(); // Specific TreeView sorter
@@ -101,8 +101,8 @@ namespace Mstp.BacnetCapture
             if (Application.CurrentCulture.TwoLetterISOLanguageName == "fr")
             {
 
-                label1.Text = "Wireshark doit tre  l'coute sur le Pipeline :";
-                label2.Text = "Port Srie :";
+                label1.Text = "Wireshark doit être à l'écoute sur le Pipeline :";
+                label2.Text = "Port Série :";
                 label3.Text = "Vitesse :";
                 label4.Text = "Filtre de suppression";
                 label5.Text = "Statistiques d\'envois";

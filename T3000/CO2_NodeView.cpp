@@ -1,4 +1,4 @@
-// CO2_NodeView.cpp : 
+// CO2_NodeView.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include "MainFrm.h"
 #include "CO2_AUTO_CALIBRATION.h"
 // CCO2_NodeView
-extern tree_product selected_product_Node; // ;
+extern tree_product selected_product_Node; // 选中的设备信息;
 IMPLEMENT_DYNCREATE(CCO2_NodeView, CFormView)
 
 int CO2_MODBUS_CO2_BKCAL_ONOFF = 500;
@@ -102,7 +102,7 @@ BEGIN_MESSAGE_MAP(CCO2_NodeView, CFormView)
 END_MESSAGE_MAP()
 
 
-// CCO2_NodeView 
+// CCO2_NodeView 诊断
 
 #ifdef _DEBUG
 void CCO2_NodeView::AssertValid() const
@@ -119,7 +119,7 @@ void CCO2_NodeView::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 HANDLE h_co2_node_thread = NULL;
-// CCO2_NodeView 
+// CCO2_NodeView 消息处理程序
 void CCO2_NodeView::Fresh()
 {
     CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -251,7 +251,7 @@ void CCO2_NodeView::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
 
-    // TODO: /
+    // TODO: 在此添加专用代码和/或调用基类
     Initial_List();
     
 }
@@ -510,7 +510,7 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
     CString cs_Hum_value;
     cs_co2_value.Format(_T("%u"), product_register_value[108]);
 
-    //125 0 C   1F
+    //125寄存器 为0 则为C   1为F
     //if (product_register_value[124] == 0)
     //{
     //    if (product_register_value[125] == 0)
@@ -943,41 +943,41 @@ void CCO2_NodeView::Show_Main_radio()
 
 void CCO2_NodeView::OnEnChangeEditCo2NodeModbusId()
 {
-    // TODO:   RICHEDIT 
-    //  CFormView::OnInitDialog()
-    //  CRichEditCtrl().SetEventMask()
-    //  ENM_CHANGE 
+    // TODO:  如果该控件是 RICHEDIT 控件，它将不
+    // 发送此通知，除非重写 CFormView::OnInitDialog()
+    // 函数并调用 CRichEditCtrl().SetEventMask()，
+    // 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 
 }
 
 void CCO2_NodeView::OnEnChangeEditCo2NodeRollTimeInterval()
 {
-    // TODO:   RICHEDIT 
-    //  CFormView::OnInitDialog()
-    //  CRichEditCtrl().SetEventMask()
-    //  ENM_CHANGE 
+    // TODO:  如果该控件是 RICHEDIT 控件，它将不
+    // 发送此通知，除非重写 CFormView::OnInitDialog()
+    // 函数并调用 CRichEditCtrl().SetEventMask()，
+    // 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-    // TODO:  
+    // TODO:  在此添加控件通知处理程序代码
 
 }
 
 
 void CCO2_NodeView::OnEnChangeEditCo2NodeBacklightTime()
 {
-    // TODO:   RICHEDIT 
-    //  CFormView::OnInitDialog()
-    //  CRichEditCtrl().SetEventMask()
-    //  ENM_CHANGE 
+    // TODO:  如果该控件是 RICHEDIT 控件，它将不
+    // 发送此通知，除非重写 CFormView::OnInitDialog()
+    // 函数并调用 CRichEditCtrl().SetEventMask()，
+    // 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-    // TODO:  
+    // TODO:  在此添加控件通知处理程序代码
 
 }
 
 
 void CCO2_NodeView::OnCbnSelchangeComboCo2NodeBaudrate()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_CO2_NODE_BAUDRATE))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_CO2_NODE_BAUDRATE))->GetLBText(nSel, temp_string);
@@ -994,7 +994,7 @@ void CCO2_NodeView::OnCbnSelchangeComboCo2NodeBaudrate()
     int nret = write_one(g_tstat_id, 15, temp_baudrate);
     Sleep(1000);
     unsigned short temp_array[200];
-    Read_Multi(g_tstat_id, temp_array, 0, 100);  //Bug , CO2Node baudrate 
+    Read_Multi(g_tstat_id, temp_array, 0, 100);  //Bug , CO2Node 一定要在用以前的读一下，新的baudrate 才能用
     if (nret <= 0)
     {
         MessageBox(_T("Change baudrate failed!"));
@@ -1030,7 +1030,7 @@ void CCO2_NodeView::OnCbnSelchangeComboCo2NodeBaudrate()
 
 void CCO2_NodeView::OnCbnSelchangeComboCo2NodeProtocol()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_string;
     bool  modbus_0_bacnet_1 = 0;
     int sub_node = 0;
@@ -1072,7 +1072,7 @@ void CCO2_NodeView::OnCbnSelchangeComboCo2NodeProtocol()
 
 void CCO2_NodeView::OnCbnSelchangeComboCo2NodeTemperatureUnit()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
 
     CString temp_cs;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_CO2_NODE_TEMPERATURE_UNIT))->GetCurSel();
@@ -1359,126 +1359,126 @@ void CCO2_NodeView::UpdateRadio_Main()
 
 void CCO2_NodeView::OnBnClickedRadio1()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio2()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio3()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio4()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio5()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio6()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio7()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio8()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio9()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio10()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio11()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio12()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio13()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio14()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio15()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadio16()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Main();
 }
 
 
 void CCO2_NodeView::OnBnClickedButtonOk()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
 }
 
 
 void CCO2_NodeView::OnEnKillfocusEditCo2NodeModbusId()
 {
-    // TODO: 
-    // TODO:  
+    // TODO: 在此添加控件通知处理程序代码
+    // TODO:  在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_CO2_NODE_MODBUS_ID)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -1499,7 +1499,7 @@ void CCO2_NodeView::OnEnKillfocusEditCo2NodeModbusId()
 
 void CCO2_NodeView::OnEnKillfocusEditCo2NodeRollTimeInterval()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_CO2_NODE_ROLL_TIME_INTERVAL)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -1520,7 +1520,7 @@ void CCO2_NodeView::OnEnKillfocusEditCo2NodeRollTimeInterval()
 
 void CCO2_NodeView::OnEnKillfocusEditCo2NodeBacklightTime()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_CO2_NODE_BACKLIGHT_TIME)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -1541,7 +1541,7 @@ void CCO2_NodeView::OnEnKillfocusEditCo2NodeBacklightTime()
 
 void CCO2_NodeView::OnEnKillfocusEditFairAlarmSetpoint()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_FAIR_ALARM_SETPOINT)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -1562,7 +1562,7 @@ void CCO2_NodeView::OnEnKillfocusEditFairAlarmSetpoint()
 
 void CCO2_NodeView::OnEnKillfocusEditPoorAlarmSetpoint()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_POOR_ALARM_SETPOINT)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -1583,161 +1583,161 @@ void CCO2_NodeView::OnEnKillfocusEditPoorAlarmSetpoint()
 
 void CCO2_NodeView::OnBnClickedRadioScroll1()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll2()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll3()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll4()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll5()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll6()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll7()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll8()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll9()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll10()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll11()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll12()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll13()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll14()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll15()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll16()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll17()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll18()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll19()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll20()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll21()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioScroll22()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_ScrollDisplay();
 }
 
 
 void CCO2_NodeView::OnEnKillfocusEditNatureCo2()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_DLG_NATURE_CO2)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -1764,7 +1764,7 @@ void CCO2_NodeView::OnEnKillfocusEditNatureCo2()
 
 void CCO2_NodeView::OnEnKillfocusEditMaxMinAdjPerday()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_DLG_MAX_MIN_ADJ_PERDAY)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -1791,7 +1791,7 @@ void CCO2_NodeView::OnEnKillfocusEditMaxMinAdjPerday()
 
 void CCO2_NodeView::OnEnKillfocusEditLookDays()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     CString temp_cstring;
     GetDlgItem(IDC_EDIT_DLG_LOOK_DAYS)->GetWindowTextW(temp_cstring);
     int temp_int;
@@ -1818,7 +1818,7 @@ void CCO2_NodeView::OnEnKillfocusEditLookDays()
 
 void CCO2_NodeView::OnCbnSelchangeComboCo2AutoCal()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
 
 
 
@@ -1854,41 +1854,41 @@ void CCO2_NodeView::OnCbnSelchangeComboCo2AutoCal()
 
 void CCO2_NodeView::OnBnClickedRadioKeyTempSetEnable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Keypad();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioKeyTempSetDisable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Keypad();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioKeyHumSetEnable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Keypad();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioKeyHumSetDisable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Keypad();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioKeyCo2SetEnable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Keypad();
 }
 
 
 void CCO2_NodeView::OnBnClickedRadioKeyCo2SetDisable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     UpdateRadio_Keypad();
 }

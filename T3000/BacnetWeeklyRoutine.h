@@ -43,7 +43,7 @@ public:
 	void OnSysCommand(UINT nID, LPARAM lParam);
 
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
-	bool window_max; // ;
+	bool window_max; // 标记是否已经最大化;
 };
 
 

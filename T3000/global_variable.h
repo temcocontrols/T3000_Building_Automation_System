@@ -48,7 +48,7 @@ volatile int g_tstat_id=255;
 int g_protocol_support_ptp = PROTOCOL_UNKNOW;
 int g_output_support_relinquish = 0;
 //unsigned short output_relinquish_value[128] ;
-int g_mstp_deviceid; //Device id  MSTP  
+int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。 
 unsigned int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
 BOOL g_bPauseMultiRead=FALSE;
@@ -57,7 +57,7 @@ int g_language=0;
 CString g_strImagePathName=_T("");
 int now_tstat_id =0;//for batch load /flash.
 
-CString selected_image_fordor = _T(""); //building;
+CString selected_image_fordor = _T(""); //选中building的目录;
 CString	g_strDatabasefilepath=_T("");
 CString g_strExePth=_T("");
 CString g_strImgeFolder=_T("");
@@ -67,9 +67,9 @@ CString g_achive_folder_temp_txt = _T("");
 CString g_achive_folder_temp_db = _T("");
 CString g_achive_device_name_path = _T("");
 CString g_achive_monitor_datatbase_path = _T("");
-CString g_ext_database_path = _T(""); //;
-CString g_ext_mass_flash_path = _T(""); //   
-CString g_building_devicedatabase = _T(""); //DeviceDatabase.mdb 
+CString g_ext_database_path = _T(""); //额外的配置档数据库路径;
+CString g_ext_mass_flash_path = _T(""); //保存多烧写  选中设备的 配置文件路径
+CString g_building_devicedatabase = _T(""); //DeviceDatabase.mdb 全路径
 
 BOOL g_Scanfully=FALSE;
 BOOL g_ScanSecurity=TRUE;
@@ -156,7 +156,7 @@ unsigned int g_llTxCount = 0;
 unsigned int g_llRxCount = 0;
 bool clear_status_bar = FALSE;
 int g_llerrCount = 0;
-BOOL g_unint = TRUE;//TREE = C;FALSE = F;
+BOOL g_unint = TRUE;//TREE = °C;FALSE = F;
 
 
 
@@ -769,12 +769,12 @@ char charr[600][2][600] ={
 {"COMMON","Serial Number - 4 byte value.  Read-only"},{"COMMON","Serial Number - 4 byte value.  Read-only"},
 {"COMMON","Serial Number - 4 byte value.  Read-only"},{"COMMON","Serial Number - 4 byte value.  Read-only"},
 //4-5
-{"COMMON","Software Version  2 byte value.  Read-only"},{"COMMON","Software Version  2 byte value.  Read-only"},
+{"COMMON","Software Version – 2 byte value.  Read-only"},{"COMMON","Software Version – 2 byte value.  Read-only"},
 //6,7
 {"COMMON","ADDRESS. Modbus device address"},{"COMMON","Product Model.  This is a read-only register that is used by the microcontroller to determine the product"},
 //8-11
 {"COMMON","Hardware Revision.  This is a read-only register that is used by the microcontroller to determine the hardware rev"},{"COMMON","PIC firmware version"},
-{"COMMON","PIC version of Humidity module"},{"COMMON","PLUG_N_PLAY_ADDRESS,   plug n play address, used by the network master to resolve address conflicts. See VC code for algorithms"},
+{"COMMON","PIC version of Humidity module"},{"COMMON","PLUG_N_PLAY_ADDRESS,   ‘plug n play’ address, used by the network master to resolve address conflicts. See VC code for algorithms"},
 //12-13
 {"COMMON",""},{"COMMON",""},
 //14-17
@@ -895,22 +895,22 @@ char charr[600][2][600] ={
 {"OUTPUT","Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V "},{"OUTPUT","Output1 tot 5, bit 0 thru 4 = relay 1 thru 5."},
 {"OUTPUT","Output6 ,Analog output1, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0."},{"OUTPUT","Output7 Analog output2, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0."},
 {"OUTPUT","DAC_OFFSET , Calibration data for the 0-10VDC signal, internal variable maintained by tstat"},
-{"OUTPUT","Output1 Relay1_delay_OFF_TO_ON  delay time for output1 going from OFF to ON (sec)"},{"OUTPUT","Output2 Relay2_delay_OFF_TO_ON  delay time for output2 going from OFF to ON (sec)"},
-{"OUTPUT","Output3 Relay3_delay_OFF_TO_ON  delay time for output3 going from OFF to ON (sec)"},{"OUTPUT","Output4 Relay4_delay_OFF_TO_ON  delay time for output4 going from OFF to ON (sec)"},
-{"OUTPUT","Output5 Relay5_delay_OFF_TO_ON  delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","(future)Output6 delay_OFF_TO_ON  delay time for output4 going from OFF to ON (sec)"},
-{"OUTPUT","(future)Output7 delay_OFF_TO_ON  delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","output 1 current time left from OFF to ON"},
+{"OUTPUT","Output1 Relay1_delay_OFF_TO_ON – delay time for output1 going from OFF to ON (sec)"},{"OUTPUT","Output2 Relay2_delay_OFF_TO_ON – delay time for output2 going from OFF to ON (sec)"},
+{"OUTPUT","Output3 Relay3_delay_OFF_TO_ON – delay time for output3 going from OFF to ON (sec)"},{"OUTPUT","Output4 Relay4_delay_OFF_TO_ON – delay time for output4 going from OFF to ON (sec)"},
+{"OUTPUT","Output5 Relay5_delay_OFF_TO_ON – delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","(future)Output6 delay_OFF_TO_ON – delay time for output4 going from OFF to ON (sec)"},
+{"OUTPUT","(future)Output7 delay_OFF_TO_ON – delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","output 1 current time left from OFF to ON"},
 {"OUTPUT","output 2 current time left from OFF to ON"},{"OUTPUT","output 3 current time left from OFF to ON"},
 
  {"OUTPUT","output 4 current time left from OFF to ON"},{"OUTPUT","output 5 current time left from OFF to ON"},
  {"OUTPUT","(reserved)output 6 current time left from OFF to ON"},{"OUTPUT","(reserved)output 7 current time left from OFF to ON"},
- {"OUTPUT","Output1 Relay1_delay_ON_TO_OFF  delay time for output1 going from ON to OFF (sec)"},{"OUTPUT","Output2 Relay2_delay_ON_TO_OFF  delay time for output2 going from ON to OFF (sec)"},
- {"OUTPUT","Output3 Relay3_delay_ON_TO_OFF  delay time for output3 going from ON to OFF (sec)"},{"OUTPUT","Output4 Relay4_delay_ON_TO_OFF  delay time for output4 going from ON to OFF(sec)"},
- {"OUTPUT","Output5 Relay5_delay_ON_TO_OFF  delay time for output5 going from ON to OFF(sec)"},{"OUTPUT","(future)Output6_delay_ON_TO_OFF  delay time for output4 going from ON to OFF(sec)"},
- {"OUTPUT","(future)Output7_delay_ON_TO_OFF  delay time for output5 going from ON to OFF (sec)"},{"OUTPUT","output 1 current time left from ON to OFF"},
+ {"OUTPUT","Output1 Relay1_delay_ON_TO_OFF – delay time for output1 going from ON to OFF (sec)"},{"OUTPUT","Output2 Relay2_delay_ON_TO_OFF – delay time for output2 going from ON to OFF (sec)"},
+ {"OUTPUT","Output3 Relay3_delay_ON_TO_OFF – delay time for output3 going from ON to OFF (sec)"},{"OUTPUT","Output4 Relay4_delay_ON_TO_OFF – delay time for output4 going from ON to OFF(sec)"},
+ {"OUTPUT","Output5 Relay5_delay_ON_TO_OFF – delay time for output5 going from ON to OFF(sec)"},{"OUTPUT","(future)Output6_delay_ON_TO_OFF – delay time for output4 going from ON to OFF(sec)"},
+ {"OUTPUT","(future)Output7_delay_ON_TO_OFF – delay time for output5 going from ON to OFF (sec)"},{"OUTPUT","output 1 current time left from ON to OFF"},
  {"OUTPUT","output 2 current time left from ON to OFF"},{"OUTPUT","output 3 current time left from ON to OFF"},
  {"OUTPUT","output 4 current time left from ON to OFF"},{"OUTPUT","output 5 current time left from ON to OFF"},
  {"OUTPUT","(reserved)output 6 current time left from ON to OFF"},{"OUTPUT","(reserved)output 7 current time left from ON to OFF"},
- {"OUTPUT","MODBUS_CYCLING_DELAY  delay time (in minutes) for switching out of heating or cooling and then back in."},{"OUTPUT","MODBUS_CHANGOVER_DELAY  delay time (in minutes) for switching from cooling into heating or vice versa."},
+ {"OUTPUT","MODBUS_CYCLING_DELAY – delay time (in minutes) for switching out of heating or cooling and then back in."},{"OUTPUT","MODBUS_CHANGOVER_DELAY – delay time (in minutes) for switching from cooling into heating or vice versa."},
  
  {"OUTPUT","Valve travel time. The time of the valve travel  from one end to another end. The units is second."},{"OUTPUT","Valve percent. Show the valve opened how much percent.  READ ONLY"},
  {"OUTPUT","Interlock for  output1"},{"OUTPUT","Interlock for  output2"},
@@ -921,7 +921,7 @@ char charr[600][2][600] ={
  {"OUTPUT","Relay1 manual output value"},{"OUTPUT","Relay2 manual output value"},
  {"OUTPUT","Relay3 manual output value"},{"OUTPUT","Relay4 manual output value"},
  {"OUTPUT","Relay5 manual output value"},{"OUTPUT","(future) Analog1 manual  output value"},
- {"OUTPUT","(future) Analog2 manual  output value"},{"OUTPUT","DEADMASTER_MODE = 0, the default, outputs will not change when deadmaster is triggered DEADMASTER_MODE = 1, the output will be trigger to AUTO mode if they were previously in manual DEADMASTER_MODE = 2, the outputs will go to manual on or off as defined in the following registers."},
+ {"OUTPUT","(future) Analog2 manual  output value"},{"OUTPUT","DEADMASTER_MODE = 0, the default, outputs will not change when deadmaster is triggered DEADMASTER_MODE = 1, the output will be trigger to “AUTO” mode if they were previously in manual DEADMASTER_MODE = 2, the outputs will go to manual on or off as defined in the following registers."},
 
  {"OUTPUT","Define output states when DEADMASTER_MODE = 2 (active)Bit0 is for relay 1, bit1 for relay 2 and so on up to output 5"},{"OUTPUT","Analog Output1 goes to this value when DEADMASTER_MODE = 2 (active), 0-1000"},
  {"OUTPUT","Analog Output2 goes to this value when DEADMASTER_MODE = 2 (active), 0-1000"},{"OUTPUT","Output1 Function setting:0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "},
@@ -1005,10 +1005,10 @@ char charr[600][2][600] ={
 
 //392-512
 {"UI","KEYPAD_SELECT , variable to select various keypad arrangements.  Refer to PAd description in Table 1: Advanced Menu Items"},{"UI","SPECIAL_MENU_LOCK, Special menu lockout via keypad, serial port only, "},
-{"UI","dIS  Display.  This sets the display to either room temperature or setpoint.  0 = room temp,  1 = setpoint, 2 = Blank Display,3 = PID2 value,4 = PID2 setpoint, 5 = set segment code by manually, 6 = Display sleep"},{"UI","ICON TABLE Set when certain icons are on/off"},
+{"UI","dIS – Display.  This sets the display to either room temperature or setpoint.  0 = room temp,  1 = setpoint, 2 = Blank Display,3 = PID2 value,4 = PID2 setpoint, 5 = set segment code by manually, 6 = Display sleep"},{"UI","ICON TABLE Set when certain icons are on/off"},
 {"UI","Last key  pressed counter. Minutes since the used last pressed a key. "},{"UI","Keypad encoded value. Last keypress, READ ONLY"},
-{"UI","LED hundreds digit, , can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI",""},
-{"UI","LED ones digit code, can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI","LED discrete status symbols, can drive the LEDs manually when the display register 381 is set to manual (5) "},
+{"UI","LED hundred’s digit, , can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI",""},
+{"UI","LED one’s digit code, can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI","LED discrete status symbols, can drive the LEDs manually when the display register 381 is set to manual (5) "},
  {"UI","Rouding display. 0 = round the display to the nearest digit; 1 = round the display to the nearest 1/10 unit;  5 = round the display to the nearest 1/2 unit. 2,3,4 reserved."},{"UI","The minimum address which the device can accept, use this to limit addresses to a certain defined band. "},
 {"UI","The maximum device address can  be set. The device address should between min and max address, default is 254"},{"UI","Show the size of E2 chip. 0 = 24c02, 1 = 24c08/24c16."},
  {"UI","Assign the timer to be used for which feature. 0 = period timer, 1 = rotation timer, 2 = interlock, 3 = PWM timer."},{"UI","Clock, year"},
@@ -1838,17 +1838,17 @@ HTREEITEM selected_tree_item = NULL;
 #pragma region For_bacnet
 
 
-CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//   ;
+CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
 CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
-//int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //  ;
+//int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //自定义的  正向逻辑还是反向逻辑;
 CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
-bool read_customer_unit;	// customer unit,;
-bool receive_customer_unit; //flag true;
-bool read_analog_customer_unit;  // cus tabel ;
+bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
+bool receive_customer_unit; //收到回复，flag就置 true;
+bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
 
 bool read_msv_table; //MSV table 
-CString Custom_Msv_Range[BAC_MSV_COUNT + 1];//     AAA/BBB/CCC
+CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// 存储客户多态  例如显示  AAA/BBB/CCC
 
 CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
@@ -1895,7 +1895,7 @@ bool bac_remote_point_read_results;
 
 bool bac_cm5_graphic;
 unsigned char bac_gloab_panel;
-unsigned char g_thread_max_mac_id = 254; //mstp mac ID
+unsigned char g_thread_max_mac_id = 254; //客户上次点击的mstp mac ID
 //int g_bac_instance;
 int input_list_line;
 int output_list_line;
@@ -1905,7 +1905,7 @@ int annual_list_line ;
 int screen_list_line ;
 int monitor_list_line;
 int analog_range_tbl_line;
-int msv_range_tbl_line;  //MSV  range   
+int msv_range_tbl_line;  //MSV 多态 range 选择的  变量
 int ext_io_list_line;
 
 HWND      g_hwnd_now;
@@ -1960,12 +1960,12 @@ Str_annual_routine_point s_Annual_data;
 Control_group_point s_screen_data;
 Str_monitor_point s_monitor_data;
 Str_t3_screen_Json s_json_screen_data;
-Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //panel json item  ;
+Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //缓存其他panel json item 值的 全局变量;
 
 
-vector <_panel_info> g_bacnet_panel_info;  // object instance  panel number 
-vector <Str_out_point> m_Output_data;					vector < vector<Str_out_point> >			  g_Output_data; //panel output ;
-vector <Str_in_point>  m_Input_data;					vector < vector<Str_in_point> >				  g_Input_data; //panel input ;
+vector <_panel_info> g_bacnet_panel_info;  //全局的 object instance 与 panel number 对应的容器
+vector <Str_out_point> m_Output_data;					vector < vector<Str_out_point> >			  g_Output_data; //全局所有panel output 的集合体;
+vector <Str_in_point>  m_Input_data;					vector < vector<Str_in_point> >				  g_Input_data; //全局所有panel input 的集合体;
 vector <Str_program_point>  m_Program_data;				vector < vector<Str_program_point> >		  g_Program_data;
 vector <Str_array_point> m_Array_data;
 vector <Str_variable_point>  m_Variable_data;			vector < vector<Str_variable_point> >		  g_Variable_data;
@@ -1980,9 +1980,9 @@ vector <Str_monitor_point> m_monitor_data;			    vector < vector<Str_monitor_poi
 vector <Str_TstatInfo_point> m_Tstat_data;				vector < vector<Str_TstatInfo_point> >        g_Tstat_data;
 vector <Str_userlogin_point> m_user_login_data;			vector < vector<Str_userlogin_point> >        g_user_login_data;
 vector <Alarm_point> m_alarmlog_data;					vector < vector<Alarm_point> >				  g_alarmlog_data;
-vector <Str_label_point> m_graphic_label_data;			vector < vector<Str_label_point> >			  g_graphic_label_data;//Label;
-vector <Str_t3_screen_Json> m_json_screen_data;			vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen;
-vector <Str_item_Json> m_json_item_data;			    vector < vector<Str_item_Json> >			  g_json_item_data;//item;
+vector <Str_label_point> m_graphic_label_data;			vector < vector<Str_label_point> >			  g_graphic_label_data;//图片里面的Label的信息要存在设备里面;
+vector <Str_t3_screen_Json> m_json_screen_data;			vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen的信息要存在设备里面;
+vector <Str_item_Json> m_json_item_data;			    vector < vector<Str_item_Json> >			  g_json_item_data;//item的信息要存在设备里面;
 vector <Str_Units_element> m_customer_unit_data;        vector < vector<Str_Units_element> >		  g_customer_unit_data;
 vector <Str_table_point> m_analog_custmer_range;		vector < vector<Str_table_point> >		      g_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite; vector < vector<Str_variable_uint_point> >  g_variable_analog_unite;
@@ -1996,11 +1996,11 @@ Str_Remote_TstDB m_remote_device_db;
 
 vector <Client_Info> m_tcp_connect_info;
 
-vector <Str_remote_point> m_remote_point_data;  //Mini panel Tstat  ;
+vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
 
 
 
-vector <bacnet_background_struct> m_backbround_data; // bacnet panel
+vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
 
 vector <int>  m_Input_data_instance; // for input bacnet-thirdParty devices instance_is's
 vector <int>  m_Output_data_instance;// for output bacnet-thirdParty devices instance_is's
@@ -2018,8 +2018,8 @@ Str_MISC Device_Misc_Data;
 Str_Special Device_Special_Data;
 char m_at_write_buf[100];
 char m_at_read_buf[450];
-bacnet_panel_object_info g_bac_panel[256]; //panel  object instance ;
-vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 setpoint; ;
+bacnet_panel_object_info g_bac_panel[256]; //用于全局panel 与 object instance 对应查询;
+vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 新的setpoint表格; 以前的完全改不动了;
 vector <int> exsit_panel_number;
 vector <refresh_net_device> m_T3BB_device_data;
 vector <refresh_net_device> m_refresh_net_device_data;
@@ -2029,12 +2029,12 @@ vector <GSM_connection_info> m_gsm_connect_info;
 vector <Scan_Info> m_scan_info;
 vector <Scan_Info> m_scan_info_buffer;
 Monitor_Block m_monitor_block;
-Str_Monitor_data_header m_monitor_head;//monitor ;
-char picture_data_buffer[400]; // pic .
-Str_picture_header m_picture_head; //  monitor same.
+Str_Monitor_data_header m_monitor_head;//用来接收monitor 的头，里面有需要接收的总包和目前是第几包;
+char picture_data_buffer[400]; //用来存每包 pic 的数据.
+Str_picture_header m_picture_head; //传图片的 头，结构其实是和 monitor same.
 int Monitor_Input__Data[14][1000];	
 
-int controller_counter = 0; //
+int controller_counter = 0; //记录扫描的子节点
 
 
 
@@ -2044,7 +2044,7 @@ vector <bacnet_standard_Info> m_standard_graphic_refresh_data;
 
 byte	g_DayState[8][ANNUAL_CODE_SIZE];
 unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
-unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//2000;
+unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
 int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 
 BOOL g_mstp_flag;
@@ -2067,11 +2067,11 @@ CDialog *Tcp_Server_Window =NULL;
 HWND h_debug_window;
 CString PrintText[1000];
 CString g_Print;
-bool range_cancel;//Range 01;
+bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
 int g_protocol=PROTOCOL_UNKNOW;
 int g_new_old_IDE = 0;
-int g_bac_read_type;	//input output,;
-bool g_bac_need_read_setting;  // Setting ;Label;
+int g_bac_read_type;	//用于记录将要读取哪一个，input 还是output,给线程使用;
+bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
 HANDLE click_read_thread;
 HANDLE BACnet_read_thread;
 HANDLE BACnet_abort_read_thread;
@@ -2081,25 +2081,25 @@ int connect_invoke_id = -1;
 //bool connect_replay = false;
 BACNET_OBJECT_PROPERTY_VALUE receive_object_value;  /* for bacapp printing */
 bool bac_show_alarm_window = false;	//used for judge whether need to show the alarm window.
-bool bac_select_device_online = false; //bacnet device ;
+bool bac_select_device_online = false; //判断选中的bacnet device 是否在线;
 SOCKET h_Broad=NULL;
 SOCKADDR_IN h_siBind;
 SOCKADDR_IN h_bcast;
 
-Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];//   ;
+Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];//用来存 数字量 没变化的情况下又 不在时间轴范围内的值;
 Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
 Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];
 int analog_data_max_value[MAX_POINTS_IN_MONITOR];
 int analog_data_min_value[MAX_POINTS_IN_MONITOR];
-int digital_data_count[MAX_POINTS_IN_MONITOR];	//digital data ;
-int analog_data_count[MAX_POINTS_IN_MONITOR];	//analog data ;
+int digital_data_count[MAX_POINTS_IN_MONITOR];	//用于记录digital data 这个指针到底存了多少数据;
+int analog_data_count[MAX_POINTS_IN_MONITOR];	//用于记录analog data 这个指针到底存了多少数据;
 int get_data_count = 0;
-int monitor_analog_count = 0;	//monitor ;
+int monitor_analog_count = 0;	//暂存monitor 的模拟和数字的个数;
 int monitor_digital_count = 0;
-Data_Time_Match * temp_analog_data[MAX_POINTS_IN_MONITOR];	//;
+Data_Time_Match * temp_analog_data[MAX_POINTS_IN_MONITOR];	//临时存放新建的块;
 int SEND_COMMAND_DELAY_TIME = 100;
-bool TCP_Server_Running = false; //TCP 1;
-bool Gsm_communication = false;	//GSM  ;;
+bool TCP_Server_Running = false; //开启TCP 服务器就将标志位置1;
+bool Gsm_communication = false;	//如果是通过GSM 读远程设备 许多地方要特殊处理;不能刷新太频繁;
 CString SaveConfigFilePath;
 CString LoadConfigFilePath;
 vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
@@ -2111,8 +2111,8 @@ CString g_strStartInterface_config = _T("") MY_CONFIG;
 int g_SleepTimeForConfig = 3;
 CString	g_configfile_path;
 vector<Reg_Infor> g_Vector_Write_Error;
-bool need_read_bacnet_graphic_label_flag = true;	// graphic label ;;
-bool read_write_bacnet_config = false;	//Bacnet config  List;
+bool need_read_bacnet_graphic_label_flag = true;	//用于防止重复读取 graphic label ;只有切换设备的时候才需要再次读取;
+bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
 
  vector <Tstat_Input_Struct> m_tstat_input_data;
  vector <Tstat_Output_Struct> m_tstat_output_data;
@@ -2176,9 +2176,9 @@ int current_building_ip;
 int current_building_ipport;
 
 
-// --MainFrm.cpp
-//
-//1>T3000View-Fresh()--Tstat
+// 需要刷新--在MainFrm.cpp中的线程中需要判断这个变量
+//主要是两个地方
+//1>T3000View-Fresh()--进入到这里说明是需要刷新的因为这个是Tstat
 
 BOOL g_NEED_MULTI_READ = FALSE;
 
@@ -2197,18 +2197,18 @@ BOOL g_fresh_Graphic = FALSE;
 Global_Calibration_Module   g_calibration_module_data;
 
 CDialog *g_Draw_dlg=NULL;
-unsigned int g_progress_persent = 0;	//  ;
-bool b_stop_read_grp_label = false;		//grp label ;
-bool b_stop_read_tstat_schedule = false;	//tstat ;
+unsigned int g_progress_persent = 0;	//用来记录全局状态栏该显示的 进度 百分比;
+bool b_stop_read_grp_label = false;		//如果读到空的grp label 就不要继续读下一个了;
+bool b_stop_read_tstat_schedule = false;	//如果读到空的tstat 就不要继续读下一个了;
 
-CString Statuspanel;   //panel 2-3;
+CString Statuspanel;   //在状态栏显示panel 2-3;
 
 CString g_cstring_ini_path;
-CString g_trendlog_ini_path; //;
+CString g_trendlog_ini_path; //每个序列号单独一个配置档，避免配置文件过大;
 unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
-int input_item_limit_count = BAC_INPUT_ITEM_COUNT;	//input list input  vector size ;
-int output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;	//output list output  vector size ;
-int variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;	//variable list variable  vector size ;
+int input_item_limit_count = BAC_INPUT_ITEM_COUNT;	//input list 要显示多少个input 的个数， 不是根据vector 的size 来判断大小;
+int output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;	//output list 要显示多少个output 的个数， 不是根据vector 的size 来判断大小;
+int variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;	//variable list 要显示多少个variable 的个数， 不是根据vector 的size 来判断大小;
 int program_item_limit_count = BAC_PROGRAM_ITEM_COUNT;
 int controller_item_limit_count = BAC_PID_COUNT;
 int screen_item_limit_count = BAC_SCREEN_COUNT;
@@ -2225,9 +2225,9 @@ Str_annual_routine_point m_temp_annual_data[BAC_HOLIDAY_COUNT];
 Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
 Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
 
-char monitor_database_flag[24];   //Database 1 ;
-int b_pause_refresh_tree = false; //  ;
-int b_building_management_flag = 0; // yes;
+char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
+int b_pause_refresh_tree = false; // 全局变量，控制主线程里面的 是否刷新网络数据;
+int b_building_management_flag = 0; //另一种 虚拟控制模式，yes就停止后台扫描以及刷新;
 int debug_item_show = 0;
 bool monitor_ignore_enable = false;
 int monitor_ignore_max_value = 0;
@@ -2238,12 +2238,12 @@ HANDLE read_each_485_fun_thread = NULL;
 bool hide_485_progress = false;
 bool new_device_support_mini_ui = false;
 
-int flash_multi_auto = false; //   ;
-unsigned int T3000_Version ; //T3000.
+int flash_multi_auto = false; //用于控制 多烧的  自动控制;
+unsigned int T3000_Version ; //T3000的版本号.
 
-int flag_auto_scroll = 0; // X   1;;
-int graphic_last_scale_type = 0 ; //  X ;
-unsigned int graphic_last_time_value =0 ; //x; 
+int flag_auto_scroll = 0; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
+int graphic_last_scale_type = 0 ; //用于存储上次 有效的 X轴的 刻度;
+unsigned int graphic_last_time_value =0 ; //x轴上次查看的时间; 
 const CString c_strBaudate[NUMBER_BAUDRATE] =
 {
     L"9600",
@@ -2255,12 +2255,12 @@ const CString c_strBaudate[NUMBER_BAUDRATE] =
 };
 #pragma endregion For_bacnet
 
-int global_interface = 1; // Input  output;
+int global_interface = 1; //用来标识全局的界面在哪？主要是 Input 和 output;
 
-bool b_remote_connection = false;  //   ;
-bool refresh_tree_status_immediately = false;	//treu   IP;
-unsigned int remote_connect_serial_number = 0; // ;
-char ptpLoginName[30];	//;
+bool b_remote_connection = false;  //全局的 用来判断 对远程设备的 特殊处理;
+bool refresh_tree_status_immediately = false;	//如果置为treu了，就会立即调用 刷新 ，不用等待一个周期，用于 某些IP或状态变了，立即刷新;
+unsigned int remote_connect_serial_number = 0; // 远程连接的序列号;
+char ptpLoginName[30];	//远程连接的账号和密码;
 char ptpLoginPassword[20];
 refresh_net_device device_id_data_1;
 refresh_net_device device_id_data_2;
@@ -2292,33 +2292,33 @@ COLORREF	  nDefaultclrTxt;
 int bacnet_view_number = TYPE_INPUT;
 int input_item_select_for_range = 0;
 
-bitset<65536*3> read_analog_package; //trendlog 
-bitset<65536*3> read_dig_package;    //trendlog 
+bitset<65536*3> read_analog_package; //用于记录trendlog 已经记录了哪些模拟包
+bitset<65536*3> read_dig_package;    //用于记录trendlog 已经记录了哪些数字包
 
 int graphic_view_index ;
 CString grapgic_view_name[3];
 bool graphic_view_visible[14];
-CString bacnet_message_input_title;	//
-CString bacnet_message_return_string;  //
+CString bacnet_message_input_title;	//输入的提示信息
+CString bacnet_message_return_string;  //得到的输入字符串
 pidname_map product_map;
 pid_reglist_map product_reglist_map;
-bool offline_mode = false; //;
-CString offline_prg_path;   //prg ;
+bool offline_mode = false; //全局离线模式判断;
+CString offline_prg_path;   //离线模式得prg 保存路径;
 
-bac_mstp_com g_mstp_com; // mstp com  
-bool n_wifi_connection;  // 
-int MODE_SUPPORT_PTRANSFER; //  bip ptransfer 1   wifi  T3BB502
+bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
+bool n_wifi_connection;  //后台列表 刷新开关
+int MODE_SUPPORT_PTRANSFER; //  支持bip ptransfer 等于1时   wifi设备 和 T3BB系列的不在连接502端口
 bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
-Str_modbus_reg bacnet_to_modbus_struct;  //bacnet modbus 
-vector <str_bacnet_rp_info> standard_bacnet_data; // bacnet   ;
+Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
+vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
 vector <str_segmented_bacnet_rp_info> segmented_bacnet_data;
 bool bacnetIpDataRead = false;
 unsigned char m_dialog_signal_type;
 connect_Info system_connect_info;
 panelname_map g_panelname_map; 
 bacnet_instance_reg_map g_bacnet_reg_ins_map;
-CString HolLable[BAC_HOLIDAY_COUNT] =   //List
+CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
 {
     _T("AR1"),
     _T("AR2"),
@@ -2326,21 +2326,21 @@ CString HolLable[BAC_HOLIDAY_COUNT] =   //List
     _T("AR4")
 };
 
-int m_special_customer = 0;      //T3000;  // 1CPR_Bestek
-CString cs_special_name;         //;
+int m_special_customer = 0;      //客户自定义T3000的名字;  // 1为CPR_Bestek
+CString cs_special_name;         //对应该改的名字;
 
-unsigned char n_ignore_sync_time;  //;
-unsigned int last_ignore_sync_time;  // ;  3;
+unsigned char n_ignore_sync_time;  //是否忽略同步时间;
+unsigned int last_ignore_sync_time;  //上次点击忽略同步时间的 时间节点;  比如用于3天后继续提醒;
 
-unsigned char check_revert_daxiaoduan = 0; //;
+unsigned char check_revert_daxiaoduan = 0; //大小端是否需要反转，正常旧版本不要反转;
 
 
-int n_read_product_type = 0; //  modbus  bacnet ;
-int n_read_list_flag = -1; // Input Output
-int n_read_item_index = 0; //  Schedule3  weekly_list 
+int n_read_product_type = 0; //这三个变量 确定 modbus协议 去读取 bacnet东西的时候 ，读哪些寄存器;
+int n_read_list_flag = -1; // 读取那一个，例如读Input 还是Output
+int n_read_item_index = 0; // 读哪一个 例如Schedule3 的时间 ，不能用weekly_list 因为界面上的容易变。
 
-unsigned int DEBUG_DELAY_TIME = 0; //Wifi ;
-CString bacnet_string; // 
+unsigned int DEBUG_DELAY_TIME = 0; //测试用调试Wifi 延迟时间;
+CString bacnet_string; // 待解析的字串
 
 vector < FloorInfo> bm_floor;
 vector < RoomInfo> bm_room;
@@ -2356,10 +2356,10 @@ unsigned char daylight_end_day;
 short gsp_invoke;
 bool Bacnet_debug_fileRead = false;
 device_io_status select_device_io_status;
-vector <Str_BM_IO> m_bm_io_data; //BM   IO
+vector <Str_BM_IO> m_bm_io_data; //用来存储BM 系统  IO表数据
 
-vector <Str_product_io_count> m_product_iocount;  // IO;
-vector <Str_online_serialnumber> m_online_serial; //
+vector <Str_product_io_count> m_product_iocount;  // 用来存储不同设备包含的IO数量;
+vector <Str_online_serialnumber> m_online_serial; //在线的设备，用于动态菜单
 
 unsigned int DYNAMIC_INPUT_ITEM_COUNT = 64;
 unsigned int DYNAMIC_OUTPUT_ITEM_COUNT = 64;

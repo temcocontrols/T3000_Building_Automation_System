@@ -1,4 +1,4 @@
-﻿// CBacnetBuildingIOPoints.cpp: 
+﻿// CBacnetBuildingIOPoints.cpp: 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "MainFrm.h"
 #include "BacnetRange.h"
-// CBacnetBuildingIOPoints 
+// CBacnetBuildingIOPoints 对话框
 extern CString cs_bm_ini;
 extern int initial_dialog;
 IMPLEMENT_DYNAMIC(CBacnetBuildingIOPoints, CDialogEx)
@@ -43,7 +43,7 @@ void CBacnetBuildingIOPoints::Fresh()
 	Fresh_Building_IO_List(NULL,NULL);
 	h_db_io_hwnd = this->m_hWnd;
 }
-// CBacnetBuildingIOPoints 
+// CBacnetBuildingIOPoints 消息处理程序
 
 void CBacnetBuildingIOPoints::Initial_List()
 {
@@ -108,7 +108,7 @@ LRESULT CBacnetBuildingIOPoints::Fresh_Building_IO_List(WPARAM wParam, LPARAM lP
 	{
 		for (int i = 0; i < temp_main_point->m_child_count; i++)
 		{
-			//up
+			//区分有多少个Group
 			CBacnetBMD* temp_group = NULL;
 			temp_group = temp_main_point->pchild[i];
 			if (temp_group->m_child_count == 0)
@@ -117,7 +117,7 @@ LRESULT CBacnetBuildingIOPoints::Fresh_Building_IO_List(WPARAM wParam, LPARAM lP
 			{
 				for (int j = 0; j < temp_group->m_child_count; j++)
 				{
-					//
+					//区分有多少节点
 					CBacnetBMD* temp_node = NULL;
 					temp_node = temp_group->pchild[j];
 					if (temp_node->m_child_count == 0)
@@ -126,7 +126,7 @@ LRESULT CBacnetBuildingIOPoints::Fresh_Building_IO_List(WPARAM wParam, LPARAM lP
 					{
 						for (int k = 0; k < temp_node->m_child_count; k++)
 						{
-							//
+							//区分有多少个IO
 							CBacnetBMD* temp_io = NULL;
 							temp_io = temp_node->pchild[k];
 							Str_BM_IO temp_bm_io;
@@ -486,7 +486,7 @@ LRESULT CBacnetBuildingIOPoints::Change_Building_IO_Item(WPARAM wParam, LPARAM l
 void CBacnetBuildingIOPoints::OnNMClickListBmIoPoints(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: 
+	// TODO: 在此添加控件通知处理程序代码
 	*pResult = 0;
 
 
@@ -541,11 +541,11 @@ void CBacnetBuildingIOPoints::OnNMClickListBmIoPoints(NMHDR* pNMHDR, LRESULT* pR
 #if 1
 			if (range_cancel)
 			{
-				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST, lRow, REFRESH_ON_ITEM);//
+				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST, lRow, REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
 				return;
 			}
 
-			if (bac_range_number_choose == 0)	//used us;
+			if (bac_range_number_choose == 0)	//如果选择的是 unused 就认为是analog 的unused;这样 能显示对应的value;
 			{
 				//m_Output_data.at(lRow).digital_analog = BAC_UNITS_ANALOG;
 				bac_ranges_type = OUTPUT_RANGE_ANALOG_TYPE;
@@ -597,7 +597,7 @@ void CBacnetBuildingIOPoints::OnNMClickListBmIoPoints(NMHDR* pNMHDR, LRESULT* pR
 					}
 				}
 				m_io_list.SetItemText(lRow, BM_IO_RANGE, temp1);
-				m_io_list.SetItemText(lRow, BM_IO_UNITS, _T(""));//t 
+				m_io_list.SetItemText(lRow, BM_IO_UNITS, _T(""));//如果是数字单位 Unit 要清空;
 			}
 #endif
 		}

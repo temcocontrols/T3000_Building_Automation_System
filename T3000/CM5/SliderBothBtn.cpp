@@ -42,8 +42,8 @@ BOOL SliderBothBtn::Create(CWnd*pMum,BOOL bHorz,BOOL bFst)
 	b_Horz=bHorz;
 
 	CRect rc(0,0,0,0);
-//
-//  	if(bHorz)	//LSC 
+//原代码执行下面代码
+//  	if(bHorz)	//LSC 滑块矩形大小
 //  	{
 //  		rc.right=10;
 //  		rc.bottom=18;
@@ -53,7 +53,7 @@ BOOL SliderBothBtn::Create(CWnd*pMum,BOOL bHorz,BOOL bFst)
 //  		rc.right=18;
 //  		rc.bottom=10;
 //  	}
-//LSC 
+//LSC 增加
 	rc.right = 18;
 	rc.bottom = 18;
 
@@ -78,46 +78,46 @@ void SliderBothBtn::OnPaint()
 
 	//--------------------------------------
 	CRect rc;
-	GetClientRect(&rc); //LSC rc
+	GetClientRect(&rc); //LSC rc指的是当前滑块的区域大小
 
 	iV=192;
-	//CBrush brhBtn(RGB(iV,iV,iV));//LSC   yuanse
+	//CBrush brhBtn(RGB(iV,iV,iV));//LSC 原有代码执行这句  设置滑块的yuanse
 	CBrush brhBtn(RGB(102,204,255));
 
-	if(b_Horz) //LSC  
+	if(b_Horz) //LSC 横向的滑动控件 绘制外形
 	{
-//
+//下面这两句是原执行
 // 		int iX0=0,iX1=rc.right-1;
 // 		int iY0=0,iY1=rc.right-1,iY2=rc.bottom-1;
 
 		int iX0=0,iX1=rc.right-9;
-		int iY0=0,iY1=rc.right-9,iY2=rc.bottom-1,iX2 = rc.right;//LSC 
+		int iY0=0,iY1=rc.right-9,iY2=rc.bottom-1,iX2 = rc.right;//LSC 增加
 
 
-//
+//下面这两句是原执行
 // 		POINT pt0[]={{iX0,iY2},{iX0,iY1},{iX1,iY0},{iX1,iY2}};
 // 		POINT pt1[]={{iX0,iY2},{iX0,iY0},{iX1,iY1},{iX1,iY2}};
 
-		POINT pt2[]= {{iX1,iY0},{iX2,iY2},{iX0,iY2}};//LSC 
+		POINT pt2[]= {{iX1,iY0},{iX2,iY2},{iX0,iY2}};//LSC 新增加上去的
 		
 		CRgn rgn;
-//
-// 		if(b_Fst)	rgn.CreatePolygonRgn(pt0,4,WINDING);//LSC  4pt04
+//原代码执行下面这三行代码
+// 		if(b_Fst)	rgn.CreatePolygonRgn(pt0,4,WINDING);//LSC 左边的滑块控件形状 中间的参数4表示pt0有4个数组
 // 		else		rgn.CreatePolygonRgn(pt1,4,WINDING);
 
-		rgn.CreatePolygonRgn(pt2,3,WINDING);//LSC 
+		rgn.CreatePolygonRgn(pt2,3,WINDING);//LSC 新增加的
 
 //LSC
-// 		 lpPoints POINTCPointxy  
-// 			   POINT
+// 		参数： lpPoints 指向一个POINT结构数组，或指向一个CPoint对象数组。每一个结构指定多边形的一个顶点的x坐标和y坐标。  
+// 			   POINT结构具有下面这样的形式：
 // 			typedef struct tagPOINT
 // 		{
 // 			int x;
 // 			int y;
 // 		} POINT;
 // 
-// 		nCount lpPointsPOINTCPoint  
-// 		nMode ALTERNATEWINDING  
+// 		nCount 指定由lpPoints指向的数组中的POINT结构或CPoint对象的数目。  
+// 		nMode 指定区域的填充模式。这个参数可以是ALTERNATE或WINDING。  
 
 
 		dc.FillRgn(&rgn,&brhBtn); 

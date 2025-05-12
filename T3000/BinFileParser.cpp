@@ -41,7 +41,7 @@ int CBinFileParser::GetBinFileBuffer(char* pFileBuf, int nFileBufLen)
             if (linenum==1)
             {
                 m_strASIX.Format(_T("%C%C%C%C"),pBuf[0],pBuf[1],pBuf[2],pBuf[3]);
-                for (int i=0; i<20; i++) //20
+                for (int i=0; i<20; i++) //固定长度20个
                 {
                     if (pBuf[256+i]!=0)
                     {

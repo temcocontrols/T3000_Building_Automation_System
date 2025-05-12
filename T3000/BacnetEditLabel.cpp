@@ -124,9 +124,9 @@ BOOL CBacnetEditLabel::OnInitDialog()
 
 	POINT lpPoint;
 	GetCursorPos(&lpPoint);
-	//::GetWindowRect(BacNet_hwd,&userlogin_rect);	// view;
+	//::GetWindowRect(BacNet_hwd,&userlogin_rect);	//获取 view的窗体大小;
 	CRect temprect;
-	::GetWindowRect(m_screenedit_dlg_hwnd,&temprect);	// view;
+	::GetWindowRect(m_screenedit_dlg_hwnd,&temprect);	//获取 view的窗体大小;
 	if((lpPoint.x < temprect.left) || (lpPoint.y < temprect.top))
 	{	
 		PostMessage(WM_CLOSE,NULL,NULL);
@@ -398,7 +398,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 				}
 				else if(m_Output_data.at(label_info.nPoint_number).digital_analog == BAC_UNITS_DIGITAL)
 				{
-					if (m_Output_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //
+					if (m_Output_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //如果是
 						return 0;
 					if((m_Output_data.at(label_info.nPoint_number).range < 23) &&(m_Output_data.at(label_info.nPoint_number).range !=0))
 						temp_unit = Digital_Units_Array[m_Output_data.at(label_info.nPoint_number).range];
@@ -489,7 +489,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			}
 			else if(ncommand == CHANGE_VALUE)
 			{
-                if (m_Variable_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //
+                if (m_Variable_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //如果是
                     return 0;
                 bool msv_status = 0;
                 if ((m_Variable_data.at(label_info.nPoint_number).range >= 101) && (m_Variable_data.at(label_info.nPoint_number).range <= 104))
@@ -643,7 +643,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			}
 			else if(ncommand == CHANGE_VALUE)
 			{
-				if (m_Program_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //
+				if (m_Program_data.at(label_info.nPoint_number).auto_manual == BAC_AUTO) //如果是
 					return 0;
 				if(m_Program_data.at(label_info.nPoint_number).on_off == 0)
 				{
@@ -859,9 +859,9 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info& temp_info)
 
 	POINT lpPoint;
 	GetCursorPos(&lpPoint);
-	//::GetWindowRect(BacNet_hwd,&userlogin_rect);	// view;
+	//::GetWindowRect(BacNet_hwd,&userlogin_rect);	//获取 view的窗体大小;
 	CRect temprect;
-	::GetWindowRect(m_screenedit_dlg_hwnd, &temprect);	// view;
+	::GetWindowRect(m_screenedit_dlg_hwnd, &temprect);	//获取 view的窗体大小;
 	if ((lpPoint.x < temprect.left) || (lpPoint.y < temprect.top))
 	{
 		PostMessage(WM_CLOSE, NULL, NULL);
@@ -881,7 +881,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info& temp_info)
 	MoveWindow(lpPoint.x, lpPoint.y, add_temprect.Width(), add_temprect.Height(), 1);
 	GetDlgItem(IDC_EDIT_LABEL_VALUE)->SetFocus();
 
-	//Fandu 2018 01 12  panel2  group screen   panel 3  .
+	//Fandu 2018 01 12 在 panel2 界面 group screen 里 访问 panel 3的  ，所以屏蔽掉.
 	//if((temp_info.nMain_Panel != Station_NUM)/* || (temp_info.nSub_Panel != Station_NUM)*/)
 	//{
 	//	PostMessage(WM_CLOSE,NULL,NULL);
@@ -901,7 +901,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info& temp_info)
 				break;
 			}
 		}
-		// 2019 04 03  123456AI5
+		// 2019 04 03 新增支持 123456AI5的功能
 		Point_Net temp_point;
 		temp_point.panel = temp_info.nMain_Panel;
 		temp_point.sub_panel = temp_info.nSub_Panel;
@@ -923,7 +923,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info& temp_info)
 		//m_value = temp_info
 		m_edit_value.SetWindowTextW(m_value);
 	}
-	//2018 01 29  subpanel 0 
+	//2018 01 29 最新的 subpanel 为0 也是代表自己的
 	else if ((temp_info.nSub_Panel != Station_NUM) && (temp_info.nSub_Panel != 0))
 	{
 		Point_Net temp_point;
@@ -1034,7 +1034,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info& temp_info)
 
 					if (digital_status != 2)
 					{
-						//  disable   click;
+						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
 						m_edit_value.EnableWindow(FALSE);
 					}
 					else
@@ -1079,7 +1079,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info& temp_info)
 
 					if (digital_status != 2)
 					{
-						//  disable   click;
+						//如果是数字量 就 disable 对话框 ，用来响应 click的改变事件;
 						m_edit_value.EnableWindow(FALSE);
 					}
 					else
@@ -1161,7 +1161,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info& temp_info)
 				}
 				else
 				{
-					m_Weekly_data.at(temp_info.nPoint_number).auto_manual = 1;  // 0 1 1;
+					m_Weekly_data.at(temp_info.nPoint_number).auto_manual = 1;  //如果 既不是0 又不是1 就初始化为1;
 					m_AutoManual = _T("Manual");
 					m_edit_value.EnableWindow(true);
 				}
@@ -1201,7 +1201,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info& temp_info)
 				}
 				else
 				{
-					m_Annual_data.at(temp_info.nPoint_number).auto_manual = 1;  // 0 1 1;
+					m_Annual_data.at(temp_info.nPoint_number).auto_manual = 1;  //如果 既不是0 又不是1 就初始化为1;
 					m_AutoManual = _T("Manual");
 					m_edit_value.EnableWindow(true);
 				}
@@ -1347,7 +1347,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info& temp_info)
 		}
 		break;
 		}
-		// digital_status 0-1  ON OFF      2 ;
+		// digital_status 0-1 表示 ON OFF      2 表示是模拟量不是数字量;
 		if ((digital_status == 0) || (digital_status == 1))
 		{
 			m_edit_icon2_path.ShowWindow(true);
@@ -1397,8 +1397,8 @@ LRESULT  CBacnetEditLabel::MessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		//memcpy_s(&m_Input_data.at(label_info.nPoint_number),sizeof(Str_in_point),&label_info,sizeof(Str_in_point));//
-		//PostMessage(WM_REFRESH_BAC_INPUT_LIST,pInvoke->mRow,REFRESH_ON_ITEM);// ;
+		//memcpy_s(&m_Input_data.at(label_info.nPoint_number),sizeof(Str_in_point),&label_info,sizeof(Str_in_point));//还原没有改对的值
+		//PostMessage(WM_REFRESH_BAC_INPUT_LIST,pInvoke->mRow,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		MessageBox(Show_Results);
@@ -1611,7 +1611,7 @@ void CBacnetEditLabel::OnStnClickedEditIconPath()
 	}
 
 	SetCurrentDirectoryW(image_fordor);
-	//,databasecopy;10;
+	//选择图片,如果选的不在database目录下就copy一份过来;如果在的话就重命名，因为文件名长度不能超过10个字节;
 	CString strFilter = _T("Ico file;jpg file;bmp file;png file|*.ico;*.jpg;*.bmp;*.png||");
 	CFileDialog dlg(true, _T("Ico"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
 	if (IDOK == dlg.DoModal())
@@ -1631,7 +1631,7 @@ void CBacnetEditLabel::OnStnClickedEditIconPath()
 		}
 		CString new_file_path;
 		new_file_path = image_fordor + _T("\\") + FileName;
-		if (temp1.CompareNoCase(image_fordor) != 0)//copy;
+		if (temp1.CompareNoCase(image_fordor) != 0)//如果就在当前目录就不用copy过来了;
 		{
 			CopyFile(FilePath, new_file_path, false);
 		}
@@ -1673,7 +1673,7 @@ void CBacnetEditLabel::OnStnClickedEditIconPath2()
 	image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 
 	SetCurrentDirectoryW(image_fordor);
-	//,databasecopy;10;
+	//选择图片,如果选的不在database目录下就copy一份过来;如果在的话就重命名，因为文件名长度不能超过10个字节;
 	CString strFilter = _T("Ico file;jpg file;bmp file;png file|*.ico;*.jpg;*.bmp;*.png||");
 	CFileDialog dlg(true,_T("Ico"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
 	if(IDOK==dlg.DoModal())
@@ -1693,7 +1693,7 @@ void CBacnetEditLabel::OnStnClickedEditIconPath2()
 		}
 		CString new_file_path;
 		new_file_path = image_fordor + _T("\\") + FileName;
-		if(temp1.CompareNoCase(image_fordor) != 0)//copy;
+		if(temp1.CompareNoCase(image_fordor) != 0)//如果就在当前目录就不用copy过来了;
 		{
 			CopyFile(FilePath,new_file_path,false);
 		}

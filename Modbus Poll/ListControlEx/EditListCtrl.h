@@ -82,15 +82,15 @@ protected:
 	afx_msg void OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
 private:
-	int m_iSubItem;            //
-	int m_iItem;               //
-	BOOL m_bHighLight;         //
-	BOOL m_bFocus;             //
-	CItemEdit m_edtItemEdit;   // EditLabelCEdit*
-	CString preEditString;     //
+	int m_iSubItem;            //子项标识符
+	int m_iItem;               //主项标识符
+	BOOL m_bHighLight;         //是否高亮文本
+	BOOL m_bFocus;             //是否绘制焦点框
+	CItemEdit m_edtItemEdit;   // 用于子类化EditLabel函数返回的CEdit*指针
+	CString preEditString;     //用于保存修改前的字符串
 
 public:
-	BOOL m_bEditDataChanged;		   //
+	BOOL m_bEditDataChanged;		   //用于判断是否有数据改变了
 };
 
 //{{AFX_INSERT_LOCATION}}

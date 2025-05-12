@@ -321,7 +321,7 @@ namespace AnotherStorageImplementation
 
             // some default values
             string obj_name = object_id.type.ToString() + object_id.instance.ToString(); 
-            string obj_description = "Sample for you by C. Gnter";
+            string obj_description = "Sample for you by C. Günter";
             BacnetUnitsId obj_unit = BacnetUnitsId.UNITS_NO_UNITS;
             double obj_value = 0;
 

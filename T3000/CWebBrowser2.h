@@ -1,4 +1,4 @@
-// CWebBrowser2.h :  Microsoft Visual C++  ActiveX 
+// CWebBrowser2.h : 由 Microsoft Visual C++ 创建的 ActiveX 控件包装器类的声明
 
 #pragma once
 
@@ -31,10 +31,10 @@ public:
 		pPersist, bStorage, bstrLicKey); 
 	}
 
-// 
+// 特性
 public:
 
-// 
+// 操作
 public:
 
 	void GoBack()

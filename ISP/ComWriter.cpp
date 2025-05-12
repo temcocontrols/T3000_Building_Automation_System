@@ -5,8 +5,8 @@
 extern vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 extern unsigned int g_mstp_deviceid ;
 extern int SPECIAL_BAC_TO_MODBUS ;
-extern int new_bootload ; //1 BootLoader;
-extern int com_port_flash_status ;  // 0    1 boot
+extern int new_bootload ; //如果等于1 就说明现在烧写的是新的BootLoader;
+extern int com_port_flash_status ;  // 0 正常模式   1 烧写boot模式
 extern unsigned int n_check_temco_firmware;
 extern bool auto_flash_mode;
 extern CString g_strFlashInfo;
@@ -26,7 +26,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam);
 UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam);
 int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
-extern int firmware_must_use_new_bootloader ;  //0 boot   1 bootload;   C1hex
+extern int firmware_must_use_new_bootloader ;  //0 不用更新boot   1 需要更新bootload;   C1为hex
 extern CString g_repair_bootloader_file_path;
 
 CComWriter::CComWriter(void)
@@ -37,7 +37,7 @@ CComWriter::CComWriter(void)
 
     m_nComPort = -1;
     //m_nModbusID;
-    m_nBautrate = 0;			// 
+    m_nBautrate = 0;			// 波特率
     m_com_flash_binfile = 0;
     m_pWorkThread = NULL;
     continue_com_flash_count = 0;
@@ -143,7 +143,7 @@ int CComWriter::BeginWirteByCom()
     {
 #pragma region detect_mstp_shutdown
 
-        baudrate_def temp_baudrate_ret[100] = {0}; //MSTP
+        baudrate_def temp_baudrate_ret[100] = {0}; //用于检测串口MSTP数据
         int find_mstp_protocal = 0;
         find_mstp_protocal = Check_Mstp_Comport(m_nComPort, temp_baudrate_ret, m_nBautrate);
         if ((find_mstp_protocal == -101) || (find_mstp_protocal == -100))
@@ -169,7 +169,7 @@ int CComWriter::BeginWirteByCom()
             srtInfo.Format(_T("The current RS485 port uses Bacnet MSTP. (%d)"), temp_loop_count);
             OutPutsStatusInfo(srtInfo, FALSE);
 
-            int ret = Initial_bac(m_nComPort, _T(""), m_nBautrate); //bacnet mstp 
+            int ret = Initial_bac(m_nComPort, _T(""), m_nBautrate); //初始化bacnet mstp 协议
             CString temp_cs;
             if (ret <= 0)
             {
@@ -183,23 +183,23 @@ int CComWriter::BeginWirteByCom()
                 break;
             }
             //Send_WhoIs_Global(-1, -1);
-#if 0  //
+#if 0  //先不采用闭嘴
             srtInfo = _T("Disabling Bacnet MSTP and switching over to Modbus");
             OutPutsStatusInfo(srtInfo, FALSE);
             int nret = 0;
             int loop1_count = 0;
             do
             {
-                nret = ShutDownMstpGlobal(4);  // Temco bacnet   ;   
+                nret = ShutDownMstpGlobal(4);  //让总线上 Temco的 bacnet 设备  闭嘴; 因为是广播 ， 所有循环发
                 Sleep(2000);
                 loop1_count++;
             } while ((nret <= 0) && loop1_count < 5);
-            nret = ShutDownMstpGlobal(4);  // Temco bacnet   ;   
+            nret = ShutDownMstpGlobal(4);  //让总线上 Temco的 bacnet 设备  闭嘴; 因为是广播 ， 所有循环发
             Sleep(1000);
 
             close_bac_com();
-            find_mstp_protocal = Check_Mstp_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  // 
-            temp_loop_count++; //3
+            find_mstp_protocal = Check_Mstp_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  //再次确认总线上 都闭嘴了
+            temp_loop_count++; //最多循环3次
 #endif
         }
 
@@ -252,7 +252,7 @@ BOOL CComWriter::WriteCommandtoReset()
 
     int nRet = Write_One(m_szMdbIDs[0],16,127);   // Enter ISP mode
     //Sleep(2000);
-    //Add by Fance   ISP  16127   11  11 1  ;
+    //Add by Fance  如果从应用代码跳入 ISP  16写127后  需要读 11号寄存器  11号 大于1  说明跳转成功，否则继续等待;
 //TBD: Explain this comment better
 // If you want to read 11th register 11th or more than 1 when you jump from the application code to the ISP 16 write 127, the jump succeeds, otherwise wait
      
@@ -277,7 +277,7 @@ BOOL CComWriter::WriteCommandtoReset()
     int ModelID= read_one(m_szMdbIDs[0],7,5);
     if (ModelID>0)
     {
-        if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7,8 Detecting chip flash size        {
+        if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7,8 Detecting chip flash size，        {
         {
             int Chipsize=read_one(m_szMdbIDs[0],11,5);
 
@@ -473,10 +473,10 @@ UINT Flash_Modebus_Device(LPVOID pParam)
             CString strID;
             strID.Format(_T("|--------------->>ID-%d-<<---------------"), pWriter->m_szMdbIDs[i]);
             pWriter->OutPutsStatusInfo(strID);
-            ////flash
+            ////显示flash之前的时间
             pWriter->OutPutsStatusInfo(_T("|--------->>Begin"));
             pWriter->OutPutsStatusInfo(_T("|-->>Begin Time:")+GetSysTime());
-            //// flash
+            //// 显示flash之前的设备状态信息
             BOOL Flag_HEX_BIN=FALSE;
 //		     ((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
             pWriter->m_szMdbIDs[i] = temp_read_reg[6];
@@ -569,7 +569,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                     goto	 end_tcp_flash_mode;
                 }
                 int Chipsize = 0;
-                //  pWriter->OutPutsStatusInfo(_T("The device doesnt match with the hex file"));
+                //  pWriter->OutPutsStatusInfo(_T("The device doesn’t match with the hex file"));
 #if 1		//Reset
                 if (ModelID==6||ModelID==7||ModelID==8)
                     Chipsize = Chipsize_6;
@@ -648,7 +648,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                         CString strTemp=_T("");
                         strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);
 
-                        strFailureList+=strTemp;  // flash
+                        strFailureList+=strTemp;  // flash多个使用
                         switch(nFlashRet)
                         {
                         case -1:
@@ -698,7 +698,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                         /*CString strText;
                         strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);
                         pWriter->OutPutsStatusInfo(strText);*/
-                        //// flash
+                        //// 显示flash之前的设备状态信息
                         int time_count = 3;
                         for (int i=0; i<time_count; i++)
                         {
@@ -707,7 +707,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                             pWriter->OutPutsStatusInfo(temp_123,true);
                             Sleep(1000);
                         }
-                        //Sleep(13000);//
+                        //Sleep(13000);//等待重启好之后
 //					((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
                         pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
                         pWriter->OutPutsStatusInfo(_T("|------->>End"));
@@ -752,7 +752,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                     CString strTemp=_T("");
                     strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);
 
-                    strFailureList+=strTemp;  // flash
+                    strFailureList+=strTemp;  // flash多个使用
                     switch(nFlashRet)
                     {
                     case -1:
@@ -792,8 +792,8 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                     CString strText;
                     strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);
                     pWriter->OutPutsStatusInfo(strText);
-                    //// flash
-                    //Sleep(13000);//
+                    //// 显示flash之前的设备状态信息
+                    //Sleep(13000);//等待重启好之后
 //				((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
                     pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
                     pWriter->OutPutsStatusInfo(_T("|------->>End"));
@@ -830,11 +830,11 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 
     //************* begin to flash ***********************
     ii=0;
-    if(mudbus_read_one(m_ID,0xee10)==0x40 || mudbus_read_one(m_ID,0xee10)==0x1f) // ee10 why
+    if(mudbus_read_one(m_ID,0xee10)==0x40 || mudbus_read_one(m_ID,0xee10)==0x1f) // 读ee10， why？
     {
         if(IDOK==AfxMessageBox(_T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),MB_OKCANCEL))
         {
-            // 
+            // 选确定
             ii=0xEE00+17;
             int l=0;//temp;<200
             do
@@ -860,7 +860,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             }
             while(l<200);
         }
-        else // 
+        else // 选取消
         {
             //from 0000 flash update
             ii=0;//from 0000 register flash
@@ -1039,7 +1039,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             if(itemp<RETRY_TIMES)
             {
                 
-                if (-2 == mudbus_write_single_short(m_ID, &register_data[ii], ii, 128))//to write multiple 128 bytes  // SPECIAL_BAC_TO_MODBUS  128x2
+                if (-2 == mudbus_write_single_short(m_ID, &register_data[ii], ii, 128))//to write multiple 128 bytes  //这里 如果是SPECIAL_BAC_TO_MODBUS 就是 128x2
                 {
                     itemp++;
                     Sleep(300);
@@ -1182,7 +1182,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
                 if (itemp <= com_error_delay_count)
                     Sleep(com_error_delay_time);
                 else
-                    Sleep(300 + itemp*100); // 300ms ;
+                    Sleep(300 + itemp*100); //写失败 休眠300ms后 重试;
                 itemp++;
                 
             }
@@ -1429,7 +1429,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
         if (SPECIAL_BAC_TO_MODBUS)
         {
             g_mstp_deviceid = 0;
-            //ID device id.
+            //根据ID得到对应的 device id.
             CString strtemp;
             strtemp.Format(_T("|Reading Device Object Instance"));
             pWriter->OutPutsStatusInfo(strtemp);
@@ -1493,11 +1493,11 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     int compare_ret = 1;
 
 
-                    //88espbootloader 
+                    //如果88esp的设备在bootloader 里面
                     int n_ret = modbus_read_multi(pWriter->m_szMdbIDs[i], &pWriter->update_firmware_info[0], 1994, 6);
                     if (n_ret > 0)
                     {
-                        //MD5
+                        //比对MD5
                         for (int x = 0; x < 4; x++)
                         {
                             wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
@@ -1510,7 +1510,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
                         if ((compare_ret == 1) && (pWriter->update_firmware_info[0] != 0))
                         {
-                            pWriter->continue_com_flash_count = pWriter->update_firmware_info[0] * 128; // 1994;
+                            pWriter->continue_com_flash_count = pWriter->update_firmware_info[0] * 128; // 1994存放的是串口烧写了多少包;
                         }
                         else
                         {
@@ -1637,8 +1637,8 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     Flag_HEX_BIN=TRUE;
                 }
 
-                // pWriter->OutPutsStatusInfo(_T("The device doesnt match with the hex file"));
-#if 1		//
+                // pWriter->OutPutsStatusInfo(_T("The device doesn’t match with the hex file"));
+#if 1		//复位
                 int Chipsize= mudbus_read_one(pWriter->m_szMdbIDs[i],11,5);
                 if (Chipsize<37)	//64K
                 {
@@ -1714,7 +1714,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     CString strTemp=_T("");
                     strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);
 
-                    strFailureList+=strTemp;  // flash
+                    strFailureList+=strTemp;  // flash多个使用
                     switch(nFlashRet)
                     {
                     case -1:
@@ -2166,12 +2166,12 @@ int CComWriter::UpdataDeviceInformation(int& ID)
                 }
                 else if ((Device_infor[7] == PM_MINIPANEL_ARM) && (temp_bootloader_version < 62))
                 {
-                    c2_update_boot = false; //
+                    c2_update_boot = false; //不支持串口更新
                     Ret_Result = -1;
                 }
                 else if ((Device_infor[7] == PM_MINIPANEL) && (temp_bootloader_version < 62))
                 {
-                    c2_update_boot = false; //
+                    c2_update_boot = false; //不支持串口更新
                     Ret_Result = -1;
                 }
                 else if ((Device_infor[7] == PM_TSTAT10) && (temp_bootloader_version < 54))
@@ -2251,7 +2251,7 @@ int CComWriter::BeginWirteByTCP()
                 SetCommunicationType(1);
             }
         }
-        m_subnet_flash = 1; // TCP   ;
+        m_subnet_flash = 1; //设置标志位，是从 TCP 转 子口 的烧写;
         CString strTips = _T("|Programming device...");
         OutPutsStatusInfo(strTips);
         //AddStringToOutPuts(strTips);
@@ -2288,9 +2288,9 @@ int fun_shutdown(LPVOID pParam,int nretry_count)
     for (int i = 0; i < nretry_count; i++)
     {
         int nflag = F_INITIAL;
-        unsigned short silent_command = 0; //  
+        unsigned short silent_command = 0; //高位时间  低位命令
         silent_command = 0x0A00 | F_START_SHUTDOWN;
-        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // 
+        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // 静默初始化
         if (nRet >= 0)
         {
             CString srtInfo = _T("Connecting the subdevice , Waiting.");
@@ -2367,7 +2367,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 #endif
         if (SPECIAL_BAC_TO_MODBUS)
         {
-            //ID device id.
+            //根据ID得到对应的 device id.
             CString strtemp;
             strtemp.Format(_T("|Reading Device Object Instance"));
             pWriter->OutPutsStatusInfo(strtemp);
@@ -2417,14 +2417,14 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
         }
 
 #pragma region mstp_silent_part
-        if (pWriter->m_subnet_flash)  //flash  ;
+        if (pWriter->m_subnet_flash)  //如果是flash 子设备 才运行这一段;
         {
             int nret = 0;
             unsigned short temp_register[100] = { 0 };
             nret = modbus_read_multi(255, &temp_register[0], 0, 100, 6);
             if (nret>=0)
             {
-                //   ;
+                //只有 能够接子设备的 才搞 静默这一套;
                 if ((temp_register[7] == PM_MINIPANEL) ||
                     (temp_register[7] == PM_TSTAT10) ||
                     (temp_register[7] == PM_MINIPANEL_ARM) ||
@@ -2443,7 +2443,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
 #if 0
                         int nflag = F_INITIAL;
-                        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // 
+                        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // 静默初始化
                         if (nRet >= 0)
                         {
                             CString srtInfo = _T("Connecting the subdevice , Waiting.");
@@ -2530,13 +2530,13 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             if (nret_device_info == 1)
             {
                 Flag_HEX_BIN =TRUE;
-                int  nRet = mudbus_write_one(pWriter->m_szMdbIDs[i],16,127,2);   // ISP
+                int  nRet = mudbus_write_one(pWriter->m_szMdbIDs[i],16,127,2);   // 进入ISP模式
 
 
 
                 Sleep (2000);
                 nRet = mudbus_read_one(pWriter->m_szMdbIDs[i],11);
-				//Wait for the device to enter the ISP mode, some devices jump slower than others, cant read after reboot, retry;
+				//Wait for the device to enter the ISP mode, some devices jump slower than others, can’t read after reboot, retry;
                 if (nRet <= 0)
                 {
                     bool read_bootloader_ret = false;
@@ -2579,7 +2579,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 #endif
                 }
 
-       //         if (nRet >=41)//
+       //         if (nRet >=41)//支持多个波特率切换的
        //         {
        //             if (GetCommunicationType () == 0)
        //             {
@@ -2631,7 +2631,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 }
                 //************* begin to flash ***********************
                 ii=0;
-                if(mudbus_read_one(m_ID,0xee10)==0x40 || mudbus_read_one(m_ID,0xee10)==0x1f) // ee10 why
+                if(mudbus_read_one(m_ID,0xee10)==0x40 || mudbus_read_one(m_ID,0xee10)==0x1f) // 读ee10， why？
                 {
                     if(IDOK==AfxMessageBox(_T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),MB_OKCANCEL))  // Select OK
                     {
@@ -2660,7 +2660,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         }
                         while(l<200);
                     }
-                    else // 
+                    else // 选取消
                     {
                         //from 0000 flash update
                         ii=0;//from 0000 register flash
@@ -2751,7 +2751,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         ii=0;//to the register 0000
                     }
                 }
-                else  // Read Eeprom chip failed
+                else  // Read Eeprom chip failed？
                 {
                     //from 0000 flash update
                     ii=0;//from 0000 register flash
@@ -2766,7 +2766,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         if(ii<3)
 
                         {
-                            if(mudbus_write_one(m_ID,16,0x7f)<0)  //T3  T3 .
+                            if(mudbus_write_one(m_ID,16,0x7f)<0)  //T3系列的 是不会回复此命令的 ，T3 直接就复位了.
                             {
                                 ii++;
                                 continue;
@@ -2915,7 +2915,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
             if (pWriter->m_subnet_flash == 0)
             {
-                mudbus_write_one(255, 16, 0x0455, 3);  //  0x04  4    mstp
+                mudbus_write_one(255, 16, 0x0455, 3);  //全局广播  0x04 代表 4分钟   让所有 mstp的设备继续静默
                 Sleep(100);
             }
 
@@ -3067,7 +3067,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             //}
 
 
-            if(nFlashRet > 0) // flash 
+            if(nFlashRet > 0) // flash 成功
             {
                 CString strText;
                 strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);

@@ -1,4 +1,4 @@
-// Powermeter.cpp : 
+// Powermeter.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// CPowermeter 
+// CPowermeter 对话框
 
 IMPLEMENT_DYNAMIC(CPowermeter, CFormView)
 
@@ -31,7 +31,7 @@ BEGIN_MESSAGE_MAP(CPowermeter, CFormView)
 END_MESSAGE_MAP()
 
 
-// CPowermeter 
+// CPowermeter 消息处理程序
 
 void CPowermeter::Fresh()
 {

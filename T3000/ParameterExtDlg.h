@@ -2,23 +2,23 @@
 #include "afxwin.h"
 
 #include "CM5\CStatic\staticex.h"
-// CParameterExtDlg 
+// CParameterExtDlg 对话框
 
 class CParameterExtDlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(CParameterExtDlg)
 
 public:
-	CParameterExtDlg(CWnd* pParent = NULL);   // 
+	CParameterExtDlg(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CParameterExtDlg();
 
-// 
+// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_PARAMETERDIALOG_EXT };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:

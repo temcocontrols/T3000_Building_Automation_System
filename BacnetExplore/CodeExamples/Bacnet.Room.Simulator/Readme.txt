@@ -35,8 +35,8 @@ ANALOG_VALUE:0 Present_Value is the user selected setpoint but can be ovveride w
 by setting the Out_Of_Service property to true.
 
 A 3 levels proportional ventillation is done depending on the difference between internal 
-and external temperature (const. 12 degree celcius in heating mode, 30 in cooling mode). 
-For US people temperature are in .
+and external temperature (const. 12 degree celcius in heating mode, 30°C in cooling mode). 
+For US people temperature are in °F.
 
 Internal, external & hot/warm Water temperatures could be read through some ANALOG_INPUT objects.
 

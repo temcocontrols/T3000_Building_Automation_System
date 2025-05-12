@@ -66,8 +66,8 @@ void CConfigFileHandler::SetConfigFilePath(const CString& strFilePath)
 
 
 
-// config
-// 
+// 创建config文件
+// 如果已经存在，则不做事情
 BOOL CConfigFileHandler::CreateConfigFile(const CString& strFilePath)
 {
 // 	ASSERT(strFilePath.GetLength() > 0);
@@ -138,7 +138,7 @@ BOOL CConfigFileHandler::CreateConfigFile(const CString& strFilePath)
 // 		}
 // 		else
 // 		{
-// 			CString strTips = _T("Cannot create a new config file. Please try again.");
+// 			CString strTips = _T("├Cannot create a new config file. Please try again.");
 // 			((CISPDlg*)m_pParentWnd)->UpdateStatusInfo(strTips, FALSE);
 // 			
 // 			m_pFile->Close();
@@ -222,7 +222,7 @@ BOOL CConfigFileHandler::CreateConfigFile()
 	//	}
 	//	else
 	//	{
-	//		CString strTips = _T("Cannot create a new config file. Please try again.");
+	//		CString strTips = _T("├Cannot create a new config file. Please try again.");
 	//		((CISPDlg*)m_pParentWnd)->UpdateStatusInfo(strTips, FALSE);
 
 	//		m_pFile->Close();
@@ -352,7 +352,7 @@ void CConfigFileHandler::ReadTStatPageConfig(
 // 			strIP = m_szCfgFile[8];
 // 			strIPPort = m_szCfgFile[9];		
 		
-			// 
+			// 取有效数据
 			TCHAR c = ':';
 			strHexFileName = strHexFileName.Mid(strHexFileName.Find(c)+2);
 			strFlashMethod = strFlashMethod.Mid(strFlashMethod.Find(c)+2);
@@ -407,7 +407,7 @@ void CConfigFileHandler::ReadNCPageConfig( CString& strFlashFileName,
 	strIP = m_szCfgFile[CV_NCDeIP];
 	strIPPort = m_szCfgFile[CV_NCDeIPPort];	
 
-	// 
+	// 取有效数据
 	TCHAR c = ':';
 	strFlashFileName = strFlashFileName.Mid(strFlashFileName.Find(c)+2);
 	strFlashType = strFlashType.Mid(strFlashType.Find(c)+2);
@@ -458,7 +458,7 @@ void CConfigFileHandler::ReadLCPageConfig(	CString& strFlashFileName,
 			strIPPort = m_szCfgFile[CV_LCDeIPPort];	
 			strMDBID = m_szCfgFile[CV_LCDMDBID];	
 
-			// 
+			// 取有效数据
 			TCHAR c = ':';
 			strFlashFileName = strFlashFileName.Mid(strFlashFileName.Find(c)+2);
 			strFlashType = strFlashType.Mid(strFlashType.Find(c)+2);
@@ -553,7 +553,7 @@ void CConfigFileHandler::ReadFromCfgFileForAll(
 // 	IPPort=m_szCfgFile[CV_NCDeIPPort];
 // 	subnote = m_szCfgFile[CV_SubNot];
 // 	subID =  m_szCfgFile[CV_Sub_ID];
-	// 
+	// 取有效数据
 	//TCHAR c = ':';
 	// 
 	//HexFileName=HexFileName.Mid(HexFileName.Find(c)+2);
@@ -594,7 +594,7 @@ void CConfigFileHandler::WriteToCfgFile()
 // 		{
 // 				ASSERT(0);
 // 				m_pFile->Close();
-// 				CString strTips = _T("Cannot create a config file. Please try again.");
+// 				CString strTips = _T("├Cannot create a config file. Please try again.");
 // 				//UpdateStatusInfo(strTips, FALSE);
 // 				((CISPDlg*)m_pParentWnd)->UpdateStatusInfo(strTips, FALSE);
 // 		}
@@ -630,7 +630,7 @@ BOOL CConfigFileHandler::ReadFromCfgFile()
 // 		{
 // 			ASSERT(0);
 // 			m_pFile->Close();
-// 			CString strTips = _T("Cannot create a new config file. Please try again.");
+// 			CString strTips = _T("├Cannot create a new config file. Please try again.");
 // 			//UpdateStatusInfo(strTips, FALSE);
 // 			((CISPDlg*)m_pParentWnd)->UpdateStatusInfo(strTips, FALSE);
 // 			return FALSE;
@@ -648,7 +648,7 @@ BOOL CConfigFileHandler::ReadFromCfgFile()
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Product model
+// 操作Product model文件
 
 // int CConfigFileHandler::GetProductModel(const CString& strPMFileName, map<int, CString>& szPMMap)
 // {

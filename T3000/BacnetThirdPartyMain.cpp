@@ -1,4 +1,4 @@
-// BacnetThirdPartyMain.cpp : 
+// BacnetThirdPartyMain.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -31,7 +31,7 @@ BEGIN_MESSAGE_MAP(CBacnetThirdPartyMain, CFormView)
 END_MESSAGE_MAP()
 
 
-// CBacnetThirdPartyMain 
+// CBacnetThirdPartyMain 诊断
 
 #ifdef _DEBUG
 void CBacnetThirdPartyMain::AssertValid() const
@@ -97,7 +97,7 @@ void CBacnetThirdPartyMain::Initial_combo()
 }
 
 
-// CBacnetThirdPartyMain 
+// CBacnetThirdPartyMain 消息处理程序
 
 void CBacnetThirdPartyMain::Fresh()
 {
@@ -118,9 +118,9 @@ void CBacnetThirdPartyMain::Fresh()
 
         char *Buf = new char[len + 1];
 
-        Buf[len+1] = 0;  //0
+        Buf[len+1] = 0;  //0终止字符串，用于输出。
 
-        file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufBufnCount
+        file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
 
         CString temp_cs;
         MultiByteToWideChar(CP_ACP, 0, (char *)Buf, (int)strlen((char *)Buf) + 1, temp_cs.GetBuffer(len), len);
@@ -135,7 +135,7 @@ void CBacnetThirdPartyMain::Fresh()
 
 void CBacnetThirdPartyMain::OnBnClickedButtonThirdOk()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     object_identifier = ((CComboBox *)GetDlgItem(IDC_COMBO_OBJ_TYPE))->GetCurSel();
     CString temp_cs;
     GetDlgItem(IDC_EDIT_OBJ_INSTANCE)->GetWindowTextW(temp_cs);
@@ -158,8 +158,8 @@ void CBacnetThirdPartyMain::OnBnClickedButtonThirdOk()
             file.Open(temp_bacnet_logfile, CFile::modeRead, NULL);
             DWORD len = file.GetLength();
             char* Buf = new char[len + 1];
-            Buf[len + 1] = 0;  //0
-            file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufBufnCount
+            Buf[len + 1] = 0;  //0终止字符串，用于输出。
+            file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
             CString temp_cs;
             MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, bacnet_string.GetBuffer(len), len);
             bacnet_string.ReleaseBuffer();

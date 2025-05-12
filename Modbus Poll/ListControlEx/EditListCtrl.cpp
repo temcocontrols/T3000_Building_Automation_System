@@ -59,15 +59,15 @@ void CEditListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	{
 		CListCtrl::OnLButtonDown(nFlags, point);
 		
-		if(m_bHighLight && m_iItem == lvhit.iItem && m_iSubItem == lvhit.iSubItem && (m_iSubItem==1 || m_iSubItem==2))//
+		if(m_bHighLight && m_iItem == lvhit.iItem && m_iSubItem == lvhit.iSubItem && (m_iSubItem==1 || m_iSubItem==2))//在这里只编辑坐标点
 		{
-			//
+			//第二次单击
 			EditLabel(m_iItem);
 			return;
 		}
 		else
 		{
-			//
+			//第一次单击
 			m_iItem = lvhit.iItem;
 			m_iSubItem = lvhit.iSubItem;
 			m_bHighLight = TRUE;
@@ -77,7 +77,7 @@ void CEditListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	{
 		if(m_edtItemEdit.m_hWnd == NULL)
 		{
-			//
+			//未出现文本编辑框时
 			m_bHighLight = FALSE;
 		}
 		
@@ -129,7 +129,7 @@ void CEditListCtrl::OnPaint()
 
 		GetSubItemRect(m_iItem, m_iSubItem, LVIR_LABEL, rect);
 
-		//,
+		//当文本编辑框缩小时,擦除露出的项文本高亮部分
 		if (rcEdit.right < rect.right)
 		{
 			rect.left = rcEdit.right;
@@ -153,7 +153,7 @@ void CEditListCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 	{
 		if (plvItem->pszText != NULL )
 		{
-			SetItemText(plvItem->iItem,m_iSubItem, plvItem->pszText);//m_iSubItem1X,2Y
+			SetItemText(plvItem->iItem,m_iSubItem, plvItem->pszText);//m_iSubItem为1就是X坐标,2就是Y坐标
 			CString  strCmp(_T(""));
 
 			if (GetItemText(plvItem->iItem,1)!=strCmp && GetItemText(plvItem->iItem,2)!=strCmp)
@@ -163,12 +163,12 @@ void CEditListCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 
 			else
 			{
-				SetItemText(plvItem->iItem,3,_T(""));
+				SetItemText(plvItem->iItem,3,_T("非法点"));
 			}
 			
 			if (preEditString != plvItem->pszText)
 			{
-				m_bEditDataChanged = TRUE;//		
+				m_bEditDataChanged = TRUE;//文字改变标志改变		
 			}
 
 			if (m_iSubItem == 1)
@@ -202,7 +202,7 @@ void CEditListCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 		*pResult = 0;
 	}
 
-	//()"OnEndlabeledit"
+	//编辑文本时对控件父窗口操作(如单击其它控件)引发"OnEndlabeledit"时刷新控件
 	CRect rect;
 	GetWindowRect(&rect);
 	CPoint point;
@@ -266,7 +266,7 @@ void CEditListCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 			size.cx = 41; 
 		}
 		
-		//
+		//设置文本高亮矩形
 		rcText.left += 4;
 		rcText.right = rcText.left + size.cx + 6;
 		if(rcText.right > rcItem.right)
@@ -276,7 +276,7 @@ void CEditListCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 		
 		COLORREF crOldTextColor = pDC->GetTextColor();
 
-		///
+		//绘制项焦点/高亮效果
 		if(m_bFocus)
 		{
 			
@@ -291,7 +291,7 @@ void CEditListCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 			}		
 		}
 		
-		//
+		//绘制项文本
 		rcItem.left += 6;
 		pDC->DrawText(strItemText, &rcItem, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOCLIP);
 

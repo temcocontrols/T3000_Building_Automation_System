@@ -1,4 +1,4 @@
-// BacnetProperty.cpp : 
+// BacnetProperty.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
-// CBacnetProperty 
+// CBacnetProperty 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetProperty, CDialogEx)
 
@@ -32,17 +32,17 @@ BEGIN_MESSAGE_MAP(CBacnetProperty, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetProperty 
+// CBacnetProperty 消息处理程序
 
 
 BOOL CBacnetProperty::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  
+    // TODO:  在此添加额外的初始化
     Initial_List();
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // : OCX  FALSE
+                  // 异常: OCX 属性页应返回 FALSE
 }
 
 void CBacnetProperty::SetParameter(int nBACNET_PROPERTY_ID)

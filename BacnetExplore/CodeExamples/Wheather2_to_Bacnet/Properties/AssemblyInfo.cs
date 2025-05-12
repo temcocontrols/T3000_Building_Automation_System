@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("F. Chaxel")]
 [assembly: AssemblyProduct("Wheather2_to_Bacnet")]
-[assembly: AssemblyCopyright("Copyright  F. Chaxel 2016")]
+[assembly: AssemblyCopyright("Copyright © F. Chaxel 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

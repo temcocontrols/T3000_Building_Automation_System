@@ -124,21 +124,21 @@ typedef struct _BUILDING_TAG
 typedef struct ext_info
 {
 	int virtual_device;  // 0  default    1  verture device
-	int mini_type;       // Setting   mini_type
-	int special_com_communicate;  //  1    ;
-	unsigned char com_data_bit;   //  -1     5  6 7 8
-	unsigned char com_stop_bit;   //  -1     1   1.5   2
-	unsigned char com_parity_bit;  //  -1   0:None  1:odd    2:Even   
+	int mini_type;       //对应 Setting 界面的  mini_type
+	int special_com_communicate;  //取值  1  客户自定义的串口 停止位 校验位之类的;
+	unsigned char com_data_bit;   //取值  -1 为不可用    5  6 7 8
+	unsigned char com_stop_bit;   //取值  -1 为不可用    1   1.5   2
+	unsigned char com_parity_bit;  //取值  -1 为不可用  0:None  1:odd    2:Even   
 
 };
 
 typedef struct tree_io_info
 {
-	HTREEITEM h_tree_item; //
-	HTREEITEM h_parent_item; // 
+	HTREEITEM h_tree_item; //子节点树句柄
+	HTREEITEM h_parent_item; // 父节点的句柄
 	int h_item_type; // input or output or ......
-	int capacity;   //
-	int already_use; //;
+	int capacity;   //最大个数
+	int already_use; //已经使用;
 }tree_sub_io;
 
 typedef struct _tree_product//////////////////////
@@ -164,9 +164,9 @@ typedef struct _tree_product//////////////////////
     unsigned int note_parent_serial_number;
     unsigned char panel_number;
     unsigned int object_instance;
-    UCHAR  subnet_port;  // 1- MainPort      2-ZigbeePort      3-SubPort
-    UCHAR  subnet_baudrate;   //; 
-    UCHAR  expand; //; 1  2        2 
+    UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
+    UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
+    UCHAR  expand; //是否树形结构展开; 1为默认展开 或者 非2 为展开       2 为折叠
 	ext_info m_ext_info;
 	tree_sub_io sub_io_info[TREE_MAX_TYPE];
 	
@@ -341,7 +341,7 @@ public:
     void  Show_Wait_Dialog_And_ReadBacnet(int ncontrol);
 	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
     static DWORD WINAPI  Mul_Ping_Thread(LPVOID lpVoid);
-    int m_read_control;   // 0      1   ;
+    int m_read_control;   // 0 默认全部读取     1  读缓存的时候使用 ;
 	static DWORD WINAPI  Read_Bacnet_Thread(LPVOID lpVoid);
 	static DWORD WINAPI  Read_Modbus_10000(LPVOID lpVoid);
 	static DWORD WINAPI  Write_Modbus_10000(LPVOID lpVoid);
@@ -381,7 +381,7 @@ public:
 			//BOOL ValidAddress(CString sAddress);
 	BOOL ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT& n4);
 	 
-	void CheckConnectFailure(const CString& strIP);// 
+	void CheckConnectFailure(const CString& strIP);// 检查失败的原因，并给出详细的提示信息
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	BOOL ConnectSubBuilding(Building_info build_info);
 	BOOL ConnectDevice(LPCTSTR ip_address,int nport);
@@ -436,16 +436,16 @@ protected:
 	BOOL ImportDataBaseForFirstRun();
 	CString GetCurrentFileVersion();
 	CString ReadFileVersionFromRegister(CRegKey& reg);
-//protected://lsc20111213
+//protected://lsc20111213修改
 public:
 	BOOL m_bEnableRefreshTreeView;
 	CRefreshTreeThread*	m_pRefreshThread;
 
-	CString						m_strCurSelNodeName;  // name
+	CString						m_strCurSelNodeName;  // 记录当前点击树节点的name
 	BOOL m_isCM5;
 	BOOL m_isMiniPanel;
 
-	//HTREEITEM				m_htiCurSel;  // 
+	//HTREEITEM				m_htiCurSel;  // 记录当前点击树节点
 	CString						m_strFileVersion;
 
 public:
@@ -617,11 +617,11 @@ public:
 };
 //DWORD WINAPI  Bacnet_ReadWrite_Message(LPVOID lpVoid);
 //tree0412  2017 05 11 fance change
-extern vector <bacnet_background_struct> m_backbround_data; // bacnet panel
+extern vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
 #define TVINSERV_BUILDING 		    {tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
 #define TVINSERV_FLOOR	 			{tvInsert.item.iImage=0; tvInsert.item.iSelectedImage=0;}
 #define TVINSERV_ROOM				{tvInsert.item.iImage=2; tvInsert.item.iSelectedImage=2;}
-#define TVINSERV_TSTAT_DEFAULT 	    {tvInsert.item.iImage=6; tvInsert.item.iSelectedImage=6;}     //
+#define TVINSERV_TSTAT_DEFAULT 	    {tvInsert.item.iImage=6; tvInsert.item.iSelectedImage=6;}     //默认的产品图标
 #define TVINSERV_LED_TSTAT7 		{tvInsert.item.iImage=8; tvInsert.item.iSelectedImage=8;}   //TSTAT7
 #define TVINSERV_CMFIVE			    {tvInsert.item.iImage=10;tvInsert.item.iSelectedImage=10;}   //TSTAT7
 #define TVINSERV_NET_WORK		    {tvInsert.item.iImage=12;tvInsert.item.iSelectedImage=12;}
@@ -635,6 +635,6 @@ extern vector <bacnet_background_struct> m_backbround_data; // bacnet panel
 #define TVINSERV_T3LC			    {tvInsert.item.iImage=26;tvInsert.item.iSelectedImage=26;}//LC
 #define TVINSERV_T3_NANO    {tvInsert.item.iImage=28;tvInsert.item.iSelectedImage=28;}//zigbeerepeater
 #define TVINSERV_PM5E               {tvInsert.item.iImage=30;tvInsert.item.iSelectedImage=30;}//PM5E
-#define TVINSERV_THIRD_PARTY        {tvInsert.item.iImage=32;tvInsert.item.iSelectedImage=32;}//
+#define TVINSERV_THIRD_PARTY        {tvInsert.item.iImage=32;tvInsert.item.iSelectedImage=32;}//第三方设备
 #define ITEM_MASK				TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_TEXT
 

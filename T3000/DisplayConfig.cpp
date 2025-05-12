@@ -336,32 +336,32 @@ void CDisplayConfig::DblClickInputMsflexgrid()
 if(g_OutPutLevel==1)
 	return;
 	long lRow,lCol;
-	lRow = m_FlexGrid1.get_RowSel();//	
-	lCol = m_FlexGrid1.get_ColSel(); //
+	lRow = m_FlexGrid1.get_RowSel();//获取点击的行号	
+	lCol = m_FlexGrid1.get_ColSel(); //获取点击的列号
 	if((lCol==0))
 		return;
-	if(lRow>m_FlexGrid1.get_Rows()) //
+	if(lRow>m_FlexGrid1.get_Rows()) //如果点击区超过最大行号，则点击是无效的
 		return; 
-	if(lRow == 0) //
+	if(lRow == 0) //如果点击标题行，也无效
 		return;
 	CRect rect;
-	m_FlexGrid1.GetWindowRect(rect); //
-	ScreenToClient(rect); //
+	m_FlexGrid1.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形
 	CDC* pDC =GetDC();
-	//
+	//计算象素点和缇的转换比例
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//()
+	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid1.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid1.get_ColPos(lCol)/nTwipsPerDotX;
-	//()11
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid1.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid1.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//
+	//形成选中个所在的矩形区域
 	CRect rc(x,y,x+width,y+height);
-	//
+	//转换成相对对话框的坐标
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//
+	//获取选中格的文本信息
 	CString strValue = m_FlexGrid1.get_TextMatrix(lRow,lCol);
 	m_nCurRow=lRow;
 	m_nCurCol=lCol;
@@ -406,18 +406,18 @@ if(g_OutPutLevel==1)
 		m_ItemValueCombx.AddString(_T("CLOCK TIME"));
 		m_ItemValueCombx.AddString(_T("CO2"));
 		m_ItemValueCombx.AddString(_T("Humidity"));
-		m_ItemValueCombx.ShowWindow(SW_SHOW);//
-		m_ItemValueCombx.MoveWindow(rc); //
+		m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+		m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 		m_ItemValueCombx.BringWindowToTop();
-		m_ItemValueCombx.SelectString(-1,strValue); //		
-		m_ItemValueCombx.SetFocus(); //
+		m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+		m_ItemValueCombx.SetFocus(); //获取焦点
 		}
 }
  
 void CDisplayConfig::OnEnKillfocusInput9()
 {
    UpdateData(TRUE);
-   //
+   //写寄存器
    /*int jugde=m_display_number+1*/
    if (m_display_number>14||m_display_number<0)
    {

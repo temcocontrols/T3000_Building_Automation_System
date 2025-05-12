@@ -43,7 +43,7 @@ public:
 	virtual void OnCancel();
 public:
 	int m_latest_protocol;
-	bool window_max; // ;
+	bool window_max; // 标记是否已经最大化;
 	void Fresh_One_Item(int row);
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	CStaticEx m_output_item_info;

@@ -9,7 +9,7 @@
 #include "MainFrm.h"
 str_wifi_point wifi_info;
 // CWifiConfigDlg dialog
-extern tree_product selected_product_Node; // ;
+extern tree_product selected_product_Node; // 选中的设备信息;
 IMPLEMENT_DYNAMIC(CWifiConfigDlg, CDialogEx)
 
 CWifiConfigDlg::CWifiConfigDlg(CWnd* pParent /*=NULL*/)
@@ -25,9 +25,9 @@ CWifiConfigDlg::CWifiConfigDlg(CWnd* pParent /*=NULL*/)
     WIFI_MODBUS_PORT = 2004;
     WIFI_BACNET_PORT = 2005;
     WIFI_MOUDLE_SOFTWARE_VERSION = 2006;
-    SSID_NAME_START_REG = 2010;  // 32
-    PASSWORD_START_REG = 2042 ;   //16 
-    STATIC_IP_START_REG = 2058 ;  //12
+    SSID_NAME_START_REG = 2010;  // 32个
+    PASSWORD_START_REG = 2042 ;   //16 个
+    STATIC_IP_START_REG = 2058 ;  //12个
 }
 
 CWifiConfigDlg::~CWifiConfigDlg()
@@ -45,9 +45,9 @@ void CWifiConfigDlg::SetWifiRegStartAddress(int nstart_address)
     WIFI_MODBUS_PORT = 2004 + offset;
     WIFI_BACNET_PORT = 2005 + offset;
     WIFI_MOUDLE_SOFTWARE_VERSION = 2006 + offset;
-    SSID_NAME_START_REG = 2010 + offset;  // 32
-    PASSWORD_START_REG = 2042 + offset;   //16 
-    STATIC_IP_START_REG = 2058 + offset;  //12
+    SSID_NAME_START_REG = 2010 + offset;  // 32个
+    PASSWORD_START_REG = 2042 + offset;   //16 个
+    STATIC_IP_START_REG = 2058 + offset;  //12个
 
     m_version = 1;
 }
@@ -471,7 +471,7 @@ void CWifiConfigDlg::OnBnClickedOk()
         BYTE address1, address2, address3, address4;
         ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS2))->GetAddress(address1, address2, address3, address4);
 
-        //dufan : IP 
+        //dufan : 当IP地址 有变化时才写寄存器
         if ((m_address[0] != ret[0]) ||
             (m_address[1] != ret[1]) ||
             (m_address[2] != ret[2]) ||
@@ -493,8 +493,8 @@ void CWifiConfigDlg::OnBnClickedOk()
     {
         if (m_version >= 3)
         {
-            bool isstatic_enablewifi = ((CButton *)GetDlgItem(IDC_RADIO_WIFI_ENABLE))->GetCheck(); //10;
-            bool isstatic_disablewifi = ((CButton *)GetDlgItem(IDC_RADIO_WIFI_DISABLE))->GetCheck(); //10;
+            bool isstatic_enablewifi = ((CButton *)GetDlgItem(IDC_RADIO_WIFI_ENABLE))->GetCheck(); //返回1表示选上，0表示没选上;
+            bool isstatic_disablewifi = ((CButton *)GetDlgItem(IDC_RADIO_WIFI_DISABLE))->GetCheck(); //返回1表示选上，0表示没选上;
             if (isstatic_disablewifi)
             {
                 int ret2 = write_one(g_tstat_id, WIFI_ENABLE, 2, 10);
@@ -555,7 +555,7 @@ void CWifiConfigDlg::OnBnClickedOk()
         wifi_info.reg.getway[2] = gatway3;
         wifi_info.reg.getway[3] = gatway4;
 
-        bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_IP_AUTO))->GetCheck(); //10;
+        bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_IP_AUTO))->GetCheck(); //返回1表示选上，0表示没选上;
         if (isstatic == false)
             wifi_info.reg.IP_Auto_Manual = 1;
         else
@@ -585,7 +585,7 @@ void CWifiConfigDlg::OnBnClickedOk()
             }
             Sleep(SEND_COMMAND_DELAY_TIME * 2);
 
-#if 0  // 47808   modbus
+#if 0  //暂时不让通过 界面去修改47808 的端口号 ，实在需要凯爷手动 modbus去改
             ret2 = write_one(g_tstat_id, WIFI_BACNET_PORT, n_bacnet_port, 10);
             if (ret2 < 0)
             {
@@ -669,7 +669,7 @@ void CWifiConfigDlg::OnBnClickedOk()
 
 void CWifiConfigDlg::OnBnClickedRadioIpAuto()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     GetDlgItem(IDC_IPADDRESS1)->ShowWindow(false);
     GetDlgItem(IDC_IPADDRESS3)->ShowWindow(false);
     GetDlgItem(IDC_IPADDRESS2)->EnableWindow(false);
@@ -680,14 +680,14 @@ void CWifiConfigDlg::OnBnClickedRadioIpAuto()
 
 void CWifiConfigDlg::OnBnClickedRadioIpStatic()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     GetDlgItem(IDC_IPADDRESS1)->ShowWindow(true);
     GetDlgItem(IDC_IPADDRESS3)->ShowWindow(true);
     GetDlgItem(IDC_IPADDRESS2)->EnableWindow(true);
     GetDlgItem(IDC_STATIC_MASK)->ShowWindow(true);
     GetDlgItem(IDC_STATIC_GATEWAY)->ShowWindow(true);
 
-    //IP  0.0.0.0  255.255.255.0
+    //如果客户改为静态IP ，而子网掩码又是 0.0.0.0  就默认给客户一个较为规范的255.255.255.0
     BYTE subnet1, subnet2, subnet3, subnet4;
     ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS1))->GetAddress(subnet1, subnet2, subnet3, subnet4);
     if ((subnet1 == 0) && (subnet1 == 0) && (subnet1 == 0) && (subnet1 == 0))
@@ -699,14 +699,14 @@ void CWifiConfigDlg::OnBnClickedRadioIpStatic()
 
 void CWifiConfigDlg::OnBnClickedButtonWifiDefault()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     write_one(g_tstat_id, WIFI_LOAD_DEFAULT, 1, 10);
 }
 
 
 void CWifiConfigDlg::OnBnClickedRadioWifiDisable()
 {
-    // TODO: 
+    // TODO: 在此添加控件通知处理程序代码
     write_one(g_tstat_id, WIFI_ENABLE, 2, 10);
     Sleep(1000);
     PostMessage(WM_CLOSE, NULL, NULL);

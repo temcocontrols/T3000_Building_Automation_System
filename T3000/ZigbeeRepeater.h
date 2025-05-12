@@ -3,14 +3,14 @@
 
 #include "CM5/ListCtrlEx.h"
 
-// CZigbeeRepeater 
+// CZigbeeRepeater 窗体视图
 
 class CZigbeeRepeater : public CFormView
 {
 	DECLARE_DYNCREATE(CZigbeeRepeater)
 
 public:
-	CZigbeeRepeater();           // 
+	CZigbeeRepeater();           // 动态创建所使用的受保护的构造函数
 	virtual ~CZigbeeRepeater();
 
 public:
@@ -25,7 +25,7 @@ public:
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 

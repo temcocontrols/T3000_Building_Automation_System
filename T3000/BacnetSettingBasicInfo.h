@@ -1,23 +1,23 @@
 #pragma once
 
 
-// CBacnetSettingBasicInfo 
+// CBacnetSettingBasicInfo 对话框
 
 class CBacnetSettingBasicInfo : public CDialogEx
 {
 	DECLARE_DYNAMIC(CBacnetSettingBasicInfo)
 
 public:
-	CBacnetSettingBasicInfo(CWnd* pParent = NULL);   // 
+	CBacnetSettingBasicInfo(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBacnetSettingBasicInfo();
 
-// 
+// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_SETTING_BASIC };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 

@@ -1,4 +1,4 @@
-// TstatAQI_Detail.cpp : 
+// TstatAQI_Detail.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include "global_function.h"
 #include "global_variable_extern.h"
 #include "TstatAQ.h"
-// CTstatAQI_Detail 
+// CTstatAQI_Detail 对话框
 
 const int aqi_picture_x = 1022;
 const int aqi_picture_y = 530;
@@ -38,7 +38,7 @@ BEGIN_MESSAGE_MAP(CTstatAQI_Detail, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CTstatAQI_Detail 
+// CTstatAQI_Detail 消息处理程序
 
 HICON default_select;
 BOOL CTstatAQI_Detail::OnInitDialog()
@@ -47,11 +47,11 @@ BOOL CTstatAQI_Detail::OnInitDialog()
     CRect Temp_Rect;
     GetWindowRect(Temp_Rect);
     MoveWindow(Temp_Rect.left, Temp_Rect.top, aqi_picture_x, aqi_picture_y);
-    // TODO:  
+    // TODO:  在此添加额外的初始化
     default_select = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_SELECT), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // : OCX  FALSE
+                  // 异常: OCX 属性页应返回 FALSE
 }
 
 
@@ -82,12 +82,12 @@ PointF  USA_Select(360, 170);
 
 
 extern CString bmp_AQI;
-CRect mynew_rect3;	// ;
+CRect mynew_rect3;	//用来存储 窗体应该有多大;
 void CTstatAQI_Detail::OnPaint()
 {
     CPaintDC dc(this); // device context for painting
-                       // TODO: 
-                       //  CDialogEx::OnPaint()
+                       // TODO: 在此处添加消息处理程序代码
+                       // 不为绘图消息调用 CDialogEx::OnPaint()
 
     value1.x = 0;
     value1.y = product_register_value[TATAT_AQ_MODBUS_AQI_CUSTOMER_FIRST_LINE];
@@ -116,7 +116,7 @@ void CTstatAQI_Detail::OnPaint()
     temp_value_6.Format(_T("%d - 500"), value6.x);
 
                        //TRACE(_T("Screen Edit Paint\r\n"));
-    ::GetWindowRect(BacNet_hwd, &mynew_rect3);	// view;
+    ::GetWindowRect(BacNet_hwd, &mynew_rect3);	//获取 view的窗体大小;
     CMemDC memDC(dc, this);
     CRect rcClient;
     GetClientRect(&rcClient);
@@ -166,7 +166,7 @@ void CTstatAQI_Detail::OnPaint()
 
 void CTstatAQI_Detail::OnLButtonDown(UINT nFlags, CPoint point)
 {
-    // TODO: /
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
     //CString temp1;
     //temp1.Format(_T("%d,%d"), point.x, point.y);
     //MessageBox(temp1);
@@ -180,7 +180,7 @@ void CTstatAQI_Detail::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CTstatAQI_Detail::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: /
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
     switch (nIDEvent)
     {
     case 1:

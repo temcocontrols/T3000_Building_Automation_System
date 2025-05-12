@@ -94,8 +94,8 @@ public:
 	   int SendData(TS_US *to_write, TS_US length, unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength, BOOL CHECK_CRC);
 
 private:
-	HANDLE m_hSerial;//
-	OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // /
+	HANDLE m_hSerial;//串口句柄
+	OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // 用于重叠读/写
 	TS_UC  m_gval[128];//the data that get from com   //8
 	TS_UC  m_serinumber_in_dll[4];//only read_one function ,when read 10,
 	TS_UC  m_pval[13];//the data that send from com

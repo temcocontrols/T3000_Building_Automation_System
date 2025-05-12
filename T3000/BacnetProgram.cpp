@@ -20,7 +20,7 @@ extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure t
 #include "DialogCM5_BacNet.h"
 extern CDialog_Progess *WaitRead_Data_Dlg;
 #include "MainFrm.h"
-extern tree_product selected_product_Node; // ;
+extern tree_product selected_product_Node; // 选中的设备信息;
 // CBacnetProgram dialog
 
 IMPLEMENT_DYNAMIC(CBacnetProgram, CDialogEx)
@@ -45,7 +45,7 @@ void CBacnetProgram::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CBacnetProgram, CDialogEx)
 	ON_MESSAGE(MY_RESUME_DATA, ProgramMessageCallBack)
-	ON_MESSAGE(WM_HOTKEY,&CBacnetProgram::OnHotKey)//
+	ON_MESSAGE(WM_HOTKEY,&CBacnetProgram::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Program_Item)
 	ON_MESSAGE(WM_REFRESH_BAC_PROGRAM_LIST,Fresh_Program_List)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_EDIT, OnBnClickedButtonProgramEdit)
@@ -76,12 +76,12 @@ LRESULT  CBacnetProgram::ProgramMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		memcpy_s(&m_Program_data.at(pInvoke->mRow),sizeof(Str_program_point),&m_temp_program_data[pInvoke->mRow],sizeof(Str_program_point));//
+		memcpy_s(&m_Program_data.at(pInvoke->mRow),sizeof(Str_program_point),&m_temp_program_data[pInvoke->mRow],sizeof(Str_program_point));//还原没有改对的值
 		PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 	}
-	if((pInvoke->mRow%2)==0)	//  ;
+	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 		m_program_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
 		m_program_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -140,7 +140,7 @@ BOOL CBacnetProgram::OnInitDialog()
 	
 	g_new_old_IDE = 0;
 	ShowWindow(FALSE);
-	//RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert
+	//RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert键
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -148,8 +148,8 @@ BOOL CBacnetProgram::OnInitDialog()
 
 void CBacnetProgram::Reg_Hotkey()
 {
-	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert
-	RegisterHotKey(GetSafeHwnd(), KEY_INSERT_CONTROL, MOD_CONTROL , VK_INSERT);//Insert
+	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert键
+	RegisterHotKey(GetSafeHwnd(), KEY_INSERT_CONTROL, MOD_CONTROL , VK_INSERT);//Insert键
 }
 
 void CBacnetProgram::Unreg_Hotkey()
@@ -248,7 +248,7 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == PROGRAM_LABEL)
 	{
 		CString cs_temp = m_program_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_PROGRAM_LABEL_LENGTH)	//;
+		if(cs_temp.GetLength()>= STR_PROGRAM_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 8"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
@@ -270,7 +270,7 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == PROGRAM_FULL_LABLE)
 	{
 		CString cs_temp = m_program_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_PROGRAM_DESCRIPTION_LENGTH)	//;
+		if(cs_temp.GetLength()>= STR_PROGRAM_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 20"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
@@ -335,7 +335,7 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam, LPARAM lParam)
 	{
 		if (m_program_list.IsDataNewer((char*)&m_Program_data.at(0), sizeof(Str_program_point) * BAC_PROGRAM_ITEM_COUNT))
 		{
-			//list ;List;
+			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
 			m_program_list.SetListData((char*)&m_Program_data.at(0), sizeof(Str_program_point) * BAC_PROGRAM_ITEM_COUNT);
 		}
 		else
@@ -435,7 +435,7 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 {
 	t3_panel_version = Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub;
 	g_new_old_IDE = 0;
-	//2018 05 23 panel   program_list_line .
+	//2018 05 23 解决在切换panel时 ， 选中的 program_list_line 的值需要重新获取.
     for (int i = 0;i<m_program_list.GetItemCount();++i)
     {
         if (m_program_list.GetCellChecked(i, 0))
@@ -458,7 +458,7 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 			WaitRead_Data_Dlg = 0;
 		}
 		WaitRead_Data_Dlg = new CDialog_Progess(this,1,100);
-		//
+		//创建对话框窗口
 		WaitRead_Data_Dlg->Create(IDD_DIALOG10_Progress, this);
 		WaitRead_Data_Dlg->ShowProgress(0,0);
 		RECT RECT_SET1;
@@ -532,7 +532,7 @@ void CBacnetProgram::ShowNewProgramEdit()
 			WaitRead_Data_Dlg = 0;
 		}
 		WaitRead_Data_Dlg = new CDialog_Progess(this, 1, 100);
-		//
+		//创建对话框窗口
 		WaitRead_Data_Dlg->Create(IDD_DIALOG10_Progress, this);
 		WaitRead_Data_Dlg->ShowProgress(0, 0);
 		RECT RECT_SET1;
@@ -635,7 +635,7 @@ void CBacnetProgram::OnTimer(UINT_PTR nIDEvent)
 	{
 		PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 	}
-	else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_PROGRAM))  )	//GSM;
+	else if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_PROGRAM))  )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -666,20 +666,20 @@ BOOL CBacnetProgram::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 
 		return 1; 
 	}
-	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //F2;
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
 	{
 		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_PROGRAM);
 		return TRUE;
@@ -777,7 +777,7 @@ void CBacnetProgram::Reset_Program_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -785,7 +785,7 @@ void CBacnetProgram::Reset_Program_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -831,14 +831,14 @@ void CBacnetProgram::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	// view;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return;

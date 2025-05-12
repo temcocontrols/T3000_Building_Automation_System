@@ -23,7 +23,7 @@ void  CHexFileParser::SetFileName(const CString& strFileName)
 
 
 //////////////////////////////////////////////////////////////////////////
-// int
+// 返回int：实际的有效字节
 int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 {
 	CFile hexFile; //the hex file
@@ -91,7 +91,7 @@ BOOL CHexFileParser::Is_RAM_HEXType(){
     return m_IsRAM;
 }
 
-// 7800Normal0204
+// 读第7，8个字符，00为Normal，02为扩展，04为扩展线性
 HEXFILE_FORMAT	CHexFileParser::GetHexFileType(CFile& hexFile)
 {
 	int nRet = 0;
@@ -133,7 +133,7 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 	char a[256];
 	ZeroMemory(a, 256);
 	
-	//while(NULL!=ar.ReadString(m_get_data_from_file))//
+	//while(NULL!=ar.ReadString(m_get_data_from_file))//循环读取文件，直到文件结束
 	while(ReadLineFromFile(hexFile, a))
 	{//get a line from the file,check "crc" for total file
 	
@@ -148,11 +148,11 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 		unsigned char get_hex[128]={0};		//get hex data,it is get from the line char
 	
 		UINT i = 0;
-		for( i=0;i<strlen(a); i++)		//get a line//
+		for( i=0;i<strlen(a); i++)		//get a line//去掉第一个
 		{
 			a[i] = a[i+1];
 		}
-		int nLen = strlen(a)-2;			// 
+		int nLen = strlen(a)-2;			// 减去回车换行符号
 		if(strlen(a)%2==0)
 			turn_hex_file_line_to_unsigned_char(a);		// turn every char to int 
 		else
@@ -243,7 +243,7 @@ WORD CHexFileParser::GetHighAddrFromFile(const CString& strLine)
 
 BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 {
-	//hex256hex
+	//当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
 	int linecharnum=0;
 	char c;
 	int nRet = file.Read(&c, 1);
@@ -253,9 +253,9 @@ BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 		++linecharnum;
 		*pBuffer++ = c;
 		//TRACE(_T("\n%c"),c);
-		if (c == 0x0d) // 
+		if (c == 0x0d) // 回车
 		{
-			file.Read(&c, 1);  // 
+			file.Read(&c, 1);  // 读一个换行
 			*pBuffer++ = c;
 			TRACE(_T("%s"),pBuffer);
 			return TRUE;
@@ -281,7 +281,7 @@ BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 // 3, int      :  parameter 2, memory space's size.
 // return:
 // int			: it's the truely length of the used buffer, also useful byte number after hex file been parsed.
-// hex file512k
+// 读扩展地址记录的hex file－最大512k地址空间
 int CHexFileParser::ReadExtendHexFile(CFile& hexFile, char* pBuf, int nBufLen)
 {
 	//MessageBox(NULL, _T("Sorry, don't suppot Extend Hex File. Please contact software developer."), _T("ISP"), MB_OK);
@@ -295,7 +295,7 @@ int CHexFileParser::ReadExtendHexFile(CFile& hexFile, char* pBuf, int nBufLen)
 	char a[256];
 	ZeroMemory(a, 256);
 	
-	//while(NULL!=ar.ReadString(m_get_data_from_file))//
+	//while(NULL!=ar.ReadString(m_get_data_from_file))//循环读取文件，直到文件结束
 	while(ReadLineFromFile(hexFile, a))
 	{//get a line from the file,check "crc" for total file
 	
@@ -314,7 +314,7 @@ int CHexFileParser::ReadExtendHexFile(CFile& hexFile, char* pBuf, int nBufLen)
 		{
 			a[i] = a[i+1];
 		}
-		int nLen = strlen(a)-2;			// 
+		int nLen = strlen(a)-2;			// 减去回车换行符号
 		if(strlen(a)%2==0)
 			turn_hex_file_line_to_unsigned_char(a);		// turn every char to int 
 		else
@@ -374,7 +374,7 @@ int CHexFileParser::ReadExtendHexFile(CFile& hexFile, char* pBuf, int nBufLen)
 // 3, int      :  specify parameter 2, memory space's size.
 // return:
 // int			: it's the truely length of the used buffer, also useful byte number after hex file been parsed.
-// hex file32
+// 读扩展线性地址记录的hex file－最大32位的地址空间
 BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLen)
 {
 	//CArchive ar(&m_hex_file,CArchive::load);
@@ -392,14 +392,14 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 //*****************inspect the file*********************
 	unsigned int nLineNumErr=0;
 
-	DWORD dwHiAddr = 0; // 
+	DWORD dwHiAddr = 0; // 高位地址
 	char a[256];
 	ZeroMemory(a, 256);
 	
-	//while(NULL!=ar.ReadString(strGetData))	//
+	//while(NULL!=ar.ReadString(strGetData))	//循环读取文件，直到文件结束
 	while(ReadLineFromFile(hexfile, a))
 	{
-		// 
+		// 取得高位地址，可能不止一处扩展
 		if( a[8] == '4')
 		{
 			CString strTemp(a);
@@ -419,12 +419,12 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 		unsigned char get_hex[128]={0};//get hex data,it is get from the line char
 		//the number is (i-1)
 		//int nLen = strGetData.GetLength();
-		for(UINT i=0; i<strlen(a); i++) // 
+		for(UINT i=0; i<strlen(a); i++) // 去掉冒号
 		{
 			a[i]=a[i+1];
 		}
 
-		int nLen = strlen(a)-2; // 
+		int nLen = strlen(a)-2; // 不算回车换行的长度
 		if(strlen(a)%2==0)
 			turn_hex_file_line_to_unsigned_char(a);//turn every char to int 
 		else

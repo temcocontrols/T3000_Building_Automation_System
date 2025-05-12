@@ -124,7 +124,7 @@ void universal_value_setting_write(wofstream & out,int m_26_heat_stages,int m_26
 void value_setting_write(wofstream & out,int m_25_heat_stages,int m_25_cool_stages);
 
 void turn_order_for_fan(int source[],int order[],int m_heat_stages,int m_cool_stages);//used by get_fan_var function and get_value_setting function
-bool find_sub_chars(CString m_array_char,CString sub_array_char);//find sub chars is exist?no up or lower?
+bool find_sub_chars(CString m_array_char,CString sub_array_char);//find sub chars is exist?no up or lower?查找子串是否存在，不分大小写
 void get_heat_and_cool_stages_from_file_line(TCHAR *buf,int &m_heat_stages,int & m_cool_stages);
 void delay_time_write(wofstream & out);
 void delay_time_write_Tstat67(wofstream & out);

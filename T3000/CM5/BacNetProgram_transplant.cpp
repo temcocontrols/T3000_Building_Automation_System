@@ -17,7 +17,7 @@
 #pragma warning(disable:4309)
 #pragma warning(disable:4305)
 #pragma warning(disable:4244)
-const int support_large_instance_version = 99999; //
+const int support_large_instance_version = 99999; //待固件确定版本号
 int t3_panel_version = 0;
 extern DWORD prg_text_color;
 extern DWORD prg_label_color;
@@ -70,7 +70,7 @@ extern int mode_text;
 extern int ipxport, rs485port;
 int my_network = 0;
 char my_panel = 0;
-#pragma pack(push) // 
+#pragma pack(push) //保存对齐状态 
 #pragma pack(1)
 typedef struct {
 	char *address;
@@ -1229,7 +1229,7 @@ int findroutingentry(int port, int network, int &j, int t=1);
 int localnetwork(int net);
 void  init_info_table( void );
 void Init_table_bank();
-#pragma pack(pop)// 
+#pragma pack(pop)//恢复对齐状态 
 #pragma warning(disable:4996)
 
 
@@ -1487,7 +1487,7 @@ if(error!=-1)
 			delete local_table;
 		  
 		 *pmes = 0;
-		 sntx_err(TOTAL_2000_BREAK);	// 2017 - 01 17   fix 
+		 sntx_err(TOTAL_2000_BREAK);	// 2017 - 01 17  杜帆 fix 
 		 error = 1;
 		 return 3;
 		}
@@ -1503,7 +1503,7 @@ if(error!=-1)
 			delete local_table;
 			 
 		  *pmes = 0;
-		  sntx_err(TOTAL_2000_BREAK);	// 2017 - 01 17   fix 
+		  sntx_err(TOTAL_2000_BREAK);	// 2017 - 01 17  杜帆 fix 
 		  error = 1;
 			return 3;
 		 }
@@ -1529,7 +1529,7 @@ if(error!=-1)
 		//if(my_lengthcode >= 2000)      // 2023 09 19 delete
 		if ((code - mycode) >= 2000)
 		{
-			sntx_err(TOTAL_2000_BREAK);   // 2017 - 01 17   fix 
+			sntx_err(TOTAL_2000_BREAK);   // 2017 - 01 17  杜帆 fix 
 			error = 1;
 			return 1;
 		}
@@ -1732,7 +1732,7 @@ int prescan1 (void)
 							if(!res)
 								{sntx_err(SYNTAX);get_nl();break;}
 							get_token();
-							if (*token != ')')  //fandu   MB_BWCOIL  
+							if (*token != ')')  //fandu  因为 MB_BWCOIL  屏蔽这两行
 								{sntx_err(SYNTAX);get_nl();break;}
 						  }
 						  get_token();
@@ -2334,7 +2334,7 @@ int get_token(void)
 			{    /* delimiter*/
                 ////if ((strstr(prog, "(")) &&
                 ////    (strstr(prog, "(")) &&
-                ////    (//AV AI
+                ////    (//判断包含AV AI
                 ////    (strstr(prog, "AV") != NULL) ||
                 ////        (strstr(prog, "AI") != NULL) ||
                 ////        (strstr(prog, "AO") != NULL) ||
@@ -3562,11 +3562,11 @@ char* decode_point(char* token, Str_points &temp)
 		pc[min((int)(q - token), 10)] = 0;
 
 #if 1
-		if ((*(q + 1) >= '0') && (*(q + 1) <= '9'))	//sub panel;
+		if ((*(q + 1) >= '0') && (*(q + 1) <= '9'))	//说明存在sub panel;
 		{
 			q++;
 			fance_tok = q;
-			if ((q = strchr(fance_tok, '-')) != NULL)  //   ;
+			if ((q = strchr(fance_tok, '-')) != NULL)  //妈的，老毛不要第二个 杠 ， 又得改;
 			{
 				memcpy(fance_sub_pc, fance_tok, min((int)(q - fance_tok), 10));
 				fance_sub_pc[min((int)(q - fance_tok), 10)] = 0;
@@ -3576,7 +3576,7 @@ char* decode_point(char* token, Str_points &temp)
 
 				sub_panel = atoi(fance_sub_pc);
 			}
-			else if ((q = strchr(fance_tok, '.')) != NULL)  //;
+			else if ((q = strchr(fance_tok, '.')) != NULL)  //妈的，要改成用冒号来当分隔符，想一出是一出;
 			{
 				memcpy(fance_sub_pc, fance_tok, min((int)(q - fance_tok), 10));
 				fance_sub_pc[min((int)(q - fance_tok), 10)] = 0;
@@ -3612,14 +3612,14 @@ char* decode_point(char* token, Str_points &temp)
 		//	q=token;
 #endif
 	}
-	else	//var1   mainsub;Fance
+	else	//如果是直接var1 就代表 使用的是自己的 main和sub都是一个;Fance
 	{
-		//instance  255
+		//因为要支持instance 所以数比较大，不局限于以前的 255那么大
 		//for(l=0;l<3 && token[l]!=0;l++)
 		//	if (token[l]<'0' || token[l]>'9')
 		//		break;
 		if (b_is_instance)
-			token = token + 3; //M
+			token = token + 3; //因为前面加了M
 
 		for (l = 0; l < 10 && token[l] != 0; l++)
 			if (token[l] < '0' || token[l]>'9')
@@ -3633,11 +3633,11 @@ char* decode_point(char* token, Str_points &temp)
 		//if (*num_panel == 0)
 		//{
 		//	*num_panel = panel;
-		//	//sub_panel = *num_panel; //VAR1  subpanel 0 
+		//	//sub_panel = *num_panel; //填VAR1 之类的 subpanel 改为0 
 		//	sub_panel = 0;
 		//	itoa((int)(*num_panel), (char*)fance_sub_pc, 10);
 		//}
-#if 0   // bacnet  instance  255 panel.
+#if 0   //需要支持 bacnet 的 instance 所以 屏蔽下面的255 主panel的限制.
 		if (*num_panel > 255 && strlen(pc))
 			return(islabel(token, num_point, var_type, point_type, num_panel));
 #endif
@@ -3713,7 +3713,7 @@ char* decode_point(char* token, Str_points &temp)
 			}
 			else
 			{
-				for (l = 0; l < (int)strlen(p); l++)// Fance 
+				for (l = 0; l < (int)strlen(p); l++)//括号 Fance 加
 				{
 					if (p[l] < '0' || p[l]>'9')
 						break;
@@ -3747,7 +3747,7 @@ char* decode_point(char* token, Str_points &temp)
 					return NULL;
 					//														itoa(panel,buf,10);
 					//buf[0] = 0;
-#if 0   //2018 07 10   network point   object instance .
+#if 0   //2018 07 10   network point 用来复用 给 object instance .
 					if (netpresent)
 						if (*netpresent)
 						{
@@ -3808,15 +3808,15 @@ char* isbacnet_point(char* token, Point_Bacnet *temp_point)
 	{
 	
 	}
-	else	//var1   mainsub;Fance
+	else	//如果是直接var1 就代表 使用的是自己的 main和sub都是一个;Fance
 	{
-		//instance  255
+		//因为要支持instance 所以数比较大，不局限于以前的 255那么大
 		//for(l=0;l<3 && token[l]!=0;l++)
 		//	if (token[l]<'0' || token[l]>'9')
 		//		break;
 
 		if (b_is_instance)
-			token = token + 3; //M
+			token = token + 3; //因为前面加了M
 
 		for (l = 0; l < 10 && token[l] != 0; l++)
 			if (token[l] < '0' || token[l]>'9')
@@ -3890,7 +3890,7 @@ char* isbacnet_point(char* token, Point_Bacnet *temp_point)
 			}
 			else
 			{
-				for (l = 0; l < (int)strlen(p); l++)// Fance 
+				for (l = 0; l < (int)strlen(p); l++)//括号 Fance 加
 				{
 					if (p[l] < '0' || p[l]>'9')
 						break;
@@ -3968,7 +3968,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 	if(netpresent) *netpresent = 0;
 	*num_net = network;
 	if(strlen(token)==0) return 0;
-#if 0   //Mark by Fance  main subnetwork;
+#if 0   //Mark by Fance  点暂时用来当main 和sub的分隔符，不用在network;
 	if ((q=strchr(token,'.'))!=NULL)
 	{
 		memcpy(pc,token,min( (int)(q-token),10));
@@ -3996,11 +3996,11 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		pc[min((int)(q-token),10)]=0;
 
 #if 1
-		if((*(q + 1) >= '0') && (*(q + 1) <= '9'))	//sub panel;
+		if((*(q + 1) >= '0') && (*(q + 1) <= '9'))	//说明存在sub panel;
 		{
 			q++;
 			fance_tok = q;
-			if ((q=strchr(fance_tok,'-'))!=NULL)  //   ;
+			if ((q=strchr(fance_tok,'-'))!=NULL)  //妈的，老毛不要第二个 杠 ， 又得改;
 			{
 				memcpy(fance_sub_pc,fance_tok,min( (int)(q-fance_tok),10));
 				fance_sub_pc[min((int)(q-fance_tok),10)]=0;
@@ -4010,7 +4010,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 
 				sub_panel = atoi(fance_sub_pc);
 			}
-			else if ((q=strchr(fance_tok,'.'))!=NULL)  //;
+			else if ((q=strchr(fance_tok,'.'))!=NULL)  //妈的，要改成用冒号来当分隔符，想一出是一出;
 			{
 				memcpy(fance_sub_pc,fance_tok,min( (int)(q-fance_tok),10));
 				fance_sub_pc[min((int)(q-fance_tok),10)]=0;
@@ -4046,14 +4046,14 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		//	q=token;
 #endif
 	}
-	else	//var1   mainsub;Fance
+	else	//如果是直接var1 就代表 使用的是自己的 main和sub都是一个;Fance
 	{
-        //instance  255
+        //因为要支持instance 所以数比较大，不局限于以前的 255那么大
 		//for(l=0;l<3 && token[l]!=0;l++)
 		//	if (token[l]<'0' || token[l]>'9')
 		//		break;
         if (b_is_instance)
-            token = token + 3; //M
+            token = token + 3; //因为前面加了M
 
         for (l = 0;l<10 && token[l] != 0;l++)
             if (token[l]<'0' || token[l]>'9')
@@ -4067,11 +4067,11 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		if (*num_panel==0)
 		{
 			*num_panel = panel;
-			//sub_panel = *num_panel; //VAR1  subpanel 0 
+			//sub_panel = *num_panel; //填VAR1 之类的 subpanel 改为0 
             sub_panel = 0;
 			itoa((int)(*num_panel),(char *)fance_sub_pc,10);
 		}
-#if 0   // bacnet  instance  255 panel.
+#if 0   //需要支持 bacnet 的 instance 所以 屏蔽下面的255 主panel的限制.
 		if ( *num_panel>255 && strlen(pc) )
 			return(islabel(token,num_point,var_type,point_type,num_panel));
 #endif
@@ -4147,7 +4147,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 			}
 			else 
 			{
-				for(l=0;l<(int)strlen(p);l++)// Fance 
+				for(l=0;l<(int)strlen(p);l++)//括号 Fance 加
 				{
 					if (p[l]<'0' || p[l]>'9')
 						break;
@@ -4158,7 +4158,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 				{
 					//														itoa(panel,buf,10);
 					buf[0] = 0;
-#if 0   //2018 07 10   network point   object instance .
+#if 0   //2018 07 10   network point 用来复用 给 object instance .
 					if(netpresent)
 						if(*netpresent)
 						{
@@ -4212,14 +4212,14 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
                             int temp_num_point = *num_point;
                             temp_num_point = temp_num_point >> 11;
                             temp_num_point = temp_num_point | 0x0080;
-                            *netpresent = temp_num_point; // Number  5;
+                            *netpresent = temp_num_point; // 去Number 的 最高5位;
                         }
                         else if ((k == BAC_VAR) && (*num_point >= 2000))
                         {
                             int temp_num_point = *num_point -1;
                             temp_num_point = temp_num_point >> 11;
                             temp_num_point = temp_num_point | 0x0080;
-                            *netpresent = temp_num_point; // Number  5;
+                            *netpresent = temp_num_point; // 去Number 的 最高5位;
                         }
                         if (k > 31)
                         {
@@ -4229,7 +4229,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
                         }
                         else
                         {
-                            *netpresent = *netpresent & 0x9F; //  10011111  32 bit0
+                            *netpresent = *netpresent & 0x9F; //  与上10011111  如果不是大雨32 则这两个bit清0
                         }
 						*point_type = k & 0x1f;
 						*point_type = *point_type | high_3bit;
@@ -4265,7 +4265,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 
 
 
-                        //FANDU  2018 01 26 panel  panel;
+                        //FANDU  2018 01 26 现在开始要慢慢支持访问其他panel 的数据，所以 判断不等于本地panel的需要拿掉;
 						//if((*num_panel !=Station_NUM ) || (sub_panel != Station_NUM))
 						//{
 						//	*num_point = *num_point & 0x000000ff;
@@ -4299,12 +4299,12 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		return temp_ret;
 	}
 
-    ////     123456IN4    object instance   AV AI AO DO
+    //// 例如 编程   123456IN4   会报错 ，因为这种利用object instance 去编程 只支持 AV AI AO DO
     if ((*num_panel >= 256) || b_is_instance)
     {
         if ((k != BAC_AV) && (k != BAC_AI) && (k != BAC_AO) && (k != BAC_BO) && (k != BAC_BI) && (k != BAC_BV) && (k != BAC_MSV))
         {
-            sntx_err(INSTANCE_NOT_SUPPORT); //instance   type. 
+            sntx_err(INSTANCE_NOT_SUPPORT); //instance 不支持 此 type. 
             error = INSTANCE_NOT_SUPPORT;
             return 0;
         }
@@ -4398,7 +4398,7 @@ char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *
 			}
 			else 
 			{
-				for(l=0;l<(int)strlen(p);l++)// Fance 
+				for(l=0;l<(int)strlen(p);l++)//括号 Fance 加
 				{
 					if (p[l]<'0' || p[l]>'9')
 						break;
@@ -4573,7 +4573,7 @@ int local_request(int panel, int network)
 
 int local_request_ex(int panel, int sub_panel, int network)
 {
-    //2018 01 26   subpanel 0 
+    //2018 01 26   subpanel 都变为0 
 	//if((panel == Station_NUM) && (sub_panel == Station_NUM) && localnetwork(network) )
     if ((panel == Station_NUM) && localnetwork(network))
 		return 1;
@@ -4654,7 +4654,7 @@ int localnetwork(int net)
 char *look_label_ex(int panel,int sub_panel, int point_type, int num, int network)
 {
 	char *p=NULL;
-	if ((sub_panel != 0) && (sub_panel != panel)) //2024 09 29  133.1.REG2  133.0.REG2 Lable
+	if ((sub_panel != 0) && (sub_panel != panel)) //2024 09 29 解决 133.1.REG2 会自动变为 133.0.REG2 对应的Lable的问题
 		return NULL;
 
 	// if(local_panel)
@@ -6230,7 +6230,7 @@ case ASSIGNARRAY_2:
  }
  else
  {
-	 sntx_err(TOTAL_2000_BREAK); //2000 ;
+	 sntx_err(TOTAL_2000_BREAK); //编码长度超过2000个字节 返回提示信息;
 	 error = TOTAL_2000_BREAK;
 	 return;
   ncod = PROGRAM_SIZE;
@@ -6363,13 +6363,13 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 					}
 					else if ((vars_table[cur_index].type == POINT_VAR) || (vars_table[cur_index].type == LABEL_VAR))
 					{
-                        //if (((unsigned char)vars_table[cur_index].network >= 128) && (( ((unsigned char)vars_table[cur_index].point_type) & 0x1F) != MB_REG)) //network   
-                        if ((unsigned char)vars_table[cur_index].network >= 128)  //network   
+                        //if (((unsigned char)vars_table[cur_index].network >= 128) && (( ((unsigned char)vars_table[cur_index].point_type) & 0x1F) != MB_REG)) //network 的最高位用来标识  是否是新的数据格式
+                        if ((unsigned char)vars_table[cur_index].network >= 128)  //network 的最高位用来标识  是否是新的数据格式
                         {
                             unsigned char high_3bit;
                             cod_line[Byte++] = REMOTE_POINT_PRG;
                             unsigned char temp_point_type = (unsigned char)(vars_table[cur_index].point_type & 0x1F);
-                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //   0x60    01100000 2-3bit 
+                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
                             temp_point_type = temp_point_type | type_highest_2bytes;
 
                             if (
@@ -6400,7 +6400,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 
                             }
 
-                            point.point_type = (vars_table[cur_index].point_type + 1) | high_3bit; // 111 11111  -31 type 0  
+                            point.point_type = (vars_table[cur_index].point_type + 1) | high_3bit; //这里刚好涉及到 111 11111  -》31 type 加一后变0 了 尴尬
                             //*point_type = *point_type | high_3bit;
 
 
@@ -6417,7 +6417,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                             (   (unsigned char)vars_table[cur_index].panel == Station_NUM ) && (  (unsigned char)vars_table[cur_index].sub_panel == 0 ) )
 						{
                             unsigned char temp_point_type = vars_table[cur_index].point_type & 0x1F;
-                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //   0x60    01100000 2-3bit 
+                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
                             temp_point_type = temp_point_type | type_highest_2bytes;
 
 							if(temp_point_type == BAC_VAR )
@@ -6455,13 +6455,13 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							Byte += sizeof(MyPoint);
 						}
 						else if(( (unsigned char)vars_table[cur_index].panel == Station_NUM ) && ((unsigned char)vars_table[cur_index].sub_panel != Station_NUM )  && 
-                                 ((unsigned char)vars_table[cur_index].sub_panel != 0 ))	//Minipanel TSTAT
+                                 ((unsigned char)vars_table[cur_index].sub_panel != 0 ))	//Minipanel 下面的TSTAT
 						{
 							unsigned char high_3bit = 0;
 							cod_line[Byte++]=REMOTE_POINT_PRG;
                             unsigned char temp_point_type = (unsigned char) (vars_table[cur_index].point_type & 0x1F);
 
-                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //   0x60    01100000 2-3bit 
+                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
                             temp_point_type = temp_point_type | type_highest_2bytes;
 
 							if(
@@ -6508,7 +6508,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							unsigned char high_3bit;
 							cod_line[Byte++]=REMOTE_POINT_PRG;
                             unsigned char temp_point_type = (unsigned char)(vars_table[cur_index].point_type & 0x1F);
-                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //   0x60    01100000 2-3bit 
+                            unsigned char type_highest_2bytes = vars_table[cur_index].network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
                             temp_point_type = temp_point_type | type_highest_2bytes;
 
 							if(((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
@@ -6753,7 +6753,7 @@ unsigned char cod;//,xtemp[15];
  int bytes = 0;
 
   int code_length = ((unsigned char)code[1])*256 + (unsigned char)code[0];
- if((code_length == 0) || (code_length > 2000)) // 500  ;
+ if((code_length == 0) || (code_length > 2000)) //如果传过来的是无效的 大于500的编码 就说明是错的 直接清空;
 	 return my_display;
  bac_program_size = m_Program_data.at(program_list_line).bytes;
  bac_free_memory = 2000 - bac_program_size;
@@ -7292,14 +7292,14 @@ int desvar(void)
  {
 	 long n = 0 ;
     n = *((unsigned short *)(code + 1));
-  //n = *((int *)(code+1));  //     short
+  //n = *((int *)(code+1));  //杜帆屏蔽  实际只有两个字节  我把它改为 short
   int t=0,j,k = 0,l,c,m = 0;//lc,cc;
 
   l = c = 0;
   for(j=0;j<ind_local_table; )
   {
       switch ((unsigned char)local[j])
-	  //switch(local[j])  //dufan 
+	  //switch(local[j])  //dufan 屏蔽
 	  {
 			case FLOAT_TYPE:
 			case LONG_TYPE:
@@ -7343,7 +7343,7 @@ int desvar(void)
 
 
 #if 1
-        // Local var  
+        //此功能用来保存 Local var  变色的功能。
         char temp_local_value[40];
         memset(temp_local_value, 0, 40);
         strcpy(temp_local_value, &local[j]);
@@ -7460,12 +7460,12 @@ else
 
 		  char* temp_p = NULL;
 		  temp_p = ispoint_ex(q, &num_point, &var_type, &point_type, &num_panel, &num_net, my_network, sub_panel, temp_point.panel, &k);
-		  if (temp_p == NULL)	//
+		  if (temp_p == NULL)	//没有获取到，就算失败
 		  {
 			  return 0;
 		  }
 		  //	char *temp_p = ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, my_network, my_panel, &k);
-			  //if(temp_p == NULL)	//
+			  //if(temp_p == NULL)	//没有获取到，就算失败
 			  //{
 			  //	return 0;
 			  //}
@@ -7501,7 +7501,7 @@ else
 						}
 						else
 						{
-							if((long)f==f && (f<1000000 && f>-1000000 )) //;   ; longf f
+							if((long)f==f && (f<1000000 && f>-1000000 )) //原始的;  但是 有问题; （long）f 一直不等于f
 							{
 								ltoa((long)f,buf,10);
 							}
@@ -7620,7 +7620,7 @@ int pointtotext(char *buf,Point_Net *point)
 	panel=point->panel;
 	point_type= (point->point_type ) & 0x1F;
 
-    unsigned char type_highest_2bytes = point->network & 0x60;    //   0x60    01100000 2-3bit 
+    unsigned char type_highest_2bytes = point->network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
     point_type = point_type | type_highest_2bytes;
 
     if (((point_type == MB_REG) || 
@@ -7652,7 +7652,7 @@ int pointtotext(char *buf,Point_Net *point)
 	//	return 1;
 	//}
 
-	//Fance   net
+	//Fance  先不考虑 net
 	//if((net!=0xFFFF) && (net != 0xff))
 	//{
 	//	strcpy(buf,itoa(net,x,10));
@@ -7668,7 +7668,7 @@ int pointtotext(char *buf,Point_Net *point)
 
 	//if((point->panel == point->sub_panel) && (point->panel == Station_NUM))
 	//{
-	//	// minipanel 1-1-var10   panel1 var10 label;
+	//	//不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
 	//	strcat(buf,ptr_panel.info[point_type].name);//Fance
 	//	strcat(buf,itoa(num+1,x,10));
 	//	return 0;
@@ -7677,7 +7677,7 @@ int pointtotext(char *buf,Point_Net *point)
     if (((point->panel != 0) && (point->sub_panel == 0)) ||
         ((point->panel == point->sub_panel) && (point->panel == Station_NUM)))
     {
-        // minipanel 1-1-var10   panel1 var10 label;
+        //不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
         strcat(buf, itoa(point->panel, x, 10));
         strcat(buf, ptr_panel.info[point_type].name);//Fance
         if ((point_type == BAC_FLOAT_ABCD) ||
@@ -7712,7 +7712,7 @@ int pointtotext(char *buf,Point_Net *point)
         (point_type != BAC_FLOAT_CDAB) &&
         (point_type != BAC_FLOAT_BADC) &&
         (point_type != BAC_FLOAT_DCBA) &&
-        (point_type != BAC_VAR)) // .
+        (point_type != BAC_VAR)) // 说明是新的格式，最高位用来标识.
     {
         if ((point_type == BAC_BI) || (point_type == BAC_BV) || (point_type == BAC_MSV) ||
             (point_type == BAC_AV) || (point_type == BAC_AI) ||
@@ -7740,12 +7740,12 @@ int pointtotext(char *buf,Point_Net *point)
         else
             strcat(buf, itoa(temp_value, temp_object_instance, 10));
         if ((point->panel != point->sub_panel) && (point_type == VAR))
-            strcat(buf, "REG");//Fance	 3-25-VAR100    3-25-REG100.
+            strcat(buf, "REG");//Fance	曰了狗了 ，3-25-VAR100  非要支持  3-25-REG100.
         else
             strcat(buf, ptr_panel.info[point_type].name);//Fance
 
         point->point_type = (point->point_type) & 0x1F;
-        unsigned char type_highest_2bytes = point->network & 0x60;    //   0x60    01100000 2-3bit 
+        unsigned char type_highest_2bytes = point->network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
         point->point_type = point->point_type | type_highest_2bytes;
 
         if ((point->point_type == BAC_FLOAT_ABCD) ||
@@ -7773,7 +7773,7 @@ int pointtotext(char *buf,Point_Net *point)
     }
     
 	strcat(buf,itoa(panel,x,10));
-	//strcat(buf,itoa(panel+1,x,10));//2015-03-03panel number ;
+	//strcat(buf,itoa(panel+1,x,10));//2015-03-03修改，从此panel number 不在减一;
 	//if(panel+1<10 || num+1 < 100)
 	//	strcat(buf,"-");
 	//if(panel+1<10 || num+1 < (8*256))
@@ -7782,13 +7782,13 @@ int pointtotext(char *buf,Point_Net *point)
 	strcat(buf,".");
 		//strcat(token,ptr_panel.info[point_type-1].name);	//Fance
 	if((point->panel != point->sub_panel) && (point_type == VAR))
-		strcat(buf,"REG");//Fance	 3-25-VAR100    3-25-REG100.
+		strcat(buf,"REG");//Fance	曰了狗了 ，3-25-VAR100  非要支持  3-25-REG100.
 	else
 		strcat(buf,ptr_panel.info[point_type].name);//Fance
-	//4  0;
+	//这4个比较特别  是0基址;
     point->point_type = (point->point_type) & 0x1F;
 
-    type_highest_2bytes = point->network & 0x60;    //   0x60    01100000 2-3bit 
+    type_highest_2bytes = point->network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
     point->point_type = point->point_type | type_highest_2bytes;
 
 	if(
@@ -8591,7 +8591,7 @@ void copy_data_to_ptrpanel(int Data_type)
 void check_each_point(char *richeditchar,int item_count ,int ntype);
 void check_function_table(char *richeditchar ,int ntype);
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
-extern vector <Str_char_pos_color> m_prg_char_color;	//highlight ;
+extern vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
 extern CString high_light_string;
 void check_high_light()
 {
@@ -8681,7 +8681,7 @@ void check_function_table(char *richeditchar ,int ntype)
 		}
         else if (ntype == LOCAL_VAR_TABEL)
         {
-            //strcat_s(temp_label, 20, local_var_new_name[i]); 
+            //strcat_s(temp_label, 20, local_var_new_name[i]); 杜帆屏蔽
             strcat_s(temp_label, 40, local_var_new_name[i]);
 			strcat_s(temp_label, 40, " ");
             char_color = prg_local_var_color;//RGB(111, 111, 111);

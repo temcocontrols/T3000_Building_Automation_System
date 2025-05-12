@@ -135,7 +135,7 @@ void CWriteSingleCoilDlg::OnBnClickedOk()
 		m_Value = FALSE;
 	}
 	 
-	if (m_function15)//
+	if (m_function15)//∂‡–¥
 	{
 		int Reg_Value;
 		 bool bValue = (bool)m_Value;
@@ -176,7 +176,7 @@ void CWriteSingleCoilDlg::OnBnClickedOk()
 		}
 
 	}
-	else//
+	else//µ•–¥
 	{
 		int Reg_Value;
 		unsigned short Single_Value;

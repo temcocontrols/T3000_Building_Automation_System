@@ -1,4 +1,4 @@
-// Bacnet_Range_Msv.cpp : 
+// Bacnet_Range_Msv.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
-// CBacnet_Range_Msv 
+// CBacnet_Range_Msv 对话框
 
 IMPLEMENT_DYNAMIC(CBacnet_Range_Msv, CDialogEx)
 
@@ -34,23 +34,23 @@ BEGIN_MESSAGE_MAP(CBacnet_Range_Msv, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnet_Range_Msv 
+// CBacnet_Range_Msv 消息处理程序
 
 
 BOOL CBacnet_Range_Msv::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  
+    // TODO:  在此添加额外的初始化
     Initial_List();
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // : OCX  FALSE
+                  // 异常: OCX 属性页应返回 FALSE
 }
 
 
 BOOL CBacnet_Range_Msv::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: /
+    // TODO: 在此添加专用代码和/或调用基类
 
     return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -147,7 +147,7 @@ LRESULT CBacnet_Range_Msv::Fresh_Msv_Item(WPARAM wParam, LPARAM lParam)
     if (Changed_SubItem == CUSTOMER_MSV_RANGE_DESCRIPTION)
     {
         CString cs_temp = m_range_msv_list.GetItemText(Changed_Item, Changed_SubItem);
-        if (cs_temp.GetLength() >= STR_MSV_NAME_LENGTH)	//;
+        if (cs_temp.GetLength() >= STR_MSV_NAME_LENGTH)	//长度不能大于结构体定义的长度;
         {
             MessageBox(_T("Length can not higher than 20"), _T("Warning"), MB_OK | MB_ICONINFORMATION);
             PostMessage(WM_REFRESH_BAC_PROGRAM_LIST, NULL, NULL);

@@ -1,4 +1,4 @@
-// TstatSetpointDetail.cpp : 
+// TstatSetpointDetail.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
-// CTstatSetpointDetail 
+// CTstatSetpointDetail 对话框
 
 IMPLEMENT_DYNAMIC(CTstatSetpointDetail, CDialogEx)
 
@@ -73,7 +73,7 @@ void CTstatSetpointDetail::Fresh_window()
 {
 
 }
-// CTstatSetpointDetail 
+// CTstatSetpointDetail 消息处理程序
 
 LRESULT CTstatSetpointDetail::Fresh_Setpoint_Item(WPARAM wParam, LPARAM lParam)
 {
@@ -242,10 +242,10 @@ BOOL CTstatSetpointDetail::OnInitDialog()
     Check_Tstat_Work_Setpoint();
     Check_Tstat_Sleep_Setpoint();
     Check_Tstat_Away_Setpoint();
-    // TODO:  
+    // TODO:  在此添加额外的初始化
     Initial_List();
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // : OCX  FALSE
+                  // 异常: OCX 属性页应返回 FALSE
 }
 
 

@@ -24,12 +24,12 @@ m_bServer = m_wskServer.StartServer(Listen);
 if(!m_bServer)
 {
 CString info;
-info.Format(_T("Start Server Failed%d"), m_wskServer.err);
+info.Format(_T("Start Server Failed：%d"), m_wskServer.err);
 AfxMessageBox(info);
 }
 
 
-//TCP Server    socket;//This function add by Fance.
+//TCP Server 的 回调函数 ，当客户端连接上 之后就可以用这个socket去发送数据了;//This function add by Fance.
 void CALLBACK Listen(SOCKET s, int ServerPort, const char *ClientIP)
 {
 int nRet;
