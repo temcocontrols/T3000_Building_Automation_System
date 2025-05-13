@@ -2244,6 +2244,8 @@ unsigned int T3000_Version ; //T3000的版本号.
 int flag_auto_scroll = 0; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
 int graphic_last_scale_type = 0 ; //用于存储上次 有效的 X轴的 刻度;
 unsigned int graphic_last_time_value =0 ; //x轴上次查看的时间; 
+int auto_local_ip = 1; //自动使用本地所有ip端口扫描;
+CString local_ip_scan_address; //bind本地ip地址;
 const CString c_strBaudate[NUMBER_BAUDRATE] =
 {
     L"9600",

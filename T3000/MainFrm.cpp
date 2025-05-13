@@ -772,9 +772,6 @@ namespace ns
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-    
-
-
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
         return -1;
     CString temp_bacnet_logfile;
@@ -913,6 +910,22 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         g_tstat_id = product_register_value[6];
     }
 
+    auto_local_ip = GetPrivateProfileInt(_T("Parameter"), _T("AutoLocalIP"), 1, g_configfile_path);
+    if (auto_local_ip == 0)
+    {
+        GetPrivateProfileStringW(_T("Parameter"), _T("LocalIP"), _T(""), local_ip_scan_address.GetBuffer(MAX_PATH), MAX_PATH, g_configfile_path);
+        local_ip_scan_address.ReleaseBuffer();
+        GetIPMaskGetWay();
+        if (g_Vector_Subnet.size() == 0)
+        {
+            CString temp_cs1;
+            temp_cs1.Format(_T("The software failed to find the network adapter you specified.\r\n%s.\r\n \
+It will attempt to communicate using another network adapter.\r\n \
+The bound local network adapter can be modified through the menu .\r\nMenu-Tool-Options "), local_ip_scan_address.GetString());
+            MessageBox(temp_cs1,_T("Warning") );
+            auto_local_ip = 1;
+        }
+    }
 
     ShowSplashWnd(4000);
 //	Check_Local_TemcoUpdate();
@@ -3180,7 +3193,7 @@ void CMainFrame::OnConnect()
                     SetPaneString(1,strInfo);
                     //connectionSuccessful = 1;
                     m_nStyle=1;
-                    CString	g_configfile_path=g_strExePth+_T("T3000_config.ini");
+                    g_configfile_path=g_strExePth+_T("T3000_config.ini");
                     CFileFind fFind;
                     if(!fFind.FindFile(g_configfile_path))
                     {
@@ -15239,11 +15252,12 @@ void CMainFrame::OnToolsPsychrometry()
 }
 
 #include "T3000Option.h"
-
+#include "CT3000_Options.h"
 void CMainFrame::OnToolsOption()
 {
+    CT3000_Options dlg;
 	 //CT3000Option dlg;
-	 //dlg.DoModal();
+	 dlg.DoModal();
 }
 
 

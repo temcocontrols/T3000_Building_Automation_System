@@ -15,7 +15,7 @@
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
 #include <windows.h>  
 
-const unsigned int g_versionNO = 20250402;    // PROJECT_VERSION
+const unsigned int g_versionNO = 20250513;    // PROJECT_VERSION
 
 
 

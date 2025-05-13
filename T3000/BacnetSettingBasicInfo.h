@@ -52,4 +52,5 @@ public:
     //afx_msg void OnEnKillfocusEditSettingAliasName();
     afx_msg void OnEnKillfocusEditSettingBipNetwork2();
     afx_msg void OnEnKillfocusEditSettingMstpNetwork();
+    afx_msg void OnBnClickedButton1();
 };

@@ -59,6 +59,7 @@ extern unsigned int debug_point_main;
 extern unsigned int point_number;
 extern unsigned int point_type;
 POINT right_click_Point;
+#define USE_PROMOT_PROGRAM 0
 
 IMPLEMENT_DYNAMIC(CBacnetProgramEdit, CDialogEx)
 
@@ -314,6 +315,10 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	}
 	SetTimer(2,1000,NULL);
 	::SetWindowPos(this->m_hWnd,HWND_TOP,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
+
+#if  !USE_PROMOT_PROGRAM
+	GetDlgItem(IDC_LIST_PROMPT)->ShowWindow(0);
+#endif
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -1305,6 +1310,36 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 					SetKeyboardState(Keystatus);
 					//PostMessage(WM_KEYDOWN,VK_CAPITAL,0);
 				}
+#if USE_PROMOT_PROGRAM
+				CRichEditCtrl* pEditCtrl = (CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM);
+				if (pEditCtrl)
+				{
+					long start, end;
+					pEditCtrl->GetSel(start, end);
+					CString input;
+					pEditCtrl->GetTextRange(0, start, input);
+					if (!input.IsEmpty())
+					{
+						CStringArray temp_array;
+						SplitCStringA(temp_array, input, _T(" ")); //通过空格来分割，获取最后一个空格后面的字符;
+						if (temp_array.GetSize() > 0)
+						{
+							input = temp_array.GetAt(temp_array.GetSize() - 1);
+						}
+						else
+						{
+							
+						}
+					}
+					// 过滤掉非字母字符
+					input.Remove(_T('\n'));
+					input.Remove(_T('\r'));
+					input.Remove(_T(' '));
+					TRACE(input + _T("\r\n"));
+					((CListBox *)GetDlgItem(IDC_LIST_PROMPT))->ResetContent();
+					((CListBox*)GetDlgItem(IDC_LIST_PROMPT))->AddString(input);
+				}
+#endif	
 
 				static int prg_key_count = 1 ;
 				if(prg_key_count ++ % 20 == 0)
@@ -1393,11 +1428,17 @@ void CBacnetProgramEdit::OnSize(UINT nType, int cx, int cy)
 	{
 		((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->MoveWindow(rc.left, rc.top, rc.Width(), rc.Height() - 120);
 		if (cy > 120)
+			//m_information_window.MoveWindow(rc.left, cy - 120, rc.Width() - 580, 100);
 			m_information_window.MoveWindow(rc.left, cy - 120, rc.Width() - 360, 120);
+
+
+
 		CRect rcCtrl;
 		GetDlgItem(IDC_BUTTON_PROGRAM_EDIT_HELP)->GetWindowRect(rcCtrl);
 		ScreenToClient(rcCtrl);
-
+#if USE_PROMOT_PROGRAM
+		GetDlgItem(IDC_LIST_PROMPT)->SetWindowPos(NULL, cx - 570, cy - 120, 0, 0, SWP_NOSIZE);
+#endif
 		GetDlgItem(IDC_BUTTON_PROGRAM_EDIT_HELP)->SetWindowPos(NULL,cx - 350, cy - 100,	0, 0,  SWP_NOSIZE);
 		GetDlgItem(IDC_STATIC_PRG_GROUP)->SetWindowPos(NULL, cx - 250, cy - 120, 0, 0, SWP_NOSIZE);
 		GetDlgItem(IDC_STATIC_POOL_1)->SetWindowPos(NULL, cx - 245, cy - 100, 0, 0, SWP_NOSIZE);

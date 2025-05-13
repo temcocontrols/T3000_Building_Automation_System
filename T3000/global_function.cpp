@@ -5086,7 +5086,8 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             s_Basic_Setting.reg.max_var = *(my_temp_point++); 
             s_Basic_Setting.reg.max_in =  *(my_temp_point++);
             s_Basic_Setting.reg.max_out = *(my_temp_point++);
-
+            s_Basic_Setting.reg.fix_com_config = *(my_temp_point++);
+            s_Basic_Setting.reg.write_flash = *(my_temp_point++);
 
 
             //额外处理不同CPU的 minitype
@@ -9105,7 +9106,13 @@ void PrintAdapterInfo()
                         }
                         if(find_exsit == false)
 						{
-							g_Vector_Subnet.push_back(Temp_Node);
+                            if (auto_local_ip == 0) 
+                            {
+                                if (local_ip_scan_address.CompareNoCase(Temp_Node.StrIP) == 0)
+                                    g_Vector_Subnet.push_back(Temp_Node);
+                            }
+                            else
+							    g_Vector_Subnet.push_back(Temp_Node);
 						}
 						break;
 					}
@@ -9130,6 +9137,7 @@ void PrintAdapterInfo()
 
 void GetIPMaskGetWay()
 {
+
     g_Vector_Subnet.clear();
     PIP_ADAPTER_INFO pAdapterInfo;
     PIP_ADAPTER_INFO pAdapter = NULL;
@@ -9175,6 +9183,14 @@ void GetIPMaskGetWay()
             {
                 pAdapter = pAdapter->Next;
                 continue;
+            }
+            if (auto_local_ip == 0)
+            {
+                if (local_ip_scan_address.CompareNoCase(Temp_Node.StrIP) != 0)
+                {
+                    pAdapter = pAdapter->Next;
+                    continue;
+                }
             }
             g_Vector_Subnet.push_back(Temp_Node);
 

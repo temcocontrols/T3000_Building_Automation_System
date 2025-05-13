@@ -196,6 +196,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClCompile Include="BacnetScreen.cpp" />
     <ClCompile Include="BacnetScreenEdit.cpp" />
     <ClCompile Include="BacnetSetting.cpp" />
+    <ClCompile Include="BacnetSettingAdvParameter.cpp" />
     <ClCompile Include="BacnetSettingBasicInfo.cpp" />
     <ClCompile Include="BacnetSettingDyndns.cpp" />
     <ClCompile Include="BacnetSettingHealth.cpp" />
@@ -285,6 +286,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClCompile Include="ConfigFileHandler.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
     <ClCompile Include="ConnectRemoteServer.cpp" />
+    <ClCompile Include="CT3000_Options.cpp" />
     <ClCompile Include="CTransducer.cpp" />
     <ClCompile Include="CTstatAQ_Parameter.cpp" />
     <ClCompile Include="CTstatAQ_PM25_Parameter.cpp" />
@@ -589,6 +591,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClInclude Include="BacnetRemotePoint.h" />
     <ClInclude Include="BacnetScreenEdit.h" />
     <ClInclude Include="BacnetSetting.h" />
+    <ClInclude Include="BacnetSettingAdvParameter.h" />
     <ClInclude Include="BacnetSettingBasicInfo.h" />
     <ClInclude Include="BacnetSettingDyndns.h" />
     <ClInclude Include="BacnetSettingHealth.h" />
@@ -685,6 +688,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClInclude Include="ConnectRemoteServer.h" />
     <ClInclude Include="CControlBasicEditorCOM.h" />
     <ClInclude Include="CRange0.h" />
+    <ClInclude Include="CT3000_Options.h" />
     <ClInclude Include="CTransducer.h" />
     <ClInclude Include="CTstatAQ_Parameter.h" />
     <ClInclude Include="CTstatAQ_PM25_Parameter.h" />

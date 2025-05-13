@@ -88,6 +88,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingBasicInfo, CDialogEx)
     //ON_EN_KILLFOCUS(IDC_EDIT_SETTING_ALIAS_NAME, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingAliasName)
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_BIP_NETWORK2, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingBipNetwork2)
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_MSTP_NETWORK, &CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMstpNetwork)
+    ON_BN_CLICKED(IDC_BUTTON1, &CBacnetSettingBasicInfo::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -503,4 +504,12 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMstpNetwork()
             PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
         }
     }
+}
+
+#include "BacnetSettingAdvParameter.h"
+void CBacnetSettingBasicInfo::OnBnClickedButton1()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    BacnetSettingAdvParameter dlg;
+    dlg.DoModal();
 }
