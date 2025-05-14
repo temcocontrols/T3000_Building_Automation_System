@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="UserMacros" />
 	<PropertyGroup>
-        <AppOutputName>OptiMax</AppOutputName>
+        <AppOutputName>T3000</AppOutputName>
         <AppOutputString>"$(AppOutputName)"</AppOutputString>
         <AppExeOutputName>"$(AppOutputName).exe"</AppExeOutputName>
         <AppExeOutputRaw>$(AppOutputName).exe</AppExeOutputRaw>
