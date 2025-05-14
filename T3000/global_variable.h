@@ -2107,7 +2107,7 @@ vector<ALL_LOCAL_SUBNET_NODE> g_Scan_Vector_Subnet;
 ipaddress_info g_ipaddress_info;
 int get_ping_ip_network = 0;
 
-CString g_strStartInterface_config = _T("T3000_config.ini");
+CString g_strStartInterface_config = _T("") MY_CONFIG;
 int g_SleepTimeForConfig = 3;
 CString	g_configfile_path;
 vector<Reg_Infor> g_Vector_Write_Error;

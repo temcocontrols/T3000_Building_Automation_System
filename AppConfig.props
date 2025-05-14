@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros" />
+	<PropertyGroup>
+        <AppOutputName>OptiMax</AppOutputName>
+        <AppOutputString>"$(AppOutputName)"</AppOutputString>
+        <AppExeOutputName>"$(AppOutputName).exe"</AppExeOutputName>
+        <AppExeOutputRaw>$(AppOutputName).exe</AppExeOutputRaw>
+        <AppControlOutputName>$(AppOutputName)Controls</AppControlOutputName>
+        <AppControlDllNameString>"$(AppControlOutputName).dll"</AppControlDllNameString>
+        <AppLogNameString>"$(AppOutputName).log"</AppLogNameString>
+        <AppLogDetailRaw>$(AppOutputName) LogDetail</AppLogDetailRaw>
+        <AppTitleRaw>$(AppOutputName) Building Automation System</AppTitleRaw>
+        <AppTitleString>"$(AppOutputName) Building Automation System"</AppTitleString>
+        <AppConfigName>$(AppOutputName)_config.ini</AppConfigName>
+        <AppConfigNameString>"$(AppOutputName)_config.ini"</AppConfigNameString>
+        <AppLegalCopyright>$(AppOutputName). All rights reserved.</AppLegalCopyright>
+        <AppUpdateRaw>Update $(AppOutputName)</AppUpdateRaw>
+        <AppScanRaw>$(AppOutputName) Scanning</AppScanRaw>
+        <AppHelpRaw>$(AppOutputName) Help</AppHelpRaw>
+        <AppImportLowerRaw>Import data from database of $(AppOutputName) version LOWER than ver2.5.0.0.</AppImportLowerRaw>
+        <AppImportUpperRaw>Import data from database of $(AppOutputName) version UPPER than ver2.5.0.0.</AppImportUpperRaw>
+        <AppBacnetRaw>$(AppOutputName) Standard BACNet Tool</AppBacnetRaw>
+	</PropertyGroup>
+</Project>

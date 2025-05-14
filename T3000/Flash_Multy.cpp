@@ -111,7 +111,7 @@ BOOL CFlash_Multy::OnInitDialog()
     int ncount = m_flash_multy_list.GetItemCount();
 
 
-	 CString	g_configfile_path=g_strExePth+_T("T3000_config.ini");
+	 CString	g_configfile_path=g_strExePth+_T("") MY_CONFIG;
                      
 				  
 

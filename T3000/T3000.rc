@@ -1,7 +1,8 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
-
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x) STRINGIFY_(x)
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1200,7 +1201,7 @@ END
 
 IDD_DIALOG_BACNET_TOOL DIALOGEX 0, 0, 284, 365
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Temco Bacnet Tool"
+CAPTION STRINGIFY(MY_BACNET)
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STATIC_BAC_LOGO,"Static",SS_BLACKFRAME | WS_BORDER,7,7,268,65,WS_EX_CLIENTEDGE
@@ -1455,7 +1456,7 @@ BEGIN
     EDITTEXT        IDC_EDIT_SERVER_DOMAIN,345,66,141,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE
     PUSHBUTTON      "Open Firmware File Folder",IDC_BUTTON1,428,32,115,22
     PUSHBUTTON      "Download Firmware Only",IDC_BUTTON_FILE_DOWNLOAD_ONLY,571,3,132,22
-    PUSHBUTTON      "Update T3000",IDC_BUTTON_UPDATE_T3000,428,3,115,22,BS_MULTILINE
+    PUSHBUTTON      STRINGIFY(MY_UPDATE),IDC_BUTTON_UPDATE_T3000,428,3,115,22,BS_MULTILINE
     CONTROL         "",IDC_PROGRESS_FTP_DOWNLOAD,"msctls_progress32",WS_BORDER,0,331,718,14
     LTEXT           "Static",IDC_STATIC_FTP_PERSENT,284,311,117,12
 END
@@ -1486,7 +1487,7 @@ END
 
 IDD_DIALOG15 DIALOGEX 0, 0, 315, 180
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "T3000 Update "
+CAPTION STRINGIFY(MY_UPDATE)
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Download",IDOK_DOWNLOAD,37,159,50,14
@@ -2940,7 +2941,7 @@ END
 
 IDD_DIALOG_TEMCO_STANDARD_BACNET_TOOL DIALOGEX 0, 0, 853, 463
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Temco Standard BACnet Tool"
+CAPTION STRINGIFY(MY_BACNET)
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_T3000BACNETTOOL1,
@@ -7737,11 +7738,11 @@ END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 240, 93
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Update T3000"
+CAPTION STRINGIFY(MY_UPDATE)
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,13,13,20,20
-    LTEXT           "T3000 Building Automation System",IDC_STATIC_ABOUT_INFO,40,19,193,8,SS_NOPREFIX
+    LTEXT           STRINGIFY(MY_TITLE),IDC_STATIC_ABOUT_INFO,40,19,193,8,SS_NOPREFIX
     DEFPUSHBUTTON   "Update",IDOK,91,41,54,21,WS_GROUP
 END
 
@@ -8378,7 +8379,7 @@ END
 
 IDD_SCANDBWAITDLG DIALOGEX 0, 0, 639, 369
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "T3000 Scanning"
+CAPTION STRINGIFY(MY_SCAN)
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "Exit",IDC_EXITBUTTON,13,53,64,23
@@ -8462,9 +8463,9 @@ BEGIN
     EDITTEXT        IDC_EDIT1,86,20,171,14,ES_AUTOHSCROLL
     LTEXT           "Database File Path:",IDC_STATIC,12,23,69,11
     PUSHBUTTON      "Browse...",IDC_BROWSE_BUTTON,260,21,42,14
-    CONTROL         "Import data from database of T3000 version LOWER than ver2.5.0.0.",IDC_RADIO1,
+    CONTROL         STRINGIFY(MY_IMPORT_LOWER),IDC_RADIO1,
                     "Button",BS_AUTORADIOBUTTON,14,43,276,13
-    CONTROL         "Import data from database of T3000 version UPPER than ver2.5.0.0.",IDC_RADIO2,
+    CONTROL         STRINGIFY(MY_IMPORT_UPPER),IDC_RADIO2,
                     "Button",BS_AUTORADIOBUTTON,13,66,273,12
 END
 
@@ -8796,7 +8797,7 @@ END
 
 IDD_DIALOG_LOG_WINDOW DIALOGEX 0, 0, 553, 263
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "T3000 LogDetail"
+CAPTION STRINGIFY(MY_LOG)
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LISTBOX         IDC_LIST_LOG_WINDOW,0,4,553,232,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
@@ -11871,12 +11872,12 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "Temcocontrols.Ltd."
+            VALUE "CompanyName", STRINGIFY(MY_NAME)
             VALUE "FileDescription", "Building automation system"
             VALUE "FileVersion", "2019.3.8build"
-            VALUE "InternalName", "T3000.exe"
-            VALUE "LegalCopyright", "Temcocontrols.Ltd.  All rights reserved."
-            VALUE "OriginalFilename", "T3000.exe"
+            VALUE "InternalName", STRINGIFY(MY_EXE)
+            VALUE "LegalCopyright", STRINGIFY(MY_COPYRIGHT)
+            VALUE "OriginalFilename", STRINGIFY(MY_EXE)
             VALUE "PrivateBuild", "2019.3.8"
             VALUE "ProductName", "Building automation system"
             VALUE "ProductVersion", "2019.3 build6"
@@ -11918,7 +11919,7 @@ END
 
 STRINGTABLE
 BEGIN
-    AFX_IDS_APP_TITLE       "T3000"
+    AFX_IDS_APP_TITLE       STRINGIFY(MY_NAME)
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
@@ -11945,7 +11946,7 @@ STRINGTABLE
 BEGIN
     ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
     ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
-    ID_HELP                 "T3000 help"
+    ID_HELP                 STRINGIFY(MY_HELP)
 END
 
 STRINGTABLE

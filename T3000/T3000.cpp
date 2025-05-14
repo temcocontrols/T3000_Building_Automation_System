@@ -47,14 +47,14 @@ CT3000App::CT3000App()
     CurrentT3000Version.ReleaseBuffer();
 
     //******************************************************
-    // Release ç‰ˆæœ¬å‘å¸ƒæ—¶å±è”½æ­¤æ®µï¼Œæ­¤æ®µ ä¸»è¦ç”¨äºè°ƒè¯•æ—¶ æ˜¾ç¤º å…·ä½“æ˜¯ å‡ ç‚¹é’Ÿçš„ç‰ˆæœ¬.
+    // Release °æ±¾·¢²¼Ê±ÆÁ±Î´Ë¶Î£¬´Ë¶Î Ö÷ÒªÓÃÓÚµ÷ÊÔÊ± ÏÔÊ¾ ¾ßÌåÊÇ ¼¸µãÖÓµÄ°æ±¾.
 //#ifdef _DEBUG
     char strTime[128] = { 0 }; // å–å°æ—¶å½“ å°ç‰ˆæœ¬å·;
     CString Test_Version;  //   TIME å’ŒDATE    
     memcpy(strTime, __TIME__, 2);
     MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
     Test_Version.ReleaseBuffer();
-	CurrentT3000Version= CurrentT3000Version  + Test_Version; //æœå¸† : Release ç‰ˆå‘å¸ƒçš„æ—¶å€™ è¿™å¥å±è”½æ‰å°±å¥½äº† ï¼Œä¼šè‡ªåŠ¨è·å–ç¼–è¯‘çš„æ—¥æœŸ.
+	CurrentT3000Version= CurrentT3000Version  + Test_Version; //¶Å·« : Release °æ·¢²¼µÄÊ±ºò Õâ¾äÆÁ±Îµô¾ÍºÃÁË £¬»á×Ô¶¯»ñÈ¡±àÒëµÄÈÕÆÚ.
 //#endif 
     //*******************************************************
     
@@ -200,7 +200,7 @@ BOOL CT3000App::InitInstance()
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
     //2018 04 23 ä¿®å¤bug é»˜å†™æ“ä½œç³»ç»Ÿä¸æ˜¯Cç›˜çš„æƒ…å†µå®‰è£…æ§ä»¶å¤±è´¥
-    //è§£å†³åŠæ³•  è·å–ç³»ç»Ÿæ‰€åœ¨ç›˜ç¬¦ ï¼Œç„¶åé‡‡å–å¯¹åº”æ“ä½œ.
+    //½â¾ö°ì·¨  »ñÈ¡ÏµÍ³ËùÔÚÅÌ·û £¬È»ºó²ÉÈ¡¶ÔÓ¦²Ù×÷.
     CString Local_System_Path;
     TCHAR szPath[MAX_PATH];
     DWORD ret;
@@ -213,13 +213,13 @@ BOOL CT3000App::InitInstance()
 	{
 		//if (ReadDLLRegAsm()<1)
 		{
-#if 1 // æœå¸†å±è”½  ï¼Œ è®¸å¤šæ€æ¯’è½¯ä»¶ æ£€æµ‹åˆ°  RegAsm.exe çš„è®¿é—®ä¸åˆæ³•ï¼Œ æŠ¥ç—…æ¯’;
+#if 1 // ¶Å·«ÆÁ±Î  £¬ Ğí¶àÉ±¶¾Èí¼ş ¼ì²âµ½  RegAsm.exe µÄ·ÃÎÊ²»ºÏ·¨£¬ ±¨²¡¶¾;
             CString temp_dotnet_path;
             CString temp_t3000controlldll_path;
             CString temp_bacnetdll;
             CString temp_Regasm_path;
             temp_dotnet_path = Local_System_Path + _T("\\Microsoft.NET\\Framework\\v4.0.30319");
-            temp_t3000controlldll_path = temp_dotnet_path + _T("\\T3000Controls.dll");
+            temp_t3000controlldll_path = temp_dotnet_path + _T("\\") + _T("") MY_CONTROL_DLL_NAME;
             temp_bacnetdll = temp_dotnet_path + _T("\\TemcoStandardBacnetTool.dll");
             temp_Regasm_path = temp_dotnet_path + _T("\\RegAsm.exe");
 			CopyFile(strSource, temp_t3000controlldll_path, FALSE);
@@ -324,7 +324,7 @@ BOOL CT3000App::InitInstance()
 
 			//è¿™ä¸€æ®µæ˜¯æ–¹ä¾¿ installshield åˆ¶ä½œå®‰è£…æ–‡ä»¶çš„æ—¶å€™ç¬¬ä¸€æ¬¡è¿è¡Œå°†å®‰è£…æ–‡ä»¶çš„zipæ–‡ä»¶è§£å‹åˆ°ResourceFileä¸‹é¢çš„wwwæ–‡ä»¶å¤¹ä¸‹
 			www_zip_file = g_strExePth + _T("ResourceFile\\webview.zip");
-			//åˆ¤æ–­www_zip_fileæ–‡ä»¶æ˜¯å¦å­˜åœ¨ï¼Œå­˜åœ¨å°±è§£å‹åˆ°webview_www_folderä¸‹
+			//ÅĞ¶Ïwww_zip_fileÎÄ¼şÊÇ·ñ´æÔÚ£¬´æÔÚ¾Í½âÑ¹µ½webview_www_folderÏÂ
 			CFileFind temp_findzip;
 			BOOL	nret = temp_findzip.FindFile(www_zip_file);
 			if (nret)
@@ -468,7 +468,7 @@ BOOL CT3000App::InitInstance()
 			if (hFind==INVALID_HANDLE_VALUE)//è¯´æ˜å½“å‰ç›®å½•ä¸‹æ— t3000.mdb
 			{
 				
-				//æ²¡æœ‰æ‰¾åˆ°å°±åˆ›å»ºä¸€ä¸ªé»˜è®¤çš„æ•°æ®åº“
+				//Ã»ÓĞÕÒµ½¾Í´´½¨Ò»¸öÄ¬ÈÏµÄÊı¾İ¿â
 				FilePath=g_strExePth+_T("Database\\T3000.db");
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -495,7 +495,7 @@ BOOL CT3000App::InitInstance()
 			hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
 			if (hFind_Monitor==INVALID_HANDLE_VALUE)//è¯´æ˜å½“å‰ç›®å½•ä¸‹æ— MonitorData.db
 			{
-				//æ²¡æœ‰æ‰¾åˆ°å°±åˆ›å»ºä¸€ä¸ªé»˜è®¤çš„æ•°æ®åº“
+				//Ã»ÓĞÕÒµ½¾Í´´½¨Ò»¸öÄ¬ÈÏµÄÊı¾İ¿â
 				FilePath_Monitor= g_achive_monitor_datatbase_path;
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB2), _T("MONITOR_DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -662,7 +662,7 @@ BOOL CT3000App::InitInstance()
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
        m_szAppPath  = g_strExePth;
-       if(m_special_customer == 1) //å¦‚æœæ˜¯ç¬¬ä¸€ä¸ªå®¢æˆ· å°±å®šä¹‰ä¸ºCPR-1000-Help.chm
+       if(m_special_customer == 1) //Èç¹ûÊÇµÚÒ»¸ö¿Í»§ ¾Í¶¨ÒåÎªCPR-1000-Help.chm
            m_szHelpFile = theApp.m_szAppPath + L"CPR-1000-Help.chm";
        else
             m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";

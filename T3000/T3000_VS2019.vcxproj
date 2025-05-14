@@ -22,6 +22,7 @@
     <ProjectName>T3000</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(SolutionDir)AppConfig.props" Condition="Exists('$(SolutionDir)AppConfig.props')" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
@@ -58,10 +59,14 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\T3000 Output\T3000 object\debug\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</EmbedManifest>
+    <TargetName Condition="'$(AppOutputName)' != ''">$(AppOutputName)</TargetName>
+    <TargetName Condition="'$(AppOutputName)' == ''">$(ProjectName)</TargetName> <!-- Fallback -->
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\T3000 object\Release\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</EmbedManifest>
+    <TargetName Condition="'$(AppOutputName)' != ''">$(AppOutputName)</TargetName>
+    <TargetName Condition="'$(AppOutputName)' == ''">$(ProjectName)</TargetName> <!-- Fallback -->
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(IncludePath)</IncludePath>
@@ -74,7 +79,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SOLUTION_DIR=R"($(SolutionDir))";PROJECT_VERSION=$(ProjectVersion);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SOLUTION_DIR=R"($(SolutionDir))";PROJECT_VERSION=$(ProjectVersion);%(PreprocessorDefinitions);MY_NAME=$(AppOutputString);MY_CONTROL_DLL_NAME=$(AppControlDllNameString);MY_LOG_NAME=$(AppLogNameString);MY_APP_TITLE=$(AppTitleString);MY_EXE_NAME=$(AppExeOutputName);MY_CONFIG=$(AppConfigNameString);</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -84,7 +89,7 @@
       <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;Json-cpp\nlohmann\;Json-cpp\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions);MY_NAME=$(AppOutputName);MY_COPYRIGHT=$(AppLegalCopyright);MY_EXE=$(AppExeOutputRaw);MY_UPDATE=$(AppUpdateRaw);MY_SCAN=$(AppScanRaw);MY_TITLE=$(AppTitleRaw);MY_LOG=$(AppLogDetailRaw);MY_HELP=$(AppHelpRaw);MY_IMPORT_LOWER=$(AppImportLowerRaw);MY_IMPORT_UPPER=$(AppImportUpperRaw);MY_BACNET=$(AppBacnetRaw);</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
@@ -115,7 +120,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClCompile>
       <Optimization>MinSpace</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SOLUTION_DIR=R"($(SolutionDir))";PROJECT_VERSION=$(ProjectVersion);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SOLUTION_DIR=R"($(SolutionDir))";PROJECT_VERSION=$(ProjectVersion);%(PreprocessorDefinitions);MY_NAME=$(AppOutputString);MY_CONTROL_DLL_NAME=$(AppControlDllNameString);MY_LOG_NAME=$(AppLogNameString);MY_APP_TITLE=$(AppTitleString);MY_EXE_NAME=$(AppExeOutputName);MY_CONFIG=$(AppConfigNameString);</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -127,7 +132,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions);MY_NAME=$(AppOutputName);MY_COPYRIGHT=$(AppLegalCopyright);MY_EXE=$(AppExeOutputRaw);MY_UPDATE=$(AppUpdateRaw);MY_SCAN=$(AppScanRaw);MY_TITLE=$(AppTitleRaw);MY_LOG=$(AppLogDetailRaw);MY_HELP=$(AppHelpRaw);MY_IMPORT_LOWER=$(AppImportLowerRaw);MY_IMPORT_UPPER=$(AppImportUpperRaw);MY_BACNET=$(AppBacnetRaw);</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>

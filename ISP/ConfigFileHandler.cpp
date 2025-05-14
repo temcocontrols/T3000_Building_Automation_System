@@ -36,7 +36,7 @@ CConfigFileHandler::CConfigFileHandler(void)
 	m_pFile = new CStdioFile;
 
 
-	 	m_configfile_path=GetExePath(true)+_T("T3000_config.ini");
+	 	m_configfile_path=GetExePath(true)+_T("") MY_CONFIG;
 
 		m_ISPTool_Section = L"ISPTool_Setting";
 }

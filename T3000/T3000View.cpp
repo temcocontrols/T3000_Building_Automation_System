@@ -532,7 +532,7 @@ void CT3000View::Fresh()
 		GetDlgItem(IDC_STATIC_NAME_TSTAT)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(SW_HIDE);
 	}
-	CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
+	CString	g_configfile_path = g_strExePth + _T("") MY_CONFIG;
 	m_offline = GetPrivateProfileInt(_T("SliderUI"), _T("Online"), 0, g_configfile_path);
 	if (!m_offline)
 	{

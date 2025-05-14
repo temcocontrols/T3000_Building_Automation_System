@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(SolutionDir)AppConfig.props" Condition="Exists('$(SolutionDir)AppConfig.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -23,6 +24,8 @@
     <WarningLevel>4</WarningLevel>
     <RegisterForComInterop>true</RegisterForComInterop>
     <Prefer32Bit>false</Prefer32Bit>
+    <AssemblyName Condition="'$(AppControlOutputName)' != ''">$(AppControlOutputName)</AssemblyName>
+    <AssemblyName Condition="'$(AppControlOutputName)' == ''">$(ProjectName)</AssemblyName> <!-- Fallback -->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,6 +37,8 @@
     <RegisterForComInterop>false</RegisterForComInterop>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <Prefer32Bit>false</Prefer32Bit>
+    <AssemblyName Condition="'$(AppControlOutputName)' != ''">$(AppControlOutputName)</AssemblyName>
+    <AssemblyName Condition="'$(AppControlOutputName)' == ''">$(ProjectName)</AssemblyName> <!-- Fallback -->
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>

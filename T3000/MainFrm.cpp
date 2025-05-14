@@ -725,11 +725,11 @@ void CMainFrame::ShowSplashWnd(int nMillisecond)
         //g_configfile_path
         GetPrivateProfileString(_T("Parameter"), _T("SoftwareName"), _T(""), cs_special_name.GetBuffer(MAX_PATH), MAX_PATH, g_configfile_path);
         cs_special_name.ReleaseBuffer();
-        if ((cs_special_name.IsEmpty()   ||  (cs_special_name.CompareNoCase(_T("T3000 Building Automation System")) == 0) ))
+        if ((cs_special_name.IsEmpty()   ||  (cs_special_name.CompareNoCase(_T("") MY_APP_TITLE) == 0) ))
         {
-            WritePrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("T3000.exe"), temp_db_ini_folder);
-            WritePrivateProfileString(_T("Parameter"), _T("SoftwareName"), _T("T3000 Building Automation System"), g_configfile_path);
-            cs_special_name = _T("T3000 Building Automation System");
+            WritePrivateProfileString(_T("SpecialFlag"), _T("Customer_SoftName"), _T("") MY_EXE_NAME, temp_db_ini_folder);
+            WritePrivateProfileString(_T("Parameter"), _T("SoftwareName"), _T("") MY_APP_TITLE, g_configfile_path);
+            cs_special_name = _T("") MY_APP_TITLE;
                 m_special_customer= 0;
         }
         else
@@ -1161,7 +1161,7 @@ The bound local network adapter can be modified through the menu .\r\nMenu-Tool-
 
 	SetTimer(FOR_LAST_VIEW_TIMER,4000,NULL);
 
-	CString	configfile_path = g_strExePth + _T("T3000_config.ini");
+	CString	configfile_path = g_strExePth + _T("") MY_CONFIG;
 	int isoffline = GetPrivateProfileInt(_T("ONOFFLINE_MODEL"), _T("ISONLINE"), -1, configfile_path);
 
 	if (isoffline == 1)
@@ -1196,7 +1196,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
     //  the CREATESTRUCT cs
     // 禁用最小化按钮
     cs.style &= ~WS_MINIMIZEBOX;
-
+    cs.style &= ~FWS_ADDTOTITLE; 
     return TRUE;
 }
 
@@ -3193,7 +3193,8 @@ void CMainFrame::OnConnect()
                     SetPaneString(1,strInfo);
                     //connectionSuccessful = 1;
                     m_nStyle=1;
-                    g_configfile_path=g_strExePth+_T("T3000_config.ini");
+                    g_configfile_path=g_strExePth+_T("") MY_CONFIG;
+
                     CFileFind fFind;
                     if(!fFind.FindFile(g_configfile_path))
                     {
@@ -3247,7 +3248,7 @@ void CMainFrame::OnConnect()
                     SetPaneString(1, strInfo);
                     Change_BaudRate(default_com1_port_baudrate);
                     m_nStyle=1;
-                    CString	g_configfile_path=g_strExePth+_T("T3000_config.ini");
+                    CString	g_configfile_path=g_strExePth+_T("") MY_CONFIG;
                     CFileFind fFind;
                     if(!fFind.FindFile(g_configfile_path))
                     {
@@ -3450,7 +3451,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
             {
                 strInfo.Format((_T("Open IP:%s:%d successful")),tree_node.BuildingInfo.strIp,m_nIpPort);//prompt info;
                 SetPaneString(1,strInfo);
-                CString	g_configfile_path=g_strExePth+_T("T3000_config.ini");
+                CString	g_configfile_path=g_strExePth+_T("") MY_CONFIG;
                 CFileFind fFind;
                 if(!fFind.FindFile(g_configfile_path))
                 {
@@ -3515,7 +3516,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
             {
                 strInfo.Format((_T("Open IP:%s:%d successful")),tree_node.BuildingInfo.strIp,m_nIpPort);//prompt info;
                 SetPaneString(1,strInfo);
-                CString	g_configfile_path=g_strExePth+_T("T3000_config.ini");
+                CString	g_configfile_path=g_strExePth+_T("") MY_CONFIG;
                 CFileFind fFind;
                 if(!fFind.FindFile(g_configfile_path))
                 {
@@ -3585,7 +3586,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
         strInfo.Format(_T("COM %d Connected: Yes"), nCom);
         SetPaneString(1,strInfo);
 		 Change_BaudRate(tree_node.baudrate);
-        CString	g_configfile_path=g_strExePth+_T("T3000_config.ini");
+        CString	g_configfile_path=g_strExePth+_T("") MY_CONFIG;
         CFileFind fFind;
         if(!fFind.FindFile(g_configfile_path))
         {
@@ -6661,7 +6662,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
         m_wndStatusBar.ClientToScreen(&rect);
         if(PtInRect(&rect,pt))
         {
-            CString strHelp=g_strExePth+_T("T3000.log");
+            CString strHelp=g_strExePth+_T("") MY_LOG_NAME;
             ShellExecute(NULL, _T("open"), strHelp, NULL, NULL, SW_SHOWNORMAL);
         }
         m_wndStatusBar.GetItemRect(2,&rect);
@@ -7287,7 +7288,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 				product_type = selected_product_Node.product_class_id;
 #if 1//Modbus Poll Config 
 				m_nStyle = 1;
-				CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
+				CString	g_configfile_path = g_strExePth + _T("") MY_CONFIG;
 				CFileFind fFind;
 				if (!fFind.FindFile(g_configfile_path))
 				{
@@ -7674,7 +7675,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 
 						m_nStyle = 1;
 
-						CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
+						CString	g_configfile_path = g_strExePth + _T("") MY_CONFIG;
 						CFileFind fFind;
 						if (!fFind.FindFile(g_configfile_path))
 						{
@@ -15291,7 +15292,7 @@ void CMainFrame::OnModeOnlinemode()
 
 	set_offline_mode(offline_mode);
 
-	CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
+	CString	g_configfile_path = g_strExePth + _T("") MY_CONFIG;
 	CFileFind fFind;
 	if (!fFind.FindFile(g_configfile_path))
 	{
@@ -15315,7 +15316,7 @@ void CMainFrame::OnModeOfflinemode()
 	CreateOfflinePrgFile();
 	set_offline_mode(offline_mode);
 
-	CString	g_configfile_path = g_strExePth + _T("T3000_config.ini");
+	CString	g_configfile_path = g_strExePth + _T("") MY_CONFIG;
 	CFileFind fFind;
 	if (!fFind.FindFile(g_configfile_path))
 	{
@@ -15679,12 +15680,7 @@ void CMainFrame::OnUpdateAppAbout(CCmdUI *pCmdUI)
     if (pCmdUI->m_pMenu != NULL)
     {
         CString show_cs;
-        if(m_special_customer == 0)
-            pCmdUI->SetText(_T("Update T3000"));
-        else
-        {
-            pCmdUI->SetText(_T("Update  ") + cs_special_name);
-        }
+        pCmdUI->SetText(_T("Update ") MY_NAME);
     }
 }
 
