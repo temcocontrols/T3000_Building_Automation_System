@@ -2005,7 +2005,7 @@ void TFTPServer::FlashByEthernet()
 	CString strTips_ip;
 	if (temparray.GetSize() == 4)
 	{
-		temp_compare_ip = temparray.GetAt(0) + _T(".") + temparray.GetAt(1) + _T(".") + temparray.GetAt(2);
+		temp_compare_ip = temparray.GetAt(0) + _T(".") + temparray.GetAt(1) + _T(".") + temparray.GetAt(2) + _T(".");
 		for (int index = 0; index < g_Vector_Subnet.size(); index++)
 		{
 			if (g_Vector_Subnet[index].StrIP.Find(_T("0.0.")) != -1)

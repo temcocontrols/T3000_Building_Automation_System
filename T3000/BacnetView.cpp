@@ -8,6 +8,8 @@
 MSFLXGRD.MSM
 COMCAT.MSM
 拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
+20250320 
+支持 TSTAT10E 的input output 界面
 
 2025 01 13 
 1. Load prog时 避免改变T3 ARM设备的Mac地址
@@ -2328,16 +2330,16 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 					break;
 				case PROP_PRESENT_VALUE:
 					if (value->tag == TPYE_BACAPP_UNSIGNED) {
-						tmp.value = value->type.Unsigned_Int;
+						tmp.value = 1000 * value->type.Unsigned_Int;
 					}
 					else if (value->tag == TPYE_BACAPP_SIGNED) {
-						tmp.value = value->type.Signed_Int;
+						tmp.value = 1000 * value->type.Signed_Int;
 					}
 					else if (value->tag == TPYE_BACAPP_REAL) {
-						tmp.value = value->type.Real;
+						tmp.value = 1000 * value->type.Real;
 					}
 					else if (value->tag == TPYE_BACAPP_DOUBLE) {
-						tmp.value = value->type.Double;
+						tmp.value = 1000 * value->type.Double;
 					}
 					else {
 						tmp.value = 0;
@@ -2375,16 +2377,16 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 			if (invoke_id)
 			{
 				if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-					tmp.value = temp_value.type.Unsigned_Int;
+					tmp.value = 1000 * temp_value.type.Unsigned_Int;
 				}
 				else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
-					tmp.value = temp_value.type.Signed_Int;
+					tmp.value = 1000 * temp_value.type.Signed_Int;
 				}
 				else if (temp_value.tag == TPYE_BACAPP_REAL) {
-					tmp.value = temp_value.type.Real;
+					tmp.value = 1000 * temp_value.type.Real;
 				}
 				else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
-					tmp.value = temp_value.type.Double;
+					tmp.value = 1000 * temp_value.type.Double;
 				}
 				else {
 					tmp.value = 0;
@@ -2426,16 +2428,16 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 		if (invoke_id)
 		{
 			if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-				tmp.value = temp_value.type.Unsigned_Int;
+				tmp.value = 1000 * temp_value.type.Unsigned_Int;
 			}
 			else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
-				tmp.value = temp_value.type.Signed_Int;
+				tmp.value = 1000 * temp_value.type.Signed_Int;
 			}
 			else if (temp_value.tag == TPYE_BACAPP_REAL) {
-				tmp.value = temp_value.type.Real;
+				tmp.value = 1000 * temp_value.type.Real;
 			}
 			else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
-				tmp.value = temp_value.type.Double;
+				tmp.value = 1000 * temp_value.type.Double;
 			}
 			else {
 				tmp.value = 0;
@@ -2471,6 +2473,7 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 			//tmp.instance_id = objInstace;
 	}
 	m_Input_data_instance.at(index) = objInstace;
+	//tmp.value = tmp.value * 1000; // 20250408 input 列表中的值乘以1000;
 	m_Input_data.at(index) = tmp;
 	
 }
@@ -2537,16 +2540,16 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 					break;
 				case PROP_PRESENT_VALUE:
 					if (value->tag == TPYE_BACAPP_UNSIGNED) {
-						tmp.value = value->type.Unsigned_Int;
+						tmp.value = 1000 * value->type.Unsigned_Int;
 					}
 					else if (value->tag == TPYE_BACAPP_SIGNED) {
-						tmp.value = value->type.Signed_Int;
+						tmp.value = 1000 * value->type.Signed_Int;
 					}
 					else if (value->tag == TPYE_BACAPP_REAL) {
-						tmp.value = value->type.Real;
+						tmp.value = 1000 * value->type.Real;
 					}
 					else if (value->tag == TPYE_BACAPP_DOUBLE) {
-						tmp.value = value->type.Double;
+						tmp.value = 1000 * value->type.Double;
 					}
 					else {
 						tmp.value = 0;
@@ -2585,16 +2588,16 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 			if (invoke_id)
 			{
 				if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-					tmp.value = temp_value.type.Unsigned_Int;
+					tmp.value = 1000 * temp_value.type.Unsigned_Int;
 				}
 				else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
-					tmp.value = temp_value.type.Signed_Int;
+					tmp.value = 1000 * temp_value.type.Signed_Int;
 				}
 				else if (temp_value.tag == TPYE_BACAPP_REAL) {
-					tmp.value = temp_value.type.Real;
+					tmp.value = 1000 * temp_value.type.Real;
 				}
 				else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
-					tmp.value = temp_value.type.Double;
+					tmp.value = 1000 * temp_value.type.Double;
 				}
 				else {
 					tmp.value = 0;
@@ -2635,16 +2638,16 @@ void AddBacnetOutputData(CString temp_string, int deviceInstance, int objInstace
 		if (invoke_id)
 		{
 			if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-				tmp.value = temp_value.type.Unsigned_Int;
+				tmp.value = 1000 * temp_value.type.Unsigned_Int;
 			}
 			else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
-				tmp.value = temp_value.type.Signed_Int;
+				tmp.value = 1000 * temp_value.type.Signed_Int;
 			}
 			else if (temp_value.tag == TPYE_BACAPP_REAL) {
-				tmp.value = temp_value.type.Real;
+				tmp.value = 1000 * temp_value.type.Real;
 			}
 			else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
-				tmp.value = temp_value.type.Double;
+				tmp.value = 1000 * temp_value.type.Double;
 			}
 			else {
 				tmp.value = 0;
@@ -2737,16 +2740,16 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 					break;
 				case PROP_PRESENT_VALUE:
 					if (value->tag == TPYE_BACAPP_UNSIGNED) {
-						tmp.value = value->type.Unsigned_Int;
+						tmp.value = 1000 * value->type.Unsigned_Int;
 					}
 					else if (value->tag == TPYE_BACAPP_SIGNED) {
-						tmp.value = value->type.Signed_Int;
+						tmp.value = 1000 * value->type.Signed_Int;
 					}
 					else if (value->tag == TPYE_BACAPP_REAL) {
-						tmp.value = value->type.Real;
+						tmp.value = 1000 * value->type.Real;
 					}
 					else if (value->tag == TPYE_BACAPP_DOUBLE) {
-						tmp.value = value->type.Double;
+						tmp.value = 1000 * value->type.Double;
 					}
 					else {
 						tmp.value = 0;
@@ -2784,16 +2787,16 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 			if (invoke_id)
 			{
 				if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-					tmp.value = temp_value.type.Unsigned_Int;
+					tmp.value = 1000 * temp_value.type.Unsigned_Int;
 				}
 				else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
-					tmp.value = temp_value.type.Signed_Int;
+					tmp.value = 1000 * temp_value.type.Signed_Int;
 				}
 				else if (temp_value.tag == TPYE_BACAPP_REAL) {
-					tmp.value = temp_value.type.Real;
+					tmp.value = 1000 * temp_value.type.Real;
 				}
 				else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
-					tmp.value = temp_value.type.Double;
+					tmp.value = 1000 * temp_value.type.Double;
 				}
 				else {
 					tmp.value = 0;
@@ -2833,16 +2836,16 @@ void AddBacnetVariableData(CString temp_string, int deviceInstance, int objInsta
 		if (invoke_id)
 		{
 			if (temp_value.tag == TPYE_BACAPP_UNSIGNED) {
-				tmp.value = temp_value.type.Unsigned_Int;
+				tmp.value = 1000 * temp_value.type.Unsigned_Int;
 			}
 			else if (temp_value.tag == TPYE_BACAPP_SIGNED) {
-				tmp.value = temp_value.type.Signed_Int;
+				tmp.value = 1000 * temp_value.type.Signed_Int;
 			}
 			else if (temp_value.tag == TPYE_BACAPP_REAL) {
-				tmp.value = temp_value.type.Real;
+				tmp.value = 1000 * temp_value.type.Real;
 			}
 			else if (temp_value.tag == TPYE_BACAPP_DOUBLE) {
-				tmp.value = temp_value.type.Double;
+				tmp.value = 1000 * temp_value.type.Double;
 			}
 			else {
 				tmp.value = 0;

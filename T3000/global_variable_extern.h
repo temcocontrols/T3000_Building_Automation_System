@@ -1276,6 +1276,8 @@ extern bool new_device_support_mini_ui;
 extern int flag_auto_scroll ; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
 extern int graphic_last_scale_type ; //用于存储上次 有效的 X轴的 刻度;
 extern unsigned int graphic_last_time_value; //x轴上次查看的时间;
+extern int auto_local_ip ; //自动使用本地所有ip端口扫描;
+extern CString local_ip_scan_address; //bind本地ip地址;
 extern const CString c_strBaudate[NUMBER_BAUDRATE];
 #pragma endregion For_bacnet
 

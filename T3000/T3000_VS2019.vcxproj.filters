@@ -858,6 +858,12 @@
     <ClCompile Include="CTstatAQ_PM25_Parameter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CT3000_Options.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetSettingAdvParameter.cpp">
+      <Filter>Bacnet\Setting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -2121,6 +2127,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CTstatAQ_PM25_Parameter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CT3000_Options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetSettingAdvParameter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1174,6 +1174,10 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
 
 
 			int communicationType = pFrame->m_product.at(i).protocol;
+			if (MODBUS_BACNET_MSTP == communicationType)
+			{
+				return FALSE;
+			}
 			ModbusID = pFrame->m_product.at(i).product_id;
 			SetCommunicationType(communicationType);
 			if (communicationType == 0)

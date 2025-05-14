@@ -348,6 +348,7 @@
 #define IDD_DIALOG_REDEFINE_IO_COUNT    796
 #define IDI_ICON_DEFAULT_ARRAY          801
 #define IDD_DIALOG_TSTAT_AQ_PM25_PARAMETER 802
+#define IDD_DIALOG_ADVANCED_SETTINGS    804
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -1473,6 +1474,7 @@
 #define IDC_BUTTON_START_STOP4          1636
 #define IDC_STATIC_RANGES               1636
 #define IDC_MAX                         1636
+#define IDC_LIST_PROMPT                 1636
 #define IDC_BUTTON_CM5_WEEKLY           1637
 #define IDC_BUTTON_START_STOP5          1637
 #define IDC_STATIC_RANGE_TITLE          1637
@@ -2830,10 +2832,20 @@
 #define IDC_STATIC_C2                   2751
 #define IDC_BUTTON_BACNETTOOL           2751
 #define IDC_STATIC_C3                   2752
+#define IDC_IPADDRESS_LOCAL_IP          2752
 #define IDC_STATIC_PLC_GROUP_T          2753
+#define IDC_RADIO_IPAUTO                2753
 #define IDC_STATIC_AFS_DEGC_C1          2754
+#define IDC_RADIO_IP_BIND               2754
 #define IDC_STATIC_AFS_DEGC_C2          2755
+#define IDC_BUTTON_ADVANCED_OK          2755
 #define IDC_STATIC_AFS_DEGC_C3          2756
+#define IDC_BUTTON_ADVANCED_CANCEL      2756
+#define IDC_BUTTON_ADVANCED_Q1          2757
+#define IDC_EDIT_ADVANCED_TIMESAVE      2758
+#define IDC_BUTTON_ADVANCED_Q2          2759
+#define IDC_CHECK_FIX_RS485             2760
+#define IDC_BUTTON_ADVANCED_APPLY       2761
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3347,6 +3359,7 @@
 #define IDD_DIALOG_BACNET_VARIABLE      34908
 #define ID_TOOL_DETECTONLINEPRODUCTS    34909
 #define ID_CONFIGFILE_SAVE_AS           35000
+#define IDD_DIALOG_OPTIONS              35001
 #define ID_HELP_UPDATEFIRMWARE          35523
 #define ID_MISCELLANEOUS_UPDATEMINI     42883
 #define ID_CONTROL_WEEKLY               42884
@@ -3414,9 +3427,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        804
+#define _APS_NEXT_RESOURCE_VALUE        806
 #define _APS_NEXT_COMMAND_VALUE         34091
-#define _APS_NEXT_CONTROL_VALUE         2752
+#define _APS_NEXT_CONTROL_VALUE         2762
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

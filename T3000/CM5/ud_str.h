@@ -906,6 +906,9 @@ typedef union
 		 unsigned char max_var;  //ESP32 Only   ST 固定 128
 		 unsigned char max_in;	  //ESP32 Only	 ST 固定 64
 		 unsigned char max_out;  //ESP32 Only   ST 固定 64   //count 269
+		 unsigned char fix_com_config;   // 0 自动变化             非0 固定是啥是啥   ESP 65.5 才有的功能  ARM 67.0才有的功能
+		 unsigned char write_flash;   //按分钟  0 为不使用  ESP 65.5 才有的功能  ARM 67.0才有的功能  reg_92 
+
 
 	}reg;
 }Str_Setting_Info;

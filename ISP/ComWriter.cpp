@@ -142,25 +142,25 @@ int CComWriter::BeginWirteByCom()
     else if(m_nHexFileType == 2)
     {
 #pragma region detect_mstp_shutdown
+		if (SPECIAL_BAC_TO_MODBUS)  //暂时不要在店flash的时候 判断串口的协议，不然烧modbus的时候很慢 。
+		{
+			baudrate_def temp_baudrate_ret[100] = { 0 }; //用于检测串口MSTP数据
+			int find_mstp_protocal = 0;
+			find_mstp_protocal = Check_Mstp_Comport(m_nComPort, temp_baudrate_ret, m_nBautrate);
+			if ((find_mstp_protocal == -101) || (find_mstp_protocal == -100))
+			{
+				CString srtInfo = _T("|Error :The com port is occupied!");
+				OutPutsStatusInfo(srtInfo, FALSE);
+				return 0;
+			}
 
-        baudrate_def temp_baudrate_ret[100] = {0}; //用于检测串口MSTP数据
-        int find_mstp_protocal = 0;
-        find_mstp_protocal = Check_Mstp_Comport(m_nComPort, temp_baudrate_ret, m_nBautrate);
-        if ((find_mstp_protocal == -101) || (find_mstp_protocal == -100))
-        {
-            CString srtInfo = _T("|Error :The com port is occupied!");
-            OutPutsStatusInfo(srtInfo, FALSE);
-            return 0;
-        }
-        if (SPECIAL_BAC_TO_MODBUS)
-        {
-            if (find_mstp_protocal != 1)
-            {
-                CString srtInfo = _T("|Error :No MSTP data was found on the RS485 serial bus!");
-                OutPutsStatusInfo(srtInfo, FALSE);
-                return 0;
-            }
-        }
+			if (find_mstp_protocal != 1)
+			{
+				CString srtInfo = _T("|Error :No MSTP data was found on the RS485 serial bus!");
+				OutPutsStatusInfo(srtInfo, FALSE);
+				return 0;
+			}
+		}
 #if 0
         int temp_loop_count = 0;
         while ( (find_mstp_protocal > 0) && (temp_loop_count < 3))
@@ -1980,7 +1980,28 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
 
 }
 
+int CComWriter::Fix_Tstat10_76800_baudrate()
+{
 
+    if (Device_infor[7] != 10)
+        return 0;
+    if (m_nBautrate != 76800) //界面选择的波特率不是76800，不用理会
+        return 0;
+    if (Device_infor[14] >= 79) //固件版本大于79，说明已经修复过了
+        return 0;
+    if ((Device_infor[14] == 0) && (Device_infor[11] > 50)) //说明在BootLoader中
+    {
+        return 0;
+        Sleep(1);
+    }
+    else if ((Device_infor[14] > 0) && (Device_infor[11] == 1)) //说明在应用代码中
+    {
+        return 1;
+        Sleep(1);
+    }
+
+
+}
 
 int CComWriter::UpdataDeviceInformation(int& ID)
 {
@@ -2023,7 +2044,7 @@ int CComWriter::UpdataDeviceInformation(int& ID)
 	{
 		return TRUE;
 	}
-	
+    
 
 
     int temp_boot_version = isp_max(Device_infor[11], Device_infor[14]);
@@ -2527,13 +2548,20 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
             BOOL Flag_HEX_BIN=FALSE;
             int nret_device_info = pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
+            int temp_ret3 = pWriter->Fix_Tstat10_76800_baudrate();
             if (nret_device_info == 1)
             {
                 Flag_HEX_BIN =TRUE;
-                int  nRet = mudbus_write_one(pWriter->m_szMdbIDs[i],16,127,2);   // 进入ISP模式
-
-
-
+                int  nRet = mudbus_write_one(pWriter->m_szMdbIDs[i],16,127,3);   // 进入ISP模式
+                if (temp_ret3 == 1) //是由76800 tstat10 跳转进BootLoader的 ，并且BootLoader有问题，修改为57600波特率后通讯
+                {
+                    CString strtempnotice;
+                    strtempnotice.Format(_T("The actual baud rate in ISP mode is 57600"));
+                    pWriter->OutPutsStatusInfo(strtempnotice);
+                    strtempnotice.Format(_T("Temporarily switch the baud rate to 57600"));
+                    pWriter->OutPutsStatusInfo(strtempnotice);
+                    Change_BaudRate(57600);
+                }
                 Sleep (2000);
                 nRet = mudbus_read_one(pWriter->m_szMdbIDs[i],11);
 				//Wait for the device to enter the ISP mode, some devices jump slower than others, can’t read after reboot, retry;
