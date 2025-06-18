@@ -1949,9 +1949,12 @@ HWND      m_t3000_log_window = NULL;
 
 
 Str_Setting_Info g_Device_Basic_Setting[256] = {0};
-Str_in_point s_Input_data;
-Str_out_point s_Output_data;
-Str_variable_point s_Variable_data;
+Str_in_point t_Input_data= { 0 }; //用来取单位
+Str_out_point t_Output_data = {0};
+Str_variable_point t_Variable_data = { 0 };
+Str_in_point s_Input_data[256] = {0};
+Str_out_point s_Output_data[256] = {0};
+Str_variable_point s_Variable_data[256] = { 0 };
 Str_controller_point s_controller_data;
 Str_program_point  s_Program_data;
 Str_array_point s_Array_data;
@@ -1962,7 +1965,7 @@ Str_monitor_point s_monitor_data;
 Str_t3_screen_Json s_json_screen_data;
 Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //缓存其他panel json item 值的 全局变量;
 
-
+byte	g_DayState[8][ANNUAL_CODE_SIZE];				byte	gp_DayState[256][8][ANNUAL_CODE_SIZE];//全局所有panel output 的集合体;
 vector <_panel_info> g_bacnet_panel_info;  //全局的 object instance 与 panel number 对应的容器
 vector <Str_out_point> m_Output_data;					vector < vector<Str_out_point> >			  g_Output_data; //全局所有panel output 的集合体;
 vector <Str_in_point>  m_Input_data;					vector < vector<Str_in_point> >				  g_Input_data; //全局所有panel input 的集合体;
@@ -2042,7 +2045,7 @@ int controller_counter = 0; //记录扫描的子节点
 vector <_Graphic_Value_Info> m_graphic_refresh_data;
 vector <bacnet_standard_Info> m_standard_graphic_refresh_data;
 
-byte	g_DayState[8][ANNUAL_CODE_SIZE];
+
 unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
 unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
 int program_code_length[BAC_PROGRAM_ITEM_COUNT];

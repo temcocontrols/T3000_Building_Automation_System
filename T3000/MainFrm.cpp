@@ -138,6 +138,7 @@ HANDLE hwait_write_tstat_cfg = NULL;
 HANDLE hwait_write_ini_cfg = NULL;
 HANDLE hDetectYabeThread = NULL;
 HANDLE h_mul_ping_thread = NULL;
+HANDLE Load_descriptors_thread = NULL;
 int mul_ping_flag = 1;
 _Refresh_Write_Info Write_Config_Info;
 HANDLE hStartEvent; // thread start event
@@ -10679,7 +10680,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                     if (nret > 0)
                     {
                         m_backbround_data.at(n_handle_index).nrec_time = time(NULL);
-                         memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_input_data, &s_Input_data, sizeof(Str_in_point));
+                         memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_input_data, &t_Input_data, sizeof(Str_in_point));
                     }
                 }
                     break;
@@ -10692,7 +10693,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         sizeof(Str_out_point));
                     if (nret > 0)
                     {
-                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_output_data, &s_Output_data, sizeof(Str_out_point));
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_output_data, &t_Output_data, sizeof(Str_out_point));
                         CString temp_cs;
                         temp_cs.Format(_T("Out%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1, m_backbround_data.at(n_handle_index).ret_data.m_group_output_data.value / 1000.000);
                         //TRACE(temp_cs);
@@ -10708,7 +10709,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         sizeof(Str_variable_point));
                     if (nret > 0)
                     {
-                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_variable_data, &s_Variable_data, sizeof(Str_variable_point));
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_variable_data, &t_Variable_data, sizeof(Str_variable_point));
                     }
                 }
                     break;
@@ -12777,7 +12778,12 @@ void CMainFrame::OnControlSettings()
 
 void CMainFrame::OnMiscellaneousLoaddescriptors()
 {
-    
+    if (Load_descriptors_thread == NULL)
+    {
+        Load_descriptors_thread = CreateThread(NULL, NULL, LoadAllPanelDescriptors, this, NULL, NULL);
+    }
+    return;
+
     if(g_protocol == PROTOCOL_BACNET_IP)
     {
         if(bac_select_device_online)
@@ -15418,7 +15424,13 @@ void CMainFrame::OnLoadConfigFile()
         return;
     }
     else if (((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP)) &&
-        ((bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) || (bacnet_device_type == PM_T3_LC) || (bacnet_device_type == PID_T3PT12) || (bacnet_device_type == PID_T36CTA) || (bacnet_device_type == PWM_TRANSDUCER)))
+        ((bacnet_device_type == T38AI8AO6DO) || 
+            (bacnet_device_type == PID_T322AI) || 
+            (bacnet_device_type == PM_T332AI_ARM) ||          
+            (bacnet_device_type == PM_T3_LC) || 
+            (bacnet_device_type == PID_T3PT12) || 
+            (bacnet_device_type == PID_T36CTA) || 
+            (bacnet_device_type == PWM_TRANSDUCER)))
     {
         CFileDialog dlg(true, _T("*.prog"), _T(" "), OFN_HIDEREADONLY, _T("Prog files (*.prog)|*.prog||"), NULL, 0);
         if (IDOK != dlg.DoModal())
@@ -15530,10 +15542,11 @@ void CMainFrame::SaveConfigFile()
     }
     else if (((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP)) &&
         ((bacnet_device_type == T38AI8AO6DO) ||
-        (bacnet_device_type == PID_T322AI) ||
+        (bacnet_device_type == PID_T322AI) ||         
             (bacnet_device_type == PM_T3_LC) ||
             (bacnet_device_type == PID_T3PT12) ||
             (bacnet_device_type == PID_T36CTA) ||
+            (bacnet_device_type == PM_T332AI_ARM) ||       
             (bacnet_device_type == PWM_TRANSDUCER)))
     {
         //T3的设备支持minipanel的 input output 就读10000以后的寄存器;

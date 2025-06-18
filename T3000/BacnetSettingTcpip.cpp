@@ -330,6 +330,11 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->GetCurSel();
     m_device_com0.GetLBText(nSel, temp_string);
 
+    if (temp_string.CompareNoCase(_T("Modbus")) == 0)
+    {
+        temp_string = Device_Serial_Port_Status[MAIN_MODBUS];
+    }
+
 
     for (int i = 0;i<MAX_COM_TYPE;i++)
     {
@@ -446,6 +451,12 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->GetLBText(nSel, temp_string);
+
+    if (temp_string.CompareNoCase(_T("Modbus")) == 0)
+    {
+        temp_string = Device_Serial_Port_Status[MAIN_MODBUS];
+    }
+
     for (int i = 0;i<MAX_COM_TYPE;i++)
     {
         if (temp_string.CompareNoCase(Device_Serial_Port_Status[i]) == 0)

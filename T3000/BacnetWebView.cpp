@@ -70,6 +70,7 @@ enum WEBVIEW_MESSAGE_TYPE
 	DELETE_IMAGE = 11,
 	GET_SELECTED_DEVICE_INFO = 12,
 	BIND_DEVICE = 13,
+	SAVE_NEW_LIBRARY_DATA = 14,
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -1019,6 +1020,44 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			r_i++;
 		}
 
+
+#if 1
+		for (int k = 0; k < BAC_WEEKLYCODE_ROUTINES_COUNT; k++)
+		{
+			tempjson["data"][r_i]["pid"] = npanel_id;
+			tempjson["data"][r_i]["type"] = "SCH";
+			tempjson["data"][r_i]["index"] = k; //第几个 schedule
+			tempjson["data"][r_i]["id"] = "SCH" + to_string(k + 1);
+			tempjson["data"][r_i]["command"] = to_string(npanel_id) + "SCH" + to_string(k + 1);
+
+			for (int j = 0; j < 9; j++)
+			{
+				for (int i = 0; i < 8; i++)
+				{
+					tempjson["data"][r_i]["time"][j][i]["minutes"] = g_Schedual_Time_data[npanel_id].at(k).Schedual_Day_Time[i][j].time_minutes;
+					tempjson["data"][r_i]["time"][j][i]["hours"] = g_Schedual_Time_data[npanel_id].at(k).Schedual_Day_Time[i][j].time_hours ;
+				}
+			}
+			r_i++;
+		}
+
+		for (int k = 0; k < BAC_HOLIDAY_COUNT; k++)
+		{
+			tempjson["data"][r_i]["pid"] = npanel_id;
+			tempjson["data"][r_i]["type"] = "HOL";
+			tempjson["data"][r_i]["index"] = k; //第几个 holiday
+			tempjson["data"][r_i]["id"] = "HOL" + to_string(k + 1);
+			tempjson["data"][r_i]["command"] = to_string(npanel_id) + "CAL" + to_string(k + 1);
+			for(int m = 0 ; m < ANNUAL_CODE_SIZE; m++)
+			{
+				tempjson["data"][r_i]["data"][m] = gp_DayState[npanel_id][k][m];
+			}
+		}
+#endif
+
+
+
+
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 		outmsg = temp_cs;
@@ -1042,7 +1081,12 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			grp_index = json.get("viewitem", Json::nullValue).asInt(); //这里如果是按键点进来的，要用T3000的index ，如果是 浏览器的 要浏览器的index
 			grp_serial_number = json.get("serialNumber", Json::nullValue).asInt();
 			//浏览器这里要调用一个函数，根据panel_id 和 grp_index 以及序列号 读取对应的panel的 绘图数据的zip文件并解压;
-			
+
+			//返回传入的PanelId,ViewItem,SerialNumber 消息群发后根据状态回显数据
+			tempjson["panelId"] = panel_id;
+			tempjson["viewitem"] = grp_index;
+			tempjson["serialNumber"] = grp_serial_number;
+
 			if ((panel_id <= 0) || (panel_id > 254))
 			{
 				if (action == GET_INITIAL_DATA) 
@@ -2066,6 +2110,28 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		file.Close();
 		Json::Value tempjson;
 		tempjson["action"] = "SAVE_LIBRAY_DATA_RES";
+		tempjson["status"] = true;
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+		outmsg = temp_cs;
+		//m_webView->PostWebMessageAsJson(temp_cs);
+	}
+	break;
+	case SAVE_NEW_LIBRARY_DATA:
+	{
+		CString temp_lib_file;
+		temp_lib_file = _T("t3_hvac_library.json");
+		des_lib_file = image_fordor + _T("\\") + temp_lib_file;
+		const std::string file_output = Json::writeString(builder, json["data"]);
+
+		CFile file;
+
+		CString file_temp_cs(file_output.c_str());
+		file.Open(des_lib_file, CFile::modeCreate | CFile::modeWrite | CFile::modeCreate, NULL);
+		file.Write(file_temp_cs, file_temp_cs.GetLength() * 2);
+		file.Close();
+		Json::Value tempjson;
+		tempjson["action"] = "SAVE_NEW_LIBRARY_DATA_RES";
 		tempjson["status"] = true;
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());

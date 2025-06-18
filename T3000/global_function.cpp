@@ -2157,17 +2157,17 @@ int GetPriavteDataByPanelBlocking(Str_points * npoint  , str_group_point* temp_d
              Sleep(1);
              if (command == READINPUT_T3000)
              {
-                 memcpy(&temp_data->data.m_group_input_data, &s_Input_data, sizeof(Str_in_point));
+                 memcpy(&temp_data->data.m_group_input_data, &t_Input_data, sizeof(Str_in_point));
 
              }
              else if (command == READOUTPUT_T3000)
              {
-                 memcpy(&temp_data->data.m_group_output_data, &s_Output_data, sizeof(Str_out_point));
+                 memcpy(&temp_data->data.m_group_output_data, &t_Output_data, sizeof(Str_out_point));
 
              }
              else if (command == READVARIABLE_T3000)
              {
-                 memcpy(&temp_data->data.m_group_variable_data, &s_Variable_data, sizeof(Str_variable_point));
+                 memcpy(&temp_data->data.m_group_variable_data, &t_Variable_data, sizeof(Str_variable_point));
 
              }
              else
@@ -4036,9 +4036,13 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
 
         if (invoke_id == gsp_invoke)
         {
+            if(start_instance == end_instance) //这种基本是刷新单个时使用;
+			{
+				fill_in_output(&t_Output_data, my_temp_point);
+			}
             for (i = start_instance; i <= end_instance; i++)
             {
-                fill_in_output(&s_Output_data, my_temp_point);
+                fill_in_output(&s_Output_data[i], my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_out_point);
             }
         }
@@ -4093,9 +4097,13 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             return -1;//超过长度了;
         if (invoke_id == gsp_invoke)
         {
-            for (i = start_instance; i <= end_instance; i++)
+            if (start_instance == end_instance) //这种基本是刷新单个时使用;
             {
-                fill_in_input(&s_Input_data, my_temp_point);
+                fill_in_input(&t_Input_data, my_temp_point);
+            }
+            for (i = start_instance; i <= end_instance; i++)
+            {       
+                fill_in_input(&s_Input_data[i], my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_in_point);
             }
         }
@@ -4146,9 +4154,14 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
 
         if (invoke_id == gsp_invoke)
         {
+            if (start_instance == end_instance) //这种基本是刷新单个时使用;
+            {
+                fill_in_variable(&t_Variable_data, my_temp_point);
+            }
+
             for (i = start_instance; i <= end_instance; i++)
             {
-                fill_in_variable(&s_Variable_data, my_temp_point);
+                fill_in_variable(&s_Variable_data[i], my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_variable_point);
             }
         }
@@ -17769,17 +17782,25 @@ int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npane
                 temp_point = temp_point + sizeof(Str_monitor_point);
             }
 
-            for (int i = 0; i < BAC_WEEKLYCODE_ROUTINES_COUNT; i++)
+            for (int k = 0; k < BAC_WEEKLYCODE_ROUTINES_COUNT; k++)
             {
                 //char* temp_value = temp_point;
                 //memcpy(weeklt_time_schedule[i], temp_point, WEEKLY_SCHEDULE_SIZE);
+                for (int j = 0; j < 9; j++)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        g_Schedual_Time_data[npanel].at(k).Schedual_Day_Time[i][j].time_minutes = *(temp_point++);
+                        g_Schedual_Time_data[npanel].at(k).Schedual_Day_Time[i][j].time_hours = *(temp_point++);
+                    }
+                }
                 temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
 
             }
 
-            for (int i = 0; i < BAC_HOLIDAY_COUNT; i++)
+            for (int k = 0; k < BAC_HOLIDAY_COUNT; k++)
             {
-                //memcpy(g_DayState[i], temp_point, ANNUAL_CODE_SIZE);
+                memcpy(gp_DayState[npanel][k], temp_point, ANNUAL_CODE_SIZE);
                 temp_point = temp_point + ANNUAL_CODE_SIZE;
             }
 

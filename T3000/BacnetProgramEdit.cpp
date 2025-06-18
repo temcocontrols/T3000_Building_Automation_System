@@ -358,7 +358,7 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	}
 	else
 		temp1.MakeLower();
-
+	
 	temp1.Replace(_T("\r\n"),_T(" \r\n"));
 	temp1.Replace(_T("\("),_T(" \( "));
 	temp1.Replace(_T("\)"),_T(" \) "));

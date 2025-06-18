@@ -1039,10 +1039,15 @@ extern vector < vector<Str_table_point> >		        g_analog_custmer_range;
 extern vector < vector<Str_variable_uint_point> >       g_variable_analog_unite;
 extern vector < vector<Str_Extio_point> >			    g_extio_config_data;
 extern vector < vector<Str_MSV> >					    g_msv_data;
+extern byte	gp_DayState[256][8][ANNUAL_CODE_SIZE];
+extern byte	g_DayState[8][ANNUAL_CODE_SIZE]; 
 
-extern Str_in_point s_Input_data;
-extern Str_out_point s_Output_data;
-extern Str_variable_point s_Variable_data;
+extern Str_in_point t_Input_data ; //用来取单位
+extern Str_out_point t_Output_data;
+extern Str_variable_point t_Variable_data;
+extern Str_in_point s_Input_data[256];
+extern Str_out_point s_Output_data[256];
+extern Str_variable_point s_Variable_data[256];
 extern Str_controller_point s_controller_data;
 extern Str_program_point  s_Program_data;
 extern Str_array_point s_Array_data;
@@ -1132,7 +1137,7 @@ extern HANDLE BACnet_read_thread;
 extern HANDLE BACnet_abort_read_thread;
 extern bool bac_net_initial_once;
 extern unsigned char my_ip[4];
-extern byte	g_DayState[8][ANNUAL_CODE_SIZE];
+
 extern CDialog *pDialog[WINDOW_TAB_COUNT];
 extern CDialog *DebugWindow;
 extern CDialog *T3000LogWindow;

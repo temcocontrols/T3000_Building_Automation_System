@@ -2083,6 +2083,7 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 		g_Schedual_time_flag.push_back(m_Schedual_time_flag);
 		g_json_screen_data.push_back(m_json_screen_data);
 		g_json_item_data.push_back(m_json_item_data);
+		g_Schedual_Time_data.push_back(m_Schedual_Time_data);
 	}
 	//g_Input_data[3].at(1).value = 2;
 	//Tab_Initial();
@@ -3729,6 +3730,8 @@ void CDialogCM5_BacNet::Fresh()
 				bacnet_device_type = T38AI8AO6DO;
 			else if(selected_product_Node.product_class_id == PID_T322AI)
 				bacnet_device_type = PID_T322AI;	
+			else if (selected_product_Node.product_class_id == PM_T332AI_ARM)
+				bacnet_device_type = PM_T332AI_ARM;		
 			else if (selected_product_Node.product_class_id == PWM_TRANSDUCER)
 				bacnet_device_type = PWM_TRANSDUCER;
 			else if(selected_product_Node.product_class_id == STM32_HUM_NET)
@@ -6796,9 +6799,14 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
     }
     else if (n_read_product_type == PID_T322AI)
     {
-        output_reg = 0; // (6+8)*23 = 322
+        output_reg = 0; // 0
         input_reg = 6; //  23 * 22 = 506
     }
+	else if (n_read_product_type == PM_T332AI_ARM)
+	{
+		output_reg = 0; // 0
+		input_reg = 8; //  23 * 32 = 736
+	}
     else if (n_read_product_type == PWM_TRANSDUCER)
     {
         output_reg = 2; // (0 + 6)*23 = 138
@@ -8028,4 +8036,150 @@ Device IP : %s \r\n"), selected_product_Node.NetworkCard_Address, selected_produ
         if (g_bac_instance>0)
             Send_WhoIs_Global(g_bac_instance, g_bac_instance);
     }
+}
+
+//后台线程读取所有panel 的描述符;  20250612
+DWORD WINAPI  LoadAllPanelDescriptors(LPVOID lpVoid)
+{
+	Send_WhoIs_Global(-1, -1);
+	Sleep(2000);
+	Send_WhoIs_Global(-1, -1);
+	Sleep(2000);
+	vector <_Bac_Scan_Com_Info> temp_Iam_data;
+	//将m_bac_handle_Iam_data所有元素复制给temp_Iam_data
+	temp_Iam_data = m_bac_handle_Iam_data;
+	for (int i = 0; i < temp_Iam_data.size(); i++)
+	{
+		//if ((temp_Iam_data.at(i).device_id == 212360) ||
+		//	(temp_Iam_data.at(i).device_id == 65661) ||
+		//	(temp_Iam_data.at(i).device_id == 240488))
+		//{
+
+		//}
+		//else
+		//	continue;
+		if (temp_Iam_data.at(i).vendor_id != 148)
+			continue;
+		int ret_n = 0;
+		if (temp_Iam_data.at(i).device_id > 0x3fffff)
+		{
+			continue;
+		}
+		unsigned int temp_bac_instance = 0;
+		temp_bac_instance = temp_Iam_data.at(i).device_id;
+		ret_n = GetPrivateDataSaveSPBlocking(temp_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info),5);
+		if (ret_n > 0)
+		{
+			unsigned char t_panel_num = s_Basic_Setting.reg.panel_number;
+			if ((t_panel_num == 0) || t_panel_num == 255)
+				continue;
+			
+			g_Device_Basic_Setting[t_panel_num] = s_Basic_Setting; //保存信息至全局;
+			
+			int end_temp_instance = 0;
+			CString Mession_ret;
+			int read_success_count = 0;
+			for (int i = 0; i < BAC_INPUT_GROUP; i++)
+			{
+				end_temp_instance = BAC_READ_INPUT_REMAINDER + (BAC_READ_INPUT_GROUP_NUMBER)*i;
+				if (end_temp_instance >= BAC_INPUT_ITEM_COUNT)
+					end_temp_instance = BAC_INPUT_ITEM_COUNT - 1;
+				if (GetPrivateDataSaveSPBlocking(temp_bac_instance, READINPUT_T3000, (BAC_READ_INPUT_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_in_point)) > 0)
+				{
+					Mession_ret.Format(_T("Read input from %d to %d success."), (BAC_READ_INPUT_GROUP_NUMBER)*i, end_temp_instance);
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+					read_success_count++;
+					int temp_start_index = (BAC_READ_INPUT_GROUP_NUMBER)*i;
+					int temp_end_index = end_temp_instance;
+					for (int i = temp_start_index; i <= end_temp_instance; i++)
+					{
+						//将s_Input_data[i] 复制到 g_Input_data[t_panel_num]中
+						if (i < BAC_INPUT_ITEM_COUNT)
+						{
+							g_Input_data[t_panel_num].at(i) = s_Input_data[i];
+						}
+					}
+					
+					
+					Sleep(SEND_COMMAND_DELAY_TIME);
+				}
+				else
+				{
+					Mession_ret.Format(_T("Read input from %d to %d timeout."), (BAC_READ_INPUT_GROUP_NUMBER)*i, end_temp_instance);
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+					break;
+				}
+				g_progress_persent = read_success_count * 100 / BAC_INPUT_GROUP;
+			}
+
+			for (int i = 0; i < BAC_OUTPUT_GROUP; i++)
+			{
+				end_temp_instance = BAC_READ_OUTPUT_REMAINDER + (BAC_READ_OUTPUT_GROUP_NUMBER)*i;
+				if (end_temp_instance >= BAC_OUTPUT_ITEM_COUNT)
+					end_temp_instance = BAC_OUTPUT_ITEM_COUNT - 1;
+				if (GetPrivateDataSaveSPBlocking(temp_bac_instance, READOUTPUT_T3000, (BAC_READ_OUTPUT_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_out_point)) > 0)
+				{
+					Mession_ret.Format(_T("Read output from %d to %d success."), (BAC_READ_OUTPUT_GROUP_NUMBER)*i, end_temp_instance);
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+					read_success_count++;
+					int temp_start_index = (BAC_READ_OUTPUT_GROUP_NUMBER)*i;
+					int temp_end_index = end_temp_instance;
+					for (int i = temp_start_index; i <= end_temp_instance; i++)
+					{
+						//将s_Output_data[i] 复制到 g_Output_data[t_panel_num]中
+						if (i < BAC_OUTPUT_ITEM_COUNT)
+						{
+							g_Output_data[t_panel_num].at(i) = s_Output_data[i];
+						}
+					}
+					Sleep(SEND_COMMAND_DELAY_TIME);
+				}
+				else
+				{
+					Mession_ret.Format(_T("Read input from %d to %d timeout."), (BAC_READ_OUTPUT_GROUP_NUMBER)*i, end_temp_instance);
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+					break;
+				}
+				g_progress_persent = read_success_count * 100 / BAC_OUTPUT_GROUP;
+			}
+
+
+			for (int i = 0; i < BAC_VARIABLE_GROUP; i++)
+			{
+				end_temp_instance = BAC_READ_VARIABLE_REMAINDER + (BAC_READ_VARIABLE_GROUP_NUMBER)*i;
+				if (end_temp_instance >= BAC_VARIABLE_ITEM_COUNT)
+					end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
+				if (GetPrivateDataSaveSPBlocking(temp_bac_instance, READVARIABLE_T3000, (BAC_READ_VARIABLE_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_variable_point)) > 0)
+				{
+					Mession_ret.Format(_T("Read variable from %d to %d success."), (BAC_READ_VARIABLE_GROUP_NUMBER)*i, end_temp_instance);
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+					read_success_count++;
+					int temp_start_index = (BAC_READ_VARIABLE_GROUP_NUMBER)*i;
+					int temp_end_index = end_temp_instance;
+					for (int i = temp_start_index; i <= end_temp_instance; i++)
+					{
+						//将s_Variable_data[i] 复制到 g_Variable_data[t_panel_num]中
+						if (i < BAC_OUTPUT_ITEM_COUNT)
+						{
+							g_Variable_data[t_panel_num].at(i) = s_Variable_data[i];
+						}
+					}
+					Sleep(SEND_COMMAND_DELAY_TIME);
+				}
+				else
+				{
+					Mession_ret.Format(_T("Read variable from %d to %d timeout."), (BAC_READ_VARIABLE_GROUP_NUMBER)*i, end_temp_instance);
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, Mession_ret);
+					break;
+				}
+				g_progress_persent = read_success_count * 100 / BAC_VARIABLE_GROUP;
+			}
+
+
+		}
+		Sleep(1);
+
+	}
+	
+	return 0;
 }

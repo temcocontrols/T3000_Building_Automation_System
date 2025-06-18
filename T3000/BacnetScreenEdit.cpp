@@ -1236,37 +1236,38 @@ DWORD WINAPI CBacnetScreenEdit::ReadGroupDataThreadfun(LPVOID lpVoid)
                 m_read_group_data.at(i).read_info.entitysize,
                 1) == 1)
             {
+				unsigned char n_item = m_read_group_data.at(i).read_info.value_item;
                 memset(&m_read_group_data.at(i).detail_data, 0, sizeof(groupdata));
                 Sleep(1);
                 if (m_read_group_data.at(i).read_info.command == READINPUT_T3000)
                 {
-                    memcpy(&m_read_group_data.at(i).detail_data.m_group_input_data, &s_Input_data, sizeof(Str_in_point));
+                    memcpy(&m_read_group_data.at(i).detail_data.m_group_input_data, &s_Input_data[n_item], sizeof(Str_in_point));
 					if (m_read_group_data.at(i).point.panel == Device_Basic_Setting.reg.panel_number)
 					{
-						if(m_read_group_data.at(i).read_info.value_item < BAC_INPUT_ITEM_COUNT)
-							memcpy(&m_Input_data.at(m_read_group_data.at(i).read_info.value_item), &s_Input_data, sizeof(Str_in_point));
+						if(n_item < BAC_INPUT_ITEM_COUNT)
+							memcpy(&m_Input_data.at(n_item), &s_Input_data[n_item], sizeof(Str_in_point));
 					}
-					TRACE(_T("%d ID:%d input%d value: %f\r\n"),i, m_read_group_data.at(i).read_info.deviceid, m_read_group_data.at(i).read_info.value_item, m_read_group_data.at(i).detail_data.m_group_input_data.value/1000.00);
+					TRACE(_T("%d ID:%d input%d value: %f\r\n"),i, m_read_group_data.at(i).read_info.deviceid, n_item, m_read_group_data.at(i).detail_data.m_group_input_data.value/1000.00);
                 }
                 else if (m_read_group_data.at(i).read_info.command == READOUTPUT_T3000)
                 {
-                    memcpy(&m_read_group_data.at(i).detail_data.m_group_output_data, &s_Output_data, sizeof(Str_out_point));
+                    memcpy(&m_read_group_data.at(i).detail_data.m_group_output_data, &s_Output_data[n_item], sizeof(Str_out_point));
 					if (m_read_group_data.at(i).point.panel == Device_Basic_Setting.reg.panel_number)
 					{
-						if (m_read_group_data.at(i).read_info.value_item < BAC_OUTPUT_ITEM_COUNT)
-							memcpy(&m_Output_data.at(m_read_group_data.at(i).read_info.value_item), &s_Output_data, sizeof(Str_out_point));
+						if (n_item < BAC_OUTPUT_ITEM_COUNT)
+							memcpy(&m_Output_data.at(n_item), &s_Output_data[n_item], sizeof(Str_out_point));
 					}
-					TRACE(_T("%d ID:%d output%d value: %f\r\n"),i, m_read_group_data.at(i).read_info.deviceid, m_read_group_data.at(i).read_info.value_item, m_read_group_data.at(i).detail_data.m_group_output_data.value/1000.00);
+					TRACE(_T("%d ID:%d output%d value: %f\r\n"),i, m_read_group_data.at(i).read_info.deviceid, n_item, m_read_group_data.at(i).detail_data.m_group_output_data.value/1000.00);
                 }
                 else if (m_read_group_data.at(i).read_info.command == READVARIABLE_T3000)
                 {
-                    memcpy(&m_read_group_data.at(i).detail_data.m_group_variable_data, &s_Variable_data, sizeof(Str_variable_point));
+                    memcpy(&m_read_group_data.at(i).detail_data.m_group_variable_data, &s_Variable_data[n_item], sizeof(Str_variable_point));
 					if (m_read_group_data.at(i).point.panel == Device_Basic_Setting.reg.panel_number)
 					{
-						if (m_read_group_data.at(i).read_info.value_item < BAC_VARIABLE_ITEM_COUNT)
-							memcpy(&m_Variable_data.at(m_read_group_data.at(i).read_info.value_item), &s_Variable_data, sizeof(Str_variable_point));
+						if (n_item < BAC_VARIABLE_ITEM_COUNT)
+							memcpy(&m_Variable_data.at(n_item), &s_Variable_data[n_item], sizeof(Str_variable_point));
 					}
-					TRACE(_T("%d ID:%d variable%d value: %f\r\n"),i, m_read_group_data.at(i).read_info.deviceid, m_read_group_data.at(i).read_info.value_item, m_read_group_data.at(i).detail_data.m_group_variable_data.value/1000.00);
+					TRACE(_T("%d ID:%d variable%d value: %f\r\n"),i, m_read_group_data.at(i).read_info.deviceid, n_item, m_read_group_data.at(i).detail_data.m_group_variable_data.value/1000.00);
                 }
                 //else if (m_read_group_data.at(i).read_info.command == READCONTROLLER_T3000)
                 //else if (m_read_group_data.at(i).read_info.command == READWEEKLYROUTINE_T3000)
@@ -2225,16 +2226,16 @@ void CBacnetScreenEdit::OnPaint()
 			//memcpy(&temp_data_in, &m_Input_data.at(0), sizeof(Str_in_point));
 			if (m_read_group_data.at(read_group_index).point.panel != Device_Basic_Setting.reg.panel_number)
 			{
-				memcpy(&s_Input_data, &m_read_group_data.at(read_group_index).detail_data.m_group_input_data, sizeof(Str_in_point));
-				if (memcmp(&s_Input_data, &temp_in, sizeof(Str_in_point)) == 0) //如果暂时没有读取到 就显示空
+				memcpy(&t_Input_data, &m_read_group_data.at(read_group_index).detail_data.m_group_input_data, sizeof(Str_in_point));
+				if (memcmp(&t_Input_data, &temp_in, sizeof(Str_in_point)) == 0) //如果暂时没有读取到 就显示空
 				{
 					get_ret = 1;
 					cs_value = _T("N/A");
 				}
 				else
-					get_ret = GetInputValueEx(s_Input_data, cs_value, cs_unit, cs_auto_m, dig_unit_ret);
-				get_label = GetInputLabelEx(s_Input_data, cs_label, &m_read_group_data.at(read_group_index).point);
-				get_full_label = GetInputFullLabelEx(s_Input_data, cs_full_label, &m_read_group_data.at(read_group_index).point);
+					get_ret = GetInputValueEx(t_Input_data, cs_value, cs_unit, cs_auto_m, dig_unit_ret);
+				get_label = GetInputLabelEx(t_Input_data, cs_label, &m_read_group_data.at(read_group_index).point);
+				get_full_label = GetInputFullLabelEx(t_Input_data, cs_full_label, &m_read_group_data.at(read_group_index).point);
 			}
 			else
 			{
@@ -2258,16 +2259,16 @@ void CBacnetScreenEdit::OnPaint()
 
 			if (m_read_group_data.at(read_group_index).point.panel != Device_Basic_Setting.reg.panel_number)
 			{
-				memcpy(&s_Output_data, &m_read_group_data.at(read_group_index).detail_data.m_group_output_data, sizeof(Str_out_point));
-				if (memcmp(&s_Output_data, &temp_out, sizeof(Str_out_point)) == 0) //如果暂时没有读取到 就显示空
+				memcpy(&t_Output_data, &m_read_group_data.at(read_group_index).detail_data.m_group_output_data, sizeof(Str_out_point));
+				if (memcmp(&t_Output_data, &temp_out, sizeof(Str_out_point)) == 0) //如果暂时没有读取到 就显示空
 				{
 					get_ret = 1;
 					cs_value = _T("N/A");
 				}
 				else
-					get_ret = GetOutputValueEx(s_Output_data, cs_value, cs_unit, cs_auto_m, dig_unit_ret);
-				get_label = GetOutputLabelEx(s_Output_data, cs_label, &m_read_group_data.at(read_group_index).point);
-				get_full_label = GetOutputFullLabelEx(s_Output_data, cs_full_label, &m_read_group_data.at(read_group_index).point);
+					get_ret = GetOutputValueEx(t_Output_data, cs_value, cs_unit, cs_auto_m, dig_unit_ret);
+				get_label = GetOutputLabelEx(t_Output_data, cs_label, &m_read_group_data.at(read_group_index).point);
+				get_full_label = GetOutputFullLabelEx(t_Output_data, cs_full_label, &m_read_group_data.at(read_group_index).point);
 			}
 			else
 			{
@@ -2289,19 +2290,19 @@ void CBacnetScreenEdit::OnPaint()
 		{
 			if (m_read_group_data.at(read_group_index).point.panel != Device_Basic_Setting.reg.panel_number)
 			{
-				memcpy(&s_Variable_data, &m_read_group_data.at(read_group_index).detail_data.m_group_variable_data, sizeof(Str_variable_point));
+				memcpy(&t_Variable_data, &m_read_group_data.at(read_group_index).detail_data.m_group_variable_data, sizeof(Str_variable_point));
 
-				if (memcmp(&s_Variable_data, &temp_var, sizeof(Str_variable_point)) == 0) //如果暂时没有读取到 就显示空
+				if (memcmp(&t_Variable_data, &temp_var, sizeof(Str_variable_point)) == 0) //如果暂时没有读取到 就显示空
 				{
 					get_ret = 1;
 					cs_value = _T("N/A");
 				}
 				else
 				{
-					get_ret = GetVariableValueEx(s_Variable_data, cs_value, cs_unit, cs_auto_m, dig_unit_ret);
+					get_ret = GetVariableValueEx(t_Variable_data, cs_value, cs_unit, cs_auto_m, dig_unit_ret);
 				}
-				get_label = GetVariableLabelEx(s_Variable_data, cs_label, &m_read_group_data.at(read_group_index).point);
-				get_full_label = GetVariableFullLabelEx(s_Variable_data, cs_full_label, &m_read_group_data.at(read_group_index).point);
+				get_label = GetVariableLabelEx(t_Variable_data, cs_label, &m_read_group_data.at(read_group_index).point);
+				get_full_label = GetVariableFullLabelEx(t_Variable_data, cs_full_label, &m_read_group_data.at(read_group_index).point);
 			}
 			else
 			{
