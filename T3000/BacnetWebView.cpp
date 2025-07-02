@@ -1036,10 +1036,13 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				{
 					tempjson["data"][r_i]["time"][j][i]["minutes"] = g_Schedual_Time_data[npanel_id].at(k).Schedual_Day_Time[i][j].time_minutes;
 					tempjson["data"][r_i]["time"][j][i]["hours"] = g_Schedual_Time_data[npanel_id].at(k).Schedual_Day_Time[i][j].time_hours ;
+					tempjson["data"][r_i]["time"][j][i]["flag"] = g_Schedual_time_flag[npanel_id].at(weekly_list_line).Time_flag[i][j];
 				}
 			}
 			r_i++;
 		}
+
+
 
 		for (int k = 0; k < BAC_HOLIDAY_COUNT; k++)
 		{
@@ -1052,6 +1055,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			{
 				tempjson["data"][r_i]["data"][m] = gp_DayState[npanel_id][k][m];
 			}
+			r_i++;
 		}
 #endif
 
@@ -1664,6 +1668,73 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, entry_index, REFRESH_ON_ITEM);
 			break;
 		}
+		case  BAC_WR_TIME:
+		{
+			if ((entry_index >= 0) && entry_index + 1 > BAC_SCHEDULE_COUNT)
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
+				break;
+			}
+
+			for (int j = 0; j < 9; j++)
+			{
+				for (int i = 0; i < 8; i++)
+				{
+					g_Schedual_Time_data[panel_id].at(entry_index).Schedual_Day_Time[i][j].time_minutes = json["data"]["time"][j][i]["minutes"].asInt();
+					g_Schedual_Time_data[panel_id].at(entry_index).Schedual_Day_Time[i][j].time_hours = json["data"]["time"][j][i]["hours"].asInt();
+					g_Schedual_time_flag[panel_id].at(entry_index).Time_flag[i][j] = json["data"]["time"][j][i]["flag"].asInt();
+				}
+			}
+
+
+			n_ret = Write_Private_Data_Blocking(WRITETIMESCHEDULE_T3000, entry_index, entry_index, g_bac_instance);
+			if (n_ret > 0)
+			{
+				;//memcpy(&g_Schedual_Time_data.at(panel_id).at(entry_index), &m_Schedual_Time_data.at(entry_index), sizeof(Str_schedual_time_point));
+			}
+			else
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
+				break;
+			}
+			break;
+
+
+		}
+			break;
+		case BAC_AR_Y:
+		{
+			if ((entry_index >= 0) && entry_index + 1 > BAC_HOLIDAY_COUNT)
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
+				break;
+			}
+			for (int m = 0; m < ANNUAL_CODE_SIZE; m++)
+			{
+				gp_DayState[panel_id][entry_index][m] = json["data"]["data"][m].asInt();
+			}
+
+			n_ret = Write_Private_Data_Blocking(WRITEANNUALSCHEDULE_T3000, entry_index, entry_index, g_bac_instance);
+			if (n_ret > 0)
+			{
+				;//memcpy(&gp_DayState[panel_id][entry_index], &m_DayState[panel_id][entry_index], sizeof(Str_schedual_time_point));
+			}
+			else
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
+				break;
+			}
+
+		}
+			break;
 
 		}
 		tempjson["action"] = "UPDATE_ENTRY_RES";

@@ -414,10 +414,14 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
         }
         else
         {
-            if (m_row % 2 == 0)
-                m_Schedual_time_flag.at(weekly_list_line).Time_flag[m_row][m_col - 1] = 1;
-            else
-                m_Schedual_time_flag.at(weekly_list_line).Time_flag[m_row][m_col - 1] = 0;
+			if (m_col > 0)
+			{
+				if (m_row % 2 == 0)
+					m_Schedual_time_flag.at(weekly_list_line).Time_flag[m_row][m_col - 1] = 1;
+				else
+					m_Schedual_time_flag.at(weekly_list_line).Time_flag[m_row][m_col - 1] = 0;
+			}
+
             temp_cs.Format(_T("%02d:%02d"), chour, cmin);
 			if (product_type == PM_THIRD_PARTY_DEVICE)
 			{
