@@ -4619,8 +4619,8 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             return -1;
         memset(&g_DayState[start_instance], 0, ANNUAL_CODE_SIZE);
         memcpy_s(&g_DayState[start_instance], block_length, my_temp_point, block_length);
-
-
+        memcpy_s(gp_DayState[bac_gloab_panel][start_instance], block_length, my_temp_point, block_length);
+        
         return READANNUALSCHEDULE_T3000;
     }
     break;
@@ -17794,7 +17794,7 @@ int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npane
                         g_Schedual_Time_data[npanel].at(k).Schedual_Day_Time[i][j].time_hours = *(temp_point++);
                     }
                 }
-                temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
+                //temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
 
             }
 
