@@ -347,7 +347,8 @@
         <!-- Use WriteLinesToFile with the Lines parameter -->
         <WriteLinesToFile
             File="$(_ConfigConstantsFile)"
-            Lines="@(_LinesToWrite)"  />
+            Lines="@(_LinesToWrite)"
+            Overwrite="true"  />
 
         <!-- Add the generated file to the list of files to compile -->
         <ItemGroup>
