@@ -320,7 +320,7 @@
       </PropertyGroup>
 
       <!-- Target to generate a C# file with application config constants -->
-      <Target Name="GenerateAppConfigConstants" BeforeTargets="CoreCompile" Inputs="$(SolutionDir)AppConfig.props" Outputs="$(_ConfigConstantsFile)">
+      <Target Name="GenerateAppConfigConstants" BeforeTargets="CoreCompile">
 
         <!-- Define lines for the generated C# file as an ItemGroup -->
         <ItemGroup>
