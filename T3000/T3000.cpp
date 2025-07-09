@@ -1,6 +1,10 @@
-
-// T3000.cpp : Defines the class behaviors for the application.
-//
+/**
+ * @file T3000.cpp
+ * @brief Defines the class behaviors for the T3000 application.
+ *
+ * This file is the main implementation file for the T3000 application. It contains the initialization,
+ * database management, and various utility methods required for the application's functioning.
+ */
 
 #include "stdafx.h"
 #include "T3000.h"
@@ -15,6 +19,9 @@
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
 #include <windows.h>  
 
+/**
+ * @brief Global version of the T3000 application.
+ */
 const unsigned int g_versionNO = 20250522;    // PROJECT_VERSION
 
 
@@ -33,8 +40,8 @@ BEGIN_MESSAGE_MAP(CT3000App, CWinAppEx)
 	ON_COMMAND(ID_FILE_SAVE_CONFIG, &CWinAppEx::OnFileOpen)
 	ON_COMMAND(ID_VERSIONHISTORY,OnVersionInfo)
 END_MESSAGE_MAP()
-	
-// CT3000App construction 
+
+// CT3000App Class constructor
 CT3000App::CT3000App()
 {
 	m_bHiColorIcons = TRUE;
@@ -196,7 +203,8 @@ void CT3000App::UpdateDB()
 /// <returns></returns>
 BOOL CT3000App::InitInstance()
 {
-	 
+
+	// Loads up the required dlls
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
     //2018 04 23 修复bug 默写操作系统不是C盘的情况安装控件失败
@@ -255,7 +263,7 @@ BOOL CT3000App::InitInstance()
 
 		BOOL First_Start=TRUE;
 
-	//	Logger::WriteMessage("T3000 Unit Tester Begin....");
+		// Call the parent class's InitInstance
 		CWinAppEx::InitInstance();
 		HRESULT hr;
 		//
@@ -768,6 +776,8 @@ void CT3000App::InitModeName()
 	HANDLE hFile;
 	WIN32_FIND_DATA fData;
 	hFile = FindFirstFile(strInfoFile,&fData);
+
+	// The file doesn't exist
 	if(hFile == INVALID_HANDLE_VALUE)
 	{
 		//m_strCompany=_T("Temco Controls LTD.");
