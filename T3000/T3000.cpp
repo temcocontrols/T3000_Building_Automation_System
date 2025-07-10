@@ -206,7 +206,7 @@ BOOL CT3000App::InitInstance()
 
 	// Loads up the required dlls
 	GetModulePath();
-	CString strSource = g_strExePth + L"T3000Controls.dll";
+	CString strSource = g_strExePth + _T("") MY_CONTROL_DLL_NAME;
     //2018 04 23 淇bug 榛樺啓鎿嶄綔绯荤粺涓嶆槸C鐩樼殑鎯呭喌瀹夎鎺т欢澶辫触
     //解决办法  获取系统所在盘符 ，然后采取对应操作.
     CString Local_System_Path;
