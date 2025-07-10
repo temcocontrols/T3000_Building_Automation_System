@@ -773,6 +773,7 @@ namespace ns
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+    SetWindowText(_T("") MY_NAME);
     if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
         return -1;
     CString temp_bacnet_logfile;

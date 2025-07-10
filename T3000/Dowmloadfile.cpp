@@ -869,6 +869,14 @@ BOOL Dowmloadfile::OnInitDialog()
 		WritePrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.4"),temp_db_ini_folder);
 	}
 
+    // Check and write T3000_Version to MonitorIndex.ini if not present                                                                                                     
+    int current_t3000_version_in_ini = GetPrivateProfileInt(_T("Version"), _T("T3000"), 0, temp_db_ini_folder);                                                      
+    if (current_t3000_version_in_ini == 0)                                                                                                                                  
+    {                                                                                                                                                                       
+        CString temp_version_str;                                                                                                                                           
+        temp_version_str.Format(_T("%u"), T3000_Version);                                                                                                                   
+        WritePrivateProfileStringW(_T("Version"), _T("T3000"), temp_version_str, temp_db_ini_folder);                                                                
+    }
 
 	if((isp_mode_firmware_auto == false) && (isp_mode_is_cancel == false))
 	{

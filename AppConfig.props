@@ -3,6 +3,7 @@
   <PropertyGroup Label="UserMacros" />
 	<PropertyGroup>
         <AppOutputName>T3000</AppOutputName>
+        <AppUpdateDownloadLink></AppUpdateDownloadLink>
         <AppOutputString>"$(AppOutputName)"</AppOutputString>
         <AppExeOutputName>"$(AppOutputName).exe"</AppExeOutputName>
         <AppExeOutputRaw>$(AppOutputName).exe</AppExeOutputRaw>

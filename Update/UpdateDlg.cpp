@@ -544,7 +544,11 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 
         GetPrivateProfileString(_T("Version"), _T("T3000FTP_PATH"), _T("software/20T3000Update.zip"), temp_t3000_path.GetBuffer(MAX_PATH), MAX_PATH, DownloadIniFilePath);
         temp_t3000_path.ReleaseBuffer();
-        T3000FtpPath = _T("https://temcocontrols.com/ftp/") + temp_t3000_path;
+        T3000FtpPath = _T("") MY_UPDATE_PATH;
+        if (T3000FtpPath.IsEmpty()) 
+        {
+            T3000FtpPath = _T("https://temcocontrols.com/ftp/") + temp_t3000_path;
+        }
         if ((PC_T3000_Version < T3000_FTP_Version) || (PC_T3000_Version == 0))
         {
             CS_Info.Format(_T("New version available, downloading now."));
