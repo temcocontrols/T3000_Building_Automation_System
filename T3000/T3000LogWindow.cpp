@@ -1,4 +1,4 @@
-// T3000LogWindow.cpp : ÊµÏÖÎÄ¼þ
+// T3000LogWindow.cpp : å®žçŽ°æ–‡ä»¶; Implementation file
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// CT3000LogWindow ¶Ô»°¿ò
+// CT3000LogWindow å¯¹è¯æ¡†
 
 IMPLEMENT_DYNAMIC(CT3000LogWindow, CDialogEx)
 
@@ -33,7 +33,7 @@ BEGIN_MESSAGE_MAP(CT3000LogWindow, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CT3000LogWindow ÏûÏ¢´¦Àí³ÌÐò
+// CT3000LogWindow æ¶ˆæ¯å¤„ç†ç¨‹åº; Message handler
 
 extern CString temp_statusbar_log_path;
 
@@ -41,7 +41,7 @@ BOOL CT3000LogWindow::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
     ::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-    // TODO:  ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯
+	// TODO:  åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–; Add additional initialization here
     m_t3000_log_window = this->m_hWnd;
 
     int n_logcount = 0;
@@ -65,13 +65,13 @@ BOOL CT3000LogWindow::OnInitDialog()
     }
 
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // Òì³£: OCX ÊôÐÔÒ³Ó¦·µ»Ø FALSE
+                  // å¼‚å¸¸: OCX å±žæ€§é¡µåº”è¿”å›ž FALSE
 }
 
 
 BOOL CT3000LogWindow::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	// TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»; Add specialized code and/or call the base class here
     if (pMsg->message == WM_KEYDOWN)
     {
         if ((pMsg->wParam == VK_RETURN))

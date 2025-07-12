@@ -54,14 +54,17 @@ CT3000App::CT3000App()
     CurrentT3000Version.ReleaseBuffer();
 
     //******************************************************
-    // Release �汾����ʱ���δ˶Σ��˶� ��Ҫ���ڵ���ʱ ��ʾ ������ �����ӵİ汾.
+    // Release 版本发布时屏蔽此段，此段 主要用于调试时 显示 具体是 几点钟的版本.
+    // Release This section is blocked when the version is released. This section is mainly used to display the specific version at what time it is during debugging.
 //#ifdef _DEBUG
-    char strTime[128] = { 0 }; // 取小时当 小版本号;
-    CString Test_Version;  //   TIME 和DATE    
+    char strTime[128] = { 0 }; // 鍙栧皬鏃跺綋 灏忕増鏈彿;, Get the hour as the minor version number;
+    CString Test_Version;  //   TIME 鍜孌ATE, TIME and DATE  
     memcpy(strTime, __TIME__, 2);
     MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
     Test_Version.ReleaseBuffer();
-	CurrentT3000Version= CurrentT3000Version  + Test_Version; //�ŷ� : Release �淢����ʱ�� ������ε��ͺ��� �����Զ���ȡ���������.
+	//Du Fan: When the Release version is released, this sentence will be blocked and the compilation date will be automatically obtained.
+	CurrentT3000Version= CurrentT3000Version  + Test_Version; //杜帆 : Release 版发布的时候 这句屏蔽掉就好了 ，会自动获取编译的日期.
+
 //#endif 
     //*******************************************************
     
@@ -130,13 +133,13 @@ void CT3000App::UpdateDB()
 		q.finalize();
 		SqliteDBT3000.closedb();
 
-        remove((UTF8MBSTR)g_strDatabasefilepath);//删掉原有的数据库
+        remove((UTF8MBSTR)g_strDatabasefilepath);//鍒犳帀鍘熸湁鐨勬暟鎹簱, delete the original database
 
         CString FilePath;
         HANDLE hFind;
         WIN32_FIND_DATA wfd;
         hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-        if (hFind==INVALID_HANDLE_VALUE)//不存在该文件
+		if (hFind == INVALID_HANDLE_VALUE)//涓嶅瓨鍦ㄨ鏂囦欢, if the file does not exist
         {
            
             FilePath=g_strExePth+_T("Database\\T3000.db");
@@ -207,8 +210,10 @@ BOOL CT3000App::InitInstance()
 	// Loads up the required dlls
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
-    //2018 04 23 修复bug 默写操作系统不是C盘的情况安装控件失败
-    //����취  ��ȡϵͳ�����̷� ��Ȼ���ȡ��Ӧ����.
+    //2018 04 23 淇bug 榛樺啓鎿嶄綔绯荤粺涓嶆槸C鐩樼殑鎯呭喌瀹夎鎺т欢澶辫触
+    //解决办法  获取系统所在盘符 ，然后采取对应操作.
+    //2018 04 23 Fix bug: The installation control fails when the default operating system is not drive C.
+    //Solution: Get the drive letter where the system is located and take corresponding actions.
     CString Local_System_Path;
     TCHAR szPath[MAX_PATH];
     DWORD ret;
@@ -221,7 +226,7 @@ BOOL CT3000App::InitInstance()
 	{
 		//if (ReadDLLRegAsm()<1)
 		{
-#if 1 // �ŷ�����  �� ����ɱ������ ��⵽  RegAsm.exe �ķ��ʲ��Ϸ��� ������;
+#if 1 // 杜帆屏蔽  ， 许多杀毒软件 检测到  RegAsm.exe 的访问不合法， 报病毒; Du Fan blocked this, many antivirus software detected the access of RegAsm.exe as illegal and reported a virus;
             CString temp_dotnet_path;
             CString temp_t3000controlldll_path;
             CString temp_bacnetdll;
@@ -322,7 +327,7 @@ BOOL CT3000App::InitInstance()
 			g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
 			g_trendlog_ini_path = g_achive_folder_temp_db;
 			CString webview_www_folder;
-			CString www_zip_file; //制作安装文件的时候将安装文件的zip文件解压到www文件夹下
+			CString www_zip_file; //鍒朵綔瀹夎鏂囦欢鐨勬椂鍊欏皢瀹夎鏂囦欢鐨剒ip鏂囦欢瑙ｅ帇鍒皐ww鏂囦欢澶逛笅; When performing the unzip operation, the zip file will be unzipped to the www folder under the ResourceFile directory.
 			CString WebDBFilePath;
 			CString WebDBDesFilePath;
 			webview_www_folder = g_strExePth + _T("ResourceFile\\webview\\www");
@@ -330,9 +335,11 @@ BOOL CT3000App::InitInstance()
 			WebDBDesFilePath = g_strExePth + _T("Database\\webview_database.db");
 			CopyFile(WebDBFilePath, WebDBDesFilePath, FALSE);
 
-			//这一段是方便 installshield 制作安装文件的时候第一次运行将安装文件的zip文件解压到ResourceFile下面的www文件夹下
+			//杩欎竴娈垫槸鏂逛究 installshield 鍒朵綔瀹夎鏂囦欢鐨勬椂鍊欑涓€娆¤繍琛屽皢瀹夎鏂囦欢鐨剒ip鏂囦欢瑙ｅ帇鍒癛esourceFile涓嬮潰鐨剋ww鏂囦欢澶逛笅
+			//This section is used to unzip the installshield zip file, which is the zip file that comes with the installation package, and unzips it to the www folder under the ResourceFile directory.
 			www_zip_file = g_strExePth + _T("ResourceFile\\webview.zip");
-			//�ж�www_zip_file�ļ��Ƿ���ڣ����ھͽ�ѹ��webview_www_folder��
+			//判断www_zip_file文件是否存在，存在就解压到webview_www_folder下
+			//Check if the www_zip_file file exists, if it exists, unzip it to the webview_www_folder
 			CFileFind temp_findzip;
 			BOOL	nret = temp_findzip.FindFile(www_zip_file);
 			if (nret)
@@ -393,7 +400,8 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_folder = FindFirstFile(g_achive_folder, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//目录存在
+				//鐩綍瀛樺湪
+				//folder exists
 				ret = TRUE;
 
 			}
@@ -412,7 +420,8 @@ BOOL CT3000App::InitInstance()
 			hFind_folder = FindFirstFile(g_achive_folder_temp_txt, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//目录存在
+				//鐩綍瀛樺湪
+				//folder exists
 				ret = TRUE;
 
 			}
@@ -432,7 +441,8 @@ BOOL CT3000App::InitInstance()
 			hFind_folder = FindFirstFile(g_achive_folder_temp_db, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				//目录存在
+				//鐩綍瀛樺湪
+				//folder exists
 				ret = TRUE;
 
 			}
@@ -468,15 +478,16 @@ BOOL CT3000App::InitInstance()
 		 
 			g_strDatabasefilepath+=_T("Database\\T3000.db");//
 
-#if 1//如果沒有T3000 的情況下
+#if 1//濡傛灉娌掓湁T3000 鐨勬儏娉佷笅; If there is no T3000
 
 			CString FilePath;
  
 			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-			if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
+			if (hFind == INVALID_HANDLE_VALUE)//璇存槑褰撳墠鐩綍涓嬫棤t3000.mdb; Indicate that the current directory does not contain T3000.mdb
 			{
 				
-				//û���ҵ��ʹ���һ��Ĭ�ϵ����ݿ�
+				//没有找到就创建一个默认的数据库
+				//If not found, create a default database
 				FilePath=g_strExePth+_T("Database\\T3000.db");
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -501,9 +512,10 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_Monitor;//
 			WIN32_FIND_DATA wfd_monitor;//
 			hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
-			if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.db
+			if (hFind_Monitor == INVALID_HANDLE_VALUE)//璇存槑褰撳墠鐩綍涓嬫棤MonitorData.db; Indicate that the current directory does not contain MonitorData.db
 			{
-				//û���ҵ��ʹ���һ��Ĭ�ϵ����ݿ�
+				//没有找到就创建一个默认的数据库
+				//If not found, create a default database
 				FilePath_Monitor= g_achive_monitor_datatbase_path;
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB2), _T("MONITOR_DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -529,7 +541,7 @@ BOOL CT3000App::InitInstance()
 
 			if (First_Start)
 			{
-				//创建Default_Building
+				//鍒涘缓Default_Building
 				CString filebuildingPath;//=g_strBuildingFolder+m_Building.at(i).Main_BuildingName+_T("\\"); 
 				filebuildingPath.Format(_T("%sDefault_Building\\"),g_strBuildingFolder);
 				CreateDirectory(g_strBuildingFolder,NULL);
@@ -545,7 +557,7 @@ BOOL CT3000App::InitInstance()
 				//create building db file
 
 				hFind = FindFirstFile(filebuildingPath, &wfd);//
-				if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
+				if (hFind==INVALID_HANDLE_VALUE)//璇存槑褰撳墠鐩綍涓嬫棤t3000.mdb
 				{
 
 					HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDINGDB1), _T("BUILDINGDB"));   
@@ -670,7 +682,7 @@ BOOL CT3000App::InitInstance()
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
        m_szAppPath  = g_strExePth;
-       if(m_special_customer == 1) //����ǵ�һ���ͻ� �Ͷ���ΪCPR-1000-Help.chm
+       if(m_special_customer == 1) //如果是第一个客户 就定义为CPR-1000-Help.chm; If it is the first customer, define it as CPR-1000-Help.chm
            m_szHelpFile = theApp.m_szAppPath + L"CPR-1000-Help.chm";
        else
             m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
