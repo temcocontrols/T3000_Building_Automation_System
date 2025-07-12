@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file T3000.cpp
  * @brief Defines the class behaviors for the T3000 application.
  *
@@ -66,7 +66,8 @@ CT3000App::CT3000App()
     Test_Version.ReleaseBuffer();
 	// Du Fan: When releasing the Release version, this line should be commented out, and it will automatically get the compilation date.
 	CurrentT3000Version= CurrentT3000Version  + Test_Version; //杜帆 : Release 版发布的时候 这句屏蔽掉就好了 ，会自动获取编译的日期.
-    //*******************************************************
+// #endif  
+	//*******************************************************
     
 	T3000_Version = g_versionNO; //
 
@@ -482,7 +483,7 @@ BOOL CT3000App::InitInstance()
 		 
 			g_strDatabasefilepath+=_T("Database\\T3000.db");//
 
-#if 1//If there is no T3000 situation
+//If there is no T3000 situation
 #if 1//如果沒有T3000 的情況下
 
 			CString FilePath;
