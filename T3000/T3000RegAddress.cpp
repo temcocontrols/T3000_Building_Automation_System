@@ -13,8 +13,8 @@ int temp_Mdb_Adress_Map=0;
 
 
 
-//Currently the database supports inquiries for 3 versions, switching every time will reload a new database, which affects efficiency;
-//目前数据库支持三3个版本的查询，切换的时候重新载入新的数据库，这会影响效率。;
+//Currently the database supports queries for these 3 tables. When switching devices, loading a new database at once does not affect efficiency.
+//目前数据库支持这3张表的查询，在切换器件时，一次性载入新的数据库，并不影响效率。;
 
 
 
@@ -33,12 +33,12 @@ T3000RegAddress::~T3000RegAddress(void)
 //Code by Fance
 //The search the character from array which read from t3000.mdb
 //Default search from TSTAT5 ABCD register list .
-//Before calling this list, load the T3000.MDB register table into an array, and during dynamic loading, determine the register value and read value;
-//在调用这个列表之前，载入T3000.MDB 寄存器表到 数组，在动态加载中，判断 寄存器值 和读取值;
-//If there are firmware register tables in different modes, only the T3000.mdb register table can be loaded;
-//如果 有各 Frimware 文件寄存器列表数据模式，只需载入 T3000.mdb的 寄存器列表数据;
-//There are too many places that need to be modified in the whole device, and the code is too complex, so currently only the readable part can be modified. The old version can no longer be modified.;
-//整个设备需要修改的 地方实在太多，而且 太复杂了，所以目前只能将 能读的部分 修改。老版本已经不可能修改。;
+//Before calling this function, load the T3000.MDB register table into an array, and during dynamic operation, determine the register value and read the value;
+//在运行程序之前加载T3000.MDB 的数据至 数组，在动态运行中，判断 数组的值 后，在取值;
+//This way, if the firmware register list changes, only the T3000.mdb register table needs to be modified;
+//这样 如果 Frimware 的寄存器列表更改，则只需更改 T3000.mdb的 寄存器表即可;
+//There are too many places that need to be modified throughout the device, and the code is too complex, so currently only the readable parts can be modified. The old version exceptions will not be modified.;
+//但是由于需要修改的 地方实在太多，并且 太多特例情况，目前只能将 看的懂的部分 修改。旧版本的特例情况不做修改。;
 int _P(char *str,int mMdb_Adress_Map)
 {
 	if(product_type==T3000_5ABCDFG_LED_ADDRESS)

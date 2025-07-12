@@ -64,9 +64,8 @@ CT3000App::CT3000App()
     memcpy(strTime, __TIME__, 2);
     MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
     Test_Version.ReleaseBuffer();
-	// Distribution: When Release is published and compiled, this line of code must be removed, and the official release must use the compilation date.
-	CurrentT3000Version= CurrentT3000Version  + Test_Version; //分发 : Release 发布编译时候 这行代码都要去掉， 正式发布的都要取编译日期。
-//#endif 
+	// Du Fan: When releasing the Release version, this line should be commented out, and it will automatically get the compilation date.
+	CurrentT3000Version= CurrentT3000Version  + Test_Version; //杜帆 : Release 版发布的时候 这句屏蔽掉就好了 ，会自动获取编译的日期.
     //*******************************************************
     
 	T3000_Version = g_versionNO; //
@@ -216,7 +215,7 @@ BOOL CT3000App::InitInstance()
     //2018 04 23 Fix bug where some operating systems not on C drive fail to install controls
     //2018 04 23 修复bug 默写操作系统不是C盘的情况安装控件失败
     //Solution: Get the system drive path, then get the corresponding directory.
-    //解决方案：获取系统盘的路径，然后再获取对应目录。
+    //解决办法 获取系统所在盘符 ，然后采取对应操作.
     CString Local_System_Path;
     TCHAR szPath[MAX_PATH];
     DWORD ret;
@@ -229,8 +228,8 @@ BOOL CT3000App::InitInstance()
 	{
 		//if (ReadDLLRegAsm()<1)
 		{
-		// Distribution test item: Because antivirus software detects illegal access to RegAsm.exe, it is blocked;
-#if 1 // 分发测试项：因为杀毒软件检测到 RegAsm.exe 的访问不合法所以 屏蔽掉;
+		// Du Fan disabled: Because many antivirus software detect illegal access to RegAsm.exe and report it as a virus;
+#if 1 // 杜帆屏蔽 ， 许多杀毒软件 检测到 RegAsm.exe 的访问不合法， 报病毒;
             CString temp_dotnet_path;
             CString temp_t3000controlldll_path;
             CString temp_bacnetdll;
@@ -344,7 +343,7 @@ BOOL CT3000App::InitInstance()
 			//这一段是方便 installshield 制作安装文件的时候第一次运行将安装文件的zip文件解压到ResourceFile下面的www文件夹下
 			www_zip_file = g_strExePth + _T("ResourceFile\\webview.zip");
 			//Check if the www_zip_file exists, if it exists, extract it to webview_www_folder.
-			//判断www_zip_file文件是否存在，存在就解压到webview_www_folder。
+			//判断www_zip_file文件是否存在，存在就解压到webview_www_folder
 			CFileFind temp_findzip;
 			BOOL	nret = temp_findzip.FindFile(www_zip_file);
 			if (nret)
@@ -493,7 +492,8 @@ BOOL CT3000App::InitInstance()
 			if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
 			{
 				
-				//没有找到就使用一个默认的数据库
+				//If not found, create a default database
+				//没有找到就创建一个默认的数据库
 				FilePath=g_strExePth+_T("Database\\T3000.db");
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -521,7 +521,8 @@ BOOL CT3000App::InitInstance()
 			// Indicates that there is no MonitorData.db in the current directory
 			if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.db
 			{
-				//没有找到就使用一个默认的数据库
+				//If not found, create a default database
+				//没有找到就创建一个默认的数据库
 				FilePath_Monitor= g_achive_monitor_datatbase_path;
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB2), _T("MONITOR_DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
