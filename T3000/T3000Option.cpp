@@ -95,7 +95,8 @@ void CT3000Option::OnCbnSelchangeComboLanguage()
 
 void CT3000Option::OnBnClickedOk()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+    // TODO: Add your control notification handler code here
+    // TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
     CString temp_string_com;
     m_combox_language.GetWindowTextW(temp_string_com);
     temp_string_com = temp_string_com.Mid(3);
@@ -111,7 +112,8 @@ void CT3000Option::OnBnClickedOk()
 
 void CT3000Option::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
+    // TODO: Add your message handler code here and/or call default
+    // TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç å’Œ/æˆ–è°ƒç”¨é»˜è®¤å€¼
     show_time_left--;
     CString cs_value;
     cs_value.Format(_T("%d"), show_time_left);

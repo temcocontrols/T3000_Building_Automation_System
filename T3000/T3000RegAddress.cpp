@@ -13,7 +13,8 @@ int temp_Mdb_Adress_Map=0;
 
 
 
-//Ä¿Ç°Êı¾İ¿âÖ§³ÖÕâ3ÕÅ±íµÄ²éÑ¯£¬ÔÚÇĞ»»Æ÷¼şÊ±£¬Ò»´ÎĞÔÔØÈëĞÂµÄÊı¾İ¿â£¬²¢²»Ó°ÏìĞ§ÂÊ¡£;
+//Currently the database supports queries for these 3 tables. When switching devices, loading a new database at once does not affect efficiency.
+//ç›®å‰æ•°æ®åº“æ”¯æŒè¿™3å¼ è¡¨çš„æŸ¥è¯¢ï¼Œåœ¨åˆ‡æ¢å™¨ä»¶æ—¶ï¼Œä¸€æ¬¡æ€§è½½å…¥æ–°çš„æ•°æ®åº“ï¼Œå¹¶ä¸å½±å“æ•ˆç‡ã€‚;
 
 
 
@@ -32,9 +33,12 @@ T3000RegAddress::~T3000RegAddress(void)
 //Code by Fance
 //The search the character from array which read from t3000.mdb
 //Default search from TSTAT5 ABCD register list .
-//ÔÚÔËĞĞ³ÌĞòÖ®Ç°¼ÓÔØT3000.MDB µÄÊı¾İÖÁ Êı×é£¬ÔÚ¶¯Ì¬ÔËĞĞÖĞ£¬ÅĞ¶Ï Êı×éµÄÖµ ºó£¬ÔÚÈ¡Öµ;
-//ÕâÑù Èç¹û Frimware µÄ¼Ä´æÆ÷ÁĞ±í¸ü¸Ä£¬ÔòÖ»Ğè¸ü¸Ä T3000.mdbµÄ ¼Ä´æÆ÷±í¼´¿É;
-//µ«ÊÇÓÉÓÚĞèÒªĞŞ¸ÄµÄ µØ·½ÊµÔÚÌ«¶à£¬²¢ÇÒ Ì«¶àÌØÀıÇé¿ö£¬Ä¿Ç°Ö»ÄÜ½« ¿´µÄ¶®µÄ²¿·Ö ĞŞ¸Ä¡£¾É°æ±¾µÄÌØÀıÇé¿ö²»×öĞŞ¸Ä¡£;
+//Before calling this function, load the T3000.MDB register table into an array, and during dynamic operation, determine the register value and read the value;
+//åœ¨è¿è¡Œç¨‹åºä¹‹å‰åŠ è½½T3000.MDB çš„æ•°æ®è‡³ æ•°ç»„ï¼Œåœ¨åŠ¨æ€è¿è¡Œä¸­ï¼Œåˆ¤æ–­ æ•°ç»„çš„å€¼ åï¼Œåœ¨å–å€¼;
+//This way, if the firmware register list changes, only the T3000.mdb register table needs to be modified;
+//è¿™æ · å¦‚æœ Frimware çš„å¯„å­˜å™¨åˆ—è¡¨æ›´æ”¹ï¼Œåˆ™åªéœ€æ›´æ”¹ T3000.mdbçš„ å¯„å­˜å™¨è¡¨å³å¯;
+//There are too many places that need to be modified throughout the device, and the code is too complex, so currently only the readable parts can be modified. The old version exceptions will not be modified.;
+//ä½†æ˜¯ç”±äºéœ€è¦ä¿®æ”¹çš„ åœ°æ–¹å®åœ¨å¤ªå¤šï¼Œå¹¶ä¸” å¤ªå¤šç‰¹ä¾‹æƒ…å†µï¼Œç›®å‰åªèƒ½å°† çœ‹çš„æ‡‚çš„éƒ¨åˆ† ä¿®æ”¹ã€‚æ—§ç‰ˆæœ¬çš„ç‰¹ä¾‹æƒ…å†µä¸åšä¿®æ”¹ã€‚;
 int _P(char *str,int mMdb_Adress_Map)
 {
 	if(product_type==T3000_5ABCDFG_LED_ADDRESS)
