@@ -54,14 +54,18 @@ CT3000App::CT3000App()
     CurrentT3000Version.ReleaseBuffer();
 
     //******************************************************
-    // Release °æ±¾·¢²¼Ê±ÆÁ±Î´Ë¶Î£¬´Ë¶Î Ö÷ÒªÓÃÓÚµ÷ÊÔÊ± ÏÔÊ¾ ¾ßÌåÊÇ ¼¸µãÖÓµÄ°æ±¾.
+    // Release version compilation time does not include this section, this section is only used during debugging to display the compiled version with decimal points.
+    // Release ç‰ˆæœ¬ç¼–è¯‘æ—¶é—´ä¸å¸¦è¿™æ®µï¼Œè¿™æ®µ åªè¦ç”¨åœ¨è°ƒè¯•æ—¶ æ˜¾ç¤º ç¼–è¯‘çš„ å¸¦æœ‰å°æ•°ç‚¹çš„ç‰ˆæœ¬.
 //#ifdef _DEBUG
+
+    // Take the hour as the minor version number
     char strTime[128] = { 0 }; // å–å°æ—¶å½“ å°ç‰ˆæœ¬å·;
-    CString Test_Version;  //   TIME å’ŒDATE    
+    CString Test_Version;  //   TIME and DATE    
     memcpy(strTime, __TIME__, 2);
     MultiByteToWideChar(CP_ACP, 0, (char *)strTime, (int)strlen(strTime) + 1, Test_Version.GetBuffer(MAX_PATH), MAX_PATH);
     Test_Version.ReleaseBuffer();
-	CurrentT3000Version= CurrentT3000Version  + Test_Version; //¶Å·« : Release °æ·¢²¼µÄÊ±ºò Õâ¾äÆÁ±Îµô¾ÍºÃÁË £¬»á×Ô¶¯»ñÈ¡±àÒëµÄÈÕÆÚ.
+	// Distribution: When Release is published and compiled, this line of code must be removed, and the official release must use the compilation date.
+	CurrentT3000Version= CurrentT3000Version  + Test_Version; //åˆ†å‘ : Release å‘å¸ƒç¼–è¯‘æ—¶å€™ è¿™è¡Œä»£ç éƒ½è¦å»æ‰ï¼Œ æ­£å¼å‘å¸ƒçš„éƒ½è¦å–ç¼–è¯‘æ—¥æœŸã€‚
 //#endif 
     //*******************************************************
     
@@ -130,12 +134,14 @@ void CT3000App::UpdateDB()
 		q.finalize();
 		SqliteDBT3000.closedb();
 
+        // Delete the original database
         remove((UTF8MBSTR)g_strDatabasefilepath);//åˆ æ‰åŸæœ‰çš„æ•°æ®åº“
 
         CString FilePath;
         HANDLE hFind;
         WIN32_FIND_DATA wfd;
         hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
+        // The file does not exist
         if (hFind==INVALID_HANDLE_VALUE)//ä¸å­˜åœ¨è¯¥æ–‡ä»¶
         {
            
@@ -207,8 +213,10 @@ BOOL CT3000App::InitInstance()
 	// Loads up the required dlls
 	GetModulePath();
 	CString strSource = g_strExePth + L"T3000Controls.dll";
+    //2018 04 23 Fix bug where some operating systems not on C drive fail to install controls
     //2018 04 23 ä¿®å¤bug é»˜å†™æ“ä½œç³»ç»Ÿä¸æ˜¯Cç›˜çš„æƒ…å†µå®‰è£…æ§ä»¶å¤±è´¥
-    //½â¾ö°ì·¨  »ñÈ¡ÏµÍ³ËùÔÚÅÌ·û £¬È»ºó²ÉÈ¡¶ÔÓ¦²Ù×÷.
+    //Solution: Get the system drive path, then get the corresponding directory.
+    //è§£å†³æ–¹æ¡ˆï¼šè·å–ç³»ç»Ÿç›˜çš„è·¯å¾„ï¼Œç„¶åå†è·å–å¯¹åº”ç›®å½•ã€‚
     CString Local_System_Path;
     TCHAR szPath[MAX_PATH];
     DWORD ret;
@@ -221,7 +229,8 @@ BOOL CT3000App::InitInstance()
 	{
 		//if (ReadDLLRegAsm()<1)
 		{
-#if 1 // ¶Å·«ÆÁ±Î  £¬ Ğí¶àÉ±¶¾Èí¼ş ¼ì²âµ½  RegAsm.exe µÄ·ÃÎÊ²»ºÏ·¨£¬ ±¨²¡¶¾;
+		// Distribution test item: Because antivirus software detects illegal access to RegAsm.exe, it is blocked;
+#if 1 // åˆ†å‘æµ‹è¯•é¡¹ï¼šå› ä¸ºæ€æ¯’è½¯ä»¶æ£€æµ‹åˆ° RegAsm.exe çš„è®¿é—®ä¸åˆæ³•æ‰€ä»¥ å±è”½æ‰;
             CString temp_dotnet_path;
             CString temp_t3000controlldll_path;
             CString temp_bacnetdll;
@@ -322,6 +331,7 @@ BOOL CT3000App::InitInstance()
 			g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
 			g_trendlog_ini_path = g_achive_folder_temp_db;
 			CString webview_www_folder;
+			// When creating installation files, extract the zip file of the installation file to the www folder
 			CString www_zip_file; //åˆ¶ä½œå®‰è£…æ–‡ä»¶çš„æ—¶å€™å°†å®‰è£…æ–‡ä»¶çš„zipæ–‡ä»¶è§£å‹åˆ°wwwæ–‡ä»¶å¤¹ä¸‹
 			CString WebDBFilePath;
 			CString WebDBDesFilePath;
@@ -330,9 +340,11 @@ BOOL CT3000App::InitInstance()
 			WebDBDesFilePath = g_strExePth + _T("Database\\webview_database.db");
 			CopyFile(WebDBFilePath, WebDBDesFilePath, FALSE);
 
+			//This section is convenient for installshield to create installation files. When running for the first time, unzip the zip file of the installation file to the www folder under ResourceFile
 			//è¿™ä¸€æ®µæ˜¯æ–¹ä¾¿ installshield åˆ¶ä½œå®‰è£…æ–‡ä»¶çš„æ—¶å€™ç¬¬ä¸€æ¬¡è¿è¡Œå°†å®‰è£…æ–‡ä»¶çš„zipæ–‡ä»¶è§£å‹åˆ°ResourceFileä¸‹é¢çš„wwwæ–‡ä»¶å¤¹ä¸‹
 			www_zip_file = g_strExePth + _T("ResourceFile\\webview.zip");
-			//ÅĞ¶Ïwww_zip_fileÎÄ¼şÊÇ·ñ´æÔÚ£¬´æÔÚ¾Í½âÑ¹µ½webview_www_folderÏÂ
+			//Check if the www_zip_file exists, if it exists, extract it to webview_www_folder.
+			//åˆ¤æ–­www_zip_fileæ–‡ä»¶æ˜¯å¦å­˜åœ¨ï¼Œå­˜åœ¨å°±è§£å‹åˆ°webview_www_folderã€‚
 			CFileFind temp_findzip;
 			BOOL	nret = temp_findzip.FindFile(www_zip_file);
 			if (nret)
@@ -393,6 +405,7 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_folder = FindFirstFile(g_achive_folder, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
+				//Directory exists
 				//ç›®å½•å­˜åœ¨
 				ret = TRUE;
 
@@ -412,6 +425,7 @@ BOOL CT3000App::InitInstance()
 			hFind_folder = FindFirstFile(g_achive_folder_temp_txt, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
+				//Directory exists
 				//ç›®å½•å­˜åœ¨
 				ret = TRUE;
 
@@ -432,6 +446,7 @@ BOOL CT3000App::InitInstance()
 			hFind_folder = FindFirstFile(g_achive_folder_temp_db, &fd);
 			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
+				//Directory exists
 				//ç›®å½•å­˜åœ¨
 				ret = TRUE;
 
@@ -468,15 +483,17 @@ BOOL CT3000App::InitInstance()
 		 
 			g_strDatabasefilepath+=_T("Database\\T3000.db");//
 
+#if 1//If there is no T3000 situation
 #if 1//å¦‚æœæ²’æœ‰T3000 çš„æƒ…æ³ä¸‹
 
 			CString FilePath;
  
 			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
+			// Indicates that there is no t3000.mdb in the current directory
 			if (hFind==INVALID_HANDLE_VALUE)//è¯´æ˜å½“å‰ç›®å½•ä¸‹æ— t3000.mdb
 			{
 				
-				//Ã»ÓĞÕÒµ½¾Í´´½¨Ò»¸öÄ¬ÈÏµÄÊı¾İ¿â
+				//æ²¡æœ‰æ‰¾åˆ°å°±ä½¿ç”¨ä¸€ä¸ªé»˜è®¤çš„æ•°æ®åº“
 				FilePath=g_strExePth+_T("Database\\T3000.db");
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000DB1), _T("T3000DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -501,9 +518,10 @@ BOOL CT3000App::InitInstance()
 			HANDLE hFind_Monitor;//
 			WIN32_FIND_DATA wfd_monitor;//
 			hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
+			// Indicates that there is no MonitorData.db in the current directory
 			if (hFind_Monitor==INVALID_HANDLE_VALUE)//è¯´æ˜å½“å‰ç›®å½•ä¸‹æ— MonitorData.db
 			{
-				//Ã»ÓĞÕÒµ½¾Í´´½¨Ò»¸öÄ¬ÈÏµÄÊı¾İ¿â
+				//æ²¡æœ‰æ‰¾åˆ°å°±ä½¿ç”¨ä¸€ä¸ªé»˜è®¤çš„æ•°æ®åº“
 				FilePath_Monitor= g_achive_monitor_datatbase_path;
 				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB2), _T("MONITOR_DB"));   
 				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
@@ -529,6 +547,7 @@ BOOL CT3000App::InitInstance()
 
 			if (First_Start)
 			{
+				//Create Default_Building
 				//åˆ›å»ºDefault_Building
 				CString filebuildingPath;//=g_strBuildingFolder+m_Building.at(i).Main_BuildingName+_T("\\"); 
 				filebuildingPath.Format(_T("%sDefault_Building\\"),g_strBuildingFolder);
@@ -670,7 +689,8 @@ BOOL CT3000App::InitInstance()
 	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
        m_szAppPath  = g_strExePth;
-       if(m_special_customer == 1) //Èç¹ûÊÇµÚÒ»¸ö¿Í»§ ¾Í¶¨ÒåÎªCPR-1000-Help.chm
+       // If it is the first type of customer, define it as CPR-1000-Help.chm
+       if(m_special_customer == 1) //å¦‚æœæ˜¯ç¬¬ä¸€ç±»å®¢æˆ·ï¼Œå°±å®šä¹‰ä¸ºCPR-1000-Help.chm
            m_szHelpFile = theApp.m_szAppPath + L"CPR-1000-Help.chm";
        else
             m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
