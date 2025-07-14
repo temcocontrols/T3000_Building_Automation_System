@@ -212,8 +212,7 @@ BOOL CT3000App::InitInstance()
 
 	// Loads up the required dlls
 	GetModulePath();
-	CString strSource = g_strExePth + L"T3000Controls.dll";
-    //2018 04 23 Fix bug where some operating systems not on C drive fail to install controls
+  CString strSource = g_strExePth + _T("") MY_CONTROL_DLL_NAME;
     //2018 04 23 修复bug 默写操作系统不是C盘的情况安装控件失败
     //Solution: Get the system drive path, then get the corresponding directory.
     //解决办法 获取系统所在盘符 ，然后采取对应操作.
