@@ -1088,7 +1088,22 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		if (msg_source == 0)//来自T3000按键点击
 		{
 			grp_serial_number = g_selected_serialnumber; 
-			grp_index = screen_list_line;
+
+			// 判断是否存在 "viewitem" 字段
+			if (json.isMember("viewitem") && !json["viewitem"].isNull()) 
+			{
+				// 存在 "viewitem" 字段且不为 null
+				grp_index = json.get("viewitem", Json::nullValue).asInt(); //这里如果是按键点进来的，要用T3000的index ，如果是 浏览器的 要浏览器的index
+				// 使用 grp_index 进行后续操作
+			}
+			else {
+				// 不存在 "viewitem" 字段或其值为 null
+				grp_index = screen_list_line;
+				//std::cout << "JSON 中不存在 viewitem 字段或其值为 null" << std::endl;
+			}
+
+			
+
 			panel_id = bac_gloab_panel;
 		}
 		else if(msg_source == 1)//来自浏览器
