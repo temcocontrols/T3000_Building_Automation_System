@@ -332,11 +332,16 @@ BOOL CT3000App::InitInstance()
 			g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
 			g_trendlog_ini_path = g_achive_folder_temp_db;
 			CString webview_www_folder;
+			CString webview_www_upload_folder;
 			// When creating installation files, extract the zip file of the installation file to the www folder
 			CString www_zip_file; //制作安装文件的时候将安装文件的zip文件解压到www文件夹下
 			CString WebDBFilePath;
 			CString WebDBDesFilePath;
 			webview_www_folder = g_strExePth + _T("ResourceFile\\webview\\www");
+			webview_www_upload_folder = webview_www_folder + _T("\\uploads");
+			CreateDirectory(g_strExePth + _T("ResourceFile\\webview"), NULL);
+			CreateDirectory(webview_www_folder, NULL);
+			CreateDirectory(webview_www_upload_folder, NULL);
 			WebDBFilePath = g_strExePth + _T("ResourceFile\\webview_database.db");
 			WebDBDesFilePath = g_strExePth + _T("Database\\webview_database.db");
 			CopyFile(WebDBFilePath, WebDBDesFilePath, FALSE);
