@@ -1,6 +1,9 @@
 
-// T3000.h : main header file for the T3000 application
-//
+/**
+ * @file T3000.h
+ * @brief Header file for CT3000App class
+ */
+
 #pragma once
 
 #ifndef __AFXWIN_H__
@@ -51,6 +54,9 @@ struct ALL_NODE {
     CString Custom;
 };
 
+/**
+* Structure to hold building details
+*/
 struct Building{
 CString Main_BuildingName;
 CString Building_Name;
@@ -72,6 +78,7 @@ CString street;
 CString ZIP;
 CString EngineeringUnits;
 };
+
 struct Building_ALL{
 CString Building_Name;
 BOOL Default_Building;
@@ -208,6 +215,12 @@ class COwnMemDC : public CDC {
 		operator COwnMemDC*() {return this;}
 };
 
+/**
+ * @class CT3000App
+ * @brief The main application class for T3000.
+ * Inherits CWinAppEx class
+ * This class handles the initialization, database updates, registry operations, and application-wide settings.
+ */
 class CT3000App : public CWinAppEx
 {
 
@@ -216,7 +229,15 @@ public:
 
 // Overrides
 public:
+
+	/**
+	 * @brief The initialization method.
+	 * Sets up directories, loads resources, initializes libraries, and prepares the application environment.
+	 * Also calls the UpdateDB method
+	 * @return TRUE if initialization succeeds, FALSE otherwise.
+	 */
 	virtual BOOL InitInstance();
+
 	CLanguageLocale m_locale;
 // Implementation
 	UINT  m_nAppLook;
@@ -227,23 +248,72 @@ public:
 	virtual void SaveCustomState();
 
 	afx_msg void OnAppAbout();
+
+	/**
+	 * @brief Reads CustomInfo.ini and sets up mode names for components
+	 */
 	void InitModeName();
 	void OnVersionInfo();
 	DECLARE_MESSAGE_MAP()
 public:
+
+	/**
+	 * @brief Calls the parent class's ExitInstance and handles clean up
+	 */
 	virtual int ExitInstance();
 	void CopyDirectory(CString strSrcPath,CString strDstPath);
 //	bool cm5_timer;	  //CM5
+
+	/**
+	 * @brief Checks if m_maxClients has a value of 0 or otherwise
+	 * @return TRUE if m_maxClients is not 0, FALSE otherwise.
+	 */
 	BOOL haveRegister();
 	void GetModulePath();
+
+	/**
+	 * @brief Writes a value to the registry.
+	 * @param key The registry key to write to.
+	 * @param valueName The name of the value to write.
+	 * @param value The value to write.
+	 */
 	void WriteNumber(CRegKey& key,CStringW valueName,DWORD value);
+
+	/**
+	 * @brief Reads requested data from the registry.
+	 * @param key Registry key to read from.
+	 * @param valueName The name of the value to read.
+	 * @param value Reference to a variable to store the retrieved value.
+	 * @return TRUE if the operation succeeds, FALSE otherwise.
+	 */
 	BOOL ReadNameber(CRegKey& key,CStringW valueName,DWORD& value);
 	void Judgestore();
+
+	/**
+	 * @brief Reads and updates values from/to the registry.
+	 * Sets the values of m_maxClients and password variables from the registry.
+	 */
 	void ReadREG();
 	
-	int  GetLanguage();
-    void UpdateDB();
+	/**
+	 * @brief Retrieves the application's language preference from the registry.
+	 *
+	 * @return The language preference value.
+	 */
+	int GetLanguage();
+
+	/**
+	* @brief Sets the application's language preference in the registry.
+	*
+	* @param Last The language preference value.
+	*/
 	void SetLanguage(DWORD Last);
+
+	/**
+	 * @brief Reads the application database and fills up required structs and vectors from it
+	 * Checks the version of the database and handles migration of database.
+	 */
+	void UpdateDB();
 
 	int ReadDLLRegAsm();
 	void SetDLLRegAsm(DWORD version);
