@@ -6,6 +6,7 @@ const int KEY_F3 = 1003;
 const int KEY_F7 = 1007;
 const int KEY_F6 = 1006;
 const int KEY_F8 = 1008;
+const int KEY_F9 = 1009;
 // CBacnetProgramEdit dialog
 
 class CBacnetProgramEdit : public CDialogEx
@@ -60,6 +61,7 @@ public:
 
 	afx_msg void OnBnClickedButtonProgramEditHelp();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnRenumber();
 };
 
 

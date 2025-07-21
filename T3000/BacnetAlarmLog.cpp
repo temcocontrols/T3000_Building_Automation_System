@@ -232,7 +232,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 
 			time_t tempalarm_time ;
 			tempalarm_time = (unsigned int)m_alarmlog_data.at(i).alarm_time;
-			if((tempalarm_time < 1420041600)  || (tempalarm_time > 1735660800))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
+			if((tempalarm_time < 1420041600)  || (tempalarm_time > 2051193600))	//时间范围 2015-1-1  ->2035-1-1  ，不在此时间的数据无效;
 			{
 				temp_time.Empty();
 			}
@@ -246,10 +246,10 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 
 			if(m_alarmlog_data.at(i).acknowledged == 1)
 			{
-				m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,ACK_UNACK[1]);
+				m_alarmlog_list.SetItemText(i, ALARMLOG_ACK,ACK_UNACK[1]);
 			}
 			else
-				m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,ACK_UNACK[0]);
+				m_alarmlog_list.SetItemText(i, ALARMLOG_ACK,ACK_UNACK[0]);
 
 			if(m_alarmlog_data.at(i).restored == 1)
 			{
@@ -314,7 +314,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 void CBacnetAlarmLog::OnTimer(UINT_PTR nIDEvent)
 {
 	 
-	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  (this->m_hWnd  == ::GetActiveWindow())  )	//GSM连接时不要刷新;
+	if((this->IsWindowVisible()) && (Gsm_communication == false) && ((this->m_hWnd == ::GetActiveWindow()) || (bacnet_view_number == TYPE_ALARMLOG)))	//GSM连接时不要刷新;
 	{
 		PostMessage(WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
 		if(bac_select_device_online)

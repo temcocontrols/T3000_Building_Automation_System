@@ -101,6 +101,7 @@ BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
 	ON_COMMAND(ID_PROPERTIES_GOTODEFINITION, &CBacnetProgramEdit::OnPropertiesGotodefinition)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_EDIT_HELP, &CBacnetProgramEdit::OnBnClickedButtonProgramEditHelp)
 	ON_WM_SIZE()
+	ON_COMMAND(ID_RENUMBER, &CBacnetProgramEdit::OnRenumber)
 END_MESSAGE_MAP()
 
 
@@ -137,6 +138,12 @@ LRESULT CBacnetProgramEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 	{
 		Run_once_mutex = true;
 		OnRefresh();
+		Run_once_mutex = false;
+	}
+	else if (wParam == KEY_F9)
+	{
+		Run_once_mutex = true;
+		OnRenumber();
 		Run_once_mutex = false;
 	}
 
@@ -290,6 +297,7 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	RegisterHotKey(GetSafeHwnd(),KEY_F7,NULL,VK_F7);
 	RegisterHotKey(GetSafeHwnd(),KEY_F6,NULL,VK_F6);
 	RegisterHotKey(GetSafeHwnd(),KEY_F8,NULL,VK_F8);
+	RegisterHotKey(GetSafeHwnd(),KEY_F9,NULL,VK_F9);
 	Initial_static();
 
 	init_info_table();
@@ -927,7 +935,7 @@ void CBacnetProgramEdit::OnEnSetfocusRichedit2Program()
 
 void CBacnetProgramEdit::OnRefresh()
 {
-	
+
     refresh_program_text_color = true;
     copy_data_to_ptrpanel(TYPE_ALL);
 	memset(mycode,0,2000);
@@ -1469,4 +1477,14 @@ void CBacnetProgramEdit::OnSize(UINT nType, int cx, int cy)
 	}
 	Invalidate(1);
 	// TODO: 在此处添加消息处理程序代码
+}
+
+
+void CBacnetProgramEdit::OnRenumber()
+{
+	// TODO: 在此添加命令处理程序代码
+	program_re_line_number = 1;
+	Syntax_analysis();
+	PostMessage(WM_REFRESH_BAC_PROGRAM_RICHEDIT, NULL, NULL);
+	return;
 }
