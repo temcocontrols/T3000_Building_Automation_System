@@ -6,6 +6,6 @@ namespace Yabe
 public static class AppConfigConstants
 {
 public const string AppConfigName = "T3000_config.ini";
-public const string AppBacnetName = "T3000 Standard BacNET Tool";
+public const string AppBacnetName = "T3000 Standard BACNet Tool";
 }
 }
