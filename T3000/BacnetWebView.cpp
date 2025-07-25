@@ -2023,6 +2023,20 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 					tempjson["data"][i]["status"] = g_monitor_data[npanel_id].at(entry_index).status;
 					//There is also additional data that does not need to be passed to the webview interface
 
+					tempjson["data"][i]["num_inputs"] = g_monitor_data[npanel_id].at(i).num_inputs; ///* total number of points */
+					tempjson["data"][i]["an_inputs"] = g_monitor_data[npanel_id].at(i).an_inputs;  ///* number of analog points */
+					for (int m = 0; m < MAX_POINTS_IN_MONITOR; m++)
+					{
+						tempjson["data"][i]["range"][m] = g_monitor_data[npanel_id].at(i).range[m]; //14个input对应的range
+						//例如 例子1  111OUT45          panel = 111 , sub_panel = 0 . point_type = 0 ，number = 45 , network 默认为0
+						//例如 例子2  123.45.MB_REG67   panel = 123 , sub_panel = 45, point_type = 2 , number = 67 , network 默认为0
+						tempjson["data"][i]["input"][m]["panel"] = g_monitor_data[npanel_id].at(i).inputs[m].panel;
+						tempjson["data"][i]["input"][m]["sub_panel"] = g_monitor_data[npanel_id].at(i).inputs[m].sub_panel;
+						tempjson["data"][i]["input"][m]["point_type"] = g_monitor_data[npanel_id].at(i).inputs[m].point_type;
+						tempjson["data"][i]["input"][m]["point_number"] = g_monitor_data[npanel_id].at(i).inputs[m].number;
+						tempjson["data"][i]["input"][m]["network"] = g_monitor_data[npanel_id].at(i).inputs[m].network;
+					}
+
 				}
 			}
 			const std::string output = Json::writeString(builder, tempjson);
