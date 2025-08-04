@@ -623,13 +623,71 @@ HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
 	m_webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(this, &BacnetWebViewAppWindow::WebMessageReceived).Get(), &token);
 	/* END Resgister the listner for message handling */
 
+	// Add navigation completion handler for hard refresh (Ctrl+F5 equivalent)
+	EventRegistrationToken navigationCompletedToken;
+	m_webView->add_NavigationCompleted(
+		Callback<ICoreWebView2NavigationCompletedEventHandler>(
+			[this](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args) -> HRESULT
+			{
+				// Perform hard refresh equivalent to Ctrl+F5
+				static bool hasPerformedHardRefresh = false;
+				if (!hasPerformedHardRefresh) {
+					hasPerformedHardRefresh = true;
+
+					// Execute JavaScript to perform hard refresh
+					sender->ExecuteScript(
+						L"try {"
+						L"  // Add cache-busting meta tags"
+						L"  var metaNoCache = document.createElement('meta');"
+						L"  metaNoCache.httpEquiv = 'Cache-Control';"
+						L"  metaNoCache.content = 'no-cache, no-store, must-revalidate';"
+						L"  document.head.appendChild(metaNoCache);"
+						L"  var metaPragma = document.createElement('meta');"
+						L"  metaPragma.httpEquiv = 'Pragma';"
+						L"  metaPragma.content = 'no-cache';"
+						L"  document.head.appendChild(metaPragma);"
+						L"  // Force hard reload like Ctrl+F5"
+						L"  setTimeout(function() {"
+						L"    window.location.reload(true);"
+						L"  }, 100);"
+						L"} catch(e) { console.log('Hard refresh error:', e); }", nullptr);
+				}
+				return S_OK;
+			}).Get(), &navigationCompletedToken);
+
 	/*wil::com_ptr<ICoreWebView2CompositionController> compositionController =
 		m_controller.query<ICoreWebView2CompositionController>();*/
 	m_dropTarget = Make<DropTarget>();
 	m_dropTarget->Init(m_mainWindow, coreWebView2.get(), m_controller.get());
 
-	if (m_webView != nullptr && m_initialUri != L"")
-		m_webView->Navigate(m_initialUri.c_str());
+	if (m_webView != nullptr && m_initialUri != L"") {
+		// Add timestamp parameter to URL for cache busting
+		std::wstring cacheBustUri = m_initialUri;
+
+		// Handle Vue.js hash routing - insert timestamp before hash fragment
+		size_t hashPos = cacheBustUri.find(L'#');
+		std::wstring baseUrl, hashFragment;
+
+		if (hashPos != std::wstring::npos) {
+			baseUrl = cacheBustUri.substr(0, hashPos);
+			hashFragment = cacheBustUri.substr(hashPos);
+		} else {
+			baseUrl = cacheBustUri;
+			hashFragment = L"";
+		}
+
+		// Add timestamp parameter to base URL
+		if (baseUrl.find(L'?') != std::wstring::npos) {
+			baseUrl += L"&ts=" + std::to_wstring(GetTickCount64());
+		} else {
+			baseUrl += L"?ts=" + std::to_wstring(GetTickCount64());
+		}
+
+		// Reconstruct URL with timestamp before hash
+		cacheBustUri = baseUrl + hashFragment;
+
+		m_webView->Navigate(cacheBustUri.c_str());
+	}
 }
 bool ParseString2Json(CString strIn, Json::Value& jsonOut)
 {
@@ -1323,7 +1381,20 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		if (msg_source == 0)//来自T3000按键点击
 		{
 			grp_serial_number = g_selected_serialnumber; //暂时用这个代替
-			save_grp_index = screen_list_line;
+			// 判断是否存在 "viewitem" 字段
+			if (json.isMember("viewitem") && !json["viewitem"].isNull())
+			{
+				// 存在 "viewitem" 字段且不为 null
+				save_grp_index = json.get("viewitem", Json::nullValue).asInt(); //这里如果是按键点进来的，要用T3000的index ，如果是 浏览器的 要浏览器的index
+				// 使用 grp_index 进行后续操作
+			}
+			else {
+				// 不存在 "viewitem" 字段或其值为 null
+				save_grp_index = screen_list_line;
+				//std::cout << "JSON 中不存在 viewitem 字段或其值为 null" << std::endl;
+			}
+
+			//save_grp_index = screen_list_line;
 			panelId = bac_gloab_panel; //有时候浏览器这里传过来的panelID是0 ，不正常，这里强行赋值;
 			save_button_click = 1;
 		}
@@ -2030,6 +2101,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 						tempjson["data"][i]["range"][m] = g_monitor_data[npanel_id].at(i).range[m]; //14个input对应的range
 						//例如 例子1  111OUT45          panel = 111 , sub_panel = 0 . point_type = 0 ，number = 45 , network 默认为0
 						//例如 例子2  123.45.MB_REG67   panel = 123 , sub_panel = 45, point_type = 2 , number = 67 , network 默认为0
+						//例子3		  45678AV90         
 						tempjson["data"][i]["input"][m]["panel"] = g_monitor_data[npanel_id].at(i).inputs[m].panel;
 						tempjson["data"][i]["input"][m]["sub_panel"] = g_monitor_data[npanel_id].at(i).inputs[m].sub_panel;
 						tempjson["data"][i]["input"][m]["point_type"] = g_monitor_data[npanel_id].at(i).inputs[m].point_type;
@@ -2484,4 +2556,26 @@ int webview_run_server() {
 	}
 
 	return 0;
+}
+
+// Function to clear EBWebView cache folder
+void BacnetWebViewAppWindow::ClearEBWebViewCache()
+{
+	PWSTR userDataPath;
+	HRESULT hrfolder = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &userDataPath);
+	if (SUCCEEDED(hrfolder)) {
+		std::wstring userDataFolder(userDataPath);
+		userDataFolder += L"\\T3000\\EBWebView";
+
+		if (PathFileExists(userDataFolder.c_str())) {
+			// Multiple deletion attempts to handle file locks
+			for (int attempts = 0; attempts < 3; attempts++) {
+				DeleteDirectoryRecursive(userDataFolder);
+				if (!PathFileExists(userDataFolder.c_str()))
+					break;
+				Sleep(100);
+			}
+		}
+		CoTaskMemFree(userDataPath);
+	}
 }

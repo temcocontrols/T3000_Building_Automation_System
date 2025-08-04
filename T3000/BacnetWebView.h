@@ -111,6 +111,7 @@ private:
     bool ExecuteAppCommands(WPARAM wParam, LPARAM lParam);
     void ResizeEverything();
     void InitializeWebView();
+    void ClearEBWebViewCache();
     HRESULT OnCreateEnvironmentCompleted(HRESULT result, ICoreWebView2Environment* environment);
     HRESULT OnCreateCoreWebView2ControllerCompleted(HRESULT result, ICoreWebView2Controller* controller);
 

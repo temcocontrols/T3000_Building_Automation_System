@@ -1292,7 +1292,22 @@ void CBacnetMonitor::Check_New_DB()
 
 void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 {
+	//将m_monitor_data.at(monitor_list_line) 转换为16进制字符串;
+	CString temp_hex_data;
+	for (int i = 0; i < sizeof(Str_monitor_point); i++)
+	{
+		CString temp_cs;
+		temp_cs.Format(_T("%02X"), ((unsigned char*)&m_monitor_data.at(monitor_list_line))[i]);
+		temp_hex_data += temp_cs;
+	}
+
+	CString selseted_info;
+	selseted_info.Format(_T("?SN=%d&panelid=%d&trendlogid=%d&alldata=%s"), Device_Basic_Setting.reg.n_serial_number,
+		Device_Basic_Setting.reg.panel_number, monitor_list_line,  temp_hex_data.GetBuffer());
 	
+
+
+
 	Check_New_DB();
 	for (int i=0;i<14;i++)
 	{

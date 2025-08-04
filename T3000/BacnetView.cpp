@@ -7783,7 +7783,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
                  ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
          }
      }
-     if (GetPrivateData_Blocking(g_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 1) > 0)
+     if (GetPrivateData_Blocking(g_bac_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), 2) > 0)
      {
          SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read device info OK!"));
      }
