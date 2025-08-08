@@ -2392,6 +2392,7 @@ int Read_Webview_Data_Special(int panelid,UINT nserialnumber,int nscreenindex)
 	if (!ret_unzip)
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Unzip file failed!"));
+		return -4;
 	}
 
 #endif

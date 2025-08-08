@@ -1290,24 +1290,204 @@ void CBacnetMonitor::Check_New_DB()
 	FindClose(hFind_Monitor);//
 }
 
+extern HANDLE h_create_webview_server_thread;
+int webview_run_server();
+DWORD WINAPI  CBacnetMonitor::CreateWebServerThreadfun(LPVOID lpVoid)
+{
+	CBacnetMonitor* pParent = (CBacnetMonitor*)lpVoid;
+	webview_run_server();
+	h_create_webview_server_thread = NULL;
+	return 0;
+}
+
+#include "BacnetWebView.h"
+#include <dist/json/json.h>
+
+// Helper function to URL encode JSON string
+CString UrlEncodeJson(const CString& jsonString)
+{
+	CString encoded;
+	for (int i = 0; i < jsonString.GetLength(); i++)
+	{
+		TCHAR ch = jsonString[i];
+		if (isalnum(ch) || ch == '-' || ch == '_' || ch == '.' || ch == '~')
+		{
+			encoded += ch;
+		}
+		else
+		{
+			CString temp;
+			temp.Format(_T("%%%02X"), (unsigned char)ch);
+			encoded += temp;
+		}
+	}
+	return encoded;
+}
+
+// Convert Str_monitor_point to simplified JSON format (t3Entry structure only)
+CString ConvertMonitorDataToJson(const Str_monitor_point& monitor_data, int panelid, int trendlogid)
+{
+	try
+	{
+		// Create only the t3Entry structure (monitor point data)
+		Json::Value t3Entry;
+
+		t3Entry["an_inputs"] = monitor_data.an_inputs;
+
+		// Generate command string (1-based indexing for display)
+		CString command;
+		command.Format(_T("%dMON%d"), panelid, trendlogid + 1);
+		t3Entry["command"] = std::string(CT2A(command));
+
+		t3Entry["hour_interval_time"] = monitor_data.hour_interval_time;
+
+		// Generate ID string (1-based indexing for display)
+		CString id;
+		id.Format(_T("MON%d"), trendlogid + 1);
+		t3Entry["id"] = std::string(CT2A(id));
+
+		t3Entry["index"] = 0;
+
+		// Convert input array
+		Json::Value inputArray(Json::arrayValue);
+		for (int i = 0; i < monitor_data.num_inputs && i < MAX_POINTS_IN_MONITOR; i++)
+		{
+			Json::Value inputPoint;
+			inputPoint["network"] = monitor_data.inputs[i].network;
+			inputPoint["panel"] = monitor_data.inputs[i].panel;
+			inputPoint["point_number"] = monitor_data.inputs[i].number;
+			inputPoint["point_type"] = monitor_data.inputs[i].point_type;
+			inputPoint["sub_panel"] = monitor_data.inputs[i].sub_panel;
+			inputArray.append(inputPoint);
+		}
+		t3Entry["input"] = inputArray;
+
+		// Convert label
+		char labelStr[10] = { 0 };
+		memcpy(labelStr, monitor_data.label, sizeof(monitor_data.label));
+		labelStr[8] = '\0'; // Ensure null termination
+		t3Entry["label"] = std::string(labelStr);
+
+		t3Entry["minute_interval_time"] = monitor_data.minute_interval_time;
+		t3Entry["num_inputs"] = monitor_data.num_inputs;
+		t3Entry["pid"] = panelid;
+
+		// Convert range array
+		Json::Value rangeArray(Json::arrayValue);
+		for (int i = 0; i < MAX_POINTS_IN_MONITOR; i++)
+		{
+			rangeArray.append(monitor_data.range[i]);
+		}
+		t3Entry["range"] = rangeArray;
+
+		t3Entry["second_interval_time"] = monitor_data.second_interval_time;
+		t3Entry["status"] = monitor_data.status;
+		t3Entry["type"] = "MON";
+
+		// Convert to string using jsoncpp writer
+		Json::StreamWriterBuilder builder;
+		builder["indentation"] = ""; // Compact output
+		std::string jsonString = Json::writeString(builder, t3Entry);
+		return CString(jsonString.c_str());
+	}
+	catch (...)
+	{
+		// Fallback to simple JSON if conversion fails
+		return _T("{\"error\":\"JSON conversion failed\"}");
+	}
+}
+
+#if 0
 void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 {
-	//将m_monitor_data.at(monitor_list_line) 转换为16进制字符串;
-	CString temp_hex_data;
-	for (int i = 0; i < sizeof(Str_monitor_point); i++)
+	// This thread will not exit when it is running properly, and will exit if run_server executes abnormally, terminating the thread.
+	if (h_create_webview_server_thread == NULL)
 	{
-		CString temp_cs;
-		temp_cs.Format(_T("%02X"), ((unsigned char*)&m_monitor_data.at(monitor_list_line))[i]);
-		temp_hex_data += temp_cs;
+		h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
 	}
 
+	// Get monitor data for title formatting
+	const Str_monitor_point& monitor_data = m_monitor_data.at(monitor_list_line);
+
+	// Convert monitor data to JSON format instead of hex
+	CString jsonData = ConvertMonitorDataToJson(monitor_data,
+		Device_Basic_Setting.reg.panel_number, monitor_list_line);
+
+	// URL encode the JSON data
+	CString encodedJsonData = UrlEncodeJson(jsonData);
+
 	CString selseted_info;
-	selseted_info.Format(_T("?SN=%d&panelid=%d&trendlogid=%d&alldata=%s"), Device_Basic_Setting.reg.n_serial_number,
-		Device_Basic_Setting.reg.panel_number, monitor_list_line,  temp_hex_data.GetBuffer());
-	
+	selseted_info.Format(_T("http://localhost:3003/#/trend-log?sn=%d&panel_id=%d&trendlog_id=%d&all_data=%s"), Device_Basic_Setting.reg.n_serial_number,
+		Device_Basic_Setting.reg.panel_number, monitor_list_line, encodedJsonData.GetBuffer());
 
+	CString webviewFolder;
+	CString Resource_folder;
+	CString ApplicationFolder;
+	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+	ApplicationFolder.ReleaseBuffer();
+	Resource_folder = ApplicationFolder + _T("\\ResourceFile");
 
+	// Construct the final URL with JSON data
+	webviewFolder = selseted_info;
 
+	// Create formatted title from monitor data fields
+	CString titleString;
+	CString labelStr;
+
+	// Convert label from byte array to CString, ensuring null termination
+	char tempLabel[10] = { 0 };
+	memcpy(tempLabel, monitor_data.label, sizeof(monitor_data.label));
+	tempLabel[8] = '\0';  // Ensure null termination
+	labelStr = CString(tempLabel);
+	labelStr.Trim();  // Remove any trailing spaces
+
+	// Format interval time
+	CString intervalStr;
+	if (monitor_data.hour_interval_time > 0)
+	{
+		intervalStr.Format(_T("%dh %dm %ds"),
+			monitor_data.hour_interval_time,
+			monitor_data.minute_interval_time,
+			monitor_data.second_interval_time);
+	}
+	else if (monitor_data.minute_interval_time > 0)
+	{
+		intervalStr.Format(_T("%dm %ds"),
+			monitor_data.minute_interval_time,
+			monitor_data.second_interval_time);
+	}
+	else
+	{
+		intervalStr.Format(_T("%ds"), monitor_data.second_interval_time);
+	}
+
+	// Format status
+	CString statusStr = (monitor_data.status == 1) ? _T("ON") : _T("OFF");
+
+	// Create comprehensive title
+	if (labelStr.IsEmpty())
+	{
+		titleString.Format(_T("Trend Log MON%d - Interval: %s - Status: %s"),
+			monitor_list_line + 1, intervalStr, statusStr);
+	}
+	else
+	{
+		titleString.Format(_T("Trend Log: %s (MON%d) - Interval: %s - Status: %s"),
+			labelStr, monitor_list_line + 1, intervalStr, statusStr);
+	}
+
+	wstring fullpath = webviewFolder;
+	wstring titleWStr = wstring(titleString);
+	auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath), titleWStr);
+	auto result = BacnetWebViewAppWindow::RunMessagePump();
+	delete webviewwindow;
+}
+#endif
+
+#if 1
+void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
+{
 	Check_New_DB();
 	for (int i=0;i<14;i++)
 	{
@@ -1403,6 +1583,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 	}
 
 }
+#endif
 
 void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 {

@@ -162,9 +162,7 @@ void Getminitypename(unsigned char nmini_type, CString& ret_name)
 	case TINY_EX_MINIPANEL:
 		ret_name = _T("T3-TB");
 		break;
-	case T3_TB_11I:
-		ret_name = _T("T3-TB-11I");
-		break;
+
 	case MINIPANELARM_NB:
 		ret_name = _T("T3-Nano");
 		break;
@@ -174,20 +172,27 @@ void Getminitypename(unsigned char nmini_type, CString& ret_name)
 	case T3_OEM:
 		ret_name = _T("T3-OEM");
 		break;
+	case T3_TB_11I:
+		ret_name = _T("T3-TB-11I");
+		break;
+
+
+	case T3_FAN_MODULE:
+		ret_name = _T("T3-FAN-MODULE");
+		break;
 	case T3_OEM_12I:
 		ret_name = _T("T3-OEM-12I");
 		break;
 	case T3_ESP_RMC:
 		ret_name = _T("T3-RMC");
 		break;
+	case T3_ESP_LW:
+		ret_name = _T("T3-ESP-LW");
+		break;
 	case T3_NG2_TYPE2:
 		ret_name = _T("T3-NG2");
 		break;
-	case T3_FAN_MODULE:
-		ret_name = _T("T3-FAN-MODULE");
-		break;
-	case T3_ESP_LW:
-		ret_name = _T("T3-ESP-LW");
+	case T3_SENSOR:
 		break;
 	default:
 		ret_name = _T(" ");

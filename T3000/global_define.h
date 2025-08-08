@@ -871,16 +871,16 @@ const CString OutPut_List_Analog_Units[] =
 const CString Input_List_Analog_Units[] =
 {
 	_T(""),
-	_T("Deg.C"),
-	_T("Deg.F"),
-	_T("Deg.C"),
-	_T("Deg.F"),
-	_T("Deg.C"),
-	_T("Deg.F"),
-	_T("Deg.C"),
-	_T("Deg.F"),
-	_T("Deg.C"),
-	_T("Deg.F"),
+	_T("\u00B0C"), //\u00B0 wei  .c
+	_T("\u00B0F"),
+	_T("\u00B0C"),
+	_T("\u00B0F"),
+	_T("\u00B0C"),
+	_T("\u00B0F"),
+	_T("\u00B0C"),
+	_T("\u00B0F"),
+	_T("\u00B0C"),
+	_T("\u00B0F"),
 	_T("Volts"),
 	_T("Amps"),
 	_T("ma"),
@@ -1174,8 +1174,8 @@ const CString Device_Serial_Port_Status[] =
 const CString Variable_Analog_Units_Array[] =
 {
 	_T("Unused"),
-	_T("Deg.C"),
-	_T("Deg.F"),
+	_T("\u00B0C"),
+	_T("\u00B0F"),
 	_T("Feet per Min"),
 	_T("Pascals"),
 	_T("KPascals"),
@@ -1273,6 +1273,7 @@ typedef enum
 	T3_ESP_RMC = 19,  //1-16 input 17-18 sensor    Output1-7DO
 	T3_ESP_LW = 21,  //0 input   ,   6  output
 	T3_NG2_TYPE2 = 22,
+	T3_SENSOR = 26,  //6合1 的传感器 esp 产品 啥也没加
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,

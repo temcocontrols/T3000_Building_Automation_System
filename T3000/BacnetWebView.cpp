@@ -456,6 +456,14 @@ void BacnetWebViewAppWindow::NotifyClosed()
 	m_isClosed = true;
 }
 
+void BacnetWebViewAppWindow::SetTitleText(PCWSTR titleText)
+{
+	if (m_mainWindow != nullptr)
+	{
+		SetWindowTextW(m_mainWindow, titleText);
+	}
+}
+
 std::wstring BacnetWebViewAppWindow::GetLocalUri(std::wstring relativePath)
 {
 	if (m_webView3)
@@ -1146,7 +1154,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		if (msg_source == 0)//来自T3000按键点击
 		{
 			grp_serial_number = g_selected_serialnumber; 
-
+			panel_id = bac_gloab_panel;
 			// 判断是否存在 "viewitem" 字段
 			if (json.isMember("viewitem") && !json["viewitem"].isNull()) 
 			{
@@ -1160,9 +1168,27 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				//std::cout << "JSON 中不存在 viewitem 字段或其值为 null" << std::endl;
 			}
 
-			
-
-			panel_id = bac_gloab_panel;
+			temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, grp_index);
+			des_file_zip = image_fordor + _T("\\") + temp_item_zip;
+			//判断文件 des_file_zip是否存在 没有缓存就只能从设备中读取
+			if (!PathFileExists(des_file_zip))
+			{
+				int n_read_result = Read_Webview_Data_Special(panel_id, grp_serial_number, grp_index);
+				if (n_read_result < 0)
+				{
+					if (action == GET_INITIAL_DATA)
+					{
+						tempjson["action"] = "GET_INITIAL_DATA_RES";
+					}
+					else if (action == LOAD_GRAPHIC_ENTRY)
+					{
+						tempjson["action"] = "LOAD_GRAPHIC_ENTRY_RES";
+					}
+					WrapErrorMessage(builder, tempjson, outmsg, _T("Read panel data timeout."));
+					DFTrace(_T("Read panel data timeout."));
+					break;
+				}
+			}
 		}
 		else if(msg_source == 1)//来自浏览器
 		{
@@ -1889,7 +1915,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 					int ret_index4 = Post_Background_Read_Message_ByPanel(npanel_id, READINPUT_T3000, entry_index + 1);  //send message to background ，read 199IN3
 					if (ret_index4 >= 0)
 					{
-						memcpy(&g_Input_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index4).ret_data.m_group_input_data, sizeof(Str_in_point));
+						//memcpy(&g_Input_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index4).ret_data.m_group_input_data, sizeof(Str_in_point));
 					}
 					else
 					{
@@ -1921,7 +1947,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 					int ret_index_out = Post_Background_Read_Message_ByPanel(npanel_id, READOUTPUT_T3000, entry_index + 1);  //send message to background ，read 199OUT3
 					if (ret_index_out >= 0)
 					{
-						memcpy(&g_Output_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_output_data, sizeof(Str_out_point));
+						//memcpy(&g_Output_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_out).ret_data.m_group_output_data, sizeof(Str_out_point));
 					}
 					else
 					{
@@ -1952,7 +1978,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 					int ret_index_var = Post_Background_Read_Message_ByPanel(npanel_id, READVARIABLE_T3000, entry_index + 1);  //send message to background ，read 199OUT3
 					if (ret_index_var >= 0)
 					{
-						memcpy(&g_Variable_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_var).ret_data.m_group_variable_data, sizeof(Str_variable_point));
+						//memcpy(&g_Variable_data[npanel_id].at(entry_index), &m_backbround_data.at(ret_index_var).ret_data.m_group_variable_data, sizeof(Str_variable_point));
 					}
 					else
 					{

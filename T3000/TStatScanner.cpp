@@ -553,7 +553,7 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
                 m_scan_info.at(scan_item).scan_status = SCAN_STATUS_DETECTING;
                 memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
                 char temp_show_info[MAX_PATH] = {0};
-                sprintf(temp_show_info, "Automatic detecting ,please wait!");
+                sprintf(temp_show_info, "Scanning, please wait!");
                 memcpy(m_scan_info.at(scan_item).scan_notes, temp_show_info, strlen(temp_show_info));
             }
         }
@@ -4175,7 +4175,7 @@ DWORD WINAPI  Detect_Mstp_thread(LPVOID lpVoid)
             {
                 m_scan_info.at(scan_item).scan_status = SCAN_STATUS_DETECTING;
                 memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
-                memcpy(m_scan_info.at(scan_item).scan_notes, "Automatic detecting ,please wait!", strlen("Automatic detecting ,please wait!"));
+                memcpy(m_scan_info.at(scan_item).scan_notes, "Scanning, please wait!", strlen("Scanning, please wait!"));
             }
         }
 

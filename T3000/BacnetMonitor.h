@@ -41,6 +41,7 @@ public:
 	int m_col;
 	HICON hIcon;
 	void Set_Input_Range_And_count();
+	static DWORD WINAPI  CreateWebServerThreadfun(LPVOID lpVoid);
 	afx_msg void OnBnClickedBtnMonitorGraphic();
 	void OnBnClickedBtnMonitorDeleteAll();
 	void OnBnClickedBtnMonitorDeleteSelected();
