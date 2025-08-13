@@ -17,7 +17,7 @@
 // BacnetController dialog
 int PID_CONTROLLER_LIMITE_ITEM_COUNT = 0;
 
-extern tree_product selected_product_Node; // 选中的设备信息;
+extern tree_product selected_product_Node; // 选中的设备信息;, Selected device information
 extern int pointtotext_for_controller(char *buf,Point_T3000 *point);
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
 
@@ -77,14 +77,16 @@ LRESULT  BacnetController::ControllerMessageCallBack(WPARAM wParam, LPARAM lPara
 	}
 	else
 	{
-		memcpy_s(&m_controller_data.at(pInvoke->mRow),sizeof(Str_controller_point),&m_temp_controller_data[pInvoke->mRow],sizeof(Str_controller_point));//还原没有改对的值
+		//还原没有改对的值
+		// Restore the value that was not changed correctly
+		memcpy_s(&m_controller_data.at(pInvoke->mRow),sizeof(Str_controller_point),&m_temp_controller_data[pInvoke->mRow],sizeof(Str_controller_point));
 		PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		//AfxMessageBox(Show_Results);
 		//MessageBox(_T("Bacnet operation fail!"));
 	}
-	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
+	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;,Restore foreground and background color
 		m_controller_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
 		m_controller_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
@@ -224,7 +226,7 @@ void BacnetController::Initial_List()
 			if((i%2)==0)
 				m_controller_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
 			else
-				m_controller_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+				m_controller_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);      // 奇偶行设置不同背景色; Set different background color for odd/even rows
 		}
 	}
 	m_controller_list.Special_ToolTips(CONTROLLER_ACTION, _T(" Set this to ‘+’ for systems like cooling where the action increases when the temperature is above the setpoint.\r\n\r\n\
@@ -304,7 +306,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 						temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 					temp_des2.ReleaseBuffer();	
 					temp_des2 = temp_des2.Left(STR_IN_LABEL).Trim();
-					//如果是小叶的设备,因为没有input 就直接显示in2之类.
+					//如果是小叶的设备,因为没有input 就直接显示in2之类. // If it is Xiaoye's device, since there is no input, just display something like in2
 					if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 					{
 						temp_des2.Empty();
@@ -333,7 +335,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 						m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,Input_List_Analog_Units[m_Input_data.at(x).range]);
 					}
 
-					//如果是小叶的设备,因为没有input 就直接显示rang 对应的值.
+					//如果是小叶的设备,因为没有input 就直接显示rang 对应的值. // If it is Xiaoye's device, since there is no input, just display the value corresponding to range
 					if ((bacnet_device_type == STM32_HUM_NET) || (bacnet_device_type == STM32_HUM_RS485))
 					{
 						if(m_controller_data.at(i).units < sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0]))
@@ -411,9 +413,9 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 					int num_point,num_panel,num_net,k;
 					Point_T3000 point;
 					point.number = m_controller_data.at(i).setpoint.number;
-					point.number = point.number + 1;	//input setpoint 是从 0 开始计数的 ，但是要去找point label 要从1开始;
+					point.number = point.number + 1;   //input setpoint 是从 0 开始计数的 ，但是要去找point label 要从1开始; input setpoint starts counting from 0, but to find the point label, start from 1
 					point.panel = m_controller_data.at(i).setpoint.panel;
-					point.point_type = m_controller_data.at(i).setpoint.point_type - 1;	//调用 ispoint的时候要减一;
+					point.point_type = m_controller_data.at(i).setpoint.point_type - 1;   //调用 ispoint的时候要减一; Subtract one when calling ispoint
 					byte point_type,var_type;
 
 					int temp_network = 0;

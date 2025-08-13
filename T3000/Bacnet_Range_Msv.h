@@ -9,15 +9,18 @@ class CBacnet_Range_Msv : public CDialogEx
 	DECLARE_DYNAMIC(CBacnet_Range_Msv)
 
 public:
+    // Standard constructor
 	CBacnet_Range_Msv(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBacnet_Range_Msv();
 
 // 对话框数据
+// Dialog data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_RANGE_MSV };
 #endif
 
 protected:
+    // DDX/DDV support
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
