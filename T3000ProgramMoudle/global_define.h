@@ -1,13 +1,16 @@
 #pragma once
 //#include "RelayLabel.h"
 #ifdef DEBUG
+ // Define whether to use http api
  #define ENABLE_HTTP_FUCTION  //定义是否使用http api
 #endif // DEBUG
 using namespace std;
 
 //#define ENABLE_T3_EMAIL
 #include <map>
+// minipanel register table
 //minipanel 寄存器表
+//  9800	-	9999    200 registers   setting
 //  9800	-	9999    200个寄存器   setting
 //  10000	-   11471   1472		  OUT
 //  11472   -   12943   1472		  IN
@@ -82,6 +85,7 @@ const int THREAD_IDLE = 255;
 //const int TFTP_SEND_LENGTH = 3 * 1024 + 512;
 const int TFTP_SEND_LENGTH = 512;
 //const int TFTP_SEND_LENGTH = 1024;
+// Save alignment state
 #pragma pack(push) //保存对齐状态 
 #pragma pack(1)
 typedef struct
@@ -157,6 +161,7 @@ typedef struct
 
 
 
+// Restore alignment state
 #pragma pack(pop)//恢复对齐状态 
 
 
@@ -165,6 +170,7 @@ typedef enum
 	GET_SERIAL_NUMBER = 1,
 	DOWNLOAD_FILE = 2,
 	UPLOAD_FILE = 3,
+	// Used to distinguish from DOWNLOAD_FILE, representing new download using 3K download
 	DOWNLOAD_NEW_FILE = 4,	//用于区别  DOWNLOAD_FILE ， 代表新的下载利用3K下载;
 	GET_MD5_VALUE = 99,
 
@@ -248,8 +254,11 @@ const int PROTOCOL_GSM = 4;
 const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
 const int PROTOCOL_MSTP_TO_MODBUS = 11;
+// Network devices, sub-port running MSTP devices, can only read registers after 10000 through Ptransfer
 const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;    //网络下面的设备，子口跑MSTP设备 ，只能通过Ptransfer 转10000以后寄存器读取
+// 20200306 TSTAT10 or T3BB using MODBUS MODBUS485 connected to T3BB
 const int PROTOCOL_MB_TCPIP_TO_MB_RS485 = 13;     //20200306 TSTAT10或者T3BB  使用MODBUS MODBUS485 接到  T3BB下面 
+// MODBUS485 using ptp method to get T3 private data
 const int PROTOCOL_MB_PTP_TRANSFER = 14;          //MODBUS485采用ptp 的方式获取 T3私有数据;
 const int PROTOCOL_THIRD_PARTY_BAC_BIP = 253;
 const int PROTOCOL_VIRTUAL = 254;
@@ -491,6 +500,7 @@ const int BAC_SHOW_MISSION_RESULTS = 3;
 const int BAC_LIST_REFRESH_INPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_OUTPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_TIME = 45000;//ms
+// Determine if network is connected, use 20 second refresh
 const int BAC_LIST_REFRESH_ETHERNET_TIME = 45000;  //判断是接的网络就用20秒的刷新;
 
 const int SCHEDULE_TIME_NUM = 0;
@@ -514,6 +524,7 @@ const int HANDLE_I_AM_BIP = 1;
 struct _Bac_Scan_Com_Info
 {
     int nprotocol;  // 0 MSTP     1 BIP
+    // First four digit are IP address, last two digit are port number
     unsigned char ipaddress[6];   //前四位位IP地址  后两位位端口号
     int device_id;
     int macaddress;
@@ -555,6 +566,7 @@ struct _Resend_Read_Info
 	int task_result;
 	int invoke_id;
 	int has_resend_yes_or_no;
+	// How many times no reply received, consider it failed
 	int timeout_count;//多少次还没收到回复，就算 失败;
 };
 
@@ -579,6 +591,7 @@ struct refresh_subnet_device
 {
     UCHAR device_count;
     UINT parent_sn;
+    // Reserved
     char reserved_data[15]; // 预留
     sub_net_status device_status[255];
 };
@@ -600,8 +613,11 @@ struct refresh_net_device
 	unsigned short bacnetip_port;
     int hardware_info;     //bit  0x74 zigbee   bit1 wifi
     int nprotocol;
+    // Version number of command 65, future replies to command 65 need to increment by 1 when modified, mainly for compatibility with previous reply protocols
     UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
+    // Which port the device belongs to for reply. 1- MainPort 2-ZigbeePort 3-SubPort
     UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
+    // Baud rate used by sub-devices; corresponds to previously defined baud rate sequence numbers
     UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
 };
 
@@ -658,8 +674,11 @@ struct Monitor_Input_Info
 {
 	int Max_Value;
 	int Min_Value;
+	// Whether this record has been logged
 	bool be_record;//是否记录了这条;
+	// Whether to use individual scale
 	bool use_own_scale;//是否单独用自己的刻度;
+	// Whether to display graphics
 	bool show_graphic; //是否显示图像;
 };
 
@@ -1180,6 +1199,7 @@ const CString Variable_Analog_Units_Array[] =
 //	unsigned short entitysize;
 //	CRelayLabel* control_pt;
 //	HWND hWnd;
+//    // 0 non-standard, 1 standard
 //    //int8_t standard_command;  //0  非标      1 标准;
 //    //int object_type;
 //    //uint32_t object_instance;
@@ -1188,6 +1208,7 @@ const CString Variable_Analog_Units_Array[] =
 
 
 
+// How many Windows are embedded in the TAB
 const int WINDOW_TAB_COUNT = 14; //多少个Window 嵌入在TAB里面;
 const int WINDOW_INPUT = 0;
 const int WINDOW_OUTPUT = 1;
@@ -1280,6 +1301,7 @@ const int T322AI_OUT_A = 0;
 const int PWM_TRANSDUCER_OUT_D = 0;
 const int PWM_TRANSDUCER_OUT_A = 6;
 
+// ESP32 version sub-device Fan module input
 const int FAN_MODULE_IN_A = 12; // ESP32 版本 子设备  Fan module 输入;
 const int FAN_MODULE_IN_D = 0;
 const int FAN_MOUDLE_OUT_A = 1; 
@@ -1360,6 +1382,7 @@ typedef struct
 	int scan_status;
 	char scan_notes[250];
 	int scan_found;
+// Structure used for displaying to list during scanning
 }Scan_Info;	// 扫描的时候 用于显示给list 的结构;
 
 
@@ -1382,6 +1405,7 @@ typedef struct
     uint8_t network_point;
 	uint8_t ntext_place;
 	uint8_t n_iconsize;
+    // Used to determine if label is clicked and the click width
     int x_length; // 用来确定标签是否点击，以及点击的宽度.
 }Bacnet_Label_Info;
 
@@ -1915,6 +1939,7 @@ const int LENGTH_MODBUS_SCHEDULE_CODE = WEEKLY_SCHEDULE_SIZE / 2 * BAC_WEEKLYCOD
 const int LENGTH_MODBUS_HOLIDAY_CODE = ANNUAL_CODE_SIZE / 2;
 
 
+// Below are BACnet register mappings to Modbus positions
 //以下是 bacnet 寄存器 映射到modbus的位置;
 const int REG_SETTING_START_ADDRESS = BAC_SETTING_START_REG;
 const int REG_OUTPUT_START_ADDRESS = REG_SETTING_START_ADDRESS + LENGTH_MODBUS_SETTING; //10000
@@ -1960,6 +1985,7 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_AO        29
 #define BAC_BO        30
 
+// 31 deprecated
 //31弃用 
 #define BAC_FLOAT_ABCD  32
 #define BAC_FLOAT_CDAB  33
@@ -1991,6 +2017,7 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BLACK_PC_GROUND_HEIGHT     BLACK_GROUND_HEIGHT
 
 
+// Request bits after FF 55 initiated by slave
 																						//从机 发起的 FF 55 后面的 请求位;
 typedef enum
 {
@@ -1999,6 +2026,7 @@ typedef enum
 };
 
 
+// Command bits after FF 55 replied by master
 //主机应答的FF 55 后面的命令位;
 typedef enum
 {
@@ -2009,6 +2037,7 @@ typedef enum
 	RETURN_MINI_DATA = 5
 };
 
+// Save alignment state
 #pragma pack(push) //保存对齐状态 
 #pragma pack(1)
 typedef struct
@@ -2030,6 +2059,7 @@ typedef struct
 
 }STR_For_T3000;
 
+// Restore alignment state
 #pragma pack(pop)//恢复对齐状态 
 
 
@@ -2078,6 +2108,7 @@ const int day_in_this_year[] =
 #define HEARTBEAT_LENGTH	200
 #define  T3000_MINI_HEARTBEAT_LENGTH_WITH_MINI_PORT  (9 + HEARTBEAT_LENGTH)
 
+// Save alignment state
 #pragma pack(push) //保存对齐状态 
 #pragma pack(1)
 struct stLoginMessage

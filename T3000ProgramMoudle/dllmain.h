@@ -35,8 +35,11 @@ struct refresh_net_device_dll
 	unsigned short bacnetip_port;
 	int hardware_info;     //bit  0x74 zigbee   bit1 wifi
 	int nprotocol;
+	// Version number of command 65, future replies to command 65 need to increment by 1 when modified, mainly for compatibility with previous reply protocols
 	unsigned char  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
+	// Which port the device belongs to for reply. 1- MainPort 2-ZigbeePort 3-SubPort
 	unsigned char  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
+	// Baud rate used by sub-devices; corresponds to previously defined baud rate sequence numbers
 	unsigned char  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
 };
 
