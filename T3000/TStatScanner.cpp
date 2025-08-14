@@ -37,9 +37,12 @@ int reply_count = 0;
 vector <baudrate_def> m_com_mstp_detect;
 HANDLE hdetect_mstp_thread = NULL;
 
+// Used for serial port multi-threaded simultaneous scanning
 HANDLE * hScanComData = NULL; //用于串口多线程同时扫描
+// Used for serial port multi-threaded simultaneous scanning
 DWORD * nScanThreadID = NULL; //用于串口多线程同时扫描
 
+// Used for network multi-network simultaneous scanning
 HANDLE * hScanTCPData = NULL; //用于网络多网络同时扫描
 DWORD * nScanTCPThreadID = NULL;
 
@@ -317,6 +320,7 @@ BOOL CTStatScanner::ScanNetworkDevice()
 
     m_pScanNCThread = AfxBeginThread(_ScanNCByUDPFunc,this);//lsc
 
+    // This is for scanning TSTAT under NC
     CWinThread * pTempThread= AfxBeginThread(_ScanOldNC, this);//这个是为扫描NC下面的TSTAT
 
     //m_pWaitScanThread = AfxBeginThread(_WaitScanThread, this);
@@ -353,11 +357,13 @@ BOOL CTStatScanner::ScanComDevice()//02
     GetSerialComPortNumber1(m_szComs);
 
 
+    // Set to serial port communication mode
     SetCommunicationType(0);   //设置为串口通信方式
     close_com();
 
     if (m_szComs.size() >= 1)
     {
+        // Create corresponding number of handles
         hScanComData = new HANDLE[(int)m_szComs.size()];	//创建 对应个数的Handle;
         nScanThreadID = new DWORD[(int)m_szComs.size()];
         memset(hScanComData, 0, m_szComs.size() * sizeof(HANDLE));
@@ -372,6 +378,7 @@ BOOL CTStatScanner::ScanComDevice()//02
 //#endif
             this->scan_com_value = i;
             hScanComData[i] = CreateThread(NULL, NULL, ScanComThreadNoCritical, this /*&i*/, NULL, nScanThreadID+i);
+            // This is necessary, otherwise threads will be chaotic
             Sleep(500); //这个是必须的,否则线程会乱;
         }
     }
@@ -399,12 +406,14 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
         }
     }
     list_count = pScan->com_count + ncount;
+    // Judge whether the responding network device can support downward expansion devices. Fandu
     //判断所回复的网络设备 是否能支持向下扩展 设备.Fandu
     if ((m_T3BB_device_data.at(ncount).product_id != PM_MINIPANEL)
         && (m_T3BB_device_data.at(ncount).product_id != PM_MINIPANEL_ARM)
         && (m_T3BB_device_data.at(ncount).product_id != PM_ESP32_T3_SERIES)
         && (m_T3BB_device_data.at(ncount).product_id != PM_CM5))
     {
+        // Clear handles and thread IDs
         //清空 句柄和线程ID；
         hScanTCPData[ncount] = NULL;
         nScanTCPThreadID[ncount] = NULL;
@@ -419,6 +428,7 @@ DWORD WINAPI   CTStatScanner::ScanTCPSubPortThreadNoCritical(LPVOID lpVoid)
     int							m_device_com_port;
     unsigned int				m_parent_serialnum;
 
+    // Start subset scanning
     //开启子集扫描;
     CString strIP;
     int net_port;
@@ -535,8 +545,11 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
     CString tc = strComPort.Mid(3);
 
 
-#if 1  //测试中
+#if 1  // Testing
+//Testing
+//测试中
 
+        // Used for detecting serial port MSTP data
         baudrate_def temp_baudrate_ret[20] = { 0 }; //用于检测串口MSTP数据
         int com_port = _wtoi(tc);
 
@@ -559,6 +572,7 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
         }
 
         BOOL  bret = open_com_nocretical(com_port);
+        // Encountered a problem opening the serial port
         if (bret == 0) //打开串口遇到问题;
         {
             goto endcritical_thread;
@@ -627,6 +641,7 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
     int n = _wtoi(tc);
 
 
+    // Temporarily need to release, disable without testing
     ////暂时要release 出去 没测试先屏蔽
     int contain_mstp = 0;
 
@@ -696,6 +711,7 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
                     //pScan->SetBaudRate(strBaudrate);
                     scan_baudrate = m_scan_info.at(j).scan_baudrate;
 
+                    // Need to note: COM1 76800 cannot open normally
                     //ASSERT(bRet); // 需要注意 COM1 76800 无法正常打开
                     m_scan_info.at(scan_item).scan_status = SCAN_STATUS_RUNNING;
                     pScan->background_binarysearch(n, scan_item, m_scan_info.at(j).scan_baudrate);	//lsc comscan new cold
@@ -713,6 +729,7 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
                     m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FAILED;
                     memset(m_scan_info.at(scan_item).scan_notes, 0, 250);
                     memcpy(m_scan_info.at(scan_item).scan_notes, "Cannot open the COM Port", strlen("Cannot open the COM Port"));
+                    // Cannot open serial port X, prompt message
                     // 不能打开串口X，提示信息
                     TRACE(_T("Cannot open the COM%d\n"), n);
                     CString str;
@@ -726,6 +743,7 @@ DWORD WINAPI   CTStatScanner::ScanComThreadNoCritical(LPVOID lpVoid)
     //g_ScnnedNum = 254;
 endcritical_thread:
     CloseHandle(hScanComData[ncount]);
+    // Clear handles and thread IDs
     //清空 句柄和线程ID；
     hScanComData[ncount] = NULL;
     nScanThreadID[ncount] = NULL;
@@ -1154,7 +1172,8 @@ void CTStatScanner::modbusip_to_modbus485(int nComPort, int nBaudrate, LPCTSTR s
         }
         else
         {
-#if 0  //由杜帆 20180408 屏蔽 扫描子节点的时候 暂时不考虑 下一级 ID冲突的问题;
+#if 0  // Disabled by Du Fan on 20180408. When scanning child nodes, temporarily do not consider the next level ID conflict issue
+//由杜帆 20180408 屏蔽 扫描子节点的时候 暂时不考虑 下一级 ID冲突的问题;
             m_szRepeatedID[devLo] = devLo;
             TRACE(_T("Scan one with same ID = %d\n"), devLo);
             do
@@ -1300,6 +1319,7 @@ void CTStatScanner::modbusip_to_modbus485(int nComPort, int nBaudrate, LPCTSTR s
 
 }
 
+// 2018 03 30 This function still needs to be modified. When multi-threading simultaneous scanning, the baud rate needs to be saved properly
 //2018 03 30 这个函数还需要改造 ，多线程同事扫描时 需要保存好波特率
 int CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo, BYTE devHi, int nItem , int nbaudrate)
 {
@@ -1341,6 +1361,7 @@ int CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE d
 
 
     int a = g_CheckTstatOnline_nocritical(devLo, devHi, bForTStat, nComPort);
+    // BACnet protocol exists on the bus, modbus protocol cannot scan
     if(a ==-6)//总线上存在bacnet协议，modbus协议无法扫描;
     {
         CString temp_cs;
@@ -1403,6 +1424,7 @@ int CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE d
         BOOL bFindSameID=false;
         int nPos=-1;
 //		temp.baudrate=m_baudrate2;
+//      Compatible with Xiao Ye's Pressure
 //      兼容小叶的Pressure
         unsigned short SerialNum[10];
         memset(SerialNum,0,sizeof(SerialNum));
@@ -1436,6 +1458,7 @@ int CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE d
             unsigned int nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;//20120424
             if ((nSerialNumber == 0) || (nSerialNumber == 255 * 255 * 255 * 255))
             {
+                // The following code fixes the issue of TSTAT8 serial number being 0, assigning serial number between 200000-300000
                 //如下代码是 修复TSTAT8的序列号为0 的问题，赋值序列号 200000-300000 之间;
                 Write_One2_nocretical(a, 16, 142, 0, nComPort);
                 Sleep(1000);
@@ -1443,6 +1466,7 @@ int CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE d
                 unsigned int temp_low_value = 0;
                 unsigned int temp_high_value = 0;
                 srand(time(NULL));
+                // Randomly assign serial number
                 temp_serialnumber = rand() % (100000) +200000; //随机分配序列号;
                 temp_low_value = temp_serialnumber % 65536;
                 temp_high_value = temp_serialnumber / 65536;
@@ -1452,6 +1476,7 @@ int CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE d
                 if ((ret_1 >= 0) && (ret_2 >= 0))
                     nSerialNumber = temp_serialnumber;
 
+                // The following code fixes the issue of TSTAT8 hardware version being 0, default hardware version 6
                 //如下代码是 修复TSTAT8的硬件版本为0 的问题，默认硬件版本 6
                 if ((SerialNum[8] == 0) || (SerialNum[8] == 255))
                 {
@@ -1766,12 +1791,14 @@ BOOL CTStatScanner::CheckTheSameSubnet(CString strIP)
     strHostIP.Format(_T("%d.%d.%d.%d"), sa.sin_addr.S_un.S_un_b.s_b1,sa.sin_addr.S_un.S_un_b.s_b2,sa.sin_addr.S_un.S_un_b.s_b3,sa.sin_addr.S_un.S_un_b.s_b4);
     //AfxMessageBox(strIP);
 
+    // Whether they are on the same subnet
     // 是否是同一子网
     if ( ia.S_un.S_un_b.s_b1 == sa.sin_addr.S_un.S_un_b.s_b1 &&
             ia.S_un.S_un_b.s_b2 == sa.sin_addr.S_un.S_un_b.s_b2 &&
             ia.S_un.S_un_b.s_b3 == sa.sin_addr.S_un.S_un_b.s_b3
        )
     {
+        // Same subnet, but cannot connect, then prompt to check device connection
         // 是同一子网，但是连接不上，那么提示检查设备连接
         // 		CString strTip;
         // 		strTip.Format(_T("Can not set up the connection with %s, please check its IP address and net cable. "), strIP);
@@ -1791,14 +1818,19 @@ UINT SCAN_TCP_TO485_THREAD(LPVOID pParam)
 {
     CTStatScanner* pScanner = (CTStatScanner*)pParam;
     int ncount = 0;
+    // Here we need to wait not only for the network thread to finish scanning but also for the serial port thread to finish scanning, the underlying library temporarily does not support simultaneous Modbus communication between serial port and network
     //这里不仅要等 网络线程扫描完 还要等 串口线程 扫描完 ,底层库暂时还不支持 串口和网络的Modbus 同时通讯;
     WaitForSingleObject(pScanner->m_eScanNCEnd->m_hObject, INFINITE);
 
+    // About to release so disable first
     //即将release 所以先屏蔽
 #if 1
+    // Wait for serial port modbus communication scanning to complete
     WaitForSingleObject(pScanner->m_eScanComEnd->m_hObject, INFINITE);  //等待串口 modbus通讯扫描完毕;
+    // Need to release after using this notification because the MSTP thread is also checking whether this signal has been notified
     pScanner->m_eScanComEnd->SetEvent();  // 用完这个通知后要释放 因为MSTP的 那个线程也在判断这个信号 是否有被通知;
     
+    // If exited midway, don't scan secondary sub-interfaces anymore
     //如果中途退出了，就不要在扫描 二级子接口了;
     if (pScanner->m_bStopScan)
     {
@@ -1898,6 +1930,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
             h_siBind.sin_addr.s_addr =  inet_addr(local_network_ip);
             //	h_siBind.sin_port=
             h_siBind.sin_port= htons(57629);
+            // Force bind network card address to Socket
             if( -1 == bind(h_scan_Broad,(SOCKADDR*)&h_siBind,sizeof(h_siBind)))//把网卡地址强行绑定到Socket
             {
                 continue;
@@ -1948,6 +1981,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
             /////////////////////////////////////////////////////////////////////////*/
             int time_out=0;
             BOOL bTimeOut = FALSE;
+            // Timeout end
             while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
             {
                 time_out++;
@@ -2035,6 +2069,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                                 int n = 1;
                                 BOOL bFlag=FALSE;
                                 //////////////////////////////////////////////////////////////////////////
+                                // Detect IP duplication
                                 // 检测IP重复
                                 DWORD dwValidIP = 0;
                                 memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
@@ -2054,6 +2089,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                                 }
                                 //////////////////////////////////////////////////////////////////////////
                                 bFlag = FALSE;
+                                // Don't check if IP is duplicated, because Minipanel can mount TSTAT devices and will also reply for devices below
                                 if (!bFlag)	//不判断 Ip是否重复，因为 Minipanel能挂载TSTAT的设备 会将底下的设备也回复过来;
                                 {
                                     
@@ -2078,6 +2114,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
                             }
                             else
                             {
+                                // 2024 03 20 Fix the issue of scan termination when receiving 0x2f
                                 continue; //2024 03 20 修复当收到0x2f 时 导致的扫描终止的问题;
                             }
                             SHOW_TX_RX
@@ -2187,6 +2224,7 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         (my_temp_point[0] == my_temp_point[3]) &&
         (my_temp_point[0] != 0))
     {
+        // If the parent node information replied has all 4 bytes the same, consider it has the same bug as Airlab, clear the replied parent node to ensure it can be displayed in the Tree
         //如果谁回复的父节点信息 4个字节都相同就认为是和Airlab一样 有Bug ,将回复的父节点清零确保能够在Tree中显示出来;
         my_temp_point[0] = 0;my_temp_point[1] = 0;my_temp_point[2] = 0;my_temp_point[3] = 0;
     }
@@ -2201,6 +2239,7 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	my_temp_point = my_temp_point + 20;
 	temp_data.reg.object_instance_4 = *(my_temp_point++);
 	temp_data.reg.object_instance_3 = *(my_temp_point++);
+	// isp_mode = 0 means in application code, non-0 means in bootload
 	temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
     temp_data.reg.bacnetip_port = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
     my_temp_point = my_temp_point + 2;
@@ -2209,12 +2248,14 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
     if (temp_data.reg.subnet_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
     {
+        // Click scan, temporarily ignore the operation of adding to database when replying BIP to MSTP
         //点击扫描，暂时忽略掉回复的BIP 转MSTP 时的加入数据库的操作;
         //return	 0;
     }
 
 	if(temp_data.reg.isp_mode != 0)
 	{
+		// Record this information, if it appears multiple times in a short period, it's determined to be under bootload, just appearing occasionally once means it's just received at startup
 		//记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
 		return	 0;
 	}
@@ -2222,6 +2263,7 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	CString nip_address;
 	nip_address.Format(_T("%u.%u.%u.%u"),temp_data.reg.ip_address_1,temp_data.reg.ip_address_2,temp_data.reg.ip_address_3,temp_data.reg.ip_address_4);
 	CString nproduct_name = GetProductName(temp_data.reg.product_id);
+	// If the product number is not defined and this product is not recognized, exit
 	if(nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
 	{
 		if (temp_data.reg.product_id<220)
@@ -2593,19 +2635,23 @@ extern HWND scan_wait_dlg;
 void CTStatScanner::SendScanEndMsg()
 {
     //m_pParent->PostMessage(WM_SCANFINISH, 0, 0);
+    // Scan completed, start conflict checking
     // scan完成，开始冲突检查
 
+    // Merge like terms
     // 合并同类项
     //if (!m_isChecksubnet)
     {
         m_saving_data = true;
         CombineScanResult();
+        // Get the currently selected buildingname
         GetBuildingName();	// 获得当前选择的buildingname
         GetAllNodeFromDataBase();
         FindNetConflict();
         ResolveNetConflict();
 
 
+        // Get the currently selected buildingname
         //GetBuildingName();	// 获得当前选择的buildingname
 
         FindComConflict();
@@ -2721,6 +2767,7 @@ void CTStatScanner::ResetRepeatedID()
 }
 
 
+// Open database, then compare conflicts
 // 打开数据库，然后去去比较冲突
 int CTStatScanner::GetAllNodeFromDataBase()
 {
@@ -2777,6 +2824,7 @@ int CTStatScanner::GetAllNodeFromDataBase()
                 }
                 else
                 {
+                    // 1 is modbus ip
                     ((CTStat_Net*)(pNode))->SetProtocol(1);//1为modebus ip
                 }
 
@@ -2856,6 +2904,7 @@ int CTStatScanner::GetAllNodeFromDataBase()
 }
 
 
+// Compare database
 // 对比数据库
 void CTStatScanner::FindComConflict()
 {
@@ -2876,11 +2925,13 @@ void CTStatScanner::FindComConflict()
             int nAddr = m_szComNodes[j]->GetDevID();
             if (nRtID == nSID)
             {
+                // Add buildingname and other private data
                 //加上 buildingname等私货
                 pInfo->m_pDev->SetBuildingName(m_szComNodes[j]->GetBuildingName());
                 pInfo->m_pDev->SetFloorName(m_szComNodes[j]->GetFloorName());
                 pInfo->m_pDev->SetRoomName(m_szComNodes[j]->GetRoomName());
                 pInfo->m_pDev->SetSubnetName(m_szComNodes[j]->GetSubnetName());
+                // Need correction
                 if (nAddr != nRtAddr) // 需要矫正
                 {
                     pInfo->m_bConflict = TRUE;
@@ -2893,6 +2944,7 @@ void CTStatScanner::FindComConflict()
     }
 }
 
+// Resolve conflicts
 // 解决冲突
 void  CTStatScanner::ResolveComConflict()
 { 
@@ -2979,6 +3031,7 @@ void  CTStatScanner::ResolveComConflict()
 }
 
 //////////////////////////////////////////////////////////////////////////
+// If Serial ID is the same but IP is different, consider it a conflict
 // 如果Serial ID相同，而IP不同，视为冲突
 void CTStatScanner::FindNetConflict()
 {
@@ -3002,10 +3055,12 @@ void CTStatScanner::FindNetConflict()
             float db_sw_version = m_szNetNodes[j]->GetSoftwareVersion();
             int db_ip_port = m_szNetNodes[j]->GetIPPort();
             int db_modbus_id = m_szNetNodes[j]->GetDevID();
+            // Add buildingname and other private data
             //加上 buildingname等私货
 
             if (nScanID == nSID)
             {
+                // Need correction
                 if ((dwScanIP != dwIP) ||(hw_version != db_hw_version) || (sw_version != db_sw_version) || (ip_port != db_ip_port) || (modbus_id != db_modbus_id) ) // 需要矫正
                 {
                     pInfo->m_pNet->SetBuildingName(m_szNetNodes[j]->GetBuildingName());
@@ -3061,6 +3116,7 @@ void CTStatScanner::CompareNetToComConflict()
 // 				 dlg.m_StrCom=ComInfor;
 // 				 if (dlg.DoModal()==IDOK)
 // 				 {
+//  					 // Don't add Net
 //  					 if (!dlg.m_Bool_Check_Net)//不添加Net
 //  					 {
                 /*  for (vector<_NetDeviceInfo*>::iterator it=m_szNCScanRet.begin();it!=m_szNCScanRet.end();++it)
@@ -3110,6 +3166,7 @@ void CTStatScanner::CompareNetToComConflict()
 
 
 //////////////////////////////////////////////////////////////////////////
+// If Serial ID is the same but IP is different, then modify the ID in the database
 // 如果Serial ID相同，而IP不同，那么修改数据库中的ID
 void  CTStatScanner::ResolveNetConflict()
 {
@@ -3204,6 +3261,7 @@ void CTStatScanner::AddNewTStatToDB()
     {
         bIsNew = TRUE;
         int nSID = m_szTstatScandRet[i]->m_pDev->GetSerialID();
+        // Delete existing serial number
         //删掉 存在的序列号
         try
         {
@@ -3310,6 +3368,7 @@ void CTStatScanner::AddNewNetToDB()
 		}
 		else
 		{
+			// Insert
 			//插入
 			CString temp_pro4;
 			bool is_bacnet_device = false;
@@ -3408,7 +3467,9 @@ void CTStatScanner::AddNewNetToDB()
 //             }
 //         }
 
+		// Not adding this sentence can solve the problem that the name changes after scanning
 		//不加这句话能解决扫描后 名字会变掉
+		// But adding it will cause that when the DB is empty, obviously the device was scanned, but it takes a long time to rely on background scanning to display
 		//但是加了 会出现 DB是空的时候  明明扫描到了 设备，却要等很长时间 靠后台扫描 才显示出来;
 #if 1
 
@@ -3528,6 +3589,7 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
     
 
     CString strEPSize;
+    // If it's BACnet IP protocol, need to save protocol 3 (BACnet IP) to database
     if(pInfo->m_pNet->GetProtocol()== PROTOCOL_BACNET_IP)//如果是bacnetip 需要往数据库里保存 协议 3 就是bacnetip;
     {
         CString temp_pro = _T("3");
@@ -3536,6 +3598,7 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
     }
     else
     {
+        // Protocol type 1 is Modbus TCP
         CString temp_pro = _T("1");// protocol type 1 is modbus tcp
         strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Custom,Online_Status)					  values('"
                          +m_strBuildingName+"','"+m_strSubNet+"','"+NetwordCard_Address+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"','"+temp_pro+"','0',1)"));
@@ -3720,6 +3783,7 @@ void CTStatScanner::GetBuildingName()
 
 		int bdef=0;
 		bdef=m_q.getIntField("Default_SubBuilding");
+		// Default building
 		if(bdef == 1)//def building;
 		{
 			 
@@ -3802,7 +3866,9 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 {
     m_T3BB_device_data.clear();
 	m_tstat_net_device_data.clear();
+    // If the number of T3 controllers exceeds 2, it's not suitable to scan sub-devices below
     //if (m_refresh_net_device_data.size() > 2) //如果T3 控制器的个数超过2个就不适合 扫描下面的子设备
+    // Don't scan sub-devices below, rely on the main controller to scan on main and sub RS485 by itself
     return 0;  //不在扫描下面的设备，依靠主控器自己在main和sub RS485上扫描;
 	for (int i=0;i<m_refresh_net_device_data.size();i++)
 	{
@@ -3813,6 +3879,7 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 		{
 			continue;
 		}
+        // Used to record which devices need to scan sub-interfaces
         m_T3BB_device_data.push_back(m_refresh_net_device_data.at(i)); //用于记录需要扫描子接口的设备有哪些。
 		controller_counter ++ ;
 	}
@@ -3823,12 +3890,16 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
     }
     NetWork_Sub_Scan_Info();
 
+    // Start multi-threaded scanning of devices mounted under network devices
     //开启多线程扫描网络设备下面的挂载的设备.
+    // Set to serial communication mode
     SetCommunicationType(1);   //设置为串口通信方式
     close_com();
+    // If there are scanned network devices that can be mounted, start scanning
     if (controller_counter >= 1)   //如果有扫到能够挂载的网络设备就开启扫描;
     {
         int nsize = controller_counter;
+        // Create corresponding number of handles
         hScanTCPData = new HANDLE[(int)nsize];	//创建 对应个数的Handle;
         nScanTCPThreadID = new DWORD[(int)nsize];
         memset(hScanTCPData, 0, nsize * sizeof(HANDLE));
@@ -3836,6 +3907,7 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
         for (int i = 0;i<(int)nsize;i++)
         {
             hScanTCPData[i] = CreateThread(NULL, NULL, ScanTCPSubPortThreadNoCritical, this , NULL, nScanTCPThreadID + i);
+            // This is necessary, otherwise threads will be chaotic
             Sleep(100); //这个是必须的,否则线程会乱;
             //::CloseHandle(hScanTCPData[i]);
         }
@@ -3854,6 +3926,7 @@ int CTStatScanner::ScanSubnetFromEthernetDevice()//scan
 
 
 
+// Code adapted from void CMainFrame::binarySearchforview_networkcontroller(BYTE devLo, BYTE devHi)
 // 代码改编自void CMainFrame::binarySearchforview_networkcontroller(BYTE devLo, BYTE devHi)
 UINT _ScanOldNC(LPVOID pParam)
 {
@@ -3882,6 +3955,7 @@ UINT _ScanOldNC(LPVOID pParam)
 }
 
 
+// Code adapted from void CMainFrame::binarySearchforview_networkcontroller(BYTE devLo, BYTE devHi)
 // 代码改编自void CMainFrame::binarySearchforview_networkcontroller(BYTE devLo, BYTE devHi)
 void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 {
@@ -4119,12 +4193,14 @@ void CTStatScanner::ScanAll()
 {
     m_szNCScanRet.clear();	//Clear all the old information ,when we start a new scan;
     GetBuildingName();
+    // Initialize to close auto-detection value, mainly this task is completed in the thread
     Set_Test_Comport_Status(0); //初始化关闭自动检测的值，主要这个事情是在线程中完成的.
 
     Initial_Scan_Info();
 
     b_pause_refresh_tree = SCANALL;
 
+     // Detect serial port data
      ScanDetectComData();//检测串口数据;
 
     ScanComDevice();
@@ -4158,6 +4234,7 @@ DWORD WINAPI  Detect_Mstp_thread(LPVOID lpVoid)
 #if 0
     for (int m = 0; m < pScanner->m_szComs.size(); m++)
     {
+        // Used to detect serial port MSTP data
         baudrate_def temp_baudrate_ret[20] = { 0 }; //用于检测串口MSTP数据
         CString temp_cstring;
         temp_cstring = pScanner->m_szComs.at(m).Right(pScanner->m_szComs.at(m).GetLength() - 3);
@@ -4311,6 +4388,7 @@ void CTStatScanner::CombineScanResult()
 
 
 const int TABLE_NODE_NUM_REG = 7000;
+// One node occupies 20 registers
 const int TABLE_NODE_SIZE = 20;				// 一个node占用20寄存器
 void  CTStatScanner::ReadNCTable(_NetDeviceInfo* pNCInfo)
 {
@@ -4625,6 +4703,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 
     CStringArray temparray;
     SplitCStringA(temparray,strIP,_T("."));
+    // Has 3 dots and 4 segments
     if((temparray.GetSize()==4))	//有3个  . 4段
     {
         CString temp_0;
@@ -4649,11 +4728,13 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
             }
 
         }
+        // Otherwise, judge as domain name
         else	//否则判断为 域名;
         {
             is_domain = true;
         }
     }
+    // Judge as domain name
     else	//判断为 域名;
     {
         is_domain = true;
@@ -4702,6 +4783,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
         //DFTrace(strInfo);
         //pScan->ShowBacnetComScanInfo(strInfo);
 
+        // Break after reaching the returned count
         if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//达到返回的个数后就break;
             break;
         TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
@@ -4794,6 +4876,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
         if(count >= 1)
             find_exsit = true;
 
+        // If no same serial number is found, insert
         if(!find_exsit)//没有发现相同的序列号就插入;
         {
             //changed_items = temp1 -1;
@@ -4890,6 +4973,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
             find_exsit = true;
 
 
+        // If no same serial number is found, insert
         if(!find_exsit)//没有发现相同的序列号就插入;
         {
             CString m_protocol_temp;
@@ -5007,7 +5091,9 @@ DWORD WINAPI   CTStatScanner::_ScanThirdPartyBacnetThread(LPVOID lpVoid)
 
 
 
+// Need to let the serial port Modbus scan finish first, as it will record which serial ports have BACnet protocol
 //需要先让串口的modbus 扫完，那里会记录有哪些串口存在 bacnet的协议.
+// When scanning BACnet, after BACnet IP scanning is completed, need to scan serial port MS/TP in sequence
 //在扫描bacnet的时候 将bacnet ip 扫描完后，要去依次扫描 串口的MS/TP
 //Scan bacnet
 DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
@@ -5027,11 +5113,13 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
         n_count++;
         Sleep(1000);
     }
+   // Wait for serial port Modbus communication scanning to complete
    // WaitForSingleObject(pScan->m_eScanComEnd->m_hObject, INFINITE);  //等待串口 modbus通讯扫描完毕;
    // pScan->m_eScanComEnd->SetEvent();   // 用完这个通知后要释放 因为BACNET 转 modbus 的 那个线程也在判断这个信号 是否有被通知;
     Sleep(2000);
 
 
+    // Clear residual data from previous scan
     m_bac_handle_Iam_data.clear();	//清空上次扫描的遗留数据;
     m_bac_scan_result_data.clear();
     m_temp_result_data.clear();
@@ -5056,6 +5144,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
         }
     }
     //AfxMessageBox(temp_debug);
+    // Release version temporarily ignores BACnet part and does not scan
     //发布版本 先忽略 bacnet 的部分 不扫描 
     if (n_find_mstp == false)
     {
@@ -5093,6 +5182,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
                 break;
             }
         }
+        // Only prompt customer to select if MSTP baud rate and COM port are not found
         if (found_mstp_port == false)  //没有找到MSTP的波特率和com 口 才提示客户 自己选择;
         {
             CT3000Option dlg;
@@ -5110,6 +5200,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
 
     int ret_results;
 
+    // Global scan during scanning, no need to poll so many when connecting
     bac_gloab_panel = 254; //扫描的时候 全局扫描，连接的时候就不用轮询那么多;
 
     bool init_ret = false;
@@ -5121,6 +5212,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
         goto end_mstp_thread;
     }
     TRACE(_T("Now scan with COM%d\r\n"),temp_port);
+    // Wait a few seconds for MSTP token to start running
     Sleep(5000);//等待几秒让MSTP 的token 运行起来.
     int last_poll_node = 0;
     unsigned char mstp_add[255] = { 0 };

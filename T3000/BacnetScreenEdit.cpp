@@ -16,6 +16,7 @@ extern int pointtotext(char *buf,Point_Net *point);
 extern vector <MSG> My_Receive_msg;
 extern CCriticalSection MyCriticalSection;
 Str_label_point m_temp_graphic_label_data[BAC_GRPHIC_LABEL_COUNT];
+// Used to determine if labels are currently being loaded
 int loading_labels;   //用来判断是否正在加载label;
 static int m_bac_select_label_old = -1;
 static bool click_ret_old = false;
@@ -64,6 +65,7 @@ volatile HANDLE GraphicLable_Mutex = NULL;
 #define XStart 0
 //#define YStart 30
 #define YStart 0
+// Used to store how big the window should be
 CRect mynew_rect;	//用来存储 窗体应该有多大;
 HANDLE h_read_standard_thread = NULL;
 HANDLE h_refresh_group_thread = NULL;
@@ -83,6 +85,7 @@ extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_t
 
 
 
+// Used for refreshing group structure
 //用于刷新 group的结构;
 struct _Group_Data
 {
@@ -91,6 +94,7 @@ struct _Group_Data
     groupdata           detail_data;
 }Group_Data;
 
+// Used for refreshing group screen structure
 vector <_Group_Data> m_read_group_data; //用于刷新group screen 的结构;
 
 
@@ -114,6 +118,7 @@ void CBacnetScreenEdit::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetScreenEdit, CDialogEx)
+	// Shortcut key message mapping manually added
 	ON_MESSAGE(WM_HOTKEY,&CBacnetScreenEdit::OnHotKey)//快捷键消息映射手动加入
 	ON_BN_CLICKED(IDC_BUTTON_SCREEN_EDIT_TEST, &CBacnetScreenEdit::OnBnClickedButtonScreenEditTest)
 	ON_WM_PAINT()
@@ -192,6 +197,7 @@ LRESULT  CBacnetScreenEdit::Delete_Label_Handle(WPARAM wParam, LPARAM lParam)
 
 int check_lable_type(char* temp_point, int *temp_panel,unsigned char * temp_point_type, int* temp_number)
 {
+	// Find labels corresponding to other panels
 	//寻找其他panel 对应的 label
 	CString cs_temp_point;
 	MultiByteToWideChar(CP_ACP, 0, (char*)temp_point, (int)strlen((char*)temp_point) + 1,
@@ -296,6 +302,7 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	tempcs = ispoint_ex(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,sub_panel,Station_NUM,&k);
 	if(tempcs == NULL)
 	{
+		// Find labels corresponding to other panels
 		//寻找其他panel 对应的 label
 		bool find_lable = false;
 		find_lable = check_lable_type(temp_point, &temp_panel, &temp_point_type, &temp_number);
@@ -340,10 +347,12 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	}
 
 
+	// Vector starts from 0, here if it's INPUT1 the value is 1, directly subtract 1 for storage
 	if(temp_number != 0)	//Vector 里面是 0开始 , 这里如果是INPUT1  那值为1  直接减一 存起来 用;
 		temp_number = temp_number - 1;
 
     unsigned char temp_1 = temp_point_type & 0x1F;
+    // AND with 0x60 which is 01100000 to keep only bits 2-3
     unsigned char type_highest_2bytes = k & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
     temp_1 = temp_1 | type_highest_2bytes;
 
@@ -366,9 +375,11 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
             temp_number = temp_number + 1;
         }
 
+	// Get the window size of the view
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
 
 	int nLeft,nTop;
+	// Save relative X and Y coordinates
 	//nLeft = (insert_point.x * 1000)/mynew_rect.Width();	//保存的是相对X和Y
 	//nTop = (insert_point.y * 1000)/(mynew_rect.Height());
 	if(m_full_screen_mode)

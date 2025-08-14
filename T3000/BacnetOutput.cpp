@@ -20,7 +20,9 @@ CRect Output_rect;
 static int show_output_external =  -1;
 int OUTPUT_LIMITE_ITEM_COUNT = 0;
 #define UPDATE_OUTPUT_ONE_ITEM_TIMER 3
+// Used to immediately refresh other changes in the current column after changing a column;
 int changed_output_item = -1; //// 用于改变某一列后 ，立即刷新 当前列的其他变化;
+// Information of the selected device;
 extern tree_product selected_product_Node; // 选中的设备信息;
 
 

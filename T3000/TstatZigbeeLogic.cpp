@@ -66,6 +66,7 @@ BOOL CTstatZigbeeLogic::OnInitDialog()
 	m_zigbee_logic_list.Support_Keyboard(false);
 	m_zigbee_logic_list.SetWhetherShowBkCol(false);
 
+	// Add the ID of the first clicked tstat to the table first, because its register doesn't contain itself
 	Zigbee_Tstat_Id.push_back(g_tstat_id);	//第一个点击的 tstat 的ID先加到表里面去,因为它的寄存器里面没有它自己的;
 	Zigbee_Show_Tstat_Id.push_back(g_tstat_id);
 
@@ -117,6 +118,7 @@ UINT   CTstatZigbeeLogic::GetZigbeeInfo(LPVOID lpVoid)
 	{
 	return 0;
 	}
+	// Read the NC ID, the NC table also doesn't contain RSSI values between NC and others
 	MODBUS_ID = read_one(255,6,2);	//读到NC 的ID， NC 的表里面也没有NC和其他的 RSSI 的值;
 	if(MODBUS_ID < 0)
 	{
@@ -133,6 +135,7 @@ UINT   CTstatZigbeeLogic::GetZigbeeInfo(LPVOID lpVoid)
 	}
 	else
 		mparent->HandleOneTSTAT(g_tstat_id);
+	// Update List after processing is complete
 	mparent->SendMessage(WM_SHOW_ID_LIST,FRESH_MAIN_LIST,NULL);	//处理完成后更新 List ;
 	if (mparent->m_abort)
 	{
@@ -157,6 +160,7 @@ UINT   CTstatZigbeeLogic::GetZigbeeInfo(LPVOID lpVoid)
 }
 
 
+// Two threads operating on the same vector simultaneously may cause problems, to be modified later
 //两个线程同时操作一个vector可能会出问题，稍后修改;
 void CTstatZigbeeLogic::HandleOneMinipanel(unsigned char nId)
 {
@@ -209,6 +213,7 @@ void CTstatZigbeeLogic::HandleOneMinipanel(unsigned char nId)
 }
 
 
+// Two threads operating on the same vector simultaneously may cause problems, to be modified later
 //两个线程同时操作一个vector可能会出问题，稍后修改;
 void CTstatZigbeeLogic::HandleOneTSTAT(unsigned char nId)
 {
@@ -475,6 +480,7 @@ void CTstatZigbeeLogic::MainListRefresh()
 //   fg += gStep;
 //   fb += bStep;
 //   COLORREF color = RGB((int)(fr + 0.5),(int)(fg + 0.5),(int)(fb + 0.5));
+//   // color is the reconstructed color
 //   //color 即为重建颜色
 //   }
 //  }

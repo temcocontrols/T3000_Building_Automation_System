@@ -5,9 +5,11 @@ public:
     CBindCallback();
     virtual ~CBindCallback();
 
+    // Accept handle for displaying progress window
     //接受显示进度窗口的句柄
     Dowmloadfile* m_pdlg;
 
+    // IBindStatusCallback methods. All methods except OnProgress return E_NOTIMPL
     //IBindStatusCallback的方法。除了OnProgress     外的其他方法都返回E_NOTIMPL 
 
     STDMETHOD(OnStartBinding)
@@ -29,6 +31,7 @@ public:
         return E_NOTIMPL;
     }
 
+    // OnProgress is here
     //OnProgress在这里
     STDMETHOD(OnProgress)
         (ULONG ulProgress,
@@ -66,6 +69,7 @@ public:
         return E_NOTIMPL;
     }
 
+    // IUnknown methods. IE will not call these methods
     // IUnknown方法.IE 不会调用这些方法的
 
     STDMETHOD_(ULONG, AddRef)()
@@ -86,6 +90,7 @@ public:
     }
 };
 
+// Only need to implement OnProgress method, class implementation:
 //只需实现OnProgress方法，类的实现：
 CBindCallback::CBindCallback()
 {
@@ -97,6 +102,7 @@ CBindCallback::~CBindCallback()
 
 }
 
+// Only need to implement OnProgress member
 //////仅实现OnProgress成员即可
 
 LRESULT CBindCallback::OnProgress(ULONG ulProgress,

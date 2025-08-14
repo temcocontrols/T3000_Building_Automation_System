@@ -124,9 +124,9 @@ BOOL CBacnetEditLabel::OnInitDialog()
 
 	POINT lpPoint;
 	GetCursorPos(&lpPoint);
-	//::GetWindowRect(BacNet_hwd,&userlogin_rect);	//获取 view的窗体大小;
+	//::GetWindowRect(BacNet_hwd,&userlogin_rect);	//Get the size of the view window; 获取 view的窗体大小;
 	CRect temprect;
-	::GetWindowRect(m_screenedit_dlg_hwnd,&temprect);	//获取 view的窗体大小;
+	::GetWindowRect(m_screenedit_dlg_hwnd,&temprect);	//Get the size of the view window; 获取 view的窗体大小;
 	if((lpPoint.x < temprect.left) || (lpPoint.y < temprect.top))
 	{	
 		PostMessage(WM_CLOSE,NULL,NULL);
@@ -859,9 +859,9 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info& temp_info)
 
 	POINT lpPoint;
 	GetCursorPos(&lpPoint);
-	//::GetWindowRect(BacNet_hwd,&userlogin_rect);	//获取 view的窗体大小;
+	//::GetWindowRect(BacNet_hwd,&userlogin_rect);	//Get the size of the view window; 获取 view的窗体大小;
 	CRect temprect;
-	::GetWindowRect(m_screenedit_dlg_hwnd, &temprect);	//获取 view的窗体大小;
+	::GetWindowRect(m_screenedit_dlg_hwnd, &temprect);	//Get the size of the view window; 获取 view的窗体大小;
 	if ((lpPoint.x < temprect.left) || (lpPoint.y < temprect.top))
 	{
 		PostMessage(WM_CLOSE, NULL, NULL);

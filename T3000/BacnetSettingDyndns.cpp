@@ -1,3 +1,4 @@
+// BacnetSettingDyndns.cpp : Implementation file
 // BacnetSettingDyndns.cpp : 实现文件
 //
 
@@ -7,6 +8,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
+// CBacnetSettingDyndns dialog box
 // CBacnetSettingDyndns 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetSettingDyndns, CDialogEx)
@@ -41,6 +43,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingDyndns, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// CBacnetSettingDyndns message handlers
 // CBacnetSettingDyndns 消息处理程序
 
 
@@ -217,6 +220,7 @@ void CBacnetSettingDyndns::OnEnKillfocusEditTimeUpdate()
 
 BOOL CBacnetSettingDyndns::PreTranslateMessage(MSG* pMsg)
 {
+    // TODO: Add specialized code and/or call base class here
     // TODO: 在此添加专用代码和/或调用基类
     if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
     {

@@ -1,3 +1,4 @@
+// BacnetTstatSchedule.cpp : Implementation file
 // BacnetTstatSchedule.cpp : 实现文件
 //
 
@@ -9,7 +10,9 @@
 
 HANDLE h_write_group_thread = NULL;
 HANDLE h_read_group_thread = NULL;
+//Used to store Schedule labels
 CString ScheduleName[BAC_WEEKLYCODE_ROUTINES_COUNT + 1]; //用来存放Schedule的lable
+// CBacnetTstatSchedule dialog box
 // CBacnetTstatSchedule 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetTstatSchedule, CDialogEx)
@@ -40,7 +43,7 @@ BEGIN_MESSAGE_MAP(CBacnetTstatSchedule, CDialogEx)
     ON_NOTIFY(NM_RCLICK, IDC_LIST_BAC_TSTAT_SCHEDULE, &CBacnetTstatSchedule::OnNMRClickListBacTstatSchedule)
 END_MESSAGE_MAP()
 
-
+// CBacnetTstatSchedule message handlers
 // CBacnetTstatSchedule 消息处理程序
 
 
@@ -48,6 +51,7 @@ BOOL CBacnetTstatSchedule::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	// TODO:  Add extra initialization here
 	// TODO:  在此添加额外的初始化
 	Initial_List();
 	Fresh_TSTAT_Schedule_List(NULL, NULL);

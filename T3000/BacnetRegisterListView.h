@@ -7,6 +7,7 @@
 #include "Excel\CWorksheet0.h" 
 #include "Excel\CWorksheets0.h"
 #include "afxcmn.h"
+// CBacnetRegisterListView dialog
 // CBacnetRegisterListView 对话框
 
 class CBacnetRegisterListView : public CDialogEx
@@ -14,19 +15,23 @@ class CBacnetRegisterListView : public CDialogEx
 	DECLARE_DYNAMIC(CBacnetRegisterListView)
 
 public:
+    // Standard constructor
 	CBacnetRegisterListView(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBacnetRegisterListView();
 
+// Dialog data
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_REGISTER_LIST };
 #endif
 
 protected:
+	// DDX/DDV support
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:
+    // Original data value to be modified
     CString cs_clicked_cstring; //要修改的数据原始值;
     virtual BOOL OnInitDialog();
     virtual BOOL PreTranslateMessage(MSG* pMsg);

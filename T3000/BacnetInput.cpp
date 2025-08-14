@@ -14,6 +14,7 @@
 #include "BacnetRange.h"
 #include "MainFrm.h"
 #include "CBacnetUnitsSelection.h"
+// Information of the selected device;
 extern tree_product selected_product_Node; // 选中的设备信息;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
@@ -23,6 +24,7 @@ CRect Input_rect;
 int INPUT_LIMITE_ITEM_COUNT = 0;
 // CBacnetInput dialog
 
+// Used to immediately refresh other changes in the current column after changing a column;
 int changed_input_item = -1; // 用于改变某一列后 ，立即刷新 当前列的其他变化;
 
 IMPLEMENT_DYNAMIC(CBacnetInput, CDialogEx)

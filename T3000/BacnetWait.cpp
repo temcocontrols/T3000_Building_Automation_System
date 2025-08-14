@@ -155,6 +155,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 
 
+	// Here is the data required for reading config
 	if(m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG)	//这里是 读取config 所要的 资料;
 	{
 		int read_config_total_count = BAC_INPUT_GROUP +
@@ -168,6 +169,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 									  BAC_HOLIDAY_GROUP +
 									  BAC_MONITOR_GROUP +
 									  BAC_SCHEDULECODE_GOUP +
+									  // There are many more to add here
 									  BAC_HOLIDAYCODE_GROUP;//这里还有很多要加;
 									  BAC_BASIC_SETTING_GROUP;
 		int read_config_all_step = 1000 / read_config_total_count;
@@ -338,6 +340,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		g_progress_persent = read_config_pos;
 
 	}
+	// Here is for click reading, only need input, output, var, program and time
 	else if(m_wait_type == BAC_WAIT_NORMAL_READ)//这里是点击的时候读，只要INput output var program 和time;
 	{
 		int total_count = BAC_INPUT_GROUP + 
@@ -668,6 +671,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			g_progress_persent = 0;
 			this->ShowWindow(SW_HIDE);
 		}
+		// If it's the first time reading labels in images, read slowly and show progress bar
 		if(bac_read_which_list == BAC_READ_GRAPHIC_LABEL_INFO)	// 如果是第一次 读 图片里面的label,就慢慢读,并且显示 进度条.
 		{
 			g_progress_persent = pos;

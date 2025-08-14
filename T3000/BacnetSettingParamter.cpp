@@ -1,3 +1,4 @@
+// BacnetSettingParamter.cpp : Implementation file
 // BacnetSettingParamter.cpp : 实现文件
 //
 
@@ -7,6 +8,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
+// CBacnetSettingParamter dialog box
 // CBacnetSettingParamter 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetSettingParamter, CDialogEx)
@@ -34,6 +36,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingParamter, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// CBacnetSettingParamter message handlers
 // CBacnetSettingParamter 消息处理程序
 
 
@@ -41,9 +44,11 @@ BOOL CBacnetSettingParamter::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
+    // TODO: Add additional initialization here
     // TODO:  在此添加额外的初始化
     InitialUI();
     return TRUE;  // return TRUE unless you set the focus to a control
+                  // Exception: OCX property pages should return FALSE
                   // 异常: OCX 属性页应返回 FALSE
 }
 
@@ -111,6 +116,7 @@ void CBacnetSettingParamter::InitialUI()
 
 //void CBacnetSettingParamter::OnCbnSelchangeComboType()
 //{
+//    // TODO: Add control notification handler code here
 //    // TODO: 在此添加控件通知处理程序代码
 //    CString temp_string;
 //    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_TYPE))->GetCurSel();
@@ -135,6 +141,7 @@ void CBacnetSettingParamter::InitialUI()
 
 //void CBacnetSettingParamter::OnCbnSelchangeComboNumber()
 //{
+//    // TODO: Add control notification handler code here
 //    // TODO: 在此添加控件通知处理程序代码
 //    CString temp_string;
 //    int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_NUMBER))->GetCurSel();

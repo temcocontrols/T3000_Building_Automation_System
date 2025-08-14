@@ -512,7 +512,9 @@ END_EVENTSINK_MAP()
 void CUserAcessSetDlg::ClickAddbuildingMsflexgrid()
 {
 	long lRow,lCol;
+	// Get the clicked row number
 	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	// Get the clicked column number
 	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 
 	m_nCurRow=lRow;
@@ -523,20 +525,26 @@ void CUserAcessSetDlg::ClickAddbuildingMsflexgrid()
 		return;
 
 	CRect rect;
+	// Get the window rectangle of the table control
 	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	// Convert to client area rectangle
 	ScreenToClient(rect); //转换为客户区矩形	
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	// Calculate the top-left coordinates of the selected cell (in pixels)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	// Calculate the size of the selected cell (in pixels). Adding 1 improves the effect during actual debugging
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	// Form the rectangular area where the selected cell is located
 	//形成选中个所在的矩形区域
 	CRect rcCell(x,y,x+width,y+height);
+	// Convert to coordinates relative to the dialog box
 	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
@@ -688,20 +696,26 @@ void CUserAcessSetDlg::ClickAddbuildingMsflexgrid2()
 	m_nCurCol2=lCol;
 
 	CRect rect;
+	// Get the window rectangle of the table control
 	m_FlexGrid2.GetWindowRect(rect); //获取表格控件的窗口矩形
+	// Convert to client area rectangle
 	ScreenToClient(rect); //转换为客户区矩形	
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	// Calculate the top-left coordinates of the selected cell (in pixels)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid2.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid2.get_ColPos(lCol)/nTwipsPerDotX;
+	// Calculate the size of the selected cell (in pixels). Adding 1 improves the effect during actual debugging
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid2.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid2.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	// Form the rectangular area where the selected cell is located
 	//形成选中个所在的矩形区域
 	CRect rcCell(x,y,x+width,y+height);
+	// Convert to coordinates relative to the dialog box
 	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);

@@ -1,3 +1,4 @@
+// BacnetWeb.cpp : Implementation file
 // BacnetWeb.cpp : 实现文件
 //
 
@@ -7,6 +8,7 @@
 #include "afxdialogex.h"
 
 
+// CBacnetWeb dialog box
 // CBacnetWeb 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetWeb, CDialogEx)
@@ -32,6 +34,7 @@ BEGIN_MESSAGE_MAP(CBacnetWeb, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// CBacnetWeb message handlers
 // CBacnetWeb 消息处理程序
 
 
@@ -39,6 +42,7 @@ BOOL CBacnetWeb::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
+    // TODO: Add additional initialization here
     // TODO:  在此添加额外的初始化
 
     CRect rectClient;

@@ -31,6 +31,7 @@ public:
 	void Reset_RemotePoint_Rect();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	// Flag to mark if already maximized
 	bool window_max; // 标记是否已经最大化;
 };
 

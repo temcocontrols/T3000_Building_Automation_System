@@ -15,6 +15,7 @@
 #include "BacnetProgramDebug.h"
 #include "MainFrm.h"
 bool need_syntax = false;
+// Selected device information
 extern tree_product selected_product_Node; // 选中的设备信息;
 extern CBacnetProgramEdit *ProgramEdit_Window;
 #define  WM_RICHEDIT_RIGHT_CLICK  WM_USER + 1001
@@ -23,9 +24,13 @@ extern void clear_local_var();
 CBacnetProgramDebug * Program_Debug_Window = NULL;
 extern int error;
 extern char *pmes;
+// Controls clicking the refresh button and then updates all data colors
 int refresh_program_text_color = false;  //控制点击刷新按钮后，更新所有的数据颜色;
+// Used for highlighting keywords
 vector <Str_char_pos_color> m_prg_label_error_color;	//用于highlight 关键字用;
+// Used for highlighting keywords
 vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
+// Used to prevent flickering caused by frequent interface updates
 vector <Str_char_pos_color> buffer_prg_char_color; //用于防止频繁更新界面引起的闪烁问题;
 
 CString program_string;

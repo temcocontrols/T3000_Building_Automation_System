@@ -26,13 +26,16 @@ bool show_user_list_window = false;
 CBacnetTstatSchedule *BacnetTstatSchedule_Window = NULL;
 LONG n_tempBias;
 LONG DaylightBias = 0;
-int pc_time_to_basic_delt = 0; //用于时间转换 ，各个时区之间。
+// Used for time conversion between different time zones
+int pc_time_to_basic_delt = 0; //用于时间转换 ，各个时区之间;
 int panel_time_to_basic_delt = 0; 
+// Selected device information
 extern tree_product selected_product_Node; // 选中的设备信息;
 #define TIMER_SYNC_TIMER    1
 #define TIMER_REFRESH_READ    2
 #define TIMER_IP_CHANGED_RECONNECT 3
 #define TIMER_REFRESH_READ_DELAY    15000
+// OK button
 extern int ok_button_press ; //确定按钮
 IMPLEMENT_DYNAMIC(CBacnetSetting, CDialogEx)
 
@@ -342,6 +345,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 		else
 			((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->EnableWindow(1);
 
+		// Hardware version greater than 26 represents ARM version
 		//硬件版本大于 26 代表是arm的版本.
 		if (Device_Basic_Setting.reg.pro_info.harware_rev >= 26)
 		{
@@ -352,6 +356,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1)->EnableWindow(TRUE);
 		}
 
+		// Only versions greater than 38.6 have the ability to change port in settings
 		//版本大于38.6 的才有在setting 里面改port 的功能
 		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 476)
 		{
@@ -412,6 +417,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 497)//497
 		{
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_PARITY_BIT))->EnableWindow(TRUE);
+			// Zigbee port is always fixed
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_PARITY_BIT2))->EnableWindow(false);  //zigbee 口始终固定;
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_PARITY_BIT3))->EnableWindow(TRUE);
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_STOP_BIT))->EnableWindow(TRUE);

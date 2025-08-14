@@ -1,3 +1,4 @@
+// BacnetSettingTcpip.cpp : Implementation file
 // BacnetSettingTcpip.cpp : 实现文件
 //
 
@@ -11,6 +12,7 @@
 #include "ShowMessageDlg.h"
 #include "WifiConfigDlg.h"
 #include "BacnetSettingHealth.h"
+// CBacnetSettingTcpip dialog box
 // CBacnetSettingTcpip 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetSettingTcpip, CDialogEx)
@@ -77,7 +79,9 @@ LRESULT  CBacnetSettingTcpip::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam
     }
     else
     {
+        // Restore values that were not changed correctly
         //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//还原没有改对的值
+        // Call refresh thread here to re-refresh, which is more convenient
         PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
         Show_Results = temp_cs + _T("Fail!");
         SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
