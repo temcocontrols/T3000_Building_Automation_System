@@ -51,17 +51,17 @@ BOOL CBacnetATCommand::OnInitDialog()
 	cf.dwMask|=CFM_BOLD;
 
 	cf.dwEffects&=~CFE_BOLD;
-	//cf.dwEffects|=~CFE_BOLD; //粗体，取消用cf.dwEffects&=~CFE_BOLD;
+	//cf.dwEffects|=~CFE_BOLD; //粗体，取消用cf.dwEffects&=~CFE_BOLD;, To remove bold, use cf.dwEffects &= ~CFE_BOLD;
 	cf.dwMask|=CFM_ITALIC;
 	cf.dwEffects&=~CFE_ITALIC;
-	//cf.dwEffects|=~CFE_ITALIC; //斜体，取消用cf.dwEffects&=~CFE_ITALIC;
+	//cf.dwEffects|=~CFE_ITALIC; //斜体，取消用cf.dwEffects&=~CFE_ITALIC; To remove italic, use cf.dwEffects &= ~CFE_ITALIC;
 	cf.dwMask|=CFM_UNDERLINE;
 	cf.dwEffects&=~CFE_UNDERLINE;
-	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE;
+	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE; To remove underline, use cf.dwEffects &= ~CFE_UNDERLINE;
 	cf.dwMask|=CFM_COLOR;
-	cf.crTextColor = RGB(0,0,255); //设置颜色;
+	cf.crTextColor = RGB(0,0,255); //设置颜色;, Set color
 	cf.dwMask|=CFM_SIZE;
-	cf.yHeight =200; //设置高度;
+	cf.yHeight =200; //设置高度;, Set height
 	cf.dwMask|=CFM_FACE;
 	_tcscpy(cf.szFaceName ,_T("Arial"));
 

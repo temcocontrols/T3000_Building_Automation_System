@@ -1,3 +1,4 @@
+// dllmain.cpp : Defines the entry point for the DLL application.
 // dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "pch.h"
 #include "stdafx.h"
@@ -86,6 +87,7 @@ extern int ipxport, rs485port;
 int my_network = 0;
 char my_panel = 0;
 
+// Save alignment state
 #pragma pack(push) //保存对齐状态 
 #pragma pack(1)
 typedef struct {
@@ -1231,6 +1233,7 @@ int findroutingentry(int port, int network, int& j, int t = 1);
 int localnetwork(int net);
 void  init_info_table(void);
 void Init_table_bank();
+// Restore alignment state
 #pragma pack(pop)//恢复对齐状态 
 #pragma warning(disable:4996)
 
@@ -1501,6 +1504,7 @@ int Encode_Program( char * input_text, encode_str* encode_str )
 			delete local_table;
 
 		*pmes = 0;
+		// 2017-01-17 DuFan fix
 		sntx_err(TOTAL_2000_BREAK);	// 2017 - 01 17  杜帆 fix 
 		goto end_encode;
 	}
@@ -1516,6 +1520,7 @@ int Encode_Program( char * input_text, encode_str* encode_str )
 				delete local_table;
 
 			*pmes = 0;
+			// 2017-01-17 DuFan fix
 			sntx_err(TOTAL_2000_BREAK);	// 2017 - 01 17  杜帆 fix 
 			error = TOTAL_2000_BREAK;
 			goto end_encode;
@@ -1542,6 +1547,7 @@ int Encode_Program( char * input_text, encode_str* encode_str )
 	my_lengthcode = code - mycode;
 	if (my_lengthcode >= 2000)
 	{
+		// 2017-01-17 DuFan fix
 		sntx_err(TOTAL_2000_BREAK);   // 2017 - 01 17  杜帆 fix 
 		error = TOTAL_2000_BREAK;
 		goto end_encode;
@@ -1776,6 +1782,7 @@ int prescan1(void)
 							sntx_err(SYNTAX); get_nl(); break;
 						}
 						get_token();
+						// fandu: mask these two lines due to MB_BWCOIL
 						if (*token != ')')  //fandu  因为 MB_BWCOIL  屏蔽这两行
 						{
 							sntx_err(SYNTAX); get_nl(); break;
@@ -2454,6 +2461,7 @@ int get_token(void)
 	{    /* delimiter*/
 		////if ((strstr(prog, "(")) &&
 		////    (strstr(prog, "(")) &&
+		// Check if contains AV AI
 		////    (//判断包含AV AI
 		////    (strstr(prog, "AV") != NULL) ||
 		////        (strstr(prog, "AI") != NULL) ||
@@ -6163,6 +6171,7 @@ void write_cod(int type, int n_var, int v1, char* var1, float fvar1,
 	}
 	else
 	{
+		// Encoding length exceeds 2000 bytes, return prompt message
 		sntx_err(TOTAL_2000_BREAK); //编码长度超过2000个字节 返回提示信息;
 		error = TOTAL_2000_BREAK;
 		return;
@@ -6285,6 +6294,7 @@ int pcodvar(int cod, int v, char* var, float fvar, char* op, int Byte)
 			if ((vars_table[cur_index].type == POINT_VAR) || (vars_table[cur_index].type == LABEL_VAR))
 			{
 				//if (((unsigned char)vars_table[cur_index].network >= 128) && (( ((unsigned char)vars_table[cur_index].point_type) & 0x1F) != MB_REG)) //network 的最高位用来标识  是否是新的数据格式
+				// The highest bit of network is used to identify whether it's a new data format
 				if ((unsigned char)vars_table[cur_index].network >= 128)  //network 的最高位用来标识  是否是新的数据格式
 				{
 					unsigned char high_3bit;
@@ -6667,6 +6677,7 @@ char* desassembler_program( char * input_code, decode_str* decodestr)
 	int bytes = 0;
 
 	int code_length = ((unsigned char)code[1]) * 256 + (unsigned char)code[0];
+	// If the incoming encoding is invalid or greater than 500, it means it's wrong, clear it directly
 	if ((code_length == 0) || (code_length > 2000)) //如果传过来的是无效的 大于500的编码 就说明是错的 直接清空;
 	{
 		error = 0;
@@ -7223,6 +7234,7 @@ int desvar(void)
 	{
 		long n = 0;
 		n = *((unsigned short*)(code + 1));
+		// DuFan masked - actually only two bytes, I changed it to short
 		//n = *((int *)(code+1));  //杜帆屏蔽  实际只有两个字节  我把它改为 short
 		int t = 0, j, k = 0, l, c, m = 0;//lc,cc;
 
@@ -7230,6 +7242,7 @@ int desvar(void)
 		for (j = 0; j < ind_local_table; )
 		{
 			switch ((unsigned char)local[j])
+				// dufan masked
 				//switch(local[j])  //dufan 屏蔽
 			{
 			case FLOAT_TYPE:
@@ -7274,6 +7287,7 @@ int desvar(void)
 
 
 #if 1
+			// This function is used to save the Local var color change feature
 			//此功能用来保存 Local var  变色的功能。
 			char temp_local_value[40];
 			memset(temp_local_value, 0, 40);
@@ -7375,6 +7389,7 @@ int desvar(void)
 
 				char* temp_p = NULL;
 				temp_p = ispoint_ex(q, &num_point, &var_type, &point_type, &num_panel, &num_net, my_network, sub_panel, temp_point.panel, &k);
+				// If not obtained, consider it a failure
 				if (temp_p == NULL)	//没有获取到，就算失败
 				{
 					return 0;

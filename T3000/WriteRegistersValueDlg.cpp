@@ -67,6 +67,7 @@ void CWriteRegistersValueDlg::OnBnClickedOk()
      unsigned short Data_Buffer[100];
      for(int i=0;i<g_current_Node.Counts_Number;i++){
          Data_Buffer[i]=Get_Data_Unsigned(i);
+         // Use single write to write
          if (m_bool_single) //�õ�дȥд
          {
             int ret = write_one(g_tstat_id,Start_Address+i,Data_Buffer[i]);

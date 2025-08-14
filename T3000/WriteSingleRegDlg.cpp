@@ -62,6 +62,7 @@ BOOL CWriteSingleRegDlg::OnInitDialog()
 	m_valueedit.SetFocus();
 	UpdateData(FALSE);
 	return FALSE;  // return TRUE unless you set the focus to a control
+	// Exception: OCX Property Pages should return FALSE
 	// 异常: OCX 属性页应返回 FALSE
 }
 

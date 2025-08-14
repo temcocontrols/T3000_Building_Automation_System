@@ -16,7 +16,7 @@
 
 // BacnetAnnualRoutine dialog
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
-extern tree_product selected_product_Node; // 选中的设备信息;
+extern tree_product selected_product_Node; // 选中的设备信息;, Selected device information
 IMPLEMENT_DYNAMIC(BacnetAnnualRoutine, CDialogEx)
 
 extern vector <int>  m_Annual_data_instance;
@@ -40,7 +40,7 @@ void BacnetAnnualRoutine::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(BacnetAnnualRoutine, CDialogEx)
 	ON_MESSAGE(MY_RESUME_DATA, AnnualMessageCallBack)
-	ON_MESSAGE(WM_HOTKEY,&BacnetAnnualRoutine::OnHotKey)//快捷键消息映射手动加入;
+	ON_MESSAGE(WM_HOTKEY,&BacnetAnnualRoutine::OnHotKey)//快捷键消息映射手动加入;, Manually added shortcut key message mapping
 	ON_WM_TIMER()
 	ON_WM_CLOSE()
 	ON_NOTIFY(NM_CLICK, IDC_LIST_BAC_ANNULE_LIST, &BacnetAnnualRoutine::OnNMClickListBacAnnuleList)
@@ -73,6 +73,7 @@ LRESULT  BacnetAnnualRoutine::AnnualMessageCallBack(WPARAM wParam, LPARAM lParam
 	}
 	else
 	{
+		// Revert values that were not correctly modified
 		memcpy_s(&m_Annual_data.at(pInvoke->mRow),sizeof(Str_annual_routine_point),&m_temp_annual_data[pInvoke->mRow],sizeof(Str_annual_routine_point));//还原没有改对的值;
 		PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
@@ -81,7 +82,7 @@ LRESULT  BacnetAnnualRoutine::AnnualMessageCallBack(WPARAM wParam, LPARAM lParam
 		//MessageBox(_T("Bacnet operation fail!"));
 	}
 	
-
+	// Restore foreground and background colors
 	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 		m_annualr_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
@@ -114,20 +115,20 @@ BOOL BacnetAnnualRoutine::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 120 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 
 		return 1; 
 	}
-	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
+	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;, Refresh the value immediately upon pressing F2 as requested
 	{
 		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_ANNUAL);
 		return TRUE;
@@ -291,6 +292,7 @@ void BacnetAnnualRoutine::OnNMClickListBacAnnuleList(NMHDR *pNMHDR, LRESULT *pRe
 	if(lCol == ANNUAL_ROUTINE_AUTO_MANUAL)
 	{
 		//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
+		// First save the original value, then compare at the end; if changed, perform the write operation
 		memcpy_s(&m_temp_annual_data[lRow],sizeof(Str_annual_routine_point),&m_Annual_data.at(lRow),sizeof(Str_annual_routine_point));
 
 		if(m_Annual_data.at(lRow).auto_manual == 0)
@@ -335,6 +337,7 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_List(WPARAM wParam,LPARAM lPar
 		if(m_annualr_list.IsDataNewer((char *)&m_Annual_data.at(0),sizeof(Str_annual_routine_point) * BAC_HOLIDAY_COUNT))
 		{
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			// Prevent flickering during list refresh; do not refresh the list if data hasn't changed
 			m_annualr_list.SetListData((char *)&m_Annual_data.at(0),sizeof(Str_annual_routine_point) * BAC_HOLIDAY_COUNT);
 		}
 		else
@@ -421,11 +424,14 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 	CString New_CString =  m_annualr_list.GetItemText(Changed_Item,Changed_SubItem);
 
 	//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
+	// Save the original value first, then compare at the end; if changed, perform the write operation
 	memcpy_s(&m_temp_annual_data[Changed_Item],sizeof(Str_annual_routine_point),&m_Annual_data.at(Changed_Item),sizeof(Str_annual_routine_point));
 
 	if(Changed_SubItem == ANNUAL_ROUTINE_LABLE)
 	{
 		CString cs_temp = m_annualr_list.GetItemText(Changed_Item,Changed_SubItem);
+
+		// Length cannot exceed the length defined by the structure
 		if(cs_temp.GetLength()>= STR_ANNUAL_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
@@ -457,6 +463,8 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 	if(Changed_SubItem == ANNUAL_ROUTINE_FULL_LABEL)
 	{
 		CString cs_temp = m_annualr_list.GetItemText(Changed_Item,Changed_SubItem);
+
+		// Length must not exceed the size defined by the structure
 		if(cs_temp.GetLength()>= STR_ANNUAL_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 20"),_T("Warning"));
@@ -538,8 +546,9 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 
 void BacnetAnnualRoutine::OnTimer(UINT_PTR nIDEvent)
 {
-	 
-	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_ANNUAL))  )	//GSM连接时不要刷新;
+	//GSM连接时不要刷新;
+	// Avoid refreshing during GSM connection
+	if((this->IsWindowVisible()) && (Gsm_communication == false) &&  ((this->m_hWnd  == ::GetActiveWindow()) || (bacnet_view_number == TYPE_ANNUAL))  )
 	{
 	PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -631,14 +640,14 @@ void BacnetAnnualRoutine::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 120 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return;
@@ -652,7 +661,7 @@ void BacnetAnnualRoutine::Reset_Annual_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -660,7 +669,7 @@ void BacnetAnnualRoutine::Reset_Annual_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))

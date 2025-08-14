@@ -8,6 +8,7 @@
 #include "global_function.h"
 #include "MainFrm.h"
 
+// Selected device information
 extern tree_product selected_product_Node; // 选中的设备信息;
 // CBacnetAlarmLog dialog
 
@@ -87,6 +88,7 @@ LRESULT  CBacnetAlarmLog::AlarmLogMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
+		// Revert values that were not correctly modified
 		memcpy_s(&m_alarmlog_data.at(pInvoke->mRow),sizeof(Alarm_point),&m_temp_alarmlog_data[pInvoke->mRow],sizeof(Alarm_point));//还原没有改对的值;
 		PostMessage(WM_REFRESH_BAC_ALARMLOG_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
@@ -95,6 +97,7 @@ LRESULT  CBacnetAlarmLog::AlarmLogMessageCallBack(WPARAM wParam, LPARAM lParam)
 		//MessageBox(_T("Bacnet operation fail!"));
 	}
 
+	// Restore foreground and background colors
 	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 		m_alarmlog_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
@@ -127,14 +130,14 @@ BOOL CBacnetAlarmLog::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return 1; 
@@ -170,7 +173,7 @@ void CBacnetAlarmLog::Initial_List()
 		temp_item.Format(_T("%d"),i+1);
 		m_alarmlog_list.InsertItem(i,temp_item);
 
-
+		// Set background color with alternating white and gray for a less tiring appearance
 		for (int x=0;x<ALARMLOG_COL_NUMBER;x++)//设置背景色，白灰间隔，看起来不那么累;
 		{
 			if((i%2)==0)
@@ -200,6 +203,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 		if(m_alarmlog_list.IsDataNewer((char *)&m_alarmlog_data.at(0),sizeof(Alarm_point) * BAC_ALARMLOG_COUNT))
 		{
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			// Avoid flickering when refreshing the list; skip refresh if data remains unchanged
 			m_alarmlog_list.SetListData((char *)&m_alarmlog_data.at(0),sizeof(Alarm_point) * BAC_ALARMLOG_COUNT);
 		}
 		//else
@@ -232,6 +236,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 
 			time_t tempalarm_time ;
 			tempalarm_time = (unsigned int)m_alarmlog_data.at(i).alarm_time;
+			// Time range: 2015-01-01 to 2035-01-01; data outside this range is invalid
 			if((tempalarm_time < 1420041600)  || (tempalarm_time > 2051193600))	//时间范围 2015-1-1  ->2035-1-1  ，不在此时间的数据无效;
 			{
 				temp_time.Empty();
@@ -314,7 +319,9 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 void CBacnetAlarmLog::OnTimer(UINT_PTR nIDEvent)
 {
 	 
-	if((this->IsWindowVisible()) && (Gsm_communication == false) && ((this->m_hWnd == ::GetActiveWindow()) || (bacnet_view_number == TYPE_ALARMLOG)))	//GSM连接时不要刷新;
+	//GSM连接时不要刷新;
+	// Avoid refreshing during GSM connection
+	if((this->IsWindowVisible()) && (Gsm_communication == false) && ((this->m_hWnd == ::GetActiveWindow()) || (bacnet_view_number == TYPE_ALARMLOG)))
 	{
 		PostMessage(WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
 		if(bac_select_device_online)
@@ -350,7 +357,7 @@ void CBacnetAlarmLog::OnClickListAlarmlog(NMHDR *pNMHDR, LRESULT *pResult)
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
-
+	// If the clicked area exceeds the maximum row number, the click is invalid
 	if(lRow>m_alarmlog_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if(lRow<0)
@@ -363,7 +370,7 @@ void CBacnetAlarmLog::OnClickListAlarmlog(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if(lCol == ALARMLOG_DEL)
 	{
-		if(m_alarmlog_data.at(lRow).ddelete == 1)	//如果已经是delete 了就不在变了;
+		if(m_alarmlog_data.at(lRow).ddelete == 1)	//如果已经是delete 了就不在变了;, If it is already deleted, do not change it further
 			return;
 		CString temp_task_info;
 		CString New_CString;
@@ -468,7 +475,7 @@ void CBacnetAlarmLog::Reset_Alarm_Rect()
 {
 
 	CRect temp_mynew_rect;
-	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 
 	CRect temp_window;
 	GetWindowRect(&temp_window);
@@ -476,7 +483,7 @@ void CBacnetAlarmLog::Reset_Alarm_Rect()
 	if(window_max)
 	{
 		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
@@ -518,14 +525,14 @@ void CBacnetAlarmLog::OnSysCommand(UINT nID, LPARAM lParam)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
 		else
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;, Get the size of the view window
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
 		return;
@@ -537,6 +544,7 @@ void CBacnetAlarmLog::OnSysCommand(UINT nID, LPARAM lParam)
 void CBacnetAlarmLog::OnBnClickedButtonEmailAlarm()
 {
     // TODO: 在此添加控件通知处理程序代码
+	// TODO: Add control notification handler code here
 #ifdef ENABLE_T3_EMAIL
     if (GetPrivateData_Blocking(g_bac_instance, READ_EMAIL_ALARM, 0, 0, sizeof(Str_Email_point)) < 0)
     {

@@ -10,6 +10,7 @@
 
 
 
+// WeeklyRout_InsertDia dialog
 // WeeklyRout_InsertDia 对话框
 #define GRID_ROW_NUMBER 9
 #define GRID_COL_NUMBER 10
@@ -91,9 +92,11 @@ void WeeklyRout_InsertDia::load_grid()
 	unsigned short p[72]={0};
 	memset(p,0,sizeof(p));
 	if (m_strtype.CompareNoCase(_T("LightingController")) == 0)
-		Read_Multi(g_tstat_id,p,WEEKLY_ROUTINE_ON_TIME + WR_TIME_SIZE*(m_addr-1),0x48);//由上到下，由左到右，from up to lower ,from left to right
+		// From top to bottom, from left to right
+		Read_Multi(g_tstat_id,p,WEEKLY_ROUTINE_ON_TIME + WR_TIME_SIZE*(m_addr-1),0x48); // 由上到下，由左到右
 	else
-		Read_Multi(g_tstat_id,p,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*(m_addr-1),0x48);//由上到下，由左到右，from up to lower ,from left to right
+		// From top to bottom, from left to right
+		Read_Multi(g_tstat_id,p,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*(m_addr-1),0x48); // 由上到下，由左到右
 	CString str;
 	int i=0,j=0,k=0;
 	for(i=1;i<GRID_COL_NUMBER;i++)
@@ -118,9 +121,11 @@ void WeeklyRout_InsertDia::load_grid()
 		}
 		
 	if (m_strtype.CompareNoCase(_T("LightingController")) == 0)
-		Read_Multi(g_tstat_id,p,WEEKLY_ROUTINE_OFF_TIME + WR_TIME_SIZE*(m_addr-1),0x48);//由上到下，由左到右，from up to lower ,from left to right
+		// From top to bottom, from left to right
+		Read_Multi(g_tstat_id,p,WEEKLY_ROUTINE_OFF_TIME + WR_TIME_SIZE*(m_addr-1),0x48); // 由上到下，由左到右
 	else
-		Read_Multi(g_tstat_id,p,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*(m_addr-1),0x48);//由上到下，由左到右，from up to lower ,from left to right
+		// From top to bottom, from left to right
+		Read_Multi(g_tstat_id,p,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*(m_addr-1),0x48); // 由上到下，由左到右
 	for(i=1;i<GRID_COL_NUMBER;i++)
 		for(j=1;j<GRID_ROW_NUMBER;j++)
 		{
@@ -174,7 +179,8 @@ void WeeklyRout_InsertDia::write_grid()
 			Write_Multi(g_tstat_id,p,WEEKLY_ROUTINE_ON_TIME + WR_TIME_SIZE*(m_addr-1),0x48);
 		else
 			Write_Multi(g_tstat_id,p,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*(m_addr-1),0x48);
-	k=0;//////////////////////////////////clear
+	// Clear counter for next operation
+	k=0; // clear
 	for(int i=0;i<72;i++)
 	{
 		p[i]=0;
@@ -204,40 +210,58 @@ void WeeklyRout_InsertDia::write_grid()
 void WeeklyRout_InsertDia::on_select()
 {
 	long lRow,lCol;
-	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	// Get the selected row number
+	lRow = m_FlexGrid.get_RowSel(); // 获取点击的行号	
+	// Get the selected column number
+	lCol = m_FlexGrid.get_ColSel(); // 获取点击的列号
 	UpdateData(false);
 	if(lRow==0 || lCol==0)
 		return;
 	CRect rect;
-	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
+	// Get the window rectangle of the grid control
+	m_FlexGrid.GetWindowRect(rect); // 获取表格控件的窗口矩形
+	// Convert to client rectangle
+	ScreenToClient(rect); // 转换为客户区矩形	
+	// The length unit of MSFlexGrid control functions is "twips"
 	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	// Need to convert it to pixels, 1440 twips = 1 inch
 	//需要将其转化为像素，1440缇= 1英寸
 	CDC* pDC =GetDC();
+	// Calculate the conversion ratio between pixels and twips
 	//计算象素点和缇的转换比例
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	// Calculate the top-left coordinates of the selected cell (in pixel units)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	// Calculate the size of the selected cell (in pixel units). Adding 1 gives better visual effect
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	// Form the rectangular area where the selection is located
 	//形成选中个所在的矩形区域
 	CRect rc(x,y,x+width,y+height);
+	// Convert to coordinates relative to the dialog
 	//转换成相对对话框的坐标
 	rc.OffsetRect(rect.left+1,rect.top+1);
+	// Get the text information of the selected cell
 	//获取选中格的文本信息
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
 	row_row=lRow;
 	row_col=lCol;
-	disable_one_day(row_col);//////////////////gray one day
+	// Gray out one day
+	disable_one_day(row_col); // gray one day
 
+	// Show control
 	m_Change.ShowWindow(SW_SHOW); //显示控件
+	// Display text
 	m_Change.SetWindowText(strValue); //显示文本
+	// Get focus
 	m_Change.SetFocus(); //获取焦点
+	// Select all
 	m_Change.SetSel(0,-1); //全选
+	// Move to the position of the selected cell and cover it
 	m_Change.MoveWindow(rc); //移动到选中格的位置，覆盖
 }
 
@@ -254,6 +278,7 @@ BEGIN_MESSAGE_MAP(WeeklyRout_InsertDia, CDialog)
 	ON_BN_CLICKED(IDOK, &WeeklyRout_InsertDia::OnBnClickedOk)
 END_MESSAGE_MAP()
 
+// WeeklyRout_InsertDia message handlers
 // WeeklyRout_InsertDia 消息处理程序
 BOOL WeeklyRout_InsertDia::OnInitDialog()
 {
@@ -266,6 +291,7 @@ BOOL WeeklyRout_InsertDia::OnInitDialog()
 	this->SetWindowText(str);
 	load_grid();
 	return TRUE;  // return TRUE unless you set the focus to a control
+	// Exception: OCX property page should return FALSE
 	// 异常: OCX 属性页应返回 FALSE
 }
 BEGIN_EVENTSINK_MAP(WeeklyRout_InsertDia, CDialog)
@@ -314,7 +340,9 @@ void WeeklyRout_InsertDia::OnEnKillfocusEdit1()
 	
 	UpdateData(true);
 	inspect_input_string(row_row,row_col,m_sChange);///////////////inspect
+	// Set text information
 	m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//设置文本信息
+	// Hide text control
 	m_Change.ShowWindow(SW_HIDE); //隐藏文本控件
 	UpdateData(false);
 }
@@ -354,8 +382,10 @@ BOOL WeeklyRout_InsertDia::DestroyWindow()
 }
 void WeeklyRout_InsertDia::tab_move()
 {
-	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
+	// Get the selected row number
+	long lRow = m_FlexGrid.get_RowSel(); // 获取点击的行号
+	// Get the selected column number
+	long lCol = m_FlexGrid.get_ColSel(); // 获取点击的列号	
 	if(lRow==m_FlexGrid.get_Rows()-1 && lCol==m_FlexGrid.get_Cols()-1)
 	{
 	}
@@ -377,8 +407,10 @@ void WeeklyRout_InsertDia::tab_move()
 
 void WeeklyRout_InsertDia::shift_tab_move()
 {
-	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
+	// Get the selected row number
+	long lRow = m_FlexGrid.get_RowSel(); // 获取点击的行号
+	// Get the selected column number
+	long lCol = m_FlexGrid.get_ColSel(); // 获取点击的列号	
 	if(lRow==1 && lCol==1)
 	{
 	}
@@ -408,8 +440,10 @@ void WeeklyRout_InsertDia::right_move()
 
 void WeeklyRout_InsertDia::up_move()
 {
-	long lRow = m_FlexGrid.get_RowSel();//获取点击的行号
-	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
+	// Get the selected row number
+	long lRow = m_FlexGrid.get_RowSel(); // 获取点击的行号
+	// Get the selected column number
+	long lCol = m_FlexGrid.get_ColSel(); // 获取点击的列号	
 	if (lRow!=1)
 		m_FlexGrid.put_Row(--lRow);
 	GRID_UP_MOVE
@@ -418,8 +452,10 @@ void WeeklyRout_InsertDia::up_move()
 
 void WeeklyRout_InsertDia::down_move()
 {
-	long lRow =m_FlexGrid.get_RowSel();//获取点击的行号	
-	long lCol = m_FlexGrid.get_ColSel(); //获取点击的列号	
+	// Get the selected row number
+	long lRow =m_FlexGrid.get_RowSel(); // 获取点击的行号
+	// Get the selected column number
+	long lCol = m_FlexGrid.get_ColSel(); // 获取点击的列号	
 	if (lRow!=m_FlexGrid.get_Rows()-1)
 		m_FlexGrid.put_Row(++lRow);
 	GRID_DOWN_MOVE

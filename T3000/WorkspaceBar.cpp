@@ -158,7 +158,9 @@ CWorkspaceBar::~CWorkspaceBar()
    	/*
 	Date:2013/05/29
 	Purpose:
+	// parameters 1: According to hierarchy
 	parameters 1：根据层次
+	// 2: Changed name, with old and new comparison
 	2：改变的名字，有新旧比较
    	*/
 BOOL CWorkspaceBar::UpdateDataToDB(){
@@ -193,8 +195,10 @@ BOOL CWorkspaceBar::UpdateDataToDB(){
 					 q.nextRow();
 				 }
 				 
+				 // If the updated name cannot be found in the database
 				 if (!is_exist)	 //更新的名字在数据库中查找不到的
 				 {
+				 ////////////First update Building table/////////////////////
 				 ////////////先更新Building表/////////////////////
 					 //CString strSql;
 					 strSql.Format(_T("delete   from Building_ALL where Building_Name = '%s' "),m_name_old);

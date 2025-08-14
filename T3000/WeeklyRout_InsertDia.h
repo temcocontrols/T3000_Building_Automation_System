@@ -9,8 +9,10 @@ class WeeklyRout_InsertDia : public CDialog
 {
 	DECLARE_DYNAMIC(WeeklyRout_InsertDia)
 public:
+	// Standard constructor
 	WeeklyRout_InsertDia(unsigned char row,CString strtyp = _T(""),CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~WeeklyRout_InsertDia();
+// Dialog data
 // 对话框数据
 	enum { IDD = IDD_WEEKLY_ROUTINES_INSERT_DIA };
 public:
@@ -29,7 +31,7 @@ public:
 	void col_copy_to_col(int base_col,int order_col);
 	void disable_one_day(int day_number);
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持 , DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 public:
