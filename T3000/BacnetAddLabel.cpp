@@ -46,6 +46,7 @@ BOOL CBacnetAddLabel::OnInitDialog()
 	GetCursorPos(&lpPoint);
 	//::GetWindowRect(BacNet_hwd,&userlogin_rect);	//获取 view的窗体大小;
 	CRect temprect;
+	// Get the size of the view window
 	::GetWindowRect(m_screenedit_dlg_hwnd,&temprect);	//获取 view的窗体大小;
 	if(lpPoint.x < temprect.left)
 	{	
@@ -90,6 +91,7 @@ BOOL CBacnetAddLabel::PreTranslateMessage(MSG* pMsg)
 			if(GetFocus()->GetDlgCtrlID() == IDC_EDIT_ADD_LABEL_POINT)
 			{
 				//发送消息给父窗体 现在输入的是什么;
+				// Send a message to the parent window indicating the current input
 				CString temp_point;
 				char * temp_char = new char[200];
 				m_add_label_edit.GetWindowTextW(temp_point);
@@ -121,6 +123,7 @@ void CBacnetAddLabel::FreshWindow()
 	GetCursorPos(&lpPoint);
 	//::GetWindowRect(BacNet_hwd,&userlogin_rect);	//获取 view的窗体大小;
 	CRect temprect;
+	// Get the size of the view window
 	::GetWindowRect(m_screenedit_dlg_hwnd,&temprect);	//获取 view的窗体大小;
 	if((lpPoint.x < temprect.left) || (lpPoint.y < temprect.top))
 	{	

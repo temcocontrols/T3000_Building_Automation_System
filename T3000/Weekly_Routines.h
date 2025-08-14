@@ -11,14 +11,17 @@ class Weekly_Routines : public CDialog
 	DECLARE_DYNAMIC(Weekly_Routines)
 
 public:
+	// Standard constructor
 	Weekly_Routines(CWnd* pParent = NULL,CString strtype = _T(""));   // 标准构造函数
 /*	Weekly_Routines(CWnd* pParent = NULL,CString strtype = _T(""));*/
 	virtual ~Weekly_Routines();
 
+// Dialog data
 // 对话框数据
 	enum { IDD = IDD_WEEKLY_Routines };
 
 protected:
+	// DDX/DDV support
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 public:
 	//add function by manual

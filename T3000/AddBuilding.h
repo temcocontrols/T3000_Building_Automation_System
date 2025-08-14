@@ -104,11 +104,13 @@ public:
 	BOOL m_Changed;
 	//////////////////////////////////////////////////////////////////////////
 	//	Added by zgq; 2010-11-29;
+	//  Merge the functionality of Exit and Save buttons
 	//  把按钮Exit和Save功能合并
 	//
 	void CAddBuilding::SaveAll();
 
 	///////////////////////////////////////////////////////////////////////////
+	// added by zgq; 2010-12-09; Get the serial port numbers on the computer
 	// added by zgq; 2010-12-09; 获得计算机上的串口号
 	//BOOL GetSerialComm(vector<CString>& szComm);
 

@@ -38,6 +38,7 @@ void GetIPMaskGetWayForScan()
     pAdapterInfo = (PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO));
     ulOutBufLen = sizeof(IP_ADAPTER_INFO);
     ALL_LOCAL_SUBNET_NODE  Temp_Node;
+    // First call to GetAdapterInfo to get the ulOutBufLen size
     // 第一次调用GetAdapterInfo获取ulOutBufLen大小
     if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
     {
@@ -139,6 +140,7 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
         h_siBind.sin_addr.s_addr = inet_addr(local_network_ip);
         //	h_siBind.sin_port=
         h_siBind.sin_port = htons(57629);
+        // Forcibly bind the network card address to Socket
         if (-1 == bind(h_scan_Broad, (SOCKADDR*)&h_siBind, sizeof(h_siBind)))//把网卡地址强行绑定到Socket
         {
             continue;
@@ -169,6 +171,7 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
 
         int time_out = 0;
         BOOL bTimeOut = FALSE;
+        // Timeout end
         while (!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
         {
             time_out++;
@@ -230,6 +233,7 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
                             int n = 1;
                             BOOL bFlag = FALSE;
                             //////////////////////////////////////////////////////////////////////////
+                            // Check for duplicate IP
                             // 检测IP重复
                             DWORD dwValidIP = 0;
                             memcpy((BYTE*)&dwValidIP, pSendBuf + n, 4);
@@ -249,6 +253,7 @@ int ScanByUDPFunc(vector<refresh_net_device_dll>& ret_scan_results)
                             }
                             //////////////////////////////////////////////////////////////////////////
                             bFlag = FALSE;
+                            // Don't check if IP is duplicate, because Minipanel can mount TSTAT devices and will also reply back from devices underneath
                             if (!bFlag)	//不判断 Ip是否重复，因为 Minipanel能挂载TSTAT的设备 会将底下的设备也回复过来;
                             {
 
@@ -355,6 +360,7 @@ int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind)
         (my_temp_point[0] == my_temp_point[3]) &&
         (my_temp_point[0] != 0))
     {
+        // If the parent node information replied by someone has the same 4 bytes, it is considered to have a Bug like Airlab, clear the replied parent node to ensure it can be displayed in the Tree
         //如果谁回复的父节点信息 4个字节都相同就认为是和Airlab一样 有Bug ,将回复的父节点清零确保能够在Tree中显示出来;
         my_temp_point[0] = 0; my_temp_point[1] = 0; my_temp_point[2] = 0; my_temp_point[3] = 0;
     }
@@ -369,6 +375,7 @@ int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind)
     my_temp_point = my_temp_point + 20;
     temp_data.reg.object_instance_4 = *(my_temp_point++);
     temp_data.reg.object_instance_3 = *(my_temp_point++);
+    // isp_mode = 0 means in application code, non-0 means in bootload
     temp_data.reg.isp_mode = *(my_temp_point++);	//isp_mode = 0 表示在应用代码 ，非0 表示在bootload.
     temp_data.reg.bacnetip_port = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
     my_temp_point = my_temp_point + 2;
@@ -377,12 +384,14 @@ int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind)
 
     if (temp_data.reg.subnet_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS)
     {
+        // When clicking scan, temporarily ignore the operation of adding to database when replying BIP to MSTP
         //点击扫描，暂时忽略掉回复的BIP 转MSTP 时的加入数据库的操作;
         return	 0;
     }
 
     if (temp_data.reg.isp_mode != 0)
     {
+        // Record this information, if it appears multiple times in a short period, determine it's under bootload, if it only appears occasionally once, it means it was just received during boot
         //记录这个的信息,如果短时间多次出现 就判定在bootload下面，只是偶尔出现一次表示只是恰好开机收到的.
         return	 0;
     }
@@ -390,6 +399,7 @@ int AddNCToList(BYTE* buffer, int nBufLen, sockaddr_in& siBind)
     CString nip_address;
     nip_address.Format(_T("%u.%u.%u.%u"), temp_data.reg.ip_address_1, temp_data.reg.ip_address_2, temp_data.reg.ip_address_3, temp_data.reg.ip_address_4);
     CString nproduct_name = GetProductName(temp_data.reg.product_id);
+    // If the product number is not defined and this product is not recognized, then exit
     if (nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
     {
         if (temp_data.reg.product_id < 220)

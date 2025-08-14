@@ -165,7 +165,9 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 
 #if 1
 	long lRow,lCol;
+	// Get the clicked row number
 	lRow = m_AddBuiding_FlexGrid.get_RowSel();//获取点击的行号	
+	// Get the clicked column number
 	lCol = m_AddBuiding_FlexGrid.get_ColSel(); //获取点击的列号
 
 	if(lRow<=0)
@@ -194,20 +196,26 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 	
 
 	CRect rect;
+	// Get the window rectangle of the grid control
 	m_AddBuiding_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	// Convert to client area rectangle
 	ScreenToClient(rect); //转换为客户区矩形	
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	// Calculate the coordinates of the top-left corner of the selected cell (in pixels)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_AddBuiding_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_AddBuiding_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	// Calculate the size of the selected cell (in pixels). Adding 1 gives better results in practice
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_AddBuiding_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_AddBuiding_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	// Form the rectangle area of the selected cell
 	//形成选中个所在的矩形区域
 	CRect rcCell(x,y,x+width,y+height);
+	// Convert to dialog-relative coordinates
 	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
@@ -244,6 +252,7 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 		m_mainBuildEdt.SetWindowText(strValue);
 		m_mainBuildEdt.SetFocus();
 		int nLenth=strValue.GetLength();
+		// Select all
 		m_mainBuildEdt.SetSel(0,nLenth); //全选//
 	}
 	if(AB_NAME==lCol||AB_IPADDRESS==lCol||AB_IPPORT==lCol)
@@ -254,6 +263,7 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 		m_AddBuiding_SetEditCtrl.SetWindowText(strValue);
 		m_AddBuiding_SetEditCtrl.SetFocus();
 		int nLenth=strValue.GetLength();
+		// Select all
 		m_AddBuiding_SetEditCtrl.SetSel(0,nLenth); //全选//
 	}
 
@@ -264,9 +274,12 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 		m_AddBuiding_SetComBox.InsertString(0,_T("COM Port"));
 		m_AddBuiding_SetComBox.InsertString(1,_T("IP（VIA NC)"));
 		m_AddBuiding_SetComBox.InsertString(2,_T("IP(Direct)"));
+		// Move to the position of the selected cell
 		m_AddBuiding_SetComBox.MoveWindow(&rcCell,1); //移动到选中格的位置
 		m_AddBuiding_SetComBox.BringWindowToTop();
+		// Show the control
 		m_AddBuiding_SetComBox.ShowWindow(SW_SHOW);//显示控件
+		// Set focus
 		m_AddBuiding_SetComBox.SetFocus(); //获取焦点
 	}
 	*/
@@ -276,9 +289,12 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 		m_AddBuiding_SetComBox.InsertString(0,_T("Modbus 485"));
 		m_AddBuiding_SetComBox.InsertString(1,_T("Modbus TCP"));
 		m_AddBuiding_SetComBox.InsertString(2,_T("BacnetIP"));
+		// Move to the position of the selected cell
 		m_AddBuiding_SetComBox.MoveWindow(&rcCell,1); //移动到选中格的位置
 		m_AddBuiding_SetComBox.BringWindowToTop();
+		// Show the control
 		m_AddBuiding_SetComBox.ShowWindow(SW_SHOW);//显示控件
+		// Set focus
 		m_AddBuiding_SetComBox.SetFocus(); //获取焦点
 	}
 	if(AB_COMPORT==lCol)
@@ -288,9 +304,12 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 		{
 			m_AddBuiding_SetComBox.AddString(m_szComm[i]);
 		}
+		// Move to the position of the selected cell
 		m_AddBuiding_SetComBox.MoveWindow(&rcCell,1); //移动到选中格的位置
 		m_AddBuiding_SetComBox.BringWindowToTop();
+		// Show the control
 		m_AddBuiding_SetComBox.ShowWindow(SW_SHOW);//显示控件
+		// Set focus
 		m_AddBuiding_SetComBox.SetFocus(); //获取焦点
 	}
 	if(AB_BAUDRAT==lCol)
@@ -298,9 +317,12 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 		m_AddBuiding_SetComBox.ResetContent();
 		m_AddBuiding_SetComBox.AddString(_T("9600"));
 		m_AddBuiding_SetComBox.AddString(_T("19200"));
+		// Move to the position of the selected cell
 		m_AddBuiding_SetComBox.MoveWindow(&rcCell,1); //移动到选中格的位置
 	//	m_AddBuiding_SetComBox.BringWindowToTop();
+		// Show the control
 		m_AddBuiding_SetComBox.ShowWindow(SW_SHOW);//显示控件
+		// Set focus
 		m_AddBuiding_SetComBox.SetFocus(); //获取焦点
 	}
 #endif
@@ -362,6 +384,7 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 					return;
 				CStringArray temparray;
 				SplitCStringA(temparray,strIP,_T("."));
+				// Has 3 dots, 4 segments (IP address format)
 				if((temparray.GetSize()==4))	//有3个  . 4段
 				{
 					CString temp_0;
@@ -382,11 +405,13 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 						}
 
 					}
+					// Otherwise, considered as domain name
 					else	//否则判断为 域名;
 					{
 						is_domain = true;
 					}
 				}
+				// Considered as domain name
 				else	//判断为 域名;
 				{
 					is_domain = true;
@@ -601,6 +626,8 @@ void CAddBuilding::OnBnClickedOk()
 {
 	
 
+			
+		// Save all settings. Note: For scanning, you often need to deliberately select a COM port, even if the visible one is correct, otherwise it will say the serial port number is wrong
 		SaveAll();//scan，常要特意选择一个COM，即使看到的是正确也要选一下，否则就说串口号不对
 // 		CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 // 		pMain->Treestatus();
@@ -819,7 +846,9 @@ void CAddBuilding::DblClickAddbuildingMsflexgrid()
 {
 	return;
 	long lRow,lCol;
+	// Get the clicked row number
 	lRow = m_AddBuiding_FlexGrid.get_RowSel();	//获取点击的行号	
+	// Get the clicked column number
 	lCol = m_AddBuiding_FlexGrid.get_ColSel();	//获取点击的列号
 
 	if(lRow<=0)
@@ -993,6 +1022,7 @@ UINT _BroadCastScanNCFun(LPVOID pParam)
 				{
 					if(FD_ISSET(fdSocket.fd_array[i], &fdRead))
 					{
+						// (1) Listening socket receives new connection
 						if(fdSocket.fd_array[i] == sListen)		// （1）监听套节字接收到新连接
 						{
 							if(fdSocket.fd_count < FD_SETSIZE)
@@ -1011,6 +1041,7 @@ UINT _BroadCastScanNCFun(LPVOID pParam)
 						{
 							unsigned short buffer[256];
 							int nRecv = ::recv(fdSocket.fd_array[i], (char*)buffer, 256, 0);
+							// (2) Readable
 							if(nRecv > 0)						// （2）可读
 							{			
 								if(buffer[0]==RESPONSE_MSG)
@@ -1067,6 +1098,7 @@ UINT _BroadCastScanNCFun(LPVOID pParam)
 
 }
 
+// UDP broadcast mode to find network devices, not only NC but also others
 // UDP 广播模式查找网络设备，不仅仅是NC，也有其他
 UINT _BroadCastScanNCFunByUDP(LPVOID pParam)
 {
@@ -1093,6 +1125,7 @@ UINT _BroadCastScanNCFunByUDP(LPVOID pParam)
 	BOOL bBroadcast=TRUE;
 	::setsockopt(hBroad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
 	int iMode=1;
+	// Non-blocking setting
 	ioctlsocket(hBroad,FIONBIO, (u_long FAR*) &iMode);//非阻塞设置
 	SOCKADDR_IN bcast;
 	bcast.sin_family=AF_INET;
@@ -1100,6 +1133,7 @@ UINT _BroadCastScanNCFunByUDP(LPVOID pParam)
 	bcast.sin_port=htons(UDP_BROADCAST_PORT);
 	short nmsgType=UPD_BROADCAST_QRY_MSG;
 	::sendto(hBroad,(char*)&nmsgType,sizeof(short),0,(sockaddr*)&bcast,sizeof(bcast));
+	// Receive broadcast
 	// 接收广播
 	SOCKADDR_IN addrRemote;	
 	int nLen = sizeof(addrRemote);
@@ -1263,6 +1297,7 @@ void CAddBuilding::OnBnClickedSavebutton()
 
 //////////////////////////////////////////////////////////////////////////
 //	Added by zgq; 2010-11-29;
+//  Merge the functionality of Exit and Save buttons
 //  把按钮Exit和Save功能合并
 //
 //
