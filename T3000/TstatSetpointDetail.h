@@ -9,7 +9,7 @@ class CTstatSetpointDetail : public CDialogEx
 	DECLARE_DYNAMIC(CTstatSetpointDetail)
 
 public:
-	CTstatSetpointDetail(CWnd* pParent = NULL);   // Standard constructor
+    // Standard constructor
 	CTstatSetpointDetail(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CTstatSetpointDetail();
 
@@ -20,7 +20,7 @@ public:
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	// DDX/DDV support
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
