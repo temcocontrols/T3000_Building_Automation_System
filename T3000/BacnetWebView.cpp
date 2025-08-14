@@ -71,6 +71,7 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_SELECTED_DEVICE_INFO = 12,
 	BIND_DEVICE = 13,
 	SAVE_NEW_LIBRARY_DATA = 14,
+	LOGGING_DATA = 15
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -2376,6 +2377,14 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		CString temp_cs(output.c_str());
 		outmsg = temp_cs;
 		//m_webView->PostWebMessageAsJson(temp_cs);
+	}
+	break;
+	case LOGGING_DATA:
+	{
+		Json::Value tempjson;
+		tempjson["action"] = "LOGGING_DATA_RES";
+		Post_ReadAllTrendlog_Message();
+		//发送消息加载所有panel 的 in out var 数据;
 	}
 	break;
 	default:

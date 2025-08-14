@@ -1170,43 +1170,42 @@ const CString Device_Serial_Port_Status[] =
 	_T("Bacnet Mstp")       // 9  master
 };
 
-
 const CString Variable_Analog_Units_Array[] =
 {
-	_T("Unused"),
-	_T("\u00B0C"),
-	_T("\u00B0F"),
-	_T("Feet per Min"),
-	_T("Pascals"),
-	_T("KPascals"),
-	_T("lbs/sqr.inch"),
-	_T("inches of WC"),
-	_T("Watts"),
-	_T("KWatts"),
-	_T("KWH"),
-	_T("Volts"),
-	_T("KV"),
-	_T("Amps"),//13
-	_T("ma"),
-	_T("CFM"),
-	_T("Seconds"),
-	_T("Minutes"),
-	_T("Hours"),
-	_T("Days"),
-	_T("Time"),
-	_T("Ohms"),
-	_T("%"),
-	_T("%RH"),
-	_T("p/min"),
-	_T("Counts"),
-	_T("%Open"),
-	_T("Kg"),
-	_T("L/Hour"),
-	_T("GPH"),
-	_T("GAL"),
-	_T("CF"),
-	_T("BTU"),
-	_T("CMH"),
+	_T("Unused"),               // 未使用
+	_T("\u00B0C"),              // 摄氏度
+	_T("\u00B0F"),              // 华氏度
+	_T("FPM"),                  // Feet per Min → 简写为FPM（英尺/分钟）
+	_T("Pa"),                   // 帕斯卡
+	_T("KPa"),                  // 千帕
+	_T("PSI"),                  // lbs/sqr.inch → 简写为PSI（磅/平方英寸）
+	_T("inWC"),                 // inches of WC → 简写为inWC（英寸水柱）
+	_T("W"),                    // Watts → 简写为W（瓦特）
+	_T("kW"),                   // KWatts → 简写为kW（千瓦，标准小写k）
+	_T("KWH"),                  // 千瓦时
+	_T("V"),                    // Volts → 简写为V（伏特）
+	_T("KV"),                   // 千伏
+	_T("A"),                    // Amps → 简写为A（安培）
+	_T("ma"),                   // 毫安
+	_T("CFM"),                  // 立方英尺/分钟
+	_T("s"),                    // Seconds → 简写为s（秒）
+	_T("min"),                  // Minutes → 简写为min（分钟）
+	_T("h"),                    // Hours → 简写为h（小时）
+	_T("d"),                    // Days → 简写为d（天）
+	_T("Time"),                 // 时间
+	_T("\u03A9"),               // Ohms → 简写为Ω（欧姆符号）
+	_T("%"),                    // 百分比
+	_T("%RH"),                  // 相对湿度
+	_T("p/min"),                // 次/分钟
+	_T("Counts"),               // 计数
+	_T("%Open"),                // 打开百分比
+	_T("Kg"),                   // 千克
+	_T("L/h"),                  // L/Hour → 简写为L/h（升/小时）
+	_T("GPH"),                  // 加仑/小时
+	_T("GAL"),                  // 加仑
+	_T("CF"),                   // 立方英尺
+	_T("BTU"),                  // 英热单位
+	_T("CMH"),                  // 立方米/小时
 };
 
 

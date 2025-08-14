@@ -1096,6 +1096,18 @@ int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata 
     }
 }
 
+
+int Post_ReadAllTrendlog_Message()
+{
+    //这里要判断在线的panel   ,对在线的panel读取 input output variable. 
+    for (int i = 0; i < g_bacnet_panel_info.size(); i++)
+    {
+
+    }
+    Sleep(1);
+    return 0;
+}
+
 //read  123IN4  ->  panel_id = 123     command_type = READINPUT_T3000     npoint = 3
 int Post_Background_Read_Message_ByPanel(unsigned char panel_id,int command_type,int npoint)
 {
@@ -8884,8 +8896,8 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         int find_in_list = false;
         for (int j = 0; j < g_bacnet_panel_info.size(); j++)
         {
-            //判断主键  panel  以这个为依据更新 其他数据;
-            if (temp_panel.panel_number == g_bacnet_panel_info.at(j).panel_number)
+            //判断主键  nseiral_number  以这个为依据更新 其他数据;
+            if (temp_panel.nseiral_number == g_bacnet_panel_info.at(j).nseiral_number)
             {
                 //更新表格数据;
                 find_in_list = true;
@@ -8893,6 +8905,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
                 g_bacnet_panel_info.at(j).object_instance = temp_panel.object_instance;
                 g_bacnet_panel_info.at(j).online_time = temp_panel.online_time;
                 g_bacnet_panel_info.at(j).nseiral_number = temp_panel.nseiral_number;
+                g_bacnet_panel_info.at(j).panel_number = temp_panel.panel_number;
                 break;
             }
         }
@@ -8902,19 +8915,6 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
             //插入最新得到数据至表格;
             g_bacnet_panel_info.push_back(temp_panel);
         }
-
-        int temp_time_now = time(NULL);
-        vector<_panel_info>::iterator it = g_bacnet_panel_info.begin();
-        for (; it != g_bacnet_panel_info.end();) 
-        {
-            if (temp_time_now - it->online_time > 600) //删除10分钟以前的在线设备;
-            {
-                it = g_bacnet_panel_info.erase(it);
-            }
-            else
-                it++;
-        }
-
 
     }
     
@@ -9350,9 +9350,9 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 
     //////////////////////////////////////////////////////////////////////////
     const DWORD END_FLAG = 0x00000000;
-    TIMEVAL time;
-    time.tv_sec =8;
-    time.tv_usec = 1000;
+    TIMEVAL time2;
+    time2.tv_sec =8;
+    time2.tv_usec = 1000;
 
     fd_set fdSocket;
     BYTE buffer[512] = {0};
@@ -9417,7 +9417,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
             }
             int nLen = sizeof(h_siBind);
             fd_set fdRead = fdSocket;
-            int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
+            int nSelRet = ::select(0, &fdRead, NULL, NULL, &time2);//TRACE("recv nc info == %d\n", nSelRet);
             if (nSelRet == SOCKET_ERROR)
             {
                 int nError = WSAGetLastError();
@@ -9583,7 +9583,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                     FD_SET(h_Broad, &fdSocket);
                     nLen = sizeof(h_siBind);
                     fdRead = fdSocket;
-                    nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
+                    nSelRet = ::select(0, &fdRead, NULL, NULL, &time2);//TRACE("recv nc info == %d\n", nSelRet);
                 }
                 while (nSelRet);
 
@@ -9653,6 +9653,7 @@ END_REFRESH_SCAN:
         }
 
     }
+    int temp_time_now = time(NULL);
 
 
 

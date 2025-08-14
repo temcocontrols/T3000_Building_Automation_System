@@ -195,6 +195,7 @@ BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
 BOOL Post_Refresh_One_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize);
 BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size);
 BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd,CString Task_Info = _T(""),int nRow = 0,int nCol = 0);
+int Post_ReadAllTrendlog_Message();
 int Post_Background_Read_Message_ByPanel(unsigned char panel_id, int command_type, int npoint);
 int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata write_data);
 int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
