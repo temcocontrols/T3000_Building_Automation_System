@@ -17,6 +17,7 @@ static int temp_static_value = 0;
 int old_bac_range_number_choose = 0;
 int initial_dialog = 0;
 bool move_window_to_right = true; 
+// Selected device information
 extern tree_product selected_product_Node; // 选中的设备信息;
 // BacnetRange dialog
 IMPLEMENT_DYNAMIC(BacnetRange, CDialogEx)
@@ -161,6 +162,7 @@ BOOL BacnetRange::OnInitDialog()
 	}
     else
     {
+        // Except PT12, all others default to 3K sensors
         GetDlgItem(IDC_RADIO55)->SetWindowTextW(_T("3K YSI 44005 "));//除了PT12 其他的默认 用3K的传感器
         GetDlgItem(IDC_RADIO56)->SetWindowTextW(_T("3K YSI 44005 "));
         GetDlgItem(IDC_RADIO59)->SetWindowTextW(_T("3K Allerton/ASI"));
@@ -174,6 +176,7 @@ BOOL BacnetRange::OnInitDialog()
 
 void BacnetRange::SetAllRadioButton(int button_index ) // 0  keep     1 enable all  2 disable all
 {
+    // First disable all
     //先DisableAll
     GetDlgItem(IDC_EDIT_RANGE_SELECT)->EnableWindow(1);
     for (int i = IDC_RADIO47;i <= IDC_RADIO53;i++)
@@ -709,6 +712,7 @@ void BacnetRange::Initial_static()
 		GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(false);//input
 		MoveWindow(Temp_Rect.left,Temp_Rect.top, 950,630);
 
+		// Fandu 2021 09 06 All T3 series and extension series do not support 4-20ma current output
 		GetDlgItem(IDC_RADIO53)->EnableWindow(false); //Fandu 2021 09 06 所有的T3系列 以及扩展系列都不支持 4-20ma 电流输出;
 	}
 	else if((bac_ranges_type == INPUT_RANGE_ANALOG_TYPE) || (initial_dialog == 2))

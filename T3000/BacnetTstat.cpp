@@ -77,12 +77,14 @@ LRESULT  CBacnetTstat::TstatsMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
+		//Restore values that were not changed correctly;
 		memcpy_s(&m_Tstat_data.at(pInvoke->mRow),sizeof(Str_TstatInfo_point),&m_temp_tstat_data[pInvoke->mRow],sizeof(Str_TstatInfo_point));//还原没有改对的值;
 		PostMessage(WM_REFRESH_BAC_TSTAT_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 	}
 
+	//Restore foreground and background colors;
 	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 		m_tstat_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
@@ -153,6 +155,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_List(WPARAM wParam,LPARAM lParam)
 	{
 		if(m_tstat_list.IsDataNewer((char *)&m_Tstat_data.at(0),sizeof(Str_TstatInfo_point) * BAC_TSTAT_COUNT))
 		{
+			//Avoid list flickering when refreshing; do not refresh the list when there is no data change;
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
 			m_tstat_list.SetListData((char *)&m_Tstat_data.at(0),sizeof(Str_TstatInfo_point) * BAC_TSTAT_COUNT);
 		}

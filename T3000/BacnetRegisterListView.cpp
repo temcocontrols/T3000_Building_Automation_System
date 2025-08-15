@@ -64,7 +64,9 @@ END_MESSAGE_MAP()
 
 void CBacnetRegisterListView::OnBnClickedListDelete()
 {
+    // Add code to pop up message box
     //添加代码弹出消息框
+    // Delete the row clicked by mouse in m_register_view
     //删除 m_register_view 鼠标点击的这一行
 
     MessageBox(_T("Delete"));
@@ -73,6 +75,7 @@ void CBacnetRegisterListView::OnBnClickedListDelete()
 
 void CBacnetRegisterListView::OnBnClickedListAdd()
 {
+    // Add a new row to m_register_view
     //新增m_register_view 一行
     m_register_view.InsertItem(m_register_view.GetItemCount(), _T(" "));
     //MessageBox(_T("Add"));

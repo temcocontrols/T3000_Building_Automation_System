@@ -1,6 +1,7 @@
 #pragma once
 
 
+// CBacnetEmailAlarm dialog
 // CBacnetEmailAlarm 对话框
 
 class CBacnetEmailAlarm : public CDialogEx
@@ -8,16 +9,17 @@ class CBacnetEmailAlarm : public CDialogEx
 	DECLARE_DYNAMIC(CBacnetEmailAlarm)
 
 public:
-	CBacnetEmailAlarm(CWnd* pParent = NULL);   // 标准构造函数
+	CBacnetEmailAlarm(CWnd* pParent = NULL);   // standard constructor // 标准构造函数
 	virtual ~CBacnetEmailAlarm();
 
+// Dialog Data
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_EMAIL_ALARM };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:

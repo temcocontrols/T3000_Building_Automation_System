@@ -15,6 +15,7 @@
 #include "CBacnetUnitsSelection.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
+// Selected device information
 extern tree_product selected_product_Node; // 选中的设备信息;
 
 
@@ -70,6 +71,7 @@ LRESULT  CBacnetVariable::VariableMessageCallBack(WPARAM wParam, LPARAM lParam)
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		if((pInvoke->mRow < BAC_VARIABLE_ITEM_COUNT) && (pInvoke->mRow >= 0))
 		{
+            // Not Modbus protocol, call the following refresh single item function
             if ((!SPECIAL_BAC_TO_MODBUS) && (Bacnet_Private_Device(selected_product_Node.product_class_id))) //不是转Modbus的协议的 就调用下面的刷新单条.)
             {
                 Post_Refresh_One_Message(g_bac_instance, READVARIABLE_T3000,
@@ -81,11 +83,13 @@ LRESULT  CBacnetVariable::VariableMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
+		// Restore incorrect values
 		memcpy_s(&m_Variable_data.at(pInvoke->mRow),sizeof(Str_variable_point),&m_temp_variable_data[pInvoke->mRow],sizeof(Str_variable_point));//还原没有改对的值
 		PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 	}
+	// Restore foreground and background colors
 	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 		m_variable_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
@@ -213,6 +217,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 	{
 		if (m_variable_list.IsDataNewer((char*)&m_Variable_data.at(0), sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT))
 		{
+			// Avoid list flickering during refresh; don't refresh list when there's no data change
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
 			m_variable_list.SetListData((char*)&m_Variable_data.at(0), sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT);
 		}
@@ -349,6 +354,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
+			// If it's a time value
 			if (m_Variable_data.at(i).range == 20)	//如果是时间;
 			{
 				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
@@ -478,11 +484,13 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == VARIABLE_LABLE)
 	{
 		CString cs_temp = m_variable_list.GetItemText(Changed_Item,Changed_SubItem);
+		// Length cannot exceed structure definition length
 		if(cs_temp.GetLength()>= STR_VARIABLE_LABEL)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 9"),_T("Warning"));
 
 #pragma region note_what_do	
+			// The following actions achieve, after the popup, continue to select the customer input part, Mr. Mao's requirement
 			//如下所做的事 达到 ,在弹窗后 继续选中客户输入的部分 ，毛总的要求;
 			CRect list_rect,win_rect;
 			m_variable_list.GetWindowRect(list_rect);
@@ -527,10 +535,12 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == VARIABLE_FULL_LABLE)
 	{
 		CString cs_temp = m_variable_list.GetItemText(Changed_Item,Changed_SubItem);
+		// Length cannot exceed structure definition length
 		if(cs_temp.GetLength()>= STR_VARIABLE_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 20"),_T("Warning"));
 #pragma region note_what_do	
+			// The following actions achieve, after the popup, continue to select the customer input part, Mr. Mao's requirement
 			//如下所做的事 达到 ,在弹窗后 继续选中客户输入的部分 ，毛总的要求;
 			CRect list_rect,win_rect;
 			m_variable_list.GetWindowRect(list_rect);
@@ -593,6 +603,7 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 			int invoke_id = Bacnet_Write_Properties_Blocking(g_bac_instance, (BACNET_OBJECT_TYPE)ObjectType, m_Variable_data_instance.at(Changed_Item), PROP_OUT_OF_SERVICE, temp_value);
 		}
 	}
+	// Only handle ANALOG values here, DIGITAL values are already handled in Click event
 	if(Changed_SubItem == VARIABLE_VALUE)//这里只用处理 ANALOG 的值就看要了， DIGITAL 的值在Click 事件中处理过了;
 	{
 		CString temp_cs = m_variable_list.GetItemText(Changed_Item,Changed_SubItem);

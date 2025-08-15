@@ -1,3 +1,4 @@
+// BacnetSettingBasicInfo.cpp : Implementation file
 // BacnetSettingBasicInfo.cpp : 实现文件
 //
 
@@ -9,6 +10,7 @@
 #include "BacnetSettingHealth.h"
 #include "BacnetSettingParamter.h"
 #include "MainFrm.h"
+// CBacnetSettingBasicInfo dialog box
 // CBacnetSettingBasicInfo 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetSettingBasicInfo, CDialogEx)
@@ -39,7 +41,9 @@ LRESULT  CBacnetSettingBasicInfo::ResumeMessageCallBack(WPARAM wParam, LPARAM lP
     }
     else
     {
+        // Restore values that were not changed correctly
         //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//还原没有改对的值
+        // Call refresh thread here to re-refresh, which is more convenient
         PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
         Show_Results = temp_cs + _T("Fail!");
         SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
@@ -92,6 +96,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingBasicInfo, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// CBacnetSettingBasicInfo message handlers
 // CBacnetSettingBasicInfo 消息处理程序
 
 void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingObjInstance()
@@ -106,6 +111,7 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingObjInstance()
         temp_warning.Format(_T("Do you really want to change the bacnet object instance to %u ?"), temp_obj_instance);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
+            // Save before writing; restore original value if write fails
             unsigned int old_object_instance = Device_Basic_Setting.reg.object_instance;	//写之前先保存起来；写失败 恢复原值;
             Device_Basic_Setting.reg.object_instance = (unsigned int)temp_obj_instance;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)

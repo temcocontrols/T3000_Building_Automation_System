@@ -8,6 +8,7 @@
 #include "global_function.h"
 #include "global_define.h"
 // CBacnetUserlogin dialog
+//Used to store how big the window should be;
 CRect userlogin_rect;	//用来存储 窗体应该有多大;
 CString bmp_login_path;
 HBITMAP 	hBitmap_login;
@@ -51,6 +52,7 @@ BOOL CBacnetUserlogin::OnInitDialog()
 	m_cxScreen=GetSystemMetrics(SM_CXSCREEN);
 	m_cyScreen=GetSystemMetrics(SM_CYSCREEN);
 	m_user_login_hwnd = this->m_hWnd;
+	//Get the view window size;
 	::GetWindowRect(BacNet_hwd,&userlogin_rect);	//获取 view的窗体大小;
 	MoveWindow(userlogin_rect.left,userlogin_rect.top,userlogin_rect.Width(),userlogin_rect.Height(),1);
 	Invalidate();
@@ -80,6 +82,7 @@ BOOL CBacnetUserlogin::OnInitDialog()
 // CBacnetScreenEdit message handlers
 LRESULT  CBacnetUserlogin::RedrawLoginWindow(WPARAM wParam, LPARAM lParam)
 {
+	//Get the view window size;
 	::GetWindowRect(BacNet_hwd,&userlogin_rect);	//获取 view的窗体大小;
 	MoveWindow(userlogin_rect.left,userlogin_rect.top,userlogin_rect.Width(),userlogin_rect.Height(),1);
 	Invalidate();

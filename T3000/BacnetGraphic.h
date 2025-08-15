@@ -67,9 +67,11 @@ public:
 	void Draw_Graphic(HDC my_hdc);
 	void Create_Line_Point();
 	void SetXaxisTime(unsigned long nstarttime,unsigned long nendtime);
+	//Set only the start time, the end time of x is calculated by m_time_selected;
 	void SetXaxisStartTime(unsigned long nstarttime);//只设置开始时间，x的结束时间由 m_time_selected 去计算;
 	void SetYaxisValue(float nlowvalue,float nhighvalue);
 	void SetXaxisScale(int nxscale);
+	//Set how many scales the X and Y axes have;
 	void SetYaxisScale(int nyscale);//设置X Y轴有几个刻度;
 	void SetAnalogOrignPoint(PointF npoint);
 	void SetDigitalOrignPoint(PointF npoint);
@@ -107,6 +109,7 @@ public:
 	void Get_Input_Unit();
 	void Reset_X_Y_Parameter();
 	int MaxMinRound(int Data,bool UP);
+    //Assign values to the time and scale of the X-axis
     void Initial_Scale_Time();  //给X轴的时间和 刻度 赋值
 	bool re_calc_max_and_min(int y_max,int y_min,int &ret_y_max,int &ret_y_min,int scale=2);
 public:
@@ -132,7 +135,9 @@ public:
     int m_analog_count;
     int m_digital_count;
 protected:
+	//The total current time of the x-axis;
 	int x_axis_total_time ;//x轴 总共 目前的时间;
+	//The total current maximum value minus the minimum value of the y-axis;
 	float y_axis_total_value;//y轴 总共 目前最大值 减最小值;
 BOOL InitDC();
 
@@ -222,17 +227,19 @@ const COLORREF Static_Color[15] =
 };
 
 
+//These 4 parameters are used to set the position and size of the rectangular drawing area;
 const int X_ORIGIN = 200;//这4个参数是设置 矩形绘图区域的位置和大小;
 //const int X_WIDTH  = 1200;
 const int X_WIDTH  = 1000;
 
 const int Y_ORIGIN = 30;
 const int Y_HIGHT = 500;
-
+//The interval between 14 labels;
 const int STATIC_INTERVAL = 200;	//14 个Lable 之间的间隔;
+//The width of each label;
 const int STATIC_LABLE_WIDTH = 140; //每个Lable 的宽度;
 //const int STATIC_LABLE_HIGHT = 25; //高度;
-const int STATIC_LABLE_HIGHT = 36; //高度;
+const int STATIC_LABLE_HIGHT = 36; //高度; Height
 
 
 const int DIGITAL_X_ORIGIN = 200;	//draw the digital graphic in this range;

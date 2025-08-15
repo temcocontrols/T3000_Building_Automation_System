@@ -20,6 +20,7 @@ extern CBacnetScheduleTime* ScheduleEdit_Window;
 extern CBacnetTstatSchedule *BacnetTstatSchedule_Window ;
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern vector <int>  m_Weekly_data_instance;
+// Selected device information
 extern tree_product selected_product_Node; // 选中的设备信息;
 
 CString Hol_Old_Lable[BAC_HOLIDAY_COUNT] =
@@ -53,6 +54,7 @@ void BacnetWeeklyRoutine::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(BacnetWeeklyRoutine, CDialogEx)
 	ON_MESSAGE(MY_RESUME_DATA, WeeklyMessageCallBack)
+	// Hotkey message mapping manually added
 	ON_MESSAGE(WM_HOTKEY,&BacnetWeeklyRoutine::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_REFRESH_BAC_WEEKLY_LIST,Fresh_Weekly_List)
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Weekly_Routine_Item)
@@ -86,6 +88,7 @@ LRESULT  BacnetWeeklyRoutine::WeeklyMessageCallBack(WPARAM wParam, LPARAM lParam
 	}
 	else
 	{
+		// Restore incorrect values
 		memcpy_s(&m_Weekly_data.at(pInvoke->mRow),sizeof(Str_weekly_routine_point),&m_temp_weekly_data[pInvoke->mRow],sizeof(Str_weekly_routine_point));//还原没有改对的值
 		PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
@@ -93,6 +96,7 @@ LRESULT  BacnetWeeklyRoutine::WeeklyMessageCallBack(WPARAM wParam, LPARAM lParam
 
 	}
 
+	// Restore foreground and background colors
 	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 		m_weeklyr_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	else
@@ -126,6 +130,7 @@ BOOL BacnetWeeklyRoutine::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
+			// Get the view window size
 			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
@@ -133,12 +138,14 @@ BOOL BacnetWeeklyRoutine::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
+			// Get the view window size
 			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 60 ,temp_mynew_rect.top + 60,500,700,SWP_SHOWWINDOW);
 		}
 
 		return 1; 
 	}
+	// Old Mao requires pressing F2 to refresh values immediately
 	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
 	{
 		::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_WEEKLY);

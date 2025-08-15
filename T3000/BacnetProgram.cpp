@@ -20,6 +20,7 @@ extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure t
 #include "DialogCM5_BacNet.h"
 extern CDialog_Progess *WaitRead_Data_Dlg;
 #include "MainFrm.h"
+// Information of the selected device;
 extern tree_product selected_product_Node; // 选中的设备信息;
 // CBacnetProgram dialog
 
@@ -45,6 +46,7 @@ void CBacnetProgram::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CBacnetProgram, CDialogEx)
 	ON_MESSAGE(MY_RESUME_DATA, ProgramMessageCallBack)
+	//Shortcut key message mapping manually added
 	ON_MESSAGE(WM_HOTKEY,&CBacnetProgram::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Program_Item)
 	ON_MESSAGE(WM_REFRESH_BAC_PROGRAM_LIST,Fresh_Program_List)

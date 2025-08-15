@@ -52,17 +52,20 @@ CPointItem *pPrevItem = NULL;
 CPointItem	*m_pFirstItem[INPUT_NUMBER];
 
 unsigned int time_interval_point = 0;
+// The length of x defined by the customer;
 unsigned int customer_define_x_time = 3600;	// 客户定义的 x 的 长度; 
 unsigned long customer_start_time = 0;
 unsigned long customer_end_time = 3600;
 bool use_customer_time = false;
 int no_space_auto_close = 0;
+//Used to determine whether it contains digital quantities;
 bool contain_digital = false; //用于判断是否包含数字量;
 bool draw_graphic_finished = false;
 //extern unsigned char read_monitor_sd_ret;
 
 RECT RectPosition[15];
 static bool b_has_create_point = false ;
+//Variable used to control display refresh;
 int start_wait_init = 0;	//用于控制显示刷新的变量;
 extern CBacnetGraphic * GraphicWindow;
 //CRect Static_Num_Rect[15];
@@ -84,6 +87,7 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid);
 DWORD WINAPI RefreshThreadPro(LPVOID lPvoid);
 int point_error_2 = 0;
 PointF      RclickValueTime(0, 0);
+//If the scale or progress bar is changed, exit the previous reading loop and read the new scale;
 extern int ncontinue_read_data ; //如果变更了刻度或进度条，就退出之前正在读的循环,需要读新的刻度;
 
 //#define  MY_COLOR_BACKGRAND SolidBrush(Color(255,192,192,192))
@@ -171,6 +175,7 @@ END_MESSAGE_MAP()
 
 
 // CBacnetGraphic message handlers
+//The time on the far right of the X-axis;
 unsigned long m_time_monitor_now; //X轴最右边的时间;
 unsigned long m_time_left_time;
 
@@ -1602,7 +1607,7 @@ void CBacnetGraphic::OnOK()
 
 	CDialogEx::OnOK();
 }
-
+//Calculate whether the clicked coordinates are in a self-drawn STATIC. If so, set whether to change color and display;
 //计算点击的坐标是否在某个  自己绘制的STATIC 里面 ，如果在里面就设置是否变色 以及 显示;
 void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -2428,7 +2433,7 @@ void CBacnetGraphic::OnTimebase4days()
 }
 
 
-
+//Round up to the nearest whole number
 //向大方向规整
 int CBacnetGraphic::MaxMinRound(int Data,bool UP)
 {

@@ -8,6 +8,7 @@
 	file ext:	h
 	author:		ZGQ
 	
+	// Purpose: Scan all TStat devices connected to the computer, including serial ports and network ports
 	purpose:	扫描连接在计算机上的所有TStat设备，包括串口和网口
 *********************************************************************/
 #include "TStatBase.h"
@@ -21,8 +22,11 @@
 struct _ComDeviceInfo
 {
 	CTStat_Dev*	m_pDev;
+	// Whether there is conflict with other devices, TRUE has, FALSE no
 	BOOL				m_bConflict;		// 是否与其他设备有冲突,TRUE 有，FALSE 无
+	// Temporary ID, during scan process, to enable normal read/write to device
 	int					m_nTempID;      // 临时ID，在scan过程中，为了能正常读写设备
+	// Original ID, ....
 	int					m_nSourceID;		// 原始的ID, ....
 
 	// added for NC table
@@ -65,6 +69,7 @@ struct _ComDeviceInfo
 struct _NetDeviceInfo
 {	
 	CTStat_Net*	m_pNet;
+	// Whether there is conflict with other devices TRUE has, FALSE no
 	BOOL				m_bConflict;		// 是否与其他设备有冲突 TRUE 有，FALSE 无
 	DWORD			m_dwIPDB;			// 
 	DWORD			m_dwIPScan;		// 
@@ -86,26 +91,34 @@ public:
 	CTStatScanner(void);
 	~CTStatScanner(void);
 
-	// 搜索网口设备
+	// Search network port devices
+ 	// 搜索网口设备
  	BOOL ScanNetworkDevice(); 
 
+    // Search serial port devices under network ports
     // 搜索网口下的串口设备
     BOOL ScanTCPtoRS485SubPort();
 
+ 	// Search serial port devices
  	// 搜索串口设备
  	BOOL ScanComDevice();
 
     BOOL ScanDetectComData();
+	// Scan remote devices
 	BOOL ScanRemoteIPDevice(); //扫描 远程设备;
+	// Scan Bacnet MSTP devices
 	BOOL ScanBacnetMSTPDevice();//扫描Bacnet MSTP 设备;
 	BOOL ScanThirdPartyBACnetDevice();
 	void SetComPort(int nCom);
 	BOOL CheckTheSameSubnet(CString strIP);
 public:
+	// Release resources
 	// 释放资源
 	void		Release();
+	// Whether searching serial port devices
 	// 是否正在搜索串口设备
 	BOOL		IsComScanRunning();
+	// Search function
 	// 搜索函数
 	void		background_binarysearch(int nComPort, int nItem,int nbaudrate);
 
@@ -117,13 +130,16 @@ public:
 	// bForTstat = TRUE : scan tstat, = FALSE : scan  MINI Pannel
 	//void		MINI_binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254,int NET_COM=1);
 	void        OneByOneSearchforComDevice(int nComPort, bool bForTStat=FALSE, BYTE devLo=1, BYTE devHi=254);
+	// Validation
 	// 校验
 	BOOL		binary_search_crc(int a);
 
 	BOOL m_thesamesubnet;
+	// Get all serial ports on computer, return number of serial ports
 	// 获得计算机上的所有串口,返回串口数量
 	//int GetAllComPort();
 
+	// Before starting search, set current search type, whether scan com or net
 	// 在开始搜索之前，设置当前的搜索类型，是scan com or net
 	// True = scan com; FALSE = scan net
 	void SetScanType( BOOL bScanCom);
@@ -135,23 +151,29 @@ public:
 
 	void SendScanEndMsg();
 
+	// Open serial port
 	// 打开串口
 	BOOL OpenCom(int nCom);
 
 	BOOL IsRepeatedID(int nID);
 	
 	void ResetRepeatedID();
+	// Get all nodes from database, from All_Nodes table
 	// 从数据库中取出所有的node，从All_Nodes表
 	int GetAllNodeFromDataBase();
+	// Find conflicts
 	// 找到冲突
 	void FindComConflict();
 	void FindNetConflict();
+	// Resolve conflicts
 	// 解决冲突
 	void  ResolveComConflict();
 	void  ResolveNetConflict();
+	// Write newly found tstat to database All_Nodes table
 	// 把新找到的tstat写到数据库All_Nodes表
 	void AddNewTStatToDB();
 	void AddNewNetToDB();
+	// Write one tstat to database All_Nodes table
 	//  把一个tstat写到数据库里 All_Nodes表
 	void WriteOneDevInfoToDB( _ComDeviceInfo* pInfo);
 	void WriteOneNetInfoToDB( _NetDeviceInfo* pInfo);
@@ -169,6 +191,7 @@ public:
 	void ScanOldNC(BYTE devLo, BYTE devHi);
 
 	//////////////////////////////////////////////////////////////////////////
+	// When writing discovered devices to database, give them subnet name field, useful for tree node display
 	// 搜索到的设备	写入数据库时，给他们写上subnet name这一项，在tree node显示时有用
 	
 
@@ -176,6 +199,7 @@ public:
 	void SetSubnetInfo(vector<Building_info>& szSubnets);
 	void SetBaudRate(const CString& strBaudrate);
 	
+	// When minipanel is detected, after ending all serial port network scans, separately scan this type of device to see if there are other connected devices below
 	int ScanSubnetFromEthernetDevice(); //当检测到minipanel 后,在结束所有串口的网络扫描后，单独对此类设备扫描下面是否有连接其他设备;
 
 	void Initial_Scan_Info();
@@ -196,10 +220,12 @@ public:
 
 
 
+	// Read 255, determine if only one Tstat is connected
 	BOOL ReadOneCheckOnline(int nCOMPort); // 读255，确定是否只有一个Tstat连接。
 
 	BOOL IsNetDevice(const CString& strDevType);
     bool m_saving_data;
+    // Record count of com and regular
     int com_count; // 记录com 和常规的个数;
 public:
     bool is_delete_tstat_scanner ;
@@ -223,7 +249,9 @@ public:
 	//CEvent*						m_eScanBacnetMstpEnd;
 	CEvent*						m_eScanThirdPartyBacnetIpEnd;
 
+	// Force end SCAN, stop two search threads when user chooses exit
 	BOOL								m_bStopScan;					// 强制结束SCAN，由用户选择exit时，停止两个搜索线程
+	// Network scan completed
 	BOOL								m_bNetScanFinish;			// 网络scan完成
 	BOOL m_isChecksubnet;
 	BOOL m_bCheckSubnetFinish;
@@ -260,6 +288,7 @@ public:
 	static DWORD WINAPI   _ScanThirdPartyBacnetThread(LPVOID lpVoid);
     unsigned int               scan_com_value;
 protected:
+	// Whether it's Com scan, TRUE = scan com, FALSE = scan net
 	BOOL								m_bComScanRunning;		// 是否是Com scan, TRUE = scan com, FALSE = scan net
 	int									m_ScannedNum;
 
@@ -271,6 +300,7 @@ protected:
 
 
 	//vector<int>						m_szRepeatedID;
+	// Record repeated IDs, index represents current ID, content represents old ID. If repetition occurs, then the index content is not 0
 	int									m_szRepeatedID[255];				// 记录重复ID，下标表示现在的ID，内容表示老ID。如果出现重复，那么该下标内容不为0。
 	//	vector <binary_search_result> m_szNCScanRet;				////background thread search result
 	//	vector <binary_search_result> m_szTstatScandRet;			////background thread search result
@@ -278,6 +308,7 @@ protected:
 	vector<CTStat_Net*>		m_szNetNodes;
 	vector<CTStat_Dev*>		m_szComNodes;
 
+	// Conflict list
 	vector<_NetDeviceInfo*>		m_szNetConfNodes;			// 冲突列表
 	vector<_ComDeviceInfo*>		m_szComConfNodes;
 	

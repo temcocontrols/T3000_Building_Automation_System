@@ -205,7 +205,9 @@ END_EVENTSINK_MAP()
 void CTStatScheduleDlg::ClickMsflexgridWeekend()
 {
 	long lRow,lCol;
+	// Get the clicked row number
 	lRow = m_fgWeekend.get_RowSel();//获取点击的行号	
+	// Get the clicked column number
 	lCol = m_fgWeekend.get_ColSel(); //获取点击的列号
 
 	if(lRow<=0)
@@ -221,7 +223,9 @@ void CTStatScheduleDlg::ClickMsflexgridWeekend()
 void CTStatScheduleDlg::ClickMsflexgridWorking()
 {
 	long lRow,lCol;
+	// Get the clicked row number
 	lRow = m_fgWorkDay.get_RowSel();//获取点击的行号	
+	// Get the clicked column number
 	lCol = m_fgWorkDay.get_ColSel(); //获取点击的列号
 
 	if(lRow<=0)
@@ -247,6 +251,7 @@ void CTStatScheduleDlg::ShowInputEditBox(int iRow, int iCol, BOOL bWorkDay)
 	if (iCol != 0)
 	{
 		m_editInput.SetWindowText(_T(""));
+		// Definitely ID column
 		CRect rc = CalcGridCellRect(iRow, iCol, bWorkDay);  // 肯定ID列
 		m_editInput.MoveWindow(rc, TRUE);
 		m_editInput.SetFocus();
@@ -259,6 +264,7 @@ void CTStatScheduleDlg::ShowInputEditBox(int iRow, int iCol, BOOL bWorkDay)
 	else
 	{
 		//CComboBox* pCom = (CComboBox*)GetDlgItem(IDC_COMBO_PMAM);
+		// Definitely ID column
 		//CRect rc = CalcGridCellRect(iRow, iCol, bWorkDay);  // 肯定ID列
 		//pCom->MoveWindow(rc, TRUE);
 		//pCom->SetFocus();
@@ -274,11 +280,14 @@ CRect CTStatScheduleDlg::CalcGridCellRect(int iRow, int iCol, BOOL bWorkDay)
 {
 	CRect rect;
 	if (bWorkDay)
+			// Get the window rectangle of the table control
 			m_fgWorkDay.GetWindowRect(rect); //获取表格控件的窗口矩形
 	else
+			// Get the window rectangle of the table control
 			m_fgWeekend.GetWindowRect(rect); //获取表格控件的窗口矩形
 
 
+	// Convert to client area rectangle
 	ScreenToClient(rect); //转换为客户区矩形	
 	CDC* pDC = GetDC();
 
@@ -287,25 +296,31 @@ CRect CTStatScheduleDlg::CalcGridCellRect(int iRow, int iCol, BOOL bWorkDay)
 	long x,y,width,height;
 	if (bWorkDay)
 	{
+		// Calculate the top-left coordinates of the selected cell (in pixels)
 		//计算选中格的左上角的坐标(象素为单位)
 		 y = m_fgWorkDay.get_RowPos(iRow)/nTwipsPerDotY;
 		 x = m_fgWorkDay.get_ColPos(iCol)/nTwipsPerDotX;
+		// Calculate the size of the selected cell (in pixels). Adding 1 improves the effect during actual debugging
 		//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 		 width = m_fgWorkDay.get_ColWidth(iCol)/nTwipsPerDotX+1;
 		 height = m_fgWorkDay.get_RowHeight(iRow)/nTwipsPerDotY+1;
 	}
 	else
 	{
+		// Calculate the top-left coordinates of the selected cell (in pixels)
 		//计算选中格的左上角的坐标(象素为单位)
 		y = m_fgWeekend.get_RowPos(iRow)/nTwipsPerDotY;
 		x = m_fgWeekend.get_ColPos(iCol)/nTwipsPerDotX;
+		// Calculate the size of the selected cell (in pixels). Adding 1 improves the effect during actual debugging
 		//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 		width = m_fgWeekend.get_ColWidth(iCol)/nTwipsPerDotX+1;
 		height = m_fgWeekend.get_RowHeight(iRow)/nTwipsPerDotY+1;
 	}
 
+	// Form the rectangular area where the selected cell is located
 	//形成选中个所在的矩形区域
 	CRect rcCell(x,y,x+width,y+height);
+	// Convert to coordinates relative to the dialog box
 	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+2,rect.top+2);	
 	rcCell.InflateRect(-1,-1,-1,-1);
@@ -345,6 +360,7 @@ void CTStatScheduleDlg::OnEnKillfocusEditInput()
 	}
 
 	int nValue = _wtoi(strText);
+	// Validity check
 	// 合法性判断
 	if ((m_szEditPosInWork.cy == 1 && m_bInWorkDay) || (m_szEditPosInWeekend.cy == 1 && !m_bInWorkDay)) // hour
 	{

@@ -53,6 +53,7 @@ public:
 	void Fresh_One_Item(int row);
 	void Reset_Input_Rect();
 	int m_latest_protocol;
+	// Mark whether it has been maximized;
 	bool window_max; // 标记是否已经最大化;
 
 /*

@@ -15,6 +15,7 @@
 #include "BacnetWait.h"
 #include "BADO/BADO.h"
 #include "MainFrm.h"
+// Information of the selected device;
 extern tree_product selected_product_Node; // 选中的设备信息;
 void BitToString(int digtal_or_analog, int nIndex);
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
@@ -32,9 +33,11 @@ extern BacnetWait *WaitDlg;
 HANDLE h_read_monitordata_thread = NULL;
 Str_MISC Device_Misc_Data_Old;
 //unsigned char read_monitor_sd_ret = false;
+//When starting, only read the last 10 packets and save them as temporary data;
 bool read_temp_local_tem_package = true; //开始点的时候只读最后10包并保存为临时数据;
 
 CString ReadPackage;
+//If the scale or progress bar is changed, exit the previous reading loop and read the new scale;
 int ncontinue_read_data = true; //如果变更了刻度或进度条，就退出之前正在读的循环,需要读新的刻度;
 
 IMPLEMENT_DYNAMIC(CBacnetMonitor, CDialogEx)

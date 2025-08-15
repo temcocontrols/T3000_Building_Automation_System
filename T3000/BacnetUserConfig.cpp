@@ -44,11 +44,13 @@ END_MESSAGE_MAP()
 BOOL CBacnetUserConfig::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+	//Initialize with no selection, start selecting from 0;
 	m_slected_item = -1;	//初始化时 没有选择，从0 开始选择	;
 	ok_button_stage = 0;
 	
 	Initial_List();
 	Enable_Window_Stage(HIDE_ALL);
+	//Avoid popping up the configuration dialog when clicking the left list, only popup when clicking the userlist button;
 	show_user_list_window = false;	//避免点击左边list的时候 也弹出 配置对话框，只有在 点userlist 按键时弹出;
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -290,6 +292,7 @@ LRESULT CBacnetUserConfig::Fresh_User_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == USERLIST_NAME)
 	{
 		CString cs_temp = m_user_config_list.GetItemText(Changed_Item,Changed_SubItem);
+		//Length cannot be greater than the structure-defined length;
 		if(cs_temp.GetLength()>= STR_USER_NAME_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not greater than 16"),_T("Warning"));

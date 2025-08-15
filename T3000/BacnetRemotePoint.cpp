@@ -64,6 +64,7 @@ BOOL CBacnetRemotePoint::OnInitDialog()
 	Initial_List();
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_NETWORKPOINT);
 	SetIcon(m_hIcon,TRUE);
+	// F2 key
 	//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2键
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	ShowWindow(FALSE);
@@ -135,6 +136,7 @@ BOOL CBacnetRemotePoint::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
+			// Get the window size of the view
 			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
@@ -142,6 +144,7 @@ BOOL CBacnetRemotePoint::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
+			// Get the window size of the view
 			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 90 ,temp_mynew_rect.top + 70,500,700,SWP_SHOWWINDOW);
 		}
@@ -181,6 +184,7 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
 	{
 		if(m_remote_point_list.IsDataNewer((char *)&m_remote_point_data.at(0),sizeof(Str_remote_point) * BAC_REMOTE_POINT_COUNT))
 		{
+			// Avoid list refresh flickering; do not refresh list when there is no data change
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
 			m_remote_point_list.SetListData((char *)&m_remote_point_data.at(0),sizeof(Str_remote_point) * BAC_REMOTE_POINT_COUNT);
 		}

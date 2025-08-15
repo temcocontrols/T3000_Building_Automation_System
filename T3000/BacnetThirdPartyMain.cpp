@@ -1,3 +1,4 @@
+// BacnetThirdPartyMain.cpp : Implementation file
 // BacnetThirdPartyMain.cpp : 实现文件
 //
 
@@ -31,6 +32,7 @@ BEGIN_MESSAGE_MAP(CBacnetThirdPartyMain, CFormView)
 END_MESSAGE_MAP()
 
 
+// CBacnetThirdPartyMain Diagnostics
 // CBacnetThirdPartyMain 诊断
 
 #ifdef _DEBUG
@@ -97,6 +99,7 @@ void CBacnetThirdPartyMain::Initial_combo()
 }
 
 
+// CBacnetThirdPartyMain Message handlers
 // CBacnetThirdPartyMain 消息处理程序
 
 void CBacnetThirdPartyMain::Fresh()
@@ -118,8 +121,10 @@ void CBacnetThirdPartyMain::Fresh()
 
         char *Buf = new char[len + 1];
 
+        // Null-terminate string for output
         Buf[len+1] = 0;  //0终止字符串，用于输出。
 
+        // Read data: lpBuf is buffer pointer to receive read data, nCount is number of bytes to read from file
         file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBuf是用于接收读取到的数据的Buf指针nCount是从文件读取的字节数
 
         CString temp_cs;
@@ -135,6 +140,7 @@ void CBacnetThirdPartyMain::Fresh()
 
 void CBacnetThirdPartyMain::OnBnClickedButtonThirdOk()
 {
+    // TODO: Add control notification handler code here
     // TODO: 在此添加控件通知处理程序代码
     object_identifier = ((CComboBox *)GetDlgItem(IDC_COMBO_OBJ_TYPE))->GetCurSel();
     CString temp_cs;
