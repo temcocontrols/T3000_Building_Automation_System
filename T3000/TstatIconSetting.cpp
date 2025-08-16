@@ -1,3 +1,4 @@
+// TstatIconSetting.cpp : implementation file
 // TstatIconSetting.cpp : 实现文件
 //
 
@@ -7,6 +8,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
+// CTstatIconSetting dialog
 // CTstatIconSetting 对话框
 
 IMPLEMENT_DYNAMIC(CTstatIconSetting, CDialogEx)
@@ -34,6 +36,7 @@ BEGIN_MESSAGE_MAP(CTstatIconSetting, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// CTstatIconSetting message handlers
 // CTstatIconSetting 消息处理程序
 
 
@@ -41,15 +44,18 @@ BOOL CTstatIconSetting::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
+    // TODO: Add additional initialization here
     // TODO:  在此添加额外的初始化
     Initial_List();
     return TRUE;  // return TRUE unless you set the focus to a control
+                  // Exception: OCX property pages should return FALSE
                   // 异常: OCX 属性页应返回 FALSE
 }
 
 
 BOOL CTstatIconSetting::PreTranslateMessage(MSG* pMsg)
 {
+    // TODO: Add specialized code and/or call base class here
     // TODO: 在此添加专用代码和/或调用基类
 
     return CDialogEx::PreTranslateMessage(pMsg);
@@ -117,6 +123,7 @@ void CTstatIconSetting::Initial_List()
 void CTstatIconSetting::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+    // TODO: Add control notification handler code here
     // TODO: 在此添加控件通知处理程序代码
     DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
     CPoint point(GET_X_LPARAM(dwPos), GET_Y_LPARAM(dwPos));
@@ -147,6 +154,7 @@ void CTstatIconSetting::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CTstatIconSetting::OnBnClickedButtonIconOk()
 {
+    // TODO: Add control notification handler code here
     // TODO: 在此添加控件通知处理程序代码
     unsigned short temp_product_register_value[10];
     memset(temp_product_register_value, 0, 20);

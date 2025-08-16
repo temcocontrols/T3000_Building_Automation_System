@@ -2,6 +2,7 @@
 #include "afxcmn.h"
 #include "CM5/ListCtrlEx.h"
 
+// CBacnetTstatSchedule dialog box
 // CBacnetTstatSchedule 对话框
 
 class CBacnetTstatSchedule : public CDialogEx
@@ -9,9 +10,11 @@ class CBacnetTstatSchedule : public CDialogEx
 	DECLARE_DYNAMIC(CBacnetTstatSchedule)
 
 public:
+	// Standard constructor
 	CBacnetTstatSchedule(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBacnetTstatSchedule();
 
+// Dialog data
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_TSTAT_SCHEDULE };

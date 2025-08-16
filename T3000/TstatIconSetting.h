@@ -2,6 +2,7 @@
 
 #include "CM5/ListCtrlEx.h"
 #include "afxcmn.h"
+// CTstatIconSetting dialog
 // CTstatIconSetting 对话框
 
 class CTstatIconSetting : public CDialogEx
@@ -9,15 +10,18 @@ class CTstatIconSetting : public CDialogEx
 	DECLARE_DYNAMIC(CTstatIconSetting)
 
 public:
+	// Standard constructor
 	CTstatIconSetting(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CTstatIconSetting();
 
+// Dialog data
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_TSTAT_ICON_SETTING };
 #endif
 
 protected:
+	// DDX/DDV support
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()

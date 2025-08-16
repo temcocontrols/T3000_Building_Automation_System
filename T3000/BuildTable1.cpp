@@ -1,3 +1,4 @@
+// BuildTable1.cpp : Implementation file
 // BuildTable1.cpp : 实现文件
 //
 
@@ -130,6 +131,7 @@ BEGIN_MESSAGE_MAP(CBuildTable1, CDialog)
 END_MESSAGE_MAP()
 
 
+// CBuildTable1 message handlers
 // CBuildTable1 消息处理程序
 
 void CBuildTable1::OnBnClickedOk()
@@ -146,6 +148,7 @@ BOOL CBuildTable1::OnInitDialog()
  
 	to_fresh();
 	return TRUE;  // return TRUE unless you set the focus to a control
+	// Exception: OCX property pages should return FALSE
 	// 异常: OCX 属性页应返回 FALSE
 }
 
@@ -372,7 +375,7 @@ void CBuildTable1::to_fresh()
 void CBuildTable1::OnTimer(UINT nIDEvent)
 {
 	
-	to_fresh();//fresh	
+	to_fresh();//refresh UI	
 	CDialog::OnTimer(nIDEvent);
 }
 
@@ -380,7 +383,7 @@ void CBuildTable1::OnDestroy()
 {
 	CDialog::OnDestroy();
 
-	KillTimer(1);//killtimer
+	KillTimer(1);//stop timer
 	
 }
 
@@ -922,7 +925,7 @@ void CBuildTable1::OnEnChangeEdit10()
 void CBuildTable1::OnEnSetfocusEdit10()
 {
     
-    KillTimer(1);//killtimer
+    KillTimer(1);//stop timer
 }
 BOOL CBuildTable1::PreTranslateMessage(MSG* pMsg)
 {
@@ -975,6 +978,7 @@ CString CBuildTable1::GetValueFromRegister(short nValue)
 {
 	CString strTxt;
 	int nNum=0;
+	//is negative number
 	if((nValue & 0x1000)>>15==1)//为负数;
 	{
 		nNum= (0x7fff & nValue);

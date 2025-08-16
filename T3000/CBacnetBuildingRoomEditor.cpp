@@ -1,4 +1,5 @@
-﻿// CBacnetBuildingRoomEditor.cpp: 实现文件
+﻿// CBacnetBuildingRoomEditor.cpp: Implementation file
+// CBacnetBuildingRoomEditor.cpp: 实现文件
 //
 
 #include "stdafx.h"
@@ -7,6 +8,7 @@
 #include "afxdialogex.h"
 
 extern CString cs_bm_ini;
+// CBacnetBuildingRoomEditor dialog
 // CBacnetBuildingRoomEditor 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetBuildingRoomEditor, CDialogEx)
@@ -61,6 +63,7 @@ LRESULT CBacnetBuildingRoomEditor::Fresh_Floor_Item(WPARAM wParam, LPARAM lParam
 	{
 		//int last_index = 0;
 		//last_index = bm_floor.back().xindex + 1;
+		// New item added
 		//新增的项目
 		//vector < RoomInfo> bm_room;
 		FloorInfo temp_floor;
@@ -72,6 +75,7 @@ LRESULT CBacnetBuildingRoomEditor::Fresh_Floor_Item(WPARAM wParam, LPARAM lParam
 	{
 		bm_floor.at(Changed_Item).csName = New_CString;
 	}
+	// Save to local cache
 	//保存至本地缓存;
 	CString temp_total_index;
 	for (int i = 0; i < bm_floor.size(); i++)
@@ -83,6 +87,7 @@ LRESULT CBacnetBuildingRoomEditor::Fresh_Floor_Item(WPARAM wParam, LPARAM lParam
 		temp.Format(_T("%d"), bm_floor.at(i).xindex);
 		temp_total_index = temp_total_index + temp;
 	}
+	// Modify total
 	//WritePrivateProfileStringW(_T("FloorInfo"), _T("FloorIndex"), temp_total_index, cs_bm_ini); //修改总
 	
     
@@ -97,7 +102,9 @@ LRESULT CBacnetBuildingRoomEditor::Fresh_Room_Item(WPARAM wParam, LPARAM lParam)
 	int Changed_SubItem = (int)lParam;
 	return 1;
 }
+// CBacnetBuildingRoomEditor message handlers
 // CBacnetBuildingRoomEditor 消息处理程序
+// For a dialog with multiple Lists, can only send Changed messages by confirming focus
 //对于一个对话框里面有多个List 只能通过确认焦点 来发送Changed 消息;
 LRESULT CBacnetBuildingRoomEditor::Fresh_EditCallBack_Item(WPARAM wParam, LPARAM lParam)
 {
@@ -121,10 +128,12 @@ BOOL CBacnetBuildingRoomEditor::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	// TODO: Add extra initialization here
 	// TODO:  在此添加额外的初始化
 	InitialUI();
 	Initial_List();
 	return TRUE;  // return TRUE unless you set the focus to a control
+	              // Exception: OCX property pages should return FALSE
 				  // 异常: OCX 属性页应返回 FALSE
 }
 
@@ -196,6 +205,7 @@ LRESULT CBacnetBuildingRoomEditor::Fresh_Room_List(WPARAM wParam, LPARAM lParam)
 
 void CBacnetBuildingRoomEditor::OnBnClickedButtonBmFloorAdd()
 {
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	int ncount = m_bm_floor_list.GetItemCount();
 	if (ncount > bm_floor.size())
@@ -211,6 +221,7 @@ void CBacnetBuildingRoomEditor::OnBnClickedButtonBmFloorAdd()
 void CBacnetBuildingRoomEditor::OnNMClickListBmFloor(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	*pResult = 0;
 
@@ -222,6 +233,7 @@ void CBacnetBuildingRoomEditor::OnNMClickListBmFloor(NMHDR* pNMHDR, LRESULT* pRe
 	lvinfo.flags = LVHT_ABOVE;
 	int nItem = m_bm_floor_list.SubItemHitTest(&lvinfo);
 
+	// If click area exceeds maximum row number, the click is invalid
 	if (lvinfo.iItem > m_bm_floor_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if (lvinfo.iItem < 0)
@@ -245,6 +257,7 @@ void CBacnetBuildingRoomEditor::OnNMClickListBmFloor(NMHDR* pNMHDR, LRESULT* pRe
 void CBacnetBuildingRoomEditor::OnNMClickListBmRoom(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	*pResult = 0;
 

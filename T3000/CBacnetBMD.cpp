@@ -5,8 +5,11 @@ CBacnetBMD::CBacnetBMD(void)
 {
 	memset(pchild, 0, 255);
 	m_node_type = 0;
+	// Number of inputs
 	m_input_count    = 0;  //输入的个数;
+	// Number of outputs
 	m_output_count   = 0; //输出的个数;
+	// Number of variables
 	m_variable_count = 0; //变量的个数;
 	pfather = NULL;
 	m_index = 0;
@@ -20,6 +23,7 @@ CBacnetBMD::CBacnetBMD(void)
 
 CBacnetBMD::~CBacnetBMD(void)
 {
+	// Delete child nodes
 	//删除子节点
 	while (m_child_count != 0)
 	{
@@ -31,6 +35,7 @@ CBacnetBMD::~CBacnetBMD(void)
 	if (pfather == NULL)
 		return;
 
+	// Reorder sibling nodes
 	//重新排序 ，兄弟节点;
 	for (int j = m_index; j < pfather->m_child_count; j++)
 	{

@@ -2,6 +2,7 @@
 
 
 
+// CAirFlowSensor form view
 // CAirFlowSensor 窗体视图
 
 class CAirFlowSensor : public CFormView
@@ -9,6 +10,7 @@ class CAirFlowSensor : public CFormView
 	DECLARE_DYNCREATE(CAirFlowSensor)
 
 public:
+	// Protected constructor used by dynamic creation
 	CAirFlowSensor();           // 动态创建所使用的受保护的构造函数
 	virtual ~CAirFlowSensor();
 
@@ -24,6 +26,7 @@ public:
 #endif
 
 protected:
+	// DDX/DDV support
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()

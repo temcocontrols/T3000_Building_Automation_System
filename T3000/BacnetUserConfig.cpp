@@ -332,7 +332,7 @@ void CBacnetUserConfig::OnNMClickUserList(NMHDR *pNMHDR, LRESULT *pResult)
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
-
+	// If the click area exceeds the maximum row number, the click is invalid
 	if(lRow>m_user_config_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if(lRow<0)
@@ -438,6 +438,7 @@ void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 	{
 		bool any_user_valid = false;
 		bool any_user_administrator = false;
+		// Detect if there are valid usernames and passwords inside
 		//检测是否里面存在有效的账号密码;
 		for (int i=0;i<(int)m_user_login_data.size();i++)
 		{
@@ -459,6 +460,7 @@ void CBacnetUserConfig::OnBnClickedCheckUserlistInfo()
 						any_user_administrator = true;
 						break;
 					}
+					// Valid username and password exist in User table
 					any_user_valid = true;	//User表里面 存在可用的 账号密码;
 				}
 			}		
@@ -535,6 +537,7 @@ void CBacnetUserConfig::OnBnClickedButtonUserOk()
 	CString access_string;
 	switch(ok_button_stage)
 	{
+	// Check if the original password is correct
 	case stage_enter_original_password://检查原始密码是否正确;
 		{
 			//m_user_login_data.at(m_slected_item).password

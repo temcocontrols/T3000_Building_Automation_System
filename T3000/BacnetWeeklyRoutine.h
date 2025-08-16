@@ -12,7 +12,7 @@ public:
 	BacnetWeeklyRoutine(CWnd* pParent = NULL);   // standard constructor
 	virtual ~BacnetWeeklyRoutine();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = IDD_DIALOG_BACNET_WEEKLY_ROUTINES };
 
 protected:

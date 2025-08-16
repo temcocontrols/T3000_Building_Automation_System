@@ -713,6 +713,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					{
 						cotinue_waite = true;
 						Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].resend_count ++ ;
+						// If send timeout 10 times, or already sent and still returns fail, show timeout
 						//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
 						if((Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].resend_count>RESEND_COUNT) 
 							|| (Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
@@ -1533,7 +1534,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					goto endthis;
 				}
 				Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].has_resend_yes_or_no ++;
+				// And set the feedback status to unknown
 				Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
+				// Re-record the resent ID number
 				Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 				CString temp_cs_show;

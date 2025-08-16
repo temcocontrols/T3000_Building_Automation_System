@@ -66,12 +66,14 @@
      pdlg->m_StrRev.TrimRight();
      global_message.Format (_T("Bootloader Model Device IP and Name :%s  %s"),pdlg->ISP_Device_IP,pdlg->m_StrProductName);// =   +L""
      ::PostMessage(pdlg->m_hWnd,WM_BOOTMESSAGE,0,0);
+     // Rest for three seconds
      Sleep(20000);//休息三秒钟
      RefreshNetWorkDeviceListByUDPFunc();
      Sleep (5000);
      BOOL FindDevice = FALSE;
      for (int i = 0 ;i < m_refresh_net_device_data.size ();i++)
      {
+          // Found it
           if (m_refresh_net_device_data.at (i).ip_address.CompareNoCase(pdlg->ISP_Device_IP) == 0)  //找到了 
           {
              FindDevice = TRUE;

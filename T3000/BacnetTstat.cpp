@@ -256,6 +256,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	CString temp_task_info;
 	CString New_CString =  m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
 	CString cstemp_value;
+	// Save the original value first, compare when finished to see if there is any change, if changed then perform write operation
 	//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
 	memcpy_s(&m_temp_tstat_data[Changed_Item],sizeof(Str_TstatInfo_point),&m_Tstat_data.at(Changed_Item),sizeof(Str_TstatInfo_point));
 	if((m_Tstat_data.at(Changed_Item).product_model == 255) || (m_Tstat_data.at(Changed_Item).tst_db.id == 0))
@@ -271,6 +272,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
 		int temp_value = (int)(_wtof(cs_temp) * 10);
+		// Length cannot be greater than the structure-defined length
 		if(temp_value >= 65535)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Please input An effective value "),_T("Warning"));
@@ -284,6 +286,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
 		int temp_value = (int)(_wtof(cs_temp) * 10);
+		// Length cannot be greater than the structure-defined length
 		if(temp_value >= 65535)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Please input An effective value "),_T("Warning"));
@@ -297,6 +300,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
 		int temp_value = (int)(_wtof(cs_temp) * 10);
+		// Length cannot be greater than the structure-defined length
 		if(temp_value >= 65535)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Please input An effective value "),_T("Warning"));
@@ -311,6 +315,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
 		int temp_value = (int)(_wtof(cs_temp) * 10);
+		// Length cannot be greater than the structure-defined length
 		if(temp_value >= 65535)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Please input An effective value "),_T("Warning"));
@@ -324,6 +329,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
 		int temp_value = _wtoi(cs_temp);
+		// Length cannot be greater than the structure-defined length
 		if(temp_value >= 255)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Please input An effective value "),_T("Warning"));
@@ -337,6 +343,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
 		int temp_value = _wtoi(cs_temp);
+		// Length cannot be greater than the structure-defined length
 		if(temp_value >= 255)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Please input An effective value "),_T("Warning"));
@@ -350,6 +357,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
 		int temp_value = _wtoi(cs_temp);
+		// Length cannot be greater than the structure-defined length
 		if(temp_value >= 255)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Please input An effective value "),_T("Warning"));
@@ -363,6 +371,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
 		int temp_value = _wtoi(cs_temp);
+		// Length cannot be greater than the structure-defined length
 		if(temp_value >= 255)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Please input An effective value "),_T("Warning"));

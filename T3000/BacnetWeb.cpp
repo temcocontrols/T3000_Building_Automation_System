@@ -70,6 +70,7 @@ BOOL CBacnetWeb::OnInitDialog()
 
 void CBacnetWeb::OnTimer(UINT_PTR nIDEvent)
 {
+    // TODO: Add message handler code and/or call default
     // TODO: 在此添加消息处理程序代码和/或调用默认值
 
     CDialogEx::OnTimer(nIDEvent);

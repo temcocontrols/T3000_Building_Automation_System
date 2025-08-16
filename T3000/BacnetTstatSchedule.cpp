@@ -57,6 +57,7 @@ BOOL CBacnetTstatSchedule::OnInitDialog()
 	Fresh_TSTAT_Schedule_List(NULL, NULL);
     SetWindowText(_T("Group Schedule Setting"));
 
+    // Make the list's width and height the same as the dialog
     //使list的长宽 和对话框一样大;
     CRect windowrect;
     GetWindowRect(windowrect);
@@ -65,12 +66,14 @@ BOOL CBacnetTstatSchedule::OnInitDialog()
     SetTimer(1, 7000, NULL);
     ::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	return TRUE;  // return TRUE unless you set the focus to a control
+				  // EXCEPTION: OCX Property Pages should return FALSE
 				  // 异常: OCX 属性页应返回 FALSE
 }
 
 
 BOOL CBacnetTstatSchedule::PreTranslateMessage(MSG* pMsg)
 {
+	// TODO: Add specialized code and/or call base class here
 	// TODO: 在此添加专用代码和/或调用基类
 
 	return CDialogEx::PreTranslateMessage(pMsg);
@@ -195,6 +198,7 @@ LRESULT CBacnetTstatSchedule::Fresh_TSTAT_Schedule_Item(WPARAM wParam, LPARAM lP
     CString temp_cs = m_bac_tstat_sch_list.GetItemText(Changed_Item, Changed_SubItem);
     if (Changed_SubItem == TSTAT_SCHEDULE_SCHEDULES)
     {
+        // After change, determine which one it changed to
         for (int i = 0;i < 9;i++) //改变后判断是变化为哪一个
         {
             if (temp_cs.CompareNoCase(ScheduleName[i]) == 0)
@@ -206,6 +210,7 @@ LRESULT CBacnetTstatSchedule::Fresh_TSTAT_Schedule_Item(WPARAM wParam, LPARAM lP
     }
 
     
+    // Fandu 2013-12-13  When changing setpoint, need to validate the value range first
     //Fandu 2013-12-13  在变更 setpoint 时 ，需要优先校验值的取值范围。
     if (Changed_SubItem == TSTAT_SCHEDULE_DSP_VALUE)
     {
@@ -276,6 +281,7 @@ LRESULT CBacnetTstatSchedule::Fresh_TSTAT_Schedule_Item(WPARAM wParam, LPARAM lP
                 m_group_value = write_sp_value;
                 m_group_index = Changed_SubItem;
 
+                // Save the group id that needs to be changed
                 m_group_id = m_tatat_schedule_data.at(Changed_Item).tstat.schedule; //保存需要改的group id.
                 h_write_group_thread = CreateThread(NULL, NULL, WriteGroupRegThreadfun, this, NULL, NULL);
                 return true;
@@ -388,6 +394,7 @@ void CBacnetTstatSchedule::Initial_List()
 void CBacnetTstatSchedule::OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 
 	long lRow, lCol;
@@ -403,7 +410,7 @@ void CBacnetTstatSchedule::OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT 
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
-
+	// If the click area exceeds the maximum row number, the click is invalid
 	if (lRow>m_bac_tstat_sch_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if (lRow<0)
@@ -425,6 +432,7 @@ void CBacnetTstatSchedule::OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT 
 			m_tatat_schedule_data.at(lRow).tstat.flag &= 0x7F;
 			m_bac_tstat_sch_list.SetItemText(lRow, TSTAT_SCHEDULE_SCHEDULES_AM, _T("Auto"));
 		}
+		// If it's Manual, change to auto
 		else //是Manual 就改auto
 		{
 			m_tatat_schedule_data.at(lRow).tstat.flag |= 0x80;
@@ -434,6 +442,7 @@ void CBacnetTstatSchedule::OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT 
 	else if (lCol == TSTAT_SCHEDULE_SCHEDULES_VALUE)
 	{
 		CString temp_am = m_bac_tstat_sch_list.GetItemText(lRow, TSTAT_SCHEDULE_SCHEDULES_AM);
+		// When in Auto mode, manually changing the value is not allowed
 		if (temp_am.CompareNoCase(_T("Auto")) == 0)  //Auto 的时候是不允许手动改 value 值.
 		{
 			return;
@@ -467,6 +476,7 @@ void CBacnetTstatSchedule::OnNMClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT 
 
 void CBacnetTstatSchedule::OnTimer(UINT_PTR nIDEvent)
 {
+    // TODO: Add message handler code and/or call default value here
     // TODO: 在此添加消息处理程序代码和/或调用默认值
     switch (nIDEvent)
     {
@@ -487,6 +497,7 @@ DWORD WINAPI  CBacnetTstatSchedule::ReadGroupRegThreadfun(LPVOID lpVoid)
     //Write_Config_Info 
     CBacnetTstatSchedule *pParent = (CBacnetTstatSchedule *)lpVoid;
 
+    // Flag to continue reading, exit the loop if the following data is empty
     b_stop_read_tstat_schedule = false;  //是否继续读取标志，若后面数据为空则退出循环体.
     for (int i = 0;i<BAC_TSTAT_SCHEDULE_GROUP;i++)
     {
@@ -567,7 +578,7 @@ void CBacnetTstatSchedule::OnNMRClickListBacTstatSchedule(NMHDR *pNMHDR, LRESULT
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
 
-
+    // If the click area exceeds the maximum row number, the click is invalid
     if (lRow>m_bac_tstat_sch_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
         return;
     if (lRow<0)
