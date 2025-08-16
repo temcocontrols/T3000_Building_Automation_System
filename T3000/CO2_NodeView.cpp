@@ -1,3 +1,4 @@
+// CO2_NodeView.cpp : Implementation file
 // CO2_NodeView.cpp : 实现文件
 //
 
@@ -8,6 +9,7 @@
 #include "MainFrm.h"
 #include "CO2_AUTO_CALIBRATION.h"
 // CCO2_NodeView
+// Selected device information
 extern tree_product selected_product_Node; // 选中的设备信息;
 IMPLEMENT_DYNCREATE(CCO2_NodeView, CFormView)
 
@@ -102,6 +104,7 @@ BEGIN_MESSAGE_MAP(CCO2_NodeView, CFormView)
 END_MESSAGE_MAP()
 
 
+// CCO2_NodeView diagnostics
 // CCO2_NodeView 诊断
 
 #ifdef _DEBUG
@@ -119,6 +122,7 @@ void CCO2_NodeView::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 HANDLE h_co2_node_thread = NULL;
+// CCO2_NodeView message handlers
 // CCO2_NodeView 消息处理程序
 void CCO2_NodeView::Fresh()
 {
@@ -251,6 +255,7 @@ void CCO2_NodeView::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
 
+    // TODO: Add your specialized code here and/or call the base class
     // TODO: 在此添加专用代码和/或调用基类
     Initial_List();
     
@@ -510,6 +515,7 @@ LRESULT CCO2_NodeView::Fresh_CO2_Node_List(WPARAM wParam, LPARAM lParam)
     CString cs_Hum_value;
     cs_co2_value.Format(_T("%u"), product_register_value[108]);
 
+    //Register 125: 0 for Celsius, 1 for Fahrenheit
     //125寄存器 为0 则为C   1为F
     //if (product_register_value[124] == 0)
     //{

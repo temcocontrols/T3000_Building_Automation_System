@@ -1,4 +1,5 @@
-﻿// CBacnetBuildingManagement.cpp: 实现文件
+﻿// CBacnetBuildingManagement.cpp: Implementation file
+// CBacnetBuildingManagement.cpp: 实现文件
 //
 
 #include "stdafx.h"
@@ -38,6 +39,7 @@ BEGIN_MESSAGE_MAP(CBacnetBuildingManagement, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// CBacnetBuildingManagement diagnostics
 // CBacnetBuildingManagement 诊断
 
 #ifdef _DEBUG
@@ -55,6 +57,7 @@ void CBacnetBuildingManagement::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 
+// CBacnetBuildingManagement message handlers
 // CBacnetBuildingManagement 消息处理程序
 
 
@@ -65,6 +68,7 @@ void CBacnetBuildingManagement::Fresh()
 	Initial_List();
 
 	LoadFileShowToList();
+	// TODO: Add implementation code here.
 	// TODO: 在此处添加实现代码.
 }
 
@@ -104,6 +108,7 @@ void CBacnetBuildingManagement::Initial_List()
 
 void CBacnetBuildingManagement::OnBnClickedButtonBmAdd()
 {
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	return;
 }
@@ -111,6 +116,7 @@ void CBacnetBuildingManagement::OnBnClickedButtonBmAdd()
 //int test_count = 35;
 void CBacnetBuildingManagement::OnBnClickedButtonBmDelete()
 {
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	if (MessageBox(_T("This operation will clear all the configuration. Are you sure?"), _T("Notic"), MB_OKCANCEL) == IDOK)
 	{
@@ -126,13 +132,17 @@ void CBacnetBuildingManagement::OnBnClickedButtonBmDelete()
 	TV_INSERTSTRUCT tvInsert;////added
 	CString strBuilding = tempcs;//m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
 
+	// Specify parent handle
 	tvInsert.hParent = TVI_ROOT; // 指定父句柄
+	// Specify TV_ITEM structure object
 	tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 	tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strBuilding;
+	// Item insertion method
 	tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 	//TVINSERV_BUILDING
 	tvInsert.item.iImage = test_count; tvInsert.item.iSelectedImage = test_count;
 	HTREEITEM hTreePointList = NULL;
+	// Insert PointList
 	hTreePointList = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
 	test_count++;
 #endif
@@ -187,6 +197,7 @@ void CBacnetBuildingManagement::SaveAllIntoIniFile()
 
 void CBacnetBuildingManagement::OnBnClickedButtonBmDone()
 {
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	//ShowListToTree();
 }
@@ -247,14 +258,18 @@ void CBacnetBuildingManagement::TreeInital()
 	TV_INSERTSTRUCT tvInsert;////added
 	CString strBuilding = _T("Point List");//m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
 
+	// Specify parent handle
 	tvInsert.hParent = TVI_ROOT; // 指定父句柄
+	// Specify TV_ITEM structure object
 	tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 	tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strBuilding;
+	// Item insertion method
 	tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 	TVINSERV_BUILDING
 
 	HTREEITEM hTreePointList = NULL;
 
+	// Insert PointList
 	hTreePointList = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
 
 #pragma region 根节点显示PointList
@@ -262,6 +277,7 @@ void CBacnetBuildingManagement::TreeInital()
 	BuildingNode.h_treeitem = hTreePointList;
 	BuildingNode.m_child_count = (unsigned char)nGroupCount;
 	BuildingNode.m_csName = _T("Point List");
+	// Root node index is 0
 	BuildingNode.m_index = 0; //根节点 序号就是0
 #pragma endregion
 
@@ -270,9 +286,12 @@ void CBacnetBuildingManagement::TreeInital()
 	for (int i = 0; i < nGroupCount; i++)
 	{
 		HTREEITEM hTreeGroup = NULL;
+		// Specify parent handle
 		tvInsert.hParent = hTreePointList; // 指定父句柄
+		// Specify TV_ITEM structure object
 		tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 		tvInsert.item.pszText = (LPTSTR)(LPCTSTR)groupname[i];
+		// Item insertion method
 		tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 		TVINSERV_ROOM
 			hTreeGroup = pFrame_BM->m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入PointList
@@ -299,6 +318,7 @@ void CBacnetBuildingManagement::TreeInital()
 				BuildingNode.pchild[i]->pchild[j] = new CBacnetBMD;
 			int temp_io_count = 0;
 			HTREEITEM hTreeABC123 = NULL;
+			// Need to read name from database first, use default name if not found
 			CString temp_abc1_name; //这里要先从数据库读取名字，读取不到就用默认的名字;
 			CString section_device_name;
 			CString section_io_count;
@@ -473,6 +493,7 @@ void CBacnetBuildingManagement::TreeInital()
 	}
 	if (hTreePointList != NULL)
 		pFrame_BM->m_pTreeViewCrl->Expand(hTreePointList, TVE_EXPAND);
+	// Recursively calculate the number of each input and output
 	BuildingNode.UpdateCount(); //递归计算每一个input和output的数量
 
 	UpdateList();
@@ -1212,6 +1233,7 @@ void CBacnetBuildingManagement::UpdateList()
 
 void CBacnetBuildingManagement::OnBnClickedButtonBmSave()
 {
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	SaveAllIntoIniFile();
 }
@@ -1224,6 +1246,7 @@ void CBacnetBuildingManagement::SetDataTreeCtrl()
 
 void CBacnetBuildingManagement::OnBnClickedButtonDbDone()
 {
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	LoadFileShowToList();
 	::PostMessage(h_db_io_hwnd,WM_REFRESH_BAC_BUILDING_IO_LIST, NULL, NULL);

@@ -190,6 +190,7 @@ void CTstatRangeDlg::Initial_window(){
 
 	  m_show_unit.SetWindowTextW(analog_range_TSTAT6[m_input_Analog_select]);
 	  CRect c13;
+	  // Get control position and adjust position
 	  GetDlgItem(IDC_RADIO_T_0 + m_input_Analog_select)->GetWindowRect(c13);   //获取控件的位置 ，饼调整位置;
 	  ScreenToClient(c13);  
 	  m_rang_pic.SetWindowPos(NULL,c13.left - 40,c13.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
@@ -294,6 +295,7 @@ void CTstatRangeDlg::OnTimer(UINT_PTR nIDEvent)
 	if(nfocusid == IDC_EDIT_RANGE_SELECT)
 	{
 		CRect c2;
+		// Get control position and adjust position
 		GetDlgItem(IDC_RADIO_T_0 + m_current_range)->GetWindowRect(c2);   //获取控件的位置 ，饼调整位置;
 		ScreenToClient(c2);  
 		m_rang_pic.SetWindowPos(NULL,c2.left - 40,c2.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
@@ -308,6 +310,7 @@ void CTstatRangeDlg::OnTimer(UINT_PTR nIDEvent)
 	if(nfocusid != IDC_EDIT_RANGE_SELECT)
 	{
 		CRect c1;
+        // Get control position and adjust position
 		GetFocus()->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
 		ScreenToClient(c1);  
 		m_rang_pic.SetWindowPos(NULL,c1.left - 40,c1.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
@@ -555,8 +558,11 @@ void CTstatRangeDlg::OnBnClickedOk()
      }
      else if (m_input_Analog_select == 12)
      {
+         //fandu 2018 01 05  TSTAT 4-20ma corresponds to 2 points in the table;
          //fandu 2018 01 05  TSTAT 4-20ma 对应2个点的table;
+         //979 4ma corresponds to the minimum value
          //979 4ma 对应的最小值
+         //980 20ma corresponds to the maximum value
          //980 20ma 对应的最大值
          CString temp_units;
          CString temp_4_value;
@@ -971,10 +977,13 @@ short CTstatRangeDlg::Get_Max(short *short_Array,int length){
 void CTstatRangeDlg::OnEnChangeEdit1()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
-	
+	// Add control notification handler code here
 	//   在此添加控件通知处理程序代码
 	IsModfied=true;
 }
@@ -982,8 +991,13 @@ void CTstatRangeDlg::OnEnChangeEdit1()
 void CTstatRangeDlg::OnEnChangeEdit8()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码
@@ -993,8 +1007,12 @@ void CTstatRangeDlg::OnEnChangeEdit8()
 void CTstatRangeDlg::OnEnChangeEdit9()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码
@@ -1004,8 +1022,12 @@ void CTstatRangeDlg::OnEnChangeEdit9()
 void CTstatRangeDlg::OnEnChangeEdit13()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码
@@ -1015,8 +1037,12 @@ void CTstatRangeDlg::OnEnChangeEdit13()
 void CTstatRangeDlg::OnEnChangeEdit14()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码
@@ -1026,8 +1052,12 @@ void CTstatRangeDlg::OnEnChangeEdit14()
 void CTstatRangeDlg::OnEnChangeEdit15()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码
@@ -1037,8 +1067,12 @@ void CTstatRangeDlg::OnEnChangeEdit15()
 void CTstatRangeDlg::OnEnChangeEdit16()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码
@@ -1048,8 +1082,12 @@ void CTstatRangeDlg::OnEnChangeEdit16()
 void CTstatRangeDlg::OnEnChangeEdit17()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码
@@ -1059,8 +1097,12 @@ void CTstatRangeDlg::OnEnChangeEdit17()
 void CTstatRangeDlg::OnEnChangeEdit18()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码
@@ -1070,8 +1112,12 @@ void CTstatRangeDlg::OnEnChangeEdit18()
 void CTstatRangeDlg::OnEnChangeEdit19()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码
@@ -1081,8 +1127,12 @@ void CTstatRangeDlg::OnEnChangeEdit19()
 void CTstatRangeDlg::OnEnChangeEdit20()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码
@@ -1092,8 +1142,12 @@ void CTstatRangeDlg::OnEnChangeEdit20()
 void CTstatRangeDlg::OnEnChangeEdit12()
 {
 	
+	// Send this notification unless CDialog::OnInitDialog() is overridden
 	// 发送该通知，除非重写 CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask(),
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
+    // while ORing the ENM_CHANGE flag into the mask
+    // Add control notification handler code here
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	//   在此添加控件通知处理程序代码

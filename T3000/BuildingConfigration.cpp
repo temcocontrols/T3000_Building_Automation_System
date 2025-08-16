@@ -164,8 +164,11 @@ void CBuildingConfigration::Initial_Building_List()
         {
             continue;
         }
+        // 1. Copy to current directory: new Building added to database
         //1.拷贝到当前目录下：新的Building 加入到数据库中
+        // 2. Database name changed: update database path
         //2.把数据库的名字改掉了：把数据库的路径更改掉
+        // 3. Building directory name changed: treat as a new Building
         //3.把Building的目录名字改掉了：当成一个新的Building
         CString sql;
         _variant_t temp_variant;
@@ -178,6 +181,7 @@ void CBuildingConfigration::Initial_Building_List()
             {
                 continue;
             }
+// Verify if it's a Building database
 #if 1 //校驗一下看看是否是Building的Database
             CString strpath = GetExePath(true)+m_vecdbfile.at(i);
             SqliteDBBuilding.open((UTF8MBSTR)strpath);
@@ -232,6 +236,7 @@ void CBuildingConfigration::Initial_Building_List()
             BCTemp.BuildingPath=m_vecdbfile.at(i);
             BCTemp.b_selected=FALSE;
 
+            // Update data in ALL_NODE
             //更新ALL_NODE 里面的数据
 
 			CppSQLite3DB SqliteDBT3000;
@@ -240,6 +245,7 @@ void CBuildingConfigration::Initial_Building_List()
 
             sql.Format(_T("Select *  from  Building  where  Main_BuildingName='%s' "),BCTemp.MainBuildingName);
            q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
+            // Has table but no corresponding serial number value
             if (q.eof())//有表但是没有对应序列号的值
             {
                  
@@ -287,12 +293,14 @@ void CBuildingConfigration::Initial_Building_List()
  
             }
             SqliteDBT3000.closedb();
+            // After updating to database, add to Vector list
             //更新到数据库之后，加入到Vector列表
             m_BuildNameLst.push_back(BCTemp);
 
         }
 
     }
+    // Reload data
     //重新加载数据
     LoadBuildingConfigDB();
     m_building_config_list.DeleteAllItems();

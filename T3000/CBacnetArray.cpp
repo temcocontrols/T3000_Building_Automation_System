@@ -1,4 +1,5 @@
-﻿// CBacnetArray.cpp: 实现文件
+﻿// CBacnetArray.cpp: Implementation file
+// CBacnetArray.cpp: 实现文件
 //
 
 #include "stdafx.h"
@@ -7,6 +8,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
+// CBacnetArray dialog box
 // CBacnetArray 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetArray, CDialogEx)
@@ -36,6 +38,7 @@ BEGIN_MESSAGE_MAP(CBacnetArray, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// CBacnetArray message handlers
 // CBacnetArray 消息处理程序
 
 
@@ -45,9 +48,11 @@ BOOL CBacnetArray::OnInitDialog()
 	SetWindowTextW(_T("Array"));
 	HICON m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_DEFAULT_ARRAY);
 	SetIcon(m_hIcon, TRUE);
+	// TODO: Add additional initialization here
 	// TODO:  在此添加额外的初始化
 	Initial_List();
 	return TRUE;  // return TRUE unless you set the focus to a control
+				  // Exception: OCX property pages should return FALSE
 				  // 异常: OCX 属性页应返回 FALSE
 }
 
@@ -119,6 +124,7 @@ LRESULT CBacnetArray::Fresh_Array_List(WPARAM wParam, LPARAM lParam)
 	{
 		if (m_array_list.IsDataNewer((char*)&m_Array_data.at(0), sizeof(Str_array_point) * BAC_ARRAY_ITEM_COUNT))
 		{
+			// Avoid list flickering when refreshing; don't refresh List when there's no data change
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
 			m_array_list.SetListData((char*)&m_Array_data.at(0), sizeof(Str_array_point) * BAC_ARRAY_ITEM_COUNT);
 		}
@@ -185,6 +191,7 @@ LRESULT CBacnetArray::Fresh_Array_Item(WPARAM wParam, LPARAM lParam)
 	if (Changed_SubItem == ARRAY_LABLE)
 	{
 		CString cs_temp = m_array_list.GetItemText(Changed_Item, Changed_SubItem);
+		// Length cannot exceed the length defined by the structure
 		if (cs_temp.GetLength() > STR_ARRAY_NAME_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 9"), _T("Warning"), MB_OK | MB_ICONINFORMATION);
@@ -210,6 +217,7 @@ LRESULT CBacnetArray::Fresh_Array_Item(WPARAM wParam, LPARAM lParam)
 		if ((temp2 < 0) || (temp2 > 65535))
 		{
 			MessageBox(_T("Please Input an value between 0 - 65535"), _T("Warning"), MB_OK);
+			// Calling refresh thread here for convenience
 			PostMessage(WM_REFRESH_BAC_ARRAY_LIST, NULL, NULL);//这里调用 刷新线程重新刷新会方便一点;
 			return 0;
 		}
@@ -230,6 +238,7 @@ void CBacnetArray::Reset_Array_Rect()
 {
 
 	CRect temp_mynew_rect;
+	// Get the window size of the view
 	::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//获取 view的窗体大小;
 
 	CRect temp_window;
@@ -238,6 +247,7 @@ void CBacnetArray::Reset_Array_Rect()
 	if (window_max)
 	{
 		CRect temp_mynew_rect;
+		// Get the window size of the view
 		::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//获取 view的窗体大小;
 		::SetWindowPos(this->m_hWnd, NULL, temp_mynew_rect.left, temp_mynew_rect.top, temp_mynew_rect.Width(), temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
 	}
@@ -256,6 +266,7 @@ void CBacnetArray::Reset_Array_Rect()
 
 BOOL CBacnetArray::PreTranslateMessage(MSG* pMsg)
 {
+	// TODO: Add specialized code and/or call the base class here
 	// TODO: 在此添加专用代码和/或调用基类
 	if ((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN))
 	{
@@ -279,6 +290,7 @@ BOOL CBacnetArray::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = true;
 			CRect temp_mynew_rect;
+			// Get the window size of the view
 			::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd, NULL, temp_mynew_rect.left, temp_mynew_rect.top, temp_mynew_rect.Width(), temp_mynew_rect.Height(), SWP_SHOWWINDOW);
 		}
@@ -286,6 +298,7 @@ BOOL CBacnetArray::PreTranslateMessage(MSG* pMsg)
 		{
 			window_max = false;
 			CRect temp_mynew_rect;
+			// Get the window size of the view
 			::GetWindowRect(BacNet_hwd, &temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd, NULL, temp_mynew_rect.left + 60, temp_mynew_rect.top + 60, 500, 700, SWP_SHOWWINDOW);
 		}
@@ -301,6 +314,7 @@ void CBacnetArray::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
+	// TODO: Add message handler code here
 	// TODO: 在此处添加消息处理程序代码
 	CRect rc;
 	GetClientRect(rc);
@@ -326,11 +340,13 @@ LRESULT  CBacnetArray::ArrayMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
+		// Restore the value that was not changed correctly
 		memcpy_s(&m_Array_data.at(pInvoke->mRow), sizeof(Str_array_point), &m_temp_array_data[pInvoke->mRow], sizeof(Str_array_point));//还原没有改对的值
 		PostMessage(WM_REFRESH_BAC_ARRAY_LIST, pInvoke->mRow, REFRESH_ON_ITEM);
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
 	}
+	// Restore foreground and background colors
 	if ((pInvoke->mRow % 2) == 0)	//恢复前景和 背景 颜色;
 		m_array_list.SetItemBkColor(pInvoke->mRow, pInvoke->mCol, LIST_ITEM_DEFAULT_BKCOLOR, 0);
 	else

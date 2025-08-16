@@ -42,8 +42,11 @@ afx_msg void OnSize(UINT nType, int cx, int cy);
  virtual BOOL PreTranslateMessage(MSG* pMsg);
  afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 
+ // Used to determine whether TSTAT input has Hum sensor
  bool b_hum_sensor;   //用于判断TSTAT 输入 有无 Hum
+ // Flag to determine whether input has CO2 sensor and whether to display in input list
  bool b_co2_sensor;   //输入 有无 CO2 用此标志 来判断是否显示在输入想里;
+ // Light intensity sensor
  bool b_lux_sensor;   // 光强
 };
 

@@ -1,6 +1,7 @@
 #pragma once
 
 
+// CBacnetSettingDyndns Dialog
 // CBacnetSettingDyndns 对话框
 
 class CBacnetSettingDyndns : public CDialogEx
@@ -8,16 +9,19 @@ class CBacnetSettingDyndns : public CDialogEx
 	DECLARE_DYNAMIC(CBacnetSettingDyndns)
 
 public:
-	CBacnetSettingDyndns(CWnd* pParent = NULL);   // 标准构造函数
+	CBacnetSettingDyndns(CWnd* pParent = NULL);   // Standard constructor
+	// 标准构造函数
 	virtual ~CBacnetSettingDyndns();
 
+// Dialog Data
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_SETTING_DYNDNS };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	// DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:

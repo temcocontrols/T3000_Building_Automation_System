@@ -1,4 +1,5 @@
-﻿// BacnetSettingAdvParameter.cpp: 实现文件
+﻿// BacnetSettingAdvParameter.cpp: Implementation file
+// BacnetSettingAdvParameter.cpp: 实现文件
 //
 
 #include "stdafx.h"
@@ -7,6 +8,7 @@
 #include "BacnetSettingAdvParameter.h"
 #include "global_function.h"
 
+// BacnetSettingAdvParameter Dialog
 // BacnetSettingAdvParameter 对话框
 
 IMPLEMENT_DYNAMIC(BacnetSettingAdvParameter, CDialogEx)
@@ -36,6 +38,7 @@ BEGIN_MESSAGE_MAP(BacnetSettingAdvParameter, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// BacnetSettingAdvParameter Message handlers
 // BacnetSettingAdvParameter 消息处理程序
 
 
@@ -43,6 +46,7 @@ BOOL BacnetSettingAdvParameter::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	// TODO: Add extra initialization here
 	// TODO:  在此添加额外的初始化
 	if(Device_Basic_Setting.reg.panel_type == PM_ESP32_T3_SERIES)
 	{
@@ -95,12 +99,14 @@ BOOL BacnetSettingAdvParameter::OnInitDialog()
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
+	// Exception: OCX property pages should return FALSE
 	// 异常: OCX 属性页应返回 FALSE
 }
 
 
 void BacnetSettingAdvParameter::OnBnClickedButtonAdvancedApply()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	int temp_flag = 0;
 	if (Device_Basic_Setting.reg.panel_type == PM_ESP32_T3_SERIES)
@@ -177,6 +183,7 @@ void BacnetSettingAdvParameter::OnBnClickedButtonAdvancedApply()
 
 void BacnetSettingAdvParameter::OnBnClickedButtonAdvancedOk()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	OnBnClickedButtonAdvancedApply();
 	PostMessage(WM_CLOSE, 0, 0); // Close the dialog
@@ -185,6 +192,7 @@ void BacnetSettingAdvParameter::OnBnClickedButtonAdvancedOk()
 
 void BacnetSettingAdvParameter::OnBnClickedButtonAdvancedQ1()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	MessageBox(_T("After enabling this item, the Setting-Communication-Device Serial Port Config will be fixed."),_T("Advanced Settings"), MB_OK | MB_ICONINFORMATION);
 }
@@ -192,6 +200,7 @@ void BacnetSettingAdvParameter::OnBnClickedButtonAdvancedQ1()
 
 void BacnetSettingAdvParameter::OnBnClickedButtonAdvancedQ2()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	MessageBox(_T("All parameters, input, output, variable, and the values run in the program are saved at regular intervals within the set time. Prevent data loss after an unexpected power outage.You can also modify this value through register 92 of modbus. When this value is set to 0, it means that this function is disabled."), _T("Advanced Settings"), MB_OK | MB_ICONINFORMATION);
 }
@@ -199,6 +208,7 @@ void BacnetSettingAdvParameter::OnBnClickedButtonAdvancedQ2()
 
 void BacnetSettingAdvParameter::OnBnClickedButtonAdvancedCancel()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	PostMessage(WM_CLOSE, 0, 0); // Close the dialog
 }

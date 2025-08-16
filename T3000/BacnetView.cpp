@@ -1,17 +1,22 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+// Using VS2010 to compile requires deleting cvtres.exe to ensure using higher version to convert resource files
 //使用VS2010 编译需删除 c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cvtres.exe 来确保用更高版本的 来转换资源文件
 81 0B 00 0C 01 20 FF FF 00 FF 10 08
+// WiFi version, greater than or equal to 4 uses low latency 300ms
 //wifi 版本，大于等于4  使用低延时300ms
 
 MSFLXGRD.MSM
 COMCAT.MSM
+// Copy these two files to 2018 packaging directory to avoid packaging compilation failure
 拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
 20250320 
+// Support TSTAT10E input output interface
 支持 TSTAT10E 的input output 界面
 
 2025 01 13 
+// 1. Avoid changing T3 ARM device Mac address when loading prog
 1. Load prog时 避免改变T3 ARM设备的Mac地址
 
 2024 02 22
@@ -441,11 +446,13 @@ T3000 Revisions for the software release of Apr 4, 2019
 
 2016 - 03 - 17 Update by Fance
 //Fix the bugs which make the program crash when start up.
+// Caused by automatically entering the last interface
 //原因是由 自动进入上一次的界面引起的;
 
 2016 - 03 - 16  Update by Fance
 //Merge Code.
 
+// Minipanel register table
 //minipanel 寄存器表
 //  9800	-	9999    200个寄存器   setting
 //  10000	-   11471   1472		  OUT
@@ -979,6 +986,7 @@ CDialog_Progess *WaitRead_Data_Dlg=NULL;
 extern CBacnetScreenEdit * ScreenEdit_Window;
 bool m_is_remote_device = false;
 HANDLE hconnect_modbus_thread = NULL;
+// Used to save the previously selected TAB; used for shortcut key operations
 static int old_selected_item = WINDOW_PROGRAM; // 用于保存 上一个选中的 TAB; 用于 快捷键的操作;
 extern CBacnetAlarmWindow * AlarmWindow_Window;
 CBacnetProgramEdit *ProgramEdit_Window = NULL;
@@ -987,21 +995,30 @@ AnnualRout_InsertDia *HolidayEdit_Window = NULL;
 //define a dialg for new program ide 
 ControlBasicEditorView *ProgramNEWEdit_Window = NULL;
 extern char mycode[2000];
+// Number of times to send whois when clicking to switch device
 int click_resend_time = 0;//当点击的时候，要切换device时 发送whois的次数;
+// Status of reading cache file
 int load_prg_cache_ret = 0; //读取缓存文件的状态；
 // CDialogCM5_BacNet
 CString IP_ADDRESS;
 _Refresh_Info Bacnet_Refresh_Info;
 CString remote_ip_address;
+// Selected device information
 extern tree_product selected_product_Node; // 选中的设备信息;
+// Directory for storing data to database, temporary file storage directory
 extern CString SaveConfigFilePath; //用来将资料存放至数据库，临时文件的存放目录;
 
 extern SOCKET my_sokect;
 extern bool show_user_list_window ;
+// Thread started when clicking MSTP device for connection
 HANDLE connect_mstp_thread = NULL; // 当点击MSTP的设备时开启 连接的线程;
+// RS485 device general use
 HANDLE read_rs485_thread = NULL; // RS485的设备 通用;
+// Thread for writing data to database
 HANDLE write_indb_thread = NULL; //将资料写入数据库的线程;
+// 1 for MODBUS RS485, 2 for MODBUS TCP
 int connect_way = 0;  // 1 为MODBUS RS485    2 为 MODBUS TCP
+// Thread for handling I am replies
 HANDLE hbip_whois_thread = NULL; //处理回复 I am 线程
 
 extern vector <int>  m_Input_data_instance;
@@ -1092,6 +1109,7 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 	unsigned int next_lower_station_num = 0;
 	unsigned int next_higher_station_num = 255;
 	int next_index = -1;
+	// Get current panel, if it's up key then return to previous panel
 	//获取目前的panel  ， 如果是向上键就 返回 上一个 panel;
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 
@@ -1107,6 +1125,7 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 				continue;
 			}
 
+			// If next panel is offline, continue searching for next one
 			if(pFrame->m_product.at(i).status == false)//下一个panel 不在线 就继续寻找下一个;
 			{
 				continue;
@@ -1134,6 +1153,7 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 				continue;
 			}
 
+			// If next panel is offline, continue searching for next one
 			if(pFrame->m_product.at(i).status == false)//下一个panel 不在线 就继续寻找下一个;
 			{
 				continue;
@@ -1407,6 +1427,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			}
 			if(bac_read_which_list == BAC_READ_CUSTOMER_UNITS)
 			{
+				// Flag that units have been read, no need to read again; older versions of devices may not be able to read
 				read_customer_unit = true;	//标志已经读过 单位了 不必再读，旧版本的设备 可能读不到;
 				if(bac_customer_unit_read_results)
 				{
@@ -1631,6 +1652,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			{
 				if(bac_weeklycode_read_results)
 				{
+					// Display non-modal dialog
 					//显示非模态对话框;
 					if(ScheduleEdit_Window != NULL)
 					{
@@ -1642,6 +1664,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
                     {
                         if(GetPrivateData_Blocking(g_bac_instance, READ_SCHEDUAL_TIME_FLAG, weekly_list_line, weekly_list_line, sizeof(Str_schedual_time_flag))< 0)
                         {
+                             // For modbus, if flag is not read, set flag to default 1; if 00:00 then default not to display
                              //对modbus下 没有读取到flag 情况 , 将 flag 默认为 1 ，如果00:00 则默认不显示;
                             for (int x = 0; x < 8; x++)
                             {
@@ -1770,6 +1793,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					bac_read_which_list = -1;
 					bac_programcode_read_results = false;
 
+					// Display non-modal dialog
 					//显示非模态对话框;
 					if(ProgramEdit_Window != NULL)
 					{
@@ -1796,6 +1820,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				bac_read_which_list = -1;
 				bac_programcode_read_results = false;
 
+				// Display non-modal dialog
 				//显示非模态对话框;
 				if (ProgramNEWEdit_Window != NULL)
 				{
@@ -2039,6 +2064,7 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].invoke_id)
 				Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].task_result = false;
 		}
+		// If any read/write fails, the task will be interrupted and the progress bar will be reset to zero
 		g_progress_persent = 0 ; // 只要有一个读写失败 任务就会中断 ， 进度条就清零;
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
@@ -3288,6 +3314,7 @@ void CDialogCM5_BacNet::Fresh()
 
 
     str_bacnet_rp_info temp_test2;
+	// Pause the thread that reads registers as long as on minipanel interface
 	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 
 	if ((g_protocol!=PROTOCOL_BACNET_IP) && 
@@ -3543,7 +3570,9 @@ void CDialogCM5_BacNet::Fresh()
     }
     else
     {
+        // Virtual devices check in many places whether customer's custom range has been received
         receive_customer_unit = true;  // 虚拟设备很多地方判断是否有接收到了  客户的自定义range
+        // Virtual devices also need to initialize bacnet related parameters
         //虚拟设备也需要初始化bacnet 的相关参数;
         if (!bac_net_initial_once)
         {
@@ -3774,9 +3803,11 @@ void CDialogCM5_BacNet::Fresh()
 					bacnet_device_type = PRODUCT_CM5;
 			}
 	
+            // Check if bit1 contains wifi module
             if ((selected_product_Node.nhardware_info & 0x02) == 2) //判断bit1 是否含有wifi模块;
             {
                 ;
+                // Need to read wifi part version number to determine appropriate delay
                 //这里需要读取wifi部分的版本号  用来判断 延时采用多少合适;
             }
 
@@ -5968,6 +5999,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				break;
 			if(this->IsWindowVisible())
 			{
+				// Pause the thread that reads registers as long as on minipanel interface
 				g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 				//if(!Gsm_communication)
 					//m_bac_handle_Iam_data.clear();
@@ -8038,6 +8070,7 @@ Device IP : %s \r\n"), selected_product_Node.NetworkCard_Address, selected_produ
     }
 }
 
+// Background thread to read descriptors of all panels; 20250612
 //后台线程读取所有panel 的描述符;  20250612
 DWORD WINAPI  LoadAllPanelDescriptors(LPVOID lpVoid)
 {

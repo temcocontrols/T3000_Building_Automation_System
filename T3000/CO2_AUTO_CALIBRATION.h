@@ -1,6 +1,7 @@
 #pragma once
 #include "afxwin.h"
 
+// CCO2_AUTO_CALIBRATION dialog
 // CCO2_AUTO_CALIBRATION 对话框
 
 class CCO2_AUTO_CALIBRATION : public CDialogEx
@@ -8,15 +9,18 @@ class CCO2_AUTO_CALIBRATION : public CDialogEx
 	DECLARE_DYNAMIC(CCO2_AUTO_CALIBRATION)
 
 public:
+	// Standard constructor
 	CCO2_AUTO_CALIBRATION(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CCO2_AUTO_CALIBRATION();
 
+// Dialog data
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_FIRMWARE_AUTO_CAL };
 #endif
 
 protected:
+	// DDX/DDV support
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
