@@ -3,6 +3,7 @@
 #include "afxwin.h"
 
 
+// CT3000LogWindow dialog
 // CT3000LogWindow 对话框
 
 class CT3000LogWindow : public CDialogEx
@@ -10,16 +11,17 @@ class CT3000LogWindow : public CDialogEx
 	DECLARE_DYNAMIC(CT3000LogWindow)
 
 public:
-	CT3000LogWindow(CWnd* pParent = NULL);   // 标准构造函数
+	CT3000LogWindow(CWnd* pParent = NULL);   // Standard constructor - 标准构造函数
 	virtual ~CT3000LogWindow();
 
+// Dialog data
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_LOG_WINDOW };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support - DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
 public:

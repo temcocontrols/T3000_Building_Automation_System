@@ -56,6 +56,7 @@ BOOL CT3000UpdateDlg::OnInitDialog()
     {
         CString text;
 
+        // Current version is not consistent with server, prompt for update
         if ( _tcscmp( buffer, version.GetBuffer() ) != 0 )//当前版本不和服务器保持一致，提醒更新
         {
         //, buffer,version.GetBuffer()
@@ -69,6 +70,7 @@ BOOL CT3000UpdateDlg::OnInitDialog()
             //        _T("http://temcocontrols.com/ftp/software/9TstatSoftware.zip"), NULL, NULL, SW_SHOWMAXIMIZED );
             //}
         }
+        // If consistent, it's correct, indicating it's the latest version
         else//保持一致的话，就对了，说明是最新的
         {
             versioninfor.Format( _T("Your T3000 is the lastest version \nT3000 Ver=%s"), version.GetBuffer());

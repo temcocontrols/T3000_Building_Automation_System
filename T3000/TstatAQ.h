@@ -4,7 +4,7 @@
 #include "CM5\CStatic\staticex.h"
 #include "afxcmn.h"
 #include "CM5/ListCtrlEx.h"
-// CTstatAQ 窗体视图
+// CTstatAQ 窗体视图 - CTstatAQ form view
 
 class CTstatAQ : public CFormView
 {
@@ -26,12 +26,12 @@ public:
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持 - DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 
 public:
-    CTstatAQ();           // 动态创建所使用的受保护的构造函数
+    CTstatAQ();           // 动态创建所使用的受保护的构造函数 - Protected constructor used for dynamic creation
     virtual ~CTstatAQ();
     void Fresh();
     void UpdateUI();
@@ -109,14 +109,14 @@ const COLORREF AQI_Info_Status_Back_Color[] =
 
 static DWORD WINAPI Update_TstatAQ_Thread(LPVOID lPvoid);
 const int TSTAT_AQ_TEMP_AMBIENT = 101;
-const int TSTAT_AQ_TEMP_REMOTE = 102;  //红外传感器的两个温度值;
-const int TSTAT_AQ_TEMP_UNIT = 104;   //温度单位   0 摄氏度     1华氏度
+const int TSTAT_AQ_TEMP_REMOTE = 102;  //红外传感器的两个温度值; - Two temperature values from infrared sensor;
+const int TSTAT_AQ_TEMP_UNIT = 104;   //温度单位   0 摄氏度     1华氏度 - Temperature unit: 0 Celsius, 1 Fahrenheit
 const int TSTAT_AQ_TEMPERATURE = 121;
 const int TSTAT_AQ_HUM = 140;
 const int TSTAT_AQ_CO2 = 139;
 const int TSTAT_AQ_VOC = 998;
 
-const int TSTAT_AQ_VOC_AIRLAB = 988;  //产品号62 的Airlab 用得是988 
+const int TSTAT_AQ_VOC_AIRLAB = 988;  //产品号62 的Airlab 用得是988 - Product number 62 Airlab uses 988
 
 const int TSTAT_AQ_WEIGHT_1 = 760;
 const int TSTAT_AQ_WEIGHT_2_5 = 761;

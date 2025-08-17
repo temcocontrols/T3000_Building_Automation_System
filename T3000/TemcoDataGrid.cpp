@@ -151,22 +151,22 @@ BOOL CTemcoDataGrid::OnMouseMove(short Button, short Shift, long x, long y)
 	{
 	    int col = get_MouseCol();
 		CRect rect;
-		GetWindowRect(&rect);                 //获取FlexGrid控件的窗口矩形
-		m_pParent->ScreenToClient(&rect);                 //转换为客户区矩形
+		GetWindowRect(&rect);                 //获取FlexGrid控件的窗口矩形 - Get the window rectangle of the FlexGrid control
+		m_pParent->ScreenToClient(&rect);                 //转换为客户区矩形 - Convert to client area rectangle
 		CDC* pDC=GetDC();
-		//MSFlexGrid 控件的函数的长度单位是“缇(twips)”，需要将其转化为像素，1440 缇 = 1 英寸
-		//计算象素点和缇的转换比例
+		//MSFlexGrid 控件的函数的长度单位是“缇(twips)”，需要将其转化为像素，1440 缇 = 1 英寸 - The length unit of the MSFlexGrid control function is "twips", which needs to be converted to pixels, 1440 twips = 1 inch
+		//计算象素点和缇的转换比例 - Calculate the conversion ratio between pixel points and twips
 		int nTwipsPerDotX=1440/pDC->GetDeviceCaps(LOGPIXELSX);
 		int nTwipsPerDotY=1440/pDC->GetDeviceCaps(LOGPIXELSY);
 
 		long y = get_RowPos(0)/nTwipsPerDotY;
 		long x = get_ColPos(col)/nTwipsPerDotX;
-		//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+		//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好 - Calculate the size of the selected cell (in pixels). Adding 1 is found to be more effective in actual debugging.
 		long width = get_ColWidth(m_SelCurCol)/nTwipsPerDotX+1;
 		long height = get_RowHeight(m_SelCurRow)/nTwipsPerDotY+1;
-		//形成选中个所在的矩形区域
+		//形成选中个所在的矩形区域 - Form the rectangular area where the selected cell is located
 		CRect rcCell(x,y,x+width,y+height);
-		//转换成相对对话框的坐标
+		//转换成相对对话框的坐标 - Convert to the coordinates relative to the dialog box
 		rcCell.OffsetRect(rect.left+1,rect.top+1);
 		m_ColName->MoveWindow(rcCell);
 		m_ColName->ShowWindow(SW_SHOW);

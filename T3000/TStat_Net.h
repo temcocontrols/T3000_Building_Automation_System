@@ -14,24 +14,24 @@ public:
 	virtual int ReadMultiReg(int nRegAddrStart, int nRegAddrEnd, OUT int* nVal);
 	virtual int WriteMultiReg(int nRegAddrStart, int nRegAddrEnd, OUT int* nVal);
 
-	// 也必须通过读写寄存器来实现
+	// 也必须通过读写寄存器来实现 - Must also be implemented through reading and writing registers
 	virtual BOOL IsOnLine();	
 
 	//---------------------------------------------------------------
-	// 以下仅仅是对象操作
+	// 以下仅仅是对象操作 - The following are object operations only
 
-	// 串口号
+	// 串口号 - Serial port number
 	virtual int GetComPort()const; 
 	virtual void SetComPort(int nComPort);
 
-	// IP地址
+	// IP地址 - IP address
 	virtual DWORD GetIPAddr()const; 
 	CString GetIPAddrStr()const;
 	virtual void SetIPAddr(DWORD dwIDAddr);
 	virtual void SetIPAddr(char* szIPAddr);
 	//virtual void SetIPAddr(const CString& strIPAddr);
 
-	// 网络端口
+	// 网络端口 - Network port
 	virtual int GetIPPort()const; 
 	virtual void SetIPPort(int nPort);
 
@@ -39,7 +39,7 @@ public:
 	void SetProtocol(int nProtocol);
 
 
-	// 波特率
+	// 波特率 - Baud rate
 	virtual int GetBaudRate()const; 
 	virtual void SetBaudRate(int nBaudRate);
 	//NetworkCard address
@@ -48,7 +48,7 @@ public:
 	
 	
 	//----------------------------------------------------------------
-	// 以下两个才需要去读写寄存器
+	// 以下两个才需要去读写寄存器 - The following two need to read and write registers
 	virtual int WriteDevID(int nID)const;	
 	virtual int ReadDevID(int& nID);
 
@@ -60,11 +60,11 @@ public:
 	BOOL CTStat_Net::operator==(const CTStat_Net& dev);
 
 protected:
-	int				m_nprotocol;				//协议
-	int				m_nBaudRate;				// 波特率
-	int				m_nComPort;				// 串口	
+	int				m_nprotocol;				//协议 - Protocol
+	int				m_nBaudRate;				// 波特率 - Baud rate
+	int				m_nComPort;				// 串口 - Serial port	
 	DWORD		m_dwIPAddr;				// IP Address
-	int				m_nPort;					// 当前端口
+	int				m_nPort;					// 当前端口 - Current port
 	CString NetworkCard_Address;
 	
 	

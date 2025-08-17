@@ -1,4 +1,4 @@
-﻿// TstatAQ.cpp : 实现文件
+﻿// TstatAQ.cpp : 实现文件 - Implementation file
 //
 
 #include "stdafx.h"
@@ -59,7 +59,7 @@ BEGIN_MESSAGE_MAP(CTstatAQ, CFormView)
 END_MESSAGE_MAP()
 
 
-// CTstatAQ 诊断
+// CTstatAQ 诊断 - CTstatAQ diagnostics
 
 #ifdef _DEBUG
 void CTstatAQ::AssertValid() const
@@ -104,7 +104,7 @@ void CTstatAQ::PM2_5_Window(int nflag)
 {
 	if (nflag == 0)
 	{
-		//m_airlab_list.ShowWindow(0);  暂时所有产品都不显示，这个表格是鸡肋;
+		//m_airlab_list.ShowWindow(0);  暂时所有产品都不显示，这个表格是鸡肋; - Temporarily hide for all products, this table is useless;
 		GetDlgItem(IDC_RADIO_DEG_C)->EnableWindow(0);
 		GetDlgItem(IDC_RADIO_DEG_F)->EnableWindow(0);
 		GetDlgItem(IDC_BUTTON_HELP_WBGT)->EnableWindow(0);
@@ -135,7 +135,7 @@ CString bmp_AQI;
 CString jpg_airlab;
 void CTstatAQ::Fresh()
 {
-	CStatic* pWnd = (CStatic*)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE); // 得到 Picture Control 句柄 ;
+	CStatic* pWnd = (CStatic*)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE); // 得到 Picture Control 句柄 ; - Get Picture Control handle;
 	CString icon_temperature;
 
 
@@ -151,9 +151,9 @@ void CTstatAQ::Fresh()
 	HBITMAP bitmap;
 	bitmap = (HBITMAP)LoadImage(AfxGetInstanceHandle(), icon_temperature, IMAGE_BITMAP, 40, 120, LR_LOADFROMFILE);
 	CStatic* p = (CStatic*)GetDlgItem(IDC_STATIC_AQ_TEMPERATURE);
-	//设置静态控件窗口风格为位图居中显示  
+	//设置静态控件窗口风格为位图居中显示 - Set static control window style to bitmap center display  
 	p->ModifyStyle(0xf, SS_BITMAP | SS_CENTERIMAGE);
-	//将图片设置到Picture控件上  
+	//将图片设置到Picture控件上 - Set image to Picture control  
 	p->SetBitmap(bitmap);
 
 
@@ -178,7 +178,7 @@ void CTstatAQ::Fresh()
 
 
 	CString sound_full_path;
-	CStatic* pWnd_sound_pic = (CStatic*)GetDlgItem(IDC_STATIC_SOUND); // 得到 Picture Control 句柄 ;
+	CStatic* pWnd_sound_pic = (CStatic*)GetDlgItem(IDC_STATIC_SOUND); // 得到 Picture Control 句柄 - Get the Picture Control handle ;
 	if (product_register_value[TSTAT_AQ_SOUND] <= 10)
 		sound_full_path = ApplicationFolder + _T("\\ResourceFile\\Icon\\sound_0.ico");
 	else if (product_register_value[TSTAT_AQ_SOUND] <= 30)
@@ -870,7 +870,7 @@ void CTstatAQ::UpdateUI()
 		}
 	}
 }
-// CTstatAQ 消息处理程序
+// CTstatAQ 消息处理程序 - CTstatAQ message handlers
 
 
 
@@ -886,7 +886,7 @@ void CTstatAQ::OnInitialUpdate()
 	m_static_info.textColor(RGB(255, 255, 255));
 	m_static_info.bkColor(RGB(0, 0, 255));
 	m_static_info.setFont(28, 26, NULL, _T("Arial"));
-	// TODO: 在此添加专用代码和/或调用基类
+	// TODO: 在此添加专用代码和/或调用基类 - TODO: Add your specialized code and/or call the base class
 }
 
 DWORD WINAPI Update_TstatAQ_Thread(LPVOID lPvoid)
@@ -920,7 +920,7 @@ LRESULT CTstatAQ::UpdateUI(WPARAM wParam, LPARAM lParam)
 
 void CTstatAQ::OnEnKillfocusEditCo2OnTime()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 
 	CString strText;
 	GetDlgItem(IDC_EDIT_CO2_ON_TIME)->GetWindowText(strText);
@@ -938,7 +938,7 @@ void CTstatAQ::OnEnKillfocusEditCo2OnTime()
 
 void CTstatAQ::OnEnKillfocusEditCo2OffTime()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	CString strText;
 	GetDlgItem(IDC_EDIT_CO2_OFF_TIME)->GetWindowText(strText);
 	int nValue = (int)(_wtoi(strText));
@@ -955,7 +955,7 @@ void CTstatAQ::OnEnKillfocusEditCo2OffTime()
 
 void CTstatAQ::OnEnKillfocusEditPmOnTime()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	CString strText;
 	GetDlgItem(IDC_EDIT_PM_ON_TIME)->GetWindowText(strText);
 	int nValue = (int)(_wtoi(strText));
@@ -972,7 +972,7 @@ void CTstatAQ::OnEnKillfocusEditPmOnTime()
 
 void CTstatAQ::OnEnKillfocusEditPmOffTime()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	CString strText;
 	GetDlgItem(IDC_EDIT_PM_OFF_TIME)->GetWindowText(strText);
 	int nValue = (int)(_wtoi(strText));
@@ -989,7 +989,7 @@ void CTstatAQ::OnEnKillfocusEditPmOffTime()
 
 void CTstatAQ::OnBnClickedRadioDegC()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	int nValue = 0;
 
 
@@ -1004,7 +1004,7 @@ void CTstatAQ::OnBnClickedRadioDegC()
 
 void CTstatAQ::OnBnClickedRadioDegF()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	int nValue = 1;
 
 
@@ -1019,7 +1019,7 @@ void CTstatAQ::OnBnClickedRadioDegF()
 
 void CTstatAQ::OnCbnSelchangeComboAqiRegion()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	int n_value = 0;
 	CString temp_string;
 	int nSel = ((CComboBox*)GetDlgItem(IDC_COMBO_AQI_REGION))->GetCurSel();
@@ -1050,7 +1050,7 @@ void CTstatAQ::OnCbnSelchangeComboAqiRegion()
 
 void CTstatAQ::OnEnKillfocusEditLevel1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_LEVEL_1, temp_cstring);
@@ -1066,7 +1066,7 @@ void CTstatAQ::OnEnKillfocusEditLevel1()
 
 void CTstatAQ::OnEnKillfocusEditLevel2()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_LEVEL_2, temp_cstring);
 	unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
@@ -1081,7 +1081,7 @@ void CTstatAQ::OnEnKillfocusEditLevel2()
 
 void CTstatAQ::OnEnKillfocusEditLevel3()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_LEVEL_3, temp_cstring);
 	unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
@@ -1096,7 +1096,7 @@ void CTstatAQ::OnEnKillfocusEditLevel3()
 
 void CTstatAQ::OnEnKillfocusEditLevel4()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_LEVEL_4, temp_cstring);
 	unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
@@ -1111,7 +1111,7 @@ void CTstatAQ::OnEnKillfocusEditLevel4()
 
 void CTstatAQ::OnEnKillfocusEditLevel5()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_LEVEL_5, temp_cstring);
 	unsigned int temp_value = unsigned int(_wtoi(temp_cstring));
@@ -1128,7 +1128,7 @@ void CTstatAQ::OnEnKillfocusEditLevel5()
 #include "TstatAQI_Detail.h"
 void CTstatAQ::OnBnClickedButtonCusAqi()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	CTstatAQI_Detail dlg;
 	dlg.DoModal();
 }
@@ -1136,7 +1136,7 @@ void CTstatAQ::OnBnClickedButtonCusAqi()
 #include "CO2_AUTO_CALIBRATION.h"
 void CTstatAQ::OnBnClickedButtonAutoCal()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	CCO2_AUTO_CALIBRATION Dlg;
 	Dlg.DoModal();
 
@@ -1271,7 +1271,7 @@ LRESULT CTstatAQ::Fresh_Airlab_Item(WPARAM wParam, LPARAM lParam)
 
 void CTstatAQ::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	// TODO: 在此添加消息处理程序代码和/或调用默认值 - TODO: Add your message handler code here and/or call default
 	static int  fan_status = 0;
 	switch (nIDEvent)
 	{
@@ -1331,7 +1331,7 @@ void CTstatAQ::OnTimer(UINT_PTR nIDEvent)
 void CTstatAQ::OnNMClickListAirlab(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	*pResult = 0;
 
 	DWORD dwPos = GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
@@ -1347,7 +1347,7 @@ void CTstatAQ::OnNMClickListAirlab(NMHDR* pNMHDR, LRESULT* pResult)
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
-	if (lRow > m_airlab_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if (lRow > m_airlab_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的 - If the click area exceeds the maximum row number, the click is invalid.
 		return;
 	if (lRow < 0)
 		return;
@@ -1364,7 +1364,7 @@ void CTstatAQ::OnNMClickListAirlab(NMHDR* pNMHDR, LRESULT* pResult)
 		m_time_trigger.ShowWindow(SW_SHOW);
 		CRect list_rect, win_rect;
 		m_airlab_list.GetWindowRect(list_rect);
-		ScreenToClient(list_rect); //转换为客户区矩形	
+		ScreenToClient(list_rect); //转换为客户区矩形 - Convert to client area rectangle
 		GetWindowRect(win_rect);
 		CRect myrect;
 		m_airlab_list.GetSubItemRect(lRow, lCol, LVIR_BOUNDS, myrect);
@@ -1424,7 +1424,7 @@ void CTstatAQ::OnNMClickListAirlab(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CTstatAQ::OnNMKillfocusDatetimepickerTimeRemain(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	CTime temp_time; CString temp_cs;
 	int chour, cmin, csecond;
 	m_time_trigger.GetTime(temp_time);
@@ -1469,7 +1469,7 @@ void CTstatAQ::OnNMKillfocusDatetimepickerTimeRemain(NMHDR* pNMHDR, LRESULT* pRe
 #include "CTstatAQ_Parameter.h"
 void CTstatAQ::OnBnClickedButtonAirlabParameter()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
 	int read_ret = 0;
 	if (product_register_value[7] == STM32_PM25)
 	{
@@ -1500,8 +1500,8 @@ void CTstatAQ::OnBnClickedButtonAirlabParameter()
 void CTstatAQ::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: 在此处添加消息处理程序代码
-	// 不为绘图消息调用 CFormView::OnPaint()
+	// TODO: 在此处添加消息处理程序代码 - Add your message handler code here
+	// 不为绘图消息调用 CFormView::OnPaint() - Do not call CFormView::OnPaint() for drawing messages
 //CMemDC memDC(dc, this);
 //CRect rcClient(100,100,200,200);
 //memDC.GetDC().FillSolidRect(&rcClient, RGB(238, 245, 250));
@@ -1511,7 +1511,7 @@ void CTstatAQ::OnPaint()
 #include "ShowMessageDlg.h"
 void CTstatAQ::OnBnClickedButtonHelpWbgt()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - TODO: Add your control notification handler code here
     CShowMessageDlg dlg;
     CString TotalMessage;
     TotalMessage = _T("What is WBGT?\r\nWBGT is an experimental forecast tool indicating expected heat stress on the human body when in direct sunlight. It estimates the effect of temperature, relative humidity, wind speed, and solar radiation on humans using a combination of temperatures from three thermometers:\r\n\
