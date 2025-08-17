@@ -2240,8 +2240,8 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult)
     int Value_Length = 0;
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
-    
-    if(lRow>m_T3_Input_List.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+    //If out of range, return directly - this is normal behavior
+    if(lRow>m_T3_Input_List.GetItemCount()) //?绻?点击??最大行号，则点击是无效的
         return;
     if(lRow<0)
         return;

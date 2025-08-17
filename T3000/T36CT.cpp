@@ -212,28 +212,32 @@ void T36CT::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
 #if 1	
-    //ÉèÖÃÅÅ/ĞĞÊıÁ¿
+    // Set row/column count
+    //è®¾ç½®æ’/è¡Œæ•°é‡
     m_msflexgrid_input.put_Cols(4);
     m_msflexgrid_input.put_Rows(6+1); 
     m_msflexgrid_input.put_TextMatrix(0,0,_T("Input Name"));
     m_msflexgrid_input.put_TextMatrix(0,1,_T("Register Value"));
     m_msflexgrid_input.put_TextMatrix(0,2,_T("Range"));
     m_msflexgrid_input.put_TextMatrix(0,3,_T("Filter"));
-    //ÉèÖÃÁĞ¿í	
+    // Set column width
+    //è®¾ç½®åˆ—å®½	
     m_msflexgrid_input.put_ColWidth(0,1000);
     m_msflexgrid_input.put_ColWidth(1,1500);
     //m_msflexgrid_input.put_ColWidth(2,1500);
     m_msflexgrid_input.put_ColWidth(2,1500);
     m_msflexgrid_input.put_ColWidth(3,1000);
-    //¾ÓÖĞÏÔÊ¾
+    // Center display
+    //å±…ä¸­æ˜¾ç¤º
     for (int col=0;col<4;col++)
     { 
         m_msflexgrid_input.put_ColAlignment(col,4);
     }
-    //²ÊÉ«ÏÔÊ¾
-    for(int i=1;i<4+1;i++)		//ÅÅÊıÁ¿
+    // Color display
+    //å½©è‰²æ˜¾ç¤º
+    for(int i=1;i<4+1;i++)		// Row count - æ’æ•°é‡
     {
-        for(int k=0;k<4;k++)	//ÁĞÊıÁ¿
+        for(int k=0;k<4;k++)	// Column count - åˆ—æ•°é‡
         {
             if (i%2==1)
             {
@@ -245,7 +249,8 @@ void T36CT::OnInitialUpdate()
             }
         }
     }
-    //ÏÔÊ¾×İ±êÌâ
+    // Display vertical titles
+    //æ˜¾ç¤ºçºµæ ‡é¢˜
     CString str;
     for(int i=1;i<6+1;i++)
     {
@@ -255,28 +260,32 @@ void T36CT::OnInitialUpdate()
         m_msflexgrid_input.put_TextMatrix(i,0,str);	 
     }
 
-    //============================================================================================================½çÃæOutput DO²¿·İÁĞ±í¿ò
+    // Interface Output DO section list box
+    //============================================================================================================ç•Œé¢Output DOéƒ¨ä»½åˆ—è¡¨æ¡†
     m_msflexgrid_Ainput.put_Cols(4);
     m_msflexgrid_Ainput.put_Rows(10+1); 
     m_msflexgrid_Ainput.put_TextMatrix(0,0,_T("Input Name"));
     m_msflexgrid_Ainput.put_TextMatrix(0,1,_T("Register Value"));
     m_msflexgrid_Ainput.put_TextMatrix(0,2,_T("Range"));
     m_msflexgrid_Ainput.put_TextMatrix(0,3,_T("Filter"));
-    //ÉèÖÃÁĞ¿í	
+    // Set column width
+    //è®¾ç½®åˆ—å®½	
     m_msflexgrid_Ainput.put_ColWidth(0,1000);
     m_msflexgrid_Ainput.put_ColWidth(1,1500);
     //m_msflexgrid_input.put_ColWidth(2,1500);
     m_msflexgrid_Ainput.put_ColWidth(2,1500);
     m_msflexgrid_Ainput.put_ColWidth(3,1000);
-    //¾ÓÖĞÏÔÊ¾
+    // Center display
+    //å±…ä¸­æ˜¾ç¤º
     for (int col=0;col<4;col++)
     { 
         m_msflexgrid_Ainput.put_ColAlignment(col,4);
     }
-    //²ÊÉ«ÏÔÊ¾
-    for(int i=1;i<4+1;i++)		//ÅÅÊıÁ¿
+    // Color display
+    //å½©è‰²æ˜¾ç¤º
+    for(int i=1;i<4+1;i++)		// Row count - æ’æ•°é‡
     {
-        for(int k=0;k<4;k++)	//ÁĞÊıÁ¿
+        for(int k=0;k<4;k++)	// Column count - åˆ—æ•°é‡
         {
             if (i%2==1)
             {
@@ -288,7 +297,7 @@ void T36CT::OnInitialUpdate()
             }
         }
     }
-    //ÏÔÊ¾×İ±êÌâ
+    //æ˜¾ç¤ºçºµæ ‡é¢˜ - Display vertical titles
 //    CString str;
     for(int i=1;i<10+1;i++)
     {
@@ -299,13 +308,13 @@ void T36CT::OnInitialUpdate()
     }
 
 
-    //ÉèÖÃĞĞ/ÁĞÊıÁ¿
+    //è®¾ç½®è¡Œ/åˆ—æ•°é‡ - Set row/column count
     m_msflexgrid_output.put_Rows(6);
     m_msflexgrid_output.put_Cols(3);
-    //ÉèÖÃÁĞ¿í	
+    //è®¾ç½®åˆ—å®½ - Set column width
 
 
-    //ÏÔÊ¾ºá±êÌâ
+    //æ˜¾ç¤ºæ¨ªæ ‡é¢˜ - Display horizontal titles
     m_msflexgrid_output.put_TextMatrix(0,0,_T("Output Name"));
     m_msflexgrid_output.put_TextMatrix(0,1,_T("Switch Status"));
     m_msflexgrid_output.put_TextMatrix(0,2,_T("Output Value"));
@@ -316,11 +325,11 @@ void T36CT::OnInitialUpdate()
         m_msflexgrid_output.put_ColAlignment(col,4);
     }
 
-    //²ÊÉ«ÏÔÊ¾
-    for(int i=1;i<6;i++)		//ÅÅÊıÁ¿
+    //å½©è‰²æ˜¾ç¤º - Color display
+    for(int i=1;i<6;i++)		//æ’æ•°é‡ - Row count
     {
 
-        for(int k=0;k<2;k++)	//ÁĞÊıÁ¿
+        for(int k=0;k<2;k++)	//åˆ—æ•°é‡ - Column count
         {
             if (i%2==1)
             {
@@ -332,7 +341,7 @@ void T36CT::OnInitialUpdate()
             }
         }
     }
-    //ÏÔÊ¾×İ±êÌâ
+    //æ˜¾ç¤ºçºµæ ‡é¢˜ - Display vertical titles
     CString str_output;
     for(int i=1;i<5+1;i++)
     {
@@ -766,26 +775,26 @@ void T36CT::ClickMsflexgridOutput()
 {
     grid_flag=3;
     long lRow,lCol;
-    lRow = m_msflexgrid_output.get_RowSel();//»ñÈ¡µã»÷µÄĞĞºÅ	
-    lCol = m_msflexgrid_output.get_ColSel(); //»ñÈ¡µã»÷µÄÁĞºÅ
+    lRow = m_msflexgrid_output.get_RowSel();//è·å–ç‚¹å‡»çš„è¡Œå·	- Get clicked row number
+    lCol = m_msflexgrid_output.get_ColSel(); //è·å–ç‚¹å‡»çš„åˆ—å· - Get clicked column number
     TRACE(_T("Click input grid!\n"));
 
     CRect rect;
-    m_msflexgrid_output.GetWindowRect(rect); //»ñÈ¡±í¸ñ¿Ø¼şµÄ´°¿Ú¾ØĞÎ
-    ScreenToClient(rect); //×ª»»Îª¿Í»§Çø¾ØĞÎ	
+    m_msflexgrid_output.GetWindowRect(rect); //è·å–è¡¨æ ¼æ§ä»¶çš„çª—å£çŸ©å½¢ - Get the window rectangle of the grid control
+    ScreenToClient(rect); //è½¬æ¢ä¸ºå®¢æˆ·åŒºçŸ©å½¢ - Convert to client area rectangle
     CDC* pDC =GetDC();
 
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //¼ÆËãÑ¡ÖĞ¸ñµÄ×óÉÏ½ÇµÄ×ø±ê(ÏóËØÎªµ¥Î»)
+    //è®¡ç®—é€‰ä¸­æ ¼çš„å·¦ä¸Šè§’çš„åæ ‡(è±¡ç´ ä¸ºå•ä½) - Calculate the coordinates of the top-left corner of the selected cell (in pixels)
     long y = m_msflexgrid_output.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_msflexgrid_output.get_ColPos(lCol)/nTwipsPerDotX;
-    //¼ÆËãÑ¡ÖĞ¸ñµÄ³ß´ç(ÏóËØÎªµ¥Î»)¡£¼Ó1ÊÇÊµ¼Êµ÷ÊÔÖĞ£¬·¢ÏÖ¼Ó1ºóĞ§¹û¸üºÃ
+    //è®¡ç®—é€‰ä¸­æ ¼çš„å°ºå¯¸(è±¡ç´ ä¸ºå•ä½)ã€‚åŠ 1æ˜¯å®é™…è°ƒè¯•ä¸­ï¼Œå‘ç°åŠ 1åæ•ˆæœæ›´å¥½ - Calculate the size of the selected cell (in pixels). Adding 1 is found to be better in actual debugging
     long width = m_msflexgrid_output.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_msflexgrid_output.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //ĞÎ³ÉÑ¡ÖĞ¸öËùÔÚµÄ¾ØĞÎÇøÓò
+    //å½¢æˆé€‰ä¸­ä¸ªæ‰€åœ¨çš„çŸ©å½¢åŒºåŸŸ - Calculate the rectangle area where the selected cell is located
     CRect rcCell(x,y,x+width,y+height);
-    //×ª»»³ÉÏà¶Ô¶Ô»°¿òµÄ×ø±ê
+    //è½¬æ¢æˆç›¸å¯¹å¯¹è¯æ¡†çš„åæ ‡ - Convert to the coordinates relative to the dialog box
     rcCell.OffsetRect(rect.left+1,rect.top+1);
     ReleaseDC(pDC);
     CString strValue = m_msflexgrid_output.get_TextMatrix(lRow,lCol);
@@ -795,7 +804,7 @@ void T36CT::ClickMsflexgridOutput()
 
     if(lRow!=0)
     {
-        //return; // 2012.2.7ÀÏÃ«Ëµ²»ÔÊĞíĞŞ¸Ä
+        //return; // 2012.2.7è€æ¯›è¯´ä¸å…è®¸ä¿®æ”¹
         if (m_curcol==0||m_curcol==2)
         {
             m_inNameEdt.MoveWindow(&rcCell,1);
@@ -804,7 +813,7 @@ void T36CT::ClickMsflexgridOutput()
             m_inNameEdt.SetFocus();
             m_inNameEdt.SetCapture();//LSC
             int nLenth=strValue.GetLength();
-            m_inNameEdt.SetSel(nLenth,nLenth); //È«Ñ¡//
+            m_inNameEdt.SetSel(nLenth,nLenth); //å…¨é€‰// - Select all
         } 
         //else 
         //{
@@ -814,7 +823,7 @@ void T36CT::ClickMsflexgridOutput()
         //    m_comboxRange.AddString(_T("ON"));
         //    m_comboxRange.ShowWindow(SW_SHOW);
         //    m_comboxRange.BringWindowToTop();
-        //    m_comboxRange.SetFocus(); //»ñÈ¡½¹µã
+        //    m_comboxRange.SetFocus(); //è·å–ç„¦ç‚¹
         //    m_comboxRange.SetWindowText(strValue);
         //}
         
@@ -830,26 +839,26 @@ void T36CT::ClickMsflexgridInput()
     UpdateData(FALSE);
 
     long lRow,lCol;
-    lRow = m_msflexgrid_input.get_RowSel();//»ñÈ¡µã»÷µÄĞĞºÅ	
-    lCol = m_msflexgrid_input.get_ColSel(); //»ñÈ¡µã»÷µÄÁĞºÅ
+    lRow = m_msflexgrid_input.get_RowSel();//è·å–ç‚¹å‡»çš„è¡Œå·	- Get clicked row number
+    lCol = m_msflexgrid_input.get_ColSel(); //è·å–ç‚¹å‡»çš„åˆ—å· - Get clicked column number
     TRACE(_T("Click input grid!\n"));
 
     CRect rect;
-    m_msflexgrid_input.GetWindowRect(rect); //»ñÈ¡±í¸ñ¿Ø¼şµÄ´°¿Ú¾ØĞÎ
-    ScreenToClient(rect); //×ª»»Îª¿Í»§Çø¾ØĞÎ	
+    m_msflexgrid_input.GetWindowRect(rect); //è·å–è¡¨æ ¼æ§ä»¶çš„çª—å£çŸ©å½¢ - Get the window rectangle of the grid control
+    ScreenToClient(rect); //è½¬æ¢ä¸ºå®¢æˆ·åŒºçŸ©å½¢ - Convert to client area rectangle
     CDC* pDC =GetDC();
 
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //¼ÆËãÑ¡ÖĞ¸ñµÄ×óÉÏ½ÇµÄ×ø±ê(ÏóËØÎªµ¥Î»)
+    //è®¡ç®—é€‰ä¸­æ ¼çš„å·¦ä¸Šè§’çš„åæ ‡(è±¡ç´ ä¸ºå•ä½) - Calculate the coordinates of the top-left corner of the selected cell (in pixels)
     long y = m_msflexgrid_input.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_msflexgrid_input.get_ColPos(lCol)/nTwipsPerDotX;
-    //¼ÆËãÑ¡ÖĞ¸ñµÄ³ß´ç(ÏóËØÎªµ¥Î»)¡£¼Ó1ÊÇÊµ¼Êµ÷ÊÔÖĞ£¬·¢ÏÖ¼Ó1ºóĞ§¹û¸üºÃ
+    //è®¡ç®—é€‰ä¸­æ ¼çš„å°ºå¯¸(è±¡ç´ ä¸ºå•ä½)ã€‚åŠ 1æ˜¯å®é™…è°ƒè¯•ä¸­ï¼Œå‘ç°åŠ 1åæ•ˆæœæ›´å¥½ - Calculate the size of the selected cell (in pixels). Adding 1 is found to be better in actual debugging
     long width = m_msflexgrid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_msflexgrid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //ĞÎ³ÉÑ¡ÖĞ¸öËùÔÚµÄ¾ØĞÎÇøÓò
+    //å½¢æˆé€‰ä¸­ä¸ªæ‰€åœ¨çš„çŸ©å½¢åŒºåŸŸ - Calculate the rectangle area where the selected cell is located
     CRect rcCell(x,y,x+width,y+height);
-    //×ª»»³ÉÏà¶Ô¶Ô»°¿òµÄ×ø±ê
+    //è½¬æ¢æˆç›¸å¯¹å¯¹è¯æ¡†çš„åæ ‡ - Convert to the coordinates relative to the dialog box
     rcCell.OffsetRect(rect.left+1,rect.top+1);
     ReleaseDC(pDC);
     CString strValue = m_msflexgrid_input.get_TextMatrix(lRow,lCol);
@@ -885,7 +894,7 @@ void T36CT::ClickMsflexgridInput()
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
 
-        m_comboxRange.SetFocus(); //»ñÈ¡½¹µã
+        m_comboxRange.SetFocus(); //è·å–ç„¦ç‚¹ - Get focus
         m_comboxRange.SetWindowText(strValue);
     }
     else  
@@ -897,7 +906,7 @@ void T36CT::ClickMsflexgridInput()
         m_inNameEdt.SetFocus();
         m_inNameEdt.SetCapture();//LSC
         int nLenth=strValue.GetLength();
-        m_inNameEdt.SetSel(nLenth,nLenth); //È«Ñ¡//
+        m_inNameEdt.SetSel(nLenth,nLenth); //å…¨é€‰// - Select all
     }
 }
 
@@ -909,26 +918,26 @@ void T36CT::ClickMsflexgridInput2()
     UpdateData(FALSE);
 
     long lRow,lCol;
-    lRow = m_msflexgrid_Ainput.get_RowSel();//»ñÈ¡µã»÷µÄĞĞºÅ	
-    lCol = m_msflexgrid_Ainput.get_ColSel(); //»ñÈ¡µã»÷µÄÁĞºÅ
+    lRow = m_msflexgrid_Ainput.get_RowSel();//è·å–ç‚¹å‡»çš„è¡Œå·	- Get clicked row number
+    lCol = m_msflexgrid_Ainput.get_ColSel(); //è·å–ç‚¹å‡»çš„åˆ—å· - Get clicked column number
     TRACE(_T("Click input grid!\n"));
 
     CRect rect;
-    m_msflexgrid_Ainput.GetWindowRect(rect); //»ñÈ¡±í¸ñ¿Ø¼şµÄ´°¿Ú¾ØĞÎ
-    ScreenToClient(rect); //×ª»»Îª¿Í»§Çø¾ØĞÎ	
+    m_msflexgrid_Ainput.GetWindowRect(rect); //è·å–è¡¨æ ¼æ§ä»¶çš„çª—å£çŸ©å½¢ - Get the window rectangle of the grid control
+    ScreenToClient(rect); //è½¬æ¢ä¸ºå®¢æˆ·åŒºçŸ©å½¢ - Convert to client area rectangle
     CDC* pDC =GetDC();
 
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //¼ÆËãÑ¡ÖĞ¸ñµÄ×óÉÏ½ÇµÄ×ø±ê(ÏóËØÎªµ¥Î»)
+    //è®¡ç®—é€‰ä¸­æ ¼çš„å·¦ä¸Šè§’çš„åæ ‡(è±¡ç´ ä¸ºå•ä½) - Calculate the coordinates of the top-left corner of the selected cell (in pixels)
     long y = m_msflexgrid_Ainput.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_msflexgrid_Ainput.get_ColPos(lCol)/nTwipsPerDotX;
-    //¼ÆËãÑ¡ÖĞ¸ñµÄ³ß´ç(ÏóËØÎªµ¥Î»)¡£¼Ó1ÊÇÊµ¼Êµ÷ÊÔÖĞ£¬·¢ÏÖ¼Ó1ºóĞ§¹û¸üºÃ
+    //è®¡ç®—é€‰ä¸­æ ¼çš„å°ºå¯¸(è±¡ç´ ä¸ºå•ä½)ã€‚åŠ 1æ˜¯å®é™…è°ƒè¯•ä¸­ï¼Œå‘ç°åŠ 1åæ•ˆæœæ›´å¥½ - Calculate the size of the selected cell (in pixels). Adding 1 is found to be better in actual debugging
     long width = m_msflexgrid_Ainput.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_msflexgrid_Ainput.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //ĞÎ³ÉÑ¡ÖĞ¸öËùÔÚµÄ¾ØĞÎÇøÓò
+    //å½¢æˆé€‰ä¸­ä¸ªæ‰€åœ¨çš„çŸ©å½¢åŒºåŸŸ - Calculate the rectangle area where the selected cell is located
     CRect rcCell(x,y,x+width,y+height);
-    //×ª»»³ÉÏà¶Ô¶Ô»°¿òµÄ×ø±ê
+    //è½¬æ¢æˆç›¸å¯¹å¯¹è¯æ¡†çš„åæ ‡ - Convert to the coordinates relative to the dialog box
     rcCell.OffsetRect(rect.left+1,rect.top+1);
     ReleaseDC(pDC);
     CString strValue = m_msflexgrid_Ainput.get_TextMatrix(lRow,lCol);
@@ -959,7 +968,7 @@ void T36CT::ClickMsflexgridInput2()
         m_comboxRange.AddString(_T("4-20 ma"));
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
-        m_comboxRange.SetFocus(); //»ñÈ¡½¹µã
+        m_comboxRange.SetFocus(); //è·å–ç„¦ç‚¹ - Get focus
         m_comboxRange.SetWindowText(strValue);
     }
     else  
@@ -970,7 +979,7 @@ void T36CT::ClickMsflexgridInput2()
         m_inNameEdt.SetFocus();
         m_inNameEdt.SetCapture();//LSC
         int nLenth=strValue.GetLength();
-        m_inNameEdt.SetSel(nLenth,nLenth); //È«Ñ¡//
+        m_inNameEdt.SetSel(nLenth,nLenth); //å…¨é€‰// Select all
     }
 }
 
@@ -1187,7 +1196,7 @@ void T36CT::OnCbnSelchangeBaudratecombo()
 		CString sql;
 		sql.Format(_T("Select * from ALL_NODE where Serial_ID = '%d' "),m_sn);
 		q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
-		if (!q.eof())//ÓĞ±íµ«ÊÇÃ»ÓĞ¶ÔÓ¦ĞòÁĞºÅµÄÖµ
+		if (!q.eof())//æœ‰è¡¨ä½†æ˜¯æ²¡æœ‰å¯¹åº”åºåˆ—å·çš„å€¼ - There is a table but no corresponding serial number value
 		{
 			sql.Format(_T("update ALL_NODE set Bautrate = '%d' where Serial_ID = '%d'"),bandrate,m_sn);
 			 SqliteDBT3000.execDML((UTF8MBSTR)sql);

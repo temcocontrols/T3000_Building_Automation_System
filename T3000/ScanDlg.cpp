@@ -10,9 +10,10 @@
  
 #define STATUS_FAILED 0xFFFF 
 #define DEF_PACKET_SIZE    32
-#define DEF_PACKET_NUMBER  4    /* 发送数据报的个数 */
+#define DEF_PACKET_NUMBER  4    /* Number of data packets to send - 发送数据报的个数 */
 #define MAX_PACKET 1024 
 
+// Column definitions for table in scan dialog
 // scan dialog 中表格的列的定义
 #define SCAN_TABLE_TYPE					0
 #define SCAN_TABLE_BUILDING				1
@@ -95,6 +96,7 @@ void CScanDlg::GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetwa
 	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO)); 
 	ulOutBufLen = sizeof(IP_ADAPTER_INFO); 
 	 ;
+	// First call to GetAdapterInfo to get ulOutBufLen size
 	// 第一次调用GetAdapterInfo获取ulOutBufLen大小 
 	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
 	{ 
@@ -164,6 +166,7 @@ void CScanDlg::GetIPMaskGetWay(vector<ALL_LOCAL_SUBNET_NODE>& Vector_Subnet){
 	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO)); 
 	ulOutBufLen = sizeof(IP_ADAPTER_INFO); 
 	ALL_LOCAL_SUBNET_NODE  Temp_Node;
+	// First call to GetAdapterInfo to get ulOutBufLen size
 	// 第一次调用GetAdapterInfo获取ulOutBufLen大小 
 	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
 	{ 
@@ -381,7 +384,7 @@ BOOL CScanDlg::TestPing(const CString& strIP)
 {	
  #ifdef CPING_USE_ICMP
 
-    for (int i = 0; i < 2; i++) //改为2次 ，这一次都要大约4秒钟，只是用这个来判断IP是否在线
+    for (int i = 0; i < 2; i++) //Changed to 2 times, each time takes about 4 seconds, just use this to check if IP is online - 改为2次 ，这一次都要大约4秒钟，只是用这个来判断IP是否在线
     {
         CPing p1;
         CPingReply pr1;
@@ -522,7 +525,7 @@ void CScanDlg::OnBnClickedButtonScanall()
     allsubnets.clear();
 	GetIPMaskGetWay(allsubnets);
 	
-	WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .这里要等待Main Scan 那里弄完了 在去扫;
+	WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance. Here we need to wait for Main Scan to finish before scanning - Add by Fance .这里要等待Main Scan 那里弄完了 在去扫;
 	ReleaseMutex(Read_Mutex);
 
 	SOCKET sListen=NULL;
@@ -544,7 +547,7 @@ void CScanDlg::OnBnClickedButtonScanall()
 	int row_flags=m_flexGrid.get_Rows()-1;
 	CString stroldipaddress,strnewipadress,strlocalipaddress,strnewsubnet,strnewgateway;
 	GetIPMaskGetWay(strlocalipaddress,strnewsubnet,strnewgateway);
-	while(row_flags>=1)  // 超时结束
+	while(row_flags>=1)  // Timeout end - 超时结束
 	{
 		USES_CONVERSION;
 		//strnewipadress=m_flexGrid.get_TextMatrix(row_flags,NEW_IPADRESS);
@@ -621,7 +624,7 @@ void CScanDlg::OnBnClickedButtonScanall()
 // 			if(nRet > 0)
 // 			{		
 // 				FD_ZERO(&fdSocket);
-// 				if(buffer[0]==0x67)//收到正确的回复了
+// 				if(buffer[0]==0x67)//Received correct reply - 收到正确的回复了
 // 				{	
 // 					for (int i=0;i<10;i++)
 // 					{
@@ -716,7 +719,7 @@ stroldipaddress=strIP;
 	for (int i=0;i<allsubnets.size();i++)
 	{
 		GetNewIP(strnewipadress,allsubnets[i].StrIP);
-		if (strnewipadress.Find(_T("0.0.0"))!=-1)//对0.0.0.0的过滤掉
+		if (strnewipadress.Find(_T("0.0.0"))!=-1)//Filter out 0.0.0.0 - 对0.0.0.0的过滤掉
 		{
 			continue;
 		}
@@ -787,7 +790,7 @@ stroldipaddress=strIP;
 			if(nRet > 0)
 			{		
 				FD_ZERO(&fdSocket);
-				if(buffer[0]==0x67)//收到正确的回复了
+				if(buffer[0]==0x67)//Received correct reply - 收到正确的回复了
 				{	
 
 				    Sleep(8000);
@@ -1325,6 +1328,7 @@ void CScanDlg::OnClose()
 
 
 // 
+// // Draw button at specified position
 // // 在指定位置画button
 // void CScanDlg::DrawButtonOnGrid(int iRow, int iCol)
 // {
@@ -1360,7 +1364,7 @@ void CScanDlg::ShowInputEditBox(int iRow, int iCol)
 {	
 //	int iRow,iCol;
 	m_editGrid.SetWindowText(_T(""));
-	CRect rc = CalcGridCellRect(iRow, iCol);  // 肯定ID列
+	CRect rc = CalcGridCellRect(iRow, iCol);  // Definitely the ID column - 肯定ID列
 	m_editGrid.MoveWindow(rc, TRUE);
 	m_editGrid.SetFocus();
 	m_editGrid.BringWindowToTop();
@@ -1374,20 +1378,24 @@ void CScanDlg::ShowInputEditBox(int iRow, int iCol)
 CRect CScanDlg::CalcGridCellRect(int iRow, int iCol )
 {
 	CRect rect;
-	m_flexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
+	m_flexGrid.GetWindowRect(rect); //Get the window rectangle of the table control - 获取表格控件的窗口矩形
+	ScreenToClient(rect); //Convert to client area rectangle - 转换为客户区矩形	
 	CDC* pDC = GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//Calculate the coordinates of the upper left corner of the selected cell (in pixels)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_flexGrid.get_RowPos(iRow)/nTwipsPerDotY;
 	long x = m_flexGrid.get_ColPos(iCol)/nTwipsPerDotX;
+	//Calculate the size of the selected cell (in pixels). Adding 1 makes the effect better in actual debugging
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_flexGrid.get_ColWidth(iCol)/nTwipsPerDotX+1;
 	long height = m_flexGrid.get_RowHeight(iRow)/nTwipsPerDotY+1;
+	//Form the rectangular area where the selected cell is located
 	//形成选中个所在的矩形区域
 	CRect rcCell(x,y,x+width,y+height);
+	//Convert to coordinates relative to the dialog box
 	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+2,rect.top+2);	
 	rcCell.InflateRect(-1,-1,-1,-1);
@@ -1411,26 +1419,30 @@ void CScanDlg::ClickMsflexgrid1()
 
 #if 1
 	long lRow,lCol;
-	lRow = m_flexGrid.get_RowSel();//获取点击的行号	
-	lCol = m_flexGrid.get_ColSel(); //获取点击的列号
+	lRow = m_flexGrid.get_RowSel();//Get the row number clicked - 获取点击的行号	
+	lCol = m_flexGrid.get_ColSel(); //Get the column number clicked - 获取点击的列号
 	TRACE(_T("Click input grid!\n"));
 	m_currow=lRow;
 	m_curcol=lCol;
 	CRect rect;
-	m_flexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
+	m_flexGrid.GetWindowRect(rect); //Get the window rectangle of the table control - 获取表格控件的窗口矩形
+	ScreenToClient(rect); //Convert to client area rectangle - 转换为客户区矩形	
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//Calculate the coordinates of the upper left corner of the selected cell (in pixels)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_flexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_flexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	//Calculate the size of the selected cell (in pixels). Adding 1 makes the effect better in actual debugging
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_flexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_flexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//Form the rectangular area where the selected cell is located
 	//形成选中个所在的矩形区域
 	CRect rcCell(x,y,x+width,y+height);
+	//Convert to coordinates relative to the dialog box
 	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
@@ -1443,36 +1455,40 @@ void CScanDlg::ClickMsflexgrid1()
 		m_editGrid.SetFocus();
 		m_editGrid.SetCapture();//LSC
 		int nLenth=m_editGrid.GetLineCount();//m_editGrid.GetLength();
-		m_editGrid.SetSel(nLenth,nLenth); //全选//
+		m_editGrid.SetSel(nLenth,nLenth); //Select all - 全选//
 		return;
 		
 	}
 #endif
 	CSize szTemp;
-	CalcClickPos(szTemp);// 计算点中的位置
+	CalcClickPos(szTemp);// Calculate the clicked position - 计算点中的位置
 	if (szTemp == m_szGridEditPos)
 	{
 		return;	
 	}
 	
 	
+	// 3 situations
 	// 3种情况
+	// 1. Click on other valid places, display, record, data and move edit
 	// 1，点在其他有效处，显示，记录，数据并移动edit
+	// 2. Click on invalid places, lose focus, close edit, display, record, data
 	// 2，点在无效处，并失去焦点，关掉edit，显示，记录，数据
+	// 3. Exit, close edit, display, record, data, and save to database
 	// 3，退出，关掉edit，显示，记录，数据，并保存至数据库
 
 	if (IsValidClick(szTemp))  
 	{	
-		if(m_szGridEditPos.cx != -1) // 不是第一次点击才需要记录上一次的数据
+		if(m_szGridEditPos.cx != -1) // Only need to record the previous data if it's not the first click - 不是第一次点击才需要记录上一次的数据
 		{
-			GetGridEditString();    // 记录edit的数据			
+			GetGridEditString();    // Record edit data - 记录edit的数据			
 		}
 		ShowInputEditBox(szTemp.cx, szTemp.cy);		
 		m_szGridEditPos = szTemp;							
 	}	
-	else// 点在不相干的地方就 destroy
+	else// Click on unrelated places, then destroy - 点在不相干的地方就 destroy
 	{	
-		GetGridEditString();    // 记录edit的数据
+		GetGridEditString();    // Record edit data - 记录edit的数据
 		DestroyFlexEdit();	     
 	}
 // 	if(GetFocus()->m_hWnd != m_editGrid.m_hWnd)
@@ -1484,11 +1500,11 @@ void CScanDlg::ClickMsflexgrid1()
 
 }
 
-void CScanDlg::GetGridEditString() // 记录edit的数据
+void CScanDlg::GetGridEditString() // Record edit data - 记录edit的数据
 {
 	CString strText ;
 	m_editGrid.GetWindowText(strText)	;
-	if (strText.GetLength() == 0)  // 没输入，啥也不干
+	if (strText.GetLength() == 0)  // No input, do nothing - 没输入，啥也不干
 	{
 		return;
 	}
@@ -1518,8 +1534,11 @@ void CScanDlg::GetGridEditString() // 记录edit的数据
 
 
 //////////////////////////////////////////////////////////////////////////
+// return 1, normal
 // return 1, 正常 
+// return 0, invalid click, should not react
 // return 0, 无效点击，就是不应该反应的
+// return 3, outside the grid or somewhere unknown
 // return 3, 在grid之外或者不知道什么地方
 int CScanDlg::IsValidClick(CSize szTemp)
 {
@@ -1536,8 +1555,8 @@ int CScanDlg::IsValidClick(CSize szTemp)
 void CScanDlg::CalcClickPos(CSize& size)
 {
 	long lRow,lCol;
-	lRow = m_flexGrid.get_RowSel();//获取点击的行号	
-	lCol = m_flexGrid.get_ColSel(); //获取点击的列号
+	lRow = m_flexGrid.get_RowSel();//Get the row number clicked - 获取点击的行号	
+	lCol = m_flexGrid.get_ColSel(); //Get the column number clicked - 获取点击的列号
 
 	if(lRow<=0)
 		return;
@@ -1550,10 +1569,14 @@ void CScanDlg::DestroyFlexEdit()
 	CString strText;
 	m_editGrid.GetWindowText(strText);		
 }
+// Get values from database to memory
 // 将数据库里的值取出放到内存
+// Write memory values to database
 // 将内存的值将被写入数据库
 //
+// Only allow writing buildingname, floorname, roomname, address
 // 只允许写 buildingname，floorname，roomname，address
+// Therefore, only address needs to be written to register
 // 因此，需要向寄存器写的只有address
 void CScanDlg::GetDataFromGrid()
 {
@@ -1591,10 +1614,11 @@ void CScanDlg::GetDataFromGrid()
 		pInfo->SetRoomName(strRoomName);
 		pInfo->SetSubnetName(strSubnetName);
 		//pInfo->m_pDev->SetDevID(nAddress);
-		//Write_One(pInfo->m_pDev->GetDevID(), 6, nAddress);  // 此时写ID到寄存器	
+		//Write_One(pInfo->m_pDev->GetDevID(), 6, nAddress);  // Write ID to register at this time - 此时写ID到寄存器	
 	}
 }
 
+// Save all nodes to database, AllNodes
 // 将所有节点保存到数据库，AllNodes
 void CScanDlg::SaveAllNodeToDB()
 {
@@ -1632,6 +1656,7 @@ void CScanDlg::SaveAllNodeToDB()
 		WriteOneNetInfoToDB(pNetInfo);
 	}
 
+	// Write back to database
 	// 数据库的写回去.
 	for (UINT i = 0; i < m_szComNodes.size(); i++)
 	{
@@ -1649,7 +1674,9 @@ void CScanDlg::SaveAllNodeToDB()
  
 }
 
+// Merge database and scan results for storage in database
 // 合并数据库和scan结果，以便存入数据库
+// If Serial ID is the same, use grid data as standard
 // 如果Serial ID相同的，则以grid的数据为准
 void CScanDlg::CombineDBandScanRet()
 {
@@ -1664,7 +1691,7 @@ void CScanDlg::CombineDBandScanRet()
 		{
 			CTStat_Dev* pDBDev = m_szComNodes[j];
 			int nDBSID= pDBDev->GetSerialID();
-			if (nDBSID == nSID) // 相等，删掉数据库这项，保留scan 结果
+			if (nDBSID == nSID) // Equal, delete this database item, keep scan result - 相等，删掉数据库这项，保留scan 结果
 			{
 // 				pDBDev->SetBuildingName(pDev->GetBuildingName());
 // 				pDBDev->SetFloorName(pDev->GetFloorName());
@@ -1689,7 +1716,7 @@ void CScanDlg::CombineDBandScanRet()
 		{
 			CTStat_Net* pDBNet = m_szNetNodes[j];
 			int nDBSID= pDBNet->GetSerialID();
-			if (nDBSID == nSID) // 相等，赋值
+			if (nDBSID == nSID) // Equal, assign values - 相等，赋值
 			{
 // 				pDBNet->SetBuildingName(pDBNet->GetBuildingName());
 // 				pDBNet->SetFloorName(pDBNet->GetFloorName());
@@ -1708,7 +1735,7 @@ void CScanDlg::CombineDBandScanRet()
 }
 
 
-//程序設計
+//Program Design - 程序設計
 void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 {
 	ASSERT(pDev);
@@ -1866,8 +1893,8 @@ void CScanDlg::AddComDeviceToGrid(vector<_ComDeviceInfo*>& szList)
 {
 	int nSize = 1;//m_flexGrid.get_Rows();
 	VARIANT vRow; 
-	vRow.vt = VT_I4;//指定变量类型 
-	vRow.lVal =1;     //赋值 
+	vRow.vt = VT_I4;//Specify variable type - 指定变量类型 
+	vRow.lVal =1;     //Assign value - 赋值 
 	//EnterCriticalSection(&m_csGrid);
 	TRACE(_T("scan has found node == %d\n"), szList.size());
 	m_flexGrid.put_Rows(szList.size() + nSize);

@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 生成的包含文件。
-// 供 T3000.rc 使用
+// Microsoft Visual C++ 生成的包含文件。- Generated include file
+// 供 T3000.rc 使用 - For use by T3000.rc
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3

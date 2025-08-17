@@ -9,7 +9,7 @@
 
 HDC status_gloab_hdc;
 HDC status_hMemDC;
-HBITMAP status_hBmp; //ÓÃÓÚË«»º³å;
+HBITMAP status_hBmp; // For double buffering - ç”¨äºåŒç¼“å†²;
 CRect status_myRect;
 CString cs_show_status_info;
 
@@ -260,7 +260,7 @@ DWORD WINAPI MyStatusBarThread(LPVOID lPvoid)
 
 		SelectObject(status_hMemDC, status_hBmp);
 		mparent->DrawStatusBar(status_hMemDC);
-		BitBlt(status_gloab_hdc, 0, 0, status_myRect.right, status_myRect.bottom, status_hMemDC, 0, 0, SRCCOPY);//½«»æÖÆÍê³ÉµÄÄÚ´æÎ»Í¼Ìùµ½µÄPicture¿Õ¼ä¶ÔÏóÖĞ;
+		BitBlt(status_gloab_hdc, 0, 0, status_myRect.right, status_myRect.bottom, status_hMemDC, 0, 0, SRCCOPY);// Paste the completed memory bitmap to the Picture control object - å°†ç»˜åˆ¶å®Œæˆçš„å†…å­˜ä½å›¾è´´åˆ°çš„Pictureç©ºé—´å¯¹è±¡ä¸­;
 		for (int z = 0; z < 100; z++)
 		{
 			if (b_statusbarthreadflag)
@@ -276,7 +276,8 @@ DWORD WINAPI MyStatusBarThread(LPVOID lPvoid)
 	return 0;
 }
 
-//ÖØ»æ×´Ì¬À¸ £¬ ×´Ì¬À¸µÄ´óĞ¡»á¸ù¾İ´°ÌåµÄ´óĞ¡±ä¶¯;
+// Redraw status bar, the size of the status bar will change according to the size of the window
+//é‡ç»˜çŠ¶æ€æ  ï¼Œ çŠ¶æ€æ çš„å¤§å°ä¼šæ ¹æ®çª—ä½“çš„å¤§å°å˜åŠ¨;
 void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 {
 	Graphics* mygraphics;
@@ -326,7 +327,8 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 	mygraphics->DrawRectangle(myRectangle_pen, progress_start_pos, 0, progress_width - STATUS_ALARM_ICON_WIDTH, window_height);
 
 	CString temp_value;
-	//Íâ²¿ÇåÁãµÄÇé¿öÏÂ£¬ĞèÒªÆäËû²ÎÊıÒ²³õÊ¼»¯
+	// In case of external clearing, other parameters also need to be initialized
+	//å¤–éƒ¨æ¸…é›¶çš„æƒ…å†µä¸‹ï¼Œéœ€è¦å…¶ä»–å‚æ•°ä¹Ÿåˆå§‹åŒ–
 	if (clear_status_bar)
 	{
 		m_health_persent = 100;
@@ -375,7 +377,8 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 
 	staticpointF.X = err_start_pos + STATUS_CHARACTER_VALUE_OFFSET;
 
-	//ÕâÒ»¶ÎÖ÷ÒªÊÇ´¦ÀíÓĞĞ©ÃüÁîÊÇÉè±¸¶àÓà»Ø¸´³öÀ´µÄ£¬ÀıÈç ·¢Ò»Ìõ£¬Éè±¸»Ø¸´Á½Ìõ£¬ÕâÑù¾Í²»Ì«ºÃ¼ÆËã error µÄ¸öÊı;
+	// This section mainly handles some commands that the device replies excessively, for example, sending one command but the device replies with two, making it difficult to calculate the number of errors
+	//è¿™ä¸€æ®µä¸»è¦æ˜¯å¤„ç†æœ‰äº›å‘½ä»¤æ˜¯è®¾å¤‡å¤šä½™å›å¤å‡ºæ¥çš„ï¼Œä¾‹å¦‚ å‘ä¸€æ¡ï¼Œè®¾å¤‡å›å¤ä¸¤æ¡ï¼Œè¿™æ ·å°±ä¸å¤ªå¥½è®¡ç®— error çš„ä¸ªæ•°;
 	static int n_err_show_count = 0;
 	if (++n_err_show_count == 50)
 	{
@@ -394,7 +397,7 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 			g_llerrCount = g_llTxCount - g_llRxCount;
 		}
 	}
-	if (g_llTxCount > old_tx_count) //Ã¿·¢ËÍÒ»´Î²Å½øÀ´Ò»´Î;
+	if (g_llTxCount > old_tx_count) //æ¯å‘é€ä¸€æ¬¡æ‰è¿›æ¥ä¸€æ¬¡; - Only enter once for each transmission
 	{
 		old_tx_count = g_llTxCount;
 		if (persent_array_count < 100)
@@ -522,8 +525,8 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 	delete BlackBrush;
 	delete CharacterblkBrush;
 	delete ProgressblkBrush;
-    delete HealthGreenBrush;  //2018 03 02 fanduÌí¼Ó  
-    delete HealthRedBrush;    //2018 03 02 fanduÌí¼Ó  
+    delete HealthGreenBrush;  //2018 03 02 fanduæ·»åŠ  - Added by fandu on 2018 03 02
+    delete HealthRedBrush;    //2018 03 02 fanduæ·»åŠ  - Added by fandu on 2018 03 02
 }
 
 void CMyStatusbarCtrl::OnPaint()
@@ -558,7 +561,7 @@ LRESULT CMyStatusbarCtrl::ShowProgressText(WPARAM wParam, LPARAM lParam)
 
 void CMyStatusbarCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-    // TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
+    // TODO: åœ¨æ­¤æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç å’Œ/æˆ–è°ƒç”¨é»˜è®¤å€¼ - Add message handler code and/or call default values here
     if (T3000LogWindow == NULL)
     {
         T3000LogWindow = new CT3000LogWindow;

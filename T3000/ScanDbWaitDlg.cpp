@@ -8,7 +8,7 @@
 
 // CScanDbWaitDlg dialog
 CRect Scan_rect;
-extern HANDLE * hScanTCPData ; //用于网络多网络同时扫描
+extern HANDLE * hScanTCPData ; //用于网络多网络同时扫描 - Used for multi-threaded network scanning
 IMPLEMENT_DYNAMIC(CScanDbWaitDlg, CDialog)
 
 CScanDbWaitDlg::CScanDbWaitDlg(CWnd* pParent /*=NULL*/)
@@ -62,7 +62,7 @@ void CScanDbWaitDlg::OnBnClickedCancel()
     ;
 }
 
-extern HANDLE * hScanComData ; //用于串口多线程同时扫描
+extern HANDLE * hScanComData ; //用于串口多线程同时扫描 - Used for multi-threaded serial port scanning
 void CScanDbWaitDlg::OnBnClickedExitbutton()
 {
     m_pScaner->m_bStopScan = TRUE;
@@ -460,9 +460,9 @@ void CScanDbWaitDlg::OnSize(UINT nType, int cx, int cy)
 {
     CDialog::OnSize(nType, cx, cy);
 
-    // TODO: 在此处添加消息处理程序代码
+    // TODO: 在此处添加消息处理程序代码 - Add your message handler code here
     CRect temp_mynew_rect;
-    ::GetWindowRect(this->m_hWnd, &temp_mynew_rect);	//获取 view的窗体大小;
+    ::GetWindowRect(this->m_hWnd, &temp_mynew_rect);	//获取 view的窗体大小; - Get the size of the view window
 
     ::SetWindowPos(m_scan_com_list.m_hWnd, NULL, temp_mynew_rect.left, temp_mynew_rect.top, temp_mynew_rect.Width() -30, temp_mynew_rect.Height(), SWP_NOMOVE);
 }

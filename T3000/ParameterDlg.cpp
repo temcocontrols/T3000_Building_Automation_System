@@ -359,13 +359,13 @@ BOOL CParameterDlg::OnInitDialog()
 {
 	//20120420
 	//pProgess = new CDialog_Progess(this,1,10);
-	//创建对话框窗口
+	//创建对话框窗口 - 20120420
 
 
 	//居中显示
 	//	pProgess->CenterWindow();//2.5.0.98
 
-	//显示对话框窗口
+	//显示对话框窗口 - Show dialog window
 
 	//20120420
 
@@ -426,7 +426,7 @@ BOOL CParameterDlg::OnInitDialog()
 	m_gUnit.AddString(_T("°F"));
 
 
-    //Fandu 20180127  TSTAT8 才显示 额外新增的 TSTAT 参数对话框的 按钮;
+    //Fandu 20180127  TSTAT8 才显示 额外新增的 TSTAT 参数对话框的 按钮; - Show button for additional TSTAT parameter dialog
     if ((product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9))
     {
         GetDlgItem(IDC_BUTTON_PARAMETER_EXT)->ShowWindow(SW_SHOW);
@@ -2311,10 +2311,10 @@ void CParameterDlg::OnBnClickedInputsbutton()
 
 void CParameterDlg::OnBnClickedOutputsbutton()
 {
-    g_bPauseMultiRead = TRUE;	//暂停主线程读取 寄存器;	//Add by Fance
+    g_bPauseMultiRead = TRUE;	//暂停主线程读取 寄存器;	//Add by Fance - Pause main thread reading registers
     COutputSetDlg dlg;
     dlg.DoModal();
-    g_bPauseMultiRead =FALSE;		//Add by Fance
+    g_bPauseMultiRead =FALSE;		//Add by Fance - Resume main thread reading registers
     Reflesh_ParameterDlg();//Recode by Fance
 }
 
@@ -2323,7 +2323,7 @@ void CParameterDlg::OnBnClickedOutputstablebutton()
     CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 
 
-    g_bPauseMultiRead = TRUE;	//暂停主线程读取 寄存器;	//Add by Fance
+    g_bPauseMultiRead = TRUE;	//暂停主线程读取 寄存器;	//Add by Fance - Pause main thread reading registers
     COutPutDlg Dlg;
     Dlg.DoModal();
     g_bPauseMultiRead =FALSE;	//Add by Fance
@@ -2438,7 +2438,7 @@ BOOL CParameterDlg::PreTranslateMessage(MSG* pMsg)
 
 void CParameterDlg::OnEnKillfocusSetvalue1()
 {
-//修改这个因为 用消息 一直在消息队列中，故而改成这种方式
+//修改这个因为 用消息 一直在消息队列中，故而改成这种方式 - Modify this because the message is always in the message queue, so change to this way
     if(g_ParamLevel==1)
         return;
     CString strText;
@@ -2533,7 +2533,7 @@ void CParameterDlg::OnCbnSelchangeOccupiedmodecombo()
 }
 
 
-//Modify by Fance 这里原来的代码400只支持 5E 不支持T6 所以 改为如下
+//Modify by Fance 这里原来的代码400只支持 5E 不支持T6 所以 改为如下 - Modify this because the original code 400 only supports 5E and does not support T6
 void CParameterDlg::OnCbnSelchangeComboLcdscrn1()
 {
     CComboBox* pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_LCDSCRN1);
@@ -2606,7 +2606,7 @@ void CParameterDlg::OnCbnKillfocusCombo4()
 
 
 
-CString CParameterDlg::GetInputValue(int InputNo) //这个是行号，如果是Input的话，要在这个基础上加1
+CString CParameterDlg::GetInputValue(int InputNo) //这个是行号，如果是Input的话，要在这个基础上加1 - This is the line number, if it is Input, it needs to be increased by 1
 {
 //所以InputNO=InputNo+1;
     InputNo+=1;
@@ -2981,11 +2981,11 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
         if(product_register_value[382]>=5&&product_register_value[382]<=14) // input1
         {
-            if (product_register_value[382] == 13) //说明是选择的CO2 ，而CO2对应的是 index 是10
+            if (product_register_value[382] == 13) //说明是选择的CO2 ，而CO2对应的是 index 是10 - This indicates that the selected CO2 corresponds to index 10
             {
                 strTemp = m_tstat_input_data.at(10).Value.StrValue + m_tstat_input_data.at(10).Unit.StrValue;
             }
-            else if (product_register_value[382] == 14) //说明是选择的HUM ，而HUM对应的是 index 是9
+            else if (product_register_value[382] == 14) //说明是选择的HUM ，而HUM对应的是 index 是9 - This indicates that the selected HUM corresponds to index 9
             {
                 strTemp = m_tstat_input_data.at(9).Value.StrValue + m_tstat_input_data.at(9).Unit.StrValue;
             }
@@ -3023,22 +3023,22 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			)
 		{
 			bitset<16>  value109(product_register_value[109]);
-			int sel = value109[4];//第五位
+			int sel = value109[4];//第五位 - Fifth bit
 			m_combox_mrd.SetCurSel(sel);
 		}
 		else
 		{
 			bitset<16>  value184(product_register_value[184]);
-			int sel = value184[4];//第五位
+			int sel = value184[4];//第五位 - Fifth bit
 			m_combox_mrd.SetCurSel(sel);
 		}
         if(product_register_value[383]>=5&&product_register_value[383]<=14) // input1
         {
-            if (product_register_value[383] == 13) //说明是选择的CO2 ，而CO2对应的是 index 是10
+            if (product_register_value[383] == 13) //说明是选择的CO2 ，而CO2对应的是 index 是10 - This indicates that the selected CO2 corresponds to index 10
             {
                 strTemp = m_tstat_input_data.at(10).Value.StrValue + m_tstat_input_data.at(10).Unit.StrValue;
             }
-            else if (product_register_value[383] == 14) //说明是选择的HUM ，而HUM对应的是 index 是9
+            else if (product_register_value[383] == 14) //说明是选择的HUM ，而HUM对应的是 index 是9 - This indicates that the selected HUM corresponds to index 9
             {
                 strTemp = m_tstat_input_data.at(9).Value.StrValue + m_tstat_input_data.at(9).Unit.StrValue;
             }
@@ -3296,7 +3296,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
             else
             {
                 m_application_ctrl.SetCurSel(product_register_value[454]);
-                // 5E 以及以后的型号
+                // 5E 以及以后的型号 - 5E and later models
             }
 
         }
@@ -3381,7 +3381,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
     m_dayOccEdt2.SetWindowText(strTemp);
 
 
-    //下面有问题;
+    //下面有问题; - There may be a problem below
     //if (product_register_value[MODBUS_INPUT1_SELECT]==3) // humidity		//241
     //{
     //	strTemp.Format(_T("%0.1f%%"),product_register_value[422]/10.0);	//422 Don't know why???
@@ -3389,7 +3389,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
     //}
 
     strTemp.Empty();
-    //上面可能有问题;
+    //上面可能有问题; - There may be a problem above
 
     if(product_type!=T3000_6_ADDRESS)
     {
@@ -4054,11 +4054,11 @@ HBRUSH CParameterDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
     
     for (int i=0; i<(int)Change_Color_ID.size(); i++)
     {
-        if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
+        if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果 - Note that (pWnd->) is required here, otherwise it won't work
         {
             pDC->SetTextColor(RGB(0,0,0));
-            pDC->SetBkColor(RGB(255,0,0));//设置文本背景色
-            pDC->SetBkMode(TRANSPARENT);//设置背景透明
+            pDC->SetBkColor(RGB(255,0,0));//设置文本背景色 - Set text background color
+            pDC->SetBkMode(TRANSPARENT);//设置背景透明 - Set background transparent
             hbr = (HBRUSH)m_brush;
         }
 
@@ -4212,21 +4212,21 @@ void CParameterDlg::OnCbnSelchangeInputselect3Pid3()
 
     Reflesh_ParameterDlg();
 }
-//获取一个第八位数据，s:system:进制，n;num:这个数是几位的，第N位是1还是0
+//获取一个第八位数据，s:system:进制，n;num:这个数是几位的，第N位是1还是0 - Get the eighth bit of data, s:system:base, n:num:how many bits this number has, whether the Nth bit is 1 or 0
 //n>=N
 BOOL CParameterDlg::Get_Data_Bit(UINT Data,int n,int N)
 {
-    //Data=Data&0FFx;//去掉高八位数据
-    //下面是算幂 2的N
-    //最大的num位数的数是？ 2~num-1
+    //Data=Data&0FFx;//去掉高八位数据 - Remove high eight bits of data
+    //下面是算幂 2的N - Calculate 2 to the power of N
+    //最大的num位数的数是？ 2~num-1 - What is the largest number with num bits? 2~num-1
     // AfxMessageBox(_T("OK"));
     UINT num=1;
     for (int i=1; i<=n; i++)
     {
         num=num*2;
     }
-    num=num-1;//最大的num位数
-    Data=Data&num;//取得这个n位数是什么 ？
+    num=num-1;//最大的num位数 - What is the largest number with num bits?
+    Data=Data&num;//取得这个n位数是什么 ？ - What is this n-bit number?
     num=1;
     for (int i=1; i<N; i++)
     {
@@ -5305,7 +5305,7 @@ void CParameterDlg::OnEnKillfocusEditTstatName()
     {
         return;
     }
-    if(newname.GetLength()> 17)	//长度不能大于结构体定义的长度;
+    if(newname.GetLength()> 17)	//长度不能大于结构体定义的长度; - Length cannot exceed the defined length of the structure;
     {
         newname.Delete(16,newname.GetLength()-16);
     }
@@ -5330,7 +5330,7 @@ void CParameterDlg::OnEnKillfocusEditTstatName()
         SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
         SqliteDBBuilding.closedb();
         CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-        // 这里就是用来刷新产品树结构,刷新树的产品的名字，以及名字产品的装填
+        // 这里就是用来刷新产品树结构,刷新树的产品的名字，以及名字产品的装填 - This is used to refresh the product tree structure, refresh the names of the products in the tree, and the loading of the named products
         ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
     }
     /* else
@@ -5468,7 +5468,7 @@ BOOL CParameterDlg::OnHelpInfo(HELPINFO* pHelpInfo)
 
 void CParameterDlg::OnEnKillfocusEditDterm()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
     if (g_ParamLevel == 1)
         return;
 
@@ -5488,7 +5488,7 @@ void CParameterDlg::OnEnKillfocusEditDterm()
 
 void CParameterDlg::OnEnKillfocusEditSamplingInterval()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
     if (g_ParamLevel == 1)
         return;
 
@@ -5508,7 +5508,7 @@ void CParameterDlg::OnEnKillfocusEditSamplingInterval()
 
 void CParameterDlg::OnBnClickedButtonParameterExt()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
     CParameterExtDlg dlg;
     dlg.DoModal();
 }
@@ -5692,7 +5692,7 @@ void CParameterDlg::OnBnClickedButtonIconSetting()
 
 void CParameterDlg::OnCbnSelchangeDeltaSelect1()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
 
     CString temp_string;
     unsigned short TempValue;
@@ -5719,7 +5719,7 @@ void CParameterDlg::OnCbnSelchangeDeltaSelect1()
 
 void CParameterDlg::OnCbnSelchangeDeltaSelect2()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
 
 
     CString temp_string;

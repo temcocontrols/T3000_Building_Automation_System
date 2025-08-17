@@ -34,10 +34,10 @@ public:
 	CString m_description;
 	CString m_operation;
 	CString m_type;
-	int m_col;//0:是Value 1：Description
+	int m_col;//0:是Value 1：Description - 0: is Value 1: Description
 	CEdit m_reg_name;
 	CEdit m_reg_no;
-	int m_color;//0:默认值，1：红色
+	int m_color;//0:默认值，1：红色 - 0: default value, 1: red
 	CButton m_sendBtn;
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 };
