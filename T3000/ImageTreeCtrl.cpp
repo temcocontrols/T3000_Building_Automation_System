@@ -1153,7 +1153,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 //    }
 //
 //    return 715; // 如果没有默认按照从715 开始 8个寄存器. - If not, default to 715, starting from 8 registers.
-}
+//}
 
 BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
        if (m_level==0)
