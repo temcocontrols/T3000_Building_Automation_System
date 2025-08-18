@@ -1,3 +1,4 @@
+// ImageTreeCtrl.cpp : Implementation file
 // ImageTreeCtrl.cpp : 实现文件
 //
 
@@ -114,6 +115,7 @@ DWORD WINAPI _Background_Write_Name(LPVOID pParam)
 				IPPort = temp_tree_product.ncomport;
 				if (Open_Socket_Retry(strIPAddress, IPPort))
 				{
+					// Length cannot be greater than the defined length of the structure
 					if (dlg->m_name_new.GetLength() > 17)	//长度不能大于结构体定义的长度;
 					{
 						dlg->m_name_new.Delete(16, dlg->m_name_new.GetLength() - 16);
@@ -300,6 +302,7 @@ bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem)
 	m_hSelItem=hItem;
 
 
+	// Root node and nodes under root are not allowed to change names
 	//root 节点和root 下一级的节点不允许更改名字;
 	HTREEITEM root_item = CImageTreeCtrl::GetRootItem();
 	
@@ -441,7 +444,7 @@ bool CImageTreeCtrl::BM_Delete(HTREEITEM hItem)
 	//operation_nodeinfo
 	//DeleteItem(myiterator->product_item);
 
-	HTREEITEM htree_delete = NULL; //需要删除的节点;
+	HTREEITEM htree_delete = NULL; // 需要删除的节点; - Node to be deleted
 	if (operation_nodeinfo.node_type == TYPE_BM_POINT_LIST)
 	{
 		htree_delete = m_BMpoint->BuildingNode.h_treeitem;
@@ -499,6 +502,7 @@ bool CImageTreeCtrl::BM_Add_Module(HTREEITEM hItem)
 
 void CImageTreeCtrl::BM_Property(HTREEITEM hItem)
 {
+	// Determine whether the selected node is Node or IO and which Node or which IO
 	//确定选中的节点是Node 还是IO  并且是哪一个Node 哪一个IO
 	Sleep(1);
 }
@@ -516,23 +520,29 @@ void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
 		if ((ntype == TYPE_BM_INPUT) || (ntype == TYPE_BM_OUTPUT) || (ntype == TYPE_BM_VARIABLE))
 		{
 			//operation_nodeinfo.
-			HTREEITEM htree_node = NULL; //Input 的父节点
+			HTREEITEM htree_node = NULL; //Input 的父节点 - Input parent node
+
 			htree_node = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->h_treeitem;
-			int exist_count; // 此前的哥哥节点;
+			int exist_count; // 此前的哥哥节点; - Previous sibling nodes
 			exist_count = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->m_child_count;
+			// ABC123 node
 			CBacnetBMD* temp_node = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]; //ABC123 的节点
 			TV_INSERTSTRUCT tvInsert;
 			for (int i = 0; i < dlg_ret.m_BM_ret_count; i++)
 			{
 				CString temp_number;
+				// Only add number suffix when the number of added nodes is not unique
 				if (dlg_ret.m_BM_ret_count > 1)   //当添加的节点个数不唯一的时候才加上数字后缀
 					temp_number.Format(_T("%d"), exist_count + 1 + i);
 				else
 					temp_number.Empty();
 				CString strinfo = dlg_ret.m_BM_ret_name + temp_number;
+				// Specify parent handle
 				tvInsert.hParent = htree_node; // 指定父句柄
+				// Specify TV_ITEM structure object
 				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 				tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strinfo;
+				// Item insertion method
 				tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 				if (ntype == TYPE_BM_INPUT)
 				{
@@ -550,10 +560,10 @@ void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
 					tvInsert.item.iImage = TREE_IMAGE_VARIABLE_OFFLINE; tvInsert.item.iSelectedImage = TREE_IMAGE_VARIABLE_OFFLINE;
 				}
 				HTREEITEM hTreeIOList = NULL;
-				hTreeIOList = InsertSubnetItem(&tvInsert);//插入PointList
+				hTreeIOList = InsertSubnetItem(&tvInsert);//插入PointList - Insert PointList
 				m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->pchild[operation_nodeinfo.child_device]->m_child_count++;
 
-				//因为已经有 old 个兄节点了，只能在后面创建
+				//因为已经有 old 个兄节点了，只能在后面创建 - Since there are already old sibling nodes, they can only be created later
 				if (temp_node->pchild[exist_count + i] == NULL)
 					temp_node->pchild[exist_count + i] = new CBacnetBMD;
 				CBacnetBMD* io_node = temp_node->pchild[exist_count + i];
@@ -566,35 +576,39 @@ void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
 				io_node->m_node_type = ntype;
 				io_node->pfather = temp_node;
 
-				//新增节点，添加信息，保存到数据库;
+				//新增节点，添加信息，保存到数据库; - Add new node, add information, save to database
 			}
 			if (htree_node != NULL)
 				Expand(htree_node, TVE_EXPAND);
 		}
 		else if (ntype == TYPE_BM_NODES)
 		{
-			HTREEITEM hgroup_node = NULL; //Input 的父节点
+			HTREEITEM hgroup_node = NULL; //Input 的父节点 - Input parent node
 			hgroup_node = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->h_treeitem;
-			int exist_device_count; // 此前的哥哥节点;
+			int exist_device_count; // 此前的哥哥节点; - Previous sibling nodes
 			exist_device_count = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]->m_child_count;
-			CBacnetBMD* temp_group = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]; //ABC Group 的节点
+			CBacnetBMD* temp_group = m_BMpoint->BuildingNode.pchild[operation_nodeinfo.child_group]; //ABC Group 的节点 - ABC Group node
 			TV_INSERTSTRUCT tvInsert;
 			for (int i = 0; i < dlg_ret.m_BM_ret_count; i++)
 			{
 				CString temp_number;
-				if (dlg_ret.m_BM_ret_count > 1)   //当添加的节点个数不唯一的时候才加上数字后缀
+				if (dlg_ret.m_BM_ret_count > 1)   //当添加的节点个数不唯一的时候才加上数字后缀 - Only add number suffix when the number of added nodes is not unique
 					temp_number.Format(_T("%d"), exist_device_count + 1 + i);
 				else
 					temp_number.Empty();
 				CString strinfo = dlg_ret.m_BM_ret_name + temp_number;
+				// Specify parent handle
 				tvInsert.hParent = hgroup_node; // 指定父句柄
+				// Specify TV_ITEM structure object
 				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 				tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strinfo;
+				// Item insertion method
 				tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 
+				// Here select device icon
 				//这里选择device的图标
 				//if (i == 0)
-				//	TVINSERV_MINIPANEL   //这里到时候要判断到底是什么设备
+				//	TVINSERV_MINIPANEL   //这里到时候要判断到底是什么设备 - Here you need to determine what kind of device it is
 				//else if (i == 1)
 				//	TVINSERV_TSTAT8
 				//else if (i == 2)
@@ -604,10 +618,10 @@ void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
 
 
 				HTREEITEM hTreeDeviceList = NULL;
-				hTreeDeviceList = InsertSubnetItem(&tvInsert);//插入DeviceList
+				hTreeDeviceList = InsertSubnetItem(&tvInsert);//插入DeviceList - Insert DeviceList
 				temp_group->m_child_count++;
 
-				//因为已经有 old 个兄节点了，只能在后面创建
+				//因为已经有 old 个兄节点了，只能在后面创建 - Since there are already old sibling nodes, they can only be created later
 				if (temp_group->pchild[exist_device_count + i] == NULL)
 					temp_group->pchild[exist_device_count + i] = new CBacnetBMD;
 				CBacnetBMD* device_node = temp_group->pchild[exist_device_count + i];
@@ -619,7 +633,7 @@ void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
 				//io_node->m_node_type = TYPE_BM_INPUT;
 				device_node->m_node_type = ntype;
 				device_node->pfather = temp_group;
-				//新增节点，添加信息，保存到数据库;
+				//新增节点，添加信息，保存到数据库; - Add new node, add information, save to database
 			}
 			if (hgroup_node != NULL)
 				Expand(hgroup_node, TVE_EXPAND);
@@ -627,31 +641,34 @@ void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
 		}
 		else if (ntype == TYPE_BM_GROUP)
 		{
-		HTREEITEM hpointlist_node = NULL; //Group 的父节点
+		HTREEITEM hpointlist_node = NULL; //Group 的父节点 - Group parent node
 		hpointlist_node = m_BMpoint->BuildingNode.h_treeitem;
-		int exist_group_count; // 此前的哥哥节点;
+		int exist_group_count; // 此前的哥哥节点; - Previous sibling nodes
 		exist_group_count = m_BMpoint->BuildingNode.m_child_count;
-		CBacnetBMD* temp_root = &(m_BMpoint->BuildingNode); //Group 的节点
+		CBacnetBMD* temp_root = &(m_BMpoint->BuildingNode); //Group 的节点 - Group node
 		TV_INSERTSTRUCT tvInsert;
 		for (int i = 0; i < dlg_ret.m_BM_ret_count; i++)
 		{
 			CString temp_number;
-			if (dlg_ret.m_BM_ret_count > 1)   //当添加的节点个数不唯一的时候才加上数字后缀
+			if (dlg_ret.m_BM_ret_count > 1)   //当添加的节点个数不唯一的时候才加上数字后缀 - Only add number suffix when the number of added nodes is not unique
 				temp_number.Format(_T("%d"), exist_group_count + 1 + i);
 			else
 				temp_number.Empty();
 			CString strinfo = dlg_ret.m_BM_ret_name + temp_number;
+			// Specify parent handle
 			tvInsert.hParent = hpointlist_node; // 指定父句柄
+			// Specify TV_ITEM structure object
 			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strinfo;
+			// Item insertion method
 			tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式
 			TVINSERV_ROOM
 
 				HTREEITEM hTreeGroupList = NULL;
-			hTreeGroupList = InsertSubnetItem(&tvInsert);//插入DeviceList
+			hTreeGroupList = InsertSubnetItem(&tvInsert);//插入DeviceList - Insert DeviceList
 			temp_root->m_child_count++;
 
-			//因为已经有 old 个兄节点了，只能在后面创建
+			//因为已经有 old 个兄节点了，只能在后面创建 - Since there are already old sibling nodes, they can only be created later
 			if (temp_root->pchild[exist_group_count + i] == NULL)
 				temp_root->pchild[exist_group_count + i] = new CBacnetBMD;
 			CBacnetBMD* group_node = temp_root->pchild[exist_group_count + i];
@@ -662,7 +679,7 @@ void CImageTreeCtrl::BM_Adds(HTREEITEM hItem,int nfunction, int ntype)
 			group_node->m_index = exist_group_count + i;
 			group_node->m_node_type = ntype;
 			group_node->pfather = temp_root;
-			//新增节点，添加信息，保存到数据库;
+			//新增节点，添加信息，保存到数据库; - Add new node, add information, save to database
 		}
 		if (hpointlist_node != NULL)
 			Expand(hpointlist_node, TVE_EXPAND);
@@ -699,7 +716,7 @@ bool CImageTreeCtrl::BM_Add_Variable(HTREEITEM hItem)
 
 bool CImageTreeCtrl::BM_IO_Mapping(HTREEITEM hItem)
 {
-	//先删除本group下其他兄弟节点下面的 所有数据
+	//先删除本group下其他兄弟节点下面的 所有数据 - First delete all data under other sibling nodes in this group
 
 
 	CBacnetBMD* group_point;
@@ -715,13 +732,13 @@ bool CImageTreeCtrl::BM_IO_Mapping(HTREEITEM hItem)
 		if (node_point->m_index == operation_nodeinfo.child_device)
 			continue;
 		source_point = group_point->pchild[operation_nodeinfo.child_device];
-		for (int j = 0; node_point->m_child_count!=0; j = 0)  //循环删除兄弟  节点下面的 子节点
+		for (int j = 0; node_point->m_child_count!=0; j = 0)  //循环删除兄弟  节点下面的 子节点 - Loop to delete sibling nodes under the node
 		{
 			delete node_point->pchild[j];
 			DeleteItem(node_point->h_treeitem);
 		}
 
-		//添加一模一样的   兄弟  节点下面的 子节点
+		//添加一模一样的   兄弟  节点下面的 子节点 - Add identical child nodes under the sibling node
 		for (int k = 0; k < source_point->m_child_count; k++)
 		{
 			node_point->m_child_count++;
@@ -844,10 +861,10 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 	try 
 	{
 		////////////////////////////////////////////////////////////////////////////////////////////
-		//获取数据库名称及路径
+		//获取数据库名称及路径 - Get database name and path
 		/////////////////////////////////////////////////////////////////////////////////////////////////
-		//连接数据库
-	    
+		//连接数据库 - Connect to database
+
 		CString strSql;   BOOL is_exist=FALSE;	  CString str_temp;
 		switch (m_level)
 		{
@@ -870,8 +887,8 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 				}			
 				q.nextRow();
 				}
-				 
-				if (!is_exist)	 //更新的名字在数据库中查找不到的
+
+				if (!is_exist)	 //更新的名字在数据库中查找不到的 - The updated name cannot be found in the database
 				{
  
 					 strSql.Format(_T("update Building_ALL set Building_Name='%s' where Building_Name='%s' "),m_name_new,m_name_old);
@@ -1018,7 +1035,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                                 if (open_com(ComPort))
                                 {
                                     Change_BaudRate(brandrate);
-                                    if(m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度;
+                                    if(m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度 - Length cannot be greater than the defined length of the structure
                                     {
                                         m_name_new.Delete(16,m_name_new.GetLength()-16);
                                     }
@@ -1048,7 +1065,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                                 IPPort = _wtoi(pFrame->m_product.at(i).BuildingInfo.strIpPort);
                                 if (Open_Socket2(strIPAddress,IPPort))
                                 {
-                                    if(m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度;
+                                    if(m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度; - Length cannot be greater than the defined length of the structure
                                     {
                                         m_name_new.Delete(16,m_name_new.GetLength()-16);
                                     }
@@ -1082,7 +1099,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                         
                         if (product_register_value[714]==0x56)
                         {
-                            if(m_name_new.GetLength()> 16)	//长度不能大于结构体定义的长度;
+                            if(m_name_new.GetLength()> 16)	//长度不能大于结构体定义的长度; - Length cannot be greater than the defined length of the structure
                             {
                                 m_name_new.Delete(16,m_name_new.GetLength()-16);
                             }
@@ -1134,9 +1151,9 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
 //        test1 = g_panelname_map.at(product_type);
 //        return test1;
 //    }
-//   
-//    return 715; // 如果没有默认按照从715 开始 8个寄存器.
-//}
+//
+//    return 715; // 如果没有默认按照从715 开始 8个寄存器. - If not, default to 715, starting from 8 registers.
+}
 
 BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
        if (m_level==0)
@@ -1164,7 +1181,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
 			int sn = pFrame->m_product.at(i).serial_number;
 			temp_serial.Format(_T("%d"), sn);
 			int  int_product_type = pFrame->m_product.at(i).product_class_id;
-			int panel_name_start_reg = 0;  //获取对应产品号
+			int panel_name_start_reg = 0;  //获取对应产品号 - Get corresponding product number
 			panel_name_start_reg = PanelName_Map(int_product_type);
 
 
@@ -1217,7 +1234,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
 				IPPort = pFrame->m_product.at(i).ncomport;
 				if (Open_Socket_Retry(strIPAddress, IPPort))
 				{
-					if (m_name_new.GetLength() > 17)	//长度不能大于结构体定义的长度;
+					if (m_name_new.GetLength() > 17)	//长度不能大于结构体定义的长度; - Length cannot be greater than the defined length of the structure
 					{
 						m_name_new.Delete(16, m_name_new.GetLength() - 16);
 					}
@@ -1253,7 +1270,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
 			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 			SqliteDBBuilding.closedb();
 
-			if (m_name_new.GetLength() > 16)	//长度不能大于结构体定义的长度;
+			if (m_name_new.GetLength() > 16)	//长度不能大于结构体定义的长度; - Length cannot be greater than the defined length of the structure
 			{
 				m_name_new.Delete(16, m_name_new.GetLength() - 16);
 			}
@@ -1286,9 +1303,9 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
         try 
     {
         ////////////////////////////////////////////////////////////////////////////////////////////
-        //获取数据库名称及路径
+        //获取数据库名称及路径 - Get database name and path
         /////////////////////////////////////////////////////////////////////////////////////////////////
-        //连接数据库
+        //连接数据库 - Connect to database
 
         CString strSql;   BOOL is_exist=FALSE;	  CString str_temp;
         if(m_level >= 2)
@@ -1376,7 +1393,7 @@ bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
 //        ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
         return true;
 }
-// CImageTreeCtrl 消息处理程序
+// CImageTreeCtrl 消息处理程序 - Message handler for CImageTreeCtrl
 bool CImageTreeCtrl::HandleKeyDown(WPARAM wParam, LPARAM lParam) {
 	bool bCtrl = (::GetKeyState(VK_CONTROL) & 0x8000) != 0;
 	bool bShift = (::GetKeyState(VK_SHIFT) & 0x8000) != 0;
@@ -1442,7 +1459,7 @@ void CImageTreeCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 		CString temp_cs;
 		temp_cs = item.pszText;
 		temp_cs.Trim();
-		if (temp_cs.IsEmpty()) //在不变更的情况下， 会是 一个空的字符;
+		if (temp_cs.IsEmpty()) //在不变更的情况下， 会是 一个空的字符; - In the case of no change, it will be an empty character;
 			return;
 		//if(m_BMpoint->BuildingNode)
 		//operation_nodeinfo
@@ -1651,7 +1668,7 @@ HTREEITEM CImageTreeCtrl::InsertDeviceItem(LPTVINSERTSTRUCT lpInsertStruct)
 //This function add by Fance ,used for when some click ,the device will change color
 //and user will know which one is selected
 //add time  2014 01 06
-//添加设置字体、颜色、粗体的函数
+//添加设置字体、颜色、粗体的函数 - Add functions to set font, color, and bold
 	void CImageTreeCtrl::SetItemFont(HTREEITEM hItem, LOGFONT& logfont)
 {
 	Color_Font cf;
@@ -1787,33 +1804,35 @@ COLORREF CImageTreeCtrl::GetItemColor(HTREEITEM hItem)
 // }
 
 
-//添加WM_PAINT 信息监控，重载OnPaint()函数来实现绘制
+//添加WM_PAINT 信息监控，重载OnPaint()函数来实现绘制 - Add WM_PAINT message monitoring, override OnPaint() function to implement drawing
 
 void CImageTreeCtrl::OnPaint()
 {
 try
 {
-	//获取当前绘制对象的DC
+	//获取当前绘制对象的DC - Get the DC of the current drawing object
 	CPaintDC dc(this);
 
-	// 使用将要绘制的对象的DC创建一个memory DC
+	// 使用将要绘制的对象的DC创建一个memory DC - Create a memory DC using the DC of the object to be drawn
+	//The concept of memory device context: is to create a structure in memory to reflect a display (screen area, window
 	//memory device context的概念：是在内存中创建一个结构来反映一个显示（屏幕区域、窗口、
-	//打印机等）的表面。可以用来先在内存中准备好要显示的图像，从而实现双缓存，提高刷新
-	//速度减少刷新时产生的闪烁。
+	// Printers, etc.) can be used to prepare the image to be displayed in memory first, thereby achieving double buffering and improving refresh
+	//打印机等）的表面。可以用来先在内存中准备好要显示的图像，从而实现双缓存，提高刷新 
+	//速度减少刷新时产生的闪烁。- Speed and reduce flicker during refresh.
 	CDC memDC;
-	//从当前DC创建内存对象
+	//从当前DC创建内存对象 - Create a memory DC using the current DC
 	memDC.CreateCompatibleDC( &dc );
 
-	//定义CRect对象，用来确定区域
+	//定义CRect对象，用来确定区域 - Define CRect objects to determine the area
 	CRect rcClip, rcClient;
-	//获取当前对象的边界区域
+	//获取当前对象的边界区域 - Get the bounding area of the current object
 	dc.GetClipBox( &rcClip );
-	//获取当前对象的用户区域
+	//获取当前对象的用户区域 - Get the client area of the current object
 	GetClientRect(&rcClient);
 
 	// Select a compatible bitmap into the memory DC
-	//创建一个bmp文件，作为memDC的内容
-	//该文件的大小与用于区域相同
+	//创建一个bmp文件，作为memDC的内容 - Create a bmp file as the content of memDC
+	//该文件的大小与用于区域相同 - The size of this file is the same as that used for the area
 	CBitmap bitmap;
 	bitmap.CreateCompatibleBitmap( &dc, rcClient.Width(), rcClient.Height() );
 	memDC.SelectObject( &bitmap );
@@ -1832,10 +1851,10 @@ try
 	//首先让控件自己进行默认的绘制，绘制到内存中
 	CWnd::DefWindowProc( WM_PAINT, (WPARAM)memDC.m_hDC, 0 );
 
-	//获取树状控件的第一个节点
+	//获取树状控件的第一个节点 - Get the first visible item of the tree control
 	HTREEITEM hItem = GetFirstVisibleItem();
 
-	//遍历这棵树
+	//遍历这棵树 - Traverse the tree
 	int n = GetVisibleCount()+1;
 	while( hItem && n--)
 	{
@@ -1850,11 +1869,11 @@ try
 		else
 			selflag = TVIS_DROPHILITED;
 
-		//定义字体、颜色
+		//定义字体、颜色 - Define font and color
 		Color_Font cf;
 
 
-		//设置字体
+		//设置字体 - Set font
 		if ( !(GetItemState( hItem, selflag ) & selflag )
 			&& m_mapColorFont.Lookup( hItem, cf ))
 		{
@@ -1864,40 +1883,40 @@ try
 
 			if( cf.logfont.lfFaceName[0] != '/0' )
 			{
-				//用户定义了字体
+				//用户定义了字体 - User-defined font
 				logfont = cf.logfont;
 			}
 			else
 			{
-				// 用户没有定义，使用系统字体
+				// 用户没有定义，使用系统字体 - User did not define, use system font
 				CFont *pFont = GetFont();
 				pFont->GetLogFont( &logfont );
 			}
 
-			//用户是否设定节点为加粗
+			//用户是否设定节点为加粗 - Did the user set the node to be bold
 			if( GetItemBold( hItem ) )
 				logfont.lfWeight = 700;
-			//创建字体
+			//创建字体 - Create font
 			fontDC.CreateFontIndirect( &logfont );
 			pFontDC = memDC.SelectObject( &fontDC );
 
-			//设置字体颜色
+			//设置字体颜色 - Set font color
 			if( cf.color != (COLORREF)-1 )
 				memDC.SetTextColor( cf.color );
 
-			//获取节点文字
+			//获取节点文字 - Get item text
 			CString sItem = GetItemText( hItem );
 
-			//获取节点区域
+			//获取节点区域 - Get item rect
 			GetItemRect( hItem, &rect, TRUE );
 			//rect.bottom = rect.bottom + 2;
-			//设置背景色为系统色
+			//设置背景色为系统色 - Set background color to system color
 			memDC.FillSolidRect(&rect,GetSysColor( COLOR_WINDOW ));//clr);
 
 			memDC.SetBkColor( GetSysColor( COLOR_WINDOW ) );
 
 
-			//向内存中的图片写入内容,为该节点的内容
+			//向内存中的图片写入内容,为该节点的内容 - Write the content for this node to the memory image
 			memDC.TextOut( rect.left+2, rect.top+1, sItem );
 			if(tree_offline_mode)
 			{
@@ -1999,7 +2018,7 @@ void CImageTreeCtrl::BMContextMenu(CPoint& point, BM_nodeinfo nodeinfo)
 
 	VERIFY(menu.AppendMenu(MF_STRING, ID_BM_DELETE, _T("Delete")));
 
-	operation_nodeinfo = nodeinfo; //保存 操作的节点;
+	operation_nodeinfo = nodeinfo; //保存 操作的节点; - Save the operation node
 
 	CMenu SubMenu;
 	SubMenu.CreatePopupMenu();
@@ -2116,7 +2135,7 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 		menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
 }
 
-void CImageTreeCtrl::CheckClickNode(HTREEITEM hItem ,BM_nodeinfo& nodeinfo) //给管理模式使用的功能
+void CImageTreeCtrl::CheckClickNode(HTREEITEM hItem ,BM_nodeinfo& nodeinfo) //给管理模式使用的功能 - Check the clicked node
 {
 
 	if (hItem == m_BMpoint->BuildingNode.h_treeitem)
@@ -2141,10 +2160,10 @@ void CImageTreeCtrl::CheckClickNode(HTREEITEM hItem ,BM_nodeinfo& nodeinfo) //�
 			return;
 		}
 
-		for (int j = 0; j < temp_group_point->m_child_count; j++) //判断GROUP 有几个 子节点
+		for (int j = 0; j < temp_group_point->m_child_count; j++) //判断GROUP 有几个 子节点 - Check how many child nodes the group has
 		{
 			CBacnetBMD* temp_device_point = NULL;
-			temp_device_point = temp_group_point->pchild[j];   //这里得到类似
+			temp_device_point = temp_group_point->pchild[j];   //这里得到类似 - Here we get something like
 			if (hItem == temp_device_point->h_treeitem)
 			{
 				nodeinfo.child_group = i;
@@ -2157,7 +2176,7 @@ void CImageTreeCtrl::CheckClickNode(HTREEITEM hItem ,BM_nodeinfo& nodeinfo) //�
 			for (int z = 0; z < temp_device_point->m_child_count; z++)
 			{
 				CBacnetBMD* temp_io_point = NULL;
-				temp_io_point = temp_device_point->pchild[z];   //IO节点
+				temp_io_point = temp_device_point->pchild[z];   //IO节点 - IO node
 				if (hItem == temp_io_point->h_treeitem)
 				{
 					nodeinfo.child_group = i;
@@ -2264,7 +2283,7 @@ void CImageTreeCtrl::OnTimer(UINT_PTR nIDEvent)
 			Expand(m_hDragDist, TVE_EXPAND);
 }
 	}
-	//滚动响应
+	//滚动响应 - Scroll response
 	else if (nIDEvent == m_nScrollTimerID)
 	{
 		m_nTicks++;
@@ -2276,10 +2295,10 @@ void CImageTreeCtrl::OnTimer(UINT_PTR nIDEvent)
 
 		HTREEITEM hItem = GetFirstVisibleItem();
 
-		//向上滚动
+		//向上滚动 - Scroll up
 		if (pt.y < (clientRt.top + 10))
 		{
-			//响应延迟
+			//响应延迟 - Response delay
 			if (0 == (m_nTicks % 4))
 			{
 				CImageList::DragShowNolock(FALSE);
@@ -2294,7 +2313,7 @@ void CImageTreeCtrl::OnTimer(UINT_PTR nIDEvent)
 		}
 		else if (pt.y > (clientRt.bottom - 10))
 		{
-			//响应延迟
+			//响应延迟 - Response delay
 			if (0 == (m_nTicks % 4))
 			{
 				CImageList::DragShowNolock(FALSE);
@@ -2332,7 +2351,7 @@ void CImageTreeCtrl::OnTimer(UINT_PTR nIDEvent)
 
 void CImageTreeCtrl::PreSubclassWindow()
 {
-    // TODO: 在此添加专用代码和/或调用基类
+    // TODO: 在此添加专用代码和/或调用基类 - Add specialized code here and/or call the base class
 
     CTreeCtrl::PreSubclassWindow();
 
@@ -2343,7 +2362,7 @@ void CImageTreeCtrl::PreSubclassWindow()
 
 INT_PTR CImageTreeCtrl::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 {
-    // TODO: 在此添加专用代码和/或调用基类
+    // TODO: 在此添加专用代码和/或调用基类 - Add specialized code here and/or call the base class
     RECT rect;
 
     UINT nFlags;
@@ -2587,7 +2606,7 @@ tooltip_product.NameShowOnTree.GetBuffer(), GetProductName(tooltip_product.produ
 void CImageTreeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	//LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
 	//*pResult = 0;
 
 
@@ -2603,15 +2622,16 @@ void CImageTreeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 		COLORREF crText, crBkgnd;
 		if (b_building_management_flag == SYS_DB_BUILDING_MODE)
 		{
-			if (plvoid->iLevel == 1)  //判断节点所在的层次，根节点在第0层
+			if (plvoid->iLevel == 1)  //判断节点所在的层次，根节点在第0层 - Check the level of the node, the root node is at level 0
 			{
-				if (plvoid->nmcd.lItemlParam == TREE_LP_VIRTUAL_DEVICE) //在添加节点时设置了节点的lParam属性，在这里就利用来判定具体是哪个节点
+				//The lParam property of the node is set when adding the node, and it is used here to determine which node it is
+				if (plvoid->nmcd.lItemlParam == TREE_LP_VIRTUAL_DEVICE) //在添加节点时设置了节点的lParam属性，在这里就利用来判定具体是哪个节点 
 				{
 					crText = RGB(40, 40, 40);
 					crBkgnd = RGB(222, 222, 222);
 
-					plvoid->clrText = crText;  //设置文字颜色
-					plvoid->clrTextBk = crBkgnd;  //设置背景颜色
+					plvoid->clrText = crText;  //设置文字颜色 - Set text color
+					plvoid->clrTextBk = crBkgnd;  //设置背景颜色 - Set background color
 				}
 				else
 				{
@@ -2622,8 +2642,9 @@ void CImageTreeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 		}
 		else
 		{
-			if (plvoid->iLevel == 2)  //判断节点所在的层次，根节点在第0层
+			if (plvoid->iLevel == 2)  //判断节点所在的层次，根节点在第0层 - Check the level of the node, the root node is at level 0
 			{
+				//The lParam property of the node is set when adding the node, and it is used here to determine which node it is
 				if (plvoid->nmcd.lItemlParam == TREE_LP_VIRTUAL_DEVICE) //在添加节点时设置了节点的lParam属性，在这里就利用来判定具体是哪个节点
 				{
 					crText = RGB(40, 40, 40);
@@ -2631,8 +2652,8 @@ void CImageTreeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					//crText = RGB(200, 200, 200);
 					//crBkgnd = RGB(66, 66, 66);
 
-					plvoid->clrText = crText;  //设置文字颜色
-					plvoid->clrTextBk = crBkgnd;  //设置背景颜色
+					plvoid->clrText = crText;  //设置文字颜色 - Set text color
+					plvoid->clrTextBk = crBkgnd;  //设置背景颜色 - Set background color
 				}
 				else if (plvoid->nmcd.lItemlParam == 2000)
 				{
@@ -2663,7 +2684,7 @@ void CImageTreeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 void CImageTreeCtrl::OnBegindrag(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
 	*pResult = 0;
 	if ((GetTickCount() - m_dwDrawStart) < DRAG_DELAY)
 		return;
@@ -2687,13 +2708,13 @@ void CImageTreeCtrl::OnBegindrag(NMHDR* pNMHDR, LRESULT* pResult)
 	ClientToScreen(&pt);
 	m_pDragImage->DragEnter(this, pt);
 	SetCapture();
-	//设置滚动检测计时器
+	//设置滚动检测计时器 - Set scroll detection timer
 	m_nScrollTimerID = SetTimer(2, 50, NULL);
 }
 
 void CImageTreeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	// TODO: 在此添加消息处理程序代码和/或调用默认值 - Add message handler code here and/or call default
 
 	m_dwDrawStart = GetTickCount();
 
@@ -2701,7 +2722,7 @@ void CImageTreeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	// 	GetCursorPos(&pt); 
 	// 	ScreenToClient(&pt);
 	// 	HTREEITEM hItem = HitTest(pt,&nFlags);
-	// 	//点击图标区域（复选框）
+	// 	//点击图标区域（复选框）- Check the icon area (checkbox)
 	// 	if(hItem && (nFlags & TVHT_ONITEMSTATEICON))
 	// 	{
 	// 		SelectItem(hItem);
@@ -2715,15 +2736,15 @@ void CImageTreeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CImageTreeCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值	
+	// TODO: 在此添加消息处理程序代码和/或调用默认值 - Add message handler code here and/or call default
 	if (m_bDraged)
 	{
 		m_bDraged = false;
-		//释放窗口锁定
+		//释放窗口锁定 - Release window capture
 		CImageList::DragLeave(this);
-		//终止拖动
+		//终止拖动 - End drag
 		CImageList::EndDrag();
-		//释放鼠标捕捉，将鼠标操作交还给操作系统
+		//释放鼠标捕捉，将鼠标操作交还给操作系统 - Release mouse capture and return mouse operation to the system
 		ReleaseCapture();
 		if (m_pDragImage)
 		{
@@ -2732,15 +2753,15 @@ void CImageTreeCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 
 		SelectDropTarget(NULL);
-		//未拖动
+		//未拖动 - Not dragged
 		if (m_hDragSrc == m_hDragDist)
 		{
 			KillTimer(m_nScrollTimerID);
 			return;
 		}
-		//展开目标节点
+		//展开目标节点 - Expand target node
 		Expand(m_hDragDist, TVE_EXPAND);
-		//节点拷贝，禁止父节点到子节点的拖动
+		//节点拷贝，禁止父节点到子节点的拖动 - Node copy, prohibit dragging from parent node to child node
 		HTREEITEM hParent = m_hDragDist;
 		while (hParent = GetParentItem(hParent))
 		{
@@ -2753,7 +2774,7 @@ void CImageTreeCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 		DragBranch(m_hDragSrc, m_hDragDist);
 		//HTREEITEM hNewItem = CopyBranch(m_hDragSrc, m_hDragDist, TVI_LAST);
-		//删除被拖动节点
+		//删除被拖动节点 - Delete dragged node
 		//DeleteItem(m_hDragSrc);
 		//SelectItem(hNewItem);
 		KillTimer(m_nScrollTimerID);
@@ -2763,38 +2784,38 @@ void CImageTreeCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CImageTreeCtrl::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	// TODO: 在此添加消息处理程序代码和/或调用默认值 - Add message handler code here and/or call default
 	if (m_nMsMoveTimerID)
 	{
 		KillTimer(m_nMsMoveTimerID);
 		m_nMsMoveTimerID = 0;
 	}
-	m_nMsMoveTimerID = SetTimer(1, 500, NULL);	//0.5秒展开节点组
+	m_nMsMoveTimerID = SetTimer(1, 500, NULL);	//0.5秒展开节点组 - 0.5 seconds to expand node group
 	m_ptMouseMove = point;
 
 	if (m_bDraged)
 	{
 		CImageList::DragMove(point);
 
-		//设置鼠标经过节点的节点高亮显示
-		CImageList::DragShowNolock(FALSE);	//擦除拖动痕迹
+		//设置鼠标经过节点的节点高亮显示 - Set highlight for the node being hovered over
+		CImageList::DragShowNolock(FALSE);	//擦除拖动痕迹 - Erase drag mark
 		HTREEITEM hItem;
 		if (hItem = HitTest(point, &nFlags))
 		{
 			SelectDropTarget(hItem);
 			m_hDragDist = hItem;
 		}
-		CImageList::DragShowNolock(TRUE);	//显示当前拖动图像列表
+		CImageList::DragShowNolock(TRUE);	//显示当前拖动图像列表 - Show current drag image list
 	}
 
 	CTreeCtrl::OnMouseMove(nFlags, point);
 }
 
 
-//拖动一个节点至另一个节点
+//拖动一个节点至另一个节点 - Drag a node to another node
 int CImageTreeCtrl::DragBranch(HTREEITEM horgitem, HTREEITEM hdesitem)
 {
-	//检查org 属于哪一个item
+	//检查org 属于哪一个item - Check which item org belongs to
 	//m_BMpoint->
 	CBacnetBMD *pointlistnode = &m_BMpoint->BuildingNode;
 	TRACE(_T("%s\r\n"), pointlistnode->m_csName);
@@ -2844,7 +2865,7 @@ int CImageTreeCtrl::DragBranch(HTREEITEM horgitem, HTREEITEM hdesitem)
 			}
 		}
 	}
-	return -1; //原始tree item 不是Point list中的 节点
+	return -1; //原始tree item 不是Point list中的 节点 - Original tree item is not a node in the Point list
 
 endtreesearch:
 	TRACE(_T("%d,%d,%d\r\n"), index_group, index_device, index_io);
@@ -2885,7 +2906,7 @@ endtreesearch:
 enddestreesearch:
 	if (find_des)
 	{
-		//确认赋予给哪一个IO  并且需要变更 个数 以及 更新数据库的个数;
+		//确认赋予给哪一个IO  并且需要变更 个数 以及 更新数据库的个数; - Confirm which IO to assign and the number of changes needed, as well as the number to update in the database
 
 
 		TRACE(_T("%d\r\n"), index_des);
@@ -2902,11 +2923,11 @@ enddestreesearch:
 		CString cs_property_value;
 		cs_property_section.Format(_T("IO_%d_%d_property"), index_device, index_io);
 		cs_property_value.Format(_T(""));
-		//存储格式 例如      序列号,122IN4
+		//存储格式 例如      序列号,122IN4 - Storage format, e.g. Serial Number, 122IN4
 		CString des_points_value;
 		CString temp_type;
 		temp_type = cssub_io_type[index_des_io_type];//index_des_io_type
-		//打开缓存数据库 ，确认放置在哪个IO  暂时没有完成 ，待定;
+		//打开缓存数据库 ，确认放置在哪个IO  暂时没有完成 ，待定; - Open cache database to confirm which IO to place it in, not yet completed, pending
 
 		cs_property_value.Format(_T("%u,%d%s"), pFrame->m_product.at(index_des).serial_number,pFrame->m_product.at(index_des).panel_number, temp_type);
 		WritePrivateProfileStringW(temp_lpAppname, cs_property_section, cs_property_value, cs_bm_ini);
@@ -2920,14 +2941,14 @@ HTREEITEM CImageTreeCtrl::CopyBranch(HTREEITEM hChildBruch, HTREEITEM hNewParent
 {
 #if 0
 	HTREEITEM hChild = NULL;
-	//先将拖动节点树的根节点拷贝至目标节点下
+	//先将拖动节点树的根节点拷贝至目标节点下 - First, copy the root node of the dragged node tree to the target node
 	HTREEITEM hInsert = CopyItem(hChildBruch, hNewParent, hInsertAfter);
-	//递归调用，拷贝孩子节点
+	//递归调用，拷贝孩子节点 - Recursively call to copy child nodes
 	hChild = GetChildItem(hChildBruch);
 	while (hChild)
 	{
 		CopyBranch(hChild, hInsert, hInsertAfter);
-		//获取兄弟节点
+		//获取兄弟节点 - Get sibling node
 		hChild = GetNextSiblingItem(hChild);
 	}
 	return hInsert;
@@ -2942,7 +2963,7 @@ HTREEITEM CImageTreeCtrl::CopyItem(HTREEITEM hItem, HTREEITEM hParent, HTREEITEM
 	TVINSERTSTRUCT tvItemST;
 	CString strText;
 
-	//获取插入节点源信息
+	//获取插入节点源信息 - Get source information of the inserted node
 	tvItemST.item.hItem = hItem;
 	tvItemST.item.mask = TVIF_CHILDREN | TVIF_HANDLE | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
 	GetItem(&tvItemST.item);
@@ -2950,16 +2971,16 @@ HTREEITEM CImageTreeCtrl::CopyItem(HTREEITEM hItem, HTREEITEM hParent, HTREEITEM
 	tvItemST.item.cchTextMax = strText.GetLength() + 1;
 	tvItemST.item.pszText = strText.LockBuffer();
 
-	//插入节点
+	//插入节点 - Insert node
 	tvItemST.hParent = hParent;
 	tvItemST.hInsertAfter = hInsertAfter;
 	tvItemST.item.mask = TVIF_IMAGE | TVIF_TEXT | TVIF_SELECTEDIMAGE;
 	hInsert = InsertItem(&tvItemST);
 	strText.ReleaseBuffer();
 
-	//为节点绑定数据用以标识
+	//为节点绑定数据用以标识 - Bind data to the node for identification
 	SetItemData(hInsert, GetItemData(hInsert));
-	//设置节点状态
+	//设置节点状态 - Set node state
 	SetItemState(hInsert, GetItemState(hInsert, TVIS_STATEIMAGEMASK), TVIS_STATEIMAGEMASK);
 #endif
 	return hInsert;
@@ -2968,7 +2989,7 @@ HTREEITEM CImageTreeCtrl::CopyItem(HTREEITEM hItem, HTREEITEM hParent, HTREEITEM
 
 BOOL CImageTreeCtrl::OnNMClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add control notification handler code here
 	*pResult = 0;
 	return FALSE;
 }
@@ -2977,7 +2998,7 @@ BOOL CImageTreeCtrl::OnNMClick(NMHDR* pNMHDR, LRESULT* pResult)
 void CImageTreeCtrl::OnTvnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMTVDISPINFO pTVDispInfo = reinterpret_cast<LPNMTVDISPINFO>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码 - TODO: Add control notification handler code here
 	*pResult = 0;
 	CString strName = pTVDispInfo->item.pszText;
 	HTREEITEM hItem = GetSelectedItem();
