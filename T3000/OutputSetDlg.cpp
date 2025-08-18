@@ -111,6 +111,7 @@ BOOL COutputSetDlg::OnInitDialog()
 	m_outFunCmbox.ShowWindow(SW_HIDE);
 	m_Interlockcombo.ShowWindow(SW_HIDE);//tsta5
 	//m_FlexGrid.put_Cols(TOTAL_OUTCOLS);//tsta5
+	// Originally was 7, later added ON/OFF Time Set, ON/OFF Time left, OFF/ON Time Set OFF/ON Time left
 	m_FlexGrid.put_Cols(9);	//原来是7 后来加了ON/OFF Time Set,ON/OFFTime left,OFF/ON Time Set OFF/ON Time left 
 	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8) || (product_register_value[7] == PM_TSTAT9)
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
@@ -120,6 +121,7 @@ BOOL COutputSetDlg::OnInitDialog()
 		m_FlexGrid.put_TextMatrix(0,SIGUAL_TYPE,_T("Signal Type"));
 		m_FlexGrid.put_ColWidth(SIGUAL_TYPE,1000);
 	}
+	// Added a row for signal type
 	//加了一行 signal type
 	m_FlexGrid.put_Rows(TOTAL_OUTROWS);
 
@@ -250,8 +252,11 @@ void COutputSetDlg::Fresh_Grid()
 	CString strTemp;
 	//row1:
 	int nVAlue;int nValue=0;
+	// The purpose of this code is when Floating or PWM mode is selected,
+	// it needs to determine whether the user selected PID1 or PID2 in the outputtable. PID1 reads value from 384, PID2 reads from 389
 	//这段代码的作用是当选择的是Floating或者PWM模式的时候，
 	//要根据在outputtable中 用户选择的是PID1，还是PID2 PID1 从384 读值 PID2 就是从389读值
+	// First three rows
 	/////前三行
 	#if 1
 	int pid_select2[7]={0};
@@ -271,6 +276,7 @@ void COutputSetDlg::Fresh_Grid()
 
 	int nAMVAlue=0;//=product_register_value[310];
 	nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
+	// Row 1-3 initialize Value, A/M, Range
 	//Row 1-3 初始化 Value，A/M，Range
 
 	for(int i=1;i<=3;i++)
@@ -310,12 +316,14 @@ void COutputSetDlg::Fresh_Grid()
 			CppSQLite3DB SqliteDBBuilding;
 			SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 
+			// Has Version table
 			if (SqliteDBBuilding.tableExists("Value_Range"))//有Version表
 			 {
 				 CString sql;
 				 sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),i,i,m_sn);
 				 q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
 
+				 // Has table but no corresponding serial number values
 				 if (!q.eof())//有表但是没有对应序列号的值
 				 {    
 					  
@@ -396,6 +404,7 @@ void COutputSetDlg::Fresh_Grid()
 		}
 		else
 		{
+			// Comments by Fance, previously there was no 348 -> corresponding to t6's 598, now there is. Should it be changed to the current one???
 			//comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
 			int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
 			strTemp.Format(_T("%d%%"), nValueTemp);
@@ -405,6 +414,7 @@ void COutputSetDlg::Fresh_Grid()
 
 	}
 	//Fan  Comments 这里有问题 ， strTemp 判断了那么久 在后面直接赋值 NO_APPLICATION ，是为什么?;
+	// Row 1-3 other columns
 	//Row1-3 其他几列
 	
 	#if 1 
@@ -412,6 +422,7 @@ void COutputSetDlg::Fresh_Grid()
 	{
 		//	328	266	1	Low byte	W/R	"Output1 Function setting:
 		//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
+		// tstat6 cannot find corresponding
 		int nFun=0;//=product_register_value[328];//tstat6找不到对应的
 		nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION]; //328   266
 		if(nFun>=0&&nFun<5)
@@ -581,6 +592,7 @@ void COutputSetDlg::Fresh_Grid()
 		
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
+		// If AM column selected Auto or Range column selected On/Off, value displays ON/OFF
 		if(nRange == 0||nRange==4||nRange==5||nRange==6 || !(nAMVAlue & 8)) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
 		{  // output is on/off
 			 
@@ -1617,6 +1629,7 @@ else
 	}
 	}
 
+	// Rewrite Range
 	///////////////////////////////////////重现写Range//////////////////////////
 	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8 || product_register_value[7] == PM_TSTAT9
 		|| (product_register_value[7] == PM_TSTAT8_WIFI) || (product_register_value[7] == PM_TSTAT8_OCC) || (product_register_value[7] == PM_TSTAT7_ARM) || (product_register_value[7] == PM_TSTAT8_220V)
@@ -4953,32 +4966,45 @@ void COutputSetDlg::ClickMsflexgrid1()
 	{
 	m_FlexGrid.SetFocus();
 	long lRow,lCol;
+	// Get the clicked row number
 	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	// Get the clicked column number
 	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	// If the click area exceeds the maximum row number, the click is invalid
 	if(lRow>m_FlexGrid.get_Rows()) //如果点击区超过最大行号，则点击是无效的
 		return;
+	// If the title row is clicked, it's also invalid
 	if(lRow == 0) //如果点击标题行，也无效
 		return;
 	CRect rect;
+	// Get the window rectangle of the grid control
 	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
 	ScreenToClient(rect); 
+	// Convert to client area rectangle
 	//转换为客户区矩形	
 	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	// Need to convert to pixels, 1440 twips = 1 inch
 	//需要将其转化为像素，1440缇= 1英寸
 	CDC* pDC =GetDC();
+	// Calculate the conversion ratio between pixels and twips
 	//计算象素点和缇的转换比例
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	// Calculate the top-left coordinates of the selected cell (in pixels)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	// Calculate the size of the selected cell (in pixels). Adding 1 is found to work better in actual debugging
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	// Form the rectangle area where the selected cell is located
 	//形成选中个所在的矩形区域
 	CRect rc(x,y,x+width,y+height);
+	// Convert to coordinates relative to the dialog box
 	//转换成相对对话框的坐标
 	rc.OffsetRect(rect.left+1,rect.top+1);
+	// Get the text information of the selected cell
 	//获取选中格的文本信息
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
 	m_nCurRow=lRow;
@@ -4994,11 +5020,14 @@ void COutputSetDlg::ClickMsflexgrid1()
 			m_OutValueCmbox.ResetContent();
 			m_OutValueCmbox.AddString(_T("Off"));
 			m_OutValueCmbox.AddString(_T("On"));
+			// Show control
 			m_OutValueCmbox.ShowWindow(SW_SHOW);//显示控件
 
+			// Move to selected cell position, overlay
 			m_OutValueCmbox.MoveWindow(rc);			//移动到选中格的位置，覆盖
 			m_OutValueCmbox.BringWindowToTop();
 			m_OutValueCmbox.SelectString(-1,strValue);
+			// Get focus
 			m_OutValueCmbox.SetFocus();					//获取焦点
 
 			//310	254	1	Low byte	W/R	"Output auto/manual enable. Bit 0 to 4 correspond to output1 to output5, bit 5 correspond to 
@@ -5279,10 +5308,14 @@ void COutputSetDlg::ClickMsflexgrid1()
 	{
 		m_FlexGrid.SetFocus();
 		long lRow,lCol;
+		// Get the clicked row number
 		lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+		// Get the clicked column number
 		lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+		// If the click area exceeds the maximum row number, the click is invalid
 		if(lRow>m_FlexGrid.get_Rows()) //如果点击区超过最大行号，则点击是无效的
 			return;
+		// If the title row is clicked, it's also invalid
 		if(lRow == 0) //如果点击标题行，也无效
 		return;
 	CRect rect;
@@ -7578,7 +7611,9 @@ void COutputSetDlg::OnEnKillfocusOutputnameedit()
 	int lCol; 
 	m_outputNameEDIT.GetWindowText(strText);
 	m_outputNameEDIT.ShowWindow(SW_HIDE);
+	// Get the clicked row number
 	 lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	// Get the clicked column number
 	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 	
 

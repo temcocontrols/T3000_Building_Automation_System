@@ -6,6 +6,7 @@
 #include "FreeCoolDlg.h"
 #include "global_variable_extern.h"
 #include "global_function.h"
+// CFreeCoolDlg dialog
 // CFreeCoolDlg 对话框
 
 IMPLEMENT_DYNAMIC(CFreeCoolDlg, CDialog)
@@ -38,6 +39,7 @@ BEGIN_MESSAGE_MAP(CFreeCoolDlg, CDialog)
 END_MESSAGE_MAP()
 
 
+// CFreeCoolDlg message handlers
 // CFreeCoolDlg 消息处理程序
 BOOL CFreeCoolDlg::OnInitDialog()
 {
@@ -120,6 +122,7 @@ BOOL CFreeCoolDlg::OnInitDialog()
 	SetTimer(1,25000,NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
+// Exception: OCX Property Pages should return FALSE
 // 异常: OCX 属性页应返回 FALSE
 
 }

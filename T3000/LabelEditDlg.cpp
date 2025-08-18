@@ -259,6 +259,7 @@ void CLabelEditDlg::OnCbnSelchangeIocombox()
 //	m_statusComBox.ResetContent();
 int m_inRows;
 	m_input_or_output=m_IOCombox.GetCurSel();
+	// If its not CM5
 	if(bac_cm5_graphic == false)	//如果不是CM5 
 	{
 		if(m_input_or_output==0)
@@ -272,7 +273,7 @@ int m_inRows;
 			case 4:m_inRows=5;break; // 5C
 			case PM_TSTAT7:m_inRows=12;break;
 			case PM_PRESSURE:
-			case 12:m_inRows=5;break; // 5D 同 TStat7
+			case 12:m_inRows=5;break; // 5D 同 TStat7, // 5D same as TStat7
 			case PM_TSTAT6:	m_inRows=12;break;
 			case PM_TSTAT5i:	m_inRows=12;break;
             case PM_TSTAT8:	m_inRows=12;break;
@@ -291,7 +292,7 @@ int m_inRows;
 			default:
 				break;
 			}
-			--m_inRows;//去掉一行
+			--m_inRows;//去掉一行, // Remove a line
 
 
 			GetDlgItem(IDC_REG_STATIC)->SetWindowText(_T("Input"));
@@ -329,7 +330,7 @@ int m_inRows;
 			m_statusComBox.ShowWindow(SW_HIDE);
 		}
 	}
-	else//是Bacnet 协议;
+	else//是Bacnet 协议; // It is the Bacnet protocol;
 	{
 		if(m_input_or_output==0)
 		{

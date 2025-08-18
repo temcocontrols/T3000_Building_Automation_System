@@ -62,7 +62,7 @@ BOOL Cconfigure::OnInitDialog()
 	{
 		m_msflexgrid.put_ColAlignment(n,4);
 	}
-//设置行的高度
+//设置行的高度 -  Set the height of the row
     
 	CString str;
 	for(int i=1;i<25;i++)
@@ -73,7 +73,7 @@ BOOL Cconfigure::OnInitDialog()
 		m_msflexgrid.put_TextMatrix(i,1,_T("ON/OFF"));
 	}
 	m_msflexgrid.put_Cols(7);
-	//设置列宽
+	//设置列宽 - Set the width of the column
 	m_msflexgrid.put_ColWidth(0,1200);
 	m_msflexgrid.put_ColWidth(1,1500);
 	m_msflexgrid.put_ColWidth(2,1500);
@@ -88,7 +88,7 @@ BOOL Cconfigure::OnInitDialog()
 	m_msflexgrid.put_TextMatrix(0,4,_T("Auto/Manual"));
 	m_msflexgrid.put_TextMatrix(0,5,_T("Delay Time(s)"));
     m_msflexgrid.put_TextMatrix(0,6,_T("Time Left(s)"));
-	//读取硬件数据
+	//读取硬件数据 - Read hardware data
 
 	//201…224	1 * 24	switch (1..24) types: 0 --- low active,  1--- high active,   2 --- falling edge active,    3 --- rising edge active
 	//252…275	2 * 24	override time for each switch. Uint is second. 2bytes = 65536s =~18hours max.
@@ -264,36 +264,36 @@ DWORD WINAPI _UpdateThread_LC(LPVOID pParam)
 void Cconfigure::ClickMsflexgridConfigure()
 {
     KILLTIMER
-	long lRow = m_msflexgrid.get_RowSel();//获取点击的行号	
-	long lCol = m_msflexgrid.get_ColSel(); //获取点击的列号	
+	long lRow = m_msflexgrid.get_RowSel();//获取点击的行号	- Get the clicked row number
+	long lCol = m_msflexgrid.get_ColSel(); //获取点击的列号	- Get the clicked column number
 
 	CRect rect;	
-	m_msflexgrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形
-	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-	//需要将其转化为像素，1440缇= 1英寸
+	m_msflexgrid.GetWindowRect(rect); //获取表格控件的窗口矩形 - Get the window rectangle of the grid control
+	ScreenToClient(rect); //转换为客户区矩形 - Convert to client area rectangle
+	// MSFlexGrid控件的函数的长度单位是"缇(twips)" - The length unit of the MSFlexGrid control function is "twips"
+	//需要将其转化为像素，1440缇= 1英寸 - It needs to be converted to pixels, 1440 twips = 1 inch
 	CDC* pDC =GetDC();
-	//计算象素点和缇的转换比例
+	//计算象素点和缇的转换比例 - Calculate the conversion ratio between pixel points and twips
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//计算选中格的左上角的坐标(象素为单位) - Calculate the coordinates of the upper left corner of the selected cell (in pixels)
 	long y = m_msflexgrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_msflexgrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好 - Calculate the size of the selected cell (in pixels). Adding 1 is found to be better in actual debugging
 	long width = m_msflexgrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_msflexgrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//形成选中个所在的矩形区域 - Form the rectangular area where the selected cell is located
 	CRect rc(x,y,x+width,y+height);
-	//转换成相对对话框的坐标	
+	//转换成相对对话框的坐标- Convert to coordinates relative to the dialog box
 	rc.OffsetRect(rect.left+1,rect.top+1);	
-	//获取选中格的文本信息	
+	//获取选中格的文本信息	- Get the text information of the selected cell
 	m_CurRow=lRow;
 	m_CurCol=lCol;
 	CString strValue = m_msflexgrid.get_TextMatrix(lRow,lCol);
 	m_oldname=strValue;
 	if (lCol == 1||lCol ==2||lCol==4)
 	{
-		//使用combobox控件形式显示
+		//使用combobox控件形式显示 - Use the combobox control to display
 		m_edit.ShowWindow(SW_HIDE);
 		m_controlcombo.ShowWindow(SW_SHOW);
 
@@ -320,10 +320,10 @@ void Cconfigure::ClickMsflexgridConfigure()
 			m_controlcombo.AddString(_T("OFF"));
 			 
 		}
-		m_controlcombo.MoveWindow(&rc,1); //移动到选中格的位置
+		m_controlcombo.MoveWindow(&rc,1); //移动到选中格的位置 - Move to the position of the selected cell
 		m_controlcombo.BringWindowToTop();	
 		m_controlcombo.SelectString(-1,strValue);
-		m_controlcombo.ShowWindow(SW_SHOW);//显示控件
+		m_controlcombo.ShowWindow(SW_SHOW);//显示控件- Show the control
 	}
 	else if (lCol ==3||lCol ==5)
 	{  
@@ -339,13 +339,13 @@ void Cconfigure::ClickMsflexgridConfigure()
         
          
        
-		//使用edition控件形式显示
+		//使用edition控件形式显示 - Use the edition control to display
 		m_controlcombo.ShowWindow(SW_HIDE);
 		m_edit.MoveWindow(&rc,1);
 		m_edit.ShowWindow(SW_SHOW);	
 		m_edit.SetWindowText(strValue);	
 		m_edit.SetFocus();
-		m_edit.SetCapture();//使随后的鼠标输入都被发送到这个CWnd 
+		m_edit.SetCapture();//使随后的鼠标输入都被发送到这个CWnd - Make subsequent mouse input sent to this CWnd
 		int nLenth=strValue.GetLength();	
 		m_edit.SetSel(nLenth,nLenth); 	
 
@@ -360,8 +360,8 @@ void Cconfigure::ClickMsflexgridConfigure()
 
 void Cconfigure::OnCbnKillfocusComboSelect()
 {KILLTIMER
-	long lRow = m_msflexgrid.get_RowSel();//获取点击的行号	
-	long lCol = m_msflexgrid.get_ColSel(); //获取点击的列号	
+	long lRow = m_msflexgrid.get_RowSel();//获取点击的行号	- Get the clicked row number
+	long lCol = m_msflexgrid.get_ColSel(); //获取点击的列号	- Get the clicked column number
 
 
 
@@ -527,8 +527,8 @@ KILLTIMER
 	{
 		Value=16;
 	}
-	RegValue&=0x0F;//留底位，去高位
-	RegValue+=Value;//置高位
+	RegValue&=0x0F;//留底位，去高位 - Keep the low bit, remove the high bit
+	RegValue+=Value;//置高位 - Set the high bit
 	ret=write_one(g_tstat_id,200+m_CurRow,RegValue);
 
 

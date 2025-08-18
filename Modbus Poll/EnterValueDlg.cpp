@@ -77,6 +77,7 @@ BOOL CEnterValueDlg::OnInitDialog(){
 	
 	m_Value_Edit.SetCapture();//LSC
 	int nLenth=m_StrValue.GetLength();
+	// Select all
 	m_Value_Edit.SetSel(0,nLenth); //全选//
 	 m_Value_Edit.SetFocus();
 	return FALSE;
@@ -87,6 +88,7 @@ void CEnterValueDlg::OnBnClickedOk()
 	UpdateData(TRUE);
 	if (m_dataformate==2)//Hex
 	{
+		// Format Hex data format
 		//格式化Hex数据格式
 		int ret;
 		CString temp=_T("0x");

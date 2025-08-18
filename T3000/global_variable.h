@@ -48,6 +48,7 @@ volatile int g_tstat_id=255;
 int g_protocol_support_ptp = PROTOCOL_UNKNOW;
 int g_output_support_relinquish = 0;
 //unsigned short output_relinquish_value[128] ;
+//Used for global access to MSTP based on Device id.
 int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。 
 unsigned int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
@@ -57,6 +58,7 @@ int g_language=0;
 CString g_strImagePathName=_T("");
 int now_tstat_id =0;//for batch load /flash.
 
+//Selected building directory;
 CString selected_image_fordor = _T(""); //选中building的目录;
 CString	g_strDatabasefilepath=_T("");
 CString g_strExePth=_T("");
@@ -67,8 +69,11 @@ CString g_achive_folder_temp_txt = _T("");
 CString g_achive_folder_temp_db = _T("");
 CString g_achive_device_name_path = _T("");
 CString g_achive_monitor_datatbase_path = _T("");
+//Additional configuration database path;
 CString g_ext_database_path = _T(""); //额外的配置档数据库路径;
+//Save multiple flash configuration file path for selected devices
 CString g_ext_mass_flash_path = _T(""); //保存多烧写  选中设备的 配置文件路径
+//DeviceDatabase.mdb full path
 CString g_building_devicedatabase = _T(""); //DeviceDatabase.mdb 全路径
 
 BOOL g_Scanfully=FALSE;

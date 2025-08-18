@@ -54,6 +54,7 @@ public:
 	}
 
 	inline bool operator<(const Schedule_Node& t1) {
+		// Will produce ascending sort, if changed to >, it becomes descending
 		return Hour*60+ Minite < t1.Hour*60+t1.Minite;    //会产生升序排序,若改为>,则变为降序
 	}
 

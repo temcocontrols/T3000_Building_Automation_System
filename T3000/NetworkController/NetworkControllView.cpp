@@ -176,7 +176,7 @@ void CNetworkControllView::Fresh()
 	CEdit* pEdit = (CEdit*)GetDlgItem(IDC_EDIT_BLDVERSION);
 	CString strBldVer; strBldVer.Format(_T("%d"), m_nbldVersion);
 	pEdit->SetWindowText(strBldVer);
-	if (m_nbldVersion < _OLD_NC_VERSION && !m_bWarningBldVersion && m_nSerialNum != 0 && m_hardware_version < 4) // 序列号不等于0防止掉线时版本寄存器为0弹这个消息
+	if (m_nbldVersion < _OLD_NC_VERSION && !m_bWarningBldVersion && m_nSerialNum != 0 && m_hardware_version < 4) // 序列号不等于0防止掉线时版本寄存器为0弹这个消息 - // The serial number is not equal to 0 to prevent the message from popping up when the version register is 0 during disconnection
 	{	
 		m_bWarningBldVersion = TRUE;
 		CString strBldVer;
@@ -661,9 +661,9 @@ void CNetworkControllView::OnBnClickedButtonUpdatetimeserver()
 	n=write_one(g_tstat_id,180,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b3 ));
 	n=write_one(g_tstat_id,181,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b4 ));
 
-	n=write_one(g_tstat_id,177,6); // 命令寄存器，同步命令
+	n=write_one(g_tstat_id,177,6); // 命令寄存器，同步命令 - // Command register, synchronization command
 
-	Sleep(5000);  // 等待NC 同步
+	Sleep(5000);  // 等待NC 同步 - // Wait for NC synchronization
 	AddNewTimeServer(strTimeServer);
 
 	int nCount = 0;
@@ -727,10 +727,10 @@ CString CNetworkControllView::GetIPFromHostName(CString& strHostName)
 { 
 	//char	szhostname[128]; 
 	CString	str; 
-	//获得主机名 
+	//获得主机名 - // Get the host name
 //	if(   gethostname(szhostname,   128)   ==   0   ) 
 	{
-		//   获得主机ip地址 
+		//   获得主机ip地址 - // Get the host IP address
 		struct hostent* phost;
 		int i;
 		USES_CONVERSION;
@@ -767,7 +767,7 @@ CString CNetworkControllView::GetIPFromHostName(CString& strHostName)
 // }
 
 
-// 读取NC信息，并加入到数据库
+// 读取NC信息，并加入到数据库 - // Read NC information and add it to the database
 void CNetworkControllView::GetTstatInfo(int nID)
 {
 	
@@ -904,7 +904,7 @@ BOOL CNetworkControllView::SaveTimeServerToRegister(const CString& strVal, const
 			ASSERT(0);
 		}
 	}	
-	else // 没有这个表项
+	else // 没有这个表项 - // There is no such entry
 	{
 		ASSERT(0);		
 		return FALSE;
@@ -935,7 +935,7 @@ BOOL CNetworkControllView::LoadTimeServerFromRegister(const CString& strKey ,CSt
 			return FALSE;
 		}	
 	}	
-	else // 没有这个表项
+	else // 没有这个表项 - // There is no such entry
 	{
 		delete []szRet;
 		return FALSE;
@@ -1016,7 +1016,7 @@ void CNetworkControllView::InitGrid()
 
 
 const int TABLE_NODE_NUM_REG = 7000;
-const int TABLE_NODE_SIZE = 20;				// 一个node占用20寄存器
+const int TABLE_NODE_SIZE = 20;				// 一个node占用20寄存器 - // A node occupies 20 registers
 void  CNetworkControllView::ReadNCTable()
 {
 	WORD wNumLow = Read_One(m_IDaddress, TABLE_NODE_NUM_REG);

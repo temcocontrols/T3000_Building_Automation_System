@@ -205,6 +205,7 @@ int GetSpecialPrivateData(uint32_t deviceid, uint8_t command, uint8_t start_inst
 int GetPriavteDataByPanelBlocking(Str_points* npoint, str_group_point* temp_data, uint8_t retrytime = 5);
 int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize, uint8_t retrytime = 10);
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize, uint8_t retrytime = 10);
+//Bacnet protocol conversion to modbus protocol;
 int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t readlength, unsigned short *data_out);//Bacnet 协议转换为 modbus 协议;
 int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_t writelength, unsigned short *data_in);
 
@@ -243,6 +244,7 @@ void localhandler_read_property_ack(
     uint8_t * service_request,
     uint16_t service_len,
     BACNET_ADDRESS * src,
+    //Standard read property;
     BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data); //标准的读属性;
 
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src);
@@ -288,6 +290,7 @@ bool GetFileNameFromPath(CString ncstring,CString &cs_return);
 BOOL Ping(const CString& strIP, CWnd* pWndEcho);
  
 void Send_WhoIs_remote_ip(CString ipaddress);
+//Used to initialize bacnet memory;
 void ClearBacnetData(); //用来初始化bacnet 内存;
 void SaveBacnetBinaryFile(CString &SaveConfigFilePath);
 void SaveBacnetBinaryFile(unsigned int serialnumber);
@@ -373,13 +376,19 @@ bool Save_VariableData_to_db(unsigned char  temp_output_index, unsigned int nser
 bool Save_OutputData_to_db(unsigned char  temp_output_index);
 bool Save_AVData_to_db();
 CString GetGUID();
+//Used to set the response delay time for each product. Default is 100ms.
 int  SetCommandDelayTime(unsigned char product_id); //用于设置每个产品的 应答延时时间.默认为100ms.
 bool Open_Socket_Retry(CString strIPAdress, short nPort, int retry_time = 3);
+//Initialize Panel Name storage location, default is position 714
 void Inial_ProductName_map();  //初始化 Panel Name 存放的位置 默认是714位置 
+//Determine if bacnet range is within reasonable value range;
 bool bac_Invalid_range(unsigned char nrange);  //判断bacnet range 是否在合理值范围内;
+//Initialize instance storage location;
 void Initial_Instance_Reg_Map();  //初始化 instance 存放位置;
+//Find Panel Name storage location, if not found, default to position 714
 int PanelName_Map(int product_type);  //查找 Panel  Name 存放的位置 没有找到就认为是从714位置开始的
 int Get_Instance_Reg_Map(int product_type, unsigned short &temp_high, unsigned short &temp_low);
+//Get corresponding product instance value through instance register stored in map;
 unsigned int GetDeviceInstance(unsigned char pid_type);  //通过 map 中存放的 instance 寄存器 获取 对应产品的 instance 值;
 int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bacnet 
     unsigned char modbus_id,

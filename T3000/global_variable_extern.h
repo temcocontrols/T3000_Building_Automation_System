@@ -64,12 +64,12 @@ extern	volatile int g_tstat_id;
 extern int g_protocol_support_ptp ;
 extern int g_output_support_relinquish ;
 //extern unsigned short output_relinquish_value[128];
-extern  int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。
+extern  int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。 - Used for global access to MSTP based on Device id.
 extern unsigned int g_serialNum;
 extern	BOOL g_tstat_id_changed;
 extern  BOOL g_bPauseMultiRead;     // for background read register
 extern  int now_tstat_id;//for batch load/flash read/write
-extern  CString selected_image_fordor; //选中building的目录;
+extern  CString selected_image_fordor; //选中building的目录; - Selected building directory;
 extern  CString g_strImagePathName;
 extern	CString	g_strDatabasefilepath;
 extern	CString g_strExePth;
@@ -79,10 +79,10 @@ extern  CString g_achive_folder_temp_db;
 extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
-extern CString g_ext_database_path ; //额外的配置档数据库路径;
-extern CString g_ext_mass_flash_path ; //保存多烧写  选中设备的 配置文件路径
+extern CString g_ext_database_path ; //额外的配置档数据库路径; - Additional configuration database path;
+extern CString g_ext_mass_flash_path ; //保存多烧写  选中设备的 配置文件路径 - Save multiple flash configuration file path for selected devices
 extern  CString g_achive_monitor_datatbase_path ;
-extern CString g_building_devicedatabase; //DeviceDatabase.mdb 全路径
+extern CString g_building_devicedatabase; //DeviceDatabase.mdb 全路径 - DeviceDatabase.mdb full path
 extern BOOL g_mstp_flag;
 extern	BOOL g_Scanfully;
 extern	BOOL g_ScanSecurity;
@@ -913,12 +913,15 @@ extern int selected_product_index;
 extern HTREEITEM selected_tree_item;
 #pragma region For_bacnet
 
-extern CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
+extern CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位; - Used to save customer-defined units;
 extern CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
+//Custom forward logic or reverse logic;
 //extern int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //自定义的  正向逻辑还是反向逻辑;
 extern CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 extern CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
+//If this device hasn't read customer unit item, need to try to read it, older versions don't have it;
 extern bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
+//When reply received, flag is set to true;
 extern bool receive_customer_unit; //收到回复，flag就置 true;
 extern bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
 extern bool read_msv_table; //MSV table 
