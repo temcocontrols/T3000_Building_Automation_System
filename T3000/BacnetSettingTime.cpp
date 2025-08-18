@@ -1,3 +1,4 @@
+// BacnetSettingTime.cpp : Implementation file
 // BacnetSettingTime.cpp : 实现文件
 //
 
@@ -7,8 +8,11 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 
+// Used for time conversion between different time zones
 extern int pc_time_to_basic_delt ; //用于时间转换 ，各个时区之间。
 extern int panel_time_to_basic_delt ;
+
+// CBacnetSettingTime Dialog
 // CBacnetSettingTime 对话框
 
 IMPLEMENT_DYNAMIC(CBacnetSettingTime, CDialogEx)
@@ -52,6 +56,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingTime, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// CBacnetSettingTime Message handlers
 // CBacnetSettingTime 消息处理程序
 
 
@@ -184,6 +189,7 @@ int CBacnetSettingTime::MonthType(unsigned char n_month)
 
 void CBacnetSettingTime::UpdateDayNightStartEndUI()
 {
+	// Initialize the start and end times for daylight saving time
 	//初始化 夏令时的起止时间;
 	GetDlgItem(IDC_COMBO_START_MONTH)->EnableWindow(1);
 	GetDlgItem(IDC_COMBO_END_MONTH)->EnableWindow(1);
@@ -202,6 +208,7 @@ void CBacnetSettingTime::UpdateDayNightStartEndUI()
 	}
     else
     {
+        // Default 2021 daylight saving time start time
         Device_Basic_Setting.reg.start_month = 3; //默认2021夏令时的开始时间;
         Device_Basic_Setting.reg.start_day = 14;
     }
@@ -211,6 +218,7 @@ void CBacnetSettingTime::UpdateDayNightStartEndUI()
 	}
     else
     {
+        // Default daylight saving time end time
         Device_Basic_Setting.reg.end_month = 11; //默认夏令时的结束时间;
         Device_Basic_Setting.reg.end_day = 7;
     }
@@ -349,7 +357,9 @@ void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
     Device_time.new_time.n_time = temp_time_long;
 
 
+    // TSTAT10 sometimes hangs up communication when writing sync time
     //TSTAT10 有时候 写同步时间的时候 会通讯挂掉;
+    // Temporarily disable TSTAT10 sync time, after that no communication
     //暂时屏蔽TSTAT10 同步时间 后就不通讯;
    // if (g_selected_product_id == PM_TSTAT10)
     //    return;
@@ -375,6 +385,7 @@ void CBacnetSettingTime::OnBnClickedBtnBacSYNCTime()
 //    if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 469)
 //    {
 //        panel_time_to_basic_delt = Device_Basic_Setting.reg.time_zone * 360 / 10;
+//        // Because local CDateTimeCtrl will automatically add computer's timezone when setting time, but when displaying, it should show the device's selected timezone, so conversion is needed
 //        //因为本地CDateTimeCtrl 在设置时间的时候 会默认 加上 电脑的时区，但是显示的时候要显示 设备所选时区，所以 要 变换.
 //        if (Device_Basic_Setting.reg.time_zone_summer_daytime == 0)
 //            scale_time = temp_time_long - pc_time_to_basic_delt + panel_time_to_basic_delt;

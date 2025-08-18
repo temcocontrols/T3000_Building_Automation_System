@@ -911,7 +911,7 @@ void CT3ModulesOutputDlg::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pResult)
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
 	m_isstop = TRUE;
-    if(lRow>m_outputlist.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+    if(lRow>m_outputlist.GetItemCount()) //如果点击区超过最大行号，则点击是无效的 - If the clicked area exceeds the maximum row number, the click is invalid`
     {
        
         return;

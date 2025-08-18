@@ -15,12 +15,19 @@ class CBacnetBMD
 public:
 	CBacnetBMD(void);
 	~CBacnetBMD(void);
+	// Node name
 	CString m_csName;  //节点名字;
+	// Node index
 	int m_index;  //节点的序号;
+	// Number of child nodes
 	int m_child_count;  //子节点的个数;
+	// Number of inputs
 	int m_input_count;  //输入的个数;
+	// Number of outputs
 	int m_output_count; //输出的个数;
+	// Number of variables
 	int m_variable_count; //变量的个数;
+	// Node type: group, device, IO, or input
 	int m_node_type;   //节点类型 是group 还是device 还是IO  还是 input
 	Str_points m_property;
 	HTREEITEM hParent;
@@ -28,7 +35,9 @@ public:
 	CBacnetBMD* pfather;
 	CBacnetBMD* pchild[255];
 	void UpdateCount();
+	// Indicates which floor it belongs to in Build view
 	int m_floor;  //指示Build view 中 隶属于哪一 层楼
+	// Indicates which room it belongs to in Build view
 	int m_room;   //指示Build view 中 隶属于哪一 个房间
 };
 

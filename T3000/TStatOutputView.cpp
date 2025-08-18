@@ -69,6 +69,7 @@ LRESULT  CTStatOutputView::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
     CString Show_Results;
    
     LoadTstat_OutputData();
+    // Single write
     if (msg_result==1||msg_result==2)//µ¥Ð´
     {
         _MessageWriteOneInfo_List *pInvoke =(_MessageWriteOneInfo_List *)lParam;
@@ -86,6 +87,7 @@ LRESULT  CTStatOutputView::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
         }
         Fresh_One_Item(pInvoke->mRow);
 
+        // Restore foreground and background colors
         if((pInvoke->mRow%2)==0)//»Ö¸´Ç°¾°ºÍ ±³¾° ÑÕÉ«;
             m_output_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
         else
@@ -97,6 +99,7 @@ LRESULT  CTStatOutputView::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
         if(pInvoke)
             delete pInvoke;
     }
+    // Multiple write
     if (msg_result==3||msg_result==4)//¶àÐ´
     { 
 
@@ -120,6 +123,7 @@ LRESULT  CTStatOutputView::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
         //  PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
 
 
+        // Restore foreground and background colors
         if((pInvoke->mRow%2)==0)	//»Ö¸´Ç°¾°ºÍ ±³¾° ÑÕÉ«;
             m_output_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
         else

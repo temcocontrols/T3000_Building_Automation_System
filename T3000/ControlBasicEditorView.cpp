@@ -20,8 +20,11 @@
 #include "BacnetProgramDebug.h"
 
 /*
+1. Can support reading program code from MINIPANEL
 1.可以支持从MINIPANEL中读取program code 
+2. Added C# program Editor control to display program code
 2.添加了C#的program Editor 控件用来显示 program code
+3. Added syntax parsing part to display different color standards
 3.添加了语法解析部分，用来显示不同的颜色标准
 */
 
@@ -454,6 +457,7 @@ void ControlBasicEditorView::SetAllPoints_BACnetDevice()
 		}
 		else
 		{
+			//If it's time
 			if (m_Variable_data.at(i).range == 20)	//如果是时间;
 			{
 				Units=Variable_Analog_Units_Array[m_Variable_data.at(i).range];
@@ -669,6 +673,7 @@ void ControlBasicEditorView::OnSend()
 	memset((void*)editbuf, 0, sizeof(char) * (iTextLen + 1));
 	::WideCharToMultiByte(CP_ACP, 0, tempcs, -1, editbuf, iTextLen, NULL, NULL);
 
+	//2017/12/04 dufan: Do not allow using nested IF in THEN, otherwise decoding will error. Temporarily can't find a better solution.
 	//2017/ 12 / 04   dufan 不允许使用 在THEN 中嵌套使用IF ，否则 解码时会出错。暂时找不出更好的解决办法。
 	if (tempcs.Find(_T("THEN IF")) != -1)
 	{

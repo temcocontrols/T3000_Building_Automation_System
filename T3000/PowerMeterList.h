@@ -3,23 +3,23 @@
 #include "CM5/ListCtrlEx.h"
 #include "afxwin.h"
 #include "CM5\CStatic\staticex.h"
-// CPowerMeterList 对话框
+// CPowerMeterList 对话框 - CPowerMeterList dialog box
 
 class CPowerMeterList : public CDialogEx
 {
 	DECLARE_DYNAMIC(CPowerMeterList)
 
 public:
-	CPowerMeterList(CWnd* pParent = NULL);   // 标准构造函数
+	CPowerMeterList(CWnd* pParent = NULL);   // 标准构造函数 - Standard constructor
 	virtual ~CPowerMeterList();
 
-// 对话框数据
+// 对话框数据 - Dialog data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_POWER_METER };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持 - DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 public:

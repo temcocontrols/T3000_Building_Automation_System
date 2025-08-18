@@ -1,4 +1,5 @@
-﻿// CBacnetBuilidngAddNode.cpp: 实现文件
+﻿// CBacnetBuilidngAddNode.cpp: Implementation file
+// CBacnetBuilidngAddNode.cpp: 实现文件
 //
 #include "stdafx.h"
 
@@ -8,6 +9,7 @@
 #include "CBacnetBuildingRoomEditor.h"
 #include "CBacnetBMD.h"
 BM_dlg_ret dlg_ret;
+// CBacnetBuilidngAddNode dialog
 // CBacnetBuilidngAddNode 对话框
 
 CString BM_Cstring_Type[]
@@ -62,6 +64,7 @@ BEGIN_MESSAGE_MAP(CBacnetBuilidngAddNode, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// CBacnetBuilidngAddNode message handlers
 // CBacnetBuilidngAddNode 消息处理程序
 
 void CBacnetBuilidngAddNode::SetParameter(int nfunction,int ntype)
@@ -154,15 +157,18 @@ BOOL CBacnetBuilidngAddNode::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	// TODO: Add extra initialization here
 	// TODO:  在此添加额外的初始化
 	InitalUI();
 	return TRUE;  // return TRUE unless you set the focus to a control
+	              // Exception: OCX property pages should return FALSE
 				  // 异常: OCX 属性页应返回 FALSE
 }
 
 
 void CBacnetBuilidngAddNode::OnBnClickedButtonBmNodeOk()
 {
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_csfunction;
 	GetDlgItem(IDC_COMBO_BM_FUNCTION)->GetWindowTextW(temp_csfunction);
@@ -232,6 +238,7 @@ void CBacnetBuilidngAddNode::OnBnClickedButtonBmNodeOk()
 
 void CBacnetBuilidngAddNode::OnBnClickedButtonManageBuild()
 {
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CBacnetBuildingRoomEditor dlg;
 	dlg.DoModal();
@@ -240,6 +247,7 @@ void CBacnetBuilidngAddNode::OnBnClickedButtonManageBuild()
 
 void CBacnetBuilidngAddNode::OnCbnSelchangeComboBmMoudle()
 {
+	// TODO: Add your control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	int example_index = 0;
 	CString temp_string;

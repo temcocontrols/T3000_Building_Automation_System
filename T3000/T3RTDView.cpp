@@ -76,7 +76,7 @@ CT3RTDView::~CT3RTDView()
     //CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
     //pMain->m_pFreshMultiRegisters->ResumeThread();
     ////	pMain->m_pFreshTree->SuspendThread();
-    //pMain->m_pRefreshThread->ResumeThread();	//²»ÄÜ¼ÓÕâÒ»¶Î£¬·ñÔò ÍË³öT3000µÄÊ±ºò ±¨´í; Fance comments
+    //pMain->m_pRefreshThread->ResumeThread();	// Cannot add this section, otherwise it will error when exiting T3000 - ä¸èƒ½åŠ è¿™ä¸€æ®µï¼Œå¦åˆ™ é€€å‡ºT3000çš„æ—¶å€™ æŠ¥é”™; Fance comments
     if(hFirstThread != NULL)
         TerminateThread(hFirstThread, 0);
 }
@@ -129,7 +129,8 @@ void CT3RTDView::OnInitialUpdate()
     m_dataformat.AddString(_T("Float"));
     m_dataformat.AddString(_T("Int"));;
 //#if 1	
-    //ÉèÖÃÅÅ/ĞĞÊıÁ¿
+    // Set row/column count
+    //è®¾ç½®æ’/è¡Œæ•°é‡
     m_msflexgrid_input.put_Cols(6);
     m_msflexgrid_input.put_Rows(10+1); 
     m_msflexgrid_input.put_TextMatrix(0,0,_T("Channel N0"));
@@ -138,7 +139,8 @@ void CT3RTDView::OnInitialUpdate()
     m_msflexgrid_input.put_TextMatrix(0,3,_T("Range"));
     m_msflexgrid_input.put_TextMatrix(0,4,_T("Filter"));
     m_msflexgrid_input.put_TextMatrix(0,5,_T("Status"));
-    //ÉèÖÃÁĞ¿í	
+    // Set column width
+    //è®¾ç½®åˆ—å®½	
     m_msflexgrid_input.put_ColWidth(0,1000);
     m_msflexgrid_input.put_ColWidth(1,1500);
   
@@ -146,15 +148,17 @@ void CT3RTDView::OnInitialUpdate()
     m_msflexgrid_input.put_ColWidth(3,1000);
     m_msflexgrid_input.put_ColWidth(4,1000);
     m_msflexgrid_input.put_ColWidth(5,1000);
-    //¾ÓÖĞÏÔÊ¾
+    // Center display
+    //å±…ä¸­æ˜¾ç¤º
     for (int col=0;col<6;col++)
     { 
         m_msflexgrid_input.put_ColAlignment(col,4);
     }
-    //²ÊÉ«ÏÔÊ¾
-    for(int i=1;i<10+1;i++)		//ÅÅÊıÁ¿
+    // Color display
+    //å½©è‰²æ˜¾ç¤º
+    for(int i=1;i<10+1;i++)		// Row count - æ’æ•°é‡
     {
-        for(int k=0;k<6;k++)	//ÁĞÊıÁ¿
+        for(int k=0;k<6;k++)	// Column count - åˆ—æ•°é‡
         {
             if (i%2==1)
             {
@@ -166,7 +170,8 @@ void CT3RTDView::OnInitialUpdate()
             }
         }
     }
-    //ÏÔÊ¾×İ±êÌâ
+    // Display vertical titles
+    //æ˜¾ç¤ºçºµæ ‡é¢˜
     CString str;
     for(int i=1;i<10+1;i++)
     {
@@ -387,7 +392,7 @@ void CT3RTDView::InitialDialog(){
             }
             else if (2==product_register_value[RANGE_CHANNEL1+i-1])
             {
-                strresult=_T("¦¸");
+                strresult=_T("Î©");
             }
             m_msflexgrid_input.put_TextMatrix(i,3,strresult);
 			DataFormat mydata;
@@ -466,7 +471,7 @@ void CT3RTDView::InitialDialog(){
             }
             else if (2==product_register_value[RANGE_CHANNEL1+i-1])
             {
-                strresult=_T("¦¸");
+                strresult=_T("Î©");
             }
             m_msflexgrid_input.put_TextMatrix(i,3,strresult);
             CString unit=strresult;
@@ -611,26 +616,26 @@ void CT3RTDView::ClickMsflexgridInput()
     UpdateData(FALSE);
 
     long lRow,lCol;
-    lRow = m_msflexgrid_input.get_RowSel();//»ñÈ¡µã»÷µÄĞĞºÅ	
-    lCol = m_msflexgrid_input.get_ColSel(); //»ñÈ¡µã»÷µÄÁĞºÅ
+    lRow = m_msflexgrid_input.get_RowSel();//è·å–ç‚¹å‡»çš„è¡Œå· - Get the clicked row number
+    lCol = m_msflexgrid_input.get_ColSel(); //è·å–ç‚¹å‡»çš„åˆ—å· - Get the clicked column number
     TRACE(_T("Click input grid!\n"));
 
     CRect rect;
-    m_msflexgrid_input.GetWindowRect(rect); //»ñÈ¡±í¸ñ¿Ø¼şµÄ´°¿Ú¾ØĞÎ
-    ScreenToClient(rect); //×ª»»Îª¿Í»§Çø¾ØĞÎ	
+    m_msflexgrid_input.GetWindowRect(rect); //è·å–è¡¨æ ¼æ§ä»¶çš„çª—å£çŸ©å½¢ - Get the window rectangle of the grid control
+    ScreenToClient(rect); //è½¬æ¢ä¸ºå®¢æˆ·åŒºçŸ©å½¢ - Convert to client area rectangle
     CDC* pDC =GetDC();
 
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-    //¼ÆËãÑ¡ÖĞ¸ñµÄ×óÉÏ½ÇµÄ×ø±ê(ÏóËØÎªµ¥Î»)
+    //è®¡ç®—é€‰ä¸­æ ¼çš„å·¦ä¸Šè§’çš„åæ ‡(è±¡ç´ ä¸ºå•ä½) - Calculate the coordinates of the upper left corner of the selected cell (in pixels)
     long y = m_msflexgrid_input.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_msflexgrid_input.get_ColPos(lCol)/nTwipsPerDotX;
-    //¼ÆËãÑ¡ÖĞ¸ñµÄ³ß´ç(ÏóËØÎªµ¥Î»)¡£¼Ó1ÊÇÊµ¼Êµ÷ÊÔÖĞ£¬·¢ÏÖ¼Ó1ºóĞ§¹û¸üºÃ
+    //è®¡ç®—é€‰ä¸­æ ¼çš„å°ºå¯¸(è±¡ç´ ä¸ºå•ä½)ã€‚åŠ 1æ˜¯å®é™…è°ƒè¯•ä¸­ï¼Œå‘ç°åŠ 1åæ•ˆæœæ›´å¥½ - Calculate the size of the selected cell (in pixels). Adding 1 is found to be more effective in actual debugging
     long width = m_msflexgrid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_msflexgrid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
-    //ĞÎ³ÉÑ¡ÖĞ¸öËùÔÚµÄ¾ØĞÎÇøÓò
+    //å½¢æˆé€‰ä¸­ä¸ªæ‰€åœ¨çš„çŸ©å½¢åŒºåŸŸ - Form the rectangular area where the selected cell is located
     CRect rcCell(x,y,x+width,y+height);
-    //×ª»»³ÉÏà¶Ô¶Ô»°¿òµÄ×ø±ê
+    //è½¬æ¢æˆç›¸å¯¹å¯¹è¯æ¡†çš„åæ ‡ - Convert to the coordinates relative to the dialog box
     rcCell.OffsetRect(rect.left+1,rect.top+1);
     ReleaseDC(pDC);
     CString strValue = m_msflexgrid_input.get_TextMatrix(lRow,lCol);
@@ -650,10 +655,10 @@ void CT3RTDView::ClickMsflexgridInput()
         m_comboxRange.ResetContent();
         m_comboxRange.AddString(_T("C"));
         m_comboxRange.AddString(_T("F"));
-        m_comboxRange.AddString(_T("¦¸"));
+        m_comboxRange.AddString(_T("Î©"));
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
-        m_comboxRange.SetFocus(); //»ñÈ¡½¹µã
+        m_comboxRange.SetFocus(); //è·å–ç„¦ç‚¹ - Get focus
         m_comboxRange.SetWindowText(strValue);
     }
     else  
@@ -665,7 +670,7 @@ void CT3RTDView::ClickMsflexgridInput()
         m_inNameEdt.SetFocus();
         m_inNameEdt.SetCapture();//LSC
         int nLenth=strValue.GetLength();
-        m_inNameEdt.SetSel(nLenth,nLenth); //È«Ñ¡//
+        m_inNameEdt.SetSel(nLenth,nLenth); //å…¨é€‰// - Select all
     }
 }
 

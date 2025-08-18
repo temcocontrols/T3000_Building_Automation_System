@@ -3,7 +3,8 @@
 #include "afxwin.h"
 #include "afxcmn.h"
 
-// CShowMessageDlg ¶Ô»°¿ò
+// CShowMessageDlg dialog
+// CShowMessageDlg å¯¹è¯æ¡†
 const int EVENT_AUTO_CLOSE = 0;
 const int EVENT_IP_AUTO = 1;
 const int EVENT_IP_STATIC_CHANGE = 2;
@@ -19,16 +20,17 @@ class CShowMessageDlg : public CDialogEx
 	DECLARE_DYNAMIC(CShowMessageDlg)
 
 public:
-	CShowMessageDlg(CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
+	CShowMessageDlg(CWnd* pParent = NULL);   // Standard constructor - æ ‡å‡†æ„é€ å‡½æ•°
 	virtual ~CShowMessageDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// Dialog data
+// å¯¹è¯æ¡†æ•°æ®
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_AA_SHOWMESSAGE };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support - DDX/DDV æ”¯æŒ
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -37,28 +39,28 @@ public:
     CString static_text;
     CString static_percent;
     int     m_pos;
-    COLORREF static_backcolor; //±³¾°É«
-    COLORREF static_textcolor; //×ÖÌåÉ«
-    int static_text_length ; // ×ÖÌå³¤¿í
-    int static_text_width ;  // ×ÖÌå³¤¿í
+    COLORREF static_backcolor; // Background color - èƒŒæ™¯è‰²
+    COLORREF static_textcolor; // Font color - å­—ä½“è‰²
+    int static_text_length ; // Font width and height - å­—ä½“é•¿å®½
+    int static_text_width ;  // Font width and height - å­—ä½“é•¿å®½
     bool b_set_backcolor ;
     bool b_show_progress;
-    int auto_close_time; // ×Ô¶¯¹Ø±ÕÊ±¼ä;
+    int auto_close_time; // Auto close time - è‡ªåŠ¨å…³é—­æ—¶é—´;
     
     bool resize_message_window;
-    int int_x;  //´°ÌåµÄ´óĞ¡ ÒÔ¼° static µÄ´óĞ¡
+    int int_x;  // Window size and static control size - çª—ä½“çš„å¤§å° ä»¥åŠ static çš„å¤§å°
     int int_y;
     int int_cx;
     int int_cy;
 
-    int auto_close_time_count; // ¼¸´Îºó×Ô¶¯¹Ø±Õ;
-    int auto_close_time_count_old; // ÓÃÓÚ¼ÆËã°Ù·Ö±È;
+    int auto_close_time_count; // Auto close after several times - å‡ æ¬¡åè‡ªåŠ¨å…³é—­;
+    int auto_close_time_count_old; // Used to calculate percentage - ç”¨äºè®¡ç®—ç™¾åˆ†æ¯”;
     int mevent;
 
-    HWND m_message_hwnd ;  //ÓÃÓÚ»Ø´«ÏûÏ¢;
+    HWND m_message_hwnd ;  // Used for message callback - ç”¨äºå›ä¼ æ¶ˆæ¯;
     int m_message ;
 
-    _Bac_Scan_Com_Info m_mstp_device_info;  // MSTP ÓÃÓÚÈ·ÈÏ whois ÊÇ·ñÓĞ»Ø¸´;
+    _Bac_Scan_Com_Info m_mstp_device_info;  // MSTP ç”¨äºç¡®è®¤ whois æ˜¯å¦æœ‰å›å¤; - MSTP used to confirm if whois has a reply
     void SetMessageWindowSize(int xx, int yy, int c_xx, int c_yy);
     void SetStaticText(LPCTSTR lpszTitleText);
     void SetStaticTextBackgroundColor(COLORREF TitleTextBackColor);
@@ -70,10 +72,10 @@ public:
         unsigned char modbus_id,
         unsigned short nreg_address,
         unsigned short nreg_value,
-        unsigned char sub_device,         // Èç¹ûÊÇ×ÓÉè±¸  £¬Êı¾İ¿âÖĞµÄĞ­Òé ±È½ÏÌØÊâ;
+        unsigned char sub_device,         // If it's a sub-device, the protocol in the database is special - å¦‚æœæ˜¯å­è®¾å¤‡  ï¼Œæ•°æ®åº“ä¸­çš„åè®® æ¯”è¾ƒç‰¹æ®Š;
         LPCTSTR Dbpath);
     void SetHwnd(HWND h_hwnd, int nMessage);
-    void SetMstpDeviceInfo(_Bac_Scan_Com_Info deviceinfo); // MSTP ÓÃÓÚÈ·ÈÏ whois ÊÇ·ñÓĞ»Ø¸´;
+    void SetMstpDeviceInfo(_Bac_Scan_Com_Info deviceinfo); // MSTP used to confirm if whois has a reply - MSTP ç”¨äºç¡®è®¤ whois æ˜¯å¦æœ‰å›å¤;
     CStaticEx m_static_title;
     CStaticEx m_static_persent;
     afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -81,18 +83,20 @@ public:
     static DWORD WINAPI ShowMessageThread(LPVOID lPvoid);
 
 
-    //ÊÂ¼ş2 ¾²Ì¬IPĞŞ¸Ä
+    // Event 2: Static IP modification
+    //äº‹ä»¶2 é™æ€IPä¿®æ”¹
     CString m_string_event_2_static_ip;
     void SetChangedIPaddress(LPCTSTR lp_ipaddr);
     afx_msg void OnClose();
     virtual void OnCancel();
 
-    //¸ü¸ÄĞ­ÒéËùÓÃ²ÎÊı
+    // Parameters for protocol change
+    //æ›´æ”¹åè®®æ‰€ç”¨å‚æ•°
     bool cprotocol_modbus_to_bacnet;   // 0  modbus to bacnet          1  bacnet to modbus
     unsigned char cprotocol_modbus_id;
     unsigned short cprotocol_nreg_address;
     unsigned short cprotocol_nreg_value;
-    unsigned char cprotocol_sub_device;         // Èç¹ûÊÇ×ÓÉè±¸  £¬Êı¾İ¿âÖĞµÄĞ­Òé ±È½ÏÌØÊâ;
+    unsigned char cprotocol_sub_device;         // If it's a sub-device, the protocol in the database is special - å¦‚æœæ˜¯å­è®¾å¤‡  ï¼Œæ•°æ®åº“ä¸­çš„åè®® æ¯”è¾ƒç‰¹æ®Š;
     CString cprotocol_Dbpath;
     afx_msg void OnBnClickedOk();
     afx_msg void OnBnClickedCancel();

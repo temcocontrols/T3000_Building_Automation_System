@@ -13,7 +13,7 @@ public:
 	CBacnetVariable(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CBacnetVariable();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = IDD_DIALOG_BACNET_VARIABLE };
 
 protected:
@@ -34,6 +34,7 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CDateTimeCtrl m_variable_time_picker;
 	afx_msg void OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESULT *pResult);
+	// Flag to mark if already maximized
 	bool window_max; // 标记是否已经最大化;
 	int m_row;
 	int m_col;

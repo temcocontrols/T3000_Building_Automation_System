@@ -1,4 +1,4 @@
-// Timer_Calibrate.cpp : 实现文件
+// Timer_Calibrate.cpp : 实现文件 - Timer_Calibrate.cpp : Implementation files
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 //#include ".\timer_calibrate.h"
 
 
-// Timer_Calibrate 对话框
+// Timer_Calibrate 对话框 - Timer_Calibrate dialog
 #define SETTIMER    SetTimer(1,10000,NULL)
 #define KILLTIMER 	KillTimer(1)
 	
@@ -54,7 +54,7 @@ BEGIN_MESSAGE_MAP(Timer_Calibrate, CDialog)
 END_MESSAGE_MAP()
 
 
-// Timer_Calibrate 消息处理程序
+// Timer_Calibrate 消息处理程序 - Timer_Calibrate message handlers
 
 BOOL Timer_Calibrate::OnInitDialog()
 {
@@ -134,7 +134,7 @@ BOOL Timer_Calibrate::OnInitDialog()
 	SETTIMER;	
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// 异常: OCX 属性页应返回 FALSE
+	// 异常: OCX 属性页应返回 FALSE - Exception: OCX property pages should return FALSE
 }
 
 void Timer_Calibrate::OnDestroy()

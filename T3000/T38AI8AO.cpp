@@ -111,9 +111,12 @@ void T38AI8AO::OnInitialUpdate()
 	CFormView::OnInitialUpdate();
 	
 #if 1	
+	// Set row/column count
 	//设置排/行数量
 	m_msflexgrid_input.put_Cols(INPUT_COLS);
+	// Including title bar
 	m_msflexgrid_input.put_Rows(INPUT_ROWS+1);//包括标题栏
+	// Display horizontal titles
 	//显示横标题
 	m_msflexgrid_input.put_TextMatrix(0,0,_T("Input Name"));
 	m_msflexgrid_input.put_TextMatrix(0,1,_T("Register Value"));
@@ -124,23 +127,26 @@ void T38AI8AO::OnInitialUpdate()
 
 
 
+	// Set column width
 	//设置列宽	
 	m_msflexgrid_input.put_ColWidth(0,1000);
 	m_msflexgrid_input.put_ColWidth(1,1500);
 	//m_msflexgrid_input.put_ColWidth(2,1500);
 	m_msflexgrid_input.put_ColWidth(2,1500);
 	m_msflexgrid_input.put_ColWidth(3,1000);
+	// Center display
 	//居中显示
 	for (int col=0;col<INPUT_COLS;col++)
 	{ 
 		m_msflexgrid_input.put_ColAlignment(col,4);
 	}
 
+	// Color display
 	//彩色显示
-	for(int i=1;i<INPUT_ROWS+1;i++)		//排数量
+	for(int i=1;i<INPUT_ROWS+1;i++)		// Row count - 排数量
 	{
 
-		for(int k=0;k<INPUT_COLS;k++)	//列数量
+		for(int k=0;k<INPUT_COLS;k++)	// Column count - 列数量
 		{
 			if (i%2==1)
 			{
@@ -156,6 +162,7 @@ void T38AI8AO::OnInitialUpdate()
 
 
 
+	// Display vertical titles
 	//显示纵标题
 	CString str;
 	for(int i=1;i<INPUT_ROWS+1;i++)
@@ -166,14 +173,18 @@ void T38AI8AO::OnInitialUpdate()
 		m_msflexgrid_input.put_TextMatrix(i,0,str);	 
 	}
 
+	// Interface Output DO section list box
 	//============================================================================================================界面Output DO部份列表框
 
+	// Set row/column count
 	//设置行/列数量
 	m_msflexgrid_output.put_Rows(OUTPUT_ROWS+1);
 	m_msflexgrid_output.put_Cols(OUTPUT_COLS);
+	// Set column width
 	//设置列宽	
 
 
+	// Display horizontal titles
 	//显示横标题
 	m_msflexgrid_output.put_TextMatrix(0,0,_T("Output Name"));
 	m_msflexgrid_output.put_TextMatrix(0,1,_T("Output Value"));
@@ -183,17 +194,19 @@ void T38AI8AO::OnInitialUpdate()
 	m_msflexgrid_output.put_ColWidth(0,1500);
 	m_msflexgrid_output.put_ColWidth(1,1200);
 	m_msflexgrid_output.put_ColWidth(2,1200);
+	// Center display
 	//m_msflexgrid_output.put_ColWidth(3,1500);//居中显示
 	for (int col=0;col<OUTPUT_COLS;col++)
 	{ 
 		m_msflexgrid_output.put_ColAlignment(col,4);
 	}
 
+	// Color display
 	//彩色显示
-	for(int i=1;i<OUTPUT_ROWS+1;i++)		//排数量
+	for(int i=1;i<OUTPUT_ROWS+1;i++)		// Row count - 排数量
 	{
 
-		for(int k=0;k<OUTPUT_COLS;k++)	//列数量
+		for(int k=0;k<OUTPUT_COLS;k++)	// Column count - 列数量
 		{
 			if (i%2==1)
 			{
@@ -205,6 +218,7 @@ void T38AI8AO::OnInitialUpdate()
 			}
 		}
 	}
+	// Display vertical titles
 	//显示纵标题
     CString str_output;
     for(int i=1;i<OUTPUT_ROWS+1;i++)
@@ -597,26 +611,25 @@ void T38AI8AO::ClickMsflexgridInput()
 	UpdateData(FALSE);
 
 	long lRow,lCol;
-	lRow = m_msflexgrid_input.get_RowSel();//获取点击的行号	
-	lCol = m_msflexgrid_input.get_ColSel(); //获取点击的列号
-	 
+	lRow = m_msflexgrid_input.get_RowSel();//获取点击的行号	- Get the clicked row number
+	lCol = m_msflexgrid_input.get_ColSel(); //获取点击的列号 - Get the clicked column number
 
 	CRect rect;
-	m_msflexgrid_input.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
+	m_msflexgrid_input.GetWindowRect(rect); //获取表格控件的窗口矩形 - Get the window rectangle of the grid control
+	ScreenToClient(rect); //转换为客户区矩形 - Convert to client area rectangle
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//计算选中格的左上角的坐标(象素为单位) - Calculate the coordinates of the top-left corner of the selected cell (in pixels)
 	long y = m_msflexgrid_input.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_msflexgrid_input.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好 - Calculate the size of the selected cell (in pixels). Adding 1 is found to improve the effect in actual debugging
 	long width = m_msflexgrid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_msflexgrid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//形成选中个所在的矩形区域 - Form the rectangular area where the selected cell is located
 	CRect rcCell(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	//转换成相对对话框的坐标 - Convert to the coordinates relative to the dialog box
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
 	CString strValue = m_msflexgrid_input.get_TextMatrix(lRow,lCol);
@@ -633,7 +646,7 @@ void T38AI8AO::ClickMsflexgridInput()
 		m_inNameEdt.SetFocus();
 		m_inNameEdt.SetCapture();//LSC
 		int nLenth=strValue.GetLength();
-		m_inNameEdt.SetSel(nLenth,nLenth); //全选//
+		m_inNameEdt.SetSel(nLenth,nLenth); //全选// - Select all
 
 	}
 	if((2==lCol)&&lRow!=0)
@@ -663,7 +676,7 @@ void T38AI8AO::ClickMsflexgridInput()
 
 		m_comboxRange.BringWindowToTop();
 
-		m_comboxRange.SetFocus(); //获取焦点
+		m_comboxRange.SetFocus(); //获取焦点 - Get focus
 		m_comboxRange.SetWindowText(strValue);
 	}
 	bPauseMultiRead=FALSE;
@@ -675,26 +688,26 @@ void T38AI8AO::ClickMsflexgridOutput()
 bPauseMultiRead=TRUE;
 	m_isinput=FALSE;
 	long lRow,lCol;
-	lRow = m_msflexgrid_output.get_RowSel();//获取点击的行号	
-	lCol = m_msflexgrid_output.get_ColSel(); //获取点击的列号
+	lRow = m_msflexgrid_output.get_RowSel();//获取点击的行号	- Get the clicked row number
+	lCol = m_msflexgrid_output.get_ColSel(); //获取点击的列号 - Get the clicked column number
 	TRACE(_T("Click input grid!\n"));
 
 	CRect rect;
-	m_msflexgrid_output.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
+	m_msflexgrid_output.GetWindowRect(rect); //获取表格控件的窗口矩形 - Get the window rectangle of the grid control
+	ScreenToClient(rect); //转换为客户区矩形 - Convert to client area rectangle
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//计算选中格的左上角的坐标(象素为单位) - Calculate the coordinates of the top-left corner of the selected cell (in pixels)
 	long y = m_msflexgrid_output.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_msflexgrid_output.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好 - Calculate the size of the selected cell (in pixels). Adding 1 is found to improve the effect in actual debugging
 	long width = m_msflexgrid_output.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_msflexgrid_output.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//形成选中个所在的矩形区域 - Form the rectangular area where the selected cell is located
 	CRect rcCell(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	//转换成相对对话框的坐标 - Convert to the coordinates relative to the dialog box
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
 	CString strValue = m_msflexgrid_output.get_TextMatrix(lRow,lCol);
@@ -703,14 +716,14 @@ bPauseMultiRead=TRUE;
 
 	if(lCol==1&&lRow!=0)
 	{
-		//return; // 2012.2.7老毛说不允许修改
+		//return; // 2012.2.7老毛说不允许修改 - 2012.2.7 Lao Mao said modification is not allowed
 		m_inNameEdt.MoveWindow(&rcCell,1);
 		m_inNameEdt.ShowWindow(SW_SHOW);
 		m_inNameEdt.SetWindowText(strValue);
 		m_inNameEdt.SetFocus();
 		m_inNameEdt.SetCapture();//LSC
 		int nLenth=strValue.GetLength();
-		m_inNameEdt.SetSel(nLenth,nLenth); //全选//
+		m_inNameEdt.SetSel(nLenth,nLenth); //全选// - Select all
 
 	}
 	bPauseMultiRead=FALSE;

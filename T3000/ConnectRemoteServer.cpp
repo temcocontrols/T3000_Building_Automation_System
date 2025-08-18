@@ -103,7 +103,9 @@ end_connect_paint:
 	return;
 }
 
+// TCP status thread connecting to server
 HANDLE tcp_client_thread = NULL; // 连接server 的 TCP状态 线程;
+// UDP hole punching thread
 HANDLE udp_ptp_client_thread = NULL; // UDP 打洞 线程;
 BOOL CConnectRemoteServer::OnInitDialog()
 {
@@ -188,6 +190,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 
 	if (ret_rec <= 0)
 	{
+		//Receive error, delay wait
 		Sleep(1000); //接收出错 延时等待;
 		ConnectMessage[static_step].Format(_T("Recvfrom server error!"));
 		static_step ++;
@@ -195,6 +198,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 		goto end_udp_hole_thread;
 		//continue;
 	}
+	//Received information from the server sent by minipanel; 209 bytes
 	//接收到服务器发来的 minipanel 的 信息; 209 个字节
 	if (((unsigned char)receive_buffer[0] == 0x55) && ((unsigned char)receive_buffer[1] == 0xff))
 	{
@@ -207,6 +211,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 		}
 		else if ((unsigned char)receive_buffer[2] == COMMAND_PASSWORD_ERROR)
 		{
+			//Account password error
 			//账号密码错误;
 			ConnectMessage[static_step].Format(_T("Username and password error!"));
 			static_step ++;
@@ -230,6 +235,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 
 	if (ret_rec != T3000_MINI_HEARTBEAT_LENGTH_WITH_MINI_PORT)
 	{
+		//Not received minipanel's port information + minipanel's all information
 		//不是收到的minipanel 的端口信息 + minipanel 的 所有信息 ;
 		ConnectMessage[static_step].Format(_T("Error comand receive!"));
 		static_step ++;
@@ -261,7 +267,7 @@ DWORD WINAPI UDP_ptp_Thread(LPVOID lpVoid)
 	send_buffer[1] = 0xff;
 	send_buffer[2] = COMMAND_T3000_SEND_TO_DEVICE_MAKEHOLE;
 
-	//int nNetTimeout = 5000; //1秒
+	//int nNetTimeout = 5000; //1秒, 1 second
 	//setsockopt( sockClient, SOL_SOCKET, SO_RCVTIMEO, ( char * )&nNetTimeout, sizeof( int ) );
 
 	memset(receive_buffer, 0, 1000);

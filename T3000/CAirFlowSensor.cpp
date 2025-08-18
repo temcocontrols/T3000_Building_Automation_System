@@ -1,4 +1,5 @@
-﻿// CAirFlowSensor.cpp: 实现文件
+﻿// CAirFlowSensor.cpp: Implementation file
+// CAirFlowSensor.cpp: 实现文件
 //
 #include "stdafx.h"
 #include "T3000.h"
@@ -54,6 +55,7 @@ BEGIN_MESSAGE_MAP(CAirFlowSensor, CFormView)
 END_MESSAGE_MAP()
 
 
+// CAirFlowSensor diagnostics
 // CAirFlowSensor 诊断
 
 #ifdef _DEBUG
@@ -71,6 +73,7 @@ void CAirFlowSensor::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 
+// CAirFlowSensor message handlers
 // CAirFlowSensor 消息处理程序
 
 
@@ -78,6 +81,7 @@ void CAirFlowSensor::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
 
+	// TODO: Add specialized code and/or call the base class here
 	// TODO: 在此添加专用代码和/或调用基类
 }
 
@@ -197,6 +201,8 @@ void CAirFlowSensor::ShowTempHumUI_Part2(bool show_window)
 void CAirFlowSensor::UpdateUserInterface()
 {
 	EnablePressureUI(true);
+	// If hardware version is less than 6, it indicates only AFS sensor; otherwise, temperature and humidity information needs to be displayed
+	// If register 99 is 0, it indicates there is no temperature and humidity sensor, so hide the interface
 	//如果硬件版本号小于6 就说明只有 AFS的传感器 否则的话需要显示温湿度的信息
 	//如果99 寄存器  为 0  就说明 没有温湿度传感器 就隐藏界面
 	if (product_register_value[95] == 1)
@@ -286,9 +292,11 @@ void CAirFlowSensor::UpdateUserInterface()
 		GetDlgItem(IDC_STATIC_AFS_TEMP_DEGF)->SetWindowText(temp_temp_f);
 	}
 
+	// PLC has only 2 humidity sensors and 3 temperature sensors, no output
 	//PLC 只有2个湿度传感器 和3 和温度传感器，没有任何输出;
 	if (product_register_value[95] == 1)
 	{
+		// If it's PLC, disable these interfaces
 		EnablePLCUI(0); //如果是PLC的话，就Disable这些界面
 	}
 
@@ -534,6 +542,7 @@ void CAirFlowSensor::EnablePLCUI(bool nflag)
 
 void CAirFlowSensor::Fresh()
 {
+	// TODO: Add implementation code here.
 	// TODO: 在此处添加实现代码.
 	EnablePLCUI(1);
 	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -577,6 +586,7 @@ DWORD WINAPI Update_Airflow_Thread(LPVOID lPvoid)
 
 void CAirFlowSensor::OnCbnSelchangeComboAirflowMode()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	int n_value = 0;
 	CString temp_string;
@@ -619,6 +629,7 @@ void CAirFlowSensor::OnCbnSelchangeComboAirflowMode()
 
 void CAirFlowSensor::OnCbnSelchangeComboAirflowRange()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	int n_value = 0;
 	CString temp_string;
@@ -679,6 +690,7 @@ void CAirFlowSensor::OnCbnSelchangeComboAirflowRange()
 
 void CAirFlowSensor::OnCbnSelchangeComboAirflowUnit()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	int n_value = 0;
 	CString temp_string;
@@ -711,6 +723,7 @@ void CAirFlowSensor::OnCbnSelchangeComboAirflowUnit()
 
 void CAirFlowSensor::OnEnKillfocusEditAirflowDifLength()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_AIRFLOW_DIF_LENGTH, temp_cstring);
@@ -731,6 +744,7 @@ void CAirFlowSensor::OnEnKillfocusEditAirflowDifLength()
 
 void CAirFlowSensor::OnEnKillfocusEditAirflowDifWidth()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_AIRFLOW_DIF_WIDTH, temp_cstring);
@@ -753,38 +767,50 @@ void CAirFlowSensor::OnEnKillfocusEditAirflowDifWidth()
 
 void CAirFlowSensor::OnBnClickedButtonAirflowDone()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 
 }
 
 
 
+// Canvas
 int CANVAS_TOP_X = 550;  //画布
 int CANVAS_TOP_Y = 0;
 int CANVAS_BOTTOM_X = 1210;
 int CANVAS_BOTTOM_Y = 420;
+// Origin point
 int ORIGIN_X = 600; //原点
 int ORIGIN_Y = 400;
 
 
+// Y-axis top point
 int Y_AXIS_TOP_X = ORIGIN_X;  //Y轴最上面点
 int Y_AXIS_TOP_Y = CANVAS_TOP_Y + 10;
+// Y-axis arrow left side
 int Y_AXIS_ARROW_LEFT_X = Y_AXIS_TOP_X - 5;  //Y轴的箭头左边
 int Y_AXIS_ARROW_LEFT_Y = Y_AXIS_TOP_Y + 10;
+// Y-axis arrow right side
 int Y_AXIS_ARROW_RIGHT_X = Y_AXIS_TOP_X + 5; // Y轴的箭头右边
 int Y_AXIS_ARROW_RIGHT_Y = Y_AXIS_TOP_Y + 10;
 
+// X-axis rightmost X coordinate
 int X_AXIS_RIGHT_X = CANVAS_BOTTOM_X - 10;  //X轴最右边  X坐标
+// X-axis rightmost Y coordinate
 int X_AXIS_RIGHT_Y = ORIGIN_Y;				//X轴最右边  Y坐标
 
+// X-axis maximum point X coordinate
 int X_AXIS_MAX_VALUE_X = X_AXIS_RIGHT_X - 100; //X轴最大点  X坐标
+// X-axis maximum point Y coordinate
 int X_AXIS_MAX_VALUE_Y = X_AXIS_RIGHT_Y; //X轴最大点  Y坐标
 
 int Y_AXIS_MAX_VALUE_X = Y_AXIS_TOP_X;
 int Y_AXIS_MAX_VALUE_Y = Y_AXIS_TOP_Y + 50;
 
+// X-axis arrow top side
 int X_AXIS_ARROW_TOP_X = X_AXIS_RIGHT_X - 10; //X轴的箭头上边
 int X_AXIS_ARROW_TOP_Y = X_AXIS_RIGHT_Y - 5;
+// X-axis arrow bottom side
 int X_AXIS_ARROW_BOTTOM_X = X_AXIS_RIGHT_X - 10; //X轴的箭头下边
 int X_AXIS_ARROW_BOTTOM_Y = X_AXIS_RIGHT_Y + 5;
 
@@ -794,6 +820,8 @@ int X_AXIS_ARROW_BOTTOM_Y = X_AXIS_RIGHT_Y + 5;
 void CAirFlowSensor::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
+	// TODO: Add message handler code here
+	// Do not call CFormView::OnPaint() for drawing messages
 	// TODO: 在此处添加消息处理程序代码
 	// 不为绘图消息调用 CFormView::OnPaint()
 //CString png_airflow_shape_cylinder;
@@ -841,9 +869,11 @@ void CAirFlowSensor::OnPaint()
 		mygraphics->DrawLine(myRectangle_pen, ORIGIN_X, ORIGIN_Y, Y_AXIS_TOP_X, Y_AXIS_TOP_Y);
 		mygraphics->DrawLine(myRectangle_pen, ORIGIN_X, ORIGIN_Y, X_AXIS_RIGHT_X, X_AXIS_RIGHT_Y);
 
+		// Draw Y-axis arrow
 		mygraphics->DrawLine(myRectangle_pen, Y_AXIS_TOP_X, Y_AXIS_TOP_Y, Y_AXIS_ARROW_LEFT_X, Y_AXIS_ARROW_LEFT_Y); //画 Y轴 箭头
 		mygraphics->DrawLine(myRectangle_pen, Y_AXIS_TOP_X, Y_AXIS_TOP_Y, Y_AXIS_ARROW_RIGHT_X, Y_AXIS_ARROW_RIGHT_Y);
 
+		// Draw X-axis arrow
 		mygraphics->DrawLine(myRectangle_pen, X_AXIS_RIGHT_X, X_AXIS_RIGHT_Y, X_AXIS_ARROW_TOP_X, X_AXIS_ARROW_TOP_Y); //画 X轴 箭头
 		mygraphics->DrawLine(myRectangle_pen, X_AXIS_RIGHT_X, X_AXIS_RIGHT_Y, X_AXIS_ARROW_BOTTOM_X, X_AXIS_ARROW_BOTTOM_Y);
 
@@ -1093,6 +1123,7 @@ void CAirFlowSensor::OnPaint()
 
 void CAirFlowSensor::OnBnClickedRadioCircular()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	if (write_one(g_tstat_id, MODBUS_FLOW_SHAPE, 1) > 0)
 	{
@@ -1109,6 +1140,7 @@ void CAirFlowSensor::OnBnClickedRadioCircular()
 
 void CAirFlowSensor::OnBnClickedRadioRectangular()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	if (write_one(g_tstat_id, MODBUS_FLOW_SHAPE, 0) > 0)
 	{
@@ -1125,6 +1157,7 @@ void CAirFlowSensor::OnBnClickedRadioRectangular()
 
 void CAirFlowSensor::OnEnKillfocusEditAirflowRadius()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_AIRFLOW_RADIUS, temp_cstring);
@@ -1144,6 +1177,7 @@ void CAirFlowSensor::OnEnKillfocusEditAirflowRadius()
 
 void CAirFlowSensor::OnBnClickedRadioUnitM()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	if (write_one(g_tstat_id, MODBUS_FLOW_SHAPE_UNIT, 0) > 0)
 	{
@@ -1159,6 +1193,7 @@ void CAirFlowSensor::OnBnClickedRadioUnitM()
 
 void CAirFlowSensor::OnBnClickedRadioUnitIn()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	if (write_one(g_tstat_id, MODBUS_FLOW_SHAPE_UNIT, 1) > 0)
 	{
@@ -1174,6 +1209,7 @@ void CAirFlowSensor::OnBnClickedRadioUnitIn()
 
 void CAirFlowSensor::OnBnClickedRadioDefault()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	if (write_one(g_tstat_id, MODBUS_DEF_CUSTOMER, 0) > 0)
 	{
@@ -1190,6 +1226,7 @@ void CAirFlowSensor::OnBnClickedRadioDefault()
 
 void CAirFlowSensor::OnBnClickedRadioUserDefined()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	if (write_one(g_tstat_id, MODBUS_DEF_CUSTOMER, 1) > 0)
 	{
@@ -1206,6 +1243,7 @@ void CAirFlowSensor::OnBnClickedRadioUserDefined()
 
 void CAirFlowSensor::OnEnKillfocusEditVolatgeMin()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_VOLATGE_MIN, temp_cstring);
@@ -1234,6 +1272,7 @@ void CAirFlowSensor::OnEnKillfocusEditVolatgeMin()
 
 void CAirFlowSensor::OnEnKillfocusEditVolatgeMax()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_VOLATGE_MIN, temp_cstring);
@@ -1263,6 +1302,7 @@ void CAirFlowSensor::OnEnKillfocusEditVolatgeMax()
 
 void CAirFlowSensor::OnEnKillfocusEditCurrentMin()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_CURRENT_MIN, temp_cstring);
@@ -1292,6 +1332,7 @@ void CAirFlowSensor::OnEnKillfocusEditCurrentMin()
 
 void CAirFlowSensor::OnEnKillfocusEditCurrentMax()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_CURRENT_MIN, temp_cstring);
@@ -1322,6 +1363,7 @@ void CAirFlowSensor::OnEnKillfocusEditCurrentMax()
 
 void CAirFlowSensor::OnEnKillfocusEditPascalMin()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring;
 	GetDlgItemTextW(IDC_EDIT_PASCAL_MIN, temp_cstring);
@@ -1349,6 +1391,7 @@ void CAirFlowSensor::OnEnKillfocusEditPascalMin()
 
 void CAirFlowSensor::OnEnKillfocusEditPascalMax()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	CString temp_cstring_min;
 	GetDlgItemTextW(IDC_EDIT_PASCAL_MIN, temp_cstring_min);
@@ -1378,6 +1421,7 @@ void CAirFlowSensor::OnEnKillfocusEditPascalMax()
 
 BOOL CAirFlowSensor::PreTranslateMessage(MSG* pMsg)
 {
+	// TODO: Add specialized code and/or call the base class here
 	// TODO: 在此添加专用代码和/或调用基类
 	if (pMsg->message == WM_KEYDOWN)
 	{
@@ -1395,6 +1439,7 @@ BOOL CAirFlowSensor::PreTranslateMessage(MSG* pMsg)
 
 void CAirFlowSensor::OnCbnSelchangeComboAirflowSensorType()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	int n_value = 0;
 	CString temp_string;

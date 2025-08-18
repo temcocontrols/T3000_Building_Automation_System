@@ -628,7 +628,9 @@ void CCO2NetView::Initial_Window()
         GetDlgItem(IDC_BUTTON_RE_CALIBRATION_DONE)->EnableWindow(0);
     }
 
-    m_grid_input.ShowWindow(false);  //隐藏CO2界面的 input  表格
+    //Hide the input table of CO2 interface
+    //隐藏CO2界面的 input  表格
+    m_grid_input.ShowWindow(false);
 }
 void CCO2NetView::Show_InputList()
 {
@@ -682,7 +684,8 @@ void CCO2NetView::Show_InputList()
     CString  TempValue,StrAM;
     m_grid_input.put_TextMatrix(1,2,strUnit);
 
-    if(product_register_value[CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//内部
+
+    if(product_register_value[CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//Internal //内部
     {
         TempValue.Format(_T("%0.1f"),f_internal_temp);
     }
@@ -1236,7 +1239,7 @@ void CCO2NetView::OnBnClickedButtonApply()
 
 
     n=write_one(g_tstat_id, 61, ip_mode_value);
-    n=write_one(g_tstat_id,CO2_NET_MODBUS_ENABLE_GHOST,1);//使能之后
+    n=write_one(g_tstat_id,CO2_NET_MODBUS_ENABLE_GHOST,1);//After enabling //使能之后
     Sleep(5*1000);
 
 
@@ -1278,10 +1281,12 @@ void CCO2NetView::OnBnClickedButtonApply()
                 //strSql.Format(_T("update Building set Ip_Address='%s' where Ip_Address='%s'"),strIP,pPraent->m_strIP);
                 //t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
 
+                // Change node
                 // 改node
                 CString strSID;
 
                 strSID.Format(_T("%d"), get_serialnumber());
+                //bautrate put IP
                 strSql.Format(_T("update ALL_NODE set Bautrate='%s',Com_Port='%s' where Serial_ID='%s'"),strIP,strPort,strSID); //bautrate 放IP
                 SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
@@ -1497,14 +1502,17 @@ void CCO2NetView::Check_HourTime()
 void CCO2NetView::OnBnClickedBtnCo2Refresh()
 {
     //CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
+    //Create dialog window
     //创建对话框窗口
     //pDlg->Create(IDD_DIALOG10_Progress, this);
 
+    //Center display
     //居中显示
     //pDlg->CenterWindow();
     //void MoveWindow( LPCRECT lpRect, BOOL bRepaint = TRUE );
     //pDlg->MoveWindow(100,100,500,1000);
     //pDlg->ShowProgress(0,0);
+    //Show dialog window
     //显示对话框窗口
     //pDlg->ShowWindow(SW_SHOW);
    // RECT RECT_SET1;
@@ -1555,11 +1563,16 @@ HBRUSH CCO2NetView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
     
     for (int i=0; i<(int)Change_Color_ID.size(); i++)
     {
+        //Note here (pWnd->), otherwise it has no effect
         if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
         {
             pDC->SetTextColor(RGB(0,0,0));
-            pDC->SetBkColor(RGB(255,0,0));//设置文本背景色
-            pDC->SetBkMode(TRANSPARENT);//设置背景透明
+            //Set text background color
+            //设置文本背景色
+            pDC->SetBkColor(RGB(255,0,0));
+            //Set background transparent
+            //设置背景透明
+            pDC->SetBkMode(TRANSPARENT);
             hbr = (HBRUSH)m_brush;
         }
 
@@ -2003,11 +2016,13 @@ LRESULT CCO2NetView::Fresh_Co2Output_Item(WPARAM wParam, LPARAM lParam)
     CString temp_task_info;
     CString New_CString = m_output_list.GetItemText(Changed_Item, Changed_SubItem);
 
+    //CO2 NET Output temperature and humidity allows changing Min and Max
     //CO2 NET  Output 温湿度  允许 改变 Min 以及Max
     if (Changed_SubItem == CO2NET_MIN_OUT_SCALE)
     {
         int n_value = 0;
 
+        //Temperature
         if (Changed_Item == 0) //温度;
         {
             n_value = _wtof(New_CString) * 10;
@@ -2028,6 +2043,7 @@ LRESULT CCO2NetView::Fresh_Co2Output_Item(WPARAM wParam, LPARAM lParam)
     {
         int n_value = 0;
 
+        //Temperature
         if (Changed_Item == 0) //温度;
         {
             n_value = _wtof(New_CString) * 10;
@@ -2056,25 +2072,31 @@ void CCO2NetView::DblClickMsflexgridInput()
 	UpdateData(FALSE);
 
 	long lRow,lCol;
+	//Get the clicked row and column number
 	lRow = m_grid_input.get_RowSel();//获取点击的行号	
+	lCol = m_grid_input.get_ColSel(); //Get the clicked column number
 	lCol = m_grid_input.get_ColSel(); //获取点击的列号
 	TRACE(_T("Click input grid!\n"));
 
 	CRect rect;
-	m_grid_input.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
+	m_grid_input.GetWindowRect(rect); //Get the window rectangle of the table control //获取表格控件的窗口矩形
+	ScreenToClient(rect); //Convert to client rectangle //转换为客户区矩形	
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//Calculate the coordinates of the upper left corner of the selected cell (in pixels)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_grid_input.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_grid_input.get_ColPos(lCol)/nTwipsPerDotX;
+	//Calculate the size of the selected cell (in pixels). Adding 1 is found in actual debugging to have better effect
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_grid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_grid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//Form the rectangular area where the selected cell is located
 	//形成选中个所在的矩形区域
 	CRect rcCell(x,y,x+width,y+height);
+	//Convert to coordinates relative to the dialog
 	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
@@ -2090,6 +2112,7 @@ void CCO2NetView::DblClickMsflexgridInput()
 		m_inNameEdt.SetFocus();
 		m_inNameEdt.SetCapture();//LSC
 		int nLenth=strValue.GetLength();
+		//Select all
 		m_inNameEdt.SetSel(nLenth,nLenth); //全选//
 	}
 }
@@ -2134,6 +2157,7 @@ void CCO2NetView::OnEnKillfocusEditName()
 
 				int RegAddress = 0;
 
+				//Internal
 				if (product_register_value[CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//内部
 				{
 					RegAddress = Internal_Address;
@@ -2177,6 +2201,7 @@ void CCO2NetView::OnEnKillfocusEditName()
 
 void CCO2NetView::OnBnClickedRadioCo2CalEnable()
 {
+    // TODO: Add your control notification handler code here
     // TODO: 在此添加控件通知处理程序代码
     if (product_register_value[3131] != 0)
     {
@@ -2188,6 +2213,7 @@ void CCO2NetView::OnBnClickedRadioCo2CalEnable()
 
 void CCO2NetView::OnBnClickedRadioCo2CalDisable()
 {
+    // TODO: Add your control notification handler code here
     // TODO: 在此添加控件通知处理程序代码
     if (product_register_value[3131] != 1)
     {

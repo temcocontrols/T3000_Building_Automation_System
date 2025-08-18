@@ -83,7 +83,9 @@ UINT _Background_Read(LPVOID pParam) {
 				if (ret>0)
 				{
 					/*
+					Description: Here we convert the read values to string format, with values separated by commas
 					说明：这里是把读到的值转化成字符串，值与值之间用逗号隔开
+					Then assign the values to the Value field in the structure, and send a message to display the values
 					然后把值赋值给结构体中的Value，在发出消息，把值显示出来
 					*/
 					/* 16 Bit Unsigned Integer
@@ -285,7 +287,7 @@ CProductRegisterListView::CProductRegisterListView()
 
 	m_short_counts = 1;
 	m_string_paratypes = _T("");
-	m_sort_type = 0;//默认排序
+	m_sort_type = 0;//Default sorting - 默认排序
 	m_value_format = 0;
 
 	m_vecDataRW.clear();
@@ -1035,7 +1037,7 @@ void CProductRegisterListView::OnBnClickedReadDevice()
 
 void CProductRegisterListView::OnBnClickedButton4()
 {
-	if (m_sort_type != 0)    //防止已经是默认排序了，还狂点默认排序
+	if (m_sort_type != 0)    //Prevent repeated clicking of default sort when already in default sorting - 防止已经是默认排序了，还狂点默认排序
 	{
 		m_sort_type = 0;
 		SendMessage(WM_REFRESH_BAC_INPUT_LIST, 0, 0);
@@ -2003,7 +2005,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
-	if (lRow>m_register_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if (lRow>m_register_list.GetItemCount()) //If the clicked area exceeds the maximum row number, the click is invalid - 如果点击区超过最大行号，则点击是无效的
 		return;
 	if (lRow<0)
 		return;
@@ -2065,7 +2067,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 		}
 
 
-		//5=数据格式
+		//5=Data format - 5=数据格式
 		if (lCol == _NUM_DATAFORMAT)
 		{
 			m_vecDataFormat = GetDataFormatByVariable(GetFunctionName(m_register_data_sheet[lRow].function_code));
@@ -2080,7 +2082,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 				m_register_list.SetCellStringList(lRow, _NUM_DATAFORMAT, strlist);
 			}
 		}
-		//11=读写属性的判断
+		//11=Read/Write attribute determination - 11=读写属性的判断
 		if (lCol == _NUM_RW)
 		{
 			m_vecDataRW = GetRWByVariableDataFormat(GetFunctionName(m_register_data_sheet[lRow].function_code), m_register_data_sheet[lRow].DataFormat);
@@ -2094,7 +2096,7 @@ void CProductRegisterListView::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pRes
 				m_register_list.SetCellStringList(lRow, _NUM_RW, strlist);
 			}
 		}
-		//12=Bacnet Type 判断
+		//12=Bacnet Type determination - 12=Bacnet Type 判断
 		if (lCol == _NUM_Bacnet_Type)
 		{
 			m_vecBacnetType = GetBacnetType(GetFunctionName(m_register_data_sheet[lRow].function_code), m_register_data_sheet[lRow].DataFormat, m_register_data_sheet[lRow].Read_Only_Or_RW);
@@ -2227,7 +2229,7 @@ void CProductRegisterListView::OnNMDblclkListCustomList(NMHDR *pNMHDR, LRESULT *
 void CProductRegisterListView::FreshOneRowInGrid(int Row, CustomProductTable_T tp, int operator_Grid)
 {
 	CString strTemp;
-	if (operator_Grid == 0)//插入到最后一行
+	if (operator_Grid == 0)//Insert to the last row - 插入到最后一行
 	{
 		strTemp.Format(_T("%d"), Row + 1);
 		m_register_list.InsertItem(Row, strTemp);
@@ -2284,11 +2286,11 @@ void CProductRegisterListView::FreshOneRowInGrid(int Row, CustomProductTable_T t
 		strTemp.Format(_T("%s"), tp.Reg_Description);
 		m_register_list.SetItemText(Row, _NUM_Modbus_DESCRIPTION, strTemp);
 	}
-	else if (operator_Grid == 1)//更新改行的数据
+	else if (operator_Grid == 1)//Update data for this row - 更新改行的数据
 	{
 
 	}
-	else if (operator_Grid == 2)//删除改行的数据
+	else if (operator_Grid == 2)//Delete data for this row - 删除改行的数据
 	{
 
 	}
@@ -2343,7 +2345,7 @@ void CProductRegisterListView::OnBnClickedButtonExportexcelfile()
 		AfxMessageBox(_T("Create Excel false!"));
 		return;
 	}
-	//遍历所有行  
+	//Iterate through all rows - 遍历所有行  
 	strFilename = g_strExePth + _T("RegisterListTemplate.xls");
 
 	books.AttachDispatch(app.GetWorkbooks());

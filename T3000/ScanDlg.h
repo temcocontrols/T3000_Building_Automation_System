@@ -98,7 +98,7 @@ public:
 	void Set_IsScan(BOOL Is_Scan);
 	void Release();
 protected:
-	// 读出所有存在数据库中的设备节点。准备与搜索到的设备比较
+	// 读出所有存在数据库中的设备节点。准备与搜索到的设备比较 - Read all existing device nodes from the database. Prepare to compare with the devices found.
 	int GetAllNodeFromDataBase();
 	void SetGridCellColor(int nRow, int nCol, COLORREF clr);
  
@@ -115,18 +115,18 @@ protected:
 	// destroy
 	void DestroyFlexEdit();
 
-	// 显示edit
+	// 显示edit - Show the edit box
 	void ShowInputEditBox(int iRow, int iCol);
-	
-	// 计算gridcell rect, 根据行列号
-	CRect CalcGridCellRect(int iRow, int iCol );	
 
-	// 把一个tstat写成一条DB记录
+	// 计算gridcell rect, 根据行列号 - Calculate the grid cell rect based on the row and column numbers
+	CRect CalcGridCellRect(int iRow, int iCol );
+
+	// 把一个tstat写成一条DB记录 - Write a TStat as a DB record
 	void WriteOneDevInfoToDB( CTStat_Dev* pDev);
 	void WriteOneNetInfoToDB( CTStat_Net* pNet);
 
-	// 只允许写 buildingname，floorname，roomname，address
-	// 因此，需要向寄存器写的只有address
+	// 只允许写 buildingname，floorname，roomname，address - Only allow writing buildingname, floorname, roomname, address
+	// 因此，需要向寄存器写的只有address - Therefore, only the address needs to be written to the register.
 	void GetDataFromGrid();
 	void SaveAllNodeToDB();
 	void AutoFixComConflict();
@@ -145,7 +145,7 @@ protected:
 	}IcmpHeader; 
 protected:
 	void		CalcClickPos(CSize& size);
-	void		GetGridEditString(); // 记录edit的数据
+	void		GetGridEditString(); // 记录edit的数据 - Record the edit data
 	int			IsValidClick(CSize szTemp);	
 	void		CombineDBandScanRet();
 

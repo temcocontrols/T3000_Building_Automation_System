@@ -165,7 +165,8 @@ void CTCP_Server::OnCancel()
 }
 
 extern SOCKET my_sokect;
-//TCP Server 的 回调函数 ，当客户端连接上 之后就可以用这个socket去发送数据了;//This function add by Fance.
+
+//TCP Server 的 回调函数 ，当客户端连接上 之后就可以用这个socket去发送数据了 - TCP Server callback function, after client connects, this socket can be used to send data;//This function add by Fance;
 void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 {
 	CppSQLite3DB SqliteDBBuilding;
@@ -198,7 +199,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 	m_bac_handle_Iam_data.clear();
 
 
-	while (!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
+	while (!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束 - timeout end
 	{
 		time_out++;
 		if (time_out > 5)
@@ -244,7 +245,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 		//DFTrace(strInfo);
 		//pScan->ShowBacnetComScanInfo(strInfo);
 
-		if ((int)m_bac_scan_result_data.size() >= ready_to_read_count) //达到返回的个数后就break;
+		if ((int)m_bac_scan_result_data.size() >= ready_to_read_count) //达到返回的个数后就break; - break when the number of returned items is reached
 			break;
 		TRACE(_T("gloab scan = %d\r\n"), ready_to_read_count);
 		for (int i = 0; i < ready_to_read_count; i++)
@@ -333,7 +334,7 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char* ClientIP)
 	if (is_found_in_db) //Found in DB  
 	{
 		CString strSql;
-		//pFrame->m_pCon.CreateInstance(_T("ADODB.Connection"));	//这里要用互斥变量保护起来;
+		//pFrame->m_pCon.CreateInstance(_T("ADODB.Connection"));	//这里要用互斥变量保护起来; - This needs to be protected by a mutex
 		//pFrame->m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 		CString str_serialid;
 		CString str_screen_name;

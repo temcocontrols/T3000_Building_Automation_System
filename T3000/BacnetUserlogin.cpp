@@ -8,7 +8,7 @@
 #include "global_function.h"
 #include "global_define.h"
 // CBacnetUserlogin dialog
-//Used to store how big the window should be;
+// Used to store how big the window should be
 CRect userlogin_rect;	//用来存储 窗体应该有多大;
 CString bmp_login_path;
 HBITMAP 	hBitmap_login;
@@ -129,6 +129,7 @@ void CBacnetUserlogin::OnBnClickedButtonLogin()
 {
 	
 	bool any_user_valid = false;
+	// Check if there are valid usernames and passwords
 	//检测是否里面存在有效的账号密码;
 	for (int i=0;i<(int)m_user_login_data.size();i++)
 	{
@@ -145,6 +146,7 @@ void CBacnetUserlogin::OnBnClickedButtonLogin()
 		{
 			if(!temp_password.IsEmpty())
 			{
+				// User table contains available username and password
 				any_user_valid = true;	//User表里面 存在可用的 账号密码;
 				break;
 			}
@@ -268,6 +270,7 @@ void CBacnetUserlogin::OnPaint()
 	// Do not call CDialogEx::OnPaint() for painting messages
 
 	CRect test_rect;
+	// Get the view window size
 	::GetWindowRect(BacNet_hwd,&test_rect);	//获取 view的窗体大小;
 
 

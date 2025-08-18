@@ -66,7 +66,9 @@ void CConfigFileHandler::SetConfigFilePath(const CString& strFilePath)
 
 
 
+// Create config file
 // 创建config文件
+// If it already exists, do nothing
 // 如果已经存在，则不做事情
 BOOL CConfigFileHandler::CreateConfigFile(const CString& strFilePath)
 {
@@ -352,6 +354,7 @@ void CConfigFileHandler::ReadTStatPageConfig(
 // 			strIP = m_szCfgFile[8];
 // 			strIPPort = m_szCfgFile[9];		
 		
+			// Get valid data
 			// 取有效数据
 			TCHAR c = ':';
 			strHexFileName = strHexFileName.Mid(strHexFileName.Find(c)+2);
@@ -407,6 +410,7 @@ void CConfigFileHandler::ReadNCPageConfig( CString& strFlashFileName,
 	strIP = m_szCfgFile[CV_NCDeIP];
 	strIPPort = m_szCfgFile[CV_NCDeIPPort];	
 
+	// Get valid data
 	// 取有效数据
 	TCHAR c = ':';
 	strFlashFileName = strFlashFileName.Mid(strFlashFileName.Find(c)+2);
@@ -458,6 +462,7 @@ void CConfigFileHandler::ReadLCPageConfig(	CString& strFlashFileName,
 			strIPPort = m_szCfgFile[CV_LCDeIPPort];	
 			strMDBID = m_szCfgFile[CV_LCDMDBID];	
 
+			// Get valid data
 			// 取有效数据
 			TCHAR c = ':';
 			strFlashFileName = strFlashFileName.Mid(strFlashFileName.Find(c)+2);
@@ -553,6 +558,7 @@ void CConfigFileHandler::ReadFromCfgFileForAll(
 // 	IPPort=m_szCfgFile[CV_NCDeIPPort];
 // 	subnote = m_szCfgFile[CV_SubNot];
 // 	subID =  m_szCfgFile[CV_Sub_ID];
+	// Get valid data
 	// 取有效数据
 	//TCHAR c = ':';
 	// 
@@ -648,6 +654,7 @@ BOOL CConfigFileHandler::ReadFromCfgFile()
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Operate Product model files
 // 操作Product model文件
 
 // int CConfigFileHandler::GetProductModel(const CString& strPMFileName, map<int, CString>& szPMMap)

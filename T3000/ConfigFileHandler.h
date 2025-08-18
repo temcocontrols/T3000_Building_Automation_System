@@ -7,6 +7,7 @@
 	file ext:	h
 	author:		ZGQ
 	
+	purpose:	Read and write configuration files
 	purpose:	¶ÁĞ´ÅäÖÃÎÄ¼ş
 *********************************************************************/
 

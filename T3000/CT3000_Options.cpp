@@ -4,6 +4,7 @@
 #include "CT3000_Options.h"
 #include "global_function.h"
 
+// CT3000_Options dialog
 // CT3000_Options 对话框
 
 IMPLEMENT_DYNAMIC(CT3000_Options, CDialogEx)
@@ -31,6 +32,7 @@ BEGIN_MESSAGE_MAP(CT3000_Options, CDialogEx)
 END_MESSAGE_MAP()
 
 
+// CT3000_Options message handlers
 // CT3000_Options 消息处理程序
 
 
@@ -38,9 +40,13 @@ BOOL CT3000_Options::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	// TODO:  Add additional initialization here
 	// TODO:  在此添加额外的初始化
+	//Read configuration file g_configfile_path
 	//读取配置文件g_configfile_path
+	//Automatically use all local IP port scanning
 	//int auto_local_ip = 1; //自动使用本地所有ip端口扫描;
+	//Bind local IP address
 	CString local_ip_scan_address; //bind本地ip地址;
 	 auto_local_ip = GetPrivateProfileInt(_T("Parameter"), _T("AutoLocalIP"), 1, g_configfile_path);
 	 if (auto_local_ip)
@@ -54,9 +60,11 @@ BOOL CT3000_Options::OnInitDialog()
 		 ((CButton*)GetDlgItem(IDC_RADIO_IPAUTO))->SetCheck(false);
 		 ((CButton*)GetDlgItem(IDC_RADIO_IP_BIND))->SetCheck(true);
 		 ((CIPAddressCtrl*)GetDlgItem(IDC_IPADDRESS_LOCAL_IP))->EnableWindow(true);
+		 //Get local_ip_scan_address from configuration file
 		 //从配置文件获取local_ip_scan_address
 		 GetPrivateProfileStringW(_T("Parameter"), _T("LocalIP"), _T(""), local_ip_scan_address.GetBuffer(MAX_PATH), MAX_PATH, g_configfile_path);
 		 local_ip_scan_address.ReleaseBuffer();
+		 //Fill local_ip_scan_address to IDC_IPADDRESS_LOCAL_IP
 		 //将 local_ip_scan_address 填充 至IDC_IPADDRESS_LOCAL_IP
 		 BYTE address1, address2, address3, address4;
 		 CStringArray temp_array;
@@ -72,13 +80,16 @@ BOOL CT3000_Options::OnInitDialog()
 
 	 }
 	return TRUE;  // return TRUE unless you set the focus to a control
+	// Exception: OCX property pages should return FALSE
 	// 异常: OCX 属性页应返回 FALSE
 }
 
 
 void CT3000_Options::OnBnClickedOk()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
+	//Check if checkbox IDC_RADIO_IPAUTO is checked
 	//检查checkbox  IDC_RADIO_IPAUTO是否选中
 	if (((CButton*)GetDlgItem(IDC_RADIO_IPAUTO))->GetCheck())
 	{
@@ -107,6 +118,7 @@ void CT3000_Options::OnBnClickedOk()
 
 void CT3000_Options::OnBnClickedRadioIpBind()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	((CIPAddressCtrl*)GetDlgItem(IDC_IPADDRESS_LOCAL_IP))->EnableWindow(true);
 }
@@ -114,6 +126,7 @@ void CT3000_Options::OnBnClickedRadioIpBind()
 
 void CT3000_Options::OnBnClickedRadioIpauto()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	((CIPAddressCtrl*)GetDlgItem(IDC_IPADDRESS_LOCAL_IP))->EnableWindow(false);
 }

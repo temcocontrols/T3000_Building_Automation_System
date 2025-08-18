@@ -1,4 +1,4 @@
-// ParameterExtDlg.cpp : 实现文件
+// ParameterExtDlg.cpp : 实现文件 - implementation file
 //
 
 #include "stdafx.h"
@@ -40,8 +40,7 @@ BEGIN_MESSAGE_MAP(CParameterExtDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CParameterExtDlg 消息处理程序
-
+// CParameterExtDlg 消息处理程序 - CParameterExtDlg Message Handlers
 
 BOOL CParameterExtDlg::OnInitDialog()
 {
@@ -55,7 +54,7 @@ BOOL CParameterExtDlg::OnInitDialog()
     temp_time_left.Format(_T("%d"),  product_register_value[805]);
     temp_min_pwm.Format(_T("%d"),    product_register_value[806]);
 
-    // TODO:  在此添加额外的初始化
+    // TODO:  在此添加额外的初始化 - Additional initialization
     m_edit_delay_time.SetWindowTextW(temp_delay_time);
     //m_edit_delay_time.textColor(RGB(0, 0, 0));
     //m_edit_delay_time.bkColor(RGB(0,255,255));
@@ -76,13 +75,13 @@ BOOL CParameterExtDlg::OnInitDialog()
     m_zigbee_panid.SetWindowTextW(zigbeepanid);
 
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // 异常: OCX 属性页应返回 FALSE
+                  // 异常: OCX 属性页应返回 FALSE - Exception: OCX property page should return FALSE
 }
 
 
 BOOL CParameterExtDlg::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: 在此添加专用代码和/或调用基类
+    // TODO: 在此添加专用代码和/或调用基类 - Specialized code here and/or call base class
     if (pMsg->message == WM_KEYDOWN)
     {
         if (pMsg->wParam == VK_RETURN)
@@ -99,7 +98,7 @@ BOOL CParameterExtDlg::PreTranslateMessage(MSG* pMsg)
 
 void CParameterExtDlg::OnEnKillfocusEditParaExtDelay()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Control notification handler code here
     if (g_ParamLevel == 1)
         return;
 
@@ -135,7 +134,7 @@ void CParameterExtDlg::OnEnKillfocusEditParaExtDelay()
 
 void CParameterExtDlg::OnEnKillfocusEditParaExtMinPwm()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Control notification handler code here
     if (g_ParamLevel == 1)
         return;
 
@@ -167,14 +166,14 @@ void CParameterExtDlg::OnEnKillfocusEditParaExtMinPwm()
 
 void CParameterExtDlg::OnBnClickedButtonParaExtOk()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Control notification handler code here
     PostMessage(WM_CLOSE, NULL, NULL);
 }
 
 
 void CParameterExtDlg::OnEnKillfocusEditParaExtTimeRemaining()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Control notification handler code here                  
     if (g_ParamLevel == 1)
         return;
 
@@ -208,7 +207,7 @@ void CParameterExtDlg::OnEnKillfocusEditParaExtTimeRemaining()
 
 void CParameterExtDlg::OnEnKillfocusEditZigbeePanId()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Control notification handler code here
     CString strText;
     m_edit_time_remaining.GetWindowText(strText);
     int nValue = _wtoi(strText);

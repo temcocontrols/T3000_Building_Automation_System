@@ -9,6 +9,7 @@
 
 
 
+// CConfig_Routines dialog
 // CConfig_Routines 对话框
 #define SIZEOF_DESCRIPTION 3
 #define GRID_ROW_NUMBER 254
@@ -55,12 +56,14 @@ BEGIN_MESSAGE_MAP(CConfig_Routines, CDialog)
 END_MESSAGE_MAP()
 
 	//read_addr(temp_description,36,(i-1)*36+1);
+// CConfig_Routines message handlers
 // CConfig_Routines 消息处理程序
 void CConfig_Routines::read_addr(description3 *temp_description,int number,unsigned char addr2)
 {	
 	description3 * temp2=temp_description;
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
 	{
+		//Read in two parts
 		unsigned short temp_buffer[SIZEOF_DESCRIPTION*40];//分两次读
 		for (int i=0;i<2;i++)
 		{
@@ -337,23 +340,32 @@ void CConfig_Routines::load_grid()
 void CConfig_Routines::on_select()
 {
 	long lRow,lCol;
+	//Get the clicked row number
 	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	//Get the clicked column number
 	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 	UpdateData(false);
 	if(lRow==0 || lCol==0)
 		return;
 	CRect rect;
+	//Get the window rectangle of the table control
 	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	//Convert to client rectangle
 	ScreenToClient(rect); //转换为客户区矩形	
+	// The length unit of MSFlexGrid control functions is "twips",
 	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	//need to convert it to pixels, 1440 twips = 1 inch
 	//需要将其转化为像素，1440缇= 1英寸
 	CDC* pDC =GetDC();
+	//Calculate the conversion ratio between pixels and twips
 	//计算象素点和缇的转换比例
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//Calculate the coordinates of the upper left corner of the selected cell (in pixels)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	//Calculate the size of the selected cell (in pixels). Adding 1 is found in actual debugging to have better effect
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;

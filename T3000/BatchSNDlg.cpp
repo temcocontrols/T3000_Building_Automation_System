@@ -247,6 +247,7 @@ void CBatchSNDlg::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
 
+    // If click area exceeds maximum row number, then click is invalid
     if(lRow>m_products_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
         return;
     if(lRow<0)
@@ -297,6 +298,7 @@ void CBatchSNDlg::OnBnClickedCalibrationPointReport()
         AfxMessageBox(_T("Create Excel false!")); 
         return;
     } 
+    // Traverse all rows
     //遍历所有行  
     strFilename=g_strExePth+_T("Calibration Sensor Report.xls");
 

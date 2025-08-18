@@ -10,8 +10,8 @@
 #define FLEXGRID_CELL_WHITE_COLOR				0
 
 #define EXIT_BUTTON_GET_FOCUS					m_exit_button.SetFocus();
-// WeeklyRout_InsertDia 对话框
-// Weekly_Routines 对话框
+// WeeklyRout_InsertDia 对话框 - Weekly Routine Insert Dialog
+// Weekly_Routines 对话框 - Weekly Routines Dialog
 #define GRID_DOWN_MOVE								if(lRow==m_FlexGrid.get_Rows()-1) \
 													{ \
 														if(m_FlexGrid.get_RowIsVisible(1)) \
