@@ -152,7 +152,7 @@ BOOL CMyPing::TestPing(const CString& strIP)
 	int fromlen = sizeof(from); 
 	int timeout = 300;
 	/* Used for statistical results */  
-	int statistic = 0;  /* 用于统计结果 */  - This is used for statistical results
+	int statistic = 0;  /* 用于统计结果 */
 	char *dest_ip; 
 	char *icmp_data; 
 	char *recvbuf; 
@@ -344,7 +344,7 @@ BOOL CMyPing::TestPing(const CString& strIP)
 		} 
 
 		if(!DecodeResp(recvbuf,bread,&from))
-			statistic++; /* 成功接收的数目++ */ - This is the number of successful receptions
+			statistic++; /* 成功接收的数目++  - This is the number of successful receptions */
 
 		Sleep(1000); 
 	}

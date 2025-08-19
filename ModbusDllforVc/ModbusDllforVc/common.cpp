@@ -10411,7 +10411,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
             Sleep(100);
             if (ClearCommError(m_hSerial, &error, &stat) && error > 0)    //清除错误 - Clear errors
             {
-                PurgeComm(m_hSerial, PURGE_RXABORT | PURGE_RXCLEAR); /*清除输入缓冲区*/ - Clear input buffer
+                PurgeComm(m_hSerial, PURGE_RXABORT | PURGE_RXCLEAR); /*清除输入缓冲区- Clear input buffer*/ 
                 continue;
             }
 
