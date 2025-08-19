@@ -5,7 +5,9 @@
 extern vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 extern unsigned int g_mstp_deviceid ;
 extern int SPECIAL_BAC_TO_MODBUS ;
+// If equal to 1, it means that the new BootLoader is being flashed now
 extern int new_bootload ; //如果等于1 就说明现在烧写的是新的BootLoader;
+// 0 normal mode, 1 flash boot mode
 extern int com_port_flash_status ;  // 0 正常模式   1 烧写boot模式
 extern unsigned int n_check_temco_firmware;
 extern bool auto_flash_mode;
@@ -26,6 +28,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam);
 UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam);
 int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
+// 0 no need to update boot, 1 need to update bootloader; C1 is hex
 extern int firmware_must_use_new_bootloader ;  //0 不用更新boot   1 需要更新bootload;   C1为hex
 extern CString g_repair_bootloader_file_path;
 
@@ -37,7 +40,8 @@ CComWriter::CComWriter(void)
 
     m_nComPort = -1;
     //m_nModbusID;
-    m_nBautrate = 0;			// 波特率
+    // Baud rate
+    m_nBautrate = 0;			// 波特率 - Baud rate
     m_com_flash_binfile = 0;
     m_pWorkThread = NULL;
     continue_com_flash_count = 0;
@@ -142,8 +146,10 @@ int CComWriter::BeginWirteByCom()
     else if(m_nHexFileType == 2)
     {
 #pragma region detect_mstp_shutdown
+		// Don't judge the serial port protocol when flashing for now, otherwise it will be slow when burning modbus
 		if (SPECIAL_BAC_TO_MODBUS)  //暂时不要在店flash的时候 判断串口的协议，不然烧modbus的时候很慢 。
 		{
+			// Used to detect serial port MSTP data
 			baudrate_def temp_baudrate_ret[100] = { 0 }; //用于检测串口MSTP数据
 			int find_mstp_protocal = 0;
 			find_mstp_protocal = Check_Mstp_Comport(m_nComPort, temp_baudrate_ret, m_nBautrate);
@@ -169,6 +175,7 @@ int CComWriter::BeginWirteByCom()
             srtInfo.Format(_T("The current RS485 port uses Bacnet MSTP. (%d)"), temp_loop_count);
             OutPutsStatusInfo(srtInfo, FALSE);
 
+            // Initialize bacnet mstp protocol
             int ret = Initial_bac(m_nComPort, _T(""), m_nBautrate); //初始化bacnet mstp 协议
             CString temp_cs;
             if (ret <= 0)
@@ -183,6 +190,7 @@ int CComWriter::BeginWirteByCom()
                 break;
             }
             //Send_WhoIs_Global(-1, -1);
+// Don't use mute for now
 #if 0  //先不采用闭嘴
             srtInfo = _T("Disabling Bacnet MSTP and switching over to Modbus");
             OutPutsStatusInfo(srtInfo, FALSE);
@@ -190,16 +198,18 @@ int CComWriter::BeginWirteByCom()
             int loop1_count = 0;
             do
             {
+                // Make Temco's bacnet devices on the bus silent; since it's a broadcast, send it in a loop
                 nret = ShutDownMstpGlobal(4);  //让总线上 Temco的 bacnet 设备  闭嘴; 因为是广播 ， 所有循环发
                 Sleep(2000);
                 loop1_count++;
             } while ((nret <= 0) && loop1_count < 5);
+            // Make Temco's bacnet devices on the bus silent; since it's a broadcast, send it in a loop
             nret = ShutDownMstpGlobal(4);  //让总线上 Temco的 bacnet 设备  闭嘴; 因为是广播 ， 所有循环发
             Sleep(1000);
 
             close_bac_com();
-            find_mstp_protocal = Check_Mstp_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  //再次确认总线上 都闭嘴了
-            temp_loop_count++; //最多循环3次
+            find_mstp_protocal = Check_Mstp_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  //再次确认总线上 都闭嘴了 - Confirm that all devices on the bus are silent again
+            temp_loop_count++; //最多循环3次 - Loop up to 3 times
 #endif
         }
 
@@ -252,9 +262,9 @@ BOOL CComWriter::WriteCommandtoReset()
 
     int nRet = Write_One(m_szMdbIDs[0],16,127);   // Enter ISP mode
     //Sleep(2000);
-    //Add by Fance  如果从应用代码跳入 ISP  16写127后  需要读 11号寄存器  11号 大于1  说明跳转成功，否则继续等待;
-//TBD: Explain this comment better
-// If you want to read 11th register 11th or more than 1 when you jump from the application code to the ISP 16 write 127, the jump succeeds, otherwise wait
+    //Add by Fance  如果从应用代码跳入 ISP  16写127后  需要读 11号寄存器  11号 大于1  说明跳转成功，否则继续等待
+    //TBD: Explain this comment better
+    // If you want to read 11th register 11th or more than 1 when you jump from the application code to the ISP 16 write 127, the jump succeeds, otherwise wait
      
     strTips = _T("Wait device jump to isp mode!");
     OutPutsStatusInfo(strTips);
@@ -1985,16 +1995,16 @@ int CComWriter::Fix_Tstat10_76800_baudrate()
 
     if (Device_infor[7] != 10)
         return 0;
-    if (m_nBautrate != 76800) //界面选择的波特率不是76800，不用理会
+    if (m_nBautrate != 76800) //界面选择的波特率不是76800，不用理会  // If the baud rate selected in the interface is not 76800, ignore it
         return 0;
-    if (Device_infor[14] >= 79) //固件版本大于79，说明已经修复过了
+    if (Device_infor[14] >= 79) //固件版本大于79，说明已经修复过了  // If firmware version is greater than 79, it means it has been fixed
         return 0;
-    if ((Device_infor[14] == 0) && (Device_infor[11] > 50)) //说明在BootLoader中
+    if ((Device_infor[14] == 0) && (Device_infor[11] > 50)) //说明在BootLoader中  // Indicates it's in BootLoader
     {
         return 0;
         Sleep(1);
     }
-    else if ((Device_infor[14] > 0) && (Device_infor[11] == 1)) //说明在应用代码中
+    else if ((Device_infor[14] > 0) && (Device_infor[11] == 1)) //说明在应用代码中  // Indicates it's in application code
     {
         return 1;
         Sleep(1);
@@ -2187,12 +2197,12 @@ int CComWriter::UpdataDeviceInformation(int& ID)
                 }
                 else if ((Device_infor[7] == PM_MINIPANEL_ARM) && (temp_bootloader_version < 62))
                 {
-                    c2_update_boot = false; //不支持串口更新
+                    c2_update_boot = false; //不支持串口更新 - Does not support serial port update
                     Ret_Result = -1;
                 }
                 else if ((Device_infor[7] == PM_MINIPANEL) && (temp_bootloader_version < 62))
                 {
-                    c2_update_boot = false; //不支持串口更新
+                    c2_update_boot = false; //不支持串口更新 - Does not support serial port update
                     Ret_Result = -1;
                 }
                 else if ((Device_infor[7] == PM_TSTAT10) && (temp_bootloader_version < 54))
@@ -2272,7 +2282,7 @@ int CComWriter::BeginWirteByTCP()
                 SetCommunicationType(1);
             }
         }
-        m_subnet_flash = 1; //设置标志位，是从 TCP 转 子口 的烧写;
+        m_subnet_flash = 1; //设置标志位，是从 TCP 转 子口 的烧写; - Set flag to indicate flashing from TCP to sub-port
         CString strTips = _T("|Programming device...");
         OutPutsStatusInfo(strTips);
         //AddStringToOutPuts(strTips);
@@ -2309,9 +2319,9 @@ int fun_shutdown(LPVOID pParam,int nretry_count)
     for (int i = 0; i < nretry_count; i++)
     {
         int nflag = F_INITIAL;
-        unsigned short silent_command = 0; //高位时间  低位命令
+        unsigned short silent_command = 0; //高位时间  低位命令 - High byte time low byte command
         silent_command = 0x0A00 | F_START_SHUTDOWN;
-        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // 静默初始化
+        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // 静默初始化 - Silent initialization
         if (nRet >= 0)
         {
             CString srtInfo = _T("Connecting the subdevice , Waiting.");
@@ -2388,7 +2398,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 #endif
         if (SPECIAL_BAC_TO_MODBUS)
         {
-            //根据ID得到对应的 device id.
+            //根据ID得到对应的 device id. - Get the corresponding device ID based on ID
             CString strtemp;
             strtemp.Format(_T("|Reading Device Object Instance"));
             pWriter->OutPutsStatusInfo(strtemp);
@@ -2438,14 +2448,14 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
         }
 
 #pragma region mstp_silent_part
-        if (pWriter->m_subnet_flash)  //如果是flash 子设备 才运行这一段;
+        if (pWriter->m_subnet_flash)  //如果是flash 子设备 才运行这一段; - If it is a flash sub-device, run this section
         {
             int nret = 0;
             unsigned short temp_register[100] = { 0 };
             nret = modbus_read_multi(255, &temp_register[0], 0, 100, 6);
             if (nret>=0)
             {
-                //只有 能够接子设备的 才搞 静默这一套;
+                //只有 能够接子设备的 才搞 静默这一套; - Only devices that can connect to sub-devices can use this silent method.
                 if ((temp_register[7] == PM_MINIPANEL) ||
                     (temp_register[7] == PM_TSTAT10) ||
                     (temp_register[7] == PM_MINIPANEL_ARM) ||
@@ -2464,7 +2474,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
 #if 0
                         int nflag = F_INITIAL;
-                        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // 静默初始化
+                        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // 静默初始化 - Silent initialization
                         if (nRet >= 0)
                         {
                             CString srtInfo = _T("Connecting the subdevice , Waiting.");
@@ -2552,8 +2562,8 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             if (nret_device_info == 1)
             {
                 Flag_HEX_BIN =TRUE;
-                int  nRet = mudbus_write_one(pWriter->m_szMdbIDs[i],16,127,3);   // 进入ISP模式
-                if (temp_ret3 == 1) //是由76800 tstat10 跳转进BootLoader的 ，并且BootLoader有问题，修改为57600波特率后通讯
+                int  nRet = mudbus_write_one(pWriter->m_szMdbIDs[i],16,127,3);   // 进入ISP模式 - Enter ISP mode
+                if (temp_ret3 == 1) //是由76800 tstat10 跳转进BootLoader的 ，并且BootLoader有问题，修改为57600波特率后通讯  // It's 76800 tstat10 jumping to BootLoader, and BootLoader has problems, modified to 57600 baud rate for communication
                 {
                     CString strtempnotice;
                     strtempnotice.Format(_T("The actual baud rate in ISP mode is 57600"));
@@ -2607,7 +2617,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 #endif
                 }
 
-       //         if (nRet >=41)//支持多个波特率切换的
+       //         if (nRet >=41)//支持多个波特率切换的 - Support for switching between multiple baud rates
        //         {
        //             if (GetCommunicationType () == 0)
        //             {
@@ -2688,7 +2698,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         }
                         while(l<200);
                     }
-                    else // 选取消
+                    else // 选取消 - Select Cancel
                     {
                         //from 0000 flash update
                         ii=0;//from 0000 register flash
@@ -2794,7 +2804,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         if(ii<3)
 
                         {
-                            if(mudbus_write_one(m_ID,16,0x7f)<0)  //T3系列的 是不会回复此命令的 ，T3 直接就复位了.
+                            if(mudbus_write_one(m_ID,16,0x7f)<0)  //T3系列的 是不会回复此命令的 ，T3 直接就复位了. - The T3 series will not respond to this command, and T3 will reset directly.
                             {
                                 ii++;
                                 continue;
@@ -2943,7 +2953,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
             if (pWriter->m_subnet_flash == 0)
             {
-                mudbus_write_one(255, 16, 0x0455, 3);  //全局广播  0x04 代表 4分钟   让所有 mstp的设备继续静默
+                mudbus_write_one(255, 16, 0x0455, 3);  //全局广播  0x04 代表 4分钟   让所有 mstp的设备继续静默 - Global broadcast 0x04 represents 4 minutes, allowing all MSTP devices to continue silent
                 Sleep(100);
             }
 
@@ -3095,7 +3105,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             //}
 
 
-            if(nFlashRet > 0) // flash 成功
+            if(nFlashRet > 0) // flash 成功 - Flash successful
             {
                 CString strText;
                 strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);

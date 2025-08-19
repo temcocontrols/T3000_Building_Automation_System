@@ -82,6 +82,7 @@ void CDoubleThumbOpt::OnLButtonDown(const CPoint& point)
 
 }
 
+// Next step, larger value
 // 下一步，大的数值
 void CDoubleThumbOpt::MoveNextStep()
 {/*
@@ -110,6 +111,7 @@ void CDoubleThumbOpt::MoveNextStep()
 }
 
 
+// Previous step, smaller value
 // 上一步，小的数值
 void CDoubleThumbOpt::MovePreStep()
 {

@@ -54,20 +54,25 @@ int CCalcTics::CalcTicArray(vector<int>& szTics)
 	nLowNum = m_nTicNum - nHighNum;
 
 	//////////////////////////////////////////////////////////////////////////
+	// Get distribution model, two scale sizes insert intervals, excess scales distributed at both ends
 	// 获得分布情况模型，两种刻度尺寸插入间隔，多余的刻度分布在两端
 	ASSERT(nHighNum + nLowNum == m_nTicNum);
 	
 	int nGap=0;
 	int nStartNum, nEndNum;
+	// End value, whether the ends should use small or large values
 	int nEndValue = 0; // 端值，即两端应该用小值还是大值
 	int nBigNum, nSmallNum;
+	// Corresponding to bignum, the scale value corresponding to the more numerous scales
 	int nBigVal, nSmallVal; // 与bignum对应，数量多的刻度对应的刻度值
 
 
+	// Only need one type of scale value
 	if (nHighNum == 0) // 只需要一种刻度值
 	{
 		nStartNum = 0;
 		nEndNum = 0;
+		// Only one type
 		nBigNum = nLowNum;nBigVal = nLow;	// 只有一种
 		nSmallNum = nLowNum;nSmallVal = nLow;
 	}
@@ -77,7 +82,9 @@ int CCalcTics::CalcTicArray(vector<int>& szTics)
 		int nTempNum = nLowNum - (nGap * nHighNum);
 		nStartNum = nTempNum /2;
 		nEndNum = nTempNum/2 + nTempNum%2;
+		// Use whichever is more numerous
 		nEndValue = nLow; // 谁多用谁
+		// Whichever is bigger is used for the main loop
 		nBigNum = nLowNum;nBigVal = nLow; // 谁大谁用来主循环
 		nSmallNum = nHighNum;nSmallVal = nHigh;
 	}
@@ -87,14 +94,18 @@ int CCalcTics::CalcTicArray(vector<int>& szTics)
 		int nTempNum = nHighNum - (nGap * nLowNum);
 		nStartNum = nTempNum /2;
 		nEndNum = nTempNum/2 + nTempNum%2;
+		// Use whichever is more numerous
 		nEndValue = nHigh;// 谁多用谁
+		// Whichever is bigger is used for the main loop
 		nBigNum = nHighNum;nBigVal = nHigh;// 谁大谁用来主循环
 		nSmallNum = nLowNum;nSmallVal = nLow;
 	}
 		
 	//////////////////////////////////////////////////////////////////////////
+	// Generate scale array, note that when calculating it's intervals, but the array contains scales, so there will be one more
 	// 生成刻度数组, 注意，算的时候是间隔，数组里是刻度，所以会多一
 
+	// Header
 	// 头部
 	
 	int nSumTic = 0;	
@@ -105,6 +116,7 @@ int CCalcTics::CalcTicArray(vector<int>& szTics)
 		m_szTics.push_back(nSumTic);
 	}
 
+	// Middle
 	// 中间
 	
 	int nGapCount = 0;
@@ -120,6 +132,7 @@ int CCalcTics::CalcTicArray(vector<int>& szTics)
 		}
 	}
 
+	// End
 	// 结尾
 	for (int i = 0; i < nEndNum; i++)
 	{	

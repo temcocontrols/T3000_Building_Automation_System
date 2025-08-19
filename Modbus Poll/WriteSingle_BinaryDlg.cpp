@@ -185,7 +185,7 @@ void CWriteSingle_BinaryDlg::OnBnClickedOk()
 		--m_address;
 	} 
 	
-	if (m_function)//多写
+	if (m_function)//多写, Multiple writes
 	{
 	 
 		 
@@ -231,7 +231,7 @@ void CWriteSingle_BinaryDlg::OnBnClickedOk()
 		} 
 
 	} 
-	else//单写
+	else//单写, Single write
 	{
 
 		

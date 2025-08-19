@@ -23,6 +23,7 @@
 #endif
 
 #include "BADO\BADO.h"
+//Determine whether to use MSTP to update firmware
 extern int SPECIAL_BAC_TO_MODBUS; //判断是否用MSTP来更新固件;
 unsigned char ready_towrite_mac[6] = { 0 };
 unsigned int ready_towrite_sn = 0;
@@ -57,10 +58,15 @@ CString AutoFlashConfigPath;
 CString g_strExePath;
 CString SettingPath;
 CString g_repair_bootloader_file_path;
+//Latest normal code path to be burned
 CString g_update_newfirmware_file_path; //最新的要烧写的正常的代码路径;
+//Hex file product PID
 unsigned int n_hex_file_pid;//hex文件的产品PID；
+//0 No need to update boot   1 Need to update bootloader;   C1 is hex
 int firmware_must_use_new_bootloader = 0;  //0 不用更新boot   1 需要更新bootload;   C1为hex
+//If equals 1, it means we are now burning the new BootLoader
 int new_bootload = 0; //如果等于1 就说明现在烧写的是新的BootLoader;
+// 0 Normal mode   1 Burn boot mode    2 Burn normal mode code again
 int com_port_flash_status = 0;  // 0 正常模式   1 烧写boot模式    2 再次烧写正常模式的代码
 //HANDLE get_file_thread_handle = NULL;
 CString g_strFlashInfo;
@@ -68,15 +74,18 @@ const TCHAR c_strLogFileName[]=_T("Log_info.txt");				//log information file nam
 const TCHAR c_strDBFileName[]=_T("Database\\t3000.mdb") ;
 //extern CString g_strExePath;
 //const int BOOTLOADER_FILE_SIZE = 16384;
-/*这个变量虽然和DLL中的变量相同，但是他们两个没有关系，DLL中的该变量是被封装起来了
-如果想改变dll中的g_Commu_type 通过函数 SetCommunicationType*/
-
+/*这个变量虽然和DLL中的变量相同，但是他们两个没有关系，DLL中的该变量是被封装起来了 - This variable is the same as the variable in the DLL, but they are not related. The variable in the DLL is encapsulated.
+如果想改变dll中的g_Commu_type 通过函数 SetCommunicationType- If you want to change g_Commu_type in the DLL, use the function SetCommunicationType
+*/ 
 /* These variables are the same as the variables in the communications DLL but they are separate, the variables in the DLL are encapsulated. If you want to change the G_commu_type in the DLL use the function Setcommunicationtype */
  
 
 int handle_write_sensor_info = 0;
+//Number of all checked components
 int n_component_count = 0; //所有勾选的组件的个数
+//Value of the first 16 bits
 unsigned short sensor_value1 = 0; //前16位的值
+//Value of the last 16 bits, reserved
 unsigned short sensor_value2 = 0; //后16位的值 ， 预留
 unsigned short FUNCTION_CHECK_SUM_REG = 65000;
 unsigned short FUNCTION_CHECK_SUM_VALUE = 0x55;
@@ -802,7 +811,7 @@ void CISPDlg::ShowProductNameFromIni()
     }
 
 
-    //Part 2 第2个寄存器的 16个 模组;
+    //Part 2 第2个寄存器的 16个 模组; - Part 2 of the 16 modules for the second register
     for (int i = 0; i < 16; i++)
     {
         if (i+16 >= n_component_count)
@@ -833,8 +842,7 @@ void CISPDlg::InitISPUI()
         WINDOWPLACEMENT wp;
 
         GetWindowPlacement(&wp);
-        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->ShowWindow(1); //暂时不显示 mstp的 update按钮，设备几乎还不支持;
-
+        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->ShowWindow(1); //暂时不显示 mstp的 update按钮，设备几乎还不支持; - Temporarily not displaying the MSTP update button, as the device hardly supports it.
 
         CRect rc;
         CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
@@ -1181,7 +1189,7 @@ afx_msg LRESULT CISPDlg::OnFlashBoot_Update_boot(WPARAM wParam, LPARAM lParam)
         //g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_NB_rev1.hex");
 
 
-    //更改要烧写的代码路径;
+    //更改要烧写的代码路径; - Change the path of the code to be burned;
     GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(g_repair_bootloader_file_path);
 
 
@@ -1221,7 +1229,7 @@ afx_msg LRESULT CISPDlg::OnFlashNewBootFinish(WPARAM wParam, LPARAM lParam)
         m_pTFTPServer = NULL;
     }
 
-    //更改要烧写的新的固件的  代码路径;
+    //更改要烧写的新的固件的  代码路径; - Change the path of the new firmware to be burned;
     GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(g_update_newfirmware_file_path);
     new_bootload = 0;
     com_port_flash_status = 2;
@@ -1240,7 +1248,7 @@ static int total_udp_success_count = 0;
 extern int temco_burning_mode;
 #endif
 void close_bac_com();
-// NC 是使用tftp协议来进行flash的
+// NC 是使用tftp协议来进行flash的 - NC uses TFTP protocol for flashing
 afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 {
 #ifdef ISP_BURNING_MODE
@@ -1306,7 +1314,7 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
     SetResponseTime(100);
 	if(auto_flash_mode)
     {
-        if (com_port_flash_status != 1) //如果是烧写 bootloader 的模式  自动的，还要继续烧写完客户需要的代码才行;
+        if (com_port_flash_status != 1) //如果是烧写 bootloader 的模式  自动的，还要继续烧写完客户需要的代码才行; - If it is the mode of flashing the bootloader automatically, it is necessary to continue flashing the code required by the customer.
         {
             auto_flash_mode = false;	//Flash completed, allow manual shutdown;
             if (nRet > 0)
@@ -1318,7 +1326,7 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
                 WritePrivateProfileStringW(_T("Data"), _T("Command"), _T("4"), AutoFlashConfigPath);	//FAILED_UNKNOW_ERROR
             }
             #ifdef ISP_BURNING_MODE
-            burning_test_finished = 1; //如果是循环模式就不关闭;
+            burning_test_finished = 1; //如果是循环模式就不关闭; - If it is the loop mode, do not close it.
             return 1;
             #endif
             PostMessage(WM_CLOSE, NULL, NULL);
@@ -2252,13 +2260,13 @@ void CISPDlg::FlashByEthernet()
         temp_hex_pid_name.ReleaseBuffer();
         temp_hex_pid_name.Trim();
         temp_hex_pid_name.MakeUpper();
-        //只有Hex PID 为minipanel arm 版本时  ， 才可能要修复 bootload 的版本;
+        //只有Hex PID 为minipanel arm 版本时  ， 才可能要修复 bootload 的版本; - Only when the Hex PID is the minipanel arm version can the bootloader version be repaired.
         //if ((temp_hex_pid_name.CompareNoCase(_T("MINI_ARM")) == 0 ) ||
         //    (temp_hex_pid_name.CompareNoCase(_T("MINIPANEL")) == 0))
         if (temp_hex_pid_name.CompareNoCase(_T("MINI_ARM")) == 0) 
         {
             n_hex_file_pid = PM_MINIPANEL_ARM;
-            if (hex_version >= 60) //大于这个版本就说明需要512的flash ，必须先更新bootload;
+            if (hex_version >= 60) //大于这个版本就说明需要512的flash ，必须先更新bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
             }
@@ -2266,8 +2274,8 @@ void CISPDlg::FlashByEthernet()
         else if (temp_hex_pid_name.CompareNoCase(_T("PID10")) == 0)
         {
             n_hex_file_pid = PM_TSTAT10;
-            //暂时不让更新TSTAT10的bootloader
-            //if (hex_version >= 51.08) //大于这个版本就说明需要512的flash ，必须先更新bootload;
+            //暂时不让更新TSTAT10的bootloader - Temporarily not allowing the update of TSTAT10's bootloader
+            //if (hex_version >= 51.08) //大于这个版本就说明需要512的flash ，必须先更新bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             //{
             //    firmware_must_use_new_bootloader = 1;
             //}
@@ -2275,7 +2283,7 @@ void CISPDlg::FlashByEthernet()
         else if (temp_hex_pid_name.CompareNoCase(_T("CO2ALL")) == 0)
         {
             n_hex_file_pid = STM32_CO2_NET;
-            if (hex_version > 0.58) //大于这个58  版本就说明需要512的flash ，必须先更新bootload;
+            if (hex_version > 0.58) //大于这个58  版本就说明需要512的flash ，必须先更新bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
             }
@@ -2585,7 +2593,7 @@ void CISPDlg::FlashByCom()
         temp_hex_pid_name.ReleaseBuffer();
         temp_hex_pid_name.Trim();
         temp_hex_pid_name.MakeUpper();
-        //只有Hex PID 为minipanel arm 版本时  ， 才可能要修复 bootload 的版本;
+        //只有Hex PID 为minipanel arm 版本时  ， 才可能要修复 bootload 的版本; - Only when the Hex PID is the minipanel arm version can the bootloader version be repaired.
 
         float hex_version = 0;
 
@@ -2596,10 +2604,10 @@ void CISPDlg::FlashByCom()
             hex_version = ((float)(global_fileInfor.software_high * 256 + global_fileInfor.software_low)) / 100;
             strTips_version.Format(_T("Hex file firmware version : %.2f"), hex_version);
             n_hex_file_pid = PM_MINIPANEL_ARM;
-            if (hex_version >= 60) //大于这个版本就说明需要512的flash ，必须先更新bootload;
+            if (hex_version >= 60) //大于这个版本就说明需要512的flash ，必须先更新bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
-                if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径;
+                if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径; - The second time is the path of the new boot, and the path of the first time needs to be saved.
                     g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
@@ -2609,10 +2617,10 @@ void CISPDlg::FlashByCom()
             hex_version = ((float)(global_fileInfor.software_high * 256 + global_fileInfor.software_low));
             strTips_version.Format(_T("Hex file firmware version : %.2f"), hex_version);
             n_hex_file_pid = PM_MINIPANEL_ARM;
-            if (hex_version >= 101) //大于这个版本就说明需要512的flash ，必须先更新bootload;
+            if (hex_version >= 101) //大于这个版本就说明需要512的flash ，必须先更新bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
-                if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径;
+                if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径; - The second time is the path of the new boot, and the path of the first time needs to be saved.
                     g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
@@ -2622,10 +2630,10 @@ void CISPDlg::FlashByCom()
             hex_version = ((float)(global_fileInfor.software_high * 256 + global_fileInfor.software_low));
             strTips_version.Format(_T("Hex file firmware version : %.2f"), hex_version);
             n_hex_file_pid = PM_TSTAT10;
-            if (hex_version >= 5109) //大于这个版本就说明需要512的flash ，必须先更新bootload;
+            if (hex_version >= 5109) //大于这个版本就说明需要512的flash ，必须先更新bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
-                if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径;
+                if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径; - The second time is the path of the new boot, and the path of the first time needs to be saved.
                     g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
@@ -2635,10 +2643,10 @@ void CISPDlg::FlashByCom()
             hex_version = ((float)(global_fileInfor.software_high * 256 + global_fileInfor.software_low));
             strTips_version.Format(_T("Hex file firmware version : %.2f"), hex_version);
             n_hex_file_pid = STM32_CO2_NET;
-            if (hex_version >= 59) //大于这个版本就说明需要512的flash ，必须先更新bootload;
+            if (hex_version >= 59) //大于这个版本就说明需要512的flash ，必须先更新bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
-                if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径;
+                if (new_bootload == 0)   //第二遍是 new boot 的 路径，需要保存的是第一遍的路径; - The second time is the path of the new boot, and the path of the first time needs to be saved.
                     g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
@@ -2738,13 +2746,13 @@ afx_msg LRESULT CISPDlg::Show_Flash_DeviceInfor(WPARAM wParam, LPARAM lParam)
 
         m_FirmVer.Format(_T("%.1f"),tstat_version2);
         m_HardVer.Format(_T("%d"),US_Device_infor[MODBUS_HARDWARE_REV]);
-        /*展示到消息log框中*/
+        /*展示到消息log框中 - Show in message log box */
         UpdateStatusInfo(_T("|Device Information-Begin"),FALSE);
         UpdateStatusInfo(_T("|Model  Name:")+m_ModelName,FALSE);
         UpdateStatusInfo(_T("|Firmware Ver:")+m_FirmVer,FALSE);
         UpdateStatusInfo(_T("|Hardware Ver:")+m_HardVer,FALSE);
         UpdateStatusInfo(_T("|Device Information-End"),FALSE);
-        UpdateData(FALSE); //显示在界面上
+        UpdateData(FALSE); //显示在界面上 - Show on the interface
     }
     else
     {
@@ -2954,7 +2962,7 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
     _RecordsetPtr m_pRecordset;
     m_pRecordset.CreateInstance(__uuidof(Recordset));
 
-    // 在ADO操作中建议语句中要常用try...catch()来捕获错误信息，
+    // 在ADO操作中建议语句中要常用try...catch()来捕获错误信息,
     // 因为它有时会经常出现一些意想不到的错误。jingzhou xu
        // The Try...catch () is used in the proposed statement in the ADO operation to catch the error message.
      //Because it can return unexpected errors.
@@ -3477,7 +3485,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
     if (n_need_write_pid == 1)
     {
-        //需要烧写新的产品号
+        //需要烧写新的产品号 - The new product ID needs to be written
         int n_ret_pid = Write_One_Retry(temp_read_reg[6], 7, g_sn_product_id,6);
         if (n_ret_id < 0)
         {
@@ -3494,7 +3502,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     }
     else
     {
-        //需要烧写新原有的产品号  ，最好写一下，否则 产品号容易变掉.
+        //需要烧写新原有的产品号  ，最好写一下，否则 产品号容易变掉. - The new original product ID needs to be written, it is best to write it, otherwise the product ID is easy to change.
         int n_ret_pid = Write_One_Retry(temp_read_reg[6], 7, temp_read_reg[7],6);
         if (n_ret_id < 0)
         {
@@ -3528,7 +3536,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
     if (handle_write_sensor_info == 1)
     {
-        //先要确认 是否支持写入sensor 标志;
+        //先要确认 是否支持写入sensor 标志; - First, confirm whether to support writing sensor flags;
         unsigned short sensor_check_flag = 0;
         sensor_check_flag = read_one(temp_read_reg[6], FUNCTION_CHECK_SUM_REG, 6);
         sn_mac_info.Format(_T("正在写入组合模块校验信息"));
@@ -3792,7 +3800,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         {
             write_value[i] = ready_towrite_mac[i];
             if (write_value[i] < 0x10)
-                write_value[i] = write_value[i] + 0x10;        //wifi的mac地址 有些位位小于0x10 写不进去
+                write_value[i] = write_value[i] + 0x10;        //wifi的mac地址 有些位位小于0x10 写不进去 - Some bits of the wifi MAC address are less than 0x10 and cannot be written in
         }
         write_value[0] = 0x18;
         int n_mac_ret = 0;
@@ -3845,7 +3853,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
 {
 
 
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
     GetDlgItem(IDC_EDIT_MAC_ADDRESS)->SetWindowTextW(_T(""));
     GetDlgItem(IDC_EDIT_SN)->SetWindowTextW(_T(""));
 
@@ -4021,7 +4029,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
 
 void CISPDlg::OnCbnSelchangeComboPm()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
     CString strModel;
     CComboBox* pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_PM);
     int nSel = pCbx->GetCurSel();
@@ -4079,7 +4087,7 @@ void CISPDlg::Enable_Sensor_Window(bool nenable)
 
 void CAboutDlg::OnBnClickedOk()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
     CDialog::OnOK();
 }
 
@@ -4088,7 +4096,7 @@ BOOL CAboutDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
 
-    // TODO:  在此添加额外的初始化
+    // TODO:  在此添加额外的初始化 - Add additional initialization here
     CString release_note;
     CString temp;
     temp.Format(_T("Rev6.3.8  (2023-03-31)\r\n  1.Support update Tstat10 when it is in Mstp Mode  .\r\n  Tstat10 firmware version should be larger than 63.5\r\n"));
@@ -4120,16 +4128,16 @@ BOOL CAboutDlg::OnInitDialog()
 
     SetDlgItemTextW(IDC_EDIT_ISP, release_note);
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // 异常: OCX 属性页应返回 FALSE
+                  // 异常: OCX 属性页应返回 FALSE - Exception: OCX property pages should return FALSE
 }
 
 void CISPDlg::OnBnClickedCheckNoItem()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
     CButton* pBtn = (CButton*)GetDlgItem(IDC_CHECK_NO_ITEM);
     int state = pBtn->GetCheck();
-    //上面的也可以绑定一个变量做处理
-    if (state == 1) // 选中
+    //上面的也可以绑定一个变量做处理 - The above can also be bound to a variable for processing
+    if (state == 1) // 选中 - Selected
     {
         for (int j = 0; j < 16; j++)
         {
@@ -4167,7 +4175,7 @@ int temco_burning_mode = 0;
 
 void CISPDlg::OnBnClickedButtonLoopFlash()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: 在此添加控件通知处理程序代码 - Add control notification handler code here
 
     if (temco_burning_mode == 0)
     {

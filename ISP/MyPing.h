@@ -40,6 +40,7 @@ typedef struct icmphdr {
 
 #define STATUS_FAILED 0xFFFF 
 #define DEF_PACKET_SIZE    32
+/* Number of datagrams to send */
 #define DEF_PACKET_NUMBER  4    /* 发送数据报的个数 */
 #define MAX_PACKET 1024 
 

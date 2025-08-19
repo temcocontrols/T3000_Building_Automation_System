@@ -33,6 +33,7 @@ struct _Bac_Scan_results_Info
 struct _Bac_Scan_Com_Info
 {
     int nprotocol;  // 0 MSTP     1 BIP
+    //The first four digits are the IP address, and the last two digits are the port number.
     unsigned char ipaddress[6];   //前四位位IP地址  后两位位端口号
     int device_id;
     int macaddress;

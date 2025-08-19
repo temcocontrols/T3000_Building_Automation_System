@@ -56,6 +56,7 @@ protected:
 	DWORD GetIPAddress();
 	int Judge_BinHexFile(CString filepath);
 public:
+	// Select flash file
 	//选择flash文件
 	afx_msg void OnBnClickedButtonSelfile();
 	//flash button click
@@ -80,6 +81,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// public method
 	////////////////////////////////////////////////////////////////////////////
+	// Parameter BOOL, =TRUE replace the current line, =FALSE add a new line
 	// 参数 BOOL, =TRUE replace the current line, =FALSE add a new line
 
 	void UpdateStatusInfo(const CString& strInfo, BOOL bReplace);
@@ -109,6 +111,7 @@ BOOL	GetFlashSNParam(int& nHWVerison, CString& strProductModel,int &nProductID);
 public: 
 	// public member
 	//CIPAddressCtrl m_IPAddr;
+	/* Tooltip control */
 	/*提示信息控件*/
 	CToolTipCtrl *m_ToolTip;
  
@@ -147,16 +150,22 @@ public:	// private method
 protected:	// private member
 
 	//int					m_nFlashTypeFlag;			// =0 flash by com;  =1 flash by ethernet;
+	// Requested by Lao Mao, actually not used
 	//CString			m_strInstallPath;				// 老毛要的，其实没用
+	// Flash method
 	CString			m_strFlashMethod;			// flash的方式
 	CString			m_strLogoFileName;			// logo文件名，包含路径
 	CString 		m_strLogFileName;           //log file name
+	// Record all entered Modbus IDs
 	vector<int>		m_szMdbIDs;					// 记录所有输入的Modbus ID
 	CListBox			m_lbStatusInfo;
 	NC_FLASH_TYPE		m_ftFlashType;
+	// Pointer to serial port flash class, instantiated when used and released immediately after use
 	CComWriter*	m_pComWriter;				// 用串口flash的类的指针，在使用时才实例化，用完后立即释放
 	
+	// Use network, TFTP protocol flash, instantiated when used
 	TFTPServer*	m_pTFTPServer;				// 使用网络，TFTP协议flash，使用时实例化
+	// Use network interface to flash subid
 	CComWriter*		m_pTCPFlasher;//使用网络接口来flash subid
 	
 public:
@@ -190,12 +199,17 @@ private:
 	CEdit m_ipPort;
 	CButton m_Check_SubID;
 	CEdit m_SubID;
+	// File buffer to store the content of read files, should delete after flash, new when using
 	// 文件缓冲区，用来存放读取的文件的内容，flash完后应当delete，使用时再new
 	char*					m_pFileBuf;	//FOR SUBID					
+	    // This variable controls the judgment condition of whether controls are available
 	    //这个变量来控制控件是否可用的判断条件 
+	    // COM_INPUT=TRUE means COM is selected
 	    //COM_INPUT=TRUE 那就是选择COM的状态
 		BOOL 						COM_INPUT;
+		// This variable controls refreshing devices connected under NC or LC through IP
 		//这个变量是控制 通过IP刷新连到NC或者LC下面的设备的
+		// If TRUE, user needs to input
 		//TRUE的话，用户需要输入
 		BOOL						FLASH_SUBID;
 	   	/*	 Flash_Type
@@ -208,8 +222,10 @@ private:
 		*/
 		unsigned int  Flash_Type;	 
 
-	 	//为写入日志文件  系统文件类
+	 	// For writing log files, system file class
+		//为写入日志文件  系统文件类
 		CStdioFile*		 m_plogFile;
+		// This variable is the database path
 		//这个变量是数据库的路径
 		CString	m_strDatabasefilepath;
 
@@ -221,11 +237,15 @@ private:
 		UINT m_ChipSize;
 
 public:
+	// Event triggered by clicking the check-box control
 	//点击click-box 的空间的触发事件
 	afx_msg void OnBnClickedCheckFlashSubid();
+	// Initialize Combox control
 	//初始化Combox控件
 	void InitCombox(void);
+	// This function is the main function for COM_TStat
 	//这个函数为COM_TStat的总函数
+	// When user clicks COM_FLASH
 	//当用户点击COM_FLASH的时候，
 	BOOL FlashByComport(void);
 	BOOL FlashByNetwork(void);

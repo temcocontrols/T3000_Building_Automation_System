@@ -18,6 +18,7 @@ CMultiThumbOpt::~CMultiThumbOpt(void)
 }
 
 
+// Set the number of Thumbs
 // 设置Thumb的个数
 void CMultiThumbOpt::SetThumbNum(int nThumbNum)
 {
@@ -114,6 +115,7 @@ void CMultiThumbOpt::SetThumbColor(COLORREF clr)
 		m_szThumb[i]->SetColor(clr);
 	}
 
+	//Change the color of the bottom slider
 	//m_szThumb[0]->SetColor(RGB(0,0,128));  //改变下面那个滑块的颜色
 	m_szThumb[0]->SetColor(RGB(255,0,0)); 
 }
@@ -231,6 +233,7 @@ void CMultiThumbOpt::OnLButtonDown(const CPoint& point)
 }
 
 
+// Next step, large value
 // 下一步，大的数值
 void CMultiThumbOpt::MoveNextStep()
 {
@@ -260,6 +263,7 @@ void CMultiThumbOpt::MoveNextStep()
 }
 
 
+// Previous step, small value
 // 上一步，小的数值
 void CMultiThumbOpt::MovePreStep()
 {
@@ -356,7 +360,8 @@ void CMultiThumbOpt::OnMouseMove(const CPoint& point)
 
 			int nTemp = nPixMin;
 			nPixMin = nPixMax;
-			nPixMax = nTemp;     // 交换一下，
+			nPixMax = nTemp;     // Swap
+			                     // 交换一下，
 
 			ptNewPS.y = point.y;
 
@@ -524,7 +529,8 @@ int CMultiThumbOpt::GetThumbPosition()
 
 void CMultiThumbOpt::SetThumbPosition(int nIndex, int nPosition)
 {	
-	if (nPosition >= (int)m_szTicMarks->size())   // 超过刻度那么裁减掉
+	if (nPosition >= (int)m_szTicMarks->size())   // If exceeds scale then trim it
+	                                              // 超过刻度那么裁减掉
 	{
 		nPosition = m_szTicMarks->size()-1;
 	}
@@ -549,6 +555,7 @@ int CMultiThumbOpt::GetFocusThumb(const CPoint& point)
 }
 
 
+// Returns all reachable positions, not unreachable positions (i.e., overlapping positions).
 // 返回的都是可以到达的位置，而不是不能到达的位置（即重合位置）。
 void CMultiThumbOpt::GetThumbRange(int nIndex, int& nMin, int& nMax)
 {			

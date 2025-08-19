@@ -103,6 +103,7 @@ BOOL CBADO::OnInitADOConn()
         // 		CreateDirectory(m_dbImgeFolder,NULL);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
+                                // Connect to database
                                 //连接数据库
 
 
@@ -203,10 +204,15 @@ void CBADO::Createtable( CString strSQL )
 
 /*------------------------------------fun-------------------------------------------------------- 
 *   Functions           -   IsHaveTable(_ConnectionPtr   pConnection,   CString   strTableName) 
+*   Parameter:         -   pConnection: Database object; 
 *   Parameter:         -   pConnection：数据库对象； 
+-   strTableName: Is there this table in the database?
 -   strTableName：数据库中是否有此表？ 
+*   Return   Value:   -   TRUE: table exists, FALSE: no table
 *   Return   Value:   -  ，TRUE bool。FALSE：无表：有表 
+*   Description:     -   Query table from database to see if table [strTableName] to be opened exists, if no table, give prompt and return FALSE; 
 *   Description:     -   从数据库中查表看是否有要打开的表[strTableName]，有无表，给出提示返回FALSE； 
+-   Therefore, when applying this function, you only need to decide whether to continue, no need to give prompt again.
 -   因而在应用此函数时，只需决定是否要继续进行，不需再给出提示。 
 *   Author:               -   lishancai 
 *   Date:                   -   2011-10-1 
