@@ -1056,6 +1056,7 @@ extern Str_annual_routine_point s_Annual_data;
 extern Control_group_point s_screen_data;
 extern Str_monitor_point s_monitor_data;
 extern Str_t3_screen_Json s_json_screen_data;
+extern str_webview_logging_time g_logging_time[256];
 extern Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //缓存其他panel json item 值的 全局变量;
 extern vector <_panel_info> g_bacnet_panel_info; //全局的 object instance 与 panel number 对应的容器
 extern vector <Str_out_point> m_Output_data;

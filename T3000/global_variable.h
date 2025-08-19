@@ -1964,7 +1964,7 @@ Control_group_point s_screen_data;
 Str_monitor_point s_monitor_data;
 Str_t3_screen_Json s_json_screen_data;
 Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //缓存其他panel json item 值的 全局变量;
-
+str_webview_logging_time g_logging_time[256] = {0};
 byte	g_DayState[8][ANNUAL_CODE_SIZE];				byte	gp_DayState[256][8][ANNUAL_CODE_SIZE];//全局所有panel output 的集合体;
 vector <_panel_info> g_bacnet_panel_info;  //全局的 object instance 与 panel number 对应的容器
 vector <Str_out_point> m_Output_data;					vector < vector<Str_out_point> >			  g_Output_data; //全局所有panel output 的集合体;

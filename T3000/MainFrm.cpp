@@ -10563,6 +10563,11 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
                 My_Receive_msg.push_back(msg);
                 MyCriticalSection.Unlock();
                 break;
+            case MY_BAC_LOGGING_DATA:
+                MyCriticalSection.Lock();
+                My_Receive_msg.push_back(msg);
+                MyCriticalSection.Unlock();
+                break;
             case MY_BAC_WRITE_GRP:
                 MyCriticalSection.Lock();
                 My_Receive_msg.push_back(msg);
@@ -10599,6 +10604,113 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
             MSG my_temp_msg = My_Receive_msg.at(0);
             switch(my_temp_msg.message)
             {
+            case MY_BAC_LOGGING_DATA:
+            {
+                MyCriticalSection.Lock();
+                msg = My_Receive_msg.at(0);
+                str_point_info* My_read_Struct = (str_point_info*)msg.wParam;
+                My_Receive_msg.erase(My_Receive_msg.begin());
+                MyCriticalSection.Unlock();
+                int temp_instance = My_read_Struct->ninstance;
+                int n_panel_id = My_read_Struct->npanel_id;
+                int end_temp_instance = 0;
+
+                if (GetPrivateDataSaveSPBlocking(temp_instance, READ_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info),3) > 0)
+                {
+                    memcpy(&g_Device_Basic_Setting[n_panel_id], &s_Basic_Setting, sizeof(Str_Setting_Info));
+                    g_logging_time[n_panel_id].basic_setting_log_time = time(NULL); //记录请求的时间
+                    g_logging_time[n_panel_id].basic_setting_status = 1;
+                }
+                else
+                {
+                    break;
+                }
+
+
+                for (int i = 0; i < BAC_INPUT_GROUP; i++)
+                {
+                    end_temp_instance = BAC_READ_INPUT_REMAINDER + (BAC_READ_INPUT_GROUP_NUMBER)*i;
+                    if (end_temp_instance >= BAC_INPUT_ITEM_COUNT)
+                        end_temp_instance = BAC_INPUT_ITEM_COUNT - 1;
+
+                    if (GetPrivateDataSaveSPBlocking(temp_instance, READINPUT_T3000,
+                        (BAC_READ_INPUT_GROUP_NUMBER)*i,
+                        end_temp_instance, sizeof(Str_in_point)) > 0)
+                    {
+                        int temp_start_index = (BAC_READ_INPUT_GROUP_NUMBER)*i;
+                        int temp_end_index = end_temp_instance;
+
+                        for (int i = temp_start_index; i < temp_end_index; i++)
+                        {
+                            g_Input_data[n_panel_id].at(i) = s_Input_data[i];
+                        }
+
+                        g_logging_time[n_panel_id].input_log_time = time(NULL); //记录请求的时间
+                        g_logging_time[n_panel_id].bac_instance = temp_instance;
+                        g_logging_time[n_panel_id].input_status = 1;
+                        g_logging_time[n_panel_id].n_panel_number = n_panel_id;
+                        g_logging_time[n_panel_id].sn = My_read_Struct->sn;
+                        Sleep(SEND_COMMAND_DELAY_TIME);
+                    }
+
+                }
+
+                for (int i = 0; i < BAC_OUTPUT_GROUP; i++)
+                {
+                    end_temp_instance = BAC_READ_OUTPUT_REMAINDER + (BAC_READ_OUTPUT_GROUP_NUMBER)*i;
+                    if (end_temp_instance >= BAC_OUTPUT_ITEM_COUNT)
+                        end_temp_instance = BAC_OUTPUT_ITEM_COUNT - 1;
+
+                    if (GetPrivateDataSaveSPBlocking(temp_instance, READOUTPUT_T3000,
+                        (BAC_READ_OUTPUT_GROUP_NUMBER)*i,
+                        end_temp_instance, sizeof(Str_out_point)) > 0)
+                    {
+                        int temp_start_index = (BAC_READ_OUTPUT_GROUP_NUMBER)*i;
+                        int temp_end_index = end_temp_instance;
+
+                        for (int i = temp_start_index; i < temp_end_index; i++)
+                        {
+                            g_Output_data[n_panel_id].at(i) = s_Output_data[i];
+                        }
+
+                        g_logging_time[n_panel_id].output_log_time = time(NULL); //记录请求的时间
+                        g_logging_time[n_panel_id].bac_instance = temp_instance;
+                        g_logging_time[n_panel_id].output_status = 1;
+                        g_logging_time[n_panel_id].n_panel_number = n_panel_id;
+                        g_logging_time[n_panel_id].sn = My_read_Struct->sn;
+                        Sleep(SEND_COMMAND_DELAY_TIME);
+                    }
+                }
+
+
+                for (int i = 0; i < BAC_VARIABLE_GROUP; i++)
+                {
+                    end_temp_instance = BAC_READ_VARIABLE_REMAINDER + (BAC_READ_VARIABLE_GROUP_NUMBER)*i;
+                    if (end_temp_instance >= BAC_VARIABLE_ITEM_COUNT)
+                        end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
+                  
+                        if (GetPrivateDataSaveSPBlocking(temp_instance, READVARIABLE_T3000,
+                            (BAC_READ_VARIABLE_GROUP_NUMBER)*i,
+                            end_temp_instance, sizeof(Str_variable_point)) > 0)
+                        {
+                            int temp_start_index = (BAC_READ_VARIABLE_GROUP_NUMBER)*i;
+                            int temp_end_index = end_temp_instance;
+
+                            for (int i = temp_start_index; i < temp_end_index; i++)
+                            {
+                                g_Variable_data[n_panel_id].at(i) = s_Variable_data[i];
+                            }
+                            g_logging_time[n_panel_id].variable_log_time = time(NULL); //记录请求的时间
+                            g_logging_time[n_panel_id].bac_instance = temp_instance;
+                            g_logging_time[n_panel_id].output_status = 1;
+                            g_logging_time[n_panel_id].n_panel_number = n_panel_id;
+                            g_logging_time[n_panel_id].sn = My_read_Struct->sn;
+                            Sleep(SEND_COMMAND_DELAY_TIME);
+                        }
+                }
+
+            }
+                break;
             case MY_BAC_READ_GRP:
             {
                 MyCriticalSection.Lock();

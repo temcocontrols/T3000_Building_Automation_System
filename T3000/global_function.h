@@ -54,6 +54,7 @@ typedef struct
 	int command_type;
 }str_command_info;
 
+
 typedef struct
 {
 	unsigned char npanel_id;
@@ -61,7 +62,10 @@ typedef struct
 	int npanel_commad;
 	int nstandard_command;
 	int npoint_number;
+	unsigned int sn;
 }str_point_info;
+
+
 
 enum Bacnet_Vector_Status
 {

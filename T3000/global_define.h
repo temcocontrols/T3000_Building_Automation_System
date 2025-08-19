@@ -2625,6 +2625,21 @@ typedef struct RoomInfo
 #define SENSOR_BIT_FAR_INFRA_RED 12
 
 
+typedef struct webview_logging_time
+{
+	unsigned int sn;
+	unsigned int request_time;
+	unsigned int basic_setting_log_time;
+	unsigned int input_log_time;
+	unsigned int output_log_time;
+	unsigned int variable_log_time;
+	unsigned int n_panel_number;
+	unsigned int bac_instance;
+	unsigned int input_status; // 0 read failed    1 read ok
+	unsigned int output_status;
+	unsigned int variable_status;
+	unsigned int basic_setting_status;
+}str_webview_logging_time;
 
 typedef  struct
 {

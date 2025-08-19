@@ -1886,7 +1886,25 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				tempjson["data"][send_index]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
 				tempjson["data"][send_index]["pid"] = g_bacnet_panel_info.at(i).npid;
 				tempjson["data"][send_index]["panel_name"] = (char*)g_Device_Basic_Setting[g_bacnet_panel_info.at(i).panel_number].reg.panel_name;
-				send_index++; //若缓存中没有 在线设备的数据，就不读取 。
+				send_index++; 
+			}
+			else
+			{
+				int temp_panel = g_bacnet_panel_info.at(i).panel_number;
+				if ((temp_panel == 0) || (temp_panel >= 255))
+					continue;
+				if (temp_panel != g_Device_Basic_Setting[temp_panel].reg.panel_number)
+					continue;
+				if (g_bacnet_panel_info.at(i).nseiral_number != g_Device_Basic_Setting[temp_panel].reg.n_serial_number)
+					continue;
+
+				tempjson["data"][send_index]["panel_number"] = temp_panel;
+				tempjson["data"][send_index]["object_instance"] = g_Device_Basic_Setting[temp_panel].reg.object_instance;
+				tempjson["data"][send_index]["serial_number"] = g_Device_Basic_Setting[temp_panel].reg.n_serial_number;
+				tempjson["data"][send_index]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
+				tempjson["data"][send_index]["pid"] = g_Device_Basic_Setting[temp_panel].reg.panel_type;
+				tempjson["data"][send_index]["panel_name"] = (char*)g_Device_Basic_Setting[g_bacnet_panel_info.at(i).panel_number].reg.panel_name;
+				send_index++; 
 			}
 		}
 		const std::string output = Json::writeString(builder, tempjson);
@@ -2383,8 +2401,107 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	{
 		Json::Value tempjson;
 		tempjson["action"] = "LOGGING_DATA_RES";
+
 		Post_ReadAllTrendlog_Message();
+
 		//发送消息加载所有panel 的 in out var 数据;
+		int p_i = 0;
+		for (int i = 0; i < g_bacnet_panel_info.size(); i++)
+		{
+#if 1
+			int npanel_id = g_bacnet_panel_info.at(i).panel_number;
+
+
+			if (g_bacnet_panel_info.at(i).object_instance != g_logging_time[npanel_id].bac_instance)
+				continue;
+			if (g_bacnet_panel_info.at(i).nseiral_number != g_logging_time[npanel_id].sn)
+				continue;
+			if (g_bacnet_panel_info.at(i).panel_number != g_logging_time[npanel_id].n_panel_number)
+				continue;
+			if (npanel_id != g_logging_time[npanel_id].n_panel_number)
+				continue;
+			if (g_logging_time[npanel_id].basic_setting_status != 1)
+				continue;
+			
+			g_Device_Basic_Setting[npanel_id].reg.ip_addr;
+			char ipStr[16]; // 用于存储转换后的IP字符串
+			unsigned char* ipAddr = g_Device_Basic_Setting[npanel_id].reg.ip_addr;
+			// 使用 sprintf 将 IP 地址转换为字符串
+			sprintf(ipStr, "%d.%d.%d.%d", ipAddr[0], ipAddr[1], ipAddr[2], ipAddr[3]);
+
+			tempjson["panel_id"] = npanel_id;
+			tempjson["panel_name"] = (char*)g_Device_Basic_Setting[npanel_id].reg.panel_name;
+			tempjson["panel_serial_number"] = g_Device_Basic_Setting[npanel_id].reg.n_serial_number;
+			tempjson["panel_ipaddress"] = ipStr;
+
+			tempjson["input_logging_time"] = g_logging_time[npanel_id].input_log_time;
+			tempjson["output_logging_time"] = g_logging_time[npanel_id].output_log_time;
+			tempjson["variable_logging_time"] = g_logging_time[npanel_id].variable_log_time;
+			for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++) {
+				tempjson["data"][p_i]["pid"] = npanel_id;
+				tempjson["data"][p_i]["type"] = "INPUT";
+				tempjson["data"][p_i]["index"] = i;
+				tempjson["data"][p_i]["id"] = "IN" + to_string(i + 1);
+				tempjson["data"][p_i]["command"] = to_string(npanel_id) + "IN" + to_string(i + 1);
+				tempjson["data"][p_i]["description"] = (char*)g_Input_data[npanel_id].at(i).description;
+				tempjson["data"][p_i]["label"] = (char*)g_Input_data[npanel_id].at(i).label;
+				tempjson["data"][p_i]["unit"] = g_Input_data[npanel_id].at(i).range;
+				tempjson["data"][p_i]["auto_manual"] = g_Input_data[npanel_id].at(i).auto_manual;
+				tempjson["data"][p_i]["value"] = g_Input_data[npanel_id].at(i).value;
+				tempjson["data"][p_i]["filter"] = g_Input_data[npanel_id].at(i).filter;
+				tempjson["data"][p_i]["control"] = g_Input_data[npanel_id].at(i).control;
+				tempjson["data"][p_i]["digital_analog"] = g_Input_data[npanel_id].at(i).digital_analog;
+				tempjson["data"][p_i]["range"] = g_Input_data[npanel_id].at(i).range;
+				tempjson["data"][p_i]["calibration_sign"] = g_Input_data[npanel_id].at(i).calibration_sign;
+				tempjson["data"][p_i]["calibration_h"] = g_Input_data[npanel_id].at(i).calibration_h;
+				tempjson["data"][p_i]["calibration_l"] = g_Input_data[npanel_id].at(i).calibration_l;
+				tempjson["data"][p_i]["decom"] = g_Input_data[npanel_id].at(i).decom; //for input   0 "Normal"    1"Open"   2  "Shorted"
+				p_i++;
+			}
+
+			for (int i = 0; i < BAC_OUTPUT_ITEM_COUNT; i++) {
+				tempjson["data"][p_i]["pid"] = npanel_id;
+				tempjson["data"][p_i]["type"] = "OUTPUT";
+				tempjson["data"][p_i]["index"] = i;
+				tempjson["data"][p_i]["id"] = "OUT" + to_string(i + 1);
+				tempjson["data"][p_i]["command"] = to_string(npanel_id) + "OUT" + to_string(i + 1);
+				tempjson["data"][p_i]["description"] = (char*)g_Output_data[npanel_id].at(i).description;
+				tempjson["data"][p_i]["label"] = (char*)g_Output_data[npanel_id].at(i).label;
+				tempjson["data"][p_i]["auto_manual"] = g_Output_data[npanel_id].at(i).auto_manual;
+				tempjson["data"][p_i]["value"] = g_Output_data[npanel_id].at(i).value;
+				tempjson["data"][p_i]["low_voltage"] = g_Output_data[npanel_id].at(i).low_voltage;
+				tempjson["data"][p_i]["high_voltage"] = g_Output_data[npanel_id].at(i).high_voltage;
+				tempjson["data"][p_i]["range"] = g_Output_data[npanel_id].at(i).range;
+				tempjson["data"][p_i]["control"] = g_Output_data[npanel_id].at(i).control;
+				tempjson["data"][p_i]["digital_analog"] = g_Output_data[npanel_id].at(i).digital_analog;
+				tempjson["data"][p_i]["hw_switch_status"] = g_Output_data[npanel_id].at(i).hw_switch_status;
+				tempjson["data"][p_i]["decom"] = g_Output_data[npanel_id].at(i).decom; //for output   0 "Normal"    1"Alarm"  
+				p_i++;
+			}
+
+
+			for (int i = 0; i < BAC_VARIABLE_ITEM_COUNT; i++) {
+				tempjson["data"][p_i]["pid"] = npanel_id;
+				tempjson["data"][p_i]["type"] = "VARIABLE";
+				tempjson["data"][p_i]["index"] = i;
+				tempjson["data"][p_i]["id"] = "VAR" + to_string(i + 1);
+				tempjson["data"][p_i]["command"] = to_string(npanel_id) + "VAR" + to_string(i + 1);
+				tempjson["data"][p_i]["description"] = (char*)g_Variable_data[npanel_id].at(i).description;
+				tempjson["data"][p_i]["label"] = (char*)g_Variable_data[npanel_id].at(i).label;
+				tempjson["data"][p_i]["auto_manual"] = g_Variable_data[npanel_id].at(i).auto_manual;
+				tempjson["data"][p_i]["value"] = g_Variable_data[npanel_id].at(i).value;
+				tempjson["data"][p_i]["range"] = g_Variable_data[npanel_id].at(i).range;
+				tempjson["data"][p_i]["control"] = g_Variable_data[npanel_id].at(i).control;
+				tempjson["data"][p_i]["digital_analog"] = g_Variable_data[npanel_id].at(i).digital_analog;
+				tempjson["data"][p_i]["unused"] = g_Variable_data[npanel_id].at(i).unused;
+				p_i++;
+			}
+			const std::string output = Json::writeString(builder, tempjson);
+			CString temp_cs(output.c_str());
+			outmsg = temp_cs;
+#endif
+		}
+
 	}
 	break;
 	default:

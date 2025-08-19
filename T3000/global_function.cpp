@@ -1099,12 +1099,37 @@ int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata 
 
 int Post_ReadAllTrendlog_Message()
 {
+    if (read_write_bacnet_config)	//在读写Bacnet config 的时候禁止刷新List;
+        return -1;
     //这里要判断在线的panel   ,对在线的panel读取 input output variable. 
     for (int i = 0; i < g_bacnet_panel_info.size(); i++)
     {
+        str_point_info readinfo = {0};
+        readinfo.ninstance = g_bacnet_panel_info.at(i).object_instance;
+        readinfo.npanel_id = g_bacnet_panel_info.at(i).panel_number;
+        readinfo.sn = g_bacnet_panel_info.at(i).nseiral_number;
+        if ((readinfo.npanel_id == 0) || (readinfo.npanel_id > 254))
+            continue;
+        if(readinfo.ninstance >= 0x3FFFFF)
+            continue; //instance number is too big, skip it.
+        if (Bacnet_Private_Device(g_bacnet_panel_info.at(i).npid) == 0)
+            continue;
+        if((readinfo.npanel_id > 254) || readinfo.npanel_id ==0)
+			continue; //panel id is not valid, skip it.
+
+        g_logging_time[readinfo.npanel_id].request_time = time(NULL); //记录请求的时间
+
+
+        str_point_info* pmy_refresh_info = new str_point_info;
+        memcpy(pmy_refresh_info, &readinfo, sizeof(str_point_info));
+        if (!PostThreadMessage(nThreadID, MY_BAC_LOGGING_DATA, (WPARAM)pmy_refresh_info, NULL))//post thread msg
+        {
+            return -1;
+        }
+
+
 
     }
-    Sleep(1);
     return 0;
 }
 
