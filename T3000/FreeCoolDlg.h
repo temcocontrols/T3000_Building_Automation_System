@@ -22,6 +22,7 @@ protected:
 };
 */
 
+// CFreeCoolDlg dialog
 // CFreeCoolDlg 对话框
 
 class CFreeCoolDlg : public CDialog
@@ -29,13 +30,16 @@ class CFreeCoolDlg : public CDialog
 	DECLARE_DYNAMIC(CFreeCoolDlg)
 
 public:
+	// Standard constructor
 	CFreeCoolDlg(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CFreeCoolDlg();
 
+// Dialog Data
 // 对话框数据
 	enum { IDD = IDD_FREECOOLDLG };
 
 protected:
+	// DDX/DDV support
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
     virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()

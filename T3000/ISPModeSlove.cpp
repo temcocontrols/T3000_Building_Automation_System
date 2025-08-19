@@ -125,6 +125,7 @@ void CISPModeSlove::OnBnClickedButtonUpdateFirmware()
 {
 	
 	GetDlgItemText(IDC_STATIC_ISP_FIRMWARE_PATH, isp_mode_detect_firmware_path);
+	// Return 1 means selected, 0 means not selected;
 	isp_mode_firmware_auto = ((CButton *)GetDlgItem(IDC_RADIO_FROM_SERVER))->GetCheck(); //返回1表示选上，0表示没选上;
 	isp_mode_is_cancel = false;
 	PostMessage(WM_CLOSE,NULL,NULL);

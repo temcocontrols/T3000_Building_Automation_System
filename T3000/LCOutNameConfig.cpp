@@ -59,6 +59,7 @@ BOOL CLCOutNameConfig::OnInitDialog()
    // AfxBeginThread(_Read_LightingOutputName,this);
 	return TRUE; 
 	 // return TRUE unless you set the focus to a control
+	// Exception: OCX property pages should return FALSE
 	// 异常: OCX 属性页应返回 FALSE
 }
 
@@ -119,7 +120,9 @@ BEGIN_EVENTSINK_MAP(CLCOutNameConfig, CDialogEx)
 void CLCOutNameConfig::ClickInputMsflexgrid()
 {
     m_editName.ShowWindow(SW_HIDE);  
+	//Get the clicked row number
 	long lCol=m_outputname.get_ColSel();         //获取点击的行号
+	//Get the clicked column number
 	long lRow=m_outputname.get_RowSel();      //获取点击的列号
 	m_curcol=lCol;
 	m_currow=lRow;
@@ -131,9 +134,11 @@ void CLCOutNameConfig::ClickInputMsflexgrid()
 	ScreenToClient(&rect);                                    //转换为客户区矩形
 	CDC* pDC=GetDC();
 	//MSFlexGrid 控件的函数的长度单位是“缇(twips)”，需要将其转化为像素，1440 缇 = 1 英寸
+	//Calculate the conversion ratio between pixels and twips
 	//计算象素点和缇的转换比例
 	int nTwipsPerDotX=1440/pDC->GetDeviceCaps(LOGPIXELSX);
 	int nTwipsPerDotY=1440/pDC->GetDeviceCaps(LOGPIXELSY);
+	//Calculate the top-left coordinates of the selected cell (in pixels)
 	//计算选中格的左上角的坐标（象素为单位）
 	long y = m_outputname.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_outputname.get_ColPos(lCol)/nTwipsPerDotX;
@@ -144,18 +149,21 @@ void CLCOutNameConfig::ClickInputMsflexgrid()
 	//long h= m_msflexgrid1to96.get_RowHeight(lRow);
 	/*m_msflexgrid1to96.get_CellWidth()*/
 	//计算选中格的尺寸（象素为单位）。加1是实际调试中，发现加1后效果更好
+	// Calculate the size of the selected cell (in pixels). Adding 1 gives better results based on actual debugging
 	long width = m_outputname.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_outputname.get_RowHeight(lRow)/nTwipsPerDotY+1;
 	//形成选中个所在的矩形区域
+	// Form the rectangle area where the selected cell is located
 	CRect rc(x,y,x+width,y+height);
 	//转换成相对对话框的坐标
+	// Convert to coordinates relative to the dialog box
 	rc.OffsetRect(rect.left,rect.top);
 
 	CString strValue=m_outputname.get_TextMatrix(lRow,lCol);       //获取单元格内容
 	m_stroldername=strValue;
-	m_editName.ShowWindow(SW_SHOW);                  //显示控件
-	m_editName.MoveWindow(rc);                            //改变大小并移到选中格位置
-	m_editName.SetWindowText(strValue);                   //显示文本
+	m_editName.ShowWindow(SW_SHOW);                  //显示控件,Show the control
+	m_editName.MoveWindow(rc);                            //改变大小并移到选中格位置, Resize and move to the selected cell's position
+	m_editName.SetWindowText(strValue);                   //显示文本, Display the text
 	m_editName.SetFocus();   
 }
 

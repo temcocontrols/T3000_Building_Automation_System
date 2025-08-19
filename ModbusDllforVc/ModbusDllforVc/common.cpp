@@ -7,7 +7,8 @@ using namespace std;
 
 #define TRUE_OR_FALSE	true
 #define SLEEP_TIME		50
-//#define  LATENCY_TIME_COM	60      // ´®¿ÚÑÓ³Ù£¬±ØĞë600£¬ÉèÎª500»ò¸üĞ¡Ê±£¬Í¨¹ıNC scan TStatÈİÒ×Ê§°Ü
+// Serial port delay, must be 600, when set to 500 or smaller, NC scan TStat is prone to failure
+//#define  LATENCY_TIME_COM	60      // ä¸²å£å»¶è¿Ÿï¼Œå¿…é¡»600ï¼Œè®¾ä¸º500æˆ–æ›´å°æ—¶ï¼Œé€šè¿‡NC scan TStatå®¹æ˜“å¤±è´¥
 //#define  LATENCY_TIME_NET	100
 
 extern TS_US LATENCY_TIME_COM ;
@@ -17,10 +18,13 @@ extern  TS_US LATENCY_TIME_NET ;
 CString g_cs_com_section_mulwrite = _T("Write");
 CString g_cs_com_section_read = _T("Read");
  
-extern HANDLE m_hSerial;//´®¿Ú¾ä±ú
+// Serial port handle
+extern HANDLE m_hSerial;//ä¸²å£å¥æŸ„ // Serial port handle
 extern HANDLE m_com_h_serial[100];
-extern OVERLAPPED m_com_osRead[100], m_com_osWrite[100], m_com_osMulWrite[100]; // ÓÃÓÚ¶àÏß³ÌÍ¬Ê±ÖØµş¶Á/Ğ´
-extern OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // ÓÃÓÚÖØµş¶Á/Ğ´
+// For multi-threaded concurrent overlapped read/write operations
+extern OVERLAPPED m_com_osRead[100], m_com_osWrite[100], m_com_osMulWrite[100]; // ç”¨äºå¤šçº¿ç¨‹åŒæ—¶é‡å è¯»/å†™
+// For overlapped read/write operations
+extern OVERLAPPED m_osRead, m_osWrite, m_osMulWrite; // ç”¨äºé‡å è¯»/å†™ - For overlapped read/write
 extern TS_UC  gval[13];//the data that get from com
 extern TS_UC  serinumber_in_dll[4];//only read_one function ,when read 10,
 extern TS_UC  pval[13];//the data that send from com
@@ -34,7 +38,8 @@ static int old_or_new_scan_protocal_in_dll=1;//1==new protocal;2==old protocal
 extern 	SOCKET m_hSocket;
 extern SOCKET m_bip_socket;
 extern  SOCKET m_hSocket_for_list;
-extern 	SOCKET m_tcp_hSocket[256];  //ÓÃÓÚ¶àÏß³ÌÉ¨Ãè
+// For multi-threaded scanning
+extern 	SOCKET m_tcp_hSocket[256];  //ç”¨äºå¤šçº¿ç¨‹æ‰«æ - For multi-threaded scanning
 int g_Commu_type=0;//0:serial modus//
 CString last_connected_ip;
 int last_connected_port = 0;
@@ -108,7 +113,8 @@ OUTPUT void close_com_nocritical(int ncomport)
     {
         if (m_com_h_serial[ncomport] != NULL)
         {
-            //¹Ø±Õ´®¿Ú
+            // Close serial port
+            //å…³é—­ä¸²å£ - Close serial port
             CloseHandle(m_com_h_serial[ncomport]);
             m_com_h_serial[ncomport] = NULL;
         }
@@ -133,7 +139,8 @@ OUTPUT void close_com()
     {
         if(m_hSerial != NULL)
         {
-            //¹Ø±Õ´®¿Ú
+            // Close serial port
+            //å…³é—­ä¸²å£
             CloseHandle(m_hSerial);
             m_hSerial = NULL;
         }
@@ -163,7 +170,8 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        // Clear serial port buffer
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
         if(devLo<1 || devHi>254)
             return -5;
@@ -172,7 +180,7 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[6];
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = 255;
         pval[1] = 25;  //put comments here,
         pval[2] = devHi;
@@ -196,17 +204,17 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,// Êı¾İ»º³åÇøµØÖ·
-                             6,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             6,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -226,17 +234,17 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        gval,// Êı¾İ»º³åÇøµØÖ·
-                        13,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                        gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                        13,// æ•°æ®å¤§å° - Data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -337,7 +345,7 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
         //the return value is the register address
 
         if(devLo<1 || devHi>254)
@@ -348,7 +356,7 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 
         TS_UC  pval[10];
         //	TS_US crc;
-        //	DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //	DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0]=1;
         pval[1]=2;
         pval[2]=3;
@@ -464,7 +472,7 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -523,7 +531,7 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -584,7 +592,8 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 OUTPUT bool Change_BaudRate_NoCretical(int new_baudrate,int ncomport)
 {
 
-    ///ÅäÖÃ´®¿Ú
+    /// Configure serial port
+    ///é…ç½®ä¸²å£ - Configure serial port
     //if(new_baudrate!=9600 && new_baudrate!=19200)
     //	return false;
     BOOL iscorrect = FALSE;
@@ -606,7 +615,7 @@ OUTPUT bool Change_BaudRate_NoCretical(int new_baudrate,int ncomport)
     //    baudrate_in_dll = new_baudrate;
     DCB  PortDCB;
     PortDCB.DCBlength = sizeof(DCB);
-    // Ä¬ÈÏ´®¿Ú²ÎÊı
+    // é»˜è®¤ä¸²å£å‚æ•° - Default serial port parameters
     int i = 0;
     bool successful = false;//true==do it success;false==do it failure
     for (i = 0;i < 10;i++)
@@ -634,7 +643,7 @@ OUTPUT bool Change_BaudRate_NoCretical(int new_baudrate,int ncomport)
     for (i = 0;i<10;i++)
         if (SetCommState(m_com_h_serial[ncomport], &PortDCB))
         {
-            ///L"ÅäÖÃ´®¿ÚÊ§°Ü";
+            ///L"é…ç½®ä¸²å£å¤±è´¥"; - Configuration serial port failed
             successful = true;
             break;
         }
@@ -645,7 +654,8 @@ OUTPUT bool Change_BaudRate_NoCretical(int new_baudrate,int ncomport)
 OUTPUT bool Change_BaudRate(int new_baudrate)
 {
 
-    ///ÅäÖÃ´®¿Ú
+    /// Configure serial port
+    ///é…ç½®ä¸²å£
     //if(new_baudrate!=9600 && new_baudrate!=19200)
     //	return false;
     BOOL iscorrect= FALSE;
@@ -667,7 +677,7 @@ OUTPUT bool Change_BaudRate(int new_baudrate)
         baudrate_in_dll=new_baudrate;
     DCB  PortDCB;    
     PortDCB.DCBlength = sizeof(DCB); 
-    // Ä¬ÈÏ´®¿Ú²ÎÊı
+    // é»˜è®¤ä¸²å£å‚æ•°
     int i=0;
     bool successful=false;//true==do it success;false==do it failure
     for(i=0;i<10;i++)
@@ -688,7 +698,7 @@ OUTPUT bool Change_BaudRate(int new_baudrate)
         for(i=0;i<10;i++)
             if(SetCommState(m_hSerial, &PortDCB))
             {
-                ///L"ÅäÖÃ´®¿ÚÊ§°Ü";
+                ///L"é…ç½®ä¸²å£å¤±è´¥"; - Configuration serial port failed
                 successful=true;
                 break;
             }
@@ -732,14 +742,14 @@ OUTPUT bool Open_Socket(CString strIPAdress)
     sockaddr_in servAddr;
     servAddr.sin_family = AF_INET;
     servAddr.sin_port = htons(6001);
-    // ×¢Òâ£¬ÕâÀïÒªÌîĞ´·şÎñÆ÷³ÌĞò£¨TCPServer³ÌĞò£©ËùÔÚ»úÆ÷µÄIPµØÖ·
+    // æ³¨æ„ï¼Œè¿™é‡Œè¦å¡«å†™æœåŠ¡å™¨ç¨‹åºï¼ˆTCPServerç¨‹åºï¼‰æ‰€åœ¨æœºå™¨çš„IPåœ°å€
     //servAddr.sin_addr.S_un.S_addr =inet_addr("192.168.0.28");
     servAddr.sin_addr.S_un.S_addr =inet_addr((LPSTR)(LPCTSTR)strIPAdress);
     //	u_long ul=1;
     //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-    //·¢ËÍÊ±ÏŞ
+    //å‘é€æ—¶é™
     setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
-    //½ÓÊÕÊ±ÏŞ
+    //æ¥æ”¶æ—¶é™
     setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
     if(::connect(m_hSocket,(sockaddr*)&servAddr, sizeof(servAddr)) == -1)
     {
@@ -796,27 +806,30 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
     servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
     //	u_long ul=1;
     //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-    //·¢ËÍÊ±ÏŞ
+    //å‘é€æ—¶é™
     setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
-    //½ÓÊÕÊ±ÏŞ
+    //æ¥æ”¶æ—¶é™
     setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
 
     BOOL bDontLinger = FALSE;
-    setsockopt(m_hSocket, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));  //20200214 ĞÂÔöÖ±½Ó¹Ø±ÕÌ×½Ó×Ö
+    setsockopt(m_hSocket, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));  //20200214 æ–°å¢ç›´æ¥å…³é—­å¥—æ¥å­—
     //****************************************************************************
-    // Fance added ,²»ÒªÓÃ×èÈûµÄÄ£Ê½£¬Èç¹ûÉè±¸²»ÔÚÏß ¾­³£ĞÔµÄ ÒªµÈ10¼¸Ãë 
-    //¸ÄÎª·Ç×èÈûµÄ 2.5Ãëºó»¹Ã»Á¬½ÓÉÏ¾Í ËãÁ¬½ÓÊ§°Ü;
+    // Fance added, don't use blocking mode, if device is offline, it often takes 10+ seconds to wait
+    // Fance added ,ä¸è¦ç”¨é˜»å¡çš„æ¨¡å¼ï¼Œå¦‚æœè®¾å¤‡ä¸åœ¨çº¿ ç»å¸¸æ€§çš„ è¦ç­‰10å‡ ç§’ 
+    // Change to non-blocking mode, if connection is not established after 2.5 seconds, consider it as connection failure
+    //æ”¹ä¸ºéé˜»å¡çš„ 2.5ç§’åè¿˜æ²¡è¿æ¥ä¸Šå°± ç®—è¿æ¥å¤±è´¥;
     int error = -1;
     int len;
     len = sizeof(int);
     timeval tm;
     fd_set set;
     unsigned long ul = 1;
-    ioctlsocket(m_hSocket, FIONBIO, &ul); //ÉèÖÃÎª·Ç×èÈûÄ£Ê½
+    ioctlsocket(m_hSocket, FIONBIO, &ul); //è®¾ç½®ä¸ºéé˜»å¡æ¨¡å¼ - Set to non-blocking mode
     bool ret = false;
     if( connect(m_hSocket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
     {
-        tm.tv_sec = 4;//4s Èç¹ûÁ¬½Ó²»ÉÏ¾Í ËãÊ§°Ü £¬²»ÒªÖØĞÂretryÁË;
+        // 4s if unable to connect, consider it as failure, don't retry anymore
+        tm.tv_sec = 4; //4s å¦‚æœè¿æ¥ä¸ä¸Šå°± ç®—å¤±è´¥ ï¼Œä¸è¦é‡æ–°retryäº†; 
         tm.tv_usec = 0;
         FD_ZERO(&set);
         FD_SET(sockfd, &set);
@@ -837,7 +850,7 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
     }
     else ret = true;
     ul = 0;
-    ioctlsocket(sockfd, FIONBIO, &ul); //ÉèÖÃÎª×èÈûÄ£Ê½
+    ioctlsocket(sockfd, FIONBIO, &ul); //è®¾ç½®ä¸ºé˜»å¡æ¨¡å¼ - Set to blocking mode
     //****************************************************************************
 
     if(ret)
@@ -910,25 +923,28 @@ OUTPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort,int ninde
     servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
     //	u_long ul=1;
     //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-    //·¢ËÍÊ±ÏŞ
+    //å‘é€æ—¶é™ - Set send timeout
     setsockopt(m_hSocket, SOL_SOCKET, SO_SNDTIMEO, (char *)&nNetTimeout, sizeof(int));
-    //½ÓÊÕÊ±ÏŞ
+    //æ¥æ”¶æ—¶é™ - Set receive timeout
     setsockopt(m_hSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int));
 
     //****************************************************************************
-    // Fance added ,²»ÒªÓÃ×èÈûµÄÄ£Ê½£¬Èç¹ûÉè±¸²»ÔÚÏß ¾­³£ĞÔµÄ ÒªµÈ10¼¸Ãë
-    //¸ÄÎª·Ç×èÈûµÄ 2.5Ãëºó»¹Ã»Á¬½ÓÉÏ¾Í ËãÁ¬½ÓÊ§°Ü;
+    // Fance added, don't use blocking mode, if device is offline, it often takes 10+ seconds to wait
+    // Fance added ,ä¸è¦ç”¨é˜»å¡çš„æ¨¡å¼ï¼Œå¦‚æœè®¾å¤‡ä¸åœ¨çº¿ ç»å¸¸æ€§çš„ è¦ç­‰10å‡ ç§’
+    // Change to non-blocking mode, if connection is not established after 2.5 seconds, consider it as connection failure
+    //æ”¹ä¸ºéé˜»å¡çš„ 2.5ç§’åè¿˜æ²¡è¿æ¥ä¸Šå°± ç®—è¿æ¥å¤±è´¥;
     int error = -1;
     int len;
     len = sizeof(int);
     timeval tm;
     fd_set set;
     unsigned long ul = 1;
-    ioctlsocket(m_hSocket, FIONBIO, &ul); //ÉèÖÃÎª·Ç×èÈûÄ£Ê½
+    ioctlsocket(m_hSocket, FIONBIO, &ul); //è®¾ç½®ä¸ºéé˜»å¡æ¨¡å¼ - Set to non-blocking mode
     bool ret = false;
     if (connect(m_hSocket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
     {
-        tm.tv_sec = 4;//4.5s Èç¹ûÁ¬½Ó²»ÉÏ¾Í ËãÊ§°Ü £¬²»ÒªÖØĞÂretryÁË;
+        //4.5s å¦‚æœè¿æ¥ä¸ä¸Šå°± ç®—å¤±è´¥ ï¼Œä¸è¦é‡æ–°retryäº†;
+        tm.tv_sec = 4;// 4.5s if unable to connect, consider it as failure, don't retry anymore    
         tm.tv_usec = 0;
         FD_ZERO(&set);
         FD_SET(sockfd, &set);
@@ -949,7 +965,7 @@ OUTPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort,int ninde
     }
     else ret = true;
     ul = 0;
-    ioctlsocket(sockfd, FIONBIO, &ul); //ÉèÖÃÎª×èÈûÄ£Ê½
+    ioctlsocket(sockfd, FIONBIO, &ul); //è®¾ç½®ä¸ºé˜»å¡æ¨¡å¼ - Set to blocking mode
                                        //****************************************************************************
 
     if (ret)
@@ -978,11 +994,16 @@ OUTPUT bool Open_Socket2_multy_thread(CString strIPAdress, short nPort,int ninde
 
 
 ////////////////////////////////////////////////////////////////////////////
-// Connect ·ÖÎªÁ½ÖÖÇé¿ö£º
-// 1£¬´®¿Ú´ò¿ª¹¤×÷Õı³££¬µ«ÊÇÉè±¸Í¨ĞÅÊ§°Ü£¨¶Ïµç£¬µôÏßµÈµÈ£©¡£
-// ±íÏÖÎª¶Ô´®¿Ú²Ù×÷Õı³££¬µ«ÊÇÃ»ÓĞÍ¨ĞÅÊı¾İ¡£
-// 2£¬´®¿Ú´ò¿ªÊ§°Ü»ò¹¤×÷²»Õı³££¨USB´®¿Ú°Î³ö£¬Õ¼ÓÃµÈµÈ£©¡£
-// ±íÏÖÎªÎŞ·¨²Ù×÷´®¿Ú¡£
+// Connect has two scenarios:
+// Connect åˆ†ä¸ºä¸¤ç§æƒ…å†µï¼š
+// 1. Serial port opens and works normally, but device communication fails (power off, disconnected, etc.).
+// 1ï¼Œä¸²å£æ‰“å¼€å·¥ä½œæ­£å¸¸ï¼Œä½†æ˜¯è®¾å¤‡é€šä¿¡å¤±è´¥ï¼ˆæ–­ç”µï¼Œæ‰çº¿ç­‰ç­‰ï¼‰ã€‚
+// Manifests as normal serial port operations, but no communication data.
+// è¡¨ç°ä¸ºå¯¹ä¸²å£æ“ä½œæ­£å¸¸ï¼Œä½†æ˜¯æ²¡æœ‰é€šä¿¡æ•°æ®ã€‚
+// 2. Serial port fails to open or works abnormally (USB serial port unplugged, occupied, etc.).
+// 2ï¼Œä¸²å£æ‰“å¼€å¤±è´¥æˆ–å·¥ä½œä¸æ­£å¸¸ï¼ˆUSBä¸²å£æ‹”å‡ºï¼Œå ç”¨ç­‰ç­‰ï¼‰ã€‚
+// Manifests as inability to operate the serial port.
+// è¡¨ç°ä¸ºæ— æ³•æ“ä½œä¸²å£ã€‚
 
 OUTPUT bool is_connect()
 {
@@ -1045,7 +1066,7 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSerial==NULL)
         {
             return -1;
@@ -1065,17 +1086,17 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             data_to_write,// Êı¾İ»º³åÇøµØÖ·
-                             length*2+9,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             data_to_write,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             length*2+9,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Number of bytes sent
                              &m_osMulWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -1090,17 +1111,17 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        gval,// Êı¾İ»º³åÇøµØÖ·
-                        8,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                        gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                        8,// æ•°æ®å¤§å° - Data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -1161,7 +1182,7 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
 //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -1172,7 +1193,7 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚ - The remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                     Open_Socket2(last_connected_ip, last_connected_port);
@@ -1188,9 +1209,9 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
     }
     return -1;
 }
-OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_address,TS_US length,//²ÎÊıÃüÁî²¿·Ö
-                                 unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, //·¢ËÍºÍ½ÓÊÜµÄÔ­Ê¼Êı¾İ
-                                 int* sendDataLength, int* recvDataLength) //·¢ËÍºÍ½ÓÊÜÊı¾İ³¤¶È
+OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_address,TS_US length,//å‚æ•°å‘½ä»¤éƒ¨åˆ† - Parameter command part
+                                 unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, //å‘é€å’Œæ¥å—çš„åŸå§‹æ•°æ® - Send and receive raw data
+                                 int* sendDataLength, int* recvDataLength) //å‘é€å’Œæ¥å—æ•°æ®é•¿åº¦ - Send and receive data length
 {
     if(g_Commu_type==0)//
     {
@@ -1243,7 +1264,7 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSerial==NULL)
         {
             return -1;
@@ -1261,17 +1282,17 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             data_to_write,// Êı¾İ»º³åÇøµØÖ·
-                             length*2+9,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             data_to_write,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             length*2+9,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Number of bytes sent
                              &m_osMulWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -1286,17 +1307,17 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        gval,// Êı¾İ»º³åÇøµØÖ·
-                        8,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                        gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                        8,// æ•°æ®å¤§å° - Data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -1368,7 +1389,7 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
 //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° // Number of bytes sent
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -1379,7 +1400,7 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚- The remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                 {
@@ -1407,9 +1428,9 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
     }
     return -1;
 }
-OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start_address, TS_US length,//²ÎÊıÃüÁî²¿·Ö
-	unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here, //·¢ËÍºÍ½ÓÊÜµÄÔ­Ê¼Êı¾İ
-	int* sendDataLength, int* recvDataLength) //·¢ËÍºÍ½ÓÊÜÊı¾İ³¤¶È
+OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start_address, TS_US length,//å‚æ•°å‘½ä»¤éƒ¨åˆ† - Parameter command part
+	unsigned char *put_senddate_into_here, unsigned char *put_revdata_into_here, //å‘é€å’Œæ¥å—çš„åŸå§‹æ•°æ® - Send and receive raw data
+	int* sendDataLength, int* recvDataLength) //å‘é€å’Œæ¥å—æ•°æ®é•¿åº¦ - Send and receive data length
 {
 	unsigned short ToSendData[16];
 	int DataLength = 0;
@@ -1425,7 +1446,7 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 	bitset<8> BitReg;
 	for (int index = 0;index< DataLength;index++)
 	{
-		//³õÊ¼»¯BitReg
+		//åˆå§‹åŒ–BitReg - Initialize BitReg
 		for (int i=0;i<8;i++)
 		{
 			BitReg[i] = false;
@@ -1491,7 +1512,7 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		hc = LoadCursor(NULL, IDC_WAIT);
 		hc = SetCursor(hc);
 		//length is the data length,if you want to write 128 bite,the length == 128
-		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° // Number of bytes already sent
 		if (m_hSerial == NULL)
 		{
 			return -1;
@@ -1509,17 +1530,17 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		m_osMulWrite.Offset = 0;
 		m_osMulWrite.OffsetHigh = 0;
 		///////////////////////////////////////////////////////send the to read message
-		int fState = WriteFile(m_hSerial,// ¾ä±ú
-			data_to_write,// Êı¾İ»º³åÇøµØÖ·
-			length * 2 + 9,// Êı¾İ´óĞ¡
-			&m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+		int fState = WriteFile(m_hSerial,// å¥æŸ„ // Handle
+			data_to_write,// æ•°æ®ç¼“å†²åŒºåœ°å€ // Data buffer address
+			length * 2 + 9,// æ•°æ®å¤§å° // Data size
+			&m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° // Returns number of bytes sent
 			&m_osMulWrite);
-		if (!fState)// ²»Ö§³ÖÖØµş
+		if (!fState)// ä¸æ”¯æŒé‡å  // Overlapped not supported
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾… // Wait
 			}
 			else
 				m_had_send_data_number = 0;
@@ -1534,17 +1555,17 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		m_osRead.OffsetHigh = 0;
 		Sleep(LATENCY_TIME_COM);
 		////////////////////////////////////////////////clear com error
-		fState = ReadFile(m_hSerial,// ¾ä±ú
-			gval,// Êı¾İ»º³åÇøµØÖ·
-			8,// Êı¾İ´óĞ¡
-			&m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+		fState = ReadFile(m_hSerial,// å¥æŸ„ // Handle
+			gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ // Data buffer address
+			8,// æ•°æ®å¤§å° // Data size
+			&m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° // Returns number of bytes sent
 			&m_osRead);
-		if (!fState)// ²»Ö§³ÖÖØµş
+		if (!fState)// ä¸æ”¯æŒé‡å  // Overlapped not supported
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾… // Wait
 			}
 			else
 				m_had_send_data_number = 0;
@@ -1616,7 +1637,7 @@ OUTPUT int write_multi_Coil_log(TS_UC device_var, TS_BOOL *to_write, TS_US start
 		hc = LoadCursor(NULL, IDC_WAIT);
 		hc = SetCursor(hc);
 		//length is the data length,if you want to write 128 bite,the length == 128
-		//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+		//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
 		if (m_hSocket == INVALID_SOCKET)
 		{
 			return -1;
@@ -1658,13 +1679,13 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° // Number of bytes already sent
         pval[0] = device_var;
         pval[1] = 3;
         pval[2] = address>>8 & 0xFF ;
@@ -1693,17 +1714,17 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         m_osWrite.Offset = 0;
         m_osWrite.OffsetHigh = 0;
 
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,	// Êı¾İ»º³åÇøµØÖ·
-                             8,		// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ // Handle
+                             pval,	// æ•°æ®ç¼“å†²åŒºåœ°å€ // Data buffer address
+                             8,		// æ•°æ®å¤§å° // Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° // Returns number of bytes sent
                              &m_osWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  // Overlapped not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾… // Wait
                 //			if(GetLastError()==ERROR_IO_PENDING)
                 //				AfxMessageBox("wrong1");
             }
@@ -1723,26 +1744,26 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         if(address==10)
         {
             serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            11,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                            11,// æ•°æ®å¤§å° - Data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                             &m_osRead);
         }
         else
         {
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            7,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                            7,// æ•°æ®å¤§å° - Data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                             &m_osRead);
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -1802,7 +1823,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
 
@@ -1836,7 +1857,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //TS_US crc;
-        //DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
 
         pval[0] = device_var;
         pval[1] = 3;
@@ -1881,7 +1902,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚ - Error code: The remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                 {
@@ -1945,7 +1966,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
             }
         }
         nTemp = gval[3];
-        //2018 09 26 Fandu  ÆÁ±Î
+        //2018 09 26 Fandu  å±è”½ // Blocked/Masked
         //if(nTemp==255)
         //    nTemp=-1;
         return (gval[3] * 256 + gval[4]);
@@ -1966,13 +1987,13 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 3;
         pval[2] = address>>8 & 0xFF ;
@@ -2007,17 +2028,17 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
             *((char*)put_senddate_into_here + i) = pval[i];
         }
 
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,	// Êı¾İ»º³åÇøµØÖ·
-                             8,		// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             pval,	// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             8,		// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
                 //			if(GetLastError()==ERROR_IO_PENDING)
                 //				AfxMessageBox("wrong1");
             }
@@ -2037,26 +2058,26 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
         if(address==10)
         {
             serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            11,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                            11,// æ•°æ®å¤§å° - Data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                             &m_osRead);
         }
         else
         {
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            7,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                            7,// æ•°æ®å¤§å° - Data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                             &m_osRead);
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -2123,7 +2144,7 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
 
@@ -2177,7 +2198,7 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //TS_US crc;
-        //DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° // - Number of bytes sent
 
         pval[0] = device_var;
         pval[1] = 3;
@@ -2303,14 +2324,14 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for (int i = 0; i <= 11; i++)
             gval[i] = 0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address >> 8 & 0xFF;
@@ -2366,10 +2387,10 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         Sleep(50);
         if (address != 10)
         {
-            fState = WriteFile(m_hSerial,// ¾ä±ú
-                pval,// Êı¾İ»º³åÇøµØÖ·
-                8,// Êı¾İ´óĞ¡
-                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                8,// æ•°æ®å¤§å° - Data size
+                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                 &m_osWrite);
         }
         else
@@ -2378,28 +2399,28 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
             if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
             {
                 //old protocal
-                fState = WriteFile(m_hSerial,// ¾ä±ú
-                    pval,// Êı¾İ»º³åÇøµØÖ·
-                    8,// Êı¾İ´óĞ¡
-                    &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                    pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                    8,// æ•°æ®å¤§å° - Data size
+                    &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                     &m_osWrite);
             }
             else
             {
                 //new protocal
-                fState = WriteFile(m_hSerial,// ¾ä±ú
-                    pval,// Êı¾İ»º³åÇøµØÖ·
-                    12,// Êı¾İ´óĞ¡
-                    &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                    pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                    12,// æ•°æ®å¤§å° - Data size
+                    &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                     &m_osWrite);
             }
         }
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Overlapped not supported
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
                                                                                                    //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                                                                                                    //				AfxMessageBox("wrong1");
             }
@@ -2418,10 +2439,10 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         Sleep(LATENCY_TIME_COM);
         if (address != 10)
         {
-            fState = ReadFile(m_hSerial,// ¾ä±ú
-                gval,// Êı¾İ»º³åÇøµØÖ·
-                8,// Êı¾İ´óĞ¡
-                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                8,// æ•°æ®å¤§å° - Data size
+                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                 &m_osRead);
         }
         else
@@ -2429,28 +2450,28 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
             if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
             {
                 //old protocal
-                fState = ReadFile(m_hSerial,// ¾ä±ú
-                    gval,// Êı¾İ»º³åÇøµØÖ·
-                    8,// Êı¾İ´óĞ¡
-                    &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                    gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                    8,// æ•°æ®å¤§å° - Data size
+                    &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                     &m_osRead);
             }
             else
             {
                 //new protocal
-                fState = ReadFile(m_hSerial,// ¾ä±ú
-                    gval,// Êı¾İ»º³åÇøµØÖ·
-                    12,// Êı¾İ´óĞ¡
-                    &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                    gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                    12,// æ•°æ®å¤§å° - Data size
+                    &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                     &m_osRead);
             }
         }
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Overlapped not supported
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number = 0;
@@ -2501,7 +2522,7 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -2527,7 +2548,7 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         data[3] = 0;
         data[4] = 0;
         data[5] = 6;
-        //		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         data[6] = device_var;
         data[7] = 6;
         data[8] = address >> 8 & 0xFF;
@@ -2559,7 +2580,7 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         for (int i = 0; i <= 11; i++)
             gval[i] = 0;/////////////////////////////////////////clear buffer
                         //	TS_US crc;
-                        //	DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+                        //	DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° // - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address >> 8 & 0xFF;
@@ -2581,7 +2602,7 @@ OUTPUT int Write_One_Multy_Thread(TS_UC device_var, TS_US address, TS_US val,int
         if (nRet < 0)	//Add by Fance ,if device is dosconnected , we need to connect the device again;
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚ - Error code: The remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                     Open_Socket2_multy_thread(last_connected_ip, last_connected_port, nindex);
@@ -2647,14 +2668,14 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -2710,10 +2731,10 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         Sleep(50);
         if(address!=10)
         {
-            fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,// Êı¾İ»º³åÇøµØÖ·
-                             8,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             8,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osWrite);
         }
         else
@@ -2722,28 +2743,28 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=WriteFile(m_hSerial,// ¾ä±ú
-                                 pval,// Êı¾İ»º³åÇøµØÖ·
-                                 8,// Êı¾İ´óĞ¡
-                                 &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                                 pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                                 8,// æ•°æ®å¤§å° - Data size
+                                 &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                                  &m_osWrite);
             }
             else
             {
                 //new protocal
-                fState=WriteFile(m_hSerial,// ¾ä±ú
-                                 pval,// Êı¾İ»º³åÇøµØÖ·
-                                 12,// Êı¾İ´óĞ¡
-                                 &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                                 pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                                 12,// æ•°æ®å¤§å° - Data size
+                                 &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                                  &m_osWrite);
             }
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -2762,10 +2783,10 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         Sleep(LATENCY_TIME_COM);
         if(address!=10)
         {
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            8,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                            8,// æ•°æ®å¤§å° - Data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                             &m_osRead);
         }
         else
@@ -2773,28 +2794,28 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=ReadFile(m_hSerial,// ¾ä±ú
-                                gval,// Êı¾İ»º³åÇøµØÖ·
-                                8,// Êı¾İ´óĞ¡
-                                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                                gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                                8,// æ•°æ®å¤§å° - Data size
+                                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                                 &m_osRead);
             }
             else
             {
                 //new protocal
-                fState=ReadFile(m_hSerial,// ¾ä±ú
-                                gval,// Êı¾İ»º³åÇøµØÖ·
-                                12,// Êı¾İ´óĞ¡
-                                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                                gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                                12,// æ•°æ®å¤§å° - Data size
+                                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                                 &m_osRead);
             }
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -2843,7 +2864,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -2869,7 +2890,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         data[3]=0;
         data[4]=0;
         data[5]=6;
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         data[6] = device_var;
         data[7] = 6;
         data[8] = address>>8 & 0xFF ;
@@ -2901,7 +2922,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //	TS_US crc;
-        //	DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //	DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -2916,7 +2937,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
         for(int i=0;i<=11;i++)
         	gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -3025,14 +3046,14 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -3094,10 +3115,10 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
                 *((char*)put_senddate_into_here + i) = pval[i];
             }
 
-            fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,// Êı¾İ»º³åÇøµØÖ·
-                             8,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             8,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osWrite);
         }
         else
@@ -3111,10 +3132,10 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
                 {
                     *((char*)put_senddate_into_here + i) = pval[i];
                 }
-                fState=WriteFile(m_hSerial,// ¾ä±ú
-                                 pval,// Êı¾İ»º³åÇøµØÖ·
-                                 8,// Êı¾İ´óĞ¡
-                                 &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                                 pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                                 8,// æ•°æ®å¤§å° - Data size
+                                 &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                                  &m_osWrite);
             }
             else
@@ -3126,19 +3147,19 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
                     *((char*)put_senddate_into_here + i) = pval[i];
                 }
 
-                fState=WriteFile(m_hSerial,// ¾ä±ú
-                                 pval,// Êı¾İ»º³åÇøµØÖ·
-                                 12,// Êı¾İ´óĞ¡
-                                 &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                                 pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                                 12,// æ•°æ®å¤§å° - Data size
+                                 &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                                  &m_osWrite);
             }
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾… - Wait
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -3158,10 +3179,10 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         Sleep(LATENCY_TIME_COM);
         if(address!=10)
         {
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            8,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                            8,// æ•°æ®å¤§å° - Data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                             &m_osRead);
         }
         else
@@ -3169,28 +3190,28 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=ReadFile(m_hSerial,// ¾ä±ú
-                                gval,// Êı¾İ»º³åÇøµØÖ·
-                                8,// Êı¾İ´óĞ¡
-                                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                                gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                                8,// æ•°æ®å¤§å° - Data size
+                                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                                 &m_osRead);
             }
             else
             {
                 //new protocal
-                fState=ReadFile(m_hSerial,// ¾ä±ú
-                                gval,// Êı¾İ»º³åÇøµØÖ·
-                                12,// Êı¾İ´óĞ¡
-                                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                                gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                                12,// æ•°æ®å¤§å° - Data size
+                                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                                 &m_osRead);
             }
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -3246,7 +3267,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -3282,7 +3303,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         data[3]=g_data_to_send[3];
         data[4]=g_data_to_send[4];
         data[5]=g_data_to_send[5];
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         data[6] = device_var;
         data[7] = 6;
         data[8] = address>>8 & 0xFF ;
@@ -3314,7 +3335,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //	TS_US crc;
-        //	DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //	DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -3329,7 +3350,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
         for(int i=0;i<=11;i++)
         	gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -3446,14 +3467,14 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 		//val         the value that you want to write to the register
 		//the return value == -1 ,no connecting
 		//the return value == -3 , no response
-		//Çå¿Õ´®¿Ú»º³åÇø
+		//æ¸…ç©ºä¸²å£ç¼“å†²åŒº
 
 		//		gval[8]={'\0'};//the data that get
 		//      TS_UC  pval[9];
 		for (int i = 0; i <= 11; i++)
 			gval[i] = 0;/////////////////////////////////////////clear buffer
 		TS_US crc;
-		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
 		pval[0] = device_var;
 		pval[1] = 5;
 		pval[2] = address >> 8 & 0xFF;
@@ -3498,19 +3519,19 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 				*((char*)put_senddate_into_here + i) = pval[i];
 			}
 
-			fState = WriteFile(m_hSerial,// ¾ä±ú
-				pval,// Êı¾İ»º³åÇøµØÖ·
-				8,// Êı¾İ´óĞ¡
-				&m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+			fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+				pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+				8,// æ•°æ®å¤§å° - Data size
+				&m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
 				&m_osWrite);
-		 
-		 
-		if (!fState)// ²»Ö§³ÖÖØµş
+
+
+		if (!fState)// ä¸æ”¯æŒé‡å  - Overlapping not supported
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
 																								   //			if(GetLastError()==ERROR_IO_INCOMPLETE)
 																								   //				AfxMessageBox("wrong1");
 			}
@@ -3528,20 +3549,20 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 		m_osRead.OffsetHigh = 0;
 		////////////////////////////////////////////////clear com error
 		Sleep(LATENCY_TIME_COM);
-		 
-			fState = ReadFile(m_hSerial,// ¾ä±ú
-				gval,// Êı¾İ»º³åÇøµØÖ·
-				8,// Êı¾İ´óĞ¡
-				&m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+
+			fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+				gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+				8,// æ•°æ®å¤§å° - Data size
+				&m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
 				&m_osRead);
-		 
-		 
-		if (!fState)// ²»Ö§³ÖÖØµş
+
+
+		if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
 			}
 			else
 				m_had_send_data_number = 0;
@@ -3570,7 +3591,7 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 		//val         the value that you want to write to the register
 		//the return value == -1 ,no connecting
 		//the return value == -3 , no response
-		//Çå¿Õ´®¿Ú»º³åÇø
+		//æ¸…ç©ºä¸²å£ç¼“å†²åŒº
 
 		//TS_UC data[12];
 		TS_UC data[16];
@@ -3606,7 +3627,7 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
         data[4] = 0;
         data[5] = 6;
 
-		//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+		//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
 		data[6] = device_var;
 		data[7] = 5;
 		data[8] = address >> 8 & 0xFF;
@@ -3627,7 +3648,7 @@ OUTPUT int Write_Coil_log(TS_UC device_var, TS_US address, TS_BOOL val, unsigned
 			gval[i] = 0;
 		/////////////////////////////////////////clear buffer
 						//	TS_US crc;
-						//	DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+						//	DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
 		pval[0] = device_var;
 		pval[1] = 5;
 		pval[2] = address >> 8 & 0xFF;
@@ -3714,7 +3735,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSerial==NULL)
         {
             return -1;
@@ -3735,17 +3756,17 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 
 
 
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             data_to_send,// Êı¾İ»º³åÇøµØÖ·
-                             8,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             data_to_send,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             8,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osMulWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -3761,17 +3782,17 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        to_send_data,// Êı¾İ»º³åÇøµØÖ·
-                        length*2+5,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                        to_send_data,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                        length*2+5,// æ•°æ®å¤§å° - Data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -3811,7 +3832,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSocket==INVALID_SOCKET)
         {
         	return -1;
@@ -3868,7 +3889,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         //data_to_send[6]=(crc>>8) & 0xff;
         //data_to_send[7]=crc & 0xff;/
 
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -3887,7 +3908,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚ - Error code 10054: The remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                 {
@@ -3945,7 +3966,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSerial==NULL)
         {
             return -1;
@@ -3970,17 +3991,17 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         }
 
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             data_to_send,// Êı¾İ»º³åÇøµØÖ·
-                             8,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             data_to_send,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             8,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osMulWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -3996,17 +4017,17 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        to_send_data,// Êı¾İ»º³åÇøµØÖ·
-                        length*2+5,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                        to_send_data,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                        length*2+5,// æ•°æ®å¤§å° - Data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -4063,7 +4084,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSocket==INVALID_SOCKET)
         {
         	return -1;
@@ -4130,7 +4151,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         //data_to_send[6]=(crc>>8) & 0xff;
         //data_to_send[7]=crc & 0xff;/
 
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -4151,7 +4172,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚ - Error code 10054: The remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                 {
@@ -4222,7 +4243,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSerial==NULL)
         {
             return -1;
@@ -4240,17 +4261,17 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             data_to_write,// Êı¾İ»º³åÇøµØÖ·
-                             length+9,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             data_to_write,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             length+9,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osMulWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -4265,17 +4286,17 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        gval,// Êı¾İ»º³åÇøµØÖ·
-                        8,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                        gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                        8,// æ•°æ®å¤§å° - Data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -4326,7 +4347,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -4337,7 +4358,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_U
         if(nRecv<0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)    //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£ 10060 ÓĞÊ±ºò»á³¬Ê±;
+            if (nErr == 10054)    //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚ 10060 æœ‰æ—¶å€™ä¼šè¶…æ—¶; - Error code 10054: The remote host forcibly closed an existing connection. 10060 sometimes times out;
             {
                 if (last_connected_port != 0)
                 {
@@ -4385,7 +4406,7 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSerial==NULL)
         {
             return -1;
@@ -4410,17 +4431,17 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         }
 
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             data_to_write,// Êı¾İ»º³åÇøµØÖ·
-                             length+9,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             data_to_write,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             length+9,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osMulWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -4435,17 +4456,17 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        gval,// Êı¾İ»º³åÇøµØÖ·
-                        8,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                        gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                        8,// æ•°æ®å¤§å° - Data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -4515,7 +4536,7 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -4561,7 +4582,7 @@ OUTPUT int NetController_CheckTstatOnline(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
         //the return value is the register address
 
         //Sleep(150);       //must use this function to slow computer
@@ -4622,7 +4643,7 @@ OUTPUT int NetController_CheckTstatOnline(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -4688,7 +4709,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
 
         if(devLo<1 || devHi>254)
@@ -4698,7 +4719,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[6];
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = 255;
         pval[1] = 26;  //put comments here,
         pval[2] = devHi;
@@ -4724,17 +4745,17 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,// Êı¾İ»º³åÇøµØÖ·
-                             6,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             6,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Number of bytes sent
                              &m_osWrite);
-        if(!fState)//²»Ö§³ÖÖØµş
+        if(!fState)//ä¸æ”¯æŒé‡å 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -4754,17 +4775,17 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        gval,// Êı¾İ»º³åÇøµØÖ·
-                        13,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                        gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                        13,// æ•°æ®å¤§å° - Data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -4852,7 +4873,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
         if(devLo<1 || devHi>254)
             return -5;
@@ -4862,7 +4883,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[10];
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
 
 
         pval[0]=1;
@@ -4893,7 +4914,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
         int nRecv = ::recv(m_hSocket, (char*)rvdata, sizeof(rvdata), 0);
         if (nRecv>0)
         {
-            //Òì³£:
+            //å¼‚å¸¸:
             memcpy(gval,(void*)&rvdata[6],sizeof(rvdata)-6);
         }
         if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
@@ -4997,11 +5018,11 @@ OUTPUT bool open_com(int m_com ,unsigned char com_data_bit,unsigned char com_sto
     {
         if (m_com_h_serial[m_com] != NULL)
             m_com_h_serial[m_com] = NULL;
-        //¹Ø±Õ´®¿Ú
+        //å…³é—­ä¸²å£ - Close serial port
         CloseHandle(m_hSerial);
         m_hSerial = NULL;
     }
-    /////////////////////////////////////////////////////////////////////¼ÓÈëµÄ´®¿ÚÍ¨ĞÅ²¿·Ö
+    /////////////////////////////////////////////////////////////////////åŠ å…¥çš„ä¸²å£é€šä¿¡éƒ¨åˆ†
     // 	LPCSTR lpComNum[6];
     // 	ZeroMemory(lpComNum, )
 
@@ -5017,12 +5038,12 @@ OUTPUT bool open_com(int m_com ,unsigned char com_data_bit,unsigned char com_sto
         strCom = _T("\\\\.\\COM") + strCom;
     }
 
-    m_hSerial = CreateFile(strCom, //strCom,//´®¿Ú¾ä±ú£¬´ò¿ª´®¿Ú
+    m_hSerial = CreateFile(strCom, //strCom,//ä¸²å£å¥æŸ„ï¼Œæ‰“å¼€ä¸²å£ - Serial port handle, open serial port
         GENERIC_READ | GENERIC_WRITE,
         0,
         NULL,
         OPEN_EXISTING,
-        FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,ÊÇÁíÍâµÄĞÎÊ½£¬±íÊ¾µÄÊÇÒì²½Í¨ĞÅ£¬ÄÜÍ¬Ê±¶ÁĞ´;0ÎªÍ¬²½¶ÁĞ´
+        FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,æ˜¯å¦å¤–çš„å½¢å¼ï¼Œè¡¨ç¤ºçš„æ˜¯å¼‚æ­¥é€šä¿¡ï¼Œèƒ½åŒæ—¶è¯»å†™;0ä¸ºåŒæ­¥è¯»å†™ - FILE_FLAG_OVERLAPPED is another form, indicating asynchronous communication, allowing simultaneous read and write; 0 is synchronous read and write
         NULL);
 
 
@@ -5041,7 +5062,7 @@ OUTPUT bool open_com(int m_com ,unsigned char com_data_bit,unsigned char com_sto
     }
     DCB  PortDCB;
     PortDCB.DCBlength = sizeof(DCB);
-    // Ä¬ÈÏ´®¿Ú²ÎÊı
+    // é»˜è®¤ä¸²å£å‚æ•°
     if (!GetCommState(m_hSerial, &PortDCB))
     {
         CloseHandle(m_hSerial);
@@ -5102,11 +5123,11 @@ OUTPUT bool open_com_nocretical(int m_com, int default_baudrate)
     //}
     if(m_com_h_serial[m_com] != NULL)
     {
-        //¹Ø±Õ´®¿Ú
+        //å…³é—­ä¸²å£
         CloseHandle(m_com_h_serial[m_com]);
         m_com_h_serial[m_com] = NULL;
     }
-    /////////////////////////////////////////////////////////////////////¼ÓÈëµÄ´®¿ÚÍ¨ĞÅ²¿·Ö
+    /////////////////////////////////////////////////////////////////////åŠ å…¥çš„ä¸²å£é€šä¿¡éƒ¨åˆ† - Added serial communication part
 // 	LPCSTR lpComNum[6];
 // 	ZeroMemory(lpComNum, )
 
@@ -5122,12 +5143,12 @@ OUTPUT bool open_com_nocretical(int m_com, int default_baudrate)
         strCom = _T("\\\\.\\COM")+strCom;
     }
 
-     m_hSerial = CreateFile(strCom, //strCom,//´®¿Ú¾ä±ú£¬´ò¿ª´®¿Ú
+     m_hSerial = CreateFile(strCom, //strCom,//ä¸²å£å¥æŸ„ï¼Œæ‰“å¼€ä¸²å£ - Serial port handle, open serial port
          GENERIC_READ | GENERIC_WRITE,
          0,
          NULL,
          OPEN_EXISTING,
-         FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,ÊÇÁíÍâµÄĞÎÊ½£¬±íÊ¾µÄÊÇÒì²½Í¨ĞÅ£¬ÄÜÍ¬Ê±¶ÁĞ´;0ÎªÍ¬²½¶ÁĞ´
+         FILE_FLAG_OVERLAPPED,//FILE_FLAG_OVERLAPPED,æ˜¯å¦å¤–çš„å½¢å¼ï¼Œè¡¨ç¤ºçš„æ˜¯å¼‚æ­¥é€šä¿¡ï¼Œèƒ½åŒæ—¶è¯»å†™;0ä¸ºåŒæ­¥è¯»å†™ - Another form, indicates asynchronous communication, can read and write simultaneously; 0 for synchronous read/write
          NULL);
 
 
@@ -5150,7 +5171,7 @@ OUTPUT bool open_com_nocretical(int m_com, int default_baudrate)
     }
     DCB  PortDCB;
     PortDCB.DCBlength = sizeof(DCB);
-    // Ä¬ÈÏ´®¿Ú²ÎÊı
+    // é»˜è®¤ä¸²å£å‚æ•° - Default serial port parameters
     if(!GetCommState(m_hSerial, &PortDCB))
     {
         CloseHandle(m_hSerial);
@@ -5175,7 +5196,7 @@ OUTPUT bool open_com_nocretical(int m_com, int default_baudrate)
     CommTimeouts.WriteTotalTimeoutMultiplier = 20;
     CommTimeouts.WriteTotalTimeoutConstant = 200;
 
-//²âÊÔ
+//æµ‹è¯• - Test
     //CommTimeouts.ReadIntervalTimeout = 0;
     //CommTimeouts.ReadTotalTimeoutMultiplier = 0;
     //CommTimeouts.ReadTotalTimeoutConstant = 0;
@@ -5205,13 +5226,13 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•°
         pval[0] = device_var;
         pval[1] = 3;
         pval[2] = address>>8 & 0xFF ;
@@ -5240,17 +5261,17 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         m_osWrite.Offset = 0;
         m_osWrite.OffsetHigh = 0 ;
 
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,// Êı¾İ»º³åÇøµØÖ·
-                             8,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             8,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osWrite);
-        if(!fState)// I/OÎ´Íê³É»òÊ§°Ü
+        if(!fState)// I/Oæœªå®Œæˆæˆ–å¤±è´¥ - I/O incomplete or failed
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
                 //			if(GetLastError()==ERROR_IO_PENDING)
                 //				AfxMessageBox("wrong1");
             }
@@ -5270,26 +5291,26 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         if(address==10)
         {
             serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            11,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                            11,// æ•°æ®å¤§å° - data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                             &m_osRead);
         }
         else
         {
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            7,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                            7,// æ•°æ®å¤§å° - data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                             &m_osRead);
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -5348,7 +5369,7 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
 
@@ -5382,7 +5403,7 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - number of bytes sent
 
         pval[0] = device_var;
         pval[1] = 3;
@@ -5423,7 +5444,7 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚ - Error code, the remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                 {
@@ -5509,14 +5530,14 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes of data already sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -5572,10 +5593,10 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         Sleep(50);
         if(address!=10)
         {
-            fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,// Êı¾İ»º³åÇøµØÖ·
-                             8,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                             pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                             8,// æ•°æ®å¤§å° - data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                              &m_osWrite);
         }
         else
@@ -5584,28 +5605,28 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=WriteFile(m_hSerial,// ¾ä±ú
-                                 pval,// Êı¾İ»º³åÇøµØÖ·
-                                 8,// Êı¾İ´óĞ¡
-                                 &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                                 pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                                 8,// æ•°æ®å¤§å° - data size
+                                 &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                                  &m_osWrite);
             }
             else
             {
                 //new protocal
-                fState=WriteFile(m_hSerial,// ¾ä±ú
-                                 pval,// Êı¾İ»º³åÇøµØÖ·
-                                 12,// Êı¾İ´óĞ¡
-                                 &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                                 pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                                 12,// æ•°æ®å¤§å° - data size
+                                 &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                                  &m_osWrite);
             }
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -5624,10 +5645,10 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         Sleep(LATENCY_TIME_COM);
         if(address!=10)
         {
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            8,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                            8,// æ•°æ®å¤§å° - data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                             &m_osRead);
         }
         else
@@ -5635,28 +5656,28 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=ReadFile(m_hSerial,// ¾ä±ú
-                                gval,// Êı¾İ»º³åÇøµØÖ·
-                                8,// Êı¾İ´óĞ¡
-                                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                                gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                                8,// æ•°æ®å¤§å° - data size
+                                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                                 &m_osRead);
             }
             else
             {
                 //new protocal
-                fState=ReadFile(m_hSerial,// ¾ä±ú
-                                gval,// Êı¾İ»º³åÇøµØÖ·
-                                12,// Êı¾İ´óĞ¡
-                                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                                gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                                12,// æ•°æ®å¤§å° - data size
+                                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                                 &m_osRead);
             }
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -5705,7 +5726,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -5731,7 +5752,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         data[3]=0;
         data[4]=0;
         data[5]=6;
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - number of bytes sent
         data[6] = device_var;
         data[7] = 6;
         data[8] = address>>8 & 0xFF ;
@@ -5763,7 +5784,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
 //		TS_US crc;
-        //	DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //	DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -5778,7 +5799,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         for(int i=0;i<=11;i++)
         	gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -5831,7 +5852,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚- The remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                 {
@@ -5897,7 +5918,7 @@ OUTPUT int NetController_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
         //the return value is the register address
 
         //Sleep(150);       //must use this function to slow computer
@@ -5958,7 +5979,7 @@ OUTPUT int NetController_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -6025,7 +6046,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
         //the return value is the register address
         strlog.Format(_T("Scan From ID=%d To ID=%d"),devLo,devHi);
         //WriteLogFile(strlog);
@@ -6036,7 +6057,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[6];
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - number of bytes sent
         pval[0] = 255;
         pval[1] = 26;  //put comments here,
         pval[2] = devHi;
@@ -6062,17 +6083,17 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,// Êı¾İ»º³åÇøµØÖ·
-                             6,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                             pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                             6,// æ•°æ®å¤§å° - data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                              &m_osWrite);
-        if(!fState)//²»Ö§³ÖÖØµş
+        if(!fState)//ä¸æ”¯æŒé‡å  - overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -6092,17 +6113,17 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        gval,// Êı¾İ»º³åÇøµØÖ·
-                        13,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                        gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                        13,// æ•°æ®å¤§å° - data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -6224,7 +6245,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
         //the return value is the register address
         strlog.Format(_T("Scan From ID=%d To ID=%d"),devLo,devHi);
         //NET_WriteLogFile(strlog);
@@ -6236,7 +6257,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[10];
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - number of bytes sent
 
 
         pval[0]=1;
@@ -6267,7 +6288,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
         int nRecv = ::recv(m_hSocket, (char*)rvdata, sizeof(rvdata), 0);
         if (nRecv>0)
         {
-            //Òì³£:
+            //å¼‚å¸¸:
             memcpy(gval,(void*)&rvdata[6],sizeof(rvdata)-6);
         }
 
@@ -6382,7 +6403,7 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         data_to_send[6] = (crc >> 8) & 0xff;
         data_to_send[7] = crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes of data already sent
         if (m_hSerial == NULL)
         {
             return -1;
@@ -6400,17 +6421,17 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0;
         ///////////////////////////////////////////////////////send the to read message
-        int fState = WriteFile(m_hSerial,// ¾ä±ú
-            data_to_send,// Êı¾İ»º³åÇøµØÖ·
-            8,// Êı¾İ´óĞ¡
-            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+            data_to_send,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+            8,// æ•°æ®å¤§å° - Data size
+            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
             &m_osMulWrite);
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾… - Wait
             }
             else
                 m_had_send_data_number = 0;
@@ -6426,17 +6447,17 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState = ReadFile(m_hSerial,// ¾ä±ú
-            to_send_data,// Êı¾İ»º³åÇøµØÖ·
-            length * 2 + 5,// Êı¾İ´óĞ¡
-            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+            to_send_data,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+            length * 2 + 5,// æ•°æ®å¤§å° - Data size
+            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
             &m_osRead);
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾… - Wait
             }
             else
                 m_had_send_data_number = 0;
@@ -6476,7 +6497,7 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes of data already sent
         if(m_hSocket==INVALID_SOCKET)
         {
         return -1;
@@ -6533,7 +6554,7 @@ OUTPUT int read_multi2(TS_UC device_var, TS_US *put_data_into_here, TS_US start_
                                          //data_to_send[6]=(crc>>8) & 0xff;
                                          //data_to_send[7]=crc & 0xff;/
 
-                                         //		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+                                         //		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•°
         if (m_hSocket == INVALID_SOCKET)
         {
             return -1;
@@ -6575,14 +6596,14 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for (int i = 0; i <= 11; i++)
             gval[i] = 0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes of data already sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address >> 8 & 0xFF;
@@ -6640,10 +6661,10 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         Sleep(50);
         if (address != 10)
         {
-            fState = WriteFile(m_hSerial,// ¾ä±ú
-                pval,// Êı¾İ»º³åÇøµØÖ·
-                8,// Êı¾İ´óĞ¡
-                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                8,// æ•°æ®å¤§å° - Data size
+                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                 &m_com_osWrite[ncomport]);
         }
         else
@@ -6652,28 +6673,28 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
             if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
             {
                 //old protocal
-                fState = WriteFile(m_hSerial,// ¾ä±ú
-                    pval,// Êı¾İ»º³åÇøµØÖ·
-                    8,// Êı¾İ´óĞ¡
-                    &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                    pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                    8,// æ•°æ®å¤§å° - Data size
+                    &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                     &m_com_osWrite[ncomport]);
             }
             else
             {
                 //new protocal
-                fState = WriteFile(m_hSerial,// ¾ä±ú
-                    pval,// Êı¾İ»º³åÇøµØÖ·
-                    12,// Êı¾İ´óĞ¡
-                    &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                    pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                    12,// æ•°æ®å¤§å° - Data size
+                    &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                     &m_com_osWrite[ncomport]);
             }
         }
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_com_osWrite[ncomport], &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_com_osWrite[ncomport], &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
                                                                                                    //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                                                                                                    //				AfxMessageBox("wrong1");
             }
@@ -6692,10 +6713,10 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         Sleep(LATENCY_TIME_COM);
         if (address != 10)
         {
-            fState = ReadFile(m_hSerial,// ¾ä±ú
-                gval,// Êı¾İ»º³åÇøµØÖ·
-                8,// Êı¾İ´óĞ¡
-                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                8,// æ•°æ®å¤§å° - Data size
+                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                 &m_com_osWrite[ncomport]);
         }
         else
@@ -6703,28 +6724,28 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
             if (serinumber_in_dll[0] == 0 && serinumber_in_dll[1] == 0 && serinumber_in_dll[2] == 0 && serinumber_in_dll[3] == 0)
             {
                 //old protocal
-                fState = ReadFile(m_hSerial,// ¾ä±ú
-                    gval,// Êı¾İ»º³åÇøµØÖ·
-                    8,// Êı¾İ´óĞ¡
-                    &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                    gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                    8,// æ•°æ®å¤§å° - Data size
+                    &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                     &m_com_osWrite[ncomport]);
             }
             else
             {
                 //new protocal
-                fState = ReadFile(m_hSerial,// ¾ä±ú
-                    gval,// Êı¾İ»º³åÇøµØÖ·
-                    12,// Êı¾İ´óĞ¡
-                    &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                    gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                    12,// æ•°æ®å¤§å° - Data size
+                    &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                     &m_com_osWrite[ncomport]);
             }
         }
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_com_osWrite[ncomport], &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_com_osWrite[ncomport], &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number = 0;
@@ -6773,7 +6794,7 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -6801,7 +6822,7 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         data[4] = 0;
         data[5] = 6;
 
-        //		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         data[6] = device_var;
         data[7] = 6;
         data[8] = address >> 8 & 0xFF;
@@ -6833,7 +6854,7 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         for (int i = 0; i <= 11; i++)
             gval[i] = 0;/////////////////////////////////////////clear buffer
                         //		TS_US crc;
-                        //	DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+                        //	DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address >> 8 & 0xFF;
@@ -6848,7 +6869,7 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
                              for(int i=0;i<=11;i++)
                              gval[i]=0;/////////////////////////////////////////clear buffer
                              TS_US crc;
-                             DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+                             DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•°
                              pval[0] = device_var;
                              pval[1] = 6;
                              pval[2] = address>>8 & 0xFF ;
@@ -6901,7 +6922,7 @@ OUTPUT int Write_One2_nocretical(TS_UC device_var, TS_US address, TS_US val, boo
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚- The remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                 {
@@ -6985,7 +7006,7 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSerial==NULL)
         {
             return -1;
@@ -7006,17 +7027,17 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             data_to_send,// Êı¾İ»º³åÇøµØÖ·
-                             8,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             data_to_send,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             8,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osMulWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -7034,17 +7055,17 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0 ;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        to_send_data,// Êı¾İ»º³åÇøµØÖ·
-                        length*2+5,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                        to_send_data,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                        length*2+5,// æ•°æ®å¤§å° - Data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -7084,7 +7105,7 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSocket==INVALID_SOCKET)
         {
         	return -1;
@@ -7142,7 +7163,7 @@ OUTPUT int read_multi2_nocretical(TS_UC device_var,TS_US *put_data_into_here,TS_
         //data_to_send[6]=(crc>>8) & 0xff;
         //data_to_send[7]=crc & 0xff;/
 
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -7192,7 +7213,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
         //the return value == -5 ,the input have some trouble
         //the return value == -6 , the bus has bannet protocol,scan stop;
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
         //the return value is the register address
         strlog.Format(_T("Com Scan:  From ID=%d To ID=%d"), devLo, devHi);
         //WriteLogFile(strlog);
@@ -7204,7 +7225,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
             gval[i] = 0;/////////////////////////////////////////clear buffer
         TS_UC  pval[6];
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = 255;
         pval[1] = 25;  //put comments here,
         pval[2] = devHi;
@@ -7235,17 +7256,17 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
 
         ClearCommError(m_hSerial, &dwErrorFlags, &ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);//clear buffer
-        int fState = WriteFile(m_hSerial,// ¾ä±ú
-            pval,// Êı¾İ»º³åÇøµØÖ·
-            6,// Êı¾İ´óĞ¡
-            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+            pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+            6,// æ•°æ®å¤§å° - Data size
+            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
             &m_osWrite);
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
                                                                                                    //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                                                                                                    //				AfxMessageBox("wrong1");
             }
@@ -7267,17 +7288,17 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState = ReadFile(m_hSerial,// ¾ä±ú
-            gval,// Êı¾İ»º³åÇøµØÖ·
-            13,// Êı¾İ´óĞ¡
-            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState = ReadFile(m_hSerial,// å¥æŸ„ - handle
+            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+            13,// æ•°æ®å¤§å° - data size
+            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
             &m_osRead);
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - overlapping not supported
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number = 0;
@@ -7310,14 +7331,14 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
             strValue.Format(_T("%0X, "), nValue);
             //g_fileScanLog->WriteString(strValue);
             filelog += strValue;
-            if ((nValue == 0x55) && ((i + 1)<13))	//ÎªÁË·ÀÖ¹ÎóÅĞ£¬¼ì²â2¸öÖÜÆÚµÄ 55 ff  ¡£¡£¡£¡£55 ff;
+            if ((nValue == 0x55) && ((i + 1)<13))	//ä¸ºäº†é˜²æ­¢è¯¯åˆ¤ï¼Œæ£€æµ‹2ä¸ªå‘¨æœŸçš„ 55 ff  ã€‚ã€‚ã€‚ã€‚55 ff - To prevent misjudgment, detect 2 cycles of 55 ff;
             {
                 if ((gval[i + 1] == 0xff) && (i + 8)<13)
                 {
                     if ((gval[i + 8] == 0x55) && (i + 9)<13)
                     {
                         if (gval[i + 9] == 0xff)
-                            return -6;//×ÜÏßÉÏÓĞbacnetĞ­Òé£¬½áÊøÉ¨Ãè;
+                            return -6;//æ€»çº¿ä¸Šæœ‰bacnetåè®®ï¼Œç»“æŸæ‰«æ - BACnet protocol exists on the bus, end scanning;
                     }
 
                 }
@@ -7335,7 +7356,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
             //WriteLogFile(_T(">>No one device answer......"));
         }
 
-        if (gval[7] == 0 && gval[8] == 0 && gval[9] == 0 && gval[10] == 0 && gval[11] == 0 && gval[12] == 0)  //modify by fance .½â¾öÉ¨ÃèĞ£Ñé¸ÕºÃÎª0¶øÉ¨²»µ½µÄ bug;
+        if (gval[7] == 0 && gval[8] == 0 && gval[9] == 0 && gval[10] == 0 && gval[11] == 0 && gval[12] == 0)  //modify by fance .è§£å†³æ‰«ææ ¡éªŒåˆšå¥½ä¸º0è€Œæ‰«ä¸åˆ°çš„ bug - Fixed bug where scan verification happens to be 0 and cannot be scanned;
                                                                                                               //if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
         {
             //old scan protocal
@@ -7382,7 +7403,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
             // new scan protocal,if many old tstat ,get into here ,scan result is oK too.
             old_or_new_scan_protocal_in_dll = 1;
             Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
-            if ((devLo == devHi) && ((gval[9] != 0 || gval[10] != 0 || gval[11] != 0 || gval[12] != 0)))  //Èç¹û2·Ö·¨ ÆğÊ¼ID Ò»Ñù »¹ÊÕµ½À¬»øÊı¾İ£¬ËµÃ÷×ÜÏßÊı¾İÓĞ´íÎó;
+            if ((devLo == devHi) && ((gval[9] != 0 || gval[10] != 0 || gval[11] != 0 || gval[12] != 0)))  //å¦‚æœ2åˆ†æ³• èµ·å§‹ID ä¸€æ · è¿˜æ”¶åˆ°åƒåœ¾æ•°æ®ï¼Œè¯´æ˜æ€»çº¿æ•°æ®æœ‰é”™è¯¯;
                 return -6;
             if (gval[9] != 0 || gval[10] != 0 || gval[11] != 0 || gval[12] != 0)//to inspect
                 return -3;
@@ -7422,7 +7443,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
         //the return value is the register address
         SOCKET m_hSocket = NULL;
         m_hSocket = m_tcp_hSocket[ncomport];
@@ -7436,7 +7457,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
 
         TS_UC  pval[10];
         //		TS_US crc;
-        //		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•°
         pval[0] = 1;
         pval[1] = 2;
         pval[2] = 3;
@@ -7459,7 +7480,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
         {
             return -1;
         }
-        int nRet = ::send(m_hSocket, (char*)pval, sizeof(pval), 0);//scan É¨NCÖĞµÄTSTAT
+        int nRet = ::send(m_hSocket, (char*)pval, sizeof(pval), 0);//scan æ‰«NCä¸­çš„TSTAT
 
                                                                    //Sleep(SLEEP_TIME+8);
         Sleep(LATENCY_TIME_NET + 100);
@@ -7553,7 +7574,7 @@ OUTPUT int CheckTstatOnline2_a_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_T
         //				}
         //
         //				g_fileScanLog->WriteString(_T("\n"));
-        //				g_fileScanLog->WriteString(strreceive+_T("\n"));//¡ü
+        //				g_fileScanLog->WriteString(strreceive+_T("\n"));//â†‘
         //				for (int i =0;i<sizeof(rvData);i++)
         //				{
         //					idate =(int)rvData[i];
@@ -7668,7 +7689,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         //the return value == -5 ,the input have some trouble
         //the return value == -6 , the bus has bannet protocol,scan stop;
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
         strlog.Format(_T("Com Scan:  From ID=%d To ID=%d"),devLo,devHi);
         //WriteLogFile(strlog);
@@ -7680,7 +7701,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_UC  pval[6];
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•°
         pval[0] = 255;
         pval[1] = 25;  //put comments here,
         pval[2] = devHi;
@@ -7704,17 +7725,17 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 
         ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
         PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,// Êı¾İ»º³åÇøµØÖ·
-                             6,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                             pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                             6,// æ•°æ®å¤§å° - data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                              &m_osWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾… - wait
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -7734,17 +7755,17 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        gval,// Êı¾İ»º³åÇøµØÖ·
-                        13,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                        gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                        13,// æ•°æ®å¤§å° - data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾… - wait
             }
             else
                 m_had_send_data_number=0;
@@ -7777,14 +7798,14 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
             strValue.Format(_T("%0X, "), nValue);
             //g_fileScanLog->WriteString(strValue);
             filelog+=strValue;
-            if((nValue == 0x55) &&((i+1)<13))	//ÎªÁË·ÀÖ¹ÎóÅĞ£¬¼ì²â2¸öÖÜÆÚµÄ 55 ff  ¡£¡£¡£¡£55 ff;
+            if((nValue == 0x55) &&((i+1)<13))	//ä¸ºäº†é˜²æ­¢è¯¯åˆ¤ï¼Œæ£€æµ‹2ä¸ªå‘¨æœŸçš„ 55 ff  ã€‚ã€‚ã€‚ã€‚55 ff - To prevent misjudgment, detect 2 cycles of 55 ff;
             {
                 if((gval[i+1] == 0xff) && (i+8)<13)
                 {
                     if((gval[i+8] == 0x55) && (i+9)<13)
                     {
                         if(gval[i+9] == 0xff)
-                            return -6;//×ÜÏßÉÏÓĞbacnetĞ­Òé£¬½áÊøÉ¨Ãè;
+                            return -6;//æ€»çº¿ä¸Šæœ‰bacnetåè®®ï¼Œç»“æŸæ‰«æ - BACnet protocol exists on the bus, end scanning;
                     }
 
                 }
@@ -7802,7 +7823,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
             //WriteLogFile(_T(">>No one device answer......"));
         }
 
-		if(gval[7]==0 && gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)  //modify by fance .½â¾öÉ¨ÃèĞ£Ñé¸ÕºÃÎª0¶øÉ¨²»µ½µÄ bug;
+		if(gval[7]==0 && gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)  //modify by fance .è§£å†³æ‰«ææ ¡éªŒåˆšå¥½ä¸º0è€Œæ‰«ä¸åˆ°çš„ bug - Fixed bug where scan verification happens to be 0 and cannot be scanned;
         //if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
         {
             //old scan protocal
@@ -7887,7 +7908,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
         strlog.Format(_T("NET Scan:  From ID=%d To ID=%d"),devLo,devHi);
         //NET_WriteLogFile(strlog);
@@ -7899,7 +7920,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 
         TS_UC  pval[10];
 //		TS_US crc;
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - number of bytes sent
         pval[0]=1;
         pval[1]=2;
         pval[2]=3;
@@ -7922,7 +7943,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         {
             return -1;
         }
-        int nRet =::send(m_hSocket,(char*)pval,sizeof(pval),0);//scan É¨NCÖĞµÄTSTAT
+        int nRet =::send(m_hSocket,(char*)pval,sizeof(pval),0);//scan æ‰«NCä¸­çš„TSTAT
 
         //Sleep(SLEEP_TIME+8);
         Sleep(LATENCY_TIME_NET+100);
@@ -8016,7 +8037,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 //				}
 //
 //				g_fileScanLog->WriteString(_T("\n"));
-//				g_fileScanLog->WriteString(strreceive+_T("\n"));//¡ü
+//				g_fileScanLog->WriteString(strreceive+_T("\n"));//â†‘
 //				for (int i =0;i<sizeof(rvData);i++)
 //				{
 //					idate =(int)rvData[i];
@@ -8127,7 +8148,7 @@ OUTPUT int CheckTstatOnline_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_Type
         //the return value == -5 ,the input have some trouble
         //the return value == -6 , the bus has bannet protocol,scan stop;
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if (devLo<1 || devHi>254)
@@ -8139,7 +8160,7 @@ OUTPUT int CheckTstatOnline_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_Type
 
         int the_return_value;
         int the_return_value2 = 0;
-        //CheckTstatOnline2_a ¿ÉÒÔ¼ÇÂ¼ÊÕ·¢µÄÊı¾İ
+        //CheckTstatOnline2_a å¯ä»¥è®°å½•æ”¶å‘çš„æ•°æ® - CheckTstatOnline2_a can record sent and received data
         the_return_value = CheckTstatOnline2_a_nocretical(devLo, devHi, bComm_Type,ncomport);
         if (the_return_value == -6)
             return -6;
@@ -8190,7 +8211,7 @@ OUTPUT int CheckTstatOnline_nocretical(TS_UC devLo, TS_UC devHi, bool bComm_Type
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         SOCKET m_hSocket = NULL;
@@ -8261,7 +8282,7 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         //the return value == -5 ,the input have some trouble
         //the return value == -6 , the bus has bannet protocol,scan stop;
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -8272,7 +8293,7 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         }
         int the_return_value;
         int the_return_value2=0;
-        //CheckTstatOnline2_a ¿ÉÒÔ¼ÇÂ¼ÊÕ·¢µÄÊı¾İ
+        //CheckTstatOnline2_a å¯ä»¥è®°å½•æ”¶å‘çš„æ•°æ® - CheckTstatOnline2_a can record the sent and received data
         the_return_value=CheckTstatOnline2_a(devLo,devHi, bComm_Type);
         if(the_return_value == -6)
             return -6;
@@ -8324,7 +8345,7 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
         //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
         //the return value == -5 ,the input have some trouble
         //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //the return value is the register address
         //Sleep(50);       //must use this function to slow computer
         if(devLo<1 || devHi>254)
@@ -8461,13 +8482,13 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - number of bytes sent
         pval[0] = device_var;
         pval[1] = 3;
         pval[2] = address>>8 & 0xFF ;
@@ -8496,17 +8517,17 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         m_osWrite.Offset = 0;
         m_osWrite.OffsetHigh = 0;
 
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,	// Êı¾İ»º³åÇøµØÖ·
-                             8,		// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                             pval,	// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                             8,		// æ•°æ®å¤§å° - data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                              &m_osWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
                 //			if(GetLastError()==ERROR_IO_PENDING)
                 //				AfxMessageBox("wrong1");
             }
@@ -8526,26 +8547,26 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         if(address==10)
         {
             serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            11,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                            11,// æ•°æ®å¤§å° - data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                             &m_osRead);
         }
         else
         {
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            7,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                            7,// æ•°æ®å¤§å° - data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                             &m_osRead);
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - overlapping not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -8604,7 +8625,7 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         //the return value ,-2 is wrong
         //the return value == -1 ,no connecting
         //return value == -3 ,no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
         //TS_UC  gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
 
@@ -8638,7 +8659,7 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
         for(int i=0; i<11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //TS_US crc;
-        //DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
 
         pval[0] = device_var;
         pval[1] = 3;
@@ -8752,14 +8773,14 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
 
         //		gval[8]={'\0'};//the data that get
         //      TS_UC  pval[9];
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -8815,10 +8836,10 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         Sleep(50);
         if(address!=10)
         {
-            fState=WriteFile(m_hSerial,// ¾ä±ú
-                             pval,// Êı¾İ»º³åÇøµØÖ·
-                             8,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                             pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                             8,// æ•°æ®å¤§å° - data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                              &m_osWrite);
         }
         else
@@ -8827,28 +8848,28 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=WriteFile(m_hSerial,// ¾ä±ú
-                                 pval,// Êı¾İ»º³åÇøµØÖ·
-                                 8,// Êı¾İ´óĞ¡
-                                 &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                                 pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                                 8,// æ•°æ®å¤§å° - data size
+                                 &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                                  &m_osWrite);
             }
             else
             {
                 //new protocal
-                fState=WriteFile(m_hSerial,// ¾ä±ú
-                                 pval,// Êı¾İ»º³åÇøµØÖ·
-                                 12,// Êı¾İ´óĞ¡
-                                 &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                                 pval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                                 12,// æ•°æ®å¤§å° - data size
+                                 &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                                  &m_osWrite);
             }
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å 
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
                 //			if(GetLastError()==ERROR_IO_INCOMPLETE)
                 //				AfxMessageBox("wrong1");
             }
@@ -8867,10 +8888,10 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         Sleep(LATENCY_TIME_COM);
         if(address!=10)
         {
-            fState=ReadFile(m_hSerial,// ¾ä±ú
-                            gval,// Êı¾İ»º³åÇøµØÖ·
-                            8,// Êı¾İ´óĞ¡
-                            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                            gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                            8,// æ•°æ®å¤§å° - data size
+                            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                             &m_osRead);
         }
         else
@@ -8878,28 +8899,28 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
             if(serinumber_in_dll[0]==0 && serinumber_in_dll[1]==0 && serinumber_in_dll[2]==0 && serinumber_in_dll[3]==0)
             {
                 //old protocal
-                fState=ReadFile(m_hSerial,// ¾ä±ú
-                                gval,// Êı¾İ»º³åÇøµØÖ·
-                                8,// Êı¾İ´óĞ¡
-                                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                                gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                                8,// æ•°æ®å¤§å° - data size
+                                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                                 &m_osRead);
             }
             else
             {
                 //new protocal
-                fState=ReadFile(m_hSerial,// ¾ä±ú
-                                gval,// Êı¾İ»º³åÇøµØÖ·
-                                12,// Êı¾İ´óĞ¡
-                                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+                fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                                gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                                12,// æ•°æ®å¤§å° - data size
+                                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                                 &m_osRead);
             }
         }
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped I/O not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -8948,7 +8969,7 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         //val         the value that you want to write to the register
         //the return value == -1 ,no connecting
         //the return value == -3 , no response
-        //Çå¿Õ´®¿Ú»º³åÇø
+        //æ¸…ç©ºä¸²å£ç¼“å†²åŒº
 
         //TS_UC data[12];
         TS_UC data[16];
@@ -8974,7 +8995,7 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         data[3]=0;
         data[4]=0;
         data[5]=6;
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         data[6] = device_var;
         data[7] = 6;
         data[8] = address>>8 & 0xFF ;
@@ -9006,7 +9027,7 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         for(int i=0; i<=11; i++)
             gval[i]=0;/////////////////////////////////////////clear buffer
         //	TS_US crc;
-        //	DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        //	DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -9021,7 +9042,7 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
         for(int i=0;i<=11;i++)
         	gval[i]=0;/////////////////////////////////////////clear buffer
         TS_US crc;
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         pval[0] = device_var;
         pval[1] = 6;
         pval[2] = address>>8 & 0xFF ;
@@ -9143,7 +9164,7 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if(m_hSerial==NULL)
         {
             return -1;
@@ -9164,17 +9185,17 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 
 
 
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             data_to_send,// Êı¾İ»º³åÇøµØÖ·
-                             8,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - Handle
+                             data_to_send,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                             8,// æ•°æ®å¤§å° - Data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                              &m_osMulWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -9191,17 +9212,17 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         m_osRead.OffsetHigh = 0 ;
         ////////////////////////////////////////////////clear com error
 
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        to_send_data,// Êı¾İ»º³åÇøµØÖ·
-                        length*2+5,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                        to_send_data,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                        length*2+5,// æ•°æ®å¤§å° - Data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -9241,7 +9262,7 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         data_to_send[6]=(crc>>8) & 0xff;
         data_to_send[7]=crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•°
         if(m_hSocket==INVALID_SOCKET)
         {
         	return -1;
@@ -9298,7 +9319,7 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
         //data_to_send[6]=(crc>>8) & 0xff;
         //data_to_send[7]=crc & 0xff;/
 
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - the number of data that has been sent
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -9321,14 +9342,14 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 
         if (nRecv < 0)
         {
-            unsigned int t1 = GetTickCount();//³ÌĞò¶Î¿ªÊ¼Ç°È¡µÃÏµÍ³ÔËĞĞÊ±¼ä(ms);
+            unsigned int t1 = GetTickCount();//ç¨‹åºæ®µå¼€å§‹å‰å–å¾—ç³»ç»Ÿè¿è¡Œæ—¶é—´(ms); - Get system running time (ms) before the program segment starts
             nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length * 2 + 12, 0);
-            unsigned int t2 = GetTickCount();//³ÌĞò¶Î¿ªÊ¼Ç°È¡µÃÏµÍ³ÔËĞĞÊ±¼ä(ms);
+            unsigned int t2 = GetTickCount();//ç¨‹åºæ®µå¼€å§‹å‰å–å¾—ç³»ç»Ÿè¿è¡Œæ—¶é—´(ms); - Get system running time (ms) before the program segment starts
             if (nRecv < 0)
             {
-                TRACE(_T("\r\n%u-%u , time  %u - %u = %u\r\n"), start_address, start_address+ length - 1,t2,t1,t2 - t1); //Timeout µÄÊ±¼ä;
+                TRACE(_T("\r\n%u-%u , time  %u - %u = %u\r\n"), start_address, start_address+ length - 1,t2,t1,t2 - t1); //Timeout çš„æ—¶é—´;
                 int nErr = WSAGetLastError();
-                if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+                if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚
                 {
                     if (last_connected_port != 0)
                         Open_Socket2(last_connected_ip, last_connected_port);
@@ -9388,7 +9409,7 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - the number of data that has been sent
         if(m_hSerial==NULL)
         {
             return -1;
@@ -9406,17 +9427,17 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0 ;
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             data_to_write,// Êı¾İ»º³åÇøµØÖ·
-                             length+9,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                             data_to_write,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                             length+9,// æ•°æ®å¤§å° - data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                              &m_osMulWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped I/O not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -9431,17 +9452,17 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        gval,// Êı¾İ»º³åÇøµØÖ·
-                        8,// Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                        gval,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                        8,// æ•°æ®å¤§å° - data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped I/O not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -9492,7 +9513,7 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - the number of data that has been sent
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -9548,7 +9569,7 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - the number of data that has been sent
         if(m_hSerial==NULL)
         {
             return -1;
@@ -9581,17 +9602,17 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
         }
 
         ///////////////////////////////////////////////////////send the to read message
-        int fState=WriteFile(m_hSerial,// ¾ä±ú
-                             data_to_write,// Êı¾İ»º³åÇøµØÖ·
-                             length,// Êı¾İ´óĞ¡
-                             &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState=WriteFile(m_hSerial,// å¥æŸ„ - handle
+                             data_to_write,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                             length,// æ•°æ®å¤§å° - data size
+                             &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                              &m_osMulWrite);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped I/O not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -9606,17 +9627,17 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
         m_osRead.OffsetHigh = 0 ;
         Sleep(LATENCY_TIME_COM);
         ////////////////////////////////////////////////clear com error
-        fState=ReadFile(m_hSerial,// ¾ä±ú
-                        gval,    // Êı¾İ»º³åÇøµØÖ·
-                        128,      // Êı¾İ´óĞ¡
-                        &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState=ReadFile(m_hSerial,// å¥æŸ„ - handle
+                        gval,    // æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+                        128,      // æ•°æ®å¤§å° - data size
+                        &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
                         &m_osRead);
-        if(!fState)// ²»Ö§³ÖÖØµş
+        if(!fState)// ä¸æ”¯æŒé‡å  - Overlapped I/O not supported
         {
             if(GetLastError()==ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number=0;
@@ -9665,7 +9686,7 @@ OUTPUT int SendData (TS_US *to_write,TS_US length,unsigned char *put_senddate_in
         hc = LoadCursor(NULL,IDC_WAIT);
         hc = SetCursor(hc);
         //length is the data length,if you want to write 128 bite,the length == 128
-//		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+//		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - the number of data that has been sent
         if(m_hSocket==INVALID_SOCKET)
         {
             return -1;
@@ -9741,7 +9762,7 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		data_to_send[6] = (crc >> 8) & 0xff;
 		data_to_send[7] = crc & 0xff;
 
-		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - the number of data that has been sent
 		if (m_hSerial == NULL)
 		{
 			return -1;
@@ -9766,17 +9787,17 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		}
 
 
-		int fState = WriteFile(m_hSerial,// ¾ä±ú
-			data_to_send,// Êı¾İ»º³åÇøµØÖ·
-			8,// Êı¾İ´óĞ¡
-			&m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+		int fState = WriteFile(m_hSerial,// å¥æŸ„ - handle
+			data_to_send,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+			8,// æ•°æ®å¤§å° - data size
+			&m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
 			&m_osMulWrite);
-		if (!fState)// ²»Ö§³ÖÖØµş
+		if (!fState)// ä¸æ”¯æŒé‡å  - Overlapped I/O not supported
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+				GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
 			}
 			else
 				m_had_send_data_number = 0;
@@ -9793,17 +9814,17 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 		m_osRead.OffsetHigh = 0;
 		////////////////////////////////////////////////clear com error
 
-		fState = ReadFile(m_hSerial,// ¾ä±ú
-			to_send_data,// Êı¾İ»º³åÇøµØÖ·
-			length * 2 + 5,// Êı¾İ´óĞ¡
-			&m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+		fState = ReadFile(m_hSerial,// å¥æŸ„ - handle
+			to_send_data,// æ•°æ®ç¼“å†²åŒºåœ°å€ - data buffer address
+			length * 2 + 5,// æ•°æ®å¤§å° - data size
+			&m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - number of bytes sent
 			&m_osRead);
-		if (!fState)// ²»Ö§³ÖÖØµş
+		if (!fState)// ä¸æ”¯æŒé‡å  - Overlapped I/O not supported
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
 				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+				GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
 			}
 			else
 				m_had_send_data_number = 0;
@@ -9936,7 +9957,7 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
 										 //data_to_send[6]=(crc>>8) & 0xff;
 										 //data_to_send[7]=crc & 0xff;/
 
-										 //		DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+										 //		DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - the number of data that has been sent
 		if (m_hSocket == INVALID_SOCKET)
 		{
 			return -1;
@@ -9955,7 +9976,7 @@ OUTPUT int Modbus_Standard_Read(TS_UC device_var, TS_US *put_data_into_here, int
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ - Remote host forcibly closed an existing connection
             {
                 if (last_connected_port != 0)
                     Open_Socket2(last_connected_ip, last_connected_port);
@@ -10071,9 +10092,9 @@ OUTPUT bool Open_Socket_For_All(CString strIPAdress, short nPort)
     servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
     //	u_long ul=1;
     //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-    //·¢ËÍÊ±ÏŞ
+    //å‘é€æ—¶é™
     setsockopt(m_hSocket, SOL_SOCKET, SO_SNDTIMEO, (char *)&nNetTimeout, sizeof(int));
-    //½ÓÊÕÊ±ÏŞ
+    //æ¥æ”¶æ—¶é™
     setsockopt(m_hSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int));
     if (::connect(m_hSocket, (sockaddr*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
     {
@@ -10089,20 +10110,20 @@ OUTPUT bool Open_Socket_For_All(CString strIPAdress, short nPort)
 }
 
 
-//Ğ£Ñé×ÜÏßÉÏµÄÊı¾İ,ÊÇ·ñÓĞbacnet µÄ55  FF µÄ Êı¾İ
+//æ ¡éªŒæ€»çº¿ä¸Šçš„æ•°æ®,æ˜¯å¦æœ‰bacnet çš„55  FF çš„ æ•°æ®
 int check_bacnet_data(unsigned char * buffer, int nlength)
 {
     if (nlength <= 2)
         return -1;
     unsigned char * nlast_point = buffer + nlength - 1;
     unsigned char * npoint = buffer;
-    int no_token_count = 0; //Á¬Ğø¶à¸ö×Ö½ÚÃ»ÓĞËÑµ½0x55µÄ¸öÊı 
+    int no_token_count = 0; //è¿ç»­å¤šä¸ªå­—èŠ‚æ²¡æœ‰æœåˆ°0x55çš„ä¸ªæ•° - Number of consecutive bytes without 0x55
     int token_count = 0;
     while ((npoint - buffer) < (nlength - 1))
     {
         if (no_token_count > 100)
         {
-            return -2; //×ÜÏßÎŞbacnet 55  ff Êı¾İ
+            return -2; //æ€»çº¿æ— bacnet 55  ff æ•°æ® - No bacnet 55 ff data on the bus
         }
         if (*npoint != 0x55)
         {
@@ -10119,7 +10140,7 @@ int check_bacnet_data(unsigned char * buffer, int nlength)
         }
         npoint++;
         token_count++;
-        if(token_count >= 3)  //Ò»Ö¡Êı¾İ³öÏÖ 55 FF µÄ¸öÊı´ïµ½3¸ö¾ÍÅĞ¶¨ÎªÓĞ bacnet mstp´æÔÚ
+        if(token_count >= 3)  //ä¸€å¸§æ•°æ®å‡ºç° 55 FF çš„ä¸ªæ•°è¾¾åˆ°3ä¸ªå°±åˆ¤å®šä¸ºæœ‰ bacnet mstpå­˜åœ¨ - If a frame of data contains 3 occurrences of 55 FF, it is determined that bacnet mstp exists
            return 1;
     }
 }
@@ -10141,15 +10162,15 @@ OUTPUT int Set_Test_Comport_Status(int command)
 }
 
 /* Test_Comport return
-    1  ·¢ÏÖÁ½¸öÖÜÆÚµÄ 55 FF ´æÔÚ
-    0  ´ú±í×ÜÏßÎŞÊı¾İ
-    -1 ÓĞÊı¾İ µ«³¤¶È²»×ã 8¸ö×Ö½Ú
-    -2 ¼àÊÓºÜ50¸ötoken ÒÔÉÏ µ«Ã»ÓĞ·¢ÏÖ 55 FF
-    -3 ¼ì²éÍê³¤¶È³¬¹ı×îºóµÃ ¶¼Ã»ÓĞ·¢ÏÖ 55 FF
-    -4 ÊÖ¶¯ÖÕÖ¹
-    -100  ´ú±í´®¿ÚºÅ´óÓÚ 100
-    -101  Í¬²½´ò¿ª´®¿ÚÊ§°Ü
-    -102  ´®¿Ú¾ä±úÎªÁã£¬ÎŞĞ§µÄ´®¿Ú
+    1  å‘ç°ä¸¤ä¸ªå‘¨æœŸçš„ 55 FF å­˜åœ¨ - Found two cycles of 55 FF
+    0  ä»£è¡¨æ€»çº¿æ— æ•°æ® - Represents no data on the bus
+    -1 æœ‰æ•°æ® ä½†é•¿åº¦ä¸è¶³ 8ä¸ªå­—èŠ‚ - Data exists but is less than 8 bytes
+    -2 ç›‘è§†å¾ˆ50ä¸ªtoken ä»¥ä¸Š ä½†æ²¡æœ‰å‘ç° 55 FF - Monitored more than 50 tokens but did not find 55 FF
+    -3 æ£€æŸ¥å®Œé•¿åº¦è¶…è¿‡æœ€åå¾— éƒ½æ²¡æœ‰å‘ç° 55 FF - Checked all lengths and did not find 55 FF
+    -4 æ‰‹åŠ¨ç»ˆæ­¢ - Manually terminated
+    -100  ä»£è¡¨ä¸²å£å·å¤§äº 100 - Represents a serial port number greater than 100
+    -101  åŒæ­¥æ‰“å¼€ä¸²å£å¤±è´¥ - Failed to open serial port synchronously
+    -102  ä¸²å£å¥æŸ„ä¸ºé›¶ï¼Œæ— æ•ˆçš„ä¸²å£ - Serial port handle is zero, invalid serial port
 */
 //OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret)
 OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudrate)
@@ -10172,7 +10193,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
             return -4;
         }
 
-        if (default_baudrate != 0) //Ä¬ÈÏ²»´« ²¨ÌØÂÊµÄÇé¿öÏÂ ¾Í¼ì²âËùÓĞµÄ ²¨ÌØÂÊ;
+        if (default_baudrate != 0) //é»˜è®¤ä¸ä¼  æ³¢ç‰¹ç‡çš„æƒ…å†µä¸‹ å°±æ£€æµ‹æ‰€æœ‰çš„ æ³¢ç‰¹ç‡;
         {
             ntest_ret[i].ncomport = comport;
             ntest_ret[i].test_ret = 0;
@@ -10237,7 +10258,7 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
         data_to_send[6] = (crc >> 8) & 0xff +20;
         data_to_send[7] = crc & 0xff + 20;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if (m_hSerial == NULL)
         {
             if (default_baudrate != 0)
@@ -10267,17 +10288,17 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
         m_com_osMulWrite[comport].Offset = 0;
         m_com_osMulWrite[comport].OffsetHigh = 0;
         ///////////////////////////////////////////////////////send the to read message
-        fState = WriteFile(m_hSerial,// ¾ä±ú
-            data_to_send,// Êı¾İ»º³åÇøµØÖ·
-            8,// Êı¾İ´óĞ¡
-            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+            data_to_send,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+            8,// æ•°æ®å¤§å° - Data size
+            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns the number of bytes sent
             &m_com_osMulWrite[comport]);
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_com_osMulWrite[comport], &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_com_osMulWrite[comport], &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number = 0;
@@ -10303,17 +10324,17 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
 
         Sleep(LATENCY_TIME_COM * 3);
         ////////////////////////////////////////////////clear com error
-        fState = ReadFile(m_hSerial,// ¾ä±ú
-            to_send_data,// Êı¾İ»º³åÇøµØÖ·
-            100 * 2 + 5,// Êı¾İ´óĞ¡
-            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+            to_send_data,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+            100 * 2 + 5,// æ•°æ®å¤§å° - Data size
+            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns the number of bytes sent
             &m_com_osRead[comport]);
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_com_osRead[comport], &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_com_osRead[comport], &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number = 0;
@@ -10388,13 +10409,13 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
         for (int j = 0;j < 30;j++)
         {
             Sleep(100);
-            if (ClearCommError(m_hSerial, &error, &stat) && error > 0)    //Çå³ı´íÎó
+            if (ClearCommError(m_hSerial, &error, &stat) && error > 0)    //æ¸…é™¤é”™è¯¯ - Clear errors
             {
-                PurgeComm(m_hSerial, PURGE_RXABORT | PURGE_RXCLEAR); /*Çå³ıÊäÈë»º³åÇø*/
+                PurgeComm(m_hSerial, PURGE_RXABORT | PURGE_RXCLEAR); /*æ¸…é™¤è¾“å…¥ç¼“å†²åŒº- Clear input buffer*/ 
                 continue;
             }
 
-            if (!stat.cbInQue)// »º³åÇøÎŞÊı¾İ
+            if (!stat.cbInQue)// ç¼“å†²åŒºæ— æ•°æ® - Buffer is empty
                 continue;
 
             buf_len = min((int)(buf_len - 1), (int)stat.cbInQue);
@@ -10409,13 +10430,13 @@ OUTPUT int Test_Comport(int comport, baudrate_def* ntest_ret, int default_baudra
             m_osRead.OffsetHigh = 0;
 
 
-            if (!ReadFile(m_hSerial, buf, buf_len, &r_len, &m_osRead)) //2000 ÏÂ ReadFile Ê¼ÖÕ·µ»Ø True
+            if (!ReadFile(m_hSerial, buf, buf_len, &r_len, &m_osRead)) //2000 ä¸‹ ReadFile å§‹ç»ˆè¿”å› True - Under 2000, ReadFile always returns True
             {
-                if (GetLastError() == ERROR_IO_PENDING) // ½áÊøÒì²½I/O
+                if (GetLastError() == ERROR_IO_PENDING) // ç»“æŸå¼‚æ­¥I/O - End asynchronous I/O
                 {
                     if (!GetOverlappedResult(m_hSerial, &m_osRead, &r_len, false))
                     {
-                        if (GetLastError() != ERROR_IO_INCOMPLETE)//ÆäËû´íÎó
+                        if (GetLastError() != ERROR_IO_INCOMPLETE)//å…¶ä»–é”™è¯¯ - Other errors
                             r_len = 0;
                     }
                 }
@@ -10459,7 +10480,7 @@ OUTPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_
 
         return -101;
     }
-    // Çå¿Õ´®¿Ú»º³åÇø
+    // æ¸…ç©ºä¸²å£ç¼“å†²åŒº - Clear serial port buffer
     PurgeComm(m_com_h_serial[comport], PURGE_RXCLEAR | PURGE_TXCLEAR);
     DWORD nerrors1; COMSTAT com_stats1;
     ::ClearCommError(m_com_h_serial[comport], &nerrors1, &com_stats1);
@@ -10479,7 +10500,7 @@ OUTPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_
                 return -4;
             }
 
-            if (default_baudrate != 0) //Ä¬ÈÏ²»´« ²¨ÌØÂÊµÄÇé¿öÏÂ ¾Í¼ì²âËùÓĞµÄ ²¨ÌØÂÊ;
+            if (default_baudrate != 0) //é»˜è®¤ä¸ä¼  æ³¢ç‰¹ç‡çš„æƒ…å†µä¸‹ å°±æ£€æµ‹æ‰€æœ‰çš„ æ³¢ç‰¹ç‡; - In the case where the default baud rate is not passed, all baud rates are detected.
             {
                 ntest_ret[i].ncomport = comport;
                 ntest_ret[i].test_ret = 0;
@@ -10547,7 +10568,7 @@ OUTPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_
             data_to_send[6] = (crc >> 8) & 0xff + 20;
             data_to_send[7] = crc & 0xff + 20;
 
-            DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+            DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
             if (m_hSerial == NULL)
             {
                 if (default_baudrate != 0)
@@ -10580,25 +10601,25 @@ OUTPUT int Check_Mstp_Comport(int comport, baudrate_def* ntest_ret, int default_
 
             Sleep(LATENCY_TIME_COM * 5);
             ////////////////////////////////////////////////clear com error
-            fState = ReadFile(m_hSerial,// ¾ä±ú
-                to_send_data,// Êı¾İ»º³åÇøµØÖ·
-                100 * 2 + 5,// Êı¾İ´óĞ¡
-                &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+            fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+                to_send_data,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+                100 * 2 + 5,// æ•°æ®å¤§å° - Data size
+                &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
                 &m_com_osRead[comport]);
-            if (!fState)// ²»Ö§³ÖÖØµş
+            if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
             {
                 if (GetLastError() == ERROR_IO_PENDING)
                 {
                     //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                    BOOL result = GetOverlappedResult(m_hSerial, &m_com_osRead[comport], &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                    BOOL result = GetOverlappedResult(m_hSerial, &m_com_osRead[comport], &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
                     if (result)
                     {
-                        // ²Ù×÷³É¹¦£¬´¦Àí´«ÊäµÄ×Ö½ÚÊı
+                        // æ“ä½œæˆåŠŸï¼Œå¤„ç†ä¼ è¾“çš„å­—èŠ‚æ•° - Operation succeeded, process the number of bytes transferred
                         TRACE("Bytes transferred: %lu\n", m_had_send_data_number);
                     }
                     else
                     {
-                        // ²Ù×÷Ê§°Ü£¬»ñÈ¡´íÎóĞÅÏ¢
+                        // æ“ä½œå¤±è´¥ï¼Œè·å–é”™è¯¯ä¿¡æ¯ - Operation failed, get error information
                         DWORD error = GetLastError();
                         TRACE("GetOverlappedResult failed with error: %lu\n", error);
                     }
@@ -10670,7 +10691,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
         data_to_send[6] = 0x4F; //O
 
         data_to_send[7] = 0x07;  
-        data_to_send[8] = 0x00;  // ÕâÇ°ÃæÁ½¸öÖ»¸øprgºÍmonitorÊ¹ÓÃ
+        data_to_send[8] = 0x00;  // è¿™å‰é¢ä¸¤ä¸ªåªç»™prgå’Œmonitorä½¿ç”¨
         data_to_send[9] = command;
         data_to_send[10] = start_instance;
         data_to_send[11] = end_instance;
@@ -10680,7 +10701,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
         data_to_send[14] = (crc >> 8) & 0xff;
         data_to_send[15] = crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if (m_hSerial == NULL)
         {
             return -1;
@@ -10701,17 +10722,17 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
 
 
 
-        int fState = WriteFile(m_hSerial,// ¾ä±ú
-            data_to_send,// Êı¾İ»º³åÇøµØÖ·
-            16,// Êı¾İ´óĞ¡
-            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+            data_to_send,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+            16,// æ•°æ®å¤§å° - Data size
+            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
             &m_osMulWrite);
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å 
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number = 0;
@@ -10735,18 +10756,18 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
         {
             data_length = (end_instance - start_instance + 1)*entitysize;
         }
-        
-        fState = ReadFile(m_hSerial,// ¾ä±ú
-            read_buffer_data,// Êı¾İ»º³åÇøµØÖ·
-            data_length + 14 + 2,// Êı¾İ´óĞ¡
-            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+
+        fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+            read_buffer_data,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+            data_length + 14 + 2,// æ•°æ®å¤§å° - Data size
+            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
             &m_osRead);
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number = 0;
@@ -10791,7 +10812,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
         data_to_send[6+6] = 0x4F; //O
 
         data_to_send[7+6] = 0x07;
-        data_to_send[8+6] = 0x00;  // ÕâÇ°ÃæÁ½¸öÖ»¸øprgºÍmonitorÊ¹ÓÃ
+        data_to_send[8+6] = 0x00;  // è¿™å‰é¢ä¸¤ä¸ªåªç»™prgå’Œmonitorä½¿ç”¨ - These two are only for prg and monitor
         data_to_send[9+6] = command;
         data_to_send[10+6] = start_instance;
         data_to_send[11+6] = end_instance;
@@ -10827,7 +10848,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚- The remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                 {
@@ -10846,7 +10867,7 @@ OUTPUT int read_ptp_data(unsigned char device_var, unsigned char *put_data_into_
             data_length = (end_instance - start_instance + 1)*entitysize;
         }
 
-        memcpy((void*)read_buffer_data, rvData + 6, data_length + 14 + 2);// Êı¾İ´óĞ¡
+        memcpy((void*)read_buffer_data, rvData + 6, data_length + 14 + 2);// æ•°æ®å¤§å° - Data size
 
         for (int x = 0; x < 14; x++)
         {
@@ -10889,7 +10910,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         data_to_send[nlength + 7] = (crc >> 8) & 0xff;
         data_to_send[nlength + 8] = crc & 0xff;
 
-        DWORD m_had_send_data_number;//ÒÑ¾­·¢ËÍµÄÊı¾İµÄ×Ö½ÚÊı
+        DWORD m_had_send_data_number;//å·²ç»å‘é€çš„æ•°æ®çš„å­—èŠ‚æ•° - Number of bytes sent
         if (m_hSerial == NULL)
         {
             return -1;
@@ -10907,17 +10928,17 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         m_osMulWrite.Offset = 0;
         m_osMulWrite.OffsetHigh = 0;
         ///////////////////////////////////////////////////////send the to read message
-        int fState = WriteFile(m_hSerial,// ¾ä±ú
-            data_to_send,// Êı¾İ»º³åÇøµØÖ·
-            nlength + 9,// Êı¾İ´óĞ¡
-            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        int fState = WriteFile(m_hSerial,// å¥æŸ„ - Handle
+            data_to_send,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+            nlength + 9,// æ•°æ®å¤§å° - Data size
+            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
             &m_osMulWrite);
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_osWrite, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number = 0;
@@ -10931,17 +10952,17 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         m_osRead.Offset = 0;
         m_osRead.OffsetHigh = 0;
         Sleep(LATENCY_TIME_COM);
-        fState = ReadFile(m_hSerial,// ¾ä±ú
-            read_buffer_data,// Êı¾İ»º³åÇøµØÖ·
-            7 + 7 + 2,// Êı¾İ´óĞ¡
-            &m_had_send_data_number,// ·µ»Ø·¢ËÍ³öÈ¥µÄ×Ö½ÚÊı
+        fState = ReadFile(m_hSerial,// å¥æŸ„ - Handle
+            read_buffer_data,// æ•°æ®ç¼“å†²åŒºåœ°å€ - Data buffer address
+            7 + 7 + 2,// æ•°æ®å¤§å° - Data size
+            &m_had_send_data_number,// è¿”å›å‘é€å‡ºå»çš„å­—èŠ‚æ•° - Returns number of bytes sent
             &m_osRead);
-        if (!fState)// ²»Ö§³ÖÖØµş
+        if (!fState)// ä¸æ”¯æŒé‡å  - Does not support overlap
         {
             if (GetLastError() == ERROR_IO_PENDING)
             {
                 //WaitForSingleObject(m_osRead.hEvent,INFINITE);
-                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// µÈ´ı
+                GetOverlappedResult(m_hSerial, &m_osRead, &m_had_send_data_number, TRUE_OR_FALSE);// ç­‰å¾…
             }
             else
                 m_had_send_data_number = 0;
@@ -11015,7 +11036,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         if (nRecv < 0)
         {
             int nErr = WSAGetLastError();
-            if (nErr == 10054)   //10054  ´íÎóÂë   Ô¶³ÌÖ÷»úÇ¿ÆÈ¹Ø±ÕÁËÒ»¸öÏÖÓĞµÄÁ¬½Ó¡£
+            if (nErr == 10054)   //10054  é”™è¯¯ç    è¿œç¨‹ä¸»æœºå¼ºè¿«å…³é—­äº†ä¸€ä¸ªç°æœ‰çš„è¿æ¥ã€‚- The remote host forcibly closed an existing connection.
             {
                 if (last_connected_port != 0)
                 {
@@ -11027,8 +11048,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
         }
 
 
-        memcpy((void*)read_buffer_data, rvData + 6, nlength + 8  + 1);// Êı¾İ´óĞ¡
-
+        memcpy((void*)read_buffer_data, rvData + 6, nlength + 8  + 1);// æ•°æ®å¤§å° - Data size
 
         for (int x = 0; x < 14; x++)
         {

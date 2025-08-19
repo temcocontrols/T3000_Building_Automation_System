@@ -335,6 +335,7 @@ void CGraphicMode::ShowChecks(){
 void CGraphicMode::OnBnClickedUser(){
 
 	 
+		//Indicates selected state
 		if (product_register_value[g_calibration_module_data.User_Table_Selection.regAddress] == 1)//说明是选中状态
 		{
 

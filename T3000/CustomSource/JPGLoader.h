@@ -7,7 +7,7 @@
 	file ext:	h
 	author:		ZGQ
 	
-	purpose:	加载JPG文件，并显示到指定的窗口
+	purpose:	加载JPG文件，并显示到指定的窗口 - Load JPG files and display them in a specified window
 *********************************************************************/
 
 

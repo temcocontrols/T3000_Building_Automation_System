@@ -44,10 +44,13 @@ BOOL CDialog_Progess::OnInitDialog()
 	CDialog::OnInitDialog();
 
 			
+	//Set the range of the progress bar
 	//设置进度条的范围
 		m_progress.SetRange(m_lower,m_upper);
+	//Set the increment of each step of the progress bar
 	//设置进度条的每一步的增量
 	//	m_progress.SetStep(m_setsetup);
+	//Set the current position of the progress bar
 	//设置进度条的当前位置
 //	SetTimer(1, 1000, NULL);
 

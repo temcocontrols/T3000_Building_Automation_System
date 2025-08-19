@@ -306,6 +306,7 @@ BOOL COutPutDlg::OnInitDialog()
 
 
         GetDlgItem(IDC_STATIC_FAN_MODE_NAME)->ShowWindow(FALSE);
+        // Fan 2018 01 17 Even if there is no fan name, the default name should be displayed, otherwise showing just a bare button is unreasonable
         //GetDlgItem(IDC_STATIC_FAN_OFF)->ShowWindow(FALSE);   //Fan 2018 01 17 即便没有fan名字也要现实默认名字，否则光秃秃的 show 一个button  太不合情理
         //GetDlgItem(IDC_STATIC_FAN_ON)->ShowWindow(FALSE);
         //GetDlgItem(IDC_STATIC_FAN_LOW)->ShowWindow(FALSE);
@@ -477,6 +478,7 @@ BOOL COutPutDlg::OnInitDialog()
 		int currentrow=0;
 		for (int i=0;i<5;i++)
 		{
+			// Found the first PWM
 			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==3)//找到了第一个pwm
 			{
 				m_pwm_row1=i+1;
@@ -486,6 +488,7 @@ BOOL COutPutDlg::OnInitDialog()
 		}
 		for (int i=currentrow;i<5;i++)
 		{
+			// Found the first PWM
 			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==3)//找到了第一个pwm
 			{
 				m_pwm_row2=i+1;
@@ -498,6 +501,7 @@ BOOL COutPutDlg::OnInitDialog()
 		int currentrow=0;
 		for (int i=0;i<5;i++)
 		{
+			// Found the first PWM
 			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==2)//找到了第一个pwm
 			{
 				m_pwm_row1=i+1;
@@ -507,6 +511,7 @@ BOOL COutPutDlg::OnInitDialog()
 		}
 		for (int i=currentrow;i<5;i++)
 		{
+			// Found the first PWM
 			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==2)//找到了第一个pwm
 			{
 				m_pwm_row2=i+1;
@@ -526,6 +531,7 @@ BOOL COutPutDlg::OnInitDialog()
 
 		GetWindowPlacement(&wp);
 
+        // Repeated calls to OnInitDialog will keep adding; 
         if(wp.rcNormalPosition.bottom<1038)      //重新调用 OnInitDialog时 会反复增加;
 		    wp.rcNormalPosition.bottom += 120;
 
@@ -708,6 +714,7 @@ void COutPutDlg::put_fan_variable()
 		 
 		m_fan.ResetContent();
 		//if(read_one(g_tstat_id,107)==1)////here can't use  function
+		// If you try to read, it will often hang here.
 		if(product_register_value[107] == 1)////here can't use  function  如果去读，常会死在这里。
 		{
 			strdemo = _T("1-4-1,");
@@ -799,6 +806,7 @@ void COutPutDlg::put_fan_variable()
 	else
 	{
 
+// 		Start read_one(g_tstat_id,129)==1
 // 		strdemo = _T("read_one(g_tstat_id,129)==1开始");
 // 		SetPaneString(2,strdemo);
 		//if(read_one(g_tstat_id,129)==1)////here can't use  function//0912
@@ -818,6 +826,7 @@ void COutPutDlg::put_fan_variable()
 		   default:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
 			}
 		}
+// 		Finished read_one(g_tstat_id,129)==1
 // 		strdemo = _T("read_one(g_tstat_id,129)==1完成");
 // 		SetPaneString(2,strdemo);
 		m_fan.SetCurSel(product_register_value[137]);
@@ -1273,6 +1282,7 @@ if(product_register_value[129]==1)
 	m_FlexGrid1.put_TextMatrix(0,1,_T("Description"));
 	m_FlexGrid1.put_TextMatrix(0,2,_T("Function"));
 	m_FlexGrid1.put_TextMatrix(0,3,_T("Rotation"));
+	// Hide Rotation
 	m_FlexGrid1.put_ColWidth(3,0);//隐藏Rotation
 	m_FlexGrid1.put_TextMatrix(0,4,_T("Control"));
 	m_FlexGrid1.put_TextMatrix(0,5,_T("InterLock"));
@@ -1354,6 +1364,7 @@ if(product_register_value[129]==1)
 		totalrows = 5;
 		
 	if(m_nmoduleType == 3)//2.5.0.99
+		// As long as it's Tstat, there are 7 outputs
 		totalrows = 7;//只要是Tstat都是7个输出
 
 	int pid_select2[7]={0};
@@ -1362,6 +1373,7 @@ if(product_register_value[129]==1)
 			pid_select2[i]=product_register_value[MODBUS_PID_OUTPUT1+i];/////////////////////////////get pid select ;col one 1
 			
  
+	// lsc add default to pid1
 	m_pids = pid_select2[0];//lsc add 默认为pid1
 	//new feature:
 	short nRotation;
@@ -1428,10 +1440,12 @@ if(product_register_value[129]==1)
 			else
 				tstatval = product_register_value[138+nFan * 7 + pos];
 			CString str;
+			     // PID2 is selected, PID1 becomes grayed out
 			{    //被选中Pid2，Pid1变灰
 				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
 					if(pid_select2[row-1]==1||pid_select2[row-1]==2)
 						FLEX_GRID1_PUT_COLOR_STR(row,col,str);
+						// col +1//Grayed out, not displayed
 						//col +1//变灰不显示
 					else
 						FLEX_GRID1_PUT_STR(row,col,str);
@@ -1440,6 +1454,7 @@ if(product_register_value[129]==1)
 
 		}
 	}
+// Previously only displayed the first three rows of data
 //以前只显示了前三排的数据
 #if 1 //test
 	if(m_nmoduleType == 1 || m_nmoduleType == 3)
@@ -1455,6 +1470,7 @@ if(product_register_value[129]==1)
 			else
 				pos = col - (m_PID1_heat_stages+1);
 			 
+			// a,d,g 3 is tstat5g//2.5.0.99
 			if(product_register_value[MODBUS_FAN_SPEED]==0)//a,d,g 3就是tstat5g//2.5.0.99
 			{
 					tstatval = product_register_value[351+ pos];
@@ -1499,6 +1515,7 @@ if(product_register_value[129]==1)
 				//if(/*tstatval>63*/TRUE)//
 				//{
 			
+					// Second to last row
 					if(row==(totalrows-1))//倒数第二行
 					{
 					if (product_register_value[186]!=0)
@@ -1549,6 +1566,7 @@ if(product_register_value[129]==1)
 				 
 					}
 					}
+					// Last one
 					if(row==totalrows)//倒数第一个
 					{
 					if (product_register_value[187]!=0)
@@ -1618,6 +1636,7 @@ if(product_register_value[129]==1)
 		}
 	}
 
+// output4_value =product_register_value[283]; // 1 means floating
 // 	output4_value =product_register_value[283]; // 1 表示floating
 // 	output5_value =product_register_value[284];
 	if (product_register_value[7] == 18) // 2.5.0.98
@@ -1799,6 +1818,7 @@ if(product_register_value[129]==1)
 		}
 
 	}
+	// 2 means PWM
 	if(m_bOut4PWM) // 2表示PWM
 	{
 
@@ -1834,6 +1854,7 @@ if(product_register_value[129]==1)
 				default:
 					strTemp=_T("");
 				}
+			// 2.5.0.98  1 means pid2
 			if(pid_select2[4-1]==1||pid_select2[4-1]==2)//2.5.0.98  1表示pid2
 				FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp);
 				else

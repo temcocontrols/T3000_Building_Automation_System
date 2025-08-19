@@ -1,6 +1,7 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////
+// Calculate the correspondence between scale marks and pixels, return this array
 // 计算刻度与象素的对应关系，返回这个数组
 
 

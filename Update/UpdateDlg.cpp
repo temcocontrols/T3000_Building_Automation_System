@@ -14,7 +14,7 @@
 
 #include "..\\Update\\MFC16API.h"
 #pragma comment(lib,"..\\Update\\MFC16API.lib")
-CString cs_new_name; //×Ô¶¨ÒåÈí¼þµÄÃû×Ö;
+CString cs_new_name; //×Ô¶¨ÒåÈí¼þµÄÃû×Ö; - Custom Software Name
 bool run_t3000 = true;
 
 HANDLE getftpthread = NULL;
@@ -126,7 +126,7 @@ bool CUpdateDlg::DeleteDirectory(CString DirName)
             }
             else
             {
-                SetFileAttributes(strDirName, FILE_ATTRIBUTE_NORMAL); //È¥µôÎÄ¼þµÄÏµÍ³ºÍÒþ²ØÊôÐÔ
+                SetFileAttributes(strDirName, FILE_ATTRIBUTE_NORMAL); //È¥µôÎÄ¼þµÄÏµÍ³ºÍÒþ²ØÊôÐÔ - Remove system and hidden attributes
                 DeleteFile(strDirName);
             }
         }
@@ -232,9 +232,9 @@ void CUpdateDlg::InitialTemcoLogo()
         IMAGE_BITMAP, 0, 0,
         LR_LOADMAP3DCOLORS);
 
-    CStatic *pStatic = (CStatic *)GetDlgItem(IDC_STATIC_T3000_UPDATE); //»ñµÃÖ¸Ïò¾²Ì¬¿Ø¼þµÄÖ¸Õë 
-    pStatic->ModifyStyle(0xF, SS_BITMAP/*|SS_CENTERIMAGE*/);  //ÉèÖÃ¾²Ì¬¿Ø¼þµÄÑùÊ½£¬Ê¹ÆäÎ»Í¼¾ÓÖÐ  ;
-    pStatic->SetBitmap(hBitmap);     //ÉèÖÃ¾²Ì¬¿Ø¼þÏÔÊ¾Î»Í¼ 
+    CStatic *pStatic = (CStatic *)GetDlgItem(IDC_STATIC_T3000_UPDATE); //»ñµÃÖ¸Ïò¾²Ì¬¿Ø¼þµÄÖ¸Õë - Get pointer to static control
+    pStatic->ModifyStyle(0xF, SS_BITMAP/*|SS_CENTERIMAGE*/);  //ÉèÖÃ¾²Ì¬¿Ø¼þµÄÑùÊ½£¬Ê¹ÆäÎ»Í¼¾ÓÖÐ - Set static control style to center bitmap
+    pStatic->SetBitmap(hBitmap);     //ÉèÖÃ¾²Ì¬¿Ø¼þÏÔÊ¾Î»Í¼  - Set static control to display bitmap
 }
 
 void CUpdateDlg::InitialStatic()
@@ -284,39 +284,39 @@ void CUpdateDlg::InitialStatic()
 
 bool CopyDirW(CString strSrcPath, CString strDstPath, bool bFailIfExists)
 {
-    CreateDirectory(strDstPath, NULL);// ´´½¨Ä¿±êÎÄ¼þ¼Ð£¬Èç¹û´æÔÚÔò²»´´½¨£¬Èç¹û²»´æÔÚÔò´´½¨¡£
-    if (PathIsDirectory(strDstPath) && PathFileExists(strSrcPath))//Ä¿±êÄ¿Â¼ÊÇ·ñ´æÔÚ ¶øÇÒstrSrcPath ÒªÃ´ÊÇÎÄ¼þ¼ÐÒªÃ´ÊÇÎÄ¼þ
+    CreateDirectory(strDstPath, NULL);// ´´½¨Ä¿±êÎÄ¼þ¼Ð£¬Èç¹û´æÔÚÔò²»´´½¨£¬Èç¹û²»´æÔÚÔò´´½¨¡£- Create the destination folder, do not create if it exists, create if it does not exist.
+    if (PathIsDirectory(strDstPath) && PathFileExists(strSrcPath))//Ä¿±êÄ¿Â¼ÊÇ·ñ´æÔÚ ¶øÇÒstrSrcPath ÒªÃ´ÊÇÎÄ¼þ¼ÐÒªÃ´ÊÇÎÄ¼þ - Check if the destination directory exists and strSrcPath is either a folder or a file
     {
-        if (::PathIsDirectory(strSrcPath))//Èç¹ûÊÇÎÄ¼þ¼Ð¿½±´
+        if (::PathIsDirectory(strSrcPath))//Èç¹ûÊÇÎÄ¼þ¼Ð¿½±´ - If it is a folder copy
         {
             CFileFind finder;
-            // ´ò¿ªÖ¸¶¨µÄÎÄ¼þ¼Ð½øÐÐËÑË÷
+            // ´ò¿ªÖ¸¶¨µÄÎÄ¼þ¼Ð½øÐÐËÑË÷ - Open the specified folder for searching
             BOOL bWorking = finder.FindFile(strSrcPath + _T("\\") + _T("*.*"));
             while (bWorking)
             {
-                // ´Óµ±Ç°Ä¿Â¼ËÑË÷ÎÄ¼þ
+                // ´Óµ±Ç°Ä¿Â¼ËÑË÷ÎÄ¼þ - Search files from the current directory
                 bWorking = finder.FindNextFile();
                 CString strFileName = finder.GetFileName();
                 CString strSrc = strSrcPath + _T("\\") + strFileName;
                 CString strDst = strDstPath + _T("\\") + strFileName;
-                // ÅÐ¶ÏËÑË÷µ½µÄÊÇ²»ÊÇ"."ºÍ".."Ä¿Â¼
+                // ÅÐ¶ÏËÑË÷µ½µÄÊÇ²»ÊÇ"."ºÍ".."Ä¿Â¼ - Check if the found directory is not "." and ".."
                 if (!finder.IsDots())
                 {
-                    // ÅÐ¶ÏËÑË÷µ½µÄÄ¿Â¼ÊÇ·ñÊÇÎÄ¼þ¼Ð
+                    // ÅÐ¶ÏËÑË÷µ½µÄÄ¿Â¼ÊÇ·ñÊÇÎÄ¼þ¼Ð - Check if the found directory is a folder
                     if (finder.IsDirectory())
-                    { // Èç¹ûÊÇÎÄ¼þ¼ÐµÄ»°£¬½øÐÐµÝ¹é
+                    { // Èç¹ûÊÇÎÄ¼þ¼ÐµÄ»°£¬½øÐÐµÝ¹é - If it is a folder, perform recursion
                         if (!CopyDirW(strSrc, strDst, bFailIfExists))
                             return false;
                     }
                     else
-                    {// Èç¹ûÊÇÎÄ¼þ£¬½øÐÐ¸´ÖÆ
+                    {// Èç¹ûÊÇÎÄ¼þ£¬½øÐÐ¸´ÖÆ - If it is a file, perform copy
                         if (!CopyFileW(strSrc, strDst, bFailIfExists))
                             return false;
                     }
                 }
             }
         }
-        else//Èç¹ûÊÇÎÄ¼þ¿½±´
+        else//Èç¹ûÊÇÎÄ¼þ¿½±´ - If it is a file copy
         {
             strDstPath += _T("\\");
             strDstPath += PathFindFileName(strSrcPath);
@@ -324,7 +324,7 @@ bool CopyDirW(CString strSrcPath, CString strDstPath, bool bFailIfExists)
                 return false;
         }
     }
-    else//Ä¿µÄÂ·¾¶²»´æÔÚ
+    else//Ä¿µÄÂ·¾¶²»´æÔÚ - Destination path does not exist
         return false;
     return true;
 
@@ -407,19 +407,19 @@ DWORD WINAPI UnzipFileThread(LPVOID lPvoid)
 
 BOOL KillProcessFromName(CString strProcessName)
 {
-    //´´½¨½ø³Ì¿ìÕÕ(TH32CS_SNAPPROCESS±íÊ¾´´½¨ËùÓÐ½ø³ÌµÄ¿ìÕÕ)
+    //´´½¨½ø³Ì¿ìÕÕ(TH32CS_SNAPPROCESS±íÊ¾´´½¨ËùÓÐ½ø³ÌµÄ¿ìÕÕ) - Create a process snapshot (TH32CS_SNAPPROCESS indicates creating a snapshot of all processes)
 
     HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 
 
-    //PROCESSENTRY32½ø³Ì¿ìÕÕµÄ½á¹¹Ìå
+    //PROCESSENTRY32½ø³Ì¿ìÕÕµÄ½á¹¹Ìå - PROCESSENTRY32 is the structure for process snapshots
 
     PROCESSENTRY32 pe;
 
 
 
-    //ÊµÀý»¯ºóÊ¹ÓÃProcess32First»ñÈ¡µÚÒ»¸ö¿ìÕÕµÄ½ø³ÌÇ°±Ø×öµÄ³õÊ¼»¯²Ù×÷
+    //ÊµÀý»¯ºóÊ¹ÓÃProcess32First»ñÈ¡µÚÒ»¸ö¿ìÕÕµÄ½ø³ÌÇ°±Ø×öµÄ³õÊ¼»¯²Ù×÷ - Initialization before using Process32First to get the first snapshot process
 
     pe.dwSize = sizeof(PROCESSENTRY32);
 
@@ -427,9 +427,9 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-    //ÏÂÃæµÄIFÐ§¹ûÍ¬:
+    //ÏÂÃæµÄIFÐ§¹ûÍ¬ - The following IF effect is the same as
 
-    //if(hProcessSnap == INVALID_HANDLE_VALUE)   ÎÞÐ§µÄ¾ä±ú
+    //if(hProcessSnap == INVALID_HANDLE_VALUE)   ÎÞÐ§µÄ¾ä±ú - Invalid handle
 
     if (!Process32First(hSnapShot, &pe))
 
@@ -441,13 +441,13 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-    //½«×Ö·û´®×ª»»ÎªÐ¡Ð´
+    //½«×Ö·û´®×ª»»ÎªÐ¡Ð´ - Convert the string to lowercase
 
     strProcessName.MakeLower();
 
 
 
-    //Èç¹û¾ä±úÓÐÐ§  ÔòÒ»Ö±»ñÈ¡ÏÂÒ»¸ö¾ä±úÑ­»·ÏÂÈ¥
+    //Èç¹û¾ä±úÓÐÐ§  ÔòÒ»Ö±»ñÈ¡ÏÂÒ»¸ö¾ä±úÑ­»·ÏÂÈ¥ - If the handle is valid, keep getting the next handle in a loop
 
     while (Process32Next(hSnapShot, &pe))
 
@@ -455,7 +455,7 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-        //pe.szExeFile»ñÈ¡µ±Ç°½ø³ÌµÄ¿ÉÖ´ÐÐÎÄ¼þÃû³Æ
+        //pe.szExeFile»ñÈ¡µ±Ç°½ø³ÌµÄ¿ÉÖ´ÐÐÎÄ¼þÃû³Æ - pe.szExeFile gets the executable file name of the current process
 
         CString scTmp = pe.szExeFile;
 
@@ -463,15 +463,15 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-        //½«¿ÉÖ´ÐÐÎÄ¼þÃû³ÆËùÓÐÓ¢ÎÄ×ÖÄ¸ÐÞ¸ÄÎªÐ¡Ð´
+        //½«¿ÉÖ´ÐÐÎÄ¼þÃû³ÆËùÓÐÓ¢ÎÄ×ÖÄ¸ÐÞ¸ÄÎªÐ¡Ð´ - Convert all letters in the executable file name to lowercase
 
         scTmp.MakeLower();
 
 
 
-        //±È½Ïµ±Ç°½ø³ÌµÄ¿ÉÖ´ÐÐÎÄ¼þÃû³ÆºÍ´«µÝ½øÀ´µÄÎÄ¼þÃû³ÆÊÇ·ñÏàÍ¬
+        //±È½Ïµ±Ç°½ø³ÌµÄ¿ÉÖ´ÐÐÎÄ¼þÃû³ÆºÍ´«µÝ½øÀ´µÄÎÄ¼þÃû³ÆÊÇ·ñÏàÍ¬ - Compare the executable file name of the current process with the passed file name
 
-        //ÏàÍ¬µÄ»°Compare·µ»Ø0
+        //ÏàÍ¬µÄ»°Compare·µ»Ø0 - If they are the same, Compare returns 0
 
         if (!scTmp.Compare(strProcessName))
 
@@ -479,7 +479,7 @@ BOOL KillProcessFromName(CString strProcessName)
 
 
 
-            //´Ó¿ìÕÕ½ø³ÌÖÐ»ñÈ¡¸Ã½ø³ÌµÄPID(¼´ÈÎÎñ¹ÜÀíÆ÷ÖÐµÄPID)
+            //´Ó¿ìÕÕ½ø³ÌÖÐ»ñÈ¡¸Ã½ø³ÌµÄPID(¼´ÈÎÎñ¹ÜÀíÆ÷ÖÐµÄPID) - Get the PID of the process from the snapshot process (i.e., the PID in Task Manager)
 
             DWORD dwProcessID = pe.th32ProcessID;
 
@@ -576,7 +576,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
 
         DesDownloadFilePath = DownloadFileFolder + _T("\\T3000Update.zip");
         int retry_count = 0;
-        DeleteUrlCacheEntry(T3000FtpPath); // ÇåÀí»º´æ
+        DeleteUrlCacheEntry(T3000FtpPath); // ÇåÀí»º´æ - Clear cache
         Sleep(2000);
         while (1)
         {
@@ -640,7 +640,7 @@ DWORD WINAPI GetFtpFileThread(LPVOID lPvoid)
     }
 
 
-    //ÕâÀïÒª¼ì²âÊÇ·ñÏÂÔØÍê±Ï;
+    //ÕâÀïÒª¼ì²âÊÇ·ñÏÂÔØÍê±Ï; - Here we need to check if the download is complete;
 
 
 download_pass:
@@ -890,8 +890,8 @@ BOOL CUpdateDlg::PreTranslateMessage(MSG* pMsg)
     return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //´ýÏÂÔØÎÄ¼þµÄURL
-    const CString & strFileLocalFullPath)//´æ·Åµ½±¾µØµÄÂ·¾¶
+BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //´ýÏÂÔØÎÄ¼þµÄURL - URL of the file to be downloaded
+    const CString & strFileLocalFullPath)//´æ·Åµ½±¾µØµÄÂ·¾¶ - Path to store the file locally
 {
     ASSERT(strFileURLInServer != "");
     ASSERT(strFileLocalFullPath != "");
@@ -903,8 +903,8 @@ BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //´ýÏÂÔØÎÄ¼
 
     DWORD dwType;
     const int nTimeOut = 2000;
-    session.SetOption(INTERNET_OPTION_CONNECT_TIMEOUT, nTimeOut); //ÖØÊÔÖ®¼äµÄµÈ´ýÑÓÊ±
-    session.SetOption(INTERNET_OPTION_CONNECT_RETRIES, 1);   //ÖØÊÔ´ÎÊý
+    session.SetOption(INTERNET_OPTION_CONNECT_TIMEOUT, nTimeOut); //ÖØÊÔÖ®¼äµÄµÈ´ýÑÓÊ± - Wait delay between retries
+    session.SetOption(INTERNET_OPTION_CONNECT_RETRIES, 1);   //ÖØÊÔ´ÎÊý - Number of retries
     char* pszBuffer = NULL;
 
     try
@@ -921,7 +921,7 @@ BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //´ýÏÂÔØÎÄ¼
         {
             HANDLE hFile = CreateFile(strFileLocalFullPath, GENERIC_WRITE,
                 FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,
-                NULL);  //´´½¨±¾µØÎÄ¼þ
+                NULL);  //´´½¨±¾µØÎÄ¼þ - Create local file
             if (hFile == INVALID_HANDLE_VALUE)
             {
                 pHttpFile->Close();
@@ -930,8 +930,8 @@ BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //´ýÏÂÔØÎÄ¼
                 return false;
             }
 
-            char szInfoBuffer[1000];  //·µ»ØÏûÏ¢
-            DWORD dwFileSize = 0;   //ÎÄ¼þ³¤¶È
+            char szInfoBuffer[1000];  //·µ»ØÏûÏ¢ - Return message
+            DWORD dwFileSize = 0;   //ÎÄ¼þ³¤¶È - File length
             DWORD dwInfoBufferSize = sizeof(szInfoBuffer);
             BOOL bResult = FALSE;
             bResult = pHttpFile->QueryInfo(HTTP_QUERY_CONTENT_LENGTH,
@@ -939,14 +939,14 @@ BOOL CUpdateDlg::DownloadFileHttp(const CString& strFileURLInServer, //´ýÏÂÔØÎÄ¼
 
             dwFileSize = atoi(szInfoBuffer);
             const int BUFFER_LENGTH = 1024 * 10;
-            pszBuffer = new char[BUFFER_LENGTH];  //¶ÁÈ¡ÎÄ¼þµÄ»º³å
+            pszBuffer = new char[BUFFER_LENGTH];  //¶ÁÈ¡ÎÄ¼þµÄ»º³å - Buffer for reading the file
             DWORD dwWrite, dwTotalWrite;
             dwWrite = dwTotalWrite = 0;
-            UINT nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH); //¶ÁÈ¡·þÎñÆ÷ÉÏÊý¾Ý
+            UINT nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH); //¶ÁÈ¡·þÎñÆ÷ÉÏÊý¾Ý - Read data from the server
 
             while (nRead > 0)
             {
-                WriteFile(hFile, pszBuffer, nRead, &dwWrite, NULL);  //Ð´µ½±¾µØÎÄ¼þ
+                WriteFile(hFile, pszBuffer, nRead, &dwWrite, NULL);  //Ð´µ½±¾µØÎÄ¼þ - Write to local file
                 dwTotalWrite += dwWrite;
                 nRead = pHttpFile->Read(pszBuffer, BUFFER_LENGTH);
             }

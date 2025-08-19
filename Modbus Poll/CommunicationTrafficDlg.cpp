@@ -170,6 +170,7 @@ void CCommunicationTrafficDlg::OnBnClickedSave()
 
 
         delete m_plogFile;
+        // Open file
         //打开文件
         //LPCSTR filename=m_strLogFileName.GetBuffer();
         //ShellExecute(NULL, "open","Log_info.txt",NULL, NULL, SW_SHOWNORMAL); 
@@ -190,6 +191,7 @@ void CCommunicationTrafficDlg::OnBnClickedCopy()
     aryListSel.SetSize(nCount);
     m_DataList.GetSelItems(nCount, aryListSel.GetData()); 
 
+  //  aryListSel stores the index values of selected columns, if you need to get the content, add the following statement:
   //  aryListSel中存的就是选中列的index值，如果需要取内容，加以下语句：
         CString str,content;
         for (int i= nCount-1; i>= 0; i--)
@@ -203,22 +205,31 @@ void CCommunicationTrafficDlg::OnBnClickedCopy()
 //--------------------------------------------------------------------------------------------------------------------
      
     HGLOBAL hClip; 
+    // Define a HGLOBAL handle variable to point to the allocated memory block
     //定义一个HGLOBAL句柄变量用来指向分配的内存块
     if (OpenClipboard())
     {
+        // Clear clipboard contents
         EmptyClipboard();                            //将剪贴板内容清空
         hClip=GlobalAlloc(GMEM_MOVEABLE,content.GetLength()+1); 
+        // Allocate movable memory block on heap, program returns a memory handle
         //在堆上分配可移动的内存块，程序返回一个内存句柄
+        // Define pointer variable pointing to character type
         char * buff;                                 //定义指向字符型的指针变量
         buff=(char*)GlobalLock(hClip);
+        // Lock the allocated memory block, convert memory block handle to a pointer, and increment the corresponding reference counter by 1
         //对分配的内存块进行加锁，将内存块句柄转化成一个指针,并将相应的引用计数器加1
         strcpy(buff,(char*)content.GetBuffer());
+        // Copy user input data to pointer variable, actually copying to the allocated memory block
         //将用户输入的数据复制到指针变量中，实际上就是复制到分配的内存块中
         GlobalUnlock(hClip);
+        // Data writing completed, perform unlock operation and decrease reference counter by 1
         //数据写入完毕，进行解锁操作，并将引用计数器数字减1
         SetClipboardData(CF_TEXT,hClip);
+        // Put the memory block containing data into clipboard resource management
         //将存放有数据的内存块放入剪贴板的资源管理中
         CloseClipboard();
+        // Close clipboard, release clipboard resource occupancy
         //关闭剪贴板，释放剪贴板资源的占用权
       
     }

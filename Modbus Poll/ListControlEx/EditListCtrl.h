@@ -82,14 +82,21 @@ protected:
 	afx_msg void OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
 private:
+	// Subitem identifier
 	int m_iSubItem;            //子项标识符
+	// Main item identifier
 	int m_iItem;               //主项标识符
+	// Whether to highlight text
 	BOOL m_bHighLight;         //是否高亮文本
+	// Whether to draw focus frame
 	BOOL m_bFocus;             //是否绘制焦点框
+	// Used to subclass CEdit* pointer returned by EditLabel function
 	CItemEdit m_edtItemEdit;   // 用于子类化EditLabel函数返回的CEdit*指针
+	// Used to save the string before modification
 	CString preEditString;     //用于保存修改前的字符串
 
 public:
+	// Used to determine if data has changed
 	BOOL m_bEditDataChanged;		   //用于判断是否有数据改变了
 };
 

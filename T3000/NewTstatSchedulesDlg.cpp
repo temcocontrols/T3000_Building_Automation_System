@@ -54,7 +54,9 @@ END_MESSAGE_MAP()
 
 int CNewTstatSchedulesDlg::GetEventNumber(int DayIndex)
 {
+	// 2 events occupy one register
 	int RegNumber = DayIndex / 6;//2个事件占用一个寄存器
+	// Even positions are in the back, odd positions are in high bits
 	int Position = DayIndex % 6;//偶数位在后面，奇数高位
 	int int32value = m_SchduleBuffer[96 + 2 * RegNumber] + m_SchduleBuffer[96 + 2 * RegNumber + 1] * PowerFour(2, 16);
 	std::bitset<32> RegBits(int32value);
@@ -256,6 +258,7 @@ BOOL CNewTstatSchedulesDlg::OnInitDialog()
 	strlist.push_back(L"");
 	strlist.push_back(L"Home");
 	strlist.push_back(L"Work");
+	// TSTAT7 seems not to support AWAY and sleep these two modes. Fandu 2023 03 08
 	if ((product_register_value[7] == PM_TSTAT7) ||
 		(product_register_value[7] == PM_TSTAT7_ARM)) //TSTAT7  貌似不支持 AWAY  和 sleep这两种模式。Fandu 2023 03 08
 	{
@@ -330,6 +333,7 @@ void CNewTstatSchedulesDlg::Fresh_List()
 	strlist.push_back(L"");
 	strlist.push_back(L"Home");
 	strlist.push_back(L"Work");
+	// TSTAT7 seems not to support AWAY and sleep these two modes. Fandu 2023 03 08
 	if ((product_register_value[7] == PM_TSTAT7) ||
 		(product_register_value[7] == PM_TSTAT7_ARM))  //TSTAT7  貌似不支持 AWAY  和 sleep这两种模式。Fandu 2023 03 08
 	{
@@ -715,6 +719,7 @@ BOOL CNewTstatSchedulesDlg::Insert_Schdule(Schedule_Node SR, int POS)
 	{
 		for (list<Schedule_Node>::iterator index = m_ScheduleList.begin();index != m_ScheduleList.end();++index)
 		{
+			// Found the position to insert
 			if (position == POS)//找到了要插入的位置
 			{
 				m_ScheduleList.insert(index, SR);
@@ -724,6 +729,7 @@ BOOL CNewTstatSchedulesDlg::Insert_Schdule(Schedule_Node SR, int POS)
 		}
 
 	}
+	// If the position is not found, just add to the list
 	if (position != POS)//没有找到要插入的位置，就直接添加到列表里面
 	{
 		m_ScheduleList.push_back(SR);
@@ -893,6 +899,7 @@ void CNewTstatSchedulesDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	lCol = lvinfo.iSubItem;
 
 
+	// If the clicked area exceeds the maximum row number, the click is invalid
 	if (lRow>WeeklyList.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
 	if (lRow<0)

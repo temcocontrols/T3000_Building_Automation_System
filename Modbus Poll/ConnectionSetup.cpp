@@ -262,6 +262,7 @@ void CConnectionSetup::Write_Config()
     Connect_Type.Format(_T("%d"),m_combox_connection_type.GetCurSel());
     CString COM_Port,FriendComportName;
     m_combox_comport.GetWindowText(COM_Port);
+	// Find serial port COM
 	//ÕÒµ½´®¿ÚCOM
 	FriendComportName = COM_Port;
 	int ComStart = COM_Port.Find(L"(");

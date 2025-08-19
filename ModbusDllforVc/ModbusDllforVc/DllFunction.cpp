@@ -11,13 +11,15 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <winioctl.h>
-//#include "devintf.h"	// DriverWorks中的一个头文件
+//#include "devintf.h"	// DriverWorks中的一个头文件 - A header file in DriverWorks
+
 
 #define INITGUID
 #include <guiddef.h>
 //#include "initguid.h"
 #include "setupapi.h"
-#include "devintf.h"	// DriverWorks中的一个头文件
+#include "devintf.h"	// DriverWorks中的一个头文件 - A header file in DriverWorks
+
 
 #pragma comment(lib,"setupapi.lib")
 
@@ -121,7 +123,7 @@ int ReadTestoDeviceData(float reveivevalue[])
 
 		DWORD receive_length;
 		int fState = ReadFile(hDevice, buf, n, &nRead, &m_TESTORead);
-		if(!fState)// 不支持重叠	
+		if(!fState)// 不支持重叠 - Not supported overlapping
 		{
 			if(GetLastError()==ERROR_IO_PENDING)
 			{

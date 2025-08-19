@@ -13,11 +13,15 @@ enum TFTP_REQTYPE
 
 
 
+// Data packet
 // 数据包
 struct TFTP_DATA_PACK
 {
+	// Operation code
 	WORD		m_wOPCode;		// 操作码
+	// Block number
 	WORD		m_wBlkNum;		// 块编号
+	// Data content
 	BYTE			m_szData[512];	// 数据内容
 	TFTP_DATA_PACK()
 	{
@@ -31,7 +35,9 @@ struct TFTP_DATA_PACK
 // ACK
 struct TFTP_ACK
 {
+	// Operation code
 	WORD		m_wOPCode;		// 操作码
+	// Block number	
 	WORD		m_wBlkNum;		// 块编号	
 	TFTP_ACK()
 	{
@@ -45,8 +51,11 @@ struct TFTP_ACK
 // ERROR
 struct TFTP_ERROR
 {
+	// Operation code
 	WORD		m_wOPCode;		// 操作码
+	// Error code	
 	WORD		m_wErrCode;		// 差错码	
+	// Error information
 	CString		m_strErrorInfo;	// 错误信息
 	TFTP_ERROR()
 	{
@@ -66,9 +75,13 @@ struct TFTP_ItemPair
 // WR Request
 struct TFTP_WRRequest
 {
+	// Operation code
 	WORD		m_wOPCode;							// 操作码
+	// File name
 	BYTE			m_strFileName[256];					// 文件名
+	// Mode
 	BYTE			m_strMode[256];						// 模式
+	// Options
 	vector<TFTP_ItemPair*>		m_szItems;		// 选项
 	TFTP_WRRequest()
 	{
@@ -80,9 +93,13 @@ struct TFTP_WRRequest
 // OACK
 struct TFTP_OACK
 {
+	// Operation code
 	WORD		m_wOPCode;				// 操作码
+	// File name
 	CString		m_strFileName;			// 文件名
+	// Mode
 	CString		m_strMode;					// 模式
+	// Option/value pairs	
 	vector<TFTP_ItemPair*>		m_szItem;		// 选项/值对	
 	TFTP_OACK()
 	{

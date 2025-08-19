@@ -115,6 +115,7 @@ CModbusPollView::CModbusPollView()
 CModbusPollView::~CModbusPollView()
 {
 	 
+    //2018 04 17 dufan  If successfully connected before, open MB POLL to read modbus id from config file, restore default 255 when closing.
     //2018 04 17 dufan  如果是成功的连接过 打开MB POLL 通过配置文件读取 modbus id ， 关闭时 恢复默认255.
     WritePrivateProfileStringW(_T("MBPOLL_Setting"), _T("Modbus ID"), _T("255"), g_configfile_path);
 // 	if(m_MultiRead_handle != NULL)
@@ -538,6 +539,7 @@ void CModbusPollView::Fresh_Data(){
 	m_grid_cols=2*m_data_cols+1;
 	m_grid_rows=m_data_rows+1;
 
+	// If m_Hide_Alias=1;
 	如果 m_Hide_Alias=1;
 	m_grid_cols=m_data_cols+1;
 	m_grid_rows=m_data_rows+1;
@@ -572,6 +574,7 @@ void CModbusPollView::Fresh_Data(){
 	CString DataTemp;
 	int Index;
 	int Index_start,Index_end,row;
+	// Write subscript
 	//写下标
 	if (m_PLC_Addresses==1)
 	{
@@ -592,13 +595,17 @@ void CModbusPollView::Fresh_Data(){
 		m_MsDataGrid.SetItemText(row, 0, index);
 		row++;
 	}
+	// Hide the index
 	//把索引隐藏掉
  
 	//m_MsDataGrid.SetColumnWidth(0, 0);
+	// The main point here is not to display the index row, if you want to display it, you can block this line
 	//这里主要是不要显示index行，如果要显示的话，就要把这行屏蔽掉，就可以了
+	// For Modbus Poll
 	//Modbus Poll的
 	if (m_Hide_Alias_Columns!=0)
 	{
+		 // Initialize row 0
 		 //初始化第0行
 		for (int i=1;i<m_MsDataGrid.GetColumnCount();i++)
 		{
@@ -614,6 +621,7 @@ void CModbusPollView::Fresh_Data(){
  
  					if (j==0)
  					{
+ 						// Initialize row 0
  						//初始化第0行
  						if (i%2==1)
  						{
@@ -664,6 +672,7 @@ void CModbusPollView::Fresh_Data(){
  			}
 	}
 	else{
+		// Initialize rows
 		//初始化行
 		for (int i=1;i<m_MsDataGrid.GetColumnCount();i++)
 		{
@@ -751,6 +760,7 @@ void CModbusPollView::Fresh_Data(){
          if (g_Time_Offset%10==0)
          {
             ::SendMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
+            // Respond to drawing
             Sleep(200);   //响应绘图
          } 
        
@@ -760,6 +770,7 @@ void CModbusPollView::Fresh_Data(){
         
      }
     
+///////////////// Record data Txt
 /////////////////记录数据 Txt 
 	if (!m_logText)
 	{

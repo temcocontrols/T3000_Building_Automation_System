@@ -742,6 +742,7 @@ void Update_ViewData(CView* MBPollView){
 			return;
 		}
 		//DataBuffer=pMBPollView->m_DataBuffer;
+        // Solve the problem that Modbus ID is always fixed reading from ini. Only read from ini for the first time at the beginning
         static bool run_loadid_once = false;  //解决Modbus ID 一直固定从ini读取的问题.只有开始第一次从ini读取
         if (!run_loadid_once)
         {
@@ -872,6 +873,7 @@ void Update_ViewData(CView* MBPollView){
 		}
 		register_critical_section.Unlock();
 #endif
+		// After reading correctly, we pass the value to view for display
 		if (ret>0)//读的正确之后，我们才把值传给view显示
 		{
 			memcpy_s(pMBPollView->m_DataBuffer,sizeof(pMBPollView->m_DataBuffer),DataBuffer,sizeof(DataBuffer));

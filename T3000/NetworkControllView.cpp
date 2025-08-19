@@ -179,6 +179,7 @@ void CNetworkControllView::Fresh()
 	CEdit* pEdit = (CEdit*)GetDlgItem(IDC_EDIT_BLDVERSION);
 	CString strBldVer; strBldVer.Format(_T("%d"), m_nbldVersion);
 	pEdit->SetWindowText(strBldVer);
+	// Serial number not equal to 0 prevents version register being 0 when disconnected from showing this message
 	if (m_nbldVersion < _OLD_NC_VERSION && !m_bWarningBldVersion && m_nSerialNum != 0 && m_hardware_version < 4) // 序列号不等于0防止掉线时版本寄存器为0弹这个消息
 	{	
 		m_bWarningBldVersion = TRUE;
@@ -504,10 +505,12 @@ return;
 				 
 			 
 
+			// Change node
 			// 改node
 			CString strSID;
 			CString strSql;
 			strSID.Format(_T("%d"), m_nSerialNum);
+			//Bautrate stores IP
 			strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Serial_ID='%s'"),strIP, strSID); //bautrate 放IP
 			SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 
@@ -729,8 +732,10 @@ void CNetworkControllView::OnBnClickedButtonUpdatetimeserver()
 	n=write_one(g_tstat_id,180,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b3 ));
 	n=write_one(g_tstat_id,181,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b4 ));
 
+	// Command register, sync command
 	n=write_one(g_tstat_id,177,6); // 命令寄存器，同步命令
 
+	// Wait for NC sync
 	Sleep(5000);  // 等待NC 同步
 	AddNewTimeServer(strTimeServer);
 
@@ -795,9 +800,11 @@ CString CNetworkControllView::GetIPFromHostName(CString& strHostName)
 { 
 	//char	szhostname[128]; 
 	CString	str; 
+	//Get hostname
 	//获得主机名 
 //	if(   gethostname(szhostname,   128)   ==   0   ) 
 	{
+		//Get host IP address
 		//   获得主机ip地址 
 		struct hostent* phost;
 		int i;
@@ -835,6 +842,7 @@ CString CNetworkControllView::GetIPFromHostName(CString& strHostName)
 // }
 
 
+// Read NC information and add to database
 // 读取NC信息，并加入到数据库
 void CNetworkControllView::GetTstatInfo(int nID)
 {

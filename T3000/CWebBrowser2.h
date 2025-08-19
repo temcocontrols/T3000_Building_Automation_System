@@ -1,3 +1,4 @@
+// CWebBrowser2.h : ActiveX control wrapper class declaration created by Microsoft Visual C++
 // CWebBrowser2.h : 由 Microsoft Visual C++ 创建的 ActiveX 控件包装器类的声明
 
 #pragma once
@@ -31,9 +32,11 @@ public:
 		pPersist, bStorage, bstrLicKey); 
 	}
 
+// Features
 // 特性
 public:
 
+// Operations
 // 操作
 public:
 

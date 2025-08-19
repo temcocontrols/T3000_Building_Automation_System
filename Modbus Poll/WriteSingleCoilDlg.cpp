@@ -135,7 +135,7 @@ void CWriteSingleCoilDlg::OnBnClickedOk()
 		m_Value = FALSE;
 	}
 	 
-	if (m_function15)//多写
+	if (m_function15)//多写, Multiple write
 	{
 		int Reg_Value;
 		 bool bValue = (bool)m_Value;
@@ -176,7 +176,7 @@ void CWriteSingleCoilDlg::OnBnClickedOk()
 		}
 
 	}
-	else//单写
+	else//单写, Single write
 	{
 		int Reg_Value;
 		unsigned short Single_Value;

@@ -1,3 +1,4 @@
+// CWebBrowser2.cpp : ActiveX control wrapper class definition created by Microsoft Visual C++
 // CWebBrowser2.cpp : 由 Microsoft Visual C++ 创建的 ActiveX 控件包装器类的定义
 
 
@@ -9,6 +10,8 @@
 
 IMPLEMENT_DYNCREATE(CWebBrowser2, CWnd)
 
+// CWebBrowser2 properties
 // CWebBrowser2 属性
 
+// CWebBrowser2 operations
 // CWebBrowser2 操作

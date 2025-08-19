@@ -117,11 +117,11 @@ void CWriteSingleRegisterDlg::OnBnClickedOk()
 
 	unsigned char rev_back_rawData[300],send_data[100];
 
-	if (m_base_0!=0)//用
+	if (m_base_0!=0)//用, Base 0
 	{
 		--m_address;
 	} 
-	if (m_function)//多写
+	if (m_function)//多写, Multiple writes
 	{
 		int Reg_Value;
 		 
@@ -190,7 +190,7 @@ void CWriteSingleRegisterDlg::OnBnClickedOk()
 		} 
 
 	} 
-	else//单写
+	else//单写, Single write
 	{
 		int Reg_Value;
 		unsigned short Single_Value;

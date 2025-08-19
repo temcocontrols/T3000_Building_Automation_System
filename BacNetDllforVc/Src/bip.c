@@ -63,6 +63,7 @@ void bip_set_socket(
     BIP_Socket = sock_fd;
 }
 
+// If it's a GSM connection, ports like 47808 will not be checked, using special case communication
 //如果是GSM 的连接 将不会判断47808 之类的端口，采用特殊情况 通讯;
 void bip_setgsm(bool isconnect)
 {

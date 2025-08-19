@@ -138,6 +138,7 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg void OnRclick(NMHDR* pNMHDR, LRESULT* pResult);
+	//Function for management mode use
 	void CheckClickNode(HTREEITEM hItem, BM_nodeinfo & nodeinfo); //给管理模式使用的功能
 	void SetSelectSerialNumber(unsigned int nserial);
 	unsigned int GetSelectSerialNumber();
@@ -161,10 +162,15 @@ public:
 	CString strmyTipText;
 
 	private:
+		//Node icons
 		CImageList	m_ImageList;		//节点图标
+		//Image list for dragging
 		CImageList* m_pDragImage;		//拖动是的图像列表
+		//Start dragging moment
 		DWORD		m_dwDrawStart;		//开始拖动时刻
+		//Dragged node
 		HTREEITEM	m_hDragSrc;			//被拖动节点
+		//Node receiving the drag
 		HTREEITEM	m_hDragDist;		//接收拖动的节点
 		bool		m_bDraged;			//拖动标识符
 		UINT		m_nMsMoveTimerID;	//检测鼠标移动的定时器

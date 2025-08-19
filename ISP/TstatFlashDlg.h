@@ -60,6 +60,7 @@ protected:
 	void			FlashByCom();
 
 	CString		GetCurSelPageStr();
+	// Flash serial number
 	// 烧 序列号
 	void			FlashSN();
 
@@ -73,13 +74,18 @@ protected:
 
 	//CString				m_strHexFileName;
 
+	// Pointer to COM flash class, instantiated only when in use, released immediately after use
 	CComWriter*	m_pComWriter;				// 用串口flash的类的指针，在使用时才实例化，用完后立即释放
+	// Use network, TFTP protocol flash, instantiated when in use
 //	TFTPServer*	m_pTFTPServer;				// 使用网络，TFTP协议flash，使用时实例化
+	// File buffer, used to store the content of read files, should be deleted after flash, new when in use
 	//char*				m_pFileBuf;						// 文件缓冲区，用来存放读取的文件的内容，flash完后应当delete，使用时再new
 
 	
 	// flash sn
+	// Whether to flash serial number
 	BOOL				m_bFlashSN;					// 是否烧serial number.
+	// Whether to flash Mac address
 //	BOOL				m_bFlashMacAddr;			// 是否烧Mac address
 
 

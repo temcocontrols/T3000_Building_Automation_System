@@ -155,6 +155,7 @@ DWORD WINAPI CheckIPvalidThread(LPVOID lpvoid)
         CPingReply pr1;
         if (p1.Ping1((LPCTSTR)strIP, pr1))
         {
+            // If ping is successful, it means the IP address to be changed exists and is being used by someone
             //如果ping 的通就说明要改的IP地址是存在的，有人在用的;
             continue;
         }
@@ -649,6 +650,7 @@ void CDuplicateIdDetected::Initial_static()
             _variant_t temp_variant;
             if (temp_count > 0)
             {
+                // All devices under this Com port
                 while (!m_q.eof())//次Com port 下面的所有 设备;
                 {
                     temp_pid = m_q.getValuebyName(L"Product_ID");
@@ -671,6 +673,7 @@ void CDuplicateIdDetected::Initial_static()
 
             if (temp_count > 0)
             {
+                // All devices under this Com port
                 while (!m_q.eof())//此Com port 下面的所有 设备;
                 {
 
@@ -699,6 +702,7 @@ void CDuplicateIdDetected::Initial_static()
 
             if (temp_count > 0)
             {
+                // All devices under this Com port
                 while (!m_q.eof())//次Com port 下面的所有 设备;
                 {
 
@@ -967,6 +971,7 @@ BOOL CDuplicateIdDetected::ChangeNetDeviceIP(CString soldIP, CString newstrIP, u
     }
 
     //GetNewIP(strnewipadress,allsubnets[i].StrIP);
+    // Filter out 0.0.0.0
     if (strnewipadress.Find(_T("0.0.0")) != -1)//对0.0.0.0的过滤掉
     {
         return FALSE;
@@ -1005,6 +1010,7 @@ BOOL CDuplicateIdDetected::ChangeNetDeviceIP(CString soldIP, CString newstrIP, u
     WideCharToMultiByte(CP_ACP, 0, local_enthernet_ip.GetBuffer(), -1, local_network_ip, 255, NULL, NULL);
     h_siBind.sin_family = AF_INET;
     h_siBind.sin_addr.s_addr = inet_addr(local_network_ip);
+    // Forcibly bind network card address to Socket
     if (-1 == bind(h_scan_Broad, (SOCKADDR*)&h_siBind, sizeof(h_siBind)))//把网卡地址强行绑定到Socket  
     {
         //MessageBox(_T("Network Initial Fail"));
@@ -1092,6 +1098,7 @@ BOOL CDuplicateIdDetected::ChangeNetDeviceIP(CString soldIP, CString newstrIP, u
             if (nRet > 0)
             {
                 FD_ZERO(&fdSocket);
+                // Received correct reply
                 if (buffer[0] == 0x67)//收到正确的回复了
                 {
 
@@ -1153,6 +1160,7 @@ END_CHANGEIP_SCAN:
 
 void CDuplicateIdDetected::OnClose()
 {
+    // TODO: Add message handler code and/or call default
     // TODO: 在此添加消息处理程序代码和/或调用默认值
     close_duplicate_window = true;
     do
@@ -1165,6 +1173,7 @@ void CDuplicateIdDetected::OnClose()
 
 void CDuplicateIdDetected::OnCancel()
 {
+    // TODO: Add custom code and/or call base class
     // TODO: 在此添加专用代码和/或调用基类
 
     CDialogEx::OnCancel();

@@ -6,31 +6,44 @@
 	file base:	FlexSlideBarDef
 	file ext:	h
 	author:			
+	purpose:	 Global variables, constants, macro definitions
 	purpose:	 全局变量，常量，宏定义
 *********************************************************************/
 #pragma once
 
 
+// fsb shape
 // fsb的形态
 enum FSB_STYLE
 {
-	FSB_STYLE_SINGLETHUMB = 0x5001,		// 单个button指针
-	FSB_STYLE_DOUBLETHUMB =	0x5002,		// 两个button指针
-	FSB_STYLE_TRIPLETHUMB	= 0x5003,		// 3个button指针
-	FSB_STYLE_DOUBLELINKAGE	= 0x5004,		// 2个button指针锁定联动
-	FSB_STYLE_TRIPLELINKAGE	= 0x5005,		// 3个button指针锁定联动
+	FSB_STYLE_SINGLETHUMB = 0x5001,		// Single button pointer
+	                                    // 单个button指针
+	FSB_STYLE_DOUBLETHUMB =	0x5002,		// Two button pointers  
+	                                    // 两个button指针
+	FSB_STYLE_TRIPLETHUMB	= 0x5003,		// 3 button pointers
+	                                        // 3个button指针
+	FSB_STYLE_DOUBLELINKAGE	= 0x5004,		// 2 button pointers locked linkage
+	                                        // 2个button指针锁定联动
+	FSB_STYLE_TRIPLELINKAGE	= 0x5005,		// 3 button pointers locked linkage
+	                                        // 3个button指针锁定联动
 };
 
+// fsb pointer appearance, shape  
 // fsb 指针的样子，外观
 enum FSB_THUMBSHAPE
 {
-	FSB_THUMBSHAPE_BAR = 0x6001,		// 指针形状 － bar
-	FSB_THUMBSHAPE_RECT =  0x6002,		// 指针形状 － rectangle
-	FSB_THUMBSHAPE_TRI = 0x6003,		// 指针形状 － 三角
-	FSB_THUMBSHAPE_CIRCLE = 0x6004,		// 指针形状 － 圆形
+	FSB_THUMBSHAPE_BAR = 0x6001,		// Pointer shape - bar
+	                                    // 指针形状 － bar
+	FSB_THUMBSHAPE_RECT =  0x6002,		// Pointer shape - rectangle
+	                                    // 指针形状 － rectangle
+	FSB_THUMBSHAPE_TRI = 0x6003,		// Pointer shape - triangle
+	                                    // 指针形状 － 三角
+	FSB_THUMBSHAPE_CIRCLE = 0x6004,		// Pointer shape - circle
+	                                    // 指针形状 － 圆形
 };
 
 
+// fsb scale position
 // fsb 刻度的位置
 enum FSB_TICSIDE
 {
@@ -51,6 +64,7 @@ const int THUNMB_BAR_HEIGHT=2;
 // const DWORD CLR_HEATING = RGB(224,128,128);
 // const DWORD CLR_BALANCE = RGB(96,192,0);
 
+// Slider above
 const DWORD CLR_COOLING = RGB(0,0,255);//滑块上面
 const DWORD CLR_HEATING = RGB(255,0,0);
 const DWORD CLR_BALANCE = RGB(96,192,0);

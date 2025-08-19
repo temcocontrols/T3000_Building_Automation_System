@@ -22,13 +22,16 @@ char sendbuf[45];
 extern CString g_strFlashInfo;
 extern unsigned int Remote_timeout;
 extern unsigned int nflash_receive_to_send_delay_time;
+// 0 no need to update boot   1 need to update bootloader;   C2 is bootloader, must update if updating simultaneously
 extern int c2_need_update_boot;  //0 不用更新boot   1 需要更新bootload;   C2为bootload  同时要更新就必须更新;
 extern CString g_repair_bootloader_file_path;
+// If equals 1, it means we are now burning new BootLoader
 extern int new_bootload ; //如果等于1 就说明现在烧写的是新的BootLoader;
 extern unsigned char firmware_md5[32];
 /*extern*/ CRITICAL_SECTION g_cs;
 /*extern*/ CString showing_text;
 /*extern*/ int writing_row;
+// 0 no need to update boot   1 need to update bootloader;   C1 is hex
 extern int firmware_must_use_new_bootloader ;  //0 不用更新boot   1 需要更新bootload;   C1为hex
 const int TFTP_PORT = 69;
 
@@ -578,6 +581,7 @@ void TFTPServer::GetIPMaskGetWay()
 	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO));
 	ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 	ALL_LOCAL_SUBNET_NODE  Temp_Node;
+	// First call to GetAdapterInfo to get the ulOutBufLen size
 	// 第一次调用GetAdapterInfo获取ulOutBufLen大小
 	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
 	{
@@ -1136,7 +1140,7 @@ BOOL TFTPServer::StartServer()
                 if((mode_send_flash_try_time++)<20)
                 {
 					int send_ret=TCP_Flash_CMD_Socket.Send(byCommand,sizeof(byCommand),0);
-                    Sleep(50);   //WIFI 的 bootloader 需要此延时 ， 设备的响应时间太慢了.不延时他们的设备  会忽略其他的网络包;
+                    Sleep(50);   //WIFI 的 bootloader 需要此延时 ， 设备的响应时间太慢了.不延时他们的设备  会忽略其他的网络包;  // WIFI bootloader needs this delay, device response time is too slow. Without delay their device will ignore other network packets
                    // int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
                     TRACE(_T("send_ret = %d\r\n"),send_ret);
                     if(send_ret<0)	//Try TCP connection again if send fails
@@ -1557,7 +1561,7 @@ bool TFTPServer::Send_Tftp_File()
             //}
             nRet = SendDataNew(pBuf, nSendNum);
             if (package_number == 1)
-                Sleep(2000);   //发送第一包的时候 设备接收到会做擦除flash的动作，需要等待.
+                Sleep(2000);   //发送第一包的时候 设备接收到会做擦除flash的动作，需要等待.  // When sending the first packet, the device will perform flash erase operation upon receiving it, need to wait
             for (int i=0; i<Remote_timeout; i++)
             {
                 //if(IP_is_Local())
@@ -1693,9 +1697,9 @@ void TFTPServer::OutPutsStatusInfo(const CString& strInfo, BOOL bReplace)
 }
 
 
-// 返回 -1， 那么socket error
-// 返回 0，  no response
-// 1，       ok
+// 返回 -1， 那么socket error  // Return -1, socket error
+// 返回 0，  no response  // Return 0, no response
+// 1，       ok  // 1, ok
 int TFTPServer::RecvBOOTP()
 {
     BYTE szBuf[512];
@@ -1800,7 +1804,7 @@ BOOL TFTPServer::SendDHCPPack()
 }
 
 
-// 返回的是网络字节顺序
+// 返回的是网络字节顺序  // Returns network byte order
 DWORD TFTPServer::GetLocalIP()
 {
     IP_ADAPTER_INFO pAdapterInfo;

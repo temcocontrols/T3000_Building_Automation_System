@@ -18,6 +18,7 @@ extern vector <Str_download_firmware_info> download_info_type;
 
 BYTE IP_ADDRESS_SERVER[20];
 int total_file_length = 0;	
+//Used to read how many counts need to be changed
 int Add_log_count = 1;	//用于读取改读多少count了;
 int replace_count = 1;
 CString AutoFlashConfigPath;
@@ -41,6 +42,7 @@ CString new_firmware_ip;
 int is_local_temco_net = false;
 extern bool update_t3000_only ;
 IMPLEMENT_DYNAMIC(Dowmloadfile, CDialogEx)
+// Record when MSTP is silent, wait for 10 seconds
 int time_8_count = 0; // 记录mstp静默的时候 ，等待10秒; 
 map <int,CString> product_folder_map;
 
@@ -163,14 +165,17 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
         temp_isp_info = temp_isp_info + mypath;
         m_download_info.InsertString(m_download_info.GetCount(), temp_isp_info);
         m_download_info.SetTopIndex(m_download_info.GetCount() - 1);
+        // If downloading is T3000
         //if (m_download_product_type == 199) //如果下载的是T3000;
         //{
+        // Call extraction
         //    //调用解压;
         //}
         if (download_and_update == DOWNLOAD_ONLY)
         {
             if (flash_multi_auto)
             {
+                // Save download location, product number and other information
                 //保存下载的位置,产品号 等信息;
 
                 for (int z = 0;z<download_info_type.size();z++)
@@ -232,7 +237,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam, LPARAM lParam)
             (m_product_isp_auto_flash.baudrate == 38400) ||
             (m_product_isp_auto_flash.baudrate == 57600) ||
             (m_product_isp_auto_flash.baudrate == 76800) ||
-            (m_product_isp_auto_flash.baudrate == 115200))//串口
+            (m_product_isp_auto_flash.baudrate == 115200))//串口, serial port
         {
             CString temp_baudrate;
             temp_baudrate.Format(_T("%d"), m_product_isp_auto_flash.baudrate);
@@ -652,11 +657,13 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				file_name.ReleaseBuffer();
 				temp_file_path = temp_file_path + _T("\\") + file_name; 
 				CFileFind findfirmwarefile;
+				// File not found, need to get from server
 				if(!findfirmwarefile.FindFile(temp_file_path))	//没有发现文件 就要服务器传过来;
 				{
 					::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_NOT_FIND_LOCAL,NULL);
 					download_step = START_SEND_WANT_PACKAGE;
 				}
+				// Found the same file, need to compare MD5 consistency
 				else	//发现有一样的了就要比对MD5是否一致;
 				{
 
@@ -664,11 +671,13 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 					char locoal_char_md5[20];
 					memcpy_s(locoal_char_md5,20, MD5(ifstream( temp_file_path )).digest(),20);
 					int ret_value = memcmp(locoal_char_md5,receive_md5,16);
+					// MD5 values are the same, no need to download, just end
 					if(ret_value == 0)	//MD5值一样就不用下载 直接结束;
 					{
 						::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_LOCAL_EXSIT,NULL);
 						download_step = THREAD_IDLE;
 					}
+					// Inconsistent, need to download again
 					else	// 不一致就要再次下载;
 					{
 						::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_NOT_FIND_LOCAL,NULL);
@@ -743,6 +752,7 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				{
 					delete receivefile_buffer;
 					receivefile_buffer = NULL;
+					// Size of allocated memory space
 					total_file_length = 0;	//开辟的内存空间大小;
 				}
 				download_step = THREAD_IDLE;
@@ -932,8 +942,11 @@ BOOL Dowmloadfile::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
+// When updating packages with patches, place UpdateEng.exe in the zip file
 //更新包打补丁的时候，在zip文件中放置 UpdateEng.exe 
+// When opening T3000, during updates, replace the existing Update.exe to achieve automatic update engine
 //在打开T3000的时候，更新时，替换 原有的Update.exe 达到自动更新引擎的目的
+// T3000 updates, Update.exe updates itself
 //T3000 更新  Update.exe 更新 自己 .
 HANDLE h_updatefile = NULL;
 void Dowmloadfile::Update_File()

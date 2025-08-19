@@ -2,6 +2,7 @@
 
 #include "RelayLabel.h"
 #ifdef DEBUG
+ //Define whether to use http api
  //#define ENABLE_HTTP_FUCTION  //定义是否使用http api
 #endif // DEBUG
 
@@ -9,6 +10,7 @@
 //#define ENABLE_T3_EMAIL
 #define DISABLE_HANDLE_JSON_DATA
 #include <map>
+//minipanel register table
 //minipanel 寄存器表
 //  9800	-	9999    200个寄存器   setting
 //  10000	-   11471   1472		  OUT
@@ -84,6 +86,7 @@ const int THREAD_IDLE = 255;
 //const int TFTP_SEND_LENGTH = 3 * 1024 + 512;
 const int TFTP_SEND_LENGTH = 512;
 //const int TFTP_SEND_LENGTH = 1024;
+//Save alignment state
 #pragma pack(push) //保存对齐状态 
 #pragma pack(1)
 typedef struct
@@ -159,6 +162,7 @@ typedef struct
 
 
 
+//Restore alignment state
 #pragma pack(pop)//恢复对齐状态 
 
 
@@ -167,6 +171,7 @@ typedef enum
 	GET_SERIAL_NUMBER = 1,
 	DOWNLOAD_FILE = 2,
 	UPLOAD_FILE = 3,
+	//Used to distinguish DOWNLOAD_FILE, represents new download using 3K download;
 	DOWNLOAD_NEW_FILE = 4,	//用于区别  DOWNLOAD_FILE ， 代表新的下载利用3K下载;
 	GET_MD5_VALUE = 99,
 
@@ -251,8 +256,11 @@ const int PROTOCOL_GSM = 4;
 const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
 const int PROTOCOL_MSTP_TO_MODBUS = 11;
+//Network device, sub-port runs MSTP device, can only read registers after 10000 through Ptransfer
 const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;    //网络下面的设备，子口跑MSTP设备 ，只能通过Ptransfer 转10000以后寄存器读取
+//20200306 TSTAT10 or T3BB using MODBUS MODBUS485 connected to T3BB below
 const int PROTOCOL_MB_TCPIP_TO_MB_RS485 = 13;     //20200306 TSTAT10或者T3BB  使用MODBUS MODBUS485 接到  T3BB下面 
+//MODBUS485 uses PTP method to obtain T3 private data;
 const int PROTOCOL_MB_PTP_TRANSFER = 14;          //MODBUS485采用ptp 的方式获取 T3私有数据;
 const int PROTOCOL_THIRD_PARTY_BAC_BIP = 253;
 const int PROTOCOL_VIRTUAL = 254;
@@ -500,6 +508,7 @@ const int BAC_SHOW_MISSION_RESULTS = 3;
 const int BAC_LIST_REFRESH_INPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_OUTPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_TIME = 45000;//ms
+//If it's determined to be a network connection, use a 20-second refresh;
 const int BAC_LIST_REFRESH_ETHERNET_TIME = 45000;  //判断是接的网络就用20秒的刷新;
 
 const int SCHEDULE_TIME_NUM = 0;
@@ -523,6 +532,7 @@ const int HANDLE_I_AM_BIP = 1;
 struct _Bac_Scan_Com_Info
 {
     int nprotocol;  // 0 MSTP     1 BIP
+    //First four bits are IP address, last two bits are port number
     unsigned char ipaddress[6];   //前四位位IP地址  后两位位端口号
     int device_id;
     int macaddress;
@@ -565,6 +575,7 @@ struct _Resend_Read_Info
 	int task_result;
 	int invoke_id;
 	int has_resend_yes_or_no;
+	//How many times no reply received, then consider failed;
 	int timeout_count;//多少次还没收到回复，就算 失败;
 };
 
@@ -589,6 +600,7 @@ struct refresh_subnet_device
 {
     UCHAR device_count;
     UINT parent_sn;
+    // Reserved
     char reserved_data[15]; // 预留
     sub_net_status device_status[255];
 };
@@ -617,9 +629,13 @@ struct refresh_net_device
 	unsigned short bacnetip_port;
     int hardware_info;     //bit  0x74 zigbee   bit1 wifi
     int nprotocol;
+    //Version number of command 65, future replies to command 65 with changes should +1, mainly to maintain compatibility with previous reply protocols
     UCHAR  command_version; //65命令的版本号，以后回复的65命令 有改动就要+1 ，主要是要兼容以前的回复协议
+    //Which port the device replies from. 1- MainPort 2-ZigbeePort 3-SubPort
     UCHAR  subnet_port;  //设备属于哪一个端口回复出来的。 1- MainPort      2-ZigbeePort      3-SubPort
+    //Baud rate used by sub-devices; corresponds to previously defined baud rate serial numbers
     UCHAR  subnet_baudrate;   //子设备所用的波特率; 和之前定义的波特率序号对应
+	//Used to confirm which device it is, ESP device uses a master device;
 	UCHAR  minitype; //用来确认到底是哪个设备，ESP 设备用了一个主设备;
 };
 
@@ -676,8 +692,11 @@ struct Monitor_Input_Info
 {
 	int Max_Value;
 	int Min_Value;
+	//Is this entry recorded;
 	bool be_record;//是否记录了这条;
+	//Whether to use its own scale separately;
 	bool use_own_scale;//是否单独用自己的刻度;
+	//Whether to display graphics;
 	bool show_graphic; //是否显示图像;
 };
 
@@ -1172,34 +1191,63 @@ const CString Device_Serial_Port_Status[] =
 
 const CString Variable_Analog_Units_Array[] =
 {
+	// Unused
 	_T("Unused"),               // 未使用
+	// Celsius
 	_T("\u00B0C"),              // 摄氏度
+	 // Fahrenheit
 	_T("\u00B0F"),              // 华氏度
+	// Feet per Min → Abbreviated as FPM (feet/minute)
 	_T("FPM"),                  // Feet per Min → 简写为FPM（英尺/分钟）
+	// Pascal
 	_T("Pa"),                   // 帕斯卡
+	// Kilopascal
 	_T("KPa"),                  // 千帕
+	// lbs/sqr.inch → Abbreviated as PSI (pounds per square inch)
 	_T("PSI"),                  // lbs/sqr.inch → 简写为PSI（磅/平方英寸）
+	// inches of WC → Abbreviated as inWC (inches water column)
 	_T("inWC"),                 // inches of WC → 简写为inWC（英寸水柱）
+	// Watts → Abbreviated as W (watts)
 	_T("W"),                    // Watts → 简写为W（瓦特）
+	// KWatts → Abbreviated as kW (kilowatt, standard lowercase k)
 	_T("kW"),                   // KWatts → 简写为kW（千瓦，标准小写k）
+	// Kilowatt-hours
 	_T("KWH"),                  // 千瓦时
+	// Volts → Abbreviated as V (volts)
 	_T("V"),                    // Volts → 简写为V（伏特）
+	// Kilovolts
 	_T("KV"),                   // 千伏
+	// Amps → Abbreviated as A (amperes)
 	_T("A"),                    // Amps → 简写为A（安培）
+	// Milliamperes
 	_T("ma"),                   // 毫安
+	// Cubic feet per minute
 	_T("CFM"),                  // 立方英尺/分钟
+	// Seconds → Abbreviated as s (seconds)
 	_T("s"),                    // Seconds → 简写为s（秒）
+	// Minutes → Abbreviated as min (minutes)
 	_T("min"),                  // Minutes → 简写为min（分钟）
+	// Hours → Abbreviated as h (hours)
 	_T("h"),                    // Hours → 简写为h（小时）
+	// Days → Abbreviated as d (days)
 	_T("d"),                    // Days → 简写为d（天）
+	// Time
 	_T("Time"),                 // 时间
+	// Ohms → Abbreviated as Ω (ohm symbol)
 	_T("\u03A9"),               // Ohms → 简写为Ω（欧姆符号）
+	// Percentage
 	_T("%"),                    // 百分比
+	// Relative humidity
 	_T("%RH"),                  // 相对湿度
+	// Times per minute
 	_T("p/min"),                // 次/分钟
+	// Counts
 	_T("Counts"),               // 计数
+	// Percent open
 	_T("%Open"),                // 打开百分比
+	// Kilograms
 	_T("Kg"),                   // 千克
+	// L/Hour → Abbreviated as L/h (liters per hour)
 	_T("L/h"),                  // L/Hour → 简写为L/h（升/小时）
 	_T("GPH"),                  // 加仑/小时
 	_T("GAL"),                  // 加仑

@@ -86,6 +86,7 @@ int tstat29_register_var[TSTAT29_VAR_NUM]={	118,121,185,128,111,	112,114,115,119
 											329,330,331,332,333,     334,335,};
 */
 
+// Attention: Values in this array should not have completely inclusive occurrences
 _TCHAR * NET_WORK_CONTROLLER[] = {                  //attention:该数组中的值，不要有完全包含的出现
 						_T("ip Mode:"),		//0
 						_T("Ip Address:"),		//1
@@ -100,6 +101,7 @@ _TCHAR * NET_WORK_CONTROLLER[] = {                  //attention:该数组中的值，不
 						_T("Inter Character Timeout:"),		//10
 						_T("Factory Default:")		//11
 						};
+// Attention: Values in this array should not have completely inclusive occurrences
 _TCHAR * LC_VARIABLE_LIST[] = {                  //attention:该数组中的值，不要有完全包含的出现
 	_T("Input Filter Time:"),		//0
 	_T("Relay Pulse Duration:"),		//1
@@ -160,6 +162,7 @@ _TCHAR * STATE_DELAY_TIMES_CONST[] = {
 	_T("COOL_DELAY_TIMES  : "),
 	_T("HEAT_DELAY_TIMES  : "),
 };
+// Attention: Values in this array should not have completely inclusive occurrences
 _TCHAR * TSTATVAR_CONST_24[] = {                  //attention:该数组中的值，不要有完全包含的出现
 						_T("SEQUENCE"),		
 						_T("DEGC_OR_F"),                   
@@ -198,6 +201,7 @@ _TCHAR * TSTATVAR_CONST_24[] = {                  //attention:该数组中的值，不要
 						_T("NIGHT_COOLING_SETPOINT")
 						};
 
+// Attention: Values in this array should not have completely inclusive occurrences
 _TCHAR * TSTATVAR_CONST_25[] = {                  //attention:该数组中的值，不要有完全包含的出现
 	_T("SEQUENCE"),		
 	_T("DEGC_OR_F"),                   
@@ -298,6 +302,7 @@ _TCHAR * TSTATVAR_CONST_25[] = {                  //attention:该数组中的值，不要
 	_T("VAV_PID3_OFF_OUTPUT_HEAT2"),
 	_T("VAV_PID3_OFF_OUTPUT_HEAT3"),
 };	
+// Attention: Values in this array should not have completely inclusive occurrences
 _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要有完全包含的出现
 	_T("SEQUENCE"),		
 	_T("DEGC_OR_F"),                   
@@ -478,6 +483,7 @@ _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要
 	_T("VAV_PID3_OFF_OUTPUT_HEAT3"),
 
 };
+// Attention: Values in this array should not have completely inclusive occurrences
 _TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要有完全包含的出现
 	_T("COOL HEAT MODE"),																																																																																						
 	//_T("MODE OPERATION"),																																																																																						
@@ -876,6 +882,7 @@ _TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要
     _T("     MODBUS_PID_D_TERM  "),
     _T("     MODBUS_PID_SAMPLE_TIME  ")
 };
+// Attention: Values in this array should not have completely inclusive occurrences
 _TCHAR * CO2NODEVAR_CONST_25[] = {                  //attention:该数组中的值，不要有完全包含的出现
     _T("CO2 Calibration Offset"),		
     _T("Delta Value"),                   
@@ -3010,6 +3017,7 @@ bool Check_Config_File(wifstream & inf){
 		inf.getline(buf,1024);
 		if (find_sub_chars(buf,_T("Config File")))
 		{
+			// T3000 version number
 			inf.getline(buf,1024);//T3000 版本号
             if (find_sub_chars(buf,GetProductName(product_register_value[7])))
             {
@@ -3730,6 +3738,7 @@ void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_lo
 		CString sql;
 		sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),inputno,m_sn);
 		q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
+		// There is a table but no corresponding serial number value
 		if (!q.eof())//有表但是没有对应序列号的值
 		{
 
@@ -3831,6 +3840,7 @@ Reg_Infor Reg_Infor_Temp;
 	int register_id=_wtoi(buf);
     if (register_id == 101)
     {
+        // 2018 08 22  TSTAT current version COOL HEAT MODE, this register is not allowed to be written
         return;  //2018 08 22  TSTAT 现在的版本 COOL HEAT MODE ,这个寄存器 不让写.
     }
 	int register_value=_wtoi(temp);
@@ -3862,6 +3872,7 @@ Reg_Infor Reg_Infor_Temp;
         else
             product_register_value[register_id] = register_value;
     }
+// 20180911 Du Fan disabled, T5 needs it but not maintained now
 #if 0   //20180911 杜帆屏蔽 T5需要，但现在不维护;
 	if(register_id==185)
 	{
@@ -3872,6 +3883,7 @@ Reg_Infor Reg_Infor_Temp;
 #endif 
 	if(j==-2 && tstat_version<25 && tstat_version >0)  ////////////////////////if the version is 24.4 ,write_one some register will restart,for example 118,121
 	{
+		// 20180911 Du Fan disabled, T5 needs it but not maintained now
 		//Sleep(14000);	//20180911 杜帆屏蔽 T5需要，但现在不维护;
         if (!support_mul_write)
 		   j=write_one(now_tstat_id,register_id,register_value);	
@@ -4430,6 +4442,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 		multy_ret = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100,10);
 		//register_critical_section.Unlock();
 		Sleep(100);
+		// Fance: If read failure occurs, break out of the loop, because if it is a read failure caused by disconnection, it will prevent other places that need to read from getting resources
 		if(multy_ret<0)		//Fance : 如果出现读失败 就跳出循环体,因为如果是由断开连接 造成的 读失败 会使其他需要用到读的地方一直无法获得资源;
 			break;
         g_progress_persent = (i * 100) / 11;

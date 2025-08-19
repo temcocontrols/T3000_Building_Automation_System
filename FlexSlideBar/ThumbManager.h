@@ -51,7 +51,8 @@ private:
 	CRect					m_rcChannel;
 
 	CRect					m_rcParent;
-	int							m_nStepLength;		// 步长，通常是指几个刻度单位。
+	int							m_nStepLength;		// Step length, usually refers to several scale units.
+	                                            // 步长，通常是指几个刻度单位。
 
 
 };

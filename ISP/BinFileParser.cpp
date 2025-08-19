@@ -41,13 +41,14 @@ int CBinFileParser::GetBinFileBuffer(char* pFileBuf, int nFileBufLen)
             if (linenum==1)
             {
                 CString temp_identify;
-                //判断AXIS 0x100位置
+                //判断AXIS 0x100位置 //Check AXIS at position 0x100
 
-                //判断ESP8266 0x200位置
+                //判断ESP8266 0x200位置 //Check ESP8266 at position 0x200
 
                 m_strASIX.Format(_T("%C%C%C%C"),pBuf[0],pBuf[1],pBuf[2],pBuf[3]);
                 if (m_strASIX.CompareNoCase(_T("ASIX") ) == 0)
                 {
+                    //Fixed length of 20 elements
                     for (int i = 0; i<20; i++) //固定长度20个
                     {
                         if (pBuf[256 + i] != 0)
@@ -62,7 +63,7 @@ int CBinFileParser::GetBinFileBuffer(char* pFileBuf, int nFileBufLen)
                         }
                     }
                 }
-                else //在去0x200位置判断是不是ESP8266的固件;
+                else //在去0x200位置判断是不是ESP8266的固件; //Check if the firmware at position 0x200 is for ESP8266;
                 {
                     	MultiByteToWideChar( CP_ACP, 0, (char *)(&pBuf[512]),20,temp_identify.GetBuffer(MAX_PATH), MAX_PATH );
                         temp_identify.ReleaseBuffer();

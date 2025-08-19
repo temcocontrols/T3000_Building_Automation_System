@@ -68,6 +68,7 @@ BOOL CDebugWindow::OnInitDialog()
 	if(hInst)  
 	{      
 		typedef    BOOL    (WINAPI    *MYFUNC)(HWND,COLORREF,BYTE,DWORD);      
+		// Get pointer to SetLayeredWindowAttributes function
 		MYFUNC    fun    =    NULL;      //取¨?得Ì?SetLayeredWindowAttributes函¡¥数ºy指?针?     
 		fun=(MYFUNC)GetProcAddress(hInst,    "SetLayeredWindowAttributes");      
 		if(fun)
@@ -110,6 +111,7 @@ BOOL CDebugWindow::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
+//Hide debug window;
 //隐藏调试窗口;
 void CDebugWindow::OnClose()
 {
@@ -128,6 +130,7 @@ void CDebugWindow::Change_Transparency(int persent)
 	if(hInst)  
 	{      
 		typedef    BOOL    (WINAPI    *MYFUNC)(HWND,COLORREF,BYTE,DWORD);      
+		// Get pointer to SetLayeredWindowAttributes function
 		MYFUNC    fun    =    NULL;      //取¨?得Ì?SetLayeredWindowAttributes函¡¥数ºy指?针?     
 		fun=(MYFUNC)GetProcAddress(hInst,    "SetLayeredWindowAttributes");    
 		if(fun)
@@ -314,6 +317,7 @@ void CDebugWindow::OnCbnSelchangeComboDebugChoose()
 
 void CDebugWindow::OnBnClickedButtonDebug()
 {
+    // TODO: Add control notification handler code here
     // TODO: 在此添加控件通知处理程序代码
 	//BACNET_READ_ACCESS_DATA value;
 	//Bacnet_Read_Properties_Multiple_Blocking(47085, (BACNET_OBJECT_TYPE)8, 1, 77, value, 3);
@@ -341,6 +345,7 @@ void CDebugWindow::OnBnClickedButtonDebug()
 	return;
 
 
+	//Get corresponding product firmware information
 	//获取对应产品的 固件信息
 #if 0
 	StrGetFileInfo test1 = { 0 };
@@ -349,6 +354,7 @@ void CDebugWindow::OnBnClickedButtonDebug()
 	Sleep(1);
 #endif
 
+	//Get corresponding product firmware information
 	//获取对应产品的 固件信息
 #if 0
 #ifdef ENABLE_HTTP_FUCTION
@@ -380,9 +386,11 @@ test1.key[GETP_UPDATED].KeyName, test1.key[GETP_UPDATED].tValue.cs_value);
 #include "BacnetWeb.h"
 void CDebugWindow::OnBnClickedButtonWebTest()
 {
+    // TODO: Add control notification handler code here
     // TODO: 在此添加控件通知处理程序代码
 #if 0
-    mul_ping_flag = false; //关闭 ping 的命令;
+    // Close ping command;
+    mul_ping_flag = false; //Close ping command;//关闭 ping 的命令;
     for (int j = 1; j < 254; j++)
     {
         g_ipaddress_info.ip_status[j] = 0;
@@ -399,6 +407,7 @@ void CDebugWindow::OnBnClickedButtonWebTest()
 
 void CDebugWindow::OnBnClickedButtonBacnettool()
 {
+	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	close_bac_com();
     CBacnetTool dlg;

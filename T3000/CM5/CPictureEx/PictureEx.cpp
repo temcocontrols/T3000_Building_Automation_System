@@ -1,42 +1,46 @@
 /*
-BOOL Load(...) - 加载GIF并准备一个对象进行绘图;
-BOOL Draw() - 绘制图片或继续动画;
-void Stop() - 停止动画;
-void UnLoad() - 停止动画并释放所有资源;
-void SetBkColor(COLORREF) - 设置透明区域的填充颜色;
-COLORREF GetBkColor() - 获取当前填充颜色;
-BOOL IsGIF()- TRUE如果当前图片是GIF;
-BOOL IsAnimatedGIF()- TRUE如果当前图片是动画GIF;
-BOOL IsPlaying()- TRUE如果当前图片显示动画;
-SIZE GetSize() - 返回图片尺寸;
-int GetFrameCount() - 返回当前图片中的帧数;
-BOOL GetPaintRect(RECT *lpRect) - 返回当前绘制矩形;
-BOOL SetPaintRect(const RECT *lpRect) - 设置当前绘制矩形;
+BOOL Load(...) - 加载GIF并准备一个对象进行绘图; - Load GIF and prepare an object for drawing;
+BOOL Draw() - 绘制图片或继续动画; - Draw the picture or continue the animation;
+void Stop() - 停止动画;- Stop the animation;
+void UnLoad() - 停止动画并释放所有资源; - Stop the animation and release all resources;
+void SetBkColor(COLORREF) - 设置透明区域的填充颜色; - Set the fill color for the transparent area;
+COLORREF GetBkColor() - 获取当前填充颜色; - Get the current fill color;
+BOOL IsGIF()- TRUE如果当前图片是GIF; - TRUE if the current picture is GIF;
+BOOL IsAnimatedGIF()- TRUE如果当前图片是动画GIF; - TRUE if the current picture is animated GIF;
+BOOL IsPlaying()- TRUE如果当前图片显示动画; - TRUE if the current picture is displaying animation;
+SIZE GetSize() - 返回图片尺寸; - Return the picture size;
+int GetFrameCount() - 返回当前图片中的帧数; - Return the number of frames in the current picture;
+BOOL GetPaintRect(RECT *lpRect) - 返回当前绘制矩形; - Return the current paint rectangle;
+BOOL SetPaintRect(const RECT *lpRect) - 设置当前绘制矩形; - Set the current paint rectangle;
 
-CPictureEx[Wnd]::Load 有三个版本可用：
+CPictureEx[Wnd]::Load 有三个版本可用: - Load has three versions available:
 BOOL Load(LPCTSTR szFileName);
-该版本从文件加载图片szFileName。函数的返回类型表示加载的成功。
+该版本从文件加载图片szFileName。函数的返回类型表示加载的成功。-  This version loads the picture from the file szFileName. The return type of the function indicates whether the loading was successful.
 
 BOOL Load(HGLOBAL hGlobal, DWORD dwSize);
-这Load将获得一个分配给GlobalAlloc和GMEM_MOVEABLE标志的全局内存块的句柄。该功能不会释放内存，所以不要忘记GlobalFree它。返回值表示加载的成功。
+这Load将获得一个分配给GlobalAlloc和GMEM_MOVEABLE标志的全局内存块的句柄。该功能不会释放内存，所以不要忘记GlobalFree它。返回值表示加载的成功。- This Load will get a handle to a global memory block allocated with GlobalAlloc and the GMEM_MOVEABLE flag. The function does not free the memory, so don't forget to GlobalFree it. The return value indicates whether the loading was successful.
 
 BOOL Load(LPCTSTR szResourceName,LPCTSTR szResourceType);
-该函数获取具有图片的资源的名称和该资源类型的名称。例如：
+该函数获取具有图片的资源的名称和该资源类型的名称。例如：- This function takes the name of the resource with the picture and the name of that resource type. For example:
 
 m_Picture.Load(MAKEINTRESOURCE(IDR_MYPIC),_T("GIFTYPE"));
+// After loading the image, display it using the CPictureEx[Wnd]::Draw() function. If the image is an animated GIF, this function will spawn a background thread to perform the animation; if it's a static image, it will immediately display the image using OleLoadPicture/IPicture. You can stop the spawned thread at any time using the CPictureEx[Wnd]::Stop() function. If you want to not only stop the animation but also release all resources, use CPictureEx[Wnd]::UnLoad() (which automatically calls UnLoad()). 
 加载图片后，用CPictureEx[Wnd]::Draw()功能显示。如果图片是动画GIF，该功能将产生一个后台线程来执行动画; 如果是静态图片，它将立即显示OleLoadPicture/ IPicture。您可以随时使用该CPictureEx[Wnd]::Stop()功能停止生成的线程。如果您不仅要停止动画，还要释放所有资源，请使用CPictureEx[Wnd]::UnLoad()（自动CPictureEx[Wnd]::Load()调用UnLoad()）。
 
+// By default, the background color of the picture is filled with COLOR_3DFACE (the background color of the dialog window). If you need to change the background information of the picture, please CPictureEx[Wnd]::SetBkColor(COLORREF) and then CPictureEx[Wnd]::Load().
 默认情况下，图片的背景填充COLOR_3DFACE（对话窗口的背景颜色）。如果您需要更改图片的背景信息，请CPictureEx[Wnd]::SetBkColor(COLORREF)然后CPictureEx[Wnd]::Load()。
 
+// Add the following code to OnInitDialog (or wherever you like):
 在OnInitDialog(或者其他什么你喜欢的地方)加入下面的代码：   
 
-if (m_Picture.Load(_T("mypicture.gif")))   //文件的路径，用相对路径或者绝对路径都行
+if (m_Picture.Load(_T("mypicture.gif")))   //文件的路径，用相对路径或者绝对路径都行 - The file path can be a relative path or an absolute path
     m_Picture.Draw();   
-或者
+或者 - or
 
-if (m_Picture.Load(MAKEINTRESOURCE(IDR_GIF),_T("Gif")))//IDR_GIF导入工程gif的id属性,IDR_GIF是资源文件
+if (m_Picture.Load(MAKEINTRESOURCE(IDR_GIF),_T("Gif")))//IDR_GIF导入工程gif的id属性,IDR_GIF是资源文件 - IDR_GIF is the resource file
+    m_Picture.Draw();
 m_Picture.Draw();
-可以在onpaint()中移动加载gif的图片控件：
+可以在onpaint()中移动加载gif的图片控件 - You can move the image control loaded with gif in onpaint()
 
 
 CRect rc =CRect(100,400,150,450);

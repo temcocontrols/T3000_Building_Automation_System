@@ -72,7 +72,9 @@ void CFlexSlideWnd::SetFSBStyle(FSB_STYLE fsbStyle)
 		switch(fsbStyle)
 		{
 		case FSB_STYLE_SINGLETHUMB:
+ 		// Because ThumbOperator is an abstract class, but CSingleThumbOpt has a function not yet implemented, virtual int GetThumbNum()=0;
  		//	m_pThumbOpter = new CSingleThumbOpt;//因ThumbOperator是抽象类，但在CSingleThumbOpt有一个函数还没实现，	virtual int GetThumbNum()=0;
+			// So CSingleThumbOpt cannot be instantiated either
 			//所以CSingleThumbOpt也不能实例化
  		//	m_pThumbOpter->SetParentWnd(this);
 			break;
@@ -114,6 +116,7 @@ void CFlexSlideWnd::SetFSBThumbShape(FSB_THUMBSHAPE fsbTbShape)
 	m_pThumbOpter->SetThumbShape(fsbTbShape);
 }
 
+// Set the position of the control
 // 设置控件的位置
 void CFlexSlideWnd::SetFlexSlideBarRect(CRect& rc)
 {
@@ -122,6 +125,9 @@ void CFlexSlideWnd::SetFlexSlideBarRect(CRect& rc)
 	m_rc = rc;
 }
 
+// Set channel width, not greater than control width, not less than 1 pixel
+// Channel length should be calculated based on control length  
+// The width here refers to the shorter side length, for vertical it's width, for horizontal it's height
 // 设置channel的宽度，不得大于控件宽度，不小于1个象素
 // channel 长度应该依据控件长度来计算获得
 // 这里的宽度是指的较短的边长，相对于垂直来说，是width，对于水平来说，是height
@@ -150,6 +156,7 @@ int CFlexSlideWnd::GetChannelWidth()
 	return m_fsbChannel.GetWidth();
 }
 
+// Set Channel color
 // 设置Channel的颜色
 COLORREF CFlexSlideWnd::GetChannelColor()
 {
@@ -174,6 +181,7 @@ void CFlexSlideWnd::SetThumbWidth(int nThumbWidth)
 }
 
 
+// Set Thumb color
 // 设置Thumb的颜色
 COLORREF CFlexSlideWnd::GetThumbColor()const		
 {
@@ -280,6 +288,7 @@ void CFlexSlideWnd::CalcTicMarks(CRect& rcChannel)
 }
 
 
+// Create flex slidebar
 // 创建flex slidebar
 BOOL CFlexSlideWnd::CreateFlexSlideBar(
 									   BOOL bHorizontal, 

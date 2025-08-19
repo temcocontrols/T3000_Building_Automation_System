@@ -57,30 +57,42 @@ void CIONameConfig::ClickMsflexgridIotable()
 {
     m_Clicked=TRUE;
 	long lRow,lCol;
+	//Get the clicked row number
 	lRow = m_IONametable.get_RowSel();//获取点击的行号	
+	//Get the clicked column number
 	lCol = m_IONametable.get_ColSel(); //获取点击的列号
 	if(lRow==0)
 		return;
 	CRect rect;
+	//Get the window rectangle of the table control
 	m_IONametable.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
+	//Convert to client rectangle
+	ScreenToClient(rect); //转换为客户区矩形
 	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
 	//需要将其转化为像素，1440缇= 1英寸
+	// The length unit for MSFlexGrid control functions is "twips"
+	// It needs to be converted to pixels; 1440 twips = 1 inch
 	CDC* pDC =GetDC();
 	//计算象素点和缇的转换比例
+	// Calculate the conversion ratio between pixels and twips
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
 	//计算选中格的左上角的坐标(象素为单位)
+	// Calculate the top-left coordinate of the selected cell (in pixels)
 	long y = m_IONametable.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_IONametable.get_ColPos(lCol)/nTwipsPerDotX;
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	// Calculate the size of the selected cell (in pixels). Adding 1 gives better visual results based on actual debugging
 	long width = m_IONametable.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_IONametable.get_RowHeight(lRow)/nTwipsPerDotY+1;
 	//形成选中个所在的矩形区域
+	// Form the rectangle region of the selected cell
 	CRect rc(x,y,x+width,y+height);
 	//转换成相对对话框的坐标
+	// Convert to coordinates relative to the dialog box
 	rc.OffsetRect(rect.left+1,rect.top+1);
-	//获取选中格的文本信息	
+	//获取选中格的文本信息
+	// Get the text information of the selected cell
 	CString strValue = m_IONametable.get_TextMatrix(lRow,lCol);
 	m_oldname=strValue;
 	m_nCurRow=lRow;

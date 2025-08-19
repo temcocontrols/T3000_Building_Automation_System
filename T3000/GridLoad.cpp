@@ -142,6 +142,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		//{
 		//	nID=read_one(nTempID,6);
 		//}
+		//if (nID<0)//If no ID is read, skip it
 		//if (nID<0)//没有读到 ID，就省略掉
 		//{
 		//   continue;
@@ -731,7 +732,9 @@ END_EVENTSINK_MAP()
 void CGridLoad::ClickMsflexgrid1()
 {
 	long lRow,lCol;
+	//Get the selected row number
 	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	//Get the selected column number
 	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 	UpdateData(false);
 	if(lRow==0 || lCol==0)
@@ -741,24 +744,34 @@ void CGridLoad::ClickMsflexgrid1()
 	if(lRow==nRowsCounts-1)
 		return;
 	CRect rect;
+	//Get the window rectangle of the grid control
 	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	//Convert to client rectangle
 	ScreenToClient(rect); //转换为客户区矩形	
+	// The length unit of MSFlexGrid control functions is "twips",
 	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	//Need to convert it to pixels, 1440 twips = 1 inch
 	//需要将其转化为像素，1440缇= 1英寸
 	CDC* pDC =GetDC();
+	//Calculate the conversion ratio between pixels and twips
 	//计算象素点和缇的转换比例
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//Calculate the top-left coordinates of the selected cell (in pixels)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	//Calculate the size of the selected cell (in pixels). Adding 1 gives better effect based on actual debugging
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//Form the rectangle area where the selected cell is located
 	//形成选中个所在的矩形区域
 	CRect rc(x,y,x+width,y+height);
+	//Convert to dialog-relative coordinates
 	//转换成相对对话框的坐标
 	rc.OffsetRect(rect.left+1,rect.top+1);
+	//Get the text information of the selected cell
 	//获取选中格的文本信息
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
 	row_row=lRow;
@@ -1484,6 +1497,7 @@ BOOL CGridLoad::CheckLoadFileForNC(GRID_LOAD& glItem)
 BOOL CGridLoad::CheckLoadFileForTStat(GRID_LOAD& glItem)
 {
 	BOOL bRet = FALSE;
+	// Not a tstat
 	if(glItem.device > PM_TSTAT5H)  // 不是tstat
 	{
 		return FALSE;

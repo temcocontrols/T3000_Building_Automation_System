@@ -92,6 +92,7 @@ void CGraphicView::InitGraphic(int nSerialNum,int nTstatID)
 	//	GetDlgItem(IDC_EDTBUTTON)->ShowWindow(SW_HIDE);
 	//	GetDlgItem(IDC_APPLYBUTTON)->ShowWindow(SW_HIDE);
 		FindClose(hFile);
+		//Automatically delete related records since image doesn't exist, Label has no meaning
 		//自动删除相关记录，因为图象不存在，Label没有任何意思
 
 	}
@@ -103,6 +104,7 @@ void CGraphicView::InitGraphic(int nSerialNum,int nTstatID)
 	
 	ReloadLabelsFromDB();
 	this->SetFocus();
+	//This timer is used to refresh Labels;
 	SetTimer(1,7000,NULL);//此定时器是用于刷新 Label的;
 }
 // CGraphicView message handlers
@@ -489,6 +491,7 @@ void CGraphicView::ReloadLabelsFromDB()
 	_variant_t temp_variant;
 	int nTemp;
 	CString strTemp;
+	//Used to record how many items need to be refreshed;
 	int nItem = 0;//用于记录有多少个需要刷新;
 	while(!q.eof())
 	{	
@@ -777,6 +780,7 @@ void CGraphicView::OnTimer(UINT_PTR nIDEvent)
 	switch(nIDEvent)
 	{
 	case 1:
+		//If it's CM5 Bacnet protocol; don't modify original TSTAT processing methods and procedures;
 		if(bac_cm5_graphic == true)	//如果是CM5 的Bacnet的协议 ;原来TSTAT的 处理方法和过程不要动;
 		{
 			for (int i=0;i<(int)m_graphic_refresh_data.size();i++)
@@ -811,6 +815,7 @@ void CGraphicView::OnTimer(UINT_PTR nIDEvent)
 					temp.Format(_T("%d"),m_Variable_data.at(m_graphic_refresh_data.at(i).value_item).value);
 				}
 
+				//Set the displayed value on the Label;
 				m_graphic_refresh_data.at(i).control_pt->m_strValueText = temp;	//在Label上 设置显示的 值;
 #endif
 				m_graphic_refresh_data.at(i).control_pt->Invalidate();

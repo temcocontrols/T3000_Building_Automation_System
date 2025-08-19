@@ -41,6 +41,7 @@
 #define MAX_SEND_FRAMES             5
 
 
+// Save alignment state
 #pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
 #pragma pack(1)
 
@@ -257,6 +258,7 @@ typedef struct
 
 } UNITDATA_PARAMETERS;
 
+// Restore alignment state
 #pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
 
 //typedef struct {

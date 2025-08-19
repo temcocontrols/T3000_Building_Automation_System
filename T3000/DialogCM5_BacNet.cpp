@@ -704,6 +704,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	GetParentFrame()->RecalcLayout();
 	ResizeParentToFit();
 
+	//Add two pages to Tab Control;
 	//为Tab Control增加两个页面;
 	m_bac_main_tab.InsertItem(WINDOW_INPUT, _T("Input    "));
 	m_bac_main_tab.InsertItem(WINDOW_OUTPUT, _T("Output    "));
@@ -727,6 +728,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_MONITOR] = Monitor_Window = new CBacnetMonitor;
 	pDialog[WINDOW_ALARMLOG] = AlarmLog_Window = new CBacnetAlarmLog;
 	
+	//Create two dialog boxes;
 	//创建两个对话框;
 	Input_Window->Create(IDD_DIALOG_BACNET_INPUT, &m_bac_main_tab);
 	Output_Window->Create(IDD_DIALOG_BACNET_OUTPUT, &m_bac_main_tab);
@@ -738,6 +740,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	AnnualRoutine_Window->Create(IDD_DIALOG_BACNET_ANNUAL_ROUTINES, &m_bac_main_tab);
 	Monitor_Window->Create(IDD_DIALOG_BACNET_MONITOR, &m_bac_main_tab);
 	AlarmLog_Window->Create(IDD_DIALOG_BACNET_ALARMLOG,&m_bac_main_tab);
+	//Set the range displayed within the Tab;
 	//设定在Tab内显示的范围;
 	CRect rc;
 	m_bac_main_tab.GetClientRect(rc);
@@ -752,6 +755,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	}
 
 
+	//Display the initial page
 	//显示初始页面
 	pDialog[WINDOW_INPUT]->ShowWindow(SW_SHOW);
 	pDialog[WINDOW_OUTPUT]->ShowWindow(SW_HIDE);
@@ -765,6 +769,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_ALARMLOG]->ShowWindow(SW_HIDE);
 
 	g_hwnd_now = m_input_dlg_hwnd;
+	//Save the current selection
 	//保存当前选择
 //	m_CurSelTab = WINDOW_INPUT;
 
@@ -810,6 +815,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		Str_program_point temp_program;
 		memset(temp_program.description,0,21);
 		memset(temp_program.label,0,9);
+		//Default to 400 length during initialization to avoid not reading data;
 		temp_program.bytes = 400;//初始化时默认为400的长度，避免读不到数据;
 		m_Program_data.push_back(temp_program);
 	}
@@ -919,6 +925,7 @@ void CDialogCM5_BacNet::Fresh()
 			Set_RS485_Handle(NULL);
 		}
 
+		//Both network and serial port must be closed here;
 		SetCommunicationType(0);	//这里要同时关闭网络的和串口的;
 		close_com();
 		//SetCommunicationType(1);
@@ -934,7 +941,9 @@ void CDialogCM5_BacNet::Fresh()
 
 		CString Program_Path,Program_ConfigFile_Path;
 		int g_com=0;
+		//Get the absolute address of current running;
 		GetModuleFileName(NULL,Program_Path.GetBuffer(MAX_PATH),MAX_PATH);  //获取当前运行的绝对地址;
+		//Return the upper directory of the absolute address?;
 		PathRemoveFileSpec(Program_Path.GetBuffer(MAX_PATH) );            //返回绝对地址的上层目录?;
 		Program_Path.ReleaseBuffer();
 		Program_ConfigFile_Path = Program_Path + _T("\\MyConfig.ini");
@@ -1003,6 +1012,7 @@ void CDialogCM5_BacNet::Fresh()
 	m_cm5_time_picker.SetFormat(_T("HH:mm"));
 
 	SetTimer(1,500,NULL);
+	//Timer 2 is used to send whois at intervals; don't know when the device will be removed;
 	SetTimer(2,15000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 	SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
 	BacNet_hwd = this->m_hWnd;
@@ -1317,6 +1327,7 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
+			//Clear all INVOKE IDs to zero every time you click;
 			tsm_free_all_invoke_id();//每次点击的时候都将所有INVOKE ID 清零;
 			Show_Wait_Dialog_And_SendMessage(button_click);
 		}
@@ -1502,6 +1513,7 @@ void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 	{
 		if(bac_read_which_list == BAC_READ_SVAE_CONFIG)
 		{
+			//If saving as ini file, need to read all data;
 			WaitDlg = new BacnetWait((int)2);//如果是保存为ini文件 就要读取全部的data;
 		}
 		else
@@ -2515,6 +2527,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 		{
 			if(AlarmWindow_Window!=NULL)
 			{
+				//Display;
 				if(bac_show_alarm_window)//显示;
 				{
 					if(!(CBacnetAlarmWindow *)AlarmWindow_Window->IsWindowVisible())
@@ -2620,6 +2633,7 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 				g_hwnd_now = m_monitor_dlg_hwnd;
 				break;
 			case WINDOW_ALARMLOG:
+				//Add refresh list and change current window hwnd;
 				//增加刷新list和改变当前window 的hwnd;
 				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALARMLOG);
 				((CBacnetAlarmLog *)pDialog[i])->Fresh_Alarmlog_List(NULL,NULL);

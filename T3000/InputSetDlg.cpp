@@ -172,6 +172,7 @@ DWORD WINAPI CInputSetDlg::StartRefresh(LPVOID lpVoid)
 	memcpy_s(product_register_value,sizeof(product_register_value),product_register_value,sizeof(product_register_value));//
 	//if ((product_register_value[7] == 6)||(product_register_value[7] == 7))//tstat6
 	//{
+	//	//product_register_value[] list exchange.
 	//	//product_register_value[]列表交换。
 	//	memset(pParent->tempchange,0,sizeof(pParent->tempchange));
 	//	int index = 0;
@@ -282,6 +283,7 @@ BOOL CInputSetDlg::OnInitDialog()
 		case PM_TSTAT7:
 		m_inRows=12;break;
 		case PM_PRESSURE:
+		// 5D same as TStat7
 		case 12:m_inRows=5;break; // 5D 同 TStat7
 		case PM_TSTAT6:	m_inRows=12;break;
         case PM_TSTAT5i:	m_inRows=12;break;
@@ -493,8 +495,10 @@ BOOL CInputSetDlg::PreTranslateMessage(MSG* pMsg)
  	if (pMsg->message == WM_KEYDOWN)
  	{
 		 if(GetFocus()->GetDlgCtrlID() == IDC_MSFLEXGRID1){
-		 HideAllControls();
-		  			int lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+			HideAllControls();
+			//Get the clicked row number
+			int lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+			//Get the clicked column number
  			int lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 			int lRow_Count = m_FlexGrid.get_Rows();
 			int lCol_Count = m_FlexGrid.get_Cols();

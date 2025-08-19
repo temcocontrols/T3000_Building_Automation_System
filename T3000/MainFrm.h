@@ -124,20 +124,29 @@ typedef struct _BUILDING_TAG
 typedef struct ext_info
 {
 	int virtual_device;  // 0  default    1  verture device
+	//Corresponds to mini_type in Settings interface
 	int mini_type;       //对应 Setting 界面的  mini_type
+	//Value 1 for customer-defined serial port stop bits, parity bits, etc.
 	int special_com_communicate;  //取值  1  客户自定义的串口 停止位 校验位之类的;
+	//Value -1 for unavailable, 5 6 7 8
 	unsigned char com_data_bit;   //取值  -1 为不可用    5  6 7 8
+	//Value -1 for unavailable, 1 1.5 2
 	unsigned char com_stop_bit;   //取值  -1 为不可用    1   1.5   2
+	//Value -1 for unavailable, 0:None 1:odd 2:Even
 	unsigned char com_parity_bit;  //取值  -1 为不可用  0:None  1:odd    2:Even   
 
 };
 
 typedef struct tree_io_info
 {
+	//Child node tree handle
 	HTREEITEM h_tree_item; //子节点树句柄
+	// Parent node handle
 	HTREEITEM h_parent_item; // 父节点的句柄
 	int h_item_type; // input or output or ......
+	//Maximum number
 	int capacity;   //最大个数
+	//Already used
 	int already_use; //已经使用;
 }tree_sub_io;
 

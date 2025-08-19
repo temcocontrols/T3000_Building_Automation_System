@@ -86,13 +86,13 @@ public:
 	void Read_Input_Group_Mapping(BOOL Input_Group);
 	CString m_datetime;
 	unsigned short LightCregister[512];
-	BOOL prodtopcData();//采集数据
-	BOOL checkDB(CString DBname,CString strSQL);//决定是否创建数据库
+	BOOL prodtopcData();//采集数据 - Collect data
+	BOOL checkDB(CString DBname,CString strSQL);//决定是否创建数据库 - Decide whether to create a database
 	 
  
  
 
-	int comnum;//读取串口号
+	int comnum;//读取串口号 - // Read the serial port number
 	vector<lightingcontroller>veclightingcontroller;
 	lightingcontroller m_veclightingcontroller;
 
@@ -131,7 +131,7 @@ public:
 	 CEdit m_editName;
 	 afx_msg void OnEnKillfocusEditModifyname();
 	 afx_msg void OnEnKillfocusEditTimeSaveDelay();
-	 //存放输出名称Status
+	 //存放输出名称Status - // Store output name status
 	 vector<ONS>m_vecONS;
 	 ONS m_structONS;
   
@@ -166,7 +166,7 @@ public:
 	VECTOR_OUT_PARAM m_vecoutparam;
 
 public:
-	typedef std::map<int,CString> MAP_OUT_ADDRESS;//int表示output板的顺序 CString是output的地址
+	typedef std::map<int,CString> MAP_OUT_ADDRESS;//int表示output板的顺序 CString是output的地址 - // int represents the order of the output board, CString is the address of the output
 	MAP_OUT_ADDRESS m_mapoutputaddress;
 
 	
@@ -235,10 +235,10 @@ public:
 	map<CString,vecaddoutputs> m_mapaddoutputs;
 	unsigned short SerialNum[60];
 
-	BOOL GetSerialComm(vector<CString>& szComm);//读了串口
+	BOOL GetSerialComm(vector<CString>& szComm);//读了串口 - Read the serial port
 	vector<CString> m_szComm;
 
-	int outputno;//output端口号
+	int outputno;//output端口号 - // Output port number
 
 	 
 

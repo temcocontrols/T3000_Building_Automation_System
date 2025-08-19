@@ -1,4 +1,4 @@
-﻿// CTstatAQ_Parameter.cpp: 实现文件
+﻿// CTstatAQ_Parameter.cpp: 实现文件 - Implementation file
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "global_function.h"
 extern CString jpg_airlab;
-// CTstatAQ_Parameter 对话框
+// CTstatAQ_Parameter 对话框 - CTstatAQ_Parameter dialog
 
 IMPLEMENT_DYNAMIC(CTstatAQ_Parameter, CDialogEx)
 

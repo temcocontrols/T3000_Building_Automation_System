@@ -45,7 +45,7 @@ END_MESSAGE_MAP()
 
 void CLightingSet::OnBnClickedOk()
 {
-	int Count = m_List_Box.GetCount();//获取增加的地址总数量
+	int Count = m_List_Box.GetCount();//获取增加的地址总数量 - // Get the total number of addresses added
 	m_mapoutputaddress.clear();
 
 	if(Count!= 0)
@@ -75,10 +75,12 @@ void CLightingSet::OnBnClickedButton1()//add
 		strtmp.Format(_T("%d"),m_intaddress);
 		if((m_List_Box.FindString(index,strtmp)) == LB_ERR)
 		{
-			//m_List_Box.InsertString(m_outputboardsum+1,strtmp);//这样写的话，界面上看不到。但将这行代码放在for循环中则可以
-			//m_List_Box.AddString(m_straddress);//注意要将控件中的sort这项设为fase，否则增加的这一项不是放在listbox的最后面，按字母或数字顺序的
+			//这样写的话，界面上看不到。但将这行代码放在for循环中则可以 - // This way, it cannot be seen on the interface, but it can be seen if this line of code is placed in the for loop
+			//m_List_Box.InsertString(m_outputboardsum+1,strtmp);
+			//注意要将控件中的sort这项设为fase，否则增加的这一项不是放在listbox的最后面，按字母或数字顺序的 - // Note that the sort option in the control should be set to false, otherwise the added item will not be placed at the end of the listbox, sorted by letters or numbers
+			//m_List_Box.AddString(m_straddress);
 			m_List_Box.AddString(strtmp);
-			m_List_Box.SetCurSel(m_outputboardsum);//索引从0开始,这里选中的是新增加的这一项
+			m_List_Box.SetCurSel(m_outputboardsum);//索引从0开始,这里选中的是新增加的这一项 - // The index starts from 0, and the newly added item is selected here
 			m_outputboardsum+=1;
 			m_intaddress++;
 		
@@ -92,10 +94,10 @@ void CLightingSet::OnBnClickedButton1()//add
 		}
 			UpdateData(FALSE);
 
-		// 	AddString( "xxx ")---------在listbox的最后位置添加 
-		// 	InsertString(index, "xxx ")----------在指定的index位置添加 "xxx " 
+		// 	AddString( "xxx ")---------在listbox的最后位置添加 - // AddString("xxx ") - Add "xxx " at the end of the listbox
+		// 	InsertString(index, "xxx ")----------在指定的index位置添加 "xxx " - // Insert "xxx " at the specified index position
 		// 	CString   str; 
-		// 	GetText(index,str)--------获取在index处的文本，保存在str中
+		// 	GetText(index,str)--------获取在index处的文本，保存在str中 - // GetText(index, str) - Get the text at index and store it in str
 	}
 	else
 		AfxMessageBox(_T("Please enter modbus address from 1 to 200."));
@@ -117,9 +119,9 @@ BOOL CLightingSet::OnInitDialog()
 //	m_List_Box.AddString()
 	//UpdateData(FALSE);
 
-// 	theApp.pCWnd   =   this;   //这样写 
+// 	theApp.pCWnd   =   this;   //这样写 - Write like this
 // 
-// 	//   这样写也可以，ID必须是对话框上的控件，得到的指针也是控件类的指针 
+// 	//   这样写也可以，ID必须是对话框上的控件，得到的指针也是控件类的指针  - //   // This can also be written, the ID must be the control on the dialog box, and the pointer obtained is also a pointer to the control class
 // 	theApp.pCWnd   =   GetDlgItem(B的ID);
 
 // 	CWnd*pCWnd  = (CLightingController)GetDlgItem(IDD_DIALOG_LIGHTINGCONTROLLER);
@@ -213,10 +215,10 @@ void CLightingSet::OnBnClickedButtonmodify()
 		{
 			
 			m_List_Box.DeleteString(i);
-			m_List_Box.InsertString(i,strtmp);//这样写的话，界面上看不到。但将这行代码放在for循环中则可以
-			//m_List_Box.AddString(m_straddress);//注意要将控件中的sort这项设为fase，否则增加的这一项不是放在listbox的最后面，按字母或数字顺序的
+			m_List_Box.InsertString(i,strtmp);//这样写的话，界面上看不到。但将这行代码放在for循环中则可以 - // This way, it cannot be seen on the interface, but it can be seen if this line of code is placed in the for loop
+			//m_List_Box.AddString(m_straddress);//注意要将控件中的sort这项设为fase，否则增加的这一项不是放在listbox的最后面，按字母或数字顺序的 - // Note that the sort option in the control should be set to false, otherwise the added item will not be placed at the end of the listbox, sorted by letters or numbers
 			//m_List_Box.AddString(strtmp);
-			//m_List_Box.SetCurSel(m_outputboardsum);//索引从0开始,这里选中的是新增加的这一项
+			//m_List_Box.SetCurSel(m_outputboardsum);//索引从0开始,这里选中的是新增加的这一项 - // The index starts from 0, and the newly added item is selected here
 			//m_outputboardsum+=1;
 			//m_intaddress++;
 
@@ -230,10 +232,10 @@ void CLightingSet::OnBnClickedButtonmodify()
 		}
 		UpdateData(FALSE);
 
-		// 	AddString( "xxx ")---------在listbox的最后位置添加 
-		// 	InsertString(index, "xxx ")----------在指定的index位置添加 "xxx " 
+		// 	AddString( "xxx ")---------在listbox的最后位置添加 - // AddString("xxx ") - Add "xxx " at the end of the listbox
+		// 	InsertString(index, "xxx ")----------在指定的index位置添加 "xxx " - // Insert "xxx " at the specified index position
 		// 	CString   str; 
-		// 	GetText(index,str)--------获取在index处的文本，保存在str中
+		// 	GetText(index,str)--------获取在index处的文本，保存在str中 - // GetText(index, str) - Get the text at index and store it in str
 	}
 	else
 		AfxMessageBox(_T("Please enter modbus address from 1 to 200."));

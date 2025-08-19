@@ -856,7 +856,8 @@ CHexFileParser* pHexFile = new CHexFileParser;
 pHexFile->SetFileName(filepath);
 pFileBuffer = new char[c_nHexFileBufLen];
 memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
-int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
+// Get file buffer
+int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer - Get file buffer
 
 memcpy(&ret_bin_Info,&pFileBuffer[Address],sizeof(Bin_Info));
 
@@ -1033,7 +1034,9 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
 
 }
 
+// 0 normal mode, 1 flash boot mode
 extern int com_port_flash_status;  // 0 正常模式   1 烧写boot模式
+// 0 no need to update boot, 1 need to update bootloader; C1 is hex
 extern int firmware_must_use_new_bootloader;  //0 不用更新boot   1 需要更新bootload;   C1为hex
 int check_bootloader_and_frimware(int npid ,int comport , unsigned short reg_11 , unsigned short reg_14, int &update_value, unsigned char app_already_version)
 {
@@ -1046,7 +1049,7 @@ int check_bootloader_and_frimware(int npid ,int comport , unsigned short reg_11 
 	int Ret_Result = 1;
 	if ((((npid >= STM32_CO2_NET) && (npid <= STM32_PRESSURE_RS485)) ||
 		(npid == STM32_PM25)) &&
-		app_already_version >= 59) //不管读到没读到 boot version 都不用 再次更新boot
+		app_already_version >= 59) //不管读到没读到 boot version 都不用 再次更新boot - Regardless of whether the boot version is read or not, it does not need to be updated again
 	{
 		c2_update_boot = false;
 		return Ret_Result;
@@ -1085,7 +1088,7 @@ int check_bootloader_and_frimware(int npid ,int comport , unsigned short reg_11 
                 {
                     if (comport == 0)
                     {
-                        c2_update_boot = false; //不支持串口更新
+                        c2_update_boot = false; //不支持串口更新 - Do not support serial port update
                         Ret_Result = -1;
                     }
                     else
@@ -1096,7 +1099,7 @@ int check_bootloader_and_frimware(int npid ,int comport , unsigned short reg_11 
                 {
                     if (comport == 0)
                     {
-                        c2_update_boot = false; //不支持串口更新
+                        c2_update_boot = false; //不支持串口更新 - Do not support serial port update
                         Ret_Result = -1;
                     }
                     else
@@ -1188,7 +1191,7 @@ int mudbus_read_one(unsigned char device_var, unsigned short address, int retry_
 
 int mudbus_write_one(unsigned char device_var, unsigned short address, short value, int retry_times)
 {
-    //2018 0606 在底层公共读写函数增加对不同协议的处理
+    //2018 0606 在底层公共读写函数增加对不同协议的处理 - Add support for different protocols in the underlying read/write functions
     if (SPECIAL_BAC_TO_MODBUS)
     {
         int n_ret = 0;
@@ -1277,7 +1280,7 @@ int modbus_read_multi(unsigned char device_var, unsigned short *put_data_into_he
 
 int mudbus_write_single_short(unsigned char device_var, unsigned char *to_write, unsigned short start_address, int length, int retry_times)
 {
-    //2018 0525 在底层公共读写函数增加对不同协议的处理
+    //2018 0525 在底层公共读写函数增加对不同协议的处理 - Add support for different protocols in the underlying read/write functions
     //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     if (SPECIAL_BAC_TO_MODBUS)
     {
@@ -1319,7 +1322,7 @@ int mudbus_write_single_short(unsigned char device_var, unsigned char *to_write,
 
 int mudbus_write_multi_short(unsigned char device_var, unsigned short *to_write, unsigned short start_address, int length, int retry_times)
 {
-    //2018 0525 在底层公共读写函数增加对不同协议的处理
+    //2018 0525 在底层公共读写函数增加对不同协议的处理 - Add support for different protocols in the underlying read/write functions
     //if ((g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_MSTP_TO_MODBUS) || (g_protocol == PROTOCOL_BIP_T0_MSTP_TO_MODBUS))
     if (SPECIAL_BAC_TO_MODBUS)
     {

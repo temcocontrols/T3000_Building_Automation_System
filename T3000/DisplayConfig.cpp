@@ -336,27 +336,39 @@ void CDisplayConfig::DblClickInputMsflexgrid()
 if(g_OutPutLevel==1)
 	return;
 	long lRow,lCol;
-	lRow = m_FlexGrid1.get_RowSel();//获取点击的行号	
-	lCol = m_FlexGrid1.get_ColSel(); //获取点击的列号
+	lRow = m_FlexGrid1.get_RowSel();//Get the clicked row number
+	//Get the clicked row number
+	//获取点击的行号	
+	lCol = m_FlexGrid1.get_ColSel(); //Get the clicked column number
+	//Get the clicked column number
+	//获取点击的列号
 	if((lCol==0))
 		return;
+	//If the clicked area exceeds the maximum row number, the click is invalid
 	if(lRow>m_FlexGrid1.get_Rows()) //如果点击区超过最大行号，则点击是无效的
 		return; 
+	//If you click the title row, it is also invalid
 	if(lRow == 0) //如果点击标题行，也无效
 		return;
 	CRect rect;
+	//Get the window rectangle of the table control
 	m_FlexGrid1.GetWindowRect(rect); //获取表格控件的窗口矩形
+	//Convert to client area rectangle
 	ScreenToClient(rect); //转换为客户区矩形
 	CDC* pDC =GetDC();
+	//Calculate pixel point and twips conversion ratio
 	//计算象素点和缇的转换比例
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//Calculate the coordinates of the upper left corner of the selected cell (in pixels)
 	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid1.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid1.get_ColPos(lCol)/nTwipsPerDotX;
+	//Calculate the size of the selected cell (in pixels). Add 1 is better effect found in actual debugging
 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid1.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid1.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//Form the rectangular area of the selected one
 	//形成选中个所在的矩形区域
 	CRect rc(x,y,x+width,y+height);
 	//转换成相对对话框的坐标

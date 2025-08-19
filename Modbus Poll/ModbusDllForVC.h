@@ -46,7 +46,9 @@ INPUT int read_multi_log(unsigned char device_var,unsigned short *put_data_into_
 	                       int* sendDataLength, int* recvDataLength);
 INPUT int write_multi_log(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,
                           unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+// Parameter command section
 INPUT int write_multi_Short_log(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,//参数命令部分
+                                // Send and receive raw data
                                 unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, //发送和接受的原始数据
                                 int* sendDataLength, int* recvDataLength);
 INPUT int Modbus_Standard_Read(unsigned char device_var, unsigned short *put_data_into_here, int function_code, unsigned short start_address, int length,

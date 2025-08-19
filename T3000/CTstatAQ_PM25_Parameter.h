@@ -2,23 +2,23 @@
 #include "afxdialogex.h"
 
 
-// CTstatAQ_PM25_Parameter 对话框
+// CTstatAQ_PM25_Parameter 对话框 - CTstatAQ_PM25_Parameter dialog
 
 class CTstatAQ_PM25_Parameter : public CDialogEx
 {
 	DECLARE_DYNAMIC(CTstatAQ_PM25_Parameter)
 
 public:
-	CTstatAQ_PM25_Parameter(CWnd* pParent = nullptr);   // 标准构造函数
+	CTstatAQ_PM25_Parameter(CWnd* pParent = nullptr);   // 标准构造函数 - Standard constructor
 	virtual ~CTstatAQ_PM25_Parameter();
 
-// 对话框数据
+// 对话框数据 - Dialog data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_TSTAT_AQ_PM25_PARAMETER };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持 - DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 public:

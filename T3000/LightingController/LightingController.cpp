@@ -219,23 +219,23 @@ void CLightingController::OnInitialUpdate()
 
 
 
-	//初始化MSFLXGRID控件
+	//初始化MSFLXGRID控件 - Initialize the MSFLXGRID control
 
 #if 1
-	//设置排/行数量
-	m_msflexgrid1to96.put_Cols(4);//这句一定要有，如果下面再增加显示一外，而这里不变还是5，则会出错
-	m_msflexgrid1to96.put_Rows(200);//包括标题栏
+	//设置排/行数量 - Set the number of rows/columns
+	m_msflexgrid1to96.put_Cols(4);//这句一定要有，如果下面再增加显示一外，而这里不变还是5，则会出错 - This line must be present; if another display is added below and this remains 5, it will cause an error
+	m_msflexgrid1to96.put_Rows(200);//包括标题栏 - Includes the header row
 
 
 // 	long n1,n2(0);
 // 	n1 = clock();
-	//显示横标题
+	//显示横标题 - Display the horizontal header
 	m_msflexgrid1to96.put_TextMatrix(0,0,_T("Panels"));
 	m_msflexgrid1to96.put_TextMatrix(0,1,_T("Card_ID"));
 	m_msflexgrid1to96.put_TextMatrix(0,2,_T("No."));
 	m_msflexgrid1to96.put_TextMatrix(0,3,_T("OutputName"));
 
-	//设置列宽	
+	//设置列宽	-	// Set the column width
 	/*m_msflexgrid1to96.put_ColWidth(0,0);*/
 	m_msflexgrid1to96.put_ColWidth(1,700);
 	m_msflexgrid1to96.put_ColWidth(2,500);
@@ -245,7 +245,7 @@ void CLightingController::OnInitialUpdate()
 	for (int col=0;col<4;col++)//11
 	{ 
 		m_msflexgrid1to96.put_ColAlignment(col,4);
-		//第二个参数数是功能码，就是表示文字居中显示而已，没别的意思
+		//第二个参数数是功能码，就是表示文字居中显示而已，没别的意思 - The second parameter is a function code, indicating that the text is displayed centered, nothing more.
 	}
 
 
@@ -256,20 +256,20 @@ void CLightingController::OnInitialUpdate()
 
 //Inputs 
 #if 1
-	//设置排/行数量
-	m_inputs_grid.put_Cols(3);//这句一定要有，如果下面再增加显示一外，而这里不变还是5，则会出错
-	m_inputs_grid.put_Rows(25);//包括标题栏
+	//设置排/行数量 - Set the number of rows/columns
+	m_inputs_grid.put_Cols(3);//这句一定要有，如果下面再增加显示一外，而这里不变还是5，则会出错 - This line must be present; if another display is added below and this remains 5, it will cause an error
+	m_inputs_grid.put_Rows(25);//包括标题栏 - Includes the header row
 
 
 	// 	long n1,n2(0);
 	// 	n1 = clock();
-	//显示横标题
+	//显示横标题 - Display the horizontal header
 	m_inputs_grid.put_TextMatrix(0,0,_T("Inputs"));
 	m_inputs_grid.put_TextMatrix(0,1,_T("Status"));
 	m_inputs_grid.put_TextMatrix(0,2,_T("Auto/Manual"));
 	 
 
-	//设置列宽	
+	//设置列宽	- // Set the column width
 	m_inputs_grid.put_ColWidth(0,1500);
 	m_inputs_grid.put_ColWidth(1,700);
 	m_inputs_grid.put_ColWidth(2,1500);
@@ -278,7 +278,7 @@ void CLightingController::OnInitialUpdate()
 
 	for (int col=0;col<3;col++)//11
 	{ 
-		m_inputs_grid.put_ColAlignment(col,4);//第二个参数数是功能码，就是表示文字居中显示而已，没别的意思
+		m_inputs_grid.put_ColAlignment(col,4);//第二个参数数是功能码，就是表示文字居中显示而已，没别的意思- The second parameter is a function code, indicating that the text is displayed centered, nothing more.
 	}
 #endif
 
@@ -302,16 +302,16 @@ void CLightingController::Fresh()
 	pMain->m_pFreshMultiRegisters->SuspendThread();
 	pMain->m_pRefreshThread->SuspendThread();
 
-	//m_inaddress = 255;//界面上Address的值,在这里除显示没任何意义
+	//m_inaddress = 255;//界面上Address的值,在这里除显示没任何意义 - // The value of Address on the interface, which has no meaning other than display here
 	UpdateData(FALSE);
 	
-	if(ifLCdb)//T3000启动仅执行一次
+	if(ifLCdb)//T3000启动仅执行一次 - T3000 starts only once
 	{
 
 
 		m_strcomboBox = _T("Input-Output-Map");
 		m_comboBox.SetCurSel(1);//input 1 group 0
-		m_ListBox.SetCurSel(0);//列表默认项设为第一项
+		m_ListBox.SetCurSel(0);//列表默认项设为第一项 - // Set the default item in the list to the first item
 		m_CStrModel = _T("Lighting Controller");
 		GetDlgItem(IDC_EDIT5)->SetWindowText(m_CStrModel);
 		
@@ -414,7 +414,7 @@ void CLightingController::Read_Input_Group_Mapping(BOOL Input_Group)
 						RegisterValue=Output_Units_Data[3*out+2];
 						Position=OutputAddress-16;
 					}
-					if(Get_Bit_FromRegister(RegisterValue,Position))//如果是1的话，那么就加入到Mapping中去
+					if(Get_Bit_FromRegister(RegisterValue,Position))//如果是1的话，那么就加入到Mapping中去 - If it is 1, then add it to the mapping
 					{
 						temp.OuputNo=OutputAddress;
 						temp.OutputNameAddress=OutputNameAddress;

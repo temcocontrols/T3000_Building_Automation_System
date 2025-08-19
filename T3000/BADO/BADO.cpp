@@ -37,9 +37,12 @@ void CBADO::DeleteDB()
 BOOL CBADO::OnInitADOConn()
 {
 	CString StrTips;
+	// File handle
 	HANDLE hFind;//
 	WIN32_FIND_DATA wfd;//
+	// Find first file
 	hFind = FindFirstFile(m_dbfilepath, &wfd);//
+	// Indicates that there is no t3000.mdb in the current directory
 	if (hFind == INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
 	{
 		// 	StrTips.Format(_T("%s\n The datebase file disappeared.T3000 help you create a default datebase of your current building."),m_dbfilepath);
@@ -57,7 +60,8 @@ BOOL CBADO::OnInitADOConn()
 		CreateDirectory(m_dbImgeFolder,NULL);
 
 		hFind = FindFirstFile(m_dbfilepath, &wfd);//
-		if (hFind == INVALID_HANDLE_VALUE)//说明当前目录下没有building数据库的话，就创建一个
+		// If there is no building database in the current directory, create one
+		if (hFind == INVALID_HANDLE_VALUE)//说明当前目录下没有building数据库的话，就创建一个 
 		{
 #if 0
 		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB2), _T("BUILDING_DB"));   
@@ -97,7 +101,7 @@ BOOL CBADO::OnInitADOConn()
 		// 		CreateDirectory(m_dbImgeFolder,NULL);
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////
-		//连接数据库
+			// Connect to database
 
 
 		m_pConnection.CreateInstance("ADODB.Connection");
@@ -215,6 +219,16 @@ void CBADO::Createtable(CString strSQL)
 
 /*------------------------------------fun-------------------------------------------------------- 
 *   Functions           -   IsHaveTable(_ConnectionPtr   pConnection,   CString   strTableName) 
+*   Parameter:         -   pConnection: database object; 
+-   strTableName: does this table exist in the database? 
+*   Return   Value:   -  , TRUE bool. FALSE: no table: has table 
+*   Description:     -   Search table from database to see if there is a table to open [strTableName], if no table, give prompt and return FALSE; 
+-   Therefore, when using this function, you only need to decide whether to continue, no need to give prompt again. 
+*   Author:               -   lishancai 
+*   Date:                   -   2011-10-1 
+***********************************************************************************************/
+/*------------------------------------fun-------------------------------------------------------- 
+*   Functions           -   IsHaveTable(_ConnectionPtr   pConnection,   CString   strTableName) 
 *   Parameter:         -   pConnection：数据库对象； 
 -   strTableName：数据库中是否有此表？ 
 *   Return   Value:   -  ，TRUE bool。FALSE：无表：有表 
@@ -226,22 +240,27 @@ void CBADO::Createtable(CString strSQL)
 
 bool CBADO::IsHaveTable(CBADO ado, CString strTableName)
 {
+	// Database table pointer
 	ado.m_pRecordset = NULL;//数据库表指针 
+	// Does the table exist? Default is no table
 	bool bIsHaveNo = FALSE;//是否有表？默认无表 
 
-	//pConnection:指向数据库 
+	//pConnection:指向数据库 - pConnection: Point to the database
+	// Point to all tables
 	ado.m_pRecordset = ado.m_pConnection->OpenSchema(adSchemaTables);//指向所有的表 
 
 	CString strMsg;
 
-
+	// Is the pointer already pointing to the last record?
 	while (!(ado.m_pRecordset->EndOfFile))//指针是否已经指向最后一条记录？ 
 	{
+		// Get the name of the table
 		_bstr_t table_name = ado.m_pRecordset->Fields->GetItem(_T("TABLE_NAME"))->Value;//得到表的名称 
 
-
+		// Check if table names are the same?
 		if (strTableName == (LPCSTR)table_name)//表名判断是否相同？ 
 		{
+			// Table found
 			bIsHaveNo = TRUE;//有表了 
 			break;
 		}
@@ -249,8 +268,8 @@ bool CBADO::IsHaveTable(CBADO ado, CString strTableName)
 		ado.m_pRecordset->MoveNext();
 	}
 
-
 	if (bIsHaveNo == FALSE)
+	// No table found, give prompt and return FALSE
 	//无表给出提示，并返回FALSE 
 	{
 		//strMsg.Format(_T( "数据库中没有查到下的表：:   %s。\n请先确认数据库的有效性！ "),   strTableName); 
@@ -258,6 +277,7 @@ bool CBADO::IsHaveTable(CBADO ado, CString strTableName)
 		//	MessageBox(_T("Products表不存在！"));
 		return FALSE;
 	}
+	// If table exists, can proceed further
 	else//若有表才可进一步进行 
 	{
 		return TRUE;

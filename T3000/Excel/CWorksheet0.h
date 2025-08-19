@@ -1,22 +1,28 @@
-// 从类型库向导中用“添加类”创建的计算机生成的 IDispatch 包装器类
+// Computer-generated IDispatch wrapper class created from type library wizard using "Add Class"
+// 从类型库向导中用"添加类"创建的计算机生成的 IDispatch 包装器类 
 
 //#import "C:\\Program Files\\Microsoft Office\\Office14\\EXCEL.EXE" no_namespace
+// CWorksheet0 wrapper class
 // CWorksheet0 包装器类
 
 class CWorksheet0 : public COleDispatchDriver
 {
 public:
+    // Call COleDispatchDriver default constructor
     CWorksheet0() {} // 调用 COleDispatchDriver 默认构造函数
     CWorksheet0(LPDISPATCH pDispatch) : COleDispatchDriver(pDispatch) {}
     CWorksheet0(const CWorksheet0& dispatchSrc) : COleDispatchDriver(dispatchSrc) {}
 
+    // Attributes
     // 特性
 public:
 
+    // Operations  
     // 操作
 public:
 
 
+    // _Worksheet methods
     // _Worksheet 方法
 public:
     LPDISPATCH get_Application()
@@ -857,6 +863,7 @@ public:
         return result;
     }
 
+    // _Worksheet properties
     // _Worksheet 属性
 public:
 

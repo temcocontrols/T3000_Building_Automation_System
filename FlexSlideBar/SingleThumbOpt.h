@@ -26,7 +26,8 @@ public:
 	virtual void OnLButtonUp(const CPoint& point);
 	virtual void SetTicsArray(vector<int>& szTics);
 	virtual int GetThumbPosition();	
-	virtual void SetThumbPosition(int nIndex, int nPosition);		// 在只有一个thumb时，nIndex是无意义的
+	virtual void SetThumbPosition(int nIndex, int nPosition);		// When there's only one thumb, nIndex is meaningless
+	                                                                // 在只有一个thumb时，nIndex是无意义的
 	virtual int GetAllThumbPosition(vector<int>& szThumbPos);	
 	virtual void CalcThumbPosition();
 
@@ -83,6 +84,7 @@ protected:
 	CFSBThumb				m_thumb;
 
 	
-	vector<int>*			m_szTicMarks;  // 位置与象素对应的数组
+	vector<int>*			m_szTicMarks;  // Array corresponding to position and pixels
+	                                       // 位置与象素对应的数组
 
 };

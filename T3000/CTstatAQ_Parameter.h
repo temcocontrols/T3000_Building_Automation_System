@@ -1,23 +1,23 @@
 ﻿#pragma once
 
 
-// CTstatAQ_Parameter 对话框
+// CTstatAQ_Parameter dialog box
 
 class CTstatAQ_Parameter : public CDialogEx
 {
 	DECLARE_DYNAMIC(CTstatAQ_Parameter)
 
 public:
-	CTstatAQ_Parameter(CWnd* pParent = nullptr);   // 标准构造函数
+	CTstatAQ_Parameter(CWnd* pParent = nullptr);   // 标准构造函数 - Standard constructor
 	virtual ~CTstatAQ_Parameter();
 
-// 对话框数据
+// 对话框数据 - Dialog data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_AIRLAB_PARAMETER };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持 - DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 public:

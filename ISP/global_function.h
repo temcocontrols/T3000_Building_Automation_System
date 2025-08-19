@@ -11,8 +11,11 @@ const int PROTOCOL_GSM = 4;
 const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
 const int PROTOCOL_MSTP_TO_MODBUS = 11;
+// Network devices below, sub-port running MSTP devices, can only read registers through Ptransfer after 10000
 const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;    //网络下面的设备，子口跑MSTP设备 ，只能通过Ptransfer 转10000以后寄存器读取
+// 20200306 TSTAT10 or T3BB using MODBUS MODBUS485 connected to T3BB
 const int PROTOCOL_MB_TCPIP_TO_MB_RS485 = 13;     //20200306 TSTAT10或者T3BB  使用MODBUS MODBUS485 接到  T3BB下面 
+// MODBUS485 uses PTP method to get T3 private data
 const int PROTOCOL_MB_PTP_TRANSFER = 14;          //MODBUS485采用ptp 的方式获取 T3私有数据;
 const int PROTOCOL_THIRD_PARTY_BAC_BIP = 253;
 const int PROTOCOL_VIRTUAL = 254;
@@ -37,9 +40,9 @@ CString GetProductName(int ModelID);
 CString GetFirmwareUpdateName(int ModelID);
 //According to ModelID ,getting the product model name.
 CString GetSysTime(); 
-//得到系统的时间 精确到秒
- //字符串分割函数
-//eg："192.168.0.1" 用.分割，就成了四个字符串 192 168 0 1
+//得到系统的时间 精确到秒  // Get system time accurate to seconds
+ //字符串分割函数  // String split function
+//eg："192.168.0.1" 用.分割，就成了四个字符串 192 168 0 1  // e.g.: "192.168.0.1" split by ".", becomes four strings 192 168 0 1
 void ExtractString(CStringArray& arr, const CString strSrc, const CString sep = _T("\r\n"));
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info,int Address);
