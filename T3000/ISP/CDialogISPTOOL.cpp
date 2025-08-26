@@ -84,6 +84,8 @@ void CCDialogISPTOOL::OnBnClickedButtonFlash()
 			}
 
 		}
+
+		// This is invalid. When the ID in pDialogInfo->Create(IDC_STATIC_INFO,this); is written incorrectly, this function does not throw an error, so it cannot be captured. 
 		catch (...)//这个无效，当pDialogInfo->Create(IDC_STATIC_INFO,this);中的ID写错时，这个函数没有throw抛出错误，所以捕获不到
 		{
 

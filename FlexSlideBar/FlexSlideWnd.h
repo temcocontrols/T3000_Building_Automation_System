@@ -47,23 +47,29 @@ public:
 
 	void SetFSBThumbShape(FSB_THUMBSHAPE fsbTbShape);
 	
+	// Set the position of the control
 	// 设置控件的位置
 	void SetFlexSlideBarRect(CRect& rc);	
 	CRect& GetFlexSlideBarRect();
 
+	// Set channel width, not greater than control width, not less than 1 pixel
+	// Channel length should be calculated based on control length
 	// 设置channel的宽度，不得大于控件宽度，不小于1个象素
 	// channel 长度应该依据控件长度来计算获得
 	void SetChannelWidth(int nChannelWidth);
 	int GetChannelWidth();
 
+	// Set Channel color
 	// 设置Channel的颜色
 	COLORREF GetChannelColor();					
 	void SetChannelColor(COLORREF clrChannel);
 
+	// Set Thumb length, not less than channel width, not greater than control width, thumb width is fixed value
 	// 设置Thumb的长度，不小于channel的宽度，不大于控件的宽度，thumb的宽度为固定值
 	int GetThumbWidth();					
 	void SetThumbWidth(int nThumbLen);
 
+	// Set Thumb color
 	// 设置Thumb的颜色
 	COLORREF GetThumbColor()const;					
 	void SetThumbColor(COLORREF clrThumb);
@@ -72,6 +78,7 @@ public:
 	void	SetRangeMax(int nMax);
 	void	SetRangeMin(int nMin);
 	
+	// Whether the control is horizontally placed
 	// 控件是否水平放置
 	void SetHorizontal(BOOL bHorizontal);
 	BOOL IsHorizontal();
@@ -95,6 +102,7 @@ public:
 	void GetRange(int& nMin, int& nMax)const;
 	
 	// Sets the current position of the slider. 
+	// nMinPos is the minimum value, MidPos is the medium value, Max is the maximum value
 	// nMinPos 是最小的值，MidPos是中等值，Max是最大的值
 	BOOL SetPos(int nMinPos, int nMidPos, int nMaxPos); 	
 
@@ -111,14 +119,17 @@ public:
 
 	void SendCallBackMsg();
 protected:
+	// Calculate how many pixels each step corresponds to
 	// 计算每个step对应多少个象素
 	int CalcPixelNumOfTicLength();
 	void CalcTicMarks(CRect& rcChannel);
 	void Draw(CDC* pDC);
 	void MoveStep(const CPoint& pt);
 	void MovePage(const CPoint& pt);
-	void DrawTics(CDC* pDC);					// 画两列刻度
-	//void DrawTicMark(CDC* pDC, const CPoint& ptStart, const CPoint& ptEnd);			// 画一个刻度
+	void DrawTics(CDC* pDC);					// Draw two columns of scales
+	                                            // 画两列刻度
+	//void DrawTicMark(CDC* pDC, const CPoint& ptStart, const CPoint& ptEnd);			// Draw a scale
+	                                                                                        // 画一个刻度
 	//GetBuddy 
 // 	CRect GetChannelRect ()
 // 		GetLineSize 		Retrieves the line size of a slider control. 
@@ -164,21 +175,26 @@ protected:
 	int										m_nMax;
 	int										m_nMin;
 
-	BOOL									m_bHorizontal;			// 控件是否水平放置
+	BOOL									m_bHorizontal;			// Whether the control is horizontally placed
+	                                                        // 控件是否水平放置
 
 	BOOL									m_bStartDrag;
 
-	int										m_nTicLength;			// 每个刻度单位长度（象素单位）
+	int										m_nTicLength;			// Length of each scale unit (pixel unit)
+	                                                        // 每个刻度单位长度（象素单位）
 	
 
-	int										m_nPageLength;		// 每步长几个刻度单位
+	int										m_nPageLength;		// How many scale units per step
+	                                            // 每步长几个刻度单位
 
 
 	CThumbOperator*				m_pThumbOpter;		// 
 	//
-	COLORREF							m_clrTic;					// 刻度颜色
+	COLORREF							m_clrTic;					// Scale color
+	                                                // 刻度颜色
 
-	vector<int>							m_szTics;				// 刻度数组
+	vector<int>							m_szTics;				// Scale array
+	                                            // 刻度数组
 	CWnd*								m_pParent;
 	
 	CFSBContainer*					m_pContainer;

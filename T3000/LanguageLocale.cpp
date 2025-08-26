@@ -94,6 +94,7 @@ bool gSetDialogStrings(HWND hWnd,UINT uDlgID)
 	CString szDefault = _T("");
 
 	
+	//Read dialog title
 	//读对话框标题
 	szKey.Format(_T("IDD%d_Title"),uDlgID);
 	if(GetPrivateProfileString(SECTION_NAME,szKey,szDefault,
@@ -102,6 +103,7 @@ bool gSetDialogStrings(HWND hWnd,UINT uDlgID)
 		::SetWindowText(hWnd,gBufferString);
 	}
 	
+	//Write title text for each sub-control
 	//写入各个子控件的标题文字
 	HWND hSubWnd = GetWindow(hWnd,GW_CHILD);
 	while(::IsWindow(hSubWnd))

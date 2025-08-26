@@ -62,6 +62,7 @@ typedef enum {
          READ_MSV_COMMAND          = 42,
          READ_EMAIL_ALARM          = 43,
 
+         // 2018 04 17 New read time command
          READ_NEW_TIME_COMMAND = 88,           /* read new time            */  //2018 04 17 新的读时间命令
          READMONITORPACKAGE_T3000 = 89,           /* read monitor belong to which package   */
          READ_AT_COMMAND = 90,	//450 length
@@ -119,6 +120,7 @@ typedef enum {
          WRITE_SCHEDUAL_TIME_FLAG   = 141,
          WRITE_MSV_COMMAND          = 142,
          WRITE_EMAIL_ALARM           = 143,
+         // 2018 04 17 New write time command
          WRITE_NEW_TIME_COMMAND     = 188,  //2018 04 17 新的写时间命令
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
@@ -377,7 +379,9 @@ typedef struct
 {
     uint16_t  		total_length;        /*	total length to be received or sent	*/
     uint8_t		command;
+    // Starting register
     uint16_t    start_reg;            //开始的寄存器
+    // Read/write length
     uint16_t		nlength;          //读写的长度
 
 }Str_bacnet_to_modbus_header;
@@ -391,6 +395,7 @@ typedef struct
     unsigned short ndata[400];
 }Str_modbus_reg;
 
+// Restore alignment state
 #pragma pack(pop)//恢复对齐状态 
 
 

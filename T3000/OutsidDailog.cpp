@@ -6,7 +6,7 @@
 #include "global_variable_extern.h"
 #include "global_function.h"
 
-// COutsidDailog 对话框
+// COutsidDailog 对话框 (dialog box)
 
 IMPLEMENT_DYNAMIC(COutsidDailog, CDialog)
 COutsidDailog::COutsidDailog(CWnd* pParent /*=NULL*/)
@@ -39,6 +39,7 @@ END_MESSAGE_MAP()
 
 
 // COutsidDailog 消息处理程序
+// COutsidDailog message handler
 BOOL COutsidDailog::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -105,6 +106,7 @@ BOOL COutsidDailog::OnInitDialog()
 	
 	return TRUE;  // return TRUE unless you set the focus to a control
 // 异常: OCX 属性页应返回 FALSE
+// Exception: OCX property pages should return FALSE
 
 }
 

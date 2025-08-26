@@ -2887,7 +2887,8 @@ void CAirQuality::Initial_OutputList()
 			{
 				m_output_list.SetItemText(1, 6,Global_String_AUTO);
 				HUM = ((float)((short)product_register_value[373])) / 10;
-				if (product_register_value[186] == 1)  //187 改186 修改原因是187 固件没有处理，所以退一步改186
+				// Changed 187 to 186. Reason for modification: 187 is not handled by firmware, so step back to change to 186
+				if (product_register_value[186] == 1)  //修改187 为186  修改原因：187 固件没有处理，所以退一步修改为186
 				{
 					Vhum = HUM / 10;
 					if (Vhum > 10)
@@ -2900,7 +2901,8 @@ void CAirQuality::Initial_OutputList()
 					}
 					humsignal.Format(_T("%.2fv"), Vhum);
 				}
-				else if (product_register_value[186] == 2) //187 改186 修改原因是187 固件没有处理，所以退一步改186
+				// Changed 187 to 186. Reason for modification: 187 is not handled by firmware, so step back to change to 186
+				else if (product_register_value[186] == 2) //修改187 为186  修改原因：187 固件没有处理，所以退一步修改为186
 				{
 					Vhum = HUM / 20;
 					if (Vhum > 5)
@@ -2913,7 +2915,8 @@ void CAirQuality::Initial_OutputList()
 					}
 					humsignal.Format(_T("%.2fv"), Vhum);
 				}
-				else if (product_register_value[186] == 3) //187 改186 修改原因是187 固件没有处理，所以退一步改186
+				// Changed 187 to 186. Reason for modification: 187 is not handled by firmware, so step back to change to 186
+				else if (product_register_value[186] == 3) //修改187 为186  修改原因：187 固件没有处理，所以退一步修改为186
 				{
 					Vhum = (HUM / 100) * 16 + 4;
 					if (Vhum > 20)

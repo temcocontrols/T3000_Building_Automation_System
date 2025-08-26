@@ -327,7 +327,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
     ON_BN_CLICKED(IDC_BUTTON_ICON_SETTING, &CParameterDlg::OnBnClickedButtonIconSetting)
     ON_CBN_SELCHANGE(IDC_DELTA_SELECT_1, &CParameterDlg::OnCbnSelchangeDeltaSelect1)
     ON_CBN_SELCHANGE(IDC_DELTA_SELECT_2, &CParameterDlg::OnCbnSelchangeDeltaSelect2)
-    ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)  //添加 高级选项界面对话框的提示语;
+    ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)  //添加 高级选项界面对话框的提示语; // Add prompt/message for the Advanced Options dialog box;
 END_MESSAGE_MAP()
 
 	/// <summary>

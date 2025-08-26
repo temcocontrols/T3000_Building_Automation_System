@@ -100,6 +100,7 @@ void CFSBChannel::Draw(CDC* pDC)
 	// put back the old objects
 	//pDC->SelectObject(pOldBrush);
 	//pDC->SelectObject(pOldPen);
+//if (m_szRC.size()!=1)//lsc added, when adding a slider, there is an error here m_szRC.size() has no data
 //if (m_szRC.size()!=1)//lsc加的，当增加一人滑块后在这里出错m_szRC.size()没有数据
 //{
 	//////////////////////////////////////////////////////////////////////////

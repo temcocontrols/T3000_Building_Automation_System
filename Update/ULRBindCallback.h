@@ -5,10 +5,10 @@ public:
 CBindCallback();
 virtual ~CBindCallback();
 
-//接受显示进度窗口的句柄
+//接受显示进度窗口的句柄 - Accept the handle to display the progress window
 CUpdateDlg* m_pdlg;
 
-//IBindStatusCallback的方法。除了OnProgress     外的其他方法都返回E_NOTIMPL 
+//IBindStatusCallback的方法。除了OnProgress     外的其他方法都返回E_NOTIMPL  - IBindStatusCallback methods. All methods return E_NOTIMPL except OnProgress
     
 STDMETHOD(OnStartBinding)
 ( DWORD dwReserved,
@@ -23,7 +23,7 @@ STDMETHOD(OnLowResource)
 ( DWORD reserved)
 { return E_NOTIMPL; }
 
-//OnProgress在这里
+//OnProgress在这里 - OnProgress is here
 STDMETHOD(OnProgress)
 ( ULONG ulProgress,    
 ULONG ulProgressMax,
@@ -52,7 +52,7 @@ STDMETHOD(OnObjectAvailable)
 IUnknown __RPC_FAR *punk)
 { return E_NOTIMPL; }
 
-// IUnknown方法.IE 不会调用这些方法的
+// IUnknown方法.IE 不会调用这些方法的 - IUnknown methods. IE will not call these methods
 
 STDMETHOD_(ULONG,AddRef)()
 { return 0; }
@@ -66,7 +66,7 @@ void __RPC_FAR *__RPC_FAR *ppvObject)
 { return E_NOTIMPL; }
 };
 
-//只需实现OnProgress方法，类的实现：
+//只需实现OnProgress方法，类的实现 - Just implement the OnProgress method, the class implementation
 CBindCallback::CBindCallback()
 {
 
@@ -77,7 +77,7 @@ CBindCallback::~CBindCallback()
 
 }
 
-//////仅实现OnProgress成员即可
+//////仅实现OnProgress成员即可 - Only implement the OnProgress member
 
 LRESULT CBindCallback::OnProgress(ULONG ulProgress,
 ULONG ulProgressMax,

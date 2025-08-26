@@ -58,8 +58,10 @@ protected:
 	CRect					m_rcChannel;
 
 	CRect					m_rcParent;
-	int						m_nLengthOfTic;			// 刻度，通常是指每个刻度单位的象素数。
-	int						m_nLengthOfPage;		// 步长，通常是指每个步长单位的刻度数。
+	int						m_nLengthOfTic;			// Scale, usually refers to the number of pixels per scale unit.
+	                                            // 刻度，通常是指每个刻度单位的象素数。
+	int						m_nLengthOfPage;		// Step length, usually refers to the number of scale units per step length unit.
+	                                            // 步长，通常是指每个步长单位的刻度数。
 
 	BOOL					m_bStartDraging;
 

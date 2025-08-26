@@ -179,6 +179,7 @@ void set_datalink_protocol(int nprotocol)
 	BACNET_ADDRESS * my_address)
 {
 	//if(protocal == BAC_MSTP || protocal == BAC_PTP)
+	// If the protocol is MSTP or PTP, use MSTP addressing
 	if((m_protocol == 2) || (m_protocol == 4))	//如果协议时MSTP 或者PTP  就采用mstp的 地址;
 	{
 		dlmstp_get_my_address(my_address);

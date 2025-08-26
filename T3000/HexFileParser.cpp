@@ -23,6 +23,7 @@ void  CHexFileParser::SetFileName(const CString& strFileName)
 
 
 //////////////////////////////////////////////////////////////////////////
+// Return int: actual valid bytes
 // 返回int：实际的有效字节
 int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 {
@@ -91,6 +92,7 @@ BOOL CHexFileParser::Is_RAM_HEXType(){
     return m_IsRAM;
 }
 
+// Read the 7th and 8th characters, 00 for Normal, 02 for Extended, 04 for Extended Linear
 // 读第7，8个字符，00为Normal，02为扩展，04为扩展线性
 HEXFILE_FORMAT	CHexFileParser::GetHexFileType(CFile& hexFile)
 {
@@ -133,6 +135,7 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 	char a[256];
 	ZeroMemory(a, 256);
 	
+	//while(NULL!=ar.ReadString(m_get_data_from_file))//Loop to read the file until the file ends
 	//while(NULL!=ar.ReadString(m_get_data_from_file))//循环读取文件，直到文件结束
 	while(ReadLineFromFile(hexFile, a))
 	{//get a line from the file,check "crc" for total file
@@ -148,10 +151,12 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 		unsigned char get_hex[128]={0};		//get hex data,it is get from the line char
 	
 		UINT i = 0;
+		//get a line//Remove the first one
 		for( i=0;i<strlen(a); i++)		//get a line//去掉第一个
 		{
 			a[i] = a[i+1];
 		}
+		// Subtract carriage return and line feed characters
 		int nLen = strlen(a)-2;			// 减去回车换行符号
 		if(strlen(a)%2==0)
 			turn_hex_file_line_to_unsigned_char(a);		// turn every char to int 
@@ -243,6 +248,7 @@ WORD CHexFileParser::GetHighAddrFromFile(const CString& strLine)
 
 BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 {
+	//When each line in the hex file exceeds 256 characters, we consider that there is a problem with this hex file
 	//当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
 	int linecharnum=0;
 	char c;
@@ -253,8 +259,10 @@ BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 		++linecharnum;
 		*pBuffer++ = c;
 		//TRACE(_T("\n%c"),c);
+		// Carriage return
 		if (c == 0x0d) // 回车
 		{
+			// Read a line feed
 			file.Read(&c, 1);  // 读一个换行
 			*pBuffer++ = c;
 			TRACE(_T("%s"),pBuffer);
@@ -281,6 +289,7 @@ BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 // 3, int      :  parameter 2, memory space's size.
 // return:
 // int			: it's the truely length of the used buffer, also useful byte number after hex file been parsed.
+// Read extended address record hex file - maximum 512k address space
 // 读扩展地址记录的hex file－最大512k地址空间
 int CHexFileParser::ReadExtendHexFile(CFile& hexFile, char* pBuf, int nBufLen)
 {

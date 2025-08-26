@@ -160,6 +160,7 @@ void CSingleThumbOpt::OnLButtonDown(const CPoint& point)
 }
 
 
+// Next step, large value
 // 下一步，大的数值
 void CSingleThumbOpt::MoveNextStep()
 {
@@ -187,6 +188,7 @@ void CSingleThumbOpt::MoveNextStep()
 }
 
 
+// Previous step, small value
 // 上一步，小的数值
 void CSingleThumbOpt::MovePreStep()
 {

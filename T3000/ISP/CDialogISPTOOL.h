@@ -52,7 +52,8 @@ public:
 	CString m_strMainBuildingName;
 	CString m_strSubNetName;
 	CString m_strID;
-
+	
+	//Hex file name, including path, file to be burned, may actually be a bin file
 	CString	m_strHexFileName;			// hex文件名，包含路径，要烧录的文件，实际上也可能是bin文件
 	CDialogInfo* pDialogInfo;
 	DECLARE_EVENTSINK_MAP()

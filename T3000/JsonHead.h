@@ -20,6 +20,7 @@ using json = nlohmann::json;
 
 typedef struct StrJson
 {
+	// Controls the number of items in the structure myitems, does not store in the device
 	unsigned short ncount; //控制结构体 myitems 的数量的，不存入设备
 
 

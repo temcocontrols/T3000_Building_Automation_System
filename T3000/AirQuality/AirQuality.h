@@ -289,7 +289,7 @@ public:
 	CButton m_check_user;
 	CButton m_check_default;
 	CStatic m_Picture;
-private: //画图所需要的数据
+private: //画图所需要的数据 - Data needed for drawing the chart
 	int m_Draw_User;
 	int m_offset;
 	int m_Xmax;
