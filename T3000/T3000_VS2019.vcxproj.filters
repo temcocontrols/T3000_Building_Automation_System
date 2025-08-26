@@ -864,6 +864,9 @@
     <ClCompile Include="BacnetSettingAdvParameter.cpp">
       <Filter>Bacnet\Setting</Filter>
     </ClCompile>
+    <ClCompile Include="BacnetWebView_Exports.cpp">
+      <Filter>Source Files\WebView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -2133,6 +2136,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetSettingAdvParameter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetWebView_Exports.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

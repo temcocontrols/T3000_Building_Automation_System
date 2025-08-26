@@ -2399,109 +2399,174 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	break;
 	case LOGGING_DATA:
 	{
+		// Local flag to enable/disable logging - set to false to disable
+		bool enable_logging_data_log = true;
+
 		Json::Value tempjson;
 		tempjson["action"] = "LOGGING_DATA_RES";
 
 		Post_ReadAllTrendlog_Message();
 
 		//发送消息加载所有panel 的 in out var 数据;
-		int p_i = 0;
-		for (int i = 0; i < g_bacnet_panel_info.size(); i++)
+		int device_count = 0;
+		for (int panel_idx = 0; panel_idx < g_bacnet_panel_info.size(); panel_idx++)
 		{
 #if 1
-			int npanel_id = g_bacnet_panel_info.at(i).panel_number;
+			int npanel_id = g_bacnet_panel_info.at(panel_idx).panel_number;
 
-
-			if (g_bacnet_panel_info.at(i).object_instance != g_logging_time[npanel_id].bac_instance)
+			if (g_bacnet_panel_info.at(panel_idx).object_instance != g_logging_time[npanel_id].bac_instance)
 				continue;
-			if (g_bacnet_panel_info.at(i).nseiral_number != g_logging_time[npanel_id].sn)
+			if (g_bacnet_panel_info.at(panel_idx).nseiral_number != g_logging_time[npanel_id].sn)
 				continue;
-			if (g_bacnet_panel_info.at(i).panel_number != g_logging_time[npanel_id].n_panel_number)
+			if (g_bacnet_panel_info.at(panel_idx).panel_number != g_logging_time[npanel_id].n_panel_number)
 				continue;
 			if (npanel_id != g_logging_time[npanel_id].n_panel_number)
 				continue;
 			if (g_logging_time[npanel_id].basic_setting_status != 1)
 				continue;
-			
+
+			// Device passed validation - add device main info
 			g_Device_Basic_Setting[npanel_id].reg.ip_addr;
 			char ipStr[16]; // 用于存储转换后的IP字符串
 			unsigned char* ipAddr = g_Device_Basic_Setting[npanel_id].reg.ip_addr;
 			// 使用 sprintf 将 IP 地址转换为字符串
 			sprintf(ipStr, "%d.%d.%d.%d", ipAddr[0], ipAddr[1], ipAddr[2], ipAddr[3]);
 
-			tempjson["panel_id"] = npanel_id;
-			tempjson["panel_name"] = (char*)g_Device_Basic_Setting[npanel_id].reg.panel_name;
-			tempjson["panel_serial_number"] = g_Device_Basic_Setting[npanel_id].reg.n_serial_number;
-			tempjson["panel_ipaddress"] = ipStr;
+			// Add device main info to data array
+			tempjson["data"][device_count]["panel_id"] = npanel_id;
+			tempjson["data"][device_count]["panel_name"] = (char*)g_Device_Basic_Setting[npanel_id].reg.panel_name;
+			tempjson["data"][device_count]["panel_serial_number"] = g_Device_Basic_Setting[npanel_id].reg.n_serial_number;
+			tempjson["data"][device_count]["panel_ipaddress"] = ipStr;
+			tempjson["data"][device_count]["input_logging_time"] = g_logging_time[npanel_id].input_log_time;
+			tempjson["data"][device_count]["output_logging_time"] = g_logging_time[npanel_id].output_log_time;
+			tempjson["data"][device_count]["variable_logging_time"] = g_logging_time[npanel_id].variable_log_time;
 
-			tempjson["input_logging_time"] = g_logging_time[npanel_id].input_log_time;
-			tempjson["output_logging_time"] = g_logging_time[npanel_id].output_log_time;
-			tempjson["variable_logging_time"] = g_logging_time[npanel_id].variable_log_time;
-			for (int i = 0; i < BAC_INPUT_ITEM_COUNT; i++) {
-				tempjson["data"][p_i]["pid"] = npanel_id;
-				tempjson["data"][p_i]["type"] = "INPUT";
-				tempjson["data"][p_i]["index"] = i;
-				tempjson["data"][p_i]["id"] = "IN" + to_string(i + 1);
-				tempjson["data"][p_i]["command"] = to_string(npanel_id) + "IN" + to_string(i + 1);
-				tempjson["data"][p_i]["description"] = (char*)g_Input_data[npanel_id].at(i).description;
-				tempjson["data"][p_i]["label"] = (char*)g_Input_data[npanel_id].at(i).label;
-				tempjson["data"][p_i]["unit"] = g_Input_data[npanel_id].at(i).range;
-				tempjson["data"][p_i]["auto_manual"] = g_Input_data[npanel_id].at(i).auto_manual;
-				tempjson["data"][p_i]["value"] = g_Input_data[npanel_id].at(i).value;
-				tempjson["data"][p_i]["filter"] = g_Input_data[npanel_id].at(i).filter;
-				tempjson["data"][p_i]["control"] = g_Input_data[npanel_id].at(i).control;
-				tempjson["data"][p_i]["digital_analog"] = g_Input_data[npanel_id].at(i).digital_analog;
-				tempjson["data"][p_i]["range"] = g_Input_data[npanel_id].at(i).range;
-				tempjson["data"][p_i]["calibration_sign"] = g_Input_data[npanel_id].at(i).calibration_sign;
-				tempjson["data"][p_i]["calibration_h"] = g_Input_data[npanel_id].at(i).calibration_h;
-				tempjson["data"][p_i]["calibration_l"] = g_Input_data[npanel_id].at(i).calibration_l;
-				tempjson["data"][p_i]["decom"] = g_Input_data[npanel_id].at(i).decom; //for input   0 "Normal"    1"Open"   2  "Shorted"
-				p_i++;
+			// Add all INPUT points for this device in device_data array
+			int point_idx = 0;
+			for (int input_idx = 0; input_idx < BAC_INPUT_ITEM_COUNT; input_idx++) {
+				tempjson["data"][device_count]["device_data"][point_idx]["pid"] = npanel_id;
+				tempjson["data"][device_count]["device_data"][point_idx]["type"] = "INPUT";
+				tempjson["data"][device_count]["device_data"][point_idx]["index"] = input_idx;
+				tempjson["data"][device_count]["device_data"][point_idx]["id"] = "IN" + to_string(input_idx + 1);
+				tempjson["data"][device_count]["device_data"][point_idx]["command"] = to_string(npanel_id) + "IN" + to_string(input_idx + 1);
+				tempjson["data"][device_count]["device_data"][point_idx]["description"] = (char*)g_Input_data[npanel_id].at(input_idx).description;
+				tempjson["data"][device_count]["device_data"][point_idx]["label"] = (char*)g_Input_data[npanel_id].at(input_idx).label;
+				tempjson["data"][device_count]["device_data"][point_idx]["unit"] = g_Input_data[npanel_id].at(input_idx).range;
+				tempjson["data"][device_count]["device_data"][point_idx]["auto_manual"] = g_Input_data[npanel_id].at(input_idx).auto_manual;
+				tempjson["data"][device_count]["device_data"][point_idx]["value"] = g_Input_data[npanel_id].at(input_idx).value;
+				tempjson["data"][device_count]["device_data"][point_idx]["filter"] = g_Input_data[npanel_id].at(input_idx).filter;
+				tempjson["data"][device_count]["device_data"][point_idx]["control"] = g_Input_data[npanel_id].at(input_idx).control;
+				tempjson["data"][device_count]["device_data"][point_idx]["digital_analog"] = g_Input_data[npanel_id].at(input_idx).digital_analog;
+				tempjson["data"][device_count]["device_data"][point_idx]["range"] = g_Input_data[npanel_id].at(input_idx).range;
+				tempjson["data"][device_count]["device_data"][point_idx]["calibration_sign"] = g_Input_data[npanel_id].at(input_idx).calibration_sign;
+				tempjson["data"][device_count]["device_data"][point_idx]["calibration_h"] = g_Input_data[npanel_id].at(input_idx).calibration_h;
+				tempjson["data"][device_count]["device_data"][point_idx]["calibration_l"] = g_Input_data[npanel_id].at(input_idx).calibration_l;
+				tempjson["data"][device_count]["device_data"][point_idx]["decom"] = g_Input_data[npanel_id].at(input_idx).decom; //for input   0 "Normal"    1"Open"   2  "Shorted"
+				point_idx++;
 			}
 
-			for (int i = 0; i < BAC_OUTPUT_ITEM_COUNT; i++) {
-				tempjson["data"][p_i]["pid"] = npanel_id;
-				tempjson["data"][p_i]["type"] = "OUTPUT";
-				tempjson["data"][p_i]["index"] = i;
-				tempjson["data"][p_i]["id"] = "OUT" + to_string(i + 1);
-				tempjson["data"][p_i]["command"] = to_string(npanel_id) + "OUT" + to_string(i + 1);
-				tempjson["data"][p_i]["description"] = (char*)g_Output_data[npanel_id].at(i).description;
-				tempjson["data"][p_i]["label"] = (char*)g_Output_data[npanel_id].at(i).label;
-				tempjson["data"][p_i]["auto_manual"] = g_Output_data[npanel_id].at(i).auto_manual;
-				tempjson["data"][p_i]["value"] = g_Output_data[npanel_id].at(i).value;
-				tempjson["data"][p_i]["low_voltage"] = g_Output_data[npanel_id].at(i).low_voltage;
-				tempjson["data"][p_i]["high_voltage"] = g_Output_data[npanel_id].at(i).high_voltage;
-				tempjson["data"][p_i]["range"] = g_Output_data[npanel_id].at(i).range;
-				tempjson["data"][p_i]["control"] = g_Output_data[npanel_id].at(i).control;
-				tempjson["data"][p_i]["digital_analog"] = g_Output_data[npanel_id].at(i).digital_analog;
-				tempjson["data"][p_i]["hw_switch_status"] = g_Output_data[npanel_id].at(i).hw_switch_status;
-				tempjson["data"][p_i]["decom"] = g_Output_data[npanel_id].at(i).decom; //for output   0 "Normal"    1"Alarm"  
-				p_i++;
+			// Add all OUTPUT points for this device in device_data array
+			for (int output_idx = 0; output_idx < BAC_OUTPUT_ITEM_COUNT; output_idx++) {
+				tempjson["data"][device_count]["device_data"][point_idx]["pid"] = npanel_id;
+				tempjson["data"][device_count]["device_data"][point_idx]["type"] = "OUTPUT";
+				tempjson["data"][device_count]["device_data"][point_idx]["index"] = output_idx;
+				tempjson["data"][device_count]["device_data"][point_idx]["id"] = "OUT" + to_string(output_idx + 1);
+				tempjson["data"][device_count]["device_data"][point_idx]["command"] = to_string(npanel_id) + "OUT" + to_string(output_idx + 1);
+				tempjson["data"][device_count]["device_data"][point_idx]["description"] = (char*)g_Output_data[npanel_id].at(output_idx).description;
+				tempjson["data"][device_count]["device_data"][point_idx]["label"] = (char*)g_Output_data[npanel_id].at(output_idx).label;
+				tempjson["data"][device_count]["device_data"][point_idx]["auto_manual"] = g_Output_data[npanel_id].at(output_idx).auto_manual;
+				tempjson["data"][device_count]["device_data"][point_idx]["value"] = g_Output_data[npanel_id].at(output_idx).value;
+				tempjson["data"][device_count]["device_data"][point_idx]["low_voltage"] = g_Output_data[npanel_id].at(output_idx).low_voltage;
+				tempjson["data"][device_count]["device_data"][point_idx]["high_voltage"] = g_Output_data[npanel_id].at(output_idx).high_voltage;
+				tempjson["data"][device_count]["device_data"][point_idx]["range"] = g_Output_data[npanel_id].at(output_idx).range;
+				tempjson["data"][device_count]["device_data"][point_idx]["control"] = g_Output_data[npanel_id].at(output_idx).control;
+				tempjson["data"][device_count]["device_data"][point_idx]["digital_analog"] = g_Output_data[npanel_id].at(output_idx).digital_analog;
+				tempjson["data"][device_count]["device_data"][point_idx]["hw_switch_status"] = g_Output_data[npanel_id].at(output_idx).hw_switch_status;
+				tempjson["data"][device_count]["device_data"][point_idx]["decom"] = g_Output_data[npanel_id].at(output_idx).decom; //for output   0 "Normal"    1"Alarm"
+				point_idx++;
 			}
 
-
-			for (int i = 0; i < BAC_VARIABLE_ITEM_COUNT; i++) {
-				tempjson["data"][p_i]["pid"] = npanel_id;
-				tempjson["data"][p_i]["type"] = "VARIABLE";
-				tempjson["data"][p_i]["index"] = i;
-				tempjson["data"][p_i]["id"] = "VAR" + to_string(i + 1);
-				tempjson["data"][p_i]["command"] = to_string(npanel_id) + "VAR" + to_string(i + 1);
-				tempjson["data"][p_i]["description"] = (char*)g_Variable_data[npanel_id].at(i).description;
-				tempjson["data"][p_i]["label"] = (char*)g_Variable_data[npanel_id].at(i).label;
-				tempjson["data"][p_i]["auto_manual"] = g_Variable_data[npanel_id].at(i).auto_manual;
-				tempjson["data"][p_i]["value"] = g_Variable_data[npanel_id].at(i).value;
-				tempjson["data"][p_i]["range"] = g_Variable_data[npanel_id].at(i).range;
-				tempjson["data"][p_i]["control"] = g_Variable_data[npanel_id].at(i).control;
-				tempjson["data"][p_i]["digital_analog"] = g_Variable_data[npanel_id].at(i).digital_analog;
-				tempjson["data"][p_i]["unused"] = g_Variable_data[npanel_id].at(i).unused;
-				p_i++;
+			// Add all VARIABLE points for this device in device_data array
+			for (int var_idx = 0; var_idx < BAC_VARIABLE_ITEM_COUNT; var_idx++) {
+				tempjson["data"][device_count]["device_data"][point_idx]["pid"] = npanel_id;
+				tempjson["data"][device_count]["device_data"][point_idx]["type"] = "VARIABLE";
+				tempjson["data"][device_count]["device_data"][point_idx]["index"] = var_idx;
+				tempjson["data"][device_count]["device_data"][point_idx]["id"] = "VAR" + to_string(var_idx + 1);
+				tempjson["data"][device_count]["device_data"][point_idx]["command"] = to_string(npanel_id) + "VAR" + to_string(var_idx + 1);
+				tempjson["data"][device_count]["device_data"][point_idx]["description"] = (char*)g_Variable_data[npanel_id].at(var_idx).description;
+				tempjson["data"][device_count]["device_data"][point_idx]["label"] = (char*)g_Variable_data[npanel_id].at(var_idx).label;
+				tempjson["data"][device_count]["device_data"][point_idx]["auto_manual"] = g_Variable_data[npanel_id].at(var_idx).auto_manual;
+				tempjson["data"][device_count]["device_data"][point_idx]["value"] = g_Variable_data[npanel_id].at(var_idx).value;
+				tempjson["data"][device_count]["device_data"][point_idx]["range"] = g_Variable_data[npanel_id].at(var_idx).range;
+				tempjson["data"][device_count]["device_data"][point_idx]["control"] = g_Variable_data[npanel_id].at(var_idx).control;
+				tempjson["data"][device_count]["device_data"][point_idx]["digital_analog"] = g_Variable_data[npanel_id].at(var_idx).digital_analog;
+				tempjson["data"][device_count]["device_data"][point_idx]["unused"] = g_Variable_data[npanel_id].at(var_idx).unused;
+				point_idx++;
 			}
-			const std::string output = Json::writeString(builder, tempjson);
-			CString temp_cs(output.c_str());
-			outmsg = temp_cs;
+			device_count++;
 #endif
 		}
 
+		// Generate final JSON response once for all devices
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+		outmsg = temp_cs;
+
+		// Final log message - write to T3WebLog\YYYY-MM\ if logging enabled
+		if (enable_logging_data_log) {
+			try {
+				SYSTEMTIME st;
+				GetSystemTime(&st);
+
+				// Create directory path based on current date
+				CString logDir;
+				logDir.Format(_T("T3WebLog\\%04d-%02d"), st.wYear, st.wMonth);
+				CreateDirectory(logDir, NULL);
+
+				// Calculate 4-hour bucket (00-03, 04-07, 08-11, 12-15, 16-19, 20-23)
+				int start_hour = (st.wHour / 4) * 4;
+				int end_hour = start_hour + 3;
+
+				// Create log file with new naming convention: t3_cppmsg_logging_data_MMDD_HHHH.txt
+				CString logFile;
+				logFile.Format(_T("%s\\T3_CppMsg_LOGGING_DATA_%02d%02d_%02d%02d.txt"),
+					logDir, st.wMonth, st.wDay, start_hour, end_hour);
+
+				CStdioFile file;
+				// Use append mode to add multiple calls to same 4-hour period file
+				if (file.Open(logFile, CFile::modeCreate | CFile::modeWrite | CFile::modeNoTruncate | CFile::typeText)) {
+					// Move to end of file for appending
+					file.SeekToEnd();
+
+					// Log entry separator and timestamp
+					CString logContent;
+					logContent.Format(_T("=== LOGGING_DATA C++ FFI Call [%04d-%02d-%02d %02d:%02d:%02d] ===\n"),
+						st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+					file.WriteString(logContent);
+
+					logContent.Format(_T("Total panels found: %zu\n"), g_bacnet_panel_info.size());
+					file.WriteString(logContent);
+
+					logContent.Format(_T("JSON response size: %d characters\n"), outmsg.GetLength());
+					file.WriteString(logContent);
+
+					logContent.Format(_T("Data items processed: %d\n"), device_count);
+					file.WriteString(logContent);
+
+					// Log full JSON response for complete inspection
+					file.WriteString(_T("=== Complete JSON Response ===\n"));
+					file.WriteString(outmsg);
+					file.WriteString(_T("\n"));
+
+					file.WriteString(_T("=== End of Entry ===\r\n"));
+					file.Close();
+				}
+			}
+			catch (...) {
+				// Silently ignore logging errors to prevent disrupting main functionality
+				// Logging failure should not affect the FFI response
+			}
+		}
 	}
 	break;
 	default:

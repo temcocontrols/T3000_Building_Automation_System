@@ -228,6 +228,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClCompile Include="BacnetWebViewToolBar.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="BacnetWebView_Exports.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="Bacnet_Range_Msv.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
