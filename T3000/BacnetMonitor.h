@@ -43,6 +43,7 @@ public:
 	void Set_Input_Range_And_count();
 	static DWORD WINAPI  CreateWebServerThreadfun(LPVOID lpVoid);
 	afx_msg void OnBnClickedBtnMonitorGraphic();
+	afx_msg void OnBnClickedBtnMonitorGraphicBeta();
 	void OnBnClickedBtnMonitorDeleteAll();
 	void OnBnClickedBtnMonitorDeleteSelected();
 	void OnBnClickedBtnMonitorDeleteLocal();

@@ -1571,6 +1571,7 @@
 #define IDC_BTN_MONITOR_REFRESH         1689
 #define IDC_MBPOLL_CHECK3               1689
 #define IDC_BTN_MONITOR_GRAPHIC         1690
+#define IDC_BTN_MONITOR_GRAPHIC_BETA    1691
 #define IDC_MBPOLL_CHECK4               1690
 #define IDC_BUTTON_MONITOR_TEST         1691
 #define IDC_STATIC_DISPLAYTYPE          1691

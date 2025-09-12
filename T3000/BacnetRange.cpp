@@ -1015,12 +1015,22 @@ void BacnetRange::Initial_static()
 		MoveWindow(Temp_Rect.left,Temp_Rect.top, 950,800);
 	}
 
-
+	HandleSpecialRange();
 
 
 	GetDlgItem(IDC_EDIT_RANGE_SELECT)->ShowWindow(1);
 	GetDlgItem(IDC_STATIC_RANGE_ENTER_UNITS)->ShowWindow(1);
 	UpdateData(FALSE);
+}
+
+void BacnetRange::HandleSpecialRange()
+{
+	GetDlgItem(IDC_RADIO_DEGC)->SetWindowText(_T("\u00B0C"));
+	GetDlgItem(IDC_RADIO_DEGF)->SetWindowText(_T("\u00B0F"));
+	GetDlgItem(IDC_RADIO2)->SetWindowText(_T("31. \u00B0C"));
+	GetDlgItem(IDC_RADIO3)->SetWindowText(_T("32. \u00B0F"));
+	GetDlgItem(IDC_RADIO22)->SetWindowText(_T("51. \u03A9"));
+	GetDlgItem(IDC_RADIO34)->SetWindowText(_T("63. m\u00B3/h"));
 }
 
 

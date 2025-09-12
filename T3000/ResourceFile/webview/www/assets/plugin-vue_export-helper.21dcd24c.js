@@ -1,1 +1,1 @@
-var a=(t,o)=>{const r=t.__vccOpts||t;for(const[e,_]of o)r[e]=_;return r};export{a as _};
+var o=(o,r)=>{const t=o.__vccOpts||o;for(const[c,s]of r)t[c]=s;return t};export{o as _};

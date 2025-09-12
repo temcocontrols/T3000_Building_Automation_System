@@ -1,1 +1,1 @@
-var s="/assets/logo.3a389360.png";export{s as _};
+var a="/assets/logo.3a389360.png";export{a as _};

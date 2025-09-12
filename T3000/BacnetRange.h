@@ -70,7 +70,7 @@ public:
     afx_msg void OnBnClickedRadio87();
     afx_msg void OnBnClickedRadio103();
 	void RadioDegC_DegF(bool n_enable, bool n_deg_c= 1);
-
+	void HandleSpecialRange();
 	afx_msg void OnBnClickedRadioMsv4();
 };
 

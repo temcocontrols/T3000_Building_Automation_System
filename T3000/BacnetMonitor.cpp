@@ -74,6 +74,7 @@ BEGIN_MESSAGE_MAP(CBacnetMonitor, CDialogEx)
 	ON_WM_TIMER()
 	ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER_MONITOR, &CBacnetMonitor::OnNMKillfocusDatetimepickerMonitor)
 	ON_BN_CLICKED(IDC_BTN_MONITOR_GRAPHIC, &CBacnetMonitor::OnBnClickedBtnMonitorGraphic)
+	ON_BN_CLICKED(IDC_BTN_MONITOR_GRAPHIC_BETA, &CBacnetMonitor::OnBnClickedBtnMonitorGraphicBeta)
 	ON_BN_CLICKED(IDC_BUTTON_MONITOR_DEL_ALL, &CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll)
 	ON_BN_CLICKED(IDC_BUTTON_MONITOR_DEL_SEL, &CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected)
 	ON_BN_CLICKED(IDC_BUTTON_MONITOR_DEL_LOCAL, &CBacnetMonitor::OnBnClickedBtnMonitorDeleteLocal)
@@ -1587,6 +1588,92 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 
 }
 #endif
+
+void CBacnetMonitor::OnBnClickedBtnMonitorGraphicBeta()
+{
+	// This thread will not exit when it is running properly, and will exit if run_server executes abnormally, terminating the thread.
+	if (h_create_webview_server_thread == NULL)
+	{
+		h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
+	}
+
+	// Get monitor data for title formatting
+	const Str_monitor_point& monitor_data = m_monitor_data.at(monitor_list_line);
+
+	// Convert monitor data to JSON format instead of hex
+	CString jsonData = ConvertMonitorDataToJson(monitor_data,
+		Device_Basic_Setting.reg.panel_number, monitor_list_line);
+
+	// URL encode the JSON data
+	CString encodedJsonData = UrlEncodeJson(jsonData);
+
+	CString selseted_info;
+	selseted_info.Format(_T("http://localhost:9103/#/trend-log?sn=%d&panel_id=%d&trendlog_id=%d&all_data=%s&mode=beta"), Device_Basic_Setting.reg.n_serial_number,
+		Device_Basic_Setting.reg.panel_number, monitor_list_line, encodedJsonData.GetBuffer());
+
+	CString webviewFolder;
+	CString Resource_folder;
+	CString ApplicationFolder;
+	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+	ApplicationFolder.ReleaseBuffer();
+	Resource_folder = ApplicationFolder + _T("\\ResourceFile");
+
+	// Construct the final URL with JSON data
+	webviewFolder = selseted_info;
+
+	// Create formatted title from monitor data fields
+	CString titleString;
+	CString labelStr;
+
+	// Convert label from byte array to CString, ensuring null termination
+	char tempLabel[10] = { 0 };
+	memcpy(tempLabel, monitor_data.label, sizeof(monitor_data.label));
+	tempLabel[8] = '\0';  // Ensure null termination
+	labelStr = CString(tempLabel);
+	labelStr.Trim();  // Remove any trailing spaces
+
+	// Format interval time
+	CString intervalStr;
+	if (monitor_data.hour_interval_time > 0)
+	{
+		intervalStr.Format(_T("%dh %dm %ds"),
+			monitor_data.hour_interval_time,
+			monitor_data.minute_interval_time,
+			monitor_data.second_interval_time);
+	}
+	else if (monitor_data.minute_interval_time > 0)
+	{
+		intervalStr.Format(_T("%dm %ds"),
+			monitor_data.minute_interval_time,
+			monitor_data.second_interval_time);
+	}
+	else
+	{
+		intervalStr.Format(_T("%ds"), monitor_data.second_interval_time);
+	}
+
+	// Format status
+	CString statusStr = (monitor_data.status == 1) ? _T("ON") : _T("OFF");
+
+	// Create comprehensive title with Beta designation
+	if (labelStr.IsEmpty())
+	{
+		titleString.Format(_T("Trend Log Beta MON%d - Interval: %s - Status: %s"),
+			monitor_list_line + 1, intervalStr, statusStr);
+	}
+	else
+	{
+		titleString.Format(_T("Trend Log Beta: %s (MON%d) - Interval: %s - Status: %s"),
+			labelStr, monitor_list_line + 1, intervalStr, statusStr);
+	}
+
+	wstring fullpath = webviewFolder;
+	wstring titleWStr = wstring(titleString);
+	auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath), titleWStr);
+	auto result = BacnetWebViewAppWindow::RunMessagePump();
+	delete webviewwindow;
+}
 
 void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 {

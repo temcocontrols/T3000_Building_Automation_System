@@ -2400,6 +2400,15 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	case LOGGING_DATA:
 	{
 		// Local flag to enable/disable logging - set to false to disable
+		//15分钟内收到这个命令直接break;
+		static DWORD last_logging_time = 0;
+		DWORD current_time = GetTickCount();
+		if (current_time - last_logging_time < 15 * 60 * 1000) // 15 minutes in milliseconds
+		{
+			break; // Ignore the command if within 15 minutes
+		}
+		last_logging_time = current_time;
+
 		bool enable_logging_data_log = true;
 
 		Json::Value tempjson;
@@ -2512,22 +2521,32 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		CString temp_cs(output.c_str());
 		outmsg = temp_cs;
 
-		// Final log message - write to T3WebLog\YYYY-MM\ if logging enabled
+		// Final log message - write to T3WebLog\YYYY-MM\MMDD\ if logging enabled
 		if (enable_logging_data_log) {
 			try {
 				SYSTEMTIME st;
 				GetSystemTime(&st);
 
-				// Create directory path based on current date
+				// Create directory path: T3WebLog\YYYY-MM\MMDD
+                CString yearMonth;
+				yearMonth.Format(_T("T3WebLog\\%04d-%02d"), st.wYear, st.wMonth);
+
+				CString monthDay;
+				monthDay.Format(_T("%02d%02d"), st.wMonth, st.wDay);
+
 				CString logDir;
-				logDir.Format(_T("T3WebLog\\%04d-%02d"), st.wYear, st.wMonth);
+				logDir.Format(_T("%s\\%s"), yearMonth, monthDay);
+
+				// Create directories if they don't exist
+				CreateDirectory(_T("T3WebLog"), NULL);
+				CreateDirectory(yearMonth, NULL);
 				CreateDirectory(logDir, NULL);
 
 				// Calculate 4-hour bucket (00-03, 04-07, 08-11, 12-15, 16-19, 20-23)
 				int start_hour = (st.wHour / 4) * 4;
 				int end_hour = start_hour + 3;
 
-				// Create log file with new naming convention: t3_cppmsg_logging_data_MMDD_HHHH.txt
+				// Create log file with pattern: YYYY-MM/MMDD/T3_CppMsg_LOGGING_DATA_MMDD_HHMM.txt
 				CString logFile;
 				logFile.Format(_T("%s\\T3_CppMsg_LOGGING_DATA_%02d%02d_%02d%02d.txt"),
 					logDir, st.wMonth, st.wDay, start_hour, end_hour);

@@ -7,7 +7,7 @@
 #endif // DEBUG
 
 
-//#define ENABLE_T3_EMAIL
+#define ENABLE_T3_EMAIL
 #define DISABLE_HANDLE_JSON_DATA
 #include <map>
 //minipanel register table
@@ -1212,15 +1212,15 @@ const CString Variable_Analog_Units_Array[] =
 	// KWatts → Abbreviated as kW (kilowatt, standard lowercase k)
 	_T("kW"),                   // KWatts → 简写为kW（千瓦，标准小写k）
 	// Kilowatt-hours
-	_T("KWH"),                  // 千瓦时
+	_T("kWH"),                  // 千瓦时
 	// Volts → Abbreviated as V (volts)
 	_T("V"),                    // Volts → 简写为V（伏特）
 	// Kilovolts
-	_T("KV"),                   // 千伏
+	_T("kV"),                   // 千伏
 	// Amps → Abbreviated as A (amperes)
 	_T("A"),                    // Amps → 简写为A（安培）
 	// Milliamperes
-	_T("ma"),                   // 毫安
+	_T("mA"),                   // 毫安
 	// Cubic feet per minute
 	_T("CFM"),                  // 立方英尺/分钟
 	// Seconds → Abbreviated as s (seconds)
@@ -1246,14 +1246,14 @@ const CString Variable_Analog_Units_Array[] =
 	// Percent open
 	_T("%Open"),                // 打开百分比
 	// Kilograms
-	_T("Kg"),                   // 千克
+	_T("kg"),                   // 千克
 	// L/Hour → Abbreviated as L/h (liters per hour)
 	_T("L/h"),                  // L/Hour → 简写为L/h（升/小时）
 	_T("GPH"),                  // 加仑/小时
 	_T("GAL"),                  // 加仑
 	_T("CF"),                   // 立方英尺
 	_T("BTU"),                  // 英热单位
-	_T("CMH"),                  // 立方米/小时
+	_T("m\u00B3/h"),                  // 立方米/小时
 };
 
 
@@ -1831,18 +1831,18 @@ const CString Input_Filter_Array[8] =
 const CString Input_Unit[42] =
 {
 	_T("Not Used"),
-	_T("℃"),
-	_T("℉"),
+	_T("\u00B0C"),
+	_T("\u00B0F"),
 	_T("FPM"),
 	_T("Pa"),
-	_T("KPa"),
+	_T("kPa"),
 	_T("psi"),
 	_T("in_w"),
 	_T("Watts"),
-	_T("KW"),
-	_T("KWH"),
-	_T("Volt"),
-	_T("KV"),
+	_T("kW"),
+	_T("kWH"),
+	_T("Vo"),
+	_T("kV"),
 	_T("Amps"),
 	_T("mA"),
 	_T("CFM"),
@@ -1863,7 +1863,7 @@ const CString Input_Unit[42] =
 	_T("GAL"),
 	_T("CF"),
 	_T("BTU"),
-	_T("CMH"),
+	_T("m\u00B3/h"),
 	_T("custom1"),
 	_T("custom2"),
 	_T("custom3"),

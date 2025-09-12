@@ -790,6 +790,7 @@ program_part_success:
 		MessageBox(_T("Errors,program NOT Sent!"));
 	}
 	UpdateDataProgramText();
+	PostMessage(WM_REFRESH_BAC_PROGRAM_RICHEDIT, NULL, NULL);
 }
 
 

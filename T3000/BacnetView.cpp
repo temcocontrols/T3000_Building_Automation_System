@@ -5178,11 +5178,23 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             }
             Sleep(SEND_COMMAND_DELAY_TIME*3);
 #ifdef ENABLE_T3_EMAIL
-            if (GetPrivateData_Blocking(g_bac_instance, READ_EMAIL_ALARM, 0, 0, sizeof(Str_Email_point)) < 0)
-            {
-                SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read email setting timeout !"));
-                Sleep(10);
-            }
+			if (((((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 +
+				(int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 675)
+				&& Device_Basic_Setting.reg.panel_type == PM_MINIPANEL_ARM) ||
+				((((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 +
+					(int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 658)
+					&& Device_Basic_Setting.reg.panel_type == PM_ESP32_T3_SERIES))
+			{
+				if (GetPrivateData_Blocking(g_bac_instance, READ_EMAIL_ALARM, 0, 0, sizeof(Str_Email_point)) < 0)
+				{
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Read email setting timeout !"));
+					Sleep(10);
+				}
+			}
+			else
+			{
+				::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_EMAIL_ALARM, NULL);
+			}
             Sleep(SEND_COMMAND_DELAY_TIME);
 #endif
 		}

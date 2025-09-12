@@ -546,11 +546,20 @@ void CBacnetAlarmLog::OnBnClickedButtonEmailAlarm()
     // TODO: 在此添加控件通知处理程序代码
 	// TODO: Add control notification handler code here
 #ifdef ENABLE_T3_EMAIL
-    if (GetPrivateData_Blocking(g_bac_instance, READ_EMAIL_ALARM, 0, 0, sizeof(Str_Email_point)) < 0)
-    {
-        MessageBox(_T("Read data timeout"));
-        return;
-    }
+	//ARM_67.5 ESP_65.8
+	if ((   (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + 
+		(int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 675) 
+		&& Device_Basic_Setting.reg.panel_type == PM_MINIPANEL_ARM) ||
+		((((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 +
+			(int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 658)
+		&& Device_Basic_Setting.reg.panel_type == PM_ESP32_T3_SERIES))
+	{
+		if (GetPrivateData_Blocking(g_bac_instance, READ_EMAIL_ALARM, 0, 0, sizeof(Str_Email_point)) < 0)
+		{
+			MessageBox(_T("Read data timeout"));
+			return;
+		}
+	}
 #endif
 
 
