@@ -1926,6 +1926,13 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				//tempjson["data"][i]["panel_id"] = panel_id;
 				tempjson["data"][i]["index"] = entry_index;
 
+				if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+				{
+					CString Mession_ret;
+					Mession_ret.Format(_T("GET_ENTRIES panel = %d , entry_type=%d ,entry_index =%d."), npanel_id, entry_type, entry_index);
+					DFTrace(Mession_ret);
+				}
+
 				if (entry_type == BAC_IN)
 				{
 					if (entry_index >= BAC_INPUT_ITEM_COUNT)
@@ -2403,7 +2410,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		//15分钟内收到这个命令直接break;
 		static DWORD last_logging_time = 0;
 		DWORD current_time = GetTickCount();
-		if (current_time - last_logging_time < 15 * 60 * 1000) // 15 minutes in milliseconds
+		if (current_time - last_logging_time <  60 * 1000) // 15 minutes in milliseconds
 		{
 			break; // Ignore the command if within 15 minutes
 		}

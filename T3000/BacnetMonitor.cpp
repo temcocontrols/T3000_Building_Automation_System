@@ -2158,7 +2158,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
     m_monitor_head.total_seg = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
     my_temp_point = my_temp_point + 4;
 	//在调试界面中打印出接收到得字符;
-	if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)) /*&& (m_monitor_head.special == 0)*/)
+	if(debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)
 	{
 		for (int i = 0; i< nlength ; i++)
 		{
@@ -2216,17 +2216,13 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
         temp_data.mark = (unsigned char)my_temp_point[1] << 8 | (unsigned char)my_temp_point[0];
         my_temp_point = my_temp_point + 2;
 
-        //if (((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY) || (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)))
-        //{
-
-        //        DFTrace(n_temp_print);
-        //}
+ 
 
         if (temp_data.mark != 0x0A0D)	//0d0a
             break;
 		if((temp_data.time == 0) ) //说明后面是无用的数据;填充的是0
 		{
-			if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)))
+			if(debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)
 			{
 				if(i!= (loop_count -1))
 				{
@@ -2238,7 +2234,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		}
 		if(temp_data.point.point_type > BAC_MAX)
 		{
-			if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)))
+			if (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)
 			{
 				if(i!= (loop_count -1))
 				{
@@ -2371,7 +2367,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		CString strSql;
 		strSql.Format(_T("insert into MonitorData values('%s',#%s#,%u,%d,%u,%u,'%s')"),temp_type,display_time,temp_data.time,temp_data.value,  analog_data ,temp_flag,Label_Des);
 
-        if (((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)))
+		if (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)
         {
             CString tem1111;
             tem1111 = strSql + _T("\r\n");

@@ -10651,6 +10651,23 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         g_logging_time[n_panel_id].n_panel_number = n_panel_id;
                         g_logging_time[n_panel_id].sn = My_read_Struct->sn;
                         Sleep(SEND_COMMAND_DELAY_TIME);
+                       
+                        if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+                        {
+                            CString Mession_ret;
+                            Mession_ret.Format(_T("GetSPBlocking panel = %d Read input from %d to %d success.  instance = %d"), n_panel_id, temp_start_index, temp_start_index, temp_instance);
+                            DFTrace(Mession_ret);
+                        }
+                    }
+                    else
+                    {
+                        if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+                        {
+                            CString Mession_ret;
+                            Mession_ret.Format(_T("GetSPBlocking panel = %d Read input  timeout ,break read.  instance = %d"), n_panel_id,  temp_instance);
+                            DFTrace(Mession_ret);
+                        }
+                        break;
                     }
 
                 }
@@ -10679,6 +10696,22 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         g_logging_time[n_panel_id].n_panel_number = n_panel_id;
                         g_logging_time[n_panel_id].sn = My_read_Struct->sn;
                         Sleep(SEND_COMMAND_DELAY_TIME);
+                        if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+                        {
+                            CString Mession_ret;
+                            Mession_ret.Format(_T("GetSPBlocking panel = %d Read output from %d to %d success.  instance = %d"), n_panel_id, temp_start_index, temp_start_index, temp_instance);
+                            DFTrace(Mession_ret);
+                        }
+                    }
+                    else
+                    {
+                        if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+                        {
+                            CString Mession_ret;
+                            Mession_ret.Format(_T("GetSPBlocking panel = %d Read output  timeout ,break read.  instance = %d"), n_panel_id, temp_instance);
+                            DFTrace(Mession_ret);
+                        }
+                        break;
                     }
                 }
 
@@ -10706,7 +10739,24 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                             g_logging_time[n_panel_id].n_panel_number = n_panel_id;
                             g_logging_time[n_panel_id].sn = My_read_Struct->sn;
                             Sleep(SEND_COMMAND_DELAY_TIME);
+                            if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+                            {
+                                CString Mession_ret;
+                                Mession_ret.Format(_T("GetSPBlocking panel = %d Read variable from %d to %d success.  instance = %d"), n_panel_id, temp_start_index, temp_start_index, temp_instance);
+                                DFTrace(Mession_ret);
+                            }
                         }
+                        else 
+                        {
+                            if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+                            {
+                                CString Mession_ret;
+                                Mession_ret.Format(_T("GetSPBlocking panel = %d Read variable  timeout ,break read.  instance = %d"), n_panel_id, temp_instance);
+                                DFTrace(Mession_ret);
+                            }
+                            break;
+                        }
+                       
                 }
 
             }
@@ -10799,7 +10849,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                 }
                         CString Mession_ret;
                         Mession_ret.Format(_T("GetPrivateDataSaveSPBlocking Read input from %d to %d success.%.1f"), temp_start_index, temp_start_index, g_Input_data[My_read_Struct->npanel_id].at(temp_end_index).value / 1000.0);
-                        if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA))
+                        if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
                         {
                             DFTrace(Mession_ret);
                         }
@@ -10835,7 +10885,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         }
                         CString Mession_ret;
                         Mession_ret.Format(_T("GetPrivateDataSaveSPBlocking Read Out from %d to %d success.%.1f"), temp_start_index, temp_start_index, g_Output_data[My_read_Struct->npanel_id].at(temp_end_index).value / 1000.0);
-                        if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA))
+                        if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
                         {
                             DFTrace(Mession_ret);
                         }
@@ -10872,7 +10922,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 						}
 						CString Mession_ret;
 						Mession_ret.Format(_T("GetPrivateDataSaveSPBlocking Read var from %d to %d success.%.1f"), temp_start_index, temp_start_index, g_Variable_data[My_read_Struct->npanel_id].at(temp_end_index).value/1000.0);
-						if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA))
+						if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
 						{
 							DFTrace(Mession_ret);
 						}

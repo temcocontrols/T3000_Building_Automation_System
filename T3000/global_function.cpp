@@ -506,7 +506,7 @@ int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsig
             n_ret = GetPrivateBacnetToModbusData(g_mstp_deviceid, start_address, length, put_data_into_here);
             if (n_ret >= 0)
             {
-                if ((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+                if (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)
                 {
                     CString total_char_test;
                     //total_char_test = _T("Read MSTP To Modbus : ");
@@ -2096,7 +2096,7 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         return ret_length;
     }
 
-	if((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+	if(debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) 
 	{
 		CString total_char_test;
 		total_char_test = _T("Write : ");
@@ -2257,14 +2257,14 @@ int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t sta
                 Sleep(500);
             else if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
             {
-                gsp_invoke = -1;
+                //gsp_invoke = -1;
+                gsp_invoke = temp_invoke_id; //20250918 add 通过这个函数进来的 都是特殊的读取 
                 return 1;
             }
-            else
-            {
-                gsp_invoke = temp_invoke_id;
+
+                gsp_invoke = temp_invoke_id; //20250918 add 通过这个函数进来的 都是特殊的读取 
                 send_status = true;
-            }
+            
 
         } while (temp_invoke_id < 0);
 
@@ -2853,7 +2853,7 @@ int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_
     private_data.serviceParametersLen = private_data_len;
 
 
-    if ((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+    if (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) 
     {
         CString total_char_test;
         total_char_test = _T("Write : ");
@@ -3319,7 +3319,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 
     char * bacnet_apud_point = (char *)Temp_CS.value;
 	CString total_char_test;
-	if((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+	if(debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) 
 	{
 		char * temp_print_test = NULL;
 		temp_print_test = (char *)&Temp_CS.value;
@@ -4537,7 +4537,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         //program_code_length[start_instance] = 400;
 
 
-        if ((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_PROGRAM_DATA_ONLY))
+        if (debug_item_show == DEBUG_SHOW_PROGRAM_DATA_ONLY)
         {
             CString temp_char;
             CString n_temp_print;

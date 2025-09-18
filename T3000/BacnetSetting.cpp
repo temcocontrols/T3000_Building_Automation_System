@@ -455,7 +455,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 		unsigned long time_setting_now = (unsigned long)time(NULL);
 
-		if ((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+		if (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)
 		{
 			CString temp123;
 			temp123.Format(_T("%u"), Device_Basic_Setting.reg.time_update_since_1970);

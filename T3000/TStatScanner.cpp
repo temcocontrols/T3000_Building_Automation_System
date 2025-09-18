@@ -5289,7 +5289,7 @@ DWORD WINAPI   CTStatScanner::_ScanBacnetMSTPThread(LPVOID lpVoid)
                 ntest_ret = GetPrivateBacnetToModbusData(m_temp_com_data.at(i).device_id, 0, 100, test_array);
                 if (ntest_ret >= 0)
                 {
-                    if ((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+                    if (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)
                     {
                         CString total_char_test;
                         //total_char_test = _T("Read MSTP To Modbus : ");

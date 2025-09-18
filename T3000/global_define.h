@@ -1957,7 +1957,8 @@ const CString Debug_Combo_Choose[] =
 	_T("Only Program Code"),
 	_T("Screen Pictrue Data"),
 	_T("Bacnet Data"),
-	_T("SQLite Debug")
+	_T("SQLite Debug"),
+	_T("Message Read Thread")
 };
 
 const CString System_Log[] =
@@ -1999,6 +2000,7 @@ const int DEBUG_SHOW_PROGRAM_DATA_ONLY = 4;
 const int DEBUG_SHOW_WRITE_PIC_DATA_ONLY = 5;
 const int DEBUG_SHOW_BACNET_ALL_DATA = 6;
 const int DEBUG_SHOW_SQLITE_INFO = 7;
+const int DEBUG_SHOW_MESSAGE_THREAD = 8;
 #define NUMBER_BAUDRATE 6
 typedef struct
 {

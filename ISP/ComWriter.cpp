@@ -1223,7 +1223,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
         if (itemp >= RETRY_TIMES*2)
         {
             CString str;
-            str.Format(_T("Write Flash ID = %d To = 128*%d "),m_ID,ii);
+            str.Format(_T("Timeout error!Write Flash ID = %d To = 128*%d "),m_ID,ii);
 			if(!auto_flash_mode)
 				 AfxMessageBox(str);
             return -8;
