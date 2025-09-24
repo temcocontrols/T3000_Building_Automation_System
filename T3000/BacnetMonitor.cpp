@@ -1659,13 +1659,13 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphicBeta()
 	// Create comprehensive title with Beta designation
 	if (labelStr.IsEmpty())
 	{
-		titleString.Format(_T("Trend Log Beta MON%d - Interval: %s - Status: %s"),
-			monitor_list_line + 1, intervalStr, statusStr);
+		titleString.Format(_T("Trend Log Beta MON%d - Panel: %d - Interval: %s - Status: %s"),
+			monitor_list_line + 1, Device_Basic_Setting.reg.panel_number, intervalStr, statusStr);
 	}
 	else
 	{
-		titleString.Format(_T("Trend Log Beta: %s (MON%d) - Interval: %s - Status: %s"),
-			labelStr, monitor_list_line + 1, intervalStr, statusStr);
+		titleString.Format(_T("Trend Log Beta: %s (MON%d) - Panel: %d - Interval: %s - Status: %s"),
+			labelStr, monitor_list_line + 1, Device_Basic_Setting.reg.panel_number, intervalStr, statusStr);
 	}
 
 	wstring fullpath = webviewFolder;
