@@ -22,6 +22,15 @@ __declspec(dllexport) int BacnetWebView_HandleWebViewMsg(int action, char* msg, 
 __declspec(dllexport) int GetDeviceBasicSettings(int panel_id, char* buffer, int buffer_size);
 __declspec(dllexport) int GetDeviceNetworkConfig(int panel_id, char* buffer, int buffer_size);
 
+// TRENDLOG EXPORTS: Direct access to monitor/trendlog data
+// These functions provide trendlog data equivalent to BacnetMonitor dialog functionality
+__declspec(dllexport) int BacnetWebView_GetTrendlogList(int panel_id, char* result_buffer, int buffer_size);
+__declspec(dllexport) int BacnetWebView_GetTrendlogEntry(int panel_id, int monitor_index, char* result_buffer, int buffer_size);
+
+// MONITOR DATA SYNC: Sync m_monitor_data to g_monitor_data[panel_id]
+// Call this after loading device data to ensure webview can access monitor data
+__declspec(dllexport) int BacnetWebView_SyncMonitorData(int panel_id);
+
 #ifdef __cplusplus
 }
 #endif

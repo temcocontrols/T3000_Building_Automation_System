@@ -137,7 +137,7 @@ extern "C" {
         BACNET_RPM_DATA * rpmdata);
 
 /* RPM Ack - reply from server */
-    int rpm_ack_encode_apdu_init(
+    __declspec(dllexport)  int rpm_ack_encode_apdu_init(
         uint8_t * apdu,
         uint8_t invoke_id);
 
@@ -177,6 +177,21 @@ extern "C" {
         unsigned apdu_len,
         BACNET_PROPERTY_ID * object_property,
         uint32_t * array_index);
+
+    __declspec(dllexport) BACNET_PROPERTY_ID RPM_Object_Property(
+        struct special_property_list_t* pPropertyList,
+        BACNET_PROPERTY_ID special_property,
+        unsigned index);
+
+    __declspec(dllexport)   unsigned RPM_Object_Property_Count(
+        struct special_property_list_t* pPropertyList,
+        BACNET_PROPERTY_ID special_property);
+
+    __declspec(dllexport)  int RPM_Encode_Property(
+        uint8_t* apdu,
+        uint16_t offset,
+        uint16_t max_apdu,
+        BACNET_RPM_DATA* rpmdata);
 #ifdef TEST
 #include "ctest.h"
     int rpm_decode_apdu(

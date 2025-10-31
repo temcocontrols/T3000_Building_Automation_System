@@ -290,6 +290,25 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 	{
 
 		UpdateTreeName();
+		if (((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
+			(((g_selected_product_id == PM_MINIPANEL_ARM) || (PM_TSTAT10 == g_selected_product_id)) &&
+				(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670)))
+		{
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_CHECK_FIX_PORT))->EnableWindow(1);
+			if (Device_Basic_Setting.reg.fix_com_config == 1)
+			{
+				((CButton*)m_page_tcpip.GetDlgItem(IDC_CHECK_FIX_PORT))->SetCheck(true);
+			}
+			else
+				((CButton*)m_page_tcpip.GetDlgItem(IDC_CHECK_FIX_PORT))->SetCheck(false);
+		}
+		else
+		{
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_CHECK_FIX_PORT))->EnableWindow(0);
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_CHECK_FIX_PORT))->SetCheck(1);
+		}
+
+
 
 		((CIPAddressCtrl*)m_page_tcpip.GetDlgItem(IDC_IPADDRESS_BAC_IP))->SetAddress(Device_Basic_Setting.reg.ip_addr[0],
 			Device_Basic_Setting.reg.ip_addr[1], Device_Basic_Setting.reg.ip_addr[2], Device_Basic_Setting.reg.ip_addr[3]);
@@ -912,9 +931,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->ResetContent();
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[NOUSE]);
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[BACNET_MSTP]);
-			if (((g_selected_product_id == PM_ESP32_T3_SERIES) &&((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
+			if ((((g_selected_product_id == PM_ESP32_T3_SERIES) &&((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
 				(((g_selected_product_id == PM_MINIPANEL_ARM) || (PM_TSTAT10 == g_selected_product_id)) &&
-				(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670)))
+				(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670))) &&
+				Device_Basic_Setting.reg.fix_com_config == 0)
 			{
 				//670版本以后  ARM的芯片统一显示未modbus
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(_T("Modbus"));
@@ -928,9 +948,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->ResetContent();
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[NOUSE]);
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[BACNET_MSTP]);
-			if (((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
+			if ((((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
 				(((g_selected_product_id == PM_MINIPANEL_ARM) || (PM_TSTAT10 == g_selected_product_id)) &&
-					(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670)))
+					(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670))) &&
+				Device_Basic_Setting.reg.fix_com_config == 0)
 			{
 				//670版本以后  ARM的芯片统一显示未modbus
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(_T("Modbus"));
@@ -944,10 +965,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(TRUE);
 			if (Device_Basic_Setting.reg.com0_config < MAX_COM_TYPE)
 			{
-				if (((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
+				if ((((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
 					(((g_selected_product_id == PM_MINIPANEL_ARM) || (PM_TSTAT10 == g_selected_product_id)) &&
-						((Device_Basic_Setting.reg.com0_config == MAIN_MODBUS) || (Device_Basic_Setting.reg.com0_config == SUB_MODBUS)) &&
-						(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670)))
+						(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670))) &&
+					Device_Basic_Setting.reg.fix_com_config == 0)
 				{
 					((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->SetWindowTextW(_T("Modbus"));
 				}
@@ -958,10 +979,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->SetWindowTextW(Device_Serial_Port_Status[Device_Basic_Setting.reg.com1_config]);
 			if (Device_Basic_Setting.reg.com2_config < MAX_COM_TYPE)
 			{
-				if (((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
+				if ((((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
 					(((g_selected_product_id == PM_MINIPANEL_ARM) || (PM_TSTAT10 == g_selected_product_id)) &&
-						((Device_Basic_Setting.reg.com2_config == MAIN_MODBUS) || (Device_Basic_Setting.reg.com2_config == SUB_MODBUS)) &&
-						(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670)))
+						(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670))) &&
+					Device_Basic_Setting.reg.fix_com_config == 0)
 				{
 					((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->SetWindowTextW(_T("Modbus"));
 				}
@@ -1033,8 +1054,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->ResetContent();
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[NOUSE]);
 				((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[BACNET_MSTP]);
-				if (((g_selected_product_id == PM_MINIPANEL_ARM) || (PM_TSTAT10 == g_selected_product_id)) &&
-					((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670)
+				if ((((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
+					(((g_selected_product_id == PM_MINIPANEL_ARM) || (PM_TSTAT10 == g_selected_product_id)) &&
+						(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670))) &&
+					Device_Basic_Setting.reg.fix_com_config == 0)
 				{
 
 					((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(_T("Modbus"));
@@ -1046,9 +1069,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				}
 				if (Device_Basic_Setting.reg.com0_config < MAX_COM_TYPE)
 				{
-					if (((g_selected_product_id == PM_MINIPANEL_ARM) || (PM_TSTAT10 == g_selected_product_id)) &&
-						((Device_Basic_Setting.reg.com0_config == MAIN_MODBUS) || (Device_Basic_Setting.reg.com0_config == SUB_MODBUS)) &&
-						((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670)
+					if ((((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
+						(((g_selected_product_id == PM_MINIPANEL_ARM) || (PM_TSTAT10 == g_selected_product_id)) &&
+							(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670))) &&
+						Device_Basic_Setting.reg.fix_com_config == 0)
 					{
 						((CComboBox*)m_page_tcpip.GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->SetWindowTextW(_T("Modbus"));
 					}
@@ -1185,6 +1209,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 		((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_MSTP_NETWORK))->SetWindowTextW(temp_mstp_network);
 		((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->SetWindowTextW(temp_bip_network);
 		((CEdit*)m_page_basic_info.GetDlgItem(IDC_EDIT_SETTING_MODBUS_ID))->SetWindowTextW(temp_modbus_id);
+
+
 
 		if (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 640)
 		{

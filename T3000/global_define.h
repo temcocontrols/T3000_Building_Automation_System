@@ -1240,7 +1240,7 @@ const CString Variable_Analog_Units_Array[] =
 	// Relative humidity
 	_T("%RH"),                  // 相对湿度
 	// Times per minute
-	_T("p/min"),                // 次/分钟
+	_T("PPM"),                // 次/分钟
 	// Counts
 	_T("Counts"),               // 计数
 	// Percent open
@@ -3007,6 +3007,23 @@ enum
 	TREE_IO_ONLINE,
 	TREE_IO_UNKNOWN,
 };
+
+#ifdef read_prop_multi_function
+// BACnet读属性多应答数据结构（根据实际协议栈调整）
+typedef struct {
+	BACNET_READ_ACCESS_DATA* listOfReadAccessResults;  // 应答结果链表
+	int error_code;                                    // 错误码（0=成功）
+} BACNET_READ_PROP_MULTIPLE_ACK;
+
+// 同步等待状态结构体（Windows原生API版）
+typedef struct {
+	uint8_t invoke_id;                               // 目标Invoke ID
+	BOOL is_received;                                // 是否收到应答（TRUE/FALSE）
+	BACNET_READ_PROP_MULTIPLE_ACK ack_data;          // 应答数据
+	CRITICAL_SECTION cs;                             // 临界区（保护共享数据）
+	HANDLE h_event;                                  // 事件对象（用于等待唤醒）
+} SyncReadState;
+#endif
 
 #define ESP32_IO_COUNT_REDEFINE_VERSION  637
 #define WEBVIEW_JSON_FEATURE             643

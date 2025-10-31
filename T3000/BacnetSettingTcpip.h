@@ -45,6 +45,7 @@ public:
     afx_msg void OnBnClickedRadioUsbHost();
     afx_msg void OnBnClickedButtonHealth();
     afx_msg void OnEnKillfocusEditSettingPort();
+    afx_msg void OnBnClickedCheckSettingFixComm();
     afx_msg void OnEnKillfocusEditSettingZeigbeePanid();
     CEdit m_edit_port;
     CComboBox m_device_com0;

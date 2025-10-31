@@ -2406,6 +2406,12 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	break;
 	case LOGGING_DATA:
 	{
+		//release 版本暂时不启用这个功能
+		int temp_panel_id = json.get("panelId", Json::nullValue).asInt();
+		int temp_serial_number = json.get("serialNumber", Json::nullValue).asInt();
+		//temp_panel_id = 144; //test
+		//temp_serial_number = 240488;
+		//break;
 		// Local flag to enable/disable logging - set to false to disable
 		//15分钟内收到这个命令直接break;
 		static DWORD last_logging_time = 0;
@@ -2421,8 +2427,12 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		Json::Value tempjson;
 		tempjson["action"] = "LOGGING_DATA_RES";
 
-		Post_ReadAllTrendlog_Message();
-
+		int nret = Post_ReadTrendlog_Message(temp_panel_id, temp_serial_number);
+		if (nret < 0)
+		{
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Panel is offline ."));
+			break;
+		}
 		//发送消息加载所有panel 的 in out var 数据;
 		int device_count = 0;
 		for (int panel_idx = 0; panel_idx < g_bacnet_panel_info.size(); panel_idx++)

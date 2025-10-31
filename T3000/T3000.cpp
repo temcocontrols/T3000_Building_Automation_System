@@ -23,7 +23,7 @@
 /**
  * @brief Global version of the T3000 application.
  */
-const unsigned int g_versionNO = 20250918;    // PROJECT_VERSION
+const unsigned int g_versionNO = 20251031;    // PROJECT_VERSION
 
 
 
@@ -272,7 +272,9 @@ BOOL CT3000App::InitInstance()
 		CMultipleMonthCalCtrl::RegisterControl();
 
 		BOOL First_Start=TRUE;
-
+#ifdef read_prop_multi_function
+		SyncReadState_Init();
+#endif
 		// Call the parent class's InitInstance
 		CWinAppEx::InitInstance();
 		HRESULT hr;
@@ -324,7 +326,7 @@ BOOL CT3000App::InitInstance()
             cs_update_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("Update");
             DeleteDirectory(cs_update_folder);
 			CreateDirectory(g_strExePth+_T("Database"),NULL);//creat database folder;//
-
+			DeleteDirectory(g_strDatabasefilepath + _T("T3WebLog"));
 			g_achive_device_name_path = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp\\") + _T("device_name.ini") ;
 			g_achive_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp");
 			g_achive_folder_temp_txt = g_achive_folder + _T("\\") + _T("prg_txt_file");
@@ -846,7 +848,9 @@ void CT3000App::InitModeName()
 
 int CT3000App::ExitInstance()
 {
-	
+#ifdef read_prop_multi_function
+	SyncReadState_Cleanup();
+#endif
 	CoUninitialize( );
 	return CWinAppEx::ExitInstance();
 }

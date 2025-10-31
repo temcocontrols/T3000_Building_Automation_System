@@ -76,6 +76,10 @@ extern CBacnetRemotePoint* Remote_Point_Window ;
 extern int pc_time_to_basic_delt; //用于时间转换 ，各个时区之间。
 extern CString program_string;
 extern vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
+// 全局同步状态实例
+#ifdef read_prop_multi_function
+static SyncReadState g_sync_state;
+#endif
 int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length)
 {
     int retVal;
@@ -1097,7 +1101,7 @@ int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata 
 }
 
 
-int Post_ReadAllTrendlog_Message()
+int Post_ReadTrendlog_Message(unsigned char panel_id, uint32_t nserialnumber)
 {
     if (read_write_bacnet_config)	//在读写Bacnet config 的时候禁止刷新List;
         return -1;
@@ -1117,6 +1121,12 @@ int Post_ReadAllTrendlog_Message()
         if((readinfo.npanel_id > 254) || readinfo.npanel_id ==0)
 			continue; //panel id is not valid, skip it.
 
+        if (nserialnumber == 0)
+            continue;
+        if (panel_id != readinfo.npanel_id)
+            continue;
+        if (readinfo.sn != nserialnumber)
+            continue;
         g_logging_time[readinfo.npanel_id].request_time = time(NULL); //记录请求的时间
 
 
@@ -5728,8 +5738,252 @@ int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, ui
 //        }
 //    }
 //}
+#ifdef read_prop_multi_function
+int Bacnet_Read_Property_MultipleValue(uint32_t deviceid, BACNET_READ_ACCESS_DATA* head) 
+{
+    head = NULL;
+    BACNET_READ_ACCESS_DATA* tail = NULL;
+    uint8_t invoke_id = -1;
+    // 示例：读取100-127的Analog Value的Present Value
+    for (int i = 0; i < 32; ++i) {
+        BACNET_READ_ACCESS_DATA* read_access = (BACNET_READ_ACCESS_DATA*)malloc(sizeof(BACNET_READ_ACCESS_DATA));
+        memset(read_access, 0, sizeof(BACNET_READ_ACCESS_DATA));
+        read_access->object_type = OBJECT_ANALOG_VALUE;
+        read_access->object_instance = i;
 
-//int Bacnet_Read_Property_Multiple()
+        BACNET_PROPERTY_REFERENCE* prop = (BACNET_PROPERTY_REFERENCE*)malloc(sizeof(BACNET_PROPERTY_REFERENCE));
+        memset(prop, 0, sizeof(BACNET_PROPERTY_REFERENCE));
+        prop->propertyIdentifier = PROP_PRESENT_VALUE;
+        prop->propertyArrayIndex = BACNET_ARRAY_ALL;
+        prop->next = NULL;
+
+        read_access->listOfProperties = prop;
+        read_access->next = NULL;  // 修复原代码重复设置next的问题
+
+        if (!head) {
+            head = read_access;
+            tail = read_access;
+        }
+        else {
+            tail->next = read_access;
+            tail = read_access;
+        }
+    }
+
+    // 2. 发送读属性多请求，获取Invoke ID
+    uint8_t pdu[2048];
+    int pdu_len = sizeof(pdu);
+     invoke_id = Send_Read_Property_Multiple_Request(
+        pdu,
+        pdu_len,
+        deviceid,
+        head
+    );
+    if (invoke_id == 0) {  // 发送失败（假设0为无效ID）
+        // 释放链表内存（见步骤6）
+        goto cleanup;
+    }
+
+    // 3. 初始化同步等待状态
+    EnterCriticalSection(&g_sync_state.cs);
+    g_sync_state.invoke_id = invoke_id;         // 设置目标Invoke ID
+    g_sync_state.is_received = FALSE;           // 重置接收状态
+    g_sync_state.ack_data.listOfReadAccessResults = NULL;
+    g_sync_state.ack_data.error_code = -1;
+    ResetEvent(g_sync_state.h_event);           // 重置事件为未触发
+    LeaveCriticalSection(&g_sync_state.cs);
+
+    // 4. 阻塞等待应答（超时5秒）
+    DWORD wait_result = WaitForSingleObject(
+        g_sync_state.h_event,  // 等待事件对象
+        3000                   // 超时时间（毫秒）
+    );
+
+    // 5. 处理等待结果
+
+    EnterCriticalSection(&g_sync_state.cs);  // 加锁访问共享数据
+    if (wait_result == WAIT_OBJECT_0 && g_sync_state.is_received) {
+        // 成功收到应答，在此处理数据
+        printf("收到应答，Invoke ID: %hhu\n", invoke_id);
+
+        // 遍历应答结果链表
+        BACNET_READ_ACCESS_DATA* result_node = g_sync_state.ack_data.listOfReadAccessResults;
+        while (result_node) {
+            //TRACE(_T("对象类型: %hhu, 实例: %u\n"),result_node->object_type,result_node->object_instance);
+
+            // 解析属性值（以PROP_PRESENT_VALUE为例）
+            BACNET_PROPERTY_REFERENCE* prop_ref = result_node->listOfProperties;  // 假设为属性值列表
+            if (prop_ref && prop_ref->propertyIdentifier == PROP_PRESENT_VALUE) 
+            {
+                if (prop_ref->value && prop_ref->value->tag == BACNET_APPLICATION_TAG_REAL) 
+                {
+                    float value = prop_ref->value->type.Real;
+                    TRACE("objinstance:%d  Value: %.2f\n", result_node->object_instance, value);
+                }
+                else {
+                    TRACE("objinstance:%d  当前值类型不是 float\n", result_node->object_instance);
+                }
+            }
+
+            result_node = result_node->next;
+        }
+    }
+    else if (wait_result == WAIT_TIMEOUT) {
+        printf("等待应答超时（Invoke ID: %hhu）\n", invoke_id);
+        invoke_id = -1;
+    }
+    else {
+        printf("等待失败，错误码: %lu\n", GetLastError());
+        invoke_id = -1;
+    }
+    LeaveCriticalSection(&g_sync_state.cs);  // 解锁
+
+cleanup:
+    // 6. 释放请求链表内存
+    BACNET_READ_ACCESS_DATA* cur = head;
+    while (cur) {
+        BACNET_READ_ACCESS_DATA* next = cur->next;
+        free(cur->listOfProperties);
+        free(cur);
+        cur = next;
+    }
+
+    return invoke_id;  // 0=成功，-1=失败/超时
+}
+#endif
+#if 0
+int Bacnet_Read_Property_MultipleValue(uint32_t deviceid, BACNET_READ_ACCESS_DATA * head)
+{
+    // 构造链表
+     head = NULL;
+    BACNET_READ_ACCESS_DATA* tail = NULL;
+#if 0
+    // 64个AI
+    for (int i = 0; i < 64; ++i) {
+        BACNET_READ_ACCESS_DATA* read_access = (BACNET_READ_ACCESS_DATA*)malloc(sizeof(BACNET_READ_ACCESS_DATA));
+        memset(read_access, 0, sizeof(BACNET_READ_ACCESS_DATA));
+        read_access->object_type = OBJECT_ANALOG_INPUT;
+        read_access->object_instance = i;
+
+        BACNET_PROPERTY_REFERENCE* prop = (BACNET_PROPERTY_REFERENCE*)malloc(sizeof(BACNET_PROPERTY_REFERENCE));
+        memset(prop, 0, sizeof(BACNET_PROPERTY_REFERENCE));
+        prop->propertyIdentifier = PROP_PRESENT_VALUE;
+        prop->propertyArrayIndex = BACNET_ARRAY_ALL;
+        prop->next = NULL;
+
+        read_access->listOfProperties = prop;
+        read_access->next = NULL;
+
+        if (!head) {
+            head = read_access;
+            tail = read_access;
+        }
+        else {
+            tail->next = read_access;
+            tail = read_access;
+        }
+    }
+
+    // 64个AO
+    for (int i = 0; i < 64; ++i) {
+        BACNET_READ_ACCESS_DATA* read_access = (BACNET_READ_ACCESS_DATA*)malloc(sizeof(BACNET_READ_ACCESS_DATA));
+        memset(read_access, 0, sizeof(BACNET_READ_ACCESS_DATA));
+        read_access->object_type = OBJECT_ANALOG_OUTPUT;
+        read_access->object_instance = i;
+
+        BACNET_PROPERTY_REFERENCE* prop = (BACNET_PROPERTY_REFERENCE*)malloc(sizeof(BACNET_PROPERTY_REFERENCE));
+        memset(prop, 0, sizeof(BACNET_PROPERTY_REFERENCE));
+        prop->propertyIdentifier = PROP_PRESENT_VALUE;
+        prop->propertyArrayIndex = BACNET_ARRAY_ALL;
+        prop->next = NULL;
+
+        read_access->listOfProperties = prop;
+        read_access->next = NULL;
+
+        tail->next = read_access;
+        tail = read_access;
+    }
+#endif
+    // 128个AV
+    for (int i = 100; i < 128; ++i) {
+        BACNET_READ_ACCESS_DATA* read_access = (BACNET_READ_ACCESS_DATA*)malloc(sizeof(BACNET_READ_ACCESS_DATA));
+        memset(read_access, 0, sizeof(BACNET_READ_ACCESS_DATA));
+        read_access->object_type = OBJECT_ANALOG_VALUE;
+        read_access->object_instance = i;
+
+        BACNET_PROPERTY_REFERENCE* prop = (BACNET_PROPERTY_REFERENCE*)malloc(sizeof(BACNET_PROPERTY_REFERENCE));
+        memset(prop, 0, sizeof(BACNET_PROPERTY_REFERENCE));
+        prop->propertyIdentifier = PROP_PRESENT_VALUE;
+        prop->propertyArrayIndex = BACNET_ARRAY_ALL;
+        prop->next = NULL;
+
+        read_access->listOfProperties = prop;
+        read_access->next = NULL;
+
+        read_access->listOfProperties = prop;
+        read_access->next = NULL;
+
+        if (!head) {
+            head = read_access;
+            tail = read_access;
+        }
+        else {
+            tail->next = read_access;
+            tail = read_access;
+        }
+    }
+
+    // 发送请求
+    uint8_t pdu[2048];
+    int pdu_len = sizeof(pdu);
+    uint8_t invoke_id = Send_Read_Property_Multiple_Request(
+        pdu,
+        pdu_len,
+        deviceid,
+        head
+    );
+
+    // 释放链表内存
+    BACNET_READ_ACCESS_DATA* cur = head;
+    while (cur) {
+        BACNET_READ_ACCESS_DATA* next = cur->next;
+        free(cur->listOfProperties);
+        free(cur);
+        cur = next;
+    }
+
+    return invoke_id; // 可用于后续应答匹配
+}
+#endif
+
+#ifdef read_prop_multi_function
+int Bacnet_Read_Property_MultipleValue_Blocking(uint32_t deviceid, BACNET_READ_ACCESS_DATA* head)
+{
+    int send_status = true;
+    int retrytime = 3;
+    for (int z = 0; z < 3; z++)
+    {
+        int temp_invoke_id = -1;
+        int	resend_count = 0;
+        send_status = true;
+
+        resend_count++;
+
+        temp_invoke_id = Bacnet_Read_Property_MultipleValue(deviceid, head);
+        //temp_invoke_id = Bacnet_Read_Property_Multiple(deviceid, object_type, object_instance, property_id);
+
+        if (temp_invoke_id < 0)
+            Sleep(50);
+        else
+        {
+            return 1;
+        }
+    }
+    
+    return -1;
+}
+#endif
+
 int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id)
 {
     BACNET_ADDRESS src = {
@@ -6516,6 +6770,7 @@ int Bacnet_Read_Properties_Multiple_Blocking(uint32_t deviceid, BACNET_OBJECT_TY
 
 }
 
+
 /** Handler for a ReadPropertyMultiple ACK.
 * @ingroup DSRPM
 * For each read property, print out the ACK'd data for debugging,
@@ -6543,7 +6798,8 @@ void local_handler_read_property_multiple_ack(
 
     (void)src;
     (void)service_data;        /* we could use these... */
-
+    uint8_t invoke_id;
+    invoke_id = service_data->invoke_id;
    // rpm_data = (BACNET_READ_ACCESS_DATA *)calloc(1, sizeof(BACNET_READ_ACCESS_DATA));
     //if (rpm_data) 
     {
@@ -6556,6 +6812,23 @@ void local_handler_read_property_multiple_ack(
 #endif
     if (len > 0) 
     {
+#ifdef read_prop_multi_function
+        // 进入临界区（保护共享数据）
+        EnterCriticalSection(&g_sync_state.cs);
+
+        // 只处理当前等待的Invoke ID对应的应答
+        if (g_sync_state.invoke_id == invoke_id) {
+            g_sync_state.is_received = TRUE;
+            // 复制应答数据（注意：若协议栈数据为临时内存，需深拷贝）
+            g_sync_state.ack_data.listOfReadAccessResults = &rpm_data;
+            // 触发事件，唤醒等待线程
+            SetEvent(g_sync_state.h_event);
+        }
+
+        // 离开临界区
+        LeaveCriticalSection(&g_sync_state.cs);
+#endif
+
        /* while (rpm_data) 
         {
             rpm_ack_print_data(rpm_data);
@@ -18283,5 +18556,39 @@ bool ZipSingleItem(CString strUserDesZipFile, CString strsingleFilepath)
     else
         return 0;
 }
+
+#ifdef read_prop_multi_function
+// 初始化同步状态（程序启动时调用）
+void SyncReadState_Init(void) 
+{
+    // 初始化临界区
+    InitializeCriticalSection(&g_sync_state.cs);
+    // 创建手动重置事件（初始状态为未触发）
+    g_sync_state.h_event = CreateEvent(
+        NULL,           // 默认安全属性
+        TRUE,           // 手动重置（TRUE=手动，FALSE=自动）
+        FALSE,          // 初始状态：未触发
+        NULL            // 无名事件
+    );
+    // 初始化状态变量
+    g_sync_state.invoke_id = 0;
+    g_sync_state.is_received = FALSE;
+    g_sync_state.ack_data.listOfReadAccessResults = NULL;
+    g_sync_state.ack_data.error_code = -1;
+}
+
+// 清理同步状态（程序退出时调用）
+void SyncReadState_Cleanup(void) 
+{
+    // 释放临界区
+    DeleteCriticalSection(&g_sync_state.cs);
+    // 关闭事件句柄
+    if (g_sync_state.h_event != INVALID_HANDLE_VALUE) {
+        CloseHandle(g_sync_state.h_event);
+        g_sync_state.h_event = INVALID_HANDLE_VALUE;
+    }
+}
+#endif
+
 
 

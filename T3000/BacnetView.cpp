@@ -7646,6 +7646,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
      else
      {
          bac_select_device_online = true;
+		 memcpy_s(&product_register_value[0], 100 * sizeof(unsigned short), read_data, 100 * sizeof(unsigned short));
          //发送消息给 Main 更新 设备状态;
          ::PostMessage(pFrame->m_hWnd, WM_MAIN_MSG_UPDATE_PRODUCT_TREE, 0, 1);
      }

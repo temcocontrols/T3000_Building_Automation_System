@@ -46,6 +46,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingTcpip, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO_USB_DEVICE, &CBacnetSettingTcpip::OnBnClickedRadioUsbDevice)
     ON_BN_CLICKED(IDC_RADIO_USB_HOST, &CBacnetSettingTcpip::OnBnClickedRadioUsbHost)
     ON_BN_CLICKED(IDC_BUTTON_HEALTH, &CBacnetSettingTcpip::OnBnClickedButtonHealth)
+    ON_BN_CLICKED(IDC_CHECK_FIX_PORT, &CBacnetSettingTcpip::OnBnClickedCheckSettingFixComm)
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_ZEIGBEE_PANID, &CBacnetSettingTcpip::OnEnKillfocusEditSettingZeigbeePanid)
     ON_EN_KILLFOCUS(IDC_EDIT_SETTING_PORT, &CBacnetSettingTcpip::OnEnKillfocusEditSettingPort)
 
@@ -757,6 +758,27 @@ void CBacnetSettingTcpip::OnBnClickedRadioUsbDevice()
         Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
     }
 
+}
+
+
+void CBacnetSettingTcpip::OnBnClickedCheckSettingFixComm()
+{
+    CString temp_task_info;
+    if (Device_Basic_Setting.reg.fix_com_config == 1)
+    {
+        Device_Basic_Setting.reg.fix_com_config = 0;
+        temp_task_info.Format(_T("The Auto mode has been updated; Modbus Master and Modbus Slave will switch automatically. "));
+    }
+    else
+    {
+        Device_Basic_Setting.reg.fix_com_config = 1;
+        temp_task_info.Format(_T("Disable Auto mode; Modbus Master and Modbus Slave remain fixed according to the configuration."));
+    }
+
+    Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
+
+    Sleep(1000);
+    ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
 }
 
 

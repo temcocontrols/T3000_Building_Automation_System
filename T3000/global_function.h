@@ -199,7 +199,7 @@ BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
 BOOL Post_Refresh_One_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize);
 BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size);
 BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd,CString Task_Info = _T(""),int nRow = 0,int nCol = 0);
-int Post_ReadAllTrendlog_Message();
+int Post_ReadTrendlog_Message(unsigned char panel_id , uint32_t nserialnumber);
 int Post_Background_Read_Message_ByPanel(unsigned char panel_id, int command_type, int npoint);
 int Post_Background_Write_Message_ByIndex(str_command_info ret_index, groupdata write_data);
 int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
@@ -235,8 +235,9 @@ void local_handler_read_property_multiple_ack(
     uint16_t service_len,
     BACNET_ADDRESS * src,
     BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
-
-//int Bacnet_Read_Property_Multiple();
+#ifdef read_prop_multi_function
+int Bacnet_Read_Property_MultipleValue_Blocking(uint32_t deviceid, BACNET_READ_ACCESS_DATA* head);
+#endif
 int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id); 
 int Bacnet_Read_Properties_Multiple_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_READ_ACCESS_DATA &value, uint8_t retrytime, uint32_t index = BACNET_ARRAY_ALL);
 
@@ -437,4 +438,8 @@ int SearchDataIndexByPanel(unsigned char panel_id, int command_type, int npoint)
 
 bool UnzipItem(CString SourceFilePath, CString DesFolder);
 bool ZipSingleItem(CString strUserDesZipFile, CString strsingleFilepath);
+# ifdef read_prop_multi_function
+void SyncReadState_Init(void);
+void SyncReadState_Cleanup(void);
+#endif
 #endif

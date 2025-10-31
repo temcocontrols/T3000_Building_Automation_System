@@ -388,6 +388,12 @@ void CDebugWindow::OnBnClickedButtonWebTest()
 {
     // TODO: Add control notification handler code here
     // TODO: 在此添加控件通知处理程序代码
+#ifdef read_prop_multi_function
+	BACNET_READ_ACCESS_DATA rpm_data;
+	int read_ret = Bacnet_Read_Property_MultipleValue_Blocking(240488, &rpm_data);
+	//Sleep(1);
+	return;
+#endif
 #if 0
     // Close ping command;
     mul_ping_flag = false; //Close ping command;//关闭 ping 的命令;

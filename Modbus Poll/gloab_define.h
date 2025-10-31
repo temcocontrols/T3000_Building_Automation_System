@@ -449,7 +449,7 @@ const CString Variable_Analog_Units_Array[] =
 	_T("Ohms"),
 	_T("%"),
 	_T("%RH"),
-	_T("p/min"),
+	_T("PPM"),
 	_T("Counts"),
 	_T("%Open"),
 	_T("CFH"),

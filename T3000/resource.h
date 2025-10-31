@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 生成的包含文件。- Generated include file
-// 供 T3000.rc 使用 - For use by T3000.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 T3000.rc 使用
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -1571,8 +1571,8 @@
 #define IDC_BTN_MONITOR_REFRESH         1689
 #define IDC_MBPOLL_CHECK3               1689
 #define IDC_BTN_MONITOR_GRAPHIC         1690
-#define IDC_BTN_MONITOR_GRAPHIC_BETA    1691
 #define IDC_MBPOLL_CHECK4               1690
+#define IDC_BTN_MONITOR_GRAPHIC_BETA    1691
 #define IDC_BUTTON_MONITOR_TEST         1691
 #define IDC_STATIC_DISPLAYTYPE          1691
 #define IDC_STATIC_GRAPHIC_1            1692
@@ -2847,6 +2847,7 @@
 #define IDC_BUTTON_ADVANCED_Q2          2759
 #define IDC_CHECK_FIX_RS485             2760
 #define IDC_BUTTON_ADVANCED_APPLY       2761
+#define IDC_CHECK_FIX_PORT              2762
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3431,7 +3432,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        806
 #define _APS_NEXT_COMMAND_VALUE         34092
-#define _APS_NEXT_CONTROL_VALUE         2762
+#define _APS_NEXT_CONTROL_VALUE         2763
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
