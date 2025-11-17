@@ -71,7 +71,8 @@ enum WEBVIEW_MESSAGE_TYPE
 	GET_SELECTED_DEVICE_INFO = 12,
 	BIND_DEVICE = 13,
 	SAVE_NEW_LIBRARY_DATA = 14,
-	LOGGING_DATA = 15
+	LOGGING_DATA = 15,
+	UPDATE_WEBVIEW_LIST = 16
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -769,6 +770,74 @@ void WrapErrorMessage(Json::StreamWriterBuilder& builder, const Json::Value& tem
 	}
 }
 
+
+// Helper function to write HandleWebViewMsg logs to T3WebLog directory
+// Creates organized logs in pattern: T3WebLog/YYYY-MM/MMDD/T3_CppMsg_HandWebViewMsg_MMDD_HHMM.txt
+// Logs are grouped into 4-hour buckets (00-03, 04-07, 08-11, 12-15, 16-19, 20-23)
+void WriteHandleWebViewMsgLog(const CString& messageType, const CString& outmsg, int itemCount)
+{
+	try {
+		SYSTEMTIME st;
+		GetSystemTime(&st);
+
+		// Create directory path: T3WebLog\YYYY-MM\MMDD
+		CString yearMonth;
+		yearMonth.Format(_T("T3WebLog\\%04d-%02d"), st.wYear, st.wMonth);
+
+		CString monthDay;
+		monthDay.Format(_T("%02d%02d"), st.wMonth, st.wDay);
+
+		CString logDir;
+		logDir.Format(_T("%s\\%s"), yearMonth, monthDay);
+
+		// Create directories if they don't exist
+		CreateDirectory(_T("T3WebLog"), NULL);
+		CreateDirectory(yearMonth, NULL);
+		CreateDirectory(logDir, NULL);
+
+		// Calculate 4-hour bucket (00-03, 04-07, 08-11, 12-15, 16-19, 20-23)
+		int start_hour = (st.wHour / 4) * 4;
+		int end_hour = start_hour + 3;
+
+		// Create log file with pattern: YYYY-MM/MMDD/T3_CppMsg_HandWebViewMsg_MMDD_HHMM.txt
+		CString logFile;
+		logFile.Format(_T("%s\\T3_CppMsg_HandWebViewMsg_%02d%02d_%02d%02d.txt"),
+			logDir, st.wMonth, st.wDay, start_hour, end_hour);
+
+		CStdioFile file;
+		// Use append mode to add multiple calls to same 4-hour period file
+		if (file.Open(logFile, CFile::modeCreate | CFile::modeWrite | CFile::modeNoTruncate | CFile::typeText)) {
+			// Move to end of file for appending
+			file.SeekToEnd();
+
+			// Log entry separator and timestamp
+			CString logContent;
+			logContent.Format(_T("=== %s C++ FFI Call [%04d-%02d-%02d %02d:%02d:%02d] ===\n"),
+				messageType, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+			file.WriteString(logContent);
+
+			logContent.Format(_T("JSON response size: %d characters\n"), outmsg.GetLength());
+			file.WriteString(logContent);
+
+			logContent.Format(_T("Data items processed: %d\n"), itemCount);
+			file.WriteString(logContent);
+
+			// Log full JSON response for complete inspection
+			file.WriteString(_T("=== Complete JSON Response ===\n"));
+			file.WriteString(outmsg);
+			file.WriteString(_T("\n"));
+
+			file.WriteString(_T("=== End of Entry ===\r\n"));
+			file.Close();
+		}
+	}
+	catch (...) {
+		// Silently ignore logging errors to prevent disrupting main functionality
+		// Logging failure should not affect the FFI response
+	}
+}
+
+
 #include <mutex>
 std::mutex handleWebViewMsgMutex;
 void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
@@ -811,6 +880,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	CString temp_action;
 	temp_action.Format(_T("action value = %d\r\n"), action);
 	DFTrace(temp_action);
+
 	switch (action)
 	{
 	case WEBVIEW_MESSAGE_TYPE::GET_PANEL_DATA:
@@ -1534,6 +1604,88 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 		break;
 	}
+	case WEBVIEW_MESSAGE_TYPE::UPDATE_WEBVIEW_LIST:
+	{
+		int temp_panel_id = json.get("panelId", Json::nullValue).asInt();
+		int temp_serial_number = json.get("serialNumber", Json::nullValue).asInt();
+		int entry_type = json.get("entryType", Json::nullValue).asInt();
+		int entry_index = json.get("entryIndex", Json::nullValue).asInt();
+
+		if ((temp_panel_id == 0) || (temp_panel_id >= 255))
+		{
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is invalid ."));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Panel is invalid ."));
+			break;
+		}
+
+		switch (entry_type)
+		{
+		case BAC_IN:
+		{
+
+			if ((entry_index >= 0) && entry_index + 1 > BAC_INPUT_ITEM_COUNT)
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
+				break;
+			}
+
+			g_Input_data[temp_panel_id].at(entry_index).control = json["control"].asInt();
+			g_Input_data[temp_panel_id].at(entry_index).value = json["value"].asFloat() * 1000;
+			strncpy((char *)g_Input_data[temp_panel_id].at(entry_index).description, json["description"].asCString(), STR_IN_DESCRIPTION_LENGTH);
+			strncpy((char*)g_Input_data[temp_panel_id].at(entry_index).label, json["label"].asCString(), STR_IN_LABEL);
+			g_Input_data[temp_panel_id].at(entry_index).range = json["range"].asInt();
+			g_Input_data[temp_panel_id].at(entry_index).auto_manual = json["auto_manual"].asInt();
+			g_Input_data[temp_panel_id].at(entry_index).filter = json["filter"].asInt();
+			g_Input_data[temp_panel_id].at(entry_index).control = json["control"].asInt();
+			g_Input_data[temp_panel_id].at(entry_index).digital_analog = json["digital_analog"].asInt();
+			g_Input_data[temp_panel_id].at(entry_index).calibration_sign = json["calibration_sign"].asInt();
+			g_Input_data[temp_panel_id].at(entry_index).calibration_h = json["calibration_h"].asInt();
+			g_Input_data[temp_panel_id].at(entry_index).calibration_l = json["calibration_l"].asInt();
+			g_Input_data[temp_panel_id].at(entry_index).decom = json["decom"].asInt();
+
+			if (g_Device_Basic_Setting[temp_panel_id].reg.n_serial_number != temp_serial_number)
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The serial number does not match the panel."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("The serial number does not match the panel."));
+				break;
+			}
+			unsigned int temp_objectinstance = g_Device_Basic_Setting[temp_panel_id].reg.object_instance;
+
+			int ret_results = WritePrivateData_Blocking(temp_objectinstance,WRITEINPUT_T3000, entry_index,entry_index, 4, (char*)&g_Input_data[temp_panel_id].at(entry_index));
+			if (ret_results > 0)
+			{
+
+			}
+			else
+			{
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
+				break;
+			}
+			break;
+		}
+		case BAC_OUT:
+		{
+			break;
+		}
+		default:
+			break;
+		}
+	
+		tempjson["action"] = "UPDATE_WEBVIEW_LIST";
+		tempjson["data"]["status"] = true; 
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+		outmsg = temp_cs;
+
+
+
+
+	}
+	break;
 	case WEBVIEW_MESSAGE_TYPE::UPDATE_ENTRY:
 	{
 
@@ -1911,6 +2063,14 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		CString temp_cs(output.c_str());
 		outmsg = temp_cs;
 		//m_webView->PostWebMessageAsJson(temp_cs);
+
+
+		bool enable_logging_data_log = true;
+
+		// Final log message - write to T3WebLog\YYYY-MM\MMDD\ if logging enabled
+		if (enable_logging_data_log) {
+			WriteHandleWebViewMsgLog(_T("GET_PANELS_LIST"), outmsg, g_bacnet_panel_info.size());
+		}
 		break;
 	}
 	case WEBVIEW_MESSAGE_TYPE::GET_ENTRIES:
@@ -2412,12 +2572,20 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		//temp_panel_id = 144; //test
 		//temp_serial_number = 240488;
 		//break;
+		// 
+		// LOG INPUT PARAMETERS for debugging
+		CString debugLog;
+		debugLog.Format(_T("LOGGING_DATA RECEIVED - panelId: %d, serialNumber: %d\n"), temp_panel_id, temp_serial_number);
+		OutputDebugString(debugLog);
 		// Local flag to enable/disable logging - set to false to disable
 		//15分钟内收到这个命令直接break;
 		static DWORD last_logging_time = 0;
 		DWORD current_time = GetTickCount();
 		if (current_time - last_logging_time <  60 * 1000) // 15 minutes in milliseconds
 		{
+			CString skipLog;
+			skipLog.Format(_T("LOGGING_DATA SKIPPED - within 1 minute cooldown (panelId: %d, serialNumber: %d)\n"), temp_panel_id, temp_serial_number);
+			OutputDebugString(skipLog);
 			break; // Ignore the command if within 15 minutes
 		}
 		last_logging_time = current_time;
@@ -2457,6 +2625,14 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			unsigned char* ipAddr = g_Device_Basic_Setting[npanel_id].reg.ip_addr;
 			// 使用 sprintf 将 IP 地址转换为字符串
 			sprintf(ipStr, "%d.%d.%d.%d", ipAddr[0], ipAddr[1], ipAddr[2], ipAddr[3]);
+
+			CString deviceLog;
+			deviceLog.Format(_T("� Reading g_Device_Basic_Setting[%d] - SerialNumber: %d, Name: %s, IP: %s\n"),
+				npanel_id,
+				g_Device_Basic_Setting[npanel_id].reg.n_serial_number,
+				CString(g_Device_Basic_Setting[npanel_id].reg.panel_name),
+				CString(ipStr));
+			OutputDebugString(deviceLog);
 
 			// Add device main info to data array
 			tempjson["data"][device_count]["panel_id"] = npanel_id;
@@ -2540,68 +2716,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 		// Final log message - write to T3WebLog\YYYY-MM\MMDD\ if logging enabled
 		if (enable_logging_data_log) {
-			try {
-				SYSTEMTIME st;
-				GetSystemTime(&st);
-
-				// Create directory path: T3WebLog\YYYY-MM\MMDD
-                CString yearMonth;
-				yearMonth.Format(_T("T3WebLog\\%04d-%02d"), st.wYear, st.wMonth);
-
-				CString monthDay;
-				monthDay.Format(_T("%02d%02d"), st.wMonth, st.wDay);
-
-				CString logDir;
-				logDir.Format(_T("%s\\%s"), yearMonth, monthDay);
-
-				// Create directories if they don't exist
-				CreateDirectory(_T("T3WebLog"), NULL);
-				CreateDirectory(yearMonth, NULL);
-				CreateDirectory(logDir, NULL);
-
-				// Calculate 4-hour bucket (00-03, 04-07, 08-11, 12-15, 16-19, 20-23)
-				int start_hour = (st.wHour / 4) * 4;
-				int end_hour = start_hour + 3;
-
-				// Create log file with pattern: YYYY-MM/MMDD/T3_CppMsg_LOGGING_DATA_MMDD_HHMM.txt
-				CString logFile;
-				logFile.Format(_T("%s\\T3_CppMsg_LOGGING_DATA_%02d%02d_%02d%02d.txt"),
-					logDir, st.wMonth, st.wDay, start_hour, end_hour);
-
-				CStdioFile file;
-				// Use append mode to add multiple calls to same 4-hour period file
-				if (file.Open(logFile, CFile::modeCreate | CFile::modeWrite | CFile::modeNoTruncate | CFile::typeText)) {
-					// Move to end of file for appending
-					file.SeekToEnd();
-
-					// Log entry separator and timestamp
-					CString logContent;
-					logContent.Format(_T("=== LOGGING_DATA C++ FFI Call [%04d-%02d-%02d %02d:%02d:%02d] ===\n"),
-						st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
-					file.WriteString(logContent);
-
-					logContent.Format(_T("Total panels found: %zu\n"), g_bacnet_panel_info.size());
-					file.WriteString(logContent);
-
-					logContent.Format(_T("JSON response size: %d characters\n"), outmsg.GetLength());
-					file.WriteString(logContent);
-
-					logContent.Format(_T("Data items processed: %d\n"), device_count);
-					file.WriteString(logContent);
-
-					// Log full JSON response for complete inspection
-					file.WriteString(_T("=== Complete JSON Response ===\n"));
-					file.WriteString(outmsg);
-					file.WriteString(_T("\n"));
-
-					file.WriteString(_T("=== End of Entry ===\r\n"));
-					file.Close();
-				}
-			}
-			catch (...) {
-				// Silently ignore logging errors to prevent disrupting main functionality
-				// Logging failure should not affect the FFI response
-			}
+			WriteHandleWebViewMsgLog(_T("LOGGING_DATA"), outmsg, device_count);
 		}
 	}
 	break;

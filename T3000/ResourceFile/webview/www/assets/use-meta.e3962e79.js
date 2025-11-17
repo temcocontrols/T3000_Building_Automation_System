@@ -1,1 +1,0 @@
-import{a,w as e,ae as s,I as i,J as t,e as c,af as n}from"./index.0d1b2de5.js";function o(o){{const v={active:!0};if("function"==typeof o){const i=a(o);v.val=i.value,e(i,(a=>{v.val=a,!0===v.active&&s()}))}else v.val=o;n.push(v),s(),i((()=>{v.active=!0,s()})),t((()=>{v.active=!1,s()})),c((()=>{n.splice(n.indexOf(v),1),s()}))}}export{o as u};
