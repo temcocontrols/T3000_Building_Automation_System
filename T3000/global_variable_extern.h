@@ -1381,5 +1381,6 @@ extern bool bacnetIpDataRead;
 extern unsigned int DYNAMIC_INPUT_ITEM_COUNT ;
 extern unsigned int DYNAMIC_OUTPUT_ITEM_COUNT ;
 extern unsigned int DYNAMIC_VARIABLE_ITEM_COUNT ;
+extern bool enable_trendlog_background_read ; //是否启用trendlog 后台读取功能;
 
 

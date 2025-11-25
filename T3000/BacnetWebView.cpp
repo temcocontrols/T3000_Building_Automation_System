@@ -1669,7 +1669,87 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		}
 		case BAC_OUT:
 		{
+			if ((entry_index >= 0) && entry_index + 1 > BAC_OUTPUT_ITEM_COUNT)
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
+				break;
+			}
+
+			g_Output_data[temp_panel_id].at(entry_index).control = json["control"].asInt();
+			g_Output_data[temp_panel_id].at(entry_index).value = json["value"].asFloat() * 1000;
+			strncpy((char*)g_Output_data[temp_panel_id].at(entry_index).description, json["description"].asCString(), STR_OUT_DESCRIPTION_LENGTH);
+			strncpy((char*)g_Output_data[temp_panel_id].at(entry_index).label, json["label"].asCString(), STR_OUT_LABEL);
+			g_Output_data[temp_panel_id].at(entry_index).auto_manual	= json["auto_manual"].asInt();
+			g_Output_data[temp_panel_id].at(entry_index).low_voltage = json["low_voltage"].asInt();
+			g_Output_data[temp_panel_id].at(entry_index).high_voltage = json["high_voltage"].asInt();
+			g_Output_data[temp_panel_id].at(entry_index).range = json["range"].asInt();
+			g_Output_data[temp_panel_id].at(entry_index).digital_analog = json["digital_analog"].asInt();
+			g_Output_data[temp_panel_id].at(entry_index).hw_switch_status = json["hw_switch_status"].asInt();
+			g_Output_data[temp_panel_id].at(entry_index).decom = json["decom"].asInt();  ////for output   0 "Normal"    1"Alarm"  
+			if (g_Device_Basic_Setting[temp_panel_id].reg.n_serial_number != temp_serial_number)
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The serial number does not match the panel."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("The serial number does not match the panel."));
+				break;
+			}
+			unsigned int temp_objectinstance = g_Device_Basic_Setting[temp_panel_id].reg.object_instance;
+			int ret_results = WritePrivateData_Blocking(temp_objectinstance, WRITEOUTPUT_T3000, entry_index, entry_index, 4, (char*)&g_Output_data[temp_panel_id].at(entry_index));
+			if (ret_results > 0)
+			{
+
+			}
+			else
+			{
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
+				break;
+			}
+
 			break;
+		}
+		case BAC_VAR:
+		{
+			if ((entry_index >= 0) && entry_index + 1 > BAC_VARIABLE_ITEM_COUNT)
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
+				break;
+			}
+
+
+			strncpy((char*)g_Variable_data[temp_panel_id].at(entry_index).description, json["description"].asCString(), STR_VARIABLE_DESCRIPTION_LENGTH);
+			strncpy((char*)g_Variable_data[temp_panel_id].at(entry_index).label, json["label"].asCString(), STR_VARIABLE_LABEL);
+			g_Variable_data[temp_panel_id].at(entry_index).auto_manual = json["auto_manual"].asInt();
+			g_Variable_data[temp_panel_id].at(entry_index).value = json["value"].asFloat() * 1000;
+			g_Variable_data[temp_panel_id].at(entry_index).range = json["range"].asInt();
+			g_Variable_data[temp_panel_id].at(entry_index).control = json["control"].asInt();
+			g_Variable_data[temp_panel_id].at(entry_index).digital_analog = json["digital_analog"].asInt();
+
+			if (g_Device_Basic_Setting[temp_panel_id].reg.n_serial_number != temp_serial_number)
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The serial number does not match the panel."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("The serial number does not match the panel."));
+				break;
+			}
+			unsigned int temp_objectinstance = g_Device_Basic_Setting[temp_panel_id].reg.object_instance;
+
+			int ret_results = WritePrivateData_Blocking(temp_objectinstance, WRITEVARIABLE_T3000, entry_index, entry_index, 4, (char*)&g_Variable_data[temp_panel_id].at(entry_index));
+			if (ret_results > 0)
+			{
+
+			}
+			else
+			{
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
+				break;
+			}
+
+			break;
+
 		}
 		default:
 			break;
@@ -2567,6 +2647,10 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	case LOGGING_DATA:
 	{
 		//release 版本暂时不启用这个功能
+		if (enable_trendlog_background_read == false)
+		{
+			break;
+		}
 		int temp_panel_id = json.get("panelId", Json::nullValue).asInt();
 		int temp_serial_number = json.get("serialNumber", Json::nullValue).asInt();
 		//temp_panel_id = 144; //test

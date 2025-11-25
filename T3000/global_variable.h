@@ -2375,4 +2375,6 @@ unsigned int DYNAMIC_INPUT_ITEM_COUNT = 64;
 unsigned int DYNAMIC_OUTPUT_ITEM_COUNT = 64;
 unsigned int DYNAMIC_VARIABLE_ITEM_COUNT = 128;
 
+bool enable_trendlog_background_read = false; //是否启用trendlog 后台读取功能;
+
 

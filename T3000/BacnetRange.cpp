@@ -425,24 +425,38 @@ void BacnetRange::Initial_static()
 		}
 		else
 		{
-			if(bac_Invalid_range(bac_range_number_choose))
+			if (bac_Invalid_range(bac_range_number_choose))
 				bac_range_number_choose = 0;
-            if(bac_range_number_choose == 101)
-                GetDlgItem(IDC_RADIO_MSV_1)->SetFocus();
-            else if (bac_range_number_choose == 102)
-                GetDlgItem(IDC_RADIO_MSV_2)->SetFocus();
-            else if (bac_range_number_choose == 103)
-                GetDlgItem(IDC_RADIO_MSV_3)->SetFocus();
-			else if (bac_range_number_choose == 104)
-				GetDlgItem(IDC_RADIO_MSV_4)->SetFocus();
-            else
-			    GetDlgItem(IDC_RADIO35 + bac_range_number_choose)->SetFocus();
+			if ((bac_range_number_choose >= 0) && (bac_range_number_choose <= 11))
+				GetDlgItem(IDC_RADIO35 + bac_range_number_choose)->SetFocus();
+			else if ((bac_range_number_choose >= 12) && (bac_range_number_choose <= 22))
+				GetDlgItem(IDC_RADIO89 + bac_range_number_choose - 12)->SetFocus();
+			//GetDlgItem(IDC_RADIO89 + bac_range_number_choose - 12)->SetFocus();
+			else if ((bac_range_number_choose >= 101) && (bac_range_number_choose <= 104))
+				GetDlgItem(IDC_RADIO_MSV_1 + bac_range_number_choose - 101)->SetFocus();
+
+			temp_cs.Format(_T("%d"), bac_range_number_choose);
+
+
+			//if(bac_Invalid_range(bac_range_number_choose))
+			//	bac_range_number_choose = 0;
+   //         if(bac_range_number_choose == 101)
+   //             GetDlgItem(IDC_RADIO_MSV_1)->SetFocus();
+   //         else if (bac_range_number_choose == 102)
+   //             GetDlgItem(IDC_RADIO_MSV_2)->SetFocus();
+   //         else if (bac_range_number_choose == 103)
+   //             GetDlgItem(IDC_RADIO_MSV_3)->SetFocus();
+			//else if (bac_range_number_choose == 104)
+			//	GetDlgItem(IDC_RADIO_MSV_4)->SetFocus();
+			//else if((bac_range_number_choose >= 12) && (bac_range_number_choose <= 22))
+			//	GetDlgItem(IDC_RADIO89 + bac_range_number_choose - 12)->SetFocus();
+       //     else
+			    //GetDlgItem(IDC_RADIO35 + bac_range_number_choose)->SetFocus();
 			temp_cs.Format(_T("%d"),bac_range_number_choose);
 
 		}
 		GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs);
 		m_analog_select = bac_range_number_choose;
-
 #pragma region VARIABLE_RANGE
 
 		for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
@@ -1848,7 +1862,8 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value - 11;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //»ñÈ¡¿Ø¼þµÄÎ»ÖÃ £¬²¢µ÷ÕûÎ»ÖÃ;
+				//GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   
+				GetDlgItem(IDC_RADIO89 + m_digital_select - 1)->GetWindowRect(c4);
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1865,7 +1880,9 @@ void BacnetRange::Timer2_handle()
 				{
 					((CButton *)GetDlgItem(i))->SetCheck(false);
 				}
-				((CButton *)GetDlgItem(IDC_RADIO35 + m_digital_select))->SetCheck(true);
+				
+				((CButton*)GetDlgItem(IDC_RADIO89 + m_digital_select - 1))->SetCheck(true);
+				//((CButton *)GetDlgItem(IDC_RADIO35 + m_digital_select))->SetCheck(true);
 			}
 			else
 			{

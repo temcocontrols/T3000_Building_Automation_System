@@ -1596,7 +1596,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphicBeta()
 	{
 		h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
 	}
-
+	enable_trendlog_background_read = true; //暂时性的 只有当客户点击了beta版本的 ，才开启后台读取，等稳定后移除此标志;
 	// Get monitor data for title formatting
 	const Str_monitor_point& monitor_data = m_monitor_data.at(monitor_list_line);
 

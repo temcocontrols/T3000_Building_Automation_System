@@ -23,7 +23,7 @@
 /**
  * @brief Global version of the T3000 application.
  */
-const unsigned int g_versionNO = 20251031;    // PROJECT_VERSION
+const unsigned int g_versionNO = 20251125;    // PROJECT_VERSION
 
 
 
