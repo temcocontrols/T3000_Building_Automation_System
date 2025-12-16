@@ -35,6 +35,7 @@ BEGIN_MESSAGE_MAP(BacnetSettingAdvParameter, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_ADVANCED_Q1, &BacnetSettingAdvParameter::OnBnClickedButtonAdvancedQ1)
 	ON_BN_CLICKED(IDC_BUTTON_ADVANCED_Q2, &BacnetSettingAdvParameter::OnBnClickedButtonAdvancedQ2)
 	ON_BN_CLICKED(IDC_BUTTON_ADVANCED_CANCEL, &BacnetSettingAdvParameter::OnBnClickedButtonAdvancedCancel)
+	ON_BN_CLICKED(IDC_BUTTON_ADV_COUNT_OK, &BacnetSettingAdvParameter::OnBnClickedButtonAdvCountOk)
 END_MESSAGE_MAP()
 
 
@@ -46,10 +47,33 @@ BOOL BacnetSettingAdvParameter::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	((CButton*)GetDlgItem(IDC_BUTTON_ADV_COUNT_OK))->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_ADV_INPUT)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_ADV_OUTPUT)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_ADV_VARIABLE)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_ADV_INPUT)->SetWindowTextW(_T(""));
+	GetDlgItem(IDC_EDIT_ADV_OUTPUT)->SetWindowTextW(_T(""));
+	GetDlgItem(IDC_EDIT_ADV_VARIABLE)->SetWindowTextW(_T(""));
 	// TODO: Add extra initialization here
 	// TODO:  在此添加额外的初始化
 	if(Device_Basic_Setting.reg.panel_type == PM_ESP32_T3_SERIES)
 	{
+		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 664)//655
+		{
+			((CButton*)GetDlgItem(IDC_BUTTON_ADV_COUNT_OK))->EnableWindow(TRUE);
+			GetDlgItem(IDC_EDIT_ADV_INPUT)->EnableWindow(TRUE);
+			GetDlgItem(IDC_EDIT_ADV_OUTPUT)->EnableWindow(TRUE);
+			GetDlgItem(IDC_EDIT_ADV_VARIABLE)->EnableWindow(TRUE);
+			CString temp_in;
+			temp_in.Format(_T("%u"), Device_Basic_Setting.reg.max_in);
+			GetDlgItem(IDC_EDIT_ADV_INPUT)->SetWindowTextW(temp_in);
+			CString temp_out;
+			temp_out.Format(_T("%u"), Device_Basic_Setting.reg.max_out);
+			GetDlgItem(IDC_EDIT_ADV_OUTPUT)->SetWindowTextW(temp_out);
+			CString temp_var;
+			temp_var.Format(_T("%u"), Device_Basic_Setting.reg.max_var);
+			GetDlgItem(IDC_EDIT_ADV_VARIABLE)->SetWindowTextW(temp_var);
+		}
 		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub < 655)//655
 		{
 			((CButton*)GetDlgItem(IDC_CHECK_FIX_RS485))->EnableWindow(FALSE);
@@ -211,4 +235,53 @@ void BacnetSettingAdvParameter::OnBnClickedButtonAdvancedCancel()
 	// TODO: Add control notification handler code here
 	// TODO: 在此添加控件通知处理程序代码
 	PostMessage(WM_CLOSE, 0, 0); // Close the dialog
+}
+
+void BacnetSettingAdvParameter::OnBnClickedButtonAdvCountOk()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	CString temp_cstring_in;
+	GetDlgItemTextW(IDC_EDIT_ADV_INPUT, temp_cstring_in);
+	unsigned char temp_in = unsigned char(_wtoi(temp_cstring_in));
+
+	CString temp_cstring_out;
+	GetDlgItemTextW(IDC_EDIT_ADV_OUTPUT, temp_cstring_out);
+	unsigned char temp_out = unsigned char(_wtoi(temp_cstring_out));
+
+	CString temp_cstring_var;
+	GetDlgItemTextW(IDC_EDIT_ADV_VARIABLE, temp_cstring_out);
+	unsigned char temp_var = unsigned char(_wtoi(temp_cstring_out));
+
+	if ((temp_in < 64) || temp_in > 256)
+	{
+		MessageBox(_T("The value of input count must be between 128 and 256!"), _T("Advanced Settings"), MB_OK | MB_ICONINFORMATION);
+		return;
+	}
+	if ((temp_out < 64) || temp_out > 256)
+	{
+		MessageBox(_T("The value of output count must be between 128 and 256!"), _T("Advanced Settings"), MB_OK | MB_ICONINFORMATION);
+		return;
+	}
+	if ((temp_var < 128) || temp_var > 256)
+	{
+		MessageBox(_T("The value of variable count must be between 128 and 256!"), _T("Advanced Settings"), MB_OK | MB_ICONINFORMATION);
+		return;
+	}
+
+	Device_Basic_Setting.reg.max_in = temp_in;
+	Device_Basic_Setting.reg.max_out = temp_out;
+	Device_Basic_Setting.reg.max_var = temp_var;
+
+	if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Update advanced setting timeout!"));
+		MessageBox(_T("Update advanced setting timeout!!"), _T("Advanced Settings"), MB_OK | MB_ICONINFORMATION);
+	}
+	else
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Update advanced setting success!"));
+		MessageBox(_T("Update advanced setting success!"), _T("Advanced Settings"), MB_OK | MB_ICONINFORMATION);
+	}
+
 }

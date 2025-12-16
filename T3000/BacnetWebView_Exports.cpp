@@ -10,12 +10,14 @@
 #include "CM5/ud_str.h"
 #include "global_variable_extern.h"
 
+static bool enable_t3_web_logging = true;
 // Forward declarations
 class CMainFrame;
 extern void HandleWebViewMsg(CString msg, CString &outmsg, int msg_source = 0);
 
 // Helper function for T3WebLog logging
 void WriteToT3WebLog(const CString& functionName, const CString& logContent) {
+    if (!enable_t3_web_logging) return;
     try {
         SYSTEMTIME st;
         GetSystemTime(&st);

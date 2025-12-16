@@ -2848,6 +2848,11 @@
 #define IDC_CHECK_FIX_RS485             2760
 #define IDC_BUTTON_ADVANCED_APPLY       2761
 #define IDC_CHECK_FIX_PORT              2762
+#define IDC_EDIT_ADV_INPUT              2763
+#define IDC_EDIT_ADV_OUTPUT             2764
+#define IDC_EDIT_ADV_INPUT3             2765
+#define IDC_EDIT_ADV_VARIABLE           2765
+#define IDC_BUTTON_ADV_COUNT_OK         2766
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3432,7 +3437,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        806
 #define _APS_NEXT_COMMAND_VALUE         34092
-#define _APS_NEXT_CONTROL_VALUE         2763
+#define _APS_NEXT_CONTROL_VALUE         2767
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

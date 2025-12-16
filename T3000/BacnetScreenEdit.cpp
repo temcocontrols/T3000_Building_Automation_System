@@ -2227,6 +2227,11 @@ void CBacnetScreenEdit::OnPaint()
 		Str_variable_point  temp_var = { 0 };
 		unsigned char temp_type = m_bac_label_vector.at(i).nPoint_type;
 		unsigned char temp_number = m_read_group_data.at(read_group_index).point.number;
+		if((temp_number==0) || (temp_number >254))
+		{
+			return;
+			cs_value = _T("N/A");
+		}
 		switch (temp_type)
 		{
 		case BAC_IN://INPUT
@@ -2237,16 +2242,16 @@ void CBacnetScreenEdit::OnPaint()
 			//memcpy(&temp_data_in, &m_Input_data.at(0), sizeof(Str_in_point));
 			if (m_read_group_data.at(read_group_index).point.panel != Device_Basic_Setting.reg.panel_number)
 			{
-				memcpy(&t_Input_data, &m_read_group_data.at(read_group_index).detail_data.m_group_input_data, sizeof(Str_in_point));
-				if (memcmp(&t_Input_data, &temp_in, sizeof(Str_in_point)) == 0) //如果暂时没有读取到 就显示空
+				memcpy(&s_Input_data[temp_number], &m_read_group_data.at(read_group_index).detail_data.m_group_input_data, sizeof(Str_in_point));
+				if (memcmp(&s_Input_data[temp_number], &temp_in, sizeof(Str_in_point)) == 0) //如果暂时没有读取到 就显示空
 				{
 					get_ret = 1;
 					cs_value = _T("N/A");
 				}
 				else
-					get_ret = GetInputValueEx(t_Input_data, cs_value, cs_unit, cs_auto_m, dig_unit_ret);
-				get_label = GetInputLabelEx(t_Input_data, cs_label, &m_read_group_data.at(read_group_index).point);
-				get_full_label = GetInputFullLabelEx(t_Input_data, cs_full_label, &m_read_group_data.at(read_group_index).point);
+					get_ret = GetInputValueEx(s_Input_data[temp_number], cs_value, cs_unit, cs_auto_m, dig_unit_ret);
+				get_label = GetInputLabelEx(s_Input_data[temp_number], cs_label, &m_read_group_data.at(read_group_index).point);
+				get_full_label = GetInputFullLabelEx(s_Input_data[temp_number], cs_full_label, &m_read_group_data.at(read_group_index).point);
 			}
 			else
 			{
@@ -2270,16 +2275,16 @@ void CBacnetScreenEdit::OnPaint()
 
 			if (m_read_group_data.at(read_group_index).point.panel != Device_Basic_Setting.reg.panel_number)
 			{
-				memcpy(&t_Output_data, &m_read_group_data.at(read_group_index).detail_data.m_group_output_data, sizeof(Str_out_point));
-				if (memcmp(&t_Output_data, &temp_out, sizeof(Str_out_point)) == 0) //如果暂时没有读取到 就显示空
+				memcpy(&s_Output_data[temp_number], &m_read_group_data.at(read_group_index).detail_data.m_group_output_data, sizeof(Str_out_point));
+				if (memcmp(&s_Output_data[temp_number], &temp_out, sizeof(Str_out_point)) == 0) //如果暂时没有读取到 就显示空
 				{
 					get_ret = 1;
 					cs_value = _T("N/A");
 				}
 				else
-					get_ret = GetOutputValueEx(t_Output_data, cs_value, cs_unit, cs_auto_m, dig_unit_ret);
-				get_label = GetOutputLabelEx(t_Output_data, cs_label, &m_read_group_data.at(read_group_index).point);
-				get_full_label = GetOutputFullLabelEx(t_Output_data, cs_full_label, &m_read_group_data.at(read_group_index).point);
+					get_ret = GetOutputValueEx(s_Output_data[temp_number], cs_value, cs_unit, cs_auto_m, dig_unit_ret);
+				get_label = GetOutputLabelEx(s_Output_data[temp_number], cs_label, &m_read_group_data.at(read_group_index).point);
+				get_full_label = GetOutputFullLabelEx(s_Output_data[temp_number], cs_full_label, &m_read_group_data.at(read_group_index).point);
 			}
 			else
 			{
@@ -2301,19 +2306,19 @@ void CBacnetScreenEdit::OnPaint()
 		{
 			if (m_read_group_data.at(read_group_index).point.panel != Device_Basic_Setting.reg.panel_number)
 			{
-				memcpy(&t_Variable_data, &m_read_group_data.at(read_group_index).detail_data.m_group_variable_data, sizeof(Str_variable_point));
+				memcpy(&s_Variable_data[temp_number], &m_read_group_data.at(read_group_index).detail_data.m_group_variable_data, sizeof(Str_variable_point));
 
-				if (memcmp(&t_Variable_data, &temp_var, sizeof(Str_variable_point)) == 0) //如果暂时没有读取到 就显示空
+				if (memcmp(&s_Variable_data[temp_number], &temp_var, sizeof(Str_variable_point)) == 0) //如果暂时没有读取到 就显示空
 				{
 					get_ret = 1;
 					cs_value = _T("N/A");
 				}
 				else
 				{
-					get_ret = GetVariableValueEx(t_Variable_data, cs_value, cs_unit, cs_auto_m, dig_unit_ret);
+					get_ret = GetVariableValueEx(s_Variable_data[temp_number], cs_value, cs_unit, cs_auto_m, dig_unit_ret);
 				}
-				get_label = GetVariableLabelEx(t_Variable_data, cs_label, &m_read_group_data.at(read_group_index).point);
-				get_full_label = GetVariableFullLabelEx(t_Variable_data, cs_full_label, &m_read_group_data.at(read_group_index).point);
+				get_label = GetVariableLabelEx(s_Variable_data[temp_number], cs_label, &m_read_group_data.at(read_group_index).point);
+				get_full_label = GetVariableFullLabelEx(s_Variable_data[temp_number], cs_full_label, &m_read_group_data.at(read_group_index).point);
 			}
 			else
 			{
@@ -2336,170 +2341,7 @@ void CBacnetScreenEdit::OnPaint()
 		}
 
 		}
-#if 0
-		else
-		{
-			//**********************************************************************
-			// 得到 Value; 
-			read_bac_index = m_bac_label_vector.at(i).nPoint_number;
-			dig_unit_ret = -1;
-			unsigned char temp_type = m_bac_label_vector.at(i).nPoint_type ;
-			switch(temp_type)
-			{
-			case BAC_IN://INPUT
-				{
-					if(read_bac_index < BAC_INPUT_ITEM_COUNT)
-					{		
-						int get_ret = GetInputValue(read_bac_index ,cs_value,cs_unit,cs_auto_m,dig_unit_ret);
-						int get_label = GetInputLabel(read_bac_index,cs_label);
-						int get_full_label = GetInputFullLabel(read_bac_index,cs_full_label);
 
-                        if (get_ret < 0)
-                            label_invalid = get_ret;
-                        else if (get_label < 0)
-                            label_invalid = get_label;
-                        else if (get_full_label < 0)
-                            label_invalid = get_full_label;
-
-					}
-					else
-					{
-						label_invalid = true;
-					}
-				}
-				break;
-			case BAC_OUT://OUTPUT
-				{
-					if(read_bac_index < BAC_OUTPUT_ITEM_COUNT)
-					{
-						int get_ret_out = GetOutputValue(read_bac_index ,cs_value,cs_unit,cs_auto_m,dig_unit_ret);
-						int get_label_out = GetOutputLabel(read_bac_index,cs_label);
-						int get_full_label_out = GetOutputFullLabel(read_bac_index,cs_full_label);
-
-                        if (get_ret_out < 0)
-                            label_invalid = get_ret_out;
-                        else if (get_label_out < 0)
-                            label_invalid = get_label_out;
-                        else if (get_full_label_out < 0)
-                            label_invalid = get_full_label_out;
-
-					}
-					else
-						label_invalid = true;
-				}
-				break;
-			case BAC_VAR://VARIABLE
-				{
-					if(read_bac_index < BAC_VARIABLE_ITEM_COUNT)
-					{
-						int get_ret_var = GetVariableValue(read_bac_index ,cs_value,cs_unit,cs_auto_m,dig_unit_ret);
-						int get_label_var = GetVariableLabel(read_bac_index,cs_label);
-						int get_full_label_var = GetVariableFullLabel(read_bac_index,cs_full_label);
-                        if (get_ret_var < 0)
-                            label_invalid = get_ret_var;
-                        else if (get_label_var < 0)
-                            label_invalid = get_label_var;
-                        else if (get_full_label_var < 0)
-                            label_invalid = get_full_label_var;
-					}
-					else
-						label_invalid = true;
-				}
-				break;
-			case BAC_PID: //PID Controller
-				{
-					if(read_bac_index < BAC_PID_COUNT)
-					{
-						cs_label.Format(_T("PID%d"),read_bac_index + 1);
-						cs_full_label.Format(_T("PID%d"),read_bac_index + 1);
-						int get_pid_var = GetPidValue(read_bac_index,cs_auto_m,cs_value);
-						if(get_pid_var < 0)
-							label_invalid = true;
-					}
-					else
-						label_invalid = true;
-				}
-				break;
-			case BAC_SCH: //SCHEDULE
-				{
-					if(read_bac_index < BAC_HOLIDAY_COUNT)
-					{
-						int get_label_var = GetScheduleLabel(read_bac_index,cs_label);
-						int get_full_label_var = GetScheduleFullLabel(read_bac_index,cs_full_label);
-                        int get_ret_var = GetScheduleValue(read_bac_index, cs_auto_m, cs_value);
-                        if ((get_ret_var <0) || (get_label_var < 0) || (get_full_label_var < 0))
-						//if((get_label_var < 0) || (get_full_label_var < 0))
-							label_invalid = true;
-					}
-					else
-						label_invalid = true;
-				}
-				break;
-			case BAC_HOL: //HOLIDAY
-				{
-					if(read_bac_index < BAC_HOLIDAY_COUNT)
-					{
-						int get_label_var = GetHolidayLabel(read_bac_index,cs_label);
-						int get_full_label_var = GetHolidayFullLabel(read_bac_index,cs_full_label);
-                        int get_ret_var = GetHolidayValue(read_bac_index, cs_auto_m, cs_value);
-                        if ((get_ret_var <0) || (get_label_var < 0) || (get_full_label_var < 0))
-						//if((get_label_var < 0) || (get_full_label_var < 0))
-							label_invalid = true;
-					}
-					else
-						label_invalid = true;
-				}
-				break;
-			case BAC_PRG: //Program
-				{
-					if(read_bac_index < BAC_PROGRAM_ITEM_COUNT)
-					{
-						int get_label_prg = GetPrgLabel(read_bac_index,cs_label);
-						int get_full_label_prg = GetPrgFullLabel(read_bac_index,cs_full_label);
-						if((get_label_prg < 0) || (get_full_label_prg < 0))
-							label_invalid = true;
-					}
-					else
-						label_invalid = true;
-				}
-				break;
-			case BAC_AMON:
-				{
-					if(read_bac_index < BAC_MONITOR_COUNT)
-					{
-						int get_label_amon = GetAmonLabel(read_bac_index,cs_label);
-						cs_full_label = cs_label;
-						int get_full_label_amon = 0;
-						if((get_label_amon < 0) || (get_full_label_amon < 0))
-							label_invalid = true;
-					}
-					else
-						label_invalid = true;
-				}
-				break;
-			case BAC_GRP:
-				{
-					if(read_bac_index < BAC_SCREEN_COUNT)
-					{
-						if(m_bac_label_vector.at(i).nDisplay_Type == LABEL_SHOW_VALUE)
-							m_bac_label_vector.at(i).nDisplay_Type = LABEL_SHOW_LABEL;
-						GetScreenLabel(read_bac_index,cs_label);
-						GetScreenFullLabel(read_bac_index,cs_full_label);
-						cs_value.Empty();
-						cs_unit.Empty();
-						cs_auto_m.Empty();
-						label_invalid = false;
-					}
-					else
-						label_invalid = true;
-				}
-				break;
-			default:
-				label_invalid = true;
-				break;
-			}
-		}
-#endif
 		//**********************************************************************
 		if(label_invalid == RANGE_ERROR)
 		{

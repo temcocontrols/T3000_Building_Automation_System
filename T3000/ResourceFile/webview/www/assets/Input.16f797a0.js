@@ -1,0 +1,1 @@
+import{r as t}from"./client.b9d1bbf8.js";import{i as e,j as n,au as o,av as r,l as s}from"./App.2c62e2d1.js";const a=t.exports.forwardRef(((t,a)=>{const p=o(t,a);return r(p),s("useInputStyles_unstable")(p),(t=>e(t.root,{children:[t.contentBefore&&n(t.contentBefore,{}),n(t.input,{}),t.contentAfter&&n(t.contentAfter,{})]}))(p)}));a.displayName="Input";export{a as I};

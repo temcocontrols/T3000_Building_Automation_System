@@ -10832,42 +10832,31 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                 int nret = 0;
                 
                 switch (m_backbround_data.at(n_handle_index).str_info.npanel_commad)
-                {
-                case READINPUT_T3000:
-                {
-                    if (GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance, READINPUT_T3000,
-                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
-                        m_backbround_data.at(n_handle_index).str_info.npoint_number, sizeof(Str_in_point)) > 0)
-                    {
-                        int temp_start_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
-                        int temp_end_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
+				{
+				case READINPUT_T3000:
+				{
+					if (GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance, READINPUT_T3000,
+						m_backbround_data.at(n_handle_index).str_info.npoint_number,
+						m_backbround_data.at(n_handle_index).str_info.npoint_number, sizeof(Str_in_point)) > 0)
+					{
+						int temp_start_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
+						int temp_end_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
 
-                        //将t_Output_data 复制到 g_Input_data[t_panel_num]中
-                        if (temp_end_index < BAC_INPUT_ITEM_COUNT)
-                        {
-                            g_Input_data[My_read_Struct->npanel_id].at(temp_end_index) = t_Input_data;
-                }
-                        CString Mession_ret;
-                        Mession_ret.Format(_T("GetPrivateDataSaveSPBlocking Read input from %d to %d success.%.1f"), temp_start_index, temp_start_index, g_Input_data[My_read_Struct->npanel_id].at(temp_end_index).value / 1000.0);
-                        if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
-                        {
-                            DFTrace(Mession_ret);
-                        }
-                        Sleep(SEND_COMMAND_DELAY_TIME);
-                }
-#if 0
-                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
-                                            m_backbround_data.at(n_handle_index).str_info.npanel_commad, 
-                                            m_backbround_data.at(n_handle_index).str_info.npoint_number, 
-                                            m_backbround_data.at(n_handle_index).str_info.npoint_number, 
-                                            sizeof(Str_in_point));
-                    if (nret > 0)
-                    {
-                        m_backbround_data.at(n_handle_index).nrec_time = time(NULL);
-                         memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_input_data, &t_Input_data, sizeof(Str_in_point));
-                    }
-#endif
-                }
+						//将t_Output_data 复制到 g_Input_data[t_panel_num]中
+						if (temp_end_index < BAC_INPUT_ITEM_COUNT)
+						{
+							g_Input_data[My_read_Struct->npanel_id].at(temp_end_index) = s_Input_data[m_backbround_data.at(n_handle_index).str_info.npoint_number];
+						}
+						CString Mession_ret;
+						Mession_ret.Format(_T("GetPrivateDataSaveSPBlocking Read input from %d to %d success.%.1f"), temp_start_index, temp_start_index, g_Input_data[My_read_Struct->npanel_id].at(temp_end_index).value / 1000.0);
+						if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+						{
+							DFTrace(Mession_ret);
+						}
+						Sleep(SEND_COMMAND_DELAY_TIME);
+					}
+
+				}
                     break;
                 case READOUTPUT_T3000:
                 {
@@ -10881,7 +10870,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         //将t_Variable_data 复制到 g_Variable_data[t_panel_num]中
                         if (temp_end_index < BAC_OUTPUT_ITEM_COUNT)
                         {
-                            g_Output_data[My_read_Struct->npanel_id].at(temp_end_index) = t_Output_data;
+                            g_Output_data[My_read_Struct->npanel_id].at(temp_end_index) = s_Output_data[temp_end_index];
                         }
                         CString Mession_ret;
                         Mession_ret.Format(_T("GetPrivateDataSaveSPBlocking Read Out from %d to %d success.%.1f"), temp_start_index, temp_start_index, g_Output_data[My_read_Struct->npanel_id].at(temp_end_index).value / 1000.0);
@@ -10891,20 +10880,6 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         }
                         Sleep(SEND_COMMAND_DELAY_TIME);
                     }
-#if 0
-                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
-                        m_backbround_data.at(n_handle_index).str_info.npanel_commad,
-                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
-                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
-                        sizeof(Str_out_point));
-                    if (nret > 0)
-                    {
-                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_output_data, &t_Output_data, sizeof(Str_out_point));
-                        CString temp_cs;
-                        temp_cs.Format(_T("Out%d %.3f\r\n"), m_backbround_data.at(n_handle_index).str_info.npoint_number + 1, m_backbround_data.at(n_handle_index).ret_data.m_group_output_data.value / 1000.000);
-                        //TRACE(temp_cs);
-                    }
-#endif
                 }
                     break;
                 case READVARIABLE_T3000:
@@ -10918,7 +10893,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 						//将t_Variable_data 复制到 g_Variable_data[t_panel_num]中
 						if (temp_end_index < BAC_VARIABLE_ITEM_COUNT)
 						{
-							g_Variable_data[My_read_Struct->npanel_id].at(temp_end_index) = t_Variable_data;
+							g_Variable_data[My_read_Struct->npanel_id].at(temp_end_index) = s_Variable_data[temp_end_index];
 						}
 						CString Mession_ret;
 						Mession_ret.Format(_T("GetPrivateDataSaveSPBlocking Read var from %d to %d success.%.1f"), temp_start_index, temp_start_index, g_Variable_data[My_read_Struct->npanel_id].at(temp_end_index).value/1000.0);
@@ -10928,18 +10903,6 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 						}
 						Sleep(SEND_COMMAND_DELAY_TIME);
 					}
-
-#if 0
-                    nret = GetPrivateDataSaveSPBlocking(m_backbround_data.at(n_handle_index).str_info.ninstance,
-                        m_backbround_data.at(n_handle_index).str_info.npanel_commad,
-                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
-                        m_backbround_data.at(n_handle_index).str_info.npoint_number,
-                        sizeof(Str_variable_point));
-                    if (nret > 0)
-                    {
-                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_variable_data, &t_Variable_data, sizeof(Str_variable_point));
-                    }
-#endif
                 }
                     break;
                 case READCONTROLLER_T3000:

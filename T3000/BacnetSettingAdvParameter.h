@@ -32,4 +32,5 @@ public:
 	afx_msg void OnBnClickedButtonAdvancedQ1();
 	afx_msg void OnBnClickedButtonAdvancedQ2();
 	afx_msg void OnBnClickedButtonAdvancedCancel();
+	afx_msg void OnBnClickedButtonAdvCountOk();
 };

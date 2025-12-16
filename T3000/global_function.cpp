@@ -2204,17 +2204,17 @@ int GetPriavteDataByPanelBlocking(Str_points * npoint  , str_group_point* temp_d
              Sleep(1);
              if (command == READINPUT_T3000)
              {
-                 memcpy(&temp_data->data.m_group_input_data, &t_Input_data, sizeof(Str_in_point));
+                 memcpy(&temp_data->data.m_group_input_data, &s_Input_data[start_instance], sizeof(Str_in_point));
 
              }
              else if (command == READOUTPUT_T3000)
              {
-                 memcpy(&temp_data->data.m_group_output_data, &t_Output_data, sizeof(Str_out_point));
+                 memcpy(&temp_data->data.m_group_output_data, &s_Output_data[start_instance], sizeof(Str_out_point));
 
              }
              else if (command == READVARIABLE_T3000)
              {
-                 memcpy(&temp_data->data.m_group_variable_data, &t_Variable_data, sizeof(Str_variable_point));
+                 memcpy(&temp_data->data.m_group_variable_data, &s_Variable_data[start_instance], sizeof(Str_variable_point));
 
              }
              else
@@ -2271,10 +2271,12 @@ int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t sta
                 gsp_invoke = temp_invoke_id; //20250918 add 通过这个函数进来的 都是特殊的读取 
                 return 1;
             }
-
+            if (temp_invoke_id >= 0)
+            {
                 gsp_invoke = temp_invoke_id; //20250918 add 通过这个函数进来的 都是特殊的读取 
+                TRACE(_T("GetPrivateDataSaveSPBlocking gsp_invoke = %d,deviceid =%d,command = %d,s=%d,end=%d\r\n"), gsp_invoke, deviceid, command, start_instance, end_instance);
                 send_status = true;
-            
+            }
 
         } while (temp_invoke_id < 0);
 
@@ -3714,6 +3716,7 @@ int fill_in_variable(Str_variable_point* temp_var, char* temp_point)
 
 int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, bool &end_flag, short invoke_id)
 {
+    TRACE(_T("Bacnet_PrivateData_Deal invoke_id = %d , gsp_invoke = %d\r\n"), invoke_id, gsp_invoke);
     int temp_struct_value;
     int command_type;
     int i = 0;
@@ -4083,10 +4086,6 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
 
         if (invoke_id == gsp_invoke)
         {
-            if(start_instance == end_instance) //这种基本是刷新单个时使用;
-			{
-				fill_in_output(&t_Output_data, my_temp_point);
-			}
             for (i = start_instance; i <= end_instance; i++)
             {
                 fill_in_output(&s_Output_data[i], my_temp_point);
@@ -4144,10 +4143,6 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             return -1;//超过长度了;
         if (invoke_id == gsp_invoke)
         {
-            if (start_instance == end_instance) //这种基本是刷新单个时使用;
-            {
-                fill_in_input(&t_Input_data, my_temp_point);
-            }
             for (i = start_instance; i <= end_instance; i++)
             {       
                 fill_in_input(&s_Input_data[i], my_temp_point);
@@ -4201,11 +4196,6 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
 
         if (invoke_id == gsp_invoke)
         {
-            if (start_instance == end_instance) //这种基本是刷新单个时使用;
-            {
-                fill_in_variable(&t_Variable_data, my_temp_point);
-            }
-
             for (i = start_instance; i <= end_instance; i++)
             {
                 fill_in_variable(&s_Variable_data[i], my_temp_point);
@@ -5184,6 +5174,10 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             else
             {
                 memcpy(&Device_Basic_Setting, &s_Basic_Setting, sizeof(Str_Setting_Info));
+                if ((s_Basic_Setting.reg.panel_number!=0) && (s_Basic_Setting.reg.panel_number <=254))
+                {
+                    memcpy(&g_Device_Basic_Setting[s_Basic_Setting.reg.panel_number], &s_Basic_Setting, sizeof(Str_Setting_Info));         
+                }
             }
 
         return READ_SETTING_COMMAND;

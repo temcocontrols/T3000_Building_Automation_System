@@ -37,7 +37,7 @@ using namespace Microsoft::WRL;
 size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
 char* base64_decode(char const* base64Str, char* debase64Str, int encodeStrLen);
 extern int Read_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex);
-extern int Write_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex,int element_count);
+extern int Write_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex, int element_count);
 //enum WEBVIEW_MESSAGE_TYPE
 //{
 //    READ_VARIABLES = 0,
@@ -72,7 +72,8 @@ enum WEBVIEW_MESSAGE_TYPE
 	BIND_DEVICE = 13,
 	SAVE_NEW_LIBRARY_DATA = 14,
 	LOGGING_DATA = 15,
-	UPDATE_WEBVIEW_LIST = 16
+	UPDATE_WEBVIEW_LIST = 16,
+	GET_WEBVIEW_LIST = 17
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -113,8 +114,8 @@ void DeleteDirectoryRecursive(const std::wstring& dir_path) {
 }
 
 extern CBacnetProgram* Program_Window;
-extern BacnetWeeklyRoutine* WeeklyRoutine_Window ;
-extern BacnetAnnualRoutine* AnnualRoutine_Window ;
+extern BacnetWeeklyRoutine* WeeklyRoutine_Window;
+extern BacnetAnnualRoutine* AnnualRoutine_Window;
 BacnetWebViewAppWindow::BacnetWebViewAppWindow(
 	UINT creationModeId,
 	std::wstring initialUri,
@@ -197,7 +198,7 @@ PCWSTR BacnetWebViewAppWindow::GetWindowClass()
 		// Register the window class. 
 		RegisterClassEx(&wcx);
 		return windowClass.c_str();
-	}();
+		}();
 
 	return windowClass;
 }
@@ -285,7 +286,7 @@ bool BacnetWebViewAppWindow::HandleWindowMessage(
 	{
 		if (Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 + Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= WEBVIEW_JSON_FEATURE) //643 版本会有这个功能
 		{
-				::PostMessage(m_screen_dlg_hwnd, HANDLE_JSON_DATA, NULL, NULL);
+			::PostMessage(m_screen_dlg_hwnd, HANDLE_JSON_DATA, NULL, NULL);
 		}
 
 		int retValue = 0;
@@ -543,7 +544,7 @@ void BacnetWebViewAppWindow::CloseWebView(bool cleanupUserDataFolder)
 		// creation, they would need to pass in that explicit value here.
 		// For more information about userDataFolder:
 		// https://docs.microsoft.com/microsoft-edge/webview2/reference/win32/webview2-idl#createcorewebview2environmentwithoptions
-		/* 
+		/*
 		PWSTR userDataPath;
 		HRESULT hrfolder = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &userDataPath);
 		std::wstring userDataFolder(userDataPath);
@@ -681,7 +682,8 @@ HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
 		if (hashPos != std::wstring::npos) {
 			baseUrl = cacheBustUri.substr(0, hashPos);
 			hashFragment = cacheBustUri.substr(hashPos);
-		} else {
+		}
+		else {
 			baseUrl = cacheBustUri;
 			hashFragment = L"";
 		}
@@ -689,7 +691,8 @@ HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
 		// Add timestamp parameter to base URL
 		if (baseUrl.find(L'?') != std::wstring::npos) {
 			baseUrl += L"&ts=" + std::to_wstring(GetTickCount64());
-		} else {
+		}
+		else {
 			baseUrl += L"?ts=" + std::to_wstring(GetTickCount64());
 		}
 
@@ -770,12 +773,17 @@ void WrapErrorMessage(Json::StreamWriterBuilder& builder, const Json::Value& tem
 	}
 }
 
+// ❌ Set to false to disable all T3WebLog logging
+static bool enable_t3_web_logging = false;
+
 
 // Helper function to write HandleWebViewMsg logs to T3WebLog directory
 // Creates organized logs in pattern: T3WebLog/YYYY-MM/MMDD/T3_CppMsg_HandWebViewMsg_MMDD_HHMM.txt
 // Logs are grouped into 4-hour buckets (00-03, 04-07, 08-11, 12-15, 16-19, 20-23)
 void WriteHandleWebViewMsgLog(const CString& messageType, const CString& outmsg, int itemCount)
 {
+	if (!enable_t3_web_logging) return;
+
 	try {
 		SYSTEMTIME st;
 		GetSystemTime(&st);
@@ -840,7 +848,7 @@ void WriteHandleWebViewMsgLog(const CString& messageType, const CString& outmsg,
 
 #include <mutex>
 std::mutex handleWebViewMsgMutex;
-void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
+void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 {
 	// 使用 std::lock_guard 来锁定互斥锁
 	std::lock_guard<std::mutex> lock(handleWebViewMsgMutex);
@@ -868,7 +876,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	CString image_fordor = g_strExePth + CString("Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 	CString temp_item;
 	CString temp_item_zip;
-	
+
 #endif
 
 	// append msgId
@@ -876,7 +884,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		std::string msgId = json["msgId"].asString();
 		tempjson["msgId"] = msgId;
 	}
-	
+
 	CString temp_action;
 	temp_action.Format(_T("action value = %d\r\n"), action);
 	DFTrace(temp_action);
@@ -923,7 +931,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			CString temp_message;
 			temp_message.Format(_T("Panel %d is offline!\r\n"), npanel_id);
 			TRACE(temp_message);
-            WrapErrorMessage(builder, tempjson, outmsg, temp_message);
+			WrapErrorMessage(builder, tempjson, outmsg, temp_message);
 			break;
 		}
 		else if (npanel_id == 0)
@@ -1184,7 +1192,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				for (int i = 0; i < 8; i++)
 				{
 					tempjson["data"][r_i]["time"][j][i]["minutes"] = g_Schedual_Time_data[npanel_id].at(k).Schedual_Day_Time[i][j].time_minutes;
-					tempjson["data"][r_i]["time"][j][i]["hours"] = g_Schedual_Time_data[npanel_id].at(k).Schedual_Day_Time[i][j].time_hours ;
+					tempjson["data"][r_i]["time"][j][i]["hours"] = g_Schedual_Time_data[npanel_id].at(k).Schedual_Day_Time[i][j].time_hours;
 					tempjson["data"][r_i]["time"][j][i]["flag"] = g_Schedual_time_flag[npanel_id].at(weekly_list_line).Time_flag[i][j];
 				}
 			}
@@ -1200,7 +1208,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			tempjson["data"][r_i]["index"] = k; //第几个 holiday
 			tempjson["data"][r_i]["id"] = "HOL" + to_string(k + 1);
 			tempjson["data"][r_i]["command"] = to_string(npanel_id) + "CAL" + to_string(k + 1);
-			for(int m = 0 ; m < ANNUAL_CODE_SIZE; m++)
+			for (int m = 0; m < ANNUAL_CODE_SIZE; m++)
 			{
 				tempjson["data"][r_i]["data"][m] = gp_DayState[npanel_id][k][m];
 			}
@@ -1224,10 +1232,10 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		int panel_id;
 		if (msg_source == 0)//来自T3000按键点击
 		{
-			grp_serial_number = g_selected_serialnumber; 
+			grp_serial_number = g_selected_serialnumber;
 			panel_id = bac_gloab_panel;
 			// 判断是否存在 "viewitem" 字段
-			if (json.isMember("viewitem") && !json["viewitem"].isNull()) 
+			if (json.isMember("viewitem") && !json["viewitem"].isNull())
 			{
 				// 存在 "viewitem" 字段且不为 null
 				grp_index = json.get("viewitem", Json::nullValue).asInt(); //这里如果是按键点进来的，要用T3000的index ，如果是 浏览器的 要浏览器的index
@@ -1261,7 +1269,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				}
 			}
 		}
-		else if(msg_source == 1)//来自浏览器
+		else if (msg_source == 1)//来自浏览器
 		{
 			panel_id = json.get("panelId", Json::nullValue).asInt(); //这里要根据panelId来判断是那个序列号的设备，进而确定保存的文件名
 			grp_index = json.get("viewitem", Json::nullValue).asInt(); //这里如果是按键点进来的，要用T3000的index ，如果是 浏览器的 要浏览器的index
@@ -1275,7 +1283,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 			if ((panel_id <= 0) || (panel_id > 254))
 			{
-				if (action == GET_INITIAL_DATA) 
+				if (action == GET_INITIAL_DATA)
 				{
 					tempjson["action"] = "GET_INITIAL_DATA_RES";
 				}
@@ -1301,7 +1309,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
 				break;
 			}
-			int n_read_result = Read_Webview_Data_Special(panel_id, grp_serial_number, grp_index );
+			int n_read_result = Read_Webview_Data_Special(panel_id, grp_serial_number, grp_index);
 			if (n_read_result < 0)
 			{
 				if (action == GET_INITIAL_DATA)
@@ -1474,7 +1482,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		int panelId = json.get("panelId", Json::nullValue).asInt(); //这里要根据panelId来判断是那个序列号的设备，进而确定保存的文件名
 		int save_grp_index = -1;
 
-		
+
 		if (msg_source == 0)//来自T3000按键点击
 		{
 			grp_serial_number = g_selected_serialnumber; //暂时用这个代替
@@ -1507,7 +1515,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Message Source Error."));
 			break;
 		}
-		
+
 		if ((save_grp_index < 0) || (save_grp_index > 7))
 		{
 			if (msg_source == 0)
@@ -1515,7 +1523,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Viewitem out of range."));
 			break;
 		}
-		
+
 
 		temp_item.Format(_T("%u_%d.txt"), grp_serial_number, save_grp_index);
 		temp_item_zip.Format(_T("%u_%d.zip"), grp_serial_number, save_grp_index);
@@ -1584,7 +1592,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 		//这里涉及到写设备的动作 发消息放到线程中去做。避免界面卡死，以及影响其他消息收发;
 		//这里要根据不同的panel 对不同设备进行保存 .
-		int n_write_result =  Write_Webview_Data_Special(panelId, grp_serial_number, save_grp_index, temp_elementcount);
+		int n_write_result = Write_Webview_Data_Special(panelId, grp_serial_number, save_grp_index, temp_elementcount);
 		if (n_write_result == -3)
 		{
 			if (msg_source == 0)
@@ -1592,7 +1600,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Write too often. Ignore this request!"));
 			break;
 		}
-		else if(n_write_result < 0)
+		else if (n_write_result < 0)
 		{
 			if (msg_source == 0)
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Failed to store data!"));
@@ -1600,7 +1608,350 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			break;
 		}
 
-		
+
+
+		break;
+	}
+	case WEBVIEW_MESSAGE_TYPE::GET_WEBVIEW_LIST:
+	{
+		//接受 6个参数 panelId,serialNumber,entryType,entryIndexStart,entryIndexEnd,objectinstance
+		//并返回对应的数据列表  阻塞的方式读取数据
+		int temp_panel_id = json.get("panelId", Json::nullValue).asInt();
+		int temp_serial_number = json.get("serialNumber", Json::nullValue).asInt();
+		int entry_type = json.get("entryType", Json::nullValue).asInt();
+		int entry_index_start = json.get("entryIndexStart", Json::nullValue).asInt();
+		int entry_index_end = json.get("entryIndexEnd", Json::nullValue).asInt();
+		int entry_objectinstance = json.get("objectinstance", Json::nullValue).asInt();
+		// Log incoming request
+		CString logMsg;
+		logMsg.Format(_T("GET_WEBVIEW_LIST: PanelId=%d, SerialNumber=%d, EntryType=%d, StartIndex=%d, EndIndex=%d"),
+			temp_panel_id, temp_serial_number, entry_type, entry_index_start, entry_index_end);
+		WriteHandleWebViewMsgLog(_T("GET_WEBVIEW_LIST"), logMsg, 1);
+		if ((temp_panel_id == 0) || (temp_panel_id >= 255))
+		{
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is invalid ."));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Panel is invalid ."));
+			CString errorLog;
+			errorLog.Format(_T("ERROR: Invalid panel_id=%d"), temp_panel_id);
+			WriteHandleWebViewMsgLog(_T("GET_WEBVIEW_LIST"), errorLog, 0);
+			break;
+		}
+
+		if (g_Device_Basic_Setting[temp_panel_id].reg.n_serial_number != temp_serial_number)
+		{
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The serial number does not match the panel."));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("The serial number does not match the panel."));
+
+			CString errorLog;
+			errorLog.Format(_T("ERROR: Serial mismatch - Expected=%d, Got=%d"),
+				g_Device_Basic_Setting[temp_panel_id].reg.n_serial_number, temp_serial_number);
+			WriteHandleWebViewMsgLog(_T("GET_WEBVIEW_LIST"), errorLog, 0);
+			break;
+		}
+		unsigned int temp_objectinstance = g_Device_Basic_Setting[temp_panel_id].reg.object_instance;
+		if ((temp_objectinstance == 0) ||
+			(temp_objectinstance >= 0X3FFFFF) ||
+			(temp_objectinstance != entry_objectinstance))
+		{
+			if (msg_source == 0)
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The objectinstance does not match the panel."));
+			WrapErrorMessage(builder, tempjson, outmsg, _T("The objectinstance does not match the panel."));
+
+			CString errorLog;
+			errorLog.Format(_T("ERROR: object_instance mismatch - Expected=%d, Got=%d"),
+				g_Device_Basic_Setting[temp_panel_id].reg.object_instance, entry_objectinstance);
+			WriteHandleWebViewMsgLog(_T("GET_WEBVIEW_LIST"), errorLog, 0);
+			break;
+		}
+
+		// Add device main info to data array
+		tempjson["data"]["panelId"] = temp_panel_id;
+		tempjson["data"]["serialNumber"] = temp_serial_number;
+		tempjson["data"]["entryType"] = entry_type;
+		tempjson["data"]["entryIndexStart"] = entry_index_start;
+		tempjson["data"]["entryIndexEnd"] = entry_index_end;
+		tempjson["data"]["objectinstance"] = entry_objectinstance;
+		int point_idx = 0;
+		switch (entry_type)
+		{
+			case BAC_IN:
+			{
+				if (entry_index_end >= entry_index_start)
+				{
+					// 计算需要几个块（向上取整）
+					int totalCount = entry_index_end - entry_index_start + 1;
+					int groupSize = BAC_READ_INPUT_GROUP_NUMBER;
+					int read_input_group = (totalCount + groupSize - 1) / groupSize;
+
+					for (int i = 0; i < read_input_group; ++i)
+					{
+						int temp_start = entry_index_start + i * groupSize;
+						if (temp_start > entry_index_end) // 防止越界
+							break;
+
+						int temp_end = temp_start + groupSize - 1;
+						if (temp_end > entry_index_end)
+							temp_end = entry_index_end;
+
+						// 再次确保不超过全局最大点数
+						if (temp_start >= BAC_INPUT_ITEM_COUNT)
+							break;
+						if (temp_end >= BAC_INPUT_ITEM_COUNT)
+							temp_end = BAC_INPUT_ITEM_COUNT - 1;
+
+						// 示例：对每个块进行阻塞读取
+						if (GetPrivateDataSaveSPBlocking(entry_objectinstance, READINPUT_T3000,
+							(uint8_t)temp_start, (uint8_t)temp_end, sizeof(Str_in_point), 4) > 0)
+						{
+							// 将读取到的临时数据复制到全局缓存
+							for (int idx = temp_start; idx <= temp_end; ++idx)
+							{
+								if (idx < BAC_INPUT_ITEM_COUNT) {
+									g_Input_data[temp_panel_id].at(idx) = s_Input_data[idx];
+								}
+							}
+							if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+							{
+								int elementCount = temp_end - temp_start + 1; // 本块实际元素个数
+								// 调试输出（可选）
+								CString dbg;
+								dbg.Format(_T("obj=%d,input ,Chunk %d: temp_start=%d, temp_end=%d, count=%d\r\n"), entry_objectinstance, i, temp_start, temp_end, elementCount);
+								DFTrace(dbg);
+							}
+							Sleep(SEND_COMMAND_DELAY_TIME);
+						}
+						else
+						{
+							CString errorLog;
+							errorLog.Format(_T("ERROR: Read input failed start=%d, end=%d"),
+								temp_start, temp_end);
+							WriteHandleWebViewMsgLog(_T("GET_WEBVIEW_LIST"), errorLog, 0);
+
+							if (msg_source == 0)
+								SetPaneString(BAC_SHOW_MISSION_RESULTS, errorLog);
+							WrapErrorMessage(builder, tempjson, outmsg, errorLog);
+							if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+							{
+								DFTrace(errorLog);
+							}
+							continue;
+						}
+
+						int npanel_id = temp_panel_id;
+						for (int i = temp_start; i < temp_end; i++)
+						{
+							int input_idx = i;
+							tempjson["data"]["device_data"][point_idx]["pid"] = npanel_id;
+							tempjson["data"]["device_data"][point_idx]["type"] = "INPUT";
+							tempjson["data"]["device_data"][point_idx]["index"] = i;
+							tempjson["data"]["device_data"][point_idx]["id"] = "IN" + to_string(input_idx + 1);
+							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "IN" + to_string(input_idx + 1);
+							tempjson["data"]["device_data"][point_idx]["description"] = (char*)g_Input_data[npanel_id].at(input_idx).description;
+							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_Input_data[npanel_id].at(input_idx).label;
+							tempjson["data"]["device_data"][point_idx]["unit"] = g_Input_data[npanel_id].at(input_idx).range;
+							tempjson["data"]["device_data"][point_idx]["auto_manual"] = g_Input_data[npanel_id].at(input_idx).auto_manual;
+							tempjson["data"]["device_data"][point_idx]["value"] = g_Input_data[npanel_id].at(input_idx).value;
+							tempjson["data"]["device_data"][point_idx]["filter"] = g_Input_data[npanel_id].at(input_idx).filter;
+							tempjson["data"]["device_data"][point_idx]["control"] = g_Input_data[npanel_id].at(input_idx).control;
+							tempjson["data"]["device_data"][point_idx]["digital_analog"] = g_Input_data[npanel_id].at(input_idx).digital_analog;
+							tempjson["data"]["device_data"][point_idx]["range"] = g_Input_data[npanel_id].at(input_idx).range;
+							tempjson["data"]["device_data"][point_idx]["calibration_sign"] = g_Input_data[npanel_id].at(input_idx).calibration_sign;
+							tempjson["data"]["device_data"][point_idx]["calibration_h"] = g_Input_data[npanel_id].at(input_idx).calibration_h;
+							tempjson["data"]["device_data"][point_idx]["calibration_l"] = g_Input_data[npanel_id].at(input_idx).calibration_l;
+							tempjson["data"]["device_data"][point_idx]["decom"] = g_Input_data[npanel_id].at(input_idx).decom; //for input   0 "Normal"    1"Open"   2  "Shorted"
+							point_idx++;
+						}
+
+					} // for groups
+				}
+				break;
+			}
+			case BAC_OUT:
+			{
+				if (entry_index_end >= entry_index_start)
+				{
+					// 计算需要几个块（向上取整）
+					int totalCount = entry_index_end - entry_index_start + 1;
+					int groupSize = BAC_READ_OUTPUT_GROUP_NUMBER;
+					int read_output_group = (totalCount + groupSize - 1) / groupSize;
+
+					for (int i = 0; i < read_output_group; ++i)
+					{
+						int temp_start = entry_index_start + i * groupSize;
+						if (temp_start > entry_index_end) // 防止越界
+							break;
+
+						int temp_end = temp_start + groupSize - 1;
+						if (temp_end > entry_index_end)
+							temp_end = entry_index_end;
+
+						// 再次确保不超过全局最大点数
+						if (temp_start >= BAC_OUTPUT_ITEM_COUNT)
+							break;
+						if (temp_end >= BAC_OUTPUT_ITEM_COUNT)
+							temp_end = BAC_OUTPUT_ITEM_COUNT - 1;
+
+						// 示例：对每个块进行阻塞读取
+						if (GetPrivateDataSaveSPBlocking(entry_objectinstance, READOUTPUT_T3000,
+							(uint8_t)temp_start, (uint8_t)temp_end, sizeof(Str_out_point), 4) > 0)
+						{
+							// 将读取到的临时数据复制到全局缓存
+							for (int idx = temp_start; idx <= temp_end; ++idx)
+							{
+								if (idx < BAC_OUTPUT_ITEM_COUNT) {
+									g_Output_data[temp_panel_id].at(idx) = s_Output_data[idx];
+								}
+							}
+							if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+							{
+								int elementCount = temp_end - temp_start + 1; // 本块实际元素个数
+								// 调试输出（可选）
+								CString dbg;
+								dbg.Format(_T("obj=%d,output ,Chunk %d: temp_start=%d, temp_end=%d, count=%d\r\n"), entry_objectinstance, i, temp_start, temp_end, elementCount);
+								DFTrace(dbg);
+							}
+							Sleep(SEND_COMMAND_DELAY_TIME);
+						}
+						else
+						{
+							CString errorLog;
+							errorLog.Format(_T("ERROR: Read output failed start=%d, end=%d"),
+								temp_start, temp_end);
+							WriteHandleWebViewMsgLog(_T("GET_WEBVIEW_LIST"), errorLog, 0);
+
+							if (msg_source == 0)
+								SetPaneString(BAC_SHOW_MISSION_RESULTS, errorLog);
+							WrapErrorMessage(builder, tempjson, outmsg, errorLog);
+							if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+							{
+								DFTrace(errorLog);
+							}
+							continue;
+						}
+
+						int npanel_id = temp_panel_id;
+						for (int i = temp_start; i < temp_end; i++)
+						{
+							int output_idx = i;
+							tempjson["data"]["device_data"][point_idx]["pid"] = npanel_id;
+							tempjson["data"]["device_data"][point_idx]["type"] = "OUTPUT";
+							tempjson["data"]["device_data"][point_idx]["index"] = output_idx;
+							tempjson["data"]["device_data"][point_idx]["id"] = "OUT" + to_string(output_idx + 1);
+							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "OUT" + to_string(output_idx + 1);
+							tempjson["data"]["device_data"][point_idx]["description"] = (char*)g_Output_data[npanel_id].at(output_idx).description;
+							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_Output_data[npanel_id].at(output_idx).label;
+							tempjson["data"]["device_data"][point_idx]["auto_manual"] = g_Output_data[npanel_id].at(output_idx).auto_manual;
+							tempjson["data"]["device_data"][point_idx]["value"] = g_Output_data[npanel_id].at(output_idx).value;
+							tempjson["data"]["device_data"][point_idx]["low_voltage"] = g_Output_data[npanel_id].at(output_idx).low_voltage;
+							tempjson["data"]["device_data"][point_idx]["high_voltage"] = g_Output_data[npanel_id].at(output_idx).high_voltage;
+							tempjson["data"]["device_data"][point_idx]["range"] = g_Output_data[npanel_id].at(output_idx).range;
+							tempjson["data"]["device_data"][point_idx]["control"] = g_Output_data[npanel_id].at(output_idx).control;
+							tempjson["data"]["device_data"][point_idx]["digital_analog"] = g_Output_data[npanel_id].at(output_idx).digital_analog;
+							tempjson["data"]["device_data"][point_idx]["hw_switch_status"] = g_Output_data[npanel_id].at(output_idx).hw_switch_status;
+							tempjson["data"]["device_data"][point_idx]["decom"] = g_Output_data[npanel_id].at(output_idx).decom; //for output   0 "Normal"    1"Alarm"
+							point_idx++;
+						}
+					} // for groups
+				}
+				break;
+			}
+			case BAC_VAR:
+			{
+				if (entry_index_end >= entry_index_start)
+				{
+					// 计算需要几个块（向上取整）
+					int totalCount = entry_index_end - entry_index_start + 1;
+					int groupSize = BAC_READ_VARIABLE_GROUP_NUMBER;
+					int read_variable_group = (totalCount + groupSize - 1) / groupSize;
+
+					for (int i = 0; i < read_variable_group; ++i)
+					{
+						int temp_start = entry_index_start + i * groupSize;
+						if (temp_start > entry_index_end) // 防止越界
+							break;
+
+						int temp_end = temp_start + groupSize - 1;
+						if (temp_end > entry_index_end)
+							temp_end = entry_index_end;
+
+						// 再次确保不超过全局最大点数
+						if (temp_start >= BAC_VARIABLE_ITEM_COUNT)
+							break;
+						if (temp_end >= BAC_VARIABLE_ITEM_COUNT)
+							temp_end = BAC_VARIABLE_ITEM_COUNT - 1;
+
+						// 示例：对每个块进行阻塞读取
+						if (GetPrivateDataSaveSPBlocking(entry_objectinstance, READVARIABLE_T3000,
+							(uint8_t)temp_start, (uint8_t)temp_end, sizeof(Str_variable_point), 4) > 0)
+						{
+							// 将读取到的临时数据复制到全局缓存
+							for (int idx = temp_start; idx <= temp_end; ++idx)
+							{
+								if (idx < BAC_VARIABLE_ITEM_COUNT) {
+									g_Variable_data[temp_panel_id].at(idx) = s_Variable_data[idx];
+								}
+							}
+							if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+							{
+								int elementCount = temp_end - temp_start + 1; // 本块实际元素个数
+								// 调试输出（可选）
+								CString dbg;
+								dbg.Format(_T("obj=%d,variable ,Chunk %d: temp_start=%d, temp_end=%d, count=%d\r\n"), entry_objectinstance, i, temp_start, temp_end, elementCount);
+								DFTrace(dbg);
+							}
+							Sleep(SEND_COMMAND_DELAY_TIME);
+						}
+						else
+						{
+							CString errorLog;
+							errorLog.Format(_T("ERROR: Read variable failed start=%d, end=%d"),
+								temp_start, temp_end);
+							WriteHandleWebViewMsgLog(_T("GET_WEBVIEW_LIST"), errorLog, 0);
+
+							if (msg_source == 0)
+								SetPaneString(BAC_SHOW_MISSION_RESULTS, errorLog);
+							WrapErrorMessage(builder, tempjson, outmsg, errorLog);
+							if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+							{
+								DFTrace(errorLog);
+							}
+							continue;
+						}
+
+						int npanel_id = temp_panel_id;
+						for (int i = temp_start; i < temp_end; i++)
+						{
+							int var_idx = i;
+							tempjson["data"]["device_data"][point_idx]["pid"] = npanel_id;
+							tempjson["data"]["device_data"][point_idx]["type"] = "VARIABLE";
+							tempjson["data"]["device_data"][point_idx]["index"] = var_idx;
+							tempjson["data"]["device_data"][point_idx]["id"] = "VAR" + to_string(var_idx + 1);
+							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "VAR" + to_string(var_idx + 1);
+							tempjson["data"]["device_data"][point_idx]["description"] = (char*)g_Variable_data[npanel_id].at(var_idx).description;
+							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_Variable_data[npanel_id].at(var_idx).label;
+							tempjson["data"]["device_data"][point_idx]["auto_manual"] = g_Variable_data[npanel_id].at(var_idx).auto_manual;
+							tempjson["data"]["device_data"][point_idx]["value"] = g_Variable_data[npanel_id].at(var_idx).value;
+							tempjson["data"]["device_data"][point_idx]["range"] = g_Variable_data[npanel_id].at(var_idx).range;
+							tempjson["data"]["device_data"][point_idx]["control"] = g_Variable_data[npanel_id].at(var_idx).control;
+							tempjson["data"]["device_data"][point_idx]["digital_analog"] = g_Variable_data[npanel_id].at(var_idx).digital_analog;
+							tempjson["data"]["device_data"][point_idx]["unused"] = g_Variable_data[npanel_id].at(var_idx).unused;
+							point_idx++;
+						}
+					} // for groups
+				}
+				break;
+			}
+			default:
+				break;
+		}
+
+
+		// Generate final JSON response once for all devices
+		const std::string output = Json::writeString(builder, tempjson);
+		CString temp_cs(output.c_str());
+		outmsg = temp_cs;
 
 		break;
 	}
@@ -1611,12 +1962,23 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		int entry_type = json.get("entryType", Json::nullValue).asInt();
 		int entry_index = json.get("entryIndex", Json::nullValue).asInt();
 
+		// Log incoming request
+		CString logMsg;
+		logMsg.Format(_T("UPDATE_WEBVIEW_LIST: PanelId=%d, SerialNumber=%d, EntryType=%d, Index=%d"),
+			temp_panel_id, temp_serial_number, entry_type, entry_index);
+		WriteHandleWebViewMsgLog(_T("UPDATE_WEBVIEW_LIST"), logMsg, 1);
+
+
 		if ((temp_panel_id == 0) || (temp_panel_id >= 255))
 		{
 			if (msg_source == 0)
 				SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Panel is invalid ."));
 			WrapErrorMessage(builder, tempjson, outmsg, _T("Panel is invalid ."));
+			CString errorLog;
+			errorLog.Format(_T("ERROR: Invalid panel_id=%d"), temp_panel_id);
+			WriteHandleWebViewMsgLog(_T("UPDATE_WEBVIEW_LIST"), errorLog, 0);
 			break;
+
 		}
 
 		switch (entry_type)
@@ -1629,12 +1991,26 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				if (msg_source == 0)
 					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
+				CString errorLog;
+				errorLog.Format(_T("ERROR: Invalid entry_index=%d (max=%d)"), entry_index, BAC_INPUT_ITEM_COUNT);
+				WriteHandleWebViewMsgLog(_T("UPDATE_WEBVIEW_LIST"), errorLog, 0);
+
 				break;
 			}
+			// Log field values before update
+			CString beforeLog;
+			beforeLog.Format(_T("INPUT[%d] BEFORE: description='%s', label='%s', value=%d, range=%d"),
+				entry_index,
+				(LPCTSTR)CString((char*)g_Input_data[temp_panel_id].at(entry_index).description),
+				(LPCTSTR)CString((char*)g_Input_data[temp_panel_id].at(entry_index).label),
+				g_Input_data[temp_panel_id].at(entry_index).value,
+				g_Input_data[temp_panel_id].at(entry_index).range);
+			WriteHandleWebViewMsgLog(_T("UPDATE_WEBVIEW_LIST"), beforeLog, 0);
+
 
 			g_Input_data[temp_panel_id].at(entry_index).control = json["control"].asInt();
 			g_Input_data[temp_panel_id].at(entry_index).value = json["value"].asFloat() * 1000;
-			strncpy((char *)g_Input_data[temp_panel_id].at(entry_index).description, json["description"].asCString(), STR_IN_DESCRIPTION_LENGTH);
+			strncpy((char*)g_Input_data[temp_panel_id].at(entry_index).description, json["description"].asCString(), STR_IN_DESCRIPTION_LENGTH);
 			strncpy((char*)g_Input_data[temp_panel_id].at(entry_index).label, json["label"].asCString(), STR_IN_LABEL);
 			g_Input_data[temp_panel_id].at(entry_index).range = json["range"].asInt();
 			g_Input_data[temp_panel_id].at(entry_index).auto_manual = json["auto_manual"].asInt();
@@ -1646,16 +2022,39 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			g_Input_data[temp_panel_id].at(entry_index).calibration_l = json["calibration_l"].asInt();
 			g_Input_data[temp_panel_id].at(entry_index).decom = json["decom"].asInt();
 
+			// Log field values after update
+			CString afterLog;
+			afterLog.Format(_T("INPUT[%d] AFTER: description='%s', label='%s', value=%d, range=%d"),
+				entry_index,
+				(LPCTSTR)CString((char*)g_Input_data[temp_panel_id].at(entry_index).description),
+				(LPCTSTR)CString((char*)g_Input_data[temp_panel_id].at(entry_index).label),
+				g_Input_data[temp_panel_id].at(entry_index).value,
+				g_Input_data[temp_panel_id].at(entry_index).range);
+			WriteHandleWebViewMsgLog(_T("UPDATE_WEBVIEW_LIST"), afterLog, 0);
+
+
 			if (g_Device_Basic_Setting[temp_panel_id].reg.n_serial_number != temp_serial_number)
 			{
 				if (msg_source == 0)
 					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The serial number does not match the panel."));
 				WrapErrorMessage(builder, tempjson, outmsg, _T("The serial number does not match the panel."));
+
+				CString errorLog;
+				errorLog.Format(_T("ERROR: Serial mismatch - Expected=%d, Got=%d"),
+					g_Device_Basic_Setting[temp_panel_id].reg.n_serial_number, temp_serial_number);
+				WriteHandleWebViewMsgLog(_T("UPDATE_WEBVIEW_LIST"), errorLog, 0);
 				break;
 			}
 			unsigned int temp_objectinstance = g_Device_Basic_Setting[temp_panel_id].reg.object_instance;
 
-			int ret_results = WritePrivateData_Blocking(temp_objectinstance,WRITEINPUT_T3000, entry_index,entry_index, 4, (char*)&g_Input_data[temp_panel_id].at(entry_index));
+			// Log write attempt
+			CString writeLog;
+			writeLog.Format(_T("Writing to device: ObjectInstance=%d, Type=INPUT, Index=%d"),
+				temp_objectinstance, entry_index);
+			WriteHandleWebViewMsgLog(_T("UPDATE_WEBVIEW_LIST"), writeLog, 0);
+
+
+			int ret_results = WritePrivateData_Blocking(temp_objectinstance, WRITEINPUT_T3000, entry_index, entry_index, 4, (char*)&g_Input_data[temp_panel_id].at(entry_index));
 			if (ret_results > 0)
 			{
 
@@ -1681,7 +2080,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			g_Output_data[temp_panel_id].at(entry_index).value = json["value"].asFloat() * 1000;
 			strncpy((char*)g_Output_data[temp_panel_id].at(entry_index).description, json["description"].asCString(), STR_OUT_DESCRIPTION_LENGTH);
 			strncpy((char*)g_Output_data[temp_panel_id].at(entry_index).label, json["label"].asCString(), STR_OUT_LABEL);
-			g_Output_data[temp_panel_id].at(entry_index).auto_manual	= json["auto_manual"].asInt();
+			g_Output_data[temp_panel_id].at(entry_index).auto_manual = json["auto_manual"].asInt();
 			g_Output_data[temp_panel_id].at(entry_index).low_voltage = json["low_voltage"].asInt();
 			g_Output_data[temp_panel_id].at(entry_index).high_voltage = json["high_voltage"].asInt();
 			g_Output_data[temp_panel_id].at(entry_index).range = json["range"].asInt();
@@ -1754,9 +2153,9 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		default:
 			break;
 		}
-	
+
 		tempjson["action"] = "UPDATE_WEBVIEW_LIST";
-		tempjson["data"]["status"] = true; 
+		tempjson["data"]["status"] = true;
 		const std::string output = Json::writeString(builder, tempjson);
 		CString temp_cs(output.c_str());
 		outmsg = temp_cs;
@@ -2062,7 +2461,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 
 
 		}
-			break;
+		break;
 		case BAC_AR_Y:
 		{
 			if ((entry_index >= 0) && entry_index + 1 > BAC_HOLIDAY_COUNT)
@@ -2091,7 +2490,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 			}
 
 		}
-			break;
+		break;
 
 		}
 		tempjson["action"] = "UPDATE_ENTRY_RES";
@@ -2118,7 +2517,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				tempjson["data"][send_index]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
 				tempjson["data"][send_index]["pid"] = g_bacnet_panel_info.at(i).npid;
 				tempjson["data"][send_index]["panel_name"] = (char*)g_Device_Basic_Setting[g_bacnet_panel_info.at(i).panel_number].reg.panel_name;
-				send_index++; 
+				send_index++;
 			}
 			else
 			{
@@ -2136,7 +2535,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 				tempjson["data"][send_index]["online_time"] = g_bacnet_panel_info.at(i).online_time; //Last response time .4bytes.   0  means 1970 1 1 0 
 				tempjson["data"][send_index]["pid"] = g_Device_Basic_Setting[temp_panel].reg.panel_type;
 				tempjson["data"][send_index]["panel_name"] = (char*)g_Device_Basic_Setting[g_bacnet_panel_info.at(i).panel_number].reg.panel_name;
-				send_index++; 
+				send_index++;
 			}
 		}
 		const std::string output = Json::writeString(builder, tempjson);
@@ -2665,7 +3064,7 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 		//15分钟内收到这个命令直接break;
 		static DWORD last_logging_time = 0;
 		DWORD current_time = GetTickCount();
-		if (current_time - last_logging_time <  60 * 1000) // 15 minutes in milliseconds
+		if (current_time - last_logging_time < 60 * 1000) // 15 minutes in milliseconds
 		{
 			CString skipLog;
 			skipLog.Format(_T("LOGGING_DATA SKIPPED - within 1 minute cooldown (panelId: %d, serialNumber: %d)\n"), temp_panel_id, temp_serial_number);
@@ -2807,7 +3206,6 @@ void HandleWebViewMsg(CString msg ,CString &outmsg, int msg_source = 0)
 	default:
 		break;
 	}
-
 }
 
 
@@ -2815,7 +3213,7 @@ void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 {
 	CString outmsg;
 	HandleWebViewMsg(msg, outmsg);
-	if(!outmsg.IsEmpty())
+	if (!outmsg.IsEmpty())
 		m_webView->PostWebMessageAsJson(outmsg);
 }
 
@@ -3002,7 +3400,7 @@ int webview_run_server() {
 
 	RustError result = run_server();
 	if (result != RustError::Ok) {
-		
+
 		SetPaneString(BAC_SHOW_MISSION_RESULTS, L"Couldn't run the webview API server");
 		return 1;
 	}

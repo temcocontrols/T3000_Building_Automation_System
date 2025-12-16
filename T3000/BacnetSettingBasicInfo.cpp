@@ -511,10 +511,326 @@ void CBacnetSettingBasicInfo::OnEnKillfocusEditSettingMstpNetwork()
         }
     }
 }
+#if 0
+static CString AnsiToCString(const char* s)
+{
+    if (!s) return CString();
+    wchar_t buf[256] = { 0 };
+    MultiByteToWideChar(CP_ACP, 0, s, -1, buf, _countof(buf));
+    return CString(buf);
+}
 
+static void TraceInputPoint(int npanel_id, int input_idx)
+{
+    // 保护性检查，避免越界访问
+    if (npanel_id < 0) return;
+    extern std::vector<std::vector<Str_in_point>> g_Input_data; // 若项目中定义不同，请按实际声明调整
+    try
+    {
+        // 访问元素（与代码中其它地方使用的语法一致）
+        const Str_in_point& pt = g_Input_data.at(npanel_id).at(input_idx);
+
+        CString desc = AnsiToCString((char*)pt.description);
+        CString label = AnsiToCString((char*)pt.label);
+
+        CString log;
+        log.Format(_T("g_Input_data[%d][%d]: description=\"%s\", label=\"%s\", value=%d, filter=%d, decom=%d, sub_id=%d, sub_product=%d, control=%d, auto_manual=%d, digital_analog=%d, calibration_sign=%d, sub_number=%d,  calibration=%u, range=%u"),
+            npanel_id, input_idx,
+            (LPCTSTR)desc,
+            (LPCTSTR)label,
+            (int)pt.value,
+            (int)pt.filter,
+            (int)pt.decom,
+            (int)pt.sub_id,
+            (int)pt.sub_product,
+            (int)pt.control,
+            (int)pt.auto_manual,
+            (int)pt.digital_analog,
+            (int)pt.calibration_sign,
+            (int)pt.sub_number,
+            (unsigned int)pt.calibration_h,
+            (unsigned int)pt.range
+        );
+
+        TRACE(_T("%s\r\n"), (LPCTSTR)log);
+    }
+    catch (...)
+    {
+        TRACE(_T("TraceInputPoint: invalid panel_id or input_idx (%d, %d)\r\n"), npanel_id, input_idx);
+    }
+}
+
+void test1()
+{
+    int temp_panel_id = 144;// json.get("panelId", Json::nullValue).asInt();
+    int temp_serial_number = 240488;// json.get("serialNumber", Json::nullValue).asInt();
+    int entry_type = BAC_VAR;// json.get("entryType", Json::nullValue).asInt();
+    int entry_index_start = 3;// json.get("entryIndexStart", Json::nullValue).asInt();
+    int entry_index_end = 55;// json.get("entryIndexEnd", Json::nullValue).asInt();
+    int entry_objectinstance = 240488;// json.get("objectinstance", Json::nullValue).asInt();
+            // Log incoming request
+            CString logMsg;
+            logMsg.Format(_T("GET_WEBVIEW_LIST: PanelId=%d, SerialNumber=%d, EntryType=%d, StartIndex=%d, EndIndex=%d"),
+                temp_panel_id, temp_serial_number, entry_type, entry_index_start, entry_index_end);
+
+
+            if (g_Device_Basic_Setting[temp_panel_id].reg.n_serial_number != temp_serial_number)
+            {
+                return;
+            }
+            unsigned int temp_objectinstance = g_Device_Basic_Setting[temp_panel_id].reg.object_instance;
+            if ((temp_objectinstance == 0) ||
+                (temp_objectinstance >= 0X3FFFFF) ||
+                (temp_objectinstance != entry_objectinstance))
+            {
+                return;
+            }
+
+            // Add device main info to data array
+
+            int point_idx = 0;
+            switch (entry_type)
+            {
+            case BAC_IN:
+            {
+                if (entry_index_end >= entry_index_start)
+                {
+                    // 计算需要几个块（向上取整）
+                    int totalCount = entry_index_end - entry_index_start + 1;
+                    int groupSize = BAC_READ_INPUT_GROUP_NUMBER;
+                    int read_input_group = (totalCount + groupSize - 1) / groupSize;
+
+                    for (int i = 0; i < read_input_group; ++i)
+                    {
+                        int temp_start = entry_index_start + i * groupSize;
+                        if (temp_start > entry_index_end) // 防止越界
+                            break;
+
+                        int temp_end = temp_start + groupSize - 1;
+                        if (temp_end > entry_index_end)
+                            temp_end = entry_index_end;
+
+                        // 再次确保不超过全局最大点数
+                        if (temp_start >= BAC_INPUT_ITEM_COUNT)
+                            break;
+                        if (temp_end >= BAC_INPUT_ITEM_COUNT)
+                            temp_end = BAC_INPUT_ITEM_COUNT - 1;
+
+                        // 示例：对每个块进行阻塞读取
+                        if (GetPrivateDataSaveSPBlocking(entry_objectinstance, READINPUT_T3000,
+                            (uint8_t)temp_start, (uint8_t)temp_end, sizeof(Str_in_point), 4) > 0)
+                        {
+                            // 将读取到的临时数据复制到全局缓存
+                            for (int idx = temp_start; idx <= temp_end; ++idx)
+                            {
+                                if (idx < BAC_INPUT_ITEM_COUNT) {
+                                    g_Input_data[temp_panel_id].at(idx) = s_Input_data[idx];
+                                }
+                            }
+                            if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+                            {
+                                int elementCount = temp_end - temp_start + 1; // 本块实际元素个数
+                                // 调试输出（可选）
+                                CString dbg;
+                                dbg.Format(_T("obj=%d,input ,Chunk %d: temp_start=%d, temp_end=%d, count=%d\r\n"), entry_objectinstance, i, temp_start, temp_end, elementCount);
+                                DFTrace(dbg);
+                            }
+                            Sleep(SEND_COMMAND_DELAY_TIME);
+                        }
+                        else
+                        {
+                            CString errorLog;
+                            errorLog.Format(_T("ERROR: Read input failed start=%d, end=%d"),
+                                temp_start, temp_end);
+                            continue;
+                        }
+
+                        int npanel_id = temp_panel_id;
+                        for (int i = temp_start; i < temp_end; i++)
+                        {
+                            int input_idx = i;
+                            TraceInputPoint(npanel_id, i);
+                        }
+
+                    } // for groups
+                }
+                break;
+            }
+            case BAC_OUT:
+            {
+                if (entry_index_end >= entry_index_start)
+                {
+                    // 计算需要几个块（向上取整）
+                    int totalCount = entry_index_end - entry_index_start + 1;
+                    int groupSize = BAC_READ_OUTPUT_GROUP_NUMBER;
+                    int read_output_group = (totalCount + groupSize - 1) / groupSize;
+
+                    for (int i = 0; i < read_output_group; ++i)
+                    {
+                        int temp_start = entry_index_start + i * groupSize;
+                        if (temp_start > entry_index_end) // 防止越界
+                            break;
+
+                        int temp_end = temp_start + groupSize - 1;
+                        if (temp_end > entry_index_end)
+                            temp_end = entry_index_end;
+
+                        // 再次确保不超过全局最大点数
+                        if (temp_start >= BAC_OUTPUT_ITEM_COUNT)
+                            break;
+                        if (temp_end >= BAC_OUTPUT_ITEM_COUNT)
+                            temp_end = BAC_OUTPUT_ITEM_COUNT - 1;
+
+                        // 示例：对每个块进行阻塞读取
+                        if (GetPrivateDataSaveSPBlocking(entry_objectinstance, READOUTPUT_T3000,
+                            (uint8_t)temp_start, (uint8_t)temp_end, sizeof(Str_out_point), 4) > 0)
+                        {
+                            // 将读取到的临时数据复制到全局缓存
+                            for (int idx = temp_start; idx <= temp_end; ++idx)
+                            {
+                                if (idx < BAC_OUTPUT_ITEM_COUNT) {
+                                    g_Output_data[temp_panel_id].at(idx) = s_Output_data[idx];
+                                }
+                            }
+                            if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+                            {
+                                int elementCount = temp_end - temp_start + 1; // 本块实际元素个数
+                                // 调试输出（可选）
+                                CString dbg;
+                                dbg.Format(_T("obj=%d,output ,Chunk %d: temp_start=%d, temp_end=%d, count=%d\r\n"), entry_objectinstance, i, temp_start, temp_end, elementCount);
+                                DFTrace(dbg);
+                            }
+                            Sleep(SEND_COMMAND_DELAY_TIME);
+                        }
+                        else
+                        {
+                            continue;
+                        }
+
+                        int npanel_id = temp_panel_id;
+                        for (int i = temp_start; i < temp_end; i++)
+                        {
+                            int output_idx = i;
+ point_idx++;
+                        }
+                    } // for groups
+                }
+                break;
+            }
+            case BAC_VAR:
+            {
+                if (entry_index_end >= entry_index_start)
+                {
+                    // 计算需要几个块（向上取整）
+                    int totalCount = entry_index_end - entry_index_start + 1;
+                    int groupSize = BAC_READ_VARIABLE_GROUP_NUMBER;
+                    int read_variable_group = (totalCount + groupSize - 1) / groupSize;
+
+                    for (int i = 0; i < read_variable_group; ++i)
+                    {
+                        int temp_start = entry_index_start + i * groupSize;
+                        if (temp_start > entry_index_end) // 防止越界
+                            break;
+
+                        int temp_end = temp_start + groupSize - 1;
+                        if (temp_end > entry_index_end)
+                            temp_end = entry_index_end;
+
+                        // 再次确保不超过全局最大点数
+                        if (temp_start >= BAC_VARIABLE_ITEM_COUNT)
+                            break;
+                        if (temp_end >= BAC_VARIABLE_ITEM_COUNT)
+                            temp_end = BAC_VARIABLE_ITEM_COUNT - 1;
+
+                        // 示例：对每个块进行阻塞读取
+                        if (GetPrivateDataSaveSPBlocking(entry_objectinstance, READVARIABLE_T3000,
+                            (uint8_t)temp_start, (uint8_t)temp_end, sizeof(Str_variable_point), 4) > 0)
+                        {
+                            // 将读取到的临时数据复制到全局缓存
+                            for (int idx = temp_start; idx <= temp_end; ++idx)
+                            {
+                                if (idx < BAC_VARIABLE_ITEM_COUNT) {
+                                    g_Variable_data[temp_panel_id].at(idx) = s_Variable_data[idx];
+                                }
+                            }
+                            if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+                            {
+                                int elementCount = temp_end - temp_start + 1; // 本块实际元素个数
+                                // 调试输出（可选）
+                                CString dbg;
+                                dbg.Format(_T("obj=%d,variable ,Chunk %d: temp_start=%d, temp_end=%d, count=%d\r\n"), entry_objectinstance, i, temp_start, temp_end, elementCount);
+                                DFTrace(dbg);
+                            }
+                            Sleep(SEND_COMMAND_DELAY_TIME);
+                        }
+                        else
+                        {
+
+                            continue;
+                        }
+
+                        int npanel_id = temp_panel_id;
+                        for (int i = temp_start; i < temp_end; i++)
+                        {
+                            int var_idx = i;point_idx++;
+                        }
+                    } // for groups
+                }
+                break;
+            }
+            default:
+                break;
+            }
+
+}
+#endif
 #include "BacnetSettingAdvParameter.h"
 void CBacnetSettingBasicInfo::OnBnClickedButton1()
 {
+#if 0
+    test1();
+    return;
+#endif
+#if 0
+    int entry_index_end = 45;
+    int entry_index_start = 13;
+    if (entry_index_end < entry_index_start)
+    {
+        // 无效范围，直接跳过
+    }
+    else {
+        // 计算需要几个块（向上取整）
+        int totalCount = entry_index_end - entry_index_start + 1;
+        int groupSize = BAC_READ_INPUT_GROUP_NUMBER;
+        int read_input_group = (totalCount + groupSize - 1) / groupSize;
+
+        for (int i = 0; i < read_input_group; ++i)
+        {
+            int temp_start = entry_index_start + i * groupSize;
+            if (temp_start > entry_index_end) // 防止越界
+                break;
+
+            int temp_end = temp_start + groupSize - 1;
+            if (temp_end > entry_index_end)
+                temp_end = entry_index_end;
+
+            // 再次确保不超过全局最大点数
+            if (temp_start >= BAC_INPUT_ITEM_COUNT)
+                break;
+            if (temp_end >= BAC_INPUT_ITEM_COUNT)
+                temp_end = BAC_INPUT_ITEM_COUNT - 1;
+
+            int elementCount = temp_end - temp_start + 1; // 本块实际元素个数
+
+            // 调试输出（可选）
+            CString dbg;
+            dbg.Format(_T("Chunk %d: temp_start=%d, temp_end=%d, count=%d\r\n"), i, temp_start, temp_end, elementCount);
+            TRACE(dbg);
+
+        } // for groups
+    }
+#endif
+
     // TODO: 在此添加控件通知处理程序代码
     BacnetSettingAdvParameter dlg;
     dlg.DoModal();

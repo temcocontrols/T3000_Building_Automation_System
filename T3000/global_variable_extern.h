@@ -1045,9 +1045,9 @@ extern vector < vector<Str_MSV> >					    g_msv_data;
 extern byte	gp_DayState[256][8][ANNUAL_CODE_SIZE];
 extern byte	g_DayState[8][ANNUAL_CODE_SIZE]; 
 
-extern Str_in_point t_Input_data ; //用来取单位
-extern Str_out_point t_Output_data;
-extern Str_variable_point t_Variable_data;
+//extern Str_in_point t_Input_data ; //用来取单位
+//extern Str_out_point t_Output_data;
+//extern Str_variable_point t_Variable_data;
 extern Str_in_point s_Input_data[256];
 extern Str_out_point s_Output_data[256];
 extern Str_variable_point s_Variable_data[256];
