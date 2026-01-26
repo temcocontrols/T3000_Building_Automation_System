@@ -75,7 +75,7 @@ jobs:
       - name: Build the installer
         uses: caphyon/advinst-github-action@main
         with:
-          advinst-version: "20.9"
+          advinst-version: "21.4"
           advinst-enable-automation: "true"
           aip-path: ${{ github.workspace }}\T3000.aip
           aip-build-name: DefaultBuild
