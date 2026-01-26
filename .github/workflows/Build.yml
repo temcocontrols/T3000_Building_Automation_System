@@ -133,28 +133,52 @@ jobs:
             SetProductCode -langid 1033
             SetVersion ${{ steps.iversion.outputs.iversion }}
 
-      - name: Upload unsigned MSI for signing
-        uses: actions/upload-artifact@v4
-        with:
-          name: unsigned-msi
-          path: setup/T3000-setup.msi
-
       - name: Sign the MSI installer with SignPath
-        uses: signpath/github-action-submit-signing-request@v1
-        with:
-          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
-          organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
-          project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
-          signing-policy-slug: ${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}
-          github-artifact-id: unsigned-msi
-          wait-for-completion: true
-          output-artifact-directory: setup/signed
+        shell: pwsh
+        run: |
+          $file = Get-Item "setup/T3000-setup.msi"
+          Write-Host "Signing: $($file.FullName)"
+
+          # Submit to SignPath
+          $response = Invoke-RestMethod `
+            -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests" `
+            -Method POST `
+            -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
+            -Form @{
+              "Artifact" = $file
+              "ProjectSlug" = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
+              "SigningPolicySlug" = "${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}"
+            }
+
+          $signingRequestId = $response.SigningRequestId
+          Write-Host "Signing request ID: $signingRequestId"
+
+          # Wait for signing to complete
+          do {
+            Start-Sleep -Seconds 10
+            $status = Invoke-RestMethod `
+              -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
+              -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
+            Write-Host "Status: $($status.Status)"
+          } while ($status.Status -eq "Processing" -or $status.Status -eq "Submitted")
+
+          if ($status.Status -eq "Completed") {
+            # Download signed file
+            Invoke-RestMethod `
+              -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId/SignedArtifact" `
+              -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
+              -OutFile "setup/T3000-setup.msi"
+            Write-Host "Successfully signed MSI installer"
+          } else {
+            Write-Error "Signing failed: $($status.Status)"
+            exit 1
+          }
 
       - name: Upload the signed installer to artifacts
         uses: actions/upload-artifact@v4
         with:
           name: T3000-setup
-          path: setup/signed/T3000-setup.msi
+          path: setup/T3000-setup.msi
 
       - name: Prepare & zip the update files
         run: |
