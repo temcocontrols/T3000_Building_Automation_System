@@ -75,14 +75,22 @@ jobs:
             $signingRequestId = $response.SigningRequestId
             Write-Host "Signing request ID: $signingRequestId"
 
-            # Wait for signing to complete
+            # Wait for signing to complete (max 10 minutes)
+            $maxWaitSeconds = 600
+            $elapsedSeconds = 0
             do {
               Start-Sleep -Seconds 10
+              $elapsedSeconds += 10
               $status = Invoke-RestMethod `
                 -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
                 -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
-              Write-Host "Status: $($status.Status)"
-            } while ($status.Status -eq "Processing" -or $status.Status -eq "Submitted")
+              Write-Host "Status: $($status.Status) (elapsed: $elapsedSeconds seconds)"
+
+              if ($elapsedSeconds -ge $maxWaitSeconds) {
+                Write-Error "Timeout waiting for signing to complete for $($file.Name)"
+                exit 1
+              }
+            } while ($status.Status -eq "Processing" -or $status.Status -eq "Submitted" -or $status.Status -eq "InProgress")
 
             if ($status.Status -eq "Completed") {
               # Download signed file
@@ -153,14 +161,22 @@ jobs:
           $signingRequestId = $response.SigningRequestId
           Write-Host "Signing request ID: $signingRequestId"
 
-          # Wait for signing to complete
+          # Wait for signing to complete (max 10 minutes)
+          $maxWaitSeconds = 600
+          $elapsedSeconds = 0
           do {
             Start-Sleep -Seconds 10
+            $elapsedSeconds += 10
             $status = Invoke-RestMethod `
               -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
               -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
-            Write-Host "Status: $($status.Status)"
-          } while ($status.Status -eq "Processing" -or $status.Status -eq "Submitted")
+            Write-Host "Status: $($status.Status) (elapsed: $elapsedSeconds seconds)"
+
+            if ($elapsedSeconds -ge $maxWaitSeconds) {
+              Write-Error "Timeout waiting for MSI signing to complete"
+              exit 1
+            }
+          } while ($status.Status -eq "Processing" -or $status.Status -eq "Submitted" -or $status.Status -eq "InProgress")
 
           if ($status.Status -eq "Completed") {
             # Download signed file
