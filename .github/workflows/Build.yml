@@ -52,6 +52,51 @@ jobs:
         run: |
           msbuild "T3000 - VS2019.sln" /p:Platform=x86 /p:Configuration=Release /p:ProjectVersion=${{ steps.version.outputs.version }}
 
+      - name: Sign all executables and DLLs with SignPath
+        shell: pwsh
+        run: |
+          # Find all .exe and .dll files in the release output
+          $filesToSign = Get-ChildItem -Path "T3000 Output\release\" -Include *.exe,*.dll -Recurse -File
+
+          foreach ($file in $filesToSign) {
+            Write-Host "Signing: $($file.FullName)"
+
+            # Submit to SignPath
+            $response = Invoke-RestMethod `
+              -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests" `
+              -Method POST `
+              -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
+              -Form @{
+                "Artifact" = $file
+                "ProjectSlug" = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
+                "SigningPolicySlug" = "${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}"
+              }
+
+            $signingRequestId = $response.SigningRequestId
+            Write-Host "Signing request ID: $signingRequestId"
+
+            # Wait for signing to complete
+            do {
+              Start-Sleep -Seconds 10
+              $status = Invoke-RestMethod `
+                -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
+                -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
+              Write-Host "Status: $($status.Status)"
+            } while ($status.Status -eq "Processing" -or $status.Status -eq "Submitted")
+
+            if ($status.Status -eq "Completed") {
+              # Download signed file
+              Invoke-RestMethod `
+                -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId/SignedArtifact" `
+                -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
+                -OutFile $file.FullName
+              Write-Host "Successfully signed: $($file.Name)"
+            } else {
+              Write-Error "Signing failed for $($file.Name): $($status.Status)"
+              exit 1
+            }
+          }
+
       - name: Clean & Orgenize Files
         continue-on-error: true
         run: |
@@ -75,7 +120,7 @@ jobs:
       - name: Build the installer
         uses: caphyon/advinst-github-action@main
         with:
-          advinst-version: "20.9"
+          advinst-version: "21.4"
           advinst-enable-automation: "true"
           aip-path: ${{ github.workspace }}\T3000.aip
           aip-build-name: DefaultBuild
@@ -87,6 +132,17 @@ jobs:
             AddFolder "APPDIR" ".\T3000InstallShield\Psychrometry"
             SetProductCode -langid 1033
             SetVersion ${{ steps.iversion.outputs.iversion }}
+
+      - name: Sign the MSI installer with SignPath
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}
+          input-artifact-path: 'setup/T3000-setup.msi'
+          output-artifact-path: 'setup/T3000-setup.msi'
+          wait-for-completion: true
 
       - name: Upload the installer to artifacts
         uses: actions/upload-artifact@v4
