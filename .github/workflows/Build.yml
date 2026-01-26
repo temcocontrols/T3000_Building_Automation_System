@@ -133,6 +133,12 @@ jobs:
             SetProductCode -langid 1033
             SetVersion ${{ steps.iversion.outputs.iversion }}
 
+      - name: Upload unsigned MSI for signing
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-msi
+          path: setup/T3000-setup.msi
+
       - name: Sign the MSI installer with SignPath
         uses: signpath/github-action-submit-signing-request@v1
         with:
@@ -140,15 +146,15 @@ jobs:
           organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
           project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
           signing-policy-slug: ${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}
-          input-artifact-path: 'setup/T3000-setup.msi'
-          output-artifact-path: 'setup/T3000-setup.msi'
+          github-artifact-id: unsigned-msi
           wait-for-completion: true
+          output-artifact-directory: setup/signed
 
-      - name: Upload the installer to artifacts
+      - name: Upload the signed installer to artifacts
         uses: actions/upload-artifact@v4
         with:
           name: T3000-setup
-          path: setup/T3000-setup.msi
+          path: setup/signed/T3000-setup.msi
 
       - name: Prepare & zip the update files
         run: |
