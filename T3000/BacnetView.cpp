@@ -957,7 +957,7 @@ Update by Fance
 #include "BacnetScreenEdit.h"
 #include "BacnetRemotePoint.h"
 #include "ShowMessageDlg.h"
-
+#include "BacnetPVar.h"
 #include "ControlBasicEditorView.h"
 
 int g_gloab_bac_comport = 1;
@@ -972,6 +972,7 @@ CBacnetProgram *Program_Window =NULL;
 CBacnetInput *Input_Window = NULL;
 CBacnetOutput *Output_Window = NULL;
 CBacnetVariable *Variable_Window = NULL;
+CBacnetPvar* Pvar_Window = NULL;
 CBacnetArray* Array_Window = NULL;
 BacnetWeeklyRoutine *WeeklyRoutine_Window = NULL;
 BacnetAnnualRoutine *AnnualRoutine_Window = NULL;
@@ -1040,6 +1041,7 @@ extern vector <int>  m_Annual_data_instance;
 // int m_Input_data_length;
 extern void  init_info_table( void );
 extern void Init_table_bank();
+extern unsigned char product_menu[255][20];
 void intial_bip_socket();
 CShowMessageDlg * ShowMessageDlg = NULL;
 IMPLEMENT_DYNCREATE(CDialogCM5_BacNet, CFormView)
@@ -2137,6 +2139,8 @@ void CDialogCM5_BacNet::Tab_Initial()
 	m_bac_main_tab.InsertItem(WINDOW_SETTING, _T("Setting   "));
 	m_bac_main_tab.InsertItem(12, _T("Remote Point   "));
 	m_bac_main_tab.InsertItem(13, _T("Array"));
+	m_bac_main_tab.InsertItem(14, _T("PVar"));
+
 
 	pDialog[WINDOW_INPUT] = Input_Window = new CBacnetInput;
 	pDialog[WINDOW_OUTPUT] =Output_Window = new CBacnetOutput;
@@ -2153,6 +2157,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_USER_LOGIN] =  User_Login_Window = new CBacnetUserlogin;
 	pDialog[WINDOW_REMOTE_POINT] =  Remote_Point_Window = new CBacnetRemotePoint;
 	pDialog[WINDOW_ARRAY] = Array_Window = new CBacnetArray;
+	pDialog[WINDOW_PVAR] = Pvar_Window = new CBacnetPvar;
 	//创建两个对话框;
 #if 0
 	Input_Window->Create(IDD_DIALOG_BACNET_INPUT, &m_bac_main_tab);
@@ -2185,6 +2190,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	Tstat_Window->Create(IDD_DIALOG_BACNET_TSTAT,this);
 	Setting_Window->Create(IDD_DIALOG_BACNET_SETTING,this);
 	Array_Window->Create(IDD_DIALOG_BACNET_ARRAY, this);
+	Pvar_Window->Create(IDD_DIALOG_BACNET_PVAR, this);
 #endif
 	//设定在Tab内显示的范围;
 	CRect rc;
@@ -2225,6 +2231,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_USER_LOGIN]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_REMOTE_POINT]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_ARRAY]->ShowWindow(SW_HIDE);
+	pDialog[WINDOW_PVAR]->ShowWindow(SW_HIDE);
     g_hwnd_now = m_input_dlg_hwnd;
 	//Input_Window->m_input_list.SetFocus(); 暂时屏蔽 避免焦点切换导致无法F2变更名字;
 
@@ -3799,6 +3806,8 @@ void CDialogCM5_BacNet::Fresh()
 					bacnet_device_type = T3_ESP_RMC;
 				else if (ret == T3_NG2_TYPE2)
 					bacnet_device_type = T3_NG2_TYPE2;
+				else if (ret == T3_3IIC)
+					bacnet_device_type = T3_3IIC;
 				else
 					bacnet_device_type = PRODUCT_CM5;
 			}
@@ -5379,6 +5388,32 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		}
 	}
 
+	for (int i = 0; i < BAC_PVAR_GROUP; i++)
+	{
+		if ((bac_read_which_list == BAC_READ_PVAR_LIST) || (bac_read_which_list == BAC_READ_ALL_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_IN_OUT_VAR_LIST))
+		{
+			end_temp_instance = BAC_READ_VARIABLE_REMAINDER + (BAC_READ_VARIABLE_GROUP_NUMBER)*i;
+			if (end_temp_instance >= BAC_PVAR_ITEM_COUNT)
+				end_temp_instance = BAC_PVAR_ITEM_COUNT - 1;
+			CString temp_cs;
+			temp_cs.Format(_T("Read Pvar List Item From %d to %d "), BAC_READ_VARIABLE_GROUP_NUMBER * i, end_temp_instance);
+			if (GetPrivateData_Blocking(g_bac_instance, READ_PVARIABLE_T3000, BAC_READ_VARIABLE_GROUP_NUMBER * i, end_temp_instance, sizeof(Str_variable_point)) > 0)
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
+			}
+			else
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" timeout!"));
+			}
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		}
+		if (bac_read_which_list == BAC_READ_VARIABLE_LIST)
+		{
+			g_progress_persent = (i + 1) * 100 / BAC_PVAR_GROUP;
+		}
+	}
+
+
 	for (int i=0;i<BAC_PROGRAM_GROUP;i++)
 	{
 		if((bac_read_which_list == BAC_READ_PROGRAM_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST) || (bac_read_which_list ==TYPE_SVAE_CONFIG))
@@ -5911,6 +5946,19 @@ void CDialogCM5_BacNet::Read_Setting_Info_Progress(int retry_count)
 			}
 			if (is_connected)
 			{
+				if ((((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 664) &&
+					(g_selected_product_id == PM_ESP32_T3_SERIES))
+				{
+					enable_pvar = true;
+					unsigned char  temp[20] = { 1,1,1,1,  1,1,1,1,  1,1,1,1,   1,1,1,1  ,1,0,0,0 };
+					memcpy(product_menu[PM_ESP32_T3_SERIES], temp, 20);
+				}
+				else
+				{
+					enable_pvar = false;
+					unsigned char  temp[20] = { 1,1,1,1,  1,1,1,1,  1,1,1,1,   1,1,1,1  ,0,0,0,0 };
+					memcpy(product_menu[PM_ESP32_T3_SERIES], temp, 20);
+				}
 				Initial_Some_UI(LOGIN_SUCCESS_FULL_ACCESS);
 				KillTimer(BAC_READ_SETTING_TIMER);
 				return;

@@ -80,7 +80,7 @@ typedef enum {
          READ_EMAIL_ALARM          = 43,
 		 READ_JSON_SCREEN          = 86,
 		 READ_JSON_ITEM            = 87, 
-         READ_NEW_TIME_COMMAND = 88,           /* read new time            */  //2018 04 17 新的读时间命令
+		 READ_PVARIABLE_T3000		= 88,           /* read Pvariables         */
          READMONITORPACKAGE_T3000 = 89,           /* read monitor belong to which package   */
          READ_AT_COMMAND = 90,	//450 length
          READ_GRPHIC_LABEL_COMMAND = 91,
@@ -139,7 +139,7 @@ typedef enum {
          WRITE_EMAIL_ALARM           = 143,
 		 WRITE_JSON_SCREEN			= 186,
 		 WRITE_JSON_ITEM			= 187,
-         WRITE_NEW_TIME_COMMAND     = 188,  //2018 04 17 新的写时间命令
+		 WRITE_PVARIABLE_T3000		= 188,           /* read Pvariables         */
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
          WRITE_BACNET_TO_MODBUS_COMMAND = 194,

@@ -62,6 +62,7 @@
 #define MAX_OUTS		 128
 #define MAX_INS		   128
 #define MAX_VARS		 128
+#define MAX_PVAR		 48
 #define MAX_PIDS		  48
 #define MAX_SCHS		16
 #define MAX_HOLS		8

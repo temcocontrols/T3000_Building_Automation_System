@@ -494,6 +494,7 @@ public:
 	afx_msg void OnControlVariables();
 	afx_msg void OnControlWeekly();
 	afx_msg void OnControlRefresh();
+	afx_msg void OnControlPvar();
 	afx_msg void OnControlAnnualroutines();
 	afx_msg void OnMiscellaneousLoaddescriptors();
 	afx_msg void OnMiscellaneousUpdatemini();
@@ -566,6 +567,7 @@ public:
 	void GetProductFirmwareFTPDirectory(int ProductModel,CString &FtpPath,CString &ProductFileName);
 	afx_msg void OnToolDetectonlineproducts();
 	afx_msg void OnControlSettings();
+	afx_msg void OnUpdateControlPvar(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateControlMain(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateControlInputs(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateControlOutputs(CCmdUI *pCmdUI);

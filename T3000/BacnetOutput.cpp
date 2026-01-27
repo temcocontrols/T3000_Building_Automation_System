@@ -689,6 +689,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 			bacnet_device_type == T3_OEM_12I ||
 			bacnet_device_type == T3_ESP_RMC ||
 			bacnet_device_type == T3_NG2_TYPE2 ||
+			bacnet_device_type == T3_3IIC ||
 			bacnet_device_type == BIG_MINIPANEL ||
 			bacnet_device_type == MINIPANELARM ||
 			bacnet_device_type == MINIPANELARM_LB ||

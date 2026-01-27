@@ -292,6 +292,13 @@ void CBacnetInput::Reload_Unit_Type()
 		else
 			initial_count = NG2_TYPE2_IN_A;
 	}
+	else if (bacnet_device_type == T3_3IIC)
+	{
+		if (T3_3IIC_IN_A > (int)m_Input_data.size())
+			initial_count = (int)m_Input_data.size();
+		else
+			initial_count = T3_3IIC_IN_A;
+	}
 
 }
 

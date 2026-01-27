@@ -1,1 +1,0 @@
-import{q as e,s as i,G as t,v as r}from"./App.2c62e2d1.js";const a=t=>(e(r),i({groupper:{tabbability:o(null==t?void 0:t.tabBehavior)},focusable:{ignoreKeydown:null==t?void 0:t.ignoreDefaultKeydown}})),o=e=>{switch(e){case"unlimited":return t.Unlimited;case"limited":return t.Limited;case"limited-trap-focus":return t.LimitedTrapFocus;default:return}};export{a as u};

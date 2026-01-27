@@ -990,6 +990,7 @@ extern HWND      m_output_dlg_hwnd;
 extern HWND      m_pragram_dlg_hwnd;
 extern HWND      m_program_edit_hwnd;
 extern HWND      m_variable_dlg_hwnd;
+extern HWND      m_pvar_dlg_hwnd;
 extern HWND      m_array_dlg_hwnd;
 extern HWND      m_weekly_dlg_hwnd;
 extern HWND      m_annual_dlg_hwnd;
@@ -1025,6 +1026,7 @@ extern vector < vector<Str_out_point> >			        g_Output_data; //全局所有panel
 extern vector < vector<Str_in_point> >				    g_Input_data; //全局所有panel input 的集合体;
 extern vector < vector<Str_program_point> >		        g_Program_data;
 extern vector < vector<Str_variable_point> >		    g_Variable_data;
+extern vector < vector<Str_variable_point> >		    g_pvar_data;
 extern vector < vector<Str_weekly_routine_point> >      g_Weekly_data;
 extern vector < vector<Str_annual_routine_point> >      g_Annual_data;
 extern vector < vector<Str_schedual_time_point> >       g_Schedual_Time_data;
@@ -1045,18 +1047,17 @@ extern vector < vector<Str_MSV> >					    g_msv_data;
 extern byte	gp_DayState[256][8][ANNUAL_CODE_SIZE];
 extern byte	g_DayState[8][ANNUAL_CODE_SIZE]; 
 
-//extern Str_in_point t_Input_data ; //用来取单位
-//extern Str_out_point t_Output_data;
-//extern Str_variable_point t_Variable_data;
+
 extern Str_in_point s_Input_data[256];
 extern Str_out_point s_Output_data[256];
 extern Str_variable_point s_Variable_data[256];
-extern Str_controller_point s_controller_data;
-extern Str_program_point  s_Program_data;
+extern Str_variable_point s_pvar_data[128];
+extern Str_controller_point s_controller_data[16];
+extern Str_program_point  s_Program_data[16];
 extern Str_array_point s_Array_data;
-extern Str_weekly_routine_point s_Weekly_data;
-extern Str_annual_routine_point s_Annual_data;
-extern Control_group_point s_screen_data;
+extern Str_weekly_routine_point s_Weekly_data[8];
+extern Str_annual_routine_point s_Annual_data[4];
+extern Control_group_point s_screen_data[16];
 extern Str_monitor_point s_monitor_data;
 extern Str_t3_screen_Json s_json_screen_data;
 extern str_webview_logging_time g_logging_time[256];
@@ -1067,6 +1068,7 @@ extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
 extern vector <Str_array_point> m_Array_data;
 extern vector <Str_variable_point>  m_Variable_data;
+extern vector <Str_variable_point>  m_pvar_data;			    
 extern vector <Str_weekly_routine_point> m_Weekly_data;
 extern vector <Str_annual_routine_point> m_Annual_data;
 extern vector <Str_schedual_time_point> m_Schedual_Time_data;
@@ -1257,6 +1259,7 @@ extern int screen_item_limit_count ;
 extern Str_out_point m_temp_output_data[BAC_OUTPUT_ITEM_COUNT];
 extern Str_in_point m_temp_Input_data[BAC_INPUT_ITEM_COUNT];
 extern Str_variable_point m_temp_variable_data[BAC_VARIABLE_ITEM_COUNT];
+extern Str_variable_point m_temp_pvar_data[BAC_PVAR_ITEM_COUNT];
 extern Str_program_point m_temp_program_data[BAC_PROGRAM_ITEM_COUNT];
 extern Str_array_point m_temp_array_data[BAC_ARRAY_ITEM_COUNT];
 extern Str_controller_point m_temp_controller_data[BAC_PID_COUNT];
@@ -1382,5 +1385,6 @@ extern unsigned int DYNAMIC_INPUT_ITEM_COUNT ;
 extern unsigned int DYNAMIC_OUTPUT_ITEM_COUNT ;
 extern unsigned int DYNAMIC_VARIABLE_ITEM_COUNT ;
 extern bool enable_trendlog_background_read ; //是否启用trendlog 后台读取功能;
+extern bool enable_pvar ; // 固件高于66.4 的eps 才有这个功能
 
 

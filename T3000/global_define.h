@@ -314,6 +314,7 @@ const int TYPE_READ_CUSTOMER_UNIT = 18;
 const int TYPE_READ_USER_LOGIN_INFO = 19;
 const int TYPE_READ_GRAPHIC_LABEL_INFO = 20;
 const int TYPE_READ_REMOTE_POINT_INFO = 21;
+const int TYPE_PVAR = 22;
 
 const int TYPE_TSTAT_MAIN_INFOR = 22;
 const int TYPE_PANEL = 23;
@@ -352,6 +353,7 @@ const int BAC_READ_CUSTOMER_UNITS = 18;
 const int BAC_READ_USER_LOGIN_INFO = 19;
 const int BAC_READ_GRAPHIC_LABEL_INFO = 20;
 const int BAC_READ_REMOTE_POINT_INFO = 21;
+const int BAC_READ_PVAR_LIST = 22;
 const int BAC_READ_ARRAY_ITEM = 24;
 
 
@@ -439,6 +441,7 @@ const int BAC_ALALOG_CUSTMER_RANGE_TABLE_REMAINDER = BAC_ALALOG_CUSTMER_RANGE_TA
 const int BAC_INPUT_ITEM_COUNT = 64;	//sizeof(Str_in_point);					//46
 const int BAC_OUTPUT_ITEM_COUNT = 64;	//sizeof(Str_out_point);					//45
 const int BAC_VARIABLE_ITEM_COUNT = 128; // sizeof(Str_variable_point);			//39
+const int BAC_PVAR_ITEM_COUNT = 48; // sizeof(Str_variable_point);			//39
 const int BAC_PROGRAM_ITEM_COUNT = 16;	//sizeof(Str_program_point);				//37
 const int BAC_PROGRAMCODE_ITEM_COUNT = 16;
 const int BAC_ARRAY_ITEM_COUNT = 16;
@@ -476,6 +479,7 @@ const int BAC_TSTAT_SCHEDULE = 240;
 const int BAC_INPUT_GROUP = (BAC_INPUT_ITEM_COUNT + BAC_READ_INPUT_GROUP_NUMBER - 1) / BAC_READ_INPUT_GROUP_NUMBER;
 const int BAC_OUTPUT_GROUP = (BAC_OUTPUT_ITEM_COUNT + BAC_READ_OUTPUT_GROUP_NUMBER - 1) / BAC_READ_OUTPUT_GROUP_NUMBER;
 const int BAC_VARIABLE_GROUP = (BAC_VARIABLE_ITEM_COUNT + BAC_READ_VARIABLE_GROUP_NUMBER - 1) / BAC_READ_VARIABLE_GROUP_NUMBER;
+const int BAC_PVAR_GROUP = (BAC_PVAR_ITEM_COUNT + BAC_READ_VARIABLE_GROUP_NUMBER - 1) / BAC_READ_VARIABLE_GROUP_NUMBER;
 
 const int BAC_PROGRAM_GROUP = (BAC_PROGRAM_ITEM_COUNT + BAC_READ_PROGRAM_GROUP_NUMBER - 1) / BAC_READ_PROGRAM_GROUP_NUMBER;
 const int BAC_PROGRAMCODE_GROUP = BAC_PROGRAMCODE_ITEM_COUNT;
@@ -1274,7 +1278,7 @@ struct _Graphic_Value_Info
 
 
 
-const int WINDOW_TAB_COUNT = 15; //多少个Window 嵌入在TAB里面;
+const int WINDOW_TAB_COUNT = 16; //多少个Window 嵌入在TAB里面;
 const int WINDOW_INPUT = 0;
 const int WINDOW_OUTPUT = 1;
 const int WINDOW_VARIABLE = 2;
@@ -1290,6 +1294,7 @@ const int WINDOW_SETTING = 11;
 const int WINDOW_USER_LOGIN = 12;
 const int WINDOW_REMOTE_POINT = 13;
 const int WINDOW_ARRAY = 14;
+const int WINDOW_PVAR = 15;
 
 
 
@@ -1320,7 +1325,7 @@ typedef enum
 	T3_ESP_RMC = 19,  //1-16 input 17-18 sensor    Output1-7DO
 	T3_ESP_LW = 21,  //0 input   ,   6  output
 	T3_NG2_TYPE2 = 22,
-	T3_SENSOR = 26,  //6合1 的传感器 esp 产品 啥也没加
+	T3_3IIC = 26,  //6合1 的传感器 esp 产品 啥也没加
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1394,6 +1399,11 @@ const int NG2_TYPE2_IN_A = 30;
 const int NG2_TYPE2_IN_D = 0;
 const int NG2_TYPE2_OUT_A = 4;
 const int NG2_TYPE2_OUT_D = 8;
+
+const int T3_3IIC_IN_A = 10;
+const int T3_3IIC_IN_D = 0;
+const int T3_3IIC_OUT_A = 3;
+const int T3_3IIC_OUT_D = 0;
 
 const int T3_ESP_LW_IN_A = 0;
 const int T3_ESP_LW_IN_D = 0;
@@ -2472,6 +2482,7 @@ const int MENU_NETWORK_POINT = 12;
 const int MENU_SETTING = 13;
 const int MENU_SCAN = 14;
 const int MENU_BUILDING = 15;
+const int MENU_PVAR = 16;
 
 const int READ_MODE_NORMAL = 0;
 const int READ_MODE_SIMPLIFICATION = 1;

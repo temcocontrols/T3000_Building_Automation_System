@@ -60,13 +60,15 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</EmbedManifest>
     <TargetName Condition="'$(AppOutputName)' != ''">$(AppOutputName)</TargetName>
-    <TargetName Condition="'$(AppOutputName)' == ''">$(ProjectName)</TargetName> <!-- Fallback -->
+    <TargetName Condition="'$(AppOutputName)' == ''">$(ProjectName)</TargetName>
+    <!-- Fallback -->
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\T3000 object\Release\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</EmbedManifest>
     <TargetName Condition="'$(AppOutputName)' != ''">$(AppOutputName)</TargetName>
-    <TargetName Condition="'$(AppOutputName)' == ''">$(ProjectName)</TargetName> <!-- Fallback -->
+    <TargetName Condition="'$(AppOutputName)' == ''">$(ProjectName)</TargetName>
+    <!-- Fallback -->
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(IncludePath)</IncludePath>
@@ -193,6 +195,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClCompile Include="BacnetProgramEdit.cpp" />
     <ClCompile Include="BacnetProgramSetting.cpp" />
     <ClCompile Include="BacnetProperty.cpp" />
+    <ClCompile Include="BacnetPvar.cpp" />
     <ClCompile Include="BacnetRange.cpp" />
     <ClCompile Include="BacnetRegisterListView.cpp" />
     <ClCompile Include="BacnetRemotePoint.cpp" />

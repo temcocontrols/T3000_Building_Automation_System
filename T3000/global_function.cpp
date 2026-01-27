@@ -1695,6 +1695,7 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 		entitysize = sizeof(Str_tstat_schedule);
 		break;
 	case WRITEVARIABLE_T3000:
+    case WRITE_PVARIABLE_T3000:
 		entitysize = sizeof(Str_variable_point);
 		break;
 	case  WRITEOUTPUT_T3000:
@@ -1901,6 +1902,20 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
             for (int i = 0; i < (end_instance - start_instance + 1); i++)
             {
                 memcpy_s(SendBuffer + i * sizeof(Str_variable_point) + HEADER_LENGTH, sizeof(Str_variable_point), &m_Variable_data.at(i + start_instance), sizeof(Str_variable_point));
+            }
+        }
+        else
+        {
+            memcpy_s(SendBuffer + HEADER_LENGTH, (end_instance - start_instance + 1) * sizeof(Str_variable_point), ext_data, (end_instance - start_instance + 1) * sizeof(Str_variable_point));
+        }
+
+        break;
+    case WRITE_PVARIABLE_T3000:
+        if (ext_data == NULL)
+        {
+            for (int i = 0; i < (end_instance - start_instance + 1); i++)
+            {
+                memcpy_s(SendBuffer + i * sizeof(Str_variable_point) + HEADER_LENGTH, sizeof(Str_variable_point), &m_pvar_data.at(i + start_instance), sizeof(Str_variable_point));
             }
         }
         else
@@ -3155,6 +3170,15 @@ bool Check_FullLabel_Exsit(LPCTSTR m_new_fulllabel)
         }
     }
 
+    for (int i = 0; i < BAC_PVAR_ITEM_COUNT; i++)
+    {
+        if (strcmp(cTemp1, (char*)m_pvar_data.at(i).description) == 0)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, new_string + _T(" already exist !"));
+            return true;
+        }
+    }
+
     for (int i=0; i<BAC_PROGRAM_ITEM_COUNT; i++)
     {
         if(strcmp(cTemp1,(char *)m_Program_data.at(i).description) == 0)
@@ -3233,6 +3257,15 @@ bool Check_Label_Exsit(LPCTSTR m_new_label)
         if(strcmp(cTemp1,(char *)m_Variable_data.at(i).label) == 0)
         {
             SetPaneString(BAC_SHOW_MISSION_RESULTS,new_string + _T(" already exist !"));
+            return true;
+        }
+    }
+
+    for (int i = 0; i < m_pvar_data.size(); i++)
+    {
+        if (strcmp(cTemp1, (char*)m_pvar_data.at(i).label) == 0)
+        {
+            SetPaneString(BAC_SHOW_MISSION_RESULTS, new_string + _T(" already exist !"));
             return true;
         }
     }
@@ -4165,6 +4198,52 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         return READINPUT_T3000;
     }
     break;
+    case READ_PVARIABLE_T3000:
+    {
+
+        if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_variable_point)) != 0)
+            return -1;	//得到的结构长度错误;
+
+        block_length = (len_value_type - PRIVATE_HEAD_LENGTH) / sizeof(Str_variable_point);
+        my_temp_point = bacnet_apud_point + 3;
+        start_instance = *my_temp_point;
+        my_temp_point++;
+        end_instance = *my_temp_point;
+        my_temp_point++;
+        my_temp_point = my_temp_point + 2;
+
+        if (end_instance == (BAC_PVAR_ITEM_COUNT - 1))
+            end_flag = true;
+        if (start_instance >= BAC_PVAR_ITEM_COUNT)
+            return -1;//超过长度了;
+
+        if (invoke_id == gsp_invoke)
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+
+                fill_in_variable(&s_pvar_data[i], my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_variable_point);
+            }
+        }
+        else
+        {
+            for (i = start_instance; i <= end_instance; i++)
+            {
+                if (i >= m_pvar_data.size())
+                {
+                    TRACE(_T("receive pvar out of range!"));
+                    break;
+                }
+                fill_in_variable(&m_pvar_data.at(i), my_temp_point);
+                my_temp_point = my_temp_point + sizeof(Str_variable_point);
+            }
+        }
+
+        return READ_PVARIABLE_T3000;
+
+    }
+        break;
     case READVARIABLE_T3000:
     {
         if ((len_value_type - PRIVATE_HEAD_LENGTH) % (sizeof(Str_variable_point)) != 0)
@@ -4330,7 +4409,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         {
             for (i = start_instance; i <= end_instance; i++)
             {
-                fill_in_sch(&s_Weekly_data, my_temp_point);
+                fill_in_sch(&s_Weekly_data[i], my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_weekly_routine_point);
             }
         }
@@ -4366,7 +4445,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         {
             for (i = start_instance; i <= end_instance; i++)
             {
-                fill_in_holiday(&s_Annual_data, my_temp_point);
+                fill_in_holiday(&s_Annual_data[i], my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_annual_routine_point);
             }
         }
@@ -4440,7 +4519,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         {
             for (i = start_instance; i <= end_instance; i++)
             {
-                fill_in_programs(&s_Program_data, my_temp_point);
+                fill_in_programs(&s_Program_data[i], my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_program_point);
             }
         }
@@ -4744,7 +4823,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         {
             for (i = start_instance; i <= end_instance; i++)
             {
-                fill_in_pids(&s_controller_data, my_temp_point);
+                fill_in_pids(&s_controller_data[i], my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_controller_point);
             }
         }
@@ -4784,7 +4863,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         {
             for (i = start_instance; i <= end_instance; i++)
             {
-                fill_in_screen(&s_screen_data, my_temp_point);
+                fill_in_screen(&s_screen_data[i], my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Control_group_point);
             }
         }
@@ -6951,6 +7030,14 @@ void local_handler_update_bacnet_ui(int receive_data_type, bool each_end_flag)
         break;
     case READPROGRAMCODE_T3000:
         break;
+    case READ_PVARIABLE_T3000:
+        if (each_end_flag)
+        {
+            if (pDialog[WINDOW_PVAR]->IsWindowVisible())
+                ::PostMessage(m_pvar_dlg_hwnd, WM_REFRESH_BAC_PVAR_LIST, NULL, NULL);
+        }
+        copy_data_to_ptrpanel(TYPE_PVAR);
+        break;
     case READVARIABLE_T3000:
         if (each_end_flag)
         {
@@ -7230,7 +7317,7 @@ void Inial_Product_Menu_map()
         case PM_MINIPANEL_ARM:
         case PM_ESP32_T3_SERIES:
         {
-            unsigned char  temp[20] = { 1,1,1,1,  1,1,1,1,  1,1,1,1,   1,1,1,1  ,0,0,0,0 };
+            unsigned char  temp[20] = { 1,1,1,1,  1,1,1,1,  1,1,1,1,   1,1,1,1  ,1,0,0,0 };
             memcpy(product_menu[i], temp, 20);
         }
             break;
@@ -11886,10 +11973,21 @@ void init_product_list()
 
     temp.cs_name = _T("T3-NG2-TYPE2");
     temp.ai_count = NG2_TYPE2_IN_A;
-    temp.bi_count = 0;
+    temp.bi_count = NG2_TYPE2_IN_D;
     temp.input_count = temp.ai_count + temp.bi_count;
-    temp.ao_count = NG2_TYPE2_IN_A;
+    temp.ao_count = NG2_TYPE2_OUT_A;
     temp.bo_count = NG2_TYPE2_OUT_D;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 88;
+    temp.sub_pid = T3_NG2_TYPE2;
+    m_product_iocount.push_back(temp);
+
+    temp.cs_name = _T("T3_3IIC");
+    temp.ai_count = T3_3IIC_IN_A;
+    temp.bi_count = T3_3IIC_IN_D;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = T3_3IIC_IN_A;
+    temp.bo_count = T3_3IIC_OUT_D;
     temp.output_count = temp.ao_count + temp.bo_count;
     temp.pid = 88;
     temp.sub_pid = T3_NG2_TYPE2;
@@ -16934,6 +17032,16 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
                 nret_type = OUTPUT_VIRTUAL_PORT;
         }
         break;
+        case T3_3IIC:
+        {
+            if (portindex <= T3_3IIC_OUT_D)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else if (portindex <= T3_3IIC_OUT_D + T3_3IIC_OUT_A)
+                nret_type = OUTPUT_ANALOG_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
         case T3_ESP_LW:
         {
             if (portindex <= T3_ESP_LW_OUT_D)
@@ -17166,6 +17274,21 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
             else
                 nret_type = INPUT_VIRTUAL_PORT;
         }
+        break;
+        case T3_3IIC:
+        {
+            if (portindex <= T3_3IIC_IN_A)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    nret_type = INPUT_DIGITAL_PORT;
+                else
+                    nret_type = INPUT_ANALOG_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+		}
+        break;
         default:
             break;
         }
@@ -17452,6 +17575,15 @@ void Initial_All_Point()
         m_Variable_data.push_back(temp_variable);
         m_Variable_data_instance.push_back(i);
     }
+    for (int i = 0; i < BAC_PVAR_ITEM_COUNT; i++)
+    {
+        Str_variable_point temp_variable = { 0 };
+        memset(&temp_variable, 0, sizeof(temp_variable));
+        sprintf((char*)temp_variable.description, "PVAR%d", i + 1);
+        m_pvar_data.push_back(temp_variable);
+        
+    }
+
     for (int i = 0; i < BAC_PROGRAM_ITEM_COUNT; i++)
     {
         Str_program_point temp_program = { 0 };

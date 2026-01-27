@@ -169,6 +169,7 @@ extern void Init_table_bank();
 #include "BacnetRemotePoint.h"
 #include "BacnetSetting.h"
 #include "BacnetWebView.h"
+#include "BacnetPVar.h"
 
 HANDLE h_create_webview_server_thread = NULL;
 HANDLE h_create_webview_client_thread = NULL;
@@ -178,6 +179,7 @@ extern CBacnetProgram *Program_Window;
 extern CBacnetInput *Input_Window ;
 extern CBacnetOutput *Output_Window ;
 extern CBacnetVariable *Variable_Window ;
+extern CBacnetPvar* Pvar_Window;
 extern BacnetWeeklyRoutine *WeeklyRoutine_Window ;
 extern BacnetAnnualRoutine *AnnualRoutine_Window ;
 extern BacnetController *Controller_Window ;
@@ -314,6 +316,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_CONTROL_VARIABLES, &CMainFrame::OnControlVariables)
     ON_COMMAND(ID_CONTROL_WEEKLY, &CMainFrame::OnControlWeekly)
     ON_COMMAND(ID_CONTROL_REFRESH, &CMainFrame::OnControlRefresh)
+    ON_COMMAND(ID_CONTROL_PVAR, &CMainFrame::OnControlPvar)
     ON_COMMAND(ID_CONTROL_ANNUALROUTINES, &CMainFrame::OnControlAnnualroutines)
     ON_COMMAND(ID_MISCELLANEOUS_LOADDESCRIPTORS, &CMainFrame::OnMiscellaneousLoaddescriptors)
     ON_COMMAND(ID_MISCELLANEOUS_UPDATEMINI, &CMainFrame::OnMiscellaneousUpdatemini)
@@ -346,6 +349,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_MISCELLANEOUS_GSMCONNECTION, &CMainFrame::OnMiscellaneousGsmconnection)
     ON_MESSAGE(WM_HTTPDOWNLOAD_THREAD_FINISHED, OnThreadFinished)
     ON_COMMAND(ID_CONTROL_SETTINGS, &CMainFrame::OnControlSettings)
+    ON_UPDATE_COMMAND_UI(ID_CONTROL_PVAR, &CMainFrame::OnUpdateControlPvar)
     ON_UPDATE_COMMAND_UI(ID_CONTROL_MAIN, &CMainFrame::OnUpdateControlMain)
     ON_UPDATE_COMMAND_UI(ID_CONTROL_INPUTS, &CMainFrame::OnUpdateControlInputs)
     ON_UPDATE_COMMAND_UI(ID_CONTROL_OUTPUTS, &CMainFrame::OnUpdateControlOutputs)
@@ -6904,7 +6908,7 @@ void CMainFrame::DoConnectToANode(const HTREEITEM& hTreeItem)
 	float flagsoftwareversion;
 	HTREEITEM hSelItem = hTreeItem;
 	int nCounts = m_product.size();
-
+    enable_pvar = false;
 	int nSelectID = -1;
 	UINT nSelectSerialNumber;
 	bac_gloab_panel = 0;
@@ -10842,17 +10846,25 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 						int temp_start_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
 						int temp_end_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
 
-						//将t_Output_data 复制到 g_Input_data[t_panel_num]中
-						if (temp_end_index < BAC_INPUT_ITEM_COUNT)
-						{
-							g_Input_data[My_read_Struct->npanel_id].at(temp_end_index) = s_Input_data[m_backbround_data.at(n_handle_index).str_info.npoint_number];
-						}
-						CString Mession_ret;
-						Mession_ret.Format(_T("GetPrivateDataSaveSPBlocking Read input from %d to %d success.%.1f"), temp_start_index, temp_start_index, g_Input_data[My_read_Struct->npanel_id].at(temp_end_index).value / 1000.0);
-						if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
-						{
-							DFTrace(Mession_ret);
-						}
+						//将s_Input_data 复制到 g_Input_data[t_panel_num]中
+                        for (int idx = temp_start_index; idx <= temp_end_index; ++idx)
+                        {
+                            if (idx < BAC_INPUT_ITEM_COUNT)
+                            {
+                                memcpy(&g_Input_data[My_read_Struct->npanel_id].at(idx), &s_Input_data[idx], sizeof(Str_in_point));
+                                if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+                                {
+                                    CString Mession_ret;
+                                    Mession_ret.Format(_T("Panel %d, Read input from %d to %d success.%.1f"), My_read_Struct->npanel_id, idx, idx, g_Input_data[My_read_Struct->npanel_id].at(idx).value / 1000.0);
+                                    if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+                                    {
+                                        DFTrace(Mession_ret);
+                                    }
+                                }
+                            }
+                        }
+
+
 						Sleep(SEND_COMMAND_DELAY_TIME);
 					}
 
@@ -10867,17 +10879,24 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         int temp_start_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
                         int temp_end_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
 
-                        //将t_Variable_data 复制到 g_Variable_data[t_panel_num]中
-                        if (temp_end_index < BAC_OUTPUT_ITEM_COUNT)
-                        {
-                            g_Output_data[My_read_Struct->npanel_id].at(temp_end_index) = s_Output_data[temp_end_index];
-                        }
-                        CString Mession_ret;
-                        Mession_ret.Format(_T("GetPrivateDataSaveSPBlocking Read Out from %d to %d success.%.1f"), temp_start_index, temp_start_index, g_Output_data[My_read_Struct->npanel_id].at(temp_end_index).value / 1000.0);
-                        if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
-                        {
-                            DFTrace(Mession_ret);
-                        }
+                        //将s_Output_data 复制到 g_Output_data[t_panel_num]中
+                            for (int idx = temp_start_index; idx <= temp_end_index; ++idx)
+                            {
+                                if (idx < BAC_OUTPUT_ITEM_COUNT)
+                                {
+                                    memcpy(&g_Output_data[My_read_Struct->npanel_id].at(idx), &s_Output_data[idx], sizeof(Str_out_point));
+                                    if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+                                    {
+                                        CString Mession_ret;
+                                        Mession_ret.Format(_T("Panel %d , Read Out from %d to %d success.%.1f"), My_read_Struct->npanel_id, idx, idx, g_Output_data[My_read_Struct->npanel_id].at(idx).value / 1000.0);
+                                        if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+                                        {
+                                            DFTrace(Mession_ret);
+                                        }
+                                    }
+                                }
+                            }
+
                         Sleep(SEND_COMMAND_DELAY_TIME);
                     }
                 }
@@ -10893,14 +10912,24 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 						//将t_Variable_data 复制到 g_Variable_data[t_panel_num]中
 						if (temp_end_index < BAC_VARIABLE_ITEM_COUNT)
 						{
-							g_Variable_data[My_read_Struct->npanel_id].at(temp_end_index) = s_Variable_data[temp_end_index];
+                            for (int idx = temp_start_index; idx <= temp_end_index; ++idx)
+                            {
+                                if (idx < BAC_VARIABLE_ITEM_COUNT)
+                                {
+                                    memcpy(&g_Variable_data[My_read_Struct->npanel_id].at(idx), &s_Variable_data[idx], sizeof(Str_variable_point));
+                                    if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+                                    {
+                                        CString Mession_ret;
+                                        Mession_ret.Format(_T("Panel %d, Read var from %d to %d success.%.1f"), My_read_Struct->npanel_id, idx, idx, g_Variable_data[My_read_Struct->npanel_id].at(idx).value / 1000.0);
+                                        if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
+                                        {
+                                            DFTrace(Mession_ret);
+                                        }
+                                    }
+                                }
+                            }
 						}
-						CString Mession_ret;
-						Mession_ret.Format(_T("GetPrivateDataSaveSPBlocking Read var from %d to %d success.%.1f"), temp_start_index, temp_start_index, g_Variable_data[My_read_Struct->npanel_id].at(temp_end_index).value/1000.0);
-						if (debug_item_show == DEBUG_SHOW_MESSAGE_THREAD)
-						{
-							DFTrace(Mession_ret);
-						}
+
 						Sleep(SEND_COMMAND_DELAY_TIME);
 					}
                 }
@@ -10911,10 +10940,26 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         m_backbround_data.at(n_handle_index).str_info.npanel_commad,
                         m_backbround_data.at(n_handle_index).str_info.npoint_number,
                         m_backbround_data.at(n_handle_index).str_info.npoint_number,
-                        sizeof(Str_variable_point));
+                        sizeof(Str_controller_point));
                     if (nret > 0)
                     {
-                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_pid_data, &s_controller_data, sizeof(Str_controller_point));
+                        int temp_start_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
+                        int temp_end_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
+                        for (int idx = temp_start_index; idx <= temp_end_index; ++idx)
+                        {
+                            if (idx < BAC_PID_COUNT)
+                            {
+                                memcpy(&g_controller_data[My_read_Struct->npanel_id].at(idx), &s_controller_data[idx], sizeof(Str_controller_point));
+                                if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+                                {
+                                    CString Mession_ret;
+                                    Mession_ret.Format(_T("Panel %d, Read PID from %d to %d success."), My_read_Struct->npanel_id, idx, idx);
+                                    DFTrace(Mession_ret);
+                                }
+                            }
+                        }
+
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_pid_data, &s_controller_data[temp_start_index], sizeof(Str_controller_point));
                     }
                 }
                     break;
@@ -10927,7 +10972,17 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         sizeof(Str_program_point));
                     if (nret > 0)
                     {
-                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_program_data, &s_Program_data, sizeof(Str_program_point));
+                        int temp_start_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
+                        int temp_end_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
+
+                        for (int idx = temp_start_index; idx <= temp_end_index; ++idx)
+                        {
+                            if (idx < BAC_PROGRAM_ITEM_COUNT)
+                            {
+                                memcpy(&g_Program_data[My_read_Struct->npanel_id].at(idx), &s_Program_data[idx], sizeof(Str_program_point));
+                            }
+                        }
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_program_data, &s_Program_data[temp_start_index], sizeof(Str_program_point));
                     }
                 }
                 break;
@@ -10940,7 +10995,18 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         sizeof(Str_weekly_routine_point));
                     if (nret > 0)
                     {
-                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_schedual_data, &s_Weekly_data, sizeof(Str_weekly_routine_point));
+                        int temp_start_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
+                        int temp_end_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
+
+                        for (int idx = temp_start_index; idx <= temp_end_index; ++idx)
+                        {
+                            if (idx < BAC_SCHEDULE_COUNT)
+                            {
+                                memcpy(&g_Weekly_data[My_read_Struct->npanel_id].at(idx), &s_Weekly_data[idx], sizeof(Str_weekly_routine_point));
+                            }
+                        }
+
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_schedual_data, &s_Weekly_data[temp_start_index], sizeof(Str_weekly_routine_point));
                     }
                 }
                 break;
@@ -10966,7 +11032,16 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         sizeof(Control_group_point));
                     if (nret > 0)
                     {
-                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_screen_data, &s_screen_data, sizeof(Control_group_point));
+                        int temp_start_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
+                        int temp_end_index = m_backbround_data.at(n_handle_index).str_info.npoint_number;
+                        for (int idx = temp_start_index; idx <= temp_end_index; ++idx)
+                        {
+                            if (idx < BAC_SCREEN_COUNT)
+                            {
+                                memcpy(&g_screen_data[My_read_Struct->npanel_id].at(idx), &s_screen_data[idx], sizeof(Control_group_point));
+                            }
+                        }
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_screen_data, &s_screen_data[temp_start_index], sizeof(Control_group_point));
                     }
                 }
                 break;
@@ -12650,6 +12725,90 @@ void CMainFrame::OnControlVariables()
     else
     {
        MessageBox(_T("This device doesn't have a variable grid display"));
+    }
+}
+void CMainFrame::OnControlPvar()
+{
+    g_llTxCount++; //其实毫无意义 ，毛非要不在线点击时 也要能看到TX ++ 了;
+    if ((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
+    {
+        if ((m_user_level == LOGIN_SUCCESS_GRAPHIC_MODE) ||
+            (m_user_level == LOGIN_SUCCESS_ROUTINE_MODE))
+        {
+            MessageBox(_T("Please use the administrator to access data!"), _T("Warning"), MB_OK | MB_ICONINFORMATION);
+            return;
+        }
+
+        if (pDialog[WINDOW_PVAR] != NULL)
+        {
+            if (pDialog[WINDOW_PVAR]->IsWindowVisible() == false)
+            {
+                Pvar_Window->Reset_Pvar_Rect();
+                pDialog[WINDOW_PVAR]->ShowWindow(SW_SHOW);
+            }
+            ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_PVAR);
+            Pvar_Window->m_pvar_list.SetFocus();
+            bacnet_view_number = TYPE_PVAR;
+            g_hwnd_now = m_pvar_dlg_hwnd;
+
+
+            CString temp_ui;
+            temp_ui.Format(_T("%u"), TYPE_PVAR);
+            WritePrivateProfileString(_T("LastView"), _T("FistLevelViewUI"), temp_ui, g_cstring_ini_path);
+        }
+        if (ScreenEdit_Window)
+        {
+            ::SendMessage(m_screen_dlg_hwnd, WM_SCREENEDIT_CLOSE, NULL, NULL);
+        }
+
+        ((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
+        ((BacnetScreen*)pDialog[WINDOW_SCREEN])->Unreg_Hotkey();
+        ((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Unreg_Hotkey();
+        ((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Unreg_Hotkey();
+        ((CBacnetMonitor*)pDialog[WINDOW_MONITOR])->Unreg_Hotkey();
+
+        if (g_protocol == PROTOCOL_BIP_TO_MSTP)
+        {
+            Create_Thread_Read_Item(TYPE_PVAR);
+        }
+        else
+        {
+            if (bac_select_device_online)
+                ::PostMessage(BacNet_hwd, WM_FRESH_CM_LIST, MENU_CLICK, TYPE_PVAR);
+        }
+    }
+    else if ((g_protocol == MODBUS_RS485) ||  //RS485 下面挂T3 MINIPANEL
+        (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485))   //BB网络下面挂 MODBUS485  的   TSTAT10或 BB
+    {
+        if ((product_type == PM_MINIPANEL) ||
+            (product_type == PM_TSTAT10) ||
+            (product_type == PM_ESP32_T3_SERIES) ||
+            (product_type == PM_MINIPANEL_ARM))
+        {
+            if (BacNet_hwd == NULL)
+            {
+                SwitchToPruductType(DLG_BACNET_VIEW);
+            }
+            ::PostMessage(BacNet_hwd, WM_RS485_MESSAGE, PM_MINIPANEL_ARM, READVARIABLE_T3000/*BAC_VAR*/);//第二个参数 In
+            bacnet_view_number = TYPE_VARIABLE;
+            global_interface = BAC_VAR;
+
+            if (pDialog[WINDOW_VARIABLE]->IsWindowVisible() == false)
+            {
+                Variable_Window->Reset_Variable_Rect();
+                pDialog[WINDOW_VARIABLE]->ShowWindow(SW_SHOW);
+            }
+            ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_VARIABLE);
+            Variable_Window->m_variable_list.SetFocus();
+
+            CString temp_ui;
+            temp_ui.Format(_T("%u"), TYPE_VARIABLE);
+            WritePrivateProfileString(_T("LastView"), _T("FistLevelViewUI"), temp_ui, g_cstring_ini_path);
+        }
+    }
+    else
+    {
+        MessageBox(_T("This device doesn't have a variable grid display"));
     }
 }
 
@@ -14605,6 +14764,12 @@ void CMainFrame::OnToolDetectonlineproducts()
 
 }
 
+void CMainFrame::OnUpdateControlPvar(CCmdUI* pCmdUI)
+{
+    //  Add your command update UI handler code here
+    pCmdUI->SetCheck(bacnet_view_number == TYPE_PVAR);
+    pCmdUI->Enable(Get_Product_Menu_Map(g_selected_product_id, MENU_PVAR));
+}
 
 void CMainFrame::OnUpdateControlMain(CCmdUI *pCmdUI)
 {
@@ -14908,6 +15073,10 @@ BOOL CMainFrame::OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult)
             {
                 pTTT->lpszText = _T("Refresh Data");
             }
+            else if (pBtn->m_nID == ID_CONTROL_PVAR)
+            {
+                pTTT->lpszText = _T("Program Variables.\r\nMainly used to assist in additional programming within the program.");
+            }
             
             pTTT->hinst = AfxGetResourceHandle();
         }
@@ -15116,6 +15285,17 @@ void CMainFrame::Reset_Window_Pos()
 				}
 			}
 			break;
+        case TYPE_PVAR:
+        {
+            if (((CBacnetPvar*)pDialog[WINDOW_PVAR]) != NULL)
+            {
+                if (((CBacnetPvar*)pDialog[WINDOW_PVAR])->IsWindowVisible())
+                {
+                    ((CBacnetPvar*)pDialog[WINDOW_PVAR])->Reset_Pvar_Rect();
+                }
+            }
+        }
+            break;
 		case TYPE_VARIABLE:
 			if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE]) != NULL)
 			{

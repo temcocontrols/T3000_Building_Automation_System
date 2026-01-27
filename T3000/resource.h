@@ -2850,9 +2850,12 @@
 #define IDC_CHECK_FIX_PORT              2762
 #define IDC_EDIT_ADV_INPUT              2763
 #define IDC_EDIT_ADV_OUTPUT             2764
-#define IDC_EDIT_ADV_INPUT3             2765
 #define IDC_EDIT_ADV_VARIABLE           2765
 #define IDC_BUTTON_ADV_COUNT_OK         2766
+#define IDC_BUTTON_pVARIABLE_APPLY      2767
+#define IDC_LIST_PVARIABLE              2768
+#define IDC_DATETIMEPICKER2_PVARIABLE   2769
+#define IDC_BUTTON_PVARIABLE_READ       2770
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3149,6 +3152,8 @@
 #define IDC_LIST_GSM_CONNECTION         32761
 #define IDD_DIALOG_BACNET_ARRAY         32761
 #define IDC_BUTTON_STOP_SERVER          32762
+#define IDD_DIALOG_BACNET_VARIABLE1     32762
+#define IDD_DIALOG_BACNET_PVAR          32762
 #define IDC_BUTTON_START_SERVER         32763
 #define IDC_EDIT_SERVER_PORT            32764
 #define IDC_LIST_SCAN                   32765
@@ -3360,6 +3365,7 @@
 #define ID_TOOLS_LOGINMYACCOUNT         34089
 #define ID_TOOLS_WEBVIEW34090           34090
 #define ID_RENUMBER                     34091
+#define ID_CONTROL_PVAR                 34092
 #define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
@@ -3435,9 +3441,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        806
-#define _APS_NEXT_COMMAND_VALUE         34092
-#define _APS_NEXT_CONTROL_VALUE         2767
+#define _APS_NEXT_RESOURCE_VALUE        807
+#define _APS_NEXT_COMMAND_VALUE         34093
+#define _APS_NEXT_CONTROL_VALUE         2771
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

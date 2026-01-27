@@ -206,6 +206,7 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_ROOM_LIST					WM_USER + 302
 #define     WM_LIST_FLOOR_CHANGED                       WM_USER + 303
 #define     WM_LIST_ROOM_CHANGED                        WM_USER + 304
+#define		WM_REFRESH_BAC_PVAR_LIST				    WM_USER + 305
 #define     WM_REFRESH_POWERMETER_LIST                   WM_USER + 2690
 #define     WM_SHOW_SCANN_RESULTS                       WM_USER + 2691
 #define     WM_CO2_NODE_THREAD_READ                     WM_USER + 2692

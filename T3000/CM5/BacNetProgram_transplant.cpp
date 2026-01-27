@@ -771,6 +771,7 @@ public:
 	Str_in_point    				   inputs[MAX_INS];
 	//	char                       in_control[MAX_INS];
 	Str_variable_point			   vars[MAX_VARS];
+	Str_variable_point			   pvars[MAX_VARS];
 	//	char                       var_control[MAX_VARS];
 	Str_controller_point 		   controllers[MAX_PIDS];
 	Str_monitor_point				   analog_mon[MAX_ANALM];
@@ -880,6 +881,7 @@ public:
   extern vector <Str_out_point>  m_Output_data;
   extern vector <Str_program_point>  m_Program_data;
   extern vector <Str_variable_point>  m_Variable_data;
+  extern vector <Str_variable_point>  m_pvar_data;
    extern vector <Str_weekly_routine_point>  m_Weekly_data;
     extern vector <Str_annual_routine_point>  m_Annual_data;
 	extern vector <Control_group_point> m_screen_data;
@@ -8505,6 +8507,10 @@ void copy_data_to_ptrpanel(int Data_type)
 		for (int i=0;i<(int)m_Variable_data.size();i++)
 		{
 			memcpy(&ptr_panel.vars[i], &m_Variable_data.at(i),sizeof(Str_variable_point));
+		}
+		for (int i = 0; i < (int)m_pvar_data.size(); i++)
+		{
+			memcpy(&ptr_panel.pvars[i], &m_pvar_data.at(i), sizeof(Str_variable_point));
 		}
 		for (int i=0;i<(int)m_Weekly_data.size();i++)
 		{
