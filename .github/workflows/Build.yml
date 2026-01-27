@@ -62,18 +62,24 @@ jobs:
             Write-Host "Signing: $($file.FullName)"
 
             # Submit to SignPath
-            $response = Invoke-RestMethod `
-              -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests" `
-              -Method POST `
-              -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
-              -Form @{
-                "Artifact" = $file
-                "ProjectSlug" = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
-                "SigningPolicySlug" = "${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}"
-              }
+            try {
+              $response = Invoke-RestMethod `
+                -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests" `
+                -Method POST `
+                -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
+                -Form @{
+                  "Artifact" = $file
+                  "ProjectSlug" = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
+                  "SigningPolicySlug" = "${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}"
+                }
 
-            $signingRequestId = $response.SigningRequestId
-            Write-Host "Signing request ID: $signingRequestId"
+              $signingRequestId = $response.SigningRequestId
+              Write-Host "Signing request ID: $signingRequestId"
+            } catch {
+              Write-Error "Failed to submit signing request for $($file.Name): $_"
+              Write-Error "Response: $($_.Exception.Response | ConvertTo-Json -Depth 10)"
+              exit 1
+            }
 
             # Wait for signing to complete (max 10 minutes)
             $maxWaitSeconds = 600
@@ -81,10 +87,20 @@ jobs:
             do {
               Start-Sleep -Seconds 10
               $elapsedSeconds += 10
-              $status = Invoke-RestMethod `
-                -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
-                -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
-              Write-Host "Status: $($status.Status) (elapsed: $elapsedSeconds seconds)"
+              try {
+                $status = Invoke-RestMethod `
+                  -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
+                  -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
+                Write-Host "Status: $($status.Status) (elapsed: $elapsedSeconds seconds)"
+
+                # Check if there are error details
+                if ($status.ErrorMessage) {
+                  Write-Host "Error message from SignPath: $($status.ErrorMessage)"
+                }
+              } catch {
+                Write-Error "Failed to check signing status for $($file.Name): $_"
+                exit 1
+              }
 
               if ($elapsedSeconds -ge $maxWaitSeconds) {
                 Write-Error "Timeout waiting for signing to complete for $($file.Name)"
@@ -94,13 +110,24 @@ jobs:
 
             if ($status.Status -eq "Completed") {
               # Download signed file
-              Invoke-RestMethod `
-                -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId/SignedArtifact" `
-                -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
-                -OutFile $file.FullName
-              Write-Host "Successfully signed: $($file.Name)"
+              try {
+                Invoke-RestMethod `
+                  -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId/SignedArtifact" `
+                  -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
+                  -OutFile $file.FullName
+                Write-Host "Successfully signed: $($file.Name)"
+              } catch {
+                Write-Error "Failed to download signed artifact for $($file.Name): $_"
+                exit 1
+              }
             } else {
-              Write-Error "Signing failed for $($file.Name): $($status.Status)"
+              Write-Error "Signing failed for $($file.Name) with status: $($status.Status)"
+              if ($status.ErrorMessage) {
+                Write-Error "Error details: $($status.ErrorMessage)"
+              }
+              if ($status) {
+                Write-Error "Full status object: $($status | ConvertTo-Json -Depth 10)"
+              }
               exit 1
             }
           }
@@ -148,18 +175,24 @@ jobs:
           Write-Host "Signing: $($file.FullName)"
 
           # Submit to SignPath
-          $response = Invoke-RestMethod `
-            -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests" `
-            -Method POST `
-            -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
-            -Form @{
-              "Artifact" = $file
-              "ProjectSlug" = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
-              "SigningPolicySlug" = "${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}"
-            }
+          try {
+            $response = Invoke-RestMethod `
+              -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests" `
+              -Method POST `
+              -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
+              -Form @{
+                "Artifact" = $file
+                "ProjectSlug" = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
+                "SigningPolicySlug" = "${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}"
+              }
 
-          $signingRequestId = $response.SigningRequestId
-          Write-Host "Signing request ID: $signingRequestId"
+            $signingRequestId = $response.SigningRequestId
+            Write-Host "Signing request ID: $signingRequestId"
+          } catch {
+            Write-Error "Failed to submit signing request: $_"
+            Write-Error "Response: $($_.Exception.Response | ConvertTo-Json -Depth 10)"
+            exit 1
+          }
 
           # Wait for signing to complete (max 10 minutes)
           $maxWaitSeconds = 600
@@ -167,10 +200,20 @@ jobs:
           do {
             Start-Sleep -Seconds 10
             $elapsedSeconds += 10
-            $status = Invoke-RestMethod `
-              -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
-              -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
-            Write-Host "Status: $($status.Status) (elapsed: $elapsedSeconds seconds)"
+            try {
+              $status = Invoke-RestMethod `
+                -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
+                -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
+              Write-Host "Status: $($status.Status) (elapsed: $elapsedSeconds seconds)"
+
+              # Check if there are error details
+              if ($status.ErrorMessage) {
+                Write-Host "Error message from SignPath: $($status.ErrorMessage)"
+              }
+            } catch {
+              Write-Error "Failed to check signing status: $_"
+              exit 1
+            }
 
             if ($elapsedSeconds -ge $maxWaitSeconds) {
               Write-Error "Timeout waiting for MSI signing to complete"
@@ -180,13 +223,24 @@ jobs:
 
           if ($status.Status -eq "Completed") {
             # Download signed file
-            Invoke-RestMethod `
-              -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId/SignedArtifact" `
-              -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
-              -OutFile "setup/T3000-setup.msi"
-            Write-Host "Successfully signed MSI installer"
+            try {
+              Invoke-RestMethod `
+                -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId/SignedArtifact" `
+                -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
+                -OutFile "setup/T3000-setup.msi"
+              Write-Host "Successfully signed MSI installer"
+            } catch {
+              Write-Error "Failed to download signed artifact: $_"
+              exit 1
+            }
           } else {
-            Write-Error "Signing failed: $($status.Status)"
+            Write-Error "Signing failed with status: $($status.Status)"
+            if ($status.ErrorMessage) {
+              Write-Error "Error details: $($status.ErrorMessage)"
+            }
+            if ($status) {
+              Write-Error "Full status object: $($status | ConvertTo-Json -Depth 10)"
+            }
             exit 1
           }
 
