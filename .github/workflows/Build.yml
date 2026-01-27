@@ -145,6 +145,43 @@ jobs:
           xcopy "T3000Webview\api\target\i686-pc-windows-msvc\release\t3_webview_api.dll" "T3000 Output\release\" /Y
           xcopy "T3000Webview\api\target\i686-pc-windows-msvc\release\t3_webview_api.dll.lib" "T3000 Output\release\" /Y
 
+      - name: Verify all files are signed before MSI build
+        shell: pwsh
+        run: |
+          Write-Host "Verifying all EXE and DLL files are properly signed..."
+          
+          $filesToCheck = Get-ChildItem -Path "T3000 Output\release\" -Include *.exe,*.dll -Recurse -File
+          $unsignedFiles = @()
+          $signedCount = 0
+          
+          foreach ($file in $filesToCheck) {
+            $sig = Get-AuthenticodeSignature $file.FullName
+            
+            if ($sig.Status -eq 'Valid') {
+              $signedCount++
+              Write-Host "✓ Signed: $($file.Name) - Signer: $($sig.SignerCertificate.Subject)"
+            } else {
+              $unsignedFiles += $file.Name
+              Write-Host "✗ NOT SIGNED: $($file.Name) - Status: $($sig.Status)"
+            }
+          }
+          
+          Write-Host ""
+          Write-Host "===== SIGNATURE VERIFICATION SUMMARY ====="
+          Write-Host "Total files checked: $($filesToCheck.Count)"
+          Write-Host "Signed files: $signedCount"
+          Write-Host "Unsigned files: $($unsignedFiles.Count)"
+          Write-Host "=========================================="
+          
+          if ($unsignedFiles.Count -gt 0) {
+            Write-Error "Found $($unsignedFiles.Count) unsigned files:"
+            $unsignedFiles | ForEach-Object { Write-Error "  - $_" }
+            Write-Error "All files must be signed before building MSI installer"
+            exit 1
+          }
+          
+          Write-Host "✓ All EXE/DLL files are properly signed and ready for MSI packaging"
+
       - name: Set the installer version ( doesn't accept big numbers so we add a point )
         id: iversion
         run: |
