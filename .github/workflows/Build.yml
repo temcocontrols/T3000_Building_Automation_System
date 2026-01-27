@@ -204,14 +204,21 @@ jobs:
               $status = Invoke-RestMethod `
                 -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
                 -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
+              
               Write-Host "Status: $($status.Status) (elapsed: $elapsedSeconds seconds)"
-
-              # Check if there are error details
+              Write-Host "DEBUG - Full SignPath Response:"
+              Write-Host ($status | ConvertTo-Json -Depth 10)
+              
+              # Check if there are error details during polling
               if ($status.ErrorMessage) {
                 Write-Host "Error message from SignPath: $($status.ErrorMessage)"
               }
+              if ($status.ErrorDetails) {
+                Write-Host "Error details from SignPath: $($status.ErrorDetails)"
+              }
             } catch {
               Write-Error "Failed to check signing status: $_"
+              Write-Error "Exception details: $($_.Exception.Message)"
               exit 1
             }
 
@@ -231,16 +238,21 @@ jobs:
               Write-Host "Successfully signed MSI installer"
             } catch {
               Write-Error "Failed to download signed artifact: $_"
+              Write-Error "Exception: $($_.Exception.Message)"
               exit 1
             }
           } else {
-            Write-Error "Signing failed with status: $($status.Status)"
-            if ($status.ErrorMessage) {
-              Write-Error "Error details: $($status.ErrorMessage)"
-            }
-            if ($status) {
-              Write-Error "Full status object: $($status | ConvertTo-Json -Depth 10)"
-            }
+            Write-Error "MSI Signing FAILED!"
+            Write-Error "Final Status: $($status.Status)"
+            Write-Host "====== COMPLETE STATUS OBJECT ======"
+            Write-Host ($status | ConvertTo-Json -Depth 10)
+            Write-Host "=====================================" 
+            
+            # Try to extract any available error information
+            $statusProps = $status.PSObject.Properties | ForEach-Object { "$($_.Name): $($_.Value)" }
+            Write-Host "All status properties:"
+            $statusProps | ForEach-Object { Write-Host $_ }
+            
             exit 1
           }
 
