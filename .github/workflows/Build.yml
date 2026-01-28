@@ -163,10 +163,30 @@ jobs:
 
               if ($status.Status -eq "Completed") {
                 # Download signed file
+                Write-Host "  Downloading signed artifact..."
                 Invoke-RestMethod `
                   -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId/SignedArtifact" `
                   -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
                   -OutFile $file
+
+                # Verify file was downloaded and has correct size
+                if (Test-Path $file) {
+                  $fileSize = (Get-Item $file).Length
+                  Write-Host "  Downloaded file size: $fileSize bytes"
+
+                  # Give Windows a moment to release file handle
+                  Start-Sleep -Seconds 2
+
+                  # Verify signature immediately after download
+                  $sig = Get-AuthenticodeSignature $file
+                  if ($sig.Status -eq 'Valid') {
+                    Write-Host "  ✓ Signature verified: $($sig.SignerCertificate.Subject)"
+                  } else {
+                    Write-Host "  ⚠ Signature status: $($sig.Status)"
+                  }
+                } else {
+                  throw "Downloaded file not found at: $file"
+                }
 
                 Write-Host "  ✓ Successfully signed: $fileName"
                 Write-Host ""
@@ -200,8 +220,13 @@ jobs:
       - name: Verify all files are signed before MSI build
         shell: pwsh
         run: |
+          Write-Host "=========================================="
           Write-Host "Verifying signed EXE and DLL files..."
+          Write-Host "=========================================="
           Write-Host ""
+
+          # Give Windows time to flush file handles
+          Start-Sleep -Seconds 3
 
           # Only verify OUR files (exclude 3rd party libraries we don't sign)
           $filesToVerify = @(
