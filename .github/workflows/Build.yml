@@ -129,6 +129,7 @@ jobs:
                   "Artifact" = Get-Item $file
                   "ProjectSlug" = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
                   "SigningPolicySlug" = "${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}"
+                  "ArtifactConfigurationSlug" = "pe-files"
                 }
 
               $signingRequestId = $response.SigningRequestId
@@ -367,6 +368,7 @@ jobs:
                 "Artifact" = $file
                 "ProjectSlug" = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
                 "SigningPolicySlug" = "${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}"
+                "ArtifactConfigurationSlug" = "msi-container"
               }
 
             $signingRequestId = $response.SigningRequestId
