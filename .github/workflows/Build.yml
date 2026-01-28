@@ -344,7 +344,18 @@ jobs:
         run: |
           $file = Get-Item "setup/T3000-setup.msi"
           Write-Host "Signing MSI installer: $($file.Name)"
+          Write-Host "  File size: $([math]::Round($file.Length / 1MB, 2)) MB"
+          Write-Host "  File path: $($file.FullName)"
           Write-Host ""
+
+          # Validate MSI file
+          if ($file.Length -eq 0) {
+            Write-Error "MSI file is empty (0 bytes)"
+            exit 1
+          }
+          if ($file.Length -gt 100MB) {
+            Write-Warning "MSI file is very large: $([math]::Round($file.Length / 1MB, 2)) MB"
+          }
 
           # Submit to SignPath
           try {
@@ -360,9 +371,22 @@ jobs:
 
             $signingRequestId = $response.SigningRequestId
             Write-Host "  Request ID: $signingRequestId"
+            Write-Host "  Submitted at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
           } catch {
-            Write-Error "Failed to submit MSI signing request: $_"
-            Write-Error "Response: $($_.Exception.Response | ConvertTo-Json -Depth 10)"
+            Write-Error "Failed to submit MSI signing request"
+            Write-Host ""
+            Write-Host "Error: $_"
+            if ($_.Exception.Response) {
+              Write-Host "Response Status: $($_.Exception.Response.StatusCode)"
+              Write-Host "Response StatusDescription: $($_.Exception.Response.StatusDescription)"
+              try {
+                $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
+                $responseBody = $reader.ReadToEnd()
+                Write-Host "Response Body: $responseBody"
+              } catch {
+                Write-Host "Could not read response body"
+              }
+            }
             exit 1
           }
 
@@ -386,8 +410,15 @@ jobs:
                 $lastStatus = $status.Status
               }
 
+              # Show detailed error information
               if ($status.ErrorMessage) {
-                Write-Host "  Error: $($status.ErrorMessage)"
+                Write-Host "  ⚠️  ErrorMessage: $($status.ErrorMessage)"
+              }
+              if ($status.Description) {
+                Write-Host "  Description: $($status.Description)"
+              }
+              if ($status.WorkflowStatus) {
+                Write-Host "  WorkflowStatus: $($status.WorkflowStatus)"
               }
             } catch {
               Write-Error "Failed to check MSI signing status: $_"
@@ -415,11 +446,28 @@ jobs:
             }
           } else {
             Write-Error "MSI signing FAILED with status: $($status.Status)"
+            Write-Host ""
+            Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            Write-Host "SIGNPATH ERROR DETAILS:"
+            Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            Write-Host ""
             if ($status.ErrorMessage) {
-              Write-Error "Error details: $($status.ErrorMessage)"
+              Write-Host "ErrorMessage: $($status.ErrorMessage)"
             }
-            Write-Host "Full status response:"
+            if ($status.Description) {
+              Write-Host "Description: $($status.Description)"
+            }
+            if ($status.WorkflowStatus) {
+              Write-Host "WorkflowStatus: $($status.WorkflowStatus)"
+            }
+            if ($status.IsFinalStatus) {
+              Write-Host "IsFinalStatus: $($status.IsFinalStatus)"
+            }
+            Write-Host ""
+            Write-Host "Full status response (JSON):"
             Write-Host ($status | ConvertTo-Json -Depth 10)
+            Write-Host ""
+            Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             exit 1
           }
 
