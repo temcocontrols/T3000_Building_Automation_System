@@ -68,7 +68,7 @@ jobs:
       - name: Sign all executables and DLLs with SignPath
         shell: pwsh
         run: |
-          Write-Host "Preparing files for batch signing with SignPath..."
+          Write-Host "Preparing files for signing with SignPath..."
 
           # Define files to sign (only OUR files, exclude 3rd party libraries)
           $filesToSign = @(
@@ -88,145 +88,114 @@ jobs:
           # - sqlite3.dll (SQLite project)
           # - WebView2Loader.dll (Microsoft)
 
+          Write-Host "Files to sign: $($filesToSign.Count)"
+          Write-Host ""
+
           # Verify all files exist before signing
           $missingFiles = @()
           foreach ($file in $filesToSign) {
             if (-not (Test-Path $file)) {
               $missingFiles += $file
+              Write-Host "  ✗ MISSING: $file"
             } else {
               Write-Host "  ✓ Found: $file"
             }
           }
 
           if ($missingFiles.Count -gt 0) {
-            Write-Error "Missing files that need to be signed:"
-            $missingFiles | ForEach-Object { Write-Error "  - $_" }
+            Write-Error "Missing $($missingFiles.Count) files that need to be signed"
             exit 1
           }
 
-          # Create temporary directory to organize files for ZIP (preserve names)
-          $timestamp = Get-Date -Format "yyyyMMddHHmmss"
-          $tempDir = "temp-signing-$timestamp"
-          New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+          Write-Host ""
+          Write-Host "Starting individual file signing..."
+          Write-Host ""
 
-          # Copy files to temp directory (flattened structure)
-          Write-Host "Copying files to temporary directory..."
+          # Sign each file individually
+          $signedCount = 0
+          $failedFiles = @()
+
           foreach ($file in $filesToSign) {
             $fileName = Split-Path $file -Leaf
-            Copy-Item $file -Destination "$tempDir\$fileName" -Force
-            Write-Host "  Copied: $fileName"
-          }
+            Write-Host "[$($signedCount + 1)/$($filesToSign.Count)] Signing: $fileName"
 
-          # Create ZIP artifact for batch signing
-          $zipPath = "T3000-unsigned-$timestamp.zip"
-          Write-Host "Creating ZIP artifact: $zipPath"
-
-          Compress-Archive -Path "$tempDir\*" -DestinationPath $zipPath -Force
-
-          Write-Host "Submitting ZIP artifact to SignPath for batch signing..."
-
-          # Submit ZIP to SignPath
-          try {
-            $response = Invoke-RestMethod `
-              -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests" `
-              -Method POST `
-              -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
-              -Form @{
-                "Artifact" = Get-Item $zipPath
-                "ProjectSlug" = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
-                "SigningPolicySlug" = "${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}"
-              }
-
-            $signingRequestId = $response.SigningRequestId
-            Write-Host "✓ Signing request submitted successfully"
-            Write-Host "  Request ID: $signingRequestId"
-          } catch {
-            Write-Error "Failed to submit signing request: $_"
-            Write-Error "Response: $($_.Exception.Response | ConvertTo-Json -Depth 10)"
-            exit 1
-          }
-
-          # Wait for signing to complete (max 15 minutes for batch)
-          $maxWaitSeconds = 900
-          $elapsedSeconds = 0
-          Write-Host "Waiting for SignPath to process batch signing..."
-
-          do {
-            Start-Sleep -Seconds 15
-            $elapsedSeconds += 15
             try {
-              $status = Invoke-RestMethod `
-                -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
-                -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
-
-              Write-Host "  Status: $($status.Status) (elapsed: $($elapsedSeconds)s / $($maxWaitSeconds)s)"
-
-              if ($status.ErrorMessage) {
-                Write-Host "  ⚠ Error message: $($status.ErrorMessage)"
-              }
-            } catch {
-              Write-Error "Failed to check signing status: $_"
-              exit 1
-            }
-
-            if ($elapsedSeconds -ge $maxWaitSeconds) {
-              Write-Error "Timeout waiting for batch signing to complete (15 minutes)"
-              exit 1
-            }
-          } while ($status.Status -eq "Processing" -or $status.Status -eq "Submitted" -or $status.Status -eq "InProgress")
-
-          if ($status.Status -eq "Completed") {
-            Write-Host "✓ Batch signing completed successfully"
-
-            # Download signed ZIP
-            $signedZipPath = "T3000-signed-$timestamp.zip"
-            try {
-              Invoke-RestMethod `
-                -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId/SignedArtifact" `
+              # Submit to SignPath
+              $response = Invoke-RestMethod `
+                -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests" `
+                -Method POST `
                 -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
-                -OutFile $signedZipPath
-
-              Write-Host "✓ Downloaded signed artifact: $signedZipPath"
-
-              # Extract signed files to temporary directory
-              $signedTempDir = "temp-signed-$timestamp"
-              Write-Host "Extracting signed files..."
-              Expand-Archive -Path $signedZipPath -DestinationPath $signedTempDir -Force
-
-              # Copy signed files back to original locations
-              Write-Host "Copying signed files back to release directory..."
-              foreach ($originalPath in $filesToSign) {
-                $fileName = Split-Path $originalPath -Leaf
-                $signedFile = "$signedTempDir\$fileName"
-
-                if (Test-Path $signedFile) {
-                  Copy-Item $signedFile -Destination $originalPath -Force
-                  Write-Host "  ✓ Replaced: $fileName"
-                } else {
-                  Write-Error "  ✗ Missing from signed ZIP: $fileName"
-                  exit 1
+                -Form @{
+                  "Artifact" = Get-Item $file
+                  "ProjectSlug" = "${{ secrets.SIGNPATH_PROJECT_SLUG }}"
+                  "SigningPolicySlug" = "${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}"
                 }
+
+              $signingRequestId = $response.SigningRequestId
+              Write-Host "  Request ID: $signingRequestId"
+
+              # Wait for signing to complete (max 10 minutes per file)
+              $maxWaitSeconds = 600
+              $elapsedSeconds = 0
+              $lastStatus = ""
+
+              do {
+                Start-Sleep -Seconds 10
+                $elapsedSeconds += 10
+
+                $status = Invoke-RestMethod `
+                  -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
+                  -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
+
+                if ($status.Status -ne $lastStatus) {
+                  Write-Host "  Status: $($status.Status) ($($elapsedSeconds)s elapsed)"
+                  $lastStatus = $status.Status
+                }
+
+                if ($status.ErrorMessage) {
+                  Write-Host "  Error: $($status.ErrorMessage)"
+                }
+
+                if ($elapsedSeconds -ge $maxWaitSeconds) {
+                  throw "Timeout waiting for signing to complete"
+                }
+              } while ($status.Status -eq "Processing" -or $status.Status -eq "Submitted" -or $status.Status -eq "InProgress")
+
+              if ($status.Status -eq "Completed") {
+                # Download signed file
+                Invoke-RestMethod `
+                  -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId/SignedArtifact" `
+                  -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
+                  -OutFile $file
+
+                Write-Host "  ✓ Successfully signed: $fileName"
+                Write-Host ""
+                $signedCount++
+              } else {
+                throw "Signing failed with status: $($status.Status)"
               }
 
-              # Cleanup temporary directories
-              Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
-              Remove-Item $signedTempDir -Recurse -Force -ErrorAction SilentlyContinue
-
-              Write-Host "✓ Successfully replaced all files with signed versions"
-
             } catch {
-              Write-Error "Failed to download signed artifact: $_"
-              exit 1
+              Write-Error "  ✗ Failed to sign $fileName : $_"
+              $failedFiles += $fileName
+              Write-Host ""
             }
-          } else {
-            Write-Error "Batch signing FAILED with status: $($status.Status)"
-            if ($status.ErrorMessage) {
-              Write-Error "Error details: $($status.ErrorMessage)"
-            }
-            Write-Host "Full status object:"
-            Write-Host ($status | ConvertTo-Json -Depth 10)
+          }
+
+          Write-Host "=========================================="
+          Write-Host "Signing Summary:"
+          Write-Host "  Total files: $($filesToSign.Count)"
+          Write-Host "  Successfully signed: $signedCount"
+          Write-Host "  Failed: $($failedFiles.Count)"
+          Write-Host "=========================================="
+
+          if ($failedFiles.Count -gt 0) {
+            Write-Error "Failed to sign $($failedFiles.Count) files:"
+            $failedFiles | ForEach-Object { Write-Error "  - $_" }
             exit 1
           }
+
+          Write-Host "✓ All Temco files signed successfully"
 
       - name: Verify all files are signed before MSI build
         shell: pwsh
@@ -328,7 +297,8 @@ jobs:
         shell: pwsh
         run: |
           $file = Get-Item "setup/T3000-setup.msi"
-          Write-Host "Signing: $($file.FullName)"
+          Write-Host "Signing MSI installer: $($file.Name)"
+          Write-Host ""
 
           # Submit to SignPath
           try {
@@ -343,9 +313,9 @@ jobs:
               }
 
             $signingRequestId = $response.SigningRequestId
-            Write-Host "Signing request ID: $signingRequestId"
+            Write-Host "  Request ID: $signingRequestId"
           } catch {
-            Write-Error "Failed to submit signing request: $_"
+            Write-Error "Failed to submit MSI signing request: $_"
             Write-Error "Response: $($_.Exception.Response | ConvertTo-Json -Depth 10)"
             exit 1
           }
@@ -353,33 +323,33 @@ jobs:
           # Wait for signing to complete (max 10 minutes)
           $maxWaitSeconds = 600
           $elapsedSeconds = 0
+          $lastStatus = ""
+
           do {
             Start-Sleep -Seconds 10
             $elapsedSeconds += 10
+
             try {
               $status = Invoke-RestMethod `
                 -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId" `
                 -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" }
 
-              Write-Host "Status: $($status.Status) (elapsed: $elapsedSeconds seconds)"
-              Write-Host "DEBUG - Full SignPath Response:"
-              Write-Host ($status | ConvertTo-Json -Depth 10)
-
-              # Check if there are error details during polling
-              if ($status.ErrorMessage) {
-                Write-Host "Error message from SignPath: $($status.ErrorMessage)"
+              # Only log status changes to reduce noise
+              if ($status.Status -ne $lastStatus) {
+                Write-Host "  Status: $($status.Status) ($($elapsedSeconds)s elapsed)"
+                $lastStatus = $status.Status
               }
-              if ($status.ErrorDetails) {
-                Write-Host "Error details from SignPath: $($status.ErrorDetails)"
+
+              if ($status.ErrorMessage) {
+                Write-Host "  Error: $($status.ErrorMessage)"
               }
             } catch {
-              Write-Error "Failed to check signing status: $_"
-              Write-Error "Exception details: $($_.Exception.Message)"
+              Write-Error "Failed to check MSI signing status: $_"
               exit 1
             }
 
             if ($elapsedSeconds -ge $maxWaitSeconds) {
-              Write-Error "Timeout waiting for MSI signing to complete"
+              Write-Error "Timeout waiting for MSI signing to complete (10 minutes)"
               exit 1
             }
           } while ($status.Status -eq "Processing" -or $status.Status -eq "Submitted" -or $status.Status -eq "InProgress")
@@ -391,24 +361,19 @@ jobs:
                 -Uri "https://app.signpath.io/API/v1/${{ secrets.SIGNPATH_ORGANIZATION_ID }}/SigningRequests/$signingRequestId/SignedArtifact" `
                 -Headers @{ "Authorization" = "Bearer ${{ secrets.SIGNPATH_API_TOKEN }}" } `
                 -OutFile "setup/T3000-setup.msi"
-              Write-Host "Successfully signed MSI installer"
+              Write-Host "  ✓ Successfully signed MSI installer"
+              Write-Host ""
             } catch {
-              Write-Error "Failed to download signed artifact: $_"
-              Write-Error "Exception: $($_.Exception.Message)"
+              Write-Error "Failed to download signed MSI: $_"
               exit 1
             }
           } else {
-            Write-Error "MSI Signing FAILED!"
-            Write-Error "Final Status: $($status.Status)"
-            Write-Host "====== COMPLETE STATUS OBJECT ======"
+            Write-Error "MSI signing FAILED with status: $($status.Status)"
+            if ($status.ErrorMessage) {
+              Write-Error "Error details: $($status.ErrorMessage)"
+            }
+            Write-Host "Full status response:"
             Write-Host ($status | ConvertTo-Json -Depth 10)
-            Write-Host "====================================="
-
-            # Try to extract any available error information
-            $statusProps = $status.PSObject.Properties | ForEach-Object { "$($_.Name): $($_.Value)" }
-            Write-Host "All status properties:"
-            $statusProps | ForEach-Object { Write-Host $_ }
-
             exit 1
           }
 
