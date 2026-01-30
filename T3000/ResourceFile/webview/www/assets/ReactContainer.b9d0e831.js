@@ -1,0 +1,1 @@
+import{i as t}from"./react.8639cc86.js";import{o as e,Y as o,Z as a}from"./index.3bd6c859.js";import"./client.58f92968.js";const i={id:"t3000-react-root"},n={__name:"ReactContainer",setup:n=>(e((()=>{console.log("🎯 ReactContainer mounted, initializing React app..."),setTimeout((()=>{t()}),10)})),(t,e)=>(o(),a("div",i)))};export{n as default};

@@ -2408,6 +2408,60 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 				break;
 			}
 
+			case READ_SETTING_COMMAND:
+			{
+				if ((entry_index_end == 0) && (entry_index_start == 0))
+				{
+						// 示例：对每个块进行阻塞读取
+						if (GetPrivateDataSaveSPBlocking(entry_objectinstance, READ_SETTING_COMMAND,
+							entry_index_start, entry_index_end, sizeof(Str_Setting_Info), 4) > 0)
+						{
+
+							// 将读取到的临时数据复制到全局缓存
+							memcpy(&g_Device_Basic_Setting[temp_panel_id], &s_Basic_Setting, sizeof(Str_Setting_Info));
+
+							if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+							{
+								CString dbg;
+								dbg.Format(_T("obj=%d, Setting config info \r\n"), entry_objectinstance);
+								DFTrace(dbg);
+							}
+							Sleep(SEND_COMMAND_DELAY_TIME);
+						}
+						else
+						{
+							CString errorLog;
+							errorLog.Format(_T("ERROR: Read Setting config info failed start=%d, end=%d"),
+								entry_index_start, entry_index_end);
+							WriteHandleWebViewMsgLog(_T("GET_WEBVIEW_LIST"), errorLog, 0);
+
+							if (msg_source == 0)
+								SetPaneString(BAC_SHOW_MISSION_RESULTS, errorLog);
+							WrapErrorMessage(builder, tempjson, outmsg, errorLog);
+							if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+							{
+								DFTrace(errorLog);
+							}
+							break;
+						}
+
+						int npanel_id = temp_panel_id;
+						int input_idx = 0;
+						tempjson["data"]["device_data"][point_idx]["pid"] = npanel_id;
+						tempjson["data"]["device_data"][point_idx]["type"] = "SETTING";
+						tempjson["data"]["device_data"][point_idx]["index"] = input_idx;
+						tempjson["data"]["device_data"][point_idx]["id"] = "SETTING" + to_string(input_idx + 1);
+
+						for (int m = 0; m < 400; m++)
+						{
+							tempjson["data"]["device_data"][point_idx]["All"][m] = Device_Basic_Setting.all[m];
+						}point_idx++;
+
+
+				} // for groups
+				
+				break;
+			}
 			default:
 				break;
 		}
@@ -2615,6 +2669,57 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 			break;
 
 		}
+		case WRITE_SETTING_COMMAND:
+		{
+			if (entry_index != 0)
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Index is invalid."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Index is invalid."));
+				CString errorLog;
+				errorLog.Format(_T("ERROR: Invalid entry_index=%d (fix=%d)"), entry_index, 0);
+				WriteHandleWebViewMsgLog(_T("UPDATE_WEBVIEW_LIST"), errorLog, 0);
+				break;
+			}
+			Str_Setting_Info temp_Setting;
+			for (int index = 0; index < 400; index++)
+			{
+				temp_Setting.all[index] = json["all"][index].asInt();
+			}
+
+			//校验是不是同一个设备
+			if (g_Device_Basic_Setting[temp_panel_id].reg.n_serial_number != temp_serial_number)
+			{
+				if (msg_source == 0)
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("The serial number does not match the panel."));
+				WrapErrorMessage(builder, tempjson, outmsg, _T("The serial number does not match the panel."));
+
+				CString errorLog;
+				errorLog.Format(_T("ERROR: Serial mismatch - Expected=%d, Got=%d"),
+					g_Device_Basic_Setting[temp_panel_id].reg.n_serial_number, temp_serial_number);
+				WriteHandleWebViewMsgLog(_T("UPDATE_WEBVIEW_LIST"), errorLog, 0);
+				break;
+			}
+			unsigned int temp_objectinstance = g_Device_Basic_Setting[temp_panel_id].reg.object_instance;
+
+			// Log write attempt
+			CString writeLog;
+			writeLog.Format(_T("Writing to device: ObjectInstance=%d, Type=SETTING, Index=%d"),
+				temp_objectinstance, entry_index);
+			WriteHandleWebViewMsgLog(_T("UPDATE_WEBVIEW_LIST"), writeLog, 0);
+			int ret_results = WritePrivateData_Blocking(temp_objectinstance, WRITE_SETTING_COMMAND, entry_index, entry_index, 4, (char*)&temp_Setting);
+			if (ret_results > 0)
+			{
+				memcpy(g_Device_Basic_Setting[temp_panel_id].all, &temp_Setting, sizeof(Str_Setting_Info));
+			}
+			else
+			{
+				WrapErrorMessage(builder, tempjson, outmsg, _T("Write data timeout."));
+				break;
+			}
+
+		}
+			break;
 		default:
 			break;
 		}
@@ -3536,7 +3641,7 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 		//15分钟内收到这个命令直接break;
 		static DWORD last_logging_time = 0;
 		DWORD current_time = GetTickCount();
-		if (current_time - last_logging_time < 60 * 1000) // 15 minutes in milliseconds
+		if (current_time - last_logging_time < 15 * 1000) // 15 minutes in milliseconds
 		{
 			CString skipLog;
 			skipLog.Format(_T("LOGGING_DATA SKIPPED - within 1 minute cooldown (panelId: %d, serialNumber: %d)\n"), temp_panel_id, temp_serial_number);
