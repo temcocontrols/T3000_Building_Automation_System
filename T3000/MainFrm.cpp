@@ -5762,12 +5762,18 @@ LRESULT  CMainFrame::ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM l
     msg_result = MKBOOL(wParam);
     if(msg_result)
     {
+        CString temp_serial;
+        CString temp_file;
+        temp_serial.Format(_T("%u.prog"), g_selected_serialnumber);//g_selected_serialnumber
+        temp_file = g_achive_folder + _T("\\") + temp_serial;
+
+
         CFileFind cfindtempfile;
-        if (cfindtempfile.FindFile(SaveConfigFilePath))
+        if (cfindtempfile.FindFile(temp_file))
         {
-            DeleteFile(SaveConfigFilePath);
+            DeleteFile(temp_file);
         }
-		SaveBacnetBinaryFile(SaveConfigFilePath);
+		SaveBacnetBinaryFile(temp_file);
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Save config file success!"));
     }
     return 0;
@@ -11568,6 +11574,8 @@ loop1:
                     pMy_Invoke_id->mCol = My_WriteList_Struct->ItemInfo.nCol;
                     if (ret_cusunits)
                     {
+                        if(My_WriteList_Struct->deviceid == Device_Basic_Setting.reg.object_instance)
+                            ::PostMessageW(MainFram_hwd, MY_BAC_CONFIG_READ_RESULTS, 1, NULL); 
                         ::PostMessage(MainFram_hwd, MY_RX_TX_COUNT, 1, 0);
                         ::PostMessage(My_WriteList_Struct->hWnd, MY_RESUME_DATA, (WPARAM)WRITE_SUCCESS, (LPARAM)pMy_Invoke_id);
                     }
@@ -11627,7 +11635,7 @@ loop1:
                             memcpy(&m_Variable_data.at(z).value, temp_value, 4);
                             Sleep(1);
                         }
-                        SaveBacnetBinaryFile(g_selected_serialnumber);
+                        //SaveBacnetBinaryFile(g_selected_serialnumber);
                         ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, NULL, NULL);
 
                     }
@@ -11648,7 +11656,7 @@ loop1:
                             memcpy(&m_Input_data.at(z).value, temp_value, 4);
                             Sleep(1);
                         }
-                        SaveBacnetBinaryFile(g_selected_serialnumber);
+                        //SaveBacnetBinaryFile(g_selected_serialnumber);
                         ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
                     }
                     else if ((unsigned char)My_WriteList_Struct->command == READOUTPUT_T3000)
@@ -11668,7 +11676,7 @@ loop1:
                             memcpy(&m_Output_data.at(z).value, temp_value, 4);
                             Sleep(1);
                         }
-                        SaveBacnetBinaryFile(g_selected_serialnumber);
+                        //SaveBacnetBinaryFile(g_selected_serialnumber);
                         ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, NULL, NULL);
                     }
                 }

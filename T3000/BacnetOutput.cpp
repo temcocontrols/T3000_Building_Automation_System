@@ -1047,7 +1047,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 
 				m_output_list.SetItemText(i, OUTPUT_PANEL, Statuspanel);
 				UCHAR OutputType = 0;
-				if (Bacnet_Private_Device(selected_product_Node.product_class_id))
+				if ((Bacnet_Private_Device(selected_product_Node.product_class_id)) && Device_Basic_Setting.reg.mini_type != 0)
 					bacnet_device_type = Device_Basic_Setting.reg.mini_type;
 				OutputType = GetOutputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1);
 

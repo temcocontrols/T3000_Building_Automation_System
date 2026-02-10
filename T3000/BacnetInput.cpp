@@ -1272,7 +1272,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 
 				m_input_list.SetItemText(i, INPUT_PANEL, Statuspanel);
 				int InputType = 0;
-				if (Bacnet_Private_Device(selected_product_Node.product_class_id))
+				if ((Bacnet_Private_Device(selected_product_Node.product_class_id)) && Device_Basic_Setting.reg.mini_type != 0)
 					bacnet_device_type = Device_Basic_Setting.reg.mini_type;
 				InputType = GetInputType(selected_product_Node.product_class_id, bacnet_device_type, i + 1, m_Input_data.at(i).digital_analog);
 				m_input_list.SetItemText(i, INPUT_EXTERNAL, Output_Type_String[InputType]);

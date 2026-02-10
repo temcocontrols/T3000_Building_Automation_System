@@ -8494,10 +8494,14 @@ void copy_data_to_ptrpanel(int Data_type)
 	{
 		for (int i=0;i<(int)m_Input_data.size();i++)
 		{
+			if (i >= MAX_INS)
+				break;
 			memcpy(&ptr_panel.inputs[i], &m_Input_data.at(i),sizeof(Str_in_point));
 		}
 		for (int i=0;i<(int)m_Output_data.size();i++)
 		{
+			if (i >= MAX_OUTS)
+				break;
 			memcpy(&ptr_panel.outputs[i], &m_Output_data.at(i),sizeof(Str_out_point));
 		}
 		for (int i=0;i<(int)m_Program_data.size();i++)
@@ -8506,6 +8510,8 @@ void copy_data_to_ptrpanel(int Data_type)
 		}
 		for (int i=0;i<(int)m_Variable_data.size();i++)
 		{
+			if (i >= MAX_VARS)
+				break;
 			memcpy(&ptr_panel.vars[i], &m_Variable_data.at(i),sizeof(Str_variable_point));
 		}
 		for (int i = 0; i < (int)m_pvar_data.size(); i++)

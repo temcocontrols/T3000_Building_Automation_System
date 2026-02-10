@@ -59,9 +59,12 @@
 #define MAX_OUTS_MINI  64
 #define MAX_INS_MINI   64
 
-#define MAX_OUTS		 128
-#define MAX_INS		   128
-#define MAX_VARS		 128
+//#define MAX_OUTS		 128
+//#define MAX_INS		   128
+//#define MAX_VARS		 128
+#define MAX_OUTS		 256
+#define MAX_INS		   256
+#define MAX_VARS		 256
 #define MAX_PVAR		 48
 #define MAX_PIDS		  48
 #define MAX_SCHS		16

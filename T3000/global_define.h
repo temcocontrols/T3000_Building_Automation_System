@@ -2482,7 +2482,7 @@ const int MENU_NETWORK_POINT = 12;
 const int MENU_SETTING = 13;
 const int MENU_SCAN = 14;
 const int MENU_BUILDING = 15;
-const int MENU_PVAR = 16;
+const int MENU_PVAR = 17;
 
 const int READ_MODE_NORMAL = 0;
 const int READ_MODE_SIMPLIFICATION = 1;

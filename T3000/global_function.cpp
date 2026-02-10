@@ -7161,13 +7161,14 @@ void local_handler_conf_private_trans_ack(
     }
 	bac_select_device_online = true;
     local_handler_update_bacnet_ui(receive_data_type, each_end_flag);
-    if (each_end_flag)
-        copy_data_to_ptrpanel(TYPE_ALL);
+    // 20260209 屏蔽
+    //if (each_end_flag)
+    //    copy_data_to_ptrpanel(TYPE_ALL);
 
-    if((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG)) 
-    {
-        SaveBacnetBinaryFile(g_selected_serialnumber);
-    }
+    //if((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG)) 
+    //{
+    //    SaveBacnetBinaryFile(g_selected_serialnumber);
+    //}
 
     return;
 }

@@ -5958,6 +5958,7 @@ void CDialogCM5_BacNet::Read_Setting_Info_Progress(int retry_count)
 					enable_pvar = false;
 					unsigned char  temp[20] = { 1,1,1,1,  1,1,1,1,  1,1,1,1,   1,1,1,1  ,0,0,0,0 };
 					memcpy(product_menu[PM_ESP32_T3_SERIES], temp, 20);
+					memcpy(product_menu[PM_MINIPANEL_ARM], temp, 20);
 				}
 				Initial_Some_UI(LOGIN_SUCCESS_FULL_ACCESS);
 				KillTimer(BAC_READ_SETTING_TIMER);
@@ -6075,14 +6076,14 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
                         Send_WhoIs_Global(-1, -1);
                 }
 
-				if(bac_select_device_online)
-				{
-					CString temp_file;
-					CString temp_serial;
-					temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
-					temp_file = g_achive_folder + _T("\\") + temp_serial;
-                    SaveBacnetBinaryFile(temp_file);
-				}
+				//if(bac_select_device_online)
+				//{
+				//	CString temp_file;
+				//	CString temp_serial;
+				//	temp_serial.Format(_T("%u.prog"),g_selected_serialnumber);
+				//	temp_file = g_achive_folder + _T("\\") + temp_serial;
+    //                SaveBacnetBinaryFile(temp_file);
+				//}
 			}
 
 		}

@@ -917,7 +917,7 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 		{
 			CString temp_message;
 			temp_message.Format(_T("No cached data was found for this panel %d"), npanel_id);
-			SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_message);
+			//SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_message);
 			WrapErrorMessage(builder, tempjson, outmsg, temp_message);
 			break;
 #if 0
@@ -3629,10 +3629,7 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 		}
 		int temp_panel_id = json.get("panelId", Json::nullValue).asInt();
 		int temp_serial_number = json.get("serialNumber", Json::nullValue).asInt();
-		//temp_panel_id = 144; //test
-		//temp_serial_number = 240488;
-		//break;
-		// 
+
 		// LOG INPUT PARAMETERS for debugging
 		CString debugLog;
 		debugLog.Format(_T("LOGGING_DATA RECEIVED - panelId: %d, serialNumber: %d\n"), temp_panel_id, temp_serial_number);
@@ -3677,6 +3674,11 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 				continue;
 			if (g_logging_time[npanel_id].basic_setting_status != 1)
 				continue;
+			if (temp_panel_id != -1) //-1 为返回所有在线设备信息
+			{
+				if (temp_panel_id != npanel_id)
+					continue;
+			}
 
 			// Device passed validation - add device main info
 			g_Device_Basic_Setting[npanel_id].reg.ip_addr;
