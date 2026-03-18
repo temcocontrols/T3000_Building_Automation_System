@@ -1606,11 +1606,13 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphicBeta()
 
 	// URL encode the JSON data
 	CString encodedJsonData = UrlEncodeJson(jsonData);
-
+	if (Device_Basic_Setting.reg.panel_number == 0)
+	{
+		Sleep(1);
+	}
 	CString selseted_info;
 	selseted_info.Format(_T("http://localhost:9103/#/trend-log?sn=%d&panel_id=%d&trendlog_id=%d&all_data=%s&mode=beta"), Device_Basic_Setting.reg.n_serial_number,
 		Device_Basic_Setting.reg.panel_number, monitor_list_line, encodedJsonData.GetBuffer());
-
 	CString webviewFolder;
 	CString Resource_folder;
 	CString ApplicationFolder;

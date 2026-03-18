@@ -19,6 +19,9 @@ extern int initial_dialog;
 CRect Output_rect;
 static int show_output_external =  -1;
 int OUTPUT_LIMITE_ITEM_COUNT = 0;
+int digital_special_output_count = 0;
+int analog_special_output_count = 0;
+bool enable_all_output_analog_range = true;
 #define UPDATE_OUTPUT_ONE_ITEM_TIMER 3
 // Used to immediately refresh other changes in the current column after changing a column;
 int changed_output_item = -1; //// 用于改变某一列后 ，立即刷新 当前列的其他变化;
@@ -395,8 +398,9 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	int digital_special_output_count = 0;
-	int analog_special_output_count = 0;
+	digital_special_output_count = 0;
+	analog_special_output_count = 0;
+	OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT; //
 	if (bacnet_device_type == BIG_MINIPANEL || bacnet_device_type == MINIPANELARM)
 	{
 		digital_special_output_count = BIG_MINIPANEL_OUT_D;
@@ -492,15 +496,26 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 	{
 		OUTPUT_LIMITE_ITEM_COUNT = 2;
 	}
-	else
+	else if (T3_ESP_RMC == bacnet_device_type)
 	{
-		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+		digital_special_output_count = RMC_OUT_D;
+		analog_special_output_count = RMC_OUT_A;
+
+	}
+	else if (T3_NG3 == bacnet_device_type)
+	{
+		digital_special_output_count = NG3_OUT_D;
+		analog_special_output_count = NG3_OUT_A;
+
+	}
+
+		
 		if ((g_selected_product_id == PM_ESP32_T3_SERIES) &&
 			((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= ESP32_IO_COUNT_REDEFINE_VERSION)
 		{
 			OUTPUT_LIMITE_ITEM_COUNT = DYNAMIC_OUTPUT_ITEM_COUNT;
 		}
-	}
+	
 
 	int temp_need_show_external = 0;
 	for (int z = 0; z < (int)m_Output_data.size(); z++)
@@ -688,7 +703,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 			bacnet_device_type == T3_OEM ||
 			bacnet_device_type == T3_OEM_12I ||
 			bacnet_device_type == T3_ESP_RMC ||
-			bacnet_device_type == T3_NG2_TYPE2 ||
+			bacnet_device_type == T3_NG3 ||
 			bacnet_device_type == T3_3IIC ||
 			bacnet_device_type == BIG_MINIPANEL ||
 			bacnet_device_type == MINIPANELARM ||
@@ -872,7 +887,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 				m_output_list.SetItemText(i, OUTPUT_RANGE, Digital_Units_Array[m_Output_data.at(i).range]);
 			else if ((m_Output_data.at(i).range >= 23) && (m_Output_data.at(i).range <= 30))
 			{
-				if (receive_customer_unit)
+				if (receive_custom_unit)
 					m_output_list.SetItemText(i, OUTPUT_RANGE, Custom_Digital_Range[m_Output_data.at(i).range - 23]);
 				else
 					m_output_list.SetItemText(i, OUTPUT_RANGE, Digital_Units_Array[0]);
@@ -898,7 +913,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 					temp1 = Digital_Units_Array[m_Output_data.at(i).range];
 				else if ((m_Output_data.at(i).range >= 23) && (m_Output_data.at(i).range <= 30))
 				{
-					if (receive_customer_unit)
+					if (receive_custom_unit)
 						temp1 = Custom_Digital_Range[m_Output_data.at(i).range - 23];
 				}
 				else
@@ -1477,7 +1492,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 			temp1 = Digital_Units_Array[m_Output_data.at(lRow).range];
 		else if((m_Output_data.at(lRow).range >=23) && (m_Output_data.at(lRow).range <= 30))
 		{
-			if(receive_customer_unit)
+			if(receive_custom_unit)
 				temp1 = Custom_Digital_Range[m_Output_data.at(lRow).range - 23];
 			else
 			{
@@ -1515,7 +1530,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
     //                temp1 = Digital_Units_Array[m_Output_data.at(lRow).range];
     //            else if ((m_Output_data.at(lRow).range >= 23) && (m_Output_data.at(lRow).range <= 30))
     //            {
-    //                if (receive_customer_unit)
+    //                if (receive_custom_unit)
     //                    temp1 = Custom_Digital_Range[m_Output_data.at(lRow).range - 23];
     //                else
     //                {
@@ -1601,7 +1616,10 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	else if(lCol == OUTPUT_RANGE)
 	{
 
-
+		if (lRow < digital_special_output_count)
+			enable_all_output_analog_range = false;
+		else
+			enable_all_output_analog_range = true; //对所有虚拟的output 都允许digital 的继电器 使用PWM去开关
 
 			//CString temp_cs = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
 			BacnetRange dlg;
@@ -2058,7 +2076,7 @@ int GetOutputValueEx(Str_out_point temp_out, CString& ret_cstring, CString& ret_
 				temp1 = Digital_Units_Array[temp_out.range];
 			else if ((temp_out.range >= 23) && (temp_out.range <= 30))
 			{
-				if (receive_customer_unit)
+				if (receive_custom_unit)
 					temp1 = Custom_Digital_Range[temp_out.range - 23];
 			}
 			else

@@ -539,7 +539,7 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lPa
 
 	if(temp_show_unit.GetLength() > 9)
 		temp_show_unit = temp_show_unit.Left(9);
-	Analog_Customer_Units[analog_range_tbl_line] = temp_show_unit;
+	Analog_Custom_Units[analog_range_tbl_line] = temp_show_unit;
 	((CEdit *)GetDlgItem(IDC_EDIT_BAC_CUS_ANALOG_UNIT))->SetWindowText(temp_show_unit);
 	
 	for (int i=0;i<11;i++)
@@ -902,7 +902,7 @@ void CBacnetAnalogCusRang::UpdateCusAnalogUnit()
 	CString temp_task_info;
 	temp_task_info.Format(_T("Update Analog Range Unit : %s  "),temp_cs);
 	Post_Write_Message(g_bac_instance,WRITEANALOG_CUS_TABLE_T3000,analog_range_tbl_line,analog_range_tbl_line,sizeof(Str_table_point),analog_cus_range_dlg ,temp_task_info);
-    Analog_Customer_Units[analog_range_tbl_line] = temp_cs;
+    Analog_Custom_Units[analog_range_tbl_line] = temp_cs;
 }
 
 

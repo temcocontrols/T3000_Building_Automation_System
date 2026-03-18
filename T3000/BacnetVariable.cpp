@@ -331,7 +331,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 					temp1 = Digital_Units_Array[m_Variable_data.at(i).range];
 				else if ((m_Variable_data.at(i).range >= 23) && (m_Variable_data.at(i).range <= 30))
 				{
-					if (receive_customer_unit)
+					if (receive_custom_unit)
 						temp1 = Custom_Digital_Range[m_Variable_data.at(i).range - 23];
 				}
 				else
@@ -724,7 +724,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			temp1 = Digital_Units_Array[m_Variable_data.at(lRow).range];
 		else if((m_Variable_data.at(lRow).range >=23) && (m_Variable_data.at(lRow).range <= 30))
 		{
-			if(receive_customer_unit)
+			if(receive_custom_unit)
 				temp1 = Custom_Digital_Range[m_Variable_data.at(lRow).range - 23];
 			else
 			{
@@ -783,6 +783,10 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			temp_hour = 0;
 			temp_minute = 0;
 			temp_second = 0;
+			// 替换原有的 CTime 构造处（例如：CTime TimeTemp(2017,1,1,temp_hour,temp_minute,0);）为：
+			//CTime now = CTime::GetCurrentTime();
+			//CTime TimeTemp(now.GetYear(), now.GetMonth(), now.GetDay(),
+			//	temp_hour, temp_minute, 0);
 			CTime TimeTemp(2017,1,1,temp_hour,temp_minute,0);
 			m_variable_time_picker.SetFormat(_T("HH:mm:ss"));
 			m_variable_time_picker.SetTime(&TimeTemp);
@@ -800,6 +804,9 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			if(temp_second >= 60)
 				temp_second = 0;
 			CTime TimeTemp(2017,1,1,temp_hour,temp_minute,temp_second);
+			//CTime now = CTime::GetCurrentTime();
+			//CTime TimeTemp(now.GetYear(), now.GetMonth(), now.GetDay(),
+			//	temp_hour, temp_minute, temp_second);
 			m_variable_time_picker.SetFormat(_T("HH:mm:ss"));
 			m_variable_time_picker.SetTime(&TimeTemp);
 			m_variable_time_picker.SetFocus();
@@ -837,8 +844,6 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 				m_variable_list.SetItemText(lRow, VARIABLE_VALUE, cstempNextItemString);
 			}
 		}
-
-        //Custom_Msv_Range[range_index]
     }
 	else if(lCol == VARIABLE_VALUE)
 	{
@@ -940,46 +945,6 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
                 }
 
             }
-#if 0
-			for (int z=0;z<3;z++)
-			{
-				do 
-				{
-					resend_count ++;
-					if(resend_count>5)
-					{
-						send_status = false;
-						break;
-					}
-					temp_invoke_id =  GetPrivateData(
-						g_bac_instance,
-						READUNIT_T3000,
-						0,
-						BAC_CUSTOMER_UNITS_COUNT - 1,
-						sizeof(Str_Units_element));		
-
-					Sleep(SEND_COMMAND_DELAY_TIME);
-				} while (g_invoke_id<0);
-				if(send_status)
-				{
-					for (int z=0;z<1000;z++)
-					{
-						Sleep(1);
-						if(tsm_invoke_id_free(temp_invoke_id))
-						{
-							read_customer_unit = true;
-							break;
-						}
-						else
-							continue;
-					}
-
-				}
-				if(read_customer_unit)
-					break;
-			}
-#endif
-
 		}
 
 
@@ -1328,8 +1293,6 @@ BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 60 ,temp_mynew_rect.top + 60,500,700,SWP_SHOWWINDOW);
 		}
-
-
 		return 1; 
 	}
 	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
@@ -1343,7 +1306,6 @@ BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetVariable::OnClose()
 {
-	 
 	ShowWindow(FALSE);
 	return;
 	KillTimer(1);
@@ -1355,11 +1317,7 @@ void CBacnetVariable::OnClose()
 
 void CBacnetVariable::OnCancel()
 {
-	
-	//KillTimer(1);
-	//m_variable_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
-	//CDialogEx::OnCancel();
 }
 
 int GetVariableLabelEx(Str_variable_point temp_var, CString& ret_label, Point_Net* npoint)
@@ -1469,7 +1427,7 @@ int GetVariableValueEx(Str_variable_point temp_var, CString& ret_cstring, CStrin
 				temp1 = Digital_Units_Array[temp_var.range];
 			else if((temp_var.range >=23) && (temp_var.range <= 30))
 			{
-				if(receive_customer_unit)
+				if(receive_custom_unit)
 					temp1 = Custom_Digital_Range[temp_var.range - 23];
 			}
 			else
@@ -1617,8 +1575,6 @@ void CBacnetVariable::OnSize(UINT nType, int cx, int cy)
 
 void CBacnetVariable::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	 
-
 	if(nID == SC_MAXIMIZE)
 	{
 		if(window_max == false)

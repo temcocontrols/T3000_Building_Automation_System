@@ -2101,7 +2101,7 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 		g_screen_data.push_back(m_screen_data);
 		g_graphic_label_data.push_back(m_graphic_label_data);
 		g_user_login_data.push_back(m_user_login_data);
-		g_customer_unit_data.push_back(m_customer_unit_data);
+		g_customer_unit_data.push_back(m_custom_unit_data);
 		g_analog_custmer_range.push_back(m_analog_custmer_range);
 		g_monitor_data.push_back(m_monitor_data);
 		g_Annual_data.push_back(m_Annual_data);
@@ -3344,7 +3344,10 @@ void CDialogCM5_BacNet::Fresh()
     temp_serial.Format(_T("%d.prog"), g_selected_serialnumber);
     achive_file_path = g_achive_folder + _T("\\") + temp_serial;
 	CheckDeviceCountTable(g_selected_serialnumber, selected_product_Node.object_instance);
+	Str_Setting_Info TempSetting;
+	memcpy(&TempSetting, &Device_Basic_Setting, sizeof(Str_Setting_Info));
     load_prg_cache_ret = LoadBacnetBinaryFile(false, achive_file_path);
+	memcpy( &Device_Basic_Setting, &TempSetting, sizeof(Str_Setting_Info));
 
 	g_trendlog_ini_path = g_achive_folder_temp_db;
 	CString cs_serial_number;
@@ -3578,7 +3581,7 @@ void CDialogCM5_BacNet::Fresh()
     else
     {
         // Virtual devices check in many places whether customer's custom range has been received
-        receive_customer_unit = true;  // 虚拟设备很多地方判断是否有接收到了  客户的自定义range
+        receive_custom_unit = true;  // 虚拟设备很多地方判断是否有接收到了  客户的自定义range
         // Virtual devices also need to initialize bacnet related parameters
         //虚拟设备也需要初始化bacnet 的相关参数;
         if (!bac_net_initial_once)
@@ -3804,8 +3807,8 @@ void CDialogCM5_BacNet::Fresh()
 					bacnet_device_type = T3_FAN_MODULE;
 				else if (ret == T3_ESP_RMC)
 					bacnet_device_type = T3_ESP_RMC;
-				else if (ret == T3_NG2_TYPE2)
-					bacnet_device_type = T3_NG2_TYPE2;
+				else if (ret == T3_NG3)
+					bacnet_device_type = T3_NG3;
 				else if (ret == T3_3IIC)
 					bacnet_device_type = T3_3IIC;
 				else
@@ -5787,21 +5790,14 @@ program_part_success:
 		//bac_programcode_read_results = true;
 	}
 #endif
-	//if( bac_read_which_list == BAC_READ_ALL_LIST)
-	//{
-	//	g_CommunicationType = 1;
-	//	SetCommunicationType(1);
-	//	CreateThread(NULL,NULL,ConnectToDevice,NULL,NULL,NULL);
-	//}
+
 	
 	hwait_thread = NULL;
     ::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, 0, 0);
 	return 0;
-		//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
 
 myend:	hwait_thread = NULL;
-		//AfxMessageBox(_T("Send Command Timeout!!!!!!!!!!"));
-		
+
 	return 0;
 }
 
@@ -5814,7 +5810,6 @@ void CDialogCM5_BacNet::SetConnected_IP(LPCTSTR myip)
 {
 	IP_ADDRESS.Empty();
 	IP_ADDRESS.Format(_T("%s"),myip);
-	//IP_ADDRESS = myip;
 }
 
 void CDialogCM5_BacNet::WriteFlash()
@@ -5828,24 +5823,6 @@ void CDialogCM5_BacNet::WriteFlash()
     SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs_show);
     
     return;
-	//int resend_count = 0;
-	//do 
-	//{
-	//	resend_count ++;
-	//	if(resend_count>10)
-	//		break;
-	//	g_invoke_id = GetPrivateData(g_bac_instance,WRITEPRGFLASH_COMMAND,0,0,0);
-	//	Sleep(100);
-	//} while (g_invoke_id<0);
-
-	//if(g_invoke_id>0)
-	//{
-	//	CString temp_cs_show;
-	//	temp_cs_show.Format(_T("Write into flash "));
-	//	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
-	//}
-
-
 }
 
 
@@ -5905,9 +5882,6 @@ void CDialogCM5_BacNet::Read_Setting_Info_Progress(int retry_count)
 
 		if (find_exsit)
 		{
-			//if (hbip_whois_thread == NULL)
-			//	hbip_whois_thread = CreateThread(NULL, NULL, Handle_Bip_whois_Thread, this, NULL, NULL);
-
 			int temp_invoke_id = -1;
 			int send_status = true;
 			int	resend_count = 0;
@@ -5988,17 +5962,7 @@ void CDialogCM5_BacNet::Read_Setting_Info_Progress(int retry_count)
 				{
 					//如果 TCP能连接上， 而没有回复UDP的包，就用TCP 发送软复位命令给板子;
 					SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("No bacnet command response!"));
-					//if(IDYES == MessageBox(_T("No bacnet command reply from panel .Do you want reset the network of this panel"),_T("Warning"),MB_YESNO))
-					//{
-					//	write_one(g_tstat_id,33,151,1);
-
-					//	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reset the network , please wait!"));
-
-					//}
-					//click_resend_time = 3;
 					already_retry = true;
-
-
 				}
 
 			}
@@ -6281,11 +6245,18 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			//重新加载 input output  variable  esp32 的3个是动态设置变化的;
 			ReInital_Someof_Point();
 			last_inital_point = 2; // 最后一次是esp 的count
+			Str_Setting_Info TempSetting;
+			memcpy(&TempSetting, &Device_Basic_Setting, sizeof(Str_Setting_Info));
+			load_prg_cache_ret = LoadBacnetBinaryFile(false, achive_file_path);
+			memcpy(&Device_Basic_Setting, &TempSetting, sizeof(Str_Setting_Info));
+
 		}
 		else
 		{
 			if (last_inital_point == 2)
 			{
+				Str_Setting_Info TempSetting;
+				memcpy(&TempSetting, &Device_Basic_Setting, sizeof(Str_Setting_Info));
 				last_inital_point = 1;
 				Initial_All_Point();
 				//input_item_limit_count = DYNAMIC_INPUT_ITEM_COUNT;
@@ -6294,7 +6265,23 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 				((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->Initial_List();
 				//variable_item_limit_count = DYNAMIC_VARIABLE_ITEM_COUNT;
 				((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->Initial_List();
+
+				load_prg_cache_ret = LoadBacnetBinaryFile(false, achive_file_path);
+				memcpy(&Device_Basic_Setting, &TempSetting, sizeof(Str_Setting_Info));
 			}
+		}
+
+		if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+		{
+			CString temp_cs;
+			temp_cs.Format(_T("Select device : obj: %d,minitype : %d ,ip:%d.%d.%d.%d"),
+				Device_Basic_Setting.reg.object_instance,
+				Device_Basic_Setting.reg.mini_type,
+				Device_Basic_Setting.reg.ip_addr[0],
+				Device_Basic_Setting.reg.ip_addr[1],
+				Device_Basic_Setting.reg.ip_addr[2],
+				Device_Basic_Setting.reg.ip_addr[3]);
+			DFTrace(temp_cs);
 		}
 	}
 
@@ -6596,7 +6583,7 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
         if (offline_mode == false)
         {
             read_customer_unit = false;
-            receive_customer_unit = false;
+            receive_custom_unit = false;
             read_analog_customer_unit = false;
             read_msv_table = false;
         }
@@ -6608,7 +6595,7 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
         {
             read_customer_unit = false;
             read_analog_customer_unit = false;
-            receive_customer_unit = false;
+            receive_custom_unit = false;
             read_msv_table = false;
         }
 		static_value_read = g_selected_serialnumber;
@@ -7817,7 +7804,10 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
      if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
      {
          achive_file_path = g_achive_folder + _T("\\")  + str_serialid + _T(".prog");
-         load_prg_cache_ret = LoadBacnetBinaryFile(false, achive_file_path);
+		 Str_Setting_Info TempSetting;
+		 memcpy(&TempSetting, &Device_Basic_Setting, sizeof(Str_Setting_Info));
+		 load_prg_cache_ret = LoadBacnetBinaryFile(false, achive_file_path);
+		 memcpy(&Device_Basic_Setting, &TempSetting, sizeof(Str_Setting_Info));
          Sleep(1);
      }
      else

@@ -1849,13 +1849,13 @@ CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
 CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
 bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
-bool receive_customer_unit; //收到回复，flag就置 true;
+bool receive_custom_unit; //收到回复，flag就置 true;
 bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
 
 bool read_msv_table; //MSV table 
 CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// 存储客户多态  例如显示  AAA/BBB/CCC
 
-CString Analog_Customer_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
+CString Analog_Custom_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
 
 unsigned char bacnet_add_id[254];
@@ -1934,7 +1934,7 @@ HWND      m_alarmwindow_dlg_hwnd;
 HWND      m_tstat_dlg_hwnd;
 HWND      m_setting_dlg_hwnd;
 HWND      m_flash_multy_hwnd;
-HWND      m_customer_digital_range_dlg_hwnd;
+HWND      m_custom_digital_range_dlg_hwnd;
 HWND      m_building_config_hwnd;
 HWND      m_scan_dlg_hwnd;
 HWND	  m_tcp_server_hwnd;
@@ -1966,7 +1966,7 @@ Str_array_point s_Array_data;
 Str_weekly_routine_point s_Weekly_data[8] = {0};
 Str_annual_routine_point s_Annual_data[4] = {0};
 Control_group_point s_screen_data[16];
-Str_monitor_point s_monitor_data;
+Str_monitor_point s_monitor_data[12] = {0};
 Str_t3_screen_Json s_json_screen_data;
 Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //缓存其他panel json item 值的 全局变量;
 str_webview_logging_time g_logging_time[256] = {0};
@@ -1992,7 +1992,7 @@ vector <Alarm_point> m_alarmlog_data;					vector < vector<Alarm_point> >				  g_
 vector <Str_label_point> m_graphic_label_data;			vector < vector<Str_label_point> >			  g_graphic_label_data;//图片里面的Label的信息要存在设备里面;
 vector <Str_t3_screen_Json> m_json_screen_data;			vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen的信息要存在设备里面;
 vector <Str_item_Json> m_json_item_data;			    vector < vector<Str_item_Json> >			  g_json_item_data;//item的信息要存在设备里面;
-vector <Str_Units_element> m_customer_unit_data;        vector < vector<Str_Units_element> >		  g_customer_unit_data;
+vector <Str_Units_element> m_custom_unit_data;        vector < vector<Str_Units_element> >		  g_customer_unit_data;
 vector <Str_table_point> m_analog_custmer_range;		vector < vector<Str_table_point> >		      g_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite; vector < vector<Str_variable_uint_point> >  g_variable_analog_unite;
 vector <Str_Extio_point> m_extio_config_data;			vector < vector<Str_Extio_point> >			  g_extio_config_data;

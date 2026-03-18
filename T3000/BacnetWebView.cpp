@@ -2408,6 +2408,110 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 				break;
 			}
 
+			case BAC_AMON:
+			{
+				if (entry_index_end >= entry_index_start)
+				{
+					// Calculate number of groups needed (round up)
+					int totalCount = entry_index_end - entry_index_start + 1;
+					int groupSize = BAC_READ_MONITOR_GROUP_NUMBER;  // 4
+					int read_monitor_group = (totalCount + groupSize - 1) / groupSize;
+
+
+					for (int i = 0; i < read_monitor_group; ++i)
+					{
+						int temp_start = entry_index_start + i * groupSize;
+						if (temp_start > entry_index_end) // Prevent overflow
+							break;
+
+						int temp_end = temp_start + groupSize - 1;
+						if (temp_end > entry_index_end)
+							temp_end = entry_index_end;
+
+						// Ensure not exceeding global max count
+						if (temp_start >= BAC_MONITOR_COUNT)
+							break;
+						if (temp_end >= BAC_MONITOR_COUNT)
+							temp_end = BAC_MONITOR_COUNT - 1;
+
+						// Blocking read for each group
+						if (GetPrivateDataSaveSPBlocking(entry_objectinstance, READMONITOR_T3000,
+							(uint8_t)temp_start, (uint8_t)temp_end, sizeof(Str_monitor_point), 4) > 0)
+						{
+							// Copy read data to global cache
+							for (int idx = temp_start; idx <= temp_end; ++idx)
+							{
+								if (idx < BAC_MONITOR_COUNT)
+								{
+									memcpy(&g_monitor_data[temp_panel_id].at(idx), &s_monitor_data[idx], sizeof(Str_monitor_point));
+									if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+									{
+										int elementCount = temp_end - temp_start + 1;
+										CString dbg;
+										dbg.Format(_T("obj=%d,trendlog , temp_start=%d, temp_end=%d\r\n"),
+											entry_objectinstance, idx, idx);
+										DFTrace(dbg);
+									}
+								}
+							}
+
+							Sleep(SEND_COMMAND_DELAY_TIME);
+						}
+						else
+						{
+							CString errorLog;
+							errorLog.Format(_T("ERROR: Read trendlog failed start=%d, end=%d"),
+								temp_start, temp_end);
+							WriteHandleWebViewMsgLog(_T("GET_WEBVIEW_LIST"), errorLog, 0);
+
+							if (msg_source == 0)
+								SetPaneString(BAC_SHOW_MISSION_RESULTS, errorLog);
+							WrapErrorMessage(builder, tempjson, outmsg, errorLog);
+							if ((debug_item_show == DEBUG_SHOW_MESSAGE_THREAD) || (debug_item_show == DEBUG_SHOW_ALL))
+							{
+								DFTrace(errorLog);
+							}
+							continue;
+						}
+
+						int npanel_id = temp_panel_id;
+						for (int idx = temp_start; idx <= temp_end; idx++)
+						{
+							int entry_index = idx;
+							tempjson["data"]["device_data"][point_idx]["pid"] = npanel_id;
+							tempjson["data"]["device_data"][point_idx]["type"] = "MON";
+							tempjson["data"]["device_data"][point_idx]["index"] = entry_index;
+							tempjson["data"]["device_data"][point_idx]["id"] = "MON" + to_string(entry_index + 1);
+							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "MON" + to_string(entry_index + 1);
+							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_monitor_data[npanel_id].at(entry_index).label;
+							tempjson["data"]["device_data"][point_idx]["hour_interval_time"] = g_monitor_data[npanel_id].at(entry_index).hour_interval_time;
+							tempjson["data"]["device_data"][point_idx]["minute_interval_time"] = g_monitor_data[npanel_id].at(entry_index).minute_interval_time;
+							tempjson["data"]["device_data"][point_idx]["second_interval_time"] = g_monitor_data[npanel_id].at(entry_index).second_interval_time;
+							tempjson["data"]["device_data"][point_idx]["status"] = g_monitor_data[npanel_id].at(entry_index).status;
+							//There is also additional data that does not need to be passed to the webview interface
+
+							tempjson["data"]["device_data"][point_idx]["num_inputs"] = g_monitor_data[npanel_id].at(i).num_inputs; ///* total number of points */
+							tempjson["data"]["device_data"][point_idx]["an_inputs"] = g_monitor_data[npanel_id].at(i).an_inputs;  ///* number of analog points */
+							for (int m = 0; m < MAX_POINTS_IN_MONITOR; m++)
+							{
+								tempjson["data"]["device_data"][point_idx]["range"][m] = g_monitor_data[npanel_id].at(i).range[m]; //14个input对应的range
+								//例如 例子1  111OUT45          panel = 111 , sub_panel = 0 . point_type = 0 ，number = 45 , network 默认为0
+								//例如 例子2  123.45.MB_REG67   panel = 123 , sub_panel = 45, point_type = 2 , number = 67 , network 默认为0
+								//例子3		  45678AV90         
+								tempjson["data"]["device_data"][point_idx]["input"][m]["panel"] = g_monitor_data[npanel_id].at(i).inputs[m].panel;
+								tempjson["data"]["device_data"][point_idx]["input"][m]["sub_panel"] = g_monitor_data[npanel_id].at(i).inputs[m].sub_panel;
+								tempjson["data"]["device_data"][point_idx]["input"][m]["point_type"] = g_monitor_data[npanel_id].at(i).inputs[m].point_type;
+								tempjson["data"]["device_data"][point_idx]["input"][m]["point_number"] = g_monitor_data[npanel_id].at(i).inputs[m].number;
+								tempjson["data"]["device_data"][point_idx]["input"][m]["network"] = g_monitor_data[npanel_id].at(i).inputs[m].network;
+							}
+							point_idx++;
+						}
+
+					} // for groups
+				}
+				break;
+			}
+
 			case READ_SETTING_COMMAND:
 			{
 				if ((entry_index_end == 0) && (entry_index_start == 0))

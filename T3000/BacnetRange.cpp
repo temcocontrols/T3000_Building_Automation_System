@@ -12,6 +12,7 @@
 #include "BacnetVarCusRang.h"
 #include "Bacnet_Range_Msv.h"
 #include "MainFrm.h"
+extern bool enable_all_output_analog_range;
 CBacnetAnalogCusRang * bac_analog_window = NULL;
 static int temp_static_value = 0;
 int old_bac_range_number_choose = 0;
@@ -290,29 +291,29 @@ void BacnetRange::SetAllRadioButton(int button_index ) // 0  keep     1 enable a
 void BacnetRange::Update_Custom_Units()
 {
 			CString temp_cs_analog;
-		if (!Analog_Customer_Units[0].IsEmpty())
+		if (!Analog_Custom_Units[0].IsEmpty())
 		{
-			temp_cs_analog.Format(_T("50.  Table 1 ( %s )"),Analog_Customer_Units[0]);
+			temp_cs_analog.Format(_T("50.  Table 1 ( %s )"),Analog_Custom_Units[0]);
 			GetDlgItem(IDC_RADIO82)->SetWindowTextW(temp_cs_analog);
 		}
-		if (!Analog_Customer_Units[1].IsEmpty())
+		if (!Analog_Custom_Units[1].IsEmpty())
 		{
-			temp_cs_analog.Format(_T("51.  Table 2 ( %s )"),Analog_Customer_Units[1]);
+			temp_cs_analog.Format(_T("51.  Table 2 ( %s )"),Analog_Custom_Units[1]);
 			GetDlgItem(IDC_RADIO83)->SetWindowTextW(temp_cs_analog);
 		}
-		if (!Analog_Customer_Units[2].IsEmpty())
+		if (!Analog_Custom_Units[2].IsEmpty())
 		{
-			temp_cs_analog.Format(_T("52.  Table 3 ( %s )"),Analog_Customer_Units[2]);
+			temp_cs_analog.Format(_T("52.  Table 3 ( %s )"),Analog_Custom_Units[2]);
 			GetDlgItem(IDC_RADIO84)->SetWindowTextW(temp_cs_analog);
 		}
-		if (!Analog_Customer_Units[3].IsEmpty())
+		if (!Analog_Custom_Units[3].IsEmpty())
 		{
-			temp_cs_analog.Format(_T("53.  Table 4 ( %s )"),Analog_Customer_Units[3]);
+			temp_cs_analog.Format(_T("53.  Table 4 ( %s )"),Analog_Custom_Units[3]);
 			GetDlgItem(IDC_RADIO85)->SetWindowTextW(temp_cs_analog);
 		}
-		if (!Analog_Customer_Units[4].IsEmpty())
+		if (!Analog_Custom_Units[4].IsEmpty())
 		{
-			temp_cs_analog.Format(_T("54.  Table 5 ( %s )"),Analog_Customer_Units[4]);
+			temp_cs_analog.Format(_T("54.  Table 5 ( %s )"),Analog_Custom_Units[4]);
 			GetDlgItem(IDC_RADIO86)->SetWindowTextW(temp_cs_analog);
 		}
 }
@@ -353,7 +354,7 @@ void BacnetRange::Initial_static()
 		GetDlgItem(IDC_RADIO_MSV_4)->SetWindowTextW(Custom_Msv_Range[3]);
     }
 
-	if((receive_customer_unit) || (offline_mode))
+	if((receive_custom_unit) || (offline_mode))
 	{
 
 		for(int i=0 ;i < BAC_CUSTOMER_UNITS_COUNT ; i++)
@@ -581,7 +582,6 @@ void BacnetRange::Initial_static()
 	{
 		m_show_unit.ShowWindow(TRUE);
 
-
 		if(bac_ranges_type == OUTPUT_RANGE_ANALOG_TYPE)
 		{
 			if((bac_ranges_type>0) && (bac_ranges_type <=5))
@@ -728,6 +728,42 @@ void BacnetRange::Initial_static()
 
 		// Fandu 2021 09 06 All T3 series and extension series do not support 4-20ma current output
 		GetDlgItem(IDC_RADIO53)->EnableWindow(false); //Fandu 2021 09 06 所有的T3系列 以及扩展系列都不支持 4-20ma 电流输出;
+
+		//if(Device_Basic_Setting.reg.panel_number)
+		if (g_selected_product_id == PM_ESP32_T3_SERIES)
+		{
+			if (enable_all_output_analog_range == false)
+			{
+				for (int i = IDC_RADIO47; i <= IDC_RADIO53; i++)	//Output analog
+				{
+					GetDlgItem(i)->EnableWindow(false);
+				}
+				GetDlgItem(IDC_RADIO_NEW200)->EnableWindow(true);
+				GetDlgItem(IDC_RADIO_NEW201)->EnableWindow(false);
+
+				for (int i = IDC_RADIO_MSV_1; i <= IDC_RADIO_MSV_4; i++)
+				{
+					((CButton*)GetDlgItem(i))->EnableWindow(false);
+				}
+				((CButton*)GetDlgItem(IDC_BTN_EDIT_MSV_RANGE))->EnableWindow(false);
+			}
+			else
+			{
+				for (int i = IDC_RADIO47; i <= IDC_RADIO53; i++)	//Output analog
+				{
+					GetDlgItem(i)->EnableWindow(true);
+				}
+				GetDlgItem(IDC_RADIO_NEW200)->EnableWindow(true);
+				GetDlgItem(IDC_RADIO_NEW201)->EnableWindow(true);
+				for (int i = IDC_RADIO_MSV_1; i <= IDC_RADIO_MSV_4; i++)
+				{
+					((CButton*)GetDlgItem(i))->EnableWindow(true);
+				}
+				((CButton*)GetDlgItem(IDC_BTN_EDIT_MSV_RANGE))->EnableWindow(true);
+			}
+		}
+
+
 	}
 	else if((bac_ranges_type == INPUT_RANGE_ANALOG_TYPE) || (initial_dialog == 2))
 	{
@@ -851,29 +887,29 @@ void BacnetRange::Initial_static()
 		}
 		Update_Custom_Units();
 		//CString temp_cs_analog;
-		//if(!Analog_Customer_Units[0].IsEmpty())
+		//if(!Analog_Custom_Units[0].IsEmpty())
 		//{
-		//	temp_cs_analog.Format(_T("50.  Table 1 ( %s )"),Analog_Customer_Units[0]);
+		//	temp_cs_analog.Format(_T("50.  Table 1 ( %s )"),Analog_Custom_Units[0]);
 		//	GetDlgItem(IDC_RADIO82)->SetWindowTextW(temp_cs_analog);
 		//}
-		//if(!Analog_Customer_Units[1].IsEmpty())
+		//if(!Analog_Custom_Units[1].IsEmpty())
 		//{
-		//	temp_cs_analog.Format(_T("51.  Table 2 ( %s )"),Analog_Customer_Units[1]);
+		//	temp_cs_analog.Format(_T("51.  Table 2 ( %s )"),Analog_Custom_Units[1]);
 		//	GetDlgItem(IDC_RADIO83)->SetWindowTextW(temp_cs_analog);
 		//}
-		//if(!Analog_Customer_Units[2].IsEmpty())
+		//if(!Analog_Custom_Units[2].IsEmpty())
 		//{
-		//	temp_cs_analog.Format(_T("52.  Table 3 ( %s )"),Analog_Customer_Units[2]);
+		//	temp_cs_analog.Format(_T("52.  Table 3 ( %s )"),Analog_Custom_Units[2]);
 		//	GetDlgItem(IDC_RADIO84)->SetWindowTextW(temp_cs_analog);
 		//}
-		//if(!Analog_Customer_Units[3].IsEmpty())
+		//if(!Analog_Custom_Units[3].IsEmpty())
 		//{
-		//	temp_cs_analog.Format(_T("53.  Table 4 ( %s )"),Analog_Customer_Units[3]);
+		//	temp_cs_analog.Format(_T("53.  Table 4 ( %s )"),Analog_Custom_Units[3]);
 		//	GetDlgItem(IDC_RADIO85)->SetWindowTextW(temp_cs_analog);
 		//}
-		//if(!Analog_Customer_Units[4].IsEmpty())
+		//if(!Analog_Custom_Units[4].IsEmpty())
 		//{
-		//	temp_cs_analog.Format(_T("54.  Table 5 ( %s )"),Analog_Customer_Units[4]);
+		//	temp_cs_analog.Format(_T("54.  Table 5 ( %s )"),Analog_Custom_Units[4]);
 		//	GetDlgItem(IDC_RADIO86)->SetWindowTextW(temp_cs_analog);
 		//}
 
@@ -2468,20 +2504,20 @@ void BacnetRange::OnBnClickedBtnEditCustomerRange()
 	{
 		CString temp_dig_off;
 		CString temp_dig_on;
-		MultiByteToWideChar(CP_ACP, 0, (char*)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char*)m_customer_unit_data.at(i).digital_units_off) + 1,
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_custom_unit_data.at(i).digital_units_off, (int)strlen((char*)m_custom_unit_data.at(i).digital_units_off) + 1,
 			temp_dig_off.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_dig_off.ReleaseBuffer();
 		if (temp_dig_off.GetLength() >= 12)
 			temp_dig_off.Empty();
 
-		MultiByteToWideChar(CP_ACP, 0, (char*)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char*)m_customer_unit_data.at(i).digital_units_on) + 1,
+		MultiByteToWideChar(CP_ACP, 0, (char*)m_custom_unit_data.at(i).digital_units_on, (int)strlen((char*)m_custom_unit_data.at(i).digital_units_on) + 1,
 			temp_dig_on.GetBuffer(MAX_PATH), MAX_PATH);
 		temp_dig_on.ReleaseBuffer();
 		if (temp_dig_on.GetLength() >= 12)
 			temp_dig_on.Empty();
 
 		//判断正反向逻辑 ，正逻辑处理方式如同  Range 1    负逻辑如同 12;
-		if (m_customer_unit_data.at(i).direct == DIGITAL_DIRECT)
+		if (m_custom_unit_data.at(i).direct == DIGITAL_DIRECT)
 		{
 			cus_digital_off[i] = temp_dig_off;
 			cus_digital_on[i] = temp_dig_on;

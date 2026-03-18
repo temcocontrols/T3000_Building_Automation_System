@@ -333,7 +333,7 @@ LRESULT CBacnetPvar::Fresh_Pvar_List(WPARAM wParam, LPARAM lParam)
 					temp1 = Digital_Units_Array[m_pvar_data.at(i).range];
 				else if ((m_pvar_data.at(i).range >= 23) && (m_pvar_data.at(i).range <= 30))
 				{
-					if (receive_customer_unit)
+					if (receive_custom_unit)
 						temp1 = Custom_Digital_Range[m_pvar_data.at(i).range - 23];
 				}
 				else
@@ -681,7 +681,7 @@ void CBacnetPvar::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			temp1 = Digital_Units_Array[m_pvar_data.at(lRow).range];
 		else if((m_pvar_data.at(lRow).range >=23) && (m_pvar_data.at(lRow).range <= 30))
 		{
-			if(receive_customer_unit)
+			if(receive_custom_unit)
 				temp1 = Custom_Digital_Range[m_pvar_data.at(lRow).range - 23];
 			else
 			{

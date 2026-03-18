@@ -1324,7 +1324,7 @@ typedef enum
 	T3_ESP_SAUTER = 18,//T3000 TBD
 	T3_ESP_RMC = 19,  //1-16 input 17-18 sensor    Output1-7DO
 	T3_ESP_LW = 21,  //0 input   ,   6  output
-	T3_NG2_TYPE2 = 22,
+	T3_NG3 = 22,
 	T3_3IIC = 26,  //6合1 的传感器 esp 产品 啥也没加
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
@@ -1382,6 +1382,7 @@ const int T322AI_OUT_A = 0;
 const int T332AI_OUT_D = 0;
 const int T332AI_OUT_A = 0;
 
+
 const int PWM_TRANSDUCER_OUT_D = 0;
 const int PWM_TRANSDUCER_OUT_A = 6;
 
@@ -1390,15 +1391,15 @@ const int FAN_MODULE_IN_D = 0;
 const int FAN_MOUDLE_OUT_A = 1; 
 const int FAN_MOUDLE_OUT_D = 0;
 
-const int NG2_IN_A = 18;
-const int NG2_IN_D = 0;
-const int NG2_OUT_A = 0;
-const int NG2_OUT_D = 7;
+const int RMC_IN_A = 18;
+const int RMC_IN_D = 0;
+const int RMC_OUT_A = 0;
+const int RMC_OUT_D = 7;
 
-const int NG2_TYPE2_IN_A = 30;
-const int NG2_TYPE2_IN_D = 0;
-const int NG2_TYPE2_OUT_A = 4;
-const int NG2_TYPE2_OUT_D = 8;
+const int NG3_IN_A = 24;
+const int NG3_IN_D = 0;
+const int NG3_OUT_A = 4;
+const int NG3_OUT_D = 8;
 
 const int T3_3IIC_IN_A = 10;
 const int T3_3IIC_IN_D = 0;

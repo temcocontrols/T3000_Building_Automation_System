@@ -505,7 +505,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 									temp1 = Digital_Units_Array[m_Variable_data.at(x).range];
 								else if((m_Variable_data.at(x).range >=23) && (m_Variable_data.at(x).range <= 30))
 								{
-									if(receive_customer_unit)
+									if(receive_custom_unit)
 										temp1 = Custom_Digital_Range[m_Variable_data.at(x).range - 23];
 								}
 

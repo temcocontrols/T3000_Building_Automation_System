@@ -22,7 +22,7 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	ListCtrlEx::CListCtrlEx m_customer_dig_range_list;
+	ListCtrlEx::CListCtrlEx m_custom_dig_range_list;
 	void Initial_List();
 	afx_msg LRESULT Fresh_Customer_Digital_Range_List(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Fresh_Customer_Digital_Range_Item(WPARAM wParam,LPARAM lParam);
@@ -32,9 +32,9 @@ public:
 
 };
 
-const int CUSTOMER_DIGITAL_RANGE_NUM = 0;
-const int CUSTOMER_DIGITAL_RANGE_OFF = 1;
-const int CUSTOMER_DIGITAL_RANGE_ON = 2;
-const int CUSTOMER_DIGITAL_RANGE_DIRECT_INV = 3;
+const int CUSTOM_DIGITAL_RANGE_NUM = 0;
+const int CUSTOM_DIGITAL_RANGE_OFF = 1;
+const int CUSTOM_DIGITAL_RANGE_ON = 2;
+const int CUSTOM_DIGITAL_RANGE_DIRECT_INV = 3;
 
-const int CUSTOMER_DIGITAL_RANGE_COL_NUMBER = 4;
+const int CUSTOM_DIGITAL_RANGE_COL_NUMBER = 4;

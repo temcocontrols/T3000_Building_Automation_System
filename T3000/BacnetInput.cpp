@@ -280,17 +280,17 @@ void CBacnetInput::Reload_Unit_Type()
 	}
 	else if (bacnet_device_type == T3_ESP_RMC)
 	{
-		if (NG2_IN_A > (int)m_Input_data.size())
+		if (RMC_IN_A > (int)m_Input_data.size())
 			initial_count = (int)m_Input_data.size();
 		else
-			initial_count = NG2_IN_A;
+			initial_count = RMC_IN_A;
 	}
-	else if (bacnet_device_type == T3_NG2_TYPE2)
+	else if (bacnet_device_type == T3_NG3)
 	{
-		if (NG2_TYPE2_IN_A > (int)m_Input_data.size())
+		if (NG3_IN_A > (int)m_Input_data.size())
 			initial_count = (int)m_Input_data.size();
 		else
-			initial_count = NG2_TYPE2_IN_A;
+			initial_count = NG3_IN_A;
 	}
 	else if (bacnet_device_type == T3_3IIC)
 	{
@@ -1005,7 +1005,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 
 			if ((m_Input_data.at(i).range >= 20) && (m_Input_data.at(i).range <= 24))
 			{
-				m_input_list.SetItemText(i, INPUT_UNITE, Analog_Customer_Units[m_Input_data.at(i).range - 20]);
+				m_input_list.SetItemText(i, INPUT_UNITE, Analog_Custom_Units[m_Input_data.at(i).range - 20]);
 				m_input_list.SetCellEnabled(i, INPUT_JUMPER, 1);  //如果input range 是analog 默认不可改 signal type 除非custom
 				m_input_list.SetItemTextColor(i, INPUT_JUMPER, RGB(0, 0, 0), 0);
 			}
@@ -1103,7 +1103,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 				m_input_list.SetItemText(i, INPUT_RANGE, Digital_Units_Array[m_Input_data.at(i).range]);
 			else if ((m_Input_data.at(i).range >= 23) && (m_Input_data.at(i).range <= 30))
 			{
-				if (receive_customer_unit)
+				if (receive_custom_unit)
 					m_input_list.SetItemText(i, INPUT_RANGE, Custom_Digital_Range[m_Input_data.at(i).range - 23]);
 				else
 					m_input_list.SetItemText(i, INPUT_RANGE, Digital_Units_Array[0]);
@@ -1125,7 +1125,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 					temp1 = Digital_Units_Array[m_Input_data.at(i).range];
 				else if ((m_Input_data.at(i).range >= 23) && (m_Input_data.at(i).range <= 30))
 				{
-					if (receive_customer_unit)
+					if (receive_custom_unit)
 						temp1 = Custom_Digital_Range[m_Input_data.at(i).range - 23];
 				}
 
@@ -1491,7 +1491,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			temp1 = Digital_Units_Array[m_Input_data.at(lRow).range];
 		else if((m_Input_data.at(lRow).range >=23) && (m_Input_data.at(lRow).range <= 30))
 		{
-			if(receive_customer_unit)
+			if(receive_custom_unit)
 				temp1 = Custom_Digital_Range[m_Input_data.at(lRow).range - 23];
 			else
 			{
@@ -1651,7 +1651,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				if ((lRow >= 16) && (lRow <= 17))  //IN17  IN18 is sensor
 					return;
 			}
-			else if (Device_Basic_Setting.reg.mini_type == T3_NG2_TYPE2)
+			else if (Device_Basic_Setting.reg.mini_type == T3_NG3)
 			{
 				if ((lRow >= 24) && (lRow <= 29))  //IN25  IN30 这些range是固定的传感器，不可更改
 					return;
@@ -1751,7 +1751,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                 if ((bac_range_number_choose >= 20) && (bac_range_number_choose <= 24))//选择的是cus range 需要去选择single type
                 {
                     m_Input_data.at(lRow).decom = m_dialog_signal_type;
-					m_input_list.SetItemText(lRow, INPUT_UNITE, Analog_Customer_Units[bac_range_number_choose - 20]);//需要将units 赋值给全局变量，刷新;
+					m_input_list.SetItemText(lRow, INPUT_UNITE, Analog_Custom_Units[bac_range_number_choose - 20]);//需要将units 赋值给全局变量，刷新;
                 }
 
 				
@@ -2302,7 +2302,7 @@ int GetInputValueEx(Str_in_point temp_in, CString& ret_cstring, CString& ret_uni
 				temp1 = Digital_Units_Array[temp_in.range];
 			else if ((temp_in.range >= 23) && (temp_in.range <= 30))
 			{
-				if (receive_customer_unit)
+				if (receive_custom_unit)
 					temp1 = Custom_Digital_Range[temp_in.range - 23];
 			}
 
@@ -2391,7 +2391,7 @@ int GetInputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Aut
 	//			temp1 = Digital_Units_Array[m_Input_data.at(i).range];
 	//		else if((m_Input_data.at(i).range >=23) && (m_Input_data.at(i).range <= 30))
 	//		{
-	//			if(receive_customer_unit)
+	//			if(receive_custom_unit)
 	//				temp1 = Custom_Digital_Range[m_Input_data.at(i).range - 23];
 	//		}
 
@@ -2508,7 +2508,7 @@ void CBacnetInput::GetInputUnitandValue(int i, CString& unit, CString& value)
 
 		if ((m_Input_data.at(i).range >= 20) && (m_Input_data.at(i).range <= 24))
 		{
-			unit = Analog_Customer_Units[m_Input_data.at(i).range - 20];
+			unit = Analog_Custom_Units[m_Input_data.at(i).range - 20];
 		}
 		else if (m_Input_data.at(i).range < (sizeof(Input_List_Analog_Units) / sizeof(Input_List_Analog_Units[0])))
 			unit = Input_List_Analog_Units[m_Input_data.at(i).range];
@@ -2565,7 +2565,7 @@ void CBacnetInput::GetInputUnitandValue(int i, CString& unit, CString& value)
 				temp1 = Digital_Units_Array[m_Input_data.at(i).range];
 			else if ((m_Input_data.at(i).range >= 23) && (m_Input_data.at(i).range <= 30))
 			{
-				if (receive_customer_unit)
+				if (receive_custom_unit)
 					temp1 = Custom_Digital_Range[m_Input_data.at(i).range - 23];
 			}
 

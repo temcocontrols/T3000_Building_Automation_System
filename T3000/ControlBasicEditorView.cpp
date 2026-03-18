@@ -191,7 +191,7 @@ void ControlBasicEditorView::SetAllPoints_BACnetDevice()
 		if (m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG)
 		{
 			if ((m_Input_data.at(i).range >= 20) && (m_Input_data.at(i).range <= 24))
-				Units=Analog_Customer_Units[m_Input_data.at(i).range - 20];
+				Units=Analog_Custom_Units[m_Input_data.at(i).range - 20];
 			else if (m_Input_data.at(i).range < (sizeof(Input_List_Analog_Units) / sizeof(Input_List_Analog_Units[0])))
 				Units =  Input_List_Analog_Units[m_Input_data.at(i).range];
 			else if (m_Input_data.at(i).range < (sizeof(Input_Analog_Units_Array) / sizeof(Input_Analog_Units_Array[0])))
@@ -249,7 +249,7 @@ void ControlBasicEditorView::SetAllPoints_BACnetDevice()
 				Units = Digital_Units_Array[m_Input_data.at(i).range];
 			else if ((m_Input_data.at(i).range >= 23) && (m_Input_data.at(i).range <= 30))
 			{
-				if (receive_customer_unit)
+				if (receive_custom_unit)
 					Units = Custom_Digital_Range[m_Input_data.at(i).range - 23];
 				else
 					Units = Digital_Units_Array[0];
@@ -271,7 +271,7 @@ void ControlBasicEditorView::SetAllPoints_BACnetDevice()
 					Units = Digital_Units_Array[m_Input_data.at(i).range];
 				else if ((m_Input_data.at(i).range >= 23) && (m_Input_data.at(i).range <= 30))
 				{
-					if (receive_customer_unit)
+					if (receive_custom_unit)
 						Units = Custom_Digital_Range[m_Input_data.at(i).range - 23];
 				}
 
@@ -349,7 +349,7 @@ void ControlBasicEditorView::SetAllPoints_BACnetDevice()
 				Units = Digital_Units_Array[m_Output_data.at(i).range];
 			else if ((m_Output_data.at(i).range >= 23) && (m_Output_data.at(i).range <= 30))
 			{
-				if (receive_customer_unit)
+				if (receive_custom_unit)
 					Units = Custom_Digital_Range[m_Output_data.at(i).range - 23];
 				else
 					Units = Digital_Units_Array[0];
@@ -370,7 +370,7 @@ void ControlBasicEditorView::SetAllPoints_BACnetDevice()
 					Units = Digital_Units_Array[m_Output_data.at(i).range];
 				else if ((m_Output_data.at(i).range >= 23) && (m_Output_data.at(i).range <= 30))
 				{
-					if (receive_customer_unit)
+					if (receive_custom_unit)
 						Units = Custom_Digital_Range[m_Output_data.at(i).range - 23];
 				}
 				else
@@ -434,7 +434,7 @@ void ControlBasicEditorView::SetAllPoints_BACnetDevice()
 					Units = Digital_Units_Array[m_Variable_data.at(i).range];
 				else if ((m_Variable_data.at(i).range >= 23) && (m_Variable_data.at(i).range <= 30))
 				{
-					if (receive_customer_unit)
+					if (receive_custom_unit)
 						Units = Custom_Digital_Range[m_Variable_data.at(i).range - 23];
 				}
 				else

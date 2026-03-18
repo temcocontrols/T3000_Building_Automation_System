@@ -5853,6 +5853,7 @@ LRESULT CMainFrame::HandleWriteNewDevice(WPARAM wParam, LPARAM lParam)
         //temp_path = 
         LoadBacnetBinaryFile(2, temp_path);
 
+
     return 1; 
 }
 
@@ -6176,7 +6177,7 @@ void CMainFrame::OnDestroy()
     m_alarmlog_data.clear();
     m_Tstat_data.clear();
     m_alarmlog_data.clear();
-    m_customer_unit_data.clear();
+    m_custom_unit_data.clear();
     m_user_login_data.clear();
     m_graphic_label_data.clear();
     m_remote_point_data.clear();
@@ -12245,8 +12246,8 @@ void CMainFrame::OnControlInputs()
                         }
                         MultiByteToWideChar(CP_ACP, 0, (char*)temp_char,
                             (int)strlen((char*)temp_char) + 1,
-                            Analog_Customer_Units[i].GetBuffer(MAX_PATH), MAX_PATH);
-                        Analog_Customer_Units[i].ReleaseBuffer();
+                            Analog_Custom_Units[i].GetBuffer(MAX_PATH), MAX_PATH);
+                        Analog_Custom_Units[i].ReleaseBuffer();
                     }
 
                 }
@@ -15497,7 +15498,7 @@ void CMainFrame::OnHelpUsingUpdate()
 	if((temp_product_count > 0) && (selected_product_index!=-1) && (selected_product_index < temp_product_count))
 	{
         m_product_isp_auto_flash = m_product.at(selected_product_index);
-        if ((Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) || (Device_Basic_Setting.reg.mini_type == T3_NG2_TYPE2))
+        if ((Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) || (Device_Basic_Setting.reg.mini_type == T3_NG3))
         {
             //如果是PLC的 RMC和NG2的第二种类型，那么在后面判断类型  不能直接使用T3000 去更新固件;
             m_product_isp_auto_flash.m_ext_info.mini_type = Device_Basic_Setting.reg.mini_type;

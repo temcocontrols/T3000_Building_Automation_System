@@ -325,7 +325,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 						temp_unit = Digital_Units_Array[m_Input_data.at(label_info.nPoint_number).range];
 					else if((m_Input_data.at(label_info.nPoint_number).range >=23) && (m_Input_data.at(label_info.nPoint_number).range <= 30))
 					{
-						if(receive_customer_unit)
+						if(receive_custom_unit)
 							temp_unit = Custom_Digital_Range[m_Input_data.at(label_info.nPoint_number).range - 23];
 						else
 						{
@@ -404,7 +404,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 						temp_unit = Digital_Units_Array[m_Output_data.at(label_info.nPoint_number).range];
 					else if((m_Output_data.at(label_info.nPoint_number).range >=23) && (m_Output_data.at(label_info.nPoint_number).range <= 30))
 					{
-						if(receive_customer_unit)
+						if(receive_custom_unit)
 							temp_unit = Custom_Digital_Range[m_Output_data.at(label_info.nPoint_number).range - 23];
 						else
 						{
@@ -524,7 +524,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 						temp_unit = Digital_Units_Array[m_Variable_data.at(label_info.nPoint_number).range];
 					else if((m_Variable_data.at(label_info.nPoint_number).range >=23) && (m_Variable_data.at(label_info.nPoint_number).range <= 30))
 					{
-						if(receive_customer_unit)
+						if(receive_custom_unit)
 							temp_unit = Custom_Digital_Range[m_Variable_data.at(label_info.nPoint_number).range - 23];
 						else
 						{
