@@ -10,7 +10,7 @@ const DATA_CACHE_NAME = 't3000-data-cache-v1';
 const STATIC_CACHE_URLS = [
   '/',
   '/index.html',
-  '/favicon.ico',
+  '/icons/favicon.ico',
   '/assets/logo.png',
   // Add other static assets as needed
 ];
@@ -74,6 +74,11 @@ self.addEventListener('fetch', (event) => {
 
   // Skip cross-origin requests
   if (url.origin !== location.origin) {
+    return;
+  }
+
+  // Skip non-GET requests - Cache API only supports GET
+  if (request.method !== 'GET') {
     return;
   }
 

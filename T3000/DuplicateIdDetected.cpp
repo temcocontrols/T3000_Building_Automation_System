@@ -972,7 +972,7 @@ BOOL CDuplicateIdDetected::ChangeNetDeviceIP(CString soldIP, CString newstrIP, u
 
     //GetNewIP(strnewipadress,allsubnets[i].StrIP);
     // Filter out 0.0.0.0
-    if (strnewipadress.Find(_T("0.0.0")) != -1)//对0.0.0.0的过滤掉
+    if (strnewipadress.Find(_T("0.0.0.0")) != -1)//对0.0.0.0的过滤掉
     {
         return FALSE;
     }

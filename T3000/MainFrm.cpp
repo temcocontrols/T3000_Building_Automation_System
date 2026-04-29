@@ -396,6 +396,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
         //ON_COMMAND(ID_WEBVIEW_THIRDPARTYMODBUSDATABASE, &CMainFrame::OnWebviewThirdpartymodbusdatabase)
         ON_COMMAND(ID_TOOLS_LOGINMYACCOUNT, &CMainFrame::OnToolsLoginmyaccount)
         ON_WM_SYSCOMMAND()
+        ON_WM_ACTIVATEAPP()
         END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -1201,7 +1202,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
     //  Modify the Window class or styles here by modifying
     //  the CREATESTRUCT cs
     // 禁用最小化按钮
-    cs.style &= ~WS_MINIMIZEBOX;
+    //cs.style &= ~WS_MINIMIZEBOX;
     cs.style &= ~FWS_ADDTOTITLE; 
     return TRUE;
 }
@@ -5766,7 +5767,11 @@ LRESULT  CMainFrame::ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM l
         CString temp_file;
         temp_serial.Format(_T("%u.prog"), g_selected_serialnumber);//g_selected_serialnumber
         temp_file = g_achive_folder + _T("\\") + temp_serial;
-
+        if (!FinalSaveProgPath.IsEmpty())
+        {
+            temp_file = FinalSaveProgPath;
+            FinalSaveProgPath.Empty();
+        }
 
         CFileFind cfindtempfile;
         if (cfindtempfile.FindFile(temp_file))
@@ -6344,7 +6349,6 @@ void CMainFrame::OnDestroy()
 
 void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 {
-    TRACE("OnSysCommand: nID = 0x%04X\n", nID);  // 注意用十六进制打印
     if ((nID & 0xFFF0) == SC_MINIMIZE)
     {
         // 处理最小化
@@ -6353,19 +6357,17 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
     }
     else if (((nID & 0xFFF0) == SC_RESTORE) || (nID == SC_DEFAULT && IsIconic()))
     {
-        //PostMessage(WM_KEYDOWN, VK_ESCAPE, 0);
-        // 模拟 ESC 键释放
-        //PostMessage(WM_KEYUP, VK_ESCAPE, 0);
         // 处理恢复
-        //TRACE("Restoring window...\n");
         ShowWindow(SW_RESTORE);
-        //SetForegroundWindow();   // 将窗口置于前台
-        //SetActiveWindow();        // 激活窗口
-        //SetFocus();
+        SetForegroundWindow();   // ← 添加这行，确保窗口置于前台
+        SetActiveWindow();       // ← 添加这行，激活窗口
     }
     else
     {
-        DefWindowProc(WM_SYSCOMMAND, nID, lParam);  // 调用默认窗口过程处理其他系统命令
+        // 其他命令交给基类处理
+        CFrameWndEx::OnSysCommand(nID, lParam);  // ← 改用基类方法
+
+        //DefWindowProc(WM_SYSCOMMAND, nID, lParam);  // 调用默认窗口过程处理其他系统命令
         //CFrameWnd::OnSysCommand(nID, lParam);
     }
 }
@@ -6477,7 +6479,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
                 CString temp_pc_ip;
                 temp_pc_ip.Format(_T("%s.%s.%s"), temp_pc_strip.GetAt(0), temp_pc_strip.GetAt(1), temp_pc_strip.GetAt(2));
 
-                if (temp_pc_ip.CompareNoCase(_T("0.0.0")) == 0)
+                if (temp_pc_ip.CompareNoCase(_T("0.0.0.0")) == 0)
                     continue;
 
                 if (temp_ip.CompareNoCase(temp_pc_ip) == 0)
@@ -10651,7 +10653,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         int temp_start_index = (BAC_READ_INPUT_GROUP_NUMBER)*i;
                         int temp_end_index = end_temp_instance;
 
-                        for (int i = temp_start_index; i < temp_end_index; i++)
+                        for (int i = temp_start_index; i <= temp_end_index; i++)
                         {
                             g_Input_data[n_panel_id].at(i) = s_Input_data[i];
                         }
@@ -10696,7 +10698,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         int temp_start_index = (BAC_READ_OUTPUT_GROUP_NUMBER)*i;
                         int temp_end_index = end_temp_instance;
 
-                        for (int i = temp_start_index; i < temp_end_index; i++)
+                        for (int i = temp_start_index; i <= temp_end_index; i++)
                         {
                             g_Output_data[n_panel_id].at(i) = s_Output_data[i];
                         }
@@ -10740,7 +10742,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                             int temp_start_index = (BAC_READ_VARIABLE_GROUP_NUMBER)*i;
                             int temp_end_index = end_temp_instance;
 
-                            for (int i = temp_start_index; i < temp_end_index; i++)
+                            for (int i = temp_start_index; i <= temp_end_index; i++)
                             {
                                 g_Variable_data[n_panel_id].at(i) = s_Variable_data[i];
                             }
@@ -11061,7 +11063,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
                         sizeof(Str_monitor_point));
                     if (nret > 0)
                     {
-                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_monitor_data, &s_monitor_data, sizeof(Str_monitor_point));
+                        memcpy(&m_backbround_data.at(n_handle_index).ret_data.m_group_monitor_data, &s_monitor_data[m_backbround_data.at(n_handle_index).str_info.npoint_number], sizeof(Str_monitor_point));
                     }
                 }
                 break;
@@ -15892,6 +15894,7 @@ void CMainFrame::SaveConfigFile()
         {
 
             SaveConfigFilePath = dlg.GetPathName();
+            FinalSaveProgPath = SaveConfigFilePath;
             //CFileFind cfindtempfile;
             //if(cfindtempfile.FindFile(SaveConfigFilePath))
             //{
@@ -15938,6 +15941,7 @@ void CMainFrame::SaveConfigFile()
         {
 
             SaveConfigFilePath = dlg.GetPathName();
+            FinalSaveProgPath = SaveConfigFilePath;
             CFileFind cfindtempfile;
             if (cfindtempfile.FindFile(SaveConfigFilePath))
             {
@@ -16585,6 +16589,19 @@ void CMainFrame::OnWebviewModbusregister()
     delete webviewwindow;
 }
 
+void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
+{
+    TRACE("OnActivateApp: bActive=%d, IsIconic=%d\n", bActive, IsIconic());
+
+    if (bActive && IsIconic())
+    {
+        // 应用被激活且窗口处于最小化状态 -> 恢复窗口
+        ShowWindow(SW_RESTORE);
+        SetForegroundWindow();
+    }
+
+    CFrameWndEx::OnActivateApp(bActive, dwThreadID);
+}
 
 
 

@@ -172,7 +172,7 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
          }
 
 		//GetNewIP(strnewipadress,allsubnets[i].StrIP);
-		if (strnewipadress.Find(_T("0.0.0"))!=-1)//对0.0.0.0的过滤掉 - Filter out 0.0.0.0
+		if (strnewipadress.Find(_T("0.0.0.0"))!=-1)//对0.0.0.0的过滤掉 - Filter out 0.0.0.0
 		{
 			return FALSE;
 		}

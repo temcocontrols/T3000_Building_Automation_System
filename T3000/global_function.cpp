@@ -2084,7 +2084,14 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         break;
 	case  WRITE_MISC:
 		{
-			 memcpy_s(SendBuffer +   HEADER_LENGTH,sizeof(Str_MISC),&Device_Misc_Data,sizeof(Str_MISC));
+            if (ext_data == NULL)
+            {
+                memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_MISC), &Device_Misc_Data, sizeof(Str_MISC));
+            }
+            else
+            {
+                memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_MISC), ext_data, sizeof(Str_Setting_Info));
+            }		
 		}
 		break;
 	case WRITE_SPECIAL_COMMAND:
@@ -5037,61 +5044,70 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = bacnet_apud_point + PRIVATE_HEAD_LENGTH;
         if (block_length != sizeof(Str_MISC))
             return -1;
-        Device_Misc_Data.reg.flag[0] = *(my_temp_point++);
-        Device_Misc_Data.reg.flag[1] = *(my_temp_point++);
-        if ((Device_Misc_Data.reg.flag[0] != 0x55) || (Device_Misc_Data.reg.flag[1] != 0xff))
+        s_Device_Misc_Data.reg.flag[0] = *(my_temp_point++);
+        s_Device_Misc_Data.reg.flag[1] = *(my_temp_point++);
+        if ((s_Device_Misc_Data.reg.flag[0] != 0x55) || (s_Device_Misc_Data.reg.flag[1] != 0xff))
             return -1;
         for (int z = 0; z < 12; z++)
         {
-            Device_Misc_Data.reg.monitor_analog_block_num[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.monitor_analog_block_num[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
-            Device_Misc_Data.reg.monitor_digital_block_num[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.monitor_digital_block_num[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
         }
 
         for (int j = 0;j < 12;j++)
         {
-            Device_Misc_Data.reg.operation_time[j] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.operation_time[j] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
-            if ((Device_Misc_Data.reg.operation_time[j] < 1450774486) || (Device_Misc_Data.reg.operation_time[j] > 1505939286))
+            if ((s_Device_Misc_Data.reg.operation_time[j] < 1450774486) || (s_Device_Misc_Data.reg.operation_time[j] > 1505939286))
             {
-                Device_Misc_Data.reg.operation_time[j] = 0;
+                s_Device_Misc_Data.reg.operation_time[j] = 0;
             }
         }
 
-        Device_Misc_Data.reg.flag1 = *(my_temp_point++);
-        if (Device_Misc_Data.reg.flag1 != 0x55)
+        s_Device_Misc_Data.reg.flag1 = *(my_temp_point++);
+        if (s_Device_Misc_Data.reg.flag1 != 0x55)
         {
             return -1;
         }
         for (int z = 0;z < 3;z++)
         {
-            Device_Misc_Data.reg.com_rx[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.com_rx[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
         }
 
         for (int z = 0;z < 3;z++)
         {
-            Device_Misc_Data.reg.com_tx[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.com_tx[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
         }
 
         for (int z = 0;z < 3;z++)
         {
-            Device_Misc_Data.reg.collision[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.collision[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 2;
         }
 
         for (int z = 0;z < 3;z++)
         {
-            Device_Misc_Data.reg.packet_error[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.packet_error[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 2;
         }
 
         for (int z = 0;z < 3;z++)
         {
-            Device_Misc_Data.reg.timeout[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.timeout[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 2;
+        }
+
+        if (invoke_id == gsp_invoke)
+        {
+            Sleep(1);
+        }
+        else
+        {
+            memcpy(&Device_Misc_Data, &s_Device_Misc_Data, sizeof(Str_MISC));
         }
 
     }
@@ -8612,7 +8628,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
             CString temp_pc_ip;
             temp_pc_ip.Format(_T("%s.%s.%s"), temp_pc_strip.GetAt(0), temp_pc_strip.GetAt(1), temp_pc_strip.GetAt(2));
 
-            if (temp_pc_ip.CompareNoCase(_T("0.0.0")) == 0)
+            if (temp_pc_ip.CompareNoCase(_T("0.0.0.0")) == 0)
                 continue;
 
 
@@ -9474,17 +9490,20 @@ void PrintAdapterInfo()
                     Temp_Node.StrIP.ReleaseBuffer();
                     MultiByteToWideChar(CP_ACP, 0, subnetMaskStr, (int)strlen((char*)subnetMaskStr) + 1, Temp_Node.StrMask.GetBuffer(MAX_PATH), MAX_PATH);
                     Temp_Node.StrMask.ReleaseBuffer();
-                    if (Temp_Node.StrIP.Find(_T("0.0.0")) != -1)
+                    if (Temp_Node.StrIP.Find(_T("0.0.0.0")) != -1)
                     {
                         pUnicast = pUnicast->Next;
+                        continue;
                     }
                     else if (Temp_Node.StrIP.GetLength() > 16) //过滤ip6
                     {
                         pUnicast = pUnicast->Next;
+                        continue;
                     }
                     else if (Temp_Node.StrIP.GetLength() < 7)  //过滤不合理的IP
                     {
                         pUnicast = pUnicast->Next;
+                        continue;
                     }
                     else
 					{
@@ -9572,7 +9591,7 @@ void GetIPMaskGetWay()
 
             Temp_Node.NetworkCardType=pAdapter->Type;
 
-            if (Temp_Node.StrIP.Find(_T("0.0.0")) != -1)
+            if (Temp_Node.StrIP.Find(_T("0.0.0.0")) != -1)
             {
                 pAdapter = pAdapter->Next;
                 continue;

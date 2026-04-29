@@ -5061,7 +5061,7 @@ DWORD WINAPI   CTStatScanner::_ScanThirdPartyBacnetThread(LPVOID lpVoid)
         CString temp_pc_ip;
         temp_pc_ip.Format(_T("%s.%s.%s"), temp_pc_strip.GetAt(0), temp_pc_strip.GetAt(1), temp_pc_strip.GetAt(2));
 
-        if (temp_pc_ip.CompareNoCase(_T("0.0.0")) == 0)
+        if (temp_pc_ip.CompareNoCase(_T("0.0.0.0")) == 0)
             continue;
          
         if (Initial_bac(g_gloab_bac_comport, g_Vector_Subnet.at(i).StrIP))

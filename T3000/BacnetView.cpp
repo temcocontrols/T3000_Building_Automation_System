@@ -1008,7 +1008,6 @@ CString remote_ip_address;
 extern tree_product selected_product_Node; // 选中的设备信息;
 // Directory for storing data to database, temporary file storage directory
 extern CString SaveConfigFilePath; //用来将资料存放至数据库，临时文件的存放目录;
-
 extern SOCKET my_sokect;
 extern bool show_user_list_window ;
 // Thread started when clicking MSTP device for connection
@@ -1803,8 +1802,16 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						ProgramEdit_Window = NULL;
 					}
 					ProgramEdit_Window = new CBacnetProgramEdit;
-					ProgramEdit_Window->Create(IDD_DIALOG_BACNET_PROGRAM_EDIT,this);	
+					BOOL bCreateOK = ProgramEdit_Window->Create(IDD_DIALOG_BACNET_PROGRAM_EDIT, this);
+					if (!bCreateOK)
+					{
+						AfxMessageBox(_T("程序编辑对话框创建失败！请检查对话框资源属性"));
+						delete ProgramEdit_Window;
+						ProgramEdit_Window = NULL;
+						return 0; // 失败直接返回，不执行后续操作
+					}
 					ProgramEdit_Window->ShowWindow(SW_SHOW);
+					ProgramEdit_Window->UpdateWindow(); // 强制绘制窗口，解决"创建但不显示"
 
 
 				}

@@ -1953,7 +1953,7 @@ HWND analog_cus_range_dlg=NULL;
 HWND	  m_statusbar_hwnd = NULL;
 HWND      m_t3000_log_window = NULL;
 
-
+Str_MISC g_Device_Misc_Data[256] = { 0 };
 Str_Setting_Info g_Device_Basic_Setting[256] = {0};
 
 Str_in_point s_Input_data[256] = {0};
@@ -2024,6 +2024,7 @@ Str_Setting_Info s_Basic_Setting;
 Str_Setting_Info Device_Basic_Setting;
 Str_Email_point  Device_Email_Point;
 Str_MISC Device_Misc_Data;
+Str_MISC s_Device_Misc_Data;
 Str_Special Device_Special_Data;
 char m_at_write_buf[100];
 char m_at_read_buf[450];
@@ -2111,6 +2112,7 @@ bool TCP_Server_Running = false; //开启TCP 服务器就将标志位置1;
 bool Gsm_communication = false;	//如果是通过GSM 读远程设备 许多地方要特殊处理;不能刷新太频繁;
 CString SaveConfigFilePath;
 CString LoadConfigFilePath;
+CString FinalSaveProgPath;
 vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
 vector<ALL_LOCAL_SUBNET_NODE> g_Scan_Vector_Subnet;
 ipaddress_info g_ipaddress_info;
