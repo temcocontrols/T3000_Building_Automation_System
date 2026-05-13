@@ -14070,6 +14070,13 @@ void CMainFrame::GetProductFPTAndLocalPath(int ProductModel,CString &FtpPath,CSt
             ProductFileName=_T("Tstat6.HEX");
         }
         break;
+    case PM_WINPC:
+        strProductName = "winPC";
+        {
+            FtpPath = _T("");
+            ProductFileName = _T("");
+        }
+        break;
     default:
         strProductName="TStat";
         {
@@ -14311,6 +14318,13 @@ void CMainFrame::GetProductFirmwareFTPDirectory(int ProductModel,CString &FtpPat
         {
             FtpPath=_T("");
             ProductFileName=_T("Tstat6.HEX");
+        }
+        break;
+    case PM_WINPC:
+        strProductName = "winPC";
+        {
+            FtpPath = _T("");
+            ProductFileName = _T("");
         }
         break;
     default:

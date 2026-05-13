@@ -57,6 +57,10 @@ Launching a Build
 
 Remember that these steps are general guidelines, and the actual process might vary based on the specifics of your project and any dependencies it might have. Additionally, make sure you have the required libraries, dependencies, and resources available to successfully compile the solution.
 
+### T3Engine (shared headers)
+
+Use `git submodule update --init --recursive` so the **`T3Engine`** submodule is populated at the **repository root** (alongside the **`T3000`** folder, not inside it). **T3000_VS2019** lists `..\T3Engine\include\` in **Additional Include Directories**; **T3000 `CMakeLists.txt`** adds `../T3Engine/include` for CMake builds. **`stdafx.h`** includes **`temco_product_desc.h`** (product descriptor layout shared with ESP32 `pro_info`).
+
    
 What to do if CI or local build fails with a build error
 -----------------------------------------------------------

@@ -166,6 +166,8 @@ INPUT int write_multi_log(unsigned char device_var,unsigned char *to_write,unsig
 INPUT void SetResponseTime(unsigned short Time);
 
 #include <stdint.h>
+#include "temco_product_desc.h"
+// T3Engine: shared product descriptor (layout + helpers)
 //#include "modbus.h"
 #include <vector>  // STL vector header. There is no ".h"
 #include <afxdhtml.h>

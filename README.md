@@ -7,6 +7,8 @@ This is our T3000 Building Automation front end, a mature project for managing t
 
 The project has been around for many years and has a bright future as the system and our application matures. We welcome contributions and suggestions on next steps. Please refer to [Wiki](https://github.com/temcocontrols/T3000_Building_Automation_System/wiki) for details on how you can get started with contributing towards the project.  For build instructions see [Compile T3000](README_Build.md).
 
+The repo includes the **[T3Engine](https://github.com/temcocontrols/T3_Engine)** submodule at **`T3Engine/`** (repository root, next to **`T3000/`**), for shared C headers such as **`temco_product_desc.h`**. After cloning, run **`git submodule update --init --recursive`**. **T3000_VS2019** adds `..\T3Engine\include\` to the include path; **`stdafx.h`** includes **`temco_product_desc.h`** so the product-descriptor layout matches ESP32 firmware.
+
 To see how you can use our github release action in your own fork follow the instructions in our Wiki [How to use our github action to build the solution and the msi installer](https://github.com/temcocontrols/T3000_Building_Automation_System/wiki/How-to-use-our-github-action-to-build-the-solution-and-the-msi-installer)
 
 Many of our products are open source, check them out on the [Temco Controls](http://www.temcocontrols.com/) web site. Most of what we do at Temco Controls is behind the scenes OEM work so feel free to send an email and ask for custom products. 

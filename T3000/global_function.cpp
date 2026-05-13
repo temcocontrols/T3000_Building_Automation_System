@@ -6792,6 +6792,7 @@ void Inial_Product_Reglist_map()
     product_reglist_map.insert(map<int, CString>::value_type(STM32_PRESSURE_NET, _T("Pressure")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS485, _T("Pressure")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_CO2_NODE, _T("CO2-W+Ethernet")));
+    product_reglist_map.insert(map<int, CString>::value_type(PM_WINPC, _T("winPC")));
 }
 
 unsigned char product_menu[255][20] = { 0 };
@@ -7019,6 +7020,7 @@ void Inial_Product_map()
 	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_NET, _T("Pressure")));
 	product_map.insert(map<int, CString>::value_type(STM32_PRESSURE_RS485, _T("Pressure")));
 	product_map.insert(map<int, CString>::value_type(STM32_CO2_NODE, _T("CO2 Node")));
+	product_map.insert(map<int, CString>::value_type(PM_WINPC, _T("winPC")));
 
 }
 

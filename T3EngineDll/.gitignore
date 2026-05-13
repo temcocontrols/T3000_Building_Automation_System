@@ -1,0 +1,23 @@
+# MSVC / MSBuild outputs (keep sources + project in git)
+Debug/
+Release/
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.ipdb
+*.pdb
+*.exp
+*.dll
+*.lib
+*.tlog
+*.log
+*.idb
+*.opendb
+.vs/

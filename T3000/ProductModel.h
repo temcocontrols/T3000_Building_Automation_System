@@ -93,6 +93,7 @@
 #define STM32_PRESSURE_NET            214      //PSNET
 #define STM32_PRESSURE_RS485         215      //PSRS485
 #define STM32_CO2_NODE                216      //CO2NODE
+#define PM_WINPC                      217      // Windows PC / T3000 host (not field hardware)
 
 
 #define PM_THIRD_PARTY_DEVICE         254      //第三方设备
