@@ -196,6 +196,49 @@ BOOL CT3000App::InitInstance()
 {
 	 
 	GetModulePath();
+	// ---------------------------------------------------------------------------
+	// T3Engine (native DLL) — early load / link smoke
+	//
+	// Purpose: Verify at startup that T3Engine.dll can be loaded from the same
+	// directory as T3000.exe and that the exported entry point used for bring-up
+	// (T3Engine_MonotonicMs) resolves. This does not yet drive application logic;
+	// it only exercises the DLL boundary before the rest of InitInstance runs.
+	//
+	// Deployment: Copy T3Engine.dll next to the T3000 executable (g_strExePth).
+	// If the DLL is absent, release builds continue silently; debug builds TRACE.
+	//
+	// To disable this block during development, change the #if below from 1 to 0.
+	// ---------------------------------------------------------------------------
+#if 1
+	{
+		typedef DWORD(__cdecl* T3Engine_MonotonicMs_fn)(void);
+		CString t3dll = g_strExePth + L"T3Engine.dll";
+		HMODULE hT3 = LoadLibrary((LPCTSTR)t3dll);
+		if (hT3)
+		{
+			// Ordinal-free: resolve by exported name so the DEF/exports stay stable.
+			T3Engine_MonotonicMs_fn fn = (T3Engine_MonotonicMs_fn)GetProcAddress(hT3, "T3Engine_MonotonicMs");
+			if (fn)
+			{
+				// Call once so the import path is known-good; value intentionally unused in retail.
+				volatile DWORD ms = fn();
+				(void)ms;
+#ifdef _DEBUG
+				TRACE(_T("T3Engine.dll: T3Engine_MonotonicMs() = %lu\n"), (unsigned long)ms);
+#endif
+			}
+#ifdef _DEBUG
+			else
+				TRACE(_T("T3Engine.dll: GetProcAddress T3Engine_MonotonicMs failed, err=%lu\n"), (unsigned long)GetLastError());
+#endif
+			FreeLibrary(hT3);
+		}
+#ifdef _DEBUG
+		else
+			TRACE(_T("T3Engine.dll: LoadLibrary failed for '%s', err=%lu\n"), (LPCTSTR)t3dll, (unsigned long)GetLastError());
+#endif
+	}
+#endif
 	CString strSource = g_strExePth + L"T3000Controls.dll";
     //2018 04 23 修复bug 默写操作系统不是C盘的情况安装控件失败
     //解决办法  获取系统所在盘符 ，然后采取对应操作.
