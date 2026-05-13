@@ -914,24 +914,8 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
             }
             while(ii);
 
-            //********************write register 16 value 0x1f **************
             ii=0;
             Sleep(7000);//must have this ,the Tstat need
-            do
-            {
-                if(ii<RETRY_TIMES)
-                    if(-2== mudbus_write_one(m_ID,16,0x1f))
-                        ii++;
-                    else
-                        ii=0;
-                else
-                {
-                    return -4;//error -4
-                }
-            }
-            while(ii);
-            //***************send data to com*************************
-            ii=0;//to the register 0000
         }
     }
     else  // Failed to read Eeprom chip?
@@ -981,7 +965,6 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
         }
         while(ii<RETRY_TIMES);
 
-        //********************write register 16 value 0x1f **************
         ii=0;
         Sleep(7000);//Delay required while device writes to flash
 
@@ -989,6 +972,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
         ii=0;//to the register 0000
     } //End of reading EEprom chip
 
+    //********************write register 16 value 0x1f **************
     uint8_t write_status = 0;
     do  // Set device to programming mode by writing 0x1f to reg 16, retry if fails
     {
@@ -1429,6 +1413,8 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
     for(i = 0; i < pWriter->m_szMdbIDs.size(); i++)
     {
+        // Reset per-device resume pointer; it may be reloaded from device metadata for ESP OTA devices.
+        pWriter->continue_com_flash_count = 0;
         if (SPECIAL_BAC_TO_MODBUS)
         {
             g_mstp_deviceid = 0;
@@ -1539,8 +1525,9 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                 if(nRet < 0)
                     mudbus_write_one(pWriter->m_szMdbIDs[i],16,127);   // Enter ISP mode
 
-                //TBD: explain this comment better
- /*  If you jump from the application code to the ISP 16 write 127, you need to read 11th register 11th number greater than 1 description of the jump success, otherwise continue to wait; */
+                // After writing 16=127 (request jump to ISP), poll register 11.
+                // A value > 1 means the bootloader is alive and ready for programming.
+                // Keep waiting (up to ~15s) because some devices reboot slowly.
 
                 strTips = _T("Wait device jump to isp mode!");
                 pWriter->OutPutsStatusInfo(strTips);
@@ -1556,7 +1543,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     if(re_count == 15)
                         break;
                 }
-                while (nnn_ret > 1);
+                while (nnn_ret <= 1);
 
                 // Sleep(2000);
                 int ModelID= mudbus_read_one(pWriter->m_szMdbIDs[i],7,5);
@@ -1690,16 +1677,57 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                 strTips.Format(_T("Resume at breakpoint, starting from package %u"), pWriter->continue_com_flash_count/128);
                 pWriter->OutPutsStatusInfo(strTips, FALSE);
             }
+
+            // Validate resume position against parsed file boundaries.
+            if ((!pWriter->m_szHexFileFlags.empty()) &&
+                (nCount > pWriter->m_szHexFileFlags[pWriter->m_szHexFileFlags.size() - 1]))
+            {
+                CString strText;
+                strText.Format(_T("|Resume offset %d exceeds file size %d, restarting from beginning."),
+                    nCount,
+                    pWriter->m_szHexFileFlags[pWriter->m_szHexFileFlags.size() - 1]);
+                pWriter->OutPutsStatusInfo(strText);
+                nCount = 0;
+                pWriter->continue_com_flash_count = 0;
+            }
+
             for(UINT p = 0; p < pWriter->m_szHexFileFlags.size(); p++)
             {
-                int nBufLen = pWriter->m_szHexFileFlags[p]-nCount;
+                // Each flag value is the cumulative end offset of one section.
+                // Resume can land in the middle of a section, so compute an explicit
+                // [sectionStart, sectionEnd) window and skip fully completed sections.
+                int sectionStart = (p == 0) ? 0 : pWriter->m_szHexFileFlags[p - 1];
+                int sectionEnd = pWriter->m_szHexFileFlags[p];
+                if (nCount >= sectionEnd)
+                {
+                    CString strText;
+                    strText.Format(_T("|ID %d: Section %d already finished, skipping."), pWriter->m_szMdbIDs[i], p);
+                    pWriter->OutPutsStatusInfo(strText, TRUE);
+                    continue;
+                }
+
+                int sectionResumeStart = (nCount > sectionStart) ? nCount : sectionStart;
+                int nBufLen = sectionEnd - sectionResumeStart;
+                if (nBufLen <= 0)
+                {
+                    CString strText;
+                    strText.Format(_T("|ID %d: Invalid section length at section %d, aborting update."),
+                        pWriter->m_szMdbIDs[i], p);
+                    pWriter->OutPutsStatusInfo(strText);
+                    nFlashRet = -8;
+                    break;
+                }
+
                 if (Device_infor[7] == 88)
                 {
+                    // ESP OTA flow uses absolute index inside flash_a_tstat(), so it must
+                    // receive the full image base pointer.
                     nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer), pParam);
                 }
                 else
                 {
-                    nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer + nCount), pParam);
+                    // Legacy MCU flow uses section-relative indexing, so pass section start pointer.
+                    nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer + sectionResumeStart), pParam);
                 }
                 //if((nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer+nCount), pParam)) < 0 )
                 if(nFlashRet < 0)
@@ -1744,7 +1772,8 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                 }
                 else
                 {
-                    nCount += nBufLen;
+                    // Move global progress pointer to the end of this section window.
+                    nCount = sectionResumeStart + nBufLen;
 
                     CString strText;
                     strText.Format(_T("|ID %d: Programming section %d finished."), pWriter->m_szMdbIDs[i], p);
