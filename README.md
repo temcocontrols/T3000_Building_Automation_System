@@ -7,15 +7,6 @@ This is our T3000 Building Automation front end, a mature project for managing t
 
 The project has been around for many years and has a bright future as the system and our application matures. We welcome contributions and suggestions on next steps. Please refer to [Wiki](https://github.com/temcocontrols/T3000_Building_Automation_System/wiki) for details on how you can get started with contributing towards the project.  For build instructions see [Compile T3000](README_Build.md).
 
-### T3Engine (shared logic with firmware)
-
-T3000 is integrating **[T3Engine](https://github.com/temcocontrols/T3_Engine)** — portable controller logic (hooks and growing core) shared with ESP32 firmware. In this repo:
-
-- **`T3EngineDll/`** — Windows **T3Engine.dll** MSVC project and **[integration notes](T3EngineDll/README.md)** (build output, `LoadLibrary` smoke in `T3000`, PR checklist).
-- **`T3Engine/`** — **Git submodule** at [temcocontrols/T3_Engine](https://github.com/temcocontrols/T3_Engine). After clone or pull of T3000, run `git submodule update --init --recursive` (or use GitHub Desktop’s submodule update). The super-repo records a **fixed submodule commit**; bump it when you intentionally move to a newer engine. Roadmap: **[`T3Engine/docs/NEXT-STEPS.md`](T3Engine/docs/NEXT-STEPS.md)** (only present after submodule init).
-
-Upstream source of truth and CI: [temcocontrols/T3_Engine](https://github.com/temcocontrols/T3_Engine).
-
 To see how you can use our github release action in your own fork follow the instructions in our Wiki [How to use our github action to build the solution and the msi installer](https://github.com/temcocontrols/T3000_Building_Automation_System/wiki/How-to-use-our-github-action-to-build-the-solution-and-the-msi-installer)
 
 Many of our products are open source, check them out on the [Temco Controls](http://www.temcocontrols.com/) web site. Most of what we do at Temco Controls is behind the scenes OEM work so feel free to send an email and ask for custom products. 

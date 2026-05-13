@@ -7,6 +7,3 @@
 [submodule "T3000Webview"]
 	path = T3000Webview
 	url = https://github.com/temcocontrols/T3000Webview.git
-[submodule "T3Engine"]
-	path = T3Engine
-	url = https://github.com/temcocontrols/T3_Engine.git

@@ -57,15 +57,7 @@ Launching a Build
 
 Remember that these steps are general guidelines, and the actual process might vary based on the specifics of your project and any dependencies it might have. Additionally, make sure you have the required libraries, dependencies, and resources available to successfully compile the solution.
 
-T3Engine native DLL
--------------------
-**T3Engine** is a **git submodule** (`T3Engine/` → [T3_Engine](https://github.com/temcocontrols/T3_Engine)). After cloning T3000, initialize it once from the repo root:
-
-`git submodule update --init --recursive`
-
-Without this, `T3Engine\include\` will be missing and the **T3Engine** DLL project will not compile.
-
-When the solution includes the **T3Engine** projects, build **T3Engine** (native DLL) so **T3Engine.dll** is produced under `T3000 Output\` next to **T3000.exe**. The MFC app may load it at startup for bring-up checks. Full details: **[`T3EngineDll/README.md`](T3EngineDll/README.md)**. Roadmap (inside submodule): **`T3Engine/docs/NEXT-STEPS.md`**. Upstream: [T3_Engine on GitHub](https://github.com/temcocontrols/T3_Engine).
+   
 What to do if CI or local build fails with a build error
 -----------------------------------------------------------
 * If the above fails this is mostly due to:

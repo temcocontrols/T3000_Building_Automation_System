@@ -1,9 +1,4 @@
 # Next For T3000 ignore
-
-# Leftover copy of T3Engine before submodule — do not commit (use T3Engine submodule only)
-/T3Engine._vendor_backup/
-/T3Engine_vendor_backup/
-
 /Documentation/Express
 /Documentation/T3000InstallShield
 /Documentation/TemcoSoftware
