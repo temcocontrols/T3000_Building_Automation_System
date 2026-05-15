@@ -7328,6 +7328,17 @@ void Inial_Product_Menu_map()
         memcpy(product_menu[i], default_menu, 20);
         switch (i)
         {
+        //case STM32_CO2_NET:
+        //case STM32_CO2_RS485:
+        //case STM32_HUM_NET:     
+        //case STM32_HUM_RS485:  
+        //case STM32_PRESSURE_NET:
+        //case STM32_PRESSURE_RS485:
+        //{
+        //    unsigned char  temp[20] = { 1,1,1,0  ,0,1,1,1 ,1,0,0,0   ,0 ,1,1,1   ,0,0,0,0 };
+        //    memcpy(product_menu[i], temp, 20);
+        //}
+        //    break;
         case PM_CM5:
         case PM_TSTAT10:
         case PM_MINIPANEL:

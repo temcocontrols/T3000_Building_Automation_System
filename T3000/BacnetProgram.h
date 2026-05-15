@@ -49,6 +49,7 @@ public:
 	// Mark whether it has been maximized;
 	bool window_max; // 标记是否已经最大化;
 	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButtonVirtualProgram();
 };
 
 	const int PROGRAM_NUM = 0;

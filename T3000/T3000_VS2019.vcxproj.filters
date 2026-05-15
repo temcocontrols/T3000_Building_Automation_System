@@ -870,6 +870,9 @@
     <ClCompile Include="BacnetPvar.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
+    <ClCompile Include="T3000_VM_VirtualProgramEngine.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">

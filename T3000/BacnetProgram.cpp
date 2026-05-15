@@ -13,6 +13,7 @@
 #include "BacnetProgramEdit.h"
 #include "ControlBasicEditorView.h"
 #include "global_define.h"
+#include "T3000_VM_VirtualProgramEngine.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 
 
@@ -59,6 +60,7 @@ BEGIN_MESSAGE_MAP(CBacnetProgram, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SYSCOMMAND()
 	ON_BN_CLICKED(IDC_BUTTON1, &CBacnetProgram::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON_VIRTUAL_PROGRAM, &CBacnetProgram::OnBnClickedButtonVirtualProgram)
 END_MESSAGE_MAP()
 
 
@@ -847,4 +849,119 @@ void CBacnetProgram::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 
 	CDialogEx::OnSysCommand(nID, lParam);
+}
+
+void CBacnetProgram::OnBnClickedButtonVirtualProgram()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	// Check if VM is currently running
+	// The g_VirtualProgramEngine is a global instance defined in VirtualProgramEngine.cpp
+
+	// Determine current VM state by checking if worker thread exists
+	// We use a static flag to track our local state for toggle behavior
+	static BOOL bVMStarted = FALSE;
+	if (!bVMStarted)
+	{
+		// =====================================================================
+		// START VIRTUAL PROGRAM ENGINE
+		// =====================================================================
+
+		// Step 1: Initialize the worker thread
+		if (!g_VirtualProgramEngine.Initialize())
+		{
+			AfxMessageBox(_T("Failed to initialize Virtual Program Engine.\nPlease check if the system has sufficient resources."),
+				MB_ICONERROR | MB_OK);
+			return;
+		}
+
+		// Step 2: Load and start each program that is ON and has valid bytecode
+		int nProgramsLoaded = 0;
+		CString strLoadedPrograms;
+
+		for (int i = 0; i < BAC_PROGRAM_ITEM_COUNT; i++)
+		{
+			// Check if program has valid bytecode and is turned ON
+			if (program_code_length[i] > 0 && m_Program_data[i].on_off == 1)
+			{
+				// Load the program bytecode
+				if (g_VirtualProgramEngine.LoadProgram(i, program_code[i], program_code_length[i]))
+				{
+					// Start the program
+					g_VirtualProgramEngine.StartProgram(i);
+					nProgramsLoaded++;
+
+					// Build a string of loaded program names for the message
+					CString strProgName;
+					strProgName.Format(_T("%d"), i);
+					if (strlen((const char*)m_Program_data[i].label) > 0)
+					{
+						strLoadedPrograms += (const char*)m_Program_data[i].label;
+					}
+					else
+					{
+						strLoadedPrograms += _T("Program ") + strProgName;
+					}
+					strLoadedPrograms += _T(", ");
+				}
+				else
+				{
+					CString strErr;
+					strErr.Format(_T("Warning: Failed to load program %d"), i);
+					SetPaneString(BAC_SHOW_MISSION_RESULTS, strErr);
+				}
+			}
+		}
+
+		// Update the toggle state
+		bVMStarted = TRUE;
+
+		// Step 3: Show confirmation message
+		CString strMsg;
+		if (nProgramsLoaded > 0)
+		{
+			// Remove trailing comma and space
+			if (strLoadedPrograms.GetLength() > 2)
+			{
+				strLoadedPrograms = strLoadedPrograms.Left(strLoadedPrograms.GetLength() - 2);
+			}
+
+			strMsg.Format(_T("Virtual Program Engine started.\n\nPrograms loaded: %d\n(%s)"),
+				nProgramsLoaded, strLoadedPrograms);
+		}
+		else
+		{
+			strMsg = _T("Virtual Program Engine started.\n\nNo programs were loaded.\nMake sure programs are turned ON and have valid bytecode.");
+		}
+
+		AfxMessageBox(strMsg, MB_ICONINFORMATION | MB_OK);
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Virtual Program Engine is running"));
+
+		// Update button text to indicate running state (optional enhancement)
+		// CWnd* pBtn = GetDlgItem(IDC_BUTTON_VIRTUAL_PROGRAM);
+		// if (pBtn) pBtn->SetWindowText(_T("Stop VM"));
+	}
+	else
+	{
+		// =====================================================================
+		// STOP VIRTUAL PROGRAM ENGINE
+		// =====================================================================
+
+		// Stop all programs
+		g_VirtualProgramEngine.StopAll();
+
+		// Shutdown the worker thread
+		g_VirtualProgramEngine.Shutdown();
+
+		// Update the toggle state
+		bVMStarted = FALSE;
+
+		// Show confirmation
+		AfxMessageBox(_T("Virtual Program Engine stopped.\n\nAll programs have been halted."),
+			MB_ICONINFORMATION | MB_OK);
+		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Virtual Program Engine stopped"));
+
+		// Update button text back to original (optional enhancement)
+		// CWnd* pBtn = GetDlgItem(IDC_BUTTON_VIRTUAL_PROGRAM);
+		// if (pBtn) pBtn->SetWindowText(_T("Start VM"));
+	}
 }
