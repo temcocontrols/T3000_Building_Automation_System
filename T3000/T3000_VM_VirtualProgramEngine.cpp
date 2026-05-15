@@ -219,13 +219,18 @@ BOOL CVirtualProgramEngine::LoadProgram(int programIndex, const unsigned char* b
         return FALSE;
     }
     
-    // Find 0xFE end marker
+    // Find 0xFE end marker (DORU_SYSTEM program terminator)
     int codeEnd = startOffset;
     while (codeEnd < byteLen && bytecode[codeEnd] != 0xFE) {
         codeEnd++;
     }
-    
-    // Store only the actual code portion (between header and 0xFE marker)
+
+    // Store code bytes INCLUDING the 0xFE terminator as a sentinel.
+    // This matches `BacNetProgram_transplant.cpp` output layout and lets the VM
+    // stop cleanly at end-of-program each scan.
+    if (codeEnd < byteLen && bytecode[codeEnd] == 0xFE) {
+        codeEnd++;
+    }
     ctx.bytecode.assign(bytecode + startOffset, bytecode + codeEnd);
     ctx.ip = 0;
     ctx.instructionCount = 0;
@@ -439,7 +444,15 @@ void CVirtualProgramEngine::ExecuteOneScan()
 {
     m_nScanCount++;
     m_dwTotalExecTime += m_dwScanInterval;
-    
+#ifdef _DEBUG
+    static DWORD s_lastTrace = 0;
+    DWORD now = GetTickCount();
+    if (now - s_lastTrace >= 5000) {
+        s_lastTrace = now;
+        TRACE("[VM] Scan=%u interval=%u ms active=%d\n", (unsigned)m_nScanCount, (unsigned)m_dwScanInterval, GetActiveProgramCount());
+    }
+#endif
+
     ExecuteAllPrograms();
 }
 
@@ -477,7 +490,8 @@ void CVirtualProgramEngine::ExecuteAllPrograms()
         }
         
         // Execute program
-        if (m_Programs[i].state == STATE_RUNNING && !m_Programs[i].bytecode.empty()) {
+        if ((m_Programs[i].state == STATE_RUNNING || m_Programs[i].state == STATE_WAITING) &&
+            !m_Programs[i].bytecode.empty()) {
             ExecuteProgram(m_Programs[i]);
         }
     }
@@ -488,6 +502,17 @@ BOOL CVirtualProgramEngine::ExecuteProgram(ProgramContext& ctx)
     ctx.instructionCount = 0;
     
     while (ctx.ip < (int)ctx.bytecode.size() && ctx.instructionCount < VM_MAX_INSTRUCTIONS) {
+        // Skip non-executable markers without counting as an instruction
+        unsigned char op = ctx.bytecode[ctx.ip];
+        if (op == 0xFE) {
+            // End-of-program marker (DORU_SYSTEM)
+            break;
+        }
+        if (op == 0x01 || op == 0xFF) {
+            ExecuteInstruction(ctx);
+            continue;
+        }
+
         // Check breakpoint
         int currentLine = ctx.ip;  // Simplified: use ip directly as line number
         
@@ -506,10 +531,10 @@ BOOL CVirtualProgramEngine::ExecuteProgram(ProgramContext& ctx)
         ctx.instructionCount++;
     }
     
-    // Loop until ip reaches end of bytecode
-    // Programs run continuously and loop back for next scan
-    if (ctx.ip >= (int)ctx.bytecode.size()) {
-        ctx.ip = 0;  // Reset for next scan cycle
+    // If IP reached end (missing ENDPRG), loop back for next scan cycle.
+    if (ctx.ip >= (int)ctx.bytecode.size() ||
+        (ctx.ip < (int)ctx.bytecode.size() && ctx.bytecode[ctx.ip] == 0xFE)) {
+        ctx.ip = 0;
     }
     
     // Check instruction count limit
@@ -536,6 +561,19 @@ BOOL CVirtualProgramEngine::ExecuteInstruction(ProgramContext& ctx)
     // Handle line number marker (0x01 + 2-byte line number)
     if (opcode == 0x01) {
         ctx.ip += 3;  // Skip: 0x01 marker + 2-byte line number
+        return TRUE;
+    }
+
+    // Expression/statement delimiter used by DORU_SYSTEM compiler (0xFF)
+    // It can appear between operands/grouped expressions, so just advance.
+    if (opcode == 0xFF) {
+        ctx.ip++;
+        return TRUE;
+    }
+
+    // End-of-program marker used by DORU_SYSTEM compiler (0xFE)
+    if (opcode == 0xFE) {
+        // Stop executing further in this scan; caller will reset ip to 0.
         return TRUE;
     }
     
@@ -729,38 +767,81 @@ BOOL CVirtualProgramEngine::ExecuteInstruction(ProgramContext& ctx)
 //=============================================================================
 BOOL CVirtualProgramEngine::ExecAssign(ProgramContext& ctx)
 {
-    if (ctx.valueStack.empty()) {
-        SetError(ctx, "Assign: stack empty");
-        return FALSE;
-    }
-    
-    float value = ctx.valueStack.top();
-    ctx.valueStack.pop();
-    
     const unsigned char* code = ctx.bytecode.data();
     ctx.ip++;  // skip ASSIGN opcode
     
+    // DORU_SYSTEM code format (see `BacNetProgram_transplant.cpp`):
+    // ASSIGN + <LHS varref> + <RHS expression tokens (RPN)> + 0xFF
+    if (ctx.ip >= (int)ctx.bytecode.size()) {
+        SetError(ctx, "Assign: missing target");
+        return FALSE;
+    }
+
+    // 1) Parse LHS target
     unsigned char marker = ReadByte(code + ctx.ip);
-    
+    unsigned char lhsNumber = 0;
+    unsigned char lhsPointType = 0;
+
     if (marker == LOCAL_POINT_PRG) {
-        ctx.ip++;  // skip 0x9C marker
-        
-        // MyPoint format: number(1 byte) + point_type(1 byte)
-        // point_type is already +1 (KEY_VARIABLE=3, etc.)
-        // number is 0-based index
-        unsigned char number = ReadByte(code + ctx.ip); ctx.ip++;
-        unsigned char pointType = ReadByte(code + ctx.ip); ctx.ip++;
-        
-        WriteVariable(0, pointType, 0, number, value);
-    } else if (marker == CONST_VALUE_PRG) {
-        // Cannot assign to constant
-        SetError(ctx, "Assign: cannot assign to constant");
+        ctx.ip++; // skip 0x9C
+        if (ctx.ip + 2 > (int)ctx.bytecode.size()) {
+            SetError(ctx, "Assign: truncated local point");
+            return FALSE;
+        }
+        lhsNumber = (unsigned char)ReadByte(code + ctx.ip); ctx.ip++;
+        lhsPointType = (unsigned char)ReadByte(code + ctx.ip); ctx.ip++;
+    } else if (marker == REMOTE_POINT_PRG) {
+        // Remote write not supported yet, but we must skip its bytes to keep IP consistent.
+        ctx.ip++; // skip 0x9E
+        if (ctx.ip + 4 <= (int)ctx.bytecode.size() &&
+            code[ctx.ip] == 0x55 && code[ctx.ip + 1] == 0xFF &&
+            code[ctx.ip + 2] == 0x55 && code[ctx.ip + 3] == 0xFF) {
+            ctx.ip += sizeof(Point_Bacnet);
+        } else {
+            ctx.ip += 5;
+        }
+        SetError(ctx, "Assign: remote target not supported");
         return FALSE;
     } else {
         SetError(ctx, "Assign: invalid target marker 0x%02X", marker);
         return FALSE;
     }
-    
+
+    // 2) Evaluate RHS expression until delimiter (0xFF) / next line marker (0x01) / end
+    // Use a temporary stack for RHS evaluation to match compiler behavior and
+    // avoid interfering with other statement execution state.
+    std::stack<float> savedStack;
+    savedStack.swap(ctx.valueStack);
+    while (ctx.ip < (int)ctx.bytecode.size()) {
+        unsigned char op = code[ctx.ip];
+        if (op == 0xFF || op == 0x01 || op == 0xFE) {
+            break;
+        }
+        if (!ExecuteInstruction(ctx)) {
+            ctx.valueStack.swap(savedStack);
+            return FALSE;
+        }
+    }
+
+    if (ctx.valueStack.empty()) {
+        ctx.valueStack.swap(savedStack);
+        SetError(ctx, "Assign: RHS produced no value");
+        return FALSE;
+    }
+
+    float value = ctx.valueStack.top();
+    ctx.valueStack.pop();
+
+    // Restore previous stack context
+    ctx.valueStack.swap(savedStack);
+
+    // 3) Consume delimiter if present
+    if (ctx.ip < (int)ctx.bytecode.size() && code[ctx.ip] == 0xFF) {
+        ctx.ip++;
+    }
+
+    // 4) Write-back
+    WriteVariable(0, lhsPointType, 0, lhsNumber, value);
     return TRUE;
 }
 
@@ -1190,6 +1271,23 @@ float CVirtualProgramEngine::ExecUnaryOp(unsigned char op, float a)
 //=============================================================================
 // Bytecode reading helper
 //=============================================================================
+static unsigned char VmKeyFromPrgPointType(unsigned char prgPointType)
+{
+    // BacnetProgram_transplant.cpp encodes MyPoint.point_type as (point_type + 1)
+    // where point_type follows OUT=0, IN=1, VAR=2, PRG=4, etc.
+    // The VM ReadVariable/WriteVariable use KEY_* enums (KEY_INPUT=1, KEY_OUTPUT=2, KEY_VARIABLE=3, KEY_PROGRAM=4 ...)
+    // Map common cases explicitly.
+    switch (prgPointType) {
+        case 1: return KEY_OUTPUT;   // OUT(0)+1
+        case 2: return KEY_INPUT;    // IN(1)+1
+        case 3: return KEY_VARIABLE; // VAR(2)+1
+        case 5: return KEY_PROGRAM;  // PRG(4)+1
+        default:
+            // Fallback: best-effort shift (keeps existing behavior for other types)
+            return prgPointType;
+    }
+}
+
 float CVirtualProgramEngine::ReadFloat(const unsigned char* ptr)
 {
     float value;
@@ -1274,7 +1372,7 @@ float CVirtualProgramEngine::ReadVariable(unsigned char varType, unsigned char p
                 int32_t val = m_Input_data[index].value;
                 // digital_analog: 1=analog(value*10), 0=digital(0/1)
                 if (m_Input_data[index].digital_analog == 1) {
-                    return (float)val / 10.0f;  // analog: value stored as value*10
+                    return (float)val / 1000.0f;  // analog: value stored as value*1000
                 } else {
                     return (float)val;  // digital: 0 or 1
                 }
@@ -1286,7 +1384,7 @@ float CVirtualProgramEngine::ReadVariable(unsigned char varType, unsigned char p
                 int32_t val = m_Output_data[index].value;
                 // digital_analog: 1=analog(value*10), 0=digital(0/1)
                 if (m_Output_data[index].digital_analog == 1) {
-                    return (float)val / 10.0f;
+                    return (float)val / 1000.0f;
                 } else {
                     return (float)val;
                 }
@@ -1296,12 +1394,9 @@ float CVirtualProgramEngine::ReadVariable(unsigned char varType, unsigned char p
         case KEY_VARIABLE:
             if (index >= 0 && index < (int)m_Variable_data.size()) {
                 int32_t val = m_Variable_data[index].value;
-                // digital_analog: 1=analog(value*10), 0=digital(0/1)
-                if (m_Variable_data[index].digital_analog == 1) {
-                    return (float)val / 10.0f;
-                } else {
-                    return (float)val;
-                }
+                // In this project variables are stored/scaled as value*1000.
+                // Treat VAR points as analog by default to match UI and compiler encoding.
+                return (float)val / 1000.0f;
             }
             break;
             
@@ -1315,7 +1410,7 @@ float CVirtualProgramEngine::ReadVariable(unsigned char varType, unsigned char p
         case KEY_PID:
             if (index >= 0 && index < (int)m_controller_data.size()) {
                 int32_t val = m_controller_data[index].value;
-                return (float)val / 10.0f;
+                return (float)val / 1000.0f;
             }
             break;
             
@@ -1345,7 +1440,7 @@ void CVirtualProgramEngine::WriteVariable(unsigned char varType, unsigned char p
                 Str_out_point& out = m_Output_data[index];
                 // digital_analog: 1=analog, 0=digital
                 if (out.digital_analog == 1) {
-                    out.value = (int32_t)(value * 10);  // analog: store as value*10
+                    out.value = (int32_t)(value * 1000);  // analog: store as value*1000
                 } else {
                     out.value = (int32_t)(value > 0 ? 1 : 0);  // digital: 0 or 1
                 }
@@ -1357,12 +1452,9 @@ void CVirtualProgramEngine::WriteVariable(unsigned char varType, unsigned char p
         case KEY_VARIABLE: {
             if (index >= 0 && index < (int)m_Variable_data.size()) {
                 Str_variable_point& var = m_Variable_data[index];
-                // digital_analog: 1=analog, 0=digital
-                if (var.digital_analog == 1) {
-                    var.value = (int32_t)(value * 10);
-                } else {
-                    var.value = (int32_t)(value > 0 ? 1 : 0);
-                }
+                // Variables are stored as value*1000 (analog) in this codebase.
+                // Do not clamp to 0/1 based on digital_analog since many VARs default to 0.
+                var.value = (int32_t)(value * 1000);
                 NotifyVariableChanged(index);
             }
             break;
@@ -1370,7 +1462,7 @@ void CVirtualProgramEngine::WriteVariable(unsigned char varType, unsigned char p
         
         case KEY_PID: {
             if (index >= 0 && index < (int)m_controller_data.size()) {
-                m_controller_data[index].value = (int32_t)(value * 10);
+                m_controller_data[index].value = (int32_t)(value * 1000);
             }
             break;
         }
