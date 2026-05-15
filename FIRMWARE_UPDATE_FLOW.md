@@ -1,607 +1,823 @@
-# T3000 Firmware Update Flow - Complete Technical Analysis
-## Ctrl+F2 / Tools → Load Firmware (Single Device)
+# T3000 Firmware Update Flow - ISP Process
+
+## Overview
+This document describes the firmware update process with resumable capability, error recovery, and state management.
 
 ---
 
-## 1. ENTRY POINT & MENU DEFINITION
+## System Architecture
 
-### Menu Item Definition
-- **File**: `T3000/T3000.rc` (Resource File)
-- **Menu ID**: `ID_FILE_BATCHBURNHEX`
-- **Shortcut**: `Ctrl+F2`
-- **Display Text**: "Load firmware for a single device"
-
-### Message Map Binding
-- **Location**: [T3000/MainFrm.cpp](T3000/MainFrm.cpp#L294)
-- **Binding**: `ON_COMMAND(ID_FILE_BATCHBURNHEX, OnBatchFlashHex)`
-
----
-
-## 2. MAIN HANDLER FUNCTION
-
-### Function: `CMainFrame::OnBatchFlashHex()`
-- **Location**: [T3000/MainFrm.cpp](T3000/MainFrm.cpp#L3108)
-- **Class**: `CMainFrame` (MFC Application Main Window)
-
-### Pre-Flash Setup Phase
-```cpp
-// Step 1: Save current state
-b_pause_refresh_tree = BATCH_FLASH_HEX;  // Pause tree refresh
-bool temp_status = g_bPauseMultiRead;
-g_bPauseMultiRead = true;
-int temp_type = GetCommunicationType();  // Save communication type (Serial=0 or Network=1)
-
-// Step 2: Close existing connections
-BOOL bDontLinger = FALSE;
-setsockopt(h_Broad, SOL_SOCKET, SO_DONTLINGER, (const char*)&bDontLinger, sizeof(BOOL));
-closesocket(h_Broad);  // Close broadcast socket
-SetCommunicationType(0);  // Set to serial mode
-close_com();  // Close serial port (free for ISP tool)
-
-// Step 3: Create firmware update dialog
-CFlash_Multy dlg;
-dlg.DoModal();  // Modal dialog - blocks until user completes or cancels
 ```
-
-### Post-Flash Cleanup Phase
-```cpp
-// Step 4: Restore communication
-if(temp_type == 0) {
-    int comport = GetLastOpenedComport();
-    open_com(comport);  // Reopen serial port
-} else {
-    // Network mode restoration
-}
-
-SetCommunicationType(temp_type);  // Restore communication type
-
-// Step 5: Recreate broadcast socket
-h_Broad = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-BOOL bBroadcast = TRUE;
-::setsockopt(h_Broad, SOL_SOCKET, SO_BROADCAST, (char*)&bBroadcast, sizeof(BOOL));
-int iMode = 1;
-ioctlsocket(h_Broad, FIONBIO, (u_long FAR*) &iMode);
-
-// Step 6: Resume tree refresh
-h_bcast.sin_family = AF_INET;
-h_bcast.sin_addr.s_addr = INADDR_BROADCAST;
-h_bcast.sin_port = htons(UDP_BROADCAST_PORT);
+┌─────────────────────────────────────────────────────────────────┐
+│                    User Interface                               │
+│            (Ctrl+F2 / Tools → Load Firmware)                    │
+└─────────────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────────────┐
+│              MainFrm::OnBatchFlashHex()                          │
+│          [MainFrm.cpp:3108 - Entry Point]                       │
+└─────────────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────────────┐
+│            CFlash_Multy Dialog                                   │
+│   • Device selection                                             │
+│   • Firmware file (.hex) selection                               │
+│   • Configuration file selection                                 │
+└─────────────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────────────┐
+│            Update State Manager                                  │
+│   • Initialize/Load update state                                │
+│   • Checkpoint creation                                         │
+│   • Progress tracking                                           │
+└─────────────────────────────────────────────────────────────────┘
+                           ↓
+              ┌────────────────────┐
+              │  Main Flash Thread │
+              │ multy_isp_thread() │
+              └────────────────────┘
+                           ↓
+         ┌─────────────────────────────────┐
+         │   For Each Device (Sequential)   │
+         └─────────────────────────────────┘
 ```
 
 ---
 
-## 3. FIRMWARE UPDATE DIALOG
+## Phase 1: Firmware Flash (ISP.exe)
 
-### Class: `CFlash_Multy`
-- **Header File**: [T3000/Flash_Multy.h](T3000/Flash_Multy.h)
-- **Implementation**: [T3000/Flash_Multy.cpp](T3000/Flash_Multy.cpp)
-- **Base Class**: `CDialogEx`
-- **Resource ID**: `IDD_DIALOG_MULTY_FLASH`
+### Entry Point
+- **Handler**: `CFlash_Multy::multy_isp_thread()` [Flash_Multy.cpp:969]
+- **Mode**: Sequential processing (one device at a time)
+- **Thread**: Background worker thread with UI updates
 
-### Dialog Initialization: `OnInitDialog()`
-**Location**: [Flash_Multy.cpp:175](T3000/Flash_Multy.cpp#L175)
+### Flow Diagram
 
-**Initialization Steps:**
-
-1. **Initial_List()** - Populate device list
-   - Reads device tree
-   - Inserts devices into list control
-   - Columns: ID, Product Name, Serial Number, COM Port, Baudrate, IP Address, IP Port
-
-2. **GetProductType()** - Detect device type
-   - Identifies product type based on register values
-   - Types: TSTAT5, TSTAT6, T3 Modules, etc.
-
-3. **Get_Device_Firmware()** - Read current firmware versions
-   - Queries each device for current firmware revision
-   - Displays in "Current Firmware Version" column
-
-**Data Structure:**
-```cpp
-typedef struct {
-    int nitem;
-    CString nID;
-    CString devicename;
-    CString strSN;              // Serial Number
-    CString ncomport;           // COM Port
-    CString nBaudrate;          // Baud Rate
-    CString nIPaddress;         // IP Address
-    CString nipport;            // IP Port
-    CString file_position;      // Firmware file path (.hex)
-    CString config_file_position; // Config file path
-    int nresult;                // Flash result
-    int cofnigresult;           // Config result
-    bool online;                // Device online status
-    float software_rev;         // Current firmware version
-    float newest_rev;           // Latest available version
-    CString file_rev;           // Selected firmware file version
-    bool need_flash;            // Flash needed flag
-    unsigned char product_id;   // Product ID
-    bool select_status;         // User selection checkbox
-} Str_flash_device;
 ```
-
-### UI Elements
-- **List Control**: `IDC_LIST_FLASH_MULTY`
-  - Displays all devices in network
-  - Checkbox for device selection
-  - Shows current/target firmware versions
-  - Shows firmware file paths
-  - Shows config file paths
-
-- **Buttons**:
-  - "Select Firmware File" - Browse for .hex file
-  - "Select Config File" - Browse for config file
-  - "START" - Begin firmware update
+START
+  ↓
+[Load/Initialize Update State]
+  ├─ Read state file (.isp_state)
+  ├─ Determine resume point
+  └─ Load checkpoint data
+  ↓
+[For Each Device]
+  ├─ Check if device update already completed
+  ├─ If YES → Skip to next device
+  ├─ If NO → Continue
+  ↓
+[Pre-Flash Checks]
+  ├─ Verify device connectivity
+  ├─ Validate device type (TSTAT6, 5E, 5A, T3, etc.)
+  ├─ Check bootloader version
+  ├─ Verify firmware compatibility
+  ├─ Check disk space
+  └─ If ANY check fails → Log error → RETRY or SKIP
+  ↓
+[Save Progress Checkpoint]
+  ├─ Update state: "Device X - Pre-Flash Check Passed"
+  ├─ Save checkpoint to INI/JSON
+  └─ Record timestamp
+  ↓
+[Bootloader Update (if required)]
+  ├─ Determine if new bootloader needed
+  │  ├─ Check firmware_must_use_new_bootloader flag
+  │  └─ Compare bootloader versions
+  ├─ If bootloader update needed:
+  │  ├─ Set com_port_flash_status = 1 (flash boot mode)
+  │  ├─ Save checkpoint: "Bootloader Flash Start"
+  │  ├─ Invoke ISP.exe for bootloader
+  │  ├─ Wait for completion
+  │  ├─ Check result in INI
+  │  ├─ If FAIL → Retry (max 3 times) → If still fail → Log error → Continue
+  │  ├─ If SUCCESS → Save checkpoint: "Bootloader Flash Success"
+  │  ├─ Device reboot (Sleep 4 seconds)
+  │  ├─ Verify device reconnection
+  │  └─ If NOT reconnected → Retry or Mark as failed
+  └─ If bootloader update not needed → Skip this section
+  ↓
+[Main Firmware Flash]
+  ├─ Set com_port_flash_status = 0 (normal mode)
+  ├─ Save checkpoint: "Firmware Flash Start"
+  ├─ Prepare ISP parameters:
+  │  ├─ Device ID (Modbus/BACnet)
+  │  ├─ Firmware file path
+  │  ├─ COM port
+  │  ├─ Baud rate
+  │  └─ Firmware checksum/MD5
+  ├─ Call CComWriter::BeginWriteByCom()
+  │  ├─ Open COM port / Network socket
+  │  ├─ Detect device MSTP if needed
+  │  ├─ Enter flash mode
+  │  ├─ Transfer firmware data:
+  │  │  ├─ Read firmware file in chunks
+  │  │  ├─ For each chunk:
+  │  │  │  ├─ Send chunk to device
+  │  │  │  ├─ Wait for ACK
+  │  │  │  ├─ Verify checksum
+  │  │  │  ├─ If CRC error → Retry chunk (max 3 times)
+  │  │  │  ├─ Update progress bar
+  │  │  │  └─ Save chunk checkpoint every N chunks
+  │  │  ├─ Handle timeouts:
+  │  │  │  ├─ com_error_delay_time = delay between retries
+  │  │  │  ├─ com_error_delay_count = max retry attempts
+  │  │  │  └─ Log error if exceeds max
+  │  │  └─ Final verification:
+  │  │     ├─ Compare MD5/Checksum
+  │  │     └─ If mismatch → Retry from last checkpoint
+  │  ├─ Verify firmware integrity:
+  │  │  ├─ Check CRC
+  │  │  ├─ Validate firmware header
+  │  │  └─ If invalid → Retry flash
+  │  └─ Exit flash mode
+  ├─ Invoke ISP.exe via WinExecAndWait()
+  │  ├─ Pass parameters via INI file
+  │  ├─ Wait for ISP.exe completion
+  │  ├─ Read result from INI file
+  │  └─ Parse return code
+  ├─ Check flash result:
+  │  ├─ SUCCESS → Save checkpoint: "Firmware Flash Success"
+  │  ├─ CRC ERROR → Retry (max 3 times)
+  │  ├─ TIMEOUT → Retry with increased delay
+  │  ├─ DEVICE NOT FOUND → Check connectivity → Retry
+  │  └─ OTHER ERROR → Log detailed error → Continue to next device
+  ├─ Device reboot:
+  │  ├─ Set UI to blue (running)
+  │  ├─ Sleep 4 seconds (allow device reboot)
+  │  ├─ Attempt device reconnection (retry max 5 times)
+  │  └─ If reconnected → Continue
+  │     Else → Mark device as "Reboot Failed" → Continue
+  └─ Save checkpoint: "Firmware Flash Complete"
+  ↓
+[Post-Flash Verification]
+  ├─ Read device firmware version
+  ├─ Compare with uploaded version
+  ├─ If mismatch:
+  │  ├─ Log version mismatch error
+  │  ├─ Set device status to failed
+  │  └─ Continue to next
+  ├─ If match:
+  │  ├─ Update device status to success
+  │  └─ Post UI message (Green color)
+  └─ Save checkpoint: "Phase 1 Complete"
+  ↓
+[Next Device or Proceed to Phase 2]
+  ├─ If more devices → Loop back to "For Each Device"
+  └─ If all devices done → Proceed to Phase 2
+```
 
 ---
 
-## 4. USER INTERACTION PHASE
+## Phase 2: Configuration Load
 
-### User Selection
-1. **Check devices** to update (checkbox column 0)
-2. **Select firmware file** (.hex) - typically stored in `Database/Firmware/`
-3. **Select configuration file** (optional) - product-specific configs
-4. **Click START button** - Triggers flash process
+### Flow Diagram
 
-### Button Handler: `OnBnClickedButtonStatrt()`
-**Location**: [Flash_Multy.cpp:789](T3000/Flash_Multy.cpp#L789)
-
-```cpp
-// Validation
-if (nflashitemcount == 0) {
-    MessageBox(_T("Please select one or more items."), _T("Notice"), MB_OK | MB_ICONINFORMATION);
-    return;
-}
-
-// Build device list into flash_device vector
-for (int i = 0; i < ncount; i++) {
-    if (!m_flash_multy_list.GetCellChecked(i, 0))
-        continue;  // Skip unchecked devices
-    
-    Str_flash_device temp;
-    temp.nitem = i;
-    temp.strSN = m_flash_multy_list.GetItemText(i, FLASH_SERIAL_NUMBER);
-    temp.nID = m_flash_multy_list.GetItemText(i, FLASH_ID);
-    temp.ncomport = m_flash_multy_list.GetItemText(i, FLASH_COM_PORT);
-    temp.nBaudrate = m_flash_multy_list.GetItemText(i, FLASH_BAUDRATE);
-    temp.nIPaddress = m_flash_multy_list.GetItemText(i, FLASH_IPADDRESS);
-    temp.nipport = m_flash_multy_list.GetItemText(i, FLASH_IPPORT);
-    temp.devicename = m_flash_multy_list.GetItemText(i, FLASH_PRODUCT_NAME);
-    temp.file_position = m_flash_multy_list.GetItemText(i, FLASH_FILE_POSITION);
-    temp.config_file_position = m_flash_multy_list.GetItemText(i, FLASH_CONFIG_FILE_POSITION);
-    
-    temp.need_flash = true;
-    flash_device.push_back(temp);  // Add to processing queue
-}
-
-// Create background thread for ISP execution
-Call_ISP_Application = CreateThread(NULL, NULL, multy_isp_thread, this, NULL, NULL);
+```
+START (Phase 2)
+  ↓
+[Load Configuration State]
+  ├─ Read saved state from checkpoint
+  └─ Skip devices with Phase 1 failures
+  ↓
+[For Each Device with Successful Firmware]
+  ├─ Check if config already loaded
+  ├─ If YES → Skip to next device
+  ├─ If NO → Continue
+  ↓
+[Device Connection]
+  ├─ Open COM port or network socket
+  ├─ If port busy:
+  │  ├─ Retry (max 3 times)
+  │  ├─ If still busy → Log error → Skip device
+  │  └─ Continue
+  └─ Connection established
+  ↓
+[Device Type Detection]
+  ├─ Send discovery command
+  ├─ Parse device response:
+  │  ├─ Check device type (TSTAT6, 5E, 5A, T3 Modules, etc.)
+  │  ├─ Verify firmware version
+  │  └─ Get device capabilities
+  ├─ If not recognized:
+  │  ├─ Log unknown device type
+  │  ├─ Attempt generic load
+  │  └─ If fails → Skip device
+  └─ Device type confirmed
+  ↓
+[Select Configuration Loader]
+  ├─ TSTAT6/5E → LoadFile2Tstat67()
+  ├─ TSTAT5A → LoadFile2Tstat67() (variant)
+  ├─ T3 Modules → LoadFile2Tstat_T3()
+  ├─ Network Devices → LoadFile2NetworkDevice()
+  ├─ BACnet Devices → LoadFile2BacnetDevice()
+  └─ Other → LoadFile2GenericDevice()
+  ↓
+[Load Configuration File]
+  ├─ Parse configuration file (.json/.xml/.bin)
+  ├─ Validate configuration against device model
+  ├─ Build configuration packets
+  └─ If parsing error:
+     ├─ Log detailed error
+     └─ Skip device
+  ↓
+[Transfer Configuration]
+  ├─ Save checkpoint: "Config Transfer Start"
+  ├─ For each config parameter:
+  │  ├─ Create Modbus/BACnet write command
+  │  ├─ Send to device:
+  │  │  ├─ Wait for ACK (max timeout: 5 seconds)
+  │  │  ├─ If ACK received → Update progress → Continue
+  │  │  ├─ If timeout:
+  │  │  │  ├─ Retry (max 3 times)
+  │  │  │  ├─ If still fails → Log error → Mark parameter failed
+  │  │  │  └─ Continue to next parameter
+  │  │  └─ If CRC error → Retry from last checkpoint
+  │  └─ Update progress bar every N parameters
+  ├─ Save progress checkpoint every N parameters:
+  │  ├─ Save last successful parameter index
+  │  ├─ Save timestamp
+  │  └─ Allow resumption from this point
+  └─ All parameters transferred
+  ↓
+[Configuration Verification]
+  ├─ Read back configuration from device
+  ├─ Compare with sent configuration:
+  │  ├─ For each critical parameter:
+  │  │  ├─ If matches → OK
+  │  │  ├─ If mismatch:
+  │  │  │  ├─ Retry write (max 2 times)
+  │  │  │  ├─ If still mismatch → Log error → Mark parameter failed
+  │  │  │  └─ Continue to next parameter
+  │  │  └─ Track verification status
+  │  └─ Calculate verification score (% parameters correct)
+  ├─ If >= 95% parameters correct → Mark as SUCCESS
+  ├─ If < 95% parameters correct → Mark as PARTIAL SUCCESS
+  └─ Update UI status
+  ↓
+[Device Reboot (if needed)]
+  ├─ Send reboot command to device
+  ├─ Wait for device to reboot (Sleep 2-4 seconds)
+  ├─ Attempt reconnection (retry max 5 times)
+  ├─ If reconnected:
+  │  ├─ Verify device is functional
+  │  └─ Mark device as ONLINE
+  └─ If not reconnected:
+     ├─ Mark device as REBOOT_FAILED
+     └─ Continue
+  ↓
+[Post-Configuration Status]
+  ├─ SUCCESS (Green):
+  │  ├─ All firmware + config transferred & verified
+  │  └─ Device online and functional
+  ├─ PARTIAL SUCCESS (Light Green):
+  │  ├─ Firmware successful, config partial success
+  │  └─ Device functional but some settings may be missing
+  ├─ CONFIG FAILED (Light Red):
+  │  ├─ Firmware successful, config failed
+  │  └─ Device needs manual configuration
+  └─ FAILED (Red):
+     ├─ One or more critical phases failed
+     └─ Device requires manual intervention
+  ↓
+[Save Final Checkpoint]
+  ├─ Record Phase 2 completion status
+  ├─ Save completion timestamp
+  ├─ Log device final state
+  └─ Move to next device
+  ↓
+[Next Device]
+  ├─ If more devices → Loop back to "For Each Device"
+  └─ If all devices done → Cleanup and finish
 ```
 
 ---
 
-## 5. BACKGROUND THREAD - ISP EXECUTION
+## Resumable Update Mechanism
 
-### Function: `multy_isp_thread()`
-**Location**: [Flash_Multy.cpp:969](T3000/Flash_Multy.cpp#L969)
-**Type**: Static thread function (DWORD WINAPI)
+### State Management
 
-### **PHASE 1: FIRMWARE FLASHING**
+#### Update State File Format (`.isp_state.json`)
 
-```cpp
-for(int i = 0; i < nflashdevicecount; i++) {
-    if (flash_device.at(i).nresult != OPERATION_SUCCESS) {
-        if (!flash_device.at(i).file_position.IsEmpty()) {
-            
-            // 1. Save configuration to INI file
-            pParent->SetAutoConfig(flash_device.at(i));  // Write to AutoFlashConfig.ini
-            
-            // 2. Post UI update: "Running" (Blue color)
-            pParent->PostMessage(WM_MULTY_FLASH_MESSAGE, CHANGE_THE_ITEM_COLOR_BLUE, 
-                                 flash_device.at(i).nitem);
-            
-            // 3. Execute ISP.exe external tool
-            CString MultyISPtool_path = ApplicationFolder + _T("\\ISP.exe");
-            WinExecAndWait(MultyISPtool_path, NULL, NULL, 0);
-            
-            // 4. Read ISP result from INI file
-            int nresult = GetPrivateProfileInt(_T("Data"), _T("Command"), 
-                                               FAILED_UNKNOW_ERROR, AutoFlashConfigPath);
-            
-            // 5. Handle result
-            if (nresult == FLASH_SUCCESS) {
-                flash_device.at(i).nresult = CHANGE_THE_ITEM_COLOR_GREEN;
-                pParent->PostMessage(WM_MULTY_FLASH_MESSAGE, CHANGE_THE_ITEM_COLOR_GREEN,
-                                    flash_device.at(i).nitem);  // Green
-                Sleep(4000);  // Wait for device reboot
-            } else {
-                flash_device.at(i).nresult = CHANGE_THE_ITEM_COLOR_RED;
-                pParent->PostMessage(WM_MULTY_FLASH_MESSAGE, CHANGE_THE_ITEM_COLOR_RED,
-                                    flash_device.at(i).nitem);  // Red
-                continue;  // Skip config for failed device
-            }
+```json
+{
+  "update_session_id": "UUID-timestamp",
+  "start_time": "2024-05-15T10:30:00Z",
+  "last_update_time": "2024-05-15T10:35:42Z",
+  "total_devices": 5,
+  "firmware_file": "/path/to/firmware.hex",
+  "firmware_md5": "abc123def456...",
+  "config_file": "/path/to/config.json",
+
+  "phase_status": {
+    "phase1_firmware": "IN_PROGRESS",
+    "phase2_config": "PENDING"
+  },
+
+  "devices": [
+    {
+      "device_id": "DEVICE_001",
+      "modbus_id": 10,
+      "device_type": "TSTAT6",
+      "firmware_version_old": "1.2.3",
+      "firmware_version_target": "1.3.0",
+
+      "phase1_status": "IN_PROGRESS",
+      "phase1_current_step": "FIRMWARE_FLASH",
+      "bootloader_status": "SUCCESS",
+      "bootloader_version": "2.1.0",
+
+      "firmware_transfer": {
+        "total_chunks": 256,
+        "chunks_transferred": 128,
+        "last_chunk_index": 127,
+        "chunk_size": 1024,
+        "last_checkpoint_time": "2024-05-15T10:35:00Z",
+        "crc_ok": true
+      },
+
+      "verification": {
+        "status": "IN_PROGRESS",
+        "md5_match": false,
+        "attempts": 1
+      },
+
+      "phase2_status": "PENDING",
+      "config_transfer": {
+        "total_parameters": 150,
+        "parameters_transferred": 0,
+        "last_parameter_index": -1,
+        "verification_score": 0
+      },
+
+      "error_log": [
+        {
+          "timestamp": "2024-05-15T10:34:15Z",
+          "step": "FIRMWARE_TRANSFER_CHUNK_50",
+          "error_code": "CRC_ERROR",
+          "error_message": "CRC mismatch for chunk 50",
+          "retry_count": 2,
+          "recovered": true
         }
+      ],
+
+      "retry_count": {
+        "firmware_flash": 1,
+        "config_transfer": 0,
+        "total": 1
+      }
     }
-```
+  ],
 
-### **PHASE 2: CONFIGURATION FILE LOADING**
-
-```cpp
-    // Skip if config file is empty or already applied
-    if (flash_device.at(i).cofnigresult == 3 || flash_device.at(i).config_file_position.IsEmpty())
-        continue;
-    
-    // 1. Open communication (Serial OR Network)
-    if (!flash_device.at(i).ncomport.IsEmpty()) {
-        // Serial communication
-        int comport = _wtoi(flash_device.at(i).ncomport);
-        int baudrate = _wtoi(flash_device.at(i).nBaudrate);
-        
-        if (open_com(comport)) {
-            is_connect_device = TRUE;
-            Change_BaudRate(baudrate);
-            SetCommunicationType(0);  // Serial mode
-        }
-    } else {
-        // Network communication
-        CString currentIp = flash_device.at(i).nIPaddress;
-        int Port = _wtoi(flash_device.at(i).nipport);
-        
-        if (Open_Socket2(currentIp, Port)) {
-            is_connect_device = TRUE;
-            SetCommunicationType(1);  // Network mode
-        }
-    }
-    
-    if (!is_connect_device)
-        continue;
-    
-    // 2. Detect product type
-    Read_Multi(now_tstat_id, product_register_value, 0, 10);
-    int nFlag = product_register_value[7];
-    
-    if (nFlag == PM_TSTAT6 || nFlag == PM_TSTAT7 || nFlag == PM_TSTAT8 || nFlag == PM_TSTAT9) {
-        product_type = T3000_6_ADDRESS;
-    } else if (nFlag == PM_TSTAT5E || nFlag == PM_PM5E || nFlag == PM_TSTAT5H) {
-        product_type = T3000_5EH_LCD_ADDRESS;
-    } else if (nFlag == PM_TSTAT5A || nFlag == PM_TSTAT5B || nFlag == PM_TSTAT5C) {
-        product_type = T3000_5ABCDFG_LED_ADDRESS;
-    } else if (nFlag == PM_T3PT10 || nFlag == PM_T332AI || nFlag == PM_T38AI16O) {
-        product_type = T3000_T3_MODULES;
-    }
-    
-    // 3. Load configuration file (product-specific handler)
-    if(config_file.Open(config_file_path, CFile::modeRead | CFile::shareDenyNone)) {
-        
-        if (product_type == T3000_6_ADDRESS) {
-            LoadFile2Tstat67(temppp, (LPTSTR)(LPCTSTR)config_file_path, &log_file);
-        } else if (product_type == T3000_T3_MODULES) {
-            LoadFile2Tstat_T3(temppp, (LPTSTR)(LPCTSTR)config_file_path, &log_file);
-        } else if (product_type == PM_LightingController) {
-            load_file_2_schedule_LC((LPTSTR)(LPCTSTR)config_file_path, now_tstat_id, log_file);
-        } else if (product_type == PM_NC) {
-            load_file_2_schedule_NC((LPTSTR)(LPCTSTR)config_file_path, now_tstat_id, log_file);
-        } else {
-            LoadFile2Tstat(temppp, (LPTSTR)(LPCTSTR)config_file_path, &log_file);
-        }
-    }
-    
-    // 4. Check for write errors
-    if (g_Vector_Write_Error.size() > 0) {
-        flash_device.at(i).nresult = CHANGE_THE_ITEM_COLOR_LESS_RED;  // Config failed
-    } else {
-        flash_device.at(i).nresult = CHANGE_THE_ITEM_COLOR_MORE_GREEN;  // Success
-    }
-    
-    // 5. Close communication
-    if (IS_COM) {
-        SetCommunicationType(0);
-        close_com();
-    } else {
-        SetCommunicationType(1);
-        close_com();
-    }
-    
-    // 6. Post UI update with result
-    pParent->PostMessage(WM_MULTY_FLASH_MESSAGE, flash_device.at(i).nresult, 
-                        flash_device.at(i).nitem);
-}
-
-// Thread complete
-pParent->m_bTstatLoadFinished = TRUE;
-return 0;
-```
-
----
-
-## 6. UI MESSAGE HANDLER
-
-### Function: `MultyFlashMessage()`
-**Location**: [Flash_Multy.cpp:1582](T3000/Flash_Multy.cpp#L1582)
-**Message ID**: `WM_MULTY_FLASH_MESSAGE`
-
-**Parameters:**
-- `wParam`: Command/Status code
-- `lParam`: Device list item index
-
-### Status Codes & Colors
-```cpp
-// Status codes with UI colors
-CHANGE_THE_ITEM_COLOR_BLUE = 1;         // Running (Blue)
-CHANGE_THE_ITEM_COLOR_RED = 2;          // Failed (Red)
-CHANGE_THE_ITEM_COLOR_GREEN = 3;        // Firmware Success (Green)
-CHANGE_THE_ITEM_COLOR_DEFAULT = 4;      // Clear
-CHANGE_THE_ITEM_COLOR_MORE_GREEN = 5;   // Firmware + Config Success (Bright Green)
-CHANGE_THE_ITEM_COLOR_LESS_RED = 6;     // Firmware Success + Config Failed (Light Red)
-MASS_FLASH_MESSAGE = 200;               // Device already up-to-date
-
-// Color definitions
-#define FLASH_COLOR_BLUE RGB(50,50,180)
-#define FLASH_COLOR_RED RGB(255,0,0)
-#define FLASH_COLOR_GREEN RGB(0,255,0)
-#define CONFIG_COLOR_RED_FAIL RGB(255,86,86)
-#define CONFIG_COLOR_CONFIG_FLASH_GOOD RGB(86,120,86)
-```
-
-### UI Update Logic
-```cpp
-switch(main_command) {
-    case CHANGE_THE_ITEM_COLOR_BLUE:
-        m_flash_multy_list.SetItemTextColor(sub_parameter, FLASH_RESULTS, FLASH_COLOR_BLUE);
-        m_flash_multy_list.SetItemText(sub_parameter, FLASH_RESULTS, _T("Running"));
-        break;
-    
-    case CHANGE_THE_ITEM_COLOR_GREEN:
-        m_flash_multy_list.SetItemTextColor(sub_parameter, FLASH_RESULTS, FLASH_COLOR_GREEN);
-        m_flash_multy_list.SetItemText(sub_parameter, FLASH_RESULTS, _T("Sucessful"));
-        break;
-    
-    case CHANGE_THE_ITEM_COLOR_RED:
-        m_flash_multy_list.SetItemTextColor(sub_parameter, FLASH_RESULTS, FLASH_COLOR_RED);
-        m_flash_multy_list.SetItemText(sub_parameter, FLASH_RESULTS, _T("Fail"));
-        break;
-    
-    case CHANGE_THE_ITEM_COLOR_MORE_GREEN:
-        m_flash_multy_list.SetItemTextColor(sub_parameter, -1, CONFIG_COLOR_CONFIG_FLASH_GOOD);
-        m_flash_multy_list.SetItemText(sub_parameter, FLASH_CONFIG_RESULTS, _T("Sucessful"));
-        break;
-    
-    case CHANGE_THE_ITEM_COLOR_LESS_RED:
-        m_flash_multy_list.SetItemTextColor(sub_parameter, -1, CONFIG_COLOR_RED_FAIL);
-        m_flash_multy_list.SetItemText(sub_parameter, FLASH_RESULTS, _T("Sucessful"));
-        m_flash_multy_list.SetItemText(sub_parameter, FLASH_CONFIG_RESULTS, _T("Fail"));
-        break;
+  "summary": {
+    "completed": 0,
+    "in_progress": 1,
+    "failed": 0,
+    "pending": 4
+  }
 }
 ```
 
----
+### Checkpoint Types
 
-## 7. EXTERNAL ISP TOOL
+#### 1. **Pre-Operation Checkpoint**
+- Record: Device ID, operation type, parameters
+- Timing: Before major operation starts
+- Purpose: Allow resumption from this exact point
 
-### ISP.exe Application
-- **Type**: External executable
-- **Location**: Typically in `Application Folder\ISP.exe`
-- **Purpose**: Writes .hex firmware directly to device hardware
-- **Communication**: Via serial port or network (Modbus/BACnet protocol)
+#### 2. **Progress Checkpoint**
+- Record: Current progress (e.g., chunk number, parameter count)
+- Timing: Periodically (every N chunks/parameters)
+- Purpose: Reduce data re-transfer
 
-### Configuration via INI File
-- **Config File Path**: `AutoFlashConfigPath`
-- **INI Sections**:
-  - `[Data]` - Flash commands and results
-  - `[Device]` - Target device info (serial number, IP, port)
-  - `[Firmware]` - .hex file path and parameters
+#### 3. **Error Checkpoint**
+- Record: Error type, location, recovery action
+- Timing: When error occurs
+- Purpose: Track issues for debugging
 
-### ISP Result Codes
-```cpp
-#define FLASH_SUCCESS 0             // Flash completed successfully
-#define FAILED_UNKNOW_ERROR -1      // Unknown error
-#define FAILED_DEVICE_NOT_FOUND -2  // Device not found
-#define FAILED_FLASH_TIMEOUT -3     // Timeout during flash
+#### 4. **Milestone Checkpoint**
+- Record: Major phase completion (bootloader, firmware, config)
+- Timing: After each major phase
+- Purpose: Skip completed phases on resume
+
+### Recovery Strategies
+
+```
+RESUMABLE UPDATE FLOW:
+
+User initiates update
+  ↓
+Load existing state file
+  ├─ If found:
+  │  ├─ Parse checkpoint data
+  │  ├─ Verify checkpoint integrity
+  │  ├─ Ask user: "Resume or restart?"
+  │  ├─ If RESUME:
+  │  │  ├─ Skip completed devices
+  │  │  ├─ Resume from last checkpoint
+  │  │  └─ Reload partial data
+  │  └─ If RESTART:
+  │     ├─ Backup old state file
+  │     └─ Create new state file
+  │
+  └─ If NOT found:
+     └─ Create new state file
+
+During execution:
+  ├─ Save checkpoint every N operations
+  ├─ On error:
+  │  ├─ If recoverable error:
+  │  │  ├─ Save error checkpoint
+  │  │  ├─ Retry (with exponential backoff)
+  │  │  ├─ If retry succeeds → Update checkpoint → Continue
+  │  │  └─ If retry fails → Mark device failed → Next device
+  │  │
+  │  └─ If unrecoverable error:
+  │     ├─ Log detailed error
+  │     ├─ Save error checkpoint
+  │     └─ Skip device or ask user
+  │
+  └─ On user interrupt:
+     ├─ Save current checkpoint
+     ├─ Close connections gracefully
+     └─ Exit (resumable state preserved)
+
+On completion:
+  ├─ Archive state file
+  ├─ Generate completion report
+  └─ Cleanup temporary files
 ```
 
 ---
 
-## 8. CONFIGURATION FILE LOADING
+## Error Handling & Recovery
 
-### Product-Specific Loaders
-Each product type has specialized config loader:
+### Error Categories
 
-1. **TSTAT6/7/8/9**: `LoadFile2Tstat67()`
-2. **TSTAT5E/5H/5G**: `LoadFile2Tstat()` (generic)
-3. **T3 Modules**: `LoadFile2Tstat_T3()`
-4. **Lighting Controller**: `load_file_2_schedule_LC()`
-5. **Network Controller**: `load_file_2_schedule_NC()`
+#### 1. **COM Port Errors**
+```
+ERROR: "The COM port is occupied!"
+RECOVERY:
+  ├─ Retry 3 times with 500ms delay
+  ├─ Check for other applications using port
+  ├─ If still occupied → Restart COM manager → Retry
+  └─ If still failed → Skip device → Continue
 
-### Config File Format
-- **Type**: Text-based configuration
-- **Content**: Device registers, schedules, programs
-- **Communication**: Modbus/BACnet protocol
-- **Logging**: All writes logged to `Load_config_Log\<SN>.txt`
-
-### Loading Process
-1. Parse configuration file
-2. Extract register/program data
-3. Open serial or network communication
-4. Send configuration data in Modbus packets
-5. Verify writes
-6. Log results and errors
-7. Close communication
-
----
-
-## 9. DATA PERSISTENCE
-
-### SQLite Database Storage
-- **Database File**: Current building database (`.mdb`)
-- **Table**: `BatchFlashResult`
-- **Function**: `ParameterSaveToDB()` - [Flash_Multy.cpp:916](T3000/Flash_Multy.cpp#L916)
-
-### Stored Information
-```sql
-CREATE TABLE BatchFlashResult (
-    SN INTEGER,
-    FirmwarePath TEXT,
-    ConfigPath TEXT,
-    FirmwareResult INTEGER,
-    ConfigResult INTEGER
-);
+ERROR: "No MSTP data on RS485"
+RECOVERY:
+  ├─ Check cable connections
+  ├─ Verify device power
+  ├─ Retry 2 times with 1 second delay
+  └─ If failed → Mark device offline → Continue
 ```
 
-### Mass Flash Log Files
-- **Location**: `Load_config_Log\` folder
-- **Files**: `<SerialNumber>.txt` for each device
-- **Content**: Configuration load operations and results
+#### 2. **Firmware Transfer Errors**
+```
+ERROR: "CRC Error"
+RECOVERY:
+  ├─ Retry last chunk (max 3 times)
+  ├─ If succeeds → Continue from next chunk
+  ├─ If fails → Restore from last checkpoint → Retry entire phase
+  └─ If fails again → Mark device failed → Continue
 
-### INI Files
-- **ProductPath.ini**: Maps product IDs to firmware versions
-- **AutoFlashConfig.ini**: Current flash job configuration
-- **Mass Flash Result INI**: Status tracking for batch operations
+ERROR: "Device Timeout"
+RECOVERY:
+  ├─ Increase com_error_delay_time
+  ├─ Retry with backoff: 500ms → 1s → 2s
+  ├─ Verify device is responding to commands
+  └─ If no response → Check device power/connection
 
----
+ERROR: "Firmware Mismatch"
+RECOVERY:
+  ├─ Re-read firmware version from device
+  ├─ Compare with target version
+  ├─ If mismatch persists → Retry flash (max 2 times)
+  └─ If still mismatch → Manual intervention required
+```
 
-## 10. KEY GLOBAL VARIABLES
+#### 3. **Configuration Errors**
+```
+ERROR: "Parameter Write Failed"
+RECOVERY:
+  ├─ Retry write (max 3 times)
+  ├─ Skip failed parameter → Continue
+  ├─ Mark device as "Partial Success"
+  └─ Log which parameters failed
 
-```cpp
-// Device list for current flash batch
-vector <Str_flash_device> flash_device;
+ERROR: "Verification Failed"
+RECOVERY:
+  ├─ Read parameter value again
+  ├─ Compare with target
+  ├─ If mismatch → Retry write
+  └─ If persistent mismatch → Log and continue
+```
 
-// Download info for cloud-based firmware
-vector <Str_download_firmware_info> download_info_type;
+### Retry Strategy
 
-// Thread handles
-HANDLE Call_ISP_Application;           // ISP thread handle
-HANDLE Check_Online_Thread;            // Device online monitor
+```
+EXPONENTIAL BACKOFF:
 
-// Paths
-CString ApplicationFolder;              // T3000 executable folder
-CString MultyISPtool_path;             // Path to ISP.exe
-CString AutoFlashConfigPath;           // Auto flash config INI path
-CString g_ext_mass_flash_path;         // Mass flash result INI
+Retry 1: Immediate retry
+Retry 2: Wait 500ms → Retry
+Retry 3: Wait 1000ms → Retry
+Retry 4: Wait 2000ms → Retry
+Max Retries: 3-5 (depending on error type)
 
-// Global state
-bool b_pause_refresh_tree;             // Pause tree refresh during flash
-bool g_bPauseMultiRead;                // Pause multi-device reads
-int multy_log_count;                   // Log counter
+For timeout errors:
+  ├─ Increase timeout by 50%
+  ├─ Increase retry delay
+  └─ Add diagnostic logging
 ```
 
 ---
 
-## 11. ERROR HANDLING
+## UI Status Indicators
 
-### Common Failure Scenarios
+### Color Codes
+- **Blue**: Update in progress
+- **Green**: Firmware flash successful
+- **Bright Green**: Both firmware + config successful
+- **Light Green**: Config partial success (firmware OK)
+- **Yellow**: Paused/Checkpointed
+- **Light Red**: Firmware OK, config failed
+- **Red**: Update failed (firmware or critical config)
+- **Gray**: Skipped/Not updated
 
-1. **No Device Selected**
-   - Message: "Please select one or more items."
-   - Recovery: User selects devices and retries
+### Progress Bar
+- Shows overall progress: `(devices_completed / total_devices) × 100%`
+- Sub-progress: `(current_operation_progress) × 100%` within device
 
-2. **Device Not Online**
-   - Device marked with red "Offline" indicator
-   - Skipped during flash process
-
-3. **ISP Execution Failed**
-   - Result shows RED "Fail"
-   - Config phase skipped for that device
-
-4. **Configuration Write Failed**
-   - Status: RED "Less_Red" (firmware OK, config failed)
-   - Logged to `<SN>.txt`
-   - Device left with new firmware but old config
-
-5. **Communication Port In Use**
-   - ISP tool expects free COM/network port
-   - T3000 closes all ports before flashing
-
-### Error Logging
-- **Log Location**: `<Application Folder>\Load_config_Log\<SN>.txt`
-- **Log Content**: All register writes, errors, and completion status
-- **Purpose**: Troubleshooting failed flash operations
-
----
-
-## 12. FILE LOCATIONS & PATHS
-
-### Key Directories
+### Status Messages
 ```
-T3000 Installation Folder/
-├── T3000.exe                          (Main application)
-├── ISP.exe                            (Firmware flash tool)
-├── Database/
-│   ├── Firmware/
-│   │   ├── *.hex                      (Firmware files)
-│   │   ├── *.ini                      (Config files)
-│   │   └── ProductPath.ini            (Product-to-firmware mapping)
-│   └── Buildings/
-│       └── <CurrentBuilding>.mdb      (SQLite database)
-├── Load_config_Log/                   (Configuration logs)
-├── AutoFlashConfig.ini               (Current flash config)
-└── LoadFirmware.ini                   (Mass flash results)
+[DEVICE_001] Phase 1: Firmware Flash → 50% Complete (128/256 chunks)
+[DEVICE_001] Phase 1: Firmware Verification → In Progress
+[DEVICE_001] Phase 2: Configuration Load → Pending
+[DEVICE_002] Phase 1: Bootloader Flash → Success
+[DEVICE_002] Phase 1: Firmware Flash → In Progress
 ```
 
 ---
 
-## 13. PERFORMANCE & TIMING
+## Thread Management
 
-### Typical Operation Times
-- **Dialog Initialization**: 2-5 seconds (scans all devices)
-- **Per Device Firmware Flash**: 30-60 seconds (via ISP.exe)
-- **Device Reboot Wait**: 4 seconds (Sleep timer)
-- **Per Device Config Load**: 5-15 seconds (register writes)
-- **Total for 1 Device**: 40-80 seconds
-- **Total for 10 Devices**: 6-15 minutes
+### Main Thread
+- UI event handling
+- Dialog management
+- Status updates
 
-### Thread Management
-- **Main Thread**: UI handling, dialog management
-- **ISP Thread**: Sequential device processing (not parallel)
-- **Monitor Thread**: (Optional) Device online status checking
+### Flash Thread (`multy_isp_thread`)
+- Sequential device processing
+- Phase 1 (Firmware) execution
+- Posts messages to UI via `WM_MULTY_FLASH_MESSAGE`
 
----
+### ISP Thread
+- Invokes ISP.exe subprocess
+- Waits for completion
+- Parses result from INI file
 
-## 14. SUMMARY OF FILES INVOLVED
-
-| File | Purpose |
-|------|---------|
-| `MainFrm.cpp` | Main window, entry point handler |
-| `Flash_Multy.cpp` | Dialog UI, thread management |
-| `Flash_Multy.h` | Data structures, dialog definition |
-| `Dowmloadfile.cpp` | Cloud firmware download |
-| `global_function.cpp` | ISP execution, com port management |
-| `T3000.rc` | Menu resource, keyboard shortcut |
-| `resource.h` | Resource IDs |
-| `T3000.mdb` | SQLite database |
+### Message Handling (`MultyFlashMessage`)
+- Receives `WM_MULTY_FLASH_MESSAGE`
+- Updates UI elements:
+  - Device status color
+  - Progress bar
+  - Status text
+  - Error messages
 
 ---
 
-## 15. QUICK REFERENCE - FUNCTION CALL SEQUENCE
+## Cleanup & Finalization
 
 ```
-User: Ctrl+F2 or Tools→Load Firmware
-    ↓
-MainFrm::OnBatchFlashHex()
-    ├─ Pause communications
-    ├─ Close serial/network
-    ├─ CFlash_Multy::DoModal()
-    │   ├─ OnInitDialog()
-    │   │   ├─ Initial_List()
-    │   │   ├─ GetProductType()
-    │   │   └─ Get_Device_Firmware()
-    │   ├─ [User selects devices & files]
-    │   └─ OnBnClickedButtonStatrt()
-    │       └─ CreateThread(multy_isp_thread)
-    │           ├─ Phase 1: Firmware Flash
-    │           │   ├─ SetAutoConfig()
-    │           │   ├─ WinExecAndWait(ISP.exe)
-    │           │   └─ Check result → PostMessage()
-    │           └─ Phase 2: Config Load
-    │               ├─ Open communication
-    │               ├─ Load product-specific config
-    │               ├─ Write to device
-    │               └─ PostMessage()
-    ├─ MultyFlashMessage() → Update UI colors
-    └─ Restore communications & exit
+CLEANUP PHASE:
+
+[Close ISP Thread]
+  ├─ Terminate ISP.exe if still running
+  ├─ Close file handles
+  └─ Clean temporary INI files
+
+[Restore Communication]
+  ├─ Reopen serial/network connections
+  ├─ Recreate broadcast socket
+  ├─ Restore previous communication parameters
+  └─ Verify connectivity to all devices
+
+[Resume Tree Refresh]
+  ├─ Update device list in main UI
+  ├─ Refresh device properties
+  ├─ Show updated firmware versions
+  └─ Display final status for each device
+
+[Archive State & Logs]
+  ├─ Move state file to archive
+  ├─ Append update log to history
+  ├─ Generate completion report
+  ├─ Email/notify on completion
+  └─ Backup for troubleshooting
+
+[Final Summary]
+  ├─ Display:
+  │  ├─ Total devices: X
+  │  ├─ Successful: Y
+  │  ├─ Failed: Z
+  │  ├─ Partial Success: W
+  │  └─ Time elapsed: HH:MM:SS
+  └─ Save to history.txt
 ```
 
 ---
 
-**Generated**: 2024 T3000 Building Automation System
-**Version**: Complete firmware update flow documentation
+## Configuration Files
+
+### INI Files Used
+
+**Update Configuration (auto_config.ini)**
+```ini
+[DEVICE_001]
+MODBUS_ID=10
+DEVICE_TYPE=TSTAT6
+COM_PORT=COM3
+BAUD_RATE=19200
+FIRMWARE_FILE=C:\path\to\firmware.hex
+FIRMWARE_MD5=abc123def456
+BOOTLOADER_FILE=C:\path\to\bootloader.hex
+NEW_BOOTLOAD=1
+```
+
+**ISP Result File (isp_result.ini)**
+```ini
+[RESULT]
+DEVICE_ID=DEVICE_001
+STATUS=SUCCESS
+FIRMWARE_VERSION=1.3.0
+BOOTLOADER_VERSION=2.1.0
+TIME_TAKEN=45.3
+ERROR_CODE=0
+ERROR_MESSAGE=
+```
+
+### State File Location
+- **Path**: `{APP_DATA}/T3000/update_states/`
+- **Pattern**: `update_session_{TIMESTAMP}.json`
+- **Example**: `update_session_20240515_103000.json`
+
+---
+
+## Key Files Involved
+
+| File | Location | Purpose |
+|------|----------|---------|
+| **MainFrm.cpp** | src/ | Entry point (OnBatchFlashHex) |
+| **Flash_Multy.cpp** | src/ | Dialog & thread management |
+| **Flash_Multy.h** | src/ | Dialog class definition |
+| **ComWriter.cpp** | ISP/ | Firmware transfer logic |
+| **ComWriter.h** | ISP/ | COM writer class |
+| **BacnetMstp.cpp** | ISP/ | MSTP communication |
+| **ISPDlg.h** | ISP/ | ISP dialog definitions |
+| **TstatFlashDlg.cpp** | ISP/ | TSTAT flash dialog |
+
+---
+
+## Resume Update Flow
+
+```
+User launches T3000
+  ↓
+Check for incomplete update state
+  ├─ Found: `update_session_*.json` exists
+  │  ├─ Parse state file
+  │  ├─ Show "Resume Update?" dialog
+  │  ├─ If YES:
+  │  │  ├─ Load all checkpoints
+  │  │  ├─ Ask which devices to update
+  │  │  ├─ Skip completed devices
+  │  │  ├─ Resume from last checkpoint
+  │  │  └─ Start update process
+  │  └─ If NO:
+  │     ├─ Delete/archive old state
+  │     └─ User can start fresh update
+  │
+  └─ Not found: Continue normal startup
+
+During resumed update:
+  ├─ Reload device list from state
+  ├─ Restore progress bar state
+  ├─ Restore error log display
+  ├─ Continue from last checkpoint
+  ├─ Skip bootloader if already done
+  ├─ Resume firmware from chunk N
+  ├─ Or skip firmware if done
+  ├─ Continue with config from parameter M
+  └─ Generate completion report
+
+On successful completion:
+  ├─ Archive state file
+  ├─ Clear "incomplete update" flag
+  ├─ Display final status
+  └─ Allow starting new update
+```
+
+---
+
+## Best Practices
+
+### Before Starting Update
+- [ ] Backup current device configuration
+- [ ] Verify firmware file integrity (MD5)
+- [ ] Check all devices are online and responding
+- [ ] Ensure stable network/COM connection
+- [ ] Close other applications using COM ports
+- [ ] Test with single device first
+
+### During Update
+- [ ] Monitor progress in real-time
+- [ ] Do NOT disconnect power to devices
+- [ ] Do NOT close application during update
+- [ ] Do NOT start another update session
+- [ ] Watch for error messages and retry suggestions
+
+### After Update
+- [ ] Verify devices are online
+- [ ] Check firmware versions match targets
+- [ ] Validate configuration parameters
+- [ ] Test device communication
+- [ ] Review update log for warnings
+- [ ] Archive state file for troubleshooting
+
+---
+
+## Troubleshooting
+
+### Issue: "Update Resumed but Device Shows Different State"
+**Solution**: State file corruption
+- [ ] Delete state file
+- [ ] Restart update
+- [ ] Check firmware version manually on device
+
+### Issue: "Stuck at 50% Progress"
+**Solution**: Thread deadlock or device hang
+- [ ] Wait 5 minutes
+- [ ] If still stuck: Press Escape to pause
+- [ ] Check device power/connection
+- [ ] Resume update or restart
+
+### Issue: "CRC Error Repeats on Same Chunk"
+**Solution**: Communication or hardware issue
+- [ ] Check COM port cable
+- [ ] Reduce baud rate (try 9600)
+- [ ] Replace COM cable
+- [ ] Try different COM port
+
+### Issue: "Configuration Load Fails After Firmware Success"
+**Solution**: Device firmware issue or config incompatibility
+- [ ] Verify device firmware version
+- [ ] Check config file format
+- [ ] Try manual config load
+- [ ] Check device logs for errors
+
+---
+
+## Performance Optimization
+
+### Parallel Processing (Future Enhancement)
+```
+Currently: Sequential (one device at a time)
+Proposed: Parallel processing with:
+  ├─ Max 3-4 devices in parallel
+  ├─ Each device on separate COM port/network
+  ├─ Separate thread pool for each device
+  └─ Shared state management with locks
+```
+
+### Bandwidth Optimization
+```
+Current:
+  ├─ Firmware chunk size: 1024 bytes
+  ├─ Config parameter batch: 10 parameters
+
+Optimized:
+  ├─ Firmware chunk size: 4096 bytes (if stable)
+  ├─ Config parameter batch: 20 parameters
+  └─ Enable pipelining for faster transfer
+```
+
+---
+
+## Monitoring & Logging
+
+### Log Levels
+- **DEBUG**: Detailed step-by-step information
+- **INFO**: Major phase changes and milestones
+- **WARN**: Recoverable errors, retries
+- **ERROR**: Unrecoverable errors, failures
+- **FATAL**: System-level failures
+
+### Log Files
+- **Main Log**: `T3000_update_{date}.log`
+- **Error Log**: `T3000_update_{date}_errors.log`
+- **Debug Log**: `T3000_update_{date}_debug.log` (if debug mode enabled)
+- **History**: `history.txt` (appended for each update)
+
+---
+
+**Document Version**: 1.0
+**Last Updated**: 2024-05-15
+**Author**: T3000 Development Team
