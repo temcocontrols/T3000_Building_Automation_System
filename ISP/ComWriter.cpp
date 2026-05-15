@@ -6,7 +6,7 @@ extern vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 extern unsigned int g_mstp_deviceid ;
 extern int SPECIAL_BAC_TO_MODBUS ;
 // If equal to 1, it means that the new BootLoader is being flashed now
-extern int new_bootload ; //�������1 ��˵��������д�����µ�BootLoader;
+extern int new_bootload ; //�������?1 ��˵��������д�����µ�BootLoader;
 // 0 normal mode, 1 flash boot mode
 extern int com_port_flash_status ;  // 0 ����ģʽ   1 ��дbootģʽ
 extern unsigned int n_check_temco_firmware;
@@ -147,7 +147,7 @@ int CComWriter::BeginWirteByCom()
     {
 #pragma region detect_mstp_shutdown
 		// Don't judge the serial port protocol when flashing for now, otherwise it will be slow when burning modbus
-		if (SPECIAL_BAC_TO_MODBUS)  //��ʱ��Ҫ�ڵ�flash��ʱ�� �жϴ��ڵ�Э�飬��Ȼ��modbus��ʱ����� ��
+		if (SPECIAL_BAC_TO_MODBUS)  //��ʱ��Ҫ�ڵ�flash��ʱ�� �жϴ��ڵ�Э�飬��Ȼ��modbus��ʱ�����? ��
 		{
 			// Used to detect serial port MSTP data
 			baudrate_def temp_baudrate_ret[100] = { 0 }; //���ڼ�⴮��MSTP����
@@ -209,7 +209,7 @@ int CComWriter::BeginWirteByCom()
 
             close_bac_com();
             find_mstp_protocal = Check_Mstp_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  //�ٴ�ȷ�������� �������� - Confirm that all devices on the bus are silent again
-            temp_loop_count++; //���ѭ��3�� - Loop up to 3 times
+            temp_loop_count++; //���ѭ��?3�� - Loop up to 3 times
 #endif
         }
 
@@ -262,7 +262,7 @@ BOOL CComWriter::WriteCommandtoReset()
 
     int nRet = Write_One(m_szMdbIDs[0],16,127);   // Enter ISP mode
     //Sleep(2000);
-    //Add by Fance  �����Ӧ�ô������� ISP  16д127��  ��Ҫ�� 11�żĴ���  11�� ����1  ˵����ת�ɹ�����������ȴ�
+    //Add by Fance  �����Ӧ�ô�������? ISP  16д127��  ��Ҫ�� 11�żĴ���  11�� ����1  ˵����ת�ɹ�����������ȴ�?
     //TBD: Explain this comment better
     // If you want to read 11th register 11th or more than 1 when you jump from the application code to the ISP 16 write 127, the jump succeeds, otherwise wait
 
@@ -658,7 +658,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                         CString strTemp=_T("");
                         strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);
 
-                        strFailureList+=strTemp;  // flash���ʹ��
+                        strFailureList+=strTemp;  // flash���ʹ��?
                         switch(nFlashRet)
                         {
                         case -1:
@@ -762,7 +762,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                     CString strTemp=_T("");
                     strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);
 
-                    strFailureList+=strTemp;  // flash���ʹ��
+                    strFailureList+=strTemp;  // flash���ʹ��?
                     switch(nFlashRet)
                     {
                     case -1:
@@ -823,10 +823,17 @@ end_tcp_flash_mode :
 
 }
 
-#define REG_RESUME_OFFSET_LO    1991
-#define REG_RESUME_OFFSET_HI    1992
+#define REG_RESUME_OFFSET    1991
 
-//////////////////////////////////////////////////////////////////////////
+// reg 1991 on ESP32 returns packet count (each packet = 128 bytes).
+// Convert to byte offset for use as buffer index and ISP address field.
+static int ReadResumeByteOffset(BYTE deviceID)
+{
+    int packet_count = mudbus_read_one(deviceID, REG_RESUME_OFFSET); // reg 1991
+    if (packet_count < 0) packet_count = 0;
+    return packet_count * 128;  // convert to byte offset
+}
+
 //the return value 1,successful,   return < 0 , fail
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam)
 {
@@ -848,21 +855,14 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
     {
         if(IDOK==AfxMessageBox(_T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),MB_OKCANCEL))
         {
-            // Read resume offset from regs 1991 & 1992
-            int lo = mudbus_read_one(m_ID, REG_RESUME_OFFSET_LO);
-            int hi = mudbus_read_one(m_ID, REG_RESUME_OFFSET_HI);
-            if (lo >= 0 && hi >= 0)
-            {
-                ii = (int)((UINT32)(lo & 0xFFFF) | ((UINT32)(hi & 0xFFFF) << 16));
-                CString strResumePos;
-                strResumePos.Format(_T("|Resuming from offset: 0x%08X"), ii);
-                pWriter->OutPutsStatusInfo(strResumePos);
-            }
-            else
-            {
-                ii = 0;
-                pWriter->OutPutsStatusInfo(_T("|Failed to read resume offset, restarting from beginning."));
-            }
+            // Read resume offset from regs 1991
+            pWriter->continue_com_flash_count = ReadResumeByteOffset(m_ID);
+
+            CString strResumePos;
+            strResumePos.Format(_T("|Resuming from byte offset: %d (packet %d)"),
+                pWriter->continue_com_flash_count,
+                pWriter->continue_com_flash_count / 128);
+            pWriter->OutPutsStatusInfo(strResumePos);
             Sleep(500);
         }
         else // ѡȡ��
@@ -997,8 +997,6 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
         if(pWriter->continue_com_flash_count < 0)
             pWriter->continue_com_flash_count = 0;
         ii = pWriter->continue_com_flash_count;
-        the_max_register_number_parameter = the_max_register_number_parameter + ii;
-        Sleep(4000);
     }
     int one_flash_package = 128;
     if (SPECIAL_BAC_TO_MODBUS)
@@ -1480,18 +1478,16 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                 {
                     unsigned short wirte_md5[4];
                     int compare_ret = 1;
-                    strTips = _T("|Current Programming type is : Hex Only");
-                    pWriter->OutPutsStatusInfo(strTips);
 
-                    //���88esp���豸��bootloader ����
+                    //���?88esp���豸��bootloader ����
                     int n_ret = modbus_read_multi(pWriter->m_szMdbIDs[i], &pWriter->update_firmware_info[0], 1994, 6);
                     if (n_ret > 0)
                     {
                         //�ȶ�MD5
-                        for (int UpdateStatus = 0; UpdateStatus < 4; UpdateStatus++)
+                        for (int x = 0; x < 4; x++)
                         {
-                            wirte_md5[UpdateStatus] = firmware_md5[2 * UpdateStatus] * 256 + firmware_md5[2 * UpdateStatus + 1];
-                            if (pWriter->update_firmware_info[UpdateStatus + 1] != wirte_md5[UpdateStatus])
+                            wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
+                            if (pWriter->update_firmware_info[x + 1] != wirte_md5[x])
                             {
                                 compare_ret = -1;
                                 //break;
@@ -1500,7 +1496,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
                         if ((compare_ret == 1) && (pWriter->update_firmware_info[0] != 0))
                         {
-                            pWriter->continue_com_flash_count = pWriter->update_firmware_info[0] * 128; // 1994��ŵ��Ǵ�����д�˶��ٰ�;
+                            pWriter->continue_com_flash_count = pWriter->update_firmware_info[0] * 128; // 1994��ŵ��Ǵ�����д�˶��ٰ�?;
                         }
                         else
                         {
@@ -1546,7 +1542,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                 while (nnn_ret <= 1);
 
                 // Sleep(2000);
-                int ModelID= mudbus_read_one(pWriter->m_szMdbIDs[i],7,5);
+                int ModelID = Device_infor[7];
                 if (ModelID>0)
                 {
                     if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7,8 Detect CPU flash size.                     {
@@ -1653,9 +1649,6 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                         }
                         ii++;
                     }
-
-
-
                 }
 #endif
 
@@ -1736,7 +1729,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     CString strTemp=_T("");
                     strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);
 
-                    strFailureList+=strTemp;  // flash���ʹ��
+                    strFailureList+=strTemp;  // flash���ʹ��?
                     switch(nFlashRet)
                     {
                     case -1:
@@ -2008,7 +2001,7 @@ int CComWriter::Fix_Tstat10_76800_baudrate()
 
     if (Device_infor[7] != 10)
         return 0;
-    if (m_nBautrate != 76800) //����ѡ��Ĳ����ʲ���76800����������  // If the baud rate selected in the interface is not 76800, ignore it
+    if (m_nBautrate != 76800) //����ѡ��Ĳ����ʲ���?76800����������  // If the baud rate selected in the interface is not 76800, ignore it
         return 0;
     if (Device_infor[14] >= 79) //�̼��汾����79��˵���Ѿ��޸�����  // If firmware version is greater than 79, it means it has been fixed
         return 0;
@@ -2078,11 +2071,7 @@ int CComWriter::UpdataDeviceInformation(int& ID)
         strtips_version.Format(_T("Bootloader version : unknown"));
     OutPutsStatusInfo(strtips_version, false);
 
-
     CString prodcutname= GetFirmwareUpdateName(Device_infor[7]);
-
-
-
 
     MultiByteToWideChar(CP_ACP, 0, (char *)global_fileInfor.product_name,
         (int)strlen(global_fileInfor.product_name) + 1,
@@ -2631,7 +2620,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 #endif
                 }
 
-       //         if (nRet >=41)//֧�ֶ���������л��� - Support for switching between multiple baud rates
+       //         if (nRet >=41)//֧�ֶ���������л���? - Support for switching between multiple baud rates
        //         {
        //             if (GetCommunicationType () == 0)
        //             {
@@ -2687,21 +2676,13 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 {
                     if(IDOK==AfxMessageBox(_T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),MB_OKCANCEL))  // Select OK
                     {
-                        // Read resume offset from regs 1991 & 1992
-                        int lo = mudbus_read_one(m_ID, REG_RESUME_OFFSET_LO);
-                        int hi = mudbus_read_one(m_ID, REG_RESUME_OFFSET_HI);
-                        if (lo >= 0 && hi >= 0)
-                        {
-                            nResumeOffset = (int)((UINT32)(lo & 0xFFFF) | ((UINT32)(hi & 0xFFFF) << 16));
-                            CString strResumePos;
-                            strResumePos.Format(_T("|Resuming from offset: 0x%08X"), ii);
-                            pWriter->OutPutsStatusInfo(strResumePos);
-                        }
-                        else
-                        {
-                            nResumeOffset = 0;
-                            pWriter->OutPutsStatusInfo(_T("|Failed to read resume offset, restarting from beginning."));
-                        }
+                        nResumeOffset = ReadResumeByteOffset(m_ID);
+
+                        CString strResumePos;
+                        strResumePos.Format(_T("|Resume byte offset: %d (packet %d)"),
+                            nResumeOffset, nResumeOffset / 128);
+                        pWriter->OutPutsStatusInfo(strResumePos);
+                        Sleep(500);
                     }
                     else // ѡȡ�� - Select Cancel
                     {
