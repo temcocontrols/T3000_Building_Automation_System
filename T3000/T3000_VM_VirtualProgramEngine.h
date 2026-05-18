@@ -1,4 +1,4 @@
-﻿#ifndef VIRTUAL_PROGRAM_ENGINE_H
+#ifndef VIRTUAL_PROGRAM_ENGINE_H
 #define VIRTUAL_PROGRAM_ENGINE_H
 
 #pragma once
@@ -222,6 +222,20 @@ struct VMInstruction {
 };
 
 //=============================================================================
+// Local variable → global point mapping
+// When a local_table variable name matches a global point's label
+// (e.g. "COUNT" matches m_Variable_data[0].label),
+// reads/writes to that local variable must be redirected to the global point.
+//=============================================================================
+struct LocalVarMapping {
+    int localOffset;               // offset as it appears in bytecode (j+1 in local_table)
+    unsigned char varType;         // FLOAT_TYPE, LONG_TYPE, etc.
+    std::string name;              // variable name extracted from local_table
+    unsigned char globalPointType; // KEY_VARIABLE/KEY_INPUT/KEY_OUTPUT/... (0 = not mapped)
+    int globalIndex;               // index in global data vector (-1 = not mapped)
+};
+
+//=============================================================================
 // Single program runtime context
 //=============================================================================
 struct ProgramContext {
@@ -229,42 +243,51 @@ struct ProgramContext {
     std::vector<unsigned char> bytecode;   // Program bytecode
     std::vector<variable_table> localTable; // Local variable table
     std::vector<variable_table> timeTable;  // Time table
-    
+
+    // Raw local table data bytes (Bug 5 fix: load bytes after 0xFE terminator)
+    // Layout: [2 bytes Byte=0][2 bytes ind_local_table][local_table data...][time_table data...]
+    std::vector<unsigned char> localTableBytes;
+
+    // Parsed mapping: local variable offset → global point
+    std::vector<LocalVarMapping> localVarMappings;
+    int localTableDataStart;               // Byte offset of local_table data within localTableBytes (typically 4)
+
     int ip;                                // Instruction pointer
     int instructionCount;                  // Executed instruction count
     ProgramState state;                    // Running state
-    
+
     // Stacks
     std::stack<float> valueStack;
     std::stack<int> returnStack;          // GOSUB return address stack
-    
+
     // Local variable storage
     std::vector<float> localVariables;
-    
+
     // FOR/NEXT loop stack
     struct ForLoop {
         int targetIp;
         float counter;
         float endValue;
         float step;
+        unsigned char varIndex;
     };
     std::stack<ForLoop> forStack;
-    
+
     // Wait state
     DWORD waitUntil;                       // Wait until timestamp
     bool waiting;
-    
+
     // Error info
     std::string errorMessage;
     int errorLine;
-    
+
     // Breakpoints
     std::set<int> breakpoints;
-    
+
     // Last exec time (for INTERVAL calc)
     DWORD lastExecTime;
     DWORD totalRuntime;                    // Accumulated runtime (ms)
-    
+
     ProgramContext() {
         programIndex = 0;
         ip = 0;
@@ -275,8 +298,9 @@ struct ProgramContext {
         errorLine = -1;
         lastExecTime = 0;
         totalRuntime = 0;
+        localTableDataStart = 4;  // default: 2-byte Byte + 2-byte ind_local_table
     }
-    
+
     void Reset() {
         ip = 0;
         instructionCount = 0;
@@ -290,6 +314,8 @@ struct ProgramContext {
         errorLine = -1;
         localVariables.clear();
         localVariables.resize(VM_MAX_LOCAL_VARS, 0.0f);
+        // Note: localTableBytes and localVarMappings are NOT cleared here;
+        // they persist across scans and are only loaded once via LoadProgram.
     }
 };
 
@@ -317,7 +343,7 @@ public:
     void StopAll();
     void PauseAll();
     void ResumeAll();
-    
+
     void StartProgram(int programIndex);
     void StopProgram(int programIndex);
     void PauseProgram(int programIndex);
@@ -334,7 +360,7 @@ public:
     BOOL SingleStep(int programIndex);
     BOOL StepOver(int programIndex);
     BOOL StepOut(int programIndex);
-    
+
     // State query
     ProgramState GetProgramState(int programIndex) const;
     int GetCurrentLine(int programIndex) const;
@@ -366,15 +392,22 @@ private:
     float ReadFloat(const unsigned char* ptr);
     int ReadShort(const unsigned char* ptr);
     int ReadByte(const unsigned char* ptr);
-    
+
     // Operand parsing
     BOOL ParseOperand(const unsigned char* ip, ProgramContext& ctx, float& outValue, int& bytesConsumed);
 
     // Variable read/write
-    float ReadVariable(unsigned char varType, unsigned char pointType, 
+    float ReadVariable(unsigned char varType, unsigned char pointType,
                        unsigned char panel, unsigned short numPoint);
     void WriteVariable(unsigned char varType, unsigned char pointType,
                        unsigned char panel, unsigned short numPoint, float value);
+
+    // Local variable read/write (Bug 5 fix)
+    float ReadLocalVariable(ProgramContext& ctx, unsigned char varType, int offset);
+    void WriteLocalVariable(ProgramContext& ctx, unsigned char varType, int offset, float value);
+
+    // Parse local_table and build variable→global-point mapping
+    void ParseLocalTable(ProgramContext& ctx);
 
     // Read global data
     int32_t GetInputValue(int index);
@@ -388,6 +421,7 @@ private:
 
     // Time functions
     float GetTimeFunc(unsigned char funcCode);
+    float ExecFunction(ProgramContext& ctx, unsigned char funcCode);
     BOOL CheckWeeklySchedule(int schedIndex);
     BOOL CheckAnnualSchedule(int schedIndex);
 
@@ -433,7 +467,7 @@ private:
 private:
     // Scan interval
     DWORD m_dwScanInterval;
-    
+
     // Thread synchronization
     CCriticalSection m_csMain;
     CEvent m_eventShutdown;
@@ -441,28 +475,32 @@ private:
     CWinThread* m_pWorkerThread;
     BOOL m_bRunning;
     BOOL m_bPaused;
-    
+
     // Program context array (16 programs)
     ProgramContext m_Programs[BAC_PROGRAM_ITEM_COUNT];
-    
+
     // Bytecode disassembly cache
     std::map<int, std::vector<VMInstruction>> m_DisasmCache;
-    
+
     // Statistics
     DWORD m_dwTotalExecTime;
     int m_nScanCount;
-    
+
     // Function argument stack (for functions with args)
     std::stack<float> m_FunctionArgs;
-    
+
     // INTERVAL tracking
     DWORD m_dwLastScanTime[BAC_PROGRAM_ITEM_COUNT];
-    
+
     // RUNTIME tracking
     DWORD m_dwProgramStartTime[BAC_PROGRAM_ITEM_COUNT];
-    
+
     // Call depth (for StepOut)
     int m_nCallDepth[BAC_PROGRAM_ITEM_COUNT];
+
+    // Global data vectors are NOT members of this class.
+    // They are declared as extern globals in global_variable_extern.h
+    // and accessed directly by ReadVariable/WriteVariable.
 };
 
 // Global instance
