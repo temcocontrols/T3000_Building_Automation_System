@@ -870,7 +870,7 @@
     <ClCompile Include="BacnetPvar.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
-    <ClCompile Include="T3000_VM_VirtualProgramEngine.cpp">
+    <ClCompile Include="VirtualProgramEngine.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
   </ItemGroup>

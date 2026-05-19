@@ -394,9 +394,6 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClCompile Include="T3000UpdateDlg.cpp" />
     <ClCompile Include="T3000View.cpp" />
     <ClCompile Include="T3000_Default_MainView.cpp" />
-    <ClCompile Include="T3000_VM_VirtualProgramEngine.cpp">
-      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PreprocessToFile>
-    </ClCompile>
     <ClCompile Include="T328IN.cpp" />
     <ClCompile Include="T332AI.cpp" />
     <ClCompile Include="T36CT.cpp" />
@@ -429,6 +426,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClCompile Include="TStatScanner.cpp" />
     <ClCompile Include="TStatScheduleDlg.cpp" />
     <ClCompile Include="UserAcessSetDlg.cpp" />
+    <ClCompile Include="VirtualProgramEngine.cpp" />
     <ClCompile Include="Weekly_Routines.cpp" />
     <ClCompile Include="WeeklyRout_InsertDia.cpp" />
     <ClCompile Include="WifiConfigDlg.cpp" />
