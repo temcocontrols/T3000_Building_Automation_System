@@ -1,20 +1,20 @@
-# Copyright 2020 Temco Controls 
+# Copyright 2020 Temco Controls
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the 
-# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-# copies of the Software, and to permit persons to whom the Software is furnished to do so, 
+# in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is furnished to do so,
 # subject to the following conditions:
 
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS 
-# OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
+# OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 # IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # We support CMake starting at version 3.0.0
@@ -92,7 +92,7 @@ if(NOT MSVC)
    endif()
 endif(NOT MSVC)
 
-# Include directories 
+# Include directories
 include_directories(${CPP_HEADER_DIR})
 
 ################ Files ################
@@ -171,12 +171,12 @@ set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/isp.rc PROPERTIES LANGUA
 set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ./")
 set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -i ./res/")
 
-# Since we link to BACnet_Stack_Library through pragma directive, we need to specify the 
+# Since we link to BACnet_Stack_Library through pragma directive, we need to specify the
 # link directory path.
 link_directories(${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE})
 
 # Add executable to build.
-add_executable(${PROJECT_NAME} 
+add_executable(${PROJECT_NAME}
    ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES}
 )
 
@@ -188,4 +188,3 @@ add_dependencies(${PROJECT_NAME} BACnet_Stack_Library ModbusDllforVc)
 # Link with other dependencies. Linking will happen using pragma directive.
 #target_link_libraries(${PROJECT_NAME} ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/BACnetStackLibrary.lib
 #  ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/ModbusDllforVc.lib)
-  
