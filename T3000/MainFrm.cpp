@@ -9856,7 +9856,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
                         {
                             tp.status = 1;
                             m_product.at(i).status = 1;
-                            TRACE(_T("Change %s.%d status to 1\r\n"), temp_head_ip, nlastip);
+                            //TRACE(_T("Change %s.%d status to 1\r\n"), temp_head_ip, nlastip);
                         }
                     }
                 }
@@ -16408,7 +16408,7 @@ DWORD WINAPI  CMainFrame::CreateWebServerClientThreadfun(LPVOID lpVoid)
                     WSACleanup();
                     return 1;
                 }
-                TRACE(handshakeConfirm + _T("\r\n"));
+                //TRACE(handshakeConfirm + _T("\r\n"));
             }
             else if (receivedData.length() > 6)
             {
@@ -16591,7 +16591,7 @@ void CMainFrame::OnWebviewModbusregister()
 
 void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 {
-    TRACE("OnActivateApp: bActive=%d, IsIconic=%d\n", bActive, IsIconic());
+    //TRACE("OnActivateApp: bActive=%d, IsIconic=%d\n", bActive, IsIconic());
 
     if (bActive && IsIconic())
     {

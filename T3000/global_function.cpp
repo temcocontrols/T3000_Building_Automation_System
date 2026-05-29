@@ -11259,6 +11259,12 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_Input_data.at(i),temp_point ,sizeof(Str_in_point));
 				temp_point = temp_point + sizeof(Str_in_point);
+                if (offline_mode)
+                {
+                    //这里初始化，使得默认都是模拟量，特别是虚拟设备
+                    if (m_Input_data.at(i).range == 0)
+                        m_Input_data.at(i).digital_analog = BAC_UNITS_ANALOG;
+                }
                 if (i < select_device_io_status.device_capacity[TREE_IN])
                 {
                     if (m_Input_data.at(i).range != 0)
@@ -11274,6 +11280,12 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_Output_data.at(i),temp_point,sizeof(Str_out_point));
 				temp_point = temp_point + sizeof(Str_out_point);
+                if (offline_mode)
+                {
+                    //这里初始化，使得默认都是模拟量，特别是虚拟设备
+                    if (m_Output_data.at(i).range == 0)
+                        m_Output_data.at(i).digital_analog = BAC_UNITS_ANALOG;
+                }
                 if (i < select_device_io_status.device_capacity[TREE_OUT])
                 {
                     if (m_Output_data.at(i).range != 0)
@@ -11287,6 +11299,12 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_Variable_data.at(i),temp_point,sizeof(Str_variable_point));
 				temp_point = temp_point + sizeof(Str_variable_point);
+                if (offline_mode)
+                {
+                    //这里初始化，使得默认都是模拟量，特别是虚拟设备
+                    if (m_Variable_data.at(i).range == 0)
+                        m_Variable_data.at(i).digital_analog = BAC_UNITS_ANALOG;
+                }
                 if (m_Variable_data.at(i).range != 0)
                 {
                     select_device_io_status.device_use[TREE_VAR]++;

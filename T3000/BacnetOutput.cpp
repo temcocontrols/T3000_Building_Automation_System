@@ -37,6 +37,7 @@ CBacnetOutput::CBacnetOutput(CWnd* pParent /*=NULL*/)
 {
   //m_latest_protocol=3;
 	window_max = true;
+	InvalidateColumnWidthCache();
 }
 
 CBacnetOutput::~CBacnetOutput()
@@ -364,6 +365,7 @@ void CBacnetOutput::Initial_List()
 	}
 	m_output_list.InitListData();
 	m_output_list.ShowWindow(SW_SHOW);
+	InvalidateColumnWidthCache();
 }
 
 
@@ -374,7 +376,19 @@ void CBacnetOutput::OnBnClickedButtonOutputRead()
 		PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 }
 
+void CBacnetOutput::SafeSetColumnWidth(int col, int width)
+{
+	if (col >= 0 && col < OUTPUT_COL_NUMBER && m_cached_col_width[col] != width)
+	{
+		m_output_list.SetColumnWidth(col, width);
+		m_cached_col_width[col] = width;
+	}
+}
 
+void CBacnetOutput::InvalidateColumnWidthCache()
+{
+	memset(m_cached_col_width, -1, sizeof(m_cached_col_width));
+}
 
 LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 {
@@ -382,6 +396,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 	int Fresh_Item;
 	int isFreshOne = (bool)lParam;
 	int  Minipanel_device = 1;
+	m_output_list.SetRedraw(FALSE);   // ← 加这行，禁止中间重绘
 	//int Fresh_List_Now = (int)wParam;
 	//if( Fresh_List_Now == REFRESH_LIST_NOW)
 	//{
@@ -548,8 +563,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 		if (temp_need_show_external)
 		{
 			//m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,60);
-			m_output_list.SetColumnWidth(OUTPUT_PRODUCT, 80);
-			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 80);
+			SafeSetColumnWidth(OUTPUT_PRODUCT, 80);
+			SafeSetColumnWidth(OUTPUT_EXT_NUMBER, 80);
 		}
 		else
 		{
@@ -559,15 +574,15 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 				m_output_list.SetItemTextColor(i, -1, RGB(0, 0, 0), 0);
 			}
 			//m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
-			m_output_list.SetColumnWidth(OUTPUT_PRODUCT, 0);
-			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
+			SafeSetColumnWidth(OUTPUT_PRODUCT, 0);
+			SafeSetColumnWidth(OUTPUT_EXT_NUMBER, 0);
 		}
 	}
 	if (Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
 	{
 		//m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
-		m_output_list.SetColumnWidth(OUTPUT_PRODUCT, 0);
-		m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
+		SafeSetColumnWidth(OUTPUT_PRODUCT, 0);
+		SafeSetColumnWidth(OUTPUT_EXT_NUMBER, 0);
 	}
 
 
@@ -582,6 +597,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 		if ((m_output_list.IsDataNewer((char*)&m_Output_data.at(0), sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT) == 0) && refresh_output == 0)
 		{
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			m_output_list.SetRedraw(TRUE);
 			return 0;
 		}
 	}
@@ -598,14 +614,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 		col.pszText = _T("Out of Service");
 		m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
 
-		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH, 0);
-		m_output_list.SetColumnWidth(OUTPUT_RANGE, 0);
-		m_output_list.SetColumnWidth(OUTPUT_LOW_VOLTAGE, 0);
-		m_output_list.SetColumnWidth(OUTPUT_HIGH_VOLTAGE, 0);
-		m_output_list.SetColumnWidth(OUTPUT_PWM_PERIOD, 0);
-		m_output_list.SetColumnWidth(OUTPUT_DECOM, 0);
-		m_output_list.SetColumnWidth(OUTPUT_PRODUCT, 0);
-		m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER, 0);
+		SafeSetColumnWidth(OUTPUT_HW_SWITCH, 0);
+		SafeSetColumnWidth(OUTPUT_RANGE, 0);
+		SafeSetColumnWidth(OUTPUT_LOW_VOLTAGE, 0);
+		SafeSetColumnWidth(OUTPUT_HIGH_VOLTAGE, 0);
+		SafeSetColumnWidth(OUTPUT_PWM_PERIOD, 0);
+		SafeSetColumnWidth(OUTPUT_DECOM, 0);
+		SafeSetColumnWidth(OUTPUT_PRODUCT, 0);
+		SafeSetColumnWidth(OUTPUT_EXT_NUMBER, 0);
 	}
 	else { // to show the column for non-bacnet devices
 		TCHAR szBuffer[80];
@@ -616,14 +632,15 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 		m_output_list.GetColumn(OUTPUT_AUTO_MANUAL, &col);
 		col.pszText = _T("Auto/Man");
 		m_output_list.SetColumn(OUTPUT_AUTO_MANUAL, &col);
-		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH, 80);
-		m_output_list.SetColumnWidth(OUTPUT_RANGE, 100);
-		m_output_list.SetColumnWidth(OUTPUT_LOW_VOLTAGE, 50);
-		m_output_list.SetColumnWidth(OUTPUT_HIGH_VOLTAGE, 50);
-		m_output_list.SetColumnWidth(OUTPUT_PWM_PERIOD, 80);
-		m_output_list.SetColumnWidth(OUTPUT_DECOM, 70);
+		SafeSetColumnWidth(OUTPUT_HW_SWITCH, 80);
+		SafeSetColumnWidth(OUTPUT_RANGE, 100);
+		SafeSetColumnWidth(OUTPUT_LOW_VOLTAGE, 50);
+		SafeSetColumnWidth(OUTPUT_HIGH_VOLTAGE, 50);
+		SafeSetColumnWidth(OUTPUT_PWM_PERIOD, 80);
+		SafeSetColumnWidth(OUTPUT_DECOM, 70);
 	}
 #endif
+
 
 	CString temp1;
 	for (int i = 0; i < (int)m_Output_data.size(); i++)
@@ -632,7 +649,10 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 		{
 			i = Fresh_Item;
 			if (i >= m_Output_data.size())
+			{
+				m_output_list.SetRedraw(TRUE);
 				return 1;
+			}
 		}
 
 		if (i >= output_item_limit_count)
@@ -1102,6 +1122,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 			break;
 		}
 	}
+	m_output_list.SetRedraw(TRUE);    // ← 加这行，恢复重绘
+	m_output_list.Invalidate();        // ← 加这行，统一刷一次
 	if (m_output_list.IsDataNewer((char*)&m_Output_data.at(0), sizeof(Str_out_point) * BAC_OUTPUT_ITEM_COUNT))
 	{
 		//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;

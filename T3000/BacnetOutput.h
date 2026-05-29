@@ -52,6 +52,10 @@ public:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	void Reset_Output_Rect();
     afx_msg void OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult);
+private:
+	int m_cached_col_width[OUTPUT_COL_NUMBER];  // 列宽缓存，-1表示未设置
+	void SafeSetColumnWidth(int col, int width);
+	void InvalidateColumnWidthCache();
 };
 
 

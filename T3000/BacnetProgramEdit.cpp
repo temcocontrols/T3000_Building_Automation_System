@@ -697,7 +697,7 @@ void CBacnetProgramEdit::OnSend()
 		}
 		memset(program_code[program_list_line], 0, 2000);
 		memcpy_s(program_code[program_list_line], my_lengthcode, mycode, my_lengthcode);
-		program_code_length[program_list_line] = program_code[program_list_line][1] * 256 + (unsigned char)program_code[program_list_line][0];
+ 		program_code_length[program_list_line] = program_code[program_list_line][1] * 256 + (unsigned char)program_code[program_list_line][0];
 		if ((my_lengthcode > program_code_length[program_list_line]) &&
 			my_lengthcode < 2000)
 		{

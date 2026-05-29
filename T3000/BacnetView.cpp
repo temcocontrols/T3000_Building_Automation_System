@@ -2150,7 +2150,11 @@ void CDialogCM5_BacNet::Tab_Initial()
 
 
 	pDialog[WINDOW_INPUT] = Input_Window = new CBacnetInput;
-	pDialog[WINDOW_OUTPUT] =Output_Window = new CBacnetOutput;
+	if (pDialog[WINDOW_OUTPUT] == NULL)
+	{
+		Output_Window = new CBacnetOutput;
+		pDialog[WINDOW_OUTPUT] = Output_Window;
+	}
 	pDialog[WINDOW_VARIABLE] = Variable_Window = new CBacnetVariable;
 	pDialog[WINDOW_PROGRAM] = Program_Window = new CBacnetProgram;
 	pDialog[WINDOW_CONTROLLER] = Controller_Window = new BacnetController;

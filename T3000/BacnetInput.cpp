@@ -34,6 +34,7 @@ CBacnetInput::CBacnetInput(CWnd* pParent /*=NULL*/)
 {
   //  m_latest_protocol=3;
 	window_max = true;
+	InvalidateColumnWidthCache(); 
 }
 
 
@@ -421,6 +422,7 @@ void CBacnetInput::Initial_List()
 	}
 	m_input_list.InitListData();
 	 m_input_list.ShowWindow(SW_SHOW);
+	 InvalidateColumnWidthCache();   
 }
 
 void CBacnetInput::OnBnClickedOk()
@@ -687,7 +689,19 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
+void CBacnetInput::InvalidateColumnWidthCache()
+{
+	memset(m_cached_col_width, -1, sizeof(m_cached_col_width));
+}
 
+void CBacnetInput::SafeSetColumnWidth(int col, int width)
+{
+	if (col >= 0 && col < INPUT_COL_NUMBER && m_cached_col_width[col] != width)
+	{
+		m_input_list.SetColumnWidth(col, width);
+		m_cached_col_width[col] = width;
+	}
+}
 
 LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 {
@@ -695,6 +709,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 	int isFreshOne = (bool)lParam;
 	int  Minipanel_device = 1;
 	int listCount = m_input_list.GetItemCount();
+	m_input_list.SetRedraw(FALSE);   // ← 加这行，禁止中间重绘
 	if (listCount != input_item_limit_count) // for bacnet devices hiding columns
 	{
 		if (bacnet_device_type == PM_THIRD_PARTY_DEVICE) // for bacnet devices hiding columns
@@ -792,58 +807,33 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 		}
 
 	}
-	//if(show_external != temp_need_show_external)
-	//{
-	//	show_external = temp_need_show_external;
-	//	if(temp_need_show_external)
-	//	{
-	//		CRect temp_rect;
-	//		temp_rect = Input_rect;
-	//		temp_rect.right = 1250;
-	//		temp_rect.top = temp_rect.top + 22;
-	//		m_input_list.MoveWindow(temp_rect);
-	//		m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
-	//		m_input_list.SetColumnWidth(INPUT_PRODUCT,80);
-	//		m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,80);
-	//	}
-	//	else
-	//	{
-	//		CRect temp_rect;
-	//		temp_rect = Input_rect;
-	//		temp_rect.right = 975;
-	//		temp_rect.top = temp_rect.top + 22;
-	//		m_input_list.MoveWindow(temp_rect);
 
-	//		m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
-	//		m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
-	//		m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
-	//	}
-	//}
 
 	if (Minipanel_device == 0)	//如果不是minipanel的界面就隐藏扩展行;
 	{
 
 
 		//m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
-		m_input_list.SetColumnWidth(INPUT_PRODUCT, 0);
-		m_input_list.SetColumnWidth(INPUT_EXT_NUMBER, 0);
+
+		SafeSetColumnWidth(INPUT_PRODUCT, 0);
+		SafeSetColumnWidth(INPUT_EXT_NUMBER, 0);
 	}
 	else
 	{
 		if (temp_need_show_external)
 		{
 			//m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
-			m_input_list.SetColumnWidth(INPUT_PRODUCT, 80);
-			m_input_list.SetColumnWidth(INPUT_EXT_NUMBER, 80);
+			SafeSetColumnWidth(INPUT_PRODUCT, 80);
+			SafeSetColumnWidth(INPUT_EXT_NUMBER, 80);
 		}
 		else
 		{
 			//m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
-			m_input_list.SetColumnWidth(INPUT_PRODUCT, 0);
-			m_input_list.SetColumnWidth(INPUT_EXT_NUMBER, 0);
+			SafeSetColumnWidth(INPUT_PRODUCT, 0);
+			SafeSetColumnWidth(INPUT_EXT_NUMBER, 0);
 		}
 	}
-	m_input_list.SetColumnWidth(INPUT_EXTERNAL, 60);
+	SafeSetColumnWidth(INPUT_EXTERNAL, 60);
 
 	if (isFreshOne == (int)REFRESH_ON_ITEM)
 	{
@@ -854,6 +844,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 		//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
 		if ((m_input_list.IsDataNewer((char*)&m_Input_data.at(0), sizeof(Str_in_point) * BAC_INPUT_ITEM_COUNT) == false) && refresh_input == 0)
 		{
+			m_input_list.SetRedraw(TRUE);
 			return 0;
 		}
 	}
@@ -879,14 +870,14 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 		m_input_list.GetColumn(INPUT_AUTO_MANUAL, &col);
 		col.pszText = _T("Out of Service");
 		m_input_list.SetColumn(INPUT_AUTO_MANUAL, &col);
-		m_input_list.SetColumnWidth(INPUT_RANGE, 0); // range and unit dupilcate value's no need to show.
-		m_input_list.SetColumnWidth(INPUT_CAL, 0);
-		m_input_list.SetColumnWidth(INPUT_CAL_OPERATION, 0);
-		m_input_list.SetColumnWidth(INPUT_FITLER, 0);
-		m_input_list.SetColumnWidth(INPUT_DECOM, 0);
-		m_input_list.SetColumnWidth(INPUT_JUMPER, 0);
-		m_input_list.SetColumnWidth(INPUT_PRODUCT, 0);
-		m_input_list.SetColumnWidth(INPUT_EXT_NUMBER, 0);
+		SafeSetColumnWidth(INPUT_RANGE, 0); // range and unit dupilcate value's no need to show.
+		SafeSetColumnWidth(INPUT_CAL, 0);
+		SafeSetColumnWidth(INPUT_CAL_OPERATION, 0);
+		SafeSetColumnWidth(INPUT_FITLER, 0);
+		SafeSetColumnWidth(INPUT_DECOM, 0);
+		SafeSetColumnWidth(INPUT_JUMPER, 0);
+		SafeSetColumnWidth(INPUT_PRODUCT, 0);
+		SafeSetColumnWidth(INPUT_EXT_NUMBER, 0);
 
 	}
 	else { // to show the column for non-bacnet devices
@@ -901,14 +892,16 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 		m_input_list.GetColumn(INPUT_AUTO_MANUAL, &col);
 		col.pszText = _T("Auto/Man");
 		m_input_list.SetColumn(INPUT_AUTO_MANUAL, &col);
-		m_input_list.SetColumnWidth(INPUT_RANGE, 100);
-		m_input_list.SetColumnWidth(INPUT_CAL, 70);
-		m_input_list.SetColumnWidth(INPUT_CAL_OPERATION, 50);
-		m_input_list.SetColumnWidth(INPUT_FITLER, 60);
-		m_input_list.SetColumnWidth(INPUT_DECOM, 60);
-		m_input_list.SetColumnWidth(INPUT_JUMPER, 60);
+		SafeSetColumnWidth(INPUT_RANGE, 100);
+		SafeSetColumnWidth(INPUT_CAL, 70);
+		SafeSetColumnWidth(INPUT_CAL_OPERATION, 50);
+		SafeSetColumnWidth(INPUT_FITLER, 60);
+		SafeSetColumnWidth(INPUT_DECOM, 60);
+		SafeSetColumnWidth(INPUT_JUMPER, 60);
 	}
 #endif
+
+
 	CString temp1;
 	//m_input_list.DeleteAllItems();
 	for (int i = 0; i < (int)m_Input_data.size(); i++)
@@ -921,7 +914,10 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 		{
 			i = Fresh_Item;
 			if (i >= m_Input_data.size())
+			{
+				m_input_list.SetRedraw(TRUE);
 				return 1;
+			}
 		}
 
 		if (i >= input_item_limit_count)
@@ -1366,6 +1362,9 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 			break;
 		}
 	}
+
+	m_input_list.SetRedraw(TRUE);    // ← 加这行，恢复重绘
+	m_input_list.Invalidate();        // ← 加这行，统一刷一次
 	if (m_input_list.IsDataNewer((char*)&m_Input_data.at(0), sizeof(Str_in_point) * BAC_INPUT_ITEM_COUNT))
 	{
 		//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;

@@ -189,7 +189,7 @@ extern vector<Str_variable_point> m_pvar_data;
 // REFRESH_ON_ITEM constant default value (use 0 if not defined)
 //=============================================================================
 #ifndef REFRESH_ON_ITEM
-#define REFRESH_ON_ITEM 0
+#define REFRESH_ON_ITEM 1
 #endif
 
 //=============================================================================
@@ -374,7 +374,7 @@ S16_T put_point_value(VM_Point *point, S32_T *val_ptr, S16_T aux, S16_T prog_op)
                 }
                 // Notify UI via PostMessage
                 if (m_output_dlg_hwnd) {
-                    ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, REFRESH_ON_ITEM, index);
+                    ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST,  index, REFRESH_ON_ITEM);
                 }
                 return 0;
             }
@@ -392,7 +392,7 @@ S16_T put_point_value(VM_Point *point, S32_T *val_ptr, S16_T aux, S16_T prog_op)
                 }
                 // Notify UI via PostMessage
                 if (m_input_dlg_hwnd) {
-                    ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, REFRESH_ON_ITEM, index);
+                    ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST,  index, REFRESH_ON_ITEM);
                 }
                 return 0;
             }
@@ -410,7 +410,7 @@ S16_T put_point_value(VM_Point *point, S32_T *val_ptr, S16_T aux, S16_T prog_op)
                 }
                 // Notify UI via PostMessage
                 if (m_variable_dlg_hwnd) {
-                    ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, REFRESH_ON_ITEM, index);
+                    ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST,  index, REFRESH_ON_ITEM);
                 }
                 return 0;
             }
@@ -813,10 +813,45 @@ void CVirtualProgramEngine::ExecuteOneScan()
 //=============================================================================
 // Internal execution
 //=============================================================================
+// SyncRtcFromSystemTime — Fill Rtc structure from Windows system time
+// decode.c reads Rtc.Clk.hour/min/sec/day/week/mon/day_of_year for
+// TIME, DOM, DOW, DOY, MOY, WR_ON, WR_OFF functions.
+// All values use the embedded encoding (0-based week where 0=SUN, 1=MON, etc.)
+//=============================================================================
+static void SyncRtcFromSystemTime()
+{
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+
+    Rtc.Clk.sec  = (U8_T)st.wSecond;
+    Rtc.Clk.min  = (U8_T)st.wMinute;
+    Rtc.Clk.hour = (U8_T)st.wHour;
+    Rtc.Clk.day  = (U8_T)st.wDay;
+    Rtc.Clk.week = (U8_T)st.wDayOfWeek;   // 0=Sunday, same as embedded
+    Rtc.Clk.mon  = (U8_T)st.wMonth;
+    Rtc.Clk.year = (U8_T)(st.wYear % 100);
+
+    // Calculate day of year (1-366)
+    // Use a static table of cumulative days per month (non-leap / leap)
+    static const U16_T cumDays[2][13] = {
+        { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },  // non-leap
+        { 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }   // leap
+    };
+    int isLeap = ((st.wYear % 4 == 0) && (st.wYear % 100 != 0)) || (st.wYear % 400 == 0);
+    int doy = cumDays[isLeap][st.wMonth - 1] + st.wDay;
+    Rtc.Clk.day_of_year = (U16_T)doy;
+
+    Rtc.Clk.is_dst = 0;  // DST not handled
+}
+
+//=============================================================================
 void CVirtualProgramEngine::ExecuteAllPrograms()
 {
     // Update system_timer to match embedded 10ms tick
     system_timer = GetTickCount() / 10;
+
+    // Sync Rtc from system time so decode.c can read TIME/DOM/DOW/DOY/MOY
+    SyncRtcFromSystemTime();
 
     for (int i = 0; i < BAC_PROGRAM_ITEM_COUNT; i++) {
         // Check if program should run
@@ -836,14 +871,15 @@ void CVirtualProgramEngine::ExecuteAllPrograms()
         }
 
         // Check wait state (from previous exec_program WAIT return=1)
+        // IMPORTANT: Don't skip the program entirely — just clear the waiting
+        // flag so ExecuteProgram can be called. decode.c manages the WAIT
+        // accumulator internally: each scan adds miliseclast_cur to the
+        // accumulator, and when it exceeds the target, WAIT completes.
+        // If we skip the program, the accumulator never updates and WAIT
+        // never completes.
         if (m_Programs[i].waiting) {
-            DWORD now = GetTickCount();
-            if (now >= m_Programs[i].waitUntil) {
-                m_Programs[i].waiting = false;
-                m_Programs[i].state = STATE_RUNNING;
-            } else {
-                continue;
-            }
+            m_Programs[i].waiting = false;
+            m_Programs[i].state = STATE_RUNNING;
         }
 
         // Execute program if running
@@ -975,21 +1011,35 @@ BOOL CVirtualProgramEngine::ExecuteProgram(ProgramContext& ctx)
     cond = 0;
     op1 = op2 = 0;
 
+    // Set just_load for the first scan of this program.
+    // In the embedded firmware, the main loop sets just_load=1 before
+    // calling exec_program for the first time after a program load/restart.
+    // This causes INTERVAL, TIME_ON, TIME_OFF accumulators to reset to 0
+    // instead of accumulating stale values.
+    // After the first scan, just_load is cleared.
+    just_load = ctx.firstScan ? 1 : 0;
+
     // Call the embedded execution engine
-    TRACE("[VM] >>> exec_program(%d) ENTERING, rawLen=%d, base_len=%d, local_len=%d, time_len=%d\n",
-          ctx.programIndex, rawLen, base_len, local_len, time_len);
+    TRACE("[VM] >>> exec_program(%d) ENTERING, rawLen=%d, base_len=%d, local_len=%d, time_len=%d, just_load=%d\n",
+          ctx.programIndex, rawLen, base_len, local_len, time_len, (int)just_load);
     S16_T result = exec_program(ctx.programIndex, prog);
+
+    // Clear firstScan after the first successful execution
+    if (ctx.firstScan) {
+        ctx.firstScan = false;
+    }
 
     // DEBUG: Log execution result
     TRACE("[VM] <<< exec_program(%d) returned %d\n", ctx.programIndex, (int)result);
 
     // Check for WAIT state (exec_program returns 1 when waiting)
     if (result == 1) {
-        // WAIT in progress — set wait state and record wake time
-        // The miliseclast_cur value has been stored in the bytecode (decode.c modifies it)
-        // We approximate by setting a reasonable wait timeout.
+        // WAIT in progress — mark the program as waiting.
+        // On the next scan, ExecuteAllPrograms will clear the waiting flag
+        // and call ExecuteProgram again. decode.c manages the WAIT accumulator
+        // internally: each scan adds miliseclast_cur to the accumulator, and
+        // when it exceeds the target wait time, WAIT completes and returns 0.
         m_Programs[ctx.programIndex].waiting = true;
-        m_Programs[ctx.programIndex].waitUntil = GetTickCount() + 1000;  // default 1s
         m_Programs[ctx.programIndex].state = STATE_WAITING;
         return TRUE;
     }
@@ -1277,8 +1327,8 @@ void CVirtualProgramEngine::NotifyInputChanged(int index)
 {
 #ifdef WM_REFRESH_BAC_INPUT_LIST
     if (m_input_dlg_hwnd && ::IsWindow(m_input_dlg_hwnd)) {
-        ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST,
-                      REFRESH_ON_ITEM, index);
+        ::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, index,
+                      REFRESH_ON_ITEM);
     }
 #endif
 }
@@ -1287,8 +1337,8 @@ void CVirtualProgramEngine::NotifyOutputChanged(int index)
 {
 #ifdef WM_REFRESH_BAC_OUTPUT_LIST
     if (m_output_dlg_hwnd && ::IsWindow(m_output_dlg_hwnd)) {
-        ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST,
-                      REFRESH_ON_ITEM, index);
+        ::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST, index,
+                      REFRESH_ON_ITEM);
     }
 #endif
 }
@@ -1297,8 +1347,8 @@ void CVirtualProgramEngine::NotifyVariableChanged(int index)
 {
 #ifdef WM_REFRESH_BAC_VARIABLE_LIST
     if (m_variable_dlg_hwnd && ::IsWindow(m_variable_dlg_hwnd)) {
-        ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST,
-                      REFRESH_ON_ITEM, index);
+        ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, index,
+                      REFRESH_ON_ITEM);
     }
 #endif
 }
@@ -1307,8 +1357,8 @@ void CVirtualProgramEngine::NotifyPvarChanged(int index)
 {
 #ifdef WM_REFRESH_BAC_VARIABLE_LIST
     if (m_variable_dlg_hwnd && ::IsWindow(m_variable_dlg_hwnd)) {
-        ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST,
-                      REFRESH_ON_ITEM, index + 1000);  // offset to distinguish from VAR
+        ::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST, index,
+                      REFRESH_ON_ITEM);  // offset to distinguish from VAR
     }
 #endif
 }
@@ -1317,8 +1367,8 @@ void CVirtualProgramEngine::NotifyProgramStateChanged(int index)
 {
 #ifdef WM_REFRESH_BAC_PROGRAM_LIST
     if (m_pragram_dlg_hwnd && ::IsWindow(m_pragram_dlg_hwnd)) {
-        ::PostMessage(m_pragram_dlg_hwnd, WM_REFRESH_BAC_PROGRAM_LIST,
-                      REFRESH_ON_ITEM, index);
+        ::PostMessage(m_pragram_dlg_hwnd, WM_REFRESH_BAC_PROGRAM_LIST, index,
+                      REFRESH_ON_ITEM);
     }
 #endif
 }

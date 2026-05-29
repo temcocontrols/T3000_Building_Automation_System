@@ -92,6 +92,12 @@ struct ProgramContext {
     std::string errorMessage;
     int errorLine;
 
+    // First-scan flag: set to true when program starts/restarts,
+    // cleared after the first successful exec_program call.
+    // Used to set decode.c's just_load=1 for the first scan,
+    // which resets time accumulators (INTERVAL, TIME_ON, TIME_OFF).
+    bool firstScan;
+
     // Breakpoints
     std::set<int> breakpoints;
 
@@ -107,6 +113,7 @@ struct ProgramContext {
         waiting = false;
         waitUntil = 0;
         errorLine = -1;
+        firstScan = true;
         lastExecTime = 0;
         totalRuntime = 0;
     }
@@ -120,6 +127,7 @@ struct ProgramContext {
         waitUntil = 0;
         errorMessage.clear();
         errorLine = -1;
+        firstScan = true;
     }
 };
 

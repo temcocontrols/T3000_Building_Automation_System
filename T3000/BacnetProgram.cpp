@@ -820,8 +820,10 @@ void CBacnetProgram::OnSize(UINT nType, int cx, int cy)
 		m_program_list.MoveWindow(rc.left,rc.top,rc.Width(),rc.Height() - 80);
 
 		GetDlgItem(IDC_BUTTON_PROGRAM_EDIT)->MoveWindow(rc.left + 20 ,rc.bottom - 60 , 120,50);
+		GetDlgItem(IDC_BUTTON_VIRTUAL_PROGRAM)->MoveWindow(rc.left + 160, rc.bottom - 60, 120, 50);
 
-		GetDlgItem(IDC_BUTTON1)->MoveWindow(rc.left + 160, rc.bottom - 60, 200, 50);
+		
+		GetDlgItem(IDC_BUTTON1)->MoveWindow(rc.left + 360, rc.bottom - 60, 200, 50);
 	}
 }
 
