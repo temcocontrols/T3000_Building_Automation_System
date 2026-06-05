@@ -6570,7 +6570,14 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 
 
 	}
-
+	  if (offline_mode)
+	  {
+		  Program_Window->GetDlgItem(IDC_BUTTON_VIRTUAL_PROGRAM)->ShowWindow(SW_SHOW);
+	  }
+	  else
+	  {
+		  Program_Window->GetDlgItem(IDC_BUTTON_VIRTUAL_PROGRAM)->ShowWindow(SW_HIDE);
+	  }
 	WritePrivateProfileStringW(_T("LastView"),_T("ViewSerialNumber"),temp_serial_number,g_cstring_ini_path);
 	WritePrivateProfileStringW(_T("LastView"),_T("ViewPid"),_T("35"),g_cstring_ini_path);
 	SetTimer(BAC_SET_LAST_UI,1000,NULL);

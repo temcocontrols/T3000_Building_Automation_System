@@ -19,11 +19,10 @@
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
 #include <windows.h>  
 
-
 /**
  * @brief Global version of the T3000 application.
  */
-const unsigned int g_versionNO = 20260429;    // PROJECT_VERSION
+const unsigned int g_versionNO = 20260605;    // PROJECT_VERSION
 
 
 #ifdef _DEBUG

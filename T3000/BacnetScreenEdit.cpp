@@ -2227,7 +2227,7 @@ void CBacnetScreenEdit::OnPaint()
 		Str_variable_point  temp_var = { 0 };
 		unsigned char temp_type = m_bac_label_vector.at(i).nPoint_type;
 		unsigned char temp_number = m_read_group_data.at(read_group_index).point.number;
-		if((temp_number==0) || (temp_number >254))
+		if (temp_number >254)
 		{
 			return;
 			cs_value = _T("N/A");
