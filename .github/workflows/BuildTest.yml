@@ -31,17 +31,13 @@ jobs:
       # 新增：安装 MFC 和 .NET 4.5.2 目标包
       # 插在 Setup MSBuild 之后、Build Solution 之前
       # ============================================================
-      - name: Install MFC and .NET 4.5.2 targeting pack
+ - name: Install MFC and .NET 4.5.2 targeting pack
         shell: pwsh
         run: |
-          # 1. 安装 .NET Framework 4.5.2 Developer Pack
-          $devPackUrl = "https://download.microsoft.com/download/E/2/1/E21FAD2C-2C7D-402B-9010-10D075D77E03/NDP452-KB2901951-x86-x64-DevPack.exe"
-          $devPackExe = "$env:TEMP\ndp452-devpack.exe"
-          Write-Host "Downloading .NET 4.5.2 Developer Pack..."
-          Invoke-WebRequest -Uri $devPackUrl -OutFile $devPackExe -UseBasicParsing
-          Write-Host "Installing..."
-          Start-Process -FilePath $devPackExe -ArgumentList "/q /norestart" -Wait -NoNewWindow
-          Write-Host ".NET 4.5.2 installed."
+          # 1. 用 Chocolatey 安装 .NET 4.5.2 Developer Pack
+          Write-Host "Installing .NET 4.5.2 Developer Pack via Chocolatey..."
+          choco install netfx-4.5.2-devpack -y --no-progress
+          Write-Host ".NET 4.5.2 Developer Pack installed."
 
           # 2. 安装 MFC for VS 2022 (x86 + x64)
           $vsInstaller = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
@@ -55,6 +51,7 @@ jobs:
             "--norestart"
           ) -Wait -NoNewWindow
           Write-Host "MFC installed."
+
 
       - name: Build Solution
         run: |
