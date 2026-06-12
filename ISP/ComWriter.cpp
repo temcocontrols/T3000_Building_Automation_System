@@ -865,7 +865,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter,
                 MB_OKCANCEL))
         {
             // Read stored MD5 from device (regs 1995-1998)
-            int md5_ret = modbus_read_multi(m_ID, &stored_md5[0], 1995, 4);
+            int md5_ret = modbus_read_multi(m_ID, &stored_md5[0], 1993, 4);
             if (md5_ret > 0)
             {
                 md5_match = true;
@@ -929,8 +929,12 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter,
 
         // Write MD5 to device BEFORE erasing
         for (int y = 0; y < 4; y++)
-            mudbus_write_one(m_ID, 1995 + y, wirte_md5[y], 3);
+            mudbus_write_one(m_ID, 1993 + y, wirte_md5[y], 3);
 
+        unsigned short fw_size_high = (the_max_register_number_parameter >> 16) & 0xFFFF;
+        unsigned short fw_size_low = (the_max_register_number_parameter) & 0xFFFF;
+        mudbus_write_one(m_ID, 1997, fw_size_high);
+        mudbus_write_one(m_ID, 1998, fw_size_low);
         // 0x7f
         do {
             if (mudbus_write_one(m_ID, 16, 0x7f) < 0) {
@@ -979,7 +983,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter,
     int one_flash_package = 128;
     if (SPECIAL_BAC_TO_MODBUS)
         one_flash_package = 256;
-
+    SetResponseTime(5);
     while (ii < the_max_register_number_parameter)
     {
         if (pWriter->m_bStopWrite)
@@ -1677,6 +1681,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     // Legacy MCU flow uses section-relative indexing, so pass section start pointer.
                     nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer + sectionResumeStart), pParam);
                 }
+                SetResponseTime(30);
                 //if((nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer+nCount), pParam)) < 0 )
                 if(nFlashRet < 0)
                 {
@@ -2705,7 +2710,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         Sleep(7000);//must have this ,the Tstat need
                         do
                         {
-                            if(ii<RETRY_TIMES)
+                            if(ii<RETRY_TIMES * 2)
                                 if(-2== mudbus_write_one(m_ID,16,0x1f))
                                     ii++;
 
