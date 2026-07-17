@@ -1,0 +1,1 @@
+import{j as s}from"./react.903d3f5b.js";import{d2 as t}from"./App.e8213aac.js";import"./index.0fce3919.js";import"./client.c07cb498.js";import"./Serializer.f6a5f515.js";import"./axios.65f6a2c9.js";import"./T3Data.523ead8c.js";import"./_commonjsHelpers.a5007c1f.js";const a=()=>s.exports.jsx(t,{replace:!0,to:"/t3000/haystack-tags"});export{a as TrendPolicyRouteAdapterPage};

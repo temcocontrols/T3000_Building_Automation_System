@@ -172,6 +172,9 @@ void Getminitypename(unsigned char nmini_type, CString& ret_name)
 	case T3_TSTAT10:
 		ret_name = _T("TSTAT10");
 		break;
+	case T3_TSTAT11:
+		ret_name = _T("TSTAT11");
+		break;
 	case T3_OEM:
 		ret_name = _T("T3-OEM");
 		break;
@@ -291,6 +294,16 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 	{
 
 		UpdateTreeName();
+
+		if (((g_selected_product_id == PM_ESP32_T3_SERIES) && (Device_Basic_Setting.reg.mini_type == T3_TSTAT11) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 699))
+		{
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_WIREGUARD_CONFIG))->EnableWindow(1);
+		}
+		else
+		{
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_WIREGUARD_CONFIG))->EnableWindow(0);
+		}
+
 		if (((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||
 			(((g_selected_product_id == PM_MINIPANEL_ARM) || (PM_TSTAT10 == g_selected_product_id)) &&
 				(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 670)))
@@ -319,6 +332,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			Device_Basic_Setting.reg.gate_addr[1], Device_Basic_Setting.reg.gate_addr[2], Device_Basic_Setting.reg.gate_addr[3]);
 		bacnet_device_type = Device_Basic_Setting.reg.mini_type;
 		if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
+			(Device_Basic_Setting.reg.mini_type == T3_TSTAT11) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
 		{
@@ -648,6 +662,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 		}
 
 		if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
+			(Device_Basic_Setting.reg.mini_type == T3_TSTAT11) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
 		{
@@ -664,6 +679,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 		if ((Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
 			Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL ||
 			Device_Basic_Setting.reg.mini_type == T3_TSTAT10 ||
+			Device_Basic_Setting.reg.mini_type == T3_TSTAT11 ||
 			Device_Basic_Setting.reg.mini_type == T3_OEM ||
 			Device_Basic_Setting.reg.mini_type == T3_3IIC ||
 			Device_Basic_Setting.reg.mini_type == T3_OEM_12I ||
@@ -923,6 +939,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			bacnet_device_type == T3_NG3 ||
 			bacnet_device_type == T3_3IIC ||
 			bacnet_device_type == T3_TSTAT10 ||
+			bacnet_device_type == T3_TSTAT11 ||
 			bacnet_device_type == T3_OEM ||
 			bacnet_device_type == T3_OEM_12I ||
 			bacnet_device_type == PRODUCT_CM5)
@@ -1019,6 +1036,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				(Device_Basic_Setting.reg.mini_type == T3_3IIC) ||
 				(Device_Basic_Setting.reg.mini_type == T3_OEM) ||
 				(Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
+				(Device_Basic_Setting.reg.mini_type == T3_TSTAT11) ||
 				(Device_Basic_Setting.reg.mini_type == T3_TSTAT10))
 			{
 				for (int x = 0; x < (sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0])); x++)
@@ -1055,6 +1073,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				(Device_Basic_Setting.reg.mini_type == T3_3IIC) ||
 				(Device_Basic_Setting.reg.mini_type == T3_OEM) ||
 				(Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
+				(Device_Basic_Setting.reg.mini_type == T3_TSTAT11) ||
 				(Device_Basic_Setting.reg.mini_type == T3_TSTAT10))
 			{
 				if (Device_Basic_Setting.reg.com_baudrate0 < sizeof(Baudrate_Array) / sizeof(Baudrate_Array[0]))
@@ -1117,6 +1136,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 
 			if ((bacnet_device_type == T3_TSTAT10) ||
+				(bacnet_device_type == T3_TSTAT11) ||
 				(bacnet_device_type == T3_OEM) ||
 				(bacnet_device_type == T3_3IIC) ||
 				(bacnet_device_type == T3_OEM_12I))
@@ -1148,6 +1168,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			(Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
+			(Device_Basic_Setting.reg.mini_type == T3_TSTAT11) ||
 			(Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
 
 			)
@@ -1160,6 +1181,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			temp_bootloader_version.Format(_T("%d"), Device_Basic_Setting.reg.pro_info.bootloader_rev);
 		}
 		if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
+			(Device_Basic_Setting.reg.mini_type == T3_TSTAT11) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM) ||
 			(Device_Basic_Setting.reg.mini_type == T3_3IIC) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM_12I))

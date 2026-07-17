@@ -720,6 +720,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 		m_output_list.SetItemText(i, OUTPUT_HIGH_VOLTAGE, high_voltage);
 		if (
 			bacnet_device_type == T3_TSTAT10 ||
+			bacnet_device_type == T3_TSTAT11 ||
 			bacnet_device_type == T3_OEM ||
 			bacnet_device_type == T3_OEM_12I ||
 			bacnet_device_type == T3_ESP_RMC ||

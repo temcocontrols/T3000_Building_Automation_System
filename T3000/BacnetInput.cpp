@@ -1642,6 +1642,11 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
                 if ((lRow >= 9) && (lRow <= 12))
                     return;
             }
+			if (Device_Basic_Setting.reg.mini_type == T3_TSTAT11)
+			{
+				if ((lRow >= 9) && (lRow <= 12))
+					return;
+			}
         }
 		if (PM_ESP32_T3_SERIES == g_selected_product_id)
 		{

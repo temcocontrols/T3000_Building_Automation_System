@@ -12,6 +12,7 @@
 #include "ShowMessageDlg.h"
 #include "WifiConfigDlg.h"
 #include "BacnetSettingHealth.h"
+#include "CWireGuardConfig.h"
 // CBacnetSettingTcpip dialog box
 // CBacnetSettingTcpip 对话框
 
@@ -60,6 +61,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingTcpip, CDialogEx)
     ON_CBN_SELCHANGE(IDC_COMBO_STOP_BIT3, &CBacnetSettingTcpip::OnCbnSelchangeComboStopBit3)
     ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
     ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
+    ON_BN_CLICKED(IDC_BUTTON_WIREGUARD_CONFIG, &CBacnetSettingTcpip::OnBnClickedButtonWireguardConfig)
 END_MESSAGE_MAP()
 
 
@@ -934,3 +936,20 @@ BOOL CBacnetSettingTcpip::OnInitDialog()
 }
 
 
+
+void CBacnetSettingTcpip::OnBnClickedButtonWireguardConfig()
+{
+    //TSTAT11
+    // TODO: 在此添加控件通知处理程序代码
+    if (((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 699))
+    {
+        if (GetPrivateData_Blocking(g_bac_instance, READ_WIREGUARD_CFG, 0, 0, sizeof(Str_Wireguard_point)) < 0)
+        {
+            MessageBox(_T("Read data timeout"));
+            return;
+        }
+        CWireGuardConfig dlg;
+        dlg.DoModal();
+    }
+
+}

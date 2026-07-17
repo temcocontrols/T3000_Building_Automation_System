@@ -1685,6 +1685,9 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     case WRITE_EMAIL_ALARM:
         entitysize = sizeof(Str_Email_point);
         break;
+    case WRITE_WIREGUARD_CFG:
+        entitysize = sizeof(Str_Wireguard_point);
+		break;
     case WRITE_JSON_SCREEN:
         entitysize = sizeof(Str_t3_screen_Json);
         break;
@@ -1795,6 +1798,11 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_Email_point), &Device_Email_Point, sizeof(Str_Email_point));
     }
         break;
+    case WRITE_WIREGUARD_CFG:
+    {
+		memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_Wireguard_point), &Device_Wireguard_Point, sizeof(Str_Wireguard_point));
+    }
+    break;
 	case WRITEEXT_IO_T3000:
 		{
 			for (int i=0; i<(end_instance - start_instance + 1); i++)
@@ -5306,6 +5314,47 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 60;
         Device_Email_Point.reg.error_code = *(my_temp_point++);
         return READ_EMAIL_ALARM;
+    }
+    break;
+    case READ_WIREGUARD_CFG:
+    {
+        block_length = len_value_type - PRIVATE_HEAD_LENGTH;
+        my_temp_point = bacnet_apud_point + PRIVATE_HEAD_LENGTH;
+
+        if (block_length != sizeof(Str_Wireguard_point))
+            return -1;
+
+        // WireGuard Enable (1 byte)
+        Device_Wireguard_Point.reg.wg_enable = *(my_temp_point++);
+
+        // Private Key (66 bytes)
+        memcpy_s(Device_Wireguard_Point.reg.private_key, 66, my_temp_point, 66);
+        my_temp_point = my_temp_point + 66;
+
+        // Peer Public Key (66 bytes)
+        memcpy_s(Device_Wireguard_Point.reg.peer_public_key, 66, my_temp_point, 66);
+        my_temp_point = my_temp_point + 66;
+
+        // Pre-Shared Key (66 bytes)
+        memcpy_s(Device_Wireguard_Point.reg.pre_shared_key, 66, my_temp_point, 66);
+        my_temp_point = my_temp_point + 66;
+
+        // Local VPN IP (4 bytes)
+        memcpy_s(Device_Wireguard_Point.reg.local_ip, 4, my_temp_point, 4);
+        my_temp_point = my_temp_point + 4;
+
+        // WireGuard Port (2 bytes, little-endian)
+        Device_Wireguard_Point.reg.wg_port = (unsigned char)my_temp_point[1] << 8 |
+            (unsigned char)my_temp_point[0];
+        my_temp_point = my_temp_point + 2;
+
+        // Peer Endpoint IP (4 bytes)
+        memcpy_s(Device_Wireguard_Point.reg.peer_ip, 4, my_temp_point, 4);
+        my_temp_point = my_temp_point + 4;
+
+        // reserved 区域不用处理
+
+        return READ_WIREGUARD_CFG;
     }
     break;
     case READMONITORDATA_T3000:
@@ -12076,7 +12125,16 @@ void init_product_list()
     m_product_iocount.push_back(temp);
 
 
-
+    temp.cs_name = _T("TSTAT11");
+    temp.ai_count = 0;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 0;
+    temp.bo_count = 0;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 88;
+    temp.sub_pid = T3_TSTAT11;
+    m_product_iocount.push_back(temp);
     
     
 #if 0
@@ -17034,6 +17092,7 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
         }
         break;
         case T3_TSTAT10:
+        case T3_TSTAT11:
         {
             if (portindex <= 5)
                 nret_type = OUTPUT_DIGITAL_PORT;
@@ -17257,6 +17316,7 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
         }
         break;
         case T3_TSTAT10:   //12DO  ,12AO
+        case T3_TSTAT11:   //12DO  ,12AO
             if (portindex <= 10)
             {
                 nret_type = INPUT_ANALOG_PORT;

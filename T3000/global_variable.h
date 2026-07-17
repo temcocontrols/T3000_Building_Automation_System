@@ -2023,6 +2023,7 @@ Time_block_mini Device_time;
 Str_Setting_Info s_Basic_Setting;
 Str_Setting_Info Device_Basic_Setting;
 Str_Email_point  Device_Email_Point;
+Str_Wireguard_point Device_Wireguard_Point;
 Str_MISC Device_Misc_Data;
 Str_MISC s_Device_Misc_Data;
 Str_Special Device_Special_Data;

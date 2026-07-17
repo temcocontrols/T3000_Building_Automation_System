@@ -873,6 +873,9 @@
     <ClCompile Include="VirtualProgramEngine.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
+    <ClCompile Include="CWireGuardConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -2142,6 +2145,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetSettingAdvParameter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWireGuardConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

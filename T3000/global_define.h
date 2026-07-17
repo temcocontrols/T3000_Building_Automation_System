@@ -1326,6 +1326,7 @@ typedef enum
 	T3_ESP_LW = 21,  //0 input   ,   6  output
 	T3_NG3 = 22,
 	T3_3IIC = 26,  //6合1 的传感器 esp 产品 啥也没加
+	T3_TSTAT11 = 27,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -2124,12 +2125,17 @@ enum sub_io_type
 #define BAC_BO        30
 
 //31弃用 
-#define BAC_FLOAT_ABCD  32
-#define BAC_FLOAT_CDAB  33
-#define BAC_FLOAT_BADC  34
-#define BAC_FLOAT_DCBA  35
+#define BAC_HOLDING_FLOAT_ABCD  32
+#define BAC_HOLDING_FLOAT_CDAB  33
+#define BAC_HOLDING_FLOAT_BADC  34
+#define BAC_HOLDING_FLOAT_DCBA  35
 
-#define BAC_MAX       36
+#define BAC_INPUT_FLOAT_ABCD  36
+#define BAC_INPUT_FLOAT_CDAB  37
+#define BAC_INPUT_FLOAT_BADC  38
+#define BAC_INPUT_FLOAT_DCBA  39
+
+#define BAC_MAX       40
 #define BAC_SETTING   254
 #define BAC_MAIN      255
 

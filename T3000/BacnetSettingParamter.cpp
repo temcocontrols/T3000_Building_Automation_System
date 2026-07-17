@@ -88,6 +88,7 @@ void CBacnetSettingParamter::InitialUI()
   
 
         if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
+            (Device_Basic_Setting.reg.mini_type == T3_TSTAT11) ||
             (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
             (Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
         {
@@ -163,6 +164,7 @@ void CBacnetSettingParamter::OnBnClickedButtonLcdOk()
 {
     // TODO: 在此添加控件通知处理程序代码
     if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
+        (Device_Basic_Setting.reg.mini_type == T3_TSTAT11) ||
         (Device_Basic_Setting.reg.mini_type == T3_OEM) ||
         (Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
     {

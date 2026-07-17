@@ -1112,6 +1112,7 @@ extern vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 ÐÂµÄsetpoint±í
 extern Str_Setting_Info s_Basic_Setting;
 extern Str_Setting_Info Device_Basic_Setting;
 extern Str_Email_point  Device_Email_Point;
+extern Str_Wireguard_point Device_Wireguard_Point;
 extern Str_MISC Device_Misc_Data;
 extern Str_MISC s_Device_Misc_Data;
 

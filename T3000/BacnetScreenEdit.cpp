@@ -357,10 +357,14 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
     temp_1 = temp_1 | type_highest_2bytes;
 
 		if(
-            (temp_1 == BAC_FLOAT_ABCD) ||
-            (temp_1 == BAC_FLOAT_CDAB) ||
-            (temp_1 == BAC_FLOAT_BADC) ||
-            (temp_1 == BAC_FLOAT_DCBA) ||
+            (temp_1 == BAC_HOLDING_FLOAT_ABCD) ||
+            (temp_1 == BAC_HOLDING_FLOAT_CDAB) ||
+            (temp_1 == BAC_HOLDING_FLOAT_BADC) ||
+            (temp_1 == BAC_HOLDING_FLOAT_DCBA) ||
+			(temp_1 == BAC_INPUT_FLOAT_ABCD) ||
+			(temp_1 == BAC_INPUT_FLOAT_CDAB) ||
+			(temp_1 == BAC_INPUT_FLOAT_BADC) ||
+			(temp_1 == BAC_INPUT_FLOAT_DCBA) ||
             (temp_1 == COIL_REG) || 
             (temp_1 == DIS_INPUT_REG) || 
             (temp_1 == INPUT_REG) || 

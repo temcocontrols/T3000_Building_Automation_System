@@ -3687,10 +3687,14 @@ char* decode_point(char* token, Str_points &temp)
 				(
 					((strlen(p) == 1) && (*p == '0')) &&
 					(
-						(k != BAC_FLOAT_ABCD) &&  // 2020 03 25
-						(k != BAC_FLOAT_CDAB) &&
-						(k != BAC_FLOAT_BADC) &&
-						(k != BAC_FLOAT_DCBA) &&
+						(k != BAC_HOLDING_FLOAT_ABCD) &&  // 2020 03 25
+						(k != BAC_HOLDING_FLOAT_CDAB) &&
+						(k != BAC_HOLDING_FLOAT_BADC) &&
+						(k != BAC_HOLDING_FLOAT_DCBA) &&
+						(k != BAC_INPUT_FLOAT_ABCD) &&  // 2026 07 15
+						(k != BAC_INPUT_FLOAT_CDAB) &&
+						(k != BAC_INPUT_FLOAT_BADC) &&
+						(k != BAC_INPUT_FLOAT_DCBA) &&
 						(k != COIL_REG) &&
 						(k != DIS_INPUT_REG) &&
 						(k != INPUT_REG) &&
@@ -4121,10 +4125,14 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
                 (
                     ((strlen(p)==1) && (*p=='0')) && 
 				    (
-                        (k != BAC_FLOAT_ABCD) &&  // 2020 03 25
-                        (k != BAC_FLOAT_CDAB) &&
-                        (k != BAC_FLOAT_BADC) &&
-                        (k != BAC_FLOAT_DCBA) &&
+                        (k != BAC_HOLDING_FLOAT_ABCD) &&  // 2020 03 25
+                        (k != BAC_HOLDING_FLOAT_CDAB) &&
+                        (k != BAC_HOLDING_FLOAT_BADC) &&
+                        (k != BAC_HOLDING_FLOAT_DCBA) &&
+						(k != BAC_INPUT_FLOAT_ABCD) &&  // 2026 07 15
+						(k != BAC_INPUT_FLOAT_CDAB) &&
+						(k != BAC_INPUT_FLOAT_BADC) &&
+						(k != BAC_INPUT_FLOAT_DCBA) &&
                       (k!= COIL_REG) && 
                       (k!= DIS_INPUT_REG) && 
                       (k!= INPUT_REG) && 
@@ -4204,10 +4212,14 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 							high_3bit = ((*num_point) & 0xff00) >> 3;
 
                         if (
-                            ((k == BAC_FLOAT_ABCD) ||
-                             (k == BAC_FLOAT_CDAB) ||
-                             (k == BAC_FLOAT_BADC) ||
-                             (k == BAC_FLOAT_DCBA) ||
+                            ((k == BAC_HOLDING_FLOAT_ABCD) ||
+                             (k == BAC_HOLDING_FLOAT_CDAB) ||
+                             (k == BAC_HOLDING_FLOAT_BADC) ||
+                             (k == BAC_HOLDING_FLOAT_DCBA) ||
+							 (k == BAC_INPUT_FLOAT_ABCD) ||
+							 (k == BAC_INPUT_FLOAT_CDAB) ||
+							 (k == BAC_INPUT_FLOAT_BADC) ||
+							 (k == BAC_INPUT_FLOAT_DCBA) ||
                             (k == MB_REG) || (k == COIL_REG) || (k == DIS_INPUT_REG) || (k == INPUT_REG) )&&
                             (*num_point >=2000))
                         {
@@ -6375,10 +6387,14 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                             temp_point_type = temp_point_type | type_highest_2bytes;
 
                             if (
-                                (temp_point_type == BAC_FLOAT_ABCD) ||
-                                (temp_point_type == BAC_FLOAT_CDAB) ||
-                                (temp_point_type == BAC_FLOAT_BADC) ||
-                                (temp_point_type == BAC_FLOAT_DCBA) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_ABCD) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_CDAB) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_BADC) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_DCBA) ||
+								(temp_point_type == BAC_INPUT_FLOAT_ABCD) ||
+								(temp_point_type == BAC_INPUT_FLOAT_CDAB) ||
+								(temp_point_type == BAC_INPUT_FLOAT_BADC) ||
+								(temp_point_type == BAC_INPUT_FLOAT_DCBA) ||
                                 (temp_point_type == COIL_REG) ||
                                 (temp_point_type == DIS_INPUT_REG) ||
                                 (temp_point_type == INPUT_REG) ||
@@ -6467,10 +6483,14 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                             temp_point_type = temp_point_type | type_highest_2bytes;
 
 							if(
-                                (temp_point_type == BAC_FLOAT_ABCD) ||
-                                (temp_point_type == BAC_FLOAT_CDAB) ||
-                                (temp_point_type == BAC_FLOAT_BADC) ||
-                                (temp_point_type == BAC_FLOAT_DCBA) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_ABCD) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_CDAB) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_BADC) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_DCBA) ||
+								(temp_point_type == BAC_INPUT_FLOAT_ABCD) ||
+								(temp_point_type == BAC_INPUT_FLOAT_CDAB) ||
+								(temp_point_type == BAC_INPUT_FLOAT_BADC) ||
+								(temp_point_type == BAC_INPUT_FLOAT_DCBA) ||
                                 (temp_point_type == COIL_REG) ||
 								(temp_point_type == DIS_INPUT_REG) ||
 								(temp_point_type == INPUT_REG) ||
@@ -6514,10 +6534,14 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
                             temp_point_type = temp_point_type | type_highest_2bytes;
 
 							if(((unsigned char)vars_table[cur_index].point_type == COIL_REG) ||
-                                (temp_point_type == BAC_FLOAT_ABCD) ||
-                                (temp_point_type == BAC_FLOAT_CDAB) ||
-                                (temp_point_type == BAC_FLOAT_BADC) ||
-                                (temp_point_type == BAC_FLOAT_DCBA) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_ABCD) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_CDAB) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_BADC) ||
+                                (temp_point_type == BAC_HOLDING_FLOAT_DCBA) ||
+								(temp_point_type == BAC_INPUT_FLOAT_ABCD) ||
+								(temp_point_type == BAC_INPUT_FLOAT_CDAB) ||
+								(temp_point_type == BAC_INPUT_FLOAT_BADC) ||
+								(temp_point_type == BAC_INPUT_FLOAT_DCBA) ||
                                 (temp_point_type == DIS_INPUT_REG) ||
 								(temp_point_type == INPUT_REG) ||
 								(temp_point_type == MB_REG) ||
@@ -7629,10 +7653,14 @@ int pointtotext(char *buf,Point_Net *point)
 		(point_type == COIL_REG) ||
 		(point_type == DIS_INPUT_REG) ||
 		(point_type == INPUT_REG) ||
-         (point_type == BAC_FLOAT_ABCD) ||
-         (point_type == BAC_FLOAT_CDAB) ||
-         (point_type == BAC_FLOAT_BADC) ||
-         (point_type == BAC_FLOAT_DCBA)
+         (point_type == BAC_HOLDING_FLOAT_ABCD) ||
+         (point_type == BAC_HOLDING_FLOAT_CDAB) ||
+         (point_type == BAC_HOLDING_FLOAT_BADC) ||
+         (point_type == BAC_HOLDING_FLOAT_DCBA) ||
+		(point_type == BAC_INPUT_FLOAT_ABCD) ||
+		(point_type == BAC_INPUT_FLOAT_CDAB) ||
+		(point_type == BAC_INPUT_FLOAT_BADC) ||
+		(point_type == BAC_INPUT_FLOAT_DCBA)
         )&& (point->network >=128))
     {
         num = (point->number)  + ((point->network & 0x1f )   *8 + high_3_bit)*256;
@@ -7682,10 +7710,14 @@ int pointtotext(char *buf,Point_Net *point)
         //不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
         strcat(buf, itoa(point->panel, x, 10));
         strcat(buf, ptr_panel.info[point_type].name);//Fance
-        if ((point_type == BAC_FLOAT_ABCD) ||
-            (point_type == BAC_FLOAT_CDAB) ||
-            (point_type == BAC_FLOAT_BADC) ||
-            (point_type == BAC_FLOAT_DCBA) ||
+        if ((point_type == BAC_HOLDING_FLOAT_ABCD) ||
+            (point_type == BAC_HOLDING_FLOAT_CDAB) ||
+            (point_type == BAC_HOLDING_FLOAT_BADC) ||
+            (point_type == BAC_HOLDING_FLOAT_DCBA) ||
+			(point_type == BAC_INPUT_FLOAT_ABCD) ||
+			(point_type == BAC_INPUT_FLOAT_CDAB) ||
+			(point_type == BAC_INPUT_FLOAT_BADC) ||
+			(point_type == BAC_INPUT_FLOAT_DCBA) ||
             (point_type == BAC_AV) ||
             (point_type == BAC_AI) ||
             (point_type == BAC_AO) ||
@@ -7710,10 +7742,14 @@ int pointtotext(char *buf,Point_Net *point)
 		(point_type != COIL_REG) &&
 		(point_type != DIS_INPUT_REG) &&
 		(point_type != INPUT_REG) &&
-        (point_type != BAC_FLOAT_ABCD) &&
-        (point_type != BAC_FLOAT_CDAB) &&
-        (point_type != BAC_FLOAT_BADC) &&
-        (point_type != BAC_FLOAT_DCBA) &&
+        (point_type != BAC_HOLDING_FLOAT_ABCD) &&
+        (point_type != BAC_HOLDING_FLOAT_CDAB) &&
+        (point_type != BAC_HOLDING_FLOAT_BADC) &&
+        (point_type != BAC_HOLDING_FLOAT_DCBA) &&
+		(point_type != BAC_INPUT_FLOAT_ABCD) &&
+		(point_type != BAC_INPUT_FLOAT_CDAB) &&
+		(point_type != BAC_INPUT_FLOAT_BADC) &&
+		(point_type != BAC_INPUT_FLOAT_DCBA) &&
         (point_type != BAC_VAR)) // 说明是新的格式，最高位用来标识.
     {
         if ((point_type == BAC_BI) || (point_type == BAC_BV) || (point_type == BAC_MSV) ||
@@ -7750,10 +7786,14 @@ int pointtotext(char *buf,Point_Net *point)
         unsigned char type_highest_2bytes = point->network & 0x60;    //  与上 0x60  就是与  01100000 只保留2-3bit 
         point->point_type = point->point_type | type_highest_2bytes;
 
-        if ((point->point_type == BAC_FLOAT_ABCD) ||
-            (point->point_type == BAC_FLOAT_CDAB) ||
-            (point->point_type == BAC_FLOAT_BADC) ||
-            (point->point_type == BAC_FLOAT_DCBA) ||
+        if ((point->point_type == BAC_HOLDING_FLOAT_ABCD) ||
+            (point->point_type == BAC_HOLDING_FLOAT_CDAB) ||
+            (point->point_type == BAC_HOLDING_FLOAT_BADC) ||
+            (point->point_type == BAC_HOLDING_FLOAT_DCBA) ||
+			(point->point_type == BAC_INPUT_FLOAT_ABCD) ||
+			(point->point_type == BAC_INPUT_FLOAT_CDAB) ||
+			(point->point_type == BAC_INPUT_FLOAT_BADC) ||
+			(point->point_type == BAC_INPUT_FLOAT_DCBA) ||
             (point->point_type == COIL_REG) ||
             (point->point_type == DIS_INPUT_REG) ||
             (point->point_type == INPUT_REG) ||
@@ -7794,10 +7834,14 @@ int pointtotext(char *buf,Point_Net *point)
     point->point_type = point->point_type | type_highest_2bytes;
 
 	if(
-        (point->point_type == BAC_FLOAT_ABCD) ||
-        (point->point_type == BAC_FLOAT_CDAB) ||
-        (point->point_type == BAC_FLOAT_BADC) ||
-        (point->point_type == BAC_FLOAT_DCBA) ||
+        (point->point_type == BAC_HOLDING_FLOAT_ABCD) ||
+        (point->point_type == BAC_HOLDING_FLOAT_CDAB) ||
+        (point->point_type == BAC_HOLDING_FLOAT_BADC) ||
+        (point->point_type == BAC_HOLDING_FLOAT_DCBA) ||
+		(point->point_type == BAC_INPUT_FLOAT_ABCD) ||
+		(point->point_type == BAC_INPUT_FLOAT_CDAB) ||
+		(point->point_type == BAC_INPUT_FLOAT_BADC) ||
+		(point->point_type == BAC_INPUT_FLOAT_DCBA) ||
         (point->point_type == COIL_REG) ||
 		(point->point_type == DIS_INPUT_REG) ||
 		(point->point_type == INPUT_REG) ||
@@ -8467,18 +8511,30 @@ void init_info_table( void )
 			case BAC_MSV:
 				ptr_panel.info[i].name = "MSV";
 				break;
-            case BAC_FLOAT_ABCD:
+            case BAC_HOLDING_FLOAT_ABCD:
                 ptr_panel.info[i].name = "MB_REG_FLOAT_ABCD";
                 break;
-            case BAC_FLOAT_CDAB:
+            case BAC_HOLDING_FLOAT_CDAB:
                 ptr_panel.info[i].name = "MB_REG_FLOAT_CDAB";
                 break;
-            case BAC_FLOAT_BADC:
+            case BAC_HOLDING_FLOAT_BADC:
                 ptr_panel.info[i].name = "MB_REG_FLOAT_BADC";
                 break;
-            case BAC_FLOAT_DCBA:
+            case BAC_HOLDING_FLOAT_DCBA:
                 ptr_panel.info[i].name = "MB_REG_FLOAT_DCBA";
                 break;
+			case BAC_INPUT_FLOAT_ABCD:
+				ptr_panel.info[i].name = "MB_INPUT_FLOAT_ABCD";
+				break;
+			case BAC_INPUT_FLOAT_CDAB:
+				ptr_panel.info[i].name = "MB_INPUT_FLOAT_CDAB";
+				break;
+			case BAC_INPUT_FLOAT_BADC:
+				ptr_panel.info[i].name = "MB_INPUT_FLOAT_BADC";
+				break;
+			case BAC_INPUT_FLOAT_DCBA:
+				ptr_panel.info[i].name = "MB_INPUT_FLOAT_DCBA";
+				break;
 			default:
 				{
 					ptr_panel.info[i].name = "DEFAULT_NAME";

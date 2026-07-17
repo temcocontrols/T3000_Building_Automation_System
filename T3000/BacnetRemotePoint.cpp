@@ -295,19 +295,32 @@ LRESULT CBacnetRemotePoint::Fresh_Remote_List(WPARAM wParam,LPARAM lParam)
             temp_type = _T("BV");
         else if (t_type == BAC_BI + 1)
             temp_type = _T("BI");
-        else if (t_type == BAC_FLOAT_ABCD + 1)
-            temp_type = _T("BAC_FLOAT_ABCD");
-        else if (t_type == BAC_FLOAT_CDAB + 1)
-            temp_type = _T("BAC_FLOAT_CDAB");
-        else if (t_type == BAC_FLOAT_BADC + 1)
-            temp_type = _T("BAC_FLOAT_BADC");
-        else if (t_type == BAC_FLOAT_DCBA + 1)
-            temp_type = _T("BAC_FLOAT_DCBA");
+        else if (t_type == BAC_HOLDING_FLOAT_ABCD + 1)
+            temp_type = _T("MB_REG_FLOAT_ABCD");
+        else if (t_type == BAC_HOLDING_FLOAT_CDAB + 1)
+            temp_type = _T("MB_REG_FLOAT_CDAB");
+        else if (t_type == BAC_HOLDING_FLOAT_BADC + 1)
+            temp_type = _T("MB_REG_FLOAT_BADC");
+        else if (t_type == BAC_HOLDING_FLOAT_DCBA + 1)
+            temp_type = _T("MB_REG_FLOAT_DCBA");
+		else if (t_type == BAC_INPUT_FLOAT_ABCD + 1)
+			temp_type = _T("MB_INPUT_FLOAT_ABCD");
+		else if (t_type == BAC_INPUT_FLOAT_CDAB + 1)
+			temp_type = _T("MB_INPUT_FLOAT_CDAB");
+		else if (t_type == BAC_INPUT_FLOAT_BADC + 1)
+			temp_type = _T("MB_INPUT_FLOAT_BADC");
+		else if (t_type == BAC_INPUT_FLOAT_DCBA + 1)
+			temp_type = _T("MB_INPUT_FLOAT_DCBA");
 
-        if ((t_type == BAC_FLOAT_ABCD + 1) ||
-            (t_type == BAC_FLOAT_CDAB + 1) ||
-            (t_type == BAC_FLOAT_BADC + 1) ||
-            (t_type == BAC_FLOAT_DCBA + 1))
+        if ((t_type == BAC_HOLDING_FLOAT_ABCD + 1) ||
+            (t_type == BAC_HOLDING_FLOAT_CDAB + 1) ||
+            (t_type == BAC_HOLDING_FLOAT_BADC + 1) ||
+            (t_type == BAC_HOLDING_FLOAT_DCBA + 1) ||
+			(t_type == BAC_INPUT_FLOAT_ABCD + 1) ||
+			(t_type == BAC_INPUT_FLOAT_CDAB + 1) ||
+			(t_type == BAC_INPUT_FLOAT_BADC + 1) ||
+			(t_type == BAC_INPUT_FLOAT_DCBA + 1)
+			)
         {
             temp_reg_value.Format(_T("%.3f"), ((float)m_remote_point_data.at(i).point_value)/1000);
         }
