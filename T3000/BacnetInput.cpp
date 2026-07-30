@@ -286,6 +286,13 @@ void CBacnetInput::Reload_Unit_Type()
 		else
 			initial_count = RMC_IN_A;
 	}
+	else if (bacnet_device_type == T3_RMC1232)
+	{
+		if (RMC1232_IN_A > (int)m_Input_data.size())
+			initial_count = (int)m_Input_data.size();
+		else
+			initial_count = RMC1232_IN_A;
+			}
 	else if (bacnet_device_type == T3_NG3)
 	{
 		if (NG3_IN_A > (int)m_Input_data.size())
@@ -1653,6 +1660,11 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			if (Device_Basic_Setting.reg.mini_type == T3_ESP_RMC)
 			{
 				if ((lRow >= 16) && (lRow <= 17))  //IN17  IN18 is sensor
+					return;
+			}
+			if (Device_Basic_Setting.reg.mini_type == T3_RMC1232)
+			{
+				if ((lRow == 32) && (lRow <= 37))  
 					return;
 			}
 			else if (Device_Basic_Setting.reg.mini_type == T3_NG3)

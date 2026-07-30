@@ -1327,6 +1327,7 @@ typedef enum
 	T3_NG3 = 22,
 	T3_3IIC = 26,  //6合1 的传感器 esp 产品 啥也没加
 	T3_TSTAT11 = 27,
+	T3_RMC1232 = 29,  
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1396,6 +1397,11 @@ const int RMC_IN_A = 18;
 const int RMC_IN_D = 0;
 const int RMC_OUT_A = 0;
 const int RMC_OUT_D = 7;
+
+const int RMC1232_IN_A = 32;
+const int RMC1232_IN_D = 0;
+const int RMC1232_OUT_A = 0;
+const int RMC1232_OUT_D = 4;
 
 const int NG3_IN_A = 24;
 const int NG3_IN_D = 0;

@@ -192,6 +192,9 @@ void Getminitypename(unsigned char nmini_type, CString& ret_name)
 	case T3_ESP_RMC:
 		ret_name = _T("T3-RMC");
 		break;
+	case T3_RMC1232:
+		ret_name = _T("T3-RMC-1232");
+		break;
 	case T3_ESP_LW:
 		ret_name = _T("T3-ESP-LW");
 		break;
@@ -936,6 +939,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			bacnet_device_type == T3_ESP_LW ||
 			bacnet_device_type == T3_FAN_MODULE ||
 			bacnet_device_type == T3_ESP_RMC ||
+			bacnet_device_type == T3_RMC1232 ||
 			bacnet_device_type == T3_NG3 ||
 			bacnet_device_type == T3_3IIC ||
 			bacnet_device_type == T3_TSTAT10 ||
@@ -1032,6 +1036,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				(Device_Basic_Setting.reg.mini_type == T3_ESP_LW) ||
 				(Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
 				(Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) ||
+				(Device_Basic_Setting.reg.mini_type == T3_RMC1232) ||
 				(Device_Basic_Setting.reg.mini_type == T3_NG3) ||
 				(Device_Basic_Setting.reg.mini_type == T3_3IIC) ||
 				(Device_Basic_Setting.reg.mini_type == T3_OEM) ||
@@ -1069,6 +1074,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 				(Device_Basic_Setting.reg.mini_type == T3_ESP_LW) ||
 				(Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
 				(Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) ||
+				(Device_Basic_Setting.reg.mini_type == T3_RMC1232) ||
 				(Device_Basic_Setting.reg.mini_type == T3_NG3) ||
 				(Device_Basic_Setting.reg.mini_type == T3_3IIC) ||
 				(Device_Basic_Setting.reg.mini_type == T3_OEM) ||
@@ -1163,6 +1169,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			(Device_Basic_Setting.reg.mini_type == T3_ESP_LW) ||
 			(Device_Basic_Setting.reg.mini_type == T3_FAN_MODULE) ||
 			(Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) ||
+			(Device_Basic_Setting.reg.mini_type == T3_RMC1232) ||
 			(Device_Basic_Setting.reg.mini_type == T3_NG3) ||
 			(Device_Basic_Setting.reg.mini_type == T3_3IIC) ||
 			(Device_Basic_Setting.reg.mini_type == PRODUCT_CM5) ||

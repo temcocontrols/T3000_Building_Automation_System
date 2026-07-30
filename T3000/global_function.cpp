@@ -12058,7 +12058,7 @@ void init_product_list()
     temp.sub_pid = T3_FAN_MODULE;
     m_product_iocount.push_back(temp);
 
-    temp.cs_name = _T("T3-NG2");
+    temp.cs_name = _T("T3-RMC1216");
     temp.ai_count = 18;
     temp.bi_count = 0;
     temp.input_count = temp.ai_count + temp.bi_count;
@@ -12067,6 +12067,17 @@ void init_product_list()
     temp.output_count = temp.ao_count + temp.bo_count;
     temp.pid = 88;
     temp.sub_pid = T3_ESP_RMC;
+    m_product_iocount.push_back(temp);
+
+    temp.cs_name = _T("T3-RMC1232");
+    temp.ai_count = 38;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 0;
+    temp.bo_count = 4;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 88;
+    temp.sub_pid = T3_RMC1232;
     m_product_iocount.push_back(temp);
 
     temp.cs_name = _T("T3-NG2-TYPE2");
@@ -17130,6 +17141,14 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //èŽ·å
                 nret_type = OUTPUT_VIRTUAL_PORT;
         }
         break;
+        case T3_RMC1232:
+        {
+            if (portindex <= 3)
+                nret_type = OUTPUT_DIGITAL_PORT;
+            else
+                nret_type = OUTPUT_VIRTUAL_PORT;
+        }
+        break;
         case T3_NG3:
         {
             if (portindex <= NG3_OUT_D)
@@ -17359,6 +17378,20 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
         case T3_ESP_RMC:
         {
             if (portindex <= 18)
+            {
+                nret_type = INPUT_ANALOG_PORT;
+                if (n_digital_analog == BAC_UNITS_DIGITAL)
+                    nret_type = INPUT_DIGITAL_PORT;
+                else
+                    nret_type = INPUT_ANALOG_PORT;
+            }
+            else
+                nret_type = INPUT_VIRTUAL_PORT;
+        }
+        break;
+        case T3_RMC1232:
+        {
+            if (portindex <= 37)
             {
                 nret_type = INPUT_ANALOG_PORT;
                 if (n_digital_analog == BAC_UNITS_DIGITAL)

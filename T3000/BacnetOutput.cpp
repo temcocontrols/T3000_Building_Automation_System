@@ -517,6 +517,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 		analog_special_output_count = RMC_OUT_A;
 
 	}
+	else if (T3_RMC1232 == bacnet_device_type)
+	{
+		digital_special_output_count = RMC1232_OUT_D;
+		analog_special_output_count = RMC1232_OUT_A;
+	}
 	else if (T3_NG3 == bacnet_device_type)
 	{
 		digital_special_output_count = NG3_OUT_D;
@@ -724,6 +729,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 			bacnet_device_type == T3_OEM ||
 			bacnet_device_type == T3_OEM_12I ||
 			bacnet_device_type == T3_ESP_RMC ||
+			bacnet_device_type == T3_RMC1232 ||
 			bacnet_device_type == T3_NG3 ||
 			bacnet_device_type == T3_3IIC ||
 			bacnet_device_type == BIG_MINIPANEL ||

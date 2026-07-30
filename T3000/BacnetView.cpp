@@ -3818,6 +3818,10 @@ void CDialogCM5_BacNet::Fresh()
 					bacnet_device_type = T3_FAN_MODULE;
 				else if (ret == T3_ESP_RMC)
 					bacnet_device_type = T3_ESP_RMC;
+				else if (ret == T3_RMC1232)
+					bacnet_device_type = T3_RMC1232;
+				else if (ret == T3_RMC1232)
+					bacnet_device_type = T3_RMC1232;
 				else if (ret == T3_NG3)
 					bacnet_device_type = T3_NG3;
 				else if (ret == T3_3IIC)

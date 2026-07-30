@@ -1405,13 +1405,8 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 				}
 #endif	
 
-				static int prg_key_count = 1;
-				if (prg_key_count++ % 40 == 0)
-				{
-					need_syntax = true;
-					SetTimer(1, 60000, NULL);
-					prg_key_count = 1;
-				}
+				// 方案A：编辑过程中不再自动触发语法编译/重绘，避免打断用户输入。
+				// 语法检查仅保留在显式动作：OnSend / OnRenumber / OnProgramIdeSettings。
 
 			}
 
