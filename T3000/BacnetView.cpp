@@ -1008,7 +1008,6 @@ CString remote_ip_address;
 extern tree_product selected_product_Node; // 选中的设备信息;
 // Directory for storing data to database, temporary file storage directory
 extern CString SaveConfigFilePath; //用来将资料存放至数据库，临时文件的存放目录;
-
 extern SOCKET my_sokect;
 extern bool show_user_list_window ;
 // Thread started when clicking MSTP device for connection
@@ -1803,8 +1802,16 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						ProgramEdit_Window = NULL;
 					}
 					ProgramEdit_Window = new CBacnetProgramEdit;
-					ProgramEdit_Window->Create(IDD_DIALOG_BACNET_PROGRAM_EDIT,this);	
+					BOOL bCreateOK = ProgramEdit_Window->Create(IDD_DIALOG_BACNET_PROGRAM_EDIT, this);
+					if (!bCreateOK)
+					{
+						AfxMessageBox(_T("程序编辑对话框创建失败！请检查对话框资源属性"));
+						delete ProgramEdit_Window;
+						ProgramEdit_Window = NULL;
+						return 0; // 失败直接返回，不执行后续操作
+					}
 					ProgramEdit_Window->ShowWindow(SW_SHOW);
+					ProgramEdit_Window->UpdateWindow(); // 强制绘制窗口，解决"创建但不显示"
 
 
 				}
@@ -2143,7 +2150,11 @@ void CDialogCM5_BacNet::Tab_Initial()
 
 
 	pDialog[WINDOW_INPUT] = Input_Window = new CBacnetInput;
-	pDialog[WINDOW_OUTPUT] =Output_Window = new CBacnetOutput;
+	if (pDialog[WINDOW_OUTPUT] == NULL)
+	{
+		Output_Window = new CBacnetOutput;
+		pDialog[WINDOW_OUTPUT] = Output_Window;
+	}
 	pDialog[WINDOW_VARIABLE] = Variable_Window = new CBacnetVariable;
 	pDialog[WINDOW_PROGRAM] = Program_Window = new CBacnetProgram;
 	pDialog[WINDOW_CONTROLLER] = Controller_Window = new BacnetController;
@@ -6559,7 +6570,14 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 
 
 	}
-
+	  if (offline_mode)
+	  {
+		  Program_Window->GetDlgItem(IDC_BUTTON_VIRTUAL_PROGRAM)->ShowWindow(SW_SHOW);
+	  }
+	  else
+	  {
+		  Program_Window->GetDlgItem(IDC_BUTTON_VIRTUAL_PROGRAM)->ShowWindow(SW_HIDE);
+	  }
 	WritePrivateProfileStringW(_T("LastView"),_T("ViewSerialNumber"),temp_serial_number,g_cstring_ini_path);
 	WritePrivateProfileStringW(_T("LastView"),_T("ViewPid"),_T("35"),g_cstring_ini_path);
 	SetTimer(BAC_SET_LAST_UI,1000,NULL);

@@ -632,7 +632,7 @@ bool BacnetScreen::run_old_graphic_screen()
 	}
 	else
 	{
-		MessageBox(_T("'Graphic Classical View' have some data in it, If you want use 'Webview Graphic' ,you should click 'Clear All Graphic Data' button!"));
+		//MessageBox(_T("'Graphic Classical View' have some data in it, If you want use 'Webview Graphic' ,you should click 'Clear All Graphic Data' button!"));
 	}
 	if (h_read_screenlabel_thread == NULL)
 	{
@@ -2101,7 +2101,8 @@ void BacnetScreen::OnBnClickedWebViewShow()
 	int nret = CheckOldGraphic();
 	if (nret == 0)
 	{
-		PostMessage(WM_HOTKEY, KEY_INSERT, NULL);
+		MessageBox(_T("If you want to use the new version of WebView, click ~clear all graphic data~ to erase old data, upgrade your firmware to Rev64.4 or higher, and run Windows 10 or later operating systems.!"));
+		//PostMessage(WM_HOTKEY, KEY_INSERT, NULL);
 		return;
 	}
 

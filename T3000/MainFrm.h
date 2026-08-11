@@ -411,6 +411,7 @@ public:
  
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	afx_msg void OnActivateApp(BOOL bActive, DWORD dwThreadID);
 public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	BOOL GetIPbyHostName(CString strHostName,CString& strIP);

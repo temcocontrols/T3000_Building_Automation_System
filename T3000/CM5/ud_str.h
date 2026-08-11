@@ -78,6 +78,7 @@ typedef enum {
          READ_SCHEDUAL_TIME_FLAG   = 41,
          READ_MSV_COMMAND          = 42,
          READ_EMAIL_ALARM          = 43,
+		 READ_WIREGUARD_CFG        = 44,
 		 READ_JSON_SCREEN          = 86,
 		 READ_JSON_ITEM            = 87, 
 		 READ_PVARIABLE_T3000		= 88,           /* read Pvariables         */
@@ -137,6 +138,7 @@ typedef enum {
          WRITE_SCHEDUAL_TIME_FLAG   = 141,
          WRITE_MSV_COMMAND          = 142,
          WRITE_EMAIL_ALARM           = 143,
+		 WRITE_WIREGUARD_CFG		= 144,
 		 WRITE_JSON_SCREEN			= 186,
 		 WRITE_JSON_ITEM			= 187,
 		 WRITE_PVARIABLE_T3000		= 188,           /* read Pvariables         */
@@ -221,6 +223,20 @@ typedef union
 	}reg;
 }Str_Email_point;
 
+
+typedef union {
+	uint8_t all[400];
+	struct {
+		unsigned char  wg_enable;          // Register 2100   (0=Disabled, 1=Enabled)
+		char           private_key[66];    // Registers 2101-2133 (Base64±àÂë£¬33¼Ä´æÆ÷¡Á2×Ö·û)
+		char           peer_public_key[66];// Registers 2134-2166 (Base64±àÂë£¬33¼Ä´æÆ÷¡Á2×Ö·û)
+		char           pre_shared_key[66]; // Registers 2167-2199 (Base64±àÂë£¬¿ÉÑ¡£¬33¼Ä´æÆ÷¡Á2×Ö·û)
+		unsigned char  local_ip[4];        // Registers 2200-2203 (4¸öoctet£¬Èç10.0.0.2)
+		unsigned short wg_port;            // Register 2204 (UDP¶Ë¿Ú£¬Ä¬ÈÏ51820)
+		unsigned char  peer_ip[4];         // Registers 2205-2208 (4¸öoctet£¬¶Ô¶Ëendpoint)
+		unsigned char  reserved[191];      // Registers 2209-2250 (Ô¤Áô) + ÓàÁ¿
+	} reg;
+} Str_Wireguard_point;
 
 typedef union
 {

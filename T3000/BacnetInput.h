@@ -86,6 +86,11 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnMove(int x, int y);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+
+private:
+	int m_cached_col_width[INPUT_COL_NUMBER];  // 列宽缓存，-1表示未设置
+	void SafeSetColumnWidth(int col, int width);
+	void InvalidateColumnWidthCache();
 };
 //int GetPrivateData();
 //int WritePrivateData();

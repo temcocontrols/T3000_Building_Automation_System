@@ -208,7 +208,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
-
+	m_variable_list.SetRedraw(FALSE);   // ← 加这行，禁止中间重绘
 	if (isFreshOne == REFRESH_ON_ITEM)
 	{
 		Fresh_Item = (int)wParam;
@@ -223,6 +223,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
+			m_variable_list.SetRedraw(TRUE);
 			return 0;
 		}
 	}
@@ -266,6 +267,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 
 		if (i >= variable_item_limit_count)
 		{
+			m_variable_list.SetRedraw(TRUE);
 			return 0;
 		}
 
@@ -462,6 +464,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 		}
 
 	}
+	m_variable_list.SetRedraw(TRUE);    // ← 加这行，恢复重绘
+	m_variable_list.Invalidate();        // ← 加这行，统一刷一次
 	copy_data_to_ptrpanel(TYPE_VARIABLE);
 #ifdef LOCAL_DB_FUNCTION
 	if (selected_product_Node.serial_number != 0)

@@ -1685,6 +1685,9 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     case WRITE_EMAIL_ALARM:
         entitysize = sizeof(Str_Email_point);
         break;
+    case WRITE_WIREGUARD_CFG:
+        entitysize = sizeof(Str_Wireguard_point);
+		break;
     case WRITE_JSON_SCREEN:
         entitysize = sizeof(Str_t3_screen_Json);
         break;
@@ -1795,6 +1798,11 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_Email_point), &Device_Email_Point, sizeof(Str_Email_point));
     }
         break;
+    case WRITE_WIREGUARD_CFG:
+    {
+		memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_Wireguard_point), &Device_Wireguard_Point, sizeof(Str_Wireguard_point));
+    }
+    break;
 	case WRITEEXT_IO_T3000:
 		{
 			for (int i=0; i<(end_instance - start_instance + 1); i++)
@@ -2084,7 +2092,14 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         break;
 	case  WRITE_MISC:
 		{
-			 memcpy_s(SendBuffer +   HEADER_LENGTH,sizeof(Str_MISC),&Device_Misc_Data,sizeof(Str_MISC));
+            if (ext_data == NULL)
+            {
+                memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_MISC), &Device_Misc_Data, sizeof(Str_MISC));
+            }
+            else
+            {
+                memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_MISC), ext_data, sizeof(Str_Setting_Info));
+            }		
 		}
 		break;
 	case WRITE_SPECIAL_COMMAND:
@@ -5037,61 +5052,70 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = bacnet_apud_point + PRIVATE_HEAD_LENGTH;
         if (block_length != sizeof(Str_MISC))
             return -1;
-        Device_Misc_Data.reg.flag[0] = *(my_temp_point++);
-        Device_Misc_Data.reg.flag[1] = *(my_temp_point++);
-        if ((Device_Misc_Data.reg.flag[0] != 0x55) || (Device_Misc_Data.reg.flag[1] != 0xff))
+        s_Device_Misc_Data.reg.flag[0] = *(my_temp_point++);
+        s_Device_Misc_Data.reg.flag[1] = *(my_temp_point++);
+        if ((s_Device_Misc_Data.reg.flag[0] != 0x55) || (s_Device_Misc_Data.reg.flag[1] != 0xff))
             return -1;
         for (int z = 0; z < 12; z++)
         {
-            Device_Misc_Data.reg.monitor_analog_block_num[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.monitor_analog_block_num[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
-            Device_Misc_Data.reg.monitor_digital_block_num[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.monitor_digital_block_num[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
         }
 
         for (int j = 0;j < 12;j++)
         {
-            Device_Misc_Data.reg.operation_time[j] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.operation_time[j] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
-            if ((Device_Misc_Data.reg.operation_time[j] < 1450774486) || (Device_Misc_Data.reg.operation_time[j] > 1505939286))
+            if ((s_Device_Misc_Data.reg.operation_time[j] < 1450774486) || (s_Device_Misc_Data.reg.operation_time[j] > 1505939286))
             {
-                Device_Misc_Data.reg.operation_time[j] = 0;
+                s_Device_Misc_Data.reg.operation_time[j] = 0;
             }
         }
 
-        Device_Misc_Data.reg.flag1 = *(my_temp_point++);
-        if (Device_Misc_Data.reg.flag1 != 0x55)
+        s_Device_Misc_Data.reg.flag1 = *(my_temp_point++);
+        if (s_Device_Misc_Data.reg.flag1 != 0x55)
         {
             return -1;
         }
         for (int z = 0;z < 3;z++)
         {
-            Device_Misc_Data.reg.com_rx[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.com_rx[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
         }
 
         for (int z = 0;z < 3;z++)
         {
-            Device_Misc_Data.reg.com_tx[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.com_tx[z] = ((unsigned char)my_temp_point[3]) << 24 | ((unsigned char)my_temp_point[2] << 16) | ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 4;
         }
 
         for (int z = 0;z < 3;z++)
         {
-            Device_Misc_Data.reg.collision[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.collision[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 2;
         }
 
         for (int z = 0;z < 3;z++)
         {
-            Device_Misc_Data.reg.packet_error[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.packet_error[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 2;
         }
 
         for (int z = 0;z < 3;z++)
         {
-            Device_Misc_Data.reg.timeout[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
+            s_Device_Misc_Data.reg.timeout[z] = ((unsigned char)my_temp_point[1]) << 8 | ((unsigned char)my_temp_point[0]);
             my_temp_point = my_temp_point + 2;
+        }
+
+        if (invoke_id == gsp_invoke)
+        {
+            Sleep(1);
+        }
+        else
+        {
+            memcpy(&Device_Misc_Data, &s_Device_Misc_Data, sizeof(Str_MISC));
         }
 
     }
@@ -5290,6 +5314,47 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         my_temp_point = my_temp_point + 60;
         Device_Email_Point.reg.error_code = *(my_temp_point++);
         return READ_EMAIL_ALARM;
+    }
+    break;
+    case READ_WIREGUARD_CFG:
+    {
+        block_length = len_value_type - PRIVATE_HEAD_LENGTH;
+        my_temp_point = bacnet_apud_point + PRIVATE_HEAD_LENGTH;
+
+        if (block_length != sizeof(Str_Wireguard_point))
+            return -1;
+
+        // WireGuard Enable (1 byte)
+        Device_Wireguard_Point.reg.wg_enable = *(my_temp_point++);
+
+        // Private Key (66 bytes)
+        memcpy_s(Device_Wireguard_Point.reg.private_key, 66, my_temp_point, 66);
+        my_temp_point = my_temp_point + 66;
+
+        // Peer Public Key (66 bytes)
+        memcpy_s(Device_Wireguard_Point.reg.peer_public_key, 66, my_temp_point, 66);
+        my_temp_point = my_temp_point + 66;
+
+        // Pre-Shared Key (66 bytes)
+        memcpy_s(Device_Wireguard_Point.reg.pre_shared_key, 66, my_temp_point, 66);
+        my_temp_point = my_temp_point + 66;
+
+        // Local VPN IP (4 bytes)
+        memcpy_s(Device_Wireguard_Point.reg.local_ip, 4, my_temp_point, 4);
+        my_temp_point = my_temp_point + 4;
+
+        // WireGuard Port (2 bytes, little-endian)
+        Device_Wireguard_Point.reg.wg_port = (unsigned char)my_temp_point[1] << 8 |
+            (unsigned char)my_temp_point[0];
+        my_temp_point = my_temp_point + 2;
+
+        // Peer Endpoint IP (4 bytes)
+        memcpy_s(Device_Wireguard_Point.reg.peer_ip, 4, my_temp_point, 4);
+        my_temp_point = my_temp_point + 4;
+
+        // reserved 区域不用处理
+
+        return READ_WIREGUARD_CFG;
     }
     break;
     case READMONITORDATA_T3000:
@@ -7312,6 +7377,17 @@ void Inial_Product_Menu_map()
         memcpy(product_menu[i], default_menu, 20);
         switch (i)
         {
+        //case STM32_CO2_NET:
+        //case STM32_CO2_RS485:
+        //case STM32_HUM_NET:     
+        //case STM32_HUM_RS485:  
+        //case STM32_PRESSURE_NET:
+        //case STM32_PRESSURE_RS485:
+        //{
+        //    unsigned char  temp[20] = { 1,1,1,0  ,0,1,1,1 ,1,0,0,0   ,0 ,1,1,1   ,0,0,0,0 };
+        //    memcpy(product_menu[i], temp, 20);
+        //}
+        //    break;
         case PM_CM5:
         case PM_TSTAT10:
         case PM_MINIPANEL:
@@ -8612,7 +8688,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
             CString temp_pc_ip;
             temp_pc_ip.Format(_T("%s.%s.%s"), temp_pc_strip.GetAt(0), temp_pc_strip.GetAt(1), temp_pc_strip.GetAt(2));
 
-            if (temp_pc_ip.CompareNoCase(_T("0.0.0")) == 0)
+            if (temp_pc_ip.CompareNoCase(_T("0.0.0.0")) == 0)
                 continue;
 
 
@@ -9474,17 +9550,20 @@ void PrintAdapterInfo()
                     Temp_Node.StrIP.ReleaseBuffer();
                     MultiByteToWideChar(CP_ACP, 0, subnetMaskStr, (int)strlen((char*)subnetMaskStr) + 1, Temp_Node.StrMask.GetBuffer(MAX_PATH), MAX_PATH);
                     Temp_Node.StrMask.ReleaseBuffer();
-                    if (Temp_Node.StrIP.Find(_T("0.0.0")) != -1)
+                    if (Temp_Node.StrIP.Find(_T("0.0.0.0")) != -1)
                     {
                         pUnicast = pUnicast->Next;
+                        continue;
                     }
                     else if (Temp_Node.StrIP.GetLength() > 16) //过滤ip6
                     {
                         pUnicast = pUnicast->Next;
+                        continue;
                     }
                     else if (Temp_Node.StrIP.GetLength() < 7)  //过滤不合理的IP
                     {
                         pUnicast = pUnicast->Next;
+                        continue;
                     }
                     else
 					{
@@ -9572,7 +9651,7 @@ void GetIPMaskGetWay()
 
             Temp_Node.NetworkCardType=pAdapter->Type;
 
-            if (Temp_Node.StrIP.Find(_T("0.0.0")) != -1)
+            if (Temp_Node.StrIP.Find(_T("0.0.0.0")) != -1)
             {
                 pAdapter = pAdapter->Next;
                 continue;
@@ -11229,6 +11308,12 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_Input_data.at(i),temp_point ,sizeof(Str_in_point));
 				temp_point = temp_point + sizeof(Str_in_point);
+                if (offline_mode)
+                {
+                    //这里初始化，使得默认都是模拟量，特别是虚拟设备
+                    if (m_Input_data.at(i).range == 0)
+                        m_Input_data.at(i).digital_analog = BAC_UNITS_ANALOG;
+                }
                 if (i < select_device_io_status.device_capacity[TREE_IN])
                 {
                     if (m_Input_data.at(i).range != 0)
@@ -11244,6 +11329,12 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_Output_data.at(i),temp_point,sizeof(Str_out_point));
 				temp_point = temp_point + sizeof(Str_out_point);
+                if (offline_mode)
+                {
+                    //这里初始化，使得默认都是模拟量，特别是虚拟设备
+                    if (m_Output_data.at(i).range == 0)
+                        m_Output_data.at(i).digital_analog = BAC_UNITS_ANALOG;
+                }
                 if (i < select_device_io_status.device_capacity[TREE_OUT])
                 {
                     if (m_Output_data.at(i).range != 0)
@@ -11257,6 +11348,12 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 			{
 				memcpy(&m_Variable_data.at(i),temp_point,sizeof(Str_variable_point));
 				temp_point = temp_point + sizeof(Str_variable_point);
+                if (offline_mode)
+                {
+                    //这里初始化，使得默认都是模拟量，特别是虚拟设备
+                    if (m_Variable_data.at(i).range == 0)
+                        m_Variable_data.at(i).digital_analog = BAC_UNITS_ANALOG;
+                }
                 if (m_Variable_data.at(i).range != 0)
                 {
                     select_device_io_status.device_use[TREE_VAR]++;
@@ -12028,7 +12125,16 @@ void init_product_list()
     m_product_iocount.push_back(temp);
 
 
-
+    temp.cs_name = _T("TSTAT11");
+    temp.ai_count = 0;
+    temp.bi_count = 0;
+    temp.input_count = temp.ai_count + temp.bi_count;
+    temp.ao_count = 0;
+    temp.bo_count = 0;
+    temp.output_count = temp.ao_count + temp.bo_count;
+    temp.pid = 88;
+    temp.sub_pid = T3_TSTAT11;
+    m_product_iocount.push_back(temp);
     
     
 #if 0
@@ -16986,6 +17092,7 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
         }
         break;
         case T3_TSTAT10:
+        case T3_TSTAT11:
         {
             if (portindex <= 5)
                 nret_type = OUTPUT_DIGITAL_PORT;
@@ -17209,6 +17316,7 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
         }
         break;
         case T3_TSTAT10:   //12DO  ,12AO
+        case T3_TSTAT11:   //12DO  ,12AO
             if (portindex <= 10)
             {
                 nret_type = INPUT_ANALOG_PORT;

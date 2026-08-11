@@ -10,7 +10,7 @@
 #include "CM5/ud_str.h"
 #include "global_variable_extern.h"
 
-static bool enable_t3_web_logging = true;
+static bool enable_t3_web_logging = false;
 // Forward declarations
 class CMainFrame;
 extern void HandleWebViewMsg(CString msg, CString &outmsg, int msg_source = 0);

@@ -719,7 +719,7 @@ stroldipaddress=strIP;
 	for (int i=0;i<allsubnets.size();i++)
 	{
 		GetNewIP(strnewipadress,allsubnets[i].StrIP);
-		if (strnewipadress.Find(_T("0.0.0"))!=-1)//Filter out 0.0.0.0 - 对0.0.0.0的过滤掉
+		if (strnewipadress.Find(_T("0.0.0.0"))!=-1)//Filter out 0.0.0.0 - 对0.0.0.0的过滤掉
 		{
 			continue;
 		}
