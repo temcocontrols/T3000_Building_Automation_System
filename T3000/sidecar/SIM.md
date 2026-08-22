@@ -20,8 +20,8 @@ Then Tools → CCTV (or CRM #cctv) and **Add and play** each RTSP URL. Clips are
 
 ## Automated test (no browser)
 
-`powershell
+```powershell
 powershell -ExecutionPolicy Bypass -File T3000\sidecar\test-sim.ps1
-`
+```
 
 Starts go2rtc on 9291/9292/9293 if needed, checks ffmpeg.exe + go2rtc.exe sit together, lists sim-north/east/south/west, then pulls video/mp4 from each. Exit 0 = all pass, 1 = fail.
