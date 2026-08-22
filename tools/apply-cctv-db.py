@@ -1,48 +1,41 @@
-"""Apply sites.db + user-side CCTV people tables. Drop camera tables from T3000.db."""
+"""Apply CCTV tables to the existing T3000.db (Building = site). Remove leftover sites.db."""
 import json
 import sqlite3
 from pathlib import Path
 
 root = Path(r"C:\Xdrive\T3000_Building_Automation_System")
-t3000 = root / "Database" / "T3000.db"
-sites = root / "Database" / "sites.db"
+db = root / "Database" / "T3000.db"
+sql = (root / "Database" / "cctv.sql").read_text(encoding="utf-8")
 
-users_sql = (root / "Database" / "cctv-users.sql").read_text(encoding="utf-8")
-sites_sql = (root / "Database" / "sites.sql").read_text(encoding="utf-8")
+con = sqlite3.connect(str(db))
+con.execute("PRAGMA foreign_keys = ON")
+con.executescript(sql)
+con.commit()
 
-scon = sqlite3.connect(str(sites))
-scon.execute("PRAGMA foreign_keys = ON")
-scon.executescript(sites_sql)
-scon.commit()
-print("sites.db")
-for row in scon.execute("SELECT id, name, slug FROM Site"):
-    print(" site", row)
-for row in scon.execute("SELECT id, name, title, rtsp_url FROM Camera ORDER BY sort_order"):
-    print(" cam", row)
-print(" ignore zones", scon.execute("SELECT COUNT(*) FROM IgnoreZone").fetchone()[0])
+print("Building sites:")
+for row in con.execute("SELECT ID, Main_BuildingName, Building_Name, city, street FROM Building"):
+    print(" ", row)
+print("CCTV_Camera:")
+for row in con.execute("SELECT id, building_name, name, title, rtsp_url FROM CCTV_Camera ORDER BY sort_order"):
+    print(" ", row)
+print("ignore zones", con.execute("SELECT COUNT(*) FROM CCTV_IgnoreZone").fetchone()[0])
+print("people", con.execute("SELECT COUNT(*) FROM CCTV_Person").fetchone()[0])
+print("users", list(con.execute("SELECT user_name_login FROM users")))
 
 cams = [
     {"name": n, "title": t, "src": src}
-    for n, t, src in scon.execute(
-        "SELECT name, title, rtsp_url FROM Camera WHERE enabled=1 ORDER BY sort_order"
+    for n, t, src in con.execute(
+        "SELECT name, title, rtsp_url FROM CCTV_Camera WHERE enabled=1 ORDER BY sort_order"
     )
 ]
-scon.close()
-
-ucon = sqlite3.connect(str(t3000))
-ucon.execute("PRAGMA foreign_keys = ON")
-ucon.executescript(users_sql)
-# cameras do not belong in the users db
-ucon.execute("DROP TABLE IF EXISTS CCTV_IgnoreZone")
-ucon.execute("DROP TABLE IF EXISTS CCTV_Camera")
-ucon.commit()
-print("T3000.db people tables", [r[0] for r in ucon.execute(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'CCTV_%' ORDER BY name"
-)])
-print("users", list(ucon.execute("SELECT user_name_login FROM users")))
-ucon.close()
+con.close()
 
 nvr = Path.home() / "AppData" / "Local" / "T3000" / "nvr"
 nvr.mkdir(parents=True, exist_ok=True)
 (nvr / "cameras.json").write_text(json.dumps({"cameras": cams}, indent=2), encoding="utf-8")
 print("wrote", nvr / "cameras.json")
+
+for leftover in (root / "Database" / "sites.db", root / "Database" / "sites.sql", root / "Database" / "cctv-users.sql"):
+    if leftover.exists():
+        leftover.unlink()
+        print("removed", leftover)
