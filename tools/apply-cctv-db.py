@@ -1,35 +1,48 @@
-"""Apply Database/cctv.sql to T3000.db and seed cameras.json for the T3000 CCTV view."""
+"""Apply sites.db + user-side CCTV people tables. Drop camera tables from T3000.db."""
 import json
 import sqlite3
 from pathlib import Path
 
 root = Path(r"C:\Xdrive\T3000_Building_Automation_System")
-db = root / "Database" / "T3000.db"
-sql = (root / "Database" / "cctv.sql").read_text(encoding="utf-8")
-con = sqlite3.connect(str(db))
-con.execute("PRAGMA foreign_keys = ON")
-con.executescript(sql)
-con.commit()
+t3000 = root / "Database" / "T3000.db"
+sites = root / "Database" / "sites.db"
 
-print("CCTV_Camera:")
-for row in con.execute("SELECT id, name, title, rtsp_url, enabled FROM CCTV_Camera ORDER BY sort_order"):
-    print(" ", row)
-print("CCTV_IgnoreZone count", con.execute("SELECT COUNT(*) FROM CCTV_IgnoreZone").fetchone()[0])
-print("CCTV_Person count", con.execute("SELECT COUNT(*) FROM CCTV_Person").fetchone()[0])
-print("users still", list(con.execute("SELECT user_name_login FROM users")))
+users_sql = (root / "Database" / "cctv-users.sql").read_text(encoding="utf-8")
+sites_sql = (root / "Database" / "sites.sql").read_text(encoding="utf-8")
 
-cams = []
-for name, title, src in con.execute(
-    "SELECT name, title, rtsp_url FROM CCTV_Camera WHERE enabled=1 ORDER BY sort_order"
-):
-    cams.append({"name": name, "title": title, "src": src})
-con.close()
+scon = sqlite3.connect(str(sites))
+scon.execute("PRAGMA foreign_keys = ON")
+scon.executescript(sites_sql)
+scon.commit()
+print("sites.db")
+for row in scon.execute("SELECT id, name, slug FROM Site"):
+    print(" site", row)
+for row in scon.execute("SELECT id, name, title, rtsp_url FROM Camera ORDER BY sort_order"):
+    print(" cam", row)
+print(" ignore zones", scon.execute("SELECT COUNT(*) FROM IgnoreZone").fetchone()[0])
+
+cams = [
+    {"name": n, "title": t, "src": src}
+    for n, t, src in scon.execute(
+        "SELECT name, title, rtsp_url FROM Camera WHERE enabled=1 ORDER BY sort_order"
+    )
+]
+scon.close()
+
+ucon = sqlite3.connect(str(t3000))
+ucon.execute("PRAGMA foreign_keys = ON")
+ucon.executescript(users_sql)
+# cameras do not belong in the users db
+ucon.execute("DROP TABLE IF EXISTS CCTV_IgnoreZone")
+ucon.execute("DROP TABLE IF EXISTS CCTV_Camera")
+ucon.commit()
+print("T3000.db people tables", [r[0] for r in ucon.execute(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'CCTV_%' ORDER BY name"
+)])
+print("users", list(ucon.execute("SELECT user_name_login FROM users")))
+ucon.close()
 
 nvr = Path.home() / "AppData" / "Local" / "T3000" / "nvr"
 nvr.mkdir(parents=True, exist_ok=True)
-(nvr / "www").mkdir(exist_ok=True)
-(nvr / "recordings").mkdir(exist_ok=True)
-payload = {"cameras": cams}
-(nvr / "cameras.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+(nvr / "cameras.json").write_text(json.dumps({"cameras": cams}, indent=2), encoding="utf-8")
 print("wrote", nvr / "cameras.json")
-print(json.dumps(payload, indent=2))
