@@ -1,8 +1,20 @@
-# CCTV UX inspiration (internal only)
+# CCTV documentation
 
-Vendor help pages and manuals saved on branch **`CCTV`** so Temco can study how homeowners and building operators use popular NVR products.
+## Product book (T3000)
 
-**These files are inspiration only.** They are not a spec and they do not change T3000. T3000 CCTV still uses the **go2rtc + MediaMTX** localhost sidecars and **Tools → CCTV**. Do not copy vendor UI chrome, trademarks, or copy into the shipping product.
+**[t3000-cctv/T3000_CCTV_User_Manual.md](t3000-cctv/T3000_CCTV_User_Manual.md)** is the T3000 CCTV operator manual (homeowner / building operator). Folder index: [t3000-cctv/README.md](t3000-cctv/README.md).
+
+That book is what Temco ships as product documentation. T3000 CCTV still uses the **go2rtc + MediaMTX** localhost sidecars and **Tools → CCTV**.
+
+Windows demo / build: [DEMO.md](../../DEMO.md). First-slice notes: [nvr.md](../nvr.md).
+
+---
+
+## Vendor inspiration (internal only)
+
+The folders below are **not** the T3000 product book. They are vendor help pages and manuals saved on branch **`CCTV`** so Temco can study how homeowners and building operators use popular NVR products.
+
+**Inspiration only.** They are not a spec and they do not change T3000. Do not copy vendor UI chrome, trademarks, or copy into the shipping product.
 
 ## Operator ranking (homeowner / building operator)
 
