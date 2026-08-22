@@ -1,15 +1,15 @@
 # Simulated job-site cameras
 
-Four looping clips of the same early-stage construction site (no walls), cameras facing inward. Not ffmpeg test patterns. Ports avoid Project Management on 9192.
+Four looping clips of the real early-stage lot (white ICF + rebar, wooden fence, orange Hitachi). Cameras face inward from the four corners so the same workers can be tracked across views. Ports avoid Project Management on 9192.
 
 | Camera | Angle | RTSP |
 | --- | --- | --- |
-| sim-north | North fence, looking south | rtsp://127.0.0.1:9292/sim-north |
-| sim-east | East fence, looking west | rtsp://127.0.0.1:9292/sim-east |
-| sim-south | South gate, looking north | rtsp://127.0.0.1:9292/sim-south |
-| sim-west | West fence, looking east | rtsp://127.0.0.1:9292/sim-west |
+| sim-north | NW corner, looking southeast | rtsp://127.0.0.1:9292/sim-north |
+| sim-east | NE corner, looking southwest | rtsp://127.0.0.1:9292/sim-east |
+| sim-south | SE corner, looking northwest | rtsp://127.0.0.1:9292/sim-south |
+| sim-west | SW corner, looking northeast | rtsp://127.0.0.1:9292/sim-west |
 
-HTTP/API: http://127.0.0.1:9291  
+HTTP/API: http://127.0.0.1:9291
 WebRTC: 127.0.0.1:9293
 
 ```powershell
