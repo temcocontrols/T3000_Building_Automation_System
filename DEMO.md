@@ -1,4 +1,4 @@
-# T3000 Cameras / NVR — Windows teammate demo
+# T3000 CCTV — Windows teammate demo
 
 **This branch is for a live demo on a normal T3000 Windows box. Do not merge until people have seen it running.**
 
@@ -32,7 +32,7 @@ Built app:
 
 Post-build already copies `T3000\ResourceFile\nvr\index.html` next to that exe.
 
-You also need the **Microsoft Edge WebView2 Runtime** (same as HVAC graphics / Modbus Register v2). If Cameras warns that it is missing, install it from https://developer.microsoft.com/en-us/microsoft-edge/webview2/ then retry.
+You also need the **Microsoft Edge WebView2 Runtime** (same as HVAC graphics / Modbus Register v2). If CCTV warns that it is missing, install it from https://developer.microsoft.com/en-us/microsoft-edge/webview2/ then retry.
 
 ---
 
@@ -71,7 +71,7 @@ A Release post-build will also copy `T3000\sidecar\*.exe` into `T3000 Output\rel
 
 - Zip: **[mediamtx_v1.20.1_windows_amd64.zip](https://github.com/bluenviron/mediamtx/releases/download/v1.20.1/mediamtx_v1.20.1_windows_amd64.zip)**
 - Drop `mediamtx.exe` in the **same** folder as `go2rtc.exe`.
-- The Cameras header shows **MediaMTX :9197** when it is up, **MediaMTX off** when it is not. Live tiles still work.
+- The CCTV header shows **MediaMTX :9197** when it is up, **MediaMTX off** when it is not. Live tiles still work.
 
 ### Optional: fetch script instead of a browser download
 
@@ -87,11 +87,11 @@ That writes `T3000\sidecar\go2rtc.exe` and `T3000\sidecar\mediamtx.exe`. Then ei
 
 ---
 
-## 3. Open the Cameras / NVR view
+## 3. Open the CCTV view
 
 1. Run **`T3000.exe`** (the one you built — it will ask for Administrator, as usual).
-2. Menu: **Tools → Cameras (NVR)**.
-3. A WebView2 window titled **Cameras** opens.
+2. Menu: **Tools → CCTV**.
+3. A WebView2 window titled **CCTV** opens.
 
 T3000 starts `go2rtc.exe` (and `mediamtx.exe` if present) on localhost, then loads `http://127.0.0.1:9191/index.html`. Closing that window stops processes T3000 started.
 
@@ -115,7 +115,7 @@ The PC and the camera must be on the **same LAN** (ONVIF discovery uses multicas
    `rtsp://admin:password@192.168.1.20/Streaming/Channels/101`
 3. Click **Add and play**.
 
-Any RTSP the Windows box can reach works (another NVR, a camera, a phone app that publishes RTSP). There is no fake “demo stream” bundled. Without a reachable URL you still see the Cameras UI and sidecar status, but no video.
+Any RTSP the Windows box can reach works (another recorder, a camera, a phone app that publishes RTSP). There is no fake “demo stream” bundled. Without a reachable URL you still see the CCTV UI and sidecar status, but no video.
 
 WebView2 cannot play raw `rtsp://` inside a `<video>` tag. The page asks go2rtc for **WebRTC**, then **MP4**, then **MJPEG**.
 
@@ -124,11 +124,11 @@ WebView2 cannot play raw `rtsp://` inside a `<video>` tag. The page asks go2rtc 
 ## 5. What success looks like
 
 - Header pills: **go2rtc :9191** (green). MediaMTX green only if you dropped that exe.
-- Sidecar panel: something like “Cameras sidecar started (go2rtc on 127.0.0.1:9191).”
+- Sidecar panel: something like “CCTV sidecar started (go2rtc on 127.0.0.1:9191).”
 - After Add / Discover: a **live tile** with moving video (not a frozen snapshot).
 - Status bar at the bottom of T3000 may repeat the sidecar message.
 
-Close **Cameras**, reopen **Tools → Cameras (NVR)** — saved cameras come back (WebView `localStorage` + `%LOCALAPPDATA%\T3000\nvr\cameras.json`).
+Close **CCTV**, reopen **Tools → CCTV** — saved cameras come back (WebView `localStorage` + `%LOCALAPPDATA%\T3000\nvr\cameras.json`).
 
 ---
 
@@ -137,12 +137,12 @@ Close **Cameras**, reopen **Tools → Cameras (NVR)** — saved cameras come bac
 Leave `go2rtc.exe` out on purpose if you want to show this:
 
 1. T3000 still starts and the rest of the app is unchanged.
-2. **Tools → Cameras (NVR)** still opens a Cameras window (no crash).
+2. **Tools → CCTV** still opens a CCTV window (no crash).
 3. The sidecar panel is **red** and says `go2rtc.exe was not found. T3000 is running normally.`
 4. It lists the folders to drop the file into, plus the official zip URL.
 5. You can still use every other T3000 tool.
 
-Drop `go2rtc.exe` into one of those folders, close Cameras, open it again — no reinstall.
+Drop `go2rtc.exe` into one of those folders, close CCTV, open it again — no reinstall.
 
 ---
 
@@ -150,7 +150,7 @@ Drop `go2rtc.exe` into one of those folders, close Cameras, open it again — no
 
 | Process | Bind | Port | Used for |
 | --- | --- | --- | --- |
-| go2rtc | 127.0.0.1 | **9191** | Cameras page + API |
+| go2rtc | 127.0.0.1 | **9191** | CCTV page + API |
 | go2rtc | 127.0.0.1 | 9192 | RTSP republish |
 | go2rtc | 127.0.0.1 | 9193 | WebRTC |
 | MediaMTX | 127.0.0.1 | 9194 / 9196 / 9197 | Optional; later record/playback |
@@ -163,7 +163,7 @@ Already taken by T3000 and **left alone**:
 | **9104** | Rust WebSocket |
 | **3003** | Quasar / T3000Webview dev UI |
 
-If something else already owns **9191** and it is not go2rtc, Cameras opens offline and tells you the port is in use.
+If something else already owns **9191** and it is not go2rtc, CCTV opens offline and tells you the port is in use.
 
 Config written on each open: `%LOCALAPPDATA%\T3000\nvr\` (`go2rtc.yaml`, `mediamtx.yml`, `www\index.html`).
 
@@ -173,7 +173,7 @@ Config written on each open: `%LOCALAPPDATA%\T3000\nvr\` (`go2rtc.yaml`, `mediam
 
 - [ ] Branch `cursor/onvif-nvr-sidecar-dd58` built Win32 in VS2019
 - [ ] `go2rtc.exe` sitting next to `T3000.exe` or in `sidecar\`
-- [ ] **Tools → Cameras (NVR)** opens
+- [ ] **Tools → CCTV** opens
 - [ ] Green **go2rtc :9191**
 - [ ] ONVIF **Discover** or a pasted `rtsp://...` shows **live video**
-- [ ] (Optional) Hide `go2rtc.exe` and reopen Cameras — red message, T3000 still works
+- [ ] (Optional) Hide `go2rtc.exe` and reopen CCTV — red message, T3000 still works

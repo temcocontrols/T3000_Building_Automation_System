@@ -1,7 +1,7 @@
-T3000 NVR sidecar binaries
-==========================
+T3000 CCTV sidecar binaries
+===========================
 
-Windows teammate demo (no installer, no merge): see DEMO.md at the repo root.
+Windows teammate demo (no installer, no merge): see DEMO.md at the repo root. Open Tools → CCTV.
 
 Drop go2rtc.exe here (and optionally mediamtx.exe). Official zips:
 

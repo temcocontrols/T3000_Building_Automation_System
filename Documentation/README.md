@@ -8,7 +8,7 @@ Technical plans, integration guides, and reference material for the T3000 Buildi
 
 ## Technical reference
 
-- [Cameras / NVR Windows demo](../DEMO.md) — checkout, build, drop go2rtc, open Tools → Cameras, ONVIF/RTSP.
-- [Cameras / NVR first slice](nvr.md) — go2rtc + MediaMTX sidecars, ports, Cameras WebView, installer notes.
+- [CCTV Windows demo](../DEMO.md) — checkout, build, drop go2rtc, open Tools → CCTV, ONVIF/RTSP.
+- [CCTV first slice](nvr.md) — go2rtc + MediaMTX sidecars, ports, CCTV WebView, installer notes.
 - [WireGuard Modbus Register Map](WireGuard%20Modbus%20Register%20Map.md) — Modbus register interface for WireGuard VPN configuration on T3 ESP32 controllers.
 - [Rebrand guide](rebrand.md) — How to extract custom names into `AppConfig.props` for software rebranding.

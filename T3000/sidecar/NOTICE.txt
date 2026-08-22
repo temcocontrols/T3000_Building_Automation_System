@@ -1,5 +1,5 @@
-T3000 NVR sidecars
-==================
+T3000 CCTV sidecars
+===================
 
 This folder is for optional MIT-licensed companion processes. They are not
 linked into T3000.exe or t3_webview_api.dll.

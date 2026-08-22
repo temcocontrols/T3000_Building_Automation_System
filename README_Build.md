@@ -51,11 +51,11 @@ Launching a Build
   
    Once the compilation is successful, the output files (executable, libraries, etc.) will be generated in the appropriate directory. By default, for the Release configuration, you can find the output files in the "Release" folder within your project directory.
 
-Cameras / NVR sidecars (optional)
+CCTV sidecars (optional)
 ---------------------------------
 Live view uses `go2rtc.exe` (and optionally `mediamtx.exe`) as localhost processes. They are not required to compile T3000.
 
-**Windows teammate demo (this branch):** [DEMO.md](DEMO.md) — checkout, Win32 build, official zip links, Tools → Cameras, ONVIF/RTSP, missing-exe behavior.
+**Windows teammate demo (this branch):** [DEMO.md](DEMO.md) — checkout, Win32 build, official zip links, Tools → CCTV, ONVIF/RTSP, missing-exe behavior.
 
 Short version after a successful build:
 
@@ -63,7 +63,7 @@ Short version after a successful build:
 powershell -ExecutionPolicy Bypass -File tools\fetch-nvr-sidecars.ps1
 ```
 
-or drop `go2rtc.exe` from https://github.com/AlexxIT/go2rtc/releases/download/v1.9.14/go2rtc_win64.zip into `T3000 Output\release\sidecar\`. Then start T3000 and open **Tools → Cameras (NVR)**.
+or drop `go2rtc.exe` from https://github.com/AlexxIT/go2rtc/releases/download/v1.9.14/go2rtc_win64.zip into `T3000 Output\release\sidecar\`. Then start T3000 and open **Tools → CCTV**.
 
 * **Test the Application:**
   

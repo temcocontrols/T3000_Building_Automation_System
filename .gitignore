@@ -954,6 +954,6 @@ build/ALL_BUILD.vcxproj
 /T3000/Database
 T3000Controls/project.lock.json
 
-# NVR sidecar binaries (downloaded; MIT, not vendored)
+# CCTV sidecar binaries (downloaded; MIT, not vendored)
 T3000/sidecar/*.exe
 T3000/sidecar/*.zip

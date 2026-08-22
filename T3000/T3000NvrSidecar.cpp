@@ -498,7 +498,7 @@ T3000NvrLaunchResult T3000Nvr_StartSidecars()
 		else
 		{
 			r.go2rtcPortBusy = true;
-			r.message = _T("Port 127.0.0.1:9191 is in use by another program. Close it or change the T3000 NVR ports.");
+			r.message = _T("Port 127.0.0.1:9191 is in use by another program. Close it or change the T3000 CCTV ports.");
 			r.viewUrl = OfflineViewUrl(r.message);
 			return r;
 		}
@@ -512,7 +512,7 @@ T3000NvrLaunchResult T3000Nvr_StartSidecars()
 			r.go2rtcMissing = true;
 			r.message.Format(
 				_T("go2rtc.exe was not found. T3000 is running normally.\r\n\r\n")
-				_T("Drop go2rtc.exe here and reopen Tools > Cameras (NVR):\r\n")
+				_T("Drop go2rtc.exe here and reopen Tools > CCTV:\r\n")
 				_T("  %s\\sidecar\\go2rtc.exe\r\n")
 				_T("  %s\\go2rtc.exe\r\n")
 				_T("or in the source tree: T3000\\sidecar\\go2rtc.exe\r\n\r\n")
@@ -580,7 +580,7 @@ T3000NvrLaunchResult T3000Nvr_StartSidecars()
 			if (r.go2rtcAlreadyRunning)
 				r.message = _T("Using go2rtc already listening on 127.0.0.1:9191.");
 			else
-				r.message = _T("Cameras sidecar started (go2rtc on 127.0.0.1:9191).");
+				r.message = _T("CCTV sidecar started (go2rtc on 127.0.0.1:9191).");
 			if (r.mediamtxMissing)
 				r.message += _T(" MediaMTX is not installed yet (optional for live view).");
 		}

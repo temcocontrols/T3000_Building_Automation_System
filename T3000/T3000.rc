@@ -11526,7 +11526,7 @@ BEGIN
         MENUITEM "Modbus Poll",                 ID_DATABASE_MBPOLL
         MENUITEM "Register Viewer",             ID_TOOL_REGISTERVIEWER
         MENUITEM "Modbus Register v2 ( beta )", ID_WEBVIEW_MODBUSREGISTER
-        MENUITEM "Cameras (NVR)",               ID_TOOLS_CAMERAS
+        MENUITEM "CCTV",                        ID_TOOLS_CAMERAS
         MENUITEM "RegisterList Database Folder", ID_FILE_EXPORTREGISETERSLIST1
         MENUITEM "Load firmware for a single device    [Ctrl+F2]", ID_TOOL_ISPTOOLFORONE
         MENUITEM "Load firmware for many devices [Ctrl+M]", ID_FILE_BATCHBURNHEX, INACTIVE

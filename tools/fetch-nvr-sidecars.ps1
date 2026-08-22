@@ -1,4 +1,4 @@
-# Download MIT-licensed NVR sidecars for T3000 (not committed to git).
+# Download MIT-licensed CCTV sidecars for T3000 (not committed to git).
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File tools\fetch-nvr-sidecars.ps1
 #   powershell -ExecutionPolicy Bypass -File tools\fetch-nvr-sidecars.ps1 -OutDir "T3000 Output\release\sidecar"

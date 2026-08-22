@@ -1,6 +1,6 @@
-# T3000 Cameras / NVR (first slice)
+# T3000 CCTV (first slice)
 
-**Windows demo (do not merge until teammates have seen it):** follow **[DEMO.md](../DEMO.md)** — checkout, VS2019 Win32 build, where to drop `go2rtc.exe`, Tools → Cameras, ONVIF/RTSP, success vs missing-exe.
+**Windows demo (do not merge until teammates have seen it):** follow **[DEMO.md](../DEMO.md)** — checkout, VS2019 Win32 build, where to drop `go2rtc.exe`, Tools → CCTV, ONVIF/RTSP, success vs missing-exe.
 
 Temco customers get cameras plus building automation in one T3000 install. v1 launches localhost sidecar processes, discovers ONVIF cameras, and shows live video in the existing WebView2 host. Motion detection, AI, mobile apps, full timeline playback, and cloud relay are out of scope.
 
@@ -11,8 +11,8 @@ T3000.exe stays 32-bit MFC. Sidecars are **separate processes** (64-bit is fine)
 | Piece | Location | Notes |
 | --- | --- | --- |
 | Launcher / lifecycle | `T3000/T3000NvrSidecar.cpp` | `CreateProcess`, job object, port checks |
-| Cameras UI | `T3000/ResourceFile/nvr/index.html` | Self-contained page (T3000Webview is a submodule) |
-| Menu entry | Tools → **Cameras (NVR)** | Opens WebView2 |
+| CCTV UI | `T3000/ResourceFile/nvr/index.html` | Self-contained page (T3000Webview is a submodule) |
+| Menu entry | Tools → **CCTV** | Opens WebView2 |
 | Fetch script | `tools/fetch-nvr-sidecars.ps1` | Downloads MIT binaries for devs / CI |
 | Sidecar folder | `T3000/sidecar/` | Place `go2rtc.exe` and `mediamtx.exe` here |
 
@@ -47,8 +47,10 @@ You can also drop the exes next to `T3000.exe` or under `nvr\`. Search order:
 1. `{T3000.exe dir}\sidecar\go2rtc.exe` (same for `mediamtx.exe`)
 2. `{T3000.exe dir}\go2rtc.exe`
 3. `{T3000.exe dir}\nvr\go2rtc.exe`
+4. `{T3000.exe dir}\..\..\T3000\sidecar\` (source tree when running from `T3000 Output\`)
+5. `{T3000.exe dir}\..\T3000\sidecar\`
 
-T3000 still builds and runs if the exes are missing. Opening Cameras shows a clear message in the WebView.
+T3000 still builds and runs if the exes are missing. Opening CCTV shows a clear message in the WebView (see [DEMO.md](../DEMO.md) §6).
 
 ## Ports (127.0.0.1 only)
 
@@ -67,9 +69,9 @@ Do not use 9103 (Rust HTTP), 9104 (Rust WS), or 3003 (Quasar dev).
 
 Generated under `%LOCALAPPDATA%\T3000\nvr\` (same LocalAppData root as WebView2's `T3000` user-data folder):
 
-- `go2rtc.yaml` — rewritten on each Cameras launch
+- `go2rtc.yaml` — rewritten on each CCTV launch
 - `mediamtx.yml` — record/playback hook (`record` stays commented)
-- `www\index.html` — copy of the Cameras page served by go2rtc `static_dir`
+- `www\index.html` — copy of the CCTV page served by go2rtc `static_dir`
 - `cameras.json` — persisted camera list (also kept in WebView `localStorage`)
 - `recordings\` — reserved for MediaMTX
 
@@ -77,9 +79,9 @@ Generated under `%LOCALAPPDATA%\T3000\nvr\` (same LocalAppData root as WebView2'
 
 1. Build T3000 (VS2019, Win32, Release or Debug) with or without sidecar exes.
 2. Fetch or copy `go2rtc.exe` into `sidecar\` (and optionally `mediamtx.exe`).
-3. Run T3000 and choose **Tools → Cameras (NVR)**.
+3. Run T3000 and choose **Tools → CCTV**.
 4. T3000 starts go2rtc (and MediaMTX if present), then opens WebView2 at `http://127.0.0.1:9191/index.html`.
-5. Closing the Cameras window stops processes T3000 started. Exit of T3000 also stops them. An already-running go2rtc on 9191 is reused and not killed.
+5. Closing the CCTV window stops processes T3000 started. Exit of T3000 also stops them. An already-running go2rtc on 9191 is reused and not killed.
 
 ## Point at a camera
 

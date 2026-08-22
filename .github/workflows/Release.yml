@@ -85,7 +85,7 @@ jobs:
           xcopy "T3000Webview\dist\spa\" "T3000 Output\release\ResourceFile\webview\www\" /E /H /C /I /y
           xcopy "T3000Webview\api\target\i686-pc-windows-msvc\release\t3_webview_api.dll" "T3000 Output\release\" /Y
           xcopy "T3000Webview\api\target\i686-pc-windows-msvc\release\t3_webview_api.dll.lib" "T3000 Output\release\" /Y
-          # NVR Cameras UI. Sidecar exes are optional MIT processes (go2rtc / MediaMTX).
+          # CCTV UI. Sidecar exes are optional MIT processes (go2rtc / MediaMTX).
           # T3000.aip is unchanged; AddFolder of the release tree installs this folder.
           xcopy "T3000\ResourceFile\nvr\" "T3000 Output\release\ResourceFile\nvr\" /E /H /C /I /y
           if exist "T3000\sidecar\go2rtc.exe" (
@@ -97,7 +97,7 @@ jobs:
             copy /Y "T3000\sidecar\mediamtx.exe" "T3000 Output\release\sidecar\"
           )
 
-      - name: Fetch NVR sidecars (optional MIT exes for the MSI)
+      - name: Fetch CCTV sidecars (optional MIT exes for the MSI)
         continue-on-error: true
         shell: pwsh
         run: |

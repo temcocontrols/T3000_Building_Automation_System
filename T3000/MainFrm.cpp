@@ -16575,7 +16575,7 @@ void CMainFrame::OnToolsCameras()
 	if (check_webview_runtime() == 0)
 	{
 		const int answer = AfxMessageBox(
-			_T("Cameras needs the Microsoft Edge WebView2 Runtime.\r\nDownload it from https://developer.microsoft.com/microsoft-edge/webview2/"),
+			_T("CCTV needs the Microsoft Edge WebView2 Runtime.\r\nDownload it from https://developer.microsoft.com/microsoft-edge/webview2/"),
 			MB_YESNO | MB_ICONWARNING);
 		if (answer == IDYES)
 		{
@@ -16590,7 +16590,7 @@ void CMainFrame::OnToolsCameras()
 	SetPaneString(BAC_SHOW_MISSION_RESULTS, launch.message);
 
 	CString webviewUrl = launch.viewUrl;
-	CString webviewTitle = _T("Cameras");
+	CString webviewTitle = _T("CCTV");
 	auto webviewwindow = new BacnetWebViewAppWindow(
 		IDM_CREATION_MODE_WINDOWED,
 		wstring(webviewUrl),
