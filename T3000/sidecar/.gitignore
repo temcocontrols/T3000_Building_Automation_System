@@ -6,3 +6,10 @@
 !NOTICE.txt
 !.gitignore
 !README.txt
+
+# Simulated job-site feeds (keep yaml + clips)
+!go2rtc-sim.yaml
+!start-sim.ps1
+!SIM.md
+!sim/
+!sim/*.mp4

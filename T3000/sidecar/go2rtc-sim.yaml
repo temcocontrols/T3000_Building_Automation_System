@@ -1,0 +1,14 @@
+# Simulated inward job-site cameras for T3000 CCTV tests.
+# Do not bind 9191/9192 — Project Management already uses 9192.
+api:
+  listen: "127.0.0.1:9291"
+rtsp:
+  listen: "127.0.0.1:9292"
+webrtc:
+  listen: "127.0.0.1:9293"
+
+streams:
+  sim-north: ffmpeg:sim/north.mp4#video=h264
+  sim-east: ffmpeg:sim/east.mp4#video=h264
+  sim-south: ffmpeg:sim/south.mp4#video=h264
+  sim-west: ffmpeg:sim/west.mp4#video=h264
