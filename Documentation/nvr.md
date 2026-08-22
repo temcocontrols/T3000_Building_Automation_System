@@ -1,5 +1,7 @@
 # T3000 Cameras / NVR (first slice)
 
+**Windows demo (do not merge until teammates have seen it):** follow **[DEMO.md](../DEMO.md)** — checkout, VS2019 Win32 build, where to drop `go2rtc.exe`, Tools → Cameras, ONVIF/RTSP, success vs missing-exe.
+
 Temco customers get cameras plus building automation in one T3000 install. v1 launches localhost sidecar processes, discovers ONVIF cameras, and shows live video in the existing WebView2 host. Motion detection, AI, mobile apps, full timeline playback, and cloud relay are out of scope.
 
 T3000.exe stays 32-bit MFC. Sidecars are **separate processes** (64-bit is fine) talking HTTP on 127.0.0.1. Do not load go2rtc or MediaMTX as a DLL into T3000.exe.

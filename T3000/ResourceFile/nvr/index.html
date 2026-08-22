@@ -438,7 +438,13 @@
         if (qs.get("offline") === "1") {
           setPill("pill-go2rtc", false, "go2rtc missing");
           setPill("pill-mtx", false, "MediaMTX off");
-          showMsg(qs.get("reason") || "Sidecar is not running. Install go2rtc.exe next to T3000.exe or under sidecar\\ and reopen Cameras.", "err");
+          var reason = qs.get("reason") || (
+            "go2rtc.exe was not found. T3000 is still running.\n\n" +
+            "Drop go2rtc.exe next to T3000.exe, in sidecar\\go2rtc.exe, or in T3000\\sidecar\\, then reopen Tools > Cameras (NVR).\n" +
+            "Download: https://github.com/AlexxIT/go2rtc/releases/download/v1.9.14/go2rtc_win64.zip\n" +
+            "See DEMO.md"
+          );
+          showMsg(reason, "err");
           loadLocal();
           if (cameras.length) renderTiles();
           return;

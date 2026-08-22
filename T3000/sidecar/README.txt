@@ -1,9 +1,16 @@
 T3000 NVR sidecar binaries
 ==========================
 
-Drop go2rtc.exe and (optionally) mediamtx.exe in this folder.
+Windows teammate demo (no installer, no merge): see DEMO.md at the repo root.
+
+Drop go2rtc.exe here (and optionally mediamtx.exe). Official zips:
+
+  https://github.com/AlexxIT/go2rtc/releases/download/v1.9.14/go2rtc_win64.zip
+  https://github.com/bluenviron/mediamtx/releases/download/v1.20.1/mediamtx_v1.20.1_windows_amd64.zip
+
+Or:
 
   powershell -ExecutionPolicy Bypass -File ..\..\tools\fetch-nvr-sidecars.ps1
 
-See Documentation/nvr.md for ports, lifecycle, and installer notes.
+Then either rebuild, or copy the exes next to T3000.exe / T3000 Output\release\sidecar\.
 Do not commit the .exe files.

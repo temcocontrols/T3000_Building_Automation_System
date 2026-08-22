@@ -53,13 +53,17 @@ Launching a Build
 
 Cameras / NVR sidecars (optional)
 ---------------------------------
-Live view uses `go2rtc.exe` (and optionally `mediamtx.exe`) as localhost processes. They are not required to compile T3000. After a successful build:
+Live view uses `go2rtc.exe` (and optionally `mediamtx.exe`) as localhost processes. They are not required to compile T3000.
+
+**Windows teammate demo (this branch):** [DEMO.md](DEMO.md) — checkout, Win32 build, official zip links, Tools → Cameras, ONVIF/RTSP, missing-exe behavior.
+
+Short version after a successful build:
 
 ```
 powershell -ExecutionPolicy Bypass -File tools\fetch-nvr-sidecars.ps1
 ```
 
-Then start T3000 and open **Tools → Cameras (NVR)**. Details: [Documentation/nvr.md](Documentation/nvr.md).
+or drop `go2rtc.exe` from https://github.com/AlexxIT/go2rtc/releases/download/v1.9.14/go2rtc_win64.zip into `T3000 Output\release\sidecar\`. Then start T3000 and open **Tools → Cameras (NVR)**.
 
 * **Test the Application:**
   

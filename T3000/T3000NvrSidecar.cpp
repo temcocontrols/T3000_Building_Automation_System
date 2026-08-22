@@ -458,15 +458,22 @@ CString T3000Nvr_GetConfigDir()
 CString T3000Nvr_FindSidecarExe(LPCTSTR fileName)
 {
 	const CString exeDir = ExeDir();
+	// Runtime next to T3000.exe first, then the source-tree sidecar folder so a
+	// teammate can drop go2rtc.exe in T3000\sidecar\ without a rebuild.
 	const CString candidates[] = {
 		exeDir + _T("\\sidecar\\") + fileName,
 		exeDir + _T("\\") + fileName,
 		exeDir + _T("\\nvr\\") + fileName,
+		exeDir + _T("\\..\\..\\T3000\\sidecar\\") + fileName,
+		exeDir + _T("\\..\\T3000\\sidecar\\") + fileName,
 	};
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 5; ++i)
 	{
-		if (FileExists(candidates[i]))
-			return candidates[i];
+		TCHAR full[MAX_PATH] = { 0 };
+		if (GetFullPathName(candidates[i], MAX_PATH, full, NULL) == 0)
+			continue;
+		if (FileExists(full))
+			return CString(full);
 	}
 	return CString();
 }
@@ -503,7 +510,15 @@ T3000NvrLaunchResult T3000Nvr_StartSidecars()
 		if (go2rtc.IsEmpty())
 		{
 			r.go2rtcMissing = true;
-			r.message = _T("go2rtc.exe was not found. Place it next to T3000.exe or in a sidecar\\ folder. See Documentation/nvr.md.");
+			r.message.Format(
+				_T("go2rtc.exe was not found. T3000 is running normally.\r\n\r\n")
+				_T("Drop go2rtc.exe here and reopen Tools > Cameras (NVR):\r\n")
+				_T("  %s\\sidecar\\go2rtc.exe\r\n")
+				_T("  %s\\go2rtc.exe\r\n")
+				_T("or in the source tree: T3000\\sidecar\\go2rtc.exe\r\n\r\n")
+				_T("Windows zip: https://github.com/AlexxIT/go2rtc/releases/download/v1.9.14/go2rtc_win64.zip\r\n")
+				_T("Step-by-step: DEMO.md"),
+				ExeDir().GetString(), ExeDir().GetString());
 			r.viewUrl = OfflineViewUrl(r.message);
 		}
 		else
