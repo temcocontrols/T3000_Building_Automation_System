@@ -13,3 +13,5 @@
 !SIM.md
 !sim/
 !sim/*.mp4
+
+!test-sim.ps1
