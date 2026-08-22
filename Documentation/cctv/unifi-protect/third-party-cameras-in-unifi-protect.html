@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Third-Party Cameras in UniFi Protect</title>
+  <meta name="source" content="https://help.ui.com/hc/en-us/articles/26301104828439-Third-Party-Cameras-in-UniFi-Protect">
+</head>
+<body>
+  <!-- Official article HTML from https://help.ui.com/api/v2/help_center/en-us/articles/26301104828439.json. Source: https://help.ui.com/hc/en-us/articles/26301104828439-Third-Party-Cameras-in-UniFi-Protect -->
+  <p><strong>Official source:</strong> <a href="https://help.ui.com/hc/en-us/articles/26301104828439-Third-Party-Cameras-in-UniFi-Protect">https://help.ui.com/hc/en-us/articles/26301104828439-Third-Party-Cameras-in-UniFi-Protect</a></p>
+  <article>
+    <h1>Third-Party Cameras in UniFi Protect</h1>
+    <p>UniFi Protect simplifies the integration of ONVIF-compatible third-party cameras, making it easy to incorporate your existing security infrastructure into the UniFi ecosystem. This flexibility allows you to gradually transition to a UniFi-only setup at your own pace, ensuring a smooth upgrade path without needing to replace all your cameras at once.</p><p>This guide will help you incorporate these cameras into your UniFi setup, enabling live view and playback while gradually upgrading your equipment.</p><h2 id="h_01J7GZ3T0SNNWN0XZJHFAJZV39">Preparing a Third-Party Camera</h2><ol>
+<li data-list-item-id="e7ff9fbc6bd72a5b82fa72686247177f8">Reference the OEM user manual for instructions on how to set up a specific camera. Generic steps are provided below. </li>
+<li data-list-item-id="e811b27c282ceb7f610f3577652ba4fa5">Connect the camera to the network and lookup the camera IP address in the UniFi Network app. <ol><li data-list-item-id="e3bc8e66f6b3aa8b90523db865e0e73ee">Certain camera models ship with a static default IP Address. Connect one camera at a time to ensure there are no IP address conflicts. </li></ol>
+</li>
+<li data-list-item-id="e6f091fb5e9d29c3c880dcc155c785ba8">In your browser, navigate to the camera’s local web server. </li>
+<li data-list-item-id="ef373b859a90cda0ab464705258c3e878">Log in to the camera with default credentials and configure a username and password. </li>
+<li data-list-item-id="ee94803530a738b1e9c97da28dd97daa0"><span id="docs-internal-guid-2718cc8b-7fff-c116-aea0-43202fe0b40d">Check if the camera requires a firmware update. Apply any updates available.</span></li>
+<li data-list-item-id="efe3a941b80d04cfe7a3988c80f74a505">Enable ONVIF in the camera and configure an ONVIF username and password. This is enabled automatically on some cameras and the global username and password are used.</li>
+<li data-list-item-id="e7a5f1ee4623f9623ae02c649935bd07c">Configure the date, time, and timezone on the camera. Some cameras will fail authentication if the time is not set correctly.<ol><li data-list-item-id="e81386b24c3b19f4ab88c234fd044253e">If applicable, ensure the authentication is set to <code>Digest&amp;ws-username token</code>
+</li></ol>
+</li>
+</ol><h2 id="h_01J7GZ48XZZZ4JQPA7T550Z66H">Adopting Third-Party Cameras in UniFi Protect</h2><ol>
+<li data-list-item-id="eeb3eb41bf310549ebeca1eccef940e30">Open UniFi Protect and go to <em>Settings &gt; System</em>. </li>
+<li data-list-item-id="e96050a945cf01a9fdb871646d4f73dab">Enable <strong>Discover Third-Party Cameras</strong>.</li>
+<li data-list-item-id="ec0b1f48ae8026a79070e6e89925d59fd">Navigate to the UniFi Devices page. Third-party cameras should appear in the list ready for adoption. </li>
+<li data-list-item-id="e865db0a5e70657dbdd464f64556e77df">Select <strong>Click to Adopt</strong>
+</li>
+<li data-list-item-id="e832db5fa7eba8baa377ed7bff1b95d59">In the popup, enter the previously configured camera credentials. </li>
+<li data-list-item-id="e3f14fd6b1d1275f113e35866ceea322f">If the authentication is successful, the camera will be added to the UniFi devices list and the stream will appear in the Dashboard. </li>
+</ol><h2 id="h_01JKRCJPTYAJAQT58VE3XXJ93K">Camera Functionality</h2><ol>
+<li data-list-item-id="e1e43c6e0b79e01d53f3a87a68f5775b1">The Protect application automatically detects the highest and lowest quality streams provided by the camera. These are shown as HQ and LQ within Protect. <ol>
+<li data-list-item-id="e8ba37156b85bfaf688e8e724e6fb341a">LQ is used for multi views and playback when switched to LQ. </li>
+<li data-list-item-id="e61c7cf8a67a6b911262e12ce5263906b">HQ is used for HQ live view and playback.</li>
+</ol>
+</li>
+<li data-list-item-id="e94e3f19922af6468cee1c5b061822a97">Motion detections, PTZ control, and Audio are supported on third party cameras.  Other advanced features are not supported. <ol>
+<li data-list-item-id="e9262a569dcc6758a1c00e16e3da7218e">Enabling audio on third party cameras requires transcoding and may use additional console resources. </li>
+<li data-list-item-id="e7f9258160aa23823c57f9c301cbf1cfe">Motion detections must be configured on the camera and sent to Protect. </li>
+</ol>
+</li>
+<li data-list-item-id="e0f9be00395082bef3285fb78ec9bf7a0">The streams are configured in the third party camera setup tool. If the streams are adjusted after adopting, the camera must be removed and re-added to Protect for the updates to appear.</li>
+</ol><h2 id="h_01J7GZ4FQYZXEJ9TJ2KC3THE7R">Troubleshooting</h2><h3 id="h_01J7GZ4NYPCA73BEQM6A9SN8RN">Camera Does Not Appear in UniFi Devices List</h3><ul>
+<li data-list-item-id="ed8d974582323ca48c5407b06595b8093">
+<strong>Network Check</strong>: Ensure the camera is on the same network as the UniFi NVR.</li>
+<li data-list-item-id="e88f3253aafc692efe40e46db48765b8a">
+<strong>ONVIF Enabled</strong>: Verify that ONVIF is enabled on the camera. Refer to the OEM user manual for model-specific instructions.</li>
+<li data-list-item-id="e25a34cfcbeaf7ef1154cc991d5330fc4">
+<span id="docs-internal-guid-e5b9fbb2-7fff-ef40-4dec-110dce0a6175"><strong>Advanced Adoption: </strong></span>If the camera is not on the same subnet as the console it can be adopted using the IP address. Navigate to the help icon in the top left and select Advanced Adoption.</li>
+</ul><h3 id="h_01J7GZ4YNX3S6VKNMEM6EGCJVW">Authentication Fails When Adopting the Camera</h3><ul>
+<li data-list-item-id="e8ba053cfc80ae788355c4989fc31a43d">
+<strong>ONVIF &amp; Credentials</strong>: Double-check that ONVIF is enabled and the credentials entered are correct.</li>
+<li data-list-item-id="e70e600277514641f029fe1f8295c85bf">
+<strong>Date &amp; Time Settings</strong>: Confirm that the camera’s date and time are accurate.</li>
+<li data-list-item-id="e89f7b199abd9d1a3d092efaf0bf0e20d">
+<strong>Hikvision Cameras</strong>: If using Hikvision, change the <strong>Open Network Video Interface Authentication</strong> setting to <code>Digest &amp; ws-username</code> and try again.</li>
+<li data-list-item-id="e707d0b3ab6aee5a7cda56bc1c793d239">
+<strong>Sony Cameras:</strong> Ensure there are video encoders enabled for each profile in <em>Camera UI &gt; Settings &gt; Video/Audio &gt; Video codec</em>.</li>
+<li data-list-item-id="e7f9f121e6f2c8b6ba648e19d2db6e0f5">
+<strong>Test Connection</strong>: Use a third-party application to test the camera’s ONVIF connection. Several smartphone apps are available for this purpose.</li>
+<li data-list-item-id="eb725184458170d7fec30a0a239ef047e">
+<strong>Support</strong>: If the third-party app confirms the connection but the issue persists, submit a support ticket on <a href="https://ui.com">ui.com</a>.</li>
+</ul>
+  </article>
+  <p><em>Copyright the original vendor. Saved for internal Temco T3000 CCTV UX inspiration only. Do not treat as Temco documentation.</em></p>
+</body>
+</html>
