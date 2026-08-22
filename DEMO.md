@@ -21,6 +21,8 @@ git checkout cursor/onvif-nvr-sidecar-dd58
 
 Same MFC / x86 / requireAdministrator path as always. Sidecar `.exe` files are **not** required to compile. If the build fails, it is a normal T3000 compile error — see [README_Build.md](README_Build.md).
 
+**Ignore the red GitHub check named “Testing the MSBuild” on this PR.** That workflow has been failing on `master` as well (missing MFC and .NET Framework 4.5.2 targeting pack on `windows-latest`). It dies before compiling `T3000NvrSidecar.cpp`. Your local VS2019 box is the real build.
+
 Built app:
 
 | Config | T3000.exe |
