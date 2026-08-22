@@ -169,6 +169,7 @@ extern void Init_table_bank();
 #include "BacnetRemotePoint.h"
 #include "BacnetSetting.h"
 #include "BacnetWebView.h"
+#include "T3000NvrSidecar.h"
 #include "BacnetPVar.h"
 
 HANDLE h_create_webview_server_thread = NULL;
@@ -394,6 +395,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
         ON_MESSAGE(WM_WRITE_INTO_NEW_DEVICE, HandleWriteNewDevice)
         ON_COMMAND(ID_WEBVIEW_MODBUSREGISTER, &CMainFrame::OnWebviewModbusregister)
         //ON_COMMAND(ID_WEBVIEW_THIRDPARTYMODBUSDATABASE, &CMainFrame::OnWebviewThirdpartymodbusdatabase)
+        ON_COMMAND(ID_TOOLS_CAMERAS, &CMainFrame::OnToolsCameras)
         ON_COMMAND(ID_TOOLS_LOGINMYACCOUNT, &CMainFrame::OnToolsLoginmyaccount)
         ON_WM_SYSCOMMAND()
         ON_WM_ACTIVATEAPP()
@@ -16565,6 +16567,37 @@ CString GetUserAppDataPath(LPCTSTR lpFolderName = NULL)
         return strPath;
     }
     return _T("");
+}
+
+void CMainFrame::OnToolsCameras()
+{
+	extern int check_webview_runtime();
+	if (check_webview_runtime() == 0)
+	{
+		const int answer = AfxMessageBox(
+			_T("Cameras needs the Microsoft Edge WebView2 Runtime.\r\nDownload it from https://developer.microsoft.com/microsoft-edge/webview2/"),
+			MB_YESNO | MB_ICONWARNING);
+		if (answer == IDYES)
+		{
+			ShellExecute(NULL, _T("open"),
+				_T("https://developer.microsoft.com/en-us/microsoft-edge/webview2/"),
+				NULL, NULL, SW_SHOWNORMAL);
+		}
+		return;
+	}
+
+	const T3000NvrLaunchResult launch = T3000Nvr_StartSidecars();
+	SetPaneString(BAC_SHOW_MISSION_RESULTS, launch.message);
+
+	CString webviewUrl = launch.viewUrl;
+	CString webviewTitle = _T("Cameras");
+	auto webviewwindow = new BacnetWebViewAppWindow(
+		IDM_CREATION_MODE_WINDOWED,
+		wstring(webviewUrl),
+		wstring(webviewTitle));
+	BacnetWebViewAppWindow::RunMessagePump();
+	delete webviewwindow;
+	T3000Nvr_StopSidecars();
 }
 
 void CMainFrame::OnWebviewModbusregister()

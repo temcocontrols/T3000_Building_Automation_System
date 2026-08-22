@@ -3381,6 +3381,7 @@
 #define ID_THIRD_LIST_AND               34088
 #define ID_TOOLS_LOGINMYACCOUNT         34089
 #define ID_TOOLS_WEBVIEW34090           34090
+#define ID_TOOLS_CAMERAS                34093
 #define ID_RENUMBER                     34091
 #define ID_CONTROL_PVAR                 34092
 #define ID_HELP_USING_UPDATE            34904

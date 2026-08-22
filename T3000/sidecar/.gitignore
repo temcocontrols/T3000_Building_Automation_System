@@ -1,0 +1,8 @@
+# Downloaded sidecar binaries — do not vendor
+*.exe
+*.zip
+*.yml
+*.yaml
+!NOTICE.txt
+!.gitignore
+!README.txt

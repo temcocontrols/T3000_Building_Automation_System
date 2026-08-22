@@ -110,7 +110,8 @@
 XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY "$(ProjectDir)ResourceFile" "$(TargetDir)ResourceFile" /E /C /I /D /Y</Command>
+      <Command>XCOPY "$(ProjectDir)ResourceFile" "$(TargetDir)ResourceFile" /E /C /I /D /Y
+IF EXIST "$(ProjectDir)sidecar\*.exe" XCOPY "$(ProjectDir)sidecar\*.exe" "$(TargetDir)sidecar\" /C /I /D /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -155,7 +156,8 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
 XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>XCOPY "$(ProjectDir)ResourceFile" "$(TargetDir)ResourceFile" /E /C /I /D /Y</Command>
+      <Command>XCOPY "$(ProjectDir)ResourceFile" "$(TargetDir)ResourceFile" /E /C /I /D /Y
+IF EXIST "$(ProjectDir)sidecar\*.exe" XCOPY "$(ProjectDir)sidecar\*.exe" "$(TargetDir)sidecar\" /C /I /D /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -232,6 +234,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="BacnetWebView_Exports.cpp" />
+    <ClCompile Include="T3000NvrSidecar.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="Bacnet_Range_Msv.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
@@ -455,6 +458,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     </None>
     <None Include="packages.config" />
     <None Include="ResourceFile\DeviceDatabase.mdb" />
+    <None Include="ResourceFile\nvr\index.html" />
     <None Include="res\AlarmsBrown.bmp" />
     <None Include="res\AlarmsGreen.bmp" />
     <None Include="res\AlarmsRed.bmp" />
@@ -623,6 +627,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClInclude Include="BacnetWebView.h" />
     <ClInclude Include="BacnetWebViewDropTarget.h" />
     <ClInclude Include="BacnetWebViewToolBar.h" />
+    <ClInclude Include="T3000NvrSidecar.h" />
     <ClInclude Include="Bacnet_Include.h" />
     <ClInclude Include="Bacnet_Range_Msv.h" />
     <ClInclude Include="BADO\BADO.h" />

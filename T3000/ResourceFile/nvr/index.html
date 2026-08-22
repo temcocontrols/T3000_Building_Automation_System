@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>T3000 Cameras</title>
+  <style>
+    :root {
+      --navy: #0d2137;
+      --navy-2: #16324f;
+      --accent: #1e6bb8;
+      --accent-hover: #185a9a;
+      --bg: #e8eef2;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #5a6570;
+      --line: #c5d0d8;
+      --ok: #2e7d32;
+      --warn: #c47d00;
+      --err: #b71c1c;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--bg);
+    }
+    header {
+      background: linear-gradient(180deg, var(--navy) 0%, var(--navy-2) 100%);
+      color: #fff;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-height: 48px;
+    }
+    header h1 { font-size: 16px; font-weight: 600; margin: 0; letter-spacing: 0.02em; }
+    header .sub { color: #c5d4e4; font-size: 12px; }
+    .status { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+    .pill {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 3px 10px;
+      font-size: 11px;
+    }
+    .pill.ok { background: #1f6b3a; border-color: #2e8b4f; }
+    .pill.warn { background: #7a5a10; border-color: #c47d00; }
+    .pill.err { background: #7a1f1f; border-color: #b71c1c; }
+    .wrap { padding: 12px 16px 24px; display: grid; grid-template-columns: 320px 1fr; gap: 12px; }
+    @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+    }
+    .panel h2 {
+      margin: 0;
+      padding: 8px 12px;
+      font-size: 13px;
+      background: #f3f6f8;
+      border-bottom: 1px solid var(--line);
+    }
+    .panel .body { padding: 12px; }
+    label { display: block; color: var(--muted); margin: 8px 0 3px; }
+    input, select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      font: inherit;
+    }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      border-radius: 3px;
+      padding: 7px 12px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button:hover { background: var(--accent-hover); }
+    button.secondary { background: #5a6570; }
+    button.secondary:hover { background: #465058; }
+    button.danger { background: #b71c1c; }
+    .row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .msg {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 3px;
+      background: #f4f7fa;
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+    .msg.err { background: #fdecea; color: var(--err); }
+    .msg.warn { background: #fff6e0; color: #7a5200; }
+    .disc { list-style: none; margin: 8px 0 0; padding: 0; }
+    .disc li {
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+    .disc .name { font-weight: 600; }
+    .disc .meta { color: var(--muted); font-size: 12px; word-break: break-all; }
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 12px;
+      padding: 12px;
+    }
+    .tile {
+      background: #000;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      min-height: 220px;
+      position: relative;
+    }
+    .tile video, .tile img { width: 100%; height: 220px; object-fit: contain; background: #000; display: block; }
+    .tile .cap {
+      background: var(--card);
+      padding: 6px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .tile .cap span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .empty { color: var(--muted); padding: 32px 16px; text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>T3000 Cameras</h1>
+      <div class="sub">ONVIF discovery and live view via go2rtc sidecar</div>
+    </div>
+    <div class="status">
+      <span id="pill-go2rtc" class="pill">go2rtc …</span>
+      <span id="pill-mtx" class="pill">MediaMTX …</span>
+    </div>
+  </header>
+  <div class="wrap">
+    <div>
+      <div class="panel">
+        <h2>Sidecar</h2>
+        <div class="body">
+          <div id="sidecar-msg" class="msg">Checking localhost sidecars…</div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:12px">
+        <h2>Add camera</h2>
+        <div class="body">
+          <label>Name</label>
+          <input id="cam-name" placeholder="lobby" />
+          <label>RTSP or ONVIF URL</label>
+          <input id="cam-src" placeholder="rtsp://user:pass@192.168.1.20/Streaming/Channels/101" />
+          <div class="row">
+            <button id="btn-add">Add and play</button>
+            <button id="btn-refresh" class="secondary" type="button">Refresh list</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:12px">
+        <h2>ONVIF discovery</h2>
+        <div class="body">
+          <p class="sub" style="margin:0 0 8px;color:var(--muted)">Scans the local subnet. Enter credentials if the camera requires them, then add.</p>
+          <label>Username</label>
+          <input id="onvif-user" placeholder="admin" />
+          <label>Password</label>
+          <input id="onvif-pass" type="password" />
+          <div class="row">
+            <button id="btn-discover">Discover ONVIF</button>
+          </div>
+          <ul id="disc-list" class="disc"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Live view</h2>
+      <div id="tiles" class="tiles"><div class="empty">Add an RTSP URL or discover an ONVIF camera to start live video.</div></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var qs = new URLSearchParams(location.search);
+      var API = qs.get("api") || (location.protocol === "http:" ? location.origin : "http://127.0.0.1:9191");
+      var cameras = [];
+      var peers = {};
+
+      function $(id) { return document.getElementById(id); }
+      function hostAvailable() {
+        return !!(window.chrome && chrome.webview && chrome.webview.postMessage);
+      }
+      function postHost(obj) {
+        if (hostAvailable()) chrome.webview.postMessage(JSON.stringify(obj));
+      }
+      function setPill(id, ok, label) {
+        var el = $(id);
+        el.className = "pill " + (ok ? "ok" : "err");
+        el.textContent = label;
+      }
+      function showMsg(text, kind) {
+        var el = $("sidecar-msg");
+        el.className = "msg" + (kind ? " " + kind : "");
+        el.textContent = text;
+      }
+      function sanitizeName(name) {
+        return String(name || "").replace(/[^A-Za-z0-9_-]/g, "_").replace(/^_+/, "") || ("cam_" + Date.now());
+      }
+      function persist() {
+        try { localStorage.setItem("t3000.nvr.cameras", JSON.stringify(cameras)); } catch (e) {}
+        postHost({ type: "nvr", cmd: "saveCameras", cameras: cameras });
+      }
+      function loadLocal() {
+        try {
+          var raw = localStorage.getItem("t3000.nvr.cameras");
+          if (raw) cameras = JSON.parse(raw) || [];
+        } catch (e) { cameras = []; }
+      }
+
+      async function api(path, opt) {
+        var r = await fetch(API + path, opt || {});
+        if (!r.ok) throw new Error(path + " HTTP " + r.status);
+        var ct = r.headers.get("content-type") || "";
+        if (ct.indexOf("json") >= 0) return r.json();
+        return r.text();
+      }
+
+      async function putStream(name, src) {
+        var url = API + "/api/streams?name=" + encodeURIComponent(name) + "&src=" + encodeURIComponent(src);
+        var r = await fetch(url, { method: "PUT" });
+        if (!r.ok && r.status !== 400) {
+          r = await fetch(API + "/api/streams", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: name, src: [src] })
+          });
+        }
+        if (!r.ok && r.status !== 200 && r.status !== 400) {
+          throw new Error("Could not register stream " + name + " (" + r.status + ")");
+        }
+      }
+
+      async function playWebRtc(video, src) {
+        var pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+        pc.addTransceiver("video", { direction: "recvonly" });
+        pc.addTransceiver("audio", { direction: "recvonly" });
+        pc.ontrack = function (ev) {
+          if (ev.streams && ev.streams[0]) video.srcObject = ev.streams[0];
+        };
+        var offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        var r = await fetch(API + "/api/webrtc?src=" + encodeURIComponent(src), {
+          method: "POST",
+          headers: { "Content-Type": "application/sdp" },
+          body: offer.sdp
+        });
+        if (!r.ok) throw new Error("webrtc " + r.status);
+        var answer = await r.text();
+        await pc.setRemoteDescription({ type: "answer", sdp: answer });
+        return pc;
+      }
+
+      function playMp4(video, src) {
+        video.srcObject = null;
+        video.src = API + "/api/stream.mp4?src=" + encodeURIComponent(src);
+        video.muted = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        return video.play();
+      }
+
+      async function playTile(video, name) {
+        try {
+          peers[name] = await playWebRtc(video, name);
+          video.muted = true;
+          video.autoplay = true;
+          video.playsInline = true;
+          await video.play().catch(function () {});
+        } catch (e) {
+          try { await playMp4(video, name); }
+          catch (e2) {
+            video.poster = "";
+            video.src = API + "/api/stream.mjpeg?src=" + encodeURIComponent(name);
+          }
+        }
+      }
+
+      function renderTiles() {
+        var box = $("tiles");
+        box.innerHTML = "";
+        if (!cameras.length) {
+          box.innerHTML = '<div class="empty">Add an RTSP URL or discover an ONVIF camera to start live video.</div>';
+          return;
+        }
+        cameras.forEach(function (cam) {
+          var tile = document.createElement("div");
+          tile.className = "tile";
+          var video = document.createElement("video");
+          video.controls = true;
+          video.muted = true;
+          video.autoplay = true;
+          video.playsInline = true;
+          var cap = document.createElement("div");
+          cap.className = "cap";
+          cap.innerHTML = "<span></span>";
+          cap.querySelector("span").textContent = cam.title || cam.name;
+          var rm = document.createElement("button");
+          rm.className = "danger";
+          rm.textContent = "Remove";
+          rm.onclick = function () { removeCam(cam.name); };
+          cap.appendChild(rm);
+          tile.appendChild(video);
+          tile.appendChild(cap);
+          box.appendChild(tile);
+          playTile(video, cam.name);
+        });
+      }
+
+      function upsertCam(name, src, title) {
+        name = sanitizeName(name);
+        var found = cameras.filter(function (c) { return c.name === name; })[0];
+        if (found) { found.src = src; found.title = title || name; }
+        else cameras.push({ name: name, src: src, title: title || name });
+        persist();
+        return name;
+      }
+
+      async function addCam(name, src, title) {
+        if (!src) { showMsg("Enter an RTSP or ONVIF URL.", "err"); return; }
+        name = upsertCam(name || "camera", src, title);
+        try {
+          await putStream(name, src);
+          renderTiles();
+          showMsg("Playing " + name + ".", "");
+        } catch (e) {
+          showMsg(String(e.message || e), "err");
+          renderTiles();
+        }
+      }
+
+      function removeCam(name) {
+        cameras = cameras.filter(function (c) { return c.name !== name; });
+        if (peers[name]) { try { peers[name].close(); } catch (e) {} delete peers[name]; }
+        persist();
+        fetch(API + "/api/streams?src=" + encodeURIComponent(name), { method: "DELETE" }).catch(function () {});
+        renderTiles();
+      }
+
+      function onvifUrl(raw, user, pass) {
+        raw = String(raw || "");
+        if (!raw) return "";
+        if (raw.indexOf("onvif://") !== 0 && raw.indexOf("rtsp://") !== 0) {
+          raw = "onvif://" + raw.replace(/^https?:\/\//, "");
+        }
+        if (user && raw.indexOf("@") < 0) {
+          raw = raw.replace(/^(onvif|rtsp):\/\//, function (m) {
+            return m + encodeURIComponent(user) + ":" + encodeURIComponent(pass || "") + "@";
+          });
+        }
+        return raw;
+      }
+
+      function renderDiscovery(list) {
+        var ul = $("disc-list");
+        ul.innerHTML = "";
+        if (!list || !list.length) {
+          ul.innerHTML = "<li class='meta'>No ONVIF devices answered. Confirm the camera is on this LAN and not isolated from multicast.</li>";
+          return;
+        }
+        list.forEach(function (dev, i) {
+          var url = dev.url || dev.src || dev.xaddr || dev.location || "";
+          var name = dev.name || dev.hardware || ("onvif_" + (i + 1));
+          var li = document.createElement("li");
+          li.innerHTML = "<div class='name'></div><div class='meta'></div>";
+          li.querySelector(".name").textContent = name;
+          li.querySelector(".meta").textContent = url || JSON.stringify(dev);
+          var b = document.createElement("button");
+          b.textContent = "Add";
+          b.style.marginTop = "6px";
+          b.onclick = function () {
+            var src = onvifUrl(url, $("onvif-user").value, $("onvif-pass").value);
+            addCam(name, src, name);
+          };
+          li.appendChild(b);
+          ul.appendChild(li);
+        });
+      }
+
+      async function discover() {
+        $("disc-list").innerHTML = "<li>Scanning…</li>";
+        var paths = ["/api/onvif", "/api/discovery?src=onvif", "/api/discovery"];
+        var lastErr = null;
+        for (var i = 0; i < paths.length; i++) {
+          try {
+            var data = await api(paths[i]);
+            var list = Array.isArray(data) ? data : (data.sources || data.devices || data.items || []);
+            if (data && !Array.isArray(data) && typeof data === "object" && !list.length) {
+              list = Object.keys(data).map(function (k) {
+                var v = data[k] || {};
+                if (typeof v === "string") return { name: k, url: v };
+                v.name = v.name || k;
+                return v;
+              });
+            }
+            renderDiscovery(list);
+            return;
+          } catch (e) { lastErr = e; }
+        }
+        $("disc-list").innerHTML = "";
+        showMsg("ONVIF discovery failed. " + (lastErr && lastErr.message ? lastErr.message : "Is go2rtc running?"), "err");
+      }
+
+      async function refreshFromGo2rtc() {
+        try {
+          var data = await api("/api/streams");
+          if (data && typeof data === "object") {
+            Object.keys(data).forEach(function (name) {
+              if (!cameras.some(function (c) { return c.name === name; })) {
+                var src = "";
+                var rec = data[name];
+                if (rec && rec.producers && rec.producers[0] && rec.producers[0].url)
+                  src = rec.producers[0].url;
+                cameras.push({ name: name, src: src || name, title: name });
+              }
+            });
+            persist();
+          }
+        } catch (e) {}
+        renderTiles();
+      }
+
+      async function init() {
+        if (qs.get("offline") === "1") {
+          setPill("pill-go2rtc", false, "go2rtc missing");
+          setPill("pill-mtx", false, "MediaMTX off");
+          showMsg(qs.get("reason") || "Sidecar is not running. Install go2rtc.exe next to T3000.exe or under sidecar\\ and reopen Cameras.", "err");
+          loadLocal();
+          if (cameras.length) renderTiles();
+          return;
+        }
+        try {
+          await api("/api");
+          setPill("pill-go2rtc", true, "go2rtc :9191");
+          var mtxOk = qs.get("mediamtx") === "1";
+          try {
+            var m = await fetch((qs.get("mtx") || "http://127.0.0.1:9197") + "/v3/config/global/get");
+            mtxOk = m.ok;
+          } catch (e) {}
+          setPill("pill-mtx", mtxOk, mtxOk ? "MediaMTX :9197" : "MediaMTX off");
+          showMsg("Live view is served by go2rtc on 127.0.0.1:9191 (WebRTC, then MP4). MediaMTX is reserved for later record/playback.", mtxOk ? "" : "warn");
+          loadLocal();
+          for (var i = 0; i < cameras.length; i++) {
+            if (cameras[i].src) {
+              try { await putStream(cameras[i].name, cameras[i].src); } catch (e) {}
+            }
+          }
+          await refreshFromGo2rtc();
+        } catch (e) {
+          setPill("pill-go2rtc", false, "go2rtc down");
+          setPill("pill-mtx", false, "MediaMTX off");
+          showMsg("Cannot reach go2rtc at " + API + ". " + (e.message || e), "err");
+        }
+      }
+
+      $("btn-add").onclick = function () {
+        addCam($("cam-name").value, $("cam-src").value.trim(), $("cam-name").value);
+      };
+      $("btn-discover").onclick = discover;
+      $("btn-refresh").onclick = refreshFromGo2rtc;
+      if (hostAvailable()) {
+        chrome.webview.addEventListener("message", function () {});
+      }
+      init();
+    })();
+  </script>
+</body>
+</html>

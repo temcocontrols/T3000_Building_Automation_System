@@ -51,6 +51,16 @@ Launching a Build
   
    Once the compilation is successful, the output files (executable, libraries, etc.) will be generated in the appropriate directory. By default, for the Release configuration, you can find the output files in the "Release" folder within your project directory.
 
+Cameras / NVR sidecars (optional)
+---------------------------------
+Live view uses `go2rtc.exe` (and optionally `mediamtx.exe`) as localhost processes. They are not required to compile T3000. After a successful build:
+
+```
+powershell -ExecutionPolicy Bypass -File tools\fetch-nvr-sidecars.ps1
+```
+
+Then start T3000 and open **Tools → Cameras (NVR)**. Details: [Documentation/nvr.md](Documentation/nvr.md).
+
 * **Test the Application:**
   
    Before distributing or using the compiled application, it's important to test it thoroughly to ensure it behaves as expected. Run the executable generated during the compilation to verify its functionality.

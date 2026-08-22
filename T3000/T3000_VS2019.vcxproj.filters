@@ -867,6 +867,9 @@
     <ClCompile Include="BacnetWebView_Exports.cpp">
       <Filter>Source Files\WebView</Filter>
     </ClCompile>
+    <ClCompile Include="T3000NvrSidecar.cpp">
+      <Filter>Source Files\WebView</Filter>
+    </ClCompile>
     <ClCompile Include="BacnetPvar.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
@@ -2115,6 +2118,9 @@
       <Filter>Header Files\Webview</Filter>
     </ClInclude>
     <ClInclude Include="BacnetWebViewToolBar.h">
+      <Filter>Header Files\Webview</Filter>
+    </ClInclude>
+    <ClInclude Include="T3000NvrSidecar.h">
       <Filter>Header Files\Webview</Filter>
     </ClInclude>
     <ClInclude Include="Json-cpp\dist\json\json.h">

@@ -23,6 +23,7 @@
 #include "BacnetWeeklyRoutine.h"
 #include "BacnetAnnualRoutine.h"
 #include "BacnetWebView.h"
+#include "T3000NvrSidecar.h"
 #include "MainFrm.h"
 #include "JsonHead.h"
 extern "C" {
@@ -870,6 +871,12 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 	std::string message = CT2A(msg);
 	Json::Reader reader;
 	reader.parse(message, json, false);
+	if (json.isMember("type") && json["type"].asString() == "nvr")
+	{
+		T3000Nvr_HandleWebMessage(msg, outmsg);
+		return;
+	}
+
 	int action = json.get("action", Json::nullValue).asInt();
 
 

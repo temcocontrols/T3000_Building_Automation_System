@@ -624,6 +624,7 @@ public:
 #endif
 		afx_msg void OnWebviewModbusregister();
 		//afx_msg void OnWebviewThirdpartymodbusdatabase();
+		afx_msg void OnToolsCameras();
 		afx_msg void OnToolsLoginmyaccount();
 		afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 };

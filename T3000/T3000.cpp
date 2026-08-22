@@ -31,6 +31,7 @@ const unsigned int g_versionNO = 20260717;     // PROJECT_VERSION
 
 
 #include "global_variable.h"
+#include "T3000NvrSidecar.h"
 
 BEGIN_MESSAGE_MAP(CT3000App, CWinAppEx)
 	ON_COMMAND(ID_APP_ABOUT, &CT3000App::OnAppAbout)
@@ -847,6 +848,7 @@ int CT3000App::ExitInstance()
 #ifdef read_prop_multi_function
 	SyncReadState_Cleanup();
 #endif
+	T3000Nvr_StopSidecars();
 	CoUninitialize( );
 	return CWinAppEx::ExitInstance();
 }
