@@ -4,6 +4,10 @@
 $ErrorActionPreference = "Stop"
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $here
+$env:PATH = "$here;" + $env:PATH
+
+Get-Process go2rtc -ErrorAction SilentlyContinue | Stop-Process -Force
+Start-Sleep -Milliseconds 400
 
 $candidates = @(
   (Join-Path $here "go2rtc.exe"),
@@ -16,13 +20,17 @@ if (-not $go2rtc) {
   Write-Host "  powershell -ExecutionPolicy Bypass -File tools\fetch-nvr-sidecars.ps1"
   exit 1
 }
+if (-not (Test-Path (Join-Path $here "ffmpeg.exe"))) {
+  Write-Host "ffmpeg.exe not found next to go2rtc. Put ffmpeg.exe in $here"
+  exit 1
+}
 
 $config = Join-Path $here "go2rtc-sim.yaml"
 Write-Host "Starting $go2rtc"
 Write-Host "Config  $config"
 Write-Host "HTTP    http://127.0.0.1:9291"
-Write-Host "North   rtsp://127.0.0.1:9292/sim-north   (north fence, looking south)"
-Write-Host "East    rtsp://127.0.0.1:9292/sim-east    (east fence, looking west)"
-Write-Host "South   rtsp://127.0.0.1:9292/sim-south   (south gate, looking north)"
-Write-Host "West    rtsp://127.0.0.1:9292/sim-west    (west fence, looking east)"
+Write-Host "North   rtsp://127.0.0.1:9292/sim-north"
+Write-Host "East    rtsp://127.0.0.1:9292/sim-east"
+Write-Host "South   rtsp://127.0.0.1:9292/sim-south"
+Write-Host "West    rtsp://127.0.0.1:9292/sim-west"
 Start-Process -FilePath $go2rtc -ArgumentList @("-config", $config) -WorkingDirectory $here

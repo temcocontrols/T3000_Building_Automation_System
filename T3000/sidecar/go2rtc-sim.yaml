@@ -7,6 +7,9 @@ rtsp:
 webrtc:
   listen: "127.0.0.1:9293"
 
+ffmpeg:
+  bin: ffmpeg.exe
+
 streams:
   sim-north: ffmpeg:sim/north.mp4#video=h264
   sim-east: ffmpeg:sim/east.mp4#video=h264
