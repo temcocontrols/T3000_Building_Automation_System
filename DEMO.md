@@ -12,7 +12,7 @@ Developer background: [Documentation/nvr.md](Documentation/nvr.md).
 
 ```bat
 git fetch origin
-git checkout cursor/onvif-nvr-sidecar-dd58
+git checkout cctv
 ```
 
 1. Open **`T3000 - VS2019.sln`** in Visual Studio 2019.
@@ -171,7 +171,7 @@ Config written on each open: `%LOCALAPPDATA%\T3000\nvr\` (`go2rtc.yaml`, `mediam
 
 ## Quick checklist for the person running the demo
 
-- [ ] Branch `cursor/onvif-nvr-sidecar-dd58` built Win32 in VS2019
+- [ ] Branch `cctv` built Win32 in VS2019
 - [ ] `go2rtc.exe` sitting next to `T3000.exe` or in `sidecar\`
 - [ ] **Tools → CCTV** opens
 - [ ] Green **go2rtc :9191**
