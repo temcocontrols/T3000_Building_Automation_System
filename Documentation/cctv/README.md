@@ -69,3 +69,8 @@ No obsolete UniFi Video PDFs.
 
 - [Windows demo](../../DEMO.md) — checkout `CCTV`, build, drop go2rtc, **Tools → CCTV**
 - [First-slice notes](../nvr.md) — sidecar ports, launcher, installer notes
+
+## Hotspot map
+
+**[hotspot-map.md](hotspot-map.md)** — daily path / hotspot across the four inward sim cameras.
+

@@ -1,0 +1,35 @@
+{
+  "site": "Victoria ICF",
+  "building_id": 1,
+  "building_name": "Default_Building",
+  "day": "2026-08-22",
+  "person": { "id": "demo-a", "name": "Person A", "role": "worker" },
+  "open_site": true,
+  "cameras": [
+    { "id": "sim-north", "title": "NW looking SE", "x": 0.10, "y": 0.10, "facing": "SE" },
+    { "id": "sim-east",  "title": "NE looking SW", "x": 0.90, "y": 0.12, "facing": "SW" },
+    { "id": "sim-south", "title": "SE looking NW", "x": 0.88, "y": 0.88, "facing": "NW" },
+    { "id": "sim-west",  "title": "SW looking NE", "x": 0.12, "y": 0.86, "facing": "NE" }
+  ],
+  "sightings": [
+    { "t": "07:12", "camera": "sim-west",  "x": 0.22, "y": 0.72, "label": "Person A" },
+    { "t": "09:40", "camera": "sim-south", "x": 0.62, "y": 0.70, "label": "Person A" },
+    { "t": "11:05", "camera": "sim-east",  "x": 0.74, "y": 0.38, "label": "Person A" },
+    { "t": "14:20", "camera": "sim-north", "x": 0.34, "y": 0.28, "label": "Person A" },
+    { "t": "16:05", "camera": "sim-west",  "x": 0.28, "y": 0.58, "label": "Person A" }
+  ],
+  "path": [
+    [0.18,0.90],[0.22,0.80],[0.24,0.72],[0.28,0.64],[0.36,0.60],[0.48,0.66],
+    [0.58,0.70],[0.66,0.66],[0.72,0.54],[0.74,0.42],[0.70,0.32],[0.56,0.26],
+    [0.40,0.28],[0.34,0.34],[0.30,0.46],[0.28,0.58],[0.26,0.70],[0.20,0.86]
+  ],
+  "hotspots": [
+    { "x": 0.28, "y": 0.62, "w": 0.9, "label": "rebar / west ICF" },
+    { "x": 0.62, "y": 0.68, "w": 0.7, "label": "south walk" },
+    { "x": 0.74, "y": 0.40, "w": 1.0, "label": "excavator" },
+    { "x": 0.36, "y": 0.30, "w": 0.6, "label": "north ICF" }
+  ],
+  "future_walls": [
+    [[0.32,0.32],[0.68,0.32],[0.68,0.68],[0.32,0.68],[0.32,0.32]]
+  ]
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>T3000 CCTV — Hotspot map</title>
+  <style>
+    html,body{margin:0;height:100%;background:#0a1220;color:#e8eef5;font:13px Segoe UI,Tahoma,sans-serif}
+    header{padding:10px 16px;background:linear-gradient(180deg,#0d2137,#16324f);display:flex;gap:16px;align-items:center}
+    header a{color:#9ec9f0}
+    #map{display:block;width:100%;height:calc(100% - 52px);background:#0a1220}
+  </style>
+</head>
+<body>
+  <header>
+    <div><b>T3000 CCTV</b> · daily path / hotspot · <span id="meta"></span></div>
+    <a href="index.html">Live view</a>
+  </header>
+  <canvas id="map"></canvas>
+  <script>
+  fetch("hotspot-demo.json").then(function(r){return r.json()}).then(draw);
+  function draw(d){
+    document.getElementById("meta").textContent = d.site + "  " + d.day + "  " + d.person.name + "  open site";
+    var c = document.getElementById("map"), x = c.getContext("2d");
+    function fit(){ c.width = c.clientWidth; c.height = c.clientHeight; paint(); }
+    var data = d;
+    function xy(nx,ny){ var p=56,w=c.width-280,h=c.height-80; return [p+nx*w, 40+p+ny*h]; }
+    function paint(){
+      x.fillStyle="#0a1220"; x.fillRect(0,0,c.width,c.height);
+      var a=xy(0,0), b=xy(1,1);
+      x.fillStyle="#2e2a22"; x.fillRect(a[0],a[1],b[0]-a[0],b[1]-a[1]);
+      x.strokeStyle="#8c6030"; x.lineWidth=4; x.strokeRect(a[0],a[1],b[0]-a[0],b[1]-a[1]);
+      var ic= [xy(0.34,0.34),xy(0.66,0.34),xy(0.66,0.66),xy(0.34,0.66)];
+      x.fillStyle="#e6e6de"; x.beginPath(); x.moveTo(ic[0][0],ic[0][1]); ic.slice(1).forEach(function(p){x.lineTo(p[0],p[1])}); x.closePath(); x.fill();
+      (data.hotspots||[]).forEach(function(h){
+        var p=xy(h.x,h.y), r=30+40*(h.w||0.7);
+        var g=x.createRadialGradient(p[0],p[1],4,p[0],p[1],r);
+        g.addColorStop(0,"rgba(255,180,40,0.55)"); g.addColorStop(1,"rgba(255,70,40,0)");
+        x.fillStyle=g; x.beginPath(); x.arc(p[0],p[1],r,0,6.3); x.fill();
+      });
+      x.strokeStyle="#50dcff"; x.lineWidth=4; x.beginPath();
+      (data.path||[]).forEach(function(p,i){ var q=xy(p[0],p[1]); i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]); });
+      x.stroke();
+      (data.cameras||[]).forEach(function(cam){
+        var p=xy(cam.x,cam.y);
+        x.fillStyle="#145aaa"; x.beginPath(); x.arc(p[0],p[1],7,0,6.3); x.fill();
+        x.fillStyle="#c8e6ff"; x.fillText(cam.id, p[0]+10, p[1]-8);
+      });
+      x.strokeStyle="#50ff78";
+      (data.sightings||[]).forEach(function(s){
+        var p=xy(s.x,s.y);
+        x.strokeRect(p[0]-14,p[1]-24,28,34);
+        x.fillStyle="#8fffad"; x.fillText(s.t+" "+s.camera, p[0]+16, p[1]-10);
+      });
+      x.fillStyle="#c8d0dc"; x.fillText("YOLO boxes + daily path. Map grows when walls go up.", 24, 28);
+    }
+    window.addEventListener("resize", fit); fit();
+  }
+  </script>
+</body>
+</html>
