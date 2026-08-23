@@ -1,7 +1,7 @@
 T3000 CCTV sidecar binaries
 ===========================
 
-Windows teammate demo (no installer, no merge): see DEMO.md at the repo root. Open Tools → CCTV.
+Open Tools → CCTV. Merge notes: Documentation\cctv\DEVELOPER.md. Demo: DEMO.md at the repo root.
 
 Drop go2rtc.exe here (and optionally mediamtx.exe). Official zips:
 
@@ -14,3 +14,4 @@ Or:
 
 Then either rebuild, or copy the exes next to T3000.exe / T3000 Output\release\sidecar\.
 Do not commit the .exe files.
+

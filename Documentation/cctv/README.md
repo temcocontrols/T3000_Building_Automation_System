@@ -74,3 +74,7 @@ No obsolete UniFi Video PDFs.
 
 **[hotspot-map.md](hotspot-map.md)** — daily path / hotspot across the four inward sim cameras.
 
+## Merge into T3000
+
+**[DEVELOPER.md](DEVELOPER.md)** — file list, Tools → CCTV hook, DB, sim test. For T3000 engineers.
+

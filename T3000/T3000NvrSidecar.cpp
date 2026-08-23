@@ -312,10 +312,15 @@ namespace
 	{
 		const CString www = configDir + _T("\\www");
 		EnsureDir(www);
-		const CString src = ExeDir() + _T("\\ResourceFile\\nvr\\index.html");
-		const CString dst = www + _T("\\index.html");
-		if (FileExists(src))
-			CopyFile(src, dst, FALSE);
+		const CString srcDir = ExeDir() + _T("\\ResourceFile\\nvr");
+		const TCHAR* names[] = { _T("index.html"), _T("hotspot.html"), _T("hotspot-demo.json") };
+		for (int i = 0; i < 3; ++i)
+		{
+			const CString src = srcDir + _T("\\") + names[i];
+			const CString dst = www + _T("\\") + names[i];
+			if (FileExists(src))
+				CopyFile(src, dst, FALSE);
+		}
 	}
 
 	void EnsureJobObject()
