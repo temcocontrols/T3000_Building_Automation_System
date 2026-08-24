@@ -65,8 +65,14 @@ if ($go2rtcUp) {
 }
 
 New-Item -ItemType Directory -Force -Path "C:\Xdrive\T3000_DVR" | Out-Null
-Start-HiddenScript "dvr-api.ps1"
-Start-Sleep -Milliseconds 400
-Start-HiddenScript "dvr-record.ps1"
+Start-HiddenScript "start-motion-record.ps1"
 Write-Host "DVR API  http://127.0.0.1:9294/settings"
+Write-Host "Events   http://127.0.0.1:9294/events.json"
 Write-Host "DVR store C:\Xdrive\T3000_DVR"
+
+# SADP probe API (inquiry only; does not launch SADPTool.exe)
+$sadp = Join-Path $here "sadp-discover.py"
+if (Test-Path $sadp) {
+  Start-Process -FilePath "python" -ArgumentList @($sadp, "--serve") -WorkingDirectory $here -WindowStyle Hidden
+  Write-Host "SADP    http://127.0.0.1:9295/discover"
+}

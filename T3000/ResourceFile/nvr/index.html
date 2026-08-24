@@ -204,15 +204,15 @@
         </div>
       </div>
       <div class="panel" style="margin-top:12px">
-        <h2>ONVIF discovery</h2>
+        <h2>Discover cameras</h2>
         <div class="body">
-          <p class="sub" style="margin:0 0 8px;color:var(--muted)">Scans the local subnet. Enter credentials if the camera requires them, then add.</p>
+          <p class="sub" style="margin:0 0 8px;color:var(--muted)">SADP probe (Hikvision multicast 37020) plus ONVIF. Does not launch SADPTool. Enter credentials only when adding.</p>
           <label>Username</label>
           <input id="onvif-user" placeholder="admin" />
           <label>Password</label>
           <input id="onvif-pass" type="password" />
           <div class="row">
-            <button id="btn-discover">Discover ONVIF</button>
+            <button id="btn-discover">Discover ONVIF + Hikvision</button>
           </div>
           <ul id="disc-list" class="disc"></ul>
         </div>
@@ -220,7 +220,7 @@
     </div>
     <div class="panel">
       <h2>Live view</h2>
-      <div id="tiles" class="tiles"><div class="empty">Add an RTSP URL or discover an ONVIF camera to start live video.</div></div>
+      <div id="tiles" class="tiles"><div class="empty">Add an RTSP URL or Discover ONVIF + Hikvision.</div></div>
     </div>
   </div>
 
@@ -392,7 +392,7 @@
         var box = $("tiles");
         box.innerHTML = "";
         if (!cameras.length) {
-          box.innerHTML = '<div class="empty">Add an RTSP URL or discover an ONVIF camera to start live video.</div>';
+          box.innerHTML = '<div class="empty">Add an RTSP URL or Discover ONVIF + Hikvision.</div>';
           return;
         }
         cameras.forEach(function (cam) {
@@ -463,25 +463,37 @@
         return raw;
       }
 
+      function hikRtsp(dev, user, pass) {
+        var ip = dev.ip || "";
+        var path = (dev.rtsp || ("rtsp://" + ip + ":554/Streaming/Channels/101"));
+        if (user && path.indexOf("://") >= 0 && path.indexOf("@") < 0) {
+          path = path.replace("://", "://" + encodeURIComponent(user) + ":" + encodeURIComponent(pass || "") + "@");
+        }
+        return path;
+      }
+
       function renderDiscovery(list) {
         var ul = $("disc-list");
         ul.innerHTML = "";
         if (!list || !list.length) {
-          ul.innerHTML = "<li class='meta'>No ONVIF devices answered. Confirm the camera is on this LAN and not isolated from multicast.</li>";
+          ul.innerHTML = "<li class='meta'>No cameras answered the SADP probe or ONVIF. Same LAN, multicast not blocked.</li>";
           return;
         }
         list.forEach(function (dev, i) {
-          var url = dev.url || dev.src || dev.xaddr || dev.location || "";
-          var name = dev.name || dev.hardware || ("onvif_" + (i + 1));
+          var url = dev.rtsp || dev.url || dev.src || dev.xaddr || dev.location || "";
+          var name = dev.name || dev.hardware || ("cam-" + ((dev.ip || "").split(".").pop() || (i + 1)));
+          var kind = dev.src === "sadp" ? "Hikvision SADP" : "ONVIF";
           var li = document.createElement("li");
           li.innerHTML = "<div class='name'></div><div class='meta'></div>";
-          li.querySelector(".name").textContent = name;
-          li.querySelector(".meta").textContent = url || JSON.stringify(dev);
+          li.querySelector(".name").textContent = kind + " · " + name + (dev.ip ? " · " + dev.ip : "");
+          li.querySelector(".meta").textContent = (dev.rtsp || url || "") + (dev.mac ? " · " + dev.mac : "");
           var b = document.createElement("button");
           b.textContent = "Add";
           b.style.marginTop = "6px";
           b.onclick = function () {
-            var src = onvifUrl(url, $("onvif-user").value, $("onvif-pass").value);
+            var user = $("onvif-user").value;
+            var pass = $("onvif-pass").value;
+            var src = dev.src === "sadp" ? hikRtsp(dev, user, pass) : onvifUrl(url, user, pass);
             addCam(name, src, name);
           };
           li.appendChild(b);
@@ -489,10 +501,15 @@
         });
       }
 
-      async function discover() {
-        $("disc-list").innerHTML = "<li>Scanning.</li>";
+      async function discoverSadp() {
+        var r = await fetch("http://127.0.0.1:9295/discover?timeout=3");
+        if (!r.ok) throw new Error("SADP HTTP " + r.status);
+        var data = await r.json();
+        return Array.isArray(data.devices) ? data.devices : [];
+      }
+
+      async function discoverOnvif() {
         var paths = ["/api/onvif", "/api/discovery?src=onvif", "/api/discovery"];
-        var lastErr = null;
         for (var i = 0; i < paths.length; i++) {
           try {
             var data = await api(paths[i]);
@@ -502,15 +519,48 @@
                 var v = data[k] || {};
                 if (typeof v === "string") return { name: k, url: v };
                 v.name = v.name || k;
+                if (!v.src) v.src = "onvif";
                 return v;
               });
             }
-            renderDiscovery(list);
-            return;
-          } catch (e) { lastErr = e; }
+            return list;
+          } catch (e) {}
         }
-        $("disc-list").innerHTML = "";
-        showMsg("ONVIF discovery failed. " + (lastErr && lastErr.message ? lastErr.message : "Is go2rtc running?"), "err");
+        return [];
+      }
+
+      function mergeDiscover(sadpList, onvifList) {
+        var byIp = {};
+        (sadpList || []).forEach(function (d) {
+          var ip = d.ip || "";
+          if (ip) byIp[ip] = d;
+        });
+        (onvifList || []).forEach(function (d) {
+          var url = String(d.url || d.src || d.xaddr || d.location || "");
+          var m = url.match(/(\d+\.\d+\.\d+\.\d+)/);
+          var ip = d.ip || (m ? m[1] : "");
+          if (ip && byIp[ip]) return;
+          d.src = d.src || "onvif";
+          if (ip) d.ip = ip;
+          byIp[ip || ("onvif-" + (d.name || Math.random()))] = d;
+        });
+        return Object.keys(byIp).map(function (k) { return byIp[k]; });
+      }
+
+      async function discover() {
+        $("disc-list").innerHTML = "<li>SADP probe + ONVIF scan.</li>";
+        var sadpList = [];
+        var onvifList = [];
+        var err = "";
+        try { sadpList = await discoverSadp(); } catch (e) { err = e.message || String(e); }
+        try { onvifList = await discoverOnvif(); } catch (e) {}
+        var list = mergeDiscover(sadpList, onvifList);
+        renderDiscovery(list);
+        if (!list.length) {
+          showMsg("No cameras. " + (err || "SADP probe on 37020 and ONVIF both empty."), "err");
+        } else {
+          showMsg("Found " + list.length + " camera" + (list.length === 1 ? "" : "s") + " (SADP " + sadpList.length + ", ONVIF " + onvifList.length + ").", "ok");
+        }
       }
 
       async function refreshFromGo2rtc() {
