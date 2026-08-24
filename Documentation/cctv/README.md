@@ -4,7 +4,7 @@
 
 **[t3000-cctv/T3000_CCTV_User_Manual.md](t3000-cctv/T3000_CCTV_User_Manual.md)** is the T3000 CCTV operator manual (homeowner / building operator). Folder index: [t3000-cctv/README.md](t3000-cctv/README.md).
 
-That book is what Temco ships as product documentation. T3000 CCTV still uses the **go2rtc + MediaMTX** localhost sidecars and **Tools → CCTV**.
+That book is the proposed product manual: Tools → CCTV in T3000, same 9294 Live / Heatmap / People / Events / Settings pages. Figures start with a real T3000 menu bar (not CRM).
 
 Windows demo / build: [DEMO.md](../../DEMO.md). First-slice notes: [nvr.md](../nvr.md).
 
@@ -91,3 +91,4 @@ Pages served by the DVR sidecar (127.0.0.1:9294). CRM #cctv children should ifra
 - DVR Settings: http://127.0.0.1:9294/settings.html
 
 JSON stays at `/settings` and `/timeline`.
+

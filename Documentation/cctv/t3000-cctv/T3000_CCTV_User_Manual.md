@@ -2,212 +2,256 @@
 
 For homeowners and building operators who already run **T3000** on a Windows PC.
 
-This book describes **Tools → CCTV** on branch `CCTV`. It is the Temco product manual. Vendor folders next to this one (UniFi, Reolink, Synology) are inspiration only.
+T3000 CCTV is the camera tool inside T3000. You open it from **Tools → CCTV**. You watch live video, play recordings from the same window, and keep motion clips on a disk on this PC. You do not install a separate NVR program, and you do not open extra viewers.
 
-Figures `images/01`–`09` are labeled placeholders. **Real screenshots live in the pull-request conversation** until a Windows machine captures Tools → CCTV. Placeholder art is empty rooms and a box camera — **no people**.
-
----
-
-## Current vs coming next
-
-| Chapter | In this slice | Coming next |
-| --- | --- | --- |
-| What CCTV is | Cameras inside T3000, localhost sidecars | Cloud, phone app, AI |
-| Tools → CCTV | Menu, CCTV window, sidecar start/stop | Dedicated CCTV workstation mode |
-| First run / go2rtc | Live video after dropping `go2rtc.exe`; clear red panel if it is missing | Bundled installer that always includes the sidecar |
-| ONVIF or RTSP | Discover on the LAN, or paste an RTSP URL | Guided camera wizard, credentials vault |
-| Live view | Tiles (WebRTC, then MP4, then MJPEG) | PTZ joystick, multi-monitor wall |
-| Playback | **Not shipped** | Timeline, clips, export |
-| Events + T3000 alarms | **Not shipped** | Motion / disconnect → T3000 alarm |
-| Recording | Motion-only clips via sidecar (T3000\\sidecar\\recordings). No 24/7 writer. | Timeline, retention UI |
-| Settings | **Not shipped** | Schedules, users, storage |
-
-If a later chapter says **Coming next**, the control is not on the screen yet. Do not look for it in this build.
+The shop or office can also open the same CCTV from Temco CRM. Building operators use **Tools → CCTV** in T3000.
 
 ---
 
 ## 1. What CCTV is
 
-T3000 CCTV is the camera page inside the same T3000 you already use for controllers, graphics, and alarms. You do not install a second NVR program for this first slice.
+T3000 CCTV is the camera page in the same T3000 you already use for controllers, graphics, and alarms.
 
-**What you get today**
+**What you get**
 
 - One menu item: **Tools → CCTV**
-- A window titled **CCTV** that can find ONVIF cameras on your LAN or play an RTSP URL you paste
-- Live video tiles on the T3000 PC
-- Your camera list saved so it comes back the next time you open CCTV
+- Live video in a 2×2 tile wall, with a timeline in that same window
+- Motion-only recording to a local disk on this PC
+- Heatmap, People, Events, and Settings in the same CCTV window
+- Cameras stored per T3000 building, so the site you have open is the site you see
 
-**How it runs (you do not have to manage this every day)**
+**How it runs**
 
-T3000 starts a small helper program named **go2rtc** on this PC only (`127.0.0.1`). Video never uses T3000’s existing ports **9103**, **9104**, or **3003**. Closing the CCTV window stops helpers that T3000 started.
+T3000 starts a small recorder on this PC if it is not already running. Live video, playback, and the CCTV pages all stay on this computer. Closing **Tools → CCTV** returns you to the rest of T3000.
 
-**Coming next:** phone app, off-site relay, motion AI, and a full recorder UI. Those are not in this book’s “current” steps.
+Use only T3000 CCTV to hold camera streams. Close CCTV when you are done. Do not open extra viewers for the same cameras.
 
 ---
 
-## 2. Tools → CCTV
+## 2. Open Tools → CCTV
 
-![Tools menu: CCTV](images/01-tools-cctv.png)
+![T3000 window](images/00-t3000-window.png)
+
+*Real T3000 (Aug 8 2025 build on this PC). Menu bar: File, Tools, View, Database, Control, Miscellaneous, Help.*
+
+![Tools on the T3000 menu bar](images/01-tools-cctv.png)
+
+*Real T3000 menu bar. CCTV is not on this install yet. It is already in the Maurice source Tools list (between Modbus Register v2 and RegisterList Database Folder) and will appear there in the next T3000 build.*
 
 1. Start **T3000** as usual (it asks for Administrator, same as always).
-2. On the menu bar choose **Tools → CCTV**.
-3. A WebView window titled **CCTV** opens. The heading on the page is **T3000 CCTV**.
+2. Select the building you want to watch. CCTV uses the building you have open in T3000.
+3. On the menu bar choose **Tools → CCTV**.
+4. The CCTV window opens on **Live**.
 
-If T3000 instead offers a download for **Microsoft Edge WebView2 Runtime**, install that (same runtime HVAC graphics already use), then choose **Tools → CCTV** again.
+T3000 needs the **Microsoft Edge WebView2 Runtime** — the same runtime HVAC graphics already use. If T3000 offers a download, install it, then choose **Tools → CCTV** again.
+
+T3000 starts the recorder if it is down. If the recorder is not running, the window shows **recorder not running**. Close CCTV, wait a few seconds, and open **Tools → CCTV** again.
 
 Closing the CCTV window returns you to the rest of T3000. Other tools are unchanged.
 
-**Coming next:** a larger CCTV workspace (timeline, events, settings tabs) behind the same menu.
+**One stream rule.** Only T3000 CCTV may hold the camera streams. When you finish, close CCTV. Do not leave it open in the background while another program tries to watch the same cameras.
 
 ---
 
-## 3. First run / missing go2rtc
+## 3. Live view and timeline
 
-![First run and missing go2rtc](images/02-first-run-go2rtc.png)
+![Live view](images/02-live.png)
 
-Live video needs **`go2rtc.exe`** next to T3000 (or in a `sidecar` folder). It is a separate MIT program. T3000 does not compile it and does not put it inside `T3000.exe`.
+*Live view, 2×2 tiles and timeline. (T3000 window — capture pending)*
 
-### When everything is in place
+Live is the first page you see. Four tiles sit in a 2×2 grid. The timeline sits in that same window — not in a second app.
 
-The top-right pills show **go2rtc :9191** in green. The Sidecar panel says the helper started (or that T3000 reused one already listening). **MediaMTX** may stay grey/off. That is normal: live view does not need it.
+**Tiles**
 
-### When `go2rtc.exe` is missing
+Each tile is one camera on the current building. A tile plays that camera’s recording when you are on the timeline, or stays live when you are at “now.”
 
-T3000 **still starts**. Every other T3000 tool still works. **Tools → CCTV** still opens.
+If a tile is blank or frozen, use **Reconnect**. That drops leftover sessions on this PC and starts the streams again. Do not open another viewer to “check” the camera.
 
-The Sidecar panel turns **red** and says `go2rtc.exe was not found. T3000 is running normally.` It lists folders to drop the file into, plus the official Windows zip.
+**Timeline in the Live window**
 
-1. Download [go2rtc_win64.zip](https://github.com/AlexxIT/go2rtc/releases/download/v1.9.14/go2rtc_win64.zip).
-2. Unzip and copy **`go2rtc.exe`** to **any one** of:
-   - `T3000 Output\release\sidecar\go2rtc.exe` (or next to `T3000.exe`)
-   - `T3000\sidecar\go2rtc.exe` in the source tree
-3. Close CCTV and choose **Tools → CCTV** again. You do not reinstall T3000.
+The bar under the tiles is the timeline for this building:
 
-If something else already owns port **127.0.0.1:9191** and it is not go2rtc, CCTV opens offline and tells you the port is in use.
+- **Play / Pause** — start or stop the playhead
+- **Previous event / Next event** — jump to the last or next motion clip
+- **Zoom** — stretch or compress the time scale
+- **Hourly ticks** — hours marked on the bar so you can find a time of day
 
-**Coming next:** the Windows installer can ship `go2rtc.exe` so operators never hunt for a zip. That is not required for this slice.
-
----
-
-## 4. Discover ONVIF or paste RTSP
-
-The PC and the camera must be on the **same LAN**. ONVIF discovery uses multicast. There is no bundled fake “demo camera.”
-
-### Discover ONVIF
-
-![ONVIF discovery](images/03-onvif-discover.png)
-
-1. If the camera needs a login, type **Username** and **Password** first.
-2. Click **Discover ONVIF**.
-3. Wait a few seconds. Each device shows a name and URL.
-4. Click **Add** on the camera you want.
-
-If the list is empty, the camera is off, on another VLAN, or blocked from multicast. Try the RTSP steps below, or ask whoever set up the camera for its stream URL.
-
-### Paste an RTSP URL
-
-![Add RTSP](images/04-add-rtsp.png)
-
-1. **Name** — a short label you will recognize, for example `lobby`.
-2. **RTSP or ONVIF URL** — from the camera’s own web page, for example  
-   `rtsp://admin:password@192.168.1.20/Streaming/Channels/101`
-3. Click **Add and play**.
-
-Any RTSP this Windows PC can reach works (a camera, another recorder, a phone app that publishes RTSP).
-
-**Refresh list** pulls streams go2rtc already knows. **Remove** on a tile deletes that camera from the saved list.
-
-Cameras persist in the CCTV window (`localStorage`) and in `%LOCALAPPDATA%\T3000\nvr\cameras.json`. Close CCTV and reopen **Tools → CCTV** — they should come back.
-
-**Coming next:** a shorter “add camera” wizard and stored site credentials. Today you type the URL or discover ONVIF once.
+Play skips idle gaps. If nothing moved between 2:00 and 2:40, play jumps to the next motion instead of sitting on empty time.
 
 ---
 
-## 5. Live view
+## 4. Playback from the timeline
 
-![Live view tiles](images/05-live-view.png)
+![Timeline playback](images/03-timeline.png)
 
-After Add or Discover, the right-hand **Live view** area shows a tile per camera.
+*Playback on the Live timeline. (T3000 window — capture pending)*
 
-**Success looks like this**
+There is no separate Playback app. You review recordings from the timeline on Live.
 
-- Green **go2rtc :9191**
-- Sidecar text such as “CCTV sidecar started (go2rtc on 127.0.0.1:9191).”
-- **Moving video** in the tile (not a frozen snapshot)
-- The T3000 status bar may repeat the sidecar message
+1. Stay on **Live**.
+2. Click a time on the timeline, or use **Previous event** / **Next event**.
+3. Press **Play**. Each tile plays that camera’s clip at that time. A camera with no clip at that moment stays live.
+4. Press **Pause**, or drag the playhead back to now, to return to live video.
 
-The Windows viewer cannot play raw `rtsp://` in a video box. The page asks go2rtc for **WebRTC**, then **MP4**, then **MJPEG**. You do not pick the mode.
+Idle time is skipped automatically. You are moving through motion, not through hours of empty hallway.
 
-Tiles are muted by default so a wall of cameras does not blast audio. Use the tile controls if you need sound on a camera that has a microphone.
-
-**Coming next:** larger video wall layouts, PTZ, and two-way talk. This slice is watch-live-on-this-PC.
+To look at one clip with its event details, use **Events** (chapter 7). The timeline is for watching several cameras together.
 
 ---
 
-## 6. Playback
+## 5. Heatmap
 
-![Playback — coming next](images/06-playback.png)
+![Heatmap](images/04-heatmap.png)
 
-**Coming next.** This slice has no timeline, no calendar, and no clip export.
+*Heatmap with floor dots and FOV cones. (T3000 window — capture pending)*
 
-MediaMTX (if you drop `mediamtx.exe` beside go2rtc) reserves localhost ports for later playback. The CCTV header may show **MediaMTX :9197**. That does **not** mean you can scrub yesterday’s video yet.
+Heatmap shows where people have been on the floor for this building.
 
-Until playback ships, use the camera’s own app or NVR if you need history.
+**What you see**
 
----
+- A **dot** for each camera on the floor plan
+- A **cone** for that camera’s field of view (FOV)
 
-## 7. Events + T3000 alarms
+**How to place cameras on the plan**
 
-![Events and alarms — coming next](images/07-events-alarms.png)
+- **Drag** a dot to move the camera on the floor.
+- Drag the **cone handle** to rotate the field of view.
 
-**Coming next.** CCTV does not yet raise T3000 alarms for motion, line-cross, or camera disconnect.
+The layout is saved for this building. Change building in T3000 and you get that building’s plan and cameras.
 
-Today, building alarms stay on the controllers and T3000 alarm screens you already know. Camera motion, if you need it now, stays on the camera or a separate recorder.
+**Time range**
 
-The intended later story: a camera event becomes a T3000 alarm the operator already acknowledges — one product, one alarm list. That wiring is not in this build.
-
----
-
-## 8. Recording
-
-![Recording](images/08-recording.png)
-
-Recording is **motion only**. The sidecar does not keep a 24/7 file writer. If the scene is idle, clip count and bytes do not grow.
-
-Arming is automatic with the sim:
-
-`powershell
-powershell -ExecutionPolicy Bypass -File T3000\sidecar\start-sim.ps1
-`
-
-Or, if go2rtc is already running:
-
-`powershell
-powershell -ExecutionPolicy Bypass -File T3000\sidecar\start-motion-record.ps1
-`
-
-Clips: T3000\sidecar\recordings\. The CCTV page lists them under **Motion events** (also on the hotspot page). Events JSON: http://127.0.0.1:9294/events.json
-
-Do not turn on go2rtc #record or MediaMTX 
-ecord: yes — those are continuous.
-
+- **Today** — motion from today
+- **Week** — the last seven days
+- **All** — everything still on disk
+- **Reset** — clear the heatmap overlay (it does not delete recordings)
 
 ---
 
-## 9. Troubleshooting
+## 6. People
 
-![Future settings — coming next](images/09-future-settings.png)
+![People](images/05-people.png)
 
-There is no Settings page in this slice (schedules, retention, and users are **coming next**). Use this table first.
+*People list with names, Unknown, and Ignore. (T3000 window — capture pending)*
+
+People is the face list for this building. New faces are enrolled automatically as **Person1**, **Person2**, and so on.
+
+**Name a person**
+
+Type a name in the field and save. The next time that face is seen, Events and the tiles can show the name you typed.
+
+**Unknown**
+
+Click **?** to mark the face as **Unknown**. Use this when you do not know who it is and do not want a made-up Person number in the list.
+
+**Ignore**
+
+Click **×** to **Ignore** that face. Ignored faces are not treated as people you care about. Use this for staff you do not need to track, or for a false detection.
+
+Do not delete recordings from this page. Ignore only changes how that face is handled.
+
+---
+
+## 7. Events
+
+![Events](images/06-events.png)
+
+*Events list and clip player. (T3000 window — capture pending)*
+
+Events is the list of motion clips. Each row is one recording.
+
+**List and player**
+
+Select a row. The clip plays in the player on this page. The time, camera, and any person name sit with the row.
+
+**Filter**
+
+Use the camera filter to show one camera, or all cameras on this building.
+
+Events is the place to open a single clip. Live + timeline is the place to scrub several cameras at once.
+
+---
+
+## 8. Settings and recording
+
+![Settings](images/07-settings.png)
+
+*Settings and recording. (T3000 window — capture pending)*
+
+Open **Settings** from the CCTV window. This is where you point recordings at a disk and choose how long to keep them.
+
+**Storage**
+
+Clips stay on a **local disk on this PC**. Pick a path with room to grow, for example `C:\Xdrive\T3000_DVR` on a desktop drive. Do not record to a NAS.
+
+**Motion only**
+
+Recording is **motion only**. If the scene is idle, new clips are not written. There is no 24/7 continuous writer in this product.
+
+**Pre-roll and post-roll**
+
+- **Pre-roll** is **1 second**, taken from the recorder’s ring on this PC. It is not a setting you change on the camera.
+- **Post-roll** is how long to keep recording after motion stops. Set it here.
+
+**Retention**
+
+Set how many days of clips to keep. Older motion files are removed when they pass that age.
+
+**Per-camera enable**
+
+Turn recording on or off for each camera. A camera can still appear on Live when recording is off; it simply does not write clips.
+
+After you save, new motion uses the new path and times. Clips already on disk stay where they were until retention deletes them.
+
+---
+
+## 9. Add / discover cameras
+
+Cameras belong to the **T3000 building** you have open. Each camera is stored against that building. Open a different building in T3000 and CCTV shows that building’s cameras only.
+
+The PC and the camera must be on the **same LAN**.
+
+### Discover on the LAN (SADP)
+
+Use **Discover** in the CCTV window. T3000 finds Hikvision cameras with **SADP multicast** on your network.
+
+This is not the Hikvision SADP desktop app. You do not install extra vendor tools. If the list is empty, the camera is off, on another VLAN, or blocked from multicast — add it with RTSP instead.
+
+### Add with RTSP
+
+For a Hikvision camera, use RTSP on **port 554** and path **`/Streaming/Channels/101`**.
+
+1. Give the camera a short name you will recognize, for example `lobby`.
+2. Enter the camera address and that RTSP path.
+3. Save. The camera attaches to the current T3000 building.
+
+Live tiles use the **sub stream** for viewing so the PC stays light. Do not point the wall of tiles at a heavy main stream.
+
+**ONVIF stays off** unless Temco asks you to turn it on. Discovery is SADP. Everyday add and play is RTSP.
+
+If a tile has no video after you add the camera, check the address, path, and that the camera is on this LAN. Then use **Reconnect** on Live. Do not open another program to test the stream.
+
+---
+
+## 10. Troubleshooting
 
 | You see | What to do |
 | --- | --- |
-| Prompt to install WebView2 | Install the [Edge WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/), then Tools → CCTV again |
-| Red “go2rtc.exe was not found” | Drop `go2rtc.exe` in `sidecar\` or next to `T3000.exe`, close CCTV, reopen it |
-| Port 9191 in use | Close the other program using `127.0.0.1:9191`, or stop a leftover go2rtc, then reopen CCTV |
-| Green go2rtc, no devices | Same LAN? Credentials entered? Try a pasted `rtsp://` URL from the camera’s web UI |
-| Tile added, no motion | Confirm the URL in a VLC window on this PC. Wrong path or password is the usual cause |
-| CCTV window closes and helpers stop | Expected. Open **Tools → CCTV** again when you want live view |
-| Want playback, events, or record | Not in this slice — see chapters 6–8 |
+| Prompt to install WebView2 | Install the [Edge WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/) (same as HVAC graphics), then **Tools → CCTV** again |
+| **Recorder not running** | T3000 starts the recorder when it is down. Close CCTV, wait a few seconds, open **Tools → CCTV** again. If the line is still there, restart T3000 |
+| Blank tiles, or a tile that was live and then froze | Click **Reconnect** on Live. Close CCTV when you are finished so nothing else holds the streams |
+| No cameras, or the wrong cameras | Confirm the **building** selected in T3000. Cameras are stored per building |
+| Discover finds nothing | Same LAN? Camera powered? Multicast allowed? Add the camera with RTSP on port 554, path `/Streaming/Channels/101` |
+| Tile added, no video | Check the RTSP path and that viewing is on the **sub stream**. Use **Reconnect**. Do not open extra viewers |
+| Disk filling up | Open **Settings**. Confirm motion-only, retention, and a local path (not a NAS) |
+| CCTV window closes | Expected. You are back in the rest of T3000. Open **Tools → CCTV** when you want cameras again |
 
-Installer and build steps for technicians: [DEMO.md](../../../DEMO.md). Port and sidecar notes: [nvr.md](../../nvr.md).
+**Still stuck**
+
+1. Close CCTV.
+2. Confirm T3000 is on the building that owns the cameras.
+3. Open **Tools → CCTV** and wait for Live.
+4. If you see **recorder not running**, restart T3000 and try once more.
+5. Call Temco with the building name, the camera name, and what the window showed.
+
+Do not open extra viewers on this PC. Only T3000 CCTV should hold the streams.

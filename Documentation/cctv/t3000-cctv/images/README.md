@@ -1,19 +1,18 @@
-# Manual figures
+# T3000 CCTV manual figures
 
-Files `01-tools-cctv.png` through `09-future-settings.png` are **placeholders**.
+These files are the figures in [T3000_CCTV_User_Manual.md](../T3000_CCTV_User_Manual.md).
 
-This Linux environment cannot run T3000.exe or WebView2, so it cannot capture the real UI. **Put the real screenshots in the pull-request conversation** (or replace these PNGs on branch `CCTV`) once someone has Tools → CCTV open on a Windows box.
+**`01-tools-cctv.png` is a real T3000 menu-bar screenshot** from the installed Program Files T3000 (Aug 8 2025 build). Not CRM, not a mock. That build does not yet list CCTV on Tools; the caption says so.
 
-Placeholders show empty rooms and a simple box camera. **No people** in the camera art.
-
-| File | Chapter |
+| File | Capture |
 | --- | --- |
-| [01-tools-cctv.png](01-tools-cctv.png) | Tools → CCTV |
-| [02-first-run-go2rtc.png](02-first-run-go2rtc.png) | First run / missing go2rtc |
-| [03-onvif-discover.png](03-onvif-discover.png) | Discover ONVIF |
-| [04-add-rtsp.png](04-add-rtsp.png) | Add RTSP |
-| [05-live-view.png](05-live-view.png) | Live view |
-| [06-playback.png](06-playback.png) | Playback (coming next) |
-| [07-events-alarms.png](07-events-alarms.png) | Events + T3000 alarms (coming next) |
-| [08-recording.png](08-recording.png) | Recording (coming next) |
-| [09-future-settings.png](09-future-settings.png) | Future settings (coming next) |
+| `00-t3000-window.png` | Real T3000 main window (Aug 8 2025) |
+| `01-tools-cctv.png` | Real T3000 menu bar (File, Tools, View, …) |
+| `02-live.png` | T3000 CCTV window on Live (2×2 tiles + timeline) |
+| `03-timeline.png` | Same window, playhead on a motion clip |
+| `04-heatmap.png` | T3000 CCTV window on Heatmap |
+| `05-people.png` | T3000 CCTV window on People |
+| `06-events.png` | T3000 CCTV window on Events |
+| `07-settings.png` | T3000 CCTV window on Settings |
+
+Until a later figure is a real T3000 capture, the manual caption says **(T3000 window — capture pending)**. Do not draw fake T3000 chrome. Do not use CRM screenshots.

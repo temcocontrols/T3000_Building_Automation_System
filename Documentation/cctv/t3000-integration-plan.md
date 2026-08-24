@@ -102,6 +102,10 @@ Done when: two buildings can each have their own cameras without mixing tiles.
 - Do not enable ONVIF device management unless Maurice asks. 679 is Hikvision RTSP.
 - Do not put camera passwords in git.
 
+## User manual
+
+The operator book is [t3000-cctv/T3000_CCTV_User_Manual.md](t3000-cctv/T3000_CCTV_User_Manual.md). It uses a real T3000 menu-bar screenshot (not CRM). Live / heatmap / people / events / settings figures stay marked capture-pending until Tools -> CCTV opens those 9294 pages.
 ## How to review
 
 Read this file and [sop-view-only.md](sop-view-only.md). Confirm Tools -> CCTV is the customer door and `9294` is the only UI. Implementation is a later Maurice push, not this PR.
+
