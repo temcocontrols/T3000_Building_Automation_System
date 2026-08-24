@@ -55,3 +55,20 @@ WHERE EXISTS (SELECT 1 FROM Building WHERE ID=1);
 INSERT OR IGNORE INTO CCTV_Camera (building_id, building_name, name, title, angle, rtsp_url, play_url, enabled, sort_order)
 SELECT 1, 'Default_Building', 'sim-west', 'SW looking NE', 'SW corner looking northeast', 'rtsp://127.0.0.1:9292/sim-west', 'http://127.0.0.1:9291/stream.html?src=sim-west', 1, 4
 WHERE EXISTS (SELECT 1 FROM Building WHERE ID=1);
+
+-- DVR recorder settings (motion-only). Do not rewrite CCTV_Camera rows.
+CREATE TABLE IF NOT EXISTS CCTV_DvrSetting (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS CCTV_DvrCamera (
+  camera_name TEXT PRIMARY KEY,
+  enabled INTEGER NOT NULL DEFAULT 1
+);
+INSERT OR IGNORE INTO CCTV_DvrSetting(key,value) VALUES
+ ('storage_path','C:\Xdrive\T3000_DVR'),
+ ('motion_only','1'),
+ ('preroll_sec','3'),
+ ('postroll_sec','8'),
+ ('retention_days','14'),
+ ('max_gb','100');

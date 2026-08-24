@@ -1,0 +1,19 @@
+{
+  "storage_path": "C:\\Xdrive\\T3000_DVR",
+  "motion_only": 1,
+  "preroll_sec": 3,
+  "postroll_sec": 8,
+  "retention_days": 14,
+  "max_gb": 100,
+  "motion_threshold": 12,
+  "cameras": {
+    "sim-north": 1,
+    "sim-east": 1,
+    "sim-south": 1,
+    "sim-west": 1,
+    "cam-64": 1,
+    "cam-65": 1,
+    "cam-66": 1,
+    "cam-67": 1
+  }
+}

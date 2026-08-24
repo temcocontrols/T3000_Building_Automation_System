@@ -25,3 +25,10 @@ recordings/
 
 __pycache__/
 
+
+!dvr-api.ps1
+!dvr-api.py
+!dvr-record.ps1
+!dvr-settings.json
+!dvr-sync-db.py
+
