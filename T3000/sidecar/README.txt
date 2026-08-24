@@ -15,3 +15,7 @@ Or:
 Then either rebuild, or copy the exes next to T3000.exe / T3000 Output\release\sidecar\.
 Do not commit the .exe files.
 
+
+Motion-triggered recording (no 24/7 writers): start-motion-record.ps1 / MOTION.md
+Clips: recordings\   Events: http://127.0.0.1:9294/events.json
+

@@ -19,7 +19,7 @@ Figures `images/01`–`09` are labeled placeholders. **Real screenshots live in 
 | Live view | Tiles (WebRTC, then MP4, then MJPEG) | PTZ joystick, multi-monitor wall |
 | Playback | **Not shipped** | Timeline, clips, export |
 | Events + T3000 alarms | **Not shipped** | Motion / disconnect → T3000 alarm |
-| Recording | **Not shipped** (MediaMTX is optional and reserved) | Continuous / detection record, retention |
+| Recording | Motion-only clips via sidecar (T3000\\sidecar\\recordings). No 24/7 writer. | Timeline, retention UI |
 | Settings | **Not shipped** | Schedules, users, storage |
 
 If a later chapter says **Coming next**, the control is not on the screen yet. Do not look for it in this build.
@@ -170,13 +170,27 @@ The intended later story: a camera event becomes a T3000 alarm the operator alre
 
 ## 8. Recording
 
-![Recording — coming next](images/08-recording.png)
+![Recording](images/08-recording.png)
 
-**Coming next.** This slice does not offer Always / Detection / Never recording, schedules, or a recordings folder in the UI.
+Recording is **motion only**. The sidecar does not keep a 24/7 file writer. If the scene is idle, clip count and bytes do not grow.
 
-A `recordings` directory under `%LOCALAPPDATA%\T3000\nvr\` is reserved. MediaMTX config is written with record commented out. Do not expect files to appear there for the operator demo.
+Arming is automatic with the sim:
 
-If you need recording today, use the camera’s SD card or an existing NVR, and use T3000 CCTV for **live** only.
+`powershell
+powershell -ExecutionPolicy Bypass -File T3000\sidecar\start-sim.ps1
+`
+
+Or, if go2rtc is already running:
+
+`powershell
+powershell -ExecutionPolicy Bypass -File T3000\sidecar\start-motion-record.ps1
+`
+
+Clips: T3000\sidecar\recordings\. The CCTV page lists them under **Motion events** (also on the hotspot page). Events JSON: http://127.0.0.1:9294/events.json
+
+Do not turn on go2rtc #record or MediaMTX 
+ecord: yes — those are continuous.
+
 
 ---
 

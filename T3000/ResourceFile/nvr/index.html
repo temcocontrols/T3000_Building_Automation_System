@@ -38,6 +38,18 @@
     }
     header h1 { font-size: 16px; font-weight: 600; margin: 0; letter-spacing: 0.02em; }
     header .sub { color: #c5d4e4; font-size: 12px; }
+    header .sub a { color: #9ec9f0; }
+    .tabs { display: flex; gap: 6px; }
+    .tab {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 3px;
+      padding: 6px 14px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .tab.active { background: #1e6bb8; border-color: #9ec9f0; }
     .status { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
     .pill {
       background: rgba(255,255,255,0.1);
@@ -72,6 +84,7 @@
       border-radius: 3px;
       font: inherit;
     }
+    input[type=checkbox] { width: auto; }
     button {
       background: var(--accent);
       color: #fff;
@@ -96,6 +109,7 @@
     }
     .msg.err { background: #fdecea; color: var(--err); }
     .msg.warn { background: #fff6e0; color: #7a5200; }
+    .msg.ok { background: #e8f5e9; color: var(--ok); }
     .disc { list-style: none; margin: 8px 0 0; padding: 0; }
     .disc li {
       border: 1px solid var(--line);
@@ -130,17 +144,42 @@
     }
     .tile .cap span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .empty { color: var(--muted); padding: 32px 16px; text-align: center; }
+    #page-settings { display: none; padding: 16px; max-width: 880px; }
+    body.settings-on .wrap { display: none; }
+    body.settings-on #page-settings { display: block; }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 20px;
+    }
+    .settings-grid .full { grid-column: 1 / -1; }
+    .cam-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .cam-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 8px 10px;
+      background: #f8fafb;
+    }
+    .hint { color: var(--muted); font-size: 12px; margin: 4px 0 0; }
   </style>
 </head>
 <body>
   <header>
     <div>
       <h1>T3000 CCTV</h1>
-      <div class="sub">ONVIF discovery and live view via go2rtc sidecar · <a href="hotspot.html" style="color:#9ec9f0">Hotspot map</a></div>
+      <div class="sub">Live view and DVR settings &mdash; <a href="hotspot.html">Hotspot map</a></div>
     </div>
+    <nav class="tabs" aria-label="CCTV pages">
+      <a href="#live" id="tab-live" class="tab active">Live</a>
+      <a href="#settings" id="tab-settings" class="tab">Settings</a>
+    </nav>
     <div class="status">
-      <span id="pill-go2rtc" class="pill">go2rtc …</span>
-      <span id="pill-mtx" class="pill">MediaMTX …</span>
+      <span id="pill-go2rtc" class="pill">go2rtc .</span>
+      <span id="pill-dvr" class="pill">DVR .</span>
+      <span id="pill-mtx" class="pill">MediaMTX .</span>
     </div>
   </header>
   <div class="wrap">
@@ -148,7 +187,7 @@
       <div class="panel">
         <h2>Sidecar</h2>
         <div class="body">
-          <div id="sidecar-msg" class="msg">Checking localhost sidecars…</div>
+          <div id="sidecar-msg" class="msg">Checking localhost sidecars.</div>
         </div>
       </div>
       <div class="panel" style="margin-top:12px">
@@ -184,10 +223,59 @@
       <div id="tiles" class="tiles"><div class="empty">Add an RTSP URL or discover an ONVIF camera to start live video.</div></div>
     </div>
   </div>
+
+  <section id="page-settings">
+    <div class="panel">
+      <h2>DVR Settings</h2>
+      <div class="body">
+        <p class="hint">Motion-only recorder. Save writes <code>T3000\sidecar\dvr-settings.json</code> and <code>CCTV_DvrSetting</code> via http://127.0.0.1:9294/settings. Default storage <code>C:\Xdrive\T3000_DVR</code>.</p>
+        <div class="settings-grid">
+          <div class="full">
+            <label for="dvr-storage">Storage path</label>
+            <input id="dvr-storage" type="text" value="C:\Xdrive\T3000_DVR" />
+          </div>
+          <div class="full">
+            <label class="cam-item" style="margin-top:8px">
+              <input id="dvr-motion" type="checkbox" checked />
+              <span><strong>Motion-only record</strong> (off means off &mdash; no continuous recording)</span>
+            </label>
+          </div>
+          <div>
+            <label for="dvr-preroll">Pre-roll seconds</label>
+            <input id="dvr-preroll" type="number" min="0" max="30" value="3" />
+          </div>
+          <div>
+            <label for="dvr-postroll">Post-roll seconds</label>
+            <input id="dvr-postroll" type="number" min="1" max="120" value="8" />
+          </div>
+          <div>
+            <label for="dvr-retain">Retention days</label>
+            <input id="dvr-retain" type="number" min="1" max="365" value="14" />
+          </div>
+          <div>
+            <label for="dvr-maxgb">Max disk GB</label>
+            <input id="dvr-maxgb" type="number" min="1" max="2000" value="100" />
+          </div>
+          <div class="full">
+            <label>Cameras to record</label>
+            <div id="dvr-cams" class="cam-list"></div>
+          </div>
+        </div>
+        <div class="row">
+          <button id="btn-dvr-save" type="button">Save settings</button>
+          <button id="btn-dvr-reload" class="secondary" type="button">Reload</button>
+        </div>
+        <div id="dvr-msg" class="msg">Load settings from the local DVR API.</div>
+      </div>
+    </div>
+  </section>
+
   <script>
     (function () {
       var qs = new URLSearchParams(location.search);
-      var API = qs.get("api") || (location.protocol === "http:" ? location.origin : "http://127.0.0.1:9191");
+      var API = qs.get("api") || (location.protocol === "http:" && location.port !== "9294" ? location.origin : "http://127.0.0.1:9291");
+      var DVR = "http://127.0.0.1:9294";
+      var DEFAULT_CAMS = ["sim-north","sim-east","sim-south","sim-west","cam-64","cam-65","cam-66","cam-67"];
       var cameras = [];
       var peers = {};
 
@@ -200,6 +288,7 @@
       }
       function setPill(id, ok, label) {
         var el = $(id);
+        if (!el) return;
         el.className = "pill " + (ok ? "ok" : "err");
         el.textContent = label;
       }
@@ -220,6 +309,15 @@
           var raw = localStorage.getItem("t3000.nvr.cameras");
           if (raw) cameras = JSON.parse(raw) || [];
         } catch (e) { cameras = []; }
+      }
+
+      function showPage() {
+        var hash = String(location.hash || "").replace(/^#/, "") || "live";
+        var settings = hash === "settings";
+        document.body.classList.toggle("settings-on", settings);
+        $("tab-live").classList.toggle("active", !settings);
+        $("tab-settings").classList.toggle("active", settings);
+        if (settings) loadDvrSettings();
       }
 
       async function api(path, opt) {
@@ -392,7 +490,7 @@
       }
 
       async function discover() {
-        $("disc-list").innerHTML = "<li>Scanning…</li>";
+        $("disc-list").innerHTML = "<li>Scanning.</li>";
         var paths = ["/api/onvif", "/api/discovery?src=onvif", "/api/discovery"];
         var lastErr = null;
         for (var i = 0; i < paths.length; i++) {
@@ -434,14 +532,112 @@
         renderTiles();
       }
 
+      function dvrMsg(text, kind) {
+        var el = $("dvr-msg");
+        el.className = "msg" + (kind ? " " + kind : "");
+        el.textContent = text;
+      }
+
+      function paintCamChecks(names, enabledMap) {
+        var box = $("dvr-cams");
+        box.innerHTML = "";
+        names.forEach(function (name) {
+          var on = enabledMap[name] == null ? true : !!Number(enabledMap[name]);
+          var lab = document.createElement("label");
+          lab.className = "cam-item";
+          var cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.setAttribute("data-cam", name);
+          cb.checked = on;
+          var span = document.createElement("span");
+          span.textContent = name;
+          lab.appendChild(cb);
+          lab.appendChild(span);
+          box.appendChild(lab);
+        });
+      }
+
+      async function streamNames() {
+        var names = [];
+        try {
+          var r = await fetch("http://127.0.0.1:9291/api/streams");
+          if (r.ok) {
+            var data = await r.json();
+            Object.keys(data || {}).forEach(function (n) {
+              if (!/-main$/.test(n)) names.push(n);
+            });
+          }
+        } catch (e) {}
+        DEFAULT_CAMS.forEach(function (n) {
+          if (names.indexOf(n) < 0) names.push(n);
+        });
+        return names;
+      }
+
+      async function loadDvrSettings() {
+        var enabled = {};
+        DEFAULT_CAMS.forEach(function (n) { enabled[n] = 1; });
+        try {
+          var r = await fetch(DVR + "/settings");
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          var s = await r.json();
+          $("dvr-storage").value = s.storage_path || "C:\\Xdrive\\T3000_DVR";
+          $("dvr-motion").checked = Number(s.motion_only) !== 0;
+          $("dvr-preroll").value = s.preroll_sec != null ? s.preroll_sec : 3;
+          $("dvr-postroll").value = s.postroll_sec != null ? s.postroll_sec : 8;
+          $("dvr-retain").value = s.retention_days != null ? s.retention_days : 14;
+          $("dvr-maxgb").value = s.max_gb != null ? s.max_gb : 100;
+          if (s.cameras) {
+            Object.keys(s.cameras).forEach(function (k) { enabled[k] = s.cameras[k]; });
+          }
+          setPill("pill-dvr", true, "DVR :9294");
+          dvrMsg("Loaded from 127.0.0.1:9294. Armed: motion-only " + ($("dvr-motion").checked ? "on" : "off") + ".", "ok");
+        } catch (e) {
+          setPill("pill-dvr", false, "DVR down");
+          dvrMsg("DVR API not reachable at 127.0.0.1:9294. Start T3000\\sidecar\\start-sim.ps1. Using defaults. " + (e.message || e), "warn");
+        }
+        paintCamChecks(await streamNames(), enabled);
+      }
+
+      async function saveDvrSettings() {
+        var camerasOn = {};
+        var boxes = $("dvr-cams").querySelectorAll("input[data-cam]");
+        for (var i = 0; i < boxes.length; i++) {
+          camerasOn[boxes[i].getAttribute("data-cam")] = boxes[i].checked ? 1 : 0;
+        }
+        var payload = {
+          storage_path: $("dvr-storage").value || "C:\\Xdrive\\T3000_DVR",
+          motion_only: $("dvr-motion").checked ? 1 : 0,
+          preroll_sec: Number($("dvr-preroll").value || 3),
+          postroll_sec: Number($("dvr-postroll").value || 8),
+          retention_days: Number($("dvr-retain").value || 14),
+          max_gb: Number($("dvr-maxgb").value || 100),
+          motion_threshold: 12,
+          cameras: camerasOn
+        };
+        try { localStorage.setItem("t3000.dvr.settings", JSON.stringify(payload)); } catch (e) {}
+        try {
+          var r = await fetch(DVR + "/settings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          setPill("pill-dvr", true, "DVR :9294");
+          dvrMsg("Saved. Recorder will pick up the new settings on the next poll.", "ok");
+        } catch (e) {
+          dvrMsg("Save failed: " + (e.message || e) + ". Values kept in this page / localStorage.", "err");
+        }
+      }
+
       async function init() {
+        showPage();
         if (qs.get("offline") === "1") {
           setPill("pill-go2rtc", false, "go2rtc missing");
           setPill("pill-mtx", false, "MediaMTX off");
           var reason = qs.get("reason") || (
             "go2rtc.exe was not found. T3000 is still running.\n\n" +
             "Drop go2rtc.exe next to T3000.exe, in sidecar\\go2rtc.exe, or in T3000\\sidecar\\, then reopen Tools > CCTV.\n" +
-            "Download: https://github.com/AlexxIT/go2rtc/releases/download/v1.9.14/go2rtc_win64.zip\n" +
             "See DEMO.md"
           );
           showMsg(reason, "err");
@@ -451,26 +647,32 @@
         }
         try {
           await api("/api");
-          setPill("pill-go2rtc", true, "go2rtc :9191");
+          setPill("pill-go2rtc", true, "go2rtc :9291");
           var mtxOk = qs.get("mediamtx") === "1";
           try {
             var m = await fetch((qs.get("mtx") || "http://127.0.0.1:9197") + "/v3/config/global/get");
             mtxOk = m.ok;
           } catch (e) {}
           setPill("pill-mtx", mtxOk, mtxOk ? "MediaMTX :9197" : "MediaMTX off");
-          showMsg("Live view is served by go2rtc on 127.0.0.1:9191 (WebRTC, then MP4). MediaMTX is reserved for later record/playback.", mtxOk ? "" : "warn");
+          showMsg("Live view is served by go2rtc. DVR settings persist through 127.0.0.1:9294.", mtxOk ? "" : "warn");
           loadLocal();
           for (var i = 0; i < cameras.length; i++) {
             if (cameras[i].src) {
               try { await putStream(cameras[i].name, cameras[i].src); } catch (e) {}
             }
           }
-          await refreshFromGo2rtc();
+          if (String(location.hash || "").replace(/^#/, "") !== "settings") {
+            await refreshFromGo2rtc();
+          }
         } catch (e) {
           setPill("pill-go2rtc", false, "go2rtc down");
           setPill("pill-mtx", false, "MediaMTX off");
           showMsg("Cannot reach go2rtc at " + API + ". " + (e.message || e), "err");
         }
+        try {
+          var d = await fetch(DVR + "/settings");
+          setPill("pill-dvr", d.ok, d.ok ? "DVR :9294" : "DVR down");
+        } catch (e) { setPill("pill-dvr", false, "DVR down"); }
       }
 
       $("btn-add").onclick = function () {
@@ -478,6 +680,9 @@
       };
       $("btn-discover").onclick = discover;
       $("btn-refresh").onclick = refreshFromGo2rtc;
+      $("btn-dvr-save").onclick = saveDvrSettings;
+      $("btn-dvr-reload").onclick = loadDvrSettings;
+      window.addEventListener("hashchange", showPage);
       if (hostAvailable()) {
         chrome.webview.addEventListener("message", function () {});
       }

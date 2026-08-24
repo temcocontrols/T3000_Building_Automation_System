@@ -2,20 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>T3000 CCTV — Hotspot map</title>
+  <title>T3000 CCTV - Hotspot map</title>
   <style>
     html,body{margin:0;height:100%;background:#0a1220;color:#e8eef5;font:13px Segoe UI,Tahoma,sans-serif}
     header{padding:10px 16px;background:linear-gradient(180deg,#0d2137,#16324f);display:flex;gap:16px;align-items:center}
     header a{color:#9ec9f0}
-    #map{display:block;width:100%;height:calc(100% - 52px);background:#0a1220}
+    #wrap{display:flex;height:calc(100% - 52px)}
+    #map{display:block;flex:1;background:#0a1220}
+    #events{width:280px;border-left:1px solid #1e3348;padding:10px 12px;overflow:auto}
+    #events h3{margin:0 0 8px;font-size:13px}
+    #events li{margin:0 0 8px;padding:6px 0;border-bottom:1px solid #1e3348;list-style:none}
+    #events ul{margin:0;padding:0}
+    #events a{color:#9ec9f0}
+    .muted{color:#8aa0b5}
   </style>
 </head>
 <body>
   <header>
-    <div><b>T3000 CCTV</b> · daily path / hotspot · <span id="meta"></span></div>
+    <div><b>T3000 CCTV</b> — daily path / hotspot — <span id="meta"></span></div>
     <a href="index.html">Live view</a>
   </header>
-  <canvas id="map"></canvas>
+  <div id="wrap">
+    <canvas id="map"></canvas>
+    <aside id="events">
+      <h3>Motion events</h3>
+      <div id="ev-status" class="muted">Checking localhost recorder.</div>
+      <ul id="ev-list"></ul>
+    </aside>
+  </div>
   <script>
   fetch("hotspot-demo.json").then(function(r){return r.json()}).then(draw);
   function draw(d){
@@ -23,7 +37,7 @@
     var c = document.getElementById("map"), x = c.getContext("2d");
     function fit(){ c.width = c.clientWidth; c.height = c.clientHeight; paint(); }
     var data = d;
-    function xy(nx,ny){ var p=56,w=c.width-280,h=c.height-80; return [p+nx*w, 40+p+ny*h]; }
+    function xy(nx,ny){ var p=56,w=c.width-40,h=c.height-80; return [p+nx*w, 40+p+ny*h]; }
     function paint(){
       x.fillStyle="#0a1220"; x.fillRect(0,0,c.width,c.height);
       var a=xy(0,0), b=xy(1,1);
@@ -48,13 +62,15 @@
       x.strokeStyle="#50ff78";
       (data.sightings||[]).forEach(function(s){
         var p=xy(s.x,s.y);
-        x.strokeRect(p[0]-14,p[1]-24,28,34);
-        x.fillStyle="#8fffad"; x.fillText(s.t+" "+s.camera, p[0]+16, p[1]-10);
-      });
-      x.fillStyle="#c8d0dc"; x.fillText("YOLO boxes + daily path. Map grows when walls go up.", 24, 28);
-    }
-    window.addEventListener("resize", fit); fit();
-  }
-  </script>
-</body>
-</html>
+        x.strokeRect(p[0]-14,p[1]-24,ns"   x.fil     x.fillStyle="#c8e6ff8fffadillText(cam.ids.t+" "+sas||[])+10, p[16-8);
+  10   });
+      x.strokeyle="#c8e6ff";d; xillText(cam.id"YOLO boxesersoath / hot. Map :#0ws waw) walls go up.",     2    });
+functiwhtmowlorSE/h3>L/ulener("re3px}",  c.ill c.wi  })func(on paint()ollE/h3>s    x.fixy(surls 0.3"http://127.0.0.1:9294/</h3>
+).then, "</h3>
+).then]function xy(nx,retmlr   documefixy(sstument.getElementById("map"),tus" class   var ic= [x"evment.getElementById("map"),tus</ul>   var icif (!d) {sstontent = d.site"Rr.</div n <sarmed."rn [p+nx  functi sstontent = d.site(d.armed ? "Armed · meventsonh /· " : "Idle/· ")ers(d.Heip_c0a1t || 0)open Heips   (data.ul.innerHTMLite"   (data.si. a{colo|| rEac1).for]-820ach(function(s){
+  ev     var p=xy(slivment.getEleRadialtById("("li"     var g=x.cravment.getEleRadialtById("("a"     var g=potndeite(d. a{col_httpo|| "http://127.0.0.1:9294")ers"/Heips/persencodeURIComp   ("(evext(eo|| ""     var g=pontent = d.site(eves||[])o|| "" " + d.pers(eve" crto|| ""     var g=li.apte"dChild(a     var g=ul.apte"dChild(li   });
+      x.stfunction paint(tick( documefixy(sivme0  });
+  on paint(nm.id     var p=if (i >=surls.length) {sretmlr null)rn [p+nx  functi sh("hotspurls[i++], {cncte:"nos" ore"}(function(r){returncif (!r.ok) th#0w(nmw Error()rn [p+nxn()}).the    uncti sh(ed{unctiretmlr)es|otspnm.i   });
+    });
+  nm.id   x.stfunctitick(   x.stsetI    val(tick, 5TV<i  })f)(   x.></
+  fetc��  <hea  

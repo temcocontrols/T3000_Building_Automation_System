@@ -36,3 +36,23 @@ Need `go2rtc.exe` and `ffmpeg.exe` in `T3000\sidecar\`. Ports 9291/9292/9293 (no
 - Hardcode sim URLs in CRM
 - Fall back to building 1 when building 2 has zero cameras
 - Commit sidecar `*.exe`
+
+## Motion-triggered recording
+
+Product rule: record **only on motion**. Do not enable go2rtc `#record` or MediaMTX `record: yes` (those are continuous).
+
+| Path | Why |
+| --- | --- |
+| `T3000/sidecar/motion-record.py` | ffmpeg frame-diff on go2rtc RTSP names; short clip only while motion |
+| `T3000/sidecar/start-motion-record.ps1` | Arm when the sidecar is already up |
+| `T3000/sidecar/start-sim.ps1` | Starts go2rtc **and** arms the recorder |
+| `T3000/sidecar/recordings/` | Clips + `events.json` (gitignored) |
+| `T3000/ResourceFile/nvr/index.html` | Motion events list on Tools → CCTV |
+
+```powershell
+powershell -ExecutionPolicy Bypass -File T3000\sidecar\start-motion-record.ps1
+powershell -ExecutionPolicy Bypass -File T3000\sidecar\test-motion.ps1
+```
+
+Events HTTP: http://127.0.0.1:9294/events.json
+

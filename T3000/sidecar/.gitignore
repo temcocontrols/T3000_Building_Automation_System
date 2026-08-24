@@ -1,4 +1,4 @@
-# Downloaded sidecar binaries — do not vendor
+# Downloaded sidecar binaries - do not vendor
 *.exe
 *.zip
 *.yml
@@ -15,3 +15,13 @@
 !sim/*.mp4
 
 !test-sim.ps1
+!start-motion-record.ps1
+!motion-record.py
+!test-motion.ps1
+!MOTION.md
+
+# Motion clips / events (generated; do not commit)
+recordings/
+
+__pycache__/
+

@@ -2,6 +2,7 @@
 # Do not bind 9191/9192 — Project Management already uses 9192.
 api:
   listen: "127.0.0.1:9291"
+  origin: "*"
 rtsp:
   listen: "127.0.0.1:9292"
 webrtc:
