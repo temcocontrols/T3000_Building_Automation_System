@@ -76,5 +76,18 @@ No obsolete UniFi Video PDFs.
 
 ## Merge into T3000
 
+**[t3000-integration-plan.md](t3000-integration-plan.md)** — how the desk CCTV stack becomes Tools -> CCTV in the shipping T3000 app (docs PR first).
+
 **[DEVELOPER.md](DEVELOPER.md)** — file list, Tools → CCTV hook, DB, sim test. For T3000 engineers.
 
+## SOP
+- [This app only / close stale connections](sop-view-only.md)
+
+## CRM tree iframes
+Pages served by the DVR sidecar (127.0.0.1:9294). CRM #cctv children should iframe these, not extra Chrome tabs.
+
+- Live: http://127.0.0.1:9294/live
+- Heatmap / timeline: http://127.0.0.1:9294/heatmap
+- DVR Settings: http://127.0.0.1:9294/settings.html
+
+JSON stays at `/settings` and `/timeline`.
