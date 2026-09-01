@@ -2128,6 +2128,13 @@ int prescan1 (void)
 					case IF:
 					case IFP:
 					case IFM:
+						// THEN/ELSE 分支中禁止再次出现 IF
+						if (then_else)
+						{
+							sntx_err(SYNTAX);
+							get_nl();
+							break;
+						}
 /*
 						if (*prog=='+')
 						{
@@ -2523,6 +2530,16 @@ int parse_then_else()
 	eoi=',';
 	//t++;
 	get_token();
+
+		// 禁止 THEN/ELSE 分支内再起始 IF（避免“IF ... THEN ... IF ...”被吞并）
+	if ((token_type == KEYWORD) && (tok == IF || tok == IFP || tok == IFM))
+	{
+		then_else = 0;
+		eoi = NL;
+		error = 1;
+		return 1;
+	}
+
 	if (token_type==NUMBER)
 	{
 		putback() ;
@@ -5392,6 +5409,14 @@ void prescan2(void)
 					case IF:
 					case IFP:
 					case IFM:
+						// 与 prescan1 对齐：THEN/ELSE 分支中禁止嵌套 IF
+						if (then_else)
+						{
+							sntx_err(SYNTAX);
+							get_nl();
+							break;
+						}
+
 						fvar1 = 0;
 						if (tok==IFP)
 						{
@@ -5479,6 +5504,18 @@ void parse2_then_else()
 	eoi=',';
 	//fance t++;
 	get_token();
+
+	// 与 prescan1 保持一致：禁止 THEN/ELSE 分支内再起始 IF
+	if ((token_type == KEYWORD) && (tok == IF || tok == IFP || tok == IFM))
+	{
+		sntx_err(SYNTAX);
+		get_nl();
+		then_else = 0;
+		eoi = NL;
+		error = 1;
+		return;
+	}
+
 	if (token_type==NUMBER)
 	{
 		putback() ;
@@ -6842,11 +6879,18 @@ unsigned char cod;//,xtemp[15];
 				 continue;
 				}
 //				 return;          // return when else is finished
-
+	 // 20260730 关键修复：跳过 THEN/ELSE 分支结束分隔符，避免多输出逗号
+	 if ((unsigned char)*code == 0xFF)
+	 {
+		 ++code;
+		 continue;
+	 }
 
 
 	if (*code == ELSE) buf -= 2;
-	if (*code != ASSIGN && *code != ASSIGNAR || *code != ASSIGNARRAY_1 || *code != ASSIGNARRAY_2)
+	//if (*code != ASSIGN && *code != ASSIGNAR || *code != ASSIGNARRAY_1 || *code != ASSIGNARRAY_2)
+	// 修复逻辑：原来这里条件恒真
+	if (*code != ASSIGN && *code != ASSIGNAR && *code != ASSIGNARRAY_1 && *code != ASSIGNARRAY_2)
 	{
 			strcpy(buf,look_instr(*code));
 			buf += strlen(buf);

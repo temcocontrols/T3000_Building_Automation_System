@@ -57,7 +57,7 @@ const TCHAR c_strFlashMethodCom[] = _T("COM");
 //const DWORD c_nHexFileBufLen = 0x7FFFF;   // hex maximum 64k
 const DWORD c_nHexFileBufLen = 0x1FFFFF;   // hex 最大64k
 // bin file maximum 512k
-const DWORD c_nBinFileBufLen = 0x1FFFFF;  // bin 文件最大512k
+const DWORD c_nBinFileBufLen = 0x3FFFFF;  // bin 文件最大512k
 
 
 

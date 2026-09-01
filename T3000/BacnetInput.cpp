@@ -34,6 +34,7 @@ CBacnetInput::CBacnetInput(CWnd* pParent /*=NULL*/)
 {
   //  m_latest_protocol=3;
 	window_max = true;
+	m_restoring_position = true;  // 新增
 	InvalidateColumnWidthCache(); 
 }
 
@@ -63,6 +64,7 @@ BEGIN_MESSAGE_MAP(CBacnetInput, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_MOVE()
 	ON_WM_SYSCOMMAND()
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 // CBacnetInput message handlers
@@ -292,7 +294,14 @@ void CBacnetInput::Reload_Unit_Type()
 			initial_count = (int)m_Input_data.size();
 		else
 			initial_count = RMC1232_IN_A;
-			}
+	}
+	else if (bacnet_device_type == T3_BMS)
+	{
+		if (T3_BMS_IN_A > (int)m_Input_data.size())
+			initial_count = (int)m_Input_data.size();
+		else
+			initial_count = T3_BMS_IN_A;
+	}
 	else if (bacnet_device_type == T3_NG3)
 	{
 		if (NG3_IN_A > (int)m_Input_data.size())
@@ -1051,7 +1060,25 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 
 				}
 				else
+				{
 					m_input_list.SetItemText(i, INPUT_RANGE, Input_Analog_Units_Array[m_Input_data.at(i).range]);
+				}
+
+				if (bacnet_device_type == T3_RMC1232)
+				{
+					if ((i == 8) || (i == 9) || (i == 10) )  //IN9  10 11 12 只能测试高压
+					{
+						m_input_list.SetItemText(i ,INPUT_RANGE,_T("-30V to -65V"));
+					}
+					else if (i == 11)
+					{
+						m_input_list.SetItemText(i ,INPUT_RANGE,_T("0 to 30V"));
+					}
+				}
+				else
+				{
+					m_input_list.SetItemText(i, INPUT_RANGE, Input_Analog_Units_Array[m_Input_data.at(i).range]);
+				}
 			}
 			else
 				m_input_list.SetItemText(i, INPUT_RANGE, _T("Out of range"));
@@ -1655,6 +1682,21 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 					return;
 			}
         }
+		if (g_selected_product_id == PM_ESP32_T3_SERIES)
+		{
+			if (Device_Basic_Setting.reg.mini_type == T3_RMC1232)
+			{
+				if ((lRow >= 8) && (lRow <= 11))
+					return;
+				if ((lRow >= 32) && (lRow <= 47))
+					return;
+			}
+			if (Device_Basic_Setting.reg.mini_type == T3_BMS)
+			{
+				if ((lRow >= 32) && (lRow <= 47))
+					return;
+			}
+		}
 		if (PM_ESP32_T3_SERIES == g_selected_product_id)
 		{
 			if (Device_Basic_Setting.reg.mini_type == T3_ESP_RMC)
@@ -1662,9 +1704,14 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				if ((lRow >= 16) && (lRow <= 17))  //IN17  IN18 is sensor
 					return;
 			}
+			if (Device_Basic_Setting.reg.mini_type == T3_BMS)
+			{
+				if ((lRow == 32) && (lRow <= 47))
+					return;
+			}
 			if (Device_Basic_Setting.reg.mini_type == T3_RMC1232)
 			{
-				if ((lRow == 32) && (lRow <= 37))  
+				if ((lRow == 32) && (lRow <= 47))  
 					return;
 			}
 			else if (Device_Basic_Setting.reg.mini_type == T3_NG3)
@@ -1913,7 +1960,8 @@ void CBacnetInput::Reset_Input_Rect()
 	CRect temp_window;
 	GetWindowRect(&temp_window);
 
-	if(window_max)
+	m_restoring_position = true;  // 加这行
+	if (IsZoomed())
 	{
 		CRect temp_mynew_rect;
 		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
@@ -1925,8 +1973,8 @@ void CBacnetInput::Reset_Input_Rect()
 	}
 	else
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,700,700, NULL);
-	
-	//MoveWindow(temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(),1);
+	m_restoring_position = false; // 加这行
+
 	return;
 }
 
@@ -2082,7 +2130,9 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 
 void CBacnetInput::OnClose()
 {
-	 
+	// ========== 新增：保存窗口位置 ==========
+	SaveWindowPosition();
+	// ========================================
 	ShowWindow(FALSE);
 	return;
 
@@ -2144,24 +2194,17 @@ BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
 			ticktime = nowticktime;
 		}
 	}
-	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	else if (pMsg->message == WM_NCLBUTTONDBLCLK && pMsg->wParam == HTCAPTION)
 	{
-		if(!window_max)
-		{
-			window_max = true;
-			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
-		}
+		// 必须走原生最大化/还原，不能手动 SetWindowPos。
+		// 否则 IsZoomed() 返回 FALSE，Reset_Input_Rect() 无法识别
+		// 最大化状态，对话框就不会跟着 T3000 主窗口移动。
+		// 最大化区域由 OnGetMinMaxInfo 限制在 BacNet_hwd 范围内。
+		if (IsZoomed())
+			SendMessage(WM_SYSCOMMAND, SC_RESTORE, 0);
 		else
-		{
-			window_max = false;
-			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,500,700,SWP_SHOWWINDOW);
-		}
-
-		return 1; 
+			SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+		return 1;
 	}
 	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
 	{
@@ -2170,7 +2213,8 @@ BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
 	}
 
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    if (pFrame->m_pDialogInfo!=NULL&&pFrame->m_pDialogInfo->IsWindowVisible())
+	if (pFrame->m_pDialogInfo != NULL && ::IsWindow(pFrame->m_pDialogInfo->m_hWnd)  && pFrame->m_pDialogInfo->IsWindowVisible())
+    //if (pFrame->m_pDialogInfo!=NULL&&pFrame->m_pDialogInfo->IsWindowVisible())
     {
         if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
         {
@@ -2459,59 +2503,47 @@ BOOL CBacnetInput::OnHelpInfo(HELPINFO* pHelpInfo)
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
 
-
 void CBacnetInput::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	
+	// 同步 window_max 与窗口真实状态（双击/按钮/代码触发都能覆盖）
+	if (nType == SIZE_MAXIMIZED)
+		window_max = true;
+	else if (nType == SIZE_RESTORED)
+		window_max = false;
+
 	CRect rc;
 	GetClientRect(rc);
-	if(m_input_list.m_hWnd != NULL)
+	if (m_input_list.m_hWnd != NULL)
 	{
-
-		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
 		m_input_list.MoveWindow(&rc);
-		//BringWindowToTop();
-		//SetActiveWindow();
 	}
-}
 
+	// Don't save position when maximized
+	if (IsWindowVisible() && nType != SIZE_MINIMIZED && nType != SIZE_MAXIMIZED && !m_restoring_position)
+		SaveWindowPosition();
+}
 
 void CBacnetInput::OnMove(int x, int y)
 {
 	CDialogEx::OnMove(x, y);
-	::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+	::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
 
-	//BringWindowToTop();
-	//SetActiveWindow();
-	
-	
+
+
+	// Only save when user manually moves, not during restore
+	if (IsWindowVisible() && !m_restoring_position)
+		SaveWindowPosition();
 }
 
 
 void CBacnetInput::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	 
-	if(nID == SC_MAXIMIZE)
-	{
-		if(window_max == false)
-		{
-			window_max = true;
-			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
-		}
-		else
-		{
-			window_max = false;
-			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,500,700,SWP_SHOWWINDOW);
-		}
-
-		return;
-	}
+	// Let Windows handle maximize/restore natively.
+	// OnGetMinMaxInfo constrains the maximized area to BacNet_hwd region.
 	CDialogEx::OnSysCommand(nID, lParam);
 }
 
@@ -2597,3 +2629,77 @@ void CBacnetInput::GetInputUnitandValue(int i, CString& unit, CString& value)
 
 	}
 }
+void CBacnetInput::SaveWindowPosition()
+{
+	if (!IsWindow(m_hWnd)) return;
+	CRect rect;
+	GetWindowRect(&rect);
+
+	CString strLeft, strTop, strWidth, strHeight, strMax;
+	strLeft.Format(_T("%d"), rect.left);
+	strTop.Format(_T("%d"), rect.top);
+	strWidth.Format(_T("%d"), rect.Width());
+	strHeight.Format(_T("%d"), rect.Height());
+	strMax.Format(_T("%d"), window_max ? 1 : 0);
+
+	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Left"), strLeft, g_cstring_ini_path);
+	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Top"), strTop, g_cstring_ini_path);
+	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Width"), strWidth, g_cstring_ini_path);
+	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Height"), strHeight, g_cstring_ini_path);
+	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Max"), strMax, g_cstring_ini_path);
+}
+
+// BacnetInput.cpp - 实现：
+void CBacnetInput::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
+{
+	// Constrain maximized area to BacNet_hwd region
+	if (::IsWindow(BacNet_hwd))
+	{
+		CRect rect;
+		::GetWindowRect(BacNet_hwd, &rect);
+		lpMMI->ptMaxSize.x = rect.Width();
+		lpMMI->ptMaxSize.y = rect.Height() - DELTA_HEIGHT;
+		lpMMI->ptMaxPosition.x = rect.left;
+		lpMMI->ptMaxPosition.y = rect.top;
+		lpMMI->ptMaxTrackSize.x = lpMMI->ptMaxSize.x;
+		lpMMI->ptMaxTrackSize.y = lpMMI->ptMaxSize.y;
+	}
+	CDialogEx::OnGetMinMaxInfo(lpMMI);
+}
+
+void CBacnetInput::RestoreWindowPosition()
+{
+	int left = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Left"), -1, g_cstring_ini_path);
+	int top = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Top"), -1, g_cstring_ini_path);
+	int width = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Width"), -1, g_cstring_ini_path);
+	int height = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Height"), -1, g_cstring_ini_path);
+	int isMax = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Max"), 0, g_cstring_ini_path);
+
+	CString dbg;
+	dbg.Format(_T("[Input] Restore INI: L=%d T=%d W=%d H=%d Max=%d Path=%s"),
+		left, top, width, height, isMax, (LPCTSTR)g_cstring_ini_path);
+	TRACE(_T("%s\n"), (LPCTSTR)dbg);
+
+	if (left >= 0 && top >= 0 && width > 0 && height > 0)
+	{
+		if (left < -100 || top < -100)
+		{
+			Reset_Input_Rect();
+			return;
+		}
+		if (isMax == 1)
+			ShowWindow(SW_SHOWMAXIMIZED);
+		// Guard: prevent OnMove/OnSize from saving during restore
+		m_restoring_position = true;
+		::MoveWindow(this->m_hWnd, left, top, width, height, TRUE);
+		m_restoring_position = false;
+		TRACE(_T("[Input] Restored to: %d,%d %dx%d\n"), left, top, width, height);
+	}
+	else
+	{
+		Reset_Input_Rect();
+	}
+}
+
+
+

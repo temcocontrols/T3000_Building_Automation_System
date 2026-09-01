@@ -1532,6 +1532,7 @@ void Dowmloadfile::OnBnClickedButtonStartDownload()
 	{
 		if ((m_product_isp_auto_flash.m_ext_info.mini_type == T3_ESP_RMC) || 
             (m_product_isp_auto_flash.m_ext_info.mini_type == T3_RMC1232) ||
+            (m_product_isp_auto_flash.m_ext_info.mini_type == T3_BMS) ||
             ((m_product_isp_auto_flash.m_ext_info.mini_type == T3_NG3)))
 		{
 			CString temp_isp_info;
@@ -1553,6 +1554,7 @@ void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()
     {
         if ((m_product_isp_auto_flash.m_ext_info.mini_type == T3_ESP_RMC) || 
             (m_product_isp_auto_flash.m_ext_info.mini_type == T3_RMC1232) ||
+            (m_product_isp_auto_flash.m_ext_info.mini_type == T3_BMS) ||
             ((m_product_isp_auto_flash.m_ext_info.mini_type == T3_NG3)))
         {
             CString temp_isp_info;

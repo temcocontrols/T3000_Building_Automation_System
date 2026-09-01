@@ -63,6 +63,8 @@ BEGIN_MESSAGE_MAP(CBacnetOutput, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SYSCOMMAND()
     ON_NOTIFY(NM_RCLICK, IDC_LIST_OUTPUT, &CBacnetOutput::OnNMRClickListOutput)
+	ON_WM_MOVE()
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 
@@ -522,6 +524,11 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 		digital_special_output_count = RMC1232_OUT_D;
 		analog_special_output_count = RMC1232_OUT_A;
 	}
+	else if (T3_BMS == bacnet_device_type)
+	{
+		digital_special_output_count = T3_BMS_OUT_D;
+		analog_special_output_count = T3_BMS_OUT_A;
+		}
 	else if (T3_NG3 == bacnet_device_type)
 	{
 		digital_special_output_count = NG3_OUT_D;
@@ -730,6 +737,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 			bacnet_device_type == T3_OEM_12I ||
 			bacnet_device_type == T3_ESP_RMC ||
 			bacnet_device_type == T3_RMC1232 ||
+			bacnet_device_type == T3_BMS ||
 			bacnet_device_type == T3_NG3 ||
 			bacnet_device_type == T3_3IIC ||
 			bacnet_device_type == BIG_MINIPANEL ||
@@ -1928,24 +1936,17 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 		m_output_list.Get_clicked_mouse_position();
 		return TRUE;
 	}
-	else if(pMsg->message==WM_NCLBUTTONDBLCLK)
+	else if (pMsg->message == WM_NCLBUTTONDBLCLK && pMsg->wParam == HTCAPTION)
 	{
-		if(!window_max)
-		{
-			window_max = true;
-			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
-		}
+		// 必须走原生最大化/还原，不能手动 SetWindowPos。
+		// 否则 IsZoomed() 返回 FALSE，Reset_Input_Rect() 无法识别
+		// 最大化状态，对话框就不会跟着 T3000 主窗口移动。
+		// 最大化区域由 OnGetMinMaxInfo 限制在 BacNet_hwd 范围内。
+		if (IsZoomed())
+			SendMessage(WM_SYSCOMMAND, SC_RESTORE, 0);
 		else
-		{
-			window_max = false;
-			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 30 ,temp_mynew_rect.top + 30,500,700,SWP_SHOWWINDOW);
-		}
-
-		return 1; 
+			SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+		return 1;
 	}
 	else if ((pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F2)) //老毛要求按F2立刻刷新值;
 	{
@@ -1968,7 +1969,7 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetOutput::OnClose()
 {
-	 
+	SaveWindowPosition();
 
 	ShowWindow(FALSE);
 	return;
@@ -2170,6 +2171,12 @@ void CBacnetOutput::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
+	// 同步 window_max 与窗口真实状态（双击/按钮/代码触发都能覆盖）
+	if (nType == SIZE_MAXIMIZED)
+		window_max = true;
+	else if (nType == SIZE_RESTORED)
+		window_max = false;
+
 	CRect rc;
 	GetClientRect(rc);
 	if(m_output_list.m_hWnd != NULL)
@@ -2178,6 +2185,9 @@ void CBacnetOutput::OnSize(UINT nType, int cx, int cy)
 				m_output_list.MoveWindow(&rc);
 	}
 
+	// Only save when user manually resizes, not during restore
+	if (IsWindowVisible() && nType != SIZE_MINIMIZED && !m_restoring_position)
+		SaveWindowPosition();
 	
 }
 
@@ -2186,51 +2196,33 @@ void CBacnetOutput::OnSize(UINT nType, int cx, int cy)
 
 void CBacnetOutput::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	 
-	if(nID == SC_MAXIMIZE)
-	{
-		if(window_max == false)
-		{
-			window_max = true;
-			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height(), SWP_SHOWWINDOW);
-		}
-		else
-		{
-			window_max = false;
-			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left  + 30 ,temp_mynew_rect.top + 30,500,700,SWP_SHOWWINDOW);
-		}
-		return;
-	}
+	// Let Windows handle maximize/restore natively.
+// OnGetMinMaxInfo constrains the maximized area to BacNet_hwd region.
 	CDialogEx::OnSysCommand(nID, lParam);
 }
 
 void CBacnetOutput::Reset_Output_Rect()
 {
 
-		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
+	CRect temp_mynew_rect;
+	::GetWindowRect(BacNet_hwd, &temp_mynew_rect);
+	CRect temp_window;
+	GetWindowRect(&temp_window);
 
-		CRect temp_window;
-		GetWindowRect(&temp_window);
-		if(window_max)
-		{
-			CRect temp_mynew_rect;
-			::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
-		}
-		else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
-		{
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,0,0,SWP_NOSIZE );
-		}
-		else
-			::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left + 30,temp_mynew_rect.top + 30,700,700, NULL);
-
-
-		return;
+	m_restoring_position = true;
+	if (IsZoomed())
+	{
+		::SetWindowPos(this->m_hWnd, NULL, temp_mynew_rect.left, temp_mynew_rect.top,
+			temp_mynew_rect.Width(), temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
+	}
+	else if ((temp_window.Width() <= temp_mynew_rect.Width()) && (temp_window.Height() <= temp_mynew_rect.Height()))
+	{
+		::SetWindowPos(this->m_hWnd, NULL, temp_mynew_rect.left, temp_mynew_rect.top, 0, 0, SWP_NOSIZE);
+	}
+	else
+		::SetWindowPos(this->m_hWnd, NULL, temp_mynew_rect.left + 30, temp_mynew_rect.top + 30, 700, 700, NULL);
+	m_restoring_position = false;
+	return;
 
 }
 
@@ -2295,4 +2287,90 @@ void CBacnetOutput::OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
         }
 
     }
+}
+
+
+void CBacnetOutput::SaveWindowPosition()
+{
+	if (!IsWindow(m_hWnd)) return;
+	CRect rect;
+	GetWindowRect(&rect);
+
+	CString strLeft, strTop, strWidth, strHeight, strMax;
+	strLeft.Format(_T("%d"), rect.left);
+	strTop.Format(_T("%d"), rect.top);
+	strWidth.Format(_T("%d"), rect.Width());
+	strHeight.Format(_T("%d"), rect.Height());
+	strMax.Format(_T("%d"), window_max ? 1 : 0);
+
+	WritePrivateProfileString(_T("WindowPosition"), _T("Output_Left"), strLeft, g_cstring_ini_path);
+	WritePrivateProfileString(_T("WindowPosition"), _T("Output_Top"), strTop, g_cstring_ini_path);
+	WritePrivateProfileString(_T("WindowPosition"), _T("Output_Width"), strWidth, g_cstring_ini_path);
+	WritePrivateProfileString(_T("WindowPosition"), _T("Output_Height"), strHeight, g_cstring_ini_path);
+	WritePrivateProfileString(_T("WindowPosition"), _T("Output_Max"), strMax, g_cstring_ini_path);
+}
+
+void CBacnetOutput::RestoreWindowPosition()
+{
+	int left = GetPrivateProfileInt(_T("WindowPosition"), _T("Output_Left"), -1, g_cstring_ini_path);
+	int top = GetPrivateProfileInt(_T("WindowPosition"), _T("Output_Top"), -1, g_cstring_ini_path);
+	int width = GetPrivateProfileInt(_T("WindowPosition"), _T("Output_Width"), -1, g_cstring_ini_path);
+	int height = GetPrivateProfileInt(_T("WindowPosition"), _T("Output_Height"), -1, g_cstring_ini_path);
+	int isMax = GetPrivateProfileInt(_T("WindowPosition"), _T("Output_Max"), 0, g_cstring_ini_path);
+
+
+
+	CString dbg;
+	dbg.Format(_T("[Output] Restore INI: L=%d T=%d W=%d H=%d Max=%d Path=%s"),
+		left, top, width, height, isMax, (LPCTSTR)g_cstring_ini_path);
+	TRACE(_T("%s\n"), (LPCTSTR)dbg);
+
+	if (left >= 0 && top >= 0 && width > 0 && height > 0)
+	{
+		if (left < -100 || top < -100)
+		{
+			Reset_Output_Rect();
+			return;
+		}
+        if (isMax == 1)
+            ShowWindow(SW_SHOWMAXIMIZED);
+		// Guard: prevent OnMove/OnSize from saving during restore
+		m_restoring_position = true;
+		::MoveWindow(this->m_hWnd, left, top, width, height, TRUE);
+		m_restoring_position = false;
+		TRACE(_T("[Output] Restored to: %d,%d %dx%d\n"), left, top, width, height);
+	}
+	else
+	{
+		Reset_Output_Rect();
+	}
+
+}
+
+void CBacnetOutput::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	if (BacNet_hwd != NULL)
+	{
+		CRect rect;
+		::GetWindowRect(BacNet_hwd, &rect);
+		lpMMI->ptMaxPosition.x = rect.left;
+		lpMMI->ptMaxPosition.y = rect.top;
+		lpMMI->ptMaxSize.x = rect.Width();
+		lpMMI->ptMaxSize.y = rect.Height() - DELTA_HEIGHT;
+		lpMMI->ptMaxTrackSize = lpMMI->ptMaxSize;
+	}
+	CDialogEx::OnGetMinMaxInfo(lpMMI);
+}
+
+void CBacnetOutput::OnMove(int x, int y)
+{
+	CDialogEx::OnMove(x, y);
+
+	// TODO: 在此处添加消息处理程序代码
+	::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+
+
+	// Only save when user manually moves, not during restore
+	if (IsWindowVisible() && !m_restoring_position)
+		SaveWindowPosition();
 }

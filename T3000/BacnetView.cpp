@@ -1828,7 +1828,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			{
 				bac_read_which_list = -1;
 				bac_programcode_read_results = false;
-
+#if 0
 				// Display non-modal dialog
 				//显示非模态对话框;
 				if (ProgramNEWEdit_Window != NULL)
@@ -1840,7 +1840,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				ProgramNEWEdit_Window = new ControlBasicEditorView;
 				ProgramNEWEdit_Window->Create(IDD_CONTROLBASIC_EDITOR_VIEW, this);
 				ProgramNEWEdit_Window->ShowWindow(SW_SHOW);
-
+#endif
 
 			}
 
@@ -3820,8 +3820,8 @@ void CDialogCM5_BacNet::Fresh()
 					bacnet_device_type = T3_ESP_RMC;
 				else if (ret == T3_RMC1232)
 					bacnet_device_type = T3_RMC1232;
-				else if (ret == T3_RMC1232)
-					bacnet_device_type = T3_RMC1232;
+				else if (ret == T3_BMS)
+					bacnet_device_type = T3_BMS;
 				else if (ret == T3_NG3)
 					bacnet_device_type = T3_NG3;
 				else if (ret == T3_3IIC)
@@ -6310,7 +6310,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
         if (Input_Window->IsWindowVisible() == false)
         {
             Input_Window->ShowWindow(SW_SHOW);
-            Input_Window->Reset_Input_Rect();
+			((CBacnetInput*)pDialog[WINDOW_INPUT])->RestoreWindowPosition();
+            //Input_Window->Reset_Input_Rect();
         }
 		g_hwnd_now = m_input_dlg_hwnd;
 		Input_Window->m_input_list.SetFocus();  
@@ -6320,7 +6321,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
         if (Output_Window->IsWindowVisible() == false)
         {
             Output_Window->ShowWindow(SW_SHOW);
-            Output_Window->Reset_Output_Rect();
+			((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->RestoreWindowPosition();
+			//Output_Window->Reset_Output_Rect();
         }
 		g_hwnd_now = m_output_dlg_hwnd;
 		Output_Window->m_output_list.SetFocus();  
@@ -6330,7 +6332,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
         if (Variable_Window->IsWindowVisible() == false)
         {
             Variable_Window->ShowWindow(SW_SHOW);
-            Variable_Window->Reset_Variable_Rect();
+            Variable_Window->RestoreWindowPosition();
         }
 		g_hwnd_now =  m_variable_dlg_hwnd;
 		Variable_Window->m_variable_list.SetFocus();  

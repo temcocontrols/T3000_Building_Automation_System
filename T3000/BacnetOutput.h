@@ -52,10 +52,16 @@ public:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	void Reset_Output_Rect();
     afx_msg void OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult);
+	void RestoreWindowPosition();
+	void SaveWindowPosition();
 private:
 	int m_cached_col_width[OUTPUT_COL_NUMBER];  // 列宽缓存，-1表示未设置
 	void SafeSetColumnWidth(int col, int width);
 	void InvalidateColumnWidthCache();
+public:
+	afx_msg void OnMove(int x, int y);
+	bool m_restoring_position;       // 恢复位置保护标志 - Restore position guard
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 };
 
 
