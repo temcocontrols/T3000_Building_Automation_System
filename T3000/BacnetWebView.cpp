@@ -715,6 +715,7 @@ HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
 
 		m_webView->Navigate(cacheBustUri.c_str());
 	}
+	return S_OK;
 }
 bool ParseString2Json(CString strIn, Json::Value& jsonOut)
 {

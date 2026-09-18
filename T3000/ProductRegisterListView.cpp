@@ -1159,6 +1159,7 @@ int CProductRegisterListView::GetFunctionCode(CString FunctionName)
 		return 16;
 	}
 
+	return 0;
 }
 
 CString CProductRegisterListView::GetFunctionName(int FunctionCode)
@@ -1196,6 +1197,7 @@ CString CProductRegisterListView::GetFunctionName(int FunctionCode)
 	{
 		return m_vecVariableType[7];
 	}
+	return _T("");
 }
 
 int CProductRegisterListView::GetCaculateCode(CString CalName)

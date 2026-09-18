@@ -435,6 +435,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
     default:
         break;
     }
+	return 0;
 }
 
 

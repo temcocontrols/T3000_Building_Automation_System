@@ -11065,6 +11065,7 @@ OUTPUT int write_ptp_data(unsigned char device_var, char *to_write, unsigned sho
     }
 
 
+	return -1;
 }
 #endif
 

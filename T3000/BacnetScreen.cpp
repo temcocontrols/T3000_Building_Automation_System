@@ -363,6 +363,7 @@ int write_webview_data(int device_instance,int panel_id,int nsel_serialnumber,in
 	}
 	
 	delete temp_buffer;
+	return 0;
 }
 
 extern int save_button_click ;
@@ -638,6 +639,7 @@ bool BacnetScreen::run_old_graphic_screen()
 	{
 		h_read_screenlabel_thread = CreateThread(NULL, NULL, ReadScreenThreadfun, this, NULL, NULL);
 	}
+	return true;
 }
 
 LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
@@ -2243,6 +2245,7 @@ int Write_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex
 	//}
 
 
+	return 0;
 }
 
 

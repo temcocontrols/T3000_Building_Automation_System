@@ -1185,6 +1185,7 @@ int mudbus_read_one(unsigned char device_var, unsigned short address, int retry_
             return value;
         }
     }
+	return -2;
 }
 
 

@@ -240,6 +240,7 @@ data_error:
 	//m_nHardWareVersion = nHardWareVersion;
 	//m_nProductModel=nProductID;
 
+	return 0;
 }
 
 

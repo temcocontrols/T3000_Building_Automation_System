@@ -1630,7 +1630,7 @@ char* intervaltotext_old(char* textbuf, long seconds, unsigned minutes, unsigned
 	itoa(seconds, textbuffer, 10);
 
 	if (textbuf) strcpy(textbuf, buf);
-	return(buf);
+	return(textbuf);
 }
 /*******************intervaltotext ********************/
 
@@ -8380,6 +8380,7 @@ int get_key_name(int nfunction,CString &temp_cs)
 		(int)strlen((char*)ptr_panel.info[nfunction].name) + 1,
 		temp_cs.GetBuffer(MAX_PATH), MAX_PATH);
 	temp_cs.ReleaseBuffer();
+	return 1;
 }
 
 void init_info_table( void )

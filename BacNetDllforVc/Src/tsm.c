@@ -304,6 +304,7 @@ bool dll_offline_mode = false;
 bool set_offline_mode(bool offline)
 {
 	dll_offline_mode = offline;
+	return dll_offline_mode;
 }
 
 /** Check if the invoke ID has been made free by the Transaction State Machine.

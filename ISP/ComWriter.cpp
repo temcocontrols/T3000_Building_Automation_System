@@ -1977,6 +1977,7 @@ int CComWriter::Fix_Tstat10_76800_baudrate()
     }
 
 
+	return 0;
 }
 
 int CComWriter::UpdataDeviceInformation(int& ID)

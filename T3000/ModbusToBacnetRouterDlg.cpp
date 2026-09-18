@@ -1214,4 +1214,5 @@ LRESULT CModbusToBacnetRouterDlg::Fresh_Input_Item(WPARAM wParam, LPARAM lParam)
 	{
 		m_vecMd2BT[Changed_Item].Update_On_Reconnect = New_CString;
 	}
+	return 0;
 }

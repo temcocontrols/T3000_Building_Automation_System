@@ -7891,7 +7891,7 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
     itoa(seconds,textbuffer,10)  ;
 
     if(textbuf) strcpy(textbuf, buf);
-    return( buf ) ;
+    return( textbuf ) ;
 }
 void LocalBacnetRejectHandler(BACNET_ADDRESS* src,uint8_t invoke_id,uint8_t reject_reason)
 {

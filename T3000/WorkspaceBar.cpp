@@ -75,7 +75,7 @@ void CWorkspaceBar::OnMouseMove(UINT nFlags, CPoint point)
 	//	// 		GetDlgItem(IDC_EXPAND)->ModifyStyle(0,preStyle);	
 	//}
 
-	CWorkspaceBar::OnMouseMove(nFlags, point);
+	CDockablePane::OnMouseMove(nFlags, point);
 }
 CWorkspaceBar::CWorkspaceBar()
 {
