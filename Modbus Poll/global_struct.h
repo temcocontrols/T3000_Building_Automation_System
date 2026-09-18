@@ -5,11 +5,11 @@ typedef struct T3_Register
 	int regID;
 	CString regName;
 }T3Register;
-typedef struct RegPoint{
+struct RegPoint{
 	unsigned short Time_offset;
 	unsigned short Value_offset;
 };
-typedef struct Registers_Infor
+struct Registers_Infor
 {
     vector<RegPoint> Reg_Point;
     COLORREF Point_Color;

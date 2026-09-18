@@ -7,7 +7,7 @@
 #include "../SQLiteDriver/CppSQLite3.h"
 // CBuildingConfigration dialog
 
-typedef struct Building_Config 
+struct Building_Config 
 {
 	bool b_selected;
 	int ID;

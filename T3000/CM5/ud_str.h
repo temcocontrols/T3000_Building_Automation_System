@@ -929,7 +929,7 @@ typedef union
 	}reg;
 }Str_Setting_Info;
 
-typedef enum
+enum
 {
 	NOUSE, BACNET_MSTP,MAIN_MODBUS,MAIN_PTP,SUB_GSM,MAIN_ZIG,SUB_ZIG,SUB_MODBUS, RS232_METER, MSTP_MASTER,MAX_COM_TYPE
 };
@@ -1244,20 +1244,20 @@ typedef struct
 #pragma pack(push) //保存对齐状态 
 #pragma pack(1)
 
-typedef struct str_viewportTransform
+struct str_viewportTransform
 {
 	unsigned short scale;
 	unsigned short x;
 	unsigned short y;
 };
-typedef struct str_t3Entry
+struct str_t3Entry
 {
 	unsigned char pid;
 	unsigned char ntype;
 	unsigned char index;
 };
 
-typedef struct str_settings
+struct str_settings
 {
 	unsigned char active;
 	char bgColor[JSON_COLOR_LENGTH];
@@ -1277,7 +1277,7 @@ typedef struct str_settings
 };
 
 
-typedef struct myitems
+struct myitems
 {
 	unsigned char ntranslate_count;// 控制结构体 translate 数量
 	unsigned char item_belong_screen;

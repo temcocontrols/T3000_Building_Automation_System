@@ -15,7 +15,7 @@
 #define MAX_AR					16
 
 #define	MAX_INTERVALS_PER_DAY			4
-typedef enum
+enum
 {
 	WR_DESCRIPTION ,			 
  	AR_DESCRIPTION ,				 

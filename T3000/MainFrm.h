@@ -121,7 +121,7 @@ typedef struct _BUILDING_TAG
 	CString strConnectionType;
 }Building_info;
 
-typedef struct ext_info
+struct ext_info
 {
 	int virtual_device;  // 0  default    1  verture device
 	//Corresponds to mini_type in Settings interface

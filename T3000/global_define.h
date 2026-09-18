@@ -166,7 +166,7 @@ typedef struct
 #pragma pack(pop)//恢复对齐状态 
 
 
-typedef enum
+enum
 {
 	GET_SERIAL_NUMBER = 1,
 	DOWNLOAD_FILE = 2,
@@ -1302,7 +1302,7 @@ const int KEY_INSERT = 1020;
 const int KEY_INSERT_CONTROL = 1021;
 
 
-typedef enum
+enum
 {
 	PRODUCT_CM5 = 0,						//10A + 8 D			//10D									   //IN				//OUT	
 	BIG_MINIPANEL = 1,						//32 A				//12D   12A
@@ -2174,7 +2174,7 @@ enum sub_io_type
 
 
 																						//从机 发起的 FF 55 后面的 请求位;
-typedef enum
+enum
 {
 	SEND_MINIPANEL_INFO = 1,
 	GET_MINIPANEL_INFO = 2
@@ -2182,7 +2182,7 @@ typedef enum
 
 
 //主机应答的FF 55 后面的命令位;
-typedef enum
+enum
 {
 	RECEIVE_DATA_LEBGTH_ERROR = 1,
 	RECEIVE_MINI_DATA = 2,
@@ -2469,7 +2469,7 @@ const CString Wifi_Module_Status[] =
     _T("Wifi SSID Password Error")
 };
 
-typedef enum
+enum
 {
     WIFI_NONE,
     WIFI_NO_WIFI,
@@ -2676,13 +2676,13 @@ const CString Airlab_Unit_String[] =
     _T("Lux")
 };
 
-typedef struct FloorInfo
+struct FloorInfo
 {
 	CString csName;
 	int xindex;
 };
 
-typedef struct RoomInfo
+struct RoomInfo
 {
 	FloorInfo nFloor;
 	CString csName;
