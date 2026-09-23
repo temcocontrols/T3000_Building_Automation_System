@@ -45,6 +45,11 @@ public:
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	void SaveWindowPosition();    // 保存窗口位置到 INI
+	void RestoreWindowPosition(); // 从 INI 恢复窗口位置
+	bool m_restoring_position;
+	afx_msg void OnMove(int x, int y);
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 };
 
 

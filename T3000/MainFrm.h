@@ -434,6 +434,8 @@ public:
 	void ContinueRefreshThread();
 	CString GetDeviceClassName(int nClassID);
 	CString GetScreenName(int nSerialNumber, int nModbusID);
+	void SaveMainWindowPosition();
+	BOOL m_bRestoreMaximized;
 protected:
 
 
@@ -626,6 +628,7 @@ public:
 		//afx_msg void OnWebviewThirdpartymodbusdatabase();
 		afx_msg void OnToolsLoginmyaccount();
 		afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+		afx_msg void OnClose();
 };
 //DWORD WINAPI  Bacnet_ReadWrite_Message(LPVOID lpVoid);
 //tree0412  2017 05 11 fance change

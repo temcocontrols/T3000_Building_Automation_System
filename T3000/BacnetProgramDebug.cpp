@@ -501,6 +501,16 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 				digital_special_output_count = RMC_OUT_D;
 				analog_special_output_count = RMC_OUT_A;
 			}
+			else if (bacnet_device_type == T3_RMC1232)
+			{
+				digital_special_output_count = RMC1232_OUT_D;
+				analog_special_output_count = RMC1232_OUT_A;
+			}
+			else if (bacnet_device_type == T3_BMS)
+			{
+				digital_special_output_count = T3_BMS_OUT_D;
+				analog_special_output_count = T3_BMS_OUT_A;
+			}
 			else if (bacnet_device_type == T3_NG3)
 			{
 				digital_special_output_count = NG3_OUT_D;

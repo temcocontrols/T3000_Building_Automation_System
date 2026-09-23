@@ -91,7 +91,7 @@ END_MESSAGE_MAP()
 BOOL BacnetRange::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	((CButton*)GetDlgItem(IDC_RADIO_MSV_4))->EnableWindow(0); // 20260723 切尔西说只有3个
 	m_show_unit.ShowWindow(FALSE);
 	m_show_unit.SetWindowTextW(_T(""));
 
@@ -1830,7 +1830,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 			}
 			else
 			{
-				((CButton*)GetDlgItem(IDC_RADIO_MSV_4))->EnableWindow(1);
+				((CButton*)GetDlgItem(IDC_RADIO_MSV_4))->EnableWindow(0);
 			}
 			break;
 

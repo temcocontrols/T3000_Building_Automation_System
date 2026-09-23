@@ -258,6 +258,7 @@ BOOL m_active_key_mouse = FALSE;
 
 
 
+
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
 
 const int  iMaxUserToolbars = 10;
@@ -397,6 +398,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
         ON_COMMAND(ID_TOOLS_LOGINMYACCOUNT, &CMainFrame::OnToolsLoginmyaccount)
         ON_WM_SYSCOMMAND()
         ON_WM_ACTIVATEAPP()
+        ON_WM_CLOSE()
         END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -1179,12 +1181,12 @@ The bound local network adapter can be modified through the menu .\r\nMenu-Tool-
 		//CreateOfflinePrgFile();
 		set_offline_mode(offline_mode);
 	}
-	
+    SetTimer(8001, 500, NULL);  // 延迟恢复主窗体位置和最大化 / Delayed restore of main window position and maximize
+
     if (h_mul_ping_thread == NULL)
     {
         h_mul_ping_thread = CreateThread(NULL, NULL, Mul_Ping_Thread, this, NULL, NULL);
     }
-
     if (h_create_webview_server_thread == NULL)
     {
         h_create_webview_server_thread = CreateThread(NULL, NULL, CreateWebServerThreadfun, this, NULL, NULL);
@@ -1195,15 +1197,30 @@ The bound local network adapter can be modified through the menu .\r\nMenu-Tool-
     return 0;
 }
 
+
+
+
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
     if( !CFrameWndEx::PreCreateWindow(cs) )
         return FALSE;
     //  Modify the Window class or styles here by modifying
-    //  the CREATESTRUCT cs
-    // 禁用最小化按钮
-    //cs.style &= ~WS_MINIMIZEBOX;
-    cs.style &= ~FWS_ADDTOTITLE; 
+    cs.style &= ~FWS_ADDTOTITLE;
+#if 0
+    // 恢复窗口位置和大小（非最大化部分）/ Restore position and size
+    int left = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Left"), -1, g_cstring_ini_path);
+    int top = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Top"), -1, g_cstring_ini_path);
+    int width = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Width"), 0, g_cstring_ini_path);
+    int height = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Height"), 0, g_cstring_ini_path);
+
+    if (left >= 0 && top >= 0 && width > 0 && height > 0)
+    {
+        cs.x = left;
+        cs.y = top;
+        cs.cx = width;
+        cs.cy = height;
+    }
+#endif
     return TRUE;
 }
 
@@ -3820,6 +3837,26 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
         ConnectNodeBySerialNumber(serial_number);
 	}
 
+    // 恢复主窗体位置和最大化状态 / Restore main window position and maximize state
+    if (nIDEvent == 8001)
+    {
+        KillTimer(8001);
+        int left = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Left"), -1, g_cstring_ini_path);
+        int top = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Top"), -1, g_cstring_ini_path);
+        int width = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Width"), 0, g_cstring_ini_path);
+        int height = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Height"), 0, g_cstring_ini_path);
+        int is_max = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Max"), 0, g_cstring_ini_path);
+
+        if (left >= 0 && top >= 0 && width > 0 && height > 0)
+        {
+            if (is_max)
+                ShowWindow(SW_SHOWMAXIMIZED);
+            else
+                MoveWindow(left, top, width, height, TRUE);
+        }
+        return;
+    }
+
     CString str;
     str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), g_tstat_id, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
     SetPaneString(0,str);
@@ -6137,6 +6174,15 @@ LRESULT CMainFrame::OnFreshStatusBar(WPARAM wParam, LPARAM lParam)
 
 void CMainFrame::OnDestroy()
 {
+    SaveMainWindowPosition();
+    // 销毁信息对话框，防止PreTranslateMessage访问已销毁的窗口
+// Destroy info dialog to prevent PreTranslateMessage from accessing destroyed window
+    if (m_pDialogInfo != NULL && ::IsWindow(m_pDialogInfo->m_hWnd))
+    {
+        m_pDialogInfo->DestroyWindow();
+        delete m_pDialogInfo;
+        m_pDialogInfo = NULL;
+    }
     shutdown_server();
     mul_ping_flag = false; //关闭 ping 的命令;
     g_mstp_flag = false;
@@ -12154,9 +12200,13 @@ void CMainFrame::OnControlInputs()
         {
             if(pDialog[WINDOW_INPUT]->IsWindowVisible() == false)
             {
-				((CBacnetInput *) pDialog[WINDOW_INPUT])->Reset_Input_Rect();
+				//((CBacnetInput *) pDialog[WINDOW_INPUT])->Reset_Input_Rect();
                 pDialog[WINDOW_INPUT]->ShowWindow(SW_SHOW);
+                ((CBacnetInput*)pDialog[WINDOW_INPUT])->RestoreWindowPosition();
+
             }
+
+
             //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_INPUT);
             Input_Window->m_input_list.SetFocus();  
@@ -12596,9 +12646,10 @@ void CMainFrame::OnControlOutputs()
         {
             if(pDialog[WINDOW_OUTPUT]->IsWindowVisible() == false)
             {
-				Output_Window->Reset_Output_Rect();
                 pDialog[WINDOW_OUTPUT]->ShowWindow(SW_SHOW);
+                Output_Window->RestoreWindowPosition();
             }
+
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_OUTPUT);
             Output_Window->m_output_list.SetFocus();   
             bacnet_view_number = TYPE_OUTPUT;
@@ -12670,8 +12721,10 @@ void CMainFrame::OnControlVariables()
         {
             if(pDialog[WINDOW_VARIABLE]->IsWindowVisible() == false)
             {
-				Variable_Window->Reset_Variable_Rect();
+				//Variable_Window->Reset_Variable_Rect();
                 pDialog[WINDOW_VARIABLE]->ShowWindow(SW_SHOW);
+                Variable_Window->RestoreWindowPosition();
+
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_VARIABLE);
             Variable_Window->m_variable_list.SetFocus();  
@@ -12722,7 +12775,7 @@ void CMainFrame::OnControlVariables()
 
             if (pDialog[WINDOW_VARIABLE]->IsWindowVisible() == false)
             {
-                Variable_Window->Reset_Variable_Rect();
+                Variable_Window->RestoreWindowPosition();
                 pDialog[WINDOW_VARIABLE]->ShowWindow(SW_SHOW);
             }
             ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_VARIABLE);
@@ -15157,7 +15210,8 @@ void CMainFrame::Reset_Window_Pos()
 			statusbar->SetWindowPos(&wndNoTopMost,temprec.left,temprec.top,temprec.Width(),temprec.Height(),SWP_NOACTIVATE | SWP_SHOWWINDOW );
 		if(((CBacnetInput *)pDialog[WINDOW_INPUT]) != NULL)
 		{
-			if(((CBacnetInput *)pDialog[WINDOW_INPUT])->IsWindowVisible())
+            if (((CBacnetInput*)pDialog[WINDOW_INPUT])->IsWindowVisible() &&
+                ((CBacnetInput*)pDialog[WINDOW_INPUT])->IsZoomed())
 			{
 				((CBacnetInput *)pDialog[WINDOW_INPUT])->Reset_Input_Rect();
 			}
@@ -15165,7 +15219,8 @@ void CMainFrame::Reset_Window_Pos()
 
 		if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT]) != NULL)
 		{
-			if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->IsWindowVisible())
+            if (((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->IsWindowVisible() &&
+                ((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->IsZoomed())
 			{
 				((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->Reset_Output_Rect();
 			}
@@ -15173,7 +15228,8 @@ void CMainFrame::Reset_Window_Pos()
 
 		if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE]) != NULL)
 		{
-			if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->IsWindowVisible())
+            if (((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->IsWindowVisible() &&
+                ((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->IsZoomed())
 			{
 				((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->Reset_Variable_Rect();
 			}
@@ -15269,24 +15325,24 @@ void CMainFrame::Reset_Window_Pos()
 				}
 			}
 			break;
-		case TYPE_INPUT:
-			if(((CBacnetInput *)pDialog[WINDOW_INPUT]) != NULL)
-			{
-				if(((CBacnetInput *)pDialog[WINDOW_INPUT])->IsWindowVisible())
-				{
-					((CBacnetInput *)pDialog[WINDOW_INPUT])->Reset_Input_Rect();
-				}
-			}
-			break;
-		case TYPE_OUTPUT:
-			if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT]) != NULL)
-			{
-				if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->IsWindowVisible())
-				{
-					((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->Reset_Output_Rect();
-				}
-			}
-			break;
+		//case TYPE_INPUT:
+		//	if(((CBacnetInput *)pDialog[WINDOW_INPUT]) != NULL)
+		//	{
+		//		if(((CBacnetInput *)pDialog[WINDOW_INPUT])->IsWindowVisible())
+		//		{
+		//			((CBacnetInput *)pDialog[WINDOW_INPUT])->Reset_Input_Rect();
+		//		}
+		//	}
+		//	break;
+		//case TYPE_OUTPUT:
+		//	if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT]) != NULL)
+		//	{
+		//		if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->IsWindowVisible())
+		//		{
+		//			((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->Reset_Output_Rect();
+		//		}
+		//	}
+		//	break;
 		case TYPE_PROGRAM:
 			if(((CBacnetProgram *)pDialog[WINDOW_PROGRAM]) != NULL)
 			{
@@ -15307,15 +15363,15 @@ void CMainFrame::Reset_Window_Pos()
             }
         }
             break;
-		case TYPE_VARIABLE:
-			if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE]) != NULL)
-			{
-				if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->IsWindowVisible())
-				{
-					((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->Reset_Variable_Rect();
-				}
-			}
-			break;
+		//case TYPE_VARIABLE:
+		//	if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE]) != NULL)
+		//	{
+		//		if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->IsWindowVisible())
+		//		{
+		//			((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->Reset_Variable_Rect();
+		//		}
+		//	}
+		//	break;
         case TYPE_ARRAY:
             {
                 if (((CBacnetArray*)pDialog[WINDOW_ARRAY]) != NULL)
@@ -15500,7 +15556,10 @@ void CMainFrame::OnHelpUsingUpdate()
 	if((temp_product_count > 0) && (selected_product_index!=-1) && (selected_product_index < temp_product_count))
 	{
         m_product_isp_auto_flash = m_product.at(selected_product_index);
-        if ((Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) || (Device_Basic_Setting.reg.mini_type == T3_NG3))
+        if ((Device_Basic_Setting.reg.mini_type == T3_ESP_RMC) || 
+            (Device_Basic_Setting.reg.mini_type == T3_RMC1232) ||
+            (Device_Basic_Setting.reg.mini_type == T3_BMS) ||
+            (Device_Basic_Setting.reg.mini_type == T3_NG3))
         {
             //如果是PLC的 RMC和NG2的第二种类型，那么在后面判断类型  不能直接使用T3000 去更新固件;
             m_product_isp_auto_flash.m_ext_info.mini_type = Device_Basic_Setting.reg.mini_type;
@@ -16603,6 +16662,32 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
     CFrameWndEx::OnActivateApp(bActive, dwThreadID);
 }
 
+void CMainFrame::SaveMainWindowPosition()
+{
+
+    WINDOWPLACEMENT wp;
+    wp.length = sizeof(WINDOWPLACEMENT);
+    GetWindowPlacement(&wp);
+    BOOL is_max = (wp.showCmd == SW_SHOWMAXIMIZED);
+    RECT rc = wp.rcNormalPosition;
+
+
+
+    CString strLeft, strTop, strWidth, strHeight, strMax;
+    strLeft.Format(_T("%d"), rc.left);
+    strTop.Format(_T("%d"), rc.top);
+    strWidth.Format(_T("%d"), rc.right - rc.left);
+    strHeight.Format(_T("%d"), rc.bottom - rc.top);
+    strMax.Format(_T("%d"), is_max  ? 1 : 0);
+
+
+    WritePrivateProfileString(_T("WindowPosition"), _T("MainWindow_Left"),      strLeft, g_cstring_ini_path);
+    WritePrivateProfileString(_T("WindowPosition"), _T("MainWindow_Top"),       strTop, g_cstring_ini_path);
+    WritePrivateProfileString(_T("WindowPosition"), _T("MainWindow_Width"),     strWidth, g_cstring_ini_path);
+    WritePrivateProfileString(_T("WindowPosition"), _T("MainWindow_Height"),    strHeight, g_cstring_ini_path);
+    WritePrivateProfileString(_T("WindowPosition"), _T("MainWindow_Max"),       strMax, g_cstring_ini_path);
+}
+
 
 
 void CMainFrame::OnToolsLoginmyaccount()
@@ -16627,4 +16712,10 @@ void CMainFrame::OnToolsLoginmyaccount()
     auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(fullpath));
     auto result = BacnetWebViewAppWindow::RunMessagePump();
     delete webviewwindow;
+}
+
+void CMainFrame::OnClose()
+{
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    CFrameWndEx::OnClose();
 }

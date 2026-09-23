@@ -932,7 +932,7 @@ const CString Input_List_Analog_Units[] =
     _T("dB"),
     _T("Lux"),
     _T(""),
-    _T(""),
+    _T("A"),
     _T(""),
     _T(""),
     _T("")
@@ -976,7 +976,7 @@ const CString Input_Analog_Units_Array[] =
     _T("dB"),
     _T("Lux"),
     _T(""),
-    _T(""),
+    _T("-200A to 200A"),
     _T(""),
     _T(""),
     _T("")
@@ -1314,6 +1314,7 @@ typedef enum
 	MINIPANELARM_TB = 7,
 	MINIPANELARM_NB = 8,
 	T3_TSTAT10 = 9,
+	T3_BMS = 10,
 	T3_OEM = 11,
 	T3_TB_11I = 12,
 	T3_FAN_MODULE = 13,
@@ -1327,6 +1328,7 @@ typedef enum
 	T3_NG3 = 22,
 	T3_3IIC = 26,  //6合1 的传感器 esp 产品 啥也没加
 	T3_TSTAT11 = 27,
+	T3_RMC1232 = 29,  
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
 	PID_T3PT12 = 46,
@@ -1396,6 +1398,16 @@ const int RMC_IN_A = 18;
 const int RMC_IN_D = 0;
 const int RMC_OUT_A = 0;
 const int RMC_OUT_D = 7;
+
+const int T3_BMS_IN_A = 0;
+const int T3_BMS_IN_D = 0;
+const int T3_BMS_OUT_A = 0;
+const int T3_BMS_OUT_D = 0;
+
+const int RMC1232_IN_A = 32;
+const int RMC1232_IN_D = 0;
+const int RMC1232_OUT_A = 0;
+const int RMC1232_OUT_D = 4;
 
 const int NG3_IN_A = 24;
 const int NG3_IN_D = 0;

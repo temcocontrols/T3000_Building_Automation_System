@@ -55,7 +55,10 @@ public:
 	int m_latest_protocol;
 	// Mark whether it has been maximized;
 	bool window_max; // 标记是否已经最大化;
-
+	void SaveWindowPosition();    // 保存窗口位置到 INI
+	void RestoreWindowPosition(); // 从 INI 恢复窗口位置
+	bool m_restoring_position;       // 恢复位置保护标志 - Restore position guard
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI);
 /*
 Alex
 For Help system
