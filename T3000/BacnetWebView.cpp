@@ -127,6 +127,51 @@ void DeleteDirectoryRecursive(const std::wstring& dir_path) {
 	}
 }
 
+/* ---------------------------------------------------------------------------
+   Device fixed-width field -> UTF-8 string for the JSON replies.
+
+   Same conversion the T3000 grids make for the same field
+   (BacnetInput.cpp:964/1338, BacnetOutput.cpp:687, BacnetVariable.cpp:274/454):
+   device bytes -> MultiByteToWideChar(CP_ACP) -> wide text. The grids hand that
+   wide text to SetItemText, so nothing more is needed there; a JSON string is
+   UTF-8 instead, and jsoncpp validates it — any invalid byte becomes U+FFFD,
+   which is where the "?" characters in the WebView replies came from. Hence the
+   extra wide -> UTF-8 step here.
+
+   `rawField` is a fixed-width device field: no terminator (the packed struct
+   keeps its stride) and an unset field is 0xFF-filled (erased flash on the
+   ESP32 T3 series) or 0x00-filled on older firmware. Stopping at the first 0xFF
+   cannot cut real text: 0xFF is not a valid trail byte in a DBCS lead/trail pair.
+   --------------------------------------------------------------------------- */
+static std::string DeviceStrForJson(const void* rawField, size_t fieldSize)
+{
+	const char* src = (const char*)rawField;
+	if (!src || fieldSize == 0)
+		return std::string();
+
+	/* stop at the NUL terminator or at the 0xFF "unset" fill */
+	size_t n = 0;
+	while (n < fieldSize && src[n] != '\0' && (unsigned char)src[n] != 0xFF)
+		n++;
+	if (n == 0)
+		return std::string();                      /* unset -> empty string */
+
+	/* same call the grids make */
+	int wlen = MultiByteToWideChar(CP_ACP, 0, src, (int)n, nullptr, 0);
+	if (wlen <= 0)
+		return std::string();
+	std::wstring wide(wlen, L'\0');
+	MultiByteToWideChar(CP_ACP, 0, src, (int)n, &wide[0], wlen);
+
+	/* JSON needs UTF-8, not UTF-16 */
+	int u8len = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), wlen, nullptr, 0, nullptr, nullptr);
+	if (u8len <= 0)
+		return std::string();
+	std::string utf8(u8len, '\0');
+	WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), wlen, &utf8[0], u8len, nullptr, nullptr);
+	return utf8;
+}
+
 extern CBacnetProgram* Program_Window;
 extern BacnetWeeklyRoutine* WeeklyRoutine_Window;
 extern BacnetAnnualRoutine* AnnualRoutine_Window;
@@ -1761,8 +1806,8 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 							tempjson["data"]["device_data"][point_idx]["index"] = input_idx;
 							tempjson["data"]["device_data"][point_idx]["id"] = "IN" + to_string(input_idx + 1);
 							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "IN" + to_string(input_idx + 1);
-							tempjson["data"]["device_data"][point_idx]["description"] = (char*)g_Input_data[npanel_id].at(input_idx).description;
-							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_Input_data[npanel_id].at(input_idx).label;
+							tempjson["data"]["device_data"][point_idx]["description"] = DeviceStrForJson(g_Input_data[npanel_id].at(input_idx).description, sizeof(g_Input_data[npanel_id].at(input_idx).description));
+							tempjson["data"]["device_data"][point_idx]["label"] = DeviceStrForJson(g_Input_data[npanel_id].at(input_idx).label, sizeof(g_Input_data[npanel_id].at(input_idx).label));
 							tempjson["data"]["device_data"][point_idx]["unit"] = g_Input_data[npanel_id].at(input_idx).range;
 							tempjson["data"]["device_data"][point_idx]["auto_manual"] = g_Input_data[npanel_id].at(input_idx).auto_manual;
 							tempjson["data"]["device_data"][point_idx]["value"] = g_Input_data[npanel_id].at(input_idx).value;
@@ -1854,8 +1899,8 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 							tempjson["data"]["device_data"][point_idx]["index"] = output_idx;
 							tempjson["data"]["device_data"][point_idx]["id"] = "OUT" + to_string(output_idx + 1);
 							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "OUT" + to_string(output_idx + 1);
-							tempjson["data"]["device_data"][point_idx]["description"] = (char*)g_Output_data[npanel_id].at(output_idx).description;
-							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_Output_data[npanel_id].at(output_idx).label;
+							tempjson["data"]["device_data"][point_idx]["description"] = DeviceStrForJson(g_Output_data[npanel_id].at(output_idx).description, sizeof(g_Output_data[npanel_id].at(output_idx).description));
+							tempjson["data"]["device_data"][point_idx]["label"] = DeviceStrForJson(g_Output_data[npanel_id].at(output_idx).label, sizeof(g_Output_data[npanel_id].at(output_idx).label));
 							tempjson["data"]["device_data"][point_idx]["auto_manual"] = g_Output_data[npanel_id].at(output_idx).auto_manual;
 							tempjson["data"]["device_data"][point_idx]["value"] = g_Output_data[npanel_id].at(output_idx).value;
 							tempjson["data"]["device_data"][point_idx]["low_voltage"] = g_Output_data[npanel_id].at(output_idx).low_voltage;
@@ -1943,8 +1988,8 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 							tempjson["data"]["device_data"][point_idx]["index"] = var_idx;
 							tempjson["data"]["device_data"][point_idx]["id"] = "VAR" + to_string(var_idx + 1);
 							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "VAR" + to_string(var_idx + 1);
-							tempjson["data"]["device_data"][point_idx]["description"] = (char*)g_Variable_data[npanel_id].at(var_idx).description;
-							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_Variable_data[npanel_id].at(var_idx).label;
+							tempjson["data"]["device_data"][point_idx]["description"] = DeviceStrForJson(g_Variable_data[npanel_id].at(var_idx).description, sizeof(g_Variable_data[npanel_id].at(var_idx).description));
+							tempjson["data"]["device_data"][point_idx]["label"] = DeviceStrForJson(g_Variable_data[npanel_id].at(var_idx).label, sizeof(g_Variable_data[npanel_id].at(var_idx).label));
 							tempjson["data"]["device_data"][point_idx]["auto_manual"] = g_Variable_data[npanel_id].at(var_idx).auto_manual;
 							tempjson["data"]["device_data"][point_idx]["value"] = g_Variable_data[npanel_id].at(var_idx).value;
 							tempjson["data"]["device_data"][point_idx]["range"] = g_Variable_data[npanel_id].at(var_idx).range;
@@ -2030,8 +2075,8 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 							tempjson["data"]["device_data"][point_idx]["index"] = prg_idx;
 							tempjson["data"]["device_data"][point_idx]["id"] = "PRG" + to_string(prg_idx + 1);
 							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "PRG" + to_string(prg_idx + 1);
-							tempjson["data"]["device_data"][point_idx]["description"] = (char*)g_Program_data[npanel_id].at(prg_idx).description;
-							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_Program_data[npanel_id].at(prg_idx).label;
+							tempjson["data"]["device_data"][point_idx]["description"] = DeviceStrForJson(g_Program_data[npanel_id].at(prg_idx).description, sizeof(g_Program_data[npanel_id].at(prg_idx).description));
+							tempjson["data"]["device_data"][point_idx]["label"] = DeviceStrForJson(g_Program_data[npanel_id].at(prg_idx).label, sizeof(g_Program_data[npanel_id].at(prg_idx).label));
 							tempjson["data"]["device_data"][point_idx]["auto_manual"] = g_Program_data[npanel_id].at(prg_idx).auto_manual;
 							tempjson["data"]["device_data"][point_idx]["status"] = g_Program_data[npanel_id].at(prg_idx).on_off;
 							tempjson["data"]["device_data"][point_idx]["unused"] = g_Program_data[npanel_id].at(prg_idx).unused;
@@ -2116,8 +2161,8 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 							tempjson["data"]["device_data"][point_idx]["index"] = grp_idx;
 							tempjson["data"]["device_data"][point_idx]["id"] = "GRP" + to_string(grp_idx + 1);
 							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "GRP" + to_string(grp_idx + 1);
-							tempjson["data"]["device_data"][point_idx]["description"] = (char*)g_screen_data[npanel_id].at(grp_idx).description;
-							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_screen_data[npanel_id].at(grp_idx).label;
+							tempjson["data"]["device_data"][point_idx]["description"] = DeviceStrForJson(g_screen_data[npanel_id].at(grp_idx).description, sizeof(g_screen_data[npanel_id].at(grp_idx).description));
+							tempjson["data"]["device_data"][point_idx]["label"] = DeviceStrForJson(g_screen_data[npanel_id].at(grp_idx).label, sizeof(g_screen_data[npanel_id].at(grp_idx).label));
 							tempjson["data"]["device_data"][point_idx]["count"] = g_screen_data[npanel_id].at(grp_idx).webview_element_count;
 							point_idx++;
 						}
@@ -2303,8 +2348,8 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "SCH" + to_string(sch_idx + 1);
 
 							// Schedule specific fields (matching GET_PANEL_DATA structure)
-							tempjson["data"]["device_data"][point_idx]["description"] = (char*)g_Weekly_data[npanel_id].at(sch_idx).description;
-							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_Weekly_data[npanel_id].at(sch_idx).label;
+							tempjson["data"]["device_data"][point_idx]["description"] = DeviceStrForJson(g_Weekly_data[npanel_id].at(sch_idx).description, sizeof(g_Weekly_data[npanel_id].at(sch_idx).description));
+							tempjson["data"]["device_data"][point_idx]["label"] = DeviceStrForJson(g_Weekly_data[npanel_id].at(sch_idx).label, sizeof(g_Weekly_data[npanel_id].at(sch_idx).label));
 							tempjson["data"]["device_data"][point_idx]["auto_manual"] = g_Weekly_data[npanel_id].at(sch_idx).auto_manual;
 							tempjson["data"]["device_data"][point_idx]["output"] = g_Weekly_data[npanel_id].at(sch_idx).value;
 							tempjson["data"]["device_data"][point_idx]["state1"] = g_Weekly_data[npanel_id].at(sch_idx).override_1_value;
@@ -2395,8 +2440,8 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "CAL" + to_string(hol_idx + 1);
 
 							// Holiday specific fields (matching GET_PANEL_DATA structure)
-							tempjson["data"]["device_data"][point_idx]["description"] = (char*)g_Annual_data[npanel_id].at(hol_idx).description;
-							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_Annual_data[npanel_id].at(hol_idx).label;
+							tempjson["data"]["device_data"][point_idx]["description"] = DeviceStrForJson(g_Annual_data[npanel_id].at(hol_idx).description, sizeof(g_Annual_data[npanel_id].at(hol_idx).description));
+							tempjson["data"]["device_data"][point_idx]["label"] = DeviceStrForJson(g_Annual_data[npanel_id].at(hol_idx).label, sizeof(g_Annual_data[npanel_id].at(hol_idx).label));
 							tempjson["data"]["device_data"][point_idx]["auto_manual"] = g_Annual_data[npanel_id].at(hol_idx).auto_manual;
 							tempjson["data"]["device_data"][point_idx]["value"] = g_Annual_data[npanel_id].at(hol_idx).value;
 							tempjson["data"]["device_data"][point_idx]["unused"] = g_Annual_data[npanel_id].at(hol_idx).unused;
@@ -2484,8 +2529,7 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 							tempjson["data"]["device_data"][point_idx]["index"] = entry_index;
 							tempjson["data"]["device_data"][point_idx]["id"] = "MON" + to_string(entry_index + 1);
 							tempjson["data"]["device_data"][point_idx]["command"] = to_string(npanel_id) + "MON" + to_string(entry_index + 1);
-							tempjson["data"]["device_data"][point_idx]["label"] = (char*)g_monitor_data[npanel_id].at(entry_index).label;
-							tempjson["data"]["device_data"][point_idx]["hour_interval_time"] = g_monitor_data[npanel_id].at(entry_index).hour_interval_time;
+							tempjson["data"]["device_data"][point_idx]["label"] = DeviceStrForJson(g_monitor_data[npanel_id].at(entry_index).label, sizeof(g_monitor_data[npanel_id].at(entry_index).label));							tempjson["data"]["device_data"][point_idx]["hour_interval_time"] = g_monitor_data[npanel_id].at(entry_index).hour_interval_time;
 							tempjson["data"]["device_data"][point_idx]["minute_interval_time"] = g_monitor_data[npanel_id].at(entry_index).minute_interval_time;
 							tempjson["data"]["device_data"][point_idx]["second_interval_time"] = g_monitor_data[npanel_id].at(entry_index).second_interval_time;
 							tempjson["data"]["device_data"][point_idx]["status"] = g_monitor_data[npanel_id].at(entry_index).status;
