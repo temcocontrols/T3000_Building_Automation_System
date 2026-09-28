@@ -62,7 +62,8 @@ int varoffsetlast(int cur);
 int checkonlyarray(char *tok);
 int Encode_Program ( /*GEdit *ppedit*/);
 void put_line_num( int line_value );
-
+static int try_readnet_enum_token(const char* text, long* value);
+static const char* readnet_enum_name_from_value(long value);
 unsigned int line_array[200][2];
 int ind_line_array;
 
@@ -1059,6 +1060,7 @@ struct func_table {
  "LN_1",LN_1 ,
  "MAX",MAX,
  "MIN",MIN,
+ "READNET",READNET,
  "OUTPUT",OUTPUTD,
  "POWER-LOSS",POWER_LOSS,
  "POWER_LOSS",POWER_LOSS,
@@ -3219,6 +3221,84 @@ void parse_atom( float  *value )
 									}
 								 }
 								 break;
+				 case READNET:
+				 {
+					 char eoiold = eoi;
+					 long enum_value = 0;
+					 eoi = NL;
+
+					 // 第1参数
+					 parse_exp0(value);
+					 i = 1;
+
+					 // 第2参数
+					 if (*token == ',')
+					 {
+						 get_token();
+
+						 if ((token_type == IDENTIFIER) && try_readnet_enum_token(token, &enum_value))
+						 {
+							 if (type_eval)
+							 {
+								 buf_v[index_buf].fvar = (float)enum_value;
+								 strcpy(buf_v[index_buf].var, "");
+								 buf_v[index_buf].v = 0;
+								 index_op = 0;
+								 for (int k = 0; k < MAX_OP; k++)
+									 buf_v[index_buf].op[k] = 0;
+								 index_buf++;
+								 n_var++;
+							 }
+							 else
+							 {
+								 *value = TRUE;
+							 }
+
+							 i++;
+							 get_token(); // 读到 ',' 或 ')'
+						 }
+						 else
+						 {
+							 parse_exp0(value);
+							 i++;
+						 }
+					 }
+
+					 // 后续参数（第3个及以后）
+					 while (*token == ',')
+					 {
+						 get_token();
+						 parse_exp0(value);
+						 i++;
+					 }
+
+					 eoi = eoiold;
+
+					 if (*token != ')')
+					 {
+						 error = TRUE;
+						 *value = FALSE;
+						 sntx_err(SYNTAX);
+						 get_nl();
+						 return;
+					 }
+
+					 if (i != 3)
+					 {
+						 error = TRUE;
+						 *value = FALSE;
+						 sntx_err(SYNTAX);
+						 get_nl();
+						 return;
+					 }
+
+					 if (type_eval)
+					 {
+						 buf_v[index_buf - 1].op[index_op++] = ftok;
+						 buf_v[index_buf - 1].op[index_op++] = i;
+					 }
+				 }
+				 break;
 				 case AVG:
 				 case MAX:
 				 case MIN:
@@ -3244,6 +3324,14 @@ void parse_atom( float  *value )
 								 {	
 									 error = TRUE; 
 									 *value = FALSE ; 
+									 sntx_err(SYNTAX);
+									 get_nl();
+									 return;
+								 }
+								 if (ftok == READNET && i != 3)
+								 {
+									 error = TRUE;
+									 *value = FALSE;
 									 sntx_err(SYNTAX);
 									 get_nl();
 									 return;
@@ -6761,6 +6849,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				 case AVG:
 				 case MAX:
 				 case MIN:
+				 case READNET:
 				 case COM_1:
 				 case MB_BR:
 				 case MB_BW:
@@ -8136,6 +8225,65 @@ int	desexpr(void)
 									 }
 					//		 #endif
 								break;
+				 case READNET:
+				 {
+					 int argc = (unsigned char)*code++;
+					 char args_buf[8][200];
+					 char composed[600];
+					 const char* enum_name = NULL;
+					 char* endptr = NULL;
+					 long v = 0;
+
+					 if (argc <= 0 || argc > 8)
+					 {
+						 strcpy(op1, "READNET()");
+						 push(op1);
+						 stack_par[ind_par++] = 0;
+						 break;
+					 }
+
+					 // 栈是逆序，按原顺序恢复到 args_buf[0..argc-1]
+					 for (int ai = argc - 1; ai >= 0; ai--)
+					 {
+						 strcpy(args_buf[ai], pop());
+						 ind_par--;
+						 if (ind_par < 0) ind_par = 0;
+					 }
+
+					 // 第2参数数字 -> 枚举名
+					 if (argc >= 2)
+					 {
+						 char tmp[200];
+						 strcpy(tmp, args_buf[1]);
+						 ltrim(tmp);
+						 rtrim(tmp);
+
+						 v = strtol(tmp, &endptr, 10);
+						 if (endptr && *endptr == '\0')
+						 {
+							 enum_name = readnet_enum_name_from_value(v);
+							 if (enum_name)
+							 {
+								 strcpy(args_buf[1], enum_name);
+							 }
+						 }
+					 }
+
+					 composed[0] = 0;
+					 strcat(composed, "READNET( ");
+					 for (int ai = 0; ai < argc; ai++)
+					 {
+						 strcat(composed, args_buf[ai]);
+						 if (ai != argc - 1)
+							 strcat(composed, " , ");
+					 }
+					 strcat(composed, " )");
+
+					 strcpy(op1, composed);
+					 push(op1);
+					 stack_par[ind_par++] = 0;
+				 }
+				 break;
 				 case COM_1:
 				 case AVG:
 				 case MAX:
@@ -8156,7 +8304,7 @@ int	desexpr(void)
 				         {
 								par=0;
 								//if (*(code-1)==AVG || *(code-1)==MIN || *(code-1)==MAX  || *(code-1)==COM_1)
-								if ( *(code - 1) == AVG || *(code - 1) == MIN || *(code - 1) == MAX || *(code - 1) == COM_1 ||
+								if ( *(code - 1) == AVG || *(code - 1) == MIN || *(code - 1) == MAX || *(code - 1) == COM_1 || *(code - 1) == READNET ||
 									((unsigned char)*(code - 1)) == MB_BR || 
 									((unsigned char)*(code - 1)) == MB_BW || 
 									((unsigned char)*(code - 1)) == MB_BW_COIL ||
@@ -8977,6 +9125,42 @@ void check_each_point(char *richeditchar,int item_count ,int ntype)
 		}
 
 
+	}
+}
+
+static int try_readnet_enum_token(const char* text, long* value)
+{
+	if (!text || !value) return 0;
+
+	if (_stricmp(text, "IN") == 0) { *value = 1;  return 1; }
+	if (_stricmp(text, "OUT") == 0) { *value = 2;  return 1; }
+	if (_stricmp(text, "VAR") == 0) { *value = 3;  return 1; }
+	if (_stricmp(text, "AI") == 0) { *value = 4;  return 1; }
+	if (_stricmp(text, "BI") == 0) { *value = 5;  return 1; }
+	if (_stricmp(text, "AO") == 0) { *value = 6;  return 1; }
+	if (_stricmp(text, "BO") == 0) { *value = 7;  return 1; }
+	if (_stricmp(text, "AV") == 0) { *value = 8;  return 1; }
+	if (_stricmp(text, "BV") == 0) { *value = 9;  return 1; }
+	if (_stricmp(text, "MSV") == 0) { *value = 10; return 1; }
+
+	return 0;
+}
+
+static const char* readnet_enum_name_from_value(long value)
+{
+	switch (value)
+	{
+	case 1:  return "IN";
+	case 2:  return "OUT";
+	case 3:  return "VAR";
+	case 4:  return "AI";
+	case 5:  return "BI";
+	case 6:  return "AO";
+	case 7:  return "BO";
+	case 8:  return "AV";
+	case 9:  return "BV";
+	case 10: return "MSV";
+	default: return NULL;
 	}
 }
 
