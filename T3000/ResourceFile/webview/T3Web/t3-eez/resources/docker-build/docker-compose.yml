@@ -1,0 +1,13 @@
+services:
+    emscripten-build:
+        image: eez-studio-lvgl-build:latest
+        build: .
+        pull_policy: never
+        volumes:
+            - project-volume:/project
+        working_dir: /project
+        command: bash
+
+volumes:
+    project-volume:
+        name: ${PROJECT_VOLUME:-eez-lvgl-build-default}

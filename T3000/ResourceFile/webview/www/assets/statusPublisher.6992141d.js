@@ -1,0 +1,1 @@
+const t="t3-editor-status";function s(){return{set(t){window.dispatchEvent(new CustomEvent("t3-editor-status",{detail:t}))},clear(){window.dispatchEvent(new CustomEvent("t3-editor-status",{detail:{}}))}}}const e=s();export{t as E,s as c,e as s};

@@ -1,0 +1,1 @@
+import{r as e}from"./client.92ffe24c.js";function r(r){e.exports.useEffect((()=>{const e=()=>{r()};return window.addEventListener("t3-page-refresh",e),()=>window.removeEventListener("t3-page-refresh",e)}),[r])}export{r as u};
