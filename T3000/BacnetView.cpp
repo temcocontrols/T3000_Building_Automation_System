@@ -1189,6 +1189,7 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 }
 
 
+
 //The window which created by the button ,will delete when the wait dialog send this message,to this window.
 //It means ,it has done .we don't needed.
 LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam)
@@ -6114,7 +6115,12 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 	case BAC_SET_LAST_UI:
 		{
 			KillTimer(BAC_SET_LAST_UI);
-            switch_product_last_view();
+			// 先隐藏所有窗口，防止 switch_product_last_view 显示新窗口时旧窗口仍可见
+			for (int i = 0; i < WINDOW_TAB_COUNT; i++)
+				pDialog[i]->ShowWindow(SW_HIDE);
+			switch_product_last_view();
+			//KillTimer(BAC_SET_LAST_UI);
+   //         switch_product_last_view();
 		}
 		break;
     //case 10: //测试用
@@ -6210,6 +6216,8 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	}
 	else
 	{	
+		// 从 INI 恢复上次查看的 Tab（图形模式/例行模式不走这里）
+		bacnet_view_number = GetPrivateProfileInt(_T("LastView"), _T("ViewNumber"), TYPE_INPUT, g_cstring_ini_path);
         if(Bacnet_Private_Device(g_selected_product_id))
 		//if(g_protocol != PROTOCOL_BIP_TO_MSTP)
 		{
@@ -6303,12 +6311,16 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	if(m_bac_main_tab.IsWindowVisible() == false)
 		m_bac_main_tab.ShowWindow(true);
 	
+	// 先隐藏所有窗口，确保只显示选中的那一个
+	for (int i = 0; i < WINDOW_TAB_COUNT; i++)
+		pDialog[i]->ShowWindow(SW_HIDE);
 
 	switch(bacnet_view_number)
 	{
 	case TYPE_INPUT:
         if (Input_Window->IsWindowVisible() == false)
         {
+			((CBacnetInput*)pDialog[WINDOW_INPUT])->m_restoring_position = true;
             Input_Window->ShowWindow(SW_SHOW);
 			((CBacnetInput*)pDialog[WINDOW_INPUT])->RestoreWindowPosition();
             //Input_Window->Reset_Input_Rect();
@@ -6320,6 +6332,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	case TYPE_OUTPUT:
         if (Output_Window->IsWindowVisible() == false)
         {
+			((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->m_restoring_position = true;
             Output_Window->ShowWindow(SW_SHOW);
 			((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->RestoreWindowPosition();
 			//Output_Window->Reset_Output_Rect();
@@ -6331,6 +6344,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	case TYPE_VARIABLE:
         if (Variable_Window->IsWindowVisible() == false)
         {
+			((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->m_restoring_position = true;
             Variable_Window->ShowWindow(SW_SHOW);
             Variable_Window->RestoreWindowPosition();
         }
@@ -6866,6 +6880,13 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 		{
 			pDialog[i]->ShowWindow(SW_HIDE);
 		}
+	}
+
+	// 保存当前选中的 Tab 到 INI
+	{
+		CString strView;
+		strView.Format(_T("%d"), bacnet_view_number);
+		WritePrivateProfileString(_T("LastView"), _T("ViewNumber"), strView, g_cstring_ini_path);
 	}
 
 	pDialog[selected]->SetFocus();

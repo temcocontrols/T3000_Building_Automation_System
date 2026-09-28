@@ -308,8 +308,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 			if ((m_Variable_data.at(i).range == 0) || ((m_Variable_data.at(i).range > 30) && (m_Variable_data.at(i).range < 100)))
 			{
 				CString cstemp_value2;
-				float temp_float_value1;
-				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+				double temp_float_value1;
+				temp_float_value1 = ((double)m_Variable_data.at(i).value) / 1000;
 				cstemp_value2.Format(_T("%.3f"), temp_float_value1);
 				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value2);
 				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[0]);
@@ -320,8 +320,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 					m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
 				int get_name_ret = 0;
 				CString cstemp_value2;
-				float temp_float_value1;
-				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+				double temp_float_value1;
+				temp_float_value1 = ((double)m_Variable_data.at(i).value) / 1000;
 				get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
 				if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
 					cstemp_value2.Format(_T("%.3f"), temp_float_value1);
@@ -390,8 +390,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
 
 				CString cstemp_value;
-				float temp_float_value;
-				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+				double temp_float_value;
+				temp_float_value = ((double)m_Variable_data.at(i).value) / 1000;
 				cstemp_value.Format(_T("%.3f"), temp_float_value);
 				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value);
 			}
@@ -400,8 +400,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 				m_variable_list.SetItemText(i, VARIABLE_UNITE, Analog_Variable_Units[m_Variable_data.at(i).range - 34]);
 
 				CString cstemp_value;
-				float temp_float_value;
-				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+				double temp_float_value;
+				temp_float_value = ((double)m_Variable_data.at(i).value) / 1000;
 				cstemp_value.Format(_T("%.3f"), temp_float_value);
 				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value);
 			}
@@ -411,8 +411,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 					m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
 				int get_name_ret = 0;
 				CString cstemp_value2;
-				float temp_float_value1;
-				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+				double temp_float_value1;
+				temp_float_value1 = ((double)m_Variable_data.at(i).value) / 1000;
 				get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
 				if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
 					cstemp_value2.Format(_T("%.3f"), temp_float_value1);
@@ -424,8 +424,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 					m_variable_list.SetItemText(i, VARIABLE_UNITE, Custom_Msv_Range[m_Variable_data.at(i).range - 101]);
 				int get_name_ret = 0;
 				CString cstemp_value2;
-				float temp_float_value1;
-				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+				double temp_float_value1;
+				temp_float_value1 = ((double)m_Variable_data.at(i).value) / 1000;
 				get_name_ret = Get_Msv_Item_Name(m_Variable_data.at(i).range - 101, (int)temp_float_value1, cstemp_value2);
 				if (get_name_ret < 0)  //若没有找到对应 就默认显示 浮点数;
 					cstemp_value2.Format(_T("%.3f"), temp_float_value1);
@@ -436,8 +436,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam, LPARAM lParam)
 				m_variable_list.SetItemText(i, VARIABLE_UNITE, Variable_Analog_Units_Array[0]);
 
 				CString cstemp_value;
-				float temp_float_value;
-				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+				double temp_float_value;
+				temp_float_value = ((double)m_Variable_data.at(i).value) / 1000;
 				cstemp_value.Format(_T("%.3f"), temp_float_value);
 				m_variable_list.SetItemText(i, VARIABLE_VALUE, cstemp_value);
 			}
@@ -1305,6 +1305,7 @@ BOOL CBacnetVariable::PreTranslateMessage(MSG* pMsg)
 }
 
 
+
 void CBacnetVariable::OnClose()
 {
 	SaveWindowPosition();
@@ -1571,7 +1572,7 @@ void CBacnetVariable::OnSize(UINT nType, int cx, int cy)
 	GetClientRect(rc);
 	if(m_variable_list.m_hWnd != NULL)
 	{
-		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+	    ::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
 		m_variable_list.MoveWindow(&rc);
 	}
 
@@ -1590,6 +1591,7 @@ void CBacnetVariable::OnSysCommand(UINT nID, LPARAM lParam)
 void CBacnetVariable::SaveWindowPosition()
 {
 	if (!IsWindow(m_hWnd)) return;
+	if (m_restoring_position) return;    
 	CRect rect;
 	GetWindowRect(&rect);
 
@@ -1620,12 +1622,19 @@ void CBacnetVariable::RestoreWindowPosition()
 			Reset_Variable_Rect();
 			return;
 		}
-		if (isMax == 1)
-			ShowWindow(SW_SHOWMAXIMIZED);
 
+		// Guard: prevent OnMove/OnSize from saving during restore
 		m_restoring_position = true;
-		::MoveWindow(this->m_hWnd, left, top, width, height, TRUE);
+		if (isMax == 1)
+		{
+			ShowWindow(SW_SHOWMAXIMIZED);
+		}
+		else
+		{
+			::MoveWindow(this->m_hWnd, left, top, width, height, TRUE);
+		}
 		m_restoring_position = false;
+
 	}
 	else
 	{
@@ -1653,7 +1662,8 @@ void CBacnetVariable::OnMove(int x, int y)
 	CDialogEx::OnMove(x, y);
 
 	// TODO: 在此处添加消息处理程序代码
-
+	if (IsWindowVisible())
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 	//::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
 
 	if (IsWindowVisible() && !m_restoring_position)
