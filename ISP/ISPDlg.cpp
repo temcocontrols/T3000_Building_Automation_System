@@ -24,7 +24,7 @@
 
 #include "BADO\BADO.h"
 //Determine whether to use MSTP to update firmware
-extern int SPECIAL_BAC_TO_MODBUS; //ÅÐ¶ÏÊÇ·ñÓÃMSTPÀ´¸üÐÂ¹Ì¼þ;
+extern int SPECIAL_BAC_TO_MODBUS; //ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½MSTPï¿½ï¿½ï¿½ï¿½ï¿½Â¹Ì¼ï¿½;
 unsigned char ready_towrite_mac[6] = { 0 };
 unsigned int ready_towrite_sn = 0;
 #ifdef ISP_BURNING_MODE
@@ -59,34 +59,34 @@ CString g_strExePath;
 CString SettingPath;
 CString g_repair_bootloader_file_path;
 //Latest normal code path to be burned
-CString g_update_newfirmware_file_path; //×îÐÂµÄÒªÉÕÐ´µÄÕý³£µÄ´úÂëÂ·¾¶;
+CString g_update_newfirmware_file_path; //ï¿½ï¿½ï¿½Âµï¿½Òªï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½Â·ï¿½ï¿½;
 //Hex file product PID
-unsigned int n_hex_file_pid;//hexÎÄ¼þµÄ²úÆ·PID£»
+unsigned int n_hex_file_pid;//hexï¿½Ä¼ï¿½ï¿½Ä²ï¿½Æ·PIDï¿½ï¿½
 //0 No need to update boot   1 Need to update bootloader;   C1 is hex
-int firmware_must_use_new_bootloader = 0;  //0 ²»ÓÃ¸üÐÂboot   1 ÐèÒª¸üÐÂbootload;   C1Îªhex
+int firmware_must_use_new_bootloader = 0;  //0 ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½ï¿½boot   1 ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½bootload;   C1Îªhex
 //If equals 1, it means we are now burning the new BootLoader
-int new_bootload = 0; //Èç¹ûµÈÓÚ1 ¾ÍËµÃ÷ÏÖÔÚÉÕÐ´µÄÊÇÐÂµÄBootLoader;
+int new_bootload = 0; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?1 ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½BootLoader;
 // 0 Normal mode   1 Burn boot mode    2 Burn normal mode code again
-int com_port_flash_status = 0;  // 0 Õý³£Ä£Ê½   1 ÉÕÐ´bootÄ£Ê½    2 ÔÙ´ÎÉÕÐ´Õý³£Ä£Ê½µÄ´úÂë
+int com_port_flash_status = 0;  // 0 ï¿½ï¿½ï¿½ï¿½Ä£Ê½   1 ï¿½ï¿½Ð´bootÄ£Ê½    2 ï¿½Ù´ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½Ä´ï¿½ï¿½ï¿½
 //HANDLE get_file_thread_handle = NULL;
 CString g_strFlashInfo;
 const TCHAR c_strLogFileName[]=_T("Log_info.txt");				//log information file name
 const TCHAR c_strDBFileName[]=_T("Database\\t3000.mdb") ;
 //extern CString g_strExePath;
 //const int BOOTLOADER_FILE_SIZE = 16384;
-/*Õâ¸ö±äÁ¿ËäÈ»ºÍDLLÖÐµÄ±äÁ¿ÏàÍ¬£¬µ«ÊÇËûÃÇÁ½¸öÃ»ÓÐ¹ØÏµ£¬DLLÖÐµÄ¸Ã±äÁ¿ÊÇ±»·â×°ÆðÀ´ÁË - This variable is the same as the variable in the DLL, but they are not related. The variable in the DLL is encapsulated.
-Èç¹ûÏë¸Ä±ädllÖÐµÄg_Commu_type Í¨¹ýº¯Êý SetCommunicationType- If you want to change g_Commu_type in the DLL, use the function SetCommunicationType
-*/ 
+/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½DLLï¿½ÐµÄ±ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ð¹ï¿½Ïµï¿½ï¿½DLLï¿½ÐµÄ¸Ã±ï¿½ï¿½ï¿½ï¿½Ç±ï¿½ï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ - This variable is the same as the variable in the DLL, but they are not related. The variable in the DLL is encapsulated.
+ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½dllï¿½Ðµï¿½g_Commu_type Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ SetCommunicationType- If you want to change g_Commu_type in the DLL, use the function SetCommunicationType
+*/
 /* These variables are the same as the variables in the communications DLL but they are separate, the variables in the DLL are encapsulated. If you want to change the G_commu_type in the DLL use the function Setcommunicationtype */
- 
+
 
 int handle_write_sensor_info = 0;
 //Number of all checked components
-int n_component_count = 0; //ËùÓÐ¹´Ñ¡µÄ×é¼þµÄ¸öÊý
+int n_component_count = 0; //ï¿½ï¿½ï¿½Ð¹ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿?
 //Value of the first 16 bits
-unsigned short sensor_value1 = 0; //Ç°16Î»µÄÖµ
+unsigned short sensor_value1 = 0; //Ç°16Î»ï¿½ï¿½Öµ
 //Value of the last 16 bits, reserved
-unsigned short sensor_value2 = 0; //ºó16Î»µÄÖµ £¬ Ô¤Áô
+unsigned short sensor_value2 = 0; //ï¿½ï¿½16Î»ï¿½ï¿½Öµ ï¿½ï¿½ Ô¤ï¿½ï¿½
 unsigned short FUNCTION_CHECK_SUM_REG = 65000;
 unsigned short FUNCTION_CHECK_SUM_VALUE = 0x55;
 unsigned short FUNCTION_SENSOR1_REG = 65001;
@@ -230,7 +230,7 @@ CISPDlg::CISPDlg(CWnd* pParent /*=NULL*/)
 
     m_FlashEnable = TRUE;
 
- 
+
 }
 CISPDlg::~CISPDlg()
 {
@@ -263,7 +263,7 @@ CISPDlg::~CISPDlg()
         delete[] m_pFileBuffer;
         m_pFileBuffer = NULL;
     }
-  
+
 }
 
 void CISPDlg::DoDataExchange(CDataExchange* pDX)
@@ -300,11 +300,11 @@ BEGIN_MESSAGE_MAP(CISPDlg, CDialog)
     //wether repleace the line information
     ON_MESSAGE(WM_REPLACE_STATUSINFO, OnReplaceStatusInfo)
     ON_MESSAGE(WM_ADD_STATUSINFO, OnAddStatusInfo)
-    //Finish Í¨Öª Flash°´Å¥ÊÇ·ñ¿ÉÓÃ
+    //Finish Í¨Öª Flashï¿½ï¿½Å¥ï¿½Ç·ï¿½ï¿½ï¿½ï¿?
     ON_MESSAGE(WM_FLASH_FINISH, OnFlashFinish)
     ON_MESSAGE(WM_FLASH_RESTATR_BOOT, OnFlashBoot_Update_boot)
     ON_MESSAGE(WM_FLASH_NEW_BOOT_FINISH, OnFlashNewBootFinish)
-    
+
     ON_MESSAGE(WM_UPDATA_DEVICE_INFORMATION,Show_Flash_DeviceInfor)
     ON_WM_CLOSE()
     //ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, &CISPDlg::OnTcnSelchangeTab1)
@@ -398,7 +398,7 @@ BOOL CISPDlg::OnInitDialog()
     m_strLogoFileName=g_strExePath + _T("ResourceFile\\") + c_strLogoFileName;
     SettingPath = g_strExePath + _T("\\Setting.ini");
     //g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_BB_rev1.hex");
-    //´ÓÎÄ¼þÖÐ¶ÁÈ¡ÅäÖÃ²ÎÊý
+    //ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ð¶ï¿½È¡ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½
     m_cfgFileHandler.SetParentWnd(this);
     // m_cfgFileHandler.CreateConfigFile(g_strExePath + c_strCfgFileName);
     m_cfgFileHandler.CreateConfigFile();
@@ -449,7 +449,7 @@ BOOL CISPDlg::OnInitDialog()
     {
 
     }
-    
+
 
     GetPrivateProfileStringW(_T("Setting"),_T("DB_IPADDRESS"),_T("NULL"),Auto_flash_SN_connect_IP.GetBuffer(MAX_PATH),MAX_PATH,SettingPath);
     Auto_flash_SN_connect_IP.ReleaseBuffer();
@@ -524,9 +524,9 @@ BOOL CISPDlg::OnInitDialog()
     }
 
 
-   
+
     FLASH_SUBID=FALSE;
-    //Class COM¿Ú
+    //Class COMï¿½ï¿½
     InitCombox();
     //Initialization of log files
     //Path to log file
@@ -769,7 +769,7 @@ void CISPDlg::ShowProductNameFromIni()
             }
         }
 
-        
+
         pid_name_map.push_back(temp_value);
         ((CComboBox *)GetDlgItem(IDC_COMBO_PM))->AddString(cs_name);
     }
@@ -777,8 +777,8 @@ void CISPDlg::ShowProductNameFromIni()
 
     CString nsection;
     n_component_count = GetPrivateProfileInt(_T("ComponentType"), _T("Count"), 0,  _T("Z:\\Serial_Records\\ProductMode.ini"));
-    GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("Çë¹´Ñ¡°üº¬µÄ×é¼þ"));
-    
+    GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("ï¿½ë¹´Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?"));
+
     CString AllSupportProduct_Sensor;
     GetPrivateProfileStringW(_T("ComponentType"), _T("SupportProduct"), _T(""), AllSupportProduct_Sensor.GetBuffer(MAX_PATH * 10), MAX_PATH * 10, _T("Z:\\Serial_Records\\ProductMode.ini"));
     AllSupportProduct_Sensor.ReleaseBuffer();
@@ -794,8 +794,8 @@ void CISPDlg::ShowProductNameFromIni()
         support_sensor_id.push_back(temp_int);
     }
 
-    GetDlgItem(IDC_CHECK_NO_ITEM)->SetWindowTextW(_T("0.NULL ÎÞ¶îÍâÄ£×é"));
-    //Part 1 µÚ1¸ö¼Ä´æÆ÷µÄ 16¸ö Ä£×é;
+    GetDlgItem(IDC_CHECK_NO_ITEM)->SetWindowTextW(_T("0.NULL ï¿½Þ¶ï¿½ï¿½ï¿½Ä£ï¿½ï¿½"));
+    //Part 1 ï¿½ï¿½1ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ 16ï¿½ï¿½ Ä£ï¿½ï¿½;
     for (int i = 0; i < 16; i++)
     {
         if (i >= n_component_count)
@@ -811,7 +811,7 @@ void CISPDlg::ShowProductNameFromIni()
     }
 
 
-    //Part 2 µÚ2¸ö¼Ä´æÆ÷µÄ 16¸ö Ä£×é; - Part 2 of the 16 modules for the second register
+    //Part 2 ï¿½ï¿½2ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ 16ï¿½ï¿½ Ä£ï¿½ï¿½; - Part 2 of the 16 modules for the second register
     for (int i = 0; i < 16; i++)
     {
         if (i+16 >= n_component_count)
@@ -826,7 +826,7 @@ void CISPDlg::ShowProductNameFromIni()
         GetDlgItem(IDC_CHECK_ITEM17 + i)->SetWindowTextW(cs_component_name[i+16]);
     }
 
-    
+
 
 
 }
@@ -842,7 +842,7 @@ void CISPDlg::InitISPUI()
         WINDOWPLACEMENT wp;
 
         GetWindowPlacement(&wp);
-        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->ShowWindow(1); //ÔÝÊ±²»ÏÔÊ¾ mstpµÄ update°´Å¥£¬Éè±¸¼¸ºõ»¹²»Ö§³Ö; - Temporarily not displaying the MSTP update button, as the device hardly supports it.
+        GetDlgItem(IDC_CHECK_MSTP_UPDATE)->ShowWindow(1); //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ê¾ mstpï¿½ï¿½ updateï¿½ï¿½Å¥ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½; - Temporarily not displaying the MSTP update button, as the device hardly supports it.
 
         CRect rc;
         CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
@@ -1117,7 +1117,7 @@ void CISPDlg::OnBnClickedButtonFlash()
     }
 
 
-  
+
 
 }
 //Here's how to determine what kind of device is plugged into the PC.
@@ -1184,12 +1184,12 @@ afx_msg LRESULT CISPDlg::OnFlashBoot_Update_boot(WPARAM wParam, LPARAM lParam)
         else if (npid == PM_TSTAT9)
             return 1;
             //g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_T9.hex");
-        else 
+        else
             return 1;
         //g_repair_bootloader_file_path = g_strExePath + _T("ResourceFile\\HexFile\\repair_bootloader_NB_rev1.hex");
 
 
-    //¸ü¸ÄÒªÉÕÐ´µÄ´úÂëÂ·¾¶; - Change the path of the code to be burned;
+    //ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ð´ï¿½Ä´ï¿½ï¿½ï¿½Â·ï¿½ï¿½; - Change the path of the code to be burned;
     GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(g_repair_bootloader_file_path);
 
 
@@ -1229,7 +1229,7 @@ afx_msg LRESULT CISPDlg::OnFlashNewBootFinish(WPARAM wParam, LPARAM lParam)
         m_pTFTPServer = NULL;
     }
 
-    //¸ü¸ÄÒªÉÕÐ´µÄÐÂµÄ¹Ì¼þµÄ  ´úÂëÂ·¾¶; - Change the path of the new firmware to be burned;
+    //ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ð´ï¿½ï¿½ï¿½ÂµÄ¹Ì¼ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½; - Change the path of the new firmware to be burned;
     GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(g_update_newfirmware_file_path);
     new_bootload = 0;
     com_port_flash_status = 2;
@@ -1248,7 +1248,7 @@ static int total_udp_success_count = 0;
 extern int temco_burning_mode;
 #endif
 void close_bac_com();
-// NC ÊÇÊ¹ÓÃtftpÐ­ÒéÀ´½øÐÐflashµÄ - NC uses TFTP protocol for flashing
+// NC ï¿½ï¿½Ê¹ï¿½ï¿½tftpÐ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½flashï¿½ï¿½ - NC uses TFTP protocol for flashing
 afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 {
 #ifdef ISP_BURNING_MODE
@@ -1258,7 +1258,7 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
         auto_flash_mode = false;
     }
 #endif
-    int nRet = lParam; // Ïß³ÌÖÐÓÐÏûÏ¢µ¯³ö£¬ÕâÀï¾Í²»µ¯ÁË, popup message in the thread
+    int nRet = lParam; // ï¿½ß³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í²ï¿½ï¿½ï¿½ï¿½ï¿?, popup message in the thread
     // flash all done, release the resources
     if (m_pComWriter)
     {
@@ -1310,11 +1310,11 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 
 
 	}
-	
+
     SetResponseTime(100);
 	if(auto_flash_mode)
     {
-        if (com_port_flash_status != 1) //Èç¹ûÊÇÉÕÐ´ bootloader µÄÄ£Ê½  ×Ô¶¯µÄ£¬»¹Òª¼ÌÐøÉÕÐ´Íê¿Í»§ÐèÒªµÄ´úÂë²ÅÐÐ; - If it is the mode of flashing the bootloader automatically, it is necessary to continue flashing the code required by the customer.
+        if (com_port_flash_status != 1) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð? bootloader ï¿½ï¿½Ä£Ê½  ï¿½Ô¶ï¿½ï¿½Ä£ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½Í»ï¿½ï¿½ï¿½Ò?ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?; - If it is the mode of flashing the bootloader automatically, it is necessary to continue flashing the code required by the customer.
         {
             auto_flash_mode = false;	//Flash completed, allow manual shutdown;
             if (nRet > 0)
@@ -1326,7 +1326,7 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
                 WritePrivateProfileStringW(_T("Data"), _T("Command"), _T("4"), AutoFlashConfigPath);	//FAILED_UNKNOW_ERROR
             }
             #ifdef ISP_BURNING_MODE
-            burning_test_finished = 1; //Èç¹ûÊÇÑ­»·Ä£Ê½¾Í²»¹Ø±Õ; - If it is the loop mode, do not close it.
+            burning_test_finished = 1; //ï¿½ï¿½ï¿½ï¿½ï¿½Ñ?ï¿½ï¿½Ä£Ê½ï¿½Í²ï¿½ï¿½Ø±ï¿½; - If it is the loop mode, do not close it.
             return 1;
             #endif
             PostMessage(WM_CLOSE, NULL, NULL);
@@ -1790,7 +1790,7 @@ BOOL CISPDlg::FlashByComport(void)
 // 			UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
 // 			return FALSE;
 // 		}
-// 
+//
 // 		//SetResponseTime(60);
 //     }
     if(!FileValidation(m_strHexFileName))
@@ -1927,7 +1927,7 @@ BOOL CISPDlg::FlashByComport(void)
   //          else
   //          {
   //              WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("4"),AutoFlashConfigPath);	//FAILED_UNKNOW_ERROR
-  //              auto_flash_mode = false;//ÉèÖÃÎªfalseºó ²»ÔÚÎª×Ô¶¯Ä£Ê½£¬ÍË³ö³ÌÐò;
+  //              auto_flash_mode = false;//ï¿½ï¿½ï¿½ï¿½Îªfalseï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Îªï¿½Ô¶ï¿½Ä£Ê½ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½;
   //              PostMessage(WM_CLOSE,NULL,NULL);
   //              return FALSE;
   //          }
@@ -1989,7 +1989,7 @@ BOOL CISPDlg::FlashByNetwork(void)
 Author:	Alex
 Date: 2012-10-30
 Function:
-Write hex files to the subnet through TCP/IP Via Gateway 
+Write hex files to the subnet through TCP/IP Via Gateway
 flash tstat/input/output board.
 BOOL FlashSubID(void)
 */
@@ -2077,7 +2077,7 @@ int CISPDlg::GetModbusIDSUBID(vector<int>& szMdbIDs)
         // 		{
         // 		}
 
-        if (nPos < 0 || (nPos == strSrc.GetLength())) // Not found in the last 
+        if (nPos < 0 || (nPos == strSrc.GetLength())) // Not found in the last
         {
             return TRUE;
         }
@@ -2225,7 +2225,7 @@ void CISPDlg::FlashByEthernet()
     }
     if(HexFileValidation (m_strHexFileName))
     {
-        if(new_bootload == 0)   //µÚ¶þ±éÊÇ new boot µÄ Â·¾¶£¬ÐèÒª±£´æµÄÊÇµÚÒ»±éµÄÂ·¾¶;
+        if(new_bootload == 0)   //ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ new boot ï¿½ï¿½ Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Çµï¿½Ò»ï¿½ï¿½ï¿½Â·ï¿½ï¿½;
             g_update_newfirmware_file_path = m_strHexFileName;
         CHexFileParser* pHexFile = new CHexFileParser;
         pHexFile->SetFileName(m_strHexFileName);
@@ -2260,13 +2260,13 @@ void CISPDlg::FlashByEthernet()
         temp_hex_pid_name.ReleaseBuffer();
         temp_hex_pid_name.Trim();
         temp_hex_pid_name.MakeUpper();
-        //Ö»ÓÐHex PID Îªminipanel arm °æ±¾Ê±  £¬ ²Å¿ÉÄÜÒªÐÞ¸´ bootload µÄ°æ±¾; - Only when the Hex PID is the minipanel arm version can the bootloader version be repaired.
+        //Ö»ï¿½ï¿½Hex PID Îªminipanel arm ï¿½æ±¾Ê±  ï¿½ï¿½ ï¿½Å¿ï¿½ï¿½ï¿½Òªï¿½Þ¸ï¿½ bootload ï¿½Ä°æ±¾; - Only when the Hex PID is the minipanel arm version can the bootloader version be repaired.
         //if ((temp_hex_pid_name.CompareNoCase(_T("MINI_ARM")) == 0 ) ||
         //    (temp_hex_pid_name.CompareNoCase(_T("MINIPANEL")) == 0))
-        if (temp_hex_pid_name.CompareNoCase(_T("MINI_ARM")) == 0) 
+        if (temp_hex_pid_name.CompareNoCase(_T("MINI_ARM")) == 0)
         {
             n_hex_file_pid = PM_MINIPANEL_ARM;
-            if (hex_version >= 60) //´óÓÚÕâ¸ö°æ±¾¾ÍËµÃ÷ÐèÒª512µÄflash £¬±ØÐëÏÈ¸üÐÂbootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
+            if (hex_version >= 60) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ò?512ï¿½ï¿½flash ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¸ï¿½ï¿½ï¿½bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
             }
@@ -2274,8 +2274,8 @@ void CISPDlg::FlashByEthernet()
         else if (temp_hex_pid_name.CompareNoCase(_T("PID10")) == 0)
         {
             n_hex_file_pid = PM_TSTAT10;
-            //ÔÝÊ±²»ÈÃ¸üÐÂTSTAT10µÄbootloader - Temporarily not allowing the update of TSTAT10's bootloader
-            //if (hex_version >= 51.08) //´óÓÚÕâ¸ö°æ±¾¾ÍËµÃ÷ÐèÒª512µÄflash £¬±ØÐëÏÈ¸üÐÂbootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
+            //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½ï¿½TSTAT10ï¿½ï¿½bootloader - Temporarily not allowing the update of TSTAT10's bootloader
+            //if (hex_version >= 51.08) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ò?512ï¿½ï¿½flash ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¸ï¿½ï¿½ï¿½bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             //{
             //    firmware_must_use_new_bootloader = 1;
             //}
@@ -2283,7 +2283,7 @@ void CISPDlg::FlashByEthernet()
         else if (temp_hex_pid_name.CompareNoCase(_T("CO2ALL")) == 0)
         {
             n_hex_file_pid = STM32_CO2_NET;
-            if (hex_version > 0.58) //´óÓÚÕâ¸ö58  °æ±¾¾ÍËµÃ÷ÐèÒª512µÄflash £¬±ØÐëÏÈ¸üÐÂbootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
+            if (hex_version > 0.58) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?58  ï¿½æ±¾ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Òª512ï¿½ï¿½flash ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¸ï¿½ï¿½ï¿½bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
             }
@@ -2423,7 +2423,7 @@ BOOL CISPDlg::ValidMdbIDString(void)
 
 
 }
-//»òÕßModbusID
+//ï¿½ï¿½ï¿½ï¿½ModbusID
 int CISPDlg::GetModbusID(vector<int>& szMdbIDs)
 {
     szMdbIDs.clear();
@@ -2593,7 +2593,7 @@ void CISPDlg::FlashByCom()
         temp_hex_pid_name.ReleaseBuffer();
         temp_hex_pid_name.Trim();
         temp_hex_pid_name.MakeUpper();
-        //Ö»ÓÐHex PID Îªminipanel arm °æ±¾Ê±  £¬ ²Å¿ÉÄÜÒªÐÞ¸´ bootload µÄ°æ±¾; - Only when the Hex PID is the minipanel arm version can the bootloader version be repaired.
+        //Ö»ï¿½ï¿½Hex PID Îªminipanel arm ï¿½æ±¾Ê±  ï¿½ï¿½ ï¿½Å¿ï¿½ï¿½ï¿½Òªï¿½Þ¸ï¿½ bootload ï¿½Ä°æ±¾; - Only when the Hex PID is the minipanel arm version can the bootloader version be repaired.
 
         float hex_version = 0;
 
@@ -2604,10 +2604,10 @@ void CISPDlg::FlashByCom()
             hex_version = ((float)(global_fileInfor.software_high * 256 + global_fileInfor.software_low)) / 100;
             strTips_version.Format(_T("Hex file firmware version : %.2f"), hex_version);
             n_hex_file_pid = PM_MINIPANEL_ARM;
-            if (hex_version >= 60) //´óÓÚÕâ¸ö°æ±¾¾ÍËµÃ÷ÐèÒª512µÄflash £¬±ØÐëÏÈ¸üÐÂbootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
+            if (hex_version >= 60) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ò?512ï¿½ï¿½flash ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¸ï¿½ï¿½ï¿½bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
-                if (new_bootload == 0)   //µÚ¶þ±éÊÇ new boot µÄ Â·¾¶£¬ÐèÒª±£´æµÄÊÇµÚÒ»±éµÄÂ·¾¶; - The second time is the path of the new boot, and the path of the first time needs to be saved.
+                if (new_bootload == 0)   //ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ new boot ï¿½ï¿½ Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Çµï¿½Ò»ï¿½ï¿½ï¿½Â·ï¿½ï¿½; - The second time is the path of the new boot, and the path of the first time needs to be saved.
                     g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
@@ -2617,10 +2617,10 @@ void CISPDlg::FlashByCom()
             hex_version = ((float)(global_fileInfor.software_high * 256 + global_fileInfor.software_low));
             strTips_version.Format(_T("Hex file firmware version : %.2f"), hex_version);
             n_hex_file_pid = PM_MINIPANEL_ARM;
-            if (hex_version >= 101) //´óÓÚÕâ¸ö°æ±¾¾ÍËµÃ÷ÐèÒª512µÄflash £¬±ØÐëÏÈ¸üÐÂbootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
+            if (hex_version >= 101) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ò?512ï¿½ï¿½flash ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¸ï¿½ï¿½ï¿½bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
-                if (new_bootload == 0)   //µÚ¶þ±éÊÇ new boot µÄ Â·¾¶£¬ÐèÒª±£´æµÄÊÇµÚÒ»±éµÄÂ·¾¶; - The second time is the path of the new boot, and the path of the first time needs to be saved.
+                if (new_bootload == 0)   //ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ new boot ï¿½ï¿½ Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Çµï¿½Ò»ï¿½ï¿½ï¿½Â·ï¿½ï¿½; - The second time is the path of the new boot, and the path of the first time needs to be saved.
                     g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
@@ -2630,10 +2630,10 @@ void CISPDlg::FlashByCom()
             hex_version = ((float)(global_fileInfor.software_high * 256 + global_fileInfor.software_low));
             strTips_version.Format(_T("Hex file firmware version : %.2f"), hex_version);
             n_hex_file_pid = PM_TSTAT10;
-            if (hex_version >= 5109) //´óÓÚÕâ¸ö°æ±¾¾ÍËµÃ÷ÐèÒª512µÄflash £¬±ØÐëÏÈ¸üÐÂbootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
+            if (hex_version >= 5109) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ò?512ï¿½ï¿½flash ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¸ï¿½ï¿½ï¿½bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
-                if (new_bootload == 0)   //µÚ¶þ±éÊÇ new boot µÄ Â·¾¶£¬ÐèÒª±£´æµÄÊÇµÚÒ»±éµÄÂ·¾¶; - The second time is the path of the new boot, and the path of the first time needs to be saved.
+                if (new_bootload == 0)   //ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ new boot ï¿½ï¿½ Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Çµï¿½Ò»ï¿½ï¿½ï¿½Â·ï¿½ï¿½; - The second time is the path of the new boot, and the path of the first time needs to be saved.
                     g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
@@ -2643,10 +2643,10 @@ void CISPDlg::FlashByCom()
             hex_version = ((float)(global_fileInfor.software_high * 256 + global_fileInfor.software_low));
             strTips_version.Format(_T("Hex file firmware version : %.2f"), hex_version);
             n_hex_file_pid = STM32_CO2_NET;
-            if (hex_version >= 59) //´óÓÚÕâ¸ö°æ±¾¾ÍËµÃ÷ÐèÒª512µÄflash £¬±ØÐëÏÈ¸üÐÂbootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
+            if (hex_version >= 59) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ò?512ï¿½ï¿½flash ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¸ï¿½ï¿½ï¿½bootload; - If it is greater than this version, it means that 512 flash is needed, and the bootloader must be updated first.
             {
                 firmware_must_use_new_bootloader = 1;
-                if (new_bootload == 0)   //µÚ¶þ±éÊÇ new boot µÄ Â·¾¶£¬ÐèÒª±£´æµÄÊÇµÚÒ»±éµÄÂ·¾¶; - The second time is the path of the new boot, and the path of the first time needs to be saved.
+                if (new_bootload == 0)   //ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ new boot ï¿½ï¿½ Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Çµï¿½Ò»ï¿½ï¿½ï¿½Â·ï¿½ï¿½; - The second time is the path of the new boot, and the path of the first time needs to be saved.
                     g_update_newfirmware_file_path = m_strHexFileName;
             }
         }
@@ -2746,13 +2746,13 @@ afx_msg LRESULT CISPDlg::Show_Flash_DeviceInfor(WPARAM wParam, LPARAM lParam)
 
         m_FirmVer.Format(_T("%.1f"),tstat_version2);
         m_HardVer.Format(_T("%d"),US_Device_infor[MODBUS_HARDWARE_REV]);
-        /*Õ¹Ê¾µ½ÏûÏ¢log¿òÖÐ - Show in message log box */
+        /*Õ¹Ê¾ï¿½ï¿½ï¿½ï¿½Ï¢logï¿½ï¿½ï¿½ï¿½ - Show in message log box */
         UpdateStatusInfo(_T("|Device Information-Begin"),FALSE);
         UpdateStatusInfo(_T("|Model  Name:")+m_ModelName,FALSE);
         UpdateStatusInfo(_T("|Firmware Ver:")+m_FirmVer,FALSE);
         UpdateStatusInfo(_T("|Hardware Ver:")+m_HardVer,FALSE);
         UpdateStatusInfo(_T("|Device Information-End"),FALSE);
-        UpdateData(FALSE); //ÏÔÊ¾ÔÚ½çÃæÉÏ - Show on the interface
+        UpdateData(FALSE); //ï¿½ï¿½Ê¾ï¿½Ú½ï¿½ï¿½ï¿½ï¿½ï¿½ - Show on the interface
     }
     else
     {
@@ -2779,7 +2779,7 @@ BOOL CISPDlg::Show_Flash_DeviceInfor_NET()
     {
         int DeviceModel=-1;
         DeviceModel=read_one(255,MODBUS_PRODUCT_MODEL);//Get the model number that is being flashed, returns the name of the product
-        if (DeviceModel<0)//Modbus does not communicate, 
+        if (DeviceModel<0)//Modbus does not communicate,
         {
             return TRUE;
         }
@@ -2812,7 +2812,7 @@ BOOL CISPDlg::Show_Flash_DeviceInfor_NET()
             }
             m_FirmVer.Format(_T("%.1f"),tstat_version2);
             m_HardVer.Format(_T("%d"),read_one(255,MODBUS_HARDWARE_REV));
-            /*Õ¹Ê¾µ½ÏûÏ¢log¿òÖÐ*/
+            /*Õ¹Ê¾ï¿½ï¿½ï¿½ï¿½Ï¢logï¿½ï¿½ï¿½ï¿½*/
             UpdateStatusInfo(_T("|Device Information-Begin"),FALSE);
             UpdateStatusInfo(_T("|Model  Name:")+m_ModelName,FALSE);
             UpdateStatusInfo(_T("|Firmware Ver:")+m_FirmVer,FALSE);
@@ -2882,7 +2882,7 @@ void CISPDlg::OnBnClickedClearLog()
 }
 
 
-//* Write log information to a file 
+//* Write log information to a file
 void CISPDlg::OnBnClickedSaveLog()
 {
     if (m_lbStatusInfo.GetCount()!=0)
@@ -2935,7 +2935,7 @@ void CISPDlg::OnContextMenu(CWnd*  pWnd , CPoint  point )
         {
             CMenu menu;
             menu.LoadMenu(IDR_MENU1);//Menu Resource ID
-            menu.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN|TPM_LEFTBUTTON,point.x,point.y,this);     //m_newListCtrlÊÇCListCtrl¶ÔÏó
+            menu.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN|TPM_LEFTBUTTON,point.x,point.y,this);     //m_newListCtrlï¿½ï¿½CListCtrlï¿½ï¿½ï¿½ï¿½
             menu.DestroyMenu();
         }
 
@@ -2962,12 +2962,12 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
     _RecordsetPtr m_pRecordset;
     m_pRecordset.CreateInstance(__uuidof(Recordset));
 
-    // ÔÚADO²Ù×÷ÖÐ½¨ÒéÓï¾äÖÐÒª³£ÓÃtry...catch()À´²¶»ñ´íÎóÐÅÏ¢,
-    // ÒòÎªËüÓÐÊ±»á¾­³£³öÏÖÒ»Ð©ÒâÏë²»µ½µÄ´íÎó¡£jingzhou xu
+    // ï¿½ï¿½ADOï¿½ï¿½ï¿½ï¿½ï¿½Ð½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò?ï¿½ï¿½ï¿½ï¿½try...catch()ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï?,
+    // ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ê±ï¿½á¾­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ð©ï¿½ï¿½ï¿½ë²»ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½jingzhou xu
        // The Try...catch () is used in the proposed statement in the ADO operation to catch the error message.
      //Because it can return unexpected errors.
-    
-    
+
+
     try
     {
         CString sql;
@@ -3057,7 +3057,7 @@ void CISPDlg::OnMenuAbout()
 }
 /*
 Function:
-Extracts the name of a file from a user-selected file path£¬
+Extracts the name of a file from a user-selected file pathï¿½ï¿½
 */
 CString CISPDlg::GetFileName_FromFilePath()
 {
@@ -3317,14 +3317,14 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         SetCommunicationType(0);
         if (open_com(g_comport) == false)
         {
-            sn_mac_info.Format(_T("´ò¿ª´®¿Ú%d Ê§°Ü"), g_comport);
+            sn_mac_info.Format(_T("ï¿½ò¿ª´ï¿½ï¿½ï¿½%d Ê§ï¿½ï¿½"), g_comport);
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("´ò¿ª´®¿Ú%d ³É¹¦"), g_comport);
+            sn_mac_info.Format(_T("ï¿½ò¿ª´ï¿½ï¿½ï¿½%d ï¿½É¹ï¿½"), g_comport);
             Sleep(1000);
         }
             Change_BaudRate(g_mac_baudrate);
@@ -3341,12 +3341,12 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         }
         if (nret > 0)
         {
-            sn_mac_info.Format(_T("Á¬½ÓIP£º%s,¶Ë¿Ú:%d ³É¹¦"), g_mac_ip, g_mac_port);
+            sn_mac_info.Format(_T("ï¿½ï¿½ï¿½ï¿½IPï¿½ï¿½%s,ï¿½Ë¿ï¿½:%d ï¿½É¹ï¿½"), g_mac_ip, g_mac_port);
             Sleep(1000);
         }
         else
         {
-            sn_mac_info.Format(_T("Á¬½ÓIP£º%s,¶Ë¿Ú:%d Ê§°Ü"), g_mac_ip, g_mac_port);
+            sn_mac_info.Format(_T("ï¿½ï¿½ï¿½ï¿½IPï¿½ï¿½%s,ï¿½Ë¿ï¿½:%d Ê§ï¿½ï¿½"), g_mac_ip, g_mac_port);
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
@@ -3360,14 +3360,14 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     temp_mu_ret = read_multi_tap(255, temp_read_reg, 0, 10);
     if (temp_mu_ret < 0)
     {
-        sn_mac_info.Format(_T("¶ÁÈ¡Éè±¸»ù±¾ÐÅÏ¢Ê§°Ü"));
+        sn_mac_info.Format(_T("ï¿½ï¿½È¡ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢Ê§ï¿½ï¿½"));
         Sleep(1000);
         ::PostMessage(m_parent->m_hWnd,  WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
     else
     {
-        sn_mac_info.Format(_T("¶ÁÈ¡Éè±¸»ù±¾ÐÅÏ¢³É¹¦"));
+        sn_mac_info.Format(_T("ï¿½ï¿½È¡ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½É¹ï¿½"));
         Sleep(1000);
     }
     int n_ret_id = 0;
@@ -3376,38 +3376,38 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     n_ret = Write_One_Retry(temp_read_reg[6], 16, 142);
     //if ((n_ret < 0) && (b_com_or_ip == 0)  &&  (n_ignore_15_142_command == 0))
     //{
-    //    sn_mac_info.Format(_T("³õÊ¼»¯Ð´ÈëÃüÁîÊ§°Ü"));
+    //    sn_mac_info.Format(_T("ï¿½ï¿½Ê¼ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½"));
     //    ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
     //    return 1;
     //}
     //else
     //{
-        sn_mac_info.Format(_T("³õÊ¼»¯Ð´ÈëÃüÁî³É¹¦"));
+        sn_mac_info.Format(_T("ï¿½ï¿½Ê¼ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¹ï¿?"));
         Sleep(1000);
 
         for (int i = 0; i < n_mac_reboot_time; i++)
         {
-            sn_mac_info.Format(_T("µÈ´ýÉè±¸ÖØÆô (%d)"), n_mac_reboot_time - i);
+            sn_mac_info.Format(_T("ï¿½È´ï¿½ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ (%d)"), n_mac_reboot_time - i);
             Sleep(1000);
         }
 
         n_ret = Write_One_Retry(temp_read_reg[6], 16, 1,10);
         if ((n_ret < 0) && (b_com_or_ip == 0))
         {
-            sn_mac_info.Format(_T("Ð´ÈëÃüÁîÊ¹Éè±¸Ìø×ªÖÁÓ¦ÓÃ´úÂëÊ§°Ü"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½è±¸ï¿½ï¿½×ªï¿½ï¿½Ó¦ï¿½Ã´ï¿½ï¿½ï¿½Ê§ï¿½ï¿½"));
             Sleep(2000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("Ð´ÈëÃüÁîÊ¹Éè±¸Ìø×ªÖÁÓ¦ÓÃ´úÂë³É¹¦"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½è±¸ï¿½ï¿½×ªï¿½ï¿½Ó¦ï¿½Ã´ï¿½ï¿½ï¿½É¹ï¿?"));
             Sleep(2000);
         }
 
         for (int i = 0; i < n_mac_reboot_time; i++)
         {
-            sn_mac_info.Format(_T("µÈ´ýÉè±¸Ìø×ªÖÁÓ¦ÓÃ´úÂë (%d)"), n_mac_reboot_time - i);
+            sn_mac_info.Format(_T("ï¿½È´ï¿½ï¿½è±¸ï¿½ï¿½×ªï¿½ï¿½Ó¦ï¿½Ã´ï¿½ï¿½ï¿½ (%d)"), n_mac_reboot_time - i);
             Sleep(1000);
         }
 
@@ -3432,7 +3432,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         ready_towrite_sn = temp_serial_number + 1;
         monitor_bado.m_pRecordset->MoveNext();
     }
-    sn_mac_info.Format(_T("»ñÈ¡µ½µÄÐòÁÐºÅ: %u"), ready_towrite_sn);
+    sn_mac_info.Format(_T("ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðºï¿½: %u"), ready_towrite_sn);
 
     CTime Time_Click = CTime::GetCurrentTime();
     CString temp_g_write_hardware_version;
@@ -3458,124 +3458,124 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
     if ((n_ret_low < 0) || (n_ret_high < 0))
     {
-        sn_mac_info.Format(_T("Ð´ÈëÐòÁÐºÅÊ§°Ü"));
+        sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ðºï¿½Ê§ï¿½ï¿½"));
         Sleep(1000);
         ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
     else
     {
-        sn_mac_info.Format(_T("Ð´ÈëÐòÁÐºÅ³É¹¦:%u"), ready_towrite_sn);
+        sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ÐºÅ³É¹ï¿½:%u"), ready_towrite_sn);
         Sleep(1000);
     }
 
     n_ret_id = Write_One_Retry(temp_read_reg[6], 6, temp_read_reg[6],6);
     if (n_ret_id < 0)
     {
-        sn_mac_info.Format(_T("Ð´ÈëModbus IDÊ§°Ü"));
+        sn_mac_info.Format(_T("Ð´ï¿½ï¿½Modbus IDÊ§ï¿½ï¿½"));
         Sleep(1000);
         ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
     else
     {
-        sn_mac_info.Format(_T("Ð´ÈëModbus ID³É¹¦:%d"), temp_read_reg[6]);
+        sn_mac_info.Format(_T("Ð´ï¿½ï¿½Modbus IDï¿½É¹ï¿½:%d"), temp_read_reg[6]);
         Sleep(1000);
     }
 
     if (n_need_write_pid == 1)
     {
-        //ÐèÒªÉÕÐ´ÐÂµÄ²úÆ·ºÅ - The new product ID needs to be written
+        //ï¿½ï¿½Òªï¿½ï¿½Ð´ï¿½ÂµÄ²ï¿½Æ·ï¿½ï¿½ - The new product ID needs to be written
         int n_ret_pid = Write_One_Retry(temp_read_reg[6], 7, g_sn_product_id,6);
         if (n_ret_id < 0)
         {
-            sn_mac_info.Format(_T("Ð´Èë²úÆ·ID£º%dÊ§°Ü"), g_sn_product_id);
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½Æ·IDï¿½ï¿½%dÊ§ï¿½ï¿½"), g_sn_product_id);
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("Ð´Èë²úÆ·ID£º%d³É¹¦"), g_sn_product_id);
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½Æ·IDï¿½ï¿½%dï¿½É¹ï¿½"), g_sn_product_id);
             Sleep(1000);
         }
     }
     else
     {
-        //ÐèÒªÉÕÐ´ÐÂÔ­ÓÐµÄ²úÆ·ºÅ  £¬×îºÃÐ´Ò»ÏÂ£¬·ñÔò ²úÆ·ºÅÈÝÒ×±äµô. - The new original product ID needs to be written, it is best to write it, otherwise the product ID is easy to change.
+        //ï¿½ï¿½Òªï¿½ï¿½Ð´ï¿½ï¿½Ô­ï¿½ÐµÄ²ï¿½Æ·ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½Ð´Ò»ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿? ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½×±ï¿½ï¿?. - The new original product ID needs to be written, it is best to write it, otherwise the product ID is easy to change.
         int n_ret_pid = Write_One_Retry(temp_read_reg[6], 7, temp_read_reg[7],6);
         if (n_ret_id < 0)
         {
-            sn_mac_info.Format(_T("Ð´Èë²úÆ·ID£º%dÊ§°Ü"), temp_read_reg[7]);
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½Æ·IDï¿½ï¿½%dÊ§ï¿½ï¿½"), temp_read_reg[7]);
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("Ð´Èë²úÆ·ID£º%d³É¹¦"), temp_read_reg[7]);
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½Æ·IDï¿½ï¿½%dï¿½É¹ï¿½"), temp_read_reg[7]);
             Sleep(1000);
         }
     }
 
-    
+
 
     int n_ret_harware = Write_One_Retry(temp_read_reg[6], 8, g_write_hardware_version,6);
     if (n_ret_id < 0)
     {
-        sn_mac_info.Format(_T("Ð´ÈëÓ²¼þ°æ±¾ºÅÊ§°Ü"));
+        sn_mac_info.Format(_T("Ð´ï¿½ï¿½Ó²ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½Ê§ï¿½ï¿½"));
         Sleep(1000);
         ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
     else
     {
-        sn_mac_info.Format(_T("Ð´ÈëÓ²¼þ°æ±¾ºÅ³É¹¦:%d"), g_write_hardware_version);
+        sn_mac_info.Format(_T("Ð´ï¿½ï¿½Ó²ï¿½ï¿½ï¿½æ±¾ï¿½Å³É¹ï¿½:%d"), g_write_hardware_version);
         Sleep(1000);
     }
 
     if (handle_write_sensor_info == 1)
     {
-        //ÏÈÒªÈ·ÈÏ ÊÇ·ñÖ§³ÖÐ´Èësensor ±êÖ¾; - First, confirm whether to support writing sensor flags;
+        //ï¿½ï¿½ÒªÈ·ï¿½ï¿½ ï¿½Ç·ï¿½Ö§ï¿½ï¿½Ð´ï¿½ï¿½sensor ï¿½ï¿½Ö¾; - First, confirm whether to support writing sensor flags;
         unsigned short sensor_check_flag = 0;
         sensor_check_flag = read_one(temp_read_reg[6], FUNCTION_CHECK_SUM_REG, 6);
-        sn_mac_info.Format(_T("ÕýÔÚÐ´Èë×éºÏÄ£¿éÐ£ÑéÐÅÏ¢"));
+        sn_mac_info.Format(_T("ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½Ï?"));
         Sleep(1000);
         int n_ret_sensor_checksum = Write_One_Retry(temp_read_reg[6], FUNCTION_CHECK_SUM_REG, FUNCTION_CHECK_SUM_VALUE, 6);
         if (n_ret_sensor_checksum < 0)
         {
-            sn_mac_info.Format(_T("Ð´Èë×éºÏÄ£¿éÐ£ÑéÐÅÏ¢ Ê§°Ü"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½Ï? Ê§ï¿½ï¿½"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
-        sn_mac_info.Format(_T("ÕýÔÚÐ´Èë´ËÉè±¸µÄÄ£¿éÐÅÏ¢"));
+        sn_mac_info.Format(_T("ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½Ï?"));
         Sleep(1000);
         int n_ret_sensor1 = Write_One_Retry(temp_read_reg[6], FUNCTION_SENSOR1_REG, sensor_value1, 6);
         if (n_ret_sensor1 < 0)
         {
-            sn_mac_info.Format(_T("Ð´Èë×éºÏÄ£¿éÐÅÏ¢ µÚ1²¿·Ö Ê§°Ü"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½Ï? ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ Ê§ï¿½ï¿½"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("Ð´Èë×éºÏÄ£¿éÐÅÏ¢ µÚ1²¿·Ö ³É¹¦"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½Ï? ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ ï¿½É¹ï¿½"));
             Sleep(1000);
         }
 
         int n_ret_sensor2 = Write_One_Retry(temp_read_reg[6], FUNCTION_SENSOR2_REG, sensor_value2, 6);
         if (n_ret_sensor2 < 0)
         {
-            sn_mac_info.Format(_T("Ð´Èë×éºÏÄ£¿éÐÅÏ¢ µÚ2²¿·Ö Ê§°Ü"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½Ï? ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ Ê§ï¿½ï¿½"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("Ð´Èë×éºÏÄ£¿éÐÅÏ¢ µÚ2²¿·Ö ³É¹¦"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½Ï? ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ ï¿½É¹ï¿½"));
             Sleep(1000);
         }
     }
@@ -3649,21 +3649,21 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
             temp_pid_type_name, ready_towrite_sn, temp_time_format);
         monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
 
-        sn_mac_info.Format(_T("×¼±¸Ð´ÈëMACµØÖ·:%x-%x-%x-%x-%x-%x"), g_write_hardware_version,
+        sn_mac_info.Format(_T("×¼ï¿½ï¿½Ð´ï¿½ï¿½MACï¿½ï¿½Ö·:%x-%x-%x-%x-%x-%x"), g_write_hardware_version,
             ready_towrite_mac[1], ready_towrite_mac[2], ready_towrite_mac[3], ready_towrite_mac[4], ready_towrite_mac[5]);
         Sleep(1000);
 
         int n_ret_harware = Write_One_Retry(temp_read_reg[6], 93, 1,6);
         if (n_ret_id < 0)
         {
-            sn_mac_info.Format(_T("Ð´ÈëMACÊ¹ÄÜÃüÁîÊ§°Ü"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½MACÊ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("Ð´ÈëMACÊ¹ÄÜÃüÁî³É¹¦"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½MACÊ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¹ï¿?"));
             Sleep(1000);
         }
 
@@ -3674,8 +3674,8 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         }
 
         int n_mac_ret = 0;
-        if ((temp_read_reg[7] == PM_MINIPANEL_ARM) || 
-            temp_read_reg[7] == PM_MINIPANEL || 
+        if ((temp_read_reg[7] == PM_MINIPANEL_ARM) ||
+            temp_read_reg[7] == PM_MINIPANEL ||
             temp_read_reg[7] == PM_ESP32_T3_SERIES ||
             temp_read_reg[7] == PM_CM5)
         {
@@ -3685,17 +3685,17 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         {
             n_mac_ret = write_multi_Short(temp_read_reg[6], write_value, 40, 6);
         }
-        
+
         if (n_mac_ret < 0)
         {
-            sn_mac_info.Format(_T("Ð´ÈëMACµØÖ·Ê§°Ü"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½MACï¿½ï¿½Ö·Ê§ï¿½ï¿½"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("Ð´ÈëMACµØÖ·³É¹¦"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½MACï¿½ï¿½Ö·ï¿½É¹ï¿½"));
             Sleep(1000);
         }
     }
@@ -3772,26 +3772,26 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
             temp_pid_type_name, ready_towrite_sn, temp_time_format);
         monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
 
-        sn_mac_info.Format(_T("×¼±¸Ð´ÈëWIFI MACµØÖ·:%x-%x-%x-%x-%x-%x"), g_write_hardware_version,
+        sn_mac_info.Format(_T("×¼ï¿½ï¿½Ð´ï¿½ï¿½WIFI MACï¿½ï¿½Ö·:%x-%x-%x-%x-%x-%x"), g_write_hardware_version,
             ready_towrite_mac[1], ready_towrite_mac[2], ready_towrite_mac[3], ready_towrite_mac[4], ready_towrite_mac[5]);
         Sleep(1000);
 
 
-#if 1 //Ð´ wifi mac µØÖ·
-        //STATIC_IP_START_REG  2070  6 ¸ö¼Ä´æÆ÷
+#if 1 //Ð´ wifi mac ï¿½ï¿½Ö·
+        //STATIC_IP_START_REG  2070  6 ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½
 
 
         int n_ret_wifi_enable = Write_One_Retry(temp_read_reg[6], 2008, 0, 6);
         if (n_ret_wifi_enable < 0)
         {
-            sn_mac_info.Format(_T("Ð´ÈëÊ¹ÄÜWIFI MACµØÖ·±êÖ¾Î»Ê§°Ü"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½Ê¹ï¿½ï¿½WIFI MACï¿½ï¿½Ö·ï¿½ï¿½Ö¾Î»Ê§ï¿½ï¿½"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("Ð´ÈëÊ¹ÄÜWIFI MACµØÖ·±êÖ¾Î» ³É¹¦"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½Ê¹ï¿½ï¿½WIFI MACï¿½ï¿½Ö·ï¿½ï¿½Ö¾Î» ï¿½É¹ï¿½"));
             Sleep(1000);
         }
 
@@ -3800,7 +3800,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         {
             write_value[i] = ready_towrite_mac[i];
             if (write_value[i] < 0x10)
-                write_value[i] = write_value[i] + 0x10;        //wifiµÄmacµØÖ· ÓÐÐ©Î»Î»Ð¡ÓÚ0x10 Ð´²»½øÈ¥ - Some bits of the wifi MAC address are less than 0x10 and cannot be written in
+                write_value[i] = write_value[i] + 0x10;        //wifiï¿½ï¿½macï¿½ï¿½Ö· ï¿½ï¿½Ð©Î»Î»Ð¡ï¿½ï¿½0x10 Ð´ï¿½ï¿½ï¿½ï¿½È¥ - Some bits of the wifi MAC address are less than 0x10 and cannot be written in
         }
         write_value[0] = 0x18;
         int n_mac_ret = 0;
@@ -3809,18 +3809,18 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
         if (n_mac_ret < 0)
         {
-            sn_mac_info.Format(_T("Ð´ÈëWIFI MACµØÖ·Ê§°Ü"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½WIFI MACï¿½ï¿½Ö·Ê§ï¿½ï¿½"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("Ð´ÈëWIFI MACµØÖ·³É¹¦"));
+            sn_mac_info.Format(_T("Ð´ï¿½ï¿½WIFI MACï¿½ï¿½Ö·ï¿½É¹ï¿½"));
             Sleep(1000);
         }
 
-        sn_mac_info.Format(_T("Ð£ÑéWIFI MACµØÖ·"));
+        sn_mac_info.Format(_T("Ð£ï¿½ï¿½WIFI MACï¿½ï¿½Ö·"));
         Sleep(3000);
         unsigned short temp_read_mac[6] = { 0 };
         temp_mu_ret = read_multi_tap(temp_read_reg[6], temp_read_mac, 2070, 6);
@@ -3828,7 +3828,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         int ret_com = memcmp(write_value, temp_read_mac, 6);
         if (ret_com != 0)
         {
-            sn_mac_info.Format(_T("Ð£ÑéWIFI MACµØÖ·  Ê§°Ü"));
+            sn_mac_info.Format(_T("Ð£ï¿½ï¿½WIFI MACï¿½ï¿½Ö·  Ê§ï¿½ï¿½"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
@@ -3840,7 +3840,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
 
 
-    sn_mac_info.Format(_T("ËùÓÐ²Ù×÷ÒÑ³É¹¦Íê³É£¡"));
+    sn_mac_info.Format(_T("ï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ï¿½Ñ³É¹ï¿½ï¿½ï¿½É£ï¿?"));
     Sleep(1000);
     monitor_bado.CloseRecordset();
     monitor_bado.CloseConn();
@@ -3853,13 +3853,13 @@ void CISPDlg::OnBnClickedButtonFlashSn()
 {
 
 
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼þÍ¨Öª´¦Àí³ÌÐò´úÂë - Add control notification handler code here
+    // TODO: ï¿½Ú´ï¿½ï¿½ï¿½ï¿½Ó¿Ø¼ï¿½Í¨Öªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿? - Add control notification handler code here
     GetDlgItem(IDC_EDIT_MAC_ADDRESS)->SetWindowTextW(_T(""));
     GetDlgItem(IDC_EDIT_SN)->SetWindowTextW(_T(""));
 
     ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(false);
     ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(false);
-    
+
     if (((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->GetCheck())
     {
         g_write_mac = 1;
@@ -3880,7 +3880,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
 
     CString ProductName;
     ((CComboBox *)GetDlgItem(IDC_COMBO_PM))->GetWindowTextW(ProductName);
-    
+
     CString temp_reboot_time;
     GetDlgItem(IDC_EDIT_RESTART_TIME)->GetWindowTextW(temp_reboot_time);
     n_mac_reboot_time = _wtoi(temp_reboot_time);
@@ -3905,7 +3905,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
     {
         b_com_or_ip = 1;
     }
-    
+
 
     CString temp_hardware_version;
     GetDlgItem(IDC_EDIT_HWVERSION)->GetWindowTextW(temp_hardware_version);
@@ -3913,7 +3913,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
 
     if (g_write_hardware_version == 0)
     {
-        m_static_info.SetWindowTextW(_T("Ó²¼þ²úÆ·ºÅ²»ÄÜÎªÁã"));
+        m_static_info.SetWindowTextW(_T("Ó²ï¿½ï¿½ï¿½ï¿½Æ·ï¿½Å²ï¿½ï¿½ï¿½Îªï¿½ï¿½"));
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(true);
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(true);
         return;
@@ -3932,13 +3932,13 @@ void CISPDlg::OnBnClickedButtonFlashSn()
         }
     }
 
- 
-    
+
+
 
 
     if (find_product_name == false)
     {
-        m_static_info.SetWindowTextW(_T("²úÆ·ºÅÎ´¶¨Òå"));
+        m_static_info.SetWindowTextW(_T("ï¿½ï¿½Æ·ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½"));
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(true);
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(true);
         return;
@@ -4008,13 +4008,13 @@ void CISPDlg::OnBnClickedButtonFlashSn()
     {
         if (((CButton *)GetDlgItem(IDC_CHECK_NO_ITEM))->GetCheck()  == false)
         {
-            m_static_info.SetWindowTextW(_T("ÇëÈ·ÈÏÓÒ²à´«¸ÐÆ÷£¬ÈôÃ»ÓÐ£¬Çë¹´Ñ¡ µÚÁãÏî"));
+            m_static_info.SetWindowTextW(_T("ï¿½ï¿½È·ï¿½ï¿½ï¿½Ò²à´«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ð£ï¿½ï¿½ë¹´Ñ¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
             ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(true);
             ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(true);
             return;
         }
     }
-    
+
     if (h_sn_mac_thread == NULL)
     {
         SetTimer(SN_MAC_SHOW_TIMER, 300, NULL);
@@ -4029,7 +4029,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
 
 void CISPDlg::OnCbnSelchangeComboPm()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼þÍ¨Öª´¦Àí³ÌÐò´úÂë - Add control notification handler code here
+    // TODO: ï¿½Ú´ï¿½ï¿½ï¿½ï¿½Ó¿Ø¼ï¿½Í¨Öªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿? - Add control notification handler code here
     CString strModel;
     CComboBox* pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_PM);
     int nSel = pCbx->GetCurSel();
@@ -4044,7 +4044,7 @@ void CISPDlg::OnCbnSelchangeComboPm()
     {
         if (strModel.CompareNoCase(itr->name) == 0)
         {
-           
+
             for (; itr_sensor != support_sensor_id.end(); itr_sensor++)
             {
                 Sleep(1);
@@ -4055,13 +4055,13 @@ void CISPDlg::OnCbnSelchangeComboPm()
                 }
             }
 
-            
+
             break;
         }
     }
-    
+
     Enable_Sensor_Window(handle_write_sensor_info);
-    
+
 }
 
 void CISPDlg::Enable_Sensor_Window(bool nenable)
@@ -4076,9 +4076,9 @@ void CISPDlg::Enable_Sensor_Window(bool nenable)
         ((CButton *)GetDlgItem(IDC_CHECK_ITEM17 + i))->EnableWindow(nenable);
     }
     if(nenable)
-        GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("±ØÐë¹´Ñ¡°üº¬µÄ×é¼þ"));
+        GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("ï¿½ï¿½ï¿½ë¹´Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?"));
     else
-        GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("ÎÞÐè¹´Ñ¡°üº¬µÄ×é¼þ"));
+        GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("ï¿½ï¿½ï¿½è¹´Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?"));
 }
 
 
@@ -4087,7 +4087,7 @@ void CISPDlg::Enable_Sensor_Window(bool nenable)
 
 void CAboutDlg::OnBnClickedOk()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼þÍ¨Öª´¦Àí³ÌÐò´úÂë - Add control notification handler code here
+    // TODO: ï¿½Ú´ï¿½ï¿½ï¿½ï¿½Ó¿Ø¼ï¿½Í¨Öªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿? - Add control notification handler code here
     CDialog::OnOK();
 }
 
@@ -4096,7 +4096,7 @@ BOOL CAboutDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
 
-    // TODO:  ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯ - Add additional initialization here
+    // TODO:  ï¿½Ú´ï¿½ï¿½ï¿½ï¿½Ó¶ï¿½ï¿½ï¿½Ä³ï¿½Ê¼ï¿½ï¿? - Add additional initialization here
     CString release_note;
     CString temp;
     temp.Format(_T("Rev6.3.8  (2023-03-31)\r\n  1.Support update Tstat10 when it is in Mstp Mode  .\r\n  Tstat10 firmware version should be larger than 63.5\r\n"));
@@ -4128,16 +4128,16 @@ BOOL CAboutDlg::OnInitDialog()
 
     SetDlgItemTextW(IDC_EDIT_ISP, release_note);
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // Òì³£: OCX ÊôÐÔÒ³Ó¦·µ»Ø FALSE - Exception: OCX property pages should return FALSE
+                  // ï¿½ì³£: OCX ï¿½ï¿½ï¿½ï¿½Ò³Ó¦ï¿½ï¿½ï¿½ï¿½ FALSE - Exception: OCX property pages should return FALSE
 }
 
 void CISPDlg::OnBnClickedCheckNoItem()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼þÍ¨Öª´¦Àí³ÌÐò´úÂë - Add control notification handler code here
+    // TODO: ï¿½Ú´ï¿½ï¿½ï¿½ï¿½Ó¿Ø¼ï¿½Í¨Öªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿? - Add control notification handler code here
     CButton* pBtn = (CButton*)GetDlgItem(IDC_CHECK_NO_ITEM);
     int state = pBtn->GetCheck();
-    //ÉÏÃæµÄÒ²¿ÉÒÔ°ó¶¨Ò»¸ö±äÁ¿×ö´¦Àí - The above can also be bound to a variable for processing
-    if (state == 1) // Ñ¡ÖÐ - Selected
+    //ï¿½ï¿½ï¿½ï¿½ï¿½Ò²ï¿½ï¿½ï¿½Ô°ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿? - The above can also be bound to a variable for processing
+    if (state == 1) // Ñ¡ï¿½ï¿½ - Selected
     {
         for (int j = 0; j < 16; j++)
         {
@@ -4175,7 +4175,7 @@ int temco_burning_mode = 0;
 
 void CISPDlg::OnBnClickedButtonLoopFlash()
 {
-    // TODO: ÔÚ´ËÌí¼Ó¿Ø¼þÍ¨Öª´¦Àí³ÌÐò´úÂë - Add control notification handler code here
+    // TODO: ï¿½Ú´ï¿½ï¿½ï¿½ï¿½Ó¿Ø¼ï¿½Í¨Öªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿? - Add control notification handler code here
 
     if (temco_burning_mode == 0)
     {
@@ -4194,6 +4194,6 @@ void CISPDlg::OnBnClickedButtonLoopFlash()
     }
 
 
-    
+
 }
 #endif

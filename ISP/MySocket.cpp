@@ -292,6 +292,7 @@ void MySocket::OnReceive(int nErrorCode)
 			if((temp_data[1]==4)&&(tem_data==package_number))
 			{
 				next_package_number = package_number +1;
+				Signal_Tftp_Ack();
 			}
 		}
 		else if (Receive_data_length == 5)

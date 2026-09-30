@@ -19,6 +19,7 @@ typedef struct _DHCP_PACKET
 #define DHCP_PACKET_SIZE (sizeof(DHCP_PACKET))
 const int  FLASH_UDP_PORT=10000; 
 const int  LOCAL_UDP_PORT=10001;
+void Signal_Tftp_Ack(void);
 
 class CISPDlg;
 class TFTPServer
