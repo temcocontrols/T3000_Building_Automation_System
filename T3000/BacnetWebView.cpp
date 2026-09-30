@@ -77,7 +77,9 @@ enum WEBVIEW_MESSAGE_TYPE
 	SAVE_NEW_LIBRARY_DATA = 14,
 	LOGGING_DATA = 15,
 	UPDATE_WEBVIEW_LIST = 16,
-	GET_WEBVIEW_LIST = 17
+	GET_WEBVIEW_LIST = 17,
+	// WEBVIEW button: the web UI (WIN11 icon) asks for the desktop app back.
+	BACK_TO_DESKTOP = 18
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -4036,6 +4038,23 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 
 		// Final log message - write to T3WebLog\YYYY-MM\MMDD\ if logging enabled
 			WriteHandleWebViewMsgLog(_T("LOGGING_DATA"), outmsg, device_count);
+	}
+	break;
+	case WEBVIEW_MESSAGE_TYPE::BACK_TO_DESKTOP:
+	{
+		tempjson["action"] = "BACK_TO_DESKTOP_RES";
+		// Arrives on the Rust server thread, so the window work is posted to the frame (OnBackToDesktop).
+		if (pFrame != NULL && pFrame->GetSafeHwnd() != NULL)
+		{
+			::PostMessage(pFrame->GetSafeHwnd(), WM_T3000_BACK_TO_DESKTOP, 0, 0);
+			tempjson["data"] = "restoring";
+		}
+		else
+		{
+			WrapErrorMessage(builder, tempjson, outmsg, _T("T3000 main window is not available"));
+			break;
+		}
+		outmsg = CString(Json::writeString(builder, tempjson).c_str());
 	}
 	break;
 	default:

@@ -6998,6 +6998,9 @@ BEGIN
     BUTTON      ID_BUILDINGCONFIGDB
 END
 
+// WEBVIEW button: the last button of the toolbar. The separator in front of it is only a placeholder -
+// CMainFrame::OnCreate swaps it for an invisible spacer that pushes the button flush right. It uses the
+// 19th tile of each toolbar strip; the placeholder takes none, so 19 buttons need 19 tiles.
 IDR_TOOLBAR_BACNET TOOLBAR 32, 32
 BEGIN
     BUTTON      ID_CONTROL_MAIN
@@ -7018,6 +7021,8 @@ BEGIN
     BUTTON      ID_BUILDINGCONFIGDB
     BUTTON      ID_CONTROL_REFRESH
     BUTTON      ID_CONTROL_PVAR
+    SEPARATOR
+    BUTTON      ID_TOOLS_WEBVIEW
 END
 
 
