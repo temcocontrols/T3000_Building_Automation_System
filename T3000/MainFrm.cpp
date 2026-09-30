@@ -394,6 +394,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 #endif
         ON_MESSAGE(WM_WRITE_INTO_NEW_DEVICE, HandleWriteNewDevice)
         ON_COMMAND(ID_WEBVIEW_MODBUSREGISTER, &CMainFrame::OnWebviewModbusregister)
+        ON_COMMAND(ID_TOOLS_WEBVIEW, &CMainFrame::OnWebviewOpenBrowser)
+        ON_MESSAGE(WM_T3000_BACK_TO_DESKTOP, OnBackToDesktop)
         //ON_COMMAND(ID_WEBVIEW_THIRDPARTYMODBUSDATABASE, &CMainFrame::OnWebviewThirdpartymodbusdatabase)
         ON_COMMAND(ID_TOOLS_LOGINMYACCOUNT, &CMainFrame::OnToolsLoginmyaccount)
         ON_WM_SYSCOMMAND()
@@ -778,6 +780,119 @@ namespace ns
 
 
 
+/* The toolbar that owns the WEBVIEW spacer. Not a CMainFrame member (see MainFrm.h), and not looked up
+   through the button: MFC leaves CMFCToolBarButton::m_pWndParent NULL for LoadToolBar/InsertButton. */
+static CMFCToolBar* s_pWebviewSpacerToolBar = NULL;
+
+/* The browser window this app opened, and its pid. Not the ShellExecuteEx process handle: for Firefox
+   that belongs to the launcher, which exits once the browser process has taken over. */
+static HWND  s_hWebviewBrowserWnd = NULL;
+static DWORD s_dwWebviewBrowserPid = 0;
+
+/* Report the docked window's client width: a toolbar sizes itself to the sum of its buttons, so with its
+   own width as the ideal size the spacer in front of the WEBVIEW button could never claim anything. */
+CSize CViewClientToolBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
+{
+    CSize size = CMFCToolBar::CalcFixedLayout(bStretch, bHorz);
+
+    if (bHorz && !IsFloating())
+    {
+        CWnd* pFrame = GetParentFrame();
+        if (pFrame == NULL || !::IsWindow(pFrame->GetSafeHwnd()))
+        {
+            pFrame = AfxGetMainWnd();
+        }
+        if (pFrame != NULL && ::IsWindow(pFrame->GetSafeHwnd()))
+        {
+            CRect rcClient;
+            pFrame->GetClientRect(&rcClient);
+            if (rcClient.Width() > size.cx)
+            {
+                size.cx = rcClient.Width();
+            }
+        }
+    }
+
+    return size;
+}
+
+/* CMFCToolBar::AdjustLocations drops any button that would reach past the bar's client rect - the spacer
+   goes first and the button is left mid-row - so put the WEBVIEW button at the right end here. */
+void CViewClientToolBar::AdjustLocations()
+{
+    CMFCToolBar::AdjustLocations();
+
+    if (IsFloating() || (GetCurrentAlignment() & CBRS_ORIENT_HORZ) == 0)
+    {
+        return;
+    }
+
+    int iWebview = CommandToIndex(ID_TOOLS_WEBVIEW);
+    if (iWebview <= 0)
+    {
+        return;
+    }
+
+    CMFCToolBarButton* pWebview = GetButton(iWebview);
+    if (pWebview == NULL || pWebview->GetHwnd() != NULL || !pWebview->IsVisible())
+    {
+        return;
+    }
+
+    CRect rcClient;
+    GetClientRect(&rcClient);
+
+    CRect rcButton = pWebview->Rect();
+    if (rcButton.Width() <= 0 || rcClient.Width() <= rcButton.Width())
+    {
+        return;
+    }
+
+    /* Right edge: the left edge of whatever follows the button, else the end of the row. */
+    int iRight = rcClient.right - 2;
+    if (iWebview + 1 < GetCount())
+    {
+        CMFCToolBarButton* pAfter = GetButton(iWebview + 1);
+        if (pAfter != NULL && pAfter->IsVisible() && pAfter->Rect().Width() > 0)
+        {
+            iRight = pAfter->Rect().left - 2;
+        }
+    }
+
+    int iShift = iRight - rcButton.right;
+    if (iShift == 0)
+    {
+        return;
+    }
+
+    if (iShift < 0)
+    {
+        return;         // the row is too narrow to matter, leave the base class result alone
+    }
+
+    rcButton.OffsetRect(iShift, 0);
+    pWebview->SetRect(rcButton);
+
+    /* The spacer absorbs the slack, so the icons before it stay put; and it must not paint either, because
+       the toolbar draws the button frame around it (an empty OnDraw alone is not enough). */
+    CMFCToolBarButton* pSpacer = GetButton(iWebview - 1);
+    if (pSpacer != NULL)
+    {
+        CRect rcSpacer = pSpacer->Rect();
+        if (rcSpacer.Width() > 0)
+        {
+            rcSpacer.right += iShift;
+            pSpacer->SetRect(rcSpacer);
+        }
+        pSpacer->SetVisible(FALSE);
+    }
+
+    /* The base class refreshed the tool tips before the button above moved: do it again now. */
+    UpdateTooltips();
+
+    Invalidate();
+}
+
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     SetWindowText(_T("") MY_NAME);
@@ -826,12 +941,30 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 
 
-    if (!m_testtoolbar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC,CRect(1,1,1,1),IDR_TOOLBAR_BACNET) ||
+    // WEBVIEW: no CBRS_GRIPPER - MFC would paint its grip line at the start of the row.
+    if (!m_testtoolbar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC,CRect(1,1,1,1),IDR_TOOLBAR_BACNET) ||
             !m_testtoolbar.LoadToolBar(IDR_TOOLBAR_BACNET,uiToolbarColdID, uiMenuID, FALSE /* Not locked */, IDB_BITMAP_TOOLBAR_DISABLE, 0, uiToolbarHotID))
 
     {
         TRACE0("Failed to create toolbar\n");
         return -1;//fail to create
+    }
+
+    // WEBVIEW: swap the resource's placeholder separator for a spacer that claims the row's leftover
+    // width, so the button sits flush right (a real separator would keep painting its divider line).
+    s_pWebviewSpacerToolBar = &m_testtoolbar;
+
+    int iWebview = m_testtoolbar.CommandToIndex(ID_TOOLS_WEBVIEW);
+    if (iWebview > 0)
+    {
+        CMFCToolBarButton* pPrev = m_testtoolbar.GetButton(iWebview - 1);
+        if (pPrev != NULL && (pPrev->m_nStyle & TBBS_SEPARATOR) != 0)
+        {
+            m_testtoolbar.RemoveButton(iWebview - 1);
+            iWebview--;
+        }
+        CToolBarRightSpacerButton spacer;
+        m_testtoolbar.InsertButton(spacer, iWebview);
     }
 
 
@@ -15141,6 +15274,10 @@ BOOL CMainFrame::OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult)
             {
                 pTTT->lpszText = _T("Program Variables.\r\nMainly used to assist in additional programming within the program.");
             }
+            else if (pBtn->m_nID == ID_TOOLS_WEBVIEW)
+            {
+                pTTT->lpszText = _T("WEBVIEW\r\nOpen the web interface in Chrome / Edge / Firefox (reuses the window if it is already open)");
+            }
             
             pTTT->hinst = AfxGetResourceHandle();
         }
@@ -16646,6 +16783,548 @@ void CMainFrame::OnWebviewModbusregister()
     auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(webviewUrl), wstring(webviewTitle));
     auto result = BacnetWebViewAppWindow::RunMessagePump();
     delete webviewwindow;
+}
+
+/* ============================== WEBVIEW button ==============================
+ * WEBVIEW button (toolbar) -> reuse the browser window already open on the dedicated profile, else start
+ *                             one; then minimise T3000.
+ * WIN11 icon (web page)    -> restore + focus T3000 and close that browser window.
+ *
+ * The browser runs on its own profile (--user-data-dir): that is what makes the window ours to close (a
+ * page cannot close a tab it did not open) and how a click recognises it again - one click, one window,
+ * even after T3000 was restarted while the browser stayed open.
+ *
+ * T3000_WEBVIEW_APP_MODE=1: Chrome/Edge app mode (no tabs, no address bar). Default 0: ordinary window.
+ * ========================================================================= */
+/* The web UI the WEBVIEW button opens. 3003 is the Quasar/Vite dev server (used while testing);
+   9103 is the port the shipped app serves. Flip this one line to switch. */
+#define T3000_WEBVIEW_URL        _T("http://localhost:9103/#/t3000/")
+#define T3000_WEBVIEW_APP_MODE   0
+
+/* Handle of the browser process we launched. A file-static, not a CMainFrame member - see the note in
+   MainFrm.h: data members must not be added to the frame. */
+static HANDLE s_hWebviewBrowserProcess = NULL;
+
+IMPLEMENT_DYNCREATE(CToolBarRightSpacerButton, CMFCToolBarButton)
+
+/* The leftover width of the row. Not the bar's own client rect: that already contains this spacer, so
+   reading it would be circular and the spacer would keep the one pixel it starts with. */
+SIZE CToolBarRightSpacerButton::OnCalculateSize(CDC* pDC, const CSize& sizeDefault, BOOL bHorz)
+{
+    if (!bHorz)
+    {
+        return CMFCToolBarButton::OnCalculateSize(pDC, sizeDefault, bHorz);
+    }
+
+    CMFCToolBar* pBar = s_pWebviewSpacerToolBar;
+    if (pBar == NULL || !::IsWindow(pBar->GetSafeHwnd()))
+    {
+        pBar = DYNAMIC_DOWNCAST(CMFCToolBar, GetParentWnd());
+    }
+    if (pBar == NULL || !::IsWindow(pBar->GetSafeHwnd()))
+    {
+        return CSize(1, sizeDefault.cy);
+    }
+
+    int iUsed = 0;
+    for (int i = 0; i < pBar->GetCount(); i++)
+    {
+        CMFCToolBarButton* pButton = pBar->GetButton(i);
+        if (pButton == NULL || pButton == this || !pButton->IsVisible())
+        {
+            continue;
+        }
+        if (pButton->GetRuntimeClass() == RUNTIME_CLASS(CToolBarRightSpacerButton))
+        {
+            continue;       // InsertButton stores a copy, so the pointer test above is not enough
+        }
+        iUsed += pButton->OnCalculateSize(pDC, sizeDefault, TRUE).cx;
+    }
+
+    /* From the bar's own left edge (the dock site places it) to the right edge of the frame it is docked
+       in - right whether the bar owns its row or shares one with the menu bar. */
+    int iAvail = 0;
+    CRect rcBar(0, 0, 0, 0);
+    CRect rcFrameClient(0, 0, 0, 0);
+
+    CWnd* pFrame = pBar->GetParentFrame();
+    if (pFrame == NULL || !::IsWindow(pFrame->GetSafeHwnd()))
+    {
+        pFrame = AfxGetMainWnd();
+    }
+    if (pFrame != NULL && ::IsWindow(pFrame->GetSafeHwnd()))
+    {
+        pBar->GetWindowRect(&rcBar);
+        pFrame->GetClientRect(&rcFrameClient);
+        pFrame->ClientToScreen(&rcFrameClient);
+        iAvail = rcFrameClient.right - rcBar.left;
+    }
+
+    /* Not placed yet (1x1 creation rect): fall back to the whole client width. */
+    if (iAvail < 100 || rcBar.Width() < 100)
+    {
+        iAvail = rcFrameClient.Width();
+    }
+
+    int iFree = iAvail - iUsed - 12;            // 12 px of slack for the row's own margins
+    if (iFree < 1)
+    {
+        iFree = 1;
+    }
+
+    return CSize(iFree, sizeDefault.cy);
+}
+/* chrome.exe -> msedge.exe -> firefox.exe, as their installers register them; empty = default handler. */
+static CString FindInstalledBrowser()
+{
+    static LPCWSTR appPaths[] = {
+        L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\chrome.exe",
+        L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\msedge.exe",
+        L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\firefox.exe",
+    };
+    static const HKEY roots[] = { HKEY_LOCAL_MACHINE, HKEY_CURRENT_USER };
+
+    for (int r = 0; r < 2; r++)
+    {
+        for (int i = 0; i < _countof(appPaths); i++)
+        {
+            HKEY hKey = NULL;
+            if (::RegOpenKeyExW(roots[r], appPaths[i], 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+                continue;
+
+            wchar_t path[MAX_PATH] = { 0 };
+            DWORD cb = sizeof(path) - sizeof(wchar_t);
+            DWORD type = 0;
+            LONG rc = ::RegQueryValueExW(hKey, NULL, NULL, &type, reinterpret_cast<BYTE*>(path), &cb);
+            ::RegCloseKey(hKey);
+
+            if (rc == ERROR_SUCCESS && path[0] != L'\0')
+            {
+                CString exe(path);
+                exe.Trim();
+                if (exe.GetLength() > 0 && ::PathFileExists(exe))
+                    return exe;
+            }
+        }
+    }
+    return _T("");
+}
+
+/* The browser Windows itself uses for an http: link, so the button opens "the" browser of this PC rather
+   than a hard-coded favourite. "" when unresolved. */
+static CString FindDefaultBrowserExe()
+{
+    HKEY hKey = NULL;
+    CString progId;
+    if (::RegOpenKeyExW(HKEY_CURRENT_USER,
+            L"SOFTWARE\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\http\\UserChoice",
+            0, KEY_READ, &hKey) == ERROR_SUCCESS)
+    {
+        wchar_t value[512] = { 0 };
+        DWORD cb = sizeof(value) - sizeof(wchar_t);
+        DWORD type = 0;
+        if (::RegQueryValueExW(hKey, L"ProgId", NULL, &type, reinterpret_cast<BYTE*>(value), &cb) == ERROR_SUCCESS)
+        {
+            progId = value;
+        }
+        ::RegCloseKey(hKey);
+    }
+
+    if (progId.IsEmpty())
+    {
+        return _T("");
+    }
+
+    CString subKey;
+    subKey.Format(_T("%s\\shell\\open\\command"), (LPCTSTR)progId);
+    if (::RegOpenKeyExW(HKEY_CLASSES_ROOT, subKey, 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+    {
+        return _T("");
+    }
+
+    wchar_t command[1024] = { 0 };
+    DWORD cb = sizeof(command) - sizeof(wchar_t);
+    DWORD type = 0;
+    LONG rc = ::RegQueryValueExW(hKey, NULL, NULL, &type, reinterpret_cast<BYTE*>(command), &cb);
+    ::RegCloseKey(hKey);
+    if (rc != ERROR_SUCCESS)
+    {
+        return _T("");
+    }
+
+    CString full(command);
+    full.Trim();
+    if (full.IsEmpty())
+    {
+        return _T("");
+    }
+
+    /* Executable only: Edge appends --single-argument %1, Firefox -osint -url %1. */
+    CString exe;
+    if (full.GetAt(0) == _T('"'))
+    {
+        const int close = full.Find(_T('"'), 1);
+        if (close > 1)
+        {
+            exe = full.Mid(1, close - 1);
+        }
+    }
+    else
+    {
+        const int space = full.Find(_T(' '));
+        exe = (space > 0) ? full.Left(space) : full;
+    }
+
+    exe.Trim();
+    if (!exe.IsEmpty() && ::PathFileExists(exe))
+    {
+        return exe;
+    }
+    return _T("");
+}
+
+/* The dedicated profile the WEBVIEW browser runs on - and what tells our windows from the user's. */
+static CString GetWebviewProfilePath()
+{
+    CString profile;
+    profile.Format(_T("%s\\BrowserProfile"), (LPCTSTR)GetUserAppDataPath(_T("T3000")));
+    if (!profile.IsEmpty())
+    {
+        ::CreateDirectory(profile, NULL);
+    }
+    return profile;
+}
+
+/* Another process's command line, read with ntdll's NtQueryInformationProcess(h, 60) - no import library.
+   Needs Windows 8.1+; "" when it cannot be read. */
+typedef LONG(NTAPI* PFN_NtQueryInformationProcess)(HANDLE, ULONG, PVOID, ULONG, PULONG);
+
+struct T3WebviewUnicodeString
+{
+    USHORT Length;
+    USHORT MaximumLength;
+    PWSTR  Buffer;
+};
+
+static CString GetProcessCommandLine(DWORD pid)
+{
+    CString commandLine;
+
+    HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+    if (hProcess == NULL)
+    {
+        return commandLine;
+    }
+
+    static PFN_NtQueryInformationProcess pNtQueryInformationProcess =
+        reinterpret_cast<PFN_NtQueryInformationProcess>(
+            ::GetProcAddress(::GetModuleHandle(_T("ntdll.dll")), "NtQueryInformationProcess"));
+
+    /* On the heap: a browser's own command line carries its feature switches and can run to several KB. */
+    const SIZE_T cbBuffer = 32 * 1024;
+    BYTE* pBuffer = static_cast<BYTE*>(::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, cbBuffer));
+    if (pNtQueryInformationProcess != NULL && pBuffer != NULL)
+    {
+        ULONG cbReturned = 0;
+        if (pNtQueryInformationProcess(hProcess, 60 /* ProcessCommandLineInformation */,
+                pBuffer, static_cast<ULONG>(cbBuffer), &cbReturned) >= 0)
+        {
+            T3WebviewUnicodeString* pName = reinterpret_cast<T3WebviewUnicodeString*>(pBuffer);
+            if (pName->Buffer != NULL && pName->Length > 0)
+            {
+                commandLine = CString(pName->Buffer, static_cast<int>(pName->Length / sizeof(WCHAR)));
+            }
+        }
+    }
+    if (pBuffer != NULL)
+    {
+        ::HeapFree(::GetProcessHeap(), 0, pBuffer);
+    }
+
+    ::CloseHandle(hProcess);
+    return commandLine;
+}
+
+/* The browser windows on OUR profile: the only ones this app may reuse or close. Deciding by profile, not
+   by a handle remembered in this process, is what keeps one click to one window (see the block above). */
+static int CollectOurWebviewWindows(HWND* pOut, int nMax, const CString& profile)
+{
+    if (profile.IsEmpty())
+    {
+        return 0;
+    }
+
+    CString strProfile = profile;
+    strProfile.MakeUpper();
+
+    struct Search { HWND* pOut; int nMax; int nFound; LPCTSTR pProfile; };
+    Search s = { pOut, nMax, 0, (LPCTSTR)strProfile };
+
+    ::EnumWindows([](HWND hwnd, LPARAM lp) -> BOOL {
+        Search* s = reinterpret_cast<Search*>(lp);
+
+        if (s->nFound >= s->nMax)
+        {
+            return FALSE;
+        }
+        if (!::IsWindowVisible(hwnd) || ::GetWindow(hwnd, GW_OWNER) != NULL)
+        {
+            return TRUE;                    // not a window the user can see
+        }
+
+        DWORD pid = 0;
+        ::GetWindowThreadProcessId(hwnd, &pid);
+        if (pid == 0 || pid == ::GetCurrentProcessId())
+        {
+            return TRUE;                    // our own frame, dialogs and WebView2 windows
+        }
+
+        TCHAR cls[64] = { 0 };
+        ::GetClassName(hwnd, cls, _countof(cls));
+        if (_tcsicmp(cls, _T("MozillaWindowClass")) != 0 && _tcsicmp(cls, _T("Chrome_WidgetWin_1")) != 0)
+        {
+            return TRUE;                    // not Firefox/Chrome/Edge
+        }
+
+        CString commandLine = GetProcessCommandLine(pid);
+        commandLine.MakeUpper();
+        if (commandLine.Find(s->pProfile) < 0)
+        {
+            return TRUE;                    // a browser, but not on our profile: leave it alone
+        }
+
+        s->pOut[s->nFound++] = hwnd;
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&s));
+
+    return s.nFound;
+}
+
+/* Bring a window of ours to the front, maximised, and close the others. FALSE when there is none, i.e.
+   when a browser has to be started. */
+static BOOL ReuseWebviewBrowser(const CString& profile)
+{
+    HWND aOurs[8] = { 0 };
+    const int nOurs = CollectOurWebviewWindows(aOurs, _countof(aOurs), profile);
+    if (nOurs <= 0)
+    {
+        return FALSE;
+    }
+
+    /* The window we already know, otherwise the first one found - after a T3000 restart we know none. */
+    int iKeep = 0;
+    for (int i = 0; i < nOurs; i++)
+    {
+        if (aOurs[i] == s_hWebviewBrowserWnd)
+        {
+            iKeep = i;
+            break;
+        }
+    }
+
+    const HWND hKeep = aOurs[iKeep];
+    DWORD dwKeepPid = 0;
+    ::GetWindowThreadProcessId(hKeep, &dwKeepPid);
+
+    s_hWebviewBrowserWnd = hKeep;
+    s_dwWebviewBrowserPid = dwKeepPid;
+
+    /* In front and maximised first, so the click has a visible effect straight away. */
+    if (::IsIconic(hKeep))
+    {
+        ::ShowWindow(hKeep, SW_RESTORE);
+    }
+    ::ShowWindow(hKeep, SW_MAXIMIZE);
+    ::SetForegroundWindow(hKeep);
+
+    /* The others are leftovers of earlier clicks: close them. A window of a different process is also
+       ended if it is still there; the kept window's own process is never killed. */
+    for (int i = 0; i < nOurs; i++)
+    {
+        if (aOurs[i] == hKeep)
+        {
+            continue;
+        }
+
+        DWORD dwPid = 0;
+        ::GetWindowThreadProcessId(aOurs[i], &dwPid);
+        ::PostMessage(aOurs[i], WM_CLOSE, 0, 0);
+
+        if (dwPid != 0 && dwPid != dwKeepPid)
+        {
+            HANDLE hProcess = ::OpenProcess(SYNCHRONIZE | PROCESS_TERMINATE, FALSE, dwPid);
+            if (hProcess != NULL)
+            {
+                if (::WaitForSingleObject(hProcess, 2000) != WAIT_OBJECT_0)
+                {
+                    ::TerminateProcess(hProcess, 0);
+                }
+                ::CloseHandle(hProcess);
+            }
+        }
+    }
+
+    return TRUE;
+}
+
+void CMainFrame::OnWebviewOpenBrowser()
+{
+    OpenWebviewInBrowser();
+}
+
+void CMainFrame::OpenWebviewInBrowser()
+{
+    /* Our profile - and with it any browser window an earlier run of T3000 left open. Reuse it, or start
+       a browser; a running one is never killed in order to open another, which is what used to leave
+       several windows behind. */
+    const CString profile = GetWebviewProfilePath();
+    if (ReuseWebviewBrowser(profile))
+    {
+        if (!IsIconic())
+        {
+            ShowWindow(SW_MINIMIZE);    // hand the screen to the browser
+        }
+        return;
+    }
+
+    s_hWebviewBrowserWnd = NULL;
+    s_dwWebviewBrowserPid = 0;
+
+    CString exe = FindDefaultBrowserExe();        // whatever Windows opens for an http: link
+    if (exe.IsEmpty())
+    {
+        exe = FindInstalledBrowser();             // fallback: chrome -> edge -> firefox
+    }
+    if (!exe.IsEmpty())
+    {
+        const BOOL isFirefox = exe.Right(11).CompareNoCase(_T("firefox.exe")) == 0;
+        CString args;
+        if (isFirefox)
+        {
+            // Firefox has no app mode: an ordinary window, still on its own profile.
+            args.Format(_T("-no-remote -profile \"%s\" -new-window \"%s\""), (LPCTSTR)profile, T3000_WEBVIEW_URL);
+        }
+#if T3000_WEBVIEW_APP_MODE
+        else
+        {
+            args.Format(_T("--app=\"%s\" --user-data-dir=\"%s\" --no-first-run --no-default-browser-check"),
+                T3000_WEBVIEW_URL, (LPCTSTR)profile);
+        }
+#else
+        else
+        {
+            args.Format(_T("--user-data-dir=\"%s\" --no-first-run --no-default-browser-check \"%s\""),
+                (LPCTSTR)profile, T3000_WEBVIEW_URL);
+        }
+#endif
+
+        SHELLEXECUTEINFO sei = { 0 };
+        sei.cbSize = sizeof(sei);
+        sei.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI;
+        sei.hwnd = GetSafeHwnd();
+        sei.lpFile = exe;
+        sei.lpParameters = args;
+        sei.nShow = SW_SHOWNORMAL;
+        if (::ShellExecuteEx(&sei))
+        {
+            if (s_hWebviewBrowserProcess != NULL)
+            {
+                ::CloseHandle(s_hWebviewBrowserProcess);   // a launcher handle from an earlier click
+            }
+            s_hWebviewBrowserProcess = sei.hProcess;   // ours to close on the way back
+        }
+    }
+    else
+    {
+        // No Chrome/Edge/Firefox: the default handler opens the page, but that window is not ours to close.
+        ::ShellExecute(GetSafeHwnd(), _T("open"), T3000_WEBVIEW_URL, NULL, NULL, SW_SHOWNORMAL);
+    }
+
+    /* Remember the window this launch produced - a fresh profile can take a few seconds. Bookkeeping only:
+       the next click recognises it by its profile, remembered or not. */
+    for (int i = 0; i < 25; i++)
+    {
+        HWND aFound[8] = { 0 };
+        if (CollectOurWebviewWindows(aFound, _countof(aFound), profile) > 0)
+        {
+            s_hWebviewBrowserWnd = aFound[0];
+            ::GetWindowThreadProcessId(s_hWebviewBrowserWnd, &s_dwWebviewBrowserPid);
+            ::ShowWindow(s_hWebviewBrowserWnd, SW_MAXIMIZE);
+            break;
+        }
+        ::Sleep(100);
+    }
+
+    if (!IsIconic())
+    {
+        ShowWindow(SW_MINIMIZE);    // hand the screen to the browser
+    }
+}
+
+LRESULT CMainFrame::OnBackToDesktop(WPARAM /*wParam*/, LPARAM /*lParam*/)
+{
+    RestoreFromWebview();
+    CloseWebviewBrowser();
+    return 0;
+}
+
+void CMainFrame::RestoreFromWebview()
+{
+    /* SW_RESTORE returns a minimised or maximised window to its original size; SW_SHOWNORMAL covers the
+       case where it is already restored. */
+    if (IsIconic() || IsZoomed())
+    {
+        ShowWindow(SW_RESTORE);
+    }
+    else
+    {
+        ShowWindow(SW_SHOWNORMAL);
+    }
+
+    SetForegroundWindow();
+    // Windows refuses a foreground change for a process that is not already in front; the taskbar flash
+    // still shows the user where T3000 is.
+    ::FlashWindow(GetSafeHwnd(), TRUE);
+}
+
+void CMainFrame::CloseWebviewBrowser()
+{
+    /* Only the window this app opened: nothing is matched by appearance, so the user's own browser is
+       never touched. ShellExecuteEx's handle is not used - for Firefox it is the launcher's. */
+    if (s_hWebviewBrowserWnd != NULL && ::IsWindow(s_hWebviewBrowserWnd))
+    {
+        ::PostMessage(s_hWebviewBrowserWnd, WM_CLOSE, 0, 0);
+
+        if (s_dwWebviewBrowserPid != 0)
+        {
+            HANDLE hProcess = ::OpenProcess(SYNCHRONIZE | PROCESS_TERMINATE, FALSE, s_dwWebviewBrowserPid);
+            if (hProcess != NULL)
+            {
+                if (::WaitForSingleObject(hProcess, 3000) != WAIT_OBJECT_0)
+                {
+                    ::TerminateProcess(hProcess, 0);
+                }
+                ::CloseHandle(hProcess);
+            }
+        }
+    }
+
+    s_hWebviewBrowserWnd = NULL;
+    s_dwWebviewBrowserPid = 0;
+
+    if (s_hWebviewBrowserProcess != NULL)
+    {
+        ::CloseHandle(s_hWebviewBrowserProcess);
+        s_hWebviewBrowserProcess = NULL;
+    }
+
+    /* Leftovers of earlier clicks: nothing of ours may be left on the desktop. */
+    HWND aLeft[8] = { 0 };
+    const int nLeft = CollectOurWebviewWindows(aLeft, _countof(aLeft), GetWebviewProfilePath());
+    for (int i = 0; i < nLeft; i++)
+    {
+        ::PostMessage(aLeft[i], WM_CLOSE, 0, 0);
+    }
 }
 
 void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)

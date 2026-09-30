@@ -3292,7 +3292,11 @@ BOOL CT3000View::PreTranslateMessage(MSG* pMsg)
         }
     }
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    if (pFrame->m_pDialogInfo != NULL && ::IsWindow(pFrame->m_pDialogInfo->m_hWnd) && pFrame->m_pDialogInfo->IsWindowVisible())
+    // The modeless info dialog can already be gone here (see CMainFrame::OnDestroy), so check the
+    // pointers before touching them.
+    if (pFrame != NULL && AfxIsValidAddress(pFrame, sizeof(void*), FALSE) && pFrame->m_pDialogInfo != NULL &&
+        AfxIsValidAddress(pFrame->m_pDialogInfo, sizeof(void*), FALSE) &&
+        ::IsWindow(pFrame->m_pDialogInfo->m_hWnd) && pFrame->m_pDialogInfo->IsWindowVisible())
     {
 
         if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
