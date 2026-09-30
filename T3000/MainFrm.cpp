@@ -16798,7 +16798,7 @@ void CMainFrame::OnWebviewModbusregister()
  * ========================================================================= */
 /* The web UI the WEBVIEW button opens. 3003 is the Quasar/Vite dev server (used while testing);
    9103 is the port the shipped app serves. Flip this one line to switch. */
-#define T3000_WEBVIEW_URL        _T("http://localhost:3003/#/t3000/")
+#define T3000_WEBVIEW_URL        _T("http://localhost:9103/#/t3000/")
 #define T3000_WEBVIEW_APP_MODE   0
 
 /* Handle of the browser process we launched. A file-static, not a CMainFrame member - see the note in
