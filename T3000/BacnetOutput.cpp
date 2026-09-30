@@ -899,7 +899,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 
 
 			CString temp_value;
-			temp_value.Format(_T("%.2f"), ((float)m_Output_data.at(i).value) / 1000);
+			temp_value.Format(_T("%.2f"), ((double)m_Output_data.at(i).value) / 1000);
 			m_output_list.SetItemText(i, OUTPUT_VALUE, temp_value);
 
 		}
@@ -913,7 +913,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam, LPARAM lParam)
 			if (m_Output_data.at(i).range == 0)
 			{
 
-				temp_digital_value2.Format(_T("%.2f"), ((float)m_Output_data.at(i).value) / 1000);
+				temp_digital_value2.Format(_T("%.2f"), ((double)m_Output_data.at(i).value) / 1000);
 				m_output_list.SetItemText(i, OUTPUT_VALUE, temp_digital_value2);
 
 				m_output_list.SetItemText(i, OUTPUT_RANGE, Digital_Units_Array[0]);
@@ -1967,6 +1967,7 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 }
 
 
+
 void CBacnetOutput::OnClose()
 {
 	SaveWindowPosition();
@@ -2181,7 +2182,7 @@ void CBacnetOutput::OnSize(UINT nType, int cx, int cy)
 	GetClientRect(rc);
 	if(m_output_list.m_hWnd != NULL)
 	{
-		::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
+			::SetWindowPos(this->m_hWnd, HWND_TOP, 0,0, 0,0,  SWP_NOSIZE | SWP_NOMOVE);
 				m_output_list.MoveWindow(&rc);
 	}
 
@@ -2293,6 +2294,7 @@ void CBacnetOutput::OnNMRClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 void CBacnetOutput::SaveWindowPosition()
 {
 	if (!IsWindow(m_hWnd)) return;
+	if (m_restoring_position) return;   
 	CRect rect;
 	GetWindowRect(&rect);
 
@@ -2332,11 +2334,16 @@ void CBacnetOutput::RestoreWindowPosition()
 			Reset_Output_Rect();
 			return;
 		}
-        if (isMax == 1)
-            ShowWindow(SW_SHOWMAXIMIZED);
 		// Guard: prevent OnMove/OnSize from saving during restore
 		m_restoring_position = true;
-		::MoveWindow(this->m_hWnd, left, top, width, height, TRUE);
+		if (isMax == 1)
+		{
+			ShowWindow(SW_SHOWMAXIMIZED);
+		}
+		else
+		{
+			::MoveWindow(this->m_hWnd, left, top, width, height, TRUE);
+		}
 		m_restoring_position = false;
 		TRACE(_T("[Output] Restored to: %d,%d %dx%d\n"), left, top, width, height);
 	}
@@ -2367,7 +2374,9 @@ void CBacnetOutput::OnMove(int x, int y)
 	CDialogEx::OnMove(x, y);
 
 	// TODO: 在此处添加消息处理程序代码
-	::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+	if (IsWindowVisible())
+	  ::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+	//::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
 
 
 	// Only save when user manually moves, not during restore

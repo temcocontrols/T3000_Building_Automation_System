@@ -1088,8 +1088,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 
 
 			CString cstemp_value;
-			float temp_float_value;
-			temp_float_value = ((float)m_Input_data.at(i).value) / 1000;
+			double temp_float_value;
+			temp_float_value = ((double)m_Input_data.at(i).value) / 1000;
 			cstemp_value.Format(_T("%.2f"), temp_float_value);
 			m_input_list.SetItemText(i, INPUT_VALUE, cstemp_value);
 
@@ -1122,8 +1122,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam, LPARAM lParam)
 			if (m_Input_data.at(i).range == 0)
 			{
 				CString cstemp_value1;
-				float temp_float_value1;
-				temp_float_value1 = ((float)m_Input_data.at(i).value) / 1000;
+				double temp_float_value1;
+				temp_float_value1 = ((double)m_Input_data.at(i).value) / 1000;
 				cstemp_value1.Format(_T("%.2f"), temp_float_value1);
 				m_input_list.SetItemText(i, INPUT_VALUE, cstemp_value1);
 
@@ -2128,6 +2128,7 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 }
 
 
+
 void CBacnetInput::OnClose()
 {
 	// ========== 新增：保存窗口位置 ==========
@@ -2517,19 +2518,22 @@ void CBacnetInput::OnSize(UINT nType, int cx, int cy)
 	GetClientRect(rc);
 	if (m_input_list.m_hWnd != NULL)
 	{
-		::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0,  SWP_NOSIZE | SWP_NOMOVE);
 		m_input_list.MoveWindow(&rc);
 	}
 
 	// Don't save position when maximized
-	if (IsWindowVisible() && nType != SIZE_MINIMIZED && nType != SIZE_MAXIMIZED && !m_restoring_position)
+	if (IsWindowVisible() && nType != SIZE_MINIMIZED && !m_restoring_position)
 		SaveWindowPosition();
 }
 
 void CBacnetInput::OnMove(int x, int y)
 {
 	CDialogEx::OnMove(x, y);
-	::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+	if (IsWindowVisible())
+		::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+	//::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
 
 
 
@@ -2578,8 +2582,8 @@ void CBacnetInput::GetInputUnitandValue(int i, CString& unit, CString& value)
 
 
 		CString cstemp_value;
-		float temp_float_value;
-		temp_float_value = ((float)m_Input_data.at(i).value) / 1000;
+		double temp_float_value;
+		temp_float_value = ((double)m_Input_data.at(i).value) / 1000;
 		cstemp_value.Format(_T("%.2f"), temp_float_value);
 		value = cstemp_value;
 
@@ -2591,8 +2595,8 @@ void CBacnetInput::GetInputUnitandValue(int i, CString& unit, CString& value)
 		if (m_Input_data.at(i).range == 0)
 		{
 			CString cstemp_value1;
-			float temp_float_value1;
-			temp_float_value1 = ((float)m_Input_data.at(i).value) / 1000;
+			double temp_float_value1;
+			temp_float_value1 = ((double)m_Input_data.at(i).value) / 1000;
 			cstemp_value1.Format(_T("%.2f"), temp_float_value1);
 			value = cstemp_value1;
 
@@ -2632,6 +2636,7 @@ void CBacnetInput::GetInputUnitandValue(int i, CString& unit, CString& value)
 void CBacnetInput::SaveWindowPosition()
 {
 	if (!IsWindow(m_hWnd)) return;
+	if (m_restoring_position) return;    // ← 加这行：恢复期间不保存
 	CRect rect;
 	GetWindowRect(&rect);
 
@@ -2687,11 +2692,18 @@ void CBacnetInput::RestoreWindowPosition()
 			Reset_Input_Rect();
 			return;
 		}
-		if (isMax == 1)
-			ShowWindow(SW_SHOWMAXIMIZED);
 		// Guard: prevent OnMove/OnSize from saving during restore
 		m_restoring_position = true;
-		::MoveWindow(this->m_hWnd, left, top, width, height, TRUE);
+		if (isMax == 1)
+		{
+			// 只最大化，不调 MoveWindow，否则会撤销最大化状态
+			// 最大化区域由 OnGetMinMaxInfo 限制在 BacNet_hwd 范围内
+			ShowWindow(SW_SHOWMAXIMIZED);
+		}
+		else
+		{
+			::MoveWindow(this->m_hWnd, left, top, width, height, TRUE);
+		}
 		m_restoring_position = false;
 		TRACE(_T("[Input] Restored to: %d,%d %dx%d\n"), left, top, width, height);
 	}

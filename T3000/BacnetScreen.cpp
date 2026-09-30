@@ -2282,10 +2282,19 @@ int Read_Webview_Data_Special(int panelid,UINT nserialnumber,int nscreenindex)
 		}
 	}
 
+
+
 	if(handle_device_instance == 0)
 	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Can't find the device instance!"));
-		return -1;
+		//if (g_protocol == MODBUS_RS485)
+		//{
+		//	Sleep(1);
+		//}
+		//else
+		//{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Can't find the device instance!"));
+			return -1;
+		//}
 	}
 
 

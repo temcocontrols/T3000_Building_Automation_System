@@ -278,7 +278,7 @@ uint16_t current_page = 0;
 // point->point_type is +1 encoded: 1=OUT, 2=IN, 3=VAR
 // Returns: 0 on success
 //=============================================================================
-S16_T get_point_value(VM_Point *point, S32_T *val_ptr)
+S16_T get_point_value(VM_Point* point, S32_T* val_ptr)
 {
     if (!point || !val_ptr) return -1;
 
@@ -289,49 +289,54 @@ S16_T get_point_value(VM_Point *point, S32_T *val_ptr)
     TRACE("[VM] get_point_value: pt=%d idx=%d\n", (int)pt, index);
 
     switch (pt) {
-        case PT_OUTPUT:  // 0 = OUTPUT (point_type was 1, minus 1 = 0)
-            if (index >= 0 && index < (int)m_Output_data.size()) {
-                if (m_Output_data[index].digital_analog == 1) {
-                    // Analog: MFC ×100 = decode.c ×100, no conversion needed
-                    *val_ptr = (S32_T)m_Output_data[index].value;
-                } else {
-                    // Digital: return 0 or 1 for decode.c (NOT uses C ! operator)
-                    *val_ptr = m_Output_data[index].value ? 1 : 0;
-                }
-                return 0;
+    case PT_OUTPUT:  // 0 = OUTPUT
+        if (index >= 0 && index < (int)m_Output_data.size()) {
+            if (m_Output_data[index].digital_analog == BAC_UNITS_ANALOG) {
+                // Analog: return raw scaled value
+                *val_ptr = (S32_T)m_Output_data[index].value;
             }
-            break;
-
-        case PT_INPUT:   // 1 = INPUT (point_type was 2, minus 1 = 1)
-            if (index >= 0 && index < (int)m_Input_data.size()) {
-                if (m_Input_data[index].digital_analog == 1) {
-                    // Analog: MFC ×100 = decode.c ×100, no conversion needed
-                    *val_ptr = (S32_T)m_Input_data[index].value;
-                } else {
-                    // Digital: return 0 or 1 for decode.c (NOT uses C ! operator)
-                    *val_ptr = m_Input_data[index].value ? 1 : 0;
-                }
-                return 0;
+            else {
+                // Digital: runtime should read control state (UI toggles control)
+                //*val_ptr = (m_Output_data[index].control != 0) ? 1 : 0;
+                *val_ptr = (m_Output_data[index].control == 0) ? 0 : 1;
             }
-            break;
+            return 0;
+        }
+        break;
 
-        case PT_VARIABLE:  // 2 = VARIABLE (point_type was 3, minus 1 = 2)
-            if (index >= 0 && index < (int)m_Variable_data.size()) {
-                if (m_Variable_data[index].digital_analog == 1) {
-                    // Analog: MFC ×100 = decode.c ×100, no conversion needed
-                    *val_ptr = (S32_T)m_Variable_data[index].value;
-                } else {
-                    // Digital: return 0 or 1 for decode.c (NOT uses C ! operator)
-                    *val_ptr = m_Variable_data[index].value ? 1 : 0;
-                }
-                return 0;
+    case PT_INPUT:   // 1 = INPUT
+        if (index >= 0 && index < (int)m_Input_data.size()) {
+            if (m_Input_data[index].digital_analog == BAC_UNITS_ANALOG) {
+                // Analog: return raw scaled value
+                *val_ptr = (S32_T)m_Input_data[index].value;
             }
-            break;
+            else {
+                // Digital: runtime should read control state (UI toggles control)
+                //*val_ptr = (m_Input_data[index].control != 0) ? 1 : 0;
+                *val_ptr = (m_Input_data[index].control == 0) ? 0 : 1;
+            }
+            return 0;
+        }
+        break;
 
-        default:
-            // Unrecognized point type
-            *val_ptr = 0;
-            return -1;
+    case PT_VARIABLE:  // 2 = VARIABLE
+        if (index >= 0 && index < (int)m_Variable_data.size()) {
+            if (m_Variable_data[index].digital_analog == BAC_UNITS_ANALOG) {
+                // Analog: return raw scaled value
+                *val_ptr = (S32_T)m_Variable_data[index].value;
+            }
+            else {
+                // Digital: runtime should read control state (UI toggles control)
+                //*val_ptr = (m_Variable_data[index].control != 0) ? 1 : 0;
+                *val_ptr = (m_Variable_data[index].control == 0) ? 0 : 1;
+            }
+            return 0;
+        }
+        break;
+
+    default:
+        *val_ptr = 0;
+        return -1;
     }
 
     *val_ptr = 0;
