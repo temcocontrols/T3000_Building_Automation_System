@@ -12157,6 +12157,10 @@ void init_product_list()
     temp.pid = 88;
     temp.sub_pid = T3_TSTAT11;
     m_product_iocount.push_back(temp);
+
+    temp.cs_name = _T("Hub");
+    temp.sub_pid = T3_HUB;
+    m_product_iocount.push_back(temp);
     
     
 #if 0
@@ -17115,6 +17119,7 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //èŽ·å
         break;
         case T3_TSTAT10:
         case T3_TSTAT11:
+        case T3_HUB:
         {
             if (portindex <= 5)
                 nret_type = OUTPUT_DIGITAL_PORT;
@@ -17355,6 +17360,7 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
         break;
         case T3_TSTAT10:   //12DO  ,12AO
         case T3_TSTAT11:   //12DO  ,12AO
+        case T3_HUB:
             if (portindex <= 10)
             {
                 nret_type = INPUT_ANALOG_PORT;

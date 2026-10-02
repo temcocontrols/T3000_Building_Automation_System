@@ -1,5 +1,5 @@
 // BacnetSettingTcpip.cpp : Implementation file
-// BacnetSettingTcpip.cpp : 实现文件
+// BacnetSettingTcpip.cpp : ??????
 //
 
 #include "stdafx.h"
@@ -14,7 +14,7 @@
 #include "BacnetSettingHealth.h"
 #include "CWireGuardConfig.h"
 // CBacnetSettingTcpip dialog box
-// CBacnetSettingTcpip 对话框
+// CBacnetSettingTcpip ?????
 
 IMPLEMENT_DYNAMIC(CBacnetSettingTcpip, CDialogEx)
 
@@ -83,9 +83,9 @@ LRESULT  CBacnetSettingTcpip::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam
     else
     {
         // Restore values that were not changed correctly
-        //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//还原没有改对的值
+        //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//?????и????
         // Call refresh thread here to re-refresh, which is more convenient
-        PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
+        PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//??????? ???????????????????;
         Show_Results = temp_cs + _T("Fail!");
         SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
 
@@ -97,7 +97,7 @@ LRESULT  CBacnetSettingTcpip::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam
 }
 
 
-// CBacnetSettingTcpip 消息处理程序
+// CBacnetSettingTcpip ???????????
 
 
 void CBacnetSettingTcpip::OnBnClickedBtnBacIPAuto()
@@ -112,7 +112,7 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPAuto()
     temp_task_info.Format(_T("IP address has been changed! \r\nRebooting now! Please wait."));
     if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
     {
-        //更改失败恢复原状;
+        //???????????;
         Device_Basic_Setting.reg.tcp_type = temp_data;
         if (Device_Basic_Setting.reg.tcp_type == 0)
         {
@@ -130,7 +130,7 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPAuto()
     }
     else
     {
-        //更改成功
+        //??????
         ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
         ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
         ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
@@ -174,12 +174,12 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPChange()
     strIP.Format(_T("%u.%u.%u.%u"), address1, address2, address3, address4);
     CPing p1;
     CPingReply pr1;
-    //如果是修改网关和子网掩码 就不用测试是否ping的通.
+    //????????????????????? ????ò??????ping???.
     if (address1 != Device_Basic_Setting.reg.ip_addr[0] || address2 != Device_Basic_Setting.reg.ip_addr[1] || address3 != Device_Basic_Setting.reg.ip_addr[2] || address4 != Device_Basic_Setting.reg.ip_addr[3])
     {
         if (p1.Ping1((LPCTSTR)strIP, pr1))
         {
-            //如果ping 的通就说明要改的IP地址是存在的，有人在用的;
+            //???ping ????????????IP???????????????????;
 
             MessageBox(_T("This IP address has been occupied"), _T("Warning"));
             return;
@@ -200,12 +200,12 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPChange()
     Device_Basic_Setting.reg.gate_addr[1] = gatway2;
     Device_Basic_Setting.reg.gate_addr[2] = gatway3;
     Device_Basic_Setting.reg.gate_addr[3] = gatway4;
-    bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->GetCheck(); //返回1表示选上，0表示没选上;
+    bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->GetCheck(); //????1???????0???????;
     if (isstatic == true)
         Device_Basic_Setting.reg.tcp_type = 0;
     else
         Device_Basic_Setting.reg.tcp_type = 1;
-    if (g_protocol == MODBUS_RS485)  //  若是Modbus 485 的协议
+    if (g_protocol == MODBUS_RS485)  //  ????Modbus 485 ??Э??
     {
         int test_value1 = 0;
         int test_value2 = 0;
@@ -241,7 +241,7 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPChange()
 
     if (ip_change_flag)
     {
-        //在Ip 修改成功后 更新数据库;
+        //??Ip ??????? ?????????;
         m_tcp_type = Device_Basic_Setting.reg.tcp_type;
         CString strnewipadress;
         strnewipadress.Format(_T("%u.%u.%u.%u"), address1, address2, address3, address4);
@@ -307,7 +307,7 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPChange()
 
 BOOL CBacnetSettingTcpip::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: 在此添加专用代码和/或调用基类
+    // TODO: ??????????????/????????
     if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
     {
         return 1;
@@ -319,7 +319,7 @@ BOOL CBacnetSettingTcpip::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetSettingTcpip::OnBnClickedButtonWifiConfiguration()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: ??????????????????????
 
         CWifiConfigDlg dlg;
         dlg.SetUI_Type(UI_TYPE_WIFI_REV2);
@@ -347,7 +347,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
     {
         if (temp_string.CompareNoCase(Device_Serial_Port_Status[i]) == 0)
         {
-            //if (i == MAIN_MSTP)   //原由： 1 为 MSTP Slave     9为 MSTP Master   现在统统改为MSTP
+            //if (i == MAIN_MSTP)   //???? 1 ? MSTP Slave     9? MSTP Master   ?????????MSTP
             //    i = MSTP_MASTER;
             if (g_selected_product_id != PM_TSTAT10)
             {
@@ -356,7 +356,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
                     if ((Device_Basic_Setting.reg.com2_config == BACNET_MSTP) ||
                         (Device_Basic_Setting.reg.com2_config == MSTP_MASTER))
                     {
-                        //想配置为mstp 必须其他的口设置为 空;
+                        //???????mstp ???????????????? ??;
                         MessageBox(_T("With the current version of firmware , only one Bacnet MSTP subnet is supported, please select MSTP on only ONE of the RS485 ports"), _T("Message"));
                         ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
                         return;
@@ -380,7 +380,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
             break;
         }
     }
-    if (temp_com0_data == Device_Basic_Setting.reg.com0_config)  // 若无变化，则退出;
+    if (temp_com0_data == Device_Basic_Setting.reg.com0_config)  // ????仯???????;
         return;
 
     if ((g_protocol == MODBUS_RS485) ||
@@ -405,11 +405,11 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
         }
         if (g_selected_product_id == PM_TSTAT10)
         {
-            //并且 TSTAT10 需要  重启 协议更改 才能生效;
-            if (modbus_0_bacnet_1 == 1) //如果是要改到mstp协议
-                Device_Basic_Setting.reg.com0_config = 1;  //1 是TSTAT10 的mstp协议;
+            //???? TSTAT10 ???  ???? Э????? ??????Ч;
+            if (modbus_0_bacnet_1 == 1) //?????????mstpЭ??
+                Device_Basic_Setting.reg.com0_config = 1;  //1 ??TSTAT10 ??mstpЭ??;
             else
-                Device_Basic_Setting.reg.com0_config = 2;  //2 是TSTAT10的modbus协议
+                Device_Basic_Setting.reg.com0_config = 2;  //2 ??TSTAT10??modbusЭ??
 
         }
         else if (g_selected_product_id == PM_ESP32_T3_SERIES)
@@ -468,13 +468,13 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
     {
         if (temp_string.CompareNoCase(Device_Serial_Port_Status[i]) == 0)
         {
-            //if (i == MAIN_MSTP)   //原由： 1 为 MSTP Slave     9为 MSTP Master   现在统统改为MSTP
+            //if (i == MAIN_MSTP)   //???? 1 ? MSTP Slave     9? MSTP Master   ?????????MSTP
             //   i = MSTP_MASTER;
             if ((i == MSTP_MASTER) || (i == BACNET_MSTP))
             {
                 if ((Device_Basic_Setting.reg.com0_config == MSTP_MASTER) || (Device_Basic_Setting.reg.com0_config == BACNET_MSTP))
                 {
-                    //想配置为mstp 必须其他的口设置为 空;
+                    //???????mstp ???????????????? ??;
                     MessageBox(_T("With the current version of firmware , only one Bacnet MSTP subnet is supported, please select MSTP on only ONE of the RS485 ports"), _T("Message"));
                     ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
                     return;
@@ -496,7 +496,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
         }
     }
 
-    if (temp_main_value == Device_Basic_Setting.reg.com2_config)  // 若无变化，则退出;
+    if (temp_main_value == Device_Basic_Setting.reg.com2_config)  // ????仯???????;
         return;
 
     if ((g_protocol == MODBUS_RS485) ||
@@ -521,11 +521,11 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
         }
         //if (g_selected_product_id == PM_TSTAT10)
         //{
-        //    //并且 TSTAT10 需要  重启 协议更改 才能生效;
-        //    if (modbus_0_bacnet_1 == 1) //如果是要改到mstp协议
-        //        Device_Basic_Setting.reg.com0_config = 1;  //1 是TSTAT10 的mstp协议;
+        //    //???? TSTAT10 ???  ???? Э????? ??????Ч;
+        //    if (modbus_0_bacnet_1 == 1) //?????????mstpЭ??
+        //        Device_Basic_Setting.reg.com0_config = 1;  //1 ??TSTAT10 ??mstpЭ??;
         //    else
-        //        Device_Basic_Setting.reg.com0_config = 2;  //2 是TSTAT10的modbus协议
+        //        Device_Basic_Setting.reg.com0_config = 2;  //2 ??TSTAT10??modbusЭ??
 
         //}
         if (g_selected_product_id == PM_ESP32_T3_SERIES)
@@ -538,7 +538,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
     }
 
 
-#if 0    //暂时屏蔽     以后在客户升级许多次 后 在  禁止许 Asix 改;
+#if 0    //???????     ???????????????? ?? ??  ????? Asix ??;
     if (Device_Basic_Setting.reg.panel_type == PM_MINIPANEL)
     {
         if ((Device_Basic_Setting.reg.com2_config == 1) ||
@@ -648,7 +648,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingBaudrate2()
 
 void CBacnetSettingTcpip::OnEnKillfocusEditSettingZeigbeePanid()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: ??????????????????????
 
     CString temp_cstring;
     ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->GetWindowTextW(temp_cstring);
@@ -659,7 +659,7 @@ void CBacnetSettingTcpip::OnEnKillfocusEditSettingZeigbeePanid()
         temp_warning.Format(_T("Do you really want to change the zigbee pan ID to %u ?"), temp_panid);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned short old_panid = Device_Basic_Setting.reg.zigbee_panid;	//写之前先保存起来；写失败 恢复原值;
+            unsigned short old_panid = Device_Basic_Setting.reg.zigbee_panid;	//д?????????????д??? ?????;
             Device_Basic_Setting.reg.zigbee_panid = (unsigned short)temp_panid;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -699,17 +699,17 @@ void CBacnetSettingTcpip::OnBnClickedButtonHealth()
     return;
     CString temp_cs1;
 
-	int ret_index1 = Post_Background_Read_Message_ByPanel(199, READINPUT_T3000, 8);  //send message to background ，read 199IN3
+	int ret_index1 = Post_Background_Read_Message_ByPanel(199, READINPUT_T3000, 8);  //send message to background ??read 199IN3
 
     CString temp_cs2;
-    int ret_index2 = Post_Background_Read_Message_ByPanel(199, READOUTPUT_T3000, 40);  //send message to background ，read 199IN3
+    int ret_index2 = Post_Background_Read_Message_ByPanel(199, READOUTPUT_T3000, 40);  //send message to background ??read 199IN3
 
 	
     CString temp_cs3;
-    int ret_index3 = Post_Background_Read_Message_ByPanel(11, READINPUT_T3000, 8);  //send message to background ，read 199IN3
+    int ret_index3 = Post_Background_Read_Message_ByPanel(11, READINPUT_T3000, 8);  //send message to background ??read 199IN3
 
     CString temp_cs4;
-    int ret_index4 = Post_Background_Read_Message_ByPanel(11, READOUTPUT_T3000, 40);  //send message to background ，read 199IN3
+    int ret_index4 = Post_Background_Read_Message_ByPanel(11, READOUTPUT_T3000, 40);  //send message to background ??read 199IN3
 
     if (ret_index1 >= 0)
     {
@@ -780,7 +780,7 @@ void CBacnetSettingTcpip::OnBnClickedCheckSettingFixComm()
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
 
     Sleep(1000);
-    ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//这里调用 刷新线程重新刷新会方便一点;
+    ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//??????? ???????????????????;
 }
 
 
@@ -796,7 +796,7 @@ void CBacnetSettingTcpip::OnEnKillfocusEditSettingPort()
         temp_warning.Format(_T("Do you really want to change the modbus port to %u ?"), temp_port);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned short old_port = Device_Basic_Setting.reg.modbus_port;	//写之前先保存起来；写失败 恢复原值;
+            unsigned short old_port = Device_Basic_Setting.reg.modbus_port;	//д?????????????д??? ?????;
             Device_Basic_Setting.reg.modbus_port = (unsigned short)temp_port;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -818,7 +818,7 @@ void CBacnetSettingTcpip::OnEnKillfocusEditSettingPort()
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboParityBit()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: ??????????????????????
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_PARITY_BIT))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_PARITY_BIT))->GetLBText(nSel, temp_string);
@@ -838,7 +838,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboParityBit()
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboParityBit3()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: ??????????????????????
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_PARITY_BIT3))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_PARITY_BIT3))->GetLBText(nSel, temp_string);
@@ -858,7 +858,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboParityBit3()
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboStopBit()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: ??????????????????????
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_STOP_BIT))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_STOP_BIT))->GetLBText(nSel, temp_string);
@@ -878,7 +878,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboStopBit()
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboStopBit3()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: ??????????????????????
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_STOP_BIT3))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_STOP_BIT3))->GetLBText(nSel, temp_string);
@@ -911,7 +911,7 @@ BOOL CBacnetSettingTcpip::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pRe
             (nID == IDC_COMBO_STOP_BIT2) ||
             (nID == IDC_COMBO_STOP_BIT3))
         {
-            //  这里就是你要显示的Tooltips，可以根据需要来定制
+            //  ???????????????Tooltips??????????????????
             CString strToolTips;
             strToolTips.Format(_T("Default parity bit : None.   Default stop bit : 1"));
             pTTT->lpszText = strToolTips.AllocSysString();
@@ -929,10 +929,10 @@ BOOL CBacnetSettingTcpip::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  在此添加额外的初始化
+    // TODO:  ???????????????
     EnableToolTips(TRUE);
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // 异常: OCX 属性页应返回 FALSE
+                  // ??: OCX ?????????? FALSE
 }
 
 
@@ -940,8 +940,13 @@ BOOL CBacnetSettingTcpip::OnInitDialog()
 void CBacnetSettingTcpip::OnBnClickedButtonWireguardConfig()
 {
     //TSTAT11
-    // TODO: 在此添加控件通知处理程序代码
-    if (((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 699))
+    // TODO: ??????????????????????
+    int wireguard_product_id = g_selected_product_id;
+    if (wireguard_product_id == 0)
+        wireguard_product_id = Device_Basic_Setting.reg.panel_type;
+    if ((wireguard_product_id == PM_ESP32_T3_SERIES) &&
+        ((Device_Basic_Setting.reg.mini_type == T3_TSTAT11) || (Device_Basic_Setting.reg.mini_type == T3_HUB)) &&
+        (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 699))
     {
         if (GetPrivateData_Blocking(g_bac_instance, READ_WIREGUARD_CFG, 0, 0, sizeof(Str_Wireguard_point)) < 0)
         {

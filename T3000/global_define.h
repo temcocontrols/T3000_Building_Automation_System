@@ -1328,6 +1328,7 @@ typedef enum
 	T3_NG3 = 22,
 	T3_3IIC = 26,  //6合1 的传感器 esp 产品 啥也没加
 	T3_RMC1232 = 29,
+	T3_HUB = 30,
 	T3_TSTAT11 = 31,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,

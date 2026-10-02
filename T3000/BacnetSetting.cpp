@@ -175,6 +175,9 @@ void Getminitypename(unsigned char nmini_type, CString& ret_name)
 	case T3_TSTAT11:
 		ret_name = _T("TSTAT11");
 		break;
+	case T3_HUB:
+		ret_name = _T("Hub");
+		break;
 	case T3_OEM:
 		ret_name = _T("T3-OEM");
 		break;
@@ -301,7 +304,12 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 
 		UpdateTreeName();
 
-		if (((g_selected_product_id == PM_ESP32_T3_SERIES) && (Device_Basic_Setting.reg.mini_type == T3_TSTAT11) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 699))
+		int setting_product_id = g_selected_product_id;
+		if (setting_product_id == 0)
+			setting_product_id = Device_Basic_Setting.reg.panel_type;
+		if (((setting_product_id == PM_ESP32_T3_SERIES) &&
+			((Device_Basic_Setting.reg.mini_type == T3_TSTAT11) || (Device_Basic_Setting.reg.mini_type == T3_HUB)) &&
+			(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 699)))
 		{
 			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_WIREGUARD_CONFIG))->EnableWindow(1);
 		}
@@ -527,7 +535,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 		n_run_minite = (n_boot_time % (3600 * 24)) % 3600 / 60;
 		temp_boot_time.Format(_T("%d Days   %d Hours   %d Minites"), n_runday, n_run_hour, n_run_minite);
 		m_page_time.GetDlgItem(IDC_EDIT_DEVICE_RUNTIME)->SetWindowTextW(temp_boot_time);
-		if (Device_Basic_Setting.reg.en_dyndns == 0)
+		if ((Device_Basic_Setting.reg.en_dyndns == 0) && (Device_Basic_Setting.reg.mini_type != T3_HUB))
 		{
 			m_page_dyndns.GetDlgItem(IDC_CHECK_SETTING_DYNDNS)->EnableWindow(FALSE);
 			m_page_dyndns.GetDlgItem(IDC_STATIC_DYNDNS)->EnableWindow(FALSE);
@@ -1183,6 +1191,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			(Device_Basic_Setting.reg.mini_type == T3_OEM) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM_12I) ||
 			(Device_Basic_Setting.reg.mini_type == T3_TSTAT11) ||
+			(Device_Basic_Setting.reg.mini_type == T3_HUB) ||
 			(Device_Basic_Setting.reg.mini_type == T3_TSTAT10)
 
 			)
@@ -1196,6 +1205,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 		}
 		if ((Device_Basic_Setting.reg.mini_type == T3_TSTAT10) ||
 			(Device_Basic_Setting.reg.mini_type == T3_TSTAT11) ||
+			(Device_Basic_Setting.reg.mini_type == T3_HUB) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM) ||
 			(Device_Basic_Setting.reg.mini_type == T3_3IIC) ||
 			(Device_Basic_Setting.reg.mini_type == T3_OEM_12I))
