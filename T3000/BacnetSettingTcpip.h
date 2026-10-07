@@ -58,4 +58,5 @@ public:
     void ClearSubNetInfo();
     afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
     afx_msg void OnBnClickedButtonWireguardConfig();
+    afx_msg void OnBnClickedButtonGsmStatus();
 };

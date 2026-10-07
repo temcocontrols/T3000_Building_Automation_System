@@ -3661,6 +3661,14 @@ void CDialogCM5_BacNet::Fresh()
             MODE_SUPPORT_PTRANSFER = 1;
         else
             MODE_SUPPORT_PTRANSFER = 0;
+        /* Hub / TSTAT11 only: prefer BACnet 47808 even if DB Software_Ver is wrong (0/1).
+         * Works on LAN; avoids fragile Modbus PTP over WireGuard. Other products unchanged. */
+        if (selected_product_Node.product_class_id == PM_ESP32_T3_SERIES &&
+            (selected_product_Node.m_ext_info.mini_type == T3_HUB ||
+             selected_product_Node.m_ext_info.mini_type == T3_TSTAT11))
+        {
+            MODE_SUPPORT_PTRANSFER = 1;
+        }
         ret = 1;
         if (MODE_SUPPORT_PTRANSFER != 1)  //Ptransfer 模式下直接用47808端口访问 T3或者带Wifi的设备;
         {
@@ -3827,8 +3835,20 @@ void CDialogCM5_BacNet::Fresh()
 					bacnet_device_type = T3_NG3;
 				else if (ret == T3_3IIC)
 					bacnet_device_type = T3_3IIC;
+				else if (ret == T3_TSTAT11)
+					bacnet_device_type = T3_TSTAT11;
+				else if (ret == T3_HUB)
+					bacnet_device_type = T3_HUB;
 				else
 					bacnet_device_type = PRODUCT_CM5;
+
+				/* Hub / TSTAT11: remember mini_type; use BACnet private transfer (not Modbus PTP). */
+				if (ret == T3_HUB || ret == T3_TSTAT11)
+				{
+					selected_product_Node.m_ext_info.mini_type = (unsigned char)ret;
+					MODE_SUPPORT_PTRANSFER = 1;
+					g_protocol_support_ptp = PROTOCOL_UNKNOW;
+				}
 			}
 	
             // Check if bit1 contains wifi module
@@ -5884,8 +5904,10 @@ void CDialogCM5_BacNet::Read_Setting_Info_Progress(int retry_count)
 		if (find_exsit == false)
 		{
 			click_resend_time--;
-			if (m_is_remote_device)
-				Send_WhoIs_remote_ip(remote_ip_address);
+			/* Remote Device, or Hub/TSTAT11: unicast Who-Is (LAN + WireGuard).
+			 * All other local devices keep broadcast Who-Is. */
+			if (m_is_remote_device || Is_Hub_Or_Tstat11_Product())
+				Send_WhoIs_Hub_Tstat11_Aware(g_bac_instance);
 			else
 				Send_WhoIs_Global(g_bac_instance, g_bac_instance);
 		}
@@ -7760,7 +7782,16 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
          }
 		 else if (read_data[7] == PM_ESP32_T3_SERIES)
 		 {
-			 g_protocol_support_ptp = PROTOCOL_MB_PTP_TRANSFER;
+			 /* Hub / TSTAT11: keep BACnet private transfer (LAN + WG). Other ESP32 keep Modbus PTP. */
+			 if (read_data[34] == T3_HUB || read_data[34] == T3_TSTAT11)
+			 {
+				 selected_product_Node.m_ext_info.mini_type = (unsigned char)read_data[34];
+				 bacnet_device_type = read_data[34];
+				 g_protocol_support_ptp = PROTOCOL_UNKNOW;
+				 MODE_SUPPORT_PTRANSFER = 1;
+			 }
+			 else
+				 g_protocol_support_ptp = PROTOCOL_MB_PTP_TRANSFER;
 		 }
          else
          {

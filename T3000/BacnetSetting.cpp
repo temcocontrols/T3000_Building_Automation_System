@@ -1,4 +1,4 @@
-﻿// BacnetSetting.cpp : implementation file
+// BacnetSetting.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -316,6 +316,16 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 		else
 		{
 			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_WIREGUARD_CONFIG))->EnableWindow(0);
+		}
+
+		if ((setting_product_id == PM_ESP32_T3_SERIES) &&
+			(Device_Basic_Setting.reg.mini_type == T3_HUB))
+		{
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_GSM_STATUS))->EnableWindow(1);
+		}
+		else
+		{
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_GSM_STATUS))->EnableWindow(0);
 		}
 
 		if (((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||

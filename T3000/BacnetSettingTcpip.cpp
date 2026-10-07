@@ -13,6 +13,7 @@
 #include "WifiConfigDlg.h"
 #include "BacnetSettingHealth.h"
 #include "CWireGuardConfig.h"
+#include "CGsmStatus.h"
 // CBacnetSettingTcpip dialog box
 // CBacnetSettingTcpip ?????
 
@@ -62,6 +63,7 @@ BEGIN_MESSAGE_MAP(CBacnetSettingTcpip, CDialogEx)
     ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
     ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
     ON_BN_CLICKED(IDC_BUTTON_WIREGUARD_CONFIG, &CBacnetSettingTcpip::OnBnClickedButtonWireguardConfig)
+    ON_BN_CLICKED(IDC_BUTTON_GSM_STATUS, &CBacnetSettingTcpip::OnBnClickedButtonGsmStatus)
 END_MESSAGE_MAP()
 
 
@@ -83,7 +85,7 @@ LRESULT  CBacnetSettingTcpip::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam
     else
     {
         // Restore values that were not changed correctly
-        //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//?????ß⁄????
+        //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//?????ÔøΩÔøΩ????
         // Call refresh thread here to re-refresh, which is more convenient
         PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//??????? ???????????????????;
         Show_Results = temp_cs + _T("Fail!");
@@ -174,7 +176,7 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPChange()
     strIP.Format(_T("%u.%u.%u.%u"), address1, address2, address3, address4);
     CPing p1;
     CPingReply pr1;
-    //????????????????????? ????®∞??????ping???.
+    //????????????????????? ????ÔøΩÔøΩ??????ping???.
     if (address1 != Device_Basic_Setting.reg.ip_addr[0] || address2 != Device_Basic_Setting.reg.ip_addr[1] || address3 != Device_Basic_Setting.reg.ip_addr[2] || address4 != Device_Basic_Setting.reg.ip_addr[3])
     {
         if (p1.Ping1((LPCTSTR)strIP, pr1))
@@ -205,7 +207,7 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPChange()
         Device_Basic_Setting.reg.tcp_type = 0;
     else
         Device_Basic_Setting.reg.tcp_type = 1;
-    if (g_protocol == MODBUS_RS485)  //  ????Modbus 485 ??ßø??
+    if (g_protocol == MODBUS_RS485)  //  ????Modbus 485 ??ÔøΩÔøΩ??
     {
         int test_value1 = 0;
         int test_value2 = 0;
@@ -380,7 +382,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
             break;
         }
     }
-    if (temp_com0_data == Device_Basic_Setting.reg.com0_config)  // ????Å£???????;
+    if (temp_com0_data == Device_Basic_Setting.reg.com0_config)  // ????ÔøΩÔøΩ???????;
         return;
 
     if ((g_protocol == MODBUS_RS485) ||
@@ -405,11 +407,11 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
         }
         if (g_selected_product_id == PM_TSTAT10)
         {
-            //???? TSTAT10 ???  ???? ßø????? ??????ßπ;
-            if (modbus_0_bacnet_1 == 1) //?????????mstpßø??
-                Device_Basic_Setting.reg.com0_config = 1;  //1 ??TSTAT10 ??mstpßø??;
+            //???? TSTAT10 ???  ???? ÔøΩÔøΩ????? ??????ÔøΩÔøΩ;
+            if (modbus_0_bacnet_1 == 1) //?????????mstpÔøΩÔøΩ??
+                Device_Basic_Setting.reg.com0_config = 1;  //1 ??TSTAT10 ??mstpÔøΩÔøΩ??;
             else
-                Device_Basic_Setting.reg.com0_config = 2;  //2 ??TSTAT10??modbusßø??
+                Device_Basic_Setting.reg.com0_config = 2;  //2 ??TSTAT10??modbusÔøΩÔøΩ??
 
         }
         else if (g_selected_product_id == PM_ESP32_T3_SERIES)
@@ -496,7 +498,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
         }
     }
 
-    if (temp_main_value == Device_Basic_Setting.reg.com2_config)  // ????Å£???????;
+    if (temp_main_value == Device_Basic_Setting.reg.com2_config)  // ????ÔøΩÔøΩ???????;
         return;
 
     if ((g_protocol == MODBUS_RS485) ||
@@ -521,11 +523,11 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
         }
         //if (g_selected_product_id == PM_TSTAT10)
         //{
-        //    //???? TSTAT10 ???  ???? ßø????? ??????ßπ;
-        //    if (modbus_0_bacnet_1 == 1) //?????????mstpßø??
-        //        Device_Basic_Setting.reg.com0_config = 1;  //1 ??TSTAT10 ??mstpßø??;
+        //    //???? TSTAT10 ???  ???? ÔøΩÔøΩ????? ??????ÔøΩÔøΩ;
+        //    if (modbus_0_bacnet_1 == 1) //?????????mstpÔøΩÔøΩ??
+        //        Device_Basic_Setting.reg.com0_config = 1;  //1 ??TSTAT10 ??mstpÔøΩÔøΩ??;
         //    else
-        //        Device_Basic_Setting.reg.com0_config = 2;  //2 ??TSTAT10??modbusßø??
+        //        Device_Basic_Setting.reg.com0_config = 2;  //2 ??TSTAT10??modbusÔøΩÔøΩ??
 
         //}
         if (g_selected_product_id == PM_ESP32_T3_SERIES)
@@ -659,7 +661,7 @@ void CBacnetSettingTcpip::OnEnKillfocusEditSettingZeigbeePanid()
         temp_warning.Format(_T("Do you really want to change the zigbee pan ID to %u ?"), temp_panid);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned short old_panid = Device_Basic_Setting.reg.zigbee_panid;	//ß’?????????????ß’??? ?????;
+            unsigned short old_panid = Device_Basic_Setting.reg.zigbee_panid;	//ÔøΩÔøΩ?????????????ÔøΩÔøΩ??? ?????;
             Device_Basic_Setting.reg.zigbee_panid = (unsigned short)temp_panid;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -796,7 +798,7 @@ void CBacnetSettingTcpip::OnEnKillfocusEditSettingPort()
         temp_warning.Format(_T("Do you really want to change the modbus port to %u ?"), temp_port);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned short old_port = Device_Basic_Setting.reg.modbus_port;	//ß’?????????????ß’??? ?????;
+            unsigned short old_port = Device_Basic_Setting.reg.modbus_port;	//ÔøΩÔøΩ?????????????ÔøΩÔøΩ??? ?????;
             Device_Basic_Setting.reg.modbus_port = (unsigned short)temp_port;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -957,4 +959,24 @@ void CBacnetSettingTcpip::OnBnClickedButtonWireguardConfig()
         dlg.DoModal();
     }
 
+}
+
+void CBacnetSettingTcpip::OnBnClickedButtonGsmStatus()
+{
+    int gsm_product_id = g_selected_product_id;
+    if (gsm_product_id == 0)
+        gsm_product_id = Device_Basic_Setting.reg.panel_type;
+    if ((gsm_product_id == PM_ESP32_T3_SERIES) &&
+        (Device_Basic_Setting.reg.mini_type == T3_HUB))
+    {
+        /* Same pattern as WireGuard: read before DoModal (avoids nested BACnet during InitDialog). */
+        if (GetPrivateData_Blocking(g_bac_instance, READ_GSM_STATUS, 0, 0,
+            sizeof(Str_Gsm_status_point)) < 0)
+        {
+            MessageBox(_T("Read GSM status timeout"));
+            return;
+        }
+        CGsmStatus dlg;
+        dlg.DoModal();
+    }
 }

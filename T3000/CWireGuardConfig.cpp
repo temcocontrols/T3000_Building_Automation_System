@@ -544,9 +544,11 @@ void CWireGuardConfig::LoadFromDevice()
     strKey.Format(_T("%hs"), Device_Wireguard_Point.reg.private_key);
     SetDlgItemText(IDC_EDIT_LOCAL_PRIVATE_KEY, strKey);
 
-    // Peer public key
+    // Peer public key: the PC tunnel interface public key, stored on the Hub.
     strKey.Format(_T("%hs"), Device_Wireguard_Point.reg.peer_public_key);
     SetDlgItemText(IDC_EDIT_PEER_PUBLIC_KEY, strKey);
+
+    ShowDevicePublicKey();
 
     // PSK
     CString strPSK;
@@ -631,15 +633,20 @@ void CWireGuardConfig::UpdateUIState()
     GetDlgItem(IDC_IPADDRESS_ENDPOINT_IP)->EnableWindow(bEnabled);
 
     GetDlgItem(IDC_EDIT_LOCAL_PRIVATE_KEY)->EnableWindow(bEnabled);
+    if (GetDlgItem(IDC_EDIT_DEVICE_PUBLIC_KEY))
+        GetDlgItem(IDC_EDIT_DEVICE_PUBLIC_KEY)->EnableWindow(bEnabled);
     GetDlgItem(IDC_EDIT_PEER_PUBLIC_KEY)->EnableWindow(bEnabled);
     GetDlgItem(IDC_BUTTON_GENERATE_PRIVATE_KEY)->EnableWindow(bEnabled);
-    GetDlgItem(IDC_BUTTON_GENERATE_PUBLIC_KEY)->EnableWindow(bEnabled);
+    if (GetDlgItem(IDC_BUTTON_GENERATE_PUBLIC_KEY))
+        GetDlgItem(IDC_BUTTON_GENERATE_PUBLIC_KEY)->EnableWindow(bEnabled);
 
     GetDlgItem(IDC_CHECK_ENABLE_PRE_SHARED_KEY)->EnableWindow(bEnabled);
     GetDlgItem(IDC_EDIT_PRE_SHARED_KEY)->EnableWindow(bEnabled && bPSKEnabled);
     GetDlgItem(IDC_BUTTON_REGENERATE)->EnableWindow(bEnabled && bPSKEnabled);
 
-    GetDlgItem(IDC_BUTTON_WRITE_WIREGUARD_CFG)->EnableWindow(bEnabled);
+    /* Apply must stay enabled so users can write enable=0 to the device. */
+    GetDlgItem(IDC_BUTTON_WRITE_WIREGUARD_CFG)->EnableWindow(TRUE);
+    GetDlgItem(IDC_BUTTON_CANCEL_WIREGUARD_CFG)->EnableWindow(TRUE);
 }
 
 BOOL CWireGuardConfig::ValidateInput()
@@ -664,12 +671,31 @@ BOOL CWireGuardConfig::ValidateInput()
         return FALSE;
     }
 
-    // Private key
+    // Device private key
     CString strKey;
     GetDlgItemText(IDC_EDIT_LOCAL_PRIVATE_KEY, strKey);
     if (strKey.IsEmpty() || strKey.GetLength() < 40)
     {
-        MessageBox(_T("Invalid private key. Please generate a private key first."), _T("Error"), MB_ICONERROR);
+        MessageBox(_T("Invalid device key. Click Generate Device Key first."), _T("WireGuard"), MB_ICONERROR);
+        return FALSE;
+    }
+
+    CString strPeerKey;
+    GetDlgItemText(IDC_EDIT_PEER_PUBLIC_KEY, strPeerKey);
+    if (strPeerKey.IsEmpty() || strPeerKey.GetLength() < 40)
+    {
+        MessageBox(_T("Paste the PC tunnel public key into Peer public key."), _T("WireGuard"), MB_ICONERROR);
+        return FALSE;
+    }
+
+    CString strDevicePublic;
+    GetDlgItemText(IDC_EDIT_DEVICE_PUBLIC_KEY, strDevicePublic);
+    if (strDevicePublic.IsEmpty())
+        strDevicePublic = GeneratePublicKey(strKey);
+    if (!strDevicePublic.IsEmpty() && strPeerKey.Compare(strDevicePublic) == 0)
+    {
+        MessageBox(_T("Peer public key matches this device's key. Paste the PC tunnel public key instead."),
+                   _T("WireGuard"), MB_ICONERROR);
         return FALSE;
     }
 
@@ -681,29 +707,76 @@ void CWireGuardConfig::OnBnClickedButtonGeneratePrivateKey()
     CString strKey = GeneratePrivateKey();
     if (strKey.IsEmpty())
     {
-        MessageBox(_T("Failed to generate private key."), _T("Error"), MB_ICONERROR);
+        MessageBox(_T("Failed to generate device key."), _T("WireGuard"), MB_ICONERROR);
         return;
     }
     SetDlgItemText(IDC_EDIT_LOCAL_PRIVATE_KEY, strKey);
+    ShowDevicePublicKey();
 }
 
-void CWireGuardConfig::OnBnClickedButtonGeneratePublicKey()
+void CWireGuardConfig::ShowDevicePublicKey()
 {
+    if (GetDlgItem(IDC_EDIT_DEVICE_PUBLIC_KEY) == NULL)
+        return;
+
     CString strPrivKey;
     GetDlgItemText(IDC_EDIT_LOCAL_PRIVATE_KEY, strPrivKey);
     if (strPrivKey.IsEmpty())
     {
-        MessageBox(_T("Please generate a private key first."), _T("Information"), MB_ICONINFORMATION);
+        SetDlgItemText(IDC_EDIT_DEVICE_PUBLIC_KEY, _T(""));
         return;
     }
 
-    CString strPubKey = GeneratePublicKey(strPrivKey);
+    SetDlgItemText(IDC_EDIT_DEVICE_PUBLIC_KEY, GeneratePublicKey(strPrivKey));
+}
+
+void CWireGuardConfig::OnBnClickedButtonGeneratePublicKey()
+{
+    /* Copy device public key to clipboard. */
+    ShowDevicePublicKey();
+
+    CString strPubKey;
+    GetDlgItemText(IDC_EDIT_DEVICE_PUBLIC_KEY, strPubKey);
     if (strPubKey.IsEmpty())
     {
-        MessageBox(_T("Failed to derive public key from private key."), _T("Error"), MB_ICONERROR);
+        MessageBox(_T("Generate a device key first."), _T("WireGuard"), MB_ICONINFORMATION);
         return;
     }
-    SetDlgItemText(IDC_EDIT_PEER_PUBLIC_KEY, strPubKey);
+
+    if (!OpenClipboard())
+    {
+        MessageBox(_T("Unable to open the clipboard."), _T("WireGuard"), MB_ICONERROR);
+        return;
+    }
+
+    EmptyClipboard();
+    size_t nChars = (size_t)strPubKey.GetLength() + 1;
+    HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, nChars * sizeof(TCHAR));
+    if (hMem == NULL)
+    {
+        CloseClipboard();
+        MessageBox(_T("Unable to copy the device public key."), _T("WireGuard"), MB_ICONERROR);
+        return;
+    }
+
+    LPTSTR pMem = (LPTSTR)GlobalLock(hMem);
+    if (pMem == NULL)
+    {
+        GlobalFree(hMem);
+        CloseClipboard();
+        MessageBox(_T("Unable to copy the device public key."), _T("WireGuard"), MB_ICONERROR);
+        return;
+    }
+
+    _tcscpy_s(pMem, nChars, strPubKey);
+    GlobalUnlock(hMem);
+
+#ifdef _UNICODE
+    SetClipboardData(CF_UNICODETEXT, hMem);
+#else
+    SetClipboardData(CF_TEXT, hMem);
+#endif
+    CloseClipboard();
 }
 
 void CWireGuardConfig::OnBnClickedButtonRegenerate()
@@ -754,13 +827,13 @@ void CWireGuardConfig::OnBnClickedButtonWriteWireguardCfg()
 
     if (Write_Private_Data_Blocking(WRITE_WIREGUARD_CFG, 0, 0) <= 0)
     {
-        MessageBox(_T("Failed to write WireGuard configuration!"), _T("Error"), MB_ICONERROR);
+        MessageBox(_T("Failed to apply WireGuard configuration."), _T("WireGuard"), MB_ICONERROR);
         return;
     }
 
     MessageBox(
-        _T("WireGuard configuration written successfully."),
-        _T("Information"),
+        _T("WireGuard configuration applied successfully."),
+        _T("WireGuard"),
         MB_ICONINFORMATION
     );
 }

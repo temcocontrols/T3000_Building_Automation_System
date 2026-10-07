@@ -1,4 +1,4 @@
-﻿
+
 #include "stdafx.h"
 #include "../ISP/MyPing.h"
 #include "global_function.h"
@@ -50,6 +50,40 @@
 #include "ForZip/unzip.h"
 #include "ForZip/zip.h"
 extern tree_product selected_product_Node; // 选中的设备信息;
+extern bool m_is_remote_device;
+extern CString remote_ip_address;
+extern int bacnet_device_type;
+extern Str_Setting_Info Device_Basic_Setting;
+
+/* Hub / TSTAT11 only. Unicast Who-Is works on LAN and over WireGuard;
+ * other products keep broadcast Who-Is / Modbus PTP unchanged. */
+bool Is_Hub_Or_Tstat11_Product(void)
+{
+	unsigned char mini = selected_product_Node.m_ext_info.mini_type;
+	if (mini == T3_HUB || mini == T3_TSTAT11)
+		return true;
+	if (bacnet_device_type == T3_HUB || bacnet_device_type == T3_TSTAT11)
+		return true;
+	if (Device_Basic_Setting.reg.mini_type == T3_HUB ||
+	    Device_Basic_Setting.reg.mini_type == T3_TSTAT11)
+		return true;
+	return false;
+}
+
+void Send_WhoIs_Hub_Tstat11_Aware(uint32_t deviceid)
+{
+	CString ip;
+	if (m_is_remote_device && !remote_ip_address.IsEmpty())
+		ip = remote_ip_address;
+	else if (Is_Hub_Or_Tstat11_Product() &&
+	         !selected_product_Node.BuildingInfo.strIp.IsEmpty())
+		ip = selected_product_Node.BuildingInfo.strIp;
+
+	if (!ip.IsEmpty())
+		Send_WhoIs_remote_ip(ip);
+	else
+		Send_WhoIs_Global(deviceid, deviceid);
+}
 //#include "CM5\PTP\ptp.h"
 #pragma region For_Bacnet_program_Use
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
@@ -2295,7 +2329,7 @@ int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t sta
                 temp_invoke_id = GetSpecialPrivateData(deviceid, command, start_instance, end_instance, entitysize);
             if (temp_invoke_id < 0)
                 Sleep(500);
-            else if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+            else if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER && !Is_Hub_Or_Tstat11_Product())
             {
                 //gsp_invoke = -1;
                 gsp_invoke = temp_invoke_id; //20250918 add 通过这个函数进来的 都是特殊的读取 
@@ -2369,7 +2403,7 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
 				temp_invoke_id =  GetPrivateData( deviceid,command, start_instance,end_instance,entitysize);
 			if(temp_invoke_id < 0)
 				Sleep(500);
-            else if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+            else if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER && !Is_Hub_Or_Tstat11_Product())
             {
                 return 1;
             }
@@ -2566,7 +2600,8 @@ Get Bacnet Special Private Data  这一段是读取其他panel的数据，不是
 /************************************************************************/
 int GetSpecialPrivateData(uint32_t deviceid, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize)
 {
-    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+    /* Hub/TSTAT11: use BACnet private transfer (LAN + WireGuard). Other devices keep Modbus PTP. */
+    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER && !Is_Hub_Or_Tstat11_Product())
     {
         int ret_results = 0;
         unsigned char test_data[600] = { 0 };
@@ -2639,7 +2674,7 @@ int GetSpecialPrivateData(uint32_t deviceid, uint8_t command, uint8_t start_inst
     }
     else
     {
-        Send_WhoIs_Global(deviceid, deviceid);
+        Send_WhoIs_Hub_Tstat11_Aware(deviceid);
         return -2;
     }
 }
@@ -2658,7 +2693,8 @@ Get Bacnet Private Data
 /************************************************************************/
 int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize)
 {
-    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
+    /* Hub/TSTAT11: use BACnet private transfer (LAN + WireGuard). Other devices keep Modbus PTP. */
+    if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER && !Is_Hub_Or_Tstat11_Product())
     {
         int ret_results = 0;
         unsigned char test_data[600] = { 0 };
@@ -2731,7 +2767,7 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
     }
     else
     {
-        Send_WhoIs_Global(deviceid, deviceid);
+        Send_WhoIs_Hub_Tstat11_Aware(deviceid);
         return -2;
     }
 }
@@ -2820,7 +2856,7 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
     }
     else
     {
-        Send_WhoIs_Global(deviceid, deviceid);
+        Send_WhoIs_Hub_Tstat11_Aware(deviceid);
         //test_string.Format(_T("test_count = %d , status = %d failed ,Sleep3000\r\n"), test_count, status);
         //TRACE(test_string);
         if (MODE_SUPPORT_PTRANSFER)
@@ -5355,6 +5391,19 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         // reserved 区域不用处理
 
         return READ_WIREGUARD_CFG;
+    }
+    break;
+    case READ_GSM_STATUS:
+    {
+        block_length = len_value_type - PRIVATE_HEAD_LENGTH;
+        my_temp_point = bacnet_apud_point + PRIVATE_HEAD_LENGTH;
+
+        if (block_length != sizeof(Str_Gsm_status_point))
+            return -1;
+
+        memcpy_s(&Device_Gsm_Status_Point, sizeof(Device_Gsm_Status_Point),
+            my_temp_point, sizeof(Device_Gsm_Status_Point));
+        return READ_GSM_STATUS;
     }
     break;
     case READMONITORDATA_T3000:

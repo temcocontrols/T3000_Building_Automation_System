@@ -1,4 +1,4 @@
-// BacnetAddRemoteDevice.cpp : 实现文件 (Implementation file)
+// BacnetAddRemoteDevice.cpp : ?????? (Implementation file)
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include "global_function.h"
 #include "MainFrm.h"
 #include "ScanDlg.h"
-// CBacnetAddRemoteDevice 对话框 (dialog box)
+// CBacnetAddRemoteDevice ????? (dialog box)
 
 vector <CString> local_ip_address;
 
@@ -48,12 +48,12 @@ BEGIN_MESSAGE_MAP(CBacnetAddRemoteDevice, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CBacnetAddRemoteDevice 消息处理程序 (message handler)
+// CBacnetAddRemoteDevice ??????????? (message handler)
 
 HANDLE h_add_remote_thread = NULL;
 void CBacnetAddRemoteDevice::OnBnClickedButtonRemotedlgScan()
 {
-    // TODO: 在此添加控件通知处理程序代码
+    // TODO: ??????????????????????
     // TODO: Add control notification handler code here
     BYTE address1, address2, address3, address4;
     //GetDlgItemText(IDC_COMBO_REMOTEDLG_LOCAL_IP, cs_local_ip);
@@ -287,7 +287,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 {
                     strSql.Format(_T("Delete  From  ALL_NODE Where Serial_ID = '%d' "), temp_struct.serialnumber);
                     // If a duplicate is found, delete it first and then insert
-                    SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   //如果查询到有重复的就删除后在插入
+                    SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   //??????????????????????????
                 }
 
                 if (IS_Temco_Product(read_data[7]))
@@ -316,19 +316,33 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 CString str_hw_version;
                 CString str_fw_version;
                 CString str_panel_number = _T("0");
+                CString str_screen_name = _T("");
+                CString str_epsize = _T("0");
+                /* Hub / TSTAT11 only: persist firmware + mini_type so open uses BACnet path.
+                 * Other remote products keep empty Software_Ver / Screen_Name as before. */
+                if (read_data[7] == PM_ESP32_T3_SERIES &&
+                    (read_data[34] == T3_HUB || read_data[34] == T3_TSTAT11))
+                {
+                    int fw_raw = read_data[5] * 10 + read_data[4];
+                    str_fw_version.Format(_T("%.1f"), (float)fw_raw / 10.0f);
+                    /* Screen_Name = virtual^mini_type^  — use 0 = real device (1 = virtual). */
+                    str_screen_name.Format(_T("0^%u^"), (unsigned)read_data[34]);
+                    if (read_data[35] != 0)
+                        str_hw_version.Format(_T("%u"), read_data[35]);
+                }
                 if ((read_data[7] == PM_MINIPANEL) || (read_data[7] == PM_MINIPANEL_ARM) || (read_data[7] == PM_ESP32_T3_SERIES))
                 {
                     CString temp_pro3;
                     temp_pro3.Format(_T("%u"), PROTOCOL_REMOTE_IP /*PROTOCOL_BACNET_IP*/);
                     strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)  \
-                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro3 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "','" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','" + str_screen_name + "','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','" + str_epsize + "','" + temp_pro3 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
                 }
                 else
                 {
                     CString temp_pro4;
                     temp_pro4.Format(_T("%u"), PROTOCOL_BIP_T0_MSTP_TO_MODBUS /*PROTOCOL_BIP_T0_MSTP_TO_MODBUS*/);
                     strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)  \
-                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "', '" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','""','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','0','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
+                        values('" + pFrame->m_strCurMainBuildingName + "','" + pFrame->m_strCurSubBuldingName + "', '" + NetwordCard_Address + "','" + str_main_serialid + "','floor1','room1','" + product_name + "','" + product_class_id + "','" + modbusid + "','" + str_screen_name + "','" + str_ip_address + "','Modbus_and_Bacnet','" + str_hw_version + "','" + str_fw_version + "','" + str_n_port + "','" + str_epsize + "','" + temp_pro4 + "','1','" + str_parents_serial + "' ,'" + str_panel_number + "' ,'" + str_object_instance + "' ,'" + is_custom + "' )"));
 
                 }
                 main_device++;
@@ -336,7 +350,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 static_info.Format(_T("Add device %d into database success!"), i + 1);
                 Sleep(1000);
                 // If it is a T3 device, also check whether other devices are connected below
-                if (Bacnet_Private_Device(temp_struct.product_type)) //如果是T3 还要读下面是否挂有设备;
+                if (Bacnet_Private_Device(temp_struct.product_type)) //?????T3 ????????????????豸;
                 {
                     int ret_cusunits = GetPrivateData_Blocking(g_mstp_deviceid, READ_REMOTE_DEVICE_DB, 0, 0, sizeof(Str_Remote_TstDB), 3);
                     if (ret_cusunits > 0)
@@ -393,7 +407,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                                         {
                                             strSql.Format(_T("Delete  From  ALL_NODE Where Serial_ID = '%d' "), sub_serial);
                                             // If a duplicate is found, delete it first and then insert
-                                            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   //如果查询到有重复的就删除后在插入
+                                            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   //??????????????????????????
                                         }
 
                                         CString cs_temp_name;
@@ -456,14 +470,14 @@ BOOL CBacnetAddRemoteDevice::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  在此添加额外的初始化
+    // TODO:  ???????????????
     // TODO: Add additional initialization here
     InitialStatic();
     InitialUI();
     SetTimer(1, 200, NULL);
     return TRUE;  // return TRUE unless you set the focus to a control
                   // Exception: OCX property pages should return FALSE
-                  // 异常: OCX 属性页应返回 FALSE
+                  // ??: OCX ?????????? FALSE
 }
 
 void CBacnetAddRemoteDevice::InitialStatic()
@@ -520,7 +534,7 @@ void CBacnetAddRemoteDevice::InitialUI()
 
 BOOL CBacnetAddRemoteDevice::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: 在此添加专用代码和/或调用基类
+    // TODO: ??????????????/????????
     // TODO: Add custom code and/or call the base class here
     return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -529,7 +543,7 @@ BOOL CBacnetAddRemoteDevice::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetAddRemoteDevice::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    // TODO: ??????????????????????/?????????
     // TODO: Add message handler code and/or call the default implementation here
     static int addinfo_count = 1;
     if (Compare_CS.CompareNoCase(static_info) == 0)

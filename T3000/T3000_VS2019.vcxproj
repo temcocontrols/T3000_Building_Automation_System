@@ -305,6 +305,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClCompile Include="BacnetView.cpp" />
     <ClCompile Include="CWebBrowser2.cpp" />
     <ClCompile Include="CWireGuardConfig.cpp" />
+    <ClCompile Include="CGsmStatus.cpp" />
     <ClCompile Include="DebugWindow.cpp" />
     <ClCompile Include="DetectOnlineDlg.cpp" />
     <ClCompile Include="DisplayConfig.cpp" />
@@ -706,6 +707,7 @@ XCOPY "$(SolutionDir)DLLs\T3WebviewApi\*" "$(TargetDir)" /D /K /Y</Command>
     <ClInclude Include="CustomSTable.h" />
     <ClInclude Include="CWebBrowser2.h" />
     <ClInclude Include="CWireGuardConfig.h" />
+    <ClInclude Include="CGsmStatus.h" />
     <ClInclude Include="CWorkbook0.h" />
     <ClInclude Include="CWorkbooks0.h" />
     <ClInclude Include="CWorksheet0.h" />
