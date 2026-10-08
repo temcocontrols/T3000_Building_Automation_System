@@ -1114,6 +1114,8 @@ extern Str_Setting_Info Device_Basic_Setting;
 extern Str_Email_point  Device_Email_Point;
 extern Str_Wireguard_point Device_Wireguard_Point;
 extern Str_Gsm_status_point Device_Gsm_Status_Point;
+extern Str_Mqtt_point Device_Mqtt_Point;
+extern Str_Snmp_point Device_Snmp_Point;
 extern Str_MISC Device_Misc_Data;
 extern Str_MISC s_Device_Misc_Data;
 

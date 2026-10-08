@@ -1722,6 +1722,12 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     case WRITE_WIREGUARD_CFG:
         entitysize = sizeof(Str_Wireguard_point);
 		break;
+    case WRITE_MQTT_CFG:
+        entitysize = sizeof(Str_Mqtt_point);
+        break;
+    case WRITE_SNMP_CFG:
+        entitysize = sizeof(Str_Snmp_point);
+        break;
     case WRITE_JSON_SCREEN:
         entitysize = sizeof(Str_t3_screen_Json);
         break;
@@ -1835,6 +1841,16 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     case WRITE_WIREGUARD_CFG:
     {
 		memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_Wireguard_point), &Device_Wireguard_Point, sizeof(Str_Wireguard_point));
+    }
+    break;
+    case WRITE_MQTT_CFG:
+    {
+        memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_Mqtt_point), &Device_Mqtt_Point, sizeof(Str_Mqtt_point));
+    }
+    break;
+    case WRITE_SNMP_CFG:
+    {
+        memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_Snmp_point), &Device_Snmp_Point, sizeof(Str_Snmp_point));
     }
     break;
 	case WRITEEXT_IO_T3000:
@@ -5404,6 +5420,32 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         memcpy_s(&Device_Gsm_Status_Point, sizeof(Device_Gsm_Status_Point),
             my_temp_point, sizeof(Device_Gsm_Status_Point));
         return READ_GSM_STATUS;
+    }
+    break;
+    case READ_MQTT_CFG:
+    {
+        block_length = len_value_type - PRIVATE_HEAD_LENGTH;
+        my_temp_point = bacnet_apud_point + PRIVATE_HEAD_LENGTH;
+
+        if (block_length != sizeof(Str_Mqtt_point))
+            return -1;
+
+        memcpy_s(&Device_Mqtt_Point, sizeof(Device_Mqtt_Point),
+            my_temp_point, sizeof(Device_Mqtt_Point));
+        return READ_MQTT_CFG;
+    }
+    break;
+    case READ_SNMP_CFG:
+    {
+        block_length = len_value_type - PRIVATE_HEAD_LENGTH;
+        my_temp_point = bacnet_apud_point + PRIVATE_HEAD_LENGTH;
+
+        if (block_length != sizeof(Str_Snmp_point))
+            return -1;
+
+        memcpy_s(&Device_Snmp_Point, sizeof(Device_Snmp_Point),
+            my_temp_point, sizeof(Device_Snmp_Point));
+        return READ_SNMP_CFG;
     }
     break;
     case READMONITORDATA_T3000:

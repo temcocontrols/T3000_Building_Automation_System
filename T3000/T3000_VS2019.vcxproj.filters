@@ -879,6 +879,12 @@
     <ClCompile Include="CGsmStatus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CMqttConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CSnmpConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ApplyDisable.bmp">
@@ -2154,6 +2160,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CGsmStatus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CMqttConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CSnmpConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

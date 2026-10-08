@@ -14,6 +14,8 @@
 #include "BacnetSettingHealth.h"
 #include "CWireGuardConfig.h"
 #include "CGsmStatus.h"
+#include "CMqttConfig.h"
+#include "CSnmpConfig.h"
 // CBacnetSettingTcpip dialog box
 // CBacnetSettingTcpip ?????
 
@@ -64,6 +66,8 @@ BEGIN_MESSAGE_MAP(CBacnetSettingTcpip, CDialogEx)
     ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
     ON_BN_CLICKED(IDC_BUTTON_WIREGUARD_CONFIG, &CBacnetSettingTcpip::OnBnClickedButtonWireguardConfig)
     ON_BN_CLICKED(IDC_BUTTON_GSM_STATUS, &CBacnetSettingTcpip::OnBnClickedButtonGsmStatus)
+    ON_BN_CLICKED(IDC_BUTTON_MQTT_CONFIG, &CBacnetSettingTcpip::OnBnClickedButtonMqttConfig)
+    ON_BN_CLICKED(IDC_BUTTON_SNMP_CONFIG, &CBacnetSettingTcpip::OnBnClickedButtonSnmpConfig)
 END_MESSAGE_MAP()
 
 
@@ -977,6 +981,46 @@ void CBacnetSettingTcpip::OnBnClickedButtonGsmStatus()
             return;
         }
         CGsmStatus dlg;
+        dlg.DoModal();
+    }
+}
+
+/* MQTT / SNMP config: ESP32 T3 series, TSTAT11 or Hub, firmware >= 69.9 (same gate as WireGuard). */
+void CBacnetSettingTcpip::OnBnClickedButtonMqttConfig()
+{
+    int mqtt_product_id = g_selected_product_id;
+    if (mqtt_product_id == 0)
+        mqtt_product_id = Device_Basic_Setting.reg.panel_type;
+    if ((mqtt_product_id == PM_ESP32_T3_SERIES) &&
+        ((Device_Basic_Setting.reg.mini_type == T3_TSTAT11) || (Device_Basic_Setting.reg.mini_type == T3_HUB)) &&
+        (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 699))
+    {
+        /* Same pattern as WireGuard/GSM: read before DoModal (avoids nested BACnet during InitDialog). */
+        if (!CMqttConfig::Load())
+        {
+            MessageBox(_T("Read MQTT configuration timeout"));
+            return;
+        }
+        CMqttConfig dlg;
+        dlg.DoModal();
+    }
+}
+
+void CBacnetSettingTcpip::OnBnClickedButtonSnmpConfig()
+{
+    int snmp_product_id = g_selected_product_id;
+    if (snmp_product_id == 0)
+        snmp_product_id = Device_Basic_Setting.reg.panel_type;
+    if ((snmp_product_id == PM_ESP32_T3_SERIES) &&
+        ((Device_Basic_Setting.reg.mini_type == T3_TSTAT11) || (Device_Basic_Setting.reg.mini_type == T3_HUB)) &&
+        (((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 699))
+    {
+        if (!CSnmpConfig::Load())
+        {
+            MessageBox(_T("Read SNMP configuration timeout"));
+            return;
+        }
+        CSnmpConfig dlg;
         dlg.DoModal();
     }
 }

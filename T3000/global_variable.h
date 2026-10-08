@@ -2025,6 +2025,8 @@ Str_Setting_Info Device_Basic_Setting;
 Str_Email_point  Device_Email_Point;
 Str_Wireguard_point Device_Wireguard_Point;
 Str_Gsm_status_point Device_Gsm_Status_Point;
+Str_Mqtt_point Device_Mqtt_Point;
+Str_Snmp_point Device_Snmp_Point;
 Str_MISC Device_Misc_Data;
 Str_MISC s_Device_Misc_Data;
 Str_Special Device_Special_Data;

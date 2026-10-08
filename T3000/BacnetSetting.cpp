@@ -318,6 +318,20 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_WIREGUARD_CONFIG))->EnableWindow(0);
 		}
 
+		/* MQTT / SNMP config: same gate as WireGuard (T3_TSTAT11 / T3_HUB, firmware >= 69.9). */
+		if (((setting_product_id == PM_ESP32_T3_SERIES) &&
+			((Device_Basic_Setting.reg.mini_type == T3_TSTAT11) || (Device_Basic_Setting.reg.mini_type == T3_HUB)) &&
+			(((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 699)))
+		{
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_MQTT_CONFIG))->EnableWindow(1);
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_SNMP_CONFIG))->EnableWindow(1);
+		}
+		else
+		{
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_MQTT_CONFIG))->EnableWindow(0);
+			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_SNMP_CONFIG))->EnableWindow(0);
+		}
+
 		if ((setting_product_id == PM_ESP32_T3_SERIES) &&
 			(Device_Basic_Setting.reg.mini_type == T3_HUB))
 		{

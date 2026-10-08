@@ -59,4 +59,6 @@ public:
     afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
     afx_msg void OnBnClickedButtonWireguardConfig();
     afx_msg void OnBnClickedButtonGsmStatus();
+    afx_msg void OnBnClickedButtonMqttConfig();
+    afx_msg void OnBnClickedButtonSnmpConfig();
 };

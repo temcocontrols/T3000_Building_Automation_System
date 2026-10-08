@@ -80,6 +80,8 @@ typedef enum {
          READ_EMAIL_ALARM          = 43,
 		 READ_WIREGUARD_CFG        = 44,
 		 READ_GSM_STATUS           = 45,
+		 READ_MQTT_CFG             = 46,
+		 READ_SNMP_CFG             = 47,
 		 READ_JSON_SCREEN          = 86,
 		 READ_JSON_ITEM            = 87, 
 		 READ_PVARIABLE_T3000		= 88,           /* read Pvariables         */
@@ -140,6 +142,8 @@ typedef enum {
          WRITE_MSV_COMMAND          = 142,
          WRITE_EMAIL_ALARM           = 143,
 		 WRITE_WIREGUARD_CFG		= 144,
+		 WRITE_MQTT_CFG			= 146,
+		 WRITE_SNMP_CFG			= 147,
 		 WRITE_JSON_SCREEN			= 186,
 		 WRITE_JSON_ITEM			= 187,
 		 WRITE_PVARIABLE_T3000		= 188,           /* read Pvariables         */
@@ -259,6 +263,46 @@ typedef union {
 		unsigned char  reserved[320];
 	} reg;
 } Str_Gsm_status_point;
+
+/* Hub MQTT client config - must match Hub Str_Mqtt_point and Modbus 2301-2450.
+ * BACnet private transfer: READ_MQTT_CFG (46) / WRITE_MQTT_CFG (146).
+ * UI defaults: enable=0, port=1883, broker="broker.hivemq.com",
+ *              pub_topic="temco/test/hub/pub", sub_topic="temco/test/hub/sub". */
+typedef union {
+	uint8_t all[400];
+	struct {
+		unsigned char  enable;            /* 0=Disabled, 1=Enabled */
+		unsigned char  connected;         /* read-only: 1=connected to broker */
+		unsigned short port;              /* default 1883 */
+		char           broker[64];
+		char           username[32];
+		char           password[32];
+		char           client_id[32];
+		char           pub_topic[64];
+		char           sub_topic[64];
+		unsigned char  reserved[108];
+	} reg;
+} Str_Mqtt_point;
+
+/* Hub SNMP agent config - must match Hub Str_Snmp_point and Modbus 2451-2550.
+ * BACnet private transfer: READ_SNMP_CFG (47) / WRITE_SNMP_CFG (147).
+ * UI defaults: enable=0, port=161, ro="public", rw="private", trap_port=162. */
+typedef union {
+	uint8_t all[400];
+	struct {
+		unsigned char  enable;            /* 0=Disabled, 1=Enabled */
+		unsigned char  running;           /* read-only: 1=agent running */
+		unsigned short port;              /* default 161 */
+		char           ro_community[32];
+		char           rw_community[32];
+		unsigned char  trap_dest_ip[4];
+		unsigned short trap_dest_port;    /* default 162 */
+		char           sys_name[32];
+		char           sys_location[32];
+		char           sys_contact[32];
+		unsigned char  reserved[230];
+	} reg;
+} Str_Snmp_point;
 
 typedef union
 {
