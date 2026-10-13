@@ -67,6 +67,37 @@ const int NUMVIEWS = 37;
 
 
 #define  WM_REFRESH_TREEVIEW_MAP WM_USER + 2008
+// WEBVIEW: posted by the FFI thread when the web page asks for the desktop app back.
+#define  WM_T3000_BACK_TO_DESKTOP WM_USER + 2009
+
+// WEBVIEW: the separator in front of the WEBVIEW button is swapped for this class at runtime, so the
+// button is pushed to the right end of the row (see CMainFrame::OnCreate).
+#include "afxtoolbarbutton.h"      // CMFCToolBarButton - base of the WEBVIEW toolbar spacer
+
+class CToolBarRightSpacerButton : public CMFCToolBarButton
+{
+    // DECLARE_DYNCREATE, not DECLARE_DYNAMIC: CMFCToolBar::InsertButton clones through
+    // CRuntimeClass::CreateObject(), which DECLARE_DYNAMIC does not provide (NULL + an assert in MFC).
+    DECLARE_DYNCREATE(CToolBarRightSpacerButton)
+public:
+    // A plain button, deliberately NOT a TBBS_SEPARATOR: MFC never calls OnDraw for a separator and always
+    // paints its divider line, so an ordinary button that paints nothing is the only invisible gap.
+    CToolBarRightSpacerButton() {}      // m_nID = 0, m_iImage = -1 and no text: there is nothing to draw
+    virtual SIZE OnCalculateSize(CDC* pDC, const CSize& sizeDefault, BOOL bHorz);
+
+    virtual void OnDraw(CDC* pDC, const CRect& rect, CMFCToolBarImages* pImages, BOOL bHorz,
+                        BOOL bCustomizeMode, BOOL bHighlight, BOOL bDrawBorder, BOOL bGrayDisabledButtons)
+    {
+        UNREFERENCED_PARAMETER(pDC);            UNREFERENCED_PARAMETER(rect);
+        UNREFERENCED_PARAMETER(pImages);        UNREFERENCED_PARAMETER(bHorz);
+        UNREFERENCED_PARAMETER(bCustomizeMode); UNREFERENCED_PARAMETER(bHighlight);
+        UNREFERENCED_PARAMETER(bDrawBorder);    UNREFERENCED_PARAMETER(bGrayDisabledButtons);
+    }
+
+    virtual BOOL HaveHotBorder() const { return FALSE; }     // no hover frame either
+    virtual BOOL CanBeStored() const { return FALSE; }       // keep it out of the customization dialog
+    virtual BOOL IsEditable() const { return FALSE; }
+};
 extern int g_gloab_bac_comport;
 extern int g_gloab_bac_baudrate;
 const int REGISTER_USE_ZIGBEE_485 = 640;
@@ -202,6 +233,14 @@ public:
     HWND Get_Tip_HWND(){
     return  m_pToolTip->m_hWnd;
     }
+
+    // WEBVIEW: a docked toolbar's ideal width is the sum of its buttons, which is circular for a spacer -
+    // report the docked window's client width instead (horizontal, non-floating bars only).
+    virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz);
+
+    // WEBVIEW: the base class hides any button that would reach past the bar's client rect, which drops
+    // the spacer and leaves the button mid-row; this puts it back at the right end.
+    virtual void AdjustLocations();
 };
 
 
@@ -284,6 +323,21 @@ public://scan
 
 // Operations
 public:
+	// ---- WEBVIEW button -----------------------------------------------------------------
+	// OpenWebviewInBrowser : toolbar button. Reuses the browser window already open on the dedicated
+	//                       profile (restore + maximise + focus, leftovers closed), or opens one;
+	//                       then minimises T3000.
+	// RestoreFromWebview   : the WIN11 half. Restore, resize and focus T3000.
+	// CloseWebviewBrowser  : closes our browser window and any leftover on that profile.
+	// Both are driven by the web page through FFI action BACK_TO_DESKTOP (BacnetWebView.cpp), which posts
+	// WM_T3000_BACK_TO_DESKTOP to this frame.
+	// CMainFrame must not gain data members: an .obj built against an older MainFrm.h reads member offsets
+	// wrongly (this is what once crashed T3000View::PreTranslateMessage), so the WEBVIEW state lives in
+	// file-statics in MainFrm.cpp.
+	// --------------------------------------------------------------------------------------
+	void OpenWebviewInBrowser();
+	void RestoreFromWebview();
+	void CloseWebviewBrowser();
 	CMFCStatusBar& GetStatusBar ()
 	{
 	return m_wndStatusBar;
@@ -627,6 +681,8 @@ public:
 		afx_msg void OnWebviewModbusregister();
 		//afx_msg void OnWebviewThirdpartymodbusdatabase();
 		afx_msg void OnToolsLoginmyaccount();
+		afx_msg void OnWebviewOpenBrowser();                            // WEBVIEW toolbar button
+		afx_msg LRESULT OnBackToDesktop(WPARAM wParam, LPARAM lParam);  // posted by the FFI thread
 		afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 		afx_msg void OnClose();
 };
@@ -652,4 +708,3 @@ extern vector <bacnet_background_struct> m_backbround_data; // ÓÃÀ´È«³Ì´¢´æÐèÒª¶
 #define TVINSERV_PM5E               {tvInsert.item.iImage=30;tvInsert.item.iSelectedImage=30;}//PM5E
 #define TVINSERV_THIRD_PARTY        {tvInsert.item.iImage=32;tvInsert.item.iSelectedImage=32;}//µÚÈý·½Éè±¸
 #define ITEM_MASK				TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_TEXT
-
