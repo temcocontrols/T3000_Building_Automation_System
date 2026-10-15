@@ -4,7 +4,7 @@
 #include "global_function.h"
 #include "Windows.h"
 #include "T3000.h"
- 
+
 
 #include "ShowMessageDlg.h"
 #include "T3000RegAddress.h"
@@ -109,7 +109,7 @@ extern CBacnetUserlogin* User_Login_Window ;
 extern CBacnetRemotePoint* Remote_Point_Window ;
 extern int pc_time_to_basic_delt; //用于时间转换 ，各个时区之间。
 extern CString program_string;
-extern vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
+extern vector <bacnet_background_struct> m_backbround_data; // Holds extra BACnet panel data that the background must read.
 // 全局同步状态实例
 #ifdef read_prop_multi_function
 static SyncReadState g_sync_state;
@@ -1139,7 +1139,7 @@ int Post_ReadTrendlog_Message(unsigned char panel_id, uint32_t nserialnumber)
 {
     if (read_write_bacnet_config)	//在读写Bacnet config 的时候禁止刷新List;
         return -1;
-    //这里要判断在线的panel   ,对在线的panel读取 input output variable. 
+    //这里要判断在线的panel   ,对在线的panel读取 input output variable.
     for (int i = 0; i < g_bacnet_panel_info.size(); i++)
     {
         str_point_info readinfo = {0};
@@ -1189,7 +1189,7 @@ int Post_Background_Read_Message_ByPanel(unsigned char panel_id,int command_type
     readinfo.npanel_id = panel_id;
     readinfo.npanel_commad = command_type;
     readinfo.npoint_number = npoint - 1;
-    if (readinfo.npanel_id == 0) 
+    if (readinfo.npanel_id == 0)
         return -1;
     str_point_info* pmy_refresh_info = new str_point_info;
     memcpy(pmy_refresh_info, &readinfo, sizeof(str_point_info));
@@ -1441,7 +1441,7 @@ int WriteBacnetPictureData_Blocking(uint32_t deviceid,uint8_t index , unsigned s
 	}
 	return -1;
 
-	
+
 }
 
 
@@ -1503,7 +1503,7 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 	unsigned short entitysize=0;
 	uint8_t apdu[480] = { 0 };
 	uint8_t test_value[480] = { 0 };
-	int private_data_len = 0;	
+	int private_data_len = 0;
 	BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
 	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
 	BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
@@ -1538,7 +1538,7 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 		n_temp_point = n_temp_point + npackage*400;
 		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,400,n_temp_point,400);
 		Set_transfer_length(private_data_chunk.total_length);
-	
+
 
         if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
         {
@@ -1669,7 +1669,7 @@ int WritePrivateData_Blocking(uint32_t deviceid, unsigned char n_command, unsign
 ****************************************************/
 int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance,char *ext_data)
 {
- 
+
 
     unsigned char command = (unsigned char)n_command;
 
@@ -2004,7 +2004,7 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         break;
     case WRITETIMESCHEDULE_T3000:
         temp_buffer = temp_buffer + HEADER_LENGTH;
- 
+
         if (offline_mode)
         {
             for (int j = 0; j < 9; j++)
@@ -2083,7 +2083,7 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         else
         {
             memcpy_s(SendBuffer + HEADER_LENGTH, (end_instance - start_instance + 1) * sizeof(Str_Setting_Info), ext_data, (end_instance - start_instance + 1) * sizeof(Str_Setting_Info));
-        }     
+        }
     }
     break;
     case WRITEPID_T3000:
@@ -2149,7 +2149,7 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
             else
             {
                 memcpy_s(SendBuffer + HEADER_LENGTH, sizeof(Str_MISC), ext_data, sizeof(Str_Setting_Info));
-            }		
+            }
 		}
 		break;
 	case WRITE_SPECIAL_COMMAND:
@@ -2186,7 +2186,7 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         return ret_length;
     }
 
-	if(debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) 
+	if(debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)
 	{
 		CString total_char_test;
 		total_char_test = _T("Write : ");
@@ -2279,7 +2279,7 @@ int GetPriavteDataByPanelBlocking(Str_points * npoint  , str_group_point* temp_d
          nret = GetPrivateDataSaveSPBlocking(device_object_instance, command, start_instance, end_instance, entitysize, retrytime);
          if (nret > 0)
          {
-             
+
              memset(temp_data, 0, sizeof(groupdata));
              Sleep(1);
              if (command == READINPUT_T3000)
@@ -2348,12 +2348,12 @@ int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t sta
             else if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER && !Is_Hub_Or_Tstat11_Product())
             {
                 //gsp_invoke = -1;
-                gsp_invoke = temp_invoke_id; //20250918 add 通过这个函数进来的 都是特殊的读取 
+                gsp_invoke = temp_invoke_id; //20250918 add 通过这个函数进来的 都是特殊的读取
                 return 1;
             }
             if (temp_invoke_id >= 0)
             {
-                gsp_invoke = temp_invoke_id; //20250918 add 通过这个函数进来的 都是特殊的读取 
+                gsp_invoke = temp_invoke_id; //20250918 add 通过这个函数进来的 都是特殊的读取
                 TRACE(_T("GetPrivateDataSaveSPBlocking gsp_invoke = %d,deviceid =%d,command = %d,s=%d,end=%d\r\n"), gsp_invoke, deviceid, command, start_instance, end_instance);
                 send_status = true;
             }
@@ -2384,7 +2384,7 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
     if (g_protocol_support_ptp != PROTOCOL_MB_PTP_TRANSFER)
     {
         if ((g_protocol == MODBUS_RS485) ||
-            (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) || 
+            (g_protocol == PROTOCOL_MB_TCPIP_TO_MB_RS485) ||
             g_protocol == PROTOCOL_THIRD_PARTY_BAC_BIP)
         {
             //if (READVARUNIT_T3000 == command)
@@ -2431,7 +2431,7 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
 			//	Sleep(SEND_COMMAND_DELAY_TIME);
         }
         while (temp_invoke_id<0);
-	
+
         if(send_status)
         {
             for (int i=0; i<300; i++)
@@ -2563,7 +2563,7 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
 	int	resend_count = 0;
 	for (int z=0;z<5;z++)
 	{
-		do 
+		do
 		{
 			resend_count ++;
 			if(resend_count>5)
@@ -2593,7 +2593,7 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
 				else
 					continue;
 			}
-			
+
 
         }
     }
@@ -2878,7 +2878,7 @@ int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t 
         if (MODE_SUPPORT_PTRANSFER)
             Sleep(300);
         else
-            Sleep(1000);  //address 
+            Sleep(1000);  //address
 
         return -12;
     }
@@ -2947,7 +2947,7 @@ int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_
     private_data.serviceParametersLen = private_data_len;
 
 
-    if (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) 
+    if (debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)
     {
         CString total_char_test;
         total_char_test = _T("Write : ");
@@ -3143,7 +3143,7 @@ Get Bacnet Monitor Private Data
 /************************************************************************/
 int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint32_t ntotal_seg, uint32_t nseg_index,MonitorUpdateData* up_data)
 {
-    
+
 
     uint8_t apdu[480] = { 0 };
     uint8_t test_value[480] = { 0 };
@@ -3431,7 +3431,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 
     char * bacnet_apud_point = (char *)Temp_CS.value;
 	CString total_char_test;
-	if(debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) 
+	if(debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)
 	{
 		char * temp_print_test = NULL;
 		temp_print_test = (char *)&Temp_CS.value;
@@ -4204,10 +4204,10 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
                 fill_in_output(&m_Output_data.at(i), my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_out_point);
 
-               
+
             }
         }
-       
+
         return READOUTPUT_T3000;
     }
     break;
@@ -4244,7 +4244,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (invoke_id == gsp_invoke)
         {
             for (i = start_instance; i <= end_instance; i++)
-            {       
+            {
                 fill_in_input(&s_Input_data[i], my_temp_point);
                 my_temp_point = my_temp_point + sizeof(Str_in_point);
             }
@@ -4400,7 +4400,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
 				memcpy_s(temp_char, 9, my_temp_point, 8);
 			}
 
-            
+
 
             MultiByteToWideChar(CP_ACP, 0, (char *)temp_char,
                 (int)strlen((char *)temp_char) + 1,
@@ -4803,7 +4803,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         memset(&g_DayState[start_instance], 0, ANNUAL_CODE_SIZE);
         memcpy_s(&g_DayState[start_instance], block_length, my_temp_point, block_length);
         memcpy_s(gp_DayState[bac_gloab_panel][start_instance], block_length, my_temp_point, block_length);
-        
+
         return READANNUALSCHEDULE_T3000;
     }
     break;
@@ -4925,7 +4925,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
         if (end_instance == (BAC_SCREEN_COUNT - 1))
             end_flag = true;
 
-        
+
         if (invoke_id == gsp_invoke)
         {
             for (i = start_instance; i <= end_instance; i++)
@@ -4942,7 +4942,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
                 my_temp_point = my_temp_point + sizeof(Control_group_point);
             }
         }
-       
+
         return READSCREEN_T3000;
     }
     break;
@@ -5287,8 +5287,8 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             //memcpy_s(&s_Basic_Setting.reg.zone_name, 10, my_temp_point, 10);
             //my_temp_point = my_temp_point + 10; //算上这个  长度是 270
             s_Basic_Setting.reg.webview_json_flash = *(my_temp_point++);
-            
-            s_Basic_Setting.reg.max_var = *(my_temp_point++); 
+
+            s_Basic_Setting.reg.max_var = *(my_temp_point++);
             s_Basic_Setting.reg.max_in =  *(my_temp_point++);
             s_Basic_Setting.reg.max_out = *(my_temp_point++);
             s_Basic_Setting.reg.fix_com_config = *(my_temp_point++);
@@ -5321,8 +5321,8 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
             }
             bacnet_device_type = s_Basic_Setting.reg.mini_type;
 
-            
-            if (invoke_id == gsp_invoke) 
+
+            if (invoke_id == gsp_invoke)
             {
                 Sleep(1);
             }
@@ -5331,7 +5331,7 @@ int Bacnet_PrivateData_Deal(char * bacnet_apud_point, uint32_t len_value_type, b
                 memcpy(&Device_Basic_Setting, &s_Basic_Setting, sizeof(Str_Setting_Info));
                 if ((s_Basic_Setting.reg.panel_number!=0) && (s_Basic_Setting.reg.panel_number <=254))
                 {
-                    memcpy(&g_Device_Basic_Setting[s_Basic_Setting.reg.panel_number], &s_Basic_Setting, sizeof(Str_Setting_Info));         
+                    memcpy(&g_Device_Basic_Setting[s_Basic_Setting.reg.panel_number], &s_Basic_Setting, sizeof(Str_Setting_Info));
                 }
             }
 
@@ -5799,7 +5799,7 @@ int Bacnet_Write_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, u
                         send_status = false;
                         break;
                     }
-                   
+
                 } while (temp_invoke_id < 0);
 
                 if (send_status)
@@ -5968,7 +5968,7 @@ int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, ui
 //    }
 //}
 #ifdef read_prop_multi_function
-int Bacnet_Read_Property_MultipleValue(uint32_t deviceid, BACNET_READ_ACCESS_DATA* head) 
+int Bacnet_Read_Property_MultipleValue(uint32_t deviceid, BACNET_READ_ACCESS_DATA* head)
 {
     head = NULL;
     BACNET_READ_ACCESS_DATA* tail = NULL;
@@ -6042,9 +6042,9 @@ int Bacnet_Read_Property_MultipleValue(uint32_t deviceid, BACNET_READ_ACCESS_DAT
 
             // 解析属性值（以PROP_PRESENT_VALUE为例）
             BACNET_PROPERTY_REFERENCE* prop_ref = result_node->listOfProperties;  // 假设为属性值列表
-            if (prop_ref && prop_ref->propertyIdentifier == PROP_PRESENT_VALUE) 
+            if (prop_ref && prop_ref->propertyIdentifier == PROP_PRESENT_VALUE)
             {
-                if (prop_ref->value && prop_ref->value->tag == BACNET_APPLICATION_TAG_REAL) 
+                if (prop_ref->value && prop_ref->value->tag == BACNET_APPLICATION_TAG_REAL)
                 {
                     float value = prop_ref->value->type.Real;
                     TRACE("objinstance:%d  Value: %.2f\n", result_node->object_instance, value);
@@ -6208,7 +6208,7 @@ int Bacnet_Read_Property_MultipleValue_Blocking(uint32_t deviceid, BACNET_READ_A
             return 1;
         }
     }
-    
+
     return -1;
 }
 #endif
@@ -6341,7 +6341,7 @@ int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_t
     //argv[4] = "8";
     /* decode the command line parameters */
     Target_Device_Object_Instance = strtol(argv[1], NULL, 0);
-    if (Target_Device_Object_Instance >= BACNET_MAX_INSTANCE) 
+    if (Target_Device_Object_Instance >= BACNET_MAX_INSTANCE)
     {
         fprintf(stderr, "device-instance=%u - it must be less than %u\r\n",
             Target_Device_Object_Instance, BACNET_MAX_INSTANCE);
@@ -6413,7 +6413,7 @@ int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_t
                 //    calloc(1, sizeof(BACNET_PROPERTY_REFERENCE));
                 rpm_property->next =
                  (BACNET_PROPERTY_REFERENCE *)calloc(1, sizeof(BACNET_PROPERTY_REFERENCE));
-                
+
                 rpm_property = rpm_property->next;
             }
             else {
@@ -6580,7 +6580,7 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
                     itrflag->invoke_id = temp_invoke_id;
                 }
                 else
-                {              
+                {
                     if (standard_bacnet_data.size() > 0)
                     {
 						itrflag = standard_bacnet_data.end() - 1;
@@ -6639,7 +6639,7 @@ int Bacnet_Read_Properties_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object
 
 
 }
-   
+
 
 
 void localhandler_read_property_ack(
@@ -6654,8 +6654,8 @@ void localhandler_read_property_ack(
     (void)src;
     (void)service_data;        /* we could use these... */
     len = rp_ack_decode_service_request(service_request, service_len, &data);
-    
-       
+
+
         if (service_data->segmented_message /*&& service_data->sequence_number < service_data->proposed_window_number*/)
         {
             vector<str_segmented_bacnet_rp_info>::iterator itr = segmented_bacnet_data.begin();
@@ -6669,7 +6669,7 @@ void localhandler_read_property_ack(
                     //(itr->property_id == data.object_property))
                     )
                 {
-                    
+
                     if (( service_data->sequence_number % service_data->proposed_window_number == 0) || !service_data->more_follows)
                     {
                         uint8_t* app_data = new uint8_t[service_len];
@@ -6705,16 +6705,16 @@ void localhandler_read_property_ack(
                             memcpy_s(arr, 475, itr->application_data[i], itr->application_data_len[i]);
                             for (int u = 0; u < itr->application_data_len[i]; u++)
                             {
-                                
+
                                 tempData.application_data[lengthCount] = itr->application_data[i][u];
                                 lengthCount++;
                             }
                            // lengthCount += itr->application_data_len[i];
                         }
-                        
+
                        // tempData.application_data = itr->application_data;
                         tempData.application_data_len = length;
-                       
+
                             rp_ack_print_data(&tempData);
                             Sleep(100);
                         itr->last_seq_no = service_data->sequence_number;
@@ -6732,8 +6732,8 @@ void localhandler_read_property_ack(
                         find_exsit = true;
                         break;
                     }
-                    else 
-                    { 
+                    else
+                    {
                         if (service_data->sequence_number > 0 && service_data->sequence_number > itr->last_seq_no  )
                         {
                             uint8_t* app_data = new uint8_t[service_len];
@@ -6753,11 +6753,11 @@ void localhandler_read_property_ack(
                             /*for (int u = 0; u < service_len; u++)
                             {
                                 itr->application_data[itr->application_data_len+(u+1)] = service_request[u];
-                            } 
+                            }
                             itr->application_data_len = itr->application_data_len + service_len;
                             */
                             itr->last_seq_no = service_data->sequence_number;
-                       
+
                         }
                     }
                     find_exsit = true;
@@ -6791,7 +6791,7 @@ void localhandler_read_property_ack(
                 int inv_id = Send_Segment_Ack(data.object_instance, service_data->invoke_id, service_data->sequence_number, service_data->proposed_window_number, 0);
                 segmentedCompleted = false;
             }
-           
+
         }
 
 
@@ -6809,7 +6809,7 @@ void localhandler_read_property_ack(
             bool openTagFound = false;
             for (int u = 0 ;u < data.application_data_len; u++)
             {
-               
+
                 uint8_t tempval = data.application_data[u];
                 if (IS_OPENING_TAG(tempval) && !openTagFound) {
                     openTagFound = true;
@@ -6838,7 +6838,7 @@ void localhandler_read_property_ack(
             {
 
                 uint8_t tempval = data.application_data[u];
-                
+
                     bacnet_string += std::to_string(tempval).c_str();
                     bacnet_string += ",";
             }
@@ -6866,7 +6866,7 @@ void localhandler_read_property_ack(
         }
 
 #endif
-            
+
                 vector<str_bacnet_rp_info>::iterator itr = standard_bacnet_data.begin();
                 vector<str_bacnet_rp_info>::iterator itrflag;
 
@@ -7030,7 +7030,7 @@ void local_handler_read_property_multiple_ack(
     uint8_t invoke_id;
     invoke_id = service_data->invoke_id;
    // rpm_data = (BACNET_READ_ACCESS_DATA *)calloc(1, sizeof(BACNET_READ_ACCESS_DATA));
-    //if (rpm_data) 
+    //if (rpm_data)
     {
         len =
             rpm_ack_decode_service_request(service_request, service_len,
@@ -7039,7 +7039,7 @@ void local_handler_read_property_multiple_ack(
 #if 1
     fprintf(stderr, "Received Read-Property-Multiple Ack!\n");
 #endif
-    if (len > 0) 
+    if (len > 0)
     {
 #ifdef read_prop_multi_function
         // 进入临界区（保护共享数据）
@@ -7058,15 +7058,15 @@ void local_handler_read_property_multiple_ack(
         LeaveCriticalSection(&g_sync_state.cs);
 #endif
 
-       /* while (rpm_data) 
+       /* while (rpm_data)
         {
             rpm_ack_print_data(rpm_data);
 #if 0
             rpm_property = rpm_data->listOfProperties;
-            while (rpm_property) 
+            while (rpm_property)
             {
                 value = rpm_property->value;
-                while (value) 
+                while (value)
                 {
                     old_value = value;
                     value = value->next;
@@ -7321,7 +7321,7 @@ void local_handler_conf_private_trans_ack(
     //if (each_end_flag)
     //    copy_data_to_ptrpanel(TYPE_ALL);
 
-    //if((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG)) 
+    //if((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG))
     //{
     //    SaveBacnetBinaryFile(g_selected_serialnumber);
     //}
@@ -7422,7 +7422,7 @@ void Inial_Product_Reglist_map()
     product_reglist_map.insert(map<int, CString>::value_type(PM_T36CT, _T("T3 Modules")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_MINIPANEL, _T("T3BBSeries")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3BBSeries")));
-    product_reglist_map.insert(map<int, CString>::value_type(PM_ESP32_T3_SERIES, _T("T3BBSeries")));  
+    product_reglist_map.insert(map<int, CString>::value_type(PM_ESP32_T3_SERIES, _T("T3BBSeries")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_PRESSURE, _T("Pressure")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_HUM_R, _T("CO2-R")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_T322AI, _T("T3 Modules")));
@@ -7445,7 +7445,7 @@ void Inial_Product_Reglist_map()
     product_reglist_map.insert(map<int, CString>::value_type(PM_TSTAT8_220V, _T("Tstat 5 I-6-7-8")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_T3_LC, _T("T3-LightController")));
     product_reglist_map.insert(map<int, CString>::value_type(PM_AFS, _T("AirFlow")));
-    
+
     product_reglist_map.insert(map<int, CString>::value_type(STM32_CO2_NET, _T("CO2-W+Ethernet")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_CO2_RS485, _T("CO2-W+Ethernet")));
     product_reglist_map.insert(map<int, CString>::value_type(STM32_HUM_NET, _T("STM32-hum-w")));
@@ -7460,7 +7460,7 @@ unsigned char product_input[255][20] = { 0 };
 //初始化 产品菜单状态 2019 04 10
 void Inial_Product_Menu_map()
 {
-    
+
     unsigned char default_menu[20] = { 1,1,1,0  ,0,0,1,1 ,1,0,0,0   ,0 ,1,1,1   ,0,0,0,0};
 
     for (int i = 0; i < 255; i++)
@@ -7470,8 +7470,8 @@ void Inial_Product_Menu_map()
         {
         //case STM32_CO2_NET:
         //case STM32_CO2_RS485:
-        //case STM32_HUM_NET:     
-        //case STM32_HUM_RS485:  
+        //case STM32_HUM_NET:
+        //case STM32_HUM_RS485:
         //case STM32_PRESSURE_NET:
         //case STM32_PRESSURE_RS485:
         //{
@@ -7656,7 +7656,7 @@ void Inial_Product_map()
 	product_map.insert(map<int, CString>::value_type(PM_MINIPANEL_ARM, _T("T3Controller")));
     product_map.insert(map<int, CString>::value_type(PM_ESP32_T3_SERIES, _T("T3Controller")));
     product_map.insert(map<int, CString>::value_type(PWM_TEMPERATURE_TRANSDUCER, _T("XDUCER")));
-    
+
 	product_map.insert(map<int,CString>::value_type(PM_PRESSURE,_T("Pressure Sensor")));
 	product_map.insert(map<int,CString>::value_type(PM_HUM_R,_T("HUM-R")));
 	product_map.insert(map<int,CString>::value_type(PM_T322AI,_T("T3-22I")));
@@ -7697,15 +7697,15 @@ void Inial_Product_map()
 
 CString GetProductName(int ModelID)
 {
-	 
+
 	return product_map[ModelID];
- 
+
 }
 
 
 CString Get_Table_Name(int SerialNo,CString Type ,int Row)
 {
-    
+
     CString Table_Name;
     CppSQLite3DB SqliteDBBuilding;
     SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
@@ -7718,10 +7718,10 @@ CString Get_Table_Name(int SerialNo,CString Type ,int Row)
         q = SqliteDBBuilding.execQuery((UTF8MBSTR)sql);
         if (!q.eof())//有表但是没有对应序列号的值
         {
-            
+
             while (!q.eof())
             {
-                 
+
 				Table_Name=q.getValuebyName(L"InOutName");
                 q.nextRow();
             }
@@ -7756,7 +7756,7 @@ SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
     }
     else
     {
-         
+
         sql.Format(_T("Insert into IONAME_CONFIG(InOutName,Type,Row,SerialNo) values('%s','%s','%d','%d')"),TableName.GetBuffer(),Type.GetBuffer(),Row,SerialNo);
          SqliteDBBuilding.execDML((UTF8MBSTR)sql);
     }
@@ -7989,13 +7989,13 @@ void LocalBacnetRejectHandler(BACNET_ADDRESS* src,uint8_t invoke_id,uint8_t reje
 
     standard_bacnet_data.clear();
     if(reject_reason== REJECT_REASON_UNRECOGNIZED_SERVICE && bacnetIpDataRead && !BACnet_abort_read_thread && bacnet_device_type == PM_THIRD_PARTY_DEVICE)
-         BACnet_abort_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL); 
-    
+         BACnet_abort_read_thread = CreateThread(NULL, NULL, Bacnet_Handle_Abort_Request, BacNet_hwd, NULL, NULL);
+
     tsm_free_invoke_id(invoke_id);
 }
 void LocalBacnetAbortHandler(BACNET_ADDRESS* src, uint8_t invoke_id, uint8_t abort_reason, bool server)
 {
-   
+
     standard_bacnet_data.clear();
    // if(abort_reason== BACNET_ABORT_REASON::MAX_BACNET_ABORT_REASON)
     if( !BACnet_abort_read_thread && bacnet_device_type == PM_THIRD_PARTY_DEVICE)
@@ -8040,7 +8040,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 
     int len = 0;
     uint32_t device_id = 0;
-    unsigned max_apdu = 0; 
+    unsigned max_apdu = 0;
     int segmentation = 0;
     uint16_t vendor_id = 0;
 
@@ -8104,7 +8104,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
             find_exsit = true;
         }
     }
-     
+
     if(!find_exsit)
     {
         m_bac_handle_Iam_data.push_back(temp_1);
@@ -8224,13 +8224,13 @@ bool Initial_bac(int comport,CString bind_local_ip, int n_baudrate)
 
         if(!port_bind_results)
             return false;
-		
+
 
         bip_set_socket(my_sokect);
         bip_set_port(htons(47808));
 
         static in_addr BIP_Broadcast_Address;
-        
+
         CString temp_ip;
         temp_ip = selected_product_Node.BuildingInfo.strIp;
         char cTemp_ip[255];
@@ -8408,7 +8408,7 @@ void Init_Service_Handlers(	void)
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_PRIVATE_TRANSFER,local_handler_conf_private_trans_ack);
     //apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,Read_Property_feed_back);
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY, localhandler_read_property_ack);
-    
+
     apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROP_MULTIPLE, local_handler_read_property_multiple_ack);
     apdu_set_reject_handler(LocalBacnetRejectHandler);
     apdu_set_abort_handler(LocalBacnetAbortHandler);
@@ -8797,7 +8797,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
         refresh_tree_status_immediately = true;
         return false;
     }
-    
+
     int nNetTimeout=3000;//1 second.
     WSADATA wsaData;
     WORD sockVersion = MAKEWORD(2, 2);
@@ -8815,7 +8815,7 @@ bool Open_bacnetSocket2(CString strIPAdress, unsigned short nPort,SOCKET &mysock
         mysocket = NULL;
     }
 
-    
+
 
 
     //	mysocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -9229,7 +9229,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	CString nip_address;
 	nip_address.Format(_T("%u.%u.%u.%u"),temp_data.reg.ip_address_1,temp_data.reg.ip_address_2,temp_data.reg.ip_address_3,temp_data.reg.ip_address_4);
 	CString nproduct_name = GetProductName(temp_data.reg.product_id);
-    if (temp_data.reg.product_id == PM_ESP32_T3_SERIES) // esp32 系列 需要具体查看子产品 
+    if (temp_data.reg.product_id == PM_ESP32_T3_SERIES) // esp32 系列 需要具体查看子产品
     {
         if (temp_data.reg.minitype == T3_AIRLAB)
         {
@@ -9298,7 +9298,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
     temp.subnet_baudrate = temp_data.reg.subnet_baudrate;
     temp.subnet_port = temp_data.reg.subnet_port;
     temp.minitype = temp_data.reg.minitype;
-    if (temp.nprotocol == MODBUS_RS485)   //通过64 命令回的 都属于网络的modbus tcp ，除非直接回 12 
+    if (temp.nprotocol == MODBUS_RS485)   //通过64 命令回的 都属于网络的modbus tcp ，除非直接回 12
         temp.nprotocol = MODBUS_TCPIP;
     char * temp_point = NULL;
     refresh_net_label_info temp_label;
@@ -9370,12 +9370,12 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		temp_info.product_id = temp_data.reg.product_id;
 		CTime temp_time_now = CTime::GetCurrentTime();
 		temp_info.first_time = temp_time_now.GetTime();
-	
+
 		bool find_ip_pid_match = false;
 		int temp_index = 0;
 		for (int x=0;x<g_isp_device_info.size();x++)
 		{
-			int ip_cmp_ret =	memcmp(g_isp_device_info.at(x).ipaddress,temp_info.ipaddress,4); 
+			int ip_cmp_ret =	memcmp(g_isp_device_info.at(x).ipaddress,temp_info.ipaddress,4);
 			if((temp_info.product_id == g_isp_device_info.at(x).product_id ) &&
 				(ip_cmp_ret == 0))
 			{
@@ -9386,7 +9386,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 		if(find_ip_pid_match)
 		{
-			if(( temp_info.first_time >  g_isp_device_info.at(temp_index).first_time  + 120 ) && 
+			if(( temp_info.first_time >  g_isp_device_info.at(temp_index).first_time  + 120 ) &&
 				(temp_info.first_time <  g_isp_device_info.at(temp_index).first_time  + 180))
 			{
 				g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
@@ -9464,7 +9464,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         }
 
     }
-    
+
 
 
 
@@ -9472,7 +9472,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 }
 
 
- 
+
 
 int GetHostAdaptersInfo(CString &IP_address_local)
 {
@@ -9559,7 +9559,7 @@ int GetHostAdaptersInfo(CString &IP_address_local)
 }
 
 
-void PrintAdapterInfo() 
+void PrintAdapterInfo()
 {
     ULONG flags = GAA_FLAG_INCLUDE_PREFIX;
     ULONG family = AF_UNSPEC; // AF_INET for IPv4, AF_INET6 for IPv6, AF_UNSPEC for both
@@ -9578,13 +9578,13 @@ void PrintAdapterInfo()
     }
 
     // Make a second call to GetAdaptersAddresses to get the actual data
-    if ((dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen)) == NO_ERROR) 
+    if ((dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen)) == NO_ERROR)
     {
         PIP_ADAPTER_ADDRESSES pCurrAddresses = pAddresses;
-        while (pCurrAddresses) 
+        while (pCurrAddresses)
         {
             // 判断网卡是否被禁用
-            if (pCurrAddresses->OperStatus == IfOperStatusDown) 
+            if (pCurrAddresses->OperStatus == IfOperStatusDown)
             {
                 pCurrAddresses = pCurrAddresses->Next;
                 continue;
@@ -9592,11 +9592,11 @@ void PrintAdapterInfo()
             }
 
             // 判断网卡是否正常连接
-            if (pCurrAddresses->OperStatus == IfOperStatusUp) 
+            if (pCurrAddresses->OperStatus == IfOperStatusUp)
             {
                 printf("Connection: Connected\n");
             }
-            else 
+            else
             {
                 pCurrAddresses = pCurrAddresses->Next;
                 continue;
@@ -9606,23 +9606,23 @@ void PrintAdapterInfo()
 
             // 获取 IP 地址和子网掩码
             PIP_ADAPTER_UNICAST_ADDRESS pUnicast = pCurrAddresses->FirstUnicastAddress;
-            while (pUnicast) 
+            while (pUnicast)
             {
                 char ipAddress[INET6_ADDRSTRLEN] = { 0 };
                 void* addrPtr = NULL;
 
-                if (pUnicast->Address.lpSockaddr->sa_family == AF_INET) 
+                if (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
                 { // IPv4
                     struct sockaddr_in* sa_in = (struct sockaddr_in*)pUnicast->Address.lpSockaddr;
                     addrPtr = &(sa_in->sin_addr);
                 }
-                else if (pUnicast->Address.lpSockaddr->sa_family == AF_INET6) 
+                else if (pUnicast->Address.lpSockaddr->sa_family == AF_INET6)
                 { // IPv6
                     struct sockaddr_in6* sa_in6 = (struct sockaddr_in6*)pUnicast->Address.lpSockaddr;
                     addrPtr = &(sa_in6->sin6_addr);
                 }
 
-                if (addrPtr) 
+                if (addrPtr)
                 {
                     inet_ntop(pUnicast->Address.lpSockaddr->sa_family, addrPtr, ipAddress, sizeof(ipAddress));
                     //TRACE("IP Address: %s\n", ipAddress);
@@ -9669,7 +9669,7 @@ void PrintAdapterInfo()
                         }
                         if(find_exsit == false)
 						{
-                            if (auto_local_ip == 0) 
+                            if (auto_local_ip == 0)
                             {
                                 if (local_ip_scan_address.CompareNoCase(Temp_Node.StrIP) == 0)
                                     g_Vector_Subnet.push_back(Temp_Node);
@@ -9769,7 +9769,7 @@ void GetIPMaskGetWay()
         free(pAdapterInfo);
 
     PrintAdapterInfo();
-    
+
 }
 
 
@@ -9906,7 +9906,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 
     fd_set fdSocket;
     BYTE buffer[512] = {0};
-    
+
     BYTE pSendBuf[1024];
     for (int index=0; index<g_Vector_Subnet.size(); index++)
     {
@@ -9977,7 +9977,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
             }
             unsigned int t1 = GetTickCount();//程序段开始前取得系统运行时间(ms);
             unsigned int t2;//程序段开始前取得系统运行时间(ms);
-            
+
             if(nSelRet > 0)
             {
                 ZeroMemory(buffer, 512);
@@ -9986,8 +9986,8 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                 do
                 {
                     nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
-                   
-                   
+
+
                     BYTE szIPAddr[4] = {0};
                     if(nRet > 0)
                     {
@@ -10347,7 +10347,7 @@ int GetDeviceCountTable(int device_serialnumber, int ntype, device_io_status &te
         {
             char collect_string[30];
             memset(collect_string, 0, 30);
-                   
+
             if(i == 0)
                 strcpy_s(collect_string, strlen("Outputs") + 1, "Outputs");
             else if(i == 1)
@@ -10394,7 +10394,7 @@ int GetDeviceCountTable(int device_serialnumber, int ntype, device_io_status &te
             CStringArray temp_array;
             SplitCStringA(temp_array, temp_value, _T("/"));
             if (temp_array.GetSize() == 2)
-            {    
+            {
                 temp_device_io_status.device_use[TREE_IN] = _wtoi(temp_array.GetAt(0));
                 temp_device_io_status.device_capacity[TREE_IN] = _wtoi(temp_array.GetAt(1));
             }
@@ -10593,7 +10593,7 @@ int CheckDeviceCountTable(int device_serialnumber, int objectinstance)
     return 1;
 }
 
-//杜帆Load 
+//杜帆Load
 int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 {
 
@@ -11226,7 +11226,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 						temp_buffer[x] = Str_to_Byte(temp_value);
 					}
 					memcpy(&m_analog_custmer_range.at(i),temp_buffer,sizeof(Str_table_point));
-				}			
+				}
 
 				for (int i=0; i<BAC_CUSTOMER_UNITS_COUNT; i++)
 				{
@@ -11351,7 +11351,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 
                 memcpy(&Device_Basic_Setting, cacl_panel, sizeof(Str_Setting_Info));
                 Device_Basic_Setting.reg.n_serial_number = temp_device_serial;
-                Device_Basic_Setting.reg.reset_default = 0; 
+                Device_Basic_Setting.reg.reset_default = 0;
                 //保持如下变量不写入Setting
                 memcpy(Device_Basic_Setting.reg.panel_name,temp_panel_name , 20);
                 Device_Basic_Setting.reg.object_instance = temp_object_instance;
@@ -11376,7 +11376,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
                         select_device_io_status.device_capacity[TREE_OUT] = m_product_iocount.at(i).output_count;
                         break;
                     }
- 
+
                 }
                 select_device_io_status.device_capacity[TREE_VAR] = BAC_VARIABLE_ITEM_COUNT;
                 select_device_io_status.device_capacity[TREE_PID] = BAC_PID_COUNT;
@@ -11410,7 +11410,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
                     if (m_Input_data.at(i).range != 0)
                     {
                         select_device_io_status.device_use[TREE_IN]++;
-                    }                  
+                    }
                 }
 
 
@@ -11667,7 +11667,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 				program_code_length[i] = 2000;
 			}
 
-			if(ntemp_version >= 6)	//第六版中新增的 prg 要读写 
+			if(ntemp_version >= 6)	//第六版中新增的 prg 要读写
 			{
 				for (int i=0; i<BAC_VARIABLE_CUS_UNIT_COUNT; i++)
 				{
@@ -11676,7 +11676,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 				}
 			}
 
-            if (ntemp_version >= 7)	//第7版中新增的 msv 要读写 
+            if (ntemp_version >= 7)	//第7版中新增的 msv 要读写
             {
                 for (int i = 0; i<BAC_MSV_COUNT; i++)
                 {
@@ -11685,7 +11685,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
                 }
             }
 
-            if (ntemp_version >= 8)	//第8版中新增的 schedule flag 要读写 
+            if (ntemp_version >= 8)	//第8版中新增的 schedule flag 要读写
             {
                 for (int i = 0; i<BAC_SCHEDULE_COUNT; i++)
                 {
@@ -11742,7 +11742,7 @@ int LoadBacnetBinaryFile(int write_to_device,LPCTSTR tem_read_path)
 				 ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
 			else if(Program_Window->IsWindowEnabled())
 				::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-				
+
 
         }
         UpdateDeviceCountTable(GetPrgSetting.reg.n_serial_number, BAC_READ_ALL_LIST, select_device_io_status);
@@ -11869,7 +11869,7 @@ int UpdateDeviceDataIntoAccessDB()
     monitor_bado.SetDBPath(g_building_devicedatabase);	//删除里面的临时数据;
     monitor_bado.OnInitADOConn();
     strSql.Format(_T("select * from Version"));
-   
+
 
     monitor_bado.m_pRecordset = monitor_bado.OpenRecordset(strSql);
     temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
@@ -12252,8 +12252,8 @@ void init_product_list()
     temp.cs_name = _T("Hub");
     temp.sub_pid = T3_HUB;
     m_product_iocount.push_back(temp);
-    
-    
+
+
 #if 0
     m_product_iocount.clear();
     CString AllData;
@@ -12823,7 +12823,7 @@ void SaveBacnetBinaryFile(CString &SaveConfigFilePath)
     //WriteDeviceDataIntoAccessDB(BAC_IN,g_selected_serialnumber);
 #endif // DEBUG
 
-   
+
 
     memset(pBuf, 0, 200000);
     pBuf[0] = 0x55;
@@ -13047,7 +13047,7 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 
 	memcpy(&Device_Basic_Setting.reg,temp_buffer,400); //Setting 的400个字节;
     temp_point = temp_buffer + 400;
-	//g_progress_persent = (i+1)*100 / 32;	
+	//g_progress_persent = (i+1)*100 / 32;
 	int total_count = BAC_OUTPUT_ITEM_COUNT + BAC_INPUT_ITEM_COUNT;
 	int resent_count = 0;
 	for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
@@ -13063,7 +13063,7 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 		if(Write_Multi_org_short(g_tstat_id,(unsigned short *)write_buffer,10000 + 23 * i , 23, 10)> 0)
 		{
 			resent_count ++ ;
-			g_progress_persent = (resent_count*100) / total_count;	
+			g_progress_persent = (resent_count*100) / total_count;
 		}
 		else
 		{
@@ -13090,7 +13090,7 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
 		if(Write_Multi_org_short(g_tstat_id,(unsigned short *)write_buffer,BAC_IN_START_REG + 23 * j , 23, 10)>0)
 		{
 			resent_count ++ ;
-			g_progress_persent = (resent_count*100) / total_count;	
+			g_progress_persent = (resent_count*100) / total_count;
 
 		}
 		else
@@ -13117,7 +13117,7 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
         for (int j = 0; j < 128; j++)
         {
             n_ret_1 = write_one(g_tstat_id, 9400 + j, write_buffer[j],6);
-            if (n_ret_1< 0) 
+            if (n_ret_1< 0)
             {
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, _T("Write data timeout!"));
                 AfxMessageBox(_T("Write data timeout!"));
@@ -13132,7 +13132,7 @@ int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
             Sleep(50);
         }
        // int n_ret_1 = Write_Multi_org_short(g_tstat_id, (unsigned short *)write_buffer, 9400, 64, 10);
- 
+
             temp_point = temp_point + 256;
 
     }
@@ -13287,11 +13287,11 @@ int SaveModbusConfigFile(CString &SaveConfigFilePath)
 		if(itemp < 0 )
 		{
 			read_result = false;
-			break; 
+			break;
 		}
 		else
 		{
-			g_progress_persent = (i+1)*100 / 32;	
+			g_progress_persent = (i+1)*100 / 32;
 		}
 		Sleep(100);
 	}
@@ -13374,7 +13374,7 @@ int SaveModbusConfigFile(CString &SaveConfigFilePath)
         temp_point = temp_save_modbus_update_buffer + 400;
 		for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
 		{
-            
+
             memcpy(temp_point, &m_Output_data.at(i), sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
             temp_point = temp_point + 23 * 2;
 			//memcpy(temp_update_buffer + 400 + i*(23*2), &m_Output_data.at(i),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
@@ -13513,7 +13513,7 @@ void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigne
 }
 
 
-//用来初始化bacnet 内存;
+// Used to initialize BACnet memory.
 void ClearBacnetData()
 {
     for (int i = 0; i<BAC_INPUT_ITEM_COUNT; i++)
@@ -13642,7 +13642,7 @@ bool Bacnet_Private_Device(unsigned short n_product_class_id)
          (n_product_class_id == PM_MINIPANEL)      ||
 		 (n_product_class_id == PM_MINIPANEL_ARM)  ||
          (n_product_class_id == PM_ESP32_T3_SERIES) ||
-         (n_product_class_id == PM_TSTAT10)       
+         (n_product_class_id == PM_TSTAT10)
 		)
     {
         return true;
@@ -14113,7 +14113,7 @@ void Save_Product_Value_Cache(CString &SaveFilePath)
     savefile.Close();
 //     LoadTstat_InputData();
 //     LoadTstat_OutputData();
-    
+
 }
 int Load_Product_Value_Cache(LPCTSTR tem_read_path)
 {
@@ -14449,7 +14449,7 @@ void LoadTstat_InputData()
         int nUnitValue = nValue;
 
         strTemp=analog_range_TSTAT6[nValue];
-        
+
         m_crange=nValue;
 
         m_tstat_input_data.at(i-1).Range.StrValue=strTemp;
@@ -15106,7 +15106,7 @@ void LoadTstat_OutputData()
 			CppSQLite3Table table;
 			CppSQLite3Query q;
 			SqliteDBT3000.open((UTF8MBSTR)g_strDatabasefilepath);
-            
+
             if (SqliteDBT3000.tableExists("Value_Range"))//有Version表
             {
                 CString sql;
@@ -15114,10 +15114,10 @@ void LoadTstat_OutputData()
                 q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
                 if (!q.eof())//有表但是没有对应序列号的值
                 {
-                   
+
                     while (!q.eof())
                     {
-                         
+
 						m_crange = q.getIntField("CRange");
                        q.nextRow();
                     }
@@ -15134,7 +15134,7 @@ void LoadTstat_OutputData()
                         strTemp=OUTPUT_RANGE45[nRange];
                     }
                 }
-                
+
             }
             else
             {
@@ -15196,8 +15196,8 @@ void LoadTstat_OutputData()
         else
         {
             ////comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
-			 
-				 
+
+
             int nValueTemp = 0;
             if (i == 1)
             {
@@ -15224,7 +15224,7 @@ void LoadTstat_OutputData()
                 if (product_register_value[254] & 0x10)
                     nValueTemp = product_register_value[259]; //348 //598
             }
-            
+
 			strTemp.Format(_T("%d%%"), nValueTemp);
 			m_tstat_output_data.at(i-1).Value.regAddress= MODBUS_PWM_OUT4;
 			m_tstat_output_data.at(i-1).Value.RegValue=nValueTemp;
@@ -15286,7 +15286,7 @@ void LoadTstat_OutputData()
              q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
             if (!q.eof())//有表但是没有对应序列号的值
             {
-                 
+
                 while (!q.eof())
                 {
                     m_crange= q.getIntField("CRange");
@@ -15305,7 +15305,7 @@ void LoadTstat_OutputData()
                     strTemp=OUTPUT_RANGE45[nRange];
                 }
             }
-             
+
         }
         else
         {
@@ -15408,7 +15408,7 @@ void LoadTstat_OutputData()
             q = SqliteDBT3000.execQuery((UTF8MBSTR)sql);
             if (!q.eof())//有表但是没有对应序列号的值
             {
-				 
+
 				while (!q.eof())
                 {
                     m_crange=q.getIntField("CRange");
@@ -15428,7 +15428,7 @@ void LoadTstat_OutputData()
                     strTemp=OUTPUT_RANGE45[nRange];
                 }
             }
-            
+
         }
         else
         {
@@ -16155,8 +16155,8 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
         while(ReadLineFromHexFile(hexfile, readbuffer))
         {
             nLineNum++;						//the line number that the wrong hex file;
-           
-          
+
+
             unsigned char get_hex[128]= {0};
             //get hex data,it is get from the line char
             //the number is (i-1)
@@ -16294,7 +16294,7 @@ int GetPictureBlockData_Blocking(uint32_t deviceid,int8_t nIndex, uint16_t ntota
 			//	Sleep(SEND_COMMAND_DELAY_TIME);
 		}
 		while (temp_invoke_id<0);
-	
+
 		if(send_status)
 		{
 			for (int i=0; i<300; i++)
@@ -16322,7 +16322,7 @@ Get Bacnet picture Private Data
 /************************************************************************/
 int GetPictureBlockData(uint32_t deviceid,int8_t nIndex, uint16_t ntotal_seg,uint16_t nseg_index)
 {
-	
+
 
 	uint8_t apdu[480] = { 0 };
 	uint8_t test_value[480] = { 0 };
@@ -16379,7 +16379,7 @@ int WriteBacnetPictureData(uint32_t deviceid,uint8_t index , unsigned short tran
 	unsigned short entitysize=0;
 	uint8_t apdu[480] = { 0 };
 	uint8_t test_value[480] = { 0 };
-	int private_data_len = 0;	
+	int private_data_len = 0;
 	BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
 	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
 	BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
@@ -16411,13 +16411,13 @@ int WriteBacnetPictureData(uint32_t deviceid,uint8_t index , unsigned short tran
 	memset(private_data_chunk.unused,0,14);
 	private_data_chunk.seg_index = transfer_packet;
 
-	Set_transfer_length(420); 
+	Set_transfer_length(420);
 	memcpy_s(SendBuffer,20 ,&private_data_chunk,20 );
 
 	memcpy_s(SendBuffer + 20,400,n_temp_point,400);
 
 
-	
+
 	if(debug_item_show == DEBUG_SHOW_WRITE_PIC_DATA_ONLY)
 	{
 		CString temp_char;
@@ -16444,7 +16444,7 @@ int WriteBacnetPictureData(uint32_t deviceid,uint8_t index , unsigned short tran
 
 	BACNET_ADDRESS dest = { 0 };
 	status = address_get_by_device(deviceid, &max_apdu, &dest);
-	if (status) 
+	if (status)
 	{
 		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
 	}
@@ -16453,7 +16453,7 @@ int WriteBacnetPictureData(uint32_t deviceid,uint8_t index , unsigned short tran
 
 BOOL ShowBacnetView(unsigned char product_type)
 {
-	if((product_type == PM_MINIPANEL) || 
+	if((product_type == PM_MINIPANEL) ||
         (product_type == PM_MINIPANEL_ARM) ||
         (product_type == PM_ESP32_T3_SERIES) ||
 		(product_type == PM_CM5)  ||
@@ -16711,11 +16711,11 @@ int ChangeModbusDB(unsigned int nserialnumber, int nmodbusid, LPCTSTR Dbpath)
     return 1;
 }
 
-int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bacnet 
+int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bacnet
                          unsigned char modbus_id,
                          unsigned short nreg_address,
                          unsigned short nreg_value,
-                         unsigned char sub_device,         // 如果是子设备  ，数据库中的协议 比较特殊;
+                         unsigned char sub_device,         // A sub-device uses a special protocol value in the database.
                          LPCTSTR Dbpath)
 {
 
@@ -16975,13 +16975,13 @@ void Time32toCString(unsigned long ntime, CString &outputtime,int nproduct_id)
         unsigned long  temp_time_long = ntime;
         TIME_ZONE_INFORMATION tzi;
 
-        
+
         if (Bacnet_Private_Device(nproduct_id))
         {
 #if 1
             //**********************************************************
             //2019 05 20 Fance 用于处理 电脑勾选了夏令时 引起的 T3 显示时间 与实际时间总是相差一小时的问题;
-            
+
             GetTimeZoneInformation(&tzi);
             computer_DaylightBias = tzi.DaylightBias * 60;
             //**********************************************************
@@ -17152,8 +17152,8 @@ int Get_Msv_Table_Name(int x)
 }
 
 
-//返回值   判断输出类型  是数字的还是模拟的 还是扩展的  
-int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获取输出状态
+//返回值   判断输出类型  是数字的还是模拟的 还是扩展的
+int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) // Read the output state.
 {
     //portindex 采用1为基址 ;
     int nret_type = 0;
@@ -17394,8 +17394,8 @@ int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex) //获�
     return nret_type;
 }
 
-//返回值 判断类型  是数字的还是模拟的 还是扩展的  
-int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n_digital_analog) //获取输出状态
+//返回值 判断类型  是数字的还是模拟的 还是扩展的
+int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n_digital_analog) // Read the output state.
 {
     //portindex 采用1为基址 ;
     int nret_type = 0;
@@ -17435,9 +17435,9 @@ int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n
                 nret_type = INPUT_VIRTUAL_PORT;
         }
         break;
-        case TINY_MINIPANEL:  
+        case TINY_MINIPANEL:
         case TINY_EX_MINIPANEL:
-        case MINIPANELARM_TB:  
+        case MINIPANELARM_TB:
         {
             if (portindex <= 8)
             {
@@ -17731,7 +17731,7 @@ void ReInital_Someof_Point()
     if (Device_Basic_Setting.reg.max_in > BAC_INPUT_ITEM_COUNT)
     {
         DYNAMIC_INPUT_ITEM_COUNT = Device_Basic_Setting.reg.max_in;
-        m_Input_data.clear();    
+        m_Input_data.clear();
         m_Input_data_instance.clear();
         for (int i = 0; i < DYNAMIC_INPUT_ITEM_COUNT; i++)
         {
@@ -17844,7 +17844,7 @@ void Initial_All_Point()
         memset(&temp_variable, 0, sizeof(temp_variable));
         sprintf((char*)temp_variable.description, "PVAR%d", i + 1);
         m_pvar_data.push_back(temp_variable);
-        
+
     }
 
     for (int i = 0; i < BAC_PROGRAM_ITEM_COUNT; i++)
@@ -17863,7 +17863,7 @@ void Initial_All_Point()
         memset(&temp_array, 0, sizeof(Str_array_point));
         m_Array_data.push_back(temp_array);
     }
-    
+
     for (int i = 0; i < BAC_SCHEDULE_COUNT; i++)
     {
         Str_weekly_routine_point temp_weekly = { 0 };
@@ -18045,7 +18045,7 @@ void VariableDataToString(Str_variable_point source_variable, Variable_CString* 
     ret_string->des = temp_des;
     if (source_variable.auto_manual == 0)
     {
-        ret_string->automanual = _T("Auto");       
+        ret_string->automanual = _T("Auto");
     }
     else
     {
@@ -18156,7 +18156,7 @@ void VariableDataToString(Str_variable_point source_variable, Variable_CString* 
         {
             if (read_msv_table)
                 ret_string->units = Custom_Msv_Range[source_variable.range - 101];
-        
+
             int get_name_ret = 0;
             CString cstemp_value2;
             float temp_float_value1;
@@ -18168,7 +18168,7 @@ void VariableDataToString(Str_variable_point source_variable, Variable_CString* 
         }
         else
         {
-            ret_string->units = Variable_Analog_Units_Array[0];          
+            ret_string->units = Variable_Analog_Units_Array[0];
             CString cstemp_value;
             float temp_float_value;
             temp_float_value = ((float)source_variable.value) / 1000;
@@ -18321,7 +18321,7 @@ void OutputDataToString(Str_out_point source_output, Output_CString* ret_string)
 
 }
 
-//Load all online prog into buffer 
+//Load all online prog into buffer
 int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npanel)
 {
         CString FilePath;
@@ -18339,7 +18339,7 @@ int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npane
         myfile.Read(pBuf, dwFileLen);     //MFC   CFile 类 很方便
         myfile.Close();
         if (dwFileLen == 2048) //正常的PROG文件大小都会比60000大,防止读取文件出错
-        {           
+        {
             return -3;
         }
         char* temp_buffer = pBuf;
@@ -18457,13 +18457,13 @@ int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npane
                 temp_point = temp_point + sizeof(Str_weekly_routine_point);
             }
 
-            
+
             for (int i = 0; i < BAC_HOLIDAY_COUNT; i++)
             {
                 memcpy(&g_Annual_data[npanel].at(i), temp_point, sizeof(Str_annual_routine_point));
                 temp_point = temp_point + sizeof(Str_annual_routine_point);
             }
-            
+
             for (int i = 0; i < BAC_MONITOR_COUNT; i++)
             {
                 memcpy(&g_monitor_data[npanel].at(i), temp_point, sizeof(Str_monitor_point));
@@ -18517,7 +18517,7 @@ int LoadAllOnlinePanelBacnetBinaryFile(LPCTSTR tem_read_path,unsigned char npane
                 temp_point = temp_point + sizeof(Str_schedual_time_flag);
             }
 #endif
-        
+
 
     return 1;
 }
@@ -18603,7 +18603,7 @@ int LoadPanelRange(unsigned char npanel)  //分离出每个panel的  range 标�
             WebView_Input_range[i].object_type = BAC_IN;
             WebView_Input_range[i].panel_id = npanel;
             WebView_Input_range[i].range_type = _T("Digital");
-            
+
             if (g_Input_data[npanel].at(i).range == 0)
             {
                 WebView_Input_range[i].Ranges.digital_range.range_name = Digital_Units_Array[0];
@@ -18680,12 +18680,12 @@ int LoadPanelRange(unsigned char npanel)  //分离出每个panel的  range 标�
 			}
 
 		}
-        
+
     }
 
 }
 
-int LoadOnlinePanelData(unsigned char npanel)  //从缓存prog文件中加载所有在线设备的数据;
+int LoadOnlinePanelData(unsigned char npanel)  // Load data for every online device from the cached program file.
 {
     int nret = -1;
     for (int i = 0; i < g_bacnet_panel_info.size(); i++)
@@ -18886,7 +18886,7 @@ void InputDataToString(Str_in_point source_input, Input_CString* ret_string)
     ret_string->des = temp_des;
     ret_string->filter = temp_filter;
     ret_string->range = temp_range;
-    //ret_string->type = 
+    //ret_string->type =
     ret_string->units = temp_units;
     ret_string->value = cstemp_value;
     ret_string->lable = temp_lable;;
@@ -18948,7 +18948,7 @@ bool ZipSingleItem(CString strUserDesZipFile, CString strsingleFilepath)
 
 #ifdef read_prop_multi_function
 // 初始化同步状态（程序启动时调用）
-void SyncReadState_Init(void) 
+void SyncReadState_Init(void)
 {
     // 初始化临界区
     InitializeCriticalSection(&g_sync_state.cs);
@@ -18967,7 +18967,7 @@ void SyncReadState_Init(void)
 }
 
 // 清理同步状态（程序退出时调用）
-void SyncReadState_Cleanup(void) 
+void SyncReadState_Cleanup(void)
 {
     // 释放临界区
     DeleteCriticalSection(&g_sync_state.cs);

@@ -1,4 +1,4 @@
-// BacnetAddRemoteDevice.cpp : ?????? (Implementation file)
+// BacnetAddRemoteDevice.cpp : Implementation file
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include "global_function.h"
 #include "MainFrm.h"
 #include "ScanDlg.h"
-// CBacnetAddRemoteDevice ????? (dialog box)
+// CBacnetAddRemoteDevice dialog
 
 vector <CString> local_ip_address;
 
@@ -41,19 +41,17 @@ void CBacnetAddRemoteDevice::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_STATIC_ADD_REMOTE4, m_static_addinfo4);
 }
 
-
 BEGIN_MESSAGE_MAP(CBacnetAddRemoteDevice, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_REMOTEDLG_SCAN, &CBacnetAddRemoteDevice::OnBnClickedButtonRemotedlgScan)
     ON_WM_TIMER()
 END_MESSAGE_MAP()
 
-
-// CBacnetAddRemoteDevice ??????????? (message handler)
+// CBacnetAddRemoteDevice message handlers
 
 HANDLE h_add_remote_thread = NULL;
 void CBacnetAddRemoteDevice::OnBnClickedButtonRemotedlgScan()
 {
-    // TODO: ??????????????????????
+    // TODO: Add your control notification handler code here
     // TODO: Add control notification handler code here
     BYTE address1, address2, address3, address4;
     //GetDlgItemText(IDC_COMBO_REMOTEDLG_LOCAL_IP, cs_local_ip);
@@ -73,7 +71,6 @@ void CBacnetAddRemoteDevice::OnBnClickedButtonRemotedlgScan()
     //    MessageBox(_T("Local Endpoint is not available!"));
     //    return;
     //}
-
 
     if (cs_remote_ip.CompareNoCase(_T("0.0.0.0")) == 0)
     {
@@ -104,8 +101,6 @@ void CBacnetAddRemoteDevice::OnBnClickedButtonRemotedlgScan()
 DWORD WINAPI CBacnetAddRemoteDevice::AddRemoteThreadPro(LPVOID lPvoid)
 {
     CBacnetAddRemoteDevice * mparent = (CBacnetAddRemoteDevice *)lPvoid;
-
-    
 
     ConnectToRemoteDevice(local_ip_address/*mparent->cs_local_ip*/, mparent->cs_remote_ip, mparent->m_bacnet_udp_port, mparent->m_modbus_tcp_port);
 
@@ -145,7 +140,6 @@ int Remote_Get_PanelName(unsigned char nmodbusid, unsigned char npid_type,CStrin
 
 int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/, LPCTSTR remote_ip, int udp_port, int tcp_port)
 {
-
     int main_device = 0;
     int sub_device = 0;
     for (int x = 0; x < nlocal_ip_address.size(); x++)
@@ -172,7 +166,6 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
             }
             Sleep(500);
         }
-
 
 #if 0
         if (ready_to_read_count == 0)
@@ -222,7 +215,6 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 static_info.Format(_T("Reading device %d name!"), i + 1);
                 nmultyRet = Read_Multi(g_tstat_id, &read_panel_name[0], panel_name_start_add, 8, 6);
 
-
                 if (nmultyRet >= 0)
                 {
                     for (int j = 0; j < 8; j++)
@@ -242,7 +234,6 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                     Sleep(500);
                     continue;
                 }*/
-
 
                 _Bac_Scan_results_Info temp_struct = { 0 };
                 temp_struct.serialnumber = ((unsigned char)read_data[3]) << 24 | ((unsigned char)read_data[2] << 16) | ((unsigned char)read_data[1]) << 8 | ((unsigned char)read_data[0]);
@@ -287,7 +278,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 {
                     strSql.Format(_T("Delete  From  ALL_NODE Where Serial_ID = '%d' "), temp_struct.serialnumber);
                     // If a duplicate is found, delete it first and then insert
-                    SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   //??????????????????????????
+                    SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   // If a duplicate is found, delete it and then insert.
                 }
 
                 if (IS_Temco_Product(read_data[7]))
@@ -325,7 +316,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 {
                     int fw_raw = read_data[5] * 10 + read_data[4];
                     str_fw_version.Format(_T("%.1f"), (float)fw_raw / 10.0f);
-                    /* Screen_Name = virtual^mini_type^  ¡ª use 0 = real device (1 = virtual). */
+                    /* Screen_Name = virtual^mini_type^  ï¿½ï¿½ use 0 = real device (1 = virtual). */
                     str_screen_name.Format(_T("0^%u^"), (unsigned)read_data[34]);
                     if (read_data[35] != 0)
                         str_hw_version.Format(_T("%u"), read_data[35]);
@@ -350,7 +341,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 static_info.Format(_T("Add device %d into database success!"), i + 1);
                 Sleep(1000);
                 // If it is a T3 device, also check whether other devices are connected below
-                if (Bacnet_Private_Device(temp_struct.product_type)) //?????T3 ????????????????õô;
+                if (Bacnet_Private_Device(temp_struct.product_type)) // For a T3, also check whether devices are attached below it.
                 {
                     int ret_cusunits = GetPrivateData_Blocking(g_mstp_deviceid, READ_REMOTE_DEVICE_DB, 0, 0, sizeof(Str_Remote_TstDB), 3);
                     if (ret_cusunits > 0)
@@ -407,7 +398,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                                         {
                                             strSql.Format(_T("Delete  From  ALL_NODE Where Serial_ID = '%d' "), sub_serial);
                                             // If a duplicate is found, delete it first and then insert
-                                            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   //??????????????????????????
+                                            SqliteDBBuilding.execDML((UTF8MBSTR)strSql);   // If a duplicate is found, delete it and then insert.
                                         }
 
                                         CString cs_temp_name;
@@ -439,7 +430,6 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                         }
                     }
                 }
-
             }
             else
             {
@@ -470,14 +460,13 @@ BOOL CBacnetAddRemoteDevice::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  ???????????????
+    // TODO: Add extra initialization here
     // TODO: Add additional initialization here
     InitialStatic();
     InitialUI();
     SetTimer(1, 200, NULL);
     return TRUE;  // return TRUE unless you set the focus to a control
                   // Exception: OCX property pages should return FALSE
-                  // ??: OCX ?????????? FALSE
 }
 
 void CBacnetAddRemoteDevice::InitialStatic()
@@ -534,21 +523,18 @@ void CBacnetAddRemoteDevice::InitialUI()
 
 BOOL CBacnetAddRemoteDevice::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: ??????????????/????????
+    // TODO: Add your specialized code here and/or call the base class
     // TODO: Add custom code and/or call the base class here
     return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-
-
 void CBacnetAddRemoteDevice::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: ??????????????????????/?????????
+    // TODO: Add your message handler code here and/or call the default handler
     // TODO: Add message handler code and/or call the default implementation here
     static int addinfo_count = 1;
     if (Compare_CS.CompareNoCase(static_info) == 0)
     {
-
         m_static_addinfo1.SetWindowTextW(static_info1);
         m_static_addinfo2.SetWindowTextW(static_info2);
         m_static_addinfo3.SetWindowTextW(static_info3);
@@ -571,8 +557,6 @@ void CBacnetAddRemoteDevice::OnTimer(UINT_PTR nIDEvent)
         static_info4 = static_info;
 
         Compare_CS = static_info;
-
-
 
         m_static_addinfo1.SetWindowTextW(static_info1);
         m_static_addinfo2.SetWindowTextW(static_info2);

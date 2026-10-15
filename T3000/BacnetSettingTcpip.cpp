@@ -1,5 +1,4 @@
 // BacnetSettingTcpip.cpp : Implementation file
-// BacnetSettingTcpip.cpp : ??????
 //
 
 #include "stdafx.h"
@@ -17,7 +16,7 @@
 #include "CMqttConfig.h"
 #include "CSnmpConfig.h"
 // CBacnetSettingTcpip dialog box
-// CBacnetSettingTcpip ?????
+// CBacnetSettingTcpip dialog
 
 IMPLEMENT_DYNAMIC(CBacnetSettingTcpip, CDialogEx)
 
@@ -38,7 +37,6 @@ void CBacnetSettingTcpip::DoDataExchange(CDataExchange* pDX)
 
 	CDialogEx::DoDataExchange(pDX);
 }
-
 
 BEGIN_MESSAGE_MAP(CBacnetSettingTcpip, CDialogEx)
     ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM0, &CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom)
@@ -70,9 +68,6 @@ BEGIN_MESSAGE_MAP(CBacnetSettingTcpip, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_SNMP_CONFIG, &CBacnetSettingTcpip::OnBnClickedButtonSnmpConfig)
 END_MESSAGE_MAP()
 
-
-
-
 LRESULT  CBacnetSettingTcpip::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 {
     _MessageInvokeIDInfo *pInvoke = (_MessageInvokeIDInfo *)lParam;
@@ -89,9 +84,9 @@ LRESULT  CBacnetSettingTcpip::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam
     else
     {
         // Restore values that were not changed correctly
-        //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//?????��????
+        //memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));// Restore the value that was not changed correctly
         // Call refresh thread here to re-refresh, which is more convenient
-        PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//??????? ???????????????????;
+        PostMessage(WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);// Calling the refresh thread here makes a full refresh easier.
         Show_Results = temp_cs + _T("Fail!");
         SetPaneString(BAC_SHOW_MISSION_RESULTS, Show_Results);
 
@@ -103,8 +98,7 @@ LRESULT  CBacnetSettingTcpip::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam
 }
 
 
-// CBacnetSettingTcpip ???????????
-
+// CBacnetSettingTcpip message handlers
 
 void CBacnetSettingTcpip::OnBnClickedBtnBacIPAuto()
 {
@@ -118,7 +112,7 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPAuto()
     temp_task_info.Format(_T("IP address has been changed! \r\nRebooting now! Please wait."));
     if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
     {
-        //???????????;
+        // Change failed; restore the previous value.
         Device_Basic_Setting.reg.tcp_type = temp_data;
         if (Device_Basic_Setting.reg.tcp_type == 0)
         {
@@ -136,7 +130,7 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPAuto()
     }
     else
     {
-        //??????
+        // Change succeeded
         ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
         ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
         ((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
@@ -180,12 +174,12 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPChange()
     strIP.Format(_T("%u.%u.%u.%u"), address1, address2, address3, address4);
     CPing p1;
     CPingReply pr1;
-    //????????????????????? ????��??????ping???.
+    // If only the gateway or subnet mask is being changed, do not test whether it can be pinged.
     if (address1 != Device_Basic_Setting.reg.ip_addr[0] || address2 != Device_Basic_Setting.reg.ip_addr[1] || address3 != Device_Basic_Setting.reg.ip_addr[2] || address4 != Device_Basic_Setting.reg.ip_addr[3])
     {
         if (p1.Ping1((LPCTSTR)strIP, pr1))
         {
-            //???ping ????????????IP???????????????????;
+            // If the ping succeeds, the IP address being set already exists and is in use.
 
             MessageBox(_T("This IP address has been occupied"), _T("Warning"));
             return;
@@ -206,12 +200,12 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPChange()
     Device_Basic_Setting.reg.gate_addr[1] = gatway2;
     Device_Basic_Setting.reg.gate_addr[2] = gatway3;
     Device_Basic_Setting.reg.gate_addr[3] = gatway4;
-    bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->GetCheck(); //????1???????0???????;
+    bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->GetCheck(); // Returns 1 when selected and 0 when not selected.
     if (isstatic == true)
         Device_Basic_Setting.reg.tcp_type = 0;
     else
         Device_Basic_Setting.reg.tcp_type = 1;
-    if (g_protocol == MODBUS_RS485)  //  ????Modbus 485 ??��??
+    if (g_protocol == MODBUS_RS485)  // When the protocol is Modbus 485.
     {
         int test_value1 = 0;
         int test_value2 = 0;
@@ -247,7 +241,7 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPChange()
 
     if (ip_change_flag)
     {
-        //??Ip ??????? ?????????;
+        // After the IP change succeeds, update the database.
         m_tcp_type = Device_Basic_Setting.reg.tcp_type;
         CString strnewipadress;
         strnewipadress.Format(_T("%u.%u.%u.%u"), address1, address2, address3, address4);
@@ -313,7 +307,7 @@ void CBacnetSettingTcpip::OnBnClickedBtnBacIPChange()
 
 BOOL CBacnetSettingTcpip::PreTranslateMessage(MSG* pMsg)
 {
-    // TODO: ??????????????/????????
+    // TODO: Add your specialized code here and/or call the base class
     if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
     {
         return 1;
@@ -325,7 +319,7 @@ BOOL CBacnetSettingTcpip::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetSettingTcpip::OnBnClickedButtonWifiConfiguration()
 {
-    // TODO: ??????????????????????
+    // TODO: Add your control notification handler code here
 
         CWifiConfigDlg dlg;
         dlg.SetUI_Type(UI_TYPE_WIFI_REV2);
@@ -353,7 +347,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
     {
         if (temp_string.CompareNoCase(Device_Serial_Port_Status[i]) == 0)
         {
-            //if (i == MAIN_MSTP)   //???? 1 ? MSTP Slave     9? MSTP Master   ?????????MSTP
+            //if (i == MAIN_MSTP)   // Originally 1 was MSTP slave and 9 was MSTP master. All are now treated as MSTP.
             //    i = MSTP_MASTER;
             if (g_selected_product_id != PM_TSTAT10)
             {
@@ -362,7 +356,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
                     if ((Device_Basic_Setting.reg.com2_config == BACNET_MSTP) ||
                         (Device_Basic_Setting.reg.com2_config == MSTP_MASTER))
                     {
-                        //???????mstp ???????????????? ??;
+                        // To configure a port as MSTP, the other ports must be set to none.
                         MessageBox(_T("With the current version of firmware , only one Bacnet MSTP subnet is supported, please select MSTP on only ONE of the RS485 ports"), _T("Message"));
                         ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
                         return;
@@ -386,7 +380,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
             break;
         }
     }
-    if (temp_com0_data == Device_Basic_Setting.reg.com0_config)  // ????��???????;
+    if (temp_com0_data == Device_Basic_Setting.reg.com0_config)  // Exit when nothing has changed.
         return;
 
     if ((g_protocol == MODBUS_RS485) ||
@@ -411,11 +405,11 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
         }
         if (g_selected_product_id == PM_TSTAT10)
         {
-            //???? TSTAT10 ???  ???? ��????? ??????��;
-            if (modbus_0_bacnet_1 == 1) //?????????mstp��??
-                Device_Basic_Setting.reg.com0_config = 1;  //1 ??TSTAT10 ??mstp��??;
+            // TSTAT10 also needs a restart after the protocol change before it takes effect.
+            if (modbus_0_bacnet_1 == 1) // When changing to the MSTP protocol.
+                Device_Basic_Setting.reg.com0_config = 1;  // 1 is the TSTAT10 MSTP protocol.
             else
-                Device_Basic_Setting.reg.com0_config = 2;  //2 ??TSTAT10??modbus��??
+                Device_Basic_Setting.reg.com0_config = 2;  // 2 is the TSTAT10 Modbus protocol.
 
         }
         else if (g_selected_product_id == PM_ESP32_T3_SERIES)
@@ -423,7 +417,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingSubCom()
             reg_address = 19;
         }
         ChangeDeviceProtocol(modbus_0_bacnet_1, Device_Basic_Setting.reg.modbus_id, reg_address, Device_Basic_Setting.reg.com0_config, 0, g_strCurBuildingDatabasefilePath);
-        
+
         return;
     }
     Device_Basic_Setting.reg.reset_default = 150;
@@ -474,13 +468,13 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
     {
         if (temp_string.CompareNoCase(Device_Serial_Port_Status[i]) == 0)
         {
-            //if (i == MAIN_MSTP)   //???? 1 ? MSTP Slave     9? MSTP Master   ?????????MSTP
+            //if (i == MAIN_MSTP)   // Originally 1 was MSTP slave and 9 was MSTP master. All are now treated as MSTP.
             //   i = MSTP_MASTER;
             if ((i == MSTP_MASTER) || (i == BACNET_MSTP))
             {
                 if ((Device_Basic_Setting.reg.com0_config == MSTP_MASTER) || (Device_Basic_Setting.reg.com0_config == BACNET_MSTP))
                 {
-                    //???????mstp ???????????????? ??;
+                    // To configure a port as MSTP, the other ports must be set to none.
                     MessageBox(_T("With the current version of firmware , only one Bacnet MSTP subnet is supported, please select MSTP on only ONE of the RS485 ports"), _T("Message"));
                     ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);
                     return;
@@ -502,7 +496,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
         }
     }
 
-    if (temp_main_value == Device_Basic_Setting.reg.com2_config)  // ????��???????;
+    if (temp_main_value == Device_Basic_Setting.reg.com2_config)  // Exit when nothing has changed.
         return;
 
     if ((g_protocol == MODBUS_RS485) ||
@@ -527,11 +521,11 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
         }
         //if (g_selected_product_id == PM_TSTAT10)
         //{
-        //    //???? TSTAT10 ???  ???? ��????? ??????��;
-        //    if (modbus_0_bacnet_1 == 1) //?????????mstp��??
-        //        Device_Basic_Setting.reg.com0_config = 1;  //1 ??TSTAT10 ??mstp��??;
+        //    // TSTAT10 also needs a restart after the protocol change before it takes effect.
+        // if (modbus_0_bacnet_1 == 1) // When changing to the MSTP protocol.
+        // Device_Basic_Setting.reg.com0_config = 1; // 1 is the TSTAT10 MSTP protocol.
         //    else
-        //        Device_Basic_Setting.reg.com0_config = 2;  //2 ??TSTAT10??modbus��??
+        // Device_Basic_Setting.reg.com0_config = 2; // 2 is the TSTAT10 Modbus protocol.
 
         //}
         if (g_selected_product_id == PM_ESP32_T3_SERIES)
@@ -544,7 +538,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingMainCom()
     }
 
 
-#if 0    //???????     ???????????????? ?? ??  ????? Asix ??;
+#if 0    // Temporarily disabled. After customers have upgraded many times, block further ASIX changes.
     if (Device_Basic_Setting.reg.panel_type == PM_MINIPANEL)
     {
         if ((Device_Basic_Setting.reg.com2_config == 1) ||
@@ -654,7 +648,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboBacnetSettingBaudrate2()
 
 void CBacnetSettingTcpip::OnEnKillfocusEditSettingZeigbeePanid()
 {
-    // TODO: ??????????????????????
+    // TODO: Add your control notification handler code here
 
     CString temp_cstring;
     ((CEdit *)GetDlgItem(IDC_EDIT_SETTING_ZEIGBEE_PANID))->GetWindowTextW(temp_cstring);
@@ -665,7 +659,7 @@ void CBacnetSettingTcpip::OnEnKillfocusEditSettingZeigbeePanid()
         temp_warning.Format(_T("Do you really want to change the zigbee pan ID to %u ?"), temp_panid);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned short old_panid = Device_Basic_Setting.reg.zigbee_panid;	//��?????????????��??? ?????;
+            unsigned short old_panid = Device_Basic_Setting.reg.zigbee_panid;	// Save the value before writing. Restore it if the write fails.
             Device_Basic_Setting.reg.zigbee_panid = (unsigned short)temp_panid;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -699,23 +693,23 @@ void CBacnetSettingTcpip::OnBnClickedRadioUsbHost()
 
 void CBacnetSettingTcpip::OnBnClickedButtonHealth()
 {
-    
+
 #if 0
     ShutDownMstpGlobal(5);
     return;
     CString temp_cs1;
 
-	int ret_index1 = Post_Background_Read_Message_ByPanel(199, READINPUT_T3000, 8);  //send message to background ??read 199IN3
+	int ret_index1 = Post_Background_Read_Message_ByPanel(199, READINPUT_T3000, 8);  // Send a message to the background task to read 199 IN3
 
     CString temp_cs2;
-    int ret_index2 = Post_Background_Read_Message_ByPanel(199, READOUTPUT_T3000, 40);  //send message to background ??read 199IN3
+    int ret_index2 = Post_Background_Read_Message_ByPanel(199, READOUTPUT_T3000, 40);  // Send a message to the background task to read 199 IN3
 
-	
+
     CString temp_cs3;
-    int ret_index3 = Post_Background_Read_Message_ByPanel(11, READINPUT_T3000, 8);  //send message to background ??read 199IN3
+    int ret_index3 = Post_Background_Read_Message_ByPanel(11, READINPUT_T3000, 8);  // Send a message to the background task to read 199 IN3
 
     CString temp_cs4;
-    int ret_index4 = Post_Background_Read_Message_ByPanel(11, READOUTPUT_T3000, 40);  //send message to background ??read 199IN3
+    int ret_index4 = Post_Background_Read_Message_ByPanel(11, READOUTPUT_T3000, 40);  // Send a message to the background task to read 199 IN3
 
     if (ret_index1 >= 0)
     {
@@ -741,7 +735,7 @@ void CBacnetSettingTcpip::OnBnClickedButtonHealth()
 
     if (ret_index4 >= 0)
     {
-        
+
         temp_cs4.Format(_T("11OUT%d %.3f\r\n"), m_backbround_data.at(ret_index4).str_info.npoint_number + 1, m_backbround_data.at(ret_index4).ret_data.m_group_output_data.value / 1000.000);
         DFTrace(temp_cs4);
         //AfxMessageBox(temp_cs4);
@@ -786,7 +780,7 @@ void CBacnetSettingTcpip::OnBnClickedCheckSettingFixComm()
     Post_Write_Message(g_bac_instance, (int8_t)WRITE_SETTING_COMMAND, 0, 0, sizeof(Str_Setting_Info), this->m_hWnd, temp_task_info);
 
     Sleep(1000);
-    ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);//??????? ???????????????????;
+    ::PostMessage(m_setting_dlg_hwnd, WM_FRESH_SETTING_UI, READ_SETTING_COMMAND, NULL);// Calling the refresh thread here makes a full refresh easier.
 }
 
 
@@ -802,7 +796,7 @@ void CBacnetSettingTcpip::OnEnKillfocusEditSettingPort()
         temp_warning.Format(_T("Do you really want to change the modbus port to %u ?"), temp_port);
         if (IDYES == MessageBox(temp_warning, _T("Notice"), MB_YESNO))
         {
-            unsigned short old_port = Device_Basic_Setting.reg.modbus_port;	//��?????????????��??? ?????;
+            unsigned short old_port = Device_Basic_Setting.reg.modbus_port;	// Save the value before writing. Restore it if the write fails.
             Device_Basic_Setting.reg.modbus_port = (unsigned short)temp_port;
             if (Write_Private_Data_Blocking(WRITE_SETTING_COMMAND, 0, 0) <= 0)
             {
@@ -824,7 +818,7 @@ void CBacnetSettingTcpip::OnEnKillfocusEditSettingPort()
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboParityBit()
 {
-    // TODO: ??????????????????????
+    // TODO: Add your control notification handler code here
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_PARITY_BIT))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_PARITY_BIT))->GetLBText(nSel, temp_string);
@@ -844,7 +838,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboParityBit()
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboParityBit3()
 {
-    // TODO: ??????????????????????
+    // TODO: Add your control notification handler code here
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_PARITY_BIT3))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_PARITY_BIT3))->GetLBText(nSel, temp_string);
@@ -864,7 +858,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboParityBit3()
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboStopBit()
 {
-    // TODO: ??????????????????????
+    // TODO: Add your control notification handler code here
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_STOP_BIT))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_STOP_BIT))->GetLBText(nSel, temp_string);
@@ -884,7 +878,7 @@ void CBacnetSettingTcpip::OnCbnSelchangeComboStopBit()
 
 void CBacnetSettingTcpip::OnCbnSelchangeComboStopBit3()
 {
-    // TODO: ??????????????????????
+    // TODO: Add your control notification handler code here
     CString temp_string;
     int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_STOP_BIT3))->GetCurSel();
     ((CComboBox *)GetDlgItem(IDC_COMBO_STOP_BIT3))->GetLBText(nSel, temp_string);
@@ -917,7 +911,7 @@ BOOL CBacnetSettingTcpip::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pRe
             (nID == IDC_COMBO_STOP_BIT2) ||
             (nID == IDC_COMBO_STOP_BIT3))
         {
-            //  ???????????????Tooltips??????????????????
+            // This is the tooltip to display. Customize it as needed.
             CString strToolTips;
             strToolTips.Format(_T("Default parity bit : None.   Default stop bit : 1"));
             pTTT->lpszText = strToolTips.AllocSysString();
@@ -935,10 +929,10 @@ BOOL CBacnetSettingTcpip::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // TODO:  ???????????????
+    // TODO: Add extra initialization here
     EnableToolTips(TRUE);
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // ??: OCX ?????????? FALSE
+                  // Exception: OCX property pages should return FALSE
 }
 
 
@@ -946,7 +940,7 @@ BOOL CBacnetSettingTcpip::OnInitDialog()
 void CBacnetSettingTcpip::OnBnClickedButtonWireguardConfig()
 {
     //TSTAT11
-    // TODO: ??????????????????????
+    // TODO: Add your control notification handler code here
     int wireguard_product_id = g_selected_product_id;
     if (wireguard_product_id == 0)
         wireguard_product_id = Device_Basic_Setting.reg.panel_type;

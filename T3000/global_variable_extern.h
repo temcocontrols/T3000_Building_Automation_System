@@ -64,12 +64,12 @@ extern	volatile int g_tstat_id;
 extern int g_protocol_support_ptp ;
 extern int g_output_support_relinquish ;
 //extern unsigned short output_relinquish_value[128];
-extern  int g_mstp_deviceid; //??????????Device id ???? MSTP ?? - Used for global access to MSTP based on Device id.
+extern  int g_mstp_deviceid; // Used for global access to MSTP based on Device id.
 extern unsigned int g_serialNum;
 extern	BOOL g_tstat_id_changed;
 extern  BOOL g_bPauseMultiRead;     // for background read register
 extern  int now_tstat_id;//for batch load/flash read/write
-extern  CString selected_image_fordor; //???building????; - Selected building directory;
+extern  CString selected_image_fordor; // Selected building directory
 extern  CString g_strImagePathName;
 extern	CString	g_strDatabasefilepath;
 extern	CString g_strExePth;
@@ -79,10 +79,10 @@ extern  CString g_achive_folder_temp_db;
 extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
-extern CString g_ext_database_path ; //???????????????¡¤??; - Additional configuration database path;
-extern CString g_ext_mass_flash_path ; //???????§Õ  ????õô?? ???????¡¤?? - Save multiple flash configuration file path for selected devices
+extern CString g_ext_database_path ; // Additional configuration database path
+extern CString g_ext_mass_flash_path ; // Save multiple flash configuration file path for selected devices
 extern  CString g_achive_monitor_datatbase_path ;
-extern CString g_building_devicedatabase; //DeviceDatabase.mdb ?¡¤?? - DeviceDatabase.mdb full path
+extern CString g_building_devicedatabase; // DeviceDatabase.mdb full path
 extern BOOL g_mstp_flag;
 extern	BOOL g_Scanfully;
 extern	BOOL g_ScanSecurity;
@@ -91,7 +91,7 @@ extern	int g_nEndID;
 extern BOOL g_bCancelScan;
 extern int g_ScnnedNum;
 extern CString g_strScanInfoPrompt;
- 
+
 extern int gCommunicationType;
 extern CString g_strCurBuildingDatabasefilePath;
 extern CString m_str_curBuilding_Domain_IP;
@@ -693,30 +693,30 @@ extern int MODBUS_BUTTON_LEFT4                                 ;
 
 extern int MODBUS_HUM_HEATER_CONTROL_ENABLE;
 extern int MODBUS_HUM_INPUT_MANUAL_ENABLE;
-extern int MODBUS_HUM_INPUT_MANUAL_VALUE;                             
-extern int MODBUS_CO2_INPUT_MANUAL_ENABLE;                            
-extern int MODBUS_CO2_INPUT_VALUE    ;                                
-extern int MODBUS_CO2_CALIBRATION_DATA   ;                           
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN       ;                  
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1   ;                      
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2  ;                       
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3   ;                      
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1  ;                       
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2  ;                       
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3 ;                       
-extern int MODBUS_UNIVERSAL_OFF_VALVE_BEGIN ;                        
-extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL1;                          
-extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL2 ;                         
-extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL3   ;                       
-extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT1   ;                       
-extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT2   ;                       
-extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT3   ;                      
+extern int MODBUS_HUM_INPUT_MANUAL_VALUE;
+extern int MODBUS_CO2_INPUT_MANUAL_ENABLE;
+extern int MODBUS_CO2_INPUT_VALUE    ;
+extern int MODBUS_CO2_CALIBRATION_DATA   ;
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN       ;
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1   ;
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2  ;
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3   ;
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1  ;
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2  ;
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3 ;
+extern int MODBUS_UNIVERSAL_OFF_VALVE_BEGIN ;
+extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL1;
+extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL2 ;
+extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL3   ;
+extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT1   ;
+extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT2   ;
+extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT3   ;
 
-extern int MODBUS_VALUE_SENSOR        ;                             
-extern int MODBUS_PIR_SELECT_ENABLE      ;                           
-extern int MODBUS_PIR_REAL_VALUE    ;                                 
-extern int MODBUS_PIR_OCCUPIED      ;                                 
-                            
+extern int MODBUS_VALUE_SENSOR        ;
+extern int MODBUS_PIR_SELECT_ENABLE      ;
+extern int MODBUS_PIR_REAL_VALUE    ;
+extern int MODBUS_PIR_OCCUPIED      ;
+
 
 
 extern int MODBUS_HEATING_PID                                  ;
@@ -851,7 +851,7 @@ extern int MODBUS_WINDOW_COOLING_SETPOINT                      ;
 extern int MODBUS_RELAY_PWM_ENABLE                             ;
 extern int MODBUS_RELAY_PWM_TOTAL_DUTY                         ;
 extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;
-   
+
 extern	int	MODBUS_SUPPLY_SETPOINT	;
 extern	int	MODBUS_MAX_SUPPLY_SETPOINT	;
 extern	int	MODBUS_MIN_SUPPLY_SETPOINT	;
@@ -913,19 +913,19 @@ extern int selected_product_index;
 extern HTREEITEM selected_tree_item;
 #pragma region For_bacnet
 
-extern CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//???? ???? ????????? ??¦Ë; - Used to save customer-defined units;
+extern CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		// Used to save customer-defined units
 extern CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
 //Custom forward logic or reverse logic;
-//extern int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //??????  ?????????????????;
+// extern int     cus_direction[BAC_CUSTOMER_UNITS_COUNT]; // Custom direction: forward logic or reverse logic.
 extern CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 extern CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
 //If this device hasn't read customer unit item, need to try to read it, older versions don't have it;
-extern bool read_customer_unit;	//???????õô??§Ø??? customer unit?????,?????????????????·Ú?????;
+extern bool read_customer_unit;	// If this device has never read the customer-unit item, try to read it. Older firmware did not have it.
 //When reply received, flag is set to true;
-extern bool receive_custom_unit; //????????flag???? true;
-extern bool read_analog_customer_unit;  // ?????????cus tabel ;
-extern bool read_msv_table; //MSV table 
-extern CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// ?›¥??????  ???????  AAA/BBB/CCC
+extern bool receive_custom_unit; // Set the flag true when a reply is received.
+extern bool read_analog_customer_unit;  // This is the simulated customer table.
+extern bool read_msv_table; //MSV table
+extern CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// Stores a customer multi-state, for example the display AAA/BBB/CCC.
 extern CString Analog_Custom_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 extern CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
 extern unsigned char bacnet_add_id[254];
@@ -971,7 +971,7 @@ extern bool bac_remote_point_read_results;
 extern bool bac_cm5_graphic;
 
 extern unsigned char  bac_gloab_panel;
-extern unsigned char g_thread_max_mac_id ; //?????¦Å????mstp mac ID
+extern unsigned char g_thread_max_mac_id ; // MSTP MAC ID the customer last clicked.
 extern int input_list_line;
 extern int output_list_line;
 extern int program_list_line ;
@@ -1023,8 +1023,8 @@ extern HWND      m_t3000_log_window ;
 extern HWND      m_msv_dlg_hwnd;
 extern Str_Setting_Info g_Device_Basic_Setting[256];
 extern Str_MISC g_Device_Misc_Data[256] ;
-extern vector < vector<Str_out_point> >			        g_Output_data; //???????panel output ???????;
-extern vector < vector<Str_in_point> >				    g_Input_data; //???????panel input ???????;
+extern vector < vector<Str_out_point> >			        g_Output_data; // Collection of outputs for every panel.
+extern vector < vector<Str_in_point> >				    g_Input_data; // Collection of inputs for every panel.
 extern vector < vector<Str_program_point> >		        g_Program_data;
 extern vector < vector<Str_variable_point> >		    g_Variable_data;
 extern vector < vector<Str_variable_point> >		    g_pvar_data;
@@ -1039,14 +1039,14 @@ extern vector < vector<Str_monitor_point> >             g_monitor_data;
 extern vector < vector<Str_TstatInfo_point> >           g_Tstat_data;
 extern vector < vector<Str_userlogin_point> >           g_user_login_data;
 extern vector < vector<Alarm_point> >				    g_alarmlog_data;
-extern vector < vector<Str_label_point> >			    g_graphic_label_data;//???????Label???????????õô????;
+extern vector < vector<Str_label_point> >			    g_graphic_label_data;// Label information inside a picture is stored on the device.
 extern vector < vector<Str_Units_element> >		        g_customer_unit_data;
 extern vector < vector<Str_table_point> >		        g_analog_custmer_range;
 extern vector < vector<Str_variable_uint_point> >       g_variable_analog_unite;
 extern vector < vector<Str_Extio_point> >			    g_extio_config_data;
 extern vector < vector<Str_MSV> >					    g_msv_data;
 extern byte	gp_DayState[256][8][ANNUAL_CODE_SIZE];
-extern byte	g_DayState[8][ANNUAL_CODE_SIZE]; 
+extern byte	g_DayState[8][ANNUAL_CODE_SIZE];
 
 
 extern Str_in_point s_Input_data[256];
@@ -1062,14 +1062,14 @@ extern Control_group_point s_screen_data[16];
 extern Str_monitor_point s_monitor_data[12];
 extern Str_t3_screen_Json s_json_screen_data;
 extern str_webview_logging_time g_logging_time[256];
-extern Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //????????panel json item ??? ??????;
-extern vector <_panel_info> g_bacnet_panel_info; //???? object instance ?? panel number ?????????
+extern Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; // Global cache of JSON item values from other panels.
+extern vector <_panel_info> g_bacnet_panel_info; // Container that maps an object instance to a panel number.
 extern vector <Str_out_point> m_Output_data;
-extern vector <Str_in_point>  m_Input_data;                             
+extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
 extern vector <Str_array_point> m_Array_data;
 extern vector <Str_variable_point>  m_Variable_data;
-extern vector <Str_variable_point>  m_pvar_data;			    
+extern vector <Str_variable_point>  m_pvar_data;
 extern vector <Str_weekly_routine_point> m_Weekly_data;
 extern vector <Str_annual_routine_point> m_Annual_data;
 extern vector <Str_schedual_time_point> m_Schedual_Time_data;
@@ -1083,7 +1083,7 @@ extern vector <_Graphic_Value_Info> m_graphic_refresh_data;
 extern vector <bacnet_standard_Info> m_standard_graphic_refresh_data;
 extern vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 extern vector <Alarm_point> m_alarmlog_data;
-extern bacnet_panel_object_info g_bac_panel[256]; //???????panel ?? object instance ??????;
+extern bacnet_panel_object_info g_bac_panel[256]; // Used to look up a panel from an object instance.
 extern vector <refresh_net_device> m_refresh_net_device_data;
 extern vector <refresh_subnet_device> m_refresh_subnet_status;
 extern vector <refresh_net_device> m_T3BB_device_data;
@@ -1104,11 +1104,11 @@ extern vector <GSM_connection_info> m_gsm_connect_info;
 extern vector <Scan_Info> m_scan_info;
 extern vector <Scan_Info> m_scan_info_buffer;
 extern vector <Client_Info> m_tcp_connect_info;
-extern vector <Str_label_point> m_graphic_label_data;	//???????Label???????????õô????;
-extern vector <Str_t3_screen_Json> m_json_screen_data;		extern	vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen???????????õô????;
-extern vector <Str_item_Json> m_json_item_data;			extern    vector < vector<Str_item_Json> >			  g_json_item_data;//item???????????õô????;
-extern vector <Str_remote_point> m_remote_point_data;  //Mini panel ????Tstat ????? ?;
-extern vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 ???setpoint????; ???????????????;
+extern vector <Str_label_point> m_graphic_label_data;	// Label information inside a picture is stored on the device.
+extern vector <Str_t3_screen_Json> m_json_screen_data;		extern	vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;// Screen information is stored on the device.
+extern vector <Str_item_Json> m_json_item_data;			extern    vector < vector<Str_item_Json> >			  g_json_item_data;// Item information is stored on the device.
+extern vector <Str_remote_point> m_remote_point_data;  // Values of remote Tstat points inside the mini panel.
+extern vector <Str_tstat_setpoint> Tstat_Setpoint_data;  // New Tstat8 setpoint table. The old one could no longer be changed.
 extern Str_Setting_Info s_Basic_Setting;
 extern Str_Setting_Info Device_Basic_Setting;
 extern Str_Email_point  Device_Email_Point;
@@ -1125,14 +1125,14 @@ extern char m_at_read_buf[450];
 
 extern Monitor_Block m_monitor_block;
 extern Str_Monitor_data_header m_monitor_head;
-extern char picture_data_buffer[400]; //????????? pic ??????.
-extern Str_picture_header m_picture_head; //?????? ??????????? monitor same.
+extern char picture_data_buffer[400]; // Stores the data of each picture packet.
+extern Str_picture_header m_picture_head; // Picture transfer header. The structure is the same as the monitor header.
 extern int Monitor_Input__Data[14][1000];
 extern unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
-extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//???2000;
+extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];// Temporarily set to 2000.
 extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 
-extern int controller_counter ; //???????????
+extern int controller_counter ; // Records scanned child nodes.
 extern CString bac_cs_mac;
 extern CString bac_cs_device_id;
 //extern CString bac_cs_vendor_id;
@@ -1144,8 +1144,8 @@ extern int g_protocol;
 //to flag ,call new ,old IDE
 extern int g_new_old_IDE;
 extern int g_bac_read_type;
-extern bool g_bac_need_read_setting;  //????????¦Å?? ?????Setting????? ????;?§Ø???????????Label????;
-extern HANDLE click_read_thread; 
+extern bool g_bac_need_read_setting;  // On the first click, read the Setting data and decide whether labels need to change.
+extern HANDLE click_read_thread;
 extern HANDLE BACnet_read_thread;
 extern HANDLE BACnet_abort_read_thread;
 extern bool bac_net_initial_once;
@@ -1158,34 +1158,34 @@ extern CDialog *Tcp_Server_Window;
 extern CString PrintText[1000];
 extern CString g_Print;
 extern HWND h_debug_window;
-extern unsigned long timesec1970; 
-extern unsigned long timestart;   
-extern bool range_cancel;//??????Range ????????????????????????????0????????1;
+extern unsigned long timesec1970;
+extern unsigned long timestart;
+extern bool range_cancel;// Tracks whether the Range dialog saved normally: 0 if it did, 1 otherwise.
 extern int connect_invoke_id ;
 //extern bool connect_replay ;
 extern BACNET_OBJECT_PROPERTY_VALUE receive_object_value;  /* for bacapp printing */
 extern bool bac_show_alarm_window ;	//used for judge whether need to show the alarm window.
-extern bool bac_select_device_online ; //?§Ø???§Ö?bacnet device ???????;
+extern bool bac_select_device_online ; // Checks whether the selected BACnet device is online.
 extern SOCKET h_Broad;
 extern SOCKADDR_IN h_siBind;
 extern SOCKADDR_IN h_bcast;
 
 extern vector <int> exsit_panel_number;
- 
+
 extern Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];
 extern Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
 extern Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];
 extern int analog_data_max_value[MAX_POINTS_IN_MONITOR];
 extern int analog_data_min_value[MAX_POINTS_IN_MONITOR];
-extern int digital_data_count[MAX_POINTS_IN_MONITOR];	//??????digital data ??????????????????;
+extern int digital_data_count[MAX_POINTS_IN_MONITOR];	// Records how much data the digital-data pointer holds.
 extern int analog_data_count[MAX_POINTS_IN_MONITOR];
 extern int get_data_count ;
-extern int monitor_analog_count ;	//???monitor ??????????????;
+extern int monitor_analog_count ;	// Temporarily holds the monitor analog and digital counts.
 extern int monitor_digital_count ;
 extern Data_Time_Match * temp_analog_data[MAX_POINTS_IN_MONITOR];
 extern int SEND_COMMAND_DELAY_TIME ;
 extern bool TCP_Server_Running ;
-extern bool Gsm_communication ;	//????????GSM ??????õô ?????????????;???????????;
+extern bool Gsm_communication ;	// Reading a remote device over GSM needs special handling in many places. Do not refresh too often.
 extern CString SaveConfigFilePath;
 extern CString LoadConfigFilePath;
 extern CString FinalSaveProgPath;
@@ -1198,7 +1198,7 @@ extern vector<Reg_Infor> g_Vector_Write_Error;
 extern CString g_strStartInterface_config;
 extern CString	g_configfile_path;
 extern bool need_read_bacnet_graphic_label_flag;
-extern bool read_write_bacnet_config ;	//??§ÕBacnet config ?????????? List;
+extern bool read_write_bacnet_config ;	// Do not refresh the list while reading or writing BACnet config.
 
 extern int g_SleepTimeForConfig;
 extern vector <Tstat_Input_Struct> m_tstat_input_data;
@@ -1238,7 +1238,7 @@ extern int current_building_ipport;
 
 extern int m_user_level;
 
-extern CString Statuspanel;   //?????????panel 2-3;
+extern CString Statuspanel;   // Show panels 2-3 on the status bar.
 
 extern CString CS3000_INPUT_RANGE[4];
 extern BOOL g_NEED_MULTI_READ;
@@ -1248,18 +1248,18 @@ extern vector <IspModeInfo> g_isp_device_info;
 extern IspModeInfo need_isp_device;
 extern vector<Registers_Infor> g_vectRegisters;
 extern CString g_cstring_ini_path;
-extern CString g_trendlog_ini_path; //??????§Ü?????????????????????????????;
+extern CString g_trendlog_ini_path; // One config file per serial number, so the config file does not grow too large.
 extern unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
 extern BOOL g_fresh_Graphic;
-extern bool b_stop_read_grp_label;		//??????????grp label ?????????????????;
-extern bool b_stop_read_tstat_schedule;	    //??????????tstat ?????????????????;
+extern bool b_stop_read_grp_label;		// Stop reading the next group when a group label is empty.
+extern bool b_stop_read_tstat_schedule;	    // Stop reading the next Tstat when an empty Tstat is read.
 
 extern Global_Calibration_Module   g_calibration_module_data;
  extern CDialog *g_Draw_dlg;
-extern unsigned int g_progress_persent ;	//????????????????????? ???? ????;
-extern int input_item_limit_count;	//input list ?????????input ??????? ???????vector ??size ???§Ø??§³;
-extern int output_item_limit_count;	//output list ?????????output ??????? ???????vector ??size ???§Ø??§³;
-extern int variable_item_limit_count;	//variable list ?????????variable ??????? ???????vector ??size ???§Ø??§³;
+extern unsigned int g_progress_persent ;	// Progress percent shown on the global status bar.
+extern int input_item_limit_count;	// Number of inputs to show. Do not use the vector size.
+extern int output_item_limit_count;	// Number of outputs to show. Do not use the vector size.
+extern int variable_item_limit_count;	// Number of variables to show. Do not use the vector size.
 extern int program_item_limit_count ;
 extern int controller_item_limit_count ;
 extern int screen_item_limit_count ;
@@ -1276,36 +1276,36 @@ extern Str_weekly_routine_point m_temp_weekly_data[BAC_SCHEDULE_COUNT];
 extern Str_annual_routine_point m_temp_annual_data[BAC_HOLIDAY_COUNT];
 extern Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
 extern Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
-extern int b_pause_refresh_tree; // ?????????????????????? ??????????????;
-extern int b_building_management_flag ;//????? ???????????yes????????????????;
+extern int b_pause_refresh_tree; // Global flag: whether the main thread refreshes network data.
+extern int b_building_management_flag ;// Another virtual-control mode. Yes stops background scan and refresh.
 extern int debug_item_show;
 
-extern char monitor_database_flag[24];   //????????§»Database???????? ??1 ????;
+extern char monitor_database_flag[24];   // Marks which database rows to delete. 1 means delete.
 extern int Station_NUM;
 extern bool monitor_ignore_enable ;
 extern int monitor_ignore_max_value ;
 extern int monitor_ignore_min_value ;
 extern int persent_array_count;
 extern	unsigned int old_tx_count;
-extern int flash_multi_auto ; //??????? ?????  ???????;
-extern unsigned int T3000_Version ; //T3000??·Ú??.
+extern int flash_multi_auto ; // Controls automatic operation of multi-device flashing.
+extern unsigned int T3000_Version ; // T3000 version number.
 extern HANDLE read_each_485_fun_thread ;
 extern bool hide_485_progress ;
 extern bool new_device_support_mini_ui;
 
-extern int flag_auto_scroll ; // ??????????????X????§»??? ?? ??????? 1;???????????????;
-extern int graphic_last_scale_type ; //????›¥??? ??§¹?? X??? ???;
-extern unsigned int graphic_last_time_value; //x????¦Â??????;
-extern int auto_local_ip ; //?????????????ip??????;
-extern CString local_ip_scan_address; //bind????ip???;
+extern int flag_auto_scroll ; // Set to 1 when the customer chooses specific X-axis events. Otherwise show the newest data.
+extern int graphic_last_scale_type ; // Stores the last valid X-axis scale.
+extern unsigned int graphic_last_time_value; // Time last viewed on the X axis.
+extern int auto_local_ip ; // Automatically scan using every local IP port.
+extern CString local_ip_scan_address; // Bind the local IP address.
 extern const CString c_strBaudate[NUMBER_BAUDRATE];
 #pragma endregion For_bacnet
 
-extern int global_interface; //???????????????????????? Input ?? output;
-extern bool b_remote_connection;  //???? ?????§Ø? ??????õô?? ??????;
-extern bool refresh_tree_status_immediately ;	//??????true?????????????? ??? ???????????????????? ?§»IP????????????????;
-extern unsigned int remote_connect_serial_number; // ???????????§Ü?;
-extern char ptpLoginName[30];	//????????????????;
+extern int global_interface; // Marks which global view is active, mainly Input or Output.
+extern bool b_remote_connection;  // Global flag for special handling of a remote device.
+extern bool refresh_tree_status_immediately ;	// When set true, refresh immediately instead of waiting for the next cycle. Used when an IP or status has just changed.
+extern unsigned int remote_connect_serial_number; // Serial number of the remote connection.
+extern char ptpLoginName[30];	// Account and password of the remote connection.
 extern char ptpLoginPassword[20];
 
 extern refresh_net_device device_same_panel_1;
@@ -1337,40 +1337,40 @@ extern COLORREF	  nDefaultclrTxt;
 extern int bacnet_view_number;
 extern int input_item_select_for_range;
 
-extern bitset<65536*3> read_analog_package;  //??????trendlog ??????????§»????
-extern bitset<65536*3> read_dig_package;     //??????trendlog ??????????§»?????
+extern bitset<65536*3> read_analog_package;  // Records which analog trend-log packets have been stored.
+extern bitset<65536*3> read_dig_package;     // Records which digital trend-log packets have been stored.
 extern unsigned char m_dialog_signal_type;
 extern int graphic_view_index ;
 extern CString grapgic_view_name[3];
 extern bool graphic_view_visible[14];
 extern CString bacnet_message_input_title;
-extern CString bacnet_message_return_string;  //??????????????
+extern CString bacnet_message_return_string;  // Input string that was received.
 extern pidname_map product_map;
 extern pid_reglist_map product_reglist_map;
-extern bool offline_mode ; //??????????§Ø?;
-extern CString offline_prg_path;   //????????prg ????¡¤??;
-extern bac_mstp_com g_mstp_com; // ???mstp com ?? ??????
+extern bool offline_mode ; // Global offline-mode flag.
+extern CString offline_prg_path;   // Path where the offline-mode program is saved.
+extern bac_mstp_com g_mstp_com; // Global MSTP COM-port connection state.
 extern bool custom_bacnet_register_listview;
-extern bool n_wifi_connection;  //????§Ò? ??????
-extern int MODE_SUPPORT_PTRANSFER; // 1 ???bip ptransfer 
+extern bool n_wifi_connection;  // Switch for background list refresh.
+extern int MODE_SUPPORT_PTRANSFER; // 1 means BIP private transfer is supported.
 extern bool initial_bip ;
-extern Str_modbus_reg bacnet_to_modbus_struct; //????bacnet §¿??????modbus §¿????
-extern vector <str_bacnet_rp_info> standard_bacnet_data; // ????bacnet ??? ??§Õ ???????;
+extern Str_modbus_reg bacnet_to_modbus_struct; // Structure used when converting BACnet to Modbus.
+extern vector <str_bacnet_rp_info> standard_bacnet_data; // Storage for standard BACnet read and write variables.
 extern vector <str_segmented_bacnet_rp_info> segmented_bacnet_data;
 extern panelname_map g_panelname_map;
-extern bacnet_instance_reg_map g_bacnet_reg_ins_map;  //???????????instance ??????????????????????????????;
+extern bacnet_instance_reg_map g_bacnet_reg_ins_map;  // Selects which two bytes store each instance. The handling differs by product.
 extern connect_Info system_connect_info;
-extern CString HolLable[BAC_HOLIDAY_COUNT]; //??????????List?§Ö???????
-extern int m_special_customer ;      //????????T3000??????;  // 1?CPR_Bestek
-extern CString cs_special_name;         //???????????;
-extern unsigned char n_ignore_sync_time;  //????????????;
-extern unsigned int last_ignore_sync_time;  //??¦Å????????????? ?????;  ????????3??????????;
-extern unsigned char check_revert_daxiaoduan; //??§³???????????????????·Ú??????;
-extern int n_read_product_type ; //?????????? ??? modbus§¿?? ???? bacnet????????? ??????§»?????;
-extern int n_read_list_flag ; // ???????????????Input ????Output
-extern int n_read_item_index ; // ??????? ????Schedule3 ????? ????????weekly_list ???????????????
-extern unsigned int DEBUG_DELAY_TIME ; //?????????Wifi ??????;
-extern CString bacnet_string; // ???????????
+extern CString HolLable[BAC_HOLIDAY_COUNT]; // Used to fill drop-down lists dynamically.
+extern int m_special_customer ;      // Customer-defined T3000 name. 1 means CPR_Bestek.
+extern CString cs_special_name;         // Name that should be changed to match.
+extern unsigned char n_ignore_sync_time;  // Whether time synchronization is ignored.
+extern unsigned int last_ignore_sync_time;  // Time when Ignore time sync was last clicked, for example to remind again after 3 days.
+extern unsigned char check_revert_daxiaoduan; // Whether endianness must be swapped. Normal old firmware does not swap.
+extern int n_read_product_type ; // These three variables select which registers Modbus reads for BACnet data.
+extern int n_read_list_flag ; // Which object to read, for example Input or Output.
+extern int n_read_item_index ; // Which item to read, for example the time of Schedule 3. Do not use weekly_list because the screen value changes easily.
+extern unsigned int DEBUG_DELAY_TIME ; // Wi-Fi delay used for test and debug.
+extern CString bacnet_string; // String waiting to be parsed.
 
 extern vector < FloorInfo> bm_floor;
 extern vector < RoomInfo> bm_room;
@@ -1384,15 +1384,15 @@ extern short gsp_invoke;
 extern int gsp_invoke_instance[256];
 extern device_io_status select_device_io_status;
 extern vector <Str_BM_IO> m_bm_io_data;
-extern vector <Str_product_io_count> m_product_iocount;  // ?????›¥????õô??????IO????;
-extern vector <Str_online_serialnumber> m_online_serial; //??????õô???????????
+extern vector <Str_product_io_count> m_product_iocount;  // Stores how many I/O points each device type has.
+extern vector <Str_online_serialnumber> m_online_serial; // Online devices, used for the dynamic menu.
 extern bool Bacnet_debug_fileRead;
 extern bool bacnetIpDataRead;
 
 extern unsigned int DYNAMIC_INPUT_ITEM_COUNT ;
 extern unsigned int DYNAMIC_OUTPUT_ITEM_COUNT ;
 extern unsigned int DYNAMIC_VARIABLE_ITEM_COUNT ;
-extern bool enable_trendlog_background_read ; //???????trendlog ??????????;
-extern bool enable_pvar ; // ???????66.4 ??eps ???????????
+extern bool enable_trendlog_background_read ; // Whether background trend-log reading is enabled.
+extern bool enable_pvar ; // Only ESP firmware above 66.4 has this feature.
 
 

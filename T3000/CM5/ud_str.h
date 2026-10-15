@@ -13,12 +13,12 @@
 
 //#define PRIVATE_MONITOR_HEAD_LENGTH 20
 #define PRIVATE_MONITOR_HEAD_LENGTH 26
-#ifndef ALARM_MESSAGE_SIZE 
+#ifndef ALARM_MESSAGE_SIZE
 	#define ALARM_MESSAGE_SIZE    58
 #endif
 typedef enum
 {
-	ENUM_OUT=0,ENUM_IN, ENUM_VAR, ENUM_CON, ENUM_WRT, ENUM_AR, ENUM_PRG, ENUM_TBL, ENUM_TZ, 
+	ENUM_OUT=0,ENUM_IN, ENUM_VAR, ENUM_CON, ENUM_WRT, ENUM_AR, ENUM_PRG, ENUM_TBL, ENUM_TZ,
 	ENUM_AMON, ENUM_GRP, ENUM_ARRAY, ENUM_ALARMM,ENUM_UNIT, ENUM_USER_NAME, ENUM_ALARM_SET, ENUM_WR_TIME, ENUM_AR_DATA
 }Point_type_equate;
 //#if 0
@@ -37,7 +37,7 @@ enum
 	INPUT_SHORT
 };
 
-typedef enum { 
+typedef enum {
 		 READOUTPUT_T3000          = ENUM_OUT+1,  /* read outputs */
 		 READINPUT_T3000           = ENUM_IN+1,   /* read inputs  */
 		 READVARIABLE_T3000        = ENUM_VAR+1,        /* read variables*/
@@ -51,7 +51,7 @@ typedef enum {
 		 READSCREEN_T3000          = ENUM_GRP+1,        /* read screens        */
 		 READARRAY_T3000           = ENUM_ARRAY+1,      /* read arrays         */
 		 READALARM_T3000		   = ENUM_ALARMM + 1, /* read alarm */
-		 READUNIT_T3000			   = 14,			
+		 READUNIT_T3000			   = 14,
 		 READUSER_T3000            = 15,
 //		 READARRAYVALUE_T3000      = AYVALUE+1,    /* read array elements */
 		 READTIMESCHEDULE_T3000    = ENUM_WR_TIME+1,    /* read time schedule  */
@@ -59,7 +59,7 @@ typedef enum {
 		 READPROGRAMCODE_T3000     = 16,           /* read program code   */
 		 READGROUPELEMENTS_T3000   = 19,           /* read group elements */
 
-	
+
 
 		 READINDIVIDUALPOINT_T3000 = 20,           /* read individual point*/
 		 TIME_COMMAND              = 21,           /* read time            */
@@ -83,7 +83,7 @@ typedef enum {
 		 READ_MQTT_CFG             = 46,
 		 READ_SNMP_CFG             = 47,
 		 READ_JSON_SCREEN          = 86,
-		 READ_JSON_ITEM            = 87, 
+		 READ_JSON_ITEM            = 87,
 		 READ_PVARIABLE_T3000		= 88,           /* read Pvariables         */
          READMONITORPACKAGE_T3000 = 89,           /* read monitor belong to which package   */
          READ_AT_COMMAND = 90,	//450 length
@@ -119,7 +119,7 @@ typedef enum {
 		 //READ_COMMAND_50           = 50,
 
 		 WRITE_COMMAND_50          = 150,
-		 
+
 
 		 PANEL_INFO1_COMMAND       = 110,
 		 PANEL_INFO2_COMMAND       = 111,
@@ -156,7 +156,7 @@ typedef enum {
 		 WRITE_SETTING_COMMAND		= 198,
 		 WRITE_SUB_ID_BY_HAND = 199,
 		 DELETE_MONITOR_DATABASE = 200
-} CommandRequest;	  
+} CommandRequest;
 
 
 
@@ -202,7 +202,7 @@ typedef enum {
 
 #define STR_MONITOR_LABEL_LENGTH 9
 
-#pragma pack(push) //????????? 
+#pragma pack(push) // Save the alignment state.
 #pragma pack(1)
 
 
@@ -233,17 +233,17 @@ typedef union {
 	uint8_t all[400];
 	struct {
 		unsigned char  wg_enable;          // Register 2100   (0=Disabled, 1=Enabled)
-		char           private_key[66];    // Registers 2101-2133 (Base64????33???????2???)
-		char           peer_public_key[66];// Registers 2134-2166 (Base64????33???????2???)
-		char           pre_shared_key[66]; // Registers 2167-2199 (Base64?????????33???????2???)
-		unsigned char  local_ip[4];        // Registers 2200-2203 (4??octet????10.0.0.2)
-		unsigned short wg_port;            // Register 2204 (UDP???????51820)
-		unsigned char  peer_ip[4];         // Registers 2205-2208 (4??octet?????endpoint)
-		unsigned char  reserved[191];      // Registers 2209-2250 (???) + ????
+		char           private_key[66];    // Registers 2101-2133 (Base64, 33 registers x 2 characters). Hub private key, 66 bytes.
+		char           peer_public_key[66];// Registers 2134-2166 (Base64, 33 registers x 2 characters). Hub peer public key, 66 bytes.
+		char           pre_shared_key[66]; // Registers 2167-2199 (Base64, optional, 33 registers x 2 characters). Hub pre-shared key, 66 bytes.
+		unsigned char  local_ip[4];        // Registers 2200-2203 (4 octets, for example 10.0.0.2). Hub local VPN address.
+		unsigned short wg_port;            // Register 2204 (UDP port). Hub firmware default is 51821.
+		unsigned char  peer_ip[4];         // Registers 2205-2208 (4 octets). Peer endpoint address.
+		unsigned char  reserved[191];      // Registers 2209-2250 are reserved, plus spare.
 	} reg;
 } Str_Wireguard_point;
 
-/* Hub GSM/LTE live status ¡ª must match Hub Str_Gsm_status_point and Modbus 2251-2300 */
+/* Hub GSM/LTE live status ï¿½ï¿½ must match Hub Str_Gsm_status_point and Modbus 2251-2300 */
 typedef union {
 	uint8_t all[400];
 	struct {
@@ -333,7 +333,7 @@ typedef struct
 
 	uint8_t auto_manual;  /* (1 bit; 0=auto, 1=manual)*/
 	uint8_t digital_analog;  /* (1 bit; 0=digital, 1=analog)*/
-	uint8_t hw_switch_status;  // SW_OFF-0 SW_HAND-2 SW_AUTO-1 
+	uint8_t hw_switch_status;  // SW_OFF-0 SW_HAND-2 SW_AUTO-1
 	uint8_t control ;  /* (1 bit; 0=off, 1=on)*/
 	uint8_t digital_control;  /* (1 bit)*/
 	uint8_t decom;  /* (1 bit; 0=ok, 1=point decommissioned)*/
@@ -366,10 +366,10 @@ typedef  struct
 	uint8_t digital_analog ; /* (1 bit; 1=analog, 0=digital)*/
 	uint8_t calibration_sign; /* (1 bit; sign 0=positiv 1=negative )*/
 	uint8_t sub_number; /* (1 bit;  0=0.1, 1=1.0)*/
-	uint8_t calibration_h; /* (5 bits - spare )*/  //????? unused ?? calibration?????????
+	uint8_t calibration_h; /* (5 bits - spare )*/  // Removed unused and changed calibration to a 16-bit value.
 	uint8_t calibration_l;  /* (8 bits; -25.6 to 25.6 / -256 to 256 )*/
 	uint8_t range;	      			/* (1 uint8_t ; input_range_equate)*/
-} Str_in_point; 
+} Str_in_point;
 
 
 typedef union {
@@ -392,8 +392,8 @@ typedef struct
 {
     uint16_t  		total_length;        /*	total length to be received or sent	*/
     uint8_t		command;
-    uint16_t    start_reg;            //?????????
-    uint16_t		nlength;          //?????????
+    uint16_t    start_reg;            // Starting register.
+    uint16_t		nlength;          // Read or write length.
 
 }Str_bacnet_to_modbus_header;
 
@@ -414,35 +414,35 @@ typedef struct
 {
     uint16_t start_add;
     uint16_t nlength;
-    uint16_t org_start_add; // ??????????????????
-    uint16_t org_nlength;   // ??????????????????
+    uint16_t org_start_add; // Used to check that the data is valid.
+    uint16_t org_nlength;   // Used to check that the data is valid.
     unsigned short ndata[400];
 }Str_modbus_reg;
 
-typedef enum 
-{ 
-	not_used_output, 
-	V0_10, 
-	P0_100_Open, 
-	P0_20psi, 
+typedef enum
+{
+	not_used_output,
+	V0_10,
+	P0_100_Open,
+	P0_20psi,
 	P0_100,
-	P0_100_Close, 
-	I_0_20ma 
+	P0_100_Close,
+	I_0_20ma
 } Analog_output_range_equate;
 
 //#endif
 
 
-typedef enum  
+typedef enum
 {
 	_unused, degC, degF, FPM, Pa, KPa, psi, in_w, Watts, KW, KWH,
 	Volts, KV, Amps, ma, CFM, Sec, Min, Hours, Days, time_unit, ohms,
 	procent, RH, ppm, counts, Open, CFH, GPM, GPH, GAL, CF, BTU, CMH,
 	custom1, custom2, custom3, custom4, custom5, custom6, custom7, custom8
-} Analog_units_equate; 
+} Analog_units_equate;
 
 
-typedef enum 
+typedef enum
 {   _dUNUSED=100,
 	OFF_ON, CLOSED_OPEN, STOP_START, DISABLED_ENABLED,
 	NORMAL_ALARM, NORMAL_HIGH, NORMAL_LOW, NO_YES,
@@ -499,14 +499,14 @@ typedef struct
 	uint8_t override_1_value;  /* ( 0=off, 1=on)*/
 	uint8_t override_2_value;  /* ( 0=off, 1=on)*/
 	uint8_t off  ;
-	uint8_t unused	; 
+	uint8_t unused	;
 
 	Point_T3000 override_1;	     /* (3 bytes; point)*/
 	Point_T3000 override_2;	     /* (3 bytes; point)*/
 
 } Str_weekly_routine_point; /* */
 
-typedef struct  
+typedef struct
 {
 	byte time_minutes;
 	byte time_hours;
@@ -585,8 +585,8 @@ typedef union
 typedef struct
 {
 	int8_t description[STR_PROGRAM_DESCRIPTION_LENGTH]; 	      	  /* (21 bytes; string)*/
-	int8_t label[STR_PROGRAM_LABEL_LENGTH];			  /* (9 bytes; string)*/  
-	uint16_t bytes;		/* (2 bytes; size in bytes of program)*/ 
+	int8_t label[STR_PROGRAM_LABEL_LENGTH];			  /* (9 bytes; string)*/
+	uint16_t bytes;		/* (2 bytes; size in bytes of program)*/
 	uint8_t on_off;	//	      : 1; /* (1 bit; 0=off; 1=on)*/
 	uint8_t auto_manual;//	  : 1; /* (1 bit; 0=auto; 1=manual)*/
 	uint8_t com_prg;	//	    : 1; /* (6 bits; 0=normal use, 1=com program)*/
@@ -647,17 +647,17 @@ typedef union
 	}tstat;
 }Str_tstat_schedule; /*config roution */
 
-//????????????????????
+// Not made this flexible for now
 //typedef struct
 //{
 //	int8_t all[40];
 //	struct
 //	{
-//		char flag;                         //???????? use or not ??  0 ??????     1??????
-//		unsigned short register_pos;       //Modbus ????? 0-65535
-//		char opertion;                     // 0:readwrite  1 :read only    2 :write only  ???????????????  
-//		char headline[30];                 //?????TSTAT SCHEDUAL ???????.
-//		char reserved[6];                  //??????.
+//		char flag;                         // Whether it is used. 0: unused. 1: used.
+//		unsigned short register_pos;       // Modbus register, 0-65535
+//		char opertion;                     // 0: read/write. 1: read only. 2: write only. How this register is accessed.
+//		char headline[30];                 // Title shown in the TSTAT schedule.
+//		char reserved[6];                  // Reserved.
 //	}tstat;
 //}Str_reg_customer_def;
 
@@ -695,7 +695,7 @@ typedef struct
 typedef struct
 {
 	byte number		;
-	byte point_type;	//????????? number ????5?????????;
+	byte point_type;	// The high 3 bits are borrowed for the number. The low 5 bits belong to this field.
 	byte panel		;
 	byte sub_panel  ;
 	byte  network;
@@ -831,12 +831,7 @@ typedef struct              /* 85 bytes */
 } Monitor_Block_Header;  /* 100 bytes */
 
 
-
-
-
-
-
-typedef struct 
+typedef struct
 {
 	uint16_t instance;
 	uint8_t mac_address[6];
@@ -868,7 +863,7 @@ typedef struct
 typedef union
 {
 	uint8_t all[UN_TIME_LENGTH];
-	struct 
+	struct
 	{
 		uint8_t sec;    /* 0-59 */
 		uint8_t min;      /* 0-59 */
@@ -878,7 +873,7 @@ typedef union
 		uint8_t mon;       /* 0-11 */
 		uint8_t year;        /* 0-99 */
 		uint16_t day_of_year;  /* 0-365 */
-		uint8_t is_dst;        /* daylight saving time on / off */  
+		uint8_t is_dst;        /* daylight saving time on / off */
 
 	}Clk;
 }UN_Time;
@@ -889,13 +884,13 @@ typedef union
     uint8_t lcddisplay[7];
     struct
     {
-        uint8_t display_type; // 0:??????????????    1??modbus ???????????????
-        Point_Net npoint;     //??????????input output var ???
+        uint8_t display_type; // 0: use the original temperature display. 1: custom display format over Modbus.
+        Point_Net npoint;     // Describes whether the structure is an input, output, or variable.
     }lcd_mod_reg;
 
     struct
     {
-        uint8_t display_type; // 0:??????????????    2??Bacnet ?????????????
+        uint8_t display_type; // 0: use the original temperature display. 2: custom BACnet display format.
         unsigned int obj_instance;
         uint8_t point_type;
         uint8_t point_number;
@@ -906,11 +901,11 @@ typedef union
 typedef union
 {
 	uint8_t all[400];
-	struct 
-	{  
+	struct
+	{
 		uint8_t ip_addr[4];
 		uint8_t subnet[4];
-		uint8_t gate_addr[4];   
+		uint8_t gate_addr[4];
 		uint8_t mac_addr[6];
 		uint8_t tcp_type;   /* 0 -- DHCP, 1-- STATIC */
 		uint8_t mini_type;
@@ -921,11 +916,11 @@ typedef union
 		uint8_t com2_config;
 
 		uint8_t refresh_flash_timer;
-		uint8_t en_plug_n_play;   
-		uint8_t reset_default;   // write 88  //?? 37 ??     ??77 ???????? ??????????;
-		uint8_t com_baudrate0; 
-		uint8_t com_baudrate1; 
-		uint8_t com_baudrate2; 
+		uint8_t en_plug_n_play;
+		uint8_t reset_default;   // Item 37. Write 88 to load factory defaults. Write 77 to turn on the identify lamp.
+		uint8_t com_baudrate0;
+		uint8_t com_baudrate1;
+		uint8_t com_baudrate2;
 
 		uint8_t user_name; // 0 ;no  1:disable 2:enable
 		uint8_t custmer_unite; // 0 :no
@@ -936,7 +931,7 @@ typedef union
 
 		char panel_name[20];
 
-		uint8_t en_panel_name; 
+		uint8_t en_panel_name;
 		uint8_t panel_number;  //74
 
 		char dyndns_user[DYNDNS_MAX_USERNAME_SIZE];
@@ -945,19 +940,19 @@ typedef union
 		uint8_t en_dyndns;  //Item171 0 - no  1 - disable 2 - enable
 		uint8_t dyndns_provider;  // 0- www.3322.org 1-www.dyndns.com  2 - www.no-ip.com
 		uint16_t dyndns_update_time;  // xx min
-		uint8_t en_sntp;  // 0 - no  1 - disable  
+		uint8_t en_sntp;  // 0 - no  1 - disable
 		//0xca780265			202.120.2.101 ntp.sjtu.edu.cn      2
 		//0x1838b28c            24.56.178.140 time.nist.gov			3
 		//0xd248912d			210.72.145.45  NTSC					4
-        //???????PC???                                          200 
-		signed short time_zone; 
+        // Automatically request synchronization with the PC.                                          200
+		signed short time_zone;
 		unsigned int n_serial_number;  //count 181
 
-		 UN_Time update_dyndns; 
+		 UN_Time update_dyndns;
 
 		 uint16_t mstp_network_number;
 		 uint8_t BBMD_EN;
-		 uint8_t sd_exist;  // 1 -no    2- yes         3 ??????????.
+		 uint8_t sd_exist;  // 1: no. 2: yes. 3: the file format is wrong.
 		 unsigned short modbus_port;
 		 unsigned char modbus_id; //198
 		 unsigned int object_instance ;
@@ -966,18 +961,18 @@ typedef union
 
 		 char sntp_server[30];
 		 unsigned char zegbee_exsit;//238
-         unsigned char LCD_Display; //1: ????  0??????;
-         unsigned char flag_time_sync_pc;  // 0: ?????   1:???.
-         unsigned char time_sync_auto_manual;  // 0 ?????????????   1????PC ??????
-         unsigned char sync_time_results;      //????????????????? 0 ???         1???   ???????? reset_default ??99 ??????????????????????????????;
-         //unsigned char network_ID[3];   //?????? ???????ID??
+         unsigned char LCD_Display; // 1: normally open. 0: normally closed.
+         unsigned char flag_time_sync_pc;  // 0: not required. 1: synchronize.
+         unsigned char time_sync_auto_manual;  // 0: synchronize with the time server. 1: synchronize with the PC clock.
+         unsigned char sync_time_results;      // Time-server sync result. 0: failed. 1: success. Read this bit only after reset_default is written as 99 to request sync.
+         //unsigned char network_ID[3];   // IDs of the three ports, used for programming.
          unsigned char mstp_id;         //MSTP_ID
          unsigned short zigbee_panid;
-         unsigned char max_master; //??????????matser?  245 ??
-         unsigned char special_flag; // bit 0  ?????????? PT1K snesor 0 ????? 1???;
+         unsigned char max_master; // Maximum master value that can be set: 245.
+         unsigned char special_flag; // Bit 0: PT1K sensor support. 0: not supported. 1: supported.
                                      // bit 1 PT100
          unsigned char uart_parity[3];
-         unsigned char uart_stopbit[3];   //???253
+         unsigned char uart_stopbit[3];   // 253 in total.
          lcdconfig display_lcd;
 		 unsigned char start_month;
 		 unsigned char start_day;
@@ -985,11 +980,11 @@ typedef union
 		 unsigned char end_day;
 		 unsigned char network_number_hi;
 		 unsigned char webview_json_flash; //value 0 old way     value 2  new way for jsaon
-		 unsigned char max_var;  //ESP32 Only   ST ??? 128
-		 unsigned char max_in;	  //ESP32 Only	 ST ??? 64
-		 unsigned char max_out;  //ESP32 Only   ST ??? 64   //count 269
-		 unsigned char fix_com_config;   // 0 ??????             ??0 ?????????   ESP 65.5 ?????????  ARM 67.0?????????
-		 unsigned char write_flash;   //??????  0 ??????  ESP 65.5 ?????????  ARM 67.0?????????  reg_92 
+		 unsigned char max_var;  // ESP32 only. STM32 is fixed at 128.
+		 unsigned char max_in;	  // ESP32 only. STM32 is fixed at 64.
+		 unsigned char max_out;  // ESP32 only. STM32 is fixed at 64. Count 269.
+		 unsigned char fix_com_config;   // 0: changes automatically. Nonzero: stays fixed. ESP firmware 65.5 and ARM firmware 67.0 or later.
+		 unsigned char write_flash;   // In minutes. 0 means unused. ESP firmware 65.5 and ARM firmware 67.0 or later. Register 92.
 
 
 	}reg;
@@ -1000,12 +995,12 @@ typedef enum
 	NOUSE, BACNET_MSTP,MAIN_MODBUS,MAIN_PTP,SUB_GSM,MAIN_ZIG,SUB_ZIG,SUB_MODBUS, RS232_METER, MSTP_MASTER,MAX_COM_TYPE
 };
 
- 
+
 //**************************************************
-//2019 05 20 Fandu ???????????????? T3 ????????????;
+// 2019 05 20 Fandu  When accessing remotely, read the sub-device information under the T3.
 typedef	struct
 {
-    uint8_t protocal;  // 0  ??modbus???   1 ??bacnet ???;
+    uint8_t protocal;  // 0: Modbus device. 1: BACnet device.
     uint8_t modbus_id;
     uint32_t instance;
 }Str_Remote_Info;
@@ -1112,7 +1107,7 @@ typedef  struct
 	uint8_t night_cool_sp;
 	uint8_t over_ride;
 	//	uint8_t serial_number[4];
-	//	uint8_t address; 
+	//	uint8_t address;
 	SCAN_DB tst_db;
 	uint8_t type;
 }Str_TstatInfo_point;
@@ -1124,7 +1119,7 @@ typedef struct
 	char digital_units_off[12];       /*12 bytes; string)*/
 	char digital_units_on[12];        /*12 bytes; string)*/
 
-} Str_Units_element;  
+} Str_Units_element;
 
 typedef struct
 {
@@ -1191,12 +1186,12 @@ typedef struct
 	uint8_t product_id  ;//            : 8;
 	uint8_t count;//              : 8;
 	uint8_t read_write;//         : 2;    0 - read only 1- written
-	uint8_t time_remaining ;//          : 2; //???? ???????????
+	uint8_t time_remaining ;//          : 2; // Remaining lifetime of the remote point
     uint32_t object_instance;
 } Str_remote_point; /* 1+5+4+2+2=14 bytes */
 
 
-typedef struct	//???????data log ???;
+typedef struct	// Structure used to store the data log.
 {
 	uint8_t index;   // monitor
 	unsigned int time;
@@ -1210,8 +1205,8 @@ typedef struct	//???????data log ???;
 typedef union
 {
 	uint8_t all[400];
-	struct 
-	{  
+	struct
+	{
 		unsigned char flag[2]; //check if not 0x55ff ,means it's the old version ,ignore it.
 		unsigned int monitor_analog_block_num[12];
 		unsigned int monitor_digital_block_num[12];
@@ -1219,7 +1214,7 @@ typedef union
 
 		unsigned char flag1; // network health  0x55
 		unsigned int com_rx[3];
-		unsigned int com_tx[3]; 
+		unsigned int com_tx[3];
 		unsigned short collision[3];  // id collision
 		unsigned short packet_error[3];  // bautrate not match
 		unsigned short timeout[3];
@@ -1229,8 +1224,8 @@ typedef union
 typedef union
 {
 	uint8_t all[100];
-	struct 
-	{  
+	struct
+	{
 		unsigned char clear_health_rx_tx; //check if  0x11 clear rx tx
 	}reg;
 }Str_Special;
@@ -1245,7 +1240,7 @@ typedef struct
 
 typedef struct
 {
-	char table_name[9];  //?????????????????????????? 0xEF ????0.01  64.8
+	char table_name[9];  // The last byte selects the resolution. 0xEF means 0.01, from firmware 64.8.
 	Tbl_point  dat[16];
 
 } Str_table_point;
@@ -1266,20 +1261,20 @@ typedef union
     uint8_t all[160];
     struct
     {
-        uint8_t Wifi_Enable;   // ??1 ??? ????IP ???   Modbus ??????? 2000
+        uint8_t Wifi_Enable;   // Writing 1 applies these IP changes. Modbus starts at register 2000.
         uint8_t IP_Auto_Manual; //  0 Auto DHCP   1 static IP
-        uint8_t IP_Wifi_Status;  // 0 Wifi??????  
+        uint8_t IP_Wifi_Status;  // 0: Wi-Fi module unknown.
         uint8_t LoadDefault; //1
         uint8_t modbus_port;
         uint8_t bacnet_port;
         uint8_t software_version;
         uint8_t	reserved[7];
-        char username[64];  //????
-        char password[32];  //????
-        uint8_t ip_addr[4];   //IP??? 12??????? ????
+        char username[64];  // Write extra registers.
+        char password[32];  // Write extra registers.
+        uint8_t ip_addr[4];   // IP address uses 12 registers. Write the extra registers.
         uint8_t net_mask[4];
         uint8_t getway[4];
-        uint8_t wifi_mac[6];  //???
+        uint8_t wifi_mac[6];  // Read only.
     }reg;
 }str_wifi_point;
 
@@ -1302,12 +1297,12 @@ typedef struct
     register_point heat_db;
 }Str_tstat_setpoint;
 
-#pragma pack(pop)//????????? 
+#pragma pack(pop)// Restore the alignment state.
 
 #define JSON_COLOR_LENGTH 10
 #define JSON_STRING_LENGTH  10
 
-#pragma pack(push) //????????? 
+#pragma pack(push) // Save the alignment state.
 #pragma pack(1)
 
 typedef struct str_viewportTransform
@@ -1345,7 +1340,7 @@ typedef struct str_settings
 
 typedef struct myitems
 {
-	unsigned char ntranslate_count;// ??????? translate ????
+	unsigned char ntranslate_count;// Number of translate entries in the control structure.
 	unsigned char item_belong_screen;
 	unsigned char active;
 	unsigned char group;
@@ -1368,7 +1363,7 @@ typedef union
 	uint8_t all[50];//50x16
 	struct
 	{
-		unsigned short ncount; //??????? myitems ??????????????????
+		unsigned short ncount; // Number of myitems in the control structure. Not stored on the device.
 		unsigned char activeItemIndex;
 		unsigned char customObjectsCount;
 		unsigned char groupCount;
@@ -1397,7 +1392,7 @@ typedef union
 
 
 
-#pragma pack(pop)//????????? 
+#pragma pack(pop)// Restore the alignment state.
 
 
 #endif

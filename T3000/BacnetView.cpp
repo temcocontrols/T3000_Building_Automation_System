@@ -11,11 +11,11 @@ MSFLXGRD.MSM
 COMCAT.MSM
 // Copy these two files to 2018 packaging directory to avoid packaging compilation failure
 拷贝 这两个文件至 2018 打包目录才不至于 打包编译失败
-20250320 
+20250320
 // Support TSTAT10E input output interface
 支持 TSTAT10E 的input output 界面
 
-2025 01 13 
+2025 01 13
 // 1. Avoid changing T3 ARM device Mac address when loading prog
 1. Load prog时 避免改变T3 ARM设备的Mac地址
 
@@ -85,13 +85,13 @@ COMCAT.MSM
 
 2019 04 29
 1. User can insert more remote point in the "Graphic" user interface.
-   Using the standard bacnet keywords "AV,AI,AO,BV,BI,BO" ,format is "Deviceid + Keywords + number"  
-   Such as 55555AI3   ,  125AV45  
+   Using the standard bacnet keywords "AV,AI,AO,BV,BI,BO" ,format is "Deviceid + Keywords + number"
+   Such as 55555AI3   ,  125AV45
 2. Select the label, user can change value.
 3. Fix T3TB/BB/LB  schedule can't add "00:00" in the first column and the second column.
 4. For Tstat8 user can change the bacnet device id ,need update Tstat8 firmware version 8.6
 5. For T3TB/BB/LB trendlog , user can monitor remote bacnet point .For this release , T3000 can show the unit and object name if they have.
-6. Optimize the T3 calibration . if input a minus number , the column "sign" will automatically set to "-" 
+6. Optimize the T3 calibration . if input a minus number , the column "sign" will automatically set to "-"
 7. Fix the twinkling UI when opening T3000.
 8. For TSTAT8,add a new function of pid.(for delta t logic).
    For TSTAT8 pid loop 1, the input value and setpoint can set to minus .
@@ -134,7 +134,7 @@ T3000 Revisions for the software release of Apr 4, 2019
 1. ScreenEdit 中 Sch 以及Hol 可以显示 ON OFF 值
 2. AR1 AR2 动态加载至  SCH的 combo 中
 3. 新增 BTU 界面  创建 resourcefile 的文件夹 以后资源文件都放在这个文件夹下更新
-4. Zigbee Pan ID   for TSTAT8 
+4. Zigbee Pan ID   for TSTAT8
 
 2018 12 11
 1. 修复CO2 NET 无法显示 MODBUS_DEW_PT  的值
@@ -156,8 +156,8 @@ T3000 Revisions for the software release of Apr 4, 2019
 
 1. Fix the program bug "10 28AO5 = 3" when open again it show "10  = 3"
 
-2018 05 29 
-1.T3系列 扩展IO支持 T3-PT12 
+2018 05 29
+1.T3系列 扩展IO支持 T3-PT12
 2.支持更改名字  HUM CO2 PRESSURE .
 3.mstp 通讯参数修改.
 4.Bacnet Tool 改为非模态窗口, 支持多个窗口同时工作;
@@ -177,7 +177,7 @@ T3000 Revisions for the software release of Apr 4, 2019
 1. 没有Zigbee的设备 Com1 不允许修改 ，以免误导客户.
 
 
-2018 04 24 
+2018 04 24
 1.修复 若保存Prg失败 却将以前的文件删除的问题.
 2.从时间服务器更新时间返回信息提醒.
 3.修复时间同步问题，包括改时区，夏令时 从470版本以后 用新的命令读写更新时间;
@@ -256,7 +256,7 @@ T3000 Revisions for the software release of Apr 4, 2019
 1. Add feature  extension I/O .
 
 2017 - 01 - 18 Update by Fance
-1. Merge code finished . 
+1. Merge code finished .
 2. 修复 range edit填入数字引起的问题.
 
 2017 - 01 - 16 Update by Fance
@@ -291,7 +291,7 @@ T3000 Revisions for the software release of Apr 4, 2019
 1. 修改program 里面的时间  12：30  传值为1250.000;
 
 2016 - 12 - 12 Update by Fance
-1. 修复bug Setting将 
+1. 修复bug Setting将
 
 2016 - 12 - 02 Update by Fance
 1. ISP slove 界面恢复初始.
@@ -427,7 +427,7 @@ T3000 Revisions for the software release of Apr 4, 2019
 2016 - 04 - 06 Update by Fance
 1. Graphic 按照老毛的 要求  把下面14个改成双行的.
 2. 修复 unit 的问题，获取不到unit 的时候就从 其他data 那获取;
-3. 在load prg 之后 
+3. 在load prg 之后
 4. Output 扩展的最高位 区分是DO 还是AO
 5. HAND_AM 如果不是Auto output 就全部显示红色.
 
@@ -461,10 +461,10 @@ T3000 Revisions for the software release of Apr 4, 2019
 //	15503   -  	15806	16*19=304	  PRG	                sizeof(Str_program_point) = 37
 //  15807   -   15974	21*8=336	  SCH			sizeof(Str_weekly_routine_point) = 42
 //	15975   -	16043		17*4=68		  HOL				sizeof(Str_annual_routine_point) = 33
-//  
+//
 
 
-//  32712   - 32753		 14*16 =224								sizeof(Str_controller_point)	= 28						
+//  32712   - 32753		 14*16 =224								sizeof(Str_controller_point)	= 28
 1.在下载界面加入 固件文件夹。
 2.Download hex or bin  file name change to 40 bytes.
 
@@ -503,7 +503,7 @@ T3000 Revisions for the software release of Apr 4, 2019
 1. 修复不同网卡下面 无法正常访问的问题.
 2. 修复刷新树形产品时，先显示默认label，在显示真实label的问题;
 3. 开启时检测防火墙是否打开，若打开了，提示客户关闭防火墙.
-4.  Fix Bacnet Setting 中IP Auto 写入问题; 
+4.  Fix Bacnet Setting 中IP Auto 写入问题;
 
 2015 - 12 - 10 Update by Fance
 1. Bacnet Screen  ,上下左右移动.
@@ -546,7 +546,7 @@ Merge with Alex .
 1. Fix the second monitor doesn't work.
 
 2015 - 10 - 26
-1. Add a feature ,when saving the program file , also save the "txt" file into the temp folder 
+1. Add a feature ,when saving the program file , also save the "txt" file into the temp folder
 
 2015 - 10 - 22
 1. Fix graphic trend log ,value  .
@@ -582,19 +582,19 @@ Update by Fance
 3. In program UI , show the panel number and description in the window title.
 
 
-2015 - 09 - 06 
+2015 - 09 - 06
 Update by Fance
-1. In the programming editor, if you save to  file.txt over top of an existing file.txt it will append to the end of the file. 
-2. Descriptors were weird. We edited some inputs several times before they would 'take' properly. 
+1. In the programming editor, if you save to  file.txt over top of an existing file.txt it will append to the end of the file.
+2. Descriptors were weird. We edited some inputs several times before they would 'take' properly.
 3. Icons
-They don't work if the range is unused. Should work either way, configured or not. 
+They don't work if the range is unused. Should work either way, configured or not.
 4. Getting out of the graphics screen is cumbersome. When I am viewing a graphic screen and hit INPUTS on the menu bar, I want to jump right direct to the inputs, not have to hit escape first.
-5. Input status alarms. 
+5. Input status alarms.
 6. Read data succeed . change it to say "Read data: OK"
-IF the range is unused, no alarms shall be generated. 
-7 PID Titles. 
-Change titles as shown. 
-The grid spacing can be shrunk down , Action column for example. Most cols can be half this width. 
+IF the range is unused, no alarms shall be generated.
+7 PID Titles.
+Change titles as shown.
+The grid spacing can be shrunk down , Action column for example. Most cols can be half this width.
 
 
 
@@ -604,7 +604,7 @@ The grid spacing can be shrunk down , Action column for example. Most cols can b
 
 2015 - 08 - 28
 Update by Fance
-1. 1-1-VAR2  ->  VAR2 
+1. 1-1-VAR2  ->  VAR2
 2. Fix the program color
 
 2015 - 07 - 30
@@ -673,7 +673,7 @@ Update by Fance
 
 2015 - 06 - 02
 Update by Fance
-1>> All bacnet list , colume header set character left side. 
+1>> All bacnet list , colume header set character left side.
 
 2015 - 05 - 28
 Update by Fance
@@ -724,10 +724,10 @@ Update by Fance
 
 2015 - 04 - 02
 Update by Fance
-1>>  Fixed the label in screen window can't show normally in the first few seconds. 
-2>>  When add or edit label in screen window ,it will write data into minipanel right now.Before we write into device when exit the window. 
-3>>  Fixed the  monitor input list crash when user change focus to other application. 
-4>>  Error handle with th label point . Before "VAR-3" "3--VAR" will make the t3000 crash.  
+1>>  Fixed the label in screen window can't show normally in the first few seconds.
+2>>  When add or edit label in screen window ,it will write data into minipanel right now.Before we write into device when exit the window.
+3>>  Fixed the  monitor input list crash when user change focus to other application.
+4>>  Error handle with th label point . Before "VAR-3" "3--VAR" will make the t3000 crash.
 
 2015 - 03 - 18
 Update by Fance
@@ -755,7 +755,7 @@ Update by Fance
 
 2015 - 01 - 12
 Update by Fance
-1. Optimize Bacnet read and write config .If user click new menu to read or write , don't interrupt the task. 
+1. Optimize Bacnet read and write config .If user click new menu to read or write , don't interrupt the task.
 2. When the user delete some device , and the interface is show this device , it will exit and show the default building.
 
 2015 - 01 - 07
@@ -783,7 +783,7 @@ Update by Fance
 
 2014-07-18
 Update by Fance
-1. Improve the quality of communication. 
+1. Improve the quality of communication.
 2. Improve the network scan feature.
 3. T3000 will scan device via serial port with baud rate both “9600” and “19200”.Before we only use 19200.
 4. Add feature user can add device not through the scan command.
@@ -800,15 +800,15 @@ Update by Fance
 
 2014-06-19
 Update by Fance
-1.Control Basic Editor: When finished editing and the users' program has been sent successfully, there is no need to show the exit Y/N confirmation dialog. Just exit right out with the 'Esc' key. 
-2.Control Basic Editor: Update the error messages after each send of the program. 
-3.Device Discovery: Fixed misc bugs related to auto discovery of bacnet devices and changes in the IP address. Sync the changes properly with the database. 
-4.On line status of the nodes and the lower connection status bar now synchronized better. 
+1.Control Basic Editor: When finished editing and the users' program has been sent successfully, there is no need to show the exit Y/N confirmation dialog. Just exit right out with the 'Esc' key.
+2.Control Basic Editor: Update the error messages after each send of the program.
+3.Device Discovery: Fixed misc bugs related to auto discovery of bacnet devices and changes in the IP address. Sync the changes properly with the database.
+4.On line status of the nodes and the lower connection status bar now synchronized better.
 5.When user changes the bacnet "Auto/Manual" field the "value" column will refresh instantly, before it was slow.
-6. Match number of inputs of the controller to the hardware model, ie if it has 16 Inptus T3000 will show only 16 inputs for the LB model, 32inputs for the LB model and so on. 
+6. Match number of inputs of the controller to the hardware model, ie if it has 16 Inptus T3000 will show only 16 inputs for the LB model, 32inputs for the LB model and so on.
 7. Change the multi flash update interface, TBD : Auto flash and support pause and resume.
-8. Multi-flash update tool can now correctly handle 64k and 128k thermostats. 
-9. Add feature that user can access the remote bacnet device by internet at a remote IP address. 
+8. Multi-flash update tool can now correctly handle 64k and 128k thermostats.
+9. Add feature that user can access the remote bacnet device by internet at a remote IP address.
 10. Add the bacnet interface to show the device software version , hardware version ,boot loader version,and other information.
 
 
@@ -823,13 +823,13 @@ Update by Fance
 
 2014-04-21
 Update by Fance
-1.The analog trend logging feature has been added. Digital data still to be done. 
+1.The analog trend logging feature has been added. Digital data still to be done.
 2.Support to open the USB device "Testo-345" ,and read it's data.
 TBD: add a small GUI screen and integrate to trend logs and other features
-3.Add advanced setup screen for bacnet devices: IP address and others. 
+3.Add advanced setup screen for bacnet devices: IP address and others.
 4.Fix the modbus DLL .If the device disconnected , the "read_one" and
 "write_one" used to fail if the node goes off line. Now it will automatically reconnect to the device.
-5.Add a screen to show the Zigbee network RSSI signal strength now. TBD: add graphical version of zigbee network. 
+5.Add a screen to show the Zigbee network RSSI signal strength now. TBD: add graphical version of zigbee network.
 6.Fix the bacnet panel number, max before was 32, now supports up to 255nodes on each rs485/mstp subnet and 255 on the main bacnet IP network
 
 2014-04-16
@@ -843,7 +843,7 @@ Update by Fance
 
 2014-03-28
 Update by Fance
-1.Update the Graphic view class.Now all the position and parameter can changed more easier. 
+1.Update the Graphic view class.Now all the position and parameter can changed more easier.
 2014-03-27
 Update by Fance
 1.Finished the function ,Open the Testo USB port and read the Testo-435 data.Put the two function into the Dll,named "DllFunction.cpp"
@@ -993,7 +993,7 @@ extern CBacnetAlarmWindow * AlarmWindow_Window;
 CBacnetProgramEdit *ProgramEdit_Window = NULL;
 CBacnetScheduleTime *ScheduleEdit_Window = NULL;
 AnnualRout_InsertDia *HolidayEdit_Window = NULL;
-//define a dialg for new program ide 
+//define a dialg for new program ide
 ControlBasicEditorView *ProgramNEWEdit_Window = NULL;
 extern char mycode[2000];
 // Number of times to send whois when clicking to switch device
@@ -1073,7 +1073,7 @@ BEGIN_MESSAGE_MAP(CDialogCM5_BacNet, CFormView)
 	ON_BN_CLICKED(IDC_BUTTON_TEST, &CDialogCM5_BacNet::OnBnClickedButtonTest)
 	ON_MESSAGE(WM_FRESH_CM_LIST,Fresh_UI)
 	ON_MESSAGE(MY_RESUME_DATA, AllMessageCallBack)
-	ON_MESSAGE(WM_DELETE_NEW_MESSAGE_DLG,BacnetView_Message_Handle)	
+	ON_MESSAGE(WM_DELETE_NEW_MESSAGE_DLG,BacnetView_Message_Handle)
 	ON_MESSAGE(WM_SHOW_PROGRESS,Show_Progress)
 	ON_MESSAGE(WM_RS485_MESSAGE,RS485_Read_Fun)
 	ON_MESSAGE(WM_SHOW_PANELSTRING,Show_Panel_String)
@@ -1256,7 +1256,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					if(Input_Window == NULL)
 					{
 						Input_Window = new CBacnetInput;
-						Input_Window->Create(IDD_DIALOG_BACNET_INPUT,this);	
+						Input_Window->Create(IDD_DIALOG_BACNET_INPUT,this);
 					}
 					else
 					{
@@ -1279,7 +1279,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						hwait_thread = NULL;
 					}
 					//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Inputs list read time out!"));
-					//MessageBox(_T("Inputs list read time out!"));	
+					//MessageBox(_T("Inputs list read time out!"));
 				}
 				return 0;
 			}
@@ -1291,7 +1291,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					if(Output_Window == NULL)
 					{
 						Output_Window = new CBacnetOutput;
-						Output_Window->Create(IDD_DIALOG_BACNET_OUTPUT,this);	
+						Output_Window->Create(IDD_DIALOG_BACNET_OUTPUT,this);
 					}
 					else
 					{
@@ -1327,7 +1327,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					if(Variable_Window == NULL)
 					{
 						Variable_Window = new CBacnetVariable;
-						Variable_Window->Create(IDD_DIALOG_BACNET_VARIABLE,this);	
+						Variable_Window->Create(IDD_DIALOG_BACNET_VARIABLE,this);
 					}
 					else
 					{
@@ -1365,7 +1365,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					if(Program_Window == NULL)
 					{
 						Program_Window = new CBacnetProgram;
-						Program_Window->Create(IDD_DIALOG_BACNET_PROGRAM,this);	
+						Program_Window->Create(IDD_DIALOG_BACNET_PROGRAM,this);
 					}
 					else
 					{
@@ -1402,7 +1402,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					if(WeeklyRoutine_Window == NULL)
 					{
 						WeeklyRoutine_Window = new BacnetWeeklyRoutine;
-						WeeklyRoutine_Window->Create(IDD_DIALOG_BACNET_WEEKLY_ROUTINES,this);	
+						WeeklyRoutine_Window->Create(IDD_DIALOG_BACNET_WEEKLY_ROUTINES,this);
 					}
 					else
 					{
@@ -1521,7 +1521,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					if(Screen_Window == NULL)
 					{
 						Screen_Window = new BacnetScreen;
-						Screen_Window->Create(IDD_DIALOG_BACNET_SCREENS,this);	
+						Screen_Window->Create(IDD_DIALOG_BACNET_SCREENS,this);
 					}
 					else
 					{
@@ -1639,7 +1639,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						ScreenEdit_Window = NULL;
 					}
 					ScreenEdit_Window = new CBacnetScreenEdit;
-					ScreenEdit_Window->Create(IDD_DIALOG_BACNET_SCREENS_EDIT,this);	
+					ScreenEdit_Window->Create(IDD_DIALOG_BACNET_SCREENS_EDIT,this);
 					ScreenEdit_Window->ShowWindow(SW_SHOW);
 				}
 				else
@@ -1685,10 +1685,10 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
                             }
                         }
                     }
-                    
+
 
 					ScheduleEdit_Window = new CBacnetScheduleTime;
-					ScheduleEdit_Window->Create(IDD_DIALOG_BACNET_SCHEDULE_TIME,this);	
+					ScheduleEdit_Window->Create(IDD_DIALOG_BACNET_SCHEDULE_TIME,this);
 					ScheduleEdit_Window->ShowWindow(SW_SHOW);
 
 				}
@@ -1712,7 +1712,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 						HolidayEdit_Window = NULL;
 					}
 					HolidayEdit_Window = new AnnualRout_InsertDia;
-					HolidayEdit_Window->Create(IDD_ANNUAL_ROUTINES_INSERT_DIA,this);	
+					HolidayEdit_Window->Create(IDD_ANNUAL_ROUTINES_INSERT_DIA,this);
 					HolidayEdit_Window->ShowWindow(SW_SHOW);
 
 
@@ -1761,7 +1761,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			//click_resend_time = 3;
 			Read_Setting_Info_Progress(3);
 			//SetTimer(BAC_READ_SETTING_TIMER,2500,NULL);
-			
+
 		}
 		break;
 	case CONNECT_TO_MODBUS_FAILED:
@@ -2062,7 +2062,6 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 				Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result = false;
 		}
 
-
 		for (int i=0;i<BAC_CUSTOMER_UNIT_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id)
@@ -2080,7 +2079,7 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 
 	}
-	
+
 	if(pInvoke)
 		delete pInvoke;
 	return 0;
@@ -2088,7 +2087,7 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 
 void CDialogCM5_BacNet::OnBnClickedButtonTest()
 {
-	
+
 	Send_WhoIs_Global(g_bac_instance, g_bac_instance);
 }
 
@@ -2101,7 +2100,7 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 	Initial_All_Point();
 	for (int i = 0; i < 256; i++)
 	{
-		g_Input_data.push_back(m_Input_data);	
+		g_Input_data.push_back(m_Input_data);
 		g_Output_data.push_back(m_Output_data);
 		g_Variable_data.push_back(m_Variable_data);
 		g_Program_data.push_back(m_Program_data);
@@ -2124,7 +2123,7 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 	//g_Input_data[3].at(1).value = 2;
 	//Tab_Initial();
 	//initial_once = false;
-	
+
 }
 
 void CDialogCM5_BacNet::Tab_Initial()
@@ -2254,8 +2253,6 @@ void CDialogCM5_BacNet::Tab_Initial()
 }
 
 
-
-
 void CDialogCM5_BacNet::InitialBacnetWindow()
 {
 	if (initial_once)
@@ -2291,8 +2288,8 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 		{
 			DWORD len = file.GetLength();
 			char* Buf = new char[len + 1];
-			Buf[len + 1] = 0;  //0ÖÕÖ¹×Ö·û´®£¬ÓÃÓÚÊä³ö¡£
-			file.Read(Buf, len);   //Read( void* lpBuf, UINT nCount ) lpBufÊÇÓÃÓÚ½ÓÊÕ¶ÁÈ¡µ½µÄÊý¾ÝµÄBufÖ¸ÕënCountÊÇ´ÓÎÄ¼þ¶ÁÈ¡µÄ×Ö½ÚÊý
+			Buf[len + 1] = 0;  // 0 terminates the string, for output.
+			file.Read(Buf, len);   // Read(void* lpBuf, UINT nCount). lpBuf receives the data read from the file. nCount is the number of bytes read from the file.
 			file.Close();
 			CString temp_cs;
 			MultiByteToWideChar(CP_ACP, 0, (char*)Buf, (int)strlen((char*)Buf) + 1, tmpString.GetBuffer(len), len);
@@ -2314,7 +2311,7 @@ CString Read_Bacnet_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type
 }
 /*
 Function name : AddBacnetInputData
-inputs : 
+inputs :
 		CString temp_string ,  define type of input
 		int deviceInstance , device instance
 		int objInstace ,  device object instance
@@ -2521,7 +2518,7 @@ void AddBacnetInputData(CString temp_string, int deviceInstance, int objInstace,
 	m_Input_data_instance.at(index) = objInstace;
 	//tmp.value = tmp.value * 1000; // 20250408 input 列表中的值乘以1000;
 	m_Input_data.at(index) = tmp;
-	
+
 }
 /*
 Function name : AddBacnetOutputData
@@ -2974,7 +2971,7 @@ void AddBacnetScheduleData(CString temp_string, int deviceInstance, int objInsta
 	invoke_id = Bacnet_Read_Properties_Blocking(deviceInstance, objectType, objInstace, PROP_WEEKLY_SCHEDULE, temp_value, 1);
 	if (invoke_id)
 	{
-		if (bacnet_string) 
+		if (bacnet_string)
 		{
 
 			CStringArray temp_array;
@@ -3061,7 +3058,7 @@ void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInsta
 		if (bacnet_string!="")
 		{
 
-			
+
 				CStringArray temp_schedule;
 				SplitCStringA(temp_schedule, bacnet_string, _T(","));
 				for (int j = 0; j < temp_schedule.GetSize();)
@@ -3072,7 +3069,7 @@ void AddBacnetCalenderData(CString temp_string, int deviceInstance, int objInsta
 					int charactor_control = (day_in_year - 1) / 8;
 					int control_bit = (day_in_year - 1) % 8;
 					g_DayState[index][charactor_control] |= 1 << control_bit;
-					
+
 					j=j+5;
 				}
 			bacnet_string = "";
@@ -3142,7 +3139,7 @@ void Handle_Bacnet_Property_List_Response(CString response,int deviceInstance,in
 
 		CStringArray temp_array;
 		SplitCStringA(temp_array, response, _T(","));
-		
+
 		if (temp_array.GetSize() > 1)
 		{
 			for (int i = 0; i < temp_array.GetSize(); i++)
@@ -3209,7 +3206,7 @@ void Handle_Bacnet_Property_List_Response(CString response,int deviceInstance,in
 				i++;
 			}
 		}
-		
+
 	}
 }
 /*Thread function to read all porperties of thirdparty bacnet device*/
@@ -3229,7 +3226,7 @@ DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid)
 
 		int inputcount = 0, outputcount = 0, variablecount = 0, schedulecount = 0, calenderCount = 0;
 		Handle_Bacnet_Property_List_Response(response, deviceInstance, objInstace, inputcount, outputcount, variablecount, schedulecount, calenderCount);
-		
+
 		/*CStringArray temp_array;
 		SplitCStringA(temp_array, response, _T(","));
 		if (temp_array.GetSize() > 1)
@@ -3308,7 +3305,7 @@ DWORD WINAPI  Bacnet_read_properties_thread(LPVOID lpVoid)
 		Temp_Error_Msg.Format(_T("Read Properties error\r\n\
 Not able to read Property list of BACnet Device,\r\nThis may be due to a connection error with device \r\n\ "));
 		//AfxMessageBox(Temp_Error_Msg);
-		
+
 	}
 	bacnetIpDataRead = false;
 	::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST, NULL, NULL);
@@ -3322,7 +3319,7 @@ Not able to read Property list of BACnet Device,\r\nThis may be due to a connect
 	::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST, NULL, NULL);
 	Sleep(100);
 	BACnet_read_thread = NULL;
-	
+
 	return 0;
 }
 
@@ -3336,10 +3333,10 @@ void CDialogCM5_BacNet::Fresh()
 	// Pause the thread that reads registers as long as on minipanel interface
 	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 
-	if ((g_protocol!=PROTOCOL_BACNET_IP) && 
-        (g_protocol != MODBUS_BACNET_MSTP)  && 
-        (g_protocol != PROTOCOL_BIP_TO_MSTP) && 
-        (g_protocol != MODBUS_RS485) &&  
+	if ((g_protocol!=PROTOCOL_BACNET_IP) &&
+        (g_protocol != MODBUS_BACNET_MSTP)  &&
+        (g_protocol != PROTOCOL_BIP_TO_MSTP) &&
+        (g_protocol != MODBUS_RS485) &&
         (g_protocol != MODBUS_TCPIP) &&
         (g_protocol != PROTOCOL_BIP_T0_MSTP_TO_MODBUS) &&
         (g_protocol != PROTOCOL_MB_TCPIP_TO_MB_RS485) &&
@@ -3383,12 +3380,12 @@ void CDialogCM5_BacNet::Fresh()
 
 	}
 	m_user_level = LOGIN_SUCCESS_FULL_ACCESS;
-	 
-	input_item_limit_count = BAC_INPUT_ITEM_COUNT;	
+
+	input_item_limit_count = BAC_INPUT_ITEM_COUNT;
 	output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;
 	variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;
 
-	KillTimer(BAC_READ_PROPERTIES); 
+	KillTimer(BAC_READ_PROPERTIES);
 	if (BACnet_read_thread != NULL)
 	{
 		standard_bacnet_data.clear();
@@ -3405,7 +3402,7 @@ void CDialogCM5_BacNet::Fresh()
 	}
 	if (selected_product_Node.protocol == PROTOCOL_THIRD_PARTY_BAC_BIP) // handler for the third party bacnet device. read the objects of the device and there properties to display in																			input/output grid
 	{
-			
+
 			if (BACnet_read_thread == NULL)
 			{
 				/*To check if device is online then go futher to read the properties*/
@@ -3416,7 +3413,7 @@ void CDialogCM5_BacNet::Fresh()
 					return;
 				}
 				ClearBacnetData();
-				
+
 				/*reseting the dialuges tables to pupulate the new device Data */
 				((CBacnetInput*)pDialog[WINDOW_INPUT])->Initial_List();
 
@@ -3436,7 +3433,7 @@ void CDialogCM5_BacNet::Fresh()
 			BacNet_hwd = this->m_hWnd;
 
 		return;
-		
+
 	}
 	else if(selected_product_Node.protocol == PROTOCOL_GSM)
 	//if(0)	//GSM连接
@@ -3527,7 +3524,7 @@ void CDialogCM5_BacNet::Fresh()
 		return;
 	}
 	//else if((selected_product_Node.protocol == MODBUS_RS485) && (selected_product_Node.NetworkCard_Address.IsEmpty()))  // 2020 07 23 修改 在手动加入设备后，因为以前网络曾经扫描过，所以报错网络无法连接;
-    else if (selected_product_Node.protocol == MODBUS_RS485) 
+    else if (selected_product_Node.protocol == MODBUS_RS485)
 	{
 
 
@@ -3553,7 +3550,7 @@ void CDialogCM5_BacNet::Fresh()
             read_rs485_thread = CreateThread(NULL, NULL, RS485_Connect_Thread, this, NULL, NULL);
         return;
     }
-	else if((selected_product_Node.protocol == MODBUS_TCPIP) && 
+	else if((selected_product_Node.protocol == MODBUS_TCPIP) &&
 		((selected_product_Node.product_class_id == PM_T38AI8AO6DO) ||
 		 (selected_product_Node.product_class_id == PM_T322AI) ||
 		 (selected_product_Node.product_class_id == PM_T332AI_ARM) ||
@@ -3623,7 +3620,7 @@ void CDialogCM5_BacNet::Fresh()
 	GetDlgItem(IDC_STATIC_CM5_MAC)->SetWindowTextW(temp_cs);
 	Station_NUM = g_mac;
 
-	
+
 	CString nconnectionip = selected_product_Node.BuildingInfo.strIp;
 	int nport =	selected_product_Node.ncomport;
 
@@ -3700,7 +3697,7 @@ void CDialogCM5_BacNet::Fresh()
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
 		return;
 	}
-	
+
 	if(ret)
 	{
 		unsigned int temp_instance;
@@ -3779,7 +3776,7 @@ void CDialogCM5_BacNet::Fresh()
 
             temp_instance = temp_buffer[0] * 65536 + temp_buffer[3];
             temp_mac = temp_buffer[4];
-        } 
+        }
 
 
 
@@ -3788,13 +3785,13 @@ void CDialogCM5_BacNet::Fresh()
 			else if(selected_product_Node.product_class_id == T38AI8AO6DO)
 				bacnet_device_type = T38AI8AO6DO;
 			else if(selected_product_Node.product_class_id == PID_T322AI)
-				bacnet_device_type = PID_T322AI;	
+				bacnet_device_type = PID_T322AI;
 			else if (selected_product_Node.product_class_id == PM_T332AI_ARM)
-				bacnet_device_type = PM_T332AI_ARM;		
+				bacnet_device_type = PM_T332AI_ARM;
 			else if (selected_product_Node.product_class_id == PWM_TRANSDUCER)
 				bacnet_device_type = PWM_TRANSDUCER;
 			else if(selected_product_Node.product_class_id == STM32_HUM_NET)
-				bacnet_device_type = STM32_HUM_NET;	
+				bacnet_device_type = STM32_HUM_NET;
 			else if (selected_product_Node.product_class_id == PM_T3_LC)
 				bacnet_device_type = PM_T3_LC;
             else if (selected_product_Node.product_class_id == PM_TSTAT10)
@@ -3850,7 +3847,7 @@ void CDialogCM5_BacNet::Fresh()
 					g_protocol_support_ptp = PROTOCOL_UNKNOW;
 				}
 			}
-	
+
             // Check if bit1 contains wifi module
             if ((selected_product_Node.nhardware_info & 0x02) == 2) //判断bit1 是否含有wifi模块;
             {
@@ -3884,7 +3881,7 @@ void CDialogCM5_BacNet::Fresh()
 		{
 			//g_sub_instace = g_bac_instance;
 			//g_bac_instance = temp_instance;
-			
+
 			if(WaitRead_Data_Dlg)
 			{
 				delete WaitRead_Data_Dlg;
@@ -3968,7 +3965,7 @@ void CDialogCM5_BacNet::Fresh()
 			//::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
 		}
 		else
-#endif 
+#endif
 		{
 
 
@@ -4013,9 +4010,9 @@ void CDialogCM5_BacNet::Fresh()
 					try
 					{
 						strSql.Format(_T("update ALL_NODE set Object_Instance ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),hw_instance,str_serialid,str_baudrate);
-						SqliteDBBuilding.execDML((UTF8MBSTR)strSql);	
+						SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 						strSql.Format(_T("update ALL_NODE set Panal_Number ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),sw_mac,str_serialid,str_baudrate);
-						SqliteDBBuilding.execDML((UTF8MBSTR)strSql);	
+						SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 					}
 					catch(_com_error *e)
 					{
@@ -4027,7 +4024,7 @@ void CDialogCM5_BacNet::Fresh()
 				::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
 				CString temp_info;
 				temp_info.Format(_T("Device is connected!"));
-				CString* pstrInfo = new CString(temp_info); 
+				CString* pstrInfo = new CString(temp_info);
 				::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
 				bac_gloab_panel = g_mac = Station_NUM = temp_mac ;
 				g_bac_instance = temp_instance;
@@ -4197,7 +4194,7 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
             User_Login_Window->ShowWindow(SW_NORMAL);
             break;
         }
-            
+
 		button_click = lParam;
 		tsm_free_all_invoke_id();//每次点击的时候都将所有INVOKE ID 清零;
 		if(button_click == WRITEPRGFLASH_COMMAND)
@@ -4215,11 +4212,11 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 		tsm_free_all_invoke_id();//每次点击的时候都将所有INVOKE ID 清零;
 		Show_Wait_Dialog_And_SendMessage(TYPE_SVAE_CONFIG);
 		break;
-	default: 
+	default:
 		break;
 	}
 
-	
+
 	return 0;
 }
 
@@ -4234,7 +4231,7 @@ void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
         TerminateThread(hwait_thread, 0);
 	hwait_thread =CreateThread(NULL,NULL,Send_read_Command_Thread,this,NULL, NULL);
 
-	
+
 }
 
 
@@ -4242,7 +4239,7 @@ void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 
 DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 {
-	
+
 	int m_persent = 0;
 	int m_finished_count = 0;
 	int m_total_count = 0;
@@ -4316,7 +4313,7 @@ DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid)
 //阻塞方式的读  还有保存prg save 公用此功能; 2019 03 22
 DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 {
-	
+
 	//CDialogCM5_BacNet *pParent = (CDialogCM5_BacNet *)lpVoid;
 	int m_persent = 0;
 	int m_finished_count = 0;
@@ -4420,7 +4417,7 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 #if 1
 	if((g_bac_read_type == TYPE_ALL) || (g_bac_read_type == TYPE_SETTING) || g_bac_need_read_setting)
 	{
-		for (int i=0;i<1;i++)	
+		for (int i=0;i<1;i++)
 		{
 			int ret_n;
 			ret_n = GetPrivateData_Blocking(g_bac_instance,READ_SETTING_COMMAND,i,i,sizeof(Str_Setting_Info));
@@ -4442,7 +4439,7 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 				g_progress_persent = m_persent;
 				PostMessage(BacNet_hwd,WM_SHOW_PROGRESS,m_persent,0);
 				PostMessage(BacNet_hwd,WM_SHOW_PANELSTRING,0,(LPARAM)(temp_cstring));
-				
+
 				//TRACE(_T("Read Setting %d ok!\r\n"),i);
 				g_bac_need_read_setting = false;	//读过一次后 就不用在读了，下次点击Input 就直接读Input;
 			}
@@ -4906,7 +4903,7 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 		::PostMessage(m_annual_dlg_hwnd,WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 #endif
 	}
-	
+
     if (g_bac_read_type != TYPE_ALL)
     {
         click_read_thread = NULL;
@@ -5080,7 +5077,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 
 	for (int i=0;i<BAC_CUSTOMER_UNIT_GROUP;i++)
 	{
-		if(bac_read_which_list == BAC_READ_CUSTOMER_UNITS) 
+		if(bac_read_which_list == BAC_READ_CUSTOMER_UNITS)
 		{
             CString temp_cs;
             temp_cs.Format(_T("Read Custom units From %d to %d "), (BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,
@@ -5098,14 +5095,14 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             Sleep(SEND_COMMAND_DELAY_TIME);
 #if 0
 			resend_count = 0;
-			do 
+			do
 			{
 				resend_count ++;
 				if(resend_count>RESEND_COUNT)
 					goto myend;
 				g_invoke_id = GetPrivateData(g_bac_instance,READUNIT_T3000,(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,
 					3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_Units_element));
-				Sleep(SEND_COMMAND_DELAY_TIME);	
+				Sleep(SEND_COMMAND_DELAY_TIME);
 			} while (g_invoke_id<0);
 			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].command = READUNIT_T3000;
 			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].device_id = g_bac_instance;
@@ -5246,10 +5243,10 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             Sleep(SEND_COMMAND_DELAY_TIME);
 #endif
 		}
-		
+
 	}
 
-	
+
 	for (int i=0;i<BAC_SCHEDULE_GROUP;i++)
 	{
 
@@ -5264,7 +5261,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
            if(GetPrivateData_Blocking(g_bac_instance,
                 READWEEKLYROUTINE_T3000, (BAC_READ_SCHEDULE_GROUP_NUMBER)*i,
                 end_temp_instance,
-                sizeof(Str_weekly_routine_point)) > 0) 
+                sizeof(Str_weekly_routine_point)) > 0)
             {
                 SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs + _T(" success!"));
             }
@@ -5309,7 +5306,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	}
 
 
-	
+
 
 	for (int i=0;i<BAC_ALARMLOG_GROUP;i++)
 	{
@@ -5391,7 +5388,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             }
             Sleep(SEND_COMMAND_DELAY_TIME);
 
-			g_output_support_relinquish = 0; //删除relinquish 
+			g_output_support_relinquish = 0; //删除relinquish
 		}
 		if (bac_read_which_list == BAC_READ_OUTPUT_LIST)
 		{
@@ -5460,7 +5457,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             end_temp_instance = BAC_READ_PROGRAM_REMAINDER + (BAC_READ_PROGRAM_GROUP_NUMBER)*i;
             if (end_temp_instance >= BAC_PROGRAM_ITEM_COUNT)
                 end_temp_instance = BAC_PROGRAM_ITEM_COUNT - 1;
-            
+
             CString temp_cs;
             temp_cs.Format(_T("Read Program List Item From %d to %d "), (BAC_READ_PROGRAM_GROUP_NUMBER)*i, end_temp_instance);
             if(GetPrivateData_Blocking(g_bac_instance, READPROGRAM_T3000, (BAC_READ_PROGRAM_GROUP_NUMBER)*i, end_temp_instance, sizeof(Str_program_point)) > 0)
@@ -5551,7 +5548,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
         Sleep(SEND_COMMAND_DELAY_TIME);
 #if 0
 		int resend_count = 0;
-		do 
+		do
 		{
 			resend_count ++;
 			if(resend_count>RESEND_COUNT)
@@ -5589,7 +5586,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             Sleep(SEND_COMMAND_DELAY_TIME);
 #if 0
 			int resend_count = 0;
-			do 
+			do
 			{
 				resend_count ++;
 				if(resend_count>RESEND_COUNT)
@@ -5630,7 +5627,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
         Sleep(SEND_COMMAND_DELAY_TIME);
 #if 0
 		int resend_count = 0;
-		do 
+		do
 		{
 			resend_count ++;
 			if(resend_count>RESEND_COUNT)
@@ -5668,7 +5665,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
             Sleep(SEND_COMMAND_DELAY_TIME);
 #if 0
 			int resend_count = 0;
-			do 
+			do
 			{
 				resend_count ++;
 				if(resend_count>RESEND_COUNT)
@@ -5719,7 +5716,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 			int send_status = true;
 			int resend_count = 0;
 			int temp_invoke_id = -1;
-			do 
+			do
 			{
 				resend_count ++;
 				if(resend_count>RESEND_COUNT)
@@ -5753,7 +5750,7 @@ part_success:
 		if (g_new_old_IDE == 0)
 		{
 			::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, SHOW_PROGRAM_IDE, 0);
-		} 
+		}
 		else
 		{
 			::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, SHOW_PROGRAM_NEWIDE, 0);
@@ -5787,7 +5784,7 @@ part_success:
 				int send_status = true;
 				int resend_count = 0;
 				int temp_invoke_id = -1;
-				do 
+				do
 				{
 					resend_count ++;
 					if(resend_count>RESEND_COUNT)
@@ -5809,11 +5806,11 @@ part_success:
 					}
 					Bacnet_Refresh_Info.Read_Programcode_Info[z].task_result = BAC_RESULTS_FAIL;
 					goto myend;
-					
-program_part_success:
-					
 
-					
+program_part_success:
+
+
+
 					continue;
 				}
 
@@ -5827,7 +5824,7 @@ program_part_success:
 	}
 #endif
 
-	
+
 	hwait_thread = NULL;
     ::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, 0, 0);
 	return 0;
@@ -5851,13 +5848,13 @@ void CDialogCM5_BacNet::SetConnected_IP(LPCTSTR myip)
 void CDialogCM5_BacNet::WriteFlash()
 {
 
-    int ret_n = 0; 
+    int ret_n = 0;
     CString temp_cs_show;
     ret_n = GetPrivateData_Blocking(g_bac_instance, WRITEPRGFLASH_COMMAND, 0, 0, 0, 1);
-    
+
     temp_cs_show.Format(_T("Write into flash success")); //设备不响应这个命令，所以直接显示成功;
     SetPaneString(BAC_SHOW_MISSION_RESULTS, temp_cs_show);
-    
+
     return;
 }
 
@@ -6022,7 +6019,7 @@ void CDialogCM5_BacNet::Read_Setting_Info_Progress(int retry_count)
 
 void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 {
-	 
+
 
 	bool is_connected = false;
 	if (scaning_mode)
@@ -6030,7 +6027,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 
 	switch(nIDEvent)
 	{
-		if (hwait_write_thread != NULL) //     在写入prog的时候，不要刷新value数据  
+		if (hwait_write_thread != NULL) //     在写入prog的时候，不要刷新value数据
 			break;
 	case BAC_READ_PROPERTIES:
 	{
@@ -6046,7 +6043,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					//Send_WhoIs_Global(-1, -1);
 					Sleep(50);
 				}
-				
+
 
 				 g_mstp_deviceid = selected_product_Node.object_instance;
 				g_protocol = PROTOCOL_THIRD_PARTY_BAC_BIP;
@@ -6162,7 +6159,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 	default:
 		break;
 	}
-	
+
 
 	CFormView::OnTimer(nIDEvent);
 }
@@ -6237,7 +6234,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 		old_selected_item = WINDOW_WEEKLY;
 	}
 	else
-	{	
+	{
 		// 从 INI 恢复上次查看的 Tab（图形模式/例行模式不走这里）
 		bacnet_view_number = GetPrivateProfileInt(_T("LastView"), _T("ViewNumber"), TYPE_INPUT, g_cstring_ini_path);
         if(Bacnet_Private_Device(g_selected_product_id))
@@ -6332,7 +6329,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 
 	if(m_bac_main_tab.IsWindowVisible() == false)
 		m_bac_main_tab.ShowWindow(true);
-	
+
 	// 先隐藏所有窗口，确保只显示选中的那一个
 	for (int i = 0; i < WINDOW_TAB_COUNT; i++)
 		pDialog[i]->ShowWindow(SW_HIDE);
@@ -6348,7 +6345,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
             //Input_Window->Reset_Input_Rect();
         }
 		g_hwnd_now = m_input_dlg_hwnd;
-		Input_Window->m_input_list.SetFocus();  
+		Input_Window->m_input_list.SetFocus();
 		::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
  		break;
 	case TYPE_OUTPUT:
@@ -6360,7 +6357,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			//Output_Window->Reset_Output_Rect();
         }
 		g_hwnd_now = m_output_dlg_hwnd;
-		Output_Window->m_output_list.SetFocus();  
+		Output_Window->m_output_list.SetFocus();
 		::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST,NULL,REFRESH_LIST_NOW);
 		break;
 	case TYPE_VARIABLE:
@@ -6371,7 +6368,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
             Variable_Window->RestoreWindowPosition();
         }
 		g_hwnd_now =  m_variable_dlg_hwnd;
-		Variable_Window->m_variable_list.SetFocus();  
+		Variable_Window->m_variable_list.SetFocus();
 		::PostMessage(m_variable_dlg_hwnd, WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 		break;
 	case TYPE_PROGRAM:
@@ -6381,7 +6378,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
             Program_Window->Reset_Program_Rect();
         }
 		g_hwnd_now =  m_pragram_dlg_hwnd;
-		Program_Window->m_program_list.SetFocus();   
+		Program_Window->m_program_list.SetFocus();
 		::PostMessage(m_pragram_dlg_hwnd, WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 		break;
 	case TYPE_CONTROLLER:
@@ -6391,38 +6388,38 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
             Controller_Window->Reset_Controller_Rect();
         }
 		g_hwnd_now =  m_controller_dlg_hwnd;
-		Controller_Window->m_controller_list.SetFocus();  
+		Controller_Window->m_controller_list.SetFocus();
 		::PostMessage(m_controller_dlg_hwnd, WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
 		break;
 	case TYPE_SCREENS:
 		g_hwnd_now =  m_screen_dlg_hwnd;
-		Screen_Window->m_screen_list.SetFocus();  
+		Screen_Window->m_screen_list.SetFocus();
 		::PostMessage(m_screen_dlg_hwnd, WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 		break;
 	case TYPE_WEEKLY:
 		g_hwnd_now =  m_weekly_dlg_hwnd;
-		WeeklyRoutine_Window->m_weeklyr_list.SetFocus();  
+		WeeklyRoutine_Window->m_weeklyr_list.SetFocus();
 		::PostMessage(m_weekly_dlg_hwnd, WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 		break;
 	case TYPE_ANNUAL:
 		g_hwnd_now =  m_annual_dlg_hwnd;
-		AnnualRoutine_Window->m_annualr_list.SetFocus();   
+		AnnualRoutine_Window->m_annualr_list.SetFocus();
 		::PostMessage(m_annual_dlg_hwnd, WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 		break;
 	case TYPE_MONITOR:
 		g_hwnd_now =  m_monitor_dlg_hwnd;
-		Monitor_Window->m_monitor_list.SetFocus();  
+		Monitor_Window->m_monitor_list.SetFocus();
 		::PostMessage(m_monitor_dlg_hwnd, WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
 		::PostMessage(m_monitor_dlg_hwnd, WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
 		break;
 	case TYPE_ALARMLOG:
 		g_hwnd_now =  m_alarmlog_dlg_hwnd;
-		AlarmLog_Window->m_alarmlog_list.SetFocus();   
+		AlarmLog_Window->m_alarmlog_list.SetFocus();
 		::PostMessage(m_alarmlog_dlg_hwnd, WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
 		break;
 	case TYPE_READ_REMOTE_POINT_INFO:
 		g_hwnd_now =  m_remote_point_hwnd;
-		Remote_Point_Window->m_remote_point_list.SetFocus();  
+		Remote_Point_Window->m_remote_point_list.SetFocus();
 		::PostMessage(m_remote_point_hwnd, WM_REFRESH_BAC_REMOTE_POINT_LIST,NULL,NULL);
 		break;
     case TYPE_SETTING:
@@ -6434,12 +6431,12 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	bac_select_device_online = true;
 	CString temp_serial_number;
 	temp_serial_number.Format(_T("%u"),g_selected_serialnumber);
-	
+
 	int temp_write_flag = GetPrivateProfileInt(temp_serial_number,_T("WriteFlag"),0,g_achive_device_name_path);
 
 	if(Device_Basic_Setting.reg.en_panel_name == 1)
 	{
-		if(temp_write_flag)	//本地的 name 比较新  更新至 设备; 
+		if(temp_write_flag)	//本地的 name 比较新  更新至 设备;
 		{
 			CString Write_String;
 			char temp_buffer[20];
@@ -6478,7 +6475,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			//		SqliteDBBuilding.open((UTF8MBSTR)g_strCurBuildingDatabasefilePath);
 			//		CString strSql;
 			//		strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID ='%s'"),temp_device_panel_name,temp_serial_number);
-			//		SqliteDBBuilding.execDML((UTF8MBSTR)strSql); 
+			//		SqliteDBBuilding.execDML((UTF8MBSTR)strSql);
 			//		if(selected_product_index < pFrame->m_product.size())
 			//		{
 			//			pFrame->m_pTreeViewCrl->SetItemText(selected_product_Node.product_item,temp_device_panel_name);
@@ -6487,7 +6484,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			//		SqliteDBBuilding.closedb();
 			//	}
 			//}
-			
+
 		}
 	}
 	//if((!read_customer_unit) && selected_product_Node.protocol != MODBUS_RS485    20200820 只要点击 就在读一遍 ，老毛一直叫 没刷新 MSV的 unit 以前是 只读第一遍
@@ -6582,12 +6579,12 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 
 		}
 	}
-	
+
 
 	//if ((!read_analog_customer_unit) && selected_product_Node.protocol != MODBUS_RS485 && ((selected_product_Node.product_class_id == PM_CM5) ||
 	//	(selected_product_Node.product_class_id == PM_MINIPANEL)))
-      if((!read_analog_customer_unit) && 
-		selected_product_Node.protocol != MODBUS_RS485 && 
+      if((!read_analog_customer_unit) &&
+		selected_product_Node.protocol != MODBUS_RS485 &&
 		((selected_product_Node.product_class_id ==PM_CM5 ) ||
 		(selected_product_Node.product_class_id ==PM_MINIPANEL )||
             (selected_product_Node.product_class_id == PM_TSTAT10) ||
@@ -6601,7 +6598,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			GetPrivateData_Blocking(g_bac_instance,READANALOG_CUS_TABLE_T3000,4,4,sizeof(Str_table_point));
 			temp_cs.Format(_T("Read Analog custom table OK."));
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs);
-			read_analog_customer_unit = true;		
+			read_analog_customer_unit = true;
 		}
         Sleep(50);
 		if(GetPrivateData_Blocking(g_bac_instance,READVARUNIT_T3000,0,4,sizeof(Str_variable_uint_point)) > 0)
@@ -6649,7 +6646,7 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
         }
 		static_value_read = g_selected_serialnumber ;
 	}
-	else if(static_value_read != g_selected_serialnumber) 
+	else if(static_value_read != g_selected_serialnumber)
 	{
         if (offline_mode == false)
         {
@@ -6665,8 +6662,8 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
 
 void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	
-	
+
+
 	int selected = m_bac_main_tab.GetCurSel();
 
 
@@ -6751,7 +6748,7 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 			Invalidate(TRUE);
 			return;
 		}
-		
+
 	}
 
 	for (int i=0;i<WINDOW_TAB_COUNT;i++)
@@ -6882,7 +6879,7 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 					Set_Tab_Loaded_Parameter(WINDOW_TSTAT);
 				}
 				((CBacnetTstat *)pDialog[i])->Fresh_Tstat_List(NULL,NULL);
-				
+
 				g_hwnd_now = m_tstat_dlg_hwnd;
 				bacnet_view_number = TYPE_TSTAT;
 				break;
@@ -6994,7 +6991,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
     else if ((n_read_product_type == PM_TSTAT_AQ) ||
 		     (n_read_product_type == PM_AIRLAB_ESP32))
     {
-        input_reg = 8; //  23 * 32 = 736  
+        input_reg = 8; //  23 * 32 = 736
     }
     else
     {
@@ -7372,7 +7369,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
         break;
     case READPROGRAM_T3000/*BAC_PRG*/:
     {
-         
+
         for (int i = 0; i < 4; i++)  //15503   - 15806
         {
             int itemp = 0;
@@ -7542,7 +7539,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
                             }
                         }
                         memcpy(&m_Schedual_Time_data.at(weekly_list_line), temp_point, 72 * 2);
-                       
+
                         ::PostMessage(BacNet_hwd, WM_DELETE_NEW_MESSAGE_DLG, 0, 0);
                     }
                 }
@@ -7828,7 +7825,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
          {
              temp_object_instance = read_data_high[0] * 65536 + read_data_low[0];
              g_bac_instance = temp_object_instance;
-            
+
          }
          else
          {
@@ -7839,7 +7836,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
              return 5;
          }
      }
-	
+
 
 	 CString str_object_instance;
 	 CString str_panel_number;
@@ -7875,7 +7872,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 
 	 CString achive_file_path;
 	 CString temp_serial;
-	 
+
 
      if (g_protocol_support_ptp == PROTOCOL_MB_PTP_TRANSFER)
      {
@@ -8050,8 +8047,8 @@ LRESULT CDialogCM5_BacNet::RS485_Read_Fun(WPARAM wParam,LPARAM lParam)
 
 BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 {
-	
-	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_TAB) 
+
+	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_TAB)
 	{
 		if(m_bac_main_tab.IsWindowVisible() == false)
 		{
@@ -8234,9 +8231,9 @@ DWORD WINAPI  LoadAllPanelDescriptors(LPVOID lpVoid)
 			unsigned char t_panel_num = s_Basic_Setting.reg.panel_number;
 			if ((t_panel_num == 0) || t_panel_num == 255)
 				continue;
-			
+
 			g_Device_Basic_Setting[t_panel_num] = s_Basic_Setting; //保存信息至全局;
-			
+
 			int end_temp_instance = 0;
 			CString Mession_ret;
 			int read_success_count = 0;
@@ -8260,8 +8257,8 @@ DWORD WINAPI  LoadAllPanelDescriptors(LPVOID lpVoid)
 							g_Input_data[t_panel_num].at(i) = s_Input_data[i];
 						}
 					}
-					
-					
+
+
 					Sleep(SEND_COMMAND_DELAY_TIME);
 				}
 				else
@@ -8304,7 +8301,6 @@ DWORD WINAPI  LoadAllPanelDescriptors(LPVOID lpVoid)
 				g_progress_persent = read_success_count * 100 / BAC_OUTPUT_GROUP;
 			}
 
-
 			for (int i = 0; i < BAC_VARIABLE_GROUP; i++)
 			{
 				end_temp_instance = BAC_READ_VARIABLE_REMAINDER + (BAC_READ_VARIABLE_GROUP_NUMBER)*i;
@@ -8341,6 +8337,6 @@ DWORD WINAPI  LoadAllPanelDescriptors(LPVOID lpVoid)
 		Sleep(1);
 
 	}
-	
+
 	return 0;
 }

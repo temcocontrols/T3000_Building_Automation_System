@@ -24,15 +24,15 @@
 extern unsigned int n_check_temco_firmware;
 extern CString Failed_Message;
 extern Bin_Info        global_fileInfor;
-typedef struct _Product_IP_ID 
+typedef struct _Product_IP_ID
 {
 	CString ISP_Device_IP;
 	//unsigned char Byte_ISP_Device_IP[4];
 	unsigned char ID;
 }Product_IP_ID;
 
-////#include <vector>			//矢量模板 - Vector template
-////using  std::vector;			//命名空间 - Namespace
+// //#include <vector> // Vector template
+// //using  std::vector; // Namespace
 ////
 ////
 ////extern vector <Product_IP_ID> Product_Info;
@@ -42,9 +42,9 @@ typedef struct _Product_IP_ID
 // CAkingSocket
 
 //Used to display some results
-extern CString ShowTFTPMessage; //用于显示一些结果;
+extern CString ShowTFTPMessage; // Used to display results.
 //Used to display some results
-extern CString ShowTFTPMessage2; //用于显示一些结果;
+extern CString ShowTFTPMessage2; // Used to display results.
 extern int ISP_STEP;
 extern BYTE Byte_ISP_Device_IP[4];
 extern bool device_has_replay_lan_IP;
@@ -54,7 +54,7 @@ extern bool device_jump_from_runtime;
 extern bool has_enter_dhcp_has_lanip_block;
 extern BYTE Product_Name[12];
 extern BYTE Rev[4];
- 
+
 //extern bool some_device_reply_the_broadcast;
 MySocket::MySocket()
 {
@@ -65,17 +65,16 @@ MySocket::~MySocket()
 {
 }
 
-
 // Do not edit the following lines, which are needed by ClassWizard.
 /////////////////////////////////////////////////////////////////////////////
 // Fance Socket member functions
-void MySocket::OnAccept(int nErrorCode) 
+void MySocket::OnAccept(int nErrorCode)
 {
 	CAsyncSocket::OnAccept(nErrorCode);
 }
 extern CString ISP_Device_IP;
 //Code by Fance 2013 05 06
-void MySocket::OnReceive(int nErrorCode) 
+void MySocket::OnReceive(int nErrorCode)
 {
 	int tem_data=0;
 	memset(receive_buf,0,4096);
@@ -83,7 +82,7 @@ void MySocket::OnReceive(int nErrorCode)
 	if(ISP_STEP == ISP_SEND_FLASH_COMMAND)
 	{
 		//Receive EE 10's 40 byte reply
-		if(Receive_data_length == 40)//接收EE 10 的 40 byte 回复
+		if(Receive_data_length == 40)// Receive the 40-byte reply to command EE 10.
 		{
 			TRACE("ISP_SEND_FLASH_COMMAND Receive 40 byte\n");
 			char temp_data[100];
@@ -115,17 +114,17 @@ void MySocket::OnReceive(int nErrorCode)
                 memcpy_s(Product_Name,sizeof(Product_Name),receive_buf+15,11);//copy the first 11 byte and check
 
 				//First check if it's a reply from the target IP address, prioritize processing replies from the target IP address
-				//先检查是不是目标IP地址回复的，优先处理目标IP地址回复的
+				// First check whether the reply came from the target IP, and handle that reply first.
 				CString temp_reply_ip;
 				temp_reply_ip.Format(_T("%u.%u.%u.%u"), Byte_ISP_Device_IP[0], Byte_ISP_Device_IP[1], Byte_ISP_Device_IP[2], Byte_ISP_Device_IP[3]);
 				if ((temp_reply_ip.CompareNoCase(ISP_Device_IP) != 0) && (receive_not_want_ip_times <3))
 				{
 					ShowTFTPMessage2.Format(_T("IP:%s responds to the update request (%d)"), temp_reply_ip.GetString(), receive_not_want_ip_times);
 					receive_not_want_ip_times++;
-					//CAsyncSocket::OnReceive(nErrorCode); //暂时屏蔽，设备经常回复 05 错误命令导致握手失败 - Temporarily shielded, the device often replies with error command 05, causing handshake failure
+					// CAsyncSocket::OnReceive(nErrorCode); // Temporarily shielded, the device often replies with error command 05, causing handshake failure
 					//return;
 				}
-				
+
 
 			    CString DeviceProductName ,FileProductName;
 
@@ -142,7 +141,7 @@ void MySocket::OnReceive(int nErrorCode)
 
                 FileProductName.MakeUpper();
                 DeviceProductName.MakeUpper();
-               
+
                 if (FileProductName.CompareNoCase(DeviceProductName) == 0)
                 {
                     ShowTFTPMessage = _T("Ready to check the firmware and panel.");
@@ -151,7 +150,7 @@ void MySocket::OnReceive(int nErrorCode)
                 {
                     ShowTFTPMessage = _T("Firmware: ") +  FileProductName + _T("  ") + _T("Panel: ") + DeviceProductName;
                 }
-                    
+
 				if (DeviceProductName.CompareNoCase(FileProductName)!=0)
 				{
 					CString strTip;
@@ -164,7 +163,7 @@ void MySocket::OnReceive(int nErrorCode)
 					}
 					else if(((DeviceProductName.CompareNoCase(_T("MINI")) == 0) && (FileProductName.CompareNoCase(_T("Minipanel")) == 0)) ||
 						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0 ))  ||
-                        ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  // 2018 0307 有人把 CO2NET 改为CO2ALL了，导致匹配不到，无法烧写.为了兼容，加特例.
+                        ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  // On 2018-03-07 CO2NET was renamed CO2ALL, so the match failed and flashing could not start. A special case was added for compatibility.
                         ((DeviceProductName.CompareNoCase(_T("UMNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||
                         ((DeviceProductName.CompareNoCase(_T("CO2")) == 0) && (FileProductName.CompareNoCase(_T("CO2 NET")) == 0)) ||
                         ((DeviceProductName.CompareNoCase(_T("PSNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)))
@@ -186,7 +185,7 @@ void MySocket::OnReceive(int nErrorCode)
 
 				device_has_replay_lan_IP = true;
 				ISP_STEP =ISP_SEND_DHCP_COMMAND_HAS_LANIP;
-                
+
 
 			}
 		}
@@ -253,7 +252,7 @@ void MySocket::OnReceive(int nErrorCode)
 					}
 					else if(((DeviceProductName.CompareNoCase(_T("MINI")) == 0) && (FileProductName.CompareNoCase(_T("Minipanel")) == 0)) ||
 						((DeviceProductName.CompareNoCase(_T("Minipanel")) == 0) && (FileProductName.CompareNoCase(_T("MINI")) == 0))  ||
-                        ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  //特殊情况加入的.
+                        ((DeviceProductName.CompareNoCase(_T("CO2NET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)) ||  // Added for a special case.
                         ((DeviceProductName.CompareNoCase(_T("UMNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0))  ||
                         ((DeviceProductName.CompareNoCase(_T("CO2")) == 0) && (FileProductName.CompareNoCase(_T("CO2 NET")) == 0)) ||
                         ((DeviceProductName.CompareNoCase(_T("PSNET")) == 0) && (FileProductName.CompareNoCase(_T("CO2ALL")) == 0)))
@@ -273,7 +272,7 @@ void MySocket::OnReceive(int nErrorCode)
 				{
 					ISP_STEP =ISP_Send_TFTP_PAKAGE;
 				}
-				
+
 			}
 		}
 		else if (Receive_data_length == 5)
@@ -285,10 +284,10 @@ void MySocket::OnReceive(int nErrorCode)
 	{
 		if(Receive_data_length==4)
 		{
-			unsigned char temp_data[100];		
+			unsigned char temp_data[100];
 			memset(temp_data,0,sizeof(temp_data));
 			memcpy_s(temp_data,sizeof(temp_data),receive_buf,11);//copy the first 11 byte and check
-			tem_data =  temp_data[2]<<8|temp_data[3];		
+			tem_data =  temp_data[2]<<8|temp_data[3];
 			if((temp_data[1]==4)&&(tem_data==package_number))
 			{
 				next_package_number = package_number +1;
@@ -322,7 +321,7 @@ void MySocket::OnReceive(int nErrorCode)
 }
 
 
-void MySocket::OnClose(int nErrorCode) 
+void MySocket::OnClose(int nErrorCode)
 {
 	CAsyncSocket::OnClose(nErrorCode);
 }
@@ -331,6 +330,4 @@ void MySocket::OnConnect(int nErrorCode)
 {
 	CAsyncSocket::OnConnect(nErrorCode);
 }
-
-
 

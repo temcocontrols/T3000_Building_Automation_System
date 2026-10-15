@@ -60,7 +60,7 @@ typedef u8 bn256[32];
 // 512-bit 大整数 (小端) / 512-bit big integer (little-endian)
 typedef u8 bn512[64];
 
-// 模数 p = 2^255 - 19 / Modulus p = 2^255 - 19
+// 19 / Modulus p = 2^255 - 19
 static const bn256 P25519 = {
     0xED, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -330,15 +330,15 @@ static void add_modp(bn256 c, const bn256 a, const bn256 b)
     }
 }
 
-// 减法: c = a - b mod p / Subtraction: c = a - b mod p
+// b mod p / Subtraction: c = a - b mod p
 static void sub_modp(bn256 c, const bn256 a, const bn256 b)
 {
     u8 borrow = bn_sub(c, a, b);
     if (borrow) {
         // 不够减时: a - b = c - 2^256 (借位)
-        // 所以 (a - b) mod p = c - 2^256 + p
+        // b) mod p = c - 2^256 + p
         // 因为 p = 2^255 - 19, 所以 2^256 - p = 2^255 + 19
-        // 结果 = c - (2^255 + 19)
+        // (2^255 + 19)
         // Underflow: a - b = c - 2^256 (borrowed)
         // So (a - b) mod p = c - 2^256 + p
         // Since p = 2^255 - 19, 2^256 - p = 2^255 + 19
@@ -350,7 +350,7 @@ static void sub_modp(bn256 c, const bn256 a, const bn256 b)
         correction[0] = 0x13;     // 19
         correction[31] = 0x80;    // 2^255
         bn_sub(c, c, correction);
-        // 不会再次借位: c >= 2^256 - (p-1) = 2^255 + 20 > 2^255 + 19
+        // (p-1) = 2^255 + 20 > 2^255 + 19
         // No second borrow: c >= 2^256 - (p-1) = 2^255 + 20 > 2^255 + 19
     }
 }

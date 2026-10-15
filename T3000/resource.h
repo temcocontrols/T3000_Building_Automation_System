@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ ?????????????
-// ?? T3000.rc ???
+// Microsoft Visual C++ generated include file.
+// Used by T3000.rc
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -3512,7 +3512,7 @@
 #define IDC_STATIC_IP_PORT              60047
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        811
