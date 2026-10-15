@@ -87,7 +87,7 @@ const int THREAD_IDLE = 255;
 const int TFTP_SEND_LENGTH = 512;
 //const int TFTP_SEND_LENGTH = 1024;
 //Save alignment state
-#pragma pack(push) //保存对齐状态
+#pragma pack(push) // Save the alignment state.
 #pragma pack(1)
 typedef struct
 {
@@ -163,7 +163,7 @@ typedef struct
 
 
 //Restore alignment state
-#pragma pack(pop)//恢复对齐状态
+#pragma pack(pop)// Restore the alignment state.
 
 
 typedef enum
@@ -1328,6 +1328,7 @@ typedef enum
 	T3_NG3 = 22,
 	T3_3IIC = 26,  //6合1 的传感器 esp 产品 啥也没加
 	T3_RMC1232 = 29,
+	T3_HUB = 30,
 	T3_TSTAT11 = 31,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
@@ -2191,7 +2192,7 @@ typedef enum
 	RETURN_MINI_DATA = 5
 };
 
-#pragma pack(push) //保存对齐状态
+#pragma pack(push) // Save the alignment state.
 #pragma pack(1)
 typedef struct
 {
@@ -2212,7 +2213,7 @@ typedef struct
 
 }STR_For_T3000;
 
-#pragma pack(pop)//恢复对齐状态
+#pragma pack(pop)// Restore the alignment state.
 
 
 
@@ -2260,7 +2261,7 @@ const int day_in_this_year[] =
 #define HEARTBEAT_LENGTH	200
 #define  T3000_MINI_HEARTBEAT_LENGTH_WITH_MINI_PORT  (9 + HEARTBEAT_LENGTH)
 
-#pragma pack(push) //保存对齐状态
+#pragma pack(push) // Save the alignment state.
 #pragma pack(1)
 struct stLoginMessage
 {
@@ -2287,7 +2288,7 @@ typedef union
 #define COMMAND_FROM_MINI		2
 #define COMMAND_FROM_T3000		3
 
-#pragma pack(pop)//恢复对齐状态
+#pragma pack(pop)// Restore the alignment state.
 
 enum PTP_COMMAND_TYPE {
 	COMMAND_RECEIVE_HEART_BEAT = 0x01,

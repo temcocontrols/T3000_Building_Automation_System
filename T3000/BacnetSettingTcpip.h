@@ -2,7 +2,7 @@
 
 
 // CBacnetSettingTcpip Dialog
-// CBacnetSettingTcpip 对话框
+// CBacnetSettingTcpip dialog
 
 class CBacnetSettingTcpip : public CDialogEx
 {
@@ -10,18 +10,18 @@ class CBacnetSettingTcpip : public CDialogEx
 
 public:
 	CBacnetSettingTcpip(CWnd* pParent = NULL);   // Standard constructor
-	// 标准构造函数
+	// Standard constructor.
 	virtual ~CBacnetSettingTcpip();
 
 // Dialog Data
-// 对话框数据
+// Dialog data.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_BACNET_SETTING_TCPIP };
 #endif
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	// DDX/DDV 支持
+	// DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -31,7 +31,7 @@ public:
     afx_msg void OnBnClickedBtnBacIPChange();
 
     char m_tcp_type; // Used to record whether IP address is dynamic to determine if there are changes
-    // 用于记录 IP地址是否是动态的，来判别是否有改变;
+    // Records whether the IP address is dynamic, so a change can be detected.
     virtual BOOL PreTranslateMessage(MSG* pMsg);
     afx_msg void OnBnClickedButtonWifiConfiguration();
 
@@ -58,4 +58,7 @@ public:
     void ClearSubNetInfo();
     afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
     afx_msg void OnBnClickedButtonWireguardConfig();
+    afx_msg void OnBnClickedButtonGsmStatus();
+    afx_msg void OnBnClickedButtonMqttConfig();
+    afx_msg void OnBnClickedButtonSnmpConfig();
 };

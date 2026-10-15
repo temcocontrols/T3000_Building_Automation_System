@@ -23,16 +23,16 @@ extern CString g_strFlashInfo;
 extern unsigned int Remote_timeout;
 extern unsigned int nflash_receive_to_send_delay_time;
 // 0 no need to update boot   1 need to update bootloader;   C2 is bootloader, must update if updating simultaneously
-extern int c2_need_update_boot;  //0 不用更新boot   1 需要更新bootload;   C2为bootload  同时要更新就必须更新;
+extern int c2_need_update_boot;  // 0: do not update the bootloader. 1: bootloader update is required. C2 is the bootloader. If updating both, the bootloader must be updated.
 extern CString g_repair_bootloader_file_path;
 // If equals 1, it means we are now burning new BootLoader
-extern int new_bootload ; //如果等于1 就�?�明现在烧写的是新的BootLoader;
+extern int new_bootload ; // A value of 1 means the image being flashed is the new bootloader.
 extern unsigned char firmware_md5[32];
 /*extern*/ CRITICAL_SECTION g_cs;
 /*extern*/ CString showing_text;
 /*extern*/ int writing_row;
 // 0 no need to update boot   1 need to update bootloader;   C1 is hex
-extern int firmware_must_use_new_bootloader ;  //0 不用更新boot   1 需要更新bootload;   C1为hex
+extern int firmware_must_use_new_bootloader ;  // 0: do not update the bootloader. 1: bootloader update is required. C1 is the hex file.
 const int TFTP_PORT = 69;
 
 const int nLocalDhcp_Port = 67;			// Server Local 67
@@ -113,12 +113,11 @@ void TFTPServer::SetClientPort(int nPort)
     m_nClientPort = nPort;
 }
 
-
-
 void TFTPServer::SetFileName(const CString& strFileName)
 {
     m_strFileName= strFileName;
 }
+
 void TFTPServer::Set_FileProductName(CString Name)
 {
     m_StrFileProductName=Name;
@@ -129,8 +128,6 @@ void TFTPServer::SetDataSource(BYTE* pBuf, int nLen)
     m_szDataBuf = pBuf;
     m_nDataBufLen = nLen;
 }
-
-
 
 int TFTPServer::InitSocket()
 {
@@ -162,7 +159,7 @@ int TFTPServer::InitSocket()
     return TRUE;
 }
 
-// Broadcast notification 
+// Broadcast notification
 const int UDP_BROADCAST_PORT = 1234;
 void TFTPServer::BroadCastToClient()
 {
@@ -199,14 +196,13 @@ void TFTPServer::BroadCastToClient()
     int nRet = ::sendto(hBroad,(char*)&nmsgType,sizeof(short),0,(sockaddr*)&bcast,sizeof(bcast));
 }
 
-
 //  Accept Request
 int TFTPServer::RecvRequest()
 {
     BYTE szBuf[512];
     ZeroMemory(szBuf, 512);
 
-    SOCKADDR_IN  siRecvRead; // Receive read request，Used to bind
+    SOCKADDR_IN  siRecvRead; // Receive read request, used to bind
     siRecvRead.sin_family = AF_INET;
     siRecvRead.sin_port = htons(TFTP_PORT);
     siRecvRead.sin_addr.s_addr = htonl(INADDR_ANY);// inet_addr(_T("192.168.0.3"))
@@ -239,7 +235,6 @@ int TFTPServer::RecvRequest()
 
     return TRUE;
 }
-
 
 int TFTPServer::SendProcess()
 {
@@ -303,7 +298,6 @@ int TFTPServer::SendProcess()
                 {
                     break;
                 }
-
             }
         }
         if (nResend <= 0)
@@ -315,7 +309,6 @@ int TFTPServer::SendProcess()
     //SendEndDataPack();
     return 1;
 }
-
 
 // Send data
 int TFTPServer::SendData(BYTE* szBuf, int nLen)
@@ -344,7 +337,6 @@ int TFTPServer::SendData(BYTE* szBuf, int nLen)
         nRet = sendto(m_soSend,(char*)(&tdp), nLen+4, 0, (sockaddr*)&m_siClient, nAddrLen);
     }
 
-
     if (nRet == SOCKET_ERROR)
     {
         return 0;
@@ -354,10 +346,8 @@ int TFTPServer::SendData(BYTE* szBuf, int nLen)
     //strInfo.Format(_T("Send Data Byte Num = %d ********"), nRet);
     //strInfo.Format(_T("Send Block Num = %d\n"), tdp.m_wBlkNum);
 
-
     return nRet;
 }
-
 
 // Send data
 int TFTPServer::SendDataNew(BYTE* szBuf, int nLen)
@@ -379,9 +369,6 @@ int TFTPServer::SendDataNew(BYTE* szBuf, int nLen)
     SendUDP_Flash_Socket.SendTo((char*)(&tdp), nLen+4,FLASH_UDP_PORT,ISP_Device_IP,0);
     return nRet;
 }
-
-
-
 
 const BYTE c_byEndFlag[2] = {0xee, 0x10};
 int TFTPServer::SendEndDataPack()
@@ -433,12 +420,12 @@ void TFTPServer::ReleaseAll()
     }
     if (m_soSend)
     {
-        closesocket(m_soSend);				//  Send socket，Send tftp data
+        closesocket(m_soSend);				// Send socket, send TFTP data
     }
 
     if (m_soRecv)
     {
-        closesocket(m_soRecv);				// Receive socket，Receive tftp ack
+        closesocket(m_soRecv);				// Receive socket, receive TFTP ack
     }
     SendUDP_Flash_Socket.ShutDown();
     SendUDP_Flash_Socket.Close();
@@ -452,14 +439,12 @@ void TFTPServer::ReleaseAll()
         if( m_twr.m_szItems[i]!=NULL)
             delete m_twr.m_szItems[i];
     }
-
 }
 
 //Fance 2013 0504
 //Compare whether the device ip is in local net .
 bool TFTPServer::IP_is_Local()
 {
-
     DWORD dwIP = GetLocalIP();
     if(dwIP == 0)
         return 1;
@@ -485,7 +470,6 @@ bool TFTPServer::IP_is_Local()
     return false;
 }
 
-
 //Fance 2013 0504
 //Change Device IP to CString Format.
 void TFTPServer::GetDeviceIP_String()
@@ -502,7 +486,6 @@ void TFTPServer::GetDeviceIP_String()
     ISP_Device_IP.Format(_T("%d.%d.%d.%d"),byIP[0],byIP[1],byIP[2],byIP[3]);
 }
 
-
 //Fance 2013 0504
 //Create DHCP Data to boot loader.
 void TFTPServer::SetDHCP_Data()
@@ -516,8 +499,6 @@ void TFTPServer::SetDHCP_Data()
     //memcpy_s(MYDHCP_PACKET.Header,sizeof(MYDHCP_PACKET.Header),"Temcocontrols",13);
     memcpy_s(sendbuf,13,"Temcocontrols",13);
 
-
-
     if(IP_is_Local())
     {
         //MYDHCP_PACKET.AssignIp=m_dwClientIP;
@@ -529,7 +510,6 @@ void TFTPServer::SetDHCP_Data()
         dwClientIP = 0;
     }
 
-
     BYTE byIP[4];
     ZeroMemory(byIP,4);
     for (int i = 0, ic = 3; i < 4; i++,ic--)
@@ -537,7 +517,6 @@ void TFTPServer::SetDHCP_Data()
         byIP[i] = (dwClientIP >> ic*8)&0x000000FF;
     }
     memcpy_s(sendbuf+13,4,byIP,4);
-
 
     //MYDHCP_PACKET.SubnetMask=0xffffff00;
     BYTE btSubnetMask[4];
@@ -588,7 +567,7 @@ void TFTPServer::GetIPMaskGetWay()
 	ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 	ALL_LOCAL_SUBNET_NODE  Temp_Node;
 	// First call to GetAdapterInfo to get the ulOutBufLen size
-	// �?一次调用GetAdapterInfo获取ulOutBufLen大小
+	// First call to GetAdapterInfo, used to get the size of ulOutBufLen
 	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
 	{
 		free(pAdapterInfo);
@@ -630,10 +609,9 @@ void TFTPServer::GetIPMaskGetWay()
 		free(pAdapterInfo);
 }
 
-
 UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
 {
-			
+
 
 	int nRet = 0;
 
@@ -670,12 +648,10 @@ UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
 		BOOL bDontLinger = FALSE;
 		setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
 
-
 		ZeroMemory(pSendBuf, 255);
 		pSendBuf[0] = 100;
 		memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
 		int nSendLen = 5;
-
 
 		local_enthernet_ip=g_Vector_Subnet[index].StrIP;
 		WideCharToMultiByte( CP_ACP, 0, local_enthernet_ip.GetBuffer(), -1, local_network_ip, 255, NULL, NULL );
@@ -778,7 +754,7 @@ UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
 							int n = 1;
 							BOOL bFlag=FALSE;
 							//////////////////////////////////////////////////////////////////////////
-							// Detect duplicate IP’s 
+							// Detect duplicate IPs
 							DWORD dwValidIP = 0;
 							memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
 							while(dwValidIP != END_FLAG)
@@ -823,7 +799,6 @@ UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
 						break;
 					}
 
-
 					FD_ZERO(&fdSocket);
 					FD_SET(h_Broad, &fdSocket);
 					nLen = sizeof(h_siBind);
@@ -833,7 +808,6 @@ UINT TFTPServer::RefreshNetWorkDeviceListByUDPFunc()
 				while (nSelRet);
 
 				//int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
-
 			}
 			else
 			{
@@ -847,6 +821,7 @@ END_REFRESH_SCAN:
 	}
 	return 1;
 }
+
 struct refresh_net_device
 {
 	DWORD nSerial;
@@ -863,12 +838,11 @@ struct refresh_net_device
 	CString show_label_name;
 };
 
-
 typedef union
 {
 	unsigned char all[400];
-	struct 
-	{  
+	struct
+	{
 		UCHAR command;
 		UCHAR command_reserve;
 		UCHAR length;
@@ -906,6 +880,7 @@ typedef union
 		UCHAR isp_mode;  //Non 0 in ISP mode, 0 in the application code; 60th byte
 	}reg;
 }Str_UPD_SCAN;
+
 unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 {
 	refresh_net_device temp;
@@ -917,7 +892,6 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 
 	temp_data.reg.length = *(my_temp_point++);
 	temp_data.reg.length_reserve = *(my_temp_point++);
-
 
 	temp_data.reg.serial_low = *(my_temp_point++);
 	temp_data.reg.serial_low_reserve = *(my_temp_point++);
@@ -933,7 +907,6 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 
 	temp_data.reg.product_id =  *(my_temp_point++);
 	temp_data.reg.product_id_reserve =  *(my_temp_point++);
-
 
 	temp_data.reg.modbus_id =  *(my_temp_point++);
 	temp_data.reg.modbus_id_reserve =  *(my_temp_point++);
@@ -992,9 +965,6 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 	temp.object_instance = temp_data.reg.object_instance_1 + temp_data.reg.object_instance_2 *256+temp_data.reg.object_instance_3*256*256+temp_data.reg.object_instance_4*256*256*256;
 	temp.panal_number = temp_data.reg.station_number;
 
-
-
-
 	//if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
 	//{
 	//	g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u,isp_mode = %d"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name,temp.object_instance,temp.panal_number,temp_data.reg.isp_mode);
@@ -1003,7 +973,7 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 
 	if(temp_data.reg.isp_mode != 0)
 	{
-		//记录这个的信�?,如果�?时间多�?�出�? 就判定在bootload下面，只�?偶尔出现一次表示只�?恰好开机收到的.
+		// Record this information. If it appears many times in a short period, the device is in the bootloader. One occurrence only means the packet arrived just as the device powered on.
              // Record this information, if a short time several times to determine under the Bootload, only occasionally appear only once to the boot received. TBD: Clarify this comment
 
 #if 0
@@ -1020,7 +990,7 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 		int temp_index = 0;
 		for (int x=0;x<g_isp_device_info.size();x++)
 		{
-			int ip_cmp_ret =	memcmp(g_isp_device_info.at(x).ipaddress,temp_info.ipaddress,4); 
+			int ip_cmp_ret =	memcmp(g_isp_device_info.at(x).ipaddress,temp_info.ipaddress,4);
 			if((temp_info.product_id == g_isp_device_info.at(x).product_id ) &&
 				(ip_cmp_ret == 0))
 			{
@@ -1031,12 +1001,12 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 
 		if(find_ip_pid_match)
 		{
-			if(( temp_info.first_time >  g_isp_device_info.at(temp_index).first_time  + 60 ) && 
+			if(( temp_info.first_time >  g_isp_device_info.at(temp_index).first_time  + 60 ) &&
 				(temp_info.first_time <  g_isp_device_info.at(temp_index).first_time  + 120))
 			{
 				g_isp_device_info.at(temp_index).first_time = temp_info.first_time;
 				need_isp_device = g_isp_device_info.at(temp_index);
-				if(temp_data.reg.isp_mode == 2) //T3 controller will return some special bootloader fail mode info 
+				if(temp_data.reg.isp_mode == 2) //T3 controller will return some special bootloader fail mode info
 				{
 					isp_mode_error_code = 2;
 					::PostMessageW(MainFram_hwd,WM_HADNLE_ISP_MODE_DEVICE,2,NULL);
@@ -1059,7 +1029,6 @@ unsigned short TFTPServer::AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,
 		return	 0;
 	}
 
-
 	return temp_data.reg.modbus_port;
 }
 
@@ -1076,10 +1045,8 @@ BOOL TFTPServer::StartServer()
 	   TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
 	   Sleep(2000);
 
-
-
    //  for (int i = 0; i<m_FlashTimes ; i++)
-   // { 
+   // {
 		CString strTips;
 // 		strTips.Format(_T("FlashTimes = %d"),i);
 // 		OutPutsStatusInfo(strTips, FALSE);
@@ -1089,10 +1056,9 @@ BOOL TFTPServer::StartServer()
         memcpy_s(Flash_Done,10,"FLASH DONE",10);
         m_nBlkNum = 0;
         int nRet  =0;
-		ISP_STEP = 0; 
-       
-        need_show_device_ip = true;
+		ISP_STEP = 0;
 
+        need_show_device_ip = true;
 
         int nSendNum = m_nDataBufLen;
 
@@ -1117,13 +1083,11 @@ BOOL TFTPServer::StartServer()
         has_enter_dhcp_has_lanip_block =false;//Used to confirm the state of 2 threads to avoid isp_step jumps. TBD: explain this better
         int has_wait_device_into_bootloader = false;
 
-
-
         int nNetTimeout = 1000;//Send Time Out!
         int nReceiveNetTimeout = 1500;//Send Time Out!
 
         bool Use_Old_protocol=false;
-		
+
         while(1)
         {
             if (!ShowTFTPMessage.IsEmpty())
@@ -1147,7 +1111,7 @@ BOOL TFTPServer::StartServer()
                 if((mode_send_flash_try_time++)<mode_send_flash_limit)
                 {
 					int send_ret=TCP_Flash_CMD_Socket.Send(byCommand,sizeof(byCommand),0);
-                    Sleep(50);   //WIFI �? bootloader 需要�?�延�? �? 设�?�的响应时间�?�?�?.不延时他�?的�?��??  会忽略其他的网络�?;  // WIFI bootloader needs this delay, device response time is too slow. Without delay their device will ignore other network packets
+                    Sleep(50);   // Wi-Fi bootloader needs this delay. The device responds too slowly, and without the delay it ignores other network packets.
                    // int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
                     TRACE(_T("send_ret = %d\r\n"),send_ret);
                     if(send_ret<0)	//Try TCP connection again if send fails
@@ -1155,7 +1119,6 @@ BOOL TFTPServer::StartServer()
 						//TRACE(_T("Send EEprom data failed!"));
                         //TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
                     }
-
 
                     SetDHCP_Data();
 
@@ -1176,8 +1139,6 @@ BOOL TFTPServer::StartServer()
                     Sleep(50);
                     SendUDP_Flash_Socket.SendTo(sendbuf,sizeof(sendbuf),FLASH_UDP_PORT,ISP_Device_IP,0);
 
-
-
                     strTips.Format(_T("Communication with device.(Time remaining:%d)"),mode_send_flash_limit-mode_send_flash_try_time);
                     if(mode_send_flash_try_time == 1)
                         OutPutsStatusInfo(strTips, false);
@@ -1193,10 +1154,7 @@ BOOL TFTPServer::StartServer()
                     OutPutsStatusInfo(strTips, FALSE);
                     //}
 
-
                     goto StopServer;
-
-
                 }
                 break;
             case ISP_SEND_DHCP_COMMAND_HAS_LANIP:
@@ -1237,7 +1195,6 @@ BOOL TFTPServer::StartServer()
                         OutPutsStatusInfo(_T("Please Change your PC's IP address to the same subnet."), FALSE);
                         OutPutsStatusInfo(_T(""), FALSE);
                     }
-
                 }
 
                 if((device_jump_from_runtime == true)&&(has_wait_device_into_bootloader == false))
@@ -1253,20 +1210,19 @@ BOOL TFTPServer::StartServer()
                     has_wait_device_into_bootloader = true;
                 }
 #if 1
-				if(dhcp_package_is_broadcast == true)//If it's a broadcast, change the device IP TBD: explain this better 
+				if(dhcp_package_is_broadcast == true)//If it's a broadcast, change the device IP TBD: explain this better
 				{
 					ISP_Device_IP.Empty();
 					ISP_Device_IP.Format(_T("%d.%d.%d.%d"),Byte_ISP_Device_IP[0],Byte_ISP_Device_IP[1],Byte_ISP_Device_IP[2],Byte_ISP_Device_IP[3]);
 
 					CString Temco_logo;
-					MultiByteToWideChar( CP_ACP, 0, (char *)Product_Name, 
-						(int)strlen((char *)Product_Name)+1, 
+					MultiByteToWideChar( CP_ACP, 0, (char *)Product_Name,
+						(int)strlen((char *)Product_Name)+1,
 						m_StrProductName.GetBuffer(MAX_PATH), MAX_PATH );
-					m_StrProductName.ReleaseBuffer();		
+					m_StrProductName.ReleaseBuffer();
 
 					if(m_StrProductName.GetLength() > 11)
 						m_StrProductName = m_StrProductName.Left(10);
-
 
 					m_StrProductName.Trim();
 					if(!m_StrProductName.IsEmpty())
@@ -1281,7 +1237,7 @@ BOOL TFTPServer::StartServer()
 						ProductName.TrimRight();
 						m_StrProductName.TrimLeft();
 						m_StrProductName.TrimRight();
-						if (ProductName.CompareNoCase(m_StrProductName)!=0) 						
+						if (ProductName.CompareNoCase(m_StrProductName)!=0)
 						{
 							if(((ProductName.CompareNoCase(_T("Minipanel")) == 0) && m_StrProductName.CompareNoCase(_T("MINI")) == 0) ||
 								((ProductName.CompareNoCase(_T("MINI")) == 0) && m_StrProductName.CompareNoCase(_T("Minipanel")) == 0))
@@ -1350,7 +1306,7 @@ BOOL TFTPServer::StartServer()
 
                 if (m_tcp_connect_results == 0)
                 {
-                    //说明在�?�之前没有�?�查过bootloader 版本信息,不确定�?�不要先升级Bootloader;
+                    // The bootloader version was not checked before this, so it is not certain whether the bootloader must be updated first.
                     CString temp_real_ip;
                     temp_real_ip.Format(_T("%d.%d.%d.%d"), Byte_ISP_Device_IP[0], Byte_ISP_Device_IP[1], Byte_ISP_Device_IP[2], Byte_ISP_Device_IP[3]);
                     ISP_Device_IP = temp_real_ip;
@@ -1382,8 +1338,7 @@ BOOL TFTPServer::StartServer()
                             #endif
                             #ifndef ISP_BURNING_MODE
                             strTips_Ethernet.Format(_T("Bootloader version :%u"), temp_ver_boot);
-                            #endif 
-
+                            #endif
 
                             OutPutsStatusInfo(strTips_Ethernet, FALSE);
 
@@ -1404,14 +1359,11 @@ BOOL TFTPServer::StartServer()
 
                         }
 
-
-
                     }
-                    
+
                 }
                 strTips.Format(_T("Updating firmware. Device IP : %d.%d.%d.%d"),Byte_ISP_Device_IP[0],Byte_ISP_Device_IP[1],Byte_ISP_Device_IP[2],Byte_ISP_Device_IP[3]);
                 OutPutsStatusInfo(strTips, FALSE);
-
 
                 OutPutsStatusInfo(_T(""), FALSE);
 
@@ -1583,7 +1535,6 @@ BOOL TFTPServer::StartServer()
                 break;
             }
 
-
             Sleep(1000);
         }
 StopServer:
@@ -1609,7 +1560,7 @@ StopServer:
                     OutPutsStatusInfo(temp_cs, TRUE);
                 Sleep(1000);
             }
-			
+
             if(!auto_flash_mode)
             {
                // AfxMessageBox(strTips);
@@ -1627,7 +1578,7 @@ StopServer:
                 //AfxMessageBox(strTips);
             }
         }
-        if (new_bootload == 1) //�?前更新的�?新的bootloader 还需要更新�?�户之前选中的固�?;
+        if (new_bootload == 1) // The new bootloader is being updated. The firmware the customer selected earlier still has to be updated.
         {
             if (nRet)
             {
@@ -1646,7 +1597,7 @@ StopServer:
         }
         else
 		    WriteFinish(nRet);
-   
+
     return TRUE;
 }
 
@@ -1656,7 +1607,7 @@ void  TFTPServer::TFTPMessage(LPTSTR sMessage)
     strTips = _T("TTTTTTTTTTTTTTTTTTTTT");
     OutPutsStatusInfo(strTips, FALSE);
 }
- 
+
 bool TFTPServer::Send_Tftp_File()
 {
     int nCount = 0;
@@ -1688,7 +1639,6 @@ bool TFTPServer::Send_Tftp_File()
             }
         }
 
-
         do
         {
             //if(retry==0)
@@ -1705,7 +1655,7 @@ bool TFTPServer::Send_Tftp_File()
             //}
             nRet = SendDataNew(pBuf, nSendNum);
             if (package_number == 1)
-                Sleep(2000);   //发送�??一包的时�? 设�?�接收到会做擦除flash的动作，需要等�?.  // When sending the first packet, the device will perform flash erase operation upon receiving it, need to wait
+                Sleep(2000);   // When sending the first packet, the device erases flash on receipt, so wait.
             /* Remote_timeout counts 2 ms steps (1000 means 2 seconds).
              * Sleep(2) on Windows lasts about 15 ms, so counting those
              * sleeps waited about 15 seconds before the block was sent again. */
@@ -1721,7 +1671,7 @@ bool TFTPServer::Send_Tftp_File()
 					if (nflash_receive_to_send_delay_time)
 						Sleep(nflash_receive_to_send_delay_time);
 #ifdef ISP_BURNING_MODE
-					if (next_package_number > 64)  //�?32K是bootloader 不用算校验和;
+					if (next_package_number > 64)  // The first 32K is the bootloader and is not included in the checksum.
 					{
 						for (int x = 0; x < nSendNum; x++)
 						{
@@ -1754,8 +1704,6 @@ flash_new_package:
     }
     return true;
 }
-
-
 
 void TFTPServer::HandleWRRequest(BYTE* szBuf,  int nLen)
 {
@@ -1793,7 +1741,7 @@ void TFTPServer::HandleWRRequest(BYTE* szBuf,  int nLen)
         TFTP_ItemPair* pTip = new TFTP_ItemPair;
         ZeroMemory(pTip, sizeof(TFTP_ItemPair));
         m_twr.m_szItems.push_back(pTip);
-        // 选项
+        // Option
         nIdxTemp = ++nIndex;
         while (szBuf[nIndex] != 0)
         {
@@ -1804,7 +1752,7 @@ void TFTPServer::HandleWRRequest(BYTE* szBuf,  int nLen)
         int nItemLen = nIndex -nIdxTemp;
         memcpy(pTip->m_strItem, szBuf+nIdxTemp, nItemLen+1);
 
-        // �?
+        // Value
         nIdxTemp = ++nIndex;
         while (szBuf[nIndex] != 0)
         {
@@ -1816,9 +1764,7 @@ void TFTPServer::HandleWRRequest(BYTE* szBuf,  int nLen)
 
         memcpy(pTip->m_strValue, szBuf+nIdxTemp, nValueLen+1);
     }
-
 }
-
 
 void TFTPServer::OutPutsStatusInfo(const CString& strInfo, BOOL bReplace)
 {
@@ -1839,10 +1785,9 @@ void TFTPServer::OutPutsStatusInfo(const CString& strInfo, BOOL bReplace)
     }
 }
 
-
-// 返回 -1�? 那么socket error  // Return -1, socket error
-// 返回 0�?  no response  // Return 0, no response
-// 1�?       ok  // 1, ok
+// Return -1: socket error
+// Return 0: no response
+// 1: ok
 int TFTPServer::RecvBOOTP()
 {
     BYTE szBuf[512];
@@ -1863,7 +1808,6 @@ int TFTPServer::RecvBOOTP()
     fd_set fd;
     FD_ZERO (& fd);
     FD_SET(sockTemp, &fd);
-
 
     //while(1)
     {
@@ -1896,8 +1840,6 @@ int TFTPServer::RecvBOOTP()
     }
     return 1;
 }
-
-
 
 BOOL TFTPServer::SendDHCPPack()
 {
@@ -1943,11 +1885,9 @@ BOOL TFTPServer::SendDHCPPack()
 
     closesocket(dhcpSock);
     return TRUE;
-
 }
 
-
-// 返回的是网络字节顺序  // Returns network byte order
+// Returns network byte order
 DWORD TFTPServer::GetLocalIP()
 {
     IP_ADAPTER_INFO pAdapterInfo;
@@ -1987,7 +1927,7 @@ int TFTPServer::GetDHCPData(BYTE* pBuf, int nLen)
     memcpy(pBuf+nLocalIP4,byIP , 4);
 
     //////////////////////////////////////////////////////////////////////////
-    // Assign IP address 
+    // Assign IP address
     const int nIPPos = 0x10;
     DWORD dwClientIP = m_dwClientIP;
     ZeroMemory(byIP,4);
@@ -2055,8 +1995,6 @@ int TFTPServer::SendAnyTFTPData()
     return nRet;
 }
 
-
-
 int TFTPServer::SendFlashCommand()
 {
     SOCKET soFalsh=socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
@@ -2099,7 +2037,6 @@ int TFTPServer::SendFlashCommand()
     byCommand[0] = 0xEE;	// Command, 2 bytes, 0xee10, command to start flash
     byCommand[1] = 0x10;	//
 
-
     nRet = sendto(soFalsh,(char*)(byCommand), 64,0, (sockaddr*)&siSend, nAddrLen);
 
     if (nRet== SOCKET_ERROR)
@@ -2119,8 +2056,6 @@ int TFTPServer::SendFlashCommand()
     return nRet;
 }
 
-
-
 //////////////////////////////////////////////////////////////////////////
 // Flash finished, notify the parent window
 // parameter is the return value of the flash thread
@@ -2128,7 +2063,6 @@ void TFTPServer::WriteFinish(int nFlashFlag)
 {
     int	nRet =PostMessage(m_pDlg->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(nFlashFlag));
 }
-
 
 //////////////////////////////////////////////////////////////////////////
 // Flash finished, notify the parent window
@@ -2138,12 +2072,11 @@ void TFTPServer::NewBootWriteFinish(int nFlashFlag)
     int	nRet = PostMessage(m_pDlg->m_hWnd, WM_FLASH_NEW_BOOT_FINISH, 0, LPARAM(nFlashFlag));
 }
 
-
 void TFTPServer::FlashByEthernet()
 {
 	GetIPMaskGetWay();
 	GetDeviceIP_String();
-	//�?认绑定哪一�?�?地IP地址来建立UDP通�??
+	// Confirm which local IP address to bind for UDP communication
 	CString bind_local_pc_ip;
 	CString temp_device_ip = ISP_Device_IP;
 	CString temp_compare_ip;
@@ -2180,7 +2113,7 @@ void TFTPServer::FlashByEthernet()
 	if (bind_local_pc_ip.IsEmpty())
 		Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT, SOCK_DGRAM);
 	else
-		Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT, SOCK_DGRAM, 63L, bind_local_pc_ip); //测试
+		Udp_resualt = SendUDP_Flash_Socket.Create(LOCAL_UDP_PORT, SOCK_DGRAM, 63L, bind_local_pc_ip); // Test
 	if (Udp_resualt == 0)
 	{
 		DWORD error_msg = GetLastError();
@@ -2250,7 +2183,7 @@ void TFTPServer::FlashByEthernet()
 #endif
 #ifndef ISP_BURNING_MODE
 				strTips_Ethernet.Format(_T("Bootloader version :%u"), temp_ver_boot);
-#endif 
+#endif
 
 				OutPutsStatusInfo(strTips_Ethernet, FALSE);
 
@@ -2269,9 +2202,6 @@ void TFTPServer::FlashByEthernet()
 					return;
 				}
 			}
-
-
-
 		}
 		else
 		{
@@ -2283,12 +2213,10 @@ void TFTPServer::FlashByEthernet()
 		}
 	}
 
-
 	m_pThread = AfxBeginThread(_StartSeverFunc, this);
 
 	ASSERT(m_pThread);
 }
-
 
 UINT _StartSeverFunc(LPVOID pParam)
 {
@@ -2302,7 +2230,6 @@ UINT _StartSeverFunc(LPVOID pParam)
     return 0;
 }
 
-
 //Comment by Fance
 //This old protocol don't support remote ISP.
 //so we change the protocol,but we also need the old protocol to update the old bootload to new bootload
@@ -2310,7 +2237,6 @@ BOOL TFTPServer::StartServer_Old_Protocol()
 {
 	m_nBlkNum = 0;
 	int nRet = 0;
-
 
 	//else
 	//{
@@ -2337,8 +2263,7 @@ BOOL TFTPServer::StartServer_Old_Protocol()
 
 	//BroadCastToClient();
 
-
-	//阻�?�接�?
+	// Blocking receive
 	if (!RecvRequest())
 	{
 		CString strTips = _T("Recv TFTP read request pack failed.");

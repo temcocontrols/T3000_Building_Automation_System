@@ -49,7 +49,7 @@ int g_protocol_support_ptp = PROTOCOL_UNKNOW;
 int g_output_support_relinquish = 0;
 //unsigned short output_relinquish_value[128] ;
 //Used for global access to MSTP based on Device id.
-int g_mstp_deviceid; //用于全局根据Device id 访问 MSTP 。 
+int g_mstp_deviceid; // Used to reach MSTP globally by device ID.
 unsigned int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
 BOOL g_bPauseMultiRead=FALSE;
@@ -59,7 +59,7 @@ CString g_strImagePathName=_T("");
 int now_tstat_id =0;//for batch load /flash.
 
 //Selected building directory;
-CString selected_image_fordor = _T(""); //选中building的目录;
+CString selected_image_fordor = _T(""); // Directory of the selected building.
 CString	g_strDatabasefilepath=_T("");
 CString g_strExePth=_T("");
 CString g_strImgeFolder=_T("");
@@ -70,11 +70,11 @@ CString g_achive_folder_temp_db = _T("");
 CString g_achive_device_name_path = _T("");
 CString g_achive_monitor_datatbase_path = _T("");
 //Additional configuration database path;
-CString g_ext_database_path = _T(""); //额外的配置档数据库路径;
+CString g_ext_database_path = _T(""); // Path of the extra configuration database.
 //Save multiple flash configuration file path for selected devices
-CString g_ext_mass_flash_path = _T(""); //保存多烧写  选中设备的 配置文件路径
+CString g_ext_mass_flash_path = _T(""); // Config-file path saved for the devices selected for multi-flash.
 //DeviceDatabase.mdb full path
-CString g_building_devicedatabase = _T(""); //DeviceDatabase.mdb 全路径
+CString g_building_devicedatabase = _T(""); // Full path of DeviceDatabase.mdb.
 
 BOOL g_Scanfully=FALSE;
 BOOL g_ScanSecurity=TRUE;
@@ -83,7 +83,7 @@ int g_nEndID=254;
 BOOL g_bCancelScan=FALSE;
 int g_ScnnedNum=0;
 CString g_strScanInfoPrompt;
- 
+
 CString g_strTstat5a;
 CString g_strTstat5b;
 CString g_strTstat5b2;
@@ -106,9 +106,6 @@ int m_nbaudrat=19200;
 CString showing_text;
  CCriticalSection  critical_section;
  CCriticalSection  register_critical_section;
-
-
-
 
 
 BOOL g_buser_log_in=FALSE;
@@ -161,7 +158,7 @@ unsigned int g_llTxCount = 0;
 unsigned int g_llRxCount = 0;
 bool clear_status_bar = FALSE;
 int g_llerrCount = 0;
-BOOL g_unint = TRUE;//TREE = °C;FALSE = F;
+BOOL g_unint = TRUE;//TREE = 锟斤拷C;FALSE = F;
 
 
 
@@ -171,13 +168,7 @@ int MDAY=1,MNIGHT=1;
 int MAWAY = 1, MSLEEP = 1;
 
 
-
-
-
-
-
-
-// 345	1	Low byte	W/R	(Day)Occupied   setpoint 
+// 345	1	Low byte	W/R	(Day)Occupied   setpoint
 // 346	1	Low byte	W/R	(Day)Occupied cooling setpoint dead band  , offset from setpoint for cooling to begin.  Units are 0.1 deg.
 // 347	1	Low byte	W/R	(Day)Occupied heating setpoint dead band  , offset from setpoint for heating to begin.  Units are 0.1 deg.
 // 348	2	Full	W/R	(Day)Occupied  cooling setpoint (day cooling setpoint)
@@ -774,12 +765,12 @@ char charr[600][2][600] ={
 {"COMMON","Serial Number - 4 byte value.  Read-only"},{"COMMON","Serial Number - 4 byte value.  Read-only"},
 {"COMMON","Serial Number - 4 byte value.  Read-only"},{"COMMON","Serial Number - 4 byte value.  Read-only"},
 //4-5
-{"COMMON","Software Version – 2 byte value.  Read-only"},{"COMMON","Software Version – 2 byte value.  Read-only"},
+{"COMMON","Software Version 锟紺 2 byte value.  Read-only"},{"COMMON","Software Version 锟紺 2 byte value.  Read-only"},
 //6,7
 {"COMMON","ADDRESS. Modbus device address"},{"COMMON","Product Model.  This is a read-only register that is used by the microcontroller to determine the product"},
 //8-11
 {"COMMON","Hardware Revision.  This is a read-only register that is used by the microcontroller to determine the hardware rev"},{"COMMON","PIC firmware version"},
-{"COMMON","PIC version of Humidity module"},{"COMMON","PLUG_N_PLAY_ADDRESS,   ‘plug n play’ address, used by the network master to resolve address conflicts. See VC code for algorithms"},
+{"COMMON","PIC version of Humidity module"},{"COMMON","PLUG_N_PLAY_ADDRESS,   锟斤拷plug n play锟斤拷 address, used by the network master to resolve address conflicts. See VC code for algorithms"},
 //12-13
 {"COMMON",""},{"COMMON",""},
 //14-17
@@ -900,23 +891,23 @@ char charr[600][2][600] ={
 {"OUTPUT","Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V "},{"OUTPUT","Output1 tot 5, bit 0 thru 4 = relay 1 thru 5."},
 {"OUTPUT","Output6 ,Analog output1, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0."},{"OUTPUT","Output7 Analog output2, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0."},
 {"OUTPUT","DAC_OFFSET , Calibration data for the 0-10VDC signal, internal variable maintained by tstat"},
-{"OUTPUT","Output1 Relay1_delay_OFF_TO_ON – delay time for output1 going from OFF to ON (sec)"},{"OUTPUT","Output2 Relay2_delay_OFF_TO_ON – delay time for output2 going from OFF to ON (sec)"},
-{"OUTPUT","Output3 Relay3_delay_OFF_TO_ON – delay time for output3 going from OFF to ON (sec)"},{"OUTPUT","Output4 Relay4_delay_OFF_TO_ON – delay time for output4 going from OFF to ON (sec)"},
-{"OUTPUT","Output5 Relay5_delay_OFF_TO_ON – delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","(future)Output6 delay_OFF_TO_ON – delay time for output4 going from OFF to ON (sec)"},
-{"OUTPUT","(future)Output7 delay_OFF_TO_ON – delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","output 1 current time left from OFF to ON"},
+{"OUTPUT","Output1 Relay1_delay_OFF_TO_ON 锟紺 delay time for output1 going from OFF to ON (sec)"},{"OUTPUT","Output2 Relay2_delay_OFF_TO_ON 锟紺 delay time for output2 going from OFF to ON (sec)"},
+{"OUTPUT","Output3 Relay3_delay_OFF_TO_ON 锟紺 delay time for output3 going from OFF to ON (sec)"},{"OUTPUT","Output4 Relay4_delay_OFF_TO_ON 锟紺 delay time for output4 going from OFF to ON (sec)"},
+{"OUTPUT","Output5 Relay5_delay_OFF_TO_ON 锟紺 delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","(future)Output6 delay_OFF_TO_ON 锟紺 delay time for output4 going from OFF to ON (sec)"},
+{"OUTPUT","(future)Output7 delay_OFF_TO_ON 锟紺 delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","output 1 current time left from OFF to ON"},
 {"OUTPUT","output 2 current time left from OFF to ON"},{"OUTPUT","output 3 current time left from OFF to ON"},
 
  {"OUTPUT","output 4 current time left from OFF to ON"},{"OUTPUT","output 5 current time left from OFF to ON"},
  {"OUTPUT","(reserved)output 6 current time left from OFF to ON"},{"OUTPUT","(reserved)output 7 current time left from OFF to ON"},
- {"OUTPUT","Output1 Relay1_delay_ON_TO_OFF – delay time for output1 going from ON to OFF (sec)"},{"OUTPUT","Output2 Relay2_delay_ON_TO_OFF – delay time for output2 going from ON to OFF (sec)"},
- {"OUTPUT","Output3 Relay3_delay_ON_TO_OFF – delay time for output3 going from ON to OFF (sec)"},{"OUTPUT","Output4 Relay4_delay_ON_TO_OFF – delay time for output4 going from ON to OFF(sec)"},
- {"OUTPUT","Output5 Relay5_delay_ON_TO_OFF – delay time for output5 going from ON to OFF(sec)"},{"OUTPUT","(future)Output6_delay_ON_TO_OFF – delay time for output4 going from ON to OFF(sec)"},
- {"OUTPUT","(future)Output7_delay_ON_TO_OFF – delay time for output5 going from ON to OFF (sec)"},{"OUTPUT","output 1 current time left from ON to OFF"},
+ {"OUTPUT","Output1 Relay1_delay_ON_TO_OFF 锟紺 delay time for output1 going from ON to OFF (sec)"},{"OUTPUT","Output2 Relay2_delay_ON_TO_OFF 锟紺 delay time for output2 going from ON to OFF (sec)"},
+ {"OUTPUT","Output3 Relay3_delay_ON_TO_OFF 锟紺 delay time for output3 going from ON to OFF (sec)"},{"OUTPUT","Output4 Relay4_delay_ON_TO_OFF 锟紺 delay time for output4 going from ON to OFF(sec)"},
+ {"OUTPUT","Output5 Relay5_delay_ON_TO_OFF 锟紺 delay time for output5 going from ON to OFF(sec)"},{"OUTPUT","(future)Output6_delay_ON_TO_OFF 锟紺 delay time for output4 going from ON to OFF(sec)"},
+ {"OUTPUT","(future)Output7_delay_ON_TO_OFF 锟紺 delay time for output5 going from ON to OFF (sec)"},{"OUTPUT","output 1 current time left from ON to OFF"},
  {"OUTPUT","output 2 current time left from ON to OFF"},{"OUTPUT","output 3 current time left from ON to OFF"},
  {"OUTPUT","output 4 current time left from ON to OFF"},{"OUTPUT","output 5 current time left from ON to OFF"},
  {"OUTPUT","(reserved)output 6 current time left from ON to OFF"},{"OUTPUT","(reserved)output 7 current time left from ON to OFF"},
- {"OUTPUT","MODBUS_CYCLING_DELAY – delay time (in minutes) for switching out of heating or cooling and then back in."},{"OUTPUT","MODBUS_CHANGOVER_DELAY – delay time (in minutes) for switching from cooling into heating or vice versa."},
- 
+ {"OUTPUT","MODBUS_CYCLING_DELAY 锟紺 delay time (in minutes) for switching out of heating or cooling and then back in."},{"OUTPUT","MODBUS_CHANGOVER_DELAY 锟紺 delay time (in minutes) for switching from cooling into heating or vice versa."},
+
  {"OUTPUT","Valve travel time. The time of the valve travel  from one end to another end. The units is second."},{"OUTPUT","Valve percent. Show the valve opened how much percent.  READ ONLY"},
  {"OUTPUT","Interlock for  output1"},{"OUTPUT","Interlock for  output2"},
  {"OUTPUT","Interlock for  output3"},{"OUTPUT","Interlock for  output4"},
@@ -926,7 +917,7 @@ char charr[600][2][600] ={
  {"OUTPUT","Relay1 manual output value"},{"OUTPUT","Relay2 manual output value"},
  {"OUTPUT","Relay3 manual output value"},{"OUTPUT","Relay4 manual output value"},
  {"OUTPUT","Relay5 manual output value"},{"OUTPUT","(future) Analog1 manual  output value"},
- {"OUTPUT","(future) Analog2 manual  output value"},{"OUTPUT","DEADMASTER_MODE = 0, the default, outputs will not change when deadmaster is triggered DEADMASTER_MODE = 1, the output will be trigger to “AUTO” mode if they were previously in manual DEADMASTER_MODE = 2, the outputs will go to manual on or off as defined in the following registers."},
+ {"OUTPUT","(future) Analog2 manual  output value"},{"OUTPUT","DEADMASTER_MODE = 0, the default, outputs will not change when deadmaster is triggered DEADMASTER_MODE = 1, the output will be trigger to 锟斤拷AUTO锟斤拷 mode if they were previously in manual DEADMASTER_MODE = 2, the outputs will go to manual on or off as defined in the following registers."},
 
  {"OUTPUT","Define output states when DEADMASTER_MODE = 2 (active)Bit0 is for relay 1, bit1 for relay 2 and so on up to output 5"},{"OUTPUT","Analog Output1 goes to this value when DEADMASTER_MODE = 2 (active), 0-1000"},
  {"OUTPUT","Analog Output2 goes to this value when DEADMASTER_MODE = 2 (active), 0-1000"},{"OUTPUT","Output1 Function setting:0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "},
@@ -1010,10 +1001,10 @@ char charr[600][2][600] ={
 
 //392-512
 {"UI","KEYPAD_SELECT , variable to select various keypad arrangements.  Refer to PAd description in Table 1: Advanced Menu Items"},{"UI","SPECIAL_MENU_LOCK, Special menu lockout via keypad, serial port only, "},
-{"UI","dIS – Display.  This sets the display to either room temperature or setpoint.  0 = room temp,  1 = setpoint, 2 = Blank Display,3 = PID2 value,4 = PID2 setpoint, 5 = set segment code by manually, 6 = Display sleep"},{"UI","ICON TABLE Set when certain icons are on/off"},
+{"UI","dIS 锟紺 Display.  This sets the display to either room temperature or setpoint.  0 = room temp,  1 = setpoint, 2 = Blank Display,3 = PID2 value,4 = PID2 setpoint, 5 = set segment code by manually, 6 = Display sleep"},{"UI","ICON TABLE Set when certain icons are on/off"},
 {"UI","Last key  pressed counter. Minutes since the used last pressed a key. "},{"UI","Keypad encoded value. Last keypress, READ ONLY"},
-{"UI","LED hundred’s digit, , can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI",""},
-{"UI","LED one’s digit code, can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI","LED discrete status symbols, can drive the LEDs manually when the display register 381 is set to manual (5) "},
+{"UI","LED hundred锟斤拷s digit, , can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI",""},
+{"UI","LED one锟斤拷s digit code, can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI","LED discrete status symbols, can drive the LEDs manually when the display register 381 is set to manual (5) "},
  {"UI","Rouding display. 0 = round the display to the nearest digit; 1 = round the display to the nearest 1/10 unit;  5 = round the display to the nearest 1/2 unit. 2,3,4 reserved."},{"UI","The minimum address which the device can accept, use this to limit addresses to a certain defined band. "},
 {"UI","The maximum device address can  be set. The device address should between min and max address, default is 254"},{"UI","Show the size of E2 chip. 0 = 24c02, 1 = 24c08/24c16."},
  {"UI","Assign the timer to be used for which feature. 0 = period timer, 1 = rotation timer, 2 = interlock, 3 = PWM timer."},{"UI","Clock, year"},
@@ -1082,18 +1073,18 @@ char charr[600][2][600] ={
 
 
 
-}; 
+};
 //  Register Name                                         TSTAT6 7   		TSTAT5ABCDFG			TSTAT5EH
-int MODBUS_SERIALNUMBER_LOWORD                               =0   ;//              0                   0 
-//int RESERVED                                                 =1   ;//              1                   1 
-int MODBUS_SERIALNUMBER_HIWORD                               =2   ;//              2                   2 
-//int RESERVED                                                 =3   ;//              3                   3 
-int MODBUS_VERSION_NUMBER_LO                                 =4   ;//              4                   4 
-int MODBUS_VERSION_NUMBER_HI                                 =5   ;//              5                   5 
-int MODBUS_ADDRESS                                           =6   ;//              6                   6 
-int MODBUS_PRODUCT_MODEL                                     =7   ;//              7                   7 
-int MODBUS_HARDWARE_REV                                      =8   ;//              8                   8 
-int MODBUS_PIC_VERSION                                       =9   ;//              9                   9 
+int MODBUS_SERIALNUMBER_LOWORD                               =0   ;//              0                   0
+//int RESERVED                                                 =1   ;//              1                   1
+int MODBUS_SERIALNUMBER_HIWORD                               =2   ;//              2                   2
+//int RESERVED                                                 =3   ;//              3                   3
+int MODBUS_VERSION_NUMBER_LO                                 =4   ;//              4                   4
+int MODBUS_VERSION_NUMBER_HI                                 =5   ;//              5                   5
+int MODBUS_ADDRESS                                           =6   ;//              6                   6
+int MODBUS_PRODUCT_MODEL                                     =7   ;//              7                   7
+int MODBUS_HARDWARE_REV                                      =8   ;//              8                   8
+int MODBUS_PIC_VERSION                                       =9   ;//              9                   9
 int MODBUS_HUM_PIC_VERSION                                   =10  ;//              10                  10
 int MODBUS_ADDRESS_PLUG_N_PLAY                               =11  ;//              11                  11
 //int RESERVED                                                 =12  ;//              12                  12
@@ -1123,9 +1114,9 @@ int MODBUS_TIMER_ON                                          =114 ;//           
 int MODBUS_TIMER_OFF                                         =115 ;//              302                 302
 int MODBUS_TIMER_UNITS                                       =116 ;//              303                 303
 int MODBUS_DEAD_MASTER                                       =117 ;//              317                 317
-int MODBUS_SYSTEM_TIME_FORMAT                                =118 ;//              -1                  -1 
+int MODBUS_SYSTEM_TIME_FORMAT                                =118 ;//              -1                  -1
 int MODBUS_FREE_COOL_CONFIG                                  =119 ;//              350                 350
-int MODBUS_RS485_MODE                                        =120 ;//              -1                  -1 
+int MODBUS_RS485_MODE                                        =120 ;//              -1                  -1
 int MODBUS_TEMPRATURE_CHIP                                   =121 ;//              101                 101
 int MODBUS_ANALOG1_RANGE                                     =122 ;//              -1                  359
 int MODBUS_ANALOG2_RANGE                                     =123 ;//              -1                  360
@@ -1144,21 +1135,21 @@ int MODBUS_ANALOG_INPUT5                                     =135 ;//           
 int MODBUS_ANALOG_INPUT6                                     =136 ;//              -1                  372
 int MODBUS_ANALOG_INPUT7                                     =137 ;//              -1                  373
 int MODBUS_ANALOG_INPUT8                                     =138 ;//              -1                  374
-int MODBUS_EXTERNAL_SENSOR1                                  =139 ;//              -1                  -1 
-int MODBUS_EXTERNAL_SENSOR2                                  =140 ;//              -1                  -1 
+int MODBUS_EXTERNAL_SENSOR1                                  =139 ;//              -1                  -1
+int MODBUS_EXTERNAL_SENSOR2                                  =140 ;//              -1                  -1
 int MODBUS_INPUT_MANU_ENABLE                                 =141 ;//              309                 309
 int MODBUS_FILTER                                            =142 ;//              213                 213
-int MODBUS_INPUT1_FILTER                                     =143 ;//              -1                  -1 
-int MODBUS_INPUT2_FILTER                                     =144 ;//              -1                  -1 
-int MODBUS_INPUT3_FILTER                                     =145 ;//              -1                  -1 
-int MODBUS_INPUT4_FILTER                                     =146 ;//              -1                  -1 
-int MODBUS_INPUT5_FILTER                                     =147 ;//              -1                  -1 
-int MODBUS_INPUT6_FILTER                                     =148 ;//              -1                  -1 
-int MODBUS_INPUT7_FILTER                                     =149 ;//              -1                  -1 
-int MODBUS_INPUT8_FILTER                                     =150 ;//              -1                  -1 
-int MODBUS_EX_SENSOR1_FILTER                                 =151 ;//              -1                  -1 
-int MODBUS_EX_SENSOR2_FILTER                                 =152 ;//              -1                  -1 
-int MODBUS_CALIBRATION_TERM                                  =153 ;//              -1                  -1 
+int MODBUS_INPUT1_FILTER                                     =143 ;//              -1                  -1
+int MODBUS_INPUT2_FILTER                                     =144 ;//              -1                  -1
+int MODBUS_INPUT3_FILTER                                     =145 ;//              -1                  -1
+int MODBUS_INPUT4_FILTER                                     =146 ;//              -1                  -1
+int MODBUS_INPUT5_FILTER                                     =147 ;//              -1                  -1
+int MODBUS_INPUT6_FILTER                                     =148 ;//              -1                  -1
+int MODBUS_INPUT7_FILTER                                     =149 ;//              -1                  -1
+int MODBUS_INPUT8_FILTER                                     =150 ;//              -1                  -1
+int MODBUS_EX_SENSOR1_FILTER                                 =151 ;//              -1                  -1
+int MODBUS_EX_SENSOR2_FILTER                                 =152 ;//              -1                  -1
+int MODBUS_CALIBRATION_TERM                                  =153 ;//              -1                  -1
 int MODBUS_CALIBRATION_INTERNAL_THERMISTOR                   =154 ;//              217                 217
 int MODBUS_CALIBRATION_ANALOG1                               =155 ;//              -1                  375
 int MODBUS_CALIBRATION_ANALOG2                               =156 ;//              -1                  376
@@ -1168,18 +1159,18 @@ int MODBUS_CALIBRATION_ANALOG5                               =159 ;//           
 int MODBUS_CALIBRATION_ANALOG6                               =160 ;//              -1                  380
 int MODBUS_CALIBRATION_ANALOG7                               =161 ;//              -1                  381
 int MODBUS_CALIBRATION_ANALOG8                               =162 ;//              -1                  382
-int MODBUS_HUMCOUNT1_H                                       =163 ;//              -1                  -1 
-int MODBUS_HUMRH1_H                                          =164 ;//              -1                  -1 
-int MODBUS_HUMCOUNT2_H                                       =165 ;//              -1                  -1 
-int MODBUS_HUMRH2_H                                          =166 ;//              -1                  -1 
+int MODBUS_HUMCOUNT1_H                                       =163 ;//              -1                  -1
+int MODBUS_HUMRH1_H                                          =164 ;//              -1                  -1
+int MODBUS_HUMCOUNT2_H                                       =165 ;//              -1                  -1
+int MODBUS_HUMRH2_H                                          =166 ;//              -1                  -1
 int MODBUS_ANALOG1_FUNCTION                                  =167 ;//              298                 298
 int MODBUS_ANALOG2_FUNCTION                                  =168 ;//              299                 299
-int MODBUS_ANALOG3_FUNCTION                                  =169 ;//              -1                  -1 
-int MODBUS_ANALOG4_FUNCTION                                  =170 ;//              -1                  -1 
-int MODBUS_ANALOG5_FUNCTION                                  =171 ;//              -1                  -1 
-int MODBUS_ANALOG6_FUNCTION                                  =172 ;//              -1                  -1 
-int MODBUS_ANALOG7_FUNCTION                                  =173 ;//              -1                  -1 
-int MODBUS_ANALOG8_FUNCTION                                  =174 ;//              -1                  -1 
+int MODBUS_ANALOG3_FUNCTION                                  =169 ;//              -1                  -1
+int MODBUS_ANALOG4_FUNCTION                                  =170 ;//              -1                  -1
+int MODBUS_ANALOG5_FUNCTION                                  =171 ;//              -1                  -1
+int MODBUS_ANALOG6_FUNCTION                                  =172 ;//              -1                  -1
+int MODBUS_ANALOG7_FUNCTION                                  =173 ;//              -1                  -1
+int MODBUS_ANALOG8_FUNCTION                                  =174 ;//              -1                  -1
 int MODBUS_TABLE1_ZERO                                       =175 ;//              219                 219
 int MODBUS_TABLE1_HALFONE                                    =176 ;//              220                 220
 int MODBUS_TABLE1_ONE                                        =177 ;//              221                 221
@@ -1202,11 +1193,11 @@ int MODBUS_TABLE2_HALFFOUR                                   =193 ;//           
 int MODBUS_TABLE2_FOUR                                       =194 ;//              238                 238
 int MODBUS_TABLE2_HALFFIVE                                   =195 ;//              239                 239
 int MODBUS_TABLE2_FIVE                                       =196 ;//              240                 240
-int MODUBS_HUMIDITY_RH                                       =197 ;//              -1                  -1 
-int MODBUS_HUMIDITY_FREQUENCY                                =198 ;//              -1                  -1 
-int MODBUS_HUM_PIC_UPDATE                                    =199 ;//              -1                  -1 
-int MODBUS_HUM_CAL_NUM                                       =200 ;//              -1                  -1 
-int MODBUS_HUM_CURRENT_DEFAULT                               =201 ;//              -1                  -1 
+int MODUBS_HUMIDITY_RH                                       =197 ;//              -1                  -1
+int MODBUS_HUMIDITY_FREQUENCY                                =198 ;//              -1                  -1
+int MODBUS_HUM_PIC_UPDATE                                    =199 ;//              -1                  -1
+int MODBUS_HUM_CAL_NUM                                       =200 ;//              -1                  -1
+int MODBUS_HUM_CURRENT_DEFAULT                               =201 ;//              -1                  -1
 int MODBUS_MODE_OUTPUT1                                      =202 ;//              280                 280
 int MODBUS_MODE_OUTPUT2                                      =203 ;//              281                 281
 int MODBUS_MODE_OUTPUT3                                      =204 ;//              282                 282
@@ -1223,29 +1214,29 @@ int MODBUS_OUTPUT2_DELAY_OFF_TO_ON                           =214 ;//           
 int MODBUS_OUTPUT3_DELAY_OFF_TO_ON                           =215 ;//              193                 193
 int MODBUS_OUTPUT4_DELAY_OFF_TO_ON                           =216 ;//              194                 194
 int MODBUS_OUTPUT5_DELAY_OFF_TO_ON                           =217 ;//              195                 195
-int MODBUS_OUTPUT6_DELAY_OFF_TO_ON                           =218 ;//              -1                  -1 
-int MODBUS_OUTPUT7_DELAY_OFF_TO_ON                           =219 ;//              -1                  -1 
+int MODBUS_OUTPUT6_DELAY_OFF_TO_ON                           =218 ;//              -1                  -1
+int MODBUS_OUTPUT7_DELAY_OFF_TO_ON                           =219 ;//              -1                  -1
 int MODBUS_DELAY1_OFF_TO_ON_TIME_CURRENT                     =220 ;//              387                 410
 int MODBUS_DELAY2_OFF_TO_ON_TIME_CURRENT                     =221 ;//              388                 411
 int MODBUS_DELAY3_OFF_TO_ON_TIME_CURRENT                     =222 ;//              389                 412
 int MODBUS_DELAY4_OFF_TO_ON_TIME_CURRENT                     =223 ;//              390                 413
 int MODBUS_DELAY5_OFF_TO_ON_TIME_CURRENT                     =224 ;//              391                 414
-int MODBUS_DELAY6_OFF_TO_ON_TIME_CURRENT                     =225 ;//              -1                  -1 
-int MODBUS_DELAY7_OFF_TO_ON_TIME_CURRENT                     =226 ;//              -1                  -1 
+int MODBUS_DELAY6_OFF_TO_ON_TIME_CURRENT                     =225 ;//              -1                  -1
+int MODBUS_DELAY7_OFF_TO_ON_TIME_CURRENT                     =226 ;//              -1                  -1
 int MODBUS_OUTPUT1_DELAY_ON_TO_OFF                           =227 ;//              196                 196
 int MODBUS_OUTPUT2_DELAY_ON_TO_OFF                           =228 ;//              197                 197
 int MODBUS_OUTPUT3_DELAY_ON_TO_OFF                           =229 ;//              198                 198
 int MODBUS_OUTPUT4_DELAY_ON_TO_OFF                           =230 ;//              199                 199
 int MODBUS_OUTPUT5_DELAY_ON_TO_OFF                           =231 ;//              200                 200
-int MODBUS_OUTPUT6_DELAY_ON_TO_OFF                           =232 ;//              -1                  -1 
-int MODBUS_OUTPUT7_DELAY_ON_TO_OFF                           =233 ;//              -1                  -1 
+int MODBUS_OUTPUT6_DELAY_ON_TO_OFF                           =232 ;//              -1                  -1
+int MODBUS_OUTPUT7_DELAY_ON_TO_OFF                           =233 ;//              -1                  -1
 int MODBUS_DELAY1_ON_TO_OFF_TIME_CURRENT                     =234 ;//              382                 405
 int MODBUS_DELAY2_ON_TO_OFF_TIME_CURRENT                     =235 ;//              383                 406
 int MODBUS_DELAY3_ON_TO_OFF_TIME_CURRENT                     =236 ;//              384                 407
 int MODBUS_DELAY4_ON_TO_OFF_TIME_CURRENT                     =237 ;//              385                 408
 int MODBUS_DELAY5_ON_TO_OFF_TIME_CURRENT                     =238 ;//              386                 409
-int MODBUS_DELAY6_ON_TO_OFF_TIME_CURRENT                     =239 ;//              -1                  -1 
-int MODBUS_DELAY7_ON_TO_OFF_TIME_CURRENT                     =240 ;//              -1                  -1 
+int MODBUS_DELAY6_ON_TO_OFF_TIME_CURRENT                     =239 ;//              -1                  -1
+int MODBUS_DELAY7_ON_TO_OFF_TIME_CURRENT                     =240 ;//              -1                  -1
 int MODBUS_CYCLING_DELAY                                     =241 ;//              201                 201
 int MODBUS_CHANGOVER_DELAY                                   =242 ;//              202                 202
 int MODBUS_VALVE_TRAVEL_TIME                                 =243 ;//              279                 279
@@ -1260,13 +1251,13 @@ int MODBUS_INTERLOCK_OUTPUT7                                 =251 ;//           
 int MODBUS_FREEZE_DELAY_ON                                   =252 ;//              296                 296
 int MODBUS_FREEZE_DELAY_OFF                                  =253 ;//              297                 297
 int MODBUS_OUTPUT_MANU_ENABLE                                =254 ;//              310                 310
-int MODBUS_MANU_RELAY1                                       =255 ;//              -1                  -1 
-int MODBUS_MANU_RELAY2                                       =256 ;//              -1                  -1 
-int MODBUS_MANU_RELAY3                                       =257 ;//              -1                  -1 
-int MODBUS_MANU_RELAY4                                       =258 ;//              -1                  -1 
-int MODBUS_MANU_RELAY5                                       =259 ;//              -1                  -1 
-int MODBUS_MANUAL_AO1                                        =260 ;//              -1                  -1 
-int MODBUS_MANUAL_AO2                                        =261 ;//              -1                  -1 
+int MODBUS_MANU_RELAY1                                       =255 ;//              -1                  -1
+int MODBUS_MANU_RELAY2                                       =256 ;//              -1                  -1
+int MODBUS_MANU_RELAY3                                       =257 ;//              -1                  -1
+int MODBUS_MANU_RELAY4                                       =258 ;//              -1                  -1
+int MODBUS_MANU_RELAY5                                       =259 ;//              -1                  -1
+int MODBUS_MANUAL_AO1                                        =260 ;//              -1                  -1
+int MODBUS_MANUAL_AO2                                        =261 ;//              -1                  -1
 int MODBUS_DEADMASTER_AUTO_MANUAL                            =262 ;//              312                 312
 int MODBUS_DEADMASTER_OUTPUT_STATE                           =263 ;//              313                 313
 int MODBUS_DEADMASTER_COOL_OUTPUT                            =264 ;//              314                 314
@@ -1276,8 +1267,8 @@ int MODBUS_OUTPUT2_FUNCTION                                  =267 ;//           
 int MODBUS_OUTPUT3_FUNCTION                                  =268 ;//              335                 335
 int MODBUS_OUTPUT4_FUNCTION                                  =269 ;//              336                 336
 int MODBUS_OUTPUT5_FUNCTION                                  =270 ;//              337                 337
-int MODBUS_OUTPUT6_FUNCTION                                  =271 ;//              -1                  -1 
-int MODBUS_OUTPUT7_FUNCTION                                  =272 ;//              -1                  -1 
+int MODBUS_OUTPUT6_FUNCTION                                  =271 ;//              -1                  -1
+int MODBUS_OUTPUT7_FUNCTION                                  =272 ;//              -1                  -1
 int MODBUS_FAN_SPEED                                         =273 ;//              137                 137
 int MODBUS_PID_OUTPUT1                                       =274 ;//              247                 247
 int MODBUS_PID_OUTPUT2                                       =275 ;//              248                 248
@@ -1349,44 +1340,44 @@ int MODBUS_VALVE_OFF_TABLE_HEAT3                             =340 ;//           
 int MODBUS_DEFAULT_SETPOINT                                  =341 ;//              338                 338
 int MODBUS_SETPOINT_CONTROL                                  =342 ;//              339                 339
 int MODBUS_DAYSETPOINT_OPTION                                =343 ;//              381                 423
-int MODBUS_MIDDLE_SETPOINT                                   =344 ;//              -1                  -1 
-int MODBUS_DAY_SETPOINT                                      =345 ;//              -1                  -1 
-int MODBUS_DAY_COOLING_DEADBAND                              =346 ;//              -1                  -1 
-int MODBUS_DAY_HEATING_DEADBAND                              =347 ;//              -1                  -1 
-int MODBUS_DAY_COOLING_SETPOINT                              =348 ;//              -1                  -1 
-int MODBUS_DAY_HEATING_SETPOINT                              =349 ;//              -1                  -1 
-int MODBUS_NIGHT_SETPOINT                                    =350 ;//              -1                  -1 
+int MODBUS_MIDDLE_SETPOINT                                   =344 ;//              -1                  -1
+int MODBUS_DAY_SETPOINT                                      =345 ;//              -1                  -1
+int MODBUS_DAY_COOLING_DEADBAND                              =346 ;//              -1                  -1
+int MODBUS_DAY_HEATING_DEADBAND                              =347 ;//              -1                  -1
+int MODBUS_DAY_COOLING_SETPOINT                              =348 ;//              -1                  -1
+int MODBUS_DAY_HEATING_SETPOINT                              =349 ;//              -1                  -1
+int MODBUS_NIGHT_SETPOINT                                    =350 ;//              -1                  -1
 int MODBUS_APPLICATION                                       =351 ;//              125                 125
 int MODBUS_NIGHT_HEATING_DEADBAND                            =352 ;//              123                 123
 int MODBUS_NIGHT_COOLING_DEADBAND                            =353 ;//              124                 124
 int MODBUS_NIGHT_HEATING_SETPOINT                            =354 ;//              182                 182
 int MODBUS_NIGHT_COOLING_SETPOINT                            =355 ;//              183                 183
-int MODBUS_WINDOW_INTERLOCK_COOLING_SETPOINT                 =356 ;//              -1                  -1 
-int MODBUS_WINDOW_INTERLOCK_HEATING_SETPOINT                 =357 ;//              -1                  -1 
+int MODBUS_WINDOW_INTERLOCK_COOLING_SETPOINT                 =356 ;//              -1                  -1
+int MODBUS_WINDOW_INTERLOCK_HEATING_SETPOINT                 =357 ;//              -1                  -1
 int MODBUS_UNIVERSAL_NIGHTSET                                =358 ;//              275                 275
 int MODBUS_UNIVERSAL_SET                                     =359 ;//              246                 246
 int MODBUS_UNIVERSAL_DB_HI                                   =360 ;//              242                 242
 int MODBUS_UNIVERSAL_DB_LO                                   =361 ;//              243                 243
-int MODBUS_ECOMONY_COOLING_SETPOINT                          =362 ;//              -1                  -1 
-int MODBUS_ECOMONY_HEATING_SETPOINT                          =363 ;//              -1                  -1 
+int MODBUS_ECOMONY_COOLING_SETPOINT                          =362 ;//              -1                  -1
+int MODBUS_ECOMONY_HEATING_SETPOINT                          =363 ;//              -1                  -1
 int MODBUS_POWERUP_SETPOINT                                  =364 ;//              126                 126
 int MODBUS_MAX_SETPOINT                                      =365 ;//              131                 131
 int MODBUS_MIN_SETPOINT                                      =366 ;//              132                 132
-int MODBUS_MAX_SETPOINT2                                     =367 ;//              -1                  -1 
-int MODBUS_MIN_SETPOINT2                                     =368 ;//              -1                  -1 
-int MODBUS_MAX_SETPOINT3                                     =369 ;//              -1                  -1 
-int MODBUS_MIN_SETPOINT3                                     =370 ;//              -1                  -1 
-int MODBUS_MAX_SETPOINT4                                     =371 ;//              -1                  -1 
-int MODBUS_MIN_SETPOINT4                                     =372 ;//              -1                  -1 
+int MODBUS_MAX_SETPOINT2                                     =367 ;//              -1                  -1
+int MODBUS_MIN_SETPOINT2                                     =368 ;//              -1                  -1
+int MODBUS_MAX_SETPOINT3                                     =369 ;//              -1                  -1
+int MODBUS_MIN_SETPOINT3                                     =370 ;//              -1                  -1
+int MODBUS_MAX_SETPOINT4                                     =371 ;//              -1                  -1
+int MODBUS_MIN_SETPOINT4                                     =372 ;//              -1                  -1
 int MODBUS_SETPOINT_INCREASE                                 =373 ;//              293                 293
 int MODBUS_FREEZE_TEMP_SETPOINT                              =374 ;//              295                 295
-int MODBUS_WALL_SETPOINT                                     =375 ;//              -1                  -1 
-int MODBUS_CEILING_SETPOINT                                  =376 ;//              -1                  -1 
-int MODBUS_AVERAGE_SETPOINT                                  =377 ;//              -1                  -1 
-int MODBUS_UNOCCUPIED_HEATING                                =378 ;//              -1                  -1 
-int MODBUS_UNOCCUPIED_COOLING                                =379 ;//              -1                  -1 
-int MODBUS_RH_SETPOINT                                       =380 ;//              -1                  -1 
-int MODBUS_CURRENT1_SETPOINT                                 =381 ;//              -1                  -1 
+int MODBUS_WALL_SETPOINT                                     =375 ;//              -1                  -1
+int MODBUS_CEILING_SETPOINT                                  =376 ;//              -1                  -1
+int MODBUS_AVERAGE_SETPOINT                                  =377 ;//              -1                  -1
+int MODBUS_UNOCCUPIED_HEATING                                =378 ;//              -1                  -1
+int MODBUS_UNOCCUPIED_COOLING                                =379 ;//              -1                  -1
+int MODBUS_RH_SETPOINT                                       =380 ;//              -1                  -1
+int MODBUS_CURRENT1_SETPOINT                                 =381 ;//              -1                  -1
 int MODBUS_TEMP_SELECT                                       =382 ;//              111                 111
 int MODBUS_INPUT1_SELECT                                     =383 ;//              241                 241
 int MODBUS_COOLING_PID                                       =384 ;//              104                 104
@@ -1403,7 +1394,7 @@ int MODBUS_PID2_MODE_OPERATION                               =394 ;//           
 int MODBUS_KEYPAD_SELECT                                     =395 ;//              128                 128
 int MODBUS_SPECIAL_MENU_LOCK                                 =396 ;//              133                 133
 int MODBUS_DISPLAY                                           =397 ;//              203                 203
-int MODBUS_ICON                                              =398 ;//              -1                  -1 
+int MODBUS_ICON                                              =398 ;//              -1                  -1
 int MODBUS_LAST_KEY_TIMER                                    =399 ;//              294                 294
 int MODBUS_KEYPAD_VALUE                                      =400 ;//              304                 304
 int MODBUS_DISPLAY_HUNDRED                                   =401 ;//              305                 305
@@ -1422,23 +1413,23 @@ int MODBUS_DAY                                               =413 ;//           
 int MODBUS_HOUR                                              =414 ;//              -1                  523
 int MODBUS_MINUTE                                            =415 ;//              -1                  524
 int MODBUS_SECOND                                            =416 ;//              -1                  525
-int MODBUS_DIAGNOSTIC_ALARM                                  =417 ;//              -1                  -1 
-int MODBUS_DAY1_EVENT1_HI                                    =418 ;//              -1                  -1 
-int MODBUS_DAY1_EVENT1_LO                                    =419 ;//              -1                  -1 
-int MODBUS_DAY1_EVENT2_HI                                    =420 ;//              -1                  -1 
-int MODBUS_DAY1_EVENT2_LO                                    =421 ;//              -1                  -1 
-int MODBUS_DAY1_EVENT3_HI                                    =422 ;//              -1                  -1 
-int MODBUS_DAY1_EVENT3_LO                                    =423 ;//              -1                  -1 
-int MODBUS_DAY1_EVENT4_HI                                    =424 ;//              -1                  -1 
-int MODBUS_DAY1_EVENT4_LO                                    =425 ;//              -1                  -1 
-int MODBUS_DAY2_EVENT1_HI                                    =426 ;//              -1                  -1 
-int MODBUS_DAY2_EVENT1_LO                                    =427 ;//              -1                  -1 
-int MODBUS_DAY2_EVENT2_HI                                    =428 ;//              -1                  -1 
-int MODBUS_DAY2_EVENT2_LO                                    =429 ;//              -1                  -1 
-int MODBUS_DAY2_EVENT3_HI                                    =430 ;//              -1                  -1 
-int MODBUS_DAY2_EVENT3_LO                                    =431 ;//              -1                  -1 
-int MODBUS_DAY2_EVENT4_HI                                    =432 ;//              -1                  -1 
-int MODBUS_DAY2_EVENT4_LO                                    =433 ;//              -1                  -1 
+int MODBUS_DIAGNOSTIC_ALARM                                  =417 ;//              -1                  -1
+int MODBUS_DAY1_EVENT1_HI                                    =418 ;//              -1                  -1
+int MODBUS_DAY1_EVENT1_LO                                    =419 ;//              -1                  -1
+int MODBUS_DAY1_EVENT2_HI                                    =420 ;//              -1                  -1
+int MODBUS_DAY1_EVENT2_LO                                    =421 ;//              -1                  -1
+int MODBUS_DAY1_EVENT3_HI                                    =422 ;//              -1                  -1
+int MODBUS_DAY1_EVENT3_LO                                    =423 ;//              -1                  -1
+int MODBUS_DAY1_EVENT4_HI                                    =424 ;//              -1                  -1
+int MODBUS_DAY1_EVENT4_LO                                    =425 ;//              -1                  -1
+int MODBUS_DAY2_EVENT1_HI                                    =426 ;//              -1                  -1
+int MODBUS_DAY2_EVENT1_LO                                    =427 ;//              -1                  -1
+int MODBUS_DAY2_EVENT2_HI                                    =428 ;//              -1                  -1
+int MODBUS_DAY2_EVENT2_LO                                    =429 ;//              -1                  -1
+int MODBUS_DAY2_EVENT3_HI                                    =430 ;//              -1                  -1
+int MODBUS_DAY2_EVENT3_LO                                    =431 ;//              -1                  -1
+int MODBUS_DAY2_EVENT4_HI                                    =432 ;//              -1                  -1
+int MODBUS_DAY2_EVENT4_LO                                    =433 ;//              -1                  -1
 int MODBUS_LCD_TURN_OFF                                      =434 ;//              -1                  399
 int MODBUS_LINE1_CHAR1                                       =435 ;//              -1                  383
 int MODBUS_LINE1_CHAR2                                       =436 ;//              -1                  384
@@ -1448,42 +1439,42 @@ int MODBUS_LINE2_CHAR1                                       =439 ;//           
 int MODBUS_LINE2_CHAR2                                       =440 ;//              -1                  392
 int MODBUS_LINE2_CHAR3                                       =441 ;//              -1                  393
 int MODBUS_LINE2_CHAR4                                       =442 ;//              -1                  394
-int MODBUS_INTERNAL_CHAR1                                    =443 ;//              -1                  -1 
-int MODBUS_INTERNAL_CHAR2                                    =444 ;//              -1                  -1 
-int MODBUS_INTERNAL_CHAR3                                    =445 ;//              -1                  -1 
-int MODBUS_INTERNAL_CHAR4                                    =446 ;//              -1                  -1 
-int MODBUS_AI1_CHAR1                                         =447 ;//              -1                  -1 
-int MODBUS_AI1_CHAR2                                         =448 ;//              -1                  -1 
-int MODBUS_AI1_CHAR3                                         =449 ;//              -1                  -1 
-int MODBUS_AI1_CHAR4                                         =450 ;//              -1                  -1 
-int MODBUS_AI2_CHAR1                                         =451 ;//              -1                  -1 
-int MODBUS_AI2_CHAR2                                         =452 ;//              -1                  -1 
-int MODBUS_AI2_CHAR3                                         =453 ;//              -1                  -1 
-int MODBUS_AI2_CHAR4                                         =454 ;//              -1                  -1 
-int MODBUS_AI3_CHAR1                                         =455 ;//              -1                  -1 
-int MODBUS_AI3_CHAR2                                         =456 ;//              -1                  -1 
-int MODBUS_AI3_CHAR3                                         =457 ;//              -1                  -1 
-int MODBUS_AI3_CHAR4                                         =458 ;//              -1                  -1 
-int MODBUS_AI4_CHAR1                                         =459 ;//              -1                  -1 
-int MODBUS_AI4_CHAR2                                         =460 ;//              -1                  -1 
-int MODBUS_AI4_CHAR3                                         =461 ;//              -1                  -1 
-int MODBUS_AI4_CHAR4                                         =462 ;//              -1                  -1 
-int MODBUS_AI5_CHAR1                                         =463 ;//              -1                  -1 
-int MODBUS_AI5_CHAR2                                         =464 ;//              -1                  -1 
-int MODBUS_AI5_CHAR3                                         =465 ;//              -1                  -1 
-int MODBUS_AI5_CHAR4                                         =466 ;//              -1                  -1 
-int MODBUS_AI6_CHAR1                                         =467 ;//              -1                  -1 
-int MODBUS_AI6_CHAR2                                         =468 ;//              -1                  -1 
-int MODBUS_AI6_CHAR3                                         =469 ;//              -1                  -1 
-int MODBUS_AI6_CHAR4                                         =470 ;//              -1                  -1 
-int MODBUS_AI7_CHAR1                                         =471 ;//              -1                  -1 
-int MODBUS_AI7_CHAR2                                         =472 ;//              -1                  -1 
-int MODBUS_AI7_CHAR3                                         =473 ;//              -1                  -1 
-int MODBUS_AI7_CHAR4                                         =474 ;//              -1                  -1 
-int MODBUS_AI8_CHAR1                                         =475 ;//              -1                  -1 
-int MODBUS_AI8_CHAR2                                         =476 ;//              -1                  -1 
-int MODBUS_AI8_CHAR3                                         =477 ;//              -1                  -1 
-int MODBUS_AI8_CHAR4                                         =478 ;//              -1                  -1 
+int MODBUS_INTERNAL_CHAR1                                    =443 ;//              -1                  -1
+int MODBUS_INTERNAL_CHAR2                                    =444 ;//              -1                  -1
+int MODBUS_INTERNAL_CHAR3                                    =445 ;//              -1                  -1
+int MODBUS_INTERNAL_CHAR4                                    =446 ;//              -1                  -1
+int MODBUS_AI1_CHAR1                                         =447 ;//              -1                  -1
+int MODBUS_AI1_CHAR2                                         =448 ;//              -1                  -1
+int MODBUS_AI1_CHAR3                                         =449 ;//              -1                  -1
+int MODBUS_AI1_CHAR4                                         =450 ;//              -1                  -1
+int MODBUS_AI2_CHAR1                                         =451 ;//              -1                  -1
+int MODBUS_AI2_CHAR2                                         =452 ;//              -1                  -1
+int MODBUS_AI2_CHAR3                                         =453 ;//              -1                  -1
+int MODBUS_AI2_CHAR4                                         =454 ;//              -1                  -1
+int MODBUS_AI3_CHAR1                                         =455 ;//              -1                  -1
+int MODBUS_AI3_CHAR2                                         =456 ;//              -1                  -1
+int MODBUS_AI3_CHAR3                                         =457 ;//              -1                  -1
+int MODBUS_AI3_CHAR4                                         =458 ;//              -1                  -1
+int MODBUS_AI4_CHAR1                                         =459 ;//              -1                  -1
+int MODBUS_AI4_CHAR2                                         =460 ;//              -1                  -1
+int MODBUS_AI4_CHAR3                                         =461 ;//              -1                  -1
+int MODBUS_AI4_CHAR4                                         =462 ;//              -1                  -1
+int MODBUS_AI5_CHAR1                                         =463 ;//              -1                  -1
+int MODBUS_AI5_CHAR2                                         =464 ;//              -1                  -1
+int MODBUS_AI5_CHAR3                                         =465 ;//              -1                  -1
+int MODBUS_AI5_CHAR4                                         =466 ;//              -1                  -1
+int MODBUS_AI6_CHAR1                                         =467 ;//              -1                  -1
+int MODBUS_AI6_CHAR2                                         =468 ;//              -1                  -1
+int MODBUS_AI6_CHAR3                                         =469 ;//              -1                  -1
+int MODBUS_AI6_CHAR4                                         =470 ;//              -1                  -1
+int MODBUS_AI7_CHAR1                                         =471 ;//              -1                  -1
+int MODBUS_AI7_CHAR2                                         =472 ;//              -1                  -1
+int MODBUS_AI7_CHAR3                                         =473 ;//              -1                  -1
+int MODBUS_AI7_CHAR4                                         =474 ;//              -1                  -1
+int MODBUS_AI8_CHAR1                                         =475 ;//              -1                  -1
+int MODBUS_AI8_CHAR2                                         =476 ;//              -1                  -1
+int MODBUS_AI8_CHAR3                                         =477 ;//              -1                  -1
+int MODBUS_AI8_CHAR4                                         =478 ;//              -1                  -1
 int MODBUS_OUTPUT1_CHAR1                                     =479 ;//              -1                  469
 int MODBUS_OUTPUT1_CHAR2                                     =480 ;//              -1                  470
 int MODBUS_OUTPUT1_CHAR3                                     =481 ;//              -1                  471
@@ -1512,65 +1503,65 @@ int MODBUS_OUTPUT7_CHAR1                                     =503 ;//           
 int MODBUS_OUTPUT7_CHAR2                                     =504 ;//              -1                  494
 int MODBUS_OUTPUT7_CHAR3                                     =505 ;//              -1                  495
 int MODBUS_OUTPUT7_CHAR4                                     =506 ;//              -1                  496
-int MODBUS_SCHEDULEA_CHAR1                                   =507 ;//              -1                  -1 
-int MODBUS_SCHEDULEA_CHAR2                                   =508 ;//              -1                  -1 
-int MODBUS_SCHEDULEA_CHAR3                                   =509 ;//              -1                  -1 
-int MODBUS_SCHEDULEA_CHAR4                                   =510 ;//              -1                  -1 
-int MODBUS_SCHEDULEB_CHAR1                                   =511 ;//              -1                  -1 
-int MODBUS_SCHEDULEB_CHAR2                                   =512 ;//              -1                  -1 
-int MODBUS_SCHEDULEB_CHAR3                                   =513 ;//              -1                  -1 
-int MODBUS_SCHEDULEB_CHAR4                                   =514 ;//              -1                  -1 
-int MODBUS_SCHEDULEC_CHAR1                                   =515 ;//              -1                  -1 
-int MODBUS_SCHEDULEC_CHAR2                                   =516 ;//              -1                  -1 
-int MODBUS_SCHEDULEC_CHAR3                                   =517 ;//              -1                  -1 
-int MODBUS_SCHEDULEC_CHAR4                                   =518 ;//              -1                  -1 
-int MODBUS_SCHEDULED_CHAR1                                   =519 ;//              -1                  -1 
-int MODBUS_SCHEDULED_CHAR2                                   =520 ;//              -1                  -1 
-int MODBUS_SCHEDULED_CHAR3                                   =521 ;//              -1                  -1 
-int MODBUS_SCHEDULED_CHAR4                                   =522 ;//              -1                  -1 
-int MODBUS_WALL_CHAR1                                        =523 ;//              -1                  -1 
-int MODBUS_WALL_CHAR2                                        =524 ;//              -1                  -1 
-int MODBUS_WALL_CHAR3                                        =525 ;//              -1                  -1 
-int MODBUS_WALL_CHAR4                                        =526 ;//              -1                  -1 
-int MODBUS_CEILING_CHAR1                                     =527 ;//              -1                  -1 
-int MODBUS_CEILING_CHAR2                                     =528 ;//              -1                  -1 
-int MODBUS_CEILING_CHAR3                                     =529 ;//              -1                  -1 
-int MODBUS_CEILING_CHAR4                                     =530 ;//              -1                  -1 
-int MODBUS_OUTDOOR_CHAR1                                     =531 ;//              -1                  -1 
-int MODBUS_OUTDOOR_CHAR2                                     =532 ;//              -1                  -1 
-int MODBUS_OUTDOOR_CHAR3                                     =533 ;//              -1                  -1 
-int MODBUS_OUTDOOR_CHAR4                                     =534 ;//              -1                  -1 
-int MODBUS_AVERAGE_CHAR1                                     =535 ;//              -1                  -1 
-int MODBUS_AVERAGE_CHAR2                                     =536 ;//              -1                  -1 
-int MODBUS_AVERAGE_CHAR3                                     =537 ;//              -1                  -1 
-int MODBUS_AVERAGE_CHAR4                                     =538 ;//              -1                  -1 
+int MODBUS_SCHEDULEA_CHAR1                                   =507 ;//              -1                  -1
+int MODBUS_SCHEDULEA_CHAR2                                   =508 ;//              -1                  -1
+int MODBUS_SCHEDULEA_CHAR3                                   =509 ;//              -1                  -1
+int MODBUS_SCHEDULEA_CHAR4                                   =510 ;//              -1                  -1
+int MODBUS_SCHEDULEB_CHAR1                                   =511 ;//              -1                  -1
+int MODBUS_SCHEDULEB_CHAR2                                   =512 ;//              -1                  -1
+int MODBUS_SCHEDULEB_CHAR3                                   =513 ;//              -1                  -1
+int MODBUS_SCHEDULEB_CHAR4                                   =514 ;//              -1                  -1
+int MODBUS_SCHEDULEC_CHAR1                                   =515 ;//              -1                  -1
+int MODBUS_SCHEDULEC_CHAR2                                   =516 ;//              -1                  -1
+int MODBUS_SCHEDULEC_CHAR3                                   =517 ;//              -1                  -1
+int MODBUS_SCHEDULEC_CHAR4                                   =518 ;//              -1                  -1
+int MODBUS_SCHEDULED_CHAR1                                   =519 ;//              -1                  -1
+int MODBUS_SCHEDULED_CHAR2                                   =520 ;//              -1                  -1
+int MODBUS_SCHEDULED_CHAR3                                   =521 ;//              -1                  -1
+int MODBUS_SCHEDULED_CHAR4                                   =522 ;//              -1                  -1
+int MODBUS_WALL_CHAR1                                        =523 ;//              -1                  -1
+int MODBUS_WALL_CHAR2                                        =524 ;//              -1                  -1
+int MODBUS_WALL_CHAR3                                        =525 ;//              -1                  -1
+int MODBUS_WALL_CHAR4                                        =526 ;//              -1                  -1
+int MODBUS_CEILING_CHAR1                                     =527 ;//              -1                  -1
+int MODBUS_CEILING_CHAR2                                     =528 ;//              -1                  -1
+int MODBUS_CEILING_CHAR3                                     =529 ;//              -1                  -1
+int MODBUS_CEILING_CHAR4                                     =530 ;//              -1                  -1
+int MODBUS_OUTDOOR_CHAR1                                     =531 ;//              -1                  -1
+int MODBUS_OUTDOOR_CHAR2                                     =532 ;//              -1                  -1
+int MODBUS_OUTDOOR_CHAR3                                     =533 ;//              -1                  -1
+int MODBUS_OUTDOOR_CHAR4                                     =534 ;//              -1                  -1
+int MODBUS_AVERAGE_CHAR1                                     =535 ;//              -1                  -1
+int MODBUS_AVERAGE_CHAR2                                     =536 ;//              -1                  -1
+int MODBUS_AVERAGE_CHAR3                                     =537 ;//              -1                  -1
+int MODBUS_AVERAGE_CHAR4                                     =538 ;//              -1                  -1
 int MODBUS_LCD_SCREEN1                                       =539 ;//              -1                  400
 int MODBUS_LCD_SCREEN2                                       =540 ;//              -1                  401
-int MODBUS_DEMAND_RESPONSE                                   =541 ;//              -1                  -1 
+int MODBUS_DEMAND_RESPONSE                                   =541 ;//              -1                  -1
 int MODBUS_LOCK_REGISTER                                     =542 ;//              358                 358
 int MODBUS_PIR_STAGE                                         =543 ;//              340                 340
-int MODBUS_FIRST_CAL_FLAG                                    =544 ;//              -1                  -1 
-int MODBUS_HUM_CAL_EREASE                                    =545 ;//              -1                  -1 
-int MODBUS_HUMCOUNT3_H                                       =546 ;//              -1                  -1 
-int MODBUS_HUMRH3_H                                          =547 ;//              -1                  -1 
-int MODBUS_HUMCOUNT4_H                                       =548 ;//              -1                  -1 
-int MODBUS_HUMRH4_H                                          =549 ;//              -1                  -1 
-int MODBUS_HUMCOUNT5_H                                       =550 ;//              -1                  -1 
-int MODBUS_HUMRH5_H                                          =551 ;//              -1                  -1 
-int MODBUS_HUMCOUNT6_H                                       =552 ;//              -1                  -1 
-int MODBUS_HUMRH6_H                                          =553 ;//              -1                  -1 
-int MODBUS_HUMCOUNT7_H                                       =554 ;//              -1                  -1 
-int MODBUS_HUMRH7_H                                          =555 ;//              -1                  -1 
-int MODBUS_HUMCOUNT8_H                                       =556 ;//              -1                  -1 
-int MODBUS_HUMRH8_H                                          =557 ;//              -1                  -1 
-int MODBUS_HUMCOUNT9_H                                       =558 ;//              -1                  -1 
-int MODBUS_HUMRH9_H                                          =559 ;//              -1                  -1 
-int MODBUS_HUMCOUNT10_H                                      =560 ;//              -1                  -1 
-int MODBUS_HUMRH10_H                                         =561 ;//              -1                  -1 
-int MODBUS_HUM_LOCK_A                                        =562 ;//              -1                  -1 
-int MODBUS_HUM_LOCK_B                                        =563 ;//              -1                  -1 
+int MODBUS_FIRST_CAL_FLAG                                    =544 ;//              -1                  -1
+int MODBUS_HUM_CAL_EREASE                                    =545 ;//              -1                  -1
+int MODBUS_HUMCOUNT3_H                                       =546 ;//              -1                  -1
+int MODBUS_HUMRH3_H                                          =547 ;//              -1                  -1
+int MODBUS_HUMCOUNT4_H                                       =548 ;//              -1                  -1
+int MODBUS_HUMRH4_H                                          =549 ;//              -1                  -1
+int MODBUS_HUMCOUNT5_H                                       =550 ;//              -1                  -1
+int MODBUS_HUMRH5_H                                          =551 ;//              -1                  -1
+int MODBUS_HUMCOUNT6_H                                       =552 ;//              -1                  -1
+int MODBUS_HUMRH6_H                                          =553 ;//              -1                  -1
+int MODBUS_HUMCOUNT7_H                                       =554 ;//              -1                  -1
+int MODBUS_HUMRH7_H                                          =555 ;//              -1                  -1
+int MODBUS_HUMCOUNT8_H                                       =556 ;//              -1                  -1
+int MODBUS_HUMRH8_H                                          =557 ;//              -1                  -1
+int MODBUS_HUMCOUNT9_H                                       =558 ;//              -1                  -1
+int MODBUS_HUMRH9_H                                          =559 ;//              -1                  -1
+int MODBUS_HUMCOUNT10_H                                      =560 ;//              -1                  -1
+int MODBUS_HUMRH10_H                                         =561 ;//              -1                  -1
+int MODBUS_HUM_LOCK_A                                        =562 ;//              -1                  -1
+int MODBUS_HUM_LOCK_B                                        =563 ;//              -1                  -1
 int MODBUS_LCD_ROTATE_ENABLE                                 =564 ;//              -1                  497
-int MODBUS_SCHEDULE_ON_OFF                                   =565 ;//              -1                  -1 
+int MODBUS_SCHEDULE_ON_OFF                                   =565 ;//              -1                  -1
 int MODBUS_DISP_ITEM_TEMPERATURE                             =566 ;//              -1                  498
 int MODBUS_DISP_ITEM_SETPOINT                                =567 ;//              -1                  499
 int MODBUS_DISP_ITEM_AI1                                     =568 ;//              -1                  500
@@ -1585,10 +1576,10 @@ int MODBUS_DISP_ITEM_MODE                                    =576 ;//           
 int MODBUS_DISP_ITEM_USER_INFO                               =577 ;//              -1                  516
 int MODBUS_DISP_ITEM_CLOCK_DATE                              =578 ;//              -1                  517
 int MODBUS_DISP_ITEM_CLOCK_TIME                              =579 ;//              -1                  518
-int MODBUS_DISP_ITEM_EXTENAL_SENSOR1                         =580 ;//              -1                  -1 
-int MODBUS_DISP_ITEM_EXTENAL_SENSOR2                         =581 ;//              -1                  -1 
-int MODBUS_DISP_ITEM_EXTENAL_SENSOR3                         =582 ;//              -1                  -1 
-int MODBUS_DISP_ITEM_EXTENAL_SENSOR4                         =583 ;//              -1                  -1 
+int MODBUS_DISP_ITEM_EXTENAL_SENSOR1                         =580 ;//              -1                  -1
+int MODBUS_DISP_ITEM_EXTENAL_SENSOR2                         =581 ;//              -1                  -1
+int MODBUS_DISP_ITEM_EXTENAL_SENSOR3                         =582 ;//              -1                  -1
+int MODBUS_DISP_ITEM_EXTENAL_SENSOR4                         =583 ;//              -1                  -1
 int MODBUS_DISP_ITEM_OUT1                                    =584 ;//              -1                  508
 int MODBUS_DISP_ITEM_OUT2                                    =585 ;//              -1                  509
 int MODBUS_DISP_ITEM_OUT3                                    =586 ;//              -1                  510
@@ -1607,14 +1598,14 @@ int MODBUS_PWM_OUT4                                          =598 ;//           
 int MODBUS_PWM_OUT5                                          =599 ;//              349                 349
 int MODBUS_SUN_ICON_CONTROL                                  =600 ;//              -1                  402
 int MODBUS_MOON_ICON_CONTROL                                 =601 ;//              -1                  403
-int MODBUS_EXT_SENSOR_TEMP_CAL                               =602 ;//              -1                  -1 
-int MODBUS_BUTTON_LEFT1                                      =603 ;//              -1                  -1 
-int MODBUS_BUTTON_LEFT2                                      =604 ;//              -1                  -1 
-int MODBUS_BUTTON_LEFT3                                      =605 ;//              -1                  -1 
-int MODBUS_BUTTON_LEFT4                                      =606 ;//              -1                  -1 
+int MODBUS_EXT_SENSOR_TEMP_CAL                               =602 ;//              -1                  -1
+int MODBUS_BUTTON_LEFT1                                      =603 ;//              -1                  -1
+int MODBUS_BUTTON_LEFT2                                      =604 ;//              -1                  -1
+int MODBUS_BUTTON_LEFT3                                      =605 ;//              -1                  -1
+int MODBUS_BUTTON_LEFT4                                      =606 ;//              -1                  -1
 int MODBUS_HUM_HEATER_CONTROL_ENABLE                         =607 ;
-int MODBUS_HUM_INPUT_MANUAL_ENABLE                           =608 ;//              -1                  -1 
-int MODBUS_HUM_INPUT_MANUAL_VALUE                            =609 ;//              -1                  -1 
+int MODBUS_HUM_INPUT_MANUAL_ENABLE                           =608 ;//              -1                  -1
+int MODBUS_HUM_INPUT_MANUAL_VALUE                            =609 ;//              -1                  -1
 int MODBUS_CO2_INPUT_MANUAL_ENABLE                           =610;
 int MODBUS_CO2_INPUT_VALUE                                   =611;
 int MODBUS_CO2_CALIBRATION_DATA                              =612;
@@ -1691,27 +1682,27 @@ int MODBUS_ROTATION_OUT3                                     =-1  ;//           
 int MODBUS_ROTATION_OUT4                                     =-1  ;//              331                 331
 int MODBUS_ROTATION_OUT5                                     =-1  ;//              332                 332
 int MODBUS_ROTATION_TIME_LEFT                                =-1  ;//              333                 333
-int MODBUS_FREE_COOL_OUT_TEMP                                =-1  ;//              359                 -1 
-int MODBUS_NC_MASTER_TIME                                    =-1  ;//              360                 -1 
-int MODBUS_FREE_COOL_HYSTERISIS                              =-1  ;//              361                 -1 
-int MODBUS_OUTPUT_FREE_COOL_COAST                            =-1  ;//              362                 -1 
-int MODBUS_OUTPUT_FREE_COOL_COOL1                            =-1  ;//              363                 -1 
-int MODBUS_OUTPUT_FREE_COOL_COOL2                            =-1  ;//              364                 -1 
-int MODBUS_OUTPUT_FREE_COOL_COOL3                            =-1  ;//              365                 -1 
-int MODBUS_OUTPUT_FREE_COOL_HEAT1                            =-1  ;//              366                 -1 
-int MODBUS_OUTPUT_FREE_COOL_HEAT2                            =-1  ;//              367                 -1 
-int MODBUS_OUTPUT_FREE_COOL_HEAT3                            =-1  ;//              368                 -1 
-int MODBUS_MIN_AIR                                           =-1  ;//              369                 -1 
+int MODBUS_FREE_COOL_OUT_TEMP                                =-1  ;//              359                 -1
+int MODBUS_NC_MASTER_TIME                                    =-1  ;//              360                 -1
+int MODBUS_FREE_COOL_HYSTERISIS                              =-1  ;//              361                 -1
+int MODBUS_OUTPUT_FREE_COOL_COAST                            =-1  ;//              362                 -1
+int MODBUS_OUTPUT_FREE_COOL_COOL1                            =-1  ;//              363                 -1
+int MODBUS_OUTPUT_FREE_COOL_COOL2                            =-1  ;//              364                 -1
+int MODBUS_OUTPUT_FREE_COOL_COOL3                            =-1  ;//              365                 -1
+int MODBUS_OUTPUT_FREE_COOL_HEAT1                            =-1  ;//              366                 -1
+int MODBUS_OUTPUT_FREE_COOL_HEAT2                            =-1  ;//              367                 -1
+int MODBUS_OUTPUT_FREE_COOL_HEAT3                            =-1  ;//              368                 -1
+int MODBUS_MIN_AIR                                           =-1  ;//              369                 -1
 int MODBUS_OAT_HOTTEST                                       =-1  ;//              370                 415
 int MODBUS_OAT_COLDEST                                       =-1  ;//              371                 416
 int MODBUS_OFFSET_HOTTEST                                    =-1  ;//              372                 417
 int MODBUS_OFFSET_COLDEST                                    =-1  ;//              373                 418
-int MODBUS_TWO_BYTE_SETPOINT                                 =-1  ;//              374                 -1 
+int MODBUS_TWO_BYTE_SETPOINT                                 =-1  ;//              374                 -1
 int MODBUS_CURRENT_SETPOINT                                  =-1  ;//              375                 419
 int MODBUS_SETPOINT_OFFSET                                   =-1  ;//              376                 420
-int MODBUS_CHANGEOVER_SENSOR_MODE                            =-1  ;//              377                 -1 
-int MODBUS_EXTERNAL_SENSOR_INUSE                             =-1  ;//              378                 -1 
-int MODBUS_EXTERNAL_SENSOR_STATUS                            =-1  ;//              379                 -1 
+int MODBUS_CHANGEOVER_SENSOR_MODE                            =-1  ;//              377                 -1
+int MODBUS_EXTERNAL_SENSOR_INUSE                             =-1  ;//              378                 -1
+int MODBUS_EXTERNAL_SENSOR_STATUS                            =-1  ;//              379                 -1
 int MODBUS_NEW_COOLING_SETPOINT                              =-1  ;//              380                 422
 int MODBUS_LINE1_CHAR5                                       =-1  ;//              -1                  387
 int MODBUS_LINE1_CHAR6                                       =-1  ;//              -1                  388
@@ -1722,11 +1713,11 @@ int MODBUS_LINE2_CHAR5                                       =-1  ;//           
 int MODBUS_LINE2_CHAR6                                       =-1  ;//              -1                  396
 int MODBUS_LINE2_CHAR7                                       =-1  ;//              -1                  397
 int MODBUS_LINE2_CHAR8                                       =-1  ;//              -1                  398
-int MODBUS_DURA_WINTER_SUMMER                                =-1  ;//              407                 -1 
-int MODBUS_FREE_COOL_SETPOINT                                =-1  ;//              408                 -1 
-int MODBUS_FREE_COOL_MAX_SETPOINT                            =-1  ;//              409                 -1 
-int MODBUS_FREE_COOL_MIN_SETPOINT                            =-1  ;//              410                 -1 
-int MODBUS_FREE_COOL_MIN_DAMPER                              =-1  ;//              411                 -1 
+int MODBUS_DURA_WINTER_SUMMER                                =-1  ;//              407                 -1
+int MODBUS_FREE_COOL_SETPOINT                                =-1  ;//              408                 -1
+int MODBUS_FREE_COOL_MAX_SETPOINT                            =-1  ;//              409                 -1
+int MODBUS_FREE_COOL_MIN_SETPOINT                            =-1  ;//              410                 -1
+int MODBUS_FREE_COOL_MIN_DAMPER                              =-1  ;//              411                 -1
 int MODBUS_HEAT_COOL                                         =-1  ;//              -1                  404
 int MODBUS_TURN_OFF_FAN                                      =-1  ;//              -1                  421
 int MODBUS_UI_LINE1_CHAR1                                    =-1  ;//              -1                  425
@@ -1843,17 +1834,17 @@ HTREEITEM selected_tree_item = NULL;
 #pragma region For_bacnet
 
 
-CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
+CString cus_digital_off[BAC_CUSTOMER_UNITS_COUNT];		// Used to save customer-defined units.
 CString cus_digital_on[BAC_CUSTOMER_UNITS_COUNT];
-//int     cus_direction[BAC_CUSTOMER_UNITS_COUNT];  //自定义的  正向逻辑还是反向逻辑;
+// int     cus_direction[BAC_CUSTOMER_UNITS_COUNT]; // Custom direction: forward logic or reverse logic.
 CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
 CString Custom_Digital_Range[BAC_CUSTOMER_UNITS_COUNT];
-bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
-bool receive_custom_unit; //收到回复，flag就置 true;
-bool read_analog_customer_unit;  // 这个是模拟的cus tabel ;
+bool read_customer_unit;	// If this device has never read the customer-unit item, try to read it. Older firmware did not have it.
+bool receive_custom_unit; // Set the flag true when a reply is received.
+bool read_analog_customer_unit;  // This is the simulated customer table.
 
-bool read_msv_table; //MSV table 
-CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// 存储客户多态  例如显示  AAA/BBB/CCC
+bool read_msv_table; //MSV table
+CString Custom_Msv_Range[BAC_MSV_COUNT + 1];// Stores a customer multi-state, for example the display AAA/BBB/CCC.
 
 CString Analog_Custom_Units[BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT];
 CString Analog_Variable_Units[BAC_VARIABLE_CUS_UNIT_COUNT];
@@ -1900,7 +1891,7 @@ bool bac_remote_point_read_results;
 
 bool bac_cm5_graphic;
 unsigned char bac_gloab_panel;
-unsigned char g_thread_max_mac_id = 254; //客户上次点击的mstp mac ID
+unsigned char g_thread_max_mac_id = 254; // MSTP MAC ID the customer last clicked.
 //int g_bac_instance;
 int input_list_line;
 int output_list_line;
@@ -1910,7 +1901,7 @@ int annual_list_line ;
 int screen_list_line ;
 int monitor_list_line;
 int analog_range_tbl_line;
-int msv_range_tbl_line;  //MSV 多态 range 选择的  变量
+int msv_range_tbl_line;  // Variable selected for the MSV multi-state range.
 int ext_io_list_line;
 
 HWND      g_hwnd_now;
@@ -1968,12 +1959,12 @@ Str_annual_routine_point s_Annual_data[4] = {0};
 Control_group_point s_screen_data[16];
 Str_monitor_point s_monitor_data[12] = {0};
 Str_t3_screen_Json s_json_screen_data;
-Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; //缓存其他panel json item 值的 全局变量;
+Str_item_Json s_json_item_data[BAC_GRPHIC_JSON_ITEM_COUNT]; // Global cache of JSON item values from other panels.
 str_webview_logging_time g_logging_time[256] = {0};
-byte	g_DayState[8][ANNUAL_CODE_SIZE];				byte	gp_DayState[256][8][ANNUAL_CODE_SIZE];//全局所有panel output 的集合体;
-vector <_panel_info> g_bacnet_panel_info;  //全局的 object instance 与 panel number 对应的容器
-vector <Str_out_point> m_Output_data;					vector < vector<Str_out_point> >			  g_Output_data; //全局所有panel output 的集合体;
-vector <Str_in_point>  m_Input_data;					vector < vector<Str_in_point> >				  g_Input_data; //全局所有panel input 的集合体;
+byte	g_DayState[8][ANNUAL_CODE_SIZE];				byte	gp_DayState[256][8][ANNUAL_CODE_SIZE];// Collection of outputs for every panel.
+vector <_panel_info> g_bacnet_panel_info;  // Container that maps an object instance to a panel number.
+vector <Str_out_point> m_Output_data;					vector < vector<Str_out_point> >			  g_Output_data; // Collection of outputs for every panel.
+vector <Str_in_point>  m_Input_data;					vector < vector<Str_in_point> >				  g_Input_data; // Collection of inputs for every panel.
 vector <Str_program_point>  m_Program_data;				vector < vector<Str_program_point> >		  g_Program_data;
 vector <Str_array_point> m_Array_data;
 vector <Str_variable_point>  m_Variable_data;			vector < vector<Str_variable_point> >		  g_Variable_data;
@@ -1989,9 +1980,9 @@ vector <Str_monitor_point> m_monitor_data;			    vector < vector<Str_monitor_poi
 vector <Str_TstatInfo_point> m_Tstat_data;				vector < vector<Str_TstatInfo_point> >        g_Tstat_data;
 vector <Str_userlogin_point> m_user_login_data;			vector < vector<Str_userlogin_point> >        g_user_login_data;
 vector <Alarm_point> m_alarmlog_data;					vector < vector<Alarm_point> >				  g_alarmlog_data;
-vector <Str_label_point> m_graphic_label_data;			vector < vector<Str_label_point> >			  g_graphic_label_data;//图片里面的Label的信息要存在设备里面;
-vector <Str_t3_screen_Json> m_json_screen_data;			vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;//screen的信息要存在设备里面;
-vector <Str_item_Json> m_json_item_data;			    vector < vector<Str_item_Json> >			  g_json_item_data;//item的信息要存在设备里面;
+vector <Str_label_point> m_graphic_label_data;			vector < vector<Str_label_point> >			  g_graphic_label_data;// Label information inside a picture is stored on the device.
+vector <Str_t3_screen_Json> m_json_screen_data;			vector < vector<Str_t3_screen_Json> >		  g_json_screen_data;// Screen information is stored on the device.
+vector <Str_item_Json> m_json_item_data;			    vector < vector<Str_item_Json> >			  g_json_item_data;// Item information is stored on the device.
 vector <Str_Units_element> m_custom_unit_data;        vector < vector<Str_Units_element> >		  g_customer_unit_data;
 vector <Str_table_point> m_analog_custmer_range;		vector < vector<Str_table_point> >		      g_analog_custmer_range;
 vector <Str_variable_uint_point> m_variable_analog_unite; vector < vector<Str_variable_uint_point> >  g_variable_analog_unite;
@@ -2005,16 +1996,16 @@ Str_Remote_TstDB m_remote_device_db;
 
 vector <Client_Info> m_tcp_connect_info;
 
-vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
+vector <Str_remote_point> m_remote_point_data;  // Values of remote Tstat points inside the mini panel.
 
 
 
-vector <bacnet_background_struct> m_backbround_data; // 用来全程储存需要额外读取的一些后台bacnet panel数据
+vector <bacnet_background_struct> m_backbround_data; // Holds extra BACnet panel data that the background must read.
 
 vector <int>  m_Input_data_instance; // for input bacnet-thirdParty devices instance_is's
 vector <int>  m_Output_data_instance;// for output bacnet-thirdParty devices instance_is's
 vector <int>  m_Variable_data_instance;
-vector <int>  m_Weekly_data_instance; 
+vector <int>  m_Weekly_data_instance;
 vector <int>  m_Annual_data_instance;
 
 
@@ -2024,13 +2015,16 @@ Str_Setting_Info s_Basic_Setting;
 Str_Setting_Info Device_Basic_Setting;
 Str_Email_point  Device_Email_Point;
 Str_Wireguard_point Device_Wireguard_Point;
+Str_Gsm_status_point Device_Gsm_Status_Point;
+Str_Mqtt_point Device_Mqtt_Point;
+Str_Snmp_point Device_Snmp_Point;
 Str_MISC Device_Misc_Data;
 Str_MISC s_Device_Misc_Data;
 Str_Special Device_Special_Data;
 char m_at_write_buf[100];
 char m_at_read_buf[450];
-bacnet_panel_object_info g_bac_panel[256]; //用于全局panel 与 object instance 对应查询;
-vector <Str_tstat_setpoint> Tstat_Setpoint_data;  //tstat8 新的setpoint表格; 以前的完全改不动了;
+bacnet_panel_object_info g_bac_panel[256]; // Used to look up a panel from an object instance.
+vector <Str_tstat_setpoint> Tstat_Setpoint_data;  // New Tstat8 setpoint table. The old one could no longer be changed.
 vector <int> exsit_panel_number;
 vector <refresh_net_device> m_T3BB_device_data;
 vector <refresh_net_device> m_refresh_net_device_data;
@@ -2040,12 +2034,12 @@ vector <GSM_connection_info> m_gsm_connect_info;
 vector <Scan_Info> m_scan_info;
 vector <Scan_Info> m_scan_info_buffer;
 Monitor_Block m_monitor_block;
-Str_Monitor_data_header m_monitor_head;//用来接收monitor 的头，里面有需要接收的总包和目前是第几包;
-char picture_data_buffer[400]; //用来存每包 pic 的数据.
-Str_picture_header m_picture_head; //传图片的 头，结构其实是和 monitor same.
-int Monitor_Input__Data[14][1000];	
+Str_Monitor_data_header m_monitor_head;// Receives the monitor header: total packet count and the current packet number.
+char picture_data_buffer[400]; // Stores the data of each picture packet.
+Str_picture_header m_picture_head; // Picture transfer header. The structure is the same as the monitor header.
+int Monitor_Input__Data[14][1000];
 
-int controller_counter = 0; //记录扫描的子节点
+int controller_counter = 0; // Records scanned child nodes.
 
 
 
@@ -2055,13 +2049,13 @@ vector <bacnet_standard_Info> m_standard_graphic_refresh_data;
 
 
 unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
-unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
+unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];// Temporarily set to 2000.
 int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 
 BOOL g_mstp_flag;
 
-unsigned long timesec1970; 
-unsigned long timestart;   
+unsigned long timesec1970;
+unsigned long timestart;
 
 CString bac_cs_mac;
 CString bac_cs_device_id;
@@ -2078,11 +2072,11 @@ CDialog *Tcp_Server_Window =NULL;
 HWND h_debug_window;
 CString PrintText[1000];
 CString g_Print;
-bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
+bool range_cancel;// Tracks whether the Range dialog saved normally: 0 if it did, 1 otherwise.
 int g_protocol=PROTOCOL_UNKNOW;
 int g_new_old_IDE = 0;
-int g_bac_read_type;	//用于记录将要读取哪一个，input 还是output,给线程使用;
-bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
+int g_bac_read_type;	// Records whether the thread will read an input or an output.
+bool g_bac_need_read_setting;  // On the first click, read the Setting data and decide whether labels need to change.
 HANDLE click_read_thread;
 HANDLE BACnet_read_thread;
 HANDLE BACnet_abort_read_thread;
@@ -2092,25 +2086,25 @@ int connect_invoke_id = -1;
 //bool connect_replay = false;
 BACNET_OBJECT_PROPERTY_VALUE receive_object_value;  /* for bacapp printing */
 bool bac_show_alarm_window = false;	//used for judge whether need to show the alarm window.
-bool bac_select_device_online = false; //判断选中的bacnet device 是否在线;
+bool bac_select_device_online = false; // Checks whether the selected BACnet device is online.
 SOCKET h_Broad=NULL;
 SOCKADDR_IN h_siBind;
 SOCKADDR_IN h_bcast;
 
-Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];//用来存 数字量 没变化的情况下又 不在时间轴范围内的值;
+Point_Data_str digital_last_data[MAX_POINTS_IN_MONITOR];// Stores a digital value that did not change and is outside the time axis.
 Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
 Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];
 int analog_data_max_value[MAX_POINTS_IN_MONITOR];
 int analog_data_min_value[MAX_POINTS_IN_MONITOR];
-int digital_data_count[MAX_POINTS_IN_MONITOR];	//用于记录digital data 这个指针到底存了多少数据;
-int analog_data_count[MAX_POINTS_IN_MONITOR];	//用于记录analog data 这个指针到底存了多少数据;
+int digital_data_count[MAX_POINTS_IN_MONITOR];	// Records how much data the digital-data pointer holds.
+int analog_data_count[MAX_POINTS_IN_MONITOR];	// Records how much data the analog-data pointer holds.
 int get_data_count = 0;
-int monitor_analog_count = 0;	//暂存monitor 的模拟和数字的个数;
+int monitor_analog_count = 0;	// Temporarily holds the monitor analog and digital counts.
 int monitor_digital_count = 0;
-Data_Time_Match * temp_analog_data[MAX_POINTS_IN_MONITOR];	//临时存放新建的块;
+Data_Time_Match * temp_analog_data[MAX_POINTS_IN_MONITOR];	// Temporary storage for a newly created block.
 int SEND_COMMAND_DELAY_TIME = 100;
-bool TCP_Server_Running = false; //开启TCP 服务器就将标志位置1;
-bool Gsm_communication = false;	//如果是通过GSM 读远程设备 许多地方要特殊处理;不能刷新太频繁;
+bool TCP_Server_Running = false; // Set the flag to 1 when the TCP server is started.
+bool Gsm_communication = false;	// Reading a remote device over GSM needs special handling in many places. Do not refresh too often.
 CString SaveConfigFilePath;
 CString LoadConfigFilePath;
 CString FinalSaveProgPath;
@@ -2123,8 +2117,8 @@ CString g_strStartInterface_config = _T("") MY_CONFIG;
 int g_SleepTimeForConfig = 3;
 CString	g_configfile_path;
 vector<Reg_Infor> g_Vector_Write_Error;
-bool need_read_bacnet_graphic_label_flag = true;	//用于防止重复读取 graphic label ;只有切换设备的时候才需要再次读取;
-bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
+bool need_read_bacnet_graphic_label_flag = true;	// Avoid reading the graphic label again. Read it only when the device changes.
+bool read_write_bacnet_config = false;	// Do not refresh the list while reading or writing BACnet config.
 
  vector <Tstat_Input_Struct> m_tstat_input_data;
  vector <Tstat_Output_Struct> m_tstat_output_data;
@@ -2144,9 +2138,9 @@ bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
   _T("Outside Temp"),
   _T("Airflow"),
   _T("Heat"),
-  _T("Cool"), 
-  _T("Potentionmeter"), 
-  _T("Temperature"), 
+  _T("Cool"),
+  _T("Potentionmeter"),
+  _T("Temperature"),
   _T("Fan")};
 
 
@@ -2188,9 +2182,9 @@ int current_building_ip;
 int current_building_ipport;
 
 
-// 需要刷新--在MainFrm.cpp中的线程中需要判断这个变量
-//主要是两个地方
-//1>T3000View-Fresh()--进入到这里说明是需要刷新的因为这个是Tstat
+// Needs refresh. The thread in MainFrm.cpp checks this variable.
+// Mainly two places.
+// 1> T3000View-Fresh(). Reaching here means a refresh is required because this is a Tstat.
 
 BOOL g_NEED_MULTI_READ = FALSE;
 
@@ -2209,18 +2203,18 @@ BOOL g_fresh_Graphic = FALSE;
 Global_Calibration_Module   g_calibration_module_data;
 
 CDialog *g_Draw_dlg=NULL;
-unsigned int g_progress_persent = 0;	//用来记录全局状态栏该显示的 进度 百分比;
-bool b_stop_read_grp_label = false;		//如果读到空的grp label 就不要继续读下一个了;
-bool b_stop_read_tstat_schedule = false;	//如果读到空的tstat 就不要继续读下一个了;
+unsigned int g_progress_persent = 0;	// Progress percent shown on the global status bar.
+bool b_stop_read_grp_label = false;		// Stop reading the next group when a group label is empty.
+bool b_stop_read_tstat_schedule = false;	// Stop reading the next Tstat when an empty Tstat is read.
 
-CString Statuspanel;   //在状态栏显示panel 2-3;
+CString Statuspanel;   // Show panels 2-3 on the status bar.
 
 CString g_cstring_ini_path;
-CString g_trendlog_ini_path; //每个序列号单独一个配置档，避免配置文件过大;
+CString g_trendlog_ini_path; // One config file per serial number, so the config file does not grow too large.
 unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
-int input_item_limit_count = BAC_INPUT_ITEM_COUNT;	//input list 要显示多少个input 的个数， 不是根据vector 的size 来判断大小;
-int output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;	//output list 要显示多少个output 的个数， 不是根据vector 的size 来判断大小;
-int variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;	//variable list 要显示多少个variable 的个数， 不是根据vector 的size 来判断大小;
+int input_item_limit_count = BAC_INPUT_ITEM_COUNT;	// Number of inputs to show. Do not use the vector size.
+int output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;	// Number of outputs to show. Do not use the vector size.
+int variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;	// Number of variables to show. Do not use the vector size.
 int program_item_limit_count = BAC_PROGRAM_ITEM_COUNT;
 int controller_item_limit_count = BAC_PID_COUNT;
 int screen_item_limit_count = BAC_SCREEN_COUNT;
@@ -2238,9 +2232,9 @@ Str_annual_routine_point m_temp_annual_data[BAC_HOLIDAY_COUNT];
 Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
 Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
 
-char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
-int b_pause_refresh_tree = false; // 全局变量，控制主线程里面的 是否刷新网络数据;
-int b_building_management_flag = 0; //另一种 虚拟控制模式，yes就停止后台扫描以及刷新;
+char monitor_database_flag[24];   // Marks which database rows to delete. 1 means delete.
+int b_pause_refresh_tree = false; // Global flag: whether the main thread refreshes network data.
+int b_building_management_flag = 0; // Another virtual-control mode. Yes stops background scan and refresh.
 int debug_item_show = 0;
 bool monitor_ignore_enable = false;
 int monitor_ignore_max_value = 0;
@@ -2251,14 +2245,14 @@ HANDLE read_each_485_fun_thread = NULL;
 bool hide_485_progress = false;
 bool new_device_support_mini_ui = false;
 
-int flash_multi_auto = false; //用于控制 多烧的  自动控制;
-unsigned int T3000_Version ; //T3000的版本号.
+int flash_multi_auto = false; // Controls automatic operation of multi-device flashing.
+unsigned int T3000_Version ; // T3000 version number.
 
-int flag_auto_scroll = 0; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
-int graphic_last_scale_type = 0 ; //用于存储上次 有效的 X轴的 刻度;
-unsigned int graphic_last_time_value =0 ; //x轴上次查看的时间; 
-int auto_local_ip = 1; //自动使用本地所有ip端口扫描;
-CString local_ip_scan_address; //bind本地ip地址;
+int flag_auto_scroll = 0; // Set to 1 when the customer chooses specific X-axis events. Otherwise show the newest data.
+int graphic_last_scale_type = 0 ; // Stores the last valid X-axis scale.
+unsigned int graphic_last_time_value =0 ; // Time last viewed on the X axis.
+int auto_local_ip = 1; // Automatically scan using every local IP port.
+CString local_ip_scan_address; // Bind the local IP address.
 const CString c_strBaudate[NUMBER_BAUDRATE] =
 {
     L"9600",
@@ -2270,12 +2264,12 @@ const CString c_strBaudate[NUMBER_BAUDRATE] =
 };
 #pragma endregion For_bacnet
 
-int global_interface = 1; //用来标识全局的界面在哪？主要是 Input 和 output;
+int global_interface = 1; // Marks which global view is active, mainly Input or Output.
 
-bool b_remote_connection = false;  //全局的 用来判断 对远程设备的 特殊处理;
-bool refresh_tree_status_immediately = false;	//如果置为treu了，就会立即调用 刷新 ，不用等待一个周期，用于 某些IP或状态变了，立即刷新;
-unsigned int remote_connect_serial_number = 0; // 远程连接的序列号;
-char ptpLoginName[30];	//远程连接的账号和密码;
+bool b_remote_connection = false;  // Global flag for special handling of a remote device.
+bool refresh_tree_status_immediately = false;	// When set true, refresh immediately instead of waiting for the next cycle. Used when an IP or status has just changed.
+unsigned int remote_connect_serial_number = 0; // Serial number of the remote connection.
+char ptpLoginName[30];	// Account and password of the remote connection.
 char ptpLoginPassword[20];
 refresh_net_device device_id_data_1;
 refresh_net_device device_id_data_2;
@@ -2307,33 +2301,33 @@ COLORREF	  nDefaultclrTxt;
 int bacnet_view_number = TYPE_INPUT;
 int input_item_select_for_range = 0;
 
-bitset<65536*3> read_analog_package; //用于记录trendlog 已经记录了哪些模拟包
-bitset<65536*3> read_dig_package;    //用于记录trendlog 已经记录了哪些数字包
+bitset<65536*3> read_analog_package; // Records which analog trend-log packets have been stored.
+bitset<65536*3> read_dig_package;    // Records which digital trend-log packets have been stored.
 
 int graphic_view_index ;
 CString grapgic_view_name[3];
 bool graphic_view_visible[14];
-CString bacnet_message_input_title;	//输入的提示信息
-CString bacnet_message_return_string;  //得到的输入字符串
+CString bacnet_message_input_title;	// Prompt text for the input.
+CString bacnet_message_return_string;  // Input string that was received.
 pidname_map product_map;
 pid_reglist_map product_reglist_map;
-bool offline_mode = false; //全局离线模式判断;
-CString offline_prg_path;   //离线模式得prg 保存路径;
+bool offline_mode = false; // Global offline-mode flag.
+CString offline_prg_path;   // Path where the offline-mode program is saved.
 
-bac_mstp_com g_mstp_com; // 全局mstp com 口 连接状态
-bool n_wifi_connection;  //后台列表 刷新开关
-int MODE_SUPPORT_PTRANSFER; //  支持bip ptransfer 等于1时   wifi设备 和 T3BB系列的不在连接502端口
+bac_mstp_com g_mstp_com; // Global MSTP COM-port connection state.
+bool n_wifi_connection;  // Switch for background list refresh.
+int MODE_SUPPORT_PTRANSFER; // When BIP private-transfer support equals 1, Wi-Fi devices and the T3BB series no longer connect to port 502.
 bool custom_bacnet_register_listview = true;
 bool initial_bip = false;
-Str_modbus_reg bacnet_to_modbus_struct;  //用于bacnet 协议转换为modbus 协议的结构
-vector <str_bacnet_rp_info> standard_bacnet_data; // 用于bacnet 标准 读写 变量存取;
+Str_modbus_reg bacnet_to_modbus_struct;  // Structure used when converting BACnet to Modbus.
+vector <str_bacnet_rp_info> standard_bacnet_data; // Storage for standard BACnet read and write variables.
 vector <str_segmented_bacnet_rp_info> segmented_bacnet_data;
 bool bacnetIpDataRead = false;
 unsigned char m_dialog_signal_type;
 connect_Info system_connect_info;
-panelname_map g_panelname_map; 
+panelname_map g_panelname_map;
 bacnet_instance_reg_map g_bacnet_reg_ins_map;
-CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
+CString HolLable[BAC_HOLIDAY_COUNT] =   // Used to fill drop-down lists dynamically.
 {
     _T("AR1"),
     _T("AR2"),
@@ -2341,21 +2335,21 @@ CString HolLable[BAC_HOLIDAY_COUNT] =   //用于动态加载List中的下拉框
     _T("AR4")
 };
 
-int m_special_customer = 0;      //客户自定义T3000的名字;  // 1为CPR_Bestek
-CString cs_special_name;         //对应该改的名字;
+int m_special_customer = 0;      //锟酵伙拷锟皆讹拷锟斤拷T3000锟斤拷锟斤拷锟斤拷;  // 1为CPR_Bestek
+CString cs_special_name;         // Name that should be changed to match.
 
-unsigned char n_ignore_sync_time;  //是否忽略同步时间;
-unsigned int last_ignore_sync_time;  //上次点击忽略同步时间的 时间节点;  比如用于3天后继续提醒;
+unsigned char n_ignore_sync_time;  // Whether time synchronization is ignored.
+unsigned int last_ignore_sync_time;  // Time when Ignore time sync was last clicked, for example to remind again after 3 days.
 
-unsigned char check_revert_daxiaoduan = 0; //大小端是否需要反转，正常旧版本不要反转;
+unsigned char check_revert_daxiaoduan = 0; // Whether endianness must be swapped. Normal old firmware does not swap.
 
 
-int n_read_product_type = 0; //这三个变量 确定 modbus协议 去读取 bacnet东西的时候 ，读哪些寄存器;
-int n_read_list_flag = -1; // 读取那一个，例如读Input 还是Output
-int n_read_item_index = 0; // 读哪一个 例如Schedule3 的时间 ，不能用weekly_list 因为界面上的容易变。
+int n_read_product_type = 0; // These three variables select which registers Modbus reads for BACnet data.
+int n_read_list_flag = -1; // Which object to read, for example Input or Output.
+int n_read_item_index = 0; // Which item to read, for example the time of Schedule 3. Do not use weekly_list because the screen value changes easily.
 
-unsigned int DEBUG_DELAY_TIME = 0; //测试用调试Wifi 延迟时间;
-CString bacnet_string; // 待解析的字串
+unsigned int DEBUG_DELAY_TIME = 0; // Wi-Fi delay used for test and debug.
+CString bacnet_string; // String waiting to be parsed.
 
 vector < FloorInfo> bm_floor;
 vector < RoomInfo> bm_room;
@@ -2371,16 +2365,16 @@ unsigned char daylight_end_day;
 short gsp_invoke;
 bool Bacnet_debug_fileRead = false;
 device_io_status select_device_io_status;
-vector <Str_BM_IO> m_bm_io_data; //用来存储BM 系统  IO表数据
+vector <Str_BM_IO> m_bm_io_data; // Stores I/O table data for the building-management system.
 
-vector <Str_product_io_count> m_product_iocount;  // 用来存储不同设备包含的IO数量;
-vector <Str_online_serialnumber> m_online_serial; //在线的设备，用于动态菜单
+vector <Str_product_io_count> m_product_iocount;  // Stores how many I/O points each device type has.
+vector <Str_online_serialnumber> m_online_serial; // Online devices, used for the dynamic menu.
 
 unsigned int DYNAMIC_INPUT_ITEM_COUNT = 64;
 unsigned int DYNAMIC_OUTPUT_ITEM_COUNT = 64;
 unsigned int DYNAMIC_VARIABLE_ITEM_COUNT = 128;
 
-bool enable_trendlog_background_read = false; //是否启用trendlog 后台读取功能;
-bool enable_pvar = false; // 固件高于66.4 的eps 才有这个功能
+bool enable_trendlog_background_read = false; // Whether background trend-log reading is enabled.
+bool enable_pvar = false; // Only ESP firmware above 66.4 has this feature.
 
 

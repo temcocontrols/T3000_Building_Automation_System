@@ -28,10 +28,11 @@ public:
     afx_msg void OnBnClickedButtonCancelWireguardCfg();
 
 private:
-    void    LoadFromDevice();       // 从 Device_Wireguard_Point 加载到界面 / Load from Device_Wireguard_Point to UI
-    void    SaveToDevice();         // 从界面保存到 Device_Wireguard_Point / Save from UI to Device_Wireguard_Point
-    void    UpdateUIState();        // 更新控件启用状态 / Update control enable state
-    BOOL    ValidateInput();        // 输入校验 / Input validation
+    void    LoadFromDevice();
+    void    SaveToDevice();
+    void    UpdateUIState();
+    BOOL    ValidateInput();
+    void    ShowDevicePublicKey();
 
     CString GeneratePrivateKey();   // 生成WireGuard私钥 / Generate WG private key
     CString GeneratePublicKey(const CString& strPrivateKey);  // 从私钥派生公钥 / Derive public key from private key
