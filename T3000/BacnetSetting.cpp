@@ -328,35 +328,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam, LPARAM lParam)
 			(Device_Basic_Setting.reg.mini_type == T3_HUB))
 		{
 			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_GSM_STATUS))->EnableWindow(1);
-			CWnd *gsm_ip_label = m_page_tcpip.GetDlgItem(IDC_STATIC_BAC_GSM_IP);
-			CWnd *gsm_ip_edit = m_page_tcpip.GetDlgItem(IDC_EDIT_BAC_GSM_IP);
-			CString gsm_ip = _T("-");
-			if (GetPrivateData_Blocking(g_bac_instance, READ_GSM_STATUS, 0, 0,
-				sizeof(Str_Gsm_status_point)) >= 0)
-			{
-				gsm_ip.Format(_T("%u.%u.%u.%u"),
-					Device_Gsm_Status_Point.reg.ip[0],
-					Device_Gsm_Status_Point.reg.ip[1],
-					Device_Gsm_Status_Point.reg.ip[2],
-					Device_Gsm_Status_Point.reg.ip[3]);
-			}
-			if (gsm_ip_label)
-				gsm_ip_label->ShowWindow(SW_SHOW);
-			if (gsm_ip_edit)
-			{
-				gsm_ip_edit->SetWindowText(gsm_ip);
-				gsm_ip_edit->ShowWindow(SW_SHOW);
-			}
 		}
 		else
 		{
 			((CButton*)m_page_tcpip.GetDlgItem(IDC_BUTTON_GSM_STATUS))->EnableWindow(0);
-			CWnd *gsm_ip_label = m_page_tcpip.GetDlgItem(IDC_STATIC_BAC_GSM_IP);
-			CWnd *gsm_ip_edit = m_page_tcpip.GetDlgItem(IDC_EDIT_BAC_GSM_IP);
-			if (gsm_ip_label)
-				gsm_ip_label->ShowWindow(SW_HIDE);
-			if (gsm_ip_edit)
-				gsm_ip_edit->ShowWindow(SW_HIDE);
 		}
 
 		if (((g_selected_product_id == PM_ESP32_T3_SERIES) && ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) * 10 + (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub >= 656) ||

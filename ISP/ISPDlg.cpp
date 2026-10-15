@@ -75,10 +75,8 @@ const TCHAR c_strDBFileName[]=_T("Database\\t3000.mdb") ;
 //extern CString g_strExePath;
 //const int BOOTLOADER_FILE_SIZE = 16384;
 /* This variable is the same as the variable in the DLL, but they are not related. The variable in the DLL is encapsulated. */
-If you want to change g_Commu_type in the DLL, use the function SetCommunicationType
-*/
+/* If you want to change g_Commu_type in the DLL, use the function SetCommunicationType */
 /* These variables are the same as the variables in the communications DLL but they are separate, the variables in the DLL are encapsulated. If you want to change the G_commu_type in the DLL use the function Setcommunicationtype */
-
 
 int handle_write_sensor_info = 0;
 //Number of all checked components
