@@ -824,15 +824,27 @@ end_tcp_flash_mode :
 
 }
 
-#define REG_RESUME_OFFSET    1991
+static bool SerialResumeSupported(BYTE deviceID)
+{
+    unsigned short boot = (unsigned short)isp_max(Device_infor[ISP_REG_BOOT_REV_A], Device_infor[ISP_REG_BOOT_REV_B]);
+    unsigned short mini = 0;
+    if ((boot == ISP_RESUME_BOOTLOADER_LIMITED) && (Device_infor[ISP_REG_PRODUCT_MODEL] != PM_TSTAT10))
+    {
+        int mt = mudbus_read_one(deviceID, ISP_REG_MINI_TYPE, 2);
+        if (mt > 0)
+            mini = (unsigned short)mt;
+    }
+    return isp_device_supports_resume(Device_infor[ISP_REG_PRODUCT_MODEL], boot, mini);
+}
 
-// reg 1991 on ESP32 returns packet count (each packet = 128 bytes).
-// Convert to byte offset for use as buffer index and ISP address field.
+// Register 1991 on a supported bootloader returns packet count (each packet = 128 bytes).
+// Returns -1 when the register cannot be read.
 static int ReadResumeByteOffset(BYTE deviceID)
 {
-    int packet_count = mudbus_read_one(deviceID, REG_RESUME_OFFSET); // reg 1991
-    if (packet_count < 0) packet_count = 0;
-    return packet_count * 128;  // convert to byte offset
+    int packet_count = mudbus_read_one(deviceID, ISP_REG_RESUME_COUNT);
+    if (packet_count < 0)
+        return -1;
+    return packet_count * ISP_RESUME_PACKET_BYTES;
 }
 
 //the return value 1,successful,   return < 0 , fail
@@ -854,57 +866,72 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter,
         wirte_md5[k] = firmware_md5[2*k] * 256 + firmware_md5[2*k + 1];
 
     //*************inspect the flash at the last flash position ***********************
-    int update_status = mudbus_read_one(m_ID, 0xee10);
+    bool resume_supported = SerialResumeSupported(m_ID);
+    int update_status = mudbus_read_one(m_ID, ISP_REG_SERIAL_UPDATE_STATUS);
+    if (resume_supported)
+    {
+        int saved_status = mudbus_read_one(m_ID, ISP_REG_UPDATE_STATUS);
+        if (saved_status == ISP_STATUS_IN_PROGRESS_1F || saved_status == ISP_STATUS_IN_PROGRESS_40)
+            update_status = saved_status;
+    }
 
     //************* begin to flash ***********************
     ii = 0;
-    if (update_status == 0x40 || update_status == 0x1f)
+    if (resume_supported
+        && (update_status == ISP_STATUS_IN_PROGRESS_40 || update_status == ISP_STATUS_IN_PROGRESS_1F))
     {
-        // An interrupted update is already on the device. Continue it.
-        int md5_ret = modbus_read_multi(m_ID, &stored_md5[0], 1993, 4);
-        if (md5_ret > 0)
+        unsigned short meta[ISP_REG_RESUME_BLOCK_LEN] = { 0 };
+        int meta_ret = modbus_read_multi(m_ID, meta, ISP_REG_RESUME_COUNT, ISP_REG_RESUME_BLOCK_LEN);
+        int resume_offset = (meta_ret > 0) ? ((int)meta[0] * ISP_RESUME_PACKET_BYTES) : -1;
+
+        if (meta_ret <= 0)
+        {
+            do_fresh = true;
+            pWriter->continue_com_flash_count = 0;
+            pWriter->OutPutsStatusInfo(_T("|Could not read registers 1991-1996. Starting from the beginning."));
+        }
+        else if (resume_offset <= 0)
+        {
+            do_fresh = true;
+            pWriter->continue_com_flash_count = 0;
+        }
+        else
         {
             md5_match = true;
-            for (int k = 0; k < 4; k++)
+            for (int k = 0; k < ISP_REG_MD5_COUNT; k++)
             {
+                stored_md5[k] = meta[2 + k];
                 if (stored_md5[k] != wirte_md5[k])
                 {
                     md5_match = false;
                     break;
                 }
             }
-        }
 
-        pWriter->continue_com_flash_count = ReadResumeByteOffset(m_ID);
-        CString strResumePos;
-        if (md5_match)
-        {
-            strResumePos.Format(
-                _T("|MD5 match: Resuming from byte offset: %d (packet %d)"),
-                pWriter->continue_com_flash_count,
-                pWriter->continue_com_flash_count / 128);
+            pWriter->continue_com_flash_count = resume_offset;
+            CString strResumePos;
+            if (md5_match)
+            {
+                strResumePos.Format(
+                    _T("|MD5 match: Resuming from byte offset: %d (packet %d)"),
+                    pWriter->continue_com_flash_count,
+                    pWriter->continue_com_flash_count / ISP_RESUME_PACKET_BYTES);
+            }
+            else
+            {
+                strResumePos.Format(
+                    _T("|MD5 mismatch: resuming saved update from byte offset: %d (packet %d)"),
+                    pWriter->continue_com_flash_count,
+                    pWriter->continue_com_flash_count / ISP_RESUME_PACKET_BYTES);
+            }
+            pWriter->OutPutsStatusInfo(strResumePos);
+            Sleep(500);
         }
-        else if (md5_ret > 0)
-        {
-            strResumePos.Format(
-                _T("|MD5 mismatch: resuming saved update from byte offset: %d (packet %d)"),
-                pWriter->continue_com_flash_count,
-                pWriter->continue_com_flash_count / 128);
-        }
-        else
-        {
-            strResumePos.Format(
-                _T("|Could not read stored MD5: resuming saved update from byte offset: %d (packet %d)"),
-                pWriter->continue_com_flash_count,
-                pWriter->continue_com_flash_count / 128);
-        }
-        pWriter->OutPutsStatusInfo(strResumePos);
-        Sleep(500);
     }
     else
     {
-        // No interrupted update — normal fresh flash
         do_fresh = true;
+        pWriter->continue_com_flash_count = 0;
     }
 
     // ── Fresh flash path ──────────────────────────────────────────────────────
@@ -915,14 +942,16 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter,
         pWriter->OutPutsStatusInfo(srtInfo);
         Sleep(500);
 
-        // Write MD5 to device BEFORE erasing
-        for (int y = 0; y < 4; y++)
-            mudbus_write_one(m_ID, 1993 + y, wirte_md5[y], 3);
+        if (resume_supported)
+        {
+            for (int y = 0; y < ISP_REG_MD5_COUNT; y++)
+                mudbus_write_one(m_ID, ISP_REG_MD5_START + y, wirte_md5[y], 3);
 
-        unsigned short fw_size_high = (the_max_register_number_parameter >> 16) & 0xFFFF;
-        unsigned short fw_size_low = (the_max_register_number_parameter) & 0xFFFF;
-        mudbus_write_one(m_ID, 1997, fw_size_high);
-        mudbus_write_one(m_ID, 1998, fw_size_low);
+            unsigned short fw_size_high = (the_max_register_number_parameter >> 16) & 0xFFFF;
+            unsigned short fw_size_low = (the_max_register_number_parameter) & 0xFFFF;
+            mudbus_write_one(m_ID, ISP_REG_FW_SIZE_HI, fw_size_high);
+            mudbus_write_one(m_ID, ISP_REG_FW_SIZE_LO, fw_size_low);
+        }
         // 0x7f
         do {
             if (mudbus_write_one(m_ID, 16, 0x7f) < 0) {
@@ -1421,19 +1450,21 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
             {
                 if ((Device_infor[4] == Device_infor[14]) &&
                     (Device_infor[14] >= 20) &&
-                    (Device_infor[7] == 88))
+                    (Device_infor[7] == PM_ESP32_T3_SERIES) &&
+                    SerialResumeSupported((BYTE)pWriter->m_szMdbIDs[i]))
                 {
                     unsigned short wirte_md5[4];
                     int compare_ret = 1;
+                    for (int x = 0; x < 4; x++)
+                        wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
 
-                    // If the 88 ESP device is inside the bootloader
-                    int n_ret = modbus_read_multi(pWriter->m_szMdbIDs[i], &pWriter->update_firmware_info[0], 1994, 6);
+                    // ESP device is inside a bootloader that keeps a saved update.
+                    int n_ret = modbus_read_multi(pWriter->m_szMdbIDs[i], &pWriter->update_firmware_info[0], ISP_REG_SERIAL_SAVED_COUNT, ISP_REG_RESUME_BLOCK_LEN);
                     if (n_ret > 0)
                     {
                         // Compare MD5
                         for (int x = 0; x < 4; x++)
                         {
-                            wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
                             if (pWriter->update_firmware_info[x + 1] != wirte_md5[x])
                             {
                                 compare_ret = -1;
@@ -1443,7 +1474,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
                         if ((compare_ret == 1) && (pWriter->update_firmware_info[0] != 0))
                         {
-                            pWriter->continue_com_flash_count = pWriter->update_firmware_info[0] * 128; // Register 1994 stores how many packets have been written over the serial port;
+                            pWriter->continue_com_flash_count = pWriter->update_firmware_info[0] * ISP_RESUME_PACKET_BYTES;
                         }
                         else
                         {
@@ -1453,13 +1484,14 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     else
                     {
                         pWriter->continue_com_flash_count = 0;
+                        pWriter->OutPutsStatusInfo(_T("|Could not read registers 1991-1996. Starting from the beginning."));
                     }
 
                     if (pWriter->continue_com_flash_count == 0)
                     {
                         for (int y = 0; y < 4; y++)
                         {
-                            int ret = mudbus_write_one(pWriter->m_szMdbIDs[i], 1995 + y, wirte_md5[y],3);
+                            int ret = mudbus_write_one(pWriter->m_szMdbIDs[i], ISP_REG_SERIAL_MD5_WRITE + y, wirte_md5[y],3);
                         }
                     }
                     //continue_com_flash_count =
@@ -2598,7 +2630,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 #if 1
                 //*************inspect the flash that last flash position ***********************
                 int ii=0;
-                while(mudbus_read_one(m_ID,0xee10,1)<0) //the return value == -1 ,no connecting
+                while(mudbus_read_one(m_ID,ISP_REG_SERIAL_UPDATE_STATUS,1)<0) //the return value == -1 ,no connecting
                 {
                     if(ii<5)
                     {
@@ -2620,18 +2652,38 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 }
                 //************* begin to flash ***********************
                 ii=0;
-                if(mudbus_read_one(m_ID,0xee10)==0x40 || mudbus_read_one(m_ID,0xee10)==0x1f) // Read ee10, why?
+                int update_status = mudbus_read_one(m_ID, ISP_REG_SERIAL_UPDATE_STATUS);
+                bool resume_supported = SerialResumeSupported((BYTE)m_ID);
+                if (resume_supported)
                 {
-                    nResumeOffset = ReadResumeByteOffset(m_ID);
+                    int saved_status = mudbus_read_one(m_ID, ISP_REG_UPDATE_STATUS);
+                    if (saved_status == ISP_STATUS_IN_PROGRESS_1F || saved_status == ISP_STATUS_IN_PROGRESS_40)
+                        update_status = saved_status;
+                }
+                int resume_offset = -1;
+                if (resume_supported
+                    && (update_status == ISP_STATUS_IN_PROGRESS_40 || update_status == ISP_STATUS_IN_PROGRESS_1F))
+                {
+                    resume_offset = ReadResumeByteOffset(m_ID);
+                }
+                if (resume_offset > 0)
+                {
+                    nResumeOffset = resume_offset;
 
                     CString strResumePos;
                     strResumePos.Format(_T("|Resume byte offset: %d (packet %d)"),
-                        nResumeOffset, nResumeOffset / 128);
+                        nResumeOffset, nResumeOffset / ISP_RESUME_PACKET_BYTES);
                     pWriter->OutPutsStatusInfo(strResumePos);
                     Sleep(500);
                 }
-                else  // Read Eeprom chip failed?
+                else  // Full update from address 0
                 {
+                    nResumeOffset = 0;
+                    if (resume_supported && resume_offset < 0
+                        && (update_status == ISP_STATUS_IN_PROGRESS_40 || update_status == ISP_STATUS_IN_PROGRESS_1F))
+                    {
+                        pWriter->OutPutsStatusInfo(_T("|Could not read registers 1991-1996. Starting from the beginning."));
+                    }
                     //from 0000 flash update
                     ii=0;//from 0000 register flash
                     CString srtInfo = _T("|Initializing device...");
