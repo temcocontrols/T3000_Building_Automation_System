@@ -1,10 +1,8 @@
 #pragma once
 
 #include "TFTP Struct.h"
- 
+
 #include "MySocket.h"
-
-
 
 typedef struct _DHCP_PACKET
 {
@@ -17,8 +15,9 @@ typedef struct _DHCP_PACKET
 } DHCP_PACKET;
 
 #define DHCP_PACKET_SIZE (sizeof(DHCP_PACKET))
-const int  FLASH_UDP_PORT=10000; 
+const int  FLASH_UDP_PORT=10000;
 const int  LOCAL_UDP_PORT=10001;
+void Signal_Tftp_Ack(void);
 
 class CISPDlg;
 class TFTPServer
@@ -34,59 +33,59 @@ public:
 
 	void SetFileName(const CString& strFileName);
 	void SetDataSource(BYTE* pBuf, int nLen);
-    
+
 	//////////////////////////////////////////////////////////////////////////
 	// External interface
-	// 外部接口
+	// External interface.
 	 void FlashByEthernet();
 	//////////////////////////////////////////////////////////////////////////
 	// TFTP functional flow functions
-	// tftp 功能流程函数
+	// TFTP flow function.
 	BOOL StartServer();
 	//////////////////////////////////////////////////////////////////////////
 	// Get local IP
-	// 获得本地IP
+	// Get the local IP.
 	DWORD GetLocalIP();
-	//void ParseFile(const CString& strFileName);	
-	
+	//void ParseFile(const CString& strFileName);
+
 	int InitSocket();
 	// Broadcast notification to NC
-	// 广播通知NC
+	// Broadcast a notice to the NC.
 	void BroadCastToClient();
 
 	BOOL RecvBOOTP();
 	// Accept Request
-	// 接受Request
-	int RecvRequest();	
+	// Receive the request.
+	int RecvRequest();
 	// Send data
-	// 发送数据
+	// Send data.
 	int SendData(BYTE* szBuf, int nLen);
 
 	int SendDataNew(BYTE* szBuf, int nLen);
 	// Accept ACK
-	// 接受ACK
+	// Receive the ACK.
 	int RecvACK();
 	// Send end identifier
-	// 发送结束标识
+	// Send the end marker.
 
 	// Handle request
-	// 处理请求
+	// Handle the request.
 	void HandleWRRequest(BYTE* szBuf,  int nLen);
-	
+
 	// Print information
-	// 打印信息
+	// Print a message.
 	void OutPutsStatusInfo(const CString& strInfo, BOOL bReplace);
 
 	// Flash completed
-	// flash 完成。
+	// Flash finished.
 	void WriteFinish(int nFlashFlag);
     void NewBootWriteFinish(int nFlashFlag);
 	// Send data flow
-	// 发送数据流程
+	// Data-send sequence.
 	int SendProcess();
 
 	int SendEndDataPack();
-	
+
 	void SendBOOTPPack();
 	int GetDHCPData(BYTE* pBuf, int nLen);
 	BOOL SendDHCPPack();
@@ -111,47 +110,47 @@ public:
 	int					m_nClientPort;
 protected:
 	// Data to send
-	BYTE*			m_szDataBuf;			// 要发送到数据
+	BYTE*			m_szDataBuf;			// Data to send.
 	int					m_nDataBufLen;
 	DWORD			m_dwClientIP;
-	
+
 	// Block number
-	int					m_nBlkNum;			// 块号
-	
+	int					m_nBlkNum;			// Block number.
+
 	CString			m_strFileName;
-   
+
 
 	// Receive TFTP request socket, bound to port 69
-	SOCKET			m_sock;					// 接收tftp request socket, 绑定了69端口
+	SOCKET			m_sock;					// Socket that receives the TFTP request, bound to port 69.
 	// Send socket, for sending TFTP data
-	SOCKET			m_soSend;				// 发送socket，发送tftp数据的
+	SOCKET			m_soSend;				// Socket that sends TFTP data.
 	// Receive socket, for receiving TFTP ack
-	SOCKET			m_soRecv;				// 接收socket，接收tftp ack的
+	SOCKET			m_soRecv;				// Socket that receives the TFTP ACK.
 	// Send sockaddr_in, not bound to port
-	sockaddr_in		m_siSend;				// 发送si，不绑定端口
+	sockaddr_in		m_siSend;				// Send SI without binding a port.
 	// Receive TFTP ack
-	sockaddr_in		m_siClient;				// 接收tftp ack
+	sockaddr_in		m_siClient;				// Receive the TFTP ACK.
 	sockaddr_in		m_siServer;				// client info
 
 	MySocket TCP_Flash_CMD_Socket;
 	MySocket SendUDP_Flash_Socket;
 	MySocket UDP_Broadcast_Socket;
-	TFTP_WRRequest	m_twr;	
-	CISPDlg*			m_pDlg;
+	TFTP_WRRequest	m_twr;
+	CISPDlg*		m_pDlg;
 
 	CWinThread*	m_pThread;
 
 public:
-	
+
     CString m_StrProductName;
     CString m_StrRev;
     CString m_StrFileProductName;
     void Set_FileProductName(CString Name);
 	int total_retry;
     // After clicking Flash, indicates whether TCP socket is connected
-    int m_tcp_connect_results; // 点击Flash之后  标识TCP 套接字是否连上
+    int m_tcp_connect_results; // After Flash is clicked, marks whether the TCP socket is connected.
 	int m_FlashTimes;
 	unsigned short read_reg[100] ;
 	// Continue burning from which package; currently only supports products with product ID 88 ESP32 chip boards
-	int continue_flash_count; // 继续从多少包开始烧入; 目前只支持产品为88 的 ESP32 芯片的板子;
+	int continue_flash_count; // Packet number to resume flashing from. Currently only product 88, the ESP32 board.
 };

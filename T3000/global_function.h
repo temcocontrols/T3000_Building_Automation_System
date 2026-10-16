@@ -75,7 +75,7 @@ enum Bacnet_Vector_Status
 
 typedef struct
 {
-	int flag; // 0 - nouse 
+	int flag; // 0 - nouse
 	int nindex;
 	int operation_type; // 0 by panel id			1 by instance
 	str_point_info str_info;
@@ -88,7 +88,7 @@ typedef struct
 
 
 #include "global_variable_extern.h"
-#define FLEXGRID_CELL_COLOR RGB(128,128,128) 
+#define FLEXGRID_CELL_COLOR RGB(128,128,128)
 #define GREEN_COLOR RGB(0,255,0)
 #define YELLOW_COLOR RGB(255,255,0)
 #define ORANGE_COLOR RGB(255,165,0)
@@ -116,13 +116,13 @@ BOOL CheckForUpdate(
 
 void FLEX_GRID_PUT_STR(CMsflexgrid m_FlexGri,int row,int col,CString str);
 int Set_Communication_Count(bool b_transmission,int bac_instanceid);
-int modbus_read_one_value( 
-				int& value, 
+int modbus_read_one_value(
+				int& value,
 				unsigned char device_var,
-				unsigned short address, 
+				unsigned short address,
 				int retry_times );
 int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
-int modbus_read_multi_value( 
+int modbus_read_multi_value(
 		unsigned short *put_data_into_here,
 		unsigned char device_var,
 		unsigned short start_address,
@@ -210,7 +210,7 @@ int GetPriavteDataByPanelBlocking(Str_points* npoint, str_group_point* temp_data
 int GetPrivateDataSaveSPBlocking(uint32_t deviceid, uint8_t command, uint8_t start_instance, uint8_t end_instance, int16_t entitysize, uint8_t retrytime = 10);
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize, uint8_t retrytime = 10);
 //Bacnet protocol conversion to modbus protocol;
-int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t readlength, unsigned short *data_out);//Bacnet 协议转换为 modbus 协议;
+int GetPrivateBacnetToModbusData(uint32_t deviceid, uint16_t start_reg, int16_t readlength, unsigned short *data_out);// Convert the BACnet protocol to the Modbus protocol.
 int WritePrivateBacnetToModbusData(uint32_t deviceid, int16_t start_reg, uint16_t writelength, unsigned short *data_in);
 
 int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint32_t ntotal_seg, uint32_t nseg_index,MonitorUpdateData* up_data);
@@ -238,7 +238,7 @@ void local_handler_read_property_multiple_ack(
 #ifdef read_prop_multi_function
 int Bacnet_Read_Property_MultipleValue_Blocking(uint32_t deviceid, BACNET_READ_ACCESS_DATA* head);
 #endif
-int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id); 
+int Bacnet_Read_Property_Multiple(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id);
 int Bacnet_Read_Properties_Multiple_Blocking(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, BACNET_READ_ACCESS_DATA &value, uint8_t retrytime, uint32_t index = BACNET_ARRAY_ALL);
 
 int Bacnet_Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type, uint32_t object_instance, int property_id, uint32_t index = BACNET_ARRAY_ALL);
@@ -250,7 +250,7 @@ void localhandler_read_property_ack(
     uint16_t service_len,
     BACNET_ADDRESS * src,
     //Standard read property;
-    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data); //标准的读属性;
+    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data); // Standard ReadProperty.
 
 void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src);
 
@@ -283,7 +283,7 @@ void Inial_Product_Input_map();
 int Get_Product_Menu_Map(unsigned char product_tpye, int menu_item);
 int Get_Product_Input_Map(unsigned char product_tpye, int input_item);
 CString Get_Table_Name(int SerialNo,CString Type ,int Row);
-void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName); 
+void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName);
 int Get_Unit_Process(CString Unit);
 BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position);
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind);
@@ -293,10 +293,13 @@ UINT RefreshNetWorkDeviceListByUDPFunc();
 void DFTrace(LPCTSTR lpCString);
 bool GetFileNameFromPath(CString ncstring,CString &cs_return);
 BOOL Ping(const CString& strIP, CWnd* pWndEcho);
- 
+
 void Send_WhoIs_remote_ip(CString ipaddress);
+/* Hub (30) / TSTAT11 (31) only 锟斤拷 safe on LAN; required for WireGuard unicast. */
+bool Is_Hub_Or_Tstat11_Product(void);
+void Send_WhoIs_Hub_Tstat11_Aware(uint32_t deviceid);
 //Used to initialize bacnet memory;
-void ClearBacnetData(); //用来初始化bacnet 内存;
+void ClearBacnetData(); // Used to initialize BACnet memory.
 void SaveBacnetBinaryFile(CString &SaveConfigFilePath);
 void SaveBacnetBinaryFile(unsigned int serialnumber);
 int SaveModbusConfigFile(CString &SaveConfigFilePath);
@@ -382,39 +385,39 @@ bool Save_OutputData_to_db(unsigned char  temp_output_index);
 bool Save_AVData_to_db();
 CString GetGUID();
 //Used to set the response delay time for each product. Default is 100ms.
-int  SetCommandDelayTime(unsigned char product_id); //用于设置每个产品的 应答延时时间.默认为100ms.
+int  SetCommandDelayTime(unsigned char product_id); // Response delay for each product. Default is 100 ms.
 bool Open_Socket_Retry(CString strIPAdress, short nPort, int retry_time = 3);
 //Initialize Panel Name storage location, default is position 714
-void Inial_ProductName_map();  //初始化 Panel Name 存放的位置 默认是714位置 
+void Inial_ProductName_map();  // Initial storage position of the panel name. Default is position 714.
 //Determine if bacnet range is within reasonable value range;
-bool bac_Invalid_range(unsigned char nrange);  //判断bacnet range 是否在合理值范围内;
+bool bac_Invalid_range(unsigned char nrange);  // Checks whether the BACnet range is inside the valid limits.
 //Initialize instance storage location;
-void Initial_Instance_Reg_Map();  //初始化 instance 存放位置;
+void Initial_Instance_Reg_Map();  // Initial storage position of the instance.
 //Find Panel Name storage location, if not found, default to position 714
-int PanelName_Map(int product_type);  //查找 Panel  Name 存放的位置 没有找到就认为是从714位置开始的
+int PanelName_Map(int product_type);  // Search for where the panel name is stored. If it is not found, start at position 714.
 int Get_Instance_Reg_Map(int product_type, unsigned short &temp_high, unsigned short &temp_low);
 //Get corresponding product instance value through instance register stored in map;
-unsigned int GetDeviceInstance(unsigned char pid_type);  //通过 map 中存放的 instance 寄存器 获取 对应产品的 instance 值;
-int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bacnet 
+unsigned int GetDeviceInstance(unsigned char pid_type);  // Read the product instance from the instance register stored in the map.
+int ChangeDeviceProtocol(bool modbus_0_bacnet_1,   // 0  modbus           1  bacnet
     unsigned char modbus_id,
     unsigned short nreg_address,
     unsigned short nreg_value,
-    unsigned char sub_device,         // 如果是子设备  ，数据库中的协议 比较特殊;
+    unsigned char sub_device,         // A sub-device uses a special protocol value in the database.
     LPCTSTR Dbpath);
 int ChangeModbusDB(unsigned int nserialnumber, int nmodbusid, LPCTSTR Dbpath);
 void switch_product_last_view();
 int Initial_Function();
-int Check_Function(int product_id, unsigned char nprotocol, FunctionNumber function_number);//根据产品协议觉得使能功能
-int Get_Msv_Table_Name(int x);// 获取MSV的表缩略名称
-int Get_Msv_Item_Name(int ntable, int nitemvalue, CString &csItemString); // 匹配MSV 对应的值显示哪一个 名称
+int Check_Function(int product_id, unsigned char nprotocol, FunctionNumber function_number);// Enable features according to the product protocol.
+int Get_Msv_Table_Name(int x);// Get the short name from the MSV table.
+int Get_Msv_Item_Name(int ntable, int nitemvalue, CString &csItemString); // Match the MSV value to the name that should be shown.
 int Get_Msv_next_Name_and_Value_BySearchName(int ntable, CString nitemname, CString  &csNextItemString, int &nNextValue);
 int Get_Msv_next_Name_and_Value_BySearchValue(int ntable, int nitemvalue, CString  &csNextItemString, int &nNextValue);
 int Check_DaXiaoDuan(unsigned char npid, unsigned char Mainsw, unsigned char subsw);
 void Time32toCString(unsigned long ntime, CString &outputtime, int nproduct_id = 74);
-int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex); //获取输出状态
-int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n_digital_analog); //获取输出状态
+int GetOutputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex); // Read the output state.
+int GetInputType(UCHAR nproductid, UCHAR nproductsubid, UCHAR portindex, UCHAR n_digital_analog); // Read the output state.
 char* decode_point(char* token, Str_points& temp);
-void ReInital_Someof_Point(); //部分 产品的input output variable 的size 是产品自定义的;
+void ReInital_Someof_Point(); // Some products use a custom size for inputs, outputs, and variables.
 void Initial_All_Point();
 void Initial_Virtual_Device_Setting();
 int bacnet_set_read_result(int nret);
@@ -433,8 +436,8 @@ void InputDataToString(Str_in_point source_input, Input_CString* ret_string);
 void OutputDataToString(Str_out_point source_output, Output_CString* ret_string);
 void VariableDataToString(Str_variable_point source_variable, Variable_CString* ret_string);
 
-int LoadOnlinePanelData(unsigned char npanel = 0); //从缓存prog文件中加载所有在线设备的数据;
-int SearchDataIndexByPanel(unsigned char panel_id, int command_type, int npoint);//通过 panel type point number 寻找 对应的index
+int LoadOnlinePanelData(unsigned char npanel = 0); // Load data for every online device from the cached program file.
+int SearchDataIndexByPanel(unsigned char panel_id, int command_type, int npoint);// Find the index from the panel type and point number.
 
 bool UnzipItem(CString SourceFilePath, CString DesFolder);
 bool ZipSingleItem(CString strUserDesZipFile, CString strsingleFilepath);

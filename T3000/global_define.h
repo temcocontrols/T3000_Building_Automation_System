@@ -3,7 +3,7 @@
 #include "RelayLabel.h"
 #ifdef DEBUG
  //Define whether to use http api
- //#define ENABLE_HTTP_FUCTION  //¶¨ÒåÊÇ·ñÊ¹ÓÃhttp api
+ //#define ENABLE_HTTP_FUCTION  //å®šä¹‰æ˜¯å¦ä½¿ç”¨http api
 #endif // DEBUG
 
 
@@ -11,8 +11,8 @@
 #define DISABLE_HANDLE_JSON_DATA
 #include <map>
 //minipanel register table
-//minipanel ¼Ä´æÆ÷±í
-//  9800	-	9999    200¸ö¼Ä´æÆ÷   setting
+//minipanel å¯„å­˜å™¨è¡¨
+//  9800	-	9999    200ä¸ªå¯„å­˜å™¨   setting
 //  10000	-   11471   1472		  OUT
 //  11472   -   12943   1472		  IN
 //	12944   -   15503	2560		  VAR					sizeof(Str_variable_point)= 39
@@ -20,7 +20,7 @@
 //  15808   -   15974	21*8=336	  SCH			sizeof(Str_weekly_routine_point) = 42
 //	15975   -	16043		17*4=68		  HOL				sizeof(Str_annual_routine_point) = 33
 //  32712   - 32753		 14*16 =224								sizeof(Str_controller_point)	= 28
-//  32044 - 32619       
+//  32044 - 32619
 //  32936   										sizeof(Str_table_point)	 = 105
 #define BAC_SETTING_START_REG		9800
 #define BAC_OUT_START_REG			10000
@@ -87,7 +87,7 @@ const int THREAD_IDLE = 255;
 const int TFTP_SEND_LENGTH = 512;
 //const int TFTP_SEND_LENGTH = 1024;
 //Save alignment state
-#pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
+#pragma pack(push) // Save the alignment state.
 #pragma pack(1)
 typedef struct
 {
@@ -163,7 +163,7 @@ typedef struct
 
 
 //Restore alignment state
-#pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
+#pragma pack(pop)// Restore the alignment state.
 
 
 typedef enum
@@ -172,7 +172,7 @@ typedef enum
 	DOWNLOAD_FILE = 2,
 	UPLOAD_FILE = 3,
 	//Used to distinguish DOWNLOAD_FILE, represents new download using 3K download;
-	DOWNLOAD_NEW_FILE = 4,	//ÓÃÓÚÇø±ğ  DOWNLOAD_FILE £¬ ´ú±íĞÂµÄÏÂÔØÀûÓÃ3KÏÂÔØ;
+	DOWNLOAD_NEW_FILE = 4,	//ç”¨äºåŒºåˆ«  DOWNLOAD_FILE ï¼Œ ä»£è¡¨æ–°çš„ä¸‹è½½åˆ©ç”¨3Kä¸‹è½½;
 	GET_MD5_VALUE = 99,
 
 	RETURN_SERIAL_NUMBER = 101,
@@ -257,11 +257,11 @@ const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_BIP_TO_MSTP = 10;
 const int PROTOCOL_MSTP_TO_MODBUS = 11;
 //Network device, sub-port runs MSTP device, can only read registers after 10000 through Ptransfer
-const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;    //ÍøÂçÏÂÃæµÄÉè±¸£¬×Ó¿ÚÅÜMSTPÉè±¸ £¬Ö»ÄÜÍ¨¹ıPtransfer ×ª10000ÒÔºó¼Ä´æÆ÷¶ÁÈ¡
+const int PROTOCOL_BIP_T0_MSTP_TO_MODBUS = 12;    //ç½‘ç»œä¸‹é¢çš„è®¾å¤‡ï¼Œå­å£è·‘MSTPè®¾å¤‡ ï¼Œåªèƒ½é€šè¿‡Ptransfer è½¬10000ä»¥åå¯„å­˜å™¨è¯»å–
 //20200306 TSTAT10 or T3BB using MODBUS MODBUS485 connected to T3BB below
-const int PROTOCOL_MB_TCPIP_TO_MB_RS485 = 13;     //20200306 TSTAT10»òÕßT3BB  Ê¹ÓÃMODBUS MODBUS485 ½Óµ½  T3BBÏÂÃæ 
+const int PROTOCOL_MB_TCPIP_TO_MB_RS485 = 13;     //20200306 TSTAT10æˆ–è€…T3BB  ä½¿ç”¨MODBUS MODBUS485 æ¥åˆ°  T3BBä¸‹é¢
 //MODBUS485 uses PTP method to obtain T3 private data;
-const int PROTOCOL_MB_PTP_TRANSFER = 14;          //MODBUS485²ÉÓÃptp µÄ·½Ê½»ñÈ¡ T3Ë½ÓĞÊı¾İ;
+const int PROTOCOL_MB_PTP_TRANSFER = 14;          //MODBUS485é‡‡ç”¨ptp çš„æ–¹å¼è·å– T3ç§æœ‰æ•°æ®;
 const int PROTOCOL_THIRD_PARTY_BAC_BIP = 253;
 const int PROTOCOL_VIRTUAL = 254;
 const int PROTOCOL_UNKNOW = 255;
@@ -513,7 +513,7 @@ const int BAC_LIST_REFRESH_INPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_OUTPUT_TIME = 30000;//ms
 const int BAC_LIST_REFRESH_TIME = 45000;//ms
 //If it's determined to be a network connection, use a 20-second refresh;
-const int BAC_LIST_REFRESH_ETHERNET_TIME = 45000;  //ÅĞ¶ÏÊÇ½ÓµÄÍøÂç¾ÍÓÃ20ÃëµÄË¢ĞÂ;
+const int BAC_LIST_REFRESH_ETHERNET_TIME = 45000;  //åˆ¤æ–­æ˜¯æ¥çš„ç½‘ç»œå°±ç”¨20ç§’çš„åˆ·æ–°;
 
 const int SCHEDULE_TIME_NUM = 0;
 const int SCHEDULE_TIME_MONDAY = 1;
@@ -537,7 +537,7 @@ struct _Bac_Scan_Com_Info
 {
     int nprotocol;  // 0 MSTP     1 BIP
     //First four bits are IP address, last two bits are port number
-    unsigned char ipaddress[6];   //Ç°ËÄÎ»Î»IPµØÖ·  ºóÁ½Î»Î»¶Ë¿ÚºÅ
+    unsigned char ipaddress[6];   //å‰å››ä½ä½IPåœ°å€  åä¸¤ä½ä½ç«¯å£å·
     int device_id;
     int macaddress;
 	uint16_t vendor_id;
@@ -580,7 +580,7 @@ struct _Resend_Read_Info
 	int invoke_id;
 	int has_resend_yes_or_no;
 	//How many times no reply received, then consider failed;
-	int timeout_count;//¶àÉÙ´Î»¹Ã»ÊÕµ½»Ø¸´£¬¾ÍËã Ê§°Ü;
+	int timeout_count;//å¤šå°‘æ¬¡è¿˜æ²¡æ”¶åˆ°å›å¤ï¼Œå°±ç®— å¤±è´¥;
 };
 
 struct _Com_Scan_Read_Info
@@ -605,7 +605,7 @@ struct refresh_subnet_device
     UCHAR device_count;
     UINT parent_sn;
     // Reserved
-    char reserved_data[15]; // Ô¤Áô
+    char reserved_data[15]; // é¢„ç•™
     sub_net_status device_status[255];
 };
 
@@ -634,13 +634,13 @@ struct refresh_net_device
     int hardware_info;     //bit  0x74 zigbee   bit1 wifi
     int nprotocol;
     //Version number of command 65, future replies to command 65 with changes should +1, mainly to maintain compatibility with previous reply protocols
-    UCHAR  command_version; //65ÃüÁîµÄ°æ±¾ºÅ£¬ÒÔºó»Ø¸´µÄ65ÃüÁî ÓĞ¸Ä¶¯¾ÍÒª+1 £¬Ö÷ÒªÊÇÒª¼æÈİÒÔÇ°µÄ»Ø¸´Ğ­Òé
+    UCHAR  command_version; //65å‘½ä»¤çš„ç‰ˆæœ¬å·ï¼Œä»¥åå›å¤çš„65å‘½ä»¤ æœ‰æ”¹åŠ¨å°±è¦+1 ï¼Œä¸»è¦æ˜¯è¦å…¼å®¹ä»¥å‰çš„å›å¤åè®®
     //Which port the device replies from. 1- MainPort 2-ZigbeePort 3-SubPort
-    UCHAR  subnet_port;  //Éè±¸ÊôÓÚÄÄÒ»¸ö¶Ë¿Ú»Ø¸´³öÀ´µÄ¡£ 1- MainPort      2-ZigbeePort      3-SubPort
+    UCHAR  subnet_port;  //è®¾å¤‡å±äºå“ªä¸€ä¸ªç«¯å£å›å¤å‡ºæ¥çš„ã€‚ 1- MainPort      2-ZigbeePort      3-SubPort
     //Baud rate used by sub-devices; corresponds to previously defined baud rate serial numbers
-    UCHAR  subnet_baudrate;   //×ÓÉè±¸ËùÓÃµÄ²¨ÌØÂÊ; ºÍÖ®Ç°¶¨ÒåµÄ²¨ÌØÂÊĞòºÅ¶ÔÓ¦
+    UCHAR  subnet_baudrate;   //å­è®¾å¤‡æ‰€ç”¨çš„æ³¢ç‰¹ç‡; å’Œä¹‹å‰å®šä¹‰çš„æ³¢ç‰¹ç‡åºå·å¯¹åº”
 	//Used to confirm which device it is, ESP device uses a master device;
-	UCHAR  minitype; //ÓÃÀ´È·ÈÏµ½µ×ÊÇÄÄ¸öÉè±¸£¬ESP Éè±¸ÓÃÁËÒ»¸öÖ÷Éè±¸;
+	UCHAR  minitype; //ç”¨æ¥ç¡®è®¤åˆ°åº•æ˜¯å“ªä¸ªè®¾å¤‡ï¼ŒESP è®¾å¤‡ç”¨äº†ä¸€ä¸ªä¸»è®¾å¤‡;
 };
 
 struct refresh_net_label_info
@@ -697,11 +697,11 @@ struct Monitor_Input_Info
 	int Max_Value;
 	int Min_Value;
 	//Is this entry recorded;
-	bool be_record;//ÊÇ·ñ¼ÇÂ¼ÁËÕâÌõ;
+	bool be_record;//æ˜¯å¦è®°å½•äº†è¿™æ¡;
 	//Whether to use its own scale separately;
-	bool use_own_scale;//ÊÇ·ñµ¥¶ÀÓÃ×Ô¼ºµÄ¿Ì¶È;
+	bool use_own_scale;//æ˜¯å¦å•ç‹¬ç”¨è‡ªå·±çš„åˆ»åº¦;
 	//Whether to display graphics;
-	bool show_graphic; //ÊÇ·ñÏÔÊ¾Í¼Ïñ;
+	bool show_graphic; //æ˜¯å¦æ˜¾ç¤ºå›¾åƒ;
 };
 
 struct Changed_Item_Info
@@ -1133,7 +1133,7 @@ const CString Time_Zone_Name[] =
 	_T("(UTC - 11:00) , X-ray Time Zone"),
 	_T("(UTC - 10:00) , Cook Island , Hawaii-Aleutian Standard Time"),
 	_T("(UTC - 09:00) , Alaska Standard Time , Gambier Time"),
-	_T("(UTC - 08:00) , Pacific Standard Time , Tiempo del Pac¨ªfico"),
+	_T("(UTC - 08:00) , Pacific Standard Time , Tiempo del PacÃ­fico"),
 	_T("(UTC - 07:00) , Mountain Standard Time , Pacific Daylight Time"),
 	_T("(UTC - 06:00) , Central Standard Time , Galapagos Time"),
 	_T("(UTC - 05:00) , Eastern Standard Time"),
@@ -1196,68 +1196,68 @@ const CString Device_Serial_Port_Status[] =
 const CString Variable_Analog_Units_Array[] =
 {
 	// Unused
-	_T("Unused"),               // Î´Ê¹ÓÃ
+	_T("Unused"),               // æœªä½¿ç”¨
 	// Celsius
-	_T("\u00B0C"),              // ÉãÊÏ¶È
+	_T("\u00B0C"),              // æ‘„æ°åº¦
 	 // Fahrenheit
-	_T("\u00B0F"),              // »ªÊÏ¶È
-	// Feet per Min ¡ú Abbreviated as FPM (feet/minute)
-	_T("FPM"),                  // Feet per Min ¡ú ¼òĞ´ÎªFPM£¨Ó¢³ß/·ÖÖÓ£©
+	_T("\u00B0F"),              // åæ°åº¦
+	// Feet per Min â†’ Abbreviated as FPM (feet/minute)
+	_T("FPM"),                  // Feet per Min â†’ ç®€å†™ä¸ºFPMï¼ˆè‹±å°º/åˆ†é’Ÿï¼‰
 	// Pascal
-	_T("Pa"),                   // ÅÁË¹¿¨
+	_T("Pa"),                   // å¸•æ–¯å¡
 	// Kilopascal
-	_T("KPa"),                  // Ç§ÅÁ
-	// lbs/sqr.inch ¡ú Abbreviated as PSI (pounds per square inch)
-	_T("PSI"),                  // lbs/sqr.inch ¡ú ¼òĞ´ÎªPSI£¨°õ/Æ½·½Ó¢´ç£©
-	// inches of WC ¡ú Abbreviated as inWC (inches water column)
-	_T("inWC"),                 // inches of WC ¡ú ¼òĞ´ÎªinWC£¨Ó¢´çË®Öù£©
-	// Watts ¡ú Abbreviated as W (watts)
-	_T("W"),                    // Watts ¡ú ¼òĞ´ÎªW£¨ÍßÌØ£©
-	// KWatts ¡ú Abbreviated as kW (kilowatt, standard lowercase k)
-	_T("kW"),                   // KWatts ¡ú ¼òĞ´ÎªkW£¨Ç§Íß£¬±ê×¼Ğ¡Ğ´k£©
+	_T("KPa"),                  // åƒå¸•
+	// lbs/sqr.inch â†’ Abbreviated as PSI (pounds per square inch)
+	_T("PSI"),                  // lbs/sqr.inch â†’ ç®€å†™ä¸ºPSIï¼ˆç£…/å¹³æ–¹è‹±å¯¸ï¼‰
+	// inches of WC â†’ Abbreviated as inWC (inches water column)
+	_T("inWC"),                 // inches of WC â†’ ç®€å†™ä¸ºinWCï¼ˆè‹±å¯¸æ°´æŸ±ï¼‰
+	// Watts â†’ Abbreviated as W (watts)
+	_T("W"),                    // Watts â†’ ç®€å†™ä¸ºWï¼ˆç“¦ç‰¹ï¼‰
+	// KWatts â†’ Abbreviated as kW (kilowatt, standard lowercase k)
+	_T("kW"),                   // KWatts â†’ ç®€å†™ä¸ºkWï¼ˆåƒç“¦ï¼Œæ ‡å‡†å°å†™kï¼‰
 	// Kilowatt-hours
-	_T("kWH"),                  // Ç§ÍßÊ±
-	// Volts ¡ú Abbreviated as V (volts)
-	_T("V"),                    // Volts ¡ú ¼òĞ´ÎªV£¨·üÌØ£©
+	_T("kWH"),                  // åƒç“¦æ—¶
+	// Volts â†’ Abbreviated as V (volts)
+	_T("V"),                    // Volts â†’ ç®€å†™ä¸ºVï¼ˆä¼ç‰¹ï¼‰
 	// Kilovolts
-	_T("kV"),                   // Ç§·ü
-	// Amps ¡ú Abbreviated as A (amperes)
-	_T("A"),                    // Amps ¡ú ¼òĞ´ÎªA£¨°²Åà£©
+	_T("kV"),                   // åƒä¼
+	// Amps â†’ Abbreviated as A (amperes)
+	_T("A"),                    // Amps â†’ ç®€å†™ä¸ºAï¼ˆå®‰åŸ¹ï¼‰
 	// Milliamperes
-	_T("mA"),                   // ºÁ°²
+	_T("mA"),                   // æ¯«å®‰
 	// Cubic feet per minute
-	_T("CFM"),                  // Á¢·½Ó¢³ß/·ÖÖÓ
-	// Seconds ¡ú Abbreviated as s (seconds)
-	_T("s"),                    // Seconds ¡ú ¼òĞ´Îªs£¨Ãë£©
-	// Minutes ¡ú Abbreviated as min (minutes)
-	_T("min"),                  // Minutes ¡ú ¼òĞ´Îªmin£¨·ÖÖÓ£©
-	// Hours ¡ú Abbreviated as h (hours)
-	_T("h"),                    // Hours ¡ú ¼òĞ´Îªh£¨Ğ¡Ê±£©
-	// Days ¡ú Abbreviated as d (days)
-	_T("d"),                    // Days ¡ú ¼òĞ´Îªd£¨Ìì£©
+	_T("CFM"),                  // ç«‹æ–¹è‹±å°º/åˆ†é’Ÿ
+	// Seconds â†’ Abbreviated as s (seconds)
+	_T("s"),                    // Seconds â†’ ç®€å†™ä¸ºsï¼ˆç§’ï¼‰
+	// Minutes â†’ Abbreviated as min (minutes)
+	_T("min"),                  // Minutes â†’ ç®€å†™ä¸ºminï¼ˆåˆ†é’Ÿï¼‰
+	// Hours â†’ Abbreviated as h (hours)
+	_T("h"),                    // Hours â†’ ç®€å†™ä¸ºhï¼ˆå°æ—¶ï¼‰
+	// Days â†’ Abbreviated as d (days)
+	_T("d"),                    // Days â†’ ç®€å†™ä¸ºdï¼ˆå¤©ï¼‰
 	// Time
-	_T("Time"),                 // Ê±¼ä
-	// Ohms ¡ú Abbreviated as ¦¸ (ohm symbol)
-	_T("\u03A9"),               // Ohms ¡ú ¼òĞ´Îª¦¸£¨Å·Ä··ûºÅ£©
+	_T("Time"),                 // æ—¶é—´
+	// Ohms â†’ Abbreviated as Î© (ohm symbol)
+	_T("\u03A9"),               // Ohms â†’ ç®€å†™ä¸ºÎ©ï¼ˆæ¬§å§†ç¬¦å·ï¼‰
 	// Percentage
-	_T("%"),                    // °Ù·Ö±È
+	_T("%"),                    // ç™¾åˆ†æ¯”
 	// Relative humidity
-	_T("%RH"),                  // Ïà¶ÔÊª¶È
+	_T("%RH"),                  // ç›¸å¯¹æ¹¿åº¦
 	// Times per minute
-	_T("PPM"),                // ´Î/·ÖÖÓ
+	_T("PPM"),                // æ¬¡/åˆ†é’Ÿ
 	// Counts
-	_T("Counts"),               // ¼ÆÊı
+	_T("Counts"),               // è®¡æ•°
 	// Percent open
-	_T("%Open"),                // ´ò¿ª°Ù·Ö±È
+	_T("%Open"),                // æ‰“å¼€ç™¾åˆ†æ¯”
 	// Kilograms
-	_T("kg"),                   // Ç§¿Ë
-	// L/Hour ¡ú Abbreviated as L/h (liters per hour)
-	_T("L/h"),                  // L/Hour ¡ú ¼òĞ´ÎªL/h£¨Éı/Ğ¡Ê±£©
-	_T("GPH"),                  // ¼ÓÂØ/Ğ¡Ê±
-	_T("GAL"),                  // ¼ÓÂØ
-	_T("CF"),                   // Á¢·½Ó¢³ß
-	_T("BTU"),                  // Ó¢ÈÈµ¥Î»
-	_T("m\u00B3/h"),                  // Á¢·½Ã×/Ğ¡Ê±
+	_T("kg"),                   // åƒå…‹
+	// L/Hour â†’ Abbreviated as L/h (liters per hour)
+	_T("L/h"),                  // L/Hour â†’ ç®€å†™ä¸ºL/hï¼ˆå‡/å°æ—¶ï¼‰
+	_T("GPH"),                  // åŠ ä»‘/å°æ—¶
+	_T("GAL"),                  // åŠ ä»‘
+	_T("CF"),                   // ç«‹æ–¹è‹±å°º
+	_T("BTU"),                  // è‹±çƒ­å•ä½
+	_T("m\u00B3/h"),                  // ç«‹æ–¹ç±³/å°æ—¶
 };
 
 
@@ -1270,7 +1270,7 @@ struct _Graphic_Value_Info
 	unsigned short entitysize;
 	CRelayLabel* control_pt;
 	HWND hWnd;
-    //int8_t standard_command;  //0  ·Ç±ê      1 ±ê×¼;
+    //int8_t standard_command;  //0  éæ ‡      1 æ ‡å‡†;
     //int object_type;
     //uint32_t object_instance;
     //int property_id;
@@ -1278,7 +1278,7 @@ struct _Graphic_Value_Info
 
 
 
-const int WINDOW_TAB_COUNT = 16; //¶àÉÙ¸öWindow Ç¶ÈëÔÚTABÀïÃæ;
+const int WINDOW_TAB_COUNT = 16; //å¤šå°‘ä¸ªWindow åµŒå…¥åœ¨TABé‡Œé¢;
 const int WINDOW_INPUT = 0;
 const int WINDOW_OUTPUT = 1;
 const int WINDOW_VARIABLE = 2;
@@ -1304,7 +1304,7 @@ const int KEY_INSERT_CONTROL = 1021;
 
 typedef enum
 {
-	PRODUCT_CM5 = 0,						//10A + 8 D			//10D									   //IN				//OUT	
+	PRODUCT_CM5 = 0,						//10A + 8 D			//10D									   //IN				//OUT
 	BIG_MINIPANEL = 1,						//32 A				//12D   12A
 	SMALL_MINIPANEL = 2,		//16 A				//6 D	4 A
 	TINY_MINIPANEL = 3,
@@ -1326,8 +1326,9 @@ typedef enum
 	T3_ESP_RMC = 19,  //1-16 input 17-18 sensor    Output1-7DO
 	T3_ESP_LW = 21,  //0 input   ,   6  output
 	T3_NG3 = 22,
-	T3_3IIC = 26,  //6ºÏ1 µÄ´«¸ĞÆ÷ esp ²úÆ· É¶Ò²Ã»¼Ó
-	T3_RMC1232 = 29,  
+	T3_3IIC = 26,  //6åˆ1 çš„ä¼ æ„Ÿå™¨ esp äº§å“ å•¥ä¹Ÿæ²¡åŠ 
+	T3_RMC1232 = 29,
+	T3_HUB = 30,
 	T3_TSTAT11 = 31,
 	PID_T322AI = 43,
 	T38AI8AO6DO = 44,
@@ -1389,9 +1390,9 @@ const int T332AI_OUT_A = 0;
 const int PWM_TRANSDUCER_OUT_D = 0;
 const int PWM_TRANSDUCER_OUT_A = 6;
 
-const int FAN_MODULE_IN_A = 12; // ESP32 °æ±¾ ×ÓÉè±¸  Fan module ÊäÈë;
+const int FAN_MODULE_IN_A = 12; // ESP32 ç‰ˆæœ¬ å­è®¾å¤‡  Fan module è¾“å…¥;
 const int FAN_MODULE_IN_D = 0;
-const int FAN_MOUDLE_OUT_A = 1; 
+const int FAN_MOUDLE_OUT_A = 1;
 const int FAN_MOUDLE_OUT_D = 0;
 
 const int RMC_IN_A = 18;
@@ -1421,7 +1422,7 @@ const int T3_3IIC_OUT_D = 0;
 
 const int T3_ESP_LW_IN_A = 0;
 const int T3_ESP_LW_IN_D = 0;
-const int T3_ESP_LW_OUT_A = 6;  //Lighting sw  6 ¸öµÆ ¿ÉÒÔÊä³ö¸÷ÖÖÑÕÉ«;
+const int T3_ESP_LW_OUT_A = 6;  //Lighting sw  6 ä¸ªç¯ å¯ä»¥è¾“å‡ºå„ç§é¢œè‰²;
 const int T3_ESP_LW_OUT_D = 0;
 
 enum
@@ -1499,7 +1500,7 @@ typedef struct
 	int scan_status;
 	char scan_notes[250];
 	int scan_found;
-}Scan_Info;	// É¨ÃèµÄÊ±ºò ÓÃÓÚÏÔÊ¾¸ølist µÄ½á¹¹;
+}Scan_Info;	// æ‰«æçš„æ—¶å€™ ç”¨äºæ˜¾ç¤ºç»™list çš„ç»“æ„;
 
 
 typedef struct
@@ -1521,7 +1522,7 @@ typedef struct
     uint8_t network_point;
 	uint8_t ntext_place;
 	uint8_t n_iconsize;
-    int x_length; // ÓÃÀ´È·¶¨±êÇ©ÊÇ·ñµã»÷£¬ÒÔ¼°µã»÷µÄ¿í¶È.
+    int x_length; // ç”¨æ¥ç¡®å®šæ ‡ç­¾æ˜¯å¦ç‚¹å‡»ï¼Œä»¥åŠç‚¹å‡»çš„å®½åº¦.
 }Bacnet_Label_Info;
 
 
@@ -1913,7 +1914,7 @@ const CString Decom_Array[3] =
 	_T("Shorted")
 };
 
-const CString Scan_Ret_Info[4] = 
+const CString Scan_Ret_Info[4] =
 {
     _T("Scaning results are being merged."),
     _T("Confirm scanning results."),
@@ -2056,7 +2057,7 @@ const int LENGTH_MODBUS_SCHEDULE_CODE = WEEKLY_SCHEDULE_SIZE / 2 * BAC_WEEKLYCOD
 const int LENGTH_MODBUS_HOLIDAY_CODE = ANNUAL_CODE_SIZE / 2;
 
 
-//ÒÔÏÂÊÇ bacnet ¼Ä´æÆ÷ Ó³Éäµ½modbusµÄÎ»ÖÃ;
+//ä»¥ä¸‹æ˜¯ bacnet å¯„å­˜å™¨ æ˜ å°„åˆ°modbusçš„ä½ç½®;
 const int REG_SETTING_START_ADDRESS = BAC_SETTING_START_REG;
 const int REG_OUTPUT_START_ADDRESS = REG_SETTING_START_ADDRESS + LENGTH_MODBUS_SETTING; //10000
 const int REG_INPUT_START_ADDRESS = REG_OUTPUT_START_ADDRESS + LENGTH_MODBUS_OUTPUT;	//11472
@@ -2136,7 +2137,7 @@ enum sub_io_type
 #define BAC_AO        29
 #define BAC_BO        30
 
-//31ÆúÓÃ 
+//31å¼ƒç”¨
 #define BAC_HOLDING_FLOAT_ABCD  32
 #define BAC_HOLDING_FLOAT_CDAB  33
 #define BAC_HOLDING_FLOAT_BADC  34
@@ -2151,7 +2152,7 @@ enum sub_io_type
 #define BAC_SETTING   254
 #define BAC_MAIN      255
 
-#define MAX_FUNCTION_COUNT    BAC_MAX   
+#define MAX_FUNCTION_COUNT    BAC_MAX
 #define MAX_OBJ_INSTANCE  4194303
 
 
@@ -2173,7 +2174,7 @@ enum sub_io_type
 #define BLACK_PC_GROUND_HEIGHT     BLACK_GROUND_HEIGHT
 
 
-																						//´Ó»ú ·¢ÆğµÄ FF 55 ºóÃæµÄ ÇëÇóÎ»;
+																						//ä»æœº å‘èµ·çš„ FF 55 åé¢çš„ è¯·æ±‚ä½;
 typedef enum
 {
 	SEND_MINIPANEL_INFO = 1,
@@ -2181,7 +2182,7 @@ typedef enum
 };
 
 
-//Ö÷»úÓ¦´ğµÄFF 55 ºóÃæµÄÃüÁîÎ»;
+//ä¸»æœºåº”ç­”çš„FF 55 åé¢çš„å‘½ä»¤ä½;
 typedef enum
 {
 	RECEIVE_DATA_LEBGTH_ERROR = 1,
@@ -2191,7 +2192,7 @@ typedef enum
 	RETURN_MINI_DATA = 5
 };
 
-#pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
+#pragma pack(push) // Save the alignment state.
 #pragma pack(1)
 typedef struct
 {
@@ -2212,7 +2213,7 @@ typedef struct
 
 }STR_For_T3000;
 
-#pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
+#pragma pack(pop)// Restore the alignment state.
 
 
 
@@ -2260,7 +2261,7 @@ const int day_in_this_year[] =
 #define HEARTBEAT_LENGTH	200
 #define  T3000_MINI_HEARTBEAT_LENGTH_WITH_MINI_PORT  (9 + HEARTBEAT_LENGTH)
 
-#pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
+#pragma pack(push) // Save the alignment state.
 #pragma pack(1)
 struct stLoginMessage
 {
@@ -2276,7 +2277,7 @@ typedef union
 	unsigned char all_data[T3000_CONNECT_LENGTH];
 	struct
 	{
-		unsigned int m_serial_number; //T3000ÏëÒªÁ¬½ÓµÄ ĞòÁĞºÅ;
+		unsigned int m_serial_number; //T3000æƒ³è¦è¿æ¥çš„ åºåˆ—å·;
 		stLoginMessage login_message;
 		unsigned char reserved_reg[46];
 	}reg_date;
@@ -2287,7 +2288,7 @@ typedef union
 #define COMMAND_FROM_MINI		2
 #define COMMAND_FROM_T3000		3
 
-#pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
+#pragma pack(pop)// Restore the alignment state.
 
 enum PTP_COMMAND_TYPE {
 	COMMAND_RECEIVE_HEART_BEAT = 0x01,
@@ -2367,15 +2368,15 @@ typedef union
 		char panel_name[20];
 		UCHAR object_instance_4;
 		UCHAR object_instance_3;
-		UCHAR isp_mode;  //·Ç0 ÔÚisp mode   , 0 ÔÚÓ¦ÓÃ´úÂë;    µÚ60¸ö×Ö½Ú
-		USHORT bacnetip_port;	//bacnet µÄ¶Ë¿ÚºÅ;
+		UCHAR isp_mode;  //é0 åœ¨isp mode   , 0 åœ¨åº”ç”¨ä»£ç ;    ç¬¬60ä¸ªå­—èŠ‚
+		USHORT bacnetip_port;	//bacnet çš„ç«¯å£å·;
 		UCHAR  hardware_info;	//  //bit0 zigbee   bit1 wifi
-        UCHAR  subnet_protocol;   //0 ¾ÉµÄ modbus   12 £º PROTOCOL_BIP_T0_MSTP_TO_MODBUS
+        UCHAR  subnet_protocol;   //0 æ—§çš„ modbus   12 ï¼š PROTOCOL_BIP_T0_MSTP_TO_MODBUS
 
-        UCHAR  command_version; //65ÃüÁîµÄ°æ±¾ºÅ£¬ÒÔºó»Ø¸´µÄ65ÃüÁî ÓĞ¸Ä¶¯¾ÍÒª+1 £¬Ö÷ÒªÊÇÒª¼æÈİÒÔÇ°µÄ»Ø¸´Ğ­Òé
-        UCHAR  subnet_port;  //Éè±¸ÊôÓÚÄÄÒ»¸ö¶Ë¿Ú»Ø¸´³öÀ´µÄ¡£ 1- MainPort      2-ZigbeePort      3-SubPort
-        UCHAR  subnet_baudrate;   //×ÓÉè±¸ËùÓÃµÄ²¨ÌØÂÊ; ºÍÖ®Ç°¶¨ÒåµÄ²¨ÌØÂÊĞòºÅ¶ÔÓ¦
-		UCHAR  minitype;     //ÓÃÀ´È·ÈÏµ½µ×ÊÇÄÄ¸öÉè±¸£¬ESP Éè±¸ÓÃÁËÒ»¸öÖ÷Éè±¸;
+        UCHAR  command_version; //65å‘½ä»¤çš„ç‰ˆæœ¬å·ï¼Œä»¥åå›å¤çš„65å‘½ä»¤ æœ‰æ”¹åŠ¨å°±è¦+1 ï¼Œä¸»è¦æ˜¯è¦å…¼å®¹ä»¥å‰çš„å›å¤åè®®
+        UCHAR  subnet_port;  //è®¾å¤‡å±äºå“ªä¸€ä¸ªç«¯å£å›å¤å‡ºæ¥çš„ã€‚ 1- MainPort      2-ZigbeePort      3-SubPort
+        UCHAR  subnet_baudrate;   //å­è®¾å¤‡æ‰€ç”¨çš„æ³¢ç‰¹ç‡; å’Œä¹‹å‰å®šä¹‰çš„æ³¢ç‰¹ç‡åºå·å¯¹åº”
+		UCHAR  minitype;     //ç”¨æ¥ç¡®è®¤åˆ°åº•æ˜¯å“ªä¸ªè®¾å¤‡ï¼ŒESP è®¾å¤‡ç”¨äº†ä¸€ä¸ªä¸»è®¾å¤‡;
 	}reg;
 }Str_UPD_SCAN;
 
@@ -2480,10 +2481,10 @@ typedef enum
 };
 
 
-const int DIGITAL_DIRECT = 0; //×Ô¶¨Òå Êı×ÖÁ¿Range
+const int DIGITAL_DIRECT = 0; //è‡ªå®šä¹‰ æ•°å­—é‡Range
 const int DIGITAL_INVERS = 1;
 
-const int DELTA_HEIGHT = 10; // ÓÃÓÚ´°¿Ú×î´ó»¯Ö®ºó ÏÔÊ¾µÄ²îÖµ£¬ÒÔÃâµ²×¡ÏÂÃæµÄ×´Ì¬À¸
+const int DELTA_HEIGHT = 10; // ç”¨äºçª—å£æœ€å¤§åŒ–ä¹‹å æ˜¾ç¤ºçš„å·®å€¼ï¼Œä»¥å…æŒ¡ä½ä¸‹é¢çš„çŠ¶æ€æ 
 
 const int MENU_HOME = 0;
 const int MENU_INPUT = 1;
@@ -2506,7 +2507,7 @@ const int MENU_PVAR = 17;
 const int READ_MODE_NORMAL = 0;
 const int READ_MODE_SIMPLIFICATION = 1;
 
-#pragma region define_bacnet_data_type  //¶¨Òå±ê×¼µÄbacnet Êı¾İ½á¹¹ÀàĞÍ;
+#pragma region define_bacnet_data_type  //å®šä¹‰æ ‡å‡†çš„bacnet æ•°æ®ç»“æ„ç±»å‹;
 
 const int TPYE_BACAPP_BOOLEAN = 1;
 const int TPYE_BACAPP_UNSIGNED = 2;
@@ -2537,8 +2538,8 @@ struct str_register_db_data
 };
 
 #pragma region connect_region
-//ÓÃÓÚ±êÊ¶Ä¿Ç°Õû¸öÏµÍ³µÄĞ­Òé×´Ì¬£»
-typedef struct 
+//ç”¨äºæ ‡è¯†ç›®å‰æ•´ä¸ªç³»ç»Ÿçš„åè®®çŠ¶æ€ï¼›
+typedef struct
 {
     unsigned char mstp_status;  // 0 stop    1 running
     unsigned char ncomport;
@@ -2553,7 +2554,7 @@ typedef struct
 
 typedef enum
 {
-    F_EXPANSION_IO, //Minipanel µÄÀ©Õ¹IO½çÃæ
+    F_EXPANSION_IO, //Minipanel çš„æ‰©å±•IOç•Œé¢
     F_SETTING_USER_LOGIN,
     FUNCTION_C
 }FunctionNumber;
@@ -2601,7 +2602,7 @@ const CString AQI_Info_Status[] =
     _T("Poisonous")
 };
 
-const CString Output_Priority_Arry[] = 
+const CString Output_Priority_Arry[] =
 {
     _T("Manual Life Safety"),
     _T("Automatic Life Safety"),
@@ -2901,7 +2902,7 @@ typedef struct
 		unsigned char sub_panel;
 		unsigned char ntype;
 		unsigned int object_number;
-		unsigned char network; //Ô­ÓĞ½á¹¹;
+		unsigned char network; //åŸæœ‰ç»“æ„;
 	}pan_str;
 	struct
 	{
@@ -2957,15 +2958,15 @@ typedef  struct
 	//Str_in_point  m_group_input_data;
 	//Str_out_point m_group_output_data;
 	//Str_variable_point m_group_variable_data;
-	int group_index;  //±êÊ¶ÈıÎ¬ ÊôÓÚÄÄÒ»¸ö½Úµã;
+	int group_index;  //æ ‡è¯†ä¸‰ç»´ å±äºå“ªä¸€ä¸ªèŠ‚ç‚¹;
 	int category_index;
 	int hw_index;
 	CString Group_Name;
 	CString Category_Name;
 	CString HW_Point_Name;
 	CString type_string;
-	int type; //±êÊ¶ÊÇinput output »¹ÊÇvar
-	int nstatus; // 0  offline    1  online      2 ÔÚÏß²»¿ÉÓÃ
+	int type; //æ ‡è¯†æ˜¯input output è¿˜æ˜¯var
+	int nstatus; // 0  offline    1  online      2 åœ¨çº¿ä¸å¯ç”¨
 
 	int n_index;
 	int n_panel;
@@ -2980,7 +2981,7 @@ typedef  struct
 	CString iotype; // digital   ananlog  virtual
 
 	Str_points nproperty;  //
-	CString cs_property_name; //ÀıÈç  1234IN56
+	CString cs_property_name; //ä¾‹å¦‚  1234IN56
 	char  m_data[250];
 	Input_CString input_cstring;
 	Output_CString output_cstring;
@@ -3039,25 +3040,24 @@ enum
 };
 
 #ifdef read_prop_multi_function
-// BACnet¶ÁÊôĞÔ¶àÓ¦´ğÊı¾İ½á¹¹£¨¸ù¾İÊµ¼ÊĞ­ÒéÕ»µ÷Õû£©
+// BACnetè¯»å±æ€§å¤šåº”ç­”æ•°æ®ç»“æ„ï¼ˆæ ¹æ®å®é™…åè®®æ ˆè°ƒæ•´ï¼‰
 typedef struct {
-	BACNET_READ_ACCESS_DATA* listOfReadAccessResults;  // Ó¦´ğ½á¹ûÁ´±í
-	int error_code;                                    // ´íÎóÂë£¨0=³É¹¦£©
+	BACNET_READ_ACCESS_DATA* listOfReadAccessResults;  // åº”ç­”ç»“æœé“¾è¡¨
+	int error_code;                                    // é”™è¯¯ç ï¼ˆ0=æˆåŠŸï¼‰
 } BACNET_READ_PROP_MULTIPLE_ACK;
 
-// Í¬²½µÈ´ı×´Ì¬½á¹¹Ìå£¨WindowsÔ­ÉúAPI°æ£©
+// åŒæ­¥ç­‰å¾…çŠ¶æ€ç»“æ„ä½“ï¼ˆWindowsåŸç”ŸAPIç‰ˆï¼‰
 typedef struct {
-	uint8_t invoke_id;                               // Ä¿±êInvoke ID
-	BOOL is_received;                                // ÊÇ·ñÊÕµ½Ó¦´ğ£¨TRUE/FALSE£©
-	BACNET_READ_PROP_MULTIPLE_ACK ack_data;          // Ó¦´ğÊı¾İ
-	CRITICAL_SECTION cs;                             // ÁÙ½çÇø£¨±£»¤¹²ÏíÊı¾İ£©
-	HANDLE h_event;                                  // ÊÂ¼ş¶ÔÏó£¨ÓÃÓÚµÈ´ı»½ĞÑ£©
+	uint8_t invoke_id;                               // ç›®æ ‡Invoke ID
+	BOOL is_received;                                // æ˜¯å¦æ”¶åˆ°åº”ç­”ï¼ˆTRUE/FALSEï¼‰
+	BACNET_READ_PROP_MULTIPLE_ACK ack_data;          // åº”ç­”æ•°æ®
+	CRITICAL_SECTION cs;                             // ä¸´ç•ŒåŒºï¼ˆä¿æŠ¤å…±äº«æ•°æ®ï¼‰
+	HANDLE h_event;                                  // äº‹ä»¶å¯¹è±¡ï¼ˆç”¨äºç­‰å¾…å”¤é†’ï¼‰
 } SyncReadState;
 #endif
 
 #define ESP32_IO_COUNT_REDEFINE_VERSION  637
 #define WEBVIEW_JSON_FEATURE             643
-
 
 
 

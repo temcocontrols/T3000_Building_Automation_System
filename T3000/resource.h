@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 生成的包含文件。
-// 供 T3000.rc 使用
+// Microsoft Visual C++ generated include file.
+// Used by T3000.rc
 //
 #define IDCANCEL2                       3
 #define IDCWRITEONE                     3
@@ -350,6 +350,9 @@
 #define IDD_DIALOG_TSTAT_AQ_PM25_PARAMETER 802
 #define IDD_DIALOG_ADVANCED_SETTINGS    804
 #define IDD_DIALOG_WIREGUARD_CONFIG     807
+#define IDD_DIALOG_GSM_STATUS           808
+#define IDD_DIALOG_MQTT_CONFIG          809
+#define IDD_DIALOG_SNMP_CONFIG          810
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -2872,6 +2875,58 @@
 #define IDC_BUTTON_REGENERATE           2782
 #define IDC_BUTTON_WRITE_WIREGUARD_CFG  2783
 #define IDC_BUTTON_CANCEL_WIREGUARD_CFG 2784
+#define IDC_EDIT_DEVICE_PUBLIC_KEY      2785
+#define IDC_STATIC_WG_PORT_HINT         2786
+#define IDC_STATIC_WG_LOCAL_HINT        2787
+#define IDC_STATIC_WG_ENDPOINT_HINT     2788
+#define IDC_STATIC_WG_PRIVATE_HINT      2789
+#define IDC_STATIC_WG_DEVICE_PUB_HINT   2790
+#define IDC_STATIC_WG_PEER_HINT         2791
+#define IDC_BUTTON_GSM_STATUS           2792
+#define IDC_EDIT_GSM_MODEM_STATE        2793
+#define IDC_EDIT_GSM_PPP_STATE          2794
+#define IDC_EDIT_GSM_FLAGS              2795
+#define IDC_EDIT_GSM_ACTIVE_SIM         2796
+#define IDC_EDIT_GSM_CSQ                2797
+#define IDC_EDIT_GSM_RSSI               2798
+#define IDC_EDIT_GSM_CREG               2799
+#define IDC_EDIT_GSM_CEREG              2800
+#define IDC_EDIT_GSM_IP                 2801
+#define IDC_EDIT_GSM_AGE                2802
+#define IDC_EDIT_GSM_LAST_ERROR         2803
+#define IDC_EDIT_GSM_OPERATOR           2804
+#define IDC_EDIT_GSM_APN                2805
+#define IDC_EDIT_GSM_SOURCE             2806
+#define IDC_BUTTON_GSM_REFRESH          2807
+#define IDC_BUTTON_GSM_CLOSE            2808
+#define IDC_BTN_GSM_SIM1                2809
+#define IDC_BTN_GSM_SIM2                2810
+#define IDC_STATIC_GSM_NO_SIM           2811
+#define IDC_BUTTON_MQTT_CONFIG          2810
+#define IDC_BUTTON_SNMP_CONFIG          2811
+#define IDC_CHECK_ENABLE_MQTT           2812
+#define IDC_EDIT_MQTT_BROKER            2813
+#define IDC_EDIT_MQTT_PORT              2814
+#define IDC_EDIT_MQTT_USERNAME          2815
+#define IDC_EDIT_MQTT_PASSWORD          2816
+#define IDC_EDIT_MQTT_CLIENT_ID         2817
+#define IDC_EDIT_MQTT_PUB_TOPIC         2818
+#define IDC_EDIT_MQTT_SUB_TOPIC         2819
+#define IDC_BUTTON_WRITE_MQTT_CFG       2820
+#define IDC_BUTTON_CANCEL_MQTT_CFG      2821
+#define IDC_STATIC_MQTT_STATUS          2822
+#define IDC_CHECK_ENABLE_SNMP           2823
+#define IDC_EDIT_SNMP_PORT              2824
+#define IDC_EDIT_SNMP_RO_COMMUNITY      2825
+#define IDC_EDIT_SNMP_RW_COMMUNITY      2826
+#define IDC_IPADDRESS_SNMP_TRAP_IP      2827
+#define IDC_EDIT_SNMP_TRAP_PORT         2828
+#define IDC_EDIT_SNMP_SYS_NAME          2829
+#define IDC_EDIT_SNMP_SYS_LOCATION      2830
+#define IDC_EDIT_SNMP_SYS_CONTACT       2831
+#define IDC_BUTTON_WRITE_SNMP_CFG       2832
+#define IDC_BUTTON_CANCEL_SNMP_CFG      2833
+#define IDC_STATIC_SNMP_STATUS          2834
 #define IDC_STATIC_REMOTE_PORT_WARNING  2996
 #define IDC_CHECK_REMOTE_PORT_WARNING   2997
 #define IDC_STATIC_IGNORE_TEXT          2998
@@ -3455,12 +3510,12 @@
 #define IDC_STATIC_IP_PORT              60047
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        809
+#define _APS_NEXT_RESOURCE_VALUE        811
 #define _APS_NEXT_COMMAND_VALUE         34093
-#define _APS_NEXT_CONTROL_VALUE         2784
+#define _APS_NEXT_CONTROL_VALUE         2835
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
