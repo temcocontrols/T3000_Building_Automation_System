@@ -860,58 +860,46 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter,
     ii = 0;
     if (update_status == 0x40 || update_status == 0x1f)
     {
-        if (IDOK == AfxMessageBox(
-                _T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),
-                MB_OKCANCEL))
+        // An interrupted update is already on the device. Continue it.
+        int md5_ret = modbus_read_multi(m_ID, &stored_md5[0], 1993, 4);
+        if (md5_ret > 0)
         {
-            // Read stored MD5 from device (regs 1995-1998)
-            int md5_ret = modbus_read_multi(m_ID, &stored_md5[0], 1993, 4);
-            if (md5_ret > 0)
+            md5_match = true;
+            for (int k = 0; k < 4; k++)
             {
-                md5_match = true;
-                for (int k = 0; k < 4; k++)
+                if (stored_md5[k] != wirte_md5[k])
                 {
-                    if (stored_md5[k] != wirte_md5[k])
-                    {
-                        md5_match = false;
-                        break;
-                    }
+                    md5_match = false;
+                    break;
                 }
             }
+        }
 
-            if (md5_match)
-            {
-                // Same bin file → safe to resume
-                pWriter->continue_com_flash_count = ReadResumeByteOffset(m_ID);
-
-                CString strResumePos;
-                strResumePos.Format(
-                    _T("|MD5 match: Resuming from byte offset: %d (packet %d)"),
-                    pWriter->continue_com_flash_count,
-                    pWriter->continue_com_flash_count / 128);
-                pWriter->OutPutsStatusInfo(strResumePos);
-                Sleep(500);
-            }
-            else
-            {
-                // Different bin or unreadable MD5 → fresh flash
-                if (md5_ret > 0)
-                    pWriter->OutPutsStatusInfo(
-                        _T("|MD5 mismatch: different firmware, forcing fresh flash."));
-                else
-                    pWriter->OutPutsStatusInfo(
-                        _T("|Could not read stored MD5, forcing fresh flash."));
-
-                pWriter->continue_com_flash_count = 0;
-                do_fresh = true;
-            }
+        pWriter->continue_com_flash_count = ReadResumeByteOffset(m_ID);
+        CString strResumePos;
+        if (md5_match)
+        {
+            strResumePos.Format(
+                _T("|MD5 match: Resuming from byte offset: %d (packet %d)"),
+                pWriter->continue_com_flash_count,
+                pWriter->continue_com_flash_count / 128);
+        }
+        else if (md5_ret > 0)
+        {
+            strResumePos.Format(
+                _T("|MD5 mismatch: resuming saved update from byte offset: %d (packet %d)"),
+                pWriter->continue_com_flash_count,
+                pWriter->continue_com_flash_count / 128);
         }
         else
         {
-            // User clicked Cancel
-            pWriter->continue_com_flash_count = 0;
-            do_fresh = true;
+            strResumePos.Format(
+                _T("|Could not read stored MD5: resuming saved update from byte offset: %d (packet %d)"),
+                pWriter->continue_com_flash_count,
+                pWriter->continue_com_flash_count / 128);
         }
+        pWriter->OutPutsStatusInfo(strResumePos);
+        Sleep(500);
     }
     else
     {
@@ -2634,106 +2622,13 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 ii=0;
                 if(mudbus_read_one(m_ID,0xee10)==0x40 || mudbus_read_one(m_ID,0xee10)==0x1f) // Read ee10, why?
                 {
-                    if(IDOK==AfxMessageBox(_T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),MB_OKCANCEL))  // Select OK
-                    {
-                        nResumeOffset = ReadResumeByteOffset(m_ID);
+                    nResumeOffset = ReadResumeByteOffset(m_ID);
 
-                        CString strResumePos;
-                        strResumePos.Format(_T("|Resume byte offset: %d (packet %d)"),
-                            nResumeOffset, nResumeOffset / 128);
-                        pWriter->OutPutsStatusInfo(strResumePos);
-                        Sleep(500);
-                    }
-                    else // Select Cancel
-                    {
-                        //from 0000 flash update
-                        ii=0;//from 0000 register flash
-                        CString srtInfo = _T("|Initializing device...");
-                        pWriter->OutPutsStatusInfo(srtInfo);
-                        //********************write register 16 value 0x7f **************
-                        Sleep(500);
-                        do
-                        {
-                            if(ii<RETRY_TIMES)
-                                if(-2== mudbus_write_one(m_ID,16,0x7f))
-                                {
-                                    ii++;
-                                    Sleep(6000);
-                                }
-                                else
-                                {
-                                    ii=0;//error -2 Unable to Initialize...
-                                    break;
-                                }
-                        }
-                        while(ii);
-
-                        if (ii >= RETRY_TIMES)
-                        {
-
-                            AfxMessageBox(_T("Write 16 = 0x7f Failed"));
-                            goto end_isp_flash;
-
-                        }
-
-                        //********************write register 16 value 0x3f **************
-                        ii=0;
-                        srtInfo = _T("|Erasing device...");
-                        pWriter->OutPutsStatusInfo(srtInfo);
-                        do
-                        {
-                            if(ii<RETRY_TIMES)
-                            {
-                                if(-2== mudbus_write_one(m_ID,16,0x3f))
-                                {
-                                    ii++;
-                                }
-
-                            }
-                            else
-                            {
-                                ii=0;
-                                break;
-                                //return -3;//error -3
-                            }
-                        }
-                        while(ii);
-                        if (ii >= RETRY_TIMES)
-                        {
-							 if(!auto_flash_mode)
-								AfxMessageBox(_T("Write 16 = 0x3f Failed"));
-                            goto end_isp_flash;
-
-                        }
-                        //********************write register 16 value 0x1f **************
-                        ii=0;
-                        Sleep(7000);//must have this ,the Tstat need
-                        do
-                        {
-                            if(ii<RETRY_TIMES * 2)
-                                if(-2== mudbus_write_one(m_ID,16,0x1f))
-                                    ii++;
-
-                                else
-                                {
-                                    ii=0;
-                                    break;
-                                    //return -4;//error -4
-                                }
-                        }
-                        while(ii);
-
-                        if (ii >= RETRY_TIMES)
-                        {
-							if(!auto_flash_mode)
-								 AfxMessageBox(_T("Write 16 = 0x1f Failed"));
-                            goto end_isp_flash;
-
-                        }
-
-                        //***************send data to com*************************
-                        ii=0;//to the register 0000
-                    }
+                    CString strResumePos;
+                    strResumePos.Format(_T("|Resume byte offset: %d (packet %d)"),
+                        nResumeOffset, nResumeOffset / 128);
+                    pWriter->OutPutsStatusInfo(strResumePos);
+                    Sleep(500);
                 }
                 else  // Read Eeprom chip failed?
                 {

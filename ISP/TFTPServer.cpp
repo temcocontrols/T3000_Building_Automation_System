@@ -1436,40 +1436,33 @@ BOOL TFTPServer::StartServer()
 					if (status_ret <= 0 || meta_ret <= 0)
 					{
 						OutPutsStatusInfo(_T("|Could not read resume status on Modbus TCP port 502. Update stopped."), FALSE);
-						if (!auto_flash_mode)
-							AfxMessageBox(_T("Could not read the saved update from the device.\nCheck that TCP port 502 is open, then try again."), MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
 						nRet = 0;
 						goto StopServer;
 					}
 
-					if (can_resume)
+					bool saved_update = (status_reg == 0x1F || status_reg == 0x40)
+						&& resume_bytes > 0
+						&& resume_bytes < m_nDataBufLen;
+
+					if (can_resume || saved_update)
 					{
-						int answer = IDOK;
-						if (!auto_flash_mode)
+						continue_flash_count = (resume_bytes / 512) + 1;
+						do_fresh = false;
+						CString strResumePos;
+						if (md5_match)
 						{
-							CString ask;
-							ask.Format(
-								_T("Previous update was interrupted at %d bytes.\nMD5 matches this file.\n\nPress OK to resume.\nCancel to erase and start over."),
-								resume_bytes);
-							answer = AfxMessageBox(ask, MB_OKCANCEL | MB_SETFOREGROUND | MB_TOPMOST);
-						}
-						if (answer == IDOK)
-						{
-							continue_flash_count = (resume_bytes / 512) + 1;
-							do_fresh = false;
-							CString strResumePos;
 							strResumePos.Format(
 								_T("|MD5 match: Resuming from byte offset: %d (TFTP block %d)"),
 								resume_bytes, continue_flash_count);
-							OutPutsStatusInfo(strResumePos, FALSE);
-							Sleep(500);
 						}
-					}
-					else if ((status_reg == 0x1F || status_reg == 0x40) && !md5_match)
-					{
-						OutPutsStatusInfo(_T("|MD5 mismatch: different firmware, erasing saved update."), FALSE);
-						if (!auto_flash_mode)
-							AfxMessageBox(_T("A previous update is on the device, but its MD5 does not match this file.\nThe device will erase that update and start from the beginning."), MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
+						else
+						{
+							strResumePos.Format(
+								_T("|MD5 mismatch: resuming saved update from byte offset: %d (TFTP block %d)"),
+								resume_bytes, continue_flash_count);
+						}
+						OutPutsStatusInfo(strResumePos, FALSE);
+						Sleep(500);
 					}
 
 					if (do_fresh)
