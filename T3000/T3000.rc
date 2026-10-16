@@ -7150,8 +7150,6 @@ BEGIN
     BUTTON      ID_BUILDINGCONFIGDB
     BUTTON      ID_CONTROL_REFRESH
     BUTTON      ID_CONTROL_PVAR
-    SEPARATOR
-    BUTTON      ID_TOOLS_WEBVIEW
 END
 
 
@@ -12437,3 +12435,4 @@ LANGUAGE 9, 1
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

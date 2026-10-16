@@ -117,9 +117,7 @@ DWORD WINAPI  CBacnetRegisterListView::ReadRegDataThreadfun(LPVOID lpVoid)
             (product_register_value[7] == PM_ESP32_T3_SERIES)
             )
         {
-            if (i == 10)
-                i = 19;
-            if (i == 20)
+            if (i == 4)
                 i = 68; //
             //如果是T3 中间很多都不用读;
         }
