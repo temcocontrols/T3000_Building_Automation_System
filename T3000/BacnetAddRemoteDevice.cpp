@@ -316,7 +316,7 @@ int ConnectToRemoteDevice(vector <CString> nlocal_ip_address/*LPCTSTR local_ip*/
                 {
                     int fw_raw = read_data[5] * 10 + read_data[4];
                     str_fw_version.Format(_T("%.1f"), (float)fw_raw / 10.0f);
-                    /* Screen_Name = virtual^mini_type^  �� use 0 = real device (1 = virtual). */
+                    /* Screen_Name = virtual^mini_type^  — use 0 = real device (1 = virtual). */
                     str_screen_name.Format(_T("0^%u^"), (unsigned)read_data[34]);
                     if (read_data[35] != 0)
                         str_hw_version.Format(_T("%u"), read_data[35]);

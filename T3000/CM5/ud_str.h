@@ -243,7 +243,7 @@ typedef union {
 	} reg;
 } Str_Wireguard_point;
 
-/* Hub GSM/LTE live status �� must match Hub Str_Gsm_status_point and Modbus 2251-2300 */
+/* Hub GSM/LTE live status — must match Hub Str_Gsm_status_point and Modbus 2251-2300 */
 typedef union {
 	uint8_t all[400];
 	struct {

@@ -295,7 +295,7 @@ bool GetFileNameFromPath(CString ncstring,CString &cs_return);
 BOOL Ping(const CString& strIP, CWnd* pWndEcho);
 
 void Send_WhoIs_remote_ip(CString ipaddress);
-/* Hub (30) / TSTAT11 (31) only �� safe on LAN; required for WireGuard unicast. */
+/* Hub (30) / TSTAT11 (31) only — safe on LAN; required for WireGuard unicast. */
 bool Is_Hub_Or_Tstat11_Product(void);
 void Send_WhoIs_Hub_Tstat11_Aware(uint32_t deviceid);
 //Used to initialize bacnet memory;

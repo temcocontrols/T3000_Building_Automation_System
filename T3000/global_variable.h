@@ -158,7 +158,7 @@ unsigned int g_llTxCount = 0;
 unsigned int g_llRxCount = 0;
 bool clear_status_bar = FALSE;
 int g_llerrCount = 0;
-BOOL g_unint = TRUE;//TREE = ��C;FALSE = F;
+BOOL g_unint = TRUE;//TREE = °C;FALSE = F;
 
 
 
@@ -765,12 +765,12 @@ char charr[600][2][600] ={
 {"COMMON","Serial Number - 4 byte value.  Read-only"},{"COMMON","Serial Number - 4 byte value.  Read-only"},
 {"COMMON","Serial Number - 4 byte value.  Read-only"},{"COMMON","Serial Number - 4 byte value.  Read-only"},
 //4-5
-{"COMMON","Software Version �C 2 byte value.  Read-only"},{"COMMON","Software Version �C 2 byte value.  Read-only"},
+{"COMMON","Software Version – 2 byte value.  Read-only"},{"COMMON","Software Version – 2 byte value.  Read-only"},
 //6,7
 {"COMMON","ADDRESS. Modbus device address"},{"COMMON","Product Model.  This is a read-only register that is used by the microcontroller to determine the product"},
 //8-11
 {"COMMON","Hardware Revision.  This is a read-only register that is used by the microcontroller to determine the hardware rev"},{"COMMON","PIC firmware version"},
-{"COMMON","PIC version of Humidity module"},{"COMMON","PLUG_N_PLAY_ADDRESS,   ��plug n play�� address, used by the network master to resolve address conflicts. See VC code for algorithms"},
+{"COMMON","PIC version of Humidity module"},{"COMMON","PLUG_N_PLAY_ADDRESS,   ‘plug n play’ address, used by the network master to resolve address conflicts. See VC code for algorithms"},
 //12-13
 {"COMMON",""},{"COMMON",""},
 //14-17
@@ -891,22 +891,22 @@ char charr[600][2][600] ={
 {"OUTPUT","Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V "},{"OUTPUT","Output1 tot 5, bit 0 thru 4 = relay 1 thru 5."},
 {"OUTPUT","Output6 ,Analog output1, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0."},{"OUTPUT","Output7 Analog output2, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0."},
 {"OUTPUT","DAC_OFFSET , Calibration data for the 0-10VDC signal, internal variable maintained by tstat"},
-{"OUTPUT","Output1 Relay1_delay_OFF_TO_ON �C delay time for output1 going from OFF to ON (sec)"},{"OUTPUT","Output2 Relay2_delay_OFF_TO_ON �C delay time for output2 going from OFF to ON (sec)"},
-{"OUTPUT","Output3 Relay3_delay_OFF_TO_ON �C delay time for output3 going from OFF to ON (sec)"},{"OUTPUT","Output4 Relay4_delay_OFF_TO_ON �C delay time for output4 going from OFF to ON (sec)"},
-{"OUTPUT","Output5 Relay5_delay_OFF_TO_ON �C delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","(future)Output6 delay_OFF_TO_ON �C delay time for output4 going from OFF to ON (sec)"},
-{"OUTPUT","(future)Output7 delay_OFF_TO_ON �C delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","output 1 current time left from OFF to ON"},
+{"OUTPUT","Output1 Relay1_delay_OFF_TO_ON – delay time for output1 going from OFF to ON (sec)"},{"OUTPUT","Output2 Relay2_delay_OFF_TO_ON – delay time for output2 going from OFF to ON (sec)"},
+{"OUTPUT","Output3 Relay3_delay_OFF_TO_ON – delay time for output3 going from OFF to ON (sec)"},{"OUTPUT","Output4 Relay4_delay_OFF_TO_ON – delay time for output4 going from OFF to ON (sec)"},
+{"OUTPUT","Output5 Relay5_delay_OFF_TO_ON – delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","(future)Output6 delay_OFF_TO_ON – delay time for output4 going from OFF to ON (sec)"},
+{"OUTPUT","(future)Output7 delay_OFF_TO_ON – delay time for output5 going from OFF to ON (sec)"},{"OUTPUT","output 1 current time left from OFF to ON"},
 {"OUTPUT","output 2 current time left from OFF to ON"},{"OUTPUT","output 3 current time left from OFF to ON"},
 
  {"OUTPUT","output 4 current time left from OFF to ON"},{"OUTPUT","output 5 current time left from OFF to ON"},
  {"OUTPUT","(reserved)output 6 current time left from OFF to ON"},{"OUTPUT","(reserved)output 7 current time left from OFF to ON"},
- {"OUTPUT","Output1 Relay1_delay_ON_TO_OFF �C delay time for output1 going from ON to OFF (sec)"},{"OUTPUT","Output2 Relay2_delay_ON_TO_OFF �C delay time for output2 going from ON to OFF (sec)"},
- {"OUTPUT","Output3 Relay3_delay_ON_TO_OFF �C delay time for output3 going from ON to OFF (sec)"},{"OUTPUT","Output4 Relay4_delay_ON_TO_OFF �C delay time for output4 going from ON to OFF(sec)"},
- {"OUTPUT","Output5 Relay5_delay_ON_TO_OFF �C delay time for output5 going from ON to OFF(sec)"},{"OUTPUT","(future)Output6_delay_ON_TO_OFF �C delay time for output4 going from ON to OFF(sec)"},
- {"OUTPUT","(future)Output7_delay_ON_TO_OFF �C delay time for output5 going from ON to OFF (sec)"},{"OUTPUT","output 1 current time left from ON to OFF"},
+ {"OUTPUT","Output1 Relay1_delay_ON_TO_OFF – delay time for output1 going from ON to OFF (sec)"},{"OUTPUT","Output2 Relay2_delay_ON_TO_OFF – delay time for output2 going from ON to OFF (sec)"},
+ {"OUTPUT","Output3 Relay3_delay_ON_TO_OFF – delay time for output3 going from ON to OFF (sec)"},{"OUTPUT","Output4 Relay4_delay_ON_TO_OFF – delay time for output4 going from ON to OFF(sec)"},
+ {"OUTPUT","Output5 Relay5_delay_ON_TO_OFF – delay time for output5 going from ON to OFF(sec)"},{"OUTPUT","(future)Output6_delay_ON_TO_OFF – delay time for output4 going from ON to OFF(sec)"},
+ {"OUTPUT","(future)Output7_delay_ON_TO_OFF – delay time for output5 going from ON to OFF (sec)"},{"OUTPUT","output 1 current time left from ON to OFF"},
  {"OUTPUT","output 2 current time left from ON to OFF"},{"OUTPUT","output 3 current time left from ON to OFF"},
  {"OUTPUT","output 4 current time left from ON to OFF"},{"OUTPUT","output 5 current time left from ON to OFF"},
  {"OUTPUT","(reserved)output 6 current time left from ON to OFF"},{"OUTPUT","(reserved)output 7 current time left from ON to OFF"},
- {"OUTPUT","MODBUS_CYCLING_DELAY �C delay time (in minutes) for switching out of heating or cooling and then back in."},{"OUTPUT","MODBUS_CHANGOVER_DELAY �C delay time (in minutes) for switching from cooling into heating or vice versa."},
+ {"OUTPUT","MODBUS_CYCLING_DELAY – delay time (in minutes) for switching out of heating or cooling and then back in."},{"OUTPUT","MODBUS_CHANGOVER_DELAY – delay time (in minutes) for switching from cooling into heating or vice versa."},
 
  {"OUTPUT","Valve travel time. The time of the valve travel  from one end to another end. The units is second."},{"OUTPUT","Valve percent. Show the valve opened how much percent.  READ ONLY"},
  {"OUTPUT","Interlock for  output1"},{"OUTPUT","Interlock for  output2"},
@@ -917,7 +917,7 @@ char charr[600][2][600] ={
  {"OUTPUT","Relay1 manual output value"},{"OUTPUT","Relay2 manual output value"},
  {"OUTPUT","Relay3 manual output value"},{"OUTPUT","Relay4 manual output value"},
  {"OUTPUT","Relay5 manual output value"},{"OUTPUT","(future) Analog1 manual  output value"},
- {"OUTPUT","(future) Analog2 manual  output value"},{"OUTPUT","DEADMASTER_MODE = 0, the default, outputs will not change when deadmaster is triggered DEADMASTER_MODE = 1, the output will be trigger to ��AUTO�� mode if they were previously in manual DEADMASTER_MODE = 2, the outputs will go to manual on or off as defined in the following registers."},
+ {"OUTPUT","(future) Analog2 manual  output value"},{"OUTPUT","DEADMASTER_MODE = 0, the default, outputs will not change when deadmaster is triggered DEADMASTER_MODE = 1, the output will be trigger to “AUTO” mode if they were previously in manual DEADMASTER_MODE = 2, the outputs will go to manual on or off as defined in the following registers."},
 
  {"OUTPUT","Define output states when DEADMASTER_MODE = 2 (active)Bit0 is for relay 1, bit1 for relay 2 and so on up to output 5"},{"OUTPUT","Analog Output1 goes to this value when DEADMASTER_MODE = 2 (active), 0-1000"},
  {"OUTPUT","Analog Output2 goes to this value when DEADMASTER_MODE = 2 (active), 0-1000"},{"OUTPUT","Output1 Function setting:0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "},
@@ -1001,10 +1001,10 @@ char charr[600][2][600] ={
 
 //392-512
 {"UI","KEYPAD_SELECT , variable to select various keypad arrangements.  Refer to PAd description in Table 1: Advanced Menu Items"},{"UI","SPECIAL_MENU_LOCK, Special menu lockout via keypad, serial port only, "},
-{"UI","dIS �C Display.  This sets the display to either room temperature or setpoint.  0 = room temp,  1 = setpoint, 2 = Blank Display,3 = PID2 value,4 = PID2 setpoint, 5 = set segment code by manually, 6 = Display sleep"},{"UI","ICON TABLE Set when certain icons are on/off"},
+{"UI","dIS – Display.  This sets the display to either room temperature or setpoint.  0 = room temp,  1 = setpoint, 2 = Blank Display,3 = PID2 value,4 = PID2 setpoint, 5 = set segment code by manually, 6 = Display sleep"},{"UI","ICON TABLE Set when certain icons are on/off"},
 {"UI","Last key  pressed counter. Minutes since the used last pressed a key. "},{"UI","Keypad encoded value. Last keypress, READ ONLY"},
-{"UI","LED hundred��s digit, , can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI",""},
-{"UI","LED one��s digit code, can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI","LED discrete status symbols, can drive the LEDs manually when the display register 381 is set to manual (5) "},
+{"UI","LED hundred’s digit, , can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI",""},
+{"UI","LED one’s digit code, can drive the LEDs manually when the display register 381 is set to manual (5) "},{"UI","LED discrete status symbols, can drive the LEDs manually when the display register 381 is set to manual (5) "},
  {"UI","Rouding display. 0 = round the display to the nearest digit; 1 = round the display to the nearest 1/10 unit;  5 = round the display to the nearest 1/2 unit. 2,3,4 reserved."},{"UI","The minimum address which the device can accept, use this to limit addresses to a certain defined band. "},
 {"UI","The maximum device address can  be set. The device address should between min and max address, default is 254"},{"UI","Show the size of E2 chip. 0 = 24c02, 1 = 24c08/24c16."},
  {"UI","Assign the timer to be used for which feature. 0 = period timer, 1 = rotation timer, 2 = interlock, 3 = PWM timer."},{"UI","Clock, year"},
@@ -2335,7 +2335,7 @@ CString HolLable[BAC_HOLIDAY_COUNT] =   // Used to fill drop-down lists dynamica
     _T("AR4")
 };
 
-int m_special_customer = 0;      //�ͻ��Զ���T3000������;  // 1ΪCPR_Bestek
+int m_special_customer = 0;      // Customer-defined T3000 name; // 1 is CPR_Bestek
 CString cs_special_name;         // Name that should be changed to match.
 
 unsigned char n_ignore_sync_time;  // Whether time synchronization is ignored.

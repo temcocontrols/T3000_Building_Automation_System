@@ -6,9 +6,9 @@ extern vector <_Bac_Scan_Com_Info> m_bac_handle_Iam_data;
 extern unsigned int g_mstp_deviceid ;
 extern int SPECIAL_BAC_TO_MODBUS ;
 // If equal to 1, it means that the new BootLoader is being flashed now
-extern int new_bootload ; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?1 ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½BootLoader;
+extern int new_bootload ; // If it equals 1, the image being flashed is the new BootLoader;
 // 0 normal mode, 1 flash boot mode
-extern int com_port_flash_status ;  // 0 ï¿½ï¿½ï¿½ï¿½Ä£Ê½   1 ï¿½ï¿½Ð´bootÄ£Ê½
+extern int com_port_flash_status ;  // 0 normal mode   1 boot flash mode
 extern unsigned int n_check_temco_firmware;
 extern bool auto_flash_mode;
 extern CString g_strFlashInfo;
@@ -30,7 +30,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam);
 int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
 int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_UC *register_data_orginal, LPVOID pParam);
 // 0 no need to update boot, 1 need to update bootloader; C1 is hex
-extern int firmware_must_use_new_bootloader ;  //0 ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½ï¿½boot   1 ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½bootload;   C1Îªhex
+extern int firmware_must_use_new_bootloader ;  // 0 do not update boot   1 bootload must be updated;   C1 is hex
 extern CString g_repair_bootloader_file_path;
 
 CComWriter::CComWriter(void)
@@ -42,7 +42,7 @@ CComWriter::CComWriter(void)
     m_nComPort = -1;
     //m_nModbusID;
     // Baud rate
-    m_nBautrate = 0;			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ - Baud rate
+    m_nBautrate = 0;			// Baud rate
     m_com_flash_binfile = 0;
     m_pWorkThread = NULL;
     continue_com_flash_count = 0;
@@ -148,10 +148,10 @@ int CComWriter::BeginWirteByCom()
     {
 #pragma region detect_mstp_shutdown
 		// Don't judge the serial port protocol when flashing for now, otherwise it will be slow when burning modbus
-		if (SPECIAL_BAC_TO_MODBUS)  //ï¿½ï¿½Ê±ï¿½ï¿½Òªï¿½Úµï¿½flashï¿½ï¿½Ê±ï¿½ï¿½ ï¿½Ð¶Ï´ï¿½ï¿½Úµï¿½Ð­ï¿½é£¬ï¿½ï¿½È»ï¿½ï¿½modbusï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿? ï¿½ï¿½
+		if (SPECIAL_BAC_TO_MODBUS)  // For now, do not detect the serial protocol while flashing, or flashing Modbus is very slow.
 		{
 			// Used to detect serial port MSTP data
-			baudrate_def temp_baudrate_ret[100] = { 0 }; //ï¿½ï¿½ï¿½Ú¼ï¿½â´®ï¿½ï¿½MSTPï¿½ï¿½ï¿½ï¿½
+			baudrate_def temp_baudrate_ret[100] = { 0 }; // Used to detect serial MSTP data
 			int find_mstp_protocal = 0;
 			find_mstp_protocal = Check_Mstp_Comport(m_nComPort, temp_baudrate_ret, m_nBautrate);
 			if ((find_mstp_protocal == -101) || (find_mstp_protocal == -100))
@@ -177,7 +177,7 @@ int CComWriter::BeginWirteByCom()
             OutPutsStatusInfo(srtInfo, FALSE);
 
             // Initialize bacnet mstp protocol
-            int ret = Initial_bac(m_nComPort, _T(""), m_nBautrate); //ï¿½ï¿½Ê¼ï¿½ï¿½bacnet mstp Ð­ï¿½ï¿½
+            int ret = Initial_bac(m_nComPort, _T(""), m_nBautrate); // Initialize the BACnet MSTP protocol
             CString temp_cs;
             if (ret <= 0)
             {
@@ -192,7 +192,7 @@ int CComWriter::BeginWirteByCom()
             }
             //Send_WhoIs_Global(-1, -1);
 // Don't use mute for now
-#if 0  //ï¿½È²ï¿½ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½
+#if 0  // Do not use the silence method yet
             srtInfo = _T("Disabling Bacnet MSTP and switching over to Modbus");
             OutPutsStatusInfo(srtInfo, FALSE);
             int nret = 0;
@@ -200,17 +200,17 @@ int CComWriter::BeginWirteByCom()
             do
             {
                 // Make Temco's bacnet devices on the bus silent; since it's a broadcast, send it in a loop
-                nret = ShutDownMstpGlobal(4);  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Temcoï¿½ï¿½ bacnet ï¿½è±¸  ï¿½ï¿½ï¿½ï¿½; ï¿½ï¿½Îªï¿½Ç¹ã²¥ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½
+                nret = ShutDownMstpGlobal(4);  // Tell Temco BACnet devices on the bus to stay silent; it is a broadcast, so send it in a loop
                 Sleep(2000);
                 loop1_count++;
             } while ((nret <= 0) && loop1_count < 5);
             // Make Temco's bacnet devices on the bus silent; since it's a broadcast, send it in a loop
-            nret = ShutDownMstpGlobal(4);  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Temcoï¿½ï¿½ bacnet ï¿½è±¸  ï¿½ï¿½ï¿½ï¿½; ï¿½ï¿½Îªï¿½Ç¹ã²¥ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½
+            nret = ShutDownMstpGlobal(4);  // Tell Temco BACnet devices on the bus to stay silent; it is a broadcast, so send it in a loop
             Sleep(1000);
 
             close_bac_com();
-            find_mstp_protocal = Check_Mstp_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  //ï¿½Ù´ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ - Confirm that all devices on the bus are silent again
-            temp_loop_count++; //ï¿½ï¿½ï¿½Ñ­ï¿½ï¿?3ï¿½ï¿½ - Loop up to 3 times
+            find_mstp_protocal = Check_Mstp_Comport(m_nComPort, &temp_baudrate_ret, m_nBautrate);  // Confirm that all devices on the bus are silent again
+            temp_loop_count++; // Loop up to 3 times
 #endif
         }
 
@@ -263,7 +263,7 @@ BOOL CComWriter::WriteCommandtoReset()
 
     int nRet = Write_One(m_szMdbIDs[0],16,127);   // Enter ISP mode
     //Sleep(2000);
-    //Add by Fance  ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿? ISP  16Ð´127ï¿½ï¿½  ï¿½ï¿½Òªï¿½ï¿½ 11ï¿½Å¼Ä´ï¿½ï¿½ï¿½  11ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½1  Ëµï¿½ï¿½ï¿½ï¿½×ªï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È´ï¿?
+    // Add by Fance. After jumping from application code into ISP, write 127 to register 16, then read register 11. If register 11 is greater than 1, the jump succeeded; otherwise keep waiting.
     //TBD: Explain this comment better
     // If you want to read 11th register 11th or more than 1 when you jump from the application code to the ISP 16 write 127, the jump succeeds, otherwise wait
 
@@ -288,7 +288,7 @@ BOOL CComWriter::WriteCommandtoReset()
     int ModelID= read_one(m_szMdbIDs[0],7,5);
     if (ModelID>0)
     {
-        if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7,8 Detecting chip flash sizeï¿½ï¿½        {
+        if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7,8 Detecting chip flash sizeï¼Œ        {
         {
             int Chipsize=read_one(m_szMdbIDs[0],11,5);
 
@@ -484,10 +484,10 @@ UINT Flash_Modebus_Device(LPVOID pParam)
             CString strID;
             strID.Format(_T("|--------------->>ID-%d-<<---------------"), pWriter->m_szMdbIDs[i]);
             pWriter->OutPutsStatusInfo(strID);
-            ////ï¿½ï¿½Ê¾flashÖ®Ç°ï¿½ï¿½Ê±ï¿½ï¿½
+            //// Time shown before flashing
             pWriter->OutPutsStatusInfo(_T("|--------->>Begin"));
             pWriter->OutPutsStatusInfo(_T("|-->>Begin Time:")+GetSysTime());
-            //// ï¿½ï¿½Ê¾flashÖ®Ç°ï¿½ï¿½ï¿½è±¸×´Ì¬ï¿½ï¿½Ï¢
+            //// Device status before flashing
             BOOL Flag_HEX_BIN=FALSE;
 //		     ((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
             pWriter->m_szMdbIDs[i] = temp_read_reg[6];
@@ -580,7 +580,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                     goto	 end_tcp_flash_mode;
                 }
                 int Chipsize = 0;
-                //  pWriter->OutPutsStatusInfo(_T("The device doesnï¿½ï¿½t match with the hex file"));
+                //  pWriter->OutPutsStatusInfo(_T("The device doesn't match with the hex file"));
 #if 1		//Reset
                 if (ModelID==6||ModelID==7||ModelID==8)
                     Chipsize = Chipsize_6;
@@ -659,7 +659,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                         CString strTemp=_T("");
                         strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);
 
-                        strFailureList+=strTemp;  // flashï¿½ï¿½ï¿½Ê¹ï¿½ï¿?
+                        strFailureList+=strTemp;  // flash multiple devices
                         switch(nFlashRet)
                         {
                         case -1:
@@ -709,7 +709,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                         /*CString strText;
                         strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);
                         pWriter->OutPutsStatusInfo(strText);*/
-                        //// ï¿½ï¿½Ê¾flashÖ®Ç°ï¿½ï¿½ï¿½è±¸×´Ì¬ï¿½ï¿½Ï¢
+                        //// Device status before flashing
                         int time_count = 3;
                         for (int i=0; i<time_count; i++)
                         {
@@ -718,7 +718,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                             pWriter->OutPutsStatusInfo(temp_123,true);
                             Sleep(1000);
                         }
-                        //Sleep(13000);//ï¿½È´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½
+                        //Sleep(13000);// Wait until the restart has finished
 //					((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
                         pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
                         pWriter->OutPutsStatusInfo(_T("|------->>End"));
@@ -763,7 +763,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                     CString strTemp=_T("");
                     strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);
 
-                    strFailureList+=strTemp;  // flashï¿½ï¿½ï¿½Ê¹ï¿½ï¿?
+                    strFailureList+=strTemp;  // flash multiple devices
                     switch(nFlashRet)
                     {
                     case -1:
@@ -803,8 +803,8 @@ UINT Flash_Modebus_Device(LPVOID pParam)
                     CString strText;
                     strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);
                     pWriter->OutPutsStatusInfo(strText);
-                    //// ï¿½ï¿½Ê¾flashÖ®Ç°ï¿½ï¿½ï¿½è±¸×´Ì¬ï¿½ï¿½Ï¢
-                    //Sleep(13000);//ï¿½È´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½
+                    //// Device status before flashing
+                    //Sleep(13000);// Wait until the restart has finished
 //				((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
                     pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
                     pWriter->OutPutsStatusInfo(_T("|------->>End"));
@@ -881,7 +881,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter,
 
             if (md5_match)
             {
-                // Same bin file ¡ú safe to resume
+                // Same bin file â†’ safe to resume
                 pWriter->continue_com_flash_count = ReadResumeByteOffset(m_ID);
 
                 CString strResumePos;
@@ -894,7 +894,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter,
             }
             else
             {
-                // Different bin or unreadable MD5 ¡ú fresh flash
+                // Different bin or unreadable MD5 â†’ fresh flash
                 if (md5_ret > 0)
                     pWriter->OutPutsStatusInfo(
                         _T("|MD5 mismatch: different firmware, forcing fresh flash."));
@@ -915,11 +915,11 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter,
     }
     else
     {
-        // No interrupted update ¡ª normal fresh flash
+        // No interrupted update â€” normal fresh flash
         do_fresh = true;
     }
 
-    // ©¤©¤ Fresh flash path ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+    // â”€â”€ Fresh flash path â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (do_fresh)
     {
         ii = 0;
@@ -1127,7 +1127,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
                 if (itemp <= com_error_delay_count)
                     Sleep(com_error_delay_time);
                 else
-                    Sleep(300 + itemp*100); //Ð´Ê§ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½300msï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½;
+                    Sleep(300 + itemp*100); // Write failed; sleep 300 ms, then retry;
                 itemp++;
 
             }
@@ -1375,7 +1375,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
         if (SPECIAL_BAC_TO_MODBUS)
         {
             g_mstp_deviceid = 0;
-            //ï¿½ï¿½ï¿½ï¿½IDï¿½Ãµï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ device id.
+            // Get the device id that corresponds to this ID.
             CString strtemp;
             strtemp.Format(_T("|Reading Device Object Instance"));
             pWriter->OutPutsStatusInfo(strtemp);
@@ -1438,11 +1438,11 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     unsigned short wirte_md5[4];
                     int compare_ret = 1;
 
-                    //ï¿½ï¿½ï¿?88espï¿½ï¿½ï¿½è±¸ï¿½ï¿½bootloader ï¿½ï¿½ï¿½ï¿½
+                    // If the 88 ESP device is inside the bootloader
                     int n_ret = modbus_read_multi(pWriter->m_szMdbIDs[i], &pWriter->update_firmware_info[0], 1994, 6);
                     if (n_ret > 0)
                     {
-                        //ï¿½È¶ï¿½MD5
+                        // Compare MD5
                         for (int x = 0; x < 4; x++)
                         {
                             wirte_md5[x] = firmware_md5[2 * x] * 256 + firmware_md5[2 * x + 1];
@@ -1455,7 +1455,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
                         if ((compare_ret == 1) && (pWriter->update_firmware_info[0] != 0))
                         {
-                            pWriter->continue_com_flash_count = pWriter->update_firmware_info[0] * 128; // 1994ï¿½ï¿½Åµï¿½ï¿½Ç´ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½Ë¶ï¿½ï¿½Ù°ï¿?;
+                            pWriter->continue_com_flash_count = pWriter->update_firmware_info[0] * 128; // Register 1994 stores how many packets have been written over the serial port;
                         }
                         else
                         {
@@ -1573,8 +1573,8 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     Flag_HEX_BIN=TRUE;
                 }
 
-                // pWriter->OutPutsStatusInfo(_T("The device doesnï¿½ï¿½t match with the hex file"));
-#if 1		//ï¿½ï¿½Î»
+                // pWriter->OutPutsStatusInfo(_T("The device doesn't match with the hex file"));
+#if 1		// Reset
                 int Chipsize= mudbus_read_one(pWriter->m_szMdbIDs[i],11,5);
                 if (Chipsize<37)	//64K
                 {
@@ -1689,7 +1689,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
                     CString strTemp=_T("");
                     strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);
 
-                    strFailureList+=strTemp;  // flashï¿½ï¿½ï¿½Ê¹ï¿½ï¿?
+                    strFailureList+=strTemp;  // flash multiple devices
                     switch(nFlashRet)
                     {
                     case -1:
@@ -1961,16 +1961,16 @@ int CComWriter::Fix_Tstat10_76800_baudrate()
 
     if (Device_infor[7] != 10)
         return 0;
-    if (m_nBautrate != 76800) //ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½Ê²ï¿½ï¿½ï¿?76800ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  // If the baud rate selected in the interface is not 76800, ignore it
+    if (m_nBautrate != 76800) // If the baud rate selected in the interface is not 76800, ignore it
         return 0;
-    if (Device_infor[14] >= 79) //ï¿½Ì¼ï¿½ï¿½æ±¾ï¿½ï¿½ï¿½ï¿½79ï¿½ï¿½Ëµï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½ï¿½  // If firmware version is greater than 79, it means it has been fixed
+    if (Device_infor[14] >= 79) // If firmware version is greater than 79, it means it has been fixed
         return 0;
-    if ((Device_infor[14] == 0) && (Device_infor[11] > 50)) //Ëµï¿½ï¿½ï¿½ï¿½BootLoaderï¿½ï¿½  // Indicates it's in BootLoader
+    if ((Device_infor[14] == 0) && (Device_infor[11] > 50)) // Indicates it's in BootLoader
     {
         return 0;
         Sleep(1);
     }
-    else if ((Device_infor[14] > 0) && (Device_infor[11] == 1)) //Ëµï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½  // Indicates it's in application code
+    else if ((Device_infor[14] > 0) && (Device_infor[11] == 1)) // Indicates it's in application code
     {
         return 1;
         Sleep(1);
@@ -2159,12 +2159,12 @@ int CComWriter::UpdataDeviceInformation(int& ID)
                 }
                 else if ((Device_infor[7] == PM_MINIPANEL_ARM) && (temp_bootloader_version < 62))
                 {
-                    c2_update_boot = false; //ï¿½ï¿½Ö§ï¿½Ö´ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ - Does not support serial port update
+                    c2_update_boot = false; // Does not support serial port update
                     Ret_Result = -1;
                 }
                 else if ((Device_infor[7] == PM_MINIPANEL) && (temp_bootloader_version < 62))
                 {
-                    c2_update_boot = false; //ï¿½ï¿½Ö§ï¿½Ö´ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ - Does not support serial port update
+                    c2_update_boot = false; // Does not support serial port update
                     Ret_Result = -1;
                 }
                 else if ((Device_infor[7] == PM_TSTAT10) && (temp_bootloader_version < 54))
@@ -2244,7 +2244,7 @@ int CComWriter::BeginWirteByTCP()
                 SetCommunicationType(1);
             }
         }
-        m_subnet_flash = 1; //ï¿½ï¿½ï¿½Ã±ï¿½Ö¾Î»ï¿½ï¿½ï¿½Ç´ï¿½ TCP ×ª ï¿½Ó¿ï¿½ ï¿½ï¿½ï¿½ï¿½Ð´; - Set flag to indicate flashing from TCP to sub-port
+        m_subnet_flash = 1; // Set flag to indicate flashing from TCP to sub-port
         CString strTips = _T("|Programming device...");
         OutPutsStatusInfo(strTips);
         //AddStringToOutPuts(strTips);
@@ -2281,9 +2281,9 @@ int fun_shutdown(LPVOID pParam,int nretry_count)
     for (int i = 0; i < nretry_count; i++)
     {
         int nflag = F_INITIAL;
-        unsigned short silent_command = 0; //ï¿½ï¿½Î»Ê±ï¿½ï¿½  ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ - High byte time low byte command
+        unsigned short silent_command = 0; // High byte time, low byte command
         silent_command = 0x0A00 | F_START_SHUTDOWN;
-        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // ï¿½ï¿½Ä¬ï¿½ï¿½Ê¼ï¿½ï¿½ - Silent initialization
+        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // Silent initialization
         if (nRet >= 0)
         {
             CString srtInfo = _T("Connecting the subdevice , Waiting.");
@@ -2361,7 +2361,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 #endif
         if (SPECIAL_BAC_TO_MODBUS)
         {
-            //ï¿½ï¿½ï¿½ï¿½IDï¿½Ãµï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ device id. - Get the corresponding device ID based on ID
+            // Get the corresponding device ID based on ID
             CString strtemp;
             strtemp.Format(_T("|Reading Device Object Instance"));
             pWriter->OutPutsStatusInfo(strtemp);
@@ -2411,14 +2411,14 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
         }
 
 #pragma region mstp_silent_part
-        if (pWriter->m_subnet_flash)  //ï¿½ï¿½ï¿½ï¿½ï¿½flash ï¿½ï¿½ï¿½è±¸ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½; - If it is a flash sub-device, run this section
+        if (pWriter->m_subnet_flash)  // If it is a flash sub-device, run this section
         {
             int nret = 0;
             unsigned short temp_register[100] = { 0 };
             nret = modbus_read_multi(255, &temp_register[0], 0, 100, 6);
             if (nret>=0)
             {
-                //Ö»ï¿½ï¿½ ï¿½Ü¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ ï¿½Å¸ï¿½ ï¿½ï¿½Ä¬ï¿½ï¿½Ò»ï¿½ï¿½; - Only devices that can connect to sub-devices can use this silent method.
+                // Only devices that can connect to sub-devices can use this silent method.
                 if ((temp_register[7] == PM_MINIPANEL) ||
                     (temp_register[7] == PM_TSTAT10) ||
                     (temp_register[7] == PM_MINIPANEL_ARM) ||
@@ -2437,7 +2437,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
 #if 0
                         int nflag = F_INITIAL;
-                        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // ï¿½ï¿½Ä¬ï¿½ï¿½Ê¼ï¿½ï¿½ - Silent initialization
+                        int  nRet = mudbus_write_one(255, 99, F_START_SHUTDOWN, 10);   // Silent initialization
                         if (nRet >= 0)
                         {
                             CString srtInfo = _T("Connecting the subdevice , Waiting.");
@@ -2525,8 +2525,8 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             if (nret_device_info == 1)
             {
                 Flag_HEX_BIN =TRUE;
-                int  nRet = mudbus_write_one(pWriter->m_szMdbIDs[i],16,127,3);   // ï¿½ï¿½ï¿½ï¿½ISPÄ£Ê½ - Enter ISP mode
-                if (temp_ret3 == 1) //ï¿½ï¿½ï¿½ï¿½76800 tstat10 ï¿½ï¿½×ªï¿½ï¿½BootLoaderï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½BootLoaderï¿½ï¿½ï¿½ï¿½ï¿½â£¬ï¿½Þ¸ï¿½Îª57600ï¿½ï¿½ï¿½ï¿½ï¿½Êºï¿½Í¨Ñ¶  // It's 76800 tstat10 jumping to BootLoader, and BootLoader has problems, modified to 57600 baud rate for communication
+                int  nRet = mudbus_write_one(pWriter->m_szMdbIDs[i],16,127,3);   // Enter ISP mode
+                if (temp_ret3 == 1) // It's 76800 tstat10 jumping to BootLoader, and BootLoader has problems, modified to 57600 baud rate for communication
                 {
                     CString strtempnotice;
                     strtempnotice.Format(_T("The actual baud rate in ISP mode is 57600"));
@@ -2537,7 +2537,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 }
                 Sleep (2000);
                 nRet = mudbus_read_one(pWriter->m_szMdbIDs[i],11);
-				//Wait for the device to enter the ISP mode, some devices jump slower than others, canï¿½ï¿½t read after reboot, retry;
+				//Wait for the device to enter the ISP mode, some devices jump slower than others, can't read after reboot, retry;
                 if (nRet <= 0)
                 {
                     bool read_bootloader_ret = false;
@@ -2580,7 +2580,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 #endif
                 }
 
-       //         if (nRet >=41)//Ö§ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿? - Support for switching between multiple baud rates
+       //         if (nRet >=41)// Support for switching between multiple baud rates
        //         {
        //             if (GetCommunicationType () == 0)
        //             {
@@ -2632,7 +2632,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 }
                 //************* begin to flash ***********************
                 ii=0;
-                if(mudbus_read_one(m_ID,0xee10)==0x40 || mudbus_read_one(m_ID,0xee10)==0x1f) // ï¿½ï¿½ee10ï¿½ï¿½ whyï¿½ï¿½
+                if(mudbus_read_one(m_ID,0xee10)==0x40 || mudbus_read_one(m_ID,0xee10)==0x1f) // Read ee10, why?
                 {
                     if(IDOK==AfxMessageBox(_T("Previous Update was interrupted.\nPress OK to Resume.\nCancel to Restart."),MB_OKCANCEL))  // Select OK
                     {
@@ -2644,7 +2644,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         pWriter->OutPutsStatusInfo(strResumePos);
                         Sleep(500);
                     }
-                    else // Ñ¡È¡ï¿½ï¿½ - Select Cancel
+                    else // Select Cancel
                     {
                         //from 0000 flash update
                         ii=0;//from 0000 register flash
@@ -2735,7 +2735,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         ii=0;//to the register 0000
                     }
                 }
-                else  // Read Eeprom chip failedï¿½ï¿½
+                else  // Read Eeprom chip failed?
                 {
                     //from 0000 flash update
                     ii=0;//from 0000 register flash
@@ -2750,7 +2750,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         if(ii<3)
 
                         {
-                            if(mudbus_write_one(m_ID,16,0x7f)<0)  //T3Ïµï¿½Ðµï¿½ ï¿½Ç²ï¿½ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½T3 Ö±ï¿½Ó¾Í¸ï¿½Î»ï¿½ï¿½. - The T3 series will not respond to this command, and T3 will reset directly.
+                            if(mudbus_write_one(m_ID,16,0x7f)<0)  // The T3 series will not respond to this command, and T3 will reset directly.
                             {
                                 ii++;
                                 continue;
@@ -2899,7 +2899,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
             if (pWriter->m_subnet_flash == 0)
             {
-                mudbus_write_one(255, 16, 0x0455, 3);  //È«ï¿½Ö¹ã²¥  0x04 ï¿½ï¿½ï¿½ï¿½ 4ï¿½ï¿½ï¿½ï¿½   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ mstpï¿½ï¿½ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¬ - Global broadcast 0x04 represents 4 minutes, allowing all MSTP devices to continue silent
+                mudbus_write_one(255, 16, 0x0455, 3);  // Global broadcast 0x04 represents 4 minutes, allowing all MSTP devices to continue silent
                 Sleep(100);
             }
 
@@ -3048,7 +3048,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             //}
 
 
-            if(nFlashRet > 0) // flash ï¿½É¹ï¿½ - Flash successful
+            if(nFlashRet > 0) // Flash successful
             {
                 CString strText;
                 strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);
