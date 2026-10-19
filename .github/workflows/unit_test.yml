@@ -1,0 +1,30 @@
+name: Unit test
+
+# Push covers commits on a branch and the commit created when a pull request is merged.
+# pull_request covers the review. The closed type runs again after the merge.
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+concurrency:
+  group: unit-test-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Unit test
+    if: github.event_name != 'pull_request' || github.event.action != 'closed' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install GCC
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends build-essential python3
+
+      - name: Run unit tests
+        working-directory: Unit_Test
+        run: bash build_and_run.sh
