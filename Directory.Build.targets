@@ -1,0 +1,8 @@
+<Project>
+  <!-- GitHub runners do not ship the .NET Framework 4.5.2 targeting pack.
+       Use the reference assemblies restored by the MSBuild workflow when the
+       pack is absent. A local Visual Studio install keeps its own assemblies. -->
+  <PropertyGroup Condition="'$(TargetFrameworkVersion)' == 'v4.5.2' AND '$(Net452FallbackPath)' != '' AND !Exists('$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\mscorlib.dll')">
+    <FrameworkPathOverride>$(Net452FallbackPath)</FrameworkPathOverride>
+  </PropertyGroup>
+</Project>
