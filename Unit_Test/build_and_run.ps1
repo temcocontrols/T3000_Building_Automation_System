@@ -35,20 +35,10 @@ function Get-DefineValue([string]$File, [string]$Name) {
     return $match.Matches[0].Groups[1].Value
 }
 
-$Product = Join-Path $T3000 "T3000\ProductModel.h"
 $Struct = Join-Path $T3000 "ISP\Global_Struct.h"
 $GlobalCpp = Join-Path $T3000 "ISP\global_function.cpp"
 
 $names = @(
-    @{ File = $Product; Name = "PM_ESP32_T3_SERIES" },
-    @{ File = $Product; Name = "PM_TSTAT10" },
-    @{ File = $Product; Name = "PM_TSTAT8" },
-    @{ File = $Product; Name = "PM_TSTAT6" },
-    @{ File = $Product; Name = "PM_MINIPANEL" },
-    @{ File = $Product; Name = "PM_MINIPANEL_ARM" },
-    @{ File = $Product; Name = "STM32_CO2_NET" },
-    @{ File = $Product; Name = "STM32_PRESSURE_RS485" },
-    @{ File = $Product; Name = "STM32_PM25" },
     @{ File = $Struct; Name = "ISP_RESUME_BOOTLOADER_ALL" },
     @{ File = $Struct; Name = "ISP_RESUME_BOOTLOADER_LIMITED" },
     @{ File = $Struct; Name = "ISP_REG_PRODUCT_MODEL" },
@@ -76,7 +66,24 @@ $names = @(
 $header = New-Object System.Collections.Generic.List[string]
 $header.Add("#ifndef ISP_CONSTANTS_H")
 $header.Add("#define ISP_CONSTANTS_H")
-$header.Add("/* Generated from production headers. Do not edit. */")
+$header.Add("/* Product ids used by the ISP tool. ProductModel.h is not read. */")
+@(
+    "PM_TSTAT5B 1", "PM_TSTAT5A 2", "PM_TSTAT5B2 3", "PM_TSTAT5C 4", "PM_TSTAT6 6",
+    "PM_TSTAT7 7", "PM_TSTAT5i 8", "PM_TSTAT8 9", "PM_TSTAT10 10", "PM_TSTAT5D 12",
+    "PM_AirQuality 13", "PM_HUMTEMPSENSOR 14", "PM_TSTATRUNAR 15", "PM_TSTAT5E 16",
+    "PM_TSTAT5F 17", "PM_TSTAT5G 18", "PM_TSTAT5H 19", "PM_T38I13O 20", "PM_T3IOA 21",
+    "PM_T332AI 22", "PM_T38AI16O 23", "PM_ZIGBEE 24", "PM_FLEXDRIVER 25", "PM_T3PT10 26",
+    "PM_T3PERFORMANCE 27", "PM_T34AO 28", "PM_T36CT 29", "PM_SOLAR 30", "PM_FWMTRANSDUCER 31",
+    "PM_CO2_NET 32", "PM_CO2_RS485 33", "PM_CO2_NODE 34", "PM_MINIPANEL 35", "PM_PRESSURE 40",
+    "PM_PM5E 41", "PM_HUM_R 42", "PM_T322AI 43", "PM_T38AI8AO6DO 44", "PM_PRESSURE_SENSOR 45",
+    "PM_T3PT12 46", "PM_T322AIVG 47", "PM_T38IOVG 48", "PM_T3PTVG 49", "PM_CM5 50",
+    "PM_PM5E_ARM 51", "STM32_PM25 52", "PM_TSTAT9 59", "PM_PWMETER 73", "PM_MINIPANEL_ARM 74",
+    "PM_WEATHER_STATION 75", "PM_ESP32_T3_SERIES 88", "PM_TSTAT8_WIFI 91", "PM_TSTAT8_OCC 92",
+    "PM_TSTAT7_ARM 93", "PM_TSTAT8_220V 94", "PM_T36CTA 95", "PM_NC 100", "PWM_TRANSDUCER 104",
+    "PM_LightingController 120", "PM_BTU_METER 121", "STM32_CO2_NET 210", "STM32_CO2_RS485 211",
+    "STM32_HUM_NET 212", "STM32_HUM_RS485 213", "STM32_PRESSURE_NET 214",
+    "STM32_PRESSURE_RS485 215", "STM32_CO2_NODE 216"
+) | ForEach-Object { $header.Add("#define $_") }
 foreach ($item in $names) {
     $value = Get-DefineValue $item.File $item.Name
     $header.Add("#define $($item.Name) $value")
@@ -199,25 +206,11 @@ def extract_function(text, name):
         return text[line:end + 1]
 
 
-def product_defines(path):
-    lines = []
-    pattern = re.compile(
-        r"^\s*#define\s+([A-Za-z_][A-Za-z0-9_]*)\s+(0x[0-9A-Fa-f]+|\d+)\b"
-    )
-    for raw in open(path, encoding="utf-8", errors="replace"):
-        match = pattern.match(raw)
-        if match:
-            lines.append("#ifndef %s" % match.group(1))
-            lines.append("#define %s %s" % (match.group(1), match.group(2)))
-            lines.append("#endif")
-    return "\n".join(lines)
-
-
 def main():
-    source, products, dest = sys.argv[1], sys.argv[2], sys.argv[3]
+    source, dest = sys.argv[1], sys.argv[2]
     text = open(source, encoding="utf-8", errors="replace").read()
     bodies = "\n\n".join(extract_function(text, name) for name in FUNCTIONS)
-    open(dest, "w", encoding="utf-8", newline="\n").write(PREAMBLE + product_defines(products) + "\n\n" + bodies + WRAPPERS)
+    open(dest, "w", encoding="utf-8", newline="\n").write(PREAMBLE + "\n" + bodies + WRAPPERS)
 
 
 PREAMBLE = r'''#include <cstdarg>
@@ -366,7 +359,7 @@ extern "C" int isp_check_bootloader(int npid, int comport, unsigned reg_11, unsi
 if __name__ == "__main__":
     main()
 '@)
-& $Python $extractor $GlobalCpp (Join-Path $T3000 "T3000\ProductModel.h") (Join-Path $Build "isp_used_apis.cpp")
+& $Python $extractor $GlobalCpp (Join-Path $Build "isp_used_apis.cpp")
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $Gcc = Find-Gcc

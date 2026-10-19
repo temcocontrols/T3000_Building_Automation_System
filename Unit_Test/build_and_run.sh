@@ -17,27 +17,104 @@ fi
 define_value() {
   local file="$1"
   local name="$2"
-  local line
-  line="$(grep -E "^[[:space:]]*#define[[:space:]]+${name}[[:space:]]+" "$file" | head -n 1 || true)"
-  if [[ -z "$line" ]]; then
+  local value
+  # Keep only the number. Header comments must not become part of the macro.
+  value="$(python3 - "$file" "$name" <<'PY'
+import re
+import sys
+file_name, macro = sys.argv[1], sys.argv[2]
+text = open(file_name, "rb").read().decode("latin1")
+match = re.search(
+    r"(?m)^\s*#define\s+%s\s+(0x[0-9A-Fa-f]+|\d+)\b" % re.escape(macro),
+    text,
+)
+if not match:
+    sys.exit(1)
+sys.stdout.write(match.group(1))
+PY
+)" || {
     echo "Missing #define $name in $file" >&2
-    exit 1
-  fi
-  echo "$line" | sed -E "s/^[[:space:]]*#define[[:space:]]+${name}[[:space:]]+([^[:space:]]+).*/\1/"
+    return 1
+  }
+  printf '%s\n' "$value"
 }
 
-PRODUCT="$T3000/T3000/ProductModel.h"
 STRUCT="$T3000/ISP/Global_Struct.h"
 GLOBAL_CPP="$T3000/ISP/global_function.cpp"
 
 {
   echo "#ifndef ISP_CONSTANTS_H"
   echo "#define ISP_CONSTANTS_H"
-  echo "/* Generated from production headers. Do not edit. */"
-  for name in PM_ESP32_T3_SERIES PM_TSTAT10 PM_TSTAT8 PM_TSTAT6 PM_MINIPANEL PM_MINIPANEL_ARM \
-              STM32_CO2_NET STM32_PRESSURE_RS485 STM32_PM25; do
-    echo "#define $name $(define_value "$PRODUCT" "$name")"
-  done
+  echo "/* Product ids used by the ISP tool. ProductModel.h is not read. */"
+  cat <<'EOF'
+#define PM_TSTAT5B 1
+#define PM_TSTAT5A 2
+#define PM_TSTAT5B2 3
+#define PM_TSTAT5C 4
+#define PM_TSTAT6 6
+#define PM_TSTAT7 7
+#define PM_TSTAT5i 8
+#define PM_TSTAT8 9
+#define PM_TSTAT10 10
+#define PM_TSTAT5D 12
+#define PM_AirQuality 13
+#define PM_HUMTEMPSENSOR 14
+#define PM_TSTATRUNAR 15
+#define PM_TSTAT5E 16
+#define PM_TSTAT5F 17
+#define PM_TSTAT5G 18
+#define PM_TSTAT5H 19
+#define PM_T38I13O 20
+#define PM_T3IOA 21
+#define PM_T332AI 22
+#define PM_T38AI16O 23
+#define PM_ZIGBEE 24
+#define PM_FLEXDRIVER 25
+#define PM_T3PT10 26
+#define PM_T3PERFORMANCE 27
+#define PM_T34AO 28
+#define PM_T36CT 29
+#define PM_SOLAR 30
+#define PM_FWMTRANSDUCER 31
+#define PM_CO2_NET 32
+#define PM_CO2_RS485 33
+#define PM_CO2_NODE 34
+#define PM_MINIPANEL 35
+#define PM_PRESSURE 40
+#define PM_PM5E 41
+#define PM_HUM_R 42
+#define PM_T322AI 43
+#define PM_T38AI8AO6DO 44
+#define PM_PRESSURE_SENSOR 45
+#define PM_T3PT12 46
+#define PM_T322AIVG 47
+#define PM_T38IOVG 48
+#define PM_T3PTVG 49
+#define PM_CM5 50
+#define PM_PM5E_ARM 51
+#define STM32_PM25 52
+#define PM_TSTAT9 59
+#define PM_PWMETER 73
+#define PM_MINIPANEL_ARM 74
+#define PM_WEATHER_STATION 75
+#define PM_ESP32_T3_SERIES 88
+#define PM_TSTAT8_WIFI 91
+#define PM_TSTAT8_OCC 92
+#define PM_TSTAT7_ARM 93
+#define PM_TSTAT8_220V 94
+#define PM_T36CTA 95
+#define PM_NC 100
+#define PWM_TRANSDUCER 104
+#define PM_LightingController 120
+#define PM_BTU_METER 121
+#define STM32_CO2_NET 210
+#define STM32_CO2_RS485 211
+#define STM32_HUM_NET 212
+#define STM32_HUM_RS485 213
+#define STM32_PRESSURE_NET 214
+#define STM32_PRESSURE_RS485 215
+#define STM32_CO2_NODE 216
+EOF
   for name in \
     ISP_RESUME_BOOTLOADER_ALL ISP_RESUME_BOOTLOADER_LIMITED \
     ISP_REG_PRODUCT_MODEL ISP_REG_BOOT_REV_A ISP_REG_BOOT_REV_B \
@@ -48,7 +125,8 @@ GLOBAL_CPP="$T3000/ISP/global_function.cpp"
     ISP_STATUS_IN_PROGRESS_1F ISP_STATUS_IN_PROGRESS_40 \
     ISP_CMD_CLEAR_SAVED_UPDATE ISP_RESUME_PACKET_BYTES
   do
-    echo "#define $name $(define_value "$STRUCT" "$name")"
+    value="$(define_value "$STRUCT" "$name")" || exit 1
+    echo "#define $name $value"
   done
   if [[ -n "$BOOT" ]]; then
     echo "#define OTA_PACKET_SIZE $(define_value "$BOOT/main/app_config.h" OTA_PACKET_SIZE)"
@@ -104,7 +182,7 @@ open(dest, "w", encoding="utf-8", newline="\n").write(
 )
 PY
 
-python3 - "$GLOBAL_CPP" "$PRODUCT" "$BUILD/isp_used_apis.cpp" <<'PY'
+python3 - "$GLOBAL_CPP" "$BUILD/isp_used_apis.cpp" <<'PY'
 """Copy used ISP logic out of global_function.cpp for the host tests.
 
 Production sources are not modified. Dialog, socket, and Modbus I/O functions
@@ -159,25 +237,11 @@ def extract_function(text, name):
         return text[line:end + 1]
 
 
-def product_defines(path):
-    lines = []
-    pattern = re.compile(
-        r"^\s*#define\s+([A-Za-z_][A-Za-z0-9_]*)\s+(0x[0-9A-Fa-f]+|\d+)\b"
-    )
-    for raw in open(path, encoding="utf-8", errors="replace"):
-        match = pattern.match(raw)
-        if match:
-            lines.append("#ifndef %s" % match.group(1))
-            lines.append("#define %s %s" % (match.group(1), match.group(2)))
-            lines.append("#endif")
-    return "\n".join(lines)
-
-
 def main():
-    source, products, dest = sys.argv[1], sys.argv[2], sys.argv[3]
+    source, dest = sys.argv[1], sys.argv[2]
     text = open(source, encoding="utf-8", errors="replace").read()
     bodies = "\n\n".join(extract_function(text, name) for name in FUNCTIONS)
-    open(dest, "w", encoding="utf-8", newline="\n").write(PREAMBLE + product_defines(products) + "\n\n" + bodies + WRAPPERS)
+    open(dest, "w", encoding="utf-8", newline="\n").write(PREAMBLE + "\n" + bodies + WRAPPERS)
 
 
 PREAMBLE = r'''#include <cstdarg>
