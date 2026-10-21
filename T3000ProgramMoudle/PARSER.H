@@ -144,7 +144,7 @@ struct variable_table {
 //		 char var[12];
 //		 float fvar;
 //		 char op[10];
-//};//Fance ���ֽڸĴ�, Fance - byte size modification
+//};// Fance increased the byte size
 
 struct buf_str {
 	int v;

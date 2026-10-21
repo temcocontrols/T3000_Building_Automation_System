@@ -6,17 +6,14 @@ name: Testing the MSBuild
 on:
   push:
     branches: [ master ]
-    paths-ignore:
-      - '.github/**'
   pull_request:
     branches: [ master ]
-    paths-ignore:
-      - '.github/**'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    runs-on: windows-latest
+    # windows-2022 already has Visual Studio 2022. windows-latest is Visual Studio 2026.
+    runs-on: windows-2022
 
     steps:
       - name: checkout
@@ -27,6 +24,33 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      - name: Build Solution
+      - name: Cache .NET Framework 4.5.2 reference assemblies
+        id: net452
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\net452-ref
+          key: net452-refassemblies-1.0.3
+
+      - name: Restore .NET Framework 4.5.2 reference assemblies
+        if: steps.net452.outputs.cache-hit != 'true'
+        shell: pwsh
         run: |
-          msbuild "T3000 - VS2019.sln" /p:Platform=x86 /p:Configuration=Release /p:ProjectVersion=20230804
+          $out = Join-Path $env:RUNNER_TEMP "net452-ref"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          nuget install Microsoft.NETFramework.ReferenceAssemblies.net452 -Version 1.0.3 -OutputDirectory $out -NonInteractive
+
+      - name: Locate .NET Framework 4.5.2 reference assemblies
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:RUNNER_TEMP "net452-ref"
+          $dll = Get-ChildItem $out -Recurse -Filter mscorlib.dll |
+            Where-Object { $_.DirectoryName -match '\\v4\.5\.2$' } |
+            Select-Object -First 1
+          if (-not $dll) { throw "mscorlib.dll for .NET Framework 4.5.2 was not found." }
+          "Net452FallbackPath=$($dll.DirectoryName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Build Solution
+        shell: pwsh
+        run: |
+          if (-not $env:Net452FallbackPath) { throw "NET Framework 4.5.2 reference path was not set." }
+          msbuild "T3000 - VS2019.sln" /m /v:minimal /p:Platform=x86 /p:Configuration=Release /p:ProjectVersion=20230804 /p:Net452FallbackPath="$env:Net452FallbackPath"

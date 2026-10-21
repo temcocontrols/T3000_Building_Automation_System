@@ -1323,6 +1323,7 @@ BOOL TFTPServer::StartServer()
                         temp_mu_ret = read_multi_retry(255, read_reg, 0, 100, 3);
                         if (temp_mu_ret < 0)
                         {
+                            memset(read_reg, 0, sizeof(read_reg));
                             strTips_Ethernet = _T("Read bootloader version failed.");
                             OutPutsStatusInfo(strTips_Ethernet, FALSE);
                         }
@@ -1370,16 +1371,27 @@ BOOL TFTPServer::StartServer()
 				continue_flash_count = 0;
 				{
 					unsigned short status_reg = 0;
-					unsigned short meta[6] = { 0 };
-					unsigned short file_md5[4];
+					unsigned short meta[ISP_REG_RESUME_BLOCK_LEN] = { 0 };
+					unsigned short file_md5[ISP_REG_MD5_COUNT];
 					int status_ret = -1;
 					int meta_ret = -1;
 					bool md5_match = false;
 					bool do_fresh = true;
+					unsigned short boot_ver = (unsigned short)isp_max(read_reg[ISP_REG_BOOT_REV_A], read_reg[ISP_REG_BOOT_REV_B]);
+					bool resume_supported = isp_device_supports_resume(
+						read_reg[ISP_REG_PRODUCT_MODEL], boot_ver, read_reg[ISP_REG_MINI_TYPE]);
 
-					for (int k = 0; k < 4; k++)
+					for (int k = 0; k < ISP_REG_MD5_COUNT; k++)
 						file_md5[k] = (unsigned short)(firmware_md5[2 * k] * 256 + firmware_md5[2 * k + 1]);
 
+					if (!resume_supported)
+					{
+						CString strSkip;
+						strSkip.Format(_T("|Bootloader %u uses a full update."), boot_ver);
+						OutPutsStatusInfo(strSkip, FALSE);
+					}
+					else
+					{
 					/* Modbus TCP is the only way to learn the saved offset.
 					 * The early connect often fails because Wi-Fi is not up yet. */
 					SetCommunicationType(1);
@@ -1393,14 +1405,14 @@ BOOL TFTPServer::StartServer()
 								m_tcp_connect_results = 1;
 							Sleep(500);
 						}
-						status_ret = read_multi_retry(255, &status_reg, 16, 1, 2);
-						meta_ret = read_multi_retry(255, meta, 1991, 6, 2);
+						status_ret = read_multi_retry(255, &status_reg, ISP_REG_UPDATE_STATUS, 1, 2);
+						meta_ret = read_multi_retry(255, meta, ISP_REG_RESUME_COUNT, ISP_REG_RESUME_BLOCK_LEN, 2);
 					}
 
 					if (meta_ret > 0)
 					{
 						md5_match = true;
-						for (int k = 0; k < 4; k++)
+						for (int k = 0; k < ISP_REG_MD5_COUNT; k++)
 						{
 							if (meta[2 + k] != file_md5[k])
 							{
@@ -1411,7 +1423,7 @@ BOOL TFTPServer::StartServer()
 					}
 
 					int packets = (meta_ret > 0) ? (int)meta[0] : 0;
-					int saved_bytes = packets * 128;
+					int saved_bytes = packets * ISP_RESUME_PACKET_BYTES;
 					/* WiFi progress is a multiple of 512. An RS485 stop inside a
 					 * TFTP block is rewound to the previous 4 KB sector. */
 					int resume_bytes = saved_bytes;
@@ -1427,49 +1439,37 @@ BOOL TFTPServer::StartServer()
 						meta[2], meta[3], meta[4], meta[5]);
 					OutPutsStatusInfo(strCheck, FALSE);
 
-					bool can_resume = (status_ret > 0)
-						&& (status_reg == 0x1F || status_reg == 0x40)
-						&& md5_match
+					bool in_progress = (status_ret > 0)
+						&& (status_reg == ISP_STATUS_IN_PROGRESS_1F || status_reg == ISP_STATUS_IN_PROGRESS_40);
+					bool saved_update = in_progress
+						&& (meta_ret > 0)
 						&& resume_bytes > 0
 						&& resume_bytes < m_nDataBufLen;
 
 					if (status_ret <= 0 || meta_ret <= 0)
 					{
-						OutPutsStatusInfo(_T("|Could not read resume status on Modbus TCP port 502. Update stopped."), FALSE);
-						if (!auto_flash_mode)
-							AfxMessageBox(_T("Could not read the saved update from the device.\nCheck that TCP port 502 is open, then try again."), MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
-						nRet = 0;
-						goto StopServer;
+						OutPutsStatusInfo(_T("|Could not read registers 1991-1996. Starting from the beginning."), FALSE);
+						do_fresh = true;
 					}
-
-					if (can_resume)
+					else if (saved_update)
 					{
-						int answer = IDOK;
-						if (!auto_flash_mode)
+						continue_flash_count = (resume_bytes / 512) + 1;
+						do_fresh = false;
+						CString strResumePos;
+						if (md5_match)
 						{
-							CString ask;
-							ask.Format(
-								_T("Previous update was interrupted at %d bytes.\nMD5 matches this file.\n\nPress OK to resume.\nCancel to erase and start over."),
-								resume_bytes);
-							answer = AfxMessageBox(ask, MB_OKCANCEL | MB_SETFOREGROUND | MB_TOPMOST);
-						}
-						if (answer == IDOK)
-						{
-							continue_flash_count = (resume_bytes / 512) + 1;
-							do_fresh = false;
-							CString strResumePos;
 							strResumePos.Format(
 								_T("|MD5 match: Resuming from byte offset: %d (TFTP block %d)"),
 								resume_bytes, continue_flash_count);
-							OutPutsStatusInfo(strResumePos, FALSE);
-							Sleep(500);
 						}
-					}
-					else if ((status_reg == 0x1F || status_reg == 0x40) && !md5_match)
-					{
-						OutPutsStatusInfo(_T("|MD5 mismatch: different firmware, erasing saved update."), FALSE);
-						if (!auto_flash_mode)
-							AfxMessageBox(_T("A previous update is on the device, but its MD5 does not match this file.\nThe device will erase that update and start from the beginning."), MB_OK | MB_SETFOREGROUND | MB_TOPMOST);
+						else
+						{
+							strResumePos.Format(
+								_T("|MD5 mismatch: resuming saved update from byte offset: %d (TFTP block %d)"),
+								resume_bytes, continue_flash_count);
+						}
+						OutPutsStatusInfo(strResumePos, FALSE);
+						Sleep(500);
 					}
 
 					if (do_fresh)
@@ -1477,9 +1477,9 @@ BOOL TFTPServer::StartServer()
 						continue_flash_count = 0;
 						/* A partial update is still saved. Clear that MD5 and
 						 * resume data, reboot, then run this flash from the start. */
-						if (status_reg == 0x1F || status_reg == 0x40)
+						if (in_progress && meta_ret > 0)
 						{
-							mudbus_write_one(255, 16, 0x33, 1);
+							mudbus_write_one(255, ISP_REG_UPDATE_STATUS, ISP_CMD_CLEAR_SAVED_UPDATE, 1);
 							OutPutsStatusInfo(_T("|Waiting for erase."), FALSE);
 							/* Skip "Communication with device". That command sends
 							 * extra data while the device is erasing. Send DHCP only. */
@@ -1493,13 +1493,14 @@ BOOL TFTPServer::StartServer()
 							continue;
 						}
 
-						for (int y = 0; y < 4; y++)
-							mudbus_write_one(255, (unsigned short)(1993 + y), file_md5[y], 3);
+						for (int y = 0; y < ISP_REG_MD5_COUNT; y++)
+							mudbus_write_one(255, (unsigned short)(ISP_REG_MD5_START + y), file_md5[y], 3);
 
 						unsigned short fw_hi = (unsigned short)((m_nDataBufLen >> 16) & 0xFFFF);
 						unsigned short fw_lo = (unsigned short)(m_nDataBufLen & 0xFFFF);
-						mudbus_write_one(255, 1997, fw_hi, 3);
-						mudbus_write_one(255, 1998, fw_lo, 3);
+						mudbus_write_one(255, ISP_REG_FW_SIZE_HI, fw_hi, 3);
+						mudbus_write_one(255, ISP_REG_FW_SIZE_LO, fw_lo, 3);
+					}
 					}
 				}
 
@@ -2168,6 +2169,7 @@ void TFTPServer::FlashByEthernet()
 			temp_mu_ret = read_multi_retry(255, read_reg, 0, 100, 3);
 			if (temp_mu_ret < 0)
 			{
+				memset(read_reg, 0, sizeof(read_reg));
 				strTips_Ethernet = _T("Read bootloader version failed.");
 				OutPutsStatusInfo(strTips_Ethernet, FALSE);
 			}

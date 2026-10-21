@@ -775,7 +775,7 @@ void CISPDlg::ShowProductNameFromIni()
 
     CString nsection;
     n_component_count = GetPrivateProfileInt(_T("ComponentType"), _T("Count"), 0,  _T("Z:\\Serial_Records\\ProductMode.ini"));
-    GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("�빴ѡ���������?"));
+    GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("请勾选包含的组件"));
 
     CString AllSupportProduct_Sensor;
     GetPrivateProfileStringW(_T("ComponentType"), _T("SupportProduct"), _T(""), AllSupportProduct_Sensor.GetBuffer(MAX_PATH * 10), MAX_PATH * 10, _T("Z:\\Serial_Records\\ProductMode.ini"));
@@ -792,7 +792,7 @@ void CISPDlg::ShowProductNameFromIni()
         support_sensor_id.push_back(temp_int);
     }
 
-    GetDlgItem(IDC_CHECK_NO_ITEM)->SetWindowTextW(_T("0.NULL �޶���ģ��"));
+    GetDlgItem(IDC_CHECK_NO_ITEM)->SetWindowTextW(_T("0.NULL 无额外模组"));
     // Part 1: 16 modules in the first register.
     for (int i = 0; i < 16; i++)
     {
@@ -3248,14 +3248,14 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         SetCommunicationType(0);
         if (open_com(g_comport) == false)
         {
-            sn_mac_info.Format(_T("�򿪴���%d ʧ��"), g_comport);
+            sn_mac_info.Format(_T("打开串口%d 失败"), g_comport);
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("�򿪴���%d �ɹ�"), g_comport);
+            sn_mac_info.Format(_T("打开串口%d 成功"), g_comport);
             Sleep(1000);
         }
             Change_BaudRate(g_mac_baudrate);
@@ -3272,12 +3272,12 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         }
         if (nret > 0)
         {
-            sn_mac_info.Format(_T("����IP��%s,�˿�:%d �ɹ�"), g_mac_ip, g_mac_port);
+            sn_mac_info.Format(_T("连接IP：%s,端口:%d 成功"), g_mac_ip, g_mac_port);
             Sleep(1000);
         }
         else
         {
-            sn_mac_info.Format(_T("����IP��%s,�˿�:%d ʧ��"), g_mac_ip, g_mac_port);
+            sn_mac_info.Format(_T("连接IP：%s,端口:%d 失败"), g_mac_ip, g_mac_port);
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
@@ -3288,14 +3288,14 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     temp_mu_ret = read_multi_tap(255, temp_read_reg, 0, 10);
     if (temp_mu_ret < 0)
     {
-        sn_mac_info.Format(_T("��ȡ�豸������Ϣʧ��"));
+        sn_mac_info.Format(_T("读取设备基本信息失败"));
         Sleep(1000);
         ::PostMessage(m_parent->m_hWnd,  WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
     else
     {
-        sn_mac_info.Format(_T("��ȡ�豸������Ϣ�ɹ�"));
+        sn_mac_info.Format(_T("读取设备基本信息成功"));
         Sleep(1000);
     }
     int n_ret_id = 0;
@@ -3304,38 +3304,38 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     n_ret = Write_One_Retry(temp_read_reg[6], 16, 142);
     //if ((n_ret < 0) && (b_com_or_ip == 0)  &&  (n_ignore_15_142_command == 0))
     //{
-    //    sn_mac_info.Format(_T("Initialize write command failed"));
+    //    sn_mac_info.Format(_T("初始化写入命令失败"));
     //    ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
     //    return 1;
     //}
     //else
     //{
-        sn_mac_info.Format(_T("��ʼ��д������ɹ�?"));
+        sn_mac_info.Format(_T("初始化写入命令成功"));
         Sleep(1000);
 
         for (int i = 0; i < n_mac_reboot_time; i++)
         {
-            sn_mac_info.Format(_T("�ȴ��豸���� (%d)"), n_mac_reboot_time - i);
+            sn_mac_info.Format(_T("等待设备重启 (%d)"), n_mac_reboot_time - i);
             Sleep(1000);
         }
 
         n_ret = Write_One_Retry(temp_read_reg[6], 16, 1,10);
         if ((n_ret < 0) && (b_com_or_ip == 0))
         {
-            sn_mac_info.Format(_T("д������ʹ�豸��ת��Ӧ�ô���ʧ��"));
+            sn_mac_info.Format(_T("写入命令使设备跳转至应用代码失败"));
             Sleep(2000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("д������ʹ�豸��ת��Ӧ�ô���ɹ�?"));
+            sn_mac_info.Format(_T("写入命令使设备跳转至应用代码成功"));
             Sleep(2000);
         }
 
         for (int i = 0; i < n_mac_reboot_time; i++)
         {
-            sn_mac_info.Format(_T("�ȴ��豸��ת��Ӧ�ô��� (%d)"), n_mac_reboot_time - i);
+            sn_mac_info.Format(_T("等待设备跳转至应用代码 (%d)"), n_mac_reboot_time - i);
             Sleep(1000);
         }
 
@@ -3360,7 +3360,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         ready_towrite_sn = temp_serial_number + 1;
         monitor_bado.m_pRecordset->MoveNext();
     }
-    sn_mac_info.Format(_T("��ȡ�������к�: %u"), ready_towrite_sn);
+    sn_mac_info.Format(_T("获取到的序列号: %u"), ready_towrite_sn);
 
     CTime Time_Click = CTime::GetCurrentTime();
     CString temp_g_write_hardware_version;
@@ -3386,28 +3386,28 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
     if ((n_ret_low < 0) || (n_ret_high < 0))
     {
-        sn_mac_info.Format(_T("д�����к�ʧ��"));
+        sn_mac_info.Format(_T("写入序列号失败"));
         Sleep(1000);
         ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
     else
     {
-        sn_mac_info.Format(_T("д�����кųɹ�:%u"), ready_towrite_sn);
+        sn_mac_info.Format(_T("写入序列号成功:%u"), ready_towrite_sn);
         Sleep(1000);
     }
 
     n_ret_id = Write_One_Retry(temp_read_reg[6], 6, temp_read_reg[6],6);
     if (n_ret_id < 0)
     {
-        sn_mac_info.Format(_T("д��Modbus IDʧ��"));
+        sn_mac_info.Format(_T("写入Modbus ID失败"));
         Sleep(1000);
         ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
     else
     {
-        sn_mac_info.Format(_T("д��Modbus ID�ɹ�:%d"), temp_read_reg[6]);
+        sn_mac_info.Format(_T("写入Modbus ID成功:%d"), temp_read_reg[6]);
         Sleep(1000);
     }
 
@@ -3417,14 +3417,14 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         int n_ret_pid = Write_One_Retry(temp_read_reg[6], 7, g_sn_product_id,6);
         if (n_ret_id < 0)
         {
-            sn_mac_info.Format(_T("д���ƷID��%dʧ��"), g_sn_product_id);
+            sn_mac_info.Format(_T("写入产品ID：%d失败"), g_sn_product_id);
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("д���ƷID��%d�ɹ�"), g_sn_product_id);
+            sn_mac_info.Format(_T("写入产品ID：%d成功"), g_sn_product_id);
             Sleep(1000);
         }
     }
@@ -3434,14 +3434,14 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         int n_ret_pid = Write_One_Retry(temp_read_reg[6], 7, temp_read_reg[7],6);
         if (n_ret_id < 0)
         {
-            sn_mac_info.Format(_T("д���ƷID��%dʧ��"), temp_read_reg[7]);
+            sn_mac_info.Format(_T("写入产品ID：%d失败"), temp_read_reg[7]);
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("д���ƷID��%d�ɹ�"), temp_read_reg[7]);
+            sn_mac_info.Format(_T("写入产品ID：%d成功"), temp_read_reg[7]);
             Sleep(1000);
         }
     }
@@ -3449,14 +3449,14 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
     int n_ret_harware = Write_One_Retry(temp_read_reg[6], 8, g_write_hardware_version,6);
     if (n_ret_id < 0)
     {
-        sn_mac_info.Format(_T("д��Ӳ���汾��ʧ��"));
+        sn_mac_info.Format(_T("写入硬件版本号失败"));
         Sleep(1000);
         ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
         return 1;
     }
     else
     {
-        sn_mac_info.Format(_T("д��Ӳ���汾�ųɹ�:%d"), g_write_hardware_version);
+        sn_mac_info.Format(_T("写入硬件版本号成功:%d"), g_write_hardware_version);
         Sleep(1000);
     }
 
@@ -3465,43 +3465,43 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         // First, confirm whether to support writing sensor flags
         unsigned short sensor_check_flag = 0;
         sensor_check_flag = read_one(temp_read_reg[6], FUNCTION_CHECK_SUM_REG, 6);
-        sn_mac_info.Format(_T("����д�����ģ��У�����?"));
+        sn_mac_info.Format(_T("正在写入组合模块校验信息"));
         Sleep(1000);
         int n_ret_sensor_checksum = Write_One_Retry(temp_read_reg[6], FUNCTION_CHECK_SUM_REG, FUNCTION_CHECK_SUM_VALUE, 6);
         if (n_ret_sensor_checksum < 0)
         {
-            sn_mac_info.Format(_T("д�����ģ��У�����? ʧ��"));
+            sn_mac_info.Format(_T("写入组合模块校验信息 失败"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
-        sn_mac_info.Format(_T("����д����豸��ģ�����?"));
+        sn_mac_info.Format(_T("正在写入此设备的模块信息"));
         Sleep(1000);
         int n_ret_sensor1 = Write_One_Retry(temp_read_reg[6], FUNCTION_SENSOR1_REG, sensor_value1, 6);
         if (n_ret_sensor1 < 0)
         {
-            sn_mac_info.Format(_T("д�����ģ�����? ��1���� ʧ��"));
+            sn_mac_info.Format(_T("写入组合模块信息 第1部分 失败"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("д�����ģ�����? ��1���� �ɹ�"));
+            sn_mac_info.Format(_T("写入组合模块信息 第1部分 成功"));
             Sleep(1000);
         }
 
         int n_ret_sensor2 = Write_One_Retry(temp_read_reg[6], FUNCTION_SENSOR2_REG, sensor_value2, 6);
         if (n_ret_sensor2 < 0)
         {
-            sn_mac_info.Format(_T("д�����ģ�����? ��2���� ʧ��"));
+            sn_mac_info.Format(_T("写入组合模块信息 第2部分 失败"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("д�����ģ�����? ��2���� �ɹ�"));
+            sn_mac_info.Format(_T("写入组合模块信息 第2部分 成功"));
             Sleep(1000);
         }
     }
@@ -3575,21 +3575,21 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
             temp_pid_type_name, ready_towrite_sn, temp_time_format);
         monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
 
-        sn_mac_info.Format(_T("׼��д��MAC��ַ:%x-%x-%x-%x-%x-%x"), g_write_hardware_version,
+        sn_mac_info.Format(_T("准备写入MAC地址:%x-%x-%x-%x-%x-%x"), g_write_hardware_version,
             ready_towrite_mac[1], ready_towrite_mac[2], ready_towrite_mac[3], ready_towrite_mac[4], ready_towrite_mac[5]);
         Sleep(1000);
 
         int n_ret_harware = Write_One_Retry(temp_read_reg[6], 93, 1,6);
         if (n_ret_id < 0)
         {
-            sn_mac_info.Format(_T("д��MACʹ������ʧ��"));
+            sn_mac_info.Format(_T("写入MAC使能命令失败"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("д��MACʹ������ɹ�?"));
+            sn_mac_info.Format(_T("写入MAC使能命令成功"));
             Sleep(1000);
         }
 
@@ -3614,14 +3614,14 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
         if (n_mac_ret < 0)
         {
-            sn_mac_info.Format(_T("д��MAC��ַʧ��"));
+            sn_mac_info.Format(_T("写入MAC地址失败"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("д��MAC��ַ�ɹ�"));
+            sn_mac_info.Format(_T("写入MAC地址成功"));
             Sleep(1000);
         }
     }
@@ -3695,7 +3695,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
             temp_pid_type_name, ready_towrite_sn, temp_time_format);
         monitor_bado.m_pConnection->Execute(strSql.GetString(), NULL, adCmdText);
 
-        sn_mac_info.Format(_T("׼��д��WIFI MAC��ַ:%x-%x-%x-%x-%x-%x"), g_write_hardware_version,
+        sn_mac_info.Format(_T("准备写入WIFI MAC地址:%x-%x-%x-%x-%x-%x"), g_write_hardware_version,
             ready_towrite_mac[1], ready_towrite_mac[2], ready_towrite_mac[3], ready_towrite_mac[4], ready_towrite_mac[5]);
         Sleep(1000);
 
@@ -3707,14 +3707,14 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         int n_ret_wifi_enable = Write_One_Retry(temp_read_reg[6], 2008, 0, 6);
         if (n_ret_wifi_enable < 0)
         {
-            sn_mac_info.Format(_T("д��ʹ��WIFI MAC��ַ��־λʧ��"));
+            sn_mac_info.Format(_T("写入使能WIFI MAC地址标志位失败"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("д��ʹ��WIFI MAC��ַ��־λ �ɹ�"));
+            sn_mac_info.Format(_T("写入使能WIFI MAC地址标志位 成功"));
             Sleep(1000);
         }
 
@@ -3732,18 +3732,18 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 
         if (n_mac_ret < 0)
         {
-            sn_mac_info.Format(_T("д��WIFI MAC��ַʧ��"));
+            sn_mac_info.Format(_T("写入WIFI MAC地址失败"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
         }
         else
         {
-            sn_mac_info.Format(_T("д��WIFI MAC��ַ�ɹ�"));
+            sn_mac_info.Format(_T("写入WIFI MAC地址成功"));
             Sleep(1000);
         }
 
-        sn_mac_info.Format(_T("У��WIFI MAC��ַ"));
+        sn_mac_info.Format(_T("校验WIFI MAC地址"));
         Sleep(3000);
         unsigned short temp_read_mac[6] = { 0 };
         temp_mu_ret = read_multi_tap(temp_read_reg[6], temp_read_mac, 2070, 6);
@@ -3751,7 +3751,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
         int ret_com = memcmp(write_value, temp_read_mac, 6);
         if (ret_com != 0)
         {
-            sn_mac_info.Format(_T("У��WIFI MAC��ַ  ʧ��"));
+            sn_mac_info.Format(_T("校验WIFI MAC地址  失败"));
             Sleep(1000);
             ::PostMessage(m_parent->m_hWnd, WM_CLOSE_THREAD_MESSAGE, NULL, NULL);
             return 1;
@@ -3760,7 +3760,7 @@ DWORD WINAPI  CISPDlg::SN_MAC_Threadfun(LPVOID lpVoid)
 #endif
     }
 
-    sn_mac_info.Format(_T("���в����ѳɹ���ɣ�?"));
+    sn_mac_info.Format(_T("所有操作已成功完成！"));
     Sleep(1000);
     monitor_bado.CloseRecordset();
     monitor_bado.CloseConn();
@@ -3830,7 +3830,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
 
     if (g_write_hardware_version == 0)
     {
-        m_static_info.SetWindowTextW(_T("Ӳ����Ʒ�Ų���Ϊ��"));
+        m_static_info.SetWindowTextW(_T("硬件产品号不能为零"));
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(true);
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(true);
         return;
@@ -3851,7 +3851,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
 
     if (find_product_name == false)
     {
-        m_static_info.SetWindowTextW(_T("��Ʒ��δ����"));
+        m_static_info.SetWindowTextW(_T("产品号未定义"));
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(true);
         ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(true);
         return;
@@ -3920,7 +3920,7 @@ void CISPDlg::OnBnClickedButtonFlashSn()
     {
         if (((CButton *)GetDlgItem(IDC_CHECK_NO_ITEM))->GetCheck()  == false)
         {
-            m_static_info.SetWindowTextW(_T("��ȷ���Ҳഫ��������û�У��빴ѡ ������"));
+            m_static_info.SetWindowTextW(_T("请确认右侧传感器，若没有，请勾选 第零项"));
             ((CButton *)GetDlgItem(IDC_CHECK_FLASH_MAC))->EnableWindow(true);
             ((CButton *)GetDlgItem(IDC_CHECK_FLASH_WIFI_MAC))->EnableWindow(true);
             return;
@@ -3981,9 +3981,9 @@ void CISPDlg::Enable_Sensor_Window(bool nenable)
         ((CButton *)GetDlgItem(IDC_CHECK_ITEM17 + i))->EnableWindow(nenable);
     }
     if(nenable)
-        GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("���빴ѡ���������?"));
+        GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("必须勾选包含的组件"));
     else
-        GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("���蹴ѡ���������?"));
+        GetDlgItem(IDC_STATIC_COM_NAME)->SetWindowTextW(_T("无需勾选包含的组件"));
 }
 
 void CAboutDlg::OnBnClickedOk()

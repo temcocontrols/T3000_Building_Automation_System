@@ -68,11 +68,11 @@ S16_T isdelimit(S8_T c)
 #if 1
 
 /*
-1. float��unsigned long������ͬ�����ݽṹ����
+1. float and unsigned long share the same data structure
 */
 
 /*
-��������ת��Ϊ4���ֽ����ݷ���byte
+Convert the float to 4 bytes and store them in byte
 */
 
 
@@ -120,7 +120,7 @@ void Float_to_Byte(float f, unsigned char *mybyte,  unsigned char ntype)
 
 
 /*
-��4���ֽ�byte[4]ת��Ϊ�����������f��
+Convert the 4 bytes in byte[4] to a float and store it in f
 */
 void Byte_to_Float(float *f, S32_T val_ptr,unsigned char ntype)
 {

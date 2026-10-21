@@ -950,6 +950,7 @@ build/ALL_BUILD.vcxproj.filters
 build/ALL_BUILD.vcxproj
 
 /build/*/*
+/Unit_Test/build/
 /.vs
 /T3000/Database
 T3000Controls/project.lock.json

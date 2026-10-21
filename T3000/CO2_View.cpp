@@ -657,7 +657,6 @@ void CCO2_View::C02_SHOW_TEMP()
     m_grid_input.put_TextMatrix(1,2,strUnit);
 
 //      if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//Internal
-//      if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//�ڲ�
 //      {
 //          TempValue.Format(_T("%0.1f"),f_internal_temp);
 //      }
@@ -751,7 +750,7 @@ void CCO2_View::Node_SHOW_TEMP()
     CString  TempValue,StrAM;
     m_grid_input.put_TextMatrix(1,2,strUnit);
 
-    if(product_register_value[124] == 0)//Internal //�ڲ�
+    if(product_register_value[124] == 0)// Internal
     {
         TempValue.Format(_T("%0.1f"),f_internal_temp);
     }
@@ -894,11 +893,11 @@ void CCO2_View::Get_CO2_Temperature_unit(CString &strTemp)
         //Chinese.
         if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F]==0)//121
         {
-            strTemp=_T("��");
+            strTemp=_T("℃");
         }
         else
         {
-            strTemp=_T("�H");
+            strTemp=_T("℉");
         }
     }
 }
@@ -1053,7 +1052,7 @@ void CCO2_View::OnCbnSelchangeCo2TempUnit()
         }
         else
         {
-            if (Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],m_nCurRow))//��ǰ��1   ѡ����0
+            if (Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],m_nCurRow))// Current value is 1; the selection is 0
             {
                 m_write_value=product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL]-m_value;
             }
@@ -1195,13 +1194,11 @@ HBRUSH CCO2_View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
     
     for (int i=0;i<(int)Change_Color_ID.size();i++)
     {
-        if(/*nCtlColor==CTLCOLOR_EDIT &&*/pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//ע���˴��ģ�pWnd->��������ûЧ��
+        if(/*nCtlColor==CTLCOLOR_EDIT &&*/pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))// The (pWnd->) here matters; otherwise it has no effect
         {
             pDC->SetTextColor(RGB(0,0,0));
             pDC->SetBkColor(RGB(255,0,0));	//Set text background color
-            //�����ı�����ɫ
             pDC->SetBkMode(TRANSPARENT);	//Set background transparent
-            //���ñ���͸��
             hbr = (HBRUSH)m_brush;
         }
 
@@ -1398,7 +1395,7 @@ bool CheckString( CString str )
 {
 
     // Get string length
-    int nCount = str.GetLength(); // �����ַ�����
+    int nCount = str.GetLength();
     for ( int i = 0; i < nCount; i ++ )
     {
         if(i==0)
@@ -1409,10 +1406,10 @@ bool CheckString( CString str )
 
 
         // If it's not a numeric flag bit
-        if ( 0 == isdigit( str.GetAt(i) ) ) // �������־��ñ�־λ
+        if ( 0 == isdigit( str.GetAt(i) ) )
         {
             return FALSE;
-            //break;// �˳�, exit loop
+            //break;// Exit the loop
         }
     }
 
@@ -2254,45 +2251,37 @@ void CCO2_View::ClickMsflexgridInput()
     m_grid_input.SetFocus();
     long lRow,lCol;
     //Get the clicked row number
-    lRow = m_grid_input.get_RowSel();//��ȡ�������к�
+    lRow = m_grid_input.get_RowSel();
     //Get the clicked column number
-    lCol = m_grid_input.get_ColSel(); //��ȡ�������к�
+    lCol = m_grid_input.get_ColSel();
     //If row number is greater than total rows, it's invalid
-    if(lRow>m_grid_input.get_Rows()) //�������������������кţ�����������Ч��
+    if(lRow>m_grid_input.get_Rows())
         return;
     //If clicking on header row, also invalid
-    if(lRow == 0) //�������������У�Ҳ��Ч
+    if(lRow == 0)
         return;
     CRect rect;
     //Get the window rectangle of the table control
-    m_grid_input.GetWindowRect(rect); //��ȡ�����ؼ��Ĵ��ھ���
+    m_grid_input.GetWindowRect(rect);
     ScreenToClient(rect);
     //Convert to client rectangle
-    //ת��Ϊ�ͻ�������
     // MSFlexGrid control coordinates use "twips" units
-    // MSFlexGrid�ؼ��ĺ����ĳ��ȵ�λ��"��(twips)"��
     //Need to convert to pixels, 1440 twips = 1 inch
-    //��Ҫ����ת��Ϊ���أ�1440��= 1Ӣ��
     CDC* pDC =GetDC();
     //Get device context for coordinate conversion
-    //�������ص���羵�ת������
     int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
     int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
     //Calculate upper left corner coordinates of selected cell (in pixels)
-    //����ѡ�и������Ͻǵ�����(����Ϊ��λ)
     long y = m_grid_input.get_RowPos(lRow)/nTwipsPerDotY;
     long x = m_grid_input.get_ColPos(lCol)/nTwipsPerDotX;
     //Calculate size of selected cell (in pixels). Adding 1 is found in actual debugging to have better effect
-    //����ѡ�и��ĳߴ�(����Ϊ��λ)����1��ʵ�ʵ����У����ּ�1��Ч������
     long width = m_grid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
     long height = m_grid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
     //Form rectangular area where selected cell is located
-    //�γ�ѡ�и����ڵľ�������
     CRect rc(x,y,x+width,y+height);
     //Convert to coordinates relative to dialog
-    //ת�������ԶԻ���������
     rc.OffsetRect(rect.left+1,rect.top+1);
-    //��ȡѡ�и����ı���Ϣ
+    // Get the text of the selected cell
     CString strValue = m_grid_input.get_TextMatrix(lRow,lCol);
     m_nCurRow=lRow;
     m_nCurCol=lCol;
@@ -2312,7 +2301,7 @@ void CCO2_View::ClickMsflexgridInput()
         m_co2_temp_unit.AddString(strTemp2);
         m_co2_temp_unit.ShowWindow(SW_SHOW);
 
-        m_co2_temp_unit.MoveWindow(rc);			//�ƶ���ѡ�и���λ�ã�����
+        m_co2_temp_unit.MoveWindow(rc);			// Move onto the selected cell and cover it
         m_co2_temp_unit.BringWindowToTop();
         m_co2_temp_unit.SelectString(-1,strValue);
         m_co2_temp_unit.SetFocus();
@@ -2346,7 +2335,7 @@ void CCO2_View::ClickMsflexgridInput()
         m_co2_temp_unit.AddString(_T("Manual"));
         m_co2_temp_unit.ShowWindow(SW_SHOW);
 
-        m_co2_temp_unit.MoveWindow(rc);			//�ƶ���ѡ�и���λ�ã�����
+        m_co2_temp_unit.MoveWindow(rc);			// Move onto the selected cell and cover it
         m_co2_temp_unit.BringWindowToTop();
         m_co2_temp_unit.SelectString(-1,strValue);
         m_co2_temp_unit.SetFocus();
@@ -2361,13 +2350,13 @@ void CCO2_View::ClickMsflexgridInput()
             m_downButton.ShowWindow(SW_HIDE);
             m_inValueEdit.ShowWindow(SW_SHOW);
             //Move control to selected cell position
-            m_inValueEdit.MoveWindow(rc); //�ƶ���ѡ�и���λ�ã�����
+            m_inValueEdit.MoveWindow(rc);
             m_inValueEdit.ShowWindow(SW_SHOW);
 
             m_inValueEdit.BringWindowToTop();
             //m_RangCombox.SelectString(-1,strValue);
             m_inValueEdit.SetWindowText(strValue);
-            m_inValueEdit.SetFocus(); //��ȡ����
+            m_inValueEdit.SetFocus(); // Take focus
         }
 
 
@@ -2403,7 +2392,6 @@ void CCO2_View::OnEnKillfocusEditValueGrid()
         int RegAdd=0;
         unsigned short m_value=(unsigned short)(_wtof(TempValue)*10);
         //if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//Internal
-        //if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//�ڲ�
         //{
         //	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAdd_IN,m_value,
         //		product_register_value[RegAdd_IN],this->m_hWnd,IDC_EDIT_VALUE_GRID,_T("Calibrate Value"));
@@ -2423,7 +2411,6 @@ void CCO2_View::OnEnKillfocusEditValueGrid()
         else
         {
 //             if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//Internal
-//             if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//�ڲ�
 //             {
 //                 RegAdd=RegAdd_IN;
 //             }
@@ -2481,7 +2468,7 @@ void CCO2_View::OnLButtonDown(CPoint point)
     int RegAdd_IN,RegAdd_Ex;
     CRect lRect;
      //Get button control window rectangle
-    m_downButton.GetWindowRect(lRect); //��ȡ�����ؼ��Ĵ��ھ���
+    m_downButton.GetWindowRect(lRect);
     if((point.x>=lRect.left && point.x<=lRect.right) && (point.y>=lRect.top && point.y<=lRect.bottom))
     {
         if (m_nCurRow==1)
@@ -2502,7 +2489,7 @@ void CCO2_View::OnLButtonDown(CPoint point)
             }
             CString  TempValue;
             m_value=product_register_value[RegAdd_IN]-1;
-            if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//�ڲ�
+            if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)// Internal
             {
                 m_value=product_register_value[RegAdd_IN];
                 m_address=RegAdd_IN;
@@ -2546,7 +2533,7 @@ void CCO2_View::OnLButtonDown(CPoint point)
             }
             CString  TempValue;
             m_value=product_register_value[RegAdd_IN]-1;
-            if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//�ڲ�
+            if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)// Internal
             {
                 m_value=product_register_value[RegAdd_IN];
                 m_address=RegAdd_IN;
@@ -2607,7 +2594,7 @@ void CCO2_View::OnBnClickedUpbutton()
         CString  TempValue;
         m_inValueEdit.GetWindowTextW(TempValue);
         unsigned short m_value=product_register_value[RegAdd_IN]+1;
-        if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//�ڲ�
+        if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)// Internal
         {
             /*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAdd_IN,m_value,
             product_register_value[RegAdd_IN],this->m_hWnd,IDC_DOWNBUTTON,_T("Calibrate Value"));*/
@@ -2772,8 +2759,7 @@ void CCO2_View::OnCbnSelchangeCo2Baudratecombo()
 		RegAddress = 15;
 	}
    temp_write_ret = write_one(g_tstat_id, RegAddress, m_co2_baudRateCombox.GetCurSel());
-   //Write timeout error, device may be offline or communication failed, return directly.
-   if(temp_write_ret < 0)	//��ʱ���ж������⣬�豸���Լ����в������ڻأ����»ز�����.
+   if(temp_write_ret < 0)	// Skip this check for now: the device switches baud before it replies, so the reply never comes back.
    {
 	   MessageBox(_T("Write timeout."));
 	   return;
@@ -3475,7 +3461,7 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
                       }
 
 
-                      if(product_register_value[124] == 0)//�ڲ�
+                      if(product_register_value[124] == 0)// Internal
                       {
                          RegAddress = RegAddress_INT;
                       }
@@ -3887,7 +3873,7 @@ void CCO2_View::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
     lCol = lvinfo.iSubItem;
 
 
-    if(lRow>m_input_list.GetItemCount()) //�������������������кţ�����������Ч��
+    if(lRow>m_input_list.GetItemCount()) // A click past the last row is invalid
         return;
     if(lRow<0)
         return;
@@ -4013,7 +3999,7 @@ void CCO2_View::OnNMClickList_Output(NMHDR *pNMHDR, LRESULT *pResult){
 //     lRow = lvinfo.iItem;
 //     lCol = lvinfo.iSubItem;
 //
-//     if(lRow>m_co2_external_sensor_list.GetItemCount()) //�������������������кţ�����������Ч��
+//     if(lRow>m_co2_external_sensor_list.GetItemCount()) // A click past the last row is invalid
 //         return;
 //     if(lRow<0)
 //         return;
@@ -4139,7 +4125,7 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
             CString  TempValue,StrAM;
 
 
-            if(product_register_value[124] == 0)//�ڲ�
+            if(product_register_value[124] == 0)// Internal
             {
                 TempValue.Format(_T("%0.1f"),f_internal_temp);
             }
