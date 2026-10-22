@@ -893,11 +893,11 @@ void CCO2_View::Get_CO2_Temperature_unit(CString &strTemp)
         //Chinese.
         if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F]==0)//121
         {
-            strTemp=_T("℃");
+            strTemp=_T("%cC");
         }
         else
         {
-            strTemp=_T("℉");
+            strTemp=_T("%cF");
         }
     }
 }
