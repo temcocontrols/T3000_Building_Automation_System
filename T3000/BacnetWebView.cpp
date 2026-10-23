@@ -35,7 +35,7 @@ extern "C" {
 }
 using namespace Microsoft::WRL;
 size_t thread_local BacnetWebViewAppWindow::s_appInstances = 0;
-char* base64_decode(char const* base64Str, char* debase64Str, int encodeStrLen);
+int base64_decode(char const* base64Str, char* debase64Str, int encodeStrLen, int decodeStrLen);
 extern int Read_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex);
 extern int Write_Webview_Data_Special(int panelid, UINT nserialnumber, int nscreenindex, int element_count);
 
@@ -3654,7 +3654,10 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 	{
 		const std::string filename = json.get("filename", Json::nullValue).asString();
 		int file_length = json.get("fileLength", Json::nullValue).asInt();
-		const std::string file_data = Json::writeString(builder, json["fileData"]);
+		// Do NOT use Json::writeString() here: it re-serialises the value with surrounding
+		// quotes, so the payload keeps a trailing '"'. That made base64_decode() process one
+		// extra quartet and write past the end of the decoded buffer (HEAP CORRUPTION).
+		const std::string file_data = json["fileData"].asString();
 		char des_folder[512];
 		memset(des_folder, 0, 512);
 
@@ -3677,7 +3680,6 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 			CreateDirectory(web_image_folder, &attrib);
 		}
 
-		CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		CString cs_filename = filename.c_str();
 
 		CStringArray temp_array;
@@ -3737,23 +3739,44 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 		string newfilename = des_file_name;
 
 		WideCharToMultiByte(CP_ACP, 0, temp_image_path.GetBuffer(), -1, des_folder, 512, NULL, NULL);
-		std::ofstream file(des_folder, std::ios::binary);
 
-		char* ret_result = (char*)malloc(sizeof(char) * file_length);	//申请返回字符串空间
-		memset(ret_result, 0, sizeof(char) * file_length);		//初始化字符串空间
-		const char* temp_ret = strstr((char const*)file_data.c_str(), "base64,"); //去除前面不用的部分;
-		if (temp_ret == NULL)
+		const size_t base64_pos = file_data.find("base64,"); //去除前面不用的部分;
+		if (file_length <= 0 || base64_pos == std::string::npos)
+		{
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Invalid image data received from the web page."));
 			break;
-		const std::string temp_image_data = strstr((char const*)file_data.c_str(), "base64,") + 7; //去除前面不用的部分;
-		base64_decode((char const*)temp_image_data.c_str(), ret_result, (int)strlen(temp_image_data.c_str()));
-		file.write(ret_result, file_length);
+		}
+		const std::string temp_image_data = file_data.substr(base64_pos + 7); //去除前面不用的部分;
+
+		std::ofstream file(des_folder, std::ios::binary);
+		if (!file.is_open())
+		{
+			CString error_message;
+			error_message.Format(_T("Cannot create the image file: %s"), temp_image_path.GetString());
+			WrapErrorMessage(builder, tempjson, outmsg, error_message);
+			break;
+		}
+
+		// The buffer is sized from the reported length and the decoder is bounded by it,
+		// so a malformed/truncated payload can never overrun the allocation.
+		char* ret_result = (char*)malloc(sizeof(char) * (file_length + 4));	//申请返回字符串空间
+		if (ret_result == NULL)
+		{
+			WrapErrorMessage(builder, tempjson, outmsg, _T("Out of memory while saving the image."));
+			break;
+		}
+		memset(ret_result, 0, sizeof(char) * (file_length + 4));		//初始化字符串空间
+		const int decoded_length = base64_decode(temp_image_data.c_str(), ret_result, (int)temp_image_data.size(), file_length);
+		file.write(ret_result, decoded_length);
 		free(ret_result);
-		CString cs_temp_path;
-		cs_temp_path.Format(_T("ResourceFile\\webview\\www\\uploads\\"), pFrame->m_strCurMainBuildingName);
-		char temp_folder[256];
-		memset(temp_folder, 0, 256);
-		WideCharToMultiByte(CP_ACP, 0, cs_temp_path.GetBuffer(), -1, temp_folder, 256, NULL, NULL);
-		strcat(temp_folder, filename.c_str());
+		file.close();
+		if (!file)
+		{
+			CString error_message;
+			error_message.Format(_T("Failed to write the image file: %s"), temp_image_path.GetString());
+			WrapErrorMessage(builder, tempjson, outmsg, error_message);
+			break;
+		}
 		tempjson["action"] = "SAVE_IMAGE_RES";
 		tempjson["data"]["name"] = filename;
 		tempjson["data"]["path"] = "/uploads/" + newfilename;
@@ -4038,49 +4061,56 @@ char base64char[] = {
 };
 
 
-char* base64_decode(char const* base64Str, char* debase64Str, int encodeStrLen)
+// Decodes base64Str into debase64Str and returns the number of bytes written.
+// decodeStrLen bounds the output: a malformed payload (stray quote, newline, missing
+// padding) can never write past the caller's buffer.
+int base64_decode(char const* base64Str, char* debase64Str, int encodeStrLen, int decodeStrLen)
 {
 	int i = 0;
 	int j = 0;
 	int k = 0;
 	char temp[4] = "";
 
-	for (i = 0; i < encodeStrLen; i += 4) {
+	if (base64Str == NULL || debase64Str == NULL || decodeStrLen <= 0)
+		return 0;
+
+	for (i = 0; i + 1 < encodeStrLen && k < decodeStrLen; i += 4) {
+		// Reset the quartet, otherwise characters outside the alphabet inherit the
+		// previous quartet's value and emit garbage bytes.
+		temp[0] = temp[1] = temp[2] = temp[3] = 0;
+
 		for (j = 0; j < 64; j++) {
 			if (*(base64Str + i) == base64char[j]) {
-				temp[0] = j;
+				temp[0] = (char)j;
+			}
+			if (i + 1 < encodeStrLen && *(base64Str + i + 1) == base64char[j]) {
+				temp[1] = (char)j;
+			}
+			if (i + 2 < encodeStrLen && *(base64Str + i + 2) == base64char[j]) {
+				temp[2] = (char)j;
+			}
+			if (i + 3 < encodeStrLen && *(base64Str + i + 3) == base64char[j]) {
+				temp[3] = (char)j;
 			}
 		}
 
-		for (j = 0; j < 64; j++) {
-			if (*(base64Str + i + 1) == base64char[j]) {
-				temp[1] = j;
-			}
-		}
-
-		for (j = 0; j < 64; j++) {
-			if (*(base64Str + i + 2) == base64char[j]) {
-				temp[2] = j;
-			}
-		}
-
-		for (j = 0; j < 64; j++) {
-			if (*(base64Str + i + 3) == base64char[j]) {
-				temp[3] = j;
-			}
-		}
-
-		*(debase64Str + k++) = ((temp[0] << 2) & 0xFC) | ((temp[1] >> 4) & 0x03);
-		if (*(base64Str + i + 2) == '=')
+		if (k < decodeStrLen)
+			*(debase64Str + k) = ((temp[0] << 2) & 0xFC) | ((temp[1] >> 4) & 0x03);
+		k++;
+		if (i + 2 < encodeStrLen && *(base64Str + i + 2) == '=')
 			break;
 
-		*(debase64Str + k++) = ((temp[1] << 4) & 0xF0) | ((temp[2] >> 2) & 0x0F);
-		if (*(base64Str + i + 3) == '=')
+		if (k < decodeStrLen)
+			*(debase64Str + k) = ((temp[1] << 4) & 0xF0) | ((temp[2] >> 2) & 0x0F);
+		k++;
+		if (i + 3 < encodeStrLen && *(base64Str + i + 3) == '=')
 			break;
 
-		*(debase64Str + k++) = ((temp[2] << 6) & 0xF0) | (temp[3] & 0x3F);
+		if (k < decodeStrLen)
+			*(debase64Str + k) = ((temp[2] << 6) & 0xF0) | (temp[3] & 0x3F);
+		k++;
 	}
-	return debase64Str;
+	return k > decodeStrLen ? decodeStrLen : k;
 }
 
 
