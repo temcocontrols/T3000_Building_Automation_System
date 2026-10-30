@@ -2447,11 +2447,11 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                     int firmware_ver = temp_register[5] * 10 + temp_register[4];
                     if (firmware_ver >= 636)
                     {
-                        int nret1 = fun_shutdown(pWriter,2);
-                        if (nret1 < 0)
-                        {
-                            goto end_isp_flash;
-                        }
+                        //int nret1 = fun_shutdown(pWriter,2);
+                        //if (nret1 < 0)
+                        //{
+                        //    goto end_isp_flash;
+                        //}
 #pragma region shutdown_function
 
 
