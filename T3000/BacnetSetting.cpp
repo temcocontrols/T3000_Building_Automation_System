@@ -198,7 +198,7 @@ void Getminitypename(unsigned char nmini_type, CString& ret_name)
 		ret_name = _T("T3-ESP-LW");
 		break;
 	case T3_NG3:
-		ret_name = _T("T3-NG2");
+		ret_name = _T("T3-NG3");
 		break;
 	case T3_3IIC:
 		ret_name = _T("T3-3IIC");

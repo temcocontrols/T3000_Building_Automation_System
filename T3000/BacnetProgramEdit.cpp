@@ -13,8 +13,8 @@
 #include "BacnetProgramDebug.h"
 #include "MainFrm.h"
 
-// ===================== 跨文件访问外部全局数组（和原文件结构体名完全一致） =====================
-// 注意：结构体名、成员顺序、成员类型必须和原文件100%相同，否则会内存越界
+// ===================== ?????????????????飨??????????????????? =====================
+// ???????????????????????????????100%????????????????
 struct func_table {
 	char func_name[15];
 	unsigned char tok;
@@ -24,12 +24,12 @@ struct commands {
 	unsigned char tok;
 };
 
-// extern 声明外部全局变量（数组名也和原文件完全一致）
+// extern ??????????????????????????????????
 extern func_table func_table[];
 extern commands table[];
 // ==========================================================================================
 
-// 关键词排序比较函数（修复CStringArray无Sort方法的错误）
+// ???????????????????CStringArray??Sort?????????
 static int CALLBACK CompareCString(const void* pElement1, const void* pElement2)
 {
 	const CString* pStr1 = (const CString*)pElement1;
@@ -39,7 +39,7 @@ static int CALLBACK CompareCString(const void* pElement1, const void* pElement2)
 
 bool need_syntax = false;
 // Selected device information
-extern tree_product selected_product_Node; // 选中的设备信息;
+extern tree_product selected_product_Node; // ??е??豸???;
 extern CBacnetProgramEdit* ProgramEdit_Window;
 #define  WM_RICHEDIT_RIGHT_CLICK  WM_USER + 1001
 extern char* ispoint_ex(char* token, int* num_point, byte* var_type, byte* point_type, int* num_panel, int* num_net, int network, unsigned char& sub_panel, byte panel, int* netpresent);
@@ -48,13 +48,13 @@ CBacnetProgramDebug* Program_Debug_Window = NULL;
 extern int error;
 extern char* pmes;
 // Controls clicking the refresh button and then updates all data colors
-int refresh_program_text_color = false;  //控制点击刷新按钮后，更新所有的数据颜色;
+int refresh_program_text_color = false;  //????????°??????????е????????;
 // Used for highlighting keywords
-vector <Str_char_pos_color> m_prg_label_error_color;	//用于highlight 关键字用;
+vector <Str_char_pos_color> m_prg_label_error_color;	//????highlight ???????;
 // Used for highlighting keywords
-vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
+vector <Str_char_pos_color> m_prg_char_color;	//????highlight ???????;
 // Used to prevent flickering caused by frequent interface updates
-vector <Str_char_pos_color> buffer_prg_char_color; //用于防止频繁更新界面引起的闪烁问题;
+vector <Str_char_pos_color> buffer_prg_char_color; //????????????????????????????;
 CString program_string;
 CString AnalysisString;
 char editbuf[25000];
@@ -94,7 +94,7 @@ CBacnetProgramEdit::CBacnetProgramEdit(CWnd* pParent /*=NULL*/)
 	Run_once_mutex = false;
 	m_bAutoCompleteVisible = false;
 	m_nInputStartPos = 0;
-	m_bInAutoCompleteLogic = false; // 新增：初始化防重入标志
+	m_bInAutoCompleteLogic = false; // ???????????????????
 }
 
 CBacnetProgramEdit::~CBacnetProgramEdit()
@@ -112,7 +112,7 @@ void CBacnetProgramEdit::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
-	ON_MESSAGE(WM_HOTKEY, &CBacnetProgramEdit::OnHotKey)//快捷键消息映射手动加入
+	ON_MESSAGE(WM_HOTKEY, &CBacnetProgramEdit::OnHotKey)//?????????????????
 	ON_MESSAGE(WM_REFRESH_BAC_PROGRAM_RICHEDIT, Fresh_Program_RichEdit)
 	ON_MESSAGE(MY_RESUME_DATA, ProgramResumeMessageCallBack)
 	ON_COMMAND(ID_SEND, &CBacnetProgramEdit::OnSend)
@@ -130,24 +130,24 @@ BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_EDIT_HELP, &CBacnetProgramEdit::OnBnClickedButtonProgramEditHelp)
 	ON_WM_SIZE()
 	ON_COMMAND(ID_RENUMBER, &CBacnetProgramEdit::OnRenumber)
-	// ========== 新增自动联想相关消息映射 ==========
+	// ========== ???????????????????? ==========
 	ON_EN_CHANGE(IDC_RICHEDIT2_PROGRAM, &CBacnetProgramEdit::OnEnChangeRichedit2Program)
 	ON_NOTIFY(EN_SELCHANGE, IDC_RICHEDIT2_PROGRAM, &CBacnetProgramEdit::OnEnSelchangeRichedit2Program)
 	ON_LBN_DBLCLK(IDC_AUTOCOMPLETE_LIST, &CBacnetProgramEdit::OnLbnDblclkAutocompleteList)
 	ON_LBN_SELCHANGE(IDC_AUTOCOMPLETE_LIST, &CBacnetProgramEdit::OnLbnSelchangeAutocompleteList)
 	ON_WM_DESTROY()
-	// ========== 新增：自绘列表框消息映射 ==========
+	// ========== ??????????б????????? ==========
 	ON_WM_DRAWITEM()
 	ON_WM_MEASUREITEM()
 END_MESSAGE_MAP()
 
-// 修复：RichEdit光标位置变化时触发（WM_NOTIFY版本）
-// 修复：RichEdit光标位置变化时触发（WM_NOTIFY版本）
+// ?????RichEdit???λ??仯???????WM_NOTIFY?汾??
+// ?????RichEdit???λ??仯???????WM_NOTIFY?汾??
 void CBacnetProgramEdit::OnEnSelchangeRichedit2Program(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	// 必须设置pResult，否则可能导致RichEdit行为异常
+	// ????????pResult????????????RichEdit?????
 	*pResult = 0;
-	// 防重入，避免和联想逻辑冲突
+	// ?????????????????????
 	if (m_bInAutoCompleteLogic) return;
 
 	CRichEditCtrl* pRichEdit = (CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM);
@@ -157,30 +157,30 @@ void CBacnetProgramEdit::OnEnSelchangeRichedit2Program(NMHDR* pNMHDR, LRESULT* p
 		return;
 	}
 
-	// 获取当前光标位置
+	// ?????????λ??
 	long nCurSelStart, nCurSelEnd;
 	pRichEdit->GetSel(nCurSelStart, nCurSelEnd);
 
-	// 1. 有选中内容，直接隐藏联想
+	// 1. ?????????????????????
 	if (nCurSelStart != nCurSelEnd)
 	{
 		HideAutoComplete();
 		return;
 	}
 
-	// 2. 光标在文本最开头，隐藏联想
+	// 2. ?????????????????????
 	if (nCurSelStart <= 0)
 	{
 		HideAutoComplete();
 		return;
 	}
 
-	// 3. 【性能优化】仅获取光标前1个字符，判断是否是分隔符，无需全量文本
+	// 3. ????????????????????1????????ж??????????????????????
 	CString strPrevChar;
 	pRichEdit->GetTextRange(nCurSelStart - 1, nCurSelStart, strPrevChar);
-	const CString strDelimiters = _T(" \r\n　"); // 兼容\r\n和全角空格
+	const CString strDelimiters = _T(" \r\n??"); // ????\r\n???????
 
-	// 4. 光标前是分隔符，隐藏联想
+	// 4. ????????????????????
 	if (strDelimiters.Find(strPrevChar) >= 0)
 	{
 		HideAutoComplete();
@@ -191,13 +191,13 @@ void CBacnetProgramEdit::OnDestroy()
 {
 	CDialogEx::OnDestroy();
 
-	// 窗口销毁时，彻底清理联想资源，避免后续消息触发崩溃
+	// ??????????????????????????????????????????????
 	HideAutoComplete();
 	if (IsWindow(m_autoCompleteList.GetSafeHwnd()))
 	{
 		m_autoCompleteList.DestroyWindow();
 	}
-	// 清理字体资源
+	// ???????????
 	m_autoCompleteFont.DeleteObject();
 }
 
@@ -272,17 +272,17 @@ void CBacnetProgramEdit::SetRicheditFont(long nStartchar, long nEndchar, DWORD n
 	cf.cbSize = sizeof(CHARFORMAT);
 	cf.dwMask |= CFM_BOLD;
 	cf.dwEffects &= ~CFE_BOLD;
-	//cf.dwEffects|=~CFE_BOLD; //粗体，取消用cf.dwEffects&=~CFE_BOLD;
+	//cf.dwEffects|=~CFE_BOLD; //???壬?????cf.dwEffects&=~CFE_BOLD;
 	cf.dwMask |= CFM_ITALIC;
 	cf.dwEffects &= ~CFE_ITALIC;
-	//cf.dwEffects|=~CFE_ITALIC; //斜体，取消用cf.dwEffects&=~CFE_ITALIC;
+	//cf.dwEffects|=~CFE_ITALIC; //б?壬?????cf.dwEffects&=~CFE_ITALIC;
 	cf.dwMask |= CFM_UNDERLINE;
 	cf.dwEffects &= ~CFE_UNDERLINE;
-	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE;
+	//cf.dwEffects|=~CFE_UNDERLINE; //б?壬?????cf.dwEffects&=~CFE_UNDERLINE;
 	cf.dwMask |= CFM_COLOR;
-	cf.crTextColor = nColor;//RGB(0,0,255); //设置颜色
+	cf.crTextColor = nColor;//RGB(0,0,255); //???????
 	cf.dwMask |= CFM_SIZE;
-	cf.yHeight = 250; //设置高度
+	cf.yHeight = 250; //??????
 	cf.dwMask |= CFM_FACE;
 	_tcscpy(cf.szFaceName, prg_character_font);
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(nStartchar, nEndchar);
@@ -321,13 +321,13 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// ========== 新增：强制开启RichEdit的通知样式 ==========
+	// ========== ????????????RichEdit??????? ==========
 	CRichEditCtrl* pRichEdit = (CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM);
 	if (pRichEdit && IsWindow(pRichEdit->GetSafeHwnd()))
 	{
-		// 1. 设置 RichEdit 事件掩码，这是启用 EN_CHANGE 通知的正确方式
-		// ENM_CHANGE: 内容改变时发送通知
-		// ENM_SELCHANGE: 选择改变时发送通知 (可选)
+		// 1. ???? RichEdit ??????????????? EN_CHANGE ??????????
+		// ENM_CHANGE: ?????????????
+		// ENM_SELCHANGE: ???????????? (???)
 		pRichEdit->SetEventMask(ENM_CHANGE | ENM_SELCHANGE);
 	}
 
@@ -357,28 +357,28 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	cf.cbSize = sizeof(CHARFORMAT);
 	cf.dwMask |= CFM_BOLD;
 	cf.dwEffects &= ~CFE_BOLD;
-	//cf.dwEffects|=~CFE_BOLD; //粗体，取消用cf.dwEffects&=~CFE_BOLD;
+	//cf.dwEffects|=~CFE_BOLD; //???壬?????cf.dwEffects&=~CFE_BOLD;
 	cf.dwMask |= CFM_ITALIC;
 	cf.dwEffects &= ~CFE_ITALIC;
-	//cf.dwEffects|=~CFE_ITALIC; //斜体，取消用cf.dwEffects&=~CFE_ITALIC;
+	//cf.dwEffects|=~CFE_ITALIC; //б?壬?????cf.dwEffects&=~CFE_ITALIC;
 	cf.dwMask |= CFM_UNDERLINE;
 	cf.dwEffects &= ~CFE_UNDERLINE;
-	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE;
+	//cf.dwEffects|=~CFE_UNDERLINE; //б?壬?????cf.dwEffects&=~CFE_UNDERLINE;
 	cf.dwMask |= CFM_COLOR;
-	cf.crTextColor = prg_text_color;//RGB(0,0,255); //设置颜色
+	cf.crTextColor = prg_text_color;//RGB(0,0,255); //???????
 	cf.dwMask |= CFM_SIZE;
-	cf.yHeight = 250; //设置高度
+	cf.yHeight = 250; //??????
 	cf.dwMask |= CFM_FACE;
 	//_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
 	//_tcscpy(cf.szFaceName ,_T("Times New Roman"));
-	//	strcpy(cf.szFaceName ,_T("隶书")); //设置字体
+	//	strcpy(cf.szFaceName ,_T("????")); //????????
 	_tcscpy(cf.szFaceName, prg_character_font);
 	//_tcscpy(cf.szFaceName ,_T("NSimSun"));
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSelectionCharFormat(cf);
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetDefaultCharFormat(cf);
 	//((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->PasteSpecial(CF_TEXT);
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-	RegisterHotKey(GetSafeHwnd(), KEY_F2, NULL, VK_F2);//F2键
+	RegisterHotKey(GetSafeHwnd(), KEY_F2, NULL, VK_F2);//F2??
 	RegisterHotKey(GetSafeHwnd(), KEY_F3, NULL, VK_F3);
 	RegisterHotKey(GetSafeHwnd(), KEY_F7, NULL, VK_F7);
 	RegisterHotKey(GetSafeHwnd(), KEY_F6, NULL, VK_F6);
@@ -408,24 +408,24 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	GetDlgItem(IDC_LIST_PROMPT)->ShowWindow(0);
 #endif
 
-	// ========== 修复后：联想列表创建代码 ==========
-// 1. 先获取RichEdit控件句柄，确保有效
+	// ========== ??????????б????????? ==========
+// 1. ????RichEdit?????????????Ч
 	//CRichEditCtrl* pRichEdit = (CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM);
 	if (!pRichEdit || !IsWindow(pRichEdit->GetSafeHwnd()))
 	{
-		AfxMessageBox(_T("RichEdit控件不存在！请检查ID是否匹配"));
+		AfxMessageBox(_T("RichEdit??????????????ID??????"));
 	}
 	else
 	{
-		// 2. 初始化联想关键词库
+		// 2. ??????????????
 		InitAutoCompleteKeywords();
-		// 校验关键词库初始化成功
+		// У??????????????
 		ASSERT(m_autoCompleteKeywords.size() > 0);
-		TRACE(_T("联想关键词库初始化完成，共%d个关键词\n"), (int)m_autoCompleteKeywords.size());
+		TRACE(_T("???????????????????%d???????\n"), (int)m_autoCompleteKeywords.size());
 
-		// 3. 【修复】父窗口改为对话框this，添加自绘风格
+		// 3. ????????????????????this???????????
 		DWORD dwStyle = WS_CHILD | WS_BORDER | LBS_NOTIFY | LBS_NOINTEGRALHEIGHT | WS_VSCROLL
-			| LBS_OWNERDRAWFIXED | LBS_HASSTRINGS; // 新增：自绘固定高度+保留字符串
+			| LBS_OWNERDRAWFIXED | LBS_HASSTRINGS; // ??????????????+?????????
 		BOOL bListCreateOK = m_autoCompleteList.Create(
 			dwStyle,
 			CRect(0, 0, 350, 200),
@@ -435,12 +435,12 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 
 		if (!bListCreateOK)
 		{
-			AfxMessageBox(_T("联想列表创建失败！"));
+			AfxMessageBox(_T("?????б?????????"));
 		}
 		else
 		{
 			m_autoCompleteList.SetItemHeight(0, 20);
-			// 字体设置完全保留
+			// ???????????????
 			LOGFONT lf;
 			ZeroMemory(&lf, sizeof(LOGFONT));
 			_tcscpy(lf.lfFaceName, prg_character_font);
@@ -448,13 +448,13 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 			m_autoCompleteFont.DeleteObject();
 			m_autoCompleteFont.CreateFontIndirect(&lf);
 			m_autoCompleteList.SetFont(&m_autoCompleteFont);
-			// 初始隐藏
+			// ???????
 			m_autoCompleteList.ShowWindow(SW_HIDE);
 			m_bAutoCompleteVisible = false;
 		}
 	}
 
-	// 还原原有返回值，保持焦点逻辑不变
+	// ?????з????????????????????
 	return FALSE;
 }
 
@@ -574,7 +574,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 	Encode_Program();
 	long temp_sel_str = 0;
 	long temp_sel_end = 0;
-	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //记住刷新前用户选择的部分;
+	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //?????????????????;
 	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ShowScrollBar(SB_VERT,FALSE);
 	UpdateDataProgramText();
 
@@ -633,7 +633,7 @@ void CBacnetProgramEdit::Syntax_analysis()
 	}
 	SetRicheditFont(0, 0, prg_text_color);
 	//if(temp_sel_str!= temp_sel_end)
-	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //操作完成后还原现场;
+	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //????????????;
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(FALSE, FALSE);
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetReadOnly(FALSE);
 	value_test = ((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetScrollPos(SB_VERT, value_test, 1);
@@ -658,7 +658,7 @@ void CBacnetProgramEdit::OnSend()
 	iTextLen = WideCharToMultiByte(CP_ACP, 0, tempcs, -1, NULL, 0, NULL, NULL);
 	memset((void*)editbuf, 0, sizeof(char) * (iTextLen + 1));
 	::WideCharToMultiByte(CP_ACP, 0, tempcs, -1, editbuf, iTextLen, NULL, NULL);
-	//2017/ 12 / 04   dufan 不允许使用 在THEN 中嵌套使用IF ，否则 解码时会出错。暂时找不出更好的解决办法。
+	//2017/ 12 / 04   dufan ????????? ??THEN ????????IF ?????? ???????????????????????????????
 	if (tempcs.Find(_T("THEN IF")) != -1)
 	{
 		MessageBox(_T("Don't allowed use nested 'IF'."));
@@ -849,14 +849,14 @@ void CBacnetProgramEdit::OnSend()
 
 void CBacnetProgramEdit::OnClose()
 {
-	// 关闭联想框并释放资源
+	// ??????????????
 	HideAutoComplete();
 	if (IsWindow(m_autoCompleteList.GetSafeHwnd()))
 	{
 		m_autoCompleteList.DestroyWindow();
 	}
 
-	UnregisterHotKey(GetSafeHwnd(), KEY_F2);//注销F2键
+	UnregisterHotKey(GetSafeHwnd(), KEY_F2);//???F2??
 	UnregisterHotKey(GetSafeHwnd(), KEY_F3);
 	UnregisterHotKey(GetSafeHwnd(), KEY_F7);
 	UnregisterHotKey(GetSafeHwnd(), KEY_F6);
@@ -943,7 +943,7 @@ void CBacnetProgramEdit::OnSavefile()
 
 void CBacnetProgramEdit::OnCancel()
 {
-	// 关闭联想框并释放资源
+	// ??????????????
 	HideAutoComplete();
 	if (IsWindow(m_autoCompleteList.GetSafeHwnd()))
 	{
@@ -972,7 +972,7 @@ void CBacnetProgramEdit::OnCancel()
 //Move the mouse point to the end of the text.
 void CBacnetProgramEdit::OnEnSetfocusRichedit2Program()
 {
-	// 获得焦点时设置大小写状态，避免每次按键干扰EN_CHANGE消息
+	// ????????????Сд??????????????????EN_CHANGE???
 	if (show_upper)
 	{
 		BYTE Keystatus[256] = { 0 };
@@ -988,7 +988,7 @@ void CBacnetProgramEdit::OnEnSetfocusRichedit2Program()
 		SetKeyboardState(Keystatus);
 	}
 
-	// 原有逻辑：光标移到文本末尾
+	// ??????????????????β
 	CString temp;
 	GetDlgItemText(IDC_RICHEDIT2_PROGRAM, temp);
 	int length = temp.GetLength();
@@ -1066,7 +1066,7 @@ void CBacnetProgramEdit::OnProgramIdeSettings()
 	}
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(tempcs);
 	refresh_program_text_color = true;
-	need_syntax = true; //刷新颜色
+	need_syntax = true; //??????
 	Syntax_analysis();
 }
 
@@ -1092,7 +1092,7 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString& retselstring)
 			{
 				int sel_number_charactor;
 				sel_number_charactor = ((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetTextRange(temp_start, temp_end, temp_txt);
-				if ((temp_txt.CompareNoCase(_T(" ")) == 0) || (sel_number_charactor == 0)) //说明继续往前 没意义了，都是空格和前面的;
+				if ((temp_txt.CompareNoCase(_T(" ")) == 0) || (sel_number_charactor == 0)) //?????????? ???????????????????;
 				{
 					caculate_start = temp_start + 1;
 					break;
@@ -1110,7 +1110,7 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString& retselstring)
 			{
 				int sel_number_charactor;
 				sel_number_charactor = ((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetTextRange(temp_start, temp_end, temp_txt);
-				if ((temp_txt.CompareNoCase(_T(" ")) == 0) || (sel_number_charactor == 0)) //说明继续往前 没意义了，都是空格和前面的;
+				if ((temp_txt.CompareNoCase(_T(" ")) == 0) || (sel_number_charactor == 0)) //?????????? ???????????????????;
 				{
 					caculate_end = temp_end - 1;
 					break;
@@ -1150,17 +1150,38 @@ int CBacnetProgramEdit::Bacnet_Show_Debug(CString& retselstring)
 	tempcs = ispoint_ex(temp_point, &temp_number, &temp_value_type, &temp_point_type, &temp_panel, &temp_net, 0, sub_panel, Station_NUM, &k);
 	if (tempcs == NULL)
 		return false;
+	// Remote Modbus points (e.g. 150.12.MB_REG56) are executed by VirtualProgramEngine
+	// over Modbus TCP; they are not opened in the local point debug window.
+	bool is_remote_modbus =
+		(temp_point_type == MB_REG) ||
+		(temp_point_type == COIL_REG) ||
+		(temp_point_type == DIS_INPUT_REG) ||
+		(temp_point_type == INPUT_REG) ||
+		(temp_point_type == BAC_HOLDING_FLOAT_ABCD) ||
+		(temp_point_type == BAC_HOLDING_FLOAT_CDAB) ||
+		(temp_point_type == BAC_HOLDING_FLOAT_BADC) ||
+		(temp_point_type == BAC_HOLDING_FLOAT_DCBA) ||
+		(temp_point_type == BAC_INPUT_FLOAT_ABCD) ||
+		(temp_point_type == BAC_INPUT_FLOAT_CDAB) ||
+		(temp_point_type == BAC_INPUT_FLOAT_BADC) ||
+		(temp_point_type == BAC_INPUT_FLOAT_DCBA);
+	if (is_remote_modbus)
+	{
+		debug_point_main = temp_panel;
+		point_number = temp_number; // MB_REG is base-0
+		point_type = temp_point_type;
+		return true;
+	}
 	if (temp_panel != Station_NUM)
 	{
 		MessageBox(_T("The remote panel is not supported at this time. \r\nThis feature will be added soon."));
 		return -2;
-		debug_point_main = temp_panel;
 	}
 	else
 		debug_point_main = Station_NUM;
 	point_number = temp_number - 1;
 	point_type = temp_point_type;
-	//fandu 修复 部分 input output debug 模式无法正常弹出的问题
+	//fandu ??? ???? input output debug ???????????????????
 	switch (point_type)
 	{
 	case BAC_OUT:
@@ -1244,7 +1265,7 @@ void CBacnetProgramEdit::UpdateDataProgramText()
 		check_high_light();
 		long temp_sel_str = 0;
 		long temp_sel_end = 0;
-		((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //记住刷新前用户选择的部分;
+		((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //?????????????????;
 		((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(TRUE, FALSE);
 		SetRicheditFont(0, -1, prg_text_color);
 		//int value_test = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetScrollPos(SB_VERT);
@@ -1254,7 +1275,7 @@ void CBacnetProgramEdit::UpdateDataProgramText()
 			SetRicheditFont(m_prg_char_color.at(i).startpos, m_prg_char_color.at(i).endpos, m_prg_char_color.at(i).ncolor);
 		}
 		//SetRicheditFont(0,0,prg_text_color);111111111
-		((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //操作完成后还原现场;
+		((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //????????????;
 		((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(FALSE, FALSE);
 	}
 	else
@@ -1272,21 +1293,21 @@ void CBacnetProgramEdit::SetBackFont()
 	cf.cbSize = sizeof(CHARFORMAT);
 	cf.dwMask |= CFM_BOLD;
 	cf.dwEffects &= ~CFE_BOLD;
-	//cf.dwEffects|=~CFE_BOLD; //粗体，取消用cf.dwEffects&=~CFE_BOLD;
+	//cf.dwEffects|=~CFE_BOLD; //???壬?????cf.dwEffects&=~CFE_BOLD;
 	cf.dwMask |= CFM_ITALIC;
 	cf.dwEffects &= ~CFE_ITALIC;
-	//cf.dwEffects|=~CFE_ITALIC; //斜体，取消用cf.dwEffects&=~CFE_ITALIC;
+	//cf.dwEffects|=~CFE_ITALIC; //б?壬?????cf.dwEffects&=~CFE_ITALIC;
 	cf.dwMask |= CFM_UNDERLINE;
 	cf.dwEffects &= ~CFE_UNDERLINE;
-	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE;
+	//cf.dwEffects|=~CFE_UNDERLINE; //б?壬?????cf.dwEffects&=~CFE_UNDERLINE;
 	cf.dwMask |= CFM_COLOR;
-	cf.crTextColor = prg_text_color;//RGB(0,0,255); //设置颜色
+	cf.crTextColor = prg_text_color;//RGB(0,0,255); //???????
 	cf.dwMask |= CFM_SIZE;
-	cf.yHeight = 250; //设置高度
+	cf.yHeight = 250; //??????
 	cf.dwMask |= CFM_FACE;
 	//_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
 	//_tcscpy(cf.szFaceName ,_T("Times New Roman"));
-	//	strcpy(cf.szFaceName ,_T("隶书")); //设置字体
+	//	strcpy(cf.szFaceName ,_T("????")); //????????
 	_tcscpy(cf.szFaceName, prg_character_font);
 	//_tcscpy(cf.szFaceName ,_T("NSimSun"));
 	//((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSelectionCharFormat(cf);
@@ -1294,31 +1315,31 @@ void CBacnetProgramEdit::SetBackFont()
 };
 BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 {
-	// ========== 修复：联想框键盘事件拦截（更稳定） ==========
+	// ========== ???????????????????????????? ==========
 	if (m_bAutoCompleteVisible && IsWindow(m_autoCompleteList.GetSafeHwnd()))
 	{
 		if (pMsg->message == WM_KEYDOWN)
 		{
 			switch (pMsg->wParam)
 			{
-			case VK_DOWN: // 下箭头：切换下一个候选
+			case VK_DOWN: // ???????л?????????
 			{
 				int nCurSel = m_autoCompleteList.GetCurSel();
 				int nCount = m_autoCompleteList.GetCount();
 				if (nCurSel < nCount - 1) m_autoCompleteList.SetCurSel(nCurSel + 1);
-				return TRUE; // 拦截消息，不传递给RichEdit
+				return TRUE; // ????????????????RichEdit
 			}
-			case VK_UP: // 上箭头：切换上一个候选
+			case VK_UP: // ???????л?????????
 			{
 				int nCurSel = m_autoCompleteList.GetCurSel();
 				if (nCurSel > 0) m_autoCompleteList.SetCurSel(nCurSel - 1);
 				return TRUE;
 			}
-			case VK_RETURN: // 回车：补全候选
-			case VK_TAB:    // Tab：补全候选
+			case VK_RETURN: // ???????????
+			case VK_TAB:    // Tab????????
 				OnAutoCompleteSelect();
 				return TRUE;
-			case VK_ESCAPE: // ESC：关闭联想框
+			case VK_ESCAPE: // ESC??????????
 				HideAutoComplete();
 				return TRUE;
 			}
@@ -1337,7 +1358,7 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 		CWnd* pRichEdit = GetDlgItem(IDC_RICHEDIT2_PROGRAM);
 		BOOL bNeedHide = TRUE;
 
-		// 新焦点是编辑框、联想列表、对话框本身，都不隐藏
+		// ???????????????б????????????????????
 		if (pNewFocusWnd != NULL)
 		{
 			if (pNewFocusWnd->GetSafeHwnd() == m_autoCompleteList.GetSafeHwnd() ||
@@ -1354,7 +1375,7 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 
-	// ========== 以下是你原有代码，完全保留 ==========
+	// ========== ??????????д?????????? ==========
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_INSERT)
 	{
 		Run_once_mutex = true;
@@ -1385,7 +1406,7 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 					if (!input.IsEmpty())
 					{
 						CStringArray temp_array;
-						SplitCStringA(temp_array, input, _T(" ")); //通过空格来分割，获取最后一个空格后面的字符;
+						SplitCStringA(temp_array, input, _T(" ")); //??????????????????????????????;
 						if (temp_array.GetSize() > 0)
 						{
 							input = temp_array.GetAt(temp_array.GetSize() - 1);
@@ -1395,7 +1416,7 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 
 						}
 					}
-					// 过滤掉非字母字符
+					// ?????????????
 					input.Remove(_T('\n'));
 					input.Remove(_T('\r'));
 					input.Remove(_T(' '));
@@ -1405,8 +1426,8 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 				}
 #endif	
 
-				// 方案A：编辑过程中不再自动触发语法编译/重绘，避免打断用户输入。
-				// 语法检查仅保留在显式动作：OnSend / OnRenumber / OnProgramIdeSettings。
+				// ????A?????????в????????????????/??棬?????????????
+				// ?????????????????????OnSend / OnRenumber / OnProgramIdeSettings??
 
 			}
 
@@ -1458,7 +1479,7 @@ void CBacnetProgramEdit::OnPropertiesGotodefinition()
 
 void CBacnetProgramEdit::OnBnClickedButtonProgramEditHelp()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	// TODO: ??????????????????????
 	CString temp_demo_prog;
 	temp_demo_prog = g_strExePth + _T("ResourceFile\\DemoPrg.txt");
 	ShellExecute(this->m_hWnd, _T("open"), temp_demo_prog, NULL, NULL, SW_SHOWNORMAL);
@@ -1512,12 +1533,12 @@ void CBacnetProgramEdit::OnSize(UINT nType, int cx, int cy)
 
 	}
 	Invalidate(1);
-	// TODO: 在此处添加消息处理程序代码
+	// TODO: ??????????????????????
 }
 
 void CBacnetProgramEdit::OnRenumber()
 {
-	// TODO: 在此添加命令处理程序代码
+	// TODO: ????????????????????
 	program_re_line_number = 1;
 	Syntax_analysis();
 	PostMessage(WM_REFRESH_BAC_PROGRAM_RICHEDIT, NULL, NULL);
@@ -1528,7 +1549,7 @@ void CBacnetProgramEdit::InitAutoCompleteKeywords()
 {
 	m_autoCompleteKeywords.clear();
 
-	// 1. 添加自定义关键字
+	// 1. ?????????????
 	AutoCompleteKeyword key;
 	key.text = _T("AC1_L_IN");
 	key.type = LIST_COLOR_TYPE_CUSTOM;
@@ -1546,7 +1567,7 @@ void CBacnetProgramEdit::InitAutoCompleteKeywords()
 		m_autoCompleteKeywords.push_back(key);
 	}
 
-	// 2. 遍历 func_table 数组，添加所有函数名（类型：TYPE_FUNC）
+	// 2. ???? func_table ???飬???????к????????????TYPE_FUNC??
 	for (int i = 0; func_table[i].func_name[0] != '\0'; i++)
 	{
 		key.text = CA2T(func_table[i].func_name);
@@ -1569,7 +1590,7 @@ void CBacnetProgramEdit::InitAutoCompleteKeywords()
 		}
 	}
 
-	// 3. 遍历 table 数组，添加所有命令名（类型：TYPE_COMMAND）
+	// 3. ???? table ???飬?????????????????????TYPE_COMMAND??
 	for (int i = 0; table[i].command[0] != '\0'; i++)
 	{
 		key.text = CA2T(table[i].command);
@@ -1592,7 +1613,7 @@ void CBacnetProgramEdit::InitAutoCompleteKeywords()
 		}
 	}
 
-	// 4. 遍历 m_Input_data 数组，添加符合条件的 label（类型：TYPE_INPUT）
+	// 4. ???? m_Input_data ???飬????????????? label???????TYPE_INPUT??
 	for (int i = 0; i < (int)m_Input_data.size(); i++)
 	{
 		key.text = CA2T((char*)m_Input_data[i].label);
@@ -1616,7 +1637,7 @@ void CBacnetProgramEdit::InitAutoCompleteKeywords()
 		}
 	}
 
-	// 5. 遍历 m_Output_data 数组，添加符合条件的 label（类型：TYPE_OUTPUT）
+	// 5. ???? m_Output_data ???飬????????????? label???????TYPE_OUTPUT??
 	for (int i = 0; i < (int)m_Output_data.size(); i++)
 	{
 		key.text = CA2T((char*)m_Output_data[i].label);
@@ -1640,7 +1661,7 @@ void CBacnetProgramEdit::InitAutoCompleteKeywords()
 		}
 	}
 
-	// 6. 遍历 m_Variable_data 数组，添加符合条件的 label（类型：TYPE_VARIABLE）
+	// 6. ???? m_Variable_data ???飬????????????? label???????TYPE_VARIABLE??
 	for (int i = 0; i < (int)m_Variable_data.size(); i++)
 	{
 		key.text = CA2T((char*)m_Variable_data[i].label);
@@ -1666,11 +1687,11 @@ void CBacnetProgramEdit::InitAutoCompleteKeywords()
 }
 void CBacnetProgramEdit::OnEnChangeRichedit2Program()
 {
-	// 防重入：如果正在执行联想逻辑，直接返回，避免语法高亮触发的二次EN_CHANGE递归
+	// ???????????????????????????????????????????????????EN_CHANGE???
 	if (m_bInAutoCompleteLogic) return;
 	m_bInAutoCompleteLogic = true;
 
-	// 1. 控件有效性强校验
+	// 1. ?????Ч???У??
 	CRichEditCtrl* pRichEdit = (CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM);
 	if (!pRichEdit || !IsWindow(pRichEdit->GetSafeHwnd()) || !IsWindow(GetSafeHwnd()))
 	{
@@ -1679,7 +1700,7 @@ void CBacnetProgramEdit::OnEnChangeRichedit2Program()
 		return;
 	}
 
-	// 2. 获取光标位置，有选中内容直接隐藏联想
+	// 2. ??????λ???????????????????????
 	long nCurSelStart, nCurSelEnd;
 	pRichEdit->GetSel(nCurSelStart, nCurSelEnd);
 	if (nCurSelStart != nCurSelEnd)
@@ -1689,31 +1710,31 @@ void CBacnetProgramEdit::OnEnChangeRichedit2Program()
 		return;
 	}
 
-	// 3. 【核心性能优化】仅获取光标前最多200个字符（关键词最长不超过20，完全足够），长文本下性能无损耗
+	// 3. ???????????????????????????200????????????????????20???????????????????????????
 	const int MAX_SCAN_LENGTH = 200;
 	int nScanStart = max(0, nCurSelStart - MAX_SCAN_LENGTH);
 	CString strScanText;
-	pRichEdit->GetTextRange(nScanStart, nCurSelStart, strScanText); // 仅获取需要的小段文本，不用全量
+	pRichEdit->GetTextRange(nScanStart, nCurSelStart, strScanText); // ??????????С??????????????
 
-	// 4. 定义分隔符：兼容半角空格、全角空格、回车\r、换行\n，彻底解决换行/空格分界问题
-	const CString strDelimiters = _T(" \r\n　");
+	// 4. ?????????????????????????\r??????\n????????????/?????????
+	const CString strDelimiters = _T(" \r\n??");
 	const int nScanTextLen = strScanText.GetLength();
 
-	// 5. 从后往前找分隔符，最多找200个字符，性能拉满
+	// 5. ???????????????????200???????????????
 	int nWordStartInScan = nScanTextLen - 1;
 	while (nWordStartInScan >= 0)
 	{
 		TCHAR ch = strScanText.GetAt(nWordStartInScan);
-		if (strDelimiters.Find(ch) >= 0) break; // 遇到分隔符停止
+		if (strDelimiters.Find(ch) >= 0) break; // ???????????
 		nWordStartInScan--;
 	}
-	nWordStartInScan++; // 回退到当前单词的第一个字符
+	nWordStartInScan++; // ????????????????????
 
-	// 6. 计算单词在整个文档中的真实位置
+	// 6. ????????????????е????λ??
 	const int nWordLen = nScanTextLen - nWordStartInScan;
 	m_nInputStartPos = nScanStart + nWordStartInScan;
 
-	// 7. 单词长度<=0，说明光标在分隔符后，无新输入，隐藏联想
+	// 7. ???????<=0????????????????????????????????
 	if (nWordLen <= 0 || m_nInputStartPos < 0 || (m_nInputStartPos + nWordLen) > nCurSelStart)
 	{
 		HideAutoComplete();
@@ -1721,7 +1742,7 @@ void CBacnetProgramEdit::OnEnChangeRichedit2Program()
 		return;
 	}
 
-	// 8. 提取当前输入的单词
+	// 8. ??????????????
 	m_strCurrentInput = strScanText.Mid(nWordStartInScan, nWordLen);
 	if (m_strCurrentInput.IsEmpty() || m_strCurrentInput.GetLength() < 2)
 	{
@@ -1730,15 +1751,15 @@ void CBacnetProgramEdit::OnEnChangeRichedit2Program()
 		return;
 	}
 
-	// 9. 关键词匹配
+	// 9. ????????
 	MatchAutoCompleteKeywords(m_strCurrentInput);
 
-	// 10. 显示/隐藏逻辑
+	// 10. ???/???????
 	if (m_autoCompleteList.GetCount() > 0)
 	{
-		// 获取光标在RichEdit可视区域的正确坐标
+		// ????????RichEdit????????????????
 		CPoint ptCursor = pRichEdit->GetCharPos(nCurSelStart);
-		pRichEdit->ClientToScreen(&ptCursor); // 转为屏幕坐标
+		pRichEdit->ClientToScreen(&ptCursor); // ?????????
 		ShowAutoComplete(ptCursor);
 	}
 	else
@@ -1746,7 +1767,7 @@ void CBacnetProgramEdit::OnEnChangeRichedit2Program()
 		HideAutoComplete();
 	}
 
-	// 解除防重入
+	// ?????????
 	m_bInAutoCompleteLogic = false;
 }
 void CBacnetProgramEdit::MatchAutoCompleteKeywords(CString strInput)
@@ -1754,32 +1775,32 @@ void CBacnetProgramEdit::MatchAutoCompleteKeywords(CString strInput)
 	m_autoCompleteList.ResetContent();
 	if (strInput.IsEmpty() || strInput.GetLength() < 2) return;
 
-	// 统一大写，适配强制大写逻辑，不区分大小写匹配
+	// ????д??????????д????????????Сд???
 	CString strInputUpper = strInput;
 	strInputUpper.MakeUpper();
 	const int nInputLen = strInputUpper.GetLength();
 	int nMatchCount = 0;
 
-	// 遍历带类型的关键词库
+	// ????????????????
 	const int nTotalKeywords = (int)m_autoCompleteKeywords.size();
 	for (int i = 0; i < nTotalKeywords; i++)
 	{
 		CString strKeyword = m_autoCompleteKeywords[i].text;
 		if (strKeyword.GetLength() < nInputLen) continue;
 
-		// 前缀匹配
+		// ?????
 		if (strKeyword.Left(nInputLen).CompareNoCase(strInputUpper) == 0)
 		{
-			// 添加字符串到列表
+			// ????????????б?
 			int nIndex = m_autoCompleteList.AddString(strKeyword);
-			// 将关键词类型存入列表项的附加数据
+			// ???????????????б???????????
 			m_autoCompleteList.SetItemData(nIndex, m_autoCompleteKeywords[i].type);
 			nMatchCount++;
 			if (nMatchCount >= MAX_AUTOCOMPLETE_COUNT) break;
 		}
 	}
 
-	// 默认选中第一个候选
+	// ?????е???????
 	if (m_autoCompleteList.GetCount() > 0)
 	{
 		m_autoCompleteList.SetCurSel(0);
@@ -1787,7 +1808,7 @@ void CBacnetProgramEdit::MatchAutoCompleteKeywords(CString strInput)
 }
 void CBacnetProgramEdit::ShowAutoComplete(CPoint point)
 {
-	// 1. 全量有效性校验
+	// 1. ?????Ч??У??
 	int nItemCount = m_autoCompleteList.GetCount();
 	if (nItemCount <= 0 || !IsWindow(m_autoCompleteList.GetSafeHwnd()) || !IsWindow(GetSafeHwnd()))
 	{
@@ -1795,34 +1816,34 @@ void CBacnetProgramEdit::ShowAutoComplete(CPoint point)
 		return;
 	}
 
-	// 2. 计算列表尺寸
+	// 2. ?????б????
 	const int nItemHeight = m_autoCompleteList.GetItemHeight(0);
 	const int nListWidth = 350;
 	int nListHeight = nItemCount * nItemHeight + 4;
-	if (nListHeight > 400) nListHeight = 400; // 限制最大高度
+	if (nListHeight > 400) nListHeight = 400; // ?????????
 
-	// 3. 屏幕坐标转对话框客户区坐标
+	// 3. ?????????????????????
 	ScreenToClient(&point);
 
-	// 4. 获取对话框的可视客户区，排除底部信息窗口，避免被遮挡
+	// 4. ???????????????????????????????????????
 	CRect rcDialogClient;
 	GetClientRect(&rcDialogClient);
 	rcDialogClient.bottom -= 130;
 
-	// 5. 【修复滚动条坐标】优先向下显示，超出底部则向上显示，绝对不超出可视区域
+	// 5. ???????????????????????????????????????????????????????????????
 	int nShowTop = point.y + 20;
-	// 向下超出，向上显示
+	// ????????????????
 	if (nShowTop + nListHeight > rcDialogClient.bottom)
 	{
 		nShowTop = point.y - nListHeight - 5;
 	}
-	// 向上也超出，强制贴顶部显示
+	// ???????????????????????
 	if (nShowTop < rcDialogClient.top)
 	{
 		nShowTop = rcDialogClient.top + 5;
 	}
 
-	// 6. 横向边界控制，不超出左右边界
+	// 6. ??????????????????????
 	int nShowLeft = point.x;
 	if (nShowLeft + nListWidth > rcDialogClient.right)
 	{
@@ -1833,11 +1854,11 @@ void CBacnetProgramEdit::ShowAutoComplete(CPoint point)
 		nShowLeft = rcDialogClient.left + 5;
 	}
 
-	// 7. 设置列表最终位置
+	// 7. ?????б?????λ??
 	CRect rcList(nShowLeft, nShowTop, nShowLeft + nListWidth, nShowTop + nListHeight);
 	m_autoCompleteList.MoveWindow(rcList);
 
-	// 8. 置顶显示，不抢占输入焦点
+	// 8. ???????????????????
 	if (!m_bAutoCompleteVisible)
 	{
 		m_autoCompleteList.SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
@@ -1848,7 +1869,7 @@ void CBacnetProgramEdit::ShowAutoComplete(CPoint point)
 
 void CBacnetProgramEdit::HideAutoComplete()
 {
-	// 强校验，避免窗口销毁时崩溃
+	// ?У?飬???????????????
 	if (!IsWindow(GetSafeHwnd()))
 	{
 		m_bAutoCompleteVisible = false;
@@ -1859,7 +1880,7 @@ void CBacnetProgramEdit::HideAutoComplete()
 		m_bAutoCompleteVisible = false;
 		return;
 	}
-	// 强制隐藏，确保状态完全同步
+	// ???????????????????
 	m_autoCompleteList.ShowWindow(SW_HIDE);
 	m_bAutoCompleteVisible = false;
 }
@@ -1869,24 +1890,24 @@ void CBacnetProgramEdit::OnAutoCompleteSelect()
 	int nCurSel = m_autoCompleteList.GetCurSel();
 	if (nCurSel < 0) return;
 
-	// 获取选中的关键词
+	// ?????е?????
 	CString strSelected;
 	m_autoCompleteList.GetText(nCurSel, strSelected);
 
 	CRichEditCtrl* pRichEdit = (CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM);
 	if (!pRichEdit || !IsWindow(pRichEdit->GetSafeHwnd())) return;
 
-	// 替换输入文本为完整关键词
+	// ?滻?????????????????
 	long nCurSelEnd;
 	pRichEdit->GetSel(nCurSelEnd, nCurSelEnd);
 	pRichEdit->SetSel(m_nInputStartPos, nCurSelEnd);
 	pRichEdit->ReplaceSel(strSelected);
 
-	// 光标移动到关键词末尾
+	// ??????????????β
 	long nNewPos = m_nInputStartPos + strSelected.GetLength();
 	pRichEdit->SetSel(nNewPos, nNewPos);
 
-	// 隐藏联想框
+	// ?????????
 	HideAutoComplete();
 }
 
@@ -1897,12 +1918,12 @@ void CBacnetProgramEdit::OnLbnDblclkAutocompleteList()
 
 void CBacnetProgramEdit::OnLbnSelchangeAutocompleteList()
 {
-	// 选中变化预览逻辑，无需额外功能可留空
+	// ??б仯??????????????????????
 }
 
 void CBacnetProgramEdit::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
-	// 只处理联想列表的自绘
+	// ??????????б??????
 	if (nIDCtl != IDC_AUTOCOMPLETE_LIST)
 	{
 		CDialogEx::OnDrawItem(nIDCtl, lpDrawItemStruct);
@@ -1914,60 +1935,60 @@ void CBacnetProgramEdit::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	UINT nState = lpDrawItemStruct->itemState;
 	CRect rcItem = lpDrawItemStruct->rcItem;
 
-	// 1. 绘制背景
-	COLORREF crBkColor = RGB(255, 255, 255); // 默认白色背景
+	// 1. ???????
+	COLORREF crBkColor = RGB(255, 255, 255); // ?????????
 	if (nState & ODS_SELECTED)
 	{
-		crBkColor = GetSysColor(COLOR_HIGHLIGHT); // 选中时用系统高亮色
+		crBkColor = GetSysColor(COLOR_HIGHLIGHT); // ?????????????
 	}
 	pDC->FillSolidRect(rcItem, crBkColor);
 
-	// 2. 绘制文本
+	// 2. ???????
 	if (nItem >= 0 && nItem < m_autoCompleteList.GetCount())
 	{
 		CString strText;
 		m_autoCompleteList.GetText(nItem, strText);
 		KeywordType type = (KeywordType)m_autoCompleteList.GetItemData(nItem);
 
-		// 根据类型设置文本颜色（与编辑器语法高亮完全一致）
-		COLORREF crTextColor = prg_text_color; // 默认黑色
+		// ??????????????????????????????????????
+		COLORREF crTextColor = prg_text_color; // ?????
 		switch (type)
 		{
 		case LIST_COLOR_TYPE_FUNC:
-			crTextColor = prg_function_color; // 函数：蓝色
+			crTextColor = prg_function_color; // ?????????
 			break;
 		case LIST_COLOR_TYPE_COMMAND:
-			crTextColor = prg_command_color; // 命令：绿色
+			crTextColor = prg_command_color; // ???????
 			break;
 		case LIST_COLOR_TYPE_INPUT:
-			crTextColor = RGB(128, 0, 128); // 输入点：紫色
+			crTextColor = RGB(128, 0, 128); // ????????
 			break;
 		case LIST_COLOR_TYPE_OUTPUT:
-			crTextColor = RGB(255, 128, 0); // 输出点：橙色
+			crTextColor = RGB(255, 128, 0); // ????????
 			break;
 		case LIST_COLOR_TYPE_VARIABLE:
-			crTextColor = RGB(128, 64, 0); // 变量：棕色
+			crTextColor = RGB(128, 64, 0); // ?????????
 			break;
 		}
 
-		// 选中时文本用白色
+		// ???????????
 		if (nState & ODS_SELECTED)
 		{
 			crTextColor = GetSysColor(COLOR_HIGHLIGHTTEXT);
 		}
 
-		// 设置字体和颜色
+		// ????????????
 		pDC->SelectObject(&m_autoCompleteFont);
 		pDC->SetTextColor(crTextColor);
 		pDC->SetBkMode(TRANSPARENT);
 
-		// 绘制文本（左对齐，垂直居中）
+		// ????????????????????У?
 		CRect rcText = rcItem;
-		rcText.left += 5; // 左边距
+		rcText.left += 5; // ????
 		pDC->DrawText(strText, rcText, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 	}
 
-	// 3. 绘制焦点框
+	// 3. ????????
 	if (nState & ODS_FOCUS)
 	{
 		pDC->DrawFocusRect(rcItem);
@@ -1976,10 +1997,10 @@ void CBacnetProgramEdit::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 void CBacnetProgramEdit::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
-	// 只处理联想列表
+	// ??????????б?
 	if (nIDCtl == IDC_AUTOCOMPLETE_LIST)
 	{
-		lpMeasureItemStruct->itemHeight = 20; // 与之前设置的ItemHeight一致
+		lpMeasureItemStruct->itemHeight = 20; // ?????????ItemHeight???
 	}
 	else
 	{
