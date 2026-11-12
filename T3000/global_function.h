@@ -441,6 +441,14 @@ int SearchDataIndexByPanel(unsigned char panel_id, int command_type, int npoint)
 
 bool UnzipItem(CString SourceFilePath, CString DesFolder);
 bool ZipSingleItem(CString strUserDesZipFile, CString strsingleFilepath);
+
+// Multi-monitor: left/top monitors often use negative coordinates.
+// Default for "key missing" in INI (must be far outside any real virtual desktop).
+#ifndef WINDOWPOS_INI_UNSET
+#define WINDOWPOS_INI_UNSET  (-100000)
+#endif
+// Returns TRUE if rc intersects any connected monitor (supports negative coords).
+BOOL IsRectOnAnyMonitor(const RECT& rc);
 # ifdef read_prop_multi_function
 void SyncReadState_Init(void);
 void SyncReadState_Cleanup(void);

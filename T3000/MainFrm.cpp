@@ -594,6 +594,7 @@ CMainFrame::CMainFrame()
 
     m_bSafeToClose = TRUE;
     m_pDialogInfo = NULL;
+    m_bRestoreMaximized = FALSE;
 
 	isp_mode_is_cancel = true;
 }
@@ -3974,19 +3975,103 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
     if (nIDEvent == 8001)
     {
         KillTimer(8001);
-        int left = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Left"), -1, g_cstring_ini_path);
-        int top = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Top"), -1, g_cstring_ini_path);
+        // 多显示器：左侧屏幕 left/top 常为负数
+        int left = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Left"), WINDOWPOS_INI_UNSET, g_cstring_ini_path);
+        int top = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Top"), WINDOWPOS_INI_UNSET, g_cstring_ini_path);
         int width = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Width"), 0, g_cstring_ini_path);
         int height = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Height"), 0, g_cstring_ini_path);
         int is_max = GetPrivateProfileInt(_T("WindowPosition"), _T("MainWindow_Max"), 0, g_cstring_ini_path);
 
-        if (left >= 0 && top >= 0 && width > 0 && height > 0)
+        RECT rcPos = { left, top, left + width, top + height };
+        if (left > WINDOWPOS_INI_UNSET && top > WINDOWPOS_INI_UNSET &&
+            width > 100 && height > 50 && IsRectOnAnyMonitor(rcPos))
         {
-            if (is_max)
-                ShowWindow(SW_SHOWMAXIMIZED);
-            else
-                MoveWindow(left, top, width, height, TRUE);
+            // 与 Save(GetWindowPlacement) 对称；支持左侧显示器负坐标
+            WINDOWPLACEMENT wp;
+            memset(&wp, 0, sizeof(wp));
+            wp.length = sizeof(WINDOWPLACEMENT);
+            GetWindowPlacement(&wp);
+            wp.rcNormalPosition.left = left;
+            wp.rcNormalPosition.top = top;
+            wp.rcNormalPosition.right = left + width;
+            wp.rcNormalPosition.bottom = top + height;
+            wp.flags = 0;
+            wp.showCmd = is_max ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL;
+            SetWindowPlacement(&wp);
         }
+        else if (is_max)
+        {
+            ShowWindow(SW_SHOWMAXIMIZED);
+        }
+        return;
+    }
+
+    // 任务栏恢复后：确保主窗最大化，再强制贴附 Input/Output/Variable
+    if (nIDEvent == 8002)
+    {
+        KillTimer(8002);
+        if (IsIconic())
+            return;
+
+        if (m_bRestoreMaximized && !IsZoomed())
+            ShowWindow(SW_SHOWMAXIMIZED);
+
+        // BacNet_hwd 可能尚未完成布局，必要时短重试
+        CRect bac;
+        bac.SetRectEmpty();
+        if (::IsWindow(BacNet_hwd))
+            ::GetWindowRect(BacNet_hwd, &bac);
+
+        static int s_reattach_retry = 0;
+        if (bac.Width() < 100 || bac.Height() < 100)
+        {
+            if (s_reattach_retry < 10)
+            {
+                s_reattach_retry++;
+                SetTimer(8002, 100, NULL);
+                return;
+            }
+        }
+        s_reattach_retry = 0;
+        m_bRestoreMaximized = FALSE;
+
+        // 按运行时标志或 INI 的 Max=1 强制恢复最大化依附
+        // （主窗恢复时子窗常被系统还原成普通尺寸，必须主动再贴附）
+        if (pDialog[WINDOW_INPUT] != NULL)
+        {
+            CBacnetInput* pIn = (CBacnetInput*)pDialog[WINDOW_INPUT];
+            const int iniMax = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Max"), 0, g_cstring_ini_path);
+            if (pIn->window_max || pIn->IsZoomed() || iniMax == 1)
+            {
+                pIn->window_max = true;
+                if (pIn->IsWindowVisible())
+                    pIn->Reset_Input_Rect();
+            }
+        }
+        if (pDialog[WINDOW_OUTPUT] != NULL)
+        {
+            CBacnetOutput* pOut = (CBacnetOutput*)pDialog[WINDOW_OUTPUT];
+            const int iniMax = GetPrivateProfileInt(_T("WindowPosition"), _T("Output_Max"), 0, g_cstring_ini_path);
+            if (pOut->window_max || pOut->IsZoomed() || iniMax == 1)
+            {
+                pOut->window_max = true;
+                if (pOut->IsWindowVisible())
+                    pOut->Reset_Output_Rect();
+            }
+        }
+        if (pDialog[WINDOW_VARIABLE] != NULL)
+        {
+            CBacnetVariable* pVar = (CBacnetVariable*)pDialog[WINDOW_VARIABLE];
+            const int iniMax = GetPrivateProfileInt(_T("WindowPosition"), _T("Variable_Max"), 0, g_cstring_ini_path);
+            if (pVar->window_max || pVar->IsZoomed() || iniMax == 1)
+            {
+                pVar->window_max = true;
+                if (pVar->IsWindowVisible())
+                    pVar->Reset_Variable_Rect();
+            }
+        }
+
+        Reset_Window_Pos();
         return;
     }
 
@@ -6528,27 +6613,38 @@ void CMainFrame::OnDestroy()
 
 void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 {
-    if ((nID & 0xFFF0) == SC_MINIMIZE)
-    {
-        // 处理最小化
-        ShowWindow(SW_MINIMIZE);
-        //SetFocus();
-    }
-    else if (((nID & 0xFFF0) == SC_RESTORE) || (nID == SC_DEFAULT && IsIconic()))
-    {
-        // 处理恢复
-        ShowWindow(SW_RESTORE);
-        SetForegroundWindow();   // ← 添加这行，确保窗口置于前台
-        SetActiveWindow();       // ← 添加这行，激活窗口
-    }
-    else
-    {
-        // 其他命令交给基类处理
-        CFrameWndEx::OnSysCommand(nID, lParam);  // ← 改用基类方法
+    const UINT cmd = (nID & 0xFFF0);
 
-        //DefWindowProc(WM_SYSCOMMAND, nID, lParam);  // 调用默认窗口过程处理其他系统命令
-        //CFrameWnd::OnSysCommand(nID, lParam);
+    if (cmd == SC_MINIMIZE)
+    {
+        // 记下最小化前是否最大化（任务栏恢复时用）
+        WINDOWPLACEMENT wp;
+        wp.length = sizeof(WINDOWPLACEMENT);
+        GetWindowPlacement(&wp);
+        m_bRestoreMaximized = IsZoomed() ||
+            ((wp.flags & WPF_RESTORETOMAXIMIZED) != 0) ||
+            (wp.showCmd == SW_SHOWMAXIMIZED);
+        ShowWindow(SW_MINIMIZE);
+        return;
     }
+
+    if (cmd == SC_RESTORE || (nID == SC_DEFAULT && IsIconic()))
+    {
+        // 最小化前是最大化：直接 SW_SHOWMAXIMIZED，不要 SW_RESTORE
+        // （SW_RESTORE 在有最大化子窗体时经常还原成非最大化）
+        if (m_bRestoreMaximized)
+            ShowWindow(SW_SHOWMAXIMIZED);
+        else
+            ShowWindow(SW_RESTORE);
+
+        SetForegroundWindow();
+        SetActiveWindow();
+        // 延迟贴附 Input/Output/Variable，等 BacNet_hwd 布局完成
+        SetTimer(8002, 150, NULL);
+        return;
+    }
+
+    CFrameWndEx::OnSysCommand(nID, lParam);
 }
 
 LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
@@ -15348,7 +15444,8 @@ void CMainFrame::Reset_Window_Pos()
 		if(((CBacnetInput *)pDialog[WINDOW_INPUT]) != NULL)
 		{
             if (((CBacnetInput*)pDialog[WINDOW_INPUT])->IsWindowVisible() &&
-                ((CBacnetInput*)pDialog[WINDOW_INPUT])->IsZoomed())
+                (((CBacnetInput*)pDialog[WINDOW_INPUT])->IsZoomed() ||
+                 ((CBacnetInput*)pDialog[WINDOW_INPUT])->window_max))
 			{
 				((CBacnetInput *)pDialog[WINDOW_INPUT])->Reset_Input_Rect();
 			}
@@ -15357,7 +15454,8 @@ void CMainFrame::Reset_Window_Pos()
 		if(((CBacnetOutput *)pDialog[WINDOW_OUTPUT]) != NULL)
 		{
             if (((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->IsWindowVisible() &&
-                ((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->IsZoomed())
+                (((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->IsZoomed() ||
+                 ((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->window_max))
 			{
 				((CBacnetOutput *)pDialog[WINDOW_OUTPUT])->Reset_Output_Rect();
 			}
@@ -15366,7 +15464,8 @@ void CMainFrame::Reset_Window_Pos()
 		if(((CBacnetVariable *)pDialog[WINDOW_VARIABLE]) != NULL)
 		{
             if (((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->IsWindowVisible() &&
-                ((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->IsZoomed())
+                (((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->IsZoomed() ||
+                 ((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->window_max))
 			{
 				((CBacnetVariable *)pDialog[WINDOW_VARIABLE])->Reset_Variable_Rect();
 			}
@@ -15589,7 +15688,11 @@ void CMainFrame::OnMove(int x, int y)
 {
     CFrameWndEx::OnMove(x, y);
 
-    
+	// 主窗体最小化时 BacNet_hwd 坐标无效，此时不要去挪动已最大化的子窗体，
+	// 否则会 SetWindowPos 清掉 WS_MAXIMIZE，并把错误位置写进 INI。
+	if (IsIconic())
+		return;
+
 	//TRACE(_T("Move to x = %d , y = %d \r\n"),x,y);
 		static int cmove_cx = 0;
 	static int cmove_cy = 0;
@@ -15854,6 +15957,11 @@ typedef pair<int,string> mydefpair;
 void CMainFrame::OnSize(UINT nType, int cx, int cy)
 {
 	CFrameWndEx::OnSize(nType, cx, cy);
+
+	// 最小化过程中不要 Reset 子窗体（BacNet_hwd 此时可能是 0/-32000）
+	if (nType == SIZE_MINIMIZED || IsIconic())
+		return;
+
 	static int cmainf_cx = 0;
 	static int cmainf_cy = 0;
 	if((cmainf_cx != cx) || (cmainf_cy != cy))
@@ -15862,7 +15970,6 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		cmainf_cx = cx;
 		cmainf_cy = cy;
 	}
-	
 }
 
 
@@ -17347,10 +17454,10 @@ void CMainFrame::SaveMainWindowPosition()
     WINDOWPLACEMENT wp;
     wp.length = sizeof(WINDOWPLACEMENT);
     GetWindowPlacement(&wp);
-    BOOL is_max = (wp.showCmd == SW_SHOWMAXIMIZED);
+    // 最小化前若是最大化，flags 会带 WPF_RESTORETOMAXIMIZED
+    BOOL is_max = (wp.showCmd == SW_SHOWMAXIMIZED) ||
+                  ((wp.showCmd == SW_SHOWMINIMIZED) && (wp.flags & WPF_RESTORETOMAXIMIZED));
     RECT rc = wp.rcNormalPosition;
-
-
 
     CString strLeft, strTop, strWidth, strHeight, strMax;
     strLeft.Format(_T("%d"), rc.left);

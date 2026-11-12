@@ -33,8 +33,8 @@ CBacnetInput::CBacnetInput(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetInput::IDD, pParent)
 {
   //  m_latest_protocol=3;
-	window_max = true;
-	m_restoring_position = true;  // 新增
+	window_max = false;           // 仅在真正最大化后置 true，避免误走最大化贴附逻辑
+	m_restoring_position = true;  // 构造期阻止 OnMove/OnSize 写 INI
 	InvalidateColumnWidthCache(); 
 }
 
@@ -1957,15 +1957,54 @@ void CBacnetInput::Reset_Input_Rect()
 	CRect temp_mynew_rect;
 	::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
 
+	// 主窗体最小化或 BacNet_hwd 尚未布局好时不要挪动
+	CMainFrame* pFrame = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+	if ((pFrame && pFrame->IsIconic()) || temp_mynew_rect.Width() < 100 || temp_mynew_rect.Height() < 100)
+		return;
+
 	CRect temp_window;
 	GetWindowRect(&temp_window);
 
-	m_restoring_position = true;  // 加这行
-	if (IsZoomed())
+	m_restoring_position = true;
+	if (IsZoomed() || window_max)
 	{
-		CRect temp_mynew_rect;
-		::GetWindowRect(BacNet_hwd,&temp_mynew_rect);	//获取 view的窗体大小;
-		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,temp_mynew_rect.Width(),temp_mynew_rect.Height() - DELTA_HEIGHT, NULL);
+		// 跟随主窗：先按 BacNet_hwd 贴附（支持负坐标多显示器），再重新断言最大化。
+		// 仅 SetWindowPlacement(SHOWMAXIMIZED) 在已最大化时往往是空操作，不会跟随移动。
+		WINDOWPLACEMENT wp;
+		wp.length = sizeof(WINDOWPLACEMENT);
+		GetWindowPlacement(&wp);
+		RECT normal = wp.rcNormalPosition;
+		if ((normal.right - normal.left) < 100 || (normal.bottom - normal.top) < 50)
+		{
+			normal.left = temp_mynew_rect.left;
+			normal.top = temp_mynew_rect.top;
+			normal.right = normal.left + 700;
+			normal.bottom = normal.top + 500;
+		}
+
+		const int maxW = temp_mynew_rect.Width();
+		const int maxH = temp_mynew_rect.Height() - DELTA_HEIGHT;
+		::SetWindowPos(this->m_hWnd, NULL,
+			temp_mynew_rect.left, temp_mynew_rect.top, maxW, maxH,
+			SWP_NOZORDER | SWP_NOACTIVATE);
+
+		wp.length = sizeof(WINDOWPLACEMENT);
+		GetWindowPlacement(&wp);
+		wp.rcNormalPosition = normal;
+		wp.showCmd = SW_SHOWMAXIMIZED;
+		SetWindowPlacement(&wp);
+
+		// 左侧显示器（负坐标）上，部分系统最大化会落到主屏；再强制贴附一次
+		CRect after;
+		GetWindowRect(&after);
+		if (after.left != temp_mynew_rect.left || after.top != temp_mynew_rect.top ||
+			after.Width() != maxW || after.Height() != maxH)
+		{
+			::SetWindowPos(this->m_hWnd, NULL,
+				temp_mynew_rect.left, temp_mynew_rect.top, maxW, maxH,
+				SWP_NOZORDER | SWP_NOACTIVATE);
+		}
+		window_max = true;
 	}
 	else if((temp_window.Width() <= temp_mynew_rect.Width() ) && (temp_window.Height() <= temp_mynew_rect.Height()))
 	{
@@ -1973,7 +2012,7 @@ void CBacnetInput::Reset_Input_Rect()
 	}
 	else
 		::SetWindowPos(this->m_hWnd,NULL,temp_mynew_rect.left,temp_mynew_rect.top,700,700, NULL);
-	m_restoring_position = false; // 加这行
+	m_restoring_position = false;
 
 	return;
 }
@@ -2512,11 +2551,11 @@ void CBacnetInput::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	// 同步 window_max 与窗口真实状态（双击/按钮/代码触发都能覆盖）
+	// 仅在真正最大化时置位。不要在 SIZE_RESTORED 清 window_max：
+	// 主窗从任务栏恢复时子窗会先收到 SIZE_RESTORED，若此处清掉标志，
+	// 后续 Reset_Window_Pos 就无法再贴附最大化。
 	if (nType == SIZE_MAXIMIZED)
 		window_max = true;
-	else if (nType == SIZE_RESTORED)
-		window_max = false;
 
 	CRect rc;
 	GetClientRect(rc);
@@ -2527,7 +2566,7 @@ void CBacnetInput::OnSize(UINT nType, int cx, int cy)
 		m_input_list.MoveWindow(&rc);
 	}
 
-	// Don't save position when maximized
+	// 最小化/恢复过程不写 INI；最大化时用 GetWindowPlacement 只更新 Max 标志并保留还原矩形
 	if (IsWindowVisible() && nType != SIZE_MINIMIZED && !m_restoring_position)
 		SaveWindowPosition();
 }
@@ -2537,20 +2576,26 @@ void CBacnetInput::OnMove(int x, int y)
 	CDialogEx::OnMove(x, y);
 	if (IsWindowVisible())
 		::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-	//::SetWindowPos(this->m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
 
+	// 主窗体最小化时子窗体会跟着收到 OnMove，此时坐标无效，不能写 INI
+	CMainFrame* pFrame = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+	if (pFrame && pFrame->IsIconic())
+		return;
 
-
-	// Only save when user manually moves, not during restore
-	if (IsWindowVisible() && !m_restoring_position)
+	if (IsWindowVisible() && !m_restoring_position && !IsIconic())
 		SaveWindowPosition();
 }
 
 
 void CBacnetInput::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	 
-	// Let Windows handle maximize/restore natively.
+	const UINT cmd = (nID & 0xFFF0);
+	// 只有用户点标题栏还原/最大化时才改 window_max
+	if (cmd == SC_RESTORE)
+		window_max = false;
+	else if (cmd == SC_MAXIMIZE)
+		window_max = true;
+
 	// OnGetMinMaxInfo constrains the maximized area to BacNet_hwd region.
 	CDialogEx::OnSysCommand(nID, lParam);
 }
@@ -2640,22 +2685,38 @@ void CBacnetInput::GetInputUnitandValue(int i, CString& unit, CString& value)
 void CBacnetInput::SaveWindowPosition()
 {
 	if (!IsWindow(m_hWnd)) return;
-	if (m_restoring_position) return;    // ← 加这行：恢复期间不保存
-	CRect rect;
-	GetWindowRect(&rect);
+	if (m_restoring_position) return;
+	if (IsIconic()) return;
+	CMainFrame* pFrame = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+	if (pFrame && pFrame->IsIconic()) return;
 
-	CString strLeft, strTop, strWidth, strHeight, strMax;
-	strLeft.Format(_T("%d"), rect.left);
-	strTop.Format(_T("%d"), rect.top);
-	strWidth.Format(_T("%d"), rect.Width());
-	strHeight.Format(_T("%d"), rect.Height());
-	strMax.Format(_T("%d"), window_max ? 1 : 0);
+	// 用 GetWindowPlacement：最大化时仍保存 rcNormalPosition，避免把最大化矩形写进 INI
+	WINDOWPLACEMENT wp;
+	wp.length = sizeof(WINDOWPLACEMENT);
+	GetWindowPlacement(&wp);
+	const RECT& rc = wp.rcNormalPosition;
+	const BOOL is_max = (wp.showCmd == SW_SHOWMAXIMIZED) || window_max;
+	const int w = rc.right - rc.left;
+	const int h = rc.bottom - rc.top;
+
+	CString strMax;
+	strMax.Format(_T("%d"), is_max ? 1 : 0);
+	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Max"), strMax, g_cstring_ini_path);
+
+	// 还原矩形过小时不覆盖 INI（避免把缩成标题栏的尺寸写进去）
+	if (w < 100 || h < 50)
+		return;
+
+	CString strLeft, strTop, strWidth, strHeight;
+	strLeft.Format(_T("%d"), rc.left);
+	strTop.Format(_T("%d"), rc.top);
+	strWidth.Format(_T("%d"), w);
+	strHeight.Format(_T("%d"), h);
 
 	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Left"), strLeft, g_cstring_ini_path);
 	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Top"), strTop, g_cstring_ini_path);
 	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Width"), strWidth, g_cstring_ini_path);
 	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Height"), strHeight, g_cstring_ini_path);
-	WritePrivateProfileString(_T("WindowPosition"), _T("Input_Max"), strMax, g_cstring_ini_path);
 }
 
 // BacnetInput.cpp - 实现：
@@ -2666,22 +2727,27 @@ void CBacnetInput::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 	{
 		CRect rect;
 		::GetWindowRect(BacNet_hwd, &rect);
-		lpMMI->ptMaxSize.x = rect.Width();
-		lpMMI->ptMaxSize.y = rect.Height() - DELTA_HEIGHT;
-		lpMMI->ptMaxPosition.x = rect.left;
-		lpMMI->ptMaxPosition.y = rect.top;
-		lpMMI->ptMaxTrackSize.x = lpMMI->ptMaxSize.x;
-		lpMMI->ptMaxTrackSize.y = lpMMI->ptMaxSize.y;
+		// BacNet_hwd 尚未就绪时不要写入 0 尺寸，否则最大化会缩成标题栏
+		if (rect.Width() >= 100 && rect.Height() >= 100)
+		{
+			lpMMI->ptMaxSize.x = rect.Width();
+			lpMMI->ptMaxSize.y = rect.Height() - DELTA_HEIGHT;
+			lpMMI->ptMaxPosition.x = rect.left;
+			lpMMI->ptMaxPosition.y = rect.top;
+			lpMMI->ptMaxTrackSize.x = lpMMI->ptMaxSize.x;
+			lpMMI->ptMaxTrackSize.y = lpMMI->ptMaxSize.y;
+		}
 	}
 	CDialogEx::OnGetMinMaxInfo(lpMMI);
 }
 
 void CBacnetInput::RestoreWindowPosition()
 {
-	int left = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Left"), -1, g_cstring_ini_path);
-	int top = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Top"), -1, g_cstring_ini_path);
-	int width = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Width"), -1, g_cstring_ini_path);
-	int height = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Height"), -1, g_cstring_ini_path);
+	// 多显示器：左侧屏幕坐标常为负数，不能用 left>=0 / top>=0 判断
+	int left = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Left"), WINDOWPOS_INI_UNSET, g_cstring_ini_path);
+	int top = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Top"), WINDOWPOS_INI_UNSET, g_cstring_ini_path);
+	int width = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Width"), 0, g_cstring_ini_path);
+	int height = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Height"), 0, g_cstring_ini_path);
 	int isMax = GetPrivateProfileInt(_T("WindowPosition"), _T("Input_Max"), 0, g_cstring_ini_path);
 
 	CString dbg;
@@ -2689,27 +2755,39 @@ void CBacnetInput::RestoreWindowPosition()
 		left, top, width, height, isMax, (LPCTSTR)g_cstring_ini_path);
 	TRACE(_T("%s\n"), (LPCTSTR)dbg);
 
-	if (left >= 0 && top >= 0 && width > 0 && height > 0)
+	RECT rcPos = { left, top, left + width, top + height };
+	const BOOL havePos = (left > WINDOWPOS_INI_UNSET && top > WINDOWPOS_INI_UNSET &&
+		width > 100 && height > 50 && IsRectOnAnyMonitor(rcPos));
+
+	if (havePos)
 	{
-		if (left < -100 || top < -100)
-		{
-			Reset_Input_Rect();
-			return;
-		}
-		// Guard: prevent OnMove/OnSize from saving during restore
+		// 与 Save(GetWindowPlacement) 对称：用 SetWindowPlacement 还原（支持负坐标）
 		m_restoring_position = true;
-		if (isMax == 1)
+		WINDOWPLACEMENT wp;
+		memset(&wp, 0, sizeof(wp));
+		wp.length = sizeof(WINDOWPLACEMENT);
+		GetWindowPlacement(&wp);
+		wp.rcNormalPosition.left = left;
+		wp.rcNormalPosition.top = top;
+		wp.rcNormalPosition.right = left + width;
+		wp.rcNormalPosition.bottom = top + height;
+		wp.flags = 0;
+		wp.showCmd = (isMax == 1) ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL;
+		SetWindowPlacement(&wp);
+		window_max = (isMax == 1);
+		if (isMax == 1 && ::IsWindow(BacNet_hwd))
 		{
-			// 只最大化，不调 MoveWindow，否则会撤销最大化状态
-			// 最大化区域由 OnGetMinMaxInfo 限制在 BacNet_hwd 范围内
-			ShowWindow(SW_SHOWMAXIMIZED);
-		}
-		else
-		{
-			::MoveWindow(this->m_hWnd, left, top, width, height, TRUE);
+			// 最大化区域以 BacNet_hwd 为准（OnGetMinMaxInfo）；负坐标屏再强制贴附
+			Reset_Input_Rect();
 		}
 		m_restoring_position = false;
-		TRACE(_T("[Input] Restored to: %d,%d %dx%d\n"), left, top, width, height);
+		TRACE(_T("[Input] Restored to: %d,%d %dx%d Max=%d\n"), left, top, width, height, isMax);
+	}
+	else if (isMax == 1)
+	{
+		// 还原矩形无效（显示器已拔掉等），仍按依附最大化显示
+		window_max = true;
+		Reset_Input_Rect();
 	}
 	else
 	{
