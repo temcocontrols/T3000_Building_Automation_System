@@ -2,6 +2,7 @@
 #include "T3000.h"
 #include "global_function.h"
 #include "global_define.h"
+#include "MainFrm.h"  // tree_product / selected_product_Node.BuildingInfo.strIp
 
 #include "VirtualProgramEngine.h"
 
@@ -429,21 +430,412 @@ S16_T put_point_value(VM_Point *point, S32_T *val_ptr, S16_T aux, S16_T prog_op)
 }
 
 //=============================================================================
-// Remote/network point stubs (not supported in MFC VM)
-// NOTE: Uses VM_Point_Net* to match decode.c's call signature.
+// Remote / network points — Modbus TCP over LAN
+// Syntax (compiled as REMOTE_POINT_PRG / Point_Net):
+//   VAR1 = 150.12.MB_REG56
+//     panel   (150) = last octet of target IP
+//     sub_id  (12)  = Modbus slave ID
+//     number  (56)  = register address (MB_REG is base-0)
+// Target IP = same subnet as the current virtual device, with last octet replaced.
+// Example: virtual device 192.168.10.88  →  read 192.168.10.150 ID=12 reg=56
+// Port defaults to 502 (standard Modbus TCP / Temco LAN convention).
+// Values use decode.c ×1000 fixed-point (same as BacnetRemotePoint / Variable UI).
 //=============================================================================
+
+extern tree_product selected_product_Node;
+extern int g_CommunicationType;
+
+#ifndef VM_MODBUS_TCP_DEFAULT_PORT
+#define VM_MODBUS_TCP_DEFAULT_PORT 502
+#endif
+
+#ifndef VM_REMOTE_CACHE_MS
+#define VM_REMOTE_CACHE_MS 1000
+#endif
+
+// Cache key / entry for remote Modbus points (avoids reconnect every scan)
+struct VmRemotePointKey {
+    unsigned char panel;
+    unsigned char sub_id;
+    unsigned char point_type; // decoded type (MB_REG, COIL_REG, ...)
+    unsigned short reg;
+    bool operator<(const VmRemotePointKey& o) const {
+        if (panel != o.panel) return panel < o.panel;
+        if (sub_id != o.sub_id) return sub_id < o.sub_id;
+        if (point_type != o.point_type) return point_type < o.point_type;
+        return reg < o.reg;
+    }
+};
+
+struct VmRemotePointCache {
+    S32_T value;
+    DWORD tick;
+    bool valid;
+};
+
+static CCriticalSection g_vm_remote_cs;
+static std::map<VmRemotePointKey, VmRemotePointCache> g_vm_remote_cache;
+
+// Decode Point_Net → type + register number (mirrors BacnetRemotePoint / pointtotext)
+static void VmDecodeNetPoint(const VM_Point_Net* p, unsigned char& out_type, unsigned short& out_reg)
+{
+    unsigned char raw_type = (unsigned char)(p->point_type & 0x1F);
+    unsigned char type_hi2 = (unsigned char)(p->network_number & 0x60);
+    out_type = (unsigned char)((raw_type | type_hi2) - 1);
+
+    unsigned char high_3bit = (unsigned char)((p->point_type & 0xE0) >> 5);
+    if (((out_type == MB_REG) ||
+         (out_type == COIL_REG) ||
+         (out_type == DIS_INPUT_REG) ||
+         (out_type == INPUT_REG) ||
+         (out_type == BAC_HOLDING_FLOAT_ABCD) ||
+         (out_type == BAC_HOLDING_FLOAT_CDAB) ||
+         (out_type == BAC_HOLDING_FLOAT_BADC) ||
+         (out_type == BAC_HOLDING_FLOAT_DCBA) ||
+         (out_type == BAC_INPUT_FLOAT_ABCD) ||
+         (out_type == BAC_INPUT_FLOAT_CDAB) ||
+         (out_type == BAC_INPUT_FLOAT_BADC) ||
+         (out_type == BAC_INPUT_FLOAT_DCBA)) &&
+        (p->network_number >= 128))
+    {
+        out_reg = (unsigned short)(p->number + ((p->network_number & 0x1F) * 8 + high_3bit) * 256);
+    }
+    else
+    {
+        out_reg = (unsigned short)(high_3bit * 256 + p->number);
+    }
+}
+
+static bool VmIsModbusNetType(unsigned char t)
+{
+    return (t == MB_REG) || (t == COIL_REG) || (t == DIS_INPUT_REG) || (t == INPUT_REG) ||
+           (t == BAC_HOLDING_FLOAT_ABCD) || (t == BAC_HOLDING_FLOAT_CDAB) ||
+           (t == BAC_HOLDING_FLOAT_BADC) || (t == BAC_HOLDING_FLOAT_DCBA) ||
+           (t == BAC_INPUT_FLOAT_ABCD) || (t == BAC_INPUT_FLOAT_CDAB) ||
+           (t == BAC_INPUT_FLOAT_BADC) || (t == BAC_INPUT_FLOAT_DCBA);
+}
+
+static int VmModbusFunctionCode(unsigned char t, bool for_write)
+{
+    if (for_write) {
+        if (t == COIL_REG) return 5;   // Write Single Coil
+        return 6;                      // Write Single Register (holding / float first word)
+    }
+    switch (t) {
+    case COIL_REG:      return 1;
+    case DIS_INPUT_REG: return 2;
+    case INPUT_REG:
+    case BAC_INPUT_FLOAT_ABCD:
+    case BAC_INPUT_FLOAT_CDAB:
+    case BAC_INPUT_FLOAT_BADC:
+    case BAC_INPUT_FLOAT_DCBA:
+        return 4;
+    default:
+        return 3; // Holding registers
+    }
+}
+
+static bool VmIsFloatNetType(unsigned char t)
+{
+    return (t == BAC_HOLDING_FLOAT_ABCD) || (t == BAC_HOLDING_FLOAT_CDAB) ||
+           (t == BAC_HOLDING_FLOAT_BADC) || (t == BAC_HOLDING_FLOAT_DCBA) ||
+           (t == BAC_INPUT_FLOAT_ABCD) || (t == BAC_INPUT_FLOAT_CDAB) ||
+           (t == BAC_INPUT_FLOAT_BADC) || (t == BAC_INPUT_FLOAT_DCBA);
+}
+
+// Normalize two registers of a given byte-order into ABCD, then to host float ×1000
+static S32_T VmFloatRegsToScaled(unsigned short r0, unsigned short r1, unsigned char t)
+{
+    unsigned char abcd[4];
+    unsigned char b0 = (unsigned char)(r0 >> 8);
+    unsigned char b1 = (unsigned char)(r0 & 0xFF);
+    unsigned char b2 = (unsigned char)(r1 >> 8);
+    unsigned char b3 = (unsigned char)(r1 & 0xFF);
+
+    switch (t) {
+    case BAC_HOLDING_FLOAT_CDAB:
+    case BAC_INPUT_FLOAT_CDAB:
+        // registers hold CD, AB → ABCD
+        abcd[0] = b2; abcd[1] = b3; abcd[2] = b0; abcd[3] = b1;
+        break;
+    case BAC_HOLDING_FLOAT_BADC:
+    case BAC_INPUT_FLOAT_BADC:
+        // registers hold BA, DC → ABCD
+        abcd[0] = b1; abcd[1] = b0; abcd[2] = b3; abcd[3] = b2;
+        break;
+    case BAC_HOLDING_FLOAT_DCBA:
+    case BAC_INPUT_FLOAT_DCBA:
+        // registers hold DC, BA → ABCD
+        abcd[0] = b3; abcd[1] = b2; abcd[2] = b1; abcd[3] = b0;
+        break;
+    case BAC_HOLDING_FLOAT_ABCD:
+    case BAC_INPUT_FLOAT_ABCD:
+    default:
+        abcd[0] = b0; abcd[1] = b1; abcd[2] = b2; abcd[3] = b3;
+        break;
+    }
+
+    // ABCD (big-endian IEEE) → little-endian host float bytes
+    unsigned char host[4] = { abcd[3], abcd[2], abcd[1], abcd[0] };
+    float f = 0.0f;
+    memcpy(&f, host, sizeof(float));
+    return (S32_T)(f * 1000.0f);
+}
+
+static void VmScaledToFloatRegs(S32_T scaled, unsigned char t, unsigned short& r0, unsigned short& r1)
+{
+    float f = (float)scaled / 1000.0f;
+    unsigned char le[4];
+    memcpy(le, &f, 4); // LE: D C B A
+
+    unsigned char abcd[4] = { le[3], le[2], le[1], le[0] }; // A B C D
+
+    unsigned char out[4];
+    switch (t) {
+    case BAC_HOLDING_FLOAT_CDAB:
+    case BAC_INPUT_FLOAT_CDAB:
+        out[0] = abcd[2]; out[1] = abcd[3]; out[2] = abcd[0]; out[3] = abcd[1];
+        break;
+    case BAC_HOLDING_FLOAT_BADC:
+    case BAC_INPUT_FLOAT_BADC:
+        out[0] = abcd[1]; out[1] = abcd[0]; out[2] = abcd[3]; out[3] = abcd[2];
+        break;
+    case BAC_HOLDING_FLOAT_DCBA:
+    case BAC_INPUT_FLOAT_DCBA:
+        out[0] = abcd[3]; out[1] = abcd[2]; out[2] = abcd[1]; out[3] = abcd[0];
+        break;
+    default: // ABCD
+        out[0] = abcd[0]; out[1] = abcd[1]; out[2] = abcd[2]; out[3] = abcd[3];
+        break;
+    }
+    r0 = (unsigned short)((out[0] << 8) | out[1]);
+    r1 = (unsigned short)((out[2] << 8) | out[3]);
+}
+
+// Build target IP: replace last octet of Device_Basic_Setting.reg.ip_addr with panel.
+// Modbus TCP port defaults to 502 (Temco network-programming convention).
+static bool VmBuildTargetIp(unsigned char panel, CString& outIp, short& outPort)
+{
+    extern Str_Setting_Info Device_Basic_Setting;
+
+    const unsigned char* ip = Device_Basic_Setting.reg.ip_addr;
+    if (ip[0] == 0 && ip[1] == 0 && ip[2] == 0 && ip[3] == 0) {
+        TRACE(_T("[VM] remote point: Device_Basic_Setting.reg.ip_addr is empty\n"));
+        return false;
+    }
+
+    outIp.Format(_T("%u.%u.%u.%u"),
+                 (unsigned)ip[0], (unsigned)ip[1], (unsigned)ip[2], (unsigned)panel);
+    outPort = VM_MODBUS_TCP_DEFAULT_PORT;
+    return true;
+}
+
+// Connect to target, invoke reader/writer, restore previous socket
+static bool VmWithModbusTcp(const CString& targetIp, short targetPort, bool (*fn)(void*), void* ctx)
+{
+    CString savedIp = selected_product_Node.BuildingInfo.strIp;
+    short savedPort = (short)selected_product_Node.ncomport;
+    if (savedPort <= 0) {
+        int p = _wtoi(selected_product_Node.BuildingInfo.strIpPort);
+        savedPort = (short)((p > 0) ? p : VM_MODBUS_TCP_DEFAULT_PORT);
+    }
+    int savedCommType = g_CommunicationType;
+
+    bool ok = false;
+    SetCommunicationType(1);
+    if (Open_Socket_Retry(targetIp, targetPort, 2)) {
+        ok = fn(ctx);
+    }
+    else {
+        TRACE(_T("[VM] remote point: Open_Socket_Retry failed %s:%d\n"),
+              (LPCTSTR)targetIp, (int)targetPort);
+    }
+
+    // Restore connection to the virtual / selected device when possible
+    if (!savedIp.IsEmpty() && savedPort > 0) {
+        SetCommunicationType(1);
+        Open_Socket_Retry(savedIp, savedPort, 2);
+    }
+    else if (savedCommType == 0) {
+        SetCommunicationType(0);
+    }
+
+    return ok;
+}
+
+struct VmModbusIoCtx {
+    unsigned char modbus_id;
+    unsigned char point_type;
+    unsigned short reg;
+    S32_T* val_ptr;
+    bool writing;
+    bool success;
+};
+
+static bool VmModbusIoCallback(void* p)
+{
+    VmModbusIoCtx* ctx = (VmModbusIoCtx*)p;
+    ctx->success = false;
+
+    const bool isFloat = VmIsFloatNetType(ctx->point_type);
+    const int regCount = isFloat ? 2 : 1;
+    unsigned short data[2] = { 0, 0 };
+
+    if (ctx->writing) {
+        if (isFloat) {
+            VmScaledToFloatRegs(*ctx->val_ptr, ctx->point_type, data[0], data[1]);
+            if (Write_Multi_short(ctx->modbus_id, data, ctx->reg, 2, 2) > 0) {
+                ctx->success = true;
+            }
+        }
+        else if (ctx->point_type == COIL_REG) {
+            // Temco stack: Write_One with 0/1 for coil-mapped addresses
+            if (Write_One(ctx->modbus_id, ctx->reg, (*ctx->val_ptr != 0) ? 1 : 0) > 0) {
+                ctx->success = true;
+            }
+        }
+        else {
+            // Holding register: decode ×1000 → raw integer register
+            unsigned short raw = (unsigned short)((*ctx->val_ptr) / 1000);
+            if (Write_One(ctx->modbus_id, ctx->reg, raw) > 0) {
+                ctx->success = true;
+            }
+        }
+        return ctx->success;
+    }
+
+    // ---- READ ----
+    int fc = VmModbusFunctionCode(ctx->point_type, false);
+    if (fc == 3 || fc == 4) {
+        // Prefer Read_Multi for holding; Modbus_Standard_Read for input regs / coils
+        if (fc == 3) {
+            if (Read_Multi(ctx->modbus_id, data, ctx->reg, regCount, 2) > 0) {
+                ctx->success = true;
+            }
+        }
+        else {
+            unsigned char send_buf[64] = { 0 };
+            unsigned char recv_buf[256] = { 0 };
+            int send_len = 0, recv_len = 0;
+            if (Modbus_Standard_Read(ctx->modbus_id, data, fc, ctx->reg, regCount,
+                                     send_buf, recv_buf, &send_len, &recv_len) > 0) {
+                ctx->success = true;
+            }
+        }
+    }
+    else {
+        // Coils / discrete inputs
+        unsigned char send_buf[64] = { 0 };
+        unsigned char recv_buf[256] = { 0 };
+        int send_len = 0, recv_len = 0;
+        if (Modbus_Standard_Read(ctx->modbus_id, data, fc, ctx->reg, 1,
+                                 send_buf, recv_buf, &send_len, &recv_len) > 0) {
+            ctx->success = true;
+        }
+    }
+
+    if (!ctx->success) {
+        return false;
+    }
+
+    if (isFloat) {
+        *ctx->val_ptr = VmFloatRegsToScaled(data[0], data[1], ctx->point_type);
+    }
+    else if (ctx->point_type == COIL_REG || ctx->point_type == DIS_INPUT_REG) {
+        // Digital → decode 0 / 1000
+        *ctx->val_ptr = (data[0] != 0) ? 1000 : 0;
+    }
+    else {
+        // MB_REG / INPUT_REG: raw register ×1000
+        *ctx->val_ptr = ((S32_T)(short)data[0]) * 1000;
+    }
+    return true;
+}
+
+static S16_T VmAccessNetModbusPoint(VM_Point_Net* p, S32_T* val_ptr, bool writing)
+{
+    if (!p || !val_ptr) return -1;
+
+    unsigned char point_type = 0;
+    unsigned short reg = 0;
+    VmDecodeNetPoint(p, point_type, reg);
+
+    if (!VmIsModbusNetType(point_type)) {
+        TRACE("[VM] get/put_net_point: unsupported type %u (panel=%u sub=%u)\n",
+              (unsigned)point_type, (unsigned)p->panel, (unsigned)p->sub_id);
+        if (!writing) *val_ptr = 0;
+        return -1;
+    }
+
+    VmRemotePointKey key;
+    key.panel = p->panel;
+    key.sub_id = p->sub_id;
+    key.point_type = point_type;
+    key.reg = reg;
+
+    CSingleLock lock(&g_vm_remote_cs, TRUE);
+
+    if (!writing) {
+        std::map<VmRemotePointKey, VmRemotePointCache>::iterator it = g_vm_remote_cache.find(key);
+        DWORD now = GetTickCount();
+        if (it != g_vm_remote_cache.end() && it->second.valid &&
+            (now - it->second.tick) < VM_REMOTE_CACHE_MS) {
+            *val_ptr = it->second.value;
+            return 0;
+        }
+    }
+
+    CString targetIp;
+    short targetPort = VM_MODBUS_TCP_DEFAULT_PORT;
+    if (!VmBuildTargetIp(p->panel, targetIp, targetPort)) {
+        if (!writing) *val_ptr = 0;
+        return -1;
+    }
+
+    VmModbusIoCtx ctx;
+    ctx.modbus_id = p->sub_id;
+    ctx.point_type = point_type;
+    ctx.reg = reg;
+    ctx.val_ptr = val_ptr;
+    ctx.writing = writing;
+    ctx.success = false;
+
+    TRACE(_T("[VM] %s net point %s ID=%u type=%u reg=%u\n"),
+          writing ? _T("write") : _T("read"), (LPCTSTR)targetIp,
+          (unsigned)ctx.modbus_id, (unsigned)point_type, (unsigned)reg);
+
+    bool ok = VmWithModbusTcp(targetIp, targetPort, VmModbusIoCallback, &ctx);
+    if (!ok || !ctx.success) {
+        if (!writing) {
+            // Keep last cached value if any; otherwise 0
+            std::map<VmRemotePointKey, VmRemotePointCache>::iterator it = g_vm_remote_cache.find(key);
+            if (it != g_vm_remote_cache.end() && it->second.valid) {
+                *val_ptr = it->second.value;
+                return 0;
+            }
+            *val_ptr = 0;
+        }
+        return -1;
+    }
+
+    VmRemotePointCache entry;
+    entry.value = *val_ptr;
+    entry.tick = GetTickCount();
+    entry.valid = true;
+    g_vm_remote_cache[key] = entry;
+    return 0;
+}
+
 S16_T put_net_point_value(VM_Point_Net *point, S32_T *val_ptr, S16_T aux, S16_T prog_op, U8_T mode)
 {
-    // Remote points are not supported in the T3000 MFC VM.
-    // decode.c handles the case where remote points aren't available gracefully.
-    return 0;
+    (void)aux; (void)prog_op; (void)mode;
+    return VmAccessNetModbusPoint(point, val_ptr, true);
 }
 
 S16_T get_net_point_value(VM_Point_Net *p, S32_T *val_ptr, U8_T mode, U8_T flag)
 {
-    // Remote points not supported — return 0 (off/false)
-    if (val_ptr) *val_ptr = 0;
-    return 0;
+    (void)mode; (void)flag;
+    return VmAccessNetModbusPoint(p, val_ptr, false);
 }
 
 // Global variables used by decode.c's operand() and MAX/MIN cases

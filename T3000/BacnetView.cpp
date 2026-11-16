@@ -6363,7 +6363,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 	case TYPE_VARIABLE:
         if (Variable_Window->IsWindowVisible() == false)
         {
-			((CBacnetOutput*)pDialog[WINDOW_OUTPUT])->m_restoring_position = true;
+			((CBacnetVariable*)pDialog[WINDOW_VARIABLE])->m_restoring_position = true;
             Variable_Window->ShowWindow(SW_SHOW);
             Variable_Window->RestoreWindowPosition();
         }

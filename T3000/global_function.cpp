@@ -18979,5 +18979,24 @@ void SyncReadState_Cleanup(void)
 }
 #endif
 
+BOOL IsRectOnAnyMonitor(const RECT& rc)
+{
+	const int w = rc.right - rc.left;
+	const int h = rc.bottom - rc.top;
+	if (w < 50 || h < 30)
+		return FALSE;
+
+	// MONITOR_DEFAULTTONULL: no intersection with any monitor → NULL
+	HMONITOR hMon = ::MonitorFromRect(&rc, MONITOR_DEFAULTTONULL);
+	if (hMon != NULL)
+		return TRUE;
+
+	// Also accept a point near the top-left (handles partially off-screen but still valid)
+	const int dx = (w < 20) ? w : 20;
+	const int dy = (h < 20) ? h : 20;
+	POINT pt = { rc.left + dx / 2, rc.top + dy / 2 };
+	hMon = ::MonitorFromPoint(pt, MONITOR_DEFAULTTONULL);
+	return hMon != NULL;
+}
 
 

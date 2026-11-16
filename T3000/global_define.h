@@ -1412,7 +1412,7 @@ const int RMC1232_OUT_D = 4;
 
 const int NG3_IN_A = 24;
 const int NG3_IN_D = 0;
-const int NG3_OUT_A = 4;
+const int NG3_OUT_A = 5;
 const int NG3_OUT_D = 8;
 
 const int T3_3IIC_IN_A = 10;
