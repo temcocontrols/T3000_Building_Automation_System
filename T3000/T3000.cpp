@@ -17,7 +17,8 @@
 
 #include "../SQLiteDriver/CppSQLite3.h"
 #include "../MultipleMonthCal32/MultipleMonthCalCtrl.h"
-#include <windows.h>  
+#include <windows.h>
+#include <vector>  
 
 /**
  * @brief Global version of the T3000 application.
@@ -200,6 +201,104 @@ void CT3000App::UpdateDB()
     }
 }
 
+
+/// <summary>
+/// Drop the menu bar captions MFC keeps in the workspace state.
+///
+/// `CMFCMenuBar` is a toolbar, and `CWinAppEx` persists every toolbar's buttons - including their
+/// text - under HKCU\Software\<registry key>\<profile>\Workspace\MFCToolBar-<id>. On startup that
+/// saved text wins over T3000.rc, so renaming a menu item (for example "Documentation" ->
+/// "New T3000 Help") and rebuilding the exe changes nothing on a machine that has run T3000 before.
+/// Removing those cached buttons once per build is what makes a .rc change visible - for new and
+/// existing installations alike. The build's file time is the marker, so ordinary restarts keep the
+/// user's own toolbar customisations.
+/// </summary>
+static void ClearCachedMenuBarCaptions()
+{
+	CWinApp* app = AfxGetApp();
+	if (app == nullptr || app->m_pszRegistryKey == nullptr || app->m_pszProfileName == nullptr)
+	{
+		return;
+	}
+
+	TCHAR exePath[MAX_PATH] = { 0 };
+	::GetModuleFileName(NULL, exePath, MAX_PATH);
+	WIN32_FILE_ATTRIBUTE_DATA fileInfo;
+	CString buildStamp(_T("unknown"));
+	if (::GetFileAttributesEx(exePath, GetFileExInfoStandard, &fileInfo))
+	{
+		buildStamp.Format(_T("%08X%08X"), fileInfo.ftLastWriteTime.dwHighDateTime, fileInfo.ftLastWriteTime.dwLowDateTime);
+	}
+
+	CString appKey;
+	appKey.Format(_T("Software\\%s\\%s"), app->m_pszRegistryKey, app->m_pszProfileName);
+	const CString markerName(_T("MenuCaptionsBuild"));
+
+	CString storedStamp;
+	HKEY appHandle = NULL;
+	if (::RegOpenKeyEx(HKEY_CURRENT_USER, appKey, 0, KEY_READ, &appHandle) == ERROR_SUCCESS)
+	{
+		TCHAR value[64] = { 0 };
+		DWORD size = sizeof(value);
+		DWORD type = 0;
+		if (::RegQueryValueEx(appHandle, markerName, NULL, &type, reinterpret_cast<LPBYTE>(value), &size) == ERROR_SUCCESS)
+		{
+			storedStamp = value;
+		}
+		::RegCloseKey(appHandle);
+	}
+	if (storedStamp == buildStamp)
+	{
+		return;
+	}
+
+	const CString workspaceKey = appKey + _T("\\Workspace");
+	HKEY workspace = NULL;
+	bool workspaceFound = false;
+	if (::RegOpenKeyEx(HKEY_CURRENT_USER, workspaceKey, 0, KEY_READ | KEY_WRITE, &workspace) == ERROR_SUCCESS)
+	{
+		workspaceFound = true;
+		std::vector<CString> cachedBars;
+		TCHAR subKey[256];
+		for (DWORD index = 0;; ++index)
+		{
+			DWORD length = 256;
+			if (::RegEnumKeyEx(workspace, index, subKey, &length, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
+			{
+				break;
+			}
+			// Only the toolbars themselves ("MFCToolBar-<id>"), never MFCToolBarParameters.
+			if (CString(subKey).Left(11).CompareNoCase(_T("MFCToolBar-")) == 0)
+			{
+				cachedBars.push_back(CString(subKey));
+			}
+		}
+		for (size_t i = 0; i < cachedBars.size(); ++i)
+		{
+			HKEY bar = NULL;
+			if (::RegOpenKeyEx(workspace, cachedBars[i], 0, KEY_READ | KEY_WRITE, &bar) != ERROR_SUCCESS)
+			{
+				continue;
+			}
+			::RegDeleteValue(bar, _T("Buttons"));
+			::RegDeleteValue(bar, _T("ButtonStates"));
+			::RegCloseKey(bar);
+			// Removes the key as well when that was all it held.
+			::RegDeleteKey(workspace, cachedBars[i]);
+		}
+		::RegCloseKey(workspace);
+	}
+
+	HKEY marker = NULL;
+	if (workspaceFound
+		&& ::RegCreateKeyEx(HKEY_CURRENT_USER, appKey, 0, NULL, 0, KEY_WRITE, NULL, &marker, NULL) == ERROR_SUCCESS)
+	{
+		::RegSetValueEx(marker, markerName, 0, REG_SZ,
+			reinterpret_cast<const BYTE*>(buildStamp.GetString()),
+			static_cast<DWORD>((buildStamp.GetLength() + 1) * sizeof(TCHAR)));
+		::RegCloseKey(marker);
+	}
+}
 
 /// <summary>
 /// T3000 Start ,from here
@@ -617,6 +716,7 @@ BOOL CT3000App::InitInstance()
 			//  You should modify this string to be something appropriate
 			// such as the name of your company or organization
 			SetRegistryKey(_T("Temco T3000 Application"));//
+			ClearCachedMenuBarCaptions();
 			LoadStdProfileSettings();  // Load standard INI file options (including MRU)//
 			InitContextMenuManager();
 			InitKeyboardManager();

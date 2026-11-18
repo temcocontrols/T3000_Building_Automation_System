@@ -79,7 +79,13 @@ enum WEBVIEW_MESSAGE_TYPE
 	UPDATE_WEBVIEW_LIST = 16,
 	GET_WEBVIEW_LIST = 17,
 	// WEBVIEW button: the web UI (WIN11 icon) asks for the desktop app back.
-	BACK_TO_DESKTOP = 18
+	BACK_TO_DESKTOP = 18,
+
+	// Help & Report - design/t3000-help-and-report.md
+	REPORT_CONTEXT = 19,
+	REPORT_LOGS = 20,
+	REPORT_CAPTURE = 21,
+	REPORT_CLIPBOARD = 22
 };
 
 #define READ_INPUT_VARIABLE  0
@@ -650,6 +656,31 @@ HRESULT BacnetWebViewAppWindow::OnCreateCoreWebView2ControllerCompleted(
 	m_webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(this, &BacnetWebViewAppWindow::WebMessageReceived).Get(), &token);
 	/* END Resgister the listner for message handling */
 
+	/* Links that leave the app - the documentation site, the forum, GitHub - open in the user's own
+	   browser: a popup inside the host would have no address bar and no way back. Anything still
+	   pointing at this machine keeps the default behaviour, because it is part of the local web UI. */
+	EventRegistrationToken newWindowToken;
+	m_webView->add_NewWindowRequested(
+		Callback<ICoreWebView2NewWindowRequestedEventHandler>(
+			[this](ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args) -> HRESULT
+			{
+				wil::unique_cotaskmem_string uri;
+				if (FAILED(args->get_Uri(&uri)) || uri.get() == nullptr)
+				{
+					return S_OK;
+				}
+				const std::wstring url(uri.get());
+				const bool isWebUrl = url.compare(0, 7, L"http://") == 0 || url.compare(0, 8, L"https://") == 0;
+				const bool isLocal = url.find(L"localhost") != std::wstring::npos
+					|| url.find(L"127.0.0.1") != std::wstring::npos;
+				if (isWebUrl && !isLocal)
+				{
+					::ShellExecuteW(m_mainWindow, L"open", url.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+					args->put_Handled(TRUE);
+				}
+				return S_OK;
+			}).Get(), &newWindowToken);
+
 	// Add navigation completion handler for hard refresh (Ctrl+F5 equivalent)
 	EventRegistrationToken navigationCompletedToken;
 	m_webView->add_NavigationCompleted(
@@ -863,6 +894,470 @@ void WriteHandleWebViewMsgLog(const CString& messageType, const CString& outmsg,
 
 #include <mutex>
 std::mutex handleWebViewMsgMutex;
+
+/* `HandleWebViewMsg` is a free function, so it cannot ask the window class for its handle. The window
+   that is running the page records itself here before dispatching, which is what lets the screenshot
+   handler step that window out of the picture. */
+static HWND s_webViewHostWindow = NULL;
+
+/* The picture taken *before* the report window opened (see ReportCaptureAppWindow). REPORT_CONTEXT
+   hands it to the page, which is why the report starts with a screenshot already attached. */
+static CString s_pendingReportShotPath;
+
+#include "RuntimeLog.h"
+#include <vector>
+
+/* ======================= Help & Report =======================
+ * The Support page in the web UI (:9103/#/report) asks for the facts only this
+ * process has: the window's pixels, the runtime log, the build. Four messages.
+ * Design: design/t3000-help-and-report.md
+ * =========================================================== */
+static bool ReportEncoderClsid(const WCHAR* mime, CLSID& clsid)
+{
+	UINT num = 0, size = 0;
+	if (Gdiplus::GetImageEncodersSize(&num, &size) != Gdiplus::Ok || size == 0) { return false; }
+	std::vector<BYTE> buf(size);
+	Gdiplus::ImageCodecInfo* codecs = (Gdiplus::ImageCodecInfo*)&buf[0];
+	if (Gdiplus::GetImageEncoders(num, size, codecs) != Gdiplus::Ok) { return false; }
+	for (UINT i = 0; i < num; i++)
+	{
+		if (CString(codecs[i].MimeType).CompareNoCase(mime) == 0) { clsid = codecs[i].Clsid; return true; }
+	}
+	return false;
+}
+
+static CString ReportExeVersion()
+{
+	TCHAR path[MAX_PATH] = { 0 };
+	::GetModuleFileName(NULL, path, MAX_PATH);
+	DWORD handle = 0;
+	const DWORD size = ::GetFileVersionInfoSize(path, &handle);
+	if (size == 0) { return CString(_T("unknown")); }
+	std::vector<BYTE> buf(size);
+	if (!::GetFileVersionInfo(path, 0, size, &buf[0])) { return CString(_T("unknown")); }
+	VS_FIXEDFILEINFO* info = NULL;
+	UINT len = 0;
+	if (::VerQueryValue(&buf[0], _T("\\"), (LPVOID*)&info, &len) && info != NULL)
+	{
+		CString v;
+		v.Format(_T("%u.%u.%u.%u"),
+			(unsigned)HIWORD(info->dwFileVersionMS), (unsigned)LOWORD(info->dwFileVersionMS),
+			(unsigned)HIWORD(info->dwFileVersionLS), (unsigned)LOWORD(info->dwFileVersionLS));
+		return v;
+	}
+	return CString(_T("unknown"));
+}
+
+static CString ReportWindowsVersion()
+{
+	typedef LONG(WINAPI* RtlGetVersionProc)(OSVERSIONINFOW*);
+	CString text(_T("unknown"));
+	const HMODULE ntdll = ::GetModuleHandle(_T("ntdll.dll"));
+	if (ntdll == NULL) { return text; }
+	const RtlGetVersionProc rtlGetVersion = (RtlGetVersionProc)::GetProcAddress(ntdll, "RtlGetVersion");
+	if (rtlGetVersion == NULL) { return text; }
+	OSVERSIONINFOW osvi;
+	::ZeroMemory(&osvi, sizeof(osvi));
+	osvi.dwOSVersionInfoSize = sizeof(osvi);
+	if (rtlGetVersion(&osvi) == 0)
+	{
+		text.Format(_T("%u.%u build %u"),
+			(unsigned)osvi.dwMajorVersion, (unsigned)osvi.dwMinorVersion, (unsigned)osvi.dwBuildNumber);
+	}
+	return text;
+}
+
+static CString ReportFolder()
+{
+	TCHAR path[MAX_PATH] = { 0 };
+	::GetModuleFileName(NULL, path, MAX_PATH);
+	CString folder(path);
+	const int slash = folder.ReverseFind(_T('\\'));
+	if (slash < 0) { return CString(_T(".")); }
+	folder = folder.Left(slash + 1) + _T("reports");
+	::CreateDirectory(folder, NULL);
+	return folder;
+}
+
+/* `PrintWindow` reports success while painting nothing when the window is covered or minimised, and the
+   result is then a flat rectangle. Sample a grid of pixels before trusting it. */
+static bool ReportBitmapIsBlank(HDC hdc, int width, int height)
+{
+	if (width <= 0 || height <= 0)
+	{
+		return true;
+	}
+	const int stepX = (width > 20) ? (width / 10) : 1;
+	const int stepY = (height > 20) ? (height / 10) : 1;
+	for (int y = stepY / 2; y < height; y += stepY)
+	{
+		for (int x = stepX / 2; x < width; x += stepX)
+		{
+			const COLORREF pixel = ::GetPixel(hdc, x, y);
+			if (pixel != CLR_INVALID && pixel != RGB(0, 0, 0) && pixel != RGB(255, 255, 255))
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+/* A window's rectangle including its invisible resize border, so a picture of it lines up with what is
+   on screen. */
+static bool ReportWindowScreenRect(HWND hWnd, RECT& rc)
+{
+	typedef HRESULT(WINAPI* DwmGetWindowAttributeProc)(HWND, DWORD, PVOID, DWORD);
+	const DwmGetWindowAttributeProc dwmGet = (DwmGetWindowAttributeProc)::GetProcAddress(
+		::GetModuleHandle(_T("dwmapi.dll")), "DwmGetWindowAttribute");
+	if (dwmGet == NULL || FAILED(dwmGet(hWnd, 9 /*DWMWA_EXTENDED_FRAME_BOUNDS*/, &rc, sizeof(rc))))
+	{
+		if (::GetWindowRect(hWnd, &rc) == FALSE)
+		{
+			return false;
+		}
+	}
+	return (rc.right > rc.left) && (rc.bottom > rc.top);
+}
+
+struct ReportPaintTarget
+{
+	HWND hwnd;
+	RECT rect;
+};
+
+struct ReportPaintQuery
+{
+	DWORD pid;
+	HWND skip;
+	RECT clip;
+	std::vector<ReportPaintTarget>* targets;
+};
+
+static BOOL CALLBACK ReportCollectPaintTarget(HWND hWnd, LPARAM lParam)
+{
+	ReportPaintQuery* query = (ReportPaintQuery*)lParam;
+	if (hWnd == query->skip || ::IsWindowVisible(hWnd) == FALSE || ::IsIconic(hWnd) != FALSE)
+	{
+		return TRUE;
+	}
+	DWORD pid = 0;
+	::GetWindowThreadProcessId(hWnd, &pid);
+	if (pid != query->pid)
+	{
+		return TRUE;
+	}
+	RECT rect = { 0 };
+	if (!ReportWindowScreenRect(hWnd, rect))
+	{
+		return TRUE;
+	}
+	RECT overlap = { 0 };
+	if (::IntersectRect(&overlap, &rect, &query->clip) == FALSE)
+	{
+		return TRUE;
+	}
+	ReportPaintTarget target;
+	target.hwnd = hWnd;
+	target.rect = rect;
+	query->targets->push_back(target);
+	return TRUE;
+}
+
+/* Paint one window onto the picture where it sits on screen. False when it has nothing to draw - it is
+   covered, or it never handled WM_PRINT - so the caller can skip it rather than punch a blank hole. */
+static bool ReportPaintWindowOn(HDC hdc, const ReportPaintTarget& target, const RECT& canvas)
+{
+	const int width = target.rect.right - target.rect.left;
+	const int height = target.rect.bottom - target.rect.top;
+	HDC windowDC = ::CreateCompatibleDC(hdc);
+	if (windowDC == NULL) { return false; }
+	HBITMAP windowBmp = ::CreateCompatibleBitmap(hdc, width, height);
+	if (windowBmp == NULL)
+	{
+		::DeleteDC(windowDC);
+		return false;
+	}
+	HGDIOBJ oldBitmap = ::SelectObject(windowDC, windowBmp);
+
+	const bool painted = (::PrintWindow(target.hwnd, windowDC, 2) != FALSE)
+		&& !ReportBitmapIsBlank(windowDC, width, height);
+	if (painted)
+	{
+		::BitBlt(hdc, target.rect.left - canvas.left, target.rect.top - canvas.top,
+			width, height, windowDC, 0, 0, SRCCOPY);
+	}
+
+	::SelectObject(windowDC, oldBitmap);
+	::DeleteObject(windowBmp);
+	::DeleteDC(windowDC);
+	return painted;
+}
+
+/* The frame on its own is not the screen: T3000 keeps views like INPUT in their own popup window
+   owned by the frame, so painting only the frame loses them. Paint every visible window of this
+   process that overlaps the frame, in z-order, at the place it occupies - the app is still in front
+   when the menu takes the shot, and `PrintWindow` renders covered windows too, so nothing has to be
+   hidden. */
+static bool ReportPaintAppWindows(HDC hdc, HWND frame, const RECT& canvas, int width, int height)
+{
+	DWORD pid = 0;
+	::GetWindowThreadProcessId(frame, &pid);
+
+	std::vector<ReportPaintTarget> targets;
+	ReportPaintQuery query;
+	query.pid = pid;
+	query.skip = s_webViewHostWindow;
+	query.clip = canvas;
+	query.targets = &targets;
+	::EnumWindows(ReportCollectPaintTarget, (LPARAM)&query);
+
+	/* EnumWindows walks from the front of the z-order back, so paint the other way round and the
+	   windows that are in front end up in front. */
+	bool painted = false;
+	bool missing = false;
+	for (size_t i = targets.size(); i > 0; i--)
+	{
+		const ReportPaintTarget& target = targets[i - 1];
+		if (ReportPaintWindowOn(hdc, target, canvas))
+		{
+			painted = true;
+			continue;
+		}
+		RECT overlap = { 0 };
+		if (::IntersectRect(&overlap, &target.rect, &canvas) != FALSE
+			&& (overlap.right - overlap.left) >= 32 && (overlap.bottom - overlap.top) >= 32)
+		{
+			/* A pane that did not paint would leave a hole in the picture. Thin helper strips do not
+			   handle WM_PRINT and are not worth stepping a window aside for. */
+			missing = true;
+		}
+	}
+	return painted && !missing && !ReportBitmapIsBlank(hdc, width, height);
+}
+
+/* True when the frame itself is the window in front, i.e. a copy of the screen really does show the
+   app. A menu popup does not count - the picture would contain the open menu. */
+static bool ReportFrameIsInFront(HWND frame)
+{
+	/* The report window covers the app, so a copy of the screen would photograph that window instead.
+	   The caller hides it before asking for a screen copy, so this only rules out the covered case. */
+	if (::IsWindow(s_webViewHostWindow) != FALSE && ::IsWindowVisible(s_webViewHostWindow) != FALSE)
+	{
+		return false;
+	}
+	const HWND foreground = ::GetForegroundWindow();
+	if (foreground == NULL)
+	{
+		return false;
+	}
+	if (foreground == frame)
+	{
+		return true;
+	}
+	TCHAR cls[64] = { 0 };
+	if (::GetClassName(foreground, cls, _countof(cls)) != 0 && _tcscmp(cls, _T("#32768")) == 0)
+	{
+		return false;
+	}
+	return ::GetWindow(foreground, GW_OWNER) == frame;
+}
+
+/* `allowScreenCopy`: when the picture cannot be assembled (the window is minimised, or a pane refused
+   to paint) fall back to copying the desktop. Only worth doing when the app is actually in front -
+   otherwise the copy just shows whatever covers it; the caller hides its own window first. */
+static bool ReportCapturePng(HWND hWnd, bool wholeWindow, bool allowScreenCopy, CString& outPath, int& outW, int& outH)
+{
+	if (!::IsWindow(hWnd)) { return false; }
+
+	RECT rc = { 0 };
+	if (wholeWindow)
+	{
+		if (!ReportWindowScreenRect(hWnd, rc)) { return false; }
+	}
+	else
+	{
+		::GetClientRect(hWnd, &rc);
+		POINT origin = { 0, 0 };
+		::ClientToScreen(hWnd, &origin);
+		::OffsetRect(&rc, origin.x, origin.y);
+	}
+
+	outW = rc.right - rc.left;
+	outH = rc.bottom - rc.top;
+	if (outW <= 0 || outH <= 0) { return false; }
+
+	HDC hScreen = ::GetDC(NULL);
+	HDC hMem = ::CreateCompatibleDC(hScreen);
+	HBITMAP hBmp = ::CreateCompatibleBitmap(hScreen, outW, outH);
+	HGDIOBJ hOld = ::SelectObject(hMem, hBmp);
+
+	/* The screen is the exact picture whenever the app is the window in front - every pane, including
+	   the ones that live in their own popup window - and copying it needs nothing hidden. Only when
+	   something else is in front do we have to rebuild the picture window by window. */
+	bool painted = false;
+	if (ReportFrameIsInFront(hWnd))
+	{
+		::BitBlt(hMem, 0, 0, outW, outH, hScreen, rc.left, rc.top, SRCCOPY | CAPTUREBLT);
+		painted = !ReportBitmapIsBlank(hMem, outW, outH);
+	}
+	if (!painted)
+	{
+		painted = ReportPaintAppWindows(hMem, hWnd, rc, outW, outH);
+	}
+	if (!painted)
+	{
+		if (!allowScreenCopy)
+		{
+			// Nothing was rendered and a screen copy is not trustworthy: report failure, write no file.
+			::SelectObject(hMem, hOld);
+			::DeleteObject(hBmp);
+			::DeleteDC(hMem);
+			::ReleaseDC(NULL, hScreen);
+			return false;
+		}
+		::BitBlt(hMem, 0, 0, outW, outH, hScreen, rc.left, rc.top, SRCCOPY | CAPTUREBLT);
+	}
+
+	Gdiplus::Bitmap bmp(hBmp, NULL);
+	::SelectObject(hMem, hOld);
+	::DeleteObject(hBmp);
+	::DeleteDC(hMem);
+	::ReleaseDC(NULL, hScreen);
+
+	CLSID pngClsid;
+	if (!ReportEncoderClsid(L"image/png", pngClsid)) { return false; }
+
+	SYSTEMTIME st;
+	::GetLocalTime(&st);
+	outPath.Format(_T("%s\\screen-%04u%02u%02u-%02u%02u%02u.png"), (LPCTSTR)ReportFolder(),
+		(unsigned)st.wYear, (unsigned)st.wMonth, (unsigned)st.wDay,
+		(unsigned)st.wHour, (unsigned)st.wMinute, (unsigned)st.wSecond);
+
+	return bmp.Save((LPCWSTR)outPath, &pngClsid, NULL) == Gdiplus::Ok;
+}
+
+/* Capture the application window for the report flow. A plain free function (like HandleWebViewMsg) so
+   the menu can grab the window *before* the report window opens: nothing is covered yet, so the first
+   screenshot needs no hiding and shows no flicker. */
+bool ReportCaptureAppWindow(CString& outPath, int& outWidth, int& outHeight)
+{
+	CMainFrame* pFrame = (CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	if (pFrame == NULL || pFrame->GetSafeHwnd() == NULL)
+	{
+		return false;
+	}
+	HWND appWindow = pFrame->GetSafeHwnd();
+	if (::IsIconic(appWindow) != FALSE)
+	{
+		::ShowWindow(appWindow, SW_RESTORE);
+		::UpdateWindow(appWindow);
+	}
+	/* The menu that started this command has just closed; give the frame a moment to repaint what it
+	   covered so the copy of the screen does not contain the menu. Nothing is hidden and the delay is
+	   too short to see. */
+	::UpdateWindow(appWindow);
+	::Sleep(30);
+
+	const bool captured = ReportCapturePng(appWindow, true, false, outPath, outWidth, outHeight);
+	s_pendingReportShotPath = captured ? outPath : CString();
+	return captured;
+}
+
+/* Called once the report window has closed: the picture stays on disk for the report bundle, but a
+   later, unrelated visit to the report page must not inherit it. */
+void ReportClearPendingShot()
+{
+	s_pendingReportShotPath.Empty();
+}
+
+/* A `data:` URL for a PNG already on disk, so the page can show the thumbnail straight from the host
+   response - no second HTTP request, and nothing that can fail because a path is not reachable from
+   the browser. Empty when the file cannot be read. */
+static CString ReportFileAsDataUrl(const CString& filePath)
+{
+	static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+	CFile file;
+	if (!file.Open(filePath, CFile::modeRead | CFile::shareDenyNone))
+	{
+		return CString();
+	}
+	const ULONGLONG length = file.GetLength();
+	/* A captured window is a few hundred KB; the cap only guards against handing the page a file that
+	   was replaced by something large, which would bloat the message we post back. */
+	if (length == 0 || length > (8ull * 1024ull * 1024ull))
+	{
+		file.Close();
+		return CString();
+	}
+	std::vector<BYTE> bytes(static_cast<size_t>(length));
+	const UINT read = file.Read(bytes.data(), static_cast<UINT>(length));
+	file.Close();
+	bytes.resize(read);
+
+	std::string encoded;
+	encoded.reserve(((bytes.size() + 2) / 3) * 4);
+	for (size_t i = 0; i < bytes.size(); i += 3)
+	{
+		const unsigned int b0 = bytes[i];
+		const unsigned int b1 = (i + 1 < bytes.size()) ? bytes[i + 1] : 0;
+		const unsigned int b2 = (i + 2 < bytes.size()) ? bytes[i + 2] : 0;
+		const unsigned int triple = (b0 << 16) | (b1 << 8) | b2;
+
+		encoded.push_back(alphabet[(triple >> 18) & 0x3F]);
+		encoded.push_back(alphabet[(triple >> 12) & 0x3F]);
+		encoded.push_back((i + 1 < bytes.size()) ? alphabet[(triple >> 6) & 0x3F] : '=');
+		encoded.push_back((i + 2 < bytes.size()) ? alphabet[triple & 0x3F] : '=');
+	}
+
+	CString dataUrl(_T("data:image/png;base64,"));
+	dataUrl += CString(encoded.c_str());
+	return dataUrl;
+}
+
+static bool ReportCopyPngToClipboard(const CString& pngPath)
+{
+	if (pngPath.IsEmpty()) { return false; }
+	Gdiplus::Bitmap bmp((LPCWSTR)pngPath);
+	if (bmp.GetLastStatus() != Gdiplus::Ok) { return false; }
+
+	HBITMAP hBmp = NULL;
+	if (bmp.GetHBITMAP(Gdiplus::Color(255, 255, 255, 255), &hBmp) != Gdiplus::Ok || hBmp == NULL) { return false; }
+
+	BITMAP bm = { 0 };
+	::GetObject(hBmp, sizeof(bm), &bm);
+
+	BITMAPINFOHEADER bih = { 0 };
+	bih.biSize = sizeof(BITMAPINFOHEADER);
+	bih.biWidth = bm.bmWidth;
+	bih.biHeight = bm.bmHeight;
+	bih.biPlanes = 1;
+	bih.biBitCount = 32;
+	bih.biCompression = BI_RGB;
+
+	const DWORD imageBytes = (DWORD)bm.bmWidth * 4 * (DWORD)bm.bmHeight;
+	HANDLE hMem = ::GlobalAlloc(GMEM_MOVEABLE, sizeof(BITMAPINFOHEADER) + imageBytes);
+	if (hMem == NULL) { ::DeleteObject(hBmp); return false; }
+
+	BYTE* dest = (BYTE*)::GlobalLock(hMem);
+	if (dest == NULL) { ::GlobalFree(hMem); ::DeleteObject(hBmp); return false; }
+
+	::CopyMemory(dest, &bih, sizeof(BITMAPINFOHEADER));
+	HDC hScreen = ::GetDC(NULL);
+	::GetDIBits(hScreen, hBmp, 0, (UINT)bm.bmHeight, dest + sizeof(BITMAPINFOHEADER),
+		(BITMAPINFO*)&bih, DIB_RGB_COLORS);
+	::ReleaseDC(NULL, hScreen);
+	::GlobalUnlock(hMem);
+	::DeleteObject(hBmp);
+
+	if (!::OpenClipboard(::GetActiveWindow())) { ::GlobalFree(hMem); return false; }
+	::EmptyClipboard();
+	const bool ok = ::SetClipboardData(CF_DIB, hMem) != NULL;
+	::CloseClipboard();
+	if (!ok) { ::GlobalFree(hMem); }
+	return ok;
+}
 void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 {
 	// 使用 std::lock_guard 来锁定互斥锁
@@ -4036,6 +4531,100 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 		outmsg = CString(Json::writeString(builder, tempjson).c_str());
 	}
 	break;
+	case WEBVIEW_MESSAGE_TYPE::REPORT_CONTEXT:
+	{
+		tempjson["action"] = "REPORT_CONTEXT_RES";
+		tempjson["version"] = std::string(CT2A(ReportExeVersion()));
+		tempjson["windows"] = std::string(CT2A(ReportWindowsVersion()));
+		tempjson["locale"] = (int)::GetUserDefaultUILanguage();
+		tempjson["building"] = std::string(CT2A(pFrame->m_strCurMainBuildingName));
+		tempjson["panel"] = bac_gloab_panel;
+		tempjson["device_serial"] = (int)g_selected_serialnumber;
+		tempjson["log_lines"] = CRuntimeLog::Instance().Count();
+		/* The shot taken when the menu opened this window, so the report starts with it attached. */
+		if (!s_pendingReportShotPath.IsEmpty()
+			&& ::GetFileAttributes(s_pendingReportShotPath) != INVALID_FILE_ATTRIBUTES)
+		{
+			CString pendingDataUrl = ReportFileAsDataUrl(s_pendingReportShotPath);
+			tempjson["pending_shot"] = std::string(CT2A(s_pendingReportShotPath));
+			tempjson["pending_shot_data"] = std::string(CT2A(pendingDataUrl));
+		}
+		outmsg = CString(Json::writeString(builder, tempjson).c_str());
+	}
+	break;
+
+	case WEBVIEW_MESSAGE_TYPE::REPORT_LOGS:
+	{
+		tempjson["action"] = "REPORT_LOGS_RES";
+		const int count = json.get("count", 200).asInt();
+		tempjson["text"] = std::string(CT2A(CRuntimeLog::Instance().Tail(count)));
+		tempjson["saved"] = std::string(CT2A(CRuntimeLog::Instance().Save()));
+		outmsg = CString(Json::writeString(builder, tempjson).c_str());
+	}
+	break;
+
+	case WEBVIEW_MESSAGE_TYPE::REPORT_CAPTURE:
+	{
+		tempjson["action"] = "REPORT_CAPTURE_RES";
+		CString path;
+		int w = 0, h = 0;
+		const bool whole = json.get("whole", true).asBool();
+
+		/* Flicker-free first: the picture is assembled from the app's own windows, which needs nothing
+		   hidden. Only when a pane refuses to paint - or the app is minimised - step this window aside
+		   for a moment and copy the screen instead. */
+		HWND hostWindow = (::IsWindow(s_webViewHostWindow) != FALSE) ? s_webViewHostWindow : NULL;
+		HWND appWindow = (pFrame != nullptr) ? pFrame->GetSafeHwnd() : NULL;
+		bool captured = (appWindow != NULL) && ReportCapturePng(appWindow, whole, false, path, w, h);
+
+		if (!captured && appWindow != NULL)
+		{
+			const bool appWasMinimised = (::IsIconic(appWindow) != FALSE);
+			::ShowWindow(appWindow, appWasMinimised ? SW_RESTORE : SW_SHOW);
+			::SetForegroundWindow(appWindow);
+			if (hostWindow != NULL)
+			{
+				::ShowWindow(hostWindow, SW_HIDE);
+			}
+			::Sleep(200);
+
+			captured = ReportCapturePng(appWindow, whole, true, path, w, h);
+
+			if (hostWindow != NULL)
+			{
+				::ShowWindow(hostWindow, SW_SHOW);
+				::SetForegroundWindow(hostWindow);
+			}
+		}
+
+		if (captured)
+		{
+			tempjson["ok"] = true;
+			tempjson["path"] = std::string(CT2A(path));
+			tempjson["width"] = w;
+			tempjson["height"] = h;
+			/* The bytes travel with the answer, so the thumbnail never depends on a second request. */
+			tempjson["dataUrl"] = std::string(CT2A(ReportFileAsDataUrl(path)));
+			RUNTIME_LOG("report", _T("screen captured"));
+		}
+		else
+		{
+			tempjson["ok"] = false;
+			tempjson["error"] = "capture failed";
+			RUNTIME_LOG("report", _T("screen capture failed"));
+		}
+		outmsg = CString(Json::writeString(builder, tempjson).c_str());
+	}
+	break;
+
+	case WEBVIEW_MESSAGE_TYPE::REPORT_CLIPBOARD:
+	{
+		tempjson["action"] = "REPORT_CLIPBOARD_RES";
+		CString png(json.get("path", "").asString().c_str());
+		tempjson["ok"] = ReportCopyPngToClipboard(png);
+		outmsg = CString(Json::writeString(builder, tempjson).c_str());
+	}
+	break;
 	default:
 		break;
 	}
@@ -4045,6 +4634,7 @@ void HandleWebViewMsg(CString msg, CString& outmsg, int msg_source = 0)
 void BacnetWebViewAppWindow::ProcessWebviewMsg(CString msg)
 {
 	CString outmsg;
+	s_webViewHostWindow = m_mainWindow;
 	HandleWebViewMsg(msg, outmsg);
 	if (!outmsg.IsEmpty())
 		m_webView->PostWebMessageAsJson(outmsg);

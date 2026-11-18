@@ -11742,6 +11742,8 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "Contents",                    ID_HELP
+        MENUITEM "New T3000 Help\tF1",          ID_HELP_AND_LEARN
+        MENUITEM "&Report an Issue...",         ID_HELP_REPORT_ISSUE
         MENUITEM "Version History",             ID_VERSIONHISTORY
         MENUITEM "&About Software...",          ID_APP_ABOUT
         MENUITEM "Check For Updates",           ID_HELP_USING_UPDATE
@@ -12079,6 +12081,7 @@ BEGIN
     VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
     VK_F6,          ID_NEXT_PANE,           VIRTKEY
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+    VK_F1,          ID_HELP_AND_LEARN,      VIRTKEY
 END
 
 

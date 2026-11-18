@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "../ISP/MyPing.h"
 #include "global_function.h"
+#include "RuntimeLog.h"
 #include "Windows.h"
 #include "T3000.h"
 
@@ -281,6 +282,8 @@ void SetPaneString(int nIndext,CString str)
         return;
     if(str.IsEmpty())
         return;
+
+    RUNTIME_LOG("status", (LPCTSTR)str);
 
     char * temp_cs = new char[255];
 
