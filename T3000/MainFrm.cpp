@@ -303,6 +303,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_UPDATE_COMMAND_UI(ID_USERACCOUNT_MANNAGEUSER, OnUserMannageMentUpdate)
     ON_COMMAND(ID_USERACCOUNT_LOGIN, OnUserLogin)
     ON_COMMAND(ID_HELP, OnHelp)
+    ON_COMMAND(ID_HELP_AND_LEARN, OnHelpAndLearn)
+    ON_COMMAND(ID_HELP_REPORT_ISSUE, OnHelpReportIssue)
     ON_COMMAND(ID_TOOL_EREASE_CHANGE_ID, OnToolErease)
     ON_COMMAND(ID_TOOL_FRESH, OnToolFresh)
     ON_COMMAND(ID_TOOL_FRESHLEFTTREEVIEW, OnToolRefreshLeftTreee)
@@ -1015,6 +1017,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     EnableDocking(CBRS_ALIGN_ANY);
 
     DockPane(&m_wndMenuBar);
+
+    /* MFC Feature Pack restores the menu bar - item TEXT included - from the profile, so a label
+       changed in T3000.rc never reaches an installation that has run before; the old text wins
+       forever. Rebuild the bar from the resource instead, and let the .rc be the only source. */
+    m_wndMenuBar.RestoreOriginalState();
+
     DockPane (&m_wndWorkSpace);
 
     DockPane(&m_testtoolbar);
@@ -6928,6 +6936,86 @@ void CMainFrame::OnHelp()
 {
     HWND hWnd;
     hWnd =  ::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+}
+
+/* ======================= New T3000 Help / Report an Issue =====================
+ * Help opens the published docs in a WebView2 window - a project page, not the org root:
+ * https://temcocontrols.github.io/ is a 404, /temco-learn/ is required.
+ * Report an Issue opens the local report page (which needs the WebView2 host to capture the window
+ * and read the runtime log) and posts to the issue form of this repository as its last step.
+ * ========================================================================= */
+static const TCHAR c_szHelpAndLearnUrl[] = _T("https://temcocontrols.github.io/temco-learn/");
+
+/* Defined in BacnetWebView.cpp: shoots the application window for the report flow, before the report
+   window opens. Plain extern rather than a header change, the same way HandleWebViewMsg is declared. */
+extern bool ReportCaptureAppWindow(CString& outPath, int& outWidth, int& outHeight);
+/* Defined in BacnetWebView.cpp: drops the picture handed to the report page once its window is gone. */
+extern void ReportClearPendingShot();
+
+/* GetVersionEx reports 6.2 on Windows 10 and later unless the exe carries a Windows 8.1 compatibility
+   manifest, so ask ntdll for the real version instead. */
+static CString GetWindowsVersionText()
+{
+    CString text = _T("unknown");
+    typedef LONG(WINAPI* RtlGetVersionProc)(OSVERSIONINFOW*);
+    const HMODULE ntdll = ::GetModuleHandle(_T("ntdll.dll"));
+    if (ntdll != NULL)
+    {
+        const RtlGetVersionProc rtlGetVersion = (RtlGetVersionProc)::GetProcAddress(ntdll, "RtlGetVersion");
+        if (rtlGetVersion != NULL)
+        {
+            OSVERSIONINFOW osvi;
+            ZeroMemory(&osvi, sizeof(osvi));
+            osvi.dwOSVersionInfoSize = sizeof(osvi);
+            if (rtlGetVersion(&osvi) == 0)
+            {
+                text.Format(_T("%u.%u build %u"),
+                    osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber);
+            }
+        }
+    }
+    return text;
+}
+
+void CMainFrame::OnHelpAndLearn()
+{
+    /* New T3000 Help is the published documentation site, opened inside the WebView2 host so it
+       stays inside T3000 instead of taking over the user's browser. Links that leave the site
+       (GitHub, the forum) are handed to the default browser by the host's NewWindowRequested
+       handler. */
+    CString webviewUrl(c_szHelpAndLearnUrl);
+    CString webviewTitle(_T("New T3000 Help"));
+
+    auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(webviewUrl), wstring(webviewTitle));
+    auto result = BacnetWebViewAppWindow::RunMessagePump();
+    delete webviewwindow;
+}
+
+void CMainFrame::OnHelpReportIssue()
+{
+    /* The report page belongs to the local web UI, and it has to run inside the WebView2 host: that
+       is what lets it capture this window and read the runtime log. GitHub is the page's last step,
+       not its first one, so the menu opens the page rather than the issue form.
+
+       Development runs the Vite server on 3003; a release build serves the same page on 9103 -
+       change this one line when publishing. `?embed=1` hides the application menu bar, so the
+       window holds the report row and nothing else. */
+    CString webviewUrl = _T("http://localhost:9103/#/t3000/report?embed=1");
+
+    /* Taken here, while the app is still in front, and picked up by the page from its REPORT_CONTEXT
+       call: the report window opens with the screenshot already attached, so nothing is hidden and
+       nothing flickers. The Capture button inside the page still re-shoots on demand. */
+    CString shotPath;
+    int shotWidth = 0;
+    int shotHeight = 0;
+    ReportCaptureAppWindow(shotPath, shotWidth, shotHeight);
+
+    CString webviewTitle(_T("Report an Issue"));
+
+    auto webviewwindow = new BacnetWebViewAppWindow(IDM_CREATION_MODE_WINDOWED, wstring(webviewUrl), wstring(webviewTitle));
+    auto result = BacnetWebViewAppWindow::RunMessagePump();
+    delete webviewwindow;
+    ReportClearPendingShot();
 }
  
 

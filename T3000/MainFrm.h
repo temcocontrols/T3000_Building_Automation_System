@@ -380,6 +380,8 @@ protected:
 	afx_msg void OnScanDevice();
 
 	afx_msg void OnHelp();
+	afx_msg void OnHelpAndLearn();
+	afx_msg void OnHelpReportIssue();
 	
 	afx_msg LRESULT OnCreateStatusBarWindow(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnFreshStatusBar(WPARAM wParam, LPARAM lParam);
