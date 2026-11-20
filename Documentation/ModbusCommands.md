@@ -1,4 +1,4 @@
-# Modbus Command Set - Unified Proposal (Rev3)
+# Modbus Command Set - Unified Proposal (Rev4)
 
 Temco Controls. Proposal for the Modbus command revamp, written against the source in this repository and checked line by line against the published forum write-up.
 
@@ -410,7 +410,83 @@ On the wire the handle produces a normal Modbus TCP request to the panel: MBAP h
 
 The handle also carries what the prefix cannot: poll rate, timeout, retries, an optional unit id override, and a display name that matches the device tree in the UI. Today those live per call (`SetResponseTime`) or nowhere. `AddDeviceDlg` becomes the place that writes the registration, the program file only reads it.
 
-## 6. Types and byte order
+## 6. Network devices tree: main net and subnet, one unique name
+
+The handle needs a home, and the platform already keeps the row: `ALL_NODE` holds `Serial_ID`, `Parent_SerialNum`, `Panal_Number`, `Product_ID`, `Com_Port`, `NetworkCard_Address`, `Object_Instance` and a protocol label for every device the scan has ever seen. What it lacks is a view and a unique name. A **Network devices** tree over those rows gives both, without new storage.
+
+```text
+Bravo site
+├─ Main Net  (reached by IP)
+│  ├─ ctl-1      T3 controller   192.168.0.11:502   panel 1
+│  ├─ meter-1    power meter     192.168.0.199:502  panel 199
+│  └─ ctl-2      T3 controller   192.168.0.12:502   panel 2
+└─ Subnet  (RS485 behind a panel)
+   ├─ ctl-1
+   │  ├─ vav-1-1   VAV box   slave 1
+   │  ├─ vav-1-2   VAV box   slave 2   <- the SUB:1.2 device
+   │  └─ vav-1-7   VAV box   slave 7
+   └─ ctl-2
+      └─ ahu-2-3   AHU       slave 3
+```
+
+Both nets are in one tree because they share one identity model: a main-net device is reached by IP, a subnet device is reached by walking `Parent_SerialNum` up to the panel and then out on `Com_Port` with `Product_ID` as the unit id. The program never names either route.
+
+| Level | Name | Kind | Protocol | Route / parent | Panel | Addr |
+| --- | --- | --- | --- | --- | --- | --- |
+
+| **Bravo site** | project | - | - | - | - | - |
+
+| &nbsp;&nbsp;&nbsp;&nbsp;**Main Net  (reached by IP)** | group | - | - | - | - | - |
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`ctl-1` | T3 controller | Modbus TCP / BacnetIP | 192.168.0.11:502 | - | 1 | - |
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`meter-1` | power meter | Modbus TCP / BacnetIP | 192.168.0.199:502 | - | 199 | - |
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`ctl-2` | T3 controller | Modbus TCP / BacnetIP | 192.168.0.12:502 | - | 2 | - |
+
+| &nbsp;&nbsp;&nbsp;&nbsp;**Subnet  (RS485 behind a panel)** | group | - | - | - | - | - |
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`vav-1-1` | VAV box | Sub Device RS485 | ctl-1 | ctl-1 | 1 | 1 |
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`vav-1-2` | VAV box | Sub Device RS485 | ctl-1 | ctl-1 | 1 | 2 |
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`vav-1-7` | VAV box | Sub Device RS485 | ctl-1 | ctl-1 | 1 | 7 |
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`ahu-2-3` | AHU controller | Sub Device RS485 | ctl-2 | ctl-2 | 2 | 3 |
+
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`IP:199.4  (legacy, unnamed)` | unregistered | legacy prefix | 192.168.0.199 | - | 199 | 4 |
+
+
+### One unique name per device
+
+- **Unique per project.** Case insensitive. Two devices may never share a name, so the tree is the one place that decides who VAV7 is.
+
+- **Allowed shape.** a-z, 0-9, dash and underscore, at most 24 characters, must start with a letter. No dots, no colons: the transport is not part of the name.
+
+- **Default suggestion.** product-panel-address, e.g. vav-1-2 for the VAV at SUB:1.2. Generated from Product_name, Panal_Number and Product_ID.
+
+- **Collision.** First free suffix wins: vav-1-2, vav-1-2-b, vav-1-2-c. Validation happens on save in the tree, not at run time.
+
+- **Rename.** Allowed, but the old name stays as an alias forever, so programs, trends and graphics that already reference it keep resolving.
+
+- **Reserved words.** REG, COIL, DI, IR, AI, AV, AO, BI, BO, BV, MSV and MB_* are rejected as names so the parser stays unambiguous.
+
+- **Not the display text.** Description, room and floor stay separate fields. The name is an address, so it never gets localised.
+
+
+The name is what the program writes. Route, panel, port and unit id are properties of the row.
+
+```text
+MB_READ ("vav-1-2", REG, 7)     // name -> row -> parent ctl-1 -> panel 1 -> RS485 -> unit 2
+MB_WRITE("vav-1-2", COIL, 0, 1, 0, 1)
+MB_READ ("meter-1", REG, 300, 2, F32, ABCD)  // same verb, name resolves to the IP route instead
+```
+
+Re-parenting is the point. Move `vav-1-2` off the RS485 subnet onto its own Ethernet adapter: the row's `Parent_SerialNum` is cleared, `Product_ID` becomes the TCP unit id, the name does not change, and not one program line changes. That is exactly what a BACnet instance already gives you, and it is the reason the name belongs in the tree rather than in a `MB_DEFINE_DEVICE` line.
+
+Rows still carrying only a dotted prefix, like `IP:199.4`, appear in the tree as unregistered. The import creates their rows, suggests names from product, panel and address, and keeps the prefix as an alias so nothing breaks on day one.
+
+## 7. Types and byte order
 
 | Type | Registers | Meaning |
 | --- | --- | --- |
@@ -423,7 +499,7 @@ The handle also carries what the prefix cannot: poll rate, timeout, retries, an 
 
 Order tokens: `ABCD`, `CDAB`, `BADC`, `DCBA`, with `BE` and `LE` kept as aliases for `ABCD` and `DCBA`.
 
-## 7. Method of operation
+## 8. Method of operation
 
 ```text
 MB_READ (device, area, address [, count] [, type [, order]])
@@ -432,7 +508,7 @@ MB_WRITE(device, area, address, value | value_list [, type [, order]])
 
 The function code is derived from area and direction: REG read 0x03 / write 0x06 / block 0x10, COIL read 0x01 / write 0x05 / block 0x0F, DI read 0x02, IR read 0x04. Limits: 125 registers per read, 123 per block write, 2000 bits per read, 1968 coils per block write, all checked before a frame is built.
 
-## 8. Migration plan
+## 9. Migration plan
 
 | Phase | Work | Exit condition |
 | --- | --- | --- |
@@ -442,7 +518,7 @@ The function code is derived from area and direction: REG read 0x03 / write 0x06
 | P3 | Collapse `_2`, `_nocretical`, `_tap` onto one entry point | one implementation per function code |
 | P4 | Docs and UI | this document replaces the forum write-up, the register tool shows the resolved device and last status |
 
-## 9. Open decisions
+## 10. Open decisions
 
 1. Array return for block reads, or a separate call name, since the program engine has no array type.
 2. `MB_DEFINE_DEVICE` in the program file or in the project database so UI and program share handles.
@@ -450,6 +526,6 @@ The function code is derived from area and direction: REG read 0x03 / write 0x06
 4. Whether diagnostics 0x08 and exception status 0x07 are in scope.
 5. Auto-splitting oversized blocks, or always `MB_ERR_RANGE`.
 
-## 10. Provenance
+## 11. Provenance
 
 Forum: topic 2582 posts 1, 5, 6, 8; topic 2288 post 2; topic 156 post 1; topic 585 posts 2 and 5. Source: `common.cpp`, `dllmain.cpp`, `DemoPrg.txt`. Workbook: `ModbusCommands.xlsx`. Page: `ModbusCommands.html`.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Modbus Command Set - Rev3</title>
+<title>Modbus Command Set - Rev4</title>
 <style>
   :root {
     --navy:#1F3147; --navy-2:#2C4361; --teal:#0F766E; --orange:#E07B22;
@@ -177,6 +177,11 @@
   .case .head { background:var(--navy); color:#fff; padding:11px 16px; font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
   .case pre { margin:0; padding:16px 18px; font-family:Consolas,"SF Mono",Menlo,monospace; font-size:13px; line-height:1.75; color:#22405A; background:#FBFCFD; overflow-x:auto; }
   .case .band { border-radius:0; }
+  tr.grp td { background:var(--legacy-bg); }
+  tr.grp strong { color:var(--navy); font-size:13.5px; }
+  tr.unreg td { background:#FBFCFD; color:var(--slate); }
+  .namelist { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 22px; margin-top:16px; }
+  .namelist li { margin:8px 0; font-size:14px; }
 </style>
 </head>
 <body>
@@ -189,7 +194,7 @@
        Checked against the published forum write-up, token by token, against <code style="background:transparent;border:none;color:#FFD9B4">common.cpp</code> and
        <code style="background:transparent;border:none;color:#FFD9B4">dllmain.cpp</code>.</p>
     <div class="meta">
-      <span>Rev3  &middot; 20 November 2026</span>
+      <span>Rev4  &middot; 20 November 2026</span>
       <span>Branch: Maurice</span>
       <span>Folder: Documentation</span>
       <span>Pending implementation</span>
@@ -204,6 +209,7 @@
     <a href="#forum">Forum cross-check</a>
     <a href="#devices">Devices &amp; transport</a>
     <a href="#handles">Device handles</a>
+    <a href="#tree">Network device tree</a>
     <a href="#plan">Migration plan</a>
     <a href="#open">Open decisions</a>
     <div class="search"><input id="q" type="search" placeholder="Filter commands (reg, coil, float, block&hellip;)"></div>
@@ -971,8 +977,146 @@ STA    = MB_LAST_STATUS()                        // 0 ok, -1 timeout, -2 CRC, -5
        (<code>SetResponseTime</code>) or nowhere. <code>AddDeviceDlg</code> becomes the place that writes the registration.</p>
   </section>
 
+  <section id="tree">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Network device tree &mdash; main net and subnet, one name</h2></div>
+    <div class="rule"></div>
+    <p class="lede">The handle needs a home and the platform already keeps the row. <code>ALL_NODE</code> stores
+       <code>Serial_ID</code>, <code>Parent_SerialNum</code>, <code>Panal_Number</code>, <code>Product_ID</code>,
+       <code>Com_Port</code>, <code>NetworkCard_Address</code>, <code>Object_Instance</code> and a protocol label for every
+       device the scan has seen. What it lacks is a view and a unique name &mdash; a <b>Network devices</b> tree over those
+       rows supplies both, with no new storage.</p>
+
+    <div class="case">
+      <div class="head">The tree, as the project would show it</div>
+      <pre>Bravo site
+├─ Main Net  (reached by IP)
+│  ├─ ctl-1      T3 controller   192.168.0.11:502   panel 1
+│  ├─ meter-1    power meter     192.168.0.199:502  panel 199
+│  └─ ctl-2      T3 controller   192.168.0.12:502   panel 2
+└─ Subnet  (RS485 behind a panel)
+   ├─ ctl-1
+   │  ├─ vav-1-1   VAV box   slave 1
+   │  ├─ vav-1-2   VAV box   slave 2   &lt;- the SUB:1.2 device
+   │  └─ vav-1-7   VAV box   slave 7
+   └─ ctl-2
+      └─ ahu-2-3   AHU       slave 3</pre>
+    </div>
+
+    <table>
+      <thead><tr><th>Name</th><th>Kind</th><th>Protocol</th><th>Route / parent</th><th>Parent</th><th>Panel</th><th>Addr</th></tr></thead>
+      <tbody>
+<tr class="grp">
+      <td class="lvl" style="padding-left:10px"><strong>Bravo site</strong></td>
+      <td>project</td>
+      <td class="muted">-</td>
+      <td><code>-</code></td>
+      <td class="muted">-</td>
+      <td class="ctr">-</td>
+      <td class="ctr">-</td>
+    </tr><tr class="grp">
+      <td class="lvl" style="padding-left:32px"><strong>Main Net  (reached by IP)</strong></td>
+      <td>group</td>
+      <td class="muted">-</td>
+      <td><code>-</code></td>
+      <td class="muted">-</td>
+      <td class="ctr">-</td>
+      <td class="ctr">-</td>
+    </tr><tr class="node">
+      <td class="lvl" style="padding-left:54px"><code>ctl-1</code></td>
+      <td>T3 controller</td>
+      <td class="muted">Modbus TCP / BacnetIP</td>
+      <td><code>192.168.0.11:502</code></td>
+      <td class="muted">-</td>
+      <td class="ctr">1</td>
+      <td class="ctr">-</td>
+    </tr><tr class="node">
+      <td class="lvl" style="padding-left:54px"><code>meter-1</code></td>
+      <td>power meter</td>
+      <td class="muted">Modbus TCP / BacnetIP</td>
+      <td><code>192.168.0.199:502</code></td>
+      <td class="muted">-</td>
+      <td class="ctr">199</td>
+      <td class="ctr">-</td>
+    </tr><tr class="node">
+      <td class="lvl" style="padding-left:54px"><code>ctl-2</code></td>
+      <td>T3 controller</td>
+      <td class="muted">Modbus TCP / BacnetIP</td>
+      <td><code>192.168.0.12:502</code></td>
+      <td class="muted">-</td>
+      <td class="ctr">2</td>
+      <td class="ctr">-</td>
+    </tr><tr class="grp">
+      <td class="lvl" style="padding-left:32px"><strong>Subnet  (RS485 behind a panel)</strong></td>
+      <td>group</td>
+      <td class="muted">-</td>
+      <td><code>-</code></td>
+      <td class="muted">-</td>
+      <td class="ctr">-</td>
+      <td class="ctr">-</td>
+    </tr><tr class="node">
+      <td class="lvl" style="padding-left:54px"><code>vav-1-1</code></td>
+      <td>VAV box</td>
+      <td class="muted">Sub Device RS485</td>
+      <td><code>ctl-1</code></td>
+      <td class="muted">ctl-1</td>
+      <td class="ctr">1</td>
+      <td class="ctr">1</td>
+    </tr><tr class="node">
+      <td class="lvl" style="padding-left:54px"><code>vav-1-2</code></td>
+      <td>VAV box</td>
+      <td class="muted">Sub Device RS485</td>
+      <td><code>ctl-1</code></td>
+      <td class="muted">ctl-1</td>
+      <td class="ctr">1</td>
+      <td class="ctr">2</td>
+    </tr><tr class="node">
+      <td class="lvl" style="padding-left:54px"><code>vav-1-7</code></td>
+      <td>VAV box</td>
+      <td class="muted">Sub Device RS485</td>
+      <td><code>ctl-1</code></td>
+      <td class="muted">ctl-1</td>
+      <td class="ctr">1</td>
+      <td class="ctr">7</td>
+    </tr><tr class="node">
+      <td class="lvl" style="padding-left:54px"><code>ahu-2-3</code></td>
+      <td>AHU controller</td>
+      <td class="muted">Sub Device RS485</td>
+      <td><code>ctl-2</code></td>
+      <td class="muted">ctl-2</td>
+      <td class="ctr">2</td>
+      <td class="ctr">3</td>
+    </tr><tr class="unreg">
+      <td class="lvl" style="padding-left:54px"><code>IP:199.4  (legacy, unnamed)</code></td>
+      <td>unregistered</td>
+      <td class="muted">legacy prefix</td>
+      <td><code>192.168.0.199</code></td>
+      <td class="muted">-</td>
+      <td class="ctr">199</td>
+      <td class="ctr">4</td>
+    </tr>
+      </tbody>
+    </table>
+
+    <p style="font-weight:700;margin:26px 0 0;color:var(--navy)">One unique name per device</p>
+    <ol class="namelist">
+<li><strong>Unique per project.</strong> Case insensitive. Two devices may never share a name, so the tree is the one place that decides who VAV7 is.</li><li><strong>Allowed shape.</strong> a-z, 0-9, dash and underscore, at most 24 characters, must start with a letter. No dots, no colons: the transport is not part of the name.</li><li><strong>Default suggestion.</strong> product-panel-address, e.g. vav-1-2 for the VAV at SUB:1.2. Generated from Product_name, Panal_Number and Product_ID.</li><li><strong>Collision.</strong> First free suffix wins: vav-1-2, vav-1-2-b, vav-1-2-c. Validation happens on save in the tree, not at run time.</li><li><strong>Rename.</strong> Allowed, but the old name stays as an alias forever, so programs, trends and graphics that already reference it keep resolving.</li><li><strong>Reserved words.</strong> REG, COIL, DI, IR, AI, AV, AO, BI, BO, BV, MSV and MB_* are rejected as names so the parser stays unambiguous.</li><li><strong>Not the display text.</strong> Description, room and floor stay separate fields. The name is an address, so it never gets localised.</li>
+    </ol>
+
+    <p class="lede" style="margin-top:20px">Which makes a subnet device live in the project the way a T3 controller does: it has a row,
+       a name, a parent, a panel and an address that survive restarts and re-scans. Power the VAV down and it stays in the tree,
+       greyed out and still pollable later &mdash; it does not vanish because a program stopped typing its address. The row is
+       bookkeeping, not firmware, so it is semi-permanent rather than permanent: replace the physical box and the serial changes,
+       the name is re-bound to the new row.</p>
+
+    <div class="band">
+      <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+      <span class="band-cmd">MB_READ("vav-1-2", REG, 7)</span>
+      <span class="band-method">name resolves in the tree: parent ctl-1, panel 1, RS485 out of Com_Port, unit id 2 &mdash; move the device to its own IP and the same line still works</span>
+    </div>
+  </section>
+
   <section id="plan">
-    <div class="sec-head"><span class="sec-num">06</span><h2 class="alt">Migration plan</h2></div>
+    <div class="sec-head"><span class="sec-num">07</span><h2 class="alt">Migration plan</h2></div>
     <div class="rule alt"></div>
     <p class="lede">Each phase has to leave every existing program working. Legacy keywords stay supported permanently.</p>
     <div class="phases">
@@ -985,7 +1129,7 @@ STA    = MB_LAST_STATUS()                        // 0 ok, -1 timeout, -2 CRC, -5
   </section>
 
   <section id="open">
-    <div class="sec-head"><span class="sec-num">07</span><h2>Open decisions</h2></div>
+    <div class="sec-head"><span class="sec-num">08</span><h2>Open decisions</h2></div>
     <div class="rule"></div>
     <ol class="dec">
       <li>Do block reads return an array, or keep a separate call name, given the program engine has no array type for Modbus values?</li>
