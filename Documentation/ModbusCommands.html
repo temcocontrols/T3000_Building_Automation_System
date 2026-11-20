@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modbus Command Set - Rev1</title>
+<style>
+  :root {
+    --navy:#1F3147; --navy-2:#2C4361; --teal:#0F766E; --orange:#E07B22;
+    --orange-tint:#FFF3E3; --orange-deep:#8A4A12; --slate:#5B6B7C;
+    --legacy-bg:#F4F6F8; --line:#DDE3EA; --paper:#FFFFFF; --canvas:#F7F8FA;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--canvas); color:#243444;
+    font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,"Noto Sans SC",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55; font-size:15px;
+  }
+  .wrap { max-width:1220px; margin:0 auto; padding:0 28px 72px; }
+  header.hero {
+    background:linear-gradient(135deg,#1F3147 0%,#2C4361 55%,#0F5E63 100%);
+    color:#fff; padding:54px 0 46px; margin-bottom:34px;
+    border-bottom:6px solid var(--orange);
+  }
+  header.hero .wrap { padding-bottom:0; }
+  .kicker {
+    display:inline-block; letter-spacing:.18em; font-size:11px; font-weight:700;
+    text-transform:uppercase; color:#FFD9B4; border:1px solid rgba(255,217,180,.45);
+    padding:4px 10px; border-radius:3px; margin-bottom:16px;
+  }
+  h1 { font-size:40px; margin:0 0 10px; font-weight:800; letter-spacing:-.5px; }
+  .sub { font-size:16px; color:#D8E2EE; max-width:860px; margin:0; }
+  .meta { margin-top:22px; display:flex; flex-wrap:wrap; gap:10px; }
+  .meta span {
+    font-size:12px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18);
+    padding:5px 11px; border-radius:999px; color:#EAF1F8;
+  }
+  nav.toc {
+    position:sticky; top:0; z-index:30; background:rgba(255,255,255,.96);
+    backdrop-filter:blur(6px); border-bottom:1px solid var(--line);
+    margin:-34px 0 34px; padding:12px 0;
+  }
+  nav.toc .wrap { display:flex; gap:8px; flex-wrap:wrap; align-items:center; padding-bottom:0; }
+  nav.toc a {
+    font-size:12.5px; font-weight:600; text-decoration:none; color:var(--navy);
+    border:1px solid var(--line); border-radius:999px; padding:6px 13px; background:#fff;
+    transition:.15s;
+  }
+  nav.toc a:hover { border-color:var(--orange); color:var(--orange-deep); background:var(--orange-tint); }
+  nav.toc .search {
+    margin-left:auto; display:flex; align-items:center; gap:8px;
+  }
+  nav.toc input {
+    font:inherit; font-size:13px; padding:8px 12px; width:260px;
+    border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--navy);
+  }
+  nav.toc input:focus { outline:none; border-color:var(--orange); box-shadow:0 0 0 3px var(--orange-tint); }
+  section { margin-bottom:52px; }
+  .sec-head { display:flex; align-items:baseline; gap:14px; margin-bottom:8px; }
+  .sec-num {
+    font-size:12px; font-weight:800; letter-spacing:.14em; color:#fff;
+    background:var(--navy); padding:4px 9px; border-radius:3px;
+  }
+  h2 { font-size:26px; margin:0; color:var(--navy); letter-spacing:-.3px; }
+  .rule { height:4px; width:74px; background:var(--orange); margin:10px 0 18px; border-radius:2px; }
+  h2.alt { color:var(--teal); }
+  h2.alt + .rule, .rule.alt { background:var(--teal); }
+  .lede { color:var(--slate); max-width:900px; margin:0 0 24px; }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:18px 0 30px; }
+  .stat { background:var(--paper); border:1px solid var(--line); border-left:4px solid var(--teal);
+          border-radius:10px; padding:16px 18px; }
+  .stat b { display:block; font-size:30px; color:var(--navy); line-height:1.1; }
+  .stat span { font-size:12px; color:var(--slate); text-transform:uppercase; letter-spacing:.08em; }
+  .stat.hot { border-left-color:var(--orange); }
+  .stat.hot b { color:var(--orange-deep); }
+  .cmd {
+    background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    margin-bottom:22px; overflow:hidden; box-shadow:0 1px 2px rgba(31,49,71,.05);
+  }
+  .cmd-head {
+    display:flex; align-items:center; gap:12px; padding:14px 20px 13px;
+    background:#FCFCFD; border-bottom:1px solid var(--line);
+  }
+  .cmd-head h3 { margin:0; font-size:16px; color:var(--navy); font-weight:700; letter-spacing:.01em; }
+  .fc {
+    font-size:11.5px; font-weight:800; letter-spacing:.06em; color:#fff;
+    background:var(--teal); padding:3px 8px; border-radius:3px;
+  }
+  .area {
+    font-size:11.5px; font-weight:700; letter-spacing:.09em; color:var(--navy-2);
+    border:1px solid #C9D4E1; padding:2px 7px; border-radius:3px; background:#F2F6FB;
+  }
+  .idx { margin-left:auto; font-size:12px; color:#9AA9B9; font-weight:700; letter-spacing:.1em; }
+  .split { display:grid; grid-template-columns:1fr 1fr; }
+  .pane { padding:18px 20px 16px; }
+  .pane.legacy { background:var(--legacy-bg); border-right:1px solid var(--line); }
+  .pane.prop { background:#FFFFFF; }
+  .pane-label {
+    font-size:10.5px; font-weight:800; letter-spacing:.16em; margin-bottom:10px;
+  }
+  .pane.legacy .pane-label { color:#7A8896; }
+  .pane.prop .pane-label { color:var(--teal); }
+  .code {
+    font-family:Consolas,"Cascadia Mono",ui-monospace,Menlo,monospace; font-size:13px;
+    padding:10px 12px; border-radius:6px; margin-bottom:10px; word-break:break-word;
+  }
+  .code.lg { background:#E8EDF2; color:#3A4A5C; border-left:3px solid #9AA9B9; }
+  .code.np { background:#EAF6F4; color:#0B5350; border-left:3px solid var(--teal); font-weight:600; }
+  .desc { font-size:13px; color:#5E6E7E; margin:0 0 10px; }
+  pre {
+    font-family:Consolas,"Cascadia Mono",ui-monospace,Menlo,monospace; font-size:12.5px;
+    background:#FAFBFC; border:1px dashed #D6DEE7; border-radius:6px; padding:10px 12px;
+    margin:0; white-space:pre-wrap; color:#37475A;
+  }
+  .band {
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+    background:var(--orange-tint); border-top:1px solid #F6DDBE; border-bottom:1px solid #F6DDBE;
+    border-left:5px solid var(--orange); padding:13px 20px;
+  }
+  .band-tag {
+    font-size:10px; font-weight:800; letter-spacing:.15em; color:#fff;
+    background:var(--orange); padding:3px 8px; border-radius:3px; white-space:nowrap;
+  }
+  .band-cmd {
+    font-family:Consolas,"Cascadia Mono",ui-monospace,Menlo,monospace;
+    font-size:13px; font-weight:700; color:var(--orange-deep); word-break:break-word;
+  }
+  .band-method { font-size:12.5px; color:#8A5A2A; }
+  .note { font-size:12.5px; color:#6B7A89; margin:0; padding:11px 20px 14px; border-top:1px dashed #EDF1F5; }
+  .note.gap { color:var(--orange-deep); background:#FFFBF6; }
+  .muted { color:#8FA0B0; font-size:12.5px; font-style:italic; margin:0; }
+  table { width:100%; border-collapse:collapse; background:var(--paper);
+          border:1px solid var(--line); border-radius:10px; overflow:hidden; font-size:13px; }
+  thead th {
+    background:var(--navy); color:#fff; text-align:left; padding:11px 13px;
+    font-size:12px; letter-spacing:.05em; text-transform:uppercase; font-weight:700;
+  }
+  tbody td { padding:11px 13px; border-top:1px solid #EBEFF4; vertical-align:top; }
+  tbody tr.ok td:first-child { border-left:4px solid var(--teal); }
+  tbody tr.flag td:first-child { border-left:4px solid var(--orange); }
+  tbody tr:nth-child(even) { background:#FCFDFE; }
+  td.num { color:#9AA9B9; font-weight:700; width:44px; }
+  .where { display:block; font-size:11px; color:#8FA0B0; font-weight:500; margin-top:3px; }
+  .pill {
+    display:inline-block; font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px;
+    white-space:nowrap;
+  }
+  .pill-ok { background:#E7F5EE; color:#0B6B4F; }
+  .pill-flag { background:var(--orange-tint); color:var(--orange-deep); }
+  code {
+    font-family:Consolas,"Cascadia Mono",ui-monospace,Menlo,monospace; font-size:12.5px;
+    background:#F3F6F9; border:1px solid #E3E9F0; border-radius:4px; padding:1px 6px; color:#2F4157;
+  }
+  .phases { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; }
+  .phase { background:var(--paper); border:1px solid var(--line); border-top:4px solid var(--teal);
+            border-radius:10px; padding:16px 18px; }
+  .phase h4 { margin:0 0 6px; font-size:14px; color:var(--navy); letter-spacing:.05em; }
+  .phase .p { font-size:12.5px; color:var(--slate); }
+  .phase .out { font-size:12px; color:var(--orange-deep); margin-top:10px; padding-top:9px; border-top:1px dashed #EFE3D5; }
+  ol.dec { margin:0; padding-left:20px; color:#44566A; font-size:13.5px; }
+  ol.dec li { margin-bottom:9px; }
+  footer {
+    border-top:1px solid var(--line); margin-top:44px; padding-top:20px;
+    font-size:12px; color:#8FA0B0;
+  }
+  footer b { color:var(--navy); }
+  @media (max-width:900px) {
+    .split { grid-template-columns:1fr; }
+    .pane.legacy { border-right:none; border-bottom:1px solid var(--line); }
+    .stats { grid-template-columns:repeat(2,1fr); }
+    h1 { font-size:30px; }
+    nav.toc input { width:180px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Temco Controls &middot; T3000 &middot; Modbus</div>
+    <h1>Modbus Command Set &mdash; Unified Proposal</h1>
+    <p class="sub">Every Modbus command that exists today, what it does on the wire, and the single command set that replaces it.
+       Checked against the published forum write-up, token by token, against <code style="background:transparent;border:none;color:#FFD9B4">common.cpp</code> and
+       <code style="background:transparent;border:none;color:#FFD9B4">dllmain.cpp</code>.</p>
+    <div class="meta">
+      <span>Rev1  &middot; 20 November 2026</span>
+      <span>Branch: Maurice</span>
+      <span>Folder: Documentation</span>
+      <span>Pending implementation</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#model">The model</a>
+    <a href="#map">Command map</a>
+    <a href="#forum">Forum cross-check</a>
+    <a href="#devices">Devices &amp; transport</a>
+    <a href="#plan">Migration plan</a>
+    <a href="#open">Open decisions</a>
+    <div class="search"><input id="q" type="search" placeholder="Filter commands (reg, coil, float, block&hellip;)"></div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <section id="model">
+    <div class="sec-head"><span class="sec-num">01</span><h2>The model: two verbs, four areas</h2></div>
+    <div class="rule"></div>
+    <p class="lede">Every Modbus operation is a read or a write of an area at an address on a device. The function code is not a command,
+       it is a consequence of the area and the direction &mdash; so the command set does not need one spelling per function code.</p>
+    <div class="stats">
+      <div class="stat"><b>19</b><span>commands mapped</span></div>
+      <div class="stat"><b>8</b><span>function codes used</span></div>
+      <div class="stat"><b>4</b><span>transports unified</span></div>
+      <div class="stat hot"><b>5</b><span>gaps found in the forum list</span></div>
+    </div>
+    <div class="split" style="border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff">
+      <div class="pane legacy">
+        <div class="pane-label">THE WHOLE SET, TODAY</div>
+        <pre>VAR1 = 1.2.MB_REG7
+1.2.MB_REG3 = VAR1
+VAR1 = 1.2.MB_REG_FLOAT_ABCD33
+VAR1 = 1.2.MB_COIL7
+VAR1 = MB_BLOCKREAD(1, 2, 100, 5)
+VAR1 = MB_BLOCKWRITE(1, 2, 100, 5, 10, 20, 30, 40, 50)
+VAR1 = MB_BWCOIL(1, 2, 0, 3, 1, 0, 1)
+VAR98 = 199.4.MB_REG55
+VAR3 = 1.2.MB_REG3 * 65536 + 1.2.MB_REG4</pre>
+      </div>
+      <div class="pane prop">
+        <div class="pane-label">THE WHOLE SET, PROPOSED</div>
+        <pre>MB_DEFINE_DEVICE("VAV7", "SUB:1.2")
+
+VAR1 = MB_READ ("VAV7", REG, 7)
+MB_WRITE("VAV7", REG, 3, VAR1)
+VAR1 = MB_READ ("VAV7", REG, 33, 2, F32, ABCD)
+VAR1 = MB_READ ("VAV7", COIL, 7)
+VAR1[] = MB_READ ("VAV7", REG, 100, 5)
+MB_WRITE("VAV7", REG, 100, 10, 20, 30, 40, 50)
+MB_WRITE("VAV7", COIL, 0, 1, 0, 1)
+VAR98 = MB_READ("IP:199.4", REG, 55)
+VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
+      </div>
+    </div>
+    <div class="band" style="border-radius:0 0 12px 12px;border-left-width:5px">
+      <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+      <span class="band-cmd">MB_READ(device, area, address [, count] [, type [, order]])</span>
+      <span class="band-method">area selects the function code: REG 03/06/10, COIL 01/05/0F, DI 02, IR 04</span>
+    </div>
+  </section>
+
+  <section id="map">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Command map, one card per command</h2></div>
+    <div class="rule"></div>
+    <p class="lede">Left pane is what ships today, right pane is the replacement. The orange row under each pair is the new command and the
+       method it uses on the wire.</p>
+    <div id="cards">
+
+    <article class="cmd" data-k="reg read var1 = 1.2.mb_reg7 var1 = mb_read("sub:1.2", reg, 7)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x03</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; READ</h3>
+        <span class="idx">01</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR1 = 1.2.MB_REG7</div>
+          <p class="desc">Read one holding register from unit 2 on panel 1.</p>
+          <pre>40 VAR100 = 1.2.MB_REG7</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR1 = MB_READ("SUB:1.2", REG, 7)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>40 VAR100 = MB_READ("SUB:1.2", REG, 7)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR1 = MB_READ("SUB:1.2", REG, 7)</span>
+        <span class="band-method">REG + count 1 -&gt; FC 0x03, 1 register, unit id 2, routed through panel 1</span>
+      </div>
+      <p class="note">Same frame on the wire, only the spelling changes.</p>
+    </article>
+    <article class="cmd" data-k="reg write 1.2.mb_reg3 = var1 mb_write("sub:1.2", reg, 3, var1)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x06</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; WRITE</h3>
+        <span class="idx">02</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">1.2.MB_REG3 = VAR1</div>
+          <p class="desc">Write one holding register. Today a write is an assignment, not a call.</p>
+          <pre>230 1.2.MB_REG3 = VAR1 / 65536</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">MB_WRITE("SUB:1.2", REG, 3, VAR1)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>230 MB_WRITE("SUB:1.2", REG, 3, VAR1 / 65536)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">MB_WRITE("SUB:1.2", REG, 3, VAR1)</span>
+        <span class="band-method">REG + single value -&gt; FC 0x06, one register</span>
+      </div>
+      <p class="note">Write stops being a left-side assignment and becomes the same verb as read.</p>
+    </article>
+    <article class="cmd" data-k="coil read var107 = 1.2.mb_coil7 var107 = mb_read("sub:1.2", coil, 7)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x01</span>
+        <span class="area">COIL</span>
+        <h3>COIL &middot; READ</h3>
+        <span class="idx">03</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR107 = 1.2.MB_COIL7</div>
+          <p class="desc">Read one coil bit. Read only: there is no program keyword to write a coil.</p>
+          <pre>120 VAR107 = 1.2.MB_COIL7</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR107 = MB_READ("SUB:1.2", COIL, 7)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>120 VAR107 = MB_READ("SUB:1.2", COIL, 7)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR107 = MB_READ("SUB:1.2", COIL, 7)</span>
+        <span class="band-method">COIL + count 1 -&gt; FC 0x01, one bit</span>
+      </div>
+      <p class="note">Reads already worked; the write half of this area is missing today and arrives with this set.</p>
+    </article>
+    <article class="cmd" data-k="di read var108 = 1.2.mb_disinput7 var108 = mb_read("sub:1.2", di, 7)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x02</span>
+        <span class="area">DI</span>
+        <h3>DI &middot; READ</h3>
+        <span class="idx">04</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR108 = 1.2.MB_DISINPUT7</div>
+          <p class="desc">Read one discrete input bit. Read only by definition.</p>
+          <pre>130 VAR108 = 1.2.MB_DISINPUT7</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR108 = MB_READ("SUB:1.2", DI, 7)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>130 VAR108 = MB_READ("SUB:1.2", DI, 7)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR108 = MB_READ("SUB:1.2", DI, 7)</span>
+        <span class="band-method">DI + count 1 -&gt; FC 0x02, one bit</span>
+      </div>
+      <p class="note">A write to DI is rejected in the editor and returns MB_ERR_AREA at run time.</p>
+    </article>
+    <article class="cmd" data-k="ir read var109 = 1.2.mb_inputreg7 var109 = mb_read("sub:1.2", ir, 7)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x04</span>
+        <span class="area">IR</span>
+        <h3>IR &middot; READ</h3>
+        <span class="idx">05</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR109 = 1.2.MB_INPUTREG7</div>
+          <p class="desc">Read one input register. Read only by definition.</p>
+          <pre>140 VAR109 = 1.2.MB_INPUTREG7</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR109 = MB_READ("SUB:1.2", IR, 7)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>140 VAR109 = MB_READ("SUB:1.2", IR, 7)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR109 = MB_READ("SUB:1.2", IR, 7)</span>
+        <span class="band-method">IR + count 1 -&gt; FC 0x04, one register</span>
+      </div>
+      <p class="note">Same function code, cleaner token.</p>
+    </article>
+    <article class="cmd" data-k="reg read f32 var100 = 1.2.mb_reg_float_abcd33 var100 = mb_read("sub:1.2", reg, 33, 2, f32, abcd)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x03</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; READ F32</h3>
+        <span class="idx">06</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR100 = 1.2.MB_REG_FLOAT_ABCD33</div>
+          <p class="desc">Read a 32-bit float, high word first, from two holding registers.</p>
+          <pre>40 VAR100 = 1.2.MB_REG_FLOAT_ABCD33</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR100 = MB_READ("SUB:1.2", REG, 33, 2, F32, ABCD)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>40 VAR100 = MB_READ("SUB:1.2", REG, 33, 2, F32, ABCD)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR100 = MB_READ("SUB:1.2", REG, 33, 2, F32, ABCD)</span>
+        <span class="band-method">REG + count 2 + type F32 + order ABCD -&gt; FC 0x03, two registers</span>
+      </div>
+      <p class="note">One of four float spellings replaced by a type and an order argument.</p>
+    </article>
+    <article class="cmd" data-k="reg read f32 var101 = 1.2.mb_reg_float_cdab44 var101 = mb_read("sub:1.2", reg, 44, 2, f32, cdab)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x03</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; READ F32</h3>
+        <span class="idx">07</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR101 = 1.2.MB_REG_FLOAT_CDAB44</div>
+          <p class="desc">Read a 32-bit float, word swapped.</p>
+          <pre>50 VAR101 = 1.2.MB_REG_FLOAT_CDAB44</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR101 = MB_READ("SUB:1.2", REG, 44, 2, F32, CDAB)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>50 VAR101 = MB_READ("SUB:1.2", REG, 44, 2, F32, CDAB)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR101 = MB_READ("SUB:1.2", REG, 44, 2, F32, CDAB)</span>
+        <span class="band-method">REG + count 2 + type F32 + order CDAB -&gt; FC 0x03, two registers</span>
+      </div>
+      <p class="note">CDAB and BE/LE aliases accepted, the 2025 proposal used BE/LE.</p>
+    </article>
+    <article class="cmd" data-k="reg read f32 var102 = 1.2.mb_reg_float_badc55 var102 = mb_read("sub:1.2", reg, 55, 2, f32, badc)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x03</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; READ F32</h3>
+        <span class="idx">08</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR102 = 1.2.MB_REG_FLOAT_BADC55</div>
+          <p class="desc">Read a 32-bit float, byte swapped within each word.</p>
+          <pre>60 VAR102 = 1.2.MB_REG_FLOAT_BADC55</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR102 = MB_READ("SUB:1.2", REG, 55, 2, F32, BADC)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>60 VAR102 = MB_READ("SUB:1.2", REG, 55, 2, F32, BADC)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR102 = MB_READ("SUB:1.2", REG, 55, 2, F32, BADC)</span>
+        <span class="band-method">REG + count 2 + type F32 + order BADC -&gt; FC 0x03, two registers</span>
+      </div>
+      <p class="note">No behavioural change.</p>
+    </article>
+    <article class="cmd" data-k="reg read f32 var103 = 1.2.mb_reg_float_dcba66 var103 = mb_read("sub:1.2", reg, 66, 2, f32, dcba)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x03</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; READ F32</h3>
+        <span class="idx">09</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR103 = 1.2.MB_REG_FLOAT_DCBA66</div>
+          <p class="desc">Read a 32-bit float, both word and byte swapped.</p>
+          <pre>70 VAR103 = 1.2.MB_REG_FLOAT_DCBA66</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR103 = MB_READ("SUB:1.2", REG, 66, 2, F32, DCBA)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>70 VAR103 = MB_READ("SUB:1.2", REG, 66, 2, F32, DCBA)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR103 = MB_READ("SUB:1.2", REG, 66, 2, F32, DCBA)</span>
+        <span class="band-method">REG + count 2 + type F32 + order DCBA -&gt; FC 0x03, two registers</span>
+      </div>
+      <p class="note">DCBA also accepted as LE.</p>
+    </article>
+    <article class="cmd" data-k="ir read f32 var114 = 1.2.mb_input_float_abcd77
+(and _cdab88, _badc99, _dcba111) var114 = mb_read("sub:1.2", ir, 77, 2, f32, abcd)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x04</span>
+        <span class="area">IR</span>
+        <h3>IR &middot; READ F32</h3>
+        <span class="idx">10</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR114 = 1.2.MB_INPUT_FLOAT_ABCD77<br>(and _CDAB88, _BADC99, _DCBA111)</div>
+          <p class="desc">Four input-register float keywords that exist in the firmware and the demo program but are missing from the forum write-up.</p>
+          <pre>80 VAR114 = 1.2.MB_INPUT_FLOAT_ABCD77</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR114 = MB_READ("SUB:1.2", IR, 77, 2, F32, ABCD)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>80 VAR114 = MB_READ("SUB:1.2", IR, 77, 2, F32, ABCD)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR114 = MB_READ("SUB:1.2", IR, 77, 2, F32, ABCD)</span>
+        <span class="band-method">IR + count 2 + type F32 + order ABCD -&gt; FC 0x04, two registers</span>
+      </div>
+      <p class="note">Undocumented gap found in the source. Four keywords collapse into one area change.</p>
+    </article>
+    <article class="cmd" data-k="reg read block var1 = mb_blockread(1, 2, 100, 5) var1[] = mb_read("sub:1.2", reg, 100, 5)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x03</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; READ BLOCK</h3>
+        <span class="idx">11</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR1 = MB_BLOCKREAD(1, 2, 100, 5)</div>
+          <p class="desc">Read n contiguous holding registers in one frame.</p>
+          <pre>200 VAR1 = MB_BLOCKREAD(1, 2, 100, 5)</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR1[] = MB_READ("SUB:1.2", REG, 100, 5)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>200 VAR1[] = MB_READ("SUB:1.2", REG, 100, 5)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR1[] = MB_READ("SUB:1.2", REG, 100, 5)</span>
+        <span class="band-method">REG + count 5 -&gt; FC 0x03, five registers, one frame</span>
+      </div>
+      <p class="note">Count limit 125 registers, the specification maximum. No silent splitting.</p>
+    </article>
+    <article class="cmd" data-k="reg write block var1 = mb_blockwrite(1, 2, 100, 5, 10, 20, 30, 40, 50) mb_write("sub:1.2", reg, 100, 10, 20, 30, 40, 50)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x10</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; WRITE BLOCK</h3>
+        <span class="idx">12</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR1 = MB_BLOCKWRITE(1, 2, 100, 5, 10, 20, 30, 40, 50)</div>
+          <p class="desc">Write n contiguous holding registers in one frame. Legacy program limit is 25 values.</p>
+          <pre>210 VAR1 = MB_BLOCKWRITE(1, 2, 100, 5, 10, 20, 30, 40, 50)</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">MB_WRITE("SUB:1.2", REG, 100, 10, 20, 30, 40, 50)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>210 MB_WRITE("SUB:1.2", REG, 100, 10, 20, 30, 40, 50)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">MB_WRITE("SUB:1.2", REG, 100, 10, 20, 30, 40, 50)</span>
+        <span class="band-method">REG + value list -&gt; FC 0x10, five registers</span>
+      </div>
+      <p class="note">Legacy 25-value ceiling stays for MB_BLOCKWRITE only, the new verb allows the 123-register specification limit.</p>
+    </article>
+    <article class="cmd" data-k="coil write block var1 = mb_bwcoil(1, 2, 0, 3, 1, 0, 1) mb_write("sub:1.2", coil, 0, 1, 0, 1)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x0F</span>
+        <span class="area">COIL</span>
+        <h3>COIL &middot; WRITE BLOCK</h3>
+        <span class="idx">13</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR1 = MB_BWCOIL(1, 2, 0, 3, 1, 0, 1)</div>
+          <p class="desc">Block write coils. Present in the parser, absent from the forum documentation.</p>
+          <pre>220 VAR1 = MB_BWCOIL(1, 2, 0, 3, 1, 0, 1)</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">MB_WRITE("SUB:1.2", COIL, 0, 1, 0, 1)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>220 MB_WRITE("SUB:1.2", COIL, 0, 1, 0, 1)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">MB_WRITE("SUB:1.2", COIL, 0, 1, 0, 1)</span>
+        <span class="band-method">COIL + status list -&gt; FC 0x0F, three coils</span>
+      </div>
+      <p class="note">Second undocumented gap. Single coil write (FC 0x05) gets a keyword for the first time.</p>
+    </article>
+    <article class="cmd" data-k="reg read by ip var98 = 199.4.mb_reg55 var98 = mb_read("ip:199.4", reg, 55)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x03</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; READ by IP</h3>
+        <span class="idx">14</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR98 = 199.4.MB_REG55</div>
+          <p class="desc">Read a device selected by the last octet of its IP, unit id 4. If the local panel number is also 199, the panel number wins.</p>
+          <pre>259 VAR98 = 199.4.MB_REG55</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR98 = MB_READ("IP:199.4", REG, 55)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>259 VAR98 = MB_READ("IP:199.4", REG, 55)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR98 = MB_READ("IP:199.4", REG, 55)</span>
+        <span class="band-method">IP transport string -&gt; panel resolution by last octet, FC 0x03</span>
+      </div>
+      <p class="note">The ambiguous prefix becomes an explicit transport token, the precedence rule is unchanged.</p>
+    </article>
+    <article class="cmd" data-k="reg read 32 var3 = 1.2.mb_reg3 * 65536 + 1.2.mb_reg4 var3 = mb_read("sub:1.2", reg, 3, 2, u32, cdab)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x03</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; READ 32</h3>
+        <span class="idx">15</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR3 = 1.2.MB_REG3 * 65536 + 1.2.MB_REG4</div>
+          <p class="desc">Customer-facing trick to assemble a 32-bit value from two registers, two separate frames today.</p>
+          <pre>251 VAR3 = 1.2.MB_REG3 * 65536 + 1.2.MB_REG4</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR3 = MB_READ("SUB:1.2", REG, 3, 2, U32, CDAB)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>251 VAR3 = MB_READ("SUB:1.2", REG, 3, 2, U32, CDAB)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR3 = MB_READ("SUB:1.2", REG, 3, 2, U32, CDAB)</span>
+        <span class="band-method">REG + count 2 + type U32 -&gt; FC 0x03, one frame</span>
+      </div>
+      <p class="note">Replaces arithmetic homework, one frame instead of two, S32 available as well.</p>
+    </article>
+    <article class="cmd" data-k="reg read bit var = 1.2.mb_reg7 &amp; 1 var = mb_read("sub:1.2", reg, 7, 1, bit, bit=0)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x03</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; READ bit</h3>
+        <span class="idx">16</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">VAR = 1.2.MB_REG7 &amp; 1</div>
+          <p class="desc">Read a whole register and mask a single bit in the program.</p>
+          <pre>100 VAR105 = 1.2.MB_REG7 &amp; 1</pre>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">VAR = MB_READ("SUB:1.2", REG, 7, 1, BIT, bit=0)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>100 VAR105 = MB_READ("SUB:1.2", REG, 7, 1, BIT, bit=0)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">VAR = MB_READ("SUB:1.2", REG, 7, 1, BIT, bit=0)</span>
+        <span class="band-method">REG + type BIT + bit index -&gt; FC 0x03 then extract the bit</span>
+      </div>
+      <p class="note">Masking still works, the typed read documents the intent.</p>
+    </article>
+    <article class="cmd" data-k="all device (no equivalent) mb_define_device("meter1", "tcp:192.168.0.199:502,to=500,rt=2")">
+      <header class="cmd-head">
+        <span class="fc">FC -</span>
+        <span class="area">ALL</span>
+        <h3>ALL &middot; DEVICE</h3>
+        <span class="idx">17</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">(no equivalent)</div>
+          <p class="desc">Today the transport lives inside the address prefix. There is no way to name a device once and reuse it.</p>
+          <p class='muted'>No program form exists today.</p>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">MB_DEFINE_DEVICE("Meter1", "TCP:192.168.0.199:502,TO=500,RT=2")</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>MB_DEFINE_DEVICE("Meter1", "TCP:192.168.0.199:502,TO=500,RT=2")<br>VAR_E = MB_READ("Meter1", REG, 300, 2, F32, ABCD)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">MB_DEFINE_DEVICE("Meter1", "TCP:192.168.0.199:502,TO=500,RT=2")</span>
+        <span class="band-method">TCP / RTU / SUB / IP transport in one handle, optional timeout and retries</span>
+      </div>
+      <p class="gap">New capability. The 2025 forum proposal used MB_DEFINE_DEVICE but it was never implemented.</p>
+    </article>
+    <article class="cmd" data-k="all status (no equivalent) mb_last_status() / mb_last_exception()">
+      <header class="cmd-head">
+        <span class="fc">FC -</span>
+        <span class="area">ALL</span>
+        <h3>ALL &middot; STATUS</h3>
+        <span class="idx">18</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">(no equivalent)</div>
+          <p class="desc">A failed read returns the same shape as a zero, exception codes are invisible.</p>
+          <p class='muted'>No program form exists today.</p>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">MB_LAST_STATUS() / MB_LAST_EXCEPTION()</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>IF MB_LAST_STATUS() &lt;&gt; 0 THEN ALARM 1</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">MB_LAST_STATUS() / MB_LAST_EXCEPTION()</span>
+        <span class="band-method">0 ok, -1 timeout, -2 CRC, -3 area, -4 range, -5 no device, -6 exception</span>
+      </div>
+      <p class="gap">New capability. Makes a failed poll detectable in a program.</p>
+    </article>
+    <article class="cmd" data-k="reg write f32 (no equivalent) mb_write("sub:1.2", reg, 400, 123.45, f32, abcd)">
+      <header class="cmd-head">
+        <span class="fc">FC 0x10</span>
+        <span class="area">REG</span>
+        <h3>REG &middot; WRITE F32</h3>
+        <span class="idx">19</span>
+      </header>
+      <div class="split">
+        <div class="pane legacy">
+          <div class="pane-label">TODAY</div>
+          <div class="code lg">(no equivalent)</div>
+          <p class="desc">No float write exists in a program today, only integer writes and block writes.</p>
+          <p class='muted'>No program form exists today.</p>
+        </div>
+        <div class="pane prop">
+          <div class="pane-label">PROPOSED</div>
+          <div class="code np">MB_WRITE("SUB:1.2", REG, 400, 123.45, F32, ABCD)</div>
+          <p class="desc">Replaces the above with the same wire behaviour.</p>
+          <pre>MB_WRITE("SUB:1.2", REG, 400, 123.45, F32, ABCD)</pre>
+        </div>
+      </div>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">MB_WRITE("SUB:1.2", REG, 400, 123.45, F32, ABCD)</span>
+        <span class="band-method">REG + type F32 + order -&gt; FC 0x10, two registers</span>
+      </div>
+      <p class="gap">New capability, symmetric with the float read.</p>
+    </article>
+    </div>
+    <p class="muted" id="empty" style="display:none">No command matches that filter.</p>
+  </section>
+
+  <section id="forum">
+    <div class="sec-head"><span class="sec-num">03</span><h2 class="alt">Forum cross-check</h2></div>
+    <div class="rule alt"></div>
+    <p class="lede">The published write-up is the only customer-facing reference for these commands. Each statement in it was checked against
+       the source. Rows with an orange edge are where the forum and the code disagree or where the forum is silent.</p>
+    <table>
+      <thead><tr><th>#</th><th>Forum statement</th><th>What the source says</th><th>Verdict</th></tr></thead>
+      <tbody>
+<tr class="ok">
+      <td class="num">01</td>
+      <td><strong>Read Holding Registers, FC 0x03</strong><span class="where">Topic 2582 post 1</span></td>
+      <td>Matches common.cpp: Read_One, Read_One2, Read_One_tap all build 0x03.</td>
+      <td><span class="pill pill-ok">Confirmed</span></td>
+    </tr><tr class="ok">
+      <td class="num">02</td>
+      <td><strong>Function code per area: 0x01 coils, 0x02 discrete inputs, 0x03 holding, 0x04 input</strong><span class="where">Topic 2582 post 1</span></td>
+      <td>Matches. Modbus_Standard_Read takes function_code as an argument for exactly these four.</td>
+      <td><span class="pill pill-ok">Confirmed</span></td>
+    </tr><tr class="ok">
+      <td class="num">03</td>
+      <td><strong>Write of a register is an assignment, not a write command</strong><span class="where">Topic 2582 example</span></td>
+      <td>Matches the parser, the left side of an equals sign selects 0x06.</td>
+      <td><span class="pill pill-ok">Confirmed</span></td>
+    </tr><tr class="ok">
+      <td class="num">04</td>
+      <td><strong>Block write uses Write Multiple Registers and caps at 25 values</strong><span class="where">Topic 2582 post 1</span></td>
+      <td>FC is 0x10 as stated. The 25-value cap is the legacy program limit, the specification allows 123.</td>
+      <td><span class="pill pill-ok">Confirmed, limit explained</span></td>
+    </tr><tr class="flag">
+      <td class="num">05</td>
+      <td><strong>MB_BLOCKWRITE(2, 100, 5, 10, ...) takes slave, start, length</strong><span class="where">Topic 2582 post 1</span></td>
+      <td>The shipped demo program uses MB_BLOCKWRITE(1, 2, 100, 5, 10, ...) with a leading panel argument. The forum example is missing that argument.</td>
+      <td><span class="pill pill-flag">Discrepancy</span></td>
+    </tr><tr class="flag">
+      <td class="num">06</td>
+      <td><strong>Coils are read with 0x01</strong><span class="where">Topic 2582 post 1</span></td>
+      <td>Confirmed, but the DLL also implements 0x05 and 0x0F while no program keyword exposes them.</td>
+      <td><span class="pill pill-flag">Half documented</span></td>
+    </tr><tr class="ok">
+      <td class="num">07</td>
+      <td><strong>Discrete inputs read with 0x02, read only</strong><span class="where">Topic 2582 post 1</span></td>
+      <td>Confirmed.</td>
+      <td><span class="pill pill-ok">Confirmed</span></td>
+    </tr><tr class="ok">
+      <td class="num">08</td>
+      <td><strong>Input registers read with 0x04</strong><span class="where">Topic 2582 post 1</span></td>
+      <td>Confirmed.</td>
+      <td><span class="pill pill-ok">Confirmed</span></td>
+    </tr><tr class="ok">
+      <td class="num">09</td>
+      <td><strong>Float reads in ABCD, CDAB, BADC, DCBA</strong><span class="where">Topic 2582 post 1</span></td>
+      <td>Confirmed, and the source shows the same four orders also exist for input registers as MB_INPUT_FLOAT_*, which the write-up never mentions.</td>
+      <td><span class="pill pill-ok">Confirmed + gap</span></td>
+    </tr><tr class="ok">
+      <td class="num">10</td>
+      <td><strong>199.4.MB_REG55 means IP ending 199, unit 4, panel wins on collision</strong><span class="where">Topic 2582 post 1</span></td>
+      <td>Confirmed by the addressing rule and the demo program lines 259 and 260.</td>
+      <td><span class="pill pill-ok">Confirmed</span></td>
+    </tr><tr class="ok">
+      <td class="num">11</td>
+      <td><strong>32-bit values are assembled as MB_REG3 * 65536 + MB_REG4</strong><span class="where">Topic 2582 post 1</span></td>
+      <td>Confirmed as the only way today, two frames per value. This is what the typed read replaces.</td>
+      <td><span class="pill pill-ok">Confirmed, to be retired</span></td>
+    </tr><tr class="flag">
+      <td class="num">12</td>
+      <td><strong>60 and 70 were stray values in the block write example</strong><span class="where">Topic 2582 post 5</span></td>
+      <td>The forum correction is right, the demo program carries no such values.</td>
+      <td><span class="pill pill-flag">Corrected on the forum</span></td>
+    </tr><tr class="flag">
+      <td class="num">13</td>
+      <td><strong>MB_DEFINE_DEVICE, MB_READ_BLOCK, MB_READ_FLOAT and friends</strong><span class="where">Topic 2582 post 6 (March 2025)</span></td>
+      <td>Not implemented. The team confirmed in post 8 that MB_DEFINE_DEVICE is not supported in the programming environment yet.</td>
+      <td><span class="pill pill-flag">Proposal only</span></td>
+    </tr><tr class="flag">
+      <td class="num">14</td>
+      <td><strong>MB_BLOCKREAD and MB_BWCOIL</strong><span class="where">Absent from the forum</span></td>
+      <td>Both are live parser tokens in dllmain.cpp, tokens MB_BR and MB_BW_COIL.</td>
+      <td><span class="pill pill-flag">Undocumented</span></td>
+    </tr><tr class="ok">
+      <td class="num">15</td>
+      <td><strong>Modbus RTU and Modbus TCP both reachable from one controller, subnets transparent</strong><span class="where">Topics 156 and 585</span></td>
+      <td>Confirmed by the network programming overview, subnet unit id shares the Bacnet MAC parameter.</td>
+      <td><span class="pill pill-ok">Confirmed</span></td>
+    </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="devices">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Devices &amp; transport</h2></div>
+    <div class="rule"></div>
+    <p class="lede">The transport leaves the address prefix and becomes part of a named device. Both Ethernet and subnet devices
+       are addressed the same way, the token decides the route.</p>
+    <table>
+      <thead><tr><th>Token</th><th>Meaning</th><th>Example</th><th>What it replaces</th></tr></thead>
+      <tbody>
+<tr><td><code>TCP:&lt;ip&gt;[:&lt;port&gt;]</code></td><td>Modbus TCP, port defaults to 502</td><td><code>MB_DEFINE_DEVICE("Meter1","TCP:192.168.0.199")</code></td><td class='muted'>Open_Socket / Open_Socket2 from the DLL</td></tr><tr><td><code>RTU:COM&lt;n&gt;,&lt;baud&gt;,&lt;parity&gt;,&lt;stop&gt;,&lt;slave&gt;</code></td><td>Serial port on the PC</td><td><code>MB_DEFINE_DEVICE("Pump1","RTU:COM3,9600,N,1,5")</code></td><td class='muted'>open_com then a frame with the unit id</td></tr><tr><td><code>SUB:&lt;panel&gt;.&lt;slave&gt;</code></td><td>Device on the RS485 subnet of a controller, reached transparently</td><td><code>MB_DEFINE_DEVICE("VAV7","SUB:1.2")</code></td><td class='muted'>the 1.2. address prefix</td></tr><tr><td><code>IP:&lt;last_octet&gt;.&lt;slave&gt;</code></td><td>Legacy shortcut, kept for migration</td><td><code>MB_READ("IP:199.4", REG, 55)</code></td><td class='muted'>the 199.4. address prefix</td></tr><tr><td><code>[,TO=&lt;ms&gt;][,RT=&lt;n&gt;][,ID=&lt;unit&gt;]</code></td><td>Optional timeout, retries and unit id override on any transport</td><td><code>"TCP:192.168.0.199:502,TO=500,RT=2"</code></td><td class='muted'>SetResponseTime and per-call retries today</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="plan">
+    <div class="sec-head"><span class="sec-num">05</span><h2 class="alt">Migration plan</h2></div>
+    <div class="rule alt"></div>
+    <p class="lede">Each phase has to leave every existing program working. Legacy keywords stay supported permanently.</p>
+    <div class="phases">
+      <div class="phase"><h4>P0 &middot; Vocabulary</h4><div class="p">New verbs as translations onto the existing DLL calls. No change to any frame.</div><div class="out">Exit: every new command produces the same bytes as its legacy pair, checked with the <code>_log</code> exports.</div></div>
+      <div class="phase"><h4>P1 &middot; Types</h4><div class="p">One type system: U16, S16, U32, S32, F32, BIT, and four byte orders.</div><div class="out">Exit: eight float keywords become two aliases, and the <code>* 65536 +</code> advice disappears.</div></div>
+      <div class="phase"><h4>P2 &middot; Areas</h4><div class="p">Coil and discrete areas complete, including 0x05 and 0x0F writes.</div><div class="out">Exit: a program can drive a coil through the same verb it reads with.</div></div>
+      <div class="phase"><h4>P3 &middot; Entry point</h4><div class="p">Collapse <code>_2</code>, <code>_nocretical</code> and <code>_tap</code> onto one call.</div><div class="out">Exit: one implementation per function code, used by UI and program engine alike.</div></div>
+      <div class="phase"><h4>P4 &middot; Docs &amp; UI</h4><div class="p">This document replaces the forum write-up; the register tool shows the resolved handle and last status.</div><div class="out">Exit: help file and forum point at the same table.</div></div>
+    </div>
+  </section>
+
+  <section id="open">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Open decisions</h2></div>
+    <div class="rule"></div>
+    <ol class="dec">
+      <li>Do block reads return an array, or keep a separate call name, given the program engine has no array type for Modbus values?</li>
+      <li>Does <code>MB_DEFINE_DEVICE</code> live in the program file or in the project database, so the UI and the program share handles?</li>
+      <li>Is <code>BIT</code> a type, or an operator applied to a value?</li>
+      <li>Are diagnostics 0x08 and exception status 0x07 in scope, or does the set stay at the four data areas?</li>
+      <li>Should an oversized block write auto-split, or always return <code>MB_ERR_RANGE</code> and let the program split?</li>
+    </ol>
+  </section>
+
+  <footer>
+    <b>Provenance.</b> Forum: topic 2582 posts 1, 5, 6 and 8; topic 2288 post 2; topic 156 post 1; topic 585 posts 2 and 5.
+    Source: <b>common.cpp</b>, <b>dllmain.cpp</b>, <b>DemoPrg.txt</b>. Companion workbook: ModbusCommands.xlsx. Markdown: ModbusCommands.md.
+  </footer>
+</div>
+
+<script>
+  var q = document.getElementById('q');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.cmd'));
+  var empty = document.getElementById('empty');
+  q.addEventListener('input', function () {
+    var t = q.value.trim().toLowerCase();
+    var shown = 0;
+    cards.forEach(function (c) {
+      var hit = !t || c.getAttribute('data-k').indexOf(t) !== -1;
+      c.style.display = hit ? '' : 'none';
+      if (hit) shown++;
+    });
+    empty.style.display = shown ? 'none' : 'block';
+  });
+</script>
+</body>
+</html>
