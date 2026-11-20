@@ -1,4 +1,4 @@
-# Modbus Command Set - Unified Proposal (Rev2)
+# Modbus Command Set - Unified Proposal (Rev3)
 
 Temco Controls. Proposal for the Modbus command revamp, written against the source in this repository and checked line by line against the published forum write-up.
 
@@ -19,43 +19,43 @@ Every command that exists today, the proposed replacement, and the method each o
 | # | Area | Op | FC | Today | New command | New method |
 | --- | --- | --- | --- | --- | --- | --- |
 
-| 1 | REG | READ | 0x03 | `VAR1 = 1.2.MB_REG7` | `VAR1 = MB_READ("SUB:1.2", REG, 7)` | REG + count 1 -> FC 0x03, 1 register, unit id 2, routed through panel 1 |
+| 1 | REG | READ | 0x03 | `VAR1 = 1.2.MB_REG7` | `VAR1 = MB_READ("VAV7", REG, 7)` | REG + count 1 -> FC 0x03, 1 register, unit id 2, routed through panel 1 |
 
-| 2 | REG | WRITE | 0x06 | `1.2.MB_REG3 = VAR1` | `MB_WRITE("SUB:1.2", REG, 3, VAR1)` | REG + single value -> FC 0x06, one register |
+| 2 | REG | WRITE | 0x06 | `1.2.MB_REG3 = VAR1` | `MB_WRITE("VAV7", REG, 3, VAR1)` | REG + single value -> FC 0x06, one register |
 
-| 3 | COIL | READ | 0x01 | `VAR107 = 1.2.MB_COIL7` | `VAR107 = MB_READ("SUB:1.2", COIL, 7)` | COIL + count 1 -> FC 0x01, one bit |
+| 3 | COIL | READ | 0x01 | `VAR107 = 1.2.MB_COIL7` | `VAR107 = MB_READ("VAV7", COIL, 7)` | COIL + count 1 -> FC 0x01, one bit |
 
-| 4 | DI | READ | 0x02 | `VAR108 = 1.2.MB_DISINPUT7` | `VAR108 = MB_READ("SUB:1.2", DI, 7)` | DI + count 1 -> FC 0x02, one bit |
+| 4 | DI | READ | 0x02 | `VAR108 = 1.2.MB_DISINPUT7` | `VAR108 = MB_READ("VAV7", DI, 7)` | DI + count 1 -> FC 0x02, one bit |
 
-| 5 | IR | READ | 0x04 | `VAR109 = 1.2.MB_INPUTREG7` | `VAR109 = MB_READ("SUB:1.2", IR, 7)` | IR + count 1 -> FC 0x04, one register |
+| 5 | IR | READ | 0x04 | `VAR109 = 1.2.MB_INPUTREG7` | `VAR109 = MB_READ("VAV7", IR, 7)` | IR + count 1 -> FC 0x04, one register |
 
-| 6 | REG | READ F32 | 0x03 | `VAR100 = 1.2.MB_REG_FLOAT_ABCD33` | `VAR100 = MB_READ("SUB:1.2", REG, 33, 2, F32, ABCD)` | REG + count 2 + type F32 + order ABCD -> FC 0x03, two registers |
+| 6 | REG | READ F32 | 0x03 | `VAR100 = 1.2.MB_REG_FLOAT_ABCD33` | `VAR100 = MB_READ("VAV7", REG, 33, 2, F32, ABCD)` | REG + count 2 + type F32 + order ABCD -> FC 0x03, two registers |
 
-| 7 | REG | READ F32 | 0x03 | `VAR101 = 1.2.MB_REG_FLOAT_CDAB44` | `VAR101 = MB_READ("SUB:1.2", REG, 44, 2, F32, CDAB)` | REG + count 2 + type F32 + order CDAB -> FC 0x03, two registers |
+| 7 | REG | READ F32 | 0x03 | `VAR101 = 1.2.MB_REG_FLOAT_CDAB44` | `VAR101 = MB_READ("VAV7", REG, 44, 2, F32, CDAB)` | REG + count 2 + type F32 + order CDAB -> FC 0x03, two registers |
 
-| 8 | REG | READ F32 | 0x03 | `VAR102 = 1.2.MB_REG_FLOAT_BADC55` | `VAR102 = MB_READ("SUB:1.2", REG, 55, 2, F32, BADC)` | REG + count 2 + type F32 + order BADC -> FC 0x03, two registers |
+| 8 | REG | READ F32 | 0x03 | `VAR102 = 1.2.MB_REG_FLOAT_BADC55` | `VAR102 = MB_READ("VAV7", REG, 55, 2, F32, BADC)` | REG + count 2 + type F32 + order BADC -> FC 0x03, two registers |
 
-| 9 | REG | READ F32 | 0x03 | `VAR103 = 1.2.MB_REG_FLOAT_DCBA66` | `VAR103 = MB_READ("SUB:1.2", REG, 66, 2, F32, DCBA)` | REG + count 2 + type F32 + order DCBA -> FC 0x03, two registers |
+| 9 | REG | READ F32 | 0x03 | `VAR103 = 1.2.MB_REG_FLOAT_DCBA66` | `VAR103 = MB_READ("VAV7", REG, 66, 2, F32, DCBA)` | REG + count 2 + type F32 + order DCBA -> FC 0x03, two registers |
 
-| 10 | IR | READ F32 | 0x04 | `VAR114 = 1.2.MB_INPUT_FLOAT_ABCD77` | `VAR114 = MB_READ("SUB:1.2", IR, 77, 2, F32, ABCD)` | IR + count 2 + type F32 + order ABCD -> FC 0x04, two registers |
+| 10 | IR | READ F32 | 0x04 | `VAR114 = 1.2.MB_INPUT_FLOAT_ABCD77` | `VAR114 = MB_READ("VAV7", IR, 77, 2, F32, ABCD)` | IR + count 2 + type F32 + order ABCD -> FC 0x04, two registers |
 
-| 11 | REG | READ BLOCK | 0x03 | `VAR1 = MB_BLOCKREAD(1, 2, 100, 5)` | `VAR1[] = MB_READ("SUB:1.2", REG, 100, 5)` | REG + count 5 -> FC 0x03, five registers, one frame |
+| 11 | REG | READ BLOCK | 0x03 | `VAR1 = MB_BLOCKREAD(1, 2, 100, 5)` | `VAR1[] = MB_READ("VAV7", REG, 100, 5)` | REG + count 5 -> FC 0x03, five registers, one frame |
 
-| 12 | REG | WRITE BLOCK | 0x10 | `VAR1 = MB_BLOCKWRITE(1, 2, 100, 5, 10, 20, 30, 40, 50)` | `MB_WRITE("SUB:1.2", REG, 100, 10, 20, 30, 40, 50)` | REG + value list -> FC 0x10, five registers |
+| 12 | REG | WRITE BLOCK | 0x10 | `VAR1 = MB_BLOCKWRITE(1, 2, 100, 5, 10, 20, 30, 40, 50)` | `MB_WRITE("VAV7", REG, 100, 10, 20, 30, 40, 50)` | REG + value list -> FC 0x10, five registers |
 
-| 13 | COIL | WRITE BLOCK | 0x0F | `VAR1 = MB_BWCOIL(1, 2, 0, 3, 1, 0, 1)` | `MB_WRITE("SUB:1.2", COIL, 0, 1, 0, 1)` | COIL + status list -> FC 0x0F, three coils |
+| 13 | COIL | WRITE BLOCK | 0x0F | `VAR1 = MB_BWCOIL(1, 2, 0, 3, 1, 0, 1)` | `MB_WRITE("VAV7", COIL, 0, 1, 0, 1)` | COIL + status list -> FC 0x0F, three coils |
 
 | 14 | REG | READ by IP | 0x03 | `VAR98 = 199.4.MB_REG55` | `VAR98 = MB_READ("IP:199.4", REG, 55)` | IP transport string -> panel resolution by last octet, FC 0x03 |
 
-| 15 | REG | READ 32 | 0x03 | `VAR3 = 1.2.MB_REG3 * 65536 + 1.2.MB_REG4` | `VAR3 = MB_READ("SUB:1.2", REG, 3, 2, U32, CDAB)` | REG + count 2 + type U32 -> FC 0x03, one frame |
+| 15 | REG | READ 32 | 0x03 | `VAR3 = 1.2.MB_REG3 * 65536 + 1.2.MB_REG4` | `VAR3 = MB_READ("VAV7", REG, 3, 2, U32, CDAB)` | REG + count 2 + type U32 -> FC 0x03, one frame |
 
-| 16 | REG | READ bit | 0x03 | `VAR = 1.2.MB_REG7 & 1` | `VAR = MB_READ("SUB:1.2", REG, 7, 1, BIT, bit=0)` | REG + type BIT + bit index -> FC 0x03 then extract the bit |
+| 16 | REG | READ bit | 0x03 | `VAR = 1.2.MB_REG7 & 1` | `VAR = MB_READ("VAV7", REG, 7, 1, BIT, bit=0)` | REG + type BIT + bit index -> FC 0x03 then extract the bit |
 
 | 17 | ALL | DEVICE | - | `(no equivalent)` | `MB_DEFINE_DEVICE("Meter1", "TCP:192.168.0.199:502,TO=500,RT=2")` | TCP / RTU / SUB / IP transport in one handle, optional timeout and retries |
 
 | 18 | ALL | STATUS | - | `(no equivalent)` | `MB_LAST_STATUS() / MB_LAST_EXCEPTION()` | 0 ok, -1 timeout, -2 CRC, -3 area, -4 range, -5 no device, -6 exception |
 
-| 19 | REG | WRITE F32 | 0x10 | `(no equivalent)` | `MB_WRITE("SUB:1.2", REG, 400, 123.45, F32, ABCD)` | REG + type F32 + order -> FC 0x10, two registers |
+| 19 | REG | WRITE F32 | 0x10 | `(no equivalent)` | `MB_WRITE("VAV7", REG, 400, 123.45, F32, ABCD)` | REG + type F32 + order -> FC 0x10, two registers |
 
 
 ### Examples
@@ -69,7 +69,7 @@ Today: Read one holding register from unit 2 on panel 1.
 ```
 
 ```text
-40 VAR100 = MB_READ("SUB:1.2", REG, 7)
+40 VAR100 = MB_READ("VAV7", REG, 7)
 ```
 
 Same frame on the wire, only the spelling changes.
@@ -83,7 +83,7 @@ Today: Write one holding register. Today a write is an assignment, not a call.
 ```
 
 ```text
-230 MB_WRITE("SUB:1.2", REG, 3, VAR1 / 65536)
+230 MB_WRITE("VAV7", REG, 3, VAR1 / 65536)
 ```
 
 Write stops being a left-side assignment and becomes the same verb as read.
@@ -97,7 +97,7 @@ Today: Read one coil bit. Read only: there is no program keyword to write a coil
 ```
 
 ```text
-120 VAR107 = MB_READ("SUB:1.2", COIL, 7)
+120 VAR107 = MB_READ("VAV7", COIL, 7)
 ```
 
 Reads already worked; the write half of this area is missing today and arrives with this set.
@@ -111,7 +111,7 @@ Today: Read one discrete input bit. Read only by definition.
 ```
 
 ```text
-130 VAR108 = MB_READ("SUB:1.2", DI, 7)
+130 VAR108 = MB_READ("VAV7", DI, 7)
 ```
 
 A write to DI is rejected in the editor and returns MB_ERR_AREA at run time.
@@ -125,7 +125,7 @@ Today: Read one input register. Read only by definition.
 ```
 
 ```text
-140 VAR109 = MB_READ("SUB:1.2", IR, 7)
+140 VAR109 = MB_READ("VAV7", IR, 7)
 ```
 
 Same function code, cleaner token.
@@ -139,7 +139,7 @@ Today: Read a 32-bit float, high word first, from two holding registers.
 ```
 
 ```text
-40 VAR100 = MB_READ("SUB:1.2", REG, 33, 2, F32, ABCD)
+40 VAR100 = MB_READ("VAV7", REG, 33, 2, F32, ABCD)
 ```
 
 One of four float spellings replaced by a type and an order argument.
@@ -153,7 +153,7 @@ Today: Read a 32-bit float, word swapped.
 ```
 
 ```text
-50 VAR101 = MB_READ("SUB:1.2", REG, 44, 2, F32, CDAB)
+50 VAR101 = MB_READ("VAV7", REG, 44, 2, F32, CDAB)
 ```
 
 CDAB and BE/LE aliases accepted, the 2025 proposal used BE/LE.
@@ -167,7 +167,7 @@ Today: Read a 32-bit float, byte swapped within each word.
 ```
 
 ```text
-60 VAR102 = MB_READ("SUB:1.2", REG, 55, 2, F32, BADC)
+60 VAR102 = MB_READ("VAV7", REG, 55, 2, F32, BADC)
 ```
 
 No behavioural change.
@@ -181,7 +181,7 @@ Today: Read a 32-bit float, both word and byte swapped.
 ```
 
 ```text
-70 VAR103 = MB_READ("SUB:1.2", REG, 66, 2, F32, DCBA)
+70 VAR103 = MB_READ("VAV7", REG, 66, 2, F32, DCBA)
 ```
 
 DCBA also accepted as LE.
@@ -195,7 +195,7 @@ Today: Four input-register float keywords that exist in the firmware and the dem
 ```
 
 ```text
-80 VAR114 = MB_READ("SUB:1.2", IR, 77, 2, F32, ABCD)
+80 VAR114 = MB_READ("VAV7", IR, 77, 2, F32, ABCD)
 ```
 
 Undocumented gap found in the source. Four keywords collapse into one area change.
@@ -209,7 +209,7 @@ Today: Read n contiguous holding registers in one frame.
 ```
 
 ```text
-200 VAR1[] = MB_READ("SUB:1.2", REG, 100, 5)
+200 VAR1[] = MB_READ("VAV7", REG, 100, 5)
 ```
 
 Count limit 125 registers, the specification maximum. No silent splitting.
@@ -223,7 +223,7 @@ Today: Write n contiguous holding registers in one frame. Legacy program limit i
 ```
 
 ```text
-210 MB_WRITE("SUB:1.2", REG, 100, 10, 20, 30, 40, 50)
+210 MB_WRITE("VAV7", REG, 100, 10, 20, 30, 40, 50)
 ```
 
 Legacy 25-value ceiling stays for MB_BLOCKWRITE only, the new verb allows the 123-register specification limit.
@@ -237,7 +237,7 @@ Today: Block write coils. Present in the parser, absent from the forum documenta
 ```
 
 ```text
-220 MB_WRITE("SUB:1.2", COIL, 0, 1, 0, 1)
+220 MB_WRITE("VAV7", COIL, 0, 1, 0, 1)
 ```
 
 Second undocumented gap. Single coil write (FC 0x05) gets a keyword for the first time.
@@ -265,7 +265,7 @@ Today: Customer-facing trick to assemble a 32-bit value from two registers, two 
 ```
 
 ```text
-251 VAR3 = MB_READ("SUB:1.2", REG, 3, 2, U32, CDAB)
+251 VAR3 = MB_READ("VAV7", REG, 3, 2, U32, CDAB)
 ```
 
 Replaces arithmetic homework, one frame instead of two, S32 available as well.
@@ -279,7 +279,7 @@ Today: Read a whole register and mask a single bit in the program.
 ```
 
 ```text
-100 VAR105 = MB_READ("SUB:1.2", REG, 7, 1, BIT, bit=0)
+100 VAR105 = MB_READ("VAV7", REG, 7, 1, BIT, bit=0)
 ```
 
 Masking still works, the typed read documents the intent.
@@ -309,7 +309,7 @@ New capability. Makes a failed poll detectable in a program.
 Today: No float write exists in a program today, only integer writes and block writes.  
 
 ```text
-MB_WRITE("SUB:1.2", REG, 400, 123.45, F32, ABCD)
+MB_WRITE("VAV7", REG, 400, 123.45, F32, ABCD)
 ```
 
 New capability, symmetric with the float read.

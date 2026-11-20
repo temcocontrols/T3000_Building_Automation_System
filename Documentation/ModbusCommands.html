@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Modbus Command Set - Rev2</title>
+<title>Modbus Command Set - Rev3</title>
 <style>
   :root {
     --navy:#1F3147; --navy-2:#2C4361; --teal:#0F766E; --orange:#E07B22;
@@ -189,7 +189,7 @@
        Checked against the published forum write-up, token by token, against <code style="background:transparent;border:none;color:#FFD9B4">common.cpp</code> and
        <code style="background:transparent;border:none;color:#FFD9B4">dllmain.cpp</code>.</p>
     <div class="meta">
-      <span>Rev2  &middot; 20 November 2026</span>
+      <span>Rev3  &middot; 20 November 2026</span>
       <span>Branch: Maurice</span>
       <span>Folder: Documentation</span>
       <span>Pending implementation</span>
@@ -265,7 +265,7 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
        method it uses on the wire.</p>
     <div id="cards">
 
-    <article class="cmd" data-k="reg read var1 = 1.2.mb_reg7 var1 = mb_read("sub:1.2", reg, 7)">
+    <article class="cmd" data-k="reg read var1 = 1.2.mb_reg7 var1 = mb_read("vav7", reg, 7)">
       <header class="cmd-head">
         <span class="fc">FC 0x03</span>
         <span class="area">REG</span>
@@ -281,19 +281,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR1 = MB_READ("SUB:1.2", REG, 7)</div>
+          <div class="code np">VAR1 = MB_READ("VAV7", REG, 7)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>40 VAR100 = MB_READ("SUB:1.2", REG, 7)</pre>
+          <pre>40 VAR100 = MB_READ("VAV7", REG, 7)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR1 = MB_READ("SUB:1.2", REG, 7)</span>
+        <span class="band-cmd">VAR1 = MB_READ("VAV7", REG, 7)</span>
         <span class="band-method">REG + count 1 -&gt; FC 0x03, 1 register, unit id 2, routed through panel 1</span>
       </div>
       <p class="note">Same frame on the wire, only the spelling changes.</p>
     </article>
-    <article class="cmd" data-k="reg write 1.2.mb_reg3 = var1 mb_write("sub:1.2", reg, 3, var1)">
+    <article class="cmd" data-k="reg write 1.2.mb_reg3 = var1 mb_write("vav7", reg, 3, var1)">
       <header class="cmd-head">
         <span class="fc">FC 0x06</span>
         <span class="area">REG</span>
@@ -309,19 +309,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">MB_WRITE("SUB:1.2", REG, 3, VAR1)</div>
+          <div class="code np">MB_WRITE("VAV7", REG, 3, VAR1)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>230 MB_WRITE("SUB:1.2", REG, 3, VAR1 / 65536)</pre>
+          <pre>230 MB_WRITE("VAV7", REG, 3, VAR1 / 65536)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">MB_WRITE("SUB:1.2", REG, 3, VAR1)</span>
+        <span class="band-cmd">MB_WRITE("VAV7", REG, 3, VAR1)</span>
         <span class="band-method">REG + single value -&gt; FC 0x06, one register</span>
       </div>
       <p class="note">Write stops being a left-side assignment and becomes the same verb as read.</p>
     </article>
-    <article class="cmd" data-k="coil read var107 = 1.2.mb_coil7 var107 = mb_read("sub:1.2", coil, 7)">
+    <article class="cmd" data-k="coil read var107 = 1.2.mb_coil7 var107 = mb_read("vav7", coil, 7)">
       <header class="cmd-head">
         <span class="fc">FC 0x01</span>
         <span class="area">COIL</span>
@@ -337,19 +337,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR107 = MB_READ("SUB:1.2", COIL, 7)</div>
+          <div class="code np">VAR107 = MB_READ("VAV7", COIL, 7)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>120 VAR107 = MB_READ("SUB:1.2", COIL, 7)</pre>
+          <pre>120 VAR107 = MB_READ("VAV7", COIL, 7)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR107 = MB_READ("SUB:1.2", COIL, 7)</span>
+        <span class="band-cmd">VAR107 = MB_READ("VAV7", COIL, 7)</span>
         <span class="band-method">COIL + count 1 -&gt; FC 0x01, one bit</span>
       </div>
       <p class="note">Reads already worked; the write half of this area is missing today and arrives with this set.</p>
     </article>
-    <article class="cmd" data-k="di read var108 = 1.2.mb_disinput7 var108 = mb_read("sub:1.2", di, 7)">
+    <article class="cmd" data-k="di read var108 = 1.2.mb_disinput7 var108 = mb_read("vav7", di, 7)">
       <header class="cmd-head">
         <span class="fc">FC 0x02</span>
         <span class="area">DI</span>
@@ -365,19 +365,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR108 = MB_READ("SUB:1.2", DI, 7)</div>
+          <div class="code np">VAR108 = MB_READ("VAV7", DI, 7)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>130 VAR108 = MB_READ("SUB:1.2", DI, 7)</pre>
+          <pre>130 VAR108 = MB_READ("VAV7", DI, 7)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR108 = MB_READ("SUB:1.2", DI, 7)</span>
+        <span class="band-cmd">VAR108 = MB_READ("VAV7", DI, 7)</span>
         <span class="band-method">DI + count 1 -&gt; FC 0x02, one bit</span>
       </div>
       <p class="note">A write to DI is rejected in the editor and returns MB_ERR_AREA at run time.</p>
     </article>
-    <article class="cmd" data-k="ir read var109 = 1.2.mb_inputreg7 var109 = mb_read("sub:1.2", ir, 7)">
+    <article class="cmd" data-k="ir read var109 = 1.2.mb_inputreg7 var109 = mb_read("vav7", ir, 7)">
       <header class="cmd-head">
         <span class="fc">FC 0x04</span>
         <span class="area">IR</span>
@@ -393,19 +393,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR109 = MB_READ("SUB:1.2", IR, 7)</div>
+          <div class="code np">VAR109 = MB_READ("VAV7", IR, 7)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>140 VAR109 = MB_READ("SUB:1.2", IR, 7)</pre>
+          <pre>140 VAR109 = MB_READ("VAV7", IR, 7)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR109 = MB_READ("SUB:1.2", IR, 7)</span>
+        <span class="band-cmd">VAR109 = MB_READ("VAV7", IR, 7)</span>
         <span class="band-method">IR + count 1 -&gt; FC 0x04, one register</span>
       </div>
       <p class="note">Same function code, cleaner token.</p>
     </article>
-    <article class="cmd" data-k="reg read f32 var100 = 1.2.mb_reg_float_abcd33 var100 = mb_read("sub:1.2", reg, 33, 2, f32, abcd)">
+    <article class="cmd" data-k="reg read f32 var100 = 1.2.mb_reg_float_abcd33 var100 = mb_read("vav7", reg, 33, 2, f32, abcd)">
       <header class="cmd-head">
         <span class="fc">FC 0x03</span>
         <span class="area">REG</span>
@@ -421,19 +421,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR100 = MB_READ("SUB:1.2", REG, 33, 2, F32, ABCD)</div>
+          <div class="code np">VAR100 = MB_READ("VAV7", REG, 33, 2, F32, ABCD)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>40 VAR100 = MB_READ("SUB:1.2", REG, 33, 2, F32, ABCD)</pre>
+          <pre>40 VAR100 = MB_READ("VAV7", REG, 33, 2, F32, ABCD)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR100 = MB_READ("SUB:1.2", REG, 33, 2, F32, ABCD)</span>
+        <span class="band-cmd">VAR100 = MB_READ("VAV7", REG, 33, 2, F32, ABCD)</span>
         <span class="band-method">REG + count 2 + type F32 + order ABCD -&gt; FC 0x03, two registers</span>
       </div>
       <p class="note">One of four float spellings replaced by a type and an order argument.</p>
     </article>
-    <article class="cmd" data-k="reg read f32 var101 = 1.2.mb_reg_float_cdab44 var101 = mb_read("sub:1.2", reg, 44, 2, f32, cdab)">
+    <article class="cmd" data-k="reg read f32 var101 = 1.2.mb_reg_float_cdab44 var101 = mb_read("vav7", reg, 44, 2, f32, cdab)">
       <header class="cmd-head">
         <span class="fc">FC 0x03</span>
         <span class="area">REG</span>
@@ -449,19 +449,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR101 = MB_READ("SUB:1.2", REG, 44, 2, F32, CDAB)</div>
+          <div class="code np">VAR101 = MB_READ("VAV7", REG, 44, 2, F32, CDAB)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>50 VAR101 = MB_READ("SUB:1.2", REG, 44, 2, F32, CDAB)</pre>
+          <pre>50 VAR101 = MB_READ("VAV7", REG, 44, 2, F32, CDAB)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR101 = MB_READ("SUB:1.2", REG, 44, 2, F32, CDAB)</span>
+        <span class="band-cmd">VAR101 = MB_READ("VAV7", REG, 44, 2, F32, CDAB)</span>
         <span class="band-method">REG + count 2 + type F32 + order CDAB -&gt; FC 0x03, two registers</span>
       </div>
       <p class="note">CDAB and BE/LE aliases accepted, the 2025 proposal used BE/LE.</p>
     </article>
-    <article class="cmd" data-k="reg read f32 var102 = 1.2.mb_reg_float_badc55 var102 = mb_read("sub:1.2", reg, 55, 2, f32, badc)">
+    <article class="cmd" data-k="reg read f32 var102 = 1.2.mb_reg_float_badc55 var102 = mb_read("vav7", reg, 55, 2, f32, badc)">
       <header class="cmd-head">
         <span class="fc">FC 0x03</span>
         <span class="area">REG</span>
@@ -477,19 +477,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR102 = MB_READ("SUB:1.2", REG, 55, 2, F32, BADC)</div>
+          <div class="code np">VAR102 = MB_READ("VAV7", REG, 55, 2, F32, BADC)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>60 VAR102 = MB_READ("SUB:1.2", REG, 55, 2, F32, BADC)</pre>
+          <pre>60 VAR102 = MB_READ("VAV7", REG, 55, 2, F32, BADC)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR102 = MB_READ("SUB:1.2", REG, 55, 2, F32, BADC)</span>
+        <span class="band-cmd">VAR102 = MB_READ("VAV7", REG, 55, 2, F32, BADC)</span>
         <span class="band-method">REG + count 2 + type F32 + order BADC -&gt; FC 0x03, two registers</span>
       </div>
       <p class="note">No behavioural change.</p>
     </article>
-    <article class="cmd" data-k="reg read f32 var103 = 1.2.mb_reg_float_dcba66 var103 = mb_read("sub:1.2", reg, 66, 2, f32, dcba)">
+    <article class="cmd" data-k="reg read f32 var103 = 1.2.mb_reg_float_dcba66 var103 = mb_read("vav7", reg, 66, 2, f32, dcba)">
       <header class="cmd-head">
         <span class="fc">FC 0x03</span>
         <span class="area">REG</span>
@@ -505,20 +505,20 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR103 = MB_READ("SUB:1.2", REG, 66, 2, F32, DCBA)</div>
+          <div class="code np">VAR103 = MB_READ("VAV7", REG, 66, 2, F32, DCBA)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>70 VAR103 = MB_READ("SUB:1.2", REG, 66, 2, F32, DCBA)</pre>
+          <pre>70 VAR103 = MB_READ("VAV7", REG, 66, 2, F32, DCBA)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR103 = MB_READ("SUB:1.2", REG, 66, 2, F32, DCBA)</span>
+        <span class="band-cmd">VAR103 = MB_READ("VAV7", REG, 66, 2, F32, DCBA)</span>
         <span class="band-method">REG + count 2 + type F32 + order DCBA -&gt; FC 0x03, two registers</span>
       </div>
       <p class="note">DCBA also accepted as LE.</p>
     </article>
     <article class="cmd" data-k="ir read f32 var114 = 1.2.mb_input_float_abcd77
-(and _cdab88, _badc99, _dcba111) var114 = mb_read("sub:1.2", ir, 77, 2, f32, abcd)">
+(and _cdab88, _badc99, _dcba111) var114 = mb_read("vav7", ir, 77, 2, f32, abcd)">
       <header class="cmd-head">
         <span class="fc">FC 0x04</span>
         <span class="area">IR</span>
@@ -534,19 +534,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR114 = MB_READ("SUB:1.2", IR, 77, 2, F32, ABCD)</div>
+          <div class="code np">VAR114 = MB_READ("VAV7", IR, 77, 2, F32, ABCD)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>80 VAR114 = MB_READ("SUB:1.2", IR, 77, 2, F32, ABCD)</pre>
+          <pre>80 VAR114 = MB_READ("VAV7", IR, 77, 2, F32, ABCD)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR114 = MB_READ("SUB:1.2", IR, 77, 2, F32, ABCD)</span>
+        <span class="band-cmd">VAR114 = MB_READ("VAV7", IR, 77, 2, F32, ABCD)</span>
         <span class="band-method">IR + count 2 + type F32 + order ABCD -&gt; FC 0x04, two registers</span>
       </div>
       <p class="note">Undocumented gap found in the source. Four keywords collapse into one area change.</p>
     </article>
-    <article class="cmd" data-k="reg read block var1 = mb_blockread(1, 2, 100, 5) var1[] = mb_read("sub:1.2", reg, 100, 5)">
+    <article class="cmd" data-k="reg read block var1 = mb_blockread(1, 2, 100, 5) var1[] = mb_read("vav7", reg, 100, 5)">
       <header class="cmd-head">
         <span class="fc">FC 0x03</span>
         <span class="area">REG</span>
@@ -562,19 +562,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR1[] = MB_READ("SUB:1.2", REG, 100, 5)</div>
+          <div class="code np">VAR1[] = MB_READ("VAV7", REG, 100, 5)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>200 VAR1[] = MB_READ("SUB:1.2", REG, 100, 5)</pre>
+          <pre>200 VAR1[] = MB_READ("VAV7", REG, 100, 5)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR1[] = MB_READ("SUB:1.2", REG, 100, 5)</span>
+        <span class="band-cmd">VAR1[] = MB_READ("VAV7", REG, 100, 5)</span>
         <span class="band-method">REG + count 5 -&gt; FC 0x03, five registers, one frame</span>
       </div>
       <p class="note">Count limit 125 registers, the specification maximum. No silent splitting.</p>
     </article>
-    <article class="cmd" data-k="reg write block var1 = mb_blockwrite(1, 2, 100, 5, 10, 20, 30, 40, 50) mb_write("sub:1.2", reg, 100, 10, 20, 30, 40, 50)">
+    <article class="cmd" data-k="reg write block var1 = mb_blockwrite(1, 2, 100, 5, 10, 20, 30, 40, 50) mb_write("vav7", reg, 100, 10, 20, 30, 40, 50)">
       <header class="cmd-head">
         <span class="fc">FC 0x10</span>
         <span class="area">REG</span>
@@ -590,19 +590,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">MB_WRITE("SUB:1.2", REG, 100, 10, 20, 30, 40, 50)</div>
+          <div class="code np">MB_WRITE("VAV7", REG, 100, 10, 20, 30, 40, 50)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>210 MB_WRITE("SUB:1.2", REG, 100, 10, 20, 30, 40, 50)</pre>
+          <pre>210 MB_WRITE("VAV7", REG, 100, 10, 20, 30, 40, 50)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">MB_WRITE("SUB:1.2", REG, 100, 10, 20, 30, 40, 50)</span>
+        <span class="band-cmd">MB_WRITE("VAV7", REG, 100, 10, 20, 30, 40, 50)</span>
         <span class="band-method">REG + value list -&gt; FC 0x10, five registers</span>
       </div>
       <p class="note">Legacy 25-value ceiling stays for MB_BLOCKWRITE only, the new verb allows the 123-register specification limit.</p>
     </article>
-    <article class="cmd" data-k="coil write block var1 = mb_bwcoil(1, 2, 0, 3, 1, 0, 1) mb_write("sub:1.2", coil, 0, 1, 0, 1)">
+    <article class="cmd" data-k="coil write block var1 = mb_bwcoil(1, 2, 0, 3, 1, 0, 1) mb_write("vav7", coil, 0, 1, 0, 1)">
       <header class="cmd-head">
         <span class="fc">FC 0x0F</span>
         <span class="area">COIL</span>
@@ -618,14 +618,14 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">MB_WRITE("SUB:1.2", COIL, 0, 1, 0, 1)</div>
+          <div class="code np">MB_WRITE("VAV7", COIL, 0, 1, 0, 1)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>220 MB_WRITE("SUB:1.2", COIL, 0, 1, 0, 1)</pre>
+          <pre>220 MB_WRITE("VAV7", COIL, 0, 1, 0, 1)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">MB_WRITE("SUB:1.2", COIL, 0, 1, 0, 1)</span>
+        <span class="band-cmd">MB_WRITE("VAV7", COIL, 0, 1, 0, 1)</span>
         <span class="band-method">COIL + status list -&gt; FC 0x0F, three coils</span>
       </div>
       <p class="note">Second undocumented gap. Single coil write (FC 0x05) gets a keyword for the first time.</p>
@@ -658,7 +658,7 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
       </div>
       <p class="note">The ambiguous prefix becomes an explicit transport token, the precedence rule is unchanged.</p>
     </article>
-    <article class="cmd" data-k="reg read 32 var3 = 1.2.mb_reg3 * 65536 + 1.2.mb_reg4 var3 = mb_read("sub:1.2", reg, 3, 2, u32, cdab)">
+    <article class="cmd" data-k="reg read 32 var3 = 1.2.mb_reg3 * 65536 + 1.2.mb_reg4 var3 = mb_read("vav7", reg, 3, 2, u32, cdab)">
       <header class="cmd-head">
         <span class="fc">FC 0x03</span>
         <span class="area">REG</span>
@@ -674,19 +674,19 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR3 = MB_READ("SUB:1.2", REG, 3, 2, U32, CDAB)</div>
+          <div class="code np">VAR3 = MB_READ("VAV7", REG, 3, 2, U32, CDAB)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>251 VAR3 = MB_READ("SUB:1.2", REG, 3, 2, U32, CDAB)</pre>
+          <pre>251 VAR3 = MB_READ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR3 = MB_READ("SUB:1.2", REG, 3, 2, U32, CDAB)</span>
+        <span class="band-cmd">VAR3 = MB_READ("VAV7", REG, 3, 2, U32, CDAB)</span>
         <span class="band-method">REG + count 2 + type U32 -&gt; FC 0x03, one frame</span>
       </div>
       <p class="note">Replaces arithmetic homework, one frame instead of two, S32 available as well.</p>
     </article>
-    <article class="cmd" data-k="reg read bit var = 1.2.mb_reg7 &amp; 1 var = mb_read("sub:1.2", reg, 7, 1, bit, bit=0)">
+    <article class="cmd" data-k="reg read bit var = 1.2.mb_reg7 &amp; 1 var = mb_read("vav7", reg, 7, 1, bit, bit=0)">
       <header class="cmd-head">
         <span class="fc">FC 0x03</span>
         <span class="area">REG</span>
@@ -702,14 +702,14 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">VAR = MB_READ("SUB:1.2", REG, 7, 1, BIT, bit=0)</div>
+          <div class="code np">VAR = MB_READ("VAV7", REG, 7, 1, BIT, bit=0)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>100 VAR105 = MB_READ("SUB:1.2", REG, 7, 1, BIT, bit=0)</pre>
+          <pre>100 VAR105 = MB_READ("VAV7", REG, 7, 1, BIT, bit=0)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">VAR = MB_READ("SUB:1.2", REG, 7, 1, BIT, bit=0)</span>
+        <span class="band-cmd">VAR = MB_READ("VAV7", REG, 7, 1, BIT, bit=0)</span>
         <span class="band-method">REG + type BIT + bit index -&gt; FC 0x03 then extract the bit</span>
       </div>
       <p class="note">Masking still works, the typed read documents the intent.</p>
@@ -770,7 +770,7 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
       </div>
       <p class="gap">New capability. Makes a failed poll detectable in a program.</p>
     </article>
-    <article class="cmd" data-k="reg write f32 (no equivalent) mb_write("sub:1.2", reg, 400, 123.45, f32, abcd)">
+    <article class="cmd" data-k="reg write f32 (no equivalent) mb_write("vav7", reg, 400, 123.45, f32, abcd)">
       <header class="cmd-head">
         <span class="fc">FC 0x10</span>
         <span class="area">REG</span>
@@ -786,14 +786,14 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
         </div>
         <div class="pane prop">
           <div class="pane-label">PROPOSED</div>
-          <div class="code np">MB_WRITE("SUB:1.2", REG, 400, 123.45, F32, ABCD)</div>
+          <div class="code np">MB_WRITE("VAV7", REG, 400, 123.45, F32, ABCD)</div>
           <p class="desc">Replaces the above with the same wire behaviour.</p>
-          <pre>MB_WRITE("SUB:1.2", REG, 400, 123.45, F32, ABCD)</pre>
+          <pre>MB_WRITE("VAV7", REG, 400, 123.45, F32, ABCD)</pre>
         </div>
       </div>
       <div class="band">
         <span class="band-tag">NEW COMMAND &amp; METHOD</span>
-        <span class="band-cmd">MB_WRITE("SUB:1.2", REG, 400, 123.45, F32, ABCD)</span>
+        <span class="band-cmd">MB_WRITE("VAV7", REG, 400, 123.45, F32, ABCD)</span>
         <span class="band-method">REG + type F32 + order -&gt; FC 0x10, two registers</span>
       </div>
       <p class="gap">New capability, symmetric with the float read.</p>
