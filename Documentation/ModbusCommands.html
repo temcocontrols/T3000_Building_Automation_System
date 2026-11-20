@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Modbus Command Set - Rev1</title>
+<title>Modbus Command Set - Rev2</title>
 <style>
   :root {
     --navy:#1F3147; --navy-2:#2C4361; --teal:#0F766E; --orange:#E07B22;
@@ -171,6 +171,12 @@
     h1 { font-size:30px; }
     nav.toc input { width:180px; }
   }
+  code.handle { background:var(--orange-tint); color:var(--orange-deep); border-color:#F3C99B; font-weight:700; }
+  td.ctr { text-align:center; font-variant-numeric:tabular-nums; color:var(--slate); }
+  .case { background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-top:18px; }
+  .case .head { background:var(--navy); color:#fff; padding:11px 16px; font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+  .case pre { margin:0; padding:16px 18px; font-family:Consolas,"SF Mono",Menlo,monospace; font-size:13px; line-height:1.75; color:#22405A; background:#FBFCFD; overflow-x:auto; }
+  .case .band { border-radius:0; }
 </style>
 </head>
 <body>
@@ -183,7 +189,7 @@
        Checked against the published forum write-up, token by token, against <code style="background:transparent;border:none;color:#FFD9B4">common.cpp</code> and
        <code style="background:transparent;border:none;color:#FFD9B4">dllmain.cpp</code>.</p>
     <div class="meta">
-      <span>Rev1  &middot; 20 November 2026</span>
+      <span>Rev2  &middot; 20 November 2026</span>
       <span>Branch: Maurice</span>
       <span>Folder: Documentation</span>
       <span>Pending implementation</span>
@@ -197,6 +203,7 @@
     <a href="#map">Command map</a>
     <a href="#forum">Forum cross-check</a>
     <a href="#devices">Devices &amp; transport</a>
+    <a href="#handles">Device handles</a>
     <a href="#plan">Migration plan</a>
     <a href="#open">Open decisions</a>
     <div class="search"><input id="q" type="search" placeholder="Filter commands (reg, coil, float, block&hellip;)"></div>
@@ -896,8 +903,76 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
     </table>
   </section>
 
+  <section id="handles">
+    <div class="sec-head"><span class="sec-num">05</span><h2 class="alt">Device handles &mdash; the SUB:1.2 case</h2></div>
+    <div class="rule alt"></div>
+    <p class="lede">A subnet device is not a different kind of command, it is a different route to the same commands.
+       <code>MB_DEFINE_DEVICE</code> binds a name to the route once, so a VAV box behind panel 1 and an Ethernet meter
+       are written identically and the dotted prefix leaves the program body.</p>
+    <table>
+      <thead><tr><th>Handle</th><th>Transport</th><th>Panel</th><th>Slave</th><th>Today's form</th><th>FCs</th><th>What it means</th></tr></thead>
+      <tbody>
+<tr>
+      <td><code class="handle">VAV7</code></td>
+      <td><code>SUB:1.2</code></td>
+      <td class="ctr">1</td>
+      <td class="ctr">2</td>
+      <td class="muted"><code>1.2.</code></td>
+      <td class="muted">03 06 10 01 05 0F 02 04</td>
+      <td>VAV box on the RS485 subnet of panel 1. Panel 1 is the controller whose IP ends in .1; the frame is routed to it and reaches unit id 2 on the subnet. Reads, writes, blocks and coils all work through the one handle.</td>
+    </tr><tr>
+      <td><code class="handle">Meter1</code></td>
+      <td><code>TCP:192.168.0.199:502,TO=500,RT=2</code></td>
+      <td class="ctr">-</td>
+      <td class="ctr">-</td>
+      <td class="muted"><code>199.x. prefix today</code></td>
+      <td class="muted">03 06 10 01 05 0F 02 04</td>
+      <td>Ethernet meter by IP, with its own timeout and retries instead of the global response time.</td>
+    </tr><tr>
+      <td><code class="handle">Pump1</code></td>
+      <td><code>RTU:COM3,9600,N,1,5</code></td>
+      <td class="ctr">-</td>
+      <td class="ctr">5</td>
+      <td class="muted"><code>no prefix today, COM port is chosen in the UI</code></td>
+      <td class="muted">03 06 10 01 05 0F 02 04</td>
+      <td>Serial device on the PC COM port. The port settings live in the handle, once.</td>
+    </tr><tr>
+      <td><code class="handle">IP:199.4</code></td>
+      <td><code>legacy shortcut, no registration</code></td>
+      <td class="ctr">199</td>
+      <td class="ctr">4</td>
+      <td class="muted"><code>199.4.</code></td>
+      <td class="muted">03 06 10 02 04</td>
+      <td>The old dotted prefix kept as a token so untouched programs keep working. Panel wins over IP octet on collision.</td>
+    </tr>
+      </tbody>
+    </table>
+
+    <div class="case">
+      <div class="head">Worked case &middot; VAV7 at SUB:1.2</div>
+      <pre>MB_DEFINE_DEVICE("VAV7", "SUB:1.2")             // panel 1, slave 2, RS485 subnet, routed transparently
+
+VAR1   = MB_READ ("VAV7", REG, 7)                // FC 03, unit 2 through panel 1 - same bytes as 1.2.MB_REG7
+MB_WRITE("VAV7", REG, 3, VAR1)                   // FC 06 - same bytes as 1.2.MB_REG3 = VAR1
+VAR100 = MB_READ ("VAV7", REG, 33, 2, F32, ABCD) // FC 03, two registers - replaces MB_REG_FLOAT_ABCD33
+VAR107 = MB_READ ("VAV7", COIL, 7)               // FC 01
+MB_WRITE("VAV7", COIL, 0, 1, 0, 1)              // FC 0F, three coils - no keyword exists for this today
+STA    = MB_LAST_STATUS()                        // 0 ok, -1 timeout, -2 CRC, -5 no device, -6 exception</pre>
+      <div class="band">
+        <span class="band-tag">NEW COMMAND &amp; METHOD</span>
+        <span class="band-cmd">MB_DEFINE_DEVICE("VAV7", "SUB:1.2")</span>
+        <span class="band-method">one handle carries panel, slave, timeout and retries: MBAP to panel 1, unit id 2 in the PDU, panel forwards down its RS485 subnet</span>
+      </div>
+    </div>
+
+    <p class="muted" style="margin-top:16px">A program that used <code>1.2.MB_REG7</code> gets byte-identical traffic, so P0 can swap
+       spellings without touching a single device. The handle also carries what the prefix cannot: poll rate, timeout, retries,
+       an optional unit id override and a display name that matches the device tree. Today those live per call
+       (<code>SetResponseTime</code>) or nowhere. <code>AddDeviceDlg</code> becomes the place that writes the registration.</p>
+  </section>
+
   <section id="plan">
-    <div class="sec-head"><span class="sec-num">05</span><h2 class="alt">Migration plan</h2></div>
+    <div class="sec-head"><span class="sec-num">06</span><h2 class="alt">Migration plan</h2></div>
     <div class="rule alt"></div>
     <p class="lede">Each phase has to leave every existing program working. Legacy keywords stay supported permanently.</p>
     <div class="phases">
@@ -910,7 +985,7 @@ VAR3 = MB_READ ("VAV7", REG, 3, 2, U32, CDAB)</pre>
   </section>
 
   <section id="open">
-    <div class="sec-head"><span class="sec-num">06</span><h2>Open decisions</h2></div>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Open decisions</h2></div>
     <div class="rule"></div>
     <ol class="dec">
       <li>Do block reads return an array, or keep a separate call name, given the program engine has no array type for Modbus values?</li>

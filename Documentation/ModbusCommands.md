@@ -1,4 +1,4 @@
-# Modbus Command Set - Unified Proposal (Rev1)
+# Modbus Command Set - Unified Proposal (Rev2)
 
 Temco Controls. Proposal for the Modbus command revamp, written against the source in this repository and checked line by line against the published forum write-up.
 
@@ -377,7 +377,40 @@ Each command in the forum write-up, what it claims, and what the source does.
 
 Resolution order: defined handle, then explicit token, then the legacy `panel.slave` prefix. Panel number wins over IP octet on collision, as today.
 
-## 5. Types and byte order
+## 5. Device handles: the `SUB:1.2` case
+
+A subnet device is not a different kind of command, it is a different route to the same commands. `MB_DEFINE_DEVICE` binds a name to the route once, so `VAV7` and an Ethernet meter are used identically and the dotted prefix disappears from the program body.
+
+| Handle | Transport | Panel | Slave | Today's form | FCs reachable | What it means |
+| --- | --- | --- | --- | --- | --- | --- |
+
+| `VAV7` | `SUB:1.2` | 1 | 2 | `1.2.` | 03 06 10 01 05 0F 02 04 | VAV box on the RS485 subnet of panel 1. Panel 1 is the controller whose IP ends in .1; the frame is routed to it and reaches unit id 2 on the subnet. Reads, writes, blocks and coils all work through the one handle. |
+
+| `Meter1` | `TCP:192.168.0.199:502,TO=500,RT=2` | - | - | `199.x. prefix today` | 03 06 10 01 05 0F 02 04 | Ethernet meter by IP, with its own timeout and retries instead of the global response time. |
+
+| `Pump1` | `RTU:COM3,9600,N,1,5` | - | 5 | `no prefix today, COM port is chosen in the UI` | 03 06 10 01 05 0F 02 04 | Serial device on the PC COM port. The port settings live in the handle, once. |
+
+| `IP:199.4` | `legacy shortcut, no registration` | 199 | 4 | `199.4.` | 03 06 10 02 04 | The old dotted prefix kept as a token so untouched programs keep working. Panel wins over IP octet on collision. |
+
+
+### Worked case
+
+```text
+MB_DEFINE_DEVICE("VAV7", "SUB:1.2")            // panel 1, slave 2, RS485 subnet, routed transparently
+
+VAR1   = MB_READ ("VAV7", REG, 7)               // FC 03, unit 2 through panel 1 - same bytes as 1.2.MB_REG7
+MB_WRITE("VAV7", REG, 3, VAR1)                  // FC 06 - same bytes as 1.2.MB_REG3 = VAR1
+VAR100 = MB_READ ("VAV7", REG, 33, 2, F32, ABCD) // FC 03, two registers - replaces MB_REG_FLOAT_ABCD33
+VAR107 = MB_READ ("VAV7", COIL, 7)              // FC 01
+MB_WRITE("VAV7", COIL, 0, 1, 0, 1)             // FC 0F, three coils - no keyword exists for this today
+STA    = MB_LAST_STATUS()                        // 0 ok, -1 timeout, -2 CRC, -5 no device, -6 exception
+```
+
+On the wire the handle produces a normal Modbus TCP request to the panel: MBAP header to panel 1 (the controller whose IP ends in `.1`), unit id 2 in the PDU header, and the panel forwards it down its RS485 subnet. A program that used `1.2.MB_REG7` gets byte-identical traffic, so P0 can swap spellings without touching a single device.
+
+The handle also carries what the prefix cannot: poll rate, timeout, retries, an optional unit id override, and a display name that matches the device tree in the UI. Today those live per call (`SetResponseTime`) or nowhere. `AddDeviceDlg` becomes the place that writes the registration, the program file only reads it.
+
+## 6. Types and byte order
 
 | Type | Registers | Meaning |
 | --- | --- | --- |
@@ -390,7 +423,7 @@ Resolution order: defined handle, then explicit token, then the legacy `panel.sl
 
 Order tokens: `ABCD`, `CDAB`, `BADC`, `DCBA`, with `BE` and `LE` kept as aliases for `ABCD` and `DCBA`.
 
-## 6. Method of operation
+## 7. Method of operation
 
 ```text
 MB_READ (device, area, address [, count] [, type [, order]])
@@ -399,7 +432,7 @@ MB_WRITE(device, area, address, value | value_list [, type [, order]])
 
 The function code is derived from area and direction: REG read 0x03 / write 0x06 / block 0x10, COIL read 0x01 / write 0x05 / block 0x0F, DI read 0x02, IR read 0x04. Limits: 125 registers per read, 123 per block write, 2000 bits per read, 1968 coils per block write, all checked before a frame is built.
 
-## 7. Migration plan
+## 8. Migration plan
 
 | Phase | Work | Exit condition |
 | --- | --- | --- |
@@ -409,7 +442,7 @@ The function code is derived from area and direction: REG read 0x03 / write 0x06
 | P3 | Collapse `_2`, `_nocretical`, `_tap` onto one entry point | one implementation per function code |
 | P4 | Docs and UI | this document replaces the forum write-up, the register tool shows the resolved device and last status |
 
-## 8. Open decisions
+## 9. Open decisions
 
 1. Array return for block reads, or a separate call name, since the program engine has no array type.
 2. `MB_DEFINE_DEVICE` in the program file or in the project database so UI and program share handles.
@@ -417,6 +450,6 @@ The function code is derived from area and direction: REG read 0x03 / write 0x06
 4. Whether diagnostics 0x08 and exception status 0x07 are in scope.
 5. Auto-splitting oversized blocks, or always `MB_ERR_RANGE`.
 
-## 9. Provenance
+## 10. Provenance
 
 Forum: topic 2582 posts 1, 5, 6, 8; topic 2288 post 2; topic 156 post 1; topic 585 posts 2 and 5. Source: `common.cpp`, `dllmain.cpp`, `DemoPrg.txt`. Workbook: `ModbusCommands.xlsx`. Page: `ModbusCommands.html`.
