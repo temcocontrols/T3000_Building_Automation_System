@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Modbus Command Set - Unified Proposal (Rev5)</title>
+<style>
+  :root{
+    --ink:#1c1a17; --muted:#6d675e; --line:#ddd8cf; --bg:#f5f3ef; --card:#fff;
+    --teal:#0f766e; --amber:#b45309; --red:#b91c1c; --slate:#475569; --blue:#0b5cab;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:15px/1.6 "Segoe UI",system-ui,Arial,sans-serif;padding:0 0 80px}
+  header{background:#20211f;color:#f3f1ec;padding:34px 0 26px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:#ffffff14;border:1px solid #ffffff26;
+    padding:4px 10px;border-radius:999px;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+  h1{font-size:34px;line-height:1.2;margin:14px 0 8px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:#c9c4ba;font-size:14.5px;max-width:800px}
+  .meta{display:flex;gap:18px;margin-top:16px;flex-wrap:wrap;font-size:12.5px;color:#a9a49a}
+  .meta b{color:#e8e4dc;font-weight:600}
+
+  nav{position:sticky;top:0;background:#ffffffeb;backdrop-filter:blur(6px);border-bottom:1px solid var(--line);z-index:9}
+  nav .wrap{display:flex;gap:20px;overflow-x:auto;padding:10px 28px;font-size:12.5px}
+  nav a{color:var(--muted);text-decoration:none;white-space:nowrap;padding:3px 0;border-bottom:2px solid transparent}
+  nav a:hover{color:var(--ink);border-bottom-color:var(--amber)}
+
+  section{padding:36px 0 6px}
+  h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:10px}
+  h3{font-size:19px;margin:0 0 10px;font-weight:650}
+  p{color:#33302c;margin-bottom:12px;max-width:940px}
+  p.lead{font-size:15.5px;color:#2c2a26}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px 22px;margin-bottom:16px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{background:#f0ece4;text-align:left;padding:8px 10px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#59544c;border-bottom:1px solid var(--line)}
+  tbody td{padding:8px 10px;border-bottom:1px solid #f1ece3;vertical-align:top}
+  tbody tr:last-child td{border-bottom:0}
+  td code,p code,li code{font-family:"Cascadia Mono",Consolas,monospace;font-size:12px;background:#f3efe7;padding:1px 5px;border-radius:3px;color:#1f3b3a}
+  .num{color:#a29c92;font-variant-numeric:tabular-nums;width:34px}
+  .mono{font-family:"Cascadia Mono",Consolas,monospace;font-size:12px}
+  pre{background:#20211f;color:#e9e5dc;border-radius:6px;padding:12px 14px;overflow-x:auto;font:12.5px/1.55 "Cascadia Mono",Consolas,monospace;margin:8px 0 14px}
+  pre .cm{color:#8fae8b}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pair .old pre{background:#3a2f28}
+  .pair .lbl{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8a8479;margin-bottom:4px}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .kpi{background:#fff;border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:6px;padding:12px 14px}
+  .kpi b{display:block;font-size:16px;margin-bottom:3px}
+  .kpi span{font-size:12.5px;color:var(--muted)}
+
+  .callout{border-left:3px solid var(--amber);background:#fdf6ec;border-radius:0 6px 6px 0;padding:12px 16px;font-size:13.5px;color:#4a4238;margin-bottom:14px}
+  .callout.teal{border-left-color:var(--teal);background:#eef6f4;color:#2f4a46}
+
+  .tag{display:inline-block;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:1px 7px;border-radius:999px;border:1px solid}
+  .tag.new{color:#0b6b45;border-color:#a9d6c2;background:#eef8f2}
+  .tag.same{color:#5f5a52;border-color:#ddd8cf;background:#f2efe9}
+  .tag.gap{color:#8c1a16;border-color:#e7c3bf;background:#fdeeec}
+
+  .flow{background:#20211f;color:#e9e5dc;border-radius:8px;padding:16px 18px;font:12.5px/1.7 "Cascadia Mono",Consolas,monospace}
+  .flow i{color:#7fb3ab;font-style:normal}
+  footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:#8a8479}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="badge">Rev5 &middot; Temco Controls</span>
+    <h1>Modbus Command Set &mdash; Unified Proposal</h1>
+    <div class="sub">Keyed to the System Device List agreed in the 2026-11-20 review. The list is the registry, the
+      <b>Panel Name (CBasic)</b> column is the address, and every command takes that name and nothing else.</div>
+    <div class="meta">
+      <span><b>Registry:</b> System Device List, issue #504</span>
+      <span><b>Address:</b> panel name, 20 characters</span>
+      <span><b>Transport:</b> from the row (Protocol / IP / Baud / Parity / Address)</span>
+      <span><b>Companion:</b> ModbusCommands-Rev5.md</span>
+    </div>
+  </div>
+</header>
+
+<nav><div class="wrap">
+  <a href="#delta">What changed</a>
+  <a href="#registry">The list</a>
+  <a href="#names">Panel names</a>
+  <a href="#map">Command map</a>
+  <a href="#examples">Examples</a>
+  <a href="#resolve">Resolution</a>
+  <a href="#protocol">Per protocol</a>
+  <a href="#guarantee">List guarantees</a>
+  <a href="#types">Types</a>
+  <a href="#migration">Migration</a>
+  <a href="#open">Open decisions</a>
+</div></nav>
+
+<div class="wrap">
+
+<section id="delta">
+  <h2>01 &middot; What changed since Rev4</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Area</th><th>Rev4</th><th>Rev5</th></tr></thead>
+      <tbody>
+        <tr><td>Device name</td><td>invented <code>product-panel-address</code>, e.g. <code>vav-1-2</code>, kept in its own registry</td><td>the device&rsquo;s own <b>panel name</b>, as it stands on the device, 20 characters, e.g. <code>VAV101</code></td></tr>
+        <tr><td>Where it comes from</td><td>a new tree over <code>ALL_NODE</code> rows plus a naming rule</td><td>the <b>System Device List</b>, column <i>Panel Name (CBasic)</i> &mdash; one source for Control Basic, Modbus and the tree</td></tr>
+        <tr><td>Transport</td><td><code>MB_DEFINE_DEVICE</code> handle per device</td><td>the row&rsquo;s <b>Protocol / IP Address / Baud / Parity / Address</b> cells</td></tr>
+        <tr><td><code>MB_DEFINE_DEVICE</code></td><td>the primary way to reach anything</td><td>escape hatch only, for a meter or gateway that has no row</td></tr>
+        <tr><td>Dotted paths</td><td>discouraged</td><td>never &mdash; names read <code>VAV101</code>, not a path</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="registry">
+  <h2>02 &middot; The registry</h2>
+  <h3>System Device List, twelve columns</h3>
+  <p class="lead">Stored on the T3 devices themselves, so a replacement PC rebuilds it from the hardware. The tree, Control
+    Basic, the Modbus commands and the poll dialogs all read the same rows.</p>
+  <div class="card">
+    <table>
+      <thead><tr><th>Column</th><th>Meaning</th><th>What Modbus takes from it</th></tr></thead>
+      <tbody>
+        <tr><td><b>Main</b></td><td>main-net item, or the parent panel of a sub-net row</td><td>route &mdash; the panel the frame is sent to</td></tr>
+        <tr><td><b>Sub Net</b></td><td>sub-net item name; blank on a main-net row</td><td>grouping only</td></tr>
+        <tr><td><b>Serial ID</b></td><td>device serial number</td><td>identity, diagnostics</td></tr>
+        <tr><td><b>Product Name</b></td><td><code>VAV box</code>, <code>T3-BB</code>, <code>power meter</code></td><td>display, default name suggestion</td></tr>
+        <tr><td><b>Status</b></td><td>online / offline</td><td>an offline row returns <code>-5</code> without a frame</td></tr>
+        <tr><td><b>Product ID</b></td><td>model id</td><td>unit-id source when <i>Address</i> is blank</td></tr>
+        <tr><td><b>Address</b></td><td>sub id, or unit id on a main-net row</td><td><b>unit id</b> in the MBAP / PDU header</td></tr>
+        <tr><td><b>IP Address</b></td><td>main-net rows only; blank on sub-net rows</td><td><b>TCP host</b>, port 502 unless overridden</td></tr>
+        <tr><td><b>Baud</b></td><td>9600 &hellip; 115200</td><td>RS485 attempt speed</td></tr>
+        <tr><td><b>Parity</b></td><td>N / E / O with stop bits</td><td>RS485 framing</td></tr>
+        <tr><td><b>Protocol</b></td><td><code>BACnet/IP</code>, <code>Modbus TCP</code>, <code>Modbus RS485</code></td><td><b>which transport</b> a command uses</td></tr>
+        <tr><td><b>Panel Name (CBasic)</b></td><td>the device&rsquo;s own panel name, 20 characters</td><td><b>the device argument</b> of every command</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout teal"><b>Blank IP on a sub-net row is correct.</b> The IP belongs to the panel the device hangs
+    off; the sub id in <i>Address</i> plus <i>Protocol / Baud / Parity</i> is what identifies and reaches it. A Modbus
+    command needs no IP for such a device.</div>
+</section>
+
+<section id="names">
+  <h2>03 &middot; Panel names</h2>
+  <h3>The one address every command uses</h3>
+  <div class="card">
+    <table>
+      <thead><tr><th>Rule</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td>Shape</td><td><code>VAV101</code>, <code>AHU2-3</code>, <code>Meter1</code> &mdash; letters, digits, dash, underscore; at most <b>20 characters</b></td></tr>
+        <tr><td>Source of truth</td><td>the device. The list shows the name as it stands; there is no PC-side rename</td></tr>
+        <tr><td>Uniqueness</td><td>case-insensitive within one project; a duplicate is rejected on save</td></tr>
+        <tr><td>No dots, no colons</td><td><code>1.2.VAV101</code> and <code>VAV101:502</code> are both rejected &mdash; the transport is not part of the name</td></tr>
+        <tr><td>Reserved</td><td><code>REG</code>, <code>COIL</code>, <code>DI</code>, <code>IR</code>, <code>AI</code>, <code>AV</code>, <code>AO</code>, <code>BI</code>, <code>BO</code>, <code>BV</code>, <code>MSV</code>, <code>MB_*</code></td></tr>
+        <tr><td>Rename on the device</td><td>the program follows, because the name is looked up at run time</td></tr>
+        <tr><td>Not found</td><td><code>MB_ERR_NO_DEVICE</code> (-5) plus the closest match &mdash; never a silent zero</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="map">
+  <h2>04 &middot; Command map</h2>
+  <h3>Nineteen commands &mdash; today, proposed, and the frame each one sends</h3>
+  <div class="card" style="padding:8px 10px">
+    <table>
+      <thead><tr><th class="num">#</th><th>Area</th><th>Op</th><th>FC</th><th>Today</th><th>New command</th><th>Method</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td>REG</td><td>read</td><td>0x03</td><td><code>VAR1 = 1.2.MB_REG7</code></td><td><code>VAR1 = MB_READ("VAV101", REG, 7)</code></td><td>one register, unit 2 through panel 1</td></tr>
+        <tr><td class="num">2</td><td>REG</td><td>write</td><td>0x06</td><td><code>1.2.MB_REG3 = VAR1</code></td><td><code>MB_WRITE("VAV101", REG, 3, VAR1)</code></td><td>single value, one register</td></tr>
+        <tr><td class="num">3</td><td>COIL</td><td>read</td><td>0x01</td><td><code>VAR107 = 1.2.MB_COIL7</code></td><td><code>VAR107 = MB_READ("VAV101", COIL, 7)</code></td><td>one bit</td></tr>
+        <tr><td class="num">4</td><td>DI</td><td>read</td><td>0x02</td><td><code>VAR108 = 1.2.MB_DISINPUT7</code></td><td><code>VAR108 = MB_READ("VAV101", DI, 7)</code></td><td>one bit, read only</td></tr>
+        <tr><td class="num">5</td><td>IR</td><td>read</td><td>0x04</td><td><code>VAR109 = 1.2.MB_INPUTREG7</code></td><td><code>VAR109 = MB_READ("VAV101", IR, 7)</code></td><td>one register, read only</td></tr>
+        <tr><td class="num">6</td><td>REG</td><td>read F32</td><td>0x03</td><td><code>&hellip;MB_REG_FLOAT_ABCD33</code></td><td><code>MB_READ("VAV101", REG, 33, 2, F32, ABCD)</code></td><td>two registers, order explicit</td></tr>
+        <tr><td class="num">7</td><td>REG</td><td>read F32</td><td>0x03</td><td><code>&hellip;MB_REG_FLOAT_CDAB44</code></td><td><code>MB_READ("VAV101", REG, 44, 2, F32, CDAB)</code></td><td>word swapped</td></tr>
+        <tr><td class="num">8</td><td>REG</td><td>read F32</td><td>0x03</td><td><code>&hellip;MB_REG_FLOAT_BADC55</code></td><td><code>MB_READ("VAV101", REG, 55, 2, F32, BADC)</code></td><td>byte swapped in word</td></tr>
+        <tr><td class="num">9</td><td>REG</td><td>read F32</td><td>0x03</td><td><code>&hellip;MB_REG_FLOAT_DCBA66</code></td><td><code>MB_READ("VAV101", REG, 66, 2, F32, DCBA)</code></td><td>both swapped</td></tr>
+        <tr><td class="num">10</td><td>IR</td><td>read F32</td><td>0x04</td><td><code>&hellip;MB_INPUT_FLOAT_ABCD77</code></td><td><code>MB_READ("VAV101", IR, 77, 2, F32, ABCD)</code></td><td>undocumented in the forum set</td></tr>
+        <tr><td class="num">11</td><td>REG</td><td>block read</td><td>0x03</td><td><code>MB_BLOCKREAD(1, 2, 100, 5)</code></td><td><code>MB_READ("VAV101", REG, 100, 5)</code></td><td>five registers, one frame</td></tr>
+        <tr><td class="num">12</td><td>REG</td><td>block write</td><td>0x10</td><td><code>MB_BLOCKWRITE(1, 2, 100, 5, &hellip;)</code></td><td><code>MB_WRITE("VAV101", REG, 100, 10, 20, 30, 40, 50)</code></td><td>value list, 123 max</td></tr>
+        <tr><td class="num">13</td><td>COIL</td><td>block write</td><td>0x0F</td><td><code>MB_BWCOIL(1, 2, 0, 3, 1, 0, 1)</code></td><td><code>MB_WRITE("VAV101", COIL, 0, 1, 0, 1)</code></td><td>three coils, no keyword today</td></tr>
+        <tr><td class="num">14</td><td>REG</td><td>main-net read</td><td>0x03</td><td><code>199.4.MB_REG55</code></td><td><code>MB_READ("Meter1", REG, 55)</code></td><td>name resolves to the TCP row</td></tr>
+        <tr><td class="num">15</td><td>REG</td><td>read 32</td><td>0x03</td><td><code>MB_REG3 * 65536 + MB_REG4</code></td><td><code>MB_READ("VAV101", REG, 3, 2, U32, CDAB)</code></td><td>one frame, not two</td></tr>
+        <tr><td class="num">16</td><td>REG</td><td>read bit</td><td>0x03</td><td><code>1.2.MB_REG7 &amp; 1</code></td><td><code>MB_READ("VAV101", REG, 7, 1, BIT, bit=0)</code></td><td>typed extraction</td></tr>
+        <tr><td class="num">17</td><td>all</td><td>ad-hoc device</td><td>&ndash;</td><td>no equivalent</td><td><code>MB_DEFINE_DEVICE("ShopMeter", "TCP:192.168.0.44:502,TO=500,RT=2")</code></td><td>only for a device with no row</td></tr>
+        <tr><td class="num">18</td><td>all</td><td>status</td><td>&ndash;</td><td>no equivalent</td><td><code>MB_LAST_STATUS() / MB_LAST_EXCEPTION()</code></td><td>0 ok, -1 timeout, -2 CRC, -3 area, -4 range, -5 no device or offline, -6 exception</td></tr>
+        <tr><td class="num">19</td><td>REG</td><td>write F32</td><td>0x10</td><td>no equivalent</td><td><code>MB_WRITE("VAV101", REG, 400, 123.45, F32, ABCD)</code></td><td>two registers, symmetric with the float read</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="examples">
+  <h2>05 &middot; Examples</h2>
+
+  <div class="card">
+    <h3>1 &middot; Register read &mdash; FC 0x03</h3>
+    <p>Read one holding register from the device the list calls <code>VAV101</code> (panel 1, sub id 2). Same frame on
+      the wire, only the spelling changes.</p>
+    <div class="pair">
+      <div class="old"><div class="lbl">Today</div><pre>40 VAR100 = 1.2.MB_REG7</pre></div>
+      <div><div class="lbl">Rev5</div><pre>40 VAR100 = MB_READ(<span class="cm">"VAV101"</span>, REG, 7)</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>2 &middot; Register write &mdash; FC 0x06</h3>
+    <p>A write stops being a left-side assignment and becomes the same verb as read.</p>
+    <div class="pair">
+      <div class="old"><div class="lbl">Today</div><pre>230 1.2.MB_REG3 = VAR1 / 65536</pre></div>
+      <div><div class="lbl">Rev5</div><pre>230 MB_WRITE(<span class="cm">"VAV101"</span>, REG, 3, VAR1 / 65536)</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3 &middot; Coil and discrete reads &mdash; FC 0x01 / 0x02</h3>
+    <p>Coil reads already worked; the write half of that area is missing today and arrives with this set. A write to a
+      discrete input is rejected in the editor and returns <code>MB_ERR_AREA</code> at run time.</p>
+    <div class="pair">
+      <div class="old"><div class="lbl">Today</div><pre>120 VAR107 = 1.2.MB_COIL7
+130 VAR108 = 1.2.MB_DISINPUT7</pre></div>
+      <div><div class="lbl">Rev5</div><pre>120 VAR107 = MB_READ(<span class="cm">"VAV101"</span>, COIL, 7)
+130 VAR108 = MB_READ(<span class="cm">"VAV101"</span>, DI, 7)</pre></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>4 &middot; Float and block &mdash; FC 0x03 / 0x10 / 0x0F</h3>
+    <p>Four float spellings collapse into a type and an order argument. Block reads cap at the 125-register
+      specification limit; block writes at 123, with the legacy 25-value ceiling kept for <code>MB_BLOCKWRITE</code> only.</p>
+<pre>VAR100 = MB_READ (<span class="cm">"VAV101"</span>, REG, 33, 2, F32, ABCD)   <span class="cm">// replaces MB_REG_FLOAT_ABCD33</span>
+VAR1[] = MB_READ (<span class="cm">"VAV101"</span>, REG, 100, 5)               <span class="cm">// block read, five registers</span>
+MB_WRITE(<span class="cm">"VAV101"</span>, REG, 100, 10, 20, 30, 40, 50)           <span class="cm">// FC 10</span>
+MB_WRITE(<span class="cm">"VAV101"</span>, COIL, 0, 1, 0, 1)                    <span class="cm">// FC 0F - no keyword exists for this today</span>
+STA    = MB_LAST_STATUS()                                <span class="cm">// 0 ok, -1 timeout, -5 no device or offline</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>5 &middot; Main-net meter, and a device with no row</h3>
+    <p><code>199.4.</code> reached the meter by the last octet of its IP. In the list the meter has a panel name and a
+      <i>Protocol</i> of <code>Modbus TCP</code>, so the command names it. A gateway that has never been scanned has no
+      row, so it is defined inline &mdash; the one surviving use of <code>MB_DEFINE_DEVICE</code>.</p>
+    <div class="pair">
+      <div class="old"><div class="lbl">Today</div><pre>259 VAR98 = 199.4.MB_REG55</pre></div>
+      <div><div class="lbl">Rev5</div><pre>259 VAR98 = MB_READ(<span class="cm">"Meter1"</span>, REG, 55)</pre></div>
+    </div>
+<pre>MB_DEFINE_DEVICE(<span class="cm">"ShopMeter"</span>, "TCP:192.168.0.44:502,TO=500,RT=2")
+VAR_E = MB_READ(<span class="cm">"ShopMeter"</span>, REG, 300, 2, F32, ABCD)</pre>
+  </div>
+</section>
+
+<section id="resolve">
+  <h2>06 &middot; How a name resolves</h2>
+  <div class="flow">
+MB_READ(<span class="cm">"VAV101"</span>, REG, 7)
+   <i>&rarr;</i> System Device List, column Panel Name (CBasic), case-insensitive exact match
+   <i>&rarr;</i> row: Main = ctl-1, Sub Net = VAV group, Address = 2,
+          Protocol = Modbus RS485, Baud = 115200, Parity = N
+   <i>&rarr;</i> transport = Modbus RS485 on the panel named in Main, unit id = Address
+   <i>&rarr;</i> panel ctl-1: IP from its own row, port 502, MBAP unit id 2,
+          PDU &rarr; FC 03, address 7, count 1
+  </div>
+  <p style="margin-top:14px">Resolution order: a row whose panel name matches; then an inline
+    <code>MB_DEFINE_DEVICE</code> handle; then the legacy <code>panel.slave.</code> prefix or
+    <code>IP:&lt;octet&gt;.&lt;unit&gt;</code> token, resolved to a row if one matches, otherwise treated as unregistered.</p>
+</section>
+
+<section id="protocol">
+  <h2>07 &middot; Per protocol behaviour</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Protocol in the row</th><th>Host</th><th>Unit id</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>Modbus TCP</code></td><td><i>IP Address</i>, port 502</td><td><i>Address</i>, else <i>Product ID</i>, else 1</td><td>main-net device, one TCP frame, no routing</td></tr>
+        <tr><td><code>Modbus RS485</code></td><td>none &mdash; routed through the panel named in <i>Main</i></td><td><i>Address</i></td><td>framing from <i>Baud</i> and <i>Parity</i>; blank <i>IP</i> is expected</td></tr>
+        <tr><td><code>BACnet/IP</code></td><td><i>IP Address</i></td><td>&ndash;</td><td>the main-net default; a Modbus command against such a row is refused with <code>MB_ERR_AREA</code>, never silently re-routed</td></tr>
+        <tr><td>offline row (<i>Status</i>)</td><td>&ndash;</td><td>&ndash;</td><td>returns -5 without opening a socket, so a dead device cannot stall a program</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">Move <code>VAV101</code> from the RS485 subnet onto its own Ethernet adapter, rescan: the row&rsquo;s
+    <i>Protocol</i> becomes <code>Modbus TCP</code> with an IP, and not one program line changes.</div>
+</section>
+
+<section id="guarantee">
+  <h2>08 &middot; What the list must guarantee</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Requirement</th><th>Why the commands need it</th></tr></thead>
+      <tbody>
+        <tr><td>Panel name unique per project, case-insensitive, 20 characters</td><td>it is the device argument of every command</td></tr>
+        <tr><td>Sub-net rows keep <i>IP Address</i> blank</td><td>nobody can hard-code a panel IP into a device that has none</td></tr>
+        <tr><td><i>Protocol</i> reports what the device is actually set to</td><td>picks TCP or RS485 routing instead of an assumption</td></tr>
+        <tr><td><i>Baud</i> and <i>Parity</i> sit on the sub-net row</td><td>the RS485 attempt is built from the row, not a global setting</td></tr>
+        <tr><td>Offline rows keep red status and grey background</td><td>a command against them returns -5 locally, at no cost on the wire</td></tr>
+        <tr><td>Modbus rows cached before delete, <code>Undo (n)</code> restores them</td><td>a mis-delete cannot break programs</td></tr>
+        <tr><td>Current row highlighted blue</td><td>the row being edited is never confused with a bad one</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="types">
+  <h2>09 &middot; Types, byte order, method</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Types</h3>
+      <table>
+        <thead><tr><th>Type</th><th>Registers</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>U16</code></td><td>1</td><td>unsigned 16-bit, default</td></tr>
+          <tr><td><code>S16</code></td><td>1</td><td>signed 16-bit</td></tr>
+          <tr><td><code>U32</code></td><td>2</td><td>unsigned 32-bit</td></tr>
+          <tr><td><code>S32</code></td><td>2</td><td>signed 32-bit</td></tr>
+          <tr><td><code>F32</code></td><td>2</td><td>IEEE-754 single</td></tr>
+          <tr><td><code>BIT</code></td><td>1</td><td>one bit, <code>bit=&lt;0..15&gt;</code></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px;font-size:12.5px;color:#6d675e">Order tokens <code>ABCD</code>, <code>CDAB</code>,
+        <code>BADC</code>, <code>DCBA</code>; <code>BE</code> and <code>LE</code> stay as aliases.</p>
+    </div>
+    <div class="card">
+      <h3>Method of operation</h3>
+<pre>MB_READ (device, area, address [, count]
+         [, type [, order]])
+MB_WRITE(device, area, address,
+         value | value_list [, type [, order]])</pre>
+      <p style="font-size:12.5px;color:#6d675e">FC from area and direction: REG read 0x03 / write 0x06 / block 0x10,
+        COIL read 0x01 / write 0x05 / block 0x0F, DI 0x02, IR 0x04. Limits 125 registers per read, 123 per block write,
+        2000 bits per read, 1968 coils per block write.</p>
+    </div>
+  </div>
+</section>
+
+<section id="migration">
+  <h2>10 &middot; Migration</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Phase</th><th>Work</th><th>Exit condition</th></tr></thead>
+      <tbody>
+        <tr><td><b>P0</b></td><td>new verbs as translations onto the existing DLL calls; legacy keywords untouched</td><td>every new command produces the same bytes as its legacy pair, verified with the <code>_log</code> exports</td></tr>
+        <tr><td><b>P1</b></td><td>panel-name lookup over the System Device List</td><td><code>MB_READ("VAV101", &hellip;)</code> and <code>1.2.MB_REG7</code> reach the same unit with byte-identical traffic</td></tr>
+        <tr><td><b>P2</b></td><td>type system and byte order in one place</td><td>eight float keywords become two aliases, no <code>* 65536 +</code> advice left</td></tr>
+        <tr><td><b>P3</b></td><td>coil and discrete areas, single and block writes</td><td>a program can drive a coil and read a discrete input through the same verb</td></tr>
+        <tr><td><b>P4</b></td><td><i>Protocol</i> drives transport, offline rows short-circuit</td><td>a TCP row and an RS485 row are reached by the same verb; an offline row costs no socket</td></tr>
+        <tr><td><b>P5</b></td><td>collapse <code>_2</code>, <code>_nocretical</code>, <code>_tap</code> onto one entry point</td><td>one implementation per function code</td></tr>
+        <tr><td><b>P6</b></td><td>docs and UI</td><td>this document replaces the forum write-up; the register tool shows the resolved row, protocol and last status</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="open">
+  <h2>11 &middot; Open decisions</h2>
+  <div class="card">
+    <ol style="padding-left:20px;color:#33302c;font-size:14px;line-height:1.9">
+      <li>Unit id when <i>Address</i> is blank on a main-net Modbus TCP row &mdash; fall back to <i>Product ID</i>
+        (assumed here) or force an edit.</li>
+      <li>Array return for block reads, or a separate call name &mdash; the program engine has no array type.</li>
+      <li>A panel-name rename on the device: keep a PC-side alias for programs written against the old name, or follow
+        the device with no alias at all.</li>
+      <li><code>BIT</code> as a type or as an operator on a value.</li>
+      <li>Whether diagnostics 0x08 and exception status 0x07 are in scope.</li>
+      <li>Auto-splitting oversized blocks, or always <code>MB_ERR_RANGE</code>.</li>
+    </ol>
+  </div>
+
+  <footer>
+    <b>Provenance.</b> Issue #504 <i>System Device List in T3000</i>, 2026-11-20 review &mdash; twelve-column layout, panel
+    name column, protocol and serial settings, delete cache with undo. Forum: topic 2582 posts 1, 5, 6, 8; topic 2288
+    post 2; topic 156 post 1; topic 585 posts 2 and 5. Source: <code>common.cpp</code>, <code>dllmain.cpp</code>,
+    <code>DemoPrg.txt</code>. Markdown twin: <code>ModbusCommands-Rev5.md</code>.
+  </footer>
+</section>
+
+</div>
+</body>
+</html>
