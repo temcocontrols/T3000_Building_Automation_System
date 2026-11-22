@@ -1,0 +1,579 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 1900" width="1040" height="1900">
+<defs>
+  <linearGradient id="body" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#34383C"/><stop offset="0.18" stop-color="#2A2D31"/>
+    <stop offset="0.55" stop-color="#232629"/><stop offset="0.85" stop-color="#1B1D1F"/>
+    <stop offset="1" stop-color="#2C2F33"/>
+  </linearGradient>
+  <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#212428"/><stop offset="1" stop-color="#16181A"/>
+  </linearGradient>
+  <linearGradient id="term" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#8A9096"/><stop offset="1" stop-color="#5A6066"/>
+  </linearGradient>
+  <linearGradient id="tag" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#E9E9E1"/><stop offset="1" stop-color="#D2D2C8"/>
+  </linearGradient>
+  <linearGradient id="lcd" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#9DBE63"/><stop offset="0.5" stop-color="#8CB054"/><stop offset="1" stop-color="#779A44"/>
+  </linearGradient>
+  <linearGradient id="bezel" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#3A3E42"/><stop offset="1" stop-color="#202225"/>
+  </linearGradient>
+  <filter id="drop" x="-25%" y="-12%" width="150%" height="135%"><feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#000000" flood-opacity="0.34"/></filter>
+  <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.55"/></filter>
+</defs>
+<rect width="1040" height="1900" fill="#ffffff"/>
+<g fill="url(#body)" stroke="#121315" stroke-width="2">
+  <rect x="18" y="96" width="74" height="150" rx="30"/>
+  <rect x="948" y="96" width="74" height="150" rx="30"/>
+  <rect x="18" y="1654" width="74" height="150" rx="30"/>
+  <rect x="948" y="1654" width="74" height="150" rx="30"/>
+</g>
+<g fill="#0E0F10" stroke="#4A4E52" stroke-width="2">
+  <circle cx="55" cy="171" r="13"/><circle cx="985" cy="171" r="13"/>
+  <circle cx="55" cy="1729" r="13"/><circle cx="985" cy="1729" r="13"/>
+</g>
+<rect x="66" y="46" width="908" height="1808" rx="44" fill="url(#body)" stroke="#101112" stroke-width="3" filter="url(#drop)"/>
+<rect x="84" y="64" width="872" height="1772" rx="34" fill="none" stroke="#4A4E52" stroke-width="2" opacity="0.55"/>
+<rect x="108" y="92" width="824" height="1716" rx="20" fill="url(#panel)" stroke="#0D0E0F" stroke-width="2"/>
+<g>
+  <rect x="146" y="112" width="196" height="38" rx="6" fill="#336699"/>
+  <text x="244" y="139" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#ffffff" text-anchor="middle" letter-spacing="1.2">INPUTS  1-32</text>
+  <rect x="700" y="112" width="216" height="38" rx="6" fill="#336699"/>
+  <text x="808" y="139" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#ffffff" text-anchor="middle" letter-spacing="1.2">OUTPUTS  DO / AO</text>
+</g>
+<circle cx="166" cy="208" r="6" fill="#3F464C"/>
+<g><rect x="186" y="193" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="196" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="208" r="7" fill="#23262A"/>
+<rect x="207" y="203" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="214" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI1</text>
+<circle cx="166" cy="249" r="6" fill="#3F464C"/>
+<g><rect x="186" y="234" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="237" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="249" r="7" fill="#23262A"/>
+<rect x="207" y="244" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="255" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI2</text>
+<circle cx="166" cy="290" r="6" fill="#3F464C"/>
+<g><rect x="186" y="275" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="278" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="290" r="7" fill="#23262A"/>
+<rect x="207" y="285" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="296" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI3</text>
+<circle cx="166" cy="331" r="6" fill="#3F464C"/>
+<g><rect x="186" y="316" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="319" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="331" r="7" fill="#23262A"/>
+<rect x="207" y="326" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="337" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI4</text>
+<circle cx="166" cy="372" r="6" fill="#3F464C"/>
+<g><rect x="186" y="357" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="360" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="372" r="7" fill="#23262A"/>
+<rect x="207" y="367" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="378" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI5</text>
+<circle cx="166" cy="413" r="6" fill="#3F464C"/>
+<g><rect x="186" y="398" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="401" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="413" r="7" fill="#23262A"/>
+<rect x="207" y="408" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="419" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI6</text>
+<circle cx="166" cy="454" r="6" fill="#3F464C"/>
+<g><rect x="186" y="439" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="442" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="454" r="7" fill="#23262A"/>
+<rect x="207" y="449" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="460" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI7</text>
+<circle cx="166" cy="495" r="6" fill="#3F464C"/>
+<g><rect x="186" y="480" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="483" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="495" r="7" fill="#23262A"/>
+<rect x="207" y="490" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="501" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI8</text>
+<circle cx="166" cy="536" r="6" fill="#3F464C"/>
+<g><rect x="186" y="521" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="524" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="536" r="7" fill="#23262A"/>
+<rect x="207" y="531" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="542" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI9</text>
+<circle cx="166" cy="577" r="6" fill="#3F464C"/>
+<g><rect x="186" y="562" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="565" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="577" r="7" fill="#23262A"/>
+<rect x="207" y="572" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="583" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI10</text>
+<circle cx="166" cy="618" r="6" fill="#3F464C"/>
+<g><rect x="186" y="603" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="606" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="618" r="7" fill="#23262A"/>
+<rect x="207" y="613" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="624" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI11</text>
+<circle cx="166" cy="659" r="6" fill="#3F464C"/>
+<g><rect x="186" y="644" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="647" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="659" r="7" fill="#23262A"/>
+<rect x="207" y="654" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="665" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI12</text>
+<circle cx="166" cy="700" r="6" fill="#3F464C"/>
+<g><rect x="186" y="685" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="688" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="700" r="7" fill="#23262A"/>
+<rect x="207" y="695" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="706" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI13</text>
+<circle cx="166" cy="741" r="6" fill="#3F464C"/>
+<g><rect x="186" y="726" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="729" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="741" r="7" fill="#23262A"/>
+<rect x="207" y="736" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="747" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI14</text>
+<circle cx="166" cy="782" r="6" fill="#3F464C"/>
+<g><rect x="186" y="767" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="770" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="782" r="7" fill="#23262A"/>
+<rect x="207" y="777" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="788" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI15</text>
+<circle cx="166" cy="823" r="6" fill="#3F464C"/>
+<g><rect x="186" y="808" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="811" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="823" r="7" fill="#23262A"/>
+<rect x="207" y="818" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="829" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI16</text>
+<circle cx="166" cy="864" r="6" fill="#3F464C"/>
+<g><rect x="186" y="849" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="852" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="864" r="7" fill="#23262A"/>
+<rect x="207" y="859" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="870" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI17</text>
+<circle cx="166" cy="905" r="6" fill="#3F464C"/>
+<g><rect x="186" y="890" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="893" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="905" r="7" fill="#23262A"/>
+<rect x="207" y="900" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="911" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI18</text>
+<circle cx="166" cy="946" r="6" fill="#3F464C"/>
+<g><rect x="186" y="931" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="934" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="946" r="7" fill="#23262A"/>
+<rect x="207" y="941" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="952" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI19</text>
+<circle cx="166" cy="987" r="6" fill="#3F464C"/>
+<g><rect x="186" y="972" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="975" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="987" r="7" fill="#23262A"/>
+<rect x="207" y="982" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="993" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI20</text>
+<circle cx="166" cy="1028" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1013" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1016" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1028" r="7" fill="#23262A"/>
+<rect x="207" y="1023" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1034" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI21</text>
+<circle cx="166" cy="1069" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1054" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1057" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1069" r="7" fill="#23262A"/>
+<rect x="207" y="1064" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1075" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI22</text>
+<circle cx="166" cy="1110" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1095" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1098" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1110" r="7" fill="#23262A"/>
+<rect x="207" y="1105" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1116" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI23</text>
+<circle cx="166" cy="1151" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1136" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1139" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1151" r="7" fill="#23262A"/>
+<rect x="207" y="1146" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1157" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI24</text>
+<circle cx="166" cy="1192" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1177" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1180" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1192" r="7" fill="#23262A"/>
+<rect x="207" y="1187" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1198" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI25</text>
+<circle cx="166" cy="1233" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1218" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1221" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1233" r="7" fill="#23262A"/>
+<rect x="207" y="1228" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1239" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI26</text>
+<circle cx="166" cy="1274" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1259" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1262" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1274" r="7" fill="#23262A"/>
+<rect x="207" y="1269" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1280" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI27</text>
+<circle cx="166" cy="1315" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1300" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1303" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1315" r="7" fill="#23262A"/>
+<rect x="207" y="1310" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1321" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI28</text>
+<circle cx="166" cy="1356" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1341" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1344" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1356" r="7" fill="#23262A"/>
+<rect x="207" y="1351" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1362" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI29</text>
+<circle cx="166" cy="1397" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1382" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1385" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1397" r="7" fill="#23262A"/>
+<rect x="207" y="1392" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1403" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI30</text>
+<circle cx="166" cy="1438" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1423" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1426" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1438" r="7" fill="#23262A"/>
+<rect x="207" y="1433" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1444" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI31</text>
+<circle cx="166" cy="1479" r="6" fill="#3F464C"/>
+<g><rect x="186" y="1464" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="192" y="1467" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="212" cy="1479" r="7" fill="#23262A"/>
+<rect x="207" y="1474" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<text x="256" y="1485" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="19" fill="#E8EAEC" text-anchor="start">UI32</text>
+<text x="742" y="215" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO1</text>
+<g><rect x="748" y="194" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="199" x2="773" y2="217" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="199" x2="799" y2="217" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="197" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="200" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="193" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="196" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="208" r="7" fill="#23262A"/>
+<rect x="849" y="203" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="208" r="6" fill="#3F464C"/>
+<text x="742" y="256" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO2</text>
+<g><rect x="748" y="235" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="240" x2="773" y2="258" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="240" x2="799" y2="258" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="238" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="241" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="234" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="237" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="249" r="7" fill="#23262A"/>
+<rect x="849" y="244" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="249" r="6" fill="#3F464C"/>
+<text x="742" y="297" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO3</text>
+<g><rect x="748" y="276" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="281" x2="773" y2="299" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="281" x2="799" y2="299" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="279" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="282" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="275" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="278" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="290" r="7" fill="#23262A"/>
+<rect x="849" y="285" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="290" r="6" fill="#3F464C"/>
+<text x="742" y="338" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO4</text>
+<g><rect x="748" y="317" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="322" x2="773" y2="340" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="322" x2="799" y2="340" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="320" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="323" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="316" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="319" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="331" r="7" fill="#23262A"/>
+<rect x="849" y="326" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="331" r="6" fill="#3F464C"/>
+<text x="742" y="379" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO5</text>
+<g><rect x="748" y="358" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="363" x2="773" y2="381" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="363" x2="799" y2="381" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="361" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="364" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="357" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="360" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="372" r="7" fill="#23262A"/>
+<rect x="849" y="367" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="372" r="6" fill="#3F464C"/>
+<text x="742" y="420" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO6</text>
+<g><rect x="748" y="399" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="404" x2="773" y2="422" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="404" x2="799" y2="422" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="402" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="405" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="398" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="401" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="413" r="7" fill="#23262A"/>
+<rect x="849" y="408" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="413" r="6" fill="#3F464C"/>
+<text x="742" y="461" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO7</text>
+<g><rect x="748" y="440" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="445" x2="773" y2="463" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="445" x2="799" y2="463" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="443" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="446" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="439" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="442" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="454" r="7" fill="#23262A"/>
+<rect x="849" y="449" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="454" r="6" fill="#3F464C"/>
+<text x="742" y="502" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO8</text>
+<g><rect x="748" y="481" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="486" x2="773" y2="504" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="486" x2="799" y2="504" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="484" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="487" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="480" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="483" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="495" r="7" fill="#23262A"/>
+<rect x="849" y="490" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="495" r="6" fill="#3F464C"/>
+<text x="742" y="543" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO9</text>
+<g><rect x="748" y="522" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="527" x2="773" y2="545" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="527" x2="799" y2="545" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="525" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="528" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="521" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="524" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="536" r="7" fill="#23262A"/>
+<rect x="849" y="531" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="536" r="6" fill="#3F464C"/>
+<text x="742" y="584" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO10</text>
+<g><rect x="748" y="563" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="568" x2="773" y2="586" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="568" x2="799" y2="586" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="566" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="569" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="562" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="565" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="577" r="7" fill="#23262A"/>
+<rect x="849" y="572" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="577" r="6" fill="#3F464C"/>
+<text x="742" y="625" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO11</text>
+<g><rect x="748" y="604" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="609" x2="773" y2="627" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="609" x2="799" y2="627" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="607" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="610" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="603" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="606" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="618" r="7" fill="#23262A"/>
+<rect x="849" y="613" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="618" r="6" fill="#3F464C"/>
+<text x="742" y="666" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">DO12</text>
+<g><rect x="748" y="645" width="76" height="28" rx="14" fill="#0E1012" stroke="#5A6066" stroke-width="1.4"/>
+<line x1="773" y1="650" x2="773" y2="668" stroke="#3C4247" stroke-width="1"/>
+<line x1="799" y1="650" x2="799" y2="668" stroke="#3C4247" stroke-width="1"/>
+<rect x="801" y="648" width="20" height="22" rx="11" fill="#2E7D4F"/>
+<rect x="804" y="651" width="10" height="8" rx="4" fill="#4FA673" opacity="0.85"/></g>
+<g><rect x="828" y="644" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="647" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="659" r="7" fill="#23262A"/>
+<rect x="849" y="654" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="659" r="6" fill="#3F464C"/>
+<text x="742" y="707" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO1</text>
+<text x="783" y="705" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="685" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="688" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="700" r="7" fill="#23262A"/>
+<rect x="849" y="695" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="700" r="6" fill="#3F464C"/>
+<text x="742" y="748" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO2</text>
+<text x="783" y="746" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="726" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="729" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="741" r="7" fill="#23262A"/>
+<rect x="849" y="736" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="741" r="6" fill="#3F464C"/>
+<text x="742" y="789" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO3</text>
+<text x="783" y="787" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="767" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="770" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="782" r="7" fill="#23262A"/>
+<rect x="849" y="777" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="782" r="6" fill="#3F464C"/>
+<text x="742" y="830" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO4</text>
+<text x="783" y="828" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="808" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="811" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="823" r="7" fill="#23262A"/>
+<rect x="849" y="818" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="823" r="6" fill="#3F464C"/>
+<text x="742" y="871" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO5</text>
+<text x="783" y="869" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="849" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="852" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="864" r="7" fill="#23262A"/>
+<rect x="849" y="859" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="864" r="6" fill="#3F464C"/>
+<text x="742" y="912" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO6</text>
+<text x="783" y="910" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="890" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="893" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="905" r="7" fill="#23262A"/>
+<rect x="849" y="900" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="905" r="6" fill="#3F464C"/>
+<text x="742" y="953" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO7</text>
+<text x="783" y="951" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="931" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="934" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="946" r="7" fill="#23262A"/>
+<rect x="849" y="941" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="946" r="6" fill="#3F464C"/>
+<text x="742" y="994" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO8</text>
+<text x="783" y="992" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="972" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="975" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="987" r="7" fill="#23262A"/>
+<rect x="849" y="982" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="987" r="6" fill="#3F464C"/>
+<text x="742" y="1035" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO9</text>
+<text x="783" y="1033" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="1013" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="1016" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="1028" r="7" fill="#23262A"/>
+<rect x="849" y="1023" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="1028" r="6" fill="#3F464C"/>
+<text x="742" y="1076" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO10</text>
+<text x="783" y="1074" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="1054" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="1057" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="1069" r="7" fill="#23262A"/>
+<rect x="849" y="1064" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="1069" r="6" fill="#3F464C"/>
+<text x="742" y="1117" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO11</text>
+<text x="783" y="1115" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="1095" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="1098" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="1110" r="7" fill="#23262A"/>
+<rect x="849" y="1105" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="1110" r="6" fill="#3F464C"/>
+<text x="742" y="1158" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="20" fill="#E8EAEC" text-anchor="end">AO12</text>
+<text x="783" y="1156" font-family="Segoe UI, Arial" font-size="13" fill="#8C9298" text-anchor="middle">0-10V</text>
+<g><rect x="828" y="1136" width="52" height="30" rx="6" fill="#3A3E42" stroke="#0F1011"/>
+<rect x="834" y="1139" width="40" height="24" rx="5" fill="url(#term)"/>
+<circle cx="854" cy="1151" r="7" fill="#23262A"/>
+<rect x="849" y="1146" width="10" height="3" rx="1.5" fill="#71777D"/></g>
+<circle cx="898" cy="1151" r="6" fill="#3F464C"/>
+<rect x="330" y="188" width="126" height="1024" rx="7" fill="url(#tag)" stroke="#B4B4AA" stroke-width="1.5"/>
+<rect x="330" y="188" width="126" height="18" rx="7" fill="#CFCFC5"/>
+<rect x="330" y="197" width="126" height="9" fill="#CFCFC5"/>
+<line x1="330" y1="229" x2="456" y2="229" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="270" x2="456" y2="270" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="311" x2="456" y2="311" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="352" x2="456" y2="352" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="393" x2="456" y2="393" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="434" x2="456" y2="434" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="475" x2="456" y2="475" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="516" x2="456" y2="516" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="557" x2="456" y2="557" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="598" x2="456" y2="598" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="639" x2="456" y2="639" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="680" x2="456" y2="680" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="721" x2="456" y2="721" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="762" x2="456" y2="762" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="803" x2="456" y2="803" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="844" x2="456" y2="844" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="885" x2="456" y2="885" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="926" x2="456" y2="926" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="967" x2="456" y2="967" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="1008" x2="456" y2="1008" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="1049" x2="456" y2="1049" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="1090" x2="456" y2="1090" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="1131" x2="456" y2="1131" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="330" y1="1172" x2="456" y2="1172" stroke="#C6C6BC" stroke-width="1"/>
+<rect x="476" y="188" width="126" height="1024" rx="7" fill="url(#tag)" stroke="#B4B4AA" stroke-width="1.5"/>
+<rect x="476" y="188" width="126" height="18" rx="7" fill="#CFCFC5"/>
+<rect x="476" y="197" width="126" height="9" fill="#CFCFC5"/>
+<line x1="476" y1="229" x2="602" y2="229" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="270" x2="602" y2="270" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="311" x2="602" y2="311" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="352" x2="602" y2="352" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="393" x2="602" y2="393" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="434" x2="602" y2="434" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="475" x2="602" y2="475" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="516" x2="602" y2="516" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="557" x2="602" y2="557" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="598" x2="602" y2="598" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="639" x2="602" y2="639" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="680" x2="602" y2="680" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="721" x2="602" y2="721" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="762" x2="602" y2="762" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="803" x2="602" y2="803" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="844" x2="602" y2="844" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="885" x2="602" y2="885" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="926" x2="602" y2="926" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="967" x2="602" y2="967" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="1008" x2="602" y2="1008" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="1049" x2="602" y2="1049" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="1090" x2="602" y2="1090" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="1131" x2="602" y2="1131" stroke="#C6C6BC" stroke-width="1"/>
+<line x1="476" y1="1172" x2="602" y2="1172" stroke="#C6C6BC" stroke-width="1"/>
+<text x="393" y="201" font-family="Segoe UI, Arial" font-size="11" fill="#6E6E64" text-anchor="middle" letter-spacing="1">TAG</text>
+<text x="539" y="201" font-family="Segoe UI, Arial" font-size="11" fill="#6E6E64" text-anchor="middle" letter-spacing="1">TAG</text>
+<g>
+  <rect x="396" y="1300" width="272" height="216" rx="10" fill="url(#bezel)" stroke="#0D0E0F" stroke-width="2"/>
+  <rect x="410" y="1314" width="244" height="160" rx="6" fill="url(#lcd)" stroke="#5C7534" stroke-width="2"/>
+  <text x="532" y="1366" font-family="Consolas, monospace" font-size="22" fill="#2C3B16" text-anchor="middle">T3-BB</text>
+  <text x="532" y="1398" font-family="Consolas, monospace" font-size="16" fill="#33451B" text-anchor="middle">PANEL 1  UNIT 1</text>
+  <text x="532" y="1426" font-family="Consolas, monospace" font-size="16" fill="#33451B" text-anchor="middle">RUN   56 CH</text>
+  <text x="532" y="1454" font-family="Consolas, monospace" font-size="16" fill="#33451B" text-anchor="middle">192.168.0.140</text>
+  <g fill="#2A2E31" stroke="#5A6066" stroke-width="1.5">
+    <rect x="418" y="1486" width="52" height="22" rx="6"/>
+    <rect x="486" y="1486" width="52" height="22" rx="6"/>
+    <rect x="554" y="1486" width="52" height="22" rx="6"/>
+  </g>
+  <g fill="#C9CED2" font-family="Segoe UI, Arial" font-size="15" text-anchor="middle">
+    <text x="444" y="1502">&#9664;</text><text x="512" y="1502">&#9654;</text><text x="580" y="1502">&#10003;</text>
+  </g>
+</g>
+<g>
+  <rect x="700" y="1252" width="196" height="396" rx="10" fill="#1B1E21" stroke="#0D0E0F" stroke-width="2"/>
+  <rect x="712" y="1272" width="172" height="66" rx="6" fill="#26292C" stroke="#3C4247" stroke-width="1"/>
+  <text x="722" y="1296" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="17" fill="#E8EAEC">ETH1</text>
+  <text x="722" y="1316" font-family="Segoe UI, Arial" font-size="12" fill="#8C9298">10/100</text>
+  <circle cx="852" cy="1292" r="5" fill="#3F464C"/>
+  <circle cx="870" cy="1292" r="5" fill="#3F464C"/>
+  <text x="852" y="1312" font-family="Segoe UI, Arial" font-size="9" fill="#8C9298" text-anchor="middle">TX</text>
+  <text x="870" y="1312" font-family="Segoe UI, Arial" font-size="9" fill="#8C9298" text-anchor="middle">RX</text>
+  <rect x="712" y="1346" width="172" height="66" rx="6" fill="#26292C" stroke="#3C4247" stroke-width="1"/>
+  <text x="722" y="1370" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="17" fill="#E8EAEC">COM1</text>
+  <text x="722" y="1390" font-family="Segoe UI, Arial" font-size="12" fill="#8C9298">RS485 MAIN</text>
+  <circle cx="852" cy="1366" r="5" fill="#3F464C"/>
+  <circle cx="870" cy="1366" r="5" fill="#3F464C"/>
+  <text x="852" y="1386" font-family="Segoe UI, Arial" font-size="9" fill="#8C9298" text-anchor="middle">TX</text>
+  <text x="870" y="1386" font-family="Segoe UI, Arial" font-size="9" fill="#8C9298" text-anchor="middle">RX</text>
+  <rect x="712" y="1420" width="172" height="66" rx="6" fill="#26292C" stroke="#3C4247" stroke-width="1"/>
+  <text x="722" y="1444" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="17" fill="#E8EAEC">COM2</text>
+  <text x="722" y="1464" font-family="Segoe UI, Arial" font-size="12" fill="#8C9298">RS485 SUB</text>
+  <circle cx="852" cy="1440" r="5" fill="#3F464C"/>
+  <circle cx="870" cy="1440" r="5" fill="#3F464C"/>
+  <text x="852" y="1460" font-family="Segoe UI, Arial" font-size="9" fill="#8C9298" text-anchor="middle">TX</text>
+  <text x="870" y="1460" font-family="Segoe UI, Arial" font-size="9" fill="#8C9298" text-anchor="middle">RX</text>
+  <rect x="712" y="1494" width="172" height="66" rx="6" fill="#26292C" stroke="#3C4247" stroke-width="1"/>
+  <text x="722" y="1518" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="17" fill="#E8EAEC">COM3</text>
+  <text x="722" y="1538" font-family="Segoe UI, Arial" font-size="12" fill="#8C9298">RS232</text>
+  <circle cx="852" cy="1514" r="5" fill="#3F464C"/>
+  <circle cx="870" cy="1514" r="5" fill="#3F464C"/>
+  <text x="852" y="1534" font-family="Segoe UI, Arial" font-size="9" fill="#8C9298" text-anchor="middle">TX</text>
+  <text x="870" y="1534" font-family="Segoe UI, Arial" font-size="9" fill="#8C9298" text-anchor="middle">RX</text>
+  <rect x="712" y="1568" width="172" height="66" rx="6" fill="#26292C" stroke="#3C4247" stroke-width="1"/>
+  <text x="722" y="1592" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="17" fill="#E8EAEC">USB</text>
+  <text x="722" y="1612" font-family="Segoe UI, Arial" font-size="12" fill="#8C9298">OPTION</text>
+  <circle cx="852" cy="1588" r="5" fill="#3F464C"/>
+  <circle cx="870" cy="1588" r="5" fill="#3F464C"/>
+  <text x="852" y="1608" font-family="Segoe UI, Arial" font-size="9" fill="#8C9298" text-anchor="middle">TX</text>
+  <text x="870" y="1608" font-family="Segoe UI, Arial" font-size="9" fill="#8C9298" text-anchor="middle">RX</text>
+</g>
+<text x="532" y="1566" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="15" fill="#7C8288" text-anchor="middle" letter-spacing="2.5">BACNET / MODBUS</text>
+<g>
+  <text x="150" y="1586" font-family="Arial Black, Arial" font-size="60" fill="#D6DADD" letter-spacing="-2">T3000</text>
+  <text x="152" y="1616" font-family="Segoe UI Semibold, Segoe UI, Arial" font-size="17" fill="#8C9298" letter-spacing="4">CONTROLLER</text>
+  <text x="152" y="1682" font-family="Consolas, monospace" font-size="17" fill="#9AA0A6">MODEL:  T3-BB-2R</text>
+  <text x="152" y="1712" font-family="Consolas, monospace" font-size="15" fill="#6E747A">56 CH   32 UI / 12 AO / 12 RO</text>
+</g>
+<g>
+  <circle cx="372" cy="1752" r="7" fill="#35C05A"/>
+  <text x="388" y="1757" font-family="Segoe UI, Arial" font-size="13" fill="#9AA0A6">PWR</text>
+  <circle cx="452" cy="1752" r="7" fill="#3F464C"/>
+  <text x="468" y="1757" font-family="Segoe UI, Arial" font-size="13" fill="#9AA0A6">RUN</text>
+  <circle cx="532" cy="1752" r="7" fill="#3F464C"/>
+  <text x="548" y="1757" font-family="Segoe UI, Arial" font-size="13" fill="#9AA0A6">ERR</text>
+</g>
+</svg>
