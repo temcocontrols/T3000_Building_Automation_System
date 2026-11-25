@@ -4,6 +4,8 @@
 
 Goal: a field report should cost one click, arrive with the screen attached, and land on GitHub already structured enough to triage.
 
+Where this sits: filing is already mechanical — a described bug becomes a labelled, traceable issue in minutes, and the capture path is proven. What is still manual is the input: someone has to decide to tell us, and by then the screen is gone. This is step one of five. Triage automation, signal aggregation, status back to the reporter and feedback as product input come after, and are not designed here.
+
 ## 1. In-app reporting
 
 `Help → Report a Problem…` and `Help → Suggest a Feature…` in T3000, also on the All Nodes / NetInfo context menus.
