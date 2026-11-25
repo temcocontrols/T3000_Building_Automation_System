@@ -1,4 +1,4 @@
-# Issue Intake with Screenshots (Rev1)
+# In App Report a Problem (Rev1)
 
 **Status:** proposal · **Branch:** `Maurice` only · **Related:** #509, #510
 
