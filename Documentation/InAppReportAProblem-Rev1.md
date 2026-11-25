@@ -23,6 +23,21 @@ Auto-attached, all listed in a "What gets sent" panel the reporter can untick:
 
 Delivery: default mode opens a **prefilled GitHub issue** in the browser and writes the PNG beside the report — no token in the installer. Staff builds may file **directly via API**. Offline POSTs queue in `%LOCALAPPDATA%\T3000\issues\queue\` and retry on next start.
 
+### What a filed report starts as
+
+All Nodes as it stands today, marked up the way a reporter would send it:
+
+![All Nodes dialog with the bug marked up](images/InAppReportAProblem-screen.jpg)
+
+| Marker | Meaning |
+|---|---|
+| 1 | every row from 7 down is red **Offline** in Product Status |
+| 2 | `192.168.0.140` claimed by seven rows, three of which still report Online |
+| 3 | `10.0.0.4` never answers — off this LAN |
+| 4 | Delete Offline was pressed twice; the rows come back |
+
+The strip under the table is the annotator — Box / Arrow / 1 2 3 / Blur / Crop — with the legend that becomes the issue body, `screenshot.png · 1600x1000 · 96 dpi`, and **Open GitHub issue**. Mark it, glance at what gets sent, file it.
+
 ## 2. Screenshot tooling
 
 - Capture with `PrintWindow` + `PW_RENDERFULLCONTENT`, never a screen `BitBlt` (breaks on RDP and display switches).
