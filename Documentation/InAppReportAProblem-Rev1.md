@@ -47,6 +47,21 @@ The strip under the table is the annotator — Box / Arrow / 1 2 3 / Blur / Crop
 - GitHub has **no attachment API**, so images go one of two ways: commit to a throwaway `issue-assets` branch and link `raw.githubusercontent.com`, or have the reporter drag the PNG in. Mode 1 also puts ready-to-paste markdown on the clipboard.
 - Reviewing an issue page from the LAN needs the cloud host (playwright → chromium → proxy), `domcontentloaded` plus a retry loop — as used for #509.
 
+### Where the capture comes from
+
+None of the above is built into T3000. Capture, annotation and filing are the **Snagit service**, specified in `temcocontrols/Snagit2`: `Snagit2-API-Rev1.md` for the contract, `api/openapi.yaml` and `api/schemas/` for the machine-readable form.
+
+T3000 uses four things from it:
+
+| Call | What T3000 does with it |
+|---|---|
+| `GET /v1/health` | Decide whether to show the menu entry at all |
+| `POST /v1/captures` | Pass the handle of the dialog it is already showing, plus the three fields; get the bundle back |
+| `POST /v1/submissions` | File it on GitHub, or queue it when the service reports `target_unreachable` |
+| `GET /v1/submissions/{id}` | Follow a queued report until it is filed |
+
+The Snagit API document is the source of truth for field names, error codes, DPI handling and the `printwindow` / `copyfromscreen` distinction; this proposal only says which parts T3000 uses. Anything T3000 needs that is not in `/v1/` gets added to that contract first, not to T3000.
+
 ## 3. GitHub side
 
 Issue **forms** (`bug_report.yml`, `feature_request.yml`) so fields are enforced. Fixed label set: `bug`, `enhancement`, `needs-info`, `needs-repro`, `screenshot`, `stale-state`, `good-first-issue`, `community`.
